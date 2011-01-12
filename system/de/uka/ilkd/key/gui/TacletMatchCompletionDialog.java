@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -62,9 +62,9 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 	this.current = 0;
 	dataTable = new DataTable[model.length];
 
-	for (int i = 0; i < model.length; i++) {
-	    model[i].prepareUnmatchedInstantiation();
-	}
+        for (ApplyTacletDialogModel aModel : model) {
+            aModel.prepareUnmatchedInstantiation();
+        }
         
         setStatus();
 	
@@ -355,7 +355,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 		}  catch (ExceptionHandlerException ex) { 
 		    Exception exc = (Exception) ((mediator().getExceptionHandler()).getExceptions()).get(0);
 		    if (exc instanceof SVInstantiationExceptionWithPosition) {
-                        errorPositionKnown(((SVInstantiationExceptionWithPosition) exc).getMessage(),
+                        errorPositionKnown(exc.getMessage(),
                                 ((SVInstantiationExceptionWithPosition) exc).getRow(),
                                 ((SVInstantiationExceptionWithPosition) exc).getColumn(),
                                 ((SVInstantiationExceptionWithPosition) exc).inIfSequent());
@@ -437,9 +437,8 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 					// now set the new entry in the table ...
 
 					if(droppedString != null){
-					    String s = droppedString;
 							   
-					    DataTable.this.setValueAt(s, row, column);
+					    DataTable.this.setValueAt(droppedString, row, column);
 					    DataTable.this.repaint();
 					}
 					event.getDropTargetContext().dropComplete(true);
@@ -746,8 +745,8 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
             } else {
                 // Avoid resizing of HashMap
                 hm = new HashMap<String, List<List<String>>>(instFiles.length + 1, 1);
-                for (int i = 0; i < instFiles.length; i++) {
-                    hm.put(instFiles[i], null);
+                for (String instFile : instFiles) {
+                    hm.put(instFile, null);
                 }
             }
         }
@@ -755,8 +754,9 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
         private static void createListFor(Taclet taclet) {
             java.util.List<List<String>> instList = new LinkedList<List<String>>();
             java.util.List<String> instantiations = new LinkedList<String>();
+            BufferedReader br = null;
             try {
-                BufferedReader br = new BufferedReader(new FileReader(
+                br = new BufferedReader(new FileReader(
                         INSTANTIATION_DIR + File.separator
                                 + taclet.name().toString()));
                 String line = br.readLine();
@@ -787,8 +787,14 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                 if (sb.length() > 0) {
                     instantiations.add(sb.toString());
                 }
-                br.close();
             } catch (IOException e) {
+            } finally {
+                if (br != null) {
+                    try {
+	                br.close();
+                    } catch (IOException e) {
+                    }        	
+                }
             }
             if (instantiations.size() > 0) {
                 instList.add(instantiations);
@@ -801,8 +807,9 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
             TacletInstantiationsTableModel tableModel = model.tableModel();
             int start = model.tacletApp().instantiations().size();
             java.util.List<List<String>> instList = getInstantiationListsFor(taclet);
+            BufferedWriter bw = null;
             try {
-                BufferedWriter bw = new BufferedWriter(new FileWriter(
+                bw = new BufferedWriter(new FileWriter(
                         INSTANTIATION_DIR + File.separator
                                 + taclet.name().toString()));
                 StringBuffer sb = new StringBuffer();
@@ -833,8 +840,14 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                         }
                     }
                 }
-                bw.close();
             } catch (IOException e) {
+            } finally {
+                if (bw != null) {
+                    try {
+	                bw.close();
+                    } catch (IOException e) {
+                    }        	
+                }
             }
             hm.put(taclet.name().toString(), null);
         }

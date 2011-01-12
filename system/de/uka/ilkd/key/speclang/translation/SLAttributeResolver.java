@@ -9,19 +9,60 @@
 
 package de.uka.ilkd.key.speclang.translation;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.FieldDeclaration;
+import de.uka.ilkd.key.java.declaration.FieldSpecification;
+import de.uka.ilkd.key.java.declaration.MemberDeclaration;
+import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 
 public final class SLAttributeResolver extends SLExpressionResolver {
-
     
-    public SLAttributeResolver(JavaInfo javaInfo, SLResolverManager manager) {
-        super(javaInfo, manager);
+    public SLAttributeResolver(JavaInfo javaInfo, 
+	    		       SLResolverManager manager,
+	    		       KeYJavaType specInClass) {
+        super(javaInfo, manager, specInClass);
     }
+    
+    
+    private ProgramVariable lookupVisibleAttribute(String name,
+	    					   KeYJavaType containingType) {
+	final TypeDeclaration td
+		= (TypeDeclaration) containingType.getJavaType();
+	//lookup locally
+	for(MemberDeclaration md : td.getMembers()) {
+	    if(md instanceof FieldDeclaration
+		    && isVisible(md, containingType)) {
+		for(FieldSpecification fs
+			: ((FieldDeclaration)md).getFieldSpecifications()) {
+		    if(fs.getProgramName().equals(name)) {
+			return (ProgramVariable) fs.getProgramVariable();
+		    }
+		}
+	    }
+	}
+
+	//recursively lookup in supertypes
+	ImmutableList<KeYJavaType> sups = td.getSupertypes();
+	if(sups.isEmpty()
+		&& !containingType.equals(javaInfo.getJavaLangObject())) {
+	    sups = sups.prepend(javaInfo.getJavaLangObject());
+	}
+	for(KeYJavaType sup : sups) {
+	    final ProgramVariable res = lookupVisibleAttribute(name, sup);
+	    if(res != null) {
+		return res;
+	    }
+	}
+
+	//not found
+	return null;
+    }    
     
 
     @Override
@@ -56,16 +97,18 @@ public final class SLAttributeResolver extends SLExpressionResolver {
         } catch(IllegalArgumentException e){
             //try as short name and in enclosing classes
             KeYJavaType containingType = receiver.getType();
-            while(attribute == null){
-                attribute = javaInfo.lookupVisibleAttribute(name, 
-                	                                    containingType);
-                if(attribute == null){
+            while(attribute == null) {
+                attribute = lookupVisibleAttribute(name, containingType);
+                if(attribute == null) {
                     attribute 
-                    	= javaInfo.lookupVisibleAttribute(ImplicitFieldAdder.FINAL_VAR_PREFIX+name, containingType);
+                    	= lookupVisibleAttribute(
+                    		ImplicitFieldAdder.FINAL_VAR_PREFIX + name, 
+                    		containingType);
                 }
-                LocationVariable et 
-                	= (LocationVariable) javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, 
-                					           containingType);
+                final LocationVariable et 
+                	= (LocationVariable) javaInfo.getAttribute(
+                		ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, 
+                		containingType);
                 if(et != null && attribute == null){
                     containingType = et.getKeYJavaType();
                     if(recTerm != null){

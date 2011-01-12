@@ -1592,7 +1592,7 @@ keyjavatype returns [KeYJavaType kjt=null]
        }
      }
      
-     //XXX
+     //HEAP
      if(kjt == null) {
 	Sort sort = lookupSort(type);
 	if(sort != null) {

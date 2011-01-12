@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -94,10 +94,9 @@ public class MaxRuleAppSlider extends JSlider {
     }
 
     private void updateAllSliders(){
-	Iterator<MaxRuleAppSlider> it = allInstances.iterator();
-	while(it.hasNext()){
-	    it.next().refresh();
-	}
+        for (MaxRuleAppSlider allInstance : allInstances) {
+            allInstance.refresh();
+        }
     }
 
     public void setMediator(KeYMediator mediator) {

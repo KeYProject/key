@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -352,7 +352,7 @@ public final class EnhancedForInvRule extends AbstractMetaOperator {
         stmnt.add((Statement) w.result());
         StatementBlock s =
                 new StatementBlock(
-                        stmnt.toArray(new Statement[0]));
+                        stmnt.toArray(new Statement[stmnt.size()]));
         Statement resSta;
         if (svInst.getExecutionContext() != null)
             resSta = new MethodFrame(null, svInst.getExecutionContext(), s);
@@ -489,7 +489,7 @@ public final class EnhancedForInvRule extends AbstractMetaOperator {
                         addContext(
                                 root,
                                 new StatementBlock(
-                                        breakIfCascade.toArray(new Statement[0]))),
+                                        breakIfCascade.toArray(new Statement[breakIfCascade.size()]))),
                         post
                         );
         return TB.imp(TB.equals(

@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -85,4 +85,10 @@ public final class TypeCondition extends VariableConditionAdapter {
         }               
         return (isReference ? "" : "\\not" ) + prefix + "( " + resolver + " )";            
     }
+    
+
+    /**
+     * @return returns value of <code>resolver</code>.
+     */
+    public TypeResolver getTypeResolver() {return resolver;}
 }

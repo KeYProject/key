@@ -1,23 +1,23 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License.
+// The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//
-//
+
 package de.uka.ilkd.key.proof.init;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.parser.KeYLexer;
 import de.uka.ilkd.key.parser.KeYParser;
 import de.uka.ilkd.key.parser.ParserConfig;
 import de.uka.ilkd.key.parser.ParserMode;
-import de.uka.ilkd.key.proof.CountingBufferedInputStream;
+import de.uka.ilkd.key.proof.CountingBufferedReader;
 
 /**
  * Used for TESTS ONLY as we allow there to declare program variables global
@@ -42,9 +42,9 @@ public class KeYFileForTests extends KeYFile {
 	if (initConfig==null) {
 	    throw new IllegalStateException("KeYFile: InitConfig not set.");
 	}
+	CountingBufferedReader cinp = null;
 	try {
-	    final CountingBufferedInputStream cinp =
-		new CountingBufferedInputStream
+	    cinp = new CountingBufferedReader
 		    (getNewStream(),monitor,getNumberOfChars()/100);
 	    final ParserConfig pc = 
 		new ParserConfig(initConfig.getServices(), 
@@ -59,6 +59,14 @@ public class KeYFileForTests extends KeYFile {
 	    throw new ProofInputException(e);
 	} catch (FileNotFoundException ioe) {
             throw new ProofInputException(ioe);
+        } finally {
+            if (cinp != null) {
+        	try {
+	            cinp.close();
+                } catch (IOException ioe) {
+                    throw new ProofInputException(ioe);
+                }
+            }
         }
     }
     

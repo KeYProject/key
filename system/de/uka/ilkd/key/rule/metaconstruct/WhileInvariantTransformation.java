@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -15,14 +15,13 @@ package de.uka.ilkd.key.rule.metaconstruct;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
-import org.apache.log4j.Logger;
-
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
 /**
@@ -292,7 +291,7 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
             }
             
             if(breakInnerLabel != breakOuterLabel)
-                Logger.getRootLogger().warn("inner and outer label must be the same in WhileInvariantTransformation.performActionOnEnhancedFor");
+                Debug.log4jWarn("inner and outer label must be the same in WhileInvariantTransformation.performActionOnEnhancedFor", null);
             
             Statement body = (Statement)changeList.get(Statement.class);
             

@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -75,7 +75,7 @@ public class FindTacletAppContainer extends TacletAppContainer {
     /**
      * @return true iff a subformula that contains the find position stored by
      * this object has been altered since the creation of this object or if a 
-     * preceeding update has changed
+     * preceding update has changed
      */
     private boolean subformulaOrPreceedingUpdateHasChanged ( Goal p_goal ) {
     	ImmutableList<FormulaChangeInfo> infoList =

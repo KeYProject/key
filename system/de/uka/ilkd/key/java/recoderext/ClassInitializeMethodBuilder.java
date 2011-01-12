@@ -1,10 +1,11 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+//
 //
 // This file is part of KeY - Integrated Deductive Software Design
 // Copyright (C) 2001-2004 Universitaet Karlsruhe, Germany
@@ -89,9 +90,19 @@ public class ClassInitializeMethodBuilder
      * constant fields is due to binary compatibility reasons.
      */
     private boolean isConstantField(FieldSpecification spec) {
-	return spec.isStatic() && spec.isFinal() &&
-	    services.getConstantEvaluator().
-	    isCompileTimeConstant(spec.getInitializer());
+	boolean result = spec.isStatic() && spec.isFinal();
+	if (!result) {
+		return result;
+	}
+	recoder.service.ConstantEvaluator ce = services.getConstantEvaluator(); 
+	
+	try {
+	    result = ce.isCompileTimeConstant(spec.getInitializer()); 
+	} catch (java.lang.ArithmeticException t) {
+	    result = false;
+	}
+	
+	return result;
     }
 
     /** creates the package reference java.lang */

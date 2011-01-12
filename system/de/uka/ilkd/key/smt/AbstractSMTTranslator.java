@@ -12,8 +12,6 @@ package de.uka.ilkd.key.smt;
 
 import java.util.*;
 
-import org.apache.log4j.Logger;
-
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -44,9 +42,7 @@ import de.uka.ilkd.key.util.Debug;
  *
  */
 public abstract class AbstractSMTTranslator implements SMTTranslator {
-    static Logger logger = Logger.getLogger(AbstractSMTTranslator.class
-	    .getName());
-    
+
     private static final TermBuilder TB = TermBuilder.DF;
 
     private Sort integerSort;
@@ -1672,7 +1668,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 		subs[i] = TB.var(lv);
 		argsorts[i] = lv.sort();
 	    } else {
-		logger.error("Schema variable found in formula.");
+		Debug.log4jError("Schema variable found in formula.", AbstractSMTTranslator.class.getName());
 	    }
 	}
 	//invent a new predicate
@@ -1735,7 +1731,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    Operator op = term.op();
 	    if (term.sort() == Sort.FORMULA) {
 		//predicate
-		logger.debug("Translated as uninterpreted predicate:\n" + term.toString());
+		Debug.log4jDebug("Translated as uninterpreted predicate:\n" + term.toString(), AbstractSMTTranslator.class.getName());
 		ArrayList<StringBuffer> subterms = new ArrayList<StringBuffer>();
 		for (int i = 0; i < op.arity(); i++) {
 		    subterms.add(translateTerm(term.sub(i), quantifiedVars,
@@ -1750,7 +1746,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 		return translatePred(op, subterms);
 	    } else {
 		//function
-		logger.debug("Translated as uninterpreted function:\n" + term.toString());
+		Debug.log4jDebug("Translated as uninterpreted function:\n" + term.toString(), AbstractSMTTranslator.class.getName());
 		ArrayList<StringBuffer> subterms = new ArrayList<StringBuffer>();
 		for (int i = 0; i < op.arity(); i++) {
 		    subterms.add(translateTerm(term.sub(i), quantifiedVars,

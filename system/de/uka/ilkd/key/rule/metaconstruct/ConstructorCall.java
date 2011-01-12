@@ -1,21 +1,16 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 //
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2004 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.*;
@@ -49,13 +44,23 @@ public class ConstructorCall extends ProgramMetaConstruct {
     
     private final SchemaVariable newObjectSV;
 
+    
+    /** 
+     * creates the metaconstruct
+     */
+    protected ConstructorCall(Name name, 
+	    SchemaVariable newObjectSV,
+	    ProgramElement consRef) {
+	super(name, consRef);
+	this.newObjectSV = newObjectSV;
+    }
+    
     /** 
      * creates the metaconstruct
      */
     public ConstructorCall(SchemaVariable newObjectSV,
 			   ProgramElement consRef) {
-	super(new Name("constructor-call"), consRef);
-	this.newObjectSV = newObjectSV;
+	this(new Name("constructor-call"), newObjectSV, consRef);
     }
 
     /** 
@@ -73,18 +78,31 @@ public class ConstructorCall extends ProgramMetaConstruct {
     public ProgramElement symbolicExecution
 	(ProgramElement pe, Services services, SVInstantiations svInst) {
 
-	New constructorReference = (New) pe;
-	ProgramVariable newObject = 
-	    (ProgramVariable) svInst.getInstantiation(newObjectSV);
-	KeYJavaType classType = constructorReference.getTypeReference().getKeYJavaType();		
-
-	final ExecutionContext ec = svInst.getExecutionContext();	
+	final New constructorReference = (New) pe;	
+	final KeYJavaType classType = constructorReference.getTypeReference().getKeYJavaType();			
     
 	if (!(classType.getJavaType() instanceof ClassDeclaration)) {
 	    // no implementation available
 	    return pe;
 	}
 	
+	final List<Statement> stmnts = constructorCallSequence(constructorReference,
+                classType, svInst, services);
+    
+	return new StatementBlock(stmnts.toArray(new Statement[stmnts.size()]));
+    	
+    }
+
+    /**
+     * returns a sequence of statements modelling the Java constructor call semantics explicitly 
+     */
+    protected List<Statement> constructorCallSequence(
+            final New constructorReference, final KeYJavaType classType,
+            SVInstantiations svInst, Services services) {
+	
+	final ProgramVariable newObject = 
+	    (ProgramVariable) svInst.getInstantiation(newObjectSV);
+	final ExecutionContext ec = svInst.getExecutionContext();	
 	final ImmutableArray<Expression> arguments = 
 	    constructorReference.getArguments();
 	
@@ -103,7 +121,7 @@ public class ConstructorCall extends ProgramMetaConstruct {
 	                services, ec);	  
 	}
         
-	if(j==1){
+	if ( j == 1 ) {
             Sort s = services.getJavaInfo().getAttribute(ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, classType).sort();
 	    Expression enclosingThis = (Expression) (constructorReference.getReferencePrefix() instanceof Expression?
 	            constructorReference.getReferencePrefix() :
@@ -113,27 +131,27 @@ public class ConstructorCall extends ProgramMetaConstruct {
 	        EvaluateArgs.evaluate(enclosingThis, evaluatedArgs, 
 	                        services, ec);    
 	}
+	
 	ProgramMethod method = services.getJavaInfo().
-	  getProgramMethod(classType, NORMALFORM_IDENTIFIER, 
-              (ProgramVariable[])argumentVariables, ec.
+	  getProgramMethod(classType, NORMALFORM_IDENTIFIER,
+              argumentVariables, ec.
               getTypeReference().getKeYJavaType());
 	
 	Debug.assertTrue(method != null, "Call to non-existent constructor.");
     
 	final MethodBodyStatement mbs = new MethodBodyStatement(method, newObject, null, 
                new ImmutableArray<Expression>(argumentVariables)); 
-    
-	//   the assignment statements + the method body statement
-	final Statement[] stmnts = new Statement[evaluatedArgs.size() + 1];
-    
-	for (int i = 0, sz=evaluatedArgs.size(); i<sz; i++) {
-	    stmnts[i] = (Statement)evaluatedArgs.get(i); 
-	}
 	
-	stmnts[stmnts.length-1] = mbs;
-    
-	return new StatementBlock(stmnts);
-    	
+        //   the assignment statements + the method body statement + <allocateArea> for memory areas  
+	final ArrayList<Statement> stmnts = new ArrayList<Statement>();
+
+	for (int i = 0, sz=evaluatedArgs.size(); i<sz; i++) {
+	    stmnts.add(evaluatedArgs.get(i));
+	}               
+
+        stmnts.add(mbs); 
+	
+	return stmnts;
     }
 
 }

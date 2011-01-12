@@ -1,10 +1,11 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+//
 //
 
 
@@ -95,8 +96,8 @@ public class VariableNameProposer implements InstantiationProposer {
         if (proposals == null) return;
         String[] props = proposals.toString().split(",|;");
 
-        for (int i = 0; i < props.length; i++) {
-            oldAnonUpdateProposals = oldAnonUpdateProposals.append(new Name(props[i]));
+        for (String prop : props) {
+            oldAnonUpdateProposals = oldAnonUpdateProposals.append(new Name(prop));
         }
 
     }

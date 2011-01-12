@@ -290,4 +290,6 @@
 ./standard_key/staticInitialisation/localDeclaredMethod.key
 ./standard_key/staticInitialisation/objectOfErroneousClass.key
 ./standard_key/staticInitialisation/staticInitialisersAreNonSimple.key
+./standard_key/strings/charAt0.key
+./standard_key/strings/charAt1.key
 ./_testcase/classpath/classpath.key

@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -56,8 +56,8 @@ public class InnerVariableNamer extends VariableNamer {
         if (proposals == null) return;
         String[] props = proposals.toString().split(",|;");
 
-        for (int i = 0; i < props.length; i++) {
-            oldProgVarProposals = oldProgVarProposals.append(new Name(props[i]));
+        for (String prop : props) {
+            oldProgVarProposals = oldProgVarProposals.append(new Name(prop));
         }
 
     }
@@ -114,7 +114,7 @@ public class InnerVariableNamer extends VariableNamer {
         
         if (!newname.equals(name)) {        
             newvar = new LocationVariable(newname,
-                    var.getKeYJavaType());
+                    			  var.getKeYJavaType());
             map.put(var, newvar);
             renamingHistory = map;
             //execute renaming
@@ -124,4 +124,5 @@ public class InnerVariableNamer extends VariableNamer {
         
         return newvar;
     }
+
 }

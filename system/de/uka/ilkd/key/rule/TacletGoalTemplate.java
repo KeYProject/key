@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -120,12 +120,10 @@ public class TacletGoalTemplate {
     protected ImmutableSet<QuantifiableVariable> getBoundVariables() {
 	ImmutableSet<QuantifiableVariable> result
 	    =DefaultImmutableSet.<QuantifiableVariable>nil();
-	
-        final Iterator<Taclet> tacletIt=rules().iterator();
-	
-        while (tacletIt.hasNext()) {
-	    result=result.union(tacletIt.next().getBoundVariables());
-	}	    
+
+        for (Taclet taclet : rules()) {
+            result = result.union(taclet.getBoundVariables());
+        }
 	
         final BoundVarsVisitor bvv = new BoundVarsVisitor();
         bvv.visit(sequent());

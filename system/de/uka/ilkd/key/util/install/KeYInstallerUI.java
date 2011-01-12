@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -25,12 +25,12 @@ public abstract class KeYInstallerUI extends KeYInstaller {
      * returns true if the given character occurs in the list
      */
     public boolean containsChar ( char c, char[] chars ) {
-	
-	for ( int i = 0; i < chars.length; i++ ) {
-	    if ( chars[i] == c ) {
-		return true;
-	    }
-	}
+
+        for (char aChar : chars) {
+            if (aChar == c) {
+                return true;
+            }
+        }
 	
 	return false;
     }

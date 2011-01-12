@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -22,8 +22,6 @@ import java.io.Writer;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 
-import org.apache.log4j.Logger;
-
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.logic.Named;
@@ -33,6 +31,7 @@ import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.ApplyTacletDialogModel;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.pp.StringBackend;
 
 
@@ -110,9 +109,8 @@ public abstract class ApplyTacletDialog extends JDialog {
         JPanel panel = new JPanel(new BorderLayout());	
         panel.setBorder
         (new TitledBorder("Selected Taclet - "+model[0].taclet().name()));
-        if (logger.isDebugEnabled()) {
-            logger.debug("TacletApp: "+model[0].taclet());
-        }
+        Debug.log4jDebug("TacletApp: "+model[0].taclet(), ApplyTacletDialog.class.getName());
+        
         Taclet taclet = model[0].taclet();
         StringBackend backend = new StringBackend(68);
         StringBuffer tacletSB = new StringBuffer();
@@ -195,6 +193,4 @@ public abstract class ApplyTacletDialog extends JDialog {
     protected void closeDlg() {
 	mediator.freeModalAccess(this);
     }
-    
-    static Logger logger = Logger.getLogger(ApplyTacletDialog.class.getName());
 }

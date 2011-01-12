@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -16,8 +16,8 @@ import recoder.abstraction.*;
 import recoder.java.declaration.TypeDeclaration;
 import recoder.kit.UnitKit;
 import recoder.service.DefaultNameInfo;
-import recoder.service.KeYCrossReferenceSourceInfo;
 import de.uka.ilkd.key.java.ConvertException;
+import de.uka.ilkd.key.util.Debug;
 
 
 
@@ -74,7 +74,9 @@ public class KeYCrossReferenceNameInfo extends DefaultNameInfo {
             } else {
                 d2 = old.toString();
             }
-            throw new ConvertException("Datatype " + name + " declared twice: Once in " + d1 + " and once in " + d2);
+            Debug.log4jWarn("Datatype " + name + " declared twice: Once in " + d1 + " and once in " + d2+", Keeping one from " + d2,
+        	    	    KeYCrossReferenceNameInfo.class.getName());
+            return;
         }
         
         super.register(ct);

@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -19,73 +19,73 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.util.ExtList;
 
-/** 
- * Replaces field references o.a by methodcalls o._a(). This is needed for 
- * unit test generation.
+/**
+ * Replaces field references o.a by methodcalls o._a(). This is needed for unit
+ * test generation.
  */
-public class FieldReplaceVisitor extends CreatingASTVisitor{
+public class FieldReplaceVisitor extends CreatingASTVisitor {
 
-    private ProgramElement result=null;
-//    private KeYJavaType containingKJT=null
+    private ProgramElement result = null;
 
-    public FieldReplaceVisitor(ProgramElement pe, Services services){
+    // private KeYJavaType containingKJT=null
+
+    public FieldReplaceVisitor(final ProgramElement pe, final Services services) {
 	super(pe, true, services);
     }
 
-    /** starts the walker*/
-    public void start() {	
-	stack.push(new ExtList());		
+    /** starts the walker */
+    @Override
+    public void start() {
+	stack.push(new ExtList());
 	walk(root());
-	ExtList el= stack.peek();
-	int i=0;
+	final ExtList el = stack.peek();
+	int i = 0;
 	while (!(el.get(i) instanceof ProgramElement)) {
 	    i++;
 	}
 	result = (ProgramElement) stack.peek().get(i);
     }
 
-    public ProgramElement result() { 	
+    public ProgramElement result() {
 	return result;
     }
 
-
-    public void performActionOnFieldReference(FieldReference x) {
-        ExtList changeList = stack.peek();
-        if (changeList.getFirst() == CHANGED) {
-            changeList.removeFirst();
+    @Override
+    @SuppressWarnings("unchecked")
+    public void performActionOnFieldReference(final FieldReference x) {
+	final ExtList changeList = stack.peek();
+	if (changeList.getFirst() == CHANGED) {
+	    changeList.removeFirst();
 	}
 	changeList.removeFirstOccurrence(PositionInfo.class);
 	if (x.getReferencePrefix() != null) {
-	    Expression field = (Expression) changeList.get(1);
-	    if (field instanceof ProgramVariable) {		
-                final String shortName = ((ProgramVariable) field).
-                        getProgramElementName().getProgramName();
-                if("length".equals(shortName)){
-		    ExtList l = new ExtList();
+	    final Expression field = (Expression) changeList.get(1);
+	    if (field instanceof ProgramVariable) {
+		final String shortName = ((ProgramVariable) field)
+		        .getProgramElementName().getProgramName();
+		if ("length".equals(shortName)) {
+		    final ExtList l = new ExtList();
 		    l.add(changeList.get(0));
 		    addChild(new ArrayLengthReference(l));
-		}else{
-		    String typeName = ((ProgramVariable) x.getChildAt(1)).
-			getKeYJavaType().getName();
-		    typeName = 
-			PrettyPrinter.getTypeNameForAccessMethods(typeName);
-		    addChild(new MethodReference(
-				 new ExtList(), new ProgramElementName(
-				     "_"+shortName+typeName),
-				 (ReferencePrefix) changeList.get(0)));
+		} else {
+		    String typeName = ((ProgramVariable) x.getChildAt(1))
+			    .getKeYJavaType().getName();
+		    typeName = PrettyPrinter
+			    .getTypeNameForAccessMethods(typeName);
+		    addChild(new MethodReference(new ExtList(),
+			    new ProgramElementName("_" + shortName + typeName),
+			    (ReferencePrefix) changeList.get(0)));
 		}
 	    }
 	} else {
-	    String typeName = ((ProgramVariable) x.getChildAt(0)).
-		getKeYJavaType().getName();
+	    String typeName = ((ProgramVariable) x.getChildAt(0))
+		    .getKeYJavaType().getName();
 	    typeName = PrettyPrinter.getTypeNameForAccessMethods(typeName);
-	    addChild(new MethodReference(
-			 new ExtList(), 
-			 new ProgramElementName(
-			     "_"+((ProgramVariable)changeList.get(0)).
-                              getProgramElementName().
-                              getProgramName()+typeName),
-			 null));
+	    addChild(new MethodReference(new ExtList(), new ProgramElementName(
+		    "_"
+		            + ((ProgramVariable) changeList.get(0))
+		                    .getProgramElementName().getProgramName()
+		            + typeName), null));
 	}
 	changed();
     }

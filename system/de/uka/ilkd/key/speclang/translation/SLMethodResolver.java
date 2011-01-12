@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -7,9 +7,8 @@
 // See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.speclang.translation;
 
-import java.util.Iterator;
+package de.uka.ilkd.key.speclang.translation;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.JavaInfo;
@@ -23,8 +22,10 @@ import de.uka.ilkd.key.logic.op.ProgramMethod;
 
 public final class SLMethodResolver extends SLExpressionResolver {
   
-    public SLMethodResolver(JavaInfo javaInfo, SLResolverManager manager) {
-        super(javaInfo, manager);
+    public SLMethodResolver(JavaInfo javaInfo, 
+	    		    SLResolverManager manager,
+	    		    KeYJavaType specInClass) {
+        super(javaInfo, manager, specInClass);
     }
     
 
@@ -96,11 +97,10 @@ public final class SLMethodResolver extends SLExpressionResolver {
             subs[0] = TB.heap(services);
             i = 1;
         }
-        
-        Iterator<SLExpression> it = parameters.getParameters().iterator();
-        while(it.hasNext()) {
+
+        for (SLExpression slExpression : parameters.getParameters()) {
             //Remember: parameters.isLisOfTerm() is true!
-            subs[i++] = it.next().getTerm();
+            subs[i++] = slExpression.getTerm();
         }
         
         if (pm.getKeYJavaType() == null) {

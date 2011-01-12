@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -65,15 +65,14 @@ public class TestDeclarationProgramVariableCollector  extends TestCase {
     
     private HashSet toNames(Set programVariables) {
 	HashSet result = new HashSet();
-	Iterator it = programVariables.iterator(); 
-	while (it.hasNext()) {
-	    String name = ""+((Named)it.next()).name();
-	    if (result.contains(name)) {
-		System.out.println("Warning: Program variables have same name."+
-				   " Probably unsane test case");
-	    }
-	    result.add(name);
-	}
+        for (Object programVariable : programVariables) {
+            String name = "" + ((Named) programVariable).name();
+            if (result.contains(name)) {
+                System.out.println("Warning: Program variables have same name." +
+                        " Probably unsane test case");
+            }
+            result.add(name);
+        }
 	return result;
     }
     

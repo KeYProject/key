@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -59,7 +59,7 @@ public class RuleSource {
         URL u = KeYResourceManager.getManager().
             getResourceFile(RuleSource.class, "rules/" + filename);
         if (u == null) {
-            // a more specific exception type woul probably be better
+            // a more specific exception type would probably be better
             throw new RuntimeException("Could not find rule file "+filename);
         }
 	return new RuleSource(u);
@@ -104,7 +104,7 @@ public class RuleSource {
            localURL = url; 
        } else {
            try {
-               localURL = f.toURL();
+               localURL = f.toURI().toURL();
            } catch (MalformedURLException e) {
                return null;
            }
@@ -137,15 +137,20 @@ public class RuleSource {
     }
 
     public boolean isAvailable() {
-        InputStream is; 
+        InputStream is = null; 
         try {
             is = getNewStream();
-            is.close();
         } catch (RuntimeException re) {           
             return false;
-        } catch (IOException e) {
-            return false;
-        }        
-        return true;
+        } finally {
+            if (is != null) {
+        	try {
+	            is.close();
+                } catch (IOException e) {
+                    return false;
+                }
+            }
+        }
+        return is != null;
     }
 }

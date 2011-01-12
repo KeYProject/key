@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -10,15 +10,15 @@
 
 package de.uka.ilkd.key.speclang.jml;
 
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 
-class JMLInfoExtractor {
+public class JMLInfoExtractor {
 
     // Information about Fields...
     
@@ -147,12 +147,94 @@ class JMLInfoExtractor {
      * Returns true, if the given method is specified "pure".
      */
     public static boolean isPure(ProgramMethod pm) {
+        return hasJMLModifier(pm, "pure") || isPureByDefault(pm.getContainerType());
+    }
+    
+    /**
+     * Returns true, if the given method is specified "scopeSafe".
+     */
+    public static boolean isScopeSafe(ProgramMethod pm) {
+        return hasJMLModifier(pm, "scopeSafe");
+    }
+    
+    /**
+     * Returns true, if the receiver object of the given method is specified arbitraryScopeThis.
+     */
+    public static boolean arbitraryScopeThis(ProgramMethod pm) {
+        return hasJMLModifier(pm, "arbitraryScopeThis");
+    }
+    
+    /**
+     * Returns true, if the result of the given method is specified arbitraryScope.
+     */
+    public static boolean resultArbitraryScope(ProgramMethod pm) {
+        return hasJMLModifier(pm, "arbitraryScope");
+    }
+    
+    /**
+     * Returns true, iff the <code>pos</code>-th parameter of the given method
+     * is declared "arbitraryScope". 
+     */
+    public static boolean parameterInArbitraryScope(ProgramMethod pm, int pos) {
+
+        MethodDeclaration md = pm.getMethodDeclaration();
+        ParameterDeclaration pd = md.getParameterDeclarationAt(pos);
+
+        ImmutableList<Comment> comments = ImmutableSLList.<Comment>nil();
+        comments = comments.prepend(pd.getComments());
+        comments = comments.prepend(pd.getTypeReference().getComments());
+        comments = comments.prepend(pd.getVariableSpecification().getComments());
+        for (int j=0; j < pd.getModifiers().size(); j++) {
+            comments = comments.prepend(pd.getModifiers().get(j).getComments());
+        }
+        for (Comment c : comments ) {
+            if (checkFor("arbitraryScope",c.getText())){
+                return true;
+            }
+        }
+        
+        return false;
+    }
+
+
+    public static boolean hasJMLModifier(ClassDeclaration cd, String mod){
+        ImmutableList<Comment> coms = ImmutableSLList.<Comment>nil();
+        ImmutableArray<Modifier> mods = cd.getModifiers();
+        for (int i=0; i < mods.size(); i++) {
+            coms = coms.prepend(mods.get(i).getComments());
+        } 
+        for (Comment c : coms) {
+            if (checkFor(mod, c.getText()))
+                return true;
+        }
+        return false;
+    }
+    
+    
+    public static boolean hasJMLModifier(FieldDeclaration fd, String mod){
+        ImmutableList<Comment> coms 
+        	= ImmutableSLList.<Comment>nil().prepend(fd.getComments());
+        for(Modifier m : fd.getModifiers()) {
+            coms = coms.prepend(m.getComments());
+        } 
+        coms = coms.prepend(fd.getTypeReference().getComments());
+        
+        for(Comment c : coms) {
+            if(checkFor(mod, c.getText())) {
+                return true;
+            }
+        }
+        return false;
+    }    
+    
+    
+    public static boolean hasJMLModifier(ProgramMethod pm, String mod){
         ImmutableList<Comment> coms = ImmutableSLList.<Comment>nil();
         MethodDeclaration method = pm.getMethodDeclaration();
         
-        // Either "pure" is attached to a modifier ....
-        for (final Modifier mod : method.getModifiers()) {
-            coms = coms.prepend(mod.getComments());
+        // Either mod is attached to a modifier ....
+        for (final Modifier mo : method.getModifiers()) {
+            coms = coms.prepend(mo.getComments());
         }      
         
         // .... or to the return type ....
@@ -170,11 +252,10 @@ class JMLInfoExtractor {
         coms = coms.prepend(method.getProgramElementName().getComments());
         
         for (Comment c : coms) {
-            if (checkFor("pure", c.getText()))
+            if (checkFor(mod, c.getText()))
                 return true;
         }
-        
-        return isPureByDefault(pm.getContainerType());
+        return false;
     }
     
     

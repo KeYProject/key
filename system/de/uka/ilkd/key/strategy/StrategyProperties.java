@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Designs
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -52,6 +52,12 @@ public final class StrategyProperties extends Properties {
     public final static String QUANTIFIERS_NON_SPLITTING_WITH_PROGS = "QUANTIFIERS_NON_SPLITTING_WITH_PROGS";
     public final static String QUANTIFIERS_INSTANTIATE = "QUANTIFIERS_INSTANTIATE";
 
+    public final static String VBT_PHASE = "VBT_PHASE"; //Used for verification-based testing
+    public final static String VBT_SYM_EX = "VBT_SYM_EX";
+    public final static String VBT_QUAN_INST = "VBT_QUAN_INST";
+    public final static String VBT_MODEL_GEN = "VBT_MODEL_GEN";
+    
+
 
     public final static int USER_TACLETS_NUM = 3;
     private final static String USER_TACLETS_OPTIONS_KEY_BASE = "USER_TACLETS_OPTIONS_KEY";
@@ -73,11 +79,12 @@ public final class StrategyProperties extends Properties {
         for (int i = 1; i <= USER_TACLETS_NUM; ++i)
             defaultMap.setProperty(USER_TACLETS_OPTIONS_KEY(i), USER_TACLETS_OFF);
         defaultMap.setProperty(STOPMODE_OPTIONS_KEY, STOPMODE_DEFAULT);
+        defaultMap.setProperty(VBT_PHASE, VBT_SYM_EX);
     }
     
     public StrategyProperties() {
         put(SPLITTING_OPTIONS_KEY, defaultMap.get(SPLITTING_OPTIONS_KEY));                
-        put(LOOP_OPTIONS_KEY, defaultMap.get(LOOP_OPTIONS_KEY));                
+        put(LOOP_OPTIONS_KEY, defaultMap.get(LOOP_OPTIONS_KEY));      
         put(METHOD_OPTIONS_KEY, defaultMap.get(METHOD_OPTIONS_KEY));
         put(DEP_OPTIONS_KEY, defaultMap.get(DEP_OPTIONS_KEY));
         put(NON_LIN_ARITH_OPTIONS_KEY, defaultMap.get(NON_LIN_ARITH_OPTIONS_KEY));
@@ -85,6 +92,7 @@ public final class StrategyProperties extends Properties {
         for (int i = 1; i <= USER_TACLETS_NUM; ++i)
             put(USER_TACLETS_OPTIONS_KEY(i), defaultMap.get(USER_TACLETS_OPTIONS_KEY(i)));
         put(STOPMODE_OPTIONS_KEY, defaultMap.get(STOPMODE_OPTIONS_KEY));
+        put(VBT_PHASE, defaultMap.getProperty(VBT_PHASE));
     }
 
     public static String getDefaultProperty(String key) {
@@ -101,7 +109,7 @@ public final class StrategyProperties extends Properties {
         StrategyProperties sp = new StrategyProperties();
 
         sp.put(SPLITTING_OPTIONS_KEY, readSingleOption(p, SPLITTING_OPTIONS_KEY));                
-        sp.put(LOOP_OPTIONS_KEY, readSingleOption(p, LOOP_OPTIONS_KEY));                
+        sp.put(LOOP_OPTIONS_KEY, readSingleOption(p, LOOP_OPTIONS_KEY)); 
         sp.put(METHOD_OPTIONS_KEY, readSingleOption(p, METHOD_OPTIONS_KEY));
         sp.put(DEP_OPTIONS_KEY, readSingleOption(p,DEP_OPTIONS_KEY));
         sp.put(NON_LIN_ARITH_OPTIONS_KEY, readSingleOption(p,NON_LIN_ARITH_OPTIONS_KEY));
@@ -109,6 +117,7 @@ public final class StrategyProperties extends Properties {
         for (int i = 1; i <= USER_TACLETS_NUM; ++i)
             sp.put(USER_TACLETS_OPTIONS_KEY(i), readSingleOption(p,USER_TACLETS_OPTIONS_KEY(i)));
         sp.put(STOPMODE_OPTIONS_KEY, readSingleOption(p,STOPMODE_OPTIONS_KEY));
+        sp.put(VBT_PHASE, readSingleOption(p,VBT_PHASE));
         return sp;
     }
 
@@ -116,7 +125,7 @@ public final class StrategyProperties extends Properties {
      * @param p
      */
     private static Object readSingleOption(Properties p, String key) {
-        Object o = (String) p.get("[StrategyProperty]"+key);
+        Object o = p.get("[StrategyProperty]"+key);
         if (o == null) o = defaultMap.get(key);
         return o;
     }
@@ -131,6 +140,7 @@ public final class StrategyProperties extends Properties {
         for (int i = 1; i <= USER_TACLETS_NUM; ++i)
             p.put("[StrategyProperty]"+USER_TACLETS_OPTIONS_KEY(i), get(USER_TACLETS_OPTIONS_KEY(i)));
         p.put("[StrategyProperty]"+STOPMODE_OPTIONS_KEY, get(STOPMODE_OPTIONS_KEY));
+        p.put("[StrategyProperty]"+VBT_PHASE, get(VBT_PHASE));
     }
 
     

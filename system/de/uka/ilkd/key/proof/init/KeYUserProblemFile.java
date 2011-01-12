@@ -15,7 +15,7 @@ import java.io.FileNotFoundException;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.parser.*;
-import de.uka.ilkd.key.proof.CountingBufferedInputStream;
+import de.uka.ilkd.key.proof.CountingBufferedReader;
 import de.uka.ilkd.key.proof.ProblemLoader;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -94,8 +94,8 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         }
         
         try {
-            CountingBufferedInputStream cinp = 
-                new CountingBufferedInputStream
+            CountingBufferedReader cinp = 
+                new CountingBufferedReader
                     (getNewStream(),monitor,getNumberOfChars()/100);
             DeclPicker lexer = new DeclPicker(new KeYLexer(cinp,initConfig.getServices().getExceptionHandler()));
             

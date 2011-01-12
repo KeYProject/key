@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -107,7 +107,7 @@ public final class ProgramMethod extends ObserverFunction
      * @return the KeYJavaType of the <tt>i</tt>-th parameter
      */
     public KeYJavaType getParameterType(int i) {
-       return method.getParameterDeclarationAt(i).getTypeReference().getKeYJavaType(); 
+       return method.getParameterDeclarationAt(i).getVariableSpecification().getProgramVariable().getKeYJavaType(); 
     }
     
     public StatementBlock getBody() {

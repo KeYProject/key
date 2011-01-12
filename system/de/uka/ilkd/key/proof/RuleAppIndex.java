@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -326,11 +326,10 @@ public class RuleAppIndex  {
      * returns a list of built-in rule applications applicable
      * for the given goal, user defined constraint and position
      */
-    public ImmutableList<RuleApp> getBuiltInRule(Goal            goal, 
-					PosInOccurrence pos,
-					Constraint      userConstraint) {
+    public ImmutableList<RuleApp> getBuiltInRules(Goal g,
+	    PosInOccurrence pos, Constraint userConstraint) {
 	 	 	
-	 return builtInRuleAppIndex().getBuiltInRule(goal, pos, 
+	 return builtInRuleAppIndex().getBuiltInRule(g, pos, 
 					 	     userConstraint);
      }
 
@@ -366,16 +365,16 @@ public class RuleAppIndex  {
 
     /** 
      * called if a formula has been replaced
-     * @param goal the Goal which sequent has been changed
+     * @param g the Goal which sequent has been changed
      * @param sci SequentChangeInfo describing the change of the sequent 
      */  
-    public void sequentChanged ( Goal goal, SequentChangeInfo sci ) {
+    public void sequentChanged ( Goal g, SequentChangeInfo sci ) {
 	if ( !autoMode )
             // the TacletAppIndex is able to detect modification of the
             // sequent itself, it is not necessary to clear the index
-	    interactiveTacletAppIndex.sequentChanged ( goal, sci );
-	automatedTacletAppIndex.sequentChanged ( goal, sci );
-	builtInRuleAppIndex().sequentChanged( goal, sci );
+	    interactiveTacletAppIndex.sequentChanged ( g, sci );
+	automatedTacletAppIndex.sequentChanged ( g, sci );
+	builtInRuleAppIndex().sequentChanged( g, sci );
     }
 
     /**

@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -9,11 +9,8 @@
 //
 package de.uka.ilkd.key.gui.configuration;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Properties;
-
-import org.apache.log4j.Logger;
 
 import de.uka.ilkd.key.gui.GUIEvent;
 
@@ -26,7 +23,6 @@ import de.uka.ilkd.key.gui.GUIEvent;
  * 3) wether intermediate proofsteps should be hidden in the proof tree view
  */
 public class ViewSettings implements Settings {
-	static Logger logger = Logger.getLogger(ViewSettings.class.getName());
     private static final String MAX_TOOLTIP_LINES_KEY = "[View]MaxTooltipLines";
     private static final String SHOW_WHOLE_TACLET = "[View]ShowWholeTaclet";
     private static final String FONT_INDEX = "[View]FontIndex";
@@ -203,10 +199,9 @@ public class ViewSettings implements Settings {
      * changed to its registered listeners (not thread-safe)
      */
     protected void fireSettingsChanged() {
-	Iterator<SettingsListener> it = listenerList.iterator();
-	while (it.hasNext()) {
-	    it.next().settingsChanged(new GUIEvent(this));
-	}
+        for (SettingsListener aListenerList : listenerList) {
+            aListenerList.settingsChanged(new GUIEvent(this));
+        }
     }
 
     /** 

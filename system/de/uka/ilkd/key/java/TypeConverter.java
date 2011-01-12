@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -44,13 +44,14 @@ public final class TypeConverter {
     private FloatLDT floatLDT;
     private DoubleLDT doubleLDT;
     
+    
+    private StringConverter stringConverter;
     private ImmutableList<LDT> models = ImmutableSLList.<LDT>nil();
-
-    public static StringConverter stringConverter = new StringConverter();
     
 
     TypeConverter(Services s){
         services = s;       
+        stringConverter = new StringConverter(s); //TODO replace with stringLDT 
     }
 
     
@@ -72,7 +73,7 @@ public final class TypeConverter {
             this.floatLDT = (FloatLDT)ldt;
         } else if (ldt instanceof DoubleLDT) {
             this.doubleLDT = (DoubleLDT)ldt;
-        }
+        } 
 
         this.models = this.models.prepend(ldt);
         Debug.out("Initialize LDTs: ", ldt);
@@ -80,8 +81,8 @@ public final class TypeConverter {
     
     
     public void init(ImmutableList<LDT> ldts) {
-	for(LDT ldt : ldts) {
-	    init(ldt);
+        for (LDT ldt : ldts) {
+            init(ldt);
 	}
     }
     
@@ -351,7 +352,9 @@ public final class TypeConverter {
 	    }
 	} else if (pe instanceof ThisReference) {
 	    return convertReferencePrefix((ThisReference)pe, ec);
-	} else if (pe instanceof ParenthesizedExpression) {
+	} /*else if (pe instanceof CurrentMemoryAreaReference) {   
+            return convertToLogicElement(ec.getMemoryArea());
+        } */else if (pe instanceof ParenthesizedExpression) {
             return convertToLogicElement
                 (((ParenthesizedExpression)pe).getChildAt(0), ec);
         } else if (pe instanceof Instanceof) {
@@ -454,8 +457,8 @@ public final class TypeConverter {
             return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LOCSET);
         if (t1 == PrimitiveType.JAVA_SEQ && t2 == PrimitiveType.JAVA_SEQ) 
             return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SEQ);        
-        throw new RuntimeException("Could not determine promoted type "+
-                "of "+t1+" and "+t2);
+	throw new RuntimeException("Could not determine promoted type "+
+	  "of "+t1+" and "+t2);
     }
 
 
@@ -575,6 +578,10 @@ public final class TypeConverter {
 	}
 	
         if(result == null) {
+            //HACK
+            result = services.getJavaInfo().getKeYJavaType(t.sort().toString()); 
+        }
+        if (result == null) {
            result = getKeYJavaType(convertToProgramElement(t));
         }
  
@@ -924,5 +931,9 @@ public final class TypeConverter {
 	final TypeConverter tc = new TypeConverter(services);
 	tc.init(models);
 	return tc;
+    }
+
+    public StringConverter getStringConverter() {
+	return stringConverter;
     }
 }

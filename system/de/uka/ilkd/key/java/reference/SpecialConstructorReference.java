@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -11,11 +11,9 @@
 
 package de.uka.ilkd.key.java.reference;
 
+import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.util.ExtList;
 
 /**
@@ -32,8 +30,6 @@ public abstract class SpecialConstructorReference
      *      Arguments
      */
     protected final ImmutableArray<Expression> arguments;
-
-
     
     /**
      * Special constructor reference.
@@ -92,7 +88,7 @@ public abstract class SpecialConstructorReference
      *      @return an int giving the number of children of this node
      */
     public int getChildCount() {
-        return (arguments != null) ? arguments.size() : 0;
+        return (arguments != null) ? arguments.size()+1 : 1;
     }
 
     /**
@@ -109,7 +105,7 @@ public abstract class SpecialConstructorReference
         }
         throw new ArrayIndexOutOfBoundsException();
     }
-
+    
     /**
      *      Get the number of expressions in this container.
      *      @return the number of expressions.

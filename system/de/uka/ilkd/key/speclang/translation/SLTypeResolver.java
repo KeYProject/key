@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -16,8 +16,10 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 public final class SLTypeResolver extends SLExpressionResolver {
 
-    public SLTypeResolver(JavaInfo javaInfo, SLResolverManager manager) {
-        super(javaInfo, manager);
+    public SLTypeResolver(JavaInfo javaInfo, 
+	    		  SLResolverManager manager,
+	    		  KeYJavaType specInClass) {
+        super(javaInfo, manager, specInClass);
     }
 
     
@@ -34,26 +36,29 @@ public final class SLTypeResolver extends SLExpressionResolver {
                                    throws SLTranslationException {
         try {
             KeYJavaType type = javaInfo.getTypeByClassName(name);
+            if(type == null) {
+        	throw new RuntimeException();
+            }
             return new SLExpression(type);
         } catch (RuntimeException e) {
             try{
-                if(receiver != null){ 
+                if(receiver != null) { 
                     KeYJavaType containingType = receiver.getType();
-                    while(true){
+                    while(true) {
                         String typeName = containingType.getSort().name().toString();
                         if(typeName.substring(typeName.lastIndexOf(".")+1).equals(name)){
                             return new SLExpression(containingType);
                         }
                         ProgramVariable et = javaInfo.getAttribute(
                                 ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, containingType);
-                        if(et!=null){
+                        if(et != null) {
                             containingType = et.getKeYJavaType();
                         }else{
                             break;
                         }
                     }
                 }
-            }catch(RuntimeException ex){ }
+            } catch(RuntimeException ex){ }
             // Type not found
             return null;
         }

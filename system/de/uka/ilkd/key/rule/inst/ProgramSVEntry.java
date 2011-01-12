@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -52,12 +52,9 @@ public class ProgramSVEntry implements Serializable {
 	    return false;
 	} 
 	final ProgramSVEntry cmp = (ProgramSVEntry) o;
-	if (!(key().equals(cmp.key())) ||
-	    !(value().equals(cmp.value()))) {
-	    return false;
+        return key().equals(cmp.key()) &&
+                value().equals(cmp.value());
 	}
-	return true;	
-    }
     
     public int hashCode(){
     	int result = 17;

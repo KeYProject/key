@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -108,11 +108,10 @@ public class Config {
 
     public synchronized void fireConfigChange() {
 	synchronized(listenerList) {
-	    Iterator<ConfigChangeListener> it = listenerList.iterator();
-	    while (it.hasNext()) {
-		it.next().
-		    configChanged(configChangeEvent);
-	    }
+        for (ConfigChangeListener aListenerList : listenerList) {
+            aListenerList.
+                    configChanged(configChangeEvent);
+        }
 	}
     }
 

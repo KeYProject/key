@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -80,7 +80,7 @@ public final class StaticMethodCondition extends VariableConditionAdapter {
 	    ImmutableArray<Expression> ar 
 		= toExpArray((ImmutableArray<ProgramElement>)svInst.getInstantiation(args));
 	    if (var == args) {		
-		ar = (ImmutableArray<Expression>) toExpArray((ImmutableArray<? extends ProgramElement>)subst);
+		ar = toExpArray((ImmutableArray<? extends ProgramElement>)subst);
 	    }
 	    ExecutionContext ec 
 		= svInst.getContextInstantiation().activeStatementContext();

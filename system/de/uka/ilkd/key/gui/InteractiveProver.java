@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -99,22 +99,20 @@ public class InteractiveProver {
     /** fires the event that automatic execution has started */
     protected void fireAutoModeStarted(ProofEvent e) {
 	synchronized(listenerList) {
-	    Iterator<AutoModeListener> it = listenerList.iterator();
-	    while (it.hasNext()) {
-		it.next().
-		    autoModeStarted(e);
-	    }
+        for (AutoModeListener aListenerList : listenerList) {
+            aListenerList.
+                    autoModeStarted(e);
+        }
 	}
     }
 
     /** fires the event that automatic execution has stopped */
     public void fireAutoModeStopped(ProofEvent e) {
 	synchronized(listenerList) {
-	    Iterator<AutoModeListener> it = listenerList.iterator();
-	    while (it.hasNext()) {
-		it.next().
-		    autoModeStopped(e);
-	    }
+        for (AutoModeListener aListenerList : listenerList) {
+            aListenerList.
+                    autoModeStopped(e);
+        }
 	}
     }
     
@@ -213,20 +211,18 @@ public class InteractiveProver {
 
     private void finishFocussedAutoMode () {
         applyStrategy.removeProverTaskObserver ( focussedAutoModeTaskListener );
-        
-        final Iterator<Goal> it = proof.openGoals ().iterator ();
-        while ( it.hasNext () ) {
+
+        for (final Goal goal : proof.openGoals()) {
             // remove any filtering rule app managers that are left in the proof
             // goals
-            final Goal goal = it.next ();
-            if ( goal.getRuleAppManager () instanceof FocussedRuleApplicationManager ) {
+            if (goal.getRuleAppManager() instanceof FocussedRuleApplicationManager) {
                 final FocussedRuleApplicationManager focusManager =
-                    (FocussedRuleApplicationManager)goal.getRuleAppManager ();
-                goal.setRuleAppManager ( null );
+                        (FocussedRuleApplicationManager) goal.getRuleAppManager();
+                goal.setRuleAppManager(null);
                 final AutomatedRuleApplicationManager realManager =
-                    focusManager.getDelegate ();
-                realManager.clearCache ();
-                goal.setRuleAppManager ( realManager );
+                        focusManager.getDelegate();
+                realManager.clearCache();
+                goal.setRuleAppManager(realManager);
             }
         }
     }
@@ -255,16 +251,14 @@ public class InteractiveProver {
     public ImmutableList<BuiltInRule> getBuiltInRule(PosInOccurrence pos, 
 						 Constraint   userConstraint) {
 	ImmutableList<BuiltInRule> rules = ImmutableSLList.<BuiltInRule>nil();
-	Iterator<RuleApp> it = 
-	    getInteractiveRuleAppIndex ().getBuiltInRule
-	    (focusedGoal, pos, userConstraint).iterator();
 
-	while (it.hasNext()) {
-	    BuiltInRule r = (BuiltInRule) it.next().rule();
-	    if (!rules.contains(r)) {
-		rules = rules.prepend(r);
-	    }
-	}
+        for (RuleApp ruleApp : getInteractiveRuleAppIndex().getBuiltInRules
+                (focusedGoal, pos, userConstraint)) {
+            BuiltInRule r = (BuiltInRule) ruleApp.rule();
+            if (!rules.contains(r)) {
+                rules = rules.prepend(r);
+            }
+        }
 	return rules;
     }
 
@@ -295,17 +289,15 @@ public class InteractiveProver {
 					  Constraint       userConstraint) {
 	
 	ImmutableSet<RuleApp> result = DefaultImmutableSet.<RuleApp>nil();
-	Iterator<RuleApp> it = getInteractiveRuleAppIndex ().
-	    getBuiltInRule(focusedGoal, 
-			   pos,
-			   userConstraint).iterator();
 
-	while (it.hasNext()) {
-	    RuleApp app = it.next();
-	    if (app.rule() == rule) {
-		result = result.add(app);
-	    }
-	}
+        for (final RuleApp app : getInteractiveRuleAppIndex().
+                getBuiltInRules(focusedGoal,
+                        pos,
+                        userConstraint)) {
+            if (app.rule() == rule) {
+                result = result.add(app);
+            }
+        }
 
 	return result;
     }
@@ -429,26 +421,22 @@ public class InteractiveProver {
 	final Constraint   userConstraint =
             mediator.getUserConstraint().getConstraint();
 	if ( pos == null ) {
-            final Iterator<NoPosTacletApp> it =
-                index.getNoFindTaclet ( filter,
-                                        mediator.getServices(),
-                                        userConstraint ).iterator ();
-            while ( it.hasNext () )
-                fittingApps = fittingApps.prepend ( it.next () );
+        for (NoPosTacletApp noPosTacletApp : index.getNoFindTaclet(filter,
+                mediator.getServices(),
+                userConstraint))
+            fittingApps = fittingApps.prepend(noPosTacletApp);
         } else 
             fittingApps = index.getTacletAppAt ( filter,
                                                  pos, 
 			                         mediator.getServices(),
 					         userConstraint );
 
-	Iterator<TacletApp> it = fittingApps.iterator();
-	// filter fitting applications
-	while (it.hasNext()) {
-	    TacletApp app = it.next();
-	    if (app.rule().name().toString().equals(name) ){
-		result = result.add(app);
-	    }
-	}
+        // filter fitting applications
+        for (TacletApp app : fittingApps) {
+            if (app.rule().name().toString().equals(name)) {
+                result = result.add(app);
+            }
+        }
 //if (result.size()==0) System.err.println("Available was "+fittingApps);
 	return result;
     }
@@ -502,23 +490,21 @@ public class InteractiveProver {
     private ImmutableList<TacletApp> filterTaclet(ImmutableList<NoPosTacletApp> tacletInstances) {
         java.util.HashSet<Taclet> applicableRules = new java.util.HashSet<Taclet>();
         ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
-        Iterator<NoPosTacletApp> it = tacletInstances.iterator();		
-        while (it.hasNext()) {
-            TacletApp app = it.next ();
+        for (NoPosTacletApp app : tacletInstances) {
             if (mediator().stupidMode()) {
-                ImmutableList<TacletApp> ifCandidates = 
-                    app.findIfFormulaInstantiations(
-                                                    mediator().getSelectedGoal().sequent(),
-						    mediator().getServices(),
-                                                    mediator().getUserConstraint().getConstraint());              
+                ImmutableList<TacletApp> ifCandidates =
+                        app.findIfFormulaInstantiations(
+                                mediator().getSelectedGoal().sequent(),
+                                mediator().getServices(),
+                                mediator().getUserConstraint().getConstraint());
                 if (ifCandidates.size() == 0) continue; // skip this app
             }
-            
+
             // for the moment, just remove taclets which are
             // inconsistent with user constraint 
             // (introduction of new sorts not allowed)                     
-            if ( mediator ().getUserConstraint ().getConstraint ()
-                    .join ( app.constraint (), null ).isSatisfiable () ) {
+            if (mediator().getUserConstraint().getConstraint()
+                    .join(app.constraint(), null).isSatisfiable()) {
                 Taclet taclet = app.taclet();
                 if (!applicableRules.contains(taclet)) {
                     applicableRules.add(taclet);

@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -102,13 +102,20 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
         checkOnlyProgramVarsAsArguments(methodReference.getArguments());
     }    
 
-
+    public MethodBodyStatement(ProgramMethod method, 
+            ReferencePrefix newContext, 
+            IProgramVariable res, 
+            ImmutableArray<Expression> args,
+            boolean useSpecification){
+        this(method, newContext, res, args, useSpecification, null);
+    }
 
     public MethodBodyStatement(ProgramMethod method, 
                                ReferencePrefix newContext, 
                                IProgramVariable res, 
                                ImmutableArray<Expression> args,
-                               boolean useSpecification) {
+                               boolean useSpecification,
+                               ProgramElement scope) {
         this.method = method;
         this.bodySource = 
             new TypeRef(method.getContainerType());
@@ -148,6 +155,14 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
             IProgramVariable res, 
             ImmutableArray<Expression> args) {
         this(method, newContext, res, args, false);
+    }
+    
+    public MethodBodyStatement(ProgramMethod method, 
+            ReferencePrefix newContext, 
+            IProgramVariable res, 
+            ImmutableArray<Expression> args,
+            ProgramElement scope) {
+        this(method, newContext, res, args, false, scope);
     }
     
     /**

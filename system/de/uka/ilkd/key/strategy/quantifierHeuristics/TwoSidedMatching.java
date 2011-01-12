@@ -1,12 +1,10 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//
-//
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
@@ -45,14 +43,27 @@ class TwoSidedMatching {
             ReplacerOfQuanVariablesWithMetavariables.createSubstitutionForVars ( targetTerm );
         this.triggerSubstWithMVs =
             trigger.getTriggerSetThisBelongsTo().getReplacementWithMVs ();
-        this.targetWithMVs =
+        
+        if (targetSubstWithMVs.isGround()) {
+            this.targetWithMVs =
             targetSubstWithMVs.apply ( TriggerUtils.discardQuantifiers ( targetTerm ), services );
-        this.triggerWithMVs =
+        } else {
+            this.targetWithMVs = null;            
+        }
+        if (triggerSubstWithMVs.isGround()) {
+            this.triggerWithMVs =
             triggerSubstWithMVs.apply ( trigger.getTriggerTerm (), services );
+        } else {
+            this.triggerWithMVs = null;            
+        }
     }
     
     ImmutableSet<Substitution> getSubstitutions(Services services) {
-        return getAllSubstitutions ( targetWithMVs, services );
+        if (triggerWithMVs == null || targetWithMVs == null) {
+            // non ground subs not supported yet
+            return DefaultImmutableSet.<Substitution>nil();
+        }
+	return getAllSubstitutions ( targetWithMVs, services );
     }
     
     private ImmutableSet<Substitution> getAllSubstitutions(Term target, Services services) {
@@ -83,15 +94,14 @@ class TwoSidedMatching {
         if ( c.isSatisfiable () ) {
             ImmutableMap<QuantifiableVariable,Term> sub =
                 DefaultImmutableMap.<QuantifiableVariable,Term>nilMap();
-            Iterator<QuantifiableVariable> it = trigger.getUniVariables().iterator ();
-            while ( it.hasNext () ) {
-                QuantifiableVariable q = it.next ();
-                Term mv = triggerSubstWithMVs.getSubstitutedTerm ( q );
-                Term t = c.getInstantiation ( (Metavariable)( mv.op () ) );
-                if ( t == null || t.op () instanceof Metavariable )
+            for (QuantifiableVariable quantifiableVariable : trigger.getUniVariables()) {
+                QuantifiableVariable q = quantifiableVariable;
+                Term mv = triggerSubstWithMVs.getSubstitutedTerm(q);
+                Term t = c.getInstantiation((Metavariable) (mv.op()));
+                if (t == null || t.op() instanceof Metavariable)
                     return null;
-                if ( isGround ( t ) )
-                    sub = sub.put ( q, t );
+                if (isGround(t))
+                    sub = sub.put(q, t);
             }
             if ( sub.size () > 0 ) return new Substitution ( sub );
         }

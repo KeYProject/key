@@ -21,6 +21,7 @@ import recoder.abstraction.Type;
 import recoder.abstraction.Variable;
 import recoder.convenience.Naming;
 import recoder.java.CompilationUnit;
+import recoder.java.Expression;
 import recoder.java.Import;
 import recoder.java.ProgramElement;
 import recoder.java.Statement;
@@ -38,10 +39,19 @@ import recoder.service.ChangeHistory;
 import recoder.service.DefaultCrossReferenceSourceInfo;
 import recoder.service.NameInfo;
 import recoder.service.UnresolvedReferenceException;
+import de.uka.ilkd.key.java.expression.operator.Singleton;
+import de.uka.ilkd.key.java.recoderext.AllFields;
 import de.uka.ilkd.key.java.recoderext.ClassFileDeclarationBuilder;
+import de.uka.ilkd.key.java.recoderext.EmptySeqLiteral;
+import de.uka.ilkd.key.java.recoderext.EmptySetLiteral;
 import de.uka.ilkd.key.java.recoderext.EnumClassDeclaration;
 import de.uka.ilkd.key.java.recoderext.ExecutionContext;
 import de.uka.ilkd.key.java.recoderext.MethodCallStatement;
+import de.uka.ilkd.key.java.recoderext.SeqConcat;
+import de.uka.ilkd.key.java.recoderext.SeqReverse;
+import de.uka.ilkd.key.java.recoderext.SeqSingleton;
+import de.uka.ilkd.key.java.recoderext.SeqSub;
+import de.uka.ilkd.key.java.recoderext.SetUnion;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.util.SpecDataLocation;
@@ -592,4 +602,26 @@ public class KeYCrossReferenceSourceInfo
     public void clearTypeRefCache() {
         shit: reference2element.clear();
     }*/
+    
+    
+    private final PrimitiveType setType = new PrimitiveType("\\set", this);
+    private final PrimitiveType seqType = new PrimitiveType("\\seq", this);
+    
+    @Override 
+    public Type getType(Expression expr) {
+	if(expr instanceof EmptySetLiteral
+           || expr instanceof Singleton
+           || expr instanceof SetUnion
+           || expr instanceof AllFields) {
+	    return setType;
+	} else if(expr instanceof EmptySeqLiteral
+                  || expr instanceof SeqSingleton
+                  || expr instanceof SeqConcat
+                  || expr instanceof SeqSub
+                  || expr instanceof SeqReverse) {
+	    return seqType;
+	} else {
+	    return super.getType(expr);
+	}
+    }
 }

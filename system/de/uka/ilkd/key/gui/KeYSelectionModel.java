@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -14,12 +14,10 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
-
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-
+import de.uka.ilkd.key.util.Debug;
 
 
 public class KeYSelectionModel {
@@ -37,10 +35,7 @@ public class KeYSelectionModel {
     /** cached selected node event */
     private KeYSelectionEvent selectionEvent = 
 	new KeYSelectionEvent(this);
-    
-    private Logger threadLogger = Logger.getLogger("key.threading");
-
-    
+        
     KeYSelectionModel() {
 	listenerList = Collections.synchronizedList(new ArrayList<KeYSelectionListener>(5));
 	goalIsValid = false;
@@ -297,14 +292,14 @@ public class KeYSelectionModel {
 
     public void addKeYSelectionListener(KeYSelectionListener listener) {
 	synchronized(listenerList) {
-	    threadLogger.info("Adding "+listener.getClass());
+	    Debug.log4jInfo("Adding "+listener.getClass(), "key.threading");
 	    listenerList.add(listener);	    
 	}
     }
 
     public void removeKeYSelectionListener(KeYSelectionListener listener) {
 	synchronized(listenerList) {
-	    threadLogger.info("Removing "+listener.getClass());
+	    Debug.log4jInfo("Removing "+listener.getClass(), "key.threading");
 	    listenerList.remove(listener);	    
 	}
     }		
@@ -319,11 +314,11 @@ public class KeYSelectionModel {
 
     public synchronized void fireSelectedProofChanged() {
 	synchronized(listenerList) {
-	    threadLogger.info("Selected Proof changed, firing...");
+	    Debug.log4jInfo("Selected Proof changed, firing...", "key.threading");
             for (final KeYSelectionListener listener : listenerList) {
 	        listener.selectedProofChanged(selectionEvent);
 	    }
-	    threadLogger.info("Selected Proof changed, done firing.");
+            Debug.log4jInfo("Selected Proof changed, done firing.", "key.threading");
 	}
     }    
     

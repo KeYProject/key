@@ -1,11 +1,10 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//
 
 
 package de.uka.ilkd.key.rule.export.html;
@@ -44,10 +43,9 @@ public class HTMLFileTaclet extends HTMLFile {
     
     public void init(RuleExportModel model) {
         super.init(model);
-        
-        Iterator<TacletModelInfo> it = tacletInfos.iterator();
-        while (it.hasNext()) {
-            final TacletModelInfo tacletInfo = it.next();
+
+        for (TacletModelInfo tacletInfo1 : tacletInfos) {
+            final TacletModelInfo tacletInfo = tacletInfo1;
             getFragmentAnchor(tacletInfo);
         }
     }
@@ -69,10 +67,9 @@ public class HTMLFileTaclet extends HTMLFile {
     }
 
     private void writeTacletDetails ( StringBuffer out ) {
-        Iterator<TacletModelInfo> it = tacletInfos.iterator();
-        while (it.hasNext()) {
-            final TacletModelInfo tacletInfo = it.next();
-            writeTacletDetails( out, tacletInfo );
+        for (TacletModelInfo tacletInfo1 : tacletInfos) {
+            final TacletModelInfo tacletInfo = tacletInfo1;
+            writeTacletDetails(out, tacletInfo);
         }
     }
 
@@ -142,13 +139,12 @@ public class HTMLFileTaclet extends HTMLFile {
             out.append ( "none" );
         } else {
             boolean first = true;
-            final Iterator<RuleSetModelInfo> it = ruleSets.iterator ();
-            while (it.hasNext ()) {
-                final RuleSetModelInfo ruleSet = it.next ();
+            for (RuleSetModelInfo ruleSet1 : ruleSets) {
+                final RuleSetModelInfo ruleSet = ruleSet1;
                 if (!first) {
-                    out.append ( ", " );
+                    out.append(", ");
                 }
-                writeRuleSetLink ( out, ruleSet );
+                writeRuleSetLink(out, ruleSet);
                 first = false;
             }
         }
@@ -212,16 +208,14 @@ public class HTMLFileTaclet extends HTMLFile {
         if (schemaVars.size() > 0)
         {
             out.append ( "\\schemaVariables {\n" );
-            final Iterator<SchemaVariable> it = schemaVars.iterator();
-            while (it.hasNext())
-            {
-                final SchemaVariable schemaVar = it.next();
+            for (SchemaVariable schemaVar1 : schemaVars) {
+                final SchemaVariable schemaVar = schemaVar1;
                 // write indentation
-                out.append ( "  " );
+                out.append("  ");
                 // write declaration
                 writeTacletSchemaVariable(out, schemaVar);
                 // write newline
-                out.append ( ";\n" );
+                out.append(";\n");
             }
             out.append ( "}\n" );
         }

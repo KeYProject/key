@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -171,13 +171,17 @@ public class CatchAllStatement extends JavaStatement implements
 
     //don't think we need it
     public void accept(SourceVisitor v) {
-	throw new IllegalStateException("Not implemented in "
-					+"CatchAllStatement");
+	if (v instanceof SourceVisitorExtended) {
+	    ((SourceVisitorExtended)v).visitCatchAll(this);
+	} else {
+	    throw new IllegalStateException("Method 'accept' not implemented in "
+		    +"CatchAllStatement");
+	}
     }
 
     //don't think we need it
     public CatchAllStatement deepClone() {
-	throw new IllegalStateException("Not implemented in "
+	throw new IllegalStateException("Method 'deepClone' not implemented in "
 					+"CatchAllStatement");
     }    
 

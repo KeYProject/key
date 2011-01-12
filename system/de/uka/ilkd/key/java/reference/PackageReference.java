@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -29,12 +29,12 @@ public class PackageReference extends JavaNonTerminalProgramElement
     /**
      *      Prefix.
      */
-    protected ReferencePrefix prefix;
+    protected final ReferencePrefix prefix;
 
     /**
      *      Name.
      */
-    protected ProgramElementName name;
+    protected final ProgramElementName name;
 
 
     /**
@@ -48,12 +48,14 @@ public class PackageReference extends JavaNonTerminalProgramElement
     public PackageReference(ExtList children) {
 	prefix=(PackageReference)children.get(PackageReference.class);
 	name=(ProgramElementName)children.get(ProgramElementName.class);
+	assert name != null;
     }
 
     public PackageReference(ProgramElementName name, 
 			    ReferencePrefix prefix) {
 	this.prefix = prefix;
 	this.name = name;
+	assert name != null;
     }
 
     public SourceElement getFirstElement() {
@@ -138,5 +140,22 @@ public class PackageReference extends JavaNonTerminalProgramElement
 
     public ReferencePrefix setReferencePrefix(ReferencePrefix r) {
 	return this;
+    }
+    
+    public boolean equals(Object o) {
+	if(o.getClass() != PackageReference.class) {
+	    return false;
+	}
+	final PackageReference pr = (PackageReference) o;
+	return pr.name.equals(name)
+	       && (pr.prefix == null && prefix == null
+	           || pr.prefix != null 
+	              && prefix != null  
+	              && pr.prefix.equals(prefix));
+    }
+
+
+    public String toString() {
+        return (prefix != null ? prefix.toString() + "." : "") + getName();
     }
 }

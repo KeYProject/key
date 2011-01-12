@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -40,7 +40,7 @@ public class LVRCollector extends Visitor{
 	if (t.op() instanceof QuantifiableVariable) {
 	    varList=varList.prepend((QuantifiableVariable)t.op());
 	} else if (t.op() instanceof Quantifier) {
-	    for (int j = 0, ar = ((Quantifier)t.op()).arity(); j<ar; j++) {
+	    for (int j = 0, ar = t.op().arity(); j<ar; j++) {
 	        for (int i = 0, sz = t.varsBoundHere(j).size(); i<sz;i++) {		
 	            varList=varList.prepend
 	            (t.varsBoundHere(j).get(i));		

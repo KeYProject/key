@@ -1,10 +1,11 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+//
 //
 
 /** represents a name that is part of a program
@@ -25,7 +26,6 @@ public class ProgramElementName extends Name
     private final String shortName;
     private final NameCreationInfo creationInfo;
     private final Comment[] comments;
-
 
     /** create a new name
      * @param name the String with the name of the program element

@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -52,8 +52,11 @@ public class ContextStatementBlock
      Statement block.
      @param block a statement mutable list.
      */
-    public ContextStatementBlock(TypeSVWrapper tr, ExpressionSVWrapper runtime, 
-				 ASTList<Statement> block) {
+    public ContextStatementBlock(TypeSVWrapper tr, ExpressionSVWrapper memoryArea,
+                ExpressionSVWrapper runtime, 
+                ASTList<Statement> block,
+                ExpressionSVWrapper callerMemoryArea,
+                ExpressionSVWrapper constructedMemoryArea){
 	super(block);
 	if (tr != null) {
 	    this.ec = new ExecutionContext(tr, runtime);

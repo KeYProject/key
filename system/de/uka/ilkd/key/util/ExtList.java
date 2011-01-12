@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -31,7 +31,7 @@ public class ExtList extends LinkedList {
     }
 
     /**
-     * collects elements of the classtype cl and returns a typed array
+     * collects (non-null) elements of the classtype cl and returns a typed array
      * @param cl Class the type of the elements that are selected
      * @return array with type cl
      */

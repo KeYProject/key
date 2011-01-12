@@ -1,12 +1,10 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License.
+// The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//
-//
 
 package de.uka.ilkd.key.collection;
 
@@ -142,9 +140,9 @@ public class TestSLListOfString extends junit.framework.TestCase {
 	    newList=newList.append(str[i-1]);
 	}
 	// test cascading tail
-	for (int i=0;i<str.length;i++) {
-	    assertTrue(newList.contains(str[i]));
-	}
+        for (String aStr : str) {
+            assertTrue(newList.contains(aStr));
+        }
     }
 
 
@@ -197,9 +195,9 @@ public class TestSLListOfString extends junit.framework.TestCase {
 
     public void testToString() {
 	ImmutableList<String> newList=ImmutableSLList.<String>nil();
-	for (int i=0;i<str.length;i++) {
-	    newList=newList.append(str[i]);
-	}
+        for (String aStr : str) {
+            newList = newList.append(aStr);
+        }
 	assertEquals("[Dies,ist,ein,Test]",newList.toString());
     }
 

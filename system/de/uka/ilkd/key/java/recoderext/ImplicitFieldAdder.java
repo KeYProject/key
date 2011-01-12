@@ -1,28 +1,23 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 //
+//
 // 
 package de.uka.ilkd.key.java.recoderext;
 
-import java.util.Iterator;
 import java.util.List;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Variable;
 import recoder.java.Identifier;
-import recoder.java.declaration.ClassDeclaration;
-import recoder.java.declaration.DeclarationSpecifier;
-import recoder.java.declaration.FieldDeclaration;
-import recoder.java.declaration.TypeDeclaration;
-import recoder.java.declaration.modifier.Private;
-import recoder.java.declaration.modifier.Public;
-import recoder.java.declaration.modifier.Static;
+import recoder.java.declaration.*;
+import recoder.java.declaration.modifier.*;
 import recoder.java.reference.TypeReference;
 import recoder.kit.ProblemReport;
 import recoder.list.generic.ASTArrayList;
@@ -47,10 +42,9 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
     public static final String IMPLICIT_CLASS_INITIALIZED = "<classInitialized>";
     public static final String IMPLICIT_CLASS_INIT_IN_PROGRESS = "<classInitializationInProgress>";
     public static final String IMPLICIT_CLASS_ERRONEOUS = "<classErroneous>";
-
-    public static final String IMPLICIT_NEXT_TO_CREATE = "<nextToCreate>";
-    public static final String IMPLICIT_CREATED = "<created>";
     
+    public static final String IMPLICIT_CREATED = "<created>";
+   
     public static final String IMPLICIT_INITIALIZED = "<initialized>";
     
     public static final String IMPLICIT_ENCLOSING_THIS = "<enclosingThis>";
@@ -86,11 +80,17 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
      * @return the new created field declaration
      */
     public static FieldDeclaration createImplicitRecoderField
+        (String typeName, String fieldName, 
+         boolean isStatic, boolean isPrivate) {
+        return createImplicitRecoderField(typeName, fieldName, isStatic, isPrivate, false);
+    }
+    
+    public static FieldDeclaration createImplicitRecoderField
 	(String typeName, String fieldName, 
-	 boolean isStatic, boolean isPrivate) {
+	 boolean isStatic, boolean isPrivate, boolean isFinal) {
 	
-	ASTList<DeclarationSpecifier> modifiers = new ASTArrayList<DeclarationSpecifier>
-	    (1 + (isStatic ? 1 : 0));
+	final int modCount = 1 + (isStatic ? 1 : 0) + (isFinal ? 1 : 0); 
+	ASTList<DeclarationSpecifier> modifiers = new ASTArrayList<DeclarationSpecifier>(modCount);
 
 	if (isStatic) {
 	    modifiers.add(new Static());
@@ -100,12 +100,19 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
 	} else {
 	    modifiers.add(new Public());
 	}
+        
+        if(isFinal){
+            modifiers.add(new Final());
+        }
 	
-	Identifier id = typeName.charAt(0) == '<' ? 
-	    new ImplicitIdentifier(typeName) : new Identifier(typeName);
+        int idx = typeName.indexOf('[');        
+        final String baseType = (idx == -1 ? typeName : typeName.substring(0, idx));
+        
+	final Identifier id = typeName.charAt(0) == '<' ? 
+	    new ImplicitIdentifier(baseType) : new Identifier(baseType);
 	
 	FieldDeclaration fd = new FieldDeclaration
-	    (modifiers, new TypeReference(id), 
+	    (modifiers, new TypeReference(id, idx == -1 ? 0 : (typeName.length()-baseType.length())/2), 
 	     new ImplicitIdentifier(fieldName), null);
 	
 	fd.makeAllParentRolesValid();
@@ -123,7 +130,6 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
 	// instance
 	attach(createImplicitRecoderField("boolean", IMPLICIT_INITIALIZED, false, false), td, 0);
         attach(createImplicitRecoderField("boolean", IMPLICIT_CREATED, false, false), td, 0);	  
-        attach(createImplicitRecoderField("int", IMPLICIT_NEXT_TO_CREATE, true, false), td, 0);
     }
     
 
@@ -166,38 +172,54 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
 	}
     }
     
+    protected void addClassInitializerStatusFields(
+            recoder.java.declaration.TypeDeclaration td) {	
+	attach(createImplicitRecoderField("boolean", IMPLICIT_CLASS_INIT_IN_PROGRESS, true, true), td, 0);
+	attach(createImplicitRecoderField("boolean", IMPLICIT_CLASS_ERRONEOUS, true, true), td, 0);
+	attach(createImplicitRecoderField("boolean", IMPLICIT_CLASS_INITIALIZED, true, true), td, 0);
+	attach(createImplicitRecoderField("boolean", IMPLICIT_CLASS_PREPARED, true, true), td, 0);	
+    }
+    
     private void addFieldsForFinalVars(TypeDeclaration td){
-        List<Variable> vars = getLocalClass2FinalVar().get(td);
-        if(vars!=null){
-            Iterator<Variable> it = vars.iterator();
-            while(it.hasNext()){
-                Variable v = it.next();
-                attach(createImplicitRecoderField(v.getType().getName(), FINAL_VAR_PREFIX+v.getName(), false, true), td, 0);
+        final List<Variable> vars = getLocalClass2FinalVar().get(td);
+        if(vars != null){
+            
+            // not sure why, but doing it separated in two loops is much faster (for large programs) then just in one
+            // strangely, the effect is not measureable for e.g. the class init. fields...
+            FieldDeclaration[] newFields = new FieldDeclaration[vars.size()]; 
+            
+            int i = 0;
+            for (final Variable var : vars) {
+        	newFields[i] = createImplicitRecoderField(var.getType().getName(), FINAL_VAR_PREFIX + var.getName(), false, true); 
+        	i++;
+            }
+            
+            for (final FieldDeclaration fd : newFields) {
+        	attach(fd, td, 0);
             }
         }
     }
-
     
     public ProblemReport analyze() {
         javaLangObject = services.getNameInfo().getJavaLangObject();
 	 if (!(javaLangObject instanceof ClassDeclaration)) {
 	     Debug.fail("Could not find class java.lang.Object or only as bytecode");
 	 }
-	 for (final ClassDeclaration cd : classDeclarations()) {
-	     if(cd.getName()==null || cd.getStatementContainer() !=null){
+	 for (final TypeDeclaration cd : classDeclarations()) {
+	     if(cd instanceof ClassDeclaration && 
+                     (cd.getName()==null || ((ClassDeclaration) cd).getStatementContainer()!=null)){
 	         (new FinalOuterVarsCollector()).walk(cd);
 	     }
 	 }     
 	 return super.analyze();
     }
     
-    
     protected void makeExplicit(TypeDeclaration td) {
 
 	addImplicitRecoderFields(td);
 	
 	addFieldsForFinalVars(td);
-
+	
 	if (!transformedObject && td == javaLangObject) {	   
 	    addGlobalImplicitRecoderFields(td);
 	    transformedObject = true;			    
@@ -211,4 +233,5 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
 // 	    try { sw.close(); } catch (Exception e) {}	   
 // 	}
     }
+    
 }

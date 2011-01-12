@@ -183,10 +183,7 @@ public final class NotationInfo {
 	    tbl.put(integerLDT.getNeg(),new Notation.Prefix("-", 140, 130));
 	    tbl.put(integerLDT.getNegativeNumberSign(), new Notation.Prefix("-", 140, 130));
 	}
-        
-        //string operators
-	tbl.put(TypeConverter.stringConverter.getStringSymbol(), new Notation.StringLiteral());
-	
+        	
 	//heap operators
 	HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	tbl.put(HeapLDT.SELECT_NAME, new Notation.SelectNotation());

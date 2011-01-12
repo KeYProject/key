@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -44,7 +44,7 @@ public abstract class AbstractMonomialSmallerThanFeature
 
     protected int introductionTime(Operator op) {
         if ( op == add || op == mul || op == Z ) return -1;
-        Integer res = (Integer)introductionTimeCache.get ( op );
+        Integer res = introductionTimeCache.get ( op );
         if ( res == null ) {
             res = Integer.valueOf ( introductionTimeHelp ( op ) );
             introductionTimeCache.put ( op, res );

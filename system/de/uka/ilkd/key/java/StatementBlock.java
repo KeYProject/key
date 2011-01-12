@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -18,6 +18,7 @@ import de.uka.ilkd.key.java.statement.JavaStatement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramPrefix;
+import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
 /**
@@ -62,6 +63,10 @@ public class StatementBlock extends JavaStatement
     }
 
     public StatementBlock(ImmutableArray<? extends Statement> as) {
+	
+	// check for non-null elements (bug fix)
+	Debug.assertDeepNonNull(as, "statement block contructor");
+	
 	body = as;
         prefixElementArray = computePrefixElements(body);
     }

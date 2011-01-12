@@ -201,11 +201,15 @@ public abstract class AbstractProfile implements Profile {
      public void updateSettings(ProofSettings settings) {
 	 settings.getSMTSettings().updateSMTRules(this);
      }
+     
+     
+     @Override
+     public String getInternalClassDirectory() {
+ 	return "";
+     }     
 
-     /**
-      * returns the file name of the internal class list
-      * @return the file name of the internal class list
-      */
+
+     @Override
      public String getInternalClasslistFilename() {
 	 return "JAVALANG.TXT";
      }

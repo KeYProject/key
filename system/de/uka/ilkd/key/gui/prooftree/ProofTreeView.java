@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -179,7 +179,8 @@ public class ProofTreeView extends JPanel {
 	                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     }
     
-    protected void finalize() {
+    protected void finalize() throws Throwable {
+        super.finalize();
         Config.DEFAULT.removeConfigChangeListener(configChangeListener);
     }
 
@@ -564,7 +565,7 @@ public class ProofTreeView extends JPanel {
 		((GUIAbstractTreeNode)e.getNewLeadSelectionPath().
 		 getLastPathComponent());
 	    if (treeNode instanceof GUIProofTreeNode) {		
-		Node node = ((GUIProofTreeNode)treeNode).getNode();
+		Node node = treeNode.getNode();
 		Goal selected = proof.getGoal(node);
 		if (selected != null) {
 		    mediator.goalChosen(selected);
@@ -575,7 +576,7 @@ public class ProofTreeView extends JPanel {
                 selectBranchNode((GUIBranchNode)treeNode);
             }
 	    // catching NullPointerException occurring when renaming root node
-	    if (treeNode instanceof GUIBranchNode && ((GUIBranchNode)treeNode)
+	    if (treeNode instanceof GUIBranchNode && treeNode
 			.getNode().parent() != null) {
 		delegateView.setEditable(true);
 	    } else {
@@ -723,9 +724,10 @@ public class ProofTreeView extends JPanel {
 	private JCheckBoxMenuItem hideClosedSubtrees = 
 		new JCheckBoxMenuItem("Hide Closed Subtrees");
 	private JMenuItem search = new JMenuItem("Search");
-	private JMenuItem goalBack    = new JMenuItem("Prune Proof");
+	private JMenuItem prune    = new JMenuItem("Prune Proof");
 	private JMenuItem runStrategy = new JMenuItem("Apply Strategy",
 	    IconFactory.autoModeStartLogo(10));
+        private JMenuItem bugdetection= new JMenuItem("Bug Detection");
 
 	private TreePath path;
 	private TreePath branch;
@@ -749,6 +751,25 @@ public class ProofTreeView extends JPanel {
 	}
 
 	private void create() {
+	    this.add(runStrategy);
+	    runStrategy.addActionListener(this);
+	    runStrategy.setEnabled(false);
+	    if (proof != null) runStrategy.setEnabled(true);
+
+	    this.add(prune);
+	    if (branch != path) {
+		prune.addActionListener(this);
+		prune.setEnabled(false);
+		if (proof != null) {
+		    if (proof.isGoal(invokedNode) || 
+		        proof.getSubtreeGoals(invokedNode).size()>0) {
+		        prune.setEnabled(true);
+		    }
+		}
+	    }
+	    this.add(new JSeparator());
+
+
 	    this.add(expandAll);
 	    expandAll.addActionListener(this);
 	    this.add(expandAllBelow);
@@ -784,32 +805,23 @@ public class ProofTreeView extends JPanel {
 	    this.add(new SetGoalsBelowEnableStatus(false));
 	    // enable goals
 	    this.add(new SetGoalsBelowEnableStatus(true));
-	    this.add(new JSeparator());
-	    this.add(goalBack);
-	    if (branch != path) {
-		goalBack.addActionListener(this);
-		goalBack.setEnabled(false);
-	    }
-	    this.add(runStrategy);
-	    runStrategy.addActionListener(this);
-	    runStrategy.setEnabled(false);
-	    if (proof != null) {
-		//if (proof.getActiveStrategy() != null) {
-		runStrategy.setEnabled(true);
-		//}
-	    }
-	    if (branch != path) {
-		if (proof != null) {
-		    if (proof.isGoal(invokedNode) || 
-		        proof.getSubtreeGoals(invokedNode).size()>0) {
-		        goalBack.setEnabled(true);
-		    }
-		}
-	    }
+
+
+//	    if (branch != path) {
+//                this.add(new JSeparator());
+//                JMenu more = new JMenu("More");
+//                this.add(more);
+//
+//		more.add(visualize);
+//		more.add(bugdetection);
+//		bugdetection.addActionListener(this);
+//		bugdetection.setEnabled(true);
+//	        more.add(change);
+//	    }
 	}
 
 	public void actionPerformed(ActionEvent e) {
-	    if (e.getSource() == goalBack) {
+	    if (e.getSource() == prune) {
 		delegateModel.setAttentive(false);
 		mediator().setBack(invokedNode);
 		delegateModel.updateTree ( null );
@@ -921,7 +933,7 @@ public class ProofTreeView extends JPanel {
 		}
             } else if (e.getSource() == search) {
 		proofTreeSearchPanel.setVisible(true);
-            }
+            } 
 	}
 
 	/**
@@ -969,8 +981,7 @@ public class ProofTreeView extends JPanel {
 	     */
             @Override
             public Iterable<Goal> getGoalList() {
-                ImmutableList<Goal> goals = proof.getSubtreeGoals(invokedNode);
-                return goals;
+                return proof.getSubtreeGoals(invokedNode);
             }
 
             /* 
@@ -980,7 +991,7 @@ public class ProofTreeView extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 super.actionPerformed(e);
-                for (Goal goal : getGoalList()) {
+                for (final Goal goal : getGoalList()) {
                     delegateModel.updateTree(goal.node());
                 }
                 // trigger repainting the tree after the completion of this event.
@@ -1245,7 +1256,6 @@ public class ProofTreeView extends JPanel {
             assert string != null && searchString != null;
             return string.indexOf(searchString) != -1;
         }
-        
     }
     
     // to prevent memory leaks
@@ -1254,7 +1264,5 @@ public class ProofTreeView extends JPanel {
         public void clearDrawingCache(){
             drawingCache.clear();
         }
-        
     }
-
 }

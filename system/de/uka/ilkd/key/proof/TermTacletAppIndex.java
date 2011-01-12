@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -75,9 +75,7 @@ public class TermTacletAppIndex {
                                                          RuleFilter      filter,
                                                          Services        services,
                                                          Constraint      userConstraint,
-                                                         TacletIndex     tacletIndex) { 
-
-        ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
+                                                         TacletIndex     tacletIndex) {
 
         Constraint c = pos.constrainedFormula().constraint();
 
@@ -86,17 +84,8 @@ public class TermTacletAppIndex {
                           pos.termBelowMetavariable (), services );
             if ( !c.isSatisfiable () ) return ImmutableSLList.<NoPosTacletApp>nil();
         }
-		
-        final Iterator<NoPosTacletApp> rewriteIterator =
-            tacletIndex.getRewriteTaclet ( pos, c, filter, services,
-                                           userConstraint ).iterator();
 
-        while ( rewriteIterator.hasNext () ) {
-            NoPosTacletApp tacletApp = rewriteIterator.next ();
-            result = result.prepend ( tacletApp );
-        }
-        
-        return result;
+        return tacletIndex.getRewriteTaclet(pos, c, filter, services, userConstraint);
     }
   
     /** 
@@ -777,10 +766,8 @@ public class TermTacletAppIndex {
     private static void fireRulesAdded(NewRuleListener listener,
                                        ImmutableList<NoPosTacletApp> taclets,
                                        PosInOccurrence pos) {
-        Iterator<NoPosTacletApp> it = taclets.iterator ();
 
-        while ( it.hasNext () )
-            listener.ruleAdded ( it.next (), pos );
+        for (NoPosTacletApp taclet : taclets) listener.ruleAdded(taclet, pos);
     }
 
 

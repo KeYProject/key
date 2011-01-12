@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -23,8 +23,6 @@ import javax.swing.event.MouseInputAdapter;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
-import org.apache.log4j.Logger;
-
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.gui.KeYMediator;
@@ -46,9 +44,6 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 class SequentViewListener extends MouseInputAdapter 
     implements KeyListener  {  
 	
-    
-    static Logger logger = Logger.getLogger(SequentViewListener.class.getName());
-
     private KeYMediator mediator;
     private SequentView seqView;
 
@@ -114,7 +109,7 @@ class SequentViewListener extends MouseInputAdapter
     private String getTermInfo() {
         if ((mousePos == null)||
             ("".equals(seqView.getHighlightedText()))) return null;
-        Term t = null;
+        Term t  ;
         final PosInOccurrence posInOcc = mousePos.getPosInOccurrence();
         if (posInOcc != null) {
             t = posInOcc.subTerm();

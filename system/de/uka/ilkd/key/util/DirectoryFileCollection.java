@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -67,6 +67,36 @@ public class DirectoryFileCollection implements FileCollection {
         }
     }
     
+    /**This method is to fix the bug: "0965: Creating arrays of primitive type fails when using \bootclasspath "
+     * The method sorts the List of File that is given as parameter according to the following criteria:
+     * - File paths that contain the subpath "java/lang" are stored before other file paths.
+     * - If there is a File that contains the subpath "java/lang/Object.java" then it is stored at the very beginning of the list. 
+     * @author gladisch */ 
+    private static void sortFiles(List<File> files){
+        for(int a=0;a<files.size()-1;a++){
+            for(int b= a+1;b<files.size();b++){
+        	if(!(a<b))throw new RuntimeException("Incorrect sorting algorithms.");
+        	File fa=files.get(a);
+        	File fb=files.get(b);
+        	
+        	//Check if the path A contains the substring "JAVA/LANG"
+        	String pathA = fa.getPath().toUpperCase().replace('\\', '/');
+        	boolean A_isObjectClass = pathA.indexOf("JAVA/LANG/OBJECT.JAVA")!=-1;
+        	
+        	//Check if the path B contains the substring "JAVA/LANG/OBJECT.JAVA"
+        	String pathB = fb.getPath().toUpperCase().replace('\\', '/');
+        	boolean B_inJavaLang = pathB.indexOf("JAVA/LANG")!=-1;
+        	
+        	//Switch files to ensure the desired order of files
+        	if(B_inJavaLang && !A_isObjectClass){
+        	    files.set(a, fb);
+        	    files.set(b, fa);
+        	}
+            }
+        }
+    }
+    
+    
     /*
      * enumerate all files in a list and store that list in the walker.
      * 
@@ -75,6 +105,22 @@ public class DirectoryFileCollection implements FileCollection {
     public Walker createWalker(String extension) {
         List<File> files = new ArrayList<File>();
         addAllFiles(directory, extension, files);
+        sortFiles(files);
+        return new Walker(files.iterator());
+    }
+
+
+    /*
+     * enumerate all files in a list and store that list in the walker.
+     * 
+     * @see de.uka.ilkd.key.util.FileCollection#createWalker(java.lang.String[])
+     */
+    public Walker createWalker(String[] extensions) {
+        List<File> files = new ArrayList<File>();
+        for(String extension : extensions) {
+    	    addAllFiles(directory, extension, files);
+        }
+        sortFiles(files);
         return new Walker(files.iterator());
     }
 

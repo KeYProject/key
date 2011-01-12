@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -255,7 +255,7 @@ public abstract class TacletApp implements RuleApp {
 	    if (pair.key() instanceof VariableSV) {
 		SchemaVariable varSV = pair.key();
 		Term value = ((TermInstantiation) pair.value()).getTerm();
-		if (!collMap.containsKey((LogicVariable) value.op())) {
+		if (!collMap.containsKey(value.op())) {
 		    collMap.put((LogicVariable) value.op(), varSV);
 		} else {
 		    insts = replaceInstantiation(taclet, 
@@ -317,7 +317,7 @@ public abstract class TacletApp implements RuleApp {
 	} else
 	    return null;
     }
-
+    
     /**
      * returns true iff the instantiation of a bound SchemaVariable contains the
      * given Logicvariable
@@ -1169,7 +1169,7 @@ public abstract class TacletApp implements RuleApp {
 	MatchConditions cond = matchConditions();
 
 	if (sv instanceof ProgramSV) {
-	    cond = ((ProgramSV) sv).match(pe, cond, services);
+            cond = sv.match(pe, cond, services);
 	} else {
 	    throw new IllegalInstantiationException(
 		    "Cannot match program element '" + pe + "'("
@@ -1362,9 +1362,7 @@ public abstract class TacletApp implements RuleApp {
     private ImmutableList<ConstrainedFormula> createSemisequentList(Semisequent p_ss) {
 	ImmutableList<ConstrainedFormula> res = ImmutableSLList.<ConstrainedFormula>nil();
 
-	Iterator<ConstrainedFormula> it = p_ss.iterator();
-	while (it.hasNext())
-	    res = res.prepend(it.next());
+        for (Object p_s : p_ss) res = res.prepend((ConstrainedFormula) p_s);
 
 	return res;
     }
@@ -1547,34 +1545,32 @@ public abstract class TacletApp implements RuleApp {
      *         bound SchemaVariables
      */
     public SchemaVariable varSVNameConflict() {
-	Iterator<SchemaVariable> svIt = uninstantiatedVars().iterator();
-	while (svIt.hasNext()) {
-	    SchemaVariable sv = svIt.next();
+        for (SchemaVariable schemaVariable : uninstantiatedVars()) {
+            SchemaVariable sv = schemaVariable;
 	    if (sv instanceof TermSV || sv instanceof FormulaSV) {
 		TacletPrefix prefix = taclet().getPrefix(sv);
 		HashSet<Name> names = new HashSet<Name>();
-		if (prefix.context()) {
-		    Iterator<QuantifiableVariable> contextIt = contextVars(sv)
-			    .iterator();
-		    while (contextIt.hasNext()) {
-			names.add(contextIt.next().name());
-		    }
-		}
-		Iterator<SchemaVariable> varSVIt = prefix.iterator();
-		while (varSVIt.hasNext()) {
-		    SchemaVariable varSV = varSVIt.next();
-		    Term inst = (Term) instantiations().getInstantiation(varSV);
-		    if (inst != null) {
-			Name name = inst.op().name();
-			if (!names.contains(name)) {
-			    names.add(name);
-			} else {
-			    return varSV;
-			}
-		    }
-		}
-	    }
-	}
+                if (prefix.context()) {
+                    for (QuantifiableVariable quantifiableVariable : contextVars(sv)) {
+                        names.add(quantifiableVariable.name());
+                    }
+                }
+                Iterator<SchemaVariable> varSVIt = prefix.iterator();
+                while (varSVIt.hasNext()) {
+                    SchemaVariable varSV = varSVIt.next();
+                    Term inst = (Term)
+                            instantiations().getInstantiation(varSV);
+                    if (inst != null) {
+                        Name name = inst.op().name();
+                        if (!names.contains(name)) {
+                            names.add(name);
+                        } else {
+                            return varSV;
+                        }
+                    }
+                }
+            }
+        }
 	return null;
     }
 

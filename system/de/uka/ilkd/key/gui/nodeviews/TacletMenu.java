@@ -16,8 +16,6 @@ import java.util.*;
 
 import javax.swing.*;
 
-import org.apache.log4j.Logger;
-
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.KeYMediator;
@@ -48,9 +46,7 @@ class TacletMenu extends JMenu {
     private KeYMediator mediator;
 
     private TacletAppComparator comp = new TacletAppComparator();
-    
-    static Logger logger = Logger.getLogger(TacletMenu.class.getName());
-    
+        
     /** 
      * creates empty menu 
      */

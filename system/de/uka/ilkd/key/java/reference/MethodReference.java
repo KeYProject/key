@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -41,46 +41,65 @@ public class MethodReference extends JavaNonTerminalProgramElement
        Access path.
     */
     protected final ReferencePrefix prefix;
-
+    
     /**
      *      Name.
      */
     protected final MethodName name;
-
+    
     /**
      *      Arguments.
      */
     protected final ImmutableArray<Expression> arguments;
     
-    public MethodReference(ImmutableArray<Expression> args, MethodName n, 
-			   ReferencePrefix p) {
-	this.prefix = p;
-	name = n;
-	Debug.assertTrue(name != null, "Tried to reference unnamed method.");
-	this.arguments = args;
+    public MethodReference(ExtList args, MethodName n, 
+                   ReferencePrefix p, PositionInfo pos) {
+        super(pos);
+        this.prefix = p;
+        name = n;
+        Debug.assertTrue(name != null, "Tried to reference unnamed method.");
+        this.arguments = new ImmutableArray<Expression>((Expression[]) args.collect(Expression.class));       
     }
-
+    
+    public MethodReference(ImmutableArray<Expression> args, MethodName n, 
+            ReferencePrefix p) {
+        this.prefix = p;
+        name = n;
+        Debug.assertTrue(name != null, "Tried to reference unnamed method.");
+        this.arguments = args;        
+	checkArguments();
+    }
+    
     public MethodReference(ImmutableArray<Expression> args, MethodName n, 
 			   ReferencePrefix p, PositionInfo pos) {
 	super(pos);
 	this.prefix=p;
 	name = n;
 	Debug.assertTrue(name != null, "Tried to reference unnamed method.");
-	this.arguments=args;
+	this.arguments=args;        
+	checkArguments();
     }
 
    public MethodReference(ExtList children, MethodName n, ReferencePrefix p) {
 	this(new ImmutableArray<Expression>((Expression[]) 
 				   children.collect(Expression.class)),
-	     n, p, (PositionInfo) children.get(PositionInfo.class) );
+	     n, p, (PositionInfo) children.get(PositionInfo.class));
     }
 
-     public MethodReference(ExtList children, MethodName n, ReferencePrefix p,PositionInfo pos) {
+     public MethodReference(ExtList children, MethodName n, ReferencePrefix p,PositionInfo pos, String scope) {
 	this(new ImmutableArray<Expression>((Expression[]) 
 				   children.collect(Expression.class)),
 	     n, p, pos);
     }
 
+    protected void checkArguments(){
+	ImmutableArray<Expression> args = getArguments();
+	for(Expression arg:args){
+	    if(arg==null) 
+		throw new NullPointerException();
+	}
+    }
+    
     public SourceElement getFirstElement() {
         return (prefix == null) 
 	    ? getChildAt(0).getFirstElement() : prefix.getFirstElement();
@@ -95,7 +114,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
     public ReferencePrefix getReferencePrefix() {
         return prefix;
     }
-
+    
     /**
      *      Returns the number of children of this node.
      *      @return an int giving the number of children of this node
@@ -108,7 +127,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
         if (arguments  != null) result += arguments.size();
         return result;
     }
-
+    
     /**
      *      Returns the child at the specified index in this node's "virtual"
      *      child array
@@ -139,6 +158,8 @@ public class MethodReference extends JavaNonTerminalProgramElement
     public int getTypeReferenceCount() {
         return (prefix instanceof TypeReference) ? 1 : 0;
     }
+    
+    
 
     /*
       Return the type reference at the specified index in this node's
@@ -246,7 +267,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
 	}
 	return signature;
     }
-
+    
     /**
      * returns the static KeYJavaType of the methods prefix
      */
@@ -328,9 +349,13 @@ public class MethodReference extends JavaNonTerminalProgramElement
     }
 
     public KeYJavaType getKeYJavaType(Services services, 
-				      ExecutionContext ec) {	
-	return method(services, 
-	        determineStaticPrefixType(services, ec), ec).getKeYJavaType();
+				      ExecutionContext ec) {
+	ProgramMethod meth = method(services, 
+	        determineStaticPrefixType(services, ec), ec);
+	if(meth == null){
+	    return ec.getTypeReference().getKeYJavaType();
+	}
+	return meth.getKeYJavaType();
 		      
     }
 

@@ -14,8 +14,6 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.*;
 
-import org.apache.log4j.Logger;
-
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -29,6 +27,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.pp.Backend;
 import de.uka.ilkd.key.util.pp.Layouter;
 import de.uka.ilkd.key.util.pp.StringBackend;
@@ -87,8 +86,6 @@ public final class LogicPrinter {
 
     private SVInstantiations instantiations
     	= SVInstantiations.EMPTY_SVINSTANTIATIONS;
-
-    private static Logger logger = Logger.getLogger(LogicPrinter.class.getName());
     
     
     public static String quickPrintTerm(Term t, Services services) {
@@ -251,9 +248,8 @@ public final class LogicPrinter {
                             boolean showWholeTaclet) {
 	instantiations = sv;
 	try {
-	    if (logger.isDebugEnabled()) {
-		logger.debug(taclet.name().toString());
-	    }
+	    Debug.log4jDebug(taclet.name().toString(),
+		    	     LogicPrinter.class.getName());
 	    if (showWholeTaclet) {
 		layouter.beginC(2).print(taclet.name().toString()).print(" {");
 	    } else {
@@ -279,7 +275,8 @@ public final class LogicPrinter {
 	    }
 	    layouter.end();
 	} catch (java.io.IOException e) {
-	    logger.warn("xxx exception occurred during printTaclet");
+	    Debug.log4jWarn("xxx exception occurred during printTaclet",
+		    	    LogicPrinter.class.getName());
 	}
 	instantiations = SVInstantiations.EMPTY_SVINSTANTIATIONS;
     }
@@ -536,8 +533,9 @@ public final class LogicPrinter {
 	    } else if (o instanceof ProgramElement) {
 		printProgramElement((ProgramElement)o);
 	    } else {		
-		logger.warn("Unknown instantiation type of " + o + 
-			    "; class is " + o.getClass().getName());
+		Debug.log4jWarn("Unknown instantiation type of " + o + 
+			        "; class is " + o.getClass().getName(),
+			        LogicPrinter.class.getName());
 		printConstant(sv.name().toString());
 	    }
 	}
@@ -570,9 +568,7 @@ public final class LogicPrinter {
      * @throws IOException
      */
     public void printProgramVariable(ProgramVariable pv) throws IOException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("PP PV " + pv.name());
-        }
+	Debug.log4jDebug("PP PV " + pv.name(), LogicPrinter.class.getName());
         layouter.beginC().print(pv.name().toString()).end();
     }
 
@@ -1518,13 +1514,15 @@ public final class LogicPrinter {
         if (phi.op() instanceof ModalOperatorSV) {
             Object o = getInstantiations().getInstantiation((ModalOperatorSV) phi.op());
             if (o == null) {
-                logger.debug("PMT  NO  " + phi + " @[ " + phi.op() + " ]@ " + " is : " +
-                             phi.getClass().getName() + " @[" + phi.op().getClass().getName() + "]@ known");
+                Debug.log4jDebug("PMT  NO  " + phi + " @[ " + phi.op() + " ]@ " + " is : " +
+                                   phi.getClass().getName() + " @[" + phi.op().getClass().getName() + "]@ known",
+                                  LogicPrinter.class.getName());
             } else {
                 //logger.debug("Instantiation of " + phi + " @[" + phi.op() + "]@" + " is : " + o + o.getClass().getName());
                 //logger.debug(getInstantiations());
-                logger.debug("PMT YES " + phi.op() + " -> " + o
-                             + " @[" + o.getClass().getName() + "]@");
+                Debug.log4jDebug("PMT YES " + phi.op() + " -> " + o
+                                 + " @[" + o.getClass().getName() + "]@",
+                                 LogicPrinter.class.getName());
 
                 if(notationInfo.getAbbrevMap().isEnabled(phi)){
                     startTerm(0);

@@ -16,6 +16,8 @@ import java.util.Map;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.MemberDeclaration;
+import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
@@ -279,4 +281,14 @@ public abstract class SLResolverManager {
     public void popLocalVariablesNamespace() {
         localVariablesNamespaces = localVariablesNamespaces.tail();
     }
+    
+    
+    /**  
+     * Returns a specification-language based visibility level for the 
+     * passed member that should  take precedence over Java's ordinary 
+     * visibility, or null. 
+     */
+    public VisibilityModifier getSpecVisibility(MemberDeclaration md) {
+	return null;
+    }    
 }

@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -63,12 +63,12 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
     /**
      * The Constant OPENING_PARENS holds the characters which serve as opening parenthesis
      */
-    private static final String OPENING_PARENS = "({<[";
+    private static final String OPENING_PARENS = "({[";
     
     /**
      * The Constant CLOSING_PARENS holds the characters which serve as closing parenthesis.
      */
-    private static final String CLOSING_PARENS = ")}>]";
+    private static final String CLOSING_PARENS = ")}]";
     
     /**
      * The highlighter stores the highlights in an object which is used to denote the highlighting.

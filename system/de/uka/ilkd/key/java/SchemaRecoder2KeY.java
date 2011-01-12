@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -17,7 +17,9 @@
 
 package de.uka.ilkd.key.java;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.Reader;
 import java.io.StringReader;
 import java.util.HashMap;
 
@@ -137,8 +139,10 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader {
         SchemaJavaProgramFactory factory = (SchemaJavaProgramFactory) schemaServConf
         .getProgramFactory();
         factory.setSVNamespace(svns);
+        Reader br = null;
         try {
-            bl = factory.parseStatementBlock(new StringReader(block));
+            br = new BufferedReader(new StringReader(block));
+            bl = factory.parseStatementBlock(br);
         } catch (recoder.ParserException e) {
             Debug.out("readSchemaJavaBlock(Reader,CompilationUnit)"
                     + " caused the " + "exception:\n", e);
@@ -154,7 +158,17 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader {
                     "IO Error when parsing: \n **** BEGIN ****\n " + block
                     + "\n **** END ****\n failed. Thrown IOException:"
                     + ioe.toString());
-        }
+        } finally {
+	    if (br != null)
+	        try {
+	            br.close();
+                } catch (IOException ioe) {
+                    throw new ConvertException(
+                            "IO Error when parsing: \n **** BEGIN ****\n " + block
+                            + "\n **** END ****\n failed. Thrown IOException:"
+                            + ioe.toString());
+                }
+	}
 
         embedClass(embedMethod(embedBlock(bl), context), context);
 

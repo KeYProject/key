@@ -3,18 +3,15 @@ package de.uka.ilkd.key.smt;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.apache.log4j.Logger;
-
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.util.Debug;
 
 public class SmtLibTranslator extends AbstractSMTTranslator {
 
-    private static final Logger logger = Logger
-	    .getLogger(SmtLibTranslator.class.getName());
 
     // counter used for making names unique
     private int counter = 0;
@@ -235,8 +232,8 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 	toReturn.append("\n:formula ").append(formula).append("\n");
 
 	toReturn.append(")");
-	logger.info("Resulting formula after translation:");
-	logger.info(toReturn);
+	Debug.log4jInfo("Resulting formula after translation:", SmtLibTranslator.class.getName());
+	Debug.log4jInfo(toReturn.toString(), SmtLibTranslator.class.getName());
 	return toReturn;
 
     }

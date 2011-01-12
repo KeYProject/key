@@ -1,16 +1,9 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License.
 // See LICENSE.TXT for details.
 //
 //
@@ -426,14 +419,13 @@ public abstract class VariableNamer implements InstantiationProposer {
                 boolean collision;
                 do {
                     collision = false;
-                    Iterator<String> it = previousProposals.iterator();
-                    while(it.hasNext()) {
-                       String s = it.next();
-                       if(s.equals(result.toString())) {
-                           result = createName(basename, ++cnt, null);
-                           collision = true;
-                           break;
-                       }
+                    for (String previousProposal : previousProposals) {
+                        String s = previousProposal;
+                        if (s.equals(result.toString())) {
+                            result = createName(basename, ++cnt, null);
+                            collision = true;
+                            break;
+                        }
                     }
                 } while(collision);
             }

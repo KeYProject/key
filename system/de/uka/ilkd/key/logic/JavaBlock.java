@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -70,8 +70,16 @@ public class JavaBlock {
             return true;
         } else if (!(o instanceof JavaBlock)) {
             return false;
-        }       
-        return ((JavaBlock)o).program().equals(program());
+        } else {
+            JavaBlock block = (JavaBlock)o;
+            
+            if(block.program() == null){
+        	return program()==null;
+            }
+            else{
+        	return block.program().equals(program());
+            }
+        } 
     }
 
     /** returns true if the given ProgramElement is equal to the

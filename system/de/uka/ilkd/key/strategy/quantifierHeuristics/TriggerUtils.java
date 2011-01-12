@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -57,10 +57,9 @@ class TriggerUtils {
     public static ImmutableSet<QuantifiableVariable> intersect(ImmutableSet<QuantifiableVariable> set0,
                                                       ImmutableSet<QuantifiableVariable> set1) {
         ImmutableSet<QuantifiableVariable> res = DefaultImmutableSet.<QuantifiableVariable>nil();
-        final Iterator<QuantifiableVariable> it = set0.iterator ();
-        while ( it.hasNext () ) {
-            final QuantifiableVariable el = it.next ();
-            if ( set1.contains ( el ) ) res = res.add ( el );
+        for (QuantifiableVariable aSet0 : set0) {
+            final QuantifiableVariable el = aSet0;
+            if (set1.contains(el)) res = res.add(el);
         }
         return res;
     }

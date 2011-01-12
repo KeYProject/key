@@ -1,12 +1,10 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//
-//
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
@@ -51,12 +49,14 @@ class PredictCostProver {
     public static long computerInstanceCost(Substitution sub, Term matrix,
 	    ImmutableSet<Term> assertList, Services services) {
 
-	//HACK
-	if(!sub.isGround()) return -1;
-	
-	final PredictCostProver prover = new PredictCostProver(sub
+	if (!sub.isGround()) {
+	    // non-ground substitutions not supported yet
+	    return -1;
+	} else {
+	    final PredictCostProver prover = new PredictCostProver(sub
 		.applyWithoutCasts(matrix, services), assertList, services);
-	return prover.cost();
+	    return prover.cost();
+	}
     }
 
     // init context

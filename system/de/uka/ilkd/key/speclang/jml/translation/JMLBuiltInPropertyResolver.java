@@ -10,6 +10,7 @@
 package de.uka.ilkd.key.speclang.jml.translation;
 
 import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.*;
@@ -22,13 +23,13 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
 public final class JMLBuiltInPropertyResolver extends SLExpressionResolver {
     
-    private static final TermBuilder TB = TermBuilder.DF;    
     private final SeqLDT seqLDT;
 
     
     public JMLBuiltInPropertyResolver(JavaInfo javaInfo, 
-	    			      SLResolverManager manager) {
-        super(javaInfo, manager);
+	    			      SLResolverManager manager,
+	    			      KeYJavaType specInClass) {
+        super(javaInfo, manager, specInClass);
         this.seqLDT = services.getTypeConverter().getSeqLDT();
     }
     

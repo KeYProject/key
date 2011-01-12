@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -14,8 +14,6 @@ package de.uka.ilkd.key.rule.metaconstruct;
 
 import java.util.HashMap;
 import java.util.Stack;
-
-import org.apache.log4j.Logger;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.*;
@@ -40,7 +38,7 @@ import de.uka.ilkd.key.util.ExtList;
  */
 public class WhileLoopTransformation extends JavaASTVisitor {
 
-    protected static final Boolean CHANGED = new Boolean(true);
+    protected static final Boolean CHANGED = Boolean.TRUE;
     /** the replacement element */
     protected ProgramElement replacement;
     /** break outerlabel */
@@ -569,7 +567,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
         ExtList changeList = (ExtList)stack.peek();
         if (replaceBreakWithNoLabel == 0) {
             // the outermost loop
-            Logger.getRootLogger().error("Enhanced for loops may not be toplevel in WhileLoopTransformation");
+            Debug.log4jError("Enhanced for loops may not be toplevel in WhileLoopTransformation", null);
             doDefaultAction(x);
         } else {
             if (changeList.getFirst() == CHANGED) {

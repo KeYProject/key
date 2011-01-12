@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -66,8 +66,8 @@ public class TaskTree extends JPanel {
     public void addProof(de.uka.ilkd.key.proof.ProofAggregate plist) {
         TaskTreeNode bp = model.addProof(plist);
         Proof[] proofs = plist.getProofs();
-        for (int i=0; i<proofs.length; i++) {
-            proofs[i].addProofTreeListener(proofTreeListener);
+        for (Proof proof : proofs) {
+            proof.addProofTreeListener(proofTreeListener);
         }
         delegateView.validate();	
         delegateView.scrollPathToVisible(new TreePath(bp.getPath()));	
@@ -139,11 +139,11 @@ public class TaskTree extends JPanel {
 	    = delegateView.getSelectionModel().getSelectionPaths();
 	if (paths==null) return new BasicTask[0];
         final List<BasicTask> result = new LinkedList<BasicTask>();
-	for (int i=0; i<paths.length; i++) {
-	    if (paths[i].getLastPathComponent() instanceof BasicTask) {
-		result.add((BasicTask) paths[i].getLastPathComponent());
-	    }
-	}
+        for (TreePath path : paths) {
+            if (path.getLastPathComponent() instanceof BasicTask) {
+                result.add((BasicTask)path.getLastPathComponent());
+            }
+        }
 	return result.toArray(new BasicTask[result.size()]);
     }
 

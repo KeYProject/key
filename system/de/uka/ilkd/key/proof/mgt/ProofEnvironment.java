@@ -13,8 +13,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
-
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
@@ -42,8 +40,6 @@ public class ProofEnvironment {
     private final InitConfig initConfig; 
     private Set<ProofAggregate> proofs = new HashSet<ProofAggregate>(); //of ProofList
     private int number=0;
-
-    private Logger mgtLogger = Logger.getLogger("key.proof.mgt");
 
     /** constructs a proof environment with the given initial
      * configuration of the proofs contained in the environment.

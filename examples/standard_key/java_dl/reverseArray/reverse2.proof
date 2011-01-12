@@ -12,11 +12,11 @@
 [General]StupidMode=true
 [Strategy]MaximumNumberOfAutomaticApplications=20000
 
-[Choice]DefaultChoices=transactions-transactions\:transactionsOn , dfaPolicy-dfaPolicy\:on , programRules-programRules\:Java , throughout-throughout\:toutOn , transactionAbort-transactionAbort\:abortOn , initialisation-initialisation\:disableStaticInitialisation , intRules-intRules\:arithmeticSemanticsIgnoringOF , nullPointerPolicy-nullPointerPolicy\:nullCheck
+[Choice]DefaultChoices=transactions-transactions\\:transactionsOn , dfaPolicy-dfaPolicy\\:on , programRules-programRules\\:Java , throughout-throughout\\:toutOn , transactionAbort-transactionAbort\\:abortOn , initialisation-initialisation\\:disableStaticInitialisation , intRules-intRules\\:arithmeticSemanticsIgnoringOF , nullPointerPolicy-nullPointerPolicy\\:nullCheck
 [OCLRef]Null=true
 [OCLRef]ExcThrown=true
 [Model]Source=1
-[Choice]Choices=transactions-transactions\:transactionsOn-transactions\:transactionsOff , dfaPolicy-dfaPolicy\:on-dfaPolicy\:off , programRules-programRules\:ODL-programRules\:Java , throughout-throughout\:toutOff-throughout\:toutOn , initialisation-initialisation\:disableStaticInitialisation-initialisation\:enableStaticInitialisation , transactionAbort-transactionAbort\:abortOff-transactionAbort\:abortOn , intRules-intRules\:arithmeticSemanticsCheckingOF-intRules\:javaSemantics-intRules\:arithmeticSemanticsIgnoringOF , nullPointerPolicy-nullPointerPolicy\:noNullCheck-nullPointerPolicy\:nullCheck
+[Choice]Choices=transactions-transactions\\:transactionsOn-transactions\\:transactionsOff , dfaPolicy-dfaPolicy\\:on-dfaPolicy\\:off , programRules-programRules\\:ODL-programRules\\:Java , throughout-throughout\\:toutOff-throughout\\:toutOn , initialisation-initialisation\\:disableStaticInitialisation-initialisation\\:enableStaticInitialisation , transactionAbort-transactionAbort\\:abortOff-transactionAbort\\:abortOn , intRules-intRules\\:arithmeticSemanticsCheckingOF-intRules\\:javaSemantics-intRules\\:arithmeticSemanticsIgnoringOF , nullPointerPolicy-nullPointerPolicy\\:noNullCheck-nullPointerPolicy\\:nullCheck
 [OCLRef]Array=true
 [DecisionProcedure]=SIMPLIFY
 [General]OuterRenaming=false

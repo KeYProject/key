@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -11,6 +11,8 @@
 package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.ldt.IntegerLDT;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.StringConverter;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
@@ -218,9 +220,15 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         bindRuleSet ( d, "javaIntegerSemantics", -5000 );
             
+       
+        setUpStringNormalisation ( d, p_proof.getServices() );
+        
         setupSplitting ( d );
 
         bindRuleSet ( d, "test_gen", inftyConst () );
+        bindRuleSet ( d, "test_gen_empty_modality_hide", inftyConst () );
+        bindRuleSet ( d, "test_gen_quan", inftyConst () );
+        bindRuleSet ( d, "test_gen_quan_num", inftyConst () );
 
         bindRuleSet ( d, "gamma",
                       add ( not ( isInstantiated ( "t" ) ),
@@ -299,6 +307,9 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
                              longConst ( 200 ), longConst ( -100 ) ) ) );
                 
         
+        bindRuleSet (d, "simplify_prog_subset",	longConst(-6000));
+        bindRuleSet (d, "modal_tautology",	longConst(-10000));
+        
         // features influenced by the strategy options
         
         boolean useLoopExpand = strategyProperties.getProperty(
@@ -343,7 +354,7 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
         
         //class axioms
         bindRuleSet ( d, "classAxiom", longConst(-150) );        
-        
+                
         //limit observer (must have better priority than "classAxiom")
         bindRuleSet ( d, "limitObserver",
                       add ( NonDuplicateAppModPositionFeature.INSTANCE,
@@ -391,6 +402,185 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
         setupInstantiationWithoutRetry ( d, p_proof );
         
         return d;
+    }
+
+    private void setUpStringNormalisation (RuleSetDispatchFeature d, Services services) {
+    
+	// translates an integer into its string representation
+	bindRuleSet ( d, "integerToString", -10000);
+	
+	
+	// do not convert char to int when inside a string function
+	   // feature used to recognize if one is inside a string literal
+        final StringConverter sc = services.getTypeConverter().getStringConverter();
+	
+        final TermFeature keepChar = or ( 
+		or ( OperatorTF.create( sc.cons() ), OperatorTF.create( sc.charAt() ), OperatorTF.create(  sc.indexOf() ) ), 
+		OperatorTF.create( sc.lastIndexOf() ));
+        
+	final TermFeature emptyF = OperatorTF.create( sc.empty() );
+	
+	bindRuleSet ( d, "charLiteral_to_intLiteral",
+		ifZero ( isBelow ( keepChar ), inftyConst (), longConst (-100) ) ); 
+	
+	
+	// establish normalform 
+
+	// tf below only for test
+	final TermFeature stringLiteral = or( op (sc.empty()), op ( sc.cons() ) );
+
+	Feature belowModOpPenality = ifZero  ( isBelow ( ff.modalOperator ),
+		  longConst ( 500 ) );	
+
+
+	Feature ignoreDefOpsCharAtLetSymbols = 
+	    ifZero ( DirectlyBelowSymbolFeature.create(tf.eq, 0),
+		ifZero (IntroducedSymbolBy.create(sub(FocusProjection.create(1), 1), 
+			"defOpsCharAt", "newSym"), inftyConst()));
+
+	bindRuleSet ( d, "defOpsCharAt",
+		SumFeature.createSum ( new Feature[] {			
+			NonDuplicateAppModPositionFeature.INSTANCE, 
+				applyTF ("pos", not ( tf.zeroLiteral ) ),
+				applyTF ("str", not ( emptyF ) ),
+				ignoreDefOpsCharAtLetSymbols,
+				longConst (5000),
+				belowModOpPenality } ) ) ;
+
+	bindRuleSet ( d, "defOpsStringEqualityInline", 
+		add ( longConst (100) ,
+		      ScaleFeature.createScaled(FindDepthFeature.INSTANCE, 10) )
+	);
+		
+	bindRuleSet ( d, "defOpsStringEquality",
+		add ( NonDuplicateAppModPositionFeature.INSTANCE,
+			ifZero (
+			  add ( applyTF ("leftStr", not ( stringLiteral ) ),
+				applyTF ("rightStr", not ( stringLiteral ) ) ),
+			longConst (1000), 
+			inftyConst()
+			), belowModOpPenality ) 
+	);
+		
+	bindRuleSet ( d, "defOpsSubstringInlineBase",  
+		ifZero ( applyTF ("idx", tf.nonNegLiteral ), 
+			longConst (100), 
+			inftyConst()		
+		) );
+
+	bindRuleSet ( d, "defOpsSubstringInlineStepCons", 
+		ifZero ( applyTF ("endIdx", tf.posLiteral ),
+			longConst (100), 
+			inftyConst()		
+		) );
+	
+	bindRuleSet ( d, "defOpsSubstringInline", 
+		ifZero ( add ( applyTF ("startIdx", tf.posLiteral ), 
+			       applyTF ("endIdx", tf.posLiteral ) ),
+			longConst (100), 
+			inftyConst()		
+		) );
+
+	Feature ignoreDefOpsSubLetSymbols = 
+	    ifZero ( DirectlyBelowSymbolFeature.create(tf.eq, 0),
+		ifZero (IntroducedSymbolBy.create(sub(FocusProjection.create(1), 1), 
+			"defOpsSubstring", "newSym"), inftyConst()));
+	
+	bindRuleSet ( d, "defOpsSubstring", 
+		add ( 
+		  NonDuplicateAppModPositionFeature.INSTANCE,
+		  ifZero ( add (
+			     applyTF ("startIdx", tf.nonNegLiteral ), 
+			     applyTF ("endIdx", tf.nonNegLiteral ),
+			     applyTF ("str", stringLiteral ) ),
+			  inftyConst (), add( ignoreDefOpsSubLetSymbols, longConst(1000))
+		  ), belowModOpPenality)
+	);
+	
+	bindRuleSet ( d, "stringsLengthReduce", 
+		NonDuplicateAppModPositionFeature.INSTANCE
+	);
+	
+	bindRuleSet ( d, "defOpsConcat",
+		add( NonDuplicateAppModPositionFeature.INSTANCE,
+		     ifZero 
+		       ( or ( applyTF ("leftStr", not ( stringLiteral ) ),
+		              applyTF ("rightStr", not ( stringLiteral ) ) ), 
+		         longConst(1000)  
+		         // concat is often introduced for construction purposes, we do not want to use its definition right at the beginning      
+		       ), belowModOpPenality  ) 
+	);
+	
+	
+	bindRuleSet ( d, "stringsSimplify", longConst ( -5000 ) ); 
+	
+	bindRuleSet ( d, "stringsExpandLengthConcat", longConst ( -8000 ) ); 
+
+	bindRuleSet ( d, "stringsLengthInvariant",  
+		ifZero ( applyTF ( instOf("str"), stringLiteral ) , 
+			inftyConst(), longConst (500) )	
+	);	
+	
+	final TermFeature charOrIntLiteral = or(tf.charLiteral, 
+			tf.literal, 
+			add (OperatorClassTF.create(SortDependingFunction.class),//XXX: was CastFunctionSymbol.class
+				sub(tf.literal))); 
+	
+	bindRuleSet ( d, "defOpsReplaceInline",
+		ifZero ( add ( applyTF ("str", stringLiteral ),
+		               applyTF ("searchChar", charOrIntLiteral ),
+		               applyTF ("replChar", charOrIntLiteral ) ),
+		         longConst(500) )
+	);
+	
+	bindRuleSet ( d, "defOpsReplace",
+		add( NonDuplicateAppModPositionFeature.INSTANCE,
+		     ifZero 
+		       ( or ( applyTF ("str", not ( stringLiteral ) ),
+		              applyTF ("searchChar", not ( charOrIntLiteral ) ),
+		              applyTF ("replChar", not ( charOrIntLiteral ) )
+		              ), 
+		         longConst(500), inftyConst()		         
+		        ), belowModOpPenality ) 
+	);
+	
+	
+	bindRuleSet (d, "stringsReduceSubstring", 
+	        add(NonDuplicateAppModPositionFeature.INSTANCE,
+	        	longConst (100) ) );
+	
+	bindRuleSet (d, "defOpsStartsEndsWith", longConst (250) );
+
+
+	bindRuleSet ( d, "stringsConcatNotBothLiterals",		
+		ifZero ( MatchedIfFeature.INSTANCE,
+		ifZero ( add ( 
+			  applyTF ( instOf("leftStr"), stringLiteral ),
+			  applyTF ( instOf("rightStr"), stringLiteral ) ), 
+			inftyConst() ), inftyConst() ) ) ;	
+	
+
+	bindRuleSet ( d, "stringsReduceConcat", longConst (100) );
+	
+
+	bindRuleSet (d, "stringsReduceOrMoveOutsideConcat", 
+		ifZero (NonDuplicateAppModPositionFeature.INSTANCE,
+			longConst( 800 ), inftyConst()));
+	
+	bindRuleSet (d, "stringsMoveReplaceInside", 
+		ifZero (NonDuplicateAppModPositionFeature.INSTANCE,
+			longConst( 400 ), inftyConst()));
+	
+	bindRuleSet(d, "stringDiffIfFind", 
+		ifZero ( MatchedIfFeature.INSTANCE,
+                DiffFindAndIfFeature.INSTANCE ) );
+
+	bindRuleSet ( d, "stringsExpandDefNormalOp", 
+        	SumFeature.createSum ( new Feature[] { longConst(500) } ));
+	
+	bindRuleSet ( d, "stringsContainsDefInline", 
+        	SumFeature.createSum ( new Feature[] {
+        		EqNonDuplicateAppFeature.INSTANCE, longConst(1000) } ));
     }
 
     private void setupReplaceKnown(RuleSetDispatchFeature d) {
@@ -941,6 +1131,7 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                  longConst ( -15 ),
                                  applyTF ( "distCoeff", tf.polynomial ) ),
                         applyTF ( "distSummand0", tf.polynomial ),
+
                         applyTF ( "distSummand1", tf.polynomial ),
                         longConst ( -35 ) } ) );
 
@@ -1685,7 +1876,7 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
                  applyTF ( "divDenom", tf.notContainsDivMod ),
                  ifZero ( isBelow ( ff.modalOperator ),
                           longConst ( 200 ) ) } ) );
-        
+
             bindRuleSet ( d, "defOps_jdiv_inline",
                           add ( applyTF ( "divNum", tf.literal ),
                                 applyTF ( "divDenom", tf.polynomial ),
@@ -1943,9 +2134,10 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
         setupInEqSimpInstantiationWithoutRetry ( d, p_proof );
     }
 
+    public static final String JavaCardDLStrategy = "JavaCardDLStrategy";
     
     public Name name () {
-        return new Name("JavaCardDLStrategy");
+        return new Name(JavaCardDLStrategy);
     }
 
 
@@ -2002,7 +2194,7 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
         }
         
         public Name name () {
-            return new Name("JavaCardDLStrategy");
+            return new Name(JavaCardDLStrategy);
         }
     }
 
@@ -2020,9 +2212,10 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
     
     private class ArithTermFeatures {
 
-        public ArithTermFeatures (IntegerLDT numbers){
+	public ArithTermFeatures (IntegerLDT numbers){
             Z = numbers.getNumberSymbol ();
-
+            C = numbers.getCharSymbol();
+            
             add = numbers.getAdd();
             mul = numbers.getMul();
             mod = numbers.getMod();
@@ -2064,6 +2257,9 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
             nonPosLiteral = or ( zeroLiteral, negLiteral );
             posLiteral = add ( nonNegLiteral, not ( zeroLiteral ) );
             atLeastTwoLiteral = add ( posLiteral, not ( oneLiteral ) );
+            
+            
+            charLiteral = op ( C );
 
             atom = add ( not ( addF ), not ( mulF ) );
             linearMonomial = or ( atom, opSub ( mul, atom, literal ) );
@@ -2120,6 +2316,7 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final Sort intS;
 
         final Function Z;
+        final Function C;
         final Function add;        
         final Function mul;
         final Function mod;
@@ -2161,6 +2358,9 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final TermFeature oneLiteral;
         final TermFeature atLeastTwoLiteral;
 
+        final TermFeature charLiteral;
+
+        
         final TermFeature nonNegMonomial;
         final TermFeature posMonomial;
         final TermFeature negMonomial;
@@ -2177,11 +2377,12 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
         
         final TermFeature notContainsProduct;
         final TermFeature notContainsDivMod;
+
     }
 
     private class FormulaTermFeatures {
-
-        public FormulaTermFeatures () {
+        
+	public FormulaTermFeatures () {
             forF = extendsTrans ( Sort.FORMULA );
             
             orF = op ( Junctor.OR );
@@ -2241,6 +2442,8 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                          longTermConst ( 200 ) ) ),
                                 rec ( any (), longTermConst ( 1 ) ) );
 //            directCutAllowed = add ( tf.intInEquation, notContainsQuery );
+                     
+            
         }
 
         final TermFeature forF;

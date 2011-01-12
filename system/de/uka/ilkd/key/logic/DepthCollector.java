@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -72,7 +72,7 @@ public class DepthCollector extends Visitor {
 
 	if ( op instanceof Metavariable ||
 	     op instanceof QuantifiableVariable ) {
-	    Integer oldDepth = (Integer)varDepths.get ( op );
+	    Integer oldDepth = varDepths.get ( op );
 
 	    if ( oldDepth == null || oldDepth.intValue () < curDepth )
 		varDepths.put ( op, Integer.valueOf ( curDepth ) );
@@ -140,7 +140,7 @@ public class DepthCollector extends Visitor {
      * <code>-1</code>
      */
     public int getMaxDepth ( Operator p_var ) {
-	Integer depth = (Integer)varDepths.get ( p_var );
+	Integer depth = varDepths.get ( p_var );
 	return depth == null ? -1 : depth.intValue ();
     }
 

@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -120,7 +120,7 @@ public abstract class TypeResolver {
         @Override
         public String toString() {
             return s.toString();
-        }
+        }        
     }
     
     public static class ElementTypeResolverForSV extends TypeResolver {
@@ -223,7 +223,7 @@ public abstract class TypeResolver {
             } else if(op instanceof Function
         	      && ((Function)op).isUnique()
         	      && ((Function)op).name().toString().contains("::")) {
-        	//XXX
+        	//Heap
         	Function func = (Function) op;
         	String funcName = func.name().toString();
         	String sortName = funcName.substring(0, funcName.indexOf("::"));

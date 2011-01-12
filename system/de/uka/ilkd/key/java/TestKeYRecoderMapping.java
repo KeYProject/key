@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -38,9 +38,9 @@ public class TestKeYRecoderMapping extends TestCase{
         map = new HashMap();
         revmap = new HashMap();
         rp = new recoder.java.declaration.ClassDeclaration();
-        kp = (ProgramElement)(new EmptyStatement());
+        kp = new EmptyStatement();
         rm = new recoder.java.statement.Case();
-        km = (ModelElement)(new de.uka.ilkd.key.java.abstraction.Package("Packet"));
+        km = new de.uka.ilkd.key.java.abstraction.Package("Packet");
         rp2 = new recoder.java.declaration.ClassDeclaration();
         rm2 = new recoder.java.statement.Case();
         map.put(rp,kp);

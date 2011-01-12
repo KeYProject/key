@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -81,7 +81,7 @@ public abstract class ScaleFeature implements Feature {
         if ( dom0 instanceof TopRuleAppCost ) {
             return firstDomInfty ( f, dom1, img0, img1 );
         } else {
-            if ( img1 instanceof TopRuleAppCost )
+            if ( dom1 instanceof TopRuleAppCost )
                 return firstDomInfty ( f, dom0, img1, img0 );
             else {
                 
@@ -90,7 +90,7 @@ public abstract class ScaleFeature implements Feature {
                     return firstImgInfty ( f, dom0, dom1, img1 );
                 } else {
                     if ( img1 instanceof TopRuleAppCost )
-                        return firstImgInfty ( f, dom1, img0, img1 );
+                        return firstImgInfty ( f, dom1, dom0, img0 );
                     else {
                         return realAffine ( f, dom0, dom1, img0, img1 );
                     }

@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -34,7 +34,7 @@ import de.uka.ilkd.key.util.ExtList;
  */
 public abstract class CreatingASTVisitor extends JavaASTVisitor {
 
-    protected static final Boolean CHANGED = new Boolean(true);
+    protected static final Boolean CHANGED = Boolean.TRUE;
 
     boolean preservesPositionInfo = true;
 
@@ -118,6 +118,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         //do nothing
     }
 
+    
 
     // eee
     public void performActionOnWhile(While x) {
@@ -141,6 +142,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
             changed();
         } else {
             doDefaultAction(x);
+            performActionOnLoopInvariant(x, x);            
         }
     }
 
@@ -166,6 +168,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
             changed();
         } else {
             doDefaultAction(x);
+            performActionOnLoopInvariant(x, x);
         }
     }
 
@@ -562,6 +565,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         };
         def.doAction(x);
     }
+    
 
     public void performActionOnLessThan(LessThan x) {
         DefaultAction def = new DefaultAction(x) {
@@ -957,8 +961,8 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
 
     public void performActionOnExecutionContext(ExecutionContext x) {
         DefaultAction def = new DefaultAction(x) {
-            ProgramElement createNewElement(ExtList changeList) {
-                return new ExecutionContext(changeList);
+            ProgramElement createNewElement(ExtList changeList) {        	
+        	return new ExecutionContext(changeList);
             }
         };
         def.doAction(x);

@@ -25,7 +25,7 @@ import de.uka.ilkd.key.parser.KeYLexer;
 import de.uka.ilkd.key.parser.KeYParser;
 import de.uka.ilkd.key.parser.ParserConfig;
 import de.uka.ilkd.key.parser.ParserMode;
-import de.uka.ilkd.key.proof.CountingBufferedInputStream;
+import de.uka.ilkd.key.proof.CountingBufferedReader;
 import de.uka.ilkd.key.proof.RuleSource;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.Taclet;
@@ -289,8 +289,8 @@ public class KeYFile implements EnvInput {
         //read .key file
 	try {
             Debug.out("Reading KeY file", file);
-	    CountingBufferedInputStream cinp = 
-		new CountingBufferedInputStream
+	    CountingBufferedReader cinp = 
+		new CountingBufferedReader
 		    (getNewStream(),monitor,getNumberOfChars()/100);
                    
             final ParserConfig normalConfig 
@@ -382,7 +382,7 @@ public class KeYFile implements EnvInput {
 	    new ParserConfig(initConfig.getServices(), initConfig.namespaces());
         
 	try {
-	    final CountingBufferedInputStream cinp = new CountingBufferedInputStream
+	    final CountingBufferedReader cinp = new CountingBufferedReader
             (getNewStream(),monitor,getNumberOfChars()/100);
             KeYParser problemParser 
                 = new KeYParser(ParserMode.PROBLEM,

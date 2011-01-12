@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -10,8 +10,6 @@
 
 
 package de.uka.ilkd.key.strategy.feature;
-
-import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -35,9 +33,8 @@ public class TacletRequiringInstantiationFeature extends BinaryTacletAppFeature 
     protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
         final ImmutableSet<SchemaVariable> neededVars = app.neededUninstantiatedVars (goal.proof().getServices());
         final ImmutableSet<SchemaVariable> ifFindVars = app.taclet ().getIfFindVariables ();
-        final Iterator<SchemaVariable> it = neededVars.iterator ();
-        while ( it.hasNext () ) {
-            if ( !ifFindVars.contains ( it.next () ) ) return true;
+        for (SchemaVariable neededVar : neededVars) {
+            if (!ifFindVars.contains(neededVar)) return true;
         }
         return false;
     }

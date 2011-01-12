@@ -1,5 +1,5 @@
 # This file is part of KeY - Integrated Deductive Software Design 
-# Copyright (C) 2001-2004 Universitaet Karlsruhe, Germany
+# Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 #                         Universitaet Koblenz-Landau, Germany
 #                         Chalmers University of Technology, Sweden 
 #
@@ -45,6 +45,10 @@ endif
 
 GIT_REPOS_AVAILABLE=$(wildcard ../.git/objects)
 
+ifeq "$(GIT_REPOS_AVAILABLE)" ""
+  GIT=
+endif
+
 SHA1=ownVersion
 
 ifeq "$(KEY_VERSION_SHORT)" "" 
@@ -52,15 +56,13 @@ ifeq "$(KEY_VERSION_SHORT)" ""
 endif
 
 ifneq "$(GIT)" "" 
- ifneq "$(GIT_REPOS_AVAILABLE)" ""
    SHA1:=$(shell $(GIT) show | grep commit)
    SHA1:=$(wordlist 2,2,$(SHA1))
    ifeq "$(KEY_VERSION_SHORT)" "0.0.0" 
      KEY_VERSION_SHORT:=$(shell $(GIT) log --pretty=one | wc -l)
      KEY_VERSION_SHORT:=$(wordlist 1,1,$(KEY_VERSION_SHORT))
-     KEY_VERSION_SHORT:=1.5.$(KEY_VERSION_SHORT)
+     KEY_VERSION_SHORT:=1.7.$(KEY_VERSION_SHORT)
    endif
- endif
 endif
 
 ifeq "$(KEY_VERSION_LONG)" ""
@@ -294,6 +296,8 @@ endif
 javaFiles: 
 ifneq ("$(GIT)","")
 	@$(GIT) ls-files | grep "\.java" | grep -v "aspects" | grep -v "gjava" | grep -v "\.java\." | grep -v "resources/" | sort > javaFiles
+else
+	@find de/ -name \*\.java  | grep -v "aspects" | grep -v "gjava" | grep -v "\.java\." | grep -v "resources/" | sort > javaFiles
 endif
 
 argfile.normal: javaFiles
@@ -429,3 +433,15 @@ eclipse-plug-in: dist
 	@cp  ../eclipse/ProofVisualization/ProofVisualization_*.jar $(BINARYPATH)$(PFX)casetool/eclipse/KeY_Feature/plugins
 	@cp  ../eclipse/org.key-project.core/org.key_project.core_* $(BINARYPATH)$(PFX)casetool/eclipse/KeY_Feature/plugins
 	@cp  ../eclipse/KeYExternalLibraries/KeYExternalLibraries_1* $(BINARYPATH)$(PFX)casetool/eclipse/KeY_Feature/plugins
+
+#mostly useful for creating the COST tool distribution
+localinst:
+	@echo "Do not forget to make jar first"
+	@mkdir -p /usr/lib/key
+	@cp -r ../bin /usr/lib/key
+	@mkdir -p /usr/lib/key/key-ext-jars
+	@cp $(KEY_LIB)/recoderKey.jar /usr/lib/key/key-ext-jars
+	@cp $(KEY_LIB)/antlr.jar /usr/lib/key/key-ext-jars
+	@cp key.jar /usr/lib/key
+	@sed -i 's/system\/binary\//key.jar/g' /usr/lib/key/bin/*
+	@ln -sf /usr/lib/key/bin/runProver /usr/bin/

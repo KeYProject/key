@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -15,7 +15,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.statement.For;
-import de.uka.ilkd.key.java.statement.LoopInit;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
@@ -49,7 +48,7 @@ public class Unpack extends ProgramMetaConstruct {
 	}
 
 	loopInitStatementList
-	[loopInitStatementList.length - 1] = new For((LoopInit)null, 
+	[loopInitStatementList.length - 1] = new For(null,
 		astFor.getGuard(), 
 		astFor.getIForUpdates(), 
 		astFor.getBody());

@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -155,7 +155,6 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 	    doDefaultAction(pv);
 	}
     }
-
     
     private Term replaceVariablesInTerm(Term t){  
      	if(t==null) {
@@ -248,6 +247,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             = replaceVariablesInTerm(inv.getVariant(selfTerm, 
                                                     heapAtPre, 
                                                     services));
+        
         
         Term newSelfTerm = replaceVariablesInTerm(selfTerm); 
         Term newHeapAtPre = replaceVariablesInTerm(heapAtPre);

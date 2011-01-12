@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -580,15 +580,14 @@ public class KeYProgModelInfo{
         final ImmutableList<Field> javaLangObjectField = 
             getAllVisibleFields((KeYJavaType)rec2key().
                                 toKeY(sc.getNameInfo().getJavaLangObject()));
-                
-        final Iterator<Field> it = javaLangObjectField.iterator();
-        while (it.hasNext()) {
-           final Field f = it.next();
-           
-           if (!((recoder.abstraction.Field)
-                   rec2key().toRecoder(f)).isPrivate()){
-               result = result.append(f);
-           }
+
+        for (Field aJavaLangObjectField : javaLangObjectField) {
+            final Field f = aJavaLangObjectField;
+
+            if (!((recoder.abstraction.Field)
+                    rec2key().toRecoder(f)).isPrivate()) {
+                result = result.append(f);
+            }
         }                          
         return result;
     }
@@ -623,7 +622,9 @@ public class KeYProgModelInfo{
         for (int i=rctl.size()-1; i>=0 ; i--){
             final recoder.abstraction.ClassType rct = rctl.get(i);
             final KeYJavaType kct = (KeYJavaType)rec2key().toKeY(rct);
-            result = result.prepend(kct);
+	    if(kct!=null){
+		result = result.prepend(kct);
+	    }
         }
         return result;
     }
@@ -747,16 +748,15 @@ public class KeYProgModelInfo{
         List<recoder.abstraction.ClassType> classes = si.getSubtypes(ct);
 
         //alpha sorting to make order deterministic
-        recoder.abstraction.ClassType[] classesArray = 
-            classes.toArray(new recoder.abstraction.ClassType[0]);
+        recoder.abstraction.ClassType[] classesArray =
+                classes.toArray(new recoder.abstraction.ClassType[classes.size()]);
         java.util.Arrays.sort(classesArray, new java.util.Comparator<recoder.abstraction.ClassType>() {
             public int compare(ClassType o1, ClassType o2) {                
                 return -o1.getFullName().compareTo(o2.getFullName());
             }
         });
 
-        for (int i = 0; i <classesArray.length; i++) {
-            recoder.abstraction.ClassType c = classesArray[i];
+        for (recoder.abstraction.ClassType c : classesArray) {
             result = recFindImplementations(c, name, signature, result);
         }
         return result;

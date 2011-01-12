@@ -1,12 +1,10 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//
-//
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
@@ -181,9 +179,8 @@ class TriggersSet {
                     TriggerUtils.iteratorByOperator(clause, Junctor.OR);
             while (it.hasNext()) {
                 final Term oriTerm = it.next();
-                final Iterator<Term> it2 = expandIfThenElse(oriTerm).iterator();
-                while (it2.hasNext()) {
-                    Term t = it2.next();
+                for (Term term : expandIfThenElse(oriTerm)) {
+                    Term t = term;
                     if (t.op() == Junctor.NOT) {
                         t = t.sub(0);
                     }
@@ -269,9 +266,8 @@ class TriggersSet {
             }
 
 
-            final Iterator<Term> it = possibleSubs[i].iterator();
-            while (it.hasNext()) {
-                chosenSubs[i] = it.next();
+            for (Term term : possibleSubs[i]) {
+                chosenSubs[i] = term;
                 set.addAll(combineSubterms(oriTerm, possibleSubs,
                         chosenSubs, boundVars,
                         i + 1));
@@ -374,15 +370,14 @@ class TriggersSet {
         	Set<ImmutableSet<Trigger>> nextTriggers = setMultiTriggers(ts);
 
         	res.addAll(nextTriggers);
-        	Iterator<ImmutableSet<Trigger>> it = nextTriggers.iterator();
-        	while (it.hasNext()) {
-        	    ImmutableSet<Trigger> next = it.next();
-        	    next = next.add(trigger);
-        	    if (addMultiTrigger(next)) {
-        		continue;
-        	    }
-        	    res.add(next);
-        	}
+                for (ImmutableSet<Trigger> nextTrigger : nextTriggers) {
+                    ImmutableSet<Trigger> next = nextTrigger;
+                    next = next.add(trigger);
+                    if (addMultiTrigger(next)) {
+                        continue;
+                    }
+                    res.add(next);
+                }
             }
             return res;
         }
@@ -398,9 +393,8 @@ class TriggersSet {
          */
         private boolean addMultiTrigger(ImmutableSet<Trigger> trs) {
             ImmutableSet<QuantifiableVariable> mulqvs = DefaultImmutableSet.<QuantifiableVariable>nil();
-            Iterator<Trigger> it = trs.iterator();
-            while (it.hasNext()) {
-                mulqvs = mulqvs.union(it.next().getTriggerTerm().freeVars());
+            for (Trigger tr : trs) {
+                mulqvs = mulqvs.union(tr.getTriggerTerm().freeVars());
             }
             if (selfUQVS.subset(mulqvs)) {
                 Trigger mt = createMultiTrigger(trs, clause, selfUQVS);

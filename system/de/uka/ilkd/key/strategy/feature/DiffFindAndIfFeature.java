@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -9,8 +9,6 @@
 //
 
 package de.uka.ilkd.key.strategy.feature;
-
-import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.logic.ConstrainedFormula;
@@ -39,16 +37,15 @@ public class DiffFindAndIfFeature extends BinaryTacletAppFeature {
         ImmutableList<IfFormulaInstantiation> list = app.ifFormulaInstantiations();
         
         assert list != null;
-                            
-        final Iterator<IfFormulaInstantiation> it = list.iterator();
-        while (it.hasNext()) {
-            final IfFormulaInstSeq iffi = (IfFormulaInstSeq) it.next();
+
+        for (IfFormulaInstantiation aList : list) {
+            final IfFormulaInstSeq iffi = (IfFormulaInstSeq) aList;
             assert iffi != null;
-            final ConstrainedFormula findFormula = pos.constrainedFormula ();
-            final ConstrainedFormula ifFormula   = iffi.getConstrainedFormula();
-            
-            final boolean result = pos.isInAntec () != iffi.inAntec ()
-            || !findFormula.equals ( ifFormula );
+            final ConstrainedFormula findFormula = pos.constrainedFormula();
+            final ConstrainedFormula ifFormula = iffi.getConstrainedFormula();
+
+            final boolean result = pos.isInAntec() != iffi.inAntec()
+                    || !findFormula.equals(ifFormula);
             if (!result) {
                 return false;
             }

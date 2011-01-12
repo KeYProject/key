@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -11,6 +11,7 @@
 
 package de.uka.ilkd.key.java.expression.operator;
 
+import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.util.ExtList;
@@ -31,6 +32,15 @@ public class GreaterThan extends ComparativeOperator {
 
     public GreaterThan(ExtList children) {
         super(children);
+    }
+
+    /**
+     * Greater than.
+     * @param lhs the expression that is checked to be greater than rhs
+     * @param rhs the expression that is checked to be less than lhs
+     */
+    public GreaterThan(Expression lhs, Expression rhs) {
+        super(lhs, rhs);
     }
 
     /**

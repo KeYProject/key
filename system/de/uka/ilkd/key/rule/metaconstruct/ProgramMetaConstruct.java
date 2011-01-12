@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -93,7 +93,7 @@ public abstract class ProgramMetaConstruct extends JavaNonTerminalProgramElement
      * this element, may be equals to this element.
     */
     public SourceElement getLastElement() {
-        return (body != null) ? body : (SourceElement)this;
+        return (body != null) ? body : this;
     }
 
     /**

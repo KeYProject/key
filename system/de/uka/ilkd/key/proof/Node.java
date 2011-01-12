@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -70,8 +70,10 @@ public class Node {
      */
     private ImmutableSet<NoPosTacletApp>  localIntroducedRules = DefaultImmutableSet.<NoPosTacletApp>nil();
     
+    
     /** creates an empty node that is root and leaf.
      */
+
     public Node(Proof proof) {
 	this.proof = proof;
 	rootSink = new BufferSink ( null );
@@ -590,7 +592,7 @@ public class Node {
 	final LinkedList<Node> subTreeNodes = new LinkedList<Node>();
 	subTreeNodes.add(this);	
 	while (!subTreeNodes.isEmpty()) {
-	    final Node n = (Node)subTreeNodes.removeFirst();
+	    final Node n = subTreeNodes.removeFirst();
 	    n.closed = true;	    
 	    subTreeNodes.addAll(n.children);
 	}
@@ -670,6 +672,5 @@ public class Node {
 
     public int getUniqueTacletNr() {
         return getIntroducedRulesCount();
-    }
-
+    }    
  }

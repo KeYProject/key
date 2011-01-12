@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -181,7 +181,7 @@ public class RecentFileMenu {
      */
     public void load(Properties p) {
         int i=maxNumberOfEntries;
-        String s = null;
+        String s  ;
         do {
             s = p.getProperty("RecentFile"+i);
             if (s != null) addRecentFile(s);

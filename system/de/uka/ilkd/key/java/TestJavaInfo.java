@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -100,23 +100,23 @@ public class TestJavaInfo extends TestCase {
     };
     
     private static final String[] generalImplicitFields = new String[]{
-      ImplicitFieldAdder.IMPLICIT_CREATED, ImplicitFieldAdder.IMPLICIT_NEXT_TO_CREATE,
+      ImplicitFieldAdder.IMPLICIT_CREATED,
       ImplicitFieldAdder.IMPLICIT_INITIALIZED
     };
     
     
     public void testFindImplicitAttributesForClassTypesOnly() {
         KeYJavaType obj = javaInfo.getKeYJavaType("java.lang.Object");
-        for (int i = 0; i<generalImplicitFields.length; i++) {           
-            assertTrue("Could not find " + generalImplicitFields[i] + 
-                    "attribute for arrays.", 
-                    javaInfo.lookupVisibleAttribute(generalImplicitFields[i], 
+        for (String generalImplicitField : generalImplicitFields) {
+            assertTrue("Could not find " + generalImplicitField +
+                    "attribute for arrays.",
+                    javaInfo.lookupVisibleAttribute(generalImplicitField,
                             obj) != null);
-        }    
-        for (int i = 0; i<implictFieldsClassOnly.length; i++) {           
-            assertTrue("Could not find " + implictFieldsClassOnly[i] + 
-                    "attribute for arrays.", 
-                    javaInfo.lookupVisibleAttribute(implictFieldsClassOnly[i], 
+        }
+        for (String anImplictFieldsClassOnly : implictFieldsClassOnly) {
+            assertTrue("Could not find " + anImplictFieldsClassOnly +
+                    "attribute for arrays.",
+                    javaInfo.lookupVisibleAttribute(anImplictFieldsClassOnly,
                             obj) != null);
         }    
     }
@@ -187,10 +187,10 @@ public class TestJavaInfo extends TestCase {
         final String[] primitiveTypeNames = new String[]{
                "long", "int", "short", "byte", "char", "boolean"
         };
-        
-        for (int i = 0; i<primitiveTypeNames.length; i++) {
-            assertNotNull("Type" + primitiveTypeNames[i] +" not found", 
-                    javaInfo.getPrimitiveKeYJavaType(primitiveTypeNames[i]));
+
+        for (String primitiveTypeName : primitiveTypeNames) {
+            assertNotNull("Type" + primitiveTypeName + " not found",
+                    javaInfo.getPrimitiveKeYJavaType(primitiveTypeName));
         }
         
         assertNull("Ooops, non primitive type found",

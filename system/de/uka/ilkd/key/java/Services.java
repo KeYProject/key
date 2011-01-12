@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -12,6 +12,7 @@ package de.uka.ilkd.key.java;
 
 import java.util.HashMap;
 
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.java.recoderext.SchemaCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.logic.InnerVariableNamer;
@@ -100,11 +101,11 @@ public class Services{
 	    this.exceptionHandler = exceptionHandler;
 	}
         javainfo = new JavaInfo
-        (new KeYProgModelInfo(typeconverter, this.exceptionHandler), this);
-
+        	(new KeYProgModelInfo(typeconverter, this.exceptionHandler), this);
         nameRecorder = new NameRecorder();
     }
 
+    // ONLY for tests
     public Services(){
 	this((KeYExceptionHandler) null);
     }
@@ -116,10 +117,10 @@ public class Services{
 	//	exceptionHandler = new KeYRecoderExcHandler();
 	javainfo = new JavaInfo
 	    (new KeYProgModelInfo(crsc, rec2key, typeconverter), this);
-        nameRecorder = new NameRecorder();
+	nameRecorder = new NameRecorder();
     }
 
-
+    
     public KeYExceptionHandler getExceptionHandler(){
 	return exceptionHandler;
     }

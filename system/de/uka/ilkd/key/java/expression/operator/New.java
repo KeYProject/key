@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -11,11 +11,7 @@
 
 package de.uka.ilkd.key.java.expression.operator;
 
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclarationContainer;
@@ -51,7 +47,7 @@ public class New
      *      Anonymous class.
      */
     protected final ClassDeclaration anonymousClass;
-
+    
     /**
      *      Access path.
      */
@@ -89,7 +85,7 @@ public class New
      */
     public New(ExtList children, ReferencePrefix rp, PositionInfo pi) {
 	super(children, pi);
-	anonymousClass=(ClassDeclaration)children.get(ClassDeclaration.class);
+	anonymousClass=(ClassDeclaration)children.get(ClassDeclaration.class);        
 	accessPath=rp;
     }
 
@@ -104,7 +100,7 @@ public class New
 	anonymousClass = null;
 	accessPath = rp;
     }
-
+    
     public SourceElement getFirstElement() {
         return (accessPath != null) ? accessPath.getFirstElement() : this;
     }
@@ -220,7 +216,7 @@ public class New
     public ReferencePrefix getReferencePrefix() {
         return accessPath;
     }
-
+    
     /** calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
      * @param v the Visitor

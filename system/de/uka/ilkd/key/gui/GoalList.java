@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -415,10 +415,9 @@ public class GoalList extends JList {
 
 	public void add(ImmutableList<Goal> g) {
 	    if (!g.isEmpty()) {
-		final Iterator<Goal> it = g.iterator();
-		while (it.hasNext()) {
-		    goals.add(it.next());
-		}	
+            for (Goal aG : g) {
+                goals.add(aG);
+            }
 		fireIntervalAdded(this, goals.size()-g.size(), 
 				  goals.size()-1);
 	    }
@@ -510,6 +509,9 @@ public class GoalList extends JList {
 	        clear ();
                 add ( e.getSource ().openGoals () );
             }
+
+	    
+	    public void smtDataUpdate(ProofTreeEvent e) {}
 
 	}
     }

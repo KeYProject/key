@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -9,6 +9,7 @@
 
 package de.uka.ilkd.key.gui;
 
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
@@ -81,5 +82,4 @@ public interface IMain {
      * @param event the NotificationEvent
      */
     public abstract void notify(NotificationEvent event);
-
 }

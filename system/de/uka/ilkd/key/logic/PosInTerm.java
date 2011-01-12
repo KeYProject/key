@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -179,10 +179,9 @@ public class PosInTerm {
 	while (tker.hasMoreTokens()) 
 	    list = list.prepend(Integer.decode(tker.nextToken()));
 
-	Iterator<Integer> it = list.iterator();
-	while (it.hasNext()) {
-	    result = new PosInTerm(result, it.next().intValue());
-	}
+        for (Integer aList : list) {
+            result = new PosInTerm(result, aList.intValue());
+        }
 
 	return result;       
     }

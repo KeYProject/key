@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -298,7 +298,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
         //determine purity
         final boolean isPure = JMLInfoExtractor.isPure(pm);
         final boolean isHelper = JMLInfoExtractor.isHelper(pm);
-
+        
         //get textual JML constructs
         Comment[] comments = pm.getComments();
         ImmutableList<TextualJMLConstruct> constructs;
@@ -351,7 +351,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
         	    specCase.addSignals(new PositionedString("(Exception e) <inv>"));
         	}
             }
-
+                        
             //add non-null preconditions
             for(int j = 0, n = pm.getParameterDeclarationCount(); j < n; j++) {
                 //no additional precondition for primitive types!
@@ -366,11 +366,16 @@ public final class JMLSpecExtractor implements SpecExtractor {
                     for (PositionedString nonNull : nonNullParams) {
                 	specCase.addRequires(nonNull);
                     }
-                }
+		}
+		String param_name = paramDecl.getName();
+                Type t = pm.getParameterDeclarationAt(j).
+                            getTypeReference().
+                            getKeYJavaType();                 
             }
 
             //add non-null postcondition
             KeYJavaType resultType = pm.getKeYJavaType();
+
             if(resultType != null &&
         	    !JMLInfoExtractor.resultIsNullable(pm) &&
         	    specCase.getBehavior() != Behavior.EXCEPTIONAL_BEHAVIOR) {
@@ -379,7 +384,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
         		    fileName, pm.getStartPosition());
         	for (PositionedString nonNull : resultNonNull) {
         	    specCase.addEnsures(nonNull);
-        	}
+        	}               
             }
 
             //add implicit signals-only if omitted

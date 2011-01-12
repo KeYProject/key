@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -9,8 +9,6 @@
 //
 
 package de.uka.ilkd.key.proof;
-
-import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -40,18 +38,17 @@ public class InstantiationProposerCollection implements InstantiationProposer {
 			      Services services,
 			      Node undoAnchor,
 			      ImmutableList<String> previousProposals) {
-	Iterator<InstantiationProposer> it = proposers.iterator();
-	while(it.hasNext()) {
-	    InstantiationProposer proposer = it.next();
-	    String proposal = proposer.getProposal(app, 
-	    					   var, 
-						   services, 
-						   undoAnchor,
-						   previousProposals);
-	    if(proposal != null) {
-	    	return proposal;
-	    }
-	}
+        for (InstantiationProposer proposer1 : proposers) {
+            InstantiationProposer proposer = proposer1;
+            String proposal = proposer.getProposal(app,
+                    var,
+                    services,
+                    undoAnchor,
+                    previousProposals);
+            if (proposal != null) {
+                return proposal;
+            }
+        }
 	
 	return null;
     }

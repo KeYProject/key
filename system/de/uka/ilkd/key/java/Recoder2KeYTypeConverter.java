@@ -1,16 +1,13 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 
-
-
 package de.uka.ilkd.key.java;
 
-import java.util.Iterator;
 import java.util.List;
 
 import recoder.ServiceConfiguration;
@@ -248,7 +245,7 @@ public class Recoder2KeYTypeConverter {
     private void addKeYJavaType(recoder.abstraction.Type t, Sort s) {
         KeYJavaType result = null;
         if (!(t instanceof recoder.java.declaration.TypeDeclaration)) {
-            de.uka.ilkd.key.java.abstraction.Type type = null;
+            de.uka.ilkd.key.java.abstraction.Type type;
             if (t instanceof recoder.abstraction.PrimitiveType) {
                 type = PrimitiveType.getPrimitiveType(t.getFullName());
                 result = typeConverter.getKeYJavaType(type);
@@ -294,7 +291,7 @@ public class Recoder2KeYTypeConverter {
         if (t instanceof recoder.abstraction.ArrayType) {
             result.setJavaType(createArrayType(
                     getKeYJavaType(((recoder.abstraction.ArrayType) t)
-                            .getBaseType()), (KeYJavaType) lookupInCache(t)));
+                            .getBaseType()), lookupInCache(t)));
         }
 
         // return was never used, so it is removed and method changed to void (mu)
@@ -315,8 +312,8 @@ public class Recoder2KeYTypeConverter {
 
         List<recoder.abstraction.ClassType> supers = classType.getSupertypes();
         ImmutableSet<Sort> ss = DefaultImmutableSet.<Sort>nil();
-        for (int i = 0; i < supers.size(); i++) {
-            ss = ss.add(getKeYJavaType(supers.get(i)).getSort());
+        for (recoder.abstraction.ClassType aSuper : supers) {
+            ss = ss.add(getKeYJavaType(aSuper).getSort());
         }       
 
         /* ??
@@ -448,10 +445,6 @@ public class Recoder2KeYTypeConverter {
                 KeYJavaType integerType = getKeYJavaType(getServiceConfiguration()
                         .getNameInfo().getIntType());
 
-                members.add(createImplicitArrayField(
-                        ImplicitFieldAdder.IMPLICIT_NEXT_TO_CREATE, new TypeRef(
-                                integerType), true, parent));
-
                 final recoder.service.NameInfo nameInfo = getServiceConfiguration()
                 .getNameInfo();
 
@@ -468,8 +461,17 @@ public class Recoder2KeYTypeConverter {
                 if (arrayMethodBuilder == null) {
                     initArrayMethodBuilder();
                 }
+
+		//disabled PERC Pico extensions from side branch engelcMemoryConsumption
+		/*
+                AnnotationUseSpecification ecs = 
+                    new AnnotationUseSpecification(new TypeRef(getKeYJavaType("ExternallyConstructedScope")));
+                AnnotationUseSpecification nls = 
+                    new AnnotationUseSpecification(new TypeRef(getKeYJavaType("NoLocalScope")));
+		*/
+
                 final ProgramMethod prepare = arrayMethodBuilder.getPrepareArrayMethod(
-                        parentReference, length, defaultValue, fields);
+										       parentReference, length, defaultValue, fields);
 
                 members.add(arrayMethodBuilder
                         .getArrayInstanceAllocatorMethod(parentReference));
@@ -544,9 +546,8 @@ public class Recoder2KeYTypeConverter {
      */
     private ImmutableList<Field> filterField(ExtList list) {
         ImmutableList<Field> result = ImmutableSLList.<Field>nil();
-        Iterator it = list.iterator();
-        while (it.hasNext()) {
-            Object pe = it.next();
+        for (Object aList : list) {
+            Object pe = aList;
             if (pe instanceof FieldDeclaration) {
                 result = result.prepend(filterField((FieldDeclaration) pe));
             }

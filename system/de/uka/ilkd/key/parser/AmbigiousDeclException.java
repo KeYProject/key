@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -37,9 +37,11 @@ public class AmbigiousDeclException extends antlr.SemanticException {
     }
     /**
      * Returns a clean error message (no line number/column information)
+     * @deprecated
      */
+    @Deprecated
     public String getErrorMessage () {
-	return "The name \'" + ambigious_symbol + "\' is already in use.";
+	return getMessage();
     }
 
     /**
@@ -47,7 +49,7 @@ public class AmbigiousDeclException extends antlr.SemanticException {
      */
     public String getMessage ()
     {
-	return getErrorMessage();
+	return "The name \'" + ambigious_symbol + "\' is already in use.";
     }
     
     /**
@@ -55,6 +57,6 @@ public class AmbigiousDeclException extends antlr.SemanticException {
      */
     public String toString() {
 	return filename + "("+this.getLine()+", "+this.getColumn()+"):\n"
-	    + getErrorMessage();
+	    + getMessage();
     }
 }

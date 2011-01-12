@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -12,7 +12,6 @@ package de.uka.ilkd.key.rule.metaconstruct;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.declaration.EnumClassDeclaration;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
-import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
@@ -55,7 +54,7 @@ public final class EnumConstantValue extends AbstractMetaOperator {
             ProgramVariable pv = (ProgramVariable) op;
             String varname = pv.getProgramElementName().getProgramName();
 
-            if (varname.endsWith(ImplicitFieldAdder.IMPLICIT_NEXT_TO_CREATE)) {
+            if (false){//varname.endsWith(ImplicitFieldAdder.IMPLICIT_NEXT_TO_CREATE)) {//TODO
                 // <nextToCreate>
                 if (pv.getContainerType().getJavaType() instanceof EnumClassDeclaration) {
                     EnumClassDeclaration ecd = (EnumClassDeclaration) pv

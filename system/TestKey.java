@@ -8,7 +8,6 @@
 //
 //
 
-import de.uka.ilkd.key.collection.TestSLListOfString;
 import junit.framework.TestCase;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
@@ -20,7 +19,7 @@ public class TestKey extends TestCase {
 	de.uka.ilkd.key.collection.TestSLListOfString.class,
 	de.uka.ilkd.key.collection.TestMapAsListFromIntegerToString.class,
 	de.uka.ilkd.key.collection.TestLeftistHeapOfInteger.class,
-	de.uka.ilkd.key.util.pp.TestLayouter.class,
+	de.uka.ilkd.key.util.pp.TestLayouter.class
     }; 
 
 
@@ -78,6 +77,7 @@ public class TestKey extends TestCase {
         de.uka.ilkd.key.speclang.jml.pretranslation.TestJMLPreTranslator.class
     };
      
+     
     static Class[] smtTests = new Class[] {
 	de.uka.ilkd.key.smt.test.TestSimplify.class,
 	de.uka.ilkd.key.smt.test.TestZ3.class,
@@ -106,6 +106,7 @@ public class TestKey extends TestCase {
      
     public static junit.framework.Test suite() {
 	de.uka.ilkd.key.util.Debug.ENABLE_DEBUG = false;
+	de.uka.ilkd.key.gui.Main.setVisibleMode(false);
         
 	TestSuite suite = new TestSuite();
 	suite.addTest(createSuite(utilityTests, "Testing Utilities and Collections"));
@@ -121,6 +122,6 @@ public class TestKey extends TestCase {
     }
 
     public TestKey(String name) {
-	super(name);        
+	super(name);
     }
 }

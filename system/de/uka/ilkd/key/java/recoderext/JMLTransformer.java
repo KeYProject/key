@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -37,17 +37,18 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.*;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
 
-public final class JMLTransformer extends RecoderModelTransformer {
+public class JMLTransformer extends RecoderModelTransformer {
     
     private static final ImmutableList<String> javaMods
         = ImmutableSLList.<String>nil().prepend(new String[]{"abstract",
-                                                             "final", 
-                                                             "private", 
-                                                             "protected", 
-                                                             "public", 
-        						     "static"});    
+                                                         "final", 
+                                                         "private", 
+                                                         "protected", 
+                                                         "public", 
+                                                         "static"});    
     
-    private static ImmutableSet<PositionedString> warnings;
+    private static ImmutableSet<PositionedString> warnings 
+    	= DefaultImmutableSet.<PositionedString>nil();
 
     private HashMap<TypeDeclaration, List<Method>> typeDeclaration2Methods;
 
@@ -144,7 +145,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
         
         for(String mod : mods) {
             if(!javaMods.contains(mod)) {
-                sb.append(mod + " ");
+                sb.append(mod).append(" ");
             }
         }
         
@@ -204,8 +205,8 @@ public final class JMLTransformer extends RecoderModelTransformer {
         }
         
         Comment[] result = pe.getComments().toArray(new Comment[0]);
-        for (int i = 0; i < result.length; i++) {
-            result[i].setParent(pe);
+        for (Comment aResult : result) {
+            aResult.setParent(pe);
         }
 
         return result;
@@ -225,9 +226,9 @@ public final class JMLTransformer extends RecoderModelTransformer {
         //prepend Java modifiers
         PositionedString declWithMods = prependJavaMods(decl.getMods(), 
                                                         decl.getDecl());
-        
+                
         //ghost or model?
-        boolean isGhost = false;;
+        boolean isGhost = false;
         boolean isModel = false;
         if(decl.getMods().contains("ghost")) {
             isGhost = true;
@@ -247,7 +248,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
                             "JML field declaration has to be ghost or model!",
                             declWithMods.fileName,
                             declWithMods.pos);
-        }
+        }        
         
         //determine parent, child index
         NonTerminalProgramElement astParent
@@ -262,6 +263,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
                 fieldDecl 
                     = services.getProgramFactory()
                               .parseFieldDeclaration(declWithMods.text);
+
                 if(decl.getMods().contains("instance")) {
                     fieldDecl = new FieldDeclaration((FieldDeclaration)fieldDecl) {
                 	@Override
@@ -269,7 +271,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
                 	    return false;
                 	}
                     };
-                }                
+                }       
                 updatePositionInformation(fieldDecl, declWithMods.pos);
                 
                 //set comments: the original list of comments with the declaration, 
@@ -307,7 +309,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
                        (StatementBlock) astParent, 
                        childIndex); //Unlike above, here the value is really a 
                                     //child index, and here the position really
-                                    //matters. 
+                                    //matters.             
             }
         } catch(Throwable e) {
             throw new SLTranslationException(e.getMessage()
@@ -319,14 +321,14 @@ public final class JMLTransformer extends RecoderModelTransformer {
                                              e.getStackTrace());
         }
 
-        //add ghost modifier
+        //add ghost or model modifier
         ASTList<DeclarationSpecifier> mods 
         	= fieldDecl.getDeclarationSpecifiers();
         if(mods == null) {
             mods = new ASTArrayList<DeclarationSpecifier>();
         }
         mods.add(isGhost ? new Ghost() : new Model());
-        fieldDecl.setDeclarationSpecifiers(mods);
+        fieldDecl.setDeclarationSpecifiers(mods);    
     }
     
 
@@ -416,7 +418,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
                                              e.getStackTrace());
         }
     }
-    
+        
         
     private void transformClasslevelComments(TypeDeclaration td, 
                                              String fileName) 
@@ -488,8 +490,8 @@ public final class JMLTransformer extends RecoderModelTransformer {
                                                 throws SLTranslationException {
         //recurse to all pre-existing children
         ProgramElement[] children = getChildren(pe);
-        for(int i = 0; i < children.length; i++) {
-            transformMethodlevelCommentsHelper(children[i], fileName);
+        for (ProgramElement aChildren : children) {
+            transformMethodlevelCommentsHelper(aChildren, fileName);
         }
         
         if(pe instanceof MethodDeclaration) return;
@@ -547,14 +549,42 @@ public final class JMLTransformer extends RecoderModelTransformer {
     
     public ProblemReport analyze() {
 	 for(int i = 0, m = getUnits().size(); i < m; i++) {
-             CompilationUnit unit = getUnits().get(i);
+             final CompilationUnit unit = getUnits().get(i);
              
-             //copy comments of compilation unit to primary type declaration
-             if(unit.getComments() != null 
-                     && unit.getTypeDeclarationCount() > 0) {
-                 TypeDeclaration td = unit.getPrimaryTypeDeclaration();
-                 ASTList<Comment> tdComments = new ASTArrayList<Comment>(); 
-                 tdComments.addAll(unit.getComments().deepClone());
+             //move comments of type declarations to previous type declaration
+             //(because RecodeR attaches comments appearing at the end of a type 
+             // declaration to the next one; for example, in a unit with the 
+             // text 
+             //     class A {
+             //        //@ invariant true;
+             //     }
+             //     class B {}
+             // the invariant will appear as a comment of B. We move it to A 
+             // here.)
+             for(int j = 1; j < unit.getTypeDeclarationCount(); j++) {
+        	 TypeDeclaration td1 = unit.getTypeDeclarationAt(j - 1);
+        	 TypeDeclaration td2 = unit.getTypeDeclarationAt(j);
+        	 td1.setComments(td2.getComments());
+             }
+             
+             //copy comments of compilation unit to last type declaration 
+             //(because RecodeR attaches comments appearing at the end of the 
+             // last type declaration to the unit; for example, in a unit with 
+             // the text 
+             //     class A {}
+             //     class B {
+             //        //@ invariant true;    
+	     //     }
+             // the invariant will appear as a comment of the unit. We move it 
+             // to B here.)
+             if(unit.getTypeDeclarationCount() > 0) {
+                 TypeDeclaration td 
+                 	= unit.getTypeDeclarationAt(
+                 			unit.getTypeDeclarationCount() - 1);
+                 ASTList<Comment> tdComments = new ASTArrayList<Comment>();
+                 if(unit.getComments() != null) {
+                     tdComments.addAll(unit.getComments().deepClone());
+                 }
                  td.setComments(tdComments);
              }
              
@@ -578,6 +608,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
 	 return NO_PROBLEM;	
     }
     
+    
     public void makeExplicit() {
         //abort if JML is disabled
         if(!ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().useJML()) {
@@ -588,24 +619,17 @@ public final class JMLTransformer extends RecoderModelTransformer {
             //iterate over all compilation units
             for(int i = 0, m = getUnits().size(); i < m; i++) {
                 CompilationUnit unit = getUnits().get(i);
-                
-                //copy comments of compilation unit to primary type declaration
-                if(unit.getComments() != null 
-                        && unit.getTypeDeclarationCount() > 0) {
-                    TypeDeclaration td = unit.getPrimaryTypeDeclaration();
-                    ASTList<Comment> tdComments = new ASTArrayList<Comment>(); 
-                    tdComments.addAll(unit.getComments().deepClone());
-                    td.setComments(tdComments);
-                }
-                
+                                
                 //iterate over all type declarations of the compilation unit
                 TypeDeclarationCollector tdc = new TypeDeclarationCollector();
                 tdc.walk(unit);
                 HashSet<TypeDeclaration> typeDeclarations = tdc.result();               
                 for(TypeDeclaration td : typeDeclarations) { 
                     //collect pre-existing operations
-                    List<? extends Constructor> constructorList = typeDeclaration2Constructores.get(td);
-                    List<Method> methodList = typeDeclaration2Methods.get(td);
+                    List<? extends Constructor> constructorList 
+                        = typeDeclaration2Constructores.get(td);
+                    List<Method> methodList = 
+                	typeDeclaration2Methods.get(td);
                     
                     // fix mu: units carry an artificial file name.
                     // use getOriginalDataLocation instead
@@ -624,7 +648,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
                                    constructorList.get(k);
                             transformMethodlevelComments(cd, fileName);
                         }
-                    }
+                    }               
                                         
                     //iterate over all pre-existing methods
                     for(int k = 0, o = methodList.size(); k < o; k++) {

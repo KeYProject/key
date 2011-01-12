@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -13,6 +13,7 @@ package de.uka.ilkd.key.logic.op;
 import java.util.HashMap;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
@@ -128,38 +129,41 @@ public abstract class AbstractMetaOperator extends AbstractSortedOperator
      *  in decimal representation
      */
     public static String convertToDecimalString(Term term, Services services) {
-      	String result = "";
+      	StringBuilder result = new StringBuilder();
 	boolean neg = false;
-	Operator top = term.op();
-	Namespace intFunctions = services.getNamespaces().functions();
-	Operator numbers = (Operator)intFunctions.lookup(new Name("Z"));
-	Operator base = (Operator)intFunctions.lookup(new Name("#"));
-	Operator minus =(Operator) intFunctions.lookup(new Name("neglit"));
 	
+	Operator top = term.op();
+	IntegerLDT intModel = services.getTypeConverter().getIntegerLDT();	    
+	final Operator numbers = intModel.getNumberSymbol();
+	final Operator base    = intModel.getNumberTerminator();
+	final Operator minus   = intModel.getNegativeNumberSign();
 	// check whether term is really a "literal"
-	if (!top.name().equals(numbers.name())){
+	
+	if (top != numbers) {
 	    Debug.out("abstractmetaoperator: Cannot convert to number:", term);
 	    throw (new NumberFormatException());
 	}
+	
 	term = term.sub(0);
 	top = term.op();
 
-	while (top.name().equals(minus.name())){
+	while (top == minus) {
 	    neg=!neg;
 	    term = term.sub(0);
 	    top = term.op();
 	}
 
-	while (! top.name().equals(base.name())){
-	    result = top.name()+result;
+	while (top != base) {
+	    result.insert(0, top.name());
 	    term = term.sub(0);
 	    top = term.op();
 	}
 	
-	if (neg)
-	    return "-"+result;
-	else
-	    return result;
+	if (neg) {
+	    result.insert(0,"-");
+	}
+	
+	return result.toString();
     }
     
     

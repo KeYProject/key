@@ -1,10 +1,11 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.io.StringWriter;
@@ -17,6 +18,7 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.pp.WriterBackend;
 
 /** 
@@ -57,18 +59,17 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
     	}
         }
         if (nlcount > ProofSettings.DEFAULT_SETTINGS.getViewSettings().getMaxTooltipLines()) { 
-    	if (TacletMenu.logger.isDebugEnabled()) {
-    	    TacletMenu.logger.debug("No SchemaVariable instantiation printed, linecount is " 
+    	    Debug.log4jDebug("No SchemaVariable instantiation printed, linecount is " 
     			 + nlcount + " > " 
     			 + ProofSettings.DEFAULT_SETTINGS.
-    			 getViewSettings().getMaxTooltipLines());
-    	}
-    	taclet_sb = new StringBuffer();
-    	w = new StringWriter();
-    	backend = new WriterBackend(w, 68);
-    	tp = new LogicPrinter
+    			 getViewSettings().getMaxTooltipLines(),
+    			 TacletMenu.class.getName());
+    	    taclet_sb = new StringBuffer();
+    	    w = new StringWriter();
+    	    backend = new WriterBackend(w, 68);
+    	    tp = new LogicPrinter
     	    (new ProgramPrinter(w), notationInfo, backend, null, true);
-    	tp.printTaclet(connectedTo.taclet());
+    	    tp.printTaclet(connectedTo.taclet());
 
         }
 
@@ -105,21 +106,21 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
         String s = sb.toString();
         String[] sa = s.split("\n");
         StringBuffer result = new StringBuffer();
-        for (int i = 0; i < sa.length; i ++) {
-    	//logger.debug("'" + sa[i] + "'");
-    	if (sa[i] == "") {
-    	    continue;
-    	}
-    	boolean onlySpaces = true;
-    	for (int j = 0; j < sa[i].length(); j++) {
-    	    if (sa[i].charAt(j) != ' ') {
-    		onlySpaces = false;
-    	    }
-    	}
-    	if (onlySpaces) {
-    	    continue;
-    	}
-    	result.append(sa[i]).append("\n");
+        for (String aSa : sa) {
+            //logger.debug("'" + sa[i] + "'");
+            if ("".equals(aSa)) {
+                continue;
+            }
+            boolean onlySpaces = true;
+            for (int j = 0; j < aSa.length(); j++) {
+                if (aSa.charAt(j) != ' ') {
+                    onlySpaces = false;
+                }
+            }
+            if (onlySpaces) {
+                continue;
+            }
+            result.append(aSa).append("\n");
         }
         if (result.charAt(result.length()-1) == '\n') {
     	result.setLength(result.length() - 1);

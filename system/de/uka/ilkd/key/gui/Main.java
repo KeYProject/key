@@ -25,8 +25,6 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.MouseInputAdapter;
 import javax.swing.text.JTextComponent;
 
-import org.apache.log4j.Logger;
-
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.configuration.*;
 import de.uka.ilkd.key.gui.nodeviews.NonGoalInfoView;
@@ -63,7 +61,7 @@ public final class Main extends JFrame implements IMain {
 	KeYResourceManager.getManager().getVersion() + 
 	" (internal: "+INTERNAL_VERSION+")";
 
-    private static final String COPYRIGHT="(C) Copyright 2001-2010 "
+    private static final String COPYRIGHT="(C) Copyright 2001-2011 "
         +"Universit\u00e4t Karlsruhe, Universit\u00e4t Koblenz-Landau, "
         +"and Chalmers University of Technology";
     
@@ -74,10 +72,6 @@ public final class Main extends JFrame implements IMain {
     
     /** size of the tool bar icons */
     private static final int TOOLBAR_ICON_SIZE = 15;
-    
-    /** Name of the config file controlling logging with log4j */
-    private static final String LOGGER_CONFIGURATION = PathConfig.KEY_CONFIG_DIR + File.separator + "logger.props";
-    
     
     /** the tab bar at the left */
     private JTabbedPane tabbedPane;
@@ -298,15 +292,6 @@ public final class Main extends JFrame implements IMain {
         return instance;
     }
     
-    
-    public static void configureLogger() {
-        if ((new File(LOGGER_CONFIGURATION)).exists())
-            org.apache.log4j.PropertyConfigurator.configureAndWatch(LOGGER_CONFIGURATION, 1500);
-        else {
-            org.apache.log4j.BasicConfigurator.configure();
-            Logger.getRootLogger().setLevel(org.apache.log4j.Level.ERROR);            
-        }
-    }
     
     public String getInternalVersion() {
         return INTERNAL_VERSION;
@@ -1285,7 +1270,7 @@ public final class Main extends JFrame implements IMain {
         
         // minimize interaction
         final boolean stupidMode = 
-            ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().stupidMode();
+            ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().tacletFilter();
         final JMenuItem stupidModeOption = new
             JCheckBoxMenuItem("Minimize Interaction", stupidMode);
         mediator.setStupidMode(stupidMode);
@@ -1295,7 +1280,7 @@ public final class Main extends JFrame implements IMain {
                 boolean b = ((JCheckBoxMenuItem) e.getSource()).isSelected();
                 mediator().setStupidMode(b);
                 ProofSettings.DEFAULT_SETTINGS.
-                getGeneralSettings().setStupidMode(b);
+                getGeneralSettings().setTacletFilter(b);
             }});
         registerAtMenu(options, stupidModeOption);
         
@@ -1599,7 +1584,7 @@ public final class Main extends JFrame implements IMain {
         }
     }
     
-    protected void loadProblem(File file) {
+    public void loadProblem(File file) {
 	recentFiles.addRecentFile(file.getAbsolutePath());
         final ProblemLoader pl = 
             new ProblemLoader(file, this);
@@ -2017,8 +2002,6 @@ public final class Main extends JFrame implements IMain {
     class MainProofListener implements AutoModeListener, KeYSelectionListener,
     	SettingsListener {	
         
-        Logger logger = Logger.getLogger("key.threading");
-        
         Proof proof = null;
         
         
@@ -2065,7 +2048,7 @@ public final class Main extends JFrame implements IMain {
          * invoked if automatic execution has started
          */
         public synchronized void autoModeStarted(ProofEvent e) {
-            logger.warn("Automode started");
+            Debug.log4jWarn("Automode started", Main.class.getName());
             disableCurrentGoalView = true;
             mediator().removeKeYSelectionListener(proofListener);
             freezeExceptAutoModeButton();
@@ -2075,10 +2058,8 @@ public final class Main extends JFrame implements IMain {
          * invoked if automatic execution has stopped
          */
         public synchronized void autoModeStopped(ProofEvent e) {
-            logger.warn("Automode stopped");
-            if (logger.isDebugEnabled()) {
-                logger.debug("From " + Debug.stackTrace());
-            }
+            Debug.log4jWarn("Automode stopped", Main.class.getName());
+            Debug.log4jDebug("From " + Debug.stackTrace(), Main.class.getName());
             unfreezeExceptAutoModeButton();
             disableCurrentGoalView = false;
             setProofNodeDisplay();
@@ -2816,7 +2797,6 @@ public final class Main extends JFrame implements IMain {
         // does no harm on non macs
         System.setProperty("apple.laf.useScreenMenuBar","true"); 
  	
-        configureLogger();
         Main.evaluateOptions(args);        
  	Main key = getInstance(visible);   
  	key.loadCommandLineFile();
@@ -2838,4 +2818,9 @@ public final class Main extends JFrame implements IMain {
     public static boolean hasInstance() {
         return instance != null;
     }   
+    
+    
+    public static void setVisibleMode(boolean visible) {
+	Main.visible = visible;
+    }    
 }

@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -9,7 +9,6 @@
 //
 package de.uka.ilkd.key.gui.configuration;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Properties;
 
@@ -23,7 +22,7 @@ import de.uka.ilkd.key.gui.GUIEvent;
 public class GeneralSettings implements Settings {
 
 
-    private static final String STUPID_MODE_KEY = "[General]StupidMode";
+    private static final String TACLET_FILTER = "[General]StupidMode";
     private static final String DND_DIRECTION_SENSITIVE_KEY 
         = "[General]DnDDirectionSensitive";
     private static final String ONE_STEP_SIMPLIFICATION_KEY 
@@ -37,7 +36,7 @@ public class GeneralSettings implements Settings {
     public static boolean disableSpecs = false;
     
     /** minimize interaction is on by default */
-    private boolean stupidMode = true;
+    private boolean tacletFilter = true;
 
     /** suggestive var names are off by default */
     private boolean suggestiveVarNames = false;
@@ -59,8 +58,8 @@ public class GeneralSettings implements Settings {
 
 
     // getter
-    public boolean stupidMode() {
-	return stupidMode;
+    public boolean tacletFilter() {
+	return tacletFilter;
     }
 
     
@@ -90,9 +89,9 @@ public class GeneralSettings implements Settings {
     
 
     // setter
-    public void setStupidMode(boolean b) {
-        if (stupidMode != b) {
-          stupidMode = b;
+    public void setTacletFilter(boolean b) {
+        if (tacletFilter != b) {
+          tacletFilter = b;
           fireSettingsChanged();
         }
     }
@@ -136,9 +135,9 @@ public class GeneralSettings implements Settings {
      * represents the stored settings
      */
     public void readSettings(Properties props) {
-	String val = props.getProperty(STUPID_MODE_KEY);
+	String val = props.getProperty(TACLET_FILTER);
 	if (val != null) {
-	    stupidMode = Boolean.valueOf(val).booleanValue();
+	    tacletFilter = Boolean.valueOf(val).booleanValue();
 	}
     
         val = props.getProperty(DND_DIRECTION_SENSITIVE_KEY);
@@ -169,7 +168,7 @@ public class GeneralSettings implements Settings {
      * @param props the Properties object where to write the settings as (key, value) pair
      */
     public void writeSettings(Properties props) {
-	props.setProperty(STUPID_MODE_KEY, "" + stupidMode);
+	props.setProperty(TACLET_FILTER, "" + tacletFilter);
         props.setProperty(DND_DIRECTION_SENSITIVE_KEY, "" + dndDirectionSensitive);
         props.setProperty(ONE_STEP_SIMPLIFICATION_KEY, "" + oneStepSimplification);        
         props.setProperty(USE_JML_KEY, "" + useJML);
@@ -180,10 +179,9 @@ public class GeneralSettings implements Settings {
      * changed to its registered listeners (not thread-safe)
      */
     protected void fireSettingsChanged() {
-	Iterator<SettingsListener> it = listenerList.iterator();
-	while (it.hasNext()) {
-	    it.next().settingsChanged(new GUIEvent(this));
-	}
+        for (SettingsListener aListenerList : listenerList) {
+            aListenerList.settingsChanged(new GUIEvent(this));
+        }
     }
 
     

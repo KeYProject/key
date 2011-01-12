@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -21,7 +21,6 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.statement.If;
 import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
@@ -152,7 +151,7 @@ public class WhileInvRule extends AbstractMetaOperator {
         
         
         WhileInvariantTransformation w = 
-            new WhileInvariantTransformation((While)body, 
+            new WhileInvariantTransformation(body,
                                              (ProgramElementName)
                                              svInst.getInstantiation(outerLabel),
                                              (ProgramElementName)
@@ -222,7 +221,7 @@ public class WhileInvRule extends AbstractMetaOperator {
         
         stmnt.add(w.result());
         StatementBlock s = new StatementBlock
-        (stmnt.toArray(new Statement[0]));
+        (stmnt.toArray(new Statement[stmnt.size()]));
         Statement resSta;
         if (svInst.getExecutionContext() != null){
             resSta = new MethodFrame(null, svInst.getExecutionContext(), s);
@@ -361,7 +360,7 @@ public class WhileInvRule extends AbstractMetaOperator {
         Term executeBreak = 
             TB.prog(modality,
              addContext(root, new StatementBlock
-                        (breakIfCascade.toArray(new Statement[0]))),
+                        (breakIfCascade.toArray(new Statement[breakIfCascade.size()]))),
              post);
         return TB.imp(TB.equals(typeConv.convertToLogicElement(breakFlag), 
                                 typeConv.getBooleanLDT().getTrueTerm()), 
