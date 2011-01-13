@@ -5,18 +5,20 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+
 package de.uka.ilkd.key.pp;
 
 import java.io.IOException;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.Notation;
-import de.uka.ilkd.key.java.ConvertException;
 
-public class CharListNotation extends Notation {
+
+public final class CharListNotation extends Notation {
     public CharListNotation() {
 	super(130);
     }
 
+    @Override
     public void print(Term t, LogicPrinter sp) throws IOException {
 	if(sp.getNotationInfo().getAbbrevMap().isEnabled(t)) {
 	    sp.printTerm(t);
@@ -60,11 +62,11 @@ public class CharListNotation extends Notation {
     /** translates a term that represents a string literal into a string
      *  that is enclosed by quotation marks 
      */
-    public String translateTerm(Term t) {
+    private String translateTerm(Term t) {
 	final StringBuffer result = new StringBuffer("");
 	Term term = t;
-	while (!term.op().name().toString().equals("empty")){
-	    if (!term.op().name().toString().equals("cons"))
+	while (!term.op().name().toString().equals("clEmpty")){
+	    if (!term.op().name().toString().equals("clCons"))
 		throw new IllegalArgumentException("Term does not represent a String Literal!");
 	    result.append(translateCharTerm(term.sub(0)));
 	    term = term.sub(1);

@@ -2819,6 +2819,7 @@ term130 returns [Term a = null]
     |   TRUE  { a = tf.createTerm(Junctor.TRUE); }
     |   FALSE { a = tf.createTerm(Junctor.FALSE); }
     |   a = ifThenElseTerm
+    |   a = ifExThenElseTerm    
     |   literal:STRING_LITERAL
         {
             a = getServices().getTypeConverter().convertToLogicElement(new de.uka.ilkd.key.java.expression.literal.StringLiteral(literal.getText()));
@@ -2872,6 +2873,44 @@ ifThenElseTerm returns [Term result = null]
 		(new KeYSemanticException
 			(ex.getMessage(), getFilename(), getLine(), getColumn()));
         }
+        
+        
+ifExThenElseTerm returns [Term result = null]
+{
+    ImmutableList<QuantifiableVariable> exVars 
+    	= ImmutableSLList.<QuantifiableVariable>nil();
+    Term condF, thenT, elseT;
+    Namespace orig = variables();
+}
+    :
+        IFEX exVars = bound_variables
+        LPAREN condF = term RPAREN
+        {
+            if (condF.sort() != Sort.FORMULA) {
+                semanticError
+		  ("Condition of an \\ifEx-then-else term has to be a formula.");
+            }
+        }
+        THEN LPAREN thenT = term RPAREN
+        ELSE LPAREN elseT = term RPAREN
+        {
+            ImmutableArray<QuantifiableVariable> exVarsArray
+            	= new ImmutableArray<QuantifiableVariable>( 
+            	     exVars.toArray(new QuantifiableVariable[exVars.size()]));
+            result = tf.createTerm ( IfExThenElse.IF_EX_THEN_ELSE,  
+                                     new Term[]{condF, thenT, elseT}, 
+                                     exVarsArray, 
+                                     null );
+            if(!isGlobalDeclTermParser()) {
+                unbindVars(orig);
+            }
+        }
+ ; exception
+        catch [TermCreationException ex] {
+              keh.reportException
+		(new KeYSemanticException
+			(ex.getMessage(), getFilename(), getLine(), getColumn()));
+        }        
 
 
 argument returns [Term result = null]
@@ -2895,7 +2934,7 @@ quantifierterm returns [Term a = null]
     Operator op = null;
     ImmutableList<QuantifiableVariable> vs = null;
     Term a1 = null;
-     Namespace orig = variables();  
+    Namespace orig = variables();  
 }
 :
         (   FORALL { op = Quantifier.ALL; }

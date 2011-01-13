@@ -41,6 +41,7 @@ public interface Operator extends Named, SVSubstitute {
      */
     Sort sort(ImmutableArray<Term> terms);
     
+    
     /**
      * Tells whether the operator binds variables at the n-th subterm
      */

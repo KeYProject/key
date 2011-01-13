@@ -203,9 +203,9 @@ public final class NotationInfo {
 	//string operators
 	final CharListLDT charListLDT 
 		= services.getTypeConverter().getCharListLDT();
-	tbl.put(charListLDT.getStrConcat(), new Notation.Infix("+",120,130,130));
-	tbl.put(charListLDT.getStrCons(), new CharListNotation());
-	tbl.put(charListLDT.getStrEmpty(), new Notation.Constant("\"\"",140));
+	tbl.put(charListLDT.getClConcat(), new Notation.Infix("+",120,130,130));
+	tbl.put(charListLDT.getClCons(), new CharListNotation());
+	tbl.put(charListLDT.getClEmpty(), new Notation.Constant("\"\"",140));
     }
     
 

@@ -93,6 +93,7 @@ tokens {
 	EXISTS = "\\exists";
         SUBST  = "\\subst";
 	IF   = "\\if";
+	IFEX   = "\\ifEx";
 	THEN = "\\then";
 	ELSE = "\\else";
 

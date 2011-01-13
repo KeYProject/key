@@ -30,32 +30,31 @@ public final class CharListLDT extends LDT {
     public static final Name NAME = new Name("CharList");
     
     //Warning: Some names of char list functions are hardcoded into 
-    //         LexPathOrdering.
+    //         LexPathOrdering and into CharListNotation!
                 
     //functions
-    private final Function strEmpty;
-    private final Function strCat;
-    private final Function strCons;
-    private final Function strCharAt;
-    private final Function strLength;
-    private final Function strIndexOfChar;
-    private final Function strSub;
-    private final Function strConcat;
-    private final Function strIndexOfStr;
-    private final Function strLastIndexOfChar;
-    private final Function strLastIndexOfStr;
-    private final Function strReplace;
-    private final Function strTranslateInt;
-    private final Function strRemoveZeros;
-    private final Function strHashCode;
+    private final Function clEmpty;
+    private final Function clCat;
+    private final Function clCons;
+    private final Function clCharAt;
+    private final Function clLength;
+    private final Function clIndexOfChar;
+    private final Function clSub;
+    private final Function clConcat;
+    private final Function clIndexOfCl;
+    private final Function clLastIndexOfChar;
+    private final Function clLastIndexOfCl;
+    private final Function clReplace;
+    private final Function clTranslateInt;
+    private final Function clRemoveZeros;
+    private final Function clHashCode;
 
-    private final Function strPool;
-    private final Function strContent;
+    private final Function clContent;
     
     //predicates
-    private final Function strStartsWith;
-    private final Function strEndsWith;
-    private final Function strContains;
+    private final Function clStartsWith;
+    private final Function clEndsWith;
+    private final Function clContains;
 
 
     
@@ -66,28 +65,27 @@ public final class CharListLDT extends LDT {
     
     public CharListLDT(Services services) {
 	super(NAME, services);
-	strEmpty           = addFunction(services, "strEmpty");
-	strCat             = addFunction(services, "strCat");
-	strCons            = addFunction(services, "strCons");
-	strCharAt          = addFunction(services, "strCharAt");
-	strLength          = addFunction(services, "strLength");
-	strIndexOfChar     = addFunction(services, "strIndexOfChar");
-	strSub             = addFunction(services, "strSub");
-	strConcat          = addFunction(services, "strConcat");
-	strIndexOfStr      = addFunction(services, "strIndexOfStr");
-	strLastIndexOfChar = addFunction(services, "strLastIndexOfChar");
-	strLastIndexOfStr  = addFunction(services, "strLastIndexOfStr");
-	strReplace         = addFunction(services, "strReplace");
-	strTranslateInt    = addFunction(services, "strTranslateInt");
-	strRemoveZeros     = addFunction(services, "strRemoveZeros");
-	strHashCode        = addFunction(services, "strHashCode");
+	clEmpty           = addFunction(services, "clEmpty");
+	clCat             = addFunction(services, "clCat");
+	clCons            = addFunction(services, "clCons");
+	clCharAt          = addFunction(services, "clCharAt");
+	clLength          = addFunction(services, "clLength");
+	clIndexOfChar     = addFunction(services, "clIndexOfChar");
+	clSub             = addFunction(services, "clSub");
+	clConcat          = addFunction(services, "clConcat");
+	clIndexOfCl       = addFunction(services, "clIndexOfCl");
+	clLastIndexOfChar = addFunction(services, "clLastIndexOfChar");
+	clLastIndexOfCl   = addFunction(services, "clLastIndexOfCl");
+	clReplace         = addFunction(services, "clReplace");
+	clTranslateInt    = addFunction(services, "clTranslateInt");
+	clRemoveZeros     = addFunction(services, "clRemoveZeros");
+	clHashCode        = addFunction(services, "clHashCode");
 
-	strPool            = addFunction(services, "strPool");
-	strContent         = addFunction(services, "strContent");
+	clContent         = addFunction(services, "clContent");
 
-	strStartsWith      = addFunction(services, "strStartsWith");
-	strEndsWith        = addFunction(services, "strEndsWith");
-	strContains        = addFunction(services, "strContains");
+	clStartsWith      = addFunction(services, "clStartsWith");
+	clEndsWith        = addFunction(services, "clEndsWith");
+	clContains        = addFunction(services, "clContains");
     }
     
     
@@ -126,103 +124,98 @@ public final class CharListLDT extends LDT {
     //public interface
     //-------------------------------------------------------------------------
     
-    public Function getStrEmpty() {
-	return strEmpty;
+    public Function getClEmpty() {
+	return clEmpty;
     }
     
     
-    public Function getStrCat() {
-	return strCat;
+    public Function getClCat() {
+	return clCat;
     }
     
     
-    public Function getStrCons() {
-	return strCons;
+    public Function getClCons() {
+	return clCons;
     }
     
     
-    public Function getStrCharAt() {
-	return strCharAt;
+    public Function getClCharAt() {
+	return clCharAt;
     }
     
     
-    public Function getStrLength() {
-	return strLength;
+    public Function getClLength() {
+	return clLength;
     }
     
     
-    public Function getStrIndexOfChar() {
-	return strIndexOfChar;
+    public Function getClIndexOfChar() {
+	return clIndexOfChar;
     }
     
     
-    public Function getStrSub() {
-	return strSub;
+    public Function getClSub() {
+	return clSub;
     }
     
     
-    public Function getStrConcat() {
-	return strConcat;
+    public Function getClConcat() {
+	return clConcat;
     }
     
     
-    public Function getStrIndexOfStr() {
-	return strIndexOfStr;
+    public Function getClIndexOfCl() {
+	return clIndexOfCl;
     }
     
     
-    public Function getStrLastIndexOfChar() {
-	return strLastIndexOfChar;
+    public Function getClLastIndexOfChar() {
+	return clLastIndexOfChar;
     }
     
    
-    public Function getStrLastIndexOfStr() {
-	return strLastIndexOfStr;
+    public Function getClLastIndexOfCl() {
+	return clLastIndexOfCl;
     }
     
     
-    public Function getStrReplace() {
-	return strReplace;
+    public Function getClReplace() {
+	return clReplace;
     }
     
     
-    public Function getStrTranslateInt() {
-	return strTranslateInt;
+    public Function getClTranslateInt() {
+	return clTranslateInt;
     }
     
     
-    public Function getStrRemoveZeros() {
-	return strRemoveZeros;
+    public Function getClRemoveZeros() {
+	return clRemoveZeros;
     }
    
     
-    public Function getStrHashCode() {
-	return strHashCode;
+    public Function getClHashCode() {
+	return clHashCode;
     }
 
     
-    public Function getStrPool() {
-	return strPool;
+    public Function getClContent() {
+	return clContent;
     }
     
     
-    public Function getStrContent() {
-	return strContent;
+    public Function getClStartsWith() {
+	return clStartsWith;
     }
     
     
-    public Function getStrStartsWith() {
-	return strStartsWith;
+    public Function getClEndsWith() {
+	return clEndsWith;
     }
     
     
-    public Function getStrEndsWith() {
-	return strEndsWith;
-    }
-    
-    
-    public Function getStrContains() {
-	return strContains;
+    public Function getClContains() {
+	return clContains;
     }
 
     
@@ -256,7 +249,7 @@ public final class CharListLDT extends LDT {
 
     @Override
     public Term translateLiteral(Literal lit, Services services) {
-	final Term term_empty = TermBuilder.DF.func(strEmpty);
+	final Term term_empty = TermBuilder.DF.func(clEmpty);
 
 	char[] charArray;
 	Term result = term_empty;
@@ -274,7 +267,7 @@ public final class CharListLDT extends LDT {
 	}
 
 	for (int i = charArray.length - 2; i >= 1; i--) {
-	    result = TermBuilder.DF.func(strCons,
+	    result = TermBuilder.DF.func(clCons,
 		    intLDT.translateLiteral(new CharLiteral(charArray[i]), 
 			                    services),
 		    result);

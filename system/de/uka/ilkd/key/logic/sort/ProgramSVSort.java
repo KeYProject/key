@@ -927,7 +927,6 @@ public abstract class ProgramSVSort extends AbstractSort {
     }
 
     
-    
     /**
      * This sort represents a type of program schema variables that match
      * on labels.
@@ -942,9 +941,7 @@ public abstract class ProgramSVSort extends AbstractSort {
 				      Services services) {	    
 	    return (pe instanceof Label);
 	}
-
     }
-
 
 
     /**
@@ -976,10 +973,7 @@ public abstract class ProgramSVSort extends AbstractSort {
 	}
     }
     
-    /**
-     * This sort represents a type of program schema variables that match
-     * on string literals and string variables.
-     */
+
     public static class SimpleExpressionNonStringObjectSort 
 	extends SimpleExpressionSort{
 
@@ -987,20 +981,18 @@ public abstract class ProgramSVSort extends AbstractSort {
 	    super(new Name(name));
 	}
 
-	/* Will only match on String variables */
 	public boolean canStandFor(ProgramElement check, 
 				   ExecutionContext ec,
 				   Services services) {
 	    if (!super.canStandFor(check, ec, services)) {
 		return false;
 	    }
-	    //String Literal has SideEffects, but SimpleExpressionSort will not match
-	    //if (check instanceof StringLiteral) return false;
 	    if (check instanceof ProgramVariable) {
+		final Sort checkSort = ((ProgramVariable)check).sort();
 		Namespace ns = services.getNamespaces().sorts();
 		Sort stringSort = (Sort)ns.lookup(new Name("java.lang.String"));
-		return stringSort.extendsTrans(services.getJavaInfo().objectSort()) && 
-		 !((ProgramVariable)check).getKeYJavaType().getSort().equals(stringSort);
+		return checkSort.extendsTrans(services.getJavaInfo().objectSort()) 
+		       && !checkSort.equals(stringSort);
 	    }
 	    return false;
 	}

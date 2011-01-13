@@ -169,8 +169,6 @@ public final class SLEnvInput extends AbstractEnvInput {
     }
     
     
-
-    
     private void createDLLibrarySpecsHelper(Set<KeYJavaType> allKJTs,
 	                                    String path) 
     		throws ProofInputException {

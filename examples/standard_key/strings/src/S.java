@@ -39,5 +39,4 @@ public class S {
     public String toString() {
 	return "KeY";
     }
-
 }

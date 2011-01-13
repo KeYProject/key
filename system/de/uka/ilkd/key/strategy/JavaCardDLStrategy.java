@@ -415,12 +415,12 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final CharListLDT charListLDT = services.getTypeConverter().getCharListLDT();
 	
         final TermFeature keepChar = or ( 
-		or ( OperatorTF.create( charListLDT.getStrCons() ), 
-		     OperatorTF.create( charListLDT.getStrCharAt() ), 
-		     OperatorTF.create(  charListLDT.getStrIndexOfChar() ) ), 
-		OperatorTF.create( charListLDT.getStrLastIndexOfChar() ));
+		or ( OperatorTF.create( charListLDT.getClCons() ), 
+		     OperatorTF.create( charListLDT.getClCharAt() ), 
+		     OperatorTF.create(  charListLDT.getClIndexOfChar() ) ), 
+		OperatorTF.create( charListLDT.getClLastIndexOfChar() ));
         
-	final TermFeature emptyF = OperatorTF.create( charListLDT.getStrEmpty() );
+	final TermFeature emptyF = OperatorTF.create( charListLDT.getClEmpty() );
 	
 	bindRuleSet ( d, "charLiteral_to_intLiteral",
 		ifZero ( isBelow ( keepChar ), inftyConst (), longConst (-100) ) ); 
@@ -429,8 +429,8 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
 	// establish normalform 
 
 	// tf below only for test
-	final TermFeature stringLiteral = or( op (charListLDT.getStrEmpty()), 
-		                              op ( charListLDT.getStrCons() ) );
+	final TermFeature stringLiteral = or( op (charListLDT.getClEmpty()), 
+		                              op ( charListLDT.getClCons() ) );
 
 	Feature belowModOpPenality = ifZero  ( isBelow ( ff.modalOperator ),
 		  longConst ( 500 ) );	

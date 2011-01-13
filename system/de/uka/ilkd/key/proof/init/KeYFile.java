@@ -201,7 +201,8 @@ public class KeYFile implements EnvInput {
         return includes;            
     }
 
-    
+
+    @Override    
     public File readBootClassPath() {
         if(!javaPathAlreadyParsed)
             throw new IllegalStateException("Can access this only after 'readJavaPath' has been called");
@@ -212,7 +213,9 @@ public class KeYFile implements EnvInput {
         String parentDirectory = file.file().getParent();
         return new File(parentDirectory, bootClassPath);
     }
+    
 
+    @Override    
     public List<File> readClassPath() {
         if(!javaPathAlreadyParsed)
             throw new IllegalStateException("Can access this only after 'readJavaPath' has been called");
@@ -278,6 +281,7 @@ public class KeYFile implements EnvInput {
             throw new ProofInputException(ehe.getCause().getMessage());
         }
     }
+    
     
     @Override
     public void read() throws ProofInputException {

@@ -14,7 +14,7 @@ import java.util.*;
 
 import de.uka.ilkd.key.proof.*;
 
-public class GlobalProofMgt {
+public final class GlobalProofMgt {
 
     private static final GlobalProofMgt INSTANCE = new GlobalProofMgt();
 

@@ -19,11 +19,12 @@ import de.uka.ilkd.key.logic.sort.Sort;
 
 
 /**
- * This implements a general conditional operator <tt>if (phi) (t1) (t2)</tt>
+ * This implements a general conditional operator 
+ * <tt>\if (phi) \then (t1) \else (t2)</tt>.
  */
 public final class IfThenElse extends AbstractOperator {
     
-    public static final IfThenElse IF_THEN_ELSE = new IfThenElse ();
+    public static final IfThenElse IF_THEN_ELSE = new IfThenElse();
     
         
     private IfThenElse () {
@@ -66,8 +67,8 @@ public final class IfThenElse extends AbstractOperator {
     
     @Override
     public Sort sort(ImmutableArray<Term> terms) {
-        final Sort s2 = terms.get(1).sort ();
-        final Sort s3 = terms.get(2).sort ();
+        final Sort s2 = terms.get(1).sort();
+        final Sort s3 = terms.get(2).sort();
         if(s2 instanceof ProgramSVSort
              || s2 == AbstractMetaOperator.METASORT ) { 
             return s3; 

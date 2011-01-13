@@ -59,7 +59,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         
     @Override
     public void readActivatedChoices() throws ProofInputException{
-        if (initConfig==null) {
+        if (initConfig == null) {
             throw new IllegalStateException("KeYFile: InitConfig not set.");
         }
         try {

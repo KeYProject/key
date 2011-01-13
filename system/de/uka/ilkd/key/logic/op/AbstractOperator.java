@@ -105,7 +105,6 @@ abstract class AbstractOperator implements Operator {
     }
     
     
-    
     /** 
      * implements the default operator matching rule which means 
      * that the compared object have to be equal otherwise
