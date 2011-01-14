@@ -93,6 +93,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
 	super.read();
 	
         //read in-code specifications
+	getPreferences();	
         SLEnvInput slEnvInput = new SLEnvInput(readJavaPath(), 
         				       readClassPath(), 
         				       readBootClassPath());
@@ -103,7 +104,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
 
     @Override
     public void readProblem() throws ProofInputException {
-        if (initConfig==null) {
+        if (initConfig == null) {
             throw new IllegalStateException("KeYUserProblemFile: InitConfig not set.");
         }
         
