@@ -11,7 +11,7 @@ class Node {
       @ private invariant next != null ==> \subset(next.*, repr)
       @                                    && \subset(next.repr, repr)
       @                                    && \disjoint(this.*, next.repr)
-      @                                    && seq[1..seq.length] == next.seq
+      @                                    && seq[1..seq.length-1] == next.seq
       @                                    && next.\inv;
       @*/
        
@@ -38,14 +38,14 @@ class Node {
       @   ensures 0 <= \result;      
       @   ensures \result < seq.length && seq[\result] == 0
       @           || \result == seq.length:
-      @   ensures (\forall int x; 0 <= x && x < \result; seq[x] != 0);       
+      @   ensures (\forall int x; 0 <= x && x < \result; seq[x] != 0);
       @*/
     public /*@pure@*/ int search() {
 	Node jj = this;
 	int i = 0;
 	/*@ loop_invariant 0 <= i && i <= seq.length
 	  @                && (jj == null && i == seq.length
-	  @                    || jj != null && jj.\inv && jj.seq == seq[i..seq.length])
+	  @                    || jj != null && jj.\inv && jj.seq == seq[i..seq.length-1])
 	  @                && (\forall int x; 0 <= x && x < i; seq[x] != 0);
 	  @ assignable \nothing;
 	  @ decreases seq.length - i;
