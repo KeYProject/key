@@ -301,6 +301,7 @@
 ./standard_key/strings/implicitNullStringConversion.key
 ./standard_key/strings/implicitNullStringConversion2.key
 ./standard_key/strings/implicitObjectStringConversion.key
+./standard_key/strings/literalEquality.key
 ./standard_key/strings/replace0.key
 ./standard_key/strings/replace1.key
 ./standard_key/strings/simpleAssignment.key

@@ -49,8 +49,6 @@ public final class CharListLDT extends LDT {
     private final Function clRemoveZeros;
     private final Function clHashCode;
 
-    private final Function clContent;
-    
     //predicates
     private final Function clStartsWith;
     private final Function clEndsWith;
@@ -80,8 +78,6 @@ public final class CharListLDT extends LDT {
 	clTranslateInt    = addFunction(services, "clTranslateInt");
 	clRemoveZeros     = addFunction(services, "clRemoveZeros");
 	clHashCode        = addFunction(services, "clHashCode");
-
-	clContent         = addFunction(services, "clContent");
 
 	clStartsWith      = addFunction(services, "clStartsWith");
 	clEndsWith        = addFunction(services, "clEndsWith");
@@ -198,12 +194,7 @@ public final class CharListLDT extends LDT {
 	return clHashCode;
     }
 
-    
-    public Function getClContent() {
-	return clContent;
-    }
-    
-    
+        
     public Function getClStartsWith() {
 	return clStartsWith;
     }

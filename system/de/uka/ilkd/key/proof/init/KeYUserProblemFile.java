@@ -90,8 +90,6 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
     
     @Override
     public void read() throws ProofInputException {
-	super.read();
-	
         //read in-code specifications
 	getPreferences();	
         SLEnvInput slEnvInput = new SLEnvInput(readJavaPath(), 
@@ -99,6 +97,9 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         				       readBootClassPath());
         slEnvInput.setInitConfig(initConfig);
         slEnvInput.read();
+        
+        //read key file itself
+	super.read();        
     }    
 
 

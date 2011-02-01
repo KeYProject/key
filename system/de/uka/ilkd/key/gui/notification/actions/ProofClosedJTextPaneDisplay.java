@@ -47,6 +47,4 @@ public class ProofClosedJTextPaneDisplay extends ShowDisplayPane {
                     "Proof closed", JOptionPane.INFORMATION_MESSAGE);              
         return true;
     }
-    
-    
 }
