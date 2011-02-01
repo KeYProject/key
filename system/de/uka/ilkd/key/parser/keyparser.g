@@ -4024,12 +4024,13 @@ one_contract
   NamespaceSet oldServicesNamespaces = null;
 }
 :
-   contractName = simple_ident LBRACE { 
+   contractName = simple_ident LBRACE 
+     { 
         //for program variable declarations
         namespaces().setProgramVariables(new Namespace(programVariables()));    
      }
      (prog_var_decls)? 
-     fma = formula MODIFIES (modifiesClause = term)?
+     fma = formula MODIFIES modifiesClause = term
      {
        DLSpecFactory dsf = new DLSpecFactory(getServices());
        try {
@@ -4039,10 +4040,12 @@ one_contract
        } catch(ProofInputException e) {
          semanticError(e.getMessage());
        }
-     } RBRACE SEMI {
-     // dump local program variable declarations
-     namespaces().setProgramVariables(programVariables().parent());
-   }
+     } 
+     RBRACE SEMI 
+     {
+       //dump local program variable declarations
+       namespaces().setProgramVariables(programVariables().parent());
+     }
 ;
 
 one_invariant[ParsableVariable selfVar]
