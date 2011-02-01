@@ -305,6 +305,7 @@
 ./standard_key/strings/replace0.key
 ./standard_key/strings/replace1.key
 ./standard_key/strings/simpleAssignment.key
+./standard_key/strings/simpleLengthComp.key
 ./standard_key/strings/stringCompileTimeConstant1.key
 ./standard_key/strings/stringEquality1.key
 ./standard_key/strings/stringEquality2.key
