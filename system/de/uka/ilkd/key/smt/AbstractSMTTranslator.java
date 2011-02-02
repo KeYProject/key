@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
 import java.util.Vector;
+import java.util.Map.Entry;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
@@ -39,6 +40,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SortDependingSymbol;
+import de.uka.ilkd.key.logic.sort.PrimitiveSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.taclettranslation.AbstractTacletTranslator;
@@ -117,7 +119,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     private HashMap<Sort, StringBuffer> usedRealSort = new HashMap<Sort, StringBuffer>();
 
     protected HashMap<Sort, StringBuffer> typePredicates = new HashMap<Sort, StringBuffer>();
-
+    
     // used type predicates for constant values, e.g. 1, 2, ...
     private HashMap<Term, StringBuffer> constantTypePreds = new HashMap<Term, StringBuffer>();
     
@@ -232,9 +234,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	//add the formulas, that make sure, type correctness is kept, also
 	//for interpreted functions
 	//leave this away. This is not needed, if interpreted int functions are typed by the second type u
+	start = toReturn.size();
 	if (!this.isMultiSorted()) {
-	    start = toReturn.size();
-	    toReturn.addAll(this.getSpecialSortPredicates(services));
+	     toReturn.addAll(this.getSpecialSortPredicates(services));
 	}
 	assumptionTypes.add(new ContextualBlock(start,toReturn.size()-1,ContextualBlock.ASSUMPTION_SORT_PREDICATES));
 	    
@@ -397,16 +399,22 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
 	// add the typepredicates for null
 	if (this.nullUsed) {
-	    for (StringBuffer s : this.typePredicates.values()) {
-		ArrayList<StringBuffer> argList = new ArrayList<StringBuffer>();
-		argList.add(this.nullString);
-		StringBuffer toAdd = this.translatePredicate(s, argList);
-		toReturn.add(toAdd);
+	    Set<Entry<Sort,StringBuffer>> set = this.typePredicates.entrySet();
+	    for (Entry<Sort,StringBuffer> entry : set) {
+	
+	        if(!(entry.getKey() instanceof PrimitiveSort)){
+	            ArrayList<StringBuffer> argList = new ArrayList<StringBuffer>();
+	            argList.add(this.nullString);
+	            StringBuffer toAdd = this.translatePredicate(entry.getValue(), argList);
+	            toReturn.add(toAdd);
+	        }
 	    }
 	}
 
 	return toReturn;
     }
+    
+  
 
     /**
      * Returns a set of formula s, that defines the resulttypes of functions,

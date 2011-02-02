@@ -108,11 +108,11 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 	commentPredicate[ContextualBlock.PREDICATE_FORMULA] = "\n\n:notes \"Predicates used in formula:\"";
 	commentPredicate[ContextualBlock.PREDICATE_TYPE]    = "\n\n:notes \"Types expressed by predicates:\"";
 	String [] commentAssumption = new String[5];
-	commentAssumption[ContextualBlock.ASSUMPTION_DUMMY_IMPLEMENTATION] = "\n\n:notes \"Assumptions for dummy variables:\"";
-	commentAssumption[ContextualBlock.ASSUMPTION_FUNCTION_DEFINTION] = "\n\n:notes \"Assumptions for function definitions:\""; 
-	commentAssumption[ContextualBlock.ASSUMPTION_SORT_PREDICATES] = "\n\n:notes \"Assumptions for sort predicates:\"";
-	commentAssumption[ContextualBlock.ASSUMPTION_TYPE_HIERARCHY] = "\n\n:notes \"Assumptions for type hierarchy:\"";
-	commentAssumption[ContextualBlock.ASSUMPTION_TACLET_TRANSLATION] = "\n\n:notes \"Assumptions made of taclets:\"\n\n";
+	commentAssumption[ContextualBlock.ASSUMPTION_DUMMY_IMPLEMENTATION] = "\n\n:notes \"Assumptions for dummy variables (%i):\"";
+	commentAssumption[ContextualBlock.ASSUMPTION_FUNCTION_DEFINTION] = "\n\n:notes \"Assumptions for function definitions (%i):\""; 
+	commentAssumption[ContextualBlock.ASSUMPTION_SORT_PREDICATES] = "\n\n:notes \"Assumptions for sort predicates (%i):\"";
+	commentAssumption[ContextualBlock.ASSUMPTION_TYPE_HIERARCHY] = "\n\n:notes \"Assumptions for type hierarchy (%i):\"";
+	commentAssumption[ContextualBlock.ASSUMPTION_TACLET_TRANSLATION] = "\n\n:notes \"Assumptions made of taclets (%i):\"\n\n";
 	//add the logic definition
 	toReturn.append("\n:logic AUFLIA");
 	
@@ -198,15 +198,21 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 	
 	for(int k=0; k < assumptionBlocks.size(); k++){
 	    ContextualBlock block = assumptionBlocks.get(k);
-	    	
 	    if (block.getStart() <= block.getEnd()) {
-		assump.append(commentAssumption[block.getType()]);
+	        String commentAssump = commentAssumption[block.getType()].replaceAll("%i", Integer.toString(block.getEnd()-block.getStart()+1));
+                
+                assump.append(commentAssump);
+		
 	    	    for(int i=block.getStart(); i <= block.getEnd(); i++){
 	    		AssumptionsToRemove.add(assumptions.get(i));   
-	    		assump.append("\n:assumption ").append(assumptions.get(i)); 
+	    		
+	    		assump.append("\n:assumption ").append(assumptions.get(i));
+	    		
 	    	    }
 		}  
 	}
+	    
+	
 	    
 	
 

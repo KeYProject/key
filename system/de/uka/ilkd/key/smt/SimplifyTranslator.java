@@ -99,11 +99,11 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
 	commentPredicate[ContextualBlock.PREDICATE_FORMULA] = "\n;Predicates used in formula:\n";
 	commentPredicate[ContextualBlock.PREDICATE_TYPE]    = "\n;Types expressed by predicates:\n";
 	String [] commentAssumption = new String[5];
-	commentAssumption[ContextualBlock.ASSUMPTION_DUMMY_IMPLEMENTATION] = "\n\n;Assumptions for dummy variables:\n";
-	commentAssumption[ContextualBlock.ASSUMPTION_FUNCTION_DEFINTION] = "\n\n;Assumptions for function definitions:\n"; 
-	commentAssumption[ContextualBlock.ASSUMPTION_SORT_PREDICATES] = "\n\n;Assumptions for sort predicates:\n";
-	commentAssumption[ContextualBlock.ASSUMPTION_TYPE_HIERARCHY] = "\n\n;Assumptions for type hierarchy:\n";
-	commentAssumption[ContextualBlock.ASSUMPTION_TACLET_TRANSLATION] = "\n\n;Assumptions made of taclets:\n";
+	commentAssumption[ContextualBlock.ASSUMPTION_DUMMY_IMPLEMENTATION] = "\n\n;Assumptions for dummy variables (%i):\n";
+	commentAssumption[ContextualBlock.ASSUMPTION_FUNCTION_DEFINTION] = "\n\n;Assumptions for function definitions (%i):\n"; 
+	commentAssumption[ContextualBlock.ASSUMPTION_SORT_PREDICATES] = "\n\n;Assumptions for sort predicates (%i):\n";
+	commentAssumption[ContextualBlock.ASSUMPTION_TYPE_HIERARCHY] = "\n\n;Assumptions for type hierarchy (%i):\n";
+	commentAssumption[ContextualBlock.ASSUMPTION_TACLET_TRANSLATION] = "\n\n;Assumptions made of taclets (%i):\n";
 	
 	StringBuffer comment = new StringBuffer("\n\n;The formula:\n");
 	formula = comment.append(formula);
@@ -156,7 +156,6 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
         if(assumptions.size() > 0){
            for(int k=0; k < assumptionBlocks.size(); k++){
                 ContextualBlock block = assumptionBlocks.get(k);
-                
                 if (block.getStart() <= block.getEnd()) {
                     
                     // necessary for appending 'ANDs' correctly
@@ -168,11 +167,14 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
                 	AssumptionsToRemove.add(assumptions.get(start));
                 	start++;
                     }
-                    assump.append(commentAssumption[block.getType()]);
+                    String commentAssump = commentAssumption[block.getType()].replaceAll("%i", Integer.toString(block.getEnd()-start+1));
+                   
+                    assump.append(commentAssump);
                     assump.append(temp);
                     
         	    for (int i = start; i <= block.getEnd(); i++) {
         		assump = this.translateLogicalAnd(assump, assumptions.get(i));
+        		assump.append("\n");
         		AssumptionsToRemove.add(assumptions.get(i));
         	    }
             	
@@ -180,7 +182,7 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
     	
     	
             }
-           
+          
            assumptions.removeAll(AssumptionsToRemove);
          
            if (assumptions.size() > 0) {
@@ -194,6 +196,7 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
    	       
    	       for (int i = start; i < assumptions.size(); i++) {
    		   assump = this.translateLogicalAnd(assump, assumptions.get(i));
+   		   assump.append("\n");
    	       }
    	  
    	    }
@@ -540,7 +543,7 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
 	
 	toReturn = this.removeIllegalChars(toReturn, toReplace, replacement);
 	
-	toReturn.append("counter_").append(counter);
+	toReturn.append("_").append(counter);
 	counter++;
 	return toReturn;
     }
