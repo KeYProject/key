@@ -224,6 +224,7 @@ public class LexPathOrdering implements TermOrdering {
         final String sName = s.name ().toString ();
         if ( "int".equals ( sName ) ) res = 10000;
         if ( "boolean".equals ( sName ) ) res = 20000;
+        if ( s instanceof NullSort ) res = 30000;
 
         for (Sort sort : s.extendsSorts()) res = Math.max(res, getSortDepth(sort));
 
