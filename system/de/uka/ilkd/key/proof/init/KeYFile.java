@@ -285,7 +285,7 @@ public class KeYFile implements EnvInput {
     
     @Override
     public void read() throws ProofInputException {
-	if (initConfig==null) {
+	if(initConfig == null) {
 	    throw new IllegalStateException("KeYFile: InitConfig not set.");
 	}
         

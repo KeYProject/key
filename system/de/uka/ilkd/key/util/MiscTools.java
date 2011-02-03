@@ -20,6 +20,7 @@ import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.statement.CatchAllStatement;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
@@ -121,11 +122,14 @@ public final class MiscTools {
 	assert jb.program() != null;
 	
         SourceElement result = jb.program().getFirstElement();
-        while(result instanceof ProgramPrefix
+        while((result instanceof ProgramPrefix 
+        	 || result instanceof CatchAllStatement)
               && !(result instanceof StatementBlock 
                    && ((StatementBlock)result).isEmpty())) {
             if(result instanceof LabeledStatement) {
                 result = ((LabeledStatement)result).getChildAt(1);
+            } else if(result instanceof CatchAllStatement) {
+        	result = ((CatchAllStatement)result).getBody();
             } else {
                 result = result.getFirstElement();
             }

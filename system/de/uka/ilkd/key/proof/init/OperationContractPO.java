@@ -151,7 +151,7 @@ public final class OperationContractPO extends AbstractPO
 
         //create variables for try statement
         final KeYJavaType eType 
-        	= javaInfo.getTypeByClassName("java.lang.Throwable");
+        	= javaInfo.getTypeByClassName("java.lang.Exception");
         final TypeReference excTypeRef = javaInfo.createTypeReference(eType);
         final ProgramElementName ePEN = new ProgramElementName("e");
         final ProgramVariable eVar = new LocationVariable (ePEN, eType);

@@ -21,7 +21,7 @@ header {
     import de.uka.ilkd.key.java.abstraction.*;
     import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
     import de.uka.ilkd.key.java.declaration.ClassDeclaration;
-    import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
+    import de.uka.ilkd.key.java.expression.literal.StringLiteral;
     import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
     import de.uka.ilkd.key.ldt.*;
     import de.uka.ilkd.key.logic.*;
@@ -1486,9 +1486,23 @@ javaliteral returns [SLExpression result=null] throws SLTranslationException
 :
 	result=integerliteral
     |
-	STRING_LITERAL 
+	l:STRING_LITERAL 
 	{
-	    raiseNotSupported("string literals");
+	    Term charListTerm
+	       = services.getTypeConverter()
+	                 .convertToLogicElement(
+	                 	new StringLiteral("\"" + l.getText() + "\""));
+	    Function strPool 
+	    	= (Function) services.getNamespaces()
+	    	                     .functions()
+	    	                     .lookup(CharListLDT.STRINGPOOL_NAME);
+	    if(strPool == null) {
+	        raiseError("string literals used in specification, "
+	                   + "but string pool function not found");
+	    }
+	    Term stringTerm = TB.func(strPool, charListTerm);
+	    return new SLExpression(stringTerm, 
+	                            javaInfo.getKeYJavaType("java.lang.String"));
 	}
     |
 	CHAR_LITERAL 
@@ -1744,6 +1758,20 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 	{
 	    raiseNotSupported("\\nowarn");
 	}
+	 
+    |   STRING_EQUAL LPAREN e1=expression COMMA e2=expression RPAREN
+        {
+	    Function strContent
+	    	= (Function) services.getNamespaces()
+            	                     .functions()
+            	                     .lookup(CharListLDT.STRINGCONTENT_NAME);
+            if(strContent == null) {
+                raiseError("strings used in spec, but string content "
+                           + "function not found");
+            }
+            return new SLExpression(TB.equals(TB.func(strContent, e1.getTerm()), 
+                                              TB.func(strContent, e2.getTerm())));
+        }
 
     |   EMPTYSET
         {

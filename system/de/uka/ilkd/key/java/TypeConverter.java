@@ -433,37 +433,43 @@ public final class TypeConverter {
         final Type t2 = type2.getJavaType();
 
         if ((t1 == PrimitiveType.JAVA_BOOLEAN &&
-                t2 == PrimitiveType.JAVA_BOOLEAN))
+                t2 == PrimitiveType.JAVA_BOOLEAN)) {
             return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BOOLEAN);
-        if ((t1 == PrimitiveType.JAVA_BYTE ||
+        } else if ((t1 == PrimitiveType.JAVA_BYTE ||
                 t1 == PrimitiveType.JAVA_SHORT ||
                 t1 == PrimitiveType.JAVA_CHAR||
                 t1 == PrimitiveType.JAVA_INT) &&
                 (t2 == PrimitiveType.JAVA_BYTE||
                         t2 == PrimitiveType.JAVA_SHORT||
                         t2 == PrimitiveType.JAVA_CHAR||
-                        t2 == PrimitiveType.JAVA_INT))
+                        t2 == PrimitiveType.JAVA_INT)) {
             return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT);
-        if ((t2 == PrimitiveType.JAVA_LONG) &&
+    	} else if ((t2 == PrimitiveType.JAVA_LONG) &&
                 (t1 == PrimitiveType.JAVA_BYTE||
                         t1 == PrimitiveType.JAVA_SHORT||
                         t1 == PrimitiveType.JAVA_INT||
                         t1 == PrimitiveType.JAVA_CHAR||
-                        t1 == PrimitiveType.JAVA_LONG)) 
+                        t1 == PrimitiveType.JAVA_LONG)) { 
             return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LONG);
-        if ((t1 == PrimitiveType.JAVA_LONG) &&
+    	} else if ((t1 == PrimitiveType.JAVA_LONG) &&
                 (t2 == PrimitiveType.JAVA_BYTE||
                         t2 == PrimitiveType.JAVA_SHORT||
                         t2 == PrimitiveType.JAVA_INT||
                         t2 == PrimitiveType.JAVA_CHAR||
-                        t2 == PrimitiveType.JAVA_LONG)) 
+                        t2 == PrimitiveType.JAVA_LONG)) { 
             return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LONG);
-        if (t1 == PrimitiveType.JAVA_LOCSET && t2 == PrimitiveType.JAVA_LOCSET) 
+    	} else if (t1 == PrimitiveType.JAVA_LOCSET && t2 == PrimitiveType.JAVA_LOCSET) { 
             return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LOCSET);
-        if (t1 == PrimitiveType.JAVA_SEQ && t2 == PrimitiveType.JAVA_SEQ) 
-            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SEQ);        
-	throw new RuntimeException("Could not determine promoted type "+
-	  "of "+t1+" and "+t2);
+    	} else if (t1 == PrimitiveType.JAVA_SEQ && t2 == PrimitiveType.JAVA_SEQ) { 
+            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SEQ);
+    	} else if (type1.equals(services.getJavaInfo().getKeYJavaType("java.lang.String"))) { 
+            return type1;
+    	} else if (type2.equals(services.getJavaInfo().getKeYJavaType("java.lang.String"))) { 
+            return type2;
+        } else {
+            throw new RuntimeException("Could not determine promoted type "
+        	    	               + "of " + t1 + " and " + t2);
+        }
     }
 
 

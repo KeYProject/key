@@ -240,6 +240,9 @@ public final class SLEnvInput extends AbstractEnvInput {
             = initConfig.getServices().getJavaInfo();
         final SpecificationRepository specRepos 
             = initConfig.getServices().getSpecificationRepository();
+        
+        //read DL library specs before any other specs
+        createDLLibrarySpecs();        
        
         //sort types alphabetically (necessary for deterministic names)
         final Set<KeYJavaType> allKeYJavaTypes = javaInfo.getAllKeYJavaTypes();
@@ -291,9 +294,6 @@ public final class SLEnvInput extends AbstractEnvInput {
         	specRepos.addSpecs(constructorSpecs);
             }            
         }
-        
-        //DL library specs
-        createDLLibrarySpecs();        
         
         //show warnings to user
         ImmutableSet<PositionedString> warnings = specExtractor.getWarnings();

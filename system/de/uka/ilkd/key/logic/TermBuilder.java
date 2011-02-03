@@ -197,7 +197,7 @@ public final class TermBuilder {
 	}	
         return new LocationVariable(new ProgramElementName(name),
                                     services.getJavaInfo().getTypeByClassName(
-                                                   "java.lang.Throwable"));
+                                                   "java.lang.Exception"));
     }
     
     

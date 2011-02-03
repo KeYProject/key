@@ -20,6 +20,7 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
+import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.declaration.modifier.Private;
 import de.uka.ilkd.key.java.declaration.modifier.Protected;
 import de.uka.ilkd.key.java.declaration.modifier.Public;
@@ -76,6 +77,7 @@ public final class SpecificationRepository {
     private final Services services;
     
     private int contractCounter = 0;
+    private int libraryContractCounter = -10000;
     
     
     
@@ -470,8 +472,13 @@ public final class SpecificationRepository {
 	            .equals(contract.getTarget());
 	
 	//set id
-	contract = contract.setID(contractCounter++);
-
+	if(((TypeDeclaration)contract.getKJT().getJavaType()).isLibraryClass()) {
+	    contract = contract.setID(libraryContractCounter++);
+	    assert libraryContractCounter < -1 : "too many library contracts";
+	} else {
+	    contract = contract.setID(contractCounter++);
+	}
+	
 	//register and inherit
         final ImmutableSet<Pair<KeYJavaType,ObserverFunction>> impls 
         	= getOverridingTargets(contract.getKJT(), contract.getTarget())
@@ -492,6 +499,7 @@ public final class SpecificationRepository {
                    : "Tried to add a contract with an invalid id!";
             contracts.put(impl, 
         	          getContracts(impl.first, impl.second).add(contract));
+            
             if(contract instanceof OperationContract) {
         	operationContracts.put(new Pair<KeYJavaType,ProgramMethod>(impl.first, (ProgramMethod)impl.second), 
         		               getOperationContracts(impl.first, 

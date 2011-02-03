@@ -70,7 +70,9 @@ public abstract class ProgramSVSort extends AbstractSort {
 
     //----------- Initialisation and Creation expressions -------------------
     
-    public static final ProgramSVSort NEW = new NewSVSort();
+    public static final ProgramSVSort SIMPLE_NEW = new SimpleNewSVSort();
+    
+    public static final ProgramSVSort NONSIMPLE_NEW = new NonSimpleNewSVSort();    
 
     public static final ProgramSVSort NEWARRAY = new NewArraySVSort();
 
@@ -638,19 +640,54 @@ public abstract class ProgramSVSort extends AbstractSort {
     
     /**
      * This sort represents a type of program schema variables that match
-     * only on Class Instance Creation Expressions, new C()
+     * only on Class Instance Creation Expressions, new C(), where all
+     * arguments are simple expressions.
      */
-    private static class NewSVSort extends ProgramSVSort{
+    private static class SimpleNewSVSort extends ProgramSVSort{
 
-	public NewSVSort() {
-	    super(new Name("InstanceCreation"));
+	public SimpleNewSVSort() {
+	    super(new Name("SimpleInstanceCreation"));
 	}
 
 	protected boolean canStandFor(ProgramElement check, 
 				      Services services) {
-	    return (check instanceof New);
+	    if(!(check instanceof New)) {
+		return false;
+	    }
+	    for(Expression arg : ((New)check).getArguments()) {
+		if(NONSIMPLEEXPRESSION.canStandFor(arg, services)) {
+		    return false;
+		}
+	    }
+	    return true;
         }
     }
+    
+    
+    /**
+     * This sort represents a type of program schema variables that match
+     * only on Class Instance Creation Expressions, new C(), where at
+     * least one argument is a non-simple expression
+     */
+    private static class NonSimpleNewSVSort extends ProgramSVSort{
+
+	public NonSimpleNewSVSort() {
+	    super(new Name("NonSimpleInstanceCreation"));
+	}
+
+	protected boolean canStandFor(ProgramElement check, 
+				      Services services) {
+	    if(!(check instanceof New)) {
+		return false;
+	    }
+	    for(Expression arg : ((New)check).getArguments()) {
+		if(NONSIMPLEEXPRESSION.canStandFor(arg, services)) {
+		    return true;
+		}
+	    }
+	    return false;
+        }
+    }    
 
     /**
      * This sort represents a type of program schema variables that match
@@ -807,15 +844,15 @@ public abstract class ProgramSVSort extends AbstractSort {
 		    mr.getReferencePrefix() instanceof TypeReference) {
 		    return false;
 		}
-		if (mr.getReferencePrefix()!=null && 
+		if (mr.getReferencePrefix() != null && 
 		    NONSIMPLEEXPRESSION.canStandFor
 		    (mr.getReferencePrefix(), services)) {
 		    return false;
 		}
- 		if (mr.getArguments()==null) {
+ 		if (mr.getArguments() == null) {
  		    return false;
  		}
-		for (int i=0; i<mr.getArguments().size(); i++) {
+		for (int i = 0; i < mr.getArguments().size(); i++) {
 		    if (NONSIMPLEEXPRESSION.canStandFor(mr.getArgumentAt(i),
 							services)) {
 			return true;
@@ -876,9 +913,6 @@ public abstract class ProgramSVSort extends AbstractSort {
      * on names of method references, i.e. the "m" of o.m(p1,pn).
      */
     private static class MethodNameSort extends ProgramSVSort{
-
-        
-        
 	public MethodNameSort() {
 	    super(new Name("MethodName"));
 	}

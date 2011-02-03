@@ -29,6 +29,10 @@ public final class CharListLDT extends LDT {
     
     public static final Name NAME = new Name("CharList");
     
+    public static final Name STRINGPOOL_NAME = new Name("strPool");
+    public static final Name STRINGCONTENT_NAME = new Name("strContent");
+    
+    
     //Warning: Some names of char list functions are hardcoded into 
     //         LexPathOrdering and into CharListNotation!
                 

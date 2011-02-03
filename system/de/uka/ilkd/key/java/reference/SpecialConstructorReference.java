@@ -12,7 +12,6 @@
 package de.uka.ilkd.key.java.reference;
 
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -26,14 +25,11 @@ public abstract class SpecialConstructorReference
  extends JavaNonTerminalProgramElement implements ConstructorReference {
 
     
-    /**
-     *      Arguments
-     */
+
     protected final ImmutableArray<Expression> arguments;
     
-    /**
-     * Special constructor reference.
-     */
+
+
     public SpecialConstructorReference() {
 	this.arguments = null;
     }
@@ -134,9 +130,7 @@ public abstract class SpecialConstructorReference
      *      Get arguments.
      *      @return the expression mutable list.
      */
-
     public ImmutableArray<Expression> getArguments() {
         return arguments;
     }
-    
 }

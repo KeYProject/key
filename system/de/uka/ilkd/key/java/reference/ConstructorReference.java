@@ -19,8 +19,7 @@ import de.uka.ilkd.key.java.*;
  */
 
 public interface ConstructorReference extends MethodOrConstructorReference,
-                                              MemberReference, 
-                                              Statement {
+                                              MemberReference {
 
 
 }

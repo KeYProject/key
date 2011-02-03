@@ -102,7 +102,7 @@ public final class OperationContractImpl implements OperationContract {
 	this.originalResultVar      = resultVar;
 	this.originalExcVar         = excVar;
 	this.originalHeapAtPre      = heapAtPre;
-	this.id                     = id;
+	this.id                     = id;	
     }    
 
     

@@ -10,22 +10,20 @@
 
 package de.uka.ilkd.key.speclang.dl.translation;
 
-import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.Private;
 import de.uka.ilkd.key.java.statement.CatchAllStatement;
-import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.speclang.*;
 
 
@@ -87,60 +85,7 @@ public final class DLSpecFactory {
 	}
     }
     
-
-    private MethodBodyStatement extractMBS(Term fma) 
-    		throws ProofInputException {
-	final Term modFma = fma.sub(1).op() instanceof UpdateApplication
-	                    ? fma.sub(1).sub(1)
-	                    : fma.sub(1);
-	if(!(modFma.op() instanceof Modality)) {
-	    throw new ProofInputException("Modality expected, "
-		                          + "but found: " + modFma);
-	}
-	
-	final SourceElement se 
-		= modFma.javaBlock().program().getFirstElement();
-	if(se instanceof CatchAllStatement) {
-	    final CatchAllStatement cas = (CatchAllStatement) se;
-	    final SourceElement body = cas.getBody().getFirstElement();
-	    return (MethodBodyStatement) body;
-	} else {
-	    return (MethodBodyStatement) se;
-	}
-    }
-
     
-    private ProgramMethod extractProgramMethod(MethodBodyStatement mbs) {
-	return mbs.getProgramMethod(services);
-    }
-
-    
-    private ProgramVariable extractSelfVar(MethodBodyStatement mbs) {
-	return mbs.isStatic(services)  
-	       ? null 
-	       : (ProgramVariable) mbs.getDesignatedContext();
-    }
-    
-
-    private ImmutableList<ProgramVariable> extractParamVars(
-	    					MethodBodyStatement mbs) {
-	final ImmutableArray<Expression> args = mbs.getArguments();
-
-	ImmutableList<ProgramVariable> result 
-		= ImmutableSLList.<ProgramVariable> nil();
-	for(int i = args.size() - 1; i >= 0; i--) {
-	    result = result.prepend((ProgramVariable) args.get(i));
-	}
-
-	return result;
-    }
-
-    
-    private ProgramVariable extractResultVar(MethodBodyStatement mbs) {
-	return (ProgramVariable) mbs.getResultVariable();
-    }
-    
-
     private ProgramVariable extractExcVar(Term fma) {
 	final Term modFma = fma.sub(1).op() instanceof UpdateApplication
 	                    ? fma.sub(1).sub(1)
@@ -158,12 +103,77 @@ public final class DLSpecFactory {
     }
 
     
-    private Modality extractModality(Term fma) {
-	final Term modFma = fma.sub(1).op() instanceof UpdateApplication
-	                    ? fma.sub(1).sub(1)
-	                    : fma.sub(1);
-	
-	return (Modality) modFma.op();
+    private UseOperationContractRule.Instantiation extractInst(Term fma) 
+    		throws ProofInputException {
+	final UseOperationContractRule.Instantiation result 
+		= UseOperationContractRule.computeInstantiation(fma.sub(1), 
+								services);
+	if(result == null) {
+	    throw new ProofInputException("Contract formula of wrong shape: " 
+		    	                  + fma.sub(1));
+	}
+
+	return result;
+    }
+
+    
+    private ProgramMethod extractProgramMethod(
+	    			UseOperationContractRule.Instantiation inst) 
+    		throws ProofInputException {
+	return inst.pm;
+    }
+
+    
+    private Modality extractModality(
+	    			UseOperationContractRule.Instantiation inst) 
+    		throws ProofInputException {
+	return inst.mod;
+    }
+    
+    
+    private ProgramVariable extractSelfVar(
+    				UseOperationContractRule.Instantiation inst) 
+    		throws ProofInputException {
+	if(inst.actualSelf == null) {
+	    assert inst.pm.isStatic();
+	    return null;
+	} else if(inst.actualSelf.op() instanceof ProgramVariable) {
+	    return (ProgramVariable) inst.actualSelf.op();
+	} else {
+	    throw new ProofInputException("Program variable expected, "
+		    			  + "but found: " + inst.actualSelf);
+	}
+    }
+    
+
+    private ImmutableList<ProgramVariable> extractParamVars(
+	    			UseOperationContractRule.Instantiation inst) 
+	    	throws ProofInputException {
+	ImmutableList<ProgramVariable> result 
+		= ImmutableSLList.<ProgramVariable> nil();	
+	for(Term param : inst.actualParams) {
+	    if(param.op() instanceof ProgramVariable) {
+		result = result.append((ProgramVariable) param.op());
+	    } else {
+		throw new ProofInputException("Program variable expected, "
+					      + "but found: " + param);
+	    }
+	}
+	return result;
+    }
+
+    
+    private ProgramVariable extractResultVar(
+	    			UseOperationContractRule.Instantiation inst) 
+	    	throws ProofInputException {
+	if(inst.actualResult == null) {
+	    return null;
+	} else if(inst.actualResult instanceof ProgramVariable) {
+	    return (ProgramVariable) inst.actualResult;
+	} else {
+	    throw new ProofInputException("Program variable expected, "
+		   		          + "but found: " + inst.actualResult);
+	}
     }
     
 
@@ -173,6 +183,7 @@ public final class DLSpecFactory {
 	                    : fma.sub(1);
 	return modFma.sub(0);
     }
+    
     
     
 
@@ -224,20 +235,20 @@ public final class DLSpecFactory {
 	assert modifies != null;
 
 	//extract parts of fma
-	MethodBodyStatement mbs = extractMBS(fma);
-	if(mbs.getProgramMethod(services) == null) {
-	    throw new ProofInputException("method \""
-		    + mbs.getMethodReference() + "\" not found");
-	}
-	ProgramMethod pm = extractProgramMethod(mbs);
-	Modality modality = extractModality(fma);
-	Term pre = extractPre(fma);
-	Term post = extractPost(fma);
-	ProgramVariable selfVar = extractSelfVar(mbs);
-	ImmutableList<ProgramVariable> paramVars = extractParamVars(mbs);
-	ProgramVariable resultVar = extractResultVar(mbs);
-	ProgramVariable excVar = extractExcVar(fma);
+	final Term pre = extractPre(fma);
 	ProgramVariable heapAtPreVar = extractHeapAtPre(fma);
+	ProgramVariable excVar = extractExcVar(fma);	
+	final UseOperationContractRule.Instantiation inst = extractInst(fma);
+	final ProgramMethod pm = extractProgramMethod(inst);
+	final Modality modality = extractModality(inst);
+	final ProgramVariable selfVar = pm.isConstructor() 
+	                                ? extractResultVar(inst) 
+	                                : extractSelfVar(inst);
+	final ImmutableList<ProgramVariable> paramVars = extractParamVars(inst);
+	ProgramVariable resultVar = pm.isConstructor() 
+		                    ? null
+		                    : extractResultVar(inst);
+	Term post = extractPost(fma);
 	
 	//heapAtPre must not occur in precondition or in modifies clause
 	if(heapAtPreVar != null) {
