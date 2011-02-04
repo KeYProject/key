@@ -291,9 +291,10 @@ public class LexPathOrdering implements TermOrdering {
 
         private final Set<String> stringFunctionNames = new HashSet<String> ();
         {
-            intFunctionNames.add("clEmpty");
-            intFunctionNames.add("clCons");
-            intFunctionNames.add("C");
+            stringFunctionNames.add("strPool");            
+            stringFunctionNames.add("clEmpty");
+            stringFunctionNames.add("clCons");
+            stringFunctionNames.add("C");
         }
 
         
