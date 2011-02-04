@@ -35,15 +35,10 @@
   	<echo message="Please set (if you have not yet done so)  the environment variable ANT_OPTS to -Xms512m -Xmx512m" />
   	
 	<mkdir dir="${gen.dir}/de/uka/ilkd/key/parser"/>
-	<mkdir dir="${gen.dir}/de/uka/ilkd/key/parser/dictionary"/>
 	<mkdir dir="${gen.dir}/de/uka/ilkd/key/parser/schemajava"/>
 	<mkdir dir="${gen.dir}/de/uka/ilkd/key/parser/proofjava"/>
-	<mkdir dir="${gen.dir}/de/uka/ilkd/key/parser/diffparser"/>
-	<mkdir dir="${gen.dir}/de/uka/ilkd/key/parser/simplify"/>
 	<mkdir dir="${gen.dir}/de/uka/ilkd/key/speclang/jml/pretranslation"/>
 	<mkdir dir="${gen.dir}/de/uka/ilkd/key/speclang/jml/translation"/>
-	<mkdir dir="${gen.dir}/de/uka/ilkd/key/speclang/ocl/translation"/>
-	<mkdir dir="${gen.dir}/de/uka/ilkd/key/util/keydoc/parser"/>
   	
 	<mkdir dir="${build.dir}"/>
 
@@ -176,30 +171,6 @@
 	     </antlr>
 	  </target>
 
-	<target name="ocllexer">
-	     <antlr
-	         target="de/uka/ilkd/key/speclang/ocl/translation/ocllexer.g"
-	         outputdirectory="${gen.dir}/de/uka/ilkd/key/speclang/ocl/translation">
-	        <classpath>
-	           <pathelement location="${ext.dir}/antlr.jar" />
-	        </classpath>
-	     </antlr>
-	  </target>
-
-
-	  <target name="oclparser"  depends="ocllexer">
-	     <antlr
-	         target="de/uka/ilkd/key/speclang/ocl/translation/oclparser.g"
-	         outputdirectory="${gen.dir}/de/uka/ilkd/key/speclang/ocl/translation">
-	        <classpath>
-	           <pathelement location="${ext.dir}/antlr.jar" />
-	        </classpath>
-	     </antlr>
-	  </target>
-	
-	
-	
-	
 
   <target name="schemajavaparser"> 
     	<copy tofile="${gen.dir}/de/uka/ilkd/key/parser/schemajava/Token.java">
@@ -223,28 +194,6 @@
 	/>
   </target>
 	
-  <target name="simplifylexer">
-	<antlr
-	   target="de/uka/ilkd/key/parser/simplify/lexer.g"
-	   outputdirectory="${gen.dir}/de/uka/ilkd/key/parser/simplify">
-	   <classpath>
-	       <pathelement location="${ext.dir}/antlr.jar" />
-	   </classpath>
-	</antlr>
-  </target>
-
-
-  <target name="simplifyparser"  depends="simplifylexer">
-	     <antlr
-	         target="de/uka/ilkd/key/parser/simplify/simplify.g"
-	         outputdirectory="${gen.dir}/de/uka/ilkd/key/parser/simplify">
-	        <classpath>
-	           <pathelement location="${ext.dir}/antlr.jar" />
-	        </classpath>
-	     </antlr>
-  </target>
-
-
   <target name="build.dir" depends="prepare">
   	    <mkdir dir="${build.dir}"/>
   </target>
