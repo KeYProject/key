@@ -604,4 +604,3 @@ public class Semisequent implements Iterable<ConstrainedFormula> {
 	}
     }    
 }
-

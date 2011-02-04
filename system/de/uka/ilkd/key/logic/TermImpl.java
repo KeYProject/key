@@ -52,7 +52,7 @@ final class TermImpl implements Term {
 	    	    JavaBlock javaBlock) {
 	assert op != null;
 	assert subs != null;
-	this.op   = op;
+	this.op = op;
 	this.subs = subs.size() == 0 ? EMPTY_TERM_LIST : subs;
 	this.boundVars = boundVars == null ? EMPTY_VAR_LIST : boundVars;	
 	this.javaBlock = javaBlock == null 
@@ -252,7 +252,7 @@ final class TermImpl implements Term {
     
 
     /**
-     * true if <code>o</code> is syntactically equal to this term
+     * true iff <code>o</code> is syntactically equal to this term
      */
     @Override
     public boolean equals(Object o) {

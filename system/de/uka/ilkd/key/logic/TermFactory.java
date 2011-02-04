@@ -18,19 +18,22 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.util.LRUCache;
 
 /** 
- * The TermFactory is the <em>only</em> way to create terms using constructos of
- * class Term or any of its subclasses. It is the
- * only class that implements and may exploit knowledge about sub
- * classes of {@link Term} all other classes of the system only know
- * about terms what the {@link Term} class offers them. 
+ * The TermFactory is the <em>only</em> way to create terms using constructors 
+ * of class Term or any of its subclasses. It is the only class that implements 
+ * and may exploit knowledge about sub classes of {@link Term}. All other 
+ * classes of the system only know about terms what the {@link Term} class 
+ * offers them. 
  * 
- * This class is used to encapsulate knowledge about the internal term structures.
- * See {@link de.uka.ilkd.key.logic.TermBuilder} for more convenient methods to create
- * terms. 
+ * This class is used to encapsulate knowledge about the internal term 
+ * structures.
+ * See {@link de.uka.ilkd.key.logic.TermBuilder} for more convenient methods to 
+ * create terms. 
  */
 public final class TermFactory {
     
-    /** The only instance of TermFactory */
+    /** 
+     * The only instance of TermFactory. 
+     */
     public static final TermFactory DEFAULT = new TermFactory();    
 
     private static final Map<Term, Term> cache 
@@ -55,7 +58,7 @@ public final class TermFactory {
     
     /**
      * Master method for term creation. Should be the only place where terms 
-     * are created.
+     * are created in the entire system.
      */
     public Term createTerm(Operator op, 
 	    		   ImmutableArray<Term> subs, 

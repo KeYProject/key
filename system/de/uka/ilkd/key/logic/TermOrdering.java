@@ -24,5 +24,4 @@ public interface TermOrdering {
      * implementing class
      */
     int compare ( Term p_a, Term p_b );
-
 }
