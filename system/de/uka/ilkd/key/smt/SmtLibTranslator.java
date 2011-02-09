@@ -83,6 +83,11 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
     protected StringBuffer translateNull() {
 	return NULLSTRING;
     }
+    
+    @Override
+    protected StringBuffer getNullName() {
+        return NULLSTRING;
+    }
 
     protected StringBuffer translateNullSort() {
 	return NULLSORTSTRING;

@@ -46,6 +46,10 @@ public class SMTSettings implements Settings {
     private static final String CACHE_GOALS = "[DecisionProcedure]cache_goals";
     
     private static final String PROGRESS_DIALOG_MODE = "[DecisionProcedure]pd_mode";
+    
+    private static final String EXPLICIT_TYPE_HIERARCHY = "[DecisionProcedure]explicitTypeHierarchy";
+    
+    private static final String INSTANTIATE_NULL_PREDICATES = "[DecisionProcedure]instantiateNullPredicates";
 
 
 
@@ -98,6 +102,10 @@ public class SMTSettings implements Settings {
     
     private boolean cacheGoals=false;
     
+    private boolean explicitTypeHierarchy = false;
+    
+    private boolean instantiateNullPredicates = true;
+    
     public int getProgressDialogMode(){
 	return progressDialogMode;
     }
@@ -116,6 +124,22 @@ public class SMTSettings implements Settings {
     
     public boolean isCachingGoals(){
 	return cacheGoals;
+    }
+    
+    public boolean isExplicitTypeHierarchy() {
+	return explicitTypeHierarchy;
+    }
+
+    public boolean isInstantiateNullPredicates() {
+	return instantiateNullPredicates;
+    }
+
+    public void setExplicitTypeHierarchy(boolean b) {
+	explicitTypeHierarchy = b;
+    }
+
+    public void setInstantateNullPredicates(boolean b) {
+	instantiateNullPredicates = b;
     }
 
     public void setCacheGoals(boolean b){
@@ -293,6 +317,12 @@ public class SMTSettings implements Settings {
     	
     	String cg = props.getProperty(CACHE_GOALS);
     	this.cacheGoals = !(cg == null) && cg.equals("true");
+    	
+        String eth = props.getProperty(EXPLICIT_TYPE_HIERARCHY);
+        this.explicitTypeHierarchy = !(eth == null) && eth.equals("true");
+       
+        String inp = props.getProperty(INSTANTIATE_NULL_PREDICATES);
+        this.instantiateNullPredicates = !(inp == null) && inp.equals("true");
     	
     	file = props.getProperty(SAVEFILE_PATH,"");
     	
@@ -570,6 +600,12 @@ public class SMTSettings implements Settings {
             props.setProperty(CACHE_GOALS, "false");
         }
         
+
+        
+        props.setProperty(EXPLICIT_TYPE_HIERARCHY,this.explicitTypeHierarchy ? "true" : "false");
+         
+        props.setProperty(INSTANTIATE_NULL_PREDICATES,this.instantiateNullPredicates ? "true" : "false");
+         
         props.setProperty(PROGRESS_DIALOG_MODE,Integer.toString(progressDialogMode));
 
         props.setProperty(SAVEFILE_PATH,this.file);

@@ -413,7 +413,15 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
 
     @Override
     protected StringBuffer translateNull() {
-	return NULLSTRING;
+	StringBuffer temp = new StringBuffer("(");
+	temp.append(getNullName());
+	temp.append(")");
+	return temp;
+    }
+    
+    @Override
+    protected StringBuffer getNullName() {
+      	return NULLSTRING;
     }
 
     @Override

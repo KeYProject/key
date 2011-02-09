@@ -17,6 +17,7 @@ import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.gui.smt.SMTSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -385,7 +386,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	ArrayList<ContextualBlock> predicateTypes = new ArrayList<ContextualBlock>();
 	return buildCompleteText(formula, this.getAssumptions(serv, assumptionTypes),assumptionTypes, this.buildTranslatedFuncDecls(), this
 		    .buildTranslatedPredDecls(predicateTypes),predicateTypes, this.buildTranslatedSorts(), this
-		    .buildSortHierarchy());
+		    .buildSortHierarchy(serv));
     }
     
     /**
@@ -394,8 +395,11 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * 
      * @return a sort hierarchy for the sorts
      */
-    private SortHierarchy buildSortHierarchy() {
-	return new SortHierarchy(this.usedDisplaySort, this.typePredicates);
+    private SortHierarchy buildSortHierarchy(Services services) {
+	final SMTSettings settings = ProofSettings.DEFAULT_SETTINGS.getSMTSettings();
+	return new SortHierarchy(this.usedDisplaySort, this.typePredicates,
+	settings.isInstantiateNullPredicates(),settings.isExplicitTypeHierarchy(),services);
+
     }
 
     /**
@@ -404,63 +408,66 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * @return The well defined formula.
      */
     private ArrayList<StringBuffer> getSortHierarchyPredicates(Services services) {
-	SortHierarchy sh = this.buildSortHierarchy();
+	Function nullOp = services.getTypeConverter().getHeapLDT().getNull();
+	SortHierarchy sh = this.buildSortHierarchy(services);
 	ArrayList<StringBuffer> toReturn = new ArrayList<StringBuffer>();
-	
-	// add the typepredicates for functions.
-	HashMap<StringBuffer, ArrayList<StringBuffer>> predMap = sh
-		.getDirectSuperSortPredicate();
-	for (StringBuffer leftPred : predMap.keySet()) {
-	    StringBuffer form = new StringBuffer();
-	    for (StringBuffer rightPred : predMap.get(leftPred)) {
-		StringBuffer var = this.translateLogicalVar(new StringBuffer(
-			"tvar"));
-		ArrayList<StringBuffer> varlist = new ArrayList<StringBuffer>();
-		varlist.add(var);
-		StringBuffer leftForm = this.translatePredicate(leftPred,
-			varlist);
-
-		StringBuffer rightForm = this.translatePredicate(rightPred,
-			varlist);
-
-		form = this.translateLogicalImply(leftForm, rightForm);
-		if (this.isMultiSorted()) {
-		    form = this.translateLogicalAll(var, this.standardSort,
-			form);
+	LinkedList<SortWrapper> list = sh.getSorts();
+	for (SortWrapper swChild : list) {
+	    for (SortWrapper swParent : swChild.getParents()) {
+		StringBuffer form = new StringBuffer();
+		final SMTSettings settings = ProofSettings.DEFAULT_SETTINGS
+		        .getSMTSettings();
+		if (swChild.getSort() == nullOp.sort()
+		        && settings.isInstantiateNullPredicates()) {
+		    form = buildInstantiatedHierarchyPredicate(swChild,
+			    swParent, translateNull());
 		} else {
-		    form = this.translateLogicalAll(var, this.getIntegerSort(),
-				form);
+		    form = buildGeneralHierarchyPredicate(swChild, swParent);
 		}
-	    }
-	    if (form.length() > 0) {
-		toReturn.add(form);
-	    }
-	}
 
-	// add the typepredicates for null
-	if (this.nullUsed) {
-	    Set<Entry<Sort,StringBuffer>> set = this.typePredicates.entrySet();
-	     for (Entry<Sort,StringBuffer> entry : set) {
-	    
-	     if(isReferenceType(entry.getKey(),services)){
-	     ArrayList<StringBuffer> argList = new ArrayList<StringBuffer>();
-	     argList.add(this.nullString);
-	     StringBuffer toAdd = this.translatePredicate(entry.getValue(), argList);
-	     toReturn.add(toAdd);
-	     }
+		if (form.length() > 0) {
+		    toReturn.add(form);
+		}
 	    }
 	}
 
 	return toReturn;
     }
     
+    private StringBuffer buildGeneralHierarchyPredicate(SortWrapper child,
+	    SortWrapper parent) {
+	StringBuffer form = new StringBuffer();
+
+	StringBuffer var = this.translateLogicalVar(new StringBuffer("tvar2"));
+	ArrayList<StringBuffer> varlist = new ArrayList<StringBuffer>();
+	varlist.add(var);
+	StringBuffer leftForm = this.translatePredicate(child
+	        .getPredicateName(), varlist);
+	StringBuffer rightForm = this.translatePredicate(parent
+	        .getPredicateName(), varlist);
+
+	form = this.translateLogicalImply(leftForm, rightForm);
+	if (this.isMultiSorted()) {
+	    form = this.translateLogicalAll(var, this.standardSort, form);
+	} else {
+	    form = this.translateLogicalAll(var, this.getIntegerSort(), form);
+	}
+	return form;
+    }
+
+    private StringBuffer buildInstantiatedHierarchyPredicate(SortWrapper child,
+	    SortWrapper parent, StringBuffer constant) {
+	StringBuffer form = new StringBuffer();
+
+	ArrayList<StringBuffer> varlist = new ArrayList<StringBuffer>();
+	varlist.add(constant);
+
+	form = this.translatePredicate(parent.getPredicateName(), varlist);
+
+	return form;
+    }
     
-    private boolean isReferenceType(Sort sort, Services services){
-	LocationVariable lv = new LocationVariable(new ProgramElementName("dummy"),sort);
-	KeYJavaType type = services.getTypeConverter().getKeYJavaType(TermFactory.DEFAULT.createTerm(lv));
-	return type != null && services.getTypeConverter().isReferenceType(type.getJavaType());
-	
-     }
+    
 
     /**
      * Returns a set of formula s, that defines the resulttypes of functions,
@@ -608,7 +615,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    toReturn.add(element);
 	}
 
-	if (this.nullUsed) {
+	/*if (this.nullUsed) {
 	    //add the null constant to the declarations
 	    ArrayList<StringBuffer> a = new ArrayList<StringBuffer>();
 	    a.add(this.nullString);
@@ -618,7 +625,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 		a.add(this.getIntegerSort());
 	    }
 	    toReturn.add(a);
-	}
+	}*/
 
 	//add the definition of the cast function
 	if (this.isMultiSorted() && this.castPredicate != null) {
@@ -1182,6 +1189,12 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     protected abstract StringBuffer translateNull();
 
     /**
+     * 
+     * @return Returns the name of the NULL element.
+     */
+    protected abstract StringBuffer getNullName();
+    
+    /**
      * Translate the NULL element's Sort.
      * 
      * @return the StringBuffer used for Null.
@@ -1427,9 +1440,13 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	} else if (op == Junctor.FALSE) {
 	    return this.translateLogicalFalse();
 	} else if (op == services.getTypeConverter().getHeapLDT().getNull()) {
-	    this.nullString = this.translateNull();
+	    this.nullString = this.getNullName();
 	    this.nullUsed = true;
-	    return this.nullString;
+	    Function nullOp = services.getTypeConverter().getHeapLDT().getNull();
+	    
+	    addFunction(nullOp, new ArrayList<Sort>(),nullOp.sort());
+	    translateSort(nullOp.sort());
+	    return translateNull();
 	} else if (op instanceof LogicVariable || op instanceof ProgramVariable) {
 	    // translate as variable or constant
 	    if (quantifiedVars.contains(op)) {

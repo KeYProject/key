@@ -73,6 +73,8 @@ public class TemporarySettings extends Settings {
     public int maxGenerics = 3;
     public String folder = "";
     public int timeout = 10000;
+    public boolean explicitTypeHierarchy = false;
+    public boolean instantiateNullPredicates = true;
     public LinkedList<TemporarySolverSettings> solverSettings = new LinkedList<TemporarySolverSettings>();
     
     public final static String    PROGRESS_MODE_USER = "Progress dialog remains open after executing solvers.";
@@ -119,7 +121,8 @@ public class TemporarySettings extends Settings {
 	
 	storeToFile = settings.getSaveFile();
 	cacheGoals = settings.isCachingGoals();
-
+	explicitTypeHierarchy = settings.isExplicitTypeHierarchy();
+	instantiateNullPredicates = settings.isInstantiateNullPredicates();
 	decSettings = settings;
 	tacSettings = tacletSettings;
 
@@ -137,6 +140,8 @@ public class TemporarySettings extends Settings {
 	tacSettings.setFilename(tacletFolder);
 	tacSettings.setMaxGeneric(maxGenerics);
 	tacSettings.setSaveToFile(storeTacletsToFile);
+	decSettings.setExplicitTypeHierarchy(explicitTypeHierarchy);
+	decSettings.setInstantateNullPredicates(instantiateNullPredicates);
 	for (TemporarySolverSettings setSolver : solverSettings) {
 	    setSolver.apply();
 	}
@@ -165,6 +170,10 @@ public class TemporarySettings extends Settings {
 		        buildModel(tss.toString(), getSolverData(tss))));
 		solverOptions.add(solver);
 	    }
+	    
+	    DefaultMutableTreeNode hierarchyOptions = new DefaultMutableTreeNode();
+	    hierarchyOptions.setUserObject(new ContentItem("Type Hierarchy",
+	    buildModel("Type Hierarchy", getHierarchyOptionData())));
 
 	    DefaultMutableTreeNode tacletOptions = new DefaultMutableTreeNode();
 	    tacletOptions.setUserObject(new ContentItem("Taclets",
@@ -179,6 +188,7 @@ public class TemporarySettings extends Settings {
 
 	   
 	    root.add(solverOptions);
+	    root.add(hierarchyOptions);
 	    root.add(tacletOptions);
 
 	    contentModel = new DefaultTreeModel(root);
@@ -190,6 +200,47 @@ public class TemporarySettings extends Settings {
 	return contentModel;
 
     }
+    
+    
+     private TableComponent[] getHierarchyOptionData(){
+     TableComponent data[] = {
+     new TableCheckBox() {
+     public boolean prepareValues() {
+     setTitle("Use explicit type hierarchy.");
+     setSelected(explicitTypeHierarchy);
+     return true;
+     }
+    
+     @Override
+     public void eventChange() {
+     explicitTypeHierarchy = isSelected();
+     }
+    
+    @Override
+     public String getInfo() {
+     return "TODO: Write Info";
+     }
+     },
+     new TableCheckBox() {
+     public boolean prepareValues() {
+     setTitle("Instantiate null predicates (recommended).");
+     setSelected(instantiateNullPredicates);
+     return true;
+     }
+    
+     @Override
+     public void eventChange() {
+       instantiateNullPredicates = isSelected();
+     }
+         @Override
+     public String getInfo() {
+     return "TODO: Write Info";
+     }
+     }};
+     return data;
+   } 
+    
+
     
     
 
