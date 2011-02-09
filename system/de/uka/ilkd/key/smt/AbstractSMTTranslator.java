@@ -11,12 +11,14 @@
 package de.uka.ilkd.key.smt;
 
 import java.util.*;
+import java.util.Map.Entry;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
@@ -265,13 +267,13 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	//this means, add the typepredicates, that are needed to define
 	//for every type, what type they are (direct) subtype of
 	start = toReturn.size();
-	toReturn.addAll(this.getSortHierarchyPredicates());
+	toReturn.addAll(this.getSortHierarchyPredicates(services));
 	assumptionTypes.add(new ContextualBlock(start,toReturn.size()-1,ContextualBlock.ASSUMPTION_TYPE_HIERARCHY));
 	//add the formulas, that make sure, type correctness is kept, also
 	//for interpreted functions
 	//leave this away. This is not needed, if interpreted int functions are typed by the second type u
+	start = toReturn.size();
 	if (!this.isMultiSorted()) {
-	    start = toReturn.size();
 	    toReturn.addAll(this.getSpecialSortPredicates(services));
 	}
 	assumptionTypes.add(new ContextualBlock(start,toReturn.size()-1,ContextualBlock.ASSUMPTION_SORT_PREDICATES));
@@ -401,7 +403,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * Also the null type is added to the formula if used before.
      * @return The well defined formula.
      */
-    private ArrayList<StringBuffer> getSortHierarchyPredicates() {
+    private ArrayList<StringBuffer> getSortHierarchyPredicates(Services services) {
 	SortHierarchy sh = this.buildSortHierarchy();
 	ArrayList<StringBuffer> toReturn = new ArrayList<StringBuffer>();
 	
@@ -437,16 +439,28 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
 	// add the typepredicates for null
 	if (this.nullUsed) {
-	    for (StringBuffer s : this.typePredicates.values()) {
-		ArrayList<StringBuffer> argList = new ArrayList<StringBuffer>();
-		argList.add(this.nullString);
-		StringBuffer toAdd = this.translatePredicate(s, argList);
-		toReturn.add(toAdd);
+	    Set<Entry<Sort,StringBuffer>> set = this.typePredicates.entrySet();
+	     for (Entry<Sort,StringBuffer> entry : set) {
+	    
+	     if(isReferenceType(entry.getKey(),services)){
+	     ArrayList<StringBuffer> argList = new ArrayList<StringBuffer>();
+	     argList.add(this.nullString);
+	     StringBuffer toAdd = this.translatePredicate(entry.getValue(), argList);
+	     toReturn.add(toAdd);
+	     }
 	    }
 	}
 
 	return toReturn;
     }
+    
+    
+    private boolean isReferenceType(Sort sort, Services services){
+	LocationVariable lv = new LocationVariable(new ProgramElementName("dummy"),sort);
+	KeYJavaType type = services.getTypeConverter().getKeYJavaType(TermFactory.DEFAULT.createTerm(lv));
+	return type != null && services.getTypeConverter().isReferenceType(type.getJavaType());
+	
+     }
 
     /**
      * Returns a set of formula s, that defines the resulttypes of functions,
