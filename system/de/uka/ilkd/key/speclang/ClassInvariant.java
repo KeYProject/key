@@ -12,13 +12,15 @@ package de.uka.ilkd.key.speclang;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
 
 
 /**
  * A class invariant.
  */
-public interface ClassInvariant {
+public interface ClassInvariant extends SpecificationElement {
         
     /**
      * Returns the unique internal name of the invariant.
@@ -35,31 +37,27 @@ public interface ClassInvariant {
      * invariant belongs.
      */
     public KeYJavaType getKJT();
-
-    /**
-     * Returns the invariant formula with implicit all-quantification over
-     * the receiver object.
-     */
-    public FormulaWithAxioms getClosedInv(Services services);
     
     /**
-     * Returns the invariant formula with implicit all-quantification over
-     * all objects, excluding the object held by the passed variable.
+     * Returns the visibility of the invariant (null for default visibility)
      */
-    public FormulaWithAxioms getClosedInvExcludingOne(
-	    					ParsableVariable excludedVar, 
-	                                        Services services);
+    public VisibilityModifier getVisibility();     
     
-  
     /**
      * Returns the invariant formula without implicit all-quantification over
      * the receiver object.
      */
-    public FormulaWithAxioms getOpenInv(ParsableVariable selfVar, 
-	      			        Services services);
+    public Term getInv(ParsableVariable selfVar, Services services);
     
     /**
-     * Returns the invariant in pretty HTML format.
+     * Tells whether the invariant is static (i.e., does not refer to a
+     * receiver object).
      */
-    public String getHTMLText(Services services);
+    public boolean isStatic();
+        
+    /**
+     * Returns another class invariant like this one, except that it refers to the 
+     * passed KeYJavaType.
+     */    
+    public ClassInvariant setKJT(KeYJavaType kjt);
 }

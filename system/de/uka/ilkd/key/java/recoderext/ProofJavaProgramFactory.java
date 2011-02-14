@@ -1,14 +1,12 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 //
-//
-//
-//
+
 
 // This file is partially taken from the RECODER library, which is protected by 
 // the LGPL, and modified.
@@ -28,7 +26,8 @@ import recoder.io.PropertyNames;
 import recoder.java.*;
 import recoder.java.SourceElement.Position;
 import recoder.java.declaration.*;
-import recoder.java.reference.*;
+import recoder.java.reference.MethodReference;
+import recoder.java.reference.TypeReference;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 import recoder.util.StringUtils;
@@ -37,13 +36,6 @@ import de.uka.ilkd.key.parser.proofjava.ProofJavaParser;
 
 public class ProofJavaProgramFactory extends JavaProgramFactory {
     
-    /*
-     * by default allow java5 expressions such as the enum keyword
-     */
-    /*private static boolean ALLOW_JAVA5 =
-            System.getProperty("key.allowJava5", "true").equalsIgnoreCase(
-                    "true");*/
-
     /**
      Protected constructor - use {@link #getInstance} instead.
      */
@@ -120,22 +112,6 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
         }
         cml.add(c);
     }
-    
-    public NewWrapper createNewWrapper(Identifier scope){
-        return new NewWrapper(super.createNew(), scope);
-    }
-    
-    public NewArrayWrapper createNewArrayWrapper(Identifier scope){
-        return new NewArrayWrapper(super.createNewArray(), scope);
-    }
-    
-    public KeYAnnotationUseSpecification createKeYAnnotationUseSpecification(){
-        return new KeYAnnotationUseSpecification();
-    }
-    
-/*    public CurrentMemoryAreaReference createCurrentMemoryAreaReference(){
-        return new CurrentMemoryAreaReference();
-    }*/
 
     /**
        Perform post work on the created element. Creates parent links
@@ -405,14 +381,8 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
      */
     public MethodBodyStatement createMethodBodyStatement(TypeReference bodySource,
 							 Expression resVar,
-							 MethodReferenceWrapper methRef) {
+							 MethodReference methRef) {
 	return new MethodBodyStatement(bodySource, resVar, methRef);
-    }
-    
-    public MethodReferenceWrapper createMethodReferenceWrapper(ReferencePrefix accessPath, 
-            Identifier name, ASTList<Expression> args, 
-            ASTList<TypeArgumentDeclaration> typeArgs){
-        return new MethodReferenceWrapper(accessPath, name, args, typeArgs);
     }
 
     /**

@@ -17,26 +17,12 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 /**
 * Metaoperator for computing the result of dividing one monomial by another
 */
-public class DivideLCRMonomials extends AbstractMetaOperator {
+public final class DivideLCRMonomials extends AbstractMetaOperator {
 
     public DivideLCRMonomials() {
         super ( new Name ( "#divideLCRMonomials" ), 2 );
     }
 
-    /**
-     * checks whether the top level structure of the given
-     * 
-     * @param term the Term is syntactically valid, given the assumption that the top
-     *       level operator of the term is the same as this Operator. The
-     *       assumption that the top level operator and the term are equal is
-     *       NOT checked.
-     * @return true iff the top level structure of the Term is valid.
-     */
-    public boolean validTopLevel(Term term) {
-        // a meta operator accepts almost everything
-        return term.op () instanceof DivideLCRMonomials
-               && term.arity () == arity ();
-    }
 
     /** calculates the resulting term. */
     public Term calculate(Term term, SVInstantiations svInst, Services services) {

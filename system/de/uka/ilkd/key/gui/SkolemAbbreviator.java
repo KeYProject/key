@@ -14,6 +14,7 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.pp.AbbrevException;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
@@ -48,7 +49,7 @@ public class SkolemAbbreviator implements RuleAppListener {
 
             while ( it.hasNext () ) {
                 final SchemaVariable sv = it.next ().first ();
-                if ( !sv.isSkolemTermSV () ) continue;
+                if ( !(sv instanceof SkolemTermSV) ) continue;
                 final Term t = (Term)app.instantiations ().getInstantiation ( sv );
 
                 assert t != null : "Instantiation missing, but should be there";

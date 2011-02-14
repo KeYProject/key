@@ -16,6 +16,7 @@ import java.util.Iterator;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 
+
 /**
  * A Namespace keeps track of already used {@link Name}s and the objects
  * carrying these names. These objects have to implement the interface
@@ -31,11 +32,11 @@ public class Namespace implements java.io.Serializable {
      * The fall-back namespace for symbols not present in this
      * Namespace.
      */
-    protected Namespace parent=null;    
+    protected Namespace parent = null;    
 
     /** The hashmap that maps a name to a symbols of that name if it 
      * is defined in this Namespace. */
-    protected HashMap<Name, Named> symbols=null;
+    protected HashMap<Name, Named> symbols = null;
      
     /** One defined symbol.  Many Namespaces, e.g. those generated when 
      * a quantified formula is parsed, define only one new symbol,
@@ -43,12 +44,12 @@ public class Namespace implements java.io.Serializable {
      * So {@link #symbols} is only initialized when there is more than one
      * symbol in this namespace.  Otherwise, <code>localSym</code> contains
      * that symbol. */
-    protected Named localSym=null;
+    protected Named localSym = null;
 
     /** The number of symbols defined in this namespace.  This is different 
      * from <code>symbols.size()</code> because symbols might be null if
      * there is only one symbol in this Namespace. */
-    protected int numLocalSyms=0;
+    protected int numLocalSyms = 0;
 
     /** Additions can be "recorded" here */
     protected HashMap<Name, Named> protocol = null;
@@ -254,5 +255,4 @@ public class Namespace implements java.io.Serializable {
 	localSym=null;
 	numLocalSyms=0;
     }
-
 }

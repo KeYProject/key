@@ -13,101 +13,158 @@ package de.uka.ilkd.key.strategy;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.proof.FormulaTag;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.BuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
+
 
 /**
  * Instances of this class are immutable
  */
 public class BuiltInRuleAppContainer extends RuleAppContainer {
 
-    BuiltInRuleAppContainer(RuleApp p_app, RuleAppCost p_cost) {
-        super(p_app, p_cost);
-    }
-
     /**
-     * Create a list of new RuleAppContainers that are to be 
-     * considered for application.
+     * The position of the rule app in two different representations:
+     * <code>positionTag</code> denotes the concerned formula and survives
+     * modifications of the sequent and of parts of the formula, and
+     * <code>applicationPosition</code> is the original position for which the
+     * rule app was created
      */
-    public ImmutableList<RuleAppContainer> createFurtherApps(
-        Goal p_goal,
-        Strategy p_strategy) {
-        if (isStillApplicable(p_goal))
-            return createAppContainers(
-                (BuiltInRuleApp) getRuleApp(),
-                null,
-                p_goal,
-                p_strategy);
-        return ImmutableSLList.<RuleAppContainer>nil();
+    private final FormulaTag      positionTag;
+    private final PosInOccurrence applicationPosition;
+    
+    private final BuiltInRuleApp bir;
+    
+    
+
+    //-------------------------------------------------------------------------
+    //constructors
+    //-------------------------------------------------------------------------
+        
+    private BuiltInRuleAppContainer(BuiltInRuleApp bir,
+			     	    PosInOccurrence pio,
+			     	    RuleAppCost     cost,
+			     	    Goal            goal) {
+        super(bir, cost);
+    	applicationPosition = pio;
+    	positionTag 
+    		= pio == null 
+    	          ? null 
+    	          : goal.getFormulaTagManager().getTagForPos(pio.topLevel());
+        this.bir = bir;
+    	assert !(pio != null && positionTag == null) 
+    	       : "Formula " + pio + " does not exist";
     }
+    
+    
+    
 
-    /**
-     * Create a <code>RuleApp</code> that is suitable to be applied 
-     * or <code>null</code>.
-     */
-    public RuleApp completeRuleApp(Goal p_goal, Strategy p_strategy) {
-        if (!isStillApplicable(p_goal))
-            return null;
-
-        final BuiltInRuleApp app = getBuiltInRuleApp();
-        final BuiltInRule rule = (BuiltInRule) app.rule();
-        final Constraint userConstraint = app.userConstraint();
-        final PosInOccurrence pio = getBuiltInRuleApp().posInOccurrence();
-	
-        return new BuiltInRuleApp(rule, pio, userConstraint);
-    }
-
-    /**
-     * @return the BuiltInRuleApp belonging to this container
-     */
-    protected BuiltInRuleApp getBuiltInRuleApp() {
-        return (BuiltInRuleApp) getRuleApp();
-    }
-
+    //-------------------------------------------------------------------------
+    //internal methods
+    //-------------------------------------------------------------------------
+    
     /**
      * @return true iff the stored rule app is applicable for the given sequent,
      * i.e. if the bound position does still exist (if-formulas are not
      * considered)
      */
-    protected boolean isStillApplicable(Goal p_goal) {
-        final BuiltInRuleApp app = getBuiltInRuleApp();
-	final PosInOccurrence pio = app.posInOccurrence();
-	if(pio == null){
-	    return true;
+    private boolean isStillApplicable(Goal goal) {
+	if(applicationPosition == null) {
+	    return bir.rule().isApplicable(goal, 
+		    			   null, 
+		    			   goal.getClosureConstraint());	    
+	} else {
+            final PosInOccurrence topPos 
+    		= goal.getFormulaTagManager().getPosForTag(positionTag);
+            if(topPos == null) {
+        	//the formula does not exist anymore, bail out
+        	return false;
+            } else if(topPos.constrainedFormula()
+        	            .equals(applicationPosition.constrainedFormula())) {
+        	return true;
+            } else {
+        	return false;
+            }
 	}
-        final ConstrainedFormula cfma = pio.constrainedFormula();
-        final boolean antec = pio.isInAntec();
-        final Sequent seq = p_goal.sequent();
-        final Semisequent semiseq = antec ? seq.antecedent() : seq.succedent();
-
-        if (!semiseq.contains(cfma))
-            return false;
-
-        return true;
     }
+    
+    
+    /**
+     * Copied from FindTaclet.
+     */
+    private PosInOccurrence getPosInOccurrence(Goal p_goal) {
+    	final PosInOccurrence topPos =
+    	    p_goal.getFormulaTagManager().getPosForTag(positionTag);
 
+	assert topPos != null;
+	
+	return applicationPosition.replaceConstrainedFormula
+	    ( topPos.constrainedFormula () );
+    }    
+    
+    
+
+    //-------------------------------------------------------------------------
+    //public interface
+    //-------------------------------------------------------------------------
+    
     /**
      * Create containers for RuleApps.
      * @return list of containers for currently applicable BuiltInRuleApps,
      * the cost may be an instance of <code>TopRuleAppCost</code>.
      */
-    static ImmutableList<RuleAppContainer> createAppContainers
-        ( BuiltInRuleApp p_app,
-          PosInOccurrence p_pio,
-          Goal p_goal,
-          Strategy p_strategy ) {
-        ImmutableList<RuleAppContainer> result = ImmutableSLList.<RuleAppContainer>nil();
+    static ImmutableList<RuleAppContainer> createAppContainers( 
+	    					BuiltInRuleApp bir,
+	    					PosInOccurrence pio,
+	    					Goal goal,
+	    					Strategy strategy ) {
+        final RuleAppCost cost = strategy.computeCost(bir, pio, goal);
 
-        final RuleAppCost cost = p_strategy.computeCost(p_app, p_pio, p_goal);
+        final BuiltInRuleAppContainer container 
+        	= new BuiltInRuleAppContainer(bir, pio, cost, goal);
 
-        BuiltInRuleAppContainer container =
-            new BuiltInRuleAppContainer(p_app, cost);
+        return ImmutableSLList.<RuleAppContainer>nil().prepend(container);
+    }    
+    
 
-        result = result.prepend(container);
-
+    @Override
+    public ImmutableList<RuleAppContainer> createFurtherApps(
+	    					Goal goal,
+	    					Strategy strategy) {
+        if(!isStillApplicable(goal)) {
+            return ImmutableSLList.<RuleAppContainer>nil();
+        }
+        
+        final PosInOccurrence pio = getPosInOccurrence(goal);
+        
+        ImmutableList<RuleAppContainer> result 
+        	= createAppContainers(bir, pio, goal, strategy);
+        for(RuleAppContainer container : result) {
+            if(container.getCost() instanceof TopRuleAppCost) {
+        	result = result.removeFirst(container);
+            }
+        }
         return result;
     }
+    
 
+    @Override
+    public RuleApp completeRuleApp(Goal goal, Strategy strategy) {
+        if(!isStillApplicable(goal)) {
+            return null;
+        }
+        
+        final PosInOccurrence pio = getPosInOccurrence (goal);
+        if(!strategy.isApprovedApp(bir, pio, goal)) {
+            return null;
+        }
+        
+        final BuiltInRule rule = (BuiltInRule) bir.rule();
+        final Constraint userConstraint = bir.userConstraint();
+        final ImmutableList<PosInOccurrence> ifInsts = bir.ifInsts();
+	
+        return new BuiltInRuleApp(rule, pio, userConstraint, ifInsts);
+    }
 }

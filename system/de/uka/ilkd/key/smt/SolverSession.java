@@ -1,11 +1,12 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-
+//
+//
 package de.uka.ilkd.key.smt;
 
 import java.util.Collection;
@@ -31,7 +32,7 @@ class SolverSession {
      * 
      */
     public static class InternResult implements Cloneable {
-	private SMTSolverResult result = SMTSolverResult.createUnknown("", "");
+	private SMTSolverResult result = SMTSolverResult.createUnknownResult("", "");
 	
 	private Term            term;
 	private Goal 		goal;
@@ -112,7 +113,7 @@ class SolverSession {
 	
 	protected Object clone(SMTSolver solver)  {
 	    InternResult result = new InternResult(term , goal ,formula);
-	    result.result=SMTSolverResult.createUnknown("",solver.name());
+	    result.result=SMTSolverResult.createUnknownResult("",solver.name());
 	    return result;
 	}
 	

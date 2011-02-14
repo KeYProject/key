@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -292,7 +292,6 @@ public class ProofJavaParser {
          *  it is an explicit generic method invocation
          */
         ASTList<TypeArgumentDeclaration> typeArgs = null;
-        
     }
 
 
@@ -322,7 +321,6 @@ public class ProofJavaParser {
         static final int QUALIFIED_NAME   =  6;
         /** production was <pre>"@(" Expression ")"</pre> */
         static final int PASSIVE_EXPR =  7;    
-	static final int CURRENT_MEMORY_AREA = 8; 
     
         /** indicates the type of the result */
         int           type    = UNDEFINED;
@@ -480,7 +478,6 @@ TOKEN :
 | < WHILE: "while" >
 | < VARARGDENOTER: "..." >
 | < STRICTFP: "strictfp" >
-| < CURRENTMEMORYAREA: "<currentMemoryArea>" >
 }
 
 /* LITERALS */
@@ -1944,6 +1941,8 @@ TypeReference PrimitiveType() :
   | "long"
   | "float"
   | "double"
+  | "\\locset"
+  | "\\seq"
   )
   {
     Identifier id = factory.createIdentifier(token.image);
@@ -2264,28 +2263,82 @@ Expression Expression() :
  */
 {
     Expression result;
-    Expression expr;
+    Expression expr, expr2;
     Assignment op;
     ASTList<Expression> leftRight = new ASTArrayList<Expression>();
 }
 {
-  (result = ConditionalExpression()
-  [
-    op   = AssignmentOperator()
-    expr = Expression()
+    (result = ConditionalExpression()
+    [
+      op   = AssignmentOperator()
+      expr = Expression()
+      {
+          leftRight.add(result);
+          leftRight.add(expr);
+          op.setArguments(leftRight);
+          result = op;
+      }
+    ]
+    |
+    "\\singleton" "(" expr = Expression() ")"
     {
-        leftRight.add(result);
-        leftRight.add(expr);
-        op.setArguments(leftRight);
-        result = op;
+        result = new Singleton(expr);
+        setPrefixInfo(result);
     }
-  ]
+    |
+    "\\set_union" "(" expr = Expression() "," result = Expression() ")"
+    {
+        result = new SetUnion(expr, result);
+        setPrefixInfo(result);
+    }
+    |
+    "\\intersect" "(" expr = Expression() "," result = Expression() ")"
+    {
+        result = new Intersect(expr, result);
+        setPrefixInfo(result);
+    }
+    |
+    "\\set_minus" "(" expr = Expression() "," result = Expression() ")"
+    {
+        result = new SetMinus(expr, result);
+        setPrefixInfo(result);
+    }
+    |
+    "\\all_fields" "(" expr = Expression() ")"
+    {
+        result = new AllFields(expr);
+        setPrefixInfo(result);
+    }
+    |
+    "\\seq_singleton" "(" expr = Expression() ")"
+    {
+        result = new SeqSingleton(expr);
+        setPrefixInfo(result);
+    }
+    |
+    "\\seq_concat" "(" expr = Expression() "," result = Expression() ")"
+    {
+        result = new SeqConcat(expr, result);
+        setPrefixInfo(result);
+    }
+    |
+    "\\seq_sub" "(" expr = Expression() "," expr2 = Expression() "," result = Expression() ")"
+    {
+        result = new SeqSub(expr, expr2, result);
+        setPrefixInfo(result);
+    }
+    |
+    "\\seq_reverse" "(" expr = Expression() ")"
+    {
+        result = new SeqReverse(expr);
+        setPrefixInfo(result);
+    }
+  )
   {
       checkConstruction(result);
       setPostfixInfo(result);
       return result;
-  })
-
+  }
 }
 
 
@@ -2830,16 +2883,6 @@ Expression PrimaryExpression() :
           setPrefixInfo(tmpResult);
           setPostfixInfo(tmpResult);
           break;
-      case PrimaryPrefixReturnValue.CURRENT_MEMORY_AREA:
-    	  Identifier id = factory.createIdentifier("MemoryArea");    
-    	  setPrefixInfo(id);
-    	  setPostfixInfo(id);
-          tmpResult = factory.createUncollatedReferenceQualifier(id);
-	  id = factory.createIdentifier("currentMemoryArea");	
-          tmpResult = factory.createUncollatedReferenceQualifier(tmpResult,id);
-          setPrefixInfo(tmpResult);
-	  setPostfixInfo(tmpResult);
-          break;
       case PrimaryPrefixReturnValue.SUPER_MEMBER:
           tmpResult = prefix.name;
           break;
@@ -2950,7 +2993,7 @@ Expression PrimaryExpression() :
           // method call -determine the kind of method
           if (tmpResult instanceof UncollatedReferenceQualifier) {
               // this is a normal method call
-              tmpResult = factory.createMethodReferenceWrapper
+              tmpResult = factory.createMethodReference
               (((UncollatedReferenceQualifier)tmpResult).getReferencePrefix(),
                ((UncollatedReferenceQualifier)tmpResult).getIdentifier(),
                suffix.args, ((UncollatedReferenceQualifier)tmpResult).getTypeArguments());
@@ -3012,11 +3055,7 @@ PrimaryPrefixReturnValue PrimaryPrefix() :
       prefix.type = PrimaryPrefixReturnValue.THIS;
   }
 |
-  "<currentMemoryArea>"
-  {
-      prefix.type = PrimaryPrefixReturnValue.CURRENT_MEMORY_AREA;   
-  }
-|
+  //[NonWildcardTypeArguments()]
   "super" {
       supRef = factory.createSuperReference();
       setPrefixInfo(supRef);
@@ -3087,10 +3126,9 @@ PrimarySuffixReturnValue PrimarySuffix() :
     // reuses global suffix field
     Expression               expr;
     ASTList<Expression>    args;
-    Identifier               id=null;
+    Identifier               id;
     Literal                  lit;
     ASTList<TypeArgumentDeclaration> typeArgs;
-    UncollatedReferenceQualifier qn = null;
 }
 {
 (
@@ -3133,7 +3171,7 @@ PrimarySuffixReturnValue PrimarySuffix() :
       suffix.type = PrimarySuffixReturnValue.IDENTIFIER;
   }
 |
-  args = Arguments() 
+  args = Arguments()
   {
       suffix.type = PrimarySuffixReturnValue.ARGUMENTS;
       suffix.args = args;
@@ -3181,6 +3219,8 @@ Literal Literal() :
   }
 | result = BooleanLiteral()
 | result = NullLiteral()
+| result = EmptySetLiteral()
+| result = EmptySeqLiteral()
 
 )
   { 
@@ -3222,6 +3262,33 @@ NullLiteral NullLiteral() :
   }
 }
 
+EmptySetLiteral EmptySetLiteral() :
+{
+    EmptySetLiteral result;
+}
+{
+  "\\empty"
+  {
+      result = EmptySetLiteral.INSTANCE;
+      setPrefixInfo(result);
+      return result;
+  }
+}
+
+EmptySeqLiteral EmptySeqLiteral() :
+{
+    EmptySeqLiteral result;
+}
+{
+  "\\seq_empty"
+  {
+      result = EmptySeqLiteral.INSTANCE;
+      setPrefixInfo(result);
+      return result;
+  }
+}
+
+
 ASTList<Expression> Arguments() :
 {
     ASTList<Expression> result = null;
@@ -3233,7 +3300,8 @@ ASTList<Expression> Arguments() :
       if (result != null)
       {
           checkConstruction(result);
-      }
+          
+          }
       return result;
   }
 }
@@ -3262,15 +3330,14 @@ TypeOperator AllocationExpression() :
     ASTList<MemberDeclaration> body = null;
     ClassDeclaration cd = null;
     NewArray na;
-    Identifier id=null;
     ASTList<TypeArgumentDeclaration> typeArgs;
 }
 {
 (
-  LOOKAHEAD(4)
+  LOOKAHEAD(2)
   "new" 
     {
-        na = factory.createNewArrayWrapper(id);
+        na = factory.createNewArray();
         setPrefixInfo(na);
     }
     tr = PrimitiveType()
@@ -3281,7 +3348,7 @@ TypeOperator AllocationExpression() :
 |
   "new"
   {
-      result = factory.createNewWrapper(id);
+      result = factory.createNew();
       setPrefixInfo(result);
   }
   qn = TypedName()
@@ -3308,7 +3375,7 @@ TypeOperator AllocationExpression() :
      }
    |
      {        
-        na = factory.createNewArrayWrapper(id);
+        na = factory.createNewArray();
         copyPrefixInfo(result, na);
         na.setTypeReference(qn.toTypeReference());
      }
@@ -3497,7 +3564,7 @@ MethodBodyStatement MethodBodyStatement() :
   Expression tmp;
   VariableReference resVar = null;
   UncollatedReferenceQualifier qn;
-  MethodReferenceWrapper methRef;
+  MethodReference methRef;
   MethodBodyStatement result;
 }
 {
@@ -3517,9 +3584,9 @@ MethodBodyStatement MethodBodyStatement() :
   ";"
   
   {
-    if (tmp instanceof MethodReferenceWrapper)
+    if (tmp instanceof MethodReference)
     {
-        methRef = (MethodReferenceWrapper)tmp;
+        methRef = (MethodReference)tmp;
     }
     else
     {
@@ -3536,20 +3603,17 @@ MethodBodyStatement MethodBodyStatement() :
 ExecutionContext ExecutionContext() :
 {
   TypeReference classContext;
-
-Expression initial = factory.createThisReference();
-  Expression runtimeInstance = null, memoryArea = initial;
+  Expression runtimeInstance = null;
 } 
 {
 
   "source="
   classContext = Type() 
-  [",<currentMemoryArea>=" memoryArea = Expression()]
   [ ",this=" runtimeInstance = Expression() ]
-  
-  { 
-    return new ExecutionContext
-	(classContext, (ReferencePrefix)memoryArea, (ReferencePrefix)runtimeInstance);
+
+  { return new ExecutionContext
+        (classContext, 
+        (ReferencePrefix)runtimeInstance);
   }
 }
 
@@ -4263,7 +4327,7 @@ ASTList<Statement> GeneralizedStatements() :
 AnnotationUseSpecification AnnotationUse() :
 {
 	TypeReference tr;	
-	AnnotationUseSpecification result = factory.createKeYAnnotationUseSpecification();
+	AnnotationUseSpecification result = factory.createAnnotationUseSpecification();
 	Expression ev = null;
 	ASTList<AnnotationElementValuePair> list = null;
 	AnnotationPropertyReference id;

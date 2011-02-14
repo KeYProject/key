@@ -18,11 +18,9 @@ import java.io.Reader;
 import junit.framework.TestCase;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -36,11 +34,11 @@ public class TestRecoder2KeY extends TestCase {
 	super(name);
     }
 
-    private Recoder2KeY c2k;
+    private static Recoder2KeY c2k;
 
     // some non sense java blocks with lots of statements and expressions
     private static String[] jblocks = new String[] {
-	"{int j=7; int i;\n i=1; double d=0.4; float f=1.445; long l=123; \n "
+	"{int j=7; int i;\n i=1; byte d=0; short f=1; long l=123; \n "
 	+"for (i=0, j=1; (i<42) && (i>0); i++, j--)\n"
 	+" { i=13; j=1; } "
 	+"while ((-i<7) || (i++==7--) | (--i==++7) ||(!true && false) ||"
@@ -73,14 +71,15 @@ public class TestRecoder2KeY extends TestCase {
 
     private static String[] jclasses=new String[] {
 	"class A1 { public A1() { }} ",
+	
 	"package qwe.rty; import qwe.rty.A; import dfg.hjk.*; import java.util.*;"	
 	+"public abstract class A implements Z{"
 	+"static {d=3; Object v = new Object();}"
 	+"public static int d;"
 	+"A (int j) { d=5; }"
-	+"public A (int j, float k) {this(j); d=5; }"
+	+"public A (int j, long k) {this(j); d=5; }"
 	+"private static final A[] b=new A[]{null}; "
-	+"float f; java.util.List s;"
+	+"long f; java.util.List s;"
 	+"public void abc() {"
 	+"Object z=new A(4, 5) { public int d=7; };"
 	+"abc(); A a=(A)null; a=def(a); a=def(a).ghi(a).ghi(a);}"	
@@ -95,6 +94,7 @@ public class TestRecoder2KeY extends TestCase {
 	+"interface Z0 extends Z {}"
 	+"class A1 extends A { public static A a=new A(4); "
 	+"A1 (int j) {super(j);} }",
+	
 	"public class B extends Object {"
 	+"class E  { public E(Object s) {super();} }"
 	+"}",
@@ -118,19 +118,18 @@ public class TestRecoder2KeY extends TestCase {
     }
 
     public void setUp() {
-	c2k=new Recoder2KeY
-	    (new Services(), new NamespaceSet());
-    }
-
-    public void tearDown() {
-	c2k = null;
+	if(c2k == null) {
+	    c2k=new Recoder2KeY
+	    (TacletForTests.services(), TacletForTests.services().getNamespaces());
+	}
+	
     }
 
 
     public void testReadBlockWithContext() {
 	ProgramVariable pv = new LocationVariable
-	    (new ProgramElementName("i"), new KeYJavaType(PrimitiveType.JAVA_INT));
-	ImmutableList<ProgramVariable> list = ImmutableSLList.<ProgramVariable>nil().prepend(pv);	
+	    (new ProgramElementName("i"), TacletForTests.services().getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT));
+	ImmutableList<ProgramVariable> list = ImmutableSLList.<ProgramVariable>nil().prepend(pv);		
 	JavaBlock block = c2k.readBlock("{ i = 2; }", c2k.createContext(list));
 	ProgramVariable prgVarCmp = (ProgramVariable)	    
 	    ((Operator)((StatementBlock)block.program()).
@@ -159,7 +158,6 @@ public class TestRecoder2KeY extends TestCase {
 
     private void testClass(String is) {
         try {
-            c2k = new Recoder2KeY(TacletForTests.services(), new NamespaceSet());
             CompilationUnit cu = c2k.readCompilationUnit(is);
         } catch (RuntimeException e) {
             System.err.println("An error occured while parsing: '" + is + "'");
@@ -206,18 +204,18 @@ public class TestRecoder2KeY extends TestCase {
 	
     }
 
-    public static void main(String[] args) {
-	Services services = new Services ();
-	Recoder2KeY c2k = new Recoder2KeY(services, new NamespaceSet());
-	recoder.java.StatementBlock
-	    jb = c2k.recoderBlock("{int len; int[] i = new int[] {0,1,2} ;  len = i.length;}",
-				  c2k.createEmptyContext());
-	System.out.println("Read: "+jb);
-	recoder.java.StatementBlock block = jb;
-	recoder.java.ProgramElement pe = block.getChildAt(2);
-	System.out.println("Look at "+pe);
-	//	de.uka.ilkd.key.java.CopyAssignment ca = ;
-// 	System.out.println("Look at "+pe);
-
-    }
+//    public static void main(String[] args) {
+//	Services services = new Services ();
+//	Recoder2KeY c2k = new Recoder2KeY(services, new NamespaceSet());
+//	recoder.java.StatementBlock
+//	    jb = c2k.recoderBlock("{int len; int[] i = new int[] {0,1,2} ;  len = i.length;}",
+//				  c2k.createEmptyContext());
+//	System.out.println("Read: "+jb);
+//	recoder.java.StatementBlock block = (recoder.java.StatementBlock) jb;
+//	recoder.java.ProgramElement pe = block.getChildAt(2);
+//	System.out.println("Look at "+pe);
+//	//	de.uka.ilkd.key.java.CopyAssignment ca = ;
+//// 	System.out.println("Look at "+pe);
+//
+//    }
 }

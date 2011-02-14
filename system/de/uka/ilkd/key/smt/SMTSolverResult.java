@@ -1,23 +1,29 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
+//This file is part of KeY - Integrated Deductive Software Design
+//Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+//                    Universitaet Koblenz-Landau, Germany
+//                    Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
+//The KeY system is protected by the GNU General Public License. 
+//See LICENSE.TXT for details.
+//
+//
 
 package de.uka.ilkd.key.smt;
 
 
-public final class SMTSolverResult {
+public class SMTSolverResult {
     
     /** In the context of proving nodes/sequents these values mean the following:
-     * TRUE means that the negation of the sequent is unsatisfiable,
-     * FALSE means that the negation of the sequent is satisfiable (i.e. it has a counterexample),
-     * UNKNOWN means, well, unknown
-     * Note: Currently (1.12.'09) the SMT Solvers do not check if a node is FALSE. 
-     */
-    public static enum ThreeValuedTruth {TRUE, FALSE, UNKNOWN}
+     * TRUE iff negation of the sequent is unsatisfiable,
+     * FALSIFIABLE iff negation of the sequent is satisfiable (i.e. it has a counterexample),
+     * UNKNOWN otherwise (I'm not sure if this holds if an error occurs)
+     * Note: Currently (1.12.'09) the SMT Solvers do not check if a node is FALSE. */
+    public static enum ThreeValuedTruth {TRUE, FALSIFIABLE, UNKNOWN}
+    
+    //We should get rid of this constant because it does not track the source (the solver) of the result.
+    public static final SMTSolverResult NO_IDEA 
+    	= new SMTSolverResult("", ThreeValuedTruth.UNKNOWN, "?");
+    
     
     private final String text;
     private final ThreeValuedTruth isValid;
@@ -33,23 +39,23 @@ public final class SMTSolverResult {
 	this.isValid = isValid;
     }
     
-    public int getID() {
+    public int getID(){
 	return id;
     }
     
     
-    public static SMTSolverResult createValid(String text, String solverName) {
-	return new SMTSolverResult(text, ThreeValuedTruth.TRUE, solverName);
+    public static SMTSolverResult createValidResult(String text, String name) {
+	return new SMTSolverResult(text, ThreeValuedTruth.TRUE, name);
     }
     
     
-    public static SMTSolverResult createInvalid(String text, String solverName) {
-	return new SMTSolverResult(text, ThreeValuedTruth.FALSE, solverName);
+    public static SMTSolverResult createInvalidResult(String text, String name) {
+	return new SMTSolverResult(text, ThreeValuedTruth.FALSIFIABLE, name);
     }
     
     
-    public static SMTSolverResult createUnknown(String text, String solverName) {
-	return new SMTSolverResult(text, ThreeValuedTruth.UNKNOWN, solverName);
+    public static SMTSolverResult createUnknownResult(String text, String name) {
+	return new SMTSolverResult(text, ThreeValuedTruth.UNKNOWN, name);
     }
     
     
@@ -80,4 +86,5 @@ public final class SMTSolverResult {
     public int hashCode() {
         return text.hashCode() + isValid.hashCode();
     }
+
 }

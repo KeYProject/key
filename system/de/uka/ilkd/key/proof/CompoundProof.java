@@ -5,7 +5,7 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//
+
 //
 
 package de.uka.ilkd.key.proof;
@@ -18,7 +18,7 @@ import de.uka.ilkd.key.util.Debug;
 
 public class CompoundProof extends ProofAggregate {
 
-    private ProofAggregate[] proofs;
+    private final ProofAggregate[] proofs;
     
     CompoundProof(ProofAggregate[] proofs, String name) {
         super(name);
@@ -36,36 +36,43 @@ public class CompoundProof extends ProofAggregate {
         }
     }
     
+    @Override    
     public Proof[] getProofs() {
         List<Proof> l = new LinkedList<Proof>();
         addProofsToList(l);
         return l.toArray(new Proof[l.size()]);
     }
         
+    
+    @Override
     public int size() {
         return proofs.length;
     }
     
+        
     public ProofAggregate get(int i) {
         return proofs[i];
     }
+
     
-    public void updateProofStatus() {
-        proofs[0].updateProofStatus();
-        ProofStatus ps = proofs[0].getStatus();
-        for (int i=1; i<proofs.length; i++) {
-            proofs[i].updateProofStatus();
-            ps = ps.combineProofStatus(proofs[i].getStatus());                    
-        } 
-        proofStatus = ps;
-    }
-    
+    @Override    
     public ProofAggregate[] getChildren() {
         return proofs;
     }
+    
+    
+    @Override
+    public ProofStatus getStatus() {
+	ProofStatus result = proofs[0].getStatus();
+	for(int i = 1; i < proofs.length; i++) {
+	    result = result.combine(proofs[i].getStatus());
+	}
+	return result;
+    }
 
 
-    public boolean equals (Object o) {
+    @Override    
+    public boolean equals(Object o) {
         if (!(o instanceof CompoundProof)) return false;
         CompoundProof cmp = (CompoundProof) o;
         for (int i=0; i<cmp.size(); i++) {
@@ -75,7 +82,8 @@ public class CompoundProof extends ProofAggregate {
     }
  
    
-    public int hashCode(){
+    @Override    
+    public int hashCode() {
         int result = 17;
         for (int i=0; i < size(); i++){
             result = 37 * result + get(i).hashCode();

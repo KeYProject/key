@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -20,9 +20,11 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.conditions.AbstractOrInterfaceType;
 import de.uka.ilkd.key.rule.conditions.ArrayComponentTypeCondition;
-import de.uka.ilkd.key.rule.conditions.TypeComparisionCondition;
+import de.uka.ilkd.key.rule.conditions.TypeComparisonCondition;
 import de.uka.ilkd.key.rule.conditions.TypeCondition;
+import de.uka.ilkd.key.rule.conditions.TypeComparisonCondition.Mode;
 import de.uka.ilkd.key.rule.conditions.TypeResolver.GenericSortResolver;
+import de.uka.ilkd.key.rule.conditions.TypeResolver.NonGenericSortResolver;
 
 /**
  * This class is used for wrapping all variable conditions of a taclet
@@ -30,14 +32,15 @@ import de.uka.ilkd.key.rule.conditions.TypeResolver.GenericSortResolver;
  */
 class TacletConditions {
 
-    
-    private ImmutableList<TypeComparisionCondition> 
+//    
+    private ImmutableList<TypeComparisonCondition> 
     		comparisionCondition = ImmutableSLList.nil();
     private ImmutableList<TypeCondition> typeCondition = ImmutableSLList.nil();
     private ImmutableList<AbstractOrInterfaceType> abstractInterfaceCondition 
     		= ImmutableSLList.nil();
     private ImmutableList<ArrayComponentTypeCondition>
     		arrayComponentCondition = ImmutableSLList.nil();  
+
     
     
   
@@ -45,31 +48,44 @@ class TacletConditions {
     public final static int NULL_LEGAL = 1;
     public final static int NULL_ILLEGAL = 2;
   
+      
     
-    
-    
-    public TacletConditions(Taclet t){
+    public TacletConditions(Taclet t) throws IllegalTacletException{
+	
 	Iterator<VariableCondition> it = t.getVariableConditions();
+	
+
 	while(it.hasNext()){
+	    boolean supported = false;
 	    VariableCondition cond = it.next();
-	    if(cond instanceof TypeComparisionCondition){
+
+	    if(cond instanceof TypeComparisonCondition){
 		comparisionCondition = 
-		    comparisionCondition.append((TypeComparisionCondition)cond);
+		    comparisionCondition.append((TypeComparisonCondition)cond);
+		supported = true;
 	    }
 	    if(cond instanceof TypeCondition){
 		typeCondition = typeCondition.append((TypeCondition)cond);
+		supported = true;
 	    }
 	    if(cond instanceof AbstractOrInterfaceType){
 		abstractInterfaceCondition =
 		    abstractInterfaceCondition.append((
 			    AbstractOrInterfaceType) cond);
+		supported = true;
 	    }
 	    if(cond instanceof ArrayComponentTypeCondition){
 		arrayComponentCondition = 
 		    arrayComponentCondition.append(
 			    (ArrayComponentTypeCondition)cond);
+		supported = true;
+	    }
+	    if(!supported){
+		throw new IllegalTacletException("Condition " + cond.getClass().getSimpleName() + " is" +
+	    		" not supported.");
 	    }
 	}
+
     }
     
     public boolean containsIsReferenceArray(Term t){
@@ -122,6 +138,9 @@ class TacletConditions {
 	}    
 	return false;
     }
+
+    
+    
     
     /**
      * Checks whether the conditions contains the "notSame"-condition
@@ -133,7 +152,8 @@ class TacletConditions {
      */
     public boolean containsNotSameCondition(Sort s1, Sort s2){
 	return conatainsComparisionConditionSymmetric(s1, s2,
-		TypeComparisionCondition.NOT_SAME);
+		TypeComparisonCondition.Mode.NOT_SAME);
+
     }
     
     /**
@@ -142,7 +162,7 @@ class TacletConditions {
      * is not important.
      */    
     public boolean conatainsComparisionConditionSymmetric(Sort s1,
-	    Sort s2, int mode){
+	    Sort s2, TypeComparisonCondition.Mode mode){
 	if(!containsComparisionCondition(s1, s2, mode)){
 	    if(containsComparisionCondition(s2, s1, mode)) return true;
 	}else{return true;}
@@ -157,21 +177,23 @@ class TacletConditions {
      * <code>containsNotSameConditionSymmetric</code>.
      * @param s1 
      * @param s2
-     * @param mode see {@link TypeComparisionCondition}
+     * @param mode see {@link TypeComparisonCondition}
      * @return <code>true</code> if the taclet contains the condition,
      *  otherwise false.
      */    
-    public boolean containsComparisionCondition(Sort s1, Sort s2, int mode){
-	for(TypeComparisionCondition tcc : comparisionCondition){
+    public boolean containsComparisionCondition(Sort s1, Sort s2, TypeComparisonCondition.Mode mode){
+	
+	for(TypeComparisonCondition tcc : comparisionCondition){
 	    if(containsComparisionCondition(tcc, s1, s2,mode)){
 		return true;
 	    }
 	}
+
 	return false;
     }
     
-    private boolean containsComparisionCondition(TypeComparisionCondition tcc,
-	    Sort s1, Sort s2, int mode){
+    private boolean containsComparisionCondition(TypeComparisonCondition tcc,
+	    Sort s1, Sort s2, TypeComparisonCondition.Mode mode){
 	GenericSortResolver first  = null, second = null;
 	if(tcc.getFirstResolver() instanceof GenericSortResolver){
 	    first = (GenericSortResolver)tcc.getFirstResolver();
@@ -180,8 +202,6 @@ class TacletConditions {
 	if(tcc.getSecondResolver() instanceof GenericSortResolver){
 	    second = (GenericSortResolver)tcc.getSecondResolver();
 	}
-	
-	
 	
 	 
 	if(tcc != null && first != null && second != null){
@@ -197,6 +217,33 @@ class TacletConditions {
 	return false;
 	
     }
+    
+    public boolean containsIsSubtypeRelation(Sort gen,Sort inst, TypeComparisonCondition.Mode mode){
+	for(TypeComparisonCondition tcc : comparisionCondition){
+	    if(tcc.getMode() == mode){
+		if(tcc.getSecondResolver()  instanceof NonGenericSortResolver &&
+		   tcc.getFirstResolver() instanceof GenericSortResolver){
+
+		    GenericSortResolver first = (GenericSortResolver)tcc.getFirstResolver();
+		    if(first.getGenericSort().equals(gen)){
+			  Sort superType = ((NonGenericSortResolver)tcc.getSecondResolver()).getSort();   
+			  if(inst.extendsTrans(superType) && mode == Mode.NOT_IS_SUBTYPE){
+			     return false; 
+			  }
+			  if(!inst.extendsTrans(superType) && mode == Mode.IS_SUBTYPE){
+			     return false; 
+			  }
+		    }
+		    
+		  
+		
+		}
+		
+	    }
+	}
+	return true;
+    }
+    
     
     /**
      * Returns whether the taclet has a "isReference"-condition.
@@ -214,8 +261,8 @@ class TacletConditions {
     public int containsIsReferenceCondition(Sort s){
 	for(TypeCondition cond : typeCondition){
 	    GenericSortResolver res;
-	    if(cond.getTypeResolver() instanceof GenericSortResolver){
-		    res = (GenericSortResolver)cond.getTypeResolver();
+	    if(cond.getResolver() instanceof GenericSortResolver){
+		    res = (GenericSortResolver)cond.getResolver();
 		    if(res.getGenericSort().equals(s)){
 			if(cond.getIsReference()){
 			    if(cond.getNonNull()){return NULL_LEGAL;}

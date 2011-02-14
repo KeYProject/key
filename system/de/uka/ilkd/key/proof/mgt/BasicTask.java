@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -20,6 +20,7 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.speclang.OperationContract;
 
 
 /** Captures a node in the TaskTree which contains exactly one
@@ -72,24 +73,6 @@ public class BasicTask extends DefaultMutableTreeNode implements TaskTreeNode{
 	return proof().mgt().getStatus();
     }
     
-    /** returns a list of operation contracts (with associated class invariants)
-     *  that were used in the associated proof.
-     */
-    public ImmutableSet<ContractWithInvs> getUsedSpecs() {
-        ImmutableSet<ContractWithInvs> result 
-        	= DefaultImmutableSet.<ContractWithInvs>nil();
-        for (RuleApp ruleApp : proof().mgt().getNonAxiomApps()) {
-            RuleApp r = ruleApp;
-            RuleJustification rj = proof().mgt().getJustification(r);
-            if (rj instanceof RuleJustificationBySpec) {
-                ContractWithInvs spec = ((RuleJustificationBySpec) rj).getSpec();
-                assert spec != null;
-                result = result.add(spec);
-            }
-        }
-        
-        return result;
-    }
 
     /** returns the upper most task this basic task belongs to.*/
     public TaskTreeNode getRootTask() {

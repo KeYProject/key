@@ -1,4 +1,0 @@
-i -src english/oclLibraryEng.gf 
-i -src german/oclLibraryGer.gf  
-i -src ocl/oclLibraryOCL.gf
-

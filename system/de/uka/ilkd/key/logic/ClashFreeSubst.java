@@ -10,8 +10,6 @@
 
 package de.uka.ilkd.key.logic;
 
-import java.util.Iterator;
-
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -19,7 +17,7 @@ import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
 public class ClashFreeSubst {
-    protected TermFactory tf = TermFactory.DEFAULT;
+    protected static final TermBuilder TB = TermBuilder.DF;
 
     QuantifiableVariable v;
     Term s;
@@ -62,6 +60,24 @@ public class ClashFreeSubst {
 	    return applyOnSubterms(t);
 	}
     }
+    
+    //XXX
+    protected static ImmutableArray<QuantifiableVariable> getSingleArray(ImmutableArray<QuantifiableVariable>[] bv) {
+	if(bv == null) {
+	    return null;
+	}
+	ImmutableArray<QuantifiableVariable> result = null;
+	for(ImmutableArray<QuantifiableVariable> arr : bv) {
+	    if(arr != null && !arr.isEmpty()) {
+		if(result == null) {
+		    result = arr;
+		} else {
+		    assert arr.equals(result) : "expected: " + result + "\nfound: " + arr;
+		}
+	    }
+	}
+	return result;
+    }    
 
     /** substitute <code>s</code> for <code>v</code> in 
      * every subterm of <code>t</code>, and build a new term.
@@ -76,7 +92,7 @@ public class ClashFreeSubst {
 	for ( int i=0; i<arity; i++ ) {
 	    applyOnSubterm ( t, i, newSubterms, newBoundVars );
         }
-	return tf.createTerm(t.op(), newSubterms, newBoundVars, t.javaBlock());
+	return TB.tf().createTerm(t.op(), newSubterms, getSingleArray(newBoundVars), t.javaBlock());
     }
 
     /**
@@ -146,7 +162,7 @@ public class ClashFreeSubst {
 		
 		// Substitute that for the old one.
 		newBoundVars[varInd] = qv1;
-		new ClashFreeSubst(qv,tf.createVariableTerm((LogicVariable)qv1))
+		new ClashFreeSubst(qv, TB.var(qv1))
 		    .applyOnSubterm1(varInd+1, boundVars, newBoundVars,
 				    subInd,subTerm,newSubterms);
 		// then continue recursively, on the result.

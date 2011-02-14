@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -16,7 +16,6 @@ import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SortedSchemaVariable;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -34,7 +33,7 @@ import de.uka.ilkd.key.util.Debug;
  * (currently only schema variables <code>ProgramSVSort.EXPRESSION</code> are
  * supported)
  */
-public class JavaTypeToSortCondition implements VariableCondition {
+public final class JavaTypeToSortCondition implements VariableCondition {
 
     private final SchemaVariable exprOrTypeSV;
     private final GenericSort    sort;
@@ -52,36 +51,19 @@ public class JavaTypeToSortCondition implements VariableCondition {
 
 
     public static boolean checkSortedSV(final SchemaVariable exprOrTypeSV) {
-        if ( exprOrTypeSV instanceof SortedSchemaVariable) {
-            if (exprOrTypeSV.isTermSV() || exprOrTypeSV.isSkolemTermSV()) {
-                return true;
-            }
-            final Sort svSort = ( (SortedSchemaVariable)exprOrTypeSV ).sort ();
-            return svSort == ProgramSVSort.EXPRESSION ||
-                    svSort == ProgramSVSort.NONSIMPLEEXPRESSION ||
-                    svSort == ProgramSVSort.SIMPLEEXPRESSION ||
-                    svSort == ProgramSVSort.LEFTHANDSIDE ||
-                    svSort == ProgramSVSort.IMPLICITTRAINITIALIZED ||
-                    svSort == ProgramSVSort.TYPE;
+        final Sort svSort = exprOrTypeSV.sort ();
+        if (svSort == ProgramSVSort.EXPRESSION
+             || svSort == ProgramSVSort.SIMPLEEXPRESSION
+             || svSort == ProgramSVSort.NONSIMPLEEXPRESSION
+             || svSort == ProgramSVSort.TYPE
+             || exprOrTypeSV.arity() == 0)  {
+            return true;
         }
         return false;
     }
   
     
-    /**
-     * checks if the condition for a correct instantiation is fulfilled
-     * 
-     * @param var
-     *            the template Variable to be instantiated
-     * @param matchCond
-     *            the MatchCondition with the current matching state and in
-     *            particular the SVInstantiations that are already known to be
-     *            needed
-     * @param services
-     *            the program information object
-     * @return modified match results if the condition can be satisfied, or
-     *         <code>null</code> otherwise
-     */
+    @Override
     public MatchConditions check (SchemaVariable var,
                                   SVSubstitute svSubst,
                                   MatchConditions matchCond,
@@ -105,14 +87,16 @@ public class JavaTypeToSortCondition implements VariableCondition {
             type = expr.getKeYJavaType ( services, inst.getExecutionContext () ).getSort();
         }
         try {
-            return matchCond.setInstantiations ( inst.add
-                ( GenericSortCondition.createIdentityCondition
-                                                  ( sort, type ) ) );
+            return matchCond.setInstantiations ( inst.add( 
+        	    GenericSortCondition.createIdentityCondition(sort, type),
+        	    services) );
         } catch ( SortException e ) {
             return null;
         }        
     }
 
+    
+    @Override
     public String toString () {
         return "\\hasSort(" + exprOrTypeSV + ", " + sort + ")";
     }

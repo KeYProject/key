@@ -1,10 +1,12 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
+//This file is part of KeY - Integrated Deductive Software Design
+//Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+//                    Universitaet Koblenz-Landau, Germany
+//                    Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
+//The KeY system is protected by the GNU General Public License. 
+//See LICENSE.TXT for details.
+//
+//
 
 package de.uka.ilkd.key.smt;
 
@@ -13,12 +15,16 @@ import java.util.Collection;
 import java.util.LinkedList;
 
 import de.uka.ilkd.key.java.Services;
-
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.SolverSession.InternResult;
 
 
-public interface SMTSolver extends de.uka.ilkd.key.smt.launcher.Process {
+
+
+public interface SMTSolver extends de.uka.ilkd.key.smt.launcher.Process{
+    
+
+
     
     /**
      * This solver's name.
@@ -77,4 +83,6 @@ public interface SMTSolver extends de.uka.ilkd.key.smt.launcher.Process {
     public void useTaclets(boolean b);
     
     public void prepareSolver(LinkedList<InternResult> goals, Services services, Collection<Taclet> taclets);
+    
+   
 }

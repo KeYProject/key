@@ -166,6 +166,4 @@ class GUIBranchNode extends GUIAbstractTreeNode
         }
     	return res;
     }
-
-
 }

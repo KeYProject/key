@@ -17,44 +17,26 @@ import de.uka.ilkd.key.java.declaration.MemberDeclaration;
 import de.uka.ilkd.key.java.declaration.modifier.Protected;
 import de.uka.ilkd.key.java.declaration.modifier.Public;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.translation.*;
-import de.uka.ilkd.key.util.Debug;
 
 
-class JMLResolverManager extends SLResolverManager {
+final class JMLResolverManager extends SLResolverManager {
 
     public JMLResolverManager(JavaInfo javaInfo,
                               KeYJavaType specInClass,
                               ParsableVariable selfVar,
                               SLTranslationExceptionManager eManager) {
         super(eManager, specInClass, selfVar, false);
-        addResolver(new SLAttributeResolver(javaInfo, this, specInClass));
+        addResolver(new JMLBuiltInPropertyResolver(javaInfo, this, specInClass));
+        addResolver(new SLAttributeResolver(javaInfo, this, specInClass));        
         addResolver(new SLMethodResolver(javaInfo, this, specInClass));
-        addResolver(new SLTypeResolver(javaInfo, this, specInClass));        
-    }
-
-    
-    public SLExpression createSLExpression(Term t) {
-        return new JMLExpression(t);
-    }
-
-    
-    public SLExpression createSLExpression(KeYJavaType t) {
-        return new JMLExpression(t);
-    }
-
-    
-    // There is no collection type in JML
-    public SLExpression createSLExpression(SLCollection t) {
-        Debug.fail();
-        return null;
+        addResolver(new SLTypeResolver(javaInfo, this, specInClass));
     }
     
     
-    
+    @Override
     public VisibilityModifier getSpecVisibility(MemberDeclaration md) {
 	if(JMLInfoExtractor.hasJMLModifier((FieldDeclaration)md, 
 		                           "spec_public")) {

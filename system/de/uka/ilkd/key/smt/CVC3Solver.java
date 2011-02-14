@@ -1,11 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-
 package de.uka.ilkd.key.smt;
 
 
@@ -36,15 +28,15 @@ public class CVC3Solver extends AbstractSMTSolver {
 	if (val == 0) {
 	    //normal termination, no error
 	    if (text.startsWith("unsat\n")) {
-		return SMTSolverResult.createValid(text,name());
+		return SMTSolverResult.createValidResult(text,name());
 	    } else if (text.startsWith("sat\n")) {
-		return SMTSolverResult.createInvalid(text,name());
+		return SMTSolverResult.createInvalidResult(text,name());
 	    } else {
-		return SMTSolverResult.createUnknown(text,name());
+		return SMTSolverResult.createUnknownResult(text,name());
 	    }
 	} else {
 	    //error termination
-	    throw new IllegalArgumentException(error);
+	    throw new IllegalResultException(error);
 	}
 	
     }

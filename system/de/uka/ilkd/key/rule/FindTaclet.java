@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -14,11 +14,11 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableMap;
-import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
 
 
@@ -33,7 +33,7 @@ import de.uka.ilkd.key.proof.Goal;
 public abstract class FindTaclet extends Taclet {
 
     /** contains the find term */
-    protected final Term find;
+    protected Term find;
 
     /** Set of schemavariables of the if and the (optional) find part */
     private ImmutableSet<SchemaVariable> ifFindVariables = null;
@@ -165,13 +165,6 @@ public abstract class FindTaclet extends Taclet {
 	Iterator<TacletGoalTemplate> it               = goalTemplates().iterator();
 	Iterator<Goal>               goalIt           = newGoals.iterator();
 
-        // reklov
-        // START TEMPORARY DOWNWARD COMPATIBILITY
-        ((InnerVariableNamer) services.getVariableNamer()).
-                setOldProgVarProposals((Name) tacletApp.instantiations().
-                getInstantiation(new NameSV("_NAME_PROG_VARS")));
-        // END TEMPORARY DOWNWARD COMPATIBILITY
-
 	while (it.hasNext()) {
 	    TacletGoalTemplate gt          = it    .next();
 	    Goal               currentGoal = goalIt.next();
@@ -295,97 +288,9 @@ public abstract class FindTaclet extends Taclet {
         return !newConstraint.isAsWeakAs ( oriConstraint );
     }
     
-    
-    /** returns the variables in a Taclet with a read access
-    */
-    public ImmutableList<SchemaVariable> readSet() {
-
-	//List variables have to be collected to
-	ImmutableList<SchemaVariable> readFromVarialbes = 
-            ImmutableSLList.<SchemaVariable>nil();
-
-	//List of Variables in find-part
-	TacletSchemaVariableCollector tvarColl1 = new TacletSchemaVariableCollector() {
-            public void visit(Term t) {	
-	        if (t.op() instanceof Modality || 
-                    t.op() instanceof ModalOperatorSV) {
-	            varList = collectSVInProgram(t.javaBlock(), varList);
-	        }
-	        for (int j=0; j<t.arity(); j++) {
-	            for (int i=0;i<t.varsBoundHere(j).size();i++) {
-		        if (t.varsBoundHere(j).get(i) 
-		            instanceof SchemaVariable) {
-		            varList = varList.prepend
-			        ((SchemaVariable)t.varsBoundHere(j).get(i)); 
-		        }
-	            }
-	        }
-            }
-        };
-	tvarColl1.visit(find()); 
-
-	//List of variables im add & replaceWith-Part
-	TacletSchemaVariableCollector tvarColl2 = new TacletSchemaVariableCollector() {
-    	    public void visit(Term t) {	
-		if (t.op() instanceof SchemaVariable) 
-                    varList=varList.prepend((SchemaVariable)t.op());
-    	    }	
-        };
-	tvarColl2.visitGoalTemplates(this, false); 
-	
-        // build intersection
-	Iterator<SchemaVariable> it1 = tvarColl1.varIterator();
-	while(it1.hasNext()){
-	        SchemaVariable sv1 = it1.next();
-		Iterator<SchemaVariable> it2 = tvarColl2.varIterator();
-
-		while(it2.hasNext()){
-		    SchemaVariable sv2 = it2.next();
-
-		    if(sv1 == sv2){
-			if(writeSet().head()!= null) {
-			    //if the variable belongs to the WriteSet, 
-                            //remove it from the ReadSet
-			    if (writeSet().head() != sv1 )
-			       readFromVarialbes = readFromVarialbes.prepend(sv1);
-			}
-			else readFromVarialbes = readFromVarialbes.prepend(sv1);
-			break; //variable found, no need to keep searching
-	            }
-		}
-	}
-	return readFromVarialbes; 
-    }
-
-    /** 
-     * returns the variable in a Taclet to which is written to
-     */
-    public ImmutableList<SchemaVariable> writeSet() {
-	Iterator<TacletGoalTemplate> it = goalTemplates().iterator();
-	ImmutableList<SchemaVariable> updateVar = ImmutableSLList.<SchemaVariable>nil(); 
-	Term replWith; 
-	
-	while (it.hasNext()){
-	    TacletGoalTemplate goalTemp = it.next();
-
-	    if(goalTemp instanceof RewriteTacletGoalTemplate){
-		replWith = ((RewriteTacletGoalTemplate)goalTemp).replaceWith();
-
-		if (replWith.op() instanceof IUpdateOperator){
-		    try{                
-		        updateVar = updateVar.prepend((SchemaVariable)replWith.sub(0).op());
-		    } catch(ClassCastException e) {
-		        System.err.println(name()+" "+replWith.sub(0).op().getClass());
-		    }
-		}
-	    }
-	}
-	return updateVar;
-    } 
 
     /**
      * returns the variables that occur bound in the find part
-     * @return the variables that occur bound in the find part
      */
     protected ImmutableSet<QuantifiableVariable> getBoundVariablesHelper() {
         final BoundVarsVisitor bvv = new BoundVarsVisitor();

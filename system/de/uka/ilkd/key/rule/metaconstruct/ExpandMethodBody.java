@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -15,7 +15,10 @@ import java.util.HashMap;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.MethodDeclaration;
-import de.uka.ilkd.key.java.reference.*;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.reference.TypeRef;
+import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
@@ -84,14 +87,9 @@ public class ExpandMethodBody extends ProgramMetaConstruct {
 	paramRepl.start();	
 	result = (StatementBlock) paramRepl.result();
 
-	
-	ExecutionContext ec = new ExecutionContext(classContext, 	            
-	                        svInst.getExecutionContext().getMemoryArea(),
-	            newCalled == null ? null : new RuntimeInstanceEC(newCalled));
-	
         return 
 	    new MethodFrame(mbs.getResultVariable(),
-			    ec,
+			    new ExecutionContext(classContext, newCalled),
 			    result,
                             pm, PositionInfo.UNDEFINED); 
     }

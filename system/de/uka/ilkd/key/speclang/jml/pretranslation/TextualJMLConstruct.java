@@ -28,7 +28,7 @@ public abstract class TextualJMLConstruct {
     }
     
     
-    public ImmutableList<String> getMods() {
+    public final ImmutableList<String> getMods() {
         return mods;
     }
 }

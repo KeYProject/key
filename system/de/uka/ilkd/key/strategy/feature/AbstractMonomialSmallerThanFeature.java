@@ -15,12 +15,10 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.ImmutableMapEntry;
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.RuleSet;
@@ -48,7 +46,7 @@ public abstract class AbstractMonomialSmallerThanFeature
         if ( op == add || op == mul || op == Z ) return -1;
         Integer res = introductionTimeCache.get ( op );
         if ( res == null ) {
-            res = new Integer ( introductionTimeHelp ( op ) );
+            res = Integer.valueOf ( introductionTimeHelp ( op ) );
             introductionTimeCache.put ( op, res );
         }
         return res.intValue ();
@@ -77,7 +75,7 @@ public abstract class AbstractMonomialSmallerThanFeature
             tapp.instantiations().pairIterator();
         while ( it.hasNext () ) {
             final ImmutableMapEntry<SchemaVariable,InstantiationEntry> entry = it.next ();
-            if ( !entry.key ().isSkolemTermSV () ) continue;
+            if ( !(entry.key () instanceof SkolemTermSV) ) continue;
             if ( op == ( (Term)entry.value ().getInstantiation () ).op () )
                 return true;
         }

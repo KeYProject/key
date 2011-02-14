@@ -19,6 +19,7 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.util.Debug;
@@ -81,7 +82,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
      * Create a list of new RuleAppContainers that are to be 
      * considered for application.
      */
-    public ImmutableList<RuleAppContainer> createFurtherApps (Goal p_goal,
+    public final ImmutableList<RuleAppContainer> createFurtherApps (Goal p_goal,
                                                      Strategy p_strategy) {
         if ( !isStillApplicable ( p_goal )
              ||
@@ -179,7 +180,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
                                                 ImmutableList<RuleAppContainer> targetList,
                                                 Goal p_goal,
                                                 RuleAppCost cost) {
-        if ( !sufficientlyCompleteApp ( app ) ) return targetList;
+        if ( !sufficientlyCompleteApp ( app, p_goal.proof().getServices() ) ) return targetList;
         return targetList.prepend ( TacletAppContainer
                                     .createContainer ( app,
                                                        getPosInOccurrence ( p_goal ),
@@ -188,12 +189,12 @@ public abstract class TacletAppContainer extends RuleAppContainer {
                                                        false ) );
     }
 
-    private boolean sufficientlyCompleteApp(TacletApp app) {
-        final ImmutableSet<SchemaVariable> needed = app.neededUninstantiatedVars ();
+    private boolean sufficientlyCompleteApp(TacletApp app, Services services) {
+        final ImmutableSet<SchemaVariable> needed = app.neededUninstantiatedVars (services);
         if ( needed.size () == 0 ) return true;
         for (SchemaVariable aNeeded : needed) {
             final SchemaVariable sv = aNeeded;
-            if (sv.isSkolemTermSV()) continue;
+            if ( sv instanceof SkolemTermSV ) continue;
             return false;
         }
         return true;
@@ -305,12 +306,12 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         if ( !strategy.isApprovedApp(app, pio, p_goal) ) return null;
     
         if ( pio != null ) {
-            app = app.setPosInOccurrence ( pio );
+            app = app.setPosInOccurrence ( pio, p_goal.proof().getServices() );
             if ( app == null ) return null;
         }
     
         if ( !app.complete() )
-            app = app.tryToInstantiate ( p_goal, p_goal.proof().getServices() );
+            app = app.tryToInstantiate ( p_goal.proof().getServices() );
     
         return app;
     }
@@ -492,7 +493,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         }
 
         private Long getAgeObject () {
-            return new Long ( getAge() );
+            return Long.valueOf( getAge() );
         }
 
 
@@ -580,9 +581,13 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         }
 
         private NoPosTacletApp setAllInstantiations ( MatchConditions p_matchCond, ImmutableList<IfFormulaInstantiation> p_alreadyMatched ) {
-            return NoPosTacletApp.createNoPosTacletApp(getTaclet(),
-                    p_matchCond.getInstantiations(), p_matchCond.getConstraint(),
-                    p_matchCond.getNewMetavariables(), p_alreadyMatched);
+            return NoPosTacletApp.createNoPosTacletApp(
+        	    getTaclet(),
+                    p_matchCond.getInstantiations(), 
+                    p_matchCond.getConstraint(),
+                    p_matchCond.getNewMetavariables(), 
+                    p_alreadyMatched,
+                    getServices());
         }
 
         private ImmutableList<ConstrainedFormula> createSemisequentList ( Semisequent p_ss ) {

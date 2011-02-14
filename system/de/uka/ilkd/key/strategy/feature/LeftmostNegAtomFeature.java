@@ -13,7 +13,8 @@ package de.uka.ilkd.key.strategy.feature;
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Op;
+import de.uka.ilkd.key.logic.op.Equality;
+import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 
@@ -38,21 +39,21 @@ public class LeftmostNegAtomFeature extends AbstractBetaFeature {
             final Operator op = subTerm.op ();
 
             if ( it.getChild () == 0 ) {
-                if ( op == Op.NOT || op == Op.IMP )
+                if ( op == Junctor.NOT || op == Junctor.IMP )
                     positive = !positive;
-                else if ( op == Op.EQV )
+                else if ( op == Equality.EQV )
 		    return BinaryFeature.ZERO_COST; // TODO
 
                 continue;
             }
 
-            if ( op == ( positive ? Op.OR : Op.AND ) ) {
+            if ( op == ( positive ? Junctor.OR : Junctor.AND ) ) {
                 if ( containsNegAtom ( subTerm.sub ( 0 ), positive ) )
 		    return BinaryFeature.TOP_COST;
-            } else if ( positive && op == Op.IMP ) {
+            } else if ( positive && op == Junctor.IMP ) {
                 if ( containsNegAtom ( subTerm.sub ( 0 ), false ) )
 		    return BinaryFeature.TOP_COST;
-            } else if ( op == Op.EQV )
+            } else if ( op == Equality.EQV )
 		return BinaryFeature.ZERO_COST; // TODO
         }
 

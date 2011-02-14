@@ -5,6 +5,8 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+//
+
 
 package de.uka.ilkd.key.speclang.translation;
 
@@ -13,20 +15,28 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 
-public class SLMethodResolver extends SLExpressionResolver {
 
-    private TermBuilder tb = TermBuilder.DF;
-    
+public final class SLMethodResolver extends SLExpressionResolver {
+  
     public SLMethodResolver(JavaInfo javaInfo, 
 	    		    SLResolverManager manager,
 	    		    KeYJavaType specInClass) {
         super(javaInfo, manager, specInClass);
     }
+    
 
+    @Override    
+    protected boolean canHandleReceiver(SLExpression receiver) {
+        return receiver != null 
+               && !receiver.getType().getFullName().endsWith("[]");
+    }
+    
+    
+    @Override
     protected SLExpression doResolving(SLExpression receiver,
                                        String methodName,
                                        SLParameters parameters)
@@ -36,7 +46,7 @@ public class SLMethodResolver extends SLExpressionResolver {
             return null;
         }
 
-        KeYJavaType containingType = receiver.getKeYJavaType(javaInfo);
+        KeYJavaType containingType = receiver.getType();
         if(containingType == null) {
             return null;
         }
@@ -47,44 +57,45 @@ public class SLMethodResolver extends SLExpressionResolver {
         Term recTerm = receiver.getTerm(); 
         
         
-        while(pm==null){
-            pm = javaInfo.getProgramMethod(
-                    containingType,
-                    methodName,
-                    signature,
-                    containingType);
-            ProgramVariable et = javaInfo.getAttribute(
+        while(pm == null) {
+            pm = javaInfo.getToplevelPM(containingType, methodName, signature);
+            LocationVariable et = (LocationVariable) javaInfo.getAttribute(
                     ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, containingType);
             if(et!=null && pm==null){
                 containingType = et.getKeYJavaType();
                 if(recTerm!=null){
-                    recTerm = tb.dot(recTerm, et);
+                    final Function fieldSymbol 
+                    	= services.getTypeConverter()
+                    	          .getHeapLDT()
+                    	          .getFieldSymbolForPV(et, services);
+                    recTerm = TB.dot(services, et.sort(), recTerm, fieldSymbol);
                 }
             }else{
                 break;
             }
         }
         
-        if (pm == null)
-        {
+        if(pm == null) {
             return null;
         }
         
         int i;
-        Term subs[];
+        Term[] subs;
         
-        if (!pm.isStatic()) {
+        if(!pm.isStatic()) {
             if (!receiver.isTerm()) {
                 throw manager.excManager.createException(
                         "non-static method (" + methodName + ") invocation" +
                         " on Type " + receiver.getType());
             }
-            subs = new Term[parameters.getParameters().size()+1];
-            subs[0] = recTerm;
-            i = 1;
+            subs = new Term[parameters.getParameters().size() + 2];
+            subs[0] = TB.heap(services);
+            subs[1] = recTerm;
+            i = 2;
         } else {
-            subs = new Term[parameters.getParameters().size()];
-            i = 0;
+            subs = new Term[parameters.getParameters().size() + 1];
+            subs[0] = TB.heap(services);
+            i = 1;
         }
 
         for (SLExpression slExpression : parameters.getParameters()) {
@@ -98,16 +109,8 @@ public class SLMethodResolver extends SLExpressionResolver {
             		"method \"" + methodName + "\" in specification expression.");
         }
         
-        return manager.createSLExpression(tb.func(pm,subs));
-    }
-
-
-    public boolean canHandleReceiver(SLExpression receiver) {
-        return receiver != null && (receiver.isTerm() || receiver.isType()) && !receiver.getKeYJavaType(javaInfo).getFullName().endsWith("[]") ;
-    }
-
-    public boolean needVarDeclaration(String name) {
-        return false;
+        return new SLExpression(TB.tf().createTerm(pm, subs), 
+        	                pm.getKeYJavaType());
     }
 
 }

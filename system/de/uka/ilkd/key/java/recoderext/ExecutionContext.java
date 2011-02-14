@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -34,8 +34,6 @@ public class ExecutionContext
      */
     private ReferencePrefix runtimeInstance;
     
-    private ReferencePrefix memoryArea;
-    
     protected ExecutionContext() {}
 
     /**
@@ -46,10 +44,8 @@ public class ExecutionContext
      * is currently active/executed
      */
     public ExecutionContext(TypeReference classContext, 
-            ReferencePrefix memoryArea,
-            ReferencePrefix runtimeInstance) {
+			    ReferencePrefix runtimeInstance) {
 	this.classContext = classContext;
-	this.memoryArea = memoryArea;        
 	this.runtimeInstance  = runtimeInstance;
 	makeParentRoleValid();
     }
@@ -60,9 +56,8 @@ public class ExecutionContext
      */
     public int getChildCount() {
 	int count = 0;
-	if (classContext != null) count++;
-	if (memoryArea != null) count++;
 	if (runtimeInstance != null) count++;
+	if (classContext != null) count++;
 	return count;
     }
 
@@ -79,15 +74,11 @@ public class ExecutionContext
 	    if (index == 0) return classContext;
 	    index--;
 	}
-	if (memoryArea != null) {
-	    if (index == 0) return memoryArea;
+	if (runtimeInstance != null) {
+	    if (index == 0) return runtimeInstance;
 	    index--;
 	}
-        if (runtimeInstance != null) {
-            if (index == 0) return runtimeInstance;
-            index--;
-        }
-        throw new ArrayIndexOutOfBoundsException();
+	throw new ArrayIndexOutOfBoundsException();
     }
 
     /**
@@ -99,11 +90,8 @@ public class ExecutionContext
 	if (child != null) {
 	    if (child == classContext) return 0;
 	}
-	if (memoryArea != null) {
-	    if (child == memoryArea) return 1;
-	}
 	if (runtimeInstance != null) {
-	    if (child == runtimeInstance) return memoryArea == null ? 1 : 2;
+	    if (child == runtimeInstance) return (1 << 4 | 1);
 	}
 	return -1;
     }
@@ -112,7 +100,7 @@ public class ExecutionContext
     }
 
     public ExecutionContext deepClone() {
-	return new ExecutionContext(classContext, memoryArea, runtimeInstance);
+	return new ExecutionContext(classContext, runtimeInstance);
     }
 
     public NonTerminalProgramElement getASTParent() {
@@ -129,8 +117,8 @@ public class ExecutionContext
 	    classContext = (TypeReference) newChild;
 	} else if (child == runtimeInstance) {
 	    runtimeInstance = (ReferencePrefix)newChild;
-	} else if (child == memoryArea) {
-            memoryArea = (ReferencePrefix)newChild;
+	} else {
+	    return false;
 	}
 	makeParentRoleValid();
 	return true;
@@ -146,9 +134,6 @@ public class ExecutionContext
         }
         if (runtimeInstance != null) {
             ((Expression)runtimeInstance).setExpressionContainer(this);
-        }
-        if (memoryArea != null) {
-            ((Expression)memoryArea).setExpressionContainer(this);
         }
     }
     
@@ -167,22 +152,14 @@ public class ExecutionContext
 
 
     public Expression getExpressionAt(int index) {
-        if (memoryArea != null) {
-            if (index == 0) return (Expression) memoryArea;
-            index--;
-        }
-        if (runtimeInstance != null) {
-            if (index == 0) return (Expression) runtimeInstance;
-            index--;
-        }
+	if (runtimeInstance != null && index == 0) {
+	    return (Expression) runtimeInstance;
+	}
 	throw new ArrayIndexOutOfBoundsException();
     }
 
     public int getExpressionCount() {
-        int count = 0;
-        if (memoryArea != null) count++;
-        if (runtimeInstance != null) count++;
-        return count;
+	return runtimeInstance == null ? 0 : 1;    
     }
 
 
@@ -201,11 +178,7 @@ public class ExecutionContext
     public ReferencePrefix getRuntimeInstance() {
 	return runtimeInstance;
     }
-    
-    public ReferencePrefix getMemoryArea() {
-        return memoryArea;
-    }
-    
+
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
     }
 }

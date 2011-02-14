@@ -16,7 +16,6 @@ import de.uka.ilkd.key.proof.mgt.ProofStatus;
 public abstract class ProofAggregate {
 
     private String name;
-    protected ProofStatus proofStatus = null;
 
     protected ProofAggregate(String name) {
         this.name=name;
@@ -68,17 +67,9 @@ public abstract class ProofAggregate {
 
     public String toString() {	
         return name;
-    }
-
-    public abstract void updateProofStatus();
+    }   
     
-    
-    public ProofStatus getStatus() {
-        if (proofStatus==null) updateProofStatus();
-        return proofStatus;	
-    }
+    public abstract ProofStatus getStatus();
     
     public abstract ProofAggregate[] getChildren();
- 
-    
 }

@@ -1,3 +1,0 @@
-Name: Generating KeY-Menus
-Time: Startup
-Main-Class: de.uka.ilkd.key.casetool.together.scripts.menuextension.KeyMenuExtension

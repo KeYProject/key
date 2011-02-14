@@ -15,9 +15,7 @@ import java.util.Map;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Op;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.util.LRUCache;
 
 /**
@@ -35,7 +33,7 @@ class ClausesGraph {
     private final ImmutableSet<QuantifiableVariable> exVars;
     
     /**
-     * Map from <code>Term</code> to <code>SetOfTerm</code>
+     * Map from <code>Term</code> to <code>ImmutableSet<Term></code>
      */
     private final Map<Term, ImmutableSet<Term>> connections = new HashMap<Term, ImmutableSet<Term>>();
     
@@ -171,9 +169,9 @@ class ClausesGraph {
 
     private ImmutableSet<Term> computeClauses(Term formula) {
         final Operator op = formula.op ();
-        if ( op == Op.NOT )
+        if ( op == Junctor.NOT )
             return computeClauses ( formula.sub ( 0 ) );
-        else if ( op == Op.AND ) {
+        else if ( op == Junctor.AND ) {
             return computeClauses ( formula.sub ( 0 ) )
                    .union ( computeClauses ( formula.sub ( 1 ) ) );
         } else {
@@ -187,8 +185,8 @@ class ClausesGraph {
      */
     private ImmutableSet<QuantifiableVariable> existentialVars(Term formula) {
         final Operator op = formula.op ();
-        if ( op == Op.ALL ) return existentialVars ( formula.sub ( 0 ) );
-        if ( op == Op.EX )
+        if ( op == Quantifier.ALL ) return existentialVars ( formula.sub ( 0 ) );
+        if ( op == Quantifier.EX )
             return
                 existentialVars ( formula.sub ( 0 ) )
                 .add ( formula.varsBoundHere ( 0 ).last () );

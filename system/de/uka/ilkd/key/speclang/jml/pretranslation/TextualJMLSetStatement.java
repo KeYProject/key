@@ -14,7 +14,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.speclang.PositionedString;
 
 
-public class TextualJMLSetStatement extends TextualJMLConstruct {
+public final class TextualJMLSetStatement extends TextualJMLConstruct {
     
     private final PositionedString assignment;
     
@@ -32,11 +32,13 @@ public class TextualJMLSetStatement extends TextualJMLConstruct {
     }
     
     
+    @Override
     public String toString() {
         return assignment.toString();
     }
     
     
+    @Override
     public boolean equals(Object o) {
         if(!(o instanceof TextualJMLSetStatement)) {
             return false;
@@ -46,6 +48,7 @@ public class TextualJMLSetStatement extends TextualJMLConstruct {
     }
     
     
+    @Override
     public int hashCode() {
         return mods.hashCode() + assignment.hashCode();
     }

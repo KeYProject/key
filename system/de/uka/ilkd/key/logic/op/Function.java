@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -13,133 +13,82 @@ package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.ProgramSVSort;
+import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
-public abstract class Function extends TermSymbol {
+
+public class Function extends AbstractSortedOperator {
+            
+    private final boolean unique;
     
-    /** 
-     * sorts of arguments
-     */
-    private ImmutableArray<Sort> argSorts;
     
-    /** creates a Function 
-     * @param name String with name of the function
-     * @param sort the Sort of the function (result type)
-     * @param argSorts an array of Sort with the sorts of 
-     * the function's arguments  
-     */   
-    public Function(Name name, Sort sort, Sort[] argSorts) {
-	this(name, sort, new ImmutableArray<Sort>(argSorts));
+    //-------------------------------------------------------------------------
+    //constructors
+    //-------------------------------------------------------------------------     
+
+    public Function(Name name, 
+	            Sort sort, 
+	            ImmutableArray<Sort> argSorts, 
+	            ImmutableArray<Boolean> whereToBind,
+	            boolean unique) {
+	super(name, argSorts, sort, whereToBind, true);
+	this.unique = unique;
+	assert sort != Sort.UPDATE;
+	assert !(unique && sort == Sort.FORMULA);
+	assert !(sort instanceof NullSort) || name.toString().equals("null")
+	       : "Functions with sort \"null\" are not allowed: " + this;
     }
+    
+    
+    public Function(Name name, 
+	    	    Sort sort, 
+	    	    Sort[] argSorts, 
+	    	    Boolean[] whereToBind,
+	    	    boolean unique) {
+	this(name, 
+             sort, 
+             new ImmutableArray<Sort>(argSorts), 
+             whereToBind == null ? null : new ImmutableArray<Boolean>(whereToBind), 
+             unique);
+    }
+    
 
-
-    /** creates a Function 
-     * @param name String with name of the function
-     * @param sort the Sort of the function (result type)
-     * @param argSorts ArrayOf<Sort> of the function's arguments
-     */   
     public Function(Name name, Sort sort, ImmutableArray<Sort> argSorts) {
-	super(name, sort);
-	this.argSorts = argSorts;
-    }
-
-    /** @return array of allowed sorts of the function arguments */
-    public ImmutableArray<Sort> argSort() {
-	return argSorts;
-    }
-
-    /** @return Sort of the n-th argument */
-    public Sort argSort(int n) {
-	return argSorts.get(n);
+	this(name, sort, argSorts, null, false);
+    }    
+    
+    
+    public Function(Name name, Sort sort, Sort[] argSorts) {
+	this(name, sort, argSorts, null, false);
     }
     
-    /** @return arity of the Function as int */
-    public int arity() {
-	return argSorts.size();
+    
+    public Function(Name name, Sort sort) {
+	this(name, sort, new ImmutableArray<Sort>(), null, false);
+    }    
+    
+    
+    //-------------------------------------------------------------------------
+    //public interface
+    //-------------------------------------------------------------------------     
+    
+    public boolean isUnique() {
+	return unique;
     }
+    
 
-
-    /**
-     * checks if a given Term could be subterm (at the atth subterm
-     * position) of a term with this function at its top level. The
-     * validity of the given subterm is NOT checked.  
-     * @param at theposition of the term where this method should check 
-     * the validity.  
-     * @param possibleSub the subterm to be ckecked.
-     * @return true iff the given term can be subterm at the indicated
-     * position
-     */
-    public boolean possibleSub(int at, Term possibleSub) {
-	if (possibleSub.op() instanceof SchemaVariable ||
-	    possibleSub.sort() instanceof ProgramSVSort ||
-	    possibleSub.op() instanceof MetaOperator) {
-	    return true;
-	}
-	return possibleSub.sort().extendsTrans(argSort(at));
-    }
-
-    /**
-     * checks if given Terms could be subterms of a term with this
-     * function at its top level. The check includes the comparison of
-     * the required number of subterms and the number of given
-     * terms. The validity of the given subterms is NOT checked.
-     * @param possibleSubs the subterms to be ckecked.  
-     * @return true iff the given terms can be subterms and the number of given
-     * terms and the required number of subterms are equal.
-     */
-    public boolean possibleSubs(Term[] possibleSubs ){
-	if (possibleSubs.length!=arity()) return false;
-        for (int i=0; i<arity(); i++) {
-	    if (!possibleSub(i,possibleSubs[i])) {
-		return false;
-	    }
-	}
-        return true;
-    }
-
-    /**
-     * checks if the given term is syntactically valid at its top
-     * level assumed the top level operator were this, i.e. if the
-     * direct subterms can be subterms of a term with this top level
-     * operator, the method returns true. Furthermore, it is checked
-     * that no variables are bound for none of the subterms.  
-     * @param term the Term to be checked.
-     * @return true iff the given term has subterms that are suitable
-     * for this function.
-     */
-    public boolean validTopLevel(Term term){
-	if (term.arity()!=arity()) {
-	    return false;
-	}
-	for (int i=0; i<arity(); i++) {
-            if (!possibleSub(i,term.sub(i))) { 
-		return false;
-	    }
-	    //Need to comment this away because of OCL simplification
-	    //BinaryBindingTerm & TernaryBindingTerm have
-	    //"Function" as operator and have bound vars
-	    //if (term.varsBoundHere(i).size()!=0) {
-	    //	return false; 
-	    //}
-	}
-        return true;
-    }
-
-  
+    @Override
     public String toString() {
-	return (name()+((sort()==Sort.FORMULA)? "" : ":"+sort()));
+	return (name() + (whereToBind() == null 
+		          ? "" 
+		          : "{" + whereToBind() + "}"));
     }
     
+
     public String proofToString() {
-       String s;
-       if (sort() != null) {
-	   s = (sort() == Sort.FORMULA ? "" : sort().toString()) + " ";
-	   s += name();
-       } else {
-	   s = "NO_SORT"+" "+name();
-       }
+       String s =
+	   (sort() == Sort.FORMULA ? "" : sort().toString()) + " ";
+       s += name();
        if (arity()>0) {
           int i = 0;
           s+="(";
@@ -153,5 +102,4 @@ public abstract class Function extends TermSymbol {
        s+=";\n";
        return s;
     }
-
 }

@@ -48,9 +48,10 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * @author mulbrich
  */
 
-public class EnhancedForInvRule extends AbstractMetaOperator {
+public final class EnhancedForInvRule extends AbstractMetaOperator {
 
     private static final boolean FORMALPARAM_AS_STATEMENT = false;
+    private static final TermBuilder TB = TermBuilder.DF;    
 
     /*
      * list of breaks that lead to abrupt termination of the loop to be
@@ -78,8 +79,6 @@ public class EnhancedForInvRule extends AbstractMetaOperator {
      * the services provided at init()
      */
     private Services services;
-    
-    private TermBuilder tb = new TermBuilder();
 
     /**
      * the for loop under inspection
@@ -144,15 +143,9 @@ public class EnhancedForInvRule extends AbstractMetaOperator {
      * 
      */
     public EnhancedForInvRule() {
-        super(new Name("#foreachInvRule"), 4);
+        super(new Name("#foreachInvRule"), 4, Sort.FORMULA);
     }
 
-    /**
-     * Unlike other meta operators this one returns a formula not a term.
-     */
-    public Sort sort(Term[] term) {
-        return Sort.FORMULA;
-    }
 
     /**
      * initialises this meta operator.
@@ -330,15 +323,13 @@ public class EnhancedForInvRule extends AbstractMetaOperator {
         // normal case and continue
         if (w.continueOccurred()) {
             stmnt.add(contFlagDecl(contFlag));
-            contFlagTerm =
-                    tf.createEqualityTerm(Op.EQUALS,
-                            typeConv.convertToLogicElement(contFlag),
-                            typeConv.getBooleanLDT().getTrueTerm());
+            contFlagTerm = TB.equals(typeConv.convertToLogicElement(contFlag),
+                                     TB.tt());
         }
         resultSubterms.add(normalCaseAndContinue(contFlagTerm, returnFlagTerm,
                 breakFlagTerm, excFlagTerm, inv));
 
-        Term result = createLongJunctorTerm(Op.AND, resultSubterms);
+        Term result = createLongJunctorTerm(Junctor.AND, resultSubterms);
 
         if (FORMALPARAM_AS_STATEMENT) {
             //
@@ -370,28 +361,20 @@ public class EnhancedForInvRule extends AbstractMetaOperator {
 
         Modality loopBodyModality = modality;
 
-        // This here is crucial for transactions. If you wonder why the
-        // conversion
-        // is so "irregular", well, that's the way it is ;) /Wojtek
-        if (modality == BOXTRC || modality == TOUTTRC)
-            loopBodyModality = BOX;
-        if (modality == DIATRC)
-            loopBodyModality = DIA;
-
         final Term resultTerm =
-                tf.createProgramTerm(loopBodyModality,
-                        JavaBlock.createJavaBlock(new StatementBlock(resSta)),
-                        result);
+                TB.prog(loopBodyModality,
+                       JavaBlock.createJavaBlock(new StatementBlock(resSta)),
+                       result);
 
         if (FORMALPARAM_AS_STATEMENT) {
             return resultTerm;
         } else {
             // OR add the formal parameter declaration as an update
 
-            Term arrayAccess = tb.array(arrayvar, counter);
+            Term arrayAccess = TB.dotArr(services, arrayvar, counter);
             ProgramVariable var =
                     (ProgramVariable) formalParam.getProgramVariable();
-            return tf.createUpdateTerm(tb.var(var), arrayAccess, resultTerm);
+            return TB.applyElementary(services, TB.var(var), arrayAccess, resultTerm);
         }
 
     }
@@ -444,12 +427,12 @@ public class EnhancedForInvRule extends AbstractMetaOperator {
         if (terms.size() == 1)
             return terms.get(0);
         else if (terms.size() == 2)
-            return tf.createJunctorTerm(junctor, terms.get(0),
+            return tf.createTerm(junctor, terms.get(0),
                     terms.get(1));
         else {
             Term arg1 = terms.get(0);
             terms.remove(0);
-            return tf.createJunctorTerm(junctor, arg1, createLongJunctorTerm(
+            return tf.createTerm(junctor, arg1, createLongJunctorTerm(
                     junctor, terms));
         }
     }
@@ -501,14 +484,15 @@ public class EnhancedForInvRule extends AbstractMetaOperator {
     private Term breakCase(ProgramVariable breakFlag, Term post,
             ArrayList<If> breakIfCascade) {
         Term executeBreak =
-                tf.createProgramTerm(
+                TB.prog(
                         modality,
                         addContext(
                                 root,
                                 new StatementBlock(
                                         breakIfCascade.toArray(new Statement[breakIfCascade.size()]))),
-                        post);
-        return tf.createJunctorTerm(Op.IMP, tf.createEqualityTerm(Op.EQUALS,
+                        post
+                        );
+        return TB.imp(TB.equals(
                 typeConv.convertToLogicElement(breakFlag),
                 typeConv.getBooleanLDT().getTrueTerm()), executeBreak);
     }
@@ -547,19 +531,16 @@ public class EnhancedForInvRule extends AbstractMetaOperator {
         ArrayList<Term> al = new ArrayList<Term>();
 
         if (returnFlagTerm != null)
-            al.add(tf.createEqualityTerm(Op.EQUALS, returnFlagTerm, TRUE_TERM));
+            al.add(TB.equals(returnFlagTerm, TRUE_TERM));
         if (breakFlagTerm != null)
-            al.add(tf.createEqualityTerm(Op.EQUALS, breakFlagTerm, TRUE_TERM));
+            al.add(TB.equals(breakFlagTerm, TRUE_TERM));
         if (excFlagTerm != null)
-            al.add(tf.createEqualityTerm(Op.EQUALS, excFlagTerm, TRUE_TERM));
+            al.add(TB.equals(excFlagTerm, TRUE_TERM));
 
         if (al.size() == 0) {
             return inv;
         } else {
-            Term premiss =
-                    tf.createJunctorTerm(Op.NOT, createLongJunctorTerm(Op.OR,
-                            al));
-            return tf.createJunctorTerm(Op.IMP, premiss, inv);
+            return TB.imp(TB.not(createLongJunctorTerm(Junctor.OR, al)), inv);
         }
     }
 
@@ -587,7 +568,7 @@ public class EnhancedForInvRule extends AbstractMetaOperator {
     private Term returnCase(ProgramVariable returnFlag, KeYJavaType returnType,
             ProgramVariable returnExpression, Term post) {
         Term executeReturn =
-                tf.createProgramTerm(
+                TB.prog(
                         modality,
                         addContext(
                                 root,
@@ -595,7 +576,7 @@ public class EnhancedForInvRule extends AbstractMetaOperator {
                                         KeYJavaASTFactory.returnClause(returnExpression))),
                         post);
 
-        return tf.createJunctorTerm(Op.IMP, tf.createEqualityTerm(Op.EQUALS,
+        return TB.imp(TB.equals(
                 typeConv.convertToLogicElement(returnFlag),
                 typeConv.getBooleanLDT().getTrueTerm()), executeReturn);
 
@@ -621,12 +602,11 @@ public class EnhancedForInvRule extends AbstractMetaOperator {
     private Term throwCase(ProgramVariable excFlag,
             ProgramVariable thrownException, Term post) {
         Term throwException =
-                tf.createProgramTerm(
-                        modality,
+                TB.prog( modality,
                         addContext(root, new StatementBlock(
                                 KeYJavaASTFactory.throwClause(thrownException))),
                         post);
-        return tf.createJunctorTerm(Op.IMP, tf.createEqualityTerm(Op.EQUALS,
+        return TB.imp(TB.equals(
                 typeConv.convertToLogicElement(excFlag),
                 typeConv.getBooleanLDT().getTrueTerm()), throwException);
     }
@@ -650,5 +630,4 @@ public class EnhancedForInvRule extends AbstractMetaOperator {
         return JavaBlock.createJavaBlock((StatementBlock) replaceWhile.result());
 
     }
-
 }

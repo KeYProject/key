@@ -44,9 +44,9 @@ public class SVInstantiationParserException
 	    //needs non-prop font: errmsg +="\n"+space(column-1)+"^";
 	    StringBuffer sb = new StringBuffer( instantiation );
 	    sb.insert(column-1, "~~>"+space(column-1));
-	    errmsg +="\noccured at: "+sb.toString();
+	    errmsg +="\noccurred at: "+sb.toString();
  	} else {
-	    errmsg += "\noccured in:" + instantiation;
+	    errmsg += "\noccurred in:" + instantiation;
 	}
 	
 	errmsg += "\nDetail:\n" + detail;

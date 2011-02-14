@@ -10,8 +10,7 @@
 
 package de.uka.ilkd.key.logic.op;
 
-import java.util.HashSet;
-
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
@@ -28,14 +27,11 @@ public class SchemaVariableFactory {
      * @param name the Name of the SchemaVariable
      * @param sort the Sort of the variable the SchemaVariable will be
      * used to represent
-     * @param listSV a boolean which is true iff the schemavariable is allowed
-     * to match a list of quantified variables
      * @return the SchemaVariable
      */
-    public static SchemaVariable createVariableSV(Name name,
-						  Sort sort,
-						  boolean listSV) {
-	return new VariableSV(name, sort, listSV);
+    public static VariableSV createVariableSV(Name name,
+				              Sort sort) {
+	return new VariableSV(name, sort);
     }
 
     /** 
@@ -43,8 +39,6 @@ public class SchemaVariableFactory {
      * @param name the Name of the SchemaVariable
      * @param sort the Sort of the term the SchemaVariable will be
      * used to represent
-     * @param listSV a boolean which is true iff the schemavariable is allowed
-     * to match a list of terms
      * @param rigidness true iff this SV may only match rigid
      * terms/formulas  
      * @param strictSV boolean indicating if the schemavariable is declared as strict
@@ -53,61 +47,48 @@ public class SchemaVariableFactory {
      */
     public static SchemaVariable createTermSV(Name    name,
 					      Sort    sort,
-					      boolean listSV,
 					      boolean rigidness, 
                                               boolean strictSV) {
-	return new TermSV(name, sort, listSV, rigidness, strictSV);
+	return new TermSV(name, sort, rigidness, strictSV);
     }
 
     /**
       * creates a SchemaVariable representing an operator 
       * @param name the Name of the SchemaVariable
-      * @param arity the arity of the modal operators represented by this SV
-      * param modalitylist the list of actual modalities to match this SV (right now box & diamond)
       * @return the SchemaVariable
       */
-    public static SchemaVariable createOperatorSV(Name name,
-            Class matchingType, Sort sort, int arity, HashSet operators) {
-        if (matchingType == Modality.class) {
-            return new ModalOperatorSV(name, arity, operators);
-        } else {
-            return new OperatorSV(name, sort, arity, operators);
-        }
+    public static SchemaVariable createModalOperatorSV(Name name,
+            Sort sort, ImmutableSet<Modality> modalities) {
+	return new ModalOperatorSV(name, modalities);
     }
 
     public static SchemaVariable createTermSV(Name    name,
-					      Sort    sort,
-					      boolean listSV) {
-	return createTermSV(name, sort, listSV, false, false);
+					      Sort    sort) {
+	return createTermSV(name, sort, false, false);
     }
 
     /** creates a SchemaVariable representing a formula 
      * @param name the Name of the SchemaVariable
      * @param rigidness true iff this SV may only match rigid
      * terms/formulas
-     * @param listSV a boolean which is true iff the schemavariable is allowed
-     * to match a list of formulas
      * @return the SchemaVariable
      */
     public static SchemaVariable createFormulaSV(Name    name,
-						 boolean listSV,
 						 boolean rigidness) {
-	return new FormulaSV(name, listSV, rigidness);
+	return new FormulaSV(name, rigidness);
     }
 
-    public static SchemaVariable createFormulaSV(Name    name,
-						 boolean listSV) {
-	return createFormulaSV(name, listSV, false);
+    public static SchemaVariable createFormulaSV(Name name) {
+	return createFormulaSV(name, false);
     }
-
-    public static SchemaVariable createListSV(Name name, Class matchType){
-	return new ListSV(name, matchType);
+    
+    public static SchemaVariable createUpdateSV(Name name) {
+	return new UpdateSV(name);
     }
+    
 
     /** creates a SchemaVariable representing a program construct
      * @param name the ProgramElementName of the SchemaVariable
-     * @param listSV a boolean which is true iff the schemavariable is allowed
-     * to match a list of program constructs
      * @return the SchemaVariable
      */
     public static SchemaVariable createProgramSV(ProgramElementName name, 
@@ -120,13 +101,10 @@ public class SchemaVariableFactory {
     /** 
      * creates a SchemaVariable representing a skolem term
      * @param name the Name of the SchemaVariable
-     * @param listSV a boolean which is true iff the schemavariable is allowed
-     * to match a list of skolem terms
      * @return the SchemaVariable
      */
     public static SchemaVariable createSkolemTermSV(Name name, 
-						   Sort s,
-						   boolean listSV){
-	return new SkolemTermSV(name, s, listSV);
+						    Sort s){
+	return new SkolemTermSV(name, s);
     }
 }

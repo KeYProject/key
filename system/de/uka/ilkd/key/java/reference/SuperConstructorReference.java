@@ -21,12 +21,9 @@ import de.uka.ilkd.key.util.ExtList;
 
 /**
  *  Super constructor reference.
- *  
  */
-
-public class SuperConstructorReference
-    extends SpecialConstructorReference
-    implements ReferenceSuffix {
+public class SuperConstructorReference extends SpecialConstructorReference
+    				       implements ReferenceSuffix {
 
    
     /**
@@ -37,9 +34,7 @@ public class SuperConstructorReference
     protected final ReferencePrefix prefix;
    
 
-    /**
-     *      Super constructor reference.
-     */
+
     public SuperConstructorReference() {
 	prefix = null;
     }
@@ -59,7 +54,6 @@ public class SuperConstructorReference
      *      @param accessPath a reference prefix.
      *      @param arguments an expression mutable list.
      */
-
     public SuperConstructorReference(ReferencePrefix accessPath,
                                      Expression[] arguments) { 
         super(arguments);
@@ -72,7 +66,6 @@ public class SuperConstructorReference
      *      @param accessPath a reference prefix.
      *      @param arguments an expression mutable list.
      */
-
     public SuperConstructorReference(ReferencePrefix accessPath,
                                      ImmutableArray<Expression> arguments) { 
         super(arguments);
@@ -99,6 +92,7 @@ public class SuperConstructorReference
 	super(children, pi);	
 	this.prefix = accessPath;
     }
+    
 
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
@@ -119,26 +113,25 @@ public class SuperConstructorReference
     }
 
 
-    /**
-     * Get reference prefix.
-     * @return the reference prefix.
-     */
+    @Override
     public ReferencePrefix getReferencePrefix() {
         return prefix;
     }
 
+    
+    @Override    
     public SourceElement getFirstElement() {
         return (prefix == null) ? this : prefix.getFirstElement();
     }
+    
 
-    /** calls the corresponding method of a visitor in order to
-     * perform some action/transformation on this element
-     * @param v the Visitor
-     */
+    @Override
     public void visit(Visitor v) {
 	v.performActionOnSuperConstructorReference(this);
     }
 
+    
+    @Override    
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
         p.printSuperConstructorReference(this);
     }

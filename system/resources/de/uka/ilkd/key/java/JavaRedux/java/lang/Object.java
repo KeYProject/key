@@ -10,7 +10,6 @@ public class Object {
     
 
     public /*@ pure @*/ boolean equals(java.lang.Object o);
-
     public int hashCode();
 
     public java.lang.String toString();

@@ -17,14 +17,4 @@ public class AbbrevException extends Exception{
 		super(message);
 		this.termused = termused;
 	}
-
-	/**
-	 * returns true if the cause of the Exception was that the term is already 
-	 * mapped to a abbreviation. If false is returned the abbreviation is in use for
-	 * another term.
-	 */ 
-	public boolean TermUsed(){
-		return termused;
-	}
-
 } 

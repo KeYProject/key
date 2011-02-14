@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -9,7 +9,10 @@
 //
 package de.uka.ilkd.key.java.reference;
 
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
+import de.uka.ilkd.key.java.PrettyPrinter;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Reference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
@@ -26,30 +29,20 @@ public class ExecutionContext
     /**
      * the reference to the active object
      */
-    protected final RuntimeInstanceEC runtimeInstance;
-    
-    /**
-     * the current memory area
-     */
-    protected final MemoryAreaEC memoryArea;
-    
-    
+    protected final ReferencePrefix runtimeInstance;
+   
     /**
      * creates an execution context reference
      * @param classContext the TypeReference refering to the next enclosing
      * class 
-     * @param memoryArea the memory area used for allocation within this execution
-     * context
      * @param runtimeInstance a ReferencePrefix to the object that
      * is currently active/executed
      */
     public ExecutionContext(TypeReference classContext, 
-	    MemoryAreaEC memoryArea,
-            RuntimeInstanceEC runtimeInstance) {
-        if (classContext == null) Debug.printStackTrace();
-        this.classContext = classContext;
-        this.memoryArea = memoryArea;       
-        this.runtimeInstance = runtimeInstance;
+			    ReferencePrefix runtimeInstance) {
+	if (classContext == null) Debug.printStackTrace();
+	this.classContext = classContext;
+	this.runtimeInstance = runtimeInstance;
     }
     
     /**
@@ -63,9 +56,7 @@ public class ExecutionContext
 	    { System.out.println("||||"+children); Debug.printStackTrace(); }
 
 	children.remove(this.classContext);
-	
-	this.memoryArea = (MemoryAreaEC) children.removeFirstOccurrence(MemoryAreaEC.class);         
-        this.runtimeInstance  = (RuntimeInstanceEC) children.removeFirstOccurrence(RuntimeInstanceEC.class);
+	this.runtimeInstance = (ReferencePrefix) children.get(ReferencePrefix.class);
     }
 
 
@@ -77,8 +68,7 @@ public class ExecutionContext
     public int getChildCount() {
 	int count = 0;
 	if (classContext != null) count++;
-        if (memoryArea != null) count++;
-        if (runtimeInstance != null) count++;       
+	if (runtimeInstance != null) count++;
 	return count;
     }
 
@@ -95,15 +85,11 @@ public class ExecutionContext
 	    if (index == 0) return classContext;
 	    index--;
 	}
-	if (memoryArea != null) {
-	    if (index == 0) return memoryArea;
+	if (runtimeInstance != null) {
+	    if (index == 0) return runtimeInstance;
 	    index--;
 	}
-        if (runtimeInstance != null) {
-            if (index == 0) return runtimeInstance;
-            index--;
-        }
-        throw new ArrayIndexOutOfBoundsException();
+	throw new ArrayIndexOutOfBoundsException();
     }
 
     /**
@@ -118,21 +104,8 @@ public class ExecutionContext
      * returns the runtime instance object
      * @return the runtime instance object
      */
-    public RuntimeInstanceEC getRuntimeInstance() {
+    public ReferencePrefix getRuntimeInstance() {
 	return runtimeInstance;
-    }
-    
-    public ReferencePrefix getRuntimeInstanceAsRef() {
-	return runtimeInstance == null ? null : runtimeInstance.getReferencePrefix();
-    }
-
-   
-    public MemoryAreaEC getMemoryArea() {
-        return memoryArea;
-    }
-    
-    public ReferencePrefix getMemoryAreaAsRef() {
-	return memoryArea == null ? null : memoryArea.getReferencePrefix();
     }
     
     /** calls the corresponding method of a visitor in order to
@@ -147,10 +120,8 @@ public class ExecutionContext
         p.printExecutionContext(this);
     }
 
-    public String toString() {	
-        return "Context: " + classContext + " MemoryArea: " + memoryArea + " Instance: "+runtimeInstance;
+    public String toString() {
+        return "Context: "+classContext+" Instance: "+runtimeInstance;
     }
-
- 
     
 }

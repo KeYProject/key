@@ -59,13 +59,6 @@ public class CreateBuilder extends RecoderModelTransformer {
 	result.add
 	    (assign(attribute(new ThisReference(), 
 			      new ImplicitIdentifier
-			      (ImplicitFieldAdder.IMPLICIT_TRANSIENT)),
-		    new IntLiteral(0)));
-
-
-	result.add
-	    (assign(attribute(new ThisReference(), 
-			      new ImplicitIdentifier
 			      (ImplicitFieldAdder.IMPLICIT_INITIALIZED)),
 		    new BooleanLiteral(false)));       
 

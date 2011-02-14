@@ -18,11 +18,11 @@ import java.util.List;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.ConstrainedFormula;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.op.Op;
+import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
@@ -163,7 +163,7 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
             if ( !cfm.constraint ().isBottom () ) continue;
 
             final Term t = cfm.formula();
-            if ( t.op () != Op.EQUALS
+            if ( t.op () != Equality.EQUALS
                  || !t.sub ( 0 ).sort ().extendsTrans ( numbers.targetSort () )
                  || !t.sub ( 1 ).sort ().extendsTrans ( numbers.targetSort () ) )
                 continue;

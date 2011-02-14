@@ -12,13 +12,15 @@ package de.uka.ilkd.key.rule;
 
 import java.util.Iterator;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableMap;
-import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.NameSV;
+import de.uka.ilkd.key.logic.Choice;
+import de.uka.ilkd.key.logic.Constraint;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
@@ -99,13 +101,6 @@ public class NoFindTaclet extends Taclet {
 	
 	Iterator<TacletGoalTemplate> it               = goalTemplates().iterator();
 	Iterator<Goal>               goalIt           = newGoals.iterator();
-
-        // reklov
-        // START TEMPORARY DOWNWARD COMPATIBILITY
-        ((InnerVariableNamer) services.getVariableNamer()).
-                setOldProgVarProposals((Name) tacletApp.instantiations().
-                getInstantiation(new NameSV("_NAME_PROG_VARS")));
-        // END TEMPORARY DOWNWARD COMPATIBILITY
 
 	while (it.hasNext()) {
 	    TacletGoalTemplate gt          = it    .next();

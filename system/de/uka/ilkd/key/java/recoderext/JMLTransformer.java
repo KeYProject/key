@@ -227,18 +227,28 @@ public class JMLTransformer extends RecoderModelTransformer {
         PositionedString declWithMods = prependJavaMods(decl.getMods(), 
                                                         decl.getDecl());
                 
-        //only handle ghost fields
-        //(model fields are handled later in JMLSpecExtractor)
-        if(!decl.getMods().contains("ghost")) {
-            if(decl.getMods().contains("model")) {
-                return;
-            } else {
+        //ghost or model?
+        boolean isGhost = false;
+        boolean isModel = false;
+        if(decl.getMods().contains("ghost")) {
+            isGhost = true;
+        } 
+        if(decl.getMods().contains("model")) {
+            isModel = true;
+            if(isGhost) {
                 throw new SLTranslationException(
-                            "JML field declaration has to be ghost or model!", 
+                            "JML field declaration cannot be"
+                            + " both ghost and model!", 
                             declWithMods.fileName, 
-                            declWithMods.pos);            
+                            declWithMods.pos);                    	
             }
         }
+        if(!(isGhost || isModel)) {
+            throw new SLTranslationException(
+                            "JML field declaration has to be ghost or model!",
+                            declWithMods.fileName,
+                            declWithMods.pos);
+        }        
         
         //determine parent, child index
         NonTerminalProgramElement astParent
@@ -247,34 +257,32 @@ public class JMLTransformer extends RecoderModelTransformer {
             = astParent.getIndexOfChild(originalComments[0].getParent());
         
         //parse declaration, attach to AST
-        Declaration ghostDecl;
+        Declaration fieldDecl;
         try {
             if(astParent instanceof TypeDeclaration) {
-                ghostDecl 
+                fieldDecl 
                     = services.getProgramFactory()
                               .parseFieldDeclaration(declWithMods.text);
 
                 if(decl.getMods().contains("instance")) {
-                    ghostDecl = new FieldDeclaration((FieldDeclaration)ghostDecl) {
+                    fieldDecl = new FieldDeclaration((FieldDeclaration)fieldDecl) {
                 	@Override
                 	public boolean isStatic() {
                 	    return false;
                 	}
                     };
                 }       
-                
-                updatePositionInformation(ghostDecl, declWithMods.pos);
+                updatePositionInformation(fieldDecl, declWithMods.pos);
                 
                 //set comments: the original list of comments with the declaration, 
                 //and the JML modifiers
                 ASTList<Comment> newComments 
                    = new ASTArrayList<Comment>(Arrays.asList(originalComments));
                 Comment jmlComment = new Comment(getJMLModString(decl.getMods()));
-                jmlComment.setParent(ghostDecl);
+                jmlComment.setParent(fieldDecl);
                 newComments.add(jmlComment);
-                ghostDecl.setComments(newComments);
-                
-                attach((FieldDeclaration)ghostDecl, 
+                fieldDecl.setComments(newComments);
+                attach((FieldDeclaration)fieldDecl, 
                        (TypeDeclaration) astParent, 
                        0);   //No matter what the javadoc for attach() may say, 
                              //this value is *not* used as a child index but as 
@@ -284,17 +292,24 @@ public class JMLTransformer extends RecoderModelTransformer {
                              //in any case.
             } else {
                 assert astParent instanceof StatementBlock;
-                List<Statement> declStatement = services.getProgramFactory()
-                          .parseStatements(declWithMods.text);
+                if(isModel) {
+                    throw new SLTranslationException(
+                            "JML model fields cannot be declared"
+                	    + " within a method!", 
+                            declWithMods.fileName, 
+                            declWithMods.pos);
+                }
+                List<Statement> declStatement 
+                	= services.getProgramFactory()
+                                  .parseStatements(declWithMods.text);
                 assert declStatement.size() == 1;
-                ghostDecl 
-                    = (LocalVariableDeclaration) declStatement.get(0);
-                updatePositionInformation(ghostDecl, declWithMods.pos);
-                attach((LocalVariableDeclaration)ghostDecl, 
+                fieldDecl = (LocalVariableDeclaration) declStatement.get(0);
+                updatePositionInformation(fieldDecl, declWithMods.pos);
+                attach((LocalVariableDeclaration)fieldDecl, 
                        (StatementBlock) astParent, 
                        childIndex); //Unlike above, here the value is really a 
                                     //child index, and here the position really
-                                    //matters. 
+                                    //matters.             
             }
         } catch(Throwable e) {
             throw new SLTranslationException(e.getMessage()
@@ -306,13 +321,14 @@ public class JMLTransformer extends RecoderModelTransformer {
                                              e.getStackTrace());
         }
 
-        //add ghost modifier
-        ASTList<DeclarationSpecifier> mods = ghostDecl.getDeclarationSpecifiers();
-        if (mods == null) {
+        //add ghost or model modifier
+        ASTList<DeclarationSpecifier> mods 
+        	= fieldDecl.getDeclarationSpecifiers();
+        if(mods == null) {
             mods = new ASTArrayList<DeclarationSpecifier>();
         }
-        mods.add(new Ghost());
-        ghostDecl.setDeclarationSpecifiers(mods);
+        mods.add(isGhost ? new Ghost() : new Model());
+        fieldDecl.setDeclarationSpecifiers(mods);    
     }
     
 
@@ -390,9 +406,8 @@ public class JMLTransformer extends RecoderModelTransformer {
             assert stmtList.size() == 1;
             CopyAssignment assignStmt 
                 = (CopyAssignment) stmtList.get(0);
-            SetAssignment setStmt = new SetAssignment(assignStmt);
-            updatePositionInformation(setStmt, stat.getAssignment().pos);
-            attach(setStmt, astParent, childIndex);
+            updatePositionInformation(assignStmt, stat.getAssignment().pos);
+            doAttach(assignStmt, astParent, childIndex);
         } catch(Throwable e) {
             throw new SLTranslationException(e.getMessage()
                                              + " (" 
@@ -403,7 +418,7 @@ public class JMLTransformer extends RecoderModelTransformer {
                                              e.getStackTrace());
         }
     }
-    
+        
         
     private void transformClasslevelComments(TypeDeclaration td, 
                                              String fileName) 

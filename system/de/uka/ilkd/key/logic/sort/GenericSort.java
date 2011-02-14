@@ -23,8 +23,7 @@ import de.uka.ilkd.key.logic.Name;
  * a concrete sort, which has to be a subsort of the instantiations of
  * the supersorts of this sort
  */
-public class GenericSort extends AbstractNonCollectionSort 
-    implements ObjectSort {
+public final class GenericSort extends AbstractSort {
     
 
     /**
@@ -41,26 +40,15 @@ public class GenericSort extends AbstractNonCollectionSort
      * - if "oneOf" is not empty, the instantiation must be an element
          of "oneOf"
      */
-    private static final ImmutableSet<Sort> EMPTY_SORT_SET 
-	= DefaultImmutableSet.<Sort>nil();
 
-    /** direct supersorts */
-    ImmutableSet<Sort>        ext        = EMPTY_SORT_SET;
+    
     /**
      * list of sorts this generic sort may be instantiated with;
      * EMPTY_SORT_SORT means that every sort may be used
      */
-    ImmutableSet<Sort>        oneOf      = EMPTY_SORT_SET;
-
-    /**
-     * creates a generic sort (with a new equality symbol for this
-     * sort)   
-     */
-    public GenericSort(Name name) {
-        super ( name );
-    }
-
-    /**
+    private final ImmutableSet<Sort> oneOf;
+    
+   /**
      * creates a generic sort
      * @param ext supersorts of this sort, which have to be either
      * concrete sorts or plain generic sorts (i.e. not collection
@@ -70,24 +58,29 @@ public class GenericSort extends AbstractNonCollectionSort
             Name             name,
             ImmutableSet<Sort>        ext,
 	    ImmutableSet<Sort>        oneOf)
-	throws GenericSupersortException {
-	
-        this ( name );
-	this.ext        = ext;
-	this.oneOf      = oneOf;
-	checkSupersorts ();
+		throws GenericSupersortException {
+        super(name, ext, false);
+	this.oneOf = oneOf;
+	checkSupersorts();
     }
 
+ 
+    public GenericSort(Name name) {
+	super(name, DefaultImmutableSet.<Sort>nil(), false);
+	this.oneOf = DefaultImmutableSet.<Sort>nil();
+    }
+
+ 
     private void checkSupersorts ()
 	throws GenericSupersortException {
 	Iterator<Sort> it = extendsSorts ().iterator ();
 	Sort           s, t;
 	while ( it.hasNext () ) {
 	    s = it.next ();
-	    if ( s instanceof CollectionSort ) {
-		t = ((CollectionSort)s).elementSort ();
-		while ( t instanceof CollectionSort )
-		    t = ((CollectionSort)t).elementSort ();
+	    if ( s instanceof ArraySort ) {
+		t = ((ArraySort)s).elementSort ();
+		while ( t instanceof ArraySort )
+		    t = ((ArraySort)t).elementSort ();
 		if ( t instanceof GenericSort )
 		    throw new GenericSupersortException
 			( "Illegal supersort " + s +
@@ -98,14 +91,7 @@ public class GenericSort extends AbstractNonCollectionSort
     }
 
     /**
-     * @return direct supersorts
-     */
-    public ImmutableSet<Sort> extendsSorts () {
-	return ext;
-    }
-
-    /**
-     * @return possible instantiations or "EMPTY_SORT_SET"
+     * @return possible instantiations
      */
     public ImmutableSet<Sort> getOneOf () {
 	return oneOf;
@@ -131,7 +117,7 @@ public class GenericSort extends AbstractNonCollectionSort
      * supersort of this sort
      */
     protected boolean checkNonGenericSupersorts ( Sort p_s ) {
-	Iterator<Sort> it = ext.iterator ();
+	Iterator<Sort> it =  extendsSorts().iterator ();
 	Sort           ss;
 
 	while ( it.hasNext () ) {

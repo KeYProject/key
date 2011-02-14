@@ -41,13 +41,11 @@ import visualdebugger.VBTBuilder;
 import visualdebugger.draw2d.*;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.gui.smt.SMTRuleLauncher;
+import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.smt.SMTRule;
+import de.uka.ilkd.key.smt.DecProcRunner;
 import de.uka.ilkd.key.unittest.ModelGenerator;
 import de.uka.ilkd.key.util.ProgressMonitor;
 import de.uka.ilkd.key.visualdebugger.DebuggerEvent;
@@ -1212,7 +1210,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
                 ImmutableList<Node> nodes = toList(vd.getMediator().getProof().root()
                         .leavesIterator());
                 VBTBuilder builder = new VBTBuilder(nodes,
-                        ModelGenerator.OLD_SIMPLIFY);
+                        ModelGenerator.SIMPLIFY);
 
                 if (!builder.succesful())
                     MessageDialog.openError(PlatformUI.getWorkbench()
@@ -1259,11 +1257,9 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
                     return;
                 if (!vd.getMediator().ensureProofLoaded())
                     return;
-                
-                SMTRule r = ProofSettings.DEFAULT_SETTINGS.getSMTSettings().getActiveSMTRule();
-                final Proof proof = vd.getMediator().getProof();
-                SMTRuleLauncher.INSTANCE.start(ProofSettings.DEFAULT_SETTINGS.getSMTSettings().getActiveSMTRule(),
-                	proof, proof.getUserConstraint().getConstraint(), true);
+                new DecProcRunner((IMain)vd.getMediator().mainFrame(),
+                        vd.getMediator().getProof(), 
+                        vd.getMediator().getUserConstraint().getConstraint()).start();
             }
 
         };
@@ -1463,19 +1459,20 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
      *            the new branch condition text
      */
     private void setBranchConditionText(ETNode etn) {
-	if (etn != null) {
-	    final ImmutableList<Term> simplifiedBc = etn.getSimplifiedBc();
 
-	    if  (simplifiedBc != null && etn.getParent() != null
-		    && etn.getParent().getChildrenList().size() > 1) {
-		final String[] termsString = new String[simplifiedBc.size()];
-		int i = 0;
-		for (Term bc : simplifiedBc) {
-		    termsString[i++] = vd.prettyPrint(bc);
-		}
-		bcListControl.setItems(termsString);
-	    }
-	} else
+        final ImmutableList<Term> simplifiedBc = etn.getSimplifiedBc();
+	if (etn != null && simplifiedBc != null
+                && etn.getParent() != null
+                && etn.getParent().getChildrenList().size() > 1) {
+
+            final String[] termsString = new String[simplifiedBc.size()];
+            int i = 0;
+            for (Term bc : simplifiedBc) {
+                termsString[i++] = vd.prettyPrint(bc);
+            }
+
+            bcListControl.setItems(termsString);
+        } else
             bcListControl.setItems(new String[0]);
 
     }

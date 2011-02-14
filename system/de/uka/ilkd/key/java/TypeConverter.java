@@ -10,10 +10,7 @@
 package de.uka.ilkd.key.java;
 
 
-import java.util.HashMap;
-
 import recoder.service.ConstantEvaluator;
-import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.abstraction.*;
@@ -23,82 +20,70 @@ import de.uka.ilkd.key.java.expression.literal.*;
 import de.uka.ilkd.key.java.expression.operator.*;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.java.reference.*;
-import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.ProgramInLogic;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.ldt.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.ObjectSort;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.logic.sort.SortDefiningSymbols;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
 
-public class TypeConverter extends TermBuilder {
+public final class TypeConverter {
+    
+    private static final TermBuilder TB = TermBuilder.DF;
 
-    private Services services;
-  
-    private ByteLDT byteLDT;
-    private ShortLDT shortLDT;
-    private IntLDT intLDT;
-    private LongLDT longLDT;
-    private CharLDT charLDT;
-    private BooleanLDT booleanLDT;
+    private final Services services;
+      
     private IntegerLDT integerLDT;
-    private IntegerDomainLDT integerDomainLDT;
+    private BooleanLDT booleanLDT;
+    private LocSetLDT locSetLDT;
+    private HeapLDT heapLDT;
+    private SeqLDT seqLDT;
     private FloatLDT floatLDT;
     private DoubleLDT doubleLDT;
+    private CharListLDT charListLDT;
     
-    
-    private StringConverter stringConverter;
     private ImmutableList<LDT> models = ImmutableSLList.<LDT>nil();
-
     
 
     TypeConverter(Services s){
         services = s;       
-        stringConverter = new StringConverter(s); //TODO replace with stringLDT 
-
     }
 
+    
     /**
-     * initializes the type converter with the integer and boolean 
-     * language datatype definition to be used
-     * @param ldt the LDT 
+     * initializes the type converter with an LDT
      */
     public void init(LDT ldt) {	
-        if (ldt instanceof BooleanLDT ) {
-            this.booleanLDT = (BooleanLDT)ldt;
-        } else if (ldt instanceof ByteLDT) {
-            this.byteLDT = (ByteLDT)ldt;
-        } else if (ldt instanceof ShortLDT) {
-            this.shortLDT = (ShortLDT)ldt;
-        } else if (ldt instanceof IntLDT) {
-            this.intLDT = (IntLDT)ldt;
-        } else if (ldt instanceof LongLDT) {
-            this.longLDT = (LongLDT)ldt;
-        } else if (ldt instanceof CharLDT) {
-            this.charLDT = (CharLDT)ldt;
-        } else if (ldt instanceof IntegerLDT) {
-            this.integerLDT = (IntegerLDT)ldt;
-        } else if (ldt instanceof IntegerDomainLDT) {
-            this.integerDomainLDT = (IntegerDomainLDT)ldt;
+        if (ldt instanceof IntegerLDT) {
+            this.integerLDT = (IntegerLDT) ldt;
+        } else if (ldt instanceof BooleanLDT) {
+            this.booleanLDT = (BooleanLDT) ldt;
+        } else if (ldt instanceof LocSetLDT) {
+            this.locSetLDT = (LocSetLDT) ldt;
+        } else if (ldt instanceof HeapLDT) {
+            this.heapLDT = (HeapLDT) ldt;
+        } else if (ldt instanceof SeqLDT) {
+            this.seqLDT = (SeqLDT) ldt;
         } else if (ldt instanceof FloatLDT ) {
-            this.floatLDT = (FloatLDT)ldt;
+            this.floatLDT = (FloatLDT) ldt;
         } else if (ldt instanceof DoubleLDT) {
-            this.doubleLDT = (DoubleLDT)ldt;
-        } 
+            this.doubleLDT = (DoubleLDT) ldt;
+        } else if (ldt instanceof CharListLDT) {
+            this.charListLDT = (CharListLDT) ldt;
+        }
 
         this.models = this.models.prepend(ldt);
         Debug.out("Initialize LDTs: ", ldt);
     }
     
+    
     public void init(ImmutableList<LDT> ldts) {
         for (LDT ldt : ldts) {
             init(ldt);
-        }
+	}
     }
     
     public ImmutableList<LDT> getModels() {
@@ -109,132 +94,89 @@ public class TypeConverter extends TermBuilder {
     public Services getServices() {
 	return services;
     }
-
-    public LDT getModelFor(Type t) {
-        if (t == null || booleanLDT == null ||
-                byteLDT == null || shortLDT == null || 
-                intLDT == null || longLDT == null || 
-                charLDT == null) {
-            return  null;
-        }
-
-        if (byteLDT.javaType().equals(t)) {
-            return byteLDT;
-        } else if (shortLDT.javaType().equals(t)) {
-            return shortLDT;
-        } else if (intLDT.javaType().equals(t)) {
-            return intLDT;
-        } else if (longLDT.javaType().equals(t)) {
-            return longLDT;
-        } else if (charLDT.javaType().equals(t)) {
-            return charLDT;
-        } else if (booleanLDT.javaType().equals(t)) {
-            return booleanLDT;
-        } else if (floatLDT.javaType().equals(t)) {
-            return floatLDT;
-        } else if (doubleLDT.javaType().equals(t)) {
-            return doubleLDT;
-        }
-        Debug.out("typeconverter: No LDT found for ", t);
-        return null;
-    }
+    
 
     public LDT getModelFor(Sort s) {
-        if (s == null || booleanLDT == null ||
-                byteLDT == null || shortLDT == null || 
-                intLDT == null || longLDT == null || 
-                charLDT == null) {
-            return  null;
-        }	
-        if (byteLDT.targetSort() == s) {
-            return byteLDT;
-        } else if (shortLDT.targetSort() == s) {
-            return shortLDT;  
-        } else if (intLDT.targetSort() == s) {
-            return intLDT;  
-        } else if (longLDT.targetSort() == s) {
-            return longLDT;  
-        } else if (charLDT.targetSort() == s) {
-            return charLDT;  
-        } else if (booleanLDT.targetSort() == s) {	    
-            return booleanLDT;
-        }
+	for(LDT ldt : models) {
+	    if(s.equals(ldt.targetSort())) {
+		return ldt;
+	    }
+	}
         Debug.out("No LDT found for ", s);
         return null;
     }
 
+    
     public IntegerLDT getIntegerLDT() {
         return integerLDT;
     }
-    
-    public IntegerDomainLDT getIntegerDomainLDT() {
-        return integerDomainLDT;
-    }
-    
-    public ByteLDT getByteLDT() {
-        return  byteLDT;
-    }
-    
-    public ShortLDT getShortLDT() {
-        return  shortLDT;
-    }
-    
-    public IntLDT getIntLDT() {
-        return  intLDT;
-    }
-    
-    public LongLDT getLongLDT() {
-        return  longLDT;
-    }
-    
-    public CharLDT getCharLDT() {
-        return  charLDT;
-    }
+        
     
     public BooleanLDT getBooleanLDT() {
 	return booleanLDT;
     }
-    
-    private final HashMap<String, Term> mcrMap = new HashMap<String, Term>(10);
-    
-    private Term translateMetaClassReference(MetaClassReference mcr) {
-//	    throw new IllegalArgumentException("Convert MCR to a constant");
-//            return intLDT.translateLiteral( new CharLiteral('X'));
-        String name = mcr.getTypeReference().getName().intern();
-        
-        if (mcrMap.containsKey(name)) return mcrMap.get(name);
 
-        final Sort dummySort = services.getJavaInfo().getJavaLangObjectAsSort();       
-        final Term tMCR = func(new RigidFunction(new Name(name), 
-                dummySort, new ImmutableArray<Sort>()));
-        mcrMap.put(name, tMCR);
-        return tMCR;
+ 
+    public LocSetLDT getLocSetLDT() {
+	return locSetLDT;
     }
 
+    
+    public HeapLDT getHeapLDT() {
+	return heapLDT;
+    }
+    
+    
+    public SeqLDT getSeqLDT() {
+	return seqLDT;
+    }
+    
+    
+    public CharListLDT getCharListLDT() {
+	return charListLDT;
+    }    
+    
+
     private Term translateOperator
-	(de.uka.ilkd.key.java.expression.Operator op,
-	 LDT intLDT, LDT booleanLDT, ExecutionContext ec) {
+	(de.uka.ilkd.key.java.expression.Operator op, ExecutionContext ec) {
 
 	final Term[] subs  = new Term[op.getArity()];
-	if (op.getArity() >= 1) {
-	    subs[0] = convertToLogicElement(op.getExpressionAt(0), ec);
+	for(int i = 0, n = op.getArity(); i < n; i++) {
+	    subs[i] = convertToLogicElement(op.getExpressionAt(i), ec);
 	}
-	if (op.getArity() == 2) {
-	    subs[1] = convertToLogicElement(op.getExpressionAt(1), ec);	  
+	
+	//hack: convert object singleton to location singleton
+	if(op instanceof Singleton) {
+	    assert heapLDT.getSortOfSelect(subs[0].op()) != null 
+	           : "unexpected argument of \\singleton: " + subs[0];
+	    return TB.singleton(services, subs[0].sub(1), subs[0].sub(2));
 	}	
 	
 	LDT responsibleLDT = null;
-	if (intLDT.isResponsible(op, subs, services, ec)) {
-	    responsibleLDT = intLDT;
+	if (integerLDT.isResponsible(op, subs, services, ec)) {
+	    responsibleLDT = integerLDT;
 	} else if (booleanLDT.isResponsible(op, subs, services, ec)) {
 	    responsibleLDT = booleanLDT;
-	} else{
+	} else if (locSetLDT.isResponsible(op, subs, services, ec)) {
+	    responsibleLDT = locSetLDT;
+	} else if(seqLDT.isResponsible(op, subs, services, ec)) {
+	    responsibleLDT = seqLDT;
+	} else if(charListLDT.isResponsible(op, subs, services, ec)) {
+	    responsibleLDT = charListLDT;
+    	} else if(op instanceof Equals) {
+	    assert subs.length == 2;
+	    return TB.equals(subs[0], subs[1]);
+	} else if(op instanceof Conditional) {
+	    assert subs.length == 3;
+	    return TB.ife(subs[0], subs[1], subs[2]);
+	} else {
 	    Debug.out("typeconverter: no data type model "+
 		      "available to convert:", op, op.getClass());		
 	    throw new IllegalArgumentException("TypeConverter could not handle"
-					       +" this: "+op);
+					       +" this operator: " + op);
 	}
-	return func(responsibleLDT.getFunctionFor(op, services, ec), subs);
+	
+	return TB.func(responsibleLDT.getFunctionFor(op, services, ec), subs);
     }
    
 
@@ -251,11 +193,11 @@ public class TypeConverter extends TermBuilder {
 					       +" this");
 	} else 	if (prefix instanceof ProgramVariable) {
 	    // the base case: the leftmost item is a local variable
-	    return var((ProgramVariable)prefix);
+	    return TB.var((ProgramVariable)prefix);
 	} else 	if (prefix instanceof VariableReference) {
 	    Debug.out("typeconverter: "+
 		      "variablereference:", (((VariableReference)prefix).getProgramVariable()));
-	    return var(((VariableReference)prefix).getProgramVariable());
+	    return TB.var(((VariableReference)prefix).getProgramVariable());
 	}  else if (prefix instanceof ArrayReference) {	   
 	    return convertArrayReference((ArrayReference)prefix, ec);
 	} else if (prefix instanceof ThisReference) {	 
@@ -264,10 +206,8 @@ public class TypeConverter extends TermBuilder {
 	        KeYJavaType kjt = tr.getKeYJavaType();
 	        return findThisForSortExact(kjt.getSort(), ec);
 	    }
-	    return convertToLogicElement(ec.getRuntimeInstanceAsRef());
-	} /*else if (prefix instanceof CurrentMemoryAreaReference) {   
-            return convertToLogicElement(ec.getMemoryArea());
-        } */else {            
+	    return convertToLogicElement(ec.getRuntimeInstance());
+	} else {            
 	    Debug.out("typeconverter: WARNING: unknown reference prefix:", 
 		      prefix, prefix == null ? null : prefix.getClass());
 	    throw new IllegalArgumentException("TypeConverter failed to convert "
@@ -275,51 +215,73 @@ public class TypeConverter extends TermBuilder {
 	}
     }
     
+    
     public Term findThisForSortExact(Sort s, ExecutionContext ec){
-        ProgramElement pe = ec.getRuntimeInstanceAsRef();
+        ProgramElement pe = ec.getRuntimeInstance();
         if(pe == null) return null;
         Term inst = convertToLogicElement(pe, ec);
         return findThisForSort(s, inst, ec.getTypeReference().getKeYJavaType(), true);
+    
     }
     
     public Term findThisForSort(Sort s, ExecutionContext ec){
-        ProgramElement pe = ec.getRuntimeInstanceAsRef();
+        ProgramElement pe = ec.getRuntimeInstance();
         if(pe == null) return null;
         Term inst = convertToLogicElement(pe, ec);
         return findThisForSort(s, inst, ec.getTypeReference().getKeYJavaType(), false);
     }
     
-    public Term findThisForSort(Sort s, Term self, KeYJavaType context, boolean exact){
+    
+    public Term findThisForSort(Sort s, 
+	    			Term self, 
+	    			KeYJavaType context, 
+	    			boolean exact) {
         Term result = self;
-        ProgramVariable inst;
-        while(!exact && !context.getSort().extendsTrans(s) ||
-                 exact && !context.getSort().equals(s)){
-            inst = services.getJavaInfo().getAttribute(
-                    ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, context);
-            result = dot(result, inst);
+        LocationVariable inst;
+        while(!exact && !context.getSort().extendsTrans(s) 
+              || exact && !context.getSort().equals(s)){
+            inst = (LocationVariable)
+                    services.getJavaInfo().getAttribute(
+                       ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, context);
+            final Function fieldSymbol
+            	= heapLDT.getFieldSymbolForPV(inst, services);
+            result = TB.dot(services, inst.sort(), result, fieldSymbol);
             context = inst.getKeYJavaType();
         }
         return result;      
     }
 
+    
     public Term convertVariableReference(VariableReference fr,
 					 ExecutionContext ec) {	       
-	Debug.out("TypeConverter: FieldReference: ",fr);
+	Debug.out("TypeConverter: FieldReference: ", fr);
 	final ReferencePrefix prefix = fr.getReferencePrefix();
 	final ProgramVariable var = fr.getProgramVariable();
-	if("javax.realtime.MemoryArea::currentMemoryArea".
-	               equals(fr.getName().toString())){
-	    return convertToLogicElement(ec.getMemoryAreaAsRef());
-	} else if (var.isStatic()) {
-	    return var(var);
-	} else if (prefix == null) {
-	    if (var.isMember()) {
-		return dot(findThisForSort(var.getContainerType().getSort(), ec), 
-		        var);
+	if(var instanceof ProgramConstant) {
+	    return TB.var(var);
+	} else if(var == services.getJavaInfo().getArrayLength()) {
+	    return TB.dotLength(services, convertReferencePrefix(prefix, ec));
+	} else if(var.isStatic()) {
+	    final Function fieldSymbol 
+	    	= heapLDT.getFieldSymbolForPV((LocationVariable)var, services);
+	    return TB.staticDot(services, var.sort(), fieldSymbol);
+	} else if(prefix == null) {
+	    if(var.isMember()) {
+		final Function fieldSymbol 
+			= heapLDT.getFieldSymbolForPV((LocationVariable)var, 
+						      services);
+		return TB.dot(services, 
+			      var.sort(), 
+			      findThisForSort(var.getContainerType().getSort(), 
+				              ec), 
+			      fieldSymbol);
+	    } else {
+		return TB.var(var);
 	    }
-	    return var(var); 
 	} else if (!(prefix instanceof PackageReference) ) {
-	    return dot(convertReferencePrefix(prefix, ec), var);
+	    final Function fieldSymbol 
+	    	= heapLDT.getFieldSymbolForPV((LocationVariable)var, services);
+	    return TB.dot(services, var.sort(), convertReferencePrefix(prefix, ec), fieldSymbol);
 	} 
 	Debug.out("typeconverter: Not supported reference type (fr, class):",
 		  fr, fr.getClass());
@@ -336,7 +298,8 @@ public class TypeConverter extends TermBuilder {
             index[i] = 
                 convertToLogicElement(ar.getDimensionExpressions().get(i), ec);
         }
-        return tf.createArrayTerm(ArrayOp.getArrayOp(t.sort()), t, index);
+        assert index.length == 1 : "multi-dimensional arrays not implemented";
+        return TB.dotArr(services, t, index[0]);
     }
 
     private Term convertToInstanceofTerm(Instanceof io, 
@@ -344,28 +307,27 @@ public class TypeConverter extends TermBuilder {
 	final KeYJavaType type = ((TypeReference)io.getChildAt(1)).
 	    getKeYJavaType();
 	final Term obj = convertToLogicElement(io.getChildAt(0), ec);
-	final SortDefiningSymbols s = (SortDefiningSymbols) type.getSort();
-	final InstanceofSymbol instanceOfSymbol = 
-	    (InstanceofSymbol)s.lookupSymbol(InstanceofSymbol.NAME);
+	final Sort s = type.getSort();
+	final Function instanceOfSymbol = s.getInstanceofSymbol(services); 
 	
 	// in JavaDL S::instance(o) is also true if o (for reference types S)
 	// is null in opposite to Java
 	// we create here if (obj = null) then FALSE else S::instance(obj) 				      
-	return ife(equals(obj, NULL(services)), FALSE(services), 
-                func(instanceOfSymbol, obj));
+	return TB.ife(TB.equals(obj, TB.NULL(services)), TB.FALSE(services), 
+                TB.func(instanceOfSymbol, obj));
     }
-
   
 
     public Term convertToLogicElement(ProgramElement pe) {
 	return convertToLogicElement(pe, null);	
     }
 
+    
     public Term convertToLogicElement(ProgramElement pe, 				    
 				      ExecutionContext ec) {
 	Debug.out("typeconverter: called for:", pe, pe.getClass());
 	if (pe instanceof ProgramVariable) {	  
-	    return var((ProgramVariable)pe);
+	    return TB.var((ProgramVariable)pe);
 	} else if (pe instanceof FieldReference) {
 	    return convertVariableReference((FieldReference)pe, ec);
 	} else if (pe instanceof VariableReference) {
@@ -378,47 +340,45 @@ public class TypeConverter extends TermBuilder {
 	        && ((Negative)pe).getChildAt(0) instanceof IntLiteral) {
 	    String val = ((IntLiteral)((Negative)pe).getChildAt(0)).getValue();
 	    if (val.charAt(0)=='-') {
-		return intLDT.translateLiteral
-		    (new IntLiteral(val.substring(1)));
+		return integerLDT.translateLiteral
+		    (new IntLiteral(val.substring(1)), services);
 	    } else {
-		return intLDT.translateLiteral
-		    (new IntLiteral("-"+val));
+		return integerLDT.translateLiteral
+		    (new IntLiteral("-"+val), services);
 	    }
 	} else if (pe instanceof Negative 
 		   && ((Negative)pe).getChildAt(0) instanceof LongLiteral ) {
 	    String val = ((LongLiteral)
 			  ((Negative)pe).getChildAt(0)).getValue();
 	    if (val.charAt(0)=='-') {
-		return intLDT.translateLiteral
-		    (new LongLiteral(val.substring(1)));
+		return integerLDT.translateLiteral
+		    (new LongLiteral(val.substring(1)), services);
 	    } else {
-		return intLDT.translateLiteral
-		    (new LongLiteral("-"+val));
+		return integerLDT.translateLiteral
+		    (new LongLiteral("-"+val), services);
 	    }
 	} else if (pe instanceof ThisReference) {
 	    return convertReferencePrefix((ThisReference)pe, ec);
-	} /*else if (pe instanceof CurrentMemoryAreaReference) {   
-            return convertToLogicElement(ec.getMemoryArea());
-        } */else if (pe instanceof ParenthesizedExpression) {
+	} else if (pe instanceof ParenthesizedExpression) {
             return convertToLogicElement
                 (((ParenthesizedExpression)pe).getChildAt(0), ec);
         } else if (pe instanceof Instanceof) {
 	    return convertToInstanceofTerm((Instanceof)pe, ec);
 	} else if (pe instanceof de.uka.ilkd.key.java.expression.Operator) {
 	    return translateOperator
-		((de.uka.ilkd.key.java.expression.Operator)pe,
-		 intLDT, booleanLDT, ec);
+		((de.uka.ilkd.key.java.expression.Operator)pe, ec);
 	} else if (pe instanceof PrimitiveType) {
 	    throw new IllegalArgumentException("TypeConverter could not handle"
 					       +" this primitive type");
 	} else if (pe instanceof MetaClassReference) {
-            return translateMetaClassReference((MetaClassReference)pe);
+	    assert false : "not supported";
         }  
 	throw new IllegalArgumentException
 	    ("TypeConverter: Unknown or not convertable ProgramElement " + pe+
              " of type "+pe.getClass());
     }
 
+    
     /**
      * dispatches the given literal and converts it
      * @param lit the Literal to be converted
@@ -426,26 +386,27 @@ public class TypeConverter extends TermBuilder {
      */
     private Term convertLiteralExpression(Literal lit) {      
         if (lit instanceof BooleanLiteral) {   
-            return booleanLDT.translateLiteral(lit);
+            return booleanLDT.translateLiteral(lit, services);
         } else if (lit instanceof NullLiteral) {
-            return services.getJavaInfo().getNullConst();
+            return TB.NULL(services);
         } else if (lit instanceof IntLiteral) {
-            return intLDT.translateLiteral(lit);
+            return integerLDT.translateLiteral(lit, services);
         } else if (lit instanceof CharLiteral) {
-            return intLDT.translateLiteral(lit);
+            return integerLDT.translateLiteral(lit, services);
         } else if (lit instanceof LongLiteral) {
-            return intLDT.translateLiteral(lit);
+            return integerLDT.translateLiteral(lit, services);
         } else if (lit instanceof StringLiteral) {
-	    return stringConverter.translateLiteral(lit, charLDT, services);
-        } else if (lit instanceof FloatLiteral) {
-            return floatLDT.translateLiteral(lit);
-        } else if (lit instanceof DoubleLiteral) {
-            return doubleLDT.translateLiteral(lit);
+            return charListLDT.translateLiteral(lit, services);
+        } else if (lit instanceof EmptySetLiteral) {
+            return locSetLDT.translateLiteral(lit, services);
+        } else if (lit instanceof EmptySeqLiteral) {
+            return seqLDT.translateLiteral(lit, services);            
         } else {
             Debug.fail("Unknown literal type", lit);                 
             return null;
         }
     }
+    
 
     public static boolean isArithmeticOperator
 	(de.uka.ilkd.key.java.expression.Operator op) {
@@ -462,45 +423,53 @@ public class TypeConverter extends TermBuilder {
 	return false;
     }
 
+    
     /**
      * performs binary numeric promotion on the argument types
      */
     public KeYJavaType getPromotedType(KeYJavaType type1, 
-            KeYJavaType type2) {
+            			       KeYJavaType type2) {
         final Type t1 = type1.getJavaType();
         final Type t2 = type2.getJavaType();
 
         if ((t1 == PrimitiveType.JAVA_BOOLEAN &&
-                t2 == PrimitiveType.JAVA_BOOLEAN))
+                t2 == PrimitiveType.JAVA_BOOLEAN)) {
             return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BOOLEAN);
-        if ((t1 == PrimitiveType.JAVA_BYTE ||
+        } else if ((t1 == PrimitiveType.JAVA_BYTE ||
                 t1 == PrimitiveType.JAVA_SHORT ||
                 t1 == PrimitiveType.JAVA_CHAR||
                 t1 == PrimitiveType.JAVA_INT) &&
                 (t2 == PrimitiveType.JAVA_BYTE||
                         t2 == PrimitiveType.JAVA_SHORT||
                         t2 == PrimitiveType.JAVA_CHAR||
-                        t2 == PrimitiveType.JAVA_INT))
+                        t2 == PrimitiveType.JAVA_INT)) {
             return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT);
-        if ((t2 == PrimitiveType.JAVA_LONG) &&
+    	} else if ((t2 == PrimitiveType.JAVA_LONG) &&
                 (t1 == PrimitiveType.JAVA_BYTE||
                         t1 == PrimitiveType.JAVA_SHORT||
                         t1 == PrimitiveType.JAVA_INT||
                         t1 == PrimitiveType.JAVA_CHAR||
-                        t1 == PrimitiveType.JAVA_LONG)) 
+                        t1 == PrimitiveType.JAVA_LONG)) { 
             return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LONG);
-        if ((t1 == PrimitiveType.JAVA_LONG) &&
+    	} else if ((t1 == PrimitiveType.JAVA_LONG) &&
                 (t2 == PrimitiveType.JAVA_BYTE||
                         t2 == PrimitiveType.JAVA_SHORT||
                         t2 == PrimitiveType.JAVA_INT||
                         t2 == PrimitiveType.JAVA_CHAR||
-                        t2 == PrimitiveType.JAVA_LONG)) 
+                        t2 == PrimitiveType.JAVA_LONG)) { 
             return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LONG);
-	/*KeYJavaType strType = services.getJavaInfo().getTypeByName("java.lang.String");
-	if (t1 == strType.getJavaType() || t2 == strType.getJavaType())
-	return strType;*/
-	throw new RuntimeException("Could not determine promoted type "+
-	  "of "+t1+" and "+t2);
+    	} else if (t1 == PrimitiveType.JAVA_LOCSET && t2 == PrimitiveType.JAVA_LOCSET) { 
+            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LOCSET);
+    	} else if (t1 == PrimitiveType.JAVA_SEQ && t2 == PrimitiveType.JAVA_SEQ) { 
+            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SEQ);
+    	} else if (type1.equals(services.getJavaInfo().getKeYJavaType("java.lang.String"))) { 
+            return type1;
+    	} else if (type2.equals(services.getJavaInfo().getKeYJavaType("java.lang.String"))) { 
+            return type2;
+        } else {
+            throw new RuntimeException("Could not determine promoted type "
+        	    	               + "of " + t1 + " and " + t2);
+        }
     }
 
 
@@ -517,22 +486,26 @@ public class TypeConverter extends TermBuilder {
 	    return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT);
 	if (t1 == PrimitiveType.JAVA_LONG)
 	    return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LONG);
+	if (t1 == PrimitiveType.JAVA_LOCSET) 
+	    return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LOCSET);
+	if (t1 == PrimitiveType.JAVA_SEQ) 
+	    return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SEQ);	
 	throw new RuntimeException("Could not determine promoted type "+
 				   "of "+type1);
     }
 
 
     public KeYJavaType getBooleanType() {
-	return booleanLDT.getKeYJavaType(PrimitiveType.JAVA_BOOLEAN);
+	return services.getJavaInfo()
+	               .getKeYJavaType(PrimitiveType.JAVA_BOOLEAN);
     }
 
+    
     public Sort getPrimitiveSort(Type t) {
-	LDT result = getModelFor(t);
-
-	Debug.out("LDT found", t, result);
-        return (result == null ? null : result.targetSort());
+	return services.getJavaInfo().getKeYJavaType(t).getSort();
     }
 
+    
     /** 
      * Retrieves the static type of the expression. This method may only be called
      * if the expressions type can be determined without knowledge of context 
@@ -547,6 +520,7 @@ public class TypeConverter extends TermBuilder {
     public KeYJavaType getKeYJavaType(Expression e){
 	return getKeYJavaType(e, null);
     }
+    
 
     /** 
      * retrieves the type of the expression <tt>e</tt> with respect to 
@@ -571,7 +545,8 @@ public class TypeConverter extends TermBuilder {
      * @throws RuntimeException iff a conversion is not possible
      */
     public Expression convertToProgramElement(Term term) {
-	if (term.op()==Op.NULL) {
+	assert term != null;
+	if (term.op() == heapLDT.getNull()) {
 	    return NullLiteral.NULL;
 	} else if (term.op() instanceof Function) {
 	    for(LDT model : models) {
@@ -598,13 +573,22 @@ public class TypeConverter extends TermBuilder {
 				   +" "+term.op().getClass());
     }
 
-    public KeYJavaType getKeYJavaType(Term t) {	
-        if (t.sort() instanceof ObjectSort) {
-	    return services.getJavaInfo().getKeYJavaType(t.sort());
+    
+    public KeYJavaType getKeYJavaType(Term t) {
+	KeYJavaType result = null;
+	if(t.sort().extendsTrans(services.getJavaInfo().objectSort())) {
+	    result = services.getJavaInfo().getKeYJavaType(t.sort());
+	} else if(t.op() instanceof Function) {
+	    for(LDT ldt : models) {
+		if(ldt.containsFunction((Function)t.op())) {
+		    Type type = ldt.getType(t);
+		    result = services.getJavaInfo().getKeYJavaType(type);
+		    break;
+		}
+	    }
 	}
-        
-        KeYJavaType result = services.getJavaInfo().getKeYJavaType(t.sort());  
-        if (result == null) {
+	
+        if(result == null) {
             //HACK
             result = services.getJavaInfo().getKeYJavaType(t.sort().toString()); 
         }
@@ -615,21 +599,13 @@ public class TypeConverter extends TermBuilder {
 	return result;
     }
 
-    public KeYJavaType getKeYJavaType(Type t) {        
-	if ( t instanceof KeYJavaType )
-	    return (KeYJavaType)t;
-	final LDT model = getModelFor(t);
-	if (model != null) {
-	    return model.getKeYJavaType(t);
-	} else {
-	    Debug.out("javainfo: no predefined model for type ",t);
-	    return null;
-	}	
+    
+    public KeYJavaType getKeYJavaType(Type t) { 
+	return services.getJavaInfo().getKeYJavaType(t);
     }
 
 
     /** These methods are taken from recoder (and modified) */
-
     public boolean isWidening(PrimitiveType from, PrimitiveType to) {
 	// we do not handle null's
 	if (from == null || to == null) return false;
@@ -660,10 +636,12 @@ public class TypeConverter extends TermBuilder {
 		to == PrimitiveType.JAVA_SHORT);
     }
 
+    
     public boolean isWidening(ClassType from, ClassType to) {
 	return isWidening ( getKeYJavaType ( from ),
 			    getKeYJavaType ( to   ) );
     }
+    
 
     public boolean isWidening(ArrayType from, ArrayType to) {
 	KeYJavaType toBase   =  to.getBaseType().getKeYJavaType();
@@ -677,6 +655,7 @@ public class TypeConverter extends TermBuilder {
 	}
 	return isWidening(fromBase, toBase);
     }
+    
     
     public boolean isWidening(Type from, Type to) {
 	if ( from instanceof KeYJavaType )
@@ -704,6 +683,7 @@ public class TypeConverter extends TermBuilder {
 	return false;
     }    
 
+    
     // this also handles class types
     public boolean isWidening(KeYJavaType from, KeYJavaType to) {
 	Type a = from.getJavaType ();
@@ -757,16 +737,19 @@ public class TypeConverter extends TermBuilder {
 	return (minValue <= value) && (value <= maxValue);	
     }
 
+    
     public boolean isIdentical ( Type from, Type to ) {
 	from = getKeYJavaType ( from );
 	to   = getKeYJavaType ( to   );
 	return from == to;
     }
 
+    
     public boolean isAssignableTo ( Type from, Type to ) {
 	return isIdentical ( from, to ) || isWidening ( from, to );
     }
 
+    
     public boolean isAssignableTo ( Expression expr, Type to, ExecutionContext ec ) {
 	return
 	    ( to instanceof PrimitiveType &&
@@ -775,6 +758,7 @@ public class TypeConverter extends TermBuilder {
 	    isWidening  ( expr.getKeYJavaType ( getServices (), ec ), to );
     }
 
+    
     // this also handles class types
     public boolean isNarrowing(KeYJavaType from, KeYJavaType to) {
 	Type a = from.getJavaType ();
@@ -794,6 +778,7 @@ public class TypeConverter extends TermBuilder {
 	}
     }
 
+    
     public boolean isNarrowing(PrimitiveType from, PrimitiveType to) {
 	// we do not handle null's
 	if (from == null || to == null) return false;
@@ -837,11 +822,13 @@ public class TypeConverter extends TermBuilder {
 	}
 	return false;
     }
+    
 
     public boolean isNarrowing(ClassType from, ClassType to) {
 	return isNarrowing ( getKeYJavaType ( from ),
 			     getKeYJavaType ( to   ) );
     }
+    
 
     public boolean isNarrowing(ArrayType from, ArrayType to) {
 	KeYJavaType toBase   = to.getBaseType().getKeYJavaType();
@@ -851,6 +838,7 @@ public class TypeConverter extends TermBuilder {
 	    isReferenceType ( fromBase ) &&
 	    isNarrowing(fromBase, toBase);
     }
+    
 
     public boolean isNarrowing(Type from, Type to) {
 	if ( from instanceof KeYJavaType )
@@ -875,6 +863,7 @@ public class TypeConverter extends TermBuilder {
 	return false;
     }
 
+    
     public boolean isCastingTo ( Type from, Type to ) {
 	// there is currently no interface handling
 
@@ -895,6 +884,7 @@ public class TypeConverter extends TermBuilder {
 	return isNarrowing ( from, to );
     }
 
+    
     public boolean isArithmeticType ( Type t ) {
 	if ( t instanceof KeYJavaType )
 	    t = ((KeYJavaType)t).getJavaType ();
@@ -908,6 +898,7 @@ public class TypeConverter extends TermBuilder {
 	    t == PrimitiveType.JAVA_DOUBLE;
     }
 
+    
     public boolean isIntegralType ( Type t ) {
 	if ( t instanceof KeYJavaType )
 	    t = ((KeYJavaType)t).getJavaType ();
@@ -919,6 +910,7 @@ public class TypeConverter extends TermBuilder {
 	    t == PrimitiveType.JAVA_LONG;
     }
 
+    
     public boolean isReferenceType ( Type t ) {
 	if ( t instanceof KeYJavaType )
 	    t = ((KeYJavaType)t).getJavaType ();
@@ -928,6 +920,7 @@ public class TypeConverter extends TermBuilder {
 	    ( t instanceof ClassType && !( t instanceof NullType ) ) ||
 	    t instanceof ArrayType;
     }
+    
 
     public boolean isNullType ( Type t ) {
 	if ( t instanceof KeYJavaType )
@@ -935,6 +928,7 @@ public class TypeConverter extends TermBuilder {
 	return
 	    t == NullType.JAVA_NULL;
     }
+    
 
     public boolean isBooleanType ( Type t ) {
 	if ( t instanceof KeYJavaType )
@@ -942,15 +936,11 @@ public class TypeConverter extends TermBuilder {
 	return
 	    t == PrimitiveType.JAVA_BOOLEAN;
     }
+    
 
-    public TypeConverter copy(Services s) {
-	final TypeConverter tc = new TypeConverter(s);
+    public TypeConverter copy(Services services) {
+	final TypeConverter tc = new TypeConverter(services);
 	tc.init(models);
 	return tc;
     }
-
-    public StringConverter getStringConverter() {
-	return stringConverter;
-    }
- 
 }

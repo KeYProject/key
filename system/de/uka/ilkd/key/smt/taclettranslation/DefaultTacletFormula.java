@@ -1,10 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
 package de.uka.ilkd.key.smt.taclettranslation;
 
 import java.util.Collection;
@@ -25,12 +18,16 @@ class DefaultTacletFormula implements TacletFormula {
     }
 
     public DefaultTacletFormula(Taclet taclet, Collection<Term> formula,
-	    String status) {
-	this(taclet, formula, status, new TacletConditions(taclet));
+	    String status)  {
+	this.taclet = taclet;
+	this.formula = formula;
+	this.status = status;
     }
+    
+    
 
     public DefaultTacletFormula(Taclet taclet, Collection<Term> formula,
-	    String status, TacletConditions conditions) {
+	    String status, TacletConditions conditions) throws IllegalTacletException {
 	super();
 	this.taclet = taclet;
 	this.formula = formula;

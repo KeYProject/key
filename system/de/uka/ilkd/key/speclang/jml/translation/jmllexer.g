@@ -53,6 +53,7 @@ DOTDOT : "..";
 DURATION : "\\duration";
 ELEMTYPE : "\\elemtype";
 EQUAL : "==";
+EQUAL_SINGLE : "=";
 EQV : "<==>";
 EVERYTHING : "\\everything";
 FRESH : "\\fresh"; 
@@ -64,6 +65,7 @@ IN_IMMORTAL_MEMORY : "\\inImmortalMemory"; //KeY extension, not official JML
 IN_OUTER_SCOPE : "\\inOuterScope"; //KeY extension, not official JML
 INCLUSIVEOR : "|";
 INTO : "\\into";
+INV : "\\inv";
 INVARIANT_FOR : "\\invariant_for";
 IS_INITIALIZED : "\\is_initialized";
 LARROW : "<-";
@@ -74,20 +76,20 @@ LEQ : "<=";
 LOCKSET : "\\lockset";
 LOGICALAND : "&&";
 LOGICALOR : "||";
-LT : "<";
 MAX_SPACE : "\\max_space"; //KeY extension, not official JML
 MEMORY_AREA : "\\memoryArea"; //KeY extension, not official JML
 MINUS : "-";
 MOD : "%";
 MULT : "*";
 NONNULLELEMENTS : "\\nonnullelements";
+NON_NULL : "\\non_null";
+NULLABLE : "\\nullable";
 NOT : "!";
 NOT_MODIFIED : "\\not_modified";
 NOT_SPECIFIED : "\\not_specified";
 NOTEQUAL : "!=";
 NOTHING : "\\nothing";
 NOWARN : "\\nowarn";
-OBJECT_CREATION: "\\object_creation"; //KeY extension, not official JML
 OLD : "\\old";
 OTHER : "\\other";
 OUTER_SCOPE : "\\outerScope"; //KeY extension, not official JML
@@ -97,6 +99,7 @@ PRIVATEDATA : "\\private_data";
 QUESTIONMARK : "?";
 RBRACE : "}";
 REACH : "\\reach";
+REACHLOCS : "\\reachLocs";
 REAL : "\\real";
 REENTRANT_SCOPE : "\\reentrantScope"; //KeY extension, not official JML
 RESULT : "\\result";
@@ -106,6 +109,7 @@ SEMI : ";";
 SHIFTLEFT : "<<";
 SHIFTRIGHT : ">>";
 SPACE : "\\space";
+STRING_EQUAL : "\\string_equal";
 TYPEOF : "\\typeof";
 TYPE_SMALL : "\\type";
 TYPE : "\\TYPE";
@@ -115,6 +119,45 @@ UNSIGNEDSHIFTRIGHT : ">>>";
 WORKINGSPACE : "\\working_space";
 XOR : "^";
 
+LOCSET : "\\locset";
+EMPTYSET : "\\empty";
+SINGLETON : "\\singleton";
+UNION : "\\set_union";
+INTERSECT : "\\intersect";
+SETMINUS : "\\set_minus";
+ALLFIELDS : "\\all_fields";
+UNIONINF: "\\infinite_union";
+DISJOINT : "\\disjoint";
+SUBSET : "\\subset";
+NEWELEMSFRESH : "\\new_elems_fresh";
+
+SEQ : "\\seq";
+SEQEMPTY : "\\seq_empty";
+SEQSINGLETON : "\\seq_singleton";
+SEQCONCAT : "\\seq_concat";
+SEQSUB : "\\seq_sub";
+SEQREVERSE : "\\seq_reverse";
+
+MEASURED_BY : "\\measured_by";
+
+
+LT_DISPATCH
+     :
+     ('<' (LETTER)+ '>') => IMPLICIT_IDENT {$setType(IDENT);}
+    |
+     LT {$setType(LT);}
+    ;
+    
+protected LT : "<";
+
+    
+protected IMPLICIT_IDENT
+options {
+  paraphrase = "an implicit identifier (letters only)";
+}
+:
+  '<' (LETTER)+ '>'
+;
 
 
 LPAREN
@@ -164,7 +207,7 @@ QUANTIFIER
     |
         "\\sum"
     ;
-
+    
 protected
 LETTER
 options {

@@ -39,20 +39,18 @@ import de.uka.ilkd.key.util.ExtList;
  *  constructor is invoked from an outer instance.
  */
 
-public class New
- extends TypeOperator
- implements ConstructorReference, ExpressionStatement, ReferencePrefix, ReferenceSuffix, TypeDeclarationContainer {
+public class New extends TypeOperator
+ 		 implements ConstructorReference, 
+ 		 	    ExpressionStatement, 
+ 		 	    ReferencePrefix, 
+ 		 	    ReferenceSuffix, 
+ 		 	    TypeDeclarationContainer {
 
-    /**
-     *      Anonymous class.
-     */
-    protected final ClassDeclaration anonymousClass;
-    
-    /**
-     *      Access path.
-     */
+
+    protected final ClassDeclaration anonymousClass;   
     protected final ReferencePrefix accessPath;
 
+    
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
      * @param children the children of this AST element as KeY classes.
@@ -67,10 +65,11 @@ public class New
      */
     public New(ExtList children, ReferencePrefix rp) {
 	super(children);
-	anonymousClass=(ClassDeclaration)children.get(ClassDeclaration.class);
-	accessPath=rp;
+	anonymousClass = (ClassDeclaration)children.get(ClassDeclaration.class);
+	accessPath = rp;
     }
 
+    
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
      * @param children the children of this AST element as KeY classes.
@@ -85,8 +84,8 @@ public class New
      */
     public New(ExtList children, ReferencePrefix rp, PositionInfo pi) {
 	super(children, pi);
-	anonymousClass=(ClassDeclaration)children.get(ClassDeclaration.class);        
-	accessPath=rp;
+	anonymousClass = (ClassDeclaration)children.get(ClassDeclaration.class);        
+	accessPath = rp;
     }
 
 
@@ -101,63 +100,49 @@ public class New
 	accessPath = rp;
     }
     
+    
+    @Override    
     public SourceElement getFirstElement() {
         return (accessPath != null) ? accessPath.getFirstElement() : this;
     }
 
+    
+    @Override    
     public SourceElement getLastElement() {
         return getChildAt(getChildCount() - 1).getLastElement();
     }
 
 
-    /**
-     *      Get arity.
-     *      @return the int value.
-     */
+    @Override    
     public int getArity() {
         return 0;
     }
 
-    /**
-     *      Get precedence.
-     *      @return the int value.
-     */
+
+    @Override    
     public int getPrecedence() {
         return 0;
     }
 
-    /**
-     *      Get notation.
-     *      @return the int value.
-     */
+    
+    @Override    
     public int getNotation() {
         return PREFIX;
     }
 
-    /**
-     *      Get class declaration.
-     *      @return the class declaration.
-     */
+
     public ClassDeclaration getClassDeclaration() {
         return anonymousClass;
     }
 
-    /**
-     *      Get the number of type declarations in this container.
-     *      @return the number of type declarations.
-     */
+    
+    @Override
     public int getTypeDeclarationCount() {
         return (anonymousClass != null) ? 1 : 0;
     }
+    
 
-    /*
-      Return the type declaration at the specified index in this node's
-      "virtual" type declaration array.
-      @param index an index for a type declaration.
-      @return the type declaration with the given index.
-      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
-      of bounds.
-    */
+    @Override
     public TypeDeclaration getTypeDeclarationAt(int index) {
         if (anonymousClass != null && index == 0) {
             return anonymousClass;
@@ -165,10 +150,8 @@ public class New
         throw new ArrayIndexOutOfBoundsException();
     }
 
-    /**
-     *      Returns the number of children of this node.
-     *      @return an int giving the number of children of this node
-     */
+    
+    @Override
     public int getChildCount() {
         int result = 0;
         if (accessPath     != null) result++;
@@ -178,14 +161,8 @@ public class New
         return result;
     }
 
-    /**
-     *      Returns the child at the specified index in this node's "virtual"
-     *      child array
-     *      @param index an index into this node's "virtual" child array
-     *      @return the program element at the given position
-     *      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
-     *                 of bounds
-     */
+    
+    @Override    
     public ProgramElement getChildAt(int index) {
         int len;
         if (accessPath != null) {
@@ -209,26 +186,29 @@ public class New
         throw new ArrayIndexOutOfBoundsException();
     }
 
+    
     /**
      *      Get reference prefix.
      *      @return the reference prefix.
      */
+    @Override    
     public ReferencePrefix getReferencePrefix() {
         return accessPath;
     }
     
-    /** calls the corresponding method of a visitor in order to
-     * perform some action/transformation on this element
-     * @param v the Visitor
-     */
+    
+    @Override
     public void visit(Visitor v) {
 	v.performActionOnNew(this);
     }
 
+
+    @Override
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
         p.printNew(this);
     }
 
+    
     public ReferencePrefix setReferencePrefix(ReferencePrefix r) {
 	return this;
     }

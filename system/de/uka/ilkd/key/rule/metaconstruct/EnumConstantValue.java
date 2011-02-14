@@ -12,7 +12,6 @@ package de.uka.ilkd.key.rule.metaconstruct;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.declaration.EnumClassDeclaration;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
-import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
@@ -29,7 +28,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * 
  * @author mulbrich
  */
-public class EnumConstantValue extends AbstractMetaOperator {
+public final class EnumConstantValue extends AbstractMetaOperator {
 
     public EnumConstantValue() {
         super(new Name("#enumconstantvalue"), 1);
@@ -55,7 +54,7 @@ public class EnumConstantValue extends AbstractMetaOperator {
             ProgramVariable pv = (ProgramVariable) op;
             String varname = pv.getProgramElementName().getProgramName();
 
-            if (varname.endsWith(ImplicitFieldAdder.IMPLICIT_NEXT_TO_CREATE)) {
+            if (false){//varname.endsWith(ImplicitFieldAdder.IMPLICIT_NEXT_TO_CREATE)) {//TODO
                 // <nextToCreate>
                 if (pv.getContainerType().getJavaType() instanceof EnumClassDeclaration) {
                     EnumClassDeclaration ecd = (EnumClassDeclaration) pv

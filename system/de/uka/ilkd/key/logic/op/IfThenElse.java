@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -9,99 +9,87 @@
 
 package de.uka.ilkd.key.logic.op;
 
-import java.util.Iterator;
-
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 
 /**
- * This implements a general conditional operator <tt>if (phi) (t1) (t2)</tt>
+ * This implements a general conditional operator 
+ * <tt>\if (phi) \then (t1) \else (t2)</tt>.
  */
-public class IfThenElse extends Op {
+public final class IfThenElse extends AbstractOperator {
     
-    /**
-     * creates the default if-else operator
-     */
-    IfThenElse () {
-        super ( new Name ( "if-then-else" ) );
-    }
-
-    /**
-     * creates an if-else operator of the given name
-     */
-    IfThenElse (Name name) {
-        super ( name );
-    }
-
-    public boolean validTopLevel (Term term) {
-        final Sort s0 = term.sub ( 0 ).sort ();
-        final Sort s1 = term.sub ( 1 ).sort ();
-        final Sort s2 = term.sub ( 2 ).sort ();
+    public static final IfThenElse IF_THEN_ELSE = new IfThenElse();
+    
         
-        // TODO: like in <code>ConjCond</code>, but this is really bad!!! /PR
-        return term.arity () == arity ()
-               && s0 == Sort.FORMULA
-               && ( s1 == Sort.FORMULA ) == ( s2 == Sort.FORMULA );
+    private IfThenElse () {
+	super(new Name("if-then-else"), 3, true);
     }
+    
+    
+    private Sort getCommonSuperSort(Sort s1, Sort s2) {
+        if(s1 == Sort.FORMULA) {
+            assert s2 == Sort.FORMULA;
+            return Sort.FORMULA;
+        } else if(s1.extendsTrans(s2)) {
+            return s2;
+        } else if(s2.extendsTrans(s1)) {
+            return s1;
+        } else if(s1 instanceof NullSort || s2 instanceof NullSort) {
+            return Sort.ANY;
+        } else {
+            Sort result = Sort.ANY;
+            final ImmutableSet<Sort> set1 = s1.extendsSorts();
+            final ImmutableSet<Sort> set2 = s2.extendsSorts();
+            assert set1 != null : "null for sort: " + s1;
+            assert set2 != null : "null for sort: " + s2;
+            
+            for(final Sort sort1 : set1) {
+                if(set2.contains(sort1)) {
+                    if(result == Sort.ANY) {
+                        result = sort1;
+                    } else {
+                        // not uniquely determinable
+                        return Sort.ANY;
+                    }
+                } 
+            }
+            
+            return result;
+        }
+    }        
 
-    public Sort sort (Term[] term) {
-        final Sort s2 = term[1].sort ();
-        final Sort s3 = term[2].sort ();
-        if (s2 instanceof ProgramSVSort
-             || s2 == AbstractMetaOperator.METASORT )
-            { return s3; }
-        if (s3 instanceof ProgramSVSort
-             || s3 == AbstractMetaOperator.METASORT ) {
+    
+    @Override
+    public Sort sort(ImmutableArray<Term> terms) {
+        final Sort s2 = terms.get(1).sort();
+        final Sort s3 = terms.get(2).sort();
+        if(s2 instanceof ProgramSVSort
+             || s2 == AbstractMetaOperator.METASORT ) { 
+            return s3; 
+        } else if(s3 instanceof ProgramSVSort
+        	  || s3 == AbstractMetaOperator.METASORT ) {
             return s2;
         } else {           
-            // still a mess but a better one
             return getCommonSuperSort(s2, s3);
         }
     }
     
-    private Sort getCommonSuperSort(Sort s1, Sort s2) {
-        if (s1 == Sort.FORMULA) {
-            assert s2 == Sort.FORMULA;
-            return Sort.FORMULA;
-        }
-               
-        if (s1.extendsTrans(s2)) return s2;
-        else if (s2.extendsTrans(s1)) return s1;
-        
-        Sort result = Sort.ANY;
-        final ImmutableSet<Sort> set1 = s1.extendsSorts();
-        final ImmutableSet<Sort> set2 = s2.extendsSorts();
 
-        for (final Sort sort1 : set1) {
-            if (set2.contains(sort1)) {
-                if (result == Sort.ANY) {
-                    result = sort1;
-                } else if(sort1.extendsTrans(result)){
-                    result = sort1;
-                }
-            }
-        }        
-        return result;
+    @Override
+    protected boolean additionalValidTopLevel(Term term) {
+        final Sort s0 = term.sub(0).sort();
+        final Sort s1 = term.sub(1).sort();
+        final Sort s2 = term.sub(2).sort();
+        
+        return s0 == Sort.FORMULA
+               && (s1 == Sort.FORMULA) == (s2 == Sort.FORMULA)
+               && s1 != Sort.UPDATE 
+               && s2 != Sort.UPDATE;
     }
-    
-    private ImmutableSet<Sort> transExtSorts(Sort sort){
-        ImmutableSet<Sort> ext = sort.extendsSorts();
-        ImmutableSet<Sort> oldExt;
-        do{
-            oldExt = ext;
-            Sort[] ea = ext.toArray(new Sort[ext.size()]);
-            for(Sort s:ea){
-                ext = ext.union(s.extendsSorts());
-            }
-        }while(!oldExt.equals(ext));
-        return ext;
-    }
-    
-    public int arity () {
-        return 3;
-    }   
 }

@@ -34,5 +34,4 @@ public class OpCollector extends Visitor{
     public boolean contains(Operator op) {
 	return ops.contains(op);
     }
-
 }

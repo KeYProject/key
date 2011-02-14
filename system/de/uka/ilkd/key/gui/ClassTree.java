@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -13,44 +13,40 @@ package de.uka.ilkd.key.gui;
 import java.awt.Component;
 import java.util.*;
 
+import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JTree;
 import javax.swing.tree.*;
 
-import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
-import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
+import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.util.Pair;
 
 
-public class ClassTree extends JTree {
+class ClassTree extends JTree {
     
-    private static final String INIT_NAME 
-        =  ConstructorNormalformBuilder.CONSTRUCTOR_NORMALFORM_IDENTIFIER;
+    private final Map<Pair<KeYJavaType,ObserverFunction>,Icon> targetIcons;
     
     
     //-------------------------------------------------------------------------
     //constructors
     //-------------------------------------------------------------------------    
 
-    public ClassTree(boolean addOperations, 
+    public ClassTree(boolean addContractTargets, 
 	             boolean skipLibraryClasses,
-	    	     KeYJavaType defaultClass,
-	    	     ProgramMethod defaultPm,
-	    	     Services services) {
-	super(new DefaultTreeModel(createTree(addOperations, 
+	    	     Services services,
+	    	     Map<Pair<KeYJavaType,ObserverFunction>,Icon> targetIcons) {
+	super(new DefaultTreeModel(createTree(addContractTargets, 
 					      skipLibraryClasses, 
 					      services)));
-	if(defaultPm != null) {
-	    defaultClass = defaultPm.getContainerType();
-	}
-	if(defaultClass != null) {
-	    open(defaultClass, defaultPm);
-	}
+	this.targetIcons = targetIcons;
 	getSelectionModel().setSelectionMode(
 				TreeSelectionModel.SINGLE_TREE_SELECTION);
 	setCellRenderer(new DefaultTreeCellRenderer() {
@@ -65,14 +61,14 @@ public class ClassTree extends JTree {
 		Entry entry = (Entry) node.getUserObject();
 		
 		Component result;
-		if(entry.kjt != null) {
-		    result =  super.getTreeCellRendererComponent(tree, 
-			    				      	 value, 
-			    				      	 sel, 
-			    				      	 expanded, 
-			    				      	 true, 
-			    				      	 row, 
-			    				      	 hasFocus);
+		if(entry.target == null) {
+		    result = super.getTreeCellRendererComponent(tree, 
+			    				      	value, 
+			    				      	sel, 
+			    				      	expanded, 
+			    				      	true, 
+			    				      	row, 
+			    				      	hasFocus);
 		} else {
 		    result = super.getTreeCellRendererComponent(tree, 
 							     	value, 
@@ -82,14 +78,28 @@ public class ClassTree extends JTree {
 							     	row, 
 							     	hasFocus);
 		    
-		    if(entry.pm != null && result instanceof JLabel) {
-			((JLabel) result).setIcon(null);
+		    if(result instanceof JLabel) {
+			((JLabel) result).setIcon(
+				ClassTree.this.targetIcons.get(
+		          new Pair<KeYJavaType,ObserverFunction>(
+		        	  			entry.kjt, 
+		        	                        entry.target)));
 		    }
 		}
 		
 		return result;
 	    }
 	});
+    }
+    
+    
+    public ClassTree(boolean addContractTargets, 
+	             boolean skipLibraryClasses,
+	    	     Services services) {
+	this(addContractTargets, 
+	     skipLibraryClasses, 
+	     services, 
+	     new HashMap<Pair<KeYJavaType,ObserverFunction>,Icon>());
     }
     
     
@@ -115,16 +125,16 @@ public class ClassTree extends JTree {
     }
     
     
-    private static DefaultMutableTreeNode getChildByProgramMethod(
+    private static DefaultMutableTreeNode getChildByTarget(
 	    				     DefaultMutableTreeNode parentNode,
-	    				     ProgramMethod pm) {
+	    				     ObserverFunction target) {
         int numChildren = parentNode.getChildCount();
         for(int i = 0; i < numChildren; i++) {
             DefaultMutableTreeNode childNode 
                     = (DefaultMutableTreeNode)(parentNode.getChildAt(i));
           
             Entry te = (Entry)(childNode.getUserObject());
-            if(pm.equals(te.pm)) {
+            if(target.equals(te.target)) {
                 return childNode;
             }
         }
@@ -134,7 +144,7 @@ public class ClassTree extends JTree {
     
     private static void insertIntoTree(DefaultMutableTreeNode rootNode, 
 	    			       KeYJavaType kjt,
-	    			       boolean addOperations,
+	    			       boolean addContractTargets,
 	    			       Services services) {	
         String fullClassName = kjt.getFullName();
         int length = fullClassName.length();
@@ -164,39 +174,72 @@ public class ClassTree extends JTree {
         //save kjt in leaf
         ((Entry) node.getUserObject()).kjt = kjt;
         
-        //add all operations of kjt
-        if(addOperations) {
-            ImmutableList<ProgramMethod> pms 
-            	= services.getJavaInfo()
-                          .getAllProgramMethodsLocallyDeclared(kjt);
-            for (ProgramMethod pm : pms) {
-                if ((!pm.isImplicit() || pm.getName().equals(INIT_NAME))
-                        && pm.getMethodDeclaration().getBody() != null) {
-                    StringBuffer sb = new StringBuffer(pm.getName());
-                    sb.append("(");
-                    for (int i = 0, n = pm.getParameterDeclarationCount();
-                         i < n; i++) {
-                        sb.append(pm.getParameterDeclarationAt(i)).append(", ");
-                    }
-                    if (pm.getParameterDeclarationCount() > 0) {
-                        sb.setLength(sb.length() - 2);
-                    }
-                    sb.append(")");
-                    Entry te = new Entry(sb.toString());
-                    DefaultMutableTreeNode childNode
-                            = new DefaultMutableTreeNode(te);
-                    te.pm = pm;
-                    node.add(childNode);
-                }
+        //add all contract targets of kjt
+        if(addContractTargets) {
+            final ImmutableSet<ObserverFunction> targets
+            	= services.getSpecificationRepository().getContractTargets(kjt);
+            
+            //sort targets alphabetically
+            final ObserverFunction[] targetsArr
+            	= targets.toArray(new ObserverFunction[targets.size()]);            
+            Arrays.sort(targetsArr, new Comparator<ObserverFunction>() {
+        	public int compare(ObserverFunction o1, ObserverFunction o2) {
+        	    if(o1 instanceof ProgramMethod 
+        	       && !(o2 instanceof ProgramMethod)) {
+        		return -1;
+        	    } else if(!(o1 instanceof ProgramMethod) 
+        		      && o2 instanceof ProgramMethod) {
+        		return 1;
+        	    } else {
+        		String s1 = o1.name() instanceof ProgramElementName 
+        		            ? ((ProgramElementName)o1.name()).getProgramName()
+        		            : o1.name().toString();
+        		String s2 = o2.name() instanceof ProgramElementName 
+        		            ? ((ProgramElementName)o2.name()).getProgramName()
+        		            : o2.name().toString();
+        		return s1.compareTo(s2);
+        	    }
+        	}
+            });
+            
+            for(ObserverFunction target : targetsArr) {
+        	StringBuffer sb = new StringBuffer();
+        	String prettyName = services.getTypeConverter()
+        	                            .getHeapLDT()
+        	                            .getPrettyFieldName(target);
+        	if(prettyName != null) {
+        	    sb.append(prettyName);
+        	} else if(target.name() instanceof ProgramElementName) {
+        	    sb.append(((ProgramElementName)target.name()).getProgramName());
+        	} else {
+        	    sb.append(target.name());
+        	}
+        	if(target.getNumParams() > 0 || target instanceof ProgramMethod) {
+        	    sb.append("(");
+        	}
+        	for(KeYJavaType paramType : target.getParamTypes()) {
+        	    sb.append(paramType.getSort().name() + ", ");
+        	}
+        	if(target.getNumParams() > 0) {
+        	    sb.setLength(sb.length() - 2);
+        	}
+        	if(target.getNumParams() > 0 || target instanceof ProgramMethod) {
+        	    sb.append(")");
+        	}
+        	Entry te = new Entry(sb.toString());
+        	DefaultMutableTreeNode childNode 
+        		= new DefaultMutableTreeNode(te);
+        	te.kjt = kjt;
+        	te.target = target;
+        	node.add(childNode);
             }
         }
     }
 
     
-    private static DefaultMutableTreeNode createTree(boolean addOperations,
+    private static DefaultMutableTreeNode createTree(boolean addContractTargets,
 	    					     boolean skipLibraryClasses,
 	    					     Services services) {
-
 	//get all classes
 	final Set<KeYJavaType> kjts 
 		= services.getJavaInfo().getAllKeYJavaTypes();
@@ -223,15 +266,15 @@ public class ClassTree extends JTree {
         //build tree
         DefaultMutableTreeNode rootNode 
         	= new DefaultMutableTreeNode(new Entry(""));
-        for (KeYJavaType aKjtsarr : kjtsarr) {
-            insertIntoTree(rootNode, aKjtsarr, addOperations, services);
+        for(int i = 0; i < kjtsarr.length; i++) {
+            insertIntoTree(rootNode, kjtsarr[i], addContractTargets, services);
         }
         
         return rootNode;
     }
     
     
-    private void open(KeYJavaType kjt, ProgramMethod pm) {
+    private void open(KeYJavaType kjt, ObserverFunction target) {
         //get tree path to class
         Vector<DefaultMutableTreeNode> pathVector 
         	= new Vector<DefaultMutableTreeNode>();
@@ -262,9 +305,8 @@ public class ClassTree extends JTree {
         TreePath path = incompletePath.pathByAddingChild(node);
         
         //extend tree path to method
-        if(pm != null) {
-            DefaultMutableTreeNode methodNode 
-        	= getChildByProgramMethod(node, pm);
+        if(target != null) {
+            DefaultMutableTreeNode methodNode = getChildByTarget(node, target);
             if(methodNode != null) {
         	incompletePath = path;            
         	path = path.pathByAddingChild(methodNode);
@@ -281,6 +323,16 @@ public class ClassTree extends JTree {
     //-------------------------------------------------------------------------
     //public interface
     //-------------------------------------------------------------------------
+    
+    public void select(KeYJavaType kjt) {
+	open(kjt, null);
+    }
+    
+    
+    public void select(KeYJavaType kjt, ObserverFunction target) {
+	open(kjt, target);
+    }
+    
     
     public DefaultMutableTreeNode getRootNode() {
 	return (DefaultMutableTreeNode) getModel().getRoot();
@@ -306,10 +358,10 @@ public class ClassTree extends JTree {
     //inner classes
     //-------------------------------------------------------------------------    
     
-    public static class Entry {
+    static class Entry {
         public final String string;
         public KeYJavaType kjt = null;
-        public ProgramMethod pm = null;
+        public ObserverFunction target = null;
         public int numMembers = 0;
         public int numSelectedMembers = 0;      
         

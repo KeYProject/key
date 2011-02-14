@@ -11,10 +11,10 @@
 
 package de.uka.ilkd.key.strategy.termProjection;
 
-import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -33,6 +33,7 @@ public class TermConstructionProjection implements ProjectionToTerm {
     
 
     private TermConstructionProjection(Operator op, ProjectionToTerm[] subTerms) {
+	assert !(op instanceof Modality); //XXX
         this.op = op;
         this.subTerms = subTerms;
         assert op.arity () == subTerms.length;
@@ -49,7 +50,7 @@ public class TermConstructionProjection implements ProjectionToTerm {
             subs[i] = subTerms[i].toTerm ( app, pos, goal );           
         }
         return TermFactory.DEFAULT.createTerm ( op, subs, null,
-                                                JavaBlock.EMPTY_JAVABLOCK );
+                                                null );
     }
     
 }

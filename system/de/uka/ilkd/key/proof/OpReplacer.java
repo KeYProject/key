@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -10,13 +10,14 @@
 
 package de.uka.ilkd.key.proof;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
-import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.collection.*;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.speclang.FormulaWithAxioms;
 
 
 /**
@@ -40,6 +41,33 @@ public class OpReplacer {
     }
     
     
+    public static Term replace(Term toReplace, Term with, Term in) {
+	Map<Term,Term> map = new HashMap<Term,Term>();
+	map.put(toReplace, with);
+	OpReplacer or = new OpReplacer(map);
+	return or.replace(in);
+    }
+    
+    
+    public static ImmutableList<Term> replace(Term toReplace, 
+	                                      Term with, 
+	                                      ImmutableList<Term> in) {
+	Map<Term,Term> map = new HashMap<Term,Term>();
+	map.put(toReplace, with);
+	OpReplacer or = new OpReplacer(map);
+	return or.replace(in);
+    }    
+    
+    
+    
+    public static Term replace(Operator toReplace, Operator with, Term in) {
+	Map<Operator,Operator> map = new HashMap<Operator,Operator>();
+	map.put(toReplace, with);
+	OpReplacer or = new OpReplacer(map);
+	return or.replace(in);
+    }    
+    
+    
     /**
      * Replaces in an operator.
      */
@@ -61,42 +89,56 @@ public class OpReplacer {
             return null;
         }
         
-        Term newTerm = (Term) map.get(term); 
+        final Term newTerm = (Term) map.get(term); 
         if(newTerm != null) {
             return newTerm;
         }
 
-        Operator newOp = replace(term.op());
+        final Operator newOp = replace(term.op());
         
-        int arity = term.arity();
-        Term newSubTerms[] = new Term[arity];
-        ImmutableArray<QuantifiableVariable>[] boundVars =
-                new ImmutableArray[arity];
-    
+        final int arity = term.arity();
+        final Term newSubTerms[] = new Term[arity];    
         boolean changedSubTerm = false;
         for(int i = 0; i < arity; i++) {
             Term subTerm = term.sub(i);
             newSubTerms[i] = replace(subTerm);
-            
-            // Is it guaranteed that no variables are renamed in the replaced term?
-            boundVars[i] = term.varsBoundHere(i);
     
             if(newSubTerms[i] != subTerm) {
                 changedSubTerm = true;
             }
         }
-    
-        Term result = term;
         
-        if(newOp != term.op() || changedSubTerm) {
+        final ImmutableArray<QuantifiableVariable> newBoundVars 
+        	= replace(term.boundVars());
+    
+        final Term result;
+        if(newOp != term.op()  
+           || changedSubTerm
+           || newBoundVars != term.boundVars()) {
             result = TF.createTerm(newOp,
                                    newSubTerms,
-                                   boundVars,
+                                   newBoundVars,
                                    term.javaBlock());
+        } else {
+            result = term;
         }
     
         return result;
     }  
+    
+    
+    
+    /**
+     * Replaces in a list of terms.
+     */
+    public ImmutableList<Term> replace(ImmutableList<Term> terms) {
+        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+        for(final Term term : terms) {
+            result = result.append(replace(term));
+        }
+        return result;
+    }    
+    
     
     /**
      * Replaces in a set of terms.
@@ -108,47 +150,7 @@ public class OpReplacer {
         }
         return result;
     }
-    
-    /**
-     * Replaces in a list of terms.
-     */
-    public ImmutableList<Term> replace(ImmutableList<Term> terms) {
-        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
-        for (final Term term : terms) {
-            result = result.append(replace(term));
-        }
-        return result;
-    }
 
-    /**
-     * Replaces in a location descriptor.
-     */
-    public LocationDescriptor replace(LocationDescriptor loc) {
-        if(loc == null) {
-            return null;
-        } else if(loc instanceof BasicLocationDescriptor) {
-            BasicLocationDescriptor bloc = (BasicLocationDescriptor) loc;
-            return new BasicLocationDescriptor(replace(bloc.getFormula()), 
-                                               replace(bloc.getLocTerm()));
-        } else {
-            assert loc instanceof EverythingLocationDescriptor;
-            return loc;
-        }
-    }
-    
-    
-    /**
-     * Replaces in a set of location descriptors.
-     */
-    public ImmutableSet<LocationDescriptor> replaceLoc(ImmutableSet<LocationDescriptor> locs) {
-	ImmutableSet<LocationDescriptor> result 
-		= DefaultImmutableSet.<LocationDescriptor>nil();
-	for (final LocationDescriptor loc : locs) {
-	    result = result.add(replace(loc));
-	}
-	return result;
-    }
-    
     
     /**
      * Replaces in a map from Operator to Term.
@@ -156,9 +158,10 @@ public class OpReplacer {
     public Map<Operator, Term> replace(/*in*/ Map<Operator, Term> map) {
         
         Map<Operator,Term> result = new HashMap<Operator, Term>();
-
-        for (Object o : map.entrySet()) {
-            final Map.Entry<Operator, Term> entry = (Map.Entry<Operator, Term>) o;
+        
+        final Iterator<Map.Entry<Operator, Term>> it = map.entrySet().iterator();
+        while(it.hasNext()) {
+            final Map.Entry<Operator, Term> entry = it.next();
             result.put(replace(entry.getKey()), replace(entry.getValue()));
         }        
         return result;
@@ -166,10 +169,20 @@ public class OpReplacer {
     
    
     /**
-     * Replaces in a FormulaWithAxioms.
+     * Replaces in an ImmutableArray<QuantifiableVariable>.
      */
-    public FormulaWithAxioms replace(FormulaWithAxioms fwa) {
-        return new FormulaWithAxioms(replace(fwa.getFormula()), 
-                                     replace(fwa.getAxioms()));
+    public ImmutableArray<QuantifiableVariable> replace(
+	    			ImmutableArray<QuantifiableVariable> vars) {
+	QuantifiableVariable[] result = new QuantifiableVariable[vars.size()];
+	boolean changed = false;
+	for(int i = 0, n = vars.size(); i < n; i++) {
+	    QuantifiableVariable qv = vars.get(i);
+	    QuantifiableVariable newQv = (QuantifiableVariable)replace(qv);
+	    result[i++] = newQv;
+	    if(newQv != qv) {
+		changed = true;
+	    }
+	}
+	return changed ? new ImmutableArray<QuantifiableVariable>(result) : vars;
     }
 }

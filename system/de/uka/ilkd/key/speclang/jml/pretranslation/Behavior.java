@@ -14,7 +14,7 @@ package de.uka.ilkd.key.speclang.jml.pretranslation;
 /**
  * Enum type for the JML behavior kinds.
  */
-public class Behavior {
+public final class Behavior {
     
     public static final Behavior NONE 
         = new Behavior("");
@@ -34,6 +34,7 @@ public class Behavior {
     }
     
     
+    @Override
     public String toString() {
         return name;
     }

@@ -32,13 +32,12 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.configuration.StrategySettings;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
+import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.proofevent.NodeReplacement;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
-import de.uka.ilkd.key.proof.reuse.ReusePoint;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.strategy.VBTStrategy;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -70,12 +69,8 @@ public class ApplyStrategy {
     
     private List<ProverTaskListener> proverTaskObservers = new ArrayList<ProverTaskListener> ();
 
-    private ReusePoint reusePoint;
-
     /** time in ms after which rule application shall be aborted, -1 disables timeout */
     private long timeout = -1;
-    
-    private String usedCoalChooserOptionsKey="";
 
     
     // Please create this object beforehand and re-use it.
@@ -95,56 +90,46 @@ public class ApplyStrategy {
         // Look for the strategy ...
         RuleApp               app = null;
         Goal                  g;
-        ReuseListener rl = mediator().getReuseListener();
+        while ( ( g = goalChooser.getNextGoal () ) != null ) {                
+            app = g.getRuleAppManager().next();
+            //Hack: built in rules may become applicable without BuiltInRuleAppIndex noticing---->
+            if(app == null) {
+        	g.ruleAppIndex().scanBuiltInRules(g, Constraint.BOTTOM);
+        	app = g.getRuleAppManager().next();
+            }
+            //<-------
 
-        if (reusePoint != null) {
-            g = reusePoint.target();
-            app = reusePoint.getReuseApp();
-            g.node().setReuseSource(reusePoint);
-            rl.removeRPConsumedMarker(reusePoint.source());
-            rl.removeRPConsumedGoal(g);
-            proof.getServices().getNameRecorder().setProposals(
-                    reusePoint.getNameProposals());
-            ImmutableList<Goal> goalList = g.apply(app);
-            rl.addRPOldMarkersNewGoals(goalList);
-            rl.addRPNewMarkersAllGoals(reusePoint.source());
-        } else {
-            while ( ( g = goalChooser.getNextGoal () ) != null ) {
-                
-                app = g.getRuleAppManager().next();
-
-                if (app == null) {
-                    if (medi.getProof().getSettings().getStrategySettings()
-                            .getActiveStrategyProperties().getProperty(
+            if (app == null) {
+        	if (medi.getProof().getSettings().getStrategySettings()
+                                   .getActiveStrategyProperties().getProperty(
                                     StrategyProperties.STOPMODE_OPTIONS_KEY)
                             .equals(StrategyProperties.STOPMODE_NONCLOSE)) {
-                        // iff Stop on non-closeable Goal is selected a little
-                        // popup is generated and proof is stopped
-                        JOptionPane pane = new JOptionPane(
-                                "Couldn't close Goal Nr. "
-                                        + g.node().serialNr()
-                                        + " automatically",
-                                JOptionPane.INFORMATION_MESSAGE,
-                                JOptionPane.DEFAULT_OPTION);
-                        JDialog dialog = pane.createDialog(medi.mainFrame(),
-                                "The KeY Project");
-                        dialog.setVisible(true);
-			medi.goalChosen(g);
-			return false;
-                    }
-                    goalChooser.removeGoal(g);
-                }else
-                    break;
+                    // iff Stop on non-closeable Goal is selected a little
+                    // popup is generated and proof is stopped
+                    JOptionPane pane = new JOptionPane(
+                            "Couldn't close Goal Nr. "
+                                    + g.node().serialNr()
+                                    + " automatically",
+                            JOptionPane.INFORMATION_MESSAGE,
+                            JOptionPane.DEFAULT_OPTION);
+                    JDialog dialog = pane.createDialog(medi.mainFrame(),
+                            "The KeY Project");
+                    dialog.setVisible(true);
+                    medi.goalChosen(g);
+                    return false;
+        	}
+        	goalChooser.removeGoal(g);
+            } else {
+        	break;
             }
-            if (app == null) return false;      
-            rl.removeRPConsumedGoal(g);                
-            rl.addRPOldMarkersNewGoals(g.apply(app));
         }
-
-        if (rl.reusePossible()) reusePoint = rl.getBestReusePoint();
-        else reusePoint = null;
-
-        return true;
+        if (app == null) {
+            return false;      
+        } else {
+            assert g != null;
+            g.apply(app);
+            return true;
+        }
     }
 
 
@@ -220,18 +205,8 @@ public class ApplyStrategy {
         this.timeout = timeout;
         countApplied = 0; 
         StrategySettings sSettings =medi.getProof().getSettings().getStrategySettings();
-        if(!(sSettings.getStrategy().toString().equals(VBTStrategy.VBTStrategy))){
-            if(usedCoalChooserOptionsKey.compareTo(sSettings.getActiveStrategyProperties().getProperty(StrategyProperties.GOALCHOOSER_OPTIONS_KEY))!=0){
-            	usedCoalChooserOptionsKey = sSettings.getActiveStrategyProperties().getProperty(StrategyProperties.GOALCHOOSER_OPTIONS_KEY);
-            	if(usedCoalChooserOptionsKey.equals(StrategyProperties.GOALCHOOSER_DEFAULT)){
-            		medi.getProfile().setSelectedGoalChooserBuilder(DefaultGoalChooserBuilder.NAME);
-            	}else if(usedCoalChooserOptionsKey.equals(StrategyProperties.GOALCHOOSER_DEPTH)){
-            		medi.getProfile().setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);
-            	}
-            }
-    	}else if(sSettings.getStrategy().toString().equals(VBTStrategy.VBTStrategy)){
-    	    medi.getProfile().setSelectedGoalChooserBuilder(VBTStrategy.preferedGoalChooser);
-    	}
+       	medi.getProfile().setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);//XXX
+
 	this.goalChooser = medi.getProfile().getSelectedGoalChooserBuilder().create();//Use this independently of StrategyProperties.GOALCHOOSER_OPTIONS_KEY
 
         goalChooser.init ( proof, goals );
@@ -316,6 +291,13 @@ public class ApplyStrategy {
 			}
 		    }else{
 			mediator().startInterface(true);
+			Goal g = goalChooser.getNextGoal();
+			if(g == null) {
+			    g = proof.openGoals().head();
+			}
+			if(g != null) {
+			    mediator().goalChosen(g);
+			}
 		    }
 		}
             }

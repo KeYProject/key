@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -10,315 +10,295 @@
 
 package de.uka.ilkd.key.speclang.dl.translation;
 
-import java.util.*;
-
-import de.uka.ilkd.key.java.*;
-
-import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.modifier.Private;
 import de.uka.ilkd.key.java.statement.CatchAllStatement;
-import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.OpCollector;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.speclang.*;
 
 
 /**
- * A factory for creating class invariants and operation contracts
- * from DL specifications.
+ * A factory for creating class invariants and operation contracts from DL
+ * specifications.
  */
-public class DLSpecFactory {
-    
-    private static final TermBuilder TB = TermBuilder.DF;
-    private static final SignatureVariablesFactory SVF 
-    	= SignatureVariablesFactory.INSTANCE;
-    private final Services services;
-    
+public final class DLSpecFactory {
 
-  
+    private static final TermBuilder TB = TermBuilder.DF;
+    private final Services services;
+        
+
     //-------------------------------------------------------------------------
     //constructors
     //-------------------------------------------------------------------------
-    
-    public DLSpecFactory(Services services) {
-        assert services != null;
-        this.services = services;
-    }
-    
 
+    public DLSpecFactory(Services services) {
+	assert services != null;
+	this.services = services;
+    }
+
+    
     
     //-------------------------------------------------------------------------
     //internal methods
     //-------------------------------------------------------------------------
     
-    private MethodBodyStatement extractMBS(Term fma) {
-        SourceElement se = fma.sub(1).javaBlock().program().getFirstElement();
-        if(se instanceof CatchAllStatement) {
-            CatchAllStatement cas = (CatchAllStatement) se;
-            SourceElement body = cas.getBody().getFirstElement();
-            return (MethodBodyStatement) body;
-        } else {
-            return (MethodBodyStatement) se;
-        }
+    private Term extractPre(Term fma) throws ProofInputException {
+	if(!fma.op().equals(Junctor.IMP)) {
+	    throw new ProofInputException("Implication expected");
+	} else {
+	    return fma.sub(0);
+	}
     }
     
     
-    private ProgramMethod extractProgramMethod(MethodBodyStatement mbs) {
-        return mbs.getProgramMethod(services);
+    private ProgramVariable extractHeapAtPre(Term fma) 
+    		throws ProofInputException {
+	if(fma.sub(1).op() instanceof UpdateApplication) {
+	    final Term update = fma.sub(1).sub(0);
+	    assert update.sort() == Sort.UPDATE;
+	    if(!(update.op() instanceof ElementaryUpdate)) {
+		throw new ProofInputException("Elementary update expected, "
+					      + "but found: " + update);
+	    }
+	    final ElementaryUpdate eu = (ElementaryUpdate) update.op();
+	    if(!(eu.lhs() instanceof ProgramVariable)) {
+		throw new ProofInputException("Program variable expected, "
+				              + "but found: " + eu.lhs());
+	    } else if(!update.sub(0).equals(TB.heap(services))) {
+		throw new ProofInputException("heap expected, "
+					      + "but found: " + update.sub(0));
+	    } else {
+		return (ProgramVariable) eu.lhs();
+	    }
+	} else {
+	    return null;
+	}
     }
     
     
-    private Modality extractModality(Term fma) {
-        return (Modality) fma.sub(1).op();
+    private ProgramVariable extractExcVar(Term fma) {
+	final Term modFma = fma.sub(1).op() instanceof UpdateApplication
+	                    ? fma.sub(1).sub(1)
+	                    : fma.sub(1);	
+	
+	final SourceElement se = modFma.javaBlock().program().getFirstElement();
+	if(se instanceof CatchAllStatement) {
+	    final CatchAllStatement cas = (CatchAllStatement) se;
+	    return (ProgramVariable) cas.getParameterDeclaration()
+		                        .getVariableSpecification()
+		                        .getFirstElement();
+	} else {
+	    return null;
+	}
+    }
+
+    
+    private UseOperationContractRule.Instantiation extractInst(Term fma) 
+    		throws ProofInputException {
+	final UseOperationContractRule.Instantiation result 
+		= UseOperationContractRule.computeInstantiation(fma.sub(1), 
+								services);
+	if(result == null) {
+	    throw new ProofInputException("Contract formula of wrong shape: " 
+		    	                  + fma.sub(1));
+	}
+
+	return result;
+    }
+
+    
+    private ProgramMethod extractProgramMethod(
+	    			UseOperationContractRule.Instantiation inst) 
+    		throws ProofInputException {
+	return inst.pm;
+    }
+
+    
+    private Modality extractModality(
+	    			UseOperationContractRule.Instantiation inst) 
+    		throws ProofInputException {
+	return inst.mod;
     }
     
     
-    private ParsableVariable extractSelfVar(MethodBodyStatement mbs) {
-        return mbs.isStatic(services) 
-               ? null 
-               : (ProgramVariable) mbs.getDesignatedContext();
+    private ProgramVariable extractSelfVar(
+    				UseOperationContractRule.Instantiation inst) 
+    		throws ProofInputException {
+	if(inst.actualSelf == null) {
+	    assert inst.pm.isStatic();
+	    return null;
+	} else if(inst.actualSelf.op() instanceof ProgramVariable) {
+	    return (ProgramVariable) inst.actualSelf.op();
+	} else {
+	    throw new ProofInputException("Program variable expected, "
+		    			  + "but found: " + inst.actualSelf);
+	}
     }
     
+
+    private ImmutableList<ProgramVariable> extractParamVars(
+	    			UseOperationContractRule.Instantiation inst) 
+	    	throws ProofInputException {
+	ImmutableList<ProgramVariable> result 
+		= ImmutableSLList.<ProgramVariable> nil();	
+	for(Term param : inst.actualParams) {
+	    if(param.op() instanceof ProgramVariable) {
+		result = result.append((ProgramVariable) param.op());
+	    } else {
+		throw new ProofInputException("Program variable expected, "
+					      + "but found: " + param);
+	    }
+	}
+	return result;
+    }
+
     
-    private ImmutableList<ParsableVariable> extractParamVars(MethodBodyStatement mbs) {
-        ImmutableArray<Expression> args = mbs.getArguments();
-        
-        ImmutableList<ParsableVariable> result = ImmutableSLList.<ParsableVariable>nil();
-        for(int i = args.size() - 1; i >= 0; i--) {
-            result = result.prepend((ProgramVariable) args.get(i));
-        }
-        
-        return result;
+    private ProgramVariable extractResultVar(
+	    			UseOperationContractRule.Instantiation inst) 
+	    	throws ProofInputException {
+	if(inst.actualResult == null) {
+	    return null;
+	} else if(inst.actualResult instanceof ProgramVariable) {
+	    return (ProgramVariable) inst.actualResult;
+	} else {
+	    throw new ProofInputException("Program variable expected, "
+		   		          + "but found: " + inst.actualResult);
+	}
     }
     
-    
-    private ParsableVariable extractResultVar(MethodBodyStatement mbs) {
-        return (ProgramVariable) mbs.getResultVariable();
-    }
-    
-    
-    private ParsableVariable extractExcVar(Term fma) {
-        SourceElement se = fma.sub(1).javaBlock().program().getFirstElement();
-        if(se instanceof CatchAllStatement) {
-            CatchAllStatement cas = (CatchAllStatement) se;
-            return (ProgramVariable) cas.getParameterDeclaration()
-                                        .getVariableSpecification()
-                                        .getFirstElement();
-        } else {
-            return null;
-        }
-    }
-    
-    
-    private FormulaWithAxioms extractPre(Term fma) {
-        return new FormulaWithAxioms(fma.sub(0));
-    }
-    
-    
-    private FormulaWithAxioms extractPost(Term fma) {
-        return new FormulaWithAxioms(fma.sub(1).sub(0));
-    }
-    
-    
-    private Map<Operator, Function>
-        extractAtPreFunctions(Term term) {
-        Map<Operator, Function> result = new LinkedHashMap<Operator, Function>();
-        
-        //is the operator of the passed term an atPre function?
-        Operator op = term.op();
-        String nameString = op.name().toString();
-        if(nameString.endsWith("@pre")) {
-            assert op instanceof Function;
-            
-            //retrieve operator corresponding to the atPre function
-            Operator normalOp;
-            if(op.arity() == 2
-               && ((Function)op).argSort(0) instanceof ArraySort) {
-        	normalOp = ArrayOp.getArrayOp(((Function)op).argSort(0));
-            } else {
-                final Name normalName 
-                   = new Name(nameString.substring(0, nameString.length() - 4));        	
-        	normalOp = (Operator) services.getNamespaces()
-                                              .lookup(normalName);
-        	if(normalOp == null) {
-        	    ProgramVariable attrPV 
-        	    	= services.getJavaInfo()
-        	    	          .getAttribute(normalName.toString());
-        	    assert attrPV != null;
-        	    normalOp = AttributeOp.getAttributeOp(attrPV);
-        	}
-            }
-            assert normalOp != null;
-            
-            //add pair to map
-            result.put(normalOp, (Function)op);
-        }
-        
-        //recurse to subterms
-        for(int i = 0; i < term.arity(); i++) {
-            Map<Operator, Function> map = extractAtPreFunctions(term.sub(i));
-            result.putAll(map);
-        }
-        
-        return result;
+
+    private Term extractPost(Term fma) {
+	final Term modFma = fma.sub(1).op() instanceof UpdateApplication
+	                    ? fma.sub(1).sub(1)
+	                    : fma.sub(1);
+	return modFma.sub(0);
     }
     
     
     
+
     //-------------------------------------------------------------------------
     //public interface
     //-------------------------------------------------------------------------
-    
+
     /**
      * Creates a class invariant from a formula and a designated "self".
      */
-    public ClassInvariant createDLClassInvariant(String name, 
-                                                 String displayName,
-                                                 ParsableVariable selfVar,
-                                                 Term inv) 
-            throws ProofInputException {
-        assert name != null;
-        if(displayName == null) {
-            displayName = name;
-        }
-        assert selfVar != null;
-        assert inv != null;
-        
-        KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(selfVar.sort());
-        assert kjt != null;
-        
-        return new ClassInvariantImpl(name, 
-                                      displayName, 
-                                      kjt, 
-                                      new FormulaWithAxioms(inv), 
-                                      selfVar);
+    public ClassInvariant createDLClassInvariant(String name,
+	    					 String displayName, 
+	    					 ParsableVariable selfVar, 
+	    					 Term inv)
+	    throws ProofInputException {
+	assert name != null;
+	if(displayName == null) {
+	    displayName = name;
+	}
+	assert selfVar != null;
+	assert inv != null;
+
+	final KeYJavaType kjt 
+		= services.getJavaInfo().getKeYJavaType(selfVar.sort());
+	assert kjt != null;
+
+	return new ClassInvariantImpl(name, 
+				      displayName, 
+				      kjt,
+				      new Private(),
+				      inv, 
+				      selfVar);
     }
-  
+
     
     /**
      * Creates an operation contract from an implication formula of the form
-     * <code>pre -> \<p\> post</code> and a modifies clause (which is how
-     * DL contracts are currently represented in .key files).
+     *  "pre -> {heapAtPre := heap}
+     *                [#catchAll(java.lang.Exception exc){m();}]post",
+     * (where the update and/or the #catchAll may be omitted) and a modifies 
+     * clause.
      */
-    public OperationContract createDLOperationContract(
-                                            String name, 
-                                            String displayName, 
-                                            Term fma, 
-                                            ImmutableSet<LocationDescriptor> modifies) 
-            throws ProofInputException {
-        assert name != null;
-        if(displayName == null) {
-            displayName = name;
-        }
-        assert fma != null;
-        assert modifies != null;
-       
-        //extract parts
-        MethodBodyStatement mbs          = extractMBS(fma);
-        if(mbs.getProgramMethod(services) == null) {
-            throw new ProofInputException("method \"" 
-        	                          + mbs.getMethodReference() 
-        	                          + "\" not found");
-        }
-        ProgramMethod pm                 = extractProgramMethod(mbs);
-        Modality modality                = extractModality(fma);
-        FormulaWithAxioms pre            = extractPre(fma);
-        FormulaWithAxioms post           = extractPost(fma);
-        ParsableVariable selfVar         = extractSelfVar(mbs);
-        ImmutableList<ParsableVariable> paramVars = extractParamVars(mbs);
-        ParsableVariable resultVar       = extractResultVar(mbs);
-        ParsableVariable excVar          = extractExcVar(fma);
-        Map<Operator, Function> atPreFunctions = extractAtPreFunctions(post.getFormula());
-        
-        //atPre-functions may not occur in precondition
-        Map<Operator, Function> forbiddenAtPreFunctions = extractAtPreFunctions(pre.getFormula());
-        if(!forbiddenAtPreFunctions.isEmpty()) {
-            throw new ProofInputException(
-                "@pre-function not allowed in precondition: " 
-                + forbiddenAtPreFunctions.values().iterator().next());
-        }
-        
-        //atPre-functions may not occur in modifier set
-        for (LocationDescriptor modify : modifies) {
-            LocationDescriptor loc = modify;
-            if (loc instanceof BasicLocationDescriptor) {
-                BasicLocationDescriptor bloc = (BasicLocationDescriptor) loc;
-                Term formula = bloc.getFormula();
-                Term locTerm = bloc.getLocTerm();
-                forbiddenAtPreFunctions = new LinkedHashMap<Operator, Function>();
-                forbiddenAtPreFunctions.putAll(extractAtPreFunctions(formula));
-                forbiddenAtPreFunctions.putAll(extractAtPreFunctions(locTerm));
-                if (!forbiddenAtPreFunctions.isEmpty()) {
-                    throw new ProofInputException(
-                            "@pre-function not allowed in modifier set: "
-                                    + forbiddenAtPreFunctions.values().iterator().next());
-                }
-            }
-        }
-        
-        //result variable may be omitted
-	if(resultVar == null && pm.getKeYJavaType() != null) {
-	    ProgramElementName resultPEN = new ProgramElementName("res");
-	    resultVar = new LocationVariable(resultPEN, pm.getKeYJavaType());
+    public OperationContract createDLOperationContract(String name, 
+	    					       Term fma, 
+	    					       Term modifies)
+	    throws ProofInputException {
+	assert name != null;
+	assert fma != null;
+	assert modifies != null;
+
+	//extract parts of fma
+	final Term pre = extractPre(fma);
+	ProgramVariable heapAtPreVar = extractHeapAtPre(fma);
+	ProgramVariable excVar = extractExcVar(fma);	
+	final UseOperationContractRule.Instantiation inst = extractInst(fma);
+	final ProgramMethod pm = extractProgramMethod(inst);
+	final Modality modality = extractModality(inst);
+	final ProgramVariable selfVar = pm.isConstructor() 
+	                                ? extractResultVar(inst) 
+	                                : extractSelfVar(inst);
+	final ImmutableList<ProgramVariable> paramVars = extractParamVars(inst);
+	ProgramVariable resultVar = pm.isConstructor() 
+		                    ? null
+		                    : extractResultVar(inst);
+	Term post = extractPost(fma);
+	
+	//heapAtPre must not occur in precondition or in modifies clause
+	if(heapAtPreVar != null) {
+	    final OpCollector oc = new OpCollector();
+	    pre.execPostOrder(oc);
+	    modifies.execPostOrder(oc);
+	    if(oc.contains(heapAtPreVar)) {
+		throw new ProofInputException(
+		    "variable \"" + heapAtPreVar + "\" used for pre-state heap" 
+		    + " must not occur in precondition or in modifies clause");
+	    }
+	}
+	
+	//heapAtPre variable may be omitted
+	if(heapAtPreVar == null) {
+	    heapAtPreVar = TB.heapAtPreVar(services, "heapAtPre", false);
 	}
 
-        //exception variable may be omitted
-	if(excVar == null) {
-            excVar = SVF.createExcVar(services, pm, false);
-	    Term excNullTerm = TB.equals(TB.var(excVar), TB.NULL(services));
-            if(modality == Op.DIA) {
-                post = post.conjoin(new FormulaWithAxioms(excNullTerm));
-            } else if(modality == Op.BOX) {
-                post = post.disjoin(new FormulaWithAxioms(TB.not(excNullTerm)));
-            } else {
-                throw new ProofInputException(
-                            "unknown semantics for exceptional termination: " 
-                            + modality + "; please use #catchAll block");
-            }
-        }
-        
-        TermBuilder tb = TermBuilder.DF;
-        TermFactory tf = tb.tf();
-        
-        
-        Term[] argTerms = new Term[pm.getParameterDeclarationCount()+(pm.isStatic() ? 0 : 1)];
-        int j=0;
-        if(!pm.isStatic()){
-                argTerms[j++] = tb.var(selfVar);
-        }
+	//result variable may be omitted
+	if(resultVar == null && pm.getKeYJavaType() != null) {
+	    resultVar = TB.resultVar(services, pm, false);
+	}
 
-        for(int i=j; i<argTerms.length; i++){
-            argTerms[i] = tb.var((ProgramVariable) pm.getParameterDeclarationAt(i-j).
-                    getVariableSpecification().getProgramVariable());
-        }
-        
-        Term ws = tf.createWorkingSpaceNonRigidTerm(pm,
-            (Sort) services.getNamespaces().sorts().lookup(new Name("int")),
-            argTerms
-            );
-        FormulaWithAxioms wsPost = new FormulaWithAxioms(tb.tt(), new HashMap<Operator, Term>());
-        
-        services.getNamespaces().functions().add(ws.op());
-        
-        return new OperationContractImpl(name, 
-                                         displayName, 
-                                         pm,
-                                         modality,
-                                         pre,
-                                         post,
-                                         wsPost,
-                                         modifies,                                        
-                                         ws,
-                                         selfVar,
-                                         paramVars,
-                                         resultVar,
-                                         excVar,
-                                         atPreFunctions); 
+	//exception variable may be omitted
+	if(excVar == null) {
+	    excVar = TB.excVar(services, pm, false);
+	    Term excNullTerm = TB.equals(TB.var(excVar), TB.NULL(services));
+	    if(modality == Modality.DIA) {
+		post = TB.and(post, excNullTerm);
+	    } else if(modality == Modality.BOX) {
+		post = TB.or(post, TB.not(excNullTerm));
+	    } else {
+		throw new ProofInputException(
+		        "unknown semantics for exceptional termination: "
+		                + modality + "; please use #catchAll block");
+	    }
+	}
+
+	return new OperationContractImpl(name,
+					 pm.getContainerType(),		
+					 pm, 
+					 modality, 
+					 pre,
+					 null,//measured_by in DL contracts not supported yet					 
+					 post, 
+					 modifies, 
+					 selfVar, 
+					 paramVars, 
+					 resultVar, 
+					 excVar,
+					 TB.var(heapAtPreVar));
     }
 }

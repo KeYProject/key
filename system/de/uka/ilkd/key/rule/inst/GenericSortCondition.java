@@ -10,9 +10,10 @@
 
 package de.uka.ilkd.key.rule.inst;
 
-import de.uka.ilkd.key.logic.op.SortDependingSymbol;
-import de.uka.ilkd.key.logic.op.SortedSchemaVariable;
-import de.uka.ilkd.key.logic.sort.CollectionSort;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SortDependingFunction;
+import de.uka.ilkd.key.logic.op.TermSV;
+import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
@@ -36,14 +37,15 @@ public abstract class GenericSortCondition {
      * (no generic sorts) or never compatible (non generic sorts that
      * don't match)
      */
-    public static GenericSortCondition createCondition
-	( InstantiationEntry p_entry ) {
+    public static GenericSortCondition createCondition(
+	    				InstantiationEntry p_entry) {
 
-        if ( !( p_entry instanceof TermInstantiation ) )
+        if (!( p_entry instanceof TermInstantiation)) {
             return null;
+        }
 
         final TermInstantiation ti = (TermInstantiation)p_entry;
-        final SortedSchemaVariable ssv = (SortedSchemaVariable)p_entry.getSchemaVariable ();
+        final SchemaVariable ssv = p_entry.getSchemaVariable ();
         
         return createCondition ( ssv.sort (),
                                  ti.getTerm ().sort (),
@@ -57,8 +59,8 @@ public abstract class GenericSortCondition {
      * incompatible or equal
      */
     public static GenericSortCondition createCondition
-	( SortDependingSymbol p0,
-	  SortDependingSymbol p1 ) {
+	( SortDependingFunction p0,
+	  SortDependingFunction p1 ) {
 
 	if ( !p0.isSimilar ( p1 ) )
 	    return null;
@@ -74,8 +76,8 @@ public abstract class GenericSortCondition {
      *         subtype of the type of <code>p_sv</code>. Otherwise the sorts
      *         have to match exactly
      */
-    static boolean subSortsAllowed (SortedSchemaVariable p_sv) {
-        return p_sv.isTermSV () && !p_sv.isStrict ();
+    static boolean subSortsAllowed (SchemaVariable p_sv) {
+        return p_sv instanceof TermSV && !p_sv.isStrict ();
     }
     
     /**
@@ -91,7 +93,7 @@ public abstract class GenericSortCondition {
      */
     protected static GenericSortCondition createCondition
 	( Sort s0, Sort s1, boolean p_identity ) {
-	while ( s0 instanceof CollectionSort ) {
+	while ( s0 instanceof ArraySort ) {
 	    // Currently the sort hierarchy is not inherited by
 	    // collection sorts; therefore identity has to be ensured
 	    p_identity = true;
@@ -99,12 +101,13 @@ public abstract class GenericSortCondition {
 	    if ( !s0.getClass ().equals ( s1.getClass () ) )
 		return null;
 
-	    s0 = ((CollectionSort)s0).elementSort ();
-	    s1 = ((CollectionSort)s1).elementSort ();
+	    s0 = ((ArraySort)s0).elementSort ();
+	    s1 = ((ArraySort)s1).elementSort ();
 	}
 
-	if ( !( s0 instanceof GenericSort ) ||
-	     s1 == Sort.FORMULA )
+	if ( !( s0 instanceof GenericSort ) 
+	       || s1 == Sort.FORMULA 
+	       || s1 == Sort.UPDATE)
 	    return null;
 
 	final GenericSort gs = (GenericSort) s0;
@@ -131,8 +134,8 @@ public abstract class GenericSortCondition {
 	if ( p_s instanceof GenericSort )
 	    return createForceInstantiationCondition ( (GenericSort)p_s,
 						       p_maximum );
-	else if ( p_s instanceof CollectionSort )
-	    return forceInstantiation ( ((CollectionSort)p_s).elementSort (),
+	else if ( p_s instanceof ArraySort )
+	    return forceInstantiation ( ((ArraySort)p_s).elementSort (),
 					p_maximum );
 
 	return null;
@@ -206,7 +209,7 @@ public abstract class GenericSortCondition {
          * checks if sort <code>p_s</code> is a supersort of 
          * the <code>getSubsort</code>
          */
-        public boolean check(Sort p_s, GenericSortInstantiations insts) {    
+        public boolean check(Sort p_s, GenericSortInstantiations insts) {
             return getSubsort ().extendsTrans ( p_s );                
         }
 

@@ -11,6 +11,7 @@
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -25,11 +26,10 @@ public class BuiltInRuleApp implements RuleApp {
     private BuiltInRule builtInRule;
     private PosInOccurrence pio;
     private Constraint userConstraint;
+    private ImmutableList<PosInOccurrence> ifInsts 
+    	= ImmutableSLList.nil();
 
-    
-    /** 
-     * 
-     */
+   
     public BuiltInRuleApp(BuiltInRule builtInRule, 
 			  PosInOccurrence pio,
 			  Constraint userConstraint) {
@@ -37,11 +37,22 @@ public class BuiltInRuleApp implements RuleApp {
 	this.pio            = pio;
 	this.userConstraint = userConstraint;        
     }
+    
+    
+    public BuiltInRuleApp(BuiltInRule builtInRule, 
+			  PosInOccurrence pio,
+			  Constraint userConstraint,
+			  ImmutableList<PosInOccurrence> ifInsts) {
+	this(builtInRule, pio, userConstraint);
+	this.ifInsts = ifInsts;
+    }
+    
 
     /**
      * returns the rule of this rule application
      */
-    public Rule rule() {
+    @Override
+    public BuiltInRule rule() {
 	return builtInRule;
     }
 
@@ -49,6 +60,7 @@ public class BuiltInRuleApp implements RuleApp {
      * returns the PositionInOccurrence (representing a ConstrainedFormula and
      * a position in the corresponding formula) of this rule application
      */
+    @Override
     public PosInOccurrence posInOccurrence() {
 	return pio;
     }
@@ -59,6 +71,7 @@ public class BuiltInRuleApp implements RuleApp {
      * @param services the Services encapsulating all java information
      * @return list of new created goals 
      */
+    @Override    
     public ImmutableList<Goal> execute(Goal goal, Services services) {
 	goal.addAppliedRuleApp(this);	
 	ImmutableList<Goal> result = builtInRule.apply(goal, services, this);
@@ -70,6 +83,7 @@ public class BuiltInRuleApp implements RuleApp {
     /**
      * returns the constraint under which a rule is applicable
      */
+    @Override    
     public Constraint constraint () {
 	return Constraint.BOTTOM;
     }
@@ -80,19 +94,29 @@ public class BuiltInRuleApp implements RuleApp {
     public Constraint userConstraint () {
 	return userConstraint;
     }
+    
+    
+    public void setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {
+	assert ifInsts != null;
+	this.ifInsts = ifInsts;
+    }
+    
+    
+    public ImmutableList<PosInOccurrence> ifInsts() {
+	return ifInsts;
+    }
+    
 
     /** returns true if all variables are instantiated 
      * @return true if all variables are instantiated 
      */
+    @Override    
     public boolean complete() {
 	return true;
     }
     
-    /**
-     * toString
-     */
+    @Override    
     public String toString() {
-	return ""+rule().name();
+	return "BuiltInRule: " + rule().name() + " at pos " + pio.subTerm();
     }
-
 }

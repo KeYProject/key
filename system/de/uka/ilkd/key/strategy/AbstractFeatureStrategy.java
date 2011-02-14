@@ -176,15 +176,6 @@ public abstract class AbstractFeatureStrategy implements Strategy {
                 c ( priority ), c ( 0 ) );
     }
 
-    /**
-     * @param priority
-     */
-    protected Feature selectSimplifier (long priority) {
-        return ConditionalFeature.createConditional(
-                UpdateSimplificationRuleFilter.INSTANCE, 
-                longConst ( priority ) );
-    }
-
     private RuleAppCost c (long p) {
         return LongRuleAppCost.create ( p );
     }
@@ -445,7 +436,7 @@ public abstract class AbstractFeatureStrategy implements Strategy {
     }
 
     protected Feature isSubSortFeature(ProjectionToTerm s1, ProjectionToTerm s2) {        
-        return SortComparisionFeature.create(s1, s2, SortComparisionFeature.SUBSORT);
+        return SortComparisonFeature.create(s1, s2, SortComparisonFeature.SUBSORT);
     }
     
     protected Feature implicitCastNecessary(ProjectionToTerm s1) {

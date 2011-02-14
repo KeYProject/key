@@ -9,10 +9,11 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.Iterator;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.CastFunctionSymbol;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.AbstractSort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -39,7 +40,7 @@ public class HeuristicInstantiation implements TermGenerator {
                 goal.proof().getServices() );
         final QuantifiableVariable var =
             qf.varsBoundHere ( 0 ).last ();
-        return new HIIterator ( ia.getSubstitution ().iterator (), var );
+        return new HIIterator ( ia.getSubstitution ().iterator (), var, goal.proof().getServices() );
     }
 
 
@@ -49,15 +50,17 @@ public class HeuristicInstantiation implements TermGenerator {
         private final QuantifiableVariable quantifiedVar;
 
         private final Sort                 quantifiedVarSort;
-        private final CastFunctionSymbol   quantifiedVarSortCast;
+        private final Function             quantifiedVarSortCast;
 
         private Term                       nextInst = null;
 
-        private HIIterator(Iterator<Term> it, QuantifiableVariable var) {
+        private HIIterator(Iterator<Term> it, 
+					 QuantifiableVariable var, 
+        	         Services services) {
             this.instances = it;
             this.quantifiedVar = var;
             quantifiedVarSort = quantifiedVar.sort ();
-            quantifiedVarSortCast = ( (AbstractSort)quantifiedVarSort ).getCastSymbol ();
+            quantifiedVarSortCast = quantifiedVarSort.getCastSymbol (services);
             findNextInst ();
         }
 

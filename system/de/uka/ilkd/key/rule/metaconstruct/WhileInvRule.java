@@ -63,32 +63,8 @@ public class WhileInvRule extends AbstractMetaOperator {
     private KeYJavaType returnType;
     
     public WhileInvRule() {
-        super(new Name("#whileInvRule"), 2);
+        super(new Name("#whileInvRule"), 2, Sort.FORMULA);
     }
-
-
-    /** Unlike other meta operators this one returns a formula
-     * not a term.
-     */
-    public Sort sort(Term[] term) {
-        return Sort.FORMULA;
-    }
-
-
-    /**
-     * checks whether the top level structure of the given @link Term
-     * is syntactically valid, given the assumption that the top level
-     * operator of the term is the same as this Operator. The
-     * assumption that the top level operator and the term are equal
-     * is NOT checked.  
-     * @return true iff the top level structure of
-     * the @link Term is valid.
-     */
-    public boolean validTopLevel(Term term) {
-        // a meta operator accepts almost everything
-        return  term.arity()==arity();
-    }
-
 
    
     /**
@@ -191,10 +167,8 @@ public class WhileInvRule extends AbstractMetaOperator {
         // normal case and continue
         if (w.continueOccurred()) {
             stmnt.add(contFlagDecl(contFlag));
-            contFlagTerm = tf.createEqualityTerm
-            (Op.EQUALS, 
-             typeConv.convertToLogicElement(contFlag), 
-             typeConv.getBooleanLDT().getTrueTerm());
+            contFlagTerm = TB.equals(typeConv.convertToLogicElement(contFlag), 
+        	    	             typeConv.getBooleanLDT().getTrueTerm());
         }
         
         // exception case
@@ -243,7 +217,7 @@ public class WhileInvRule extends AbstractMetaOperator {
         (normalCaseAndContinue(contFlagTerm, returnFlagTerm,
                                breakFlagTerm, excFlagTerm, inv));
         
-        Term result = createLongJunctorTerm(Op.AND, resultSubterms); 
+        Term result = createLongJunctorTerm(Junctor.AND, resultSubterms); 
         
         stmnt.add(w.result());
         StatementBlock s = new StatementBlock
@@ -257,16 +231,9 @@ public class WhileInvRule extends AbstractMetaOperator {
         
         Modality loopBodyModality = modality;
         
-        // This here is crucial for transactions. If you wonder why the conversion
-        // is so "irregular", well, that's the way it is ;) /Wojtek
-        if (modality == BOXTRC || modality == TOUTTRC)
-            loopBodyModality = BOX;
-        if (modality == DIATRC)
-            loopBodyModality = DIA;
-        return tf.createProgramTerm
-        (loopBodyModality, 
-         JavaBlock.createJavaBlock
-         (new StatementBlock(resSta)), result); 
+        return TB.prog(loopBodyModality, 
+        	      JavaBlock.createJavaBlock(new StatementBlock(resSta)), 
+        	      result); 
     }
 
 
@@ -338,14 +305,12 @@ public class WhileInvRule extends AbstractMetaOperator {
         if (terms.size() == 1)
             return terms.get(0);
         else if (terms.size() == 2)
-            return tf.createJunctorTerm(junctor,
-                                        terms.get(0),
-                                        terms.get(1));
+            return tf.createTerm(junctor, terms.get(0), terms.get(1));
         else {
             Term arg1 = terms.get(0);
             terms.remove(0);
             return 
-                tf.createJunctorTerm(junctor, 
+                tf.createTerm(junctor, 
                                      arg1, 
                                      createLongJunctorTerm(junctor, terms));
         }
@@ -363,17 +328,15 @@ public class WhileInvRule extends AbstractMetaOperator {
                             KeYJavaType returnType,
                             ProgramVariable returnExpression,
                             Term post) {
-        Term executeReturn = tf.createProgramTerm
+        Term executeReturn = TB.prog
             (modality, 
              addContext(root, new StatementBlock
                         (KeYJavaASTFactory.returnClause(returnExpression))), 
              post);
         
-        return tf.createJunctorTerm
-            (Op.IMP, 
-             tf.createEqualityTerm(Op.EQUALS, 
-                                   typeConv.convertToLogicElement(returnFlag), 
-                                   typeConv.getBooleanLDT().getTrueTerm()), 
+        return TB.imp( 
+             TB.equals(typeConv.convertToLogicElement(returnFlag), 
+                                typeConv.getBooleanLDT().getTrueTerm()), 
              executeReturn);
         
     }
@@ -395,17 +358,13 @@ public class WhileInvRule extends AbstractMetaOperator {
                            Term post,
                            ArrayList<If> breakIfCascade) {
         Term executeBreak = 
-            tf.createProgramTerm
-            (modality,
+            TB.prog(modality,
              addContext(root, new StatementBlock
                         (breakIfCascade.toArray(new Statement[breakIfCascade.size()]))),
              post);
-        return tf.createJunctorTerm
-            (Op.IMP, 
-             tf.createEqualityTerm(Op.EQUALS, 
-                                   typeConv.convertToLogicElement(breakFlag), 
-                                   typeConv.getBooleanLDT().getTrueTerm()), 
-             executeBreak); 
+        return TB.imp(TB.equals(typeConv.convertToLogicElement(breakFlag), 
+                                typeConv.getBooleanLDT().getTrueTerm()), 
+                                executeBreak); 
     }
 
 
@@ -420,27 +379,23 @@ public class WhileInvRule extends AbstractMetaOperator {
         ArrayList<Term> al = new ArrayList<Term>();
 
         if (returnFlagTerm != null)
-            al.add(tf.createEqualityTerm(Op.EQUALS, returnFlagTerm, TRUE_TERM));
+            al.add(TB.equals(returnFlagTerm, TRUE_TERM));
         if (breakFlagTerm != null)
-            al.add(tf.createEqualityTerm(Op.EQUALS, breakFlagTerm, TRUE_TERM));
+            al.add(TB.equals(breakFlagTerm, TRUE_TERM));
         if (excFlagTerm != null)
-            al.add(tf.createEqualityTerm(Op.EQUALS, excFlagTerm, TRUE_TERM));
+            al.add(TB.equals(excFlagTerm, TRUE_TERM));
 
         if (al.size() == 0) {
             if (contFlagTerm == null)
                 return inv;
             else 
-                return tf.createJunctorTerm(Op.IMP, contFlagTerm, inv);
+                return TB.imp(contFlagTerm, inv);
         } else {
-            Term premiss = tf.createJunctorTerm(Op.NOT, 
-                                                createLongJunctorTerm(Op.OR, al));
+            Term premiss = TB.not(createLongJunctorTerm(Junctor.OR, al));
             if (contFlagTerm != null)
-                premiss = tf.createJunctorTerm(Op.OR, 
-                                               contFlagTerm,
-                                               premiss);            
+                premiss = TB.imp(contFlagTerm, premiss);            
             
-            return 
-                tf.createJunctorTerm(Op.IMP, premiss, inv);
+            return TB.imp(premiss, inv);
         }       
     }
     
@@ -449,16 +404,12 @@ public class WhileInvRule extends AbstractMetaOperator {
                            ProgramVariable thrownException,
                            Term post) {
         Term throwException = 
-            tf.createProgramTerm
-            (modality, addContext
-             (root, new StatementBlock
-              (KeYJavaASTFactory.throwClause(thrownException))), 
-             post);
-        return tf.createJunctorTerm
-            (Op.IMP, 
-             tf.createEqualityTerm(Op.EQUALS, 
-                                   typeConv.convertToLogicElement(excFlag), 
-                                   typeConv.getBooleanLDT().getTrueTerm()), 
+            TB.prog(modality, 
+        	   addContext(root, new StatementBlock(KeYJavaASTFactory.throwClause(thrownException))), 
+                   post);
+        return TB.imp( 
+             TB.equals(typeConv.convertToLogicElement(excFlag), 
+        	       typeConv.getBooleanLDT().getTrueTerm()), 
              throwException);
     }
 
@@ -472,6 +423,4 @@ public class WhileInvRule extends AbstractMetaOperator {
         return JavaBlock.createJavaBlock((StatementBlock)replaceWhile.result());
 
     }
-    
-
 }

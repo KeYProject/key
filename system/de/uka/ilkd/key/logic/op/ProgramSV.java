@@ -30,188 +30,207 @@ import de.uka.ilkd.key.rule.inst.ProgramList;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
-public class ProgramSV extends SortedSchemaVariable 
-    implements ProgramConstruct, Location {
-
+public final class ProgramSV extends AbstractSV 
+    implements ProgramConstruct, UpdateableOperator {
+    
     private static final ProgramList EMPTY_LIST_INSTANTIATION = 
         new ProgramList
         (new ImmutableArray<ProgramElement>(new ProgramElement[0]));
+
+    private final boolean isListSV;
 
     /** 
      * creates a new SchemaVariable used as a placeholder for program
      * constructs
      * @param name the Name of the SchemaVariable
-     * @param listSV a boolean which is true iff the schemavariable is
      * allowed to match a list of program constructs
      */    
-    ProgramSV(Name name, ProgramSVSort s, boolean listSV) {
-	super(name, ProgramConstruct.class, s, listSV);	
+    ProgramSV(Name name, ProgramSVSort s, boolean isListSV) {
+	super(name, s, false, false);
+	this.isListSV = isListSV;
     }
     
- 
-    /** returns true iff this SchemaVariable is used to match
-     * part of a program
-     * @return true iff this SchemaVariable is used to match
-     * part of a program
-     */
-    public boolean isProgramSV() {
-	return true;
+    
+    public boolean isListSV() {
+	return isListSV;
     }
+    
+    
+    /** 
+     * this method tests on object identity
+     */
+    @Override
+    public boolean equalsModRenaming(SourceElement se, 
+				     NameAbstractionTable nat) {
+	return se == this;
+    }    
+        
     
     /** @return comments if the schemavariable stands for programm
      * construct and has comments attached to it (not supported yet)
      */
+    @Override
     public Comment[] getComments() {
 	return new Comment[0];
     }
     
+    @Override
     public SourceElement getFirstElement(){
 	return this;
     }
     
+    @Override
     public SourceElement getLastElement(){
 	return this;
     }
 
-    /**
-     * Returns the start position of the primary token of this element.
-     * To get the start position of the syntactical first token,
-     * call the corresponding method of <CODE>getFirstElement()</CODE>.
-     * @return the start position of the primary token.
-     */
+    @Override
     public Position getStartPosition(){
 	return Position.UNDEFINED;
     }
     
-    /**
-     * Returns the end position of the primary token of this element.
-     * To get the end position of the syntactical first token,
-     * call the corresponding method of <CODE>getLastElement()</CODE>.
-     * @return the end position of the primary token.
-     */
+    @Override
     public Position getEndPosition(){
 	return Position.UNDEFINED;
     }
 
-    /**
-     * Returns the relative position (number of blank heading lines and 
-     * columns) of the primary token of this element.
-     * To get the relative position of the syntactical first token,
-     * call the corresponding method of <CODE>getFirstElement()</CODE>.
-     * @return the relative position of the primary token.
-     */
+    @Override
     public Position getRelativePosition(){
 	return  Position.UNDEFINED;
     }
     
 
-
+    @Override
     public PositionInfo getPositionInfo(){
         return  PositionInfo.UNDEFINED;
     }
 
 
+    @Override
     public ReferencePrefix getReferencePrefix() {
         return null;
     }
 
-    public ReferencePrefix setReferencePrefix(ReferencePrefix r) {
-        return this;
-    }
 
+    @Override
     public int getDimensions(){
         return 0;
     }
 
+    
+    @Override
     public int getTypeReferenceCount(){
         return 0;
     }
 
+
+    @Override
     public TypeReference getTypeReferenceAt(int index) {
         return this;
     }
 
+
+    @Override
     public PackageReference getPackageReference() {
         return null;
     }
 
+    
+    @Override
     public int getExpressionCount() {
         return 0;
     }
 
+    
+    @Override
     public Expression getExpressionAt(int index) {
         return null;
     }
 
+    
+    @Override
     public int getChildCount() {
         return 0;
     }
 
+    
+    @Override
     public ProgramElement getChildAt(int index) {
         return this;
     }
+
     
+    @Override
     public int getStatementCount() {
         return 0;
     }
 
+    
+    @Override
     public int size() {
         return 0;
     }
 
-    public ImmutableArray<Expression> getUpdates() {
+    @Override
+	public ImmutableArray<Expression> getUpdates() {
         return null;
-    }
+    }    
 
+	@Override
     public ImmutableArray<LoopInitializer> getInits() {
         return null;
     }
 
 
+    @Override
     public Statement getStatementAt(int i) {
         return this;
     }
 
+
+    @Override
     public ProgramElementName getProgramElementName() {
         return new ProgramElementName(toString());
     }    
 
+    
+    @Override
     public String getName() {
         return name().toString();
     }
 
-    /** calls the corresponding method of a visitor in order to
-     * perform some action/transformation on this element
-     * @param v the Visitor
-     */
+    
+    @Override
     public void visit(Visitor v) {
         v.performActionOnSchemaVariable(this);
     }
 
-    /** this pretty printer method is for the program pretty printer
-     * and needs not to be overwritten by ProgramSV but at the moment
-     * it is not 
-     */
+    
+    @Override
     public void prettyPrint(PrettyPrinter w) throws IOException {       
         w.printSchemaVariable(this);
     }
 
+    
+    @Override
     public KeYJavaType getKeYJavaType() {
         return null;
     }
 
+    
+    @Override
     public KeYJavaType getKeYJavaType(Services javaServ) {
         return null;
     }
 
+
+    @Override
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
         return null;
     }
   
     
-    /* (non-Javadoc)
-     * @see de.uka.ilkd.key.logic.op.Operator#match(de.uka.ilkd.key.logic.op.Operator, de.uka.ilkd.key.rule.MatchConditions, de.uka.ilkd.key.java.Services)
-     */
+    @Override
     public MatchConditions match(SVSubstitute substitute, 
 				 MatchConditions mc, 
 				 Services services) {
@@ -229,8 +248,9 @@ public class ProgramSV extends SortedSchemaVariable
 		  "instantiation(template, orig)", this, substitute);
         return null;
     }
+
     
-    /** toString */
+    @Override
     public String toString() {
 	return toString("program "+sort().name());
     }
@@ -275,7 +295,7 @@ x     * @return the updated match conditions including mapping
 	    }
 	}
 
-	insts = insts.add(this, pe);
+	insts = insts.add(this, pe, services);
 	return insts == null ? null : matchCond.setInstantiations(insts);
     }
 
@@ -308,9 +328,42 @@ x     * @return the updated match conditions including mapping
 	    }
 	}
 
-        insts = insts.add(this, list);
+        insts = insts.add(this, list, services);
         return insts == null ? null : matchCond.setInstantiations(insts);
     }
+    
+    
+    private MatchConditions matchListSV(SourceData source, MatchConditions matchCond) {
+	final Services services = source.getServices();
+	ProgramElement src = source.getSource();
+
+	if (src == null) {
+	    return addProgramInstantiation(EMPTY_LIST_INSTANTIATION, matchCond, services);
+	}
+
+	SVInstantiations instantiations = matchCond.getInstantiations();
+
+	final ExecutionContext ec = instantiations.getExecutionContext();        
+
+	final java.util.ArrayList<ProgramElement> matchedElements = 
+	    new java.util.ArrayList<ProgramElement>();        
+
+	while (src != null) {
+	    if (!check(src, ec, services)) {
+		Debug.out("taclet: Stopped list matching because of " +
+			"incompatible elements", this, src);
+		break;
+	    }
+	    matchedElements.add(src);            
+	    source.next();
+	    src = source.getSource();
+	}
+
+	Debug.out("Program list match: ", this, matchedElements);
+	return addProgramInstantiation(new ProgramList(new ImmutableArray<ProgramElement>(matchedElements)), 
+		matchCond, services);
+    }   
+    
 
     /** 
      * returns true, if the given SchemaVariable can stand for the
@@ -329,13 +382,13 @@ x     * @return the updated match conditions including mapping
         return ((ProgramSVSort)sort()).canStandFor(match, ec, services);
     }
         
-    /**
-     * 
-     */
-    public MatchConditions match(SourceData source, MatchConditions matchCond) {        
-        if (isListSV()) {
-            return matchListSV(source, matchCond);
-        }
+
+    @Override
+    public MatchConditions match(SourceData source, MatchConditions matchCond) {  
+	if(isListSV()) {
+	    return matchListSV(source, matchCond);
+        }	
+	
         final Services services  = source.getServices();        
         final ProgramElement src = source.getSource();        
         Debug.out("Program match start (template, source)", this, src);
@@ -371,38 +424,4 @@ x     * @return the updated match conditions including mapping
         source.next();   
         return matchCond;
     }
-
-    private MatchConditions matchListSV(SourceData source, MatchConditions matchCond) {
-        final Services services = source.getServices();
-        ProgramElement src = source.getSource();
-        
-        if (src == null) {
-            return addProgramInstantiation(EMPTY_LIST_INSTANTIATION, matchCond, services);
-        }
-        
-        SVInstantiations instantiations = matchCond.getInstantiations();
-        
-        final ExecutionContext ec = instantiations.getExecutionContext();        
-        
-        final java.util.ArrayList<ProgramElement> matchedElements = 
-            new java.util.ArrayList<ProgramElement>();        
-
-        while (src != null) {
-            if (!check(src, ec, services)) {
-                Debug.out("taclet: Stopped list matching because of " +
-                                "incompatible elements", this, src);
-                break;
-            }
-            matchedElements.add(src);            
-            source.next();
-            src = source.getSource();
-        }
-
-        Debug.out("Program list match: ", this, matchedElements);
-        return addProgramInstantiation(new ProgramList(new ImmutableArray<ProgramElement>(matchedElements)), 
-                matchCond, services);
-    }	
 }
-
-
-

@@ -15,7 +15,7 @@ public final class BooleanContainer {
     private boolean bool;
     
     public BooleanContainer() {
-	bool=false;
+	bool = false;
     }
     
     public final boolean val() {
@@ -23,7 +23,6 @@ public final class BooleanContainer {
     }
     
     public final void setVal(boolean b) {
-	bool=b;
+	bool = b;
     }
 }
-

@@ -1,30 +1,21 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
+// The KeY system is protected by the GNU General Public License.
 // See LICENSE.TXT for details.
 
-
 package de.uka.ilkd.key.proof.init;
-
-import java.util.HashMap;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.IMain;
-import de.uka.ilkd.key.gui.POBrowser;
-import de.uka.ilkd.key.gui.configuration.ChoiceSettings;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.proof.GoalChooserBuilder;
-import de.uka.ilkd.key.proof.init.proofobligation.DefaultPOProvider;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustification;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
-import de.uka.ilkd.key.rtsj.rule.UseWorkingSpaceContractRule;
 import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.strategy.FOLStrategy;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 
@@ -58,34 +49,21 @@ public class JavaProfile extends AbstractProfile {
     protected ImmutableSet<StrategyFactory> getStrategyFactories() {
         ImmutableSet<StrategyFactory> set = super.getStrategyFactories();
         set = set.add(DEFAULT);
-        set = set.add(new FOLStrategy.Factory());
         return set;
     }
 
-    public AbstractUseOperationContractRule getContractRule() {
-        return UseOperationContractRule.INSTANCE_NORMAL;
-    }
-
-    protected UpdateSimplificationRule getUpdateSimplificationRule() {
-        return UpdateSimplificationRule.INSTANCE;
-    }
     
-    protected UseWorkingSpaceContractRule getWorkingSpaceRule(){
-        return UseWorkingSpaceContractRule.INSTANCE;
-    }
-    
-
-    protected ImmutableList<BuiltInRule> initBuiltInRules() {
-
-        // update simplifier
-        ImmutableList<BuiltInRule> builtInRules = super.initBuiltInRules().
-            prepend(getUpdateSimplificationRule());
+    protected ImmutableList<BuiltInRule> initBuiltInRules() {       
+        ImmutableList<BuiltInRule> builtInRules = super.initBuiltInRules();
         
-        builtInRules = builtInRules.prepend(getWorkingSpaceRule());
+        builtInRules = builtInRules.prepend(WhileInvariantRule.INSTANCE)
+                                   .prepend(UseDependencyContractRule.INSTANCE)
+                                   .prepend(OneStepSimplifier.INSTANCE)
+        			   .prepend(PullOutConditionalsRule.INSTANCE);
   
         //contract insertion rule, ATTENTION: ProofMgt relies on the fact 
         // that Contract insertion rule is the FIRST element of this list!
-        builtInRules = builtInRules.prepend(getContractRule());
+        builtInRules = builtInRules.prepend(UseOperationContractRule.INSTANCE);
 
         return builtInRules;
     }
@@ -98,8 +76,9 @@ public class JavaProfile extends AbstractProfile {
      * @return justification for the given rule
      */
     public RuleJustification getJustification(Rule r) {
-        return r == getContractRule() 
-               ? new ComplexRuleJustificationBySpec() 
+        return r == UseOperationContractRule.INSTANCE 
+               || r == UseDependencyContractRule.INSTANCE
+               ? new ComplexRuleJustificationBySpec()
                : super.getJustification(r);
     }
 
@@ -116,22 +95,5 @@ public class JavaProfile extends AbstractProfile {
      */
     public StrategyFactory getDefaultStrategyFactory() {
         return DEFAULT;
-    }
-    
-    public void updateSettings(ProofSettings settings) {
-	super.updateSettings(settings);
-        ChoiceSettings cs = settings.getChoiceSettings();
-        HashMap<String, String> dcs = cs.getDefaultChoices();
-        dcs.put("rtsj", "rtsj:off");
-        dcs.put("memory", "memory:off");
-        cs.setDefaultChoices(dcs);
-    }
-
-    public DefaultPOProvider getPOProvider() {
-	return new DefaultPOProvider();
-    }
-
-    public Class<? extends POBrowser> getPOBrowserClass() {
-	return POBrowser.class;
     }
 }

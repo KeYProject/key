@@ -13,79 +13,48 @@ package de.uka.ilkd.key.logic.op;
 import java.util.HashMap;
 
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 
-/** this class is used to represent a dynamic logic modality like
+/** 
+ * This class is used to represent a dynamic logic modality like
  * diamond and box (but also extensions of DL like
  * preserves and throughout are possible in the future).
- * For further information see @see PrpgramTerm.
  */
-public class Modality extends Op implements NonRigid {
 
-    private static final HashMap<String, Modality> nameMap = 
-        new HashMap<String, Modality>(10);
+public final class Modality extends AbstractSortedOperator {
+
+    private static final HashMap<String, Modality> nameMap 
+    	= new HashMap<String, Modality>(10);
     
-    private int arity=0;
+    /** 
+     * The diamond operator of dynamic logic. A formula
+     * <alpha;>Phi can be read as after processing the program alpha
+     * there exists a state such that Phi holds. 
+     */    
+    public static final Modality DIA = new Modality(new Name("diamond"));
+    
+    /** 
+     * The box operator of dynamic logic. A formula
+     * [alpha;]Phi can be read as 'In all states reachable
+     * processing the program alpha the formula Phi holds'.
+     */
+    public static final Modality BOX = new Modality(new Name("box"));
 
-    /** creates a modal operator with the given name and default arity
+    
+    /** creates a modal operator with the given name
      * @param name the Name of the modality 
      */
-    Modality(Name name) {
-	super(name);
-	this.arity = 1;
+    private Modality(Name name) {
+	super(name, new Sort[]{Sort.FORMULA}, Sort.FORMULA, false);
 	nameMap.put(name.toString(), this);
     }
 
-    /** creates a modal operator with the given name and arity
-     * @param name the Name of the modality 
-     * @param arity the arity of the modality 
-     */
-    Modality(Name name, int arity) {
-	super(name);
-	this.arity = arity;
-	nameMap.put(name.toString(), this);
-    }
-
-    public static HashMap<String, Modality> getNameMap() {
-	return nameMap;
-    }
-
-    /** @return Sort.FORMULA
-     */
-     public Sort sort(Term[] term) {
-        return Sort.FORMULA;
-    }  
 
     /**
-     * for convenience reasons 
-     * @return Sort.FORMULA
+     * Returns a modality corresponding to a string
+     * @param str name of the modality to return
      */
-     public Sort sort(Term term) {
-        return Sort.FORMULA;
-    }  
-
-    /** @return true if the subterm at postion 0 of the given term 
-     * has Sort.FORMULA and the arity of the term is 1.
-     */
-    public boolean validTopLevel(Term term){
-	if (term.arity()!=1) return false;
-        return term.sub(0).sort().equals(Sort.FORMULA);
+    public static Modality getModality(String str) {
+        return (Modality)nameMap.get(str);
     }
-
-    /** @return arity of the Diamond operator as int */
-    public int arity() {
-	return this.arity;
-    }
-
-    /**
-     * @return true if the value of "term" having this operator as
-     * top-level operator and may not be changed by modalities
-     */
-    public boolean isRigid (Term term) {
-	return
-	    super.isRigid ( term ) &&
-	    term.javaBlock ().isEmpty();
-    }
-
 }

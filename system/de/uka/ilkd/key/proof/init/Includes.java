@@ -22,7 +22,7 @@ import de.uka.ilkd.key.proof.RuleSource;
  * <code>name2Source</code> maps the entries of both lists to the corresponding
  * RuleSources.
  */
-public class Includes{
+public class Includes {
 
     /** a list containing the "normal" includes, represented as Strings */
     private final List<String> includes;

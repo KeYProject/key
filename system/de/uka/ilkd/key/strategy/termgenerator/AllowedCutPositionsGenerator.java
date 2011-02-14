@@ -15,7 +15,7 @@ import java.util.Stack;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Op;
+import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -57,12 +57,12 @@ public class AllowedCutPositionsGenerator implements TermGenerator {
             final Term res = (Term)termStack.pop ();
             final Operator op = res.op ();
             
-            if ( op == Op.NOT ) {
+            if ( op == Junctor.NOT ) {
                 push ( res.sub ( 0 ), !negated );
-            } else if ( op == ( negated ? Op.OR : Op.AND ) ) {
+            } else if ( op == ( negated ? Junctor.OR : Junctor.AND ) ) {
                 push ( res.sub ( 0 ), negated );
                 push ( res.sub ( 1 ), negated );
-            } else if ( negated && op == Op.IMP ) {
+            } else if ( negated && op == Junctor.IMP ) {
                 push ( res.sub ( 0 ), !negated );
                 push ( res.sub ( 1 ), negated );
             }

@@ -41,9 +41,9 @@ public class StrategySettings implements Settings {
     
     private StrategyProperties strategyProperties = new StrategyProperties();
     
-    /** returns the maximal amount of heuristics steps before an user
+    /** returns the maximal amount of heuristics steps before a user
      * interaction is required 
-     * @return the maximal amount of heuristics steps before an user
+     * @return the maximal amount of heuristics steps before a user
      * interaction is required
      */
     public int getMaxSteps(){
@@ -89,7 +89,7 @@ public class StrategySettings implements Settings {
         String timeoutString = props.getProperty(TIMEOUT_KEY);
     
         long localTimeout = -1;
-        int numSteps = 1000;
+        int numSteps = 10000;
     
         if (numString != null){
             try {
@@ -135,7 +135,7 @@ public class StrategySettings implements Settings {
 	    setStrategy(SimpleJavaCardDLOptions.LOOPS_METHODS.name());
 	}
 	if (maxSteps<0) {
-	    setMaxSteps(1000);
+	    setMaxSteps(10000);
 	}
         props.setProperty(STRATEGY_KEY, getStrategy().toString());
         props.setProperty(STEPS_KEY,  String.valueOf(getMaxSteps()));

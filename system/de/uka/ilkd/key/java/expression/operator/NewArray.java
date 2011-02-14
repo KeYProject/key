@@ -72,6 +72,7 @@ public class NewArray extends TypeOperator
 	this.arrayInitializer = init;
         this.dimensions  = dimensions;
 	this.keyJavaType = keyJavaType;
+	assert dimensions > 0;	
     }
     
     
@@ -90,6 +91,7 @@ public class NewArray extends TypeOperator
 	this.arrayInitializer = init;
         this.dimensions  = dimensions;
 	this.keyJavaType = keyJavaType;
+	assert dimensions > 0;
     }
 
     public SourceElement getLastElement() {

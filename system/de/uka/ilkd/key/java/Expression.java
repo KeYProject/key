@@ -19,11 +19,8 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
  */
 public interface Expression extends ProgramElement {
 
-
     /** 
      * returns the {@link KeYJavaType} of an expression 
      */
     KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec);
-
-
 }

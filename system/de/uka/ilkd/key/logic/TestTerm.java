@@ -12,37 +12,35 @@ package de.uka.ilkd.key.logic;
 
 import junit.framework.TestCase;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.PrimitiveSort;
+import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.TacletForTests;
 
-/** class tests the term factory
-*/
 
 
 public class TestTerm extends TestCase { 
 
+    private static final TermBuilder TB = TermBuilder.DF;
+    private static final TermFactory tf=TermFactory.DEFAULT;
 
-    private TermFactory tf=TermFactory.DEFAULT;
-
-    private Sort sort1=new PrimitiveSort(new Name("S1"));
-    private Sort sort2=new PrimitiveSort(new Name("S2"));
-    private Sort sort3=new PrimitiveSort(new Name("S3"));
+    private Sort sort1=new SortImpl(new Name("S1"));
+    private Sort sort2=new SortImpl(new Name("S2"));
+    private Sort sort3=new SortImpl(new Name("S3"));
     	
 
-    Function p=new RigidFunction(new Name("p"),Sort.FORMULA,new Sort[]{sort1});  
+    Function p=new Function(new Name("p"),Sort.FORMULA,new Sort[]{sort1});  
         //p(:S1):BOOL
     LogicVariable x=new LogicVariable(new Name("x"),sort1);  //x:S1
-    Function q=new RigidFunction(new Name("q"),Sort.FORMULA,
-			    new Sort[]{new PrimitiveSort(new Name("Whatever"))}); 
+    Function q=new Function(new Name("q"),Sort.FORMULA,
+			    new Sort[]{new SortImpl(new Name("Whatever"))}); 
         //q(:Whatever):BOOL
     LogicVariable z=new LogicVariable(new Name("z"),sort1); //z:S1
     LogicVariable zz=new LogicVariable(new Name("zz"),sort1); //zz:S1
-    Function r=new RigidFunction(new Name("r"),Sort.FORMULA,new Sort[]{sort1, sort2});
+    Function r=new Function(new Name("r"),Sort.FORMULA,new Sort[]{sort1, sort2});
         //r(:S1, :S2):BOOL
     LogicVariable y=new LogicVariable(new Name("y"),sort3); //y:S3
     LogicVariable w=new LogicVariable(new Name("w"),sort2); //w:S2
-    Function f=new RigidFunction(new Name("f"),sort1, new Sort[]{sort3}); 
+    Function f=new Function(new Name("f"),sort1, new Sort[]{sort3}); 
         // f(:S3):S1
 
     ProgramVariable pv0=new LocationVariable
@@ -54,57 +52,54 @@ public class TestTerm extends TestCase {
     }
 
     private Term t1(){
-	Term t_x=tf.createFunctionTerm(x, new Term[0]);
-	Term t_px=tf.createFunctionTerm(p, new Term[]{t_x});
+	Term t_x=tf.createTerm(x);
+	Term t_px=tf.createTerm(p, new Term[]{t_x}, null, null);
 	return t_px;
     }
   
     private Term t2(){
-	Term t_x=tf.createFunctionTerm(x, new Term[]{});
-	Term t_w=tf.createFunctionTerm(w, new Term[]{});
-	return tf.createFunctionTerm(r, new Term[]{t_x,t_w});
+	Term t_x=tf.createTerm(x);
+	Term t_w=tf.createTerm(w);
+	return tf.createTerm(r, new Term[]{t_x,t_w}, null, null);
     }
 
     private Term t3() {
-	Term t_y=tf.createFunctionTerm(y, new Term[]{});
-	return tf.createFunctionTerm(f, new Term[]{t_y});
+	Term t_y=tf.createTerm(y);
+	return tf.createTerm(f, new Term[]{t_y}, null, null);
     }
 
     private Term t4(){
-	Term t_pv0=tf.createVariableTerm(pv0);
-	Term t_ppv0=tf.createFunctionTerm(p, new Term[]{t_pv0});
+	Term t_pv0=tf.createTerm(pv0);
+	Term t_ppv0=tf.createTerm(p, new Term[]{t_pv0}, null, null);
 	return t_ppv0;
     }
   
     public void testFreeVars1() {
-	Term t_allxt2=tf.createQuantifierTerm(Op.ALL,new LogicVariable[]{x},t2());
-	Term t_allxt2_andt1=tf.createJunctorTerm(Op.AND,t_allxt2,t1());
+	Term t_allxt2=TB.all(x,t2());
+	Term t_allxt2_andt1=tf.createTerm(Junctor.AND,t_allxt2,t1());
 	assertTrue(t_allxt2_andt1.freeVars().contains(w) 
 		   && t_allxt2_andt1.freeVars().contains(x));
     }
 
    public void testFreeVars2() {
-	Term t_allxt2=tf.createQuantifierTerm(Op.ALL,new LogicVariable[]{w},t2());
-	Term t_allxt2_andt1=tf.createJunctorTerm(Op.AND,t_allxt2,t1());
+	Term t_allxt2=TB.all(w ,t2());
+	Term t_allxt2_andt1=tf.createTerm(Junctor.AND,t_allxt2,t1());
 	assertTrue(!t_allxt2_andt1.freeVars().contains(w) 
 		   && t_allxt2_andt1.freeVars().contains(x));
     }
     
     public void testFreeVars3() {
-	Term t_allxt1=tf.createQuantifierTerm(Op.ALL,new LogicVariable[]{x},t2());
-	Term t_allxt1_andt2=tf.createJunctorTerm(Op.AND,t_allxt1,t1());
-	Term t_exw_allxt1_andt2=tf.createQuantifierTerm(Op.EX, 
-							new LogicVariable[]{w}, 
-							t_allxt1_andt2); 
+	Term t_allxt1=TB.all(x, t2());
+	Term t_allxt1_andt2=tf.createTerm(Junctor.AND,t_allxt1,t1());
+	Term t_exw_allxt1_andt2=TB.ex(w, t_allxt1_andt2); 
 	assertTrue(!t_exw_allxt1_andt2.freeVars().contains(w) 
 		   && t_exw_allxt1_andt2.freeVars().contains(x));
     }
 
    public void testFreeVars4() {
-	Term t_allxt1=tf.createQuantifierTerm(Op.ALL,new LogicVariable[]{x},t2());
-	Term t_allxt1_andt2=tf.createJunctorTerm(Op.AND,t_allxt1,t1());
-	Term t_exw_allxt1_andt2=tf.createQuantifierTerm(Op.EX,
-							new LogicVariable[]{w,x}, 
+	Term t_allxt1=TB.all(x, t2());
+	Term t_allxt1_andt2=tf.createTerm(Junctor.AND,t_allxt1,t1());
+	Term t_exw_allxt1_andt2=TB.ex(new LogicVariable[]{w,x}, 
 							t_allxt1_andt2); 
 	assertTrue(!t_exw_allxt1_andt2.freeVars().contains(w)
 		   && !t_exw_allxt1_andt2.freeVars().contains(x));
@@ -135,15 +130,13 @@ public class TestTerm extends TestCase {
 
     public void testEqualsModRenaming() {
         
-        final Term px = tf.createFunctionTerm ( p, tf.createVariableTerm ( x ) );
-        final Term quant1 = tf.createQuantifierTerm ( Op.ALL, z,
-                               tf.createQuantifierTerm ( Op.ALL, zz,
-                                  tf.createQuantifierTerm ( Op.ALL, x, px ) ) );
+        final Term px = tf.createTerm ( p, new Term[]{tf.createTerm(x)}, null, null );
+        final Term quant1 = TB.all(z, TB.all( zz, TB.all( x, px ) ) );
         
-        final Term pz = tf.createFunctionTerm ( p, tf.createVariableTerm ( z ) );
-        final Term quant2 = tf.createQuantifierTerm ( Op.ALL, z,
-                               tf.createQuantifierTerm ( Op.ALL, z,
-                                  tf.createQuantifierTerm ( Op.ALL, z, pz ) ) );
+        final Term pz = tf.createTerm ( p, new Term[]{tf.createTerm(z)}, null, null );
+        final Term quant2 = TB.all(z,
+                               TB.all( z,
+                                  TB.all( z, pz ) ) );
         
         assertTrue ( "Terms " + quant1 + " and " + quant2
                      + " should be equal mod renaming",

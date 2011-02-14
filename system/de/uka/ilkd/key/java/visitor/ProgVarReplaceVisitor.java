@@ -7,24 +7,26 @@
 // See LICENSE.TXT for details.
 //
 //
+
 package de.uka.ilkd.key.java.visitor;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.collection.*;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.speclang.LocationDescriptorSet;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.LoopInvariantImpl;
-import de.uka.ilkd.key.speclang.LoopPredicateSet;
-import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
 /**
@@ -155,96 +157,50 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     }
     
     private Term replaceVariablesInTerm(Term t){  
-     	if(t==null) return null;
-	if (t.op() instanceof ProgramVariable){ 
-	    if (replaceMap.containsKey(t.op())){
+     	if(t==null) {
+     	    return null;
+     	}
+	if(t.op() instanceof ProgramVariable) { 
+	    if(replaceMap.containsKey(t.op())) {
 		Object o = replaceMap.get(t.op());
 		if(o instanceof ProgramVariable){
-		    return TermFactory.DEFAULT.createVariableTerm
+		    return TermFactory.DEFAULT.createTerm
 			((ProgramVariable) replaceMap.get(t.op()));
 		}else{
-		    return TermFactory.DEFAULT.createVariableTerm
+		    return TermFactory.DEFAULT.createTerm
 			((SchemaVariable) replaceMap.get(t.op()));
 		}
-	    }else{
+	    } else {
 		return t;
 	    }
 	} else {
 	    Term subTerms[] = new Term[t.arity()];
-	    final ImmutableArray<QuantifiableVariable>[] vars = new ImmutableArray[t.arity()]; 
-	    for ( int i = 0; i<t.arity(); i++ ) {
-		vars[i] = t.varsBoundHere(i);
+	    for(int i = 0, n = t.arity(); i < n; i++) {
 		subTerms[i] = replaceVariablesInTerm(t.sub(i));
 	    }
-	    Operator op;
-	    if(t.op() instanceof IUpdateOperator){
-		IUpdateOperator uo = (IUpdateOperator) t.op();
-		final Location[] locs = new Location[uo.locationCount()];
-		for(int i = 0; i<locs.length; i++){
-		    if (replaceMap.containsKey(uo.location(i))){ 
-			locs[i] = (Location) replaceMap.get(uo.location(i));
-		    }else{
-			locs[i] = uo.location(i);
-		    }
+	    Operator op = t.op();
+	    if(op instanceof ElementaryUpdate) {
+		ElementaryUpdate uop = (ElementaryUpdate) t.op();
+		if(replaceMap.containsKey(uop.lhs())) {
+		    UpdateableOperator replacedLhs 
+		    	= (UpdateableOperator) replaceMap.get(uop.lhs());
+		    op = ElementaryUpdate.getInstance(replacedLhs);
 		}
-		op = uo.replaceLocations ( locs );
-	    }else{
-		op = t.op();
 	    }
-	    return TermFactory.DEFAULT.createTerm(op, subTerms, vars, t.javaBlock());
+	    return TermFactory.DEFAULT.createTerm(op, 
+		    				  subTerms, 
+		    				  t.boundVars(), 
+		    				  t.javaBlock());
 	}
     }
 
-    
-    private ImmutableSet<LocationDescriptor> replaceVariablesInLocs(
-                                                ImmutableSet<LocationDescriptor> locs) {
-        ImmutableSet<LocationDescriptor> res 
-            = DefaultImmutableSet.<LocationDescriptor>nil();
-        for (final LocationDescriptor loc : locs) {
-            LocationDescriptor newLoc;
-            
-            if(loc instanceof BasicLocationDescriptor) {
-                BasicLocationDescriptor bloc = (BasicLocationDescriptor) loc;
-                Term newFormula = replaceVariablesInTerm(bloc.getFormula());
-                Term newLocTerm = replaceVariablesInTerm(bloc.getLocTerm());
-                newLoc = new BasicLocationDescriptor(newFormula, newLocTerm);
-            } else {
-                Debug.assertTrue(loc instanceof EverythingLocationDescriptor);
-                newLoc = loc;
-            }
-            
-            res = res.add(newLoc);
-        }
-        
-        return res;
-    }
-    
-        
+          
     private ImmutableSet<Term> replaceVariablesInTerms(ImmutableSet<Term> terms) {
         ImmutableSet<Term> res = DefaultImmutableSet.<Term>nil();        
         for (final Term term : terms) {
             res = res.add(replaceVariablesInTerm(term));
         }        
         return res;
-    }
-    
-    
-    private Map /*Operator -> Function*/ replaceVariablesInMap(
-                                        Map /*Operator -> Function*/ map) {
-        Map result = new LinkedHashMap();
-        for (Object o : map.entrySet()) {
-            Map.Entry entry = (Map.Entry) o;
-            Operator key = (Operator) entry.getKey();
-            Function value = (Function) entry.getValue();
-
-            Operator newKey = (ProgramVariable) replaceMap.get(key);
-            if (newKey == null) {
-                newKey = key;
-            }
-
-            result.put(newKey, value);
-        }
-        return result;
     }
     
     
@@ -266,58 +222,46 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             return;
         }
         Term selfTerm = inv.getInternalSelfTerm();
-        Map atPreFunctions = inv.getInternalAtPreFunctions();
+        Term heapAtPre = inv.getInternalHeapAtPre();
         
         //invariant
         Term newInvariant 
             = replaceVariablesInTerm(inv.getInvariant(selfTerm, 
-                                                      atPreFunctions, 
+                                                      heapAtPre, 
                                                       services));
         
         //predicates
         ImmutableSet<Term> newPredicates 
             = replaceVariablesInTerms(inv.getPredicates(selfTerm, 
-                                                        atPreFunctions, 
-                                                        services).asSet());
+                                                        heapAtPre, 
+                                                        services));
         
         //modifies
-        ImmutableSet<LocationDescriptor> newModifies
-            = replaceVariablesInLocs(inv.getModifies(selfTerm, 
-                                                     atPreFunctions, 
-                                                     services).asSet());
+        Term newModifies
+            = replaceVariablesInTerm(inv.getModifies(selfTerm, 
+                                     heapAtPre, 
+                                     services));
         
         //variant
         Term newVariant
             = replaceVariablesInTerm(inv.getVariant(selfTerm, 
-                                                    atPreFunctions, 
+                                                    heapAtPre, 
                                                     services));
         
-        //working spaces
-        Term newWorkingSpaceLocal
-            = replaceVariablesInTerm(inv.getWorkingSpace(selfTerm, 
-                                                    atPreFunctions, 
-                                                    services));
-        
-        Term newParametrizedWS
-            = replaceVariablesInTerm(inv.getParametrizedWorkingSpaceTerms(selfTerm, 
-                    atPreFunctions, 
-                    services));
         
         Term newSelfTerm = replaceVariablesInTerm(selfTerm); 
-        Map newAtPreFunctions = replaceVariablesInMap(atPreFunctions);
+        Term newHeapAtPre = replaceVariablesInTerm(heapAtPre);
         boolean newPredicateHeuristicsAllowed
             = inv.getPredicateHeuristicsAllowed();
 
         LoopInvariant newInv 
             = new LoopInvariantImpl(newLoop, 
                                     newInvariant, 
-                                    new LoopPredicateSet(newPredicates),
-                                    new LocationDescriptorSet(newModifies), 
+                                    newPredicates,
+                                    newModifies, 
                                     newVariant, 
-                                    newParametrizedWS,
-                                    newWorkingSpaceLocal,
                                     newSelfTerm,
-                                    newAtPreFunctions,
+                                    newHeapAtPre,
                                     newPredicateHeuristicsAllowed);
         services.getSpecificationRepository().setLoopInvariant(newInv);
     }

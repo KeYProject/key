@@ -29,7 +29,6 @@ import de.uka.ilkd.key.logic.op.Metavariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.pp.PresentationFeatures;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.rule.*;
@@ -220,7 +219,7 @@ public class ProofSaver {
                                           appliedRuleApp.posInOccurrence()));
         tree.append(newNames2Proof(node));
 
-        if (appliedRuleApp.rule() instanceof AbstractUseOperationContractRule) {
+        if (appliedRuleApp.rule() instanceof UseOperationContractRule) {
             RuleJustificationBySpec ruleJusti = (RuleJustificationBySpec) 
                             proof.env().getJustifInfo()
                                        .getJustification(appliedRuleApp, 
@@ -234,7 +233,6 @@ public class ProofSaver {
         tree.append(")\n");
       }
    }
-       
 
 
    private StringBuffer collectProof(Node node, String prefix, 
@@ -327,11 +325,6 @@ public class ProofSaver {
 	     singleInstantiation += ((NameInstantiationEntry) value).getInstantiation();
 	 }
          else 
-         if (value instanceof ListInstantiation) {
-             ImmutableList<Object> l = (ImmutableList<Object>) ((ListInstantiation) value).getInstantiation();
-             singleInstantiation += printListInstantiation(l, proof.getServices());
-         }
-         else
              throw new RuntimeException("Saving failed.\n"+
            "FIXME: Unhandled instantiation type: " +  value.getClass());
 	 
@@ -343,25 +336,6 @@ public class ProofSaver {
       return s;
    }
    
-   
-
-   public static String printListInstantiation(ImmutableList<Object> l, Services serv) {
-       final StringBuffer sb = new StringBuffer("{");
-       final Iterator<Object> it = l.iterator();
-       while (it.hasNext()) {
-           final Object next = it.next();
-           if (next instanceof LocationDescriptor) {
-               sb.append(printLocationDescriptor(
-	           (LocationDescriptor)next, serv));
-           } else {
-               throw new RuntimeException("Unexpected entry in " +
-                        "ListInstantiation");               
-           }
-           if (it.hasNext()) sb.append(",");
-       }
-       sb.append("}");
-       return sb.toString();
-   }
 
    public String ifFormulaInsts(Node node, ImmutableList<IfFormulaInstantiation> l) {
       String s ="";
@@ -434,22 +408,6 @@ public class ProofSaver {
     }
 
 
-    public static StringBuffer printLocationDescriptor(LocationDescriptor loc,
-            Services serv) {
-        StringBuffer result;
-        LogicPrinter logicPrinter = createLogicPrinter(serv, false);
-        try {
-            logicPrinter.printLocationDescriptor(loc);
-        } catch(IOException ioe) {
-            System.err.println(ioe);
-        }
-        result = logicPrinter.result();
-        if (result.charAt(result.length()-1) == '\n')
-            result.deleteCharAt(result.length()-1);
-        return result;
-    }
-
-
     public static String printAnything(Object val, Services services) {
         if (val instanceof ProgramElement) {
             return printProgramElement((ProgramElement) val);
@@ -473,16 +431,10 @@ public class ProofSaver {
     private static LogicPrinter createLogicPrinter(Services serv, 
             boolean shortAttrNotation) {
 
-        NotationInfo ni = NotationInfo.createInstance();
+        NotationInfo ni = new NotationInfo();
         LogicPrinter p = null;
 
-        if (serv != null) {
-            PresentationFeatures.modifyNotationInfo(ni,
-                    serv.getNamespaces().functions());
-        }
         p =  new LogicPrinter(new ProgramPrinter(null), ni, (shortAttrNotation ? serv : null), true);
         return p;
     }
-
-
 }

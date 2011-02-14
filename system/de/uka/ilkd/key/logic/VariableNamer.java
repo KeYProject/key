@@ -30,11 +30,10 @@ import de.uka.ilkd.key.java.visitor.ProgramReplaceVisitor;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SortedSchemaVariable;
 import de.uka.ilkd.key.logic.sort.ArraySort;
-import de.uka.ilkd.key.logic.sort.PrimitiveSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.InstantiationProposer;
 import de.uka.ilkd.key.proof.Node;
@@ -368,7 +367,7 @@ public abstract class VariableNamer implements InstantiationProposer {
     private String getBaseNameProposal(Sort sort) {
 	String result;
         String name = sort.name().toString();
-        if(sort instanceof PrimitiveSort) {
+        if(sort instanceof SortImpl) {
             result = name.substring(0, 1);
         } else if(sort instanceof ArraySort) {
 	    result = DEFAULT_BASENAME;
@@ -398,7 +397,7 @@ public abstract class VariableNamer implements InstantiationProposer {
      */
     protected ProgramElementName getNameProposalForSchemaVariable(
                            String basename,
-                           SortedSchemaVariable sv,
+                           SchemaVariable sv,
                            PosInOccurrence posOfFind,
                            PosInProgram posOfDeclaration,
                            ImmutableList<String> previousProposals) {
@@ -510,15 +509,11 @@ public abstract class VariableNamer implements InstantiationProposer {
 	    }
         }
         
-        if(!(var instanceof SortedSchemaVariable)) {
-            return null;
-        }
-       
 	//get the proposal
         ProgramElementName name
 		    = getNameProposalForSchemaVariable(
                                                basename,
-                                               (SortedSchemaVariable)var,
+                                               var,
                                                app.posInOccurrence(),
                                                posOfDeclaration,
                                                previousProposals);
@@ -542,7 +537,7 @@ public abstract class VariableNamer implements InstantiationProposer {
      *         checked, else false
      */
     public boolean isUniqueNameForSchemaVariable(String name,
-    					       SortedSchemaVariable sv,
+    					       SchemaVariable sv,
 					       PosInOccurrence posOfFind,
 					       PosInProgram posOfDeclaration) {
 	boolean result = true;
@@ -639,9 +634,8 @@ public abstract class VariableNamer implements InstantiationProposer {
 
     // precondition: sv.sort()==ProgramSVSort.VARIABLE
     public String getSuggestiveNameProposalForProgramVariable(
-                                                SortedSchemaVariable sv,
+                                                SchemaVariable sv,
                                                 TacletApp app,
-						Goal goal,
 						Services services,
 						ImmutableList<String> previousProposals){
 	if(suggestive_off) {
@@ -659,7 +653,7 @@ public abstract class VariableNamer implements InstantiationProposer {
                 rwgt = (RewriteTacletGoalTemplate) templs.next();
 	        Term t = findProgramInTerm(rwgt.replaceWith());
 	        ContextStatementBlock c =
-                    (ContextStatementBlock) t.executableJavaBlock().program();
+                    (ContextStatementBlock) t.javaBlock().program();
 		if (c.getStatementAt(0) instanceof LocalVariableDeclaration) {
 	            VariableSpecification v =
                 	((LocalVariableDeclaration) c.getStatementAt(0)).
@@ -674,8 +668,8 @@ public abstract class VariableNamer implements InstantiationProposer {
 	        	CopyAssignment p2 = (CopyAssignment) c.getStatementAt(1);
                 	Expression lhs = p2.getExpressionAt(0);
                 	if (lhs.equals(sv)) {
-			     SortedSchemaVariable rhs =
-			         (SortedSchemaVariable) p2.getExpressionAt(1);
+			     SchemaVariable rhs =
+			         (SchemaVariable) p2.getExpressionAt(1);
                              name=app.instantiations().getInstantiation(rhs).
 			          toString();
                 	     break;
@@ -813,7 +807,7 @@ public abstract class VariableNamer implements InstantiationProposer {
 
 
     /**
-     * wrapper for global variables coming as a IList<Named>
+     * wrapper for global variables coming as a ListOfNamed
      */
     private static class GlobalsAsListOfNamed
     		   implements Globals {
@@ -847,7 +841,7 @@ public abstract class VariableNamer implements InstantiationProposer {
 
 
     /**
-     * adapter from Iterator<Named> to IteratorOfProgramElementName
+     * adapter from IteratorOfNamed to IteratorOfProgramElementName
      */
     private static class AdapterOfIteratorOfNamed
 		   implements Iterator<ProgramElementName> {
@@ -872,7 +866,7 @@ public abstract class VariableNamer implements InstantiationProposer {
 
 
     /**
-     * adapter from Iterator<ProgramVariable> to IteratorOfProgramElementName
+     * adapter from IteratorOfProgramVariable to IteratorOfProgramElementName
      */
     private static class AdapterOfIteratorOfProgramVariable
 		   implements Iterator<ProgramElementName> {
@@ -894,7 +888,6 @@ public abstract class VariableNamer implements InstantiationProposer {
 	    it.remove();
 	}
     }
-
 
     /**
      * a customized JavaASTWalker

@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -17,7 +17,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
 
-import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 
@@ -49,24 +48,33 @@ public class TaskTreeModel extends DefaultTreeModel {
 
     public void removeTask(TaskTreeNode p) {
 	Proof[] allProofs = p.allProofs();
-        for (Proof allProof : allProofs) {
-            proofToTask.remove(allProof);
-            Node.clearReuseCandidates(allProof); // yes, listeners...
-            p.decoupleFromEnv();
-        }
+	for (int i=0; i<allProofs.length; i++) {
+	    proofToTask.remove(allProofs[i]);
+	    p.decoupleFromEnv();
+	}
+	ProofEnvironment env = p.getProofEnv();
 	if (p.getParent().getChildCount()==1) { // remove env if p is single
-            GlobalProofMgt.getInstance().removeEnv(p.getProofEnv());
+            GlobalProofMgt.getInstance().removeEnv(env);
+            env = null;
 	    p = (TaskTreeNode) p.getParent();
 	}
 	removeNodeFromParent(p);
-	p.getProofEnv().updateProofStatus(); // this should be done by listeners
+	
+	if(env != null) {
+	    env.getProofs()
+	       .iterator()
+	       .next()
+	       .getProofs()[0]
+	       .mgt()
+	       .updateProofStatus();
+	}
     }
 
     private void updateProofToTask(TaskTreeNode p) {
 	Proof[] proofs = p.allProofs();
-        for (Proof proof : proofs) {
-            proofToTask.put(proof, p);
-        }
+	for (int i=0; i<proofs.length; i++) {
+	    proofToTask.put(proofs[i], p);
+	}
     }
 
     public TaskTreeNode getTaskForProof(Proof p) {
@@ -84,7 +92,4 @@ public class TaskTreeModel extends DefaultTreeModel {
 	addTask(bp);
 	return bp;
     }
-
-
-
 } 

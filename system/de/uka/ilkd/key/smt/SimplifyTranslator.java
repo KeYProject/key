@@ -1,11 +1,12 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
+//This file is part of KeY - Integrated Deductive Software Design
+//Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+//                    Universitaet Koblenz-Landau, Germany
+//                    Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-
+//The KeY system is protected by the GNU General Public License. 
+//See LICENSE.TXT for details.
+//
+//
 
 package de.uka.ilkd.key.smt;
 
@@ -13,10 +14,9 @@ import java.util.ArrayList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.util.Debug;
 
 public class SimplifyTranslator extends AbstractSMTTranslator {
-   
+    
 //  counter used for making names unique
     private int counter = 0;
 
@@ -59,12 +59,6 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
     private static StringBuffer NULLSORTSTRING = new StringBuffer("NULLSORT");
     
     
-    private static int MAX_INTEGER = 2147483646;
- 
-    private static int MIN_INTEGER = -2147483646;
-
-    
-    
     /**
      * Just a constructor which starts the conversion to Simplify syntax.
      * The result can be fetched with
@@ -83,7 +77,6 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
 	super(services);
     }
     
-    
     @Override
     protected StringBuffer buildCompleteText(StringBuffer formula,
 	    ArrayList<StringBuffer> assumptions,
@@ -99,11 +92,11 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
 	commentPredicate[ContextualBlock.PREDICATE_FORMULA] = "\n;Predicates used in formula:\n";
 	commentPredicate[ContextualBlock.PREDICATE_TYPE]    = "\n;Types expressed by predicates:\n";
 	String [] commentAssumption = new String[5];
-	commentAssumption[ContextualBlock.ASSUMPTION_DUMMY_IMPLEMENTATION] = "\n\n;Assumptions for dummy variables (%i):\n";
-	commentAssumption[ContextualBlock.ASSUMPTION_FUNCTION_DEFINTION] = "\n\n;Assumptions for function definitions (%i):\n"; 
-	commentAssumption[ContextualBlock.ASSUMPTION_SORT_PREDICATES] = "\n\n;Assumptions for sort predicates (%i):\n";
-	commentAssumption[ContextualBlock.ASSUMPTION_TYPE_HIERARCHY] = "\n\n;Assumptions for type hierarchy (%i):\n";
-	commentAssumption[ContextualBlock.ASSUMPTION_TACLET_TRANSLATION] = "\n\n;Assumptions made of taclets (%i):\n";
+	commentAssumption[ContextualBlock.ASSUMPTION_DUMMY_IMPLEMENTATION] = "\n\n;Assumptions for dummy variables:\n";
+	commentAssumption[ContextualBlock.ASSUMPTION_FUNCTION_DEFINTION] = "\n\n;Assumptions for function definitions:\n"; 
+	commentAssumption[ContextualBlock.ASSUMPTION_SORT_PREDICATES] = "\n\n;Assumptions for sort predicates:\n";
+	commentAssumption[ContextualBlock.ASSUMPTION_TYPE_HIERARCHY] = "\n\n;Assumptions for type hierarchy:\n";
+	commentAssumption[ContextualBlock.ASSUMPTION_TACLET_TRANSLATION]= "\n\n;Assumptions for taclets:";
 	
 	StringBuffer comment = new StringBuffer("\n\n;The formula:\n");
 	formula = comment.append(formula);
@@ -120,11 +113,11 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
 		preds.append(commentPredicate[block.getType()]);
 		for(int j = block.getStart(); j <= block.getEnd(); j++){
 		    PredicatesToRemove.add(predicates.get(j));
-            preds.append("(DEFPRED (").append(predicates.get(j).get(0));
+		    preds.append("(DEFPRED (" + predicates.get(j).get(0));
 		    for (int i = 1; i < predicates.get(j).size(); i++) {
 			StringBuffer var = new StringBuffer("x");
 			var = this.makeUnique(var);
-                preds.append(" ").append(var);
+			preds.append(" " + var);
 		    	}
 		    preds.append("))\n");
 		}
@@ -137,11 +130,11 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
 	{
 	    preds.append("\n;Other predicates:\n");
 	    for (ArrayList<StringBuffer> s : predicates) {
-            preds.append("(DEFPRED (").append(s.get(0));
+		preds.append("(DEFPRED (" + s.get(0));
 		for (int i = 1; i < s.size(); i++) {
 		    StringBuffer var = new StringBuffer("x");
 		    var = this.makeUnique(var);
-            preds.append(" ").append(var);
+		    preds.append(" " + var);
 		}
 		preds.append("))\n");
 	    }
@@ -154,8 +147,9 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
         StringBuffer assump = new StringBuffer();
 	
         if(assumptions.size() > 0){
-           for(int k=0; k < assumptionBlocks.size(); k++){
+           for(int k=0; k < commentAssumption.length; k++){
                 ContextualBlock block = assumptionBlocks.get(k);
+                
                 if (block.getStart() <= block.getEnd()) {
                     
                     // necessary for appending 'ANDs' correctly
@@ -167,14 +161,11 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
                 	AssumptionsToRemove.add(assumptions.get(start));
                 	start++;
                     }
-                    String commentAssump = commentAssumption[block.getType()].replaceAll("%i", Integer.toString(block.getEnd()-start+1));
-                   
-                    assump.append(commentAssump);
+                    assump.append(commentAssumption[block.getType()]);
                     assump.append(temp);
                     
         	    for (int i = start; i <= block.getEnd(); i++) {
         		assump = this.translateLogicalAnd(assump, assumptions.get(i));
-        		assump.append("\n");
         		AssumptionsToRemove.add(assumptions.get(i));
         	    }
             	
@@ -182,7 +173,7 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
     	
     	
             }
-          
+           
            assumptions.removeAll(AssumptionsToRemove);
          
            if (assumptions.size() > 0) {
@@ -196,7 +187,6 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
    	       
    	       for (int i = start; i < assumptions.size(); i++) {
    		   assump = this.translateLogicalAnd(assump, assumptions.get(i));
-   		   assump.append("\n");
    	       }
    	  
    	    }
@@ -221,24 +211,7 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
 	
 	toReturn.append(formula);
 	
-	Debug.log4jInfo("Resulting formula after translation:",
-			 SimplifyTranslator.class.getName());
-	Debug.log4jInfo(toReturn.toString(), SimplifyTranslator.class.getName());
-	
 	return toReturn;
-    }
-    
-
- 
-
-    @Override
-    protected boolean numberIsSupported(long number) {
-	//Simplify supports only numbers within the following range.
-	// Theoretically Simplify supports numbers up to 2147483647, but
-	// for some cases it is important that the negation of a number
-	// is supported, too. Therefore the biggest number is 
-	// 2147483646
-	return number <= MAX_INTEGER && number >= MIN_INTEGER;
     }
 
     @Override
@@ -355,7 +328,7 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
     protected StringBuffer translateLogicalAll(StringBuffer var,
 	    StringBuffer type, StringBuffer form) {
 	StringBuffer toReturn = new StringBuffer("(" + ALLSTRING + " ");
-        toReturn.append("(").append(var).append(") ").append(form).append(")");
+	toReturn.append("(" + var + ") " + form + ")");
 	return toReturn;
     }
 
@@ -394,7 +367,7 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
     protected StringBuffer translateLogicalExist(StringBuffer var,
 	    StringBuffer type, StringBuffer form) {
 	StringBuffer toReturn = new StringBuffer("(" + EXISTSTRING + " ");
-        toReturn.append("(").append(var).append(") ").append(form).append(")");
+	toReturn.append("(" + var + ") " + form + ")");
 	return toReturn;
     }
 
@@ -487,10 +460,10 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
 	StringBuffer toReturn = new StringBuffer();
 	    toReturn.append("(");
 	    toReturn.append(name);
-        for (StringBuffer arg : args) {
-            toReturn.append(" ");
-            toReturn.append(arg);
-        }
+	    for (int i = 0; i < args.size(); i++) {
+		toReturn.append(" ");
+		toReturn.append(args.get(i));
+	    }
 	    toReturn.append(")");
 	return toReturn;
     }
@@ -518,28 +491,28 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
 	ArrayList<String> replacement = new ArrayList<String>();
 	
 	toReplace.add("[]");
-	replacement.add("Array");
+	replacement.add("_Array");
 	
 	toReplace.add("<");
-	replacement.add("abo_");
+	replacement.add("_abo_");
 	
 	toReplace.add(">");
-	replacement.add("abc_");
+	replacement.add("_abc_");
 	
 	toReplace.add("{");
-	replacement.add("cbo_");
+	replacement.add("_cbo_");
 	
 	toReplace.add("}");
-	replacement.add("cbc_");
+	replacement.add("_cbc_");
 	
 	toReplace.add(".");
-	replacement.add("dot_");
+	replacement.add("_dot_");
 	
 	toReplace.add(":");
-	replacement.add("col_");
+	replacement.add("_col_");
 	
 	toReplace.add("\\");
-	replacement.add("slash_");
+	replacement.add("_");
 	
 	toReturn = this.removeIllegalChars(toReturn, toReplace, replacement);
 	

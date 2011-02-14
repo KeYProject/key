@@ -47,11 +47,13 @@ public class TermInstantiation extends InstantiationEntry {
     /** returns the instantiation of the SchemaVariable 
      * @return  the instantiation of the SchemaVariable 
     */
+    @Override
     public Object getInstantiation() {
 	return term;
     }
 
-    /** toString */
+
+    @Override
     public String toString() {
 	return "["+getSchemaVariable()+", "+getTerm()+"]";
     }

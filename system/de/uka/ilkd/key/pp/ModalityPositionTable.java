@@ -25,6 +25,7 @@ public class ModalityPositionTable extends PositionTable {
 
     private Range firstStatementRange = null;
     
+    
     public void setFirstStatementRange(Range r){
 	firstStatementRange = r;
     }
@@ -33,5 +34,4 @@ public class ModalityPositionTable extends PositionTable {
     public Range getFirstStatementRange(){
 	return new Range(firstStatementRange);
     }
-
 }

@@ -30,7 +30,7 @@ import de.uka.ilkd.key.rule.RuleApp;
  * manager simulates a backtracking behaviour by repeated evaluation of the
  * feature term.
  */
-public class BackTrackingManager {
+public final class BackTrackingManager {
 
     /**
      * The original rule application in question, i.e., the application without
@@ -39,7 +39,7 @@ public class BackTrackingManager {
     private RuleApp initialApp = null;
     
     /**
-     * Stack of <code>IteratorOfCPBranch</code>: the branches of
+     * Stack of <code>Iterator<CPBranch></code>: the branches of
      * <code>ChoicePoint</code>s that have not yet been taken, the branches
      * of later points being further up in the stack
      */

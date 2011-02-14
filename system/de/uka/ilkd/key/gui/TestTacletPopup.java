@@ -15,8 +15,8 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.PrimitiveSort;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.parser.KeYLexer;
 import de.uka.ilkd.key.parser.KeYParser;
 import de.uka.ilkd.key.parser.ParserMode;
@@ -55,13 +55,12 @@ public class TestTacletPopup {
 
     static SchemaVariable b;
     static SchemaVariable x;
-    static SchemaVariable x0;
     static SchemaVariable t0;
     static LogicVariable z;
 
-    static Sort nat = new PrimitiveSort(new Name("Nat"));
+    static Sort nat = new SortImpl(new Name("Nat"));
 
-    static TermFactory tf=TermFactory.DEFAULT;
+    private static final TermBuilder TB = TermBuilder.DF;
 
     public static Namespace var_ns=new Namespace();
     public static Namespace func_ns=new Namespace();
@@ -78,11 +77,11 @@ public class TestTacletPopup {
 	AntecTacletBuilder impleftbuilder=new AntecTacletBuilder();
 	b=SchemaVariableFactory.createFormulaSV(new Name("b"), false);
 	SchemaVariable b0 = SchemaVariableFactory.createFormulaSV(new Name("b0"), false);
-	Term t_b=tf.createFunctionTerm((SortedSchemaVariable)b,new Term[0]);
-	Term t_b0=tf.createFunctionTerm((SortedSchemaVariable)b0,new Term[0]);
-	Term t_bimpb0=tf.createJunctorTerm(Op.IMP,new Term[]{t_b, t_b0});
-	Term t_bandb0 = tf.createJunctorTerm(Op.AND, t_b, t_b0);
-	Term t_borb0 = tf.createJunctorTerm(Op.OR, t_b, t_b0);
+	Term t_b= TB.var((SchemaVariable)b);
+	Term t_b0= TB.var((SchemaVariable)b0);
+	Term t_bimpb0=TB.tf().createTerm(Junctor.IMP,new Term[]{t_b, t_b0});
+	Term t_bandb0 = TB.tf().createTerm(Junctor.AND, t_b, t_b0);
+	Term t_borb0 = TB.tf().createTerm(Junctor.OR, t_b, t_b0);
 
 	impleftbuilder.setFind(t_bimpb0);
 	impleftbuilder.setName(new Name("imp-left"));
@@ -122,7 +121,7 @@ public class TestTacletPopup {
 
 	// not-left rule
 	// find(not b=>) replacewith(=>b)
-	Term t_notb=tf.createJunctorTerm(Op.NOT, new Term[]{t_b});
+	Term t_notb=TB.tf().createTerm(Junctor.NOT, new Term[]{t_b});
 	AntecTacletBuilder notleftbuilder=new AntecTacletBuilder();
 	notleftbuilder.setFind(t_notb);
 	seq=Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT,
@@ -185,8 +184,8 @@ public class TestTacletPopup {
 
 	// contradiction rule
 	// find(b->b0) replacewith(-b0 -> -b)
-	Term t_notb0=tf.createJunctorTerm(Op.NOT, new Term[]{t_b0});
-	Term t_notb0impnotb=tf.createJunctorTerm(Op.IMP,new Term[]{t_notb0, t_notb});
+	Term t_notb0=TB.tf().createTerm(Junctor.NOT, new Term[]{t_b0});
+	Term t_notb0impnotb=TB.tf().createTerm(Junctor.IMP,new Term[]{t_notb0, t_notb});
 
 	RewriteTacletBuilder rwbuilder=new RewriteTacletBuilder();
 	rwbuilder.setFind(t_bimpb0);
@@ -203,12 +202,11 @@ public class TestTacletPopup {
 	// all-right
 	// find (=>Vx:b) add(=>b[x/t0])
 	SuccTacletBuilder allrightbuilder=new SuccTacletBuilder();
-	x = SchemaVariableFactory.createVariableSV(new Name("x"),nat, false);
-	t0 = SchemaVariableFactory.createTermSV(new Name("t0"),nat, false);
-	Term t_t0=tf.createFunctionTerm((SortedSchemaVariable)t0,new Term[0]);
-	Term t_allxb=tf.createQuantifierTerm(Op.ALL,
-					     new SortedSchemaVariable[]{(SortedSchemaVariable)x},t_b);
-	Term t_subxt0b=tf.createSubstitutionTerm(Op.SUBST,(SortedSchemaVariable)x,t_t0,t_b);
+	x = SchemaVariableFactory.createVariableSV(new Name("x"),nat);
+	t0 = SchemaVariableFactory.createTermSV(new Name("t0"),nat);
+	Term t_t0=TB.var((SchemaVariable)t0);
+	Term t_allxb=TB.all((VariableSV)x, t_b);
+	Term t_subxt0b=TB.subst(WarySubstOp.SUBST,(QuantifiableVariable)x,t_t0,t_b);
 	allrightbuilder.setFind(t_allxb);
 	seq=Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT,
 		    Semisequent.EMPTY_SEMISEQUENT.insert(0,new
@@ -328,28 +326,27 @@ public class TestTacletPopup {
 
 
 	//decls for nat
-	Function func_0=new RigidFunction(new Name("zero"),nat,new Sort[]{});
+	Function func_0=new Function(new Name("zero"),nat,new Sort[]{});
 	func_ns.add(func_0);
-	Function func_plus=new RigidFunction(new Name("plus"),nat,
+	Function func_plus=new Function(new Name("plus"),nat,
 					new Sort[]{nat,nat});
 	func_ns.add(func_plus);
-	Function func_min1=new RigidFunction(new Name("pred"),nat,new Sort[]{nat});
+	Function func_min1=new Function(new Name("pred"),nat,new Sort[]{nat});
 	func_ns.add(func_min1);
-	Function func_plus1=new RigidFunction(new Name("succ"),nat,new Sort[]{nat});
+	Function func_plus1=new Function(new Name("succ"),nat,new Sort[]{nat});
 	func_ns.add(func_plus1);
-	SchemaVariable var_rn=SchemaVariableFactory.createTermSV(new Name("rn"),nat, false);
-	SchemaVariable var_rm=SchemaVariableFactory.createTermSV(new Name("rm"),nat, false);
+	SchemaVariable var_rn=SchemaVariableFactory.createTermSV(new Name("rn"),nat);
+	SchemaVariable var_rm=SchemaVariableFactory.createTermSV(new Name("rm"),nat);
 
-	Term t_rn=tf.createFunctionTerm((SortedSchemaVariable)var_rn,new Term[]{});
-	Term t_rm=tf.createFunctionTerm((SortedSchemaVariable)var_rm,new Term[]{});
-	Term t_0=tf.createFunctionTerm(func_0,new Term[]{});	
-	Term t_rnminus1=tf.createFunctionTerm(func_min1,new Term[]{t_rn});
-	Term t_rnminus1plus1=tf.createFunctionTerm(func_plus1,
+	Term t_rn=TB.var(var_rn);
+	Term t_rm=TB.var(var_rm);
+	Term t_0=TB.func(func_0,new Term[]{});	
+	Term t_rnminus1=TB.func(func_min1,new Term[]{t_rn});
+	Term t_rnminus1plus1=TB.func(func_plus1,
 						   new Term[]{t_rnminus1});
-	//	Term t_0minus1=tf.createFunctionTerm(func_min1,
+	//	Term t_0minus1=TB.func(func_min1,
 	//		     new Term[]{t_0});
-	Term t_0plus1=tf.createFunctionTerm(func_plus1,
-						new Term[]{t_0});
+	Term t_0plus1=TB.func(func_plus1, new Term[]{t_0});
 
 
 
@@ -383,8 +380,7 @@ public class TestTacletPopup {
 	//plus-zero-elim
 	// find(rn + 0) replacewith(rn)
 	rwbuilder=new RewriteTacletBuilder();
-	rwbuilder.setFind(tf.createFunctionTerm(func_plus,
-						new Term[]{t_rn, t_0}));
+	rwbuilder.setFind(TB.func(func_plus, new Term[]{t_rn, t_0}));
 	rwbuilder.addTacletGoalTemplate(new
 	    RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
 				    ImmutableSLList.<Taclet>nil(),				    
@@ -395,8 +391,7 @@ public class TestTacletPopup {
 	//zero-plus-elim
 	// find(0 + rn) replacewith(rn)
 	rwbuilder=new RewriteTacletBuilder();
-	rwbuilder.setFind(tf.createFunctionTerm(func_plus,
-						new Term[]{t_0, t_rn}));
+	rwbuilder.setFind(TB.func(func_plus, new Term[]{t_0, t_rn}));
 	rwbuilder.addTacletGoalTemplate(new
 	    RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
 				    ImmutableSLList.<Taclet>nil(),				    
@@ -408,7 +403,7 @@ public class TestTacletPopup {
 	//closewitheq
 	// find(=> rn=rn)
 	SuccTacletBuilder sbuilder=new SuccTacletBuilder();
-	Term t_rneqrn=tf.createEqualityTerm(t_rn, t_rn);
+	Term t_rneqrn = TB.equals(t_rn, t_rn);
 	sbuilder.setFind( t_rneqrn);
 	sbuilder.setName(new Name("close-with-eq"));
        	closewitheq=sbuilder.getSuccTaclet();
@@ -416,14 +411,14 @@ public class TestTacletPopup {
 
 	//switch first succ
 	// find((rn +1) + rm) replacewith((rn + rm) +1)
-	Term t_rnplus1=tf.createFunctionTerm(func_plus1, 
+	Term t_rnplus1=TB.func(func_plus1, 
 					   new Term[]{t_rn});
-	Term t_rnplus1plusrm=tf.createFunctionTerm(func_plus, 
+	Term t_rnplus1plusrm=TB.func(func_plus, 
 					   new Term[]{t_rnplus1, t_rm});
 
-	Term t_rnplusrm=tf.createFunctionTerm(func_plus, 
+	Term t_rnplusrm=TB.func(func_plus, 
 					   new Term[]{t_rn, t_rm});
-	Term t_rnplusrmplus1=tf.createFunctionTerm(func_plus1, 
+	Term t_rnplusrmplus1=TB.func(func_plus1, 
 					   new Term[]{t_rnplusrm});
 
 	rwbuilder=new RewriteTacletBuilder();
@@ -439,9 +434,9 @@ public class TestTacletPopup {
 
 	//switch second succ
 	// find(rn + (rm +1)) replacewith((rn + rm) +1)
-	Term t_rmplus1=tf.createFunctionTerm(func_plus1, 
+	Term t_rmplus1=TB.func(func_plus1, 
 					   new Term[]{t_rm});
-	Term t_rnplus_rmplus1=tf.createFunctionTerm(func_plus, 
+	Term t_rnplus_rmplus1=TB.func(func_plus, 
 					   new Term[]{t_rn, t_rmplus1});
 	rwbuilder=new RewriteTacletBuilder();
 	rwbuilder.setFind(t_rnplus_rmplus1);
@@ -454,10 +449,9 @@ public class TestTacletPopup {
 
 	//elim-succ
 	// find(rn +1 = rm +1) replacewith(rn=rm)
-	Term t_rneqrm=tf.createEqualityTerm(t_rn, t_rm);
+	Term t_rneqrm = TB.equals(t_rn, t_rm);
 	rwbuilder=new RewriteTacletBuilder();
-	rwbuilder.setFind(tf.createEqualityTerm(t_rnplus1,
-						t_rmplus1));
+	rwbuilder.setFind(TB.equals(t_rnplus1, t_rmplus1));
 	rwbuilder.addTacletGoalTemplate(new
 	    RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
 				    ImmutableSLList.<Taclet>nil(),				    
@@ -492,16 +486,13 @@ public class TestTacletPopup {
 			      Semisequent.EMPTY_SEMISEQUENT.insert(0,cf2).semisequent()); 
 	
 
-	z=new LogicVariable(new Name("z"),nat);
-	Function p=new RigidFunction(new Name("P"),Sort.FORMULA,new Sort[]{nat});
+	z = new LogicVariable(new Name("z"),nat);
+	Function p = new Function(new Name("P"),Sort.FORMULA,new Sort[]{nat});
 	func_ns.add(p);
-	Term t_z=tf.createFunctionTerm(z,new Term[0]);
+	Term t_z = TB.var(z);
 	Term t_allzpz
-	    =tf.createQuantifierTerm(Op.ALL,
-				     new QuantifiableVariable[]{z}, 
-				     tf.createFunctionTerm(p,
-							 new Term[]{t_z}));
-	ConstrainedFormula cf3=new ConstrainedFormula(t_allzpz, 
+	    = TB.all(z, TB.func(p, new Term[]{t_z}));
+	ConstrainedFormula cf3 = new ConstrainedFormula(t_allzpz, 
 						    Constraint.BOTTOM);
 	seq_testAll=Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT, 
 					  Semisequent.EMPTY_SEMISEQUENT
@@ -511,31 +502,29 @@ public class TestTacletPopup {
 
 
 	//nat problem:
-	Function const_c=new RigidFunction(new Name("c"),nat,new Sort[0]);
+	Function const_c=new Function(new Name("c"),nat,new Sort[0]);
 	func_ns.add(const_c);
-	Function const_d=new RigidFunction(new Name("d"),nat,new Sort[0]);
+	Function const_d=new Function(new Name("d"),nat,new Sort[0]);
 	func_ns.add(const_d);
 
-	Term t_c=tf.createFunctionTerm(const_c,new Term[]{});
-	Term t_d=tf.createFunctionTerm(const_d,new Term[]{});
-	Term t_cplusd=tf.createFunctionTerm(func_plus,new Term[]{t_c,t_d});
-	Term t_dminus1=tf.createFunctionTerm(func_min1,new Term[]{t_d});
-	Term t_dminus1plus1=tf.createFunctionTerm(func_plus1,
+	Term t_c=TB.func(const_c,new Term[]{});
+	Term t_d=TB.func(const_d,new Term[]{});
+	Term t_cplusd=TB.func(func_plus,new Term[]{t_c,t_d});
+	Term t_dminus1=TB.func(func_min1,new Term[]{t_d});
+	Term t_dminus1plus1=TB.func(func_plus1,
 						  new Term[]{t_dminus1});	
-	Term t_dminus1plus1plusc=tf.createFunctionTerm
+	Term t_dminus1plus1plusc=TB.func
 	    (func_plus,new Term[]{t_dminus1plus1,t_c});
-	Term t_eq1=tf.createEqualityTerm
-	    (t_cplusd, t_dminus1plus1plusc);
+	Term t_eq1 = TB.equals(t_cplusd, t_dminus1plus1plusc);
 	
 
-	Term t_cplus1=tf.createFunctionTerm(func_plus1,new Term[]{t_c});
-	Term t_cplus1plusd=tf.createFunctionTerm(func_plus,new Term[]{t_cplus1,
+	Term t_cplus1=TB.func(func_plus1,new Term[]{t_c});
+	Term t_cplus1plusd=TB.func(func_plus,new Term[]{t_cplus1,
 								      t_d});
-	Term t_dpluscplus1=tf.createFunctionTerm(func_plus,
+	Term t_dpluscplus1=TB.func(func_plus,
 						 new Term[]{t_d,t_cplus1});
-	Term t_eq2=tf.createEqualityTerm
-	    (t_cplus1plusd, t_dpluscplus1);
-	Term tnat=tf.createJunctorTerm(Op.IMP, t_eq1, t_eq2);
+	Term t_eq2 = TB.equals(t_cplus1plusd, t_dpluscplus1);
+	Term tnat = TB.imp(t_eq1, t_eq2);
 
 	// => (c+d) = ((d -1 +1) +c) -> (c +1)+d = (d+c) +1
 	seq_testNat=Sequent.createSequent

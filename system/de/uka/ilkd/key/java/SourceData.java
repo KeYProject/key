@@ -43,6 +43,8 @@ public class SourceData {
      * @param services the Services 
      */
     public SourceData(ProgramElement element, int childPos, Services services) {
+	assert services != null;
+	assert element != null;
         this.services = services;
         this.element  = element;
         this.childPos = childPos;

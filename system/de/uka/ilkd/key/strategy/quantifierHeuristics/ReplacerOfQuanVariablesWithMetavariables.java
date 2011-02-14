@@ -23,7 +23,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  */
 class ReplacerOfQuanVariablesWithMetavariables {
 
-	final private static TermBuilder tb = TermBuilder.DF;
+    final private static TermBuilder tb = TermBuilder.DF;
 
     private ReplacerOfQuanVariablesWithMetavariables () {}
     
@@ -36,12 +36,12 @@ class ReplacerOfQuanVariablesWithMetavariables {
             QuantifiableVariable q =
                 t.varsBoundHere ( 0 ).get ( 0 );
             Term m;
-            if ( op == Op.ALL ) {
+            if ( op == Quantifier.ALL ) {
                 Metavariable mv = new Metavariable ( ARBITRARY_NAME, q.sort () );
-                m = tb.func ( mv );
+                m = tb.var ( mv );
             } else {
-                Function f = new RigidFunction ( ARBITRARY_NAME, q.sort (),
-                                                 new Sort [0] );
+                Function f = new Function ( ARBITRARY_NAME, q.sort (),
+                                            new Sort [0] );
                 m = tb.func ( f );
             }
             res = res.put ( q, m );

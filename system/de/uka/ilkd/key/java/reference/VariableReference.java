@@ -17,10 +17,9 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.util.ExtList;
-/**
- *  Variable reference.
- *  @author <TT>AutoDoc</TT>
- */
+
+
+
 public class VariableReference extends JavaNonTerminalProgramElement
                                implements  NameReference, Expression, 
                                ReferencePrefix {
@@ -61,7 +60,6 @@ public class VariableReference extends JavaNonTerminalProgramElement
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
      *  of bounds
      */
-
     public ProgramElement getChildAt(int index) {
         if (variable != null) {
             if (index == 0) return variable;
@@ -73,11 +71,7 @@ public class VariableReference extends JavaNonTerminalProgramElement
 	return (ProgramElementName) variable.name();
     }
 
-    /**
-     * Get name.
-     * @return the string.
-     */
-
+    
     public final String getName() {
         return (variable == null) ? null : variable.toString();
     }
@@ -129,5 +123,4 @@ public class VariableReference extends JavaNonTerminalProgramElement
     public KeYJavaType getKeYJavaType() {
 	return variable != null? variable.getKeYJavaType() : null;
     }
-
 }

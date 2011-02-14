@@ -13,22 +13,17 @@
 
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.logic.Name;
 
-public class TacletAttributes {
+public final class TacletAttributes {
     private boolean noninteractive;
    
     private String displayName;
-    private ImmutableList<Name> oldNames;
     private String helpText;
 
 
    public TacletAttributes() {
 	this.noninteractive = false;	
         this.displayName = null;
-        this.oldNames = ImmutableSLList.<Name>nil();
         this.helpText = null;
    }
 
@@ -43,10 +38,6 @@ public class TacletAttributes {
        return displayName;
     }
     
-    public ImmutableList<Name> oldNames() {
-       return oldNames;
-    }
-    
     public String helpText() {
        return helpText;
     }
@@ -58,13 +49,6 @@ public class TacletAttributes {
        displayName = s;
     }
 
-    /** adds an old name to the list of old names
-     */
-    public void addOldName(String s) {
-        oldNames = oldNames.prepend(new Name(s));
-    }
-
-
     public void setHelpText(String s) {
        helpText = s;
     }
@@ -74,7 +58,4 @@ public class TacletAttributes {
     public void setNoninteractive(boolean ni) {
 	noninteractive = ni;
     }
-    
-    
-    
 }

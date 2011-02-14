@@ -11,6 +11,7 @@
 package de.uka.ilkd.key.logic;
 
 import junit.framework.TestCase;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.TacletIndex;
@@ -22,12 +23,13 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 public class TestSyntacticalReplaceVisitor extends TestCase {
     
-    
+    private static final TermBuilder TB = TermBuilder.DF;
+       
     SVInstantiations insts=null;
 
     Term rw;
     Term t_allxpxpx;
-    private final static TermFactory tf=TermFactory.DEFAULT;
+
 
     public TestSyntacticalReplaceVisitor(String s) {
 	super(s);
@@ -53,22 +55,22 @@ public class TestSyntacticalReplaceVisitor extends TestCase {
 	SchemaVariable v=(SchemaVariable)rw.sub(0).sub(1)
 	    .varsBoundHere(1).get(0);
 
-	Sort s=((SortedSchemaVariable)u).sort();
+	Sort s=u.sort();
 
 	LogicVariable x=new LogicVariable(new Name("x"), s);
 	LogicVariable y=new LogicVariable(new Name("y"), s);
-	Function p=new RigidFunction(new Name("p"), Sort.FORMULA, new Sort[]{s});
+	Function p=new Function(new Name("p"), Sort.FORMULA, new Sort[]{s});
 
-	Term t_x=tf.createVariableTerm(x);
-	Term t_px=tf.createFunctionTerm(p, t_x);
-	Term t_y=tf.createVariableTerm(y);
-	Term t_py=tf.createFunctionTerm(p, t_y);
+	Term t_x=TB.tf().createTerm(x);
+	Term t_px=TB.tf().createTerm(p, new Term[]{t_x}, null, null);
+	Term t_y=TB.tf().createTerm(y);
+	Term t_py=TB.tf().createTerm(p, new Term[]{t_y}, null, null);
 
-	insts=SVInstantiations.EMPTY_SVINSTANTIATIONS.add(b, t_px).add(v, t_y)
-	    .add(u, t_x).add(c, t_py);
+	Services services = TacletForTests.services();
+	insts=SVInstantiations.EMPTY_SVINSTANTIATIONS.add(b, t_px, services).add(v, t_y, services)
+	    .add(u, t_x, services).add(c, t_py, services);
 	
-	t_allxpxpx=tf.createQuantifierTerm(Op.ALL, x, tf.createJunctorTerm
-					   (Op.AND, t_px, t_px));
+	t_allxpxpx=TB.all(x, TB.and(t_px, t_px));
 
     }
     

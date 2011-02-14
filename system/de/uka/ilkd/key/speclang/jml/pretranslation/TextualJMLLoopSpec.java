@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -16,7 +16,7 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.speclang.PositionedString;
 
 
-public class TextualJMLLoopSpec extends TextualJMLConstruct {
+public final class TextualJMLLoopSpec extends TextualJMLConstruct {
 
     private ImmutableList<PositionedString> invariant          
             = ImmutableSLList.<PositionedString>nil();
@@ -26,13 +26,6 @@ public class TextualJMLLoopSpec extends TextualJMLConstruct {
             = ImmutableSLList.<PositionedString>nil();
     private ImmutableList<PositionedString> assignable         
             = ImmutableSLList.<PositionedString>nil();
-
-    private ImmutableList<PositionedString> parametrizedWS        
-            = ImmutableSLList.<PositionedString>nil();
-    private PositionedString workingSpaceLocal = null;
-    private PositionedString workingSpaceConstructed = null;
-    private PositionedString workingSpaceReentrant = null;
-
     private PositionedString variant                  
             = null;
     
@@ -67,25 +60,6 @@ public class TextualJMLLoopSpec extends TextualJMLConstruct {
         variant = ps;
     }
     
-    public void addParametrizedWorkingspace(PositionedString ps){
-        parametrizedWS = parametrizedWS.append(ps);
-    }
-    
-    public void setWorkingSpaceLocal(PositionedString ps) {
-        assert workingSpaceLocal == null;
-        workingSpaceLocal = ps;
-    }
-    
-    public void setWorkingSpaceConstructed(PositionedString ps) {
-        assert workingSpaceConstructed == null;
-        workingSpaceConstructed = ps;
-    }
-    
-    public void setWorkingSpaceReentrant(PositionedString ps) {
-        assert workingSpaceReentrant == null;
-        workingSpaceReentrant = ps;
-    }
-    
     
     public ImmutableList<PositionedString> getInvariant() {
         return invariant;
@@ -111,69 +85,37 @@ public class TextualJMLLoopSpec extends TextualJMLConstruct {
         return variant;
     }
     
-    public ImmutableList<PositionedString> getParametrizedWorkingspace(){
-        return parametrizedWS;
-    }
     
-    public PositionedString getWorkingSpaceLocal() {
-        return workingSpaceLocal;
-    }
-    
-    public PositionedString getWorkingSpaceConstructed() {
-        return workingSpaceConstructed;
-    }
-    
-    public PositionedString getWorkingSpaceReentrant() {
-        return workingSpaceReentrant;
-    }
-    
-    
+    @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
         Iterator<PositionedString> it;
         
         it = invariant.iterator();
         while(it.hasNext()) {
-            sb.append("invariant: ").append(it.next()).append("\n");
+            sb.append("invariant: " + it.next() + "\n");
         }
         it = skolemDeclarations.iterator();
         while(it.hasNext()) {
-            sb.append("skolem_constant: ").append(it.next()).append("\n");
+            sb.append("skolem_constant: " + it.next() + "\n");
         }
         it = predicates.iterator();
         while(it.hasNext()) {
-            sb.append("loop_predicate: ").append(it.next()).append("\n");
+            sb.append("loop_predicate: " + it.next() + "\n");
         }
         it = assignable.iterator();
         while(it.hasNext()) {
-            sb.append("assignable: ").append(it.next()).append("\n");
+            sb.append("assignable: " + it.next() + "\n");
         }
         if(variant != null) {
-            sb.append("decreases: ").append(variant);
-        }
-        
-        it = parametrizedWS.iterator();
-        while(it.hasNext()){
-            sb.append("workingSpace"+it.next()+"\n");
-        }
-        
-        if(workingSpaceLocal != null){
-            sb.append("working_space_single_iteration_local: "+workingSpaceLocal);
-        }
-        
-        if(workingSpaceConstructed != null){
-            sb.append("working_space_single_iteration_constructed: "+workingSpaceConstructed);
-        }
-        
-        if(workingSpaceReentrant != null){
-            sb.append("working_space_single_iteration_reentrant: "+workingSpaceReentrant);
+            sb.append("decreases: " + variant);
         }
         
         return sb.toString();
     }
     
     
-    
+    @Override
     public boolean equals(Object o) {
         if(!(o instanceof TextualJMLLoopSpec)) {
             return false;
@@ -185,16 +127,11 @@ public class TextualJMLLoopSpec extends TextualJMLConstruct {
                && predicates.equals(ls.predicates)
                && assignable.equals(ls.assignable)
                && (variant == null && ls.variant == null
-                   || variant.equals(ls.variant))
-               && (workingSpaceLocal == null && ls.workingSpaceLocal == null ||
-                       workingSpaceLocal.equals(ls.workingSpaceLocal))
-               && (workingSpaceConstructed == null && ls.workingSpaceConstructed == null ||
-                       workingSpaceConstructed.equals(ls.workingSpaceConstructed))
-               && (workingSpaceReentrant == null && ls.workingSpaceReentrant == null ||
-                       workingSpaceReentrant.equals(ls.workingSpaceReentrant));
+                   || variant != null && variant.equals(ls.variant));
     }
     
     
+    @Override
     public int hashCode() {
         return mods.hashCode()
                 + invariant.hashCode() 

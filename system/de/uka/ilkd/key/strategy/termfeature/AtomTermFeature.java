@@ -23,7 +23,7 @@ public class AtomTermFeature extends BinaryTermFeature {
     protected boolean filter(Term term) {
         final Operator op = term.op ();
         return ! ( op instanceof Junctor
-                   || op == Op.EQV
+                   || op == Equality.EQV
                    || op instanceof IfThenElse
                    || op instanceof Quantifier );
     }

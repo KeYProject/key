@@ -10,7 +10,10 @@
 
 package de.uka.ilkd.key.rule;
 
+import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SkolemTermSV;
+import de.uka.ilkd.key.logic.op.TermSV;
 
 /**
  * class containing a pair of SchemaVariables, the first one being a
@@ -29,8 +32,8 @@ public class NewDependingOn {
      * an Taclet.
      */
     public NewDependingOn(SchemaVariable first, SchemaVariable second) {
-        if ( !( ( first.isSkolemTermSV () || first.isFormulaSV () )
-                && ( second.isFormulaSV () || second.isTermSV () ) ) ) {
+        if ( !( ( first instanceof SkolemTermSV || first instanceof FormulaSV )
+                && ( second instanceof FormulaSV || second instanceof TermSV ) ) ) {
             throw new RuntimeException("NewDependingOn: First SchemaVariable has to be a SkolemTermSV or FormulaSV, " +
                                        "the second one has to be a FormulaSV or a TermSV");
 	}
@@ -55,6 +58,9 @@ public class NewDependingOn {
     }
 
     public boolean equals(Object o) {
+	if(! (o instanceof NewDependingOn)) {
+	    return false;
+	}
 	NewDependingOn nfi=(NewDependingOn)o;
 	return (nfi.first==first() && nfi.second==second());
     }
@@ -65,7 +71,5 @@ public class NewDependingOn {
     	result = 37 * result + second().hashCode();
     	return result;
     }
-
 }
 
- 

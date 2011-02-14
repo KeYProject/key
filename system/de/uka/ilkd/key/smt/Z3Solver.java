@@ -1,21 +1,22 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
+//This file is part of KeY - Integrated Deductive Software Design
+//Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+//                    Universitaet Koblenz-Landau, Germany
+//                    Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
+//The KeY system is protected by the GNU General Public License. 
+//See LICENSE.TXT for details.
+//
+//
 
 package de.uka.ilkd.key.smt;
 
 
 /**Hint: In order to run Z3 on Linux or Mac use wine. 
  * On {@link http://www4.in.tum.de/~boehmes/z3.html} you can find useful script for that. 
- * Please note that you have to run "winetricks vcrun2008". 
- */
+ * Please not that you have to run "winetricks vcrun2008". */
 public final class Z3Solver extends AbstractSMTSolver {
 
-    public static final String name = "Z3";
+    public static final String name="Z3";
 
     public String name() {
         return name;
@@ -36,20 +37,20 @@ public final class Z3Solver extends AbstractSMTSolver {
     
     public SMTSolverResult interpretAnswer(String text, String error, int val) {
 	if (val == 0) {
-	    //no error occurred
+	    //no error occured
 	    if (text.contains("unsat")) {
-		return SMTSolverResult.createValid(text,name());
+		return SMTSolverResult.createValidResult(text,name());
 	    } else if (text.contains("sat")) {
-		return SMTSolverResult.createInvalid(text,name());
+		return SMTSolverResult.createInvalidResult(text,name());
 	    } else {
-		return SMTSolverResult.createUnknown(text,name());
+		return SMTSolverResult.createUnknownResult(text,name());
 	    }
-	} else if ((val == 112 && text.contains("unknown")) || val == 139) {
+	} else if ((val == 112 && text.contains("unknown")) || val ==139) {
 	    //the result was unknown
-	    return SMTSolverResult.createUnknown(text, name());
+	    return SMTSolverResult.createUnknownResult(text,name());
 	} else {
 	    //something went wrong
-	    throw new IllegalArgumentException("Code "+ val+": " + error);
+	    throw new IllegalResultException("Code "+ val+": " + error);
 	}
     }
     

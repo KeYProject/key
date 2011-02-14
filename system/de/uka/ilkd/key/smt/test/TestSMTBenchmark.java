@@ -1,10 +1,12 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
+//This file is part of KeY - Integrated Deductive Software Design
+//Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+//                    Universitaet Koblenz-Landau, Germany
+//                    Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
+//The KeY system is protected by the GNU General Public License. 
+//See LICENSE.TXT for details.
+//
+//
 
 package de.uka.ilkd.key.smt.test;
 
@@ -118,10 +120,11 @@ public class TestSMTBenchmark extends TestCase implements FilenameFilter{
 		    long time = System.currentTimeMillis();		
 		    rule.setMaxTime(maxExecutionTime);
 	    	    rule.start(p.openGoals().iterator().next(), p.getUserConstraint().getConstraint(),false);
+	    	    LinkedList<SMTSolverResult> list = rule.getResults();
 	    	    time = System.currentTimeMillis() - time;
 	    	    time = time / 100;
 	    	    toReturn.add("" + time/10 + "." + time%10);
-	    	    toReturn.add(this.translateResult(rule.getFirstResult()));
+	    	    toReturn.add(this.translateResult(list.getFirst()));
 		} catch (Exception e) {
 		    toReturn.add(ERROR);
 		    toReturn.add(ERROR);
@@ -142,7 +145,7 @@ public class TestSMTBenchmark extends TestCase implements FilenameFilter{
 	    return VALID;
 	} else if (r.isValid() == SMTSolverResult.ThreeValuedTruth.UNKNOWN) {
 	    return UNKNOWN;
-	} else if (r.isValid() == SMTSolverResult.ThreeValuedTruth.FALSE) {
+	} else if (r.isValid() == SMTSolverResult.ThreeValuedTruth.FALSIFIABLE) {
 	    return INVALID;
 	} else {
 	    Assert.assertTrue(false);

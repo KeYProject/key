@@ -1,19 +1,15 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 //
-//
 
 package de.uka.ilkd.key.java.recoderext;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.*;
@@ -186,8 +182,7 @@ public class ConstructorNormalformBuilder
              
              class2enclosingThis.put(cd, getImplicitEnclosingThis(cd));
              
-             if(cd.getAllSupertypes().size()>1 && !cd.getAllSupertypes().get(1).isStatic() && 
-		(cd.getStatementContainer()!=null || cd.getName()==null)){
+             if(cd.getAllSupertypes().size()>1 && (cd.getStatementContainer()!=null || cd.getName()==null)){
                  class2superContainer.put(cd, cd.getAllSupertypes().get(1).getContainingClassType());
              }
              
@@ -286,29 +281,26 @@ public class ConstructorNormalformBuilder
         CopyAssignment ca = null;
         String etId = "_ENCLOSING_THIS";
 	if(et!=null){
-	    if(td!=null && td.getIdentifier()!=null){
-		pd = new ParameterDeclaration(new TypeReference((Identifier) td.getIdentifier().deepClone()), 
-					      new Identifier(etId));
-	    }else{
-		pd = new ParameterDeclaration(new TypeReference(new Identifier(javaLangObject.getName())), 
-					      new Identifier(etId));
-	    }
+	    pd = new ParameterDeclaration(
+	            new TypeReference((Identifier) td.getIdentifier().deepClone()), 
+	            new Identifier(etId));
 	    ca = new CopyAssignment(new FieldReference(new ThisReference(), new ImplicitIdentifier(et.getName())),
 	                new VariableReference(new Identifier(etId)));
 	}
 	
 	if (!(cons instanceof ConstructorDeclaration)) {
 	    mods.add(new Public());
-	    parameters = new ASTArrayList<ParameterDeclaration>(j);
+	    parameters = new ASTArrayList<ParameterDeclaration>(0+j);
 	    recThrows = null;
 	    body =  new StatementBlock();    
 	} else {
 	    ConstructorDeclaration consDecl = (ConstructorDeclaration)cons;
-	    mods = consDecl.getDeclarationSpecifiers()==null ? null : consDecl.getDeclarationSpecifiers().deepClone();
+	    mods = (ASTList<DeclarationSpecifier>)
+		(consDecl.getDeclarationSpecifiers()==null ? null : consDecl.getDeclarationSpecifiers().deepClone());	    
 	    parameters = 
 		(ASTList<ParameterDeclaration>)consDecl.getParameters().deepClone();
-	    recThrows = consDecl.getThrown() == null ? null :
-				  consDecl.getThrown().deepClone();
+	    recThrows = (Throws) (consDecl.getThrown() == null ? null : 
+				  consDecl.getThrown().deepClone());
             
 	    StatementBlock origBody = consDecl.getBody();
             if(origBody == null) // may happen if a stub is defined with an empty constructor
@@ -323,11 +315,8 @@ public class ConstructorNormalformBuilder
             }
 	    
 	    for (final Variable v : outerVars) {
-                String typeName = ((Type) v2t.get(v)).getName();
-                String baseType = typeName.substring(0, typeName.indexOf("[")==-1 ? 
-                        typeName.length() : typeName.indexOf("["));
 	        parameters.add(new ParameterDeclaration(
-	                new TypeReference(new Identifier(baseType), (typeName.length()-baseType.length())/2), 
+	                new TypeReference(new Identifier(v2t.get(v).getName())), 
 	                new Identifier(v.getName())));
 	    }
 	}
@@ -343,55 +332,39 @@ public class ConstructorNormalformBuilder
 	    // remember original first statement
 	    Statement first = body.getStatementCount() > 0 ?
 		body.getStatementAt(0) : null;
-
-	    // first statement has to be a this or super constructor call
+	    
+	    // first statement has to be a this or super constructor call	
 	    if (!(first instanceof SpecialConstructorReference)) {
 		if (body.getBody() == null) {
 		    body.setBody(new ASTArrayList<Statement>());
 		}
-		attach(new MethodReferenceWrapper(new MethodReference(
-		        new SuperReference(), new ImplicitIdentifier(
-		                CONSTRUCTOR_NORMALFORM_IDENTIFIER))), body, 0);
+		attach(new MethodReference
+		    (new SuperReference(), new ImplicitIdentifier
+			(CONSTRUCTOR_NORMALFORM_IDENTIFIER)), body, 0);
 	    } else {
 		body.getBody().remove(0);
-		if (first instanceof ThisConstructorReference) {
-		    attach(new MethodReferenceWrapper(new MethodReference(
-			    new ThisReference(), new ImplicitIdentifier(
-			            CONSTRUCTOR_NORMALFORM_IDENTIFIER),
-			    ((SpecialConstructorReference) first)
-			            .getArguments())), body, 0);
-		} else {
-		    ReferencePrefix referencePrefix = ((SuperConstructorReference) first)
-			    .getReferencePrefix();
-		    ASTList<Expression> args = ((SpecialConstructorReference) first)
-			    .getArguments();
-		    if (referencePrefix != null
-			    && referencePrefix instanceof Expression) {
-			if (args == null)
-			    args = new ASTArrayList<Expression>(1);
-			args.add((Expression) referencePrefix);
-		    } else if (class2superContainer.get(cd) != null) {
-			if (args == null)
-			    args = new ASTArrayList<Expression>(1);
-			args.add(new VariableReference(new Identifier(etId)));
+		if(first instanceof ThisConstructorReference){
+		    attach(new MethodReference
+		            (new ThisReference(), new ImplicitIdentifier
+		                    (CONSTRUCTOR_NORMALFORM_IDENTIFIER), 
+		                    ((SpecialConstructorReference)first).getArguments()), body, 0);
+		}else{
+		    ReferencePrefix referencePrefix = ((SuperConstructorReference) first).getReferencePrefix();
+		    ASTList<Expression> args = ((SpecialConstructorReference)first).getArguments();
+		    if(referencePrefix!=null && referencePrefix instanceof Expression){
+		        if(args==null) args = new ASTArrayList<Expression>(1);
+		        args.add((Expression) referencePrefix);
+		    }else if(class2superContainer.get(cd)!=null){
+		        if(args==null) args = new ASTArrayList<Expression>(1);
+		        args.add(new VariableReference(new Identifier(etId)));        
 		    }
-		    attach(new MethodReferenceWrapper(new MethodReference(
-			    new SuperReference(), new ImplicitIdentifier(
-			            CONSTRUCTOR_NORMALFORM_IDENTIFIER), args)),
-			    body, 0);
+		    attach(new MethodReference
+		            (new SuperReference(), new ImplicitIdentifier
+		                    (CONSTRUCTOR_NORMALFORM_IDENTIFIER), 
+		                    args),
+		                    body, 0);	    
 		}
 	    }
-	    
-	    // initialize reentrant scope:
-	    // if(this.<rs>!=<coma>){
-	    //     if(this.<rs>!=null){
-	    //       <coma>.size += this.<rs>.size;
-	    //       <coma>.consumed += this.<rs>.consumed;
-	    //     }
-	    //     this.<rs> = <coma>;
-	    // }
-	    // -----------------------------------------------------------------------
-	    
 	    // if the first statement is not a this constructor reference
 	    // the instance initializers have to be added in source code
 	    // order
@@ -414,14 +387,7 @@ public class ConstructorNormalformBuilder
 		}
 
 	    }
-	}else if(cd == javaLangObject && body != null) {
-	    ASTList<Statement> initializers = (ASTList<Statement>) class2initializers.get(cd);
-	    for (int i = 0; i<initializers.size(); i++) {
-	        attach((Statement) 
-	                initializers.get(i).deepClone(),
-	                body, i);
-	    }
-        }
+	}
 
 	
 	MethodDeclaration nf =  new MethodDeclaration
@@ -431,9 +397,6 @@ public class ConstructorNormalformBuilder
 	     parameters,
 	     recThrows,
 	     body);
-        if(cons instanceof ConstructorDeclaration){
-            nf.setComments(((ConstructorDeclaration)cons).getComments());
-        }
 	nf.makeAllParentRolesValid();
 	return nf;
     }
@@ -473,11 +436,11 @@ public class ConstructorNormalformBuilder
 	        anonConstr = attachConstructorDecl(td);
 	    }
 	    if(anonConstr!=null) constructors.add(anonConstr);
-        for (Constructor constructor : constructors) {
-            attach(normalform
-                    ((ClassDeclaration) td,
-                            constructor), td, 0);
-        }
+	    for (int i = 0; i < constructors.size(); i++) {
+		attach(normalform
+		       ((ClassDeclaration)td, 
+			constructors.get(i)), td, 0);
+	    }
 
 	    ASTList<MethodDeclaration> mdl = class2methodDeclaration.get(td);
 	    for (int i = 0; i < mdl.size(); i++) {
@@ -489,11 +452,5 @@ public class ConstructorNormalformBuilder
   	    System.out.println(sw.toString());
   	    try { sw.close(); } catch (Exception e) {} */		
 	}
-
-
     }
-    
-    
-
-
 }

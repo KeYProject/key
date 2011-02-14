@@ -1,11 +1,10 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//
 //
 
 package de.uka.ilkd.key.rule.metaconstruct;
@@ -53,7 +52,6 @@ public class MethodCall extends ProgramMetaConstruct {
     private ProgramMethod pm;
     protected ReferencePrefix newContext;
     protected ProgramVariable pvar;
-    protected ProgramElement scope;
     private IExecutionContext execContextSV;
     private ExecutionContext execContext;
     protected ImmutableArray<Expression> arguments;
@@ -109,18 +107,10 @@ public class MethodCall extends ProgramMetaConstruct {
     }
 
 
-    private ProgramMethod assertImplementationPresent(ProgramMethod method,
-						      KeYJavaType t) {
-	if (method == null) {	    
-	    Debug.fail("methodcall:No implementation available for ", method);
-	}
-	return method;
-    }
-
 
     private KeYJavaType getStaticPrefixType(ReferencePrefix refPrefix, Services services) {
 	if (refPrefix==null || refPrefix instanceof ThisReference && 
-	        refPrefix.getReferencePrefix()==null){
+	        ((ThisReference) refPrefix).getReferencePrefix()==null){ 
 	    return execContext.getTypeReference().getKeYJavaType();
 	} else if(refPrefix instanceof ThisReference){
 	    return ((TypeReference) ((ThisReference) refPrefix).getReferencePrefix()).getKeYJavaType();
@@ -198,34 +188,38 @@ public class MethodCall extends ProgramMetaConstruct {
 	if (execContextSV!=null) {
 	    execContext
 		= (ExecutionContext) svInst.getInstantiation
-		((SortedSchemaVariable)execContextSV);
+		((SchemaVariable)execContextSV);
 	} else {
 	    execContext = svInst.getContextInstantiation().activeStatementContext();
 	}
 
 	methRef = (MethodReference) pe;
-        
+//	if(!methRef.implicit()) {
+//	    System.out.println("Modularity warning: Method " 
+//		               + methRef.getName() + " has been expanded!");
+//	}
+
 	ReferencePrefix refPrefix = methRef.getReferencePrefix();
 	if (refPrefix == null) {
-	    if (execContext.getRuntimeInstanceAsRef() == null) {
+	    if (execContext.getRuntimeInstance() == null) {
 		refPrefix = execContext.getTypeReference();
 	    } else {
-		refPrefix = execContext.getRuntimeInstanceAsRef();
+		refPrefix = execContext.getRuntimeInstance();
 	    }
 	}
 	
 	staticPrefixType = getStaticPrefixType(methRef.getReferencePrefix(), services);
 	if(execContext != null){
-            pm = assertImplementationPresent
-                (methRef.method(services, staticPrefixType, execContext), 
-                 staticPrefixType);
+	    pm = methRef.method(services, staticPrefixType, execContext);
 	}else{
-	    pm = assertImplementationPresent
-		(methRef.method(services, staticPrefixType, 
+	    pm = methRef.method(services, staticPrefixType, 
 		        methRef.getMethodSignature(services, null), 
-		        staticPrefixType), 
-		 staticPrefixType);	    
+		        staticPrefixType);	    
 	}
+	if (pm == null) {	    
+	    Debug.fail("methodcall:No implementation available for ", methRef);
+	}
+	
         newContext = methRef.getReferencePrefix();
 	if (newContext == null){
 	    Term self = services.getTypeConverter().findThisForSort(pm.getContainerType().getSort(), execContext);
@@ -239,7 +233,7 @@ public class MethodCall extends ProgramMetaConstruct {
 	    final FieldReference fieldContext = (FieldReference) newContext;
             if (fieldContext.referencesOwnInstanceField())
 	        newContext = fieldContext.setReferencePrefix
-		    (execContext.getRuntimeInstance().getReferencePrefix());
+		    (execContext.getRuntimeInstance());
 	}
 	
 	VariableSpecification[] paramSpecs = createParamSpecs(services);
@@ -255,15 +249,15 @@ public class MethodCall extends ProgramMetaConstruct {
             newContext = null;
 	    ProgramMethod staticMethod = getMethod(staticPrefixType, methRef, services);	                
             result = new MethodBodyStatement(staticMethod, newContext,
-					     pvar, arguments, scope); 
+					     pvar, arguments); 
 	} else if (refPrefix instanceof SuperReference) {
 	    Debug.out("method-call: super invocation of method detected." + 
 		      "Requires static resolving.");
 	    ProgramMethod superMethod = getSuperMethod(execContext,
 						       methRef, services);
 	    result = new MethodBodyStatement
-		(superMethod, execContext.getRuntimeInstance().getReferencePrefix(), pvar,
-		 arguments, scope);
+		(superMethod, execContext.getRuntimeInstance(), pvar,
+		 arguments);
 	} else {    // Instance invocation mode
 	    if (pm.isPrivate()) { // private methods are bound statically
 		Debug.out("method-call: invocation of private method detected." + 
@@ -305,7 +299,7 @@ public class MethodCall extends ProgramMetaConstruct {
     private Statement makeMbs(KeYJavaType t, Services services) {
 	ProgramMethod meth = getMethod(t, methRef, services);
 	return new MethodBodyStatement(meth, newContext,
-				       pvar, arguments, scope);
+				       pvar, arguments);
     }
 
     public Expression makeIOf(Type t) {
@@ -469,7 +463,4 @@ public class MethodCall extends ProgramMetaConstruct {
         Sort typeSort = ((KeYJavaType) type).getSort(); // was: services.getJavaInfo().getKeYJavaType(type);
         return expSort.extendsTrans(typeSort);
     }
-
-	
-
 }

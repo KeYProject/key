@@ -24,12 +24,10 @@ public interface ProofOblInput {
      * Returns the name of the proof obligation input.
      */
     String name();
-
-    boolean askUserForEnvironment();
-
+        
     void readActivatedChoices() throws ProofInputException;
 
-    void readProblem(ModStrategy mod) throws ProofInputException;
+    void readProblem() throws ProofInputException;
 
     /**
      * Returns the proof obligation term as result of the proof obligation

@@ -227,8 +227,13 @@ public class ContextStatementBlock extends StatementBlock {
             return null;
         }
             
-        matchCond = makeContextInfoComplete(matchCond, newSource, 
-                prefix, pos, relPos, src);
+        matchCond = makeContextInfoComplete(matchCond,
+        				    newSource, 
+        				    prefix, 
+        				    pos, 
+        				    relPos, 
+        				    src,
+        				    services);
         
         if (matchCond == null) {
             return null;
@@ -242,10 +247,14 @@ public class ContextStatementBlock extends StatementBlock {
      * completes match of context block by adding the prefix end position
      * and the suffix start position
      */
-    private MatchConditions makeContextInfoComplete
-    (MatchConditions matchCond, 
-            SourceData newSource, ProgramPrefix prefix, 
-            int pos, PosInProgram relPos, ProgramElement src) {
+    private MatchConditions makeContextInfoComplete(
+	    MatchConditions matchCond, 
+            SourceData newSource, 
+            ProgramPrefix prefix, 
+            int pos, 
+            PosInProgram relPos, 
+            ProgramElement src,
+            Services services) {
         
         final SVInstantiations instantiations = matchCond.getInstantiations();        
         final ExecutionContext lastExecutionContext = instantiations.getExecutionContext();
@@ -258,7 +267,11 @@ public class ContextStatementBlock extends StatementBlock {
                 
         /** add context block instantiation */
         matchCond = matchCond.setInstantiations
-            (instantiations.replace(prefixEnd, suffixStart, lastExecutionContext, src));
+            (instantiations.replace(prefixEnd, 
+        	    		    suffixStart, 
+        	    		    lastExecutionContext, 
+        	    		    src,
+        	    		    services));
         return matchCond;
     }
 
@@ -307,7 +320,11 @@ public class ContextStatementBlock extends StatementBlock {
       
         matchCond = 
             matchCond.setInstantiations(matchCond.getInstantiations().
-                    add(null, null, innerContext, src));
+                    add(null, 
+                	null, 
+                	innerContext, 
+                	src,
+                	services));
         
         return matchCond;
     }

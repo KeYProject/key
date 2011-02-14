@@ -39,7 +39,7 @@ public class TestCollisionResolving extends TestCase {
 	TacletForTests.parse();
 	s = (Sort)TacletForTests.getSorts().lookup(new Name("s"));
 
-   	services = new Services();
+   	services = TacletForTests.services();
 
 	//build a goal (needed for creating TacletInstantiationsTableModel)
     	Proof proof = new Proof(services);
@@ -64,19 +64,19 @@ public class TestCollisionResolving extends TestCase {
 	// the term has to be built manually because we have to ensure
 	// object equality of the LogicVariable x
 	LogicVariable x = new LogicVariable(new Name("x"), s);
-	Function p = new RigidFunction(new Name("p"), Sort.FORMULA, new Sort[]{s});
-	Function q = new RigidFunction(new Name("q"), Sort.FORMULA, new Sort[]{s});
+	Function p = new Function(new Name("p"), Sort.FORMULA, new Sort[]{s});
+	Function q = new Function(new Name("q"), Sort.FORMULA, new Sort[]{s});
 
-	Term t_x = TermFactory.DEFAULT.createVariableTerm(x);	
-	Term t_p_x = TermFactory.DEFAULT.createFunctionTerm(p, t_x);
-	Term t_q_x = TermFactory.DEFAULT.createFunctionTerm(q, t_x);
+	Term t_x = TermFactory.DEFAULT.createTerm(x);	
+	Term t_p_x = TermFactory.DEFAULT.createTerm(p, new Term[]{t_x}, null, null);
+	Term t_q_x = TermFactory.DEFAULT.createTerm(q, new Term[]{t_x}, null, null);
 	
 	Term t_all_p_x =
-	    TermFactory.DEFAULT.createQuantifierTerm(Op.ALL, x, t_p_x);
+	    TermBuilder.DF.all(x, t_p_x);
 	Term t_ex_q_x =
-	    TermFactory.DEFAULT.createQuantifierTerm(Op.EX, x, t_q_x);
+	    TermBuilder.DF.ex(x, t_q_x);
 	Term term = 
-	    TermFactory.DEFAULT.createJunctorTerm(Op.AND, t_all_p_x,
+	    TermFactory.DEFAULT.createTerm(Junctor.AND, t_all_p_x,
 						  t_ex_q_x);
 	FindTaclet coll_varSV = (FindTaclet) TacletForTests.getTaclet
 	    ("TestCollisionResolving_coll_varSV").taclet();
@@ -86,7 +86,8 @@ public class TestCollisionResolving extends TestCase {
 	     (term, 
 	      coll_varSV.find(),
 	      MatchConditions.EMPTY_MATCHCONDITIONS,
-	      null, Constraint.BOTTOM));
+	      null, Constraint.BOTTOM),
+	      services);
 
 	SchemaVariable b 
 	    = (SchemaVariable) TacletForTests.getVariables().lookup(new Name("b"));
@@ -111,21 +112,21 @@ public class TestCollisionResolving extends TestCase {
 	// the term has to be built manually because we have to ensure
 	// object equality of the LogicVariable x
 	LogicVariable x = new LogicVariable(new Name("x"), s);
-	Function p = new RigidFunction(new Name("p"), Sort.FORMULA, new Sort[]{s});
-	Function q = new RigidFunction(new Name("q"), Sort.FORMULA, new Sort[]{s});
+	Function p = new Function(new Name("p"), Sort.FORMULA, new Sort[]{s});
+	Function q = new Function(new Name("q"), Sort.FORMULA, new Sort[]{s});
 
-	Term t_x = TermFactory.DEFAULT.createVariableTerm(x);	
-	Term t_p_x = TermFactory.DEFAULT.createFunctionTerm(p, t_x);
-	Term t_q_x = TermFactory.DEFAULT.createFunctionTerm(q, t_x);
+	Term t_x = TermFactory.DEFAULT.createTerm(x);	
+	Term t_p_x = TermFactory.DEFAULT.createTerm(p, new Term[]{t_x}, null, null);
+	Term t_q_x = TermFactory.DEFAULT.createTerm(q, new Term[]{t_x}, null, null);
 	
 	Term t_ex_q_x =
-	    TermFactory.DEFAULT.createQuantifierTerm(Op.EX, x, t_q_x);
+	    TermBuilder.DF.ex(x, t_q_x);
 
 	Term t_px_and_exxqx = 
-	    TermFactory.DEFAULT.createJunctorTerm(Op.AND, t_p_x,
+	    TermFactory.DEFAULT.createTerm(Junctor.AND, t_p_x,
 						  t_ex_q_x);
 	Term term =
-	    TermFactory.DEFAULT.createQuantifierTerm(Op.ALL, x, t_px_and_exxqx);
+	    TermBuilder.DF.all(x, t_px_and_exxqx);
 
 	FindTaclet coll_varSV = (FindTaclet) TacletForTests.getTaclet
 	    ("TestCollisionResolving_coll_context").taclet();
@@ -139,7 +140,7 @@ public class TestCollisionResolving extends TestCase {
 					      (term.sub(0), 
 					       coll_varSV.find(),
 					       MatchConditions.EMPTY_MATCHCONDITIONS,
-					       null, Constraint.BOTTOM),pos);
+					       null, Constraint.BOTTOM),pos, services);
 
 	SchemaVariable b 
 	    = (SchemaVariable) TacletForTests.getVariables().lookup(new Name("b"));
@@ -168,8 +169,10 @@ public class TestCollisionResolving extends TestCase {
 	    = PosTacletApp.createPosTacletApp(taclet, 
 					      taclet.match(term.sub(0), taclet.find(),
 							   MatchConditions.EMPTY_MATCHCONDITIONS,
-							   null, Constraint.BOTTOM),pos);
-	TacletApp app1=app.prepareUserInstantiation();
+							   null, Constraint.BOTTOM),
+			                      pos,
+			                      services);
+	TacletApp app1=app.prepareUserInstantiation(services);
 	assertSame(app, app1);
 	TacletInstantiationsTableModel instModel
 	    = new TacletInstantiationsTableModel(app, TacletForTests.services(),
@@ -202,7 +205,7 @@ public class TestCollisionResolving extends TestCase {
     public void testVarNamespaceCreationWithPrefix() {
         TacletApp app = TacletForTests.getTaclet
         ("TestCollisionResolving_ns2");
-        TacletApp app1=app.prepareUserInstantiation();
+        TacletApp app1=app.prepareUserInstantiation(services);
         assertSame(app, app1);
 
         TacletInstantiationsTableModel instModel
@@ -263,7 +266,7 @@ public class TestCollisionResolving extends TestCase {
 				       Constraint.BOTTOM);
 	app0 = (NoPosTacletApp)app0.findIfFormulaInstantiations 
 	( seq, services, Constraint.BOTTOM ).head ();
-	TacletApp app = app0.setPosInOccurrence ( pos );
+	TacletApp app = app0.setPosInOccurrence ( pos, services );
 	/*
 	IList<SVInstantiations> sviList=taclet.matchIf
 	    (seq, taclet.match(semiseq.get(0).formula(), taclet.find(),
@@ -272,7 +275,7 @@ public class TestCollisionResolving extends TestCase {
 	TacletApp app 
 	    = PosTacletApp.createPosTacletApp(taclet, sviList.head(), pos);
 	*/
-	TacletApp app1=app.prepareUserInstantiation();
+	TacletApp app1=app.prepareUserInstantiation(services);
 	assertTrue("A different TacletApp should have been created to resolve"
 		   +" name conflicts", app!=app1);
 	
@@ -285,7 +288,7 @@ public class TestCollisionResolving extends TestCase {
 
 	TacletApp app = TacletForTests.getTaclet
 	    ("TestCollisionResolving_name_conflict2");
-	TacletApp app1=app.prepareUserInstantiation();
+	TacletApp app1=app.prepareUserInstantiation(services);
 	assertSame(app, app1);
 
 	TacletInstantiationsTableModel instModel
@@ -395,8 +398,8 @@ public class TestCollisionResolving extends TestCase {
 					MatchConditions.EMPTY_MATCHCONDITIONS,
 					null, Constraint.BOTTOM);
 	TacletApp app 
-	    = PosTacletApp.createPosTacletApp(taclet, mc, pos);
-	TacletApp app1=app.prepareUserInstantiation();
+	    = PosTacletApp.createPosTacletApp(taclet, mc, pos, services);
+	TacletApp app1=app.prepareUserInstantiation(services);
 	assertSame("Actually there are no conflicts yet.", app, app1);
 	TacletInstantiationsTableModel instModel
 	    = new TacletInstantiationsTableModel(app, services,

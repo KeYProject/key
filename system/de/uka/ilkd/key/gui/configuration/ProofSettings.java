@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -12,6 +12,7 @@ package de.uka.ilkd.key.gui.configuration;
 import java.io.*;
 import java.net.URL;
 import java.util.Properties;
+
 
 import de.uka.ilkd.key.gui.GUIEvent;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
@@ -69,16 +70,15 @@ public class ProofSettings {
     public ProofSettings() {       	
 	settings = new Settings[] {
             new StrategySettings(),
-	    new SimultaneousUpdateSimplifierSettings(),
             new GeneralSettings(),
 	    new ChoiceSettings(),
 	    SMTSettings.getInstance(),
 	    new ViewSettings(),
-            TacletTranslationSettings.getInstance()
+	    TacletTranslationSettings.getInstance()
 	};
-        for (Settings setting : settings) {
-            setting.addSettingsListener(listener);
-        }
+	for (int i = 0; i < settings.length; i++) { 
+	    settings[i].addSettingsListener(listener);
+	}        
     }
     
     /* copy constructor - substitutes .clone() in classes implementing Settings */
@@ -88,8 +88,8 @@ public class ProofSettings {
         Properties result = new Properties();
         Settings[] s = toCopy.settings;
 
-        for (Settings value : s) {
-            value.writeSettings(result);
+        for (int i = 0; i < s.length; i++) {
+            s[i].writeSettings(result);
         }
         
         for (int i = settings.length - 1; i >= 0; i--) {
@@ -110,8 +110,8 @@ public class ProofSettings {
     
     public void setProfile(Profile profile) {
         this.profile = profile;
-        ensureInitialized();
         profile.updateSettings(this);
+        ensureInitialized();
     }
 
     public Profile getProfile() {                
@@ -129,9 +129,9 @@ public class ProofSettings {
     public void settingsToStream(Settings[] s,OutputStream out) {
     try {
         Properties result = new Properties();
-        for (Settings value : s) {
-            value.writeSettings(result);
-        }
+	    for (int i = 0; i < s.length; i++) {
+	    s[i].writeSettings(result);
+	    }
 	    result.store(out, "Proof-Settings-Config-File");
 	} catch (IOException e){
 	    System.err.println("Warning: could not save proof-settings.");
@@ -231,11 +231,11 @@ public class ProofSettings {
      */
     public ChoiceSettings getChoiceSettings() {
 	ensureInitialized();
-	return (ChoiceSettings) settings[3];
+	return (ChoiceSettings) settings[2];
     }
 
     public ProofSettings setChoiceSettings(ChoiceSettings cs) {
-	settings[3] = cs;
+	settings[2] = cs;
         return this;
     }
 
@@ -244,28 +244,22 @@ public class ProofSettings {
      */
     public SMTSettings getSMTSettings() {
 	ensureInitialized();
-	return (SMTSettings) settings[4];
+	return (SMTSettings) settings[3];
     }
     
     public TacletTranslationSettings getTacletTranslationSettings(){
 	ensureInitialized();
-	return (TacletTranslationSettings) settings[6];
+	return (TacletTranslationSettings) settings[5];
     }
 
-    public SimultaneousUpdateSimplifierSettings 
-	getSimultaneousUpdateSimplifierSettings() {
-	ensureInitialized();
-	return (SimultaneousUpdateSimplifierSettings) settings[1];    
-    }
-    
     public GeneralSettings getGeneralSettings() {
 	ensureInitialized();
-	return (GeneralSettings) settings[2];
+	return (GeneralSettings) settings[1];
     }
 
     public ViewSettings getViewSettings() {
 	ensureInitialized();
-	return (ViewSettings) settings[5];
+	return (ViewSettings) settings[4];
     }
 
     private class ProofSettingsListener implements SettingsListener {
@@ -280,7 +274,5 @@ public class ProofSettings {
 	public void settingsChanged(GUIEvent e) {	    
 	    saveSettings();
 	}
-
     }
-    
 }

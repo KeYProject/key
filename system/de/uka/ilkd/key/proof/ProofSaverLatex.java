@@ -73,7 +73,7 @@ public class ProofSaverLatex extends ProofSaver {
    String nodeSeqToString(Node node) {
       LogicPrinter logicPrinter = 
          new LogicPrinter(new ProgramPrinter(null), 
-	                  NotationInfo.createInstance(),
+	                  new NotationInfo(),
 	                  node.proof().getServices(),
 	                  true);
       logicPrinter.printSequent(node.sequent());

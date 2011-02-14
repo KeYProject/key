@@ -221,8 +221,10 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
 //            printContainer ( "considering rule ", c );
 
             nextRuleApp = c.completeRuleApp(getGoal(), getStrategy());
-
-            if ( nextRuleApp == null ) {
+            
+            if(nextRuleApp == null && c instanceof BuiltInRuleAppContainer) {
+        	//XXX
+	    } else if ( nextRuleApp == null ) {
                 if ( !secondaryQueueUsed.val () )
                     createFurtherRuleApps ( c, true );
                 else
@@ -357,7 +359,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
             if ( !tacletApp.ifInstsComplete() ) {
                 message = message + " (unmatched if-formulas)";
             }
-            if ( !tacletApp.instsSufficientlyComplete () ) {
+            if ( !tacletApp.instsSufficientlyComplete (goal.proof().getServices()) ) {
                 message = message + " (incomplete)";
             }
         }

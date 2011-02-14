@@ -53,7 +53,7 @@ public class IHTacletFilter extends TacletFilter {
                         Boolean.TRUE : Boolean.FALSE; 
                 filterCache.put(taclet, b);
             } 
-            return b == Boolean.TRUE;
+            return b.equals(Boolean.TRUE);
         }
         // in interactive case we do not need to cache; the user is too slow ;-)
         return taclet.admissible ( interactive, heuristics );

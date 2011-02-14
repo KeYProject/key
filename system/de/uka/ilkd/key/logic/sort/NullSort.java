@@ -10,6 +10,117 @@
 
 package de.uka.ilkd.key.logic.sort;
 
-public interface NullSort extends ClassInstanceSort {
+import java.lang.ref.WeakReference;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Named;
+import de.uka.ilkd.key.logic.op.SortDependingFunction;
+
+
+public final class NullSort implements Sort  {
+    
+    public static final Name NAME = new Name("Null");
+    
+    private final Sort objectSort;
+    
+    private WeakReference<Services> lastServices 
+    	= new WeakReference<Services>(null);
+    private WeakReference<ImmutableSet<Sort>> extCache
+        = new WeakReference<ImmutableSet<Sort>>(null);
+    
+    
+    public NullSort(Sort objectSort) {
+	assert objectSort != null;
+	this.objectSort = objectSort;
+    }
+        
+    
+    @Override
+    public Name name() {
+	return NAME;
+    }
+    
+    
+    @Override
+    public ImmutableSet<Sort> extendsSorts() {
+	throw new UnsupportedOperationException(
+		  "NullSort.extendsSorts() cannot be supported");
+    }
+    
+    
+    @Override
+    public ImmutableSet<Sort> extendsSorts(Services services) {
+	assert services != null;
+	assert objectSort == services.getJavaInfo().objectSort();
+	
+	ImmutableSet<Sort> result = extCache.get();
+	if(result == null || lastServices.get() != services) {
+	    result = DefaultImmutableSet.<Sort>nil();
+
+	    for(Named n : services.getNamespaces().sorts().allElements()) {
+		Sort s = (Sort)n;
+		if(s != this && s.extendsTrans(objectSort)) {
+		    result = result.add(s);
+		}
+	    }
+	    
+	    lastServices = new WeakReference<Services>(services);
+	    extCache = new WeakReference<ImmutableSet<Sort>>(result);
+	}
+	
+	return result;
+    }
+    
+    
+    @Override
+    public boolean extendsTrans(Sort sort) {
+	return sort == this
+	       || sort == Sort.ANY
+	       || sort.extendsTrans(objectSort);
+    }
+    
+    
+    @Override
+    public boolean isAbstract() {
+	return false;
+    }
+    
+    
+    @Override
+    public final SortDependingFunction getCastSymbol(Services services) {
+        SortDependingFunction result
+            = SortDependingFunction.getFirstInstance(CAST_NAME, services)
+        			   .getInstanceFor(this, services);
+        assert result.getSortDependingOn() == this && result.sort() == this;
+        return result;
+    }
+    
+    
+    @Override    
+    public final SortDependingFunction getInstanceofSymbol(Services services) {
+	SortDependingFunction result
+	    = SortDependingFunction.getFirstInstance(INSTANCE_NAME, services)
+                                   .getInstanceFor(this, services);
+	assert result.getSortDependingOn() == this; 
+	return result;
+    }    
+    
+    
+    @Override
+    public final SortDependingFunction getExactInstanceofSymbol(Services services) {
+	SortDependingFunction result
+            = SortDependingFunction.getFirstInstance(EXACT_INSTANCE_NAME, services)
+                                   .getInstanceFor(this, services);
+	assert result.getSortDependingOn() == this;
+	return result;
+    }
+    
+    
+    @Override
+    public final String toString() {
+        return NAME.toString();
+    }
 }

@@ -204,7 +204,7 @@ public class TacletAppIndex  {
         ImmutableList<NoPosTacletApp> tacletInsts = getFindTaclet ( pos, filter,
                                                            services,
                                                            userConstraint );
-        return createTacletApps ( tacletInsts, pos );
+        return createTacletApps ( tacletInsts, pos, services );
     }
 
      
@@ -229,11 +229,12 @@ public class TacletAppIndex  {
      * @return list of all created TacletApps
      */
     static ImmutableList<TacletApp> createTacletApps(ImmutableList<NoPosTacletApp> tacletInsts,
-                                            PosInOccurrence pos) {
+                                            PosInOccurrence pos,
+                                            Services services) {
         ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
         for (NoPosTacletApp tacletApp : tacletInsts) {
             if (tacletApp.taclet() instanceof FindTaclet) {
-                PosTacletApp newTacletApp = tacletApp.setPosInOccurrence(pos);
+                PosTacletApp newTacletApp = tacletApp.setPosInOccurrence ( pos, services );
                 if (newTacletApp != null) {
                     result = result.prepend(newTacletApp);
                 }
@@ -245,9 +246,10 @@ public class TacletAppIndex  {
     }
     
     static TacletApp createTacletApp(NoPosTacletApp tacletApp,
-                                     PosInOccurrence pos) {
+                                     PosInOccurrence pos,
+                                     Services services) {
         if ( tacletApp.taclet () instanceof FindTaclet ) {
-            PosTacletApp newTacletApp = tacletApp.setPosInOccurrence ( pos );
+            PosTacletApp newTacletApp = tacletApp.setPosInOccurrence ( pos, services );
             if ( newTacletApp != null ) {
                 return newTacletApp;
             } else {
@@ -329,7 +331,7 @@ public class TacletAppIndex  {
                                                   Services        services,
                                                   Constraint      userConstraint) {
         final ImmutableList<TacletApp> findTaclets =
-            getIndex ( pos ).getTacletAppAtAndBelow ( pos, filter );
+            getIndex ( pos ).getTacletAppAtAndBelow ( pos, filter, services );
         return prepend ( findTaclets,
                          getNoFindTaclet ( filter, services, userConstraint ) );
     }

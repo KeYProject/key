@@ -24,13 +24,13 @@ public interface SpecExtractor {
     /**
      * Returns the operation contracts for the passed operation.
      */
-    public ImmutableSet<OperationContract> extractOperationContracts(ProgramMethod pm)
+    public ImmutableSet<SpecificationElement> extractMethodSpecs(ProgramMethod pm)
         throws SLTranslationException;
     
     /**
      * Returns the class invariants for the passed type.
      */
-    public ImmutableSet<ClassInvariant> extractClassInvariants(KeYJavaType kjt)
+    public ImmutableSet<SpecificationElement> extractClassSpecs(KeYJavaType kjt)
         throws SLTranslationException;
         
     /**

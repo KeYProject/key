@@ -18,13 +18,10 @@ import recoder.abstraction.Variable;
 import recoder.java.Identifier;
 import recoder.java.declaration.*;
 import recoder.java.declaration.modifier.*;
-import recoder.java.reference.PackageReference;
 import recoder.java.reference.TypeReference;
 import recoder.kit.ProblemReport;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.rtsj.proof.init.RTSJProfile;
 import de.uka.ilkd.key.util.Debug;
 
 
@@ -41,22 +38,14 @@ import de.uka.ilkd.key.util.Debug;
  */
 public class ImplicitFieldAdder extends RecoderModelTransformer {
 
-    public static final String IMPLICT_ARRAY_TRA_INITIALIZED = "<traInitialized>";
-
     public static final String IMPLICIT_CLASS_PREPARED = "<classPrepared>";
     public static final String IMPLICIT_CLASS_INITIALIZED = "<classInitialized>";
     public static final String IMPLICIT_CLASS_INIT_IN_PROGRESS = "<classInitializationInProgress>";
     public static final String IMPLICIT_CLASS_ERRONEOUS = "<classErroneous>";
     
-    public static final String IMPLICIT_NEXT_TO_CREATE = "<nextToCreate>";
     public static final String IMPLICIT_CREATED = "<created>";
    
-    public static final String IMPLICIT_MEMORY_AREA = "<memoryArea>";
-       
-    public static final String IMPLICIT_SIZE = "<size>";
-        
     public static final String IMPLICIT_INITIALIZED = "<initialized>";
-    public static final String IMPLICIT_TRANSIENT = "<transient>";
     
     public static final String IMPLICIT_ENCLOSING_THIS = "<enclosingThis>";
     
@@ -139,21 +128,8 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
      */
     private void addGlobalImplicitRecoderFields(TypeDeclaration td) {
 	// instance
-        attach(createImplicitRecoderField("byte", IMPLICIT_TRANSIENT, false, false), td, 0);
 	attach(createImplicitRecoderField("boolean", IMPLICIT_INITIALIZED, false, false), td, 0);
-        attach(createImplicitRecoderField("boolean", IMPLICIT_CREATED, false, false), td, 0);
-
-	if (ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile){
-	    ASTList<DeclarationSpecifier> modifiers = new ASTArrayList<DeclarationSpecifier>(1);
-
-	    modifiers.add(new Public());
-	    FieldDeclaration fd = new FieldDeclaration
-	    (modifiers, new TypeReference(
-		    new PackageReference(new PackageReference(new Identifier("javax")), new Identifier("realtime")),
-		    new Identifier("MemoryArea")), new ImplicitIdentifier(IMPLICIT_MEMORY_AREA), null);
-	    fd.makeAllParentRolesValid();
-	    attach(fd, td, 0);	  
-	}
+        attach(createImplicitRecoderField("boolean", IMPLICIT_CREATED, false, false), td, 0);	  
     }
     
 
@@ -172,43 +148,30 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
 		      "implicit fields");
 	    return;
 	}*/
+	attach(createImplicitRecoderField("boolean", IMPLICIT_CLASS_INIT_IN_PROGRESS, true, true), td, 0);
+	attach(createImplicitRecoderField("boolean", IMPLICIT_CLASS_ERRONEOUS, true, true), td, 0);
+	attach(createImplicitRecoderField("boolean", IMPLICIT_CLASS_INITIALIZED, true, true), td, 0);
+	attach(createImplicitRecoderField("boolean", IMPLICIT_CLASS_PREPARED, true, true), td, 0);
 	
-	
-	addClassInitializerStatusFields(td);
+	if(td instanceof ClassDeclaration && 
+	        (td.getName()==null || 
+	                ((ClassDeclaration) td).getStatementContainer() !=null ||
+	                ((ClassDeclaration) td).getContainingClassType()!=null) &&
+	                (containingMethod(td)==null || !containingMethod(td).isStatic()) &&
+	                !td.isStatic()){
+	    ClassDeclaration container = containingClass(td);
+	    ASTList<DeclarationSpecifier> modifiers = new ASTArrayList<DeclarationSpecifier>(1);
+	    modifiers.add(new Private());
+	    Identifier id = getId(container);
         
-	
-	
-	if (ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile) {
-
-	    attach(createImplicitRecoderField("long", IMPLICIT_SIZE, true, true, true), td, 0);	
-
-	}
-	
-	if (td instanceof ClassDeclaration && !td.isStatic()) { 
-	    final ClassDeclaration cd = (ClassDeclaration) td;
-	    if (td.getName()==null || cd.getStatementContainer() !=null ||cd.getContainingClassType()!=null) {
-		final MethodDeclaration md = containingMethod(td);
-		if (md==null || !md.isStatic()) {
-		    ClassDeclaration container = containingClass(td);
-		    ASTList<DeclarationSpecifier> modifiers = new ASTArrayList<DeclarationSpecifier>(1);
-		    modifiers.add(new Private());
-		    Identifier id = getId(container);
-
-		    FieldDeclaration fd = new FieldDeclaration
-		    (modifiers, new TypeReference(id), 
-			    new ImplicitIdentifier(IMPLICIT_ENCLOSING_THIS), null);
-		    fd.makeAllParentRolesValid();
-		    attach(fd, td, 0);
-		}
-	    }
-	}
-
-	if (!td.isInterface() && !td.isAbstract()) {	  
-	    attach(createImplicitRecoderField("int", 
-					      IMPLICIT_NEXT_TO_CREATE, true, true), td, 0);
+            FieldDeclaration fd = new FieldDeclaration
+                (modifiers, new TypeReference(id), 
+                        new ImplicitIdentifier(IMPLICIT_ENCLOSING_THIS), null);
+            fd.makeAllParentRolesValid();
+	    attach(fd, td, 0);
 	}
     }
-
+    
     protected void addClassInitializerStatusFields(
             recoder.java.declaration.TypeDeclaration td) {	
 	attach(createImplicitRecoderField("boolean", IMPLICIT_CLASS_INIT_IN_PROGRESS, true, true), td, 0);

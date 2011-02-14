@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -28,14 +28,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 public class ErrorDialog extends JDialog {
     private static final long serialVersionUID = 1L;
-
-
-
-
     public  final static ErrorDialog INSTANCE = new ErrorDialog();
-
-
-
 
     private JPanel jPanel = null;  //  @jve:decl-index=0:visual-constraint="279,56"
     private JTextArea jTextArea = null;
@@ -54,8 +47,7 @@ public class ErrorDialog extends JDialog {
 	    gridBagConstraints3.gridwidth = 2;
 	    gridBagConstraints3.gridx = 0;
 	    return gridBagConstraints3;
-    }
-    
+    }  
 
     
     
@@ -63,10 +55,7 @@ public class ErrorDialog extends JDialog {
      * This method initializes jPanel	
      * 	
      * @return javax.swing.JPanel	
-     */
-    
-    
-    
+     */    
     private JPanel getJPanel() {
 	if (jPanel == null) {
 
@@ -95,7 +84,6 @@ public class ErrorDialog extends JDialog {
 	    jPanel.add(getJCheckBox(), gridBagConstraints1);
 	    jPanel.add(getJButton(), gridBagConstraints2);
 	    jPanel.add(getJScrollPane(), gridBagConstraints);
-	    //jPanel.add(getJScrollPane1(),scrollPaneConst());
 	}
 	return jPanel;
     }
@@ -121,7 +109,7 @@ public class ErrorDialog extends JDialog {
 	    jCheckBox.setText("Show Details");
 	    jCheckBox.addActionListener(new ActionListener() {
 	        
-	
+	    
 	        public void actionPerformed(ActionEvent e) {
 	           if(!jCheckBox.isSelected()){
 	               getJPanel().remove(getJScrollPane1());   
@@ -147,7 +135,7 @@ public class ErrorDialog extends JDialog {
 	    jButton.setText("Close");
 	    jButton.addActionListener(new ActionListener(){
 	
-		
+
 		public void actionPerformed(ActionEvent e) {
 		    setVisible(false);
 		    

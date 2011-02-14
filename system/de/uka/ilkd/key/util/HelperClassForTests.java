@@ -14,10 +14,13 @@ package de.uka.ilkd.key.util;
 
 import java.io.File;
 
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.RuleSource;
 import de.uka.ilkd.key.proof.init.*;
+import de.uka.ilkd.key.rule.BuiltInRule;
 
 /**
  * @author bubel
@@ -27,14 +30,21 @@ import de.uka.ilkd.key.proof.init.*;
  */
 public class HelperClassForTests {
     
-    private static Profile JUNIT_PROFILE = new JUnitTestProfile();
+    private static final Profile profile = new JavaProfile() {
+            //we do not want normal standard rules, but ruleSetsDeclarations is needed for string library (HACK)
+	    public RuleCollection getStandardRules() {
+                return new RuleCollection(
+                                RuleSource.initRuleFile("LDTsForTestsOnly.key"), 
+                                ImmutableSLList.<BuiltInRule>nil());
+            }
+        };
     
     public HelperClassForTests() {
         
     }
     
     public ProofAggregate parse(File file) {
-        return parse(file, JUNIT_PROFILE);
+        return parse(file, profile);
     }
     
     public ProofAggregate parse(File file, Profile profile) {
@@ -58,7 +68,7 @@ public class HelperClassForTests {
     }
     
     public ProofAggregate parseThrowException(File file) throws ProofInputException{        
-        return parseThrowException(file, JUNIT_PROFILE);
+        return parseThrowException(file, profile);
     }
        
     

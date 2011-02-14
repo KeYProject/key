@@ -15,14 +15,8 @@ import java.util.Iterator;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Constraint;
-import de.uka.ilkd.key.logic.PIOPathIterator;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.IUpdateOperator;
-import de.uka.ilkd.key.logic.op.Metavariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.ConstraintSequentPrintFilter;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -493,8 +487,8 @@ public class TermTacletAppIndex {
         final Term newTerm = pathToModification.getSubTerm ();
         final int child = pathToModification.getChild ();
         
-        if ( newTerm.op () instanceof IUpdateOperator ) {
-            final int targetPos = ( (IUpdateOperator)newTerm.op () ).targetPos ();
+        if ( newTerm.op () instanceof UpdateApplication ) {
+            final int targetPos = ( (UpdateApplication)newTerm.op () ).targetPos ();
             if ( child != targetPos ) {
                 newSubIndices =
                     updateIUpdateTarget ( newSubIndices,
@@ -658,8 +652,9 @@ public class TermTacletAppIndex {
      * @return all taclet apps for or below the given position
      */
     public ImmutableList<TacletApp> getTacletAppAtAndBelow(PosInOccurrence pos,
-                                                  RuleFilter filter) {
-        return descend ( pos ).collectTacletApps ( pos, filter );
+                                                  RuleFilter filter,
+                                                  Services services) {
+        return descend ( pos ).collectTacletApps ( pos, filter, services );
     }
     
     /**
@@ -670,9 +665,12 @@ public class TermTacletAppIndex {
     private static class CollectTacletAppListener implements NewRuleListener {
         private ImmutableList<TacletApp> res = ImmutableSLList.<TacletApp>nil();
         private final RuleFilter filter;
+        private final Services services;
         
-        public CollectTacletAppListener ( RuleFilter p_filter ) {
+        public CollectTacletAppListener ( RuleFilter p_filter,
+        				  Services services) {
             filter = p_filter;
+            this.services = services;
         }
         
         public ImmutableList<TacletApp> getResult () {
@@ -682,7 +680,7 @@ public class TermTacletAppIndex {
         public void ruleAdded ( RuleApp app, PosInOccurrence pos ) {
             if ( filter.filter( ( app.rule() ) ) ) {
                 final TacletApp tacletApp = 
-                    TacletAppIndex.createTacletApp( (NoPosTacletApp) app, pos );
+                    TacletAppIndex.createTacletApp( (NoPosTacletApp) app, pos, services );
                 if ( tacletApp != null ) {
                     res = res.prepend ( tacletApp );
                 }
@@ -699,11 +697,12 @@ public class TermTacletAppIndex {
      * @return a list of all taclet apps
      */
     private ImmutableList<TacletApp> collectTacletApps(PosInOccurrence pos,
-                                              RuleFilter p_filter) {
+                                              RuleFilter p_filter,
+                                              Services services) {
         pos = handleDisplayConstraint ( pos, displayConstraint );
 
         final CollectTacletAppListener listener =
-            new CollectTacletAppListener ( p_filter );
+            new CollectTacletAppListener ( p_filter, services );
 
         reportTacletApps ( pos, listener );
 
@@ -752,8 +751,8 @@ public class TermTacletAppIndex {
         final Term subTerm = pos.subTerm ();
         final int nextSubtermIndex = pathToModification.getChild ();
         
-        if ( subTerm.op () instanceof IUpdateOperator ) {
-            final int targetPos = ( (IUpdateOperator)subTerm.op () ).targetPos ();
+        if ( subTerm.op () instanceof UpdateApplication ) {
+            final int targetPos = ( (UpdateApplication)subTerm.op () ).targetPos ();
             if ( nextSubtermIndex != targetPos )
                 getSubIndex ( targetPos )
                     .reportTacletApps ( pos.down ( targetPos ), listener );

@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -43,8 +43,8 @@ import recoder.io.*;
 import recoder.abstraction.TypeArgument.WildcardMode;
 
 import de.uka.ilkd.key.java.recoderext.*;
+import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SortedSchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 
@@ -164,7 +164,7 @@ public class SchemaJavaParser {
 
     private static void testLeftHandSide(Expression expr) throws ParseException{
 	if (expr instanceof ExpressionSVWrapper) {
-	    SortedSchemaVariable sv=(SortedSchemaVariable)(((ExpressionSVWrapper) expr).getSV());
+	    SchemaVariable sv=((ExpressionSVWrapper) expr).getSV();
 	    if ( !isLeftHandSide(sv.sort()) ) {
 		throw new ParseException
 		    ("Schema variable "+sv+" should be one of lefthandside"
@@ -177,9 +177,6 @@ public class SchemaJavaParser {
     private static boolean isLeftHandSide(Sort s) {
 	return  s == ProgramSVSort.VARIABLE ||
 	    s == ProgramSVSort.STATICVARIABLE ||
-	    s == ProgramSVSort.LOCALVARIABLE ||
-	    s == ProgramSVSort.IMPLICITVARIABLE ||
-	    s == ProgramSVSort.EXPLICITVARIABLE ||
 	    s == ProgramSVSort.LEFTHANDSIDE  ||
 	    s == ProgramSVSort.SIMPLEEXPRESSION  ||
 	    s == ProgramSVSort.NONSIMPLEEXPRESSION;
@@ -187,11 +184,7 @@ public class SchemaJavaParser {
 
     private static boolean isLocalVariable(String svName) {
 	return  factory.lookupSchemaVariableType(svName, 
-						 ProgramSVSort.VARIABLE)
-	    || factory.lookupSchemaVariableType(svName, 
-						ProgramSVSort.EXPLICITVARIABLE)
-	    || factory.lookupSchemaVariableType(svName, 
-						ProgramSVSort.IMPLICITVARIABLE);	
+						 ProgramSVSort.VARIABLE);	
     }
 
 
@@ -252,7 +245,7 @@ public class SchemaJavaParser {
 						 ProgramElement exp) throws ParseException{
 	if (exp!=null && exp instanceof ExpressionSVWrapper) {
 	    SchemaVariable sv=((ExpressionSVWrapper)exp).getSV();
-	    if  (((SortedSchemaVariable)sv).sort()==notOfSort) {
+	    if  (sv.sort()==notOfSort) {
 		throw new ParseException(sv
 					 +": "+notOfSort
 					 +" not allowed here");
@@ -264,7 +257,7 @@ public class SchemaJavaParser {
 					    ProgramElement exp) throws ParseException{
 	if (exp!=null && exp instanceof LabelSVWrapper) {
 	    SchemaVariable sv=((LabelSVWrapper)exp).getSV();
-	    if  (((SortedSchemaVariable)sv).sort()==notOfSort) {
+	    if  (sv.sort()==notOfSort) {
 		throw new ParseException(sv
 					 +": "+notOfSort
 					 +" not allowed here");
@@ -379,7 +372,6 @@ public class SchemaJavaParser {
     
 	/** valid iff <tt>type</tt> is <tt>ARGUMENTS</tt> */
 	ASTList<Expression> args = null;
-	
         
         /** valid iff <tt>type</tt> is <tt>IDENTIFIER</tt> and 
          *  it is an explicit generic method invocation
@@ -414,7 +406,6 @@ public class SchemaJavaParser {
 	static final int QUALIFIED_NAME   =  6;
 	/** production was <pre>"@(" Expression ")"</pre> */
 	static final int PASSIVE_EXPR =  7;    
-//	static final int CURRENT_MEMORY_AREA = 8; 
     
 	/** indicates the type of the result */
 	int           type    = UNDEFINED;
@@ -580,7 +571,6 @@ TOKEN :
 		    | < TYPEOF: "#typeof" >
 		    | < SWITCHTOIF: "#switch-to-if" >
 		    | < UNPACK: "#unpack" >
-//		    | < CURRENTMEMORYAREA: "<currentMemoryArea>" >
 		    | < SET: "#set" >
 		    }
 
@@ -2019,20 +2009,12 @@ ExecutionContext ExecutionContext() :
 {
     ExecutionContext ctxt = null;
     TypeSVWrapper tr = null;
-    ExpressionSVWrapper runtimeInstance = null;
-    ExpressionSVWrapper memoryArea = null;
+    ExpressionSVWrapper instance = null;
 }
 {
-    tr = TypeSV() "(" 
-    
- (
-   ("<currentMemoryArea>=" memoryArea = ExpressionSV() ("," "this=" runtimeInstance = ExpressionSV())?) 
-   |  "this=" runtimeInstance = ExpressionSV()
-  )?
-    
-    ")"  
+    tr = TypeSV() "(" (instance = ExpressionSV())? ")" 
     {
-	return new ExecutionContext(tr, memoryArea, runtimeInstance);
+	return new ExecutionContext(tr, instance);
     } 
 } 
 
@@ -2983,7 +2965,7 @@ Expression PrimaryExpression() :
 	    break;
 	    case PrimarySuffixReturnValue.INDEX_EXPR:
 	    if (tmpResult instanceof SVWrapper) {
-		s = ((SortedSchemaVariable)((SVWrapper)tmpResult).getSV()).sort();
+		s = ((SVWrapper)tmpResult).getSV().sort();
 	    }
 	    if (tmpResult instanceof UncollatedReferenceQualifier ||
 		tmpResult instanceof MethodReference ||
@@ -3012,7 +2994,7 @@ Expression PrimaryExpression() :
 	    break;
 	    case PrimarySuffixReturnValue.IDENTIFIER:
 	    if (tmpResult instanceof SVWrapper) {
-		s = ((SortedSchemaVariable)((SVWrapper)tmpResult).getSV()).sort();
+		s = ((SVWrapper)tmpResult).getSV().sort();
 	    }
 	    if ("length".equals(suffix.id.getText()) && isLeftHandSide(s)) {
 		    result = new ArrayLengthReference(tmpResult);
@@ -3030,7 +3012,7 @@ Expression PrimaryExpression() :
 	    // method call -determine the kind of method
 	    if (tmpResult instanceof UncollatedReferenceQualifier) {
 		// this is a normal method call
-		tmpResult = factory.createMethodReferenceWrapper
+		tmpResult = factory.createMethodReference
 		    (((UncollatedReferenceQualifier)tmpResult).getReferencePrefix(),
 		     ((UncollatedReferenceQualifier)tmpResult).getIdentifier(),
                suffix.args, ((UncollatedReferenceQualifier)tmpResult).getTypeArguments());
@@ -3040,14 +3022,14 @@ Expression PrimaryExpression() :
 		       ((MethodReference)tmpResult).getIdentifier()
 		       instanceof ProgramVariableSVWrapper) {
 			   // this is a method call with svidentifier
-			   tmpResult = factory.createMethodReferenceWrapper
+			   tmpResult = factory.createMethodReference
 			   (((MethodReference)tmpResult).getReferencePrefix(),
 			    ((MethodReference)tmpResult).getIdentifier(), suffix.args);
 		       } else if (ProgramSVSort.METHODNAME.
-		       		getClass().isInstance(((SortedSchemaVariable)
-				   ((SVWrapper)tmpResult).getSV()).sort())) {
+		       		getClass().isInstance((
+				   (SVWrapper)tmpResult).getSV().sort())) {
 				       // this is a method call with svidentifier
-				       tmpResult = factory.createMethodReferenceWrapper
+				       tmpResult = factory.createMethodReference
 				       (null, new LabelSVWrapper(((SVWrapper)tmpResult).getSV()), suffix.args);
 				   } else {
 				       throw new ParseException("Arguments without method name?");
@@ -3055,7 +3037,7 @@ Expression PrimaryExpression() :
 	    break;
 	    case PrimarySuffixReturnValue.SVIDENTIFIER:
 	    ProgramVariableSVWrapper pv = (ProgramVariableSVWrapper) suffix.id;
-	    s = ((SortedSchemaVariable)pv.getSV()).sort();
+	    s = pv.getSV().sort();
 	    if (ProgramSVSort.METHODNAME.getClass().isInstance(s)) {
 		tmpResult = new MethodReference(tmpResult,pv);
 	    } else if (s != ProgramSVSort.NONSIMPLEEXPRESSION &&
@@ -3106,11 +3088,6 @@ PrimaryPrefixReturnValue PrimaryPrefix() :
     {
 	prefix.type = PrimaryPrefixReturnValue.THIS;      
     }
-/*    |
-    "<currentMemoryArea>"
-    {
-        prefix.type = PrimaryPrefixReturnValue.CURRENT_MEMORY_AREA;   
-    }*/
       | 
       LOOKAHEAD(3) lit = Literal()
 	{
@@ -3261,9 +3238,9 @@ PrimarySuffixReturnValue PrimarySuffix() :
 	 }
 	)
      |
-     args = Arguments()  
- 	{
-            suffix.type = PrimarySuffixReturnValue.ARGUMENTS;
+     args = Arguments()
+	{
+	    suffix.type = PrimarySuffixReturnValue.ARGUMENTS;
 	    suffix.args = args;
 	}
      )
@@ -3690,22 +3667,22 @@ StatementBlock StartBlock() :
     StatementBlock result = null;
     ASTList<Statement> sl = new ASTArrayList<Statement>();
     Statement stat;
-    ExecutionContext ec = null;
+    ExecCtxtSVWrapper ec = null;
     TypeSVWrapper tr = null;
-    ExpressionSVWrapper sv = null, sv1 = null;
+    ExpressionSVWrapper sv = null;
 }
 { 
    "{" (   LOOKAHEAD(2)
            ( <DOT> ( LOOKAHEAD(2) 
-		     ec = ExecutionContext()  |
+		     tr = TypeSV() "(" (sv = ExpressionSV())? ")" |  
 	             ec = ExecutionContextSV() ))? 
             <CONTEXTSTART> 
             {
-//              if (tr == null) {
+              if (tr == null) {
                  result = factory.createContextStatementBlock(ec);
-//	      } else { 
-//                 result = factory.createContextStatementBlock(tr, sv, sv1);
-//	      }
+	      } else { 
+                 result = factory.createContextStatementBlock(tr, sv);
+	      }
               setPrefixInfo(result);
             }        
            (stat = BlockStatement() { sl.add(stat); } )*
@@ -3909,17 +3886,6 @@ Expression StatementExpression() :
 	     )
 	]
 	)
-     | (
-         "#set"
-         result = PrimaryExpression()
-         "="
-         expr = Expression()
-         {
-             op = new SetAssignment(result, expr);
-             testLeftHandSide(result);
-             result = op;             
-         }
-       )
      )
 	{
 	    checkConstruction(result);
@@ -4238,28 +4204,6 @@ RKeYMetaConstruct KeYMetaConstructStatement() :
 	  ) 
 	  |
 	  (
-	   "#method-call-contract" "("	
-	   [  LOOKAHEAD(2) sv = VariableSV() ","]
-	   [  LOOKAHEAD(2) execsv = ExecutionContextSV() ","]
-           methRef = PrimaryExpression() 
-	
-	   ")" ";" 
-	      {
-		  result = factory.createRKeYMetaConstruct();
-		  setPrefixInfo(result);
-		  result.setChild((Statement)methRef);
-		  if (sv != null) {
-		      result.setSV(sv);
-		  }
-		  if (execsv != null) {
-		      result.addSV(execsv);
-		  }		
-		  result.setName("#method-call-contract");
-		  return result;
-	      }
-	  ) 
-	  |
-	  (
 	   "#expand-method-body" "(" stat = Statement() ("," sv = VariableSV() )?  ")" ";" 
 	      {
 		  result = factory.createRKeYMetaConstruct();
@@ -4270,7 +4214,7 @@ RKeYMetaConstruct KeYMetaConstructStatement() :
 		  return result;
 	      }
 	   ) 
-	  |
+	  |  
 	  (
 	   "#constructor-call" "("	
 	   sv = VariableSV() "," consRef = ExpressionSV() 	
@@ -4281,20 +4225,6 @@ RKeYMetaConstruct KeYMetaConstructStatement() :
 		  result.setChild((Statement)consRef);
 		  result.setSV(sv);
 		  result.setName("#constructor-call");
-		  return result;
-	      }
-	   )
-	  |  
-	  (
-	   "#constructor-call-rtsj" "("	
-	   sv = VariableSV() "," consRef = ExpressionSV() 	
-	   ")" ";" 
-	      {
-		  result = factory.createRKeYMetaConstruct();
-		  setPrefixInfo(result);
-		  result.setChild((Statement)consRef);
-		  result.setSV(sv);
-		  result.setName("#constructor-call-rtsj");
 		  return result;
 	      }
 	   )
@@ -4545,7 +4475,7 @@ LOOKAHEAD(<TYPEOF> "(" <SVIDENTIFIER> ")")
 	    } else {
 		if (exprs.size()==1
 		    && exprs.get(0) instanceof ExpressionSVWrapper
-		    && ((SortedSchemaVariable)((ExpressionSVWrapper)exprs.get(0)).getSV()).sort()
+		    && (((ExpressionSVWrapper)exprs.get(0)).getSV()).sort()
 		    ==ProgramSVSort.LOOPINIT) {
 		    result.add((LoopInitializer)exprs.get(0));
 		} else {
@@ -4582,7 +4512,9 @@ ASTList<Expression> ForUpdate() :
     { 
 	if (result.size()!=1 
 	    && result.get(0) instanceof ExpressionSVWrapper
-	    && !((ExpressionSVWrapper)result.get(0)).getSV().isListSV()){
+	    && !(((ExpressionSVWrapper)result.get(0)).getSV() instanceof ProgramSV
+	         && ((ProgramSV)((ExpressionSVWrapper)result.get(0)).getSV()).isListSV()
+	        )){
 		throw new ParseException("SchemaVariable stands for a"
 					 +" whole StatementExpressionList");
 	    } 

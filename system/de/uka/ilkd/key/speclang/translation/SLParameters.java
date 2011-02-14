@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -7,15 +7,12 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.speclang.translation;
 
-import java.util.Iterator;
-
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 
-public class SLParameters {
-
+public final class SLParameters {
     
     private final ImmutableList<SLExpression> parameters;
 
@@ -23,31 +20,27 @@ public class SLParameters {
         this.parameters = parameters;
     }
     
+    
     public ImmutableList<SLExpression> getParameters() {
         return parameters;
     }
     
     
     public boolean isListOfTerm() {
-
-        for (SLExpression parameter : parameters) {
-            if (!parameter.isTerm())
+	for(SLExpression expr : parameters) {
+            if(!expr.isTerm()) {
                 return false;
+            }
         }
-        
         return true;
     }
     
-    public ImmutableList<KeYJavaType> getSignature(Services services) {
-            
+    
+    public ImmutableList<KeYJavaType> getSignature(Services services) {           
         ImmutableList<KeYJavaType> result = ImmutableSLList.<KeYJavaType>nil();
-
-        for (SLExpression parameter : parameters) {
-            result = result.append(parameter.getKeYJavaType(services.getJavaInfo()));
-        }
-        
+        for(SLExpression expr : parameters) {
+            result = result.append(expr.getType());
+        }        
         return result;
     }
-        
-
 }

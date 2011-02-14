@@ -21,8 +21,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * number of rules). The available singletons of this meta operators are kept 
  * here.
  */
-
-public interface MetaOperator extends Operator {
+public interface MetaOperator extends SortedOperator {
 
     /**
      * The method calculates the resulting term. The top level operator of the

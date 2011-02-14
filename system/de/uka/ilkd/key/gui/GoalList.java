@@ -613,7 +613,7 @@ public class GoalList extends JList {
             for ( int i = delegateBegin; i < delegateEnd; ++i ) {
                 final Goal goal = (Goal)delegate.getElementAt ( i );
                 if ( !isHiddenGoal ( goal ) )
-                    entries.add ( ind++, new Integer ( i ) );
+                    entries.add ( ind++, Integer.valueOf ( i ) );
             }
 
             return ind;
@@ -655,7 +655,7 @@ public class GoalList extends JList {
          */
         private void shiftTail (int begin, int amount) {
             for ( ; begin != entries.size (); ++begin )
-                entries.set ( begin, new Integer ( getDelegateIndex ( begin )
+                entries.set ( begin, Integer.valueOf ( getDelegateIndex ( begin )
                                                    + amount ) );
         }
         

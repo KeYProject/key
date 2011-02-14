@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -15,7 +15,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 
 import junit.framework.TestCase;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -47,7 +46,7 @@ class TestCommons extends TestCase {
     static protected Profile profile = init();
     
     static Profile init(){
-	Profile p = new JavaProfile();	
+	Profile p = new JavaProfile();
 	return p;
     }
     

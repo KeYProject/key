@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -36,14 +36,14 @@ public interface TacletTranslator {
     
     /**
      * Adds a <code>TranslationListener</code> to the list of listener. For events that are called see <code>TranslationListener</code>.
-     * @param listener listener to be added.
+     * @param list listener to be added.
      */
-    public void addListener(TranslationListener listener);
+    public void addListener(TranslationListener list);
     
     /**
      * Removes the given listener from the list of listener.
-     * @param listener
+     * @param list listener to be removed
      */
-    public void removeListener(TranslationListener listener);
+    public void removeListener(TranslationListener list);
 
 }

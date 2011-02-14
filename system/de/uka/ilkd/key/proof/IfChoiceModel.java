@@ -89,7 +89,7 @@ public class IfChoiceModel extends DefaultComboBoxModel {
      */
     private KeYParser stringParser(String s) {
 	return new KeYParser(ParserMode.TERM,new KeYLexer(new StringReader(s),services.getExceptionHandler()),
-			      "", TermFactory.DEFAULT, 
+			      "", 
 			      new Recoder2KeY(services,
 					      nss),			      
 			      services, nss, scm);

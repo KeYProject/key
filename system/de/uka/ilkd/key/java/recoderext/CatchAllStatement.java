@@ -147,7 +147,7 @@ public class CatchAllStatement extends JavaStatement implements
 
     
     /**
-     *      Ensures that each child has "this" as syntactical parent.
+     * Ensures that each child has "this" as syntactical parent.
      */
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
@@ -188,6 +188,4 @@ public class CatchAllStatement extends JavaStatement implements
     public String getName() {	
 	return "catchAll"+"("+paramdecl+") {"+body+" }";
     }
-
-
 }

@@ -10,9 +10,8 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 import junit.framework.TestCase;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.RigidFunction;
-import de.uka.ilkd.key.logic.sort.PrimitiveSort;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.rule.TacletForTests;
 
@@ -87,9 +86,9 @@ public class TestTriggersSet extends TestCase {
 
 	public void setUp() {
 		//sort
-		r = new PrimitiveSort(new Name("r"));
-		s = new PrimitiveSort(new Name("s"));
-		t = new PrimitiveSort(new Name("t"));
+		r = new SortImpl(new Name("r"));
+		s = new SortImpl(new Name("s"));
+		t = new SortImpl(new Name("t"));
 		//ints = ProofSettings.DEFAULT_SETTINGS.getLDTSettings().getIntegerSemantics().getIntSort();
 		sorts.add(r);
 		sorts.add(s);
@@ -97,35 +96,35 @@ public class TestTriggersSet extends TestCase {
 		//sorts.add(ints);
 		
 		//constant
-		r_a = new RigidFunction(new Name("r_a"), r, new Sort [0]);
-		r_b = new RigidFunction(new Name("r_b"), r, new Sort [0]);
-		r_c= new RigidFunction(new Name("r_c"), r, new Sort [0]);
+		r_a = new Function(new Name("r_a"), r, new Sort [0]);
+		r_b = new Function(new Name("r_b"), r, new Sort [0]);
+		r_c= new Function(new Name("r_c"), r, new Sort [0]);
 		functions.add(r_a);
 		functions.add(r_b);
 		functions.add(r_c);
 		
-		s_a = new RigidFunction(new Name("s_a"), s, new Sort [0]);
-		s_b = new RigidFunction(new Name("s_b"), s, new Sort [0]);
-		s_c= new RigidFunction(new Name("s_c"), s, new Sort [0]);
+		s_a = new Function(new Name("s_a"), s, new Sort [0]);
+		s_b = new Function(new Name("s_b"), s, new Sort [0]);
+		s_c= new Function(new Name("s_c"), s, new Sort [0]);
 		functions.add(s_a);
 		functions.add(s_b);
 		functions.add(s_c);
         
-		t_a = new RigidFunction(new Name("t_a"), s, new Sort [0]);
-		t_b = new RigidFunction(new Name("t_b"), s, new Sort [0]);
-		t_c = new RigidFunction(new Name("t_c"), s, new Sort [0]);
+		t_a = new Function(new Name("t_a"), s, new Sort [0]);
+		t_b = new Function(new Name("t_b"), s, new Sort [0]);
+		t_c = new Function(new Name("t_c"), s, new Sort [0]);
 		functions.add(t_a);
 		functions.add(t_b);
 		functions.add(t_c);
         
         
         	        //function
-		frr = new RigidFunction(new Name("frr"), r, new Sort[] { r });
-		f2rr = new RigidFunction(new Name("f2rr"), r, new Sort[] { r });
-		fsr = new RigidFunction(new Name("fsr"), r, new Sort[] { s });
-		ftr = new RigidFunction(new Name("ftr"), r, new Sort[] { t });
-		fstr= new RigidFunction(new Name("fst"),r, new Sort[] {s,t});
-		frstr=new RigidFunction(new Name("frstr"),r,new Sort[]{r,s,t});
+		frr = new Function(new Name("frr"), r, new Sort[] { r });
+		f2rr = new Function(new Name("f2rr"), r, new Sort[] { r });
+		fsr = new Function(new Name("fsr"), r, new Sort[] { s });
+		ftr = new Function(new Name("ftr"), r, new Sort[] { t });
+		fstr= new Function(new Name("fst"),r, new Sort[] {s,t});
+		frstr=new Function(new Name("frstr"),r,new Sort[]{r,s,t});
 		
 		functions.add(frr);
 		functions.add(f2rr);
@@ -134,11 +133,11 @@ public class TestTriggersSet extends TestCase {
 		functions.add(fstr);
 		functions.add(frstr);
         
-		gss = new RigidFunction(new Name("gss"), s, new Sort[] { s });
-		grs = new RigidFunction(new Name("grs"), s, new Sort[] { r });
-		gts = new RigidFunction(new Name("gts"), s, new Sort[] { t });
-		grts= new RigidFunction(new Name("grts"),s, new Sort[] {r,t});
-		grsts=new RigidFunction(new Name("grsts"),s,new Sort[]{r,s,t});
+		gss = new Function(new Name("gss"), s, new Sort[] { s });
+		grs = new Function(new Name("grs"), s, new Sort[] { r });
+		gts = new Function(new Name("gts"), s, new Sort[] { t });
+		grts= new Function(new Name("grts"),s, new Sort[] {r,t});
+		grsts=new Function(new Name("grsts"),s,new Sort[]{r,s,t});
 
 		functions.add(gss);
 		functions.add(grs);
@@ -146,11 +145,11 @@ public class TestTriggersSet extends TestCase {
 		functions.add(grts);
 		functions.add(grsts);
         
-		htt = new RigidFunction(new Name("htt"), t, new Sort[] { t });
-		hrt = new RigidFunction(new Name("hrt"), t, new Sort[] { r });
-		hst = new RigidFunction(new Name("hst"), t, new Sort[] { s });
-		hrst= new RigidFunction(new Name("hrst"),t, new Sort[] {r,s});
-		hrstt=new RigidFunction(new Name("hrstt"),t,new Sort[]{r,s,t});
+		htt = new Function(new Name("htt"), t, new Sort[] { t });
+		hrt = new Function(new Name("hrt"), t, new Sort[] { r });
+		hst = new Function(new Name("hst"), t, new Sort[] { s });
+		hrst= new Function(new Name("hrst"),t, new Sort[] {r,s});
+		hrstt=new Function(new Name("hrstt"),t,new Sort[]{r,s,t});
 	
 		functions.add(htt);
 		functions.add(hrt);
@@ -159,20 +158,20 @@ public class TestTriggersSet extends TestCase {
 		functions.add(hrstt);
         
 		//Formula function
-		pp=new RigidFunction(new Name("pp"),Sort.FORMULA,
+		pp=new Function(new Name("pp"),Sort.FORMULA,
 				                    new Sort[]{Sort.FORMULA});
-		pr=new RigidFunction(new Name("pr"),Sort.FORMULA,new Sort[]{r});
-		ps=new RigidFunction(new Name("ps"),Sort.FORMULA,new Sort[]{s});
-		pt=new RigidFunction(new Name("pt"),Sort.FORMULA,new Sort[]{t});
-		prs=new RigidFunction(new Name("prs"),Sort.FORMULA,
+		pr=new Function(new Name("pr"),Sort.FORMULA,new Sort[]{r});
+		ps=new Function(new Name("ps"),Sort.FORMULA,new Sort[]{s});
+		pt=new Function(new Name("pt"),Sort.FORMULA,new Sort[]{t});
+		prs=new Function(new Name("prs"),Sort.FORMULA,
 				        new Sort[]{r,s});
-		prt=new RigidFunction(new Name("prt"),Sort.FORMULA,
+		prt=new Function(new Name("prt"),Sort.FORMULA,
 				        new Sort[]{r,t});
-		pst=new RigidFunction(new Name("pst"),Sort.FORMULA,
+		pst=new Function(new Name("pst"),Sort.FORMULA,
 				        new Sort[]{s,t});
-		prst=new RigidFunction(new Name("prst"),Sort.FORMULA,
+		prst=new Function(new Name("prst"),Sort.FORMULA,
 				        new Sort[]{r,s,t});
-		//pi=new RigidFunction(new Name("pi"),Sort.FORMULA,new Sort[]{});
+		//pi=new Function(new Name("pi"),Sort.FORMULA,new Sort[]{});
 		functions.add(pp);
 		functions.add(pr);
 		functions.add(ps);

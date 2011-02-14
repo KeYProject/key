@@ -41,7 +41,7 @@ import de.uka.ilkd.key.util.Debug;
  */
 public class ClassPreparationMethodBuilder 
     extends RecoderModelTransformer {
-	
+    
     public static final String 
 	CLASS_PREPARE_IDENTIFIER = "<clprepare>";
 
@@ -80,7 +80,6 @@ public class ClassPreparationMethodBuilder
      * constant fields is due to binary compatibility reasons.
      */
     private boolean isConstantField(FieldSpecification spec) {
-	Debug.log4jDebug("now at " + spec.getFullName(), ClassPreparationMethodBuilder.class.getName());
     	boolean result = spec.isStatic() && spec.isFinal();
     	if (!result) {
     		return result;
@@ -114,20 +113,13 @@ public class ClassPreparationMethodBuilder
 
         for (FieldSpecification spec : fields) {
             if (spec.isStatic() && !isConstantField(spec)) {
-                Identifier ident = spec.getIdentifier();
-                if (ident instanceof ImplicitIdentifier) {
-                    result.add(new CopyAssignment
-                            (new PassiveExpression
-                                    (new FieldReference(ident.deepClone())),
-                                    getDefaultValue(spec.getType())));
-                } else {
-                    result.add(new CopyAssignment
-                            (new PassiveExpression
-                                    (new FieldReference(ident.deepClone())),
-                                    getDefaultValue(spec.getType())));
-                }
-            }
-        }
+		Identifier ident = spec.getIdentifier();	    
+		result.add(new CopyAssignment
+		            (new PassiveExpression
+		                    (new FieldReference(ident.deepClone())), 
+		                            getDefaultValue(spec.getType())));		    
+	    }
+	}
 
 	result.add
 	    (new CopyAssignment
@@ -194,6 +186,4 @@ public class ClassPreparationMethodBuilder
 	// 	    System.out.println(sw.toString());
 	// 	    try { sw.close(); } catch (Exception e) {}		
     }
-
-
 }

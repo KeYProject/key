@@ -1,10 +1,11 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+//
 
 package de.uka.ilkd.key.speclang.translation;
 
@@ -16,49 +17,40 @@ import de.uka.ilkd.key.java.declaration.FieldSpecification;
 import de.uka.ilkd.key.java.declaration.MemberDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermCreationException;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.NonRigidHeapDependentFunction;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 
-
-public class SLAttributeResolver extends SLExpressionResolver {
-
-    private static final TermBuilder tb = TermBuilder.DF;
-
+public final class SLAttributeResolver extends SLExpressionResolver {
     
     public SLAttributeResolver(JavaInfo javaInfo, 
-	    		        SLResolverManager manager,
-	    		        KeYJavaType specInClass) {
+	    		       SLResolverManager manager,
+	    		       KeYJavaType specInClass) {
         super(javaInfo, manager, specInClass);
     }
     
     
-    private ProgramVariable lookupVisibleAttribute(String name, 
+    private ProgramVariable lookupVisibleAttribute(String name,
 	    					   KeYJavaType containingType) {
-	final TypeDeclaration td 
+	final TypeDeclaration td
 		= (TypeDeclaration) containingType.getJavaType();
-
 	//lookup locally
 	for(MemberDeclaration md : td.getMembers()) {
-	    if(md instanceof FieldDeclaration 
-	       && isVisible(md, containingType)) {
-		for(FieldSpecification fs 
-			 : ((FieldDeclaration)md).getFieldSpecifications()) {
+	    if(md instanceof FieldDeclaration
+		    && isVisible(md, containingType)) {
+		for(FieldSpecification fs
+			: ((FieldDeclaration)md).getFieldSpecifications()) {
 		    if(fs.getProgramName().equals(name)) {
 			return (ProgramVariable) fs.getProgramVariable();
 		    }
 		}
 	    }
 	}
-		
+
 	//recursively lookup in supertypes
 	ImmutableList<KeYJavaType> sups = td.getSupertypes();
-	if(sups.isEmpty() 
-           && !containingType.equals(javaInfo.getJavaLangObject())) {
+	if(sups.isEmpty()
+		&& !containingType.equals(javaInfo.getJavaLangObject())) {
 	    sups = sups.prepend(javaInfo.getJavaLangObject());
 	}
 	for(KeYJavaType sup : sups) {
@@ -67,43 +59,62 @@ public class SLAttributeResolver extends SLExpressionResolver {
 		return res;
 	    }
 	}
-	
+
 	//not found
 	return null;
-    }
+    }    
+    
+
+    @Override
+    protected boolean canHandleReceiver(SLExpression receiver) {
+        return receiver != null;
+    }    
     
     
+    @Override
     protected SLExpression doResolving(SLExpression receiver, 
 	    			       String name,
 	    			       SLParameters parameters) 
-    						throws SLTranslationException {
-        if (parameters != null) {
+    		throws SLTranslationException {
+	
+        if(parameters != null) {
             return null;
         }
         
-        Term recTerm = receiver.getTerm();        
+        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT(); 
+        
+        Term recTerm = receiver.getTerm(); 
+        
+        //<inv> is special case (because it's really a predicate, not a boolean attribute)
+        if(name.equals("<inv>") && receiver.isTerm()) {
+            return new SLExpression(TB.inv(services, receiver.getTerm()));
+        }
+        
         ProgramVariable attribute = null;
         try {
             //try as fully qualified name
             attribute = javaInfo.getAttribute(name);
         } catch(IllegalArgumentException e){
             //try as short name and in enclosing classes
-            KeYJavaType containingType = receiver.getKeYJavaType(javaInfo);
+            KeYJavaType containingType = receiver.getType();
             while(attribute == null) {
                 attribute = lookupVisibleAttribute(name, containingType);
                 if(attribute == null) {
-                    attribute = lookupVisibleAttribute(
-                            ImplicitFieldAdder.FINAL_VAR_PREFIX + name, 
-                            containingType);
+                    attribute 
+                    	= lookupVisibleAttribute(
+                    		ImplicitFieldAdder.FINAL_VAR_PREFIX + name, 
+                    		containingType);
                 }
-                final ProgramVariable et 
-                	= javaInfo.getAttribute(
+                final LocationVariable et 
+                	= (LocationVariable) javaInfo.getAttribute(
                 		ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, 
                 		containingType);
-                if(et != null && attribute == null) {
+                if(et != null && attribute == null){
                     containingType = et.getKeYJavaType();
-                    if(recTerm != null) {
-                        recTerm = tb.dot(recTerm, et);
+                    if(recTerm != null){
+                	final Function thisFieldSymbol 
+                		= heapLDT.getFieldSymbolForPV(et, services);
+                        recTerm = TB.dot(services, et.sort(), recTerm, thisFieldSymbol);
                     }
                 } else {
                     break;
@@ -116,39 +127,38 @@ public class SLAttributeResolver extends SLExpressionResolver {
                 throw manager.excManager.createException(
                         "Reference to non-static field without receiver: " +
                         attribute.name());
-            }
-            try {
-                Term attributeTerm = tb.dot(recTerm, attribute);
-                return manager.createSLExpression(attributeTerm);
-            } catch (TermCreationException e) {
-                throw manager.excManager.createException(
-                        "Wrong attribute reference " + name + ".");
+            } else if(attribute instanceof ProgramConstant) {
+        	return new SLExpression(TB.var(attribute), 
+        				attribute.getKeYJavaType());
+            } else if(attribute == javaInfo.getArrayLength()) {
+        	return new SLExpression(TB.dotLength(services, recTerm), 
+        		                attribute.getKeYJavaType());
+            } else {
+        	try {
+        	    final Function fieldSymbol 
+        	    	= heapLDT.getFieldSymbolForPV((LocationVariable)
+        	    		                         attribute, 
+        	    		                       services);
+        	    Term attributeTerm;
+        	    if(attribute.isStatic()) {
+        		attributeTerm = TB.staticDot(services, 
+        					     attribute.sort(), 
+        					     fieldSymbol);
+        	    } else {
+        		attributeTerm = TB.dot(services, 
+        				       attribute.sort(), 
+        				       recTerm, 
+        				       fieldSymbol);
+        	    }
+        	    return new SLExpression(attributeTerm, 
+        		    		    attribute.getKeYJavaType());
+        	} catch (TermCreationException e) {
+        	    throw manager.excManager.createException(
+        		    "Wrong attribute reference \"" + name + "\": " + e.getMessage());
+        	}
             }
         }   
-        
-        //try non-rigid heap-dependent function symbol instead of attribute
-        Function f = (Function) javaInfo.getServices()
-                                        .getNamespaces()
-                                        .functions().lookup(new Name(name));
-        if(f instanceof NonRigidHeapDependentFunction) {
-            if(receiver.isTerm() 
-               && f.possibleSubs(new Term[]{receiver.getTerm()})) {
-                Term functionTerm = tb.func(f, receiver.getTerm());
-                return manager.createSLExpression(functionTerm);                
-            } else if(receiver.isType() && f.arity() == 0) {
-                Term functionTerm = tb.func(f);
-                return manager.createSLExpression(functionTerm);
-            }
-        }
     
         return null;
-    }
-
-    public boolean canHandleReceiver(SLExpression receiver) {
-        return receiver != null && (receiver.isTerm() || receiver.isType());
-    }
-
-    public boolean needVarDeclaration(String name) {
-        return false;
     }
 }

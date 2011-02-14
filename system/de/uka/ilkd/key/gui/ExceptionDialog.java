@@ -252,7 +252,7 @@ public class ExceptionDialog extends JDialog {
     }
 
 
-    class TextAreaRenderer extends JTextArea implements ListCellRenderer
+    private static class TextAreaRenderer extends JTextArea implements ListCellRenderer
     {
         public TextAreaRenderer()
         {	   

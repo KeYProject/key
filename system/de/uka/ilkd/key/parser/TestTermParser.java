@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -16,41 +16,36 @@ import java.io.StringWriter;
 
 import junit.framework.TestCase;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
-import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IUpdateOperator;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.Op;
-import de.uka.ilkd.key.logic.sort.AbstractSort;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.DefaultExceptionHandler;
-import de.uka.ilkd.key.util.ExceptionHandlerException;
 
 
 public class TestTermParser extends TestCase {
     
-    private TermFactory tf = TermFactory.DEFAULT;
+    private static final TermFactory tf = TermFactory.DEFAULT;
 
-    NamespaceSet nss;
+    private static NamespaceSet nss;
 
-    Services serv;
+    private static Services serv;
 
-    Recoder2KeY r2k;
+    private static Recoder2KeY r2k;
 
-    Sort elem,list,int_sort;
+    private static Sort elem,list;
 
-    Function head,tail,nil,cons,isempty,p; 
+    private static Function head,tail,nil,cons,isempty,p; 
 
-    LogicVariable x,y,z,xs,ys,zs;
+    private static LogicVariable x,y,z,xs,ys,zs;
 
-    Term t_x,t_y,t_z,t_xs,t_ys,t_zs;
-    Term t_headxs,t_tailxs,t_tailys,t_nil;
+    private static Term t_x,t_y,t_z,t_xs,t_ys;
+    private static Term t_headxs,t_tailys,t_nil;
 
     public TestTermParser(String name) {
 	super(name);
@@ -58,9 +53,11 @@ public class TestTermParser extends TestCase {
 
 
     public void setUp() {
-	nss = new NamespaceSet();
+	if(serv != null) {
+	    return;
+	}
 	serv = TacletForTests.services ();
-	nss.sorts().add(Sort.NULL);
+	nss = serv.getNamespaces();
 	r2k = new Recoder2KeY(serv, nss);
 	r2k.parseSpecialClasses();	
 	parseDecls("\\sorts { boolean; elem; list; int; int_sort; numbers;  }\n" +
@@ -69,25 +66,25 @@ public class TestTermParser extends TestCase {
 		   "  list tail(list);\n" +
 		   "  list nil;\n" +
 		   "  list cons(elem,list);\n"  +
-		   "numbers #;\n"+
-		   "numbers 0 (numbers);\n"+
-		   "numbers 1 (numbers);\n"+
-		   "numbers 2 (numbers);\n"+
-		   "numbers 3 (numbers);\n"+
-		   "numbers 4 (numbers);\n"+
-		   "numbers 5 (numbers);\n"+
-		   "numbers 6 (numbers);\n"+
-		   "numbers 7 (numbers);\n"+
-		   "numbers 8 (numbers);\n"+
-		   "numbers 9 (numbers);\n"+
-		   "numbers neglit (numbers);\n"+
-                   "int Z (numbers);\n"+
-		   "int neg (int);\n"+
-		   "int add (int,int);\n"+
-		   "int sub (int,int);\n"+
-		   "int mul (int,int);\n"+
-		   "int div (int,int);\n"+
-		   "int mod (int,int);\n"+
+//		   "numbers #;\n"+
+//		   "numbers 0 (numbers);\n"+
+//		   "numbers 1 (numbers);\n"+
+//		   "numbers 2 (numbers);\n"+
+//		   "numbers 3 (numbers);\n"+
+//		   "numbers 4 (numbers);\n"+
+//		   "numbers 5 (numbers);\n"+
+//		   "numbers 6 (numbers);\n"+
+//		   "numbers 7 (numbers);\n"+
+//		   "numbers 8 (numbers);\n"+
+//		   "numbers 9 (numbers);\n"+
+//		   "numbers neglit (numbers);\n"+
+//                   "int Z (numbers);\n"+
+//		   "int neg (int);\n"+
+//		   "int add (int,int);\n"+
+//		   "int sub (int,int);\n"+
+//		   "int mul (int,int);\n"+
+//		   "int div (int,int);\n"+
+//		   "int mod (int,int);\n"+
 		   "int aa ;\n"+
 		   "int bb ;\n"+
 		   "int cc ;\n"+
@@ -95,17 +92,15 @@ public class TestTermParser extends TestCase {
 		   "int ee ;\n"+
 		   "}\n" +
 		   "\\predicates {\n" +
-		   "  lt(int,int);\n" +
-                   "  leq(int,int);\n" +
+//		   "  lt(int,int);\n" +
+//                   "  leq(int,int);\n" +
 		   "  isempty(list);\n" +
-		   "  p(elem,list);\n" +
-		   "}\n"
+//		   "  p(elem,list);\n" +
+		   "}\n"+
+		   "\\programVariables {int globalIntPV;}"
 
 		   );
-
-        int_sort = lookup_sort("int");       
-        ((AbstractSort)int_sort).addDefinedSymbols(serv.getNamespaces().functions(), 
-                serv.getNamespaces().sorts());
+       
         elem = lookup_sort("elem");
 	list = lookup_sort("list");
 
@@ -116,17 +111,15 @@ public class TestTermParser extends TestCase {
 	// The declaration parser cannot parse LogicVariables; these
 	// are normally declared in quantifiers, so we introduce them
 	// ourselves!
-	x = declareVar("x",elem);   t_x = tf.createVariableTerm(x);  
-	y = declareVar("y",elem);   t_y = tf.createVariableTerm(y);  
-	z = declareVar("z",elem);   t_z = tf.createVariableTerm(z);  
-	xs = declareVar("xs",list); t_xs = tf.createVariableTerm(xs);
-	ys = declareVar("ys",list); t_ys = tf.createVariableTerm(ys);
-	zs = declareVar("zs",list); t_zs = tf.createVariableTerm(zs);
+	x = declareVar("x",elem);   t_x = tf.createTerm(x);  
+	y = declareVar("y",elem);   t_y = tf.createTerm(y);  
+	z = declareVar("z",elem);   t_z = tf.createTerm(z);  
+	xs = declareVar("xs",list); t_xs = tf.createTerm(xs);
+	ys = declareVar("ys",list); t_ys = tf.createTerm(ys);
 	
-	t_headxs = tf.createFunctionTerm(head,t_xs);
-	t_tailxs = tf.createFunctionTerm(tail,t_xs);
-	t_tailys = tf.createFunctionTerm(tail,t_ys);
-	t_nil = tf.createFunctionTerm(nil);
+	t_headxs = tf.createTerm(head,new Term[]{t_xs}, null, null);
+	t_tailys = tf.createTerm(tail,new Term[]{t_ys}, null, null);
+	t_nil = tf.createTerm(nil);
     }
 
     Sort lookup_sort(String name) {
@@ -169,11 +162,12 @@ public class TestTermParser extends TestCase {
 	    new Recoder2KeY(TacletForTests.services (), 
 	                    nss).parseSpecialClasses();	   
 	    return new KeYParser
-		(ParserMode.PROBLEM, new KeYLexer(new StringReader(s),null),
+		(ParserMode.PROBLEM, 
+	         new KeYLexer(new StringReader(s),null),
 		 "No file. Call of parser from parser/TestTermParser.java",
 		 new ParserConfig(serv, nss),
 		 new ParserConfig(serv, nss),
-		 null, DefaultImmutableSet.<Taclet>nil(),null).problem();	    
+		 null, DefaultImmutableSet.<Taclet>nil()).problem();	    
 	} catch (Exception e) {
 	    StringWriter sw = new StringWriter();
 	    PrintWriter pw = new PrintWriter(sw);
@@ -184,12 +178,13 @@ public class TestTermParser extends TestCase {
 
     private KeYParser stringTermParser(String s) {
 	return new KeYParser
-	    (ParserMode.TERM, new KeYLexer(new StringReader(s),new DefaultExceptionHandler()), 
+	    (ParserMode.TERM, 
+	     new KeYLexer(new StringReader(s), new DefaultExceptionHandler()), 
 	     "No file. Call of parser from parser/TestTermParser.java",
-	     tf, 
-	     r2k = new Recoder2KeY(TacletForTests.services(), nss),
-	                           TacletForTests.services(), nss, 
-	                           new AbbrevMap());
+	     r2k,
+	     serv, 
+	     nss, 
+	     new AbbrevMap());
 
     }
 
@@ -204,17 +199,6 @@ public class TestTermParser extends TestCase {
 	}
     }
     
-    public ImmutableSet<LocationDescriptor> parseModifies(String s) {
-    	try {     
-            return stringTermParser(s).location_list();
-        } catch (Exception e) {
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            e.printStackTrace(pw);
-            throw new RuntimeException("Exc while Parsing:\n" + sw );
-        }
-    }
-
 
     public Term parseFma(String s) {
 	try {	    	    
@@ -242,20 +226,20 @@ public class TestTermParser extends TestCase {
     }
 
     public void test3() {
-	Term t = tf.createFunctionTerm(cons,t_headxs,t_tailys);
+	Term t = tf.createTerm(cons,t_headxs,t_tailys);
 	
 	assertEquals("parse cons(head(xs),tail(ys))",
 		     t,parseTerm("cons(head(xs),tail(ys))"));
     }
 
     public void test5() {
-	Term t = tf.createEqualityTerm
-	    (tf.createFunctionTerm
+	Term t = tf.createTerm(Equality.EQUALS,
+	    tf.createTerm
 	     (head,
-	      tf.createFunctionTerm(cons, t_x, t_xs)),
-	     tf.createFunctionTerm
+	      tf.createTerm(cons, t_x, t_xs)),
+	     tf.createTerm
 	     (head,
-	      tf.createFunctionTerm (cons,t_x,t_nil)));
+	      tf.createTerm (cons,t_x,t_nil)));
 	     
 	assertEquals("parse head(cons(x,xs))=head(cons(x,nil))",
 		     t,parseFma("head(cons(x,xs))=head(cons(x,nil))"));
@@ -264,14 +248,14 @@ public class TestTermParser extends TestCase {
     }
 
     public void testNotEqual() {
-	Term t = tf.createJunctorTerm(Op.NOT,
-	    tf.createEqualityTerm
-	    (tf.createFunctionTerm
+	Term t = tf.createTerm(Junctor.NOT,
+	    tf.createTerm(Equality.EQUALS,
+	    tf.createTerm
 	     (head,
-	      tf.createFunctionTerm(cons, t_x, t_xs)),
-	     tf.createFunctionTerm
+	      tf.createTerm(cons, t_x, t_xs)),
+	     tf.createTerm
 	     (head,
-	      tf.createFunctionTerm (cons,t_x,t_nil))));
+	      tf.createTerm (cons,t_x,t_nil))));
 	     
 	assertEquals("parse head(cons(x,xs))!=head(cons(x,nil))",
 		     t,parseFma("head(cons(x,xs))!=head(cons(x,nil))"));
@@ -279,21 +263,17 @@ public class TestTermParser extends TestCase {
 
 
     public void test6() {
-	Term t = tf.createJunctorTerm
-	    (Op.EQV,
-	     tf.createJunctorTerm
-	     (Op.IMP,
-	      tf.createJunctorTerm
-	      (Op.OR,
-	       tf.createEqualityTerm(t_x,t_x),
-	       tf.createEqualityTerm(t_y,t_y)),
-	      tf.createJunctorTerm
-	      (Op.AND,
-	       tf.createEqualityTerm(t_z,t_z),
-	       tf.createEqualityTerm(t_xs,t_xs))),
-	     tf.createJunctorTerm
-	     (Op.NOT,
-	      tf.createEqualityTerm(t_ys,t_ys)));
+	Term t = tf.createTerm
+	    (Equality.EQV,
+	     new Term[]{tf.createTerm(Junctor.IMP,
+		     			     tf.createTerm(Junctor.OR,
+		     				     		  tf.createTerm(Equality.EQUALS, t_x, t_x),
+		     				     		  tf.createTerm(Equality.EQUALS, t_y,t_y)),
+		     		             tf.createTerm(Junctor.AND,
+		     		        	     	          tf.createTerm(Equality.EQUALS, t_z,t_z),
+		     		        	     	          tf.createTerm(Equality.EQUALS, t_xs,t_xs))),
+                         tf.createTerm(Junctor.NOT,
+                         tf.createTerm(Equality.EQUALS, t_ys,t_ys))}, null, null);
 
 	     
 	assertEquals("parse x=x | y=y -> z=z & xs =xs <-> ! ys = ys",
@@ -313,14 +293,13 @@ public class TestTermParser extends TestCase {
 	LogicVariable l1 = (LogicVariable) t.sub(0).varsBoundHere(0)
 	    .get(0);
 
-	Term t1 = tf.createQuantifierTerm
-	    (Op.ALL,thisx,
-	     tf.createQuantifierTerm
-	     (Op.ALL,l1,
-	      tf.createJunctorTerm
-	      (Op.NOT,
-	       tf.createEqualityTerm(tf.createVariableTerm(thisx),
-				     tf.createVariableTerm(l1)))));
+	Term t1 = TermBuilder.DF.all(thisx,
+	     TermBuilder.DF.all(l1,
+	      tf.createTerm
+	      (Junctor.NOT,
+	       tf.createTerm(Equality.EQUALS,
+		             tf.createTerm(thisx),
+		             tf.createTerm(l1)))));
 	
 	assertTrue("new variable in quantifier", thisx != x);
 	assertEquals("parse \\forall list x; \\forall list l1; ! x = l1", t1,t);
@@ -337,13 +316,15 @@ public class TestTermParser extends TestCase {
 	    LogicVariable thisxs = (LogicVariable) t.varsBoundHere(1)
 		.get(0);
 	
-	    Term t1 = tf.createSubstitutionTerm
-		(Op.SUBST,
-		 thisxs, t_headxs,
-		 tf.createFunctionTerm
-		 (cons, 
-		  tf.createVariableTerm(thisxs), 
-		  t_ys));
+	    Term t1 = tf.createTerm
+		(WarySubstOp.SUBST,
+		 new Term[]{t_headxs, tf.createTerm
+        		 (cons, 
+        		  new Term[]{tf.createTerm(thisxs), t_ys},
+        		  	     null,
+        		  	     null)},
+		new ImmutableArray<QuantifiableVariable>(thisxs),
+		null);
 
 	    assertTrue("new variable in subst term", thisxs != xs);
 	    assertEquals("parse {xs:elem head(xs)} cons(xs,ys)",t1,t);
@@ -359,11 +340,10 @@ public class TestTermParser extends TestCase {
 	LogicVariable thisx = (LogicVariable) t.varsBoundHere(0)
 	    .get(0);
 
-	Term t1 = tf.createQuantifierTerm
-	    (Op.EX,thisx,
-	     tf.createJunctorTerm
-	     (Op.NOT,
-	      tf.createFunctionTerm(isempty,tf.createVariableTerm(thisx))));
+	Term t1 = TermBuilder.DF.ex(thisx,
+	     tf.createTerm
+	     (Junctor.NOT,
+	      tf.createTerm(isempty,new Term[]{tf.createTerm(thisx)}, null, null)));
 	      
 	assertTrue("new variable in quantifier", thisx != x);
 	assertEquals("parse \\forall list x; \\forall list l1; ! x = l1", t1,t);
@@ -402,61 +382,61 @@ public class TestTermParser extends TestCase {
                                         +" cons(y,xs))");
         Term t3 = parseTerm("\\exists int_sort bi; (\\<{ int p_x = 1;"
                             +" {int s = 2;} }\\>"
-                            +" p_x=p_x ->"
+                            +" true ->"
                             +"\\<{ int p_x = 1;boolean p_y=2<1;"
                             +" while(p_y){ int s=3 ;} }\\>"
-                            +" p_x=p_x)");
+                            +" true)");
         Term t4 = parseTerm("\\exists int_sort ci; (\\<{ int p_y = 1;"
                             +" {int s = 2;} }\\>"
-                            +" p_y=p_y ->"
+                            +" true ->"
                             +"\\<{ int p_y = 1;boolean p_x = 2<1;"
                             +"while(p_x){ int s=3 ;} }\\>"
-                            +" p_y=p_y)");
+                            +" true)");
         assertTrue("Terms should be equalModRenaming", t3.equalsModRenaming(t4));
      }
 
     public void test14() {
-	    String s="\\<{int[] i;i=new int[5];}\\>i[3]=i[2]";
-	    Term t=parseTerm(s);
-	    s="\\<{int[] i;}\\>\\<{}\\>true";
-	    t=parseTerm(s);
+	String s="\\<{int[] i;i=new int[5];}\\>true";
+	Term t=parseTerm(s);
+	s="\\<{int[] i;}\\>\\<{}\\>true";
+	t=parseTerm(s);
     }
 
     public void xtestBindingUpdateTermOldBindingAlternative() {
-	    String s="\\<{int i,j;}\\> {i:=j} i = j";
-	    Term t = parseTerm(s);
-	    assertTrue("expected {i:=j}(i=j) but is ({i:=j}i)=j)", 
-		       t.sub(0).op() instanceof IUpdateOperator);
+	String s="\\<{int i,j;}\\> {i:=j} i = j";
+	Term t = parseTerm(s);
+	assertTrue("expected {i:=j}(i=j) but is ({i:=j}i)=j)", 
+		t.sub(0).op() instanceof UpdateApplication);
     }
 
     public void testBindingUpdateTerm() {
-	    String s="\\<{int i,j;}\\> {i:=j} i = j";
-	    Term t = parseTerm(s);
-	    assertFalse("expected ({i:=j}i)=j) but is {i:=j}(i=j)", 
-		       t.sub(0).op() instanceof IUpdateOperator);
+	String s="\\forall int j; {globalIntPV:=j} globalIntPV = j";
+	Term t = parseTerm(s);
+	assertFalse("expected ({globalIntPV:=j}globalIntPV)=j) but is {globalIntPV:=j}(globalIntPV=j)", 
+		t.sub(0).op() instanceof UpdateApplication);
     }
 
     public void testParsingArray() {
-	    String s="\\<{int[][] i; int j;}\\> i[j][j] = j";
-	    Term t = parseTerm(s);
+	String s="\\forall int[][] i; \\forall int j; i[j][j] = j";
+	Term t = parseTerm(s);
     }
 
-    // fails because of lexer matching blocks with braces
+
     public void xtestParsingArrayWithSpaces() {
 	String s="\\<{int[][] i; int j;}\\> i[ j ][ j ] = j";
 	Term t = parseTerm(s);
     }
 
     public void testParsingArrayCombination() {
-	    String s="\\<{int[][] i; int j;}\\> i [i[i[j][j]][i[j][j]]][i[j][i[j][j]]] = j";
-	    Term t = parseTerm(s);
+	String s="\\forall int[][] i; \\forall int j; i [i[i[j][j]][i[j][j]]][i[j][i[j][j]]] = j";
+	Term t = parseTerm(s);
     }
 
     
     public void testAmbigiousFuncVarPred() {
 	// tests bug id 216
-	String s = "\\functions {} \\predicates{gt(int, int);}"+
-	    "\n\\problem {\\forall int x; gt(x, 0)}\n \\proof {\n"+
+	String s = "\\functions {} \\predicates{mypred(int, int);}"+
+	    "\n\\problem {\\forall int x; mypred(x, 0)}\n \\proof {\n"+
 	    "(branch \"dummy ID\""+
 	    "(opengoal \"  ==> true  -> true \") ) }";
 	try {
@@ -484,8 +464,8 @@ public class TestTermParser extends TestCase {
 				+"public T query(){} "
 				+"public static T staticQ(T p){} "
 				+"public static T staticQ() {}}");
-	String s = "\\<{T t;}\\> (t.query()=t & t.query@(T)()=t & T.staticQ()=t "
-	    +"& T.staticQ(t)=t & T.b=t.a@(T) & T.d=t.c@(T) & t.e@(T)=T.f & t.g@(T)=t.h@(T))";
+	String s = "\\forall T t;( (t.query()=t & t.query@(T)()=t & T.staticQ()=t "
+	    +"& T.staticQ(t)=t & T.b=t.a@(T) & T.d=t.c@(T) & t.e@(T)=T.f & t.g@(T)=t.h@(T)))";
 	parseTerm(s);
     }
 
@@ -542,7 +522,7 @@ public class TestTermParser extends TestCase {
             fail ();
         }
         assertTrue ( "Failed parsing integer if-then-else term",
-                     t.op () == Op.IF_THEN_ELSE
+                     t.op () == IfThenElse.IF_THEN_ELSE
                      && t.sub ( 0 ).equals ( parseTerm ( "3=4" ) )
                      && t.sub ( 1 ).equals ( parseTerm ( "1" ) )
                      && t.sub ( 2 ).equals ( parseTerm ( "2" ) ) );
@@ -554,7 +534,7 @@ public class TestTermParser extends TestCase {
             fail ();
         }
         assertTrue ( "Failed parsing nested integer if-then-else term",
-                     t2.op () == Op.IF_THEN_ELSE
+                     t2.op () == IfThenElse.IF_THEN_ELSE
                      && t2.sub ( 0 ).equals ( parseTerm ( "3=4 & 1=1" ) )
                      && t2.sub ( 1 ).equals ( t )
                      && t2.sub ( 2 ).equals ( parseTerm ( "2" ) ) );
@@ -566,57 +546,13 @@ public class TestTermParser extends TestCase {
             fail ();
         }
         assertTrue ( "Failed parsing propositional if-then-else term",
-                     t.op () == Op.IF_THEN_ELSE
+                     t.op () == IfThenElse.IF_THEN_ELSE
                      && t.sub ( 0 ).equals ( parseTerm ( "3=4" ) )
                      && t.sub ( 1 ).equals ( parseTerm ( "1=2" ) )
                      && t.sub ( 2 ).equals ( parseTerm ( "2=3" ) ) );
 
     }
-    
-    public void testIfExThenElse () {
-        Term t=null, t2=null;
-        
-        String s1 = "\\ifEx int x; (3=4) \\then (1) \\else (2)";
-        try {
-            t = parseTerm ( s1 );
-        } catch ( Exception e ) {
-            fail ();
-        }
-        assertTrue ( "Failed parsing integer ifEx-then-else term",
-                     t.op () == Op.IF_EX_THEN_ELSE
-                     && t.varsBoundHere(0).size() == 1
-                     && t.sub ( 0 ).equals ( parseTerm ( "3=4" ) )
-                     && t.sub ( 1 ).equals ( parseTerm ( "1" ) )
-                     && t.sub ( 2 ).equals ( parseTerm ( "2" ) ) );
-
-        String s2 = "\\ifEx int x; (3=4 & 1=1) \\then (\\if (3=4) \\then (1) \\else (2)) \\else (2)";
-        try {
-            t2 = parseTerm ( s2 );
-        } catch ( Exception e ) {
-            fail ();
-        }
-        assertTrue ( "Failed parsing nested integer ifEx-then-else term",
-                     t2.op () == Op.IF_EX_THEN_ELSE
-                     && t.varsBoundHere ( 0 ).size () == 1
-                     && t2.sub ( 0 ).equals ( parseTerm ( "3=4 & 1=1" ) )
-                     && t2.sub ( 1 ).equals ( parseTerm ( "\\if (3=4) \\then (1) \\else (2)" ) )
-                     && t2.sub ( 2 ).equals ( parseTerm ( "2" ) ) );
-
-        String s3 = "\\ifEx (int x; int y) (x=y) \\then (1=2) \\else (2=3)";
-        try {
-            t = parseTerm ( s3 );
-        } catch ( Exception e ) {
-            fail ();
-        }
-        assertTrue ( "Failed parsing propositional ifEx-then-else term",
-                     t.op () == Op.IF_EX_THEN_ELSE
-                     && t.sub ( 0 ).op() == Op.EQUALS
-                     && t.sub ( 0 ).sub ( 0 ).op () == t.varsBoundHere ( 0 ).get ( 0 )
-                     && t.sub ( 0 ).sub ( 1 ).op () == t.varsBoundHere ( 0 ).get ( 1 )
-                     && t.sub ( 1 ).equals ( parseTerm ( "1=2" ) )
-                     && t.sub ( 2 ).equals ( parseTerm ( "2=3" ) ) );
-
-    }
+   
 
     public void testInfix1() {
 	assertEquals("infix1",parseTerm("aa + bb"),
@@ -642,63 +578,4 @@ public class TestTermParser extends TestCase {
         assertEquals("cast stronger than plus", parseTerm("(int)3+2"), 
                 parseTerm("((int)3)+2"));
      }
-    
-    public void testUnnecessaryIntersectionSort () {
-        // AZ is a subsort of Z, 
-        TacletForTests.getJavaInfo().readJavaBlock("{}");        
-        r2k.parseSpecialClasses();
-        r2k.readCompilationUnit("class Z { } " +
-                                "class SubZ extends Z {} " +
-                                "class AZ extends Z {} ");
-        
-        boolean unneccessaryIntersectionSortDetected = false;
-        try {
-           parseDecls("\\sorts { \\inter(AZ,Z); }");
-        } catch (Exception e) {
-            assertTrue("expected KeYSemanticException, but is " + e.getCause(),
-                       e.getCause().getCause()
-                       instanceof KeYSemanticException);
-            unneccessaryIntersectionSortDetected = true;
-            
-        }
-        
-        assertTrue("The given intersection sort is unnecessary as it is equal to one " +
-                   "of its components and" +
-                   "should not be parsed.", unneccessaryIntersectionSortDetected);   
-        
-        try {
-            parseDecls("\\sorts { \\inter(AZ, SubZ); }");
-         } catch (Exception e) {
-             fail("failed to parse intersection sort." + e);                        
-         }        
-     
-    
-    }
-
-    public void testIntersectionSort() {
-        // AZ is a subsort of Z, 
-        TacletForTests.getJavaInfo().readJavaBlock("{}");        
-        nss = TacletForTests.getNamespaces();
-        r2k = new Recoder2KeY(
-                        TacletForTests.getJavaInfo().getKeYProgModelInfo().getServConf(),
-                        TacletForTests.getJavaInfo().rec2key(),
-                        nss,
-                        TacletForTests.services().getTypeConverter());                     
-    }
-    
-    public void testModifies() {
-        TacletForTests.getJavaInfo().readJavaBlock("{}");        
-        r2k.parseSpecialClasses();
-        r2k.readCompilationUnit("class ZMod { static ZMod z; int a; int[] b; }");              
-        
-        ImmutableSet<LocationDescriptor> locs = null;
-        try {
-            locs = parseModifies("{\\for ZMod x; x.a@(ZMod), "
-                                 + "\\for int i; \\if(0 <= i & i <= 7) ZMod.z.b@(ZMod)[i], "
-                                 + "ZMod.z.b@(ZMod)[0..7]}");
-        } catch (Exception e) {
-            fail("Error parsing modifies clause. " + e);
-        }               
-        assertTrue("Modifies should contain 3 elements", (locs != null)&& (locs.size() == 3));
-    }
 }

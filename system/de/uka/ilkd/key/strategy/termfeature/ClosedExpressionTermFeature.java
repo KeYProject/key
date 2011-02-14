@@ -5,6 +5,7 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+
 package de.uka.ilkd.key.strategy.termfeature;
 
 import de.uka.ilkd.key.logic.Term;
@@ -23,5 +24,4 @@ public class ClosedExpressionTermFeature extends BinaryTermFeature {
     protected boolean filter(Term term) {
         return term.freeVars ().size () == 0;
     }
-
 }

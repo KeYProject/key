@@ -13,7 +13,6 @@ package de.uka.ilkd.key.logic;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.rule.soundness.SVSkolemFunction;
 
 public class WaryClashFreeSubst extends ClashFreeSubst {
 
@@ -91,7 +90,7 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
 	        newVar = newVarFor ( getVariable (), warysvars );
 	    else
 	        newVar = getVariable ();
-	    newVarTerm = tf.createVariableTerm ( (LogicVariable)newVar );
+	    newVarTerm = TB.var ( newVar );
 	}	
     }
 
@@ -107,10 +106,8 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
 	if ( !getSubstitutedTerm ().isRigid () ) {
 	    if ( t.op () instanceof Modality )
 		return applyOnModality ( t );		
-	    if ( t.op () instanceof IUpdateOperator )
+	    if ( t.op () instanceof UpdateApplication )
 		return applyOnUpdate   ( t );
-	    if ( t.op () instanceof SVSkolemFunction )
-		return applyToSVSkolem ( t );
 	}
 	return super.apply1 ( t );
     }
@@ -138,10 +135,10 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
      * PRECONDITION: <code>warysvars != null</code>
      */
     private Term applyOnUpdate ( Term t ) {
-        final IUpdateOperator updOp = (IUpdateOperator)t.op ();
+        final UpdateApplication updOp = (UpdateApplication)t.op ();
         
 	// only the last child is below the update
-	final Term target = updOp.target ( t );
+	final Term target = updOp.getTarget ( t );
 	if ( !target.freeVars ().contains ( getVariable () ) )
 	    return super.apply1 ( t );
 
@@ -160,10 +157,10 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
         newSubterms[updOp.targetPos ()] = addSubst ? substWithNewVar ( target )
                                                    : target;
 
-        return tf.createTerm ( t.op (),
-                               newSubterms,
-                               newBoundVars,
-                               t.javaBlock ());
+        return TB.tf().createTerm ( t.op (),
+                               	    newSubterms,
+                               	    getSingleArray(newBoundVars),
+                               	    t.javaBlock ());
     }
 
     /**
@@ -179,10 +176,10 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
      */
     private Term addWarySubst (Term t) {
         createVariable ();
-        return tf.createSubstitutionTerm ( Op.SUBST,
-                                           newVar,
-                                           getSubstitutedTerm (),
-                                           t );
+        return TB.subst(WarySubstOp.SUBST,
+        	        newVar,
+        	        getSubstitutedTerm (),
+        	        t );
     }
 
     /**
@@ -194,12 +191,4 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
                                                         newVarTerm );
         return cfs.apply ( t );
     }
-    
-    /**
-     * Apply the substitution to a non-rigid skolem function
-     */
-    private Term applyToSVSkolem ( Term t ) {
-    	return applyBelowModality(t);
-    }
-
 }

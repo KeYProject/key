@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -24,21 +24,16 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.op.CastFunctionSymbol;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
-import de.uka.ilkd.key.logic.sort.AbstractSort;
+import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.logic.sort.GenericSort;
-import de.uka.ilkd.key.logic.sort.ObjectSort;
-import de.uka.ilkd.key.logic.sort.PrimitiveSort;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.logic.sort.SortDefiningSymbols;
-import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.conditions.TypeComparisionCondition;
+
 
 class GenericTranslator {
 
@@ -55,19 +50,15 @@ class GenericTranslator {
 
     /**
      * Translates generic variables.
-     * 
-     * @param currentTerm
-     * @param genericSorts
-     * @param sorts
-     * @return
-     * @throws IllegalTacletException
      */
     public Collection<Term> translate(Term term, ImmutableSet<Sort> sorts, Taclet t,
-	    TacletConditions conditions, Services services, int maxGeneric)
+	    TacletConditions conditions, Services serv, int maxGeneric)
 	    throws IllegalTacletException {
-	this.services = services;
+	this.services = serv;
+
+	HashSet<GenericSort> generics = AbstractTacletTranslator.collectGenerics(term); 
 	ImmutableList<Term> list = instantiateGeneric(term,
-	        AbstractTacletTranslator.collectGenerics(term), sorts, t, conditions, maxGeneric);
+	        generics, sorts, t, conditions, maxGeneric);
 	Collection<Term> result = new LinkedList<Term>();
 	if (list == null){
 	    result.add(term);
@@ -78,7 +69,7 @@ class GenericTranslator {
 	if (list.isEmpty()) {
 	    throw new IllegalTacletException(
 		    "Can not instantiate generic variables"
-		            + " because there are not enough different sorts.");
+		            + " because there are not enough different sorts. "+ generics +" "+sorts);
 	}
 
 	
@@ -97,6 +88,12 @@ class GenericTranslator {
 	// return
 	// instantiateGeneric(term,collectGenerics(term),sorts,t,conditions);
     }
+    
+    private boolean sameHierachyBranch(Sort sort1, Sort sort2){
+	
+	
+	return sort1.extendsTrans(sort2) || sort2.extendsTrans(sort1);
+    }
 
     /**
      * Instantiates all variables of a generic sort with logic variables. The
@@ -113,21 +110,24 @@ class GenericTranslator {
      *         of type {@link SortDependingFunction} and
      *         <code>instantiation</code> is of type {@link PrimitiveSort}.
      */
+    
 
     private Term instantiateGeneric(Term term, GenericSort generic,
 	    Sort instantiation, Taclet t) throws IllegalArgumentException,
 	    IllegalTacletException {
-	ImmutableArray<QuantifiableVariable> variables[] = new ImmutableArray[term
-	        .arity()];
+	ImmutableArray<QuantifiableVariable> variables = new ImmutableArray<QuantifiableVariable>();
 	Term[] subTerms = new Term[term.arity()];
+	variables = term.boundVars(); 
 	for (int i = 0; i < term.arity(); i++) {
 	    subTerms[i] = instantiateGeneric(term.sub(i), generic,
 		    instantiation, t);
+	    
 	    if (subTerms[i] == null) {
 		return null;
 	    }
-	    variables[i] = subTerms[i].varsBoundHere(i);
+	 
 	}
+
 
 	if (term.sort().equals(generic)) {
 
@@ -136,16 +136,13 @@ class GenericTranslator {
 		term = tb.var(pool.getInstantiationOfLogicVar(instantiation,
 		        (LogicVariable) term.op()));
 	    } else if (term.op() instanceof SchemaVariable) {
-		if (((SchemaVariable) term.op()).isTermSV()) {
+		if (((SchemaVariable) term.op()) instanceof TermSV) {
 		    term = TermBuilder.DF.var(pool.getInstantiationOfLogicVar(
 			    instantiation, pool.getLogicVariable(term.op()
 			            .name(), term.sort())));
 		}
 
-	    } else if (term.op() instanceof CastFunctionSymbol) {
-		term = TermFactory.DEFAULT.createCastTerm(
-		        (AbstractSort) instantiation, subTerms[0]);
-	    }
+	    } 
 
 	}
 
@@ -155,13 +152,25 @@ class GenericTranslator {
 	    try { // Try block is necessary because there are some taclets
 		// that should have isReference-Condition, but they don't
 		// have the condition.
-
+		
 		if (func.getSortDependingOn().equals(generic)) {
-		    term = TermFactory.DEFAULT
-			    .createFunctionTerm(
-			            (SortDependingFunction) func
-			                    .getInstanceFor((SortDefiningSymbols) instantiation),
-			            subTerms);
+		    if(instantiation.extendsTrans(services.getJavaInfo().nullSort())){
+			return null;
+		    }
+		    func = func.getInstanceFor(instantiation, services);
+		   
+		    if(func.getKind().equals(Sort.CAST_NAME)){
+		        for(int i=0; i < term.arity(); i++){
+		            
+			if(!sameHierachyBranch(func.getSortDependingOn(),subTerms[i].sort())){
+			    // don't instantiate casts, that don't make sense.
+			    return null;
+			}
+		      }
+		    }
+		    
+		    term = TermFactory.DEFAULT.createTerm(func,subTerms);
+		
 		}
 	    } catch (IllegalArgumentException e) {
 		for (TranslationListener l : listener) {
@@ -174,15 +183,16 @@ class GenericTranslator {
 	}
 
 	if (term.op() instanceof Quantifier) {
-	    QuantifiableVariable[] copy = new QuantifiableVariable[term
-		    .varsBoundHere(0).size()];
+	    QuantifiableVariable[] copy = new QuantifiableVariable[term.boundVars().size()];
 	    int i = 0;
 
-	    for (QuantifiableVariable var : term.varsBoundHere(0)) {
+	    for (QuantifiableVariable var : term.boundVars()) {
 		copy[i] = var;
 		if (copy[i].sort() instanceof GenericSort) {
-		    copy[i] = pool.getLogicVariable(copy[i].name(),
-			    instantiation);
+		
+		    copy[i] =     pool.getInstantiationOfLogicVar(
+			    instantiation, pool.getLogicVariable(copy[i].name(),
+				    instantiation));
 		}
 
 		i++;
@@ -195,19 +205,20 @@ class GenericTranslator {
 	    }
 
 	}else {
+	
 	    term = TermFactory.DEFAULT.createTerm(term.op(), subTerms,
 		    variables, JavaBlock.EMPTY_JAVABLOCK);
+	     
 	}
+
 	return term;
 
     }
 
     /**
      * Tests sort of its instantiation ability.
-     * 
-     * @param sort
-     *            sort to be tested.
-     * @return <code>true</code> if can be instantiated, otherwise
+     * @return <code>true</code> if <code>generic</code> can be instantiated with <code>inst</code>,
+     *  otherwise
      *         <code>false</code>
      */
     private boolean doInstantiation(GenericSort generic, Sort inst,
@@ -216,11 +227,11 @@ class GenericTranslator {
 	return !((inst instanceof GenericSort)
 	        || (inst.equals(Sort.ANY))
 	        || (conditions.containsIsReferenceCondition(generic) > 0 && !AbstractTacletTranslator
-	                .isReferenceSort(inst))
+	                .isReferenceSort(inst,services))
 	        || (conditions.containsNotAbstractInterfaceCondition(generic) && AbstractTacletTranslator
-	                .isAbstractOrInterface(inst)) || (conditions
+	                .isAbstractOrInterface(inst,services)) || (conditions
 	        .containsAbstractInterfaceCondition(generic) && !AbstractTacletTranslator
-	        .isAbstractOrInterface(inst)));
+	        .isAbstractOrInterface(inst,services)));
     }
 
 
@@ -270,7 +281,7 @@ class GenericTranslator {
 	byte[][] referenceTable = AbstractTacletTranslator.generateReferenceTable(instSorts.size(),
 	        genericSorts.size());
 
-	AbstractTacletTranslator.checkTable(referenceTable, instTable, genericTable, conditions);
+	AbstractTacletTranslator.checkTable(referenceTable, instTable, genericTable, conditions,services);
 
 	for (int r = 0; r < referenceTable.length; r++) {
 	    Term temp = null;
@@ -318,12 +329,12 @@ class GenericTranslator {
 
  
 
-    public void addListener(TranslationListener listener) {
-	this.listener.add(listener);
+    public void addListener(TranslationListener list) {
+	this.listener.add(list);
     }
 
-    public void removeListener(TranslationListener listener) {
-	this.listener.remove(listener);
+    public void removeListener(TranslationListener list) {
+	this.listener.remove(list);
     }
 
 }

@@ -12,7 +12,7 @@ import java.io.File;
 import java.util.List;
 
 
-/**
+/** 
  * Represents an entity read to produce an environment to read a proof
  * obligation. Environment means the initial configuration of a prover
  * containing namespaces and Java model.
@@ -39,8 +39,8 @@ public interface EnvInput {
      * Reads the include section and returns an Includes object.
      */
     Includes readIncludes() throws ProofInputException;
-
-    /**
+    
+    /** 
      * Reads the Java path.
      */
     String readJavaPath() throws ProofInputException;
@@ -60,5 +60,5 @@ public interface EnvInput {
      * parts of the input do not modify the initial configuration while
      * others do.
      */
-    void read(ModStrategy mod) throws ProofInputException;
+    void read() throws ProofInputException;
 }

@@ -5,6 +5,7 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+
 package de.uka.ilkd.key.proof;
 
 import java.util.ArrayList;
@@ -12,14 +13,12 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import de.uka.ilkd.key.bugdetection.ContractAppInfo;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.visualdebugger.VisualDebuggerState;
 
 
 /**
@@ -28,9 +27,6 @@ import de.uka.ilkd.key.visualdebugger.VisualDebuggerState;
  * carry something of logical value.
  */
 public class NodeInfo {
-    
-    // for optimizing memory consumption of large proofs
-    public static boolean largeProofMode = false;
 
     /** firstStatement stripped of method frames */
     private SourceElement activeStatement                 = null;
@@ -51,14 +47,6 @@ public class NodeInfo {
     /** has the rule app of the node been applied interactively? */
     private boolean interactiveApplication = false;    
      
-    // ALL fields below are for the eclipse symbolic debugger plug-in
-    // THEY HAVE TO BE MOVED OUT TO THE DEBUGGER package
-    // where a separate mapping node <-> debugger status has to be maintained
-    private final VisualDebuggerState visualDebuggerState = largeProofMode ? null : new VisualDebuggerState();
-   
-    /**Should be initialized when using loop invariant or operation (method) contract rules. 
-     * Is used by the package bugdetection. */
-    public ContractAppInfo cInfo;     
 
     public NodeInfo(Node node) {
         this.node = node;
@@ -86,7 +74,7 @@ public class NodeInfo {
             PosTacletApp pta = (PosTacletApp) ruleApp;
             if (!isSymbolicExecution(pta.taclet())) return;
             Term t = pta.posInOccurrence().subTerm();
-            final ProgramElement pe = t.executableJavaBlock().program();
+            final ProgramElement pe = t.javaBlock().program();
             if (pe != null) {
                 firstStatement = pe.getFirstElement();
                 firstStatementString = null;
@@ -171,7 +159,7 @@ public class NodeInfo {
     }
 
     /**
-     * sets the branch label of a node. Schema variables occuring
+     * sets the branch label of a node. Schema variables occurring
      * in string <tt>s</tt> are replaced by their instantiations if
      * possible
      * @param s the String to be set
@@ -203,7 +191,7 @@ public class NodeInfo {
                     res = arg; // use sv name instead
                 } else
                     res = ProofSaver.printAnything(val, node.proof().getServices());
-                m.appendReplacement(sb, res);
+                m.appendReplacement(sb, res.replace("$", "\\$"));
             }
             m.appendTail(sb);
             branchLabel = sb.toString();
@@ -227,14 +215,5 @@ public class NodeInfo {
      */
     public boolean getInteractiveRuleApplication() {
         return interactiveApplication;
-    }
-   
-    /**
-     * returns the visual debugger state
-     * @return the visual debugger state
-     */
-    public VisualDebuggerState getVisualDebuggerState() {
-        return visualDebuggerState;
-    }
-
+    }   
 }

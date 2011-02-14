@@ -33,10 +33,8 @@ import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.Range;
-import de.uka.ilkd.key.rtsj.proof.init.RTSJProfile;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramMetaConstruct;
-import de.uka.ilkd.key.rule.soundness.ProgramSVProxy;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -452,7 +450,7 @@ public class PrettyPrinter {
     /**
        Write a complete ArrayOf<ProgramElement>.
     */
-    protected void writeArrayOfProgramElement(int firstLF,
+    protected void writeImmutableArrayOfProgramElement(int firstLF,
                                         int levelChange,
                                         int firstBlanks,
                                         String separationSymbol,
@@ -478,7 +476,7 @@ public class PrettyPrinter {
     */
     protected void writeKeywordList(int firstLF, int levelChange, int firstBlanks, 
 				    ImmutableArray<? extends ProgramElement> list) throws IOException {
-        writeArrayOfProgramElement(firstLF, levelChange, firstBlanks, "", 0, 1, list);
+        writeImmutableArrayOfProgramElement(firstLF, levelChange, firstBlanks, "", 0, 1, list);
     }
 
     /**
@@ -487,7 +485,7 @@ public class PrettyPrinter {
        @exception IOException occasionally thrown.
     */
     protected void writeKeywordList(ImmutableArray<? extends ProgramElement> list) throws IOException {
-        writeArrayOfProgramElement(0, 0, 0, "", 0, 1, list);
+        writeImmutableArrayOfProgramElement(0, 0, 0, "", 0, 1, list);
     }
 
     /**
@@ -495,7 +493,7 @@ public class PrettyPrinter {
     */
     protected void writeCommaList(int firstLF, int levelChange, int firstBlanks, 
 				  ImmutableArray<? extends ProgramElement> list) throws IOException {
-        writeArrayOfProgramElement(firstLF, levelChange, 
+        writeImmutableArrayOfProgramElement(firstLF, levelChange, 
 				   firstBlanks, ",", 0, 1, list);
     }
 
@@ -506,7 +504,7 @@ public class PrettyPrinter {
     */
     protected void writeCommaList(int separationBlanks, ImmutableArray<? extends ProgramElement> list)
         throws IOException {
-        writeArrayOfProgramElement(0, 0, 0, ",", 0, separationBlanks, list);
+        writeImmutableArrayOfProgramElement(0, 0, 0, ",", 0, separationBlanks, list);
     }
 
     /**
@@ -515,7 +513,7 @@ public class PrettyPrinter {
        @exception IOException occasionally thrown.
     */
     protected void writeCommaList(ImmutableArray<? extends ProgramElement> list) throws IOException {
-        writeArrayOfProgramElement(0, 0, 0, ",", 0, 1, list);
+        writeImmutableArrayOfProgramElement(0, 0, 0, ",", 0, 1, list);
     }
 
     /**
@@ -523,7 +521,7 @@ public class PrettyPrinter {
     */
     protected void writeLineList(int firstLF, int levelChange, int firstBlanks, 
 				 ImmutableArray<? extends ProgramElement> list) throws IOException {
-        writeArrayOfProgramElement(firstLF, levelChange, firstBlanks, "", 1, 0, list);
+        writeImmutableArrayOfProgramElement(firstLF, levelChange, firstBlanks, "", 1, 0, list);
     }
 
     /**
@@ -532,7 +530,7 @@ public class PrettyPrinter {
        @exception IOException occasionally thrown.
     */
     protected void writeLineList(ImmutableArray<? extends ProgramElement> list) throws IOException {
-        writeArrayOfProgramElement(0, 0, 0, "", 1, 0, list);
+        writeImmutableArrayOfProgramElement(0, 0, 0, "", 1, 0, list);
     }
 
     /**
@@ -540,7 +538,7 @@ public class PrettyPrinter {
     */
     protected void writeBlockList(int firstLF, int levelChange, int firstBlanks, 
 				  ImmutableArray<? extends ProgramElement> list) throws IOException {
-        writeArrayOfProgramElement(firstLF, levelChange, firstBlanks, "", 2, 0, list);
+        writeImmutableArrayOfProgramElement(firstLF, levelChange, firstBlanks, "", 2, 0, list);
     }
 
     /**
@@ -549,7 +547,7 @@ public class PrettyPrinter {
        @exception IOException occasionally thrown.
     */
     protected void writeBlockList(ImmutableArray<? extends ProgramElement> list) throws IOException {
-        writeArrayOfProgramElement(0, 0, 0, "", 2, 0, list);
+        writeImmutableArrayOfProgramElement(0, 0, 0, "", 2, 0, list);
     }
 
     private void dumpComments() throws IOException {
@@ -915,6 +913,122 @@ public class PrettyPrinter {
         write(x.getValue() ? "true" : "false");
         printFooter(x);
     }
+    
+    public void printEmptySetLiteral(EmptySetLiteral x) throws java.io.IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+        write("\\empty");
+        printFooter(x);
+    }
+    
+    public void printSingleton(de.uka.ilkd.key.java.expression.operator.Singleton x) throws java.io.IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+        writeToken(0, "\\singleton", x);
+        write("(");
+        writeElement(0, x.getChildAt(0));
+        write(")");
+        printFooter(x);
+    } 
+    
+    public void printSetUnion(de.uka.ilkd.key.java.expression.operator.SetUnion x) throws java.io.IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+        writeToken(0, "\\set_union", x);
+        write("(");
+        writeElement(0, x.getChildAt(0));
+        write(",");
+        writeElement(0, x.getChildAt(1));                
+        write(")");
+        printFooter(x);
+    }
+    
+    public void printIntersect(de.uka.ilkd.key.java.expression.operator.Intersect x) throws java.io.IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+        writeToken(0, "\\intersect", x);
+        write("(");
+        writeElement(0, x.getChildAt(0));
+        write(",");
+        writeElement(0, x.getChildAt(1));                
+        write(")");
+        printFooter(x);
+    }    
+
+    public void printSetMinus(de.uka.ilkd.key.java.expression.operator.SetMinus x) throws java.io.IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+        writeToken(0, "\\set_minus", x);
+        write("(");
+        writeElement(0, x.getChildAt(0));
+        write(",");
+        writeElement(0, x.getChildAt(1));                
+        write(")");
+        printFooter(x);
+    }
+    
+    public void printAllFields(de.uka.ilkd.key.java.expression.operator.AllFields x) throws java.io.IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+        writeToken(0, "\\all_fields", x);
+        write("(");
+        writeElement(0, x.getChildAt(0));
+        write(")");
+        printFooter(x);
+    }
+    
+    public void printEmptySeqLiteral(EmptySeqLiteral x) throws java.io.IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+        write("\\seq_empty");
+        printFooter(x);
+    }
+    
+    public void printSeqSingleton(de.uka.ilkd.key.java.expression.operator.SeqSingleton x) throws java.io.IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+        writeToken(0, "\\seq_singleton", x);
+        write("(");
+        writeElement(0, x.getChildAt(0));
+        write(")");
+        printFooter(x);
+    } 
+    
+    public void printSeqConcat(de.uka.ilkd.key.java.expression.operator.SeqConcat x) throws java.io.IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+        writeToken(0, "\\seq_concat", x);
+        write("(");
+        writeElement(0, x.getChildAt(0));
+        write(",");
+        writeElement(0, x.getChildAt(1));
+        write(")");
+        printFooter(x);
+    }    
+    
+    public void printSeqSub(de.uka.ilkd.key.java.expression.operator.SeqSub x) throws java.io.IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+        writeToken(0, "\\seq_sub", x);
+        write("(");
+        writeElement(0, x.getChildAt(0));
+        write(",");
+        writeElement(0, x.getChildAt(1));
+        write(",");
+        writeElement(0, x.getChildAt(2));
+        write(")");
+        printFooter(x);
+    }  
+    
+    public void printSeqReverse(de.uka.ilkd.key.java.expression.operator.SeqReverse x) throws java.io.IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+        writeToken(0, "\\seq_reverse", x);
+        write("(");
+        writeElement(0, x.getChildAt(0));
+        write(")");
+        printFooter(x);
+    }          
 
     public void printStringLiteral(StringLiteral x) throws java.io.IOException {
         printHeader(x);
@@ -1020,12 +1134,14 @@ public class PrettyPrinter {
 	} else if (x.getProgramElementName() != null) {
 	    printHeader(x);
 	    if (x.getReferencePrefix() != null) {
-		writeElement(x.getReferencePrefix());
-		writeToken(".", x);
-	    }   
-            writeElement(x.getProgramElementName());
+		write(x.getReferencePrefix() + "." + x.getProgramElementName());//XXX
+//		writeElement(x.getReferencePrefix());
+//		writeToken(".", x);
+	    } else {
+		writeElement(x.getProgramElementName());
+	    }
+            printFooter(x);            
         }
-        printFooter(x);
     }
 
     public void printSchemaTypeReference(SchemaTypeReference x) throws java.io.IOException {
@@ -1991,36 +2107,6 @@ public class PrettyPrinter {
         printFooter(x);	
     }
     
-    public void printSetAssignment(SetAssignment x) throws java.io.IOException {
-        printHeader(x);
-
-        markStart(0, x);
-        if (!noLinefeed) {
-            writeSymbol(1,0, "");
-        }
-        output();
-        
-        boolean wasNoSemicolons = noSemicolons;
-        boolean wasNoLinefeed = noLinefeed;
-        noSemicolons=true;
-        noLinefeed=true;
-        
-        write("#set ");
-        writeElement(0, x.getArguments().get(0));
-        writeToken(0, " = ", x);
-        writeElement(0, x.getArguments().get(1));
-        output();
-        
-        noSemicolons = wasNoSemicolons;
-        noLinefeed = wasNoLinefeed;
-        
-        write(";");
-        output();
-        markEnd(0, x);
-        
-        printFooter(x);
-    }
-
     public void printDivideAssignment(DivideAssignment x) throws java.io.IOException {
         printHeader(x);
         printOperator(x,  "/=");
@@ -2116,7 +2202,7 @@ public class PrettyPrinter {
         printOperator(x,  "^");
         printFooter(x);
     }
-
+    
     public void printConditional(Conditional x) throws java.io.IOException {
         printHeader(x);
 
@@ -2467,17 +2553,11 @@ public class PrettyPrinter {
 	throws java.io.IOException {
 	write("source=");
 	writeElement(x.getTypeReference());
-	if (x.getMemoryAreaAsRef() != null
-	        && (ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile)) {
-	    write(",<currentMemoryArea>=");
-	    writeElement(x.getMemoryAreaAsRef());
+	if (x.getRuntimeInstance() != null) {
+	    write(",this=");
+	    writeElement(x.getRuntimeInstance());
 	}
-        if (x.getRuntimeInstanceAsRef() != null) {
-            write(",this=");
-            writeElement(x.getRuntimeInstanceAsRef());
-        }
     }
-
 
     public void printSuperConstructorReference(SuperConstructorReference x) 
 	throws java.io.IOException {
@@ -2703,38 +2783,6 @@ public class PrettyPrinter {
 	output();
     }    
 
-
-    public void printProgramSVProxy(ProgramSVProxy x) 
-	throws java.io.IOException {      
-
-	printHeader(x);
-        writeInternalIndentation(x);
-
-	// Mark statement start ...
-	markStart(0,x);
-
-	writeElement(x.op ());
- 
-	write(" (");
-	boolean wasNoSemicolons = noSemicolons;
-	boolean wasNoLinefeed   = noLinefeed;
-	noLinefeed   = true;
-	noSemicolons = true;      
-	writeCommaList ( 1, x.getInfluencingPVs () );
-	noSemicolons = false;
-	write("; ");
-	output();
-	noLinefeed   = wasNoLinefeed;
-	noSemicolons = wasNoSemicolons;
-	writeKeywordList ( x.getJumpTable      () );
-	write(")");
-	write(";");
-	output();
-
-	// Mark statement end ...
-	markEnd(0,x);
-	
-    }    
 
 
     public void printPassiveExpression(PassiveExpression x) 

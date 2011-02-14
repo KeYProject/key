@@ -10,116 +10,86 @@
 
 package de.uka.ilkd.key.speclang.translation;
 
-import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.util.Debug;
 
 
 /**
- *  This class represents an expression of an arbitrary specification language.
- *  We assume that every expression is either a Term, Type or a Collection.
+ *  This class represents the translation of an expression of an arbitrary 
+ *  specification language, which in the KeY world is either a term or a type.
  */
-public abstract class SLExpression {
+public final class SLExpression {
 
     private final Term term;
     private final KeYJavaType type;
-    private final SLCollection collection;
-
-
+    private final boolean isTerm;
+    
+    
+    public SLExpression(Term term, 
+	                KeYJavaType type,
+	                boolean isTerm) {
+	assert term != null;
+	assert type != null;
+	assert term.sort() == type.getSort() 
+	       : "term has sort: " + term.sort()
+	         + "; type has sort: " + type.getSort();
+	this.term = term;
+	this.type = type;
+	this.isTerm = isTerm;
+    }
+    
+   
+    public SLExpression(Term term, 
+	                KeYJavaType type) {
+	this(term, type, true);
+    }
+    
+    
+    /**
+     * USE WITH CARE! Term-SLExpressions should have a type!
+     */
     public SLExpression(Term term) {
-	Debug.assertTrue(term != null);
+	assert term != null;
 	this.term = term;
 	this.type = null;
-	this.collection = null;
+	this.isTerm = true;
     }
 
 
     public SLExpression(KeYJavaType type) {
-	Debug.assertTrue(type != null);
+	assert type != null;
 	this.term = null;
 	this.type = type;
-	this.collection = null;
-    }
-
-
-    public SLExpression(SLCollection c) {
-	Debug.assertTrue(c != null);
-	this.term = null;
-	this.type = null;
-	this.collection = c;
+	this.isTerm = false;
     }
 
 
     public boolean isTerm() {
-	return this.term != null;
+	return isTerm;
     }
 
 
     public boolean isType() {
-	return this.type != null;
-    }
-
-
-    public boolean isCollection() {
-	return this.collection != null;
+	return !isTerm;
     }
 
 
     public Term getTerm() {
-	return this.term;
+	return term;
     }
 
 
     public KeYJavaType getType() {
-	return this.type;
+	return type;
     }
 
 
-    public SLCollection getCollection() {
-	return this.collection;
-    }
-
-
-    public KeYJavaType getKeYJavaType(JavaInfo javaInfo) {
-	if (this.isTerm()) {
-	    if (this.getTerm().sort() != Sort.FORMULA) {
-		return javaInfo.getServices().getTypeConverter()
-			.getKeYJavaType(this.getTerm());
-	    } else {
-		return javaInfo.getServices().getTypeConverter()
-			.getBooleanType();
-	    }
-	} else if (this.isType()) {
-	    return this.getType();
-	} else {
-	    // receiver is a collection
-	    return javaInfo.getKeYJavaType(this.getCollection()
-		    .getElementSort());
-	}
-    }
-
-
+    @Override
     public String toString() {
-	if (isTerm()) {
-	    return term.toString();
-	} else if (isType()) {
+	if(isTerm()) {
+	    return term + "(type: " + type + ")";
+	} else {
 	    return type.toString();
-	} else {
-	    return collection.toString();
-	}
-    }
-
-
-    public Sort getSort() {
-	if (this.isTerm()) {
-	    return this.getTerm().sort();
-	} else if (this.isType()) {
-	    return this.getType().getSort();
-	} else {
-	    // receiver is a collection
-	    return this.getCollection().getElementSort();
 	}
     }
 }

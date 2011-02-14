@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -20,10 +20,7 @@ import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.logic.ConstrainedFormula;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
@@ -32,40 +29,32 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.op.ArrayOp;
-import de.uka.ilkd.key.logic.op.AttributeOp;
 import de.uka.ilkd.key.logic.op.Equality;
+import de.uka.ilkd.key.logic.op.FormulaSV;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.NonRigidHeapDependentFunction;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
-import de.uka.ilkd.key.logic.op.RigidFunction;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariableAdapter;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
-import de.uka.ilkd.key.logic.op.SortedSchemaVariable;
-import de.uka.ilkd.key.logic.op.WarySubstOp;
-import de.uka.ilkd.key.logic.sort.ArraySort;
-import de.uka.ilkd.key.logic.sort.ClassInstanceSort;
+import de.uka.ilkd.key.logic.op.TermSV;
+import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.logic.sort.GenericSort;
-import de.uka.ilkd.key.logic.sort.ObjectSort;
-import de.uka.ilkd.key.logic.sort.ProgramSVSort;
+import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletGoalTemplate;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.conditions.AbstractOrInterfaceType;
 import de.uka.ilkd.key.rule.conditions.ArrayComponentTypeCondition;
-import de.uka.ilkd.key.rule.conditions.TypeComparisionCondition;
+import de.uka.ilkd.key.rule.conditions.TypeComparisonCondition;
 import de.uka.ilkd.key.rule.conditions.TypeCondition;
-import de.uka.ilkd.key.rule.metaconstruct.MetaCreated;
-import de.uka.ilkd.key.rule.metaconstruct.MetaNextToCreate;
+import de.uka.ilkd.key.rule.conditions.TypeComparisonCondition.Mode;
+
 
 interface VariablePool {
     LogicVariable getInstantiationOfLogicVar(Sort instantiation,
@@ -84,17 +73,14 @@ public abstract class AbstractTacletTranslator implements TacletTranslator,
 
     protected HashMap<String, LogicVariable> usedVariables = new HashMap<String, LogicVariable>();
 
-
-    private HashSet<GenericSort> usedGenericSorts = new HashSet<GenericSort>();
-
     protected Collection<TranslationListener> listener = new LinkedList<TranslationListener>();
 
     protected TacletConditions conditions;
     private Services services;
 
     private GenericTranslator genericTranslator = new GenericTranslator(this);
-    private ProgramSVTranslator programSVTranslator = new ProgramSVTranslator();
-    private AttributeTranslator attributeTranslator = new DefaultAttributeTranslator();
+
+
 
     
 
@@ -102,7 +88,25 @@ public abstract class AbstractTacletTranslator implements TacletTranslator,
 	this.services = services;
 
     }
+    
+    private String getContent(Term term){
+	return term.op().getClass().getSimpleName()+": "+term.op();
+    }
+    
+    private String termToString(Term term){
+	String res ="";
+	return termToString(term,"");
+    }
+    
+    private String termToString(Term term,String depth){
+	String res ="";
+	res +=depth+ getContent(term);
 
+	for(Term sub : term.subs()){
+	    res += "\n" + termToString(sub,depth+"-");
+	}
+	return res;
+    }
 
     public TacletFormula translate(Taclet t, ImmutableSet<Sort> sorts,
 	    ImmutableSet<Term> attributeTerms, int maxGeneric) throws IllegalTacletException {
@@ -110,79 +114,42 @@ public abstract class AbstractTacletTranslator implements TacletTranslator,
 	// check the taclet. If this translator is not able
 	// to translate the taclet throw IllegalTacletException.
 	check(t);
+	
 
 	// determine the variable conditions.
 	this.conditions = new TacletConditions(t);
 
 	// translate the taclet, but do not translate generic
-	// variables
-	// and do not quantify the variables.
+//	// variables
+//	// and do not quantify the variables.
+
 	Term term = translateTaclet(t, sorts);
 	
 
+
 	// rebuild the term to exchange schema variables with logic
 	// varibales.
-	usedGenericSorts = new HashSet<GenericSort>();
 	term = rebuildTerm(term);
-	// translate attributes
+	
+
+	
+//	// translate attributes
 
 	Collection<Term> result = new LinkedList<Term>();
 	result.add(term);
 	
 	
-	ImmutableSet<Term> tempResult = attributeTranslator.translate(t,
-	        term, attributeTerms, services, conditions);
 
-	if(!tempResult.isEmpty()){
-	    result = new LinkedList<Term>();
-	    for (Term tmp : tempResult) {
-		if (checkForNotInstantiatedAttributes(tmp)) {
-		    result.add(tmp);		
-		}
-	
-	    }
-	    if (result.isEmpty()) {
-		throw new IllegalTacletException(
-		        "There are some program schema"
-		                + " variables that can not be translated.");
-	    }
-	}
-	
 
 	
-	Collection<Sort> temp = new LinkedList<Sort>();
-	
-	for(Sort sort: sorts){
-	    if(sort instanceof ObjectSort){
-		temp.add(sort);
-	    }
-	}
 
-	Collection<Term> res = new LinkedList<Term>();
-	for(Term te : result){
-		res.addAll(programSVTranslator.translate(te,temp.toArray(new Sort[temp.size()]),
-			    services,conditions));   
-	}
-
-	if(!res.isEmpty()){
-	    result = new LinkedList<Term>();
-	    for(Term te : res){
-		result.add(te);
-	    }
-	
-	}
-
-	
 	Collection<Term> result2 = new LinkedList<Term>();
+	
 	// step: quantify all free variables.
 	for(Term te : result){
 	    te = quantifyTerm(te);
 	    result2.add(te);
 	}
-	
-	
-	
-	
 
 	// step: translate the generics sorts.
 	result = new LinkedList<Term>();
@@ -190,110 +157,16 @@ public abstract class AbstractTacletTranslator implements TacletTranslator,
 	    result.addAll(genericTranslator.translate(te, sorts, t, conditions,
 	        services, maxGeneric));
 	}
-	
-	result2 = new LinkedList<Term>();
-	for(Term te: result){
-		if (!checkForNotInstantiatedAttributes(te)) {
-		    throw new IllegalTacletException(
-			    "There are some program schema "
-			            + "variables that can not be translated.\n /*The result: "
-			            + LogicPrinter.quickPrintTerm(te, services)
-			            + "\n"
-			            + "Normally there are not enough attribute terms to instantiate"
-			            + "the taclet.*/");
-		}
-		result2.add(translateRemainingNextToCreateAndCreates(te));
-	}
 
 
-	
+	return new DefaultTacletFormula(t, result, "", conditions);
 
-	return new DefaultTacletFormula(t, result2, "", conditions);
+
 	
     }
 
-    /**
-     * Not every #create and #nextToCreate is translated by the Attribute translator.
-     * This method does this translation.
-     * @param term
-     * @return returns the new term where all #created and #nextToCreate
-     * are translated.
-     * @throws IllegalTacletException
-     */
-    private Term translateRemainingNextToCreateAndCreates(Term term)
-	    throws IllegalTacletException {
-	ImmutableArray<QuantifiableVariable> variables[] = new ImmutableArray[term
-	        .arity()];
-	Term[] subTerms = new Term[term.arity()];
-	for (int i = 0; i < term.arity(); i++) {
-	    variables[i] = term.varsBoundHere(i);
-	    subTerms[i] = translateRemainingNextToCreateAndCreates(term.sub(i));
 
-	}
 
-	if (AbstractTacletTranslator.isCreatedTerm(term, services)
-	        && !(term.sub(0).sort() instanceof GenericSort)) {
-	    if ((term.sub(0).op() instanceof ArrayOp && ((ArrayOp) term.sub(0)
-		    .op()).getSortDependingOn() instanceof GenericSort)) {
-		throw new IllegalTacletException(
-		        "There are some generic variables that"
-		                + " can not be instantiated: "
-		                + term.sub(0)
-		                + ", sort: "
-		                + ((ArrayOp) term.sub(0).op())
-		                        .getSortDependingOn());
-	    } else {
-		term = createCreatedTerm(term.sub(0), services);
-	    }
-
-	} else if (isNextToCreateTerm(term)
-	        && !(term.sub(0).sort() instanceof GenericSort)) {
-	    if (!(term.sub(0).sort() instanceof ObjectSort)) {
-
-	    }
-
-	    term.sub(0).sort();
-	    term = createNextToCreateTerm((ObjectSort) term.sub(0).sort(),
-		    services);
-	} else {
-	    term = TermFactory.DEFAULT.createTerm(term.op(), subTerms,
-		    variables, JavaBlock.EMPTY_JAVABLOCK);
-	}
-	return term;
-    }
-
-    /**
-     * Checks whether the term is correctly instantiated.
-     * 
-     * @param term
-     *            the term to be checked.
-     * @return <code>true</code> if the term is instantiated, otherwise
-     *         <code>false</code>.
-     */
-    private boolean checkForNotInstantiatedAttributes(Term term) {
-	/*
-	 * if(term.op() instanceof MetaCreated){ return false; }
-	 */
-	if (term.op() instanceof AttributeOp) {
-	    AttributeOp op = (AttributeOp) term.op();
-	    if (op.sort().equals(ProgramSVSort.VARIABLE)
-		    || op.sort().equals(ProgramSVSort.ARRAYLENGTH)) {
-		return false;
-	    }
-	}
-	
-	if(term.op() instanceof ProgramSV){
-	    return false;
-	}
-
-	for (int i = 0; i < term.arity(); i++) {
-	    if (!checkForNotInstantiatedAttributes(term.sub(i)))
-		return false;
-
-	}
-
-	return true;
-    }
 
     /**
      * Override this method to introduce a translating mechanism for taclets.
@@ -353,8 +226,9 @@ public abstract class AbstractTacletTranslator implements TacletTranslator,
 	Iterator<VariableCondition> it = t.getVariableConditions();
 	while (it.hasNext()) {
 	    VariableCondition vc = it.next();
+	   
 	 
-	    if (!(vc instanceof TypeComparisionCondition)
+	    if (!(vc instanceof TypeComparisonCondition)
 		    && !(vc instanceof TypeCondition)
 		    && !(vc instanceof AbstractOrInterfaceType)
 		    && !(vc instanceof ArrayComponentTypeCondition)) {
@@ -436,18 +310,11 @@ public abstract class AbstractTacletTranslator implements TacletTranslator,
 	if ((op instanceof Junctor)
 	        || (op instanceof Equality)
 	        || (op instanceof Quantifier)
-	        || (op instanceof RigidFunction)
+	        || (op instanceof TermSV)
+	        || (op instanceof Function)
 	        || (op instanceof IfThenElse)
-	        || ((op instanceof SchemaVariableAdapter) && ((SchemaVariableAdapter) op)
-	                .isTermSV())
-	        || ((op instanceof SchemaVariableAdapter) && ((SchemaVariableAdapter) op)
-	                .isFormulaSV())
-	        || ((op instanceof SchemaVariableAdapter) && ((SchemaVariableAdapter) op)
-	                .isVariableSV()) 
-	        || (op instanceof MetaNextToCreate)
-	        || (op instanceof NonRigidHeapDependentFunction)
-	        || (op instanceof AttributeOp) || (op instanceof MetaCreated)
-	        || (op instanceof ProgramSV) || (op instanceof ArrayOp)
+	        || (op instanceof VariableSV)
+	        || (op instanceof LocationVariable)
 
 	) {
 	    return;
@@ -468,11 +335,11 @@ public abstract class AbstractTacletTranslator implements TacletTranslator,
      */
     protected void checkTerm(Term term) throws IllegalTacletException {
 	checkOperator(term.op());
+
 	for (TranslationListener l : listener) {
 	    if (term.sort() != null && !(term.sort() instanceof GenericSort)) {
 		if (term.sort().equals(Sort.FORMULA)) {
-		    if (((term.op() instanceof SchemaVariableAdapter) && ((SchemaVariableAdapter) term
-			    .op()).isFormulaSV())) {
+		    if (term.op() instanceof FormulaSV) {
 			l.eventFormulaSV((SchemaVariable) term.op());
 		    }
 
@@ -511,32 +378,30 @@ public abstract class AbstractTacletTranslator implements TacletTranslator,
      * 
      * @param term
      *            the term to rebuild.
-     * @param genericSorts
-     *            for the translation of generic variables.
      * @return returns the new term.
      */
 
     protected Term rebuildTerm(Term term) {
 
-	ImmutableArray<QuantifiableVariable> variables[] = new ImmutableArray[term
-	        .arity()];
+	ImmutableArray<QuantifiableVariable> variables = new ImmutableArray<QuantifiableVariable>();
 	Term[] subTerms = new Term[term.arity()];
 
+	variables = term.boundVars();
 	for (int i = 0; i < term.arity(); i++) {
-	    variables[i] = term.varsBoundHere(i);// subTerms[i].varsBoundHere(i);
 	    subTerms[i] = rebuildTerm(term.sub(i));
 
 	}
+	
 
+	
 	term = tf.createTerm(term.op(), subTerms, variables,
 	        JavaBlock.EMPTY_JAVABLOCK);
-
+	
 	term = changeTerm(term);
+	
 
 	if (term.op() instanceof Quantifier) {
-	    // ImmutableArray<QuantifiableVariable> temp = new
-	    // ImmutableArray<QuantifiableVariable>();
-	    for (QuantifiableVariable qv : variables[0]) {
+	    for (QuantifiableVariable qv : variables) {
 		for (TranslationListener l : listener) {
 		    l.eventQuantifiedVariable(qv);
 		}
@@ -566,26 +431,22 @@ public abstract class AbstractTacletTranslator implements TacletTranslator,
 	return attributeTerm;
     }
 
-    static public boolean isAbstractOrInterface(Sort sort) {
-	if (!isReferenceSort(sort))
+    static public boolean isAbstractOrInterface(Sort sort, Services services) {
+	if (!isReferenceSort(sort, services))
 	    return false;
+	
 
-	return !(sort instanceof ArraySort)
-	        && ((ClassInstanceSort) sort)
-	                .representAbstractClassOrInterface();
+	return sort.isAbstract();
 
     }
 
-    static public boolean isReferenceSort(Sort sort) {
-	return (sort instanceof ClassInstanceSort);
+    static public boolean isReferenceSort(Sort sort, Services services) {
+	return (sort.extendsTrans(services.getJavaInfo().objectSort()) 
+    	    && !(sort instanceof NullSort));
+
     }
 
-    static public boolean isNextToCreateTerm(Term term) {
-	if (term.op() instanceof MetaNextToCreate) {
-	    return true;
-	}
-	return false;
-    }
+
     
    static public HashSet<GenericSort> collectGenerics(Term term) {
 	HashSet<GenericSort> genericSorts = new HashSet<GenericSort>();
@@ -664,13 +525,9 @@ public abstract class AbstractTacletTranslator implements TacletTranslator,
      * Checks the referenceTable whether there are rows that are not allowed.
      * For example: the notSame-Condition is hurted.
      * 
-     * @param referenceTable
-     * @param r
-     * @param instTable
-     * @param genericTable
      */
     static public void checkTable(byte[][] referenceTable, Sort[] instTable,
-	    Sort[] genericTable, TacletConditions conditions) {
+	    Sort[] genericTable, TacletConditions conditions, Services services) {
 
 	for (int r = 0; r < referenceTable.length; r++) {
 	    for (int c = 0; c < referenceTable[r].length; c++) {
@@ -679,13 +536,22 @@ public abstract class AbstractTacletTranslator implements TacletTranslator,
 		    break;
 
 		if ((conditions.containsIsReferenceCondition(genericTable[c]) > 0 
-			&& !isReferenceSort(instTable[index]))
+			&& !isReferenceSort(instTable[index],services))
 		        || (conditions
 		                .containsAbstractInterfaceCondition(genericTable[c]) && 
-		                !isAbstractOrInterface(instTable[index]))
+		                !isAbstractOrInterface(instTable[index],services))
 		        || (conditions
 		                .containsNotAbstractInterfaceCondition(genericTable[c]) &&
-		                 isAbstractOrInterface(instTable[index])))
+		                 isAbstractOrInterface(instTable[index],services))
+		        || (!conditions.containsIsSubtypeRelation(genericTable[c],instTable[index],Mode.IS_SUBTYPE))         
+		        
+		        || (!conditions.containsIsSubtypeRelation(genericTable[c],instTable[index],Mode.NOT_IS_SUBTYPE))
+		        
+		        || (!isReferenceSort(instTable[index],services) && isReferenceSort(genericTable[c],services))
+		        
+		        
+			)
+		    
 
 		{
 		    referenceTable[r][0] = -1;
@@ -694,6 +560,8 @@ public abstract class AbstractTacletTranslator implements TacletTranslator,
 		}
 		for (int c2 = c + 1; c2 < referenceTable[r].length; c2++) {
 		    int index2 = referenceTable[r][c2]; // not same
+		  
+		    
 		    if ((conditions.containsNotSameCondition(genericTable[c],
 			    genericTable[c2]) && instTable[index]
 			    .equals(instTable[index2]))
@@ -702,28 +570,32 @@ public abstract class AbstractTacletTranslator implements TacletTranslator,
 			            .extendsTrans(instTable[index2]))
 			    || (conditions.containsComparisionCondition(
 			            genericTable[c], genericTable[c2],
-			            TypeComparisionCondition.SAME) && !instTable[index]
+			            TypeComparisonCondition.Mode.SAME) && !instTable[index]
 			            .equals(instTable[index2]))
+			          
 			    || (conditions.containsComparisionCondition(
 			            genericTable[c], genericTable[c2],
-			            TypeComparisionCondition.IS_SUBTYPE) && !instTable[index]
+			            TypeComparisonCondition.Mode.IS_SUBTYPE) && !instTable[index]
 			            .extendsTrans(instTable[index2]))
 			    || (conditions.containsComparisionCondition(
 			            genericTable[c], genericTable[c2],
-			            TypeComparisionCondition.IS_SUBTYPE) && !instTable[index2]
+			            TypeComparisonCondition.Mode.IS_SUBTYPE) && !instTable[index2]
 			            .extendsTrans(instTable[index]))
 			    || (conditions.containsComparisionCondition(
 			            genericTable[c], genericTable[c2],
-			            TypeComparisionCondition.NOT_IS_SUBTYPE) && instTable[index]
+			            TypeComparisonCondition.Mode.NOT_IS_SUBTYPE) && instTable[index]
 			            .extendsTrans(instTable[index2]))
 			    || (conditions.containsComparisionCondition(
 			            genericTable[c], genericTable[c2],
-			            TypeComparisionCondition.NOT_IS_SUBTYPE) && instTable[index2]
+			            TypeComparisonCondition.Mode.NOT_IS_SUBTYPE) && instTable[index2]
 			            .extendsTrans(instTable[index]))
 			    || (genericTable[c].extendsTrans(genericTable[c2]) && 
 				!instTable[index].extendsTrans(instTable[index2]))
 			    || (genericTable[c2].extendsTrans(genericTable[c]) && 
 				!instTable[index2].extendsTrans(instTable[index]))
+				            
+				
+			  
 
 		    ) {
 			referenceTable[r][0] = -1;
@@ -747,10 +619,9 @@ public abstract class AbstractTacletTranslator implements TacletTranslator,
     protected static Term quantifyTerm(Term term) throws IllegalTacletException {
 	TermBuilder tb = TermBuilder.DF;
 	// Quantify over all free variables.
-
 	for (QuantifiableVariable qv : term.freeVars()) {
-	    // if(!term.sort().equals(Sort.FORMULA)){
-	    if (!(qv instanceof LogicVariable) && !(qv instanceof ProgramSV)) {
+
+	    if (!(qv instanceof LogicVariable)) {
 		throw new IllegalTacletException(
 		        "Error of translation: "
 		                + "There is a free variable that is not of type LogicVariable: "
@@ -759,7 +630,6 @@ public abstract class AbstractTacletTranslator implements TacletTranslator,
 
 	    term = tb.all(qv, term);
 
-	    // }
 	}
 	return term;
     }
@@ -789,9 +659,6 @@ public abstract class AbstractTacletTranslator implements TacletTranslator,
 
     /**
      * eliminates all special chars.
-     * 
-     * @param name
-     * @return
      */
     static protected String eliminateSpecialChars(String name) {
 	StringBuffer toReturn = new StringBuffer(name);
@@ -833,63 +700,10 @@ public abstract class AbstractTacletTranslator implements TacletTranslator,
 	return template;
     }
 
-    static public boolean isCreatedTerm(Term term, Services services) {
-	if (term.op() instanceof MetaCreated) {
-	    return true;
-	}
-	if (term.op() instanceof AttributeOp) {
-	    AttributeOp op = (AttributeOp) term.op();
-	    if (op.sort().equals(ProgramSVSort.IMPLICITCREATED)) {
-		return true;
-	    }
-	    final KeYJavaType objectKJT = services.getJavaInfo()
-		    .getJavaLangObject();
-	    if (op.attribute().equals(
-		    services.getJavaInfo().getAttribute(
-		            ImplicitFieldAdder.IMPLICIT_CREATED, objectKJT))) {
-		return true;
-	    }
 
-	}
-	return false;
-    }
 
-    /**
-     * Creates the term <code>objectTerm</code>.created.
-     * 
-     * @param objectTerm
-     * @param services
-     * @return returns the created term.
-     */
-    static public Term createCreatedTerm(Term objectTerm, Services services) {
-	JavaInfo javaInfo = services.getJavaInfo();
-	ProgramVariable createdAttribute = javaInfo.getAttribute(
-	        ImplicitFieldAdder.IMPLICIT_CREATED, javaInfo
-	                .getJavaLangObject());
-	Term createdTerm = TermBuilder.DF.dot(objectTerm, createdAttribute);
-	return createdTerm;
-    }
 
-    static public Term createNextToCreateTerm(ObjectSort sort, Services services) {
-	return createVariableTerm(sort, ImplicitFieldAdder.IMPLICIT_NEXT_TO_CREATE, services);
-    }
-    
-    static public Term createVariableTerm(ObjectSort sort,String field,Services services){
-	JavaInfo javaInfo = services.getJavaInfo();
-	ProgramVariable createdAttribute = null;
-	try{
-	  createdAttribute = javaInfo.getAttribute(field, sort);
-	}
-	catch(NullPointerException e){
-	}
-	if(createdAttribute == null){
-	    return null;
-	}
-	Term createdTerm = TermFactory.DEFAULT
-	        .createVariableTerm(createdAttribute);
-	return createdTerm;
-	
-    }
+
 
     /**
      * Override this method if you want to change the term, i.e. exchanging
@@ -903,12 +717,10 @@ public abstract class AbstractTacletTranslator implements TacletTranslator,
 
 	TermBuilder tb = TermBuilder.DF;
 
-	if (term.op() instanceof SortedSchemaVariable) {
-	    SortedSchemaVariable ssv = (SortedSchemaVariable)term.op();
-
+	if (term.op() instanceof SchemaVariable) {
 	    if (term.sort().equals(Sort.FORMULA)) {
 
-	    } else if(!ssv.isProgramSV())
+	    } else// if(!(ssv instanceof ProgramSV))
 	    {
 		term = tb.var(getLogicVariable(term.op().name(), term.sort()));
 
@@ -925,22 +737,23 @@ public abstract class AbstractTacletTranslator implements TacletTranslator,
 
 	    ImmutableArray<QuantifiableVariable> array = new ImmutableArray<QuantifiableVariable>(
 		    list);
-	    term = TermFactory.DEFAULT.createQuantifierTerm((Quantifier) term
-		    .op(), array, term.sub(0));
+	   
+	    term = TermFactory.DEFAULT.createTerm(term
+		    .op(),term.subs(), array ,JavaBlock.EMPTY_JAVABLOCK);
 
 	}
 
 	return term;
     }
 
-    public void addListener(TranslationListener listener) {
-	genericTranslator.addListener(listener);
-	this.listener.add(listener);
+    public void addListener(TranslationListener list) {
+	genericTranslator.addListener(list);
+	this.listener.add(list);
     }
 
-    public void removeListener(TranslationListener listener) {
-	genericTranslator.removeListener(listener);
-	this.listener.remove(listener);
+    public void removeListener(TranslationListener list) {
+	genericTranslator.removeListener(list);
+	this.listener.remove(list);
     }
 
     /**

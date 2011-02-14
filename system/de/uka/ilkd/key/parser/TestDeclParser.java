@@ -22,11 +22,10 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SortedSchemaVariable;
-import de.uka.ilkd.key.logic.sort.ArraySortImpl;
+import de.uka.ilkd.key.logic.op.VariableSV;
+import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
@@ -41,8 +40,19 @@ public class TestDeclParser extends TestCase {
     }
 
     public void setUp() {
-	nss = new NamespaceSet();
 	serv = new Services ();
+	nss = serv.getNamespaces();
+	
+	String sorts = "\\sorts{boolean;int;}";
+	KeYParser basicSortsParser = new KeYParser(ParserMode.DECLARATION, new KeYLexer(new StringReader(sorts),null),
+			      "No file. Call of parser from logic/TestClashFreeSubst.java",
+			      serv, nss);
+	try {
+	    basicSortsParser.parseSorts();
+	} catch(Exception e) {
+	    throw new RuntimeException(e);
+	}	
+	
 	Recoder2KeY r2k = new Recoder2KeY(serv, nss);
 	r2k.parseSpecialClasses();
     }
@@ -112,7 +122,7 @@ public class TestDeclParser extends TestCase {
 	parseDecls("\\sorts { \\generic G; \\generic H \\extends G; }");
 
 	G = checkGenericSort ( nss.sorts().lookup(new Name("G")),
-			       DefaultImmutableSet.<Sort>nil(),
+			       DefaultImmutableSet.<Sort>nil().add(Sort.ANY),
 			       DefaultImmutableSet.<Sort>nil() );
 	H = checkGenericSort ( nss.sorts().lookup(new Name("H")),
 			       DefaultImmutableSet.<Sort>nil().add ( G ),
@@ -124,7 +134,7 @@ public class TestDeclParser extends TestCase {
 	
 	S = checkSort        ( nss.sorts().lookup(new Name("S")) );
 	G = checkGenericSort ( nss.sorts().lookup(new Name("G")),
-			       DefaultImmutableSet.<Sort>nil(),
+			       DefaultImmutableSet.<Sort>nil().add(Sort.ANY),
 			       DefaultImmutableSet.<Sort>nil() );
 	H = checkGenericSort ( nss.sorts().lookup(new Name("H")),
 			       DefaultImmutableSet.<Sort>nil().add ( S ).add ( G ),
@@ -137,7 +147,7 @@ public class TestDeclParser extends TestCase {
 	S = checkSort        ( nss.sorts().lookup(new Name("S")) );
 	T = checkSort        ( nss.sorts().lookup(new Name("T")) );
 	H = checkGenericSort ( nss.sorts().lookup(new Name("H")),
-			       DefaultImmutableSet.<Sort>nil(),
+			       DefaultImmutableSet.<Sort>nil().add(Sort.ANY),
 			       DefaultImmutableSet.<Sort>nil().add ( S ).add ( T ) );
 	
 
@@ -147,7 +157,7 @@ public class TestDeclParser extends TestCase {
 	S = checkSort        ( nss.sorts().lookup(new Name("S")) );
 	T = checkSort        ( nss.sorts().lookup(new Name("T")) );
 	G = checkGenericSort ( nss.sorts().lookup(new Name("G")),
-			       DefaultImmutableSet.<Sort>nil(),
+			       DefaultImmutableSet.<Sort>nil().add(Sort.ANY),
 			       DefaultImmutableSet.<Sort>nil() );
 	H = checkGenericSort ( nss.sorts().lookup(new Name("H")),
 			       DefaultImmutableSet.<Sort>nil().add ( T ).add ( G ),
@@ -160,10 +170,10 @@ public class TestDeclParser extends TestCase {
 	S = checkSort        ( nss.sorts().lookup(new Name("S")) );
 	T = checkSort        ( nss.sorts().lookup(new Name("T")) );
 	G = checkGenericSort ( nss.sorts().lookup(new Name("G")),
-			       DefaultImmutableSet.<Sort>nil(),
+			       DefaultImmutableSet.<Sort>nil().add(Sort.ANY),
 			       DefaultImmutableSet.<Sort>nil() );
 	checkGenericSort     ( nss.sorts().lookup(new Name("G2")),
-			       DefaultImmutableSet.<Sort>nil(),
+			       DefaultImmutableSet.<Sort>nil().add(Sort.ANY),
 			       DefaultImmutableSet.<Sort>nil() );
 	H = checkGenericSort ( nss.sorts().lookup(new Name("H")),
 			       DefaultImmutableSet.<Sort>nil().add ( T ).add ( G ),
@@ -195,7 +205,7 @@ public class TestDeclParser extends TestCase {
 		   ", but the type SchemaVariable was expected",
 		   o instanceof SchemaVariable);
 
-	assertTrue(msg, ((SchemaVariable)o).isVariableSV());
+	assertTrue(msg, o instanceof VariableSV);
     }
 
     /** asserts that the SchemaVariable matches to term but not to a
@@ -207,10 +217,8 @@ public class TestDeclParser extends TestCase {
 	assertTrue("The named object: "+o+" is of type "+o.getClass()+
 		   ", but the type SchemaVariable was expected",
 		   o instanceof SchemaVariable);
-	assertSame(msg,
-		   ((SchemaVariable)o).matchType(), Term.class);
 	assertTrue("Schemavariable is not allowed to match a term of sort FORMULA.",
-		   ((SortedSchemaVariable)o).sort() != Sort.FORMULA);
+		   ((SchemaVariable)o).sort() != Sort.FORMULA);
     }
 
     /** asserts that the SchemaVariable matches to a formula 
@@ -221,11 +229,9 @@ public class TestDeclParser extends TestCase {
 	assertTrue("The named object: "+o+" is of type "+o.getClass()+
 		   ", but the type SchemaVariable was expected",
 		   o instanceof SchemaVariable);
-	assertSame(msg,
-		   ((SchemaVariable)o).matchType(), Term.class);
 	assertSame("Only matches to terms of sort FORMULA allowed. "+
-		   "But term has sort "+((SortedSchemaVariable)o).sort(), 
-		   ((SortedSchemaVariable)o).sort(), Sort.FORMULA);
+		   "But term has sort "+((SchemaVariable)o).sort(), 
+		   ((SchemaVariable)o).sort(), Sort.FORMULA);
 
 	
     }
@@ -236,12 +242,12 @@ public class TestDeclParser extends TestCase {
 		   "  aSort[][] f(aSort);\n" +
 		   "}\n");
 	Sort aSort = (Sort)nss.sorts().lookup(new Name("aSort"));
-	Sort objectSort = serv.getJavaInfo().getJavaLangObjectAsSort();
-	Sort cloneableSort = serv.getJavaInfo().getJavaLangCloneableAsSort();
-        Sort serializableSort = serv.getJavaInfo().getJavaIoSerializableAsSort();
-	Sort aSortArr = ArraySortImpl.getArraySort(aSort, objectSort, cloneableSort, serializableSort);
-	Sort aSortArr2 = ArraySortImpl.getArraySort(aSortArr, objectSort, cloneableSort, serializableSort);
-	assertTrue("aSort[] should extend Cloneable ", 
+	Sort objectSort = serv.getJavaInfo().objectSort();
+	Sort cloneableSort = serv.getJavaInfo().cloneableSort();
+        Sort serializableSort = serv.getJavaInfo().serializableSort();
+	Sort aSortArr = ArraySort.getArraySort(aSort, objectSort, cloneableSort, serializableSort);
+	Sort aSortArr2 = ArraySort.getArraySort(aSortArr, objectSort, cloneableSort, serializableSort);
+	assertTrue("aSort[] should extend Cloneable: " + aSortArr.extendsSorts(), 
 		   aSortArr.extendsSorts().contains(cloneableSort)); 
  	assertTrue("aSort[] should transitively extend Object ", 
 		   aSortArr.extendsTrans(objectSort)); 
@@ -251,7 +257,7 @@ public class TestDeclParser extends TestCase {
 		   aSortArr2.extendsTrans(cloneableSort));
 	assertTrue("aSort[][] should extend Cloneable[] ", 
 		   aSortArr2.extendsSorts().contains
-		   (ArraySortImpl.getArraySort(cloneableSort, objectSort, cloneableSort, serializableSort)));
+		   (ArraySort.getArraySort(cloneableSort, objectSort, cloneableSort, serializableSort)));
   	assertTrue("Cloneable should extend Object ", 
 		   cloneableSort.extendsSorts().contains(objectSort));
     }
@@ -269,9 +275,9 @@ public class TestDeclParser extends TestCase {
 	Sort elem = (Sort)nss.sorts().lookup(new Name("elem"));
 	Sort list = (Sort)nss.sorts().lookup(new Name("list"));
 
-        Sort objectSort = serv.getJavaInfo().getJavaLangObjectAsSort();
-        Sort cloneableSort = serv.getJavaInfo().getJavaLangCloneableAsSort();
-        Sort serializableSort = serv.getJavaInfo().getJavaIoSerializableAsSort();
+        Sort objectSort = serv.getJavaInfo().objectSort();
+        Sort cloneableSort = serv.getJavaInfo().cloneableSort();
+        Sort serializableSort = serv.getJavaInfo().serializableSort();
         
 	assertEquals("find head function", new Name("head"),
 		     nss.functions().lookup(new Name("head")).name());
@@ -291,10 +297,10 @@ public class TestDeclParser extends TestCase {
 	assertEquals("tail return sort", list,
 		     ((Function)nss.functions().lookup(new Name("tail"))).sort());
 	assertEquals("tailarray arg sort 0", 
-                ArraySortImpl.getArraySort(elem, objectSort, cloneableSort, serializableSort),
+                ArraySort.getArraySort(elem, objectSort, cloneableSort, serializableSort),
 
 		     ((Function)nss.functions().lookup(new Name("tailarray"))).argSort(0));
-	assertEquals("tailarray return sort", ArraySortImpl.getArraySort(elem, 
+	assertEquals("tailarray return sort", ArraySort.getArraySort(elem, 
                 objectSort, cloneableSort, serializableSort),
 		     ((Function)nss.functions().lookup(new Name("tailarray"))).sort());
 
@@ -375,28 +381,28 @@ public class TestDeclParser extends TestCase {
 	assertTermSV("SV x type", 
 		     nss.variables().lookup(new Name("x"))); 
 	assertEquals("SV x sort", elem,
-		     ((SortedSchemaVariable)nss.variables().lookup(new Name("x"))).sort()); 
+		     ((SchemaVariable)nss.variables().lookup(new Name("x"))).sort()); 
 
 	assertEquals("find SV ", new Name("y"),
 		     nss.variables().lookup(new Name("y")).name()); 
 	assertTermSV("SV y type", 
 		     nss.variables().lookup(new Name("y"))); 
 	assertEquals("SV y sort", elem,
-		     ((SortedSchemaVariable)nss.variables().lookup(new Name("y"))).sort()); 
+		     ((SchemaVariable)nss.variables().lookup(new Name("y"))).sort()); 
 
 	assertEquals("find SV ", new Name("lv"),
 		     nss.variables().lookup(new Name("lv")).name()); 
 	assertVariableSV("SV lv type", 
 		     nss.variables().lookup(new Name("lv"))); 
 	assertEquals("SV lv sort", list,
-		     ((SortedSchemaVariable)nss.variables().lookup(new Name("lv"))).sort()); 
+		     ((SchemaVariable)nss.variables().lookup(new Name("lv"))).sort()); 
 	
 	assertEquals("find SV ", new Name("b"),
 		     nss.variables().lookup(new Name("b")).name()); 
 	assertFormulaSV("SV b type", 
 		     nss.variables().lookup(new Name("b"))); 
 	assertEquals("SV b sort", Sort.FORMULA,
-		     ((SortedSchemaVariable)nss.variables().lookup(new Name("b"))).sort()); 
+		     ((SchemaVariable)nss.variables().lookup(new Name("b"))).sort()); 
     }
     
 

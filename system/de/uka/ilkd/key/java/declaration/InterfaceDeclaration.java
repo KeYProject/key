@@ -22,22 +22,14 @@ import de.uka.ilkd.key.util.ExtList;
 
 /**
  *  Interface declaration.
- * 
  */
 public class InterfaceDeclaration extends TypeDeclaration {
 
-    /**
-     *      Extending.
-     */
-
     protected final Extends extending;
 
-    /**
-     *      Interface declaration.
-     */
 
     public InterfaceDeclaration() {
-	extending=null;
+	extending = null;
     }
 
     /** Construct a new outer or member interface class. */
@@ -84,8 +76,8 @@ public class InterfaceDeclaration extends TypeDeclaration {
 
 
     /**
-     *      Returns the number of children of this node.
-     *      @return an int giving the number of children of this node
+     * Returns the number of children of this node.
+     * @return an int giving the number of children of this node
      */
     public int getChildCount() {
         int result = 0;
@@ -97,12 +89,12 @@ public class InterfaceDeclaration extends TypeDeclaration {
     }
 
     /**
-     *      Returns the child at the specified index in this node's "virtual"
-     *      child array
-     *      @param index an index into this node's "virtual" child array
-     *      @return the program element at the given position
-     *      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
-     *                 of bounds
+     * Returns the child at the specified index in this node's "virtual"
+     * child array
+     * @param index an index into this node's "virtual" child array
+     * @return the program element at the given position
+     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
+     *            of bounds
      */
     public ProgramElement getChildAt(int index) {
         int len;
@@ -132,16 +124,15 @@ public class InterfaceDeclaration extends TypeDeclaration {
     }
 
     /**
-     *      Get extended types.
-     *      @return the extends.
+     * Get extended types.
+     * @return the extends.
      */
-
     public Extends getExtendedTypes() {
         return extending;
     }
 
     /**
-     *      Interfaces are always abstract.
+     * Interfaces are always abstract.
      */
     public boolean isAbstract() {
         return true;

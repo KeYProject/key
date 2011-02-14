@@ -18,7 +18,7 @@ public class TestMapAsListFromIntegerToString extends junit.framework.TestCase {
 
     /** puts i and str in the corresponding arrays at place nr */
     private void put(int nr,int i,String str) {
-	entryInt[nr]=new Integer(i);
+	entryInt[nr]=Integer.valueOf(i);
 	entryStr[nr]=str;
     }
 
@@ -56,7 +56,7 @@ public class TestMapAsListFromIntegerToString extends junit.framework.TestCase {
 
     public void testReplaceIfSameKeyWithNewValueIsPutInMap() {
 	ImmutableMap<Integer,String> map=createMap();
-	map=map.put(new Integer(0),"Zero");
+	map=map.put(Integer.valueOf(0),"Zero");
 	// zero is in list
 	assertTrue("Zero is not in list.",map.containsValue("Zero"));
 	// but not so old element Null with same key (0)
@@ -66,7 +66,7 @@ public class TestMapAsListFromIntegerToString extends junit.framework.TestCase {
     public void testImmutability() {
 	ImmutableMap<Integer,String> map=createMap();
 	ImmutableMap<Integer,String> old=map;
-	map=map.put(new Integer(5),"Fuenf");
+	map=map.put(Integer.valueOf(5),"Fuenf");
 	// 5 is in map but not in old
 	assertTrue("Fuenf is not in map",map.containsValue("Fuenf"));
 	assertTrue("Fuenf is in old map, but it should not be there. Map is not immutable.", !old.containsValue("Fuenf"));
@@ -76,7 +76,7 @@ public class TestMapAsListFromIntegerToString extends junit.framework.TestCase {
 	ImmutableMap<Integer,String> map=createMap();
 	// add a mapping with a value that has been mapped to
 	// another key before
-	Integer hundred=new Integer(100);
+	Integer hundred=Integer.valueOf(100);
 	map=map.put(hundred,entryStr[1]);
 	assertSame(entryStr[1]+" is not mapped to the newer key 100", map.get(hundred),entryStr[1]);
 	assertSame(entryStr[1]+" is not mapped to the older key "+entryInt[1], map.get(entryInt[1]),entryStr[1]);
@@ -93,8 +93,8 @@ public class TestMapAsListFromIntegerToString extends junit.framework.TestCase {
 	ImmutableMap<Integer,String> map=createMap();
 	// add a mapping with a value that has been mapped to
 	// another key before
-	Integer hundred=new Integer(100);
-	map=map.put(hundred,entryStr[1]);
+	Integer hundred=Integer.valueOf(100);
+	map=map.put(hundred,entryStr[1]);	
 	// delete map (*,"Eins")
 	map=map.removeAll(entryStr[1]);
 	assertTrue("Value :"+entryStr[1]+" found in map. But I deleted all"+
@@ -103,17 +103,17 @@ public class TestMapAsListFromIntegerToString extends junit.framework.TestCase {
 
     public void testSpecialCases() {
 	ImmutableMap<Integer,String> map=DefaultImmutableMap.<Integer,String>nilMap();
-	map = map.put(new Integer(0), "A");
+	map = map.put(Integer.valueOf(0), "A");
 	assertTrue("Map should be empty and therefore equal to the EMPTY_MAP",
-	       map.remove(new Integer(0)).isEmpty());
+	       map.remove(Integer.valueOf(0)).isEmpty());
 
 	assertTrue("Repeated key removal should not change anything",
-		   map.remove(new Integer(0)).remove(new Integer(0)).isEmpty());
+		   map.remove(Integer.valueOf(0)).remove(Integer.valueOf(0)).isEmpty());
 
 
-	map = map.put(new Integer(0), "B");
-	assertTrue("Map should have only one element with key 0 and value \"B\" ",
-	       map.size() == 1 && "B".equals(map.get(new Integer(0))));
+	map = map.put(Integer.valueOf(0), "B");
+	assertTrue("Map should have only one element with key 0 and value \"B\" ", 
+	       map.size() == 1 && "B".equals(map.get(Integer.valueOf(0))));
 
 
 	map = map.removeAll("B");
@@ -121,10 +121,10 @@ public class TestMapAsListFromIntegerToString extends junit.framework.TestCase {
 		   map.isEmpty());
 
 
-	map = map.put(new Integer(0), "B");
-	map = map.put(new Integer(1), "C");
-	map = map.put(new Integer(2), "B");
-
+	map = map.put(Integer.valueOf(0), "B");
+	map = map.put(Integer.valueOf(1), "C");
+	map = map.put(Integer.valueOf(2), "B");
+	
 	map = map.removeAll("B");
 	assertTrue("Map should not contain value \"B\" any longer ",
 	       map.size() == 1 && !map.containsValue("B"));

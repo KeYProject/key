@@ -14,6 +14,7 @@ import java.awt.Dimension;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -118,17 +119,29 @@ public class ChoiceSelector extends JDialog {
 		    dispose();
 		}
 	    });
-	JButton cancel = new JButton("Cancel");
+	final JButton cancel = new JButton("Cancel");
 	cancel.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 		    setVisible(false);
 		    dispose();
 		}
 	    });
+	getRootPane().setDefaultButton(ok);	
+        ActionListener escapeListener = new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                if(event.getActionCommand().equals("ESC")) {
+                    cancel.doClick();
+                }
+            }
+        };
+        cancel.registerKeyboardAction(
+                            escapeListener,
+                            "ESC",
+                            KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+                            JComponent.WHEN_IN_FOCUSED_WINDOW);	
  	JPanel buttonPanel = new JPanel();
  	buttonPanel.add(ok);
  	buttonPanel.add(cancel);
-
 
 	Dimension paneDim = new Dimension(300, 300);
 	choiceScrollPane.setPreferredSize(paneDim);

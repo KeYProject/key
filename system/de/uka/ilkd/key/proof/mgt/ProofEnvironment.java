@@ -1,11 +1,10 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//
 //
 
 package de.uka.ilkd.key.proof.mgt;
@@ -26,7 +25,6 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.util.Debug;
 
 /** The unique environment a proof is performed in. The environment
  * consists of a java model, specifications, and a set of justified
@@ -128,9 +126,10 @@ public class ProofEnvironment {
      * justification. 
      */
     public void registerRules(ImmutableSet<Taclet> s, RuleJustification j) {
-        for (Taclet value : s) {
-            registerRule(value, j);
-        }
+	Iterator<Taclet> it = s.iterator();
+	while (it.hasNext()) {
+	    registerRule(it.next(), j);
+	}
     }
 
     /** registers a list of rules with the given justification at the
@@ -139,10 +138,11 @@ public class ProofEnvironment {
      * justification. 
      */
     public void registerRules(ImmutableList<BuiltInRule> s, RuleJustification j) {
-        for (BuiltInRule value : s) {
-            Rule r = value;
-            registerRule(r, j);
-        }
+	Iterator<BuiltInRule> it = s.iterator();
+	while (it.hasNext()) {
+	    Rule r=it.next();
+	    registerRule(r, j);
+	}
     }
 
     /** retrieves all proofs registered at this environment 
@@ -185,48 +185,6 @@ public class ProofEnvironment {
      */
     public String description() {
 	return "Env. with "+getJavaModel().description()+" #"+getNumber();
-    }
-
-    public void updateProofStatus() {
-	Set<ProofAggregate> allProofs = getProofs();
-	Iterator<ProofAggregate> allProofsIt = allProofs.iterator();
-	ProofAggregate  pl = null;
-	while (allProofsIt.hasNext()) {
-	    pl = allProofsIt.next();
-	    pl.updateProofStatus();
-	}
-    }
-
-    public String getPureDiff(ProofEnvironment pe) {
-	CvsRunner cvs = new CvsRunner();
-	String diff="";
-	if (!getJavaModel().isEmpty()) {
-	    try{
-		diff = cvs.cvsDiff(getJavaModel().getCVSModule(),
-				   pe.getJavaModel().getModelTag(), 
-				   getJavaModel().getModelTag());
-	    } catch(CvsException cvse) {
-		Debug.log4jError("Diffing models in CVS failed: "+cvse, "key.proof.mgt");
-	    }
-	}
-	return diff;
-    }
-
-    public String getRuleDiff(ProofEnvironment pe) {
-	return "Rules: \n    Earlier: " +pe.getRuleConfig().description()
-	    +"\n    Now: "+getRuleConfig().description();
-    }
-
-    public String getDiffUserInfo(ProofEnvironment pe) {
-	String base = "Comparing "+description()+" with "+pe.description()+":\n";
-	if (getJavaModel() != JavaModel.NO_MODEL && 
-	    !getJavaModel().getModelDir().equals
-	    (pe.getJavaModel().getModelDir())) {
-	    return base+"No Diff for different model directories: \n"
-		+getJavaModel().getModelDir()+" \n and "
-		+pe.getJavaModel().getModelDir();
-	}
-	return base+getPureDiff(pe) +"\n"+ getRuleDiff(pe);
     }
 
     /** sets a number that distinguishes two proof environments

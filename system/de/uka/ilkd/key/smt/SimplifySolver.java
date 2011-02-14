@@ -1,11 +1,12 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
+//This file is part of KeY - Integrated Deductive Software Design
+//Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+//                    Universitaet Koblenz-Landau, Germany
+//                    Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-
+//The KeY system is protected by the GNU General Public License. 
+//See LICENSE.TXT for details.
+//
+//
 
 package de.uka.ilkd.key.smt;
 
@@ -40,15 +41,15 @@ public final class SimplifySolver extends AbstractSMTSolver {
 	if (val == 0) {
 	    //no error occured
 	    if (meansValid(text)) {
-		return SMTSolverResult.createValid(text,name());
+		return SMTSolverResult.createValidResult(text,name());
 	    } else if (meansInvalid(text)) {
-		return SMTSolverResult.createInvalid(text,name());
+		return SMTSolverResult.createInvalidResult(text,name());
 	    } else {
-		return SMTSolverResult.createUnknown(text,name());
+		return SMTSolverResult.createUnknownResult(text,name());
 	    } 
 	} else {
 	    //error occured
-	    throw new IllegalArgumentException(error);
+	    throw new IllegalResultException(error);
 	}
 	
     }    
@@ -87,6 +88,10 @@ public final class SimplifySolver extends AbstractSMTSolver {
 	    }
 	}
 	return toReturn;
+    }
+    
+    public String toString(){
+	return name();
     }
 
     @Override

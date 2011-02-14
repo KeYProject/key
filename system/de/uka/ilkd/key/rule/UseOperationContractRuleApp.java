@@ -6,14 +6,13 @@
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 //
-//
 
 package de.uka.ilkd.key.rule;
 
 
 import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.proof.mgt.ContractWithInvs;
+import de.uka.ilkd.key.speclang.OperationContract;
 
 
 /**
@@ -23,17 +22,16 @@ import de.uka.ilkd.key.proof.mgt.ContractWithInvs;
  */
 public class UseOperationContractRuleApp extends BuiltInRuleApp {
 
-    private final ContractWithInvs instantiation;
+    private final OperationContract instantiation;
     
-    public UseOperationContractRuleApp(BuiltInRule contractRule,
-	    			       PosInOccurrence pio,
+    public UseOperationContractRuleApp(PosInOccurrence pio,
                                        Constraint userConstraint,
-                                       ContractWithInvs instantiation) {
-        super(contractRule, pio, userConstraint);
+                                       OperationContract instantiation) {
+        super(UseOperationContractRule.INSTANCE, pio, userConstraint);
         this.instantiation = instantiation;
     }   
     
-    public ContractWithInvs getInstantiation() {
+    public OperationContract getInstantiation() {
         return instantiation;
     }
 }

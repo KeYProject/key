@@ -8,9 +8,7 @@
 //
 //
 
-/** This file represents a Java method in the logic. It is part of the
- * AST of a java program 
- */
+
 package de.uka.ilkd.key.logic.op;
 
 import java.io.IOException;
@@ -38,80 +36,66 @@ import de.uka.ilkd.key.util.ExtList;
  * In case of an instance method the first argument represents the 
  * object on which the method is invoked. 
  */
-public class ProgramMethod extends NonRigidFunction 
-    implements SourceElement, ProgramElement, 
-    MemberDeclaration, ProgramInLogic {
+public final class ProgramMethod extends ObserverFunction 
+    			  	 implements SourceElement, ProgramElement, 
+    			  	            MemberDeclaration, ProgramInLogic {
 
     private final MethodDeclaration method; 
     private final KeYJavaType kjt;
-    private final KeYJavaType contKJT;
     private final PositionInfo pi;
     
     
+
+    //-------------------------------------------------------------------------
+    //constructors
+    //-------------------------------------------------------------------------     
+    
     public ProgramMethod(MethodDeclaration method, 
-			 KeYJavaType contKJT, 
+			 KeYJavaType container, 
 			 KeYJavaType kjt,
-                         PositionInfo pi) {
-	// for some reasons pm are created for void methods too. It's odd,
-        // but expand method body relies on a pm....
-        super(new ProgramElementName(method.getProgramElementName().toString(), 
-                contKJT.getSort().toString()), 
-	      kjt == null ? null : kjt.getSort(), getArgumentSorts(method, contKJT));
+                         PositionInfo pi,
+                         Sort heapSort) {
+        super(method.getProgramElementName().toString(), 
+              kjt == null ? Sort.ANY : kjt.getSort(),
+              kjt,
+              heapSort,
+              container,
+              method.isStatic(),
+              getParamTypes(method)); 
                         
-	this.method  = method;
-	this.contKJT = contKJT;
+	this.method  = method;;
 	this.kjt     = kjt;
         this.pi      = pi;
-        
     }
     
+    
 
-   /**
-    * determines the argument sorts of the symbol to be created 
-    * @param md the MethodDeclaration whose signature is used as blueprint
-    * @param container the KeYJavaType of the type where this method is declared
-    * @return the symbols argument sorts
-    */
-   private static Sort[] getArgumentSorts(MethodDeclaration md, KeYJavaType container) {  
-       final boolean instanceMethod = !md.isStatic() && !(md instanceof Constructor);
-       
-       final int arity = instanceMethod ? 
-               md.getParameterDeclarationCount() + 1 : md.getParameterDeclarationCount();       
-       
-       final Sort[] argSorts = new Sort[arity];
- 
-       final int offset;
-       
-       if (instanceMethod) {  
-           argSorts[0] = container.getSort();           
-           offset = 1;
-       } else {
-           offset = 0;
-       }
-       
-       for (int i = offset; i<argSorts.length; i++) {
-           argSorts[i] = 
-               md.getParameterDeclarationAt(i-offset).
-               getTypeReference().getKeYJavaType().getSort();
-       }
-       return argSorts;
+    //-------------------------------------------------------------------------
+    //internal methods
+    //-------------------------------------------------------------------------     
+
+
+    private static ImmutableArray<KeYJavaType> getParamTypes(
+	    					MethodDeclaration md) {
+	KeYJavaType[] result 
+		= new KeYJavaType[md.getParameterDeclarationCount()];
+	for(int i = 0; i < result.length; i++) {
+	    result[i] = md.getParameterDeclarationAt(i)
+	                  .getTypeReference()
+	                  .getKeYJavaType();
+	}
+	return new ImmutableArray<KeYJavaType>(result);
     }
-   
-   /**
-    * BUG: remove this method bit first adopt the jml translation to take about the 
-    * correct type of parameters and automatic type conversion    
-    * @return true iff number of subterms of term is equal 
-    * to its own arity
-    *    
-    */   
-   public boolean validTopLevel(Term term){   
-       return term.arity()==this.arity(); //%%% needs more checking!!!!   
-   }   
+    
+    
 
+    //-------------------------------------------------------------------------
+    //public interface
+    //-------------------------------------------------------------------------     
 
-    // convienience methods to access methods of the corresponding MethodDeclaration
+    // convenience methods to access methods of the corresponding MethodDeclaration
     // in a direct way
-    
+   
     public MethodDeclaration getMethodDeclaration() {
 	return method;
     }
@@ -130,23 +114,22 @@ public class ProgramMethod extends NonRigidFunction
         return getMethodDeclaration().getBody();
     }
 
-    /** toString */
-    public String toString() {
-	return name().toString();
-    }
-
+    @Override
     public SourceElement getFirstElement(){
 	return method.getFirstElement();
     }
 
+    @Override
     public SourceElement getLastElement(){
 	return method.getLastElement();
     }
 
+    @Override
     public Comment[] getComments() {
 	return method.getComments();
     }
 
+    @Override
     public void prettyPrint(PrettyPrinter w) throws IOException {
 	method.prettyPrint(w);
     }
@@ -156,42 +139,47 @@ public class ProgramMethod extends NonRigidFunction
      * perform some action/transformation on this element
      * @param v the Visitor
      */
+    @Override
     public void visit(Visitor v) {
 	v.performActionOnProgramMethod(this);
     }
 
     /**
- *        Returns the start position of the primary token of this element.
- *        To get the start position of the syntactical first token,
- *        call the corresponding method of <CODE>getFirstElement()</CODE>.
- *        @return the start position of the primary token.
+     *        Returns the start position of the primary token of this element.
+     *        To get the start position of the syntactical first token,
+     *        call the corresponding method of <CODE>getFirstElement()</CODE>.
+     *        @return the start position of the primary token.
     */
+    @Override    
     public Position getStartPosition(){
 	return pi.getStartPosition();
     }
 
     /**
- *        Returns the end position of the primary token of this element.
- *        To get the end position of the syntactical first token,
- *        call the corresponding method of <CODE>getLastElement()</CODE>.
- *        @return the end position of the primary token.
+     *        Returns the end position of the primary token of this element.
+     *        To get the end position of the syntactical first token,
+     *        call the corresponding method of <CODE>getLastElement()</CODE>.
+     *        @return the end position of the primary token.
      */
+    @Override
     public Position getEndPosition(){
 	return pi.getEndPosition();
     }
 
     /**
- *        Returns the relative position (number of blank heading lines and 
- *        columns) of the primary token of this element.
- *        To get the relative position of the syntactical first token,
- *        call the corresponding method of <CODE>getFirstElement()</CODE>.
- *        @return the relative position of the primary token.
+     *        Returns the relative position (number of blank heading lines and 
+     *        columns) of the primary token of this element.
+     *        To get the relative position of the syntactical first token,
+     *        call the corresponding method of <CODE>getFirstElement()</CODE>.
+     *        @return the relative position of the primary token.
      */
+    @Override
     public Position getRelativePosition(){
 	return  pi.getRelativePosition();
     }
 
 
+    @Override
     public PositionInfo getPositionInfo(){
 	return  pi;
     }
@@ -200,6 +188,7 @@ public class ProgramMethod extends NonRigidFunction
     /**
      * Test whether the declaration is private.
      */
+    @Override
     public boolean isPrivate(){
 	return method.isPrivate();
     }
@@ -207,6 +196,7 @@ public class ProgramMethod extends NonRigidFunction
     /**
      * Test whether the declaration is protected.
      */
+    @Override
     public boolean isProtected(){
 	return method.isProtected();
     }
@@ -214,15 +204,9 @@ public class ProgramMethod extends NonRigidFunction
     /**
      * Test whether the declaration is public.
      */
+    @Override
     public boolean isPublic(){
 	return method.isPublic();
-    }
-
-    /**
-     * Test whether the declaration is static.
-     */
-    public boolean isStatic(){
-	return method.isStatic();
     }
 
     /**
@@ -242,18 +226,22 @@ public class ProgramMethod extends NonRigidFunction
     /**
      * Test whether the declaration is strictfp.
      */
+    @Override
     public boolean isStrictFp(){
 	return method.isStrictFp();
     }
     
+    @Override
     public ImmutableArray<Modifier> getModifiers(){
 	return method.getModifiers();
     }
 
+    @Override
     public int getChildCount() {
 	return method.getChildCount();
     }
 
+    @Override
     public ProgramElement getChildAt(int i){
 	return method.getChildAt(i);
     }
@@ -261,27 +249,25 @@ public class ProgramMethod extends NonRigidFunction
     /** equals modulo renaming is described in class
      * SourceElement.
      */
-     public boolean equalsModRenaming(SourceElement se, 
-				      NameAbstractionTable nat) {
-	 if (se == null || !(se instanceof ProgramMethod)) {
-	     return false;
-	 }
+    @Override
+    public boolean equalsModRenaming(SourceElement se, 
+	    NameAbstractionTable nat) {
+	if (se == null || !(se instanceof ProgramMethod)) {
+	    return false;
+	}
 
-	 return method==((ProgramMethod)se).getMethodDeclaration();
-     }
+	return method==((ProgramMethod)se).getMethodDeclaration();
+    }
 
     public KeYJavaType getKeYJavaType() {
 	return kjt;
     }
 
-    public KeYJavaType getContainerType() {
-	return contKJT;
-    }
-
+    @Override
     public Expression convertToProgram(Term t, ExtList l) {
 	ProgramElement called;
 	if (isStatic()) {
-	    called = new TypeRef(contKJT);
+	    called = new TypeRef(getContainerType());
 	} else {
 	    called=(ProgramElement)l.get(0);
 	    l.remove(0);
@@ -317,6 +303,7 @@ public class ProgramMethod extends NonRigidFunction
     public boolean isFinal() {
     	return getMethodDeclaration().isFinal();
     }
+
     public boolean isSynchronized() {
     	return getMethodDeclaration().isSynchronized();
     }
@@ -333,7 +320,9 @@ public class ProgramMethod extends NonRigidFunction
     	return getMethodDeclaration().getParameterDeclarationAt(index);
     }
     
-    /** returns the variablespecification of the i-th parameterdeclaration */
+    /** 
+     * Returns the variablespecification of the i-th parameterdeclaration 
+     */
     public VariableSpecification getVariableSpecification(int index) {
         return method.getParameterDeclarationAt(index).getVariableSpecification();
     }
@@ -346,6 +335,7 @@ public class ProgramMethod extends NonRigidFunction
     	return getMethodDeclaration().getParameters();
     }
 
+    @Override
     public MatchConditions match(SourceData source, MatchConditions matchCond) {
         final ProgramElement src = source.getSource();
         if (src == this) {

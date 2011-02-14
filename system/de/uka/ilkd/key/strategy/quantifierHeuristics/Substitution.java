@@ -15,13 +15,13 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.ImmutableMap;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.ClashFreeSubst;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermCreationException;
-import de.uka.ilkd.key.logic.op.CastFunctionSymbol;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.sort.AbstractSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
@@ -60,22 +60,25 @@ class Substitution {
     public boolean isGround() {
         final Iterator<QuantifiableVariable> it = varMap.keyIterator ();
         while ( it.hasNext () ) {
-            if ( getSubstitutedTerm( it.next () ).freeVars ().size () != 0 )
+            final Term t = getSubstitutedTerm(it.next ()); 
+            if ( t.freeVars ().size () != 0 ) {
+        	System.out.println("evil free vars in term: " + t);
                 return false;
+            }
         }
         return true;
     }   
   
     
-    public Term apply(Term t) {
+    public Term apply(Term t, Services services) {
         assert isGround() :
-            "non-ground substitutions are not yet implemented";
+            "non-ground substitutions are not yet implemented: " + this;
         final Iterator<QuantifiableVariable> it = varMap.keyIterator ();
         while ( it.hasNext () ) {
             final QuantifiableVariable var = it.next ();
             final Sort quantifiedVarSort = var.sort ();
-            final CastFunctionSymbol quantifiedVarSortCast =
-                ( (AbstractSort)quantifiedVarSort ).getCastSymbol ();
+            final Function quantifiedVarSortCast =
+                quantifiedVarSort.getCastSymbol (services);
             Term instance = getSubstitutedTerm( var );
             if ( !instance.sort ().extendsTrans ( quantifiedVarSort ) )
             	instance = tb.func ( quantifiedVarSortCast, instance );
@@ -90,12 +93,12 @@ class Substitution {
     }
     
     /**
-     * Try to apply the substitution to a term, widening by removing casts to
-     * jbyte, jint whenever possible 
+     * Try to apply the substitution to a term, introducing casts if
+     * necessary (may never be the case any more, XXX)
      */
-    public Term applyWithoutCasts(Term t) {
+    public Term applyWithoutCasts(Term t, Services services) {
         assert isGround() :
-            "non-ground substitutions are not yet implemented";
+            "non-ground substitutions are not yet implemented: " + this;
         final Iterator<QuantifiableVariable> it = varMap.keyIterator ();
         while ( it.hasNext () ) {
             final QuantifiableVariable var = it.next ();
@@ -106,8 +109,8 @@ class Substitution {
             } catch (TermCreationException e) {
                 final Sort quantifiedVarSort = var.sort ();                
                 if ( !instance.sort ().extendsTrans ( quantifiedVarSort ) ) {
-                    final CastFunctionSymbol quantifiedVarSortCast =
-                        ( (AbstractSort)quantifiedVarSort ).getCastSymbol ();
+                    final Function quantifiedVarSortCast =
+                        quantifiedVarSort.getCastSymbol (services);
                     instance = tb.func ( quantifiedVarSortCast, instance );
                     t = applySubst ( var, instance, t );
                 } else {

@@ -15,14 +15,10 @@ import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
 
 
@@ -31,15 +27,15 @@ import de.uka.ilkd.key.proof.OpReplacer;
  */
 public final class ClassInvariantImpl implements ClassInvariant {
     
-    private static final SignatureVariablesFactory SVN 
-        = SignatureVariablesFactory.INSTANCE;
     private static final TermBuilder TB = TermBuilder.DF;
     
     private final String name;
     private final String displayName;
     private final KeYJavaType kjt;
-    private final FormulaWithAxioms originalInv;
+    private final VisibilityModifier visibility;    
+    private final Term originalInv;
     private final ParsableVariable originalSelfVar;
+    private final boolean isStatic;
     
     
     //-------------------------------------------------------------------------
@@ -51,13 +47,16 @@ public final class ClassInvariantImpl implements ClassInvariant {
      * @param name the unique internal name of the invariant
      * @param displayName the displayed name of the invariant
      * @param kjt the KeYJavaType to which the invariant belongs
+     * @param visibility the visibility of the invariant 
+     *        (null for default visibility)
      * @param inv the invariant formula itself
      * @param selfVar the variable used for the receiver object
      */
     public ClassInvariantImpl(String name, 
                               String displayName,
                               KeYJavaType kjt, 
-                              FormulaWithAxioms inv,
+                              VisibilityModifier visibility,                              
+                              Term inv,
                               ParsableVariable selfVar) {
         assert name != null && !name.equals("");
         assert displayName != null && !displayName.equals("");
@@ -66,8 +65,12 @@ public final class ClassInvariantImpl implements ClassInvariant {
         this.name            = name;
         this.displayName     = displayName;
 	this.kjt             = kjt;
+        this.visibility      = visibility;
         this.originalInv     = inv;
         this.originalSelfVar = selfVar;
+        final OpCollector oc = new OpCollector();
+        originalInv.execPostOrder(oc);
+        this.isStatic        = !oc.contains(originalSelfVar);
     }
     
 
@@ -89,86 +92,63 @@ public final class ClassInvariantImpl implements ClassInvariant {
         return result;
     }
     
-    
-    /**
-     * Returns an available name constructed by affixing a counter to the passed 
-     * base name.
-     */
-    private String getNewName(String baseName, Services services) {
-        NamespaceSet namespaces = services.getNamespaces();
-            
-        int i = 0;
-        String result;
-        do {
-            result = baseName + "_" + i++;
-        } while(namespaces.lookup(new Name(result)) != null);
-        
-        return result;
-    }
 
-    
     
     //-------------------------------------------------------------------------
     //public interface
     //------------------------------------------------------------------------- 
     
+    @Override
     public String getName() {
         return name;
     }
     
     
+    @Override
     public String getDisplayName() {
         return displayName;
     }
     
         
+    @Override
     public KeYJavaType getKJT() {
 	return kjt;
-    }    
-    
-
-    public FormulaWithAxioms getClosedInv(Services services) {
-        Sort sort = getKJT().getSort();
-        String baseName = sort.name().toString().substring(0, 1).toLowerCase();
-        String name = getNewName(baseName, services);
-        LogicVariable selfVar = new LogicVariable(new Name(name), sort);
-        return getOpenInv(selfVar, services).allClose(services);
     }
     
     
-    public FormulaWithAxioms getClosedInvExcludingOne(
-	    				ParsableVariable excludedVar, 
-	                                Services services) {
-        Sort sort = getKJT().getSort();
-        String baseName = sort.name().toString().substring(0, 1).toLowerCase();
-        String name = getNewName(baseName, services);
-        LogicVariable quantifVar = new LogicVariable(new Name(name), sort);
-        FormulaWithAxioms openInv = getOpenInv(quantifVar, services);
-        FormulaWithAxioms notSelf 
-        	= new FormulaWithAxioms(TB.not(TB.equals(TB.var(quantifVar), 
-        		                                 TB.var(excludedVar))));        
-        return notSelf.imply(openInv).allClose(services);
-    }
-    
-    
-    public FormulaWithAxioms getOpenInv(ParsableVariable selfVar, 
-                                        Services services) {
-        final Map<Operator, Operator> replaceMap = getReplaceMap(selfVar, services);
+    @Override
+    public Term getInv(ParsableVariable selfVar, Services services) {
+        final Map<Operator, Operator> replaceMap 
+        	= getReplaceMap(selfVar, services);
         final OpReplacer or = new OpReplacer(replaceMap);
         return or.replace(originalInv);   
     }
-
     
-    public String getHTMLText(Services services) {
-        final String inv = LogicPrinter.quickPrintTerm(originalInv.getFormula(), 
-                services);
-        
-        return "<html>"
-               + LogicPrinter.escapeHTML(inv) 
-               + "</html>";
+ 
+    @Override
+    public boolean isStatic() {
+	return isStatic;
+    }    
+    
+    
+    @Override
+    public VisibilityModifier getVisibility() {
+	return visibility;
     }
     
     
+    @Override
+    public ClassInvariant setKJT(KeYJavaType newKjt) {
+	return new ClassInvariantImpl(name, 
+                                      displayName,
+                                      newKjt, 
+                                      visibility,
+                                      originalInv,
+                                      originalSelfVar);
+    }
+    
+    
+    @Override
     public String toString() {
         return originalInv.toString();
     }

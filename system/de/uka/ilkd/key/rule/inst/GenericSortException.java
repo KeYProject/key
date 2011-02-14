@@ -10,10 +10,16 @@
 
 package de.uka.ilkd.key.rule.inst;
 
+/** 
+ * This exception thrown if there is no appropriate instantiation of
+ * the generic sorts occurring within an "SVInstantiations"-object 
+ */
 import de.uka.ilkd.key.collection.ImmutableList;
 
-/** this exception thrown if there is no appropriate instantiation of
- * the generic sorts occurring within an "SVInstantiations"-object */
+/** 
+ * This exception thrown if there is no appropriate instantiation of
+ * the generic sorts occurring within an "SVInstantiations"-object 
+ */
 public class GenericSortException extends SortException {
 
     /**
@@ -36,5 +42,4 @@ public class GenericSortException extends SortException {
     public String getMessage() {
 	return super.getMessage() + (conditions == null ? "" : conditions);
     }
-
 }

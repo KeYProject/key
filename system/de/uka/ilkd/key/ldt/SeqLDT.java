@@ -1,0 +1,172 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
+//
+//
+
+package de.uka.ilkd.key.ldt;
+
+import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.Type;
+import de.uka.ilkd.key.java.expression.Literal;
+import de.uka.ilkd.key.java.expression.literal.EmptySeqLiteral;
+import de.uka.ilkd.key.java.expression.operator.SeqConcat;
+import de.uka.ilkd.key.java.expression.operator.SeqReverse;
+import de.uka.ilkd.key.java.expression.operator.SeqSingleton;
+import de.uka.ilkd.key.java.expression.operator.SeqSub;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.SortDependingFunction;
+import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.util.ExtList;
+
+
+public final class SeqLDT extends LDT {
+    
+    public static final Name NAME = new Name("Seq");    
+
+    //getters
+    private final SortDependingFunction seqGet;
+    private final Function seqLen;
+    
+    //constructors
+    private final Function seqEmpty;
+    private final Function seqSingleton;
+    private final Function seqConcat;
+    private final Function seqSub;
+    private final Function seqReverse;    
+    
+    
+    public SeqLDT(Services services) {
+	super(NAME, services);
+        seqGet        = addSortDependingFunction(services, "seqGet");
+        seqLen        = addFunction(services, "seqLen");
+        seqEmpty      = addFunction(services, "seqEmpty");
+        seqSingleton  = addFunction(services, "seqSingleton");
+        seqConcat     = addFunction(services, "seqConcat");
+        seqSub        = addFunction(services, "seqSub");
+        seqReverse    = addFunction(services, "seqReverse");        
+    }
+    
+    
+    public Function getSeqGet(Sort instanceSort, Services services) {
+	return seqGet.getInstanceFor(instanceSort, services);
+    }
+    
+    
+    public Function getSeqLen() {
+	return seqLen;
+    }    
+    
+    
+    public Function getSeqEmpty() {
+	return seqEmpty;
+    }
+    
+    
+    public Function getSeqSingleton() {
+	return seqSingleton;
+    }
+
+    
+    public Function getSeqConcat() {
+	return seqConcat;
+    }
+    
+
+    public Function getSeqSub() {
+	return seqSub;
+    }
+    
+    
+    public Function getSeqReverse() {
+	return seqReverse;
+    }
+
+    
+    @Override
+    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
+                                 Term[] subs, 
+                                 Services services, 
+                                 ExecutionContext ec) {
+	return isResponsible(op, (Term)null, services, ec);
+    }
+    
+
+    @Override
+    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
+                		 Term left, 
+                		 Term right, 
+                		 Services services, 
+                		 ExecutionContext ec) {
+	return false;
+    }
+
+    
+    @Override
+    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
+	    			 Term sub, 
+	    			 Services services, 
+	    			 ExecutionContext ec) {
+	return op instanceof SeqSingleton
+	       || op instanceof SeqConcat
+	       || op instanceof SeqSub
+	       || op instanceof SeqReverse;
+    }
+
+
+    @Override
+    public Term translateLiteral(Literal lit, Services services) {
+	assert lit instanceof EmptySeqLiteral;
+	return TermBuilder.DF.func(seqEmpty);
+    }
+    
+
+    @Override
+    public Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, 
+	    			   Services serv, 
+	    			   ExecutionContext ec) {
+	if(op instanceof SeqSingleton) {
+	    return seqSingleton;
+	} else if(op instanceof SeqConcat) {
+	    return seqConcat;
+	} else if(op instanceof SeqSub) {
+	    return seqSub;
+	} else if(op instanceof SeqReverse) {
+	    return seqReverse;
+	}
+	assert false;
+	return null;
+    }
+
+    
+    @Override
+    public boolean hasLiteralFunction(Function f) {
+	return f.equals(seqEmpty);
+    }
+
+    
+    @Override
+    public Expression translateTerm(Term t, ExtList children) {
+	if(t.op().equals(seqEmpty)) {
+	    return EmptySeqLiteral.INSTANCE;
+	}
+	assert false;
+	return null;
+    }
+    
+    
+    @Override
+    public final Type getType(Term t) {
+	assert false;
+	return null;
+    }    
+}

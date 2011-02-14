@@ -7,99 +7,31 @@
 // See LICENSE.TXT for details.
 //
 //
-//
 
 package de.uka.ilkd.key.logic.op;
 
 import java.util.HashMap;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.sort.PrimitiveSort;
+import de.uka.ilkd.key.ldt.IntegerLDT;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.rtsj.rule.metaconstruct.*;
+import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.*;
 import de.uka.ilkd.key.rule.metaconstruct.arith.*;
 import de.uka.ilkd.key.util.Debug;
 
-/** 
- * this class implements the interface for
- * MetaOperators. MetaOperators are used to do complex term
- * transformation when applying a taclet. Often these transformation
- * caanot be described with the taclet scheme (or trying to do so would
- * result in a huge number of rules)
- */
-public abstract class AbstractMetaOperator extends Op implements MetaOperator {
+
+public abstract class AbstractMetaOperator extends AbstractSortedOperator 
+                                           implements MetaOperator {
 
     private static HashMap<String, AbstractMetaOperator> name2metaop = 
         new HashMap<String, AbstractMetaOperator>(70);
-
-    public static final AbstractMetaOperator META_LENGTH = new MetaLength();
-
-    public static final AbstractMetaOperator META_ATTRIBUTE = new MetaAttribute();
     
-    public static final AbstractMetaOperator META_INSTANCE = new MetaInstance();
-
-    public static final AbstractMetaOperator META_CREATED = new MetaCreated();
+    //must be first
+    public static final Sort METASORT = new SortImpl(new Name("Meta"));    
     
-    public static final AbstractMetaOperator META_MEMORY_AREA = new MetaMemoryArea();
-    
-    public static final AbstractMetaOperator META_NEXT_TO_CREATE = new MetaNextToCreate();
-
-    public static final AbstractMetaOperator META_ARRAY_SIZE = new ArraySize();
-    
-    public static final AbstractMetaOperator META_OBJECT_SIZE = new ObjectSize();
-        
-    public static final AbstractMetaOperator META_NEXT_TO_CREATE_STACK = new MetaNextToCreateStack();
-        
-    public static final AbstractMetaOperator META_CONSUMED_AT_PRE = new ConsumedAtPre();
-    
-    public static final AbstractMetaOperator META_WS_AT_PRE = new WSAtPre();
-    
-    public static final AbstractMetaOperator META_CONSUMED_LOOP_UPDATE = new ConsumedLoopUpdate();
-    
-    public static final AbstractMetaOperator META_CONSUMED_LOOP_INVARIANT = new ConsumedLoopInvariants();
-        
-    public static final AbstractMetaOperator META_STACK_AT_INDEX = new StackAtIndex();
-    
-    public static final AbstractMetaOperator META_UPDATE_SCOPE = new UpdateScope();
-    
-    public static final AbstractMetaOperator META_UNIQUE_ANON_UPDATE = new UniqueAnonUpdate(); 
-    
-    public static final AbstractMetaOperator META_CALCULATE_ARRAY_SIZE = 
-        new CalculateArraySize();
-    
-    public static final AbstractMetaOperator META_WC_ARRAY_SIZE = 
-        new WorstCaseArraySize();
-    
-    public static final AbstractMetaOperator META_BC_ARRAY_SIZE = 
-        new BestCaseArraySize();
-    
-    public static final AbstractMetaOperator META_PRECONDITION_FOR_WS = 
-        new PreconditionForWS();
-    
-    public static final AbstractMetaOperator META_PRE_VALID_IN_STATE_OF_WS = 
-        new PreValidInStateOfWS();
-
-    public static final AbstractMetaOperator META_TRAINITIALIZED = new MetaTraInitialized();
-
-    public static final AbstractMetaOperator META_TRANSIENT = new MetaTransient();
-
-    public static final AbstractMetaOperator META_TRANSACTIONCOUNTER = 
-	new MetaTransactionCounter();
-    
-    /** general access to nonstatic fields in classes */
-    public static final AbstractMetaOperator META_FIELDREF = new MetaFieldReference(); 
-
-    /** the shadow operator for transactions */
-    public static final AbstractMetaOperator META_SHADOW = new MetaShadow();
-
-    /** used to add integers */
     public static final AbstractMetaOperator META_ADD = new MetaAdd();
 
     public static final AbstractMetaOperator META_SUB = new MetaSub();
@@ -146,95 +78,52 @@ public abstract class AbstractMetaOperator extends Op implements MetaOperator {
     
     public static final AbstractMetaOperator ENHANCEDFOR_INV_RULE = new EnhancedForInvRule();
 
-    public static final AbstractMetaOperator INTRODUCE_NEW_ANON_UPDATE = new IntroNewAnonUpdateOp();
-
     public static final AbstractMetaOperator ARRAY_BASE_INSTANCE_OF = new ArrayBaseInstanceOf();
-
-    public static final AbstractMetaOperator ARRAY_STORE_STATIC_ANALYSE = new ArrayStoreStaticAnalyse();
-
-    public static final AbstractMetaOperator EXPAND_DYNAMIC_TYPE = new ExpandDynamicType();
-
-    public static final AbstractMetaOperator RESOLVE_QUERY = new ResolveQuery();
 
     public static final AbstractMetaOperator CONSTANT_VALUE = new ConstantValue();
     
     public static final AbstractMetaOperator ENUM_CONSTANT_VALUE = new EnumConstantValue();
     
-    public static final AbstractMetaOperator UNIVERSES = new Universes();
-
     public static final AbstractMetaOperator DIVIDE_MONOMIALS = new DivideMonomials ();
 
     public static final AbstractMetaOperator DIVIDE_LCR_MONOMIALS = new DivideLCRMonomials ();
 
-    public static final AbstractMetaOperator CREATE_IN_REACHABLE_STATE_PO = 
-        new CreateInReachableStatePO ("#createInReachableStatePO", InReachableStatePOBuilder.class);
-
-    public static final AbstractMetaOperator CREATE_IN_REACHABLE_STATE_PO_RTSJ = 
-        new CreateInReachableStatePO("#createInReachableStateRTSJPO", InReachableStateRTSJPOBuilder.class);
-
     public static final AbstractMetaOperator INTRODUCE_ATPRE_DEFINITIONS = new IntroAtPreDefsOp();
     
-    public static final AbstractMetaOperator AT_PRE_EQUATIONS = new AtPreEquations();
-    
-    public static final AbstractMetaOperator LOCATION_DEPENDENT_FUNCTION = new LocationDependentFunction();
-    
-    /** metaconstructs for OCL simplification */
-    public static final AbstractMetaOperator METAALLSUBTYPES = new MetaAllSubtypes();
-    
-    /** metaconstruct for the updateCut rule*/
-    public static final AbstractMetaOperator METAEQUALUPDATES = new MetaEquivalentUpdates();
+    public static final AbstractMetaOperator MEMBER_PV_TO_FIELD = new MemberPVToField();
 
-    /** metaconstruct for strictly pure method calls */
-    public static final AbstractMetaOperator META_METHOD_CALL_TO_UPDATE= new MethodCallToUpdate();
-
-    public static final Sort METASORT = new PrimitiveSort(new Name("Meta"));
+    public static final AbstractMetaOperator ADD_CAST = new AddCast();    
 
     
-    protected TermFactory termFactory = TermFactory.DEFAULT;
-
-    private int arity;
-
-    public AbstractMetaOperator(Name name, int arity) {
-	super(name);
-	this.arity = arity;
-	name2metaop.put(name.toString(), this);
+    protected static final TermFactory termFactory = TermFactory.DEFAULT;
+    protected static final TermBuilder TB = TermBuilder.DF;
+    
+    
+    private static Sort[] createMetaSortArray(int arity) {
+	Sort[] result = new Sort[arity];
+	for(int i = 0; i < arity; i++) {
+	    result[i] = METASORT;
+	}
+	return result;
+    }
+    
+    
+    protected AbstractMetaOperator(Name name, int arity, Sort sort) {
+	super(name, createMetaSortArray(arity), sort, false);
+	name2metaop.put(name.toString(), this);	
+    }
+    
+    
+   protected AbstractMetaOperator(Name name, int arity) {
+	this(name, arity, METASORT);
     }
 
-    /**
-     * checks whether the top level structure of the given {@link Term}
-     * is syntactically valid, given the assumption that the top level
-     * operator of the term is the same as this Operator. The
-     * assumption that the top level operator and the term are equal
-     * is NOT checked.  
-     * @return true iff the top level structure of
-     * the @link Term is valid.
-     */
-    public boolean validTopLevel(Term term) {
-	// a meta operator accepts almost everything
-	return term.op() instanceof AbstractMetaOperator;
-    }
 
+    
     public static MetaOperator name2metaop(String s) {
 	return name2metaop.get(s);
     }
 
-    /**
-     * determines the sort of the {@link Term} if it would be created using this
-     * Operator as top level operator and the given terms as sub terms. The
-     * assumption that the constructed term would be allowed is not checked.
-     * @param term an array of Term containing the subterms of a (potential)
-     * term with this operator as top level operator
-     * @return sort of the term with this operator as top level operator of the
-     * given substerms
-     */
-    public Sort sort(Term[] term) {
-	return METASORT;
-    }
-
-    /** @return arity of the Operator as int */
-    public int arity() {
-	return arity;
-    }
 
     /** @return String representing a logical integer literal 
      *  in decimal representation
@@ -277,20 +166,20 @@ public abstract class AbstractMetaOperator extends Op implements MetaOperator {
 	return result.toString();
     }
     
+    
     public MetaOperator getParamMetaOperator(String param) {
-      return null;
+	return null;
     }
     
-
+    
+    
     /** (non-Javadoc)
      * by default meta operators do not match anything 
      * @see de.uka.ilkd.key.logic.op.Operator#match(SVSubstitute, de.uka.ilkd.key.rule.MatchConditions, de.uka.ilkd.key.java.Services)
      */
+    @Override    
     public MatchConditions match(SVSubstitute subst, MatchConditions mc,
             Services services) {
         return null;
-    }
-    /** calculates the resulting term. */
-    public abstract Term calculate(Term term, SVInstantiations svInst, Services services);
-
+    }    
 }

@@ -31,14 +31,14 @@ public class PosInTerm {
      */
     private final int pos;
 
-    // saves 8 bytes (due to allignment issues) per instance if we use a 
+    // saves 8 bytes (due to alignment issues) per instance if we use a 
     // short here instead of an int
     /** 
      * the depth
      */
     private final short depth;
     
-    // saves 8 bytes (due to allignment issues) per instance if we use a 
+    // saves 8 bytes (due to alignment issues) per instance if we use a 
     // short here instead of an int
     private final short hashCode;
 

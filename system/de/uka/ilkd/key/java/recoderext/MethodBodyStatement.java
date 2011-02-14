@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -11,10 +11,12 @@
 
 package de.uka.ilkd.key.java.recoderext;
 
+import java.io.IOException;
+
 import recoder.java.*;
 import recoder.java.reference.*;
 import recoder.java.statement.JavaStatement;
-import recoder.list.generic.ASTList;
+import recoder.list.generic.*;
 
 
 /**
@@ -45,7 +47,7 @@ public class MethodBodyStatement extends JavaStatement implements
     
     public MethodBodyStatement(TypeReference bodySource, 
 			       Expression resultVar,
-			       MethodReferenceWrapper methRef) {
+			       MethodReference methRef) {
         setBodySource(bodySource);
 	this.resultVar  = resultVar;        
         setMethodReference(methRef);        
@@ -93,7 +95,7 @@ public class MethodBodyStatement extends JavaStatement implements
     /**
      *      Set the MethodReference that caused this call.
      */
-    public void setMethodReference(MethodReferenceWrapper methRef) {	
+    public void setMethodReference(MethodReference methRef) {	
         this.methodName = methRef.getIdentifier();
         this.methodReferencePrefix = methRef.getReferencePrefix();
         this.arguments = methRef.getArguments();
@@ -102,7 +104,7 @@ public class MethodBodyStatement extends JavaStatement implements
     public NonTerminalProgramElement getASTParent() {
 	return astParent;
     }
-   
+
     public StatementContainer getStatementContainer() {
 	return astParent;
     }

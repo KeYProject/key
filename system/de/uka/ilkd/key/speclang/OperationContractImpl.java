@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -10,21 +10,19 @@
 
 package de.uka.ilkd.key.speclang;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.proof.AtPreFactory;
 import de.uka.ilkd.key.proof.OpReplacer;
-import de.uka.ilkd.key.rtsj.java.RTSJInfo;
 
 
 /**
@@ -33,88 +31,124 @@ import de.uka.ilkd.key.rtsj.java.RTSJInfo;
 public final class OperationContractImpl implements OperationContract {
     
     protected static final TermBuilder TB = TermBuilder.DF;
-    protected static final SignatureVariablesFactory SVN 
-        = SignatureVariablesFactory.INSTANCE;
-    protected static final AtPreFactory APF = AtPreFactory.INSTANCE;
 
+    private final String baseName;
     private final String name;
-    private final String displayName;
-    private final ProgramMethod programMethod;
+    private final KeYJavaType kjt;    
+    private final ProgramMethod pm;
     private final Modality modality;
-    private final FormulaWithAxioms originalPre;
-    private final FormulaWithAxioms originalWorkingSpacePost;
-    private final Term originalWorkingSpace;
-    private final FormulaWithAxioms originalPost;
-    private final ImmutableSet<LocationDescriptor> originalModifies;
-    private final ParsableVariable originalSelfVar;
-    private final ImmutableList<ParsableVariable> originalParamVars;
-    private final ParsableVariable originalResultVar;
-    private final ParsableVariable originalExcVar;
-    private final Map<Operator, Function/* atPre */> originalAtPreFunctions;
+    private final Term originalPre;
+    private final Term originalMby;    
+    private final Term originalPost;
+    private final Term originalMod;
+    private final ProgramVariable originalSelfVar;
+    private final ImmutableList<ProgramVariable> originalParamVars;
+    private final ProgramVariable originalResultVar;
+    private final ProgramVariable originalExcVar;
+    private final Term originalHeapAtPre;
+    private final int id;    
     
     
     //-------------------------------------------------------------------------
     //constructors
-    //------------------------------------------------------------------------- 
+    //-------------------------------------------------------------------------
+    
+    private OperationContractImpl(String baseName,
+	                          String name,
+                                  KeYJavaType kjt,	                          
+                                  ProgramMethod pm,
+            		          Modality modality,
+            		          Term pre,
+            		          Term mby,
+            		          Term post,
+            		          Term mod,
+            		          ProgramVariable selfVar,
+            		          ImmutableList<ProgramVariable> paramVars,
+            		          ProgramVariable resultVar,
+            		          ProgramVariable excVar,
+                                  Term heapAtPre,
+                                  int id) {
+	assert !(name == null && baseName == null);
+        assert kjt != null;	
+        assert pm != null;
+        assert modality != null;
+        assert pre != null;
+        assert post != null;
+        assert mod != null;
+        assert (selfVar == null) == pm.isStatic();
+        assert paramVars != null;
+        assert paramVars.size() == pm.getParameterDeclarationCount();
+        assert (resultVar == null) == (pm.getKeYJavaType() == null);
+        assert excVar != null;
+        assert heapAtPre != null;
+        this.baseName               = baseName;
+        this.name                   = name != null 
+                                      ? name 
+                                      : baseName + " [id: " + id + " / " + pm 
+                                        + (kjt.equals(pm.getContainerType()) 
+                                           ? "" 
+                                           : " for " 
+                                             + kjt.getJavaType().getName()) 
+                                        + "]";
+        this.pm          	    = pm;
+        this.kjt                    = kjt;
+        this.modality               = modality;
+	this.originalPre            = pre;
+	this.originalMby            = mby;
+	this.originalPost           = post;
+	this.originalMod            = mod;
+	this.originalSelfVar        = selfVar;
+	this.originalParamVars      = paramVars;
+	this.originalResultVar      = resultVar;
+	this.originalExcVar         = excVar;
+	this.originalHeapAtPre      = heapAtPre;
+	this.id                     = id;	
+    }    
 
+    
     /**
      * Creates an operation contract.
-     * @param name the unique internal name of the contract
-     * @param displayName the displayed name of the contract
-     * @param programMethod the ProgramMethod to which the contract belongs
+     * @param baseName base name of the contract (does not have to be unique)
+     * @param pm the ProgramMethod to which the contract belongs
      * @param modality the modality of the contract
      * @param pre the precondition of the contract
+     * @param mby the measured_by clause of the contract 
      * @param post the postcondition of the contract
-     * @param modifies the modifier set of the contract
+     * @param mod the modifies clause of the contract
      * @param selfVar the variable used for the receiver object
      * @param paramVars the variables used for the operation parameters
      * @param resultVar the variables used for the operation result
      * @param excVar the variable used for the thrown exception
-     * @param atPreFunctions the functions used for atPre
+     * @param heapAtPre the operator used for the pre-heap
      */
-    public OperationContractImpl(String name,
-                                 String displayName,
-                                 ProgramMethod programMethod,
+    public OperationContractImpl(String baseName,
+                                 KeYJavaType kjt,	    
+                                 ProgramMethod pm,
             		         Modality modality,
-            		         FormulaWithAxioms pre,
-            		         FormulaWithAxioms post,
-                                 FormulaWithAxioms workingSpacePost,
-            		         ImmutableSet<LocationDescriptor> modifies,
-                                 Term workingSpace,                                 
-            		         ParsableVariable selfVar,
-            		         ImmutableList<ParsableVariable> paramVars,
-            		         ParsableVariable resultVar,
-            		         ParsableVariable excVar,
-                                 /*in*/ Map<Operator, Function /*atPre*/> atPreFunctions) {
-        assert name != null && !name.equals("");
-        assert displayName != null && !displayName.equals("");
-        assert programMethod != null;
-        assert modality != null;
-        assert pre != null;
-        assert post != null;
-        assert modifies != null;
-        assert (selfVar == null) == programMethod.isStatic();
-        assert paramVars != null;
-        assert paramVars.size() 
-                == programMethod.getParameterDeclarationCount();
-        assert (resultVar == null) == (programMethod.sort() == null);
-        assert excVar != null;
-        assert atPreFunctions != null;
-        this.name                     = name;
-        this.displayName              = displayName;
-        this.programMethod            = programMethod;
-        this.modality                 = modality;
-	this.originalPre              = pre;
-	this.originalPost             = post;
-        this.originalWorkingSpace     = workingSpace;       
-        this.originalWorkingSpacePost = workingSpacePost;
-	this.originalModifies         = modifies;
-	this.originalSelfVar          = selfVar;
-	this.originalParamVars        = paramVars;
-	this.originalResultVar        = resultVar;
-	this.originalExcVar           = excVar;
-	this.originalAtPreFunctions   = new LinkedHashMap<Operator, Function>();
-        this.originalAtPreFunctions.putAll(atPreFunctions);
+            		         Term pre,
+            		         Term mby,            		         
+            		         Term post,
+            		         Term mod,
+            		         ProgramVariable selfVar,
+            		         ImmutableList<ProgramVariable> paramVars,
+            		         ProgramVariable resultVar,
+            		         ProgramVariable excVar,
+                                 Term heapAtPre) {
+        this(baseName,
+             null,
+             kjt,             
+             pm,
+             modality,
+             pre,
+             mby,
+             post,
+             mod,
+             selfVar,
+             paramVars,
+             resultVar,
+             excVar,
+             heapAtPre,
+             INVALID_ID);
     }
     
     
@@ -123,75 +157,21 @@ public final class OperationContractImpl implements OperationContract {
     //internal methods
     //-------------------------------------------------------------------------
     
-    private Map /*Operator -> Term*/<Term, Term> getReplaceMap(
-                Term self, 
-                ImmutableList<Term> params, 
-                Services services) {
-        Map<Term, Term> result = new LinkedHashMap<Term, Term>();
-        TermBuilder tb = TermBuilder.DF;   
-        //self
-        if(self != null) {
-            assert self.sort().extendsTrans(originalSelfVar.sort());
-            result.put(tb.var(originalSelfVar), self);
-        }
-
-        //parameters
-        if(params != null) {
-            assert originalParamVars.size() == params.size();
-            Iterator<ParsableVariable> it1 = originalParamVars.iterator();
-            Iterator<Term> it2 = params.iterator();
-            while(it1.hasNext()) {
-                ParsableVariable originalParamVar = it1.next();
-                Term paramVar           = it2.next();
-                assert paramVar.sort().extendsTrans(originalParamVar.sort());
-                result.put(tb.var(originalParamVar), paramVar);
-            }
-        }
-        return result;
+    private static Term atPreify(Term t, Term heapAtPre, Services services) {
+	final Map<Term,Term> map = new HashMap<Term,Term>();
+	map.put(TB.heap(services), heapAtPre);
+        return new OpReplacer(map).replace(t);
     }
+
     
-    private Map /*Operator -> Term*/<Term, Term> getReplaceMap(
-            ParsableVariable self, 
-            Term memoryArea,
-            ImmutableList<ParsableVariable> paramVars,
-            Services services) {
-        Map<Term, Term> result = new LinkedHashMap<Term, Term>();
-        TermBuilder tb = TermBuilder.DF;   
-        //self
-        if(self != null) {
-            assert self.sort().extendsTrans(originalSelfVar.sort());
-            result.put(tb.var(originalSelfVar), tb.var(self));
-        }
-        
-        //memory area
-        if(memoryArea != null) {
-            assert memoryArea.sort().extendsTrans(((RTSJInfo) services.getJavaInfo()).getDefaultMemoryArea().sort());
-            result.put(tb.var(((RTSJInfo) services.getJavaInfo()).getDefaultMemoryArea()), memoryArea);
-        }
-    
-        //parameters
-        if(paramVars != null) {
-            assert originalParamVars.size() == paramVars.size();
-            Iterator<ParsableVariable> it1 = originalParamVars.iterator();
-            Iterator<ParsableVariable> it2 = paramVars.iterator();
-            while(it1.hasNext()) {
-                ParsableVariable originalParamVar = it1.next();
-                ParsableVariable paramVar           = it2.next();
-                assert paramVar.sort().extendsTrans(originalParamVar.sort());
-                result.put(tb.var(originalParamVar), tb.var(paramVar));
-            }
-        }
-        return result;
-    }    
-    
-    private Map <Operator, Operator> getReplaceMap(
-	    				ParsableVariable selfVar, 
-	    				ImmutableList<ParsableVariable> paramVars, 
-	    				ParsableVariable resultVar, 
-	    				ParsableVariable excVar,
-                                        /*inout*/ Map< Operator, Function/*atPre*/> atPreFunctions,
-                                        Services services) {
-	Map<Operator, Operator> result = new LinkedHashMap<Operator, Operator>();
+    private Map /*Operator, Operator, Term -> Term*/ getReplaceMap(
+	    		      ProgramVariable selfVar, 
+	    		      ImmutableList<ProgramVariable> paramVars, 
+	    		      ProgramVariable resultVar, 
+	    		      ProgramVariable excVar,
+	    		      Term heapAtPre,
+	    		      Services services) {
+	final Map result = new LinkedHashMap();
 	
         //self
 	if(selfVar != null) {
@@ -202,12 +182,12 @@ public final class OperationContractImpl implements OperationContract {
         //parameters
 	if(paramVars != null) {
 	    assert originalParamVars.size() == paramVars.size();
-	    Iterator<ParsableVariable> it1 = originalParamVars.iterator();
-	    Iterator<ParsableVariable> it2 = paramVars.iterator();
+	    final Iterator<ProgramVariable> it1 = originalParamVars.iterator();
+	    final Iterator<ProgramVariable> it2 = paramVars.iterator();
 	    while(it1.hasNext()) {
-		ParsableVariable originalParamVar = it1.next();
-		ParsableVariable paramVar         = it2.next();
-		assert originalParamVar.sort().equals(paramVar.sort()) : originalParamVar.sort() + " does not equal " + paramVar.sort();
+		ProgramVariable originalParamVar = it1.next();
+		ProgramVariable paramVar         = it2.next();
+		assert originalParamVar.sort().equals(paramVar.sort());
 		result.put(originalParamVar, paramVar);
 	    }
 	}
@@ -220,67 +200,76 @@ public final class OperationContractImpl implements OperationContract {
 	
         //exception
 	if(excVar != null) {
-	    assert originalExcVar.sort().equals(excVar.sort())
-		    || originalExcVar.sort().name().toString() //for backward compatibility with old DL contracts
-		                     .equals("java.lang.Exception");
+	    assert originalExcVar.sort().equals(excVar.sort());
 	    result.put(originalExcVar, excVar);
 	}
         
         //atPre-functions
-        if(atPreFunctions != null) {
-            for (Object o : originalAtPreFunctions.entrySet()) {
-                Map.Entry<Operator, Function> entry = (Map.Entry<Operator, Function>) o;
-                Operator originalNormalOp = entry.getKey();
-                Function originalAtPreFunc = entry.getValue();
-                Operator normalOp = result.get(originalNormalOp);
-                if (normalOp == null) {
-                    normalOp = originalNormalOp;
-                }
-                Function atPreFunc = atPreFunctions.get(normalOp);
-                if (atPreFunc == null) {
-                    atPreFunc
-                            = AtPreFactory.INSTANCE.createAtPreFunction(normalOp,
-                            services);
-                    atPreFunctions.put(normalOp, atPreFunc);
-                    services.getNamespaces().functions().add(atPreFunc);
-                }
-                assert originalAtPreFunc.sort().equals(atPreFunc.sort());
-                result.put(originalAtPreFunc, atPreFunc);
-            }
-        }
-	
+	if(heapAtPre != null) {
+	    assert originalHeapAtPre.sort().equals(heapAtPre.sort());
+	    result.put(originalHeapAtPre, heapAtPre);
+	}
+
 	return result;
     }
     
     
-    private ImmutableSet<LocationDescriptor> addGuard(ImmutableSet<LocationDescriptor> modifies, 
-                                             Term formula) {
-        ImmutableSet<LocationDescriptor> result 
-            = DefaultImmutableSet.<LocationDescriptor>nil();
-        for(LocationDescriptor loc : modifies) {
-            if(loc instanceof EverythingLocationDescriptor) {
-                return EverythingLocationDescriptor.INSTANCE_AS_SET;
-            } else {
-                BasicLocationDescriptor bloc = (BasicLocationDescriptor) loc;
-                Term newGuard = TB.and(bloc.getFormula(), formula);
-                result = result.add(new BasicLocationDescriptor(
-                        newGuard, 
-                        bloc.getLocTerm()));
-            }
-        }
-        return result;
-    }
-    
-    
-    private FormulaWithAxioms atPreify(
-                FormulaWithAxioms fwa, 
-                /*inout*/Map<Operator, Function/*atPre*/> atPreFunctions,
-                Services services) {
-        APF.createAtPreFunctionsForTerm(fwa.getFormula(), 
-                                        atPreFunctions, 
-                                        services);
-        return new OpReplacer(atPreFunctions).replace(fwa);
-    }
+    private Map /*Operator, Operator, Term -> Term*/ getReplaceMap(
+	    		      Term heapTerm,
+	    		      Term selfTerm, 
+	    		      ImmutableList<Term> paramTerms, 
+	    		      Term resultTerm, 
+	    		      Term excTerm,
+	    		      Term heapAtPre,
+	    		      Services services) {
+	final Map<Term,Term> result = new LinkedHashMap<Term,Term>();
+	
+	//heap
+	assert heapTerm != null;
+	assert heapTerm.sort().equals(services.getTypeConverter()
+		                              .getHeapLDT()
+		                              .targetSort());
+	result.put(TB.heap(services), heapTerm);
+	
+        //self
+	if(selfTerm != null) {
+            assert selfTerm.sort().extendsTrans(originalSelfVar.sort());
+	    result.put(TB.var(originalSelfVar), selfTerm);
+	}
+	
+        //parameters
+	if(paramTerms != null) {
+	    assert originalParamVars.size() == paramTerms.size();
+	    final Iterator<ProgramVariable> it1 = originalParamVars.iterator();
+	    final Iterator<Term> it2 = paramTerms.iterator();
+	    while(it1.hasNext()) {
+		ProgramVariable originalParamVar = it1.next();
+		Term paramTerm                   = it2.next();
+		assert paramTerm.sort().extendsTrans(originalParamVar.sort());
+		result.put(TB.var(originalParamVar), paramTerm);
+	    }
+	}
+	
+        //result
+	if(resultTerm != null) {
+	    assert originalResultVar.sort().equals(resultTerm.sort());
+	    result.put(TB.var(originalResultVar), resultTerm);
+	}
+	
+        //exception
+	if(excTerm != null) {
+	    assert originalExcVar.sort().equals(excTerm.sort());
+	    result.put(TB.var(originalExcVar), excTerm);
+	}
+        
+        //atPre-functions
+	if(heapAtPre != null) {
+	    assert originalHeapAtPre.sort().equals(heapAtPre.sort());
+	    result.put(originalHeapAtPre, heapAtPre);
+	}
+
+	return result;
+    }    
     
     
     
@@ -288,321 +277,378 @@ public final class OperationContractImpl implements OperationContract {
     //public interface
     //------------------------------------------------------------------------- 
     
+    @Override
     public String getName() {
         return name;
     }
     
-    
-    public String getDisplayName() {
-        return displayName;
+
+    @Override
+    public int id() {
+	return id;
     }
     
     
-    public ProgramMethod getProgramMethod() {
-        return programMethod;
+    @Override
+    public KeYJavaType getKJT() {
+	return kjt;
     }
     
     
+    @Override
+    public ProgramMethod getTarget() {
+        return pm;
+    }
+    
+    
+    @Override
+    public boolean hasMby() {
+	return originalMby != null;
+    }
+    
+        
+    @Override
+    public Term getPre(ProgramVariable selfVar, 
+	    	       ImmutableList<ProgramVariable> paramVars,
+                       Services services) {
+        assert (selfVar == null) == (originalSelfVar == null);
+        assert paramVars != null;
+        assert paramVars.size() == originalParamVars.size();
+        assert services != null;
+	final Map replaceMap = getReplaceMap(selfVar, 
+                                             paramVars, 
+                                             null, 
+                                             null,
+                                             null, 
+                                             services);
+	final OpReplacer or = new OpReplacer(replaceMap);
+	return or.replace(originalPre);
+    }
+    
+    
+    @Override
+    public Term getPre(Term heapTerm,
+	               Term selfTerm, 
+	    	       ImmutableList<Term> paramTerms,
+                       Services services) {
+	assert heapTerm != null;		
+        assert (selfTerm == null) == (originalSelfVar == null);
+        assert paramTerms != null;
+        assert paramTerms.size() == originalParamVars.size();
+        assert services != null;
+	final Map replaceMap = getReplaceMap(heapTerm, 
+					     selfTerm, 
+					     paramTerms, 
+					     null, 
+					     null, 
+					     null, 
+					     services);
+	final OpReplacer or = new OpReplacer(replaceMap);
+	return or.replace(originalPre);
+    }    
+    
+    
+    @Override
+    public Term getMby(ProgramVariable selfVar, 
+	    	       ImmutableList<ProgramVariable> paramVars,
+                       Services services) {
+        assert (selfVar == null) == (originalSelfVar == null);
+        assert paramVars != null;
+        assert paramVars.size() == originalParamVars.size();
+        assert services != null;
+	final Map replaceMap = getReplaceMap(selfVar, 
+                                             paramVars, 
+                                             null, 
+                                             null,
+                                             null, 
+                                             services);
+	final OpReplacer or = new OpReplacer(replaceMap);
+	return or.replace(originalMby);
+    }
+    
+    
+    @Override
+    public Term getMby(Term heapTerm,
+	               Term selfTerm, 
+	    	       ImmutableList<Term> paramTerms,
+                       Services services) {
+	assert heapTerm != null;		
+        assert (selfTerm == null) == (originalSelfVar == null);
+        assert paramTerms != null;
+        assert paramTerms.size() == originalParamVars.size();
+        assert services != null;
+	final Map replaceMap = getReplaceMap(heapTerm, 
+					     selfTerm, 
+					     paramTerms, 
+					     null, 
+					     null, 
+					     null, 
+					     services);
+	final OpReplacer or = new OpReplacer(replaceMap);
+	return or.replace(originalMby);
+    }    
+    
+
+    @Override
+    public OperationContract setID(int newId) {
+        return new OperationContractImpl(baseName,
+        	                         null,
+                			 kjt,        	                         
+                			 pm,
+                			 modality,
+                			 originalPre,
+                			 originalMby,
+                			 originalPost,
+                			 originalMod,
+                			 originalSelfVar,
+                			 originalParamVars,
+                			 originalResultVar,
+                			 originalExcVar,
+                			 originalHeapAtPre,
+                			 newId);	
+    }
+    
+    
+    @Override
+    public OperationContract setTarget(KeYJavaType newKJT,
+	    			       ObserverFunction newPM, 
+	    			       Services services) {
+        return new OperationContractImpl(baseName,
+        				 null,
+                			 newKJT,        				 
+                			 (ProgramMethod)newPM,
+                			 modality,
+                			 originalPre,
+                			 originalMby,
+                			 originalPost,
+                			 originalMod,
+                			 originalSelfVar,
+                			 originalParamVars,
+                			 originalResultVar,
+                			 originalExcVar,
+                			 originalHeapAtPre,
+                			 id);	
+    }
+    
+    
+    @Override
+    public String getHTMLText(Services services) {
+	final StringBuffer sig = new StringBuffer();
+	if(originalResultVar != null) {
+	    sig.append(originalResultVar);
+	    sig.append(" = ");
+	} else if(pm.isConstructor()) {
+	    sig.append(originalSelfVar);
+	    sig.append(" = new ");
+	}
+	if(!pm.isStatic() && !pm.isConstructor()) {
+	    sig.append(originalSelfVar);
+	    sig.append(".");
+	}
+	sig.append(pm.getName());
+	sig.append("(");
+	for(ProgramVariable pv : originalParamVars) {
+	    sig.append(pv.name());
+	}
+	sig.append(")");
+	sig.append(" catch(");
+	sig.append(originalExcVar);
+	sig.append(")");
+	
+        final String pre  = LogicPrinter.quickPrintTerm(originalPre, services);
+        final String mby  = hasMby() 
+        		    ? LogicPrinter.quickPrintTerm(originalMby, services)
+        	            : null;        
+        final String post = LogicPrinter.quickPrintTerm(originalPost, services);
+        final String mod  = LogicPrinter.quickPrintTerm(originalMod, services);
+                      
+        return "<html>"
+                + "<i>" + LogicPrinter.escapeHTML(sig.toString()) + "</i>"
+                + "<br><b>pre</b> "
+                + LogicPrinter.escapeHTML(pre)
+                + "<br><b>post</b> "
+                + LogicPrinter.escapeHTML(post)
+                + "<br><b>mod</b> "
+                + LogicPrinter.escapeHTML(mod)
+                + (hasMby() 
+                        ? "<br><b>measured-by</b> " + LogicPrinter.escapeHTML(mby)
+                        : "")                
+                + "<br><b>termination</b> "
+                + getModality()
+                + "</html>";
+    }    
+    
+    
+    @Override
     public Modality getModality() {
         return modality;
     }
     
-    
-    public FormulaWithAxioms getPre(ParsableVariable selfVar, 
-	    			    ImmutableList<ParsableVariable> paramVars,
-                                    Services services) {
-        assert (selfVar == null) == (originalSelfVar == null);
-        assert paramVars != null;
-        assert paramVars.size() == originalParamVars.size();
-        assert services != null;
-	Map<Operator, Operator> replaceMap = getReplaceMap(selfVar, 
-                                       paramVars, 
-                                       null, 
-                                       null,
-                                       null, 
-                                       services);
-	OpReplacer or = new OpReplacer(replaceMap);
-	return or.replace(originalPre);
-    }
-    
-    public FormulaWithAxioms getPre(ParsableVariable selfVar, 
-                        ImmutableList<ParsableVariable> paramVars,
-                        Term memoryArea,
+  
+    @Override
+    public Term getPost(ProgramVariable selfVar, 
+                        ImmutableList<ProgramVariable> paramVars, 
+                        ProgramVariable resultVar, 
+                        ProgramVariable excVar,
+                        Term heapAtPre,
                         Services services) {
         assert (selfVar == null) == (originalSelfVar == null);
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
-        assert services != null;
-        Map<Term, Term> replaceMap = getReplaceMap(selfVar, 
-                memoryArea,
-                paramVars, 
-                services);
-        OpReplacer or = new OpReplacer(replaceMap);
-        return or.replace(originalPre);
-    }
-    
-    public FormulaWithAxioms getPre(Term self, 
-                    ImmutableList<Term> params,
-                    Services services) {
-        assert (self == null) == (originalSelfVar == null);
-        assert params != null;
-        assert params.size() == originalParamVars.size();
-        assert services != null;
-        Map<Term, Term> replaceMap = getReplaceMap(self, 
-               params, 
-               services);
-        OpReplacer or = new OpReplacer(replaceMap);
-        return or.replace(originalPre);
-    }
-     
-    public Term getWorkingSpace(Term self, 
-            ImmutableList<Term> params,
-            Services services){
-        assert (self == null) == (originalSelfVar == null);
-        assert params != null;
-        assert params.size() == originalParamVars.size();
-        assert services != null;
-        Map<Term, Term> replaceMap = getReplaceMap(self, 
-                params, 
-                services);
-        OpReplacer or = new OpReplacer(replaceMap);
-        return or.replace(originalWorkingSpace);
-    }
-    
-    public Term getWorkingSpace(ParsableVariable selfVar, 
-                    ImmutableList<ParsableVariable> paramVars,
-                    Services services) {
-        assert (selfVar == null) == (originalSelfVar == null);
-        assert paramVars != null;
-        assert paramVars.size() == originalParamVars.size();
-        assert services != null;
-        Map<Operator, Operator> replaceMap = getReplaceMap(selfVar, 
-                paramVars, 
-                null, 
-                null,
-                null, 
-                services);
-        OpReplacer or = new OpReplacer(replaceMap);
-        return or.replace(originalWorkingSpace);
-    }
-   
-    
-    public FormulaWithAxioms getPost(ParsableVariable selfVar, 
-                                     ImmutableList<ParsableVariable> paramVars, 
-                                     ParsableVariable resultVar, 
-                                     ParsableVariable excVar,
-                                     /*inout*/ Map<Operator, Function> atPreFunctions,
-                                     Services services) {
-        assert (selfVar == null) == (originalSelfVar == null);
-        assert paramVars != null;
-        assert paramVars.size() == originalParamVars.size();
         assert (resultVar == null) == (originalResultVar == null);
         assert excVar != null;
-        assert atPreFunctions != null;
+        assert heapAtPre != null;
         assert services != null;
-	Map<Operator, Operator> replaceMap = getReplaceMap(selfVar, 
-                                       paramVars, 
-                                       resultVar, 
-                                       excVar, 
-                                       atPreFunctions, 
-                                       services);
-	OpReplacer or = new OpReplacer(replaceMap);
+	final Map replaceMap = getReplaceMap(selfVar, 
+                                       	     paramVars, 
+                                       	     resultVar, 
+                                       	     excVar, 
+                                       	     heapAtPre, 
+                                       	     services);
+	final OpReplacer or = new OpReplacer(replaceMap);
 	return or.replace(originalPost);
     }
     
-    public FormulaWithAxioms getPost(ParsableVariable selfVar, 
-            ImmutableList<ParsableVariable> paramVars, 
-            ParsableVariable resultVar, 
-            ParsableVariable excVar,
-            Term memoryArea,
-            /*inout*/ Map<Operator, Function> atPreFunctions,
-            Services services) {
-        assert (selfVar == null) == (originalSelfVar == null);
-        assert paramVars != null;
-        assert paramVars.size() == originalParamVars.size();
-        assert (resultVar == null) == (originalResultVar == null);
-        assert excVar != null;
-        assert atPreFunctions != null;
-        assert services != null;
-        Map<Operator, Operator> replaceMap = getReplaceMap(selfVar, 
-                paramVars, 
-                resultVar, 
-                excVar, 
-                atPreFunctions, 
-                services);
-        OpReplacer or = new OpReplacer(replaceMap);
-        Map<Term, Term> replaceMap2 = getReplaceMap(selfVar, 
-                memoryArea,
-                paramVars, 
-                services);
-        OpReplacer or2 = new OpReplacer(replaceMap2);
-        return or2.replace(or.replace(originalPost));
-    }
     
-    public FormulaWithAxioms getWorkingSpacePost(ParsableVariable selfVar, 
-            ImmutableList<ParsableVariable> paramVars, 
-            ParsableVariable resultVar, 
-            ParsableVariable excVar,
-            /*inout*/ Map<Operator, Function> atPreFunctions,
-            Services services) {
-        assert (selfVar == null) == (originalSelfVar == null);
-        assert paramVars != null;
-        assert paramVars.size() == originalParamVars.size();
-        assert (resultVar == null) == (originalResultVar == null);
-        assert excVar != null;
-        assert atPreFunctions != null;
+    @Override
+    public Term getPost(Term heapTerm,
+	                Term selfTerm, 
+                        ImmutableList<Term> paramTerms, 
+                        Term resultTerm, 
+                        Term excTerm,
+                        Term heapAtPre,
+                        Services services) {
+	assert heapTerm != null;
+        assert (selfTerm == null) == (originalSelfVar == null);
+        assert paramTerms != null;
+        assert paramTerms.size() == originalParamVars.size();
+        assert (resultTerm == null) == (originalResultVar == null);
+        assert excTerm != null;
+        assert heapAtPre != null;
         assert services != null;
-        Map<Operator, Operator> replaceMap = getReplaceMap(selfVar, 
-                paramVars, 
-                resultVar, 
-                excVar, 
-                atPreFunctions, 
-                services);
-        OpReplacer or = new OpReplacer(replaceMap);
-        return or.replace(originalWorkingSpacePost);
-    }
+	final Map replaceMap = getReplaceMap(heapTerm,
+		                             selfTerm, 
+                                             paramTerms, 
+                                             resultTerm, 
+                                             excTerm, 
+                                       	     heapAtPre, 
+                                       	     services);
+	final OpReplacer or = new OpReplacer(replaceMap);
+	return or.replace(originalPost);
+    }    
 
   
-    public ImmutableSet<LocationDescriptor> getModifies(ParsableVariable selfVar, 
-                                               ImmutableList<ParsableVariable> paramVars,
-                                               Services services) {
+    @Override
+    public Term getMod(ProgramVariable selfVar, 
+                       ImmutableList<ProgramVariable> paramVars,
+                       Services services) {
         assert (selfVar == null) == (originalSelfVar == null);
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
         assert services != null;
-	Map<Operator, Operator> replaceMap = getReplaceMap(selfVar, 
-                                       paramVars, 
-                                       null, 
-                                       null, 
-                                       null, 
-                                       services);
-	OpReplacer or = new OpReplacer(replaceMap);
-        return or.replaceLoc(originalModifies);
+	final Map replaceMap = getReplaceMap(selfVar, 
+                                             paramVars, 
+                                             null, 
+                                             null, 
+                                             null, 
+                                             services);
+	final OpReplacer or = new OpReplacer(replaceMap);
+        return or.replace(originalMod);
     }
     
     
+    @Override    
+    public Term getMod(Term heapTerm,
+	               Term selfTerm, 
+	    	       ImmutableList<Term> paramTerms,
+                       Services services) {
+	assert heapTerm != null;	
+        assert (selfTerm == null) == (originalSelfVar == null);
+        assert paramTerms != null;
+        assert paramTerms.size() == originalParamVars.size();
+        assert services != null;
+	final Map replaceMap = getReplaceMap(heapTerm,
+		                             selfTerm, 
+                                             paramTerms, 
+                                             null, 
+                                             null, 
+                                             null, 
+                                             services);
+	final OpReplacer or = new OpReplacer(replaceMap);
+	return or.replace(originalMod);
+    }
+    
+    
+    @Override
     public OperationContract union(OperationContract[] others, 
-                                   String p_name, 
-                                   String p_displayName, 
+                                   String newName, 
                                    Services services) {
         assert others != null;
         for(OperationContract contract : others) {
-            assert contract.getProgramMethod().equals(programMethod);
+            assert contract.getTarget().equals(pm);
         }
         if(others.length == 0) {
             return this;
         }
         
-        //copy atPre map
-        Map<Operator, Function> newAtPreFunctions 
-            = new LinkedHashMap<Operator, Function>();
-        newAtPreFunctions.putAll(originalAtPreFunctions);
-
         //collect information
-        FormulaWithAxioms pre = originalPre;
-        FormulaWithAxioms post = atPreify(originalPre, 
-                                          newAtPreFunctions, 
-                                          services).imply(originalPost);
-
-	FormulaWithAxioms wsPost = atPreify(originalPre, 
-                                          newAtPreFunctions, 
-					    services).imply(originalWorkingSpacePost);
-        ImmutableSet<LocationDescriptor> modifies = addGuard(originalModifies, 
-                                                    originalPre.getFormula());
-	
-	Term[] argTerms = new Term[originalParamVars.size()+(programMethod.isStatic()?0:1)];
-	int i = 0;
-	if(!programMethod.isStatic()){
-	    argTerms[i++] = TB.var((ProgramVariable) originalSelfVar);
-	}
-	for(ParsableVariable var : originalParamVars){
-	    argTerms[i++] = TB.var((ProgramVariable) var);
-	}
-	
-	Term ws = TB.tf().createWorkingSpaceNonRigidTerm(programMethod, 
-							 (Sort) services.getNamespaces().
-							 sorts().lookup(new Name("int")),
-							 argTerms);
-	ws = TB.ife(pre.getFormula(), originalWorkingSpace, ws);
-
+        Term pre = originalPre;
+        Term mby = originalMby;        
+        Term post = TB.imp(atPreify(originalPre, originalHeapAtPre, services), 
+        		   originalPost);
+        Term mod = originalMod;
         for(OperationContract other : others) {
-            FormulaWithAxioms otherPre = other.getPre(originalSelfVar, 
-                                                      originalParamVars, 
-                                                      services);
-            FormulaWithAxioms otherPost = other.getPost(originalSelfVar, 
-                                                        originalParamVars, 
-                                                        originalResultVar, 
-                                                        originalExcVar, 
-                                                        newAtPreFunctions, 
-                                                        services);
+            Term otherPre = other.getPre(originalSelfVar, 
+        	    			 originalParamVars, 
+        	    			 services);
+            Term otherMby = other.hasMby()
+            		    ? other.getMby(originalSelfVar, 
+            			           originalParamVars, 
+            			           services)
+            	            : null;   
+            Term otherPost = other.getPost(originalSelfVar, 
+        	    			   originalParamVars, 
+        	    			   originalResultVar, 
+        	    			   originalExcVar, 
+        	    			   originalHeapAtPre, 
+        	    			   services);
+            Term otherMod = other.getMod(originalSelfVar, 
+                                         originalParamVars, 
+                                         services);
 
-            FormulaWithAxioms otherWSPost = other.getWorkingSpacePost(originalSelfVar, 
-								      originalParamVars, 
-								      originalResultVar, 
-								      originalExcVar, 
-								      newAtPreFunctions, 
-								      services);
-
-	    Term otherWS = other.getWorkingSpace(originalSelfVar, 
-						 originalParamVars, 
-						 services);
-	    ws = TB.ife(otherPre.getFormula(), otherWS, ws);
-
-            ImmutableSet<LocationDescriptor> otherModifies 
-                    = other.getModifies(originalSelfVar, 
-                                        originalParamVars, 
-                                        services);
-
-            pre = pre.disjoin(otherPre);
-            post = post.conjoin(atPreify(otherPre, 
-                                         newAtPreFunctions, 
-                                         services).imply(otherPost));
-            wsPost = wsPost.conjoin(atPreify(otherPre, 
-					     newAtPreFunctions, 
-					     services).imply(otherWSPost));
-            modifies = modifies.union(addGuard(otherModifies, 
-                                      otherPre.getFormula()));
-
+            pre = TB.or(pre, otherPre);
+            mby = mby != null && otherMby != null
+                  ? TB.ife(otherPre, otherMby, mby)
+                  : null;            
+            post = TB.and(post, TB.imp(atPreify(otherPre, 
+        	    				originalHeapAtPre, 
+        	    				services), 
+        	    		       otherPost));
+            mod = TB.union(services, mod, otherMod);
         }
 
-        return new OperationContractImpl(p_name,
-                                         p_displayName,
-                                         programMethod,
+        return new OperationContractImpl("invalid_name",
+        				 newName,
+                                         kjt,        				 
+                                         pm,
                                          modality,
                                          pre,
+                                         mby,
                                          post,
-					 wsPost,
-                                         modifies,
-					 ws,					 
+                                         mod,
                                          originalSelfVar,
                                          originalParamVars,
                                          originalResultVar,
                                          originalExcVar,
-                                         newAtPreFunctions);
-    }
-    
-    public OperationContract replaceProgramMethod(ProgramMethod pm, 
-	    					  Services services) {
-        return new OperationContractImpl(name,
-                			 displayName,
-                			 pm,
-                			 modality,
-                			 originalPre,
-                			 originalPost,
-					 originalWorkingSpacePost,
-                			 originalModifies,
-					 originalWorkingSpace,					 
-                			 originalSelfVar,
-                			 originalParamVars,
-                			 originalResultVar,
-                			 originalExcVar,
-                			 originalAtPreFunctions);	
+                                         originalHeapAtPre,
+                                         INVALID_ID);
     }
     
     
-    public OperationContract addPre(FormulaWithAxioms addedPre,
-		    		    ParsableVariable selfVar, 
-		    		    ImmutableList<ParsableVariable> paramVars,
+    @Override
+    public OperationContract addPre(Term addedPre,
+		    		    ProgramVariable selfVar, 
+		    		    ImmutableList<ProgramVariable> paramVars,
 		    		    Services services) {
 	//replace in addedPre the variables used for self and parameters
 	Map <Operator, Operator> map = new LinkedHashMap<Operator,Operator>();
@@ -610,8 +656,8 @@ public final class OperationContractImpl implements OperationContract {
 	    map.put(selfVar, originalSelfVar);
 	}
 	if(paramVars != null) {
-	    Iterator<ParsableVariable> it1 = paramVars.iterator();
-	    Iterator<ParsableVariable> it2 = originalParamVars.iterator();
+	    Iterator<ProgramVariable> it1 = paramVars.iterator();
+	    Iterator<ProgramVariable> it2 = originalParamVars.iterator();
 	    while(it1.hasNext()) {
 		assert it2.hasNext();
 		map.put(it1.next(), it2.next());
@@ -621,84 +667,35 @@ public final class OperationContractImpl implements OperationContract {
 	addedPre = or.replace(addedPre);
 	
 	//create new contract
-        return new OperationContractImpl(name,
-		 			 displayName,
-		 			 programMethod,
+        return new OperationContractImpl(baseName,
+        	                         name,
+		 			 kjt,        	                         
+		 			 pm,
 		 			 modality,
-		 			 originalPre.conjoin(addedPre),
+		 			 TB.and(originalPre, addedPre),
+		 			 originalMby,
 		 			 originalPost,
-					 originalWorkingSpacePost,
-		 			 originalModifies,
-					 originalWorkingSpace,
+		 			 originalMod,
 		 			 originalSelfVar,
 		 			 originalParamVars,
 		 			 originalResultVar,
 		 			 originalExcVar,
-		 			 originalAtPreFunctions);
-    }
-    
-    public ImmutableSet<LocationDescriptor> getModifies(ParsableVariable self, 
-            Term memoryArea,
-            ImmutableList<ParsableVariable> params,
-            Services services) {
-        assert (self == null) == (originalSelfVar == null);
-        assert params != null;
-        assert params.size() == originalParamVars.size();
-        assert services != null;
-        Map<Term, Term> replaceMap = getReplaceMap(self, 
-                memoryArea,
-                params, 
-                services);
-        OpReplacer or = new OpReplacer(replaceMap);
-        return or.replaceLoc(originalModifies);
-    }
-
-    
-    public String getHTMLText(Services services) {
-        final String pre = LogicPrinter.quickPrintTerm(originalPre.getFormula(), 
-                services);
-        final String post = LogicPrinter.quickPrintTerm(originalPost.getFormula(), 
-                services);
-        final String ws = originalWorkingSpace!=null? LogicPrinter.quickPrintTerm(originalWorkingSpace, 
-                services) : "";
-        final String locDesc = LogicPrinter.quickPrintLocationDescriptors(originalModifies, 
-                services);
-                      
-        return "<html><b>pre</b> "
-                + LogicPrinter.escapeHTML(pre)
-                + "<br><b>post</b> "
-                + LogicPrinter.escapeHTML(post)
-                + "<br><b>modifies</b> "
-                + LogicPrinter.escapeHTML(locDesc)
-//                + "<br><b>working space</b> "
-//                + LogicPrinter.escapeHTML(ws)
-                + "<br><b>termination</b> "
-                + getModality()
-                + "</html>";
+		 			 originalHeapAtPre,
+		 			 id);
     }
     
     
+    @Override
     public String toString() {
 	return "pre: " 
-		+ originalPre 
+		+ originalPre
+		+ "; mby: " 
+		+ originalMby
 		+ "; post: " 
 		+ originalPost 
-		+ "; modifies: " 
-		+ originalModifies
-                + "; working space: "
-                + (originalWorkingSpace!=null? originalWorkingSpace : "not specified")
+		+ "; mod: " 
+		+ originalMod
 		+ "; termination: "
 		+ getModality();
-    }
-    
-    
-//    mbender
-    public FormulaWithAxioms getOriginalPre() {
-        return originalPre;
-    }
-
-    
-    public FormulaWithAxioms getOriginalPost() {
-        return originalPost;
     }
 }

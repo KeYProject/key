@@ -6,50 +6,34 @@
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 //
-//
-
 
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 
-public class Quantifier extends Op {
+public final class Quantifier extends AbstractSortedOperator {
     
-    /** creates a quantifier */
-    Quantifier(Name name) {
-	super(name);
-    }
-
     /** 
-     * @return Sort.FORMULA
+     * the ususal 'forall' operator 'all' (be A a formula then       
+     * 'all x.A' is true if and only if for all elements d of the
+     * universe A{x<-d} (x substitued with d) is true 
      */
-     public Sort sort(Term[] term) {
-        return Sort.FORMULA;
-    }  
-
+    public static final Quantifier ALL = new Quantifier(new Name("all"));
+    
     /** 
-     * for convenience reasons
-     * @return Sort.FORMULA
-     */
-     public Sort sort(Term term) {
-        return Sort.FORMULA;
-    }  
-
-    /** @return true iff the subterm at postion 0 has Sort.FORMULA and the
-     * arity of the term is 1 and at least one variable is bound.
-     */
-    public boolean validTopLevel(Term term){
-	if (term.arity()==0) return false;
-	if (term.varsBoundHere(0).size()==0) return false;
-        return term.sub(0).sort().equals(Sort.FORMULA);
-    }
+     * the ususal 'exists' operator 'ex' (be A a formula then       
+     * 'ex x.A' is true if and only if there is at least one elements
+     * d of the universe such that A{x<-d} (x substitued with d) is true 
+     */     
+    public static final Quantifier EX = new Quantifier(new Name("exist"));
 
 
-   /** @return arity of the Quantifier as int. */
-    public int arity() {
-	return 1;
-    }
-
+    private Quantifier(Name name) {
+	super(name, 
+              new Sort[]{Sort.FORMULA}, 
+              Sort.FORMULA, 
+              new Boolean[]{true}, 
+              true);
+    }    
 }

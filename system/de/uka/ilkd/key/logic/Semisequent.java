@@ -453,7 +453,7 @@ public class Semisequent implements Iterable<ConstrainedFormula> {
 
     /** 
      * returns iterator about the elements of the sequent     
-     * @return IteratorOfConstrainedFormula
+     * @return Iterator<ConstrainedFormula>
      */
     public Iterator<ConstrainedFormula> iterator() {
 	return seqList.iterator();
@@ -602,17 +602,5 @@ public class Semisequent implements Iterable<ConstrainedFormula> {
 	public String toString() {
 	    return "[]";
 	}
-	
-    }
-    
+    }    
 }
-
-
-
-
-
-
-
-
-
-

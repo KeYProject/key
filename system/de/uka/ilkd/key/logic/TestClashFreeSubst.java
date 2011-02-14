@@ -16,7 +16,6 @@ import java.io.StringWriter;
 import java.util.Stack;
 
 import junit.framework.TestCase;
-import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.*;
@@ -29,6 +28,7 @@ public class TestClashFreeSubst extends TestCase {
  
     TermFactory tf=TermFactory.DEFAULT;
 
+    Services services;
     NamespaceSet nss;
 
     Sort srt;
@@ -46,7 +46,22 @@ public class TestClashFreeSubst extends TestCase {
     }
 
     public void setUp() {
-	nss = new NamespaceSet();
+	services = new Services();
+	nss = services.getNamespaces();
+	
+	String sorts = "\\sorts{boolean;int;}";
+	KeYParser basicSortsParser = new KeYParser(ParserMode.DECLARATION, new KeYLexer(new StringReader(sorts),null),
+			      "No file. Call of parser from logic/TestClashFreeSubst.java",
+			      services, nss);
+	try {
+	    basicSortsParser.parseSorts();
+	} catch(Exception e) {
+	    throw new RuntimeException(e);
+	}
+	
+	Recoder2KeY r2k = new Recoder2KeY(services, nss);
+	r2k.parseSpecialClasses();
+	
 
 	parseDecls("\\sorts { srt; }\n" +
 		   "\\functions {\n" +
@@ -70,10 +85,10 @@ public class TestClashFreeSubst extends TestCase {
 	// The declaration parser cannot parse LogicVariables; these
 	// are normally declared in quantifiers, so we introduce them
 	// ourselves!
-	v = declareVar("v",srt);   t_v = tf.createVariableTerm(v);
-	x = declareVar("x",srt);   t_x = tf.createVariableTerm(x);
-	y = declareVar("y",srt);   t_y = tf.createVariableTerm(y);
-	z = declareVar("z",srt);   t_z = tf.createVariableTerm(z);
+	v = declareVar("v",srt);   t_v = tf.createTerm(v);
+	x = declareVar("x",srt);   t_x = tf.createTerm(x);
+	y = declareVar("y",srt);   t_y = tf.createTerm(y);
+	z = declareVar("z",srt);   t_z = tf.createTerm(z);
     }
 
     Sort lookup_sort(String name) {
@@ -100,12 +115,10 @@ public class TestClashFreeSubst extends TestCase {
     
 
     private KeYParser stringDeclParser(String s) {
-	Services serv = new Services ();
-	Recoder2KeY r2k = new Recoder2KeY(serv, nss);
-	r2k.parseSpecialClasses();
+
 	return new KeYParser(ParserMode.DECLARATION, new KeYLexer(new StringReader(s),null),
 			      "No file. Call of parser from logic/TestClashFreeSubst.java",
-			      serv, nss);
+			      services, nss);
     }
 
     public void parseDecls(String s) {
@@ -122,8 +135,9 @@ public class TestClashFreeSubst extends TestCase {
 
     private KeYParser stringTermParser(String s) {
 	return new KeYParser(ParserMode.GLOBALDECL,
-				   new KeYLexer(new StringReader(s),null),
-				   tf, new Services (), nss);
+			     new KeYLexer(new StringReader(s),null),
+			     services, 
+			     nss);
     }
 
     public Term parseTerm(String s) {
@@ -171,9 +185,9 @@ public class TestClashFreeSubst extends TestCase {
 	public void visit(Term visited) {
 	    Operator op = visited.op();
 	    int arity = visited.arity();
-	    if ( op == Op.ALL ) {
+	    if ( op == Quantifier.ALL ) {
 		Term top = (Term) subStack.peek();
-		if ( top.op() == Op.ALL )  {
+		if ( top.op() == Quantifier.ALL )  {
 		    QuantifiableVariable[] bv = 
 			new QuantifiableVariable[visited.varsBoundHere(0).size()
 						+top.varsBoundHere(0).size()];
@@ -186,18 +200,15 @@ public class TestClashFreeSubst extends TestCase {
 			    top.varsBoundHere(0).get(i);
 		    }
 		    subStack.pop();
-		    subStack.push(tf.createQuantifierTerm(
-                                      Op.ALL, bv, top.sub(0)));
+		    subStack.push(TermBuilder.DF.all(bv, top.sub(0)));
 		    return;
 		}
 	    }
-	    ImmutableArray<QuantifiableVariable>[] bv = new ImmutableArray[arity];
 	    Term[] sub = new Term[arity];
 	    for ( int i = arity-1; i>=0; i-- ) {
 		sub[i] = (Term) (subStack.pop());
-		bv[i] = visited.varsBoundHere(i);
 	    }
-	    subStack.push(tf.createTerm(op, sub, bv, null));
+	    subStack.push(tf.createTerm(op, sub, visited.boundVars(), null));
 	}
 
 	Term getResult() {
@@ -381,18 +392,5 @@ public class TestClashFreeSubst extends TestCase {
 			       x1.name () + ") )"),
 		     cfs.apply(t));
 	nss.setVariables(nss.variables().parent());
-    }
-
-    public void testClashInIfEx() {
-	Term ifEx = parseTerm("\\ifEx x; (x=v) \\then (v=x) \\else (false)");
-	assertEquals(ifEx.freeVars().size(), 1);
-	assertSame(ifEx.freeVars().iterator().next(), v);
-	
-	Term subst = parseTerm("x");
-	ClashFreeSubst cfs = new ClashFreeSubst(v,subst);
-	Term res = cfs.apply(ifEx);
-
-	assertEquals(res.freeVars().size(), 1);
-	assertSame(res.freeVars().iterator().next(), x);
     }
 }

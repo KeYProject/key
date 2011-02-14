@@ -29,6 +29,7 @@ public class SumFeature implements Feature {
 
         for ( int i = 1; i < features.length
                          && !( res instanceof TopRuleAppCost ); i++ )
+            
             res = res.add ( features[i].compute ( app, pos, goal ) );
 
         return res;

@@ -45,7 +45,7 @@ public class BoundVariableTools {
             if ( oldBoundVars.get ( i )
                  != newBoundVars.get ( i ) ) {
                 final Term newVarTerm =
-                    tf.createVariableTerm
+                    tf.createTerm
                     ( (LogicVariable)newBoundVars.get ( i ) );
                 final ClashFreeSubst subst =
                     new ClashFreeSubst ( oldBoundVars.get ( i ),
@@ -109,17 +109,17 @@ public class BoundVariableTools {
      * Ensure that none of the variables <code>criticalVars</code> is bound by
      * the top-level operator of <code>t</code> (by bound renaming)
      */
-    public Term resolveCollisions (Term t,
-                                   ImmutableSet<QuantifiableVariable> criticalVars) {
-        final ImmutableArray<QuantifiableVariable>[] newBoundVars =
-            new ImmutableArray [t.arity ()];
-        final Term[] newSubs = new Term [t.arity ()];
-        
-        if ( !resolveCollisions ( t, criticalVars, newBoundVars, newSubs ) )
-            return t;
-        
-        return tf.createTerm ( t.op (), newSubs, newBoundVars, t.javaBlock ());        
-    }
+//    public Term resolveCollisions (Term t,
+//                                   ImmutableSet<QuantifiableVariable> criticalVars) {
+//        final ImmutableArray<QuantifiableVariable>[] newBoundVars =
+//            new ImmutableArray<QuantifiableVariable> [t.arity ()];
+//        final Term[] newSubs = new Term [t.arity ()];
+//        
+//        if ( !resolveCollisions ( t, criticalVars, newBoundVars, newSubs ) )
+//            return t;
+//        
+//        return tf.createTerm ( t.op (), newSubs, newBoundVars, t.javaBlock ());        
+//    }
 
     /**
      * Ensure that none of the variables <code>criticalVars</code> is bound by

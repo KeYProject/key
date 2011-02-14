@@ -25,13 +25,10 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * @author mulbrich
  * @since 2006-12-14
  */
-public class EnumTypeCondition extends VariableConditionAdapter {
+public final class EnumTypeCondition extends VariableConditionAdapter {
 
-    private TypeResolver resolver;
-
-    // if negated==true than the result is negated, ie. true is returned iff var
-    // is NOT an array
-    private boolean negated;
+    private final TypeResolver resolver;
+    private final boolean negated;
 
     /**
      * creates a condition that checks if a type is a EnumDeclaration
@@ -39,25 +36,15 @@ public class EnumTypeCondition extends VariableConditionAdapter {
      * @param resolver
      *            the type resolver to be checked
      * @param negated
-     *            shlould the result be negated
+     *            should the result be negated
      */
     public EnumTypeCondition(TypeResolver resolver, boolean negated) {
         this.resolver = resolver;
         this.negated = negated;
     }
 
-    /**
-     * checks if the condition for a correct instantiation is fulfilled
-     * 
-     * @param var
-     *            the template Variable to be instantiated
-     * @param candidate
-     *            the SVSubstitute which is a candidate for an instantiation of
-     *            var
-     * @param svInst
-     *            the SVInstantiations that are already known to be needed
-     * @return true iff condition is fulfilled
-     */
+    
+    @Override
     public boolean check(SchemaVariable var, SVSubstitute candidate,
             SVInstantiations svInst, Services services) {
 
@@ -73,8 +60,9 @@ public class EnumTypeCondition extends VariableConditionAdapter {
         }
     }
 
+    
+    @Override    
     public String toString() {
         return (negated ? "\\not":"") + "\\isEnumType(" + resolver + ")";
     }
-
 }

@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -20,9 +20,7 @@ import de.uka.ilkd.key.java.SourceData;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.inst.GenericSortCondition;
-import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
@@ -71,15 +69,17 @@ import de.uka.ilkd.key.util.Debug;
 public abstract class Taclet implements Rule, Named {
     
     private static final String AUTONAME = "_taclet";
+    private static final TermBuilder TB = TermBuilder.DF;
 
     /** name of the taclet */
     private final Name name;
+    
     /** name displayed by the pretty printer */
     private final String displayName;
-    /** list of old names for downward compatibility */
-    private final ImmutableList<Name> oldNames;
+    
     /** contains useful text explaining the taclet */
     private final String helpText = null;
+    
     /** the set of taclet options for this taclet */
     protected final ImmutableSet<Choice> choices;
 
@@ -122,6 +122,7 @@ public abstract class Taclet implements Rule, Named {
      * should taclet be applied by strategies only 
      */
     private final boolean noninteractive;
+    
     /** 
      * constraint under which the Taclet is valid 
      */
@@ -142,6 +143,7 @@ public abstract class Taclet implements Rule, Named {
     /** tracks state of pre-computation */
     private boolean contextInfoComputed = false;
     private boolean contextIsInPrefix   = false;
+    
     /** true if one of the goal descriptions is a replacewith */
     private boolean hasReplaceWith      = false;
      
@@ -194,8 +196,7 @@ public abstract class Taclet implements Rule, Named {
 	this.prefixMap     = prefixMap;
         this.displayName   = attrs.displayName() == null ? 
                 name.toString() : attrs.displayName();
-        this.oldNames      = attrs.oldNames();
-
+        assert constraint.isBottom() : "metavariables are disabled";
     }
 
     protected void cacheMatchInfo() {
@@ -299,7 +300,8 @@ public abstract class Taclet implements Rule, Named {
      * @param v the bound variable to be searched 
      */
     protected boolean varIsBound(SchemaVariable v) {
-        return (v instanceof QuantifiableVariable) && getBoundVariables().contains((QuantifiableVariable) v);
+        return (v instanceof QuantifiableVariable) 
+        ? getBoundVariables().contains((QuantifiableVariable)v) : false;
     }
 
  
@@ -330,9 +332,10 @@ public abstract class Taclet implements Rule, Named {
 				    MatchConditions matchCond,
 				    Services        services,
 				    Constraint      userConstraint) {
-	Debug.out("taclet: Start Matching rule: ", name);
+	Debug.out("Start Matching rule: ", name);
 	matchCond = matchHelp(term, template, ignoreUpdates, matchCond, 
 		 services, userConstraint);	
+	Debug.out(matchCond == null ? "Failed: " : "Succeeded: ", name);
 	return matchCond == null ? null : checkConditions(matchCond, services);
     }
 
@@ -410,6 +413,11 @@ public abstract class Taclet implements Rule, Named {
         MatchConditions result = cond;
         final Iterator<SchemaVariable> svIterator = 
             cond.getInstantiations().svIterator();
+        
+        if(!svIterator.hasNext()) {
+            return checkVariableConditions(null, null, cond, services);//XXX
+        }
+        
         while (svIterator.hasNext()) {
             final SchemaVariable sv = svIterator.next();
             final Object o = result.getInstantiations().getInstantiation(sv);
@@ -425,80 +433,7 @@ public abstract class Taclet implements Rule, Named {
         return result;
     }
     
-    private MatchConditions addInstantiation(Term term, SchemaVariable sv, 
-					     MatchConditions matchCond,
-					     Services services) {   
-        MatchConditions result = matchCond;
-	Term t;
-	try {
-	    t = result.getInstantiations ().
-		getTermInstantiation(sv, 
-				     matchCond.
-				     getInstantiations().getExecutionContext(), 
-				     services);
-	} catch (IllegalInstantiationException e) {
-	    return null;
-	}
-	if (t != null) {
-	    Constraint c = result.getConstraint ().unify ( t, term, services );
-	    if ( !c.isSatisfiable () ) {
-		Debug.out("FAILED. 13: addInstantiation not satisfiable"); 
-		return null; //FAILED;
-	    } else {
-		return result.setConstraint ( c );
-	    }
-	}	
 
-	// no former matching found
-	result = checkVariableConditions(sv, term, result, services);
-	      
-	if (result == null) {
-	    Debug.out("FAILED. 13: Var Conds not met");	    
-	    return null; //FAILED;
-	}
-	
-	try {
-	    return result.setInstantiations ( result.getInstantiations ()
-					      .add(sv, term) );
-	} catch ( IllegalInstantiationException e ) 
-	    {Debug.out("Exception thrown by class Taclet at setInstantiations");}
-	Debug.out("FAILED. 14: Illegal Instantiation");	    
-	return null;
-    }
-    
-
-    /**
-     * Add a set of schema variable instantiations to the given match
-     * conditions object
-     * @param newInst the instantiations to be added; if the operator
-     * of any of the instantiations is a metavariable, this variable
-     * is also added to the set of new metavariable held by
-     * <code>matchCond</code>
-     * @return the match conditions after adding the new
-     * instantiations, or <code>null</code> if any of the new
-     * instantiations collide with older ones
-     */
-    private MatchConditions addNewInstantiations (ImmutableMap<SchemaVariable,Term> newInst,
-                                                  MatchConditions matchCond,
-                                                  Services services) {
-        final Iterator<ImmutableMapEntry<SchemaVariable,Term>> it = newInst.entryIterator ();
-        while ( it.hasNext () ) {
-            final ImmutableMapEntry<SchemaVariable,Term> entry = it.next ();
-            matchCond = addInstantiation ( entry.value (),
-                                           entry.key (),
-                                           matchCond,
-                                           services );
-            if ( matchCond == null ) return null;
-            final Operator op = entry.value ().op ();
-            if ( op instanceof Metavariable ) {
-                final ImmutableSet<Metavariable> newMVs =
-                    matchCond.getNewMetavariables ().add ( (Metavariable)op );
-                matchCond = matchCond.setNewMetavariables ( newMVs );
-            }
-        }
-        return matchCond;
-    }
- 
     /**
      * tries to match the bound variables of the given term against the one
      * described by the template
@@ -568,7 +503,7 @@ public abstract class Taclet implements Rule, Named {
       
 	if (term.javaBlock().isEmpty()) {
 	    if (!template.javaBlock().isEmpty()){
-		Debug.out("Match Failes. No program to match.");
+		Debug.out("Match Failed. No program to match.");
 		return null; //FAILED
 	    }
             if (template.javaBlock().program()
@@ -605,61 +540,41 @@ public abstract class Taclet implements Rule, Named {
     private MatchConditions matchHelp(final Term             term,
 				      final Term             template, 
 				      final boolean          ignoreUpdates,
-				      MatchConditions  matchCond,
+				      MatchConditions  	     matchCond,
 				      final Services         services,
 				      final Constraint       userConstraint) {
 	Debug.out("Match: ", template);
 	Debug.out("With: ",  term);
         
-        
 	final Operator sourceOp   = term.op ();
         final Operator templateOp = template.op ();
+        assert !(sourceOp instanceof Metavariable) : "metavariables are disabled";        
+        assert !(templateOp instanceof Metavariable) : "metavariables are disabled";
         
         if ( ignoreUpdates
-             && sourceOp instanceof IUpdateOperator
-             && ( !( templateOp instanceof SchemaVariable )
-                  || ( templateOp instanceof ModalOperatorSV ) )
-             && !( templateOp instanceof IUpdateOperator ) ) {
+             && sourceOp instanceof UpdateApplication
+//             &&  !( templateOp instanceof SchemaVariable )
+//                  || templateOp instanceof ModalOperatorSV  
+             && !(templateOp instanceof UpdateApplication) ) {
 	    // updates can be ignored
+            Term update = UpdateApplication.getUpdate(term);
 	    matchCond = matchCond
 		.setInstantiations ( matchCond.getInstantiations ().
-				     addUpdate (term) );
-	    return matchHelp(((IUpdateOperator)sourceOp).target(term), template,
-			     true, matchCond, services, userConstraint);
+				     addUpdate (update) );
+	    return matchHelp(UpdateApplication.getTarget(term), 
+		    	     template,
+			     true, 
+			     matchCond, 
+			     services, 
+			     userConstraint);
 	}
     
-	if ( templateOp instanceof Metavariable ) {		
-	    Constraint c = matchCond.getConstraint().unify( term, template, services );
-	        
-	    if (c.isSatisfiable()) {
-	        return matchCond.setConstraint( c );
-	    }
-        
-	    Debug.out("FAILED. 3a: constraint unsatisfiable");
-	    return null;
-	}
-    
-	if ( !(templateOp instanceof SchemaVariable) && 
-	     sourceOp instanceof Metavariable ) {		
-	    // "term" is a metavariable, "template" neither a
-	    // schemavariable nor a metavariable
-	    return matchMVTerm ( term,
-                                 template,
-                                 ignoreUpdates,
-                                 matchCond,
-                                 services,
-                                 userConstraint );
-	}
-
-	if ( templateOp instanceof SortedSchemaVariable ) {
-	    return templateOp.match ( term,
-	                                                        matchCond,
-	                                                        services );
+	if(templateOp instanceof SchemaVariable && templateOp.arity() == 0) {
+	    return templateOp.match(term, matchCond, services);
         }
     
-	matchCond = templateOp.match ( sourceOp, matchCond, services );
-	
-	if (matchCond == null) {
+	matchCond = templateOp.match (sourceOp, matchCond, services);
+	if(matchCond == null) {
 	    Debug.out("FAILED 3x.");
 	    return null; ///FAILED
 	} 
@@ -680,9 +595,13 @@ public abstract class Taclet implements Rule, Named {
 	}
 	
 	    
-	for (int i = 0, arity=term.arity(); i < arity; i++) {
-	    matchCond = matchHelp(term.sub(i), template.sub(i), false,
-				  matchCond, services, userConstraint);
+	for (int i = 0, arity = term.arity(); i < arity; i++) {
+	    matchCond = matchHelp(term.sub(i), 
+		    		  template.sub(i), 
+		    		  false,
+				  matchCond, 
+				  services, 
+				  userConstraint);
 	    if (matchCond == null) {		      
 	        return null; //FAILED
 	    } 
@@ -691,139 +610,7 @@ public abstract class Taclet implements Rule, Named {
         return matchCond.shrinkRenameTable();
     }
     
-    /**
-     * Match a template which is neither a metavariable nor a schema
-     * variable against a term that is a metavariable
-     * @param term term whose operator is a metavariable
-     * @param template template whose operator is neither a
-     * metavariable nor a schema variable
-     */
-    private MatchConditions matchMVTerm (Term term,
-					 Term template,
-					 boolean ignoreUpdates,
-					 MatchConditions matchCond,
-					 Services services,
-					 Constraint userConstraint) {
 
-        // try to instantiate "term" according to the current constraint
-        final Term t = getInstantiationFor ( (Metavariable)term.op (),
-                                             matchCond.getConstraint () );
-        if ( t != null )
-            return matchHelp ( t,
-                               template,
-                               ignoreUpdates,
-                               matchCond,
-                               services,
-                               userConstraint );
-
-        return matchMVTermHelp ( term,
-				 template,
-				 ignoreUpdates,
-				 matchCond,
-				 services,
-				 userConstraint );
-    }
-
-    /**
-     * Match a template which is neither a metavariable nor a schema
-     * variable against a term that is a metavariable; try to use an
-     * instantiation of the metavariable given by the user constraint
-     * @param term term whose operator is a metavariable
-     * @param template template whose operator is neither a
-     * metavariable nor a schema variable
-     */
-    private MatchConditions matchMVTermHelp (Term term,
-					     Term template,
-					     boolean ignoreUpdates,
-					     MatchConditions matchCond,
-					     Services services,
-					     Constraint userConstraint) {
-        // try to instantiate "term" according to the current user constraint
-        final Term t = getInstantiationFor ( (Metavariable)term.op (),
-                                              userConstraint );
-
-        if ( t == null )
-            return matchMVTermWithMatchVariables
-		( term, template, matchCond, services );
-
-        final Constraint c = matchCond.getConstraint ().unify ( term, t, 
-                services );
-        if ( c.isSatisfiable () ) {
-            MatchConditions mc = matchHelp ( t,
-                                             template,
-                                             ignoreUpdates,
-                                             matchCond.setConstraint ( c ),
-                                             services,
-                                             userConstraint );
-            if ( mc != null ) return mc;
-        }
-
-        return matchMVTermWithMatchVariables
-	    ( term, template, matchCond, services );
-    }
-
-    private Term getInstantiationFor (Metavariable p_mv, Constraint p_constraint) {
-        if ( !( p_constraint instanceof EqualityConstraint ) ) return null;
-
-        final EqualityConstraint ec = (EqualityConstraint)p_constraint;
-        return ec.getDirectInstantiation ( p_mv );
-    }
-    
-    /**
-     * Match a template which is neither a metavariable nor a schema
-     * variable against a term that is a metavariable; try to replace
-     * schema variables that occur in the template with new metavariables
-     * @param term term whose operator is a metavariable
-     * @param template template whose operator is neither a
-     * metavariable nor a schema variable
-     */
-    private MatchConditions
-	matchMVTermWithMatchVariables (Term term,
-				       Term template,
-				       MatchConditions matchCond,
-				       Services services) {
-        // try to instantiate uninstantiated SVs by
-        // creating new metavariables or bound
-        // logicvariables
-        SyntacticalReplaceVisitor srVisitor;
-        try {
-            srVisitor = new SyntacticalReplaceVisitor ( services,
-                                                        matchCond.getInstantiations (),
-                                                        matchCond.getConstraint (),
-                                                        true,
-                                                        term.op ().name () );
-            template.execPostOrder ( srVisitor );
-        } catch ( IllegalInstantiationException e ) {
-            return null; //FAILED;
-        }
-
-        final ImmutableMap<SchemaVariable,Term> newInst = srVisitor.getNewInstantiations ();
-        if ( newInst == null ) return null; //FAILED;
-
-        final MatchConditions mc = addNewInstantiations ( newInst,
-                                                          matchCond,
-                                                          services );
-
-        if ( mc == null ) return null; //FAILED;              
-
-        return addConstraint ( term, srVisitor.getTerm (), mc, services );
-    }
-
-    /**
-     * Unify the given terms and add the result to the constraint held
-     * by <code>matchCond</code>
-     * @return the new match conditions, or <code>null</code> if the
-     * terms are not unifiable given the constraint already present
-     */
-    private MatchConditions addConstraint (Term term,
-                                           Term instantiatedTerm,
-                                           MatchConditions matchCond,
-                                           Services services) {
-        final Constraint c = matchCond.getConstraint ().unify ( term,
-                                                                instantiatedTerm, services );
-
-        return c.isSatisfiable () ? matchCond.setConstraint ( c ) : null;
-    }
 
     /**
      * Match the given template (which is probably a formula of the if
@@ -853,10 +640,10 @@ public abstract class Taclet implements Rule, Named {
 	if ( p_matchCond.getInstantiations ().getUpdateContext().isEmpty() )
 	    updateFormula = p_template;
 	else
-	    updateFormula = TermFactory.DEFAULT
-		.createUpdateTerm(p_matchCond.getInstantiations ()
-				  .getUpdateContext(),
-				  p_template);
+	    updateFormula 
+	    	= TB.applySequential(p_matchCond.getInstantiations()
+				                .getUpdateContext(), 
+				     p_template);
 
 	IfFormulaInstantiation           cf;
 	Constraint                       newConstraint;
@@ -938,13 +725,6 @@ public abstract class Taclet implements Rule, Named {
     }
     
     
-    /** returns the list of old names of the taclet
-     */
-    public ImmutableList<Name> oldNames() {
-	return oldNames;
-    }
-    
-    
     public String helpText() {
        return helpText;
     }
@@ -990,6 +770,11 @@ public abstract class Taclet implements Rule, Named {
     public ImmutableSet<Choice> getChoices(){
 	return choices;
     }
+
+    /** returns an iterator over the rule sets. */
+    public Iterator<RuleSet> ruleSets() {
+	return ruleSets.iterator();
+    } 
 
     public ImmutableList<RuleSet> getRuleSets() {
 	return ruleSets;
@@ -1069,13 +854,18 @@ public abstract class Taclet implements Rule, Named {
 
 	if (!name.equals(t2.name)) return false;
 
-        for (final Choice choice1 : choices) {
-            for (Choice choice2 : t2.getChoices()) {
-                if (choice1 != choice2 && choice1.category().equals(choice2.category())) {
-                    return false;
-                }
-            }
-        }
+        final Iterator<Choice> it1 = choices.iterator();
+	        
+	while (it1.hasNext()) {
+            final Choice c1 = it1.next(); 
+            final Iterator<Choice> it2 = t2.getChoices().iterator();
+	    while (it2.hasNext()){
+                final Choice c2 = it2.next();
+		if(c1 != c2 && c1.category().equals(c2.category())){
+		    return false;
+		}
+	    }
+	}
 
         return true;
     }
@@ -1156,8 +946,8 @@ public abstract class Taclet implements Rule, Named {
                     services, matchCond);
         
         if (!svInst.getUpdateContext().isEmpty()) {
-            instantiatedFormula = TermFactory.DEFAULT.
-              createUpdateTerm(svInst.getUpdateContext(), instantiatedFormula);         
+            instantiatedFormula = TB.applySequential(svInst.getUpdateContext(), 
+            		           	             instantiatedFormula);         
 	} 
 	        
 	return new ConstrainedFormula(instantiatedFormula, 
@@ -1177,10 +967,11 @@ public abstract class Taclet implements Rule, Named {
             MatchConditions matchCond) {       
         
         ImmutableList<ConstrainedFormula> replacements = ImmutableSLList.<ConstrainedFormula>nil();
-
-        for (Object aSemi : semi) {
+        final Iterator<ConstrainedFormula> it = semi.iterator();        
+        
+        while (it.hasNext()) {
             replacements = replacements.append
-                    (instantiateReplacement((ConstrainedFormula) aSemi, services, matchCond));
+                (instantiateReplacement(it.next(), services, matchCond));           
         }
         return replacements;
     }
@@ -1307,10 +1098,11 @@ public abstract class Taclet implements Rule, Named {
     protected void applyAddrule(ImmutableList<Taclet> rules, Goal goal, 
 				Services services,
 				MatchConditions matchCond) {
-
-        for (Taclet rule : rules) {
-            Taclet tacletToAdd = rule;
-            String uniqueTail = ""; // we need to name the new taclet uniquely
+                                
+	final Iterator<Taclet> it = rules.iterator();
+	while (it.hasNext()) {
+	    Taclet tacletToAdd = it.next(); 
+	    String uniqueTail=""; // we need to name the new taclet uniquely
 /*
             TacletGoalTemplate replacewithCandidate = null;
 	    Iterator<TacletGoalTemplate> actions = 
@@ -1338,50 +1130,55 @@ public abstract class Taclet implements Rule, Named {
 	    }
 */
             if ("".equals(uniqueTail)) { // otherwise just number it
-                Node n = goal.node();
-                uniqueTail = AUTONAME + n.getUniqueTacletNr() + "_" + n.parent().siblingNr();
+               de.uka.ilkd.key.proof.Node n = goal.node();
+               uniqueTail = AUTONAME+n.getUniqueTacletNr()+"_"+n.parent().siblingNr();
             }
 
-            tacletToAdd = tacletToAdd.setName(tacletToAdd.name() + uniqueTail);
+            tacletToAdd=tacletToAdd.setName(tacletToAdd.name()+uniqueTail);
 
 
-            // the new Taclet may contain variables with a known
-            // instantiation. These must be used by the new Taclet and all
-            // further rules it contains in the addrules-sections. Therefore all
-            // appearing (including the addrules) SchemaVariables have to be
-            // collected, then it is looked if an instantiation is known and if
-            // positive the instantiation is memorized. At last the Taclet with
-            // its required instantiations is handed over to the goal, where a
-            // new TacletApp should be built including the necessary instantiation
-            // information
+	    // the new Taclet may contain variables with a known
+	    // instantiation. These must be used by the new Taclet and all
+	    // further rules it contains in the addrules-sections. Therefore all
+	    // appearing (including the addrules) SchemaVariables have to be
+	    // collected, then it is looked if an instantiation is known and if
+	    // positive the instantiation is memorized. At last the Taclet with
+	    // its required instantiations is handed over to the goal, where a
+	    // new TacletApp should be built including the necessary instantiation
+	    // information
 
-            SVInstantiations neededInstances = SVInstantiations.
-                    EMPTY_SVINSTANTIATIONS.addUpdateList
-                    (matchCond.getInstantiations().getUpdateContext());
-            final TacletSchemaVariableCollector collector = new
-                    TacletSchemaVariableCollector();
-            collector.visit(tacletToAdd, true);// true, because
-            // descend into
-            // addrules
-            final Iterator<SchemaVariable> svIt = collector.varIterator();
-            while (svIt.hasNext()) {
-                SchemaVariable sv = svIt.next();
-                if (matchCond.getInstantiations().isInstantiated(sv)) {
-                    neededInstances = neededInstances.add
-                            (sv, matchCond.getInstantiations().getInstantiationEntry(sv));
-                }
-            }
+	    SVInstantiations neededInstances = SVInstantiations.
+		EMPTY_SVINSTANTIATIONS.addUpdateList
+		(matchCond.getInstantiations ().getUpdateContext());
+	    final TacletSchemaVariableCollector collector = new
+		TacletSchemaVariableCollector(); 
+	    collector.visit(tacletToAdd, true);// true, because
+	                                     // descend into
+					     // addrules
+	    final Iterator<SchemaVariable> svIt = collector.varIterator();
+	    while (svIt.hasNext()) {
+		SchemaVariable sv = svIt.next();
+		if (matchCond.getInstantiations ().isInstantiated(sv)) {
+		    neededInstances = neededInstances.add(
+			    	sv, 
+			    	matchCond.getInstantiations ().getInstantiationEntry(sv), 
+				services);
+		} 
+	    }
 
-            {
-                final ImmutableList<GenericSortCondition> cs =
-                        matchCond.getInstantiations()
-                                .getGenericSortInstantiations().toConditions();
+	    {
+		final ImmutableList<GenericSortCondition>     cs  =
+		    matchCond.getInstantiations ()
+		    .getGenericSortInstantiations ().toConditions ();
+		final Iterator<GenericSortCondition> cit = cs.iterator ();
 
-                for (GenericSortCondition c : cs) neededInstances = neededInstances.add(c);
-            }
+		while ( cit.hasNext () )
+		    neededInstances = neededInstances.add(cit.next (), 
+			    				  services );
+	    }
 
-            goal.addTaclet(tacletToAdd, neededInstances, matchCond.getConstraint(), true);
-        }
+	    goal.addTaclet(tacletToAdd, neededInstances, matchCond.getConstraint (), true);
+	}
     }
 
 
@@ -1395,12 +1192,6 @@ public abstract class Taclet implements Rule, Named {
 	for (final SchemaVariable sv : pvs) {
 	    ProgramVariable inst
 		= (ProgramVariable)matchCond.getInstantiations ().getInstantiation(sv);
-	    //if the goal already contains the variable to be added 
-	    //(not just a variable with the same name), then there is nothing to do
-	    if(goal.getGlobalProgVars().contains(inst)) {
-		continue;
-	    }
-	    
 	    final VariableNamer vn = services.getVariableNamer();
 	    inst = vn.rename(inst, goal, posOfFind);
             final RenamingTable rt = 
@@ -1452,8 +1243,8 @@ public abstract class Taclet implements Rule, Named {
 	    p_numberOfNewGoals = 1;
 
 	if ( p_list != null ) {
-	    int                              i      = ifSequent ().antecedent ().size ();
-	    Term                             ifPart;
+	    int i = ifSequent ().antecedent ().size ();
+	    Term ifPart;
 
 	    for (final IfFormulaInstantiation inst : p_list) {
 		if ( !( inst instanceof IfFormulaInstSeq ) ) {
@@ -1462,15 +1253,14 @@ public abstract class Taclet implements Rule, Named {
 
 		    // negate formulas of the if succedent
 		    if ( i <= 0 )
-			ifPart = TermFactory.DEFAULT.createJunctorTerm
-			    ( Op.NOT, ifPart );		    
+			ifPart = TB.not(ifPart);		    
 
 		    if ( res == null ) {
 			res   = p_goal.split( p_numberOfNewGoals + 1 );
 			ifObl = ifPart;
 		    } else
-			ifObl = TermFactory.DEFAULT.createJunctorTerm
-			    ( Op.AND, ifObl, ifPart );
+			ifObl = TermFactory.DEFAULT.createTerm
+			    ( Junctor.AND, ifObl, ifPart );
 		    
 		    // UGLY: We create a flat structure of the new
 		    // goals, thus the if formulas have to be added to
@@ -1595,7 +1385,7 @@ public abstract class Taclet implements Rule, Named {
 		if (itVarsNotFreeIn.hasNext()) sb=sb.append(", ");
 	    }
 	    while (itVC.hasNext()) {
-		sb.append(itVC.next());
+		sb.append("" + itVC.next());
 		if (itVC.hasNext())
 		    sb.append(", ");
 	    }
@@ -1619,7 +1409,7 @@ public abstract class Taclet implements Rule, Named {
     }
 
     StringBuffer toStringRuleSets(StringBuffer sb) {
-	final Iterator<RuleSet> itRS=getRuleSets().iterator();
+	Iterator<RuleSet> itRS=ruleSets();
 	if (itRS.hasNext()) {
 	    sb=sb.append("\\heuristics(");
 	    while (itRS.hasNext()) {
@@ -1681,18 +1471,4 @@ public abstract class Taclet implements Rule, Named {
         }
         return false;
     }
-        
-    /** returns the variables in a Taclet with a read access
-    */
-    public ImmutableList<SchemaVariable> readSet() {
-	return ImmutableSLList.<SchemaVariable>nil();
-    }
-
-    /** returns the variable in a Taclet to which is written to
-    */
-    public ImmutableList<SchemaVariable> writeSet() {
-	return ImmutableSLList.<SchemaVariable>nil(); 
-    }
-  
-         
 }

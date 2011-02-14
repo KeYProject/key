@@ -10,12 +10,202 @@
 
 package de.uka.ilkd.key.logic.sort;
 
+import java.lang.ref.WeakReference;
+import java.util.WeakHashMap;
 
-public interface ArraySort extends CollectionSort, ObjectSort, SortDefiningSymbols {
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.abstraction.Type;
+import de.uka.ilkd.key.logic.Name;
+
+
+public final class ArraySort extends AbstractSort {
+
+    private static final WeakHashMap<SortKey, WeakReference<ArraySort>> aSH 
+    	= new WeakHashMap<SortKey, WeakReference<ArraySort>>();
+    
+    /** keeping this key is important to prevent for too early hashmap removal*/
+    private final SortKey sk;    
+
+
+    //-------------------------------------------------------------------------
+    //constructors
+    //------------------------------------------------------------------------- 
+        
+    private ArraySort(ImmutableSet<Sort> extendsSorts, SortKey sk) {
+	super(new Name((sk.elemType != null 
+		        ? sk.elemType.getName() 
+		        : sk.elemSort.name()) + "[]"), 
+              extendsSorts, 
+              false);
+	assert(!extendsSorts.isEmpty());	
+
+	this.sk = sk;
+    }    
+
+
+    
+
+    //-------------------------------------------------------------------------
+    //internal methods
+    //------------------------------------------------------------------------- 
+
+
+    private static ImmutableSet<Sort> getArraySuperSorts(Sort elemSort, 
+	    					Sort objectSort, 
+	    					Sort cloneableSort,
+	    					Sort serializableSort) {
+	ImmutableSet<Sort> result = DefaultImmutableSet.<Sort>nil();
+	
+	ImmutableSet<Sort> elemDirectSuperSorts = elemSort.extendsSorts();
+	if(elemDirectSuperSorts.equals(DefaultImmutableSet.<Sort>nil()
+		                                      .add(Sort.ANY))) {
+	    result = result.add(objectSort)
+	                   .add(cloneableSort)
+	                   .add(serializableSort);    
+	} else {
+	    for(Sort s : elemDirectSuperSorts) {
+		result = result.add(getArraySort(s,
+						 objectSort,
+						 cloneableSort,
+						 serializableSort));
+	    }
+	}
+
+	return result;
+    }
+    
+    
+
+    //-------------------------------------------------------------------------
+    //public interface
+    //------------------------------------------------------------------------- 
+
+    /**
+     * returns the ArraySort to the given elementsort. This method ensures that
+     * only one ArraySort-object exists for each Arraysort.
+     */
+    public static ArraySort getArraySort(Sort elemSort, 
+	                                 Type elemType,
+	    				 Sort objectSort, 
+	    				 Sort cloneableSort,
+	    				 Sort serializableSort) {
+	// this wrapper is required as some element sorts are shared among 
+	// several environments (int, boolean)
+	final SortKey sortKey = new SortKey(elemSort, 
+		                            elemType,
+					    objectSort, 
+					    cloneableSort, 
+					    serializableSort);
+	WeakReference<ArraySort> ref = aSH.get(sortKey);
+	ArraySort as = ref != null ? ref.get() : null;          
+
+	if(as == null) { 
+	    ImmutableSet<Sort> localExtendsSorts 
+	    	= getArraySuperSorts(elemSort, 
+	    		             objectSort,
+	    		             cloneableSort, 
+	    		             serializableSort);
+	    as = new ArraySort(localExtendsSorts, sortKey);
+	    aSH.put(sortKey, new WeakReference<ArraySort>(as));
+	}
+	return as;
+    }
+    
+    
+    public static ArraySort getArraySort(Sort elemSort,
+	    				 Sort objectSort, 
+	    				 Sort cloneableSort,
+	    				 Sort serializableSort) {
+	return getArraySort(elemSort, 
+		            null, 
+		            objectSort, 
+		            cloneableSort, 
+		            serializableSort);
+    }
+    
+
+    /** 
+     * returns elemSort([])^n.
+     */
+    public static Sort getArraySortForDim(Sort elemSort, 
+	    				  int n,
+	    				  Sort objectSort, 
+	    				  Sort cloneableSort, 
+	    				  Sort serializableSort) {
+	Sort result = elemSort;
+	while(n > 0){
+	    result = getArraySort(result, 
+		    		  objectSort, 
+		    		  cloneableSort, 
+		    		  serializableSort);
+	    n--;
+	}
+	return result;
+    }    
+        
+
+
+    /**
+     * @return an object of this class with elementSort().equals(p),
+     * or null if such an object cannot be constructed (as p is an
+     * incompatible sort).
+     */
+    public Sort cloneFor(Sort p) {
+        return getArraySort ( p, 
+        		      sk.javaLangObjectSort, 
+        		      sk.javaLangCloneable, 
+        		      sk.javaLangSerializable);
+    }
+
 
     /**
      * returns the element sort of the array
      */
-    Sort elementSort();
+    public Sort elementSort() {
+        return sk.elemSort;
+    }
+       
+    
+    private static final class SortKey {
+	final Sort elemSort;
+	final Type elemType;
+	final Sort javaLangObjectSort;
+	final Sort javaLangSerializable;
+	final Sort javaLangCloneable;
 
+	public SortKey(Sort elemSort, 
+		       Type elemType,
+		       Sort javaLangObjectSort, 
+		       Sort javaLangCloneable, 
+		       Sort javaLangSerializable) {         
+	    this.elemSort = elemSort;
+	    this.elemType = elemType;
+	    this.javaLangObjectSort = javaLangObjectSort;            
+	    this.javaLangCloneable = javaLangCloneable;
+	    this.javaLangSerializable = javaLangSerializable;
+	}
+
+
+	public boolean equals(Object o) {
+	    if (!(o instanceof SortKey)) {
+		return false;
+	    }
+	    final SortKey sk = (SortKey) o;
+	    return elemSort == sk.elemSort
+	           && elemType == sk.elemType
+	           && javaLangObjectSort == sk.javaLangObjectSort 
+	           && javaLangSerializable == sk.javaLangSerializable 
+	           && javaLangCloneable    == sk.javaLangCloneable;                
+	}
+
+	
+	public int hashCode() {
+	    return elemSort.hashCode() 
+	           + (elemType == null ? 0 : 31*elemType.hashCode())
+	           + (javaLangCloneable == null ? 0 : 31*javaLangCloneable.hashCode()) 
+	           + (javaLangObjectSort == null ? 0 : 17*javaLangObjectSort.hashCode()) 
+	           + (javaLangSerializable == null ? 0 : 3*javaLangSerializable.hashCode());
+	}
+    }
 }

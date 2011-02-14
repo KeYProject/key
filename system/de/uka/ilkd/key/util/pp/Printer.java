@@ -139,7 +139,7 @@ class Printer {
     }
 
     private void push(int n,int breaks) {
-	marginStack.add(new Integer(n|breaks));
+	marginStack.add(Integer.valueOf(n|breaks));
     }
 
     /** Pop one element from the space stack. */

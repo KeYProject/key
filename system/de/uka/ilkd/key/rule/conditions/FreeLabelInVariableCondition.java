@@ -5,6 +5,7 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+
 package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Label;
@@ -17,7 +18,8 @@ import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
-public class FreeLabelInVariableCondition extends VariableConditionAdapter {
+public final class FreeLabelInVariableCondition 
+				extends VariableConditionAdapter {
 
     private final SchemaVariable label;
     private final SchemaVariable statement;
@@ -31,8 +33,11 @@ public class FreeLabelInVariableCondition extends VariableConditionAdapter {
     }
     
     
-    public boolean check(SchemaVariable var, SVSubstitute instCandidate, 
-            SVInstantiations instMap, Services services) {
+    @Override
+    public boolean check(SchemaVariable var, 
+	    		 SVSubstitute instCandidate, 
+	    		 SVInstantiations instMap, 
+	    		 Services services) {
         Label prgLabel = null;
         ProgramElement program = null;
         
@@ -53,8 +58,9 @@ public class FreeLabelInVariableCondition extends VariableConditionAdapter {
         return negated ? !freeIn : freeIn;
     }
     
+    
+    @Override
     public String toString() {
         return (negated ? "\\not" : "") + "\\freeLabelIn (" + label.name() + "," + statement.name() + ")";
     }
-
 }

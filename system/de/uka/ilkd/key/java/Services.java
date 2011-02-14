@@ -24,9 +24,6 @@ import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-import de.uka.ilkd.key.rtsj.java.RTSJInfo;
-import de.uka.ilkd.key.rtsj.proof.init.RTSJProfile;
-import de.uka.ilkd.key.speclang.ocl.UMLInfo;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
@@ -61,13 +58,8 @@ public class Services{
     /**
      * the information object on the Java model
      */
-    private JavaInfo javainfo;
-    
-    /**
-     * The information object on the UML model
-     */
-    private UMLInfo umlinfo;
-    
+    private final JavaInfo javainfo;
+        
     /**
      * variable namer for inner renaming
      */
@@ -94,7 +86,7 @@ public class Services{
      * 
      */
     private NameRecorder nameRecorder;
-
+    
     
     /**
      * creates a new Services object with a new TypeConverter and a new
@@ -108,8 +100,8 @@ public class Services{
 	}else{
 	    this.exceptionHandler = exceptionHandler;
 	}
-	javainfo = 
-	    createProgramInfo(new KeYProgModelInfo(typeconverter, this.exceptionHandler));	    
+        javainfo = new JavaInfo
+        	(new KeYProgModelInfo(typeconverter, this.exceptionHandler), this);
         nameRecorder = new NameRecorder();
     }
 
@@ -123,21 +115,11 @@ public class Services{
 	cee = new ConstantExpressionEvaluator(this);
 	typeconverter = new TypeConverter(this);
 	//	exceptionHandler = new KeYRecoderExcHandler();
-	javainfo = 
-	    createProgramInfo(new KeYProgModelInfo(crsc, rec2key, typeconverter));
-        nameRecorder = new NameRecorder();
+	javainfo = new JavaInfo
+	    (new KeYProgModelInfo(crsc, rec2key, typeconverter), this);
+	nameRecorder = new NameRecorder();
     }
 
-    
-    // HACK: CREATE RTSJServices, make Services creation profile dependent and
-    // remove that ugly static check
-    protected JavaInfo createProgramInfo(KeYProgModelInfo kpm) {
-	if (ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile) {
-	    return new RTSJInfo(kpm, this);
-	} else {
-	    return new JavaInfo(kpm, this);
-	}
-    }
     
     public KeYExceptionHandler getExceptionHandler(){
 	return exceptionHandler;
@@ -172,10 +154,6 @@ public class Services{
         return javainfo;
     }
     
-    public void setJavaInfo(JavaInfo ji) {
-        javainfo = ji;
-    }
-    
     public NameRecorder getNameRecorder() {
         return nameRecorder;
     }
@@ -187,18 +165,6 @@ public class Services{
 
     public void addNameProposal(Name proposal) {
         nameRecorder.addProposal(proposal);
-    }
-    
-    /**
-     * Returns the UMLInfo associated with this Services object.
-     */
-    public UMLInfo getUMLInfo() {
-        return umlinfo;
-    }
-    
-    
-    public void setUMLInfo(UMLInfo umlinfo) {
-        this.umlinfo = umlinfo;
     }
     
     
@@ -232,7 +198,6 @@ public class Services{
 	s.setTypeConverter(getTypeConverter().copy(s));
 	s.setExceptionHandler(getExceptionHandler());
 	s.setNamespaces(namespaces.copy());
-        s.setUMLInfo(umlinfo);
         nameRecorder = nameRecorder.copy();
 	return s;
     }
@@ -249,7 +214,6 @@ public class Services{
 	Services s = new Services(getExceptionHandler());
 	s.setTypeConverter(getTypeConverter().copy(s));
 	s.setNamespaces(namespaces.copy());
-        s.setUMLInfo(umlinfo);
         nameRecorder = nameRecorder.copy();
 	return s;
     }
@@ -262,7 +226,6 @@ public class Services{
         s.setTypeConverter(getTypeConverter().copy(s));
         s.setExceptionHandler(getExceptionHandler());
         s.setNamespaces(namespaces.copy());
-        s.setUMLInfo(umlinfo);
         nameRecorder = nameRecorder.copy();
         return s;
     }

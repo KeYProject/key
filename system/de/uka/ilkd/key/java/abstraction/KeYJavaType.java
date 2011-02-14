@@ -38,7 +38,6 @@ public class KeYJavaType implements Type {
     public KeYJavaType(Type javaType, Sort sort) {
 	this.javaType = javaType;
 	this.sort = sort;
-        ensureTypeSortConformance();
     }
 
     /** creates a new KeYJavaType */
@@ -51,56 +50,12 @@ public class KeYJavaType implements Type {
 	this.javaType = type;
     }
     
-    private void ensureTypeSortConformance() {
-        if (javaType != null && sort != null) {
-            
-            if (javaType instanceof NullType && sort instanceof NullSort) {
-                return;
-            }
-            
-            final boolean b = 
-                (javaType instanceof ClassType ==  sort instanceof ObjectSort);
-            
-            if (!b) {
-                throw new IllegalStateException("A primitive sort/type cannot be mapped " +
-                        "for a reference type/sort (type:" + javaType + "," 
-                        +sort+")");
-            }
-                                    
-            boolean arrayTypeSort = 
-                (javaType instanceof ArrayType ==  sort instanceof ArraySort); 
-            
-            if (!arrayTypeSort) {
-                throw new IllegalStateException("A non-array sort/type cannot be mapped " +
-                        "to an array type/sort (type:" + javaType + "," 
-                        +sort+")");
-            }
-            
-            if (javaType instanceof ClassType) {                   
-                final ObjectSort os = (ObjectSort)sort;
-                if (os instanceof ClassInstanceSort) {
-                    boolean conform = 
-                        ((ClassInstanceSort)os).representAbstractClassOrInterface() ==
-                            (((ClassType)javaType).isAbstract() || 
-                                    ((ClassType)javaType).isInterface());
-                    if (!conform) {
-                        throw new IllegalStateException("Java type " + javaType 
-                                + " cannot be mapped to sort " + os);
-                    }
-                }
-            }
-        }
+    public void setJavaType(Type type) {
+	javaType = type;
     }
-    
-
-     public void setJavaType(Type type) {
-	 javaType = type;
-         ensureTypeSortConformance();
-     }
     
     public void setSort(Sort s) {
  	sort = s;
-        ensureTypeSortConformance();
     }
 
     public Type getJavaType() {

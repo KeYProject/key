@@ -25,7 +25,8 @@ import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SortedSchemaVariable;
+import de.uka.ilkd.key.logic.op.SkolemTermSV;
+import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.TacletApp;
 
@@ -59,19 +60,18 @@ public class VariableNameProposer implements InstantiationProposer {
 			      Services services,
 			      Node undoAnchor,
 			      ImmutableList<String> previousProposals) {
-	if(var.isSkolemTermSV()) {
+	if(var instanceof SkolemTermSV) {
 	    return getNameProposalForSkolemTermVariable(app,
 	    					       var,
 						       services,
 						       undoAnchor,
                                                        previousProposals);
-	} else if(var.isVariableSV()) {
+	} else if(var instanceof VariableSV) {
 	    return getNameProposalForVariableSV(app,
 	    					var,
 						services,
 						undoAnchor);
-	} else if(var instanceof SortedSchemaVariable 
-                 && ((SortedSchemaVariable)var).sort() == ProgramSVSort.LABEL) {
+	} else if(var.sort() == ProgramSVSort.LABEL) {
 	    return getNameProposalForLabel(app,
 	    				   var,
 					   services,

@@ -16,6 +16,7 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.BuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.UseDependencyContractRule;
 
 public class BuiltInRuleAppIndex implements java.io.Serializable {
 
@@ -41,8 +42,8 @@ public class BuiltInRuleAppIndex implements java.io.Serializable {
      * for the given goal and position
      */
     public ImmutableList<RuleApp> getBuiltInRule(Goal            goal, 
-					PosInOccurrence pos, 
-					Constraint      userConstraint) {
+						 PosInOccurrence pos, 
+						 Constraint      userConstraint) {
 
 	ImmutableList<RuleApp> result = ImmutableSLList.<RuleApp>nil();
 
@@ -87,6 +88,13 @@ public class BuiltInRuleAppIndex implements java.io.Serializable {
 					  NewRuleListener listener ) {
         for (BuiltInRule builtInRule : index.rules()) {
             final BuiltInRule bir = builtInRule;
+            
+            if(bir.isApplicable(goal, null, userConstraint)) {
+                BuiltInRuleApp app = new BuiltInRuleApp(bir, null, userConstraint );                            
+                listener.ruleAdded ( app, null );
+            }
+            
+            
             scanSimplificationRule(bir, goal, false, userConstraint, listener);
             scanSimplificationRule(bir, goal, true, userConstraint, listener);
         }
@@ -117,11 +125,27 @@ public class BuiltInRuleAppIndex implements java.io.Serializable {
                                           NewRuleListener listener ) {
         final PosInOccurrence    pos = new PosInOccurrence 
 		( cfma, PosInTerm.TOP_LEVEL, antec );
-        if (rule.isApplicable ( goal, pos, userConstraint ) ) {
+        if(rule instanceof UseDependencyContractRule) {//HACK
+            scanSimplificationRule(rule, goal, pos, listener);
+        } else if (rule.isApplicable ( goal, pos, userConstraint ) ) {
             BuiltInRuleApp app = new BuiltInRuleApp(rule, pos, userConstraint );                            
             listener.ruleAdded ( app, pos );
         }
     }
+    
+    //TODO: optimise?
+    private void scanSimplificationRule ( BuiltInRule rule,
+	    				  Goal goal,
+                                          PosInOccurrence pos,
+                                          NewRuleListener listener ) {
+        if (rule.isApplicable ( goal, pos, Constraint.BOTTOM ) ) {
+            BuiltInRuleApp app = new BuiltInRuleApp(rule, pos, Constraint.BOTTOM );                            
+            listener.ruleAdded ( app, pos );
+        }
+        for(int i = 0, n = pos.subTerm().arity(); i < n; i++) {
+            scanSimplificationRule(rule, goal, pos.down(i), listener);
+        }
+    }     
 
     public void reportRuleApps ( NewRuleListener l,
                                  Goal goal,
@@ -174,5 +198,4 @@ public class BuiltInRuleAppIndex implements java.io.Serializable {
             fcis = fcis.tail();
         }
     }
-
 }

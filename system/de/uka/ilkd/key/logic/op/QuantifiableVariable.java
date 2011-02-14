@@ -10,13 +10,9 @@
 
 package de.uka.ilkd.key.logic.op;
 
-import de.uka.ilkd.key.logic.sort.Sort;
 
-/** this interface represents the variables that can be bound */
-public interface QuantifiableVariable extends Operator {
-
-    /** @return Sort of the QuantifiableVariable */
-    Sort sort();
-
-
+/** 
+ * this interface represents the variables that can be bound 
+ */
+public interface QuantifiableVariable extends ParsableVariable {
 }

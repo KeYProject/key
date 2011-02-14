@@ -68,12 +68,12 @@ public class ConstructorCall extends ProgramMetaConstruct {
      * returns the result. Thereby all necessary references are
      * resolved.
      * 
-     * The method is optimized in the sense that insetad of returning
+     * The method is optimized in the sense that instead of returning
      * <code>newObject.<init>(args);</code>
      * a statementblock is returned which evaluates the constructor's arguments 
      * and inserts a method body statement rather than the method call which avoids 
      * unneccessary proof branches. As <code>newObject</code> can never be 
-     * <code>null</code> no null pointer scheck is necessary.  
+     * <code>null</code> no null pointer check is necessary.  
      */    
     public ProgramElement symbolicExecution
 	(ProgramElement pe, Services services, SVInstantiations svInst) {

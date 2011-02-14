@@ -25,22 +25,17 @@ import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.declaration.modifier.*;
-import de.uka.ilkd.key.java.declaration.modifier.Ghost;
-import de.uka.ilkd.key.java.declaration.modifier.Model;
 import de.uka.ilkd.key.java.expression.*;
-import de.uka.ilkd.key.java.expression.PassiveExpression;
 import de.uka.ilkd.key.java.expression.literal.*;
 import de.uka.ilkd.key.java.expression.operator.*;
-import de.uka.ilkd.key.java.expression.operator.SetAssignment;
-import de.uka.ilkd.key.java.recoderext.*;
+import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
+import de.uka.ilkd.key.java.recoderext.ImplicitIdentifier;
 import de.uka.ilkd.key.java.reference.*;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.*;
-import de.uka.ilkd.key.java.statement.CatchAllStatement;
-import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -429,25 +424,6 @@ public class Recoder2KeYConverter {
         }
     }
 
-    /**
-     * extracts all field specifications out of the given list. Therefore it
-     * descends into field declarations.
-     * 
-     * @param list
-     *            the ExtList with the members of a type declaration
-     * @return a IList<Field> the includes all field specifications found int the
-     *         field declaration of the given list
-     */
-    private ImmutableList<Field> filterField(ExtList list) {
-        ImmutableList<Field> result = ImmutableSLList.<Field>nil();
-        for (Object aList : list) {
-            Object pe = aList;
-            if (pe instanceof FieldDeclaration) {
-                result = result.prepend(filterField((FieldDeclaration) pe));
-            }
-        }
-        return result;
-    }
 
     /**
      * extracts all fields out of fielddeclaration
@@ -638,14 +614,10 @@ public class Recoder2KeYConverter {
         recoder.abstraction.Type javaType = getServiceConfiguration()
         .getCrossReferenceSourceInfo().getType(newArr);
 
-        ProgramElement scope = null;
-        String s = (newArr instanceof NewArrayWrapper &&  
-                ((NewArrayWrapper) newArr).getScope()!=null ? 
-                ((NewArrayWrapper) newArr).getScope().toSource() : null);
-        
         return new NewArray(children, getKeYJavaType(javaType), arrInit, newArr
                 .getDimensions());
     }
+    
 
     // ------------------- literals --------------------------------------
 
@@ -672,6 +644,61 @@ public class Recoder2KeYConverter {
         return (booleanLit.getValue() ? BooleanLiteral.TRUE
                 : BooleanLiteral.FALSE);
     }
+    
+    
+    public EmptySetLiteral convert(de.uka.ilkd.key.java.recoderext.EmptySetLiteral e) {
+	return EmptySetLiteral.INSTANCE;
+    }
+    
+    public Singleton convert(de.uka.ilkd.key.java.recoderext.Singleton e) {
+        ExtList children = collectChildren(e);	
+	return new Singleton(children);
+    }        
+    
+    public SetUnion convert(de.uka.ilkd.key.java.recoderext.SetUnion e) {
+        ExtList children = collectChildren(e);	
+	return new SetUnion(children);
+    }
+    
+    public Intersect convert(de.uka.ilkd.key.java.recoderext.Intersect e) {
+        ExtList children = collectChildren(e);	
+	return new Intersect(children);
+    }
+    
+    public SetMinus convert(de.uka.ilkd.key.java.recoderext.SetMinus e) {
+        ExtList children = collectChildren(e);	
+	return new SetMinus(children);
+    }
+    
+    public AllFields convert(de.uka.ilkd.key.java.recoderext.AllFields e) {
+        ExtList children = collectChildren(e);	
+	return new AllFields(children);
+    }
+    
+    
+    public EmptySeqLiteral convert(de.uka.ilkd.key.java.recoderext.EmptySeqLiteral e) {
+	return EmptySeqLiteral.INSTANCE;
+    }    
+    
+    public SeqSingleton convert(de.uka.ilkd.key.java.recoderext.SeqSingleton e) {
+        ExtList children = collectChildren(e);	
+	return new SeqSingleton(children);
+    }
+    
+    public SeqConcat convert(de.uka.ilkd.key.java.recoderext.SeqConcat e) {
+        ExtList children = collectChildren(e);	
+	return new SeqConcat(children);
+    }
+    
+    public SeqSub convert(de.uka.ilkd.key.java.recoderext.SeqSub e) {
+        ExtList children = collectChildren(e);	
+	return new SeqSub(children);
+    }    
+    
+    public SeqReverse convert(de.uka.ilkd.key.java.recoderext.SeqReverse e) {
+        ExtList children = collectChildren(e);	
+	return new SeqReverse(children);
+    }    
 
     /** convert a recoder StringLiteral to a KeY StringLiteral */
     public StringLiteral convert(
@@ -731,7 +758,6 @@ public class Recoder2KeYConverter {
     }
 
     public ProgramElementName convert(ImplicitIdentifier id) {
-
         return new ProgramElementName(id.getText(),
                 (Comment[]) collectComments(id).collect(Comment.class));
     }
@@ -807,10 +833,13 @@ public class Recoder2KeYConverter {
         KeYJavaType kjt = getKeYJavaType(td);
         ExtList classMembers = collectChildren(td);
 
-        ClassDeclaration keYClassDecl = new ClassDeclaration(classMembers,
-                new ProgramElementName(makeAdmissibleName(td.getFullName())),
-                isParsingLibs(), td.getContainingClassType() != null,
-                td.getName() == null, td.getStatementContainer() != null);
+        ClassDeclaration keYClassDecl 
+        	= new ClassDeclaration(classMembers,
+        			       new ProgramElementName(makeAdmissibleName(td.getFullName())),
+        			       isParsingLibs(), 
+        			       td.getContainingClassType() != null,
+        			       td.getName() == null, 
+        			       td.getStatementContainer() != null);
                 // new ProgramElementName(td.getFullName()), isParsingLibs());
 
         kjt.setJavaType(keYClassDecl);
@@ -891,9 +920,15 @@ public class Recoder2KeYConverter {
         .getCrossReferenceSourceInfo().getContainingClassType(
                 (recoder.abstraction.Member) cd);
 
-        ProgramMethod result = new ProgramMethod(consDecl,
-                getKeYJavaType(cont), getKeYJavaType(cd.getReturnType()),
-                positionInfo(cd));
+        Sort heapSort = rec2key.getTypeConverter().getTypeConverter().getHeapLDT() == null
+                            ? Sort.ANY
+                            : rec2key.getTypeConverter().getTypeConverter().getHeapLDT().targetSort();        
+        ProgramMethod result 
+        	= new ProgramMethod(consDecl,
+        			    getKeYJavaType(cont), 
+        			    getKeYJavaType(cd.getReturnType()),
+        			    positionInfo(cd),
+        			    heapSort);
         insertToMap(cd, result);
         return result;
     }
@@ -908,9 +943,13 @@ public class Recoder2KeYConverter {
         ConstructorDeclaration consDecl = new ConstructorDeclaration(children,
                 dc.getContainingClassType().isInterface());
         recoder.abstraction.ClassType cont = dc.getContainingClassType();
+        Sort heapSort = rec2key.getTypeConverter().getTypeConverter().getHeapLDT() == null
+                            ? Sort.ANY
+                            : rec2key.getTypeConverter().getTypeConverter().getHeapLDT().targetSort();        
         ProgramMethod result = new ProgramMethod(consDecl,
                 getKeYJavaType(cont), getKeYJavaType(dc.getReturnType()),
-                PositionInfo.UNDEFINED);
+                PositionInfo.UNDEFINED,
+                heapSort);
         insertToMap(dc, result);
         return result;
     }
@@ -1025,8 +1064,13 @@ public class Recoder2KeYConverter {
             .getCrossReferenceSourceInfo().getContainingClassType(
                     (recoder.abstraction.Member) md);
 
-            result = new ProgramMethod(methDecl, getKeYJavaType(cont),
-                    getKeYJavaType(md.getReturnType()), positionInfo(md));
+            Sort heapSort = rec2key.getTypeConverter().getTypeConverter().getHeapLDT() == null
+                            ? Sort.ANY
+                            : rec2key.getTypeConverter().getTypeConverter().getHeapLDT().targetSort();
+            result = new ProgramMethod(methDecl, 
+        	    		       getKeYJavaType(cont),
+                    		       getKeYJavaType(md.getReturnType()), positionInfo(md),
+                    		       heapSort);
 
             insertToMap(md, result);
         }
@@ -1098,11 +1142,20 @@ public class Recoder2KeYConverter {
                         makeAdmissibleName(recContainingClassType.getFullName()));
 
                 final Literal compileTimeConstant = getCompileTimeConstantInitializer(recoderVarSpec);
+                
+                boolean isModel = false;
+                for(recoder.java.declaration.Modifier mod : recoderVarSpec.getParent().getModifiers()) {
+                    if(mod instanceof de.uka.ilkd.key.java.recoderext.Model) {
+                	isModel = true;
+                	break;
+                    }
+                }
 
                 if (compileTimeConstant == null) {
                     pv = new LocationVariable(pen, getKeYJavaType(recoderType),
                             getKeYJavaType(recContainingClassType),
-                            recoderVarSpec.isStatic());
+                            recoderVarSpec.isStatic(),
+                            isModel);
                 } else {
                     pv = new ProgramConstant(pen, getKeYJavaType(recoderType),
                             getKeYJavaType(recContainingClassType),
@@ -1261,10 +1314,18 @@ public class Recoder2KeYConverter {
             .getByteCodeInfo().getType(recField);
             recoder.java.declaration.FieldSpecification fs = new recoder.java.declaration.FieldSpecification(
                     fr.getIdentifier());
+            boolean isModel = false;
+            for(recoder.java.declaration.Modifier mod : recoderVarSpec.getParent().getModifiers()) {
+        	if(mod instanceof de.uka.ilkd.key.java.recoderext.Model) {
+        	    isModel = true;
+        	    break;
+        	}
+            }            
+            
             pv = new LocationVariable(new ProgramElementName(makeAdmissibleName(fs.getName()),
                     makeAdmissibleName(recField.getContainingClassType().getFullName())),
                     getKeYJavaType(recoderType), getKeYJavaType(recField
-                            .getContainingClassType()), recField.isStatic());
+                            .getContainingClassType()), recField.isStatic(), isModel);
             insertToMap(fs, new FieldSpecification(pv));
             return new FieldReference(pv, prefix);
         }
@@ -1610,10 +1671,6 @@ public class Recoder2KeYConverter {
         return new CopyAssignment(collectChildrenAndComments(arg));
     }
 
-    public SetAssignment convert(de.uka.ilkd.key.java.recoderext.SetAssignment ass){ 
-        return new SetAssignment(collectChildren(ass));
-    }
-
     public PostIncrement convert(recoder.java.expression.operator.PostIncrement arg) {
         return new PostIncrement(collectChildrenAndComments(arg));
     }
@@ -1767,14 +1824,7 @@ public class Recoder2KeYConverter {
     }
 
     public ExecutionContext convert(de.uka.ilkd.key.java.recoderext.ExecutionContext arg) {
-        final recoder.java.reference.TypeReference tr = arg.getTypeReference();
-        final recoder.java.reference.ReferencePrefix mem = arg.getMemoryArea();
-        final recoder.java.reference.ReferencePrefix runtime = arg.getRuntimeInstance();
-	return new ExecutionContext((TypeReference)convert(tr), 
-		(mem != null ? 
-			new MemoryAreaEC((ReferencePrefix) convert((recoder.java.JavaProgramElement) mem)) : null),
-		(runtime != null ? 
-			new RuntimeInstanceEC((ReferencePrefix) convert((recoder.java.JavaProgramElement) runtime)) : null));
+        return new ExecutionContext(collectChildrenAndComments(arg));
     }
 
     public ThisConstructorReference convert(recoder.java.reference.ThisConstructorReference arg) {
@@ -1864,7 +1914,4 @@ public class Recoder2KeYConverter {
     public Model convert(de.uka.ilkd.key.java.recoderext.Model m) {
         return new Model(collectComments(m));
     }
-
-
 }	
-

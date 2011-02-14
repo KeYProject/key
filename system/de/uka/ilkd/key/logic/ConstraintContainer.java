@@ -9,6 +9,7 @@
 //
 
 package de.uka.ilkd.key.logic;
+
 /** ConstraintContainer wraps constraints */
 public class ConstraintContainer {
     private Constraint co;

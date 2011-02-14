@@ -195,17 +195,8 @@ public class JMLInfoExtractor {
         
         return false;
     }
-    
-    /**
-     * Returns true, if the given KeYJavaType is specified "scopeSafe".
-     */
-    public static boolean isScopeSafe(KeYJavaType kjt) {
-        if(!(kjt.getJavaType() instanceof ClassDeclaration)){
-            return false;
-        }
-        return hasJMLModifier((ClassDeclaration) kjt.getJavaType(), "scopeSafe");
-    }
-    
+
+
     public static boolean hasJMLModifier(ClassDeclaration cd, String mod){
         ImmutableList<Comment> coms = ImmutableSLList.<Comment>nil();
         ImmutableArray<Modifier> mods = cd.getModifiers();
@@ -218,6 +209,7 @@ public class JMLInfoExtractor {
         }
         return false;
     }
+    
     
     public static boolean hasJMLModifier(FieldDeclaration fd, String mod){
         ImmutableList<Comment> coms 
@@ -234,6 +226,7 @@ public class JMLInfoExtractor {
         }
         return false;
     }    
+    
     
     public static boolean hasJMLModifier(ProgramMethod pm, String mod){
         ImmutableList<Comment> coms = ImmutableSLList.<Comment>nil();
@@ -263,6 +256,38 @@ public class JMLInfoExtractor {
                 return true;
         }
         return false;
+    }
+    
+    
+    public static boolean isHelper(ProgramMethod pm) {
+        ImmutableList<Comment> coms = ImmutableSLList.<Comment>nil();
+        MethodDeclaration method = pm.getMethodDeclaration();
+        
+        // Either "helper" is attached to a modifier ....
+        for (final Modifier mod : method.getModifiers()) {
+            coms = coms.prepend(mod.getComments());
+        }      
+        
+        // .... or to the return type ....
+        if (method.getTypeReference() != null) {
+            coms = coms.prepend(method.getTypeReference().getComments());
+        }
+        
+        // .... or to the method itself
+        Comment[] methodComments = method.getComments();
+        if(methodComments.length > 0) {
+            coms = coms.prepend(methodComments[methodComments.length - 1]);
+        }
+        
+        // .... or to the method name
+        coms = coms.prepend(method.getProgramElementName().getComments());
+        
+        for (Comment c : coms) {
+            if (checkFor("helper", c.getText()))
+                return true;
+        }
+        
+        return false;	
     }
     
     

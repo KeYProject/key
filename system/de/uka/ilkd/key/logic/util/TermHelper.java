@@ -5,6 +5,7 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+
 package de.uka.ilkd.key.logic.util;
 
 import de.uka.ilkd.key.java.Services;
@@ -57,58 +58,11 @@ public class TermHelper {
 	    				 Sort maxSortDefault,
 	    				 Services services) {
         final Sort newMaxSort;
-        if (op instanceof Function) {
-            newMaxSort = ((Function)op).argSort(i);
-        } else if (i == 0 && op instanceof AttributeOp) {          
-            newMaxSort = ((AttributeOp)op).getContainerType().getSort();
-        } else if (i == 0 && op instanceof ArrayOp) {
-            newMaxSort = ((ArrayOp)op).arraySort();
-        } else if (op instanceof BoundedNumericalQuantifier) {
-            newMaxSort = ((BoundedNumericalQuantifier)op).argSort(i);
-        } else if (op instanceof AccessOp) {
-            newMaxSort = 
-        	services.getTypeConverter().getIntegerLDT().targetSort();
-        } else if (op instanceof Equality) {
-            newMaxSort = ((Equality)op).argSort(i);
-        } else if (op instanceof IUpdateOperator) {
-            newMaxSort = maxSortIUpdate( (IUpdateOperator) op, 
-        	    			  i, 
-        	    			  maxSortDefault, 
-        	    			  services );
+        if (op instanceof SortedOperator) {
+            newMaxSort = ((SortedOperator)op).argSort(i);
         } else {                        
             newMaxSort = maxSortDefault;
         }
         return newMaxSort;
     }
-    
-    /**
-     * 
-     * looks up if the given subterm position describes a value
-     */
-    private static Sort maxSortIUpdate(IUpdateOperator op, 
-	    			       int pos, 
-	    			       Sort maxSortDefault,
-	    			       Services services) {
-        if (op.targetPos() != pos) { 
-            for (int i = 0, locs = op.locationCount(); i<locs; i++) {
-                final int valuePos = op.valuePos(i);
-                if (valuePos == pos) {
-                    return Sort.ANY; //op.location(i).sort() would be more precise
-                                     // but the current solution is also sound
-                                     // as the update application rules take care
-                                      // of inserting casts when necessary
-                } else if (pos < valuePos) {
-                    if (op.locationSubtermsBegin(i) <= pos && 
-                            pos < op.locationSubtermsEnd(i)) {                   
-                        return getMaxSortHelper(op.location(i), 
-                                pos-op.locationSubtermsBegin(i), 
-                                maxSortDefault,
-                                services);
-                    }
-                }
-            }
-        }
-        return maxSortDefault;
-    }
-
 }

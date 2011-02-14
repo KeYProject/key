@@ -1,20 +1,17 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-
 package de.uka.ilkd.key.smt;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
 
 public class SmtLibTranslator extends AbstractSMTTranslator {
+
 
     // counter used for making names unique
     private int counter = 0;
@@ -60,6 +57,8 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
     private static StringBuffer LOGICALIFTHENELSE = new StringBuffer("if_then_else");
 
     private static StringBuffer TERMIFTHENELSE = new StringBuffer("ite");
+    
+    private static StringBuffer DISTINCT = new StringBuffer("distinct");
     
     /**
      * Just a constructor which starts the conversion to Simplify syntax.
@@ -108,11 +107,12 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 	commentPredicate[ContextualBlock.PREDICATE_FORMULA] = "\n\n:notes \"Predicates used in formula:\"";
 	commentPredicate[ContextualBlock.PREDICATE_TYPE]    = "\n\n:notes \"Types expressed by predicates:\"";
 	String [] commentAssumption = new String[5];
-	commentAssumption[ContextualBlock.ASSUMPTION_DUMMY_IMPLEMENTATION] = "\n\n:notes \"Assumptions for dummy variables (%i):\"";
-	commentAssumption[ContextualBlock.ASSUMPTION_FUNCTION_DEFINTION] = "\n\n:notes \"Assumptions for function definitions (%i):\""; 
-	commentAssumption[ContextualBlock.ASSUMPTION_SORT_PREDICATES] = "\n\n:notes \"Assumptions for sort predicates (%i):\"";
-	commentAssumption[ContextualBlock.ASSUMPTION_TYPE_HIERARCHY] = "\n\n:notes \"Assumptions for type hierarchy (%i):\"";
-	commentAssumption[ContextualBlock.ASSUMPTION_TACLET_TRANSLATION] = "\n\n:notes \"Assumptions made of taclets (%i):\"\n\n";
+	commentAssumption[ContextualBlock.ASSUMPTION_DUMMY_IMPLEMENTATION] = "\n\n:notes \"Assumptions for dummy variables:\"";
+	commentAssumption[ContextualBlock.ASSUMPTION_FUNCTION_DEFINTION] = "\n\n:notes \"Assumptions for function definitions:\""; 
+	commentAssumption[ContextualBlock.ASSUMPTION_SORT_PREDICATES] = "\n\n:notes \"Assumptions for sort predicates:\"";
+	commentAssumption[ContextualBlock.ASSUMPTION_TYPE_HIERARCHY] = "\n\n:notes \"Assumptions for type hierarchy:\"";
+	commentAssumption[ContextualBlock.ASSUMPTION_TACLET_TRANSLATION]= "\n\n:notes \"Assumptions for taclets:\"";
+	
 	//add the logic definition
 	toReturn.append("\n:logic AUFLIA");
 	
@@ -196,23 +196,17 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 	ArrayList<StringBuffer> AssumptionsToRemove = new ArrayList<StringBuffer>();
 	    StringBuffer assump = new StringBuffer();	
 	
-	for(int k=0; k < assumptionBlocks.size(); k++){
+	for(int k=0; k < commentAssumption.length; k++){
 	    ContextualBlock block = assumptionBlocks.get(k);
+	
 	    if (block.getStart() <= block.getEnd()) {
-	        String commentAssump = commentAssumption[block.getType()].replaceAll("%i", Integer.toString(block.getEnd()-block.getStart()+1));
-                
-                assump.append(commentAssump);
-		
+		assump.append(commentAssumption[block.getType()]);
 	    	    for(int i=block.getStart(); i <= block.getEnd(); i++){
 	    		AssumptionsToRemove.add(assumptions.get(i));   
-	    		
-	    		assump.append("\n:assumption ").append(assumptions.get(i));
-	    		
+	    		assump.append("\n:assumption ").append(assumptions.get(i)); 
 	    	    }
 		}  
 	}
-	    
-	
 	    
 	
 
@@ -238,8 +232,7 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 	toReturn.append("\n:formula ").append(formula).append("\n");
 
 	toReturn.append(")");
-	Debug.log4jInfo("Resulting formula after translation:", 
-			SmtLibTranslator.class.getName());
+	Debug.log4jInfo("Resulting formula after translation:", SmtLibTranslator.class.getName());
 	Debug.log4jInfo(toReturn.toString(), SmtLibTranslator.class.getName());
 	return toReturn;
 
@@ -258,7 +251,8 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
      *         declarations, Argument2 is the sort used for type predicates
      */
     protected StringBuffer translateSort(String name, boolean isIntVal) {
-	return makeUnique(new StringBuffer(name));
+	StringBuffer uniqueName = makeUnique(new StringBuffer(name));
+	return uniqueName;
     }
 
     @Override
@@ -378,7 +372,6 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 	}
 	
 	return arg;	
-
     }
 
     @Override
@@ -388,7 +381,9 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 
     @Override
     protected StringBuffer translateLogicalVar(StringBuffer name) {
-	return new StringBuffer("?").append(makeUnique(name));
+	StringBuffer toReturn = (new StringBuffer("?"))
+		.append(makeUnique(name));
+	return toReturn;
     }
 
     @Override
@@ -527,6 +522,93 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
     protected StringBuffer translatePredicateName(StringBuffer name) {
 	return makeUnique(name);
     }
+    
+    
+    private boolean haveSameArgs(ImmutableArray<Sort> list1, ImmutableArray<Sort> list2){
+	if(list1.size() == list2.size())
+	for(int i=0; i < list1.size(); i++){
+	    if(!list1.get(i).equals(list2.get(i))){
+		return false;
+	    }
+	}
+	return true;
+    }
+    
+    private boolean haveSameSortSignature(FunctionWrapper fw1, FunctionWrapper fw2){
+	Function f1 = fw1.getFunction();
+	Function f2 = fw2.getFunction();
+	if(!fw1.getName().equals(fw2.getName()) && 
+	   f1.sort().equals(f2.sort()) &&
+	   haveSameArgs(f1.argSorts(),f2.argSorts())){
+	   return true;
+	}
+	return false;
+    }
+    
+    private StringBuffer getQuantifiedVariable(int pos){
+	return new StringBuffer("?n"+pos);
+    }
+    
+    private ArrayList<StringBuffer> getQuantifiedVariables(int count, int start){
+	ArrayList<StringBuffer> list = new ArrayList<StringBuffer>();
+	for(int i=0; i < count; i++){
+	    list.add(getQuantifiedVariable(i+start));
+	}
+	return list;
+    }
+    
+
+   
+    protected StringBuffer buildDistinct(FunctionWrapper [] fw){
+	int start =0;
+	ArrayList<StringBuffer> temp []=  new ArrayList[fw.length];
+	
+	
+	StringBuffer rightSide = new StringBuffer();
+	rightSide.append("( "+ DISTINCT + " ");
+	for(int i=0; i < fw.length; i++){
+		temp[i] = getQuantifiedVariables(fw[i].getFunction().arity(),start);
+		start += fw[i].getFunction().arity();
+		rightSide.append(buildFunction(fw[i].getName(),temp[i])+" ");
+    
+	}
+	
+	rightSide.append(")");
+	
+	for(int j=0; j < fw.length; j++){
+	    for(int i=0; i < fw[j].getFunction().arity(); i++){
+		      Sort sort = fw[j].getFunction().argSorts().get(i);
+		      rightSide = translateLogicalAll(temp[j].get(i),usedDisplaySort.get(sort),rightSide);
+		     
+		 }
+		   
+	}
+	
+	
+	return rightSide;
+	
+    }
+    protected StringBuffer translateUniqueness(FunctionWrapper function,
+            Collection<FunctionWrapper> distinct) throws IllegalFormulaException {
+	if(!function.getFunction().isUnique()){
+	    return null;
+	}
+	function.setUsedForUnique(true);
+	
+	StringBuffer result = translateLogicalTrue();
+	for(FunctionWrapper fw : distinct){
+	    if(!fw.isUsedForUnique() &&
+	        fw.getFunction().isUnique()){
+		FunctionWrapper array [] = {function, fw};
+	       result = translateLogicalAnd(result, buildDistinct(array));
+		
+		
+	    }
+	}
+	return result;
+    }
+    
+
 
     private StringBuffer buildFunction(StringBuffer name,
 	    ArrayList<StringBuffer> args) {
@@ -536,10 +618,10 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 	} else {
 	    toReturn.append("(");
 	    toReturn.append(name);
-        for (StringBuffer arg : args) {
-            toReturn.append(" ");
-            toReturn.append(arg);
-        }
+	    for (int i = 0; i < args.size(); i++) {
+		toReturn.append(" ");
+		toReturn.append(args.get(i));
+	    }
 	    toReturn.append(")");
 	}
 	return toReturn;
@@ -560,9 +642,11 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 	return template;
     }
     
+    
+    
     private StringBuffer makeUnique(StringBuffer name) {
 	StringBuffer toReturn = new StringBuffer(name);
-
+	
 	//build the replacement pairs
 	ArrayList<String> toReplace = new ArrayList<String>();
 	ArrayList<String> replacement = new ArrayList<String>();
@@ -591,18 +675,15 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 	toReplace.add("\\");
 	replacement.add("_");
 	
+	toReplace.add("$");
+	replacement.add("_dollar_");
+	
 	toReturn = this.removeIllegalChars(toReturn, toReplace, replacement);
+	// names are must not begin with special characters
+	toReturn = (new StringBuffer()).append("a").append(toReturn);
 	
 	toReturn.append("_").append(counter);
 	counter++;
-
-	//CVC3 does not accept identifiers to start with an underscore.
-	//This happens, e.g., when translating ".create(self)", because the leading "." becomes "_dot_"
-	//Removing leading underscores.
-	while(toReturn.charAt(0)=='_'){
-	    toReturn = new StringBuffer(toReturn.substring(1)); //inefficient, but should occur seldom
-	}
-
 	return toReturn;
     }
 

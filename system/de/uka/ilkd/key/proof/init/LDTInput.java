@@ -1,11 +1,12 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
+// The KeY system is protected by the GNU General Public License.
 // See LICENSE.TXT for details.
-
+//
+//
 package de.uka.ilkd.key.proof.init;
 
 import java.io.File;
@@ -14,11 +15,8 @@ import java.util.List;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.IMain;
-import de.uka.ilkd.key.java.recoderext.RecoderModelTransformer;
-import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.Named;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.ldt.*;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.*;
 
 
 /** Represents the LDT .key files as a whole. Special treatment of these
@@ -45,56 +43,61 @@ public class LDTInput implements EnvInput {
 	this.keyFiles = keyFiles;
 	this.main=main;
     }
-
-
+        
+    
+    @Override
     public String name() {
 	return NAME;
     }
-
-
-    public RecoderModelTransformer getTransformer() {
-        return null;
-    }
-
-
+    
+    
+    @Override
     public int getNumberOfChars() {
 	int sum=0;
-        for (KeYFile keyFile : keyFiles) {
-            sum = sum + keyFile.getNumberOfChars();
-        }
+	for (int i=0; i<keyFiles.length; i++) {
+	    sum=sum+keyFiles[i].getNumberOfChars();
+	}
 	return sum;
     }
 
 
+    @Override
     public void setInitConfig(InitConfig conf) {
 	this.initConfig=conf;
-        for (KeYFile keyFile : keyFiles) {
-            keyFile.setInitConfig(conf);
-        }
+	for(int i = 0; i < keyFiles.length; i++) {
+	    keyFiles[i].setInitConfig(conf);
+	}
     }
 
-
+    
+    @Override
     public Includes readIncludes() throws ProofInputException {
 	Includes result = new Includes();
-        for (KeYFile keyFile : keyFiles) {
-            result.putAll(keyFile.readIncludes());
-        }
+	for(int i = 0; i < keyFiles.length; i++) {
+	    result.putAll(keyFiles[i].readIncludes());
+	}
 	return result;
     }
-
-
+    
+        
+    @Override
     public String readJavaPath() throws ProofInputException {
 	return "";
     }
+    
+    
     // no class path elements here
+    @Override
     public List<File> readClassPath() throws ProofInputException {
         return null;
     }
+
+
     // no class path elements here
+    @Override
     public File readBootClassPath() {
         return null;
     }
-
 
 
     /** reads all LDTs, i.e., all associated .key files with respect to
@@ -103,48 +106,40 @@ public class LDTInput implements EnvInput {
      * third the rules. This procedure makes it possible to use all declared
      * sorts in all rules, e.g.
      */
-    public void read(ModStrategy mod) throws ProofInputException {
+    @Override
+    public void read() throws ProofInputException {
 	if (initConfig==null) {
 	    throw new IllegalStateException("LDTInput: InitConfig not set.");
 	}
-        for (KeYFile keyFile2 : keyFiles) {
-            keyFile2.readSorts(mod);
-        }
-        for (KeYFile keyFile1 : keyFiles) {
-            keyFile1.readFuncAndPred(mod);
-        }
-        for (KeYFile keyFile : keyFiles) {
-            if (main != null) {
-                main.setStatusLine("Reading " + keyFile.name(),
-                        keyFile.getNumberOfChars());
-            }
-            keyFile.readRulesAndProblem(mod);
-        }
-
-	//create LDTs
-        Namespace sorts     = initConfig.sortNS();
-        Namespace functions = new Namespace(initConfig.funcNS());
-        for (Named named : initConfig.choiceNS().allElements()) {
-            Choice c = (Choice) named;
-            functions.add(c.funcNS());
-        }
+		
+	for (int i=0; i<keyFiles.length; i++) {
+	    keyFiles[i].readSorts();	    
+	}
+	for (int i=0; i<keyFiles.length; i++) {
+	    keyFiles[i].readFuncAndPred();
+	}
+	for (int i=0; i<keyFiles.length; i++) {
+	    if (main != null) {
+		main.setStatusLine("Reading " + keyFiles[i].name(), 
+				   keyFiles[i].getNumberOfChars());
+	    }
+	    keyFiles[i].readRulesAndProblem();
+	}
+		
+	//create LDT objects
+        Services services = initConfig.getServices();
         ImmutableList<LDT> ldts = ImmutableSLList.<LDT>nil()
-                        	.prepend(new ByteLDT(sorts, functions))
-                        	.prepend(new ShortLDT(sorts, functions))
-                        	.prepend(new IntLDT(sorts, functions))
-                        	.prepend(new LongLDT(sorts, functions))
-                        	.prepend(new IntegerLDT(sorts, functions))
-                        	.prepend(new IntegerDomainLDT(sorts, functions))
-                        	.prepend(new BooleanLDT(sorts, functions))
-                        	.prepend(new FloatLDT(sorts, functions))
-	                        .prepend(new DoubleLDT(sorts, functions));
-	CharLDT charLDT = new CharLDT(sorts, functions);
-	ldts = ldts.prepend (charLDT);//.prepend (new StringLDT(initConfig.getServices(), sorts, functions, charLDT));
-
+                        	.prepend(new IntegerLDT(services))
+                        	.prepend(new BooleanLDT(services))
+                        	.prepend(new LocSetLDT(services))
+                        	.prepend(new HeapLDT(services))
+                        	.prepend(new SeqLDT(services))
+                        	.prepend(new CharListLDT(services));
         initConfig.getServices().getTypeConverter().init(ldts);
     }
-
-
+  
+    
+    @Override
     public boolean equals(Object o){
 	if(!(o instanceof LDTInput)) {
 	    return false;
@@ -155,29 +150,35 @@ public class LDTInput implements EnvInput {
 	    return false;
 	}
 
-        for (KeYFile keyFile : keyFiles) {
+        for(int i = 0; i < keyFiles.length; i++) {
             boolean found = false;
-            for (int j = 0; j < keyFiles.length; j++) {
-                if (li.keyFiles[j].equals(keyFile)) {
-                    found = true;
-                    break;
-                }
+            for(int j = 0; j < keyFiles.length; j++) {
+        	if(li.keyFiles[j].equals(keyFiles[i])) {
+        	    found = true;
+        	    break;
+        	}
             }
-            if (!found) {
-                return false;
+            if(!found) {
+        	return false;
             }
         }
 
 	return true;
     }
-
-
+    
+    
+    @Override
     public int hashCode() {
 	int result = 0;
-        for (KeYFile keyFile : keyFiles) {
-            result += keyFile.hashCode();
-        }
+	for(int i = 0; i < keyFiles.length; i++) {
+	    result += keyFiles[i].hashCode();
+	}
 	return result;
     }
-
+    
+    
+    @Override
+    public String toString() {
+	return name();
+    }
 }

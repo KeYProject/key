@@ -14,7 +14,7 @@ package de.uka.ilkd.key.rule.conditions;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.sort.ObjectSort;
+import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -24,12 +24,10 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  *  This variable condition checks if a schemavariable is instantiated 
  *  with a reference or primitive type
  */
-public class TypeCondition extends VariableConditionAdapter {
+public final class TypeCondition extends VariableConditionAdapter {
 
     private final TypeResolver resolver;
-   
     private final boolean nonNull;
-
     private final boolean isReference;
 
     /**
@@ -45,14 +43,20 @@ public class TypeCondition extends VariableConditionAdapter {
         this.nonNull = nonNull;
     }
     
-    /**
-     * checks if the condition for a correct instantiation is fulfilled
-     * @param p_var the template Variable to be instantiated
-     * @param candidate the SVSubstitute which is a candidate for an
-     * instantiation of var
-     * @param svInst the SVInstantiations that are already known to be needed 
-     * @return true iff condition is fulfilled
-     */
+    public TypeResolver getResolver(){
+	return resolver;
+    }
+    
+    public boolean getIsReference(){
+	return isReference;
+    }
+    
+    public boolean getNonNull(){
+	return nonNull;
+    }
+    
+    
+    @Override
     public boolean check(SchemaVariable p_var, 
 			 SVSubstitute candidate, 
 			 SVInstantiations svInst,
@@ -65,12 +69,15 @@ public class TypeCondition extends VariableConditionAdapter {
         final Sort s = resolver.resolveSort(p_var, candidate, svInst, services);
         
         if (isReference) {        
-            return (s instanceof ObjectSort && (!nonNull || s != Sort.NULL));
+            return (s.extendsTrans(services.getJavaInfo().objectSort()) 
+        	    && !(nonNull && s instanceof NullSort));
         } else {
-            return !(s instanceof ObjectSort);
+            return !(s.extendsTrans(services.getJavaInfo().objectSort()));
         }
     }
 
+    
+    @Override
     public String toString () {
         String prefix = "\\isReference";
         if (isReference && nonNull) {
@@ -79,18 +86,9 @@ public class TypeCondition extends VariableConditionAdapter {
         return (isReference ? "" : "\\not" ) + prefix + "( " + resolver + " )";            
     }
     
-    /** 
-     * @return returns value of <code>isReference</code>.
-     */
-    public boolean getIsReference() {return isReference;}
-    
-    /** 
-     * @return returns value of <code>nonNull</code>.
-     */
-    public boolean getNonNull() {return nonNull;}
+
     /**
      * @return returns value of <code>resolver</code>.
      */
     public TypeResolver getTypeResolver() {return resolver;}
-
 }

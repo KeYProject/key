@@ -19,7 +19,6 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.IntersectionSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 
@@ -51,9 +50,6 @@ public class EqualityConstraint implements Constraint {
     private HashMap<Metavariable, Term> instantiationCache        = null;
 
     private Integer hashCode = null;
-    
-    /** static meta variable counter */
-    private static long MV_COUNTER;
     
     /** Don't use this constructor, use Constraint.BOTTOM instead */
     public EqualityConstraint() {
@@ -126,7 +122,7 @@ public class EqualityConstraint implements Constraint {
         if ( t == null ) {
             t = map.get ( p_mv );
             if ( t == null )
-                t = TermFactory.DEFAULT.createFunctionTerm ( p_mv );
+                t = TermBuilder.DF.var ( p_mv );
             else
                 t = instantiate ( t );
 
@@ -352,30 +348,31 @@ public class EqualityConstraint implements Constraint {
         
         final ImmutableSet<Sort> set = 
             DefaultImmutableSet.<Sort>nil().add(t0.sort()).add(t1.sort());
-
-        final Sort intersectionSort = 
-            IntersectionSort.getIntersectionSort(set, services);
-                      
-        if (intersectionSort == null) {
-            return Constraint.TOP;
-        }
-        
-        // I think these MV will never occur in saved proofs, or?
-        
-        final Metavariable newMV = 
-            new Metavariable(new Name("#MV"+(MV_COUNTER++)), intersectionSort);
-        final Term newMVTerm = TermFactory.DEFAULT.createFunctionTerm(newMV);
-        
-        final Constraint addFirst = normalize ( (Metavariable)t0.op (),
-                                                newMVTerm,
-                                                modifyThis,
-                                                services );
-        if ( !addFirst.isSatisfiable () ) return Constraint.TOP;
-        return ( (EqualityConstraint)addFirst )
-                                    .normalize ( (Metavariable)t1.op (),
-                                                 newMVTerm,
-                                                 modifyThis || addFirst != this,
-                                                 services );
+//        assert false : "metavariables disabled";
+        return Constraint.TOP;
+//        final Sort intersectionSort = 
+//            IntersectionSort.getIntersectionSort(set, services);
+//                      
+//        if (intersectionSort == null) {
+//            return Constraint.TOP;
+//        }
+//        
+//        // I think these MV will never occur in saved proofs, or?
+//        
+//        final Metavariable newMV = 
+//            new Metavariable(new Name("#MV"+(MV_COUNTER++)), intersectionSort);
+//        final Term newMVTerm = TermFactory.DEFAULT.createFunctionTerm(newMV);
+//        
+//        final Constraint addFirst = normalize ( (Metavariable)t0.op (),
+//                                                newMVTerm,
+//                                                modifyThis,
+//                                                services );
+//        if ( !addFirst.isSatisfiable () ) return Constraint.TOP;
+//        return ( (EqualityConstraint)addFirst )
+//                                    .normalize ( (Metavariable)t1.op (),
+//                                                 newMVTerm,
+//                                                 modifyThis || addFirst != this,
+//                                                 services );
     }
    
 
@@ -741,7 +738,7 @@ public class EqualityConstraint implements Constraint {
 			( (entry.getValue ()).op () ) ) ) {
 		    removeConstraint.map.put
 			( (Metavariable)(entry.getValue ()).op (),
-			  TermFactory.DEFAULT.createFunctionTerm
+			  TermBuilder.DF.var
 			  ( entry.getKey () ) );
 		    it.remove ();
 		}
@@ -908,7 +905,7 @@ public class EqualityConstraint implements Constraint {
                 h += getInstantiation ( mv ).hashCode ();
             }
 
-            hashCode = new Integer ( h );
+            hashCode = Integer.valueOf ( h );
         }
 
         return hashCode.intValue ();

@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -11,61 +11,73 @@
 package de.uka.ilkd.key.proof.mgt;
 
 import java.util.*;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
-import java.io.File;
-import java.io.IOException;
 
-import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.KeYRecoderMapping;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.ClassDeclaration;
+import de.uka.ilkd.key.java.declaration.TypeDeclaration;
+import de.uka.ilkd.key.java.declaration.modifier.Private;
+import de.uka.ilkd.key.java.declaration.modifier.Protected;
+import de.uka.ilkd.key.java.declaration.modifier.Public;
+import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.statement.LoopStatement;
+import de.uka.ilkd.key.logic.ConstrainedFormula;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.Semisequent;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.JavaModel;
+import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.init.proofobligation.AbstractEnsuresPostPO;
-import de.uka.ilkd.key.proof.init.proofobligation.EnsuresPO;
-import de.uka.ilkd.key.proof.init.proofobligation.PreservesInvPO;
-import de.uka.ilkd.key.speclang.ClassInvariant;
-import de.uka.ilkd.key.speclang.LoopInvariant;
-import de.uka.ilkd.key.speclang.OperationContract;
-import de.uka.ilkd.key.speclang.SignatureVariablesFactory;
-import de.uka.ilkd.key.java.declaration.ClassDeclaration;
-import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
-import de.uka.ilkd.key.java.declaration.TypeDeclaration;
-import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
+import de.uka.ilkd.key.rule.RewriteTaclet;
+import de.uka.ilkd.key.rule.RewriteTacletBuilder;
+import de.uka.ilkd.key.rule.RewriteTacletGoalTemplate;
+import de.uka.ilkd.key.rule.RuleSet;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.speclang.*;
+import de.uka.ilkd.key.util.Pair;
 
 
-public class SpecificationRepository {
+public final class SpecificationRepository {
     
     private static final String CONTRACT_COMBINATION_MARKER = "#";
+    private static final TermBuilder TB = TermBuilder.DF;
     
-    private final Map<ProgramMethod, ImmutableSet<OperationContract>> contracts 
-    		= new LinkedHashMap<ProgramMethod,ImmutableSet<OperationContract>>();
-    private final Map<String, OperationContract> contractsByName
-                = new LinkedHashMap<String,OperationContract>();
+    private final Map<Pair<KeYJavaType,ObserverFunction>, ImmutableSet<Contract>> contracts 
+    		= new LinkedHashMap<Pair<KeYJavaType,ObserverFunction>,ImmutableSet<Contract>>();
+    private final Map<Pair<KeYJavaType,ProgramMethod>, ImmutableSet<OperationContract>> operationContracts 
+    		= new LinkedHashMap<Pair<KeYJavaType,ProgramMethod>,ImmutableSet<OperationContract>>();    
+    private final Map<String,Contract> contractsByName
+                = new LinkedHashMap<String,Contract>();
+    private final Map<KeYJavaType,ImmutableSet<ObserverFunction>> contractTargets
+    		= new LinkedHashMap<KeYJavaType,ImmutableSet<ObserverFunction>>();    
     private final Map<KeYJavaType,ImmutableSet<ClassInvariant>> invs
     		= new LinkedHashMap<KeYJavaType, ImmutableSet<ClassInvariant>>();
-    private final Map<String,ClassInvariant> invsByName
-                = new LinkedHashMap<String, ClassInvariant>();
-    private final Map<KeYJavaType, ImmutableSet<ClassInvariant>> throughoutInvs
-    		= new LinkedHashMap<KeYJavaType, ImmutableSet<ClassInvariant>>();
-    private final Map<String,ClassInvariant> throughoutInvsByName
-                = new LinkedHashMap<String,ClassInvariant>();
+    private final Map<KeYJavaType,ImmutableSet<ClassAxiom>> axioms
+    		= new LinkedHashMap<KeYJavaType, ImmutableSet<ClassAxiom>>();
     private final Map<ProofOblInput,ImmutableSet<Proof>> proofs
                 = new LinkedHashMap<ProofOblInput,ImmutableSet<Proof>>();
     private final Map<LoopStatement,LoopInvariant> loopInvs
                 = new LinkedHashMap<LoopStatement,LoopInvariant>();
-    private final Map<ProgramMethod,Boolean> strictPurityCache
-    		= new LinkedHashMap<ProgramMethod,Boolean>();
+    private final Map<ObserverFunction,ObserverFunction> unlimitedToLimited
+    		= new LinkedHashMap<ObserverFunction,ObserverFunction>();
+    private final Map<ObserverFunction,ObserverFunction> limitedToUnlimited
+		= new LinkedHashMap<ObserverFunction,ObserverFunction>();
+    private final Map<ObserverFunction,ImmutableSet<Taclet>> unlimitedToLimitTaclets
+		= new LinkedHashMap<ObserverFunction,ImmutableSet<Taclet>>();
     private final Services services;
+    
+    private int contractCounter = 0;
+    private int libraryContractCounter = -10000;
     
     
     
@@ -77,6 +89,243 @@ public class SpecificationRepository {
 	this.services = services;
     }
     
+
+    //-------------------------------------------------------------------------
+    //internal methods
+    //-------------------------------------------------------------------------
+    
+    private ObserverFunction getCanonicalFormForKJT(ObserverFunction obs, 
+	    				            KeYJavaType kjt) {
+	assert obs != null;
+	assert kjt != null;
+	if(!(obs instanceof ProgramMethod) || obs.getContainerType().equals(kjt)) {
+	    return unlimitObs(obs);
+	}
+	final ProgramMethod pm = (ProgramMethod) obs;
+	if(pm.isConstructor()) {
+	    assert pm.getContainerType().equals(kjt);
+	    return pm;
+	}
+	
+	//search through all locally available methods
+        final String name   = pm.getMethodDeclaration().getName();
+        final int numParams = pm.getParameterDeclarationCount();
+	final ImmutableList<ProgramMethod> candidatePMs 
+		= services.getJavaInfo().getAllProgramMethods(kjt);
+	outer: for(ProgramMethod candidatePM : candidatePMs) {
+	    if(candidatePM.getMethodDeclaration().getName().equals(name) 
+	       && candidatePM.getParameterDeclarationCount() == numParams) {
+		for(int i = 0; i < numParams; i++) {
+		    if(!candidatePM.getParameterType(i)
+			           .equals(pm.getParameterType(i))) {
+			continue outer;
+		    }
+		}
+		return candidatePM;
+	    }
+	}
+	
+	//not found (happens for private methods of superclasses) 
+	//-> search through superclasses
+	for(KeYJavaType sup : services.getJavaInfo()
+		                      .getAllSupertypes(kjt)
+		                      .removeAll(kjt)) {
+	    final ProgramMethod result 
+	    	= (ProgramMethod) getCanonicalFormForKJT(obs, sup);
+	    if(result != null) {
+		return result;
+	    }
+	}
+	
+	//should not happen
+	assert false : "Could not find method " 
+	               + pm.getName() + " in type " + kjt;
+	return null;
+    }
+    
+
+    private ImmutableSet<Pair<KeYJavaType,ObserverFunction>> 
+    		getOverridingMethods(KeYJavaType kjt, ProgramMethod pm) {
+        ImmutableSet<Pair<KeYJavaType,ObserverFunction>> result 
+        	= DefaultImmutableSet.<Pair<KeYJavaType,ObserverFunction>>nil();
+        
+        if(pm.isConstructor()) {
+            return result;
+        }
+        
+        assert kjt != null;
+        final JavaInfo javaInfo = services.getJavaInfo();
+        for(KeYJavaType sub : javaInfo.getAllSubtypes(kjt)) {
+            assert sub != null;
+            final ProgramMethod subPM 
+            	= (ProgramMethod) getCanonicalFormForKJT(pm, sub);
+            result = result.add(new Pair<KeYJavaType,ObserverFunction>(sub, 
+        	    						       subPM));
+        }
+        
+        return result;
+    }
+    
+    
+    private ImmutableSet<Pair<KeYJavaType,ObserverFunction>> 
+    		getOverridingTargets(KeYJavaType kjt, ObserverFunction target) {
+	if(target instanceof ProgramMethod) {
+	    return getOverridingMethods(kjt, (ProgramMethod)target);
+	} else {
+	    ImmutableSet<Pair<KeYJavaType,ObserverFunction>> result 
+        	= DefaultImmutableSet.<Pair<KeYJavaType,ObserverFunction>>nil();
+	    for(KeYJavaType sub : services.getJavaInfo().getAllSubtypes(kjt)) {
+		result = result.add(
+			new Pair<KeYJavaType,ObserverFunction>(sub, target));
+	    }
+	    return result;
+	}
+    }
+    
+    
+    /**
+     * Returns all known class invariants for the passed type.
+     */
+    private ImmutableSet<ClassInvariant> getClassInvariants(KeYJavaType kjt) {
+	ImmutableSet<ClassInvariant> result = invs.get(kjt);
+	return result == null 
+	       ? DefaultImmutableSet.<ClassInvariant>nil() 
+               : result;
+    }    
+    
+    
+    /**
+     * Returns the kjt for the outer class, if the passed kjt is a member class,
+     * and null otherwise.
+     */
+    private KeYJavaType getEnclosingKJT(KeYJavaType kjt) {
+	//HACK, this should be easier
+	if(kjt.getJavaType() instanceof ClassDeclaration) {
+	    final String name = kjt.getJavaType().getFullName();
+	    if(name.contains(".")) {
+		final String enclosingName 
+			= name.substring(0, name.lastIndexOf("."));
+		final KeYJavaType result 
+			= services.getJavaInfo().getKeYJavaType(enclosingName);
+		return result;
+	    } else {
+		return null;
+	    }
+	} else {
+	    return null;
+	}
+    }
+    
+    
+    private boolean axiomIsVisible(ClassAxiom ax, KeYJavaType visibleTo) {
+	final KeYJavaType kjt = ax.getKJT();
+	final String kjtPackage = "x"; //TODO: package information not yet available
+	final String visibleToPackage = "y";
+	final VisibilityModifier visibility = ax.getVisibility();
+	if(visibility == null) {
+	    return kjtPackage.equals(visibleToPackage);
+	} else if(visibility instanceof Public) {
+	    return true;
+	} else if(visibility instanceof Private) {
+	    return kjt.equals(visibleTo);
+	} else if(visibility instanceof Protected) {
+	    return kjtPackage.equals(visibleToPackage)
+	           || visibleTo.getSort().extendsTrans(kjt.getSort());
+	} else {
+	    assert false;
+	    return false;
+	}
+    }
+    
+    
+    private ImmutableSet<ClassAxiom> getVisibleAxiomsOfOtherClasses(
+	    						KeYJavaType visibleTo) {
+	ImmutableSet<ClassAxiom> result = DefaultImmutableSet.<ClassAxiom>nil();
+	for(Map.Entry<KeYJavaType, ImmutableSet<ClassAxiom>> e 
+							: axioms.entrySet()) {
+	    if(e.getKey().equals(visibleTo)) {
+		continue;
+	    }
+	    for(ClassAxiom ax : e.getValue()) {
+		if(axiomIsVisible(ax, visibleTo)) {
+		    result = result.add(ax);
+		}
+	    }
+	}
+	return result;
+    }
+    
+    
+    private static Taclet getLimitedToUnlimitedTaclet(
+	    				ObserverFunction limited, 
+	    				ObserverFunction unlimited) {
+	assert limited.arity() == unlimited.arity();
+	
+	//create schema terms
+	final Term[] subs = new Term[limited.arity()]; 
+	for(int i = 0; i < subs.length; i++) {
+	    final SchemaVariable argSV 
+	    	= SchemaVariableFactory.createTermSV(new Name("t" + i), 
+	    					     limited.argSort(i), 
+	    					     false, 
+	    					     false);
+	    subs[i] = TB.var(argSV);
+	}
+	final Term limitedTerm = TB.func(limited, subs);
+	final Term unlimitedTerm = TB.func(unlimited, subs);	
+	
+	//create taclet
+	final RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();
+	tacletBuilder.setFind(limitedTerm);
+	tacletBuilder.addTacletGoalTemplate
+	    (new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
+					   ImmutableSLList.<Taclet>nil(),
+					   unlimitedTerm));
+	tacletBuilder.setName(new Name("unlimit " + unlimited.name()));
+	
+	return tacletBuilder.getTaclet();
+    }
+    
+    
+    private static Taclet getUnlimitedToLimitedTaclet(
+					ObserverFunction limited, 
+					ObserverFunction unlimited) {
+	assert limited.arity() == unlimited.arity();
+	
+	//create schema terms
+	final Term[] subs = new Term[limited.arity()]; 
+	for(int i = 0; i < subs.length; i++) {
+	    final SchemaVariable argSV 
+	    	= SchemaVariableFactory.createTermSV(new Name("t" + i), 
+	    					     limited.argSort(i), 
+	    					     false, 
+	    					     false);
+	    subs[i] = TB.var(argSV);
+	}
+	final Term limitedTerm = TB.func(limited, subs);
+	final Term unlimitedTerm = TB.func(unlimited, subs);
+	
+	//create taclet
+	final RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();
+	tacletBuilder.setFind(TB.func(unlimited, subs));
+	final ConstrainedFormula cf 
+		= new ConstrainedFormula(TB.equals(limitedTerm, unlimitedTerm));
+	final Sequent addedSeq 
+		= Sequent.createAnteSequent(Semisequent.EMPTY_SEMISEQUENT
+			                               .insertFirst(cf)
+			                               .semisequent());
+	tacletBuilder.addTacletGoalTemplate
+	    (new RewriteTacletGoalTemplate(addedSeq,
+					   ImmutableSLList.<Taclet>nil(),
+					   TB.func(unlimited, subs)));
+	tacletBuilder.setStateRestriction(RewriteTaclet.IN_SEQUENT_STATE);
+	tacletBuilder.setName(new Name("limit " + unlimited.name()));
+	tacletBuilder.addRuleSet(new RuleSet(new Name("limitObserver")));
+	
+	return tacletBuilder.getTaclet();
+    }
+    
+    
     
     
     //-------------------------------------------------------------------------
@@ -84,21 +333,49 @@ public class SpecificationRepository {
     //------------------------------------------------------------------------- 
     
     /**
-     * Returns all registered (atomic) contracts for the passed operation.
+     * Returns all registered (atomic) contracts for the passed target.
      */
-    public ImmutableSet<OperationContract> getOperationContracts(ProgramMethod pm) {
-	ImmutableSet<OperationContract> result = contracts.get(pm);
-        return result == null ? DefaultImmutableSet.<OperationContract>nil() : result;
+    public ImmutableSet<Contract> getContracts(KeYJavaType kjt,
+	    				       ObserverFunction target) {
+	assert kjt != null;
+	assert target != null;
+	target = getCanonicalFormForKJT(target, kjt);
+	final Pair<KeYJavaType,ObserverFunction> pair 
+		= new Pair<KeYJavaType,ObserverFunction>(kjt, target);
+	final ImmutableSet<Contract> result = contracts.get(pair);
+        return result == null 
+               ? DefaultImmutableSet.<Contract>nil() 
+               : result;
     }
     
     
     /**
-     * Returns all registered (atomic) contracts for the passed operation which 
-     * refer to the passed modality.
+     * Returns all registered (atomic) operation contracts for the passed 
+     * operation.
      */
-    public ImmutableSet<OperationContract> getOperationContracts(ProgramMethod pm, 
-	    						Modality modality) {
-	ImmutableSet<OperationContract> result = getOperationContracts(pm);
+    public ImmutableSet<OperationContract> getOperationContracts(
+	    						KeYJavaType kjt, 
+	    						ProgramMethod pm) {
+	pm = (ProgramMethod) getCanonicalFormForKJT(pm, kjt);
+	final Pair<KeYJavaType,ProgramMethod> pair 
+		= new Pair<KeYJavaType,ProgramMethod>(kjt, pm);
+	final ImmutableSet<OperationContract> result 
+		= operationContracts.get(pair);
+        return result == null 
+               ? DefaultImmutableSet.<OperationContract>nil() 
+               : result;	
+    }
+    
+    
+    /**
+     * Returns all registered (atomic) operation contracts for the passed 
+     * operation which refer to the passed modality.
+     */
+    public ImmutableSet<OperationContract> getOperationContracts(
+	    				       KeYJavaType kjt,	    
+	    				       ProgramMethod pm,
+	    				       Modality modality) {
+	ImmutableSet<OperationContract> result = getOperationContracts(kjt, pm);
 	for(OperationContract contract : result) {
 	    if(!contract.getModality().equals(modality)) {
 		result = result.remove(contract);
@@ -112,66 +389,155 @@ public class SpecificationRepository {
      * Returns the registered (atomic or combined) contract corresponding to the 
      * passed name, or null.
      */
-    public OperationContract getOperationContractByName(String name) {
+    public Contract getContractByName(String name) {
         if(name == null || name.length() == 0) {
             return null;
         }
         
-        String[] baseNames = name.split(CONTRACT_COMBINATION_MARKER);        
+        String[] baseNames = name.split(CONTRACT_COMBINATION_MARKER);
+        if(baseNames.length == 1) {
+            return contractsByName.get(baseNames[0]);
+        }
+        
         ImmutableSet<OperationContract> baseContracts 
             = DefaultImmutableSet.<OperationContract>nil();
         for(String baseName : baseNames) {
-            OperationContract baseContract = contractsByName.get(baseName);
+            OperationContract baseContract 
+            	= (OperationContract) contractsByName.get(baseName);
             if(baseContract == null) {
                 return null;
             }
             baseContracts = baseContracts.add(baseContract);
         }
         
-        return combineContracts(baseContracts);
+        return combineOperationContracts(baseContracts);
     }
     
     
     /**
-     * Registers the passed (atomic) operation contract, whose name must
-     * be different from all previously registered contracts.
+     * Returns a set encompassing the passed contract and all its versions 
+     * inherited to overriding methods.
      */
-    public void addOperationContract(OperationContract contract) {
-        ProgramMethod pm = contract.getProgramMethod();
-        String name = contract.getName();
-        assert contractsByName.get(name) == null 
-               : "Tried to add a contract with a non-unique name: " + name;
-        assert !name.contains(CONTRACT_COMBINATION_MARKER)
-               : "Tried to add a contract with a name containing the reserved" 
-                  + " character " + CONTRACT_COMBINATION_MARKER + "!";
-        contracts.put(pm, getOperationContracts(pm).add(contract));
-        contractsByName.put(name, contract);
+    public ImmutableSet<Contract> getInheritedContracts(Contract contract) {
+	ImmutableSet<Contract> result 
+		= DefaultImmutableSet.<Contract>nil().add(contract);
+        final ImmutableSet<Pair<KeYJavaType,ObserverFunction>> subs 
+        	= getOverridingTargets(contract.getKJT(), contract.getTarget());
+        for(Pair<KeYJavaType,ObserverFunction> sub : subs) {
+            for(Contract subContract : getContracts(sub.first, sub.second)) {
+        	if(subContract.id() == contract.id()) {
+        	    result = result.add(subContract);
+        	    break;
+        	}
+            }
+        }
+        return result;
+    }
+    
+    
+    /**
+     * Returns a set encompassing the passed contracts and all its versions 
+     * inherited to overriding methods.
+     */    
+    public ImmutableSet<Contract> getInheritedContracts(
+	    			ImmutableSet<Contract> contractSet) {
+	ImmutableSet<Contract> result = DefaultImmutableSet.<Contract>nil();
+        for(Contract c : contractSet) {
+            result = result.union(getInheritedContracts(c));
+        }
+        return result;
+    }
+    
+    
+    /**
+     * Returns all functions for which contracts are registered in the passed
+     * type.
+     */
+    public ImmutableSet<ObserverFunction> getContractTargets(KeYJavaType kjt) {
+	final ImmutableSet<ObserverFunction> result = contractTargets.get(kjt);
+        return result == null 
+               ? DefaultImmutableSet.<ObserverFunction>nil() 
+               : result;
+    }
+        
+    
+    /**
+     * Registers the passed (atomic) contract, and inherits it to all
+     * overriding methods.
+     */
+    public void addContract(Contract contract) {
+	//sanity check
+	assert getCanonicalFormForKJT(contract.getTarget(), 
+		                      contract.getKJT())
+	            .equals(contract.getTarget());
+	
+	//set id
+	if(((TypeDeclaration)contract.getKJT().getJavaType()).isLibraryClass()) {
+	    contract = contract.setID(libraryContractCounter++);
+	    assert libraryContractCounter < -1 : "too many library contracts";
+	} else {
+	    contract = contract.setID(contractCounter++);
+	}
+	
+	//register and inherit
+        final ImmutableSet<Pair<KeYJavaType,ObserverFunction>> impls 
+        	= getOverridingTargets(contract.getKJT(), contract.getTarget())
+        	  .add(new Pair<KeYJavaType,ObserverFunction>(contract.getKJT(),
+        		        		              contract.getTarget()));
+        
+        for(Pair<KeYJavaType,ObserverFunction> impl : impls) {
+            contract = contract.setTarget(impl.first, impl.second, services);
+            final String name = contract.getName();
+            assert contractsByName.get(name) == null
+                   : "Tried to add a contract with a non-unique name: " + name;
+            assert !name.contains(CONTRACT_COMBINATION_MARKER)
+                   : "Tried to add a contract with a name containing the"
+                     + " reserved character " 
+                     + CONTRACT_COMBINATION_MARKER 
+                     + ": " + name;
+            assert contract.id() != Contract.INVALID_ID
+                   : "Tried to add a contract with an invalid id!";
+            contracts.put(impl, 
+        	          getContracts(impl.first, impl.second).add(contract));
+            
+            if(contract instanceof OperationContract) {
+        	operationContracts.put(new Pair<KeYJavaType,ProgramMethod>(impl.first, (ProgramMethod)impl.second), 
+        		               getOperationContracts(impl.first, 
+        		        	                     (ProgramMethod)impl.second)
+        		        	              .add((OperationContract)contract));
+            }
+            contractsByName.put(contract.getName(), contract);
+            contractTargets.put(impl.first, 
+                                getContractTargets(impl.first).add(impl.second));
+        }
     }
     
     
     /**
      * Registers the passed contracts.
      */
-    public void addOperationContracts(ImmutableSet<OperationContract> contracts) {
-        for(OperationContract contract : contracts) {
-            addOperationContract(contract);
+    public void addContracts(ImmutableSet<Contract> toAdd) {
+        for(Contract contract : toAdd) {
+            addContract(contract);
         }
     }
     
+        
     
     /**
      * Creates a combined contract out of the passed atomic contracts.
      */
-    public OperationContract combineContracts(
-                                        ImmutableSet<OperationContract> contracts) {
-        assert contracts != null && contracts.size() > 0;
-        for(OperationContract contract : contracts) {            
+    public OperationContract combineOperationContracts(
+                                    ImmutableSet<OperationContract> toCombine) {
+        assert toCombine != null && toCombine.size() > 0;
+        for(Contract contract : toCombine) {            
             assert !contract.getName().contains(CONTRACT_COMBINATION_MARKER)
                    : "Please combine only atomic contracts!";
         }
 
         //sort contracts alphabetically (for determinism)
-        OperationContract[] contractsArray = contracts.toArray(new OperationContract[contracts.size()]);
+        OperationContract[] contractsArray 
+        	= toCombine.toArray(new OperationContract[toCombine.size()]);
         Arrays.sort(contractsArray, new Comparator<OperationContract> () {
             public int compare(OperationContract c1, OperationContract c2) {
                 return c1.getName().compareTo(c2.getName());
@@ -190,16 +556,13 @@ public class SpecificationRepository {
         
         //determine names
         StringBuffer nameSB = new StringBuffer(contract.getName());
-        StringBuffer displayNameSB = new StringBuffer(contract.getDisplayName());
         for(OperationContract other : others) {
-            nameSB.append(CONTRACT_COMBINATION_MARKER).append(other.getName());
-            displayNameSB.append(", ").append(other.getDisplayName());
+            nameSB.append(CONTRACT_COMBINATION_MARKER + other.getName());
         }
         
         return contract.union(
                 others, 
                 nameSB.toString(), 
-                (others.length > 0 ? "Combined Contract: " : "") + displayNameSB, 
                 services);
     }
     
@@ -207,105 +570,135 @@ public class SpecificationRepository {
     /**
      * Splits the passed contract into its atomic components. 
      */
-    public ImmutableSet<OperationContract> splitContract(OperationContract contract) {
-        ImmutableSet<OperationContract> result = DefaultImmutableSet.<OperationContract>nil();
+    public ImmutableSet<Contract> splitContract(Contract contract) {
+        ImmutableSet<Contract> result 
+        	= DefaultImmutableSet.<Contract>nil();
         String[] atomicNames 
             = contract.getName().split(CONTRACT_COMBINATION_MARKER);
         for(String atomicName : atomicNames) {
-            OperationContract atomicContract = contractsByName.get(atomicName);
+            Contract atomicContract = contractsByName.get(atomicName);
             if(atomicContract == null) {
                 return null;
             }
-            assert atomicContract.getProgramMethod()
-                                 .equals(contract.getProgramMethod());
+            assert atomicContract.getTarget().equals(contract.getTarget());
             result = result.add(atomicContract);
         }
         return result;
     }
     
-        
-    /**
-     * Returns all known class invariants for the passed type.
-     */
-    public ImmutableSet<ClassInvariant> getClassInvariants(KeYJavaType kjt) {
-	ImmutableSet<ClassInvariant> result = invs.get(kjt);
-	return result == null ? DefaultImmutableSet.<ClassInvariant>nil() : result;
-    }
     
-
     /**
-     * Returns the known class invariant corresponding to the passed name, 
-     * or null.
-     */
-    public ClassInvariant getClassInvariantByName(String name) {
-        return invsByName.get(name);
-    }
-    
-
-    /**
-     * Registers the passed class invariant, whose name must be different from 
-     * all previously registered class invariants.
+     * Registers the passed class invariant, and inherits it to all
+     * subclasses.
      */
     public void addClassInvariant(ClassInvariant inv) {
-        KeYJavaType kjt = inv.getKJT();
-        String name = inv.getName();
-        assert invsByName.get(name) == null
-               : "Tried to add an invariant with a non-unique name!";
+        final KeYJavaType kjt = inv.getKJT();
         invs.put(kjt, getClassInvariants(kjt).add(inv));
-        invsByName.put(name, inv);
+        
+        addClassAxiom(new PartialInvAxiom(inv, services));
+        
+        if(!inv.isStatic()) {
+            final ImmutableList<KeYJavaType> subs 
+            	= services.getJavaInfo().getAllSubtypes(kjt);
+            for(KeYJavaType sub : subs) {
+        	ClassInvariant subInv = inv.setKJT(sub);
+        	invs.put(sub, getClassInvariants(sub).add(subInv));
+            }
+        }
     }
     
     
     /**
      * Registers the passed class invariants.
      */
-    public void addClassInvariants(ImmutableSet<ClassInvariant> invs) {
-        for(ClassInvariant inv : invs) {
+    public void addClassInvariants(ImmutableSet<ClassInvariant> toAdd) {
+        for(ClassInvariant inv : toAdd) {
             addClassInvariant(inv);
         }
     }
     
     
     /**
-     * Returns all known throughout invariants for the passed type.
+     * Returns all class axioms visible in the passed class, including
+     * the axioms induced by invariant declarations.
      */
-    public ImmutableSet<ClassInvariant> getThroughoutClassInvariants(KeYJavaType kjt) {
-	ImmutableSet<ClassInvariant> result = throughoutInvs.get(kjt);
-        return result == null ? DefaultImmutableSet.<ClassInvariant>nil() : result;
+    public ImmutableSet<ClassAxiom> getClassAxioms(KeYJavaType kjt) {
+	//get visible registered axioms of other classes
+	ImmutableSet<ClassAxiom> result = getVisibleAxiomsOfOtherClasses(kjt);	
+	
+	//add registered axioms of own class
+	ImmutableSet<ClassAxiom> ownAxioms = axioms.get(kjt);
+	if(ownAxioms != null) {
+	    for(ClassAxiom ax : ownAxioms) {
+		result = result.add(ax);
+	    }
+	}
+	
+	//add invariant axiom for own class
+	final ImmutableSet<ClassInvariant> myInvs = getClassInvariants(kjt);
+	final ProgramVariable selfVar = TB.selfVar(services, kjt, false);
+	Term invDef = TB.tt();
+	for(ClassInvariant inv : myInvs) {
+	    invDef = TB.and(invDef, inv.getInv(selfVar, services));
+	}
+	invDef = TB.tf().createTerm(Equality.EQV, 
+		                    TB.inv(services, TB.var(selfVar)), 
+		                    invDef);
+	final ObserverFunction invSymbol = services.getJavaInfo().getInv();
+	final ClassAxiom invRepresentsAxiom 
+		= new RepresentsAxiom("Class invariant axiom for " 
+			                 + kjt.getFullName(),
+			             invSymbol,
+				     kjt,	
+				     new Private(),
+				     invDef,
+				     selfVar);
+	result = result.add(invRepresentsAxiom);
+		
+	//add query axioms for own class
+	for(ProgramMethod pm : services.getJavaInfo()
+		                       .getAllProgramMethods(kjt)) {
+	    if(pm.getKeYJavaType() != null) {
+		pm = services.getJavaInfo().getToplevelPM(kjt, pm);		
+		final ClassAxiom queryAxiom 
+		    = new QueryAxiom("Query axiom for " + pm.getFullName(),
+			             pm, 
+			             kjt);
+		result = result.add(queryAxiom);
+	    }
+	}
+	
+	//add axioms for enclosing class, if applicable
+	final KeYJavaType enclosingKJT = getEnclosingKJT(kjt);
+	if(enclosingKJT != null) {
+	    result = result.union(getClassAxioms(enclosingKJT));
+	}
+	
+	return result;
     }
     
     
     /**
-     * Returns the known throughout invariant corresponding to the passed name, 
-     * or null.
+     * Registers the passed class axiom.
      */
-    public ClassInvariant getThroughoutClassInvariantByName(String name) {
-        return throughoutInvsByName.get(name);
-    }
-    
-
-    /**
-     * Registers the passed throughout invariant, whose name must be different 
-     * from all previously registered throughout invariants.
-     */
-    public void addThroughoutClassInvariant(ClassInvariant inv) {
-        KeYJavaType kjt = inv.getKJT();
-        String name = inv.getName();
-        assert throughoutInvsByName.get(name) == null
-               : "Tried to add an invariant with a non-unique name!";
-        throughoutInvs.put(kjt, getThroughoutClassInvariants(kjt).add(inv));
-        throughoutInvsByName.put(name, inv);
-    }
-    
-    
-    /**
-     * Registers the passed throughout invariants.
-     */
-    public void addThroughoutClassInvariants(ImmutableSet<ClassInvariant> invs) {
-        for(ClassInvariant inv : invs) {
-            addThroughoutClassInvariant(inv);
+    public void addClassAxiom(ClassAxiom ax) {
+        KeYJavaType kjt = ax.getKJT();
+        ImmutableSet<ClassAxiom> currentAxioms = axioms.get(kjt);
+        if(currentAxioms == null) {
+            currentAxioms = DefaultImmutableSet.<ClassAxiom>nil();
         }
+        axioms.put(kjt, currentAxioms.add(ax));
     }
+    
+    
+    /**
+     * Registers the passed class axioms.
+     */
+    public void addClassAxioms(ImmutableSet<ClassAxiom> toAdd) {
+        for(ClassAxiom ax : toAdd) {
+            addClassAxiom(ax);
+        }
+    }    
     
     
     /**
@@ -313,7 +706,8 @@ public class SpecificationRepository {
      */
     public ImmutableSet<Proof> getProofs(ProofOblInput po) {
         ImmutableSet<Proof> result = DefaultImmutableSet.<Proof>nil();
-        for(Map.Entry<ProofOblInput,ImmutableSet<Proof>> entry : proofs.entrySet()) {
+        for(Map.Entry<ProofOblInput,ImmutableSet<Proof>> entry 
+        	: proofs.entrySet()) {
             ProofOblInput mapPO = entry.getKey();
             ImmutableSet<Proof> sop = entry.getValue();
             if(mapPO.implies(po)) {
@@ -325,16 +719,51 @@ public class SpecificationRepository {
     
     
     /**
-     * Returns all proofs registered for the passed operation.
+     * Returns all proofs registered for the passed atomic contract, or for
+     * combined contracts including the passed atomic contract
      */
-    public ImmutableSet<Proof> getProofs(ProgramMethod pm) {
+    public ImmutableSet<Proof> getProofs(Contract atomicContract) {
+        assert !atomicContract.getName().contains(CONTRACT_COMBINATION_MARKER)
+               : "Contract must be atomic";
+	
         ImmutableSet<Proof> result = DefaultImmutableSet.<Proof>nil();
-        for(Map.Entry<ProofOblInput,ImmutableSet<Proof>> entry : proofs.entrySet()) {
-            ProofOblInput po = entry.getKey();
-            ImmutableSet<Proof> sop = entry.getValue();
-            if(po instanceof EnsuresPO 
-               && ((EnsuresPO) po).getProgramMethod().equals(pm)) {
-                result = result.union(sop);
+        for(Map.Entry<ProofOblInput,ImmutableSet<Proof>> entry 
+               : proofs.entrySet()) {
+            final ProofOblInput po = entry.getKey();
+            if(po instanceof ContractPO) {
+        	final Contract poContract = ((ContractPO)po).getContract();
+        	if(splitContract(poContract).contains(atomicContract)) {
+        	    result = result.union(entry.getValue());
+        	}
+            }
+        }
+        return result;
+    }    
+    
+
+    /**
+     * Returns all proofs registered for the passed target and its overriding
+     * targets.
+     */
+    public ImmutableSet<Proof> getProofs(KeYJavaType kjt, 
+	    				 ObserverFunction target) {
+	final ImmutableSet<Pair<KeYJavaType,ObserverFunction>> targets 
+		= getOverridingTargets(kjt, target)
+		  .add(new Pair<KeYJavaType,ObserverFunction>(kjt, target));
+        ImmutableSet<Proof> result = DefaultImmutableSet.<Proof>nil();
+        for(Map.Entry<ProofOblInput,ImmutableSet<Proof>> entry 
+        	: proofs.entrySet()) {
+            final ProofOblInput po = entry.getKey();
+            final ImmutableSet<Proof> sop = entry.getValue();
+            if(po instanceof ContractPO) {
+               final Contract contract = ((ContractPO) po).getContract();
+               final Pair<KeYJavaType,ObserverFunction> pair 
+               	    = new Pair<KeYJavaType,ObserverFunction>(
+               		    		contract.getKJT(),
+               		                contract.getTarget());
+               if(targets.contains(pair)) {
+        	   result = result.union(sop);
+               }
             }
         }
         return result;
@@ -342,17 +771,40 @@ public class SpecificationRepository {
     
     
     /**
-     * Returns the operation that the passed proof is about, or null.
+     * Returns all proofs registered with this specification repository.
      */
-    public ProgramMethod getOperationForProof(Proof proof) {
-	for(Map.Entry<ProofOblInput,ImmutableSet<Proof>> entry : proofs.entrySet()) {
+    public ImmutableSet<Proof> getAllProofs() {
+	ImmutableSet<Proof> result = DefaultImmutableSet.<Proof>nil();
+	Collection<ImmutableSet<Proof>> proofSets = proofs.values();
+	for(ImmutableSet<Proof> proofSet : proofSets) {
+	    result = result.union(proofSet);
+	}
+	return result;
+    }
+    
+    
+    /**
+     * Returns the PO that the passed proof is about, or null.
+     */
+    public ContractPO getPOForProof(Proof proof) {
+	for(Map.Entry<ProofOblInput,ImmutableSet<Proof>> entry 
+		: proofs.entrySet()) {
 	    ProofOblInput po = entry.getKey();
             ImmutableSet<Proof> sop = entry.getValue();
-            if(sop.contains(proof) && po instanceof EnsuresPO) {
-                return ((EnsuresPO)po).getProgramMethod();
+            if(sop.contains(proof) && po instanceof ContractPO) {
+                return (ContractPO)po;
             }
         }
         return null;
+    }    
+    
+    
+    /**
+     * Returns the target that the passed proof is about, or null.
+     */
+    public ObserverFunction getTargetOfProof(Proof proof) {
+	final ContractPO po = getPOForProof(proof);
+	return po == null ? null : po.getContract().getTarget();
     }
     
 
@@ -368,7 +820,8 @@ public class SpecificationRepository {
      * Unregisters the passed proof.
      */
     public void removeProof(Proof proof) {
-        for(Map.Entry<ProofOblInput,ImmutableSet<Proof>> entry : proofs.entrySet()) {
+        for(Map.Entry<ProofOblInput,ImmutableSet<Proof>> entry 
+        	: proofs.entrySet()) {
             ImmutableSet<Proof> sop = (ImmutableSet<Proof>) entry.getValue();
             if(sop.contains(proof)) {
                 sop = sop.remove(proof);
@@ -401,196 +854,69 @@ public class SpecificationRepository {
     }
     
     
-    /**
-     * Tells whether the passed operation is "strictly pure", i.e., whether
-     * its specification says that it may have absolutely no side effects
-     * (except for abrupt termination, which is not considered a side effect).
-     */
-    public boolean isStrictlyPure(ProgramMethod pm) {
-        assert pm != null;
-	Boolean result = strictPurityCache.get(pm);
-	if(result != null) {
-	    return result;
-	}
-	
-	result = false;
-	SignatureVariablesFactory svf = SignatureVariablesFactory.INSTANCE;
-	Term tt = TermBuilder.DF.tt();
-        ProgramVariable selfVar 
-        	= svf.createSelfVar(services, pm, true);
-        ImmutableList<ParsableVariable> paramVars 
-        	= svf.createParamVars(services, pm, false);
-	for(OperationContract c : getOperationContracts(pm, Op.DIA)) {
-	    if(c.getPre(selfVar, paramVars, services).getFormula().equals(tt)	   
-	       && c.getModifies(selfVar, paramVars, services).size() == 0) {
-		result = true;
-		break;
+    public void addSpecs(ImmutableSet<SpecificationElement> specs) {
+	for(SpecificationElement spec : specs) {
+	    if(spec instanceof Contract) {
+		addContract((Contract)spec);
+	    } else if(spec instanceof ClassInvariant) {
+		addClassInvariant((ClassInvariant)spec);
+	    } else if(spec instanceof ClassAxiom) {
+		addClassAxiom((ClassAxiom)spec);
+	    } else if(spec instanceof LoopInvariant) {
+		setLoopInvariant((LoopInvariant)spec);
+	    } else {
+		assert false : "unexpected spec: " + spec;
 	    }
 	}
+    }
+    
+    
+    public Pair<ObserverFunction,ImmutableSet<Taclet>> limitObs(
+	    					ObserverFunction obs) {
+	assert limitedToUnlimited.get(obs) == null 
+	       : " observer is already limited: " + obs;
+	if(obs.getClass() != ObserverFunction.class) {
+	    return null;
+	}
 	
-	strictPurityCache.put(pm, result);
+	ObserverFunction limited = unlimitedToLimited.get(obs);
+	ImmutableSet<Taclet> taclets = unlimitedToLimitTaclets.get(obs);
+	
+	if(limited == null) {
+	    final String baseName
+	    	= ((ProgramElementName)obs.name()).getProgramName() + "$lmtd";
+	    final Sort heapSort
+	    	= services.getTypeConverter().getHeapLDT().targetSort();
+	    limited = new ObserverFunction(baseName,
+		    			   obs.sort(),
+		    			   obs.getType(),
+		    			   heapSort,	
+		    			   obs.getContainerType(),
+		    			   obs.isStatic(),
+		    			   obs.getParamTypes());
+	    unlimitedToLimited.put(obs, limited);
+	    limitedToUnlimited.put(limited, obs);
+	    
+	    assert taclets == null;	    
+	    taclets = DefaultImmutableSet
+	    			.<Taclet>nil()
+	                        .add(getLimitedToUnlimitedTaclet(limited, obs))
+	    			.add(getUnlimitedToLimitedTaclet(limited, obs));
+	    unlimitedToLimitTaclets.put(obs, taclets);
+	}
+	
+	assert limited != null;
+	assert taclets != null;
+	return new Pair<ObserverFunction,ImmutableSet<Taclet>>(limited, 
+							       taclets);
+    }
+    
+    
+    public ObserverFunction unlimitObs(ObserverFunction obs) {
+	ObserverFunction result = limitedToUnlimited.get(obs);
+	if(result == null) {
+	    result = obs;
+	}
 	return result;
     }
-    
-    
-    public void drawGraph(Proof currentProof) {
-        MgtGraph gra = new MgtGraph();
-        dirtyFiles = null; //clear last time's dirtiness cache
-
-	//get all classes
-	final Set<KeYJavaType> kjts 
-		= services.getJavaInfo().getAllKeYJavaTypes();
-	Iterator<KeYJavaType> it = kjts.iterator();
-	while(it.hasNext()) {
-	    KeYJavaType kjt = it.next();
-	    if(!(kjt.getJavaType() instanceof ClassDeclaration 
-		 || kjt.getJavaType() instanceof InterfaceDeclaration) 
-	       || ((TypeDeclaration) kjt.getJavaType()).isLibraryClass()) {
-	        it.remove();
-            }
-        }
-	it = kjts.iterator();
-	while(it.hasNext()) {
-	    KeYJavaType kjt = it.next();
-            String dirty = isDirty(kjt,currentProof) ? "style=dashed" : "";
-
-	    StringBuffer methods = new StringBuffer();
-            ImmutableList<ProgramMethod> pms 
-            	= services.getJavaInfo()
-                          .getAllProgramMethodsLocallyDeclared(kjt);
-            for (ProgramMethod pm : pms) {
-                if ((!pm.isImplicit() || pm.getName().equals(
-		    ConstructorNormalformBuilder.
-			CONSTRUCTOR_NORMALFORM_IDENTIFIER))
-                        && pm.getMethodDeclaration().getBody() != null) {
-
-		    if (methods.length()>0) methods.append(" | ");
-		    methods.append(gra.recordLabel(pm));
-
-		    // now the contracts
-		    Iterator<OperationContract> cit = 
-		        getOperationContracts(pm).iterator();
-		    while (cit.hasNext()) { 
-                        OperationContract ct = cit.next();
-                        gra.addNode(pm,dirty);
-                        gra.addEdge(pm,ct);
-		    }
-
-                }
-            }
-
-            gra.addNode(kjt, "shape=record",
-                "label="+gra.recordLabel(kjt)+"| {"+methods+"}",dirty);
-
-            // class invs
-	    Iterator<ClassInvariant> iit =
-		getClassInvariants(kjt).iterator();
-	    while (iit.hasNext()) {
-                ClassInvariant inv = iit.next();
-                gra.addEdge(kjt,inv);
-	    }
-	}
-
-
-        //POs
-	for(Map.Entry<ProofOblInput,ImmutableSet<Proof>> entry : proofs.entrySet()) {
-	    ProofOblInput po = entry.getKey();
-            gra.addNode(po, "shape=parallelogram");
-            ImmutableSet<Proof> sop = entry.getValue();
-	    if(po instanceof EnsuresPO) {
-		ProgramMethod pm = ((EnsuresPO)po).getProgramMethod();
-	        if(po instanceof AbstractEnsuresPostPO) {
-                    gra.addEdge(((AbstractEnsuresPostPO)po).getContract(), po);
-	        }
-	        if(po instanceof PreservesInvPO) {
-                    ImmutableSet<ClassInvariant> invs = 
-                        ((PreservesInvPO)po).getInvs();
-                    for (ClassInvariant i : invs) {
-                        gra.addEdge(i, po);
-                        gra.addEdge(pm, po);
-                    }
-	        }
-	    }
-            for (Proof p: sop) {
-                gra.addNode(p, "label="+gra.label(p),"shape=house", 
-                    p.closed() ? "color=green" : "");
-                gra.addEdge(p, po, "style=dotted");
-                Iterator<ContractWithInvs> usedSpecIt = 
-                    p.getBasicTask().getUsedSpecs().iterator();
-                while (usedSpecIt.hasNext()) {
-                    OperationContract ct = usedSpecIt.next().contract();
-                    // now some contracts are combinations
-                    Iterator<OperationContract> atomcit =
-                        splitContract(ct).iterator();
-                    while (atomcit.hasNext()) gra.addEdge(atomcit.next(),p);
-                }
-
-
-            }
-	}
-        gra.visualize();
-    }
-    
-    
-    private Set<File> dirtyFiles;
-    
-    private boolean isDirty(KeYJavaType kjt, Proof currentProof) {
-	try{
-            if (dirtyFiles == null) buildDirtyFileCache(currentProof);
-            return dirtyFiles.contains(getFile(kjt));
-	} catch(CvsException cvse) {
-            System.err.println(cvse);
-            dirtyFiles = null;
-            return true;
-//	    Logger.getLogger("key.proof.mgt").
-//                error("Dumping Model into CVS failed: "+cvse);
-	} catch(IOException ioe) {
-            System.err.println(ioe);
-            dirtyFiles = null;
-            return true;
-        }
-    }
-
-    
-    private void buildDirtyFileCache(Proof currentProof) 
-                                        throws CvsException, IOException {
-        String tempTag = "KeY_MGT_"+new Long((new java.util.Date()).getTime());
-        JavaModel jModel = currentProof.getJavaModel();
-        CvsRunner cvs = new CvsRunner();
-        boolean importOK =
-	    cvs.cvsImport(jModel.getCVSModule(), jModel.getModelDir(),
-		          System.getProperty("user.name"), tempTag);
-        if (!importOK) throw new CvsException(
-            "Import of temp model failed for\n"+jModel);
-        String diff = cvs.cvsDiff(jModel.getCVSModule(),
-			          jModel.getModelTag(),
-			          tempTag);
-        System.out.println(diff);
-        Pattern p = Pattern.compile("^Index: "+jModel.getCVSModule()+
-            ".(.*?java)$", Pattern.MULTILINE);
-        Matcher m = p.matcher(diff);
-        dirtyFiles = new HashSet();
-        while (m.find()) {
-            dirtyFiles.add(new File(m.group(1)).getCanonicalFile());
-        }
-    }
-
-    
-    private File getFile(KeYJavaType kjt) throws IOException {
-        KeYRecoderMapping r2k =services.getJavaInfo().rec2key();
-        recoder.java.declaration.TypeDeclaration td =
-            (recoder.java.declaration.TypeDeclaration)r2k.toRecoder(kjt);
-        recoder.java.NonTerminalProgramElement parent = td;
-        do {            
-            parent = parent.getASTParent();
-        } while (!(parent instanceof recoder.java.CompilationUnit)&&
-                 parent!=null);
-        recoder.java.CompilationUnit cu = 
-            (recoder.java.CompilationUnit) parent;
-        recoder.io.DataFileLocation loc =
-            (recoder.io.DataFileLocation) cu.getDataLocation();
-        return loc.getFile().getCanonicalFile();
-    }
-
-    
 }

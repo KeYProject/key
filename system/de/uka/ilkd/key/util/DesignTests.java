@@ -1,28 +1,17 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 //
-//
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2004 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-package de.uka.ilkd.key.util;
 
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
-import de.uka.ilkd.key.logic.op.Op;
+
+package de.uka.ilkd.key.util;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Iterator;
@@ -95,9 +84,9 @@ public class DesignTests {
      * source
      */
     private static void copyToList(Object[] source, LinkedList target) {
-        for (Object aSource : source) {
-            target.add(aSource);
-        }
+	for (int i = 0; i<source.length; i++) {
+	    target.add(source[i]);
+	}
     }
     
     /** 
@@ -122,9 +111,9 @@ public class DesignTests {
 	if (subDirectories == null) {
 	    return new Class[0];
 	} else {
-        for (File subDirectory : subDirectories) {
-            copyToList(getAllClasses(subDirectory), result);
-        }
+	    for (int i = 0; i<subDirectories.length; i++) {
+		copyToList(getAllClasses(subDirectories[i]), result);
+	    }
 	    return (Class[])result.toArray(new Class[result.size()]);
 	}
     }
@@ -148,52 +137,23 @@ public class DesignTests {
 	    (cl == de.uka.ilkd.key.logic.op.Junctor.class); // ASMKEY extends Junctor
     }
 
-    /**
-     * subclass of Op should have at most package private constructors
-     * (exception: metaop)
-     */
-    public LinkedList testConstructorInOpSubclasses() {
-	LinkedList badClasses = new LinkedList();
-        for (Class allClass : allClasses) {
-            if (allClass != Op.class &&
-                    (Op.class).
-                            isAssignableFrom(allClass) &&
-                    !(
-                            AbstractMetaOperator.class).isAssignableFrom(allClass)) {
-                Constructor[] cons = allClass.getConstructors();
-                for (Constructor con : cons) {
-                    int mods = con.getModifiers();
-                    if ((Modifier.isProtected(mods) && !exception(allClass)) ||
-                            Modifier.isPublic(mods)) {
-                        badClasses.add(allClass);
-                    }
-                }
-            }
-        }
-	if (badClasses.size()>0) {
-	    message = "Constructors of subclasses of 'Op'  ";
-	    message += "must have package private or private";
-	    message += "(except MetaOperators).\n";	    
-	}
-	return badClasses;
-    }
 
     /**
      * subclass of Term must be private or package private
      */
     public LinkedList testTermSubclassVisibility() {
 	LinkedList badClasses = new LinkedList();
-        for (Class allClass : allClasses) {
-            if (allClass != Term.class &&
-                    (Term.class).
-                            isAssignableFrom(allClass)) {
-                int mods = allClass.getModifiers();
-                if (Modifier.isProtected(mods) ||
-                        Modifier.isPublic(mods)) {
-                    badClasses.add(allClass);
-                }
-            }
-        }
+	for (int i = 0; i<allClasses.length; i++) {
+ 	    if (allClasses[i] != de.uka.ilkd.key.logic.Term.class &&
+		(de.uka.ilkd.key.logic.Term.class).
+		isAssignableFrom(allClasses[i])) {
+		int mods = allClasses[i].getModifiers();
+		if (Modifier.isProtected(mods) ||
+		    Modifier.isPublic(mods)) {
+		    badClasses.add(allClasses[i]);
+ 		}
+ 	    }
+	}
 	if (badClasses.size()>0) {
 	    message = "Visibility of subclasses of Term  ";
 	    message += "must be package private or private.\n";
@@ -212,21 +172,21 @@ public class DesignTests {
 	System.out.println("\n[Testing "+allClasses.length+" classes.]");	
 	int failures = 0;
 	int testcases = 0;
-        for (Method aMeth : meth) {
-            if (aMeth.getName().startsWith("test")) {
-                try {
-                    message = ".";
-                    badClasses = (LinkedList) aMeth.invoke(this, (Object[]) null);
-                    System.out.print(message);
-                    testcases++;
-                    failures += badClasses.size() > 0 ? 1 : 0;
-                    printBadClasses(badClasses);
-                } catch (Exception e) {
-                    System.err.println("Could not invoke method " + meth);
-                }
-            }
-        }
-	System.out.println("\n[Tests finished. ("+(testcases-failures)+
+	for (int i = 0; i<meth.length; i++) {
+	    if (meth[i].getName().startsWith("test")) {
+		try {
+		    message = ".";
+		    badClasses = (LinkedList)meth[i].invoke(this, (Object[])null);
+		    System.out.print(message);
+		    testcases++;
+		    failures += badClasses.size() > 0 ? 1 : 0;
+		    printBadClasses(badClasses);
+		} catch (Exception e) {
+		    System.err.println("Could not invoke method "+meth[i]);
+		}
+	    }
+	}	
+	System.out.println("\n[Design tests finished. ("+(testcases-failures)+
 			   "/"+testcases+") tests passed.]");
     }
     
@@ -234,6 +194,4 @@ public class DesignTests {
 	DesignTests tests = new DesignTests();	
 	tests.runTests();
     }
-
-
 }

@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -137,11 +137,12 @@ classlevel_element[ImmutableList<String> mods]
 	throws SLTranslationException
 :
         result=class_invariant[mods]
+    |   (depends_clause[mods]) => result=depends_clause[mods]        
     |   result=method_specification[mods]
     |   (method_declaration[mods]) => result=method_declaration[mods]
-    |   result=field_declaration[mods]    
+    |   result=field_declaration[mods] 
+    |   result=represents_clause[mods]    
     |   result=history_constraint[mods]
-    |   result=represents_clause[mods]
     |   result=initially_clause[mods]
     |   result=monitors_for_clause[mods]
     |   result=readable_if_clause[mods]
@@ -219,9 +220,6 @@ modifier returns [String result = null]:
     |   pro:PROTECTED           { result = pro.getText(); }
     |   pub:PUBLIC              { result = pub.getText(); }
     |   pur:PURE                { result = pur.getText(); }
-    |   scs:SCOPE_SAFE			{ result = scs.getText(); }
-    |   as:ARBITRARY_SCOPE		{ result = as.getText(); }
-    |   ast:ARBITRARY_SCOPE_THIS { result = ast.getText(); }
     |   spr:SPEC_PROTECTED      { result = spr.getText(); }
     |   spu:SPEC_PUBLIC         { result = spu.getText(); }
     |   sta:STATIC              { result = sta.getText(); }
@@ -522,14 +520,16 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 :
     (
 	    ps=assignable_clause     { sc.addAssignable(ps); }
+	|   ps=accessible_clause     { sc.addAccessible(ps); }
 	|   ps=ensures_clause        { sc.addEnsures(ps); }
 	|   ps=signals_clause        { sc.addSignals(ps); }
 	|   ps=signals_only_clause   { sc.addSignalsOnly(ps); }
 	|   ps=diverges_clause       { sc.addDiverges(ps); }
-	|   ps=working_space_clause  { sc.setWorkingSpace(ps);}
+	|   ps=measured_by_clause    { sc.addMeasuredBy(ps); }
 	|   ps=name_clause           { sc.addName(ps);}
 	|   captures_clause 
 	|   when_clause
+	|   working_space_clause
 	|   duration_clause
     )
     {
@@ -571,6 +571,36 @@ assignable_keyword
 ;
 
 
+accessible_clause 
+	returns [PositionedString result = null] 
+	throws SLTranslationException
+:
+    accessible_keyword result=expression
+;
+
+
+accessible_keyword
+:
+        ACCESSIBLE
+    |   ACCESSIBLE_REDUNDANTLY
+;
+
+
+measured_by_clause 
+	returns [PositionedString result = null] 
+	throws SLTranslationException
+:
+    measured_by_keyword result=expression
+;
+
+
+measured_by_keyword
+:
+        MEASURED_BY
+    |   MEASURED_BY_REDUNDANTLY
+;
+
+
 ensures_clause 
 	returns [PositionedString result = null] 
 	throws SLTranslationException
@@ -585,12 +615,6 @@ ensures_keyword
     |   ENSURES_RED
 ;
 
-
-working_space_clause returns [PositionedString result = null]
-	throws SLTranslationException
-:
-	working_space_keyword  result=expression
-;
 
 signals_clause 
 	returns [PositionedString result = null] 
@@ -688,6 +712,18 @@ when_keyword
 ;
 
 
+working_space_clause throws SLTranslationException
+{
+    PositionedString ps;
+}
+:
+    working_space_keyword ps=expression
+    {
+    	raiseNotSupported("working_space clauses");
+    }
+;
+
+
 working_space_keyword
 :
     	WORKING_SPACE 
@@ -771,6 +807,56 @@ method_declaration[ImmutableList<String> mods]
 
 
 //-----------------------------------------------------------------------------
+//represents clauses
+//-----------------------------------------------------------------------------
+
+
+represents_clause[ImmutableList<String> mods] 
+	returns [ImmutableList<TextualJMLConstruct> result = null] 
+	throws SLTranslationException 
+{
+    PositionedString ps;
+}
+:
+    represents_keyword ps=expression
+    {
+    	TextualJMLRepresents rc 
+    		= new TextualJMLRepresents(mods, ps);
+	result = ImmutableSLList.<TextualJMLConstruct>nil().prepend(rc);
+    }
+;
+
+
+represents_keyword
+:
+        REPRESENTS
+    |   REPRESENTS_RED
+;
+
+
+
+//-----------------------------------------------------------------------------
+//classlevel depends clauses (custom extension of JML)
+//-----------------------------------------------------------------------------
+
+depends_clause[ImmutableList<String> mods] 
+	returns [ImmutableList<TextualJMLConstruct> result = null] 
+	throws SLTranslationException 
+{
+    PositionedString ps;
+}
+:
+    accessible_keyword ps=expression
+    {
+    	TextualJMLDepends d 
+    		= new TextualJMLDepends(mods, ps);
+	result = ImmutableSLList.<TextualJMLConstruct>nil().prepend(d);
+    }
+;
+
+
+
+//-----------------------------------------------------------------------------
 //unsupported classlevel stuff
 //-----------------------------------------------------------------------------
 
@@ -795,28 +881,6 @@ constraint_keyword
     |   CONSTRAINT_RED
 ;
 
-
-represents_clause[ImmutableList<String> mods] 
-	returns [ImmutableList<TextualJMLConstruct> result = null] 
-	throws SLTranslationException 
-{
-    PositionedString ps;
-}
-:
-    represents_keyword ps=expression
-    {
-    	raiseNotSupported("represents clauses");
-	result = ImmutableSLList.<TextualJMLConstruct>nil();
-    }
-;
-
-
-represents_keyword
-:
-        REPRESENTS
-    |   REPRESENTS_RED
-;
-    
     
 initially_clause[ImmutableList<String> mods] 
 	returns [ImmutableList<TextualJMLConstruct> result = null] 
@@ -980,10 +1044,6 @@ loop_specification[ImmutableList<String> mods]
         |   ps=loop_predicates      { ls.addPredicates(ps); }
         |   ps=assignable_clause    { ls.addAssignable(ps); }
         |   ps=variant_function     { ls.setVariant(ps); } 
-        |   ps=working_space_single_iteration_param { ls.addParametrizedWorkingspace(ps); } 
-        |   ps=working_space_single_iteration {ls.setWorkingSpaceLocal(ps);}
-        |   ps=working_space_single_iteration_constructed {ls.setWorkingSpaceConstructed(ps);}
-        |   ps=working_space_single_iteration_reentrant {ls.setWorkingSpaceReentrant(ps);}
     )+
 ;
 
@@ -992,28 +1052,6 @@ loop_invariant returns [PositionedString result = null]
 :
     maintaining_keyword result=expression
 ;
-
-working_space_single_iteration_param returns [PositionedString result = null]
-:
-	WORKING_SPACE_SINGLE_ITERATION_PARAM result=expression
-;
-
-working_space_single_iteration returns [PositionedString result = null]
-:
-	(WORKING_SPACE_SINGLE_ITERATION | WORKING_SPACE_SINGLE_ITERATION_LOCAL) result=expression
-;
-
-working_space_single_iteration_constructed returns [PositionedString result = null]
-:
-	WORKING_SPACE_SINGLE_ITERATION_CONSTRUCTED result=expression
-;
-
-
-working_space_single_iteration_reentrant returns [PositionedString result = null]
-:
-	WORKING_SPACE_SINGLE_ITERATION_REENTRANT  result=expression
-;
-
 
 
 maintaining_keyword 

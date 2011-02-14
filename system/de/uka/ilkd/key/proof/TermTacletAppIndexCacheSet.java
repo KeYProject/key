@@ -215,9 +215,9 @@ public class TermTacletAppIndexCacheSet {
      */
     private boolean isUpdateTargetPos(Term t, int subtermIndex) {
         final Operator op = t.op ();
-        if ( !( op instanceof IUpdateOperator ) ) return false;
+        if ( !( op instanceof UpdateApplication ) ) return false;
 
-        final IUpdateOperator updOp = (IUpdateOperator)op;
+        final UpdateApplication updOp = (UpdateApplication)op;
         return subtermIndex == updOp.targetPos ();
     }
 
@@ -226,13 +226,12 @@ public class TermTacletAppIndexCacheSet {
      *         which we are caching
      */
     private boolean isAcceptedOperator(Operator op) {
-        return op instanceof AccessOp
-               || op instanceof IfThenElse
+        return op instanceof IfThenElse
                || op instanceof Function
                || op instanceof Junctor
                || op instanceof Equality
                || op instanceof Quantifier
-               || op instanceof IUpdateOperator
+               || op instanceof UpdateApplication
                || op instanceof Modality;
     }
     

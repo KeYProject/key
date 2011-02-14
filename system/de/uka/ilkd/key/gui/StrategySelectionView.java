@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -30,33 +30,23 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.strategy.VBTStrategy;
 
-public class StrategySelectionView extends JPanel {
 
-    final JRadioButtonHashMap bSimpleFOLStrategy = new JRadioButtonHashMap(
-        "FOL", "FOLStrategy", false, false);
-    final JRadioButtonHashMap bSimpleJavaCardDLStrategy = new JRadioButtonHashMap(
-        "Java DL", "JavaCardDLStrategy", false, false);
-    final JRadioButtonHashMap bSimplificationOfOCLStrategy = new JRadioButtonHashMap(
-        "OCL simplification", "SimplificationOfOCLStrategy", false, false);
-    final JRadioButtonHashMap bComputeSpecificationStrategy = new JRadioButtonHashMap(
-        "Specification extraction", "ComputeSpecificationStrategy", false, false);
-    final JRadioButtonHashMap bVBTStrategy = new JRadioButtonHashMap(
-	"VBT Strategy", "VBTStrategy", false, false);
-    final JRadioButtonHashMap bDebuggerStrategy = new JRadioButtonHashMap(
-        "Debugger Strategy", "DebuggerStrategy", false, false);
-
+public final class StrategySelectionView extends JPanel {
     
+    private static final String JAVACARDDL_STRATEGY_NAME 
+    	= "JavaCardDLStrategy";
+
+    final JRadioButtonHashMap bSimpleJavaCardDLStrategy = new JRadioButtonHashMap(
+        "Java DL", JAVACARDDL_STRATEGY_NAME, false, false);
+   
     ButtonGroup stratGroup = new ButtonGroup();
     ButtonGroup splittingGroup = new ButtonGroup();
     ButtonGroup loopGroup = new ButtonGroup();
     ButtonGroup methodGroup = new ButtonGroup();
-    ButtonGroup queryGroup = new ButtonGroup();
+    ButtonGroup depGroup = new ButtonGroup();
     ButtonGroup nonLinArithGroup = new ButtonGroup();
     ButtonGroup quantifierGroup = new ButtonGroup();
-    ButtonGroup goalChooserGroup = new ButtonGroup();
-    ButtonGroup vbtPhaseGroup = new ButtonGroup();
     ButtonGroup stopModeGroup = new ButtonGroup();    
     ButtonGroup[] userTacletsGroup = new ButtonGroup[StrategyProperties.USER_TACLETS_NUM];
     {
@@ -64,23 +54,18 @@ public class StrategySelectionView extends JPanel {
             userTacletsGroup[i] = new ButtonGroup ();
     }
     JRadioButtonHashMap rdBut9;
-    JRadioButtonHashMap rdBut9b;
     JRadioButtonHashMap rdBut10;
     JRadioButtonHashMap rdBut11;
     JRadioButtonHashMap rdBut12;
     JRadioButtonHashMap rdBut13;
     JRadioButtonHashMap rdBut14;
-    JRadioButtonHashMap[] rdButVBT = new JRadioButtonHashMap[3];
-    JRadioButtonHashMap rdBut15;
-    JRadioButtonHashMap rdBut16;
     JRadioButtonHashMap rdBut17;
     JRadioButtonHashMap rdBut18;
     private JRadioButtonHashMap splittingNormal;
     private JRadioButtonHashMap splittingOff;
     private JRadioButtonHashMap splittingDelayed;
-    private JRadioButtonHashMap queryNone;
-    private JRadioButtonHashMap queryExpand;
-    private JRadioButtonHashMap queryProgramsToRight;
+    private JRadioButtonHashMap depOn;
+    private JRadioButtonHashMap depOff;
     private JRadioButtonHashMap nonLinArithNone;
     private JRadioButtonHashMap nonLinArithDefOps;
     private JRadioButtonHashMap nonLinArithCompletion;
@@ -88,12 +73,11 @@ public class StrategySelectionView extends JPanel {
     private JRadioButtonHashMap quantifierNonSplitting;
     private JRadioButtonHashMap quantifierNonSplittingWithProgs;
     private JRadioButtonHashMap quantifierInstantiate;
-    private JRadioButton rdButDefaultGC;
-    private JRadioButton rdButDepthGC;
     
     private KeYMediator mediator;
     
-    private TimeoutSpinner timeoutSpinner;
+//    private TimeoutSpinner timeoutSpinner;
+    private JButton defaultButton;
     
     
     JPanel javaDLOptionsPanel = new JPanel() {
@@ -132,7 +116,7 @@ public class StrategySelectionView extends JPanel {
         addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentShown(java.awt.event.ComponentEvent e) {
                 maxSlider.refresh();
-                timeoutSpinner.refresh();
+//                timeoutSpinner.refresh();
             }
         });
     }
@@ -165,60 +149,6 @@ public class StrategySelectionView extends JPanel {
         int yCoord = 0;
 
         ////////////////////////////////////////////////////////////////////////
-        
-        addJavaDLOption ( new JLabel ( "Goal Chooser" ),
-                    javaDLOptionsLayout, 1, yCoord, 7 );
-        
-        ++yCoord;
-
-        rdBut15 = new JRadioButtonHashMap("Default", StrategyProperties.GOALCHOOSER_DEFAULT, true, false);
-        goalChooserGroup.add(rdBut15);
-        addJavaDLOption ( rdBut15, javaDLOptionsLayout, 2, yCoord, 2 );        
-
-        rdBut16 = new JRadioButtonHashMap(
-                "Depth First", StrategyProperties.GOALCHOOSER_DEPTH, false, false);
-        goalChooserGroup.add(rdBut16);
-        addJavaDLOption ( rdBut16, javaDLOptionsLayout, 4, yCoord, 2 );        
-       
-        
-        ++yCoord;
-        addJavaDLOptionSpace ( javaDLOptionsLayout, yCoord );
-
-        ////////////////////////////////////////////////////////////////////////
-        if(Main.testMode){
-            ++yCoord;
-            final JLabel vbtLabel= new JLabel ( "VBT Phase" );
-            addJavaDLOption ( vbtLabel , javaDLOptionsLayout, 1, yCoord, 7 );
-            vbtLabel.setToolTipText("<html>If verification does not seem too succeed, then try<br>" +
-            		"to continue with verification-based testing in order to search for<br>" +
-            		"program bugs. Apply some rules in each of the VBT phases in order<br>" +
-            		"to split-up the state space of the program and to create partial<br>" +
-            		"test data. Test data generation is necessarily incomplete and<br>" +
-            		"the quality of the data depends on the settings you chose.</html>");
-            
-            ++yCoord;
-            
-            rdButVBT[0] = new JRadioButtonHashMap("Verification", StrategyProperties.VBT_SYM_EX, true, false);
-            rdButVBT[0].setToolTipText("<html>This is the normal verification phase.<br>The focus is on symbolic execution</html>");
-            vbtPhaseGroup.add(rdButVBT[0]);
-            addJavaDLOption ( rdButVBT[0], javaDLOptionsLayout, 2, yCoord, 2 );        
-    
-            rdButVBT[1] = new JRadioButtonHashMap("QuanInst", StrategyProperties.VBT_QUAN_INST, false, false);
-            rdButVBT[1].setToolTipText("<html>Symbolic execution is disabled.<br>The focus is on quantifier instantiation.</html>");
-            vbtPhaseGroup.add(rdButVBT[1]);
-            addJavaDLOption ( rdButVBT[1], javaDLOptionsLayout, 4, yCoord, 2 );        
-    
-            rdButVBT[2] = new JRadioButtonHashMap("ModelGen", StrategyProperties.VBT_MODEL_GEN, false, false);
-            rdButVBT[2].setToolTipText("<html>Symbolic execution and quantifier instantiation are disabled<br>" +
-            		"The focus is on propositional and arithmetic rules</html>");
-            vbtPhaseGroup.add(rdButVBT[2]);
-            addJavaDLOption ( rdButVBT[2], javaDLOptionsLayout, 6, yCoord, 2 );        
-    
-            ++yCoord;
-            addJavaDLOptionSpace ( javaDLOptionsLayout, yCoord );
-        }
-            
-        ////////////////////////////////////////////////////////////////////////
         ++yCoord;
         
         addJavaDLOption ( new JLabel ( "Stop at" ),
@@ -234,7 +164,7 @@ public class StrategySelectionView extends JPanel {
         addJavaDLOption ( rdBut17, javaDLOptionsLayout, 2, yCoord, 2 );        
 
         rdBut18 = new JRadioButtonHashMap(
-                "Non-Closable Goal", StrategyProperties.STOPMODE_NONCLOSE, false, false);
+                "Unclosable", StrategyProperties.STOPMODE_NONCLOSE, false, false);
 	rdBut18.setToolTipText( "<html>Stop as soon as the first not automatically<br>" +
                                 "closable goal is encountered.</html>");
         stopModeGroup.add(rdBut18);
@@ -256,10 +186,16 @@ public class StrategySelectionView extends JPanel {
 
         ++yCoord;
         
-        splittingNormal = new JRadioButtonHashMap("Normal",
+        splittingNormal = new JRadioButtonHashMap("Free",
                        StrategyProperties.SPLITTING_NORMAL, true, false);
         splittingGroup.add(splittingNormal);
-        addJavaDLOption ( splittingNormal, javaDLOptionsLayout, 2, yCoord, 2 );        
+        addJavaDLOption ( splittingNormal, javaDLOptionsLayout, 4, yCoord, 2 );     
+        splittingNormal.setToolTipText("<html>" +
+                                        "Split formulas (if-then-else expressions,<br>" +
+                                        "disjunctions in the antecedent, conjunctions in<br>" +
+                                        "the succedent) freely without restrictions." +
+                                        "</html>");
+        
 
         splittingDelayed = new JRadioButtonHashMap("Delayed",
                      StrategyProperties.SPLITTING_DELAYED, true, false);
@@ -275,7 +211,7 @@ public class StrategySelectionView extends JPanel {
                                         "improve the performance." +
                                         "</html>");
         splittingGroup.add(splittingDelayed);
-        addJavaDLOption ( splittingDelayed, javaDLOptionsLayout, 4, yCoord, 2 );
+        addJavaDLOption ( splittingDelayed, javaDLOptionsLayout, 2, yCoord, 2 );
 
         splittingOff = new JRadioButtonHashMap("Off",
                      StrategyProperties.SPLITTING_OFF, true, false);
@@ -307,30 +243,15 @@ public class StrategySelectionView extends JPanel {
         
         rdBut9 = new JRadioButtonHashMap("Expand", StrategyProperties.LOOP_EXPAND, true, false);
         loopGroup.add(rdBut9);
-        
-        if(VBTStrategy.loopUnwindBounded){
-            rdBut9b = new JRadioButtonHashMap("Bounded Expand", StrategyProperties.LOOP_EXPAND_BOUNDED, true, false);
-            loopGroup.add(rdBut9b);
-        }
+        addJavaDLOption ( rdBut9, javaDLOptionsLayout, 4, yCoord, 2 );        
 
         rdBut10 = new JRadioButtonHashMap("Invariant", StrategyProperties.LOOP_INVARIANT, false, false);
         loopGroup.add(rdBut10);
+        addJavaDLOption ( rdBut10, javaDLOptionsLayout, 2, yCoord, 2 );        
 
         rdBut11 = new JRadioButtonHashMap("None", StrategyProperties.LOOP_NONE, false, false);
         loopGroup.add(rdBut11);
-        
-        if(!VBTStrategy.loopUnwindBounded){
-            //Normal layout
-            addJavaDLOption ( rdBut9, javaDLOptionsLayout, 2, yCoord, 2 );      
-            addJavaDLOption ( rdBut10, javaDLOptionsLayout, 4, yCoord, 2 );        
-            addJavaDLOption ( rdBut11, javaDLOptionsLayout, 6, yCoord, 2 );
-        }else{
-            addJavaDLOption ( rdBut9, javaDLOptionsLayout, 2, yCoord, 2 );      
-            addJavaDLOption ( rdBut9b, javaDLOptionsLayout, 4, yCoord, 2 );
-            yCoord ++;
-            addJavaDLOption ( rdBut10, javaDLOptionsLayout, 2, yCoord, 2 );        
-            addJavaDLOption ( rdBut11, javaDLOptionsLayout, 4, yCoord, 2 );            
-        }
+        addJavaDLOption ( rdBut11, javaDLOptionsLayout, 6, yCoord, 2 );        
 
         ++yCoord;
         addJavaDLOptionSpace ( javaDLOptionsLayout, yCoord );
@@ -346,12 +267,12 @@ public class StrategySelectionView extends JPanel {
 
         rdBut12 = new JRadioButtonHashMap("Expand", StrategyProperties.METHOD_EXPAND, true, false);
         methodGroup.add(rdBut12);
-        addJavaDLOption ( rdBut12, javaDLOptionsLayout, 2, yCoord, 2 );        
+        addJavaDLOption ( rdBut12, javaDLOptionsLayout, 4, yCoord, 2 );        
 
         rdBut13 = new JRadioButtonHashMap(
-                "Contracts", StrategyProperties.METHOD_CONTRACT, false, false);
+                "Contract", StrategyProperties.METHOD_CONTRACT, false, false);
         methodGroup.add(rdBut13);
-        addJavaDLOption ( rdBut13, javaDLOptionsLayout, 4, yCoord, 2 );        
+        addJavaDLOption ( rdBut13, javaDLOptionsLayout, 2, yCoord, 2 );        
 
         rdBut14 = new JRadioButtonHashMap("None",
                 StrategyProperties.METHOD_NONE, false, false);
@@ -365,33 +286,29 @@ public class StrategySelectionView extends JPanel {
 
         ++yCoord;
         
-        addJavaDLOption ( new JLabel ( "Query treatment" ),
+        addJavaDLOption ( new JLabel ( "Dependency contracts" ),
                     javaDLOptionsLayout, 1, yCoord, 7 );
         
         ++yCoord;
 
-        queryExpand = new JRadioButtonHashMap("Expand", 
-                StrategyProperties.QUERY_EXPAND, false, false);
-        queryGroup.add(queryExpand);
-        addJavaDLOption ( queryExpand, javaDLOptionsLayout, 2, yCoord, 2 );        
+        depOn = new JRadioButtonHashMap("On", 
+                StrategyProperties.DEP_ON, false, false);
+        depGroup.add(depOn);
+        addJavaDLOption ( depOn, javaDLOptionsLayout, 2, yCoord, 2 );        
         
-        queryProgramsToRight = new JRadioButtonHashMap("Prog2Succ", 
-                StrategyProperties.QUERY_PROGRAMS_TO_RIGHT, false, false);
-        queryProgramsToRight.setToolTipText ( "<html>Move all program blocks to the" +
-                                              " succedent.<br>" +
-                                              " This is necessary" +
-                                              " when query invocations<br>" +
-                                              " are" +
-                                              " supposed to be eliminated" +
-                                              " using<br>" +
-                                              " method contracts.</html>" );
-        queryGroup.add(queryProgramsToRight);
-        addJavaDLOption ( queryProgramsToRight, javaDLOptionsLayout, 4, yCoord, 2 );
-                                      
-        queryNone = new JRadioButtonHashMap("None", 
-                StrategyProperties.QUERY_NONE, true, false);
-        queryGroup.add(queryNone);
-        addJavaDLOption ( queryNone, javaDLOptionsLayout, 6, yCoord, 2 );        
+        depOff = new JRadioButtonHashMap("Off", 
+                StrategyProperties.DEP_OFF, false, false);
+//        queryProgramsToRight.setToolTipText ( "<html>Move all program blocks to the" +
+//                                              " succedent.<br>" +
+//                                              " This is necessary" +
+//                                              " when query invocations<br>" +
+//                                              " are" +
+//                                              " supposed to be eliminated" +
+//                                              " using<br>" +
+//                                              " method contracts.</html>" );
+        depGroup.add(depOff);
+        addJavaDLOption ( depOff, javaDLOptionsLayout, 4, yCoord, 2 );
+
         
         ++yCoord;
         addJavaDLOptionSpace ( javaDLOptionsLayout, yCoord );
@@ -497,7 +414,7 @@ public class StrategySelectionView extends JPanel {
         quantifierGroup.add(quantifierNonSplittingWithProgs);
         addJavaDLOption ( quantifierNonSplittingWithProgs, javaDLOptionsLayout, 2, yCoord, 4 );
 
-        quantifierInstantiate = new JRadioButtonHashMap("Unrestricted", 
+        quantifierInstantiate = new JRadioButtonHashMap("Free", 
                               StrategyProperties.QUANTIFIERS_INSTANTIATE, true, false);
         quantifierInstantiate.setToolTipText ( "<html>" +
             "Instantiate quantified formulas automatically<br>" +
@@ -519,8 +436,7 @@ public class StrategySelectionView extends JPanel {
         userTacletsLabel.setToolTipText("<html>" +
                                         "These options define whether user- and problem-specific taclets<br>" +
                                         "are applied automatically by the strategy. Problem-specific taclets<br>" +
-                                        "can be defined in the \\rules-section of a .key-problem file or be<br>" +
-                                        "loaded during a proof with \"Load Non-Axiom Lemma ...\". For<br>" +
+                                        "can be defined in the \\rules-section of a .key-problem file. For<br>" +
                                         "automatic application, the taclets have to contain a clause<br>" +
                                         "\\heuristics(userTaclets1), \\heuristics(userTaclets2), etc." +
                                         "</html>");
@@ -536,11 +452,7 @@ public class StrategySelectionView extends JPanel {
         ////////////////////////////////////////////////////////////////////////
 
         Box box = Box.createVerticalBox();
-        stratGroup.add(bSimpleFOLStrategy);
         stratGroup.add(bSimpleJavaCardDLStrategy);
-        stratGroup.add(bSimplificationOfOCLStrategy);
-        stratGroup.add(bVBTStrategy);
-        stratGroup.add(bComputeSpecificationStrategy);
         javaDLOptionsPanel.setEnabled(bSimpleJavaCardDLStrategy.isSelected());
         bSimpleJavaCardDLStrategy.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
@@ -548,10 +460,8 @@ public class StrategySelectionView extends JPanel {
             }
         });
         
-        JComponent go = Main.createAutoModeButton();
+        JButton go = new JButton(Main.autoModeAction);
 
-        
-        JCheckBox resumeAutoMode = createResumeAutoModeCheckBox();
         JPanel timeout = createTimeoutSpinner();
 
         JPanel goPanel = new JPanel ();
@@ -580,8 +490,6 @@ public class StrategySelectionView extends JPanel {
         gbcpanel5.weighty = 0;
         gbcpanel5.anchor = GridBagConstraints.WEST;
         gbcpanel5.insets = new Insets (0, 0, 0, 0);
-        goLayout.setConstraints(resumeAutoMode, gbcpanel5);
-        goPanel.add(resumeAutoMode);
         
         gbcpanel5.gridx = 2;
         gbcpanel5.gridy = 0;
@@ -607,18 +515,11 @@ public class StrategySelectionView extends JPanel {
         maxSlider.setAlignmentX(Component.LEFT_ALIGNMENT);
         box.add(maxSlider);
         box.add(Box.createVerticalStrut(8));
-        bSimpleFOLStrategy.setAlignmentX(Component.LEFT_ALIGNMENT);
-        box.add(bSimpleFOLStrategy);
         bSimpleJavaCardDLStrategy.setAlignmentX(Component.LEFT_ALIGNMENT);
         box.add(bSimpleJavaCardDLStrategy);
         javaDLOptionsScrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
         box.add(javaDLOptionsScrollPane);       
-        box.add(bVBTStrategy);
 	
-        bSimplificationOfOCLStrategy.setAlignmentX(Component.LEFT_ALIGNMENT);
-        box.add(bSimplificationOfOCLStrategy);
-        bComputeSpecificationStrategy.setAlignmentX(Component.LEFT_ALIGNMENT);
-        box.add(bComputeSpecificationStrategy);        
        
         // HACK but I really do not know enough about the GridBagLayout :-(
 //        final JPanel verticalGlue = new JPanel();
@@ -629,30 +530,17 @@ public class StrategySelectionView extends JPanel {
         this.add(box);
         //  add the ActionListener to the Buttons and ActionCommands 
         //  for identifying Buttons
-        bSimpleFOLStrategy.addActionListener(stratListener);
         bSimpleJavaCardDLStrategy.addActionListener(stratListener);
-        bSimplificationOfOCLStrategy.addActionListener(stratListener);
-        bVBTStrategy.addActionListener(stratListener);
-        bComputeSpecificationStrategy.addActionListener(stratListener);
         rdBut9.addActionListener(optListener);	
-        if(rdBut9b!=null){rdBut9b.addActionListener(optListener);}
         rdBut10.addActionListener(optListener);       
         rdBut11.addActionListener(optListener);    
         rdBut12.addActionListener(optListener);       
         rdBut13.addActionListener(optListener);     
         rdBut14.addActionListener(optListener);
-        if(Main.testMode){
-            for(JRadioButtonHashMap b:rdButVBT){
-                b.addActionListener(optListener);
-            }
-        }
-        rdBut15.addActionListener(optListener);
-        rdBut16.addActionListener(optListener);
         rdBut17.addActionListener(optListener);
         rdBut18.addActionListener(optListener);
-        queryExpand.addActionListener(optListener);
-        queryProgramsToRight.addActionListener(optListener);
-        queryNone.addActionListener(optListener);
+        depOn.addActionListener(optListener);
+        depOff.addActionListener(optListener);
         splittingNormal.addActionListener(optListener);
         splittingDelayed.addActionListener(optListener);
         splittingOff.addActionListener(optListener);
@@ -739,64 +627,50 @@ public class StrategySelectionView extends JPanel {
     }
     
     private JPanel createTimeoutSpinner() {
-        final JPanel timeoutPanel = new JPanel();
-        timeoutPanel.setLayout(new FlowLayout());
-        final JLabel timeoutLabel = new JLabel("Time limit (ms)"); 
-        timeoutPanel.add(timeoutLabel);
-        timeoutPanel.setToolTipText("Interrupt automatic rule application " +
-                        "after the specified period of time (-1 disables timeout).");
-        
-        timeoutSpinner = new TimeoutSpinner();       
-        
-        timeoutSpinner.addChangeListener(new ChangeListener() {
-
-            public void stateChanged(ChangeEvent e) {
-                if (e.getSource() == timeoutSpinner) {
-                    long timeout = ((Long)((JSpinner)e.getSource()).getValue()).longValue();
-                    mediator.setAutomaticApplicationTimeout(timeout);
-                }
-            }            
-        });
-        timeoutPanel.add(timeoutSpinner);
-        return timeoutPanel;
-    }
-    
-    private JCheckBox createResumeAutoModeCheckBox() {
-	JCheckBox resumeAutoMode = new JCheckBox("Autoresume strategy");
-	resumeAutoMode.setToolTipText("Restart strategy after an interactive proof step?");
-	resumeAutoMode.setBorderPaintedFlat(true);
-
-/* Sorry, but the icon was concealing the checkbox nature of  this
-thing. People were thinking it was a button.
-	resumeAutoMode.setIcon
-	    (IconFactory.resumeDisabledLogo(toolbarIconSize));		
-*/
+//        final JPanel timeoutPanel = new JPanel();
+//        timeoutPanel.setLayout(new FlowLayout());
+//        final JLabel timeoutLabel = new JLabel("Time limit (ms)"); 
+//        timeoutPanel.add(timeoutLabel);
+//        timeoutPanel.setToolTipText("Interrupt automatic rule application " +
+//                        "after the specified period of time (-1 disables timeout).");
+//        
+//        timeoutSpinner = new TimeoutSpinner();       
+//        
+//        timeoutSpinner.addChangeListener(new ChangeListener() {
+//
+//            public void stateChanged(ChangeEvent e) {
+//                if (e.getSource() == timeoutSpinner) {
+//                    long timeout = ((Long)((JSpinner)e.getSource()).getValue()).longValue();
+//                    mediator.setAutomaticApplicationTimeout(timeout);
+//                }
+//            }            
+//        });
+//        timeoutPanel.add(timeoutSpinner);
+//        return timeoutPanel;
+	final JPanel panel = new JPanel();
+	defaultButton = new JButton("Defaults");
+	defaultButton.addActionListener(new ActionListener() {
+	    public void actionPerformed(ActionEvent e) {
+		mediator.getProof()
+		        .getSettings()
+		        .getStrategySettings()
+		        .setMaxSteps(10000);
+		updateStrategySettings(JAVACARDDL_STRATEGY_NAME,
+			               new StrategyProperties());
+		refresh(mediator.getSelectedProof());
+	    }
+	});
+	panel.add(defaultButton);
 	
-	resumeAutoMode.setMaximumSize(resumeAutoMode.getPreferredSize());
-	resumeAutoMode.addItemListener(new ItemListener() {
-		public void itemStateChanged(ItemEvent e) {
-		    if (e.getStateChange() == ItemEvent.SELECTED) {
-//			resumeAutoMode.
-//			    setIcon(IconFactory.resumeLogo(toolbarIconSize));
-			mediator.setResumeAutoMode(true);
-		    } 
-		    else if (e.getStateChange() == ItemEvent.DESELECTED) {
-//			resumeAutoMode.
-//			    setIcon(IconFactory.
-//				    resumeDisabledLogo(toolbarIconSize));
-			mediator.setResumeAutoMode(false);
-		    }
-		    else System.err.println(
-		        "Automode checkbox undefined state: "+
-			    e.getStateChange());
-		    
-	       }
-	    });
-	return resumeAutoMode;
+        maxSlider.addChangeListener( new ChangeListener() {
+            public void stateChanged ( ChangeEvent e ) {
+        	refreshDefaultButton(); 
+            }
+        });
+	
+	return panel;
     }
     
-    
-
     public void setMediator(KeYMediator mediator) {
         this.mediator = mediator;
         maxSlider.setMediator(mediator);
@@ -811,7 +685,7 @@ thing. People were thinking it was a button.
     }
 
 
-    private final MaxRuleAppSlider maxSlider = new MaxRuleAppSlider(mediator);
+    private final MaxRuleAppSlider maxSlider = new MaxRuleAppSlider(null);
     
     
     private final class JavaDLOptionListener implements PropertyChangeListener, 
@@ -835,23 +709,23 @@ thing. People were thinking it was a button.
         }
     }
 
-    class TimeoutSpinner extends JSpinner {        
-        public TimeoutSpinner() {
-            super(new SpinnerNumberModel
-                    (new Long(-1), new Long(-1), new Long(Long.MAX_VALUE), new Long(1))); 
-            if (this.getEditor() instanceof JSpinner.DefaultEditor) {
-                JFormattedTextField ftf = ((JSpinner.DefaultEditor)this.getEditor()).getTextField();
-                if (ftf != null) {
-                    ftf.setColumns(6); 
-                    ftf.setHorizontalAlignment(SwingConstants.RIGHT);
-                }
-            }            
-        }
-        
-        public void refresh() {
-            setValue(new Long(mediator.getAutomaticApplicationTimeout()));
-        }    
-    }
+//    class TimeoutSpinner extends JSpinner {        
+//        public TimeoutSpinner() {
+//            super(new SpinnerNumberModel
+//                    (Long.valueOf(-1), Long.valueOf(-1), Long.valueOf(Long.MAX_VALUE), Long.valueOf(1))); 
+//            if (this.getEditor() instanceof JSpinner.DefaultEditor) {
+//                JFormattedTextField ftf = ((JSpinner.DefaultEditor)this.getEditor()).getTextField();
+//                if (ftf != null) {
+//                    ftf.setColumns(6); 
+//                    ftf.setHorizontalAlignment(SwingConstants.RIGHT);
+//                }
+//            }            
+//        }
+//        
+//        public void refresh() {
+//            setValue(Long.valueOf(mediator.getAutomaticApplicationTimeout()));
+//        }    
+//    }
 
     /**
      * TODO: here should be a settings listener listening to strategy setting changes
@@ -875,9 +749,19 @@ thing. People were thinking it was a button.
         if (proof == null) {            
             enableAll(false);                
         } else {
-            maxSlider.refresh();
-            timeoutSpinner.refresh();
-            enableAll(true);
+//            boolean methodExpandAllowed = false;
+//            for(de.uka.ilkd.key.logic.Choice c 
+//        	     : proof.env().getInitConfig().getActivatedChoices()) {
+//        	if(c.name().toString().equals("methodExpand:allow")) {
+//        	    methodExpandAllowed = true;
+//        	    break;
+//        	}
+//            }
+//            rdBut12.setEnabled(methodExpandAllowed);                        
+//            if(!methodExpandAllowed && rdBut12.isSelected()) {
+//        	rdBut13.doClick();
+//            }
+            
             String activeS = proof.getActiveStrategy().name().toString();
             JRadioButton bactive = JRadioButtonHashMap.getButton(activeS);
             bactive.setSelected(true);
@@ -897,10 +781,10 @@ thing. People were thinking it was a button.
             JRadioButton bMethodActive = getStrategyOptionButton(activeMethodOptions, 
                     StrategyProperties.METHOD_OPTIONS_KEY);
             bMethodActive.setSelected(true);   
-            String activeQueryOptions = p.getProperty(StrategyProperties.QUERY_OPTIONS_KEY);
-            JRadioButton bQueryActive = getStrategyOptionButton(activeQueryOptions, 
-                    StrategyProperties.QUERY_OPTIONS_KEY);
-            bQueryActive.setSelected(true);   
+            String activeDepOptions = p.getProperty(StrategyProperties.DEP_OPTIONS_KEY);
+            JRadioButton bDepActive = getStrategyOptionButton(activeDepOptions, 
+                    StrategyProperties.DEP_OPTIONS_KEY);
+            bDepActive.setSelected(true);   
             String activeNonLinArithOptions = p.getProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY);
             JRadioButton bNonLinArithActive = getStrategyOptionButton(activeNonLinArithOptions, 
                     StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY);
@@ -909,19 +793,10 @@ thing. People were thinking it was a button.
             JRadioButton bQuantifierActive = getStrategyOptionButton(quantifierOptions, 
                     StrategyProperties.QUANTIFIERS_OPTIONS_KEY);
             bQuantifierActive.setSelected(true);   
-            String goalChooserOptions = p.getProperty(StrategyProperties.GOALCHOOSER_OPTIONS_KEY);
-            JRadioButton bCoalChooserActive = getStrategyOptionButton(goalChooserOptions, 
-                    StrategyProperties.GOALCHOOSER_OPTIONS_KEY);
-            bCoalChooserActive.setSelected(true); 
             String stopmodeOptions = p.getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY);
             JRadioButton bStopModeActive = getStrategyOptionButton(stopmodeOptions, 
                     StrategyProperties.STOPMODE_OPTIONS_KEY);
             bStopModeActive.setSelected(true);        
-            String vbtOpts = p.getProperty(StrategyProperties.VBT_PHASE);
-            if(Main.testMode){
-        	JRadioButton bVBTOptions = getStrategyOptionButton(vbtOpts, StrategyProperties.VBT_PHASE);
-        	bVBTOptions.setSelected(true);
-            }
          
             for (int i = 1; i <= StrategyProperties.USER_TACLETS_NUM; ++i) {
                 String userTacletsOptions =
@@ -930,8 +805,26 @@ thing. People were thinking it was a button.
                     StrategyProperties.USER_TACLETS_OFF);
                 userTacletsActive.setSelected(true);
             }
+            
+            maxSlider.refresh();
+//            timeoutSpinner.refresh();
+            enableAll(true);
+            refreshDefaultButton();
         }
     }
+    
+    
+    private void refreshDefaultButton() {
+	defaultButton.setEnabled(mediator.getSelectedProof() != null
+				 && (maxSlider.getPos() != 10000
+		                    || !mediator.getSelectedProof()
+		                                .getActiveStrategy()
+		                 	        .name()
+		                 	        .toString()
+		                 	        .equals(JAVACARDDL_STRATEGY_NAME)
+		                    || !getProperties().isDefault()));	
+    }
+    
 
     private JRadioButton getStrategyOptionButton(String activeOptions, String category) {
         JRadioButton bActive = JRadioButtonHashMap.getButton(
@@ -956,31 +849,40 @@ thing. People were thinking it was a button.
      */
     private void enableAll(boolean enable) {             
         maxSlider.setEnabled(enable);     
-        timeoutSpinner.setEnabled(enable);
-        if (mediator != null) {
-            for (StrategyFactory next : mediator.getProfile().supportedStrategies()) {
-                getStrategyButton(next.name().toString()).setEnabled(enable);
+//        timeoutSpinner.setEnabled(enable);
+        defaultButton.setEnabled(enable);
+        if (mediator != null) {                   
+            final Iterator<StrategyFactory> supportedStrategies = 
+               mediator.getProfile().supportedStrategies().iterator();
+            while (supportedStrategies.hasNext()) {                  
+                final StrategyFactory next = supportedStrategies.next();              
+                getStrategyButton(next.name().toString()).setEnabled(enable);               
             }
         }
     }
 
-    public Strategy getStrategy(String strategyName, Proof proof,
-            StrategyProperties properties) {
-        if (mediator != null) {
-            for (StrategyFactory s : mediator.getProfile().supportedStrategies()) {
-                if (strategyName.equals(s.name().toString())) {
+    public Strategy getStrategy(String strategyName, 
+	    			Proof proof,
+	    			StrategyProperties properties) {
+        if (mediator != null) {        
+            final Iterator<StrategyFactory> supportedStrategies = 
+               mediator.getProfile().supportedStrategies().iterator();
+            while (supportedStrategies.hasNext()) {                
+                final StrategyFactory s = supportedStrategies.next();
+                if (strategyName.equals(s.name().toString())) {                    
                     return s.create(proof, properties);
                 }
             }
-        }
-        System.err.println("Selected Strategy '" + strategyName + "' not found falling back to "+ 
+            System.err.println("Selected Strategy '" + strategyName + "' not found falling back to "+ 
                 mediator.getProfile().getDefaultStrategyFactory().name());
+        }
         return mediator.getProfile().getDefaultStrategyFactory().create(proof, properties);
     }
   
     private String removeLast(String str, int num) {
         return str.substring ( 0, str.length () - num );
     }
+    
     
     /**
      * @return the StrategyProperties
@@ -993,20 +895,14 @@ thing. People were thinking it was a button.
                        loopGroup.getSelection().getActionCommand());
         p.setProperty( StrategyProperties.METHOD_OPTIONS_KEY, 
                        methodGroup.getSelection().getActionCommand());
-        p.setProperty( StrategyProperties.QUERY_OPTIONS_KEY, 
-                       queryGroup.getSelection().getActionCommand());
+        p.setProperty( StrategyProperties.DEP_OPTIONS_KEY, 
+                       depGroup.getSelection().getActionCommand());
         p.setProperty( StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY, 
                        nonLinArithGroup.getSelection().getActionCommand());
         p.setProperty( StrategyProperties.QUANTIFIERS_OPTIONS_KEY, 
                        quantifierGroup.getSelection().getActionCommand());
-        p.setProperty( StrategyProperties.GOALCHOOSER_OPTIONS_KEY, 
-                       goalChooserGroup.getSelection().getActionCommand());
         p.setProperty( StrategyProperties.STOPMODE_OPTIONS_KEY, 
                        stopModeGroup.getSelection().getActionCommand());
-        if(Main.testMode){
-            p.setProperty( StrategyProperties.VBT_PHASE, 
-                           vbtPhaseGroup.getSelection().getActionCommand());
-        }
         
         for (int i = 1; i <= StrategyProperties.USER_TACLETS_NUM; ++i) {
             p.setProperty( StrategyProperties.USER_TACLETS_OPTIONS_KEY(i), 
@@ -1017,12 +913,10 @@ thing. People were thinking it was a button.
         return p;
     }
 
-    /**
-     * 
-     */
-    private void updateStrategySettings(String strategyName) {
+    
+    private void updateStrategySettings(String strategyName,
+	    				StrategyProperties p) {
         final Proof proof = mediator.getProof();
-        final StrategyProperties p = getProperties();
         final Strategy strategy = getStrategy(strategyName, proof, p);
 
         ProofSettings.DEFAULT_SETTINGS.getStrategySettings().
@@ -1036,19 +930,23 @@ thing. People were thinking it was a button.
             setActiveStrategyProperties(p);
         
         proof.setActiveStrategy(strategy);
+        
+        refresh(proof);
     }
 
     public class StratListener implements ActionListener { 
-        public void actionPerformed(ActionEvent e) {            
-            updateStrategySettings(e.getActionCommand());
+        public void actionPerformed(ActionEvent e) {
+            StrategyProperties props = getProperties();
+            updateStrategySettings(e.getActionCommand(), props);
         }
     }
 
     public class OptListener implements ActionListener { 
         public void actionPerformed(ActionEvent e) { 	
-        	
-            updateStrategySettings(mediator.getProof().
-                    getActiveStrategy().name().toString());
+            StrategyProperties props = getProperties();        	
+            updateStrategySettings(
+        	    mediator.getProof().getActiveStrategy().name().toString(),
+                    props);
         }
     }
 }

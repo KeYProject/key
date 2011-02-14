@@ -7,6 +7,7 @@
 // See LICENSE.TXT for details.
 //
 //
+
 package de.uka.ilkd.key.logic.op;
 
 import java.io.IOException;
@@ -24,7 +25,7 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
-public abstract class ProgramVariable extends TermSymbol 
+public abstract class ProgramVariable extends AbstractSortedOperator 
     implements SourceElement, ProgramElement, Expression, 
 	       ReferencePrefix, IProgramVariable, ParsableVariable, ReferenceSuffix, 
 	       ProgramInLogic {
@@ -44,14 +45,14 @@ public abstract class ProgramVariable extends TermSymbol
     private final KeYJavaType containingType;
 
     protected ProgramVariable(ProgramElementName name, 
-			    Sort               s,
-			    KeYJavaType        t, 
-			    KeYJavaType        containingType,
-			    boolean            isStatic,
-			    boolean            isModel,
-			    boolean            isGhost,
-			    boolean            isFinal) {
-	super(name, s);
+			      Sort               s,
+			      KeYJavaType        t, 
+			      KeYJavaType        containingType,
+			      boolean            isStatic,
+			      boolean            isModel,
+			      boolean            isGhost,
+			      boolean            isFinal) {
+	super(name, s == null ?  t.getSort() : s, false);
 	this.type = t;
 	this.containingType = containingType;	
 	this.isStatic = isStatic;
@@ -61,6 +62,9 @@ public abstract class ProgramVariable extends TermSymbol
 	// remove this as soon as possible %%%
 	id = COUNTER;
 	COUNTER++;
+	
+	assert sort() != Sort.FORMULA;
+	assert sort() != Sort.UPDATE;
     }
     
     protected ProgramVariable(ProgramElementName name, 
@@ -78,26 +82,12 @@ public abstract class ProgramVariable extends TermSymbol
 	return id;
     }
 
-    /** returns sort */
-    public Sort sort() {
-	return super.sort() == null ? type.getSort() : super.sort();
-    }
-
-    /** @return arity of the Variable as int */
-    public int arity() {
-	return 0;
-    }
 
     /** @return name of the ProgramVariable */
     public ProgramElementName getProgramElementName() {
 	return (ProgramElementName) name();
     }
 
-    /** toString */
-    public String toString() {
-	return name().toString();
-    }
-	        
     /**
      * returns true if the program variable has been declared as static
      */
@@ -200,6 +190,7 @@ public abstract class ProgramVariable extends TermSymbol
 	return  PositionInfo.UNDEFINED;
     }
 
+    @Override
     public KeYJavaType getKeYJavaType() {
 	return type;
     }
@@ -252,8 +243,11 @@ public abstract class ProgramVariable extends TermSymbol
 	final String typeName;
 	if (javaType instanceof ArrayType) {
 	    typeName = ((ArrayType)javaType).getAlternativeNameRepresentation();
-	} else {
+	} else if (javaType != null) {
 	    typeName = javaType.getFullName();
+	} else {
+	    //XXX
+	    typeName = type.getSort().name().toString();
 	}
 	return typeName + " " + name() + ";\n";
     }
@@ -262,14 +256,8 @@ public abstract class ProgramVariable extends TermSymbol
 	return getProgramElementName().getProgramName().startsWith("<");
     }
 
-    /* (non-Javadoc)
-     * @see de.uka.ilkd.key.logic.op.Location#mayBeAliasedBy(de.uka.ilkd.key.logic.op.Location)
-     */
-    public boolean mayBeAliasedBy(Location loc) {
-        return loc instanceof SortedSchemaVariable || loc == this; 
-    }
 
-
+    @Override
     public MatchConditions match(SourceData source, MatchConditions matchCond) {        
         final ProgramElement src = source.getSource();
         source.next();

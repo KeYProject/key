@@ -24,7 +24,6 @@ import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.sort.ObjectSort;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 
@@ -75,25 +74,6 @@ public class KeYProgModelInfo{
         return rec2key().elemsKeY();
     }
     
-    
-    /**
-     * Returns all ObjectSorts mapped to java.Types in KeY.
-     * @return a Collection containing the ObjectSorts.
-     */
-    public Collection<ObjectSort> allObjectSorts(){
-	Set<ObjectSort> result=new HashSet<ObjectSort>();
-	for (final Object o : allElements()) {
-	    if (o instanceof KeYJavaType) {	        	   
-		KeYJavaType oKJT = (KeYJavaType)o;
-		if (oKJT.getSort() instanceof ObjectSort) {
-		    result.add((ObjectSort) oKJT.getSort());
-		}
-	    }
-	}
-        return result;
-    }
-
-
     private List<recoder.abstraction.Method> getAllRecoderMethods(KeYJavaType kjt){
 	if (kjt.getJavaType() instanceof TypeDeclaration) {
 	    Object o = rec2key().toRecoder(kjt);
@@ -328,7 +308,8 @@ public class KeYProgModelInfo{
 	(KeYJavaType ct, ImmutableList<KeYJavaType> signature){
         recoder.abstraction.ClassType rct
             = (recoder.abstraction.ClassType) rec2key().toRecoder(ct);
-	List<? extends recoder.abstraction.Constructor> res = rct.getProgramModelInfo().getConstructors
+	List<? extends recoder.abstraction.Constructor> res 
+		= rct.getProgramModelInfo().getConstructors
 	    (rct, getRecoderTypes(signature));
 	return res;
     }
@@ -425,18 +406,19 @@ public class KeYProgModelInfo{
      * @param signature IList<KeYJavaType> representing the signature of the constructor
      * @return the most specific constructor declared in the given type 
      */
-    public Constructor getConstructor(KeYJavaType ct, 
-				      ImmutableList<KeYJavaType> signature) {
+    public ProgramMethod getConstructor(KeYJavaType ct, 
+				       ImmutableList<KeYJavaType> signature) {
         List<? extends recoder.abstraction.Constructor> constructors =
             getRecoderConstructors(ct, signature);
         if (constructors.size()==1) {
-	    Object o = rec2key().toKeY(constructors.get(0));
-	    if(o instanceof Constructor){
-		return (Constructor) o;
-	    }
-	    if(o instanceof ProgramMethod){
-		return (Constructor) ((ProgramMethod) o).getMethodDeclaration();
-	    }
+            return (ProgramMethod) rec2key().toKeY(constructors.get(0));
+//	    Object o = rec2key().toKeY(constructors.get(0));
+//	    if(o instanceof Constructor){
+//		return (Constructor) o;
+//	    }
+//	    if(o instanceof ProgramMethod){
+//		return (Constructor) ((ProgramMethod) o).getMethodDeclaration();
+//	    }
         }
         if (constructors.size()==0) {
             Debug.out("javainfo: Constructor not found: ",ct);
@@ -836,10 +818,4 @@ public class KeYProgModelInfo{
  	return new KeYProgModelInfo(getServConf(), rec2key().copy(), 
  				    typeConverter);
     }
-    
-
 }
-
-
-
-

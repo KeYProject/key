@@ -14,7 +14,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.speclang.PositionedString;
 
 
-public class TextualJMLMethodDecl extends TextualJMLConstruct {
+public final class TextualJMLMethodDecl extends TextualJMLConstruct {
     
     private final PositionedString decl;
     private final String methodName;
@@ -40,11 +40,13 @@ public class TextualJMLMethodDecl extends TextualJMLConstruct {
     }
     
     
+    @Override
     public String toString() {
         return decl.toString();
     }
     
     
+    @Override
     public boolean equals(Object o) {
         if(!(o instanceof TextualJMLMethodDecl)) {
             return false;
@@ -56,6 +58,7 @@ public class TextualJMLMethodDecl extends TextualJMLConstruct {
     }
     
     
+    @Override
     public int hashCode() {
         return mods.hashCode() + decl.hashCode() + methodName.hashCode();
     }

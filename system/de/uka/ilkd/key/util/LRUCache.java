@@ -5,8 +5,8 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//
-//
+
+
 package de.uka.ilkd.key.util;
 
 import java.util.LinkedHashMap;
@@ -31,6 +31,7 @@ public class LRUCache<K,V> extends LinkedHashMap<K,V> {
     /**
      * removes the eldest entry, i.e. the least recently used one
      */
+    @Override
     protected boolean removeEldestEntry(Map.Entry<K,V> eldest) {
 	return size() > maxEntries;
     }

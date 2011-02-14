@@ -13,7 +13,7 @@ package de.uka.ilkd.key.strategy.feature;
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.op.IUpdateOperator;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -69,7 +69,7 @@ public class SimplifyReplaceKnownCandidateFeature
         final PIOPathIterator it = pos.iterator ();
         
         while ( it.next() != -1 ) {
-            if ( !( it.getSubTerm().op() instanceof IUpdateOperator ) )
+            if ( !( it.getSubTerm().op() instanceof UpdateApplication ) )
                 return true;
         }
         

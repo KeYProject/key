@@ -5,6 +5,7 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.HashSet;
@@ -16,7 +17,9 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.Op;
+import de.uka.ilkd.key.logic.op.Equality;
+import de.uka.ilkd.key.logic.op.IfThenElse;
+import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
 
 /**
@@ -51,15 +54,16 @@ class PredictCostProver {
 	    return -1;
 	} else {
 	    final PredictCostProver prover = new PredictCostProver(sub
-		    .applyWithoutCasts(matrix), assertList, services);
+		.applyWithoutCasts(matrix, services), assertList, services);
 	    return prover.cost();
 	}
     }
 
     // init context
     private void initClauses(Term instance) {
-	for (Term t : TriggerUtils.setByOperator(instance, Op.AND)) {
- 	    for (ImmutableSet<Term> lit : createClause(TriggerUtils.setByOperator(t, Op.OR))) {
+
+	for (Term t : TriggerUtils.setByOperator(instance, Junctor.AND)) {
+ 	    for (ImmutableSet<Term> lit : createClause(TriggerUtils.setByOperator(t, Junctor.OR))) {
 		clauses.add(new Clause(lit));
 	    }
 	}
@@ -81,12 +85,7 @@ class PredictCostProver {
 
     private ImmutableSet<ImmutableSet<Term>> createClauseHelper(ImmutableSet<ImmutableSet<Term>> res, 
 	    Term self, ImmutableSet<Term> ts) {
-	if (self.op() == Op.IF_EX_THEN_ELSE) {
-	    res = res.add(ts.add(tb.not(self.sub(0))).add(self.sub(1)));
-	    res = res.add(ts.add(self.sub(0)).add(self.sub(2)));
-	} else {
-	    res = res.add(ts.add(self));
-	}
+	res = res.add(ts.add(self));
 	return res;
     }
 
@@ -102,12 +101,12 @@ class PredictCostProver {
 	boolean negated = false;
 	Term pro = problem;
 	Operator op = pro.op();
-	while (op == Op.NOT) {
+	while (op == Junctor.NOT) {
 	    negated = !negated;
 	    pro = pro.sub(0);
 	    op = pro.op();
 	}
-	if ((op == Op.EQUALS || op == Op.EQV) && 
+	if ((op == Equality.EQUALS || op == Equality.EQV) && 
 		pro.sub(0).equalsModRenaming(pro.sub(1)))
 	    return negated ? falseT : trueT;
 	Term arithRes = HandleArith.provedByArith(pro, services);
@@ -125,12 +124,12 @@ class PredictCostProver {
     private Term directConsequenceOrContradictionOfAxiom(Term problem, Term axiom) {
 	boolean negated = false;
 	Term pro = problem;
-	while (pro.op() == Op.NOT) {
+	while (pro.op() == Junctor.NOT) {
 	    pro = pro.sub(0);
 	    negated = !negated;
 	}
 	Term ax = axiom;
-	while (ax.op() == Op.NOT) {
+	while (ax.op() == Junctor.NOT) {
 	    ax = ax.sub(0);
 	    negated = !negated;
 	}
@@ -308,11 +307,11 @@ class PredictCostProver {
 	    ImmutableSet<Term> res = DefaultImmutableSet.<Term> nil();
 	    for (final Term lit : this) {
 		final Operator op = proveLiteral(lit, assertLits).op();
-		if (op == Op.TRUE) {
+		if (op == Junctor.TRUE) {
 		    res = DefaultImmutableSet.<Term> nil().add(trueT);
 		    break;
 		}
-		if (op == Op.FALSE) {
+		if (op == Junctor.FALSE) {
 		    continue;
 		}
 		res = res.add(lit);
@@ -335,14 +334,14 @@ class PredictCostProver {
 		return false;
 	    Term[] terms = lits.toArray(new Term[lits.size()]);
 	    ImmutableSet<Term> next = lits.remove(terms[0]);
-	    boolean opNot = terms[0].op() == Op.NOT;
+	    boolean opNot = terms[0].op() == Junctor.NOT;
 	    Term axiom = opNot ? terms[0].sub(0) : tb.not(terms[0]);
 	    for (int j = 1; j < terms.length; j++) {
 		Term pro = provedByAnother(terms[j], axiom);
 		final Operator op = pro.op();
-		if (op == Op.TRUE)
+		if (op == Junctor.TRUE)
 		    return true;
-		if (op == Op.FALSE && terms[0].equals(terms[j])) {
+		if (op == Junctor.FALSE && terms[0].equals(terms[j])) {
 		    next = next.remove(terms[j]);
 		    literals = literals.remove(terms[j]);
 		}

@@ -90,6 +90,7 @@ public class FormulaTagManager {
 
 
     public void sequentChanged (Goal source, SequentChangeInfo sci) {
+	assert source != null;
         removeTags ( sci, true, source  );
 	removeTags ( sci, false, source );
 	

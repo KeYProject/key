@@ -21,11 +21,13 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
+import de.uka.ilkd.key.java.expression.operator.New;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
 
 public class EvaluateArgs extends ProgramMetaConstruct{
 
@@ -37,13 +39,14 @@ public class EvaluateArgs extends ProgramMetaConstruct{
 	super("#evaluate-arguments", pe); 
     }
 
+    
     public static ProgramVariable evaluate(Expression e, 
                                            List<? super LocalVariableDeclaration> l, 
                                            Services services, 
                                            ExecutionContext ec) {
 
 	final VariableNamer varNamer = services.getVariableNamer();
-	final KeYJavaType t      = e.getKeYJavaType(services, ec);
+	final KeYJavaType t = e.getKeYJavaType(services, ec);
 	final ProgramVariable pv = 
 	    new LocationVariable(VariableNamer.parseName
 				(varNamer.
@@ -55,22 +58,17 @@ public class EvaluateArgs extends ProgramMetaConstruct{
     }
 
 
-    /** performs the program transformation needed for symbolic
-     * program execution 
-     * @param services the Services with all necessary information 
-     * about the java programs
-     * @param svInst the instantiations esp. of the inner and outer label 
-     * @return the transformed program
-     */
+    @Override
     public ProgramElement symbolicExecution(ProgramElement pe,
 					    Services services,
 					    SVInstantiations svInst) {
 
 	final ExecutionContext ec = svInst.getExecutionContext();
 
-	MethodReference mr = 
-	    (MethodReference) (pe instanceof CopyAssignment ? 
-			       ((CopyAssignment)pe).getChildAt(1) : pe);
+	MethodOrConstructorReference mr
+	  = (MethodOrConstructorReference) (pe instanceof CopyAssignment 
+		  			    ? ((CopyAssignment)pe).getChildAt(1)
+		                            : pe);
 	
 	List<Statement> evalstat = new LinkedList<Statement>();
 
@@ -87,30 +85,42 @@ public class EvaluateArgs extends ProgramMetaConstruct{
 	
 	ImmutableArray<Expression> args = mr.getArguments();
 	Expression[] newArgs = new Expression[args.size()];
-	for (int i=0; i<args.size(); i++) { 
-	    newArgs[i]=evaluate(args.get(i), evalstat, services, ec);
+	for(int i = 0; i < args.size(); i++) { 
+	    newArgs[i] = evaluate(args.get(i), evalstat, services, ec);
 	}
 
 	Statement[] res = new Statement[1+evalstat.size()];
 	final Iterator<Statement> it = evalstat.iterator();
-
-	for (int i=0; i<evalstat.size(); i++) {
+	for(int i = 0; i < evalstat.size(); i++) {
 	    res[i] = it.next();
 	}
 
-	final MethodReference resMR = new MethodReference
-	    (new ImmutableArray<Expression>(newArgs), mr.getMethodName(), newCalled);
+	final MethodOrConstructorReference resMR;
+	if(mr instanceof MethodReference) {
+	    resMR = new MethodReference(new ImmutableArray<Expression>(newArgs),
+		    		        ((MethodReference)mr).getMethodName(), 
+		    		        newCalled);
+	} else if(mr instanceof New) {
+	    resMR = new New(newArgs, 
+		    	    ((New)mr).getTypeReference(), 
+		    	    mr.getReferencePrefix());
+	} else if(mr instanceof SuperConstructorReference) {
+	    resMR = new SuperConstructorReference(mr.getReferencePrefix(), 
+		    			          newArgs);
+	} else if(mr instanceof ThisConstructorReference) {
+	    resMR = new ThisConstructorReference(newArgs);
+	} else {	    
+	    assert false : "unexpected subclass of MethodOrConstructorReference";
+	    resMR = null;	
+	}
 
-	if (pe instanceof CopyAssignment) {
+	if(pe instanceof CopyAssignment) {
 	    res[res.length-1] = new CopyAssignment
-		(((CopyAssignment)pe).getExpressionAt(0), resMR);
+		(((CopyAssignment)pe).getExpressionAt(0), (Expression)resMR);
 	} else {
 	    res[res.length-1] = resMR;
 	}
 
 	return new StatementBlock(res);
     }
-
 }
-
-	

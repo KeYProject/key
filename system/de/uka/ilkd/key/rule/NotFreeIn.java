@@ -16,6 +16,7 @@
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.VariableSV;
 
 public class NotFreeIn {
 
@@ -29,7 +30,7 @@ public class NotFreeIn {
      * an Taclet.
      */
     public NotFreeIn(SchemaVariable first, SchemaVariable second) {
-	if (!first.isVariableSV()) {
+	if (!(first instanceof VariableSV)) {
 	    throw new RuntimeException("Expected a SchemaVariable "+
 				       "that has been only allowed to match "+
 				       "variables"); 
@@ -55,6 +56,9 @@ public class NotFreeIn {
     }
 
     public boolean equals(Object o) {
+	if(! (o instanceof NotFreeIn)) {
+	    return false;
+	}
 	NotFreeIn nfi=(NotFreeIn)o;
 	return (nfi.first==first() && nfi.second==second());
     }
@@ -65,7 +69,4 @@ public class NotFreeIn {
     	result = 37 * result + second().hashCode();
     	return result;
     }
-
 }
-
- 

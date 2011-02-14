@@ -5,13 +5,14 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.op.IUpdateOperator;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.Debug;
@@ -42,8 +43,8 @@ public class NotInScopeOfModalityFeature extends BinaryFeature {
             final Operator op = it.getSubTerm ().op();
             
             if ( op instanceof Modality ) return true;
-            if ( op instanceof IUpdateOperator ) {
-                final IUpdateOperator updOp = (IUpdateOperator)op;
+            if ( op instanceof UpdateApplication ) {
+                final UpdateApplication updOp = (UpdateApplication)op;
                 if ( it.getChild () == updOp.targetPos () ) return true;
             }
         }

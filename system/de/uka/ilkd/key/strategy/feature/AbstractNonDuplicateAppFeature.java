@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -12,13 +12,15 @@ package de.uka.ilkd.key.strategy.feature;
 
 import java.util.Iterator;
 
-import de.uka.ilkd.key.collection.ImmutableMapEntry;
 import de.uka.ilkd.key.collection.ImmutableMap;
+import de.uka.ilkd.key.collection.ImmutableMapEntry;
 import de.uka.ilkd.key.logic.ConstrainedFormula;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SkolemTermSV;
+import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
@@ -70,7 +72,7 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
         // compare the position of application
         if ( newPio != null ) {
             if ( ! ( cmp instanceof PosTacletApp ) ) return false;
-            final PosInOccurrence oldPio = cmp.posInOccurrence ();
+            final PosInOccurrence oldPio = ((PosTacletApp)cmp).posInOccurrence ();
             if ( !comparePio ( newApp, cmp, newPio, oldPio ) ) return false;
         }
 
@@ -117,15 +119,14 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
     }
     
     private boolean subset(ImmutableMap<SchemaVariable,InstantiationEntry> insts0,
-                           ImmutableMap<SchemaVariable,InstantiationEntry> insts1) {	
-	final Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry>> it =
+                           ImmutableMap<SchemaVariable,InstantiationEntry> insts1) {
+        final Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry>> it =
             insts0.entryIterator ();
 
         while ( it.hasNext () ) {
             final ImmutableMapEntry<SchemaVariable,InstantiationEntry> entry0 = it.next ();
-            
-            if ( entry0.key ().isNameSV () || entry0.key ().isSkolemTermSV () 
-        	    || entry0.key().isVariableSV() )
+
+            if ( entry0.key () instanceof SkolemTermSV || entry0.key() instanceof VariableSV)
                 continue;
                 
             final InstantiationEntry instEntry1 = insts1.get ( entry0.key () );

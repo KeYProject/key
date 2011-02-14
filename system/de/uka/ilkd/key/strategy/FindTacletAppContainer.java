@@ -12,9 +12,9 @@ package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.IUpdateOperator;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.FormulaTag;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -101,8 +101,8 @@ public class FindTacletAppContainer extends TacletAppContainer {
 
 
     /**
-     * checks if the modification path and the postition where this taclet application
-     * has been matched again denote independant subformulas. The modification affects 
+     * checks if the modification path and the position where this taclet application
+     * has been matched again denote independent subformulas. The modification affects 
      * a formula <code>F</code> if <code>F</code> is a subformula of the modified one 
      * or the modification took part inside an update which may occur in the update 
      * prefix instantiation of the taclet application    
@@ -149,8 +149,8 @@ public class FindTacletAppContainer extends TacletAppContainer {
                 // invalidated
                 final Operator modOp = changePIO.getSubTerm ().op ();
 
-                return !( modOp instanceof IUpdateOperator
-                          && appIndex == ( (IUpdateOperator)modOp ).targetPos ()
+                return !( modOp instanceof UpdateApplication
+                          && appIndex == ( (UpdateApplication)modOp ).targetPos ()
                           && updateContextIsRecorded () );
             }
         }

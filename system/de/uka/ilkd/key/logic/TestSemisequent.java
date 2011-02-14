@@ -14,12 +14,12 @@ import junit.framework.TestCase;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.Metavariable;
-import de.uka.ilkd.key.logic.op.RigidFunction;
-import de.uka.ilkd.key.logic.sort.PrimitiveSort;
+import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 public class TestSemisequent extends TestCase {
+    
+    private static final TermBuilder TB = TermBuilder.DF;
  
     private ConstrainedFormula[] con;
 
@@ -29,27 +29,25 @@ public class TestSemisequent extends TestCase {
 
 
     public void setUp() { 
-	TermFactory tf=TermFactory.DEFAULT;
-	
-       	Function p=new RigidFunction(new Name("p"),Sort.FORMULA,new Sort[]{});  
-	Function q=new RigidFunction(new Name("q"),Sort.FORMULA,new Sort[]{});
-	Function r=new RigidFunction(new Name("r"),Sort.FORMULA,new Sort[]{});
+       	Function p=new Function(new Name("p"),Sort.FORMULA,new Sort[]{});  
+	Function q=new Function(new Name("q"),Sort.FORMULA,new Sort[]{});
+	Function r=new Function(new Name("r"),Sort.FORMULA,new Sort[]{});
 
-       	Function a=new RigidFunction(new Name("a"),Sort.FORMULA,new Sort[]{});  
-	Function b=new RigidFunction(new Name("b"),Sort.FORMULA,new Sort[]{});
-	Function c=new RigidFunction(new Name("c"),Sort.FORMULA,new Sort[]{});
+       	Function a=new Function(new Name("a"),Sort.FORMULA,new Sort[]{});  
+	Function b=new Function(new Name("b"),Sort.FORMULA,new Sort[]{});
+	Function c=new Function(new Name("c"),Sort.FORMULA,new Sort[]{});
 
 
-	Term t_p=tf.createFunctionTerm(p, new Term[]{});
-	Term t_q=tf.createFunctionTerm(q, new Term[]{});
-	Term t_r=tf.createFunctionTerm(r, new Term[]{});
+	Term t_p=TB.func(p, new Term[]{});
+	Term t_q=TB.func(q, new Term[]{});
+	Term t_r=TB.func(r, new Term[]{});
 
- 	Term t_a=tf.createFunctionTerm(a, new Term[]{});
-	Term t_b=tf.createFunctionTerm(b, new Term[]{});
-	Term t_c=tf.createFunctionTerm(c, new Term[]{});
+ 	Term t_a=TB.func(a, new Term[]{});
+	Term t_b=TB.func(b, new Term[]{});
+	Term t_c=TB.func(c, new Term[]{});
 
 	
-	con=new ConstrainedFormula[8];
+	con=new ConstrainedFormula[7];
 	con[0]=new ConstrainedFormula(t_p, Constraint.BOTTOM);
 	con[1]=new ConstrainedFormula(t_q, Constraint.BOTTOM);
 	con[2]=new ConstrainedFormula(t_r, Constraint.BOTTOM);
@@ -58,14 +56,9 @@ public class TestSemisequent extends TestCase {
 	con[5]=new ConstrainedFormula(t_b, Constraint.BOTTOM);
 	con[6]=new ConstrainedFormula(t_c, Constraint.BOTTOM);
 
-	Sort s = new PrimitiveSort(new Name("test"));
-	Function f = new RigidFunction(new Name("f"), s, new Sort[]{});
- 	Term t_f = tf.createFunctionTerm(f, new Term[]{});
-	Metavariable mv = new Metavariable(new Name("mv"), s);
- 	Term t_mv = tf.createFunctionTerm(mv, new Term[]{});
-	Constraint cons = Constraint.BOTTOM.unify(t_mv, t_f, null);
-	assertTrue(cons.isSatisfiable());
-	con[7]=new ConstrainedFormula(t_c, cons);
+	Sort s = new SortImpl(new Name("test"));
+	Function f = new Function(new Name("f"), s, new Sort[]{});
+ 	Term t_f = TB.func(f, new Term[]{});
     }
        
     public void tearDown() {
@@ -249,28 +242,6 @@ public class TestSemisequent extends TestCase {
 		     ImmutableSLList.<ConstrainedFormula>nil().prepend(con[2]),
 		     result.removedFormulas());
 	assertEquals("Both semisequents should be equal.", expected, extract(result));
-	
-    }
-
-    public void testRemoveRedundantFormulaOfSequent() {
-	//[p,q,c<<mv=f]
-	Semisequent origin = extract(extract(extract(Semisequent.EMPTY_SEMISEQUENT.insertLast(con[0])).
-					     insertLast(con[1])).insertLast(con[7]));
-	//exp.:[p,q,a,c]
-	Semisequent expected = extract(extract(extract(origin.remove(2)).insertLast(con[4])).insertLast(con[6]));
-	//insert: [a,c,q,p]
-	ImmutableList<ConstrainedFormula> insertionList = ImmutableSLList.<ConstrainedFormula>nil().prepend(con[0]).prepend(con[1]).
-	    prepend(con[6]).prepend(con[4]);
-
-
-	SemisequentChangeInfo sci = origin.insert(origin.size(), insertionList);
-	assertEquals("SemisequentChangeInfo is corrupt due to wrong added formula list:",
-		     ImmutableSLList.<ConstrainedFormula>nil().prepend(con[4]).prepend(con[6]),
-		     sci.addedFormulas());
-	assertEquals("SemisequentChangeInfo is corrupt due to wrong removed formula list:",
-		     ImmutableSLList.<ConstrainedFormula>nil().prepend(con[7]),
-		     sci.removedFormulas());
-	assertEquals("Both semisequents should be equal.", expected, extract(sci));
 	
     }
 

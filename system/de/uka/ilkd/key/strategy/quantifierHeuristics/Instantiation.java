@@ -15,15 +15,9 @@ import de.uka.ilkd.key.collection.DefaultImmutableMap;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.ConstrainedFormula;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.CastFunctionSymbol;
-import de.uka.ilkd.key.logic.op.Op;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.sort.AbstractSort;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.strategy.LongRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
@@ -121,7 +115,7 @@ class Instantiation {
 
     private Term createArbitraryInstantiation(QuantifiableVariable var,
 	    Services services) {
-	return tb.func(((AbstractSort) var.sort()).getCastSymbol(),
+        return tb.func (var.sort().getCastSymbol (services),
 	        tb.zero(services));
     }
 
@@ -144,7 +138,7 @@ class Instantiation {
 	final Term inst = sub.getSubstitutedTerm(firstVar);
 	final Long oldCost = instancesWithCosts.get(inst);
 	if (oldCost == null || oldCost.longValue() >= cost)
-	    instancesWithCosts.put(inst, new Long(cost));
+            instancesWithCosts.put ( inst, Long.valueOf ( cost ) );
     }
 
     /**
@@ -157,13 +151,13 @@ class Instantiation {
 	for (final ConstrainedFormula cf : seq.antecedent()) {
 	    final Term atom = cf.formula();
 	    final Operator op = atom.op();
-	    if (!(op == Op.ALL || op == Op.EX))
+            if ( !( op == Quantifier.ALL || op == Quantifier.EX ) )
 		assertLits = assertLits.add(atom);
 	}
 	for (final ConstrainedFormula cf : seq.succedent()) {
 	    final Term atom = cf.formula();
 	    final Operator op = atom.op();
-	    if (!(op == Op.ALL || op == Op.EX))
+            if ( !( op == Quantifier.ALL || op == Quantifier.EX ) )
 		assertLits = assertLits.add(tb.not(atom));
 	}
 	return assertLits;
@@ -180,7 +174,8 @@ class Instantiation {
 
     private RuleAppCost computeCostHelp(Term inst) {
 	Long cost = instancesWithCosts.get(inst);
-	if (cost == null && (inst.op() instanceof CastFunctionSymbol))
+        if ( cost == null && ( inst.op () instanceof SortDependingFunction
+        	                && ((SortDependingFunction)inst.op()).getKind().equals(Sort.CAST_NAME)) )
 	    cost = instancesWithCosts.get(inst.sub(0));
 
 	if (cost == null) {

@@ -11,33 +11,42 @@
 package de.uka.ilkd.key.parser;
 
 
-/**
- *
- */
 public abstract class SchemaVariableModifierSet {
 
     private boolean strict = false;
     private boolean rigid  = false;
-    private boolean list   = false;
+    private boolean list = false;
     
-    public boolean list () {
-        return list;
-    }
-    protected boolean listEnabled () {
-        return false;
-    }
+    
     public boolean rigid () {
         return rigid;
     }
+    
+    
     protected boolean rigidEnabled () {
         return false;
     }
+    
+    
     public boolean strict () {
         return strict;
     }
+    
+    
     protected boolean strictEnabled () {
         return false;
     }
+    
+
+    public boolean list() {
+	return list;
+    }
+    
+    
+    protected boolean listEnabled() {
+	return false;
+    }
+    
     
     /**
      * @return <code>true</code> iff <code>option</code> is a valid modifier
@@ -48,17 +57,13 @@ public abstract class SchemaVariableModifierSet {
             return addStrict ();
         } else if ( "rigid".equals ( option ) ) {
             return addRigid ();
-        } else if ( "list".equals ( option ) ) {
-            return addList ();
+        } else if ("list".equals(option)) {
+            return addList();
         }
 
         return false;
     }
         
-    public boolean addList () {
-        this.list = true;
-        return listEnabled ();
-    }
     public boolean addRigid () {
         this.rigid = true;
         return rigidEnabled ();
@@ -67,9 +72,13 @@ public abstract class SchemaVariableModifierSet {
         this.strict = true;
         return strictEnabled ();
     }
+    public boolean addList() {
+	this.list = true;
+	return listEnabled();
+    }
 
     public static class ProgramSV extends SchemaVariableModifierSet {
-        protected boolean listEnabled () {
+        protected boolean listEnabled() {
             return true;
         }
     }
@@ -95,10 +104,4 @@ public abstract class SchemaVariableModifierSet {
     public static class VariableSV extends SchemaVariableModifierSet {}
 
     public static class SkolemTermSV extends SchemaVariableModifierSet {}
-    
-    public static class ListSV extends SchemaVariableModifierSet {
-        protected boolean listEnabled() {
-            return true;
-        }
-    }
 }

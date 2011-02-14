@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -12,17 +12,12 @@ package de.uka.ilkd.key.smt.taclettranslation;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
-
-import de.uka.ilkd.key.collection.DefaultImmutableSet;
-import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.TacletIndex;
-import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.taclettranslation.TreeItem.SelectionMode;
 
@@ -117,7 +112,6 @@ public final class UsedTaclets {
 	TreeItem item = tacletNames.get(tacletname);
 	return item != null && item.getMode() == SelectionMode.all;
 	// return usedTaclets.contains(tacletname);
-
     }
 
     private TreeItem treeItem(TreeNode node) {
@@ -158,8 +152,7 @@ public final class UsedTaclets {
     }
 
     public void validateSelectionModes(){
-	TreeModel model = getTreeModel();
-	validateSelectionMode((TreeNode)model.getRoot());
+	validateSelectionMode((TreeNode)getTreeModel().getRoot());
     }
     
     
@@ -225,6 +218,12 @@ public final class UsedTaclets {
     private void addTaclet(DefaultMutableTreeNode node, String taclet) {
 	addTaclet(node, taclet, 0);
     }
+    
+    private void addTaclet(DefaultMutableTreeNode node, String ... taclets){
+	for(String taclet : taclets){
+	    addTaclet(node, taclet);
+	}
+    }
 
     private  void addTaclet(DefaultMutableTreeNode node, String taclet,
 	    boolean checked, int genericCount) {
@@ -271,7 +270,16 @@ public final class UsedTaclets {
 	                     NEXT_TO_CREATE,
 	                     ARRAY_LENGTH,
 	                     CLASS_INITIALISATION,
-	                     NO_CATEGORY
+	                     NO_CATEGORY,
+	                     LOC_SETS,
+	                     LOC_SETS_AXIOMS,
+	                     LOC_SETS_LEMATA,
+	                     HEAP,
+	                     HEAP_AXIOMS,
+	                     HEAP_LEMATA,
+	                     REACH,
+	                     REACH_AXIOMS,
+	                     REACH_LEMATA
 	            
 	                     
 	                };
@@ -293,9 +301,9 @@ public final class UsedTaclets {
 	
 	DefaultMutableTreeNode root = new DefaultMutableTreeNode(rootItem);
 
-	DefaultMutableTreeNode node1 = newNode(root, "proof-independent",Category.PROOF_INDEPENDENT);
 
-	DefaultMutableTreeNode node2 = newNode(node1, "boolean rules",Category.BOOLEAN_RULES);
+
+	DefaultMutableTreeNode node2 = newNode(root, "boolean rules",Category.BOOLEAN_RULES);
 	addTaclet(node2, "boolean_equal_2");
 	addTaclet(node2, "boolean_not_equal_1");
 	addTaclet(node2, "boolean_not_equal_2");
@@ -307,18 +315,17 @@ public final class UsedTaclets {
 	addTaclet(node2, "apply_eq_boolean_2");
 	addTaclet(node2, "apply_eq_boolean_rigid");
 	addTaclet(node2, "apply_eq_boolean_rigid_2");
-	addTaclet(node2, "boolean_is_no_int");
-	addTaclet(node2, "int_is_no_boolean");
+
 	//
 	// // intRules
-	DefaultMutableTreeNode node3 = newNode(node1, "integer rules",Category.INTEGER_RULES);
+	DefaultMutableTreeNode node3 = newNode(root, "integer rules",Category.INTEGER_RULES);
 	addTaclet(node3, "expand_inByte");
 	addTaclet(node3, "expand_inChar");
 	addTaclet(node3, "expand_inShort");
 	addTaclet(node3, "expand_inInt");
 	addTaclet(node3, "expand_inLong");
 
-	DefaultMutableTreeNode node4 = newNode(node1,
+	DefaultMutableTreeNode node4 = newNode(root,
 	        "constant replacement rules",Category.CONSTANT_REPLACEMENT_RULES);
 	addTaclet(node4, "replace_byte_MAX");
 	addTaclet(node4, "replace_byte_MIN");
@@ -341,7 +348,7 @@ public final class UsedTaclets {
 	addTaclet(node4, "replace_long_RANGE");
 	addTaclet(node4, "replace_long_HALFRANGE");
 
-	DefaultMutableTreeNode node5 = newNode(node1,
+	DefaultMutableTreeNode node5 = newNode(root,
 	        "translation of java operators",Category.TRANSLATION_JAVA_OPERATOR);
 	addTaclet(node5, "translateJavaUnaryMinusInt");
 	addTaclet(node5, "translateJavaUnaryMinusLong");
@@ -375,98 +382,174 @@ public final class UsedTaclets {
 	addTaclet(node5, "translateJavaBitwiseXOrInt");
 	addTaclet(node5, "translateJavaBitwiseXOrLong");
 
-	DefaultMutableTreeNode node6 = newNode(root, "proof-dependent",Category.PROOF_DEPENDENT);
 
-	DefaultMutableTreeNode node7 = newNode(node6, "cast operator",Category.CAST_OPERATOR);
+	DefaultMutableTreeNode node7 = newNode(root, "cast operator",Category.CAST_OPERATOR);
 	addTaclet(node7, "castDel",1);
 	addTaclet(node7, "typeEq",2);
 	addTaclet(node7, "typeEqDerived",2);
 	addTaclet(node7, "typeEqDerived2",2);
 	addTaclet(node7, "typeStatic",1);
-	addTaclet(node7, "castType",4);
-	addTaclet(node7, "castType2",4);
 	addTaclet(node7, "closeType",3);
 	addTaclet(node7, "closeTypeSwitched",3);
 
-	DefaultMutableTreeNode node8 = newNode(node6, "miscellaneous",Category.MISCELLANEOUS);
-	addTaclet(node8, "disjoint_repositories",2);
-	addTaclet(node8, "identical_object_equal_index",1);
 
-	addTaclet(node8, "repository_object_non_null",1);
 
-	DefaultMutableTreeNode node9 = newNode(node6, "exact instance rules",Category.EXACT_INSTANCE_RULES);
-	addTaclet(node9, "exact_instance_definition_reference",2);
-	addTaclet(node9, "exact_instance_definition_integerDomain");
+	DefaultMutableTreeNode node9 = newNode(root, "exact instance rules",Category.EXACT_INSTANCE_RULES);
 	addTaclet(node9, "exact_instance_definition_int");
-	addTaclet(node9, "exact_instance_definition_jbyte");
-	addTaclet(node9, "exact_instance_definition_jshort");
-	addTaclet(node9, "exact_instance_definition_jint");
-	addTaclet(node9, "exact_instance_definition_jlong");
-	addTaclet(node9, "exact_instance_definition_jchar");
 	addTaclet(node9, "exact_instance_definition_boolean");
 	addTaclet(node9, "exact_instance_definition_null",1);
-	addTaclet(node9, "exact_instance_definition_known",1);
-	addTaclet(node9, "exact_instance_definition_known_eq",2);
-	addTaclet(node9, "exact_instance_definition_known_false",2);
 	addTaclet(node9, "exact_instance_for_interfaces_or_abstract_classes",2);
-	addTaclet(node9, "exact_instance_definition_known_eq_false",3); // n^3!!!
 
-	// usedTaclets.add("system_invariant_for_created_2a_sym");
-	DefaultMutableTreeNode node10 = newNode(node6,
-	        "only created objects are referenced...",Category.ONLY_CREATED_OBJECTS_ARE_REFERENCED);
 
-	DefaultMutableTreeNode node11 = newNode(node10, "normal",Category.ONLY_CREATED_OBJECTS_ARE_REFERENCED_NORMAL);
-	addTaclet(node11, "only_created_object_are_referenced",1);
-	addTaclet(node11, "only_created_object_are_referenced_non_null",1);
-	addTaclet(node11, "only_created_object_are_referenced_right",1);
-	addTaclet(node11, "only_created_object_are_referenced_non_null2",2);
-	addTaclet(node11, "only_created_object_are_referenced_non_null3",2);
-	
-	// Arrays are not supported yet: SMT-Translation does not work.
-	// Taclet translation works!
-//	DefaultMutableTreeNode node12 = newNode(node10, "array");
-//	addTaclet(node12, "only_created_object_are_referenced_by_arrays");
-//	addTaclet(node12, "only_created_object_are_referenced_by_arrays_right");
-//	addTaclet(node12, "only_created_object_are_referenced_by_arrays_2");
-//	addTaclet(node12,
-//	        "only_created_object_are_referenced_by_arrays_non_null");
 
-	DefaultMutableTreeNode node13 = newNode(node6, "system invariants",Category.SYTEM_INVARIANTS);
-
-	addTaclet(node13, "system_invariant_for_created_3",2);
-	addTaclet(node13, "system_invariant_for_created_2a_sym",2);
-	addTaclet(node13, "system_invariant_for_created_3_sym",2);
-
-	DefaultMutableTreeNode node14 = newNode(node6, "nextToCreate",Category.NEXT_TO_CREATE);
-	addTaclet(node14, "created_inv_index_in_bounds",2);
-	addTaclet(node14, "created_add_known_index_in_bounds",2);
-	addTaclet(node14, "created_add_known_index_in_bounds_sym",2);
-	addTaclet(node14, "created_add_known_index_in_bounds_2",2);
-	addTaclet(node14,
-	        "objects_with_index_geq_next_to_create_are_not_created",2);
-	addTaclet(
-	        node14,
-	        "objects_with_index_greater_next_to_create_are_not_createdsystem" +
-	        "_invariant_for_created_2a_automated_use_3",2);
-	addTaclet(node8, "nextToCreate_non_negative");
-	addTaclet(node8, "nextToCreate_non_negative_2");
-
-	DefaultMutableTreeNode node15 = newNode(node6, "array length",Category.ARRAY_LENGTH);
-	addTaclet(node15, "array_length_non_negative",1);
-	addTaclet(node15, "array_length_non_negative_2",1);
-	addTaclet(node15, "array_length_non_negative_3",1);
-	addTaclet(node15, "array_length_short_javacard",1);
-
-	DefaultMutableTreeNode node16 = newNode(node6, "class initialisation",Category.CLASS_INITIALISATION);
+	DefaultMutableTreeNode node16 = newNode(root, "class initialisation",Category.CLASS_INITIALISATION);
 	addTaclet(node16, "class_being_initialized_is_prepared");
 	addTaclet(node16, "initialized_class_is_prepared");
 	addTaclet(node16, "initialized_class_is_not_erroneous");
 	addTaclet(node16, "class_initialized_excludes_class_init_in_progress");
 	addTaclet(node16, "class_erroneous_excludes_class_in_init");
 	addTaclet(node16, "erroneous_class_has_no_initialized_sub_class");
-	addTaclet(node16, "superclasses_of_initialized_classes_are_initialized");
 	addTaclet(node16,
-	        "superclasses_of_initialized_classes_are_initialized_2");
+	        "superclasses_of_initialized_classes_are_prepared");
+	
+	DefaultMutableTreeNode node17 = newNode(root, "LocSets",Category.LOC_SETS);
+	
+	DefaultMutableTreeNode node20 = newNode(node17,"Axioms",Category.LOC_SETS_AXIOMS);
+	addTaclet(node20,"elementOfEmpty",
+		         "elementOfAllLocs",
+		         "elementOfSingleton",
+		         "elementOfUnion",
+		         "elementOfIntersect",
+		         "elementOfSetMinus",
+		         "elementOfAllFields",
+		         "elementOfAllObjects",
+		         "elementOfArrayRange",
+		         "elementOfFreshLocs",
+		         
+		         "equalityToElementOf",
+		         "subsetToElementOf",
+		         "disjointToElementOf",
+		         "createdInHeapToElementOf"
+		         
+		         );
+	
+
+	
+
+	
+	
+	DefaultMutableTreeNode node21 = newNode(node17,"Lemata",Category.LOC_SETS_LEMATA);
+	addTaclet(node21,"elementOfEmptyEQ",
+			 "elementOfAllLocsEQ",
+			 "elementOfSingletonEQ",
+			 "elementOfUnionEQ",
+			 "elementOfIntersectEQ",
+			 "elementOfSetMinusEQ",
+			 "elementOfAllFieldsEQ",
+			 "elementOfAllObjectsEQ",
+			 "elementOfArrayRangeEQ",
+			 "elementOfFreshLocsEQ",			 
+			 "unionWithEmpty1",
+			 "unionWithEmpty2",
+			 "unionWithAllLocs1",
+			 "unionWithAllLocs2",
+			 "intersectWithEmpty1",
+			 "intersectWithEmpty2",
+			 "intersectWithAllLocs1",
+			 "intersectWithAllLocs2",
+			 "setMinusWithEmpty1",
+			 "setMinusWithEmpty2",
+			 "setMinusWithAllLocs",
+			 "subsetWithEmpty",
+			 "subsetWithAllLocs",
+			 "disjointWithEmpty1",
+			 "disjointWithEmpty2",
+			 "createdInHeapWithEmpty",
+			 "createdInHeapWithSingleton",
+			 "createdInHeapWithUnion",
+			 "createdInHeapWithSetMinusFreshLocs",
+			 "createdInHeapWithAllFields",
+			 "createdInHeapWithArrayRange",
+			 "referencedObjectIsCreatedRight",
+			 "referencedObjectIsCreatedRightEQ",
+			 "unionWithItself",
+			 "intersectWithItself",
+			 "setMinusItself",
+			 "subsetOfItself");
+	
+	
+	
+	
+	DefaultMutableTreeNode node18 = newNode(root, "Heap",Category.HEAP);
+	
+	DefaultMutableTreeNode node22 = newNode(node18, "Axioms",Category.HEAP_AXIOMS);
+	
+	addTaclet(node22,
+		"selectOfStore",
+		"selectOfCreate",
+		"selectOfAnon",
+		"selectOfMemset",
+
+		"onlyCreatedObjectsAreReferenced",
+		"onlyCreatedObjectsAreInLocSets",
+		"onlyCreatedObjectsAreInLocSetsEQ",
+		"arrayLengthNotNegative",
+		"wellFormedStoreObject",
+		"wellFormedStoreLocSet",
+		"wellFormedStorePrimitive",
+		"wellFormedCreate",
+		"wellFormedAnon",
+		"wellFormedMemsetObject",
+		"wellFormedMemsetLocSet",
+	"wellFormedMemsetPrimitive");
+	
+	
+	DefaultMutableTreeNode node23 = newNode(node18, "Lemata",Category.HEAP_LEMATA);
+	addTaclet(node23,
+		"selectOfStoreEQ",
+		"selectOfCreateEQ",
+		"selectOfAnonEQ",
+		"selectOfMemsetEQ",
+		"memsetEmpty",
+		"selectCreatedOfAnonEQ",
+
+
+
+		"wellFormedStoreObjectEQ",
+		"wellFormedStoreLocSetEQ",	
+		"wellFormedStorePrimitiveEQ",
+		"wellFormedAnonEQ",
+		"wellFormedMemsetObjectEQ",
+	"wellFormedMemsetPrimitiveEQ");
+
+	
+	DefaultMutableTreeNode node19 = newNode(root, "Reach",Category.REACH);
+	
+	DefaultMutableTreeNode node24 = newNode(node19, "Axioms",Category.REACH_AXIOMS);
+	addTaclet(node24,"accDefinition",
+		 	 "reachDefinition");
+	
+	DefaultMutableTreeNode node25 = newNode(node19, "Lemata",Category.REACH_LEMATA);
+	addTaclet(node25,
+			 "reachZero",
+		         "reachOne",
+		         "reachNull",
+		         "reachNull2",
+		         "reachAddOne", 
+		         "reachAddOne2",
+		         "reachUniquePathSameObject",
+		         "reachDependenciesStoreSimple",
+		         "reachDoesNotDependOnCreatedness",
+		         "reachDependenciesStore",
+		         "reachDependenciesAnon",
+		         "reachDependenciesAnonCoarse",
+		         "only_created_objects_are_reachable",
+		         "reach_does_not_depend_on_fresh_locs",
+		         "reach_does_not_depend_on_fresh_locs_EQ"    
+		         
+	
+			);	
+	
 
 	model = new DefaultTreeModel(root);
 	return model;
@@ -486,6 +569,30 @@ public final class UsedTaclets {
 	}
 	
 	return result;
+    }
+    
+    /**
+     * @return All taclet names of taclets that should be used but that are not
+     * available.
+     * Use this method only for testing. It uses only simple data structure, so that 
+     * the necessary time is in O(n^2)
+     */
+    public Collection<String> getMissingTaclets(Collection<Taclet> taclets){
+	LinkedList<String> list = new LinkedList<String>();
+	
+	for(String name : this.tacletNames.keySet()){
+	    boolean found = false;
+	    for(Taclet taclet : taclets){
+		if(taclet.name().toString().equals(name)){
+		    found = true;
+		    break;
+		}
+	    }
+	    if(!found){
+		list.add(name);
+	    }
+	}
+	return list;
     }
 
 }

@@ -15,9 +15,10 @@ import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Op;
+import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.feature.BinaryFeature;
@@ -37,13 +38,13 @@ public class SplittableQuantifiedFormulaFeature extends BinaryFeature {
         if ( !analyser.analyse ( pos.constrainedFormula ().formula () ) )
             return false;
 
-        if ( analyser.binOp == Op.AND )
+        if ( analyser.binOp == Junctor.AND )
             return TriggerUtils.intersect (
                    TriggerUtils.intersect (
                           analyser.left.freeVars (),
                           analyser.right.freeVars () ),
                           analyser.existentialVars )     .size () == 0;
-        else if ( analyser.binOp == Op.OR )
+        else if ( analyser.binOp == Junctor.OR )
             return TriggerUtils.intersect ( analyser.left.freeVars (),
                                                analyser.right.freeVars () )
                    .union ( analyser.existentialVars ).size ()
@@ -61,20 +62,20 @@ public class SplittableQuantifiedFormulaFeature extends BinaryFeature {
         public boolean analyse(Term formula) {
             final Operator op = formula.op();
             
-            if ( op == Op.ALL ) {
+            if ( op == Quantifier.ALL ) {
                 // might be that a variable is bound more than once
                 existentialVars =
                     existentialVars.remove ( formula.varsBoundHere ( 0 ).last () );
                 return analyse ( formula.sub ( 0 ) );
             }
             
-            if ( op == Op.EX ) {
+            if ( op == Quantifier.EX ) {
                 existentialVars =
                     existentialVars.add ( formula.varsBoundHere ( 0 ).last () );
                 return analyse ( formula.sub ( 0 ) );
             }
 
-            if ( op == Op.AND || op == Op.OR ) {
+            if ( op == Junctor.AND || op == Junctor.OR ) {
                 binOp = op;
                 left = formula.sub ( 0 );
                 right = formula.sub ( 1 );

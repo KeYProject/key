@@ -18,8 +18,6 @@ import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
 public class TestSchemaJavaParser extends TestCase {
 
-    static ServiceConfiguration sc;
-
     static SchemaJavaProgramFactory factory;    
     
     public TestSchemaJavaParser(String name) {

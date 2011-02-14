@@ -1,10 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
 package de.uka.ilkd.key.gui.smt;
 
 import java.awt.Color;
@@ -32,11 +25,6 @@ import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
 
-
-
-
-import de.uka.ilkd.key.gui.ErrorMessages;
-
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.smt.MakesProgress;
 import de.uka.ilkd.key.smt.SMTProgressMonitor;
@@ -62,7 +50,6 @@ class ProgressPanel implements SMTProgressMonitor {
 	private static final Color UNKOWN_COLOR = Color.GRAY;
 	private static final Color UNSOLVED_COLOR = new Color(200,0,0);
 	
-	private static final int MAX_DOTS = 3;
 	
 	
 	private JProgressBar progressBarTime = null;
@@ -71,7 +58,7 @@ class ProgressPanel implements SMTProgressMonitor {
 	private JPanel progressPanel = null;
 	private JProgressBar progressBar = null;
 	private JComponent  parent;
-	private SMTProgressDialog dialog;
+	private ProgressDialog dialog;
 	
 	private List<InternGoal> goals = Collections.synchronizedList(new LinkedList<InternGoal>()); 
 	private int currentGoal =0;
@@ -79,11 +66,12 @@ class ProgressPanel implements SMTProgressMonitor {
 	private int dots =0;
 	private MakesProgress process;
 	
+	
 
 	
 	
 	
-	public ProgressPanel(MakesProgress process, JComponent parent, SMTProgressDialog dialog, Collection<Goal> goals){
+	public ProgressPanel(MakesProgress process, JComponent parent, ProgressDialog dialog, Collection<Goal> goals){
 	    	this.parent = parent;
 	    	this.dialog = dialog;
 	    	this.process = process;
@@ -122,14 +110,6 @@ class ProgressPanel implements SMTProgressMonitor {
 		}
 		time = System.currentTimeMillis();
 	    }
-	    String temp="";
-	    /*for(int i=0; i < s.length; i++){
-		if(i <= dots-1){
-		    temp += ".";    
-		}
-		else temp+=" ";
-		
-	    }*/
 	    return s[dots];
 	    
 	}
@@ -256,9 +236,8 @@ class ProgressPanel implements SMTProgressMonitor {
 	}
 	
 	private String goalName(int number, SolveType type){
-	    String temp = ""+number;
-	    temp += (number-1 == currentGoal) ? ": "+getDotString() : 
-                ((number-1>currentGoal) ? "" : ": ");
+	    String temp =number+". Goal";
+	    temp += number-1 == currentGoal ? ": "+getDotString() : number-1>currentGoal ? "" : ": ";
 	    return temp;
 	}
 	
@@ -267,14 +246,14 @@ class ProgressPanel implements SMTProgressMonitor {
 
 	}
 	
-	private int getStringWidth(String s){
+	private int getStringWidth(String str){
 	    return SwingUtilities.computeStringWidth(
-		    getProgressBar().getFontMetrics(getProgressBar().getFont()),s);
+		    getProgressBar().getFontMetrics(getProgressBar().getFont()),str);
 	}
 	
 	public int necessaryPanelWidth(int numberOfGoals){
 	    
-	    int w1 = getStringWidth("10: unsolvable")
+	    int w1 = getStringWidth("10. Goal: unsolvable")
 		               * numberOfGoals;
 	    int w2 = getStringWidth(jLabel.getText());
 	    return w1+w2;
@@ -390,8 +369,8 @@ class ProgressPanel implements SMTProgressMonitor {
 
         public void exceptionOccurred(String str,Exception e) {
             if(!dialog.getStopRunning()){
-        	ErrorDialog.INSTANCE.showDialog("Error while executing " +
-        		process.getTitle(), str, e);
+        	ErrorDialog.INSTANCE.showDialog("Error while executing "+ this.process.getTitle(),
+        		str, e);
             }
             
             

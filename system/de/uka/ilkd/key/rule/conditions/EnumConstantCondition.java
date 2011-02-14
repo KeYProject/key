@@ -30,7 +30,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * @since 2006-12-04
  * @version 2006-12-11
  */
-public class EnumConstantCondition extends VariableConditionAdapter {
+public final class EnumConstantCondition extends VariableConditionAdapter {
 
     private final SchemaVariable reference;
 
@@ -43,14 +43,8 @@ public class EnumConstantCondition extends VariableConditionAdapter {
 	this.reference = reference;
     }
 
-    /**
-     * tests if the instantiation suggestion is an enum constant
-     * @param var the template Variable to be instantiated
-     * @param subst the SVSubstitute to be mapped to var
-     * @param svInst the SVInstantiations that are already known to be
-     * needed
-     * @return true iff condition is fulfilled
-     */
+
+    @Override
     public boolean check(SchemaVariable var, 
 			 SVSubstitute subst, 
 			 SVInstantiations svInst,
@@ -76,8 +70,9 @@ public class EnumConstantCondition extends VariableConditionAdapter {
         return true;
     }
 
+    
+    @Override    
     public String toString () {
 	return "\\enumConstant(" + reference + ")";
     }
-
 }

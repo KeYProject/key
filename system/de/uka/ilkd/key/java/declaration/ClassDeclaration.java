@@ -64,15 +64,8 @@ import de.uka.ilkd.key.util.ExtList;
 
 public class ClassDeclaration extends TypeDeclaration implements Statement {
     
-    /**
-     *      Extending.
-     */
-
     protected final Extends extending;
 
-    /**
-     *      Implementing.
-     */
     protected final Implements implementing;
     
     protected final boolean isInnerClass;
@@ -82,30 +75,37 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
     protected final boolean isAnonymousClass;
 
     /**
-     *      Class declaration.     
-     *      @param mods a modifier array.
-     *      @param name Identifier of the class
-     *      @param members an array containing the memberdeclarations of
+     * Class declaration.     
+     * @param mods a modifier array.
+     * @param name Identifier of the class
+     * @param members an array containing the memberdeclarations of
      * this type
-     *      @param implemented of type Implement containing the
+     * @param implemented of type Implement containing the
      * interfaces implemented by this class
-     *      @param extended Extend containing the class extended by
+     * @param extended Extend containing the class extended by
      * the class of this classdeclaration
-     *      @param parentIsInterfaceDeclaration boolean true iff
+     * @param parentIsInterfaceDeclaration boolean true iff
      * parent is an InterfaceDeclaration 
      */
-    public ClassDeclaration(Modifier[] mods, ProgramElementName name,
-			    Extends extended, ProgramElementName fullName, 
+    public ClassDeclaration(Modifier[] mods, 
+	    		    ProgramElementName name,
+			    Extends extended, 
+			    ProgramElementName fullName, 
 			    Implements implemented,
-			    MemberDeclaration[] members, boolean
-			    parentIsInterfaceDeclaration, boolean isLibrary) {
-	super(mods,name,fullName,members,
-	      parentIsInterfaceDeclaration, isLibrary);
+			    MemberDeclaration[] members, 
+			    boolean parentIsInterfaceDeclaration, 
+			    boolean isLibrary) {
+	super(mods,
+	      name,
+	      fullName,
+	      members,
+	      parentIsInterfaceDeclaration, 
+	      isLibrary);
 	this.extending    = extended;
 	this.implementing = implemented;
 	this.isInnerClass = false;
 	this.isAnonymousClass = false;
-	this.isLocalClass =false;
+	this.isLocalClass = false;
     }
 
     /**
@@ -122,8 +122,11 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
      * library class (such classes have usually no method implementations but 
      * specifications)      
      */
-    public ClassDeclaration(ExtList children, ProgramElementName fullName, 
-			    boolean isLibrary, boolean innerClass, boolean anonymousClass,
+    public ClassDeclaration(ExtList children, 
+	    		    ProgramElementName fullName, 
+			    boolean isLibrary, 
+			    boolean innerClass, 
+			    boolean anonymousClass,
 			    boolean localClass) { 
 	super(children, fullName, isLibrary);
 	extending=(Extends)children.get(Extends.class);
@@ -133,43 +136,35 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
 	this.isLocalClass =localClass;
     } 
     
-    public ClassDeclaration(ExtList children, ProgramElementName fullName, 
-            boolean isLibrary) { 
+    public ClassDeclaration(ExtList children, 
+	    		    ProgramElementName fullName, 
+	    		    boolean isLibrary) { 
         this(children, fullName, isLibrary, false, false, false);
     } 
 
 
-    public ClassDeclaration(ProgramElementName name, ProgramElementName fullName) { 
-	this (new de.uka.ilkd.key.java.declaration.Modifier[] {}, 
-	      name, null, fullName, null, 
-	      new de.uka.ilkd.key.java.declaration.MemberDeclaration[]{},
-	      false, false);
-    }
-
     /**
-     *      Returns the number of children of this node.
-     *      @return an int giving the number of children of this node
-    */
-
+     * Returns the number of children of this node.
+     * @return an int giving the number of children of this node
+     */
     public int getChildCount() {
         int result = 0;
-        if (modArray    != null) result += modArray.size();
-        if (name         != null) result++;
-        if (extending    != null) result++;
-        if (implementing != null) result++;
-        if (members      != null) result += members.size();
+        if(modArray != null) result += modArray.size();
+        if(name != null) result++;
+        if(extending != null) result++;
+        if(implementing != null) result++;
+        if(members != null) result += members.size();
         return result;
     }
 
     /**
-     *      Returns the child at the specified index in this node's "virtual"
-     *      child array
-     *      @param index an index into this node's "virtual" child array
-     *      @return the program element at the given position
-     *      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
-     *                 of bounds
+     * Returns the child at the specified index in this node's "virtual"
+     * child array
+     * @param index an index into this node's "virtual" child array
+     * @return the program element at the given position
+     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
+     *            of bounds
      */
-
     public ProgramElement getChildAt(int index) {
         int len;
         if (modArray != null) {
@@ -198,19 +193,17 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
     }
     
     /**
-     *  Get extended types.
-     *  @return the extends.
+     * Get extended types.
+     * @return the extends.
      */
-
     public Extends getExtendedTypes() {
         return extending;
     }
 
     /**
-     *  Get implemented types.
-     *  @return the implements.
+     * Get implemented types.
+     * @return the implements.
      */
-
     public Implements getImplementedTypes() {
         return implementing;
     }
@@ -218,7 +211,6 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
     /**
      * Classes are never strictfp.
      */
-
     public boolean isStrictFp() {
         return false;
     }
@@ -226,7 +218,6 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
     /**
      * Classes are never transient.
      */
-
     public boolean isTransient() {
         return false;
     }
@@ -246,7 +237,6 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
     /**
      * Classes are never volatile.
      */
-
     public boolean isVolatile() {
         return false;
     }
@@ -281,8 +271,7 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
 	v.performActionOnClassDeclaration(this);
     }
 
-   public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
+    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
         p.printClassDeclaration(this);
     }
-
 }

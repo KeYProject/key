@@ -88,8 +88,6 @@ public class DragNDropInstantiator extends DropTargetAdapter {
     }
 
     public void drop(DropTargetDropEvent event) {
-
-
         Point dropLocation = event.getLocation();
 
         try {
@@ -200,8 +198,9 @@ public class DragNDropInstantiator extends DropTargetAdapter {
      * @param services theServices providing access to the program model  
      * @return all drag'n drop instantiable taclet applications
      */
-    private ImmutableList<PosTacletApp> getAllApplicableApps(final PosInSequent sourcePos, 
-            final PosInSequent targetPos, final Services services) {        
+    private ImmutableList<PosTacletApp>  getAllApplicableApps(final PosInSequent sourcePos, 
+            					    final PosInSequent targetPos, 
+            					    final Services services) {        
         final Sequent sequent = 
             seqView.mediator().getSelectedGoal().sequent();
         
@@ -212,8 +211,10 @@ public class DragNDropInstantiator extends DropTargetAdapter {
             // collects all applicable taclets at the source position
             // which have an addrule section
             applicableApps = applicableApps.prepend(completeIfInstantiations(
-                    getApplicableTaclets(sourcePos,
-                            TacletFilter.TACLET_WITH_NO_IF_FIND_AND_ADDRULE),
+                    getApplicableTaclets(
+                	    sourcePos,
+                            TacletFilter.TACLET_WITH_NO_IF_FIND_AND_ADDRULE,
+                            services),
                     sequent, targetPos.getPosInOccurrence(), userConstraint,
                     services));
         } else {
@@ -238,9 +239,12 @@ public class DragNDropInstantiator extends DropTargetAdapter {
      * @param userConstraint the user Constraint 
      * @return  all applicable apps respecting direction information in drag an drop
      */
-    private ImmutableList<PosTacletApp> getDirectionDependentApps(final PosInSequent sourcePos, 
-            final PosInSequent targetPos, final Services services,
-            final Sequent sequent, final Constraint userConstraint) {
+    private ImmutableList<PosTacletApp>  getDirectionDependentApps(
+	    final PosInSequent sourcePos, 
+            final PosInSequent targetPos, 
+            final Services services,
+            final Sequent sequent, 
+            final Constraint userConstraint) {
         
         ImmutableList<PosTacletApp> applicableApps = ImmutableSLList.<PosTacletApp>nil();
         // all applicable taclets where the drag source has been interpreted
@@ -251,7 +255,8 @@ public class DragNDropInstantiator extends DropTargetAdapter {
                 .prepend(completeIfInstantiations(
                         getApplicableTaclets(
                                 sourcePos,
-                                TacletFilter.TACLET_WITH_IF_FIND_AND_NO_REPLACEWITH),
+                                TacletFilter.TACLET_WITH_IF_FIND_AND_NO_REPLACEWITH,
+                                services),
                         sequent, targetPos.getPosInOccurrence(),
                         userConstraint, services));
 
@@ -260,8 +265,10 @@ public class DragNDropInstantiator extends DropTargetAdapter {
         // find part in this case only the taclets with at least one
         // replacewith part are considered
         applicableApps = applicableApps.prepend(completeIfInstantiations(
-                getApplicableTaclets(targetPos,
-                        TacletFilter.TACLET_WITH_IF_FIND_AND_REPLACEWITH),
+                getApplicableTaclets(
+                	targetPos,
+                        TacletFilter.TACLET_WITH_IF_FIND_AND_REPLACEWITH,
+                        services),
                 sequent, sourcePos.getPosInOccurrence(), userConstraint,
                 services));
         
@@ -270,9 +277,10 @@ public class DragNDropInstantiator extends DropTargetAdapter {
         //     * the term dropped on is a legal instantiation for this sv
         applicableApps = applicableApps.prepend(completeInstantiations(
                 getApplicableTaclets(sourcePos,
-                        TacletFilter.TACLET_WITH_NO_IF),
-                        targetPos.getPosInOccurrence(),
-                        services));
+                        	     TacletFilter.TACLET_WITH_NO_IF,
+                        	     services),
+                targetPos.getPosInOccurrence(),
+                services));
         
         return applicableApps;
     }
@@ -287,9 +295,12 @@ public class DragNDropInstantiator extends DropTargetAdapter {
      * @param userConstraint the user Constraint 
      * @return  all applicable apps respecting direction information in drag an drop
      */
-    private ImmutableList<PosTacletApp> getDirectionIndependentApps(PosInSequent sourcePos, 
-            PosInSequent targetPos, final Services services,
-            final Sequent sequent, final Constraint userConstraint) {
+    private ImmutableList<PosTacletApp>  getDirectionIndependentApps(
+	    PosInSequent sourcePos, 
+            PosInSequent targetPos, 
+            final Services services,
+            final Sequent sequent, 
+            final Constraint userConstraint) {
         
         return getDirectionDependentApps(sourcePos, targetPos, services,
                 sequent, userConstraint).
@@ -315,8 +326,9 @@ public class DragNDropInstantiator extends DropTargetAdapter {
      * @return the list of taclets which match the term at the given position
      *         and satisfy the filter condition
      */
-    private ImmutableList<PosTacletApp> getApplicableTaclets(PosInSequent findPos,
-            TacletFilter filter) {
+    private ImmutableList<PosTacletApp>  getApplicableTaclets(PosInSequent findPos,
+            				            TacletFilter filter,
+            				            Services services) {
 
         if (findPos == null || findPos.isSequent()) {
             return ImmutableSLList.<PosTacletApp>nil();
@@ -334,8 +346,9 @@ public class DragNDropInstantiator extends DropTargetAdapter {
             }
         }
 
-        return addPositionInformation(allTacletsAtFindPosition, findPos
-                .getPosInOccurrence());
+        return addPositionInformation(allTacletsAtFindPosition, 
+        			      findPos.getPosInOccurrence(),
+        			      services);
     }
 
     /**
@@ -351,16 +364,20 @@ public class DragNDropInstantiator extends DropTargetAdapter {
      * @return the taclet apps as given in <tt>tacletApps</tt> but with
      *         position information
      */
-    private ImmutableList<PosTacletApp> addPositionInformation(
-            ImmutableList<TacletApp> tacletApps, PosInOccurrence findPos) {
+    private ImmutableList<PosTacletApp>  addPositionInformation(
+            ImmutableList<TacletApp>  tacletApps, 
+            PosInOccurrence findPos,
+            Services services) {
 
         ImmutableList<PosTacletApp> applicableApps = ImmutableSLList.<PosTacletApp>nil();
         for (TacletApp tacletApp : tacletApps) {
             TacletApp app = tacletApp;
             if (app instanceof NoPosTacletApp) {
                 app = PosTacletApp.createPosTacletApp(
-                        (FindTaclet) app.taclet(), app.matchConditions(),
-                        findPos);
+                        (FindTaclet) app.taclet(), 
+                        app.matchConditions(),
+                        findPos,
+                        services);
             }
             applicableApps = applicableApps.prepend((PosTacletApp) app);
         }
@@ -479,7 +496,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
                 app = null;
             }
 
-            if (app != null && app.sufficientlyComplete()) {
+            if (app != null && app.sufficientlyComplete(services)) {
                 result = result.prepend(app);
             }
         }
@@ -666,9 +683,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
                         taclet instanceof FindTaclet);
                 
             }
-            
         }
-        
     }
 }
 

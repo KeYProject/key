@@ -758,8 +758,21 @@ public class ClassFileDeclarationBuilder implements Comparable<ClassFileDeclarat
      * compare to class file declaration builders.
      * comparison is performed upon the full classnames
      */
+    @Override    
     public int compareTo(ClassFileDeclarationBuilder o) {
         return getFullClassname().compareTo(o.getFullClassname());
     }
     
+    @Override    
+    public boolean equals(Object o) {
+	if(! (o instanceof ClassFileDeclarationBuilder)) {
+	    return false;
+	}
+	return compareTo((ClassFileDeclarationBuilder) o) == 0;
+    }
+    
+    @Override
+    public int hashCode() {
+	return getFullClassname().hashCode();
+    }
 }

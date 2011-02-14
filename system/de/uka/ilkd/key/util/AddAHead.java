@@ -34,8 +34,6 @@ public class AddAHead {
 
     private String[] oldHeader=null;
 
-    private String copyright="Copyright";
-    private int copyrightWithin=10;
     private File tmpFile=new File("TMP");
 
     private int[] countCode=initCounter();

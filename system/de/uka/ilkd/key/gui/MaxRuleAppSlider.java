@@ -39,7 +39,7 @@ public class MaxRuleAppSlider extends JSlider {
             int val = (int)Math.pow(10, n);
             JLabel l = new JLabel ( ""+val );
             l.setFont(l.getFont().deriveFont(9F));
-            labelTable.put(new Integer ( n*9 ), l);
+            labelTable.put(Integer.valueOf ( n*9 ), l);
         }
 
         setLabelTable ( labelTable );
@@ -53,10 +53,7 @@ public class MaxRuleAppSlider extends JSlider {
         // add change listener
         addChangeListener( new ChangeListener() {
             public void stateChanged ( ChangeEvent e ) {
-                int n = getValue();
-                int major = n / 9;
-                int minor = n % 9;
-                int val = (minor+1)*(int)Math.pow(10, major);
+                int val = getPos();
                 MaxRuleAppSlider.this.mediator.setMaxAutomaticSteps ( val );
                 setTitle ( val );
 		updateAllSliders();
@@ -76,6 +73,14 @@ public class MaxRuleAppSlider extends JSlider {
                                                    major * 9 + minor ));
             setValue(initPos);
         }
+    }
+    
+    public int getPos() {
+	int n = getValue();
+	int major = n / 9;
+	int minor = n % 9;
+	int val = (minor+1)*(int)Math.pow(10, major);
+	return val;
     }
     
     private void setTitle(int maxRuleApps) {

@@ -223,20 +223,12 @@ public class SequentView extends JEditorPane implements Autoscroll {
     public void removeNotify(){
         super.removeNotify();
         Config.DEFAULT.removeConfigChangeListener(configChangeListener);
-        if(MethodCallInfo.MethodCallCounterOn){
-            MethodCallInfo.Local.incForClass(this.getClass().toString(), "removeNotify()");
-        }
     }
 
 
     protected void finalize(){
         try{
             Config.DEFAULT.removeConfigChangeListener(configChangeListener);
-            configChangeListener=null;
-            if(MethodCallInfo.MethodCallCounterOn){
-                MethodCallInfo.Global.incForClass(this.getClass().toString(), MethodCallInfo.finalize);
-                MethodCallInfo.Local.incForClass(this.getClass().toString(), MethodCallInfo.finalize);
-            }
         } catch (Throwable e) {
             Main.getInstance().notify(new GeneralFailureEvent(e.getMessage()));
         }finally{

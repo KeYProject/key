@@ -18,7 +18,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.ArraySort;
-import de.uka.ilkd.key.logic.sort.ObjectSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -27,10 +26,13 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 /**
  *  This variable condition checks if an array component is of reference type
  */
-public class ArrayComponentTypeCondition extends VariableConditionAdapter {
+public final class ArrayComponentTypeCondition 
+				extends VariableConditionAdapter {
 
-    private SchemaVariable var;
-    private boolean checkReferenceType;
+    private final SchemaVariable var;
+    private final boolean checkReferenceType;
+    
+    
 
     /**
      * creates an instance of this condition checking if array var has reference
@@ -41,19 +43,17 @@ public class ArrayComponentTypeCondition extends VariableConditionAdapter {
      * checks for reference otherwise for primitive type
      */
     public ArrayComponentTypeCondition(SchemaVariable var, 
-            boolean checkReferenceType) {
+            			       boolean checkReferenceType) {
 	this.var = var;	
 	this.checkReferenceType = checkReferenceType;
     }
+    
+    public boolean isCheckReferenceType(){
+	return checkReferenceType;
+    }
 
-    /**
-     * checks if the condition for a correct instantiation is fulfilled
-     * @param var the template Variable to be instantiated
-     * @param candidate the SVSubstitute which is a candidate for an
-     * instantiation of var
-     * @param svInst the SVInstantiations that are already known to be needed 
-     * @return true iff condition is fulfilled
-     */
+    
+    @Override
     public boolean check(SchemaVariable var, 
 			 SVSubstitute candidate, 
 			 SVInstantiations svInst,
@@ -72,9 +72,11 @@ public class ArrayComponentTypeCondition extends VariableConditionAdapter {
 	if (s==null || !(s instanceof ArraySort)) {
 	    return false;
 	}
-	return !(((ArraySort)s).elementSort() instanceof ObjectSort) ^ checkReferenceType;
+	return !(((ArraySort)s).elementSort().extendsTrans(services.getJavaInfo().objectSort())) ^ checkReferenceType;
     }
 
+    
+    @Override
     public String toString () {
 	return ( checkReferenceType ? "" : " \\not " ) + 
 	  "\\isReferenceArray(" + var + ")";
@@ -83,12 +85,4 @@ public class ArrayComponentTypeCondition extends VariableConditionAdapter {
     public SchemaVariable getVar() {
         return var;
     }
-
-
-    public boolean isCheckReferenceType() {
-        return checkReferenceType;
-    }
-
-    
-
 }

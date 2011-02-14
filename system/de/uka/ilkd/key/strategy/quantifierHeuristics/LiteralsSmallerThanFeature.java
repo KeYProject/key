@@ -14,10 +14,11 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.op.Op;
+import de.uka.ilkd.key.logic.op.Equality;
+import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -147,7 +148,7 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
     }
     
     private Term discardNegation(Term t) {
-        while ( t.op () == Op.NOT )
+        while ( t.op () == Junctor.NOT )
             t = t.sub ( 0 );
         return t;
     }
@@ -160,7 +161,7 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
         final Operator op = t.op ();
         if ( op == numbers.getLessOrEquals () ) return 1;
         if ( op == numbers.getGreaterOrEquals () ) return 2;
-        if ( op == Op.EQUALS ) return 3;
+        if ( op == Equality.EQUALS ) return 3;
         return -1;
     }
 
@@ -210,7 +211,7 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
     private class LiteralCollector extends Collector {
         protected void collect(Term te) {
             final Operator op = te.op ();
-            if ( op == Op.OR ) {
+            if ( op == Junctor.OR ) {
                 collect ( te.sub ( 0 ) );
                 collect ( te.sub ( 1 ) );
             } else {

@@ -1,10 +1,11 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
+// The KeY system is protected by the GNU General Public License.
 // See LICENSE.TXT for details.
+//
 
 package de.uka.ilkd.key.proof.init;
 
@@ -17,11 +18,7 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.Op;
-import de.uka.ilkd.key.logic.sort.GenericSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.BuiltInRuleIndex;
-import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.BuiltInRule;
@@ -79,6 +76,8 @@ public class InitConfig {
     private HashMap<Name, Named> quickTacletMap;
 
     private String originalKeYFileName;
+    
+    private ProofSettings settings;    
 
 
 
@@ -90,33 +89,19 @@ public class InitConfig {
 	this.services  = services;
 	this.profile   = profile;
 	this.env       = new ProofEnvironment(this);
-
-        sortNS().add(Sort.NULL);
-        funcNS().add(Op.NULL);
-        category2DefaultChoice = ProofSettings.DEFAULT_SETTINGS.
-            getChoiceSettings().getDefaultChoices();
+		
+        category2DefaultChoice = ProofSettings.DEFAULT_SETTINGS
+                                              .getChoiceSettings()
+        	                              .getDefaultChoices();
     }
 
+           
     //-------------------------------------------------------------------------
     //internal methods
     //-------------------------------------------------------------------------
-
-    /**
-     * Helper for add().
-     */
-    private void addSorts (NamespaceSet ns, ModStrategy mod) {
-        for (Named named1 : ns.sorts().elements()) {
-            final Named named = named1;
-            if (named instanceof GenericSort) {
-                if (mod.modifyGenericSorts()) sortNS().add(named);
-            } else {
-                if (mod.modifySorts()) sortNS().add(named);
-            }
-        }
-    }
-
-
-
+    
+    
+    
     //-------------------------------------------------------------------------
     //public interface
     //-------------------------------------------------------------------------
@@ -235,13 +220,11 @@ public class InitConfig {
     public Taclet lookupActiveTaclet(Name name) {
 	if (quickTacletMap == null) {
             quickTacletMap = new HashMap<Name, Named>();
-        for (Taclet taclet : activatedTaclets()) {
-            Taclet t = taclet;
-            quickTacletMap.put(t.name(), t);
-            for (Name name1 : t.oldNames()) {
-                quickTacletMap.put(name1, t);
+            Iterator<Taclet> it = activatedTaclets().iterator();
+            while (it.hasNext())  {
+                Taclet t = it.next();
+                quickTacletMap.put(t.name(), t);
             }
-        }
         }
 
         return (Taclet) quickTacletMap.get(name);
@@ -347,43 +330,7 @@ public class InitConfig {
     }
 
 
-    public void createNamespacesForActivatedChoices(){
-        for (Choice activatedChoice : activatedChoices) {
-            Choice c = activatedChoice;
-            funcNS().add(c.funcNS());
-        }
-    }
-
-
-    public ProofSettings mergedProofSettings() {
-        ProofSettings defaultSettings = ProofSettings.DEFAULT_SETTINGS;
-        ProofAggregate someProof;
-	try {
-            someProof = ((ProofAggregate)getProofEnv().getProofs().iterator().next());
-	}catch(NoSuchElementException ne){
-	    throw new RuntimeException(ne);
-	}
-        if (someProof!=null) {
-            return defaultSettings.setChoiceSettings(
-                someProof.getFirstProof().getSettings().getChoiceSettings());
-        } else {
-            return defaultSettings;
-        }
-    }
-
-
-    /** adds namespaces to the namespaces of this initial configuration
-     */
-    public void add(NamespaceSet ns, ModStrategy mod) {
-        if (mod.modifyFunctions()) funcNS().add(ns.functions());
-        addSorts ( ns, mod );
-        if (mod.modifyVariables()) varNS().add(ns.variables());
-        if (mod.modifyProgramVariables()) progVarNS().add(ns.programVariables());
-        if (mod.modifyHeuristics()) ruleSetNS().add(ns.ruleSets());
-        if (mod.modifyChoices()) choiceNS().add(ns.choices());
-    }
-
-
+    
     public void setOriginalKeYFileName(String name) {
         originalKeYFileName = name;
     }
@@ -391,6 +338,16 @@ public class InitConfig {
 
     public String getOriginalKeYFileName() {
         return originalKeYFileName;
+    }
+    
+    
+    public void setSettings(ProofSettings settings) {
+	this.settings = settings;
+    }
+    
+    
+    public ProofSettings getSettings() {
+	return settings;
     }
 
 
@@ -410,10 +367,8 @@ public class InitConfig {
         return ic;
     }
 
+    
 
-    /**
-     * toString
-     */
     public String toString() {
         return
             "Namespaces:" + namespaces() +"\n" +

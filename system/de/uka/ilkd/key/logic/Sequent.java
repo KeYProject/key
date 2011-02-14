@@ -16,6 +16,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.SequentPrintFilter;
 
 
@@ -338,7 +339,7 @@ public class Sequent implements Iterable<ConstrainedFormula> {
     public StringBuffer prettyprint(Services services) {
 	de.uka.ilkd.key.pp.LogicPrinter lp = (new de.uka.ilkd.key.pp.LogicPrinter 
 					       (new de.uka.ilkd.key.pp.ProgramPrinter(null), 
-						de.uka.ilkd.key.pp.NotationInfo.createInstance(),
+						new NotationInfo(),
 						services));
 	lp.printSequent(this);
 	return lp.result();
@@ -438,15 +439,5 @@ public class Sequent implements Iterable<ConstrainedFormula> {
         public void remove() {
             throw new UnsupportedOperationException();
         }
-	
-    }
-    
-    
+    }    
 }
-
-
-
-
-
-
-

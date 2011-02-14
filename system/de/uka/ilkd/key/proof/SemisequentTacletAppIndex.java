@@ -67,7 +67,6 @@ public class SemisequentTacletAppIndex {
                                 NewRuleListener    listener ) {
         final PosInOccurrence pos =
             new PosInOccurrence ( cfma, PosInTerm.TOP_LEVEL, antec );
-
         termIndices =
             termIndices.put ( cfma, TermTacletAppIndex.create ( pos,
                                                                 services,
@@ -267,8 +266,9 @@ public class SemisequentTacletAppIndex {
      * @return all taclet apps for or below the given position
      */
     public ImmutableList<TacletApp> getTacletAppAtAndBelow(PosInOccurrence pos,
-                                                  RuleFilter filter) {
-        return getTermIndex ( pos ).getTacletAppAtAndBelow ( pos, filter );
+                                                  RuleFilter filter,
+                                                  Services services) {
+        return getTermIndex ( pos ).getTacletAppAtAndBelow ( pos, filter, services );
     }
 
     /** 

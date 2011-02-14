@@ -24,7 +24,6 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.op.IUpdateOperator;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.rule.*;
@@ -62,10 +61,6 @@ public class InteractiveProver {
     
     private boolean resumeAutoMode = false;
 
- 
-    //private static Logger threadLogger = Logger.getLogger("key.threading");
-    
-    
 
     /** creates a new interactive prover object 
      */
@@ -148,25 +143,7 @@ public class InteractiveProver {
     public void applyInteractive ( RuleApp app, Goal goal ) {
         goal.node().getNodeInfo().setInteractiveRuleApplication(true);
 
-        ImmutableList<Goal> goalList = goal.apply(app);
-        
-        
-        
-        if (!getProof ().closed ()) {
-            if ( resumeAutoMode () ) {
-                startAutoMode ();
-            } else {
-                ReuseListener rl = mediator().getReuseListener();
-                rl.removeRPConsumedGoal(goal);
-                rl.addRPOldMarkersNewGoals(goalList);
-                if (rl.reusePossible()) {
-                    mediator().indicateReuse(rl.getBestReusePoint());
-                } else {
-                    mediator().indicateNoReuse();
-                    Goal.applyUpdateSimplifier ( goalList );
-                }
-            }
-        }
+ 		ImmutableList<Goal> goalList = goal.apply(app);
     }
 
 
@@ -181,14 +158,6 @@ public class InteractiveProver {
     public Proof getProof() {
 	return proof;
     }    
-
-    /** 
-     * starts the execution of rules with active strategy 
-     */
-    public void startAutoMode () {
-	startAutoMode( proof.openGoals () );
-    }
-
 
     /** starts the execution of rules with active strategy. The
      * strategy will only be applied on the goals of the list that
@@ -229,25 +198,6 @@ public class InteractiveProver {
         
         if ( focus != null ) {
             // exchange the rule app manager of that goal to filter rule apps
-
-            // we also apply rules to directly preceding updates (usually this
-            // makes sense)
-            final PIOPathIterator it = focus.iterator();
-            it.next ();
-            focus = it.getPosInOccurrence (); 
-            while ( it.hasNext () ) {
-                if ( it.getSubTerm ().op () instanceof IUpdateOperator ) {
-                    final IUpdateOperator op =
-                        (IUpdateOperator)it.getSubTerm ().op ();
-                    if ( it.getChild () == op.targetPos() ) {
-                        it.next ();
-                        continue;
-                    }
-                }
-
-                it.next ();
-                focus = it.getPosInOccurrence (); 
-            }
                         
             final AutomatedRuleApplicationManager realManager = goal.getRuleAppManager ();
             goal.setRuleAppManager ( null );

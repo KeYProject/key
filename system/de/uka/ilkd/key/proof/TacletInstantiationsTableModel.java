@@ -18,14 +18,10 @@ import javax.swing.table.AbstractTableModel;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SortedSchemaVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -35,7 +31,6 @@ import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.rule.NewVarcond;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.*;
-import de.uka.ilkd.key.util.Array;
 
 
 public class TacletInstantiationsTableModel extends AbstractTableModel {
@@ -77,7 +72,6 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
 	this.varNamer = services.getVariableNamer();
 	
 	instantiationProposers = new InstantiationProposerCollection();
-	instantiationProposers.add(LoopInvariantProposer.DEFAULT);
 	instantiationProposers.add(varNamer);
 	instantiationProposers.add(VariableNameProposer.DEFAULT);
 	
@@ -190,7 +184,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
         NamespaceSet copy = nss.copy();
         copy.setVariables(varNS);
         copy.setFunctions(functNS);
-        Term term = TermParserFactory.createInstance().parse(
+        Term term = new DefaultTermParser().parse(
            new StringReader(s), null, services, copy, scm);
         return term;
     }
@@ -231,7 +225,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
 
         if ( ( getValueAt(irow, icol) == null  ||
                ((String)getValueAt(irow, icol)).length() == 0 ) &&
-               !originalApp.sufficientlyComplete() &&
+               !originalApp.sufficientlyComplete(services) &&
              !originalApp.canUseMVAPriori ( (SchemaVariable)getValueAt(irow, 0) ) 
          ) {
             throw new MissingInstantiationException
@@ -246,30 +240,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
      * is available)
      */
     private boolean isInputAvailable(int irow) {
-        if (((SchemaVariable)getValueAt(irow, 0)).isListSV()) return true;
         return getValueAt(irow, 1) != null && ((String)getValueAt(irow,1)).length() != 0;
-    }
-
-    private ImmutableSet<LocationDescriptor> parseLocationList(int irow) throws ParserException{
-        String instantiation = (String) getValueAt(irow, 1);
-        if (instantiation == null) {
-            instantiation = "";
-        }
-        ImmutableSet<LocationDescriptor> result = null;
-        try{
-            result = (new KeYParser(ParserMode.TERM, new KeYLexer(new StringReader(instantiation),
-                                             services.getExceptionHandler()),
-                                null, TermFactory.DEFAULT, null, services, nss, scm)).
-                location_list();
-        } catch (antlr.RecognitionException re) {
-            throw new ParserException(re.getMessage(),
-                                      new Location(re.getFilename(),
-                                                   re.getLine(),
-                                                   re.getColumn()));
-        } catch (antlr.TokenStreamException tse) {
-            throw new ParserException(tse.getMessage(), null);
-        }
-        return result;
     }
 
     /**
@@ -350,7 +321,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
 						   String instantiation,
 						   SchemaVariable sv,
 						   Services services) {
-	Sort svSort = ((SortedSchemaVariable)sv).sort();
+	Sort svSort = sv.sort();
 	if (svSort == ProgramSVSort.LABEL) {
 	    return VariableNamer.parseName(instantiation);
 	} else if (svSort == ProgramSVSort.VARIABLE ) {
@@ -402,7 +373,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
         throws SVInstantiationParserException {
 
         String instantiation = (String) getValueAt(irow, 1);
-        SortedSchemaVariable sv = (SortedSchemaVariable)getValueAt(irow, 0);
+        SchemaVariable sv = (SchemaVariable)getValueAt(irow, 0);
 
         if(! varNamer.isUniqueNameForSchemaVariable(
                         instantiation,
@@ -473,7 +444,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
                 checkNeededInputAvailable(irow);
 		sv   = (SchemaVariable) getValueAt(irow, 0);
                 sort = null;
-		if ( sv.isVariableSV () || sv.isSkolemTermSV () ) {
+		if ( sv instanceof VariableSV || sv instanceof SkolemTermSV) {
 		    IdDeclaration idd = parseIdDeclaration ( irow );
 		    sort = idd.getSort ();
 		    if ( sort == null ) {
@@ -485,7 +456,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
 			}
 		    }
 		    
-		    if ( sv.isVariableSV () ) {
+		    if ( sv instanceof VariableSV ) {
 		        LogicVariable lv = 
 		            new LogicVariable ( new Name ( idd.getName () ),
 		                    sort );
@@ -498,14 +469,14 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
                             lookupLogicSymbol(new Name(idd.getName()));
                         if (n == null) { 
                             result = result.createSkolemConstant
-                            ( idd.getName (), sv, sort, true );
+                            ( idd.getName (), sv, sort, true, services );
                         } else {
                             throw 
                                 new SVInstantiationParserException(idd.getName(), irow, 1, 
                                         "Name already in use.", false);
                         }
 		    }
-		} else if (sv.isProgramSV()) {
+		} else if (sv instanceof ProgramSV) {
 		    final ProgramElement pe = parseRow(irow);                    
 		    result = result.addCheckedInstantiation(sv, pe, services, true);
 		} 
@@ -526,41 +497,17 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
 	        
 	        sv   = (SchemaVariable)getValueAt(irow, 0);
 	        
-	        if (result.isDependingOnModifiesSV(sv) 
-		    || sv.isVariableSV () || sv.isSkolemTermSV () ||
+	        if (sv instanceof VariableSV || sv instanceof SkolemTermSV ||
 		    result.instantiations().isInstantiated(sv))
 	            continue;
                 
 	        sort = null;
                 
-                if (sv.isProgramSV()) {
+                if (sv instanceof ProgramSV) {
                     final ProgramElement pe = parseRow(irow);                    
                     result = result.addCheckedInstantiation(sv, pe, services, true);
-                } else if (sv.isListSV()){
-                    try{
-                        ImmutableSet<LocationDescriptor> s = parseLocationList(irow);
-                        result = result.addInstantiation(sv, Array.reverse(s.toArray(new LocationDescriptor[s.size()])), true);
-                    }catch (ParserException pe) {
-                        Location loc = pe.getLocation();
-                        if (loc != null) {
-                            throw new SVInstantiationParserException(
-				(String) getValueAt(irow, 1),
-				irow + (loc.getLine() <= 0 ? 0
-					: loc.getLine()),
-				loc.getColumn(), pe.getMessage(),
-				false);
-                        } else {
-                            throw new SVInstantiationParserException(
-				(String) getValueAt(irow, 1),
-				irow, -1,
-				pe.getMessage(),
-				false);
-                        }
-                    }
-                } else if (sv.isNameSV()) {
-                    result = result.addInstantiation(sv, tb.tt(), true);
                 } else{   
-                    if (!result.isDependingOnModifiesSV(sv) && isInputAvailable ( irow ) ) {
+                    if (isInputAvailable ( irow ) ) {
                         final Namespace extVarNS =
                             result.extendVarNamespaceForSV(nss.variables(), sv);
                         

@@ -1,10 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
 package de.uka.ilkd.key.smt.taclettranslation;
 
 import java.io.FileWriter;
@@ -22,7 +15,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.sort.ArraySortImpl;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -128,11 +120,13 @@ public final class DefaultTacletSetTranslation
 	}
 	return false;
     }
+    
+
 
     public ImmutableList<TacletFormula> getTranslation(ImmutableSet<Sort> sorts, 
 	    ImmutableSet<Term> attributeTerms, int max) {
 	this.maxGeneric = max;
-	// only translate once a time.
+	// only translate once.
 	if (!translate)
 	    return translation;
 	translate = false;
@@ -145,24 +139,16 @@ public final class DefaultTacletSetTranslation
 	usedFormulaSorts = (sorts == null ?emptySetSort :sorts);
 	usedAttributeTerms = (attributeTerms == null ? emptySetTerm :attributeTerms);
 	
-	
-	for (Taclet t : taclets) {
-	    if (!UsedTaclets.INSTANCE.contains(t.name().toString())) {
-		// notTranslated = notTranslated.append(new
-		// DefaultTacletFormula(t,null,"The taclet is not used for external provers."));
-		continue;
-	    }
-	
-	    if (!heuristics.isEmpty() && !checkHeuristic(t)) {
 
-		notTranslated = notTranslated.append(new DefaultTacletFormula(
-		        t, null,
-		        "The taclet does not have the right heuristic."));
-		continue;
-	    }
+	for (Taclet t : taclets) {
+	    
+	    if (UsedTaclets.INSTANCE.contains(t.name().toString())) {
+	
+	
 	    int i=0;
 	    for (TacletTranslator translator : translators) {
 		try { // check for the right translator 
+		
 		    translation = translation.append(translator.translate(t,sorts,attributeTerms,max));
 		    break; // translate only once a time.
 		} catch (IllegalTacletException e) {
@@ -171,8 +157,10 @@ public final class DefaultTacletSetTranslation
 			    .append(new DefaultTacletFormula(t, null, e
 			            .getMessage()));
 		    }
+	
 		}
 		i++;
+	    }
 	    }
 	}
 
@@ -232,12 +220,13 @@ public final class DefaultTacletSetTranslation
         if(usedSorts.size() > 0){
             toStore += "\\sorts{\n\n";
             for(Sort sort : usedFormulaSorts){
-        	    String name;
-        	    if(sort instanceof ArraySortImpl){
-        		name = ((ArraySortImpl)sort).elementSort().toString();
-        	    }else{
+        	    String name="";
+        	 //TODO: uncomment
+//        	    if(sort instanceof ArraySortImpl){
+//        		name = ((ArraySortImpl)sort).elementSort().toString();
+//        	    }else{
         		name = sort.name().toString();
-        	    }
+//        	    }
         		 
         	
               	    toStore += name+";\n";  

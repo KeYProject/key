@@ -7,14 +7,6 @@
 // See LICENSE.TXT for details.
 //
 //
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2004 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License.
-// See LICENSE.TXT for details.
-//
 //
 
 package de.uka.ilkd.key.logic;
@@ -22,27 +14,31 @@ package de.uka.ilkd.key.logic;
 import java.util.Iterator;
 
 import junit.framework.TestCase;
-import de.uka.ilkd.key.collection.ImmutableMapEntry;
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableMapEntry;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.operator.PostIncrement;
-import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.PrimitiveSort;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
+import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.rule.AntecTaclet;
 import de.uka.ilkd.key.rule.AntecTacletBuilder;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.UpdateSimplifier;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
 public class TestVariableNamer extends TestCase {
+    
+    private static final TermBuilder TB = TermBuilder.DF;
 
     private final Proof proof = new Proof(new Services());
     private final Services services = proof.getServices();
@@ -56,7 +52,7 @@ public class TestVariableNamer extends TestCase {
     private final ConstrainedFormula formulaWithX    = constructFormula(x);
     private final ConstrainedFormula formulaWithX_1  = constructFormula(x_1);
     private final ConstrainedFormula formulaWithVar_1= constructFormula(var_1);
-    private final SortedSchemaVariable variableSV = (SortedSchemaVariable)
+    private final SchemaVariable variableSV =
     	  SchemaVariableFactory.createProgramSV(new ProgramElementName("sv"),
 						ProgramSVSort.VARIABLE,
 						false);
@@ -69,7 +65,7 @@ public class TestVariableNamer extends TestCase {
 
     private ProgramVariable constructProgramVariable(ProgramElementName name) {
 	KeYJavaType myKeyJavaType
-	    = new KeYJavaType(new PrimitiveSort(new Name("mysort")));
+	    = new KeYJavaType(new SortImpl(new Name("mysort")));
     	return new LocationVariable(name, myKeyJavaType);
     }
 
@@ -84,9 +80,7 @@ public class TestVariableNamer extends TestCase {
     	StatementBlock statementBlock = new StatementBlock(statement);
     	JavaBlock javaBlock = JavaBlock.createJavaBlock(statementBlock);
 
-	TermFactory termFactory = TermFactory.DEFAULT;
-	Term subterm = termFactory.createJunctorTerm(Op.TRUE);
-	Term term = termFactory.createDiamondTerm(javaBlock, subterm);
+	Term term = TB.dia(javaBlock, TB.tt());
 
 	return new ConstrainedFormula(term);
     }
@@ -130,7 +124,7 @@ public class TestVariableNamer extends TestCase {
     }
     
     private void addTacletApp(Goal goal, ProgramVariable containedVar) {
-	Term findTerm = TermFactory.DEFAULT.createJunctorTerm(Op.TRUE);
+	Term findTerm = TB.tt();
    	AntecTacletBuilder builder = new AntecTacletBuilder();
 	builder.setFind(findTerm);
     	AntecTaclet taclet = builder.getAntecTaclet();
@@ -139,7 +133,7 @@ public class TestVariableNamer extends TestCase {
 	SchemaVariable sv
 		= SchemaVariableFactory.createProgramSV(new ProgramElementName("sv"),
 						        ProgramSVSort.STATEMENT,
-							false);
+						        false);
     	Statement statement = new PostIncrement(containedVar);
 	app = (NoPosTacletApp) app.addCheckedInstantiation(sv, statement, 
                 goal.proof().getServices(), false);
@@ -169,12 +163,6 @@ public class TestVariableNamer extends TestCase {
         }
 	
 	return false;
-    }
-
-
-    public void setUp() {
-	UpdateSimplifier sus = new UpdateSimplifier();
-	proof.setSimplifier(sus);
     }
 
 
@@ -272,5 +260,4 @@ public class TestVariableNamer extends TestCase {
 	v = vn.rename(x, goal, pio);
 	assertTrue(v.getProgramElementName().getProgramName().equals("x_2"));
     }
-    
 }

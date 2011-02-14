@@ -1,10 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
 //This file is part of KeY - Integrated Deductive Software Design
 
 package de.uka.ilkd.key.smt.test;
@@ -15,6 +8,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 import junit.framework.Assert;
+
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -79,8 +73,8 @@ public abstract class TestSMTSolver extends TestCommons {
 	    isinstalled = this.getSolver().isUsable();
 	    setToolNotInstalledChecked(true);
 	    if(!isinstalled) {
-		System.out.println("Warning: " + getSolver() + " not installed, tests skipped.");	    
-	    }
+		System.out.println("Warning: " + getSolver() + " not installed, tests skipped.");
+	    }	    
 	}
 	
 	return !isinstalled;
@@ -206,7 +200,7 @@ public abstract class TestSMTSolver extends TestCommons {
 	
 	//unknown is always allowed. But wrong answers are not allowed
 	if (isValid && result != null) {
-	    return result.isValid() != SMTSolverResult.ThreeValuedTruth.FALSE; 
+	    return result.isValid() != SMTSolverResult.ThreeValuedTruth.FALSIFIABLE; 
 	} else {
 	    return result.isValid() != SMTSolverResult.ThreeValuedTruth.TRUE;
 	}
@@ -221,6 +215,9 @@ public abstract class TestSMTSolver extends TestCommons {
      */
     private SMTSolverResult checkFile(String filepath) throws IOException {
 	ProofAggregate p;
+        
+  
+  
        
         if(!proofs.containsKey(filepath)){
             File file =  new File(filepath);
@@ -234,11 +231,13 @@ public abstract class TestSMTSolver extends TestCommons {
 	Proof proof = p.getProofs()[0];	    
 	Assert.assertTrue(proof.openGoals().size() == 1);		
 	Goal g = proof.openGoals().iterator().next();
+
 	
 	rule.setMaxTime(2000);
 	rule.start(g, proof.getUserConstraint().getConstraint(),false);
+	LinkedList<SMTSolverResult> toReturn = rule.getResults();
 	
-	return rule.getFirstResult();
+	return toReturn.getFirst();
     }
     
 }

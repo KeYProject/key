@@ -17,13 +17,10 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
-import de.uka.ilkd.key.logic.LexPathOrdering;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.ldt.IntegerLDT;
+import de.uka.ilkd.key.ldt.IntegerLDT;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.TermSymbol;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.LRUCache;
 
@@ -202,7 +199,7 @@ public class Monomial {
     
     
     public Term toTerm (Services services) {
-        final TermSymbol mul = 
+        final Operator mul = 
 	    services.getTypeConverter().getIntegerLDT().getMul();
         Term res = null;
         
@@ -210,7 +207,7 @@ public class Monomial {
         if ( it.hasNext () ) {
             res = it.next ();
             while ( it.hasNext () )
-                res = TermFactory.DEFAULT.createFunctionTerm ( mul, res,
+                res = TermFactory.DEFAULT.createTerm ( mul, res,
                                                                it.next () );
         }
         
@@ -220,7 +217,7 @@ public class Monomial {
         if ( res == null )
             res = cTerm;
         else if ( !BigInteger.ONE.equals ( coefficient ) )
-            res = TermFactory.DEFAULT.createFunctionTerm ( mul, res, cTerm );
+            res = TermFactory.DEFAULT.createTerm ( mul, res, cTerm );
         
         return res;        
     }

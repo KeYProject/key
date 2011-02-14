@@ -10,17 +10,26 @@
 package de.uka.ilkd.key.speclang.translation;
 
 import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.MemberDeclaration;
 import de.uka.ilkd.key.java.declaration.modifier.Private;
 import de.uka.ilkd.key.java.declaration.modifier.Protected;
 import de.uka.ilkd.key.java.declaration.modifier.Public;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.java.reference.PackageReference;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 public abstract class SLExpressionResolver {
+    
+    protected static final TermBuilder TB = TermBuilder.DF;        
 
     protected final JavaInfo javaInfo;
+    protected final Services services;
     protected final SLResolverManager manager;
     protected final KeYJavaType specInClass;
     
@@ -32,13 +41,15 @@ public abstract class SLExpressionResolver {
         assert specInClass != null;
         
         this.javaInfo = javaInfo;
+        this.services = javaInfo.getServices();
         this.manager = manager;
         this.specInClass = specInClass;
     }
-
+    
 
     /**
-     * Cuts off names of enclosing classes from a "package reference"
+     * Cuts off names of enclosing classes from a "package reference". 
+     * Helper for areInSamePackage().
      */
     private String trimPackageRef(String ref) {
         if(ref == null || javaInfo.isPackage(ref)) {
@@ -54,6 +65,9 @@ public abstract class SLExpressionResolver {
     }
     
     
+    /**
+     * Helper for isVisible().
+     */
     private boolean areInSamePackage(KeYJavaType kjt1, KeYJavaType kjt2) {
 	final PackageReference p1 = kjt1.createPackagePrefix();
 	final PackageReference p2 = kjt2.createPackagePrefix();
@@ -67,15 +81,15 @@ public abstract class SLExpressionResolver {
 	} else {
 	    return ps1.equals(ps2);
 	}
-    }    
+    }
     
     
-    /** 
-     * Checks whether the passed member, contained in the passed type, 
-     * is visible in specInClass.
+    /**
+     * Helper for isVisible().
      */
-    protected final boolean isVisible(MemberDeclaration md, 
-	    			      KeYJavaType containingType) {
+    private final boolean isVisibleHelper(MemberDeclaration md,
+	                                  KeYJavaType containingType,
+	                                  KeYJavaType inType) {
 	//use spec visibility
 	VisibilityModifier mod = manager.getSpecVisibility(md);
 	
@@ -94,13 +108,38 @@ public abstract class SLExpressionResolver {
 	if(mod instanceof Public) {
 	    return true;
 	} else if(mod instanceof Protected) {
-	    return specInClass.getSort().extendsTrans(containingType.getSort())
-	           || areInSamePackage(specInClass, containingType);
+	    return inType.getSort().extendsTrans(containingType.getSort())
+	           || areInSamePackage(inType, containingType);
 	} else if(mod instanceof Private) {
-	    return specInClass.equals(containingType);
-	} else { 
-	    return areInSamePackage(specInClass, containingType);
+	    return inType.equals(containingType);
+	} else {
+	    return areInSamePackage(inType, containingType);
 	}	
+    }
+    
+    
+    /** 
+     * Checks whether the passed member, contained in the passed type, 
+     * is visible in specInClass.
+     */
+    protected final boolean isVisible(MemberDeclaration md, 
+	    			      KeYJavaType containingType) {
+	//visible in specInClass directly?
+	KeYJavaType inType = specInClass;
+	boolean result = isVisibleHelper(md, containingType, inType);
+	
+	//visible in enclosing classes of specInClass?
+	while(!result) {
+	    final PackageReference p = inType.createPackagePrefix();
+	    if(p == null || javaInfo.isPackage(p.toString())) {
+		break;
+	    }
+	    inType = javaInfo.getTypeByClassName(p.toString());
+	    assert inType != null;
+	    result = isVisibleHelper(md, containingType, inType);
+	}
+	
+	return result;
     }
     
     
@@ -128,5 +167,4 @@ public abstract class SLExpressionResolver {
     
     
     protected abstract boolean canHandleReceiver(SLExpression receiver);    
-    public abstract boolean needVarDeclaration(String name);
 }

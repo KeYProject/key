@@ -13,7 +13,6 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.event.*;
-import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -173,30 +172,6 @@ public class TaskTree extends JPanel {
  		problemChosen();
  	    }
 	}
-
-	public void mousePressed(MouseEvent e) {
-	    if (e.isPopupTrigger()) {
-		TreePath selPath = delegateView.getPathForLocation
-		    (e.getX(), e.getY());
-		if (selPath!=null 
-		    && selPath.getLastPathComponent() instanceof EnvNode) {
-		    JPopupMenu popup = new ProofEnvPopupMenu
-			(((EnvNode)selPath.getLastPathComponent()));
-		    popup.show(e.getComponent(), e.getX(), e.getY());
-		}
-		if (selPath!=null 
-		    && selPath.getLastPathComponent() instanceof BasicTask) {
-		    JPopupMenu popup = new BasicTaskPopupMenu
-			(((BasicTask)selPath.getLastPathComponent()));
-		    popup.show(e.getComponent(), e.getX(), e.getY());
-		}
-		    
-	    }
-	}
-        
-        public void mouseReleased(MouseEvent e) {
-            mousePressed(e);
-        }
     }
 
 
@@ -274,98 +249,6 @@ public class TaskTree extends JPanel {
 	}
     } 
 
-
-    class ProofEnvPopupMenu extends JPopupMenu implements ActionListener {	
-	
-	private JMenuItem diffLast=new JMenuItem("Diff Last Env");
-	
-	private EnvNode invokedNode;
-
-	public ProofEnvPopupMenu(EnvNode node) {
-	    super("Choose Action");
-	    invokedNode = node;
-	    create();
-	}
-
-	private void create() {	    
-	    this.add(diffLast);
-	    diffLast.addActionListener(this);
-	}
-
-	public void actionPerformed(ActionEvent e) {
-	    if (e.getSource() == diffLast) {
-		String s = invokedNode.getDiffToLast();
-		JScrollPane scroll = new JScrollPane();
-		JTextArea text = new JTextArea(s,20,40);
-		text.setEditable(false);
-		text.setCaretPosition(0);
-		scroll.setViewportView(text);
-		JFrame fr = new JFrame("Diff to Last Proof Environemnt");
-		fr.getContentPane().setLayout(new BorderLayout());
-		fr.getContentPane().add(scroll,BorderLayout.CENTER);
-		JButton ok = new JButton("OK");
-		ok.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent ae) {
-			    ((JFrame)((JButton)ae.getSource())
-			     .getTopLevelAncestor()).dispose();
-			}});
-		fr.getContentPane().add(ok, BorderLayout.SOUTH);
-		fr.setSize(600,900);
-		fr.getContentPane().add(scroll);
-		fr.setVisible(true);
-	    } 
-	}
-
-    }
-
-
-    class BasicTaskPopupMenu extends JPopupMenu implements ActionListener {	
-	
-        private JMenuItem mcList=new JMenuItem("Show Used Specifications");
-        private JMenuItem loadProof=new JMenuItem("Load Proof from File");
-        private JMenuItem removeTask=new JMenuItem("Abandon Task");
-	
-	private BasicTask invokedNode;
-
-	public BasicTaskPopupMenu(BasicTask node) {
-	    super("Choose Action");
-	    invokedNode = node;
-	    create();
-	}
-
-	private void create() {	    
-	    this.add(mcList);
-	    mcList.addActionListener(this);
-	    this.add(loadProof);
-	    loadProof.addActionListener(this);
-            this.add(removeTask);
-            removeTask.addActionListener(this);
-	}
-
-
-	public void actionPerformed(ActionEvent e) {
-	    if (e.getSource() == mcList) {
-                new UsedSpecificationsDialog(
-                            mediator.getServices(), 
-                            invokedNode.getUsedSpecs());
-	    } else if (e.getSource() == removeTask) {
-	        Main.getInstance().closeTask(invokedNode);
-            } else if (e.getSource() == loadProof) {
-                Main mainFrame = Main.getInstance();
-                KeYFileChooser localFileChooser = Main.getFileChooser(
-                    "Choose file from which to load proof...");
-                
-	        boolean loaded = localFileChooser.showOpenDialog(mainFrame);
-	        if (loaded) {
-		    File file = localFileChooser.getSelectedFile(); 
-		    final ProblemLoader pl = new ProblemLoader(file, mainFrame, 
-                                        mediator.getProfile(), true);
-                    pl.addTaskListener(mainFrame.getProverTaskListener());
-                    pl.run();
-	        }
-            }
-	}
-    }
 
     class TaskTreeSelectionListener implements KeYSelectionListener {
 	/** focused node has changed */

@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -37,7 +37,6 @@ import javax.swing.tree.TreeNode;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.KeYSelectionEvent;
 import de.uka.ilkd.key.gui.KeYSelectionListener;
-import de.uka.ilkd.key.gui.TacletView;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
@@ -230,8 +229,7 @@ class InnerPanel extends TreePanel {
 	radioUser.setEnabled(false);
 
 	ToolTipManager.sharedInstance().registerComponent(title);
-	title.setToolTipText("Hallo");
-
+	
 	buttonGroup.add(radioAll);
 	buttonGroup.add(radioNothing);
 	buttonGroup.add(radioUser);
@@ -369,7 +367,8 @@ class LeafPanel extends TreePanel {
 	final ImmutableSet<NoPosTacletApp> apps = index.allNoPosTacletApps();
 	for (final NoPosTacletApp app : apps) {
 	    if (app.taclet().name().toString().equals(item.toString())) {
-		TacletView.getInstance().showTacletView(app.taclet(), true);
+	// TODO uncomment
+		//	TacletView.getInstance().showTacletView(app.taclet(), true);
 		break;
 	    }
 

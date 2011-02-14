@@ -21,9 +21,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * which can either fail or be successful, but which do not create a
  * constraint. 
  */
-
-public abstract class VariableConditionAdapter
-    implements VariableCondition {
+public abstract class VariableConditionAdapter implements VariableCondition {
 
     /**
      * checks if the condition for a correct instantiation is fulfilled
@@ -33,25 +31,22 @@ public abstract class VariableConditionAdapter
      * @param services the program information object
      * @return true iff condition is fulfilled
      */
-    public abstract boolean check(SchemaVariable var, SVSubstitute instCandidate, 
+    public abstract boolean check(SchemaVariable var, 
+	    			  SVSubstitute instCandidate, 
 				  SVInstantiations instMap, Services services);
 
+
     
-    /**
-     * checks if the condition for a correct instantiation is fulfilled
-     * @param var the template Variable to be instantiated
-     * @param instCandidate the SVSubstitute the schemavariable is matched against
-     * @param matchCond the MatchCondition with the current matching state and in particular 
-     *    the SVInstantiations that are already known to be needed 
-     * @param services the program information object
-     * @return modified match results if the condition can be satisfied,
-     * or <code>null</code> otherwise
-     */
-    public MatchConditions check(SchemaVariable var, SVSubstitute instCandidate, 
-			    MatchConditions matchCond, Services services) {
-	return check(var, instCandidate, matchCond.getInstantiations(), services) ? 
-	    matchCond : null;
+    @Override
+    public final MatchConditions check(SchemaVariable var, 
+	    			       SVSubstitute instCandidate, 
+	    			       MatchConditions mc, 
+	    			       Services services) {
+	return check(var, 
+		     instCandidate, 
+		     mc.getInstantiations(), 
+		     services) 
+	       ? mc 
+	       : null;
     }
-
-
 }

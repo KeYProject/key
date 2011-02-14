@@ -1,12 +1,7 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
+//This file is part of KeY - Integrated Deductive Software Design
 
 package de.uka.ilkd.key.smt;
+
 
 
 public final class YicesSolver extends AbstractSMTSolver {
@@ -43,15 +38,15 @@ public final class YicesSolver extends AbstractSMTSolver {
 //		return SMTSolverResult.createUnknownResult(input);
 //	    }
 	    if (input.startsWith("unsat\n")) {
-		return SMTSolverResult.createValid(input,name());
+		return SMTSolverResult.createValidResult(input,name());
 	    } else if (input.startsWith("sat\n")) {
-		return SMTSolverResult.createInvalid(input,name());
+		return SMTSolverResult.createInvalidResult(input,name());
 	    } else {
-		return SMTSolverResult.createUnknown(input,name());
+		return SMTSolverResult.createUnknownResult(input,name());
 	    }
 
 	} else {
-	    throw new IllegalArgumentException(error);
+	    throw new IllegalResultException(error);
 	}
 	
 	

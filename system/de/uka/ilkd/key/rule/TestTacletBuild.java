@@ -16,10 +16,7 @@ import java.io.File;
 import junit.framework.TestCase;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.Op;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SortedSchemaVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
 /**
@@ -45,14 +42,14 @@ public class TestTacletBuild extends TestCase {
     }
 
     public void test0() {
-	SortedSchemaVariable u=(SortedSchemaVariable) 
+	SchemaVariable u=(SchemaVariable) 
 	    TacletForTests.getVariables().lookup(new Name("u"));
-	SortedSchemaVariable v=(SortedSchemaVariable) 
+	SchemaVariable v=(SchemaVariable) 
 	    TacletForTests.getVariables().lookup(new Name("v"));
-	Term b=tf.createFunctionTerm((SortedSchemaVariable) 
+	Term b=tf.createTerm((SchemaVariable) 
 	    TacletForTests.getVariables().lookup(new Name("b")), NO_SUBTERMS);
-	Term t1=tf.createQuantifierTerm(Op.EX, u, b);
-	Term t2=tf.createQuantifierTerm(Op.EX, v, b);
+	Term t1=TermBuilder.DF.ex((QuantifiableVariable)u, b);
+	Term t2=TermBuilder.DF.ex((QuantifiableVariable)v, b);
 	RewriteTacletBuilder sb=new RewriteTacletBuilder();
 	sb.setFind(t1);
 	sb.addTacletGoalTemplate
@@ -76,16 +73,16 @@ public class TestTacletBuild extends TestCase {
 
     public void testUniquenessOfIfAndFindVarSVsInIfAndFind() {
 	boolean thrown=false;
-	SortedSchemaVariable u=(SortedSchemaVariable) 
+	SchemaVariable u=(SchemaVariable) 
 	    TacletForTests.getVariables().lookup(new Name("u"));
-	Term A=tf.createFunctionTerm
+	Term A=tf.createTerm
 	    ((Function)TacletForTests.getFunctions().lookup(new Name("A")), 
 	     NO_SUBTERMS);
-	Term t1=tf.createQuantifierTerm(Op.ALL, u, A);
+	Term t1=TermBuilder.DF.all((QuantifiableVariable)u, A);
 	Sequent seq = Sequent.createSuccSequent
 	    (Semisequent.EMPTY_SEMISEQUENT.insert
 	     (0, new ConstrainedFormula(t1)).semisequent());
-	Term t2=tf.createQuantifierTerm(Op.EX, u, A);
+	Term t2=TermBuilder.DF.ex((QuantifiableVariable)u, A);
 	SuccTacletBuilder sb=new SuccTacletBuilder();
 	sb.setIfSequent(seq);
 	sb.setFind(t2);
@@ -101,13 +98,13 @@ public class TestTacletBuild extends TestCase {
 
     public void testUniquenessOfIfAndFindVarSVBothInIf() {
 	boolean thrown=false;
-	SortedSchemaVariable u=(SortedSchemaVariable) 
+	SchemaVariable u=(SchemaVariable) 
 	    TacletForTests.getVariables().lookup(new Name("u"));
-	Term A=tf.createFunctionTerm
+	Term A=tf.createTerm
 	    ((Function)TacletForTests.getFunctions().lookup(new Name("A")), 
 	     NO_SUBTERMS);
-	Term t1=tf.createQuantifierTerm(Op.ALL, u, A);
-	Term t2=tf.createQuantifierTerm(Op.EX, u, A);
+	Term t1=TermBuilder.DF.all( (QuantifiableVariable)u, A);
+	Term t2=TermBuilder.DF.ex((QuantifiableVariable)u, A);
 	Sequent seq = Sequent.createSuccSequent
 	    (Semisequent.EMPTY_SEMISEQUENT
 	     .insert(0, new ConstrainedFormula(t1)).semisequent()
@@ -128,14 +125,14 @@ public class TestTacletBuild extends TestCase {
 
     public void testUniquenessOfIfAndFindVarSVsInFind() {
 	boolean thrown=false;
-	SortedSchemaVariable u=(SortedSchemaVariable) 
+	SchemaVariable u=(SchemaVariable) 
 	    TacletForTests.getVariables().lookup(new Name("u"));
-	Term A=tf.createFunctionTerm
+	Term A=tf.createTerm
 	    ((Function)TacletForTests.getFunctions().lookup(new Name("A")), 
 	     NO_SUBTERMS);
-	Term t1=tf.createQuantifierTerm(Op.ALL, u, A);
+	Term t1=TermBuilder.DF.all((QuantifiableVariable)u, A);
 	SuccTacletBuilder sb=new SuccTacletBuilder();
-	sb.setFind(tf.createJunctorTerm(Op.AND,t1,t1));
+	sb.setFind(tf.createTerm(Junctor.AND,t1,t1));
 	try {
 	    sb.getTaclet();
 	} catch (IllegalArgumentException e) {
@@ -165,6 +162,4 @@ public class TestTacletBuild extends TestCase {
         		"a schemavariable with wrong prefix.");
         
     }
-    
-
 }

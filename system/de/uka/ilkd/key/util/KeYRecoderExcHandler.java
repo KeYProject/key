@@ -34,7 +34,7 @@ public class KeYRecoderExcHandler extends KeYExceptionHandlerImpl implements rec
     
     public KeYRecoderExcHandler(int errorThreshold) {
          super();
-	 setErrorThreshold(recoderErrorThreshold);
+	 setErrorThreshold(errorThreshold);
     }
 
     public void clear(){
@@ -73,7 +73,7 @@ public class KeYRecoderExcHandler extends KeYExceptionHandlerImpl implements rec
          
  
     protected void recoderExitAction() {       
-        String msg = "Recoder: " + recoderErrorCount + " errors have occured - aborting.";
+        String msg = "Recoder: " + recoderErrorCount + " errors have occurred - aborting.";
 	recoderErrorCount = 0;
         ExceptionHandlerException ex = new ExceptionHandlerException(msg);
         ex.initCause((Throwable)recoderExceptions.getFirst());

@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -17,14 +17,13 @@ import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import javax.swing.Action;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
-import javax.swing.Action;
 import javax.swing.event.EventListenerList;
 
-import de.uka.ilkd.key.bugdetection.BugDetector;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
@@ -39,16 +38,12 @@ import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.GlobalProofMgt;
-import de.uka.ilkd.key.proof.reuse.ReusePoint;
 import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.rule.updatesimplifier.ApplyOnModality;
 import de.uka.ilkd.key.strategy.feature.AbstractBetaFeature;
 import de.uka.ilkd.key.strategy.feature.IfThenElseMalusFeature;
-import de.uka.ilkd.key.unittest.UnitTestBuilder;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
-import de.uka.ilkd.key.visualization.ProofVisualization;
 
 
 public class KeYMediator {
@@ -57,9 +52,6 @@ public class KeYMediator {
 
 
     private InteractiveProver interactiveProver;
-
-    /** the update simplifier (may be moved to nodes)*/
-    private UpdateSimplifier upd_simplifier;
 
     /** the notation info used to print sequents */
     private final NotationInfo notationInfo;
@@ -91,7 +83,7 @@ public class KeYMediator {
     */
     public KeYMediator(IMain mainFrame) {
 	this.mainFrame = mainFrame;
-	notationInfo = NotationInfo.createInstance();
+	notationInfo        = new NotationInfo();
 	proofListener       = new KeYMediatorProofListener();
 	proofTreeListener   = new KeYMediatorProofTreeListener();
 	keySelectionModel   = new KeYSelectionModel();
@@ -99,7 +91,6 @@ public class KeYMediator {
 	new SkolemAbbreviator(this); // SkolemAbbreviator registers itself
 	addRuleAppListener(proofListener);
 	addAutoModeListener(proofListener);
-	GlobalProofMgt.getInstance().setMediator(this);
 	defaultExceptionHandler = new KeYRecoderExcHandler();
     }
 
@@ -267,78 +258,15 @@ public class KeYMediator {
 	    }
 	}
     }
+    
+    
     private void finishSetBack(){
         TermTacletAppIndexCacheSet.clearCache();
-        ApplyOnModality.clearCache();
-        TermFactory.clearCache();
         AbstractBetaFeature.clearCache();
         IfThenElseMalusFeature.clearCache();
-        
-        System.gc();//Runs Garbagecolletor
-        System.runFinalization();
-        if(MethodCallInfo.MethodCallCounterOn){
-            System.out.println(MethodCallInfo.Local.toString());
-            MethodCallInfo.Local.reset();
-        }
     }
 
     
-    public ProofVisualization visualizeProof(){
-	if (ensureProofLoaded()) {
-	    return new ProofVisualization(getSelectedNode(),getServices());
-	}
-	return null;
-    }
-
-    public void testCaseConfirmation(String path){
-	TestExecutionDialog.addTest(path, null, null);
-	int n=JOptionPane.NO_OPTION;
-	if(Main.isVisibleMode() || Main.testStandalone){
-	n = JOptionPane.showConfirmDialog(
-		 Main.getInstance(),
-		"A unittest was generated and written to \n"+path+
-		"\nDo you want to compile and execute the test now?",
-		    "Unittest generated",
-		    JOptionPane.YES_NO_OPTION);
-	}
-	if(n==JOptionPane.YES_OPTION){
-	    TestExecutionDialog ted = TestExecutionDialog.getInstance(Main.getInstance());
-	    ted.setVisible(true);
-	}
-	
-    }
-    
-    public void testCaseConfirmation(String path, int coverage){
-        JOptionPane.showMessageDialog(
-            null, "A unittest was generated and written to "+path+
-                "\nTop-Level Statement Coverage: "+coverage,
-            "Unittest generated", JOptionPane.INFORMATION_MESSAGE);
-    }
-
-    public void generateTestCaseForSelectedNode(){
-	if (ensureProofLoaded()) {
-	    UnitTestBuilder testBuilder = new UnitTestBuilder(getServices(), 
-							      getProof());
-	    try {
-		testCaseConfirmation(
-		    testBuilder.createTestForNode(getSelectedNode()));
-	    } catch(Exception e){
-		new ExceptionDialog(mainFrame(), e);
-	    }
-	}
-    }
-
-    public void bugDetectionForSelectedNode(){
-	if (ensureProofLoaded()) {
-	    BugDetector bugDetector = new BugDetector();
-	    try {
-		bugDetector.run(getSelectedNode());
-	    } catch(Exception e){
-		new ExceptionDialog(mainFrame(), e);
-	    }
-	}
-    }
-
     /** 
      * initializes proof (this is Swing thread-safe) 
      */
@@ -364,7 +292,6 @@ public class KeYMediator {
 	if (proof != null) {
 	    proof.addProofTreeListener(proofTreeListener);
 	    proof.mgt().setMediator(this);
-	    proof.setSimplifier(upd_simplifier);
 	}
         keySelectionModel.setSelectedProof(proof);
     }
@@ -475,7 +402,7 @@ public class KeYMediator {
                     firstApp = ifSeqCandidates.head();
                 }               
                 TacletApp tmpApp = 
-                    firstApp.tryToInstantiate(goal, getServices());                
+                    firstApp.tryToInstantiate(getServices());                
                 if (tmpApp != null) firstApp = tmpApp;
                 
                
@@ -530,9 +457,11 @@ public class KeYMediator {
 	RuleApp app = set.iterator().next();
 	if (app != null && app.rule() == rule) {
 	    goal.apply(app);
-	    }
+	    return;
+	}
     }
      
+      
     /**
      * Apply a RuleApp and continue with update simplification or strategy
      * application according to current settings.
@@ -543,124 +472,6 @@ public class KeYMediator {
         interactiveProver.applyInteractive(app, goal);
     }
 
-// ****************** Re-Use Stuff *********************************
-
-    private ReuseListener hook = new ReuseListenerDummy();
-   
-    private boolean continuousReuse = true;
-    private boolean reuseStarted = false;
-
-    private Node changeWish;
-
-    public void changeNode(Node n) {
-        Proof old = n.proof();
-        Proof p = new Proof(old);
-        mark(old.root());
-
-        p.setProofEnv(old.env());
-        mainFrame.addProblem(new SingleProof(p, "XXX"));
-        changeWish = n;
-    }
-
-    public void setContinuousReuse(boolean b) {
-        continuousReuse = b;
-    }
-
-    public boolean reuseInProgress() {
-        return continuousReuse && reuseStarted;
-    }
-    
-    public void indicateReuse(ReusePoint rp) {
-        mainFrame.indicateReuse(rp);
-    }
-
-    public void indicateNoReuse() {
-        mainFrame.indicateNoReuse();
-    }
-    
-    public void startReuse(ReusePoint reusePoint) {
-        reuseStarted = true;
-        getInteractiveProver().fireAutoModeStarted(
-                new ProofEvent(getProof()));
-        try {           
-            do {
-                final Goal currGoal = reusePoint.target(); // check proof!!!
-                assert currGoal != null : 
-                    "Cannot apply this here. Forgot to unregister listener?";
-                final ReuseListener local_hook = getReuseListener();
-                local_hook.removeRPConsumedMarker(reusePoint.source());
-                RuleApp app = reusePoint.getReuseApp();
-                if (reusePoint.source() != changeWish) {
-                    currGoal.node().setReuseSource(reusePoint);
-                    local_hook.removeRPConsumedGoal(currGoal);
-                    getProof().getServices().getNameRecorder().setProposals(
-                            reusePoint.getNameProposals());
-                    ImmutableList<Goal> goalList = currGoal.apply(app);
-                    local_hook.addRPOldMarkersNewGoals(goalList);
-                    local_hook.addRPNewMarkersAllGoals(reusePoint.source());
-                    reuseStarted = local_hook.reusePossible();
-                } else {
-                    // InteractiveProver will do the other 2 bookkeeping
-                    reuseStarted=false;
-                    changeWish=null;
-                    local_hook.addRPNewMarkersAllGoals(reusePoint.source());
-                }
-                local_hook.showState();
-                if (reuseStarted) {
-                    reusePoint = getReuseListener().getBestReusePoint();
-                    if (!continuousReuse) {
-                        indicateReuse(reusePoint);
-                    }
-                } else  {
-                    reuseStarted = false;
-                    indicateNoReuse();                    
-                }
-            } while (reuseInProgress());
-
-        } catch(RuntimeException re) {
-            getInteractiveProver().fireAutoModeStopped(new ProofEvent(getProof()));
-            throw re;
-        }
-        getInteractiveProver().fireAutoModeStopped(new ProofEvent(getProof()));
-    }    
-    
-    public void showReuseState() {
-       hook.startShowingState();
-    }
-
-    public void showPreImage() {
-       hook.showPreImage();
-    }
-
-    public void mark(Node n) {
-       if (hook instanceof ReuseListenerDummy) {
-          hook = new ReuseListenerImpl(this);
-          addKeYSelectionListener(hook);
-       }
-       if (n.isReuseCandidate()) {
-           n.unmarkReuseCandidate();
-           hook.recomputeReuseTotal();
-       } else {
-           n.markReuseCandidate();
-       }
-    }
-    
-    public ReuseListener getReuseListener() {
-       return hook;
-    }
-    
-    public void markPersistent(Node n) {
-       mark(n);
-       n.markPersistentCandidate();
-    }
-    
- 
-    
- 
-    
- 
-    
-// **********************************************************************
     
 
     /** collects all applicable FindTaclets of the current goal
@@ -811,13 +622,6 @@ public class KeYMediator {
 		((GUIListener)listeners[i+1]).shutDown(e);
 	    }
 	}
-    }
-
-    
-    /** sets the simultaneous update simplifier */
-    public void setSimplifier(UpdateSimplifier s) {
-	upd_simplifier = s;
-	if (getProof() != null) getProof().setSimplifier(s);
     }
    
   
@@ -981,8 +785,7 @@ public class KeYMediator {
       final boolean b = fullStop;
       Runnable interfaceSignaller = new Runnable() {
          public void run() {
-	     if (mainFrame() != null) mainFrame().setCursor
-		 (new java.awt.Cursor(java.awt.Cursor.WAIT_CURSOR));
+	     mainFrame().setCursor(new java.awt.Cursor(java.awt.Cursor.WAIT_CURSOR));
             if (b) {
                interactiveProver.fireAutoModeStarted(
                   new ProofEvent(getProof()));
@@ -998,8 +801,7 @@ public class KeYMediator {
          public void run() {
             if ( b )
                interactiveProver.fireAutoModeStopped (new ProofEvent(getProof()));
-            if (mainFrame() != null) mainFrame().setCursor
-		(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+            mainFrame().setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
             if (getProof() != null)
                 keySelectionModel.fireSelectedProofChanged();
          }
@@ -1075,12 +877,9 @@ public class KeYMediator {
 	}
     }
 
-    //INNER CLASS
-    class KeYMediatorProofListener implements RuleAppListener, 
-                                              AutoModeListener {
+    private final class KeYMediatorProofListener implements RuleAppListener, 
+                                                            AutoModeListener {
 
-        private Node selectedBeforeAutoMode;
-        
 	/** invoked when a rule has been applied */
 	public void ruleApplied(ProofEvent e) {
 	    if (autoMode()) return;
@@ -1093,25 +892,13 @@ public class KeYMediator {
 	/** invoked if automatic execution has started
 	 */
 	public void autoModeStarted(ProofEvent e) {
-              autoMode = true;
-              selectedBeforeAutoMode = getSelectedNode(); 
-//            if (proof == null) return; // there is no selection or anything
+	    autoMode = true;
 	}
 	
 	/** invoked if automatic execution has stopped
 	 */
 	public void autoModeStopped(ProofEvent e) {
             autoMode = false;
-            if (getProof() != null) {
-                if (selectedBeforeAutoMode!=null) {
-//XXX%%%%% This is way too slow for big proofs! 
-                // XXX Could you please check if it is still to slow?
-                    keySelectionModel.nearestOpenGoalSelection(selectedBeforeAutoMode);
-                } else {
-                    keySelectionModel.defaultSelection();
-                }
-            }
-            selectedBeforeAutoMode = null; //Important to prevent memory leaking	    
 	}
     }
 
@@ -1126,8 +913,7 @@ public class KeYMediator {
 	 */ 
 	public void selectedProofChanged(KeYSelectionEvent e) {
 	    setProof(e.getSource().getSelectedProof());
-	}
-	
+	}	
     }
     
     public void enableWhenProof(final Action a) {
@@ -1140,6 +926,7 @@ public class KeYMediator {
             }
         });
     }
+    
 
     /**
      * takes a notification event and informs the notification
@@ -1195,5 +982,4 @@ public class KeYMediator {
     public ProverTaskListener getProverTaskListener() {
         return mainFrame.getProverTaskListener();
     }
-
 }

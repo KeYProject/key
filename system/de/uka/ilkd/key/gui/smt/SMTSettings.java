@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -35,7 +35,7 @@ public class SMTSettings implements Settings {
     
     private static final String TIMEOUT="[DecisionProcedure]SolverTimeout";
     
-    private static final String SAVEFILE="[DecisionProcedure]savefile";
+
     private static final String SAVEFILE_PATH="[DecisionProcedure]savefile_path";
     
     
@@ -47,25 +47,23 @@ public class SMTSettings implements Settings {
     
     private static final String PROGRESS_DIALOG_MODE = "[DecisionProcedure]pd_mode";
 
-    
-    /**@see {@link de.uka.ilkd.key.smt.SmtLibTranslatorWeaker} */
-    private static final String WEAKENSMTTRANSLATION = "[DecisionProcedure]WeakenSMTTranslation";
+
 
     /** the list of registered SettingListener */
     private LinkedList<SettingsListener> listenerList = new LinkedList<SettingsListener>();
     
 
     
-    private final LinkedList<SMTRule> smtRules = new LinkedList<SMTRule>();
+    private LinkedList<SMTRule> smtRules = new LinkedList<SMTRule>();
     
-    public final static int PROGRESS_MODE_USER = 0;
-    public final static int PROGRESS_MODE_CLOSE = 1;
-    public final static int PROGRESS_MODE_CLOSE_FIRST = 2;
+    public final static int    PROGRESS_MODE_USER = 0;
+    public final static int    PROGRESS_MODE_CLOSE = 1;
+    public final static int    PROGRESS_MODE_CLOSE_FIRST = 2;
    
     
     
     
-    private static Collection<AbstractSMTSolver> solvers = new LinkedList<AbstractSMTSolver>();
+    private static Collection<AbstractSMTSolver>  solvers = new LinkedList<AbstractSMTSolver>();
     
     /** the currently active rule */    
     private SMTRule activeSMTRule = SMTRule.EMPTY_RULE;
@@ -76,6 +74,8 @@ public class SMTSettings implements Settings {
     private static SMTSettings instance;
     
     private static String EXECSTR = "[DecisionProcedure]Exec";
+
+
     
     /** the string separating different solver-command values. */
     private static final String execSeperator1 = ":"; 
@@ -141,10 +141,11 @@ public class SMTSettings implements Settings {
     /**
      * retrieves the rule of the specified name or returns <code>null</code> if
      * no such rule exists
-     * @param ruleName the String unambiguously specifying a rule 
+     * @param name the String unambiguously specifying a rule 
      * @return the found SMTRule or <code>null</code> 
      */
     public SMTRule findRuleByName(String name){
+	
 	for(SMTRule rule : getSMTRules()){
 	    if(rule.name().toString().equals(name)){
 		return rule;
@@ -172,12 +173,15 @@ public class SMTSettings implements Settings {
      * changed to its registered listeners (not thread-safe)
      */
     protected void fireSettingsChanged() {
+	
         for (SettingsListener aListenerList : listenerList) {
             aListenerList.settingsChanged(new GUIEvent(this));
         }
+
         if(Main.instance != null){
             Main.instance.updateSMTSelectMenu();
         }
+      
     }
     
 
@@ -188,6 +192,7 @@ public class SMTSettings implements Settings {
 
     
     private void setSolversAndRules(){
+	
 	AbstractSMTSolver z3 = new Z3Solver();
 	AbstractSMTSolver simplify = new SimplifySolver();
 	AbstractSMTSolver yices = new YicesSolver();
@@ -204,14 +209,17 @@ public class SMTSettings implements Settings {
 	smtRules.add(new SMTRule(new Name("MULTIPLE_PROVERS"),z3,simplify,yices,cvc3));
 	
 	//solvers = s;
+	
     }
     
     public final Collection<AbstractSMTSolver> getSolvers(){
+	
 	return solvers;
     }
     
     
     public Collection<SMTRule> getSMTRules(){
+
 	return smtRules;
     }
     
@@ -258,6 +266,10 @@ public class SMTSettings implements Settings {
      * represents the stored settings
      */
     public void readSettings(Properties props) {
+	
+
+	
+	
 	String timeoutstring = props.getProperty(TIMEOUT);
 	if (timeoutstring != null) {
 	    int curr = Integer.parseInt(timeoutstring);
@@ -272,14 +284,12 @@ public class SMTSettings implements Settings {
 	readMultProversString();
 	
 	
-	String sf = props.getProperty(SAVEFILE);
-      //  this.saveFile = !(sf == null) && sf.equals("true");
+
 	
         String sd = props.getProperty(SHOW_SMT_RES_DIA);
         this.showSMTResDialog = !(sd == null) && sd.equals("true");
     
-    	String wt = props.getProperty(WEAKENSMTTRANSLATION);
-    	this.weakenSMTTranslation = !(wt == null) && wt.equals("true");
+
     	
     	String cg = props.getProperty(CACHE_GOALS);
     	this.cacheGoals = !(cg == null) && cg.equals("true");
@@ -307,6 +317,7 @@ public class SMTSettings implements Settings {
 	if(!activeSMTRule.isUsable()){
 	    this.activeSMTRule = SMTRule.EMPTY_RULE;
 	}
+
     }
     
 
@@ -339,6 +350,8 @@ public class SMTSettings implements Settings {
      */
     private void readMultProversString()
     {
+	
+	
 	if(multProversSettings != null){
 	    String[] valuepairs = multProversSettings.split(multSeparator1);
 	    for(String s : valuepairs){
@@ -348,6 +361,10 @@ public class SMTSettings implements Settings {
 		    if(solver != null){
 			solver.useForMultipleRule(vals[1].equals("true"));
 		    }
+			
+			
+			
+		   
 		}
 	    }
 	}
@@ -402,12 +419,14 @@ public class SMTSettings implements Settings {
      * @param command the command to use
      */
     public void setExecutionCommand(AbstractSMTSolver s, String command) {
+	
 	s.setExecutionCommand(command);
+	
     }
     
     /**
      * get the execution command for a certain rule.
-     * @param r the rule
+     * @param solver the solver
      * @return the execution command
      */
     public String getExecutionCommand(AbstractSMTSolver solver) {
@@ -415,9 +434,16 @@ public class SMTSettings implements Settings {
     }
     
 
+
+
+    
+
+
+    
     public boolean getMultipleUse(AbstractSMTSolver solver){
 	return solver.useForMultipleRule();
     }
+    
     
     
     
@@ -486,8 +512,7 @@ public class SMTSettings implements Settings {
     }
     
     /**
-     * returns true, if a created problem file should be saved.
-     * @return
+     * @return true, if a created problem file should be saved.
      */
     public boolean getSaveFile() {
 	return this.saveFile;
@@ -495,8 +520,7 @@ public class SMTSettings implements Settings {
     
     private boolean showSMTResDialog = false;
     
-    /**@see {@link de.uka.ilkd.key.smt.SmtLibTranslatorWeaker} */
-    public boolean weakenSMTTranslation = false;
+
     
     public void setSMTResDialog(boolean b){
 	if(b!=this.showSMTResDialog){
@@ -508,6 +532,15 @@ public class SMTSettings implements Settings {
     public boolean getShowSMTResDialog(){
 	return this.showSMTResDialog;
     }
+    
+    /**
+     * true, if the argument should be used for test
+     * TODO implement?
+     */
+    public boolean useRuleForTest(int arg) {
+	return true;
+    }
+
     
     
     /** implements the method required by the Settings interface. The
@@ -530,11 +563,6 @@ public class SMTSettings implements Settings {
             props.setProperty(SHOW_SMT_RES_DIA, "false");
         }
 
-        if (this.weakenSMTTranslation)
-            props.setProperty(WEAKENSMTTRANSLATION, "true");
-        else {
-            props.setProperty(WEAKENSMTTRANSLATION, "false");
-        }
         
         if (this.cacheGoals)
             props.setProperty(CACHE_GOALS, "true");
@@ -545,6 +573,10 @@ public class SMTSettings implements Settings {
         props.setProperty(PROGRESS_DIALOG_MODE,Integer.toString(progressDialogMode));
 
         props.setProperty(SAVEFILE_PATH,this.file);
+        
+        
+        
+
        
         this.writeExecutionString(props);
         this.writeMultipleProversString(props);
@@ -558,4 +590,11 @@ public class SMTSettings implements Settings {
 	
 	return instance;
     }
+
+
+
+
+
+ 
+
 }

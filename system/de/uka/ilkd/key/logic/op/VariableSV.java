@@ -13,68 +13,54 @@ package de.uka.ilkd.key.logic.op;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.util.Debug;
 
-class VariableSV extends SortedSchemaVariable {
+public final class VariableSV extends AbstractSV implements QuantifiableVariable {
 
-    /** creates a new SchemaVariable. That is used as placeholder for
+    
+    /** 
+     * Creates a new SchemaVariable that is used as placeholder for
      * bound(quantified) variables.
      * @param name the Name of the SchemaVariable
      * @param sort the Sort of the SchemaVariable and the matched type     
-     * @param listSV a boolean which is true iff the schemavariable is allowed
-     * to match a list of quantified variables
      */
-    VariableSV(Name name, Sort sort, boolean listSV) {
-	super(name, QuantifiableVariable.class, sort, listSV); 	
+    VariableSV(Name name, Sort sort) {
+	super(name, sort, true, false); 	
     }
+
     
-    /** returns true iff this SchemaVariable is used to match
-     * bound (quantifiable) variables 
-     * @return true iff this SchemaVariable is used to match
-     * bound (quantifiable) variables 
-     */
-    public boolean isVariableSV() {
-	return true;
-    }
-    
-    public boolean isRigid () {
-	return true;
-    }
-    
-    
-    
-    /* (non-Javadoc)
-     * @see de.uka.ilkd.key.logic.op.Operator#match(de.uka.ilkd.key.logic.op.SVSubstitute, de.uka.ilkd.key.rule.MatchConditions, de.uka.ilkd.key.java.Services)
-     */
-    public MatchConditions 
-    	match(SVSubstitute substitute, MatchConditions mc, Services services) {                
-        final Term subst;
-        if (substitute instanceof LogicVariable) {
-            subst = TermFactory.DEFAULT.createVariableTerm((LogicVariable)substitute);
-        } else if (substitute instanceof Term && 
-                ((Term)substitute).op() instanceof QuantifiableVariable) {
-            subst = (Term) substitute;
+    @Override
+    public MatchConditions match(SVSubstitute subst, 
+	    			 MatchConditions mc, 
+	    			 Services services) {                
+        final Term substTerm;
+        if(subst instanceof LogicVariable) {
+            substTerm = TermBuilder.DF.var((LogicVariable)subst);
+        } else if(subst instanceof Term && 
+                 ((Term)subst).op() instanceof QuantifiableVariable) {
+            substTerm = (Term) subst;
         } else {
             Debug.out("Strange Exit of match in VariableSV. Check for bug");
             return null;
         }
-        final Term foundMapping = (Term)mc.getInstantiations ().
-        	getInstantiation(this);
-        if (foundMapping == null) {            		
-            return addInstantiation(subst, mc, services);
-        } else if (foundMapping.op() != subst.op()) {
-            return null; //FAILED;			    
-        } 
-        return mc;
+        final Term foundMapping 
+        	= (Term)mc.getInstantiations().getInstantiation(this);
+        if(foundMapping == null) {
+            return addInstantiation(substTerm, mc, services);
+        } else if (((QuantifiableVariable)foundMapping.op()) == substTerm.op()) {
+            return mc;
+        } else {
+            Debug.out("FAILED. Already instantiated with different variable.");
+            return null;	    
+        }
     } 
     
     
-    /** toString */
+    @Override
     public String toString() {
 	return toString("variable");
     }
-
 }

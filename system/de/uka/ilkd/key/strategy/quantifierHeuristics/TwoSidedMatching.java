@@ -37,7 +37,7 @@ class TwoSidedMatching {
     private final Substitution triggerSubstWithMVs;
     private final Term targetWithMVs;
     
-    TwoSidedMatching(UniTrigger trigger, Term targetTerm) {
+    TwoSidedMatching(UniTrigger trigger, Term targetTerm, Services services) {
         this.trigger = trigger;
         this.targetSubstWithMVs =
             ReplacerOfQuanVariablesWithMetavariables.createSubstitutionForVars ( targetTerm );
@@ -46,13 +46,13 @@ class TwoSidedMatching {
         
         if (targetSubstWithMVs.isGround()) {
             this.targetWithMVs =
-        	targetSubstWithMVs.apply ( TriggerUtils.discardQuantifiers ( targetTerm ) );
+            targetSubstWithMVs.apply ( TriggerUtils.discardQuantifiers ( targetTerm ), services );
         } else {
             this.targetWithMVs = null;            
         }
         if (triggerSubstWithMVs.isGround()) {
             this.triggerWithMVs =
-        	triggerSubstWithMVs.apply ( trigger.getTriggerTerm () );
+            triggerSubstWithMVs.apply ( trigger.getTriggerTerm (), services );
         } else {
             this.triggerWithMVs = null;            
         }
@@ -77,7 +77,7 @@ class TwoSidedMatching {
             allsubs = allsubs.add ( sub );
         }
         final Operator op = target.op ();
-        if ( !( op instanceof Modality || op instanceof IUpdateOperator ) ) {
+        if ( !( op instanceof Modality || op instanceof UpdateApplication ) ) {
             for ( int i = 0; i < target.arity (); i++ ) {
                 allsubs = allsubs.union ( getAllSubstitutions ( target.sub ( i ), services ) );
             }

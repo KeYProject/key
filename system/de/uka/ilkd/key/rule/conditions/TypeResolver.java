@@ -5,12 +5,13 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+
 package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.GenericSort;
@@ -22,16 +23,18 @@ import de.uka.ilkd.key.util.Debug;
 /**
  * Several variable conditions deal with types. The type resolver provides a 
  * unique interface to access types, e.g. the type of a schemavariable instantiation,
- * the instantiated type of a generic sort or the type an attribut eis declared in. 
- *
+ * the instantiated type of a generic sort or the type an attribute is declared in. 
  */
 public abstract class TypeResolver {
     
+    //-------------------------------------------------------------------------
+    //public interface
+    //-------------------------------------------------------------------------         
     
     public static TypeResolver createContainerTypeResolver(SchemaVariable s) {
         return new ContainerTypeResolver(s);
     }
-    
+        
     public static TypeResolver createElementTypeResolver(SchemaVariable s) {
         return new ElementTypeResolverForSV(s);
     }
@@ -40,7 +43,25 @@ public abstract class TypeResolver {
         return new GenericSortResolver(gs);
     }
     
+    public static TypeResolver createNonGenericSortResolver(Sort s) {
+	return new NonGenericSortResolver(s);
+    }
     
+    
+    public abstract boolean isComplete(SchemaVariable sv, 
+            			       SVSubstitute instCandidate, 
+            			       SVInstantiations instMap, 
+            			       Services services);
+    
+    public abstract Sort resolveSort(SchemaVariable sv, 
+            			     SVSubstitute instCandidate, 
+            			     SVInstantiations instMap, 
+            			     Services services);
+    
+    
+    //-------------------------------------------------------------------------
+    //inner classes
+    //-------------------------------------------------------------------------     
     
     public static class GenericSortResolver extends TypeResolver {
 
@@ -50,45 +71,73 @@ public abstract class TypeResolver {
             this.gs = gs;
         }
 
+        public GenericSort getGenericSort(){
+            return gs;
+        }
+        
+        @Override
         public boolean isComplete(SchemaVariable sv, SVSubstitute instCandidate, 
                 SVInstantiations instMap, Services services) {            
             return instMap.getGenericSortInstantiations().getInstantiation(gs) != null;
         }
 
+        @Override
         public Sort resolveSort(SchemaVariable sv, SVSubstitute instCandidate, 
                 SVInstantiations instMap, Services services) {
             return instMap.getGenericSortInstantiations().getInstantiation(gs);
         }
-
-        public KeYJavaType resolveType(SchemaVariable sv, SVSubstitute instCandidate, 
-                SVInstantiations instMap, Services services) {            
-            final Sort s = resolveSort(sv, instCandidate, instMap, services);
-            return services.getJavaInfo().getKeYJavaType(s);
-        }
         
+        @Override
         public String toString() {
             return gs.toString();
         }
-        
-        public GenericSort getGenericSort() {return gs;}
     }
-    public static class ElementTypeResolverForSV extends TypeResolver {
+    
+    public static class NonGenericSortResolver extends TypeResolver {
 
-        private final SortedSchemaVariable resolveSV;
+        private final Sort s;
         
-        public ElementTypeResolverForSV(SchemaVariable sv) {
-            if (!(sv instanceof SortedSchemaVariable)) {
-                throw new IllegalArgumentException("Expected a SortedSchemaVariable," +
-                                " but is "+sv);
-            }
-            this.resolveSV = (SortedSchemaVariable) sv;
+        public NonGenericSortResolver(Sort s) {          
+            this.s = s;
+        }
+
+        @Override
+        public boolean isComplete(SchemaVariable sv, SVSubstitute instCandidate, 
+                SVInstantiations instMap, Services services) {            
+            return true;
+        }
+
+        @Override
+        public Sort resolveSort(SchemaVariable sv, SVSubstitute instCandidate, 
+                SVInstantiations instMap, Services services) {
+            return s;
         }
         
+        public Sort getSort(){
+            return s;
+        }
+        
+        @Override
+        public String toString() {
+            return s.toString();
+        }        
+    }
+    
+    public static class ElementTypeResolverForSV extends TypeResolver {
+
+        private final SchemaVariable resolveSV;
+        
+        public ElementTypeResolverForSV(SchemaVariable sv) {
+            this.resolveSV = sv;
+        }
+        
+        @Override
         public boolean isComplete(SchemaVariable sv, SVSubstitute instCandidate, 
                 SVInstantiations instMap, Services services) {       
             return resolveSV == sv || instMap.getInstantiation(resolveSV) != null;
         }
 
+        @Override
         public Sort resolveSort(SchemaVariable sv, SVSubstitute instCandidate, 
                 SVInstantiations instMap, Services services) {
             
@@ -115,17 +164,13 @@ public abstract class TypeResolver {
             return s;
         }
 
-        public KeYJavaType resolveType(SchemaVariable sv, SVSubstitute instCandidate, 
-                SVInstantiations instMap, Services services) {            
-            final Sort s = resolveSort(sv, instCandidate, instMap, services);
-            return services.getJavaInfo().getKeYJavaType(s);
-        }
-       
+        @Override
         public String toString() {
             return "\\typeof(" + resolveSV  + ")";
         }
     }
    
+    
     public static class ContainerTypeResolver extends TypeResolver {
                 
         private final SchemaVariable memberSV;
@@ -134,6 +179,7 @@ public abstract class TypeResolver {
             this.memberSV = sv;
         }
 
+        @Override
         public boolean isComplete(SchemaVariable sv,
                 SVSubstitute instCandidate, SVInstantiations instMap,
                 Services services) {
@@ -141,63 +187,57 @@ public abstract class TypeResolver {
             return sv == memberSV || instMap.getInstantiation(memberSV) != null;
         }
 
-        public Sort resolveSort(SchemaVariable sv, SVSubstitute instCandidate,
-                SVInstantiations instMap, Services services) {            
-            return resolveType(sv, instCandidate, instMap, services).getSort();
-        }
-
-        public KeYJavaType resolveType(SchemaVariable sv,
-                SVSubstitute instCandidate, SVInstantiations instMap,
-                Services services) {
-            
-            final KeYJavaType resolvedType;
+        @Override
+        public Sort resolveSort(SchemaVariable sv, 
+        			SVSubstitute instCandidate,
+        			SVInstantiations instMap, 
+        			Services services) {     
+            final Sort result;
             
             final SVSubstitute inst = (SVSubstitute) (memberSV == sv ? instCandidate : 
                 instMap.getInstantiation(memberSV)); 
-            
+
             if (inst instanceof Operator) {
-                resolvedType = getContainerType(inst);
+                result = getContainerSort((Operator)inst, services);
             } else {
                 if (inst instanceof Expression) {
-                    resolvedType = getContainerType
+                    result = getContainerSort
                     (services.getTypeConverter().convertToLogicElement((Expression)inst, 
-                            instMap.getExecutionContext()).op());
+                            instMap.getExecutionContext()).op(), services);
                 } else if (inst instanceof Term) {
-                    resolvedType = getContainerType(((Term)inst).op());
+                    result = getContainerSort(((Term)inst).op(), services);
                 } else {
                     Debug.fail("Unexpected instantiation for SV " + memberSV + ":" + inst);
-                    resolvedType = null;
+                    result = null;
                 }
             }     
-            return resolvedType;
+            return result;
         }
     
-        private KeYJavaType getContainerType(SVSubstitute inst) {
-            KeYJavaType resolvedType = null;
-            if (inst instanceof ProgramVariable) {
-                resolvedType  = ((ProgramVariable)inst).getContainerType();
-            } else if (inst instanceof AttributeOp) {
-                resolvedType = ((AttributeOp)inst).getContainerType();
+        private Sort getContainerSort(Operator op, Services services) {
+            Sort result = null;
+            if (op instanceof ProgramVariable) {
+                result  = ((ProgramVariable)op).getContainerType().getSort();
+            } else if(op instanceof ObserverFunction) {
+        	result = ((ObserverFunction)op).getContainerType().getSort();
+            } else if(op instanceof Function
+        	      && ((Function)op).isUnique()
+        	      && ((Function)op).name().toString().contains("::")) {
+        	//Heap
+        	Function func = (Function) op;
+        	String funcName = func.name().toString();
+        	String sortName = funcName.substring(0, funcName.indexOf("::"));
+        	return (Sort) 
+        	   services.getNamespaces().sorts().lookup(new Name(sortName));
             } else {
-                Debug.fail("Unknown member type: ", inst);
+                Debug.fail("Unknown member type", op);
             }
-            return resolvedType;
+            return result;
         }
         
+        @Override
         public String toString() {
             return "\\containerType(" + memberSV  + ")";
         }
     }
-    
-    public abstract boolean isComplete(SchemaVariable sv, 
-            SVSubstitute instCandidate, SVInstantiations instMap, Services services);
-    
-    public abstract Sort resolveSort(SchemaVariable sv, 
-            SVSubstitute instCandidate, SVInstantiations instMap, Services services);
-    
-    public abstract KeYJavaType resolveType(SchemaVariable sv, 
-            SVSubstitute instCandidate, SVInstantiations instMap, Services services);
-    
-    
-    
 }

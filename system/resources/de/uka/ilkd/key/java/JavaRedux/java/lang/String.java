@@ -84,8 +84,8 @@ public final class String extends java.lang.Object implements java.io.Serializab
    public static java.lang.String valueOf(char arg0);
    public static java.lang.String valueOf(int arg0);
    public static java.lang.String valueOf(long arg0);
-   public static java.lang.String valueOf(float arg0);
-   public static java.lang.String valueOf(double arg0);
+//   public static java.lang.String valueOf(float arg0);
+//   public static java.lang.String valueOf(double arg0);
    public java.lang.String intern();
    public int compareTo(java.lang.Object arg0);
 }

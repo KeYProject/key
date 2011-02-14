@@ -1,10 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
 package de.uka.ilkd.key.smt.taclettranslation;
 
 import java.util.HashMap;
@@ -98,6 +91,7 @@ public class FindTacletTranslator extends AbstractTacletTranslator {
     private Term translateReplaceAndAddFormula(
 	    TacletGoalTemplate template, Term find) {
 	TermBuilder tb = TermBuilder.DF;
+	
 	Term replace = find;
 	if(template instanceof RewriteTacletGoalTemplate){
 	    replace = ((RewriteTacletGoalTemplate)template).replaceWith();
@@ -106,11 +100,17 @@ public class FindTacletTranslator extends AbstractTacletTranslator {
 	Term add = template.sequent() != null ? translate(template.sequent())
 	        : STD_ADD;
 	if (add == null)
-	    add = STD_ADD;
+	    add = STD_ADD; 
 	if (replace == null)
 	    replace = STD_REPLACE;
-	Term term = tb.imp(tb.equiv(find, replace), add);
+	Term term = tb.imp(translateEqivalence(find, replace), add);
 	return term;
+
+    }
+    
+    private Term translateEqivalence(Term t1, Term t2){
+	TermBuilder tb = TermBuilder.DF;
+	return tb.equals(t1, t2);
     }
     
     private Term translateReplaceAndAddSequent(TacletGoalTemplate template, int type){
@@ -161,16 +161,19 @@ public class FindTacletTranslator extends AbstractTacletTranslator {
 	    
 	    if(findTaclet instanceof AntecTaclet){
 		list = list.append(translateReplaceAndAddSequent(template,ANTE));
-		
+
 	    }else if(findTaclet instanceof SuccTaclet){
 		list = list.append(translateReplaceAndAddSequent(template,SUCC));
+
 	    }else if(findTaclet instanceof RewriteTaclet){
 		    if (findTaclet.find().sort().equals(Sort.FORMULA)) {
 			list = list.append(translateReplaceAndAddFormula(
 			         template, find));
+
 		    } else {
 			list = list.append(translateReplaceAndAddTerm(
 			         template, find));
+
 		    }
 	    }else throw new IllegalTacletException("Not AntecTaclet, not SuccTaclet, not RewriteTaclet");
 	    
@@ -191,6 +194,7 @@ public class FindTacletTranslator extends AbstractTacletTranslator {
 	    }
 	    return tb.imp(tb.and(list),tb.or(find, assum));
 	}
+
 
 	return tb.imp(tb.and(list),assum);
 

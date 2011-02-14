@@ -11,8 +11,9 @@ package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Equality;
+import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Op;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -79,32 +80,32 @@ public abstract class AbstractBetaFeature implements Feature {
     
     private abstract static class MaxPathHelper {
         public int compute(Term p_t, boolean p_positive) {
-            if ( p_t.op () == ( p_positive ? Op.AND : Op.OR ) )
+            if ( p_t.op () == ( p_positive ? Junctor.AND : Junctor.OR ) )
                 return compute ( p_t.sub ( 0 ), p_positive )
                        + compute ( p_t.sub ( 1 ), p_positive );
 
-            else if ( p_t.op () == ( p_positive ? Op.OR : Op.AND ) )
+            else if ( p_t.op () == ( p_positive ? Junctor.OR : Junctor.AND ) )
                 return Math.max ( compute ( p_t.sub ( 0 ), p_positive ),
                                   compute ( p_t.sub ( 1 ), p_positive ) );
 
-            else if ( p_t.op () == Op.NOT )
+            else if ( p_t.op () == Junctor.NOT )
                 return compute ( p_t.sub ( 0 ), !p_positive );
 
-            else if ( p_positive && p_t.op () == Op.IMP )
+            else if ( p_positive && p_t.op () == Junctor.IMP )
                 return Math.max ( compute ( p_t.sub ( 0 ), !p_positive ),
                                   compute ( p_t.sub ( 1 ), p_positive ) );
 
-            else if ( !p_positive && p_t.op () == Op.IMP )
+            else if ( !p_positive && p_t.op () == Junctor.IMP )
                 return compute ( p_t.sub ( 0 ), !p_positive )
                        + compute ( p_t.sub ( 1 ), p_positive );
 
-            else if ( p_positive && p_t.op () == Op.EQV )
+            else if ( p_positive && p_t.op () == Equality.EQV )
                 return Math.max ( compute ( p_t.sub ( 0 ), p_positive )
                                   + compute ( p_t.sub ( 1 ), p_positive ),
                                   compute ( p_t.sub ( 0 ), !p_positive )
                                   + compute ( p_t.sub ( 1 ), !p_positive ) );
 
-            else if ( !p_positive && p_t.op () == Op.EQV )
+            else if ( !p_positive && p_t.op () == Equality.EQV )
                 return Math.max ( compute ( p_t.sub ( 0 ), !p_positive )
                                   + compute ( p_t.sub ( 1 ), p_positive ),
                                   compute ( p_t.sub ( 0 ), p_positive )
@@ -144,32 +145,32 @@ public abstract class AbstractBetaFeature implements Feature {
      * a problem. Perhaps this could be solved using generics? 
      */
     private static boolean hasPurePosPathHelp (Term p_t, boolean p_positive) {
-        if ( p_t.op () == ( p_positive ? Op.AND : Op.OR ) )
+        if ( p_t.op () == ( p_positive ? Junctor.AND : Junctor.OR ) )
             return hasPurePosPath ( p_t.sub ( 0 ), p_positive )
                    && hasPurePosPath ( p_t.sub ( 1 ), p_positive );
 
-        else if ( p_t.op () == ( p_positive ? Op.OR : Op.AND ) )
+        else if ( p_t.op () == ( p_positive ? Junctor.OR : Junctor.AND ) )
             return hasPurePosPath ( p_t.sub ( 0 ), p_positive )
                    || hasPurePosPath ( p_t.sub ( 1 ), p_positive );
 
-        else if ( p_t.op () == Op.NOT )
+        else if ( p_t.op () == Junctor.NOT )
             return hasPurePosPath ( p_t.sub ( 0 ), !p_positive );
 
-        else if ( p_positive && p_t.op () == Op.IMP )
+        else if ( p_positive && p_t.op () == Junctor.IMP )
             return hasPurePosPath ( p_t.sub ( 0 ), !p_positive )
                    || hasPurePosPath ( p_t.sub ( 1 ), p_positive );
 
-        else if ( !p_positive && p_t.op () == Op.IMP )
+        else if ( !p_positive && p_t.op () == Junctor.IMP )
             return hasPurePosPath ( p_t.sub ( 0 ), !p_positive )
                    && hasPurePosPath ( p_t.sub ( 1 ), p_positive );
 
-        else if ( p_positive && p_t.op () == Op.EQV )
+        else if ( p_positive && p_t.op () == Equality.EQV )
             return ( hasPurePosPath ( p_t.sub ( 0 ), p_positive ) &&
                      hasPurePosPath ( p_t.sub ( 1 ), p_positive ) )
                    || ( hasPurePosPath ( p_t.sub ( 0 ), !p_positive ) &&
                         hasPurePosPath ( p_t.sub ( 1 ), !p_positive ) );
 
-        else if ( !p_positive && p_t.op () == Op.EQV )
+        else if ( !p_positive && p_t.op () == Equality.EQV )
             return ( hasPurePosPath ( p_t.sub ( 0 ), !p_positive ) &&
                      hasPurePosPath ( p_t.sub ( 1 ), p_positive ) )
                    || ( hasPurePosPath ( p_t.sub ( 0 ), p_positive ) &&
@@ -181,42 +182,42 @@ public abstract class AbstractBetaFeature implements Feature {
     }
 
     private static boolean containsNegAtomHelp (Term p_t, boolean p_positive) {
-        if ( p_t.op () == Op.AND || p_t.op () == Op.OR )
+        if ( p_t.op () == Junctor.AND || p_t.op () == Junctor.OR )
             return containsNegAtom ( p_t.sub ( 0 ), p_positive )
                    || containsNegAtom ( p_t.sub ( 1 ), p_positive );
 
-        else if ( p_t.op () == Op.NOT )
+        else if ( p_t.op () == Junctor.NOT )
             return containsNegAtom ( p_t.sub ( 0 ), !p_positive );
 
-        else if ( p_t.op () == Op.IMP )
+        else if ( p_t.op () == Junctor.IMP )
             return containsNegAtom ( p_t.sub ( 0 ), !p_positive )
                    || containsNegAtom ( p_t.sub ( 1 ), p_positive );
 
-        else if ( p_t.op () == Op.EQV || alwaysReplace ( p_t ) )
+        else if ( p_t.op () == Equality.EQV || alwaysReplace ( p_t ) )
             return true;
 
         return !p_positive;
     }
 
     private static boolean containsQuantifierHelp (Term p_t) {
-        if ( p_t.op () == Op.AND || p_t.op () == Op.OR || p_t.op () == Op.IMP
-             || p_t.op () == Op.EQV )
+        if ( p_t.op () == Junctor.AND || p_t.op () == Junctor.OR || p_t.op () == Junctor.IMP
+             || p_t.op () == Equality.EQV )
             return containsQuantifier ( p_t.sub ( 0 ) )
                    || containsQuantifier ( p_t.sub ( 1 ) );
-        else if ( p_t.op () == Op.NOT )
+        else if ( p_t.op () == Junctor.NOT )
             return containsQuantifier ( p_t.sub ( 0 ) );
         else
             return alwaysReplace ( p_t );
     }
 
     private static Object candidateHelp (Term p_t, TermInfo p_ti) {
-        if ( p_t.op () == Op.IMP || p_t.op () == Op.OR )
+        if ( p_t.op () == Junctor.IMP || p_t.op () == Junctor.OR )
             return isBetaCandidateHelp ( p_ti, false ) ? TermInfo.CAND_LEFT
                                                       : TermInfo.CAND_NEVER;
-        else if ( p_t.op () == Op.AND )
+        else if ( p_t.op () == Junctor.AND )
             return isBetaCandidateHelp ( p_ti, true ) ? TermInfo.CAND_RIGHT
                                                      : TermInfo.CAND_NEVER;
-        else if ( p_t.op () == Op.EQV ) {
+        else if ( p_t.op () == Equality.EQV ) {
             if ( isBetaCandidateHelp ( p_ti, true ) )
                 return isBetaCandidateHelp ( p_ti, false ) ? TermInfo.CAND_BOTH
                                                           : TermInfo.CAND_RIGHT;
@@ -305,10 +306,10 @@ public abstract class AbstractBetaFeature implements Feature {
      */
     private static class TermInfo {
 
-        public static final Integer CAND_NEVER = new Integer ( 0 );
-        public static final Integer CAND_LEFT  = new Integer ( 1 );
-        public static final Integer CAND_RIGHT = new Integer ( 2 );
-        public static final Integer CAND_BOTH  = new Integer ( 3 );
+        public static final Integer CAND_NEVER = Integer.valueOf ( 0 );
+        public static final Integer CAND_LEFT  = Integer.valueOf ( 1 );
+        public static final Integer CAND_RIGHT = Integer.valueOf ( 2 );
+        public static final Integer CAND_BOTH  = Integer.valueOf ( 3 );
 
         /** formula is positive (not negated) */
         public int                  maxPosPath_positive;

@@ -10,31 +10,24 @@
 package de.uka.ilkd.key.java.visitor;
 
 import java.util.HashSet;
-import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.logic.BasicLocationDescriptor;
-import de.uka.ilkd.key.logic.EverythingLocationDescriptor;
-import de.uka.ilkd.key.logic.LocationDescriptor;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.Location;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.rule.soundness.TermProgramVariableCollector;
+import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.proof.TermProgramVariableCollector;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 
 /** 
  * Walks through a java AST in depth-left-fist-order. 
  * This walker is used collect all LocationVariables and optional function locations.
  */
-public class ProgramVariableCollector extends JavaASTVisitor {
+public final class ProgramVariableCollector extends JavaASTVisitor {
 
-    private final HashSet<Location> result = new HashSet<Location>();
-    private final boolean collectFunctionLocations;
+    private final HashSet<LocationVariable> result 
+    	= new HashSet<LocationVariable>();
 
     /**
      * collects all program variables occuring in the AST <tt>root</tt>
@@ -43,71 +36,68 @@ public class ProgramVariableCollector extends JavaASTVisitor {
      * @param services the Services object
      */
     public ProgramVariableCollector(ProgramElement root, 
-                                    Services services, 
-                                    boolean collectFunctionLocations) {
+                                    Services services) {
 	super(root, services);
         assert services != null;
-        this.collectFunctionLocations = collectFunctionLocations;
+        result.add(services.getTypeConverter().getHeapLDT().getHeap());
     }
     
-    public ProgramVariableCollector(ProgramElement root, 
-                                    Services services) {
-        this(root, services, false);
-    }
     
-    /** starts the walker*/
+    @Override
     public void start() {	
 	walk(root());	
     }
 
-    public HashSet<Location> result() { 
+    
+    public HashSet<LocationVariable> result() { 
 	return result;
     }    
 
+    @Override
     public String toString() {
 	return result.toString();
     }
 
+    @Override
     protected void doDefaultAction(SourceElement x) {
     }
 
+
+    @Override
     public void performActionOnLocationVariable(LocationVariable x) {
         result.add(x);
     }
     
+    
+    @Override
     public void performActionOnLoopInvariant(LoopInvariant x) {
         TermProgramVariableCollector tpvc = 
-            new TermProgramVariableCollector(services, collectFunctionLocations);
+            new TermProgramVariableCollector(services);
         Term selfTerm = x.getInternalSelfTerm();
-        Map<Operator, Function> atPreFunctions = x.getInternalAtPreFunctions();
+        Term heapAtPre = x.getInternalHeapAtPre();
         
         //invariant
-        Term inv = x.getInvariant(selfTerm, atPreFunctions, services);
+        Term inv = x.getInvariant(selfTerm, heapAtPre, services);
         if(inv != null) {
             inv.execPostOrder(tpvc);
         }
         
         //predicates
-        ImmutableSet<Term> preds = x.getPredicates(selfTerm, atPreFunctions, services).asSet();
+        ImmutableSet<Term> preds = x.getPredicates(selfTerm, 
+        					   heapAtPre, 
+        					   services);
         for(Term pred : preds) {
             pred.execPostOrder(tpvc);
         }
         
         //modifies
-        ImmutableSet<LocationDescriptor> mod 
-            = x.getModifies(selfTerm, atPreFunctions, services).asSet();
-        for(LocationDescriptor loc : mod) {
-            if(loc instanceof BasicLocationDescriptor) {
-                BasicLocationDescriptor bloc = (BasicLocationDescriptor) loc;
-                bloc.getFormula().execPostOrder(tpvc);
-                bloc.getLocTerm().execPostOrder(tpvc);
-            } else {
-                assert loc instanceof EverythingLocationDescriptor;
-            }
+        Term mod = x.getModifies(selfTerm, heapAtPre, services);
+        if(mod != null) {
+            mod.execPostOrder(tpvc);
         }
         
         //variant
-        Term v = x.getVariant(selfTerm, atPreFunctions, services);
+        Term v = x.getVariant(selfTerm, heapAtPre, services);
         if(v != null) {
             v.execPostOrder(tpvc);
         }

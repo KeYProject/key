@@ -5,6 +5,7 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.*;
@@ -14,14 +15,14 @@ import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
+import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.util.LRUCache;
 
 /**
- * This classe is used to select and store <code>Trigger</code>s 
+ * This class is used to select and store <code>Trigger</code>s 
  * for a quantified formula in Prenex CNF(PCNF).
  */
 class TriggersSet {
@@ -67,12 +68,12 @@ class TriggersSet {
      */
     private ImmutableSet<QuantifiableVariable> getAllUQS(Term allterm) {
         final Operator op = allterm.op();
-        if (op == Op.ALL) {
+        if (op == Quantifier.ALL) {
             QuantifiableVariable v =
                     allterm.varsBoundHere(0).get(0);
             return getAllUQS(allterm.sub(0)).add(v);
         }
-        if (op == Op.EX) {
+        if (op == Quantifier.EX) {
             return getAllUQS(allterm.sub(0));
         }
         return DefaultImmutableSet.<QuantifiableVariable>nil();
@@ -86,7 +87,7 @@ class TriggersSet {
                 allTerm.varsBoundHere(0).get(0);
         final Iterator<Term> it =
                 TriggerUtils.iteratorByOperator(TriggerUtils.discardQuantifiers(allTerm),
-                Op.AND);
+                Junctor.AND);
         while (it.hasNext()) {
             final Term clause = it.next();
             // a trigger should contain the first variable of allTerm
@@ -175,12 +176,12 @@ class TriggersSet {
          */
         public void createTriggers(Services services) {
             final Iterator<Term> it =
-                    TriggerUtils.iteratorByOperator(clause, Op.OR);
+                    TriggerUtils.iteratorByOperator(clause, Junctor.OR);
             while (it.hasNext()) {
                 final Term oriTerm = it.next();
                 for (Term term : expandIfThenElse(oriTerm)) {
                     Term t = term;
-                    if (t.op() == Op.NOT) {
+                    if (t.op() == Junctor.NOT) {
                         t = t.sub(0);
                     }
                     recAddTriggers(t, services);
@@ -230,7 +231,7 @@ class TriggersSet {
             }
 
             final Set<Term> res = new HashSet<Term>();
-            if (t.op() == Op.IF_THEN_ELSE) {
+            if (t.op() == IfThenElse.IF_THEN_ELSE) {
                 res.addAll(possibleSubs[1]);
                 res.addAll(possibleSubs[2]);
             }
@@ -241,21 +242,15 @@ class TriggersSet {
             }
 
             final Term[] chosenSubs = new Term[t.arity()];
-            final ImmutableArray<QuantifiableVariable>[] boundVars =
-                    new ImmutableArray[t.arity()];
-            for (int i = 0; i != t.arity(); ++i) {
-                boundVars[i] = t.varsBoundHere(i);
-            }
-
             res.addAll(combineSubterms(t, possibleSubs, chosenSubs,
-                    boundVars, 0));
+                    t.boundVars(), 0));
             return res;
         }
 
         private Set<Term> combineSubterms(Term oriTerm,
                 Set<Term>[] possibleSubs,
                 Term[] chosenSubs,
-                ImmutableArray<QuantifiableVariable>[] boundVars,
+                ImmutableArray<QuantifiableVariable> boundVars,
                 int i) {
             final HashSet<Term> set = new HashSet<Term>();
             if (i >= possibleSubs.length) {
@@ -289,7 +284,7 @@ class TriggersSet {
                 return false;
             }
             final Operator op = term.op();
-            if (op instanceof Modality || op instanceof IUpdateOperator || op instanceof QuantifiableVariable) {
+            if (op instanceof Modality || op instanceof UpdateApplication || op instanceof QuantifiableVariable) {
                 return false;
             }
             if (!UniTrigger.passedLoopTest(term, allTerm)) {
@@ -306,9 +301,9 @@ class TriggersSet {
             final Operator op = term.op();
 
             // we do not want to match on expressions a.<created>
-            if (op instanceof AttributeOp) {
-                final AttributeOp attrOp = (AttributeOp) op;                
-                if (attrOp.attribute().name().toString().endsWith(ImplicitFieldAdder.IMPLICIT_CREATED)) {
+            
+            if(term.op() == services.getTypeConverter().getHeapLDT().getSelect(term.sort(), services)) {
+        	if(term.sub(2).op().name().toString().endsWith(ImplicitFieldAdder.IMPLICIT_CREATED)) {
                     return false;
                 }
             }
@@ -316,7 +311,7 @@ class TriggersSet {
             final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
             // matching on equations and inequalities does not seem to have any
             // positive effect for the time being
-            if (op == Op.EQUALS || 
+            if (op == Equality.EQUALS || 
                     op == integerLDT.getLessOrEquals() || 
                     op == integerLDT.getGreaterOrEquals()) {
                 return false;
@@ -357,28 +352,6 @@ class TriggersSet {
             }
         }
 
-        /**
-         * add a uni-trigger to triggers set or add an element of
-         * multi-triggers for this clause
-         * @return <code>true</code> if a uni-trigger was added
-         */
-        private boolean addMultiTrigger(Term term, Services services) {
-            if (!isAcceptableTrigger(term, services)) {
-                return false;
-            }
-            final boolean isUnify = !term.freeVars().subset(selfUQVS);
-            final boolean isElement = !selfUQVS.subset(term.freeVars());
-            final ImmutableSet<QuantifiableVariable> uniVarsInTerm =
-                    TriggerUtils.intersect(term.freeVars(), selfUQVS);
-            Trigger t = createUniTrigger(term, uniVarsInTerm, isUnify, isElement);
-            if (isElement) {
-                elementsOfMultiTrigger = elementsOfMultiTrigger.add(t);
-                return false;
-            } else {
-                allTriggers = allTriggers.add(t);
-                return true;
-            }
-        }
 
         /**
          * find all possible combination of <code>ts</code>. Once a

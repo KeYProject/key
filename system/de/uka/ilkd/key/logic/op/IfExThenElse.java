@@ -1,29 +1,58 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 //
-//
 
 package de.uka.ilkd.key.logic.op;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.sort.Sort;
 
 
 /**
- * This implements an <tt>ifEx (x1, x2, ...) (phi) (t1) (t2)</tt> operator.
- * The meaning of this expression is given by
- * <tt> (ifEx (x1, x2, ...) (phi) (t1) (t2)) equiv (ifEx (x1) (ex x2. ... phi) (ifEx (x2, ...) (phi) (t1) (t2)) (t2))</tt>
- * and by
- * <tt>(ifEx (x1) (phi) (t1) (t2)) equiv (if (ex x1. phi) ({x1 (min x1. phi)}t1) (t2))</tt>
+ * This implements a conditional operator "\ifEx iv; (phi) \then (t1) 
+ * \else (t2)", where iv is an integer logic variable, phi is a formula, 
+ * and where t1 and t2 are terms with the same sort. The variable iv is bound 
+ * in phi and in t1, but not in t2.
  */
-public class IfExThenElse extends IfThenElse {
+public final class IfExThenElse extends AbstractOperator {
     
-    IfExThenElse () {
-        super ( new Name ( "ifEx-then-else" ) );
+    public static final IfExThenElse IF_EX_THEN_ELSE = new IfExThenElse();
+    
+    
+    private IfExThenElse() {
+	super(new Name("ifEx-then-else"), 
+	      3,
+	      new Boolean[]{true, true, false},
+	      true);
     }
     
+    
+    @Override
+    public Sort sort(ImmutableArray<Term> terms) {
+	return terms.get(1).sort();
+    }
+    
+
+    @Override
+    protected boolean additionalValidTopLevel(Term term) {
+        for(QuantifiableVariable var : term.varsBoundHere(0)) {
+            if(!var.sort().name().toString().equals("int")) {
+        	return false;
+            }
+        }
+
+        final Sort s0 = term.sub(0).sort();
+        final Sort s1 = term.sub(1).sort();
+        final Sort s2 = term.sub(2).sort();
+        
+        return s0 == Sort.FORMULA && s1.equals(s2);
+    }
+
 }

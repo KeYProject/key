@@ -100,36 +100,10 @@ public class TestJavaInfo extends TestCase {
     };
     
     private static final String[] generalImplicitFields = new String[]{
-      ImplicitFieldAdder.IMPLICIT_CREATED, ImplicitFieldAdder.IMPLICIT_NEXT_TO_CREATE,
-      ImplicitFieldAdder.IMPLICIT_INITIALIZED, ImplicitFieldAdder.IMPLICIT_TRANSIENT
+      ImplicitFieldAdder.IMPLICIT_CREATED,
+      ImplicitFieldAdder.IMPLICIT_INITIALIZED
     };
     
-    public void testFindImplicitArrayAttributes() {
-        KeYJavaType intarray = javaInfo.getKeYJavaType("int[]");
-        KeYJavaType objarray = javaInfo.getKeYJavaType("java.lang.Object[]");
-
-        assertTrue("Missing array types",intarray != null && objarray != null);
-        
-        assertTrue("Could not find " + ImplicitFieldAdder.IMPLICT_ARRAY_TRA_INITIALIZED + 
-                "attribute for arrays.", 
-                javaInfo.getAttribute(ImplicitFieldAdder.IMPLICT_ARRAY_TRA_INITIALIZED, 
-                        intarray) != null);
-        assertTrue("Could not find " + ImplicitFieldAdder.IMPLICT_ARRAY_TRA_INITIALIZED + 
-                "attribute for arrays.", 
-                javaInfo.getAttribute(ImplicitFieldAdder.IMPLICT_ARRAY_TRA_INITIALIZED, 
-                        objarray) != null);
-
-        for (String generalImplicitField : generalImplicitFields) {
-            assertTrue("Could not find " + generalImplicitField +
-                    "attribute for arrays.",
-                    javaInfo.lookupVisibleAttribute(generalImplicitField,
-                            intarray) != null);
-            assertTrue("Could not find " + generalImplicitField +
-                    "attribute for arrays.",
-                    javaInfo.lookupVisibleAttribute(generalImplicitField,
-                            objarray) != null);
-        }    
-    }
     
     public void testFindImplicitAttributesForClassTypesOnly() {
         KeYJavaType obj = javaInfo.getKeYJavaType("java.lang.Object");

@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -27,7 +27,6 @@ header {
 
 class KeYLexer extends Lexer;
 options {
-    charVocabulary='\u0000'..'\uFFFE';
     k=2;
     defaultErrorHandler = true;
 }
@@ -38,21 +37,18 @@ tokens {
 	GENERIC = "\\generic";
         EXTENDS = "\\extends";
         ONEOF = "\\oneof";
-	OBJECT = "\\object";
-	ABSTRACT = "\\abstract";
+	ABSTRACT = "\\abstract";        
 
         // Keywords used in schema variable declarations
 	SCHEMAVARIABLES = "\\schemaVariables";
 	SCHEMAVAR = "\\schemaVar";
 	MODALOPERATOR = "\\modalOperator";
-	OPERATOR = "\\operator";
 	PROGRAM = "\\program";
 	FORMULA = "\\formula";
 	TERM = "\\term";
+	UPDATE = "\\update";
 	VARIABLES = "\\variables";
 	SKOLEMTERM = "\\skolemTerm";
-	LOCATION = "\\location";
-	FUNCTION = "\\function";
 	
         // used in contracts
 	MODIFIES = "\\modifies";
@@ -62,60 +58,44 @@ tokens {
 
         // Keywords for varcond and related stuff
 	VARCOND = "\\varcond";
-	TYPEOF = "\\typeof";
-	ELEMTYPEOF = "\\elemTypeof";
+	APPLY_UPDATE_ON_RIGID = "\\applyUpdateOnRigid";
+        DEPENDINGON = "\\dependingOn";
+	DISJOINTMODULONULL  = "\\disjointModuloNull";
+	DROP_EFFECTLESS_ELEMENTARIES = "\\dropEffectlessElementaries";
+	DROP_EFFECTLESS_STORES = "\\dropEffectlessStores";	
+	ENUM_CONST = "\\enumConstant";	
+        FREELABELIN = "\\freeLabelIn";
+	HASSORT = "\\hasSort";        
+	ISARRAY="\\isArray";
+	ISARRAYLENGTH="\\isArrayLength";	
+        ISENUMTYPE="\\isEnumType";
+	ISLOCALVARIABLE = "\\isLocalVariable";
+	ISOBSERVER = "\\isObserver";
+	DIFFERENT = "\\different";		
+	METADISJOINT = "\\metaDisjoint";
+	ISREFERENCE="\\isReference";	        
+	ISREFERENCEARRAY="\\isReferenceArray";
+	ISSUBTYPE = "\\sub";	
+	EQUAL_UNIQUE = "\\equalUnique";
         NEW = "\\new";
         NEWLABEL = "\\newLabel";
 	NOT = "\\not";
-	SAME = "\\same";
-	COMPATIBLE = "\\compatible";
-	ISSUBTYPE = "\\sub";
-	STRICT    = "\\strict";
-	
-        STATICMETHODREFERENCE = "\\staticMethodReference";
         NOTFREEIN = "\\notFreeIn";
-        FREELABELIN = "\\freeLabelIn";
+	SAME = "\\same";
 	STATIC = "\\static";
-	ENUM_CONST = "\\enumConstant";
-	NOTSAMELITERAL="\\notSameLiteral";
-    EQUALWORKINGSPACEOP="\\equalWorkingSpaceOp";
-    TESTWORKINGSPACENONRIGIDOP = "\\testWorkingSpaceNonRigidOp";
-    TESTWORKINGSPACEOP = "\\testWorkingSpaceOp";
-	ISREFERENCEARRAY="\\isReferenceArray";
-	ISARRAY="\\isArray";
-	ISREFERENCE="\\isReference";
-	ISNONIMPLICIT="\\isNonImplicit";
-        ISENUMTYPE="\\isEnumType";
-        DEPENDINGON = "\\dependingOn";
-        DEPENDINGONMOD = "\\dependingOnMod";
-	ISQUERY = "\\isQuery";
-	ISNONIMPLICITQUERY = "\\isNonImplicitQuery";
-	HASSORT = "\\hasSort";
-	ISLOCALVARIABLE = "\\isLocalVariable";
-	NOTISLOCALVARIABLE = "\\notIsLocalVariable";
-    WORKINGSPACE = "\\workingSpace";
-    WORKINGSPACENONRIGID = "\\workingSpaceNonRigid";
-	ISUPDATED = "\\isUpdated";
-	MEMORYAREA = "\\memoryArea";
-	PARENTSCOPE = "\\parentScope";
-	SCOPESTACK = "\\scopeStack";
-	SAMEHEAPDEPPRED = "\\sameHeapDepPred";
-
+        STATICMETHODREFERENCE = "\\staticMethodReference";	
+	STRICT    = "\\strict";	
+	TYPEOF = "\\typeof";
+	INSTANTIATE_GENERIC = "\\instantiateGeneric";
 
 	// Quantifiers, binding, substitution
-	BIND   = "\\bind";
 	FORALL = "\\forall";
 	EXISTS = "\\exists";
         SUBST  = "\\subst";
-	IFEX = "\\ifEx";
-	FOR  = "\\for";
 	IF   = "\\if";
+	IFEX   = "\\ifEx";
 	THEN = "\\then";
 	ELSE = "\\else";
-    SUM  = "\\sum";
-  	BSUM  = "\\bSum";
-    PRODUCT  = "\\product";
-	
 
         // inclusion and stuff, things that (usually) come at the beginnig 
 	// of the file
@@ -133,15 +113,6 @@ tokens {
 	TRUE = "true";
 	FALSE = "false";
 
-        // Unused?
-        // NOSTANDARDRULES = "nostandardrules";
-        // NUMBER = "number";
-    	// QUOTES = "quotes";
-    	// THISREFERENCE = "ThisReference";
-        // JML_SPECIFICATIONS = "jml_specifications";
-        // OCL = "ocl";
-	// LOCAL  = "local";
-
         // Keywords related to taclets
         SAMEUPDATELEVEL = "\\sameUpdateLevel";
         INSEQUENTSTATE = "\\inSequentState";
@@ -149,7 +120,6 @@ tokens {
         HEURISTICSDECL = "\\heuristicsDecl";
 	NONINTERACTIVE = "\\noninteractive";
         DISPLAYNAME = "\\displayname";
-        OLDNAME = "\\oldname";
         HELPTEXT = "\\helptext";
         REPLACEWITH = "\\replacewith";
         ADDRULES = "\\addrules";
@@ -157,14 +127,11 @@ tokens {
         HEURISTICS = "\\heuristics";	
 	FIND = "\\find";
 	ADD = "\\add";
-	ASSUMES = "\\assumes"; // what used to be "if"
+	ASSUMES = "\\assumes";
 
 	PREDICATES = "\\predicates";
 	FUNCTIONS = "\\functions";
-//        NAME = "\\name";
-	NONRIGID = "\\nonRigid";
-
-	INTERSECTIONSORT = "\\inter";
+	UNIQUE = "\\unique";
 
 	RULES = "\\rules";
         PROBLEM = "\\problem";
@@ -175,9 +142,7 @@ tokens {
 
         // The first two guys are not really meta operators, treated separately
 	IN_TYPE = "\\inType";
-	ISINREACHABLESTATE = "\\isInReachableState";
         IS_ABSTRACT_OR_INTERFACE = "\\isAbstractOrInterface";
-        IS_INTERFACE = "\\isInterface";
         CONTAINERTYPE = "\\containerType";
 }
 
@@ -339,8 +304,7 @@ tokens {
 
 protected
 VOCAB
-   :
-   	'\u0000'..'\uFFFE'
+   :       '\3'..'\377'
    ;
 
 SEMI
@@ -612,16 +576,10 @@ options {
 
 protected IMPLICIT_IDENT
 options {
-  paraphrase = "an implicit identifier (letters only) + possible @pre";
+  paraphrase = "an implicit identifier (letters only)";
 }
 :
   '<' (LETTER)+ '>'
-        {
-   	  while(LA(1) == '@' && LA(2) == 'p' && LA(3) == 'r' && LA(4) == 'e') {
-             match('@'); match('p'); match('r'); match('e');
-	  }
-        }
-
 ;
 
 protected EQV
@@ -676,6 +634,8 @@ ESC
 	|	'"' { $setText("\""); }
 	|	'\'' { $setText("'"); }
 	|	'\\' { $setText("\\"); }
+	|	':' { $setText ("\\:"); }
+	|	' ' { $setText ("\\ "); }
     )
     ;
 
@@ -766,11 +726,8 @@ protected IDCHAR
 options {
 	paraphrase = "an admissible character for identifiers";
 }
-	: LETTER | DIGIT | '_' | '#'
+	: LETTER | DIGIT | '_' | '#' | '$'
 	;
-
-// The hack below is needed to be able to use @ in context other than
-// attr@pre, e.g. attr@(...)
 
 IDENT
 options {
@@ -778,12 +735,7 @@ options {
     paraphrase = "an identifer";
 }
 
-:  ( ('$')? (LETTER | '_' | '#') (IDCHAR)* 
-        {
-   	  while(LA(1) == '@' && LA(2) == 'p' && LA(3) == 'r' && LA(4) == 'e') {
-             match('@'); match('p'); match('r'); match('e');
-	  }
-        }
+:  ( (LETTER | '_' | '#' | '$') (IDCHAR)* 
     )
 ;
 

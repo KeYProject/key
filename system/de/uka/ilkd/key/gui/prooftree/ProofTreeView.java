@@ -182,7 +182,6 @@ public class ProofTreeView extends JPanel {
     protected void finalize() throws Throwable {
         super.finalize();
         Config.DEFAULT.removeConfigChangeListener(configChangeListener);
-        configChangeListener = null;
     }
 
     private void setProofTreeFont() {
@@ -625,13 +624,12 @@ public class ProofTreeView extends JPanel {
 	    Node node = ((GUIProofTreeNode)value).getNode();
 	    String nodeText = node.serialNr()+":"+node.name();
 	    boolean isBranch = false;
-
 	    {
                 final Node child = ((GUIProofTreeNode)value).findChild( node );
                 if ( child != null && child.getNodeInfo()
                     .getBranchLabel () != null ) {
-                    nodeText += ": " + child.getNodeInfo().getBranchLabel ();
                     isBranch = true;
+                    nodeText += ": " + child.getNodeInfo().getBranchLabel ();
                 }
             }
 
@@ -675,31 +673,24 @@ public class ProofTreeView extends JPanel {
 		*/
 		tree_cell.setForeground(Color.black);
                 String tooltipText = "An inner node of the proof";
-                if (node.isReuseCandidate()) {
-		   tree_cell.setIcon(IconFactory.reuseLogo());
+                
+                Icon defaultIcon;
+                if (node.getNodeInfo().getInteractiveRuleApplication()) {
+                    defaultIcon = IconFactory.interactiveAppLogo(16);
+                    tooltipText = "An inner node (rule applied by user)";
                 } else {
-                    Icon defaultIcon;
-                    if (node.getNodeInfo().getInteractiveRuleApplication()) {
-                        defaultIcon = IconFactory.interactiveAppLogo(16);
-                        tooltipText = "An inner node (rule applied by user)";
-                    } else {
-                        defaultIcon = null;
-                    }
-                    if (isBranch) {
-                        defaultIcon = getOpenIcon();
-                        tooltipText = "A branch node with all siblings hidden";
-                    }
-                    tree_cell.setIcon(defaultIcon);
+                    defaultIcon = null;
                 }
+                if (isBranch && node.childrenCount() > 1) {
+                    defaultIcon = getOpenIcon();
+                    tooltipText = "A branch node with all siblings hidden";
+                }
+                tree_cell.setIcon(defaultIcon);
+                
 		tree_cell.setToolTipText(tooltipText);
 	    }
 	    
-            if (node.getReuseSource() != null) {
-		tree_cell.setBackgroundNonSelectionColor(PASTEL_COLOR);
-                if (!node.getReuseSource().isConnect()) { 
-                   tree_cell.setBackgroundNonSelectionColor(PALE_RED_COLOR);
-                }
-            } else if (node.getNodeInfo().getActiveStatement() != null ) {
+            if (node.getNodeInfo().getActiveStatement() != null ) {
                 tree_cell.setBackgroundNonSelectionColor(LIGHT_BLUE_COLOR);
 
             } else {
@@ -736,12 +727,7 @@ public class ProofTreeView extends JPanel {
 	private JMenuItem prune    = new JMenuItem("Prune Proof");
 	private JMenuItem runStrategy = new JMenuItem("Apply Strategy",
 	    IconFactory.autoModeStartLogo(10));
-        private JMenuItem mark        = new JMenuItem("Mark Node for Re-Use");
-        private JMenuItem visualize   = 
-            new JMenuItem("Visualize Execution Path");
-        private JMenuItem test        = new JMenuItem("Create Unit Test For Node");
         private JMenuItem bugdetection= new JMenuItem("Bug Detection");
-        private JMenuItem change      = new JMenuItem("Change This Node");
 
 	private TreePath path;
 	private TreePath branch;
@@ -821,25 +807,17 @@ public class ProofTreeView extends JPanel {
 	    this.add(new SetGoalsBelowEnableStatus(true));
 
 
-	    if (branch != path) {
-                this.add(new JSeparator());
-                JMenu more = new JMenu("More");
-                this.add(more);
-
-		more.add(visualize);
-		visualize.addActionListener(this);
-		visualize.setEnabled(true);
-		more.add(test);
-		test.addActionListener(this);
-		test.setEnabled(true);
-		more.add(bugdetection);
-		bugdetection.addActionListener(this);
-		bugdetection.setEnabled(true);
-	        more.add(change);
-	        change.addActionListener(this);
-	        more.add(mark);
-	        mark.addActionListener(this);
-	    }
+//	    if (branch != path) {
+//                this.add(new JSeparator());
+//                JMenu more = new JMenu("More");
+//                this.add(more);
+//
+//		more.add(visualize);
+//		more.add(bugdetection);
+//		bugdetection.addActionListener(this);
+//		bugdetection.setEnabled(true);
+//	        more.add(change);
+//	    }
 	}
 
 	public void actionPerformed(ActionEvent e) {
@@ -851,10 +829,7 @@ public class ProofTreeView extends JPanel {
 		makeNodeVisible(mediator.getSelectedNode());
 	    } else if (e.getSource() == runStrategy) {
 		runStrategyOnNode();
-	    } else if (e.getSource() == mark) {
-		mediator().mark(invokedNode);
-                delegateView.treeDidChange(); // redraw with mark
-            } else if (e.getSource() == expandAll) {
+	    } else if (e.getSource() == expandAll) {
 		ExpansionState.expandAll(delegateView);
             } else if (e.getSource() == expandAllBelow) {
 		ExpansionState.expandAll(delegateView, branch);
@@ -958,15 +933,7 @@ public class ProofTreeView extends JPanel {
 		}
             } else if (e.getSource() == search) {
 		proofTreeSearchPanel.setVisible(true);
-            } else if (e.getSource() == visualize) {
-                new ProofVisTreeView(mediator.visualizeProof().getVisualizationModel());                
-            }else if (e.getSource() == test) {
-		mediator.generateTestCaseForSelectedNode();
-            } else if (e.getSource() == bugdetection) {
-		mediator.bugDetectionForSelectedNode();
-            } else if (e.getSource() == change) {
-                mediator.changeNode(invokedNode);
-            }
+            } 
 	}
 
 	/**
@@ -1289,16 +1256,13 @@ public class ProofTreeView extends JPanel {
             assert string != null && searchString != null;
             return string.indexOf(searchString) != -1;
         }
-        
     }
     
     // to prevent memory leaks
-    private class CacheLessMetalTreeUI extends MetalTreeUI{
+    private static class CacheLessMetalTreeUI extends MetalTreeUI{
         
         public void clearDrawingCache(){
             drawingCache.clear();
         }
-        
     }
-
 }

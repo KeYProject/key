@@ -10,10 +10,9 @@
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 
-public class Metavariable extends TermSymbol
+public final class Metavariable extends AbstractSortedOperator
     implements ParsableVariable, Comparable<Metavariable> {
 
     // Used to define an alternative order of all existing
@@ -28,17 +27,18 @@ public class Metavariable extends TermSymbol
     }
 
     private Metavariable(Name name, Sort sort, boolean isTemporaryVariable) {
-	super(name, sort);
+	super(name, sort, true);
 	if ( sort == Sort.FORMULA ) {
 	    throw new RuntimeException(
 		 "Attempt to create metavariable of type formula");
 	}
 	this.isTemporaryVariable = isTemporaryVariable;
 	setSerial ();
+	//assert false : "metavariables are disabled";
     }
 
     public Metavariable (Name name, Sort sort) {
-        this ( name, sort, false );
+        this ( name, sort, false );        
     }
 
     public static Metavariable createTemporaryVariable (Name name, Sort sort) {
@@ -46,21 +46,13 @@ public class Metavariable extends TermSymbol
     }
     
 
-    /** @return true iff number of subterms of term is 0
-     */
-    public boolean validTopLevel(Term term){
-        return term.arity()==0;
-    }
-
+    @Override
     public String toString() {
 	return name()+":"+sort();
     }
 
-   /** @return arity of the Metavariable as int */
-    public int arity() {
-	return 0;
-    }
-
+    
+    @Override
     public int compareTo ( Metavariable p_mr ) {
 	if ( p_mr == this )
 	    return 0;
@@ -79,6 +71,21 @@ public class Metavariable extends TermSymbol
 	    return serial < p_mr.serial ? -1 : 1;
 	return t;
     }
+    
+    @Override
+    public boolean equals(Object o) {
+	if(! (o instanceof Metavariable)) {
+	    return false;
+	}
+	return compareTo((Metavariable)o) == 0;
+    }
+    
+    
+    @Override
+    public int hashCode() {
+	return name().hashCode();
+    }
+    
     
     /**
      * @return Returns the isTemporaryVariable.

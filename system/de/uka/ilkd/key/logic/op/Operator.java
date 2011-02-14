@@ -10,25 +10,50 @@
 
 package de.uka.ilkd.key.logic.op;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
+
 
 /** 
  * All symbols acting as members of a term e.g. logical operators, predicates, 
  * functions, variables etc. have to implement this interface.  
  */
 public interface Operator extends Named, SVSubstitute {
+    
+    /**
+     * the arity of this operator  
+     */
+    int arity();
+    
 
     /**
-     * returns the name of the operator 
-     * @return name of the operator 
+     * determines the sort of the {@link Term} if it would be created using this
+     * Operator as top level operator and the given terms as sub terms. The
+     * assumption that the constructed term would be allowed is not checked.
+     * @param terms an array of Term containing the subterms of a (potential)
+     * term with this operator as top level operator
+     * @return sort of the term with this operator as top level operator of the
+     * given substerms
      */
-    Name name();
-
+    Sort sort(ImmutableArray<Term> terms);
+    
+    
+    /**
+     * Tells whether the operator binds variables at the n-th subterm
+     */
+    boolean bindVarsAt(int n);
+    
+    
+    /**
+     * Tells whether the operator is rigid
+     */
+    boolean isRigid();      
+    
+    
     /**
      * checks whether the top level structure of the given @link Term
      * is syntactically valid, given the assumption that the top level
@@ -39,31 +64,8 @@ public interface Operator extends Named, SVSubstitute {
      * the {@link Term} is valid.
      */
     boolean validTopLevel(Term term);
-
-    /**
-     * determines the sort of the {@link Term} if it would be created using this
-     * Operator as top level operator and the given terms as sub terms. The
-     * assumption that the constructed term would be allowed is not checked.
-     * @param term an array of Term containing the subterms of a (potential)
-     * term with this operator as top level operator
-     * @return sort of the term with this operator as top level operator of the
-     * given substerms
-     */
-    Sort sort(Term[] term);
-
-
-    /**
-     * the arity of this operator  
-     * @return arity of the Operator as int 
-     */
-    int arity();
-
-    /**
-     * @return true if the value of "term" having this operator as
-     * top-level operator and may not be changed by modalities
-     */
-    boolean isRigid (Term term);  
-
+    
+    
     /**
      * tests if this operator (plays role of a template) matches 
      * the given operator with respect to the given match 
@@ -75,6 +77,7 @@ public interface Operator extends Named, SVSubstitute {
      * @return the resulting match conditions (e.g. with new added
      * instantiations of schema variables)
      */
-    MatchConditions match(SVSubstitute subst, MatchConditions mc, Services services); 
-
+    MatchConditions match(SVSubstitute subst, 
+	                  MatchConditions mc, 
+	                  Services services); 
 }

@@ -1,15 +1,23 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
+//This file is part of KeY - Integrated Deductive Software Design
+//Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+//                    Universitaet Koblenz-Landau, Germany
+//                    Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
+//The KeY system is protected by the GNU General Public License. 
+//See LICENSE.TXT for details.
+//
+//
 
 package de.uka.ilkd.key.smt;
 
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -17,7 +25,6 @@ import java.util.LinkedList;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.gui.smt.SMTSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.Taclet;
@@ -89,12 +96,8 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
   
     public SMTTranslator getTranslator(Services services) {
 	try{
-	    final SMTSettings dps = ProofSettings.DEFAULT_SETTINGS.getSMTSettings();
-	    if(dps.weakenSMTTranslation){
-		return new SmtLibTranslatorWeaker(services);
-	    }else{
-		return new SmtLibTranslator(services);
-	    }
+ 	    return new SmtLibTranslator(services);
+	
 	}catch(Exception e){
 	    System.err.println("Error: An error occurred while obtaining an SmtLibTranslator: Trying to use the default translator...");
 	    e.printStackTrace();
@@ -166,7 +169,7 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
 	
 	// write the content out to the created file
 	//final BufferedWriter out = new BufferedWriter(new FileWriter(smtFile));
-	final Writer out = new BufferedWriter(new FileWriter(smtFile));
+	final FileWriter out = new FileWriter(smtFile);
 	out.write(text);
 	out.close();
 
@@ -196,7 +199,7 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
         path = path.replaceAll("%d", date);
         path = path.replaceAll("%s", this.getTitle());
         path = path.replaceAll("%t", time);
-        path = path.replaceAll("%i", Integer.toString(AbstractSMTSolver.getNextFileID()));
+        path = path.replaceAll("%i", Integer.toString(getNextFileID()));
         return path;
     }
 
@@ -353,15 +356,22 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
 		path = finalizePath(path);
 		translation.storeToFile(path);
 	    }
+
 	}
     }
     
     private void instantiateTaclets(SMTTranslator trans) throws IllegalFormulaException{
-	if (!ProofSettings.DEFAULT_SETTINGS.getTacletTranslationSettings().isUsingTaclets() || !useTaclets ){
-	    trans.setTacletsForAssumptions(new LinkedList<Taclet>());	   
-	} else {
+	if(!ProofSettings.DEFAULT_SETTINGS.getTacletTranslationSettings().isUsingTaclets() || !useTaclets ){
+	    trans.setTacletsForAssumptions(new LinkedList<Taclet>());
+	   
+	}else{
 	    trans.setTacletsForAssumptions(getTaclets());
 	}
+	
+	
+	 
+	
+	
     }
     
     public void setTacletsForTest(Collection<Taclet> set){
@@ -370,7 +380,10 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
     
     public void prepareSolver(LinkedList<InternResult> terms, Services services, Collection<Taclet> taclets) {
 	init();
+	
 	session = new SolverSession(terms, services, taclets);
+
+        
     }
     
     

@@ -16,14 +16,18 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.speclang.PositionedString;
 
 
-public class TextualJMLSpecCase extends TextualJMLConstruct {
+public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     private final Behavior behavior;
     private PositionedString workingSpace = null;
     
     private ImmutableList<PositionedString> requires     
             = ImmutableSLList.<PositionedString>nil();
+    private ImmutableList<PositionedString> measuredBy   
+    	    = ImmutableSLList.<PositionedString>nil();    
     private ImmutableList<PositionedString> assignable   
+            = ImmutableSLList.<PositionedString>nil();
+    private ImmutableList<PositionedString> accessible   
             = ImmutableSLList.<PositionedString>nil();
     private ImmutableList<PositionedString> ensures      
             = ImmutableSLList.<PositionedString>nil();
@@ -42,10 +46,12 @@ public class TextualJMLSpecCase extends TextualJMLConstruct {
         this.behavior = behavior;
     }
     
-    public void addName(PositionedString name) {
-	this.name = name;
+    
+    public void addName(PositionedString n) {
+	this.name = n;
     }
 
+    
     public void addRequires(PositionedString ps) {
         requires = requires.append(ps);
     }
@@ -55,9 +61,24 @@ public class TextualJMLSpecCase extends TextualJMLConstruct {
         requires = requires.append(l);
     }
     
+    
+    public void addMeasuredBy(PositionedString ps) {
+	measuredBy = measuredBy.append(ps);
+    }
 
+    
+    public void addMeasuredBy(ImmutableList<PositionedString> l) {
+	measuredBy = measuredBy.append(l);
+    }
+    
+    
     public void addAssignable(PositionedString ps) {
         assignable = assignable.append(ps);
+    }
+    
+    
+    public void addAccessible(PositionedString ps) {
+	accessible = accessible.append(ps);
     }
     
     
@@ -93,10 +114,20 @@ public class TextualJMLSpecCase extends TextualJMLConstruct {
     public ImmutableList<PositionedString> getRequires() {
         return requires;
     }
-
+    
+    
+    public ImmutableList<PositionedString> getMeasuredBy() {
+        return measuredBy;
+    } 
+    
     
     public ImmutableList<PositionedString> getAssignable() {
         return assignable;
+    }
+    
+    
+    public ImmutableList<PositionedString> getAccessible() {
+        return accessible;
     }
 
     
@@ -126,6 +157,7 @@ public class TextualJMLSpecCase extends TextualJMLConstruct {
     }
     
     
+    @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
         Iterator<PositionedString> it;
@@ -139,6 +171,10 @@ public class TextualJMLSpecCase extends TextualJMLConstruct {
         while(it.hasNext()) {
             sb.append("assignable: ").append(it.next()).append("\n");
         }
+        it = accessible.iterator();
+        while(it.hasNext()) {
+            sb.append("accessible: " + it.next() + "\n");
+        }        
         it = ensures.iterator();
         while(it.hasNext()) {
             sb.append("ensures: ").append(it.next()).append("\n");
@@ -160,6 +196,7 @@ public class TextualJMLSpecCase extends TextualJMLConstruct {
     }
     
     
+    @Override
     public boolean equals(Object o) {
         if(!(o instanceof TextualJMLSpecCase)) {
             return false;
@@ -169,6 +206,7 @@ public class TextualJMLSpecCase extends TextualJMLConstruct {
                && behavior.equals(sc.behavior)
                && requires.equals(sc.requires)
                && assignable.equals(sc.assignable)
+               && accessible.equals(sc.accessible)               
                && ensures.equals(sc.ensures)
                && signals.equals(sc.signals)
                && signalsOnly.equals(sc.signalsOnly)
@@ -176,11 +214,13 @@ public class TextualJMLSpecCase extends TextualJMLConstruct {
     }
     
     
+    @Override
     public int hashCode() {
         return mods.hashCode()
                + behavior.hashCode()
                + requires.hashCode()
                + assignable.hashCode()
+               + accessible.hashCode()               
                + ensures.hashCode()
                + signals.hashCode()
                + signalsOnly.hashCode()

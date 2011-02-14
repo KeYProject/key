@@ -17,9 +17,7 @@ import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.logic.ConstrainedFormula;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SortedSchemaVariable;
+import de.uka.ilkd.key.logic.op.*;
 
 public class TacletPrefixBuilder {
 
@@ -40,8 +38,7 @@ public class TacletPrefixBuilder {
 	ImmutableArray<QuantifiableVariable> bdVars=visited.varsBoundHere(subTerm);
 	for (int i=0; i<bdVars.size(); i++) {
 	    QuantifiableVariable boundVar = bdVars.get(i);
-	    if ( boundVar instanceof SchemaVariable &&
-		 ((SchemaVariable)boundVar).isVariableSV() ) {
+	    if ( boundVar instanceof VariableSV ) {
 		currentlyBoundVars = currentlyBoundVars.add
 		    ((SchemaVariable)boundVar);
 	    }
@@ -71,10 +68,11 @@ public class TacletPrefixBuilder {
     }
 
     private void visit(Term t) {
-	if (t.op() instanceof SortedSchemaVariable && 
-	    !((SchemaVariable)t.op()).isVariableSV() &&
-	    !((SchemaVariable)t.op()).isProgramSV()  &&
-	    !((SchemaVariable)t.op()).isSkolemTermSV()) {    // see below /AR
+	if (t.op() instanceof SchemaVariable && 
+            t.arity() == 0 &&
+	    !(t.op() instanceof VariableSV) &&
+	    !(t.op() instanceof ProgramSV) &&
+	    !(t.op() instanceof SkolemTermSV)) { 
 	    SchemaVariable sv = (SchemaVariable)t.op();
 	    ImmutableSet<SchemaVariable> relevantBoundVars = removeNotFreeIn(sv);
 	    TacletPrefix prefix = prefixMap.get(sv);
@@ -218,10 +216,7 @@ public class TacletPrefixBuilder {
 	return prefixMap;
     }
     
-    class InvalidPrefixException extends IllegalStateException {
-        /**
-         * 
-         */
+    static class InvalidPrefixException extends IllegalStateException {
         private static final long serialVersionUID = 5855187579027274363L;
         
         InvalidPrefixException(String tacletName, 

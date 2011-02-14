@@ -27,7 +27,6 @@ import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.rule.soundness.ProgramSVProxy;
 import de.uka.ilkd.key.util.ExtList;
 
 /**
@@ -120,14 +119,6 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     }
 
     
-    public void performActionOnMemoryAreaEC(MemoryAreaEC x) {
-        DefaultAction def = new DefaultAction(x) {
-            ProgramElement createNewElement(ExtList changeList) {
-                return new MemoryAreaEC(changeList);
-            }
-        };
-        def.doAction(x);
-    }
 
     // eee
     public void performActionOnWhile(While x) {
@@ -437,6 +428,9 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
             if (x.getLabel() != null) {
                 l = (Label) changeList.removeFirst();
             }
+            // bugfix: create an empty statement if the label body was removed
+            if(changeList.get(Statement.class) == null)
+        	changeList.add(new EmptyStatement());
             addChild(new LabeledStatement(changeList, l, pi));
             changed();
         } else {
@@ -503,15 +497,6 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         def.doAction(x);
     }
     
-    public void performActionOnSetAssignment(SetAssignment x) {        
-        DefaultAction def = new DefaultAction(x) {
-            ProgramElement createNewElement(ExtList changeList) {
-                return new SetAssignment(changeList);
-            }
-        };
-        def.doAction(x);        
-    }
-
     public void performActionOnPreIncrement(PreIncrement x) {
         DefaultAction def = new DefaultAction(x) {
             ProgramElement createNewElement(ExtList changeList) {
@@ -584,14 +569,6 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         def.doAction(x);
     }
     
-    public void performActionOnRuntimeInstanceEC(RuntimeInstanceEC x) {
-        DefaultAction def = new DefaultAction(x) {
-            ProgramElement createNewElement(ExtList changeList) {
-                return new RuntimeInstanceEC(changeList);
-            }
-        };
-        def.doAction(x);
-    }
 
     public void performActionOnLessThan(LessThan x) {
         DefaultAction def = new DefaultAction(x) {
@@ -1154,15 +1131,93 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         };
         def.doAction(x);
     }
-
-    public void performActionOnProgramSVProxy(ProgramSVProxy x) {
+    
+    
+    @Override
+    public void performActionOnSingleton(Singleton x) {
         DefaultAction def = new DefaultAction(x) {
             ProgramElement createNewElement(ExtList changeList) {
-                return new ProgramSVProxy(changeList);
+                return new Singleton(changeList);
             }
         };
-        def.doAction(x);
+        def.doAction(x);	
+    }    
+    
+    
+    @Override
+    public void performActionOnSetUnion(SetUnion x) {
+        DefaultAction def = new DefaultAction(x) {
+            ProgramElement createNewElement(ExtList changeList) {
+                return new SetUnion(changeList);
+            }
+        };
+        def.doAction(x);	
     }
+    
+    
+    @Override
+    public void performActionOnIntersect(Intersect x) {
+        DefaultAction def = new DefaultAction(x) {
+            ProgramElement createNewElement(ExtList changeList) {
+                return new Intersect(changeList);
+            }
+        };
+        def.doAction(x);	
+    }
+    
+    @Override    
+    public void performActionOnSetMinus(SetMinus x) {
+        DefaultAction def = new DefaultAction(x) {
+            ProgramElement createNewElement(ExtList changeList) {
+                return new SetMinus(changeList);
+            }
+        };
+        def.doAction(x);	
+    }
+    
+    @Override
+    public void performActionOnAllFields(AllFields x) {
+        DefaultAction def = new DefaultAction(x) {
+            ProgramElement createNewElement(ExtList changeList) {
+                return new AllFields(changeList);
+            }
+        };
+        def.doAction(x);	
+    }
+    
+
+    @Override
+    public void performActionOnSeqSingleton(SeqSingleton x) {
+        DefaultAction def = new DefaultAction(x) {
+            ProgramElement createNewElement(ExtList changeList) {
+                return new SeqSingleton(changeList);
+            }
+        };
+        def.doAction(x);	
+    }
+    
+    
+    @Override
+    public void performActionOnSeqConcat(SeqConcat x) {
+        DefaultAction def = new DefaultAction(x) {
+            ProgramElement createNewElement(ExtList changeList) {
+                return new SeqConcat(changeList);
+            }
+        };
+        def.doAction(x);	
+    } 
+    
+    
+    @Override
+    public void performActionOnSeqSub(SeqSub x) {
+        DefaultAction def = new DefaultAction(x) {
+            ProgramElement createNewElement(ExtList changeList) {
+                return new SeqSub(changeList);
+            }
+        };
+        def.doAction(x);	
+    }     
+    
 
     /**
      * returns the position of pe2 in the virtual child array of pe1

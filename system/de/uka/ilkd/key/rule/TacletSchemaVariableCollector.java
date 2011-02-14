@@ -41,13 +41,13 @@ public class TacletSchemaVariableCollector extends Visitor {
     private SVInstantiations instantiations = 
 	SVInstantiations.EMPTY_SVINSTANTIATIONS;
 
-    /** creates the Variable collector.
-     */
+
     public TacletSchemaVariableCollector() {
 	varList = ImmutableSLList.<SchemaVariable>nil();
     }
 
-    /** creates the Variable collector.
+    
+    /**
      * @param svInsts the SVInstantiations that have been already found
      * (needed by unwind loop constructs to determine which labels are needed)
      */
@@ -56,6 +56,7 @@ public class TacletSchemaVariableCollector extends Visitor {
 	instantiations = svInsts;
     }
 
+    
     /** collects all SchemVariables that occur in the JavaBlock
      * @param jb the JavaBlock where to look for Schemavariables
      * @param vars the IList<SchemaVariable> where to add the found
@@ -70,6 +71,7 @@ public class TacletSchemaVariableCollector extends Visitor {
 	prgSVColl.start();
 	return prgSVColl.getSchemaVariables();
     }
+    
 
     private ImmutableList<SchemaVariable> collectSVInProgram
 	(Term t, ImmutableList<SchemaVariable> vars) {
@@ -80,35 +82,24 @@ public class TacletSchemaVariableCollector extends Visitor {
 	prgSVColl.start();
 	return prgSVColl.getSchemaVariables();
     }
-
-    private ImmutableList<SchemaVariable> collectSVInAttributeOp(AttributeOp op) {
-        ImmutableList<SchemaVariable> result = ImmutableSLList.<SchemaVariable>nil();
-        final IProgramVariable attribute = op.attribute();
-        if (attribute instanceof SchemaVariable) {
-             result = result.prepend((SchemaVariable)attribute);
-        }
-        return result;
-    }
+    
     
     /** 
      * visits the Term in post order {@link Term#execPostOrder(Visitor)} and 
      * collects all found schema variables 
      * @param t the Term whose schema variables are collected 
      */  
+    @Override
     public void visit(Term t) {	
 	final Operator op = t.op();
         if (op instanceof Modality || 
                 op instanceof ModalOperatorSV) {
 	    varList = collectSVInProgram(t.javaBlock(), varList);
-	} else if (op instanceof AttributeOp) {
-            varList = varList.prepend(collectSVInAttributeOp((AttributeOp)op));
-        } else if (op instanceof QuanUpdateOperator) {
-            varList = collectSVInQuanUpdateOperator(op, varList);
+	} else if (op instanceof ElementaryUpdate) {
+            varList = collectSVInElementaryUpdate((ElementaryUpdate)op, varList);
         } else if (op instanceof WhileInvRule) {
  	    varList = collectSVInProgram(t, varList);
- 	} else if (op instanceof SchemaVariableContainer) {
- 	    varList = varList.prepend(((SchemaVariableContainer)op).collectSV(varList));
-        }
+ 	}
         
 	for (int j=0, ar = t.arity(); j<ar; j++) {
 	    for (int i=0, sz = t.varsBoundHere(j).size(); i<sz; i++) {
@@ -122,50 +113,48 @@ public class TacletSchemaVariableCollector extends Visitor {
         
         if (op instanceof SchemaVariable) {
             varList=varList.prepend((SchemaVariable)op);
-        }        
+        }
     }
 
+    
     /**
-     * collects all schema variables occurring as part of a quantified update 
-     * operator
-     * @param op the {@link QuanUpdateOperator} to be scanned for schemavariables
-     * @param vars the IList<SchemaVariables> with already found schema variables
+     * collects all schema variables occurring on the lhs of an elementary update
+     * @param op the ElementaryUpdate operator to be scanned for schemavariables
+     * @param vars the ImmutableList<SchemaVariable> with already found schema variables
      * @return a list of schema variables containing the ones of <code>vars</code> 
      *   together with the schema variables found in <code>op</code>
      */
-    private ImmutableList<SchemaVariable> collectSVInQuanUpdateOperator(
-            final Operator op, ImmutableList<SchemaVariable> vars) {
+    private ImmutableList<SchemaVariable> collectSVInElementaryUpdate(
+	    	ElementaryUpdate op, 
+	    	ImmutableList<SchemaVariable> vars) {
         ImmutableList<SchemaVariable> result = vars;
-        final QuanUpdateOperator quan = (QuanUpdateOperator) op;
-        for (int i = 0, locCount = quan.locationCount(); i < locCount; i++) {
-            final Location currentLocation = quan.location(i);
-            if (currentLocation instanceof SchemaVariable) {
-                result = result.prepend((SchemaVariable) currentLocation);
-            } else if (currentLocation instanceof AttributeOp) {
-                result = result
-                        .prepend(collectSVInAttributeOp((AttributeOp) currentLocation));
-            }
+        
+        if(op.lhs() instanceof SchemaVariable) {
+            result = result.prepend((SchemaVariable) op.lhs());
         }
+
         return result;
     }
+    
     
     /** @return iterator of the found Variables */
     public Iterator<SchemaVariable> varIterator() {
 	return varList.iterator();
     }
+    
 
     /** @return number of the found variables */
     public int size() {
 	return varList.size();
     }
 
+    
     /** @return true iff term contains the given variable */
     public boolean contains(SchemaVariable var) {
 	return varList.contains(var);
     }
 
    
-    
     /** collects all variables in a Semisequent 
      * @param semiseq the Semisequent to visit
      */
@@ -175,6 +164,7 @@ public class TacletSchemaVariableCollector extends Visitor {
         }
     }
 
+    
     /** goes through the given sequent an collects all vars found
      * @param seq the Sequent to visit
      */

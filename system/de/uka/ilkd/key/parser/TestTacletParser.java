@@ -24,8 +24,8 @@ import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.reference.ArrayReference;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.TermSymbol;
 import de.uka.ilkd.key.rule.*;
 
 /** class tests the parser for Taclets
@@ -79,8 +79,8 @@ public class TestTacletParser extends TestCase {
     // Utility methods for setUp:
     //
     
-    TermSymbol lookup_var(String name) {
-	return (TermSymbol)nss.variables().lookup(new Name(name));
+    Operator lookup_var(String name) {
+	return (Operator)nss.variables().lookup(new Name(name));
     }
     
 
@@ -109,7 +109,7 @@ public class TestTacletParser extends TestCase {
 	return new KeYParser
 	    (ParserMode.TACLET,new KeYLexer(new StringReader(s), null), 
 	     "No file. parser/TestTacletParser.stringTacletParser("+s+")",  
-	     tf, services, nss);
+	     services, nss);
     }
 
     public Term parseTerm(String s) {

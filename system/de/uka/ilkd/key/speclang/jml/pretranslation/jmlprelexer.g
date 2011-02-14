@@ -26,6 +26,8 @@ options {
 
 tokens {
     ABSTRACT 			= "abstract";
+    ACCESSIBLE                  = "accessible";
+    ACCESSIBLE_REDUNDANTLY      = "accessible_redundantly";
     ALSO 			= "also";
     ASSERT                      = "assert";
     ASSERT_REDUNDANTLY          = "assert_redundantly";
@@ -74,7 +76,9 @@ tokens {
     MAINTAINING  		= "maintaining";
     MAINTAINING_REDUNDANTLY	= "maintaining_redundantly";
     MAPS			= "maps";
-    MAPS_RED			= "maps_redundantly";	
+    MAPS_RED			= "maps_redundantly";
+    MEASURED_BY                 = "measured_by";
+    MEASURED_BY_REDUNDANTLY     = "measured_by_redundantly";
     MODEL 			= "model";
     MODIFIABLE			= "modifiable";
     MODIFIABLE_RED		= "modifiable_redundantly";

@@ -18,8 +18,10 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 /** 
@@ -51,8 +53,7 @@ public abstract class TacletBuilder {
 
     private static boolean containsFreeVarSV(Term t) {
 	for (final QuantifiableVariable var : t.freeVars()) {
-	    if (var instanceof SchemaVariable && 
-		((SchemaVariable)var).isVariableSV()) {
+	    if (var instanceof VariableSV) {
 		return true;
 	    }
 	}
@@ -106,13 +107,6 @@ public abstract class TacletBuilder {
     public void setDisplayName(String s) {
        attrs.setDisplayName(s);
     }
-
-    /** adds an old name to the list of old names
-     */
-    public void addOldName(String s) {
-       attrs.addOldName(s);
-    }
-
 
     public void setHelpText(String s) {
        attrs.setHelpText(s);
@@ -182,7 +176,7 @@ public abstract class TacletBuilder {
      * the Taclet: v is new.
      */
     public void addVarsNew(NewVarcond nv){
-	if (!nv.getSchemaVariable().isProgramSV()) {
+	if (!(nv.getSchemaVariable() instanceof ProgramSV)) {
 	    throw new TacletBuilderException(this, 
                     "Tried to add condition:"+nv+ 
                     "to new vars-list. That can"+ 

@@ -32,7 +32,7 @@ class BasicMatching {
         final Substitution subst = match ( trigger, targetTerm );
         if ( subst != null ) allsubs = allsubs.add ( subst );
         final Operator op = targetTerm.op ();
-        if ( !( op instanceof Modality || op instanceof IUpdateOperator ) ) {
+        if ( !( op instanceof Modality || op instanceof UpdateApplication ) ) {
             for ( int i = 0; i < targetTerm.arity (); i++ )
                 allsubs =
                     allsubs.union ( getSubstitutions ( trigger,

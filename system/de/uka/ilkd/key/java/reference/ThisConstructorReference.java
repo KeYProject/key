@@ -20,9 +20,7 @@ import de.uka.ilkd.key.util.ExtList;
 
 /**
  *  This constructor reference.
- * 
  */
-
 public class ThisConstructorReference extends SpecialConstructorReference {
 
     /**
@@ -32,11 +30,11 @@ public class ThisConstructorReference extends SpecialConstructorReference {
 	super();
     }
 
+    
     /**
      *      This constructor reference.
      *      @param arguments an expression mutable list.
      */
-
     public ThisConstructorReference(Expression[] arguments) {
         super(arguments);
     }
@@ -50,6 +48,7 @@ public class ThisConstructorReference extends SpecialConstructorReference {
         super(arguments);
     }
 
+    
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
      * @param children the children of this AST element as KeY classes.
@@ -63,15 +62,25 @@ public class ThisConstructorReference extends SpecialConstructorReference {
 	super(children);
     }
 
+    
     /** calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
      * @param v the Visitor
      */
+    @Override    
     public void visit(Visitor v) {
 	v.performActionOnThisConstructorReference(this);
     }
 
+    
+    @Override
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
         p.printThisConstructorReference(this);
+    }
+    
+    
+    @Override
+    public ReferencePrefix getReferencePrefix() {
+        return null;
     }
 }

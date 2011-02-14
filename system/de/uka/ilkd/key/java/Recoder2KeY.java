@@ -788,14 +788,11 @@ public class Recoder2KeY implements JavaReader {
                 new InstanceAllocationMethodBuilder(servConf, cache),
                 cnb = new ConstructorNormalformBuilder(servConf, cache),
                 new ClassPreparationMethodBuilder(servConf, cache),
-                new AreaAllocationMethodBuilder(servConf, cache),
                 new ClassInitializeMethodBuilder(servConf, cache), 
                 new PrepareObjectBuilder(servConf, cache), 
                 new CreateBuilder(servConf, cache),
                 new CreateObjectBuilder(servConf, cache),
-                new JVMIsTransientMethodBuilder(servConf, cache),
                 new LocalClassTransformation(servConf, cache),
-                new TestGenerationModelTransformer(servConf, cache),
                 new ConstantStringExpressionEvaluator(servConf, cache)
         };
 
@@ -965,6 +962,7 @@ public class Recoder2KeY implements JavaReader {
 
             String typeName = "";
             Type javaType = var.getKeYJavaType().getJavaType();
+            if(javaType == null) continue;
             typeName = javaType.getFullName();
 
             recoder.java.declaration.FieldDeclaration recVar = new recoder.java.declaration.FieldDeclaration(null, name2typeReference(typeName),

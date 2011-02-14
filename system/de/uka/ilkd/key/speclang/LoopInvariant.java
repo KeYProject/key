@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -10,22 +10,19 @@
 
 package de.uka.ilkd.key.speclang;
 
-import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.Term;
 
 
 /**
  * A loop invariant, consisting of an invariant formula, a set of loop 
- * predicates, a modifier set, and a variant term.
+ * predicates, a modifies clause, and a variant term.
  */
-public interface LoopInvariant {
+public interface LoopInvariant extends SpecificationElement {
     
     /**
      * Returns the loop to which the invariant belongs.
@@ -36,57 +33,29 @@ public interface LoopInvariant {
      * Returns the invariant formula.
      */
     public Term getInvariant(Term selfTerm, 
-            Term memoryArea,
-            /*inout*/ Map<Operator, Function/* (atPre)*/> atPreFunctions,
-            Services services);
-    
-    /**
-     * Returns the invariant formula.
-     */
-    public Term getInvariant(Term selfTerm, 
-            /*inout*/ Map<Operator, Function/* (atPre)*/> atPreFunctions,
-            Services services);
+            		     Term heapAtPre,
+            		     Services services);
     
     /**
      * Returns the set of loop predicates.
      */
-    public LoopPredicateSet getPredicates(Term selfTerm, 
-            /*inout*/ Map <Operator, Function/* (atPre)*/> atPreFunctions,
-            Services services);
+    public ImmutableSet<Term> getPredicates(Term selfTerm, 
+            			   	    Term heapAtPre,
+            			   	    Services services);
     
     /**
-     * Returns the modifier set.
+     * Returns the modifies clause.
      */
-    public LocationDescriptorSet getModifies(
-            Term selfTerm,
-            Term memoryArea,
-            /*inout*/ Map <Operator, Function/* (atPre)*/> atPreFunctions,
-            Services services);
-    /**
-     * Returns the modifier set.
-     */
-    public LocationDescriptorSet getModifies(
-            Term selfTerm, 
-            /*inout*/ Map <Operator, Function/* (atPre)*/> atPreFunctions,
-            Services services);
+    public Term getModifies(Term selfTerm, 
+            		    Term heapAtPre,
+            		    Services services);
     
     /**
      * Returns the variant term. 
      */
     public Term getVariant(Term selfTerm, 
-            /*inout*/Map<Operator, Function/* (atPre)*/> atPreFunctions,
-            Services services);
-    
-    /**
-     * Returns the working space term (for the local scope). 
-     */
-    public Term getWorkingSpace(Term selfTerm, 
-            /*inout*/Map<Operator, Function/* (atPre)*/> atPreFunctions,
-            Services services);
-    
-    public Term getParametrizedWorkingSpaceTerms(Term selfTerm, 
-            /*inout*/Map<Operator, Function/* (atPre)*/> atPreFunctions,
-            Services services);
+            		   Term heapAtPre,
+            		   Services services);
     
     /**
      * Tells whether using heuristics for generating additional loop predicates 
@@ -101,9 +70,9 @@ public interface LoopInvariant {
     public Term getInternalSelfTerm();
     
     /**
-     * Returns a copy of the internal map of atPre-functions.
+     * Returns the operator internally used for the pre-heap.
      */
-    public Map<Operator, Function> getInternalAtPreFunctions();
+    public Term getInternalHeapAtPre();
     
     /**
      * Returns a new loop invariant where the loop reference has been
@@ -117,18 +86,18 @@ public interface LoopInvariant {
      * the receiver, parameters, and local variables must stay the same!
      */
     public LoopInvariant setInvariant(Term invariant, 
-            Term selfTerm,
-            /*inout*/ Map<Operator, Function/*atPre*/> atPreFunctions,
-            Services services); 
+            			      Term selfTerm,
+            			      Term heapAtPre,
+            			      Services services); 
     
     /**
      * Returns a new loop invariant where the loop predicates have been 
      * replaced with the passed ones.
      */
     public LoopInvariant setPredicates(ImmutableSet<Term> predicates, 
-            Term selfTerm,
-            /*inout*/ Map<Operator, Function/*atPre*/> atPreFunctions,
-            Services services);
+            			       Term selfTerm,
+            			       Term heapAtPre,
+            			       Services services);
     
     /**
      * Returns a new loop invariant where the flag for predicate generation

@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -13,30 +13,12 @@ package de.uka.ilkd.key.pp;
 import java.util.HashMap;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.op.AnonymousUpdate;
-import de.uka.ilkd.key.logic.op.ArrayOp;
-import de.uka.ilkd.key.logic.op.AttributeOp;
-import de.uka.ilkd.key.logic.op.CastFunctionSymbol;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.Metavariable;
-import de.uka.ilkd.key.logic.op.ModalOperatorSV;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.NRFunctionWithExplicitDependencies;
-import de.uka.ilkd.key.logic.op.Op;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramConstant;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.op.QuanUpdateOperator;
-import de.uka.ilkd.key.logic.op.ShadowArrayOp;
-import de.uka.ilkd.key.logic.op.ShadowAttributeOp;
-import de.uka.ilkd.key.logic.op.SortedSchemaVariable;
-import de.uka.ilkd.key.util.Service;
-import de.uka.ilkd.key.pp.CharListNotation;
-import de.uka.ilkd.key.rtsj.logic.op.WorkingSpaceRigidOp;
+import de.uka.ilkd.key.ldt.CharListLDT;
+import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.IntegerLDT;
+import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.Sort;
 
 
 /** 
@@ -49,10 +31,6 @@ import de.uka.ilkd.key.rtsj.logic.op.WorkingSpaceRigidOp;
  * The Notation associated with an operator might change.  New Notations can
  * be added.
  * 
- * Support for infix notations in case of function symbols like 
- * <code>+, -, *, /, <, >, </code> 
- * etc. is added by class {@link de.uka.ilkd.key.pp.PresentationFeatures} (that has 
- * historical reasons)
  * <p>
  * The next lines describe a general rule how to determine priorities and 
  * associativities:
@@ -116,126 +94,134 @@ import de.uka.ilkd.key.rtsj.logic.op.WorkingSpaceRigidOp;
  * </li>
  * </ul>
  */
-public class NotationInfo {
-
-    /** Factory method: creates a new NotationInfo instance. The
-     * actual implementation depends on system properties or service
-     * entries. */
-    public static final NotationInfo createInstance() {
-	return (NotationInfo) Service.find(NotationInfo.class.getName(),
-					   NotationInfo.class.getName());
-    }
+public final class NotationInfo {
     
+    public static boolean PRETTY_SYNTAX = true;
+        
     
     /** This maps operators and classes of operators to {@link
      * Notation}s.  The idea is that we first look wether the operator has
      * a Notation registered.  Otherwise, we see if there is one for the
      * <em>class</em> of the operator.
      */
-    protected HashMap tbl;
+    private HashMap<Object, Notation> tbl;
 
     /**
      * Maps terms to abbreviations and reverse.
      */
-    protected AbbrevMap scm;
+    private AbbrevMap scm;
+    
+    
+
+    //-------------------------------------------------------------------------
+    //constructors
+    //-------------------------------------------------------------------------    
 
 
-    /** Create a new NotationInfo. Do not call this constructor
-     * directly. Use the factory method {@link #createInstance()}
-     * instead. */
     public NotationInfo() {
     	createDefaultNotationTable();
     }
-
-    /** Set all notations back to default. */
-    public void setBackToDefault() {
-    	createDefaultNotationTable();
-    }
+    
+    
+    //-------------------------------------------------------------------------
+    //internal methods
+    //-------------------------------------------------------------------------     
+        
     
     /** Register the standard set of notations.  This means no
      * abbreviations, and a set of Notations for the built-in operators
      * which corresponds to the parser syntax. 
      */
-    protected void createDefaultNotationTable() {
-		tbl=new HashMap();
-		createDefaultOpNotation();
-		createDefaultTermSymbolNotation();
-		scm = new AbbrevMap();
-    }
-
-    /**
-     * Registers notations for the built-in operators.  The priorities
-     * and associativities correspond to the parser syntax.  
-     */
-   protected void createDefaultOpNotation() {
-	tbl.put(Op.TRUE ,new Notation.Constant("true", 130));
-	tbl.put(Op.FALSE,new Notation.Constant("false", 130));
-	tbl.put(Op.NOT,new Notation.Prefix("!" ,60,60));
-	tbl.put(Op.AND,new Notation.Infix("&"  ,50,50,60));
-	tbl.put(Op.OR, new Notation.Infix("|"  ,40,40,50));
-	tbl.put(Op.IMP,new Notation.Infix("->" ,30,40,30));
-	tbl.put(Op.EQV,new Notation.Infix("<->",20,20,30));
-
-    	tbl.put(Op.ALL,new Notation.Quantifier("\\forall", 60, 60));
-	tbl.put(Op.EX, new Notation.Quantifier("\\exists", 60, 60));
-	tbl.put(Op.SUM, new Notation.NumericalQuantifier("\\sum", 60, 60, 70));
-	tbl.put(Op.BSUM, new Notation.BoundedNumericalQuantifier("\\bSum", 60, 60, 70));
-	tbl.put(Op.PRODUCT, new Notation.NumericalQuantifier("\\product", 60, 60, 70));
-	tbl.put(Op.DIA,new Notation.Modality("\\<","\\>", 60, 60));
-	tbl.put(Op.BOX,new Notation.Modality("\\[","\\]", 60, 60));
-	tbl.put(Op.TOUT,new Notation.Modality("\\[[","\\]]", 60, 60));
-	Modality modalities[] = {Op.DIATRC, Op.BOXTRC, Op.TOUTTRC,
-	                         Op.DIATRA, Op.BOXTRA, Op.TOUTTRA,
-				 Op.DIASUSP, Op.BOXSUSP, Op.TOUTSUSP};
-        for (Modality modality : modalities)
-            tbl.put(modality,
-                    new Notation.Modality("\\" + modality.name().toString(),
-                            "\\endmodality", 60, 60));
-	tbl.put(Op.IF_THEN_ELSE, new Notation.IfThenElse(130, "\\if"));
-	tbl.put(Op.IF_EX_THEN_ELSE, new Notation.IfThenElse(130, "\\ifEx"));
-
-	//createNumLitNotation(IntegerLDT.getStaticNumberSymbol());
-
-	tbl.put(Op.SUBST,new Notation.Subst());
-    }    
-
-    /** 
-     * Register notations for standard classes of operators.  This
-     * includes Function operators, all kinds of variables, etc.
-     */
-    /** 
-     * Register notations for standard classes of operators.  This
-     * includes Function operators, all kinds of variables, etc.
-     */
-   protected void createDefaultTermSymbolNotation() {
-	tbl.put(Function.class, new Notation.Function());               
+    private void createDefaultNotationTable() {
+	scm = new AbbrevMap();
+	tbl = new HashMap<Object,Notation>();
+	
+	tbl.put(Junctor.TRUE ,new Notation.Constant("true", 130));
+	tbl.put(Junctor.FALSE,new Notation.Constant("false", 130));
+	tbl.put(Junctor.NOT,new Notation.Prefix("!" ,60,60));
+	tbl.put(Junctor.AND,new Notation.Infix("&"  ,50,50,60));
+	tbl.put(Junctor.OR, new Notation.Infix("|"  ,40,40,50));
+	tbl.put(Junctor.IMP,new Notation.Infix("->" ,30,40,30));
+	tbl.put(Equality.EQV,new Notation.Infix("<->",20,20,30));
+	tbl.put(Quantifier.ALL,new Notation.Quantifier("\\forall", 60, 60));
+	tbl.put(Quantifier.EX, new Notation.Quantifier("\\exists", 60, 60));
+	tbl.put(Modality.DIA,new Notation.ModalityNotation("\\<","\\>", 60, 60));
+	tbl.put(Modality.BOX,new Notation.ModalityNotation("\\[","\\]", 60, 60));
+	tbl.put(IfThenElse.IF_THEN_ELSE, new Notation.IfThenElse(130, "\\if"));
+	tbl.put(WarySubstOp.SUBST,new Notation.Subst());
+	tbl.put(UpdateApplication.UPDATE_APPLICATION, new Notation.UpdateApplicationNotation());
+	tbl.put(UpdateJunctor.PARALLEL_UPDATE, new Notation.ParallelUpdateNotation());	
+	
+	tbl.put(Function.class, new Notation.FunctionNotation());               
 	tbl.put(LogicVariable.class, new Notation.VariableNotation());
-	//tbl.put(SchemaVariable.class, new Notation.Variable());
-	tbl.put(Metavariable.class, new Notation.MetavariableNotation());
 	tbl.put(LocationVariable.class, new Notation.VariableNotation());
         tbl.put(ProgramConstant.class, new Notation.VariableNotation());
-	tbl.put(ProgramMethod.class, new Notation.ProgramMethod(121));
 	tbl.put(Equality.class, new Notation.Infix("=", 70, 80, 80)); 
-        tbl.put(WorkingSpaceRigidOp.class, new Notation.WorkingSpaceOp(121));
-	tbl.put(QuanUpdateOperator.class, new Notation.QuanUpdate());
-	tbl.put(AnonymousUpdate.class, new Notation.AnonymousUpdate());
-	tbl.put(ShadowAttributeOp.class, new Notation.ShadowAttribute(121,121));
-	tbl.put(AttributeOp.class, new Notation.Attribute(121,121));
-	tbl.put(ShadowArrayOp.class, new Notation.ArrayNot
-		(new String[]{"[", "]", ""}, 130, new int[]{121, 0, 0}));
-	tbl.put(ArrayOp.class, new Notation.ArrayNot(new String[]{ "[","]" } ,130, new int[]{121, 0}));
-	tbl.put(CastFunctionSymbol.class, new Notation.CastFunction("(",")",120, 140));
-	tbl.put(NRFunctionWithExplicitDependencies.class, 
-		new Notation.NRFunctionWithDependenciesNotation());               
+	tbl.put(ElementaryUpdate.class, new Notation.ElementaryUpdateNotation());
 	tbl.put(ModalOperatorSV.class, new Notation.ModalSVNotation(60, 60));
-	tbl.put(SortedSchemaVariable.class, new Notation.SortedSchemaVariableNotation());
-
-	//FIXME quick and dirty to print concat applications as infix "+". Better add Function instances to map...
-	tbl.put("concat", new Notation.Infix("+",120,130,130));
-	tbl.put("cons", new CharListNotation());
-	tbl.put("empty", new Notation.Constant("\"\"",140));
+	tbl.put(SchemaVariable.class, new Notation.SchemaVariableNotation());
+	
+	tbl.put(Sort.CAST_NAME, new Notation.CastFunction("(",")",120, 140));
     }
+        
+    
+    private void addFancyNotations(Services services) {
+	//arithmetic operators
+	final IntegerLDT integerLDT 
+		= services.getTypeConverter().getIntegerLDT();	
+	tbl.put(integerLDT.getNumberSymbol(), new Notation.NumLiteral());
+	tbl.put(integerLDT.getCharSymbol(), new Notation.CharLiteral());
+	tbl.put(integerLDT.getLessThan(), new Notation.Infix("<", 80, 90, 90));
+	tbl.put(integerLDT.getGreaterThan(), new Notation.Infix("> ", 80, 90, 90));
+	tbl.put(integerLDT.getLessOrEquals(), new Notation.Infix("<=", 80, 90, 90));
+	tbl.put(integerLDT.getGreaterOrEquals(), new Notation.Infix(">=", 80, 90, 90));
+	tbl.put(integerLDT.getSub(), new Notation.Infix("-", 90, 90, 91));
+	tbl.put(integerLDT.getAdd(), new Notation.Infix("+", 90, 90, 91));
+	tbl.put(integerLDT.getMul(), new Notation.Infix("*", 100, 100, 101));
+	tbl.put(integerLDT.getDiv(), new Notation.Infix("/", 100, 100, 101));
+	tbl.put(integerLDT.getMod(), new Notation.Infix("%", 100, 100, 101));
+	tbl.put(integerLDT.getNeg(),new Notation.Prefix("-", 140, 130));
+	tbl.put(integerLDT.getNegativeNumberSign(), new Notation.Prefix("-", 140, 130));
+        	
+	//heap operators
+	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+	tbl.put(HeapLDT.SELECT_NAME, new Notation.SelectNotation());
+	tbl.put(ObserverFunction.class, new Notation.ObserverNotation());
+	tbl.put(ProgramMethod.class, new Notation.ObserverNotation());
+	tbl.put(heapLDT.getLength(), new Notation.LengthNotation());
+	
+	//set operators
+	final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
+	tbl.put(setLDT.getEmpty(), new Notation.Constant("{}", 130));
+	tbl.put(setLDT.getSingleton(), new Notation.SingletonNotation());
+	tbl.put(setLDT.getUnion(), new Notation.Infix("\\cup", 130, 0, 0));
+	tbl.put(setLDT.getIntersect(), new Notation.Infix("\\cap", 130, 0, 0));
+	tbl.put(setLDT.getSetMinus(), new Notation.Infix("\\setMinus", 130, 0, 0));
+	tbl.put(setLDT.getElementOf(), new Notation.ElementOfNotation());	
+	tbl.put(setLDT.getSubset(), new Notation.Infix("\\subset", 130, 0, 0));
+	
+	//string operators
+	final CharListLDT charListLDT 
+		= services.getTypeConverter().getCharListLDT();
+	tbl.put(charListLDT.getClConcat(), new Notation.Infix("+",120,130,130));
+	tbl.put(charListLDT.getClCons(), new CharListNotation());
+	tbl.put(charListLDT.getClEmpty(), new Notation.Constant("\"\"",140));
+    }
+    
 
+
+    //-------------------------------------------------------------------------
+    //public interface
+    //-------------------------------------------------------------------------
+    
+    public void refresh(Services services) {
+	createDefaultNotationTable();
+	if(PRETTY_SYNTAX && services != null) {
+	    addFancyNotations(services);
+	}
+    }    
+        
+    
     public AbbrevMap getAbbrevMap(){
 	return scm;
     }
@@ -248,166 +234,30 @@ public class NotationInfo {
      * If no notation is registered, a Function notation is returned.
      */
     public Notation getNotation(Operator op, Services services) {
-	if(services != null) {
-	    IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
-	    if(integerLDT != null) {
-		createNumLitNotation(integerLDT.getNumberSymbol());
-		createCharLitNotation(integerLDT.getCharSymbol());
+	Notation result = tbl.get(op);
+	if(result != null) {
+	    return result;
+	}
+	
+	result = tbl.get(op.getClass());
+	if(result != null) {
+	    return result;
+	}
+	
+	if(op instanceof SchemaVariable) {
+	    result = tbl.get(SchemaVariable.class);
+	    if(result != null) {
+		return result;
 	    }
 	}
-
-	//For OCL Simplification
-	if (tbl.containsKey(op.name().toString())) {
-	    return (Notation) tbl.get(op.name().toString());
+	
+	if(op instanceof SortDependingFunction) {
+	    result = tbl.get(((SortDependingFunction)op).getKind());
+	    if(result != null) {
+		return result;
+	    }
 	}
-	//
-	else if (tbl.containsKey(op)) {
-	    return (Notation) tbl.get(op);
-	} else if (tbl.containsKey(op.getClass())) {
-	    return (Notation) tbl.get(op.getClass());
-	} else if (op instanceof SortedSchemaVariable){
-		return (Notation) tbl.get(SortedSchemaVariable.class);
-	} else {
-	    return new Notation.Function();
-	}
-    }
-
-    /** Registers an infix notation for a given operator
-     * @param op    the operator
-     * @param token the string representing the operator
-     */
-    public void createInfixNotation(Operator op, String token) {
-	tbl.put(op, new Notation.Infix(token,120,130,130));
-    }
-
-    /** Registers an infix notation for a given operator
-     * with given priority and associativity
-     * @param op    the operator
-     * @param token the string representing the operator
-     */
-    public void createInfixNotation(Operator op, String token, int prio, int lass, int rass) {
-	tbl.put(op, new Notation.Infix(token,prio,lass,rass));
-    }
-
-    /** Registers a prefix notation for a given operator 
-     * @param op    the operator
-     * @param token the string representing the operator
-     */
-    public void createPrefixNotation(Operator op, String token) {
-	tbl.put(op, new Notation.Prefix(token, 140, 130));
-    }
-
-    /** Registers a number literal notation for a given operator.
-     * This is done for the `Z' operator which marks number literals.
-     * A term <code>Z(3(2(#)))</code> gets printed simply as
-     * <code>23</code>.
-     * @param op the operator */
-    public void createNumLitNotation(Operator op) {
-	tbl.put(op, new Notation.NumLiteral());
-    }
-
-
-    /** Registers a character literal notation for a given operator.
-     * This is done for the `C' operator which marks character literals.
-     * A term <code>C(3(2(#)))</code> gets printed simply as
-     * the character corresponding to the unicode value 23 (really 23
-     * and not 32, see integer literals)
-     * @param op the operator */
-    public void createCharLitNotation(Operator op) {
-	tbl.put(op, new Notation.CharLiteral());
-    }
-
-    /** 
-     * Used for OCL Simplification.
-     * Syntax for iterate().
-     */
-    public void createOCLIterateNotation(String token) {
-	tbl.put("$"+token, new Notation.OCLIterate());
-    }
-
-    /** 
-     * Used for OCL Simplification.
-     * Syntax for forAll(), exists(), etc.
-     */
-    public void createOCLCollOpBoundVarNotation(String token) {
-	tbl.put("$"+token, new Notation.OCLCollOpBoundVar(token));
-    }
-
-    /** 
-     * Used for OCL Simplification.
-     * Syntax for size(), includes(), etc.
-     */
-    public void createOCLCollOpNotation(String token) {
-	tbl.put("$"+token, new Notation.OCLCollOp(token));
-    }
-
-    /** 
-     * Used for OCL Simplification.
-     * Syntax for supertypes(), oclIsNew(), etc.
-     */
-    public void createOCLDotOpNotation(String token) {
-	tbl.put("$"+token, new Notation.OCLDotOp(token, 121));
-    }
-
-    /** 
-     * Used for OCL Simplification.
-     */
-    public void createOCLWrapperNotation(String token) {
-	tbl.put("$"+token, new Notation.OCLWrapper());
-    }
-
-    /** 
-     * Used for OCL Simplification.
-     * Syntax for Set{...}, Bag{...}, and Sequence{...}.
-     */
-    public void createOCLCollectionNotation(String internalName, String token) {
-	tbl.put("$"+internalName, new Notation.OCLCollection(token));
-    }
-
-    /** 
-     * Used for OCL Simplification.
-     * Syntax for self, true, false, Set{}, etc.
-     */
-    public void createConstantNotation(String internalName, String token) {
-	tbl.put("$"+internalName, new Notation.Constant(token, 100));
-    }
-
-    /** 
-     * Used for OCL Simplification.
-     * Syntax for if-then-else-endif.
-     */
-    public void createOCLIfNotation(String token) {
-	tbl.put("$"+token, new Notation.OCLIf());
-    }
-
-    /** 
-     * Used for OCL Simplification.
-     * Syntax for "not" and "-".
-     */
-    public void createOCLPrefixNotation(String internalName, String token, int prio, int ass) {
-	tbl.put("$"+internalName, new Notation.Prefix(token, prio, ass));
-    }
-
-    /** 
-     * Used for OCL Simplification.
-     * Syntax for "and", "or", "+", "<", etc.
-     */
-    public void createOCLInfixNotation(String internalName, String token, int prio, 
-				       int assLeft, int assRight) {
-	tbl.put("$"+internalName, new Notation.Infix(token, prio, assLeft, assRight));
-    }
-
-    /** 
-     * Used for OCL Simplification.
-     */
-    public void createOCLInvariantNotation(String token) {
-	tbl.put("$"+token, new Notation.OCLInvariant());
-    }
-
-    /** 
-     * Used for OCL Simplification.
-     */
-    public void createOCLListOfInvariantsNotation(String token) {
-	tbl.put("$"+token, new Notation.OCLListOfInvariants());
+	
+	return new Notation.FunctionNotation();
     }
 }

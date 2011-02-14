@@ -18,35 +18,15 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-/** this class implements the interface for
- * MetaAdderators. MetaAdderators are used to do complex term
- * transformation when applying a taclet. Often these transformation
- * caanot be described with the taclet scheme (or trying to do so would
- * result in a huge number of rules)
- */
-public class MetaAdd extends AbstractMetaOperator {
+
+
+public final class MetaAdd extends AbstractMetaOperator {
 
     public MetaAdd() {
 	super(new Name("#add"), 2);
     }
 
 
-    /**
-     * checks whether the top level structure of the given @link Term
-     * is syntactically valid, given the assumption that the top level
-     * operator of the term is the same as this Operator. The
-     * assumption that the top level operator and the term are equal
-     * is NOT checked.  
-     * @return true iff the top level structure of
-     * the @link Term is valid.
-     */
-    public boolean validTopLevel(Term term) {
-	// a meta operator accepts almost everything
-	return term.op() instanceof MetaAdd && term.arity()==arity();
-    }
-
-
-    /** calculates the resulting term. */
     public Term calculate(Term term, SVInstantiations svInst, Services services) {
 	Term arg1 = term.sub(0);
 	Term arg2 = term.sub(1);

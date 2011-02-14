@@ -16,13 +16,15 @@ import java.util.Date;
 
 public class JavaModel {
 
-    private String modelDir;
-    private String modelTag;
-    private String descr;
+    private final String modelDir;
+    private final String modelTag;
+    private final String descr;
    
     public static final JavaModel NO_MODEL = new JavaModel();
    
     private JavaModel() {
+	modelDir = null;
+	modelTag = null;
 	descr = "no model";
     }
 
@@ -45,16 +47,6 @@ public class JavaModel {
 	return (this == NO_MODEL);
     }
    
-    public String getCVSModule() {
-        String s;
-        if (modelDir.charAt(0)=='/') {
-	    s = modelDir.substring(1); // chop off leading "/"
-        } else if ( (modelDir.charAt(1)==':')&&(modelDir.charAt(2)=='\\') ) {
-            s = modelDir.charAt(0)+"__"+modelDir.substring(3);
-        } else s = modelDir;
-        return s;
-    }
-
     public String description() {
 	return descr;
     }

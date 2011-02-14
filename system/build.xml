@@ -35,15 +35,10 @@
   	<echo message="Please set (if you have not yet done so)  the environment variable ANT_OPTS to -Xms512m -Xmx512m" />
   	
 	<mkdir dir="${gen.dir}/de/uka/ilkd/key/parser"/>
-	<mkdir dir="${gen.dir}/de/uka/ilkd/key/parser/dictionary"/>
 	<mkdir dir="${gen.dir}/de/uka/ilkd/key/parser/schemajava"/>
 	<mkdir dir="${gen.dir}/de/uka/ilkd/key/parser/proofjava"/>
-	<mkdir dir="${gen.dir}/de/uka/ilkd/key/parser/diffparser"/>
-	<mkdir dir="${gen.dir}/de/uka/ilkd/key/parser/simplify"/>
 	<mkdir dir="${gen.dir}/de/uka/ilkd/key/speclang/jml/pretranslation"/>
 	<mkdir dir="${gen.dir}/de/uka/ilkd/key/speclang/jml/translation"/>
-	<mkdir dir="${gen.dir}/de/uka/ilkd/key/speclang/ocl/translation"/>
-	<mkdir dir="${gen.dir}/de/uka/ilkd/key/util/keydoc/parser"/>
   	
 	<mkdir dir="${build.dir}"/>
 
@@ -70,17 +65,15 @@
 
 
   <target name="compile" depends="prepare, keyparser, proofjavaparser, schemajavaparser, 
-  	                                   simplifyparser, 
-  	                                   jmlparser, jmlpreparser,
-  					   oclparser,
-  	                                   diffparser, dictionaryParser, keydocwalker"
+  	                                   jmlparser, jmlpreparser"
           description="Compiles all java files into the source directory.">
   	<copy todir="${build.dir}">
     	    <fileset dir="${basedir}/resources/"/>
         </copy>
      <javac srcdir= "${src.dir}:${gen.dir}"
            destdir="${dist.dir}"
-           deprecation="on"
+           source="1.6"
+     	   deprecation="on"
            debug="on"
            depend="${build.depend}"
            optimize="off">
@@ -111,35 +104,7 @@
   	  />
   </target>
 	
-	
-  <target name="dictionaryLexer">
-	     <antlr
-	         target="de/uka/ilkd/key/parser/dictionary/dictionaryLexer.g"
-	         outputdirectory="${gen.dir}/de/uka/ilkd/key/parser/dictionary">
-	       
-	     	<classpath>
-	           <pathelement location="${ext.dir}/antlr.jar" />
-	        </classpath>
-	     </antlr>
-  </target>
 
-	  <target name="dictionaryParser" depends="dictionaryLexer">
-		     <antlr
-		         target="de/uka/ilkd/key/parser/dictionary/dictionary.g"
-		         outputdirectory="${gen.dir}/de/uka/ilkd/key/parser/dictionary">
-		        <classpath>
-		           <pathelement location="${ext.dir}/antlr.jar" />
-		        </classpath>
-		     </antlr>
-	  </target>
-	
-
-  <target name="diffparser">
-     <javacc
-         target="de/uka/ilkd/key/parser/diffparser/DiffParser.jj"
-         outputdirectory="${gen.dir}/de/uka/ilkd/key/parser/diffparser"
-         javacchome="${ext.dir}" />
-    </target>
 
 
   <target name="keylexer">
@@ -206,60 +171,6 @@
 	     </antlr>
 	  </target>
 
-	<target name="ocllexer">
-	     <antlr
-	         target="de/uka/ilkd/key/speclang/ocl/translation/ocllexer.g"
-	         outputdirectory="${gen.dir}/de/uka/ilkd/key/speclang/ocl/translation">
-	        <classpath>
-	           <pathelement location="${ext.dir}/antlr.jar" />
-	        </classpath>
-	     </antlr>
-	  </target>
-
-
-	  <target name="oclparser"  depends="ocllexer">
-	     <antlr
-	         target="de/uka/ilkd/key/speclang/ocl/translation/oclparser.g"
-	         outputdirectory="${gen.dir}/de/uka/ilkd/key/speclang/ocl/translation">
-	        <classpath>
-	           <pathelement location="${ext.dir}/antlr.jar" />
-	        </classpath>
-	     </antlr>
-	  </target>
-	
-	<target name="keydoclexer">
-	     <antlr
-	         target="de/uka/ilkd/key/util/keydoc/parser/KeYDocLexer.g"
-	         outputdirectory="${gen.dir}/de/uka/ilkd/key/util/keydoc/parser">
-	        <classpath>
-	           <pathelement location="${ext.dir}/antlr.jar" />
-	        </classpath>
-	     </antlr>
-	  </target>
-
-
-	<target name="keydocparser" depends="keydoclexer">
-	     <antlr
-	         target="de/uka/ilkd/key/util/keydoc/parser/KeYDocParser.g"
-	         outputdirectory="${gen.dir}/de/uka/ilkd/key/util/keydoc/parser">
-	        <classpath>
-	           <pathelement location="${ext.dir}/antlr.jar" />
-	        </classpath>
-	     </antlr>
-	  </target>
-
-	<target name="keydocwalker" depends="keydocparser">
-	     <antlr
-	         target="de/uka/ilkd/key/util/keydoc/parser/KeYDocTreeWalker.g"
-	         outputdirectory="${gen.dir}/de/uka/ilkd/key/util/keydoc/parser">
-	        <classpath>
-	           <pathelement location="${ext.dir}/antlr.jar" />
-	        </classpath>
-	     </antlr>
-	  </target>
-
-	
-	
 
   <target name="schemajavaparser"> 
     	<copy tofile="${gen.dir}/de/uka/ilkd/key/parser/schemajava/Token.java">
@@ -283,28 +194,6 @@
 	/>
   </target>
 	
-  <target name="simplifylexer">
-	<antlr
-	   target="de/uka/ilkd/key/parser/simplify/lexer.g"
-	   outputdirectory="${gen.dir}/de/uka/ilkd/key/parser/simplify">
-	   <classpath>
-	       <pathelement location="${ext.dir}/antlr.jar" />
-	   </classpath>
-	</antlr>
-  </target>
-
-
-  <target name="simplifyparser"  depends="simplifylexer">
-	     <antlr
-	         target="de/uka/ilkd/key/parser/simplify/simplify.g"
-	         outputdirectory="${gen.dir}/de/uka/ilkd/key/parser/simplify">
-	        <classpath>
-	           <pathelement location="${ext.dir}/antlr.jar" />
-	        </classpath>
-	     </antlr>
-  </target>
-
-
   <target name="build.dir" depends="prepare">
   	    <mkdir dir="${build.dir}"/>
   </target>

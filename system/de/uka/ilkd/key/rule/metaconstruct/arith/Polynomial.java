@@ -18,14 +18,14 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
+import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
-import de.uka.ilkd.key.logic.op.CastFunctionSymbol;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.TermSymbol;
+import de.uka.ilkd.key.logic.op.SortDependingFunction;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.LRUCache;
 
 /**
@@ -190,7 +190,7 @@ public class Polynomial {
     }
     
     public Term toTerm (Services services) {
-        final TermSymbol add = 
+        final Operator add = 
             services.getTypeConverter().getIntegerLDT().getAdd();
         Term res = null;
         
@@ -198,7 +198,7 @@ public class Polynomial {
         if ( it.hasNext () ) {
             res = it.next ().toTerm ( services );
             while ( it.hasNext () )
-                res = TermFactory.DEFAULT.createFunctionTerm
+                res = TermFactory.DEFAULT.createTerm
                               ( add, res, it.next ().toTerm ( services ) );
         }
         
@@ -207,7 +207,7 @@ public class Polynomial {
         if ( res == null )
             res = cTerm;
         else if ( !BigInteger.ZERO.equals ( constantPart ) )
-            res = TermFactory.DEFAULT.createFunctionTerm ( add, cTerm, res );
+            res = TermFactory.DEFAULT.createTerm ( add, cTerm, res );
         
         return res;        
     }
@@ -246,16 +246,17 @@ public class Polynomial {
                     new BigInteger ( AbstractMetaOperator
                                      .convertToDecimalString ( polynomial, services ) );
                 constantPart = constantPart.add ( c );
-            } else if ( op instanceof CastFunctionSymbol
+            } else if ( op instanceof SortDependingFunction
+        	        && ((SortDependingFunction)op).getKind().equals(Sort.CAST_NAME)
                         && polynomial.sub ( 0 ).sort ().extendsTrans (
                                              tc.getIntegerLDT ().targetSort () )
                         &&
-                        ( polynomial.sort () == tc.getByteLDT ().targetSort ()
+                        ( /*polynomial.sort () == tc.getByteLDT ().targetSort ()
                           || polynomial.sort () == tc.getShortLDT ().targetSort ()
                           || polynomial.sort () == tc.getCharLDT ().targetSort ()
                           || polynomial.sort () == tc.getIntLDT ().targetSort ()
                           || polynomial.sort () == tc.getLongLDT ().targetSort ()
-                          || polynomial.sort () == tc.getIntegerLDT ().targetSort () ) ) {
+                          || */polynomial.sort () == tc.getIntegerLDT ().targetSort () ) ) {
                 // HACK: work around the hackish integer type hierarchy
                 analyse ( polynomial.sub ( 0 ) );
             } else {
@@ -307,5 +308,4 @@ public class Polynomial {
     public ImmutableList<Monomial> getParts() {
         return parts;
     }
-    
 }

@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -20,24 +20,18 @@ header {
   import java.math.BigInteger;
 
   import de.uka.ilkd.key.collection.*;
-  
   import de.uka.ilkd.key.logic.*;
   import de.uka.ilkd.key.logic.op.*;
   import de.uka.ilkd.key.logic.sort.*;
-  import de.uka.ilkd.key.logic.sort.oclsort.OclSort;
 
   import de.uka.ilkd.key.proof.*;
   import de.uka.ilkd.key.proof.init.*;
 
-  import de.uka.ilkd.key.rtsj.logic.op.*;
-  import de.uka.ilkd.key.rtsj.rule.conditions.*;
-
   import de.uka.ilkd.key.rule.*;
   import de.uka.ilkd.key.rule.conditions.*;
-  import de.uka.ilkd.key.rule.metaconstruct.*;
  
-  import de.uka.ilkd.key.speclang.ClassInvariant;
-  import de.uka.ilkd.key.speclang.OperationContract;
+  import de.uka.ilkd.key.speclang.*;
+
   import de.uka.ilkd.key.speclang.dl.translation.DLSpecFactory;
 
   import de.uka.ilkd.key.util.*;
@@ -53,7 +47,8 @@ header {
   import de.uka.ilkd.key.java.StatementBlock;
   import de.uka.ilkd.key.java.declaration.VariableDeclaration;
   import de.uka.ilkd.key.java.recoderext.*;
-  import de.uka.ilkd.key.pp.*;
+  import de.uka.ilkd.key.pp.AbbrevMap;
+  import de.uka.ilkd.key.pp.LogicPrinter;
 }
 
 /** 
@@ -67,13 +62,13 @@ options {
 }
 
 {
-    static final Sort[] AN_ARRAY_OF_SORTS = new Sort[0];
-    static final Term[] AN_ARRAY_OF_TERMS = new Term[0];
+    private static final TermFactory tf = TermFactory.DEFAULT;
 
-    private final static int NORMAL_NONRIGID = 0;
-    private final static int LOCATION_MODIFIER = 1;
-    private final static int HEAP_DEPENDENT = 2;
-    private final static int LOCATION_NOHEAP_MODIFIER = 3;
+    private static final Sort[] AN_ARRAY_OF_SORTS = new Sort[0];
+    private static final Term[] AN_ARRAY_OF_TERMS = new Term[0];
+
+    private static final int NORMAL_NONRIGID = 0;
+    private static final int LOCATION_MODIFIER = 1;
 
     static HashMap<String, Character> prooflabel2tag = new HashMap<String, Character>(15);
     static {
@@ -99,11 +94,9 @@ options {
    }
 
     private NamespaceSet nss;
-    private Choice defaultChoice = null;
     private HashMap<String, String> category2Default = new HashMap<String, String>();
     private boolean onlyWith=false;
     private ImmutableSet<Choice> activatedChoices = DefaultImmutableSet.<Choice>nil();
-    private ImmutableSet<Choice> selectedChoices = DefaultImmutableSet.<Choice>nil();
     private HashSet usedChoiceCategories = new HashSet();
     private HashMap taclet2Builder;
     private AbbrevMap scm;
@@ -124,7 +117,7 @@ options {
     private boolean schemaMode = false;
     private ParserMode parserMode;
 
-    private boolean chooseContract = false;
+    private String chooseContract = null;
     private int savedGuessing = -1;
 
     private int lineOffset=0;
@@ -132,7 +125,6 @@ options {
     private int stringLiteralLine=0; // HACK!
 
     private Services services;
-    private TermFactory tf;
     private JavaReader javaReader;
 
     // if this is used then we can capture parts of the input for later use
@@ -140,7 +132,7 @@ options {
     private ProgramMethod pm = null;
 
     private ImmutableSet<Taclet> taclets = DefaultImmutableSet.<Taclet>nil(); 
-    private ImmutableSet<OperationContract> contracts = DefaultImmutableSet.<OperationContract>nil();
+    private ImmutableSet<Contract> contracts = DefaultImmutableSet.<Contract>nil();
     private ImmutableSet<ClassInvariant> invs = DefaultImmutableSet.<ClassInvariant>nil();
 
     private ParserConfig schemaConfig;
@@ -150,8 +142,6 @@ options {
     private ParserConfig parserConfig;
 
     private Term quantifiedArrayGuard = null;
-    private boolean parsingContracts = false;
-    private boolean parsingFind      = false;
     
     private TokenStreamSelector selector;
 
@@ -164,6 +154,9 @@ options {
 	this((lexer instanceof KeYLexer)? ((KeYLexer)lexer).getSelector() : ((DeclPicker)lexer).getSelector(), 2);
         this.selector = (lexer instanceof KeYLexer)? ((KeYLexer)lexer).getSelector() : ((DeclPicker)lexer).getSelector();
 	this.parserMode = mode;
+	if(isTacletParser()) {
+	    switchToSchemaMode();
+	}
     }
 
     public KeYParser(ParserMode mode, TokenStream lexer, Services services) {
@@ -176,7 +169,6 @@ options {
 		     String filename,
                      Services services,
 		     NamespaceSet nss,
-		     TermFactory tf,
 		     ParserMode mode) {
         this(mode, lexer);
         setFilename(filename);
@@ -184,40 +176,39 @@ options {
 	if(services != null)
           this.keh = services.getExceptionHandler();
 	this.nss = nss;
-	
-        this.defaultChoice = new Choice(new Name("Default"));
-        if(nss != null) {
-            this.defaultChoice.setFuncNS(nss.functions());
-        }
-                
-	this.tf = tf;
         switchToNormalMode();
     }
-
-    /** 
-     * Used to construct Declaration parser - for signature declarations,
-     * i.e. sorts, schema variabls, predicates, functions and rule sets.
-     */  
-    public KeYParser(ParserMode mode, TokenStream lexer,
-                     String filename, Services services,
-                     NamespaceSet nss) {
-        this(lexer, filename, services, nss, null, mode);
-	resetSkips();
-    }
-
 
     /** 
      * Used to construct Term parser - for first-order terms
      * and formulae.
      */  
-    public KeYParser(ParserMode mode, TokenStream lexer,                   
-                     String filename, TermFactory  tf,
-                     JavaReader jr, Services services,
-                     NamespaceSet nss, AbbrevMap scm) {
-        this(lexer, filename, services, nss, tf, mode);
+    public KeYParser(ParserMode mode, 
+                     TokenStream lexer,                   
+                     String filename, 
+                     JavaReader jr, 
+                     Services services,
+                     NamespaceSet nss, 
+                     AbbrevMap scm) {
+        this(lexer, filename, services, nss, mode);
         this.javaReader = jr;
         this.scm = scm;
     }
+
+    public KeYParser(ParserMode mode, 
+                     TokenStream lexer,
+                     String filename,
+                     Services services, 
+                     NamespaceSet nss) {
+        this(mode, 
+             lexer, 
+             filename,
+             new SchemaRecoder2KeY(services, nss),
+	     services, 
+	     nss, 
+	     new HashMap());
+    }
+
 
 
     /** ONLY FOR TEST CASES.
@@ -227,18 +218,20 @@ options {
      * for test cases, where you want to know in advance which objects
      * will represent bound variables.
      */  
-    public KeYParser(ParserMode mode, TokenStream lexer,
-		     TermFactory tf, JavaReader jr,
+    public KeYParser(ParserMode mode, 
+                     TokenStream lexer,
+		     JavaReader jr,
 		     NamespaceSet nss) {
-        this(lexer, null, new Services(), nss, tf, mode);
+        this(lexer, null, new Services(), nss, mode);
         this.scm = new AbbrevMap();
         this.javaReader = jr;
     }
 
-    public KeYParser(ParserMode mode, TokenStream lexer,
-		     TermFactory tf, Services services,
+    public KeYParser(ParserMode mode, 
+                     TokenStream lexer,
+		     Services services,
 		     NamespaceSet nss) {
-	this(mode, lexer, tf, 
+	this(mode, lexer, 
 	     new Recoder2KeY(
 		new KeYCrossReferenceServiceConfiguration(
 		   services.getExceptionHandler()), 
@@ -247,77 +240,58 @@ options {
    	     nss);
     }
 
-    public KeYParser(ParserMode mode, TokenStream lexer,
-		     Services services, NamespaceSet nss) {
-	this(mode, lexer, TermFactory.DEFAULT,
-	     new Recoder2KeY(
-	       new KeYCrossReferenceServiceConfiguration(
-	         services.getExceptionHandler()),
-	       services.getJavaInfo().rec2key(), new NamespaceSet(),
-	       services.getTypeConverter()),
-	     nss);
-    }
-
-
     /**
      * Used to construct Taclet parser
      */  
-    public KeYParser(ParserMode mode, TokenStream lexer,
-                     String filename, TermFactory tf,
-                     SchemaJavaReader jr, Services services,  
-                     NamespaceSet nss, HashMap taclet2Builder) {
-        this(lexer, filename, services, nss, tf, mode);
+    public KeYParser(ParserMode mode, 
+                     TokenStream lexer,
+                     String filename, 
+                     SchemaJavaReader jr, 
+                     Services services,  
+                     NamespaceSet nss, 
+                     HashMap taclet2Builder) {
+        this(lexer, filename, services, nss, mode);
         switchToSchemaMode();
         this.scm = new AbbrevMap();
         this.javaReader = jr;
         this.taclet2Builder = taclet2Builder;
     }
 
-    public KeYParser(ParserMode mode, TokenStream lexer,
-                     String filename, TermFactory tf,
-                     Services services, NamespaceSet nss) {
-        this(mode, lexer, filename, tf,
-             new SchemaRecoder2KeY(services, nss),
-	     services, nss, new HashMap());
-    }
-
 
     /** 
      * Used to construct Problem parser
      */  
-    public KeYParser(ParserMode mode, TokenStream lexer, 
-                     String filename, ParserConfig schemaConfig,
-                     ParserConfig normalConfig, HashMap taclet2Builder,
-                     ImmutableSet<Taclet> taclets, ImmutableSet<Choice> selectedChoices) { 
-        this(lexer, filename, null, null, null, mode);
+    public KeYParser(ParserMode mode, 
+    		     TokenStream lexer, 
+                     String filename, 
+                     ParserConfig schemaConfig,
+                     ParserConfig normalConfig, 
+                     HashMap taclet2Builder,
+                     ImmutableSet<Taclet> taclets) { 
+        this(lexer, filename, null, null, mode);
         if (lexer instanceof DeclPicker) {
             this.capturer = (DeclPicker) lexer;
         }
         if (normalConfig!=null)
         scm = new AbbrevMap();
-        tf = TermFactory.DEFAULT;
         this.schemaConfig = schemaConfig;
         this.normalConfig = normalConfig;       
 	switchToNormalMode();
         this.taclet2Builder = taclet2Builder;
         this.taclets = taclets;
-	if(selectedChoices != null)
-	   this.selectedChoices = selectedChoices;
         if(normalConfig != null){
             this.keh = normalConfig.services().getExceptionHandler();
-           	this.defaultChoice.setFuncNS(parserConfig.namespaces().functions());
         }else{
             this.keh = new KeYRecoderExcHandler();
         }
     }
 
     public KeYParser(ParserMode mode, TokenStream lexer, String filename) { 
-        this(lexer, filename, null, null, null, mode);
+        this(lexer, filename, null, null, mode);
         if (lexer instanceof DeclPicker) {
             this.capturer = (DeclPicker) lexer;
         }
         scm = new AbbrevMap();
-        tf = TermFactory.DEFAULT;
         this.schemaConfig = null;
         this.normalConfig = null;       
 	switchToNormalMode();
@@ -326,7 +300,7 @@ options {
         this.keh = new KeYRecoderExcHandler();
     }
  
-    public boolean getChooseContract() {
+    public String getChooseContract() {
       return chooseContract;
     }
     
@@ -391,27 +365,27 @@ options {
         return nss;
     }
 
-    public Namespace sorts() {
+    private Namespace sorts() {
         return namespaces().sorts();
     }
 
-    public Namespace functions() {
+    private Namespace functions() {
         return namespaces().functions();
     }
 
-    public Namespace ruleSets() {
+    private Namespace ruleSets() {
         return namespaces().ruleSets();
     }
 
-    public Namespace variables() {
+    private Namespace variables() {
         return namespaces().variables();
     }
 
-    public Namespace programVariables() {
+    private Namespace programVariables() {
         return namespaces().programVariables();
     }
 
-    public Namespace choices(){
+    private Namespace choices(){
         return namespaces().choices();
     }
 
@@ -419,7 +393,7 @@ options {
         return taclets;
     }
 
-    public ImmutableSet<OperationContract> getContracts(){
+    public ImmutableSet<Contract> getContracts(){
         return contracts;
     }
     
@@ -548,7 +522,7 @@ options {
             }
             File path=new File(getFilename().substring(start,end+1)+filename);
             try{ 
-                source = RuleSource.initRuleFile(path.toURI().toURL()); 
+                source = RuleSource.initRuleFile(path.toURL()); 
             }catch(java.net.MalformedURLException e){
                 System.err.println("Exception due to malformed URL of file "+
                                    filename+"\n " +e);
@@ -563,105 +537,128 @@ options {
         }
     }  
 
-    public void parseVariables()
-        throws RecognitionException, TokenStreamException {
+    
+    public void parseSorts() throws RecognitionException, 
+    				    TokenStreamException {
+      resetSkips(); 
+      skipFuncs(); 
+      skipPreds(); 
+      skipRuleSets();
+      skipVars();
+      skipTaclets();
+      decls();
       resetSkips();
-      skipFuncs(); skipPreds(); skipSorts(); skipRuleSets();
+    }    
+
+    public void parseFunctions() throws RecognitionException, 
+    					TokenStreamException {
+      resetSkips();
+      skipSorts();      
+      skipPreds();      
+      skipRuleSets();
+      skipVars();
+      skipTaclets(); 
       decls();
       resetSkips();
     }
 
-    public void parseFunctions()
-        throws RecognitionException, TokenStreamException {
+    public void parsePredicates() throws RecognitionException, 
+    					 TokenStreamException {
       resetSkips();
-      skipVars(); skipPreds(); skipSorts(); skipRuleSets();
+      skipSorts();
+      skipFuncs();
+      skipRuleSets();
+      skipVars();
+      skipTaclets();
       decls();
       resetSkips();
     }
 
-    public void parsePredicates()
-        throws RecognitionException, TokenStreamException {
+    public void parseFuncAndPred() throws RecognitionException, 
+    					  TokenStreamException {
       resetSkips();
-      skipVars(); skipFuncs(); skipSorts(); skipRuleSets();
+      skipSorts(); 
+      skipRuleSets();
+      skipVars();
+      skipTaclets();  
+      decls();
+      resetSkips();
+    }    
+    
+    public void parseRuleSets() throws RecognitionException, 
+    				       TokenStreamException {
+      resetSkips();
+      skipSorts();      
+      skipFuncs(); 
+      skipPreds(); 
+      skipVars();
+      skipTaclets();
       decls();
       resetSkips();
     }
+    
+    public void parseVariables() throws RecognitionException, 
+                                        TokenStreamException {
+      resetSkips();
+      skipSorts();       
+      skipFuncs(); 
+      skipPreds(); 
+      skipRuleSets();      
+      skipTaclets();
+      decls();
+      resetSkips();
+    }  
 
-    public void parseSorts() 
-        throws RecognitionException, TokenStreamException {
+    public Term parseProblem() throws RecognitionException, 
+    				      TokenStreamException {
       resetSkips();
-      skipVars(); skipFuncs(); skipPreds(); skipRuleSets();
-      decls();
-      resetSkips();
-    }
-
-    public void parseRuleSets()
-        throws RecognitionException, TokenStreamException {
-      resetSkips();
-      skipVars(); skipFuncs(); skipPreds(); skipSorts();
-      decls();
-      resetSkips();
-    }
-
-    public void parseFuncAndPred()
-        throws RecognitionException, TokenStreamException {
-      resetSkips();
-      skipVars(); skipSorts(); skipRuleSets();
-      decls();
-      resetSkips();
-    }
-  
-    /** parses a problem but without reading the declarations of
-     * sorts, functions and predicates. These have to be given
-     * explicitly.
-     * the heuristics of the current problem file will be added 
-     */ 
-    public Term parseProblem() 
-        throws RecognitionException, TokenStreamException {
-      resetSkips();
-      skipSorts(); skipFuncs(); skipPreds(); skipTaclets();
+      skipSorts(); 
+      skipFuncs(); 
+      skipPreds();
+      skipRuleSets();
+      //skipVars(); 
+      skipTaclets();
       return problem();
     }
 
-    public void parseIncludes()
-        throws RecognitionException, TokenStreamException {
+    public void parseIncludes() throws RecognitionException, 
+    				        TokenStreamException {
       parse_includes=true;
       problem();
     }
 
-    public void parseWith()
-        throws RecognitionException, TokenStreamException {
+    public void parseWith() throws RecognitionException, 
+    				   TokenStreamException {
       onlyWith=true;
       problem();
     }
 
-    private void schema_var_decl(String name, Sort s, boolean makeVariableSV,
-            boolean makeSkolemTermSV, boolean makeLocationsSV, boolean makeFunctionsSV,
-            SchemaVariableModifierSet mods) throws AmbigiousDeclException {
+    private void schema_var_decl(String name, 
+    				 Sort s, 
+    				 boolean makeVariableSV,
+            			 boolean makeSkolemTermSV,
+            			 SchemaVariableModifierSet mods) 
+            			 	throws AmbigiousDeclException {
         if (!skip_schemavariables) {
-
             SchemaVariable v;
-            if ( s == Sort.FORMULA ) {
+            if(s == Sort.FORMULA) {
                 v = SchemaVariableFactory.createFormulaSV
-                (new Name(name), mods.list(), mods.rigid());
-            } else if ( s instanceof ProgramSVSort ) {
+                (new Name(name), mods.rigid());
+            } else if(s == Sort.UPDATE) {
+                v = SchemaVariableFactory.createUpdateSV(new Name(name));
+            } else if(s instanceof ProgramSVSort) {
                 v = SchemaVariableFactory.createProgramSV
                 (new ProgramElementName(name),(ProgramSVSort) s, mods.list());
             } else {
-                if ( makeVariableSV ) {
+                if(makeVariableSV) {
                     v=SchemaVariableFactory.createVariableSV
-                    (new Name(name), s, mods.list());
-                } else if ( makeSkolemTermSV ) {
-                    v = SchemaVariableFactory.createSkolemTermSV
-                    (new Name(name), s, mods.list());
-                } else if( makeLocationsSV ) {
-                	Debug.assertTrue(mods.list());
-	                v = SchemaVariableFactory.createListSV(new Name(name), LocationDescriptor.class);
-                } else if( makeFunctionsSV ) {
-                	Debug.assertTrue(mods.list());
-	                v = SchemaVariableFactory.createListSV(new Name(name), Function.class);
+                    (new Name(name), s);
+                } else if(makeSkolemTermSV) {
+                    v = SchemaVariableFactory.createSkolemTermSV(
+                    				new Name(name), 
+                    				s);
                 } else { v = SchemaVariableFactory.createTermSV
-                    (new Name(name), s, mods.list(), mods.rigid(), mods.strict());
+                    (new Name(name), s, mods.rigid(), mods.strict());
                 }
             }          
 
@@ -673,10 +670,9 @@ options {
                variables().add(v);
             }
         }
-        
     }
 
-    public static Term toZNotation(String number, Namespace functions, TermFactory tf){
+    public static Term toZNotation(String number, Namespace functions){    
 	String s = number;
         final boolean negative = (s.charAt(0) == '-');
 	if (negative) {
@@ -690,18 +686,16 @@ options {
 	    Debug.fail("Not a hexadecimal constant (BTW, this should not have happened).");
 	  }
 	}
-        Term result = tf.createFunctionTerm((Function) functions.lookup(new Name("#")));
+        Term result = tf.createTerm((Function)functions.lookup(new Name("#")));
 
         for(int i = 0; i<s.length(); i++){
-            result = tf.createFunctionTerm((Function)functions.lookup
-                 (new Name(s.substring(i,i+1))), result);
+            result = tf.createTerm((Function)functions.lookup(new Name(s.substring(i,i+1))), result);
         }
 
        	if (negative) {
-  	    result = tf.createFunctionTerm
-		((Function) functions.lookup(new Name("neglit")), result);
+  	    result = tf.createTerm((Function) functions.lookup(new Name("neglit")), result);
         }
-	return tf.createFunctionTerm
+	return tf.createTerm
             ((Function) functions.lookup(new Name("Z")), result); 
     }
 
@@ -715,15 +709,15 @@ options {
 	return result.toString();
     }
 
-    private TermSymbol getAttribute(Sort prefixSort, String attributeName) 
+    private Operator getAttribute(Sort prefixSort, String attributeName) 
            throws SemanticException {
         final JavaInfo javaInfo = getJavaInfo();
 
-        TermSymbol result = null;
+        Operator result = null;
         
         if (inSchemaMode()) {
             // if we are currently reading taclets we look for schema variables first
-            result = (SortedSchemaVariable)variables().lookup(new Name(attributeName));
+            result = (SchemaVariable)variables().lookup(new Name(attributeName));
         }
         
         assert inSchemaMode() || result == null; 
@@ -733,9 +727,15 @@ options {
 
             if (unambigousAttributeName) {     
                 result = javaInfo.getAttribute(attributeName);
+            } else if(inSchemaMode() && attributeName.equals("length")) {
+                try {
+                    result = javaInfo.getArrayLength();
+                } catch(Throwable e) {
+                    semanticError("Getting array length failed");
+                }
             } else {
                 if (inSchemaMode()) {
-                    semanticError("Either undeclared schmema variable '" + 
+                    semanticError("Either undeclared schema variable '" + 
                                   attributeName + "' or a not fully qualified attribute in taclet.");
                 }
                 final KeYJavaType prefixKJT = javaInfo.getKeYJavaType(prefixSort);
@@ -746,13 +746,6 @@ options {
                 }
                 // WATCHOUT why not in DECLARATION MODE	   
                 if(!isDeclParser()) {			      	
-                    if (prefixSort == Sort.NULL) {
-                        semanticError
-                        ("Cannot uniquely determine attribute " + attributeName + 
-                            "\n Please specify exact type by attaching" +
-                            " @( delaredInType ) to the attribute name.");
-                    }
-
                     final ImmutableList<ProgramVariable> vars = 	
                     javaInfo.getAllAttributes(attributeName, prefixKJT);
                     
@@ -785,117 +778,46 @@ options {
     }
 
    
-    public Term createAttributeTerm(Term prefix, TermSymbol attribute,
-                                    Term shadowNumber) throws SemanticException {
+    public Term createAttributeTerm(Term prefix, 
+    				    Operator attribute) throws SemanticException {
         Term result = prefix;
 
         if (attribute instanceof SchemaVariable) {
             if (!inSchemaMode()) {
                 semanticError("Schemavariables may only occur inside taclets.");
             }
-            if (shadowNumber != null) {
-                result = tf.createShadowAttributeTerm((SchemaVariable)attribute, result, shadowNumber);
-            } else {
-                result = tf.createAttributeTerm((SchemaVariable)attribute, result);         
+	    SchemaVariable sv = (SchemaVariable) attribute;            
+            if(sv.sort() instanceof ProgramSVSort 
+                || sv.sort() == AbstractMetaOperator.METASORT) {
+                semanticError("Cannot use schema variable " + sv + " as an attribute"); 
             }
+            result = TermBuilder.DF.select(getServices(), 
+                                           sv.sort(), 
+                                           TermBuilder.DF.heap(getServices()), 
+                                           prefix, 
+                                           tf.createTerm(attribute));
         } else {
-            if (((ProgramVariable)attribute).isStatic()){
-                result = tf.createVariableTerm((ProgramVariable)attribute);
+            ProgramVariable pv = (ProgramVariable) attribute;
+            if(pv instanceof ProgramConstant) {
+                result = tf.createTerm(pv);
+            } else if(pv == getServices().getJavaInfo().getArrayLength()) {
+                result = TermBuilder.DF.dotLength(getServices(), result);
             } else {
-                if (shadowNumber != null) {
-                    result = tf.createShadowAttributeTerm((ProgramVariable)attribute, 
-                                                          result, shadowNumber);
-                } else {
-                    result = tf.createAttributeTerm((ProgramVariable)attribute, result);
-                }
-            }
-        }
-        return result;
-    }
-
-    public de.uka.ilkd.key.logic.op.Location[] extractLocations(List /*String, KeYJavaType*/ locNames)
-    throws SemanticException {
-        de.uka.ilkd.key.logic.op.Location[] vars = 
-	    new de.uka.ilkd.key.logic.op.Location[locNames.size()];
-        for (int i = 0; i<vars.length; i++) {
-            final String strLocName;
-            if(locNames.get(i) instanceof KeYJavaType) { //array op
-            	strLocName = "[](" + ((KeYJavaType)(locNames.get(i))).getSort().name() + ")";
-            } else {
-	            strLocName = (String)locNames.get(i);
-            }
-            final Name locName = new Name(strLocName);
-            if(isProblemParser()) {
-               vars[i] = (SortedSchemaVariable)
-                   schemaConfig.namespaces().variables().lookup(locName);
-            }
-            if ((vars[i] == null && isProblemParser()) || !isProblemParser()) {
-                if(locNames.get(i) instanceof KeYJavaType) { //array op
-                    Sort componentSort 
-                    		= ((KeYJavaType)(locNames.get(i))).getSort();
-                    Sort objectSort 
-                    		= getJavaInfo().getJavaLangObjectAsSort();
-                    Sort cloneableSort 
-                    		= getJavaInfo().getJavaLangCloneableAsSort();
-                    Sort serializableSort 
-                    		= getJavaInfo().getJavaIoSerializableAsSort();
-                    Sort arraySort 
-                    	= ArraySortImpl.getArraySort(componentSort,
-                    								 objectSort,
-                                                     cloneableSort,
-                                                     serializableSort);
-                    vars[i] = ArrayOp.getArrayOp(arraySort);
-                } else {
-                    Object o = programVariables().lookup(locName);
-                    if (o != null) {
-                        vars[i] = (de.uka.ilkd.key.logic.op.Location) o;
-                    } else {
-                        vars[i] = (de.uka.ilkd.key.logic.op.Location) getAttribute(null, strLocName);
-                    }
-                }
-            }
-        }
-        return vars;
-    }
-
-    public List /*ImmutableArrayLocation*/ extractPartitionedLocations(List /*List (String, KeYJavaType)*/ locListList)
-    throws SemanticException {
-        List result = new ArrayList();
-        Iterator it = locListList.iterator();
-        while(it.hasNext()) {
-            List locNames = (List) it.next();
-            de.uka.ilkd.key.logic.op.Location[] locs
-                        = extractLocations(locNames);
-            result.add(new ImmutableArray<de.uka.ilkd.key.logic.op.Location>(locs));
-        }
-        return result;
-    }
-
-    public static String createDependencyName(String name, List dependencyListList) {
-	StringBuffer result = new StringBuffer(name);
-        result.append("[");
-        Iterator it = dependencyListList.iterator();
-        while (it.hasNext()) {
-            List dependencyList = (List) it.next();
-		    Iterator it2 = dependencyList.iterator();
-            while (it2.hasNext()) {
-            	Object dep = it2.next();
-            	if(dep instanceof KeYJavaType) { //array op
-            		result.append("[](" + ((KeYJavaType)dep).getSort().name() + ")");
-            	} else {
-		        	result.append((String) dep);
+            	Function fieldSymbol 
+            		= getServices().getTypeConverter()
+            		               .getHeapLDT()
+            		               .getFieldSymbolForPV((LocationVariable)pv, 
+            		                                    getServices());        
+            	if (pv.isStatic()){
+                    result = TermBuilder.DF.staticDot(getServices(), pv.sort(), fieldSymbol);
+            	} else {            
+                    result = TermBuilder.DF.dot(getServices(), pv.sort(), result, fieldSymbol);                
             	}
-                result.append(";");
-	    	}
-        	if (it.hasNext()) {
-                result.append("|");
             }
         }
-        result.append("]");
-        
-	return result.toString();
+        return result;
     }
-     
+
     private LogicVariable bindVar(String id, Sort s) {
         if(isGlobalDeclTermParser())
   	  Debug.fail("bindVar was called in Global Declaration Term parser.");
@@ -920,10 +842,7 @@ options {
     throws KeYSemanticException {
         KeYJavaType kjt = null;              
         try {
-            final Sort sort = lookupSort(s);
-            if (sort != null) {
-                kjt=getJavaInfo().getKeYJavaType(sort);
-            }
+	    kjt=getJavaInfo().getKeYJavaTypeByClassName(s);
         } catch(RuntimeException e){
             return null;
         }
@@ -940,29 +859,13 @@ options {
         } 
     }
     
-    private void unbindVars() {
+    private void unbindVars(Namespace orig) {
         if(isGlobalDeclTermParser()) {
             Debug.fail("unbindVars was called in Global Declaration Term parser.");
         }
-        namespaces().setVariables(variables().parent());
+        namespaces().setVariables(orig);
     }
 
-    private void bindProgVars(Set progVars) {
-	namespaces().setProgramVariables(new Namespace(programVariables()));
-	Iterator it=progVars.iterator();
-	while (it.hasNext()) {
-  	      programVariables().add((Named)it.next());
-	}
-    }
-
-    private void unbindProgVars() {
-	if(isGlobalDeclTermParser()) {
-   	   namespaces().setVariables(variables().parent());
-	} else
-	   if(!isDeclParser()) {
-             namespaces().setProgramVariables(programVariables().parent());
-        }
-    }
 
     private Set progVars(JavaBlock jb) {
 	if(isGlobalDeclTermParser()) {
@@ -986,20 +889,18 @@ options {
 
     private Term termForParsedVariable(ParsableVariable v) 
         throws antlr.SemanticException {
-        if ( v instanceof LogicVariable ) {
-            return tf.createVariableTerm((LogicVariable)v);
-        } else if ( v instanceof ProgramVariable ) {
-            return tf.createVariableTerm((ProgramVariable)v);
+        if ( v instanceof LogicVariable || v instanceof ProgramVariable) {
+            return tf.createTerm(v);
         } else {
 	  if(isGlobalDeclTermParser())
 		semanticError(v + " is not a logic variable");
           if ((!isProblemParser()) && (v instanceof Metavariable)) {
-             return tf.createFunctionTerm((Metavariable)v);
+             return tf.createTerm(v);
           } else {
   	     if(isTermParser())
                semanticError(v + " is an unknown kind of variable.");
 	    if (inSchemaMode() && v instanceof SchemaVariable ) {
-               return tf.createVariableTerm((SchemaVariable)v);
+               return tf.createTerm(v);
             } else {
 	    	String errorMessage = "";
                 if ( inSchemaMode() ) {
@@ -1072,24 +973,26 @@ options {
         return sjb;
     }
 
-    private Operator lookupVarfuncId(String varfunc_name, 
-                    PairOfTermArrayAndBoundVarsArray args) throws NotDeclException {
-        Term[] argTerms = null;
-        if (args != null) {
-            argTerms = args.getTerms();
-        }
-        return lookupVarfuncId(varfunc_name, argTerms);
-    }
-
     /**
      * looks up and returns the sort of the given name or null if none has been found.
      * If the sort is not found for the first time, the name is expanded with "java.lang." 
      * and the look up restarts
      */
-     private Sort lookupSort(String name) {        
+     private Sort lookupSort(String name) throws SemanticException {        
 	Sort result = (Sort) sorts().lookup(new Name(name));
 	if (result == null) {
-  	    result = (Sort) sorts().lookup(new Name("java.lang."+name));
+	    if(name.equals(NullSort.NAME.toString())) {
+	        Sort objectSort 
+	        	= (Sort) sorts().lookup(new Name("java.lang.Object"));
+	        if(objectSort == null) {
+	            semanticError("Null sort cannot be used before "
+	                          + "java.lang.Object is declared");
+	        }
+	        result = new NullSort(objectSort);
+	        sorts().add(result);
+	    } else {
+  	    	result = (Sort) sorts().lookup(new Name("java.lang."+name));
+  	    }
 	}
 	return result;
      }
@@ -1104,24 +1007,46 @@ options {
      * for instance `f()'.
      */
     private Operator lookupVarfuncId(String varfunc_name, Term[] args) 
-        throws NotDeclException{
+        throws NotDeclException, SemanticException {
         // case 1: variable
-        Operator v = (TermSymbol) variables().lookup(new Name(varfunc_name));
-        if (v != null && (args == null || (inSchemaMode() && v instanceof OperatorSV))) {
+        Operator v = (Operator) variables().lookup(new Name(varfunc_name));
+        if (v != null && (args == null || (inSchemaMode() && v instanceof ModalOperatorSV))) {
             return v;
         }
+        
         // case 2: function
-        v = (TermSymbol) functions().lookup(new Name(varfunc_name));
+        v = (Operator) functions().lookup(new Name(varfunc_name));
         if (v != null) { // we allow both args==null (e.g. `c')
                          // and args.length=0 (e.g. 'c())' here 
             return v;
         }
+        
         // case 3: program variable
-        v = (TermSymbol) programVariables().lookup
+        v = (Operator) programVariables().lookup
             (new ProgramElementName(varfunc_name));
         if (v != null && args==null) {
             return v;
         }
+        
+        // case 4: instantiation of sort depending function
+        int separatorIndex = varfunc_name.indexOf("::"); 
+        if (separatorIndex > 0) {
+            String sortName = varfunc_name.substring(0, separatorIndex);
+            String baseName = varfunc_name.substring(separatorIndex + 2);
+            Sort sort = lookupSort(sortName);
+            SortDependingFunction firstInstance 
+            	= SortDependingFunction.getFirstInstance(new Name(baseName), 
+            					         getServices());
+                        
+            if(sort != null && firstInstance != null) {
+                v = firstInstance.getInstanceFor(sort, getServices());
+                if(v != null) {
+                    return v;
+                }
+            } 
+        }
+        
+        // not found
         if (args==null) {
             throw new NotDeclException
                 ("(program) variable or constant", varfunc_name,
@@ -1214,7 +1139,7 @@ options {
                Iterator<ProgramMethod> it = javaInfo.getAllProgramMethods(kjt).iterator();
                while(it.hasNext()) {
                  final ProgramMethod pm = it.next();
-                 final String name = kjt.getFullName()+"::"+LT(n+2).getText();
+                 final String name = kjt.getFullName()+"::"+LT(n+2).getText();                 
                  if(pm != null && pm.isStatic() && pm.name().toString().equals(name) ) {
                    result = true;
 		   break;
@@ -1223,7 +1148,6 @@ options {
            }   
         }
     } catch (antlr.TokenStreamException tse) {
-        // System.out.println("an exception occured"+tse);
         result = false;
     }
     if(result && inputState.guessing > 0) {
@@ -1233,13 +1157,6 @@ options {
     return result;
     }
 
-    private boolean emptyBraces(int lookahead) {
-        try {        
-            return LA(lookahead) == LBRACE && LA(lookahead+1) == RBRACE;
-        } catch (antlr.TokenStreamException tse) {
-            return false;
-        }
-    }
 
     private TacletBuilder createTacletBuilderFor
         (Object find, int stateRestriction) 
@@ -1372,98 +1289,37 @@ options {
         return pm;
     }
 
-    public static void addSortAdditionals(Sort s, Namespace functions, Namespace sorts) {
-        if (s instanceof NonCollectionSort) {
-            NonCollectionSort ns = (NonCollectionSort)s;
-            final Sort[] addsort = {
-                ns.getSetSort(), ns.getSequenceSort(), ns.getBagSort() 
-            };
-	    
-            for (int i = 0; i<addsort.length; i++) {
-                sorts.add(addsort[i]);
-                addSortAdditionals(addsort[i], functions, sorts);
-            }
-        }
-        if ( s instanceof SortDefiningSymbols ) {                        
-           ((SortDefiningSymbols)s).addDefinedSymbols(functions, sorts);
-        }
-    }
 
     public void addFunction(Function f) {
         functions().add(f);
     }
 
-    private Sort getIntersectionSort(ImmutableList<String> composites) 
-                                            throws NotDeclException, KeYSemanticException {
-        ImmutableSet<Sort> compositeSorts = DefaultImmutableSet.<Sort>nil();
-        final Iterator<String> it = composites.iterator(); 
-        while ( it.hasNext () ) {
-            final String sortName = it.next();
-            final Sort sort = lookupSort(sortName);
-            if ( sort == null) {
-                throw new NotDeclException("Sort", sortName, 
-                    getFilename(), getLine(), getColumn(), 
-                    "Components of intersection sorts have to be declared before.");
-            }
-            compositeSorts = compositeSorts.add(sort);
-        }
-        final Sort s = IntersectionSort.getIntersectionSort(compositeSorts, sorts(), functions());
-        if (!(s instanceof IntersectionSort)) {
-            String err = "Failed to create an intersection sort of " + composites;
-            if (s == null) {
-                err += " as the resulting intersection sort would be empty.";
-            } else {
-                err += ". Usually intersection is not required in these cases as \n" + 
-                "it is equal to one composite. In this case " + s;
-            }
-            semanticError(err);
-                            
-        }        
-        return s;
-    }
     
-    private HashSet lookupOperatorSV(String opName, HashSet operators) 
-    throws KeYSemanticException {
-	OperatorSV osv = (OperatorSV)variables().lookup(new Name(opName));
-        if(osv == null)
-           semanticError("Schema variable "+opName+" not defined.");
-        operators.addAll(osv.operators());
-        return operators;
+    private ImmutableSet<Modality> lookupOperatorSV(String opName, ImmutableSet<Modality> modalities) 
+    		throws KeYSemanticException {
+	ModalOperatorSV osv = (ModalOperatorSV)variables().lookup(new Name(opName));
+        if(osv == null) {
+	    semanticError("Schema variable "+opName+" not defined.");
+	}
+        modalities = modalities.union(osv.getModalities());
+        return modalities;
     } 
     
-    private HashSet opSVHelper(String opName, 
-                                HashSet operators,
-                                boolean modalOp) 
-       throws KeYSemanticException {
-       if(opName.charAt(0) == '#') {
-          return lookupOperatorSV(opName, operators);           
-       }else{
-       	  switchToNormalMode();
-       	  Operator op;
-       	  if (modalOp) {
-       	    // modalities are not in the functions namespace
-       	    op = Op.getModality(opName);
-       	  } else {
-           op = (Operator) functions().lookup(new Name(opName));
-          }
-          switchToSchemaMode();
-          if(op == null)
-            semanticError("Unrecognised operator: "+opName);
-          operators.add(op);
+    private ImmutableSet<Modality> opSVHelper(String opName, 
+                                     ImmutableSet<Modality> modalities) 
+        	throws KeYSemanticException {
+        if(opName.charAt(0) == '#') {
+            return lookupOperatorSV(opName, modalities);           
+        } else {
+	    switchToNormalMode();
+       	    Modality m = Modality.getModality(opName);
+	    switchToSchemaMode();
+            if(m == null) {
+                semanticError("Unrecognised operator: "+opName);
+            }
+            modalities = modalities.add(m);
        }
-       return operators;
-    }
-
-    private void setChoiceHelper(ImmutableSet<Choice> choices, String section){
-        if(choices.size() > 1) {
-	   Debug.fail("Don't know what to do with multiple"+
-		      "option declarations for "+section+".");
-	}
-        if(choices.size() == 1) {
-             namespaces().setFunctions(choices.iterator().next().funcNS());
-        }else{
-             namespaces().setFunctions(defaultChoice.funcNS());
-	}
+       return modalities;
     }
 
     private void semanticError(String message) throws KeYSemanticException {
@@ -1471,7 +1327,7 @@ options {
         (message, getFilename(), getLine(), getColumn());
     }
 
-    class PairOfStringAndJavaBlock {
+    private static class PairOfStringAndJavaBlock {
       String opName;
       JavaBlock javaBlock;
     }
@@ -1602,64 +1458,36 @@ sort_decls
 : SORTS LBRACE 
        ( multipleSorts = one_sort_decl { lsorts = lsorts.prepend(multipleSorts); })* 
   RBRACE 
-     {
-        final Iterator<Sort> it = lsorts.iterator();
-        while (it.hasNext()) {                   
-             addSortAdditionals ( it.next(), defaultChoice.funcNS(), sorts() ); 
-         }
-      }
-
 ;
 
 one_sort_decl returns [ImmutableList<Sort> createdSorts = ImmutableSLList.<Sort>nil()] 
 {
-    boolean isObjectSort = false;
     boolean isAbstractSort = false;
     boolean isGenericSort = false;
-    boolean isSubSort = false;
-    boolean isIntersectionSort = false;
     Sort[] sortExt=new Sort [0];
     Sort[] sortOneOf=new Sort [0];
     String firstSort;
     ImmutableList<String> sortIds = ImmutableSLList.<String>nil(); 
 } : 
         ( 
-          OBJECT  {isObjectSort =true;} (ABSTRACT {isAbstractSort = true;})? sortIds = objectSortIdentifiers
-            ( EXTENDS sortExt = extends_sorts )?
-        | GENERIC {isGenericSort=true;} sortIds = simple_ident_comma_list
+         GENERIC {isGenericSort=true;} sortIds = simple_ident_comma_list
             ( ONEOF sortOneOf = oneof_sorts )? 
             ( EXTENDS sortExt = extends_sorts )?
-        | sortIds = intersectionSortIdentifier { isIntersectionSort = true; }
-        | firstSort = simple_ident_dots { sortIds = sortIds.prepend(firstSort); }
+        | (ABSTRACT {isAbstractSort = true;})?
+          firstSort = simple_ident_dots { sortIds = sortIds.prepend(firstSort); }
           (
-              (EXTENDS sortExt = extends_sorts {  isSubSort = true ; } ) 
+              (EXTENDS sortExt = extends_sorts ) 
             | ((COMMA) sortIds = simple_ident_comma_list { sortIds = sortIds.prepend(firstSort) ; } )
           )?
         ) SEMI {   
             if (!skip_sorts) {
-                if (isIntersectionSort) {                    
-                    final Sort sort = getIntersectionSort(sortIds);
-                    createdSorts = createdSorts.append(sort);
-                    sorts().add(sort); 
-                } else {
                     Iterator<String> it = sortIds.iterator ();        
                     while ( it.hasNext () ) {
                         Name sort_name = new Name(it.next());   
                         // attention: no expand to java.lang here!       
                         if (sorts().lookup(sort_name) == null) {
                             Sort s;
-                            if (isObjectSort) {
-                                if (sort_name.toString().equals("java.lang.Object")) {
-                                    if (sorts().lookup(new Name("java.lang.Object")) == null) {
-                                        s = new ClassInstanceSortImpl(sort_name, isAbstractSort);
-                                    } else {
-                                        s=(Sort)sorts().lookup(new Name("java.lang.Object"));
-                                    }
-                                } else {
-                                    s = new ClassInstanceSortImpl(sort_name,
-                                        (Sort)sorts().lookup(new Name("java.lang.Object")), isAbstractSort);
-                                }	
-                            } else if (isGenericSort) {
+			    if (isGenericSort) {
                                 int i;
                                 ImmutableSet<Sort>  ext   = DefaultImmutableSet.<Sort>nil();
                                 ImmutableSet<Sort>  oneOf = DefaultImmutableSet.<Sort>nil();
@@ -1678,51 +1506,23 @@ one_sort_decl returns [ImmutableList<Sort> createdSorts = ImmutableSLList.<Sort>
                                 }
                             } else if (new Name("any").equals(sort_name)) {
                                 s = Sort.ANY;
-                            } else if (isSubSort) {
+                            } else  {
                                 ImmutableSet<Sort>  ext = DefaultImmutableSet.<Sort>nil();
 
-                                for ( int i = 0; i != sortExt.length; ++i )
-                                ext = ext.add ( sortExt[i] );
+                                for ( int i = 0; i != sortExt.length; ++i ) {
+                                    ext = ext.add ( sortExt[i] );
+                                }
 
-                                s = new PrimitiveSort(sort_name, ext);
-                            } else {
-                                s = new PrimitiveSort(sort_name);
+                                s = new SortImpl(sort_name, ext, isAbstractSort);
                             }
+                            assert s != null;
                             sorts().add ( s ); 
 
                             createdSorts = createdSorts.append(s);
                         }
-                    }
                 }
             }
         };
-
-intersectionSortIdentifier returns [ImmutableList<String> composites = ImmutableSLList.<String>nil()] 
-{
-  ImmutableList<String> rightComposites;
-  String left = ""; 
-  String right = "";   
-}
-:     
-     INTERSECTIONSORT LPAREN 
-        (left  = simple_ident_dots) COMMA 
-        (rightComposites = intersectionSortIdentifier {            
-            final Iterator<String> it = rightComposites.iterator();
-            right = "\\inter(" + it.next() + "," + it.next() +")";
-        } | right = simple_ident_dots) RPAREN 
-     {
-         composites = composites.prepend(right).prepend(left);
-     }
-;
-
-objectSortIdentifiers returns [ImmutableList<String> ids = ImmutableSLList.<String>nil()]
-{
-  String id;
-}
- :
-  id = simple_ident_dots { ids = ids.append ( id );} 
-  (COMMA id = simple_ident_dots { ids = ids.append ( id );})*
- ;
 
 
 simple_ident_dots returns [ String ident = ""; ] 
@@ -1793,7 +1593,15 @@ keyjavatype returns [KeYJavaType kjt=null]
           }          
        }
      }
-	
+     
+     //HEAP
+     if(kjt == null) {
+	Sort sort = lookupSort(type);
+	if(sort != null) {
+           kjt = new KeYJavaType(null, sort);
+        }
+     }
+     
      if (kjt == null) {
        semanticError("Unknown type: " + type);
      }
@@ -1874,15 +1682,11 @@ one_schema_var_decl
     Sort s = null;
     boolean makeVariableSV  = false;
     boolean makeSkolemTermSV = false;
-    boolean makeLocationsSV	= false;
-    boolean makeFunctionsSV  = false;
-    boolean modalOpSV       = false;
     String id = null;
     ImmutableList<String> ids = null;
     SchemaVariableModifierSet mods = null;
 } :   
-   ((MODALOPERATOR {modalOpSV = true;} | OPERATOR {modalOpSV = false;} ) 
-       one_schema_op_decl[modalOpSV] SEMI)
+   (MODALOPERATOR one_schema_modal_op_decl SEMI)
  |
   ( 
    (
@@ -1902,15 +1706,10 @@ one_schema_var_decl
     ( schema_modifiers[mods] ) ?
     {s = Sort.FORMULA;}
     ids = simple_ident_comma_list 
-  | LOCATION
-    { makeLocationsSV = true; 
-      mods = new SchemaVariableModifierSet.ListSV(); }
-    ( schema_modifiers[mods] ) ?    
-    ids = simple_ident_comma_list 
-  | FUNCTION
-    { makeFunctionsSV = true; 
-      mods = new SchemaVariableModifierSet.ListSV(); }
+  | UPDATE
+    { mods = new SchemaVariableModifierSet.FormulaSV (); }
     ( schema_modifiers[mods] ) ?
+    {s = Sort.UPDATE;}
     ids = simple_ident_comma_list 
   | (    TERM
          { mods = new SchemaVariableModifierSet.TermSV (); }
@@ -1929,8 +1728,11 @@ one_schema_var_decl
    { 
      Iterator<String> it = ids.iterator();
      while(it.hasNext())
-       schema_var_decl(it.next(),s,makeVariableSV,makeSkolemTermSV, 
-       				   makeLocationsSV, makeFunctionsSV, mods);
+       schema_var_decl(it.next(),
+                       s,
+                       makeVariableSV,
+                       makeSkolemTermSV, 
+		       mods);
    }
  )
 
@@ -1955,16 +1757,16 @@ schema_modifiers[SchemaVariableModifierSet mods]
         }
     ;
 
-one_schema_op_decl[boolean modalOp]
+one_schema_modal_op_decl
 {
-    HashSet operators = new HashSet(50);
+    ImmutableSet<Modality> modalities = DefaultImmutableSet.<Modality>nil();
     String id = null;
     Sort sort = Sort.FORMULA;
     ImmutableList<String> ids = null;
 } 
     :
         (LPAREN sort = any_sortId_check[true] {
-           if (modalOp && sort != Sort.FORMULA) { 
+           if (sort != Sort.FORMULA) { 
                semanticError("Modal operator SV must be a FORMULA, not " + sort);
            }            
          } RPAREN)? 
@@ -1974,24 +1776,18 @@ one_schema_op_decl[boolean modalOp]
 	    }	        
             Iterator<String> it1 = ids.iterator();
             while(it1.hasNext()) {
-  	      operators = opSVHelper(it1.next(), operators, modalOp);
+  	      modalities = opSVHelper(it1.next(), modalities);
   	    }
             SchemaVariable osv = (SchemaVariable)variables().lookup(new Name(id));
             if(osv != null)
               semanticError("Schema variable "+id+" already defined.");
-	    Iterator it2 = operators.iterator();
-	    int arity = ((Operator)it2.next()).arity();
-	    while(it2.hasNext())
-              if(arity != ((Operator)it2.next()).arity())
-                semanticError("Arity mismatch for schema variable "+id);
 
-            osv = SchemaVariableFactory.createOperatorSV(new Name(id), 
-                        modalOp ? Modality.class : Operator.class, 
-                        sort, arity, operators);
+            osv = SchemaVariableFactory.createModalOperatorSV(new Name(id),  
+                        sort, modalities);
             
             if (inSchemaMode()) {
                 variables().add(osv);
-                functions().add(osv);
+                //functions().add(osv);
             }
         }
     ;
@@ -2000,62 +1796,59 @@ pred_decl
 {
     Sort[] argSorts;    
     String pred_name;
-    List dependencyListList = null;
-    boolean nonRigid = false;
-    int location = NORMAL_NONRIGID;
+    Boolean[] whereToBind = null;
 }
     :
-        (NONRIGID {nonRigid=true;}(LBRACKET location = location_ident RBRACKET)?)?
         pred_name = funcpred_name
+        
         (
-            LBRACKET
-            dependencyListList = dependency_list_list
-            RBRACKET
-            {
-                if (!nonRigid) {
-                    semanticError(pred_name+
-		      ": Predicate declarations with attribute lists must use the '\\nonRigid' modifier");
-                }
-                pred_name = KeYParser.createDependencyName(pred_name,
-                                                           dependencyListList);
-            }
-        )?
+	    whereToBind = where_to_bind
+	)?        
+        
+        
         argSorts = arg_sorts[!skip_predicates]
         {
             if (!skip_predicates) {
-                Name predicate = new Name(pred_name);		    		                        
-                Function p = null;
-                if (lookup(predicate) != null) {
-                    throw new AmbigiousDeclException
-                    (pred_name, getFilename(), getLine(), getColumn());
-                } else if (nonRigid) {
-                    if (dependencyListList != null) {
-                        p = NRFunctionWithExplicitDependencies.getSymbol
-                            (predicate, Sort.FORMULA, 
-                             new ImmutableArray<Sort>(argSorts),
-                             extractPartitionedLocations(dependencyListList));
-                    } else {
-	        	switch (location) {
-                           case NORMAL_NONRIGID:                         
-                              p = new NonRigidFunction(predicate, Sort.FORMULA, argSorts);                           
-                              break;
-                           case LOCATION_MODIFIER: 
-                              semanticError("Modifier 'Location' not allowed for non-rigid predicates.");
-                              break;
-                           case LOCATION_NOHEAP_MODIFIER: 
-                              semanticError("Modifier 'Location' not allowed for non-rigid predicates.");
-                              break;
-                 	  case HEAP_DEPENDENT: p = new NonRigidHeapDependentFunction(predicate, Sort.FORMULA, argSorts);      
-                 	      break;
-                 	  default:
-                 	     semanticError("Unknown modifier used in declaration of non-rigid predicate "+predicate);
-                 	}
-                    }
-
-                } else {
-                   p = new RigidFunction(predicate, Sort.FORMULA, argSorts);
+            
+                if(whereToBind != null 
+	 	   && whereToBind.length != argSorts.length) {
+                    semanticError("Where-to-bind list must have same length "
+                                  + "as argument list");
                 }
-                assert p != null;
+                 
+                Function p = null;            
+            
+            	int separatorIndex = pred_name.indexOf("::"); 
+	        if (separatorIndex > 0) {
+	            String sortName = pred_name.substring(0, separatorIndex);
+	            String baseName = pred_name.substring(separatorIndex + 2);
+		    Sort genSort = lookupSort(sortName);
+		    
+		    if(genSort instanceof GenericSort) {	        	            	
+		    	p = SortDependingFunction.createFirstInstance(
+		    	    		(GenericSort)genSort,
+		    	    		new Name(baseName),
+		    	    		Sort.FORMULA,
+		    	    		argSorts,
+		    	    		false);
+		    }
+	        }
+            
+                if(p == null) {	                        
+                    p = new Function(new Name(pred_name), 
+                    		     Sort.FORMULA, 
+                    		     argSorts,
+                    		     whereToBind,
+                    		     false);
+                }
+                
+		if (lookup(p.name()) != null) {
+		    throw new AmbigiousDeclException(p.name().toString(), 
+		                                     getFilename(), 
+		                                     getLine(), 
+		                                     getColumn());
+		}
+		
                 addFunction(p);         
             } 
         }
@@ -2063,22 +1856,13 @@ pred_decl
     ;
 
 pred_decls 
-{
-    ImmutableSet<Choice> choices = DefaultImmutableSet.<Choice>nil();
-}
     :
-        PREDICATES (choices=option_list[choices])? 
-	{
-           setChoiceHelper(choices,"predicates");
-	}
+        PREDICATES 
         LBRACE
         (
             pred_decl
         ) *
         RBRACE
-    {
-           setChoiceHelper(DefaultImmutableSet.<Choice>nil(), "predicates");
-    }
     ;
 
 
@@ -2089,10 +1873,6 @@ location_ident returns [int kind = NORMAL_NONRIGID]
        { 
           if ("Location".equals(id)) {
              kind = LOCATION_MODIFIER;
-          } else if ("LocationNoHeap".equals(id)) {
-             kind = LOCATION_NOHEAP_MODIFIER;
-          } else if ("HeapDependent".equals(id)) {
-             kind = HEAP_DEPENDENT;
           } else if (!"Location".equals(id)) {
             semanticError(
                 id+": Attribute of a Non Rigid Function can only be 'Location'");        
@@ -2105,111 +1885,82 @@ location_ident returns [int kind = NORMAL_NONRIGID]
 func_decl
 {
     Sort[] argSorts;
+    Boolean[] whereToBind = null;
     Sort retSort;
     String func_name;
-    List dependencyListList = null;
-    boolean nonRigid = false;
-    String id = null;
-    int location = NORMAL_NONRIGID;
+    boolean unique = false;
 }
     :
-        (NONRIGID {nonRigid=true;} (LBRACKET location = location_ident RBRACKET)?)?
-        retSort = sortId_check[!skip_functions]
-        func_name = funcpred_name 
         (
-            LBRACKET
-            dependencyListList = dependency_list_list
-            RBRACKET
-            {
-                if (!nonRigid)
-                {
-                    semanticError(func_name+
-		      ": Function declarations with attribute lists	must use the '\\nonRigid' modifier");
-                }
-                func_name = KeYParser.createDependencyName(func_name,
-                                                           dependencyListList);
-            }
+            UNIQUE {unique=true;}
         )?
+        
+        retSort = any_sortId_check[!skip_functions]
+        
+        func_name = funcpred_name 
+        
+	(
+	    whereToBind = where_to_bind
+	)?        
+
         argSorts = arg_sorts[!skip_functions]
+                
         {
             if (!skip_functions) {
-                Name fct_name = new Name(func_name);
+            
+	 	if(whereToBind != null 
+	 	   && whereToBind.length != argSorts.length) {
+                    semanticError("Where-to-bind list must have same length "
+                                  + "as argument list");
+                } 
+            
                 Function f = null;
-                if (lookup(fct_name) != null) {
-                    throw new AmbigiousDeclException
-                    (func_name, getFilename(), getLine(), getColumn());
-                } else if (nonRigid) {
-                    if (dependencyListList != null) {
-                        f = NRFunctionWithExplicitDependencies.getSymbol
-                            (fct_name, retSort, 
-                             new ImmutableArray<Sort>(argSorts),
-                             extractPartitionedLocations(dependencyListList));
-                    } else {
-                        switch (location) {
-                           case NORMAL_NONRIGID: f = new NonRigidFunction(fct_name, retSort, argSorts);
-                              break;
-                           case LOCATION_MODIFIER: f = new NonRigidFunctionLocation(fct_name, retSort, argSorts, true);
-                              break;
-                           case LOCATION_NOHEAP_MODIFIER: f = new NonRigidFunctionLocation(fct_name, retSort, argSorts, false);
-                              break;
-                 	  case HEAP_DEPENDENT: f = new NonRigidHeapDependentFunction(fct_name, retSort, argSorts);      
-                 	      break;
-                 	  default:
-                 	     semanticError("Unknwon modifier used in declaration of non-rigid function "+fct_name);
-                 	}
-                    }
-                } else {
-                    f = new RigidFunction(fct_name, retSort, argSorts);
-                }
-                assert f != null;
-                addFunction(f);
+                
+	        int separatorIndex = func_name.indexOf("::"); 
+	        if (separatorIndex > 0) {
+	            String sortName = func_name.substring(0, separatorIndex);
+	            String baseName = func_name.substring(separatorIndex + 2);
+		    Sort genSort = lookupSort(sortName);
+		    
+		    if(genSort instanceof GenericSort) {	        	            	
+		    	f = SortDependingFunction.createFirstInstance(
+		    	    		(GenericSort)genSort,
+		    	    		new Name(baseName),
+		    	    		retSort,
+		    	    		argSorts,
+		    	    		unique);
+		    }
+	        }
+	        
+	        if(f == null) {
+	            f = new Function(new Name(func_name), 
+	                             retSort, 
+	                             argSorts,
+	                             whereToBind,
+	                             unique);                    
+	        }
+	        
+		if (lookup(f.name()) != null) {
+		    throw new AmbigiousDeclException(f.name().toString(), 
+		                                     getFilename(), 
+		                                     getLine(), 
+		                                     getColumn());
+		}
+	        
+	        addFunction(f);
             } 
         }
         SEMI
     ;
 
 func_decls 
-{
-    ImmutableSet<Choice> choices = DefaultImmutableSet.<Choice>nil();
-}
     :
-        FUNCTIONS (choices=option_list[choices])? 
-	{
-           setChoiceHelper(choices,"functions");
-	}
+        FUNCTIONS 
         LBRACE 
         (
             func_decl
         ) *
         RBRACE
-    {
-           setChoiceHelper(DefaultImmutableSet.<Choice>nil(), "functions");
-    }
-    ;
-
-dependency_list_list returns [List dependencyListList = new LinkedList()]
-{
-    List dependencyList;
-}
-    :
-        dependencyList = dependency_list {dependencyListList.add(dependencyList);}
-        (OR dependencyList = dependency_list {dependencyListList.add(dependencyList);})*
-    ;
-
-dependency_list returns [List dependencyList = new LinkedList()]
-{
-    String attribute;
-    KeYJavaType componentType;
-}
-    :
-        (
-            (
-                (attribute = attrid) {dependencyList.add(attribute);}
-            |
-                (componentType = arrayopid) {dependencyList.add(componentType);}
-            )
-            SEMI
-        )+
     ;
 
 arrayopid returns [KeYJavaType componentType = null]
@@ -2238,6 +1989,27 @@ arg_sorts[boolean checkSort] returns [Sort[] argSorts = null]
             argSorts = (Sort[])args.toArray(AN_ARRAY_OF_SORTS);
         }
     ;
+    
+where_to_bind returns [Boolean[] result = null]
+{
+    List<Boolean> list = new ArrayList<Boolean>();
+}   
+    : 
+        LBRACE
+        (  
+            TRUE {list.add(true);} | FALSE {list.add(false);}  
+        )
+        (  
+           COMMA
+           (
+               TRUE {list.add(true);} | FALSE {list.add(false);}
+           )
+        )*
+        RBRACE    
+        {
+            result = list.toArray(new Boolean[0]);
+        }
+   ;
 
 ruleset_decls
 {
@@ -2308,8 +2080,8 @@ sortId_check_help [boolean checkSort] returns [Sort s = null]
             // don't allow generic sorts or collection sorts of
             // generic sorts at this point
             Sort t = s;
-            while ( t != Sort.NULL && t instanceof CollectionSort ) {
-            	t = ((CollectionSort)t).elementSort ();
+            while ( t instanceof ArraySort ) {
+            	t = ((ArraySort)t).elementSort ();
             }
 
             if ( t instanceof GenericSort ) {
@@ -2337,10 +2109,11 @@ array_set_decls[Sort p] returns [Sort s = null]
         { 
             if (n != 0){
                 final JavaInfo ji = getJavaInfo();
-                s = ArraySortImpl.getArraySortForDim(
-                                                     p, n, ji.getJavaLangObjectAsSort(),
-                                                     ji.getJavaLangCloneableAsSort(), 
-                                                     ji.getJavaIoSerializableAsSort());
+                s = ArraySort.getArraySortForDim(p, 
+                			             n, 
+                			             ji.objectSort(),
+                                                     ji.cloneableSort(), 
+                                                     ji.serializableSort());
 
                 Sort last = s;
                 do {
@@ -2428,10 +2201,6 @@ simple_sort_name returns [String name = ""]
 { String id = ""; }
     :
         id = simple_ident_dots  { name = id; } 
-        | inter:INTERSECTIONSORT {name += inter.getText();} LPAREN 
-             id = simple_ident_dots { name += "(" + id;  } COMMA 
-             id = simple_sort_name  { name +=  "," + id + ")"; }          
-          RPAREN
     ;
 
 
@@ -2465,57 +2234,48 @@ formula returns [Term a = null]
 
 term returns [Term a = null] 
     :
-        a=term20 
+        a=term10 
     ;
 
-    
-location_list returns [ImmutableSet<LocationDescriptor> set = DefaultImmutableSet.<LocationDescriptor>nil();]
-{
-	LocationDescriptor loc;
-}
-:
-	LBRACE
-	(
-      	loc=location_descriptor {set = set.add(loc);}
-      	(
-      		COMMA loc=location_descriptor {set = set.add(loc);}
-      	)*
-    )?
-    RBRACE
-;
 
-
-location_descriptor returns [LocationDescriptor loc = null]
+term10 returns [Term result = null]
 {
-	ImmutableList<QuantifiableVariable> boundVars = null;
-	Term f = tf.createJunctorTerm(Op.TRUE);
-	Term t;
+    Term a = null;
 }
-:
-   {
-		quantifiedArrayGuard = tf.createJunctorTerm(Op.TRUE);
-   }
-   (
-	STAR {loc = EverythingLocationDescriptor.INSTANCE;}
-    | (
-	(FOR boundVars=bound_variables)?
-    	((IF) => IF LPAREN f=formula RPAREN)?
-       	t=accessterm {
-          if(boundVars != null) {	  
-             while(!boundVars.isEmpty()) {
-    	        unbindVars();
-        	    boundVars = boundVars.tail();
-             }
-	  }	  
-     	  quantifiedArrayGuard = tf.createJunctorTermAndSimplify(Op.AND, f, quantifiedArrayGuard);       
-	  loc = new BasicLocationDescriptor(quantifiedArrayGuard, t);
-	}
-      )
-   )
-   {
-		quantifiedArrayGuard = null;
-   }
-;
+    :
+        result=term10_2
+        (
+           PARALLEL a=term10_2
+           {
+               result = tf.createTerm(UpdateJunctor.PARALLEL_UPDATE, result, a);
+           }
+            
+        )*
+    ; exception
+        catch [TermCreationException ex] {
+              keh.reportException
+		(new KeYSemanticException
+			(ex.getMessage(), getFilename(), getLine(), getColumn()));
+        }
+        
+        
+term10_2 returns[Term result=null]
+{
+    Term a = null;
+}  :
+        result=term20 
+        (
+            ASSIGN a=term20
+            {
+                result = TermBuilder.DF.elementary(getServices(), result, a);
+            }
+        )?
+   ; exception
+        catch [TermCreationException ex] {
+              keh.reportException
+		(new KeYSemanticException
+			(ex.getMessage(), getFilename(), getLine(), getColumn()));
+        }
 
 
 term20 returns [Term a = null] 
@@ -2524,7 +2284,7 @@ term20 returns [Term a = null]
 }
     :   a=term30 
         (EQV a1=term30 
-            { a = tf.createJunctorTerm(Op.EQV, new Term[]{a, a1});} )*
+            { a = tf.createTerm(Equality.EQV, new Term[]{a, a1});} )*
 ; exception
         catch [TermCreationException ex] {
               keh.reportException
@@ -2538,7 +2298,7 @@ term30 returns [Term a = null]
 }
     :   a=term40 
         (IMP a1=term30 
-            { a = tf.createJunctorTerm(Op.IMP, new Term[]{a, a1});} )?
+            { a = tf.createTerm(Junctor.IMP, new Term[]{a, a1});} )?
 ; exception
         catch [TermCreationException ex] {
               keh.reportException
@@ -2552,7 +2312,7 @@ term40 returns [Term a = null]
 }
     :   a=term50 
         (OR a1=term50 
-            { a = tf.createJunctorTerm(Op.OR, new Term[]{a, a1});} )*
+            { a = tf.createTerm(Junctor.OR, new Term[]{a, a1});} )*
 ; exception
         catch [TermCreationException ex] {
               keh.reportException
@@ -2566,7 +2326,8 @@ term50 returns [Term a = null]
 }
     :   a=term60 
         (AND a1=term60
-            { a = tf.createJunctorTerm(Op.AND, new Term[]{a, a1});} )*
+            { a = tf.createTerm(Junctor.AND, new Term[]{a, a1});} )*
+            
 ; exception
         catch [TermCreationException ex] {
               keh.reportException
@@ -2588,7 +2349,7 @@ term60 returns [Term a = null]
 unary_formula returns [Term a = null] 
 { Term a1; }
     :  
-        NOT a1  = term60 { a = tf.createJunctorTerm(Op.NOT,new Term[]{a1}); }
+        NOT a1  = term60 { a = tf.createTerm(Junctor.NOT,new Term[]{a1}); }
     |	a = quantifierterm 
     |   a = modality_dl_term
 ; exception
@@ -2613,10 +2374,10 @@ term70 returns [Term a = null]
                     a1.sort() == Sort.FORMULA) {
                     String errorMessage = 
                     "The term equality \'=\'/\'!=\' is not "+
-                    "allowed between formulas.\n Please use \'" + Op.EQV +
-                    "\' in combination with \'" + Op.NOT + "\' instead.";
-                if (a.op() == Op.TRUE || a.op() == Op.FALSE ||
-                    a1.op() == Op.TRUE || a1.op() == Op.FALSE) {
+                    "allowed between formulas.\n Please use \'" + Equality.EQV +
+                    "\' in combination with \'" + Junctor.NOT + "\' instead.";
+                if (a.op() == Junctor.TRUE || a.op() == Junctor.FALSE ||
+                    a1.op() == Junctor.TRUE || a1.op() == Junctor.FALSE) {
                     errorMessage += 
                     " It seems as if you have mixed up the boolean " +
                     "constants \'TRUE\'/\'FALSE\' " +
@@ -2624,10 +2385,10 @@ term70 returns [Term a = null]
                 }
                 semanticError(errorMessage);
             }
-            a = tf.createEqualityTerm(a, a1);
+            a = tf.createTerm(Equality.EQUALS, a, a1);
 
             if (negated) {
-              a = tf.createJunctorTerm(Op.NOT, a);
+              a = tf.createTerm(Junctor.NOT, a);
             }
         })?
  ; exception
@@ -2697,7 +2458,7 @@ logicTermReEntry returns [Term a = null]
 }
 :
    a = term90 ((relation_op)=> op = relation_op a1=term90 {
-                 a = tf.createFunctionTerm(op, a, a1);
+                 a = tf.createTerm(op, a, a1);
               })?
 ; exception
         catch [TermCreationException ex] {
@@ -2714,7 +2475,7 @@ term90 returns [Term a = null]
 }
 :
    a = term100 ( op = weak_arith_op a1=term100 {
-                  a = tf.createFunctionTerm(op, a, a1);
+                  a = tf.createTerm(op, a, a1);
                 })*
 ; exception
         catch [TermCreationException ex] {
@@ -2730,7 +2491,7 @@ term100 returns [Term a = null]
 }
 :
    a = term110 ( op = strong_arith_op a1=term110 {
-                  a = tf.createFunctionTerm(op, a, a1);
+                  a = tf.createTerm(op, a, a1);
                 })*
 ; exception
         catch [TermCreationException ex] {
@@ -2749,7 +2510,7 @@ term100 returns [Term a = null]
 term110 returns [Term result = null]
     :
         (
-            result = accessterm |
+            result = accessterm  |
             result = update_or_substitution
         ) 
         {
@@ -2788,43 +2549,10 @@ classReference returns [String classReference = ""]
 */
 
 
-transactionNumber returns [Term trans = null]
-:
-     EXP LPAREN trans = term60 RPAREN
-     |
-     p:PRIMES {
-       int primes = p.getText().length();
-       if(parsingContracts) {
-         if(primes != 1) {
-           semanticError("In contracts only one prime is allowed "+
-	     "(equivalent to ^(de.uka.ilkd.key.javacard.KeYJCSystem.<transactionCounter>)).");
-	 }
-         // Woj's solution
-         //TermSymbol v = getAttribute(
-         //  getTypeByClassName("de.uka.ilkd.key.javacard.KeYJCSystem").getSort(),
-         //  "de.uka.ilkd.key.javacard.KeYJCSystem::<transactionCounter>"); 
-	 //trans = createAttributeTerm(null, v, null);
-	 // Richard's solution
-	 final ProgramVariable op = getServices().getJavaInfo().getAttribute
-           (JVMIsTransientMethodBuilder.IMPLICIT_TRANSACTION_COUNTER, 
-            "de.uka.ilkd.key.javacard.KeYJCSystem");
-         if(op == null) {
-           semanticError("Attribute " +
-            JVMIsTransientMethodBuilder.IMPLICIT_TRANSACTION_COUNTER +
-            " of type " + "de.uka.ilkd.key.javacard.KeYJCSystem" + " not known. " + 
-            "Did you place appropriate Java Card API to your sources?");
-         }
-         trans = tf.createVariableTerm(op);
-       }else{
-         trans = toZNotation(""+primes, functions(), tf);
-       }
-     }
-;
 
 
 staticAttributeOrQueryReference returns [String attrReference = ""]
 :
-        
       //  attrReference=simple_ident_dots 
       id:IDENT
         {
@@ -2872,8 +2600,7 @@ staticAttributeOrQueryReference returns [String attrReference = ""]
 
 static_attribute_suffix returns [Term result = null]
 {
-    TermSymbol v = null;
-    Term shadowNumber  = null;
+    Operator v = null;
     String attributeName = "";
 }    
     :   
@@ -2889,8 +2616,7 @@ static_attribute_suffix returns [Term result = null]
             }	
 	       	v = getAttribute(getTypeByClassName(className).getSort(), attributeName); 
 	    }
-        (shadowNumber = transactionNumber)?
-        { result = createAttributeTerm(null, v, shadowNumber); }                   
+        { result = createAttributeTerm(null, v); }                   
  ; exception
         catch [TermCreationException ex] {
               keh.reportException
@@ -2901,26 +2627,21 @@ static_attribute_suffix returns [Term result = null]
 
 attribute_or_query_suffix[Term prefix] returns [Term result = null]
 {
-    TermSymbol v = null;
-    Term shadowNumber = null;
+    Operator v = null;
     result = prefix;
     String attributeName = "";    
 }    
     :   
         DOT 
-        ((IDENT (AT LPAREN simple_ident_dots RPAREN)? LPAREN)=>( result = query[prefix])
-         | 
-            attributeName = attrid 
-            {   
-            	v = getAttribute(prefix.sort(), attributeName);             	
-            }   
-            ( 
-
-                ( shadowNumber = transactionNumber )?
-                {
-                    result = createAttributeTerm(prefix, v, shadowNumber);
-                }        
-            ))
+        ( 
+           (IDENT (AT LPAREN simple_ident_dots RPAREN)? LPAREN)=>( result = query[prefix])
+           | 
+           attributeName = attrid 
+           {   
+              v = getAttribute(prefix.sort(), attributeName);
+	      result = createAttributeTerm(prefix, v);
+           }   
+        )
  ; exception
         catch [TermCreationException ex] {
               keh.reportException
@@ -2931,12 +2652,11 @@ attribute_or_query_suffix[Term prefix] returns [Term result = null]
 query [Term prefix] returns [Term result = null] 
 {
     String classRef = "";
-    Term[] args = null;
-    PairOfTermArrayAndBoundVarsArray argsWithBoundVars = null; 
+    Term[] args = null; 
     boolean brackets = false;
 }
     :
-    mid:IDENT (AT LPAREN classRef = simple_ident_dots (EMPTYBRACKETS {brackets = true;} )? RPAREN)? argsWithBoundVars = argument_list
+    mid:IDENT (AT LPAREN classRef = simple_ident_dots (EMPTYBRACKETS {brackets = true;} )? RPAREN)? args = argument_list
     { 
        if("".equals(classRef)){
           classRef = prefix.sort().name().toString();
@@ -2949,9 +2669,6 @@ query [Term prefix] returns [Term result = null]
               classRef, getFilename(), getLine(), 
               getColumn());
          classRef = kjt.getFullName();
-       }
-       if (argsWithBoundVars != null) {
-         args = argsWithBoundVars.getTerms();
        }
        result = getServices().getJavaInfo().getProgramMethodTerm
                 (prefix, mid.getText(), args, classRef);
@@ -2968,16 +2685,11 @@ static_query returns [Term result = null]
 {
     String queryRef = "";
     Term[] args = null;
-    PairOfTermArrayAndBoundVarsArray argsWithBoundVars = null; 
-    TermSymbol ts = null;
+    Operator ts = null;
 }
     :
-    queryRef =  staticAttributeOrQueryReference argsWithBoundVars = argument_list
+    queryRef =  staticAttributeOrQueryReference args = argument_list
     { 
-       if (argsWithBoundVars != null) {
-         args = argsWithBoundVars.getTerms();
-       }
-
        int index = queryRef.indexOf(':');
        String className = queryRef.substring(0, index); 
        String qname = queryRef.substring(index+2); 
@@ -2990,8 +2702,7 @@ static_query returns [Term result = null]
           KeYJavaType kjt = getServices().getJavaInfo().getKeYJavaType(sort);
           if (kjt == null) {
 		semanticError("Found logic sort for " + className + 
-		 " but no corresponding java type (e.g. int is only " +
-		 " available as logic sort not as java type use (jint, jbyte, jshort etc. instead)");
+		 " but no corresponding java type!");
           }          
        }
 	    
@@ -3013,7 +2724,7 @@ accessterm returns [Term result = null]
       (MINUS ~NUM_LITERAL) => MINUS result = term110
         {
             if (result.sort() != Sort.FORMULA) {
-                result = tf.createFunctionTerm
+                result = tf.createTerm
                 ((Function) functions().lookup(new Name("neg")), result);
             } else {
                 semanticError("Formula cannot be prefixed with '-'");
@@ -3021,16 +2732,19 @@ accessterm returns [Term result = null]
         } 
       |
       (LPAREN any_sortId_check[false] RPAREN term110)=> 
-        LPAREN s = any_sortId_check[true] RPAREN result=term110 {
+        LPAREN s = any_sortId_check[true] RPAREN result=term110 
+        {
+         final Sort objectSort = getServices().getJavaInfo().objectSort();
          if(s==null) {
            semanticError("Tried to cast to unknown type.");
-         } else if ((s instanceof PrimitiveSort) && 
-             (result.sort() instanceof ObjectSort)) {
+         } else if (objectSort != null
+                    && !s.extendsTrans(objectSort) 
+                    && result.sort().extendsTrans(objectSort)) {
                 semanticError("Illegal cast from " + result.sort() + 
                     " to sort " + s +
                     ". Casts between primitive and reference types are not allowed. ");
          }
-         result = tf.createFunctionTerm(((AbstractSort)s).getCastSymbol(), result);
+         result = tf.createTerm(s.getCastSymbol(getServices()), result);
 	  } |
       ( {isStaticQuery()}? // look for package1.package2.Class.query(
         result = static_query
@@ -3051,19 +2765,16 @@ accessterm returns [Term result = null]
 array_access_suffix [Term arrayReference] returns [Term result = arrayReference] 
 {
     Term indexTerm  = null;
-    Term shadowNumber = null;
     Term rangeFrom = null;
     Term rangeTo   = null;     
-    Sort arraySort = null;
-    boolean atPre = false;
 }
 	:
   	LBRACKET 
 	(   STAR {
-           	rangeFrom = toZNotation("0", functions(), tf);
-           	Term lt = createAttributeTerm(result, getAttribute(result.sort(), "length"), null);
-           	Term one = toZNotation("1", functions(), tf);
-  	   		rangeTo = tf.createFunctionTerm
+           	rangeFrom = toZNotation("0", functions());
+           	Term lt = TermBuilder.DF.dotLength(getServices(), arrayReference);
+           	Term one = toZNotation("1", functions());
+  	   		rangeTo = tf.createTerm
            		((Function) functions().lookup(new Name("sub")), lt, one); 
         } 
         | indexTerm = logicTermReEntry 
@@ -3071,34 +2782,7 @@ array_access_suffix [Term arrayReference] returns [Term result = arrayReference]
 		                 {rangeFrom = indexTerm;})?
     )
     RBRACKET 
-    (AT (
-           (LPAREN arraySort = any_sortId_check[true] RPAREN) 
-            | 
-            (id0:IDENT 
-              {
-                if(!id0.getText().equals("pre") || !(functions() instanceof AtPreNamespace)) { 
-                    semanticError("Unexpected: " + id0.getText()); 
-                }
-                atPre = true;
-              }
-            )
-        )
-    )? 
-    ( shadowNumber = transactionNumber )?
-    {
-       if (arraySort == null) {
-       	if ( inSchemaMode() ) {
-          if ( parsingFind ) {
-		semanticError("Array operators occuring in the focus term must be fully qualified"+
-			      " (e.g. a[i]@(int[]).");
-          }
-          arraySort = result.sort(); 
-       	} else {
-       	  arraySort = result.sort();	
-       	}
-       }
-       
-       
+    {       
 	if(rangeTo != null) {
 		if(quantifiedArrayGuard == null) {
 			semanticError(
@@ -3106,33 +2790,15 @@ array_access_suffix [Term arrayReference] returns [Term result = arrayReference]
 		}
 		LogicVariable indexVar = new LogicVariable(new Name("i"), 
 		   	   		   (Sort) sorts().lookup(new Name("int")));
-		indexTerm = tf.createVariableTerm(indexVar);
+		indexTerm = tf.createTerm(indexVar);
 		   	
 		Function leq = (Function) functions().lookup(new Name("leq"));
-		Term fromTerm = tf.createFunctionTerm(leq, rangeFrom, indexTerm);
-		Term toTerm = tf.createFunctionTerm(leq, indexTerm, rangeTo);
-		Term guardTerm = tf.createJunctorTerm(Op.AND, fromTerm, toTerm);
-		quantifiedArrayGuard = tf.createJunctorTermAndSimplify(Op.AND, 
-		   						  quantifiedArrayGuard, 
-		   						  guardTerm);
+		Term fromTerm = tf.createTerm(leq, rangeFrom, indexTerm);
+		Term toTerm = tf.createTerm(leq, indexTerm, rangeTo);
+		Term guardTerm = tf.createTerm(Junctor.AND, fromTerm, toTerm);
+		quantifiedArrayGuard = tf.createTerm(Junctor.AND, quantifiedArrayGuard, guardTerm);
 		}
-        if (shadowNumber != null) {
-            if(atPre) {
-            	semanticError("@pre for shadowed arrays not supported");
-            } else {
-                result = tf.createShadowArrayTerm
-                      (ShadowArrayOp.getShadowArrayOp(arraySort), result, indexTerm, 
-                       shadowNumber);
-            }
-        } else {
-            final ArrayOp aop = ArrayOp.getArrayOp(arraySort);
-            if(atPre) {
-                Function aopAtPre = ((AtPreNamespace)functions()).getArrayOpAtPre(aop);
-                result = tf.createFunctionTerm(aopAtPre, result, indexTerm);
-            } else {
-                result = tf.createArrayTerm(aop, result, indexTerm);
-            }
-        }  
+            result = TermBuilder.DF.dotArr(getServices(), result, indexTerm); 
     }            
     ;exception
         catch [TermCreationException ex] {
@@ -3150,181 +2816,21 @@ term130 returns [Term a = null]
         {isMetaOperator()}? a = specialTerm
     |   a = funcpredvarterm
     |   LPAREN a = term RPAREN 
-    |   "true"  { a = tf.createJunctorTerm(Op.TRUE); }
-    |   "false" { a = tf.createJunctorTerm(Op.FALSE); }
+    |   TRUE  { a = tf.createTerm(Junctor.TRUE); }
+    |   FALSE { a = tf.createTerm(Junctor.FALSE); }
     |   a = ifThenElseTerm
-    |   a = ifExThenElseTerm
-    |   a = workingspaceterm
-    |   a = workingspacenonrigidterm
-    |   a = sum_or_product_term
-    |   a = bounded_sum_term
-    //Used for OCL Simplification.
-    //WATCHOUT: Woj: some time we will need to have support for strings in Java DL too,
-    // what then? This here is specific to OCL, isn't it?
+    |   a = ifExThenElseTerm    
     |   literal:STRING_LITERAL
         {
-           /* OCL simplification currently deactivated
-            String s = literal.getText(); 
-            Name name = new Name(s);
-            TermSymbol stringLit = (TermSymbol)functions().lookup(name);
-            if (stringLit == null) {
-                stringLit = new RigidFunction(name, 
-                        OclSort.STRING, new Sort[0]);
-                addFunction((Function)stringLit);
-            }
-            a = tf.createFunctionTerm(stringLit);
-            */
-            
             a = getServices().getTypeConverter().convertToLogicElement(new de.uka.ilkd.key.java.expression.literal.StringLiteral(literal.getText()));
-        }
-   ; exception
+        }   
+    ; exception
         catch [TermCreationException ex] {
               keh.reportException
 		(new KeYSemanticException
 			(ex.getMessage(), getFilename(), getLine(), getColumn()));
         }
 
-workingspaceterm returns [Term a=null]
-{
-    Sort s1,s2;
-    ImmutableList<KeYJavaType> sig = ImmutableSLList.<KeYJavaType>nil();
-    ImmutableList<Term> args = ImmutableSLList.<Term>nil();
-    KeYJavaType classType = null;
-    String methodName;
-    Term self=null;
-    Term pre;
-    HashSet progVars = new HashSet();
-    int argCount = 0;
-    ProgramMethod pm = null;
-}
-    :
-        WORKINGSPACE LBRACE 
-        
-        s2=any_sortId_check[true] (id0:IDENT)?
-        {
-        	LocationVariable selfVar = new LocationVariable(new ProgramElementName(id0.getText()), 
-            	getJavaInfo().getKeYJavaType(s2));
-        	progVars.add(selfVar);
-        	self = tf.createVariableTerm(selfVar);
-        }
-        RBRACE s1=any_sortId_check[true] 
-        {
-            classType = getJavaInfo().getKeYJavaType(s1);
-        }
-        DOUBLECOLON
-        methodName=simple_ident
-        LPAREN
-        (
-            s2=any_sortId_check[true] (id1:IDENT)?
-            {
-            	ProgramVariable p = new LocationVariable(new ProgramElementName(id1.getText()), 
-                  	getJavaInfo().getKeYJavaType(s2));
-                progVars.add(p);
-                args = args.append(tf.createVariableTerm(p));
-            }
-            (
-                COMMA
-                s2=any_sortId_check[true] (id2:IDENT)?
-                {
-	               	ProgramVariable p = new LocationVariable(new ProgramElementName(id2.getText()), 
-    	              	getJavaInfo().getKeYJavaType(s2));
-        	        progVars.add(p);
-            	    args = args.append(tf.createVariableTerm(p));
-                }
-            )*
-        )?
-        RPAREN
-        {
-            bindProgVars(progVars);
-        }
-        RBRACE
-        LBRACE pre=term RBRACE
-        {
-            unbindProgVars();
-            Term[] argTerms = args.toArray(AN_ARRAY_OF_TERMS);
-            Term methodTerm = getServices().getJavaInfo().getProgramMethodTerm
-                (null, methodName, argTerms, classType.getSort().toString());
-            WorkingSpaceRigidOp op = (WorkingSpaceRigidOp) functions().lookup(
-                new Name(WorkingSpaceRigidOp.makeName(methodTerm, pre, getServices())));
-            if(op==null){
-                a = tf.createWorkingSpaceTerm(methodTerm, pre, (Sort) sorts().lookup(
-                        new Name("int")), getServices());
-                functions().add(a.op());
-            }else{
-                a = tf.createWorkingSpaceTerm(op);
-            }
-        }
-    ;
-
-workingspacenonrigidterm returns [Term a=null]
-{
-    Sort s1,s2;
-    ImmutableList<KeYJavaType> sig = ImmutableSLList.<KeYJavaType>nil();
-    ImmutableList<Term> args = ImmutableSLList.<Term>nil();
-    KeYJavaType classType = null;
-    String methodName,s;
-    Term pre, t1, t2;
-    HashSet progVars = new HashSet();
-    int argCount = 0;
-    ProgramMethod pm = null;
-    String pvr = "{";
-    WorkingSpaceNonRigidOp op=null;
-}
-    :
-        WORKINGSPACENONRIGID LBRACE s1=any_sortId_check[true] 
-        {
-            classType = getJavaInfo().getKeYJavaType(s1);
-        }
-        DOUBLECOLON
-        methodName=simple_ident
-        RBRACE
-        LPAREN
-        (
-            s2=any_sortId_check[true] (id:IDENT)?
-            {
-                sig = sig.append(getJavaInfo().getKeYJavaType(s2));
-            }
-            (
-                COMMA
-                s2=any_sortId_check[true] (id2:IDENT)?
-                {
-                    sig = sig.append(getJavaInfo().getKeYJavaType(s2));
-                }
-            )*
-        )?
-        RPAREN
-        {
-            pm = getJavaInfo().getProgramMethod(classType,
-                methodName, sig, classType);
-            op = (WorkingSpaceNonRigidOp) functions().lookup(
-                    new Name(WorkingSpaceNonRigidOp.makeName(pm)));
-            System.out.println(op);
-        }
-        LPAREN
-        (
-            t1=term130
-            {
-                args = args.append(t1);
-            }
-            (
-                COMMA
-               	t1=term130
-            	{
-                	args = args.append(t1);
-            	}
-            )*
-        )?
-        RPAREN
-        {
-        	Term[] argArray = args.toArray(AN_ARRAY_OF_TERMS);
-        	if(op!=null){
-        		a = tf.createWorkingSpaceNonRigidTerm(op, argArray);
-        	}else{
-        		a = tf.createWorkingSpaceNonRigidTerm(pm, (Sort) sorts().lookup(
-                        new Name("int")), argArray);
-        	}
-        }
-    ;
 
 abbreviation returns [Term a=null]
 { 
@@ -3343,52 +2849,6 @@ abbreviation returns [Term a=null]
         )
     ;
 
-sum_or_product_term returns [Term result=null]
-{
-    Term cond, t;
-    NumericalQuantifier op=null;
-    ImmutableList<QuantifiableVariable> index = null;   
-}
-    :
-        (
-            SUM {op = Op.SUM;}
-        |
-            PRODUCT {op = Op.PRODUCT;}
-        )
-        index=bound_variables
-        LPAREN
-        cond=term 
-        SEMI t=term 
-        {
-            unbindVars();
-            result = tf.createNumericalQuantifierTerm(op, cond, t, 
-                new ImmutableArray<QuantifiableVariable>(index.toArray(new QuantifiableVariable[index.size()])));
-        }
-        RPAREN
-    ;
-    
-bounded_sum_term returns [Term result=null]
-{
-    Term a, b, t;
-    BoundedNumericalQuantifier op=null;
-    ImmutableList<QuantifiableVariable> index = null;   
-}
-    :
-        BSUM {op = Op.BSUM;}
-        index=bound_variables
-        LPAREN
-        a=term 
-        SEMI
-        b=term 
-        SEMI
-        t=term 
-        {
-            unbindVars();
-            result = tf.createBoundedNumericalQuantifierTerm(op, a, b, t, 
-                new ImmutableArray<QuantifiableVariable>(index.toArray(new QuantifiableVariable[index.size()])));
-        }
-        RPAREN
-    ;
 
 ifThenElseTerm returns [Term result = null]
 {
@@ -3405,7 +2865,7 @@ ifThenElseTerm returns [Term result = null]
         THEN LPAREN thenT = term RPAREN
         ELSE LPAREN elseT = term RPAREN
         {
-            result = tf.createIfThenElseTerm ( condF, thenT, elseT );
+            result = tf.createTerm ( IfThenElse.IF_THEN_ELSE, new Term[]{condF, thenT, elseT} );
         }
  ; exception
         catch [TermCreationException ex] {
@@ -3413,123 +2873,104 @@ ifThenElseTerm returns [Term result = null]
 		(new KeYSemanticException
 			(ex.getMessage(), getFilename(), getLine(), getColumn()));
         }
-
+        
+        
 ifExThenElseTerm returns [Term result = null]
 {
+    ImmutableList<QuantifiableVariable> exVars 
+    	= ImmutableSLList.<QuantifiableVariable>nil();
     Term condF, thenT, elseT;
-    ImmutableList<QuantifiableVariable> exVars = ImmutableSLList.<QuantifiableVariable>nil();
-    ImmutableArray<QuantifiableVariable> exVarsAr = null;
+    Namespace orig = variables();
 }
     :
         IFEX exVars = bound_variables
-               {
-                    exVarsAr = new ImmutableArray<QuantifiableVariable>
-                                           ( exVars.toArray (new QuantifiableVariable[exVars.size()]) );
-               }
         LPAREN condF = term RPAREN
         {
             if (condF.sort() != Sort.FORMULA) {
                 semanticError
-		  ("Condition of an \\if-then-else term has to be a formula.");
+		  ("Condition of an \\ifEx-then-else term has to be a formula.");
             }
         }
         THEN LPAREN thenT = term RPAREN
-        {
-            while ( !exVars.isEmpty () ) {
-                if(!isGlobalDeclTermParser())
-                    unbindVars ();
-                exVars = exVars.tail ();
-            }
-        }
         ELSE LPAREN elseT = term RPAREN
         {
-            result = tf.createIfExThenElseTerm ( exVarsAr, condF, thenT, elseT );
+            ImmutableArray<QuantifiableVariable> exVarsArray
+            	= new ImmutableArray<QuantifiableVariable>( 
+            	     exVars.toArray(new QuantifiableVariable[exVars.size()]));
+            result = tf.createTerm ( IfExThenElse.IF_EX_THEN_ELSE,  
+                                     new Term[]{condF, thenT, elseT}, 
+                                     exVarsArray, 
+                                     null );
+            if(!isGlobalDeclTermParser()) {
+                unbindVars(orig);
+            }
         }
  ; exception
         catch [TermCreationException ex] {
               keh.reportException
 		(new KeYSemanticException
 			(ex.getMessage(), getFilename(), getLine(), getColumn()));
-        }
+        }        
 
 
-//"TermWithBoundVars" is used here instead of "Term" to allow for
-//syntax needed for OCL simplification.
-
-argument returns [TermWithBoundVars p = null]
+argument returns [Term result = null]
 {
     ImmutableArray<QuantifiableVariable> vars = null;
     Term a;
 }
 :
- (vars = ocl_bound_variables)? 
  (
    // WATCHOUT Woj: can (should) this be unified to term60?
    {isTermParser() || isGlobalDeclTermParser()}? 
-     a = term 
+     result = term 
   |  
-     a = term60 
+     result = term60 
  )
- {
-   p = new TermWithBoundVars(vars, a);
-    if(vars != null && !isGlobalDeclTermParser() )
-       unbindVars();
- }
  ;
   
-ocl_bound_variables returns [ImmutableArray<QuantifiableVariable> vars = null] 
-{
-   ImmutableList<QuantifiableVariable> vs = null;
-}
-:
-  BIND vs = bound_variables {
-     vars = new ImmutableArray<QuantifiableVariable>(vs.toArray(new QuantifiableVariable[vs.size()]));
-  }
- ;
 
 quantifierterm returns [Term a = null]
 {
     Operator op = null;
     ImmutableList<QuantifiableVariable> vs = null;
     Term a1 = null;
+    Namespace orig = variables();  
 }
 :
-        (   FORALL { op = Op.ALL; }
-          | EXISTS  { op = Op.EX;  })
+        (   FORALL { op = Quantifier.ALL; }
+          | EXISTS  { op = Quantifier.EX;  })
         vs = bound_variables a1 = term60
         {
-            a = tf.createQuantifierTerm((Quantifier)op,
-	       new ImmutableArray<QuantifiableVariable>(vs.toArray(new QuantifiableVariable[vs.size()])),a1);
+            a = tf.createTerm((Quantifier)op,
+                              new ImmutableArray<Term>(a1),
+	       		      new ImmutableArray<QuantifiableVariable>(vs.toArray(new QuantifiableVariable[vs.size()])),
+	       		      null);
             if(!isGlobalDeclTermParser())
-              unbindVars();
+              unbindVars(orig);
         }
 ;
 
 //term120_2
 update_or_substitution returns [Term result = null]
 :
-      (LBRACE SUBST) => 
-	 result = substitutionterm
-      |  (
-           {isGlobalDeclTermParser()}? result = simple_updateterm
-	 |
-           result = updateterm
-       )
+      (LBRACE SUBST) => result = substitutionterm
+      |  result = updateterm
     ; 
 
 substitutionterm returns [Term result = null] 
 {
   QuantifiableVariable v = null;
-  SubstOp op = Op.SUBST;
+  SubstOp op = WarySubstOp.SUBST;
   Term a1 = null;
   Term a2 = null;
+   Namespace orig = variables();  
 }
 :
    LBRACE SUBST
      v = one_bound_variable SEMI
      { // Tricky part, v cannot be bound while parsing a1
        if(!isGlobalDeclTermParser())
-          unbindVars();
+          unbindVars(orig);
      }
      a1=logicTermReEntry
      { // The rest of the tricky part, bind it again
@@ -3541,9 +2982,9 @@ substitutionterm returns [Term result = null]
      }
    RBRACE
    ( a2 = term110 | a2 = unary_formula ) {
-      result = tf.createSubstitutionTerm ( op, v, a1, a2 );
+      result = TermBuilder.DF.subst ( op, v, a1, a2 );
       if(!isGlobalDeclTermParser())
-        unbindVars();
+        unbindVars(orig);
    }
 ; exception
         catch [TermCreationException ex] {
@@ -3552,122 +2993,38 @@ substitutionterm returns [Term result = null]
 			(ex.getMessage(), getFilename(), getLine(), getColumn()));
         }
 
-simple_updateterm returns [Term a = null]
-{
-  ParsableVariable v;
-  Term a1, a2;
-}
-:
-  LBRACE v = varId ASSIGN a1=term RBRACE ( a2 = term110 | a2 = unary_formula )
-  { 
-	a = tf.createUpdateTerm ( tf.createVariableTerm ( (ProgramVariable) v ), a1, a2 );
-  }
-;
 
 updateterm returns [Term result = null] 
-{ 
-    SingleUpdateData sud = null;
-    List locations = new LinkedList();
-    List values    = new LinkedList();
-    List guards    = new LinkedList();
-    List boundVars = new LinkedList();
+{
+    Term u = null; 
     Term a2 = null;
 } :
-        LBRACE ((STAR ASSIGN)=> 
-          (STAR ASSIGN STAR
-             num:NUM_LITERAL RBRACE ( a2 = term110 | a2 = unary_formula ) {
-                return tf.createAnonymousUpdateTerm
-                   (new Name("*:=*"+num.getText()), a2);
-             }                  
-          )	  
-          | 
-          (sud = singleupdate {
-            locations.add(sud.a0); 
-            values.add(sud.a1); 
-            guards.add(sud.guard);
-            boundVars.add(sud.boundVars);
-          } (  ( COMMA {  
-                 	System.err.println(getFilename() + "(" + getLine() + 
-                 	", " + getColumn() + "): " + "The comma ',' " + 
-                 	"for parallel composition of updates is deprecated and " + 
-                 	"will be skipped in future. Please use '||' instead.");
-                 } | PARALLEL)
-                 
-                sud = singleupdate {
-                locations.add(sud.a0); 
-                values.add(sud.a1); 
-                guards.add(sud.guard);
-                boundVars.add(sud.boundVars);
-          })*) RBRACE ( a2 = term110 | a2 = unary_formula )
+        LBRACE u=term RBRACE 
+        ( 
+            a2=term110 
+            | 
+            a2=unary_formula 
+        )
         {   
-
-            result = tf.createQuanUpdateTerm
-		((ImmutableArray<QuantifiableVariable>[])boundVars.toArray
-                     (new ImmutableArray/*<QuantifiableVariable>*/[boundVars.size()]),
-		 (Term[])guards.toArray(new Term[guards.size()]),
-		 (Term[])locations.toArray(new Term[locations.size()]),
-		 (Term[])values.toArray(new Term[values.size()]),
-		  a2);
-        })
+	    result = tf.createTerm(UpdateApplication.UPDATE_APPLICATION, u, a2);
+        }
    ; exception
         catch [TermCreationException ex] {
               keh.reportException
 		(new KeYSemanticException
 			(ex.getMessage(), getFilename(), getLine(), getColumn()));
-        }
-
-singleupdate returns[SingleUpdateData sud=null]
-{
-    Term a0 = null;
-    Term a1 = null;
-    Term phi = null;
-    ImmutableList<QuantifiableVariable> boundVars = ImmutableSLList.<QuantifiableVariable>nil();
-    sud = new SingleUpdateData();
-}  :
-        (
-            FOR boundVars = bound_variables
-                   {
-                        sud.boundVars = new ImmutableArray<QuantifiableVariable>
-                                               ( boundVars.toArray (new QuantifiableVariable[boundVars.size()]) );
-                   }
-        ) ?
-        (
-            (IF) => (
-                IF
-                LPAREN
-                phi=term
-                {
-                    if (phi.sort() != Sort.FORMULA) {
-                      semanticError("Guard of an update has to be a formula.");
-                    }
-                    sud.guard = phi;
-                }
-                RPAREN
-            ) | (
-                // nothing
-            )
-        )
-        (a0 = lhsSingle ) ASSIGN (a1 = rhsSingle) {
-            sud.a0 = a0;
-            sud.a1 = a1;
-            while ( !boundVars.isEmpty () ) {
-                unbindVars ();
-                boundVars = boundVars.tail ();
-            }
-        }
-    ;
-   
+        }           
+        
 bound_variables returns[ImmutableList<QuantifiableVariable> list = ImmutableSLList.<QuantifiableVariable>nil()]
 {
   QuantifiableVariable var = null;
 }
 :
-      LPAREN
-        var = one_bound_variable { list = list.append(var); }
-       (SEMI var = one_bound_variable { list = list.append(var); })*
-      RPAREN
-   | var = one_bound_variable { list = list.append(var); } SEMI 
-     
+      var = one_bound_variable { list = list.append(var); }
+      (
+          COMMA var = one_bound_variable { list = list.append(var); }
+      )*
+      SEMI
 ;
 
 one_bound_variable returns[QuantifiableVariable v=null]
@@ -3682,20 +3039,15 @@ one_bound_variable returns[QuantifiableVariable v=null]
 one_schema_bound_variable returns[QuantifiableVariable v=null]
 {
   String id = null;
-  TermSymbol ts = null;
+  Operator ts = null;
 }
 :
    id = simple_ident {
-      ts = (TermSymbol) variables().lookup(new Name(id));   
-      // It is my belief (Woj) that this check is obsolete
-      // if ( ts == null || ts instanceof LogicVariable ) {
-      //  throw new KeYSemanticException("Quantified variables need a sort.", 
-      //          getFilename(), getLine(), getColumn());
-      // }
-      if ( ! (ts instanceof SchemaVariable && ((SchemaVariable)ts).isVariableSV())) {
+      ts = (Operator) variables().lookup(new Name(id));   
+      if ( ! (ts instanceof VariableSV)) {
         semanticError(ts+" is not allowed in a quantifier.");
       }
-      v = (SortedSchemaVariable) ts;
+      v = (QuantifiableVariable) ts;
       bindVar();
    }
 ;
@@ -3721,28 +3073,10 @@ one_logic_bound_variable_nosort returns[QuantifiableVariable v=null]
   }
 ;
 
-rhsSingle returns[Term result = null]
-{} :
-        result = logicTermReEntry
-    ;
-
-lhsSingle returns[Term result = null]
- :
-        result = logicTermReEntry
-        { 
-            if (!(result.sort() instanceof ProgramSVSort ||
-                  result.op() instanceof de.uka.ilkd.key.logic.op.Location))  {
-                semanticError("Only locations can be updated, but " + 
-                	result.op() + " is no location, but a " + 
-                	result.op().getClass().getName());
-            }
-        }
-    ;
-
 modality_dl_term returns [Term a = null]
 {
     Term a1;
-    PairOfTermArrayAndBoundVarsArray argsWithBoundVars = null;
+    Term[] args = null;
     Term[] terms = null;
     Operator op = null;
     PairOfStringAndJavaBlock sjb = null;
@@ -3760,12 +3094,11 @@ modality_dl_term returns [Term a = null]
          }
          op = (SchemaVariable)variables().lookup(new Name(sjb.opName));
        } else {
-         op = Op.getModality(sjb.opName);
+         op = Modality.getModality(sjb.opName);
        }
        if(op == null) {
          semanticError("Unknown modal operator: "+sjb.opName);
        }
-       bindProgVars(progVars(sjb.javaBlock));
      }
    // CAREFUL here, op can be null during guessing stage (use lazy &&)
    ({op != null && op.arity() == 1}? a1=term60
@@ -3774,22 +3107,7 @@ modality_dl_term returns [Term a = null]
      // so that it is consistent with pretty printer that prints (1).
      // A term "(post)" seems to be parsed as "post" anyway
       {
-            a = tf.createProgramTerm(op, sjb.javaBlock, new Term[]{a1});
-            unbindProgVars();
-      }
-    |
-    argsWithBoundVars = argument_list
-      {
-        Debug.fail("We don't have modalities with arity > 1, so this should not	be executed.");
-        unbindProgVars();
-        if (argsWithBoundVars != null) {
-          terms = argsWithBoundVars.getTerms();
-        }
-        if(op.arity() != terms.length) {
-            semanticError("The arity of " + op.name() +
-                " is "+op.arity() + ", but you provided " + terms.length + " arguments");
-        }
-        a = tf.createProgramTerm(op, sjb.javaBlock, terms);
+            a = tf.createTerm(op, new Term[]{a1}, null, sjb.javaBlock);
       }
    )
    ; exception
@@ -3799,12 +3117,11 @@ modality_dl_term returns [Term a = null]
 			(ex.getMessage(), getFilename(), getLine(), getColumn()));
         }
 
-//"PairOfTermArrayAndBoundVarsArray" is used here instead of "Term" to allow for
-//syntax needed for OCL simplification.
-argument_list returns [PairOfTermArrayAndBoundVarsArray ts = null]
+
+argument_list returns [Term[] result = null]
 {
-    List args = new LinkedList();
-    TermWithBoundVars p1, p2;
+    List<Term> args = new LinkedList<Term>();
+    Term p1, p2;
 }
     :
         LPAREN 
@@ -3814,21 +3131,22 @@ argument_list returns [PairOfTermArrayAndBoundVarsArray ts = null]
 
         RPAREN
         {
-            ts = new PairOfTermArrayAndBoundVarsArray(args);
+            result = args.toArray(new Term[0]);
         }
 
     ;
 
 funcpredvarterm returns [Term a = null]
 {
-    List dependencyListList = null;
-    PairOfTermArrayAndBoundVarsArray argsWithBoundVars = null;
+    ImmutableList<QuantifiableVariable> boundVars = null;
+    Term[] args = null;
     String varfuncid;
     String neg = "";
     boolean opSV = false;
+    Namespace orig = variables();  
 }
     :
-        ch:CHAR_LITERAL {
+      ch:CHAR_LITERAL {
             String s = ch.getText();
             int intVal = 0;
             if (s.length()==3) {
@@ -3840,41 +3158,68 @@ funcpredvarterm returns [Term a = null]
                     semanticError("'"+s+"' is not a valid character.");
                 }       
             }
-            a = tf.createFunctionTerm((Function) functions().lookup(new Name("C")), 
-                                      toZNotation(""+intVal, functions(), tf).sub(0));
+            a = tf.createTerm((Function) functions().lookup(new Name("C")), 
+                                      toZNotation(""+intVal, functions()).sub(0));
         }
     | 
         ((MINUS)? NUM_LITERAL) => (MINUS {neg = "-";})? number:NUM_LITERAL
-        { a = toZNotation(neg+number.getText(), functions(), tf);}    
+        { a = toZNotation(neg+number.getText(), functions());}    
     | AT a = abbreviation
-    | varfuncid = funcpred_name 
-        (   (LBRACKET dependency_list_list RBRACKET) =>
+    | varfuncid = funcpred_name
+        (
             (
-                LBRACKET
-                dependencyListList = dependency_list_list
-                RBRACKET
-                {
-                    varfuncid
-                        = KeYParser.createDependencyName(varfuncid,
-                                                         dependencyListList);
-                }
+               LBRACE 
+               boundVars = bound_variables 
+               RBRACE 
+               args = argument_list
             )
-        )?
-	((LPAREN)=>argsWithBoundVars = argument_list)? 
-        //argsWithBoundVars==null indicates no argument list
-        //argsWithBoundVars.size()==0 indicates open-close-parens ()
+            |
+            args = argument_list
+        )?     
+        
+        //args==null indicates no argument list
+        //args.size()==0 indicates open-close-parens ()
+                
         {  
-            Operator op = lookupVarfuncId(varfuncid, argsWithBoundVars);            
-            if (op instanceof ParsableVariable) {
-                a = termForParsedVariable((ParsableVariable)op);
-            } else  if (op instanceof TermSymbol) {
-                if (argsWithBoundVars==null) {
-                    argsWithBoundVars = new PairOfTermArrayAndBoundVarsArray(new LinkedList());
-                }
-
-                a = tf.createFunctionWithBoundVarsTerm((TermSymbol)op, argsWithBoundVars);
-
-            }
+            if(varfuncid.equals("inReachableState") && args == null) {
+	        a = TermBuilder.DF.wellFormedHeap(getServices());
+	    } else if(varfuncid.equals("skip") && args == null) {
+	        a = tf.createTerm(UpdateJunctor.SKIP);
+	    } else {
+	            Operator op = lookupVarfuncId(varfuncid, args);     
+	                   
+	            if (op instanceof ParsableVariable) {
+	                a = termForParsedVariable((ParsableVariable)op);
+	            } else {
+	                if (args==null) {
+	                    args = new Term[0];
+	                }
+	
+	                if(boundVars == null) {
+	                    a = tf.createTerm(op, args);
+	                } else {
+	                    //sanity check
+	                    assert op instanceof Function;
+	                    for(int i = 0; i < args.length; i++) {
+	                        if(i < op.arity() && !op.bindVarsAt(i)) {
+	                            for(QuantifiableVariable qv : args[i].freeVars()) {
+	                                if(boundVars.contains(qv)) {
+	                                    semanticError("Building a function term with bound variables failed: "
+	                                                   + "Variable " + qv + " must not occur free in subterm " + i);
+	                                } 
+	                            }	                            
+	                        }
+	                    }
+	                    
+	                    //create term
+	                    a = tf.createTerm(op, args, new ImmutableArray<QuantifiableVariable>(boundVars.toArray(new QuantifiableVariable[boundVars.size()])), null);
+	                }
+	            }
+	    }
+	    
+	    if(boundVars != null) {
+	        unbindVars(orig);
+	    }
         }
 ; exception
         catch [TermCreationException ex] {
@@ -3887,11 +3232,6 @@ specialTerm returns [Term result = null]
 {
     Operator vf = null;
 }:
-        vf = expr_op 
-            {   
-                result = tf.createFunctionTerm((Function)vf, AN_ARRAY_OF_TERMS);
-            }                 
-     | 
      {isTacletParser() || isProblemParser()}?
        result = metaTerm
    ; exception
@@ -3910,56 +3250,6 @@ arith_op returns [String op = null]
   | PLUS { op = "+";}
 ;
 
-expr_op returns [Operator v = null] 
-{
-    ParsableVariable left_var0 = null;
-    ParsableVariable right_var0 = null;
-    ParsableVariable unary_var0 = null;
-    String op_str = null;
-}   
-    :
-
-        IN_TYPE LPAREN (
-	    (left_var0=varId (op_str = arith_op right_var0 = varId)?)
-	  |
-            ( MINUS unary_var0 = varId) 
-        ) RPAREN
-        {  
-            if (unary_var0!=null) {
-                // can only be unary minus
-                ProgramSV unary_var = (ProgramSV) unary_var0;
-                Sort type = de.uka.ilkd.key.logic.sort.Sort.FORMULA;
-                return new InTypeOperator
-                    (type, new de.uka.ilkd.key.java.expression.operator.Negative(unary_var));
-            }
-            else {
-                ProgramSV left_var = (ProgramSV) left_var0;
-                Sort type = de.uka.ilkd.key.logic.sort.Sort.FORMULA;
-                if (right_var0 != null) {
-                    ProgramSV right_var = (ProgramSV) right_var0;
-                    if ("+".equals(op_str)) {
-                        return new InTypeOperator
-                            (type, new de.uka.ilkd.key.java.expression.operator.Plus(left_var, right_var));
-                    } else if ("-".equals(op_str)) {
-                        return new InTypeOperator
-                            (type, new de.uka.ilkd.key.java.expression.operator.Minus(left_var, right_var));
-                    } else if ("*".equals(op_str)) {
-                        return new InTypeOperator
-                            (type, new de.uka.ilkd.key.java.expression.operator.Times(left_var, right_var));
-                    } else if ("/".equals(op_str)) {
-                        return new InTypeOperator
-                            (type, new de.uka.ilkd.key.java.expression.operator.Divide(left_var, right_var));
-                    } else if ("%".equals(op_str)) {
-                        return new InTypeOperator
-                            (type, new de.uka.ilkd.key.java.expression.operator.Modulo(left_var, right_var));
-                    } 
-                }
-                else {
-                    return new InTypeOperator(type, left_var);
-                }
-            }
-        }
-    ;
 
 varId returns [ParsableVariable v = null]
     :
@@ -4009,7 +3299,7 @@ taclet[ImmutableSet<Choice> choices] returns [Taclet r]
         } 
 	( SCHEMAVAR one_schema_var_decl ) *
         ( ASSUMES LPAREN ifSeq=seq RPAREN ) ?
-        ( FIND {parsingFind = true; } LPAREN find = termorseq RPAREN {parsingFind = false;}
+        ( FIND LPAREN find = termorseq RPAREN 
             ( SAMEUPDATELEVEL { stateRestriction = RewriteTaclet.SAME_UPDATE_LEVEL; } |
               INSEQUENTSTATE { stateRestriction = RewriteTaclet.IN_SEQUENT_STATE; } 
             ) ? ) ?
@@ -4050,8 +3340,6 @@ modifiers[TacletBuilder b]
             }       
         | DISPLAYNAME dname = string_literal 
             {b.setDisplayName(dname);}
-        | OLDNAME oname = string_literal 
-            {b.addOldName(oname);}
         | HELPTEXT htext = string_literal
             {b.setHelpText(htext);}
         ) *
@@ -4063,10 +3351,13 @@ seq returns [Sequent s] {Semisequent ant,suc; s = null; } :
     ;
 exception
      catch [RuntimeException ex] {
-         keh.reportException
-  	    (new KeYSemanticException
-			(ex.getMessage(), getFilename(), getLine(), getColumn()));
+         KeYSemanticException betterEx = 
+         
+  	 new KeYSemanticException(ex.getMessage(), getFilename(), getLine(), getColumn());
+	 betterEx.setStackTrace(ex.getStackTrace());	
+	 keh.reportException(betterEx);			
      }
+     
 termorseq returns [Object o]
 {
     Term head = null;
@@ -4105,22 +3396,13 @@ termorseq returns [Object o]
 
 semisequent returns [Semisequent ss]
 { 
-    Term head = null, t=null;
-    ss = Semisequent.EMPTY_SEMISEQUENT;
-    ImmutableList<ConstrainedFormula> terms = ImmutableSLList.<ConstrainedFormula>nil();
+    Term head = null;
+    ss = Semisequent.EMPTY_SEMISEQUENT; 
 }
     :
         /* empty */ | 
-        head=term 
-        {terms = terms.append(new ConstrainedFormula(head, Constraint.BOTTOM));} 
-        ( 
-        	COMMA t=term 
-        	{
-        		terms = terms.append(new ConstrainedFormula(t, Constraint.BOTTOM));
-        	}
-        )*
-        { ss = ss.insert(0, terms).semisequent(); }
-    //    { ss = ss.insertFirst(new ConstrainedFormula(head, Constraint.BOTTOM)).semisequent(); }
+        head=term ( COMMA ss=semisequent ) ? 
+        { ss = ss.insertFirst(new ConstrainedFormula(head, Constraint.BOTTOM)).semisequent(); }
     ;
 
 varexplist[TacletBuilder b] : varexp[b] ( COMMA varexp[b] ) * ;
@@ -4130,56 +3412,115 @@ varexp[TacletBuilder b]
   boolean negated = false;
 }
 :
-  (   varcond_new[b]  | varcond_newlabel[b]
-    | varcond_free[b] | varcond_literal[b]
-    | varcond_hassort[b] | varcond_query[b]
-    | varcond_non_implicit[b] | varcond_non_implicit_query[b]
-    | varcond_enum_const[b]
-    | varcond_inReachableState[b] 
-    | varcond_equal_ws_op[b]
-    | varcond_ws_non_rigid_op[b]
-    | varcond_ws_op[b]
-    | varcond_isupdated[b]    
-    | varcond_sameheapdeppred[b]
+  ( varcond_applyUpdateOnRigid[b]
+    | varcond_dropEffectlessElementaries[b]
+    | varcond_dropEffectlessStores[b]  
+    | varcond_enum_const[b] 
+    | varcond_free[b]  
+    | varcond_hassort[b]
+    | varcond_equalUnique[b]
+    | varcond_new[b]
+    | varcond_newlabel[b] 
+    | varcond_observer[b]
+    | varcond_different[b]
+    | varcond_metadisjoint[b]
   ) 
   | 
   ( (NOT {negated = true;} )? 
-      ( varcond_reference[b, negated] 
-      | varcond_enumtype[b, negated]
-      | varcond_staticmethod[b,negated]  
-      | varcond_referencearray[b, negated]
-      | varcond_array[b, negated]
-      | varcond_memory_area[b, negated]
-      | varcond_parent_scope[b, negated]
-      | varcond_scope_stack[b, negated]
-      | varcond_abstractOrInterface[b, negated]
-      | varcond_interface[b, negated]
-      | varcond_static[b,negated] 
-      | varcond_typecheck[b, negated]
-      | varcond_localvariable[b, negated]
-      | varcond_freeLabelIn[b,negated] )
+      (   varcond_abstractOrInterface[b, negated]
+	| varcond_array[b, negated]
+        | varcond_array_length[b, negated]	
+        | varcond_enumtype[b, negated]
+        | varcond_freeLabelIn[b,negated]         
+        | varcond_localvariable[b, negated]        
+        | varcond_reference[b, negated]        
+        | varcond_referencearray[b, negated]
+        | varcond_static[b,negated]
+        | varcond_staticmethod[b,negated]  
+        | varcond_typecheck[b, negated]
+      )
   )
+;
+
+
+varcond_applyUpdateOnRigid [TacletBuilder b]
+{
+  ParsableVariable u = null;
+  ParsableVariable x = null;
+  ParsableVariable x2 = null;
+}
+:
+   APPLY_UPDATE_ON_RIGID LPAREN u=varId COMMA x=varId COMMA x2=varId RPAREN 
+   {
+      b.addVariableCondition(new ApplyUpdateOnRigidCondition((UpdateSV)u, 
+                                                             (SchemaVariable)x, 
+                                                             (SchemaVariable)x2));
+   }
+;
+
+varcond_dropEffectlessElementaries[TacletBuilder b]
+{
+  ParsableVariable u = null;
+  ParsableVariable x = null;
+  ParsableVariable result = null;
+}
+:
+   DROP_EFFECTLESS_ELEMENTARIES LPAREN u=varId COMMA x=varId COMMA result=varId RPAREN 
+   {
+      b.addVariableCondition(new DropEffectlessElementariesCondition((UpdateSV)u, 
+                                                                     (SchemaVariable)x, 
+                                                                     (SchemaVariable)result));
+   }
+;
+
+varcond_dropEffectlessStores[TacletBuilder b]
+{
+  ParsableVariable h = null;
+  ParsableVariable o = null;
+  ParsableVariable f = null;
+  ParsableVariable x = null;
+  ParsableVariable result = null;
+}
+:
+   DROP_EFFECTLESS_STORES LPAREN h=varId COMMA o=varId COMMA f=varId COMMA x=varId COMMA result=varId RPAREN 
+   {
+      b.addVariableCondition(new DropEffectlessStoresCondition((TermSV)h,
+      							       (TermSV)o,
+      							       (TermSV)f,
+      							       (TermSV)x, 
+                                                               (TermSV)result));
+   }
 ;
 
 type_resolver returns [TypeResolver tr = null] 
 {
     Sort s = null;
     ParsableVariable y = null;
+    ParsableVariable z = null;
 } :
-    s = any_sortId_check[true]      
-    {
-        if ( !( s instanceof GenericSort ) ) {
-        throw new GenericSortException ( "sort",
-            "Generic sort expected", s,
-            getFilename (), getLine (), getColumn () );
+    (s = any_sortId_check[true]      
+        {
+            if ( s instanceof GenericSort ) {
+                tr = TypeResolver.createGenericSortResolver((GenericSort)s);
+            } else {
+                tr = TypeResolver.createNonGenericSortResolver(s);
+            }
         }
-        tr = TypeResolver.createGenericSortResolver((GenericSort)s);
-    } |
-    ( TYPEOF LPAREN y = varId RPAREN  
-        {  tr = TypeResolver.createElementTypeResolver((SchemaVariable)y); } )
+    ) 
     |
-    ( CONTAINERTYPE LPAREN y = varId RPAREN  
-        {  tr = TypeResolver.createContainerTypeResolver((SchemaVariable)y); } )
+    ( 
+        TYPEOF LPAREN y = varId RPAREN  
+        {  
+            tr = TypeResolver.createElementTypeResolver((SchemaVariable)y); 
+        } 
+    )
+    |
+    (
+        CONTAINERTYPE LPAREN y = varId RPAREN  
+        {  
+            tr = TypeResolver.createContainerTypeResolver((SchemaVariable)y); 
+        } 
+    )
 ;
 
 varcond_new [TacletBuilder b]
@@ -4194,15 +3535,8 @@ varcond_new [TacletBuilder b]
 	    b.addVarsNew((SchemaVariable) x, (SchemaVariable) y, false);
 	  }
       |
-          ELEMTYPEOF LPAREN y=varId RPAREN {
- 	    b.addVarsNew((SchemaVariable) x, (SchemaVariable) y, true);
-	  }
-      |
          DEPENDINGON LPAREN y=varId RPAREN {
 	    b.addVarsNewDependingOn((SchemaVariable)x,(SchemaVariable)y);
-	  }
-      |  DEPENDINGONMOD LPAREN y=varId RPAREN {
-          b.addVariableCondition(new NewDepOnAnonUpdates((SchemaVariable) x,(SchemaVariable)y));		  
 	  }
       | s=sortId_check[true] {
 		b.addVarsNew((SchemaVariable) x, s);
@@ -4224,32 +3558,40 @@ varcond_newlabel [TacletBuilder b]
 varcond_typecheck [TacletBuilder b, boolean negated]
 {
   TypeResolver fst = null, snd = null;
-  int typecheckType = -1;
+  TypeComparisonCondition.Mode mode = null;
 }
 :
-   (  SAME  { 	
-	typecheckType = negated ? TypeComparisionCondition.NOT_SAME : TypeComparisionCondition.SAME;
-	} 
-    | COMPATIBLE { 
-      typecheckType = TypeComparisionCondition.NOT_COMPATIBLE;
-	if (!negated) {  
-	  semanticError("Compatible types condition only available as negated version.");
-	} 
+   (  SAME  
+      { 	
+	  mode = negated 
+	         ? TypeComparisonCondition.Mode.NOT_SAME 
+	         : TypeComparisonCondition.Mode.SAME;
+      } 
+    | ISSUBTYPE 
+      { 
+          mode = negated 
+                 ? TypeComparisonCondition.Mode.NOT_IS_SUBTYPE
+                 : TypeComparisonCondition.Mode.IS_SUBTYPE; 
       }
-    | ISSUBTYPE { typecheckType = negated ?  
-	  TypeComparisionCondition.NOT_IS_SUBTYPE: TypeComparisionCondition.IS_SUBTYPE; 
+    | STRICT ISSUBTYPE 
+      {
+          if(negated) {  
+	      semanticError("A negated strict subtype check does not make sense.");
+	  } 
+	  mode = TypeComparisonCondition.Mode.STRICT_SUBTYPE;
       }
-    | STRICT ISSUBTYPE {
-         if (negated) {  
-	  semanticError("A negated strict subtype check does not make sense.");
-	} 
-	typecheckType = TypeComparisionCondition.STRICT_SUBTYPE;
+    | DISJOINTMODULONULL 
+      {
+          if(negated) {
+              semanticError("Negation not supported");
+          }
+          mode = TypeComparisonCondition.Mode.DISJOINTMODULONULL;
       }
    ) 
-   LPAREN fst = type_resolver COMMA snd = type_resolver RPAREN {
-               b.addVariableCondition
-                 (new TypeComparisionCondition(fst, snd, typecheckType));
-            }
+   LPAREN fst = type_resolver COMMA snd = type_resolver RPAREN 
+   {
+	b.addVariableCondition(new TypeComparisonCondition(fst, snd, mode));
+   }
 ;
 
 
@@ -4264,49 +3606,6 @@ varcond_free [TacletBuilder b]
      while(it.hasNext()) {
         b.addVarsNotFreeIn((SchemaVariable)x,(SchemaVariable)it.next());
      }
-   }
-;
-
-varcond_literal [TacletBuilder b]
-{
-  ParsableVariable x = null, y = null;
-}
-:
-   NOTSAMELITERAL LPAREN x=varId COMMA y=varId RPAREN {
-     b.addVariableCondition(new TestLiteral(
-       (SchemaVariable) x, (SchemaVariable) y));          
-   }
-;
-
-varcond_equal_ws_op [TacletBuilder b]
-{
-  ParsableVariable x = null, y = null;
-}
-:
-    EQUALWORKINGSPACEOP LPAREN x=varId COMMA y=varId RPAREN {
-     b.addVariableCondition(new TestEqualWorkingSpaceOp(
-       (SchemaVariable) x, (SchemaVariable) y));          
-   }
-;
-
-varcond_ws_non_rigid_op [TacletBuilder b]
-{
-  ParsableVariable x = null;
-}
-:
-    TESTWORKINGSPACENONRIGIDOP LPAREN x=varId RPAREN {
-     b.addVariableCondition(new TestWorkingSpaceNonRigidOp(
-       (SchemaVariable) x));          
-   }
-;
-
-varcond_ws_op [TacletBuilder b]
-{
-  ParsableVariable x = null;
-}
-:
-    TESTWORKINGSPACEOP LPAREN x=varId RPAREN {
-     b.addVariableCondition(new TestWorkingSpaceOp((SchemaVariable) x));
    }
 ;
 
@@ -4365,61 +3664,7 @@ varcond_reference [TacletBuilder b, boolean isPrimitive]
    { b.addVariableCondition(new TypeCondition(tr, !isPrimitive, nonNull)); }
 ;
 
-varcond_non_implicit [TacletBuilder b]
-{
-  ParsableVariable x = null;
-}
-:
-   ISNONIMPLICIT LPAREN x=varId RPAREN {
-     b.addVariableCondition(new NonImplicitTypeCondition((SchemaVariable) x));
-   } 
-;
-
-varcond_query [TacletBuilder b]
-{
-  ParsableVariable x = null;
-}
-:
-   ISQUERY LPAREN x=varId RPAREN {
-     b.addVariableCondition(new TestQuery((SchemaVariable)x));
-   }
-;
-
-varcond_inReachableState [TacletBuilder b]
-{
-  ParsableVariable x = null;
-}
-:
-   ISINREACHABLESTATE LPAREN x=varId RPAREN    	
-   {
-      b.addVariableCondition(new InReachableStateCondition((SchemaVariable)x));
-   }
-;
-
-varcond_non_implicit_query [TacletBuilder b]
-{
-  ParsableVariable x = null;
-}
-:
-   ISNONIMPLICITQUERY LPAREN x=varId RPAREN 
-        {
-            b.addVariableCondition(new TestNonImplicitQuery((SchemaVariable)x));
-        }
-    ;
-
-/*varcond_monomials [TacletBuilder b]
-{
-  ParsableVariable x = null, y = null;
-}
-:
-   MONOMIALSDIVIDE LPAREN x=varId COMMA y=varId RPAREN {
-     final VariableCondition c;
-     c = new MonomialsDivideCondition
-                  ((SchemaVariable)x,(SchemaVariable)y);
-     b.addVariableCondition ( c );
-   }
-;*/
-         
+        
 varcond_staticmethod [TacletBuilder b, boolean negated]
 {
   ParsableVariable x = null, y = null, z = null;
@@ -4453,6 +3698,17 @@ varcond_array [TacletBuilder b, boolean negated]
    }
 ;
 
+varcond_array_length [TacletBuilder b, boolean negated]
+{
+  ParsableVariable x = null;
+}
+:
+   ISARRAYLENGTH LPAREN x=varId RPAREN {
+     b.addVariableCondition(new ArrayLengthCondition (
+       (SchemaVariable)x, negated));
+   }
+;
+
 
 varcond_abstractOrInterface [TacletBuilder b, boolean negated]
 {
@@ -4461,16 +3717,6 @@ varcond_abstractOrInterface [TacletBuilder b, boolean negated]
 :
    IS_ABSTRACT_OR_INTERFACE LPAREN tr=type_resolver RPAREN {
      b.addVariableCondition(new AbstractOrInterfaceType(tr, negated));
-   }
-;
-
-varcond_interface [TacletBuilder b, boolean negated]
-{
-  TypeResolver tr = null;
-}
-:
-   IS_INTERFACE LPAREN tr=type_resolver RPAREN {
-     b.addVariableCondition(new InterfaceType(tr, negated));
    }
 ;
 
@@ -4507,59 +3753,64 @@ varcond_localvariable [TacletBuilder b, boolean negated]
         } 
 ;
 
-varcond_isupdated [TacletBuilder b]
+
+varcond_observer [TacletBuilder b]
 {
-  ParsableVariable x = null;
+  ParsableVariable obs = null;
+  ParsableVariable heap = null;
+  ParsableVariable obj = null;
 }
 :
-   ISUPDATED 
-	LPAREN x=varId RPAREN {
-     	   b.addVariableCondition(new IsUpdatedVariableCondition((SchemaVariable) x));
+   ISOBSERVER 
+	LPAREN obs=varId COMMA heap=varId  RPAREN {
+     	   b.addVariableCondition(new ObserverCondition((TermSV)obs, 
+     	                                                (TermSV)heap));
         } 
 ;
 
-varcond_memory_area [TacletBuilder b, boolean negated]
+
+varcond_different [TacletBuilder b]
 {
-  ParsableVariable x = null;
+  ParsableVariable var1, var2;
 }
 :
-   MEMORYAREA 
-	LPAREN x=varId RPAREN {
-     	   b.addVariableCondition(new MemoryAreaCondition((SchemaVariable) x, negated));
+   DIFFERENT 
+	LPAREN var1=varId COMMA var2=varId RPAREN {
+     	   b.addVariableCondition(new DifferentInstantiationCondition(
+     	   				(SchemaVariable)var1,
+     	   				 (SchemaVariable)var2));
         } 
 ;
 
-varcond_parent_scope [TacletBuilder b, boolean negated]
+
+varcond_metadisjoint [TacletBuilder b]
 {
-  ParsableVariable x = null;
+  ParsableVariable var1, var2;
 }
 :
-   PARENTSCOPE
-	LPAREN x=varId RPAREN {
-     	   b.addVariableCondition(new ParentScopeCondition((SchemaVariable) x, negated));
+   METADISJOINT 
+	LPAREN var1=varId COMMA var2=varId RPAREN {
+     	   b.addVariableCondition(new MetaDisjointCondition(
+     	   				(TermSV)var1,
+     	   				(TermSV)var2));
         } 
 ;
 
-varcond_scope_stack [TacletBuilder b, boolean negated]
-{
-  ParsableVariable x = null;
-}
-:
-   SCOPESTACK
-	LPAREN x=varId RPAREN {
-     	   b.addVariableCondition(new ScopeStackCondition((SchemaVariable) x, negated));
-        } 
-    ;
 
-varcond_sameheapdeppred [TacletBuilder b]
+
+varcond_equalUnique [TacletBuilder b]
 {
-  ParsableVariable x = null, y = null;
+  ParsableVariable t = null;
+  ParsableVariable t2 = null;
+  ParsableVariable phi = null;
 }
 :
-   SAMEHEAPDEPPRED LPAREN x=varId COMMA y=varId RPAREN {
-     b.addVariableCondition(new SameHeapDependentPredicateVariableCondition(
-       (SchemaVariable) x, (SchemaVariable) y));          
-   }
+   EQUAL_UNIQUE 
+	LPAREN t=varId COMMA t2=varId COMMA phi=varId RPAREN {
+     	   b.addVariableCondition(new EqualUniqueCondition((TermSV) t, 
+     	                                                   (TermSV) t2, 
+     	                                                   (FormulaSV) phi));
+        } 
 ;
 
 varcond_freeLabelIn [TacletBuilder b, boolean negated]
@@ -4726,8 +3977,7 @@ metaTerm returns [Term result = null]
 		    vf = nvf;
 		  }
 		}
-                result = tf.createMetaTerm(vf,
-                                           (Term[])al.toArray(AN_ARRAY_OF_TERMS));
+                result = tf.createTerm(vf, (Term[])al.toArray(AN_ARRAY_OF_TERMS));
             }         
         ) 
  ; exception
@@ -4737,51 +3987,29 @@ metaTerm returns [Term result = null]
 			(ex.getMessage(), getFilename(), getLine(), getColumn()));
         }
 
-contracts[ImmutableSet<Choice> choices, Namespace funcNSForSelectedChoices]
-{
-  Choice c = null;
-}
+contracts
 :
    CONTRACTS
        LBRACE {
 	    switchToNormalMode();
-	    Iterator<Choice> it = choices.iterator();
-	    Namespace funcNSForRules = funcNSForSelectedChoices;
-	    while(it.hasNext()){
-		c=it.next();
-		funcNSForRules = 
-		    funcNSForRules.extended(c.funcNS().allElements());
-	    }
-	    namespaces().setFunctions(funcNSForRules); 
-	    parsingContracts = true;
        }
        ( one_contract )*
-       RBRACE {
-            parsingContracts = false;
-       }
+       RBRACE 
 ;
 
-invariants[ImmutableSet<Choice> choices, Namespace funcNSForSelectedChoices]
+invariants
 {
-  Choice c = null;
   QuantifiableVariable selfVar;
+  Namespace orig = variables();  
 }
 :
    INVARIANTS LPAREN selfVar=one_logic_bound_variable RPAREN
        LBRACE {
 	    switchToNormalMode();
-	    Iterator<Choice> it = choices.iterator();
-	    Namespace funcNSForRules = funcNSForSelectedChoices;
-	    while(it.hasNext()){
-		c=it.next();
-		funcNSForRules = 
-		    funcNSForRules.extended(c.funcNS().allElements());
-	    }
-	    namespaces().setFunctions(funcNSForRules); 
        }
        ( one_invariant[(ParsableVariable)selfVar] )*
        RBRACE  {
-           unbindVars();
+           unbindVars(orig);
        }
 ;
 
@@ -4789,42 +4017,35 @@ invariants[ImmutableSet<Choice> choices, Namespace funcNSForSelectedChoices]
 one_contract 
 {
   Term fma = null;
-  ImmutableSet<LocationDescriptor> modifiesClause = DefaultImmutableSet.<LocationDescriptor>nil();
+  Term modifiesClause = null;
   String displayName = null;
   String contractName = null;
   Vector rs = null;
   NamespaceSet oldServicesNamespaces = null;
 }
 :
-   contractName = simple_ident LBRACE { 
-        //  program variable declarations and
-        // add @pre functions
-        namespaces().setProgramVariables(new AtPreNamespace(programVariables(), getJavaInfo()));    
-        namespaces().setFunctions(new AtPreNamespace(functions(), getJavaInfo()));
-        oldServicesNamespaces = getServices().getNamespaces(); //why are the Services namespaces
-                                                             //not directly updated in the parser?
-        getServices().setNamespaces(namespaces());
+   contractName = simple_ident LBRACE 
+     { 
+        //for program variable declarations
+        namespaces().setProgramVariables(new Namespace(programVariables()));    
      }
      (prog_var_decls)? 
-     fma = formula MODIFIES (modifiesClause = location_list)?
-     (rs=rulesets)?   // for backward compatibility
-     (DISPLAYNAME displayName = string_literal)?
+     fma = formula MODIFIES modifiesClause = term
      {
        DLSpecFactory dsf = new DLSpecFactory(getServices());
        try {
          contracts = contracts.add(dsf.createDLOperationContract(contractName,
-	       					                 displayName,
        					                         fma, 
            				                         modifiesClause));
        } catch(ProofInputException e) {
          semanticError(e.getMessage());
        }
-     } RBRACE SEMI {
-     // dump local program variable declarations and @pre functions
-     namespaces().setProgramVariables(programVariables().parent());
-     namespaces().setFunctions(functions().parent());
-     getServices().setNamespaces(oldServicesNamespaces);
-   }
+     } 
+     RBRACE SEMI 
+     {
+       //dump local program variable declarations
+       namespaces().setProgramVariables(programVariables().parent());
+     }
 ;
 
 one_invariant[ParsableVariable selfVar]
@@ -4870,44 +4091,21 @@ problem returns [ Term a = null ]
         // the result is of no importance here (strange enough)        
         
         stlist = classPaths 
-        // the result is not of importance here, so we use it twice
 
-        stlist = javaSource {
-          if(stlist != null && stlist.size() > 1)
-            Debug.fail("Don't know what to do with multiple java source entries.");
-	    }
+        string = javaSource
         decls
         { 
             if(parse_includes || onlyWith) return null;
             switchToNormalMode();
-            Iterator<Choice> it = selectedChoices.iterator(); 
-            while(it.hasNext()){
-	         Choice choice = (Choice)choices().lookup(it.next().name());
-		 if(choice != null) {
-                   funcNSForSelectedChoices=funcNSForSelectedChoices.
-                      extended(choice.funcNS().allElements());
-	         }
-             } 
-             funcNSForSelectedChoices=funcNSForSelectedChoices.
-                 extended(defaultChoice.
-                          funcNS().allElements()); 
         }
         // WATCHOUT: choices is always going to be an empty set here,
 	// isn't it?
-	( contracts[choices, funcNSForSelectedChoices] )*
-	( invariants[choices, funcNSForSelectedChoices] )*
+	( contracts )*
+	( invariants )*
         (  RULES (choices = option_list[choices])?
 	    LBRACE
             { 
                 switchToSchemaMode(); 
-                 Iterator<Choice> it = choices.iterator();
-                 Namespace funcNSForRules = funcNSForSelectedChoices;
-                 while(it.hasNext()){
-                     c=it.next();
-                     funcNSForRules = 
-                         funcNSForRules.extended(c.funcNS().allElements());
-                 }
-                 namespaces().setFunctions(funcNSForRules); 
             }
             ( 
                 s = taclet[choices] SEMI
@@ -4928,16 +4126,20 @@ problem returns [ Term a = null ]
         ) *
         ((PROBLEM LBRACE 
             {switchToNormalMode(); 
-	     namespaces().setFunctions(funcNSForSelectedChoices);
 	     if (capturer != null) capturer.capture();}
                 a = formula 
-            RBRACE) | CHOOSECONTRACT {
-	                if (capturer != null) capturer.capture();
-	                chooseContract = true;
-		      })?
-        {
-			setChoiceHelper(DefaultImmutableSet.<Choice>nil(), "");
-        }
+            RBRACE) 
+           | 
+           CHOOSECONTRACT (chooseContract=string_literal SEMI)?
+           {
+	       if (capturer != null) {
+	            capturer.capture();
+	       }
+	       if(chooseContract == null) {
+	           chooseContract = "";
+	       }
+           } 
+	)?
    ;
    
 bootClassPath returns [String id = null] :
@@ -4965,17 +4167,12 @@ classPaths returns [ImmutableList<String> ids = ImmutableSLList.<String>nil()]
   )*
   ;
 
-javaSource returns [ImmutableList<String> ids = ImmutableSLList.<String>nil()]
-{ 
-  String s = null;
-}
+javaSource returns [String result = null]
 :
    (JAVASOURCE 
-      s = oneJavaSource { ids = ids.append(s); }
-      (COMMA s = oneJavaSource { ids = ids.append(s); })*
+      result = oneJavaSource
     SEMI)?
     ;
-
 
 
 oneJavaSource returns [String s = null]
