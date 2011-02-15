@@ -5,17 +5,18 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+
 package paycard;
 
-public interface LimitedIntContainer{
-    /*@
-      @ public model int value;
-      @ public model boolean regularState;
+
+public interface LimitedIntContainer {
+    
+    /*@ public instance model int value;
+      @ public instance model boolean regularState;
       @*/
 
     /*@ public normal_behavior
       @   ensures regularState ==> \result == value;
       @*/
     int /*@ pure @*/ available(); 
-
 }

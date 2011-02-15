@@ -249,13 +249,14 @@ public final class ProofManagementDialog extends JDialog {
     //-------------------------------------------------------------------------
     
     private static void showInstance(InitConfig initConfig,
+	    			     KeYJavaType selectedKJT,
 	    			     ObserverFunction selectedTarget,
 	    			     Proof selectedProof) {
 	if(instance == null
            || instance.initConfig != initConfig
            || !instance.initConfig.equals(initConfig)) {
             
-            if(instance != null){
+            if(instance != null) {
                 instance.dispose();
                 
                 //============================================
@@ -278,7 +279,7 @@ public final class ProofManagementDialog extends JDialog {
             instance = new ProofManagementDialog(initConfig, 
             			     		 "Proof Management");
             //determine own defaults if not given
-            if(selectedTarget == null) {
+            if(selectedKJT == null || selectedTarget == null) {
         	Services services = initConfig.getServices();
         	Set<KeYJavaType> kjts 
         		= services.getJavaInfo().getAllKeYJavaTypes();
@@ -298,12 +299,14 @@ public final class ProofManagementDialog extends JDialog {
         	    	= services.getSpecificationRepository().getContractTargets(kjt);
         	    for(ObserverFunction target : targets) {
         		if(!services.getSpecificationRepository()
-        			    .getContracts(kjt, target).isEmpty()) {
+        			    .getContracts(kjt, target)
+        			    .isEmpty()) {
+        		    selectedKJT = kjt;
         		    selectedTarget = target;
         		    break outer;
         		}
         	    }
-        	}	
+        	}
             }
         }
 	
@@ -313,7 +316,7 @@ public final class ProofManagementDialog extends JDialog {
 	    instance.select(selectedProof);
 	}
 	if(selectedTarget != null) {
-	    instance.select(selectedTarget);
+	    instance.select(selectedKJT, selectedTarget);
 	}
         instance.setVisible(true);
     }    
@@ -326,9 +329,9 @@ public final class ProofManagementDialog extends JDialog {
     }
 
     
-    private void select(ObserverFunction target) {
+    private void select(KeYJavaType kjt, ObserverFunction target) {
 	tabbedPane.setSelectedIndex(0);
-	classTree.select(target.getContainerType(), target);
+	classTree.select(kjt, target);
     }
     
     
@@ -537,8 +540,9 @@ public final class ProofManagementDialog extends JDialog {
      * Shows the dialog and selects the passed method.
      */
     public static void showInstance(InitConfig initConfig,
+	    		            KeYJavaType selectedKJT,
 	    			    ObserverFunction selectedTarget) {
-	showInstance(initConfig, selectedTarget, null);
+	showInstance(initConfig, selectedKJT, selectedTarget, null);
     }
 
     
@@ -547,7 +551,7 @@ public final class ProofManagementDialog extends JDialog {
      */
     public static void showInstance(InitConfig initConfig, 
 	    			    Proof selectedProof) {
-	showInstance(initConfig, null, selectedProof);
+	showInstance(initConfig, null, null, selectedProof);
     }
     
     
@@ -555,7 +559,7 @@ public final class ProofManagementDialog extends JDialog {
      * Shows the dialog.
      */
     public static void showInstance(InitConfig initConfig) {
-	showInstance(initConfig, null, null);
+	showInstance(initConfig, null, null, null);
     }    
     
     
