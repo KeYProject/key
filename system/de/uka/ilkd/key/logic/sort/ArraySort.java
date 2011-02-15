@@ -15,6 +15,7 @@ import java.util.WeakHashMap;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.logic.Name;
 
@@ -35,10 +36,13 @@ public final class ArraySort extends AbstractSort {
     private ArraySort(ImmutableSet<Sort> extendsSorts, SortKey sk) {
 	super(new Name((sk.elemType != null 
 		        ? sk.elemType.getName() 
-		        : sk.elemSort.name()) + "[]"), 
+		        : sk.elemSort.name()) 
+		       + "[]"), 
               extendsSorts, 
               false);
-	assert(!extendsSorts.isEmpty());	
+	assert(!extendsSorts.isEmpty());
+	assert !(sk.elemSort instanceof GenericSort) 
+	       : "array sorts with generic element sorts currently not supported";
 
 	this.sk = sk;
     }    
@@ -50,16 +54,15 @@ public final class ArraySort extends AbstractSort {
     //internal methods
     //------------------------------------------------------------------------- 
 
-
     private static ImmutableSet<Sort> getArraySuperSorts(Sort elemSort, 
-	    					Sort objectSort, 
-	    					Sort cloneableSort,
-	    					Sort serializableSort) {
+	    						 Sort objectSort, 
+	    						 Sort cloneableSort,
+	    						 Sort serializableSort){
 	ImmutableSet<Sort> result = DefaultImmutableSet.<Sort>nil();
 	
 	ImmutableSet<Sort> elemDirectSuperSorts = elemSort.extendsSorts();
 	if(elemDirectSuperSorts.equals(DefaultImmutableSet.<Sort>nil()
-		                                      .add(Sort.ANY))) {
+		                                          .add(Sort.ANY))) {
 	    result = result.add(objectSort)
 	                   .add(cloneableSort)
 	                   .add(serializableSort);    
@@ -83,22 +86,28 @@ public final class ArraySort extends AbstractSort {
 
     /**
      * returns the ArraySort to the given elementsort. This method ensures that
-     * only one ArraySort-object exists for each Arraysort.
+     * only one ArraySort-object exists for each array sort.
      */
     public static ArraySort getArraySort(Sort elemSort, 
 	                                 Type elemType,
 	    				 Sort objectSort, 
 	    				 Sort cloneableSort,
 	    				 Sort serializableSort) {
+	if(elemType != PrimitiveType.JAVA_BYTE 
+	   && elemType != PrimitiveType.JAVA_CHAR
+	   && elemType != PrimitiveType.JAVA_LONG
+	   && elemType != PrimitiveType.JAVA_SHORT) {
+	    elemType = null;
+	}
 	// this wrapper is required as some element sorts are shared among 
-	// several environments (int, boolean)
+	// several environments (int, boolean)	
 	final SortKey sortKey = new SortKey(elemSort, 
 		                            elemType,
 					    objectSort, 
 					    cloneableSort, 
 					    serializableSort);
 	WeakReference<ArraySort> ref = aSH.get(sortKey);
-	ArraySort as = ref != null ? ref.get() : null;          
+	ArraySort as = ref != null ? ref.get() : null;
 
 	if(as == null) { 
 	    ImmutableSet<Sort> localExtendsSorts 
@@ -128,15 +137,22 @@ public final class ArraySort extends AbstractSort {
     /** 
      * returns elemSort([])^n.
      */
-    public static Sort getArraySortForDim(Sort elemSort, 
+    public static Sort getArraySortForDim(Sort elemSort,
+	    				  Type elemType,
 	    				  int n,
 	    				  Sort objectSort, 
 	    				  Sort cloneableSort, 
 	    				  Sort serializableSort) {
-	Sort result = elemSort;
-	while(n > 0){
-	    result = getArraySort(result, 
-		    		  objectSort, 
+	assert n > 0;
+	Sort result = getArraySort(elemSort,
+				   elemType,
+				   objectSort,
+				   cloneableSort,
+				   serializableSort);
+	
+	while(n > 1) {
+	    result = getArraySort(result,
+		    		  objectSort,
 		    		  cloneableSort, 
 		    		  serializableSort);
 	    n--;
@@ -144,20 +160,6 @@ public final class ArraySort extends AbstractSort {
 	return result;
     }    
         
-
-
-    /**
-     * @return an object of this class with elementSort().equals(p),
-     * or null if such an object cannot be constructed (as p is an
-     * incompatible sort).
-     */
-    public Sort cloneFor(Sort p) {
-        return getArraySort ( p, 
-        		      sk.javaLangObjectSort, 
-        		      sk.javaLangCloneable, 
-        		      sk.javaLangSerializable);
-    }
-
 
     /**
      * returns the element sort of the array
@@ -196,16 +198,16 @@ public final class ArraySort extends AbstractSort {
 	           && elemType == sk.elemType
 	           && javaLangObjectSort == sk.javaLangObjectSort 
 	           && javaLangSerializable == sk.javaLangSerializable 
-	           && javaLangCloneable    == sk.javaLangCloneable;                
+	           && javaLangCloneable == sk.javaLangCloneable;                
 	}
 
 	
 	public int hashCode() {
 	    return elemSort.hashCode() 
-	           + (elemType == null ? 0 : 31*elemType.hashCode())
-	           + (javaLangCloneable == null ? 0 : 31*javaLangCloneable.hashCode()) 
-	           + (javaLangObjectSort == null ? 0 : 17*javaLangObjectSort.hashCode()) 
-	           + (javaLangSerializable == null ? 0 : 3*javaLangSerializable.hashCode());
+	           + (elemType == null ? 0 : 31 * elemType.hashCode())
+	           + (javaLangCloneable == null ? 0 : 31 * javaLangCloneable.hashCode()) 
+	           + (javaLangObjectSort == null ? 0 : 17 * javaLangObjectSort.hashCode()) 
+	           + (javaLangSerializable == null ? 0 : 3 * javaLangSerializable.hashCode());
 	}
     }
 }

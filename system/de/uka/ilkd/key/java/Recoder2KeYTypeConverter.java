@@ -223,17 +223,11 @@ public class Recoder2KeYTypeConverter {
 
             // I may not use JavaInfo here because the classes may not yet be cached!
             de.uka.ilkd.key.java.abstraction.Type elemType = kjt.getJavaType();
-            if(elemType != PrimitiveType.JAVA_BYTE 
-               && elemType != PrimitiveType.JAVA_CHAR
-               && elemType != PrimitiveType.JAVA_LONG
-               && elemType != PrimitiveType.JAVA_SHORT) {
-        	elemType = null;
-            }
             s = ArraySort.getArraySort(kjt.getSort(),
-        	    elemType,
-                    objectType.getSort(),
-                    cloneableType.getSort(),
-                    serializableType.getSort());
+        	    		       elemType,
+        	    		       objectType.getSort(),
+        	    		       cloneableType.getSort(),
+        	    		       serializableType.getSort());
             addKeYJavaType(t, s);
         }
 

@@ -499,8 +499,6 @@ public final class SyntacticalReplaceVisitor extends Visitor {
     private Operator handleSortDependingSymbol (SortDependingFunction depOp) {
         final Sort depSort = depOp.getSortDependingOn ();
         
-        
-        
         final Sort realDepSort =
             svInst.getGenericSortInstantiations ()
                                        .getRealSort ( depSort, getServices() );

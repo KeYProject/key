@@ -1577,24 +1577,29 @@ keyjavatype returns [KeYJavaType kjt=null]
 
      kjt = getJavaInfo().getKeYJavaType(type);
             
+     //expand to "java.lang"            
      if (kjt == null) {
-       //expand to "java.lang"
-       String guess = "java.lang."+type;
-       kjt = getJavaInfo().getKeYJavaType(guess);       
-       if (array) {
+        try {
+            String guess = "java.lang." + type;
+       	    kjt = getJavaInfo().getKeYJavaType(guess);
+       	} catch(Exception e) {
+       	    kjt = null;
+       	}
+     }
+     
+     //arrays
+     if (kjt == null && array) {
           try {
             JavaBlock jb = getJavaInfo().readJavaBlock("{" + type + " k;}");
             kjt = ((VariableDeclaration) 
                     ((StatementBlock) jb.program()).getChildAt(0)).
                         getTypeReference().getKeYJavaType();
-//            kjt = getJavaInfo().getKeYJavaType(type);
           } catch (Exception e) {
              kjt = null;
           }          
-       }
      }
      
-     //HEAP
+     //try as sort without Java type (neede e.g. for "Heap")
      if(kjt == null) {
 	Sort sort = lookupSort(type);
 	if(sort != null) {
@@ -2032,7 +2037,7 @@ ruleset_decls
         RBRACE
     ;
 
-sortId  returns [Sort s = null]
+sortId returns [Sort s = null]
     :
         s = sortId_check[true]
     ;           
@@ -2040,80 +2045,103 @@ sortId  returns [Sort s = null]
 // Non-generic sorts, array sorts allowed
 sortId_check [boolean checkSort] returns [Sort s = null]                
 {
-    Sort t;
+    Pair<Sort,Type> p;
 }
     :
-        t = sortId_check_help[checkSort]
-        s = array_set_decls[t]
+        p = sortId_check_help[checkSort]
+        s = array_decls[p]
     ;
 
 // Generic and non-generic sorts, array sorts allowed
 any_sortId_check [boolean checkSort] returns [Sort s = null]                
 {
-    Sort t;
+    Pair<Sort,Type> p;
 }
     :   
-        t = any_sortId_check_help[checkSort]
-        s = array_set_decls[t]
+        p = any_sortId_check_help[checkSort]
+        s = array_decls[p]
     ;
+    
+    
+// Non-generic sorts
+sortId_check_help [boolean checkSort] returns [Pair<Sort,Type> result = null]
+    :
+        result = any_sortId_check_help[checkSort]
+        {
+            // don't allow generic sorts or collection sorts of
+            // generic sorts at this point
+            Sort s = result.first;
+            while ( s instanceof ArraySort ) {
+            	s = ((ArraySort)s).elementSort ();
+            }
 
-// also allow generic sorts
-any_sortId_check_help [boolean checkSort] returns [Sort s = null]
+            if ( s instanceof GenericSort ) {
+                throw new GenericSortException ( "sort",
+                    "Non-generic sort expected", s,
+                    getFilename (), getLine (), getColumn () );
+            }
+        }
+    ;
+    
+
+// Generic and non-generic sorts
+any_sortId_check_help [boolean checkSort] returns [Pair<Sort,Type> result = null]
 {
     String name;
 }
     :
         name = simple_sort_name 
-        {  s = lookupSort(name);
-           if (checkSort && s == null) {
-                throw new NotDeclException("sort", name, 
-                                           getFilename(), 
-                                           getLine(), getColumn());
-           }
-        }
-    ;
-
-sortId_check_help [boolean checkSort] returns [Sort s = null]
-    :
-        s = any_sortId_check_help[checkSort]
         {
-            // don't allow generic sorts or collection sorts of
-            // generic sorts at this point
-            Sort t = s;
-            while ( t instanceof ArraySort ) {
-            	t = ((ArraySort)t).elementSort ();
+            //Special handling for byte, char, short, long:
+            //these are *not* sorts, but they are nevertheless valid
+            //prefixes for array sorts such as byte[], char[][][].
+            //Thus, we consider them aliases for the "int" sort, and remember
+            //the corresponding Java type for the case that an array sort 
+            //is being declared.
+            Type t = null;            
+            if(name.equals(PrimitiveType.JAVA_BYTE.getName())) {
+                t = PrimitiveType.JAVA_BYTE;
+                name = PrimitiveType.JAVA_INT.getName();
+            } else if(name.equals(PrimitiveType.JAVA_CHAR.getName())) {
+                t = PrimitiveType.JAVA_CHAR;
+                name = PrimitiveType.JAVA_INT.getName();            
+            } else if(name.equals(PrimitiveType.JAVA_SHORT.getName())) {
+                t = PrimitiveType.JAVA_SHORT;
+                name = PrimitiveType.JAVA_INT.getName();
+            } else if(name.equals(PrimitiveType.JAVA_LONG.getName())) {
+                t = PrimitiveType.JAVA_LONG;
+                name = PrimitiveType.JAVA_INT.getName();
             }
-
-            if ( t instanceof GenericSort ) {
-                throw new GenericSortException ( "sort",
-                    "Non-generic sort expected", t,
-                    getFilename (), getLine (), getColumn () );
+            
+            Sort s = lookupSort(name);
+            if(checkSort && s == null) {
+                throw new NotDeclException("sort", 
+                                           name, 
+                                           getFilename(), 
+                                           getLine(),  
+                                           getColumn());
             }
+            
+            result = new Pair<Sort,Type>(s, t);
         }
     ;
 
-empty_set_braces returns [String result = null]
-:
-   LBRACE RBRACE { result = "{}".intern(); }
-;
 
-array_set_decls[Sort p] returns [Sort s = null]                
+array_decls[Pair<Sort,Type> p] returns [Sort s = null]                
 {
-    String sortName = "";
-    String emptybraces = null;
-    int  n = 0;    
+    int n = 0;    
 }
-
     :
      (EMPTYBRACKETS {n++;})*
         { 
-            if (n != 0){
+            if(n != 0) {
                 final JavaInfo ji = getJavaInfo();
-                s = ArraySort.getArraySortForDim(p, 
-                			             n, 
-                			             ji.objectSort(),
-                                                     ji.cloneableSort(), 
-                                                     ji.serializableSort());
+                s = ArraySort.getArraySortForDim(p.first,
+                				 p.second, 
+                			         n, 
+                			         ji.objectSort(),
+                                                 ji.cloneableSort(), 
+                                                 ji.serializableSort());
 
                 Sort last = s;
                 do {
@@ -2122,26 +2150,11 @@ array_set_decls[Sort p] returns [Sort s = null]
                     last = as.elementSort();
                 } while (last instanceof ArraySort && sorts().lookup(last.name()) == null);
             } else {
-                s = p;
+                s = p.first;
             }
         }     
-        ({ if (s != null) { 
-                    sortName = s.name() + "";
-                }
-            }  
-             (emptybraces = empty_set_braces {                  
-                    
-                    sortName += emptybraces; 
-                    s = lookupSort(sortName);
-                    if (s == null) {
-                        throw new NotDeclException("sort", sortName, 
-                            getFilename(), 
-                            getLine(), getColumn());
-                    }
-                })*)
-      
-            
     ;
+    
 
 attrid returns [String attr = "";]
 {
@@ -2196,7 +2209,7 @@ funcpred_name returns [String result = null]
 ;
 
 
-// no array and set sorts
+// no array sorts
 simple_sort_name returns [String name = ""]
 { String id = ""; }
     :
@@ -2205,13 +2218,9 @@ simple_sort_name returns [String name = ""]
 
 
 sort_name returns [String name = null]
-{
-  String emptybraces = "";
-}
     :
         name = simple_sort_name     
-        (emptybraces = empty_set_braces {name += emptybraces;} |
-         brackets:EMPTYBRACKETS {name += brackets.getText();} )*
+        (brackets:EMPTYBRACKETS {name += brackets.getText();} )*
 ;
 
 /**

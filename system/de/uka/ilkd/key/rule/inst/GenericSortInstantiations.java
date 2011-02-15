@@ -203,17 +203,6 @@ public final class GenericSortInstantiations {
 	    if ( p_s == null ) {
 		throw GenericSortException.UNINSTANTIATED_GENERIC_SORT;
             }
-	} else if ( p_s instanceof ArraySort ) {
-	    Sort s = getRealSort ( ((ArraySort)p_s).elementSort (), services );
-
-	    s = ((ArraySort)p_s).cloneFor ( s );
-
-	    if ( s == null )
-		throw new GenericSortException
-		    ( "Generic collection sort is instantiated with a sort" +
-		      " without collections" );
-
-	    return s;
 	}
 
 	return p_s;
