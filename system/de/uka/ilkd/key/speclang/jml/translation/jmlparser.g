@@ -1595,7 +1595,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 		// http://www.cs.iastate.edu/~leavens/JML/jmlrefman/jmlrefman_11.html#SEC139		
 		Term range = TB.and(
 		    TB.leq(TB.zero(services), TB.var(i), services),
-		    TB.leq(TB.var(i), TB.dotLength(services, t), services));
+		    TB.lt(TB.var(i), TB.dotLength(services, t), services));
 		Term body = TB.equals(
 		    TB.dotArr(services, t, TB.var(i)),
 		    TB.NULL(services));

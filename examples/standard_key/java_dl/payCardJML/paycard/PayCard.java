@@ -18,12 +18,8 @@ public class PayCard implements LimitedIntContainer {
     /*@ spec_public @*/ protected LogFile log;   
     
 
-    /*@ public invariant log.logArray.length == log.logFileSize;
+    /*@ public invariant log.\inv;
       @ public invariant balance == log.logArray[log.currentRecord].balance;
-      @ public invariant log.currentRecord < log.logArray.length   
-      @                  && log.currentRecord >= 0 
-      @                  && \nonnullelements(log.logArray)
-      @                  && log.logFileSize == log.logArray.length;
       @ public invariant balance >= 0;
       @ public invariant limit > 0;
       @ public invariant available() >= 0;
@@ -37,7 +33,9 @@ public class PayCard implements LimitedIntContainer {
     
     /*@ public normal_behavior
       @   requires limit > 0;
+      @   requires LogRecord.transactionCounter >= 0;
       @   assignable LogRecord.transactionCounter;
+      @   ensures LogRecord.transactionCounter >= 0;
       @*/
     public PayCard(int limit) {
         balance = 0;
@@ -49,7 +47,9 @@ public class PayCard implements LimitedIntContainer {
 
     
     /*@ public normal_behavior
+      @   requires LogRecord.transactionCounter >= 0;
       @   assignable LogRecord.transactionCounter;
+      @   ensures LogRecord.transactionCounter >= 0;
       @*/
     public PayCard() {
 	balance = 0;
@@ -59,8 +59,12 @@ public class PayCard implements LimitedIntContainer {
     }
     
 
-    /*@ public normal_behavior
+    /*@ public behavior
+      @   requires LogRecord.transactionCounter >= 0;
       @   requires amount > 0;
+      @   assignable balance, unsuccessfulOperations, log.currentRecord, 
+      @              \infinite_union(int x; 0 <= x && x < log.logArray.length ? log.logArray[x].* : \empty),
+      @              LogRecord.transactionCounter;
       @   ensures balance >= \old(balance);
       @*/
    public void charge(int amount) {
@@ -77,7 +81,7 @@ public class PayCard implements LimitedIntContainer {
     }
 
    
-    /*@ public normal_behavior
+    /*@ also public normal_behavior
       @   ensures \result == balance || unsuccessfulOperations > 3;
       @*/
     public /*@pure@*/ int available() {

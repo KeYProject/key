@@ -13,15 +13,21 @@ public class PayCardJunior extends PayCard {
     
     /*@ spec_public @*/ private final static int juniorLimit = 100;    
 
-    /*@ public invariant balance >= 0 
-      @                  && balance < juniorLimit 
+    /*@ public invariant balance < juniorLimit 
       @                  && juniorLimit < limit; 
       @*/
 
+    /*@ public represents value = balance;
+      @ public represents regularState = (unsuccessfulOperations <= 3);
+      @*/    
+    
     
     /*@ public normal_behavior
+      @   requires LogRecord.transactionCounter >= 0;
       @   requires cardLimit > juniorLimit;
       @   assignable LogRecord.transactionCounter;
+      @   ensures this.limit == cardLimit;
+      @   ensures  LogRecord.transactionCounter >= 0;
       @*/
     public PayCardJunior(int cardLimit) {
 	super(cardLimit);
@@ -29,8 +35,10 @@ public class PayCardJunior extends PayCard {
 
     
     /*@ public normal_behavior
+      @   requires LogRecord.transactionCounter >= 0; 
       @   assignable LogRecord.transactionCounter;
       @   ensures \result.limit == 1000;
+      @   ensures  LogRecord.transactionCounter >= 0;      
       @*/
     public static PayCardJunior createCard() {
 	return new PayCardJunior(1000);

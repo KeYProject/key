@@ -13,33 +13,51 @@ public class LogFile {
     
     private /*@ spec_public @*/ static final int logFileSize = 3;
     private /*@ spec_public @*/ int currentRecord;
-    private /*@ spec_public @*/ LogRecord[] logArray = new LogRecord[logFileSize];
+    private /*@ spec_public nullable@*/ LogRecord[] logArray = new LogRecord[logFileSize];
     
 
-    /*@ public invariant logArray.length == logFileSize 
+    /*@ public invariant logArray != null 
+      @                  && \nonnullelements(logArray)
+      @                  && logArray.length == logFileSize 
       @                  && currentRecord < logFileSize
-      @                  && currentRecord >= 0;
+      @                  && currentRecord >= 0
+      @                  && LogRecord.transactionCounter >= 0;
       @*/
+    
+    //@ public accessible \inv: this.*, this.logArray[*], LogRecord.transactionCounter;
 
     
+    /*@ public normal_behavior
+      @   requires LogRecord.transactionCounter >= 0;
+      @   ensures (\forall int x; 0 <= x && x < logArray.length; \fresh(logArray[x]));
+      @   ensures currentRecord == 0;
+      @*/
     public /*@pure@*/ LogFile() {
 	int i = 0;
-	while(i < logArray.length){
+	/*@ loop_invariant 0 <= i && i <= logArray.length
+	  @    && (\forall int x; 0 <= x && x < i; logArray[x] != null && \fresh(logArray[x]));
+	  @ assignable logArray[*];
+	  @ decreases logArray.length - i;
+	  @*/
+	while(i < logArray.length) {
             logArray[i++] = new LogRecord();
 	}
         currentRecord = 0;
     }
 
 
-    /*@ public normal_behavior
+    /*@ public normal_behavior 
       @    requires balance >= 0;
+      @    requires LogRecord.transactionCounter >= 0;
       @    name "Contract for addRecord";      
-      @    assignable \everything;//currentRecord, logArray[*].transactionId, //TODO 
-      @               //logArray[*].balance, logArray[*].empty, 
-      @               //LogRecord.transactionCounter;
-      @    ensures \old(currentRecord) + 1 != logFileSize ? 
-      @        currentRecord == \old(currentRecord) + 1 : currentRecord == 0;
+      @    assignable currentRecord, 
+      @               \infinite_union(int x; 0 <= x && x < logArray.length ? logArray[x].* : \empty),
+      @               LogRecord.transactionCounter;
+      @    ensures \old(currentRecord) + 1 != logFileSize 
+      @            ? currentRecord == \old(currentRecord) + 1 
+      @            : currentRecord == 0;
       @    ensures logArray[currentRecord].balance == balance;
+      @    ensures LogRecord.transactionCounter >= 0;
       @*/
     public void addRecord(int balance) throws CardException {
 	currentRecord++;
@@ -74,18 +92,13 @@ public class LogFile {
     }
 
 
-
-    public int[] a;
-    public int[] b;
-
     
     /*@ public normal_behavior
-      @ requires a.length > 0 && a != b && a.length == b.length 
-      @          && (\forall int x; 0 <= x && x < a.length; a[x] == b[x]);
+      @ requires a.length > 0;
       @ assignable a[*];
       @ ensures (\forall int i; 0 <= i && i < a.length - 1; a[i] >= a[i + 1]);
       @ */
-    void demo() {
+    void demo(int[] a) {
         int l = a.length;
         int pos = 0;
         /*@ loop_invariant  0 <= pos && pos <= a.length 
@@ -120,10 +133,10 @@ public class LogFile {
     
     public static void main(String args[]) {
 	LogFile f = new LogFile();
-	f.a = new int[]{3, 1, 7, 5, 4, 0, 6, 4};
-	f.demo();	
-	for(int i = 0; i < f.a.length; i++) {
-	    System.out.print(f.a[i] + ",");
+	int[] a = new int[]{3, 1, 7, 5, 4, 0, 6, 4};
+	f.demo(a);	
+	for(int i = 0; i < a.length; i++) {
+	    System.out.print(a[i] + ",");
 	}
     }
 }

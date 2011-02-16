@@ -19,7 +19,6 @@ public class LogRecord {
     
     /*@ public invariant
       @     !empty ==> (balance >= 0 && transactionId >= 0);
-      @ public static invariant transactionCounter >= 0;
       @*/
     
 
@@ -27,12 +26,13 @@ public class LogRecord {
 
 
     /*@ public normal_behavior
-      @   requires balance >= 0;
+      @   requires balance >= 0 && transactionCounter >= 0;
       @   assignable empty, this.balance, transactionId, transactionCounter;
       @   ensures this.balance == balance 
       @           && transactionId == \old(transactionCounter);
+      @   ensures \inv && transactionCounter >= 0;
       @*/
-    public void setRecord(int balance) throws CardException {
+    public /*@helper@*/ void setRecord(int balance) throws CardException {
 	if(balance < 0) {
 	    throw new CardException();
 	}
@@ -45,7 +45,7 @@ public class LogRecord {
     /*@ public normal_behavior
       @   ensures \result == balance;
       @*/
-    public /*@pure@*/ int getBalance() {
+    public /*@pure helper@*/ int getBalance() {
 	return balance;
     }
 
@@ -53,7 +53,7 @@ public class LogRecord {
     /*@ public normal_behavior
       @   ensures \result == transactionId;
       @*/
-    public /*@pure@*/ int getTransactionId() {
+    public /*@pure helper@*/ int getTransactionId() {
 	return transactionId;
     }
 }

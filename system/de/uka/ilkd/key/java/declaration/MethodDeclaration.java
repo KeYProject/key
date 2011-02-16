@@ -14,7 +14,6 @@ package de.uka.ilkd.key.java.declaration;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.Method;
-import de.uka.ilkd.key.java.declaration.modifier.AnnotationUseSpecification;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.reference.TypeReferenceContainer;
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -25,44 +24,19 @@ import de.uka.ilkd.key.util.ExtList;
  *  Method declaration.
  * taken from COMPOST and changed to achieve an immutable structure
  */
-
-public class MethodDeclaration
- extends JavaDeclaration
- implements MemberDeclaration,
-           TypeReferenceContainer,
-           NamedProgramElement,
-           ParameterContainer,
-           Method,
-           VariableScope{
-
-    /**
- *      Return type.
-     */
+public class MethodDeclaration extends JavaDeclaration
+ 			       implements MemberDeclaration,
+ 			                  TypeReferenceContainer,
+ 			                  NamedProgramElement,
+ 			                  ParameterContainer,
+ 			                  Method,
+ 			                  VariableScope {
 
     protected final TypeReference returnType;
-    
-    /**
- *      Name.
-     */
-
+    protected final Comment[] voidComments;
     protected final ProgramElementName name;
-
-    /**
- *      Parameters.
-     */
-
     protected final ImmutableArray<ParameterDeclaration> parameters;
-
-    /**
- *      Exceptions.
-     */
-
     protected final Throws exceptions;
-
-    /**
- *      Body.
-     */
-
     protected final StatementBlock body;
 
 
@@ -84,16 +58,19 @@ public class MethodDeclaration
      * parent is an InterfaceDeclaration 
      */
     public MethodDeclaration(ExtList children, 
-			     boolean parentIsInterfaceDeclaration) {
+			     boolean parentIsInterfaceDeclaration,
+			     Comment[] voidComments) {
 	super(children);
-	returnType=(TypeReference)children.get(TypeReference.class);
-	name=(ProgramElementName)children.get(ProgramElementName.class);
-	this.parameters=new
+	returnType = (TypeReference)children.get(TypeReference.class);
+	this.voidComments = voidComments;
+	name = (ProgramElementName)children.get(ProgramElementName.class);
+	this.parameters = new
 	    ImmutableArray<ParameterDeclaration>((ParameterDeclaration[])
 				children.collect(ParameterDeclaration.class));  
-	exceptions=(Throws)children.get(Throws.class);
-	body=(StatementBlock)children.get(StatementBlock.class);
-	this.parentIsInterfaceDeclaration=parentIsInterfaceDeclaration;
+	exceptions = (Throws)children.get(Throws.class);
+	body = (StatementBlock)children.get(StatementBlock.class);
+	this.parentIsInterfaceDeclaration = parentIsInterfaceDeclaration;
+	assert returnType == null || voidComments == null;
     }
 
     
@@ -108,16 +85,22 @@ public class MethodDeclaration
      * @param parentIsInterfaceDeclaration a boolean set true iff
      * parent is an InterfaceDeclaration 
      */
-
-    public MethodDeclaration(Modifier[] modifiers, TypeReference returnType, 
+    public MethodDeclaration(Modifier[] modifiers, 
+	    		     TypeReference returnType, 
 			     ProgramElementName name,
 			     ParameterDeclaration[] parameters, 
-			     Throws exceptions, StatementBlock body, 
+			     Throws exceptions, 
+			     StatementBlock body, 
 			     boolean parentIsInterfaceDeclaration) { 
-	this(modifiers, returnType, name, 
+	this(modifiers, 
+	     returnType, 
+	     name, 
 	     new ImmutableArray<ParameterDeclaration>(parameters),
-	     exceptions, body, parentIsInterfaceDeclaration);
+	     exceptions, 
+	     body, 
+	     parentIsInterfaceDeclaration);
     }
+    
     
     /**
      * Method declaration.
@@ -130,40 +113,43 @@ public class MethodDeclaration
      * @param parentIsInterfaceDeclaration a boolean set true iff
      * parent is an InterfaceDeclaration 
      */
-
-    public MethodDeclaration(Modifier[] modifiers, TypeReference returnType, 
+    public MethodDeclaration(Modifier[] modifiers, 
+	    		     TypeReference returnType, 
 			     ProgramElementName name,
 			     ImmutableArray<ParameterDeclaration> parameters, 
-			     Throws exceptions, StatementBlock body, 
+			     Throws exceptions, 
+			     StatementBlock body, 
 			     boolean parentIsInterfaceDeclaration) { 
 	super(modifiers);
 	this.returnType = returnType;
-        this.name=name;
+	this.voidComments = null;
+        this.name = name;
 	this.parameters = parameters;  
         this.exceptions = exceptions;
 	this.body = body;
 	this.parentIsInterfaceDeclaration = parentIsInterfaceDeclaration;
     }
 
+    
+    @Override    
     public ProgramElementName getProgramElementName(){
 	return name;
     }
 
 
-     public SourceElement getFirstElement() {
+    @Override    
+    public SourceElement getFirstElement() {
         return getChildAt(0);
     }
 
+    
+    @Override    
     public SourceElement getLastElement() {
         return getChildAt(getChildCount() - 1).getLastElement();
     }
 
 
-    /**
- *      Returns the number of children of this node.
- *      @return an int giving the number of children of this node
-    */
-
+    @Override
     public int getChildCount() {
         int result = 0;
         if (modArray   != null) result += modArray.size();
@@ -175,15 +161,8 @@ public class MethodDeclaration
         return result;
     }
 
-    /**
- *      Returns the child at the specified index in this node's "virtual"
- *      child array
- *      @param index an index into this node's "virtual" child array
- *      @return the program element at the given position
- *      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
- *                 of bounds
-    */
-
+    
+    @Override
     public ProgramElement getChildAt(int index) {
         int len;
         if (modArray != null) {
@@ -218,24 +197,14 @@ public class MethodDeclaration
         throw new ArrayIndexOutOfBoundsException();
     }
 
-    /**
- *      Get the number of statements in this container.
- *      @return the number of statements.
-     */
 
+    @Override
     public int getStatementCount() {
         return (body != null) ? 1 : 0;
     }
 
-    /*
-      Return the statement at the specified index in this node's
-      "virtual" statement array.
-      @param index an index for a statement.
-      @return the statement with the given index.
-      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
-      of bounds.
-    */
-
+    
+    @Override
     public Statement getStatementAt(int index) {
         if (body != null && index == 0) {
             return body;
@@ -244,24 +213,13 @@ public class MethodDeclaration
     }
 
 
-    /**
-     *      Get the number of type references in this container.
-     *      @return the number of type references.
-     */
-
+    @Override
     public int getTypeReferenceCount() {
         return (returnType != null) ? 1 : 0;
     }
 
-    /*
-      Return the type reference at the specified index in this node's
-      "virtual" type reference array.
-      @param index an index for a type reference.
-      @return the type reference with the given index.
-      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
-      of bounds.
-    */
-
+    
+    @Override
     public TypeReference getTypeReferenceAt(int index) {
         if (returnType != null && index == 0) {
             return returnType;
@@ -269,23 +227,14 @@ public class MethodDeclaration
         throw new ArrayIndexOutOfBoundsException();
     }
 
-    /**
- *      Get the number of parameters in this container.
- *      @return the number of parameters.
-     */
-
+    
+    @Override
     public int getParameterDeclarationCount() {
         return (parameters != null) ? parameters.size() : 0;
     }
 
-    /*
-      Return the parameter declaration at the specified index in this node's
-      "virtual" parameter declaration array.
-      @param index an index for a parameter declaration.
-      @return the parameter declaration with the given index.
-      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
-      of bounds.
-    */
+    
+    @Override
     public ParameterDeclaration getParameterDeclarationAt(int index) {
         if (parameters != null) {
             return parameters.get(index);
@@ -293,114 +242,87 @@ public class MethodDeclaration
         throw new ArrayIndexOutOfBoundsException();
     }
 
+    
     /**
- *      Get return type.
- *      @return the type reference.
+     *      Get return type.
+     *      @return the type reference.
      */
-
     public TypeReference getTypeReference() {
         return returnType;
     }
+    
+    
+    public Comment[] getVoidComments() {
+	return voidComments;
+    }
 
 
+    @Override    
     public final String getName() {
         return (name == null) ? null : name.toString();
     }
 
 
-
-    /**
- *      Get parameters.
- *      @return the parameter declaration array wrapper.
-     */
-
     public ImmutableArray<ParameterDeclaration> getParameters() {
         return parameters;
     }
 
+    
+    @Override    
     public String getFullName() {
 	return getName();
     }
 
 
-    /**
- *      Get thrown.
- *      @return the throws.
-     */
-
     public Throws getThrown() {
         return exceptions;
     }
 
-    /**
- *      Get body.
- *      @return the statement block.
-     */
 
     public StatementBlock getBody() {
         return body;
     }
 
 
-    /**
-     * Test whether the declaration is final.
-     */
-
+    @Override
     public boolean isFinal() {
         return super.isFinal();
     }
-    
-    public boolean isAnnotatedWith(String s) {
-        for (int i = modArray.size() - 1; i >= 0; i -= 1) {
-            Modifier m = modArray.get(i);
-            if (m instanceof AnnotationUseSpecification &&
-                    ((AnnotationUseSpecification)m).getText().equals(s)) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    /**
-     * Test whether the declaration is private.
-     */
 
+    
+    @Override
     public boolean isPrivate() {
         return super.isPrivate();
     }
 
-    /**
-     * Test whether the declaration is protected.
-     */
-
+    
+    @Override    
     public boolean isProtected() {
         return super.isProtected();
     }
 
+    
     /**
      * Test whether the declaration is public. Methods of interfaces
      * are always public.
      */
-
+    @Override
     public boolean isPublic() {
         return parentIsInterfaceDeclaration || super.isPublic();
     }
 
-    /**
-     * Test whether the declaration is static.
-     */
-
+    
+    @Override
     public boolean isStatic() {
         return super.isStatic();
     }
 
-    /**
-     * Test whether the declaration is model (the jml modifier is meant).
-     */
-
+    
+    @Override
     public boolean isModel() {
         return super.isModel();
     }
+    
     
     /**
      * test whether the declaration is a method with a variable number of arguments (i.e. the ellipsis ...)
@@ -412,49 +334,45 @@ public class MethodDeclaration
         return parameters.get(parameters.size() - 1).isVarArg();
     }
 
-    /**
-     * Test whether the declaration is strictfp.
-     */
-
+    
+    @Override
     public boolean isStrictFp() {
         return super.isStrictFp();
     }
 
+    
     /**
      * Test whether the declaration is abstract. Methods of interfaces
      * are always abstract.
      */
-
+    @Override    
     public boolean isAbstract() {
         return  parentIsInterfaceDeclaration || super.isAbstract();
     }
 
+    
     /**
      * Test whether the declaration is native. Constructors
      * are never native.
      */
-
+    @Override
     public boolean isNative() {
         return super.isNative();
     }
 
 
-    /**
-     * Test whether the declaration is synchronized.
-     */
-
+    @Override
     public boolean isSynchronized() {
         return super.isSynchronized();
     }
 
-    /** calls the corresponding method of a visitor in order to
-     * perform some action/transformation on this element
-     * @param v the Visitor
-     */
+    
+    @Override
     public void visit(Visitor v) {
 	v.performActionOnMethodDeclaration(this);
     }
 
+    @Override    
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
         p.printMethodDeclaration(this);
     }

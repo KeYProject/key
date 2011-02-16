@@ -13,6 +13,7 @@ package de.uka.ilkd.key.gui;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Point;
 import java.awt.event.*;
 import java.util.*;
 
@@ -84,31 +85,31 @@ public final class ProofManagementDialog extends JDialog {
 	//create proof list
 	proofList = new JList();
 	proofList.setCellRenderer(new DefaultListCellRenderer() {
-	     public Component getListCellRendererComponent(JList list, 
-		     					   Object value, 
-		     					   int index, 
-		     					   boolean isSelected, 
-		     					   boolean cellHasFocus) {
-		 Component result = super.getListCellRendererComponent(list, 
-			 					       value, 
-			 					       index, 
-			 					       isSelected, 
-			 					       cellHasFocus);
-		 if(result instanceof JLabel) {
-		     ProofStatus ps 
+	    public Component getListCellRendererComponent(JList list, 
+	     					   	  Object value, 
+		     					  int index, 
+		     					  boolean isSelected, 
+		     					  boolean cellHasFocus) {
+		Component result = super.getListCellRendererComponent(list, 
+			 					      value,
+			 					      index, 
+			 					      isSelected, 
+			 					      cellHasFocus);
+		if(result instanceof JLabel) {
+		    ProofStatus ps 
 		     	= ((ProofWrapper)value).proof.mgt().getStatus();
-		     JLabel label = (JLabel) result;
-		     if(ps.getProofClosed()) {
-			 label.setIcon(keyClosedIcon);
-		     } else if(ps.getProofClosedButLemmasLeft()) {
-			 label.setIcon(keyAlmostClosedIcon);
-		     } else {
-			 assert ps.getProofOpen();
-			 label.setIcon(keyIcon);
-		     }
-		 }
-		 return result;
-	     }
+		    JLabel label = (JLabel) result;
+		    if(ps.getProofClosed()) {
+			label.setIcon(keyClosedIcon);
+		    } else if(ps.getProofClosedButLemmasLeft()) {
+			label.setIcon(keyAlmostClosedIcon);
+		    } else {
+			assert ps.getProofOpen();
+			label.setIcon(keyIcon);
+		    }
+		}
+		return result;
+	    }
 	});
 	proofList.addListSelectionListener(new ListSelectionListener() {
 	    public void valueChanged(ListSelectionEvent e) {
@@ -239,7 +240,8 @@ public final class ProofManagementDialog extends JDialog {
         getContentPane().setLayout(new BoxLayout(getContentPane(), 
                                                  BoxLayout.Y_AXIS));	
 	pack();
-	setLocation(20, 20);
+	final Point mainLoc = Main.getInstance().getLocation();
+	setLocation(mainLoc.x + 20, mainLoc.y + 20);
     }
     
     
@@ -292,12 +294,23 @@ public final class ProofManagementDialog extends JDialog {
         	});
         	outer: for(KeYJavaType kjt : kjtsarr) {
         	    if(kjt.getJavaType() instanceof TypeDeclaration
-        	       && ((TypeDeclaration)kjt.getJavaType()).isLibraryClass()) {
+        	       && ((TypeDeclaration)kjt.getJavaType())
+        	                               .isLibraryClass()) {
         		continue;
         	    }
-        	    ImmutableSet<ObserverFunction> targets
-        	    	= services.getSpecificationRepository().getContractTargets(kjt);
-        	    for(ObserverFunction target : targets) {
+        	    final ImmutableSet<ObserverFunction> targets
+        	    	= services.getSpecificationRepository()
+        	    	          .getContractTargets(kjt);
+        	    final ObserverFunction[] targetsArr
+        	    	= targets.toArray(new ObserverFunction[targets.size()]);
+        	    Arrays.sort(targetsArr, new Comparator<ObserverFunction>() {
+        		public int compare(ObserverFunction o1, 
+        			           ObserverFunction o2) {
+        		    return o1.name().toString()
+        		                    .compareTo(o2.name().toString());
+        		}
+        	    });
+        	    for(ObserverFunction target : targetsArr) {
         		if(!services.getSpecificationRepository()
         			    .getContracts(kjt, target)
         			    .isEmpty()) {
