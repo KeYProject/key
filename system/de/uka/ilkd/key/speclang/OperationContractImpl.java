@@ -448,7 +448,10 @@ public final class OperationContractImpl implements OperationContract {
 	sig.append(pm.getName());
 	sig.append("(");
 	for(ProgramVariable pv : originalParamVars) {
-	    sig.append(pv.name());
+	    sig.append(pv.name()).append(", ");
+	}
+	if(!originalParamVars.isEmpty()) {
+	    sig.setLength(sig.length() - 2);
 	}
 	sig.append(")");
 	sig.append(" catch(");
