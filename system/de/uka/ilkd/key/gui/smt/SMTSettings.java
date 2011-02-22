@@ -312,15 +312,32 @@ public class SMTSettings implements Settings {
     	// that the execution commands have been read yet.
 	String ruleString = props.getProperty(ACTIVE_RULE);
 
-	/*this.activeSMTRule = findRuleByName(ruleString);
+	this.activeSolverUnion = findSolverUnionByName(ruleString);
 	// Use only the rule if the corresponding solvers 
 	// are installed.
-	if(!activeSMTRule.isUsable()){
-	    this.activeSMTRule = SMTRule.EMPTY_RULE;
-	}*/
+	if(activeSolverUnion == null || !activeSolverUnion.isUsable()){
+	    this.activeSolverUnion = SolverTypeCollection.EMPTY_COLLECTION;
+	}
 
     }
     
+    private SolverTypeCollection findSolverUnionByName(String name){
+	for(SolverTypeCollection union : solverUnions){
+	    if(union.name().equals(name)){
+		return union;
+	    }
+	}
+	return null;
+    }
+    
+    private SolverType findSolverByName(String name){
+	for(SolverType type : supportedSolvers){
+	    if(type.getName().equals(name)){
+		return type;
+	    }
+	}
+	return null;
+    }
 
     
     /**
@@ -335,11 +352,11 @@ public class SMTSettings implements Settings {
 	    for (String s : valuepairs) {
 		String[] vals = s.split(execSeperator2);
 		if (vals.length == 2) {
-		//    SMTSolverImplementation solver = findSolverByName(vals[0]);
-		  //  if(solver != null){
-		//	setExecutionCommand(solver,decode(vals[1]));
-		//	solver.isInstalled(true);
-		//    }
+		    SolverType solver = findSolverByName(vals[0]);
+		   if(solver != null){
+			setExecutionCommand(solver,decode(vals[1]));
+			solver.isInstalled(true);
+		    }
 		}
 	    }
 	}
@@ -376,22 +393,22 @@ public class SMTSettings implements Settings {
      * @param prop
      */
     private void writeExecutionString(Properties prop) {
-//	String toStore = "";
-//	for (SMTSolverImplementation solver : getSolvers()) {
-//	     
-//	     String comm = encode(solver.getExecutionCommand());
-//	    	if (comm == null) {
-//			comm = "";
-//	    	}
-//	    	toStore = toStore + solver.name() + execSeperator2 + comm + execSeperator1;
-//	    }
-//	
-//	//remove the las two || again
-//	if (toStore.length() >= execSeperator1.length()){
-//	    //if the program comes here, a the end ad extra || was added.
-//	    toStore = toStore.substring(0, toStore.length()-execSeperator1.length());
-//	}
-//	prop.setProperty(EXECSTR, toStore);
+	String toStore = "";
+	for (SolverType solver : getSupportedSolvers()) {
+	     
+	     String comm = encode(solver.getExecutionCommand());
+	    	if (comm == null) {
+			comm = "";
+	    	}
+	    	toStore = toStore + solver.getName() + execSeperator2 + comm + execSeperator1;
+	    }
+	
+	//remove the las two || again
+	if (toStore.length() >= execSeperator1.length()){
+	    //if the program comes here, a the end ad extra || was added.
+	    toStore = toStore.substring(0, toStore.length()-execSeperator1.length());
+	}
+	prop.setProperty(EXECSTR, toStore);
     }
     
     /**
@@ -457,24 +474,7 @@ public class SMTSettings implements Settings {
 	listenerList.remove(l);
     }
 
-    /**
-     * if the specified rule is known it is set as active rule, otherwise or specifying <code>null</code>
-     * deactivates the rule. 
-     */
-   /* public void setActiveSMTRule(SMTRule rule){
-	if(activeSMTRule != rule){
-	    if(rule == null){
-		activeSMTRule = SMTRule.EMPTY_RULE;
-	    }else{
-		this.activeSMTRule = rule;
-	    }
-	 
-	    fireSettingsChanged();
-	}
-	
 
-    }*/
-    
     public void setActiveSolverUnion(SolverTypeCollection union){
 	if(activeSolverUnion != union){
 	    if(union == null){
@@ -564,7 +564,7 @@ public class SMTSettings implements Settings {
      * @param props the Properties object where to write the settings as (key, value) pair
      */
     public void writeSettings(Properties props) {	
-        //props.setProperty(ACTIVE_RULE, "" + activeSMTRule.name());
+        props.setProperty(ACTIVE_RULE, "" + activeSolverUnion.name());
         props.setProperty(TIMEOUT, "" + this.timeout);
       
         /*if (this.saveFile)

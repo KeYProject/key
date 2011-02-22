@@ -12,6 +12,7 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
+import javax.swing.plaf.basic.BasicProgressBarUI;
 
 public class ProgressPanel2 extends JPanel{
     
@@ -62,7 +63,13 @@ public class ProgressPanel2 extends JPanel{
 	    SwingUtilities.invokeLater(new Runnable() {
 	        @Override
 	        public void run() {
-	            bars[processIndex].setBackground(color);
+	            
+	          //  bars[processIndex].setBackground(color);
+	            
+	            bars[processIndex].setUI(  new BasicProgressBarUI() {
+	        	protected Color getSelectionBackground() { return color; }
+	            });
+	            	
 	        }
 	    });
 	

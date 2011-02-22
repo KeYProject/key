@@ -163,15 +163,7 @@ final public class SMTSolverImplementation implements SMTSolver, Runnable {
 	return getReasonOfInterruption() != ReasonOfInterruption.NoInterruption;
     }
 
-    /**
-     * Get the command for executing the external prover.
-     * This is a hardcoded default value. It might be overridden by user settings
-     * @param filename the location, where the file is stored.
-     * @param formula the formula, that was created by the translator
-     * @return Array of Strings, that can be used for executing an external decider.
-     */
-//    protected abstract String getExecutionCommand(String filename,
-//	    				            String formula);
+
   
     public SMTTranslator getTranslator(Services services) {
 	try{

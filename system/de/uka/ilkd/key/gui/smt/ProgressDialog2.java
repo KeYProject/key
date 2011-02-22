@@ -12,6 +12,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
@@ -20,9 +21,11 @@ public class ProgressDialog2 extends JDialog {
     private ScrollPane scrollPane;
     private JPanel     panelContainer;
     private JPanel     buttonContainer;
+    private JPanel     infoPanel;
     private JButton    discardButton;
     private JButton    applyButton;
     private JButton    stopButton;
+    private JLabel     infoLabel;
     private ProgressPanel2 []panels;
     
     
@@ -62,11 +65,33 @@ public class ProgressDialog2 extends JDialog {
 	return panelContainer;
     }
     
+    private JPanel getInfoPanel(){
+	if(infoPanel == null){
+	    infoPanel = new JPanel();
+	    infoPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
+	    
+	    infoPanel.add(getInfoLabel());
+	}
+	return infoPanel;
+    }
+    
+    private JLabel getInfoLabel(){
+	if(infoLabel == null){
+	    infoLabel = new JLabel();
+	    infoLabel.setAlignmentX(CENTER_ALIGNMENT);
+	    infoLabel.setAlignmentY(CENTER_ALIGNMENT);
+	}
+	return infoLabel;
+    }
+    
     private JPanel getButtonContainer(){
 	if(buttonContainer == null){
 	    buttonContainer = new JPanel();
 	    buttonContainer.setLayout(new BoxLayout(buttonContainer, BoxLayout.X_AXIS));
-	    buttonContainer.add(Box.createHorizontalGlue());
+	    
+	   // buttonContainer.add(Box.createHorizontalGlue());
+	    buttonContainer.add(getInfoPanel());
+	    buttonContainer.add(Box.createHorizontalStrut(10));
 	    buttonContainer.add(getDiscardButton());
 	    buttonContainer.add(Box.createHorizontalStrut(10));
 	    buttonContainer.add(getApplyButton());
@@ -141,8 +166,13 @@ public class ProgressDialog2 extends JDialog {
 	});
     }
     
+    public void setInfo(String text){
+	getInfoLabel().setText(text);
+    }
     
-    
+    public void setInfoColor(Color color){
+	getInfoLabel().setForeground(color);
+    }
     
     
     

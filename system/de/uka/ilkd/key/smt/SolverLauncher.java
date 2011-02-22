@@ -132,8 +132,10 @@ public class SolverLauncher implements SolverListener {
 	
 	for(SMTProblem problem : problems){
 	    for(SolverType factory : factories){
-		SMTSolver solver = factory.createSolver(problem,this,services);
-		problem.addSolver(solver);
+		if(factory.isInstalled(false)){
+		    SMTSolver solver = factory.createSolver(problem,this,services);
+		    problem.addSolver(solver);
+		}
 	    }
 	}
 	return problems;
@@ -173,7 +175,7 @@ public class SolverLauncher implements SolverListener {
 	                        Collection<SMTProblem> problems,
 	                        Collection<SolverType> solverTypes){
 	
-
+	
 	notifyListenersOfStart(problems, solverTypes);
 	
 	launchLoop(solvers);
@@ -252,9 +254,15 @@ public class SolverLauncher implements SolverListener {
     
     public void launch(Collection<SolverType> factories, Collection<SMTProblem> problems,
 	    Services services){
-	problems = prepareSolvers(factories, problems,services);
+	LinkedList<SolverType> installedSolvers = new LinkedList<SolverType>();
+	for(SolverType type: factories){
+	    if(type.isInstalled(false)){
+		installedSolvers.add(type);
+	    }
+	}
+	problems = prepareSolvers(installedSolvers, problems,services);
 	
-	launch(problems,factories);	
+	launch(problems,installedSolvers);	
     }
     
     private void notifySolverHasFinished(SMTSolver solver){

@@ -276,11 +276,13 @@ abstract class AbstractSolverType implements SolverType {
 	if (first >= 0) {
 	    cmd = cmd.substring(0, first);
 	}
-
+	
 	if (checkEnvVariable(cmd)) {
 	    return true;
 	} else {
+	    
 	    File file = new File(cmd);
+	    
 	    return file.exists();
 
 	}
@@ -302,6 +304,7 @@ abstract class AbstractSolverType implements SolverType {
      */
     public boolean isInstalled(boolean recheck) {
 	if (recheck || !installWasChecked) {
+	    
 	    String cmd = getExecutionCommand();
 	    isInstalled = isInstalled(cmd);
 	    if (isInstalled) {

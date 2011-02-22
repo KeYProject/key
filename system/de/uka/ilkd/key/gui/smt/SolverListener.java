@@ -28,6 +28,8 @@ public class SolverListener implements SolverLauncherListener {
     private ProgressPanel2 [] progressPanels;
     private Collection<InternSMTProblem> problems = new LinkedList<InternSMTProblem>();
     private Timer timer = new Timer();
+    private final static Color RED = new Color(180, 43, 43);
+    private final static Color GREEN = new Color(43,180,43);
    
     private static final int RESOLUTION = 1000;
     
@@ -237,6 +239,7 @@ public class SolverListener implements SolverLauncherListener {
     
     
     private void stopped(InternSMTProblem problem){
+
 	if(problem.solver.wasInterrupted()){
 	    interrupted(problem);
 	}else if(problem.solver.getFinalResult().isValid() 
@@ -256,6 +259,10 @@ public class SolverListener implements SolverLauncherListener {
 	ReasonOfInterruption reason = problem.solver.getReasonOfInterruption();
 	switch(reason){
 	case Exception:
+	    progressDialog.setInfo("Exception!");
+	    progressDialog.setInfoColor(RED);
+	    getPanel(problem).setProgress(problemIndex,0);
+	    getPanel(problem).setColor(problemIndex, RED);
 	    getPanel(problem).setText(problemIndex,"Exception.");
 	    break;
 	case NoInterruption:
@@ -273,20 +280,22 @@ public class SolverListener implements SolverLauncherListener {
     
     private void successfullyStopped(InternSMTProblem problem){
 	int problemIndex = problem.getProblemIndex();
-	getPanel(problem).setColor(problemIndex, Color.GREEN);
-	getPanel(problem).setText(problemIndex,"Solved.");
+	    getPanel(problem).setProgress(problemIndex,0);
+	getPanel(problem).setColor(problemIndex, GREEN);
+	getPanel(problem).setText(problemIndex,"Valid.");
     }
     
     private void unsuccessfullyStopped(InternSMTProblem problem){
 	int problemIndex = problem.getProblemIndex();
-	getPanel(problem).setColor(problemIndex, Color.RED);
+	    getPanel(problem).setProgress(problemIndex,0);
+	getPanel(problem).setColor(problemIndex, RED);
 	getPanel(problem).setText(problemIndex,"Falsifiable.");
 	
     }
     
     private void unknownStopped(InternSMTProblem problem){
 	int problemIndex = problem.getProblemIndex();		
-	getPanel(problem).setText(problemIndex,"Unkown.");
+	getPanel(problem).setText(problemIndex,"Unknown.");
     }
  
     
