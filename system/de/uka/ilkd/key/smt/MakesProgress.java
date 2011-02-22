@@ -24,7 +24,7 @@ public interface MakesProgress {
     /**
      * Calling the method <code>interrupt()</code> causes the interruption of the current process. 
      */
-    public void interrupt();
+    //public void interrupt();
     
     public String getTitle();
 

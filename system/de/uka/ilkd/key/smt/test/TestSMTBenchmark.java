@@ -187,7 +187,7 @@ public class TestSMTBenchmark extends TestCase implements FilenameFilter{
      */
     protected Collection<SMTRule> getRules() {
 	
-	return SMTSettings.getInstance().getSMTRules();
+	return null;// SMTSettings.getInstance().getSMTRules();
 	
 	
     }

@@ -86,7 +86,7 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
     /**Used for consistency.*/
     public final static SMTRule EMPTY_RULE = new EmptyRule();
     /**The solvers that are used by this rule.*/
-    private Collection<SMTSolver> solvers = new LinkedList<SMTSolver>();
+    private Collection<SolverType> factories = new LinkedList<SolverType>();
     /**Important for applying the results to goals.*/
     private Constraint 	           userConstraint = null;
     /**The name of the rule. Important to identify rules while reading and   
@@ -115,11 +115,11 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
 	super.init();
     }
     
-    private SMTRule(Name name,boolean multi, boolean background ,SMTSolver ... list){
+    private SMTRule(Name name,boolean multi, boolean background ,SolverType ... list){
 	multiRule = multi;
 	this.background = background;
-	for(SMTSolver solver : list){
-		   solvers.add(solver);   
+	for(SolverType factory : list){
+		   factories.add(factory);   
 	}
 	this.name = name;
     
@@ -130,7 +130,7 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
      * @param list the list of solvers, that should be used by 
      * by the rule.
      */
-    public SMTRule(Name name, SMTSolver ... list){
+    public SMTRule(Name name, SolverType ... list){
 	this(name,list.length>1,false,list);
 	
     }
@@ -154,13 +154,16 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
      * 1. If there is not any solver installed the method returns an empty collection. 
      * 2. If the rule consists of multiple solvers at least two solvers must be installed.
      */    
-    public Collection<SMTSolver> getInstalledSolvers(){
-	Collection<SMTSolver> installed = new LinkedList<SMTSolver>();
-	for(SMTSolver solver : solvers){
-	    if(solver.isInstalled(false) && 
-		    (((((AbstractSMTSolver)solver).useForMultipleRule() && multiRule)) || !multiRule)){
+    public Collection<SolverType> getInstalledSolvers(){
+	Collection<SolverType> installed = new LinkedList<SolverType>();
+	for(SolverType factory : factories){
+	   /* if(factory.isInstalled(false) && 
+		    (((((AbstractSMTSolver)factory).useForMultipleRule() && multiRule)) || !multiRule)){
 		
 		installed.add(solver);
+	    }*/
+	    if(factory.isInstalled(false)){
+		installed.add(factory);
 	    }
 	}
 	if(multiRule && installed.size() == 1){
@@ -200,7 +203,7 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
     }
     
     private void prepareSolvers(LinkedList<InternResult> terms, Services services, Collection<Taclet> taclets){
-	for(SMTSolver solver : getInstalledSolvers()){
+	/*for(SolverFactory factory : getInstalledSolvers()){
 	    LinkedList<InternResult> temp = new LinkedList<InternResult>();
 	    for(InternResult ir : terms){
 		temp.add((InternResult) ir.clone(solver));
@@ -208,7 +211,7 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
 	    }
 	    solver.prepareSolver(temp, services, taclets);
 	    addProcess(solver);
-	}
+	}*/
     }
     
     /**
@@ -416,8 +419,8 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
 	    return "multiple provers: disabled";
 	}
 	
-	for(SMTSolver solver : solvers){
-	    if((!solver.isInstalled(true) || !solver.useForMultipleRule()) && multiRule){
+	for(SolverType factory : factories){
+	    if(factory.isInstalled(true)){
 		continue;
 	    }
 	  
@@ -430,10 +433,10 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
 		    }
 	    }
 	    
-	    s += solver.name();
+	    s += factory.getName();
 
 	}
-	return s;
+	return s+"Test";
     }
 
     public Name name() {
@@ -456,7 +459,7 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
      */
     public void applyResults() {
 
-	LinkedList<SolverSession.InternResult> result = new LinkedList<SolverSession.InternResult>();
+	/*LinkedList<SolverSession.InternResult> result = new LinkedList<SolverSession.InternResult>();
 	for (SMTSolver solver : getInstalledSolvers()) {
 	    // if( !solver.running()){
 	    AbstractSMTSolver s = (AbstractSMTSolver) solver;
@@ -489,7 +492,7 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
 	
 	    }
 
-	}
+	}*/
 
     }
     
@@ -500,7 +503,7 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
      * but add them all to the returned list.
      */
     public LinkedList<SMTSolverResult> getResults(){
-	HashSet<SolverSession.InternResult> result = new HashSet<SolverSession.InternResult>();
+	/*HashSet<SolverSession.InternResult> result = new HashSet<SolverSession.InternResult>();
 	
 	for(SMTSolver solver : getInstalledSolvers()){
 	    AbstractSMTSolver s = (AbstractSMTSolver) solver;
@@ -513,7 +516,8 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
 	for(SolverSession.InternResult res  : result ){
 	    toReturn.add(res.getResult());
 	}
-	return toReturn;
+	return toReturn;*/
+	return null;
 	
     }
     
@@ -602,7 +606,7 @@ public class SMTRule  extends ProcessLauncher implements BuiltInRule{
 	     break;
 
 	 case PROCESS_CYCLE_FINISHED:
-	       AbstractSMTSolver solver = (AbstractSMTSolver)process;
+	       SMTSolverImplementation solver = (SMTSolverImplementation)process;
 	        SMTSolverResult result = (SMTSolverResult)e.getUserObject();
 	
 	        if(result.isValid() == SMTSolverResult.ThreeValuedTruth.TRUE){
@@ -668,8 +672,8 @@ class EmptyRule extends SMTRule{
 	return false;
     }
 
-    public Collection<SMTSolver> getInstalledSolvers(){
-	Collection<SMTSolver> installed = new LinkedList<SMTSolver>();
+    public Collection<SolverType> getInstalledSolvers(){
+	Collection<SolverType> installed = new LinkedList<SolverType>();
 	return installed;
     }
 

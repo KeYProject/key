@@ -18,7 +18,7 @@ import javax.swing.tree.DefaultTreeModel;
 
 
 import de.uka.ilkd.key.smt.SMTSolver;
-import de.uka.ilkd.key.smt.AbstractSMTSolver;
+import de.uka.ilkd.key.smt.SMTSolverImplementation;
 
 class TemporarySolverSettings {
     public SMTSolver solver;
@@ -43,8 +43,8 @@ class TemporarySolverSettings {
     }
 
     void apply() {
-	((AbstractSMTSolver) solver).setExecutionCommand(command);
-	((AbstractSMTSolver) solver).useForMultipleRule(useForMulitpleProvers);
+	((SMTSolverImplementation) solver).setExecutionCommand(command);
+	((SMTSolverImplementation) solver).useForMultipleRule(useForMulitpleProvers);
 	solver.isInstalled(true);
 
     }
@@ -338,14 +338,14 @@ public class TemporarySettings extends Settings {
 	            public boolean visible() {
 	        	SMTSolver solver =  ((TemporarySolverSettings) getUserObject())
 	        	.solver;
-	        	String info = solver.getInfo();
+	        	String info = solver.getType().getInfo();
 	        	return info !=  null && !info.isEmpty();
 	            };
 	            public boolean prepareValues() {
 	        	super.prepareValues();
 	        	SMTSolver solver =  ((TemporarySolverSettings) getUserObject())
 	        	.solver;
-	        	String info = solver.getInfo();
+	        	String info = solver.getType().getInfo();
 	        	
 	        	if(info ==  null || info.isEmpty()){
 	        	    // Don't show the component if there is no information

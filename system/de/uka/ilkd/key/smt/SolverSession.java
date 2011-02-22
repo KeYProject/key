@@ -113,7 +113,7 @@ class SolverSession {
 	
 	protected Object clone(SMTSolver solver)  {
 	    InternResult result = new InternResult(term , goal ,formula);
-	    result.result=SMTSolverResult.createUnknownResult("",solver.name());
+	    //result.result=SMTSolverResult.createUnknownResult("",solver.name());
 	    return result;
 	}
 	

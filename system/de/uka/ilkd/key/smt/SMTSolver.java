@@ -13,16 +13,19 @@ package de.uka.ilkd.key.smt;
 
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Timer;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 import de.uka.ilkd.key.smt.SolverSession.InternResult;
 
 
 
 
 public interface SMTSolver extends de.uka.ilkd.key.smt.launcher.Process{
-    
+    public enum ReasonOfInterruption{User,Timeout,Exception,NoInterruption};
+    public enum SolverState{Waiting,Running,Stopped};
 
 
     
@@ -49,7 +52,7 @@ public interface SMTSolver extends de.uka.ilkd.key.smt.launcher.Process{
      * @return A SMTSolverResult containing all information of the interpretation.
      * @throws IllegalArgumentException If the solver caused an error.
      */
-    public SMTSolverResult interpretAnswer(String output, String error, int exitstatus) throws IllegalArgumentException;
+  //  public SMTSolverResult interpretAnswer(String output, String error, int exitstatus) throws IllegalArgumentException;
     
     
     
@@ -67,13 +70,15 @@ public interface SMTSolver extends de.uka.ilkd.key.smt.launcher.Process{
     
     public String getExecutionCommand();
     
+    public SolverType getType();
+    
     public boolean useForMultipleRule();
     
     /**
      * @return Returns some information for the solver. If no information
      * is provided an empty String is returned. 
      */
-    String getInfo();
+   // String getInfo();
     
 
     /**
@@ -83,6 +88,35 @@ public interface SMTSolver extends de.uka.ilkd.key.smt.launcher.Process{
     public void useTaclets(boolean b);
     
     public void prepareSolver(LinkedList<InternResult> goals, Services services, Collection<Taclet> taclets);
+    
+    public void interrupt(ReasonOfInterruption reasonOfInterruption);
+    
+    public void start(SolverTimeout timeout);
+    
+    public SolverTimeout getSolverTimeout();
+    
+    public long getStartTime();
+    
+    public long getTimeout();
+    
+    public SolverState getState();
+    
+    public boolean wasInterrupted();
+    
+     
+    
+    public ReasonOfInterruption getReasonOfInterruption();
+    
+    public Object getUserTag();
+    
+    public void setUserTag(Object o);
+    
+    public SMTSolverResult getFinalResult();
+    
+    
+    
+    
+  
     
    
 }

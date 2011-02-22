@@ -90,16 +90,16 @@ public abstract class AbstractProfile implements Profile {
 
     protected ImmutableList<BuiltInRule> initBuiltInRules() {
         ImmutableList<BuiltInRule> builtInRules = ImmutableSLList.<BuiltInRule>nil();
-	LinkedList<AbstractSMTSolver> solverList = new LinkedList<AbstractSMTSolver>();
+	LinkedList<SMTSolverImplementation> solverList = new LinkedList<SMTSolverImplementation>();
 
 
 	
 	
-	Collection<SMTRule> rules = SMTSettings.getInstance().getSMTRules();
+	//Collection<SMTRule> rules = SMTSettings.getInstance().getSMTRules();
         
-	for(SMTRule rule : rules){
-	    builtInRules = builtInRules.prepend(rule);  
-	}     
+	//for(SMTRule rule : rules){
+	  //  builtInRules = builtInRules.prepend(rule);  
+	//}     
         
      
         

@@ -17,12 +17,10 @@ import de.uka.ilkd.key.gui.configuration.Settings;
 import de.uka.ilkd.key.gui.configuration.SettingsListener;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.smt.AbstractSMTSolver;
-import de.uka.ilkd.key.smt.CVC3Solver;
-import de.uka.ilkd.key.smt.SMTRule;
-import de.uka.ilkd.key.smt.SimplifySolver;
-import de.uka.ilkd.key.smt.YicesSolver;
-import de.uka.ilkd.key.smt.Z3Solver;
+import de.uka.ilkd.key.smt.SMTSolverImplementation;
+
+import de.uka.ilkd.key.smt.SolverType;
+import de.uka.ilkd.key.smt.SolverTypeCollection;
 
 /** This class encapsulates the information which 
  *  decision procedure should be used.
@@ -58,7 +56,8 @@ public class SMTSettings implements Settings {
     
 
     
-    private LinkedList<SMTRule> smtRules = new LinkedList<SMTRule>();
+  //   private LinkedList<SMTRule> smtRules = new LinkedList<SMTRule>();
+    private LinkedList<SolverTypeCollection> solverUnions = new LinkedList<SolverTypeCollection>(); 
     
     public final static int    PROGRESS_MODE_USER = 0;
     public final static int    PROGRESS_MODE_CLOSE = 1;
@@ -67,10 +66,11 @@ public class SMTSettings implements Settings {
     
     
     
-    private static Collection<AbstractSMTSolver>  solvers = new LinkedList<AbstractSMTSolver>();
+    private static Collection<SMTSolverImplementation>  solvers = new LinkedList<SMTSolverImplementation>();
     
     /** the currently active rule */    
-    private SMTRule activeSMTRule = SMTRule.EMPTY_RULE;
+   // private SMTRule activeSMTRule = SMTRule.EMPTY_RULE;
+    private SolverTypeCollection activeSolverUnion = SolverTypeCollection.EMPTY_COLLECTION;
     
     /** the value of the timeout in tenth of seconds.*/
     private int timeout = 60;
@@ -153,6 +153,16 @@ public class SMTSettings implements Settings {
      */
     private SMTSettings() {
 	super();
+	solverUnions.add(new SolverTypeCollection("Z3",SolverType.Z3_SOLVER));
+	solverUnions.add(new SolverTypeCollection("Yices",SolverType.YICES_SOLVER));
+	solverUnions.add(new SolverTypeCollection("CVC3",SolverType.CVC3_SOLVER));
+	solverUnions.add(new SolverTypeCollection("Simplify",SolverType.SIMPLIFY_SOLVER));
+	solverUnions.add(new SolverTypeCollection("Multiple Solvers",SolverType.Z3_SOLVER,
+					SolverType.YICES_SOLVER,
+					SolverType.CVC3_SOLVER,
+					SolverType.SIMPLIFY_SOLVER));
+	
+	
     }
     
     /** adds a listener to the settings object 
@@ -168,7 +178,7 @@ public class SMTSettings implements Settings {
      * @param name the String unambiguously specifying a rule 
      * @return the found SMTRule or <code>null</code> 
      */
-    public SMTRule findRuleByName(String name){
+    /*public SMTRule findRuleByName(String name){
 	
 	for(SMTRule rule : getSMTRules()){
 	    if(rule.name().toString().equals(name)){
@@ -176,11 +186,11 @@ public class SMTSettings implements Settings {
 	    }
 	}
 	return SMTRule.EMPTY_RULE;
-    }
+    }*/
     
     
-    public AbstractSMTSolver findSolverByName(String name){
-	for(AbstractSMTSolver solver : getSolvers()){
+    public SMTSolverImplementation findSolverByName(String name){
+	for(SMTSolverImplementation solver : getSolvers()){
 		    if(solver.name().equals(name)){
 			return solver;
 		    }
@@ -210,14 +220,18 @@ public class SMTSettings implements Settings {
     
 
     
-    public SMTRule getActiveSMTRule(){
+ /*   public SMTRule getActiveSMTRule(){
 	return activeSMTRule;
+    }*/
+    
+    public SolverTypeCollection getActiveSolverUnion(){
+	return activeSolverUnion;
     }
 
     
     private void setSolversAndRules(){
 	
-	AbstractSMTSolver z3 = new Z3Solver();
+	/*AbstractSMTSolver z3 = new Z3Solver();
 	AbstractSMTSolver simplify = new SimplifySolver();
 	AbstractSMTSolver yices = new YicesSolver();
 	AbstractSMTSolver cvc3 = new CVC3Solver();
@@ -225,33 +239,33 @@ public class SMTSettings implements Settings {
 	solvers.add(z3);
 	solvers.add(simplify);
 	solvers.add(yices);
-	solvers.add(cvc3);
-	smtRules.add(new SMTRule(new Name("Z3_PROVER"),z3));
-	smtRules.add(new SMTRule(new Name("YICES_PROVER"),yices));
-	smtRules.add(new SMTRule(new Name("SIMPLIFY_PROVER"),simplify));
-	smtRules.add(new SMTRule(new Name("CVC3_PROVER"),cvc3));
-	smtRules.add(new SMTRule(new Name("MULTIPLE_PROVERS"),z3,simplify,yices,cvc3));
+	solvers.add(cvc3);*/
+	//smtRules.add(new SMTRule(new Name("Z3_PROVER"),SolverType.Z3_FACTORY));
 	
 	//solvers = s;
 	
     }
     
-    public final Collection<AbstractSMTSolver> getSolvers(){
+    public final Collection<SMTSolverImplementation> getSolvers(){
 	
 	return solvers;
     }
     
     
-    public Collection<SMTRule> getSMTRules(){
+  /*  public Collection<SMTRule> getSMTRules(){
 
 	return smtRules;
+    }*/
+    
+    public Collection<SolverTypeCollection> getSolverUnions(){
+	return solverUnions;
     }
     
 
     /**
      * Returns a list of all installed rules, sorted alphabetically by rule name.
      */
-    public Collection<SMTRule> getInstalledRules(){
+ /*   public Collection<SMTRule> getInstalledRules(){
 	Collection<SMTRule> toReturn = new LinkedList<SMTRule>();
 	
 	for(SMTRule rule : getSMTRules()){
@@ -261,7 +275,7 @@ public class SMTSettings implements Settings {
 	}
 	
 	return toReturn;
-    }
+    }*/
     
     
     
@@ -341,12 +355,12 @@ public class SMTSettings implements Settings {
     	// that the execution commands have been read yet.
 	String ruleString = props.getProperty(ACTIVE_RULE);
 
-	this.activeSMTRule = findRuleByName(ruleString);
+	/*this.activeSMTRule = findRuleByName(ruleString);
 	// Use only the rule if the corresponding solvers 
 	// are installed.
 	if(!activeSMTRule.isUsable()){
 	    this.activeSMTRule = SMTRule.EMPTY_RULE;
-	}
+	}*/
 
     }
     
@@ -364,7 +378,7 @@ public class SMTSettings implements Settings {
 	    for (String s : valuepairs) {
 		String[] vals = s.split(execSeperator2);
 		if (vals.length == 2) {
-		    AbstractSMTSolver solver = findSolverByName(vals[0]);
+		    SMTSolverImplementation solver = findSolverByName(vals[0]);
 		    if(solver != null){
 			setExecutionCommand(solver,decode(vals[1]));
 			solver.isInstalled(true);
@@ -387,7 +401,7 @@ public class SMTSettings implements Settings {
 	    for(String s : valuepairs){
 		String[] vals = s.split(multSeparator2);
 		if(vals.length == 2){
-		    AbstractSMTSolver solver = findSolverByName(vals[0]);
+		    SMTSolverImplementation solver = findSolverByName(vals[0]);
 		    if(solver != null){
 			solver.useForMultipleRule(vals[1].equals("true"));
 		    }
@@ -406,7 +420,7 @@ public class SMTSettings implements Settings {
      */
     private void writeExecutionString(Properties prop) {
 	String toStore = "";
-	for (AbstractSMTSolver solver : getSolvers()) {
+	for (SMTSolverImplementation solver : getSolvers()) {
 	     
 	     String comm = encode(solver.getExecutionCommand());
 	    	if (comm == null) {
@@ -429,7 +443,7 @@ public class SMTSettings implements Settings {
     private void writeMultipleProversString(Properties prop) {
 	String toStore = "";
 	
-	for(AbstractSMTSolver solver : solvers){
+	for(SMTSolverImplementation solver : solvers){
 	    String value = solver.useForMultipleRule()? "true" : "false";
 	    toStore = toStore + solver.name() + multSeparator2 + value + multSeparator1; 
 	}
@@ -448,7 +462,7 @@ public class SMTSettings implements Settings {
      * @param s the solver, which uses this command.
      * @param command the command to use
      */
-    public void setExecutionCommand(AbstractSMTSolver s, String command) {
+    public void setExecutionCommand(SMTSolverImplementation s, String command) {
 	
 	s.setExecutionCommand(command);
 	
@@ -459,7 +473,7 @@ public class SMTSettings implements Settings {
      * @param solver the solver
      * @return the execution command
      */
-    public String getExecutionCommand(AbstractSMTSolver solver) {
+    public String getExecutionCommand(SMTSolverImplementation solver) {
 	return solver.getExecutionCommand();
     }
     
@@ -470,7 +484,7 @@ public class SMTSettings implements Settings {
 
 
     
-    public boolean getMultipleUse(AbstractSMTSolver solver){
+    public boolean getMultipleUse(SMTSolverImplementation solver){
 	return solver.useForMultipleRule();
     }
     
@@ -489,7 +503,7 @@ public class SMTSettings implements Settings {
      * if the specified rule is known it is set as active rule, otherwise or specifying <code>null</code>
      * deactivates the rule. 
      */
-    public void setActiveSMTRule(SMTRule rule){
+   /* public void setActiveSMTRule(SMTRule rule){
 	if(activeSMTRule != rule){
 	    if(rule == null){
 		activeSMTRule = SMTRule.EMPTY_RULE;
@@ -501,6 +515,19 @@ public class SMTSettings implements Settings {
 	}
 	
 
+    }*/
+    
+    public void setActiveSolverUnion(SolverTypeCollection union){
+	if(activeSolverUnion != union){
+	    if(union == null){
+		activeSolverUnion = SolverTypeCollection.EMPTY_COLLECTION;
+	    }else{
+		this.activeSolverUnion = union;
+	    }
+	 
+	    fireSettingsChanged();
+	}
+	
     }
 
 
@@ -579,7 +606,7 @@ public class SMTSettings implements Settings {
      * @param props the Properties object where to write the settings as (key, value) pair
      */
     public void writeSettings(Properties props) {	
-        props.setProperty(ACTIVE_RULE, "" + activeSMTRule.name());
+        //props.setProperty(ACTIVE_RULE, "" + activeSMTRule.name());
         props.setProperty(TIMEOUT, "" + this.timeout);
       
         /*if (this.saveFile)

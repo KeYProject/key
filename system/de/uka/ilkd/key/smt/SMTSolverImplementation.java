@@ -21,6 +21,8 @@ import java.io.InputStreamReader;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Timer;
+import java.util.concurrent.locks.ReentrantLock;
 
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
@@ -35,7 +37,7 @@ import de.uka.ilkd.key.smt.taclettranslation.DefaultTacletSetTranslation;
 import de.uka.ilkd.key.util.Debug;
 
 
-public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSolver {
+final public class SMTSolverImplementation extends AbstractProcess implements SMTSolver, Runnable {
 
     
     private static int fileCounter = 0;
@@ -44,6 +46,10 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
 	fileCounter++;
 	return fileCounter;
     }
+    
+    private static int IDCounter =0;
+    private final int ID = IDCounter++;
+    
 
 
     /**
@@ -77,12 +83,100 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
     
     private String   executionCommand = getDefaultExecutionCommand();
     
+    private SMTProblem problem;
+    private SolverListener listener;
+    private StringBuffer problemFormula = new StringBuffer();
+    private ExternalProcessLauncher processLauncher = new ExternalProcessLauncher();
+    private Services services;
+    private SMTSolverResult finalResult;
+    
+    private ReentrantLock lockStateVariable = new ReentrantLock();
+    private ReentrantLock lockInterruptionVariable = new ReentrantLock();
     
     
-    public AbstractSMTSolver(){
+    private Thread    thread;
+    private SolverTimeout solverTimeout;
+    private ReasonOfInterruption reasonOfInterruption = ReasonOfInterruption.NoInterruption;
+    private Object userTag;
+    private SolverState solverState=SolverState.Waiting;
+    private SolverType type;
+    
+    public SMTSolverImplementation(){
 	//isInstalled(true);
     }
+    
+    public SMTSolverImplementation(SMTProblem problem, SolverListener listener, Services services, SolverType myType){
+	this.problem = problem;
+	this.listener = listener;
+	this.services = services;
+	this.type = myType;
+    }
 
+    @Override
+    public ReasonOfInterruption getReasonOfInterruption() {
+	lockInterruptionVariable.lock();
+	ReasonOfInterruption reason = reasonOfInterruption;
+	lockInterruptionVariable.unlock();
+        return reason;
+    }
+    
+    public void setReasonOfInterruption(
+            ReasonOfInterruption reasonOfInterruption) {
+	lockInterruptionVariable.lock();
+	this.reasonOfInterruption = reasonOfInterruption;
+	lockInterruptionVariable.unlock();
+    }
+    
+    @Override
+    public SolverType getType(){
+	return type;
+    }
+
+    
+    @Override
+    public Object getUserTag() {
+        return userTag;
+    }
+    
+    public void setUserTag(Object o){
+	userTag = o;
+    }
+    
+    public SolverTimeout getSolverTimeout(){
+	return solverTimeout;
+    }
+    
+    public long getStartTime(){
+	if(solverTimeout == null){
+	    return -1;
+	}
+	return solverTimeout.scheduledExecutionTime();
+    }
+    
+    public long getTimeout(){
+	if(solverTimeout == null){
+	    return -1;
+	}
+	return solverTimeout.getTimeout();
+    }
+    
+    
+    public SolverState getState(){
+	lockStateVariable.lock();
+	SolverState b = solverState;
+	lockStateVariable.unlock();
+	return b;
+    }
+    
+    private  void setSolverState(SolverState value){
+	lockStateVariable.lock();
+	solverState = value;
+	lockStateVariable.unlock();
+    }
+    
+    public boolean wasInterrupted(){
+	return getReasonOfInterruption() != ReasonOfInterruption.NoInterruption;
+    }
 
     /**
      * Get the command for executing the external prover.
@@ -91,8 +185,8 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
      * @param formula the formula, that was created by the translator
      * @return Array of Strings, that can be used for executing an external decider.
      */
-    protected abstract String getExecutionCommand(String filename,
-	    				            String formula);
+//    protected abstract String getExecutionCommand(String filename,
+//	    				            String formula);
   
     public SMTTranslator getTranslator(Services services) {
 	try{
@@ -110,7 +204,7 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
 	//get the Command from user settings
 	String toReturn = ProofSettings.DEFAULT_SETTINGS.getSMTSettings().getExecutionCommand(this);
 	if (toReturn == null || toReturn.length() == 0) {
-	    toReturn = this.getExecutionCommand(filename, formula);
+	    toReturn = this.type.getExecutionCommand(filename, formula);
 	} else {
 	    //replace the placeholder with filename and fomula
 	    toReturn = toReturn.replaceAll("%f", filename);
@@ -119,6 +213,71 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
 	return toReturn;
     }
     
+    
+    
+    @Override
+    public void run() {
+	setSolverState(SolverState.Running);
+	listener.processStarted(this, problem);
+	String s;
+	try {
+	    s = translateToCommand(problem.getTerm(), services);
+        } catch (Throwable e) {
+            interruptionOccurred(e);
+	    listener.processInterrupted(this, problem, e);
+	   setSolverState(SolverState.Stopped);
+	    return;
+        }
+	LinkedList<String> list = new LinkedList<String>();
+	while(s.indexOf(' ')!=-1){
+	     int index = s.indexOf(' ');
+             list.add(s.substring(0,s.indexOf(' ')));
+	     s = s.substring(index+1,s.length());
+	}
+	list.add(s);
+	String [] array = new String[list.size()];
+	
+	
+	try {
+	    String result[] = processLauncher.launch(list.toArray(array));
+	    this.finalResult = type.interpretAnswer(result[ExternalProcessLauncher.RESULT], 
+		        result[ExternalProcessLauncher.ERROR], 
+		        Integer.parseInt(result[ExternalProcessLauncher.EXIT_CODE]));
+	//    Thread.sleep(8000);
+        } catch (Throwable e) {
+            interruptionOccurred(e);
+        }finally{
+            solverTimeout.cancel();
+            setSolverState(SolverState.Stopped);
+            listener.processStopped(this, problem);
+        }
+        
+
+	
+    }
+    
+ 
+    private void interruptionOccurred(Throwable e){
+	ReasonOfInterruption reason = getReasonOfInterruption();
+	switch(reason){
+	case Exception:
+	case NoInterruption:
+	    setReasonOfInterruption(ReasonOfInterruption.Exception);
+            listener.processInterrupted(this, problem, e);
+	    break;
+	case Timeout:
+	    listener.processTimeout(this, problem);
+	    break;
+	case User:
+	    listener.processUser(this,problem);
+	    break;		
+	}
+    }
+    
+    public String name(){
+	return type.getName();
+    }
+
    
 
     private static String toStringLeadingZeros(int n, int width) {
@@ -226,7 +385,7 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
 	    //store the translation to a file                                
 	    loc = this.storeToFile(formula);
 	} catch (IOException e) {
-	    Debug.log4jError("The file with the formula could not be written." + e, AbstractSMTSolver.class.getName());
+	    Debug.log4jError("The file with the formula could not be written." + e, SMTSolverImplementation.class.getName());
 	    final IOException io = new IOException("Could not create or write the input file " +
 		    "for the external prover. Received error message:\n" + e.getMessage());
 	    io.initCause(e);
@@ -317,7 +476,7 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
      * The filename od a problem is indicated by %f, the problem itsself with %p
      */
     public String getDefaultExecutionCommand() {
-	return this.getExecutionCommand("%f", "%p");
+	return type.getExecutionCommand("%f", "%p");
     }
     
     
@@ -386,6 +545,35 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
         
     }
     
+    @Override
+    public void interrupt() {
+        solverTimeout.cancel();
+	thread.interrupt();
+    }
+    
+    @Override
+    public void interrupt(ReasonOfInterruption reason) {
+	// order of assignments is important;
+	setReasonOfInterruption(reason);
+	setSolverState(SolverState.Stopped);
+	if(solverTimeout != null){
+	    solverTimeout.cancel();
+	}
+	if(thread != null){
+	    thread.interrupt();
+	}
+        
+    }
+    
+    @Override
+    public void start(SolverTimeout timeout) {
+	    thread = new Thread(this);
+	    solverTimeout = timeout;
+	    thread.start();
+
+        
+    }
+    
     
     @Override
     public String[] atStart() throws Exception{
@@ -425,7 +613,7 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
 	
 	String err = read(error);
 	error.close();
-	SMTSolverResult res = interpretAnswer(text, err, exitStatus);
+	SMTSolverResult res = type.interpretAnswer(text, err, exitStatus);
 	
 	if(session.currentTerm()!= null){
 	     
@@ -436,7 +624,7 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
 	   
 	
 	}
-	listener.eventCycleFinished(this,res);
+	//listener.eventCycleFinished(this,res);
 	
 	
 	return !session.hasNextTerm();
@@ -447,8 +635,11 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
     }
     
     public boolean wasSuccessful() {
- 
-        return session.getTermSize() == session.getSolved();
+	return this.finalResult.isValid() == ThreeValuedTruth.TRUE;
+    }
+    
+    public SMTSolverResult getFinalResult() {
+	return finalResult;
     }
     
 
@@ -458,7 +649,7 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
     }
     
     public String toString(){
-	return name();
+	return name()+" (ID: " +ID+")";
     }
     
     public String getTitle(){
@@ -484,6 +675,9 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
     public String getExecutionCommand(){
 	return executionCommand;
     }
+    
+
+    
     
 
 

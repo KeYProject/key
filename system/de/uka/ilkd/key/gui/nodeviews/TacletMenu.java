@@ -20,7 +20,6 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.Main;
-import de.uka.ilkd.key.gui.smt.RuleLauncher;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.FormulaSV;
@@ -344,8 +343,8 @@ class TacletMenu extends JMenu {
             } else if (e.getSource() instanceof BuiltInRuleMenuItem) {
         	if (((BuiltInRuleMenuItem) e.getSource()).connectedTo() instanceof SMTRule) {
         	    SMTRule rule = (SMTRule) ((BuiltInRuleMenuItem) e.getSource()).connectedTo();
-        	    RuleLauncher.INSTANCE.start(rule, Main.getInstance().mediator().getSelectedGoal(),
-        		    Main.getInstance().mediator().getProof().getUserConstraint().getConstraint(),true);
+        	 //   RuleLauncher.INSTANCE.start(rule, Main.getInstance().mediator().getSelectedGoal(),
+        	//	    Main.getInstance().mediator().getProof().getUserConstraint().getConstraint(),true);
       
         	} else {
                         mediator.selectedBuiltInRule

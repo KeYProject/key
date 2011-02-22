@@ -17,6 +17,8 @@ import de.uka.ilkd.key.smt.SMTRule;
 import de.uka.ilkd.key.smt.SMTSolver;
 import de.uka.ilkd.key.smt.SMTSolverResult;
 
+import de.uka.ilkd.key.smt.SolverType;
+
 public abstract class TestSMTSolver extends TestCommons {
 
     private SMTRule rule;
@@ -33,8 +35,8 @@ public abstract class TestSMTSolver extends TestCommons {
 
     protected void setUp() {
 	rule = this.getSolver();
-	for(SMTSolver solver : rule.getInstalledSolvers()){
-	    solver.useTaclets(false);    
+	for(SolverType type : rule.getInstalledSolvers()){
+	    type.useTaclets(false);    
 	}
 	
 	ProofSettings.DEFAULT_SETTINGS.getSMTSettings().setSaveFile(false);

@@ -17,6 +17,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedList;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -36,16 +37,20 @@ import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.gui.smt.ComplexButton;
+import de.uka.ilkd.key.gui.smt.ProgressDialog2;
+import de.uka.ilkd.key.gui.smt.ProgressPanel2;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
-import de.uka.ilkd.key.gui.smt.RuleLauncher;
 import de.uka.ilkd.key.gui.smt.SettingsDialog;
+import de.uka.ilkd.key.gui.smt.SolverListener;
 import de.uka.ilkd.key.gui.smt.TemporarySettings;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.*;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
-import de.uka.ilkd.key.smt.SMTRule;
+import de.uka.ilkd.key.smt.SMTProblem;
+import de.uka.ilkd.key.smt.SolverLauncher;
+import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.key.util.KeYResourceManager;
@@ -437,6 +442,36 @@ public final class Main extends JFrame implements IMain {
         ComplexButton comp = createSMTComponent();
         toolBar.add(comp.getActionComponent());
         toolBar.add(comp.getSelectionComponent());
+        JButton button = new JButton("Test");
+        button.addActionListener(new ActionListener() {
+	    
+	    @Override
+	    public void actionPerformed(ActionEvent e) {
+		System.out.println("StartProver");
+		final SolverLauncher launcher = new SolverLauncher();
+		final LinkedList<SMTProblem> problems = new LinkedList<SMTProblem>();
+		for(Goal goal : mediator.getProof().openGoals()){
+		    problems.add(new SMTProblem(goal,goal));
+		}
+		launcher.addListener(new SolverListener());
+		Thread thread = new Thread(new Runnable(
+			) {
+		    
+		    @Override
+		    public void run() {
+			   launcher.launch(problems, mediator.getServices());
+			
+		    }
+		});
+		
+		thread.start();
+	     
+		
+	    }
+	});
+        toolBar.add(button);
+        
+
         toolBar.addSeparator();
         
         final JButton goalBackButton = new JButton();
@@ -543,7 +578,7 @@ public final class Main extends JFrame implements IMain {
 		ComplexButton but = (ComplexButton) e.getSource();
 		if(but.getSelectedItem() instanceof SMTInvokeAction){
 		    SMTInvokeAction action = (SMTInvokeAction) but.getSelectedItem(); 
-		    SMTSettings.getInstance().setActiveSMTRule(action.rule);
+		    SMTSettings.getInstance().setActiveSolverUnion(action.solverUnion);
 		}
 	
 	    }
@@ -1320,13 +1355,17 @@ public final class Main extends JFrame implements IMain {
      */
     public void updateSMTSelectMenu() {
 	
-	Collection<SMTRule> rules = ProofSettings.DEFAULT_SETTINGS.
-	                               getSMTSettings().getInstalledRules();
+	//Collection<SMTRule> rules = ProofSettings.DEFAULT_SETTINGS.
+	  //                             getSMTSettings().getInstalledRules();
 	
-	if(rules == null || rules.size() == 0){
+	// TODO: Change this: only solver unions should be returned 
+	// that are installed.
+	Collection<SolverTypeCollection> solverUnions = ProofSettings.DEFAULT_SETTINGS.
+	                                  getSMTSettings().getSolverUnions();
+	if(solverUnions == null || solverUnions.isEmpty()){
 	    updateDPSelectionMenu();
 	}else{
-	    updateDPSelectionMenu(rules);
+	    updateDPSelectionMenu(solverUnions);
 	}
 	
 
@@ -1337,27 +1376,27 @@ public final class Main extends JFrame implements IMain {
 	       smtComponent.setItems(null);
 	   }
 	   
-	   private SMTInvokeAction findAction(SMTInvokeAction [] actions, SMTRule rule){
+	   private SMTInvokeAction findAction(SMTInvokeAction [] actions, SolverTypeCollection union){
 	       for(SMTInvokeAction action : actions){
-		   if(action.rule.equals(rule)){
+		   if(action.solverUnion.equals(union)){
 		       return action;
 		   }
 	       }
 	       return null;
 	   }
 	   
-	   private void updateDPSelectionMenu(Collection<SMTRule> rules){
-		SMTInvokeAction actions[] = new SMTInvokeAction[rules.size()];
+	   private void updateDPSelectionMenu(Collection<SolverTypeCollection> unions){
+		SMTInvokeAction actions[] = new SMTInvokeAction[unions.size()];
 	        
 		int i=0; 
-		for(SMTRule rule : rules){
-		    actions[i] = new SMTInvokeAction(rule);
+		for(SolverTypeCollection union : unions){
+		    actions[i] = new SMTInvokeAction(union);
 		    i++;
 		}
 		
 		smtComponent.setItems(actions);
 	            	
-		SMTRule active = ProofSettings.DEFAULT_SETTINGS.getSMTSettings().getActiveSMTRule();
+		SolverTypeCollection active = ProofSettings.DEFAULT_SETTINGS.getSMTSettings().getActiveSolverUnion();
 		 
 		SMTInvokeAction activeAction = findAction(actions, active);
 		
@@ -1365,8 +1404,8 @@ public final class Main extends JFrame implements IMain {
 		if(!found){
 		    Object item = smtComponent.getTopItem();
 		    if(item instanceof SMTInvokeAction){
-			active = ((SMTInvokeAction)item).rule;
-			ProofSettings.DEFAULT_SETTINGS.getSMTSettings().setActiveSMTRule(active);
+			active = ((SMTInvokeAction)item).solverUnion;
+			ProofSettings.DEFAULT_SETTINGS.getSMTSettings().setActiveSolverUnion(active);
 		    }else{
 			activeAction = null;
 		    }
@@ -2599,29 +2638,32 @@ public final class Main extends JFrame implements IMain {
      * For example the toolbar button is paramtrized with an instance of this action
      */
     private final class SMTInvokeAction extends AbstractAction {
-	SMTRule rule;
+	SolverTypeCollection solverUnion;
 	
-	public SMTInvokeAction(SMTRule rule) {
-	    this.rule = rule;
-	    if (rule != SMTRule.EMPTY_RULE) {
-		putValue(SHORT_DESCRIPTION, "Invokes " + rule.displayName());
+	public SMTInvokeAction(SolverTypeCollection solverUnion) {
+	    this.solverUnion = solverUnion;
+	    if (solverUnion != SolverTypeCollection.EMPTY_COLLECTION) {
+		putValue(SHORT_DESCRIPTION, "Invokes " + solverUnion.toString());
 	    } 
 	}
 	
 	public boolean isEnabled() {
-	    boolean b = super.isEnabled() && rule != SMTRule.EMPTY_RULE && 
+	    boolean b = super.isEnabled() && solverUnion != SolverTypeCollection.EMPTY_COLLECTION && 
  	      mediator != null && mediator.getSelectedProof() != null && !mediator.getSelectedProof().closed();
 	    return b;
 	}
 	  
 	public void actionPerformed(ActionEvent e) {
-	    if (!mediator.ensureProofLoaded() || rule ==SMTRule.EMPTY_RULE) return;
+	    if (!mediator.ensureProofLoaded() || solverUnion ==SolverTypeCollection.EMPTY_COLLECTION){
+		return;
+	    }
 	    final Proof proof = mediator.getProof();
-	    RuleLauncher.INSTANCE.start(rule, proof,proof.getUserConstraint().getConstraint(),true);
+	    SolverLauncher launcher = new SolverLauncher();
+	    launcher.launch(SMTProblem.createSMTProblems(proof), proof.getServices());
 	}
 	
 	public String toString(){
-	    return rule.displayName();
+	    return solverUnion.toString();
 	}
 
 	@Override
@@ -2630,7 +2672,7 @@ public final class Main extends JFrame implements IMain {
 		return false;
 	    }
 	    
-	    return this.rule.equals(((SMTInvokeAction)obj).rule);
+	    return this.solverUnion.equals(((SMTInvokeAction)obj).solverUnion);
 	}
     }
     
