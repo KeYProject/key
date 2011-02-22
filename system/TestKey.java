@@ -79,10 +79,10 @@ public class TestKey extends TestCase {
      
      
     static Class[] smtTests = new Class[] {
-	de.uka.ilkd.key.smt.test.TestSimplify.class,
-	de.uka.ilkd.key.smt.test.TestZ3.class,
-	de.uka.ilkd.key.smt.test.TestYices.class,
-	de.uka.ilkd.key.smt.test.TestCvc3.class,
+	//de.uka.ilkd.key.smt.test.TestSimplify.class,
+	//de.uka.ilkd.key.smt.test.TestZ3.class,
+	//de.uka.ilkd.key.smt.test.TestYices.class,
+	//de.uka.ilkd.key.smt.test.TestCvc3.class,
 
     };
 

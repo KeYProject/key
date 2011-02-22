@@ -1,16 +1,19 @@
 package de.uka.ilkd.key.gui.smt;
 
 import java.awt.Color;
+import java.awt.Dialog.ModalityType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.swing.SwingUtilities;
 
+import de.uka.ilkd.key.smt.RuleAppSMT;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SMTSolver;
 import de.uka.ilkd.key.smt.SolverType;
@@ -50,6 +53,10 @@ public class SolverListener implements SolverLauncherListener {
 	    return problemIndex;
         }
 	
+	public SMTProblem getProblem() {
+	    return problem;
+        }
+	
     }
 
     
@@ -60,7 +67,29 @@ public class SolverListener implements SolverLauncherListener {
 	timer.cancel();
 	refreshDialog();
 	progressDialog.setStopButtonEnabled(false);
-	System.out.println("Launcher stopped");
+	
+    }
+    
+    private String getTitle(SMTProblem p){
+	String title = "";
+	Iterator<SMTSolver> it = p.getSolvers().iterator();
+	while(it.hasNext()){
+	    title += it.next().name();
+	    if(it.hasNext()){
+		title+= ", ";
+	    }
+	}
+	return title;
+    }
+    
+    private void applyResults(){
+	for(InternSMTProblem problem : problems){
+	    SMTProblem smtProblem = problem.getProblem();
+	    if(smtProblem.getFinalResult().isValid() == ThreeValuedTruth.TRUE){
+		smtProblem.getGoal().apply(new RuleAppSMT(smtProblem.getGoal(),getTitle(smtProblem)));
+	    }
+	}
+		
     }
     
     private void prepareDialog(Collection<SMTProblem> smtProblems,
@@ -109,7 +138,10 @@ public class SolverListener implements SolverLauncherListener {
 			stopEvent(launcher);	
 		    }
 		});
-	progressDialog.setVisible(true);	
+
+
+	progressDialog.setVisible(true);
+	
     }
     
     private void stopEvent(final SolverLauncher launcher){
@@ -118,29 +150,21 @@ public class SolverListener implements SolverLauncherListener {
     
     private void discardEvent(final SolverLauncher launcher){
 	launcher.stop();
+	progressDialog.setVisible(false);
     }
     
     private void applyEvent(final SolverLauncher launcher){
 	launcher.stop();  
+	applyResults();
+	progressDialog.setVisible(false);
     }
     
     @Override
     public void launcherStarted(final Collection<SMTProblem> smtProblems,
 	                         final Collection<SolverType> solverTypes,
 	                         final SolverLauncher launcher){
-	
-	//SwingUtilities.invokeLater(new Runnable() {
-	    
-	  //  @Override
-	    //public void run() {
-	    	prepareDialog(smtProblems, solverTypes, launcher);
-		
-	    //}
-	//});
+    	prepareDialog(smtProblems, solverTypes, launcher);
 
-
-
-	
 
 	timer.schedule(new TimerTask() {
 	    @Override

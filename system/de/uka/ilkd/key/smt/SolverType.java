@@ -12,12 +12,16 @@ public interface SolverType {
     public String getName();
 
     public boolean isInstalled(boolean recheck);
+    
+    
 
     public void useTaclets(boolean b);
 
     public SMTSolverResult interpretAnswer(String text, String error, int val);
 
     public String getInfo();
+    
+   
     
     /**
      * Get the command for executing the external prover.
@@ -28,6 +32,15 @@ public interface SolverType {
      */
      public String getExecutionCommand(String filename,
 	    				            String formula);
+     
+     
+     public String getExecutionCommand();
+     
+     public void setExecutionCommand(String s);
+     
+     public String getDefaultExecutionCommand();
+     
+     
 
 
     static public final SolverType Z3_SOLVER = new AbstractSolverType(){
@@ -318,12 +331,19 @@ abstract class AbstractSolverType implements SolverType {
      * get the hard coded execution command from this solver. The filename od a
      * problem is indicated by %f, the problem itsself with %p
      */
+    @Override
     public String getDefaultExecutionCommand() {
 	return this.getExecutionCommand("%f", "%p");
     }
 
     public String getExecutionCommand() {
 	return executionCommand;
+    }
+    
+
+    public void setExecutionCommand(String s) {
+        
+        executionCommand = s;
     }
 
 

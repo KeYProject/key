@@ -10,15 +10,18 @@ public class SolverTypeCollection implements Iterable<SolverType>{
     
     private LinkedList<SolverType> types = new LinkedList<SolverType>();
     private String name;
+    private int    minUsableSolver =1;
  
     /**
      * 
      * @param type at least on solver type must be passed.
      * @param types
+     * @param minUsableSolvers specifies how many solvers at leas must be usable, so that  <code>isUsable</code> returns true.
      */
-    public SolverTypeCollection(String name, SolverType type, SolverType ... types){
+    public SolverTypeCollection(String name,int minUsableSolvers , SolverType type, SolverType ... types){
 	this.types.add(type);
 	this.name = name;
+	this.minUsableSolver = minUsableSolvers;
 	for(SolverType t : types){
 	    this.types.add(t);
 	}
@@ -32,6 +35,21 @@ public class SolverTypeCollection implements Iterable<SolverType>{
 	
     }
     
+    public LinkedList<SolverType> getTypes() {
+	return types;
+    }
+    
+    public boolean isUsable(){
+	int usableCount =0;
+	for(SolverType type : types){
+	    if(type.isInstalled(false)){
+		usableCount++;
+	    }
+	}
+	
+	return usableCount >= minUsableSolver;
+    }
+    
     public String name(){
 	return name;
     }
@@ -39,12 +57,15 @@ public class SolverTypeCollection implements Iterable<SolverType>{
     public String toString(){
 	String s = "";
 	Iterator<SolverType> it = types.iterator();
-	while(it.hasNext()){
-	    SolverType type = it.next();
-	    s += type.getName();
-	    if(it.hasNext()){
-		s+=", ";
-	    }	    
+	int i=0; 
+	for(SolverType type : types){
+	    if(type.isInstalled(false)){
+		if(i>0){
+		    s += ", ";
+		}
+		s+= type.getName();
+		i++;
+	    }
 	}
 	if(s.isEmpty()){
 	    return "No solver available.";

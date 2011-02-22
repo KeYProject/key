@@ -11,12 +11,14 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 
 
 public class SMTProblem{
     private Term term;
     private Collection<SMTSolver> solvers = new LinkedList<SMTSolver>();
-    private Object userTag;
+    private Goal goal;
+    private Sequent sequent;
     private String name = "";
     public Term getTerm() {
 	return term;
@@ -29,25 +31,57 @@ public class SMTProblem{
 	return solvers;
     }
     
-    public SMTProblem(Goal goal,Object userTag){
+    public SMTProblem(Goal goal){
 	name = "Goal "+goal.node().serialNr();
 	term = goalToTerm(goal);
-	this.userTag = userTag;
+	this.goal = goal;
     }
     
-    public Object getUserTag(){
-	return userTag;
+    public SMTProblem(Sequent sequent){
+	term = sequentToTerm(sequent);
+	this.sequent = sequent;
+	
     }
     
+    public Goal getGoal() {
+	return goal;
+    }
+    
+    public Sequent getSequent() {
+	return sequent;
+    }
+    
+    public SMTSolverResult getFinalResult(){
+	SMTSolverResult unknown = SMTSolverResult.NO_IDEA;
+	SMTSolverResult valid = null;
+	SMTSolverResult invalid = null;
+	for(SMTSolver solver : solvers){
+	    if(solver.getFinalResult().isValid() == ThreeValuedTruth.TRUE){
+		valid =  solver.getFinalResult();
+	    }else if(solver.getFinalResult().isValid() == ThreeValuedTruth.FALSIFIABLE){
+		valid =  solver.getFinalResult();
+	    }else{
+	        unknown = solver.getFinalResult();
+	    }
+	}
+	if(valid != null && invalid != null){
+	    throw new RuntimeException("FATAL ERROR: The results are inconsistent!");
+	}
+	if(valid != null){
+	    return valid;
+	}
+	if(invalid != null){
+	    return invalid;
+	}
+	return unknown;
+    }
+
     
     public String getName(){
 	return name;
     }
     
-    
-    
-    private Term goalToTerm(Goal goal){
-	Sequent s = goal.sequent();
+    private Term sequentToTerm(Sequent s){
 	
 	ImmutableList<Term> ante = ImmutableSLList.nil();
 	
@@ -67,10 +101,15 @@ public class SMTProblem{
 	
     }
     
+    private Term goalToTerm(Goal g){
+	sequent = g.sequent();
+	return sequentToTerm(sequent);
+    }
+    
     public static Collection<SMTProblem> createSMTProblems(Proof proof){
 	LinkedList<SMTProblem> problems = new LinkedList<SMTProblem>();
 	for(Goal goal : proof.openGoals()){
-	    problems.add(new SMTProblem(goal,goal));
+	    problems.add(new SMTProblem(goal));
 	}
 	return problems;
     }

@@ -3,6 +3,7 @@ package de.uka.ilkd.key.gui.smt;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.ScrollPane;
+import java.awt.Dialog.ModalityType;
 import java.awt.event.ActionListener;
 import java.util.Collection;
 
@@ -49,7 +50,6 @@ public class ProgressDialog2 extends JDialog {
 	getDiscardButton().addActionListener(alDiscardButton);
 	getApplyButton().addActionListener(alApplyButton);
 	getStopButton().addActionListener(alStopButton);
-
     }
     
     private JPanel getPanelContainer(){

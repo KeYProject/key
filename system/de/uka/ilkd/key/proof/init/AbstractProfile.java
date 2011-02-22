@@ -22,6 +22,7 @@ import de.uka.ilkd.key.gui.smt.SMTSettings;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.DefaultGoalChooserBuilder;
 import de.uka.ilkd.key.proof.DepthFirstGoalChooserBuilder;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.GoalChooserBuilder;
 import de.uka.ilkd.key.proof.RuleSource;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
@@ -93,7 +94,7 @@ public abstract class AbstractProfile implements Profile {
 	LinkedList<SMTSolverImplementation> solverList = new LinkedList<SMTSolverImplementation>();
 
 
-	
+
 	
 	//Collection<SMTRule> rules = SMTSettings.getInstance().getSMTRules();
         

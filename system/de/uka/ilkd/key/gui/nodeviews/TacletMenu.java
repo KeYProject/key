@@ -20,6 +20,9 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.gui.smt.SMTMenuItem;
+import de.uka.ilkd.key.gui.smt.SolverListener;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.FormulaSV;
@@ -28,8 +31,11 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.pp.AbbrevException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.pp.PosInSequent;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.smt.SMTRule;
+import de.uka.ilkd.key.smt.SMTProblem;
+import de.uka.ilkd.key.smt.SolverLauncher;
+import de.uka.ilkd.key.smt.SolverTypeCollection;
 
 
 /**
@@ -111,7 +117,10 @@ class TacletMenu extends JMenu {
 	}
 
 	createBuiltInRuleMenu(builtInList, control);
-        
+
+	if(pos.isSequent()){
+	    createSMTMenu(control);
+	}
 	createFocussedAutoModeMenu ( control );
     
 	//        addPopFrameItem(control);
@@ -144,6 +153,22 @@ class TacletMenu extends JMenu {
 		addBuiltInRuleItem(it.next(), control);
 	    }
 	}
+    }
+    
+    private void createSMTMenu(MenuControl control){
+	Collection<SolverTypeCollection> solverUnions = 
+	ProofSettings.DEFAULT_SETTINGS.getSMTSettings().getSolverUnions();
+	if(!solverUnions.isEmpty()){
+	    addSeparator();	
+	}
+	for(SolverTypeCollection union : solverUnions){
+	    if(union.isUsable()){
+		 JMenuItem item = new SMTMenuItem(union);                       
+		 item.addActionListener(control);
+		 add(item);
+	    }
+	}
+	
     }
 				      
     /**
@@ -340,17 +365,32 @@ class TacletMenu extends JMenu {
 		((SequentView)(getPopupMenu().getInvoker()))
 		    .selectedTaclet(((TacletMenuItem) e.getSource()).connectedTo(), 
 				    pos);
-            } else if (e.getSource() instanceof BuiltInRuleMenuItem) {
-        	if (((BuiltInRuleMenuItem) e.getSource()).connectedTo() instanceof SMTRule) {
-        	    SMTRule rule = (SMTRule) ((BuiltInRuleMenuItem) e.getSource()).connectedTo();
-        	 //   RuleLauncher.INSTANCE.start(rule, Main.getInstance().mediator().getSelectedGoal(),
-        	//	    Main.getInstance().mediator().getProof().getUserConstraint().getConstraint(),true);
-      
-        	} else {
-                        mediator.selectedBuiltInRule
+            }else if(e.getSource() instanceof SMTMenuItem){
+        	final SMTMenuItem item = (SMTMenuItem) e.getSource();
+        	final SolverTypeCollection solverUnion = item.getSolverUnion();
+	    	final Goal goal = mediator.getSelectedGoal();
+	    	assert goal != null;
+        	
+        	Thread thread = new Thread(new Runnable() {	        
+	        @Override
+	        public void run() {
+	            
+	            SolverLauncher launcher = new SolverLauncher();
+	            launcher.addListener(new SolverListener());
+	            Collection<SMTProblem> list = new LinkedList<SMTProblem>();
+	            list.add(new SMTProblem(goal));
+		    launcher.launch(solverUnion.getTypes(),
+			            list,
+			            goal.proof().getServices());
+	        }
+        	});
+        	thread.start();            
+            }else if (e.getSource() instanceof BuiltInRuleMenuItem) {
+        	   
+                   mediator.selectedBuiltInRule
                     (((BuiltInRuleMenuItem) e.getSource()).connectedTo(), 
                      pos.getPosInOccurrence());
-        	}
+        	
 	    } else if (e.getSource() instanceof FocussedRuleApplicationMenuItem) {
 	        mediator.getInteractiveProver ()
 	            .startFocussedAutoMode ( pos.getPosInOccurrence (),

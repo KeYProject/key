@@ -10,20 +10,14 @@
 
 package de.uka.ilkd.key.smt;
 
-
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.Timer;
-
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
-import de.uka.ilkd.key.smt.SolverSession.InternResult;
 
 
 
 
-public interface SMTSolver extends de.uka.ilkd.key.smt.launcher.Process{
+
+
+public interface SMTSolver {
     public enum ReasonOfInterruption{User,Timeout,Exception,NoInterruption};
     public enum SolverState{Waiting,Running,Stopped};
 
@@ -42,52 +36,19 @@ public interface SMTSolver extends de.uka.ilkd.key.smt.launcher.Process{
     public SMTTranslator getTranslator(Services services);    
     
     
-    /**
-     * Interpret the answer of the program.
-     * This is very solverdepending. Usually, an exitcode of 0 inicates no error.
-     * But not every solver returns 0 if successfull termination was reached.
-     * @param output the String answered by the external programm.
-     * @param error the String answered as error
-     * @param exitstatus the status of the exit
-     * @return A SMTSolverResult containing all information of the interpretation.
-     * @throws IllegalArgumentException If the solver caused an error.
-     */
-  //  public SMTSolverResult interpretAnswer(String output, String error, int exitstatus) throws IllegalArgumentException;
-    
-    
-    
-    /**
-     * check, if this solver is installed and can be used.
-     * @param recheck if false, the solver is not checked again, if a cached value for this exists.
-     * @return true, if it is installed.
-     */
-    public boolean isInstalled(boolean recheck);
-    
-    /**
-     * @return the command used for execution of the programm on default
-     */
-    public String getDefaultExecutionCommand();
-    
-    public String getExecutionCommand();
-    
+   
+
     public SolverType getType();
     
-    public boolean useForMultipleRule();
-    
-    /**
-     * @return Returns some information for the solver. If no information
-     * is provided an empty String is returned. 
-     */
-   // String getInfo();
-    
+
+   
 
     /**
      * Determines whether taclets are used for this solver.
      * @param b <code>true</code> if taclets should be used.
      */
     public void useTaclets(boolean b);
-    
-    public void prepareSolver(LinkedList<InternResult> goals, Services services, Collection<Taclet> taclets);
+
     
     public void interrupt(ReasonOfInterruption reasonOfInterruption);
     
@@ -106,13 +67,11 @@ public interface SMTSolver extends de.uka.ilkd.key.smt.launcher.Process{
      
     
     public ReasonOfInterruption getReasonOfInterruption();
-    
-    public Object getUserTag();
-    
-    public void setUserTag(Object o);
+
     
     public SMTSolverResult getFinalResult();
     
+    public void interrupt();
     
     
     

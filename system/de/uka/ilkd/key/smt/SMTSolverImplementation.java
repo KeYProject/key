@@ -31,13 +31,11 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
-import de.uka.ilkd.key.smt.SolverSession.InternResult;
-import de.uka.ilkd.key.smt.launcher.AbstractProcess;
 import de.uka.ilkd.key.smt.taclettranslation.DefaultTacletSetTranslation;
 import de.uka.ilkd.key.util.Debug;
 
 
-final public class SMTSolverImplementation extends AbstractProcess implements SMTSolver, Runnable {
+final public class SMTSolverImplementation implements SMTSolver, Runnable {
 
     
     private static int fileCounter = 0;
@@ -62,11 +60,8 @@ final public class SMTSolverImplementation extends AbstractProcess implements SM
      * the file base name to be used to store the SMT translation
      */
     private static final String FILE_BASE_NAME = "smt_formula";
-    
-    /** true, if this solver was checked if installed */
-    private boolean installwaschecked = false;
-    /** true, if last check showed solver is installed */
-    private boolean isinstalled = false;
+
+
     /** true, if the current run is for test uss only (for example checking, if the Solver is installed) */
     private boolean inTestMode = false;
 
@@ -75,20 +70,17 @@ final public class SMTSolverImplementation extends AbstractProcess implements SM
     /** Only for testing*/
     private Collection<Taclet> tacletsForTest = null;
     
-    private SolverSession session = null;
+
     
-    public SolverSession getSession(){return session;}
+
     
-    private boolean useForMultipleRule = true;
-    
-    private String   executionCommand = getDefaultExecutionCommand();
-    
+  //  private String   executionCommand;
     private SMTProblem problem;
     private SolverListener listener;
-    private StringBuffer problemFormula = new StringBuffer();
+
     private ExternalProcessLauncher processLauncher = new ExternalProcessLauncher();
     private Services services;
-    private SMTSolverResult finalResult;
+    private SMTSolverResult finalResult = SMTSolverResult.NO_IDEA;
     
     private ReentrantLock lockStateVariable = new ReentrantLock();
     private ReentrantLock lockInterruptionVariable = new ReentrantLock();
@@ -97,19 +89,19 @@ final public class SMTSolverImplementation extends AbstractProcess implements SM
     private Thread    thread;
     private SolverTimeout solverTimeout;
     private ReasonOfInterruption reasonOfInterruption = ReasonOfInterruption.NoInterruption;
-    private Object userTag;
+
     private SolverState solverState=SolverState.Waiting;
-    private SolverType type;
+    private final SolverType type;
     
-    public SMTSolverImplementation(){
-	//isInstalled(true);
-    }
+
     
     public SMTSolverImplementation(SMTProblem problem, SolverListener listener, Services services, SolverType myType){
 	this.problem = problem;
 	this.listener = listener;
 	this.services = services;
 	this.type = myType;
+	//this.executionCommand =  getDefaultExecutionCommand();
+	    
     }
 
     @Override
@@ -133,14 +125,7 @@ final public class SMTSolverImplementation extends AbstractProcess implements SM
     }
 
     
-    @Override
-    public Object getUserTag() {
-        return userTag;
-    }
-    
-    public void setUserTag(Object o){
-	userTag = o;
-    }
+
     
     public SolverTimeout getSolverTimeout(){
 	return solverTimeout;
@@ -202,7 +187,7 @@ final public class SMTSolverImplementation extends AbstractProcess implements SM
     
     private String getFinalExecutionCommand(String filename, String formula) {
 	//get the Command from user settings
-	String toReturn = ProofSettings.DEFAULT_SETTINGS.getSMTSettings().getExecutionCommand(this);
+	String toReturn = this.type.getExecutionCommand();
 	if (toReturn == null || toReturn.length() == 0) {
 	    toReturn = this.type.getExecutionCommand(filename, formula);
 	} else {
@@ -411,57 +396,9 @@ final public class SMTSolverImplementation extends AbstractProcess implements SM
     }
     
 
-    
+ 
 
-    
-    private static boolean checkEnvVariable(String cmd){
-	String filesep = System.getProperty("file.separator");
-	String path =  System.getenv("PATH");
-	String [] res = path.split(System.getProperty("path.separator"));
-	for(String s : res){
-	    File file = new File(s+ filesep + cmd);
-	    if(file.exists()){
-		return true;
-	    }
-	}
-	
-	return false;
 
-    }
-    
-    
-    public static boolean isInstalled(String cmd){
-	    
-	    int first = cmd.indexOf(" ");
-	    if(first >= 0){
-		cmd = cmd.substring(0, first);
-	    }
-	    
-	    if(checkEnvVariable(cmd)){
-		return true;
-	    } else{
-		File file = new File(cmd);
-		return file.exists();
-		
-	    }
-    }
-    
-    /**
-     * check, if this solver is installed and can be used.
-     * @param recheck if false, the solver is not checked again, if a cached value for this exists.
-     * @return true, if it is installed.
-     */
-    public boolean isInstalled(boolean recheck) {
-	if (recheck | !installwaschecked) {
-	    String cmd = getExecutionCommand();
-	    isinstalled = isInstalled(cmd); 
-	    if(isinstalled){
-		 installwaschecked = true;		      
-	    }
-
-	}
-	return isinstalled;
-    }
     
     protected String getTestFile() {
 	return System.getProperty("key.home")
@@ -471,15 +408,7 @@ final public class SMTSolverImplementation extends AbstractProcess implements SM
 	    + File.separator + "ornot.key";
     }
     
-    /**
-     * get the hard coded execution command from this solver.
-     * The filename od a problem is indicated by %f, the problem itsself with %p
-     */
-    public String getDefaultExecutionCommand() {
-	return type.getExecutionCommand("%f", "%p");
-    }
-    
-    
+
     
   
     
@@ -495,7 +424,8 @@ final public class SMTSolverImplementation extends AbstractProcess implements SM
 	 if(tacletsForTest != null){
 	     return tacletsForTest;
 	 }
-	 return session.getTaclets();
+	// return session.getTaclets();
+	 return null;
     }
     
    
@@ -537,13 +467,6 @@ final public class SMTSolverImplementation extends AbstractProcess implements SM
 	tacletsForTest = set;
     }
     
-    public void prepareSolver(LinkedList<InternResult> terms, Services services, Collection<Taclet> taclets) {
-	init();
-	
-	session = new SolverSession(terms, services, taclets);
-
-        
-    }
     
     @Override
     public void interrupt() {
@@ -569,66 +492,12 @@ final public class SMTSolverImplementation extends AbstractProcess implements SM
     public void start(SolverTimeout timeout) {
 	    thread = new Thread(this);
 	    solverTimeout = timeout;
-	    thread.start();
-
-        
+	    thread.start();        
     }
     
     
-    @Override
-    public String[] atStart() throws Exception{
 
-	LinkedList<String> list = new LinkedList<String>();
-	InternResult term = session.nextTerm();
-	//session.addResult(SMTSolverResult.createUnknownResult("",name()),session.currentTerm());
-	if(term != null){
-	    String s;
-	    if(term.getFormula() != null){
-		s = translateToCommand(term.getFormula(), session.getServices());
-	    }else{
-		s = translateToCommand(term.getRealTerm(), session.getServices()); 
-	    }
-	     
-	    
-	    while(s.indexOf(' ')!=-1){
-		int index = s.indexOf(' ');
 
-		list.add(s.substring(0,s.indexOf(' ')));
-		s = s.substring(index+1,s.length());
-	    }
-	    list.add(s);
-
-	    
-	}
-
-	return list.toArray(new String[list.size()]);
-    }
-    
-    @Override
-    public boolean atEnd(InputStream result, InputStream error, int exitStatus) throws Exception{
-	
-	String text = read(result);
-	result.close();
-
-	
-	String err = read(error);
-	error.close();
-	SMTSolverResult res = type.interpretAnswer(text, err, exitStatus);
-	
-	if(session.currentTerm()!= null){
-	     
-	   session.currentTerm().setResult(res);
-	   if(res.isValid() == ThreeValuedTruth.TRUE){
-	       session.incrementSolved();
-	   }
-	   
-	
-	}
-	//listener.eventCycleFinished(this,res);
-	
-	
-	return !session.hasNextTerm();
-    }
     
     public String getInfo() {
         return "";
@@ -641,12 +510,7 @@ final public class SMTSolverImplementation extends AbstractProcess implements SM
     public SMTSolverResult getFinalResult() {
 	return finalResult;
     }
-    
 
-    public int getMaxCycle() {
-
-        return session.getTermSize();
-    }
     
     public String toString(){
 	return name()+" (ID: " +ID+")";
@@ -655,31 +519,6 @@ final public class SMTSolverImplementation extends AbstractProcess implements SM
     public String getTitle(){
 	return name();
     }
-
-    public boolean useForMultipleRule() {
-        return useForMultipleRule;
-    }
-    
-
-    public void useForMultipleRule(boolean b) {
-	useForMultipleRule = b;
-        
-    }
-
-
-    public void setExecutionCommand(String s) {
-        
-        executionCommand = s;
-    }
-    
-    public String getExecutionCommand(){
-	return executionCommand;
-    }
-    
-
-    
-    
-
 
     
     

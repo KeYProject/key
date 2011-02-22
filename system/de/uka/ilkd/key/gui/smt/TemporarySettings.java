@@ -19,34 +19,33 @@ import javax.swing.tree.DefaultTreeModel;
 
 import de.uka.ilkd.key.smt.SMTSolver;
 import de.uka.ilkd.key.smt.SMTSolverImplementation;
+import de.uka.ilkd.key.smt.SolverType;
 
 class TemporarySolverSettings {
-    public SMTSolver solver;
+    public SolverType solverType;
     public String command = "";
     public boolean isInstalled = false;
     public boolean useForMulitpleProvers = false;
     
-    TemporarySolverSettings(SMTSolver solver) {
-	this.solver = solver;
+    TemporarySolverSettings(SolverType solver) {
+	this.solverType = solver;
 	newSession();
     }
 
     public String toString() {
-	return solver.getTitle();
+	return solverType.getName();
     }
     
     void newSession(){
 
-	this.command = solver.getExecutionCommand();
-	isInstalled = solver.isInstalled(true);
-	useForMulitpleProvers = solver.useForMultipleRule();
+	this.command = solverType.getExecutionCommand();
+	isInstalled = solverType.isInstalled(true);
+
     }
 
     void apply() {
-	((SMTSolverImplementation) solver).setExecutionCommand(command);
-	((SMTSolverImplementation) solver).useForMultipleRule(useForMulitpleProvers);
-	solver.isInstalled(true);
-
+	solverType.setExecutionCommand(command);
+	solverType.isInstalled(true);
     }
 
 }
@@ -104,8 +103,8 @@ public class TemporarySettings extends Settings {
 	folder = settings.getSaveToFile();
 	
 	if(solverSettings.isEmpty()){
-	    for (SMTSolver solver : settings.getSolvers()) {
-		solverSettings.add(new TemporarySolverSettings(solver));
+	    for (SolverType type : settings.getSupportedSolvers()) {
+		solverSettings.add(new TemporarySolverSettings(type));
 	    }
 	}else{
 	    for(TemporarySolverSettings set : solverSettings){
@@ -252,7 +251,7 @@ public class TemporarySettings extends Settings {
                     public boolean prepareValues() {
 			 this.setTitle("Name:");
 			 this.setValue(((TemporarySolverSettings)this.getUserObject())
-				 .solver.getTitle());
+				 .solverType.getName());
 			 this.setEditable(false);
 	                 return true;
                     }
@@ -266,7 +265,7 @@ public class TemporarySettings extends Settings {
                     public boolean prepareValues() {
 			 this.setTitle("Installed:");			 
 			 this.setValue(((TemporarySolverSettings)this.getUserObject())
-				 .solver.isInstalled(true));
+				 .solverType.isInstalled(true));
 			 this.setEditable(false);
 			 
 	                return true;
@@ -309,7 +308,7 @@ public class TemporarySettings extends Settings {
 		        }
 	        },
 
-	        new TableCheckBox(tss) {
+	      /*  new TableCheckBox(tss) {
 		    @Override
 		    public void eventChange() {
 		        ((TemporarySolverSettings) getUserObject()).useForMulitpleProvers = isSelected();
@@ -331,21 +330,21 @@ public class TemporarySettings extends Settings {
                 		" 'multiple provers'.";
                     }
 	
-	        },
+	        },*/
 	
 	        
 	        new TableExplanation(tss,"Information"){
 	            public boolean visible() {
-	        	SMTSolver solver =  ((TemporarySolverSettings) getUserObject())
-	        	.solver;
-	        	String info = solver.getType().getInfo();
+	        	SolverType solverType =  ((TemporarySolverSettings) getUserObject())
+	        	.solverType;
+	        	String info = solverType.getInfo();
 	        	return info !=  null && !info.isEmpty();
 	            };
 	            public boolean prepareValues() {
 	        	super.prepareValues();
-	        	SMTSolver solver =  ((TemporarySolverSettings) getUserObject())
-	        	.solver;
-	        	String info = solver.getType().getInfo();
+	        	SolverType solverType =  ((TemporarySolverSettings) getUserObject())
+	        	.solverType;
+	        	String info = solverType.getInfo();
 	        	
 	        	if(info ==  null || info.isEmpty()){
 	        	    // Don't show the component if there is no information

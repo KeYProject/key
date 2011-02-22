@@ -451,7 +451,7 @@ public final class Main extends JFrame implements IMain {
 		final SolverLauncher launcher = new SolverLauncher();
 		final LinkedList<SMTProblem> problems = new LinkedList<SMTProblem>();
 		for(Goal goal : mediator.getProof().openGoals()){
-		    problems.add(new SMTProblem(goal,goal));
+		    problems.add(new SMTProblem(goal));
 		}
 		launcher.addListener(new SolverListener());
 		Thread thread = new Thread(new Runnable(
@@ -1361,7 +1361,7 @@ public final class Main extends JFrame implements IMain {
 	// TODO: Change this: only solver unions should be returned 
 	// that are installed.
 	Collection<SolverTypeCollection> solverUnions = ProofSettings.DEFAULT_SETTINGS.
-	                                  getSMTSettings().getSolverUnions();
+	                                  getSMTSettings().getUsableSolverUnions();
 	if(solverUnions == null || solverUnions.isEmpty()){
 	    updateDPSelectionMenu();
 	}else{
@@ -1390,6 +1390,7 @@ public final class Main extends JFrame implements IMain {
 	        
 		int i=0; 
 		for(SolverTypeCollection union : unions){
+		    
 		    actions[i] = new SMTInvokeAction(union);
 		    i++;
 		}
@@ -2658,8 +2659,22 @@ public final class Main extends JFrame implements IMain {
 		return;
 	    }
 	    final Proof proof = mediator.getProof();
-	    SolverLauncher launcher = new SolverLauncher();
-	    launcher.launch(SMTProblem.createSMTProblems(proof), proof.getServices());
+	    Thread thread = new Thread(new Runnable() {	        
+	        @Override
+	        public void run() {
+	            SolverLauncher launcher = new SolverLauncher();
+	            launcher.addListener(new SolverListener());
+	          
+		    launcher.launch(solverUnion.getTypes(),
+			            SMTProblem.createSMTProblems(proof),
+			            proof.getServices());
+	        }
+	    });
+	    thread.start();
+	    
+	
+	    
+
 	}
 	
 	public String toString(){

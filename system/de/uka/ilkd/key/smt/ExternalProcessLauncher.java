@@ -29,7 +29,9 @@ public class ExternalProcessLauncher {
 	    
 		result[EXIT_CODE] = Integer.toString(exitCode);	
 	     	}finally{
-	     	    process.destroy();
+	     	    if(process != null){
+	     	       process.destroy();
+	     	    }
 	     	}	     	
 		return result;			
 	}
