@@ -140,6 +140,7 @@ public class Proof implements Named {
         }
     }
 
+    
     /** constructs a new empty proof */
     public Proof(Services services) {
 	this ( "", services );
@@ -181,6 +182,7 @@ public class Proof implements Named {
                  rules, builtInRules, services, settings );
         problemHeader = header;
     }
+    
     
     public Proof(String name, Sequent sequent, String header, TacletIndex rules,
             BuiltInRuleIndex builtInRules, Services services, ProofSettings settings) {
@@ -234,9 +236,11 @@ public class Proof implements Named {
 	return name;
     }
     
+    
     public String header() {
        return problemHeader;
     }
+    
     
     public ProofCorrectnessMgt mgt() {
 	return localMgt;
@@ -267,6 +271,7 @@ public class Proof implements Named {
         autoModeTime += time;
     }
 
+    
     /** sets the variable, function, sort, heuristics namespaces */
     public void setNamespaces(NamespaceSet ns) {
         getServices().setNamespaces(ns);
@@ -275,18 +280,22 @@ public class Proof implements Named {
         openGoals().head().setProgramVariables(ns.programVariables());
     }
 
+    
     public void setBasicTask(BasicTask t) {
 	task = t;
     }
 
+    
     public BasicTask getBasicTask() {
 	return task;
     }
+    
 
     public AbbrevMap abbreviations(){
 	return abbreviations;
     }
    
+    
     public Strategy getActiveStrategy() {
         if (activeStrategy == null) {
             initStrategy();
@@ -294,6 +303,7 @@ public class Proof implements Named {
         return activeStrategy;
     }
 
+    
     public void setActiveStrategy(Strategy activeStrategy) {
         this.activeStrategy = activeStrategy;
         getSettings().getStrategySettings().
@@ -349,24 +359,29 @@ public class Proof implements Named {
 	return metavariableDeliverer;
     }
     
+    
     public JavaModel getJavaModel() {
         return proofEnv.getJavaModel();
     }
 
+    
     public void setProofEnv(ProofEnvironment env) {
 	proofEnv=env;
     }
+    
 
     public ProofEnvironment env() {
 	return proofEnv;
     }
 
+    
     /**
      * returns the root node of the proof
      */
     public Node root() {
 	return root;
     }
+    
 
     /** sets the root of the proof */
     public void setRoot(Node root) {
@@ -382,10 +397,12 @@ public class Proof implements Named {
 	}
     }
     
+    
     public void setSettings(ProofSettings newSettings) {
         settings = newSettings;
         addStrategyListener ();
     }
+    
     
     public ProofSettings getSettings() {
         return settings;
@@ -400,6 +417,7 @@ public class Proof implements Named {
 	return openGoals;
     }
     
+    
     /**
      * return the list of open and enabled goals
      * @return list of open and enabled goals, never null
@@ -409,6 +427,7 @@ public class Proof implements Named {
         return filterEnabledGoals(openGoals);
     }
 
+    
     /**
      * filter those goals from a list which are enabled
      * 
@@ -444,6 +463,7 @@ public class Proof implements Named {
 	    add(newGoals);	
 	}
     }
+    
 
     /**
      * Add the given constraint to the closure constraint of the given
@@ -457,6 +477,7 @@ public class Proof implements Named {
 	if ( closed () )
 	    fireProofClosed();
     }
+    
 
     /**
      * This is called by a Node that is the root of a subtree that is
@@ -469,6 +490,7 @@ public class Proof implements Named {
 	    closedSubtree = p_node;
     }
 
+    
     /**
      * Use this information to remove the goals of the closed subtree
      */
@@ -501,6 +523,7 @@ public class Proof implements Named {
 	closedSubtree = null;
     }
 
+    
     /** removes the given goal from the list of open goals. Take care
      * removing the last goal will fire the proofClosed event
      * @param goal the Goal to be removed
@@ -517,6 +540,7 @@ public class Proof implements Named {
 	}
     }
 
+    
     /** adds a new goal to the list of goals 
      * @param goal the Goal to be added 
      */
@@ -527,6 +551,7 @@ public class Proof implements Named {
 	    fireProofGoalsAdded(goal);
 	}
     }
+    
 
     /** adds a list with new goals to the list of open goals 
      * @param goals the IList<Goal> to be prepended 
@@ -543,6 +568,7 @@ public class Proof implements Named {
 	
     }
 
+    
     /** Return whether the remaining goals can be closed, i.e. whether
      * the conjunction of the constraints of the open goals is
      * satisfiable. In this case all remaining open goals are removed.
@@ -580,6 +606,7 @@ public class Proof implements Named {
 	return false;
     }
 
+    
     /** Prunes away the subtree beneath <code>node</code>.
      *	<code>node</code> is going to be the last node on its
      * branch.
@@ -628,6 +655,7 @@ public class Proof implements Named {
 	}
     }
 
+    
     /** fires the event that the proof has been pruned at the given node */
     protected void fireProofIsBeingPruned(Node node, Node removedNode) {
         ProofTreeEvent e = new ProofTreeRemovedNodeEvent(this, node, removedNode);
@@ -635,6 +663,7 @@ public class Proof implements Named {
             listenerList.get(i).proofIsBeingPruned(e);
         }
     } 
+    
 
     /** fires the event that the proof has been pruned at the given node */
     protected void fireProofPruned(Node node, Node removedNode) {
@@ -644,6 +673,7 @@ public class Proof implements Named {
 	}
     } 
 
+    
     /** fires the event that the proof has been restructured */
     protected void fireProofStructureChanged() {
 	ProofTreeEvent e = new ProofTreeEvent(this);
@@ -651,6 +681,7 @@ public class Proof implements Named {
 	    listenerList.get(i).proofStructureChanged(e);
 	}    
     }
+    
 
     /** fires the event that a goal has been removed from the list of goals */
     protected void fireProofGoalRemoved(Goal goal) {
@@ -660,6 +691,7 @@ public class Proof implements Named {
 	}	
     }
 
+    
     /** fires the event that new goals have been added to the list of
      * goals 
      */
@@ -670,12 +702,14 @@ public class Proof implements Named {
 	}	
     }
 
+    
     /** fires the event that new goals have been added to the list of
      * goals 
      */
     protected void fireProofGoalsAdded(Goal goal) {
 	fireProofGoalsAdded(ImmutableSLList.<Goal>nil().prepend(goal));
     }
+    
 
     /** fires the event that the proof has been restructured */
     public void fireProofGoalsChanged() {
@@ -685,6 +719,7 @@ public class Proof implements Named {
 	}
     } 
 
+    
     /** fires the event that the proof has closed. 
      * This event fired instead of the proofGoalRemoved event when
      * the last goal in list is removed.
@@ -696,6 +731,7 @@ public class Proof implements Named {
 	}
     }
 
+    
     /**
      * adds a listener to the proof 
      * @param listener the ProofTreeListener to be added
@@ -707,6 +743,7 @@ public class Proof implements Named {
 	}
     }
 
+    
     /**
      * removes a listener from the proof 
      * @param listener the ProofTreeListener to be removed
@@ -718,18 +755,21 @@ public class Proof implements Named {
 	}
     }
     
+    
     public synchronized boolean containsProofTreeListener(ProofTreeListener listener) {
         synchronized(listenerList) {
             return listenerList.contains(listener);
         }
     }
 
+    
     /** returns true if the given node is part of a Goal 
      * @return  true if the given node is part of a Goal 
      */
     public boolean isGoal(Node node) {	
 	return getGoal(node) != null;
     }
+    
 
     /** returns the goal that belongs to the given node or null if the
      * node is an inner one 
@@ -748,6 +788,7 @@ public class Proof implements Named {
 	return null;
     }
 
+    
     /** returns the list of goals of the subtree starting with node 
      * 
      * @param node the Node where to start from
@@ -768,6 +809,7 @@ public class Proof implements Named {
 	return result;
     }
     
+    
     /**
      * get the list of goals of the subtree starting with node which are enabled.
      * @param node the Node where to start from
@@ -777,6 +819,7 @@ public class Proof implements Named {
         return filterEnabledGoals(getSubtreeGoals(node));
     }
 
+    
     /** returns true iff the given node is found in the proof tree 
      *	@param node the Node to search for
      *	@return true iff the given node is found in the proof tree 
@@ -788,6 +831,7 @@ public class Proof implements Named {
 	return root.find(node);
     }
 
+    
     /**
      * retrieves number of nodes
      */
@@ -795,6 +839,7 @@ public class Proof implements Named {
 	return root.countNodes();
     }
 
+    
     /**
      * Currently the rule app index can either operate in interactive mode (and
      * contain applications of all existing taclets) or in automatic mode (and
@@ -808,6 +853,7 @@ public class Proof implements Named {
 	    it.next ().ruleAppIndex ().autoModeStarted ();
 	}
     }
+    
 
     public void setRuleAppIndexToInteractiveMode () {
 	Iterator<Goal> it = openGoals.iterator ();
@@ -824,11 +870,13 @@ public class Proof implements Named {
 	return root.countBranches();
     }
 
+    
     public String statistics() {
 	return "Nodes:"  + countNodes() + "\n" +
 	    "Branches: " + countBranches() + "\n";
     }
 
+    
     /** toString */
     public String toString() {
 	StringBuffer result = new StringBuffer();

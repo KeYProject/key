@@ -49,5 +49,4 @@ public class NameRecorder {
         result.post = post;
         return result;
     }
-
 }

@@ -909,14 +909,6 @@ public abstract class TacletApp implements RuleApp {
 	final Sort realSort = insts.getGenericSortInstantiations().getRealSort(
 		sv, proof.getServices());
 
-	// reklov
-	// START TEMPORARY DOWNWARD COMPATIBILITY
-	SchemaVariable nameSV = insts.lookupVar(new Name("_NAME_MV_"
-		+ sv.name()));
-	Name proposal = (Name) insts.getInstantiation(nameSV);
-	VariableNameProposer.DEFAULT.setOldMVProposal(proposal);
-	// END TEMPORARY DOWNWARD COMPATIBILITY
-
 	String nameProposal = TacletInstantiationsTableModel
 		.getBaseNameProposalForMetavariable(goal, this, sv);
 	return proof.getMetavariableDeliverer().createNewVariable(nameProposal,

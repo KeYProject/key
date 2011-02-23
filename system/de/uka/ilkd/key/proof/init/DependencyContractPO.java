@@ -133,6 +133,12 @@ public final class DependencyContractPO extends AbstractPO
 		heapLDT.targetSort());
 	final Term anonHeap = TB.func(anonHeapFunc);
 	
+        //register the variables and anon heap so they are declared in proof 
+	//header if the proof is saved to a file
+        register(selfVar);	
+        register(paramVars);
+        register(anonHeapFunc);	
+	
 	//translate contract
 	final Term pre = TB.and(buildFreePre(selfVar, 
 			                     contract.getKJT(), 

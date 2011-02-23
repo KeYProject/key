@@ -137,15 +137,15 @@ public class InitConfig {
      * Only entries of <code>init</init> with keys not already contained in
      * category2DefaultChoice are added.
      */
-    public void addCategory2DefaultChoices(HashMap<String,String> init){
+    public void addCategory2DefaultChoices(HashMap<String,String> init) {
         boolean changed = false;
         for (final Map.Entry<String, String> entry : init.entrySet()) {
-            if(!category2DefaultChoice.containsKey(entry.getKey())){
+            if(!category2DefaultChoice.containsKey(entry.getKey())) {
                 changed=true;
                 category2DefaultChoice.put(entry.getKey(), entry.getValue());
             }
         }
-        if(changed){
+        if(changed) {
             ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().
                 setDefaultChoices((HashMap<String, String>)category2DefaultChoice.clone());
         }
@@ -329,17 +329,6 @@ public class InitConfig {
         return namespaces().choices();
     }
 
-
-    
-    public void setOriginalKeYFileName(String name) {
-        originalKeYFileName = name;
-    }
-
-
-    public String getOriginalKeYFileName() {
-        return originalKeYFileName;
-    }
-    
     
     public void setSettings(ProofSettings settings) {
 	this.settings = settings;

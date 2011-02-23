@@ -12,7 +12,6 @@ package de.uka.ilkd.key.java;
 
 import java.util.HashMap;
 
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.java.recoderext.SchemaCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.logic.InnerVariableNamer;
@@ -82,9 +81,7 @@ public class Services{
     private SpecificationRepository specRepos 
     	= new SpecificationRepository(this);
     
-    /**
-     * 
-     */
+
     private NameRecorder nameRecorder;
     
     
@@ -104,11 +101,13 @@ public class Services{
         	(new KeYProgModelInfo(typeconverter, this.exceptionHandler), this);
         nameRecorder = new NameRecorder();
     }
-
+    
+    
     // ONLY for tests
-    public Services(){
+    public Services() { 
 	this((KeYExceptionHandler) null);
-    }
+    }    
+    
 
     private Services(KeYCrossReferenceServiceConfiguration crsc, 
 		     KeYRecoderMapping rec2key) {
@@ -124,11 +123,13 @@ public class Services{
     public KeYExceptionHandler getExceptionHandler(){
 	return exceptionHandler;
     }
+    
 
     public void setExceptionHandler(KeYExceptionHandler keh){
 	exceptionHandler = keh;
     }
 
+    
     /**
      * Returns the TypeConverter associated with this Services object.
      */
@@ -136,33 +137,39 @@ public class Services{
         return typeconverter;
     }
 
+    
     private void setTypeConverter(TypeConverter tc) {
-	typeconverter=tc;
+	typeconverter = tc;
     }
 
+    
     /**
      * Returns the ConstantExpressionEvaluator associated with this Services object.
      */
-    public ConstantExpressionEvaluator getConstantExpressionEvaluator(){
+    public ConstantExpressionEvaluator getConstantExpressionEvaluator() {
         return cee;
     }
 
+    
     /**
      * Returns the JavaInfo associated with this Services object.
      */
-    public JavaInfo getJavaInfo(){
+    public JavaInfo getJavaInfo() {
         return javainfo;
     }
+    
     
     public NameRecorder getNameRecorder() {
         return nameRecorder;
     }
 
+    
     public void saveNameRecorder(Node n) {
         n.setNameRecorder(nameRecorder);
         nameRecorder = new NameRecorder();
     }
 
+    
     public void addNameProposal(Name proposal) {
         nameRecorder.addProposal(proposal);
     }
@@ -201,6 +208,7 @@ public class Services{
         nameRecorder = nameRecorder.copy();
 	return s;
     }
+    
 
     /**
      * creates a new service object with the same ldt information 
@@ -218,6 +226,7 @@ public class Services{
 	return s;
     }
     
+    
     public Services copyProofSpecific(Proof p_proof) {
         final Services s = new Services(getJavaInfo().getKeYProgModelInfo().getServConf(),
                 getJavaInfo().getKeYProgModelInfo().rec2key());
@@ -230,22 +239,25 @@ public class Services{
         return s;
     }
 
+    
     /*
      * returns an existing named counter, creates a new one otherwise
      */
     public Counter getCounter(String name) {
         Counter c = counters.get(name);
-        if (c!=null) return c;
+        if (c != null) return c;
         c = new Counter(name);
         counters.put(name, c);
         return c;
     }
+    
     
     public void setBackCounters(Node n) {        
         for (final Counter c : counters.values()) {
             c.undo(n);
         }
     }
+    
     
     /**
      * returns the namespaces for functions, predicates etc.
@@ -254,6 +266,7 @@ public class Services{
     public NamespaceSet getNamespaces() {
         return namespaces;
     }
+    
     
     /**
      * sets the namespaces of known predicates, functions, variables

@@ -10,9 +10,11 @@
 
 package de.uka.ilkd.key.proof.init;
 
-import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.JavaInfo;
@@ -46,6 +48,12 @@ public abstract class AbstractPO implements ProofOblInput {
     protected final SpecificationRepository specRepos;
     protected final String name;
 
+    private final List<ProgramVariable> introducedProgVars 
+    	= new LinkedList<ProgramVariable>();
+    private final List<Function> introducedFuncs
+    	= new LinkedList<Function>();
+    private final List<Function> introducedPreds
+    	= new LinkedList<Function>();
     private String header;
     private ProofAggregate proofAggregate;
     
@@ -149,9 +157,6 @@ public abstract class AbstractPO implements ProofOblInput {
 	for(ClassAxiom axiom : axioms) {
 	    final ImmutableSet<Pair<Sort, ObserverFunction>> scc 
 	    	= getSCC(axiom, axioms);
-//	    for(Pair<Sort, ObserverFunction> sccAx : scc) {
-//		System.out.println("in scc of " + axiom.getName() + ": " + sccAx);
-//	    }
 	    for(Taclet axiomTaclet : axiom.getTaclets(scc, services)) {
 		assert axiomTaclet != null 
 		       : "class axiom returned null taclet: " + axiom.getName();
@@ -165,6 +170,33 @@ public abstract class AbstractPO implements ProofOblInput {
 
 	return result;
     }    
+    
+    
+    protected final void register(ProgramVariable pv) {
+	if(pv != null) {
+	    introducedProgVars.add(pv);
+	}
+    }
+    
+    
+    protected final void register(ImmutableList<ProgramVariable> pvs) {
+	for(ProgramVariable pv : pvs) {
+	    register(pv);
+	}
+    }
+    
+    
+    protected final void register(Function f) {
+	if(f != null) {
+	    assert f.sort() != Sort.UPDATE;
+	    if(f.sort() == Sort.FORMULA) {
+		introducedPreds.add(f);
+	    } else {
+		introducedFuncs.add(f);
+	    }
+	}
+    }
+    
 
     
     //-------------------------------------------------------------------------
@@ -187,61 +219,61 @@ public abstract class AbstractPO implements ProofOblInput {
      * Creates declarations necessary to save/load proof in textual form
      * (helper for createProof()).
      */
-    private void createProofHeader(String javaPath) {
+    private void createProofHeader(String javaPath,
+	    			   String classPath,
+	    			   String bootClassPath) {
         if(header != null) {
             return;
         }
-                
-        if(initConfig.getOriginalKeYFileName() == null) {
-            header = "\\javaSource \""+javaPath+"\";\n\n";
-        } else {
-            header = "\\include \"./" + initConfig.getOriginalKeYFileName() + "\";";
-        }
-
-        Iterator<Named> it;
-
-        /* program sorts need not be declared and
-         * there are no user-defined sorts with this kind of PO (yes?)
-                s += "sorts {\n"; // create declaration header for the proof
-                it = initConfig.sortNS().getProtocolled();
-                while (it.hasNext()) {
-                String n=it.next().toString();
-                int i;
-                if ((i=n.indexOf("."))<0 ||
-                initConfig.sortNS().lookup(new Name(n.substring(0,i)))==null) {
-                //the line above is for inner classes.
-                //KeY does not want to handle them anyway...
-                s = s+"object "+n+";\n";
-                }
-            }
-                s+="}
-        */
-        header += "\n\n\\programVariables {\n";
-        it = initConfig.progVarNS().allElements().iterator();
-        while(it.hasNext())
-        header += ((ProgramVariable)(it.next())).proofToString();
+        final StringBuffer sb = new StringBuffer();
         
-        header += "}\n\n\\functions {\n";
-        it = initConfig.funcNS().allElements().iterator();
-        while(it.hasNext()) {
-            Function f = (Function)it.next();
-            // only declare @pre-functions or anonymising functions, others will be generated automat. (hack)
-            if(f.sort() != Sort.FORMULA && (f.name().toString().indexOf("AtPre")!=-1 || services.getNameRecorder().
-                    getProposals().contains(f.name()))) {
-                header += f.proofToString();
-            }
+        //bootclasspath
+        if(bootClassPath != null && !bootClassPath.equals("")) {
+            sb.append("\\bootclasspath \"")
+              .append(bootClassPath)
+              .append("\";\n\n");
         }
-        header += "}\n\n\\predicates {\n";
+        
+        //classpath
+        if(classPath != null && !classPath.equals("")) {
+            sb.append("\\classpath \"")
+              .append(classPath)
+              .append("\";\n\n");
+        }        
 
-        it = initConfig.funcNS().allElements().iterator();
-        while(it.hasNext()) {
-            Function f = (Function)it.next();            
-            if(f.sort() == Sort.FORMULA && services.getNameRecorder().getProposals().contains(f.name())) {
-                header += f.proofToString();
+        //javaSource
+        sb.append("\\javaSource \"")
+          .append(javaPath)
+          .append("\";\n\n");
+
+        //program variables
+        if(!introducedProgVars.isEmpty()) {
+            sb.append("\\programVariables {\n");
+            for(ProgramVariable pv : introducedProgVars) {
+        	sb.append("  ").append(pv.proofToString());
             }
+            sb.append("}\n\n");
         }
-
-        header += "}\n\n";
+        
+        //functions
+        if(!introducedFuncs.isEmpty()) {
+            sb.append("\\functions {\n");
+            for(Function f : introducedFuncs) {
+        	sb.append("  ").append(f.proofToString());
+            }
+            sb.append("}\n\n");
+        }
+        
+        //predicates
+        if(!introducedPreds.isEmpty()) {
+            sb.append("\\predicates {\n");
+            for(Function p : introducedPreds) {
+        	sb.append("  ").append(p.proofToString());
+            }
+            sb.append("}\n\n");
+        }
+        
+        header = sb.toString();
     }
 
 
@@ -249,9 +281,10 @@ public abstract class AbstractPO implements ProofOblInput {
      * Creates a Proof (helper for getPO()).
      */
     private Proof createProof(String proofName, Term poTerm) {
-         createProofHeader(initConfig.getProofEnv()
-   	    		             .getJavaModel()
-        	    	             .getModelDir());
+	final JavaModel javaModel = initConfig.getProofEnv().getJavaModel();
+	createProofHeader(javaModel.getModelDir(), 
+			  javaModel.getClassPath(),
+			  javaModel.getBootClassPath());
         return new Proof(proofName,
                          poTerm,
                          header,

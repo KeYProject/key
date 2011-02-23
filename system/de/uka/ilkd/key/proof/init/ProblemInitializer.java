@@ -203,7 +203,10 @@ public final class ProblemInitializer {
     /**
      * Helper for readJava().
      */
-    private JavaModel getJavaModel(String javaPath) throws ProofInputException {
+    private JavaModel createJavaModel(String javaPath,
+	    			      List<File> classPath,
+	    			      File bootClassPath) 
+    		throws ProofInputException {
 	JavaModel result;
 	if(javaPath == null) {
 	    result = JavaModel.NO_MODEL;
@@ -211,8 +214,11 @@ public final class ProblemInitializer {
 	    throw new ProofInputException("You do not want to have "+
 	    "your home directory as the program model.");
 	} else { 
-	    String modelTag = "KeY_"+new Long((new java.util.Date()).getTime());
-	    result = new JavaModel(javaPath, modelTag);
+	    String modelTag = "KeY_" + new Long((new java.util.Date()).getTime());
+	    result = new JavaModel(javaPath, 
+		    		   modelTag,
+		    		   classPath,
+		    		   bootClassPath);
 	}
 	return result;
     }
@@ -232,9 +238,9 @@ public final class ProblemInitializer {
 	
 	//read Java source and classpath settings
 	envInput.setInitConfig(initConfig);
-	String javaPath = envInput.readJavaPath();
-	List<File> classPath = envInput.readClassPath();
-	File bootClassPath = envInput.readBootClassPath();
+	final String javaPath = envInput.readJavaPath();
+	final List<File> classPath = envInput.readClassPath();
+	final File bootClassPath = envInput.readBootClassPath();
 	
 	//create Recoder2KeY, set classpath
 	final Recoder2KeY r2k = new Recoder2KeY(initConfig.getServices(), 
@@ -244,24 +250,26 @@ public final class ProblemInitializer {
 	if(javaPath != null) {
     	    //read Java	
             reportStatus("Reading Java source");
-            ProjectSettings settings 
+            final ProjectSettings settings 
             	=  initConfig.getServices()
             	             .getJavaInfo()
             	             .getKeYProgModelInfo()
                 	     .getServConf()
                 	     .getProjectSettings();
-            PathList searchPathList = settings.getSearchPathList();
+            final PathList searchPathList = settings.getSearchPathList();
             if(searchPathList.find(javaPath) == null) {
                 searchPathList.add(javaPath);
             }
-            String[] cus = getClasses(javaPath).toArray(new String[]{});
+            final String[] cus = getClasses(javaPath).toArray(new String[]{});
             r2k.readCompilationUnitsAsFiles(cus);
 	} else {
             reportStatus("Reading Java libraries");	    
 	    r2k.parseSpecialClasses();
 	}
 	
-        initConfig.getProofEnv().setJavaModel(getJavaModel(javaPath));
+        initConfig.getProofEnv().setJavaModel(createJavaModel(javaPath,
+        	                                              classPath,
+        	                                              bootClassPath));
     }
     
     
@@ -396,12 +404,12 @@ public final class ProblemInitializer {
         				       AxiomJustification.INSTANCE);
 
 	Proof[] proofs = pl.getProofs();
-	for (int i=0; i < proofs.length; i++) {
+	for(int i = 0; i < proofs.length; i++) {
 	    proofs[i].setNamespaces(proofs[i].getNamespaces());//TODO: refactor Proof.setNamespaces() so this becomes unnecessary
 	    populateNamespaces(proofs[i]);
 	}
 	initConfig.getProofEnv().registerProof(problem, pl);
-	if (main != null) {
+	if(main != null) {
             main.addProblem(pl);
         }
     }

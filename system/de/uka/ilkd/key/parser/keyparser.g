@@ -1570,48 +1570,47 @@ keyjavatype returns [KeYJavaType kjt=null]
 { 
    String type = null;
    boolean array = false;
-
 }
 :
-   type = simple_ident_dots (EMPTYBRACKETS {type += "[]"; array=true;})* {
-
-     kjt = getJavaInfo().getKeYJavaType(type);
+    type = simple_ident_dots (EMPTYBRACKETS {type += "[]"; array=true;})* 
+    {
+        kjt = getJavaInfo().getKeYJavaType(type);
             
-     //expand to "java.lang"            
-     if (kjt == null) {
-        try {
-            String guess = "java.lang." + type;
-       	    kjt = getJavaInfo().getKeYJavaType(guess);
-       	} catch(Exception e) {
-       	    kjt = null;
-       	}
-     }
-     
-     //arrays
-     if (kjt == null && array) {
-          try {
-            JavaBlock jb = getJavaInfo().readJavaBlock("{" + type + " k;}");
-            kjt = ((VariableDeclaration) 
-                    ((StatementBlock) jb.program()).getChildAt(0)).
-                        getTypeReference().getKeYJavaType();
-          } catch (Exception e) {
-             kjt = null;
-          }          
-     }
-     
-     //try as sort without Java type (neede e.g. for "Heap")
-     if(kjt == null) {
-	Sort sort = lookupSort(type);
-	if(sort != null) {
-           kjt = new KeYJavaType(null, sort);
+        //expand to "java.lang"            
+        if (kjt == null) {
+            try {
+                String guess = "java.lang." + type;
+       	        kjt = getJavaInfo().getKeYJavaType(guess);
+       	    } catch(Exception e) {
+       	        kjt = null;
+       	    }
         }
-     }
      
-     if (kjt == null) {
-       semanticError("Unknown type: " + type);
-     }
-   }
- ;
+        //arrays
+        if(kjt == null && array) {
+            try {
+                JavaBlock jb = getJavaInfo().readJavaBlock("{" + type + " k;}");
+                kjt = ((VariableDeclaration) 
+                        ((StatementBlock) jb.program()).getChildAt(0)).
+                            getTypeReference().getKeYJavaType();
+            } catch (Exception e) {
+                kjt = null;
+            }          
+        }
+     
+        //try as sort without Java type (neede e.g. for "Heap")
+        if(kjt == null) {
+	    Sort sort = lookupSort(type);
+	    if(sort != null) {
+                kjt = new KeYJavaType(null, sort);
+            }
+        }
+     
+        if(kjt == null) {
+            semanticError("Unknown type: " + type);
+        }
+    }
+;
 
 prog_var_decls 
 {

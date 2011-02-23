@@ -334,7 +334,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 	    if (e.getSource() == cancelButton) {
 		closeDialog();
 	    } else if (e.getSource() == applyButton) {		      
-		try{
+		try {
 		    try {
 			pushAllInputToModel();
 			TacletApp app = model[current()].createTacletApp();

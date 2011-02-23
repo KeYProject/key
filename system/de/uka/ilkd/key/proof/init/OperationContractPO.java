@@ -33,7 +33,6 @@ import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.speclang.OperationContract;
 
 
@@ -240,6 +239,14 @@ public final class OperationContractPO extends AbstractPO
         final Term heapAtPre = TB.var(heapAtPreVar);
         final Map<Term,Term> normalToAtPre = new HashMap<Term,Term>();
         normalToAtPre.put(TB.heap(services), heapAtPre);
+        
+        //register the variables so they are declared in proof header 
+        //if the proof is saved to a file
+        register(paramVars);
+        register(selfVar);
+        register(resultVar);
+        register(exceptionVar);
+        register(heapAtPreVar);
 
         //build precondition
         final Term pre = TB.and(buildFreePre(selfVar, 

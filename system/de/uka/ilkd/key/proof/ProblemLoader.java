@@ -218,7 +218,6 @@ public final class ProblemLoader implements Runnable {
                final String chooseContract;
                if(envInput instanceof KeYFile) {
         	   chooseContract = ((KeYFile)envInput).chooseContract();
-        	   initConfig.setOriginalKeYFileName(envInput.name());
                } else {
         	   chooseContract = null;
                }

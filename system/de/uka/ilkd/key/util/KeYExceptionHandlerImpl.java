@@ -10,39 +10,30 @@
 
 package de.uka.ilkd.key.util;
 
-import de.uka.ilkd.key.proof.init.ProofInputException;
 
-public class KeYExceptionHandlerImpl implements KeYExceptionHandler{
+public abstract class KeYExceptionHandlerImpl implements KeYExceptionHandler {
 
     protected ExtList exceptions = null; 
 
-    public KeYExceptionHandlerImpl(){
+    public KeYExceptionHandlerImpl() {
 	exceptions = new ExtList();
     }
 
-    public void reportException(Throwable e){
-        if (e != ProofInputException.USER_ABORT_EXCEPTION) {
-            exceptions.add(e);
-        } else {
-            // HACK avoids annoying error dialog after the user
-            // cancelled loading of a proof with the JMLSpecBrowser 
-        }
+    
+    @Override
+    public void reportException(Throwable e) {
+	exceptions.add(e);
     }
 
-    public ExtList getExceptions(){
+    
+    @Override    
+    public ExtList getExceptions() {
 	return exceptions;
     }
 
-    /** errors? 
-     * @return boolean true if errors or exceptions were reported, 
-     * false otherwise
-     */
-    public boolean error() {
-	return !exceptions.isEmpty();
-    }
-
-    public void clear(){
+        
+    @Override    
+    public void clear() {
 	exceptions = new ExtList();	
     }
-
 }

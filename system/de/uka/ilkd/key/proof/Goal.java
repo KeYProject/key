@@ -717,9 +717,7 @@ public class Goal  {
         final Proof proof = proof();
         if (ruleApp instanceof TacletApp) {
             TacletApp tacletApp = (TacletApp)ruleApp;
-            
-            tacletApp = tacletApp.instantiateWithMV ( this );
-            
+                        
             ruleApp = tacletApp.createSkolemFunctions 
                 ( proof.getNamespaces().functions(), 
                        proof.getServices() );

@@ -13,9 +13,6 @@ package de.uka.ilkd.key.proof.init;
  */
 public class ProofInputException extends Exception {
 
-    public static final ProofInputException USER_ABORT_EXCEPTION =
-        new ProofInputException("User cancelled problem loading.");
-
     private final String message;
 
     public ProofInputException(Exception e) {
