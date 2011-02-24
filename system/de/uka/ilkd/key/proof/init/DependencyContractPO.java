@@ -182,7 +182,9 @@ public final class DependencyContractPO extends AbstractPO
 	
         //save in field
         poTerms = new Term[]{po};
-        poTaclets = new ImmutableSet[]{collectClassAxioms(contract.getKJT())};               
+        
+        //add axioms
+        collectClassAxioms(contract.getKJT());
     }
     
     

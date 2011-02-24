@@ -275,7 +275,9 @@ public final class OperationContractPO extends AbstractPO
                 
         //save in field
         poTerms = new Term[]{TB.imp(pre, progPost)};
-        poTaclets = new ImmutableSet[]{collectClassAxioms(contract.getKJT())};               
+        
+        //add axioms
+        collectClassAxioms(contract.getKJT());
     }
     
     

@@ -27,4 +27,6 @@ public interface SchemaVariable extends ParsableVariable {
      *         instantiation of the generic sort)
      */
     boolean isStrict();
+    
+    String proofToString();
 }

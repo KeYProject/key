@@ -154,7 +154,8 @@ public abstract class TacletBuilder {
      * array SV. 
      */
     public void addVarsNew(SchemaVariable v, 
-            SchemaVariable asSort, boolean elementsort){
+            	           SchemaVariable asSort, 
+            	           boolean elementsort){
 	addVarsNew(new NewVarcond(v, asSort, elementsort));
     }
     

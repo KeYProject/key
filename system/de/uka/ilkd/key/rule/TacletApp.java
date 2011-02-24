@@ -18,6 +18,7 @@ import java.util.Iterator;
 import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
@@ -937,8 +938,11 @@ public abstract class TacletApp implements RuleApp {
      *            the Services class allowing access to the type model
      */
     public TacletApp createSkolemConstant(String instantiation,
-	    SchemaVariable sv, boolean interesting, Services services) {
-	return createSkolemConstant(instantiation, sv,
+	    		                  SchemaVariable sv, 
+	    		                  boolean interesting, 
+	    		                  Services services) {
+	return createSkolemConstant(instantiation, 
+				    sv,
 				    getRealSort(sv, services), 
 				    interesting,
 				    services);
@@ -949,139 +953,12 @@ public abstract class TacletApp implements RuleApp {
 	    				  Sort sort, 
 	    				  boolean interesting,
 	    				  Services services) {
-	Function c = new Function(new Name(instantiation), sort, new Sort[0]);
+	final Function c 
+		= new Function(new Name(instantiation), sort, new Sort[0]);
 	return addInstantiation(sv, TB.func(c), interesting, services);
     }
-
-    /**
-     * Create skolem functions (for variables declared via "\\new(c,
-     * \\dependingOn(phi))" or via "\\new(upd, \\dependingOnMod(#modifiers))")
-     * to replace previously created constants with
-     */
-    public TacletApp createSkolemFunctions(Namespace p_func_ns,
-	    			           Services services) {
-	SVInstantiations insts = instantiations();
-
-	final Iterator<SchemaVariable> svIt = insts.svIterator();
-	while (svIt.hasNext())
-	    insts = createTermSkolemFunctions(svIt.next(), 
-		    			      insts, 
-		    			      p_func_ns,
-		    			      services);
-
-	if (insts == instantiations())
-	    return this;
-	return setInstantiation(insts, services);
-    }
-
-    /**
-     * Instantiate a SkolemTermSV
-     */
-    private SVInstantiations createTermSkolemFunctions(
-	    SchemaVariable depSV,
-	    SVInstantiations insts, 
-	    Namespace p_func_ns,
-	    Services services) {
-	if (!(depSV instanceof SkolemTermSV))
-	    return insts;
-
-	final Term tempDepVar = (Term) insts.getInstantiation(depSV);
-
-	Debug.assertTrue(tempDepVar != null,
-		"Name for skolemterm variable missing");
-
-	return createSkolemFunction(insts, 
-				    p_func_ns, 
-				    depSV, 
-				    tempDepVar,
-				    determineArgMVs(insts, depSV),
-				    services);
-    }
-
-    /**
-     * Determine the metavariables that have to be added as arguments to newly
-     * created skolem symbols (as basis of the occurs check)
-     */
-    private ImmutableSet<Metavariable> determineArgMVs(SVInstantiations insts,
-	    SchemaVariable depSV) {
-	return determineExplicitArgMVs(insts, depSV).union(
-		determineArgMVsFromUpdate(insts));
-    }
-
-    private ImmutableSet<Metavariable> determineExplicitArgMVs(SVInstantiations insts,
-	    SchemaVariable depSV) {
-	final Iterator<NewDependingOn> it = taclet().varsNewDependingOn();
-	ImmutableSet<Metavariable> mvs = DefaultImmutableSet.<Metavariable>nil();
-	while (it.hasNext()) {
-	    final NewDependingOn newDepOn = it.next();
-	    if (depSV != newDepOn.first())
-		continue;
-
-	    final Term dominantTerm = (Term) insts.getInstantiation(newDepOn
-		    .second());
-
-	    assert dominantTerm != null : "Variable depends on uninstantiated variable";
-	    mvs = mvs.union(dominantTerm.metaVars());
-	}
-	return mvs;
-    }
-
-    private ImmutableSet<Metavariable> determineArgMVsFromUpdate(SVInstantiations insts) {
-	final Iterator<Term> it = insts.getUpdateContext().iterator();
-	ImmutableSet<Metavariable> mvs = DefaultImmutableSet.<Metavariable>nil();
-	while (it.hasNext()) {
-	    final Term update = it.next();
-	    mvs = mvs.union(update.metaVars());
-	}
-	return mvs;
-    }
-
-    private SVInstantiations createSkolemFunction(SVInstantiations insts,
-	    					  Namespace p_func_ns, 
-	    					  SchemaVariable depSV, 
-	    					  Term tempDepVar,
-	    					  ImmutableSet<Metavariable> mvs,
-	    					  Services services) {
-	if (mvs.isEmpty()) {
-	    // if the term contains no metavariables, we just use the
-	    // (nullary) constant <code>tempDepVar</code> as skolem symbol
-	    p_func_ns.add(tempDepVar.op());
-	    return insts;
-	}
-
-	final Term[] argTerms = toTermArray(mvs);
-	final Function skolemFunc = new Function(tempDepVar.op().name(),
-		tempDepVar.sort(), extractSorts(argTerms));
-	final Term skolemTerm = TB.func(skolemFunc, argTerms);
-
-	p_func_ns.add(skolemFunc);
-	return insts.replace(depSV, skolemTerm, services);
-    }
-
-    private Term[] toTermArray(ImmutableSet<Metavariable> mvs) {
-
-        if (mvs.isEmpty()) {
-            return new Term[0];
-        }
-	final Metavariable[] mvArray = mvs.toArray (new Metavariable[mvs.size()]);
-        Arrays.sort ( mvArray );
-        
-        // Create function with correct arguments
-        final Term[] argTerms = new Term [mvArray.length];
-        
-	for (int i = 0; i != mvArray.length; ++i)
-	    argTerms[i] = TB.var(mvArray[i]);
-
-	return argTerms;
-    }
-
-    private Sort[] extractSorts(Term[] argTerms) {
-	final Sort[] argSorts = new Sort[argTerms.length];
-	for (int i = 0; i != argTerms.length; ++i)
-	    argSorts[i] = argTerms[i].sort();
-	return argSorts;
-    }
-
+    
+    
     /**
      * adds a new instantiation to this TacletApp
      * 

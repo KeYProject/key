@@ -50,4 +50,10 @@ public final class TermSV extends AbstractSV {
     public String toString() {
         return toString(sort().toString()+" term");
     }
+    
+    
+    @Override
+    public String proofToString() {
+	return "\\schemaVar \\term " + sort().name() + " " + name() + ";\n";
+    }
 }

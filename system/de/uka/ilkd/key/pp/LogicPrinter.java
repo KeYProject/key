@@ -233,19 +233,59 @@ public final class LogicPrinter {
     public void setInstantiation(SVInstantiations instantiations) {
         this.instantiations = instantiations;
     }
+    
+    
+    private static void collectSchemaVarsHelper(Sequent s, OpCollector oc) {
+	for(ConstrainedFormula cf : s) {
+	    cf.formula().execPostOrder(oc);
+	}
+    }
+    
+    
+    private static Set<SchemaVariable> collectSchemaVars(Taclet t) {
+	Set<SchemaVariable> result = new HashSet<SchemaVariable>();
+	OpCollector oc = new OpCollector();
+	
+	collectSchemaVarsHelper(t.ifSequent(), oc);
+	
+	for(TacletGoalTemplate tgt : t.goalTemplates()) {
+	    collectSchemaVarsHelper(tgt.sequent(), oc);
+	    
+	    if(tgt instanceof AntecSuccTacletGoalTemplate) {
+		collectSchemaVarsHelper(
+			((AntecSuccTacletGoalTemplate)tgt).replaceWith(), oc);
+	    } else if(tgt instanceof RewriteTacletGoalTemplate) {
+		((RewriteTacletGoalTemplate)tgt).replaceWith()
+					        .execPostOrder(oc);
+	    }
+	}
+	
+	for(Operator op : oc.ops()) {
+	    if(op instanceof SchemaVariable) {
+		result.add((SchemaVariable)op);
+	    }
+	}
+	
+	return result;
+    }
+    
 
     /**
-         * Pretty-print a taclet. Line-breaks are taken care of.
-         *
-         * @param taclet
-         *           The Taclet to be pretty-printed.
-         * @param sv
-         *           The instantiations of the SchemaVariables
-         * @param showWholeTaclet
-         *           Should the find, varcond and heuristic part be pretty-printed?
-         */
-    public void printTaclet(Taclet taclet, SVInstantiations sv,
-                            boolean showWholeTaclet) {
+     * Pretty-print a taclet. Line-breaks are taken care of.
+     *
+     * @param taclet
+     *           The Taclet to be pretty-printed.
+     * @param sv
+     *           The instantiations of the SchemaVariables
+     * @param showWholeTaclet
+     *           Should the find, varcond and heuristic part be pretty-printed?
+     * @param declareSchemaVars
+     *           Should declarations for the schema variables used in the taclet be pretty-printed?
+     */
+    public void printTaclet(Taclet taclet, 
+	    		    SVInstantiations sv,
+                            boolean showWholeTaclet,
+                            boolean declareSchemaVars) {
 	instantiations = sv;
 	try {
 	    Debug.log4jDebug(taclet.name().toString(),
@@ -254,6 +294,13 @@ public final class LogicPrinter {
 		layouter.beginC(2).print(taclet.name().toString()).print(" {");
 	    } else {
 		layouter.beginC();
+	    }
+	    if (declareSchemaVars) {
+		Set<SchemaVariable> schemaVars = collectSchemaVars(taclet);
+		layouter.brk();
+		for(SchemaVariable schemaVar : schemaVars) {
+                    layouter.print(schemaVar.proofToString() + "  ");
+		}
 	    }
 	    if (!(taclet.ifSequent().isEmpty())) {
 		printTextSequent(taclet.ifSequent(), "\\assumes", true);
@@ -289,12 +336,12 @@ public final class LogicPrinter {
      *           The Taclet to be pretty-printed.
      */
     public void printTaclet(Taclet taclet) {
-        printTaclet(taclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+        printTaclet(taclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true, false);
     }
 
     protected void printAttribs(Taclet taclet) throws IOException{
         if (taclet.noninteractive()) {
-                layouter.brk().print("\\noninteractive");
+            layouter.brk().print("\\noninteractive");
         }       
     }
 
@@ -462,10 +509,20 @@ public final class LogicPrinter {
 	//layouter.beginC(0);
 	if (tgt.name() != null) {
 	    if (tgt.name().length() > 0) {
-		layouter.brk().beginC(2).print(tgt.name()).print(" {");
+		layouter.brk().beginC(2).print("\"" + tgt.name() + "\"").print(":");
 	    }
 			
 	}
+	if (tgt instanceof AntecSuccTacletGoalTemplate) {
+	    printTextSequent
+		(((AntecSuccTacletGoalTemplate)tgt).replaceWith(), 
+		 "\\replacewith", true);
+	}
+	if (tgt instanceof RewriteTacletGoalTemplate) {
+	    layouter.brk();
+	    printRewrite(((RewriteTacletGoalTemplate)tgt).replaceWith());
+	}	
+	
 	if (!(tgt.sequent().isEmpty())) {
 	    printTextSequent(tgt.sequent(), "\\add", true);
 	} 
@@ -477,18 +534,9 @@ public final class LogicPrinter {
 	    printAddProgVars(tgt.addedProgVars());
 	}
 	
-	if (tgt instanceof AntecSuccTacletGoalTemplate) {
-	    printTextSequent
-		(((AntecSuccTacletGoalTemplate)tgt).replaceWith(), 
-		 "\\replacewith", true);
-	}
-	if (tgt instanceof RewriteTacletGoalTemplate) {
-	    layouter.brk();
-	    printRewrite(((RewriteTacletGoalTemplate)tgt).replaceWith());
-	}
 	if (tgt.name() != null) {
 	    if (tgt.name().length() > 0) {
-		layouter.brk(1,-2).print("}").end();
+		layouter.brk(1,-2).end();
 	    }
 	}
 	//layouter.end();
@@ -500,7 +548,7 @@ public final class LogicPrinter {
         for (Iterator<Taclet> it = rules.iterator(); it.hasNext();) {
             layouter.brk();
             Taclet t = it.next();
-            printTaclet(t, instantiations, true);
+            printTaclet(t, instantiations, true, false);
             instantiations = svi;
         }
         layouter.brk(1,-2).print(")").end();
@@ -1237,7 +1285,7 @@ public final class LogicPrinter {
         int size = vars.size ();
         for(int j = 0; j != size; j++) {
             final QuantifiableVariable v = vars.get (j);
-            if(v instanceof LogicVariable){
+            if(v instanceof LogicVariable) {
                 Term t =
                     TermFactory.DEFAULT.createTerm((LogicVariable) v);
                 if(notationInfo.getAbbrevMap().containsTerm(t)) {
@@ -1342,9 +1390,9 @@ public final class LogicPrinter {
      */
     public void printQuantifierTerm(String name,
                                     ImmutableArray<QuantifiableVariable> vars,
-                                    Term phi, int ass)
-        throws IOException
-    {
+                                    Term phi, 
+                                    int ass)
+        throws IOException {
         layouter.beginC(2);
         layouter.print(name).print(" ");
         printVariables(vars);
@@ -1354,56 +1402,7 @@ public final class LogicPrinter {
         layouter.end();
     }
 
-    public void printNumericalQuantifierTerm(String name,
-            ImmutableArray<QuantifiableVariable> vars,
-            Term cond, Term summand, int ass, int ass2)
-    throws IOException
-    {
-        layouter.beginC(2);
-        layouter.print(name).print(" ");
-        printVariables(vars);
-        layouter.brk();
-        layouter.print("(");
-        startTerm(2);
-        markStartSub();
-        printTerm(cond);
-        markEndSub();
-        layouter.print(";").brk(1,0);
-        markStartSub();
-        printTerm(summand);
-        markEndSub();
-        layouter.print(")");
-        layouter.end();
-    }
-
-    public void printBoundedNumericalQuantifierTerm(String name,
-            ImmutableArray<QuantifiableVariable> vars,
-            Term lower, Term upper, Term summand, int ass, int ass2)
-    throws IOException
-    {
-        layouter.beginC(2);
-        layouter.print(name).print(" ");
-        printVariables(vars);
-        layouter.brk();
-        layouter.print("(");
-        startTerm(3);
-        markStartSub();
-        printTerm(lower);
-        markEndSub();
-        layouter.print(";").brk(1,0);
-        markStartSub();
-        printTerm(upper);
-        markEndSub();
-        layouter.print(";").brk(1,0);
-        markStartSub();
-        printTerm(summand);
-        markEndSub();       
-        layouter.print(")");
-        layouter.end();
-    }
-
-
-
+    
     /** Print a constant.  This just prints the string <code>s</code> and
      * marks it as a nullary term.
      *
@@ -1645,8 +1644,7 @@ public final class LogicPrinter {
      * @param t   the the subterm to print
      * @param ass the associativity for this subterm */
     protected void maybeParens(Term t, int ass)
-        throws IOException
-    {
+        throws IOException {
         if (t.op() instanceof SchemaVariable && instantiations != null &&
 	    instantiations.getInstantiation((SchemaVariable)t.op()) 
 	    instanceof Term) {

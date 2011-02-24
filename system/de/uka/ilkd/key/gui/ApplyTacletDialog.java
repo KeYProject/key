@@ -122,9 +122,10 @@ public abstract class ApplyTacletDialog extends JDialog {
                 new NotationInfo(), backend, mediator.getServices(), true);
         
 //        tp.printTaclet(taclet, model[0].tacletApp().instantiations(),
-        tp.printTaclet(taclet, SVInstantiations.EMPTY_SVINSTANTIATIONS,
-                ProofSettings.DEFAULT_SETTINGS.getViewSettings()
-                .getShowWholeTaclet());
+        tp.printTaclet(taclet, 
+        	       SVInstantiations.EMPTY_SVINSTANTIATIONS,
+        	       ProofSettings.DEFAULT_SETTINGS.getViewSettings().getShowWholeTaclet(), 
+        	       false);
         tacletSB.append(backend.getString());
         
         //logger.info(tacletSB);

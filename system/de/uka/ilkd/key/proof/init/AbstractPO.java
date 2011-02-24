@@ -24,11 +24,15 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.util.Pair;
 
@@ -54,12 +58,12 @@ public abstract class AbstractPO implements ProofOblInput {
     	= new LinkedList<Function>();
     private final List<Function> introducedPreds
     	= new LinkedList<Function>();
+    private ImmutableSet<NoPosTacletApp> taclets;    
     private String header;
-    private ProofAggregate proofAggregate;
+    private ProofAggregate proofAggregate;    
     
     protected Term[] poTerms;
-    protected String[] poNames;
-    protected ImmutableSet<NoPosTacletApp>[] poTaclets;    
+    protected String[] poNames;    
 
     
     //-------------------------------------------------------------------------
@@ -148,9 +152,8 @@ public abstract class AbstractPO implements ProofOblInput {
     }
     
         
-    protected final ImmutableSet<NoPosTacletApp> collectClassAxioms(
-	    						KeYJavaType selfKJT) {
-	ImmutableSet<NoPosTacletApp> result = DefaultImmutableSet.nil();
+    protected void collectClassAxioms(KeYJavaType selfKJT) {
+	taclets = DefaultImmutableSet.nil();
 	final ImmutableSet<ClassAxiom> axioms 
 		= specRepos.getClassAxioms(selfKJT);
 	
@@ -160,16 +163,15 @@ public abstract class AbstractPO implements ProofOblInput {
 	    for(Taclet axiomTaclet : axiom.getTaclets(scc, services)) {
 		assert axiomTaclet != null 
 		       : "class axiom returned null taclet: " + axiom.getName();
-		result = result.add(NoPosTacletApp.createNoPosTacletApp(
+		taclets = taclets.add(NoPosTacletApp.createNoPosTacletApp(
 				   				axiomTaclet));
 		initConfig.getProofEnv()
 			  .registerRule(axiomTaclet, 
 				  	AxiomJustification.INSTANCE);
 	    }	    
 	}
-
-	return result;
     }    
+    
     
     
     protected final void register(ProgramVariable pv) {
@@ -273,6 +275,26 @@ public abstract class AbstractPO implements ProofOblInput {
             sb.append("}\n\n");
         }
         
+        //taclets
+        if(taclets != null && !taclets.isEmpty()) {
+            sb.append("\\rules {\n");
+            LogicPrinter lp = new LogicPrinter(new ProgramPrinter(), 
+            			   	       new NotationInfo(), 
+            			   	       null, 
+            			   	       true);            
+            for(NoPosTacletApp npta : taclets) {
+        	lp.printTaclet(npta.taclet(),
+        		       SVInstantiations.EMPTY_SVINSTANTIATIONS, 
+        		       true, 
+        		       true);
+        	sb.append(lp.toString());
+        	sb.setLength(sb.length() - 1);
+        	sb.append(";\n");
+        	lp.reset();
+            }
+            sb.append("}\n\n");
+        }
+        
         header = sb.toString();
     }
 
@@ -311,9 +333,9 @@ public abstract class AbstractPO implements ProofOblInput {
         for(int i = 0; i < proofs.length; i++) {
             proofs[i] = createProof(poNames != null ? poNames[i] : name,
                                     poTerms[i]);   
-            if(poTaclets != null) {
+            if(taclets != null) {
                 proofs[i].getGoal(proofs[i].root()).indexOfTaclets()
-                                                   .addTaclets(poTaclets[i]);
+                                                   .addTaclets(taclets);
             }            
         }
         

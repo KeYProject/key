@@ -211,7 +211,6 @@ public class TestApplyTaclet extends TestCase{
 	assertTrue("Too many or zero rule applications.", rApplist.size()==1);
 	RuleApp rApp=rApplist.head();
 	rApp = ((TacletApp)rApp).tryToInstantiate ( TacletForTests.services() );
-	rApp = ((TacletApp)rApp).createSkolemFunctions ( new Namespace (), TacletForTests.services() );
 	assertTrue("Rule App should be complete", rApp.complete());
 	ImmutableList<Goal> goals = rApp.execute(goal, TacletForTests.services());
 	assertTrue("Too many or zero goals for all-right.",goals.size()==1);	

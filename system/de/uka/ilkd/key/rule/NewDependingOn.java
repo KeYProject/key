@@ -32,7 +32,7 @@ public class NewDependingOn {
      * an Taclet.
      */
     public NewDependingOn(SchemaVariable first, SchemaVariable second) {
-        if ( !( ( first instanceof SkolemTermSV || first instanceof FormulaSV )
+        if ( !( ( first instanceof SkolemTermSV)
                 && ( second instanceof FormulaSV || second instanceof TermSV ) ) ) {
             throw new RuntimeException("NewDependingOn: First SchemaVariable has to be a SkolemTermSV or FormulaSV, " +
                                        "the second one has to be a FormulaSV or a TermSV");

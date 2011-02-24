@@ -62,10 +62,10 @@ public class VariableNameProposer implements InstantiationProposer {
 			      ImmutableList<String> previousProposals) {
 	if(var instanceof SkolemTermSV) {
 	    return getNameProposalForSkolemTermVariable(app,
-	    					       var,
-						       services,
-						       undoAnchor,
-                                                       previousProposals);
+	    					        var,
+						        services,
+						        undoAnchor,
+                                                        previousProposals);
 	} else if(var instanceof VariableSV) {
 	    return getNameProposalForVariableSV(app,
 	    					var,
@@ -104,10 +104,10 @@ public class VariableNameProposer implements InstantiationProposer {
      * schema variable, which is declared as skolem term SV.
      */
     private String getNameProposalForSkolemTermVariable(TacletApp p_app,
-    						       SchemaVariable p_var,
-						       Services services,
-						       Node undoAnchor,
-                                                       ImmutableList<String> previousProposals) {
+    						        SchemaVariable p_var,
+						        Services services,
+						        Node undoAnchor,
+                                                        ImmutableList<String> previousProposals) {
 	return getNameProposalForSkolemTermVariable
 	    ( createBaseNameProposalBasedOnCorrespondence ( p_app, p_var ),
 	      services,

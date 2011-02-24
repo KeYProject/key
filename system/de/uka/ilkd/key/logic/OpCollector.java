@@ -11,13 +11,13 @@
 package de.uka.ilkd.key.logic;
 
 import java.util.HashSet;
+import java.util.Set;
 
 import de.uka.ilkd.key.logic.op.Operator;
 
 /**
  * Collects all operators occuring in the traversed term.
  */
-
 public class OpCollector extends Visitor{
     /** the found operators */
     private HashSet<Operator> ops;
@@ -33,5 +33,9 @@ public class OpCollector extends Visitor{
 
     public boolean contains(Operator op) {
 	return ops.contains(op);
+    }
+    
+    public Set<Operator> ops() {
+	return ops;
     }
 }

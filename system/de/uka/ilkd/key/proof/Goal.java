@@ -675,7 +675,7 @@ public class Goal  {
         final NodeChangeJournal journal = new NodeChangeJournal(proof, this);
         addGoalListener(journal);
         
-        final RuleApp ruleApp = completeRuleApp( p_ruleApp ); 
+        final RuleApp ruleApp = p_ruleApp; 
 
         final Node n = node;
         
@@ -708,21 +708,6 @@ public class Goal  {
     public String toString() {
 	String result = (node.sequent().prettyprint(proof().getServices()).toString());
 	return result;
-    }
-
-    /** make Taclet instantiations complete with regard to metavariables and
-     * Skolemfunctions
-     */ 
-    private RuleApp completeRuleApp ( RuleApp ruleApp ) {
-        final Proof proof = proof();
-        if (ruleApp instanceof TacletApp) {
-            TacletApp tacletApp = (TacletApp)ruleApp;
-                        
-            ruleApp = tacletApp.createSkolemFunctions 
-                ( proof.getNamespaces().functions(), 
-                       proof.getServices() );
-        }
-        return ruleApp;
     }
     
     

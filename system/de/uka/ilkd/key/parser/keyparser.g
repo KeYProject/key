@@ -641,31 +641,37 @@ options {
             			 	throws AmbigiousDeclException {
         if (!skip_schemavariables) {
             SchemaVariable v;
-            if(s == Sort.FORMULA) {
-                v = SchemaVariableFactory.createFormulaSV
-                (new Name(name), mods.rigid());
+            if(s == Sort.FORMULA && !makeSkolemTermSV) {
+                v = SchemaVariableFactory.createFormulaSV(new Name(name), 
+                					  mods.rigid());
             } else if(s == Sort.UPDATE) {
                 v = SchemaVariableFactory.createUpdateSV(new Name(name));
             } else if(s instanceof ProgramSVSort) {
-                v = SchemaVariableFactory.createProgramSV
-                (new ProgramElementName(name),(ProgramSVSort) s, mods.list());
+                v = SchemaVariableFactory.createProgramSV(
+                		new ProgramElementName(name),
+                		(ProgramSVSort) s,
+                		mods.list());
             } else {
                 if(makeVariableSV) {
-                    v=SchemaVariableFactory.createVariableSV
+                    v = SchemaVariableFactory.createVariableSV
                     (new Name(name), s);
                 } else if(makeSkolemTermSV) {
-                    v = SchemaVariableFactory.createSkolemTermSV(
-                    				new Name(name), 
-                    				s);
-                } else { v = SchemaVariableFactory.createTermSV
-                    (new Name(name), s, mods.rigid(), mods.strict());
+                    v = SchemaVariableFactory.createSkolemTermSV(new Name(name), 
+                    				                 s);
+                } else { v = SchemaVariableFactory.createTermSV(
+                					new Name(name), 
+                					s, 
+                					mods.rigid(), 
+                					mods.strict());
                 }
             }          
 
             if (inSchemaMode()) {
                if (variables().lookup(v.name()) != null) {
-            	 throw new AmbigiousDeclException(v.name().toString(), getFilename(), 
-            	  				 getLine(), getColumn());
+            	 throw new AmbigiousDeclException(v.name().toString(), 
+            	 			          getFilename(), 
+            	  				  getLine(), 
+            	  				  getColumn());
                }
                variables().add(v);
             }
@@ -1715,14 +1721,21 @@ one_schema_var_decl
     ( schema_modifiers[mods] ) ?
     {s = Sort.UPDATE;}
     ids = simple_ident_comma_list 
+  | SKOLEMFORMULA
+    { makeSkolemTermSV = true; } 
+    { mods = new SchemaVariableModifierSet.FormulaSV (); }
+    ( schema_modifiers[mods] ) ?    
+    {s = Sort.FORMULA;}
+    ids = simple_ident_comma_list
   | (    TERM
          { mods = new SchemaVariableModifierSet.TermSV (); }
          ( schema_modifiers[mods] ) ?
       | (VARIABLES
-         {makeVariableSV = true;}
+         { makeVariableSV = true; }
          { mods = new SchemaVariableModifierSet.VariableSV (); }
          ( schema_modifiers[mods] ) ?)
-      | (SKOLEMTERM {makeSkolemTermSV = true;}
+      | (SKOLEMTERM 
+         { makeSkolemTermSV = true; }
          { mods = new SchemaVariableModifierSet.SkolemTermSV (); }
          ( schema_modifiers[mods] ) ?)
     )

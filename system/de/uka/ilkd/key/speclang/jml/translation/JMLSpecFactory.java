@@ -67,7 +67,7 @@ public class JMLSpecFactory {
     //-------------------------------------------------------------------------
     
     private String getInvName() {
-        return "JML class invariant (id: " + invCounter++ + ")";
+        return "JML class invariant nr " + invCounter++;
     }
     
     
@@ -481,13 +481,14 @@ public class JMLSpecFactory {
         					  	   kjt,
         					  	   selfVar);
         //create class axiom
-        return new RepresentsAxiom("JML represents clause for " 
-        	                     + rep.first.name(),
-        	                  rep.first,
-        	                  kjt,        
-        	                  visibility,
-        	                  rep.second,
-        	                  selfVar);
+        return new RepresentsAxiom("JML_represents_clause_for_" 
+        	                   + rep.first.name().toString()
+        	                                     .replace("::$", "_"),
+        	                   rep.first,
+        	                   kjt,        
+        	                   visibility,
+        	                   rep.second,
+        	                   selfVar);
     }
    
     

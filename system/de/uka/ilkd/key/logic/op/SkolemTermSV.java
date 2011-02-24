@@ -31,12 +31,6 @@ public final class SkolemTermSV extends AbstractSV {
 	
     
     @Override
-    public String toString() {
-	return toString(sort().toString()+" skolem term");
-    }
-
-
-    @Override
     public MatchConditions match(SVSubstitute subst, 
 	    			 MatchConditions mc,
 	    			 Services services) {
@@ -45,5 +39,23 @@ public final class SkolemTermSV extends AbstractSV {
 	} else {
 	    return null;
 	}
+    }
+    
+    
+    @Override
+    public String toString() {
+	return toString(sort().toString() + " skolem term");
+    }
+    
+    
+    @Override
+    public String proofToString() {
+	return "\\schemaVar " 
+	        + (sort() == Sort.FORMULA 
+	           ? "\\skolemFormula" 
+	           : "\\skolemTerm " + sort().name()) 
+	        + " " 
+	        + name() 
+	        + ";\n";
     }
 }

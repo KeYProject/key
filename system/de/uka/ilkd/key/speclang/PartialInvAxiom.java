@@ -75,7 +75,7 @@ public final class PartialInvAxiom implements ClassAxiom {
 	ImmutableSet<Taclet> result = DefaultImmutableSet.<Taclet>nil();
 	
 	for(int i = 0; i < 2; i++) {
-	    //instantiate axiom with schema variables
+	    //create schema variables
 	    final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	    final SchemaVariable heapSV 
 	    	= SchemaVariableFactory.createTermSV(new Name("h"), 
@@ -92,11 +92,18 @@ public final class PartialInvAxiom implements ClassAxiom {
 	    	  ? null
 		  : SchemaVariableFactory.createTermSV(
 			  		new Name("EQ"), 
-			    		services.getJavaInfo().objectSort());	    
-	    final Term schemaAxiom 
+			    		services.getJavaInfo().objectSort());
+	    
+	    //instantiate axiom with schema variables
+	    final Term rawAxiom 
 	    	= OpReplacer.replace(TB.heap(services), 
-	    			     TB.var(heapSV), 
-	    			     inv.getInv(selfSV, services));
+		  		     TB.var(heapSV), 
+		    		     inv.getInv(selfSV, services));
+	    final Pair<Term,ImmutableSet<VariableSV>> replaceBoundLVsPair 
+	    	= RepresentsAxiom.replaceBoundLVsWithSVs(rawAxiom);
+	    final Term schemaAxiom = replaceBoundLVsPair.first;
+	    final ImmutableSet<VariableSV> boundSVs 
+		= replaceBoundLVsPair.second;	    
 	    
 	    //limit observers
 	    final Pair<Term, ImmutableSet<Taclet>> limited 
@@ -121,10 +128,19 @@ public final class PartialInvAxiom implements ClassAxiom {
 	    tacletBuilder.addTacletGoalTemplate(
 		    new TacletGoalTemplate(addedSeq,
 			    ImmutableSLList.<Taclet>nil()));
-	    tacletBuilder.setName(new Name("Partial inv axiom for " 
-		    			   + inv.getName()
-		    			   + (i == 0 ? "" : " EQ")));
+	    tacletBuilder.setName(new Name("Partial_inv_axiom_for_" 
+		    			   + inv.getName().replace(" ", "_")
+		    			   + (i == 0 ? "" : "_EQ")));
 	    tacletBuilder.addRuleSet(new RuleSet(new Name("partialInvAxiom")));
+	    for(VariableSV boundSV : boundSVs) {
+		tacletBuilder.addVarsNotFreeIn(boundSV, heapSV);
+		if(selfSV != null) {
+		    tacletBuilder.addVarsNotFreeIn(boundSV, selfSV);
+		}
+		if(eqSV != null && i == 1) {
+		    tacletBuilder.addVarsNotFreeIn(boundSV, eqSV);		    
+		}
+	    }	    
 	    
 	    //\assumes(self = EQ ==>)
 	    if(i == 1) {

@@ -249,13 +249,7 @@ public final class ProgramSV extends AbstractSV
         return null;
     }
 
-    
-    @Override
-    public String toString() {
-	return toString("program "+sort().name());
-    }
-    
-    
+        
     /**
      * adds a found mapping from schema variable <code>var</code> to
      * program element <code>pe</code> and returns the updated match
@@ -423,5 +417,17 @@ x     * @return the updated match conditions including mapping
         }
         source.next();   
         return matchCond;
+    }
+    
+    
+    @Override
+    public String toString() {
+	return toString("program "+sort().name());
+    }
+    
+
+    @Override
+    public String proofToString() {
+	return "\\schemaVar \\program " + sort().name() + " " + name() + ";\n";
     }
 }

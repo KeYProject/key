@@ -49,6 +49,7 @@ tokens {
 	UPDATE = "\\update";
 	VARIABLES = "\\variables";
 	SKOLEMTERM = "\\skolemTerm";
+	SKOLEMFORMULA = "\\skolemFormula";
 	
         // used in contracts
 	MODIFIES = "\\modifies";

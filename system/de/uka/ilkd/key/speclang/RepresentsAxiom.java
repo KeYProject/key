@@ -14,11 +14,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -26,6 +26,7 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.rule.NotFreeIn;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.RewriteTacletGoalTemplate;
@@ -127,6 +128,65 @@ public final class RepresentsAxiom implements ClassAxiom {
     }    
     
     
+    public static Pair<Term,ImmutableSet<VariableSV>> 
+    				replaceBoundLVsWithSVs(Term t) {
+	ImmutableSet<VariableSV> svs = DefaultImmutableSet.<VariableSV>nil();
+	
+	//prepare op replacer, new bound vars
+	final Map<Operator,Operator> map = new HashMap<Operator,Operator>();
+	final ImmutableArray<QuantifiableVariable> boundVars 
+		= t.boundVars();
+	final QuantifiableVariable[] newBoundVars 
+		= new QuantifiableVariable[boundVars.size()];	
+	for(int i = 0; i < newBoundVars.length; i++) {
+	    final QuantifiableVariable qv = boundVars.get(i);
+	    if(qv instanceof LogicVariable) {
+		final VariableSV sv 
+			= SchemaVariableFactory.createVariableSV(qv.name(), 
+							         qv.sort());
+		svs = svs.add(sv);
+		newBoundVars[i] = sv;
+		map.put(qv, sv);
+	    } else {
+		newBoundVars[i] = qv;
+	    }
+	}
+	final OpReplacer or = new OpReplacer(map);	
+	
+	//handle subterms
+	final Term[] newSubs = new Term[t.arity()];
+	boolean changedSub = false;
+	for(int i = 0; i < newSubs.length; i++) {
+	    if(t.op().bindVarsAt(i)) {
+		newSubs[i] = or.replace(t.sub(i));
+	    } else {
+		newSubs[i] = t.sub(i);
+	    }
+	    final Pair<Term,ImmutableSet<VariableSV>> subPair 
+	    	= replaceBoundLVsWithSVs(newSubs[i]);
+	    newSubs[i] = subPair.first;
+	    svs = svs.union(subPair.second);
+	    if(newSubs[i] != t.sub(i)) {
+		changedSub = true;
+	    }
+	}
+	
+	//build overall term
+	final Term newTerm;
+	if(map.isEmpty() && !changedSub) {
+	    newTerm = t;
+	} else {
+	    newTerm = TB.tf().createTerm(
+		    	t.op(), 
+		    	newSubs, 
+		    	new ImmutableArray<QuantifiableVariable>(newBoundVars),
+		        t.javaBlock());
+	}
+	
+	return new Pair<Term,ImmutableSet<VariableSV>>(newTerm, svs);
+    }
+    
+    
     @Override
     public String getName() {
 	return name;
@@ -166,7 +226,13 @@ public final class RepresentsAxiom implements ClassAxiom {
 						       kjt.getSort());
 	
 	//instantiate axiom with schema variables
-	final Term schemaAxiom = getAxiom(heapSV, selfSV, services);
+	final Term rawAxiom = getAxiom(heapSV, selfSV, services);
+	final Pair<Term,ImmutableSet<VariableSV>> replaceBoundLVsPair 
+		= replaceBoundLVsWithSVs(rawAxiom);
+	final Term schemaAxiom 
+		= replaceBoundLVsPair.first;
+	final ImmutableSet<VariableSV> boundSVs 
+		= replaceBoundLVsPair.second;
 
 	//prepare exactInstance guard
 	final boolean finalClass 
@@ -188,19 +254,19 @@ public final class RepresentsAxiom implements ClassAxiom {
 	    	= TB.or(OpReplacer.replace(targetTerm, TB.tt(), schemaAxiom),
 		        OpReplacer.replace(targetTerm, TB.ff(), schemaAxiom));
 	} else {
-	    final LogicVariable targetLV
-	    	= new LogicVariable(
+	    final VariableSV targetSV
+	    	= SchemaVariableFactory.createVariableSV(
 		    new Name(target.sort().name().toString().substring(0, 1)),
 		    target.sort());
 	    final Term targetLVReachable
 	    	= TB.reachableValue(services, 
 		    	      	    TB.var(heapSV), 
-		    	      	    TB.var(targetLV), 
+		    	      	    TB.var(targetSV), 
 		    	      	    target.getType());
-	    axiomSatisfiable = TB.ex(targetLV, 
+	    axiomSatisfiable = TB.ex(targetSV, 
 		    		     TB.and(targetLVReachable,
 		    			    OpReplacer.replace(targetTerm, 
-			    		  	               TB.var(targetLV), 
+			    		  	               TB.var(targetSV), 
 			    		  	               schemaAxiom)));
 	}
         	
@@ -228,6 +294,12 @@ public final class RepresentsAxiom implements ClassAxiom {
 	tacletBuilder.setName(new Name(name));
 	tacletBuilder.addRuleSet(
 			new RuleSet(new Name("inReachableStateImplication")));
+	for(VariableSV boundSV : boundSVs) {
+	    tacletBuilder.addVarsNotFreeIn(boundSV, heapSV);
+	    if(selfSV != null) {
+		tacletBuilder.addVarsNotFreeIn(boundSV, selfSV);
+	    }
+	}
 	
 	return tacletBuilder.getTaclet();
     }
@@ -258,7 +330,13 @@ public final class RepresentsAxiom implements ClassAxiom {
 						       kjt.getSort());
 	
 	//instantiate axiom with schema variables
-	final Term schemaAxiom = getAxiom(heapSV, selfSV, services);
+	final Term rawAxiom = getAxiom(heapSV, selfSV, services);
+	final Pair<Term,ImmutableSet<VariableSV>> replaceBoundLVsPair 
+		= replaceBoundLVsWithSVs(rawAxiom);
+	final Term schemaAxiom 
+		= replaceBoundLVsPair.first;
+	final ImmutableSet<VariableSV> boundSVs 
+		= replaceBoundLVsPair.second;	
 	assert schemaAxiom.op() instanceof Equality;
 	final Term schemaLhs = schemaAxiom.sub(0);
 	final Term schemaRhs = schemaAxiom.sub(1);
@@ -297,6 +375,12 @@ public final class RepresentsAxiom implements ClassAxiom {
 	}
 	tacletBuilder.setName(new Name(name));
 	tacletBuilder.addRuleSet(new RuleSet(new Name("classAxiom")));
+	for(VariableSV boundSV : boundSVs) {
+	    tacletBuilder.addVarsNotFreeIn(boundSV, heapSV);
+	    if(selfSV != null) {
+		tacletBuilder.addVarsNotFreeIn(boundSV, selfSV);
+	    }
+	}	
 	
 	//add satisfiability branch
 	final Term targetTerm 

@@ -336,7 +336,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
 		    final Object peerInst = app.instantiations().getInstantiation(peerSV);
                     if(peerInst instanceof TypeReference){
                         kjt = ((TypeReference) peerInst).getKeYJavaType();
-                    }else{
+                    } else {
                         Expression peerInstExpr;
                         if (peerInst instanceof Term) {
                             peerInstExpr=tc.convertToProgramElement((Term)peerInst);
@@ -463,17 +463,23 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
 		        result = result.addCheckedInstantiation( sv, 
                                 tb.var( lv ), services, true );
 		    } else {
-		        // sv.isSkolemTermSV ()
-                        
-                        Named n = namespaces().
-                            lookupLogicSymbol(new Name(idd.getName()));
-                        if (n == null) { 
-                            result = result.createSkolemConstant
-                            ( idd.getName (), sv, sort, true, services );
+		        // sv instanceof SkolemTermSV
+                        final Named n 
+                        	= namespaces()
+                                  .lookupLogicSymbol(new Name(idd.getName()));
+                        if(n == null) { 
+                            result = result.createSkolemConstant(idd.getName(),
+                        	                                 sv, 
+                        	                                 sort, 
+                        	                                 true, 
+                        	                                 services);
                         } else {
-                            throw 
-                                new SVInstantiationParserException(idd.getName(), irow, 1, 
-                                        "Name already in use.", false);
+                            throw new SVInstantiationParserException(
+                        	    		idd.getName(), 
+                        	    		irow, 
+                        	    		1, 
+                        	    		"Name already in use.", 
+                        	    		false);
                         }
 		    }
 		} else if (sv instanceof ProgramSV) {

@@ -88,23 +88,18 @@ public class SchemaVariableFactory {
     
 
     /** creates a SchemaVariable representing a program construct
-     * @param name the ProgramElementName of the SchemaVariable
-     * @return the SchemaVariable
      */
     public static SchemaVariable createProgramSV(ProgramElementName name, 
 						 ProgramSVSort s,
-						 boolean listSV){
+						 boolean listSV) {
 	return new ProgramSV(name, s, listSV);
     }
 
 
     /** 
      * creates a SchemaVariable representing a skolem term
-     * @param name the Name of the SchemaVariable
-     * @return the SchemaVariable
      */
-    public static SchemaVariable createSkolemTermSV(Name name, 
-						    Sort s){
+    public static SchemaVariable createSkolemTermSV(Name name, Sort s) {
 	return new SkolemTermSV(name, s);
     }
 }

@@ -10,8 +10,6 @@
 
 package de.uka.ilkd.key.rule;
 
-import java.util.Iterator;
-
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
@@ -55,8 +53,8 @@ public class TacletGoalTemplate {
 			      ImmutableSet<SchemaVariable> addedProgVars) {
 	TacletBuilder.checkContainsFreeVarSV(addedSeq, null, "add sequent");
 	   
-	this.addedRules=addedRules;	
-	this.addedSeq=addedSeq;
+	this.addedRules = addedRules;	
+	this.addedSeq = addedSeq;
 	this.addedProgVars = addedProgVars;
     }
     
@@ -119,7 +117,7 @@ public class TacletGoalTemplate {
      */
     protected ImmutableSet<QuantifiableVariable> getBoundVariables() {
 	ImmutableSet<QuantifiableVariable> result
-	    =DefaultImmutableSet.<QuantifiableVariable>nil();
+	    = DefaultImmutableSet.<QuantifiableVariable>nil();
 
         for (Taclet taclet : rules()) {
             result = result.union(taclet.getBoundVariables());
@@ -136,10 +134,13 @@ public class TacletGoalTemplate {
        name = s;
     }
     
+    
     public String name() {
        return name;
     }
 
+    
+    @Override    
     public boolean equals(Object o) {
 	if ( ! ( o instanceof TacletGoalTemplate ) )
 	    return false;
@@ -150,8 +151,10 @@ public class TacletGoalTemplate {
 	    addedSeq.equals(other.addedSeq)
 	    && addedRules.equals(other.addedRules);
     }
-    
-    public int hashCode(){
+
+
+    @Override    
+    public int hashCode() {
     	int result = 17;
     	result = 37 * result + addedSeq.hashCode();
     	result = 37 * result + addedRules.hashCode();    	
@@ -159,7 +162,7 @@ public class TacletGoalTemplate {
     }
 
     
-    /** toString */
+    @Override
     public String toString() {
 	String result="";
 	if (!sequent().isEmpty()) result+="\\add "+sequent()+" "; 
@@ -167,5 +170,4 @@ public class TacletGoalTemplate {
 	if (!addedProgVars().isEmpty()) result+="\\addprogvars "+addedProgVars()+" ";	
 	return result;
     }
-
 }
