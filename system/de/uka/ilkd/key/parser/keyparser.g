@@ -3547,20 +3547,20 @@ type_resolver returns [TypeResolver tr = null]
 varcond_new [TacletBuilder b]
 {
   ParsableVariable x = null, y = null;
-  Sort s = null;
+  KeYJavaType kjt = null;
 }
 :
    NEW LPAREN x=varId COMMA
       (
           TYPEOF LPAREN y=varId RPAREN {
-	    b.addVarsNew((SchemaVariable) x, (SchemaVariable) y, false);
+	    b.addVarsNew((SchemaVariable) x, (SchemaVariable) y);
 	  }
       |
          DEPENDINGON LPAREN y=varId RPAREN {
-	    b.addVarsNewDependingOn((SchemaVariable)x,(SchemaVariable)y);
+	    b.addVarsNewDependingOn((SchemaVariable)x, (SchemaVariable)y);
 	  }
-      | s=sortId_check[true] {
-		b.addVarsNew((SchemaVariable) x, s);
+      | kjt=keyjavatype {
+		b.addVarsNew((SchemaVariable) x, kjt.getJavaType());
 	  }
       )
    RPAREN

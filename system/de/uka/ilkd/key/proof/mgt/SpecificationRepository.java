@@ -658,10 +658,12 @@ public final class SpecificationRepository {
 	//add query axioms for own class
 	for(ProgramMethod pm : services.getJavaInfo()
 		                       .getAllProgramMethods(kjt)) {
-	    if(pm.getKeYJavaType() != null) {
+	    if(pm.getKeYJavaType() != null && !pm.isImplicit()) {
 		pm = services.getJavaInfo().getToplevelPM(kjt, pm);		
 		final ClassAxiom queryAxiom 
-		    = new QueryAxiom("Query_axiom_for_" + pm.getFullName(),
+		    = new QueryAxiom("Query_axiom_for_" + pm.getFullName()
+			                                    .replace("<", "_")
+			                                    .replace(">", "_"),
 			             pm, 
 			             kjt);
 		result = result.add(queryAxiom);

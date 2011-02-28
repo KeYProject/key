@@ -1072,7 +1072,8 @@ public abstract class TacletApp implements RuleApp {
 	    			      Name name, 
 	    			      Services services) {
 	return addInstantiation(SVInstantiations.EMPTY_SVINSTANTIATIONS
-				.addInteresting(sv, name, services), services);
+				.addInteresting(sv, name, services), 
+				services);
     }
 
     /**

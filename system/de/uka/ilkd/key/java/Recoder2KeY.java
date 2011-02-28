@@ -1243,7 +1243,8 @@ public class Recoder2KeY implements JavaReader {
             rte = new PosConvertException(message, pos[0], pos[1]);
             rte.initCause(cause);
         } else {
-            rte = new ConvertException(message, cause);
+            rte = new ConvertException(message);
+            rte.initCause(cause);
         }
 
         throw rte;

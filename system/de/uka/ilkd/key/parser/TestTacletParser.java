@@ -394,7 +394,7 @@ public class TestTacletParser extends TestCase {
 
     public void testVarcondNew() {
 	FindTaclet taclet = 
-            (FindTaclet) parseTaclet("xy{ \\find (true) \\varcond(\\new(#boolv,s)) \\replacewith(true)}");
+            (FindTaclet) parseTaclet("xy{ \\find (true) \\varcond(\\new(#boolv,long)) \\replacewith(true)}");
 
 	taclet = (FindTaclet) parseTaclet("xy{ \\find (true) \\varcond (\\new(#v0, \\typeof(#e2))) \\replacewith(true)}");
 

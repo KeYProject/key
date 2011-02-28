@@ -21,6 +21,7 @@ import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.util.Pair;
@@ -108,16 +109,29 @@ public final class QueryAxiom implements ClassAxiom {
 					new Name(target.getName()), 
 					target.sort());	
 	
-	//create program variables
-	final LocationVariable selfVar 
-		= TB.selfVar(services, target, kjt, false);
-	assert (selfVar == null) == (target.isStatic()); 
-	final LocationVariable[] paramVars 
-		= TB.paramVars(services, target, false)
-		    .toArray(new LocationVariable[paramSVs.length]);
-	final LocationVariable resultVar = TB.resultVar(services, 
-							target, 
-							false);
+	//create schema variables for program variables
+	final ProgramSV selfProgSV
+		= target.isStatic() 
+		  ? null
+	          : SchemaVariableFactory.createProgramSV(
+	        	  	new ProgramElementName("#self"), 
+				ProgramSVSort.VARIABLE, 
+				false);
+	final ProgramSV[] paramProgSVs = new ProgramSV[target.getNumParams()];
+	for(int i = 0; i < paramProgSVs.length; i++) {
+	    final String paramName = target.getParameterDeclarationAt(i)
+	                                   .getVariableSpecification()
+	                                   .getName();
+	    paramProgSVs[i] = SchemaVariableFactory.createProgramSV(
+		    		new ProgramElementName("#" + paramName), 
+		    		ProgramSVSort.VARIABLE, 
+		    		false);
+	}
+	final ProgramSV resultProgSV 
+		= SchemaVariableFactory.createProgramSV(
+				new ProgramElementName("#res"), 
+				ProgramSVSort.VARIABLE, 
+				false);
 	
 	//create update and postcondition linking schema variables and 
 	//program variables
@@ -127,18 +141,18 @@ public final class QueryAxiom implements ClassAxiom {
 	         ? update 
                  : TB.parallel(update, 
                 	       TB.elementary(services, 
-                		       	     selfVar, 
+                		       	     selfProgSV, 
                 		       	     TB.var(selfSV)));
 	for(int i = 0; i < paramSVs.length; i++) {
 	    update = TB.parallel(update, 
 		                 TB.elementary(services, 
-		                	       paramVars[i], 
+		                	       paramProgSVs[i], 
 		                	       TB.var(paramSVs[i])));
 	}
 	final Term post = TB.imp(TB.reachableValue(services, 
-						   TB.var(resultVar), 
+						   TB.var(resultProgSV), 
 						   target.getKeYJavaType()),
-	                  	 TB.equals(TB.var(skolemSV), TB.var(resultVar)));
+	                  	 TB.equals(TB.var(skolemSV), TB.var(resultProgSV)));
 	
 	//create java block
     	final ImmutableList<KeYJavaType> sig 
@@ -153,9 +167,9 @@ public final class QueryAxiom implements ClassAxiom {
 							  kjt);
 	final MethodBodyStatement mbs
 		= new MethodBodyStatement(targetImpl,
-					  selfVar,
-					  resultVar,
-					  new ImmutableArray<Expression>(paramVars));
+					  selfProgSV,
+					  resultProgSV,
+					  new ImmutableArray<Expression>(paramProgSVs));
 	final StatementBlock sb = new StatementBlock(mbs);
 	final JavaBlock jb = JavaBlock.createJavaBlock(sb);
 	
@@ -202,10 +216,15 @@ public final class QueryAxiom implements ClassAxiom {
 	if(!target.isStatic()) {
 	    tacletBuilder.addVarsNewDependingOn(skolemSV, selfSV);
 	    tacletBuilder.setIfSequent(ifSeq);
+	    tacletBuilder.addVarsNew(selfProgSV, kjt.getJavaType());
 	}
-	for(SchemaVariable sv : paramSVs) {
-	    tacletBuilder.addVarsNewDependingOn(skolemSV, sv);
+	for(int i = 0; i < paramSVs.length; i++) {
+	    tacletBuilder.addVarsNewDependingOn(skolemSV, paramSVs[i]);
+	    tacletBuilder.addVarsNew(paramProgSVs[i], 
+		    		     target.getParamType(i).getJavaType());
 	}
+	tacletBuilder.addVarsNew(resultProgSV, 
+				 target.getKeYJavaType().getJavaType());
 	tacletBuilder.setStateRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);
 	tacletBuilder.addTacletGoalTemplate
 	    (new RewriteTacletGoalTemplate(addedSeq,

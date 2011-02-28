@@ -10,68 +10,72 @@
 
 package de.uka.ilkd.key.rule;
 
+import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * variable condition used if a new variable is introduced
  */
 public class NewVarcond {
 
-    private SchemaVariable sv;
-    private SchemaVariable asSort = null;
-    private Sort sort = null;
-    private boolean elementsort=false;
+    private final SchemaVariable sv;
+    private final SchemaVariable peerSV;
+    private final Type type;
 
-    public NewVarcond(SchemaVariable sv, SchemaVariable asSort) {
-	this.sv=sv;
-	this.asSort=asSort;
-    }
     
     /*
      * @param sv the Schemavariable representing a new variable.
-     * @param asSort a Schemavariable defining the sort of the new variable.
-     * @param es true if asSort is an ArraySV and the sort of sv should be 
-     * the same as the elementsort of asSort. false otherwise. 
+     * @param peerSV a Schemavariable defining the type of the new variable.
      */
-    public NewVarcond(SchemaVariable sv, SchemaVariable asSort, boolean es) {
-	this.sv=sv;
-	this.asSort=asSort;
-	elementsort = es;
+    public NewVarcond(SchemaVariable sv, SchemaVariable peerSV) {
+	assert sv != null;
+	assert peerSV != null;
+	this.sv = sv;
+	this.peerSV = peerSV;
+	this.type = null;
     }
 
-    public NewVarcond(SchemaVariable sv, Sort sort) {
-	this.sv=sv;
-	this.sort=sort;
+    
+    public NewVarcond(SchemaVariable sv, Type type) {
+	assert sv != null;
+	assert type != null;
+	this.sv = sv;
+	this.peerSV = null;
+	this.type = type;
     }
 
+    
     public boolean isDefinedByType() {
-	return asSort==null;
+	return peerSV == null;
     }
 
+    
     public SchemaVariable getSchemaVariable() {
 	return sv;
     }
+    
 
     public SchemaVariable getPeerSchemaVariable() {
-	return asSort;
-    }
-
-    public Sort getSort() {
-	return sort;
+	return peerSV;
     }
     
-    public boolean isDefinedByElementSort(){
-        return elementsort;
+
+    public Type getType() {
+	return type;
+    }
+    
+    
+    public Object getTypeDefiningObject() {
+	return type != null ? type : peerSV;
     }
 
-    public Object getSortDefiningObject() {
-	return isDefinedByType() ? getSort() : getPeerSchemaVariable();
-    }
-
+    
+    @Override
     public String toString() {
-	return "\\new("+sv+", "+ (isDefinedByType() ? ""+sort : (isDefinedByElementSort()? 
-	  "\\elemTypeof(" : "\\typeof(")+getPeerSchemaVariable()+")")+")";
+	return "\\new(" + sv + ", " 
+	       + (type != null 
+		  ? "" + type 
+	          : "\\typeof(" + peerSV + ")") 
+	       + ")";
     }
-
 }

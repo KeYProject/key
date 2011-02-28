@@ -44,8 +44,8 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
     /**
      * the type that is used for schema variables types.
      */
-    public static KeYJavaType typeSVType = new KeYJavaType(
-            PrimitiveType.PROGRAM_SV, ProgramSVSort.TYPE);
+    public static KeYJavaType typeSVType 
+    	= new KeYJavaType(PrimitiveType.PROGRAM_SV, ProgramSVSort.TYPE);
 
     /**
      * create a new schema-recoder-to-key converter. It must be associated with
@@ -240,19 +240,16 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
 
     public SchemaVariable convert(
             de.uka.ilkd.key.java.recoderext.StatementSVWrapper svw) {
-
         return svw.getSV();
     }
 
     public SchemaVariable convert(
             de.uka.ilkd.key.java.recoderext.LabelSVWrapper svw) {
-
         return svw.getSV();
     }
 
     public SchemaVariable convert(
             de.uka.ilkd.key.java.recoderext.TypeSVWrapper svw) {
-
         return svw.getSV();
     }
 
@@ -325,8 +322,9 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
         .toKeY(recoderVarspec);
         if (varspec == null) {
             ExtList l = collectChildren(recoderVarspec);
-            ProgramElement pv = ProgramSVSort.VARIABLE.getSVWithSort(l,
-                    ProgramElementName.class);
+            ProgramElement pv 
+               = ProgramSVSort.VARIABLE.getSVWithSort(l, 
+            					      ProgramElementName.class);
             if (pv instanceof ProgramElementName) { // sth. like #type i;
                 KeYJavaType kjt = new KeYJavaType(typeSVType);
                 pv = new LocationVariable((ProgramElementName) pv, kjt);
@@ -346,7 +344,6 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
      * and hands it over)
      */
     public TypeReference convert(recoder.java.reference.TypeReference tr) {
-
         recoder.java.reference.ReferencePrefix rp = tr.getReferencePrefix();
 
         recoder.java.reference.PackageReference prefix = null;
@@ -388,7 +385,6 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
      */
     public VariableSpecification convert(
             recoder.java.declaration.VariableSpecification recoderVarspec) {
-
         if (!(recoderVarspec.getIdentifier() instanceof ProgramVariableSVWrapper)) {
             return super.convert(recoderVarspec);
         }
@@ -410,19 +406,16 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
     }
 
     public Expression convert(recoder.java.reference.FieldReference fr) {
-
         ReferencePrefix prefix = null;
         if (fr.getReferencePrefix() != null) {
             prefix = (ReferencePrefix) callConvert(fr.getReferencePrefix());
         }
-
         SchemaVariable suffix = (SchemaVariable) callConvert(fr.getIdentifier());
 
         return new SchematicFieldReference(suffix, prefix);
     }
 
     public MethodReference convert(recoder.java.reference.MethodReference mr) {
-
         // convert reference prefix
         final ReferencePrefix prefix;
         if (mr.getReferencePrefix() instanceof recoder.java.reference.UncollatedReferenceQualifier) {
@@ -464,7 +457,6 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
      * @return the For of KeY
      */
     public For convert(recoder.java.statement.For f) {
-
         ILoopInit li;
         IForUpdates ifu;
         IGuard iGuard;

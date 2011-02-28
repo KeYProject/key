@@ -88,7 +88,7 @@ public class KeYMediator {
 	proofTreeListener   = new KeYMediatorProofTreeListener();
 	keySelectionModel   = new KeYSelectionModel();
 	interactiveProver   = new InteractiveProver(this);
-	new SkolemAbbreviator(this); // SkolemAbbreviator registers itself
+	
 	addRuleAppListener(proofListener);
 	addAutoModeListener(proofListener);
 	defaultExceptionHandler = new KeYRecoderExcHandler();

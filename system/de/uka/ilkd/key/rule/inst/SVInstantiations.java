@@ -89,13 +89,16 @@ public class SVInstantiations {
      */
     private SVInstantiations(ImmutableMap<SchemaVariable,InstantiationEntry> map,
             ImmutableMap<SchemaVariable,InstantiationEntry> interesting,
-            ImmutableList< Term > updateContext,
+            ImmutableList<Term> updateContext,
             ImmutableList<GenericSortCondition> genericSortConditions) {
-        this(map, interesting, updateContext,
-                GenericSortInstantiations.EMPTY_INSTANTIATIONS,
-                genericSortConditions);
+        this(map,
+             interesting, 
+             updateContext,
+             GenericSortInstantiations.EMPTY_INSTANTIATIONS,
+             genericSortConditions);
     }
 
+    
     private SVInstantiations(ImmutableMap<SchemaVariable,InstantiationEntry> map,
             ImmutableMap<SchemaVariable,InstantiationEntry> interesting,
             ImmutableList<Term> updateContext,
@@ -108,10 +111,12 @@ public class SVInstantiations {
         this.genericSortConditions = genericSortConditions;  
     }
 
+    
     public GenericSortInstantiations getGenericSortInstantiations() {
         return genericSortInstantiations;
     }
 
+    
     public ImmutableList<GenericSortCondition> getGenericSortConditions() {
         return genericSortConditions;
     }
@@ -133,6 +138,7 @@ public class SVInstantiations {
         return add(sv, new TermInstantiation(sv, subst), services);    
     }
 
+    
     public SVInstantiations add(ModalOperatorSV sv, 
             			Operator op,
             			Services services) {
@@ -148,17 +154,6 @@ public class SVInstantiations {
         		      services);
     }
 
-
-    public SVInstantiations add(SchemaVariable sv, 
-	    			ProgramElement pe,
-	    			int instantiationType,
-	    			Services services) {
-        return add(sv, 
-        	   new ProgramSkolemInstantiation(sv, 
-        		   			  pe, 
-        		   			  instantiationType), 
-                   services);
-    }
 
     public SVInstantiations add(SchemaVariable sv, 
 	    		        ProgramList pes, 
@@ -335,18 +330,21 @@ public class SVInstantiations {
             				   Services services) {
         SchemaVariable existingSV = lookupVar(sv.name());
         Name oldValue = (Name) getInstantiation(existingSV);
-        if (name.equals(oldValue)) return this; // already have it
-        if (oldValue!=null) throw new IllegalStateException(
-                "Trying to add a second name proposal for "+sv+
-                ": "+oldValue+"->"+name);
-//      otherwise (nothing here yet) add it    
-        return addInteresting ( sv, 
-        			new NameInstantiationEntry(sv, name),
-        			services);
+        if(name.equals(oldValue)) {
+            return this; // already have it
+        } else if(oldValue != null) {
+            throw new IllegalStateException(
+                "Trying to add a second name proposal for " + sv +
+                ": " + oldValue + "->" + name);
+        } else {
+            // otherwise (nothing here yet) add it    
+            return addInteresting(sv, 
+        			  new NameInstantiationEntry(sv, name),
+        			  services);
+        }
     }
     
     
-
     /**
      * replaces the given pair in the instantiations. If the given
      * SchemaVariable has been instantiated already, the new pair is taken

@@ -17,6 +17,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -148,29 +149,19 @@ public abstract class TacletBuilder {
 	return choices;
     }
 
+ 
     /** adds a new <I>new</I> variable to the variable conditions of
-     * the Taclet: v is new and has the sort as asSort if elementsort=false and the
-     * sort of the elements of asSort if elementsort=true and asSort is a program
-     * array SV. 
+     * the Taclet: v is new and has the same type as peerSV
      */
-    public void addVarsNew(SchemaVariable v, 
-            	           SchemaVariable asSort, 
-            	           boolean elementsort){
-	addVarsNew(new NewVarcond(v, asSort, elementsort));
-    }
-    
-    /** adds a new <I>new</I> variable to the variable conditions of
-     * the Taclet: v is new and has the sort as asSort
-     */
-    public void addVarsNew(SchemaVariable v, SchemaVariable asSort){
-	addVarsNew(new NewVarcond(v, asSort));
+    public void addVarsNew(SchemaVariable v, SchemaVariable peerSV) {
+	addVarsNew(new NewVarcond(v, peerSV));
     }
 
     /** adds a new <I>new</I> variable to the variable conditions of
-     * the Taclet: v is new and has type sort
+     * the Taclet: v is new and has the given type
      */
-    public void addVarsNew(SchemaVariable v, Sort sort){
-	addVarsNew(new NewVarcond(v, sort));
+    public void addVarsNew(SchemaVariable v, Type type){
+	addVarsNew(new NewVarcond(v, type));
     }
 
     /** adds a new <I>new</I> variable to the variable conditions of
@@ -179,8 +170,8 @@ public abstract class TacletBuilder {
     public void addVarsNew(NewVarcond nv){
 	if (!(nv.getSchemaVariable() instanceof ProgramSV)) {
 	    throw new TacletBuilderException(this, 
-                    "Tried to add condition:"+nv+ 
-                    "to new vars-list. That can"+ 
+                    "Tried to add condition:" + nv + 
+                    "to new vars-list. That can" + 
                     "match more than program"
                     +" variables.");
 	} 

@@ -11,19 +11,21 @@ package de.uka.ilkd.key.rule.inst;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+
 /** This class is used to store the instantiation of a schemavarible
  * if it is a term.
  */
-
 public class TermInstantiation extends InstantiationEntry {
 
     /** the term the schemavariable is instantiated with */
     private final Term term ;
 
-    private static final RigidnessException RIGIDNESS_EXCEPTION = new RigidnessException
-    ( "Tried to instantiate a rigid schema variable" +
-      " with a non-rigid term/formula" );
+    private static final RigidnessException RIGIDNESS_EXCEPTION 
+    	= new RigidnessException( 
+    		"Tried to instantiate a rigid schema variable"
+    		+ " with a non-rigid term/formula" );
 
+    
     /** creates a new ContextInstantiationEntry 
      * @param sv the SchemaVariable that is
      * instantiated
@@ -32,10 +34,11 @@ public class TermInstantiation extends InstantiationEntry {
     TermInstantiation(SchemaVariable sv, Term term) {
 	super(sv);
 	this.term = term;
-	if ( !term.isRigid () && sv.isRigid () ) {
+	if(!term.isRigid () && sv.isRigid()) {
 	    throw RIGIDNESS_EXCEPTION;
 	}
     }
+    
     
     /** returns the Term the SchemaVariable is instantiated with
      * @return  the Term the SchemaVariable is instantiated with
@@ -44,6 +47,7 @@ public class TermInstantiation extends InstantiationEntry {
 	return term;
     }
 
+    
     /** returns the instantiation of the SchemaVariable 
      * @return  the instantiation of the SchemaVariable 
     */
@@ -55,7 +59,7 @@ public class TermInstantiation extends InstantiationEntry {
 
     @Override
     public String toString() {
-	return "["+getSchemaVariable()+", "+getTerm()+"]";
+	return "[" + getSchemaVariable() + ", " + getTerm() + "]";
     }
 
 }

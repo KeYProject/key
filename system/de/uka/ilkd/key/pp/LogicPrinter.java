@@ -243,14 +243,18 @@ public final class LogicPrinter {
     
     
     private static Set<SchemaVariable> collectSchemaVars(Taclet t) {
+	
 	Set<SchemaVariable> result = new HashSet<SchemaVariable>();
 	OpCollector oc = new OpCollector();
 	
-	collectSchemaVarsHelper(t.ifSequent(), oc);
-	
+	//find, assumes
+	for(SchemaVariable sv: t.getIfFindVariables()) {
+	    result.add(sv);
+	}
+		
+	//add, replacewith
 	for(TacletGoalTemplate tgt : t.goalTemplates()) {
 	    collectSchemaVarsHelper(tgt.sequent(), oc);
-	    
 	    if(tgt instanceof AntecSuccTacletGoalTemplate) {
 		collectSchemaVarsHelper(
 			((AntecSuccTacletGoalTemplate)tgt).replaceWith(), oc);
@@ -414,13 +418,9 @@ public final class LogicPrinter {
         printSchemaVariable(sv.getSchemaVariable());
         layouter.print(",").brk();
         if (sv.isDefinedByType()) {
-            layouter.print(sv.getSort().toString());
+            layouter.print(sv.getType().getFullName());
         } else {
-            if (sv.isDefinedByElementSort()) {
-                layouter.print("\\elemTypeof (").brk();
-            } else {
-                layouter.print("\\typeof (").brk();
-            }
+            layouter.print("\\typeof (").brk();
             printSchemaVariable(sv.getPeerSchemaVariable());
             layouter.brk(0,-2).print(")").brk();
         }

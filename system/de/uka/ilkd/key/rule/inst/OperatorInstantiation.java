@@ -11,10 +11,10 @@ package de.uka.ilkd.key.rule.inst;
 
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+
 /** This class is used to store the instantiation of a schemavarible
  * if it is an operator.
  */
-
 public class OperatorInstantiation extends InstantiationEntry {
 
     /** the term the schemavariable is instantiated with */
@@ -31,23 +31,22 @@ public class OperatorInstantiation extends InstantiationEntry {
 	this.op = op;
     }
 
+    
     /** returns the Operator the SchemaVariable is instantiated with
-     * @return  the Operator the SchemaVariable is instantiated with
      */
     public Operator getOperator() {
 	return op;
     }
 
-    /** returns the instantiation of the SchemaVariable 
-     * @return  the instantiation of the SchemaVariable 
-    */
+    
+    @Override    
     public Object getInstantiation() {
 	return op;
     }
 
-    /** toString */
+    
+    @Override
     public String toString() {
-	return "["+getSchemaVariable()+", "+getOperator()+"]";
+	return "[" + getSchemaVariable() + ", " + getOperator() + "]";
     }
-
 }

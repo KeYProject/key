@@ -926,12 +926,6 @@ public abstract class ProgramSVSort extends AbstractSort {
 
         private final ProgramElementName methodName;
         
-        public SpecificMethodNameSort(Name sortName, 
-				      ProgramElementName methodName) {
-            super(sortName);
-            this.methodName = methodName;
-        }
-
         public SpecificMethodNameSort(ProgramElementName name) {
             super(name);
             this.methodName = name;

@@ -24,6 +24,7 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ArraySort;
+import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.OpReplacer;
 
@@ -1172,14 +1173,16 @@ public final class TermBuilder {
 	    		       Term h, 
 	    		       Term t, 
 	    		       KeYJavaType kjt) {
-	assert t.sort().extendsTrans(kjt.getSort());
+	assert t.sort().extendsTrans(kjt.getSort()) 
+	       || t.sort() instanceof ProgramSVSort;
+	final Sort s = t.sort() instanceof ProgramSVSort ? kjt.getSort() : t.sort();
 	final IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
 	final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
-	if(t.sort().extendsTrans(services.getJavaInfo().objectSort())) {
+	if(s.extendsTrans(services.getJavaInfo().objectSort())) {
 	    return or(created(services, h, t), equals(t, NULL(services)));
-	} else if(t.sort().equals(setLDT.targetSort())) {
+	} else if(s.equals(setLDT.targetSort())) {
 	    return createdInHeap(services, t, h);
-	} else if(t.sort().equals(intLDT.targetSort())) {
+	} else if(s.equals(intLDT.targetSort())) {
 	    return func(intLDT.getInBounds(kjt.getJavaType()), t);
 	} else {
 	    return tt();

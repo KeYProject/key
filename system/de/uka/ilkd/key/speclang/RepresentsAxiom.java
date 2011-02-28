@@ -26,7 +26,6 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.OpReplacer;
-import de.uka.ilkd.key.rule.NotFreeIn;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.RewriteTacletGoalTemplate;

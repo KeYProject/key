@@ -18,7 +18,7 @@ import recoder.java.reference.ReferenceSuffix;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 
 public class ExpressionSVWrapper extends Literal implements Expression, 
-    LoopInitializer, KeYRecoderExtension, SVWrapper, ReferencePrefix{
+    LoopInitializer, KeYRecoderExtension, SVWrapper, ReferencePrefix {
    
     protected SchemaVariable sv;
     protected ReferenceSuffix suff;
@@ -28,16 +28,16 @@ public class ExpressionSVWrapper extends Literal implements Expression,
 
     protected ExpressionSVWrapper(ExpressionSVWrapper proto) {
         super(proto);
-	expressionParent=null;
+	expressionParent = null;
     }
 
     public ExpressionSVWrapper() {
-	expressionParent=null;
+	expressionParent = null;
     }
 
     public ExpressionSVWrapper(SchemaVariable sv) {
-	this.sv=sv;
-	expressionParent=null;
+	this.sv = sv;
+	expressionParent = null;
     }
 
     /**
@@ -63,9 +63,7 @@ public class ExpressionSVWrapper extends Literal implements Expression,
 	this.sv=sv;
     }
 
-    /**
-     * returns a String name of this meta construct.
-     */
+
     public SchemaVariable getSV() {
 	return sv;
     }
@@ -108,7 +106,7 @@ public class ExpressionSVWrapper extends Literal implements Expression,
      @param c a statement container.
      */
     public void setStatementContainer(StatementContainer c) {
-	statementParent=c;
+	statementParent = c;
     }
 
 
@@ -121,11 +119,12 @@ public class ExpressionSVWrapper extends Literal implements Expression,
      @param path a reference suffix.
      */
     public void setReferenceSuffix(ReferenceSuffix path) {
-	suff=path;
+	suff = path;
     }
 
-	@Override
-	public Object getEquivalentJavaType() {
-		throw new Error("mulbrich: what to do here?!");
-	}
+    
+    @Override
+    public Object getEquivalentJavaType() {
+	throw new Error("mulbrich: what to do here?!");
+    }
 }

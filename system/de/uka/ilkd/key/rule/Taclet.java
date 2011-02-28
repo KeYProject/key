@@ -278,8 +278,8 @@ public abstract class Taclet implements Rule, Named {
      * match-sort with
      */
     public NewVarcond varDeclaredNew(SchemaVariable var) {
-	for (final NewVarcond nv : varsNew) {
-	    if (nv.getSchemaVariable()==var) {
+	for(final NewVarcond nv : varsNew) {
+	    if(nv.getSchemaVariable() == var) {
 		return nv;
 	    }
 	}

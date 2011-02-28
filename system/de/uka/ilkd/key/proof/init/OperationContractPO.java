@@ -153,7 +153,7 @@ public final class OperationContractPO extends AbstractPO
         	= javaInfo.getTypeByClassName("java.lang.Exception");
         final TypeReference excTypeRef = javaInfo.createTypeReference(eType);
         final ProgramElementName ePEN = new ProgramElementName("e");
-        final ProgramVariable eVar = new LocationVariable (ePEN, eType);
+        final ProgramVariable eVar = new LocationVariable(ePEN, eType);
         
         //create try statement
         final CopyAssignment nullStat = new CopyAssignment(exceptionVar, 
@@ -192,6 +192,7 @@ public final class OperationContractPO extends AbstractPO
             LocationVariable formalParamVar
             	= new LocationVariable(pen, paramVar.getKeYJavaType());
             formalParamVars = formalParamVars.append(formalParamVar);
+            register(formalParamVar);
         }
         
         //create java block

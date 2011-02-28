@@ -3495,10 +3495,8 @@ Statement Statement() :
      result = LabeledStatement()
      | LOOKAHEAD(2)
      result = RMethodCallStatement()
-     | LOOKAHEAD( <SVIDENTIFIER> ("." <SVIDENTIFIER>)* ["[" "]"] "(" [<SVIDENTIFIER>] ")" "::" )
-        result = RMethodBodyStatement() ";"
-     | LOOKAHEAD( Type() "(" [<SVIDENTIFIER>] ")" "::" )
-        result = RMethodBodyStatement() ";"
+     | LOOKAHEAD(RMethodBodyStatement())
+     result = RMethodBodyStatement()
      | result = Block()
      | result = EmptyStatement()
      | LOOKAHEAD(2) expr   = StatementExpression() ";"
@@ -3610,16 +3608,10 @@ RMethodBodyStatement RMethodBodyStatement() :
   MethodReference methRef;  
 }
 {
-  (bodySource = Type() | bodySource = TypeSV())
-  ( 
-    "("
-        [ resVar = VariableSV() ] 
-    ")" 
-  ) 
-  "::"
-  
-  tmp = Expression()
-  
+    [ LOOKAHEAD(VariableSV() "=") resVar = VariableSV() "=" ] 
+    tmp = Expression()
+    "@" (bodySource = Type() | bodySource = TypeSV()) ";"
+   
   {
     if (tmp instanceof MethodReference)
     {

@@ -20,6 +20,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ArraySort;
@@ -328,33 +329,28 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
 	    NewVarcond nvc = app.taclet().varDeclaredNew(sv);
 	    if (nvc != null) {
 		KeYJavaType kjt;
-		Object o = nvc.getSortDefiningObject();
+		Object o = nvc.getTypeDefiningObject();
 		JavaInfo javaInfo = services.getJavaInfo ();
 		if (o instanceof SchemaVariable) {
 	            final TypeConverter tc = services.getTypeConverter();
-		    final SchemaVariable peerSV=(SchemaVariable)o;
+		    final SchemaVariable peerSV = (SchemaVariable)o;
 		    final Object peerInst = app.instantiations().getInstantiation(peerSV);
                     if(peerInst instanceof TypeReference){
                         kjt = ((TypeReference) peerInst).getKeYJavaType();
                     } else {
                         Expression peerInstExpr;
-                        if (peerInst instanceof Term) {
-                            peerInstExpr=tc.convertToProgramElement((Term)peerInst);
-                        } else{
-                            peerInstExpr=(Expression)peerInst;
+                        if(peerInst instanceof Term) {
+                            peerInstExpr = tc.convertToProgramElement((Term)peerInst);
+                        } else {
+                            peerInstExpr = (Expression)peerInst;
                         }
-                        kjt = tc.getKeYJavaType(peerInstExpr, app.instantiations().
-                                getContextInstantiation().activeStatementContext());
+                        kjt = tc.getKeYJavaType(peerInstExpr, 
+                        			app.instantiations().getContextInstantiation().activeStatementContext());
                     }
-		    if(nvc.isDefinedByElementSort()){
-		        Sort s = kjt.getSort();
-			if(s instanceof ArraySort) s = ((ArraySort)s).elementSort();              
-			kjt = javaInfo.getKeYJavaType(s);
-		    }
 		} else {
-		    kjt = javaInfo.getKeYJavaType((Sort)o);
+		    kjt = javaInfo.getKeYJavaType((Type)o);
 		}
-                assert kjt != null;
+                assert kjt != null : "could not find kjt for: " + o;
 		return new LocationVariable
 		    (VariableNamer.parseName(instantiation), kjt);
 	    }

@@ -29,6 +29,7 @@ public class ParameterDeclaration extends VariableDeclaration {
      */
     protected final ImmutableArray<VariableSpecification> varSpec;
     
+    
     /**
      * flag to store whether this parameter is a the last arg in a method
      * declaration with variable number of arguments. false if not otherwise
@@ -36,15 +37,16 @@ public class ParameterDeclaration extends VariableDeclaration {
      */
     private final boolean varArgParameter;
 
+    
     /**
- *      Parameter declaration.
+     *      Parameter declaration.
      */
-
     public ParameterDeclaration() {
-	this.varSpec=null;
+	this.varSpec = null;
 	this.varArgParameter = false;
     }
 
+    
     /**
      * Parameter declaration.
      * @param mods a modifier array.
@@ -59,8 +61,7 @@ public class ParameterDeclaration extends VariableDeclaration {
                                 TypeReference typeRef,
                                 VariableSpecification var,
                                 boolean parentIsInterfaceDeclaration,
-                                boolean parameterIsVarArg)
-    {   
+                                boolean parameterIsVarArg) {   
         super(mods,typeRef,parentIsInterfaceDeclaration);
         this.varSpec = new ImmutableArray<VariableSpecification>(var);
         this.varArgParameter = parameterIsVarArg;
@@ -75,12 +76,10 @@ public class ParameterDeclaration extends VariableDeclaration {
      * @param parentIsInterfaceDeclaration a boolean set true iff
      * the parent is an InterfaceDeclaration 
      */
-
     public ParameterDeclaration(Modifier[] mods,
 				TypeReference typeRef,
 				VariableSpecification var,
-				boolean parentIsInterfaceDeclaration)
-    {  	
+				boolean parentIsInterfaceDeclaration) {  	
         this(mods, typeRef, var, parentIsInterfaceDeclaration, false);
     }
     
@@ -112,16 +111,16 @@ public class ParameterDeclaration extends VariableDeclaration {
         return varSpec.get(0);
     }
 
+    
     public ImmutableArray<VariableSpecification> getVariables() {
         return varSpec;
     }
 
 
     /**
- *      Returns the number of children of this node.
- *      @return an int giving the number of children of this node
-    */
-
+     *      Returns the number of children of this node.
+     *      @return an int giving the number of children of this node
+     */
     public int getChildCount() {
         int result = 0;
         if (modArray != null) result += modArray.size();
@@ -130,15 +129,15 @@ public class ParameterDeclaration extends VariableDeclaration {
         return result;
     }
 
+    
     /**
- *      Returns the child at the specified index in this node's "virtual"
- *      child array
- *      @param index an index into this node's "virtual" child array
- *      @return the program element at the given position
- *      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
- *                 of bounds
-    */
-
+     *      Returns the child at the specified index in this node's "virtual"
+     *      child array
+     *      @param index an index into this node's "virtual" child array
+     *      @return the program element at the given position
+     *      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
+     *                 of bounds
+     */
     public ProgramElement getChildAt(int index) {
         int len;
         if (modArray != null) {
@@ -158,46 +157,48 @@ public class ParameterDeclaration extends VariableDeclaration {
         throw new ArrayIndexOutOfBoundsException();
     }
 
+    
     /**
      * Parameters are never private.
      */
-
     public boolean isPrivate() {
         return false;
     }
 
+    
     /**
-     * Parameters are never protected..
+     * Parameters are never protected.
      */
-
     public boolean isProtected() {
         return false;
     }
 
+    
     /**
-     * Parameters are never "public".
+     * Parameters are never public.
      */
 
     public boolean isPublic() {
         return false;
     }
-
+    
+    
     /**
      * Parameters are never static.
      */
-
     public boolean isStatic() {
         return false;
     }
 
+    
     /**
      * Parameters are never transient.
      */
-
     public boolean isTransient() {
         return false;
     }
 
+    
     /** calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
      * @param v the Visitor
@@ -205,6 +206,7 @@ public class ParameterDeclaration extends VariableDeclaration {
     public void visit(Visitor v) {
 	v.performActionOnParameterDeclaration(this);
     }
+    
     
     /**
      * returns true iff this parameter is the last in a method with 
@@ -215,6 +217,4 @@ public class ParameterDeclaration extends VariableDeclaration {
     public boolean isVarArg() {
         return varArgParameter;
     }
-
-
 }
