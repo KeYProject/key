@@ -1123,7 +1123,19 @@ public final class Main extends JFrame implements IMain {
                 Config.DEFAULT.smaller();
             }
         });
-        smaller.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.CTRL_DOWN_MASK));
+        
+        int downMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+        switch (downMask) {
+        case InputEvent.META_MASK : 
+            downMask = InputEvent.META_DOWN_MASK; 
+            break;        	
+        default:
+            // we default to Linux/Win
+            downMask = InputEvent.CTRL_DOWN_MASK;
+            break;
+        }
+
+        smaller.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, downMask));
         
         final JMenuItem larger = new JMenuItem("Larger");
         larger.addActionListener(new ActionListener() {
@@ -1131,7 +1143,7 @@ public final class Main extends JFrame implements IMain {
                 Config.DEFAULT.larger();
             }
         });
-        larger.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.CTRL_DOWN_MASK));
+        larger.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_UP, downMask));
         
         Config.DEFAULT.addConfigChangeListener(new ConfigChangeListener() {
             public void configChanged(ConfigChangeEvent e) {
