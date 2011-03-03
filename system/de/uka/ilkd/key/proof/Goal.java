@@ -675,7 +675,10 @@ public class Goal  {
         final NodeChangeJournal journal = new NodeChangeJournal(proof, this);
         addGoalListener(journal);
         
-        final RuleApp ruleApp = p_ruleApp; 
+        final RuleApp ruleApp = p_ruleApp;
+        if(ruleApp instanceof TacletApp) {
+            ((TacletApp)ruleApp).registerSkolemConstants(proof.getServices());
+        }
 
         final Node n = node;
         

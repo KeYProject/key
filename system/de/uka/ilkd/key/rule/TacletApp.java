@@ -957,6 +957,19 @@ public abstract class TacletApp implements RuleApp {
     }
     
     
+    public void registerSkolemConstants(Services services) {
+	final SVInstantiations insts = instantiations();
+	final Iterator<SchemaVariable> svIt = insts.svIterator();
+	while(svIt.hasNext()) {
+	    final SchemaVariable sv = svIt.next();
+	    if(sv instanceof SkolemTermSV) {
+		final Term inst = (Term) insts.getInstantiation(sv);
+		services.getNamespaces().functions().addSafely(inst.op());
+	    }
+	}
+    }    
+    
+    
     /**
      * adds a new instantiation to this TacletApp
      * 

@@ -578,7 +578,6 @@ public final class ProblemLoader implements Runnable {
     }
 
 
-
     /** 2nd pass: all other SV */
     public static TacletApp parseSV2(TacletApp app, 
 	    			     SchemaVariable sv,
@@ -606,8 +605,6 @@ public final class ProblemLoader implements Runnable {
         }
         return result;
     }
-
-
 
 
     private TacletApp constructInsts(TacletApp app, Services services) {
