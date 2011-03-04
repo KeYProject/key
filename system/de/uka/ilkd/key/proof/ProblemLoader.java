@@ -734,7 +734,5 @@ public final class ProblemLoader implements Runnable {
             left  = p_left;
             right = p_right;
         }
-
     }
-
 }

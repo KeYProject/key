@@ -709,7 +709,7 @@ public class Goal  {
 
 
     public String toString() {
-	String result = (node.sequent().prettyprint(proof().getServices()).toString());
+	String result = node.sequent().prettyprint(proof().getServices()).toString();
 	return result;
     }
     
@@ -725,13 +725,4 @@ public class Goal  {
 	    ruleAppListenerList.remove(p);
 	}
     }
-    // %%%%%%%% HACK !!! REMOVE AS SOON AS POSSIBLE %%%%%%
-    public static List getRuleAppListener(){
-        return ruleAppListenerList;
-    }
-    public static void setRuleAppListenerList(List ruleAppListenerList){
-        Goal.ruleAppListenerList = ruleAppListenerList;
-    }
-    // %%%%%%%%%%%%%%%%
-
 }

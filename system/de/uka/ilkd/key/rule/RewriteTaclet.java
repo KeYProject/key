@@ -260,7 +260,6 @@ public final class RewriteTaclet extends FindTaclet {
     }
     
     
-    //XXX
     public ConstrainedFormula getRewriteResult(Services services, 
 	    				       TacletApp app) {
 	assert goalTemplates().size() == 1;

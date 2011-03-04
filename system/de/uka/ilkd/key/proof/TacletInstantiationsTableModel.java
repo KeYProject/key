@@ -23,7 +23,6 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.*;
@@ -572,6 +571,4 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
             createBaseNameProposalBasedOnCorrespondence(p_app, p_var ).toUpperCase();
         return s;
     }
-
-
 }
