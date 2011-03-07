@@ -11,6 +11,7 @@
 package de.uka.ilkd.key.smt;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.smt.taclettranslation.TacletSetTranslation;
 
 
 
@@ -35,7 +36,10 @@ public interface SMTSolver {
      */
     public SMTTranslator getTranslator(Services services);    
     
+   
+    public String getTranslation();
     
+    public TacletSetTranslation getTacletTranslation();
    
 
     public SolverType getType();
@@ -47,12 +51,14 @@ public interface SMTSolver {
      * Determines whether taclets are used for this solver.
      * @param b <code>true</code> if taclets should be used.
      */
-    public void useTaclets(boolean b);
+    //public void useTaclets(boolean b);
 
     
     public void interrupt(ReasonOfInterruption reasonOfInterruption);
     
-    public void start(SolverTimeout timeout);
+    public void start(SolverTimeout timeout, SMTSettings settings);
+    
+    public void start(SMTSettings settings);
     
     public SolverTimeout getSolverTimeout();
     

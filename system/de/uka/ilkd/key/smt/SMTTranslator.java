@@ -34,7 +34,7 @@ public interface SMTTranslator {
      * @return a StringBuffer representing the term in the given syntax.
      * @throws IllegalFormulaException
      */
-    public StringBuffer translateProblem(Term problem, Services services) 
+    public StringBuffer translateProblem(Term problem, Services services,SMTSettings settings) 
            throws IllegalFormulaException;
     
 
@@ -46,14 +46,14 @@ public interface SMTTranslator {
      * @return A StringBuffer, representing the term in the given syntax.
      * @throws IllegalArgumentException if the term is not of type FORMULA or could not be translated.
      */
-    public StringBuffer translate(Term t, Services services) 
+    public StringBuffer translate(Term t, Services services, SMTSettings settings) 
     		throws IllegalFormulaException;
     /**
      * Sets the taclets that should be used for generating new assumptions.
      * Set the assumption before calling the general translate method. 
      * @param taclets 
      */
-    public void setTacletsForAssumptions(Collection<Taclet> taclets);
+   // public void setTacletsForAssumptions(Collection<Taclet> taclets);
     
     
     /**

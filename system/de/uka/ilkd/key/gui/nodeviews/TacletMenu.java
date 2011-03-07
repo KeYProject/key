@@ -22,6 +22,7 @@ import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.smt.SMTMenuItem;
+import de.uka.ilkd.key.gui.smt.SMTSettings;
 import de.uka.ilkd.key.gui.smt.SolverListener;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.logic.*;
@@ -374,8 +375,8 @@ class TacletMenu extends JMenu {
         	Thread thread = new Thread(new Runnable() {	        
 	        @Override
 	        public void run() {
-	            
-	            SolverLauncher launcher = new SolverLauncher();
+	            SMTSettings settings = ProofSettings.DEFAULT_SETTINGS.getSMTSettings();
+	            SolverLauncher launcher = new SolverLauncher(settings);
 	            launcher.addListener(new SolverListener());
 	            Collection<SMTProblem> list = new LinkedList<SMTProblem>();
 	            list.add(new SMTProblem(goal));

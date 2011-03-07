@@ -34,10 +34,22 @@ class SolverTimeout extends TimerTask{
 	this.session = session;
 	this.timeout = timeout;
     }
+    
+    public SolverTimeout(SMTSolver solver, long timeout){
+	this.solver = solver;
+	this.session = null;
+	this.timeout = timeout;
+    }
+    
+    
     @Override
     public void run() {
 	System.out.println("Timeout "+ id);
-	session.interruptSolver(solver,ReasonOfInterruption.Timeout);	
+	if(session != null){
+	    session.interruptSolver(solver,ReasonOfInterruption.Timeout);	
+	}else{
+	    solver.interrupt(ReasonOfInterruption.Timeout);
+	}
 	//this.cancel();
     }
     
@@ -107,15 +119,21 @@ class Session{
 	    
 }
 public class SolverLauncher implements SolverListener {
+    private final static int PERIOD = 50;
     private final ReentrantLock lock = new ReentrantLock();
     private final Condition     wait = lock.newCondition();
     private final Timer         timer = new Timer(true);
     private final Session session = new Session();
+    private final SMTSettings   settings;
     private final Semaphore     stopSemaphore = new Semaphore(1,true);
+    
 
-    private int maximumThreads = 5;
-    private int timeout = 5000;
     private LinkedList<SolverLauncherListener> listeners = new LinkedList<SolverLauncherListener>();
+    
+    
+    public SolverLauncher(SMTSettings settings){
+	this.settings = settings;
+    }
     
     public void addListener(SolverLauncherListener listener){
 	listeners.add(listener);
@@ -123,6 +141,21 @@ public class SolverLauncher implements SolverListener {
     
     public void removeListener(SolverLauncherListener listener){
 	listeners.remove(listener);
+    }
+    
+    
+    public void launch(Collection<SolverType> factories, Collection<SMTProblem> problems,
+	    Services services){
+	
+	LinkedList<SolverType> installedSolvers = new LinkedList<SolverType>();
+	for(SolverType type: factories){
+	    if(type.isInstalled(false)){
+		installedSolvers.add(type);
+	    }
+	}
+	problems = prepareSolvers(installedSolvers, problems,services);
+	
+	launch(problems,installedSolvers);	
     }
     
 
@@ -153,11 +186,11 @@ public class SolverLauncher implements SolverListener {
 	int i=0; 
 	while(startNextSolvers(solvers, session) && !isInterrupted()){
 	    SMTSolver solver = solvers.poll();
-	    final SolverTimeout solverTimeout = new SolverTimeout(solver,session,timeout+i*50);
-	    timer.schedule(solverTimeout,timeout,50);
+	    final SolverTimeout solverTimeout = new SolverTimeout(solver,session,settings.getTimeout()+i*50);
+	    timer.schedule(solverTimeout,settings.getTimeout(),PERIOD);
    
 	    session.addCurrentlyRunning(solver);
-	    solver.start(solverTimeout);
+	    solver.start(solverTimeout,settings);
 	    i++;
 	
 	}
@@ -168,7 +201,8 @@ public class SolverLauncher implements SolverListener {
     }
     
     private boolean startNextSolvers(LinkedList<SMTSolver> solvers, Session session){
-	return !solvers.isEmpty() && session.getCurrentlyRunningCount() < maximumThreads;
+	return !solvers.isEmpty() && 
+	        session.getCurrentlyRunningCount() < settings.getMaxConcurrentProcesses();
     }
     
     private void launchSolvers(LinkedList<SMTSolver> solvers,
@@ -202,6 +236,7 @@ public class SolverLauncher implements SolverListener {
 	// as long as there are jobs to do, start solvers
 	while(!solvers.isEmpty() && !isInterrupted()){
 	   lock.lock(); 
+	   try{
 	   fillRunningList(solvers,session);
 	   if(!startNextSolvers(solvers, session) && 
 	       !isInterrupted()){
@@ -211,9 +246,10 @@ public class SolverLauncher implements SolverListener {
             } catch (InterruptedException e) {
         	launcherInterrupted(e);
             }
-	   }
-	   
+	   }}
+	   finally{
 	   lock.unlock();
+	   }
 	}
     }
     
@@ -224,8 +260,9 @@ public class SolverLauncher implements SolverListener {
 		        wait.await();
 	            } catch (InterruptedException e) {
 	        	launcherInterrupted(e);
-	            }
+	            }finally{
 	    lock.unlock();
+	   }
 	}
     }
     
@@ -242,28 +279,8 @@ public class SolverLauncher implements SolverListener {
 	    listener.launcherStopped();
 	}
     }
-    
-    
-    public void launch(Collection<SMTProblem> problems, Services services){
-	LinkedList<SolverType> factories = new LinkedList<SolverType>();
-//	factories.add(new Z3Factory());
-//	factories.add(new Z3Factory());
-//	factories.add(new Z3Factory());
-	launch(factories, problems, services);
-    }
-    
-    public void launch(Collection<SolverType> factories, Collection<SMTProblem> problems,
-	    Services services){
-	LinkedList<SolverType> installedSolvers = new LinkedList<SolverType>();
-	for(SolverType type: factories){
-	    if(type.isInstalled(false)){
-		installedSolvers.add(type);
-	    }
-	}
-	problems = prepareSolvers(installedSolvers, problems,services);
-	
-	launch(problems,installedSolvers);	
-    }
+
+
     
     private void notifySolverHasFinished(SMTSolver solver){
 	lock.lock();

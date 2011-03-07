@@ -378,8 +378,7 @@ class LeafPanel extends TreePanel {
 
     @Override
     protected JPanel init(TreeNode node, TreeNode r, JTree t) {
-	int max = ProofSettings.DEFAULT_SETTINGS.getTacletTranslationSettings()
-	        .getMaxGeneric();
+	int max = ProofSettings.DEFAULT_SETTINGS.getSMTSettings().getMaxNumberOfGenerics();
 	currentNode = node;
 	this.tree = t;
 	this.root = r;

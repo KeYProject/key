@@ -9,154 +9,305 @@
 //
 package de.uka.ilkd.key.gui.smt;
 
+import java.io.File;
 import java.util.*;
+import java.util.Map.Entry;
+
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeNode;
 
 import de.uka.ilkd.key.gui.GUIEvent;
 import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.configuration.Settings;
 import de.uka.ilkd.key.gui.configuration.SettingsListener;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.smt.SMTSolverImplementation;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.rule.Taclet;
+
 
 import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
-
-/** This class encapsulates the information which 
- *  decision procedure should be used.
- */
-public class SMTSettings implements Settings {
-    
-   
-    /** String used in the Settings to store the active rule */
-    private static final String ACTIVE_RULE  = "[DecisionProcedure]ActiveRule";
-    
-    private static final String TIMEOUT="[DecisionProcedure]SolverTimeout";
-    
-
-    private static final String SAVEFILE_PATH="[DecisionProcedure]savefile_path";
-    
-    
-    private static final String SHOW_SMT_RES_DIA="[DecisionProcedure]showSMTResDialog";
-    
-    private static final String MULTIPLEPROVERS="[DecisionProcedure]multprovers";
-    
-    private static final String CACHE_GOALS = "[DecisionProcedure]cache_goals";
-    
-    private static final String PROGRESS_DIALOG_MODE = "[DecisionProcedure]pd_mode";
-    
-    private static final String EXPLICIT_TYPE_HIERARCHY = "[DecisionProcedure]explicitTypeHierarchy";
-    
-    private static final String INSTANTIATE_NULL_PREDICATES = "[DecisionProcedure]instantiateNullPredicates";
+import de.uka.ilkd.key.smt.taclettranslation.TreeItem;
+import de.uka.ilkd.key.smt.taclettranslation.UsedTaclets;
+import de.uka.ilkd.key.smt.taclettranslation.TreeItem.SelectionMode;
 
 
+class SettingsData{
+    private static final String ACTIVE_SOLVER  = "[SMTSettings]ActiveSolver";
+    
+    private static final String TIMEOUT="[SMTSettings]SolverTimeout";
 
-    /** the list of registered SettingListener */
-    private LinkedList<SettingsListener> listenerList = new LinkedList<SettingsListener>();
+    
+    private static final String PATH_FOR_SMT_TRANSLATION = "[SMTSettings]pathForSMTTranslation";
+    
+    private static final String PATH_FOR_TACLET_TRANSLATION = "[SMTSettings]pathForTacletTranslation";
+    
+    private static final String SHOW_SMT_RES_DIA="[SMTSettings]showSMTResDialog";
     
 
+    
+    private static final String PROGRESS_DIALOG_MODE = "[SMTSettings]pd_mode";
+    
+    private static final String EXPLICIT_TYPE_HIERARCHY = "[SMTSettings]explicitTypeHierarchy";
+    
+    private static final String INSTANTIATE_NULL_PREDICATES = "[SMTSettings]instantiateNullPredicates";
 
-    private LinkedList<SolverTypeCollection> solverUnions = new LinkedList<SolverTypeCollection>(); 
-    private LinkedList<SolverType>           supportedSolvers = new LinkedList<SolverType>();
+    private static final String MAX_CONCURRENT_PROCESSES = "[SMTSettings]maxConcurrentProcesses";
+
+    private static final String MAX_GENERIC_SORTS = "[SMTSettings]maxGenericSorts";
+    
+    private static final String EXECUTION_STRING  = "[SMTSettings]executionString";
+    
+    private static final String TACLET_SELECTION = "[SMTSettings]TacletSelection";
     
     public final static int    PROGRESS_MODE_USER = 0;
     public final static int    PROGRESS_MODE_CLOSE = 1;
     public final static int    PROGRESS_MODE_CLOSE_FIRST = 2;
-   
-    
-    
     
 
     
-    /** the currently active rule */    
-    private SolverTypeCollection activeSolverUnion = SolverTypeCollection.EMPTY_COLLECTION;
+    private final HashMap<SolverType,SolverData> dataOfSolvers =
+	                                           new HashMap<SolverType,SolverData>();
+    public boolean showResultsAfterExecution    = false;
+    public boolean storeSMTTranslationToFile    = false;
+    public boolean storeTacletTranslationToFile = false;
+    public boolean useExplicitTypeHierarchy     = false;
+    public boolean useNullInstantiation         = false;
+    public long    timeout                      = 5000;
+    public int     maxConcurrentProcesses        = 5;
+    public int     maxGenericSorts               = 2;
+    public int     modeOfProgressDialog          = 0;
+   
+    public String   pathForSMTTranslation      = "";
+    public String   pathForTacletTranslation   = "";
+    public String   activeSolver               = "";
+    public String   tacletSelection            = "";
     
-    /** the value of the timeout in tenth of seconds.*/
-    private int timeout = 60;
+
+    private SettingsData(SettingsData data) {
+	this.showResultsAfterExecution     = data.showResultsAfterExecution;
+	this.storeSMTTranslationToFile     = data.storeSMTTranslationToFile;
+	this.storeTacletTranslationToFile  = data.storeTacletTranslationToFile;
+	this.useExplicitTypeHierarchy      = data.useExplicitTypeHierarchy;
+	this.useNullInstantiation          = data.useNullInstantiation;
+	this.timeout                       = data.timeout;
+	this.maxConcurrentProcesses        = data.maxConcurrentProcesses;
+	this.maxGenericSorts               = data.maxGenericSorts;
+	this.pathForSMTTranslation         = data.pathForSMTTranslation;
+	this.pathForTacletTranslation	   = data.pathForTacletTranslation;
+	this.modeOfProgressDialog          = data.modeOfProgressDialog;
+	this.tacletSelection	           = data.tacletSelection;
+	
+	
+	for(Entry<SolverType, SolverData> entry : data.dataOfSolvers.entrySet()){
+	    dataOfSolvers.put(entry.getKey(), entry.getValue().clone());
+	}
+    }
+    
+    
+    private static final SettingsData DEFAULT_DATA = 
+        new SettingsData();
+   
+    public static SettingsData getDefaultSettingsData(){
+	return DEFAULT_DATA.clone();
+    }
+    
+    public Collection<SolverType> getSupportedSolvers(){
+	return dataOfSolvers.keySet();
+    }
+    
+    private SettingsData() {
+	dataOfSolvers.put(SolverType.Z3_SOLVER, new SolverData(SolverType.Z3_SOLVER));
+	dataOfSolvers.put(SolverType.YICES_SOLVER, new SolverData(SolverType.YICES_SOLVER));
+	dataOfSolvers.put(SolverType.SIMPLIFY_SOLVER, new SolverData(SolverType.SIMPLIFY_SOLVER));
+	dataOfSolvers.put(SolverType.CVC3_SOLVER, new SolverData(SolverType.CVC3_SOLVER));
+
+    }
+    
+
+
+
+    public String getCommand(SolverType type){
+	return dataOfSolvers.get(type).command;
+    }
+    
+    public void setCommand(SolverType type, String command){
+	dataOfSolvers.get(type).command = command;
+    }
+    
+    public Collection<SolverData> getDataOfSolvers(){
+	return dataOfSolvers.values();
+    }
+    
+    
+    
+    
+    
+    public SettingsData clone(){
+	return new SettingsData(this);
+    }
+    
+    /** gets a Properties object and has to perform the necessary
+     * steps in order to change this object in a way that it
+     * represents the stored settings
+     */
+    public void readSettings(Properties props) {
+	timeout = read(props, TIMEOUT, timeout);
+	showResultsAfterExecution = read(props,SHOW_SMT_RES_DIA,showResultsAfterExecution);
+        useExplicitTypeHierarchy = read(props,EXPLICIT_TYPE_HIERARCHY,
+        	                                           useExplicitTypeHierarchy);
+        useNullInstantiation = read(props,INSTANTIATE_NULL_PREDICATES,
+        	                                       useNullInstantiation);
+       	
+    	pathForSMTTranslation    = read(props, PATH_FOR_SMT_TRANSLATION, pathForSMTTranslation);
+    	pathForTacletTranslation =  read(props, PATH_FOR_TACLET_TRANSLATION, pathForTacletTranslation);
+    	modeOfProgressDialog     = read(props,PROGRESS_DIALOG_MODE,modeOfProgressDialog);
+    	maxConcurrentProcesses   = read(props,MAX_CONCURRENT_PROCESSES,maxConcurrentProcesses);
+    	maxGenericSorts          = read(props,MAX_GENERIC_SORTS,maxGenericSorts);
+
+    	activeSolver             = read(props,ACTIVE_SOLVER,activeSolver);
+    	tacletSelection          = read(props,TACLET_SELECTION,tacletSelection);
+    	
+    	for(SolverData solverData : dataOfSolvers.values()){
+    	    solverData.readSettings(props);
+    	}
+    	
+    }
+    
+    
+    public void writeSettings(Properties props) {	
+        store(props,TIMEOUT,timeout);
+        store(props,SHOW_SMT_RES_DIA,showResultsAfterExecution);
+        store(props,EXPLICIT_TYPE_HIERARCHY,useExplicitTypeHierarchy);
+        store(props,INSTANTIATE_NULL_PREDICATES,useNullInstantiation);
+        store(props,PROGRESS_DIALOG_MODE,modeOfProgressDialog);
+        store(props,PATH_FOR_SMT_TRANSLATION,pathForSMTTranslation);
+        store(props,PATH_FOR_TACLET_TRANSLATION,pathForTacletTranslation);
+        store(props,ACTIVE_SOLVER,activeSolver);
+        store(props,MAX_CONCURRENT_PROCESSES,maxConcurrentProcesses);
+        store(props,MAX_GENERIC_SORTS,maxGenericSorts);
+        store(props,TACLET_SELECTION,tacletSelection);
+        
+    	for(SolverData solverData : dataOfSolvers.values()){
+    	    solverData.writeSettings(props);
+    	}
+    	
+    }
+    
+
+    
+    private static String   read(Properties props, String key, String defaultVal){
+	String eth = props.getProperty(key);
+	return eth == null ? defaultVal : eth;
+    }
+    
+    private static int     read(Properties props, String key, int defaultVal){
+	String eth = props.getProperty(key);
+	if(eth == null){
+	    return defaultVal;
+	}
+	try{
+	 return Integer.parseInt(eth);
+	}catch (NumberFormatException e){
+	  return defaultVal;
+	}
+    	
+    }
+    
+    private static long    read(Properties props, String key, long defaultVal){
+	String eth = props.getProperty(key);
+	if(eth == null){
+	    return defaultVal;
+	}
+	try{
+	 return Long.parseLong(eth);
+	}catch (NumberFormatException e){
+	  return defaultVal;
+	}
+    }
+    
+    private static boolean read(Properties props, String key,boolean defaultVal){
+        String eth = props.getProperty(key);
+        if(eth == null){return defaultVal;}
+        if(eth.equals("true")){return true;}
+        if(eth.equals("false")){return false;}
+        return defaultVal;
+    }
+    
+
+    
+    private static void store(Properties props,String key, String value){
+	props.setProperty(key, value);
+    }
+    
+    private static void store(Properties props,String key, boolean value){
+	 props.setProperty(key,value ? "true" : "false");
+    }
+    
+    private static void store(Properties props,String key, long value){
+	 props.setProperty(key,Long.toString(value));
+   }
+    
+    public static class SolverData{
+	    public String command = "";
+	    public final SolverType type;
+	    public SolverData(SolverType type){
+		this.type = type;
+		command = type.getDefaultExecutionCommand();
+	    }
+	    
+	    private SolverData(SolverType type,String command){
+		this.type = type;
+		this.command = command;
+	    }
+	    
+	    private void readSettings(Properties props){
+		
+		command = read(props,EXECUTION_STRING+type.getName(),command);
+		System.out.println("READ: "+ EXECUTION_STRING+type.getName()+" "+command);
+		type.setExecutionCommand(command);
+		
+	    }
+	    
+	    private void writeSettings(Properties props){
+		store(props,EXECUTION_STRING+type.getName(),command);
+		type.setExecutionCommand(command);
+	    }
+	    
+	    
+	    public SolverData clone(){
+		return new SolverData(type,command);
+	    }
+	    
+	    public String toString(){
+		return type.getName();
+	    }
+	}
+    
+}
+
+
+
+/** This class encapsulates the information which 
+ *  decision procedure should be used.
+ */
+public class SMTSettings implements Settings, de.uka.ilkd.key.smt.SMTSettings{
+    /** the list of registered SettingListener */
+    private LinkedList<SettingsListener> listenerList = new LinkedList<SettingsListener>();
+   
+    
+    private SettingsData settingsData = SettingsData.getDefaultSettingsData();
+    
+     
+    
+    private Collection<Taclet>   tacletsForTranslation = null;
+    private SolverTypeCollection activeSolverUnion = SolverTypeCollection.EMPTY_COLLECTION;
+    private LinkedList<SolverTypeCollection> solverUnions = new LinkedList<SolverTypeCollection>(); 
+    
     
     private static SMTSettings instance;
     
-    private static String EXECSTR = "[DecisionProcedure]Exec";
-
-
-    
-    /** the string separating different solver-command values. */
-    private static final String execSeperator1 = ":"; 
-    /** The String separating solvernames from commands in the settingsfile */
-    private static final String execSeperator2 = "="; 
-    
-    /** the string separating different solvers
-      */
-    private static final String multSeparator1 = ":";
-    
-    /**the string separating solvernames from the value */
-    private static final String multSeparator2 = "=";
-    
-    
-    private String multProversSettings=null;
-    
-    private int progressDialogMode = PROGRESS_MODE_USER;
-    
-    private String file = "";
-    
-    private boolean cacheGoals=false;
-    
-    private boolean explicitTypeHierarchy = false;
-    
-    private boolean instantiateNullPredicates = true;
-    
-    public int getProgressDialogMode(){
-	return progressDialogMode;
-    }
-    
-    public void setProgressDialogMode(int mode){
-	progressDialogMode = mode;
-    }
-    
-    public void setSaveToFile(String f){
-	file = f;
-    }
-    
-    public String getSaveToFile(){
-	return file;
-    }
-    
-    public boolean isCachingGoals(){
-	return cacheGoals;
-    }
-    
-    public boolean isExplicitTypeHierarchy() {
-	return explicitTypeHierarchy;
-    }
-
-    public boolean isInstantiateNullPredicates() {
-	return instantiateNullPredicates;
-    }
-
-    public void setExplicitTypeHierarchy(boolean b) {
-	explicitTypeHierarchy = b;
-    }
-
-    public void setInstantateNullPredicates(boolean b) {
-	instantiateNullPredicates = b;
-    }
-
-    public void setCacheGoals(boolean b){
-	cacheGoals = b;
-    }
-
-    
-    
-    /**
-     * This is a singleton.
-     */
-    private SMTSettings() {
-	super();
-	supportedSolvers.add(SolverType.Z3_SOLVER);
-	supportedSolvers.add(SolverType.YICES_SOLVER);
-	supportedSolvers.add(SolverType.SIMPLIFY_SOLVER);
-	supportedSolvers.add(SolverType.CVC3_SOLVER);
-	
+    private SMTSettings(){
 	solverUnions.add(new SolverTypeCollection("Z3",1,SolverType.Z3_SOLVER));
 	solverUnions.add(new SolverTypeCollection("Yices",1,SolverType.YICES_SOLVER));
 	solverUnions.add(new SolverTypeCollection("CVC3",1,SolverType.CVC3_SOLVER));
@@ -166,11 +317,12 @@ public class SMTSettings implements Settings {
 					SolverType.CVC3_SOLVER,
 					SolverType.SIMPLIFY_SOLVER));
 	
-	
     }
+ 
+
     
     public Collection<SolverType> getSupportedSolvers(){
-	return supportedSolvers;
+	return settingsData.getSupportedSolvers();
     }
     
     /** adds a listener to the settings object 
@@ -181,7 +333,36 @@ public class SMTSettings implements Settings {
     }
     
 
+ 
     
+
+    public Collection<SolverTypeCollection> getSolverUnions(){
+	return solverUnions;
+    }
+    
+    public SolverTypeCollection computeActiveSolverUnion(){
+	if(activeSolverUnion.isUsable()){
+	    return activeSolverUnion;
+	}
+	for(SolverTypeCollection solverUnion : solverUnions){
+	    if(solverUnion.isUsable()){
+		setActiveSolverUnion(solverUnion);		
+		return solverUnion;
+	    }
+	}
+	setActiveSolverUnion(SolverTypeCollection.EMPTY_COLLECTION);
+        return SolverTypeCollection.EMPTY_COLLECTION;
+    }
+    
+    public void setActiveSolverUnion(SolverTypeCollection solverUnion){
+	
+	if(activeSolverUnion != solverUnion){
+	    activeSolverUnion = solverUnion;
+	    settingsData.activeSolver = activeSolverUnion.name();
+	    fireSettingsChanged();
+	}
+    }
+
 
 
     
@@ -190,35 +371,26 @@ public class SMTSettings implements Settings {
      * changed to its registered listeners (not thread-safe)
      */
     protected void fireSettingsChanged() {
-	
-        for (SettingsListener aListenerList : listenerList) {
+	for (SettingsListener aListenerList : listenerList) {
             aListenerList.settingsChanged(new GUIEvent(this));
         }
-
         if(Main.instance != null){
             Main.instance.updateSMTSelectMenu();
-        }
-      
+        }      
     }
     
 
-
     
-    public SolverTypeCollection getActiveSolverUnion(){
-	return activeSolverUnion;
+
+    private SolverTypeCollection getSolverUnion(String name){
+	for(SolverTypeCollection union : solverUnions){
+	    if(union.name().equals(name)){
+		return union;
+	    }
+	}
+	return SolverTypeCollection.EMPTY_COLLECTION;
     }
-
     
-
-    
-
-    
-    
-
-    
-    public Collection<SolverTypeCollection> getSolverUnions(){
-	return solverUnions;
-    }
     
     public Collection<SolverTypeCollection> getUsableSolverUnions(){
 	LinkedList<SolverTypeCollection> unions = new LinkedList<SolverTypeCollection>();
@@ -231,387 +403,185 @@ public class SMTSettings implements Settings {
     }
     
 
-
-
-    
-    
-    
-    /**
-     * returns the timeout specifying the maximal amount of time an external prover
-     * is run
-     * @return the timeout in tenth of seconds
-     */
-    public int getTimeout() {
-	return this.timeout;
-    }
-
-    private final static String EQUALITY = "#####";
-    
-    private String decode(String s){
-	return s.replaceAll(EQUALITY, "=");
-    }
-    
-    private String encode(String s){
-	return s.replaceAll("=", EQUALITY);
-    }
-    
-
     /** gets a Properties object and has to perform the necessary
      * steps in order to change this object in a way that it
      * represents the stored settings
      */
     public void readSettings(Properties props) {
-	
-
-	
-	
-	String timeoutstring = props.getProperty(TIMEOUT);
-	if (timeoutstring != null) {
-	    int curr = Integer.parseInt(timeoutstring);
-	    if (curr > 0) {
-		this.timeout = curr;
-	    }
-	}
-	
-	this.readExecutionString(props);
-	
-	multProversSettings = props.getProperty(MULTIPLEPROVERS);
-	readMultProversString();
-	
-	
-
-	
-        String sd = props.getProperty(SHOW_SMT_RES_DIA);
-        this.showSMTResDialog = !(sd == null) && sd.equals("true");
-    
-
-    	
-    	String cg = props.getProperty(CACHE_GOALS);
-    	this.cacheGoals = !(cg == null) && cg.equals("true");
-    	
-        String eth = props.getProperty(EXPLICIT_TYPE_HIERARCHY);
-        this.explicitTypeHierarchy = !(eth == null) && eth.equals("true");
-       
-        String inp = props.getProperty(INSTANTIATE_NULL_PREDICATES);
-        this.instantiateNullPredicates = !(inp == null) && inp.equals("true");
-    	
-    	file = props.getProperty(SAVEFILE_PATH,"");
-    	
-    	String pd = props.getProperty(PROGRESS_DIALOG_MODE);
-    	int mode;
-    	try{
-    	    mode = Integer.parseInt(pd);
-    	}catch(NumberFormatException e){
-    	   mode = PROGRESS_MODE_USER;
-    	}
-    	
-    	progressDialogMode = mode;
-    	
-    	
-    	// Read the active rule at the end of the method to guarantee
-    	// that the execution commands have been read yet.
-	String ruleString = props.getProperty(ACTIVE_RULE);
-
-	this.activeSolverUnion = findSolverUnionByName(ruleString);
-	// Use only the rule if the corresponding solvers 
-	// are installed.
-	if(activeSolverUnion == null || !activeSolverUnion.isUsable()){
-	    this.activeSolverUnion = SolverTypeCollection.EMPTY_COLLECTION;
-	}
-
+	System.out.println("READ SETTINGS");
+	settingsData.readSettings(props);
+	tacletAssignmentFromString(settingsData.tacletSelection);
+	activeSolverUnion = getSolverUnion(settingsData.activeSolver);
     }
-    
-    private SolverTypeCollection findSolverUnionByName(String name){
-	for(SolverTypeCollection union : solverUnions){
-	    if(union.name().equals(name)){
-		return union;
-	    }
-	}
-	return null;
-    }
-    
-    private SolverType findSolverByName(String name){
-	for(SolverType type : supportedSolvers){
-	    if(type.getName().equals(name)){
-		return type;
-	    }
-	}
-	return null;
-    }
-
-    
-    /**
-     * read the execution strings from the properties file
-     * @param props
-     */
-    private void readExecutionString(Properties props) {
-	String allCommands = props.getProperty(EXECSTR);
-	//all value pairs are stored separated by a |
-	if (allCommands != null) {
-	    String[] valuepairs = allCommands.split(execSeperator1);
-	    for (String s : valuepairs) {
-		String[] vals = s.split(execSeperator2);
-		if (vals.length == 2) {
-		    SolverType solver = findSolverByName(vals[0]);
-		   if(solver != null){
-			setExecutionCommand(solver,decode(vals[1]));
-			solver.isInstalled(true);
-		    }
-		}
-	    }
-	}
-    }
-    
-    
-    /**
-     * read the multiple provers strings from the properties file, stored in multProversSettings
-     */
-    private void readMultProversString()
-    {
-	
-	
-	if(multProversSettings != null){
-	    String[] valuepairs = multProversSettings.split(multSeparator1);
-	    for(String s : valuepairs){
-		String[] vals = s.split(multSeparator2);
-		if(vals.length == 2){
-		  //  SMTSolverImplementation solver = findSolverByName(vals[0]);
-		   // if(solver != null){
-		//	solver.useForMultipleRule(vals[1].equals("true"));
-		  //  }
-			
-			
-			
-		   
-		}
-	    }
-	}
-    }
-    
-    /**
-     * write the Execution Commands to the file
-     * @param prop
-     */
-    private void writeExecutionString(Properties prop) {
-	String toStore = "";
-	for (SolverType solver : getSupportedSolvers()) {
-	     
-	     String comm = encode(solver.getExecutionCommand());
-	    	if (comm == null) {
-			comm = "";
-	    	}
-	    	toStore = toStore + solver.getName() + execSeperator2 + comm + execSeperator1;
-	    }
-	
-	//remove the las two || again
-	if (toStore.length() >= execSeperator1.length()){
-	    //if the program comes here, a the end ad extra || was added.
-	    toStore = toStore.substring(0, toStore.length()-execSeperator1.length());
-	}
-	prop.setProperty(EXECSTR, toStore);
-    }
-    
-    /**
-     * Write the values, that specify whether a prover is used for the rule 'multiple provers'. 
-     */
-    private void writeMultipleProversString(Properties prop) {
-//	String toStore = "";
-//	
-//	for(SMTSolverImplementation solver : solvers){
-//	    String value = solver.useForMultipleRule()? "true" : "false";
-//	    toStore = toStore + solver.name() + multSeparator2 + value + multSeparator1; 
-//	}
-//
-//
-//	if (toStore.length() >= multSeparator1.length()){
-//	    toStore = toStore.substring(0, toStore.length()-multSeparator1.length());
-//	}
-//	prop.setProperty(MULTIPLEPROVERS, toStore);
-    }
-    
-
-    
-    /**
-     * Set a execution command for a certain solver.
-     * @param s the solver, which uses this command.
-     * @param command the command to use
-     */
-    public void setExecutionCommand(SolverType s, String command) {
-	
-	s.setExecutionCommand(command);
-	
-    }
-    
-    /**
-     * get the execution command for a certain rule.
-     * @param solver the solver
-     * @return the execution command
-     */
-    public String getExecutionCommand(SolverType solver) {
-	return solver.getExecutionCommand();
-    }
-    
-
-
-
-    
-
-
-    
-    public boolean getMultipleUse(SMTSolverImplementation solver){
-	return false;
-	//return solver.useForMultipleRule();
-    }
-    
-    
-    
-    
-    /**
-     * removes the specified listener form the listener list
-     * @param l the listener
-     */
-    public void removeSettingsListener(SettingsListener l) {
-	listenerList.remove(l);
-    }
-
-
-    public void setActiveSolverUnion(SolverTypeCollection union){
-	if(activeSolverUnion != union){
-	    if(union == null){
-		activeSolverUnion = SolverTypeCollection.EMPTY_COLLECTION;
-	    }else{
-		this.activeSolverUnion = union;
-	    }
-	 
-	    fireSettingsChanged();
-	}
-	
-    }
-
-
-    /**
-     * sets the timeout until an external prover is terminated
-     * @param t the timeout in tenth of seconds
-     */
-    public void setTimeout(int t) {
-	if (t > 0 && t != timeout) {
-	    this.timeout = t;
-	    this.fireSettingsChanged();
-	}
-    }
-
-    /**
-     * updates the current available SMT rules
-     * @param profile the active Profile 
-     */
-    public void updateSMTRules(Profile profile) {
-	//Load the available SMTRules...	
-	/*for (Rule r : profile.
-		getStandardRules().getStandardBuiltInRules()) {
-	    if(r instanceof SMTRuleNew){
-		this.smtRules.add((SMTRuleNew)r);
-	    }
-	}*/
-	
-    }
-    
-    private boolean saveFile = false;
-
-
-    
-    public void setSaveFile(boolean sf) {
-	if (sf != this.saveFile) {
-	    this.saveFile = sf;
-	    this.fireSettingsChanged();
-	}
-    }
-    
-    /**
-     * @return true, if a created problem file should be saved.
-     */
-    public boolean getSaveFile() {
-	return this.saveFile;
-    }
-    
-    private boolean showSMTResDialog = false;
-    
-
-    
-    public void setSMTResDialog(boolean b){
-	if(b!=this.showSMTResDialog){
-	    this.showSMTResDialog = b;
-	    this.fireSettingsChanged();
-	}
-    }
-    
-    public boolean getShowSMTResDialog(){
-	return this.showSMTResDialog;
-    }
-    
-    /**
-     * true, if the argument should be used for test
-     * TODO implement?
-     */
-    public boolean useRuleForTest(int arg) {
-	return true;
-    }
-
-    
     
     /** implements the method required by the Settings interface. The
      * settings are written to the given Properties object. Only entries of the form 
      * <key> = <value> (,<value>)* are allowed.
      * @param props the Properties object where to write the settings as (key, value) pair
      */
-    public void writeSettings(Properties props) {	
-        props.setProperty(ACTIVE_RULE, "" + activeSolverUnion.name());
-        props.setProperty(TIMEOUT, "" + this.timeout);
-      
-        /*if (this.saveFile)
-            props.setProperty(SAVEFILE, "true");
-        else {
-            props.setProperty(SAVEFILE, "false");
-        }*/
-        if (this.showSMTResDialog)
-            props.setProperty(SHOW_SMT_RES_DIA, "true");
-        else {
-            props.setProperty(SHOW_SMT_RES_DIA, "false");
-        }
-
-        
-        if (this.cacheGoals)
-            props.setProperty(CACHE_GOALS, "true");
-        else {
-            props.setProperty(CACHE_GOALS, "false");
-        }
-        
-
-        
-        props.setProperty(EXPLICIT_TYPE_HIERARCHY,this.explicitTypeHierarchy ? "true" : "false");
-         
-        props.setProperty(INSTANTIATE_NULL_PREDICATES,this.instantiateNullPredicates ? "true" : "false");
-         
-        props.setProperty(PROGRESS_DIALOG_MODE,Integer.toString(progressDialogMode));
-
-        props.setProperty(SAVEFILE_PATH,this.file);
-        
-        
-        
-
-       
-        this.writeExecutionString(props);
-        this.writeMultipleProversString(props);
+    public void writeSettings(Properties props) {
+	System.out.println("WRITE SETTINGS");
+	settingsData.tacletSelection = tacletAssignmentToString();
+	settingsData.activeSolver = computeActiveSolverUnion().name();
+	settingsData.writeSettings(props);
     }
+    
+   
+    /**
+     * removes the specified listener form the listener list
+     * @param l the listener
+     */
+    public void removeSettingsListener(SettingsListener l) {
+	listenerList.remove(l);
+    }   
+
 
     public static SMTSettings getInstance() {
 	if (instance == null) {
 	    instance = new SMTSettings();
-	}
-	
+	}	
 	return instance;
     }
 
+    public void setTacletsForTranslation(Collection<Taclet> taclets){
+	if(taclets != null){
+	    tacletsForTranslation = taclets;
+	}
+    }
+    
+    @Override
+    public String getCommand(SolverType type) {
+	return settingsData.getCommand(type);
+    }
 
+    @Override
+    public int getMaxConcurrentProcesses() {
+	return settingsData.maxConcurrentProcesses;
+    }
+
+    @Override
+    public int getMaxNumberOfGenerics() {
+	return settingsData.maxGenericSorts;
+    }
+
+    @Override
+    public String getSMTTemporaryFolder() {
+	return   PathConfig.KEY_CONFIG_DIR
+	    + File.separator + "smt_formula";
+    }
+
+    @Override
+    public Collection<Taclet> getTaclets(Services services) {
+	if(tacletsForTranslation == null){
+	    tacletsForTranslation = new LinkedList<Taclet>();
+	    for(Taclet taclet : services.getProof().env().
+		          getInitConfig().getTaclets()){
+		tacletsForTranslation.add(taclet);
+	    }
+	}
+	
+        return tacletsForTranslation;
+    }
+
+    @Override
+    public boolean instantiateNullAssumption() {
+	return settingsData.useNullInstantiation;
+    }
+
+    @Override
+    public boolean makesUseOfTaclets() {
+	 	TreeItem item = ((TreeItem)((DefaultMutableTreeNode)UsedTaclets.INSTANCE.getTreeModel()
+		.getRoot()).getUserObject());
+	return item.getMode() == SelectionMode.all || item.getMode() == SelectionMode.user;
+
+    }
+
+    @Override
+    public boolean useExplicitTypeHierarchy() {
+	return settingsData.useExplicitTypeHierarchy;
+    }
+    
+    @Override
+    public long getTimeout() {
+        return settingsData.timeout;
+    }
+    
+    public boolean storeSMTTranslationToFile(){
+	return settingsData.storeSMTTranslationToFile;
+    }
+    
+    public boolean storeTacletTranslationToFile(){
+	return settingsData.storeTacletTranslationToFile;
+    }
+    
+    public String getPathForSMTTranslation(){
+	return settingsData.pathForSMTTranslation;
+    }
+    
+    public String getPathForTacletTranslation(){
+	return settingsData.pathForTacletTranslation;
+    }
+
+
+    public SettingsData cloneData(){
+	return settingsData.clone();
+    }
+    
+    public void setData(SettingsData data){
+	settingsData = data;
+    }
+    
+    
+    private String tacletAssignmentToString(){
+	StringBuffer s= new StringBuffer();
+	tacletAssignmentToString((TreeNode)UsedTaclets.INSTANCE.getTreeModel().getRoot()
+		  , s);
+	return s.toString();
+    }
+    
+    private void tacletAssignmentToString(TreeNode node, StringBuffer buf){
+	TreeItem item = ((TreeItem)((DefaultMutableTreeNode)node).getUserObject());
+	
+
+	buf.append(item.getMode().ordinal());
+	
+	for(int i=0; i < node.getChildCount(); i++){
+	    tacletAssignmentToString(node.getChildAt(i), buf);
+	}
+    }
+    
+    private void tacletAssignmentFromString(String s){
+	tacletAssignmentFromString((TreeNode)UsedTaclets.INSTANCE.getTreeModel().getRoot(),
+		s, 0);
+	UsedTaclets.INSTANCE.validateSelectionModes();
+    }
+    
+    
+    private int tacletAssignmentFromString(TreeNode node,String s, int index){
+	if(index >= s.length() || index < 0) return -1;
+	TreeItem item = ((TreeItem)((DefaultMutableTreeNode)node).getUserObject());
+	
+	String c = String.valueOf(s.charAt(index));
+
+	
+	if(Integer.valueOf(c) == SelectionMode.all.ordinal()){
+	    item.setMode(SelectionMode.all);
+	}else if(Integer.valueOf(c) == SelectionMode.user.ordinal()){
+	    item.setMode(SelectionMode.user);
+	}else{
+	    item.setMode(SelectionMode.nothing);
+	}
+
+	index++;
+	for(int i=0; i < node.getChildCount(); i++){
+	    index = tacletAssignmentFromString(node.getChildAt(i), s, index);
+	    if(index == -1){
+		break;
+	    }
+	}
+	return index;
+    }
+    
 
 
 

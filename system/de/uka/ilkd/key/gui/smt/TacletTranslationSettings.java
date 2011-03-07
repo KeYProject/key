@@ -28,8 +28,8 @@ import de.uka.ilkd.key.smt.taclettranslation.TreeItem;
 import de.uka.ilkd.key.smt.taclettranslation.UsedTaclets;
 import de.uka.ilkd.key.smt.taclettranslation.TreeItem.SelectionMode;
 
-
-public class TacletTranslationSettings implements Settings {
+/*
+public class TacletTranslationSettings {
     private HashMap<String, Taclet> taclets =null;
     static private TacletTranslationSettings instance = new TacletTranslationSettings();
     public static TacletTranslationSettings getInstance(){
@@ -37,45 +37,13 @@ public class TacletTranslationSettings implements Settings {
     }
     private LinkedList<SettingsListener> listener = new LinkedList<SettingsListener>();
   
-    private static final String KEY_FILENAME = "[TacletTranslation]filename";
-    private static final String KEY_MAX_GENERIC = "[TacletTranslation]maxGeneric";
-    private static final String KEY_ASSIGNMENT  = "[TacletTranslation]assignment";
-    private int maxGeneric=3;
-    private String filename="";
-    private boolean saveToFile= false;
+
+
     
     private TacletTranslationSettings(){
 	
     }
-    
-    public int getMaxGeneric() {
-        return maxGeneric;
-    }
 
-
-    public void setMaxGeneric(int maxGeneric) {
-        this.maxGeneric = maxGeneric;
-    }
-
-
-    public String getFilename() {
-        return filename;
-    }
-
-
-    public void setFilename(String filename) {
-        this.filename = filename;
-    }
-
-
-    public boolean isSaveToFile() {
-        return saveToFile;
-    }
-
-
-    public void setSaveToFile(boolean saveToFile) {
-        this.saveToFile = saveToFile;
-    }
 
     private String tacletAssignmentToString(){
 	StringBuffer s= new StringBuffer();
@@ -174,41 +142,5 @@ public class TacletTranslationSettings implements Settings {
     public HashMap<String, Taclet> getTacletMap(){
 	return taclets;
     }
-    
-    
 
-    
-    
-  
-    public void addSettingsListener(SettingsListener l) {
-	listener.add(l);
-	
-    }
-    
-    
-    public void fireSettingsHaveChanged(){
-	for(SettingsListener l : listener){
-	    l.settingsChanged(new GUIEvent(this));
-	}
-    }
-
-
-    public void readSettings(Properties props) {
-	//saveToFile = Boolean.valueOf(props.getProperty(KEY_SAVE_TO_FILE,"false"));
-	maxGeneric = Integer.valueOf(props.getProperty(KEY_MAX_GENERIC,"2"));
-	filename = props.getProperty(KEY_FILENAME,"");
-	tacletAssignmentFromString(props.getProperty(KEY_ASSIGNMENT, ""));			
-    }
-    
-
-
-    public void writeSettings(Properties props) {
-	//props.setProperty(KEY_SAVE_TO_FILE,Boolean.toString(saveToFile));
-	props.setProperty(KEY_MAX_GENERIC,Integer.toString(maxGeneric));
-	props.setProperty(KEY_FILENAME, filename);
-	props.setProperty(KEY_ASSIGNMENT,tacletAssignmentToString());
-	
-	
-    }
-
-}
+}*/

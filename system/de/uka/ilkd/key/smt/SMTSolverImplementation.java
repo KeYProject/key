@@ -12,7 +12,6 @@ package de.uka.ilkd.key.smt;
 
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -24,14 +23,14 @@ import java.util.LinkedList;
 import java.util.Timer;
 import java.util.concurrent.locks.ReentrantLock;
 
-import de.uka.ilkd.key.gui.Main;
-import de.uka.ilkd.key.gui.configuration.PathConfig;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
+//import de.uka.ilkd.key.gui.Main;
+//import de.uka.ilkd.key.gui.configuration.PathConfig;
+//import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
-import de.uka.ilkd.key.smt.taclettranslation.DefaultTacletSetTranslation;
+import de.uka.ilkd.key.smt.taclettranslation.TacletSetTranslation;
 import de.uka.ilkd.key.util.Debug;
 
 
@@ -49,32 +48,12 @@ final public class SMTSolverImplementation implements SMTSolver, Runnable {
     private final int ID = IDCounter++;
     
 
-
-    /**
-     * The path for the file
-     */
-    private static final String fileDir = PathConfig.KEY_CONFIG_DIR
-	    + File.separator + "smt_formula";
-
     /**
      * the file base name to be used to store the SMT translation
      */
     private static final String FILE_BASE_NAME = "smt_formula";
 
-
-    /** true, if the current run is for test uss only (for example checking, if the Solver is installed) */
-    private boolean inTestMode = false;
-
-    /** determines whether taclets are used for this solver.*/
-    private boolean useTaclets = true;
-    /** Only for testing*/
-    private Collection<Taclet> tacletsForTest = null;
     
-
-    
-
-    
-  //  private String   executionCommand;
     private SMTProblem problem;
     private SolverListener listener;
 
@@ -92,6 +71,9 @@ final public class SMTSolverImplementation implements SMTSolver, Runnable {
 
     private SolverState solverState=SolverState.Waiting;
     private final SolverType type;
+    private SMTSettings smtSettings;
+    private String      problemString="NOT YET COMPUTED";
+    private TacletSetTranslation tacletTranslation;
     
 
     
@@ -220,8 +202,8 @@ final public class SMTSolverImplementation implements SMTSolver, Runnable {
 	    this.finalResult = type.interpretAnswer(result[ExternalProcessLauncher.RESULT], 
 		        result[ExternalProcessLauncher.ERROR], 
 		        Integer.parseInt(result[ExternalProcessLauncher.EXIT_CODE]));
-	//    Thread.sleep(8000);
-        } catch (Throwable e) {
+            
+	} catch (Throwable e) {
             interruptionOccurred(e);
         }finally{
             solverTimeout.cancel();
@@ -293,7 +275,7 @@ final public class SMTSolverImplementation implements SMTSolver, Runnable {
      */
     private final File storeToFile(String text) throws IOException {
 	// create directory where to put the files marked as delete on exit
-	final File smtFileDir = new File(fileDir);
+	final File smtFileDir = new File(smtSettings.getSMTTemporaryFolder());
 	smtFileDir.mkdirs();
 	smtFileDir.deleteOnExit();
 	
@@ -309,34 +291,8 @@ final public class SMTSolverImplementation implements SMTSolver, Runnable {
 	out.write(text);
 	out.close();
 
-	//store the text permanent to a file 
-	if (!this.inTestMode && ProofSettings.DEFAULT_SETTINGS.getSMTSettings().getSaveFile() &&
-		Main.getInstance() != null) {
-	    String path = ProofSettings.DEFAULT_SETTINGS.getSMTSettings().getSaveToFile();
-	    	path = finalizePath(path);
-		try {
-		    final BufferedWriter out2 = new BufferedWriter(new FileWriter(path));
-		    out2.write(text);
-		    out2.close();
-		} catch (IOException e) {
-		    throw new RuntimeException("Could not store to file " + path + ".");
-		}
-	   
-	}
 	
 	return smtFile;
-    }
-    
-    private String finalizePath(String path){
-	Calendar c = Calendar.getInstance();
-	String date = c.get(Calendar.YEAR)+"-"+c.get(Calendar.MONTH)+"-"+c.get(Calendar.DATE);
-	String time = c.get(Calendar.HOUR_OF_DAY)+"-"+c.get(Calendar.MINUTE)+"-"+c.get(Calendar.SECOND);
-	
-        path = path.replaceAll("%d", date);
-        path = path.replaceAll("%s", this.getTitle());
-        path = path.replaceAll("%t", time);
-        path = path.replaceAll("%i", Integer.toString(getNextFileID()));
-        return path;
     }
 
 
@@ -374,17 +330,17 @@ final public class SMTSolverImplementation implements SMTSolver, Runnable {
     }
     
 
-    private String translateToCommand(Term term, Services services) throws IllegalFormulaException, IOException {
+    private String translateToCommand(Term term, Services services)
+    	throws IllegalFormulaException, IOException {
 	
 	SMTTranslator trans = this.getTranslator(services);
-	instantiateTaclets(trans);
+	//instantiateTaclets(trans);
 	
  
-	String formula = trans.translateProblem(term, services).toString();
-
-	saveTacletTranslation(trans);
-	
-	return translateToCommand(formula, services);
+	problemString = trans.translateProblem(term, services,smtSettings).toString();
+	tacletTranslation = ((AbstractSMTTranslator) trans)
+	    .getTacletSetTranslation();
+	return translateToCommand(problemString, services);
     }
     
 
@@ -403,62 +359,11 @@ final public class SMTSolverImplementation implements SMTSolver, Runnable {
 
     
   
+ 
     
-    public void useTaclets(boolean b){
-	this.useTaclets = b;
-    }
-   
 
     
-    
-    private Collection<Taclet> getTaclets(){
-	 
-	 if(tacletsForTest != null){
-	     return tacletsForTest;
-	 }
-	// return session.getTaclets();
-	 return null;
-    }
-    
-   
-    private void saveTacletTranslation(SMTTranslator trans) {
-	if (!this.inTestMode
-	        && ProofSettings.DEFAULT_SETTINGS
-	                .getTacletTranslationSettings().isSaveToFile()
-	        && ProofSettings.DEFAULT_SETTINGS
-	                .getTacletTranslationSettings().isUsingTaclets()) {
 
-	    DefaultTacletSetTranslation translation = (DefaultTacletSetTranslation) ((AbstractSMTTranslator) trans)
-		    .getTacletSetTranslation();
-
-	    if (translation != null) {
-		String path = ProofSettings.DEFAULT_SETTINGS
-	        .getTacletTranslationSettings().getFilename();
-		path = finalizePath(path);
-		translation.storeToFile(path);
-	    }
-
-	}
-    }
-    
-    private void instantiateTaclets(SMTTranslator trans) throws IllegalFormulaException{
-	if(!ProofSettings.DEFAULT_SETTINGS.getTacletTranslationSettings().isUsingTaclets() || !useTaclets ){
-	    trans.setTacletsForAssumptions(new LinkedList<Taclet>());
-	   
-	}else{
-	    trans.setTacletsForAssumptions(getTaclets());
-	}
-	
-	
-	 
-	
-	
-    }
-    
-    public void setTacletsForTest(Collection<Taclet> set){
-	tacletsForTest = set;
-    }
-    
     
     @Override
     public void interrupt() {
@@ -480,10 +385,20 @@ final public class SMTSolverImplementation implements SMTSolver, Runnable {
         
     }
     
-    @Override
-    public void start(SolverTimeout timeout) {
+    public void start(SMTSettings settings){
+	solverTimeout = new SolverTimeout(this,settings.getTimeout());
+	Timer  timer = new Timer();
+	timer.schedule(solverTimeout, settings.getTimeout());	
+	thread = new Thread(this);
+	smtSettings = settings;
+	thread.start();        
+    }
+    
+    
+    public void start(SolverTimeout timeout,SMTSettings settings) {
 	    thread = new Thread(this);
 	    solverTimeout = timeout;
+	    smtSettings = settings;
 	    thread.start();        
     }
     
@@ -501,6 +416,16 @@ final public class SMTSolverImplementation implements SMTSolver, Runnable {
     
     public SMTSolverResult getFinalResult() {
 	return finalResult;
+    }
+    
+    @Override
+    public TacletSetTranslation getTacletTranslation() {
+        return tacletTranslation;
+    }
+    
+    @Override
+    public String getTranslation() {
+       return problemString;
     }
 
     

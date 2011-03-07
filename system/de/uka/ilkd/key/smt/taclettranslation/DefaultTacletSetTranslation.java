@@ -202,12 +202,20 @@ public final class DefaultTacletSetTranslation
      * @param dest the path of the file.
      */
     public void storeToFile(String dest) {
-	storeToFile(getTranslation(usedFormulaSorts, usedAttributeTerms,maxGeneric), dest);
+
+	FileWriter fw;
+	try {
+	    fw = new FileWriter(dest);
+	    fw.write(toString());
+	    fw.close();
+	} catch (IOException e) {
+	    throw new RuntimeException(e);
+	}
+
     }
     
-   
-    
-    private void storeToFile(ImmutableList<TacletFormula> list, String dest) {
+    public String toString(){
+	ImmutableList<TacletFormula> list = getTranslation(usedFormulaSorts, usedAttributeTerms,maxGeneric);
         String toStore = "";
         toStore = "//"+Calendar.getInstance().getTime().toString()+"\n";
         
@@ -291,17 +299,7 @@ public final class DefaultTacletSetTranslation
 	    }
 	    toStore +="\n\n*/";
 	}
-	
-
-	FileWriter fw;
-	try {
-	    fw = new FileWriter(dest);
-	    fw.write(toStore);
-	    fw.close();
-	} catch (IOException e) {
-	    throw new RuntimeException(e);
-	}
-
+	return toStore;
     }
 
     private String convertTerm(Term term) {

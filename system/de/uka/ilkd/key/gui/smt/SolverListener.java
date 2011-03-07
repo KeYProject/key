@@ -4,7 +4,11 @@ import java.awt.Color;
 import java.awt.Dialog.ModalityType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -13,6 +17,9 @@ import java.util.TimerTask;
 
 import javax.swing.SwingUtilities;
 
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.gui.smt.InformationWindow.Information;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.smt.RuleAppSMT;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SMTSolver;
@@ -22,6 +29,7 @@ import de.uka.ilkd.key.smt.SolverLauncherListener;
 import de.uka.ilkd.key.smt.SMTSolver.ReasonOfInterruption;
 import de.uka.ilkd.key.smt.SMTSolver.SolverState;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
+import de.uka.ilkd.key.smt.taclettranslation.TacletSetTranslation;
 
 public class SolverListener implements SolverLauncherListener {
     private ProgressDialog2 progressDialog;
@@ -30,6 +38,7 @@ public class SolverListener implements SolverLauncherListener {
     private Timer timer = new Timer();
     private final static Color RED = new Color(180, 43, 43);
     private final static Color GREEN = new Color(43,180,43);
+    private static int FILE_ID =0;
    
     private static final int RESOLUTION = 1000;
     
@@ -69,6 +78,15 @@ public class SolverListener implements SolverLauncherListener {
 	timer.cancel();
 	refreshDialog();
 	progressDialog.setStopButtonEnabled(false);
+	storeInformation();
+	
+	for(InternSMTProblem problem : problems){
+	int problemIndex = problem.getProblemIndex();
+	getPanel(problem).addInformation(problemIndex, new Information("Translation",problem.solver.getTranslation()));
+	if(problem.solver.getTacletTranslation() != null){
+	getPanel(problem).addInformation(problemIndex, new Information("Taclets",problem.solver.getTacletTranslation().toString()));
+	}
+	}
 	
     }
     
@@ -239,7 +257,6 @@ public class SolverListener implements SolverLauncherListener {
     
     
     private void stopped(InternSMTProblem problem){
-
 	if(problem.solver.wasInterrupted()){
 	    interrupted(problem);
 	}else if(problem.solver.getFinalResult().isValid() 
@@ -254,6 +271,7 @@ public class SolverListener implements SolverLauncherListener {
     }
     
     
+    
     private void interrupted(InternSMTProblem problem){
 	int problemIndex = problem.getProblemIndex();
 	ReasonOfInterruption reason = problem.solver.getReasonOfInterruption();
@@ -264,6 +282,7 @@ public class SolverListener implements SolverLauncherListener {
 	    getPanel(problem).setProgress(problemIndex,0);
 	    getPanel(problem).setColor(problemIndex, RED);
 	    getPanel(problem).setText(problemIndex,"Exception.");
+	
 	    break;
 	case NoInterruption:
 	    throw new RuntimeException("This position should not be reachable!");
@@ -298,6 +317,68 @@ public class SolverListener implements SolverLauncherListener {
 	getPanel(problem).setText(problemIndex,"Unknown.");
     }
  
+    private void storeInformation(){
+	SMTSettings settings = ProofSettings.DEFAULT_SETTINGS.getSMTSettings();
+	if(settings.storeSMTTranslationToFile() || 
+	   (settings.makesUseOfTaclets()&& settings.storeTacletTranslationToFile())){
+	    for(InternSMTProblem problem : problems){
+		   storeInformation(problem.getProblem(),settings);
+	    }		 
+	}
+	
+    }
+    
+    private void storeInformation(SMTProblem problem, SMTSettings settings){
+	for(SMTSolver solver : problem.getSolvers()){
+	    if(settings.storeSMTTranslationToFile() ){
+		storeSMTTranslation(solver, problem.getGoal(),solver.getTranslation(), settings);
+	    }
+	    if(settings.makesUseOfTaclets()&& settings.storeTacletTranslationToFile()
+		    && solver.getTacletTranslation() != null){
+		storeTacletTranslation(solver, problem.getGoal(), solver.getTacletTranslation());
+	    }
+	}
+    }
+    
+    private void storeTacletTranslation(SMTSolver solver, Goal goal, TacletSetTranslation translation){
+	String path = ProofSettings.DEFAULT_SETTINGS.getSMTSettings().getPathForTacletTranslation();
+	path = finalizePath(path,solver,goal);
+	storeToFile(translation.toString(),path);
+    }
+    
+    private void storeSMTTranslation(SMTSolver solver,Goal goal,String problemString, SMTSettings settings){
+	String path = ProofSettings.DEFAULT_SETTINGS.getSMTSettings().getPathForSMTTranslation();
+	path = finalizePath(path,solver,goal);
+	storeToFile(problemString,path);
+	
+    }
+    
+    private void storeToFile(String text, String path){
+	try {
+	    final BufferedWriter out2 = new BufferedWriter(new FileWriter(path));
+	    out2.write(text);
+	    out2.close();
+	} catch (IOException e) {
+	    throw new RuntimeException("Could not store to file " + path + ".");
+	}	
+    }
+    
+    
+    
+    private String finalizePath(String path,SMTSolver solver,Goal goal){
+	Calendar c = Calendar.getInstance();
+	String date = c.get(Calendar.YEAR)+"-"+c.get(Calendar.MONTH)+"-"+c.get(Calendar.DATE);
+	String time = c.get(Calendar.HOUR_OF_DAY)+"-"+c.get(Calendar.MINUTE)+"-"+c.get(Calendar.SECOND);
+	
+        path = path.replaceAll("%d", date);
+        path = path.replaceAll("%s", solver.name());
+        path = path.replaceAll("%t", time);
+        path = path.replaceAll("%i", Integer.toString(FILE_ID++));
+        path = path.replaceAll("%g", Integer.toString(goal.node().serialNr()));
+        
+        return path;
+    }
+
     
 
     @Override

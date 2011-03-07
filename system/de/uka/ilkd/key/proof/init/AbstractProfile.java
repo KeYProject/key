@@ -200,7 +200,7 @@ public abstract class AbstractProfile implements Profile {
       * sets the given settings to some default depending on the profile
       */
      public void updateSettings(ProofSettings settings) {
-	 settings.getSMTSettings().updateSMTRules(this);
+	 //settings.getSMTSettings().updateSMTRules(this);
      }
      
      

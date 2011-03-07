@@ -16,7 +16,6 @@ import java.util.Properties;
 
 import de.uka.ilkd.key.gui.GUIEvent;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
-import de.uka.ilkd.key.gui.smt.TacletTranslationSettings;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.util.Debug;
@@ -73,8 +72,7 @@ public class ProofSettings {
             new GeneralSettings(),
 	    new ChoiceSettings(),
 	    SMTSettings.getInstance(),
-	    new ViewSettings(),
-	    TacletTranslationSettings.getInstance()
+	    new ViewSettings()
 	};
 	for (int i = 0; i < settings.length; i++) { 
 	    settings[i].addSettingsListener(listener);
@@ -247,10 +245,7 @@ public class ProofSettings {
 	return (SMTSettings) settings[3];
     }
     
-    public TacletTranslationSettings getTacletTranslationSettings(){
-	ensureInitialized();
-	return (TacletTranslationSettings) settings[5];
-    }
+
 
     public GeneralSettings getGeneralSettings() {
 	ensureInitialized();

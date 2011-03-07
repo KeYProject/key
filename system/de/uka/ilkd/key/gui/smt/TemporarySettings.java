@@ -17,76 +17,40 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
 
+import de.uka.ilkd.key.gui.smt.SettingsData.SolverData;
 import de.uka.ilkd.key.smt.SMTSolver;
 import de.uka.ilkd.key.smt.SMTSolverImplementation;
 import de.uka.ilkd.key.smt.SolverType;
+import de.uka.ilkd.key.smt.SMTSolver.SolverState;
 
-class TemporarySolverSettings {
-    public SolverType solverType;
-    public String command = "";
-    public boolean isInstalled = false;
-    public boolean useForMulitpleProvers = false;
-    
-    TemporarySolverSettings(SolverType solver) {
-	this.solverType = solver;
-	newSession();
-    }
 
-    public String toString() {
-	return solverType.getName();
-    }
-    
-    void newSession(){
-
-	this.command = solverType.getExecutionCommand();
-	isInstalled = solverType.isInstalled(true);
-
-    }
-
-    void apply() {
-	solverType.setExecutionCommand(command);
-	solverType.isInstalled(true);
-    }
-
-}
 
 public class TemporarySettings extends Settings {
     
     private static TemporarySettings settingsInstance = new TemporarySettings();
-    public static TemporarySettings getInstance(SMTSettings dec, TacletTranslationSettings tac){
-	settingsInstance.newSession(dec,tac);
+    public static TemporarySettings getInstance(SMTSettings dec){
+	settingsInstance.newSession(dec);
 	return settingsInstance;
     }
     
+    private SettingsData settingsData = SettingsData.getDefaultSettingsData();
     
     private static DefaultTreeModel contentModel;
     private ContentItem defaultItem = null;
     public SMTSettings decSettings;
-    public TacletTranslationSettings tacSettings;
-    public boolean showResultsAfterExecuting = false;
-    public boolean storeToFile = false;
-    public boolean storeTacletsToFile = false;
-    public boolean cacheGoals = false;
-    public int progressDialogMode=0;
-    public String tacletFolder = "";
-    public int maxGenerics = 3;
-    public String folder = "";
-    public int timeout = 10000;
-    public boolean explicitTypeHierarchy = false;
-    public boolean instantiateNullPredicates = true;
-    public LinkedList<TemporarySolverSettings> solverSettings = new LinkedList<TemporarySolverSettings>();
     
+   
     public final static String    PROGRESS_MODE_USER = "Progress dialog remains open after executing solvers.";
     public final static String    PROGRESS_MODE_CLOSE ="Close progress dialog after all solvers have finished.";
     public final static String    PROGRESS_MODE_CLOSE_FIRST = "Close progress dialog after the first solver has finished.";
     
     public String getProgressMode(int index){
 	switch(index){
-	case SMTSettings.PROGRESS_MODE_USER:
+	case SettingsData.PROGRESS_MODE_USER:
 	    return PROGRESS_MODE_USER;
-	case SMTSettings.PROGRESS_MODE_CLOSE:
+	case SettingsData.PROGRESS_MODE_CLOSE:
 	    return PROGRESS_MODE_CLOSE;
-	case SMTSettings.PROGRESS_MODE_CLOSE_FIRST:
+	case SettingsData.PROGRESS_MODE_CLOSE_FIRST:
 	    return PROGRESS_MODE_CLOSE_FIRST;
 	}
 	return "";
@@ -96,56 +60,17 @@ public class TemporarySettings extends Settings {
 	
     }
 
-    private void newSession(SMTSettings settings,
-	    TacletTranslationSettings tacletSettings) {
-	showResultsAfterExecuting = settings.getShowSMTResDialog();
-	timeout = settings.getTimeout();
-	folder = settings.getSaveToFile();
+    private void newSession(SMTSettings settings) {
+	settingsData = settings.cloneData();
 	
-	if(solverSettings.isEmpty()){
-	    for (SolverType type : settings.getSupportedSolvers()) {
-		solverSettings.add(new TemporarySolverSettings(type));
-	    }
-	}else{
-	    for(TemporarySolverSettings set : solverSettings){
-		set.newSession();
-	    }
-	}
-
-
-	maxGenerics = tacletSettings.getMaxGeneric();
-	storeTacletsToFile = tacletSettings.isSaveToFile();
-	tacletFolder = tacletSettings.getFilename();
-	progressDialogMode = settings.getProgressDialogMode();
-	
-	storeToFile = settings.getSaveFile();
-	cacheGoals = settings.isCachingGoals();
-	explicitTypeHierarchy = settings.isExplicitTypeHierarchy();
-	instantiateNullPredicates = settings.isInstantiateNullPredicates();
 	decSettings = settings;
-	tacSettings = tacletSettings;
-
     }
 
 
 
     public void applyChanges() {
-	decSettings.setTimeout(timeout);
-	decSettings.setSaveFile(storeToFile);
-	decSettings.setProgressDialogMode(progressDialogMode);
-	decSettings.setSaveToFile(folder);
-	decSettings.setSMTResDialog(showResultsAfterExecuting);
-	decSettings.setCacheGoals(cacheGoals);
-	tacSettings.setFilename(tacletFolder);
-	tacSettings.setMaxGeneric(maxGenerics);
-	tacSettings.setSaveToFile(storeTacletsToFile);
-	decSettings.setExplicitTypeHierarchy(explicitTypeHierarchy);
-	decSettings.setInstantateNullPredicates(instantiateNullPredicates);
-	for (TemporarySolverSettings setSolver : solverSettings) {
-	    setSolver.apply();
-	}
+        decSettings.setData(settingsData);
 	decSettings.fireSettingsChanged();
-
     }
     
 
@@ -163,10 +88,10 @@ public class TemporarySettings extends Settings {
 
 	    DefaultMutableTreeNode solverOptions = new DefaultMutableTreeNode();
 	    solverOptions.setUserObject(new ContentItem("Solvers",def ));
-	    for (TemporarySolverSettings tss : solverSettings) {
+	    for (SolverType type : settingsData.getSupportedSolvers()) {
 		DefaultMutableTreeNode solver = new DefaultMutableTreeNode();
-		solver.setUserObject(new ContentItem(tss.toString(),
-		        buildModel(tss.toString(), getSolverData(tss))));
+		solver.setUserObject(new ContentItem(type.getName(),
+		        buildModel(type.getName(), getSolverData(type))));
 		solverOptions.add(solver);
 	    }
 	    
@@ -206,13 +131,13 @@ public class TemporarySettings extends Settings {
      new TableCheckBox() {
      public boolean prepareValues() {
      setTitle("Use explicit type hierarchy.");
-     setSelected(explicitTypeHierarchy);
+     setSelected(settingsData.useExplicitTypeHierarchy);
      return true;
      }
     
      @Override
      public void eventChange() {
-     explicitTypeHierarchy = isSelected();
+        settingsData.useExplicitTypeHierarchy = isSelected();
      }
     
     @Override
@@ -223,13 +148,13 @@ public class TemporarySettings extends Settings {
      new TableCheckBox() {
      public boolean prepareValues() {
      setTitle("Instantiate null predicates (recommended).");
-     setSelected(instantiateNullPredicates);
+     setSelected(settingsData.useNullInstantiation);
      return true;
      }
     
      @Override
      public void eventChange() {
-       instantiateNullPredicates = isSelected();
+       settingsData.useNullInstantiation = isSelected();
      }
          @Override
      public String getInfo() {
@@ -241,17 +166,16 @@ public class TemporarySettings extends Settings {
     
 
     
-    
 
-    private TableComponent[] getSolverData(TemporarySolverSettings tss) {
+
+    private TableComponent[] getSolverData(final SolverType type) {
 	TableComponent data[] = {
-	        new TableProperty(tss){
+	        new TableProperty(type){
 
 		
                     public boolean prepareValues() {
 			 this.setTitle("Name:");
-			 this.setValue(((TemporarySolverSettings)this.getUserObject())
-				 .solverType.getName());
+			 this.setValue(type.getName());
 			 this.setEditable(false);
 	                 return true;
                     }
@@ -259,13 +183,12 @@ public class TemporarySettings extends Settings {
 		    public void eventChange() {}
 	            
 	        },
-	        new TableProperty(tss){
-
-	
+	        new TableProperty(type){	
                     public boolean prepareValues() {
-			 this.setTitle("Installed:");			 
-			 this.setValue(((TemporarySolverSettings)this.getUserObject())
-				 .solverType.isInstalled(true));
+                	 System.out.println("CHECK: "+ type.getExecutionCommand());
+			 this.setTitle("Installed:");	
+			 
+			 this.setValue(type.isInstalled(true));
 			 this.setEditable(false);
 			 
 	                return true;
@@ -283,18 +206,19 @@ public class TemporarySettings extends Settings {
 	        
 	        
 	        
-	        new TableProperty(tss) {
+	        new TableProperty(type) {
 		
                    public boolean prepareValues() {
 			 this.setTitle("Command:");
-			 this.setValue(((TemporarySolverSettings)this.getUserObject())
-				 .command);
+			 String command = settingsData.getCommand(type);
+			 this.setValue(command);
 			 this.setEditable(true);
 	                return true;
                     }
 
 		    public void eventChange() {
-		        ((TemporarySolverSettings) getUserObject()).command = getValue();
+			System.out.println("CHANGE");
+		        settingsData.setCommand(type,  getValue());
 		    }	
 		    
 	
@@ -333,18 +257,14 @@ public class TemporarySettings extends Settings {
 	        },*/
 	
 	        
-	        new TableExplanation(tss,"Information"){
+	        new TableExplanation(type,"Information"){
 	            public boolean visible() {
-	        	SolverType solverType =  ((TemporarySolverSettings) getUserObject())
-	        	.solverType;
-	        	String info = solverType.getInfo();
+	        	String info = type.getInfo();
 	        	return info !=  null && !info.isEmpty();
 	            };
 	            public boolean prepareValues() {
 	        	super.prepareValues();
-	        	SolverType solverType =  ((TemporarySolverSettings) getUserObject())
-	        	.solverType;
-	        	String info = solverType.getInfo();
+	        	String info = type.getInfo();
 	        	
 	        	if(info ==  null || info.isEmpty()){
 	        	    // Don't show the component if there is no information
@@ -368,13 +288,13 @@ public class TemporarySettings extends Settings {
 	new TableCheckBox() {
 	    public boolean prepareValues() {
 		setTitle("Show results in a dialog after executing the solvers.");
-		setSelected(showResultsAfterExecuting);
+		setSelected(settingsData.showResultsAfterExecution);
 		return true;
 	    }
 
 	    @Override
 	    public void eventChange() {
-		showResultsAfterExecuting = isSelected();
+		settingsData.showResultsAfterExecution = isSelected();
 	    }
 	    
 	    @Override
@@ -390,14 +310,14 @@ public class TemporarySettings extends Settings {
 
 	    public boolean prepareValues() {
 		setTitle("Store translation to file:");
-		setFolder(folder);
-		setActivated(storeToFile);
+		setFolder(settingsData.pathForSMTTranslation);
+		setActivated(settingsData.storeSMTTranslationToFile);
 		return true;
 	    }
 
 	    public void eventChange() {
-		folder = getFolder();
-		storeToFile = isActivated();
+		settingsData.pathForSMTTranslation = getFolder();
+		settingsData.storeSMTTranslationToFile = isActivated();
 	    }
 	    
 
@@ -424,16 +344,16 @@ public class TemporarySettings extends Settings {
 	
 	
 	
-	 new TableComboBox(progressDialogMode,getProgressMode(SMTSettings.PROGRESS_MODE_USER),
-	         getProgressMode(SMTSettings.PROGRESS_MODE_CLOSE),
-	         getProgressMode(SMTSettings.PROGRESS_MODE_CLOSE_FIRST)) {
+	 new TableComboBox(settingsData.modeOfProgressDialog,getProgressMode(SettingsData.PROGRESS_MODE_USER),
+	         getProgressMode(SettingsData.PROGRESS_MODE_CLOSE),
+	         getProgressMode(SettingsData.PROGRESS_MODE_CLOSE_FIRST)) {
 
 	    public void eventChange() {
-		progressDialogMode = getSelectedItemIndex();
+		settingsData.modeOfProgressDialog = getSelectedItemIndex();
 	    }
 
 	    public boolean prepareValues() {
-		setSelectedItem(progressDialogMode);
+		setSelectedItem(settingsData.modeOfProgressDialog);
 		return true;
 	    }
 	    
@@ -456,14 +376,14 @@ public class TemporarySettings extends Settings {
 	new TableProperty(this) {
 
 	    public void eventChange() {
-	        int value;
+	        long value;
 	        try {
 		    float val = Float.parseFloat(getValue());
-		    value = (int)(val*10);
+		    value = (int)(val*1000);
 	        } catch (NumberFormatException e) {
-		    value = timeout;
+		    value = settingsData.timeout;
 	        }
-	        timeout = value;
+	        settingsData.timeout = value;
 	        
 	        
 
@@ -471,13 +391,40 @@ public class TemporarySettings extends Settings {
 	
             public boolean prepareValues() {
 		setTitle("Timeout:");
-		setValue(((float)timeout/10));
+		setValue(((float)settingsData.timeout/1000));
 	        return true;
             }
             
             public String getInfo() {
         	return "Timeout for the external solvers in seconds. Fractions of a second are allowed.\n" +
         		"Example: 6.5";
+            };
+
+
+	},
+	new TableProperty(this) {
+
+	    public void eventChange() {
+	        int value;
+	        try {
+		   value = Integer.parseInt(getValue()); 
+	        } catch (NumberFormatException e) {
+		    value = settingsData.maxConcurrentProcesses;
+	        }
+	        settingsData.maxConcurrentProcesses = value;
+	        
+	        
+
+	    }
+	
+            public boolean prepareValues() {
+		setTitle("Concurrent Processes:");
+		setValue(settingsData.maxConcurrentProcesses);
+	        return true;
+            }
+            
+            public String getInfo() {
+        	return "Maximal number or processes that are allowed to run concurrently.";
             };
 
 
@@ -495,16 +442,16 @@ public class TemporarySettings extends Settings {
 	        new TableSaveToFile() {
 
 		    public boolean prepareValues() {
-		        setFolder(tacletFolder);
-		        setActivated(storeTacletsToFile);
+		        setFolder(settingsData.pathForTacletTranslation);
+		        setActivated(settingsData.storeTacletTranslationToFile);
 		        //enable(storeTacletsToFile);
 		        setTitle("Store taclet translation to file:");
 		        return true;
 		    }
 
 		    public void eventChange() {
-		        tacletFolder = getFolder();
-		        storeTacletsToFile = isActivated();
+		        settingsData.pathForTacletTranslation = getFolder();
+		        settingsData.storeTacletTranslationToFile = isActivated();
 		       // enable(isActivated());
 
 		    }
@@ -531,14 +478,14 @@ public class TemporarySettings extends Settings {
 		        try {
 			    value = Integer.parseInt(getValue());
 		        } catch (NumberFormatException e) {
-			    value = maxGenerics;
+			    value = settingsData.maxGenericSorts;
 		        }
-		        maxGenerics = value;
+		        settingsData.maxGenericSorts = value;
 		    }
 
 		    public boolean prepareValues() {
 			setTitle("Maximum number of different generic sorts:");
-		        setValue(maxGenerics);
+		        setValue(settingsData.maxGenericSorts);
 		        return true;
 		    };
 		    

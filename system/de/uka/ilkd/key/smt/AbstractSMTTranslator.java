@@ -16,8 +16,6 @@ import java.util.Map.Entry;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.gui.smt.SMTSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -149,7 +147,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     /**Formulae made of taclets, used for assumptions.*/
     private TacletSetTranslation tacletSetTranslation = null;
     
-    private Collection<Taclet> taclets= new LinkedList<Taclet>();
+    //private Collection<Taclet> taclets= new LinkedList<Taclet>();
     
     private HashSet<Term> usedAttributeTerms = new HashSet<Term>();
     
@@ -183,8 +181,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	this(null, s);
     }
     
-    
-    public final StringBuffer translateProblem(Term problem, Services services) throws IllegalFormulaException{
+     
+    public final StringBuffer translateProblem(Term problem, Services services, SMTSettings settings) throws IllegalFormulaException{
 
 	StringBuffer hb = translateTerm(problem,new Vector<QuantifiableVariable>(),services);
 
@@ -199,10 +197,10 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
 	
 
-	tacletAssumptions = translateTaclets(services);
+	tacletAssumptions = translateTaclets(services,settings);
 
 	
-	return buildComplText(services, hb);
+	return buildComplText(services, hb, settings);
     }
 
     /**
@@ -212,7 +210,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * @return A StringBuffer representing the sequent in the given syntax.
      * @throws IllegalFormulaException if the sequent could not be translated.
      */
-    public final StringBuffer translate(Sequent sequent, Services services)
+    public final StringBuffer translate(Sequent sequent, Services services,SMTSettings settings)
 	    throws IllegalFormulaException {
 
 	// translate
@@ -233,7 +231,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	
 	hb = this.translateLogicalImply(ante, succ);
 
-	StringBuffer s = buildComplText(services, hb);
+	StringBuffer s = buildComplText(services, hb,settings);
 	/*StringBuffer s = buildCompleteText(hb, assumptions, this.buildTranslatedFuncDecls(), this
 		.buildTranslatedPredDecls(), this.buildTranslatedSorts(), this.buildSortHierarchy());*/
 	
@@ -253,7 +251,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * @param assumptionTypes  
      * @return ArrayList of Formulas, that are assumed to be true.
      */
-    private ArrayList<StringBuffer> getAssumptions(Services services, ArrayList<ContextualBlock> assumptionTypes) throws IllegalFormulaException {
+    private ArrayList<StringBuffer> getAssumptions(Services services, ArrayList<ContextualBlock> assumptionTypes,
+	    SMTSettings settings) throws IllegalFormulaException {
 	ArrayList<StringBuffer> toReturn = new ArrayList<StringBuffer>();
 	     
 	// add the type definitions
@@ -268,7 +267,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	//this means, add the typepredicates, that are needed to define
 	//for every type, what type they are (direct) subtype of
 	start = toReturn.size();
-	toReturn.addAll(this.getSortHierarchyPredicates(services));
+	toReturn.addAll(this.getSortHierarchyPredicates(services,settings));
 	assumptionTypes.add(new ContextualBlock(start,toReturn.size()-1,ContextualBlock.ASSUMPTION_TYPE_HIERARCHY));
 	//add the formulas, that make sure, type correctness is kept, also
 	//for interpreted functions
@@ -365,7 +364,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * @return A StringBuffer, representing the term in the given syntax.
      * @throws IllegalArgumentException if the term is not of type FORMULA or could not be translated.
      */
-    public final StringBuffer translate(Term t, Services services) 
+    public final StringBuffer translate(Term t, Services services,SMTSettings settings) 
     		throws IllegalArgumentException {
 	//check, if the term is of type formula. Otherwise a translation does not make sense
 	if (t.sort() != Sort.FORMULA) {
@@ -375,18 +374,19 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	try {
 	    StringBuffer form;
 	    form = translateTerm(t, new Vector<QuantifiableVariable>(), services);
-	    return buildComplText(services, form);
+	    return buildComplText(services, form,settings);
 	} catch (IllegalFormulaException e) {
 	    throw new IllegalArgumentException("Illegal formula. Can not be translated");
 	}
     }
     
-    private StringBuffer buildComplText(Services serv, StringBuffer formula) throws IllegalFormulaException {
+    private StringBuffer buildComplText(Services serv, StringBuffer formula, SMTSettings settings) throws IllegalFormulaException {
 	ArrayList<ContextualBlock> assumptionTypes = new ArrayList<ContextualBlock>();
 	ArrayList<ContextualBlock> predicateTypes = new ArrayList<ContextualBlock>();
-	return buildCompleteText(formula, this.getAssumptions(serv, assumptionTypes),assumptionTypes, this.buildTranslatedFuncDecls(), this
+	return buildCompleteText(formula, this.getAssumptions(serv, assumptionTypes,settings)
+		,assumptionTypes, this.buildTranslatedFuncDecls(), this
 		    .buildTranslatedPredDecls(predicateTypes),predicateTypes, this.buildTranslatedSorts(), this
-		    .buildSortHierarchy(serv));
+		    .buildSortHierarchy(serv,settings));
     }
     
     /**
@@ -395,10 +395,10 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * 
      * @return a sort hierarchy for the sorts
      */
-    private SortHierarchy buildSortHierarchy(Services services) {
-	final SMTSettings settings = ProofSettings.DEFAULT_SETTINGS.getSMTSettings();
+    private SortHierarchy buildSortHierarchy(Services services, SMTSettings settings) {
+	
 	return new SortHierarchy(this.usedDisplaySort, this.typePredicates,
-	settings.isInstantiateNullPredicates(),settings.isExplicitTypeHierarchy(),services);
+	settings.instantiateNullAssumption(),settings.useExplicitTypeHierarchy(),services);
 
     }
 
@@ -407,18 +407,17 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * Also the null type is added to the formula if used before.
      * @return The well defined formula.
      */
-    private ArrayList<StringBuffer> getSortHierarchyPredicates(Services services) {
+    private ArrayList<StringBuffer> getSortHierarchyPredicates(Services services, SMTSettings settings) {
 	Function nullOp = services.getTypeConverter().getHeapLDT().getNull();
-	SortHierarchy sh = this.buildSortHierarchy(services);
+	SortHierarchy sh = this.buildSortHierarchy(services, settings);
 	ArrayList<StringBuffer> toReturn = new ArrayList<StringBuffer>();
 	LinkedList<SortWrapper> list = sh.getSorts();
 	for (SortWrapper swChild : list) {
 	    for (SortWrapper swParent : swChild.getParents()) {
 		StringBuffer form = new StringBuffer();
-		final SMTSettings settings = ProofSettings.DEFAULT_SETTINGS
-		        .getSMTSettings();
+	
 		if (swChild.getSort() == nullOp.sort()
-		        && settings.isInstantiateNullPredicates()) {
+		        && settings.instantiateNullAssumption()) {
 		    form = buildInstantiatedHierarchyPredicate(swChild,
 			    swParent, translateNull());
 		} else {
@@ -1924,27 +1923,27 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     }
     
     
-    /**
-     * Sets the taclets which should be used for translation.
-     * @param tacletSet set of taclets.
-     */
-    public void setTacletsForAssumptions(Collection<Taclet> tacletSet){
-	
-	if(tacletSet == null) {
-	    taclets = new LinkedList<Taclet>();
-	}else{
-	taclets = tacletSet;
-	}
-    }
+//    /**
+//     * Sets the taclets which should be used for translation.
+//     * @param tacletSet set of taclets.
+//     */
+//    public void setTacletsForAssumptions(Collection<Taclet> tacletSet){
+//	
+//	if(tacletSet == null) {
+//	    taclets = new LinkedList<Taclet>();
+//	}else{
+//	taclets = tacletSet;
+//	}
+//    }
     
     /**
      * Translates the list <code>tacletFormulae</code> to the given syntax.
      *
      * @param services used for <code>translateTerm</code>
      */
-    private ArrayList<StringBuffer> translateTaclets(Services services)
+    private ArrayList<StringBuffer> translateTaclets(Services services, SMTSettings settings)
     	throws IllegalFormulaException{
-	
+	Collection<Taclet> taclets = settings.getTaclets(services);
 	ArrayList<StringBuffer> result = new ArrayList<StringBuffer>();
 	if(taclets.isEmpty() || taclets == null){
 	    return result;
@@ -1993,7 +1992,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	}
 	
 	for(TacletFormula tf :  tacletSetTranslation.getTranslation(sorts,terms,
-		ProofSettings.DEFAULT_SETTINGS.getTacletTranslationSettings().getMaxGeneric())){
+		settings.getMaxNumberOfGenerics())){
 	    for(Term subterm : tf.getInstantiations()){
 		 try{
 		     StringBuffer term = translateTerm(subterm,vector,services);    

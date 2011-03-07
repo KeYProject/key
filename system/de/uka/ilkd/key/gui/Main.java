@@ -442,34 +442,7 @@ public final class Main extends JFrame implements IMain {
         ComplexButton comp = createSMTComponent();
         toolBar.add(comp.getActionComponent());
         toolBar.add(comp.getSelectionComponent());
-        JButton button = new JButton("Test");
-        button.addActionListener(new ActionListener() {
-	    
-	    @Override
-	    public void actionPerformed(ActionEvent e) {
-		System.out.println("StartProver");
-		final SolverLauncher launcher = new SolverLauncher();
-		final LinkedList<SMTProblem> problems = new LinkedList<SMTProblem>();
-		for(Goal goal : mediator.getProof().openGoals()){
-		    problems.add(new SMTProblem(goal));
-		}
-		launcher.addListener(new SolverListener());
-		Thread thread = new Thread(new Runnable(
-			) {
-		    
-		    @Override
-		    public void run() {
-			   launcher.launch(problems, mediator.getServices());
-			
-		    }
-		});
-		
-		thread.start();
-	     
-		
-	    }
-	});
-        toolBar.add(button);
+
         
 
         toolBar.addSeparator();
@@ -1397,7 +1370,7 @@ public final class Main extends JFrame implements IMain {
 		
 		smtComponent.setItems(actions);
 	            	
-		SolverTypeCollection active = ProofSettings.DEFAULT_SETTINGS.getSMTSettings().getActiveSolverUnion();
+		SolverTypeCollection active = ProofSettings.DEFAULT_SETTINGS.getSMTSettings().computeActiveSolverUnion();
 		 
 		SMTInvokeAction activeAction = findAction(actions, active);
 		
@@ -1432,8 +1405,7 @@ public final class Main extends JFrame implements IMain {
 		   public void actionPerformed(ActionEvent e) {
 		  
 		       SettingsDialog.INSTANCE.showDialog(TemporarySettings.getInstance(
-			       ProofSettings.DEFAULT_SETTINGS.getSMTSettings(),
-			       ProofSettings.DEFAULT_SETTINGS.getTacletTranslationSettings()));
+			       ProofSettings.DEFAULT_SETTINGS.getSMTSettings()));
 		       
 		       
 		   }
@@ -2662,7 +2634,8 @@ public final class Main extends JFrame implements IMain {
 	    Thread thread = new Thread(new Runnable() {	        
 	        @Override
 	        public void run() {
-	            SolverLauncher launcher = new SolverLauncher();
+	            SMTSettings settings = ProofSettings.DEFAULT_SETTINGS.getSMTSettings();
+	            SolverLauncher launcher = new SolverLauncher(settings);
 	            launcher.addListener(new SolverListener());
 	          
 		    launcher.launch(solverUnion.getTypes(),
