@@ -33,7 +33,6 @@ import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.DependencyContract;
-import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 
@@ -61,30 +60,33 @@ public final class UseDependencyContractRule implements BuiltInRule {
     //internal methods
     //-------------------------------------------------------------------------
     
-    private Term getEqualityDef(Term term, Sequent seq) {
+    private List<Term> getEqualityDefs(Term term, Sequent seq) {
+	final List<Term> result = new LinkedList<Term>();
 	for(ConstrainedFormula cf : seq.antecedent()) {
-	    Term formula = cf.formula();
+	    final Term formula = cf.formula();
 	    if(formula.op() instanceof Equality 
 	       && formula.sub(1).equals(term)) {
-		return formula.sub(0);
+		result.add(formula.sub(0));
 	    }
 	}
-	return null;
+	return result;
     }
     
     
-    private Pair<Term,PosInOccurrence> getEqualityDefAndPos(Term term, 
-	    						    Sequent seq) {
+    private List<Pair<Term,PosInOccurrence>> getEqualityDefsAndPos(Term term, 
+	    						    	   Sequent seq){
+	final List<Pair<Term,PosInOccurrence>> result 
+		= new LinkedList<Pair<Term,PosInOccurrence>>();
 	for(ConstrainedFormula cf : seq.antecedent()) {
-	    Term formula = cf.formula();
+	    final Term formula = cf.formula();
 	    if(formula.op() instanceof Equality 
 	       && formula.sub(1).equals(term)) {
 		final PosInOccurrence pos 
 			= new PosInOccurrence(cf, PosInTerm.TOP_LEVEL, true);
-		return new Pair<Term,PosInOccurrence>(formula.sub(0), pos);
+		result.add(new Pair<Term,PosInOccurrence>(formula.sub(0), pos));
 	    }
 	}
-	return null;
+	return result;
     }    
     
     
@@ -111,16 +113,17 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	   || op == heapLDT.getMemset()) {
 	   return true;
 	} else if(op.arity() == 0) {
-	    final Term def = getEqualityDef(heapTerm, seq);
-	    if(def != null) {
-		return hasRawSteps(def, seq, services);
-	    } else {
-		return false;
-	    }
+	    final List<Term> defs = getEqualityDefs(heapTerm, seq);
+	    for(Term def : defs) {
+		if(hasRawSteps(def, seq, services)) {
+		    return true;
+		}
+	    } 
+	    return false;
 	} else {
 	    return false;
 	}
-    }    
+    }
     
     
     private void getRawSteps(Term heapTerm, 
@@ -138,8 +141,8 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	    result.add(h);	    
 	    getRawSteps(h, seq, services, result);
 	} else if(op.arity() == 0) {
-	    final Term def = getEqualityDef(heapTerm, seq);
-	    if(def != null) {
+	    final List<Term> defs = getEqualityDefs(heapTerm, seq);
+	    for(Term def : defs) {
 		getRawSteps(def, seq, services, result);
 	    }
 	}
@@ -158,15 +161,18 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	   && heapTerm.sub(1).op().equals(locSetLDT.getEmpty())) {
 	    return heapPos;
 	} else if(op.arity() == 0) {
-	    final Pair<Term,PosInOccurrence> def 
-	    	= getEqualityDefAndPos(heapTerm, seq);
-	    if(def != null) {
+	    final List<Pair<Term,PosInOccurrence>> defs 
+	    	= getEqualityDefsAndPos(heapTerm, seq);
+	    for(Pair<Term,PosInOccurrence> def : defs) {
 		final PosInOccurrence defHeapPos = def.second.down(0);
 		assert defHeapPos.subTerm().equals(def.first);
-		return getFreshLocsStep(defHeapPos, seq, services);
-	    } else {
-		return null;
+		final PosInOccurrence pos 
+			= getFreshLocsStep(defHeapPos, seq, services);
+		if(pos != null) {
+		    return pos;
+		}
 	    }
+	    return null;
 	} else {
 	    return null;
 	}
@@ -209,17 +215,18 @@ public final class UseDependencyContractRule implements BuiltInRule {
 		    	    TB.union(services, s, furtherLocs.first), 
 	                    furtherLocs.second); 
 	} else if(op.arity() == 0) {
-	    final Pair<Term,PosInOccurrence> def 
-	    	= getEqualityDefAndPos(heapTerm, seq);
-	    if(def != null) {
+	    final List<Pair<Term,PosInOccurrence>> defs 
+	    	= getEqualityDefsAndPos(heapTerm, seq);
+	    for(Pair<Term,PosInOccurrence> def : defs) {
 		final Pair<Term,ImmutableList<PosInOccurrence>> furtherLocs
 		    = getChangedLocsForStep(def.first, stepHeap, seq, services);
-		return new Pair<Term,ImmutableList<PosInOccurrence>>(
+		if(furtherLocs != null) {
+		    return new Pair<Term,ImmutableList<PosInOccurrence>>(
 				furtherLocs.first, 
 			        furtherLocs.second.prepend(def.second));
+		}
 	    }
 	}
-	assert false;
 	return null;
     }
     
@@ -394,6 +401,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 					step.subTerm().sub(0), 
 					seq, 
 					services);
+	assert changedLocs != null;
 	
 	//store insts in rule app
 	app.setIfInsts(changedLocs.second.prepend(step));
@@ -482,7 +490,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
         if(contracts.isEmpty()) {
             return false;
         }
-        
+      
         //applying a contract here must not create circular dependencies 
         //between proofs
         return goal.proof()
