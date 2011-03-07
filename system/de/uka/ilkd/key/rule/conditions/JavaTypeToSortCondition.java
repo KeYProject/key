@@ -30,16 +30,14 @@ import de.uka.ilkd.key.util.Debug;
 /**
  * Variable condition that enforces a given generic sort to be instantiated with
  * the sort of a program expression a schema variable is instantiated with
- * (currently only schema variables <code>ProgramSVSort.EXPRESSION</code> are
- * supported)
  */
 public final class JavaTypeToSortCondition implements VariableCondition {
 
     private final SchemaVariable exprOrTypeSV;
     private final GenericSort    sort;
     
-    public JavaTypeToSortCondition (final SchemaVariable exprOrTypeSV,
-                                    final GenericSort sort) {
+    public JavaTypeToSortCondition(final SchemaVariable exprOrTypeSV,
+                                   final GenericSort sort) {
         this.exprOrTypeSV = exprOrTypeSV;
         this.sort = sort;
         

@@ -77,7 +77,7 @@ public class TermCreationException extends RuntimeException {
 		    sb.append("(Unknown sort, \"null pointer\")");
 		}
 	    }else{
-		sb.append(" !null! ");
+		sb.append(" !null!\n");
 	    }
 
 	}
