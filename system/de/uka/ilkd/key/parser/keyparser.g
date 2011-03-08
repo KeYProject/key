@@ -3635,17 +3635,31 @@ varcond_hassort [TacletBuilder b]
 {
   ParsableVariable x = null;
   Sort s = null;
+  boolean elemSort = false;
 }
 :
-   HASSORT LPAREN x=varId COMMA s=any_sortId_check[true] RPAREN {
-     if ( !( s instanceof GenericSort ) )
-   	 throw new GenericSortException ( "sort",
-   					  "Generic sort expected", s,
-   					   getFilename (), getLine (), getColumn () );
-     if ( !JavaTypeToSortCondition. checkSortedSV((SchemaVariable)x) )
-   	 semanticError("Expected schema variable of kind EXPRESSION or TYPE, " +
-   					"but is " + x);
-     b.addVariableCondition(new JavaTypeToSortCondition ((SchemaVariable)x, (GenericSort)s));
+   HASSORT 
+   LPAREN 
+   (x=varId | ELEMSORT LPAREN x=varId RPAREN {elemSort = true;}) 
+   COMMA 
+   s=any_sortId_check[true] 
+   RPAREN 
+   {
+     if(!(s instanceof GenericSort)) {
+   	 throw new GenericSortException("sort",
+   					"Generic sort expected", 
+   					s,
+   					getFilename(),
+   					getLine(), 
+   					getColumn());
+     } else if (!JavaTypeToSortCondition.checkSortedSV((SchemaVariable)x)) {
+   	 semanticError("Expected schema variable of kind EXPRESSION or TYPE, " 
+   	 	       + "but is " + x);
+     } else {
+         b.addVariableCondition(new JavaTypeToSortCondition((SchemaVariable)x, 
+     							    (GenericSort)s,
+     							    elemSort));
+     }
    }
 ;
 
