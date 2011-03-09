@@ -16,6 +16,7 @@ import java.util.WeakHashMap;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
@@ -26,7 +27,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
 /**
- * ensures that the types where the variables are declared are not the same
+ * General varcond for checking relationships between types of schema variables.
  */
 public final class TypeComparisonCondition extends VariableConditionAdapter {
     
@@ -58,9 +59,11 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
 	this.mode = mode;
     }
     
+    
     public TypeResolver getFirstResolver(){
 	return fst;
     }
+    
     
     public TypeResolver getSecondResolver(){
 	return snd;
@@ -133,6 +136,7 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
 	return result;
     }
     
+    
     private static void putIntoCache(Sort s1, Sort s2, boolean b) {
 	Map<Sort,Boolean> map = disjointnessCache.get(s1);
 	if(map == null) {
@@ -175,20 +179,24 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
 	    boolean fstElemIsObject = fstElemSort.extendsTrans(objectSort);
 	    boolean sndElemIsObject = sndElemSort.extendsTrans(objectSort);
 	    
+	    //try to get KeYJavaTypes (only works for types existing in program)
+	    final KeYJavaType fstKJT = javaInfo.getKeYJavaType(fstSort);
+	    final KeYJavaType sndKJT = javaInfo.getKeYJavaType(sndSort);
+	    
 	    if(fstElemIsObject 
 	       && sndElemIsObject
 	       && !(fstElemSort instanceof ArraySort)
 	       && !(sndElemSort instanceof ArraySort)
-	       && (javaInfo.getKeYJavaType(fstSort).getJavaType() 
+	       && (fstKJT != null && fstKJT.getJavaType() 
 		       	instanceof InterfaceDeclaration
-		   || javaInfo.getKeYJavaType(sndSort).getJavaType() 
+		   || sndKJT != null && sndKJT.getJavaType() 
 		   	instanceof InterfaceDeclaration)) {
 		//be conservative wrt. modularity: program extensions may add 
 		//new subtypes between object sorts, if none of them is
 		//an array sort and at least one of them is an interface sort
 		result = false;
 	    } else {
-		//otherwise, we just check whether *currently* there are is 
+		//otherwise, we just check whether *currently* there is 
 		//some common subsort
 		result = true;
 		for(Named n : services.getNamespaces().sorts().allElements()) {
