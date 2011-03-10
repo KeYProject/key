@@ -45,6 +45,7 @@ import de.uka.ilkd.key.pp.*;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
+import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.smt.SMTRule;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
@@ -1319,9 +1320,11 @@ public final class Main extends JFrame implements IMain {
             public void actionPerformed(ActionEvent e) {
                 boolean b = ((JCheckBoxMenuItem)e.getSource()).isSelected();           
                 ProofSettings.DEFAULT_SETTINGS.
-                getGeneralSettings().setOneStepSimplification(b);           
+                getGeneralSettings().setOneStepSimplification(b);
+                OneStepSimplifier.INSTANCE.refresh(mediator.getSelectedProof());
         }});
         registerAtMenu(options, oneStepSimplificationOption);
+        mediator.addKeYSelectionListener(OneStepSimplifier.INSTANCE);
         
         return options;
     }
