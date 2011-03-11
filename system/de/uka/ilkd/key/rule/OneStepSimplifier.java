@@ -472,7 +472,7 @@ public final class OneStepSimplifier implements BuiltInRule,
 	active = ProofSettings.DEFAULT_SETTINGS
 		              .getGeneralSettings()
 		              .oneStepSimplification();
-	if(active) {
+	if(active && !proof.closed()) {
 	    initIndices(proof);
 	} else {
 	    shutdownIndices();	    
