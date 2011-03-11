@@ -3,21 +3,22 @@ package de.uka.ilkd.key.gui.smt;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.ScrollPane;
-import java.awt.Dialog.ModalityType;
+
 import java.awt.event.ActionListener;
-import java.util.Collection;
+
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JComponent;
+
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-public class ProgressDialog2 extends JDialog {
-    
+public class ProgressDialog extends JDialog {
+
+    private static final long serialVersionUID = 1L;
     private ScrollPane scrollPane;
     private JPanel     panelContainer;
     private JPanel     buttonContainer;
@@ -26,16 +27,16 @@ public class ProgressDialog2 extends JDialog {
     private JButton    applyButton;
     private JButton    stopButton;
     private JLabel     infoLabel;
-    private ProgressPanel2 []panels;
+
     
     
     
     
-    public ProgressDialog2(ProgressPanel2 [] panels, ActionListener alDiscardButton,
+    public ProgressDialog(ProgressPanel [] panels, ActionListener alDiscardButton,
 	                                              ActionListener alApplyButton,
 	                                              ActionListener alStopButton){
-	this.panels = panels;
-	for(ProgressPanel2 panel : panels){
+
+	for(ProgressPanel panel : panels){
 	    panel.setAlignmentX(LEFT_ALIGNMENT);
 	    
 	    panel.setMaximumSize(new Dimension(Integer.MAX_VALUE,50));
@@ -50,6 +51,7 @@ public class ProgressDialog2 extends JDialog {
 	this.setSize(500, 250);
 	this.setResizable(false);
 	this.setTitle("Progress Dialog");
+	this.setModal(true);
 	getDiscardButton().addActionListener(alDiscardButton);
 	getApplyButton().addActionListener(alApplyButton);
 	getStopButton().addActionListener(alStopButton);

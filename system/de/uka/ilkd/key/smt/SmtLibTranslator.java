@@ -539,16 +539,7 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 	return true;
     }
     
-    private boolean haveSameSortSignature(FunctionWrapper fw1, FunctionWrapper fw2){
-	Function f1 = fw1.getFunction();
-	Function f2 = fw2.getFunction();
-	if(!fw1.getName().equals(fw2.getName()) && 
-	   f1.sort().equals(f2.sort()) &&
-	   haveSameArgs(f1.argSorts(),f2.argSorts())){
-	   return true;
-	}
-	return false;
-    }
+
     
     private StringBuffer getQuantifiedVariable(int pos){
 	return new StringBuffer("?n"+pos);

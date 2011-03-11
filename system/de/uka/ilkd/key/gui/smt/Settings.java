@@ -13,7 +13,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultTreeModel;
 
 
-
+ 
 
 public abstract class Settings {
     abstract public DefaultTreeModel    getContent();

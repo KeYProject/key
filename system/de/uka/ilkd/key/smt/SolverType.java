@@ -12,38 +12,35 @@ public interface SolverType {
     public String getName();
 
     public boolean isInstalled(boolean recheck);
-    
-    
 
     public void useTaclets(boolean b);
 
     public SMTSolverResult interpretAnswer(String text, String error, int val);
 
     public String getInfo();
-    
-   
-    
+
     /**
-     * Get the command for executing the external prover.
-     * This is a hardcoded default value. It might be overridden by user settings
-     * @param filename the location, where the file is stored.
-     * @param formula the formula, that was created by the translator
-     * @return Array of Strings, that can be used for executing an external decider.
+     * Get the command for executing the external prover. This is a hardcoded
+     * default value. It might be overridden by user settings
+     * 
+     * @param filename
+     *            the location, where the file is stored.
+     * @param formula
+     *            the formula, that was created by the translator
+     * @return Array of Strings, that can be used for executing an external
+     *         decider.
      */
-     public String getExecutionCommand(String filename,
-	    				            String formula);
-     
-     
-     public String getExecutionCommand();
-     
-     public void setExecutionCommand(String s);
-     
-     public String getDefaultExecutionCommand();
-     
-     
+    public String getExecutionCommand(String filename, String formula);
 
+    public String getExecutionCommand();
 
-    static public final SolverType Z3_SOLVER = new AbstractSolverType(){
+    public void setExecutionCommand(String s);
+
+    public String getDefaultExecutionCommand();
+
+    public SMTTranslator getTranslator(Services services);
+
+    static public final SolverType Z3_SOLVER = new AbstractSolverType() {
 
 	@Override
 	public String getExecutionCommand(String filename, String formula) {
@@ -52,8 +49,9 @@ public interface SolverType {
 
 	@Override
 	public SMTSolver createSolver(SMTProblem problem,
-		SolverListener listener, Services services) {
-	    return new SMTSolverImplementation(problem, listener, services,this);
+	        SolverListener listener, Services services) {
+	    return new SMTSolverImplementation(problem, listener, services,
+		    this);
 	}
 
 	@Override
@@ -61,40 +59,45 @@ public interface SolverType {
 	    return "Z3";
 	}
 
-	public SMTSolverResult interpretAnswer(String text, String error, int val) {
-	    if (val == 0) {
-		//no error occured
-		if (text.contains("unsat")) {
-		    return SMTSolverResult.createValidResult(text,getName());
-		} else if (text.contains("sat")) {
-		    return SMTSolverResult.createInvalidResult(text,getName());
-		} else {
-		    return SMTSolverResult.createUnknownResult(text,getName());
-		}
-	    } else if ((val == 112 && text.contains("unknown")) || val ==139) {
-		//the result was unknown
-		return SMTSolverResult.createUnknownResult(text,getName());
-	    } else {
-		//something went wrong
-		throw new IllegalResultException("Code "+ val+": " + error);
-	    }
+	@Override
+	public SMTTranslator getTranslator(Services services) {
+	    return new SmtLibTranslator(services);
 	}
 
+	public SMTSolverResult interpretAnswer(String text, String error,
+	        int val) {
+	    if (val == 0) {
+		// no error occured
+		if (text.contains("unsat")) {
+		    return SMTSolverResult.createValidResult(text, getName());
+		} else if (text.contains("sat")) {
+		    return SMTSolverResult.createInvalidResult(text, getName());
+		} else {
+		    return SMTSolverResult.createUnknownResult(text, getName());
+		}
+	    } else if ((val == 112 && text.contains("unknown")) || val == 139) {
+		// the result was unknown
+		return SMTSolverResult.createUnknownResult(text, getName());
+	    } else {
+		// something went wrong
+		throw new IllegalResultException("Code " + val + ": " + error);
+	    }
+	}
 
 	@Override
 	public String getInfo() {
 
-	    return "Z3 does not use quantifier elimination by default. This means for example that" +
-	    " the following problem cannot be solved automatically by default:\n\n"
-	    +"\\functions{\n"+
-	    "\tint n;\n"+
-	    "}\n\n"+
-	    "\\problem{\n"+
-	    "\t((\\forall int x;(x<=0 | x >= n+1)) & n >= 1)->false\n"+
-	    "}"+
-	    "\n\n"+
-	    "You can activate quantifier elimination by appending QUANT_FM=true to"+
-	    " the execution command."; 
+	    return "Z3 does not use quantifier elimination by default. This means for example that"
+		    + " the following problem cannot be solved automatically by default:\n\n"
+		    + "\\functions{\n"
+		    + "\tint n;\n"
+		    + "}\n\n"
+		    + "\\problem{\n"
+		    + "\t((\\forall int x;(x<=0 | x >= n+1)) & n >= 1)->false\n"
+		    + "}"
+		    + "\n\n"
+		    + "You can activate quantifier elimination by appending QUANT_FM=true to"
+		    + " the execution command.";
 	}
 
     };
@@ -106,14 +109,20 @@ public interface SolverType {
 	}
 
 	@Override
-	public SMTSolver createSolver(SMTProblem problem, SolverListener listener,
-		Services services) {
-	    return new SMTSolverImplementation(problem, listener, services,this);
+	public SMTSolver createSolver(SMTProblem problem,
+	        SolverListener listener, Services services) {
+	    return new SMTSolverImplementation(problem, listener, services,
+		    this);
 	}
 
 	@Override
 	public String getExecutionCommand(String filename, String formula) {
-	    return  "cvc3 -lang smt +model " + filename;
+	    return "cvc3 -lang smt +model " + filename;
+	}
+
+	@Override
+	public SMTTranslator getTranslator(Services services) {
+	    return new SmtLibTranslator(services);
 	}
 
 	@Override
@@ -123,22 +132,21 @@ public interface SolverType {
 
 	@Override
 	public SMTSolverResult interpretAnswer(String text, String error,
-		int val) {
+	        int val) {
 	    if (val == 0) {
-		//normal termination, no error
+		// normal termination, no error
 		if (text.startsWith("unsat\n")) {
-		    return SMTSolverResult.createValidResult(text,getName());
+		    return SMTSolverResult.createValidResult(text, getName());
 		} else if (text.startsWith("sat\n")) {
-		    return SMTSolverResult.createInvalidResult(text,getName());
+		    return SMTSolverResult.createInvalidResult(text, getName());
 		} else {
-		    return SMTSolverResult.createUnknownResult(text,getName());
+		    return SMTSolverResult.createUnknownResult(text, getName());
 		}
 	    } else {
-		//error termination
+		// error termination
 		throw new IllegalResultException(error);
 	    }
 	}
-
 
     };
     static public final SolverType YICES_SOLVER = new AbstractSolverType() {
@@ -149,9 +157,15 @@ public interface SolverType {
 	}
 
 	@Override
-	public SMTSolver createSolver(SMTProblem problem, SolverListener listener,
-		Services services) {
-	    return new SMTSolverImplementation(problem, listener, services,this);
+	public SMTSolver createSolver(SMTProblem problem,
+	        SolverListener listener, Services services) {
+	    return new SMTSolverImplementation(problem, listener, services,
+		    this);
+	}
+
+	@Override
+	public SMTTranslator getTranslator(Services services) {
+	    return new SmtLibTranslator(services);
 	}
 
 	@Override
@@ -161,20 +175,20 @@ public interface SolverType {
 
 	@Override
 	public String getInfo() {
-	    return "Use the newest release of version 1.x instead of version 2. Yices 2 does not support the " +
-	    "required logic AUFLIA.";
+	    return "Use the newest release of version 1.x instead of version 2. Yices 2 does not support the "
+		    + "required logic AUFLIA.";
 	}
 
 	@Override
 	public SMTSolverResult interpretAnswer(String text, String error,
-		int val) {
+	        int val) {
 	    if (val == 0) {
 		if (text.startsWith("unsat\n")) {
-		    return SMTSolverResult.createValidResult(text,getName());
+		    return SMTSolverResult.createValidResult(text, getName());
 		} else if (text.startsWith("sat\n")) {
-		    return SMTSolverResult.createInvalidResult(text,getName());
+		    return SMTSolverResult.createInvalidResult(text, getName());
 		} else {
-		    return SMTSolverResult.createUnknownResult(text,getName());
+		    return SMTSolverResult.createUnknownResult(text, getName());
 		}
 
 	    } else {
@@ -191,9 +205,15 @@ public interface SolverType {
 	}
 
 	@Override
-	public SMTSolver createSolver(SMTProblem problem, SolverListener listener,
-		Services services) {
-	    return new SMTSolverImplementation(problem, listener, services, this);
+	public SMTSolver createSolver(SMTProblem problem,
+	        SolverListener listener, Services services) {
+	    return new SMTSolverImplementation(problem, listener, services,
+		    this);
+	}
+
+	@Override
+	public SMTTranslator getTranslator(Services services) {
+	    return new SimplifyTranslator(services);
 	}
 
 	@Override
@@ -208,22 +228,28 @@ public interface SolverType {
 
 	@Override
 	public SMTSolverResult interpretAnswer(String text, String error,
-		int val) {
-
+	        int val) {
 	    if (val == 0) {
-		//no error occured
+		// no error occured
 		if (meansValid(text)) {
-		    return SMTSolverResult.createValidResult(text,getName());
+		    return SMTSolverResult.createValidResult(text, getName());
 		} else if (meansInvalid(text)) {
-		    return SMTSolverResult.createInvalidResult(text,getName());
+		    return SMTSolverResult.createInvalidResult(text, getName());
+		} else if (meansBadInput(text)) {
+		    throw new IllegalResultException(text);
+
 		} else {
-		    return SMTSolverResult.createUnknownResult(text,getName());
-		} 
+		    return SMTSolverResult.createUnknownResult(text, getName());
+		}
 	    } else {
-		//error occured
+		// error occured
 		throw new IllegalResultException(error);
 	    }
 
+	}
+
+	private boolean meansBadInput(String text) {
+	    return text.indexOf("Bad input") >= 0;
 	}
 
 	private boolean meansValid(String text) {
@@ -231,12 +257,12 @@ public interface SolverType {
 	    String wanted = "Valid.";
 	    int pos = text.indexOf(wanted);
 	    if (pos != -1) {
-		//Valid. is found. check, if it is on the end of the String and if only \n are following
+		// Valid. is found. check, if it is on the end of the String and
+		// if only \n are following
 		toReturn = true;
 		pos = pos + wanted.length();
 		for (int i = pos + 1; i < text.length(); i++) {
-		    if (text.charAt(i) != '\n'
-			&& text.charAt(i) != ' ') {
+		    if (text.charAt(i) != '\n' && text.charAt(i) != ' ') {
 			toReturn = false;
 		    }
 		}
@@ -249,12 +275,12 @@ public interface SolverType {
 	    String wanted = "Invalid.";
 	    int pos = text.indexOf(wanted);
 	    if (pos != -1) {
-		//Valid. is found. check, if it is on the end of the String and if only \n are following
+		// Valid. is found. check, if it is on the end of the String and
+		// if only \n are following
 		toReturn = true;
 		pos = pos + wanted.length();
 		for (int i = pos + 1; i < text.length(); i++) {
-		    if (text.charAt(i) != '\n'
-			&& text.charAt(i) != ' ') {
+		    if (text.charAt(i) != '\n' && text.charAt(i) != ' ') {
 			toReturn = false;
 		    }
 		}
@@ -276,13 +302,13 @@ abstract class AbstractSolverType implements SolverType {
 	if (first >= 0) {
 	    cmd = cmd.substring(0, first);
 	}
-	
+
 	if (checkEnvVariable(cmd)) {
 	    return true;
 	} else {
-	    
+
 	    File file = new File(cmd);
-	    
+
 	    return file.exists();
 
 	}
@@ -290,7 +316,6 @@ abstract class AbstractSolverType implements SolverType {
 
     @Override
     public void useTaclets(boolean b) {
-
 
     }
 
@@ -304,7 +329,7 @@ abstract class AbstractSolverType implements SolverType {
      */
     public boolean isInstalled(boolean recheck) {
 	if (recheck || !installWasChecked) {
-	    
+
 	    String cmd = getExecutionCommand();
 	    isInstalled = isInstalled(cmd);
 	    if (isInstalled) {
@@ -342,23 +367,13 @@ abstract class AbstractSolverType implements SolverType {
     public String getExecutionCommand() {
 	return executionCommand;
     }
-    
 
     public void setExecutionCommand(String s) {
-        
-        executionCommand = s;
+
+	executionCommand = s;
     }
 
-
-
-
-    public String toString(){
+    public String toString() {
 	return getName();
     }
 }
-
-
-
-
-
-

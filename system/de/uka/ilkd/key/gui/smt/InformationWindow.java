@@ -11,6 +11,10 @@ import javax.swing.JTextArea;
 
 
 public class InformationWindow extends JDialog {
+
+    private static final long serialVersionUID = 1L;
+
+
     static class Information{
 	final String content;
 	final String title;

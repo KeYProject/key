@@ -21,9 +21,13 @@ import javax.swing.plaf.basic.BasicProgressBarUI;
 
 import de.uka.ilkd.key.gui.smt.InformationWindow.Information;
 
-public class ProgressPanel2 extends JPanel{
+public class ProgressPanel extends JPanel{
     
+
+    private static final long serialVersionUID = 1L;
+
     private static class SingleProgressPanel extends JPanel{
+        private static final long serialVersionUID = 1L;
 	final JProgressBar bar = new JProgressBar();
 	final JButton      button = new JButton();
 	final Collection<Information> information = new LinkedList<Information>();
@@ -58,7 +62,7 @@ public class ProgressPanel2 extends JPanel{
     private SingleProgressPanel bars [];
     
     
-    public ProgressPanel2(String name, int numberOfProcesses, int resolution, String [] names){
+    public ProgressPanel(String name, int numberOfProcesses, int resolution, String [] names){
 	assert numberOfProcesses == names.length;
 	this.setBorder(BorderFactory.createTitledBorder(null, name,
 			TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION,

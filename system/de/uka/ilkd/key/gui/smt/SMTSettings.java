@@ -237,15 +237,21 @@ class SettingsData{
 
     
     private static void store(Properties props,String key, String value){
-	props.setProperty(key, value);
+	if(key != null && value != null){
+	    props.setProperty(key, value);
+	}
     }
     
     private static void store(Properties props,String key, boolean value){
-	 props.setProperty(key,value ? "true" : "false");
+	if(key != null){ 
+	    props.setProperty(key,value ? "true" : "false");
+	}
     }
     
     private static void store(Properties props,String key, long value){
-	 props.setProperty(key,Long.toString(value));
+	if(key != null){ 
+	    props.setProperty(key,Long.toString(value));
+	}
    }
     
     public static class SolverData{
@@ -264,7 +270,6 @@ class SettingsData{
 	    private void readSettings(Properties props){
 		
 		command = read(props,EXECUTION_STRING+type.getName(),command);
-		System.out.println("READ: "+ EXECUTION_STRING+type.getName()+" "+command);
 		type.setExecutionCommand(command);
 		
 	    }
@@ -355,7 +360,6 @@ public class SMTSettings implements Settings, de.uka.ilkd.key.smt.SMTSettings{
     }
     
     public void setActiveSolverUnion(SolverTypeCollection solverUnion){
-	
 	if(activeSolverUnion != solverUnion){
 	    activeSolverUnion = solverUnion;
 	    settingsData.activeSolver = activeSolverUnion.name();
@@ -408,7 +412,6 @@ public class SMTSettings implements Settings, de.uka.ilkd.key.smt.SMTSettings{
      * represents the stored settings
      */
     public void readSettings(Properties props) {
-	System.out.println("READ SETTINGS");
 	settingsData.readSettings(props);
 	tacletAssignmentFromString(settingsData.tacletSelection);
 	activeSolverUnion = getSolverUnion(settingsData.activeSolver);
@@ -420,7 +423,6 @@ public class SMTSettings implements Settings, de.uka.ilkd.key.smt.SMTSettings{
      * @param props the Properties object where to write the settings as (key, value) pair
      */
     public void writeSettings(Properties props) {
-	System.out.println("WRITE SETTINGS");
 	settingsData.tacletSelection = tacletAssignmentToString();
 	settingsData.activeSolver = computeActiveSolverUnion().name();
 	settingsData.writeSettings(props);

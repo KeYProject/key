@@ -11,13 +11,11 @@
 package de.uka.ilkd.key.smt;
 
 import java.util.*;
-import java.util.Map.Entry;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
@@ -137,9 +135,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     /** map used for storing predicates representing modalities or updates */
     private HashMap<Term, StringBuffer> modalityPredicates = new HashMap<Term, StringBuffer>();
     
-    private StringBuffer nullString = new StringBuffer();
 
-    private boolean nullUsed = false;
 
     //assumptions. they have to be added to the formula!
     private ArrayList<StringBuffer> assumptions = new ArrayList<StringBuffer>();
@@ -1439,8 +1435,6 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	} else if (op == Junctor.FALSE) {
 	    return this.translateLogicalFalse();
 	} else if (op == services.getTypeConverter().getHeapLDT().getNull()) {
-	    this.nullString = this.getNullName();
-	    this.nullUsed = true;
 	    Function nullOp = services.getTypeConverter().getHeapLDT().getNull();
 	    
 	    addFunction(nullOp, new ArrayList<Sort>(),nullOp.sort());
@@ -1921,20 +1915,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     protected boolean isSomeIntegerSort(Sort s) {
 	return s == integerSort;
     }
-    
-    
-//    /**
-//     * Sets the taclets which should be used for translation.
-//     * @param tacletSet set of taclets.
-//     */
-//    public void setTacletsForAssumptions(Collection<Taclet> tacletSet){
-//	
-//	if(tacletSet == null) {
-//	    taclets = new LinkedList<Taclet>();
-//	}else{
-//	taclets = tacletSet;
-//	}
-//    }
+
     
     /**
      * Translates the list <code>tacletFormulae</code> to the given syntax.
@@ -1945,7 +1926,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     	throws IllegalFormulaException{
 	Collection<Taclet> taclets = settings.getTaclets(services);
 	ArrayList<StringBuffer> result = new ArrayList<StringBuffer>();
-	if(taclets.isEmpty() || taclets == null){
+	if(!settings.makesUseOfTaclets() || taclets == null || taclets.isEmpty()){
 	    return result;
 	}
 

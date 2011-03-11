@@ -380,9 +380,10 @@ class TacletMenu extends JMenu {
 	            launcher.addListener(new SolverListener());
 	            Collection<SMTProblem> list = new LinkedList<SMTProblem>();
 	            list.add(new SMTProblem(goal));
-		    launcher.launch(solverUnion.getTypes(),
+	           	launcher.launch(solverUnion.getTypes(),
 			            list,
 			            goal.proof().getServices());
+	         
 	        }
         	});
         	thread.start();            

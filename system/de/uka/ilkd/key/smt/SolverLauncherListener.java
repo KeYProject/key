@@ -2,11 +2,13 @@ package de.uka.ilkd.key.smt;
 
 import java.util.Collection;
 
+/**
+ * This interface can be used to observe a launcher.
+ * */
+public interface SolverLauncherListener {
+    public void launcherStopped(SolverLauncher launcher,
+	    Collection<SMTSolver> problemSolvers);
 
-
-
-
-public interface SolverLauncherListener extends SolverListener {
-    public void launcherStopped();
-    public void launcherStarted(Collection<SMTProblem> problems,Collection<SolverType> solverTypes, SolverLauncher launcher);
+    public void launcherStarted(Collection<SMTProblem> problems,
+	    Collection<SolverType> solverTypes, SolverLauncher launcher);
 }

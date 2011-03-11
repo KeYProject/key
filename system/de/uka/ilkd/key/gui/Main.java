@@ -37,8 +37,8 @@ import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.gui.smt.ComplexButton;
-import de.uka.ilkd.key.gui.smt.ProgressDialog2;
-import de.uka.ilkd.key.gui.smt.ProgressPanel2;
+import de.uka.ilkd.key.gui.smt.ProgressDialog;
+import de.uka.ilkd.key.gui.smt.ProgressPanel;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
 import de.uka.ilkd.key.gui.smt.SettingsDialog;
 import de.uka.ilkd.key.gui.smt.SolverListener;
@@ -49,6 +49,7 @@ import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
 import de.uka.ilkd.key.smt.SMTProblem;
+import de.uka.ilkd.key.smt.SolverException;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.util.Debug;
@@ -2637,10 +2638,10 @@ public final class Main extends JFrame implements IMain {
 	            SMTSettings settings = ProofSettings.DEFAULT_SETTINGS.getSMTSettings();
 	            SolverLauncher launcher = new SolverLauncher(settings);
 	            launcher.addListener(new SolverListener());
-	          
-		    launcher.launch(solverUnion.getTypes(),
+	            launcher.launch(solverUnion.getTypes(),
 			            SMTProblem.createSMTProblems(proof),
 			            proof.getServices());
+	      
 	        }
 	    });
 	    thread.start();

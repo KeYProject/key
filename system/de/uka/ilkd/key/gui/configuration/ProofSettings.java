@@ -82,7 +82,6 @@ public class ProofSettings {
     /* copy constructor - substitutes .clone() in classes implementing Settings */
     public ProofSettings(ProofSettings toCopy) {
         this();
-
         Properties result = new Properties();
         Settings[] s = toCopy.settings;
 
@@ -141,6 +140,7 @@ public class ProofSettings {
      * Saves the current settings in this dialog into a configuration file.
      */
     public void saveSettings() {
+	ensureInitialized();
 	try {
 	    if (!PROVER_CONFIG_FILE.exists()) {	                       
                 new File(PathConfig.KEY_CONFIG_DIR+File.separator).mkdirs();

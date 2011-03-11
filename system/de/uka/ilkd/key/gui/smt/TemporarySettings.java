@@ -9,7 +9,7 @@
 //
 package de.uka.ilkd.key.gui.smt;
 
-import java.util.LinkedList;
+
 
 
 import javax.swing.table.DefaultTableModel;
@@ -17,11 +17,9 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
 
-import de.uka.ilkd.key.gui.smt.SettingsData.SolverData;
-import de.uka.ilkd.key.smt.SMTSolver;
-import de.uka.ilkd.key.smt.SMTSolverImplementation;
+
 import de.uka.ilkd.key.smt.SolverType;
-import de.uka.ilkd.key.smt.SMTSolver.SolverState;
+
 
 
 
@@ -185,7 +183,6 @@ public class TemporarySettings extends Settings {
 	        },
 	        new TableProperty(type){	
                     public boolean prepareValues() {
-                	 System.out.println("CHECK: "+ type.getExecutionCommand());
 			 this.setTitle("Installed:");	
 			 
 			 this.setValue(type.isInstalled(true));
@@ -217,7 +214,6 @@ public class TemporarySettings extends Settings {
                     }
 
 		    public void eventChange() {
-			System.out.println("CHANGE");
 		        settingsData.setCommand(type,  getValue());
 		    }	
 		    

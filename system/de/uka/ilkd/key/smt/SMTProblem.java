@@ -13,104 +13,138 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 
+/**
+ * Represents a problem that can be passed to a solver. This class was
+ * introduced because the SMT module must handle both goals and terms.<br>
+ * Each <code>SMTProblem</code> is related to a set of solvers that are used to
+ * solve this problem.
+ * 
+ */
+public class SMTProblem {
 
-public class SMTProblem{
     private Term term;
     private Collection<SMTSolver> solvers = new LinkedList<SMTSolver>();
     private Goal goal;
     private Sequent sequent;
     private String name = "";
+
+    /* ############# public interface ############# */
+    /**
+     * Creates out of a proof object several SMT problems. For each open goal a
+     * new SMT problem is created.
+     */
+    public static Collection<SMTProblem> createSMTProblems(Proof proof) {
+	LinkedList<SMTProblem> problems = new LinkedList<SMTProblem>();
+	for (Goal goal : proof.openGoals()) {
+	    problems.add(new SMTProblem(goal));
+	}
+	return problems;
+    }
+
+    /**
+     * Returns the term that is related to this problem. If the problem was
+     * initialized with a goal, the goal is transformed to the term that can be
+     * accessed by this method.
+     */
     public Term getTerm() {
 	return term;
     }
-    void addSolver(SMTSolver solver){
-	solvers.add(solver);
-    }
-    
+
+    /** Returns the solvers that are related to the problem */
     public Collection<SMTSolver> getSolvers() {
 	return solvers;
     }
-    
-    public SMTProblem(Goal goal){
-	name = "Goal "+goal.node().serialNr();
+
+    public SMTProblem(Goal goal) {
+	name = "Goal " + goal.node().serialNr();
 	term = goalToTerm(goal);
 	this.goal = goal;
     }
-    
-    public SMTProblem(Sequent sequent){
+
+    public SMTProblem(Sequent sequent) {
 	term = sequentToTerm(sequent);
 	this.sequent = sequent;
-	
+
     }
-    
+
     public Goal getGoal() {
 	return goal;
     }
-    
+
     public Sequent getSequent() {
 	return sequent;
     }
-    
-    public SMTSolverResult getFinalResult(){
+
+    /**
+     * Returns the result of the problem. If more than one solver have been
+     * applied on the problem it computes the result from the results of the
+     * solvers. In case that one solver returned a positive result (valid) and
+     * another one a negative result (falsifiable) an excpetion is thrown.
+     */
+    public SMTSolverResult getFinalResult() {
 	SMTSolverResult unknown = SMTSolverResult.NO_IDEA;
 	SMTSolverResult valid = null;
 	SMTSolverResult invalid = null;
-	for(SMTSolver solver : solvers){
-	    if(solver.getFinalResult().isValid() == ThreeValuedTruth.TRUE){
-		valid =  solver.getFinalResult();
-	    }else if(solver.getFinalResult().isValid() == ThreeValuedTruth.FALSIFIABLE){
-		valid =  solver.getFinalResult();
-	    }else{
-	        unknown = solver.getFinalResult();
+	for (SMTSolver solver : solvers) {
+	    if (solver.getFinalResult().isValid() == ThreeValuedTruth.TRUE) {
+		valid = solver.getFinalResult();
+	    } else if (solver.getFinalResult().isValid() == ThreeValuedTruth.FALSIFIABLE) {
+		valid = solver.getFinalResult();
+	    } else {
+		unknown = solver.getFinalResult();
 	    }
 	}
-	if(valid != null && invalid != null){
-	    throw new RuntimeException("FATAL ERROR: The results are inconsistent!");
+	if (valid != null && invalid != null) {
+	    throw new RuntimeException(
+		    "FATAL ERROR: The results are inconsistent!");
 	}
-	if(valid != null){
+	if (valid != null) {
 	    return valid;
 	}
-	if(invalid != null){
+	if (invalid != null) {
 	    return invalid;
 	}
 	return unknown;
     }
 
-    
-    public String getName(){
+    public String getName() {
 	return name;
     }
-    
-    private Term sequentToTerm(Sequent s){
-	
+
+    /* ############# Implementation ############## */
+
+    /**
+     * Relates a solver to the problem
+     * 
+     * @param solver
+     */
+    void addSolver(SMTSolver solver) {
+	solvers.add(solver);
+    }
+
+    private Term sequentToTerm(Sequent s) {
+
 	ImmutableList<Term> ante = ImmutableSLList.nil();
-	
+
 	ante = ante.append(TermBuilder.DF.tt());
-	for(ConstrainedFormula f : s.antecedent()){
+	for (ConstrainedFormula f : s.antecedent()) {
 	    ante = ante.append(f.formula());
 	}
-	
+
 	ImmutableList<Term> succ = ImmutableSLList.nil();
 	succ = succ.append(TermBuilder.DF.ff());
-	for(ConstrainedFormula f : s.succedent()){
+	for (ConstrainedFormula f : s.succedent()) {
 	    succ = succ.append(f.formula());
 	}
-	
-	
-	return TermBuilder.DF.imp(TermBuilder.DF.and(ante), TermBuilder.DF.or(succ));
-	
+
+	return TermBuilder.DF.imp(TermBuilder.DF.and(ante), TermBuilder.DF
+	        .or(succ));
+
     }
-    
-    private Term goalToTerm(Goal g){
+
+    private Term goalToTerm(Goal g) {
 	sequent = g.sequent();
 	return sequentToTerm(sequent);
     }
-    
-    public static Collection<SMTProblem> createSMTProblems(Proof proof){
-	LinkedList<SMTProblem> problems = new LinkedList<SMTProblem>();
-	for(Goal goal : proof.openGoals()){
-	    problems.add(new SMTProblem(goal));
-	}
-	return problems;
-    }
+
 }
