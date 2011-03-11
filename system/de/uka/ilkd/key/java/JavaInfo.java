@@ -553,9 +553,9 @@ public final class JavaInfo {
      * @return a matching program method 
      */
     public ProgramMethod getProgramMethod(KeYJavaType classType, 
-            String methodName,
-            ImmutableList<? extends Type> signature,
-            KeYJavaType context) {
+            			          String methodName,
+            			          ImmutableList<? extends Type> signature,
+            			          KeYJavaType context) {
         return kpmi.getProgramMethod(classType, methodName, signature, context);
     }
     
@@ -702,9 +702,10 @@ public final class JavaInfo {
      *  the method is called 
      * @return a matching program method
      */
-    public ProgramMethod getProgramMethod
-	(KeYJavaType classType, String methodName, ProgramVariable[] args,
-	        KeYJavaType context){
+    public ProgramMethod getProgramMethod(KeYJavaType classType, 
+	    				  String methodName, 
+	    				  ProgramVariable[] args,
+	    				  KeYJavaType context){
         ImmutableList<Type> types = ImmutableSLList.<Type>nil();
         for (int i = args.length - 1; i>=0; i--) {
             types = types.prepend(args[i].getKeYJavaType());
