@@ -30,12 +30,14 @@ public class InformationWindow extends JDialog {
    
    
    
-   public InformationWindow(Collection<Information> information){
+   public InformationWindow(Collection<Information> information, String title){
        for(Information el : information){
 	  getTabbedPane().addTab(el.title, newTab(el)); 
        }
        setSize(400, 300);
        this.getContentPane().add(getTabbedPane());
+       this.setModalExclusionType(ModalExclusionType.APPLICATION_EXCLUDE);
+       this.setTitle(title);
        this.setVisible(true);
    }
    

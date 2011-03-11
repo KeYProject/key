@@ -268,7 +268,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable {
 		            result[ExternalProcessLauncher.ERROR],
 		            Integer
 		                    .parseInt(result[ExternalProcessLauncher.EXIT_CODE]));
-
+	   
 	} catch (Throwable e) {
 	    interruptionOccurred(e);
 	} finally {
@@ -413,12 +413,12 @@ final class SMTSolverImplementation implements SMTSolver, Runnable {
 
     @Override
     public void interrupt(ReasonOfInterruption reason) {
-	if (reason != ReasonOfInterruption.Timeout
-	        || reason != ReasonOfInterruption.User) {
-	    throw new IllegalArgumentException(
-		    "Only ReasonOfInterruption.Timeout"
-		            + "                       and ReasonOfInterruption.User are allowed.");
-	}
+//	if (reason != ReasonOfInterruption.Timeout
+//	        || reason != ReasonOfInterruption.User) {
+//	    throw new IllegalArgumentException(
+//		    "Only ReasonOfInterruption.Timeout"
+//		            + "                       and ReasonOfInterruption.User are allowed.");
+//	}
 	// order of assignments is important;
 	setReasonOfInterruption(reason);
 	setSolverState(SolverState.Stopped);

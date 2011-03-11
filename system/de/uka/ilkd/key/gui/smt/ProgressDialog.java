@@ -51,7 +51,9 @@ public class ProgressDialog extends JDialog {
 	this.setSize(500, 250);
 	this.setResizable(false);
 	this.setTitle("Progress Dialog");
-	this.setModal(true);
+	setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+	setModal(true);
+
 	getDiscardButton().addActionListener(alDiscardButton);
 	getApplyButton().addActionListener(alApplyButton);
 	getStopButton().addActionListener(alStopButton);

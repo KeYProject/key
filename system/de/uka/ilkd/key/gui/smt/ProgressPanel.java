@@ -6,6 +6,7 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 
 import javax.swing.BorderFactory;
@@ -31,7 +32,9 @@ public class ProgressPanel extends JPanel{
 	final JProgressBar bar = new JProgressBar();
 	final JButton      button = new JButton();
 	final Collection<Information> information = new LinkedList<Information>();
-	SingleProgressPanel(String name, int resolution){
+	HashMap<Collection<Information>,InformationWindow> windows =
+	    new HashMap<Collection<Information>,InformationWindow>();
+	SingleProgressPanel(final String name, final String panelName, int resolution){
 	
 	    this.setBackground(Color.WHITE);
 	    this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
@@ -44,7 +47,11 @@ public class ProgressPanel extends JPanel{
 	        
 	        @Override
 	        public void actionPerformed(ActionEvent e) {
-	            new InformationWindow(information);
+	            if(!windows.containsKey(information)){
+	        	InformationWindow val = new InformationWindow(information,panelName +" - "+name);
+	        	windows.put(information, val);
+	            }else windows.get(information).setVisible(true);
+	        
 	        }
 	    });
 	    button.setText("i");
@@ -69,15 +76,15 @@ public class ProgressPanel extends JPanel{
 			new Font("Dialog", Font.BOLD, 12), new Color(51, 51, 51)));    
 	this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 	this.setBackground(Color.WHITE);
-	createProgressBars(numberOfProcesses,resolution, names);
+	createProgressBars(numberOfProcesses,resolution, names,name);
 
     }
     
-    private void createProgressBars(int numberOfBars, int resolution, String [] names){
+    private void createProgressBars(int numberOfBars, int resolution, String [] names, String panelName){
 	bars = new SingleProgressPanel[numberOfBars];
 	
 	for(int i=0; i < bars.length; i++){
-	    bars[i] = new SingleProgressPanel(names[i], resolution);
+	    bars[i] = new SingleProgressPanel(names[i], panelName,resolution);
 	    this.add(bars[i]);
 	    this.add(Box.createHorizontalStrut(10));
 	}
@@ -85,6 +92,7 @@ public class ProgressPanel extends JPanel{
     
     public void setProgress(final int processIndex,final int progress){
 	if(processIndex >= 0 && processIndex < bars.length){
+		 
 	    SwingUtilities.invokeLater(new Runnable() {
 	        @Override
 	        public void run() {

@@ -3,6 +3,10 @@ package de.uka.ilkd.key.gui.smt;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.awt.event.WindowStateListener;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -12,6 +16,11 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
+
+import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.smt.InformationWindow.Information;
 import de.uka.ilkd.key.proof.Goal;
@@ -39,6 +48,8 @@ public class SolverListener implements SolverLauncherListener {
     private static int FILE_ID = 0;
 
     private static final int RESOLUTION = 1000;
+    
+ 
 
     private class InternSMTProblem {
 	final int problemIndex;
@@ -68,6 +79,7 @@ public class SolverListener implements SolverLauncherListener {
 	}
 
     }
+    
 
     @Override
     public void launcherStopped(SolverLauncher launcher,
@@ -150,12 +162,16 @@ public class SolverListener implements SolverLauncherListener {
 		    @Override
 		    public void actionPerformed(ActionEvent e) {
 		        discardEvent(launcher);
+		  
 		    }
 	        }, new ActionListener() {
 
 		    @Override
 		    public void actionPerformed(ActionEvent e) {
+			
+		
 		        applyEvent(launcher);
+		    
 		    }
 	        }, new ActionListener() {
 		    @Override
@@ -164,9 +180,19 @@ public class SolverListener implements SolverLauncherListener {
 		    }
 	        });
 
-	progressDialog.setVisible(true);
+	SwingUtilities.invokeLater(new Runnable() {
+	    
+	    @Override
+	    public void run() {
+		progressDialog.setVisible(true);
+		
+	    }
+	});
+
 
     }
+    
+
 
     private void stopEvent(final SolverLauncher launcher) {
 	launcher.stop();
@@ -196,6 +222,7 @@ public class SolverListener implements SolverLauncherListener {
 	    }
 	}, 0, 10);
     }
+
 
     private void refreshDialog() {
 	for (InternSMTProblem problem : problems) {

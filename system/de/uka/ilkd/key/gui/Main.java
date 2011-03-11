@@ -11,6 +11,7 @@
 package de.uka.ilkd.key.gui;
 
 import java.awt.*;
+import java.awt.Dialog.ModalExclusionType;
 import java.awt.event.*;
 import java.io.*;
 import java.net.URL;
@@ -2632,16 +2633,18 @@ public final class Main extends JFrame implements IMain {
 		return;
 	    }
 	    final Proof proof = mediator.getProof();
+	  
 	    Thread thread = new Thread(new Runnable() {	        
 	        @Override
 	        public void run() {
+	        
 	            SMTSettings settings = ProofSettings.DEFAULT_SETTINGS.getSMTSettings();
 	            SolverLauncher launcher = new SolverLauncher(settings);
 	            launcher.addListener(new SolverListener());
 	            launcher.launch(solverUnion.getTypes(),
 			            SMTProblem.createSMTProblems(proof),
 			            proof.getServices());
-	      
+	  
 	        }
 	    });
 	    thread.start();

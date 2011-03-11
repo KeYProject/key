@@ -375,6 +375,7 @@ class TacletMenu extends JMenu {
         	Thread thread = new Thread(new Runnable() {	        
 	        @Override
 	        public void run() {
+	            
 	            SMTSettings settings = ProofSettings.DEFAULT_SETTINGS.getSMTSettings();
 	            SolverLauncher launcher = new SolverLauncher(settings);
 	            launcher.addListener(new SolverListener());
@@ -384,8 +385,8 @@ class TacletMenu extends JMenu {
 			            list,
 			            goal.proof().getServices());
 	         
-	        }
-        	});
+	      
+        	}});
         	thread.start();            
             }else if (e.getSource() instanceof BuiltInRuleMenuItem) {
         	   
