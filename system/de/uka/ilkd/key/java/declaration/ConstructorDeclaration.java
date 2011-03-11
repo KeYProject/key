@@ -17,6 +17,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.util.ExtList;
 
+
 /**
  *  The getTypeReference method returns null - constructors do not have
  *  explicite return types.  A constructor declaration contains its own
@@ -24,7 +25,6 @@ import de.uka.ilkd.key.util.ExtList;
  *  syntactical element and hence must be represented.
  *  taken from COMPOST and changed to achieve an immutable structure
  */
-
 public class ConstructorDeclaration extends MethodDeclaration implements Constructor {
 
     /**
@@ -42,11 +42,12 @@ public class ConstructorDeclaration extends MethodDeclaration implements Constru
      * @param parentIsInterfaceDeclaration a boolean set true iff
      * parent is an InterfaceDeclaration      
      */
-    public ConstructorDeclaration(ExtList children, boolean
-				  parentIsInterfaceDeclaration) {
-	super(children, parentIsInterfaceDeclaration);	
+    public ConstructorDeclaration(ExtList children,
+				  boolean parentIsInterfaceDeclaration) {
+	super(children, parentIsInterfaceDeclaration, null);	
     }
 
+    
     /**
      * Constructor declaration.
      * @param modifiers a modifier array.
@@ -57,70 +58,78 @@ public class ConstructorDeclaration extends MethodDeclaration implements Constru
      * @param parentIsInterfaceDeclaration a boolean set true iff
      * parent is an InterfaceDeclaration 
      */
-
-    public ConstructorDeclaration(Modifier[] modifiers, ProgramElementName
-				  name,
-				  ParameterDeclaration[] parameters, Throws
-				  exceptions, StatementBlock body, boolean
-				  parentIsInterfaceDeclaration) { 
-	super(modifiers, null, name,parameters, exceptions, body, parentIsInterfaceDeclaration);
+    public ConstructorDeclaration(Modifier[] modifiers, 
+	    			  ProgramElementName name,
+				  ParameterDeclaration[] parameters, 
+				  Throws exceptions, 
+				  StatementBlock body, 
+				  boolean parentIsInterfaceDeclaration) { 
+	super(modifiers, 
+	      null, 
+	      name,
+	      parameters, 
+	      exceptions, 
+	      body, 
+	      parentIsInterfaceDeclaration);
     }
 
+    
     /**
      * Constructors are never abstract.
      */
-
+    @Override
     public boolean isAbstract() {
         return false;
     }
 
+    
     /**
      * Constructors are never final.
      */
-
+    @Override
     public boolean isFinal() {
         return false;
     }
 
+    
     /**
      * Constructors are never native.
      */
-
+    @Override
     public boolean isNative() {
         return false;
     }
 
+    
     /**
      * Constructors are never static.
      */
-
+    @Override
     public boolean isStatic() {
         return false;
     }
 
+    
     /**
      * Constructors are never strictfp.
      */
-
+    @Override
     public boolean isStrictFp() {
         return false;
     }
 
+    
     /**
      * Constructors are never synchronized.
      */
-
+    @Override
     public boolean isSynchronized() {
         return false;
     }
 
-    /** calls the corresponding method of a visitor in order to
-     * perform some action/transformation on this element
-     * @param v the Visitor
-     */
+
+    @Override    
     public void visit(Visitor v) {
 	v.performActionOnConstructorDeclaration(this);
     }
-
-
 }

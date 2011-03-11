@@ -10,18 +10,11 @@
 
 package de.uka.ilkd.key.util;
 
-public interface KeYExceptionHandler{
+public interface KeYExceptionHandler {
 
     public void reportException(Throwable e);
 
     public ExtList getExceptions();
 
-    /** errors? 
-     * @return boolean true if errors or exceptions were reported, 
-     * false otherwise
-     */
-    public boolean error();
-
     public void clear();
-
 }

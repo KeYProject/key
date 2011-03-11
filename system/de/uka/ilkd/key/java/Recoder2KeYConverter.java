@@ -1057,12 +1057,32 @@ public class Recoder2KeYConverter {
 
         methodsDeclaring.put(md, result);
         if (!getMapping().mapped(md)) {
-            final MethodDeclaration methDecl = new MethodDeclaration(
+            
+            //If the method is 'void', the 'void' type reference 
+            //gets lost in translation: the KeY AST uses "null" instead of 
+            //it. However, the type reference may have attached JML comments
+            //(in particular, with the "helper" keyword) that we must keep.            
+            Comment[] voidComments = null;
+            if(md.getTypeReference() != null 
+               && md.getTypeReference().getName().equals("void")) {
+        	final ASTList<recoder.java.Comment> trComs 
+        		= md.getTypeReference().getComments();
+        	if(trComs != null) {
+        	    voidComments = new Comment[trComs.size()];
+        	    for(int i = 0; i < voidComments.length; i++) {
+        		voidComments[i] = convert(trComs.get(i));
+        	    }
+        	}
+            }
+            
+            final MethodDeclaration methDecl 
+            	= new MethodDeclaration(
                     collectChildren(md),
-                    md.getASTParent() instanceof recoder.java.declaration.InterfaceDeclaration);
-            recoder.abstraction.ClassType cont = getServiceConfiguration()
-            .getCrossReferenceSourceInfo().getContainingClassType(
-                    (recoder.abstraction.Member) md);
+                    md.getASTParent() instanceof recoder.java.declaration.InterfaceDeclaration,
+                    voidComments);
+            recoder.abstraction.ClassType cont 
+            	= getServiceConfiguration().getCrossReferenceSourceInfo()
+            	                           .getContainingClassType((recoder.abstraction.Member) md);
 
             Sort heapSort = rec2key.getTypeConverter().getTypeConverter().getHeapLDT() == null
                             ? Sort.ANY
@@ -1210,8 +1230,9 @@ public class Recoder2KeYConverter {
 
         recoder.abstraction.Type rType = getServiceConfiguration().getSourceInfo().getType(tr);
 
-        if (rType == null)
+        if (rType == null) {
             return null; // because of 'void'
+        }
 
         KeYJavaType kjt = getKeYJavaType(rType);
         ExtList children = collectChildren(tr);

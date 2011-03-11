@@ -34,6 +34,7 @@ public abstract class JavaProgramElement extends JavaSourceElement
 	comments = NO_COMMENTS;
     }
 
+    
     /**
      * Java program element. 
      * @param list ExtList with comments
@@ -42,6 +43,7 @@ public abstract class JavaProgramElement extends JavaSourceElement
         super(list);
         comments = extractComments(list);
     }
+    
 
     /**
      * creates a java program element with the given position information
@@ -53,11 +55,13 @@ public abstract class JavaProgramElement extends JavaSourceElement
         comments = NO_COMMENTS;
     }
 
+    
     public JavaProgramElement(ExtList children, PositionInfo pos) {
         super(children, pos);
         comments = extractComments(children);
     }
 
+    
     /**
      * collects comments contained in the given list
      * @param list the ExtList with children and comments of this node
@@ -72,17 +76,14 @@ public abstract class JavaProgramElement extends JavaSourceElement
      *      Get comments.
      *      @return the comments.
      */
-
+    @Override    
     public Comment[] getComments() {
         return comments;
     }
 
 
-    /**
-     *      Template Method. Prints DocComments if existing, calls
-     *      prettyPrintMain and prints other Comments.
-     */
 
+    @Override    
     public void prettyPrint(PrettyPrinter w) throws IOException {
         int s = (comments != null) ? comments.length : 0;
         int t = 0;
@@ -109,6 +110,7 @@ public abstract class JavaProgramElement extends JavaSourceElement
         }
     }
 
+    
     /**
      *      Prints main content of current node and all syntactical children.
      *      Hook method of prettyPrint; defaults to do nothing.
@@ -121,17 +123,22 @@ public abstract class JavaProgramElement extends JavaSourceElement
      * method compares  two elements by testing if they have the 
      * same type and calling the default equals method.
      */
+    @Override    
     public boolean equalsModRenaming(SourceElement se, 
 				     NameAbstractionTable nat) {
     	return (this.getClass() == se.getClass());
     }
     
+    
+    @Override    
     public int hashCode(){
     	int result = 17;
     	result = 37 * result + this.getClass().hashCode();
     	return result;
     }
     
+    
+    @Override    
     public boolean equals(Object o){
     	if(o == this) return true;
     	if (!(o instanceof JavaProgramElement))
@@ -140,6 +147,7 @@ public abstract class JavaProgramElement extends JavaSourceElement
         return equalsModRenaming((JavaProgramElement)o,
                                  NameAbstractionTableDisabled.INSTANCE);
     }
+    
 
     /** this is the default implementation of the signature, which is
      *  used to determine program similarity.
@@ -150,10 +158,12 @@ public abstract class JavaProgramElement extends JavaSourceElement
        return s.substring(s.lastIndexOf('.')+1, s.length());
     }
     
+    
     /** this class is used by method call. As in this case we do not
      * want to abstract from  names
      */
     static class NameAbstractionTableDisabled extends NameAbstractionTable {
+	
 	
     public static final NameAbstractionTableDisabled INSTANCE = new NameAbstractionTableDisabled();
     	
@@ -165,6 +175,8 @@ public abstract class JavaProgramElement extends JavaSourceElement
 	}
     }
 
+    
+    @Override    
     public MatchConditions match(SourceData source, MatchConditions matchCond) {
         final ProgramElement src = source.getSource();
         Debug.out("Program match start (template, source)", this, src);
@@ -178,5 +190,4 @@ public abstract class JavaProgramElement extends JavaSourceElement
         source.next();
         return matchCond;
     }
-
 }

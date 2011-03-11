@@ -49,10 +49,15 @@ import de.uka.ilkd.key.pp.*;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
+
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverException;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
+
+import de.uka.ilkd.key.rule.OneStepSimplifier;
+
+
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.key.util.KeYResourceManager;
@@ -464,7 +469,7 @@ public final class Main extends JFrame implements IMain {
         fileOperations.add(createProofManagementComponent());
         
         goalView.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW ).put(
-                KeyStroke.getKeyStroke(KeyEvent.VK_C, ActionEvent.CTRL_MASK), 
+                KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), 
         "copy");
         goalView.getActionMap().put("copy", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
@@ -496,8 +501,8 @@ public final class Main extends JFrame implements IMain {
         tabbedPane.addTab("Rules", null, new JScrollPane(ruleView), "All available rules");
         tabbedPane.setSelectedIndex(0);
         tabbedPane.setPreferredSize(new java.awt.Dimension(250, 440));
-        tabbedPane.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).getParent().remove(KeyStroke.getKeyStroke(KeyEvent.VK_UP, ActionEvent.CTRL_MASK));
-        tabbedPane.getInputMap(JComponent.WHEN_FOCUSED).getParent().remove(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, ActionEvent.CTRL_MASK));
+        tabbedPane.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).getParent().remove(KeyStroke.getKeyStroke(KeyEvent.VK_UP, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        tabbedPane.getInputMap(JComponent.WHEN_FOCUSED).getParent().remove(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         
         proofListView.setPreferredSize(new java.awt.Dimension(250, 100));
         paintEmptyViewComponent(proofListView, "Proofs");
@@ -1039,6 +1044,7 @@ public final class Main extends JFrame implements IMain {
     
     
     
+    
     private static java.awt.TextArea clipBoardTextArea;
 
     private static TextArea getClipBoardArea() {
@@ -1090,7 +1096,7 @@ public final class Main extends JFrame implements IMain {
         proofManagement.setAction(proofManagementAction);        
                                        
         JMenuItem exit = new JMenuItem("Exit");
-        exit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, ActionEvent.CTRL_MASK));
+        exit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         exit.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 exitMain();
@@ -1133,7 +1139,19 @@ public final class Main extends JFrame implements IMain {
                 Config.DEFAULT.smaller();
             }
         });
-        smaller.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.CTRL_DOWN_MASK));
+        
+        int downMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+        switch (downMask) {
+        case InputEvent.META_MASK : 
+            downMask = InputEvent.META_DOWN_MASK; 
+            break;        	
+        default:
+            // we default to Linux/Win
+            downMask = InputEvent.CTRL_DOWN_MASK;
+            break;
+        }
+
+        smaller.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, downMask));
         
         final JMenuItem larger = new JMenuItem("Larger");
         larger.addActionListener(new ActionListener() {
@@ -1141,7 +1159,7 @@ public final class Main extends JFrame implements IMain {
                 Config.DEFAULT.larger();
             }
         });
-        larger.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.CTRL_DOWN_MASK));
+        larger.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_UP, downMask));
         
         Config.DEFAULT.addConfigChangeListener(new ConfigChangeListener() {
             public void configChanged(ConfigChangeEvent e) {
@@ -1161,7 +1179,7 @@ public final class Main extends JFrame implements IMain {
         
         JMenuItem pretty = new JCheckBoxMenuItem("Use pretty syntax");
         pretty.setAccelerator(KeyStroke.getKeyStroke
-                            (KeyEvent.VK_P, ActionEvent.CTRL_MASK));        
+                            (KeyEvent.VK_P, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));        
         pretty.setToolTipText("If ticked, infix notations are used.");
         pretty.setSelected(NotationInfo.PRETTY_SYNTAX);
 	pretty.addActionListener(new ActionListener() {
@@ -1258,7 +1276,7 @@ public final class Main extends JFrame implements IMain {
 	// default taclet options
 	JMenuItem choiceItem = new JMenuItem("Taclet Options...");
 	choiceItem.setAccelerator(KeyStroke.getKeyStroke
-			    (KeyEvent.VK_T, ActionEvent.CTRL_MASK));
+			    (KeyEvent.VK_T, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
 	choiceItem.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
@@ -1317,9 +1335,11 @@ public final class Main extends JFrame implements IMain {
             public void actionPerformed(ActionEvent e) {
                 boolean b = ((JCheckBoxMenuItem)e.getSource()).isSelected();           
                 ProofSettings.DEFAULT_SETTINGS.
-                getGeneralSettings().setOneStepSimplification(b);           
+                getGeneralSettings().setOneStepSimplification(b);
+                OneStepSimplifier.INSTANCE.refresh(mediator.getSelectedProof());
         }});
         registerAtMenu(options, oneStepSimplificationOption);
+        mediator.addKeYSelectionListener(OneStepSimplifier.INSTANCE);
         
         return options;
     }
@@ -1744,7 +1764,8 @@ public final class Main extends JFrame implements IMain {
             putValue(NAME, "Load...");
             putValue(SMALL_ICON, IconFactory.openKeYFile(TOOLBAR_ICON_SIZE));
             putValue(SHORT_DESCRIPTION, "Browse and load problem or proof files.");
-            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
+            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_O, 
+        	    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         }
         
         public void actionPerformed(ActionEvent e) {
@@ -1787,6 +1808,8 @@ public final class Main extends JFrame implements IMain {
             putValue(NAME, "Reload ");
             putValue(SMALL_ICON, IconFactory.openMostRecent(TOOLBAR_ICON_SIZE));
             putValue(SHORT_DESCRIPTION, "Reload last opened file.");
+            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_R,  
+        	    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         }
         
         public void actionPerformed(ActionEvent e) {
@@ -1870,7 +1893,7 @@ public final class Main extends JFrame implements IMain {
         public ProofManagementAction() {
             putValue(NAME, "Proof Management...");
             putValue(SHORT_DESCRIPTION, "Proof Management.");
-            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_M, ActionEvent.CTRL_MASK));
+            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_M, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
             
             setEnabled(enabled());
             

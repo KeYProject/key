@@ -46,17 +46,18 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
     							  connectedTo.instantiations()),
     				       notationInfo, backend, null,
     				       true);
-        tp.printTaclet(connectedTo.taclet(), connectedTo.instantiations(),
-    		   ProofSettings.DEFAULT_SETTINGS.getViewSettings()
-    		   .getShowWholeTaclet());
+        tp.printTaclet(connectedTo.taclet(), 
+        	       connectedTo.instantiations(),
+        	       ProofSettings.DEFAULT_SETTINGS.getViewSettings().getShowWholeTaclet(),
+        	       false);
         
         int nlcount = 0;
         StringBuffer sb = new StringBuffer(w.toString());
         int sbl = sb.length();
         for (int i = 0; i < sbl; i++) {
-    	if (sb.charAt(i) == '\n') {
-    	    nlcount += 1;
-    	}
+            if (sb.charAt(i) == '\n') {
+        	nlcount += 1;
+            }
         }
         if (nlcount > ProofSettings.DEFAULT_SETTINGS.getViewSettings().getMaxTooltipLines()) { 
     	    Debug.log4jDebug("No SchemaVariable instantiation printed, linecount is " 

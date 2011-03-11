@@ -12,18 +12,17 @@ package de.uka.ilkd.key.util;
 
 /** This Exception is only thrown by the ExceptionHandler */
 
-public class ExceptionHandlerException extends RuntimeException{
+public class ExceptionHandlerException extends RuntimeException {
 
-    public ExceptionHandlerException(){
+    public ExceptionHandlerException() {
 	super("An Exception occurred");
     }
 
-    public ExceptionHandlerException(String msg){
+    public ExceptionHandlerException(String msg) {
 	super(msg);
     }
 
-    public ExceptionHandlerException(Throwable ex){
+    public ExceptionHandlerException(Throwable ex) {
 	super(ex);
     }
-
 }

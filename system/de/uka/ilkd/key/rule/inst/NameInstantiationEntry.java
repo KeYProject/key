@@ -12,10 +12,10 @@ package de.uka.ilkd.key.rule.inst;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 
+
 /** This class is used to store the instantiation of a schemavarible
  * if it is a name.
  */
-
 public class NameInstantiationEntry extends InstantiationEntry {
 
     private final Name name;
@@ -27,16 +27,14 @@ public class NameInstantiationEntry extends InstantiationEntry {
     }
 
 
-    /** returns the instantiation of the SchemaVariable 
-     * @return  the instantiation of the SchemaVariable 
-    */
+    @Override
     public Object getInstantiation() {
 	return name;
     }
 
-    /** toString */
-    public String toString() {
-	return "["+getSchemaVariable()+", "+name+"]";
-    }
 
+    @Override
+    public String toString() {
+	return "[" + getSchemaVariable() + ", " + name + "]";
+    }
 }

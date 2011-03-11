@@ -33,12 +33,13 @@ import de.uka.ilkd.key.util.Debug;
 public final class ProgramSV extends AbstractSV 
     implements ProgramConstruct, UpdateableOperator {
     
-    private static final ProgramList EMPTY_LIST_INSTANTIATION = 
-        new ProgramList
-        (new ImmutableArray<ProgramElement>(new ProgramElement[0]));
+    private static final ProgramList EMPTY_LIST_INSTANTIATION 
+    	= new ProgramList(new ImmutableArray<ProgramElement>(
+    					new ProgramElement[0]));
 
     private final boolean isListSV;
 
+    
     /** 
      * creates a new SchemaVariable used as a placeholder for program
      * constructs
@@ -74,26 +75,31 @@ public final class ProgramSV extends AbstractSV
 	return new Comment[0];
     }
     
+    
     @Override
     public SourceElement getFirstElement(){
 	return this;
     }
     
+    
     @Override
     public SourceElement getLastElement(){
 	return this;
     }
+    
 
     @Override
     public Position getStartPosition(){
 	return Position.UNDEFINED;
     }
     
+    
     @Override
     public Position getEndPosition(){
 	return Position.UNDEFINED;
     }
 
+    
     @Override
     public Position getRelativePosition(){
 	return  Position.UNDEFINED;
@@ -249,13 +255,7 @@ public final class ProgramSV extends AbstractSV
         return null;
     }
 
-    
-    @Override
-    public String toString() {
-	return toString("program "+sort().name());
-    }
-    
-    
+        
     /**
      * adds a found mapping from schema variable <code>var</code> to
      * program element <code>pe</code> and returns the updated match
@@ -264,7 +264,7 @@ public final class ProgramSV extends AbstractSV
      * @param pe the ProgramElement <code>var</code> is mapped to
      * @param matchCond the MatchConditions to be updated
      * @param services the Services provide access to the Java model
-x     * @return the updated match conditions including mapping 
+     * @return the updated match conditions including mapping 
      * <code>var</code> to <code>pe</code> or null if some variable
      * condition would be hurt by the mapping
      */
@@ -423,5 +423,17 @@ x     * @return the updated match conditions including mapping
         }
         source.next();   
         return matchCond;
+    }
+    
+    
+    @Override
+    public String toString() {
+	return toString("program "+sort().name());
+    }
+    
+
+    @Override
+    public String proofToString() {
+	return "\\schemaVar \\program " + sort().name() + " " + name() + ";\n";
     }
 }

@@ -18,7 +18,9 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
@@ -364,21 +366,18 @@ public abstract class VariableNamer implements InstantiationProposer {
     /**
      * proposes a base name for a given sort
      */
-    private String getBaseNameProposal(Sort sort) {
+    private String getBaseNameProposal(Type type) {
 	String result;
-        String name = sort.name().toString();
-        if(sort instanceof SortImpl) {
-            result = name.substring(0, 1);
-        } else if(sort instanceof ArraySort) {
-	    result = DEFAULT_BASENAME;
- 	} else {
-            int lastDotIndex = name.lastIndexOf('.');
-            if(lastDotIndex != -1) {
-                name = "v_"+name.substring(lastDotIndex + 1);   
-            }
-            result = name.substring(0, 1).toLowerCase() + name.substring(1);
+        String name = type.getName().toString();
+        if(type instanceof ArrayType) {
+	    result = getBaseNameProposal(((ArrayType)type).getBaseType()
+		    					  .getKeYJavaType()
+		    					  .getJavaType());
+	    result += "_arr";
+        } else {
+            result = name.substring(0, 1).toLowerCase();
         }
-
+        
 	return result;
     }
         
@@ -486,19 +485,20 @@ public abstract class VariableNamer implements InstantiationProposer {
         String basename = null;
         NewVarcond nv = app.taclet().varDeclaredNew(var);
         if(nv != null) {
-	    Sort sort = nv.getSort();
-	    if(sort != null) {
-		basename = getBaseNameProposal(sort);
+	    Type type = nv.getType();
+	    if(type != null) {
+		basename = getBaseNameProposal(type);
 	    } else {
 		SchemaVariable psv = nv.getPeerSchemaVariable();
 		Object inst = app.instantiations().getInstantiation(psv);
 		if(inst instanceof Expression) {
 		    final ExecutionContext ec = 
 			app.instantiations().getExecutionContext();
-		    if (ec != null) {
-			KeYJavaType kjt = ((Expression)inst).getKeYJavaType
-			    (this.services, ec);		    
-			basename = getBaseNameProposal(kjt.getSort());
+		    if(ec != null) {
+			KeYJavaType kjt 
+			    = ((Expression)inst).getKeYJavaType(this.services, 
+				    				ec);		    
+			basename = getBaseNameProposal(kjt.getJavaType());
 		    } else {
 			// usually this should never be entered, but because of 
 			// naming issues we do not want nullpointer exceptions

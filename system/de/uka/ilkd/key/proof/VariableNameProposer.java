@@ -62,10 +62,10 @@ public class VariableNameProposer implements InstantiationProposer {
 			      ImmutableList<String> previousProposals) {
 	if(var instanceof SkolemTermSV) {
 	    return getNameProposalForSkolemTermVariable(app,
-	    					       var,
-						       services,
-						       undoAnchor,
-                                                       previousProposals);
+	    					        var,
+						        services,
+						        undoAnchor,
+                                                        previousProposals);
 	} else if(var instanceof VariableSV) {
 	    return getNameProposalForVariableSV(app,
 	    					var,
@@ -82,68 +82,11 @@ public class VariableNameProposer implements InstantiationProposer {
 	}
     }
 
-    // reklov
-    // START TEMPORARY DOWNWARD COMPATIBILITY
-    private Name oldMVProposal;
-
-    public void setOldMVProposal(Name proposal) {
-        oldMVProposal = proposal;
-    }
-
-    private ImmutableList<Name> oldAnonUpdateProposals = ImmutableSLList.<Name>nil();
-
-    public void setOldAnonUpdateProposals(Name proposals) {
-        if (proposals == null) return;
-        String[] props = proposals.toString().split(",|;");
-
-        for (String prop : props) {
-            oldAnonUpdateProposals = oldAnonUpdateProposals.append(new Name(prop));
-        }
-
-    }
-
-    public Name getNewNameOldAnonUpdateCompatibility(Services services, Name baseName) {
-        NamespaceSet namespaces = services.getNamespaces();
-        Name name = null;
-
-        if (!oldAnonUpdateProposals.isEmpty()) {
-            name = oldAnonUpdateProposals.head();
-            oldAnonUpdateProposals = oldAnonUpdateProposals.tail();
-        } else {  
-            name = services.getNameRecorder().getProposal();            
-        }
-
-        if (name == null || namespaces.lookup(name) != null) {
-            int i = 0;
-
-            do {
-                name = new Name(baseName + "_" + i++);
-            } while(namespaces.lookup(name) != null);
-
-        }
-
-        return name;
-    }
-
-    // END TEMPORARY DOWNWARD COMPATIBILITY
 
     public Name getNewName(Services services, Name baseName) {
         NamespaceSet namespaces = services.getNamespaces();
 
-        // reklov
-        // START TEMPORARY DOWNWARD COMPATIBILITY
-        // Name name = services.getProof().getNameRecorder().getProposal();
-        Name name = null;
-
-        if (oldMVProposal != null) {
-            name = oldMVProposal;
-            oldMVProposal = null;
-        } else {
-            name = services.getNameRecorder().getProposal();            
-        }
-
-        // END TEMPORARY DOWNWARD COMPATIBILITY
-
+        Name name = services.getNameRecorder().getProposal();            
         if (name == null || namespaces.lookup(name) != null) {
             int i = 0;
 
@@ -161,10 +104,10 @@ public class VariableNameProposer implements InstantiationProposer {
      * schema variable, which is declared as skolem term SV.
      */
     private String getNameProposalForSkolemTermVariable(TacletApp p_app,
-    						       SchemaVariable p_var,
-						       Services services,
-						       Node undoAnchor,
-                                                       ImmutableList<String> previousProposals) {
+    						        SchemaVariable p_var,
+						        Services services,
+						        Node undoAnchor,
+                                                        ImmutableList<String> previousProposals) {
 	return getNameProposalForSkolemTermVariable
 	    ( createBaseNameProposalBasedOnCorrespondence ( p_app, p_var ),
 	      services,
@@ -225,8 +168,10 @@ public class VariableNameProposer implements InstantiationProposer {
 	return name;
     }
 
+    
     public String getNameProposal(String basename, 
-            Services services, Node undoAnchor) {
+	    			  Services services, 
+	    			  Node undoAnchor) {
         final NamespaceSet nss = services.getNamespaces();
         Name l_name;
         String name = "";
@@ -243,6 +188,7 @@ public class VariableNameProposer implements InstantiationProposer {
         
         return name;
     }
+    
 
     /**
      * Generates a proposal for the instantiation of the given

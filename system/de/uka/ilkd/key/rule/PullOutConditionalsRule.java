@@ -206,6 +206,5 @@ public final class PullOutConditionalsRule implements BuiltInRule {
     @Override
     public String toString() {
         return displayName();
-    }
-    
+    }    
 }

@@ -641,31 +641,37 @@ options {
             			 	throws AmbigiousDeclException {
         if (!skip_schemavariables) {
             SchemaVariable v;
-            if(s == Sort.FORMULA) {
-                v = SchemaVariableFactory.createFormulaSV
-                (new Name(name), mods.rigid());
+            if(s == Sort.FORMULA && !makeSkolemTermSV) {
+                v = SchemaVariableFactory.createFormulaSV(new Name(name), 
+                					  mods.rigid());
             } else if(s == Sort.UPDATE) {
                 v = SchemaVariableFactory.createUpdateSV(new Name(name));
             } else if(s instanceof ProgramSVSort) {
-                v = SchemaVariableFactory.createProgramSV
-                (new ProgramElementName(name),(ProgramSVSort) s, mods.list());
+                v = SchemaVariableFactory.createProgramSV(
+                		new ProgramElementName(name),
+                		(ProgramSVSort) s,
+                		mods.list());
             } else {
                 if(makeVariableSV) {
-                    v=SchemaVariableFactory.createVariableSV
+                    v = SchemaVariableFactory.createVariableSV
                     (new Name(name), s);
                 } else if(makeSkolemTermSV) {
-                    v = SchemaVariableFactory.createSkolemTermSV(
-                    				new Name(name), 
-                    				s);
-                } else { v = SchemaVariableFactory.createTermSV
-                    (new Name(name), s, mods.rigid(), mods.strict());
+                    v = SchemaVariableFactory.createSkolemTermSV(new Name(name), 
+                    				                 s);
+                } else { v = SchemaVariableFactory.createTermSV(
+                					new Name(name), 
+                					s, 
+                					mods.rigid(), 
+                					mods.strict());
                 }
             }          
 
             if (inSchemaMode()) {
                if (variables().lookup(v.name()) != null) {
-            	 throw new AmbigiousDeclException(v.name().toString(), getFilename(), 
-            	  				 getLine(), getColumn());
+            	 throw new AmbigiousDeclException(v.name().toString(), 
+            	 			          getFilename(), 
+            	  				  getLine(), 
+            	  				  getColumn());
                }
                variables().add(v);
             }
@@ -1570,43 +1576,47 @@ keyjavatype returns [KeYJavaType kjt=null]
 { 
    String type = null;
    boolean array = false;
-
 }
 :
-   type = simple_ident_dots (EMPTYBRACKETS {type += "[]"; array=true;})* {
-
-     kjt = getJavaInfo().getKeYJavaType(type);
+    type = simple_ident_dots (EMPTYBRACKETS {type += "[]"; array=true;})* 
+    {
+        kjt = getJavaInfo().getKeYJavaType(type);
             
-     if (kjt == null) {
-       //expand to "java.lang"
-       String guess = "java.lang."+type;
-       kjt = getJavaInfo().getKeYJavaType(guess);       
-       if (array) {
-          try {
-            JavaBlock jb = getJavaInfo().readJavaBlock("{" + type + " k;}");
-            kjt = ((VariableDeclaration) 
-                    ((StatementBlock) jb.program()).getChildAt(0)).
-                        getTypeReference().getKeYJavaType();
-//            kjt = getJavaInfo().getKeYJavaType(type);
-          } catch (Exception e) {
-             kjt = null;
-          }          
-       }
-     }
-     
-     //HEAP
-     if(kjt == null) {
-	Sort sort = lookupSort(type);
-	if(sort != null) {
-           kjt = new KeYJavaType(null, sort);
+        //expand to "java.lang"            
+        if (kjt == null) {
+            try {
+                String guess = "java.lang." + type;
+       	        kjt = getJavaInfo().getKeYJavaType(guess);
+       	    } catch(Exception e) {
+       	        kjt = null;
+       	    }
         }
-     }
      
-     if (kjt == null) {
-       semanticError("Unknown type: " + type);
-     }
-   }
- ;
+        //arrays
+        if(kjt == null && array) {
+            try {
+                JavaBlock jb = getJavaInfo().readJavaBlock("{" + type + " k;}");
+                kjt = ((VariableDeclaration) 
+                        ((StatementBlock) jb.program()).getChildAt(0)).
+                            getTypeReference().getKeYJavaType();
+            } catch (Exception e) {
+                kjt = null;
+            }          
+        }
+     
+        //try as sort without Java type (neede e.g. for "Heap")
+        if(kjt == null) {
+	    Sort sort = lookupSort(type);
+	    if(sort != null) {
+                kjt = new KeYJavaType(null, sort);
+            }
+        }
+     
+        if(kjt == null) {
+            semanticError("Unknown type: " + type);
+        }
+    }
+;
 
 prog_var_decls 
 {
@@ -1711,14 +1721,21 @@ one_schema_var_decl
     ( schema_modifiers[mods] ) ?
     {s = Sort.UPDATE;}
     ids = simple_ident_comma_list 
+  | SKOLEMFORMULA
+    { makeSkolemTermSV = true; } 
+    { mods = new SchemaVariableModifierSet.FormulaSV (); }
+    ( schema_modifiers[mods] ) ?    
+    {s = Sort.FORMULA;}
+    ids = simple_ident_comma_list
   | (    TERM
          { mods = new SchemaVariableModifierSet.TermSV (); }
          ( schema_modifiers[mods] ) ?
       | (VARIABLES
-         {makeVariableSV = true;}
+         { makeVariableSV = true; }
          { mods = new SchemaVariableModifierSet.VariableSV (); }
          ( schema_modifiers[mods] ) ?)
-      | (SKOLEMTERM {makeSkolemTermSV = true;}
+      | (SKOLEMTERM 
+         { makeSkolemTermSV = true; }
          { mods = new SchemaVariableModifierSet.SkolemTermSV (); }
          ( schema_modifiers[mods] ) ?)
     )
@@ -2032,7 +2049,7 @@ ruleset_decls
         RBRACE
     ;
 
-sortId  returns [Sort s = null]
+sortId returns [Sort s = null]
     :
         s = sortId_check[true]
     ;           
@@ -2040,80 +2057,103 @@ sortId  returns [Sort s = null]
 // Non-generic sorts, array sorts allowed
 sortId_check [boolean checkSort] returns [Sort s = null]                
 {
-    Sort t;
+    Pair<Sort,Type> p;
 }
     :
-        t = sortId_check_help[checkSort]
-        s = array_set_decls[t]
+        p = sortId_check_help[checkSort]
+        s = array_decls[p]
     ;
 
 // Generic and non-generic sorts, array sorts allowed
 any_sortId_check [boolean checkSort] returns [Sort s = null]                
 {
-    Sort t;
+    Pair<Sort,Type> p;
 }
     :   
-        t = any_sortId_check_help[checkSort]
-        s = array_set_decls[t]
+        p = any_sortId_check_help[checkSort]
+        s = array_decls[p]
     ;
+    
+    
+// Non-generic sorts
+sortId_check_help [boolean checkSort] returns [Pair<Sort,Type> result = null]
+    :
+        result = any_sortId_check_help[checkSort]
+        {
+            // don't allow generic sorts or collection sorts of
+            // generic sorts at this point
+            Sort s = result.first;
+            while ( s instanceof ArraySort ) {
+            	s = ((ArraySort)s).elementSort ();
+            }
 
-// also allow generic sorts
-any_sortId_check_help [boolean checkSort] returns [Sort s = null]
+            if ( s instanceof GenericSort ) {
+                throw new GenericSortException ( "sort",
+                    "Non-generic sort expected", s,
+                    getFilename (), getLine (), getColumn () );
+            }
+        }
+    ;
+    
+
+// Generic and non-generic sorts
+any_sortId_check_help [boolean checkSort] returns [Pair<Sort,Type> result = null]
 {
     String name;
 }
     :
         name = simple_sort_name 
-        {  s = lookupSort(name);
-           if (checkSort && s == null) {
-                throw new NotDeclException("sort", name, 
-                                           getFilename(), 
-                                           getLine(), getColumn());
-           }
-        }
-    ;
-
-sortId_check_help [boolean checkSort] returns [Sort s = null]
-    :
-        s = any_sortId_check_help[checkSort]
         {
-            // don't allow generic sorts or collection sorts of
-            // generic sorts at this point
-            Sort t = s;
-            while ( t instanceof ArraySort ) {
-            	t = ((ArraySort)t).elementSort ();
+            //Special handling for byte, char, short, long:
+            //these are *not* sorts, but they are nevertheless valid
+            //prefixes for array sorts such as byte[], char[][][].
+            //Thus, we consider them aliases for the "int" sort, and remember
+            //the corresponding Java type for the case that an array sort 
+            //is being declared.
+            Type t = null;            
+            if(name.equals(PrimitiveType.JAVA_BYTE.getName())) {
+                t = PrimitiveType.JAVA_BYTE;
+                name = PrimitiveType.JAVA_INT.getName();
+            } else if(name.equals(PrimitiveType.JAVA_CHAR.getName())) {
+                t = PrimitiveType.JAVA_CHAR;
+                name = PrimitiveType.JAVA_INT.getName();            
+            } else if(name.equals(PrimitiveType.JAVA_SHORT.getName())) {
+                t = PrimitiveType.JAVA_SHORT;
+                name = PrimitiveType.JAVA_INT.getName();
+            } else if(name.equals(PrimitiveType.JAVA_LONG.getName())) {
+                t = PrimitiveType.JAVA_LONG;
+                name = PrimitiveType.JAVA_INT.getName();
             }
-
-            if ( t instanceof GenericSort ) {
-                throw new GenericSortException ( "sort",
-                    "Non-generic sort expected", t,
-                    getFilename (), getLine (), getColumn () );
+            
+            Sort s = lookupSort(name);
+            if(checkSort && s == null) {
+                throw new NotDeclException("sort", 
+                                           name, 
+                                           getFilename(), 
+                                           getLine(),  
+                                           getColumn());
             }
+            
+            result = new Pair<Sort,Type>(s, t);
         }
     ;
 
-empty_set_braces returns [String result = null]
-:
-   LBRACE RBRACE { result = "{}".intern(); }
-;
 
-array_set_decls[Sort p] returns [Sort s = null]                
+array_decls[Pair<Sort,Type> p] returns [Sort s = null]                
 {
-    String sortName = "";
-    String emptybraces = null;
-    int  n = 0;    
+    int n = 0;    
 }
-
     :
      (EMPTYBRACKETS {n++;})*
         { 
-            if (n != 0){
+            if(n != 0) {
                 final JavaInfo ji = getJavaInfo();
-                s = ArraySort.getArraySortForDim(p, 
-                			             n, 
-                			             ji.objectSort(),
-                                                     ji.cloneableSort(), 
-                                                     ji.serializableSort());
+                s = ArraySort.getArraySortForDim(p.first,
+                				 p.second, 
+                			         n, 
+                			         ji.objectSort(),
+                                                 ji.cloneableSort(), 
+                                                 ji.serializableSort());
 
                 Sort last = s;
                 do {
@@ -2122,26 +2162,11 @@ array_set_decls[Sort p] returns [Sort s = null]
                     last = as.elementSort();
                 } while (last instanceof ArraySort && sorts().lookup(last.name()) == null);
             } else {
-                s = p;
+                s = p.first;
             }
         }     
-        ({ if (s != null) { 
-                    sortName = s.name() + "";
-                }
-            }  
-             (emptybraces = empty_set_braces {                  
-                    
-                    sortName += emptybraces; 
-                    s = lookupSort(sortName);
-                    if (s == null) {
-                        throw new NotDeclException("sort", sortName, 
-                            getFilename(), 
-                            getLine(), getColumn());
-                    }
-                })*)
-      
-            
     ;
+    
 
 attrid returns [String attr = "";]
 {
@@ -2196,7 +2221,7 @@ funcpred_name returns [String result = null]
 ;
 
 
-// no array and set sorts
+// no array sorts
 simple_sort_name returns [String name = ""]
 { String id = ""; }
     :
@@ -2205,13 +2230,9 @@ simple_sort_name returns [String name = ""]
 
 
 sort_name returns [String name = null]
-{
-  String emptybraces = "";
-}
     :
         name = simple_sort_name     
-        (emptybraces = empty_set_braces {name += emptybraces;} |
-         brackets:EMPTYBRACKETS {name += brackets.getText();} )*
+        (brackets:EMPTYBRACKETS {name += brackets.getText();} )*
 ;
 
 /**
@@ -3526,20 +3547,20 @@ type_resolver returns [TypeResolver tr = null]
 varcond_new [TacletBuilder b]
 {
   ParsableVariable x = null, y = null;
-  Sort s = null;
+  KeYJavaType kjt = null;
 }
 :
    NEW LPAREN x=varId COMMA
       (
           TYPEOF LPAREN y=varId RPAREN {
-	    b.addVarsNew((SchemaVariable) x, (SchemaVariable) y, false);
+	    b.addVarsNew((SchemaVariable) x, (SchemaVariable) y);
 	  }
       |
          DEPENDINGON LPAREN y=varId RPAREN {
-	    b.addVarsNewDependingOn((SchemaVariable)x,(SchemaVariable)y);
+	    b.addVarsNewDependingOn((SchemaVariable)x, (SchemaVariable)y);
 	  }
-      | s=sortId_check[true] {
-		b.addVarsNew((SchemaVariable) x, s);
+      | kjt=keyjavatype {
+		b.addVarsNew((SchemaVariable) x, kjt.getJavaType());
 	  }
       )
    RPAREN
@@ -3614,17 +3635,31 @@ varcond_hassort [TacletBuilder b]
 {
   ParsableVariable x = null;
   Sort s = null;
+  boolean elemSort = false;
 }
 :
-   HASSORT LPAREN x=varId COMMA s=any_sortId_check[true] RPAREN {
-     if ( !( s instanceof GenericSort ) )
-   	 throw new GenericSortException ( "sort",
-   					  "Generic sort expected", s,
-   					   getFilename (), getLine (), getColumn () );
-     if ( !JavaTypeToSortCondition. checkSortedSV((SchemaVariable)x) )
-   	 semanticError("Expected schema variable of kind EXPRESSION or TYPE, " +
-   					"but is " + x);
-     b.addVariableCondition(new JavaTypeToSortCondition ((SchemaVariable)x, (GenericSort)s));
+   HASSORT 
+   LPAREN 
+   (x=varId | ELEMSORT LPAREN x=varId RPAREN {elemSort = true;}) 
+   COMMA 
+   s=any_sortId_check[true] 
+   RPAREN 
+   {
+     if(!(s instanceof GenericSort)) {
+   	 throw new GenericSortException("sort",
+   					"Generic sort expected", 
+   					s,
+   					getFilename(),
+   					getLine(), 
+   					getColumn());
+     } else if (!JavaTypeToSortCondition.checkSortedSV((SchemaVariable)x)) {
+   	 semanticError("Expected schema variable of kind EXPRESSION or TYPE, " 
+   	 	       + "but is " + x);
+     } else {
+         b.addVariableCondition(new JavaTypeToSortCondition((SchemaVariable)x, 
+     							    (GenericSort)s,
+     							    elemSort));
+     }
    }
 ;
 

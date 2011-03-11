@@ -31,7 +31,6 @@ public class TestKey extends TestCase {
 	de.uka.ilkd.key.logic.TestPosInOcc.class,   	
 	de.uka.ilkd.key.logic.TestClashFreeSubst.class,
 	de.uka.ilkd.key.logic.TestSyntacticalReplaceVisitor.class,
-	de.uka.ilkd.key.logic.TestTermOrdering.class,
 	de.uka.ilkd.key.logic.TestVariableNamer.class
     };
 

@@ -23,7 +23,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 
-public class AntecSuccTacletGoalTemplate extends TacletGoalTemplate{
+public class AntecSuccTacletGoalTemplate extends TacletGoalTemplate {
     /** sequent that replaces another one */
     private Sequent replacewith=Sequent.EMPTY_SEQUENT;
 

@@ -15,7 +15,7 @@ import java.util.HashMap;
 import de.uka.ilkd.key.logic.Term;
 
 
-public class AbbrevMap{
+public class AbbrevMap {
     
     /**
      * HashMaps used to store the mappings from Term to String, String to Term
@@ -29,7 +29,7 @@ public class AbbrevMap{
     /**
      * Creates a  AbbrevMap.
      */
-    public AbbrevMap(){
+    public AbbrevMap() {
 	termstring = new HashMap<AbbrevWrapper, String>();
 	stringterm = new HashMap<String, AbbrevWrapper>();
 	termenabled = new HashMap<AbbrevWrapper, Boolean>();
@@ -132,7 +132,7 @@ public class AbbrevMap{
         private Term t;
 
         public AbbrevWrapper(Term t){
-            this.t =t;
+            this.t = t;
         }
 
         public int hashCode(){
@@ -151,6 +151,3 @@ public class AbbrevMap{
         }
     }
 }
-
-
-

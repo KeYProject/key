@@ -218,7 +218,6 @@ public final class ProblemLoader implements Runnable {
                final String chooseContract;
                if(envInput instanceof KeYFile) {
         	   chooseContract = ((KeYFile)envInput).chooseContract();
-        	   initConfig.setOriginalKeYFileName(envInput.name());
                } else {
         	   chooseContract = null;
                }
@@ -572,29 +571,30 @@ public final class ProblemLoader implements Runnable {
     /** 1st pass: only VariableSV */
     public static TacletApp parseSV1(TacletApp app, SchemaVariable sv,
                                      String value, Services services) {
-        LogicVariable lv=new LogicVariable(new Name(value),
+        LogicVariable lv = new LogicVariable(new Name(value),
                                            app.getRealSort(sv, services));
         Term instance = TermFactory.DEFAULT.createTerm(lv);
         return app.addCheckedInstantiation(sv, instance, services,true);
     }
 
 
-
     /** 2nd pass: all other SV */
-    public static TacletApp parseSV2(TacletApp app, SchemaVariable sv,
-                                     String value, Goal targetGoal) {        
+    public static TacletApp parseSV2(TacletApp app, 
+	    			     SchemaVariable sv,
+                                     String value, 
+                                     Goal targetGoal) {        
         final Proof p = targetGoal.proof();
         final Services services = p.getServices();
         TacletApp result;
-        if (sv instanceof VariableSV) {
+        if(sv instanceof VariableSV) {
             // ignore -- already done
             result = app;
-        } else if (sv instanceof ProgramSV) {
+        } else if(sv instanceof ProgramSV) {
 	    final ProgramElement pe = 
 	        TacletInstantiationsTableModel.getProgramElement(
 		    app, value, sv, services);
 	    result = app.addCheckedInstantiation(sv, pe, services, true);
-        } else if ( sv instanceof SkolemTermSV ) {
+        } else if(sv instanceof SkolemTermSV) {
 	    result = app.createSkolemConstant ( value, sv, true, services );
         } else {
             Namespace varNS = p.getNamespaces().variables();
@@ -605,8 +605,6 @@ public final class ProblemLoader implements Runnable {
         }
         return result;
     }
-
-
 
 
     private TacletApp constructInsts(TacletApp app, Services services) {
@@ -641,9 +639,11 @@ public final class ProblemLoader implements Runnable {
             String s = (String) it.next();
             int eq = s.indexOf('=');
             String varname = s.substring(0, eq);
-            String value = s.substring(eq+1, s.length());
+            String value = s.substring(eq + 1, s.length());
             SchemaVariable sv = lookupName(uninsts, varname);
-            if (sv==null) continue;
+            if(sv == null) {
+        	continue;
+            }
             app = parseSV2(app, sv, value, currGoal);
         }
 
@@ -734,7 +734,5 @@ public final class ProblemLoader implements Runnable {
             left  = p_left;
             right = p_right;
         }
-
     }
-
 }

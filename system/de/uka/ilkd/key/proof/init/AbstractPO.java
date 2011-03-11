@@ -10,9 +10,11 @@
 
 package de.uka.ilkd.key.proof.init;
 
-import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.JavaInfo;
@@ -22,11 +24,15 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.util.Pair;
 
@@ -46,12 +52,18 @@ public abstract class AbstractPO implements ProofOblInput {
     protected final SpecificationRepository specRepos;
     protected final String name;
 
+    private final List<ProgramVariable> introducedProgVars 
+    	= new LinkedList<ProgramVariable>();
+    private final List<Function> introducedFuncs
+    	= new LinkedList<Function>();
+    private final List<Function> introducedPreds
+    	= new LinkedList<Function>();
+    private ImmutableSet<NoPosTacletApp> taclets;    
     private String header;
-    private ProofAggregate proofAggregate;
+    private ProofAggregate proofAggregate;    
     
     protected Term[] poTerms;
-    protected String[] poNames;
-    protected ImmutableSet<NoPosTacletApp>[] poTaclets;    
+    protected String[] poNames;    
 
     
     //-------------------------------------------------------------------------
@@ -140,31 +152,53 @@ public abstract class AbstractPO implements ProofOblInput {
     }
     
         
-    protected final ImmutableSet<NoPosTacletApp> collectClassAxioms(
-	    						KeYJavaType selfKJT) {
-	ImmutableSet<NoPosTacletApp> result = DefaultImmutableSet.nil();
+    protected void collectClassAxioms(KeYJavaType selfKJT) {
+	taclets = DefaultImmutableSet.nil();
 	final ImmutableSet<ClassAxiom> axioms 
 		= specRepos.getClassAxioms(selfKJT);
 	
 	for(ClassAxiom axiom : axioms) {
 	    final ImmutableSet<Pair<Sort, ObserverFunction>> scc 
 	    	= getSCC(axiom, axioms);
-//	    for(Pair<Sort, ObserverFunction> sccAx : scc) {
-//		System.out.println("in scc of " + axiom.getName() + ": " + sccAx);
-//	    }
 	    for(Taclet axiomTaclet : axiom.getTaclets(scc, services)) {
 		assert axiomTaclet != null 
 		       : "class axiom returned null taclet: " + axiom.getName();
-		result = result.add(NoPosTacletApp.createNoPosTacletApp(
+		taclets = taclets.add(NoPosTacletApp.createNoPosTacletApp(
 				   				axiomTaclet));
 		initConfig.getProofEnv()
 			  .registerRule(axiomTaclet, 
 				  	AxiomJustification.INSTANCE);
 	    }	    
 	}
-
-	return result;
     }    
+    
+    
+    
+    protected final void register(ProgramVariable pv) {
+	if(pv != null) {
+	    introducedProgVars.add(pv);
+	}
+    }
+    
+    
+    protected final void register(ImmutableList<ProgramVariable> pvs) {
+	for(ProgramVariable pv : pvs) {
+	    register(pv);
+	}
+    }
+    
+    
+    protected final void register(Function f) {
+	if(f != null) {
+	    assert f.sort() != Sort.UPDATE;
+	    if(f.sort() == Sort.FORMULA) {
+		introducedPreds.add(f);
+	    } else {
+		introducedFuncs.add(f);
+	    }
+	}
+    }
+    
 
     
     //-------------------------------------------------------------------------
@@ -187,61 +221,81 @@ public abstract class AbstractPO implements ProofOblInput {
      * Creates declarations necessary to save/load proof in textual form
      * (helper for createProof()).
      */
-    private void createProofHeader(String javaPath) {
+    private void createProofHeader(String javaPath,
+	    			   String classPath,
+	    			   String bootClassPath) {
         if(header != null) {
             return;
         }
-                
-        if(initConfig.getOriginalKeYFileName() == null) {
-            header = "\\javaSource \""+javaPath+"\";\n\n";
-        } else {
-            header = "\\include \"./" + initConfig.getOriginalKeYFileName() + "\";";
-        }
-
-        Iterator<Named> it;
-
-        /* program sorts need not be declared and
-         * there are no user-defined sorts with this kind of PO (yes?)
-                s += "sorts {\n"; // create declaration header for the proof
-                it = initConfig.sortNS().getProtocolled();
-                while (it.hasNext()) {
-                String n=it.next().toString();
-                int i;
-                if ((i=n.indexOf("."))<0 ||
-                initConfig.sortNS().lookup(new Name(n.substring(0,i)))==null) {
-                //the line above is for inner classes.
-                //KeY does not want to handle them anyway...
-                s = s+"object "+n+";\n";
-                }
-            }
-                s+="}
-        */
-        header += "\n\n\\programVariables {\n";
-        it = initConfig.progVarNS().allElements().iterator();
-        while(it.hasNext())
-        header += ((ProgramVariable)(it.next())).proofToString();
+        final StringBuffer sb = new StringBuffer();
         
-        header += "}\n\n\\functions {\n";
-        it = initConfig.funcNS().allElements().iterator();
-        while(it.hasNext()) {
-            Function f = (Function)it.next();
-            // only declare @pre-functions or anonymising functions, others will be generated automat. (hack)
-            if(f.sort() != Sort.FORMULA && (f.name().toString().indexOf("AtPre")!=-1 || services.getNameRecorder().
-                    getProposals().contains(f.name()))) {
-                header += f.proofToString();
-            }
+        //bootclasspath
+        if(bootClassPath != null && !bootClassPath.equals("")) {
+            sb.append("\\bootclasspath \"")
+              .append(bootClassPath)
+              .append("\";\n\n");
         }
-        header += "}\n\n\\predicates {\n";
+        
+        //classpath
+        if(classPath != null && !classPath.equals("")) {
+            sb.append("\\classpath \"")
+              .append(classPath)
+              .append("\";\n\n");
+        }        
 
-        it = initConfig.funcNS().allElements().iterator();
-        while(it.hasNext()) {
-            Function f = (Function)it.next();            
-            if(f.sort() == Sort.FORMULA && services.getNameRecorder().getProposals().contains(f.name())) {
-                header += f.proofToString();
+        //javaSource
+        sb.append("\\javaSource \"")
+          .append(javaPath)
+          .append("\";\n\n");
+
+        //program variables
+        if(!introducedProgVars.isEmpty()) {
+            sb.append("\\programVariables {\n");
+            for(ProgramVariable pv : introducedProgVars) {
+        	sb.append("  ").append(pv.proofToString());
             }
+            sb.append("}\n\n");
         }
-
-        header += "}\n\n";
+        
+        //functions
+        if(!introducedFuncs.isEmpty()) {
+            sb.append("\\functions {\n");
+            for(Function f : introducedFuncs) {
+        	sb.append("  ").append(f.proofToString());
+            }
+            sb.append("}\n\n");
+        }
+        
+        //predicates
+        if(!introducedPreds.isEmpty()) {
+            sb.append("\\predicates {\n");
+            for(Function p : introducedPreds) {
+        	sb.append("  ").append(p.proofToString());
+            }
+            sb.append("}\n\n");
+        }
+        
+        //taclets
+        if(taclets != null && !taclets.isEmpty()) {
+            sb.append("\\rules {\n");
+            LogicPrinter lp = new LogicPrinter(new ProgramPrinter(), 
+            			   	       new NotationInfo(), 
+            			   	       null, 
+            			   	       true);            
+            for(NoPosTacletApp npta : taclets) {
+        	lp.printTaclet(npta.taclet(),
+        		       SVInstantiations.EMPTY_SVINSTANTIATIONS, 
+        		       true, 
+        		       true);
+        	sb.append(lp.toString());
+        	sb.setLength(sb.length() - 1);
+        	sb.append(";\n");
+        	lp.reset();
+            }
+            sb.append("}\n\n");
+        }
+        
+        header = sb.toString();
     }
 
 
@@ -249,9 +303,10 @@ public abstract class AbstractPO implements ProofOblInput {
      * Creates a Proof (helper for getPO()).
      */
     private Proof createProof(String proofName, Term poTerm) {
-         createProofHeader(initConfig.getProofEnv()
-   	    		             .getJavaModel()
-        	    	             .getModelDir());
+	final JavaModel javaModel = initConfig.getProofEnv().getJavaModel();
+	createProofHeader(javaModel.getModelDir(), 
+			  javaModel.getClassPath(),
+			  javaModel.getBootClassPath());
         return new Proof(proofName,
                          poTerm,
                          header,
@@ -278,9 +333,9 @@ public abstract class AbstractPO implements ProofOblInput {
         for(int i = 0; i < proofs.length; i++) {
             proofs[i] = createProof(poNames != null ? poNames[i] : name,
                                     poTerms[i]);   
-            if(poTaclets != null) {
+            if(taclets != null) {
                 proofs[i].getGoal(proofs[i].root()).indexOfTaclets()
-                                                   .addTaclets(poTaclets[i]);
+                                                   .addTaclets(taclets);
             }            
         }
         

@@ -16,6 +16,7 @@ import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -30,18 +31,20 @@ import de.uka.ilkd.key.util.Debug;
 /**
  * Variable condition that enforces a given generic sort to be instantiated with
  * the sort of a program expression a schema variable is instantiated with
- * (currently only schema variables <code>ProgramSVSort.EXPRESSION</code> are
- * supported)
  */
 public final class JavaTypeToSortCondition implements VariableCondition {
 
     private final SchemaVariable exprOrTypeSV;
     private final GenericSort    sort;
+    private final boolean elemSort;
     
-    public JavaTypeToSortCondition (final SchemaVariable exprOrTypeSV,
-                                    final GenericSort sort) {
+    
+    public JavaTypeToSortCondition(final SchemaVariable exprOrTypeSV,
+                                   final GenericSort sort,
+                                   final boolean elemSort) {
         this.exprOrTypeSV = exprOrTypeSV;
         this.sort = sort;
+        this.elemSort = elemSort;
         
         if (!checkSortedSV(exprOrTypeSV)) {
             throw new RuntimeException
@@ -64,10 +67,10 @@ public final class JavaTypeToSortCondition implements VariableCondition {
   
     
     @Override
-    public MatchConditions check (SchemaVariable var,
-                                  SVSubstitute svSubst,
-                                  MatchConditions matchCond,
-                                  Services services) {
+    public MatchConditions check(SchemaVariable var,
+                                 SVSubstitute svSubst,
+                                 MatchConditions matchCond,
+                                 Services services) {
         if ( var != exprOrTypeSV ) {
             return matchCond;
         }
@@ -77,7 +80,7 @@ public final class JavaTypeToSortCondition implements VariableCondition {
                 svSubst instanceof Term);
         
         final SVInstantiations inst = matchCond.getInstantiations ();
-        final Sort type;
+        Sort type;
         if (svSubst instanceof Term) {
             type = ((Term)svSubst).sort();
         } else if (svSubst instanceof TypeReference) {
@@ -85,6 +88,13 @@ public final class JavaTypeToSortCondition implements VariableCondition {
         } else {
             final Expression expr = (Expression)svSubst;          
             type = expr.getKeYJavaType ( services, inst.getExecutionContext () ).getSort();
+        }
+        if(elemSort) {
+            if(type instanceof ArraySort) {
+        	type = ((ArraySort)type).elementSort();
+            } else {
+        	return null;
+            }
         }
         try {
             return matchCond.setInstantiations ( inst.add( 
@@ -98,6 +108,10 @@ public final class JavaTypeToSortCondition implements VariableCondition {
     
     @Override
     public String toString () {
-        return "\\hasSort(" + exprOrTypeSV + ", " + sort + ")";
+        return "\\hasSort(" 
+               + (elemSort ? "\\elemSort(" + exprOrTypeSV + ")" : exprOrTypeSV)
+               + ", " 
+               + sort 
+               + ")";
     }
 }

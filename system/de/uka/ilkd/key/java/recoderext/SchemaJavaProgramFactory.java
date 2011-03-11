@@ -132,7 +132,7 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
     }
 
 
-    public boolean lookupSchemaVariableType(String s, ProgramSVSort sort){
+    public boolean lookupSchemaVariableType(String s, ProgramSVSort sort) {
 	if (svns==null) return false;
 	Named n=svns.lookup(new Name(s));
 	if (n!=null && n instanceof SchemaVariable) {
@@ -142,7 +142,7 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
     }
 
 
-    public SchemaVariable lookupSchemaVariable(String s) throws ParseException{
+    public SchemaVariable lookupSchemaVariable(String s) throws ParseException {
 	SchemaVariable sv=null;
 	Named n=svns.lookup(new Name(s));
 	if (n!=null && n instanceof SchemaVariable) {
@@ -153,7 +153,7 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
 	return sv;
     }
 
-    public StatementSVWrapper getStatementSV(String s) throws ParseException{
+    public StatementSVWrapper getStatementSV(String s) throws ParseException {
 	SchemaVariable sv=lookupSchemaVariable(s);
 	if (!(sv instanceof ProgramSV)) {   
 	    throwSortInvalid(sv, "Statement");
@@ -162,7 +162,7 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
 	return new StatementSVWrapper(sv);
     }
 
-    public ExpressionSVWrapper getExpressionSV(String s) throws ParseException{
+    public ExpressionSVWrapper getExpressionSV(String s) throws ParseException {
 	SchemaVariable sv=lookupSchemaVariable(s);
 	if (!(sv instanceof ProgramSV)) {   
 	    throwSortInvalid(sv, "Expression");
@@ -179,7 +179,7 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
 	return new LabelSVWrapper(sv);
     }
     
-    public JumpLabelSVWrapper getJumpLabelSV(String s) throws ParseException{
+    public JumpLabelSVWrapper getJumpLabelSV(String s) throws ParseException {
         SchemaVariable sv=lookupSchemaVariable(s);
         if (!(sv instanceof ProgramSV) ||
                 sv.sort()!=ProgramSVSort.LABEL) {   
@@ -196,7 +196,7 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
 	return new TypeSVWrapper(sv);
     }
 
-    public ExecCtxtSVWrapper getExecutionContextSV(String s) throws ParseException{
+    public ExecCtxtSVWrapper getExecutionContextSV(String s) throws ParseException {
 	SchemaVariable sv=lookupSchemaVariable(s);
 	if (!(sv instanceof ProgramSV)) {   
 	    throwSortInvalid(sv, "Type");

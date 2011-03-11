@@ -39,7 +39,7 @@ public class ProofEnvironment {
     private RuleJustificationInfo justifInfo = new RuleJustificationInfo();
     private final InitConfig initConfig; 
     private Set<ProofAggregate> proofs = new HashSet<ProofAggregate>(); //of ProofList
-    private int number=0;
+    private int number = 0;
 
     /** constructs a proof environment with the given initial
      * configuration of the proofs contained in the environment.
@@ -168,9 +168,9 @@ public class ProofEnvironment {
  	    return false;
  	}
  	ProofEnvironment pe = (ProofEnvironment) cmp;
- 	return pe.getJavaModel().equals(getJavaModel())&&
+ 	return pe.getJavaModel().equals(getJavaModel()) &&
 	    pe.getRuleConfig().equals(getRuleConfig()) &&
-	    pe.getNumber()==(getNumber());
+	    pe.getNumber() == (getNumber());
     }
 
     public int hashCode() {
@@ -204,5 +204,4 @@ public class ProofEnvironment {
     public String toString() {
 	return description();
     }    
-
 }

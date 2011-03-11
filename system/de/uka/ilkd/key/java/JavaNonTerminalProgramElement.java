@@ -20,24 +20,22 @@ import de.uka.ilkd.key.util.ExtList;
  *  Top level implementation of a Java {@link NonTerminalProgramElement}.
  * taken from COMPOST and changed to achieve an immutable structure
  */
-public abstract class JavaNonTerminalProgramElement extends JavaProgramElement
- implements NonTerminalProgramElement {
+public abstract class JavaNonTerminalProgramElement 
+			extends JavaProgramElement
+ 			implements NonTerminalProgramElement {
 
+    
     private int hashCode;
 
-
-    /**
-     * Java program element.
-     */
-
+    
     public JavaNonTerminalProgramElement() {
     }
 
+    
     /**
      * Java program element.
      * @param list as ExtList with children of the node
      */
-
     public JavaNonTerminalProgramElement(ExtList list) {
         super(list);
     }
@@ -47,9 +45,11 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement
         super(pos);
     }
 
+    
     public JavaNonTerminalProgramElement(ExtList children, PositionInfo pos) {
         super(children, pos);
     } 
+    
     
     /**
      * returns the index of element el in array arr
@@ -66,6 +66,7 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement
 	return -1;
     } 
 
+    
     /** commented in interface SourceElement. Overwrites the default
      * method implementation in ProgramElement by descending down to
      * the children.
@@ -89,10 +90,14 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement
 	return true;
     }
 
+    
+    @Override    
     public boolean equals(Object o) {
         return super.equals(o);
     }
     
+    
+    @Override    
     public int hashCode(){
 	if (hashCode == 0) {
 	    int result = 17;
@@ -111,16 +116,7 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement
     
   
 
-    /**
-     * matches the source "text" (@link SourceData#getSource()) against the pattern represented 
-     * by this object. In case of a successful match the resulting {@link MatchConditions} with 
-     * the found instantiations of the schemavariables. If the match 
-     * failed, <tt>null</tt> is returned instead. 
-     * 
-     * @param source the SourceData with the program element to match
-     * @param matchCond the MatchConditions found up to this point
-     * @return the resulting match conditions or <tt>null</tt> if the match failed 
-     */
+    @Override    
     public MatchConditions match(SourceData source, MatchConditions matchCond) {
         final ProgramElement src = source.getSource();
         
@@ -152,6 +148,7 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement
     
     }
     
+    
     /**
      * used by @link matchChildren to decide if a found match is valid or if there are remaining
      * source elements that have not been matched (in which case the match failed) 
@@ -159,6 +156,7 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement
     protected boolean compatibleBlockSize(int pos, int max) {
         return pos >= max;
     }
+    
     
     /**
      * matches successively all children of this current node. Thereby the

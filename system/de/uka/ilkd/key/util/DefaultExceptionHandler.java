@@ -11,13 +11,14 @@
 package de.uka.ilkd.key.util;
 
 
-public class DefaultExceptionHandler extends KeYExceptionHandlerImpl{
+public class DefaultExceptionHandler extends KeYExceptionHandlerImpl {
 
-    public void reportException(Throwable e){
+    public DefaultExceptionHandler() {}
+    
+    public void reportException(Throwable e) {
 	super.reportException(e);
-        if (getExceptions().size() != 0) {
+        if(getExceptions().size() != 0) {
             throw new RuntimeException(e);
         }
     }
-
 }

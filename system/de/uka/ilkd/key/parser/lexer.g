@@ -49,6 +49,7 @@ tokens {
 	UPDATE = "\\update";
 	VARIABLES = "\\variables";
 	SKOLEMTERM = "\\skolemTerm";
+	SKOLEMFORMULA = "\\skolemFormula";
 	
         // used in contracts
 	MODIFIES = "\\modifies";
@@ -65,7 +66,8 @@ tokens {
 	DROP_EFFECTLESS_STORES = "\\dropEffectlessStores";	
 	ENUM_CONST = "\\enumConstant";	
         FREELABELIN = "\\freeLabelIn";
-	HASSORT = "\\hasSort";        
+	HASSORT = "\\hasSort";
+	ELEMSORT = "\\elemSort";        
 	ISARRAY="\\isArray";
 	ISARRAYLENGTH="\\isArrayLength";	
         ISENUMTYPE="\\isEnumType";

@@ -31,8 +31,8 @@ public class NotFreeIn {
      */
     public NotFreeIn(SchemaVariable first, SchemaVariable second) {
 	if (!(first instanceof VariableSV)) {
-	    throw new RuntimeException("Expected a SchemaVariable "+
-				       "that has been only allowed to match "+
+	    throw new RuntimeException("Expected a SchemaVariable " +
+				       "that has been only allowed to match " +
 				       "variables"); 
 	}
 	this.first = first;
@@ -52,18 +52,18 @@ public class NotFreeIn {
     }
 
     public String toString() {
-	return "\\notFreeIn("+first()+","+second()+")";
+	return "\\notFreeIn(" + first() + "," + second() + ")";
     }
 
     public boolean equals(Object o) {
-	if(! (o instanceof NotFreeIn)) {
+	if(!(o instanceof NotFreeIn)) {
 	    return false;
 	}
-	NotFreeIn nfi=(NotFreeIn)o;
-	return (nfi.first==first() && nfi.second==second());
+	NotFreeIn nfi = (NotFreeIn)o;
+	return nfi.first == first() && nfi.second == second();
     }
     
-    public int hashCode(){
+    public int hashCode() {
     	int result = 17;
     	result = 37 * result + first().hashCode();
     	result = 37 * result + second().hashCode();

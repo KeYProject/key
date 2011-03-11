@@ -646,22 +646,24 @@ public final class SpecificationRepository {
 		                    invDef);
 	final ObserverFunction invSymbol = services.getJavaInfo().getInv();
 	final ClassAxiom invRepresentsAxiom 
-		= new RepresentsAxiom("Class invariant axiom for " 
+		= new RepresentsAxiom("Class_invariant_axiom_for_" 
 			                 + kjt.getFullName(),
-			             invSymbol,
-				     kjt,	
-				     new Private(),
-				     invDef,
-				     selfVar);
+			              invSymbol,
+				      kjt,	
+				      new Private(),
+				      invDef,
+				      selfVar);
 	result = result.add(invRepresentsAxiom);
 		
 	//add query axioms for own class
 	for(ProgramMethod pm : services.getJavaInfo()
 		                       .getAllProgramMethods(kjt)) {
-	    if(pm.getKeYJavaType() != null) {
+	    if(pm.getKeYJavaType() != null && !pm.isImplicit()) {
 		pm = services.getJavaInfo().getToplevelPM(kjt, pm);		
 		final ClassAxiom queryAxiom 
-		    = new QueryAxiom("Query axiom for " + pm.getFullName(),
+		    = new QueryAxiom("Query_axiom_for_" + pm.getFullName()
+			                                    .replace("<", "_")
+			                                    .replace(">", "_"),
 			             pm, 
 			             kjt);
 		result = result.add(queryAxiom);

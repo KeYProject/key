@@ -2,13 +2,12 @@ public class StringSet {
 
     private /*@ spec_public nullable @*/ String[] elements;
     private /*@ spec_public @*/ int size;
+
+    /*@ public instance invariant this.size > 0; @*/
+
     /*@ public instance invariant
-      this.size > 0;
-      @*/
-    /*@ public instance invariant
-      this.elements != null && this.elements.length == this.size;
-      @*/
-	
+      @   this.elements != null && this.elements.length == this.size;
+      @*/	
     public StringSet (int size) {
 	assert (size > 0);
 	this.size = size;
@@ -16,43 +15,35 @@ public class StringSet {
     }
 	
     /*@ public normal_behavior
-      requires s != null && s.hashCode() >= 0;
-      requires this.elements[(s.hashCode() % this.size)] == null;
-      assignable this.elements[(s.hashCode() % this.size)];
-      ensures this.elements[(s.hashCode() % this.size)] == s;
-      ensures \result == true;
-		
-      also
-
-      public normal_behavior
-      requires s != null && s.hashCode() < 0;
-      requires this.elements[(-(s.hashCode() + 1) % this.size)] == null;
-      assignable this.elements[(-(s.hashCode() + 1) % this.size)];
-      ensures this.elements[(-(s.hashCode() + 1) % this.size)] == s;
-      ensures \result == true;
-      
-      also
-		
-      public normal_behavior
-      requires s != null && s.hashCode() >= 0;
-      requires this.elements[(s.hashCode() % this.size)] != null;
-      assignable \nothing;
-      ensures \result == elements[(s.hashCode() % this.size)].equals(s);
-		
-      also
-
-      public normal_behavior
-      requires s != null && s.hashCode() < 0;
-      requires this.elements[(-(s.hashCode() + 1) % this.size)] != null;
-      assignable \nothing;
-      ensures \result == this.elements[(-(s.hashCode() + 1) % this.size)].equals(s);
-      
-      also
-		
-      public normal_behavior
-      requires s == null;
-      assignable \nothing;
-      ensures \result == false;
+      @  requires s != null && s.hashCode() >= 0;
+      @  requires this.elements[(s.hashCode() % this.size)] == null;
+      @  assignable this.elements[(s.hashCode() % this.size)];
+      @  ensures this.elements[(s.hashCode() % this.size)] == s;
+      @  ensures \result == true;		
+      @ also
+      @ public normal_behavior
+      @  requires s != null && s.hashCode() < 0;
+      @  requires this.elements[(-(s.hashCode() + 1) % this.size)] == null;
+      @  assignable this.elements[(-(s.hashCode() + 1) % this.size)];
+      @  ensures this.elements[(-(s.hashCode() + 1) % this.size)] == s;
+      @  ensures \result == true;     
+      @ also		
+      @ public normal_behavior
+      @  requires s != null && s.hashCode() >= 0;
+      @  requires this.elements[(s.hashCode() % this.size)] != null;
+      @  assignable \nothing;
+      @  ensures \result == elements[(s.hashCode() % this.size)].equals(s);		
+      @ also
+      @ public normal_behavior
+      @  requires s != null && s.hashCode() < 0;
+      @  requires this.elements[(-(s.hashCode() + 1) % this.size)] != null;
+      @  assignable \nothing;
+      @  ensures \result == this.elements[(-(s.hashCode() + 1) % this.size)].equals(s);      
+      @ also		
+      @ public normal_behavior
+      @  requires s == null;
+      @  assignable \nothing;
+      @  ensures \result == false;
       @*/
     public boolean insert (String /*@ nullable @*/ s) {
 	if (s==null) return false;
@@ -71,25 +62,21 @@ public class StringSet {
     }
 	
     /*@ public normal_behavior
-      requires s != null && s.hashCode() >= 0;
-      assignable \nothing;
-      ensures \result == 
-      s.equals(this.elements[s.hashCode() % this.size]);
-		
-      also
-
-      public normal_behavior
-      requires s != null && s.hashCode() < 0;
-      assignable \nothing;
-      ensures \result == 
-        s.equals(this.elements[-(s.hashCode() + 1) % this.size]);
-		
-      also
-		
-      public normal_behavior
-      requires s == null;
-      assignable \nothing;
-      ensures \result == false;
+      @  requires s != null && s.hashCode() >= 0;
+      @  assignable \nothing;
+      @  ensures \result == 
+      @  s.equals(this.elements[s.hashCode() % this.size]);		
+      @ also
+      @ public normal_behavior
+      @  requires s != null && s.hashCode() < 0;
+      @  assignable \nothing;
+      @  ensures \result == 
+      @    s.equals(this.elements[-(s.hashCode() + 1) % this.size]);		
+      @ also		
+      @ public normal_behavior
+      @  requires s == null;
+      @  assignable \nothing;
+      @  ensures \result == false;
       @*/
     public boolean contains (String /*@ nullable @*/ s) {
 	if (s==null) return false;

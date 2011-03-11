@@ -132,10 +132,14 @@ public class ConstructorCall extends ProgramMetaConstruct {
 	                        services, ec);    
 	}
 	
-	ProgramMethod method = services.getJavaInfo().
-	  getProgramMethod(classType, NORMALFORM_IDENTIFIER,
-              argumentVariables, ec.
-              getTypeReference().getKeYJavaType());
+	//get init method
+	//(deliberately using classType itself as the "context type", in order 
+	//to allow public calls to private init methods)
+	final ProgramMethod method 
+		= services.getJavaInfo().getProgramMethod(classType, 
+							  NORMALFORM_IDENTIFIER,
+							  argumentVariables, 
+							  classType);
 	
 	Debug.assertTrue(method != null, "Call to non-existent constructor.");
     

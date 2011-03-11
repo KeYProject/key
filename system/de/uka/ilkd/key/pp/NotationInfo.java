@@ -109,7 +109,7 @@ public final class NotationInfo {
     /**
      * Maps terms to abbreviations and reverse.
      */
-    private AbbrevMap scm;
+    private AbbrevMap scm = new AbbrevMap();
     
     
 
@@ -117,23 +117,20 @@ public final class NotationInfo {
     //constructors
     //-------------------------------------------------------------------------    
 
-
     public NotationInfo() {
     	createDefaultNotationTable();
     }
+    
     
     
     //-------------------------------------------------------------------------
     //internal methods
     //-------------------------------------------------------------------------     
         
-    
-    /** Register the standard set of notations.  This means no
-     * abbreviations, and a set of Notations for the built-in operators
-     * which corresponds to the parser syntax. 
+    /** Register the standard set of notations (that can be defined without
+     * a services object).
      */
     private void createDefaultNotationTable() {
-	scm = new AbbrevMap();
 	tbl = new HashMap<Object,Notation>();
 	
 	tbl.put(Junctor.TRUE ,new Notation.Constant("true", 130));
@@ -165,6 +162,10 @@ public final class NotationInfo {
     }
         
     
+    /**
+     * Adds notations that can only be defined when a services object is 
+     * available.
+     */
     private void addFancyNotations(Services services) {
 	//arithmetic operators
 	final IntegerLDT integerLDT 
@@ -225,11 +226,13 @@ public final class NotationInfo {
     public AbbrevMap getAbbrevMap(){
 	return scm;
     }
+    
 
     public void setAbbrevMap(AbbrevMap am){
 	scm = am;
     }
 
+    
     /** Get the Notation for a given Operator.  
      * If no notation is registered, a Function notation is returned.
      */

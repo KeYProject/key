@@ -74,9 +74,20 @@ public final class ModalOperatorSV extends AbstractSV  {
     }
     
     
-    
     @Override
     public String toString() {
 	return toString(" (modal operator)");
+    }
+    
+    
+    @Override 
+    public String proofToString() {
+	StringBuffer result = new StringBuffer();
+	result.append("\\schemaVar \\modalOperator {");
+	for(Modality modality : modalities) {
+	    result.append(modality);
+	}
+	result.append("} ").append(name()).append(";\n");
+	return result.toString();
     }
 }

@@ -19,6 +19,8 @@ import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.gui.KeYSelectionEvent;
+import de.uka.ilkd.key.gui.KeYSelectionListener;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
@@ -32,7 +34,8 @@ import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.util.LRUCache;
 
 
-public final class OneStepSimplifier implements BuiltInRule {
+public final class OneStepSimplifier implements BuiltInRule, 	
+						KeYSelectionListener {
     
     public static final OneStepSimplifier INSTANCE 
                                             = new OneStepSimplifier();
@@ -56,6 +59,7 @@ public final class OneStepSimplifier implements BuiltInRule {
     private ImmutableSet<NoPosTacletApp> appsTakenOver;
     private TacletIndex[] indices;
     private Map<Term,Term> notSimplifiableCaches[];
+    private boolean active;
     
     
 
@@ -80,12 +84,27 @@ public final class OneStepSimplifier implements BuiltInRule {
      * be restored later, and returns them.
      */
     private ImmutableSet<Taclet> tacletsForRuleSet(
-	    			Goal goal, 
+	    			Proof proof, 
 	    			String ruleSetName,
 	    			ImmutableList<String> excludedRuleSetNames) {
+	assert !proof.openGoals().isEmpty();
 	ImmutableSet<Taclet> result = DefaultImmutableSet.<Taclet>nil();
+	
+	//collect apps present in all open goals
 	ImmutableSet<NoPosTacletApp> allApps 
-		= goal.ruleAppIndex().tacletIndex().allNoPosTacletApps();
+		= proof.openGoals()
+		       .head()
+		       .ruleAppIndex()
+		       .tacletIndex()
+		       .allNoPosTacletApps();
+	for(Goal goal : proof.openGoals().tail()) {
+	    allApps = allApps.intersect(goal.ruleAppIndex()
+		    		            .tacletIndex()
+		    		            .allNoPosTacletApps());
+	}
+	
+	//identify those apps suitable for the one step simplifier; 
+	//store them in appsTakenOver and their taclets in result
 	for(NoPosTacletApp app : allApps) {
 	    if(!(app.taclet() instanceof RewriteTaclet)
 	       || !app.taclet().hasReplaceWith()
@@ -94,12 +113,12 @@ public final class OneStepSimplifier implements BuiltInRule {
 	       || !app.taclet().goalTemplates().head().sequent().isEmpty()
 	       || ((RewriteTaclet)app.taclet()).getStateRestriction() 
 	             != RewriteTaclet.NONE
-	       || !goal.proof().mgt().getJustification(app)
-	                             .isAxiomJustification()) {
+	       || !proof.mgt().getJustification(app)
+	                      .isAxiomJustification()) {
 	        continue;
 	    }
 	    
-	    boolean accept = false;	    
+	    boolean accept = false;
 	    for(RuleSet rs : app.taclet().getRuleSets()) {
 		if(rs.name().toString().equals(ruleSetName)) {
 		    accept = true;
@@ -111,8 +130,14 @@ public final class OneStepSimplifier implements BuiltInRule {
 	    
 	    if(accept) {
 		appsTakenOver = appsTakenOver.add(app);		
-		goal.ruleAppIndex().removeNoPosTacletApp(app);
 		result = result.add(app.taclet());
+	    }
+	}
+	
+	//remove apps in appsTakenOver from taclet indices of all open goals
+	for(NoPosTacletApp app : appsTakenOver) {
+	    for(Goal goal : proof.openGoals()) {
+		goal.ruleAppIndex().removeNoPosTacletApp(app);
 	    }
 	}
 	
@@ -124,17 +149,17 @@ public final class OneStepSimplifier implements BuiltInRule {
      * If the rule is applied to a different proof than last time, then clear
      * all caches and initialise the taclet indices.
      */
-    private void initIndices(Goal goal) {
-	if(goal.proof() != lastProof) {
+    private void initIndices(Proof proof) {
+	if(proof != lastProof) {
 	    shutdownIndices();
-	    lastProof = goal.proof();	    
+	    lastProof = proof;	    
 	    appsTakenOver = DefaultImmutableSet.<NoPosTacletApp>nil();;	    
 	    indices = new TacletIndex[ruleSets.size()];
 	    notSimplifiableCaches = new LRUCache[indices.length];
 	    int i = 0;
 	    ImmutableList<String> done = ImmutableSLList.<String>nil();
 	    for(String ruleSet : ruleSets) {
-		ImmutableSet<Taclet> taclets = tacletsForRuleSet(goal, 
+		ImmutableSet<Taclet> taclets = tacletsForRuleSet(proof, 
 						        	 ruleSet, 
 						        	 done);
 		indices[i] = new TacletIndex(taclets);
@@ -441,28 +466,34 @@ public final class OneStepSimplifier implements BuiltInRule {
 
     //-------------------------------------------------------------------------
     //public interface
-    //------------------------------------------------------------------------- 
+    //-------------------------------------------------------------------------
+    
+    public void refresh(Proof proof) {
+	active = ProofSettings.DEFAULT_SETTINGS
+		              .getGeneralSettings()
+		              .oneStepSimplification();
+	if(active && !proof.closed()) {
+	    initIndices(proof);
+	} else {
+	    shutdownIndices();	    
+	}
+    }
+    
     
     @Override    
     public boolean isApplicable(Goal goal, 
                                 PosInOccurrence pio, 
                                 Constraint userConstraint) {
+	//abort if switched off
+	if(!active) {
+	    return false;
+	}	
+	
 	//abort if not top level constrained formula
 	if(pio == null || !pio.isTopLevel()) {
 	    return false;
 	}
 	
-	//abort if switched off
-	if(!ProofSettings.DEFAULT_SETTINGS
-		         .getGeneralSettings()
-		         .oneStepSimplification()) {
-	    shutdownIndices();
-	    return false;
-	}
-		
-	//initialize if needed
-	initIndices(goal);
-		
 	//get instantiation
 	Services services = goal.proof().getServices();	
 	Instantiation inst = getInstantiation(services, 
@@ -513,6 +544,19 @@ public final class OneStepSimplifier implements BuiltInRule {
     public String toString() {
         return displayName();
     }
+    
+    
+    @Override
+    public void selectedNodeChanged(KeYSelectionEvent e) {
+	//don't care
+    }
+
+    
+    @Override
+    public void selectedProofChanged(KeYSelectionEvent e) {
+	refresh(e.getSource().getSelectedProof());
+    }
+    
     
     
 

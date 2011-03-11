@@ -52,7 +52,7 @@ public class NamespaceSet {
     }
 
     public void setProgramVariables(Namespace progVarNS) {
-	this.progVarNS=progVarNS;
+	this.progVarNS = progVarNS;
     }
 
     public Namespace functions() {
@@ -60,7 +60,7 @@ public class NamespaceSet {
     }
 
     public void setFunctions(Namespace funcNS) {
-	this.funcNS=funcNS;
+	this.funcNS = funcNS;
     }
 
     public Namespace ruleSets() {
@@ -76,7 +76,7 @@ public class NamespaceSet {
     }
 
     public void setSorts(Namespace sortNS) {
-	this.sortNS=  sortNS;
+	this.sortNS = sortNS;
     }
 
     public Namespace choices() {

@@ -15,6 +15,7 @@ import de.uka.ilkd.key.java.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.ProgramElementName;
+
 /**
  *  TypeReferences reference {@link recoder.abstraction.Type}s by name.
  *  A TypeReference can refer to an outer or inner type and hence can also
@@ -24,7 +25,6 @@ import de.uka.ilkd.key.logic.ProgramElementName;
  *  have other TypeReferences as a prefix, playing the role of a
  *  {@link TypeReferenceContainer}.
  */
-
 public interface TypeReference
  extends TypeReferenceInfix, TypeReferenceContainer, PackageReferenceContainer, MemberReference, NonTerminalProgramElement, SourceElement {
 
@@ -37,7 +37,6 @@ public interface TypeReference
     int getDimensions();
 
     KeYJavaType getKeYJavaType();
-
 }
 
 

@@ -45,27 +45,30 @@ public class SchemaVariableFactory {
      * forcing exact type match
      * @return the SchemaVariable
      */
-    public static SchemaVariable createTermSV(Name    name,
-					      Sort    sort,
-					      boolean rigidness, 
-                                              boolean strictSV) {
+    public static TermSV createTermSV(Name name,
+			              Sort sort,
+			              boolean rigidness, 
+                                      boolean strictSV) {
 	return new TermSV(name, sort, rigidness, strictSV);
     }
+    
 
     /**
       * creates a SchemaVariable representing an operator 
       * @param name the Name of the SchemaVariable
       * @return the SchemaVariable
       */
-    public static SchemaVariable createModalOperatorSV(Name name,
-            Sort sort, ImmutableSet<Modality> modalities) {
+    public static ModalOperatorSV createModalOperatorSV(Name name,
+            						Sort sort, 
+            						ImmutableSet<Modality> modalities) {
 	return new ModalOperatorSV(name, modalities);
     }
 
-    public static SchemaVariable createTermSV(Name    name,
-					      Sort    sort) {
+    
+    public static TermSV createTermSV(Name name, Sort sort) {
 	return createTermSV(name, sort, false, false);
     }
+    
 
     /** creates a SchemaVariable representing a formula 
      * @param name the Name of the SchemaVariable
@@ -73,38 +76,34 @@ public class SchemaVariableFactory {
      * terms/formulas
      * @return the SchemaVariable
      */
-    public static SchemaVariable createFormulaSV(Name    name,
-						 boolean rigidness) {
+    public static FormulaSV createFormulaSV(Name name, boolean rigidness) {
 	return new FormulaSV(name, rigidness);
     }
 
-    public static SchemaVariable createFormulaSV(Name name) {
+    
+    public static FormulaSV createFormulaSV(Name name) {
 	return createFormulaSV(name, false);
     }
     
-    public static SchemaVariable createUpdateSV(Name name) {
+    
+    public static UpdateSV createUpdateSV(Name name) {
 	return new UpdateSV(name);
     }
     
 
     /** creates a SchemaVariable representing a program construct
-     * @param name the ProgramElementName of the SchemaVariable
-     * @return the SchemaVariable
      */
-    public static SchemaVariable createProgramSV(ProgramElementName name, 
-						 ProgramSVSort s,
-						 boolean listSV){
+    public static ProgramSV createProgramSV(ProgramElementName name, 
+				            ProgramSVSort s,
+				            boolean listSV) {
 	return new ProgramSV(name, s, listSV);
     }
 
 
     /** 
      * creates a SchemaVariable representing a skolem term
-     * @param name the Name of the SchemaVariable
-     * @return the SchemaVariable
      */
-    public static SchemaVariable createSkolemTermSV(Name name, 
-						    Sort s){
+    public static SkolemTermSV createSkolemTermSV(Name name, Sort s) {
 	return new SkolemTermSV(name, s);
     }
 }

@@ -5,11 +5,12 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+
 package paycard;
 
 
-public class CardException extends java.lang.RuntimeException{
+public class CardException extends java.lang.RuntimeException {
 
-    public CardException(){
+    public CardException() {
     }
 }

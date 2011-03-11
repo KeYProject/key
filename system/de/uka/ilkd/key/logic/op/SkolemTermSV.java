@@ -18,7 +18,7 @@ import de.uka.ilkd.key.rule.MatchConditions;
 public final class SkolemTermSV extends AbstractSV {
 
     /** 
-     * creates a new SchemaVariable. That is used as placeholder for
+     * Creates a new schema variable that is used as placeholder for
      * skolem terms.
      * @param name the Name of the SchemaVariable
      * @param sort the Sort of the SchemaVariable and the matched type     
@@ -31,12 +31,6 @@ public final class SkolemTermSV extends AbstractSV {
 	
     
     @Override
-    public String toString() {
-	return toString(sort().toString()+" skolem term");
-    }
-
-
-    @Override
     public MatchConditions match(SVSubstitute subst, 
 	    			 MatchConditions mc,
 	    			 Services services) {
@@ -45,5 +39,23 @@ public final class SkolemTermSV extends AbstractSV {
 	} else {
 	    return null;
 	}
+    }
+    
+    
+    @Override
+    public String toString() {
+	return toString(sort().toString() + " skolem term");
+    }
+    
+    
+    @Override
+    public String proofToString() {
+	return "\\schemaVar " 
+	        + (sort() == Sort.FORMULA 
+	           ? "\\skolemFormula" 
+	           : "\\skolemTerm " + sort().name()) 
+	        + " " 
+	        + name() 
+	        + ";\n";
     }
 }

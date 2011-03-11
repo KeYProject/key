@@ -63,4 +63,14 @@ public final class VariableSV extends AbstractSV implements QuantifiableVariable
     public String toString() {
 	return toString("variable");
     }
+    
+    
+    @Override
+    public String proofToString() {
+	return "\\schemaVar \\variables " 
+	       + sort().name() 
+	       + " " 
+	       + name() 
+	       + ";\n";
+    }    
 }

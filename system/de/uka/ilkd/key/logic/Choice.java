@@ -20,7 +20,7 @@ public class Choice implements Named {
      * creates a choice object with name <category>:<choice>.
      */
     public Choice(String choice, String category){
-	this(new Name(category+":"+choice), category);
+	this(new Name(category + ":" + choice), category);
     }
     
 

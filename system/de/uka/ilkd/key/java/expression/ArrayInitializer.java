@@ -17,7 +17,6 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.sort.ArraySort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.ExtList;
 
 
@@ -30,14 +29,9 @@ import de.uka.ilkd.key.util.ExtList;
  *  The parent expression is either another ArrayInitializer (nested blocks)
  *  or a VariableDeclaration.
  */
+public class ArrayInitializer extends JavaNonTerminalProgramElement
+ 			      implements Expression, ExpressionContainer {
 
-public class ArrayInitializer
- extends JavaNonTerminalProgramElement
- implements Expression, ExpressionContainer {
-
-    /**
- *      Children.
-     */
 
     protected final ImmutableArray<Expression> children;
 
@@ -49,12 +43,12 @@ public class ArrayInitializer
      * 		several of Expression (as the initializing expression)
      * 		Comments
      */
-
     public ArrayInitializer(ExtList list) {
 	super(list);
 	this.children = 
 	    new ImmutableArray<Expression>((Expression[])list.collect(Expression.class));
     }
+    
     
     /**
      * create a new array initializer with the given expressions as elements.
@@ -66,25 +60,13 @@ public class ArrayInitializer
     }
     
 
-
-    /**
- *      Returns the number of children of this node.
- *      @return an int giving the number of children of this node
-    */
-
+    @Override
     public int getChildCount() {
         return (children != null) ? children.size() : 0;
     }
 
-    /**
- *      Returns the child at the specified index in this node's "virtual"
- *      child array
- *      @param index an index into this node's "virtual" child array
- *      @return the program element at the given position
- *      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
- *                 of bounds
-    */
 
+    @Override
     public ProgramElement getChildAt(int index) {
         if (children != null) {
             return children.get(index);
@@ -92,24 +74,14 @@ public class ArrayInitializer
         throw new ArrayIndexOutOfBoundsException();
     }
 
-    /**
- *      Get the number of expressions in this container.
- *      @return the number of expressions.
-     */
-
+    
+    @Override
     public int getExpressionCount() {
         return (children != null) ? children.size() : 0;
     }
 
-    /*
-      Return the expression at the specified index in this node's
-      "virtual" expression array.
-      @param index an index for an expression.
-      @return the expression with the given index.
-      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
-      of bounds.
-    */
-
+    
+    @Override
     public Expression getExpressionAt(int index) {
         if (children != null) {
             return children.get(index);
@@ -117,17 +89,18 @@ public class ArrayInitializer
         throw new ArrayIndexOutOfBoundsException();
     }
 
-    /** calls the corresponding method of a visitor in order to
-     * perform some action/transformation on this element
-     * @param v the Visitor
-     */
+    
+    @Override
     public void visit(Visitor v) {
 	v.performActionOnArrayInitializer(this);
     }
 
+    
+    @Override    
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
         p.printArrayInitializer(this);
     }
+    
 
     /**
      *      Get arguments.
@@ -137,20 +110,23 @@ public class ArrayInitializer
         return children;
     }
 
+    
+    @Override    
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
 	Expression i = this;
 	int n = 0;
-	Sort s;
-	for(;i instanceof ArrayInitializer && ((ArrayInitializer)i).getChildCount()!=0 ;
-	    i=((ArrayInitializer)i).getExpressionAt(0)){
+	for(; i instanceof ArrayInitializer && ((ArrayInitializer)i).getChildCount() != 0 ;
+	    i = ((ArrayInitializer)i).getExpressionAt(0)) {
 	    n++;
 	}
-	s = i.getKeYJavaType(javaServ, ec).getSort();        
-        final JavaInfo javaInfo = javaServ.getJavaInfo(); 
-	return javaInfo.getKeYJavaType
-	    (ArraySort.getArraySortForDim(s, n, 
-					      javaInfo.objectSort(), 
-                                              javaInfo.cloneableSort(),
-                                              javaInfo.serializableSort()));
+	final KeYJavaType kjt = i.getKeYJavaType(javaServ, ec);
+        final JavaInfo javaInfo = javaServ.getJavaInfo();
+	return javaInfo.getKeYJavaType(
+		ArraySort.getArraySortForDim(kjt.getSort(),
+					     kjt.getJavaType(),
+					     n, 
+				             javaInfo.objectSort(), 
+                                             javaInfo.cloneableSort(),
+                                             javaInfo.serializableSort()));
     }
 }

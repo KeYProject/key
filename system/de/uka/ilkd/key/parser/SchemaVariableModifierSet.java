@@ -18,22 +18,22 @@ public abstract class SchemaVariableModifierSet {
     private boolean list = false;
     
     
-    public boolean rigid () {
+    public boolean rigid() {
         return rigid;
     }
     
     
-    protected boolean rigidEnabled () {
+    protected boolean rigidEnabled() {
         return false;
     }
     
     
-    public boolean strict () {
+    public boolean strict() {
         return strict;
     }
     
     
-    protected boolean strictEnabled () {
+    protected boolean strictEnabled() {
         return false;
     }
     
@@ -64,13 +64,13 @@ public abstract class SchemaVariableModifierSet {
         return false;
     }
         
-    public boolean addRigid () {
+    public boolean addRigid() {
         this.rigid = true;
-        return rigidEnabled ();
+        return rigidEnabled();
     }
-    public boolean addStrict () {
+    public boolean addStrict() {
         this.strict = true;
-        return strictEnabled ();
+        return strictEnabled();
     }
     public boolean addList() {
 	this.list = true;
@@ -84,19 +84,19 @@ public abstract class SchemaVariableModifierSet {
     }
 
     public static class TermSV extends SchemaVariableModifierSet {        
-        protected boolean rigidEnabled () {
+        protected boolean rigidEnabled() {
             return true;
         }
-        protected boolean strictEnabled () {
+        protected boolean strictEnabled() {
             return true;
         }
-        protected boolean listEnabled () {
+        protected boolean listEnabled() {
             return true;
         }
     }
 
     public static class FormulaSV extends SchemaVariableModifierSet {
-        protected boolean rigidEnabled () {
+        protected boolean rigidEnabled() {
             return true;
         }
     }
@@ -104,4 +104,6 @@ public abstract class SchemaVariableModifierSet {
     public static class VariableSV extends SchemaVariableModifierSet {}
 
     public static class SkolemTermSV extends SchemaVariableModifierSet {}
+    
+    public static class FreshProgVarSV extends SchemaVariableModifierSet {}
 }

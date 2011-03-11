@@ -170,7 +170,7 @@ public class KeYFile implements EnvInput {
 
     
     @Override
-    public Includes readIncludes() throws ProofInputException{
+    public Includes readIncludes() throws ProofInputException {
         if (includes == null) {
             try {
                 ParserConfig pc = new ParserConfig
@@ -204,11 +204,13 @@ public class KeYFile implements EnvInput {
 
     @Override    
     public File readBootClassPath() {
-        if(!javaPathAlreadyParsed)
+        if(!javaPathAlreadyParsed) {
             throw new IllegalStateException("Can access this only after 'readJavaPath' has been called");
+        }
         
-        if(bootClassPath == null)
+        if(bootClassPath == null) {
             return null;
+        }
         
         String parentDirectory = file.file().getParent();
         return new File(parentDirectory, bootClassPath);
@@ -217,8 +219,9 @@ public class KeYFile implements EnvInput {
 
     @Override    
     public List<File> readClassPath() {
-        if(!javaPathAlreadyParsed)
+        if(!javaPathAlreadyParsed) {
             throw new IllegalStateException("Can access this only after 'readJavaPath' has been called");
+        }
 
         String parentDirectory = file.file().getParent();
         List<File> fileList = new ArrayList<File>();
@@ -421,7 +424,7 @@ public class KeYFile implements EnvInput {
     
     
     @Override    
-    public boolean equals(Object o){
+    public boolean equals(Object o) {
         if(!(o instanceof KeYFile)) {
             return false;
         }

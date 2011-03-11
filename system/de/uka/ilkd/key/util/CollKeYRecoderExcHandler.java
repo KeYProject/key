@@ -13,14 +13,13 @@ package de.uka.ilkd.key.util;
 
 
 
-public class CollKeYRecoderExcHandler extends KeYRecoderExcHandler{
+public class CollKeYRecoderExcHandler extends KeYRecoderExcHandler {
 
-    public void reportException(Throwable e){
+    public void reportException(Throwable e) {
 	try {
             super.reportException(e);
         } catch(Throwable t) {
             // we collect more than one error
         }
-    }
-    	  
+    }   	  
 }

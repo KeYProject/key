@@ -298,7 +298,9 @@ class ClassTree extends JTree {
             
             //get child node, go down to it
             DefaultMutableTreeNode childNode = getChildByString(node, namePart);
-	    assert childNode != null;
+	    assert childNode != null : "type not found: " + namePart 
+	                               + " (part of " + fullClassName
+	                               + ", for observer " + target + ")";
             node = childNode;
         } while(index != length);
         TreePath incompletePath = new TreePath(pathVector.toArray());

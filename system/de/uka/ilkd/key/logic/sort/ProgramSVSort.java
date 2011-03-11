@@ -58,6 +58,7 @@ public abstract class ProgramSVSort extends AbstractSort {
     
     public static final ProgramSVSort LOCALVARIABLE
         = new LocalVariableSort();
+    
     public static final ProgramSVSort SIMPLEEXPRESSION 
 	= new SimpleExpressionSort();
 
@@ -261,21 +262,7 @@ public abstract class ProgramSVSort extends AbstractSort {
 
     public static final ProgramSVSort ARRAYLENGTH
 	= new ArrayLengthSort();
-
-    public static final ProgramSVSort JCARRAYCOPY
-	= new SpecificMethodNameSort(new ProgramElementName("jvmArrayCopy"));
-    public static final ProgramSVSort JCARRAYCOPYNONATOMIC
-	= new SpecificMethodNameSort(new ProgramElementName("jvmArrayCopyNonAtomic"));
-    public static final ProgramSVSort JCARRAYFILLNONATOMIC
-	= new SpecificMethodNameSort(new ProgramElementName("jvmArrayFillNonAtomic"));
-    public static final ProgramSVSort JCARRAYCOMPARE
-	= new SpecificMethodNameSort(new ProgramElementName("jvmArrayCompare"));
-
-    public static final ProgramSVSort JCMAKESHORT
-	= new SpecificMethodNameSort(new ProgramElementName("jvmMakeShort"));
-    public static final ProgramSVSort JCSETSHORT
-	= new SpecificMethodNameSort(new ProgramElementName("jvmSetShort"));
-    
+   
     public static final ProgramSVSort ALLOCATE
         = new SpecificMethodNameSort(new ProgramElementName
                 (InstanceAllocationMethodBuilder.IMPLICIT_INSTANCE_ALLOCATE));
@@ -939,12 +926,6 @@ public abstract class ProgramSVSort extends AbstractSort {
 
         private final ProgramElementName methodName;
         
-        public SpecificMethodNameSort(Name sortName, 
-				      ProgramElementName methodName) {
-            super(sortName);
-            this.methodName = methodName;
-        }
-
         public SpecificMethodNameSort(ProgramElementName name) {
             super(name);
             this.methodName = name;

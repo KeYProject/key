@@ -41,7 +41,7 @@ public class ExceptionDialog extends JDialog {
     private JTextArea stTextArea;
     private boolean withList = false;
 
-    private Location getLocation(Object exc){
+    private Location getLocation(Object exc) {
 	Location location=null;
 	if  (exc instanceof antlr.RecognitionException) { 
 	    location = new Location(((antlr.RecognitionException)exc).getFilename(),
@@ -71,7 +71,7 @@ public class ExceptionDialog extends JDialog {
     }
 
 
-    private JPanel createButtonPanel(){
+    private JPanel createButtonPanel() {
 	 JButton closeButton = new JButton( "Close" );
          JCheckBox detailsBox  = new JCheckBox("Show Details");
          detailsBox.setSelected(false);
@@ -106,7 +106,7 @@ public class ExceptionDialog extends JDialog {
     }
     
 
-    private JScrollPane createJListScroll(Object[] excArray){
+    private JScrollPane createJListScroll(Object[] excArray) {
 	 String[] excMessages = new String[excArray.length];
 	 for (int i= 0; i<excArray.length;i++){
 	     if (!(getLocation(exceptionArray[i])==null))
@@ -179,7 +179,7 @@ public class ExceptionDialog extends JDialog {
     }
 
 
-    private JPanel createLocationPanel(Object[] excArray){
+    private JPanel createLocationPanel(Object[] excArray) {
 	Location loc = getLocation(excArray[0]);
 	JPanel lPanel = new JPanel();
 	JTextField fTextField,lTextField, cTextField;

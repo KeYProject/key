@@ -41,8 +41,9 @@ public class TacletView implements ActionListener{
         }
         return instance;
     }
+    
 
-    private TacletView(){
+    private TacletView() {
 
         frame = new JDialog();
         frame.setTitle("Taclet View");
@@ -75,9 +76,11 @@ public class TacletView implements ActionListener{
         frame.pack();	   
     }
 
+    
     public void actionPerformed(ActionEvent e){
         frame.setVisible(false);
     }
+    
     
     public void showTacletView(Taclet tac, boolean modal){
 	frame.setModal(modal);
@@ -91,8 +94,9 @@ public class TacletView implements ActionListener{
         frame.setVisible(true);	
     }
 
+    
     public void showTacletView(DefaultMutableTreeNode node){
-        Taclet tac  ;
+        Taclet tac;
         if (node.getUserObject() instanceof Taclet) {
             tac = (Taclet) node.getUserObject();        
         } else return;
@@ -100,13 +104,14 @@ public class TacletView implements ActionListener{
 
     }
 
+    
     private String getDisplayName(Taclet tac){
         return tac.displayName();
     }
 
 
     private String getTacletByName(Taclet tac){
-        String rule  ;
+        String rule;
         LogicPrinter lp = 
             new LogicPrinter(new ProgramPrinter(), new NotationInfo(), null, true);
         lp.printTaclet(tac);

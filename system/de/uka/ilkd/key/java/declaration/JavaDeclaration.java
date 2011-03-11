@@ -23,7 +23,7 @@ import de.uka.ilkd.key.util.ExtList;
  */
 
 public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
- implements Declaration {
+ 			              implements Declaration {
 
     /**
      * Modifiers.
@@ -31,23 +31,25 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
      * to the array without hurting immutabilitiy */
     protected final ImmutableArray<Modifier> modArray;
 
+    
     /**
      *      Java declaration.
      */
     public JavaDeclaration() {
-	modArray=null;
+	modArray = null;
     }
-
 
 
     public JavaDeclaration(Modifier[] mods) {
-	modArray=new ImmutableArray<Modifier>(mods);
+	modArray = new ImmutableArray<Modifier>(mods);
     }
 
+    
     public JavaDeclaration(ImmutableArray<Modifier> mods) {
-	modArray =  mods;
+	modArray = mods;
     }
 
+    
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
      * @param children the children of this AST element as KeY classes. May
@@ -56,7 +58,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
      */     
     public JavaDeclaration(ExtList children) {
 	super(children);
-	modArray=new ImmutableArray<Modifier>((Modifier[])children.collect(Modifier.class));
+	modArray = new ImmutableArray<Modifier>((Modifier[])children.collect(Modifier.class));
     }
 
 
@@ -64,17 +66,16 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
      *      Get modifiers.
      *      @return the modifier array wrapper.
      */
-
     public ImmutableArray<Modifier> getModifiers() {
         return modArray;
     }
 
+    
     /**
      *      Returns a Public, Protected, or Private Modifier, if there
      *      is one, null otherwise. A return value of null can usually be
      *      interpreted as package visibility.
      */
-
     public VisibilityModifier getVisibilityModifier() {
         if (modArray == null) {
             return null;
@@ -99,6 +100,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
         return false;
     }
 
+    
     /**
      * Test whether the declaration is abstract.
      */
@@ -106,100 +108,99 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
         return containsModifier(Abstract.class);
     }
 
+    
     /**
      * Test whether the declaration is private.
      */
-
     protected boolean isPrivate() {
         return containsModifier(Private.class);
     }
 
+    
     /**
      * Test whether the declaration is protected.
      */
-
     protected boolean isProtected() {
         return containsModifier(Protected.class);
     }
 
+    
     /**
      * Test whether the declaration is public.
      */
-
     protected boolean isPublic() {
         return containsModifier(Public.class);
     }
 
+    
     /**
      * Test whether the declaration is static.
      */
-
     protected boolean isStatic() {
         return containsModifier(Static.class);
     }
 
+    
     /**
      * Test whether the declaration is transient.
      */
-
     protected boolean isTransient() {
         return containsModifier(Transient.class);
     }
 
+    
     /**
      * Test whether the declaration is model (the jml modifier is meant).
      */
-
     protected boolean isModel() {
         return containsModifier(Model.class);
     }
 
+    
     /**
      * Test whether the declaration is ghost (the jml modifier is meant).
      */
-
     protected boolean isGhost() {
         return containsModifier(Ghost.class);
     }
 
+    
     /**
      * Test whether the declaration is volatile.
      */
-
     protected boolean isVolatile() {
         return containsModifier(Volatile.class);
     }
 
+    
     /**
      * Test whether the declaration is strictfp.
      */
-
     protected boolean isStrictFp() {
         return containsModifier(StrictFp.class);
     }
 
+    
     /**
      * Test whether the declaration is final.
      */
-
     protected boolean isFinal() {
         return containsModifier(Final.class);
     }
 
+    
     /**
      * Test whether the declaration is native.
      */
-
     protected boolean isNative() {
         return containsModifier(Native.class);
     }
 
+    
     /**
      * Test whether the declaration is synchronized.
      */
-
     protected boolean isSynchronized() {
         return containsModifier(Synchronized.class);
     }
-
 }

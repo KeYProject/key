@@ -20,9 +20,9 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.*;
@@ -328,33 +328,28 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
 	    NewVarcond nvc = app.taclet().varDeclaredNew(sv);
 	    if (nvc != null) {
 		KeYJavaType kjt;
-		Object o = nvc.getSortDefiningObject();
+		Object o = nvc.getTypeDefiningObject();
 		JavaInfo javaInfo = services.getJavaInfo ();
 		if (o instanceof SchemaVariable) {
 	            final TypeConverter tc = services.getTypeConverter();
-		    final SchemaVariable peerSV=(SchemaVariable)o;
+		    final SchemaVariable peerSV = (SchemaVariable)o;
 		    final Object peerInst = app.instantiations().getInstantiation(peerSV);
                     if(peerInst instanceof TypeReference){
                         kjt = ((TypeReference) peerInst).getKeYJavaType();
-                    }else{
+                    } else {
                         Expression peerInstExpr;
-                        if (peerInst instanceof Term) {
-                            peerInstExpr=tc.convertToProgramElement((Term)peerInst);
-                        } else{
-                            peerInstExpr=(Expression)peerInst;
+                        if(peerInst instanceof Term) {
+                            peerInstExpr = tc.convertToProgramElement((Term)peerInst);
+                        } else {
+                            peerInstExpr = (Expression)peerInst;
                         }
-                        kjt = tc.getKeYJavaType(peerInstExpr, app.instantiations().
-                                getContextInstantiation().activeStatementContext());
+                        kjt = tc.getKeYJavaType(peerInstExpr, 
+                        			app.instantiations().getContextInstantiation().activeStatementContext());
                     }
-		    if(nvc.isDefinedByElementSort()){
-		        Sort s = kjt.getSort();
-			if(s instanceof ArraySort) s = ((ArraySort)s).elementSort();              
-			kjt = javaInfo.getKeYJavaType(s);
-		    }
 		} else {
-		    kjt = javaInfo.getKeYJavaType((Sort)o);
+		    kjt = javaInfo.getKeYJavaType((Type)o);
 		}
-                assert kjt != null;
+                assert kjt != null : "could not find kjt for: " + o;
 		return new LocationVariable
 		    (VariableNamer.parseName(instantiation), kjt);
 	    }
@@ -463,17 +458,23 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
 		        result = result.addCheckedInstantiation( sv, 
                                 tb.var( lv ), services, true );
 		    } else {
-		        // sv.isSkolemTermSV ()
-                        
-                        Named n = namespaces().
-                            lookupLogicSymbol(new Name(idd.getName()));
-                        if (n == null) { 
-                            result = result.createSkolemConstant
-                            ( idd.getName (), sv, sort, true, services );
+		        // sv instanceof SkolemTermSV
+                        final Named n 
+                        	= namespaces()
+                                  .lookupLogicSymbol(new Name(idd.getName()));
+                        if(n == null) { 
+                            result = result.createSkolemConstant(idd.getName(),
+                        	                                 sv, 
+                        	                                 sort, 
+                        	                                 true, 
+                        	                                 services);
                         } else {
-                            throw 
-                                new SVInstantiationParserException(idd.getName(), irow, 1, 
-                                        "Name already in use.", false);
+                            throw new SVInstantiationParserException(
+                        	    		idd.getName(), 
+                        	    		irow, 
+                        	    		1, 
+                        	    		"Name already in use.", 
+                        	    		false);
                         }
 		    }
 		} else if (sv instanceof ProgramSV) {
@@ -570,6 +571,4 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
             createBaseNameProposalBasedOnCorrespondence(p_app, p_var ).toUpperCase();
         return s;
     }
-
-
 }
