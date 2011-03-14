@@ -25,6 +25,7 @@ import java.util.Set;
 
 import javax.swing.*;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.Main;
@@ -40,6 +41,7 @@ import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.JavaASTCollector;
+import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.RuleSource;
 import de.uka.ilkd.key.proof.init.AbstractEnvInput;
@@ -176,7 +178,8 @@ public final class SLEnvInput extends AbstractEnvInput {
             if(kjt.getJavaType() instanceof TypeDeclaration
                && ((TypeDeclaration)kjt.getJavaType()).isLibraryClass()) {
                 final String filePath
-                	= path + "/" + kjt.getFullName().replace(".", "/") + ".key";
+                	= path + "/" + kjt.getFullName().replace(".", "/") 
+                	       + ".key";
                 RuleSource rs = null;
                 
                 //external or internal path?
@@ -313,8 +316,8 @@ public final class SLEnvInput extends AbstractEnvInput {
         if(initConfig == null) {
             throw new IllegalStateException("InitConfig not set.");
         }
-        
-        GeneralSettings gs 
+            
+        final GeneralSettings gs 
             = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
         if(gs.useJML()) {
             createSpecs(new JMLSpecExtractor(initConfig.getServices()));

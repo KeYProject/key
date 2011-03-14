@@ -372,9 +372,6 @@ public final class ProblemInitializer {
     		throws ProofInputException {       
 	ProofEnvironment env = initConfig.getProofEnv();
 	
-	//read activated choices
-	po.readActivatedChoices();
-        
         //TODO: what does this actually do?
         ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().updateChoices(initConfig.choiceNS(), false);
 	

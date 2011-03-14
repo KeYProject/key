@@ -472,10 +472,13 @@ public final class ProblemLoader implements Runnable {
         PosInOccurrence pos = null;
 
         if (currFormula != 0) { // otherwise we have no pos
-            pos = PosInOccurrence.findInSequent(currGoal.sequent(),
-                                                currFormula,
-                                                currPosInTerm);
-        } else {
+            try {
+        	pos = PosInOccurrence.findInSequent(currGoal.sequent(),
+                                                    currFormula,
+                                                    currPosInTerm);
+            } catch(RuntimeException e) {
+        	throw new BuiltInConstructionException(e);
+            }
         }
 
         final Constraint userConstraint = mediator.getUserConstraint()
@@ -716,10 +719,12 @@ public final class ProblemLoader implements Runnable {
     }
 
     private static class BuiltInConstructionException extends Exception {
-
-        BuiltInConstructionException(String s) {
-            super(s);
-    }
+	BuiltInConstructionException(String s) {
+	    super(s);
+	}
+	BuiltInConstructionException(Throwable cause) {
+	    super(cause);
+	}	
     }
 
     public KeYExceptionHandler getExceptionHandler() {

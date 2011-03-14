@@ -209,12 +209,6 @@ public abstract class AbstractPO implements ProofOblInput {
     public final String name() {
         return name;
     }
-    
-        
-    @Override
-    public final void readActivatedChoices() throws ProofInputException {
-	initConfig.setActivatedChoices(DefaultImmutableSet.<Choice>nil());
-    }
 
     
     /**

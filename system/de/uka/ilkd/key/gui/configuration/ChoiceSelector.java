@@ -44,7 +44,7 @@ public class ChoiceSelector extends JDialog {
 	super(new JFrame(), "Taclet Base Configuration", true);
        	this.settings = settings;
 	category2DefaultChoice = settings.getDefaultChoices();
-	if(category2DefaultChoice.isEmpty()){
+	if(category2DefaultChoice.isEmpty()) {
 	    JOptionPane.showConfirmDialog
 		(ChoiceSelector.this,
 		 "There are no Taclet Options available as the rule-files "+
@@ -52,7 +52,7 @@ public class ChoiceSelector extends JDialog {
 		 "No Options available", 
 		 JOptionPane.DEFAULT_OPTION);
 	    dispose();
-	}else{
+	} else {
 	    category2Choices = settings.getChoices();
 	    layoutChoiceSelector();
 	    pack();
