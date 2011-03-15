@@ -172,8 +172,11 @@ public final class RewriteTaclet extends FindTaclet {
     /**
      * does the work for applyReplacewith (wraps recursion) 
      */
-    private Term replace(Term term, Term with, IntIterator it,
-			 Services services, MatchConditions mc, 
+    private Term replace(Term term, 
+	    		 Term with, 
+	    		 IntIterator it,
+			 Services services, 
+			 MatchConditions mc, 
                          Sort maxSort) {
 	if (it.hasNext()) {	    
 	    int sub = it.next();
@@ -186,56 +189,29 @@ public final class RewriteTaclet extends FindTaclet {
 		    subs[i] = term.sub(i);
 		} else {                    
                     final Sort newMaxSort = TermHelper.getMaxSort(term, i, services);
-		    subs[i] = replace(term.sub(i), with, it, services, 
-		            mc, newMaxSort);
+		    subs[i] = replace(term.sub(i), 
+			    	      with, 
+			    	      it, 
+			    	      services, 
+			    	      mc, 
+			    	      newMaxSort);
 		}
 	    }	    	    	    	    	    
  	    
 	    return TermFactory.DEFAULT.createTerm(term.op(), 
-	            subs, term.boundVars(), term.javaBlock());
+	            				  subs, 
+	            				  term.boundVars(), 
+	            				  term.javaBlock());
 	} 
                                       
 	with = syntacticalReplace(with, services, mc);   
 
                
-	if (!with.sort().extendsTrans(maxSort)) {
+	if(!with.sort().extendsTrans(maxSort)) {
 	    with = TermBuilder.DF.cast(services, maxSort, with);
 	}
         
 	return with;
-    }
-
-
-    /**
-     * Check if p_pos contains an explicit metavariable instantiation,
-     * and creates in this case a new simple term by replacing the
-     * metavariable with the instantiation
-     */
-    private PosInOccurrence flatten ( PosInOccurrence p_pos,
-				      Services        p_services) {
-	if ( p_pos.termBelowMetavariable () != null ) {
-	    assert false : "metavariables are disabled";
-	    Term flatTerm = replace ( p_pos.constrainedFormula ().formula (),
-				      p_pos.termBelowMetavariable (),
-				      p_pos.posInTerm ().iterator (),
-				      p_services,
-				      MatchConditions.EMPTY_MATCHCONDITIONS, 
-                                      Sort.FORMULA);
-
-	    PosInOccurrence pos = new PosInOccurrence
-		( new ConstrainedFormula ( flatTerm,
-					   p_pos.constrainedFormula ().constraint () ),
-		  p_pos.posInTerm (),
-		  p_pos.isInAntec() );
-
-	    IntIterator it = p_pos.posInTermBelowMetavariable ().iterator ();
-	    while ( it.hasNext () )
-		pos = pos.down ( it.next () );
-
-	    return pos;
-	}
-
-	return p_pos;
     }
     
 
@@ -244,10 +220,8 @@ public final class RewriteTaclet extends FindTaclet {
 				 	PosInOccurrence    posOfFind,
 				 	Services           services,
 				 	MatchConditions    matchCond) {
-	PosInOccurrence flatPos = flatten ( posOfFind, services );
-
-	Term term = flatPos.constrainedFormula().formula();
-	IntIterator it = flatPos.posInTerm().iterator();
+	Term term = posOfFind.constrainedFormula().formula();
+	IntIterator it = posOfFind.posInTerm().iterator();
 	Term rwTemplate=((RewriteTacletGoalTemplate)gt).replaceWith();
 
 	Term formula = replace(term, 
@@ -256,7 +230,11 @@ public final class RewriteTaclet extends FindTaclet {
 		       	       services, 
 		       	       matchCond, 
 		       	       term.sort());
-	return new ConstrainedFormula(formula);
+	if(term == formula) {
+	    return posOfFind.constrainedFormula();
+	} else {
+	    return new ConstrainedFormula(formula);
+	}
     }
     
     
