@@ -287,7 +287,7 @@ public final class Main extends JFrame implements IMain {
      */
     public static Main getInstance(final boolean visible) {
         if (instance == null) {
-            instance = new Main("KeYHeap");
+            instance = new Main("KeY " + KeYResourceManager.getManager().getVersion());
         }
         if (!instance.isVisible()) {
             if (SwingUtilities.isEventDispatchThread()) {

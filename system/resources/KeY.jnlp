@@ -2,11 +2,11 @@
 <!-- JNLP file for KeY -->
 <jnlp spec="1.0+" codebase="http://i12www.ira.uka.de/~bweiss/keyheap" href="keyheap.jnlp">
 <information> 
-<title>KeYHeap</title>
-<vendor>KeY-Project, Universitaet Karlsruhe, Chalmers University, Universitaet Koblenz</vendor> 
+<title>KeY</title>
+<vendor>KeY Project, Karlsruhe Institute of Technology, Chalmers University, Universität Koblenz</vendor> 
 <homepage href="http://www.key-project.org"/> 
 <description>
-  The KeYHeap tool.
+  The KeY tool.
 </description> 
 <icon href="http://www.key-project.org/keylogo.gif"/> 
 <offline-allowed/> 
