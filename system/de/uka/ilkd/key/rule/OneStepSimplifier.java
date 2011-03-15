@@ -52,8 +52,8 @@ public final class OneStepSimplifier implements BuiltInRule,
     private static final boolean[] bottomUp 
     	= {false, false, false, false, true};
   
-    private final Map<ConstrainedFormula, Instantiation> cache 
-    		= new LRUCache<ConstrainedFormula, Instantiation>(1000);
+    private final Map<ConstrainedFormula,Boolean> applicabilityCache 
+    		= new LRUCache<ConstrainedFormula,Boolean>(100);
    
     private Proof lastProof;
     private ImmutableSet<NoPosTacletApp> appsTakenOver;
@@ -106,12 +106,15 @@ public final class OneStepSimplifier implements BuiltInRule,
 	//identify those apps suitable for the one step simplifier; 
 	//store them in appsTakenOver and their taclets in result
 	for(NoPosTacletApp app : allApps) {
-	    if(!(app.taclet() instanceof RewriteTaclet)
-	       || !app.taclet().hasReplaceWith()
-	       || !app.taclet().ifSequent().isEmpty()	       
-	       || app.taclet().goalTemplates().size() != 1
-	       || !app.taclet().goalTemplates().head().sequent().isEmpty()
-	       || ((RewriteTaclet)app.taclet()).getStateRestriction() 
+	    final Taclet tac = app.taclet();
+	    if(!(tac instanceof RewriteTaclet)
+	       || !tac.hasReplaceWith()
+	       || !tac.ifSequent().isEmpty()	       
+	       || tac.goalTemplates().size() != 1
+	       || !tac.goalTemplates().head().sequent().isEmpty()
+	       || !tac.varsNew().isEmpty()
+	       || tac.varsNewDependingOn().hasNext()
+	       || ((RewriteTaclet)tac).getStateRestriction() 
 	             != RewriteTaclet.NONE
 	       || !proof.mgt().getJustification(app)
 	                      .isAxiomJustification()) {
@@ -130,7 +133,7 @@ public final class OneStepSimplifier implements BuiltInRule,
 	    
 	    if(accept) {
 		appsTakenOver = appsTakenOver.add(app);		
-		result = result.add(app.taclet());
+		result = result.add(tac);
 	    }
 	}
 	
@@ -184,7 +187,7 @@ public final class OneStepSimplifier implements BuiltInRule,
 		g.getRuleAppManager().clearCache();
 		g.ruleAppIndex().clearIndexes();		
 	    }
-	    cache.clear();
+	    applicabilityCache.clear();
 	    lastProof = null;
 	    appsTakenOver = null;
 	    indices = null;
@@ -372,16 +375,6 @@ public final class OneStepSimplifier implements BuiltInRule,
     private Instantiation computeInstantiation(Services services,
 	    				       ConstrainedFormula cf,
 	    				       Sequent seq) {
-	//try one simplification step without replace-known
-	//give up if this does not work
-	ConstrainedFormula simplifiedCf 
-		= simplifyConstrainedFormula(services, cf, null, null);
-	if(simplifiedCf == null || simplifiedCf.equals(cf)) {
-	    return new Instantiation(cf, 
-		                     0, 
-		                     ImmutableSLList.<PosInOccurrence>nil());
-	}
-	
 	//collect context formulas (potential if-insts for replace-known)
 	final Map<Term,PosInOccurrence> context 
 		= new HashMap<Term,PosInOccurrence>();
@@ -404,8 +397,8 @@ public final class OneStepSimplifier implements BuiltInRule,
 	
 	//simplify as long as possible
 	ImmutableList<ConstrainedFormula> list 
-		= ImmutableSLList.<ConstrainedFormula>nil()
-				 .prepend(simplifiedCf);
+		= ImmutableSLList.<ConstrainedFormula>nil();
+	ConstrainedFormula simplifiedCf = cf;
 	while(true) {
 	    simplifiedCf = simplifyConstrainedFormula(services, 
 		    				      simplifiedCf,
@@ -429,37 +422,21 @@ public final class OneStepSimplifier implements BuiltInRule,
     
     
     /**
-     * Determines the overall simplification result for the passed constrained
-     * formula. Uses cache to (re)compute this result only when necessary.
+     * Tells whether the passed formula can be simplified
      */
-    private Instantiation getInstantiation(Services services, 
-	                                   ConstrainedFormula cf,
-	                                   Sequent seq) {
-	Instantiation result = cache.get(cf);
-	
-	//check whether if-insts still available	
-	if(result != null) {
-	    for(PosInOccurrence pos : result.ifInsts) {
-		if(pos.isInAntec()) { 
-	            if(!seq.antecedent().contains(pos.constrainedFormula())) {
-		    	result = null;
-			break;
-		    }
-		} else if(!seq.succedent().contains(pos.constrainedFormula())) {
-		    result = null;
-		    break;
-		}
-	    }
+    private boolean applicableTo(Services services, ConstrainedFormula cf) {
+	final Boolean b = applicabilityCache.get(cf);
+	if(b != null) {
+	    return b.booleanValue();
+	} else {
+	    //try one simplification step without replace-known
+	    final ConstrainedFormula simplifiedCf 
+	    	= simplifyConstrainedFormula(services, cf, null, null);
+	    final boolean result = simplifiedCf != null 
+	    			   && !simplifiedCf.equals(cf);
+	    applicabilityCache.put(cf, Boolean.valueOf(result));
+	    return result;
 	}
-	
-	//(re)compute if needed
-	if(result == null) {
-	    result = computeInstantiation(services, cf, seq);
-	    cache.put(cf, result);
-	}
-	
-	assert result != null;
-	return result;
     }
     
     
@@ -494,14 +471,9 @@ public final class OneStepSimplifier implements BuiltInRule,
 	    return false;
 	}
 	
-	//get instantiation
-	Services services = goal.proof().getServices();	
-	Instantiation inst = getInstantiation(services, 
-					      pio.constrainedFormula(),
-					      goal.sequent());
-
-	//tell whether the instantiation is interesting
-	return inst.getNumAppliedRules() > 0;
+	//applicable to the formula?
+	return applicableTo(goal.proof().getServices(), 
+			    pio.constrainedFormula());
     }
 
     
@@ -515,13 +487,17 @@ public final class OneStepSimplifier implements BuiltInRule,
 	assert pos != null && pos.isTopLevel();
 		
 	//get instantiation
-	final Instantiation inst = getInstantiation(services, 
-					            pos.constrainedFormula(),
-					            goal.sequent());
+	final Instantiation inst 
+		= computeInstantiation(services, 
+			               pos.constrainedFormula(),
+				       goal.sequent());
 	
 	//change goal, set if-insts
 	resultGoal.changeFormula(inst.getCf(), pos);
-	goal.setBranchLabel(inst.getNumAppliedRules() + " rules");
+	goal.setBranchLabel(inst.getNumAppliedRules() 
+		            + (inst.getNumAppliedRules() > 1 
+		               ? " rules" 
+		               : " rule"));
 	((BuiltInRuleApp)ruleApp).setIfInsts(inst.getIfInsts());
 	
 	return result;
@@ -591,7 +567,8 @@ public final class OneStepSimplifier implements BuiltInRule,
 	}
 	
 	public String toString() {
-	    return cf + " (" + (numAppliedRules > 1 ? " rules)" : "rule)");
+	    return cf + " (" + numAppliedRules 
+	              + (numAppliedRules > 1 ? " rules)" : "rule)");
 	}
     }
 }
