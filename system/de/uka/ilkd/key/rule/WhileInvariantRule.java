@@ -267,7 +267,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 		= new ProgramElementName(TB.newName(services, "variant"));
 	final LocationVariable variantPV = new LocationVariable(variantName, 
 								intKJT);
-	services.getNamespaces().programVariables().add(variantPV);
+	services.getNamespaces().programVariables().addSafely(variantPV);
 	final boolean dia = inst.progPost.op() == Modality.DIA;
 	final Term variantUpdate 
 		= dia ? TB.elementary(services, variantPV, variant) : TB.skip();

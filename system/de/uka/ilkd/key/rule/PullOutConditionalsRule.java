@@ -151,14 +151,14 @@ public final class PullOutConditionalsRule implements BuiltInRule {
 	}
 	
 	//prepare replace map
-	final Map<Term,Term> map = new HashMap<Term,Term>();
+	final Map<Term,Term> map = new LinkedHashMap<Term,Term>();
 	for(List<Term> equivalenceClass : equivalenceClasses) {	    
 	    if(equivalenceClass.size() > 1) {
 		final Function f = new Function(new Name(TB.newName(services, 
 								    "cond")), 
 		                                equivalenceClass.get(0).sort());
 		final Term fTerm = TB.func(f);
-		services.getNamespaces().functions().add(f);
+		services.getNamespaces().functions().addSafely(f);
 		for(Term t : equivalenceClass) {
 		    map.put(t, fTerm);
 		}

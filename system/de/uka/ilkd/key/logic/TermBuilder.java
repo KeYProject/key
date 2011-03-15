@@ -77,13 +77,20 @@ public final class TermBuilder {
      * base name.
      */
     public String newName(Services services, String baseName) {
-        NamespaceSet namespaces = services.getNamespaces();
+	final Name savedName = services.getNameRecorder().getProposal();
+	if(savedName != null) {
+	    return savedName.toString();
+	}
+	
+        final NamespaceSet namespaces = services.getNamespaces();
             
         int i = 0;
         String result = baseName;
         while(namespaces.lookup(new Name(result)) != null) {
             result = baseName + "_" + i++;
         }
+        
+        services.getNameRecorder().addProposal(new Name(result));
         
         return result;
     }
