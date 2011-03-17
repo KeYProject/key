@@ -27,6 +27,4 @@ public interface IfFormulaInstantiation {
     ConstrainedFormula getConstrainedFormula ();
 
     String             toString              (Services services);
-
-    boolean            equals                ( Object p_obj );
 }

@@ -85,7 +85,8 @@ options {
       prooflabel2tag.put("keyUser", new Character('u'));
       prooflabel2tag.put("keyVersion", new Character('v'));
       prooflabel2tag.put("keySettings", new Character('s'));
-      prooflabel2tag.put("contract", new Character('c'));	
+      prooflabel2tag.put("contract", new Character('c'));
+      prooflabel2tag.put("ifInst", new Character('x'));		
       prooflabel2tag.put("userinteraction", new Character('a'));
       prooflabel2tag.put("userconstraint", new Character('o'));
       prooflabel2tag.put("matchconstraint", new Character('m'));

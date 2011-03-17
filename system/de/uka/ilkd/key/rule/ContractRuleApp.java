@@ -12,26 +12,31 @@ package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
 
 
 /**
- * Represents an application of the use contract rule. Currently, this is only 
+ * Represents an application of a contract rule. Currently, this is only 
  * used for applications read in from a proof file; fresh applications are 
  * represented as regular BuiltInRuleApps. (yes, I know that this is ugly - BW) 
  */
-public class UseOperationContractRuleApp extends BuiltInRuleApp {
+public class ContractRuleApp extends BuiltInRuleApp {
 
-    private final OperationContract instantiation;
+    private final Contract instantiation;
     
-    public UseOperationContractRuleApp(PosInOccurrence pio,
-                                       Constraint userConstraint,
-                                       OperationContract instantiation) {
-        super(UseOperationContractRule.INSTANCE, pio, userConstraint);
+    public ContractRuleApp(PosInOccurrence pio,
+	    		   Constraint userConstraint,
+	    		   Contract instantiation) {
+        super(instantiation instanceof OperationContract 
+              ? UseOperationContractRule.INSTANCE
+              : UseDependencyContractRule.INSTANCE,
+              pio, 
+              userConstraint);
         this.instantiation = instantiation;
     }   
     
-    public OperationContract getInstantiation() {
+    public Contract getInstantiation() {
         return instantiation;
     }
 }

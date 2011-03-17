@@ -218,15 +218,18 @@ public class ProofSaver {
         tree.append(posInOccurrence2Proof(node.sequent(), 
                                           appliedRuleApp.posInOccurrence()));
         tree.append(newNames2Proof(node));
+        tree.append(builtinRuleIfInsts(node, 
+        	                       ((BuiltInRuleApp)appliedRuleApp).ifInsts()));
 
-        if (appliedRuleApp.rule() instanceof UseOperationContractRule) {
+        if (appliedRuleApp.rule() instanceof UseOperationContractRule 
+            || appliedRuleApp.rule() instanceof UseDependencyContractRule) {
             RuleJustificationBySpec ruleJusti = (RuleJustificationBySpec) 
                             proof.env().getJustifInfo()
                                        .getJustification(appliedRuleApp, 
                                                          proof.getServices());
 
             tree.append(" (contract \"");
-            tree.append(ruleJusti.getSpec().toString());
+            tree.append(ruleJusti.getSpec().getName());
             tree.append("\")");
         }
 
@@ -358,6 +361,18 @@ public class ProofSaver {
       
         return s;
     }
+   
+   
+   public String builtinRuleIfInsts(Node node, 
+	   			    ImmutableList<PosInOccurrence> ifInsts) {
+       String s = "";
+       for(PosInOccurrence ifInst : ifInsts) {
+	   s += " (ifInst \"\" ";
+	   s += posInOccurrence2Proof(node.sequent(), ifInst);
+	   s += ")";
+       }
+       return s;
+    }   
 
 
     /**

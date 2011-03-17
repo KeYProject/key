@@ -55,11 +55,14 @@ public final class ProblemLoader implements Runnable {
     private String currTacletName = null;
     private int currFormula = 0;
     private PosInTerm currPosInTerm = PosInTerm.TOP_LEVEL;
-    private OperationContract currContract = null;
+    private Contract currContract = null;
     private Stack stack = new Stack();
     private LinkedList loadedInsts = null;
-    private ImmutableList<IfFormulaInstantiation> ifFormulaList =
-        ImmutableSLList.<IfFormulaInstantiation>nil();
+    private ImmutableList<IfFormulaInstantiation> ifFormulaList 
+    	= ImmutableSLList.<IfFormulaInstantiation>nil();
+    private ImmutableList<PosInOccurrence> builtinIfInsts;
+    private int currIfInstFormula;
+    private PosInTerm currIfInstPosInTerm;
     private Constraint matchConstraint = null;
 
 
@@ -325,12 +328,22 @@ public final class ProblemLoader implements Runnable {
             matchConstraint = Constraint.BOTTOM;
             break;
 
-        case 'f' :
-            currFormula   = Integer.parseInt(s);
+        case 'f' : //formula
+            final int formula = Integer.parseInt(s);
+            if(builtinIfInsts != null) {
+        	currIfInstFormula = formula;
+            } else {
+        	currFormula = formula;
+            }
             break;
 
-        case 't' :
-            currPosInTerm = PosInTerm.parseReverseString(s);
+        case 't' : //term
+            final PosInTerm pos = PosInTerm.parseReverseString(s);
+            if(builtinIfInsts != null) {
+        	currIfInstPosInTerm = pos;
+            } else {
+        	currPosInTerm = pos;
+            }
             break;
 
         case 'i' :
@@ -365,7 +378,7 @@ public final class ProblemLoader implements Runnable {
             //System.out.println("---------------\n" + s + "------------\n");
             //necessary for downward compatibility of the proof format
             loadPreferences(s);
-        break;
+            break;
         case 'n' : //BuiltIn rules
             if (currNode == null) currNode = children.next();
             currGoal      = proof.getGoal(currNode);
@@ -374,13 +387,21 @@ public final class ProblemLoader implements Runnable {
             // set default state
             currFormula   = 0;
             currPosInTerm = PosInTerm.TOP_LEVEL;
+            builtinIfInsts = null;
             break;
         case 'c' : //contract
-            currContract = (OperationContract) proof.getServices().getSpecificationRepository().getContractByName(s);
+            currContract = proof.getServices().getSpecificationRepository().getContractByName(s);
             if(currContract == null) {
                 throw new RuntimeException("Error loading proof: contract \"" + s + "\" not found.");
             }
             break;
+        case 'x' : //ifInst (for built in rules)
+            if(builtinIfInsts == null) {
+        	builtinIfInsts = ImmutableSLList.<PosInOccurrence>nil();
+            }
+            currIfInstFormula = 0;
+            currIfInstPosInTerm = PosInTerm.TOP_LEVEL;
+            break;            
         case 'o' : //userconstraint
             assert false : "metavariables are disabled";
             break;
@@ -455,6 +476,20 @@ public final class ProblemLoader implements Runnable {
                     linenr+" rule: "+currTacletName,e);
             }
             break;
+        case 'x' : //ifInst (for built in rules)
+            try {
+        	final PosInOccurrence ifInst 
+        		= PosInOccurrence.findInSequent(currGoal.sequent(),
+                                                    	currIfInstFormula,
+                                                    	currIfInstPosInTerm);
+        	builtinIfInsts = builtinIfInsts.append(ifInst);        	
+            } catch(RuntimeException e) {
+        	System.out.println("formula: " + currIfInstFormula);
+        	System.out.println("term: " + currIfInstPosInTerm);
+                throw new RuntimeException("Error loading proof. Line "+
+                    linenr +" rule: "+currTacletName,e);
+            }
+            break;                        
         }
 
     }
@@ -481,14 +516,16 @@ public final class ProblemLoader implements Runnable {
             }
         }
 
-        final Constraint userConstraint = mediator.getUserConstraint()
-                        .getConstraint();
+        final Constraint userConstraint 
+        	= mediator.getUserConstraint().getConstraint();
         
-        if (currContract!=null) {
-            ourApp = new UseOperationContractRuleApp(pos, 
-                                                     userConstraint, 
-                                                     currContract);
-            currContract=null;
+        if (currContract != null) {
+            ourApp = new ContractRuleApp(pos, userConstraint, currContract);
+            currContract = null;
+            if(builtinIfInsts != null) {
+        	ourApp.setIfInsts(builtinIfInsts);
+        	builtinIfInsts = null;
+            }
             return ourApp;
         }
 
@@ -510,6 +547,7 @@ public final class ProblemLoader implements Runnable {
             }
         }
         ourApp = (BuiltInRuleApp) ruleApps.iterator().next();
+        builtinIfInsts = null;
         return ourApp;
     }
 
