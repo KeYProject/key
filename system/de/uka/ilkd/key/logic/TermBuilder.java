@@ -66,7 +66,7 @@ public final class TermBuilder {
 	if(index == -1) {
 	    result = result.charAt(0) + "";
 	} else {
-	    result = result.substring(index).charAt(0) + "";
+	    result = result.substring(index).charAt(1) + "";
 	}
 	return result.toLowerCase();
     }

@@ -481,9 +481,8 @@ public class JMLSpecFactory {
         					  	   kjt,
         					  	   selfVar);
         //create class axiom
-        return new RepresentsAxiom("JML_represents_clause_for_" 
-        	                   + rep.first.name().toString()
-        	                                     .replace("::$", "_"),
+        return new RepresentsAxiom("JML represents clause for " 
+        	                   + rep.first.name().toString(),
         	                   rep.first,
         	                   kjt,        
         	                   visibility,

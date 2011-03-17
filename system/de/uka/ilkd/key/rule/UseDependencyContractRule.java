@@ -587,6 +587,14 @@ public final class UseDependencyContractRule implements BuiltInRule {
         final Term cutFormula 
         	= TB.and(new Term[]{freePre, pre, disjoint, mbyOk});
         
+        //create justification
+        final RuleJustificationBySpec just 
+        	= new RuleJustificationBySpec(contract);
+        final ComplexRuleJustificationBySpec cjust 
+            	= (ComplexRuleJustificationBySpec)
+            	    goal.proof().env().getJustifInfo().getJustification(this);
+        cjust.add(ruleApp, just);        
+        
         //bail out if obviously not helpful
         if(!baseHeapAndChangedLocs.second.op().equals(locSetLDT.getEmpty())) {
             final ImmutableSet<Term> changed 
@@ -624,14 +632,6 @@ public final class UseDependencyContractRule implements BuiltInRule {
         postGoal.addFormula(new ConstrainedFormula(cutFormula),
         	 	    true,
         	 	    false);
-        
-        //create justification
-        final RuleJustificationBySpec just 
-        	= new RuleJustificationBySpec(contract);
-        final ComplexRuleJustificationBySpec cjust 
-            	= (ComplexRuleJustificationBySpec)
-            	    goal.proof().env().getJustifInfo().getJustification(this);
-        cjust.add(ruleApp, just);
         
         return result;
     }

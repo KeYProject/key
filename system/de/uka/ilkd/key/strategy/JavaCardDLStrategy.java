@@ -133,7 +133,7 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final Feature oneStepSimplificationF 
         	= oneStepSimplificationFeature(longConst(-10000));
         
-        final Feature pullOutConditionalsF = pullOutConditionalsFeature(longConst(-10001));        
+        final Feature pullOutConditionalsF = pullOutConditionalsFeature(longConst(-11000));        
         
       //  final Feature smtF = smtFeature(inftyConst());
 

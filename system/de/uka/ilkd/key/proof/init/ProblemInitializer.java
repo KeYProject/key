@@ -15,9 +15,11 @@ import java.util.*;
 
 import recoder.io.PathList;
 import recoder.io.ProjectSettings;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.Field;
@@ -42,6 +44,7 @@ import de.uka.ilkd.key.proof.mgt.GlobalProofMgt;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.RuleConfig;
 import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 
@@ -353,6 +356,17 @@ public final class ProblemInitializer {
 	    	= (ProgramVariable)((ElementaryUpdate)term.op()).lhs();
 	    if(namespaces.programVariables().lookup(pv.name()) == null) {	    
 		rootGoal.addProgramVariable(pv);
+	    }
+	} else if(term.javaBlock() != null && !term.javaBlock().isEmpty()) {
+	    final ProgramElement pe = term.javaBlock().program();
+	    final Services serv = rootGoal.proof().getServices();
+	    final ImmutableSet<ProgramVariable> freeProgVars 
+	    	= MiscTools.getLocalIns(pe, serv)
+	    	           .union(MiscTools.getLocalOuts(pe, serv));
+	    for(ProgramVariable pv : freeProgVars) {
+		if(namespaces.programVariables().lookup(pv.name()) == null) {	    
+		    rootGoal.addProgramVariable(pv);
+		}		
 	    }
 	}
     }

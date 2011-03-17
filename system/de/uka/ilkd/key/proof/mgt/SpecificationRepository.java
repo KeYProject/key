@@ -646,7 +646,7 @@ public final class SpecificationRepository {
 		                    invDef);
 	final ObserverFunction invSymbol = services.getJavaInfo().getInv();
 	final ClassAxiom invRepresentsAxiom 
-		= new RepresentsAxiom("Class_invariant_axiom_for_" 
+		= new RepresentsAxiom("Class invariant axiom for " 
 			                 + kjt.getFullName(),
 			              invSymbol,
 				      kjt,	
@@ -661,10 +661,8 @@ public final class SpecificationRepository {
 	    if(pm.getKeYJavaType() != null && !pm.isImplicit()) {
 		pm = services.getJavaInfo().getToplevelPM(kjt, pm);		
 		final ClassAxiom queryAxiom 
-		    = new QueryAxiom("Query_axiom_for_" + pm.getFullName()
-			                                    .replace("<", "_")
-			                                    .replace(">", "_"),
-			             pm, 
+		    = new QueryAxiom("Query axiom for " + pm.getFullName(),
+			    	     pm, 
 			             kjt);
 		result = result.add(queryAxiom);
 	    }

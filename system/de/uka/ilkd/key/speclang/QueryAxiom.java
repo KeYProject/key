@@ -230,7 +230,7 @@ public final class QueryAxiom implements ClassAxiom {
 	    (new RewriteTacletGoalTemplate(addedSeq,
 					   ImmutableSLList.<Taclet>nil(),
 					   replacewith));
-	tacletBuilder.setName(new Name(name));
+	tacletBuilder.setName(RepresentsAxiom.toValidTacletName(name));
 	tacletBuilder.addRuleSet(new RuleSet(new Name("simplify")));
 	
 	return DefaultImmutableSet.<Taclet>nil().add(tacletBuilder.getTaclet());
