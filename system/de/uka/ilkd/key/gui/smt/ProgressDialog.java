@@ -2,18 +2,24 @@ package de.uka.ilkd.key.gui.smt;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.ScrollPane;
 
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Collection;
 
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 
+import javax.swing.AbstractAction;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
 public class ProgressDialog extends JDialog {
@@ -27,6 +33,9 @@ public class ProgressDialog extends JDialog {
     private JButton    applyButton;
     private JButton    stopButton;
     private JLabel     infoLabel;
+    private JButton    exceptionButton;
+    private JPopupMenu      exceptionMenu;
+    private final ProgressPanel [] panels ;
 
     
     
@@ -36,6 +45,7 @@ public class ProgressDialog extends JDialog {
 	                                              ActionListener alApplyButton,
 	                                              ActionListener alStopButton){
 
+	this.panels = panels;
 	for(ProgressPanel panel : panels){
 	    panel.setAlignmentX(LEFT_ALIGNMENT);
 	    
@@ -74,9 +84,21 @@ public class ProgressDialog extends JDialog {
 	    infoPanel = new JPanel();
 	    infoPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
 	    
-	    infoPanel.add(getInfoLabel());
+	    infoPanel.add(getExceptionButton());
+	    //infoPanel.add(getInfoLabel());
 	}
 	return infoPanel;
+    }
+    
+    private JButton getExceptionButton(){
+	if(exceptionButton == null){
+	    exceptionButton = new JButton();
+	    exceptionButton.addActionListener(new ExceptionButtonListener());
+	    exceptionButton.setText("Exception!");
+	    exceptionButton.setVisible(false);
+	   
+	}
+	return exceptionButton;
     }
     
     private JLabel getInfoLabel(){
@@ -142,6 +164,13 @@ public class ProgressDialog extends JDialog {
 	return scrollPane;
     }
     
+    private JPopupMenu getExceptionMenu(){
+	if(exceptionMenu == null){
+	    exceptionMenu = new JPopupMenu();
+	}
+	return exceptionMenu;
+    }
+    
     public void setApplyButtonEnabled(final boolean b){
 	SwingUtilities.invokeLater(new Runnable() {
 	    @Override
@@ -174,8 +203,42 @@ public class ProgressDialog extends JDialog {
 	getInfoLabel().setText(text);
     }
     
+    public void setInfo(String text, Collection<Point> singlePanels){
+	getExceptionButton().setText(text);
+	
+	exceptionMenu = new JPopupMenu();
+	for(final Point singlePanel : singlePanels){
+	    if(singlePanel.x>=0 && singlePanel.x < panels.length){
+	    JMenuItem item = new JMenuItem(new AbstractAction(
+		    panels[singlePanel.x].getTitle(singlePanel.y)) {
+	        private static final long serialVersionUID = 1L;
+
+		@Override
+	        public void actionPerformed(ActionEvent e) {
+		    panels[singlePanel.x].showInfo(singlePanel.y);
+	        }
+	    });
+	 
+	    exceptionMenu.add(item);
+	  }
+	}
+	getExceptionButton().setVisible(true);
+	
+    }
+    
     public void setInfoColor(Color color){
+	getExceptionButton().setForeground(color);
 	getInfoLabel().setForeground(color);
+    }
+    
+    private class ExceptionButtonListener implements ActionListener{
+	@Override
+	public void actionPerformed(ActionEvent e) {
+	    JPopupMenu menu = getExceptionMenu();
+            int width = Math.max(menu.getPreferredSize().width,getExceptionButton().getWidth());
+                menu.setPopupSize(width, menu.getPreferredSize().height);
+                menu.show(getExceptionButton(),0 ,getExceptionButton().getHeight());
+	}
     }
     
     

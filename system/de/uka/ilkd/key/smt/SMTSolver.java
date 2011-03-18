@@ -136,5 +136,19 @@ public interface SMTSolver {
      * 'unknown'.
      **/
     public SMTSolverResult getFinalResult();
+    
+    /**
+     * Returns the solver output without any change. 
+     * The format is:
+     * "
+     * Normal Output:
+     * ...
+     * 
+     * Error Output:
+     * ...
+     * Exit Code: ...
+     * "
+     */
+    public String getSolverOutput();
 
 }

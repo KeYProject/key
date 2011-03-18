@@ -31,11 +31,15 @@ public class ProgressPanel extends JPanel{
         private static final long serialVersionUID = 1L;
 	final JProgressBar bar = new JProgressBar();
 	final JButton      button = new JButton();
+	private final String parentName;
+	private final String ownName;
 	final Collection<Information> information = new LinkedList<Information>();
 	HashMap<Collection<Information>,InformationWindow> windows =
 	    new HashMap<Collection<Information>,InformationWindow>();
-	SingleProgressPanel(final String name, final String panelName, int resolution){
 	
+	SingleProgressPanel(final String name, final String panelName, int resolution){
+	    ownName = name;
+	    parentName = panelName;
 	    this.setBackground(Color.WHITE);
 	    this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 	    bar.setMaximumSize(new Dimension(Integer.MAX_VALUE,20));
@@ -47,13 +51,12 @@ public class ProgressPanel extends JPanel{
 	        
 	        @Override
 	        public void actionPerformed(ActionEvent e) {
-	            if(!windows.containsKey(information)){
-	        	InformationWindow val = new InformationWindow(information,panelName +" - "+name);
-	        	windows.put(information, val);
-	            }else windows.get(information).setVisible(true);
-	        
+	            showInfo();
 	        }
 	    });
+	    
+	   
+	    
 	    button.setText("i");
 	    button.setMaximumSize(new Dimension(20,20));
 	    button.setEnabled(false);
@@ -62,6 +65,18 @@ public class ProgressPanel extends JPanel{
 	    this.add(bar);
 	    this.add(Box.createHorizontalStrut(2));
 	    this.add(button);
+	}
+	
+	public void showInfo(){
+            if(!windows.containsKey(information)){
+        	InformationWindow val = new InformationWindow(information,toString());
+        	windows.put(information, val);
+            }else windows.get(information).setVisible(true);
+        
+	}
+	
+	public String toString(){
+	    return parentName +" - "+ownName;
 	}
     }
     
@@ -134,6 +149,19 @@ public class ProgressPanel extends JPanel{
 	        }
 	    });
 	}
+    }
+    
+    public void showInfo(int index){
+	if(index >= 0 && index < this.bars.length){
+	    bars[index].showInfo();
+	}
+    }
+    
+    public String getTitle(int index){
+	if(index >= 0 && index < this.bars.length){
+	    return bars[index].toString();
+	}
+	return "";
     }
     
     

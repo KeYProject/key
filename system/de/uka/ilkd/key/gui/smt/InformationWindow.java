@@ -18,10 +18,12 @@ public class InformationWindow extends JDialog {
     static class Information{
 	final String content;
 	final String title;
-	public Information(String title,String content) {
+	final String solver;
+	public Information(String title,String content,String solver) {
 	    super();
 	    this.content = content;
 	    this.title = title;
+	    this.solver = solver;
         }
 	
     }

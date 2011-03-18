@@ -106,7 +106,11 @@ final class SMTSolverImplementation implements SMTSolver, Runnable {
      * attribute
      */
     private Throwable exception;
+    
+    private String solverOutput[] = null;
 
+    private static final String [] HEAD_LINES = {"Normal Output:\n\n","\n\nError Output:\n\n","\n\nExit Code: "};
+    
     SMTSolverImplementation(SMTProblem problem, SolverListener listener,
 	    Services services, SolverType myType) {
 	this.problem = problem;
@@ -244,9 +248,8 @@ final class SMTSolverImplementation implements SMTSolver, Runnable {
 	    interruptionOccurred(e);
 	    listener.processInterrupted(this, problem, e);
 	    setSolverState(SolverState.Stopped);
-	    return;
-	} finally {
 	    solverTimeout.cancel();
+	    return;
 	}
 
 	// thirdly: Split the command in several strings.
@@ -261,14 +264,13 @@ final class SMTSolverImplementation implements SMTSolver, Runnable {
 
 	// start the external process.
 	try {
-	    String result[] = processLauncher.launch(list.toArray(array));
+	    solverOutput = processLauncher.launch(list.toArray(array));
 	    this.finalResult = type
 		    .interpretAnswer(
-		            result[ExternalProcessLauncher.RESULT],
-		            result[ExternalProcessLauncher.ERROR],
+		            solverOutput[ExternalProcessLauncher.RESULT],
+		            solverOutput[ExternalProcessLauncher.ERROR],
 		            Integer
-		                    .parseInt(result[ExternalProcessLauncher.EXIT_CODE]));
-	   
+		                    .parseInt(solverOutput[ExternalProcessLauncher.EXIT_CODE]));
 	} catch (Throwable e) {
 	    interruptionOccurred(e);
 	} finally {
@@ -413,12 +415,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable {
 
     @Override
     public void interrupt(ReasonOfInterruption reason) {
-//	if (reason != ReasonOfInterruption.Timeout
-//	        || reason != ReasonOfInterruption.User) {
-//	    throw new IllegalArgumentException(
-//		    "Only ReasonOfInterruption.Timeout"
-//		            + "                       and ReasonOfInterruption.User are allowed.");
-//	}
+
 	// order of assignments is important;
 	setReasonOfInterruption(reason);
 	setSolverState(SolverState.Stopped);
@@ -450,6 +447,22 @@ final class SMTSolverImplementation implements SMTSolver, Runnable {
     @Override
     public String toString() {
 	return name() + " (ID: " + ID + ")";
+    }
+
+    @Override
+    public String getSolverOutput() {
+	if(solverOutput == null){
+	    return null;
+	}
+	String s="";
+	int i=0; 
+	
+	for(String temp : solverOutput){
+	    s += i < HEAD_LINES.length ? HEAD_LINES[i] : "";
+	    s += temp;
+	    i++;
+	}
+	return s;
     }
 
 }

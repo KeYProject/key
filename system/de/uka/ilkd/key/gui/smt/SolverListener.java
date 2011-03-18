@@ -1,12 +1,9 @@
 package de.uka.ilkd.key.gui.smt;
 
 import java.awt.Color;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
-import java.awt.event.WindowStateListener;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -17,10 +14,9 @@ import java.util.LinkedList;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import javax.swing.JFrame;
+
 import javax.swing.SwingUtilities;
 
-import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.smt.InformationWindow.Information;
 import de.uka.ilkd.key.proof.Goal;
@@ -88,27 +84,45 @@ public class SolverListener implements SolverLauncherListener {
 	refreshDialog();
 	progressDialog.setStopButtonEnabled(false);
 	storeInformation();
-
+	Collection<Point> problemInformation = new LinkedList<Point>();
 	for (InternSMTProblem problem : problems) {
 	    int problemIndex = problem.getProblemIndex();
+	    
+	    if (problem.solver.getException() != null) {
+		Information info = new Information("Error-Message", problem.solver
+	                .getException().toString()
+	        	,problem.solver.name());
+		getPanel(problem).addInformation(
+		        problemIndex, info);
+		problemInformation.add(new Point(problem.getSolverIndex(),problem.getProblemIndex()));
+		
+	    }
+	    
 	    getPanel(problem).addInformation(
 		    problemIndex,
 		    new Information("Translation", problem.solver
-		            .getTranslation()));
+		            .getTranslation(),problem.solver.name()));
 	    if (problem.solver.getTacletTranslation() != null) {
 		getPanel(problem).addInformation(
 		        problemIndex,
 		        new Information("Taclets", problem.solver
-		                .getTacletTranslation().toString()));
+		                .getTacletTranslation().toString()
+		                ,problem.solver.name()));
 	    }
-	    if (problem.solver.getException() != null) {
+
+	    if(problem.solver.getSolverOutput() != null){
 		getPanel(problem).addInformation(
 		        problemIndex,
-		        new Information("Error-Message", problem.solver
-		                .getException().toString()));
+		        new Information("Solver Output",
+		                problem.solver.getSolverOutput(),
+		                problem.solver.name()));
 	    }
+	    
 	}
-
+	if(!problemInformation.isEmpty()){
+	    progressDialog.setInfo("Exception!", problemInformation);
+	    progressDialog.setInfoColor(RED);
+	}
     }
 
     private String getTitle(SMTProblem p) {

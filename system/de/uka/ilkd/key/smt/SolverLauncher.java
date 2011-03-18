@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
@@ -271,10 +272,11 @@ public class SolverLauncher implements SolverListener {
 	while (startNextSolvers(solvers) && !isInterrupted()) {
 	    SMTSolver solver = solvers.poll();
 
-	    final SolverTimeout solverTimeout = new SolverTimeout(solver,
+	    SolverTimeout solverTimeout = new SolverTimeout(solver,
 		    session, settings.getTimeout() + i * 50);
-	    timer.schedule(solverTimeout, settings.getTimeout(), PERIOD);
 
+	 
+	    timer.schedule(solverTimeout, settings.getTimeout(),PERIOD);
 	    session.addCurrentlyRunning(solver);
 	    // This cast is okay since there is only the class
 	    // SMTSolverImplementation that implements SMTSolver.
