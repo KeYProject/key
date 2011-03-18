@@ -85,20 +85,15 @@ public final class QueryAxiom implements ClassAxiom {
 	final SchemaVariable selfSV
 		= target.isStatic()
 		  ? null
-	          : SchemaVariableFactory.createTermSV(
-	        	  	new Name(TB.shortBaseName(kjt.getSort())), 
-                                kjt.getSort(), 
-                                false, 
-                                false);
+	          : SchemaVariableFactory.createTermSV(new Name("self"), 
+                                	               kjt.getSort(), 
+                                	               false, 
+                                	               false);
 	final SchemaVariable[] paramSVs 
 		= new SchemaVariable[target.getNumParams()];
 	for(int i = 0; i < paramSVs.length; i++) {
-	    final Name paramName 
-	        = target.getParameterDeclarationAt(i)
-	                .getVariableSpecification()
-	                .getProgramElementName();
 	    paramSVs[i]
-	    	= SchemaVariableFactory.createTermSV(paramName, 
+	    	= SchemaVariableFactory.createTermSV(new Name("p" + i), 
 						     target.getParamType(i)
 						           .getSort(), 
 						     false, 
@@ -106,7 +101,7 @@ public final class QueryAxiom implements ClassAxiom {
 	}
 	final SchemaVariable skolemSV 
 		= SchemaVariableFactory.createSkolemTermSV(
-					new Name(target.getName()), 
+					new Name(target.getName() + "_sk"), 
 					target.sort());	
 	
 	//create schema variables for program variables
@@ -123,7 +118,7 @@ public final class QueryAxiom implements ClassAxiom {
 	                                   .getVariableSpecification()
 	                                   .getName();
 	    paramProgSVs[i] = SchemaVariableFactory.createProgramSV(
-		    		new ProgramElementName("#" + paramName), 
+		    		new ProgramElementName("#p" + i), 
 		    		ProgramSVSort.VARIABLE, 
 		    		false);
 	}

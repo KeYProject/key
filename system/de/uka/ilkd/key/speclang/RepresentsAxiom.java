@@ -248,7 +248,7 @@ public final class RepresentsAxiom implements ClassAxiom {
     
     
     public static Name toValidTacletName(String s) {
-	s = s.replaceAll("\\s|\\.|::\\$|<|>", "_");
+	s = s.replaceAll("\\s|\\.|::\\$|::|<|>", "_");
 	return new Name(s);
     }
     
@@ -288,7 +288,7 @@ public final class RepresentsAxiom implements ClassAxiom {
 	final SchemaVariable selfSV
 		= target.isStatic()
 		  ? null
-	          : SchemaVariableFactory.createTermSV(originalSelfVar.name(), 
+	          : SchemaVariableFactory.createTermSV(new Name("self"), 
 						       kjt.getSort());
 	
 	//instantiate axiom with schema variables
@@ -322,7 +322,7 @@ public final class RepresentsAxiom implements ClassAxiom {
 	} else {
 	    final VariableSV targetSV
 	    	= SchemaVariableFactory.createVariableSV(
-		    new Name(target.sort().name().toString().substring(0, 1)),
+		    new Name(target.sort().name().toString().substring(0, 1) + "_lv"),
 		    target.sort());
 	    final Term targetLVReachable
 	    	= TB.reachableValue(services, 

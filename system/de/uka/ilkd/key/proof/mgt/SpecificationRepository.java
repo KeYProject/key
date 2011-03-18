@@ -281,7 +281,8 @@ public final class SpecificationRepository {
 	    (new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
 					   ImmutableSLList.<Taclet>nil(),
 					   unlimitedTerm));
-	tacletBuilder.setName(new Name("unlimit " + unlimited.name()));
+	tacletBuilder.setName(RepresentsAxiom.toValidTacletName(
+					"unlimit " + unlimited.name()));
 	
 	return tacletBuilder.getTaclet();
     }
@@ -319,7 +320,8 @@ public final class SpecificationRepository {
 					   ImmutableSLList.<Taclet>nil(),
 					   TB.func(unlimited, subs)));
 	tacletBuilder.setStateRestriction(RewriteTaclet.IN_SEQUENT_STATE);
-	tacletBuilder.setName(new Name("limit " + unlimited.name()));
+	tacletBuilder.setName(RepresentsAxiom.toValidTacletName(
+					"limit " + unlimited.name()));
 	tacletBuilder.addRuleSet(new RuleSet(new Name("limitObserver")));
 	
 	return tacletBuilder.getTaclet();

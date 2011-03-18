@@ -20,6 +20,7 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
@@ -418,7 +419,12 @@ public final class LogicPrinter {
         printSchemaVariable(sv.getSchemaVariable());
         layouter.print(",").brk();
         if (sv.isDefinedByType()) {
-            layouter.print(sv.getType().getFullName());
+            if(sv.getType() instanceof ArrayType) {
+        	layouter.print(((ArrayType)sv.getType())
+        		            .getAlternativeNameRepresentation());
+            } else {
+        	layouter.print(sv.getType().getFullName());
+            }
         } else {
             layouter.print("\\typeof (").brk();
             printSchemaVariable(sv.getPeerSchemaVariable());
