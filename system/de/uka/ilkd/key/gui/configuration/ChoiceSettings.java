@@ -22,22 +22,27 @@ import de.uka.ilkd.key.logic.Namespace;
 public class ChoiceSettings implements Settings {
 
     private static final String DEFAULTCHOICES_KEY = "[Choice]DefaultChoices";
-    private static final String CHOICES_KEY = "[Choice]Choices";
-    private LinkedList<SettingsListener> listenerList = new LinkedList<SettingsListener>();
+    private LinkedList<SettingsListener> listenerList 
+    	= new LinkedList<SettingsListener>();
     private HashMap<String,String> category2Default;
+    
+    
     /** maps categories to a set of Strings(representing the choices
      * which are options for this category).*/
-    private HashMap<String, Set<String>> category2Choices=new HashMap<String, Set<String>>();
+    private HashMap<String, Set<String>> category2Choices 
+    	= new HashMap<String, Set<String>>();
 
 
     public ChoiceSettings() {
 	category2Default = new HashMap<String, String>();
     }
 
+    
     public ChoiceSettings(HashMap<String, String> category2Default){
 	this.category2Default = category2Default;
     }
 
+    
     public void setDefaultChoices(HashMap<String, String> category2Default){
 	HashMap<String, String> category2Defaultold = this.category2Default;
 	this.category2Default = category2Default;
@@ -47,6 +52,7 @@ public class ChoiceSettings implements Settings {
 	}
     }
 
+    
     /** returns a copy of the HashMap that maps categories to 
      * their choices. */ 
     public HashMap<String, Set<String>> getChoices(){
@@ -59,12 +65,15 @@ public class ChoiceSettings implements Settings {
     public HashMap<String,String> getDefaultChoices(){
 	return (HashMap<String,String>) category2Default.clone();
     }
+    
+    
     /** 
      * returns the current selected choices as set    
      */ 
     public ImmutableSet<Choice> getDefaultChoicesAsSet() {              
         return choiceMap2choiceSet(category2Default);   
     }
+    
 
     private ImmutableSet<Choice> choiceMap2choiceSet(HashMap<String, String> ccc) {
         ImmutableSet<Choice> choices = DefaultImmutableSet.<Choice>nil();        
@@ -74,6 +83,7 @@ public class ChoiceSettings implements Settings {
         }
         return choices;
     }
+    
     
     /** updates <code>category2Choices</code> if new entries are found
      * in <code>choiceNS</code> or if entries of <code>category2Choices</code>
@@ -131,6 +141,7 @@ public class ChoiceSettings implements Settings {
 	    it.next().settingsChanged(new GUIEvent(this));
 	}
     }
+    
 
     /** gets a Properties object and has to perform the necessary
      * steps in order to change this object in a way that it
@@ -150,21 +161,8 @@ public class ChoiceSettings implements Settings {
 		
 	    }
 	}
-//	choiceSequence = props.getProperty(CHOICES_KEY);
-//	if (choiceSequence != null) {
-//	    StringTokenizer st = new StringTokenizer(choiceSequence, ",");
-//	    while (st.hasMoreTokens()) {
-//		StringTokenizer st2 = new StringTokenizer(
-//				       st.nextToken().trim(), "-");
-//		String category = st2.nextToken().trim();
-//		Set<String> soc = new HashSet<String>();
-//		while(st2.hasMoreTokens()){
-//		    soc.add(st2.nextToken().trim());
-//		}
-//		category2Choices.put(category, soc);
-//	    }
-//	}
     }
+    
 
     /** implements the method required by the Settings interface. The
      * settings are written to the given Properties object. Only entries of 
@@ -182,19 +180,8 @@ public class ChoiceSettings implements Settings {
 		entry.getValue().toString();
 	}
 	props.setProperty(DEFAULTCHOICES_KEY, choiceSequence);
-//	choiceSequence = "";
-//	for (final String cat : category2Choices.keySet()) {
-//	    if (choiceSequence.length() > 0) {
-//	        choiceSequence += " , ";
-//	    }
-//	    Set<String> soc = category2Choices.get(cat);
-//	    choiceSequence += cat;
-//	    for (final String choice : soc) {
-//		choiceSequence += "-"+choice.toString();
-//	    }
-//	}
-//	props.setProperty(CHOICES_KEY, choiceSequence);	
     }
+    
     
     public ChoiceSettings updateWith(ImmutableSet<Choice> sc) {
         for (final Choice c : sc) {
@@ -206,6 +193,7 @@ public class ChoiceSettings implements Settings {
         return this;
     }
 
+    
     /** adds a listener to the settings object 
      * @param l the listener
      */

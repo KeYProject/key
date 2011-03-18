@@ -11,7 +11,9 @@
 package de.uka.ilkd.key.speclang;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
@@ -127,8 +129,8 @@ public final class RepresentsAxiom implements ClassAxiom {
     }    
     
     
-    public static Pair<Term,ImmutableSet<VariableSV>> 
-    				replaceBoundLVsWithSVs(Term t) {
+    private static Pair<Term,ImmutableSet<VariableSV>> 
+    				replaceBoundLVsWithSVsHelper(Term t) {
 	ImmutableSet<VariableSV> svs = DefaultImmutableSet.<VariableSV>nil();
 	
 	//prepare op replacer, new bound vars
@@ -162,7 +164,7 @@ public final class RepresentsAxiom implements ClassAxiom {
 		newSubs[i] = t.sub(i);
 	    }
 	    final Pair<Term,ImmutableSet<VariableSV>> subPair 
-	    	= replaceBoundLVsWithSVs(newSubs[i]);
+	    	= replaceBoundLVsWithSVsHelper(newSubs[i]);
 	    newSubs[i] = subPair.first;
 	    svs = svs.union(subPair.second);
 	    if(newSubs[i] != t.sub(i)) {
@@ -183,6 +185,71 @@ public final class RepresentsAxiom implements ClassAxiom {
 	}
 	
 	return new Pair<Term,ImmutableSet<VariableSV>>(newTerm, svs);
+    }
+    
+    
+    /**
+     * Replaces any bound logical variables in t with schema variables
+     * (necessary for proof saving/loading, if t occurs as part of a taclet). 
+     */
+    public static Pair<Term,ImmutableSet<VariableSV>> 
+    				replaceBoundLVsWithSVs(Term t) {
+	//recursive replacement process
+	final Pair<Term,ImmutableSet<VariableSV>> intermediateRes 
+		= replaceBoundLVsWithSVsHelper(t);
+	
+	//Post-processing: different bound variables with the same name 
+	//(but non-overlapping scopes) may be used in t; in contrast, the 
+	//schema variables in this method's result must have names that are 
+	//unique within the term.
+	
+	//collect all operator names used in t
+	final OpCollector oc = new OpCollector();
+	oc.visit(t);
+	final Set<Name> usedNames = new HashSet<Name>();
+	for(Operator op : oc.ops()) {
+	    usedNames.add(op.name());
+	}
+	
+	//find and resolve name conflicts between schema variables
+	ImmutableSet<VariableSV> newSVs 
+		= DefaultImmutableSet.<VariableSV>nil();
+	final Set<Name> namesOfNewSVs = new HashSet<Name>();
+	final Map<VariableSV,VariableSV> replaceMap 
+		= new HashMap<VariableSV,VariableSV>(); 
+	for(VariableSV sv : intermediateRes.second) {
+	    if(namesOfNewSVs.contains(sv.name())) {
+		//choose alternative name
+		final String baseName = sv.name().toString();
+		int i = 0;
+		Name newName;
+		do {
+		    newName = new Name(baseName + "_" + i++);
+		} while(usedNames.contains(newName));
+		
+		//create new SV, register in replace map
+		final VariableSV newSV 
+			= SchemaVariableFactory.createVariableSV(newName, 
+								 sv.sort());
+		newSVs = newSVs.add(newSV);
+		namesOfNewSVs.add(sv.name());
+		usedNames.add(sv.name());
+		replaceMap.put(sv, newSV);
+	    } else {
+		newSVs = newSVs.add(sv);
+		namesOfNewSVs.add(sv.name());
+	    }
+	}
+	final OpReplacer or = new OpReplacer(replaceMap);
+	final Term newTerm = or.replace(intermediateRes.first);	
+	
+	return new Pair<Term,ImmutableSet<VariableSV>>(newTerm, newSVs);
+    }
+    
+    
+    public static Name toValidTacletName(String s) {
+	s = s.replaceAll("\\s|\\.|::\\$|::|<|>", "_");
+	return new Name(s);
     }
     
     
@@ -221,7 +288,7 @@ public final class RepresentsAxiom implements ClassAxiom {
 	final SchemaVariable selfSV
 		= target.isStatic()
 		  ? null
-	          : SchemaVariableFactory.createTermSV(originalSelfVar.name(), 
+	          : SchemaVariableFactory.createTermSV(new Name("self"), 
 						       kjt.getSort());
 	
 	//instantiate axiom with schema variables
@@ -255,7 +322,7 @@ public final class RepresentsAxiom implements ClassAxiom {
 	} else {
 	    final VariableSV targetSV
 	    	= SchemaVariableFactory.createVariableSV(
-		    new Name(target.sort().name().toString().substring(0, 1)),
+		    new Name(target.sort().name().toString().substring(0, 1) + "_lv"),
 		    target.sort());
 	    final Term targetLVReachable
 	    	= TB.reachableValue(services, 
@@ -290,7 +357,7 @@ public final class RepresentsAxiom implements ClassAxiom {
 	    (new RewriteTacletGoalTemplate(addedSeq,
 					   ImmutableSLList.<Taclet>nil(),
 					   findTerm));
-	tacletBuilder.setName(new Name(name));
+	tacletBuilder.setName(toValidTacletName(name));
 	tacletBuilder.addRuleSet(
 			new RuleSet(new Name("inReachableStateImplication")));
 	for(VariableSV boundSV : boundSVs) {
@@ -372,7 +439,7 @@ public final class RepresentsAxiom implements ClassAxiom {
 	if(ifSeq != null) {
 	    tacletBuilder.setIfSequent(ifSeq);
 	}
-	tacletBuilder.setName(new Name(name));
+	tacletBuilder.setName(toValidTacletName(name));
 	tacletBuilder.addRuleSet(new RuleSet(new Name("classAxiom")));
 	for(VariableSV boundSV : boundSVs) {
 	    tacletBuilder.addVarsNotFreeIn(boundSV, heapSV);

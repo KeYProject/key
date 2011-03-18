@@ -104,6 +104,7 @@ public final class OperationContractPO extends AbstractPO
         		       services.getTypeConverter()
         		               .getIntegerLDT()
         		               .targetSort());
+            register(mbyAtPreFunc);
             mbyAtPre = TB.func(mbyAtPreFunc);
             final Term mby = contract.getMby(selfVar, paramVars, services);
             mbyAtPreDef = TB.equals(mbyAtPre, mby);

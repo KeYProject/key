@@ -8,11 +8,6 @@
 //
 //
 
-/**
- * Implements "inner renaming", i.e. renaming - if a new variable entering the
- * globals causes a name clash - this "inner" variable, and leaving the clashing
- * "outer" one untouched.
- */
 
 package de.uka.ilkd.key.logic;
 
@@ -26,6 +21,11 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.ProgVarReplacer;
 
 
+/**
+ * Implements "inner renaming", i.e. renaming - if a new variable entering the
+ * globals causes a name clash - this "inner" variable, and leaving the clashing
+ * "outer" one untouched.
+ */
 public class InnerVariableNamer extends VariableNamer {
 
     public InnerVariableNamer(Services services) {

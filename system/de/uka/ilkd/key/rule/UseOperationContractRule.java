@@ -535,13 +535,14 @@ public final class UseOperationContractRule implements BuiltInRule {
 		= instantiate(ruleApp.posInOccurrence().subTerm(), services);
         final JavaBlock jb = inst.progPost.javaBlock();
         
-        //configure contract and assumed / ensured invariants
+        //configure contract
         final OperationContract contract;
-        if(ruleApp instanceof UseOperationContractRuleApp) {
+        if(ruleApp instanceof ContractRuleApp) {
             //the contract is already fixed 
             //(probably because we're in the process of reading in a 
             //proof from a file)
-            contract = ((UseOperationContractRuleApp) ruleApp).getInstantiation();            
+            contract = (OperationContract)((ContractRuleApp) ruleApp)
+                                           .getInstantiation();            
         } else { 
             contract = configureContract(services, 
         	    		         inst.pm, 

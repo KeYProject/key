@@ -517,8 +517,18 @@ public final class UseDependencyContractRule implements BuiltInRule {
         	= target.isStatic() 
 		  ? target.getContainerType()
 	          : services.getJavaInfo().getKeYJavaType(selfTerm.sort());
-        final DependencyContract contract 
-        	= configureContract(services, kjt, target);
+		   
+        //configure contract
+        final DependencyContract contract;
+        if(ruleApp instanceof ContractRuleApp) {
+            //the contract is already fixed 
+            //(probably because we're in the process of reading in a 
+            //proof from a file)
+            contract = (DependencyContract)((ContractRuleApp) ruleApp)
+                                            .getInstantiation();            
+        } else {      
+            contract = configureContract(services, kjt, target);
+        }
         assert contract != null;
         final Pair<Term,Term> baseHeapAndChangedLocs 
         	= getBaseHeapAndChangedLocs(pio, 
@@ -577,6 +587,14 @@ public final class UseDependencyContractRule implements BuiltInRule {
         final Term cutFormula 
         	= TB.and(new Term[]{freePre, pre, disjoint, mbyOk});
         
+        //create justification
+        final RuleJustificationBySpec just 
+        	= new RuleJustificationBySpec(contract);
+        final ComplexRuleJustificationBySpec cjust 
+            	= (ComplexRuleJustificationBySpec)
+            	    goal.proof().env().getJustifInfo().getJustification(this);
+        cjust.add(ruleApp, just);        
+        
         //bail out if obviously not helpful
         if(!baseHeapAndChangedLocs.second.op().equals(locSetLDT.getEmpty())) {
             final ImmutableSet<Term> changed 
@@ -614,14 +632,6 @@ public final class UseDependencyContractRule implements BuiltInRule {
         postGoal.addFormula(new ConstrainedFormula(cutFormula),
         	 	    true,
         	 	    false);
-        
-        //create justification
-        final RuleJustificationBySpec just 
-        	= new RuleJustificationBySpec(contract);
-        final ComplexRuleJustificationBySpec cjust 
-            	= (ComplexRuleJustificationBySpec)
-            	    goal.proof().env().getJustifInfo().getJustification(this);
-        cjust.add(ruleApp, just);
         
         return result;
     }

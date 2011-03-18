@@ -19,7 +19,6 @@ import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.ClassRuleFilter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.SetRuleFilter;
@@ -134,7 +133,7 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final Feature oneStepSimplificationF 
         	= oneStepSimplificationFeature(longConst(-10000));
         
-        final Feature pullOutConditionalsF = pullOutConditionalsFeature(longConst(-10001));        
+        final Feature pullOutConditionalsF = pullOutConditionalsFeature(longConst(-11000));        
         
       //  final Feature smtF = smtFeature(inftyConst());
 

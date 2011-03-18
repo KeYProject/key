@@ -25,8 +25,6 @@ public interface ProofOblInput {
      */
     String name();
         
-    void readActivatedChoices() throws ProofInputException;
-
     void readProblem() throws ProofInputException;
 
     /**

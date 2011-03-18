@@ -58,10 +58,12 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
     //-------------------------------------------------------------------------
         
     @Override
-    public void readActivatedChoices() throws ProofInputException{
-        if (initConfig == null) {
-            throw new IllegalStateException("KeYFile: InitConfig not set.");
-        }
+    public void read() throws ProofInputException {
+        if(initConfig == null) {
+            throw new IllegalStateException("InitConfig not set.");
+        }	
+        
+        //read activated choices
         try {
             ProofSettings settings = getPreferences();
             
@@ -74,30 +76,25 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
                         file.toString(), pc, pc, null, null);    
             problemParser.parseWith();            
         
-            settings.getChoiceSettings().
-             updateWith(problemParser.getActivatedChoices());           
+            settings.getChoiceSettings()
+                    .updateWith(problemParser.getActivatedChoices());           
             
-            initConfig.setActivatedChoices(settings.getChoiceSettings().
-                    getDefaultChoicesAsSet());
+            initConfig.setActivatedChoices(settings.getChoiceSettings()
+        	      		                   .getDefaultChoicesAsSet());
         
         } catch (antlr.ANTLRException e) {
             throw new ProofInputException(e);      
         } catch (FileNotFoundException fnfe) {
             throw new ProofInputException(fnfe);
-        }
-    }
-    
-    
-    @Override
-    public void read() throws ProofInputException {
+        }        
+	
         //read in-code specifications
-	getPreferences();	
         SLEnvInput slEnvInput = new SLEnvInput(readJavaPath(), 
         				       readClassPath(), 
         				       readBootClassPath());
         slEnvInput.setInitConfig(initConfig);
         slEnvInput.read();
-        
+                
         //read key file itself
 	super.read();        
     }    

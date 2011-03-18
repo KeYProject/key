@@ -70,7 +70,8 @@ public class InitConfig {
      * ({@link Choice}s) allow to use different ruleset modelling or skipping
      * certain features (e.g. nullpointer checks when resolving references)
      */
-    private ImmutableSet<Choice> activatedChoices = DefaultImmutableSet.<Choice>nil();
+    private ImmutableSet<Choice> activatedChoices 
+    	= DefaultImmutableSet.<Choice>nil();
 
     /** HashMap for quick lookups taclet name->taclet */
     private HashMap<Name, Named> quickTacletMap;
@@ -202,7 +203,7 @@ public class InitConfig {
      * <code>getChoices</code> in <code>de.uka.ilkd.key.proof.Proof
      * </code> has to be used.
      */
-    public ImmutableSet<Choice> getActivatedChoices(){
+    public ImmutableSet<Choice> getActivatedChoices() {
         return activatedChoices;
     }
 

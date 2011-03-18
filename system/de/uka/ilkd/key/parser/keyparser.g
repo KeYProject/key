@@ -85,7 +85,8 @@ options {
       prooflabel2tag.put("keyUser", new Character('u'));
       prooflabel2tag.put("keyVersion", new Character('v'));
       prooflabel2tag.put("keySettings", new Character('s'));
-      prooflabel2tag.put("contract", new Character('c'));	
+      prooflabel2tag.put("contract", new Character('c'));
+      prooflabel2tag.put("ifInst", new Character('x'));		
       prooflabel2tag.put("userinteraction", new Character('a'));
       prooflabel2tag.put("userconstraint", new Character('o'));
       prooflabel2tag.put("matchconstraint", new Character('m'));
@@ -3164,7 +3165,8 @@ funcpredvarterm returns [Term a = null]
     String varfuncid;
     String neg = "";
     boolean opSV = false;
-    Namespace orig = variables();  
+    Namespace orig = variables();
+    boolean limited = false;  
 }
     :
       ch:CHAR_LITERAL {
@@ -3186,7 +3188,7 @@ funcpredvarterm returns [Term a = null]
         ((MINUS)? NUM_LITERAL) => (MINUS {neg = "-";})? number:NUM_LITERAL
         { a = toZNotation(neg+number.getText(), functions());}    
     | AT a = abbreviation
-    | varfuncid = funcpred_name
+    | varfuncid = funcpred_name (LIMITED {limited = true;})?
         (
             (
                LBRACE 
@@ -3196,7 +3198,7 @@ funcpredvarterm returns [Term a = null]
             )
             |
             args = argument_list
-        )?     
+        )? 
         
         //args==null indicates no argument list
         //args.size()==0 indicates open-close-parens ()
@@ -3207,7 +3209,15 @@ funcpredvarterm returns [Term a = null]
 	    } else if(varfuncid.equals("skip") && args == null) {
 	        a = tf.createTerm(UpdateJunctor.SKIP);
 	    } else {
-	            Operator op = lookupVarfuncId(varfuncid, args);     
+	            Operator op = lookupVarfuncId(varfuncid, args);  
+	            if(limited) {
+	                if(op.getClass() == ObserverFunction.class) {
+	                    op = getServices().getSpecificationRepository()
+	                                      .limitObs((ObserverFunction)op).first;
+	                } else {
+	                    semanticError("Cannot can be limited: " + op);
+	                }
+	            }   
 	                   
 	            if (op instanceof ParsableVariable) {
 	                a = termForParsedVariable((ParsableVariable)op);

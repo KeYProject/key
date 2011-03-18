@@ -146,6 +146,8 @@ tokens {
 	IN_TYPE = "\\inType";
         IS_ABSTRACT_OR_INTERFACE = "\\isAbstractOrInterface";
         CONTAINERTYPE = "\\containerType";
+        
+        LIMITED = "$lmtd";
 }
 
 {

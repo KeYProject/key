@@ -36,6 +36,7 @@ public class ComplexRuleJustificationBySpec implements ComplexRuleJustification 
     
     
     public void add(RuleApp ruleApp, RuleJustificationBySpec just) {
+	assert !(just instanceof ComplexRuleJustification);
         app2Just.put(ruleApp, just);
     }
 }

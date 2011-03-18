@@ -15,15 +15,24 @@ import java.util.*;
 
 import recoder.io.PathList;
 import recoder.io.ProjectSettings;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.Type;
+import de.uka.ilkd.key.java.declaration.ClassDeclaration;
+import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
+import de.uka.ilkd.key.java.declaration.TypeDeclaration;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
@@ -35,6 +44,7 @@ import de.uka.ilkd.key.proof.mgt.GlobalProofMgt;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.RuleConfig;
 import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 
@@ -231,9 +241,9 @@ public final class ProblemInitializer {
     		throws ProofInputException {
 	//this method must only be called once per init config	
 	assert !initConfig.getServices()
-	                  .getJavaInfo()
-	                  .rec2key()
-	                  .parsedSpecial();
+			  .getJavaInfo()
+			  .rec2key()
+			  .parsedSpecial();
 	assert initConfig.getProofEnv().getJavaModel() == null;
 	
 	//read Java source and classpath settings
@@ -247,8 +257,8 @@ public final class ProblemInitializer {
                                                 initConfig.namespaces());
 	r2k.setClassPath(bootClassPath, classPath);
 
+    	//read Java (at least the library classes)		
 	if(javaPath != null) {
-    	    //read Java	
             reportStatus("Reading Java source");
             final ProjectSettings settings 
             	=  initConfig.getServices()
@@ -266,7 +276,6 @@ public final class ProblemInitializer {
             reportStatus("Reading Java libraries");	    
 	    r2k.parseSpecialClasses();
 	}
-	
         initConfig.getProofEnv().setJavaModel(createJavaModel(javaPath,
         	                                              classPath,
         	                                              bootClassPath));
@@ -348,6 +357,17 @@ public final class ProblemInitializer {
 	    if(namespaces.programVariables().lookup(pv.name()) == null) {	    
 		rootGoal.addProgramVariable(pv);
 	    }
+	} else if(term.javaBlock() != null && !term.javaBlock().isEmpty()) {
+	    final ProgramElement pe = term.javaBlock().program();
+	    final Services serv = rootGoal.proof().getServices();
+	    final ImmutableSet<ProgramVariable> freeProgVars 
+	    	= MiscTools.getLocalIns(pe, serv)
+	    	           .union(MiscTools.getLocalOuts(pe, serv));
+	    for(ProgramVariable pv : freeProgVars) {
+		if(namespaces.programVariables().lookup(pv.name()) == null) {	    
+		    rootGoal.addProgramVariable(pv);
+		}		
+	    }
 	}
     }
     
@@ -372,9 +392,6 @@ public final class ProblemInitializer {
     		throws ProofInputException {       
 	ProofEnvironment env = initConfig.getProofEnv();
 	
-	//read activated choices
-	po.readActivatedChoices();
-        
         //TODO: what does this actually do?
         ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().updateChoices(initConfig.choiceNS(), false);
 	
@@ -452,11 +469,28 @@ public final class ProblemInitializer {
         
 	//read Java
         readJava(envInput, initConfig);
+        
+        //register function and predicate symbols defined by Java program
         final JavaInfo javaInfo = initConfig.getServices().getJavaInfo();
         final Namespace functions 
         	= initConfig.getServices().getNamespaces().functions();
+        final HeapLDT heapLDT 
+        	= initConfig.getServices().getTypeConverter().getHeapLDT();
+        assert heapLDT != null;
         functions.add(initConfig.getServices().getJavaInfo().getInv());
         for(KeYJavaType kjt : javaInfo.getAllKeYJavaTypes()) {
+            final Type type = kjt.getJavaType();
+            if(type instanceof ClassDeclaration 
+        	     || type instanceof InterfaceDeclaration) {
+        	for(Field f : javaInfo.getAllFields((TypeDeclaration)type)) {
+        	    final ProgramVariable pv 
+        	    	= (ProgramVariable)f.getProgramVariable();
+        	    if(pv instanceof LocationVariable) {
+        		heapLDT.getFieldSymbolForPV((LocationVariable)pv, 
+        					    initConfig.getServices());
+        	    }
+        	}
+            }
             for(ProgramMethod pm
         	    : javaInfo.getAllProgramMethodsLocallyDeclared(kjt)) {
         	if(pm.getKeYJavaType() != null) {
