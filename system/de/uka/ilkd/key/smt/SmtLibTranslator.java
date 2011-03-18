@@ -584,11 +584,12 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 	return rightSide;
 	
     }
-    protected StringBuffer translateUniqueness(FunctionWrapper function,
+  /*  protected StringBuffer translateUniqueness(FunctionWrapper function,
             Collection<FunctionWrapper> distinct) throws IllegalFormulaException {
 	if(!function.getFunction().isUnique()){
 	    return null;
 	}
+
 	function.setUsedForUnique(true);
 	
 	StringBuffer result = translateLogicalTrue();
@@ -602,7 +603,7 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 	    }
 	}
 	return result;
-    }
+    }*/
     
 
 

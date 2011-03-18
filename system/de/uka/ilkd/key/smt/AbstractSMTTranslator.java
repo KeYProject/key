@@ -1260,8 +1260,109 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      */
     protected  StringBuffer translateUniqueness(FunctionWrapper function, Collection<FunctionWrapper> distinct)
     throws IllegalFormulaException {
-	throw new IllegalFormulaException("The function "+ function.getName() + " is unique, " + "but the solver your are using" +
-			" does not support the uniquness of functions.");
+	if(!function.getFunction().isUnique()){
+	    return null;
+	}
+
+	function.setUsedForUnique(true);
+	
+	StringBuffer result = translateLogicalTrue();
+	for(FunctionWrapper fw : distinct){
+	    if(!fw.isUsedForUnique() &&
+	        fw.getFunction().isUnique()){
+		FunctionWrapper array [] = {function, fw};
+		if(function.function.sort().extendsTrans(fw.function.sort()) ||
+			fw.function.sort().extendsTrans(function.function.sort()))
+	        {
+	            result = translateLogicalAnd(result, buildDistinct(array));
+	        }
+		
+	    }
+	}
+	return translateLogicalAnd(result,buildInjectiveFunctionAssumption(function));
+	
+    }
+    
+    protected StringBuffer buildInjectiveFunctionAssumption(FunctionWrapper fw){
+	if(fw.getFunction().arity() == 0){
+	    return translateLogicalTrue();
+	}
+	StringBuffer result;
+	ArrayList<StringBuffer> vars1 = createGenericVariables(fw.getFunction().arity(), 0);
+	ArrayList<StringBuffer> vars2 = createGenericVariables(fw.getFunction().arity(), 0);
+	StringBuffer function1 = translateFunction(fw.getName(),vars1);
+	StringBuffer function2 = translateFunction(fw.getName(),vars2);
+	result = translateLogicalNot(translateObjectEqual(function1, function2));
+	StringBuffer leftSide = translateLogicalTrue();
+	for(int i=0; i < vars1.size(); i++){
+	    StringBuffer eq = translateObjectEqual(vars1.get(i), vars2.get(i));
+	    leftSide = translateLogicalAnd(leftSide,eq);
+	}
+	
+	
+	
+	result = translateLogicalOr(leftSide, result);
+	result = translateLogicalAll(vars1,getArgSorts(fw.function), result);
+	result = translateLogicalAll(vars2,getArgSorts(fw.function), result);
+	return result;
+    }
+    
+    private ArrayList<Sort> getArgSorts(Function function){
+	ArrayList<Sort> sorts = new ArrayList<Sort>();
+	for(Sort sort : function.argSorts()){
+	    sorts.add(sort);
+	}
+	return sorts;
+    }
+    
+    private StringBuffer createGenericVariable(int pos){
+	return translateLogicalVar(new StringBuffer("n"+Integer.toString(pos)));
+    }
+    
+    private ArrayList<StringBuffer> createGenericVariables(int count, int start){
+	ArrayList<StringBuffer> list = new ArrayList<StringBuffer>();
+	for(int i=0; i < count; i++){
+	    list.add(createGenericVariable(i+start));
+	}
+	return list;
+    }
+    
+    
+    private StringBuffer buildDistinct(FunctionWrapper []functions){
+	assert functions.length == 2;
+	int start =0;
+	StringBuffer functionTranslation [] = new StringBuffer[functions.length];
+	ArrayList<StringBuffer> createdVariables = new ArrayList<StringBuffer>();
+	ArrayList<Sort>         sorts = new ArrayList<Sort>();
+	
+	StringBuffer result = new StringBuffer();
+	for(int i=0; i < functions.length; i++){
+	    FunctionWrapper fw = functions[i];
+	    ArrayList<StringBuffer> vars = createGenericVariables(fw.getFunction().arity(), start);
+	    sorts.addAll(getArgSorts(fw.getFunction()));
+	    
+	    functionTranslation[i] = 
+	    translateFunction(fw.getName(), vars);   
+	    createdVariables.addAll(vars);
+	}
+	
+	result = translateObjectEqual(functionTranslation[0], functionTranslation[1]);
+	result = translateLogicalNot(result);
+
+	result = translateLogicalAll(createdVariables,sorts, result);
+
+	return result;
+    }
+    
+    protected StringBuffer translateLogicalAll(ArrayList<StringBuffer> variables,ArrayList<Sort>sorts,StringBuffer result){
+	for(int i=0; i < variables.size(); i++){
+	    result = translateLogicalAll(variables.get(i),sorts.get(i), result);
+	}
+	return result;
+    }
+    
+    protected StringBuffer translateLogicalAll(StringBuffer var, Sort sort,StringBuffer result){
+	return translateLogicalAll(var, translateSort(sort), result);
     }
 
     
