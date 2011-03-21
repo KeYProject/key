@@ -34,6 +34,7 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.ClassAxiom;
+import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.util.Pair;
 
 
@@ -269,13 +270,28 @@ public abstract class AbstractPO implements ProofOblInput {
             sb.append("}\n\n");
         }
         
+        //contracts
+        ImmutableSet<Contract> contractsToSave = specRepos.getAllContracts();
+        for(Contract c : contractsToSave) {
+            if(!c.toBeSaved()) {
+        	contractsToSave = contractsToSave.remove(c);
+            }
+        }
+        if(!contractsToSave.isEmpty()) {
+            sb.append("\\contracts {\n");
+            for(Contract c : contractsToSave) {
+        	sb.append(c.proofToString(services));
+            }
+            sb.append("}\n\n");
+        }        
+        
         //taclets
         if(taclets != null && !taclets.isEmpty()) {
             sb.append("\\rules {\n");
-            LogicPrinter lp = new LogicPrinter(new ProgramPrinter(), 
-            			   	       new NotationInfo(), 
-            			   	       null, 
-            			   	       true);            
+            final LogicPrinter lp = new LogicPrinter(new ProgramPrinter(), 
+            			   	       	     new NotationInfo(), 
+            			   	       	     null, 
+            			   	       	     true);    
             for(NoPosTacletApp npta : taclets) {
         	lp.printTaclet(npta.taclet(),
         		       SVInstantiations.EMPTY_SVINSTANTIATIONS, 
@@ -288,7 +304,7 @@ public abstract class AbstractPO implements ProofOblInput {
             }
             sb.append("}\n\n");
         }
-        
+
         header = sb.toString();
     }
 

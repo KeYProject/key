@@ -46,7 +46,7 @@ public interface OperationContract extends Contract {
 	    	        ImmutableList<ProgramVariable> paramVars, 
 	    	        ProgramVariable resultVar, 
 	    	        ProgramVariable excVar,
-	    	        Term heapAtPre,
+	    	        ProgramVariable heapAtPreVar,
 	    	        Services services);
     
     /**
@@ -94,9 +94,4 @@ public interface OperationContract extends Contract {
 	    			    ProgramVariable selfVar, 
                                     ImmutableList<ProgramVariable> paramVars,
                                     Services services);    
-        
-    /**
-     * Returns the contract in pretty HTML format.
-     */
-    public String getHTMLText(Services services);
 }

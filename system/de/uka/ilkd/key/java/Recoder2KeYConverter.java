@@ -817,11 +817,11 @@ public class Recoder2KeYConverter {
         return new MethodBodyStatement(bodySource, resultVar, mr);
     }
     
-    public CatchAllStatement convert
-        (de.uka.ilkd.key.java.recoderext.CatchAllStatement cas) {
+    public CatchAllStatement convert(
+	    	de.uka.ilkd.key.java.recoderext.CatchAllStatement cas) {
         return new CatchAllStatement
             ((StatementBlock)callConvert(cas.getStatementAt(0)),
-             (ParameterDeclaration) callConvert(cas.getParameterDeclarationAt(0)));
+             (LocationVariable) callConvert(cas.getVariable()));
     }
 
     // ------------------- declaration ---------------------

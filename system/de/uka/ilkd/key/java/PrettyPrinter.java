@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.declaration.modifier.Final;
@@ -1945,14 +1944,14 @@ public class PrettyPrinter {
     public void printCatchAllStatement(CatchAllStatement x) 
 	throws java.io.IOException {
         printHeader(x);
-	markStart(0,x);
+	markStart(0, x);
 	write("#catchAll");
 	write("(");
-	writeElement(x.getParameterDeclaration());
+	writeElement(x.getParam());
 	write(")");
 	writeElement(1, x.getBody());        
-        printFooter(x);
-
+	markEnd(0, x);
+        printFooter(x);	
     }
 
     public void printMethodBodyStatement(MethodBodyStatement x)

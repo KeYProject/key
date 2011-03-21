@@ -15,6 +15,7 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.declaration.modifier.Private;
 import de.uka.ilkd.key.java.statement.CatchAllStatement;
 import de.uka.ilkd.key.logic.OpCollector;
@@ -61,7 +62,7 @@ public final class DLSpecFactory {
     }
     
     
-    private ProgramVariable extractHeapAtPre(Term fma) 
+    private LocationVariable extractHeapAtPre(Term fma) 
     		throws ProofInputException {
 	if(fma.sub(1).op() instanceof UpdateApplication) {
 	    final Term update = fma.sub(1).sub(0);
@@ -78,7 +79,7 @@ public final class DLSpecFactory {
 		throw new ProofInputException("heap expected, "
 					      + "but found: " + update.sub(0));
 	    } else {
-		return (ProgramVariable) eu.lhs();
+		return (LocationVariable) eu.lhs();
 	    }
 	} else {
 	    return null;
@@ -93,10 +94,7 @@ public final class DLSpecFactory {
 	
 	final SourceElement se = modFma.javaBlock().program().getFirstElement();
 	if(se instanceof CatchAllStatement) {
-	    final CatchAllStatement cas = (CatchAllStatement) se;
-	    return (ProgramVariable) cas.getParameterDeclaration()
-		                        .getVariableSpecification()
-		                        .getFirstElement();
+	    return ((CatchAllStatement) se).getParam();
 	} else {
 	    return null;
 	}
@@ -236,7 +234,7 @@ public final class DLSpecFactory {
 
 	//extract parts of fma
 	final Term pre = extractPre(fma);
-	ProgramVariable heapAtPreVar = extractHeapAtPre(fma);
+	LocationVariable heapAtPreVar = extractHeapAtPre(fma);
 	ProgramVariable excVar = extractExcVar(fma);	
 	final UseOperationContractRule.Instantiation inst = extractInst(fma);
 	final ProgramMethod pm = extractProgramMethod(inst);
@@ -286,7 +284,10 @@ public final class DLSpecFactory {
 		                + modality + "; please use #catchAll block");
 	    }
 	}
-
+	
+	final boolean isLibraryClass 
+		= ((TypeDeclaration)pm.getContainerType() 
+			              .getJavaType()).isLibraryClass();
 	return new OperationContractImpl(name,
 					 pm.getContainerType(),		
 					 pm, 
@@ -299,6 +300,7 @@ public final class DLSpecFactory {
 					 paramVars, 
 					 resultVar, 
 					 excVar,
-					 TB.var(heapAtPreVar));
+					 heapAtPreVar,
+					 !isLibraryClass);
     }
 }

@@ -81,14 +81,8 @@ public class DeclarationProgramVariableCollector extends JavaASTVisitor {
 	addVariable(x.getProgramVariable());
     }
 
-    public void performActionOnCatchAllStatement(CatchAllStatement x) {
-	result.add(x.getParameterDeclaration().getVariableSpecification()
-		   .getProgramVariable());
-    }
-
     public void performActionOnLocationVariable(LocationVariable x) {
-        performActionOnProgramVariable(x);
-        
+        performActionOnProgramVariable(x);        
     }
 
     public void performActionOnProgramConstant(ProgramConstant x) {

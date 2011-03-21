@@ -272,6 +272,19 @@ public final class DependencyContractImpl implements DependencyContract {
     }    
     
     
+    @Override
+    public boolean toBeSaved() {
+	return false; //because dependency contracts currently cannot be
+	              //specified directly in DL 
+    }
+    
+    
+    @Override
+    public String proofToString(Services services) {
+	assert false;
+	return null;
+    }
+    
 
     @Override
     public Term getDep(ProgramVariable selfVar,

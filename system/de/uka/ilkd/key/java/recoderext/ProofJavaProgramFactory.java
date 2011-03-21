@@ -28,6 +28,7 @@ import recoder.java.SourceElement.Position;
 import recoder.java.declaration.*;
 import recoder.java.reference.MethodReference;
 import recoder.java.reference.TypeReference;
+import recoder.java.reference.VariableReference;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 import recoder.util.StringUtils;
@@ -388,9 +389,9 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     /**
      * Create a {@link CatchAllStatement}.
      */
-    public Statement createCatchAllStatement(ParameterDeclaration decl,
+    public Statement createCatchAllStatement(VariableReference param,
 					     StatementBlock body) {
-	return new CatchAllStatement(decl, body);
+	return new CatchAllStatement(param, body);
     }
     
     /**

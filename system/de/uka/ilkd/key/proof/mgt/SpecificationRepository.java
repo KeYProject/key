@@ -335,6 +335,18 @@ public final class SpecificationRepository {
     //------------------------------------------------------------------------- 
     
     /**
+     * Returns all registered contracts.
+     */
+    public ImmutableSet<Contract> getAllContracts() {
+	ImmutableSet<Contract> result = DefaultImmutableSet.<Contract>nil();
+	for(ImmutableSet<Contract> s : contracts.values()) {
+	    result = result.union(s);
+	}
+	return result;
+    }
+    
+    
+    /**
      * Returns all registered (atomic) contracts for the passed target.
      */
     public ImmutableSet<Contract> getContracts(KeYJavaType kjt,
@@ -663,7 +675,8 @@ public final class SpecificationRepository {
 	    if(pm.getKeYJavaType() != null && !pm.isImplicit()) {
 		pm = services.getJavaInfo().getToplevelPM(kjt, pm);		
 		final ClassAxiom queryAxiom 
-		    = new QueryAxiom("Query axiom for " + pm.getFullName(),
+		    = new QueryAxiom("Query axiom for " + pm.getName() 
+			    	     + " in " + kjt.getFullName(),
 			    	     pm, 
 			             kjt);
 		result = result.add(queryAxiom);

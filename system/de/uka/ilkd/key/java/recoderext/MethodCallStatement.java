@@ -23,7 +23,6 @@ public class MethodCallStatement extends JavaStatement implements
     /**
      * resultVar (should be a VariableReference, but the parser can't enforce this)
      */
-        
     protected Expression resultVar;
 
     protected ExecutionContext ec;

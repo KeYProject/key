@@ -167,7 +167,9 @@ public class JMLSpecFactory {
         	= TB.paramVars(services, pm, false);
         ProgramVariable resultVar = TB.resultVar(services, pm, false);
         ProgramVariable excVar = TB.excVar(services, pm, false);
-        Term heapAtPre = TB.var(TB.heapAtPreVar(services, "heapAtPre", false));
+        LocationVariable heapAtPreVar 
+        	= TB.heapAtPreVar(services, "heapAtPre", false);
+        Term heapAtPre = TB.var(heapAtPreVar);
 
         //translate requires
         Term requires = TB.tt();
@@ -335,7 +337,8 @@ public class JMLSpecFactory {
                                             paramVars,
                                             resultVar,
                                             excVar,
-                                            heapAtPre); 
+                                            heapAtPreVar,
+                                            false); 
             result = result.add(contract);
         } else if(diverges.equals(TB.tt())) {
             OperationContract contract
@@ -351,7 +354,8 @@ public class JMLSpecFactory {
                                             paramVars,
                                             resultVar,
                                             excVar,
-                                            heapAtPre); 
+                                            heapAtPreVar,
+                                            false); 
             result = result.add(contract);
         } else {
             OperationContract contract1
@@ -367,7 +371,8 @@ public class JMLSpecFactory {
                                             paramVars,
                                             resultVar,
                                             excVar,
-                                            heapAtPre);
+                                            heapAtPreVar,
+                                            false);
             OperationContract contract2
                 = new OperationContractImpl(name,
                                             pm.getContainerType(),                	
@@ -381,7 +386,8 @@ public class JMLSpecFactory {
                                             paramVars,
                                             resultVar,
                                             excVar,
-                                            heapAtPre);
+                                            heapAtPreVar,
+                                            false);
             result = result.add(contract1).add(contract2);
         }
         

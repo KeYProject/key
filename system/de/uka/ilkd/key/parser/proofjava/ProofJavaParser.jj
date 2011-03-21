@@ -3487,14 +3487,17 @@ Statement Statement() :
 
 Statement KeYCatchAllStatement() :
 {
-  Statement cat;
-  ParameterDeclaration param;
+  Statement result;
+  UncollatedReferenceQualifier qn;
   StatementBlock block;
 }
 {
-  "#catchAll" "(" param = FormalParameter() ")" block = Block()
-  { cat = factory.createCatchAllStatement(param, block); 
-    return cat;
+  "#catchAll" "(" qn = Name() ")" block = Block()
+  {
+      result = factory.createCatchAllStatement(qn.toVariableReference(), block);
+      checkConstruction(result);
+      setPostfixInfo(result);
+      return result;
   }
 }
 

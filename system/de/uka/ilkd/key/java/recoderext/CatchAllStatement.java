@@ -12,34 +12,28 @@
 package de.uka.ilkd.key.java.recoderext;
 
 import recoder.java.*;
-import recoder.java.declaration.ParameterDeclaration;
+import recoder.java.reference.VariableReference;
 import recoder.java.statement.JavaStatement;
 
-/**
- *  A shortcut-statement for a method body.
- */
+public class CatchAllStatement extends JavaStatement 
+			       implements StatementContainer,
+			       		  ExpressionContainer {
 
-public class CatchAllStatement extends JavaStatement implements
-				 StatementContainer, ParameterContainer {
-
-
-    /**
-     * the ast parent
-     */
     private StatementContainer astParent;
 
     protected StatementBlock body;
-    protected ParameterDeclaration paramdecl;
+    protected VariableReference param;
+    
     
     /**
-     *      Construct a method body shortcut
-     *      @param r the ParameterDeclaration of the catch clause
+     *      Construct a catch all statement
+     *      @param r the VariableReference of the catch clause
      *      @param body the StatementBlock representing the catch clause's body     
      */    
-    public CatchAllStatement(ParameterDeclaration r,
+    public CatchAllStatement(VariableReference r,
 			     StatementBlock body) {
         this.body = body;
-	paramdecl = r;
+	param = r;
         makeParentRoleValid();
     }
 
@@ -48,62 +42,77 @@ public class CatchAllStatement extends JavaStatement implements
 	return astParent;
     }
 
+    
     public StatementContainer getStatementContainer() {
 	return astParent;
     }
 
+    
     public int getStatementCount() {
-	return (body==null) ? 0 : 1;
+	return body == null ? 0 : 1;
     }
 
+    
     public Statement getStatementAt(int i) {
-	return (i==0) ? body : null;
+	return i == 0 ? body : null;
+    }
+    
+    
+    public int getExpressionCount() {
+        return (param != null) ? 1 : 0;
     }
 
-    public int getParameterDeclarationCount() {
-	return (paramdecl==null) ? 0 : 1;
+    
+    public Expression getExpressionAt(int index) {
+        if (param != null && index == 0) {
+            return param;
+        }
+        throw new ArrayIndexOutOfBoundsException();
+    }
+    
+    
+    public VariableReference getVariable() {
+	return param;
     }
 
-    public ParameterDeclaration getParameterDeclarationAt(int i) {
-	return (i==0) ? paramdecl : null;
-    }
 
     public void setStatementContainer(StatementContainer parent) {
 	astParent = parent;
     }
+    
 
     /**
      *      Finds the source element that occurs first in the source.
      *      @return the last source element in the syntactical representation of
      *      this element, may be equals to this element.
      */
-    
     public SourceElement getFirstElement() {
         return getChildAt(0).getFirstElement();
     }
 
+    
     /**
      *      Finds the source element that occurs last in the source.
      *      @return the last source element in the syntactical representation of
      *      this element, may be equals to this element.
      */
-    
     public SourceElement getLastElement() {
         return getChildAt(getChildCount() - 1).getLastElement();
     }
 
+    
     /**
      *      Returns the number of children of this node.
      *      @return an int giving the number of children of this node
      */
-    
     public int getChildCount() {
         int result = 0;
         if (body != null) result++;
-        if (paramdecl != null) result++;
+        if (param != null) result++;
         return result;
     }
 
+    
     /**
      *      Returns the child at the specified index in this node's "virtual"
      *      child array
@@ -112,10 +121,9 @@ public class CatchAllStatement extends JavaStatement implements
      *      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
      *                 of bounds
      */
-    
     public ProgramElement getChildAt(int index) {
-        if (paramdecl != null) {
-            if (index == 0) return paramdecl;
+        if (param != null) {
+            if (index == 0) return param;
             index--;
         }
         if (body != null) {
@@ -126,22 +134,23 @@ public class CatchAllStatement extends JavaStatement implements
     }
 
 
-    /**
-     * Replace a single child in the current node.
-     * The child to replace is matched by identity and hence must be known
-     * exactly. The replacement element can be null - in that case, the child
-     * is effectively removed.
-     * The parent role of the new child is validated, while the
-     * parent link of the replaced child is left untouched.
-     * @param p the old child.
-     * @param q the new child.
-     * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException if the new child cannot take over
-     *            the role of the old one.
-     */
-
+    @Override
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-   
+        if (param == p) {
+            VariableReference r = (VariableReference)q;
+            param = r;
+            if (r != null) {
+                r.setExpressionContainer(this);
+            }
+            return true;
+        } else if (body == p) {
+            StatementBlock r = (StatementBlock)q;
+            body = r;
+            if (r != null) {
+                r.setStatementContainer(this);
+            }
+            return true;
+        }
         return false;
     }
 
@@ -151,16 +160,17 @@ public class CatchAllStatement extends JavaStatement implements
      */
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
+        if (param != null) {
+            param.setExpressionContainer(this);
+        }        
         if (body != null) {
             body.setStatementContainer(this);
         }
-        if (paramdecl != null) {
-            paramdecl.setParameterContainer(this);
-        }
     }
+    
 
     public int getChildPositionCode(ProgramElement child) {
-        if (paramdecl == child) {
+        if (param == child) {
             return 0;
         }	
         if (body == child) {
@@ -168,6 +178,7 @@ public class CatchAllStatement extends JavaStatement implements
         }
         return -1;
     }
+    
 
     //don't think we need it
     public void accept(SourceVisitor v) {
@@ -179,13 +190,15 @@ public class CatchAllStatement extends JavaStatement implements
 	}
     }
 
+    
     //don't think we need it
     public CatchAllStatement deepClone() {
 	throw new IllegalStateException("Method 'deepClone' not implemented in "
 					+"CatchAllStatement");
     }    
 
+    
     public String getName() {	
-	return "catchAll"+"("+paramdecl+") {"+body+" }";
+	return "catchAll" + "(" + param + ") {" + body + " }";
     }
 }
