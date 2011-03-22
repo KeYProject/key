@@ -263,7 +263,9 @@ public final class ProblemLoader implements Runnable {
                currNode = proof.root(); // initialize loader
                children = currNode.childrenIterator(); // --"--
                iconfig = proof.env().getInitConfig();
-               init.tryReadProof(this, po);
+               if(envInput instanceof KeYUserProblemFile) {
+        	   init.tryReadProof(this, (KeYUserProblemFile)envInput);
+               }
 	       setStandardStatusLine();
            
 	   } catch (ExceptionHandlerException e) {

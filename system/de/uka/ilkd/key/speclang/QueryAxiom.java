@@ -24,6 +24,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 
 
@@ -225,7 +226,7 @@ public final class QueryAxiom implements ClassAxiom {
 	    (new RewriteTacletGoalTemplate(addedSeq,
 					   ImmutableSLList.<Taclet>nil(),
 					   replacewith));
-	tacletBuilder.setName(RepresentsAxiom.toValidTacletName(name));
+	tacletBuilder.setName(MiscTools.toValidTacletName(name));
 	tacletBuilder.addRuleSet(new RuleSet(new Name("simplify")));
 	
 	return DefaultImmutableSet.<Taclet>nil().add(tacletBuilder.getTaclet());

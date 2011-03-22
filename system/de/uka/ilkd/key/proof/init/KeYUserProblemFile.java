@@ -180,6 +180,9 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      * Reads a saved proof of a .key file.
      */
     public void readProof(ProblemLoader prl) throws ProofInputException {
+	if(lastParser == null) {
+	    readProblem();
+	}
         try {
             lastParser.proof(prl);
         } catch(antlr.ANTLRException e) {

@@ -61,6 +61,7 @@ import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.key.util.KeYResourceManager;
+import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 
@@ -1596,8 +1597,12 @@ public final class Main extends JFrame implements IMain {
     
     /** saves a proof */
     protected void saveProof() {
-        KeYFileChooser jFC = getFileChooser("Choose filename to save proof");
-        boolean saved = jFC.showSaveDialog(this);
+        final KeYFileChooser jFC = getFileChooser("Choose filename to save proof");
+        final String defaultName 
+        	= MiscTools.toValidFileName(mediator.getSelectedProof()
+        		                            .name()
+        		                            .toString()).toString();
+        boolean saved = jFC.showSaveDialog(this, defaultName + ".proof");
         if (saved) {
             saveProof(jFC.getSelectedFile());
         }

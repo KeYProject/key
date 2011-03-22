@@ -17,7 +17,7 @@ import javax.swing.JOptionPane;
 
 public class KeYFileChooser {
 
-    JFileChooser fileChooser;
+    private final JFileChooser fileChooser;
 
     private boolean saveDialog;
 
@@ -32,7 +32,6 @@ public class KeYFileChooser {
                     super.approveSelection();
                 }
             };
-	fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 	fileChooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
 		public boolean accept(File f) {
 		    return 
@@ -67,9 +66,18 @@ public class KeYFileChooser {
 
     private void setSaveDialog(boolean b) {
         saveDialog = b;
+	fileChooser.setFileSelectionMode(b 
+		                         ? JFileChooser.FILES_ONLY 
+		                         : JFileChooser.FILES_AND_DIRECTORIES);        
     }
 
-    public boolean showSaveDialog(Main main) {
+    public boolean showSaveDialog(Main main, String defaultName) {
+	if(defaultName != null) {
+	    File file = new File(fileChooser.getCurrentDirectory(), 
+		    		 defaultName);
+	    fileChooser.setSelectedFile(file);
+	}
+	
         setSaveDialog(true);
 	int result = fileChooser.showSaveDialog(main);
 	return (result == JFileChooser.APPROVE_OPTION);

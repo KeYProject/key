@@ -14,9 +14,7 @@ import de.uka.ilkd.key.proof.ProofAggregate;
 /**
  * Represents something that produces an input proof obligation for the
  * prover. A .key file or a proof obligation generated from a CASE tool may
- * be instances. During reading the input the
- * given initial configuration may become modified. The modification
- * can be controlled by a modification strategy.
+ * be instances.
  */
 public interface ProofOblInput {
 

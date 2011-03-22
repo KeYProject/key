@@ -247,12 +247,6 @@ public final class RepresentsAxiom implements ClassAxiom {
     }
     
     
-    public static Name toValidTacletName(String s) {
-	s = s.replaceAll("\\s|\\.|::\\$|::|<|>", "_");
-	return new Name(s);
-    }
-    
-    
     @Override
     public String getName() {
 	return name;
@@ -357,7 +351,7 @@ public final class RepresentsAxiom implements ClassAxiom {
 	    (new RewriteTacletGoalTemplate(addedSeq,
 					   ImmutableSLList.<Taclet>nil(),
 					   findTerm));
-	tacletBuilder.setName(toValidTacletName(name));
+	tacletBuilder.setName(MiscTools.toValidTacletName(name));
 	tacletBuilder.addRuleSet(
 			new RuleSet(new Name("inReachableStateImplication")));
 	for(VariableSV boundSV : boundSVs) {
@@ -439,7 +433,7 @@ public final class RepresentsAxiom implements ClassAxiom {
 	if(ifSeq != null) {
 	    tacletBuilder.setIfSequent(ifSeq);
 	}
-	tacletBuilder.setName(toValidTacletName(name));
+	tacletBuilder.setName(MiscTools.toValidTacletName(name));
 	tacletBuilder.addRuleSet(new RuleSet(new Name("classAxiom")));
 	for(VariableSV boundSV : boundSVs) {
 	    tacletBuilder.addVarsNotFreeIn(boundSV, heapSV);

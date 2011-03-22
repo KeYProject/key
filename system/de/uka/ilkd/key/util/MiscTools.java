@@ -516,4 +516,19 @@ public final class MiscTools {
 	    return result;
 	}
     }
+
+
+    public static Name toValidTacletName(String s) {
+        s = s.replaceAll("\\s|\\.|::\\$|::|<|>|/", "_");
+        return new Name(s);
+    }
+    
+    
+    public static String toValidFileName(String s) {
+        s = s.replaceAll("\\$|<|>", "_")
+             .replace("/", "-")
+             .replace("[", "(")
+             .replace("]", ")");
+        return s;
+    }
 }

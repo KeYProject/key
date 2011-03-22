@@ -554,12 +554,9 @@ public final class ProblemInitializer {
     }
     
     
-    public void tryReadProof(ProblemLoader prl, ProofOblInput problem) 
+    public void tryReadProof(ProblemLoader prl, KeYUserProblemFile kupf) 
     		throws ProofInputException {
-	if(problem instanceof KeYUserProblemFile) {
-	    KeYUserProblemFile kupf = (KeYUserProblemFile)problem;
-	    reportStatus("Loading proof", kupf.getNumberOfChars());
-	    kupf.readProof(prl);
-	}
+	reportStatus("Loading proof", kupf.getNumberOfChars());
+	kupf.readProof(prl);
     }
 }

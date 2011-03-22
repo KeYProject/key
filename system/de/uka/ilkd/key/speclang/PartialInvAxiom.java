@@ -128,7 +128,7 @@ public final class PartialInvAxiom implements ClassAxiom {
 	    tacletBuilder.addTacletGoalTemplate(
 		    new TacletGoalTemplate(addedSeq,
 			    ImmutableSLList.<Taclet>nil()));
-	    tacletBuilder.setName(RepresentsAxiom.toValidTacletName(
+	    tacletBuilder.setName(MiscTools.toValidTacletName(
 		    			   "Partial inv axiom for " 
 		    			   + inv.getName()
 		    			   + (i == 0 ? "" : " EQ")));

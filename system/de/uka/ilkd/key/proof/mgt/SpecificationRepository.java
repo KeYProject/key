@@ -44,6 +44,7 @@ import de.uka.ilkd.key.rule.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.*;
+import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 
 
@@ -281,7 +282,7 @@ public final class SpecificationRepository {
 	    (new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
 					   ImmutableSLList.<Taclet>nil(),
 					   unlimitedTerm));
-	tacletBuilder.setName(RepresentsAxiom.toValidTacletName(
+	tacletBuilder.setName(MiscTools.toValidTacletName(
 					"unlimit " + unlimited.name()));
 	
 	return tacletBuilder.getTaclet();
@@ -320,7 +321,7 @@ public final class SpecificationRepository {
 					   ImmutableSLList.<Taclet>nil(),
 					   TB.func(unlimited, subs)));
 	tacletBuilder.setStateRestriction(RewriteTaclet.IN_SEQUENT_STATE);
-	tacletBuilder.setName(RepresentsAxiom.toValidTacletName(
+	tacletBuilder.setName(MiscTools.toValidTacletName(
 					"limit " + unlimited.name()));
 	tacletBuilder.addRuleSet(new RuleSet(new Name("limitObserver")));
 	
