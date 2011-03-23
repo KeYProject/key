@@ -1,3 +1,13 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
+//
+//
+
 package de.uka.ilkd.key.smt;
 
 import java.util.ArrayList;
@@ -6,7 +16,6 @@ import java.util.Collection;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
 
