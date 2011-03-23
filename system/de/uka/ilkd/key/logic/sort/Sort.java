@@ -20,9 +20,20 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 
 public interface Sort extends Named {
     
-    final Sort FORMULA  = new SortImpl(new Name("Formula"));
-    final Sort UPDATE   = new SortImpl(new Name("Update"));
-    final Sort ANY      = new SortImpl(new Name("any"));    
+    /**
+     * Formulas are represented as "terms" of this sort.
+     */
+    final Sort FORMULA = new SortImpl(new Name("Formula"));
+    
+    /**
+     * Updates are represented as "terms" of this sort.
+     */
+    final Sort UPDATE = new SortImpl(new Name("Update"));
+    
+    /**
+     * Any is a supersort of all sorts.
+     */
+    final Sort ANY = new SortImpl(new Name("any"));    
     
     final Name CAST_NAME = new Name("cast");
     final Name INSTANCE_NAME = new Name("instance");

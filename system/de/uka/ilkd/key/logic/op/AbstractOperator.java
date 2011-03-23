@@ -85,6 +85,10 @@ abstract class AbstractOperator implements Operator {
     }
     
     
+    /**
+     * Allows subclasses to impose custom demands on what constitutes a 
+     * valid term using the operator represented by the subclass. 
+     */
     protected abstract boolean additionalValidTopLevel(Term term);
     
     

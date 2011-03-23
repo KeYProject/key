@@ -18,11 +18,12 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.util.Debug;
 
 
+/** 
+ * A schema variable that is used as placeholder for updates.
+ */  
 public final class UpdateSV extends AbstractSV {
 
-    /** 
-     * Creates a new SchemaVariable that is used as placeholder for updates.
-     */    
+  
     UpdateSV(Name name) {	
         super(name, Sort.UPDATE, false, true);
     }

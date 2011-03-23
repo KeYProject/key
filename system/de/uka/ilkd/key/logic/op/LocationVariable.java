@@ -15,11 +15,12 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
- * This class represents all kind of local and instance variables. In addition it represents
- * static variables, which are no compile time constants, i.e. which are not final or
- * not initialised with a compile time constant.
+ * This class represents proper program variables, which are not program 
+ * constants. See the description of the superclass ProgramVariable for
+ * more information.
  */
-public final class LocationVariable extends ProgramVariable implements UpdateableOperator {
+public final class LocationVariable extends ProgramVariable 
+			            implements UpdateableOperator {
 
     public LocationVariable(ProgramElementName name, 
             		    KeYJavaType        t, 
@@ -29,9 +30,11 @@ public final class LocationVariable extends ProgramVariable implements Updateabl
         super(name, t.getSort(), t, containingType, isStatic, isModel, false);
     }
 
+    
     public LocationVariable(ProgramElementName name, KeYJavaType t) {
         super(name, t.getSort(), t, null, false, false, false);
     }
+    
     
     public LocationVariable(ProgramElementName name, KeYJavaType t, boolean isFinal) {
         super(name, t.getSort(), t, null, false, false, false, isFinal);

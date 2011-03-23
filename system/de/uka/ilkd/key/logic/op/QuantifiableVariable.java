@@ -12,7 +12,8 @@ package de.uka.ilkd.key.logic.op;
 
 
 /** 
- * this interface represents the variables that can be bound 
+ * This interface represents the variables that can be bound
+ * (by quantifiers or other binding operators).
  */
 public interface QuantifiableVariable extends ParsableVariable {
 }

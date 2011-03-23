@@ -28,5 +28,9 @@ public interface SchemaVariable extends ParsableVariable {
      */
     boolean isStrict();
     
+    /**
+     * Creates a parseable string representation of the declaration of the 
+     * schema variable.
+     */
     String proofToString();
 }

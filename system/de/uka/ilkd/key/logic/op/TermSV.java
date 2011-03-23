@@ -17,14 +17,17 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.util.Debug;
 
+
+/** 
+ * A schema variable that is used as placeholder for terms.
+ */  
 public final class TermSV extends AbstractSV {
 
     /** 
-     * Creates a new schema variable that is used as placeholder for terms.
      * @param name the name of the schema variable
      * @param sort the sort of the schema variable     
      * @param isRigid true iff this schema variable may only match rigid
-     * terms/formulas
+     * terms
      * @param isStrict boolean indicating if the schema variable is declared as 
      * strict forcing exact type match
      */    

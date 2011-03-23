@@ -19,7 +19,18 @@ import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.logic.Name;
 
-
+/**
+ * The objects of this class represent array sorts (in the sense of *Java* 
+ * arrays). There can be one such sort for every element sort; however, the 
+ * array sorts are only created lazily on demand.
+ * 
+ * More precisely, there can be one array sort for every pair (element sort,
+ * element type); i.e., there can be several array sorts for the same element
+ * sort, distinguished by their element *type*. This is used for the integer
+ * types of Java: these are all mapped to the sort "int" (i.e., the mathematical
+ * integers), but we have different array sorts int[], byte[], char[], short[] 
+ * and long[], all storing mathematical integers.
+ */
 public final class ArraySort extends AbstractSort {
 
     private static final WeakHashMap<SortKey, WeakReference<ArraySort>> aSH 
@@ -85,8 +96,8 @@ public final class ArraySort extends AbstractSort {
     //------------------------------------------------------------------------- 
 
     /**
-     * returns the ArraySort to the given elementsort. This method ensures that
-     * only one ArraySort-object exists for each array sort.
+     * Returns the ArraySort to the given element sort and element type. This 
+     * method ensures that only one ArraySort-object exists for each array sort.
      */
     public static ArraySort getArraySort(Sort elemSort, 
 	                                 Type elemType,

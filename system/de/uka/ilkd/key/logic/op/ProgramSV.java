@@ -30,6 +30,11 @@ import de.uka.ilkd.key.rule.inst.ProgramList;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
+/**
+ * Objects of this class are schema variables matching program constructs 
+ * within modal operators. The particular construct being matched is
+ * determined by the ProgramSVSort of the schema variable.
+ */
 public final class ProgramSV extends AbstractSV 
     implements ProgramConstruct, UpdateableOperator {
     

@@ -88,13 +88,6 @@ public interface Term extends SVSubstitute {
     public JavaBlock javaBlock();
     
     /**
-     * Checks whether the Term is valid on the top level. If this is
-     * the case this method returns the Term unmodified. Otherwise a
-     * TermCreationException is thrown.  
-     */
-    public Term checked();
-    
-    /**
      * The arity of the term.   
      * */
     public int arity();

@@ -14,6 +14,12 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 
+/**
+ * Class of update junctor operators, i.e., operators connecting
+ * a given number of updates to create another update. There
+ * are currently two such operators: the empty update "skip" and
+ * the parallel update connector "|".
+ */
 public final class UpdateJunctor extends AbstractSortedOperator {
     
     public static final UpdateJunctor SKIP 

@@ -23,6 +23,9 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
 
+/**
+ * Abstract base class for schema variables.
+ */
 abstract class AbstractSV extends AbstractSortedOperator 
                           implements SchemaVariable {   
     
@@ -54,7 +57,6 @@ abstract class AbstractSV extends AbstractSortedOperator
 	                 boolean isStrict) {
 	this(name,(ImmutableArray<Sort>) null, sort, isRigid, isStrict);
     }    
-        
     
     
     /**
@@ -103,7 +105,6 @@ abstract class AbstractSV extends AbstractSortedOperator
     }
     
     
-    
     /**
      * Tries to add the pair <tt>(this,term)</tt> to the match conditions. If
      * successful the resulting conditions are returned, otherwise null. Failure
@@ -149,8 +150,8 @@ abstract class AbstractSV extends AbstractSortedOperator
     }
     
     
-    protected String toString(String sortSpec) {
-	return name() +" ("+sortSpec+")"; 
+    protected final String toString(String sortSpec) {
+	return name() +" (" + sortSpec + ")"; 
     }    
 
     

@@ -12,6 +12,10 @@ package de.uka.ilkd.key.logic.op;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.sort.Sort;
 
+/**
+ * The two objects of this class represent the universal and the existential
+ * quantifier, respectively.
+ */
 public final class Quantifier extends AbstractSortedOperator {
     
     /** 

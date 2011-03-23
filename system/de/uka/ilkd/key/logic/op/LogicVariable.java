@@ -17,6 +17,10 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
 
 
+/**
+ * The objects of this class represent logical variables,
+ * used e.g. for quantification.
+ */
 public final class LogicVariable extends AbstractSortedOperator 
     implements QuantifiableVariable, ParsableVariable {
 
@@ -35,7 +39,6 @@ public final class LogicVariable extends AbstractSortedOperator
     @Override
     public MatchConditions match(SVSubstitute subst, MatchConditions mc,
             Services services) {
-        
         if (subst == this) {
             return mc;
         }

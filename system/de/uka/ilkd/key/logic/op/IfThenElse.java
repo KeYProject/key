@@ -20,7 +20,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 
 
 /**
- * This implements a general conditional operator 
+ * This singleton class implements a general conditional operator 
  * <tt>\if (phi) \then (t1) \else (t2)</tt>.
  */
 public final class IfThenElse extends AbstractOperator {

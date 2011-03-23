@@ -14,6 +14,9 @@ import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Name;
 
+/**
+ * Standard implementation of the Sort interface.
+ */
 public final class SortImpl extends AbstractSort {
     
     public SortImpl(Name name, ImmutableSet<Sort> ext, boolean isAbstract) {

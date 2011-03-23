@@ -18,9 +18,11 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.util.Debug;
 
+/**
+ * Schema variable that is instantiated with logical variables.
+ */
 public final class VariableSV extends AbstractSV implements QuantifiableVariable {
 
-    
     /** 
      * Creates a new SchemaVariable that is used as placeholder for
      * bound(quantified) variables.

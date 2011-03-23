@@ -19,6 +19,11 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.util.Debug;
 
 
+/**
+ * Class of operators for elementary updates, i.e., updates of the form 
+ * "x := t". There is one such operator for every left hand side "x".
+ * Each of these operator is unary, accepting a single argument "t".
+ */
 public final class ElementaryUpdate extends AbstractSortedOperator {
     
     private static final WeakHashMap<UpdateableOperator, 
@@ -39,6 +44,9 @@ public final class ElementaryUpdate extends AbstractSortedOperator {
     }
     
     
+    /**
+     * Returns the elementary update operator for the passed left hand side.
+     */
     public static ElementaryUpdate getInstance(UpdateableOperator lhs) {
 	ElementaryUpdate result = instances.get(lhs);
 	if(result == null) {
@@ -71,6 +79,9 @@ public final class ElementaryUpdate extends AbstractSortedOperator {
     }
     
     
+    /**
+     * Returns the left hand side of this elementary update operator.
+     */
     public UpdateableOperator lhs() {
 	return lhs;
     }

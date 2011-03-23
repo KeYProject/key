@@ -20,7 +20,6 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * diamond and box (but also extensions of DL like
  * preserves and throughout are possible in the future).
  */
-
 public final class Modality extends AbstractSortedOperator {
 
     private static final HashMap<String, Modality> nameMap 

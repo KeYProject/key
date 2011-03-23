@@ -32,8 +32,8 @@ import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
 /**
- * The program method represents a concrete method in the logic.
- * In case of an instance method the first argument represents the 
+ * The program method represents a (pure) method in the logic.
+ * In case of a non-static method the first argument represents the 
  * object on which the method is invoked. 
  */
 public final class ProgramMethod extends ObserverFunction 

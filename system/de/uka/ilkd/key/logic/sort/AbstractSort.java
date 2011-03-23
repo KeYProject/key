@@ -16,6 +16,9 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 
+/**
+ * Abstract base class for implementations of the Sort interface.
+ */
 public abstract class AbstractSort implements Sort {
     
     private final Name name;
@@ -46,10 +49,6 @@ public abstract class AbstractSort implements Sort {
     }
 
     
-    /**
-     * returns true iff given sort is a part of the transitive closure of the
-     * supersorts of this sort. One might optimize by hashing %%
-     */
     @Override    
     public final boolean extendsTrans(Sort sort) {
         if(sort == this) {

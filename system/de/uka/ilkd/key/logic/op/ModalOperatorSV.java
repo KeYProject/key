@@ -17,6 +17,9 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.util.Debug;
 
+/**
+ * Schema variable matching modal operators.
+ */
 public final class ModalOperatorSV extends AbstractSV  {
     
     /** 

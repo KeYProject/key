@@ -20,6 +20,15 @@ import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 
 
+/**
+ * There is one instance of this class per proof, representing the sort "Null".
+ * This sort is a subsort of all object sorts. Unfortunately, NullSort sometimes
+ * has to be treated as a special case, because it cannot support the method
+ * extendsSorts() (without a Services parameter) -- for this, the object would
+ * have to "know" all the object sorts, but these sorts are created only after
+ * the NullSort object itself has to be created; and immutability prevents us
+ * from filling in this information later.
+ */
 public final class NullSort implements Sort  {
     
     public static final Name NAME = new Name("Null");
