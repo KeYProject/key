@@ -151,6 +151,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     /**Assumptions made of taclets - the translation of <code>tacletFormulae</code>*/
     private ArrayList<StringBuffer> tacletAssumptions = new ArrayList<StringBuffer>();
     
+    private SMTSettings smtSettings = null;
+    
     public TacletSetTranslation  getTacletSetTranslation() {return tacletSetTranslation;}
     
     /**
@@ -179,7 +181,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     
      
     public final StringBuffer translateProblem(Term problem, Services services, SMTSettings settings) throws IllegalFormulaException{
-
+	smtSettings = settings;
 	StringBuffer hb = translateTerm(problem,new Vector<QuantifiableVariable>(),services);
 
 	//add one variable for each sort
@@ -198,47 +200,36 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	
 	return buildComplText(services, hb, settings);
     }
-
+    
     /**
-     * Translate a sequent into a given syntax.
-     * @param sequent the sequent to translate.
-     * @param services wrapper object for service attributes.
-     * @return A StringBuffer representing the sequent in the given syntax.
-     * @throws IllegalFormulaException if the sequent could not be translated.
+     * Translate a term into the given syntax.
+     * @param t The term to translate.
+     * @param services a service wrapper object.
+     * @return A StringBuffer, representing the term in the given syntax.
+     * @throws IllegalArgumentException if the term is not of type FORMULA or could not be translated.
      */
-    public final StringBuffer translate(Sequent sequent, Services services,SMTSettings settings)
-	    throws IllegalFormulaException {
-
-	// translate
-	StringBuffer hb = new StringBuffer();
-	StringBuffer ante;
-	ante = translate(sequent.antecedent(), SMTTranslator.TERMPOSITION.ANTECEDENT, services);
-	StringBuffer succ;
-	succ = translate(sequent.succedent(), SMTTranslator.TERMPOSITION.SUCCEDENT, services);
-
-	//add one variable for each sort
-	for (Sort s : this.usedRealSort.keySet()) {
-	    LogicVariable l = new LogicVariable(new Name("dummy_" + s.name().toString()), s);
-	    this.addFunction(l, new ArrayList<Sort>(), s);
-	    this.translateFunc(l, new ArrayList<StringBuffer>());
+    public final StringBuffer translate(Term t, Services services,SMTSettings settings) 
+    		throws IllegalArgumentException {
+	smtSettings = settings;
+	//check, if the term is of type formula. Otherwise a translation does not make sense
+	if (t.sort() != Sort.FORMULA) {
+	    throw new IllegalArgumentException("The given Term is not Type of Formula");
 	}
-	
-	//ArrayList<StringBuffer> assumptions = this.getAssumptions(services);
-	
-	hb = this.translateLogicalImply(ante, succ);
+	 //translate
+	try {
+	    StringBuffer form;
+	    form = translateTerm(t, new Vector<QuantifiableVariable>(), services);
+	    return buildComplText(services, form,settings);
+	} catch (IllegalFormulaException e) {
+	    throw new IllegalArgumentException("Illegal formula. Can not be translated");
+	}
+    }
+    
 
-	StringBuffer s = buildComplText(services, hb,settings);
-	/*StringBuffer s = buildCompleteText(hb, assumptions, this.buildTranslatedFuncDecls(), this
-		.buildTranslatedPredDecls(), this.buildTranslatedSorts(), this.buildSortHierarchy());*/
-	
-	return s;
-
+    protected final SMTSettings getSettings(){
+	return smtSettings;
     }
 
-    
-   
-
-    
     
     
     /**
@@ -353,36 +344,14 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	return toReturn;
     }
     
-    /**
-     * Translate a term into the given syntax.
-     * @param t The term to translate.
-     * @param services a service wrapper object.
-     * @return A StringBuffer, representing the term in the given syntax.
-     * @throws IllegalArgumentException if the term is not of type FORMULA or could not be translated.
-     */
-    public final StringBuffer translate(Term t, Services services,SMTSettings settings) 
-    		throws IllegalArgumentException {
-	//check, if the term is of type formula. Otherwise a translation does not make sense
-	if (t.sort() != Sort.FORMULA) {
-	    throw new IllegalArgumentException("The given Term is not Type of Formula");
-	}
-	 //translate
-	try {
-	    StringBuffer form;
-	    form = translateTerm(t, new Vector<QuantifiableVariable>(), services);
-	    return buildComplText(services, form,settings);
-	} catch (IllegalFormulaException e) {
-	    throw new IllegalArgumentException("Illegal formula. Can not be translated");
-	}
-    }
-    
+
     private StringBuffer buildComplText(Services serv, StringBuffer formula, SMTSettings settings) throws IllegalFormulaException {
 	ArrayList<ContextualBlock> assumptionTypes = new ArrayList<ContextualBlock>();
 	ArrayList<ContextualBlock> predicateTypes = new ArrayList<ContextualBlock>();
 	return buildCompleteText(formula, this.getAssumptions(serv, assumptionTypes,settings)
 		,assumptionTypes, this.buildTranslatedFuncDecls(), this
 		    .buildTranslatedPredDecls(predicateTypes),predicateTypes, this.buildTranslatedSorts(), this
-		    .buildSortHierarchy(serv,settings));
+		    .buildSortHierarchy(serv,settings),settings);
     }
     
     /**
@@ -727,10 +696,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 		  }
 		  
 		}
-	}
-	
+	}	
 	return distinct; 
-
     }
 
     /**
@@ -770,7 +737,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    ArrayList<ArrayList<StringBuffer>> functions,
 	    ArrayList<ArrayList<StringBuffer>> predicates,
 	    ArrayList<ContextualBlock> predicateBlocks,
-	    ArrayList<StringBuffer> types, SortHierarchy sortHierarchy);
+	    ArrayList<StringBuffer> types, SortHierarchy sortHierarchy,
+	    SMTSettings settings);
 
     /**
      * Translates the given Semisequent into "Simplify" input syntax and
@@ -1274,14 +1242,15 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 		if(function.function.sort().extendsTrans(fw.function.sort()) ||
 			fw.function.sort().extendsTrans(function.function.sort()))
 	        {
-	            result = translateLogicalAnd(result, buildDistinct(array));
+	            result = translateLogicalAnd(result, translateDistinct(array));
 	        }
 		
 	    }
 	}
 	return translateLogicalAnd(result,buildInjectiveFunctionAssumption(function));
-	
     }
+    
+ 
     
     protected StringBuffer buildInjectiveFunctionAssumption(FunctionWrapper fw){
 	if(fw.getFunction().arity() == 0){
@@ -1328,7 +1297,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     }
     
     
-    private StringBuffer buildDistinct(FunctionWrapper []functions){
+    protected StringBuffer translateDistinct(FunctionWrapper []functions){
 	assert functions.length == 2;
 	int start =0;
 	StringBuffer functionTranslation [] = new StringBuffer[functions.length];
@@ -1402,9 +1371,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	}
     }
     
+    
+    
     /**
-     * CAUTION: Do not use this method from outside this class!!
-     * It is public just for test reasons! It will be private very soon!
      * 
      * Translates the given term into input syntax and adds the resulting
      * string to the StringBuffer sb.
@@ -1417,8 +1386,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      *                modulo terms, but must be looped through until we get
      *                there.
      */
-//  TODO make private again after testing!!
-    public final StringBuffer translateTerm (Term term, Vector<QuantifiableVariable> quantifiedVars,
+    
+    protected StringBuffer translateTerm(Term term, Vector<QuantifiableVariable> quantifiedVars,
 	    Services services) throws IllegalFormulaException {
 	
 	//added, because meatavariables should not be translated.
@@ -2094,7 +2063,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	}
 	
 
-	
+
 	
 	return result;	
 	}

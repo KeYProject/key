@@ -60,6 +60,8 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
     
     private static StringBuffer DISTINCT = new StringBuffer("distinct");
     
+    private boolean useBuiltInUniqueness = false;
+    
     /**
      * Just a constructor which starts the conversion to Simplify syntax.
      * The result can be fetched with
@@ -100,7 +102,9 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 	    ArrayList<ArrayList<StringBuffer>> functions,
 	    ArrayList<ArrayList<StringBuffer>> predicates,
 	    ArrayList<ContextualBlock> predicateBlocks,
-	    ArrayList<StringBuffer> types, SortHierarchy sortHierarchy) {
+	    ArrayList<StringBuffer> types, SortHierarchy sortHierarchy,
+	    SMTSettings settings) {
+	
 	StringBuffer toReturn = new StringBuffer(
 		"( benchmark KeY_translation\n");
 	// add the sortdeclarations
@@ -554,11 +558,13 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
     }
     
 
-   
-    protected StringBuffer buildDistinct(FunctionWrapper [] fw){
+    @Override
+    protected StringBuffer translateDistinct(FunctionWrapper [] fw){
+	if(getSettings() == null || !getSettings().useBuiltInUniqueness()){
+	    return super.translateDistinct(fw);
+	}
 	int start =0;
 	ArrayList<StringBuffer> temp []=  new ArrayList[fw.length];
-	
 	
 	StringBuffer rightSide = new StringBuffer();
 	rightSide.append("( "+ DISTINCT + " ");
@@ -576,36 +582,11 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 		      Sort sort = fw[j].getFunction().argSorts().get(i);
 		      rightSide = translateLogicalAll(temp[j].get(i),usedDisplaySort.get(sort),rightSide);
 		     
-		 }
-		   
-	}
-	
-	
+		 }		   
+	}	
 	return rightSide;
 	
     }
-  /*  protected StringBuffer translateUniqueness(FunctionWrapper function,
-            Collection<FunctionWrapper> distinct) throws IllegalFormulaException {
-	if(!function.getFunction().isUnique()){
-	    return null;
-	}
-
-	function.setUsedForUnique(true);
-	
-	StringBuffer result = translateLogicalTrue();
-	for(FunctionWrapper fw : distinct){
-	    if(!fw.isUsedForUnique() &&
-	        fw.getFunction().isUnique()){
-		FunctionWrapper array [] = {function, fw};
-	       result = translateLogicalAnd(result, buildDistinct(array));
-		
-		
-	    }
-	}
-	return result;
-    }*/
-    
-
 
     private StringBuffer buildFunction(StringBuffer name,
 	    ArrayList<StringBuffer> args) {

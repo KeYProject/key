@@ -48,18 +48,5 @@ public interface SMTTranslator {
      */
     public StringBuffer translate(Term t, Services services, SMTSettings settings) 
     		throws IllegalFormulaException;
-    /**
-     * Sets the taclets that should be used for generating new assumptions.
-     * Set the assumption before calling the general translate method. 
-     * @param taclets 
-     */
-   // public void setTacletsForAssumptions(Collection<Taclet> taclets);
-    
-    
-    /**
-     * Caution! This Method is just for testing!! Do not use it, it might be removed very soon!!
-     */
-    public StringBuffer translateTerm (Term term, Vector<QuantifiableVariable> quantifiedVars,
-	    Services services) throws IllegalFormulaException;
-    
+
 }

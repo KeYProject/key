@@ -50,7 +50,7 @@ class SettingsData{
     
     private static final String EXPLICIT_TYPE_HIERARCHY = "[SMTSettings]explicitTypeHierarchy";
     
-    private static final String INSTANTIATE_NULL_PREDICATES = "[SMTSettings]instantiateNullPredicates";
+    private static final String INSTANTIATE_NULL_PREDICATES = "[SMTSettings]instantiateHierarchyAssumptions";
 
     private static final String MAX_CONCURRENT_PROCESSES = "[SMTSettings]maxConcurrentProcesses";
 
@@ -59,6 +59,8 @@ class SettingsData{
     private static final String EXECUTION_STRING  = "[SMTSettings]executionString";
     
     private static final String TACLET_SELECTION = "[SMTSettings]TacletSelection";
+    
+    private static final String USE_BUILT_IN_UNIQUENESS = "[SMTSettings]UseBuiltUniqueness";
     
     public final static int    PROGRESS_MODE_USER = 0;
     public final static int    PROGRESS_MODE_CLOSE = 1;
@@ -72,7 +74,8 @@ class SettingsData{
     public boolean storeSMTTranslationToFile    = false;
     public boolean storeTacletTranslationToFile = false;
     public boolean useExplicitTypeHierarchy     = false;
-    public boolean useNullInstantiation         = false;
+    public boolean useNullInstantiation         = true;
+    public boolean useBuiltInUniqueness          = false;
     public long    timeout                      = 5000;
     public int     maxConcurrentProcesses        = 5;
     public int     maxGenericSorts               = 2;
@@ -82,6 +85,7 @@ class SettingsData{
     public String   pathForTacletTranslation   = "";
     public String   activeSolver               = "";
     public String   tacletSelection            = "";
+    
     
 
     private SettingsData(SettingsData data) {
@@ -97,6 +101,7 @@ class SettingsData{
 	this.pathForTacletTranslation	   = data.pathForTacletTranslation;
 	this.modeOfProgressDialog          = data.modeOfProgressDialog;
 	this.tacletSelection	           = data.tacletSelection;
+	this.useBuiltInUniqueness          = data.useBuiltInUniqueness;
 	
 	
 	for(Entry<SolverType, SolverData> entry : data.dataOfSolvers.entrySet()){
@@ -158,6 +163,7 @@ class SettingsData{
         	                                           useExplicitTypeHierarchy);
         useNullInstantiation = read(props,INSTANTIATE_NULL_PREDICATES,
         	                                       useNullInstantiation);
+        useBuiltInUniqueness = read(props,USE_BUILT_IN_UNIQUENESS,useBuiltInUniqueness);
        	
     	pathForSMTTranslation    = read(props, PATH_FOR_SMT_TRANSLATION, pathForSMTTranslation);
     	pathForTacletTranslation =  read(props, PATH_FOR_TACLET_TRANSLATION, pathForTacletTranslation);
@@ -187,6 +193,7 @@ class SettingsData{
         store(props,MAX_CONCURRENT_PROCESSES,maxConcurrentProcesses);
         store(props,MAX_GENERIC_SORTS,maxGenericSorts);
         store(props,TACLET_SELECTION,tacletSelection);
+        store(props,USE_BUILT_IN_UNIQUENESS,useBuiltInUniqueness);
         
     	for(SolverData solverData : dataOfSolvers.values()){
     	    solverData.writeSettings(props);
@@ -533,6 +540,10 @@ public class SMTSettings implements Settings, de.uka.ilkd.key.smt.SMTSettings{
 	settingsData = data;
     }
     
+    @Override
+    public boolean useBuiltInUniqueness() {
+        return settingsData.useBuiltInUniqueness;
+    }
     
     private String tacletAssignmentToString(){
 	StringBuffer s= new StringBuffer();
