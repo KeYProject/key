@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -86,13 +86,6 @@ public interface Term extends SVSubstitute {
      * The Java block at top level.
      */
     public JavaBlock javaBlock();
-    
-    /**
-     * Checks whether the Term is valid on the top level. If this is
-     * the case this method returns the Term unmodified. Otherwise a
-     * TermCreationException is thrown.  
-     */
-    public Term checked();
     
     /**
      * The arity of the term.   

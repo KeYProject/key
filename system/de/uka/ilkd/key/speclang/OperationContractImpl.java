@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -10,18 +10,29 @@
 
 package de.uka.ilkd.key.speclang;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
+import de.uka.ilkd.key.java.reference.MethodReference;
+import de.uka.ilkd.key.java.statement.CatchAllStatement;
+import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
 
 
@@ -45,8 +56,9 @@ public final class OperationContractImpl implements OperationContract {
     private final ImmutableList<ProgramVariable> originalParamVars;
     private final ProgramVariable originalResultVar;
     private final ProgramVariable originalExcVar;
-    private final Term originalHeapAtPre;
-    private final int id;    
+    private final LocationVariable originalHeapAtPreVar;
+    private final int id;
+    private final boolean toBeSaved;
     
     
     //-------------------------------------------------------------------------
@@ -66,8 +78,9 @@ public final class OperationContractImpl implements OperationContract {
             		          ImmutableList<ProgramVariable> paramVars,
             		          ProgramVariable resultVar,
             		          ProgramVariable excVar,
-                                  Term heapAtPre,
-                                  int id) {
+                                  LocationVariable heapAtPreVar,
+                                  int id,
+                                  boolean toBeSaved) {
 	assert !(name == null && baseName == null);
         assert kjt != null;	
         assert pm != null;
@@ -80,7 +93,7 @@ public final class OperationContractImpl implements OperationContract {
         assert paramVars.size() == pm.getParameterDeclarationCount();
         assert (resultVar == null) == (pm.getKeYJavaType() == null);
         assert excVar != null;
-        assert heapAtPre != null;
+        assert heapAtPreVar != null;
         this.baseName               = baseName;
         this.name                   = name != null 
                                       ? name 
@@ -101,8 +114,9 @@ public final class OperationContractImpl implements OperationContract {
 	this.originalParamVars      = paramVars;
 	this.originalResultVar      = resultVar;
 	this.originalExcVar         = excVar;
-	this.originalHeapAtPre      = heapAtPre;
+	this.originalHeapAtPreVar   = heapAtPreVar;
 	this.id                     = id;	
+	this.toBeSaved	            = toBeSaved;
     }    
 
     
@@ -119,7 +133,7 @@ public final class OperationContractImpl implements OperationContract {
      * @param paramVars the variables used for the operation parameters
      * @param resultVar the variables used for the operation result
      * @param excVar the variable used for the thrown exception
-     * @param heapAtPre the operator used for the pre-heap
+     * @param heapAtPreVar the variable used for the pre-heap
      */
     public OperationContractImpl(String baseName,
                                  KeYJavaType kjt,	    
@@ -133,7 +147,8 @@ public final class OperationContractImpl implements OperationContract {
             		         ImmutableList<ProgramVariable> paramVars,
             		         ProgramVariable resultVar,
             		         ProgramVariable excVar,
-                                 Term heapAtPre) {
+                                 LocationVariable heapAtPreVar,
+                                 boolean toBeSaved) {
         this(baseName,
              null,
              kjt,             
@@ -147,8 +162,9 @@ public final class OperationContractImpl implements OperationContract {
              paramVars,
              resultVar,
              excVar,
-             heapAtPre,
-             INVALID_ID);
+             heapAtPreVar,
+             INVALID_ID,
+             toBeSaved);
     }
     
     
@@ -157,9 +173,11 @@ public final class OperationContractImpl implements OperationContract {
     //internal methods
     //-------------------------------------------------------------------------
     
-    private static Term atPreify(Term t, Term heapAtPre, Services services) {
+    private static Term atPreify(Term t, 
+	    			 ProgramVariable heapAtPreVar,
+	    			 Services services) {
 	final Map<Term,Term> map = new HashMap<Term,Term>();
-	map.put(TB.heap(services), heapAtPre);
+	map.put(TB.heap(services), TB.var(heapAtPreVar));
         return new OpReplacer(map).replace(t);
     }
 
@@ -169,7 +187,7 @@ public final class OperationContractImpl implements OperationContract {
 	    		      ImmutableList<ProgramVariable> paramVars, 
 	    		      ProgramVariable resultVar, 
 	    		      ProgramVariable excVar,
-	    		      Term heapAtPre,
+	    		      ProgramVariable heapAtPreVar,
 	    		      Services services) {
 	final Map result = new LinkedHashMap();
 	
@@ -205,9 +223,9 @@ public final class OperationContractImpl implements OperationContract {
 	}
         
         //atPre-functions
-	if(heapAtPre != null) {
-	    assert originalHeapAtPre.sort().equals(heapAtPre.sort());
-	    result.put(originalHeapAtPre, heapAtPre);
+	if(heapAtPreVar != null) {
+	    assert originalHeapAtPreVar.sort().equals(heapAtPreVar.sort());
+	    result.put(originalHeapAtPreVar, heapAtPreVar);
 	}
 
 	return result;
@@ -264,8 +282,8 @@ public final class OperationContractImpl implements OperationContract {
         
         //atPre-functions
 	if(heapAtPre != null) {
-	    assert originalHeapAtPre.sort().equals(heapAtPre.sort());
-	    result.put(originalHeapAtPre, heapAtPre);
+	    assert originalHeapAtPreVar.sort().equals(heapAtPre.sort());
+	    result.put(TB.var(originalHeapAtPreVar), heapAtPre);
 	}
 
 	return result;
@@ -404,8 +422,9 @@ public final class OperationContractImpl implements OperationContract {
                 			 originalParamVars,
                 			 originalResultVar,
                 			 originalExcVar,
-                			 originalHeapAtPre,
-                			 newId);	
+                			 originalHeapAtPreVar,
+                			 newId,
+                			 toBeSaved);	
     }
     
     
@@ -426,8 +445,9 @@ public final class OperationContractImpl implements OperationContract {
                 			 originalParamVars,
                 			 originalResultVar,
                 			 originalExcVar,
-                			 originalHeapAtPre,
-                			 id);	
+                			 originalHeapAtPreVar,
+                			 id,
+                			 toBeSaved && newKJT.equals(kjt));	
     }
     
     
@@ -483,6 +503,96 @@ public final class OperationContractImpl implements OperationContract {
     
     
     @Override
+    public boolean toBeSaved() {
+	return toBeSaved;
+    }
+    
+    
+    @Override
+    public String proofToString(Services services) {
+	assert toBeSaved;
+	final StringBuffer sb = new StringBuffer();
+	sb.append(baseName).append(" {\n");
+	
+	//print var decls
+	sb.append("  \\programVariables {\n");
+	if(originalSelfVar != null) {
+	    sb.append("    ").append(originalSelfVar.proofToString());
+	}
+	for(ProgramVariable originalParamVar : originalParamVars) {
+	    sb.append("    ").append(originalParamVar.proofToString());
+	}
+	if(originalResultVar != null) {
+	    sb.append("    ").append(originalResultVar.proofToString());
+	}
+	sb.append("    ").append(originalExcVar.proofToString());
+	sb.append("    ").append(originalHeapAtPreVar.proofToString());	
+	sb.append("  }\n");
+
+	//prepare Java program
+	final Expression[] args 
+		= new ProgramVariable[originalParamVars.size()];
+	int i = 0;
+	for(ProgramVariable arg : originalParamVars) {
+	    args[i++] = arg;
+	}
+	final MethodReference mr 
+		= new MethodReference(new ImmutableArray<Expression>(args), 
+			              pm.getProgramElementName(), 
+			              originalSelfVar);
+	final Statement callStatement;
+	if(originalResultVar == null) {
+	    callStatement = mr;
+	} else {
+	    callStatement = new CopyAssignment(originalResultVar, mr);
+	}
+	final CatchAllStatement cas 
+		= new CatchAllStatement(new StatementBlock(callStatement), 
+					(LocationVariable)originalExcVar);
+	final StatementBlock sblock = new StatementBlock(cas);
+	final JavaBlock jb = JavaBlock.createJavaBlock(sblock);
+	
+	//print contract term
+	final Term update 
+		= TB.tf().createTerm(
+			ElementaryUpdate.getInstance(originalHeapAtPreVar),
+			TB.heap(services));	
+	final Term modalityTerm 
+		= TB.tf().createTerm(modality, 
+				     new Term[]{originalPost}, 
+				     new ImmutableArray<QuantifiableVariable>(),
+				     jb);
+	final Term updateTerm
+		= TB.tf().createTerm(UpdateApplication.UPDATE_APPLICATION, 
+				     update, 
+				     modalityTerm);
+	final Term contractTerm 
+		= TB.tf().createTerm(Junctor.IMP, originalPre, updateTerm);
+	final LogicPrinter lp = new LogicPrinter(new ProgramPrinter(), 
+            			   	       	 new NotationInfo(), 
+            			   	       	 null);
+	try {
+	    lp.printTerm(contractTerm);
+	} catch(IOException e) {
+	    throw new RuntimeException(e);
+	}
+	sb.append(lp.toString());
+	
+	//print modifies
+	lp.reset();
+	try {
+	    lp.printTerm(originalMod);
+	} catch(IOException e) {
+	    throw new RuntimeException(e);
+	}
+	sb.append("  \\modifies ").append(lp.toString());
+	
+	sb.append("};\n");
+	return sb.toString();
+    }
+    
+    
+    @Override
     public Modality getModality() {
         return modality;
     }
@@ -493,20 +603,20 @@ public final class OperationContractImpl implements OperationContract {
                         ImmutableList<ProgramVariable> paramVars, 
                         ProgramVariable resultVar, 
                         ProgramVariable excVar,
-                        Term heapAtPre,
+                        ProgramVariable heapAtPreVar,
                         Services services) {
         assert (selfVar == null) == (originalSelfVar == null);
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
         assert (resultVar == null) == (originalResultVar == null);
         assert excVar != null;
-        assert heapAtPre != null;
+        assert heapAtPreVar != null;
         assert services != null;
 	final Map replaceMap = getReplaceMap(selfVar, 
                                        	     paramVars, 
                                        	     resultVar, 
                                        	     excVar, 
-                                       	     heapAtPre, 
+                                       	     heapAtPreVar, 
                                        	     services);
 	final OpReplacer or = new OpReplacer(replaceMap);
 	return or.replace(originalPost);
@@ -597,7 +707,9 @@ public final class OperationContractImpl implements OperationContract {
         //collect information
         Term pre = originalPre;
         Term mby = originalMby;        
-        Term post = TB.imp(atPreify(originalPre, originalHeapAtPre, services), 
+        Term post = TB.imp(atPreify(originalPre, 
+        			    originalHeapAtPreVar,
+        			    services), 
         		   originalPost);
         Term mod = originalMod;
         for(OperationContract other : others) {
@@ -613,7 +725,7 @@ public final class OperationContractImpl implements OperationContract {
         	    			   originalParamVars, 
         	    			   originalResultVar, 
         	    			   originalExcVar, 
-        	    			   originalHeapAtPre, 
+        	    			   originalHeapAtPreVar, 
         	    			   services);
             Term otherMod = other.getMod(originalSelfVar, 
                                          originalParamVars, 
@@ -624,7 +736,7 @@ public final class OperationContractImpl implements OperationContract {
                   ? TB.ife(otherPre, otherMby, mby)
                   : null;            
             post = TB.and(post, TB.imp(atPreify(otherPre, 
-        	    				originalHeapAtPre, 
+        	    				originalHeapAtPreVar, 
         	    				services), 
         	    		       otherPost));
             mod = TB.union(services, mod, otherMod);
@@ -643,8 +755,9 @@ public final class OperationContractImpl implements OperationContract {
                                          originalParamVars,
                                          originalResultVar,
                                          originalExcVar,
-                                         originalHeapAtPre,
-                                         INVALID_ID);
+                                         originalHeapAtPreVar,
+                                         INVALID_ID,
+                                         toBeSaved);
     }
     
     
@@ -683,8 +796,9 @@ public final class OperationContractImpl implements OperationContract {
 		 			 originalParamVars,
 		 			 originalResultVar,
 		 			 originalExcVar,
-		 			 originalHeapAtPre,
-		 			 id);
+		 			 originalHeapAtPreVar,
+		 			 id,
+		 			 toBeSaved);
     }
     
     

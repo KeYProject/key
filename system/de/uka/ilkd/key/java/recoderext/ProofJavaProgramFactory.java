@@ -1,12 +1,12 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 //
-
+//
 
 // This file is partially taken from the RECODER library, which is protected by 
 // the LGPL, and modified.
@@ -28,6 +28,7 @@ import recoder.java.SourceElement.Position;
 import recoder.java.declaration.*;
 import recoder.java.reference.MethodReference;
 import recoder.java.reference.TypeReference;
+import recoder.java.reference.VariableReference;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 import recoder.util.StringUtils;
@@ -388,9 +389,9 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     /**
      * Create a {@link CatchAllStatement}.
      */
-    public Statement createCatchAllStatement(ParameterDeclaration decl,
+    public Statement createCatchAllStatement(VariableReference param,
 					     StatementBlock body) {
-	return new CatchAllStatement(decl, body);
+	return new CatchAllStatement(param, body);
     }
     
     /**

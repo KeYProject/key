@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -30,6 +30,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
+import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.*;
@@ -78,22 +79,35 @@ public class ProofSaver {
       String errorMsg = null;
       FileOutputStream fos = null;
       PrintWriter ps = null;
-
+      
       try {
           fos = new FileOutputStream(filename);
           ps = new PrintWriter(fos, true);
-
-
-          Sequent problemSeq = proof.root().sequent();
           printer = createLogicPrinter(proof.getServices(), false);
+          
+          //settings
+          ps.println(writeSettings(proof.getSettings()));
+          
+          //declarations of symbols, sorts, rules
+          ps.print(proof.header());          
 
-          ps.println(writeSettings(proof.getSettings()));          
-          ps.print(proof.header());
-          ps.println("\\problem {");
-          printer.printSemisequent(problemSeq.succedent());
-          ps.println(printer.result());
-          ps.println("}\n");
-   //                ps.println(mediator.sort_ns());
+          //\problem or \chooseContract
+          final ContractPO po = proof.getServices()
+          			     .getSpecificationRepository()
+          			     .getPOForProof(proof);
+          if(po != null) {
+              ps.println("\\chooseContract \"" 
+        	         + po.getContract().getName() 
+        	         + "\";\n");
+          } else {
+              Sequent problemSeq = proof.root().sequent();
+              ps.println("\\problem {");
+              printer.printSemisequent(problemSeq.succedent());
+              ps.println(printer.result());
+              ps.println("}\n");
+          }
+
+          //\proof
           ps.println("\\proof {");
           ps.println(writeLog(proof));
           ps.println("(autoModeTime \"" + proof.getAutoModeTime() + "\")\n");

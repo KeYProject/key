@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -20,9 +20,20 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 
 public interface Sort extends Named {
     
-    final Sort FORMULA  = new SortImpl(new Name("Formula"));
-    final Sort UPDATE   = new SortImpl(new Name("Update"));
-    final Sort ANY      = new SortImpl(new Name("any"));    
+    /**
+     * Formulas are represented as "terms" of this sort.
+     */
+    final Sort FORMULA = new SortImpl(new Name("Formula"));
+    
+    /**
+     * Updates are represented as "terms" of this sort.
+     */
+    final Sort UPDATE = new SortImpl(new Name("Update"));
+    
+    /**
+     * Any is a supersort of all sorts.
+     */
+    final Sort ANY = new SortImpl(new Name("any"));    
     
     final Name CAST_NAME = new Name("cast");
     final Name INSTANCE_NAME = new Name("instance");

@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -46,7 +46,7 @@ public interface OperationContract extends Contract {
 	    	        ImmutableList<ProgramVariable> paramVars, 
 	    	        ProgramVariable resultVar, 
 	    	        ProgramVariable excVar,
-	    	        Term heapAtPre,
+	    	        ProgramVariable heapAtPreVar,
 	    	        Services services);
     
     /**
@@ -94,9 +94,4 @@ public interface OperationContract extends Contract {
 	    			    ProgramVariable selfVar, 
                                     ImmutableList<ProgramVariable> paramVars,
                                     Services services);    
-        
-    /**
-     * Returns the contract in pretty HTML format.
-     */
-    public String getHTMLText(Services services);
 }

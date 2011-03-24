@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -24,16 +24,13 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.ClassAxiom;
+import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.util.Pair;
 
 
@@ -242,53 +239,21 @@ public abstract class AbstractPO implements ProofOblInput {
           .append(javaPath)
           .append("\";\n\n");
 
-        //program variables
-        if(!introducedProgVars.isEmpty()) {
-            sb.append("\\programVariables {\n");
-            for(ProgramVariable pv : introducedProgVars) {
-        	sb.append("  ").append(pv.proofToString());
+        //contracts
+        ImmutableSet<Contract> contractsToSave = specRepos.getAllContracts();
+        for(Contract c : contractsToSave) {
+            if(!c.toBeSaved()) {
+        	contractsToSave = contractsToSave.remove(c);
+            }
+        }
+        if(!contractsToSave.isEmpty()) {
+            sb.append("\\contracts {\n");
+            for(Contract c : contractsToSave) {
+        	sb.append(c.proofToString(services));
             }
             sb.append("}\n\n");
         }
-        
-        //functions
-        if(!introducedFuncs.isEmpty()) {
-            sb.append("\\functions {\n");
-            for(Function f : introducedFuncs) {
-        	sb.append("  ").append(f.proofToString());
-            }
-            sb.append("}\n\n");
-        }
-        
-        //predicates
-        if(!introducedPreds.isEmpty()) {
-            sb.append("\\predicates {\n");
-            for(Function p : introducedPreds) {
-        	sb.append("  ").append(p.proofToString());
-            }
-            sb.append("}\n\n");
-        }
-        
-        //taclets
-        if(taclets != null && !taclets.isEmpty()) {
-            sb.append("\\rules {\n");
-            LogicPrinter lp = new LogicPrinter(new ProgramPrinter(), 
-            			   	       new NotationInfo(), 
-            			   	       null, 
-            			   	       true);            
-            for(NoPosTacletApp npta : taclets) {
-        	lp.printTaclet(npta.taclet(),
-        		       SVInstantiations.EMPTY_SVINSTANTIATIONS, 
-        		       true, 
-        		       true);
-        	sb.append(lp.toString());
-        	sb.setLength(sb.length() - 1);
-        	sb.append(";\n");
-        	lp.reset();
-            }
-            sb.append("}\n\n");
-        }
-        
+
         header = sb.toString();
     }
 

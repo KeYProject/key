@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -10,9 +10,6 @@
 
 /** tests the TacletIndex class.*/
 package de.uka.ilkd.key.proof;
-
-
-import java.util.Iterator;
 
 import junit.framework.TestCase;
 import de.uka.ilkd.key.collection.ImmutableList;

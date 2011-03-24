@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -22,8 +22,11 @@ import de.uka.ilkd.key.rule.inst.GenericSortCondition;
 import de.uka.ilkd.key.rule.inst.SortException;
 import de.uka.ilkd.key.util.Debug;
 
+
 /**
- * A sort depending function is a function symbol. 
+ * The objects of this class represent families of function symbols, where
+ * each family contains an instantiation of a template symbol for a particular
+ * sort. 
  * The following invariant has to hold:
  * Given two sort depending functions f1 and f2 then
  * from f1.isSimilar(f2) and f1.getSortDependingOn() == f2.getSortDependingOn()

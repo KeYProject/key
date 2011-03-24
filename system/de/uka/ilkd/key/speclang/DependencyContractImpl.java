@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -271,6 +271,19 @@ public final class DependencyContractImpl implements DependencyContract {
                 + "</html>";
     }    
     
+    
+    @Override
+    public boolean toBeSaved() {
+	return false; //because dependency contracts currently cannot be
+	              //specified directly in DL 
+    }
+    
+    
+    @Override
+    public String proofToString(Services services) {
+	assert false;
+	return null;
+    }
     
 
     @Override

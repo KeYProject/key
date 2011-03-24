@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -18,11 +18,12 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.util.Debug;
 
 
+/** 
+ * A schema variable that is used as placeholder for updates.
+ */  
 public final class UpdateSV extends AbstractSV {
 
-    /** 
-     * Creates a new SchemaVariable that is used as placeholder for updates.
-     */    
+  
     UpdateSV(Name name) {	
         super(name, Sort.UPDATE, false, true);
     }

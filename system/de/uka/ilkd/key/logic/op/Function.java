@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -17,6 +17,11 @@ import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 
+/**
+ * Objects of this class represent function and predicate symbols. Note
+ * that program variables are a separate syntactic category, and not a type
+ * of function.
+ */
 public class Function extends AbstractSortedOperator {
             
     private final boolean unique;
@@ -72,20 +77,31 @@ public class Function extends AbstractSortedOperator {
     //public interface
     //-------------------------------------------------------------------------     
     
-    public boolean isUnique() {
+    /**
+     * Indicates whether the function or predicate symbol has the "uniqueness"
+     * property. For two unique symbols f1: A1 -> B1, f2: A2 -> B2 by definition
+     * we have
+     * (1) f1(x) != f1(y) for all x, y in A1 with x != y (i.e., injectivity), 
+     * and (2) f1(x) != f2(y) for all x in A1, y in A2.
+     */
+    public final boolean isUnique() {
 	return unique;
     }
     
 
     @Override
-    public String toString() {
+    public final String toString() {
 	return (name() + (whereToBind() == null 
 		          ? "" 
 		          : "{" + whereToBind() + "}"));
     }
     
 
-    public String proofToString() {
+    /**
+     * Returns a parsable string representation of the declaration of this
+     * function or predicate symbol.
+     */
+    public final String proofToString() {
        String s =
 	   (sort() == Sort.FORMULA ? "" : sort().toString()) + " ";
        s += name();

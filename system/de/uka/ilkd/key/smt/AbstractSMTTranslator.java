@@ -1,10 +1,10 @@
-//This file is part of KeY - Integrated Deductive Software Design
-//Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
-//                    Universitaet Koblenz-Landau, Germany
-//                    Chalmers University of Technology, Sweden
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
 //
-//The KeY system is protected by the GNU General Public License. 
-//See LICENSE.TXT for details.
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
 //
 //
 
@@ -1190,7 +1190,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	        fw.getFunction().isUnique()){
 		FunctionWrapper array [] = {function, fw};
 		if(function.function.sort().extendsTrans(fw.function.sort()) ||
-			fw.function.sort().extendsTrans(function.function.sort()))
+			fw.function.sort().extendsTrans(function.function.sort())||
+			fw.function.sort().equals(function.function.sort()))
 	        {
 	            result = translateLogicalAnd(result, translateDistinct(array));
 	        }

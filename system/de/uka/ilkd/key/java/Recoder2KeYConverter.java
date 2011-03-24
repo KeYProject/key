@@ -1,10 +1,12 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+//
+//
 
 
 
@@ -817,11 +819,11 @@ public class Recoder2KeYConverter {
         return new MethodBodyStatement(bodySource, resultVar, mr);
     }
     
-    public CatchAllStatement convert
-        (de.uka.ilkd.key.java.recoderext.CatchAllStatement cas) {
+    public CatchAllStatement convert(
+	    	de.uka.ilkd.key.java.recoderext.CatchAllStatement cas) {
         return new CatchAllStatement
             ((StatementBlock)callConvert(cas.getStatementAt(0)),
-             (ParameterDeclaration) callConvert(cas.getParameterDeclarationAt(0)));
+             (LocationVariable) callConvert(cas.getVariable()));
     }
 
     // ------------------- declaration ---------------------

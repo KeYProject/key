@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -30,6 +30,11 @@ import de.uka.ilkd.key.rule.inst.ProgramList;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
+/**
+ * Objects of this class are schema variables matching program constructs 
+ * within modal operators. The particular construct being matched is
+ * determined by the ProgramSVSort of the schema variable.
+ */
 public final class ProgramSV extends AbstractSV 
     implements ProgramConstruct, UpdateableOperator {
     

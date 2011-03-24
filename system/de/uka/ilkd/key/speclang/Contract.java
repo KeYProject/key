@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -97,4 +97,17 @@ public interface Contract extends SpecificationElement {
      * Returns the contract in pretty HTML format.
      */
     public String getHTMLText(Services services);
+    
+    /**
+     * Tells whether, on saving a proof where this contract is available, the
+     * contract should be saved too. (this is currently true for contracts
+     * specified directly in DL, but not for JML contracts)
+     */
+    public boolean toBeSaved();
+    
+    /**
+     * Returns a parseable String representation of the contract. 
+     * Precondition: toBeSaved() must be true.
+     */
+    public String proofToString(Services services);
 }

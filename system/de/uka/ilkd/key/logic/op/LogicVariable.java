@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -17,6 +17,10 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
 
 
+/**
+ * The objects of this class represent logical variables,
+ * used e.g. for quantification.
+ */
 public final class LogicVariable extends AbstractSortedOperator 
     implements QuantifiableVariable, ParsableVariable {
 
@@ -35,7 +39,6 @@ public final class LogicVariable extends AbstractSortedOperator
     @Override
     public MatchConditions match(SVSubstitute subst, MatchConditions mc,
             Services services) {
-        
         if (subst == this) {
             return mc;
         }

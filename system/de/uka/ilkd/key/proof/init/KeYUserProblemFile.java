@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -7,6 +7,7 @@
 // See LICENSE.TXT for details.
 //
 //
+
 package de.uka.ilkd.key.proof.init;
 
 import java.io.File;
@@ -180,6 +181,9 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      * Reads a saved proof of a .key file.
      */
     public void readProof(ProblemLoader prl) throws ProofInputException {
+	if(lastParser == null) {
+	    readProblem();
+	}
         try {
             lastParser.proof(prl);
         } catch(antlr.ANTLRException e) {

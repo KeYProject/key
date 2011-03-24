@@ -1,10 +1,11 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+//
 //
 
 package de.uka.ilkd.key.logic.op;
@@ -19,7 +20,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 
 
 /**
- * This implements a general conditional operator 
+ * This singleton class implements a general conditional operator 
  * <tt>\if (phi) \then (t1) \else (t2)</tt>.
  */
 public final class IfThenElse extends AbstractOperator {

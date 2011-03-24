@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -32,8 +32,8 @@ import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
 /**
- * The program method represents a concrete method in the logic.
- * In case of an instance method the first argument represents the 
+ * The program method represents a (pure) method in the logic.
+ * In case of a non-static method the first argument represents the 
  * object on which the method is invoked. 
  */
 public final class ProgramMethod extends ObserverFunction 

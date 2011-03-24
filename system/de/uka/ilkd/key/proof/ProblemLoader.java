@@ -1,10 +1,11 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+//
 //
 
 package de.uka.ilkd.key.proof;
@@ -263,7 +264,9 @@ public final class ProblemLoader implements Runnable {
                currNode = proof.root(); // initialize loader
                children = currNode.childrenIterator(); // --"--
                iconfig = proof.env().getInitConfig();
-               init.tryReadProof(this, po);
+               if(envInput instanceof KeYUserProblemFile) {
+        	   init.tryReadProof(this, (KeYUserProblemFile)envInput);
+               }
 	       setStandardStatusLine();
            
 	   } catch (ExceptionHandlerException e) {

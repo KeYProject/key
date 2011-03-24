@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -554,12 +554,9 @@ public final class ProblemInitializer {
     }
     
     
-    public void tryReadProof(ProblemLoader prl, ProofOblInput problem) 
+    public void tryReadProof(ProblemLoader prl, KeYUserProblemFile kupf) 
     		throws ProofInputException {
-	if(problem instanceof KeYUserProblemFile) {
-	    KeYUserProblemFile kupf = (KeYUserProblemFile)problem;
-	    reportStatus("Loading proof", kupf.getNumberOfChars());
-	    kupf.readProof(prl);
-	}
+	reportStatus("Loading proof", kupf.getNumberOfChars());
+	kupf.readProof(prl);
     }
 }

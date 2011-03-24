@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -17,6 +17,17 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 
+/**
+ * Objects of this class represent "observer" function or predicate symbols.
+ * An observer symbol is a symbol taking a heap array as its first argument,
+ * and an object as its second argument (unless it is static). Observer
+ * symbols are used to represent JML model fields as well as occurrences of
+ * pure methods in specifications (via the subclass ProgramMethod). As they
+ * come from the Java program, both their parameter sorts and their result 
+ * sorts always have an associated KeYJavaType. Observer symbols serve as
+ * the targets of contracts (i.e., as the subjects that the contracts are
+ * about).
+ */
 public class ObserverFunction extends Function {
             
     private final KeYJavaType container;
@@ -87,31 +98,57 @@ public class ObserverFunction extends Function {
     //public interface
     //-------------------------------------------------------------------------
     
+    /**
+     * Returns the result type of this symbol.
+     */
     public final KeYJavaType getType() {
 	return type;
     }
     
     
+    /**
+     * Returns the container type of this symbol; for non-static observer 
+     * symbols, this corresponds to the sort of its second argument.
+     */
     public final KeYJavaType getContainerType() {
 	return container;
     }
     
     
+    /**
+     * Tells whether the observer symbol is static.
+     */
     public final boolean isStatic() {
 	return isStatic;
     }
     
     
+    /**
+     * Gives the number of parameters of the observer symbol. "Parameters" here
+     * includes only the *explicit* parameters, not the heap and the receiver
+     * object. Thus, for observer symbols representing model fields, this will
+     * always return 0.
+     */
     public final int getNumParams() {
 	return paramTypes.size();
     }
     
     
+    /**
+     * Gives the type of the i-th parameter of this observer symbol. 
+     * "Parameters" here includes only the *explicit* parameters, not the heap 
+     * and the receiver object. 
+     */
     public final KeYJavaType getParamType(int i) {
 	return paramTypes.get(i);
     }
     
     
+    /**
+     * Returns the parameter types of this observer symbol. "Parameters" here
+     * includes only the *explicit* parameters, not the heap and the receiver
+     * object. 
+     */
     public final ImmutableArray<KeYJavaType> getParamTypes() {
 	return paramTypes;
     }

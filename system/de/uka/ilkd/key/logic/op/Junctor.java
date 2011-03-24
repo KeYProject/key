@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -14,6 +14,12 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 
+/**
+ * Class of junctor operators, i.e., operators connecting
+ * a given number of formula to create another formula. There
+ * are six such operators: true, false, conjunction,
+ * disjunction, negation, and implication.
+ */
 public final class Junctor extends AbstractSortedOperator {
    
     /** 

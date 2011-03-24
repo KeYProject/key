@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -31,7 +31,7 @@ public interface Operator extends Named, SVSubstitute {
     
 
     /**
-     * determines the sort of the {@link Term} if it would be created using this
+     * Determines the sort of the {@link Term} if it would be created using this
      * Operator as top level operator and the given terms as sub terms. The
      * assumption that the constructed term would be allowed is not checked.
      * @param terms an array of Term containing the subterms of a (potential)
@@ -43,19 +43,19 @@ public interface Operator extends Named, SVSubstitute {
     
     
     /**
-     * Tells whether the operator binds variables at the n-th subterm
+     * Tells whether the operator binds variables at the n-th subterm.
      */
     boolean bindVarsAt(int n);
     
     
     /**
-     * Tells whether the operator is rigid
+     * Tells whether the operator is rigid.
      */
     boolean isRigid();      
     
     
     /**
-     * checks whether the top level structure of the given @link Term
+     * Checks whether the top level structure of the given @link Term
      * is syntactically valid, given the assumption that the top level
      * operator of the term is the same as this Operator. The
      * assumption that the top level operator and the term are equal
@@ -67,7 +67,7 @@ public interface Operator extends Named, SVSubstitute {
     
     
     /**
-     * tests if this operator (plays role of a template) matches 
+     * Tests if this operator (plays role of a template) matches 
      * the given operator with respect to the given match 
      * conditions. 
      * If matching fails <code>null</code> is returned.

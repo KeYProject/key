@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -90,6 +90,7 @@ public final class DependencyContractPO extends AbstractPO
         		       services.getTypeConverter()
         		               .getIntegerLDT()
         		               .targetSort());
+            register(mbyAtPreFunc);
             mbyAtPre = TB.func(mbyAtPreFunc);
             final Term mby = contract.getMby(selfVar, paramVars, services);
             mbyAtPreDef = TB.equals(mbyAtPre, mby);

@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -81,14 +81,8 @@ public class DeclarationProgramVariableCollector extends JavaASTVisitor {
 	addVariable(x.getProgramVariable());
     }
 
-    public void performActionOnCatchAllStatement(CatchAllStatement x) {
-	result.add(x.getParameterDeclaration().getVariableSpecification()
-		   .getProgramVariable());
-    }
-
     public void performActionOnLocationVariable(LocationVariable x) {
-        performActionOnProgramVariable(x);
-        
+        performActionOnProgramVariable(x);        
     }
 
     public void performActionOnProgramConstant(ProgramConstant x) {

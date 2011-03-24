@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -20,6 +20,10 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 
+/**
+ * The currently only class implementing the Term interface. TermFactory should
+ * be the only class dealing directly with the TermImpl class.
+ */
 final class TermImpl implements Term {
 
     private static final ImmutableArray<Term> EMPTY_TERM_LIST 
@@ -90,7 +94,20 @@ final class TermImpl implements Term {
     
     //-------------------------------------------------------------------------
     //public interface
-    //------------------------------------------------------------------------- 
+    //-------------------------------------------------------------------------
+    
+    /**
+     * Checks whether the Term is valid on the top level. If this is
+     * the case this method returns the Term unmodified. Otherwise a
+     * TermCreationException is thrown.  
+     */
+    public Term checked() {
+    	if(op().validTopLevel(this)) {
+	    return this;	    
+	} else {	   	    
+	    throw new TermCreationException(op(), this);
+	}
+    }    
     
     @Override
     public Operator op() {
@@ -137,16 +154,6 @@ final class TermImpl implements Term {
 	return javaBlock;
     }    
     
-    
-    @Override
-    public Term checked() {
-	if(op().validTopLevel(this)) {
-	    return this;	    
-	} else {	   	    
-	    throw new TermCreationException(op(), this);
-	}
-    }
-
     
     @Override
     public int arity() {

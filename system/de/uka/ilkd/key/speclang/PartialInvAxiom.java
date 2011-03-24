@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -128,7 +128,7 @@ public final class PartialInvAxiom implements ClassAxiom {
 	    tacletBuilder.addTacletGoalTemplate(
 		    new TacletGoalTemplate(addedSeq,
 			    ImmutableSLList.<Taclet>nil()));
-	    tacletBuilder.setName(RepresentsAxiom.toValidTacletName(
+	    tacletBuilder.setName(MiscTools.toValidTacletName(
 		    			   "Partial inv axiom for " 
 		    			   + inv.getName()
 		    			   + (i == 0 ? "" : " EQ")));

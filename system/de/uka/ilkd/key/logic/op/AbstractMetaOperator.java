@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -23,11 +23,15 @@ import de.uka.ilkd.key.rule.metaconstruct.arith.*;
 import de.uka.ilkd.key.util.Debug;
 
 
+/**
+ * Common base class for meta operator implementations. 
+ * The available singletons of meta operators are kept here.
+ */
 public abstract class AbstractMetaOperator extends AbstractSortedOperator 
                                            implements MetaOperator {
 
-    private static HashMap<String, AbstractMetaOperator> name2metaop = 
-        new HashMap<String, AbstractMetaOperator>(70);
+    private static final HashMap<String, AbstractMetaOperator> name2metaop 
+    	= new HashMap<String, AbstractMetaOperator>(70);
     
     //must be first
     public static final Sort METASORT = new SortImpl(new Name("Meta"));    
@@ -171,15 +175,11 @@ public abstract class AbstractMetaOperator extends AbstractSortedOperator
 	return null;
     }
     
-    
-    
-    /** (non-Javadoc)
-     * by default meta operators do not match anything 
-     * @see de.uka.ilkd.key.logic.op.Operator#match(SVSubstitute, de.uka.ilkd.key.rule.MatchConditions, de.uka.ilkd.key.java.Services)
-     */
+        
     @Override    
     public MatchConditions match(SVSubstitute subst, MatchConditions mc,
             Services services) {
+	// by default meta operators do not match anything 	
         return null;
     }    
 }

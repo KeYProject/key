@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -44,6 +44,7 @@ import de.uka.ilkd.key.rule.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.*;
+import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 
 
@@ -281,7 +282,7 @@ public final class SpecificationRepository {
 	    (new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
 					   ImmutableSLList.<Taclet>nil(),
 					   unlimitedTerm));
-	tacletBuilder.setName(RepresentsAxiom.toValidTacletName(
+	tacletBuilder.setName(MiscTools.toValidTacletName(
 					"unlimit " + unlimited.name()));
 	
 	return tacletBuilder.getTaclet();
@@ -320,7 +321,7 @@ public final class SpecificationRepository {
 					   ImmutableSLList.<Taclet>nil(),
 					   TB.func(unlimited, subs)));
 	tacletBuilder.setStateRestriction(RewriteTaclet.IN_SEQUENT_STATE);
-	tacletBuilder.setName(RepresentsAxiom.toValidTacletName(
+	tacletBuilder.setName(MiscTools.toValidTacletName(
 					"limit " + unlimited.name()));
 	tacletBuilder.addRuleSet(new RuleSet(new Name("limitObserver")));
 	
@@ -333,6 +334,18 @@ public final class SpecificationRepository {
     //-------------------------------------------------------------------------
     //public interface
     //------------------------------------------------------------------------- 
+    
+    /**
+     * Returns all registered contracts.
+     */
+    public ImmutableSet<Contract> getAllContracts() {
+	ImmutableSet<Contract> result = DefaultImmutableSet.<Contract>nil();
+	for(ImmutableSet<Contract> s : contracts.values()) {
+	    result = result.union(s);
+	}
+	return result;
+    }
+    
     
     /**
      * Returns all registered (atomic) contracts for the passed target.
@@ -663,7 +676,8 @@ public final class SpecificationRepository {
 	    if(pm.getKeYJavaType() != null && !pm.isImplicit()) {
 		pm = services.getJavaInfo().getToplevelPM(kjt, pm);		
 		final ClassAxiom queryAxiom 
-		    = new QueryAxiom("Query axiom for " + pm.getFullName(),
+		    = new QueryAxiom("Query axiom for " + pm.getName() 
+			    	     + " in " + kjt.getFullName(),
 			    	     pm, 
 			             kjt);
 		result = result.add(queryAxiom);

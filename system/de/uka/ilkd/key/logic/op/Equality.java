@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -16,10 +16,11 @@ import de.uka.ilkd.key.logic.sort.Sort;
 
 
 /**
- * This class represents an equality symbol for a given sort.
- * The system will generate automatically for each sort exactly one 
- * equality symbol. For the special sort Formula the corresponding equality 
- * symbol is the equivalence-junctor {@link Equality#EQV}.
+ * This class defines the equality operator "=". It is a binary
+ * predicate accepting arbitrary terms (sort "any") as arguments.
+ * 
+ * It also defines the formula equivalence operator "<->" (which
+ * could alternatively be seen as a Junctor).
  */
 public final class Equality extends AbstractSortedOperator {
 

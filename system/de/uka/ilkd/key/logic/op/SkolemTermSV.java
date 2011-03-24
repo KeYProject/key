@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -15,6 +15,12 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
 
+/**
+ * Schema variable that is instantiated with fresh Skolem constants. At the
+ * moment, such schema variables have to be accompanied by a "NewDependingOn"
+ * varcond, although with the removal of the meta variable mechanism, this
+ * would no longer really be necessary.
+ */
 public final class SkolemTermSV extends AbstractSV {
 
     /** 

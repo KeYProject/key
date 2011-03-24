@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -25,6 +25,19 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
+/**
+ * The objects of this class represent (local!) program variables and program 
+ * constants  (resulting from static final declarations in programs; TODO: it is
+ * weird that constants are a special case of variables).
+ * 
+ * Additionally, as a legacy of the past, the RecodeR front end of KeY still 
+ * creates objects of this class also for fields (aka. attributes, member 
+ * variables), even though theoretically, these are *not* program variables 
+ * (not any more)! Such fake "program variables" can be recognized by the fact 
+ * that calling isMember() on them returns true. Thus, they must never occur in 
+ * actual proofs. The method HeapLDT.getFieldSymbolForPV() serves to convert 
+ * such fake program variables to the appropriate constant symbols.
+ */
 public abstract class ProgramVariable extends AbstractSortedOperator 
     				      implements SourceElement, 
     				                 ProgramElement, 

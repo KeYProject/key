@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -14,6 +14,12 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 
+/**
+ * Class of update junctor operators, i.e., operators connecting
+ * a given number of updates to create another update. There
+ * are currently two such operators: the empty update "skip" and
+ * the parallel update connector "|".
+ */
 public final class UpdateJunctor extends AbstractSortedOperator {
     
     public static final UpdateJunctor SKIP 

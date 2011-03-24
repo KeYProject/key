@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -238,9 +238,8 @@ public final class OperationContractPO extends AbstractPO
         final ProgramVariable exceptionVar = TB.excVar(services, pm, true);
      	final LocationVariable heapAtPreVar 
 		= TB.heapAtPreVar(services, "heapAtPre", true);
-        final Term heapAtPre = TB.var(heapAtPreVar);
         final Map<Term,Term> normalToAtPre = new HashMap<Term,Term>();
-        normalToAtPre.put(TB.heap(services), heapAtPre);
+        normalToAtPre.put(TB.heap(services), TB.var(heapAtPreVar));
         
         //register the variables so they are declared in proof header 
         //if the proof is saved to a file
@@ -261,7 +260,7 @@ public final class OperationContractPO extends AbstractPO
                                     	   	  paramVars, 
                                     	   	  resultVar, 
                                     	   	  exceptionVar,
-                                    	   	  heapAtPre,
+                                    	   	  heapAtPreVar,
                                     	   	  services),
                                  TB.frame(services, 
                                 	  normalToAtPre, 

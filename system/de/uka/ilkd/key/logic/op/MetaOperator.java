@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -16,10 +16,9 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
  * This is the interface for MetaOperators, which are used to do complex term
- * transformation when applying a taclet. Often these transformation cannot be
+ * transformation when applying a taclet. Often these transformations cannot be
  * described with the taclet scheme (or trying to do so would result in a huge
- * number of rules). The available singletons of this meta operators are kept 
- * here.
+ * number of rules).
  */
 public interface MetaOperator extends SortedOperator {
 
