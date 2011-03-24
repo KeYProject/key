@@ -10,13 +10,9 @@
 
 package de.uka.ilkd.key.smt;
 
-import java.util.Collection;
-import java.util.Vector;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.rule.Taclet;
 
 
 public interface SMTTranslator {

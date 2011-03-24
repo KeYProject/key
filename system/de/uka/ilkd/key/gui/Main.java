@@ -2663,7 +2663,7 @@ public final class Main extends JFrame implements IMain {
 	        
 	            SMTSettings settings = ProofSettings.DEFAULT_SETTINGS.getSMTSettings();
 	            SolverLauncher launcher = new SolverLauncher(settings);
-	            launcher.addListener(new SolverListener());
+	            launcher.addListener(new SolverListener(settings));
 	            launcher.launch(solverUnion.getTypes(),
 			            SMTProblem.createSMTProblems(proof),
 			            proof.getServices());

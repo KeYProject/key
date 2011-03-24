@@ -1,12 +1,9 @@
 package de.uka.ilkd.key.smt;
 
 import java.util.ArrayList;
-import java.util.Collection;
 
-import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
 
@@ -59,9 +56,7 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
     private static StringBuffer TERMIFTHENELSE = new StringBuffer("ite");
     
     private static StringBuffer DISTINCT = new StringBuffer("distinct");
-    
-    private boolean useBuiltInUniqueness = false;
-    
+
     /**
      * Just a constructor which starts the conversion to Simplify syntax.
      * The result can be fetched with
@@ -533,30 +528,9 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
     }
     
     
-    private boolean haveSameArgs(ImmutableArray<Sort> list1, ImmutableArray<Sort> list2){
-	if(list1.size() == list2.size())
-	for(int i=0; i < list1.size(); i++){
-	    if(!list1.get(i).equals(list2.get(i))){
-		return false;
-	    }
-	}
-	return true;
-    }
-    
+ 
 
-    
-    private StringBuffer getQuantifiedVariable(int pos){
-	return new StringBuffer("?n"+pos);
-    }
-    
-    private ArrayList<StringBuffer> getQuantifiedVariables(int count, int start){
-	ArrayList<StringBuffer> list = new ArrayList<StringBuffer>();
-	for(int i=0; i < count; i++){
-	    list.add(getQuantifiedVariable(i+start));
-	}
-	return list;
-    }
-    
+
 
     @Override
     protected StringBuffer translateDistinct(FunctionWrapper [] fw){
@@ -564,14 +538,14 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 	    return super.translateDistinct(fw);
 	}
 	int start =0;
-	ArrayList<StringBuffer> temp []=  new ArrayList[fw.length];
+	ArrayList<ArrayList<StringBuffer>> temp = new ArrayList<ArrayList<StringBuffer>>();
 	
 	StringBuffer rightSide = new StringBuffer();
 	rightSide.append("( "+ DISTINCT + " ");
 	for(int i=0; i < fw.length; i++){
-		temp[i] = getQuantifiedVariables(fw[i].getFunction().arity(),start);
+		temp.add(createGenericVariables(fw[i].getFunction().arity(),start));
 		start += fw[i].getFunction().arity();
-		rightSide.append(buildFunction(fw[i].getName(),temp[i])+" ");
+		rightSide.append(buildFunction(fw[i].getName(),temp.get(i))+" ");
     
 	}
 	
@@ -580,7 +554,7 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 	for(int j=0; j < fw.length; j++){
 	    for(int i=0; i < fw[j].getFunction().arity(); i++){
 		      Sort sort = fw[j].getFunction().argSorts().get(i);
-		      rightSide = translateLogicalAll(temp[j].get(i),usedDisplaySort.get(sort),rightSide);
+		      rightSide = translateLogicalAll(temp.get(j).get(i),usedDisplaySort.get(sort),rightSide);
 		     
 		 }		   
 	}	

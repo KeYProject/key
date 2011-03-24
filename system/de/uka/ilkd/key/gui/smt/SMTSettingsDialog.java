@@ -68,7 +68,7 @@ public class SMTSettingsDialog {
     private JScrollPane jScrollPane1 = null;
     private OptionTable optionTable = null; // @jve:decl-index=0:visual-constraint="885,171"
     private JPanel panel = null;
-    private JButton applyButton = null;
+
     private JButton okButton = null;
     private JButton cancelButton = null;
 
@@ -312,7 +312,7 @@ public class SMTSettingsDialog {
 		final TableComponent component = ((TableComponent) model
 		        .getValueAt(i, Settings.OPTIONCOL));
 
-		int height = 0;
+
 		if (component.getInfo() != null && 
 		    !(getOptionTable().getModel().getValueAt( i,
 			    Settings.OPTIONCOL + 1) instanceof TableInfoButton)) {
@@ -367,13 +367,11 @@ public class SMTSettingsDialog {
 		if((getOptionTable().getModel().getValueAt( i,
 			    Settings.OPTIONCOL + 1) instanceof TableInfoButton)){
 		    TableInfoButton button =  ((TableInfoButton)getOptionTable().getModel().getValueAt( i,Settings.OPTIONCOL + 1));
-		    height =button.getHeight();	
+	
 		    width = Math.max(button.getEditorComponent()
 			    .getPreferredSize().width + 5, width);
 		}
 
-		//getOptionTable().setRowHeight(i,
-		  //      Math.max(component.getHeight(), height));
 
 	    }
 
@@ -423,7 +421,7 @@ public class SMTSettingsDialog {
     }
     
     class OptionTable extends JTable{
-	
+        private static final long serialVersionUID = 1L;
 	DefaultTableCellRenderer renderer; 
 	TableCellEditor editor;
 	

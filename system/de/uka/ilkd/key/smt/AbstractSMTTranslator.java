@@ -740,59 +740,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    ArrayList<StringBuffer> types, SortHierarchy sortHierarchy,
 	    SMTSettings settings);
 
-    /**
-     * Translates the given Semisequent into "Simplify" input syntax and
-     * adds the resulting string to the StringBuffer sb.
-     * 
-     * @param semi
-     *                the SemiSequent which should be written in Simplify
-     *                syntax
-     */
-    private final StringBuffer translate(Semisequent semi, SMTTranslator.TERMPOSITION skolemization, Services services)
-	    throws IllegalFormulaException {
-	StringBuffer hb = new StringBuffer();
 
-	// if the sequent is empty, return true/false as formula
-	if (semi.size() == 0) {
-	    if (skolemization == SMTTranslator.TERMPOSITION.ANTECEDENT) {
-		hb.append(translateLogicalTrue());
-	    } else {
-		hb.append(translateLogicalFalse());
-	    }
-	    return hb;
-	}
-
-	// translate the first semisequence
-	hb = translate(semi.get(0), services);
-
-	// translate the other semisequences, juncted with AND or OR
-	for (int i = 1; i < semi.size(); ++i) {
-	    if (skolemization == SMTTranslator.TERMPOSITION.ANTECEDENT) {
-		hb = translateLogicalAnd(hb, translate(semi.get(i), services));
-	    } else {
-		hb = translateLogicalOr(hb, translate(semi.get(i), services));
-	    }
-	}
-
-	return hb;
-    }
     
-    /**
-     * Translates the given ConstrainedFormula into "Simplify" input syntax
-     * and adds the resulting string to the StringBuffer sb.
-     * 
-     * @param cf
-     *                the ConstrainedFormula which should be written in
-     *                given syntax
-     */
-    private final StringBuffer translate(ConstrainedFormula cf, Services services)
-	    throws IllegalFormulaException {
-	StringBuffer hb = new StringBuffer();
-	Term t;
-	t = cf.formula();
-	hb.append(translateTerm(t, new Vector<QuantifiableVariable>(), services));
-	return hb;
-    }
+
     
     /**
      * Returns, whether the Structure, this translator creates should be a
@@ -1288,7 +1238,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	return translateLogicalVar(new StringBuffer("n"+Integer.toString(pos)));
     }
     
-    private ArrayList<StringBuffer> createGenericVariables(int count, int start){
+    protected ArrayList<StringBuffer> createGenericVariables(int count, int start){
 	ArrayList<StringBuffer> list = new ArrayList<StringBuffer>();
 	for(int i=0; i < count; i++){
 	    list.add(createGenericVariable(i+start));

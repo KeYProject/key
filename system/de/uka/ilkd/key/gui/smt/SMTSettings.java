@@ -536,6 +536,10 @@ public class SMTSettings implements Settings, de.uka.ilkd.key.smt.SMTSettings{
 	return settingsData.clone();
     }
     
+    public int getModeOfProgressDialog(){
+	return settingsData.modeOfProgressDialog;
+    }
+    
     public void setData(SettingsData data){
 	settingsData = data;
     }

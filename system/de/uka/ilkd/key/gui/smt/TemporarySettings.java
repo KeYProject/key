@@ -262,29 +262,6 @@ public class TemporarySettings extends Settings {
 		        }
 	        },
 
-	      /*  new TableCheckBox(tss) {
-		    @Override
-		    public void eventChange() {
-		        ((TemporarySolverSettings) getUserObject()).useForMulitpleProvers = isSelected();
-		    }
-
-	
-                    public boolean prepareValues() {
-		        setTitle("Use this prover for the rule 'multiple provers'.");
-		        setSelected(((TemporarySolverSettings) getUserObject()).useForMulitpleProvers);
-	                return true;
-                    }
-
-                    public String getInfo(){
-                	return "All provers for which this option is activated" +
-                		" are executed concurrently when the rule 'multiple provers'"+
-                		" is applied.\n\n"+
-                		"This option must be activated for at least two provers to"+
-                		" enable the rule"+
-                		" 'multiple provers'.";
-                    }
-	
-	        },*/
 	
 	        
 	        new TableExplanation(type,"Information"){
@@ -375,8 +352,8 @@ public class TemporarySettings extends Settings {
 	
 	
 	 new TableComboBox(settingsData.modeOfProgressDialog,getProgressMode(SettingsData.PROGRESS_MODE_USER),
-	         getProgressMode(SettingsData.PROGRESS_MODE_CLOSE),
-	         getProgressMode(SettingsData.PROGRESS_MODE_CLOSE_FIRST)) {
+	         getProgressMode(SettingsData.PROGRESS_MODE_CLOSE)
+	         ) {
 
 	    public void eventChange() {
 		settingsData.modeOfProgressDialog = getSelectedItemIndex();
@@ -394,11 +371,11 @@ public class TemporarySettings extends Settings {
 			"\n" +
 			"2. Option: The progress dialog is closed once the " +
 			"external provers have done their work or the time limit " +
-			"has been exceeded.\n"+
-			"\n"+
-			"3. Option: The progress dialog is closed once the first " +
-			"external prover has successfully solved all given goals " +
-			"or the time limit has been exceeded.";
+			"has been exceeded.\n";//+
+			//"\n"+
+			//"3. Option: The progress dialog is closed once the first " +
+			//"external prover has successfully solved all given goals " +
+			//"or the time limit has been exceeded.";
 	    }
       
 	},
