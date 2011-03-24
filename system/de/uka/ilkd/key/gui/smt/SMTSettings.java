@@ -47,7 +47,7 @@ class SettingsData{
     
 
     
-    private static final String PROGRESS_DIALOG_MODE = "[SMTSettings]pd_mode";
+    private static final String PROGRESS_DIALOG_MODE = "[SMTSettings]modeOfProgressDialog";
     
     private static final String EXPLICIT_TYPE_HIERARCHY = "[SMTSettings]explicitTypeHierarchy";
     
