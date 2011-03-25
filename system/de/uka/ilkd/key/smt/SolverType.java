@@ -13,6 +13,7 @@ package de.uka.ilkd.key.smt;
 import java.io.File;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.smt.AbstractSMTTranslator.Configuration;
 
 public interface SolverType {
 
@@ -28,6 +29,8 @@ public interface SolverType {
     public SMTSolverResult interpretAnswer(String text, String error, int val);
 
     public String getInfo();
+    
+
 
     /**
      * Get the command for executing the external prover. This is a hardcoded
@@ -71,7 +74,7 @@ public interface SolverType {
 
 	@Override
 	public SMTTranslator getTranslator(Services services) {
-	    return new SmtLibTranslator(services);
+	    return new SmtLibTranslator(services,new Configuration(false));
 	}
 
 	public SMTSolverResult interpretAnswer(String text, String error,
@@ -109,6 +112,9 @@ public interface SolverType {
 		    + "You can activate quantifier elimination by appending QUANT_FM=true to"
 		    + " the execution command.";
 	}
+	
+
+	
 
     };
     static public final SolverType CVC3_SOLVER = new AbstractSolverType() {
@@ -132,7 +138,7 @@ public interface SolverType {
 
 	@Override
 	public SMTTranslator getTranslator(Services services) {
-	    return new SmtLibTranslator(services);
+	    return new SmtLibTranslator(services,new Configuration(false));
 	}
 
 	@Override
@@ -175,7 +181,7 @@ public interface SolverType {
 
 	@Override
 	public SMTTranslator getTranslator(Services services) {
-	    return new SmtLibTranslator(services);
+	    return new SmtLibTranslator(services,new Configuration(true));
 	}
 
 	@Override
@@ -206,6 +212,8 @@ public interface SolverType {
 	    }
 
 	}
+	
+
     };
     static public final SolverType SIMPLIFY_SOLVER = new AbstractSolverType() {
 
@@ -223,7 +231,7 @@ public interface SolverType {
 
 	@Override
 	public SMTTranslator getTranslator(Services services) {
-	    return new SimplifyTranslator(services);
+	    return new SimplifyTranslator(services, new Configuration(false));
 	}
 
 	@Override
@@ -235,6 +243,7 @@ public interface SolverType {
 	public String getInfo() {
 	    return "Simplify only supports integers within the interval [-2147483646,2147483646]=[-2^31+2,2^31-2].";
 	}
+	
 
 	@Override
 	public SMTSolverResult interpretAnswer(String text, String error,
@@ -386,4 +395,6 @@ abstract class AbstractSolverType implements SolverType {
     public String toString() {
 	return getName();
     }
+    
+
 }

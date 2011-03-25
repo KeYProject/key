@@ -86,6 +86,16 @@ class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings{
     public boolean useBuiltInUniqueness() {
          return false;
     }
+
+    @Override
+    public boolean useAssumptionsForBigSmallIntegers() {
+	return false;
+    }
+
+    @Override
+    public boolean useUninterpretedMultiplicationIfNecessary() {
+	return false;
+    }
     
 }
 

@@ -52,6 +52,11 @@ class ContextualBlock {
     
     public static final int ASSUMPTION_DISTINCT = 5;
     
+    public static final int ASSUMPTION_INTEGER = 6;
+    
+    
+    public static final int ASSUMPTION_MULTIPLICATION = 7;
+    
     
     
     /**

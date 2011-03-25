@@ -72,12 +72,12 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
      * @param services
      * 		      The services Object belonging to the sequent.
      */
-    public SimplifyTranslator(Sequent sequent, Services services) {
-	super(sequent, services);
+    public SimplifyTranslator(Sequent sequent, Services services,Configuration config) {
+	super(sequent, services,config);
     }
     
-    public SimplifyTranslator(Services services) {
-	super(services);
+    public SimplifyTranslator(Services services,Configuration config) {
+	super(services,config);
     }
     
     @Override
@@ -95,12 +95,16 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
 	String [] commentPredicate = new String[2];
 	commentPredicate[ContextualBlock.PREDICATE_FORMULA] = "\n;Predicates used in formula:\n";
 	commentPredicate[ContextualBlock.PREDICATE_TYPE]    = "\n;Types expressed by predicates:\n";
-	String [] commentAssumption = new String[5];
+	String [] commentAssumption = new String[8];
 	commentAssumption[ContextualBlock.ASSUMPTION_DUMMY_IMPLEMENTATION] = "\n\n;Assumptions for dummy variables:\n";
 	commentAssumption[ContextualBlock.ASSUMPTION_FUNCTION_DEFINTION] = "\n\n;Assumptions for function definitions:\n"; 
 	commentAssumption[ContextualBlock.ASSUMPTION_SORT_PREDICATES] = "\n\n;Assumptions for sort predicates:\n";
 	commentAssumption[ContextualBlock.ASSUMPTION_TYPE_HIERARCHY] = "\n\n;Assumptions for type hierarchy:\n";
-	commentAssumption[ContextualBlock.ASSUMPTION_TACLET_TRANSLATION]= "\n\n;Assumptions for taclets:";
+	commentAssumption[ContextualBlock.ASSUMPTION_TACLET_TRANSLATION]= "\n\n;Assumptions for taclets:\n";
+	commentAssumption[ContextualBlock.ASSUMPTION_DISTINCT]= "\n\n;Assumptions for uniqueness of functions:\n";
+	commentAssumption[ContextualBlock.ASSUMPTION_INTEGER]= "\n\n;Assumptions for very small and very big integers:\n";
+	commentAssumption[ContextualBlock.ASSUMPTION_MULTIPLICATION]= "\n\n;Assumptions for uninterpreted multiplication:\n";
+	
 	
 	StringBuffer comment = new StringBuffer("\n\n;The formula:\n");
 	formula = comment.append(formula);
@@ -536,5 +540,20 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
 	toReturn.append("_").append(counter);
 	counter++;
 	return toReturn;
+    }
+    
+    @Override
+    protected long getMaxNumber() {
+     	return 2147483646;
+    }
+    
+    @Override
+    protected long getMinNumber() {
+	return -2147483646;
+    }
+    
+    @Override
+    protected boolean hasNumberLimit() {
+	return true;
     }
 }
