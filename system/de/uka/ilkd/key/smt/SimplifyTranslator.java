@@ -12,8 +12,11 @@ package de.uka.ilkd.key.smt;
 
 import java.util.ArrayList;
 
+
 import de.uka.ilkd.key.java.Services;
+
 import de.uka.ilkd.key.logic.Sequent;
+
 
 public class SimplifyTranslator extends AbstractSMTTranslator {
     
@@ -84,7 +87,8 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
 	    ArrayList<ArrayList<StringBuffer>> functions,
 	    ArrayList<ArrayList<StringBuffer>> predicates,
 	    ArrayList<ContextualBlock> predicateBlocks,
-	    ArrayList<StringBuffer> types, SortHierarchy sortHierarchy) {
+	    ArrayList<StringBuffer> types, SortHierarchy sortHierarchy,
+	    SMTSettings settings) {
 	
 	StringBuffer toReturn = new StringBuffer();
 	
@@ -223,6 +227,7 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
     protected boolean isMultiSorted() {
 	return false;
     }
+    
 
     @Override
     protected StringBuffer translateFunction(StringBuffer name,
@@ -471,6 +476,7 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
 	    for (int i = 0; i < args.size(); i++) {
 		toReturn.append(" ");
 		toReturn.append(args.get(i));
+		
 	    }
 	    toReturn.append(")");
 	return toReturn;
@@ -521,6 +527,9 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
 	
 	toReplace.add("\\");
 	replacement.add("_");
+	
+	toReplace.add("$");
+	replacement.add("");
 	
 	toReturn = this.removeIllegalChars(toReturn, toReplace, replacement);
 	

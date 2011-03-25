@@ -163,7 +163,7 @@ public class ComplexButton {
 	        	return;
 	            }
 	            
-                    JPopupMenu menu = getMenu();
+
                     if (showing) {
                         showing = false;
                         // the menu is already cleared by

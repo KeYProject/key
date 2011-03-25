@@ -70,5 +70,12 @@ public interface SMTSettings {
      * ignored.
      */
     public Collection<Taclet> getTaclets(Services services);
+    
+    /**
+     * Returns <code>true</code> if the uniqueness property should be translated 
+     * by using the built-in mechanism of the solver.
+     * Has only some effect if the solver supports a built in feature for uniqueness.
+     */
+    public boolean useBuiltInUniqueness();
 
 }

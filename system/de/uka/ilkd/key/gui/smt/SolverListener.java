@@ -49,6 +49,7 @@ public class SolverListener implements SolverLauncherListener {
     // Every SMT problem refers to many solvers.
     private Collection<SMTProblem> smtProblems = new LinkedList<SMTProblem>();
     private Timer timer = new Timer();
+    private final SMTSettings settings;
     private final static Color RED = new Color(180, 43, 43);
     private final static Color GREEN = new Color(43, 180, 43);
     private static int FILE_ID = 0;
@@ -86,6 +87,10 @@ public class SolverListener implements SolverLauncherListener {
 
     }
     
+    
+    public SolverListener(SMTSettings settings){
+	this.settings = settings;
+    }
 
     @Override
     public void launcherStopped(SolverLauncher launcher,
@@ -132,6 +137,10 @@ public class SolverListener implements SolverLauncherListener {
 	if(!problemInformation.isEmpty()){
 	    progressDialog.setInfo("Exception!", problemInformation);
 	    progressDialog.setInfoColor(RED);
+	}else{
+	    if(settings.getModeOfProgressDialog() == SettingsData.PROGRESS_MODE_CLOSE){
+		applyEvent(launcher);
+	    }
 	}
     }
 
@@ -364,22 +373,22 @@ public class SolverListener implements SolverLauncherListener {
     }
 
     private void storeInformation() {
-	SMTSettings settings = ProofSettings.DEFAULT_SETTINGS.getSMTSettings();
+
 	if (settings.storeSMTTranslationToFile()
 	        || (settings.makesUseOfTaclets() && settings
 	                .storeTacletTranslationToFile())) {
 	    for (InternSMTProblem problem : problems) {
-		storeInformation(problem.getProblem(), settings);
+		storeInformation(problem.getProblem());
 	    }
 	}
 
     }
 
-    private void storeInformation(SMTProblem problem, SMTSettings settings) {
+    private void storeInformation(SMTProblem problem) {
 	for (SMTSolver solver : problem.getSolvers()) {
 	    if (settings.storeSMTTranslationToFile()) {
 		storeSMTTranslation(solver, problem.getGoal(), solver
-		        .getTranslation(), settings);
+		        .getTranslation());
 	    }
 	    if (settings.makesUseOfTaclets()
 		    && settings.storeTacletTranslationToFile()
@@ -399,9 +408,8 @@ public class SolverListener implements SolverLauncherListener {
     }
 
     private void storeSMTTranslation(SMTSolver solver, Goal goal,
-	    String problemString, SMTSettings settings) {
-	String path = ProofSettings.DEFAULT_SETTINGS.getSMTSettings()
-	        .getPathForSMTTranslation();
+	    String problemString) {
+	String path = settings.getPathForSMTTranslation();
 	path = finalizePath(path, solver, goal);
 	storeToFile(problemString, path);
 

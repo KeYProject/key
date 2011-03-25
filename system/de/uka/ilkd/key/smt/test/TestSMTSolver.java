@@ -82,6 +82,11 @@ class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings{
 	return false;
     }
     
+    @Override
+    public boolean useBuiltInUniqueness() {
+         return false;
+    }
+    
 }
 
 public abstract class TestSMTSolver extends TestCommons {

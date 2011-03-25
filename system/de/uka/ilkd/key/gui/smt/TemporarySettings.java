@@ -95,8 +95,8 @@ public class TemporarySettings extends Settings {
 	    }
 	    
 	    DefaultMutableTreeNode hierarchyOptions = new DefaultMutableTreeNode();
-	    hierarchyOptions.setUserObject(new ContentItem("Type Hierarchy",
-	    buildModel("Type Hierarchy", getHierarchyOptionData())));
+	    hierarchyOptions.setUserObject(new ContentItem("Translation",
+	    buildModel("Translation", getTranslationOptionData())));
 
 	    DefaultMutableTreeNode tacletOptions = new DefaultMutableTreeNode();
 	    tacletOptions.setUserObject(new ContentItem("Taclets",
@@ -125,7 +125,7 @@ public class TemporarySettings extends Settings {
     }
     
     
-     private TableComponent[] getHierarchyOptionData(){
+     private TableComponent[] getTranslationOptionData(){
      TableComponent data[] = {
      new TableCheckBox() {
      public boolean prepareValues() {
@@ -141,12 +141,19 @@ public class TemporarySettings extends Settings {
     
     @Override
      public String getInfo() {
-     return "TODO: Write Info";
+     return "If this option is selected, the transitive inheritance between classes is modeled by " +
+     	      "assumptions.\n\n" +
+     	      "Example: Let A, B and C  be classes such that C extends B and B extends A.\n" +
+     	      "If the option is not selected, the following assumptions are added:\n" +
+     	      "\\forall x; (type_of_C(x)->type_of_B(x))\n" +
+     	      "\\forall x; (type_of_B(x)->type_of_A(x))\n" + 
+     	      "If the option is selected, the following assumption is additionally added to the assumptions above:\n" +
+     	      "\\forall x; (type_of_C(x)->type_of_A(x))\n";
      }
      },
      new TableCheckBox() {
      public boolean prepareValues() {
-     setTitle("Instantiate null predicates (recommended).");
+     setTitle("Instantiate hierarchy assumptions if possible (recommended).");
      setSelected(settingsData.useNullInstantiation);
      return true;
      }
@@ -157,12 +164,39 @@ public class TemporarySettings extends Settings {
      }
          @Override
      public String getInfo() {
-     return "TODO: Write Info";
-     }
+             return "At the moment this option has only effect on hierarchy assumptions regarding the null object.\n" +
+             	     "Example: Let A and B be classes.\n" +
+             	     "If the option is not selected, the type null is treated as a normal class. " +
+             	     "Consequently, the following assumptions are added:\n" +
+             	     "\\forall x; (type_of_Null(x)->type_of_A(x))\n" +
+             	     "\\forall x; (type_of_Null(x)->type_of_B(x))\n" +
+             	     "If the option is selected, those assumptions are instantiated with a concrete null object:\n" +
+             	     "type_of_A(null)\n" +
+             	     "type_of_B(null)";
+         }
+     },
+     new TableCheckBox() {
+	 public boolean prepareValues() {
+	     setTitle("Use built-in mechanism for uniqueness if possible.");
+	     setSelected(settingsData.useBuiltInUniqueness);
+	     return true;
+	 }
+
+	 @Override
+	 public void eventChange() {
+	     settingsData.useBuiltInUniqueness = isSelected();
+	 }
+
+	 @Override
+	 public String getInfo() {
+	     return "Some solvers support the uniqueness of functions by built-in mechanisms. If this option is selected " +
+	     		"those mechanisms are used, otherwise some assumptions are added by using normal FOL.\n" +
+	     		"Note: The uniqueness of functions is needed for translating attributes and arrays.";
+	 }
      }};
      return data;
-   } 
-    
+     } 
+
 
     
 
@@ -229,29 +263,6 @@ public class TemporarySettings extends Settings {
 		        }
 	        },
 
-	      /*  new TableCheckBox(tss) {
-		    @Override
-		    public void eventChange() {
-		        ((TemporarySolverSettings) getUserObject()).useForMulitpleProvers = isSelected();
-		    }
-
-	
-                    public boolean prepareValues() {
-		        setTitle("Use this prover for the rule 'multiple provers'.");
-		        setSelected(((TemporarySolverSettings) getUserObject()).useForMulitpleProvers);
-	                return true;
-                    }
-
-                    public String getInfo(){
-                	return "All provers for which this option is activated" +
-                		" are executed concurrently when the rule 'multiple provers'"+
-                		" is applied.\n\n"+
-                		"This option must be activated for at least two provers to"+
-                		" enable the rule"+
-                		" 'multiple provers'.";
-                    }
-	
-	        },*/
 	
 	        
 	        new TableExplanation(type,"Information"){
@@ -342,8 +353,8 @@ public class TemporarySettings extends Settings {
 	
 	
 	 new TableComboBox(settingsData.modeOfProgressDialog,getProgressMode(SettingsData.PROGRESS_MODE_USER),
-	         getProgressMode(SettingsData.PROGRESS_MODE_CLOSE),
-	         getProgressMode(SettingsData.PROGRESS_MODE_CLOSE_FIRST)) {
+	         getProgressMode(SettingsData.PROGRESS_MODE_CLOSE)
+	         ) {
 
 	    public void eventChange() {
 		settingsData.modeOfProgressDialog = getSelectedItemIndex();
@@ -361,11 +372,11 @@ public class TemporarySettings extends Settings {
 			"\n" +
 			"2. Option: The progress dialog is closed once the " +
 			"external provers have done their work or the time limit " +
-			"has been exceeded.\n"+
-			"\n"+
-			"3. Option: The progress dialog is closed once the first " +
-			"external prover has successfully solved all given goals " +
-			"or the time limit has been exceeded.";
+			"has been exceeded.\n";//+
+			//"\n"+
+			//"3. Option: The progress dialog is closed once the first " +
+			//"external prover has successfully solved all given goals " +
+			//"or the time limit has been exceeded.";
 	    }
       
 	},
