@@ -272,6 +272,8 @@ public final class RepresentsAxiom implements ClassAxiom {
 
     
     public Taclet getRelationalTaclet(Services services) {
+	final RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();
+	
 	//create schema variables
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	final SchemaVariable heapSV 
@@ -318,6 +320,10 @@ public final class RepresentsAxiom implements ClassAxiom {
 	    	= SchemaVariableFactory.createVariableSV(
 		    new Name(target.sort().name().toString().substring(0, 1) + "_lv"),
 		    target.sort());
+	    tacletBuilder.addVarsNotFreeIn(targetSV, heapSV);
+	    if(!target.isStatic()) {
+		tacletBuilder.addVarsNotFreeIn(targetSV, selfSV);
+	    }	    
 	    final Term targetLVReachable
 	    	= TB.reachableValue(services, 
 		    	      	    TB.var(heapSV), 
@@ -337,7 +343,6 @@ public final class RepresentsAxiom implements ClassAxiom {
 		= new ConstrainedFormula(guardedAxiom);
 	
 	//create taclet
-	final RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();
 	final Term findTerm = target.isStatic() 
 	                      ? TB.func(target, TB.var(heapSV)) 
 	                      : TB.func(target, TB.var(heapSV), TB.var(selfSV));
