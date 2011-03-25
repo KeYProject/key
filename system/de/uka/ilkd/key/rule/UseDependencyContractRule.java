@@ -10,6 +10,7 @@
 
 package de.uka.ilkd.key.rule;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -27,6 +28,7 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
@@ -334,15 +336,28 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	    		List<PosInOccurrence> steps, 
 	    		Services services) {
 	//prepare array of possible base heaps
-	final Term[] heaps = new Term[steps.size()];
+	final TermStringWrapper[] heaps = new TermStringWrapper[steps.size()];
 	int i = 0;
+	final LogicPrinter lp = new LogicPrinter(null, 
+                                           	 new NotationInfo(), 
+                                           	 services);
+	lp.setLineWidth(120);
 	for(PosInOccurrence step : steps) {
-	    heaps[i++] = step.subTerm().sub(0);
+	    final Term heap = step.subTerm().sub(0);
+	    lp.reset();
+	    try {
+		lp.printTerm(heap);
+	    } catch(IOException e) {
+		throw new RuntimeException(e);
+	    }
+	    String prettyprint = lp.toString();
+	    prettyprint = "<html><tt>" + LogicPrinter.escapeHTML(prettyprint) + "</tt></html>";
+	    heaps[i++] = new TermStringWrapper(heap, prettyprint);
 	}
 	
 	//open dialog
-	final Term heap 
-		= (Term)JOptionPane.showInputDialog(
+	final TermStringWrapper heapWrapper 
+		= (TermStringWrapper)JOptionPane.showInputDialog(
 				Main.getInstance(),
 				"Please select a base heap:",
 				"Instantiation",
@@ -350,9 +365,10 @@ public final class UseDependencyContractRule implements BuiltInRule {
 				null,
 				heaps,
 				heaps.length > 0 ? heaps[0] : null);
-	if(heap == null) {
+	if(heapWrapper == null) {
 	    return null;
 	}
+	final Term heap = heapWrapper.term;
 	
 	//find corresponding step
 	for(PosInOccurrence step : steps) {
@@ -652,5 +668,21 @@ public final class UseDependencyContractRule implements BuiltInRule {
     @Override
     public String toString() {
         return displayName();
+    }
+    
+    
+    private static final class TermStringWrapper {
+	final Term term;
+	final String string;
+	
+	TermStringWrapper(Term term, String string) {
+	    this.term = term;
+	    this.string = string;
+	}
+	
+	@Override
+	public String toString() {
+	    return string;
+	}
     }
 }

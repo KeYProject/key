@@ -1824,6 +1824,12 @@ public final class LogicPrinter {
              case ';': 
                  sb.append("&#059;");
                  break;
+             case '\n': 
+                 sb.append("<br>");
+                 break;            
+             case ' ':
+             	 sb.append("&nbsp;");
+             	 break;
              default:
                  sb.append(c);
              }
