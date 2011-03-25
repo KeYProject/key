@@ -76,15 +76,15 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
      *                
      * @param services The Services Object belonging to the sequent.
      */
-    public SmtLibTranslator(Sequent sequent, Services services) {
-	super(sequent, services);
+    public SmtLibTranslator(Sequent sequent, Services services, Configuration config) {
+	super(sequent, services,config);
     }
 
     /**
      * For translating only terms and not complete sequents.
      */
-    public SmtLibTranslator(Services s) {
-	super(s);
+    public SmtLibTranslator(Services s,Configuration config) {
+	super(s,config);
     }
 
     protected StringBuffer translateNull() {
@@ -120,12 +120,16 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 	String [] commentPredicate = new String[2];
 	commentPredicate[ContextualBlock.PREDICATE_FORMULA] = "\n\n:notes \"Predicates used in formula:\"";
 	commentPredicate[ContextualBlock.PREDICATE_TYPE]    = "\n\n:notes \"Types expressed by predicates:\"";
-	String [] commentAssumption = new String[5];
+	String [] commentAssumption = new String[8];
 	commentAssumption[ContextualBlock.ASSUMPTION_DUMMY_IMPLEMENTATION] = "\n\n:notes \"Assumptions for dummy variables:\"";
 	commentAssumption[ContextualBlock.ASSUMPTION_FUNCTION_DEFINTION] = "\n\n:notes \"Assumptions for function definitions:\""; 
 	commentAssumption[ContextualBlock.ASSUMPTION_SORT_PREDICATES] = "\n\n:notes \"Assumptions for sort predicates:\"";
 	commentAssumption[ContextualBlock.ASSUMPTION_TYPE_HIERARCHY] = "\n\n:notes \"Assumptions for type hierarchy:\"";
 	commentAssumption[ContextualBlock.ASSUMPTION_TACLET_TRANSLATION]= "\n\n:notes \"Assumptions for taclets:\"";
+	commentAssumption[ContextualBlock.ASSUMPTION_DISTINCT]= "\n\n:notes \"Assumptions for uniqueness of functions:\"";
+	commentAssumption[ContextualBlock.ASSUMPTION_INTEGER]= "\n\n:notes \"Assumptions for very small and very big integers:\"";
+	commentAssumption[ContextualBlock.ASSUMPTION_MULTIPLICATION]= "\n\n:notes \"Assumptions for uninterpreted multiplication:\"";
+	
 	
 	//add the logic definition
 	toReturn.append("\n:logic AUFLIA");

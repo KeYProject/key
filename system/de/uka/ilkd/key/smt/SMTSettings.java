@@ -77,5 +77,19 @@ public interface SMTSettings {
      * Has only some effect if the solver supports a built in feature for uniqueness.
      */
     public boolean useBuiltInUniqueness();
+    
+    /**
+     * Returns <code>true</code> if a uninterpreted function should be used if the
+     * normal normal multiplication is not supported. In case that such a function 
+     * should not be used an exception is thrown when a not supported multiplication
+     * occurs.
+     * */
+    public boolean useUninterpretedMultiplicationIfNecessary();
+    
+    /**
+     * Returns <code>true</code> if for too big respective too small integers (integers that
+     * are not supported) a constant should be introduced.
+     */
+    public boolean useAssumptionsForBigSmallIntegers();
 
 }

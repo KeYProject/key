@@ -193,7 +193,70 @@ public class TemporarySettings extends Settings {
 	     		"those mechanisms are used, otherwise some assumptions are added by using normal FOL.\n" +
 	     		"Note: The uniqueness of functions is needed for translating attributes and arrays.";
 	 }
-     }};
+     },
+     new TableCheckBox() {
+	 public boolean prepareValues() {
+	     setTitle("Use uninterpreted multiplication if necessary.");
+	     setSelected(settingsData.useUIMultiplication);
+	     return true;
+	 }
+
+	 @Override
+	 public void eventChange() {
+	     settingsData.useUIMultiplication = isSelected();
+	 }
+
+	 @Override
+	 public String getInfo() {
+	     return "Some solvers support only simple multiplications. For example Yices supports only multiplications of type a*b" +
+	     	     " where a or b must be a number.\n" +
+	     	     "In order to support more complex multiplications, this option can be activated: If the solver does not support a" +
+	     	     " certain kind of multiplication, the occurence of this multiplication is translated" +
+	     	     " into the uninterpreted function mult. Furthermore some" +
+	     	     " typical assumptions are added:\n" +
+	     	     "\\forall x; mult(x,0)=0\n" +
+	     	     "\\forall x; mult(0,x)=0\n" +
+	     	     "\\forall x; mult(x,1)=x\n" +
+	     	     "\\forall x; mult(1,x)=x\n" +
+	     	     "\\forall x; \\forall y; mult(x,y)=mult(y,x)\n" +
+	     	     "\\forall x; \\forall y; \\forall z; mult(mult(x,y),z)=mult(x,mult(y,z))\n" +
+	     	     "\\forall x; \\forall y; mult(x,y)=0 -> (x=0|y=0)\n" +
+	     	     "\\forall x; \\forall y; mult(x,y)=1 -> (x=1&y=1)\n" +
+	     	     "Note:\n" +
+	     	     "1. If this option is not selected, an exception is thrown in the case that a unsupported multiplication " +
+	     	     "occurs.\n" +
+	     	     "2. The translation makes the uninterpreted function mult unique, so that there cannot be any clashes with functions" +
+	     	     " that are introduced by the user.";
+	 }
+     },
+     new TableCheckBox() {
+	 public boolean prepareValues() {
+	    
+	     setTitle("Use uninterpreted constants for too small or too big numbers." );
+	     setSelected(settingsData.useConstantsForIntegers);
+	     return true;
+	 }
+
+	 @Override
+	 public void eventChange() {
+	     settingsData.useConstantsForIntegers = isSelected();
+	 }
+
+	 @Override
+	 public String getInfo() {
+	     return "Some solvers support only a certain interval of integers (e.g. Simplify). If this option is activated," +
+	     		" numbers that are not supported by the used solver are translated into uninterpreted constants. Furthermore " +
+	     		" an asumption is added that states that the introduced constant is greater than the maximum of the supported numbers.\n\n" +
+	     		"Example: Assume that a solver supports numbers less or equal 10:\n" +
+	     		"The number 11 is translated into the constant c_11 and the assumption" +
+	     		" c_11>10 is introduced.\n\n" +
+	     		"Note: If this option is not selected, an exception is thrown in the case that a not supported number occurs.\n";
+	 }
+     }
+     
+     
+     
+     };
      return data;
      } 
 

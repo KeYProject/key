@@ -10,20 +10,24 @@
 
 package de.uka.ilkd.key.smt;
 
+import java.io.StringWriter;
 import java.util.*;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.taclettranslation.DefaultTacletSetTranslation;
 import de.uka.ilkd.key.smt.taclettranslation.TacletFormula;
 import de.uka.ilkd.key.smt.taclettranslation.TacletSetTranslation;
+import de.uka.ilkd.key.strategy.feature.TernarySumFeature;
 import de.uka.ilkd.key.util.Debug;
 
 
@@ -41,6 +45,25 @@ import de.uka.ilkd.key.util.Debug;
  *
  */
 public abstract class AbstractSMTTranslator implements SMTTranslator {
+    
+    public static class Configuration{
+	/**
+	  * Some solvers (e.q Yices) support only multiplications where 
+	  * one operand is a simple integer (even a constant symbol is not
+	  * allowed.).
+	  * In this case the multiplication is translated into a uninterpreted
+	  * function with some assumptions.
+	  */
+	private boolean supportsOnlySimpleMultiplication = false;
+
+	public Configuration(boolean supportsOnlySimpleMultiplication) {
+	    super();
+	    this.supportsOnlySimpleMultiplication = supportsOnlySimpleMultiplication;
+        }
+	
+	
+	 
+    }
 
     private static final TermBuilder TB = TermBuilder.DF;
 
@@ -68,6 +91,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     protected final Set<Operator> functionSet = new HashSet<Operator>();
 
     protected final Set<Sort> sortSet = new HashSet<Sort>();
+    
 
     /** remember all function declarations */
 
@@ -135,6 +159,15 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     /** map used for storing predicates representing modalities or updates */
     private HashMap<Term, StringBuffer> modalityPredicates = new HashMap<Term, StringBuffer>();
     
+    /**If a integer is not supported by a solver because it is too big, the integer is translated into
+     * a constant. This constants are stored at this place. */
+    private final HashMap<Long,StringBuffer> constantsForBigIntegers =
+	new HashMap<Long, StringBuffer>();
+    /**If a integer is not supported by a solver because it is too small, the integer is translated into 
+     * a constant. 
+     */
+    private final HashMap<Long,StringBuffer> constantsForSmallIntegers =
+	new HashMap<Long, StringBuffer>();
 
 
     //assumptions. they have to be added to the formula!
@@ -152,6 +185,18 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     private ArrayList<StringBuffer> tacletAssumptions = new ArrayList<StringBuffer>();
     
     private SMTSettings smtSettings = null;
+    private Configuration config    = null;
+    
+    /**
+     * If the solver supports only simple multiplications, complex multiplications
+     * are translated into a uninterpreted function. The name of the function is stored
+     * here.
+     */
+    private Function multiplicationFunction = null;
+    
+    
+    
+
     
     public TacletSetTranslation  getTacletSetTranslation() {return tacletSetTranslation;}
     
@@ -164,8 +209,10 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * @param services
      * 		      The services object belonging to sequent.
      */
-    public AbstractSMTTranslator(Sequent sequent, Services services) {
+    public AbstractSMTTranslator(Sequent sequent, Services services, Configuration config) {
+	this.config = config;
 	integerSort = services.getTypeConverter().getIntegerLDT().targetSort();
+	
     }
 
 
@@ -175,8 +222,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * @param s
      *  		 
      */
-    public AbstractSMTTranslator(Services s) {
-	this(null, s);
+    public AbstractSMTTranslator(Services s, Configuration config) {
+	this(null, s,config);
     }
     
      
@@ -229,6 +276,23 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     protected final SMTSettings getSettings(){
 	return smtSettings;
     }
+    
+    private Function getMultiplicationFunction(Services services) {
+	if(multiplicationFunction == null){
+	    Function reference = services.getTypeConverter().getIntegerLDT().getMul();
+
+	    multiplicationFunction = new 
+	    Function(new Name(TermBuilder.DF.newName(services, "unin_mult")),
+		     reference.sort(),reference.argSorts());
+	}
+	return multiplicationFunction;
+    }
+    
+    private boolean isUsingUninterpretedMultiplication(){
+	return multiplicationFunction != null;
+    }
+    
+    
 
     
     
@@ -282,6 +346,14 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	toReturn.addAll(buildUniqueAssumptions());
 	assumptionTypes.add(new ContextualBlock(start,toReturn.size()-1,ContextualBlock.ASSUMPTION_DISTINCT));
 	
+	start = toReturn.size();
+	toReturn.addAll(buildAssumptionsForIntegers());
+	assumptionTypes.add(new ContextualBlock(start,toReturn.size()-1,ContextualBlock.ASSUMPTION_INTEGER));
+	start = toReturn.size();
+	if(isUsingUninterpretedMultiplication()){
+	    toReturn.addAll(buildAssumptionsForUninterpretedMultiplication(services));
+	}
+	assumptionTypes.add(new ContextualBlock(start,toReturn.size()-1,ContextualBlock.ASSUMPTION_MULTIPLICATION));
 	return toReturn;
     }
     
@@ -698,6 +770,96 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 		}
 	}	
 	return distinct; 
+    }
+    
+    private Term createLogicalVar(Services services, String baseName, Sort sort){
+	return TermBuilder.DF.var(new LogicVariable(new Name(TermBuilder.DF.newName(services, baseName)), sort));
+    }
+    
+    private ArrayList<StringBuffer> buildAssumptionsForUninterpretedMultiplication(Services services) 
+    throws IllegalFormulaException{
+	ArrayList<StringBuffer> result = new ArrayList<StringBuffer>();
+	Sort sort = services.getTypeConverter().getIntegerLDT().getMul().sort();
+	Function mult = getMultiplicationFunction(services);
+	TermBuilder tb = TermBuilder.DF;
+	Term zero = tb.zero(services);
+	Term one  = tb.one(services);
+	LinkedList<Term> multAssumptions = new LinkedList<Term>();
+	
+	Term x = createLogicalVar(services, "x", sort);
+	Term y = createLogicalVar(services, "y", sort);
+	Term z = createLogicalVar(services, "z", sort);
+	multAssumptions.add(tb.equals(tb.func(mult, x, zero),zero));
+	multAssumptions.add(tb.equals(tb.func(mult, zero,x),zero));
+	multAssumptions.add(tb.equals(tb.func(mult, x, one),x));
+	multAssumptions.add(tb.equals(tb.func(mult, one, x),x));
+	multAssumptions.add(tb.equals(tb.func(mult, x, y),tb.func(mult, y, x)));
+	multAssumptions.add(tb.equals(tb.func(mult, tb.func(mult, y, x), z),tb.func(mult, y,tb.func(mult, x, z))));
+	multAssumptions.add(tb.imp(tb.equals(tb.func(mult,x,y), zero),tb.or(tb.equals(x,zero),tb.equals(y, zero))));
+	multAssumptions.add(tb.imp(tb.equals(tb.func(mult,x,y), one),tb.and(tb.equals(x,one),tb.equals(y, one))));
+	for(Term assumption : multAssumptions){
+	    assumption = tb.allClose(assumption);
+	    result.add(translateTerm(assumption, new Vector<QuantifiableVariable>(), services));
+	}	
+	return result;
+    }
+    
+    private ArrayList<StringBuffer> buildAssumptionsForIntegers() throws IllegalFormulaException{
+	ArrayList<StringBuffer> result = new ArrayList<StringBuffer>();
+	result.addAll(buildAssumptionsForIntegers(this.constantsForBigIntegers.values(), true));
+	result.addAll(buildAssumptionsForIntegers(this.constantsForSmallIntegers.values(), false));
+	return result;
+    }
+    
+    private ArrayList<StringBuffer> buildAssumptionsForIntegers(Collection<StringBuffer> constants,boolean upperBound)
+    throws IllegalFormulaException{
+	ArrayList<StringBuffer> result = new ArrayList<StringBuffer>();
+	for(StringBuffer constant : constants){
+	    if(upperBound){
+		result.add(translateIntegerLt(translateIntegerValue(getMaxNumber()),constant));
+	    }
+	    else{
+		result.add(translateIntegerGt(translateIntegerValue(getMinNumber()), constant));
+	    }
+	}
+	return result;
+    }
+    
+    private HashMap<Long,StringBuffer> getRightConstantContainer(long integer){
+	return integer < 0 ? constantsForSmallIntegers : constantsForBigIntegers;
+    }
+    
+    private Term getRightBorderAsTerm(long integer,Services services){
+	return TermBuilder.DF.zTerm(services, 
+		Long.toString(getRightBorderAsInteger(integer, services)));
+    }
+   
+    private Long getRightBorderAsInteger(long integer,Services services){
+	return integer < 0 ? getMinNumber() :
+	                     getMaxNumber();
+    }
+    
+    private StringBuffer getNameForIntegerConstant(Services services,long integer){
+	String val = Long.toString(integer);
+	val = integer < 0 ? "min"+val.substring(1) : val;
+	return new StringBuffer(TermBuilder.DF.newName(services, "i")+"_"+val);
+	
+    }
+    
+    private StringBuffer buildUniqueConstant(long integer, Services services) throws IllegalFormulaException{
+	HashMap<Long,StringBuffer> map = getRightConstantContainer(integer);
+	StringBuffer buf = map.get(integer);
+	if(buf != null){
+	    return buf; 
+	}
+	StringBuffer name = translateFunctionName(getNameForIntegerConstant(services, integer));
+	buf = translateFunction(name
+		, new ArrayList<StringBuffer>());
+	map.put(integer, buf);
+	Term term = getRightBorderAsTerm(integer, services);
+	addConstantTypePredicate(term, 
+		translateIntegerValue(getRightBorderAsInteger(integer, services)));
+	return buf;
     }
 
     /**
@@ -1322,6 +1484,15 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	}
     }
     
+    private void addConstantTypePredicate(Term term, StringBuffer name){
+	    if (!this.constantTypePreds.containsKey(term)) {
+		this.translateSort(term.sort());
+		StringBuffer typePred = this.getTypePredicate(term
+			.sort(), name);
+		this.constantTypePreds.put(term, typePred);
+	    }
+    }
+    
     
     
     /**
@@ -1563,6 +1734,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 		    return this.translateIntegerUnaryMinus(arg1);
 		} else if (fun == services.getTypeConverter().getIntegerLDT()
 			.getMul()) {
+	
 		    StringBuffer arg1 = translateTerm(term.sub(0), quantifiedVars,
 			    services);
 		    StringBuffer arg2 = translateTerm(term.sub(1), quantifiedVars,
@@ -1570,6 +1742,25 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 		  //add the function to the used ones
 		    this.addSpecialFunction(fun);
 		    //return the final translation
+		    ArrayList<StringBuffer> list = new ArrayList<StringBuffer>();
+		    list.add(arg1);
+		    list.add(arg2);
+		    
+		    if(isComplexMultiplication(services,term.sub(0),term.sub(1)) &&
+			config.supportsOnlySimpleMultiplication){
+			if(smtSettings.useUninterpretedMultiplicationIfNecessary()){
+			    Function unin_mult = getMultiplicationFunction(services);
+			    return this.translateAsUninterpretedFunction(unin_mult, quantifiedVars, 
+				term.subs(), services);
+			}else{
+			    String mult = LogicPrinter.quickPrintTerm(term, services);
+			    throw new IllegalFormulaException("The multiplication "+ mult + " is not" +
+			    		" supported by this solver.\nThe problem can be" +
+			    		" handled by using uninterpreted functions.\nFor more information see the settings of" +
+			    		" the SMT integration: Options/SMT Settings/Translation.");
+			}
+		    }
+		    
 		    return this.translateIntegerMult(arg1, arg2);
 		} else if (fun == services.getTypeConverter().getIntegerLDT()
 			.getDiv()) {
@@ -1581,43 +1772,34 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 		    this.addSpecialFunction(fun);
 		    //return the final translation
 		    return this.translateIntegerDiv(arg1, arg2);
-		} else if (fun == services.getTypeConverter().getIntegerLDT()
-			.getNumberSymbol()) {
+		} else if (isNumberSymbol(services,fun)) {
 		    Debug.assertTrue(term.arity() == 1);
 		    long num = NumberTranslation.translate(term.sub(0))
 			    .longValue();
-		    StringBuffer numVal = translateIntegerValue(num);
-		    
+		    StringBuffer numVal;
+		    if(hasNumberLimit() &&
+		        (num < getMinNumber() || num > getMaxNumber())){
+			if(smtSettings.useAssumptionsForBigSmallIntegers()){
+			    numVal = buildUniqueConstant(num,services);  
+			}else{
+			    throw new IllegalNumberException("The number "+num+" is not supported" +
+			    		" by this solver. Either it is too big or too small.\nThe problem can be" +
+			    		" handled by using uninterpreted constants. For more information see the settings of" +
+			    		" the SMT integration: Options/SMT Settings/Translation.");
+			}
+		    }else{
+		     numVal = translateIntegerValue(num);
+		    }   
+
 		    // add the type predicate for this
 		    // constant
-		    if (!this.constantTypePreds.containsKey(term)) {
-			this.translateSort(term.sort());
-			StringBuffer typePred = this.getTypePredicate(term
-				.sort(), numVal);
-			this.constantTypePreds.put(term, typePred);
-		    }
+		    addConstantTypePredicate(term, numVal);
+	
 
 		    return numVal;
 		} else {
-		    // an uninterpreted function. just
-		    // translate it as such
-		    ArrayList<StringBuffer> subterms = new ArrayList<StringBuffer>();
-		    for (int i = 0; i < fun.arity(); i++) {
-			//make type casts, if neccessary
-			StringBuffer subterm = translateTerm(term.sub(i), quantifiedVars,
-				services);
-			if (this.isMultiSorted()) {
-			    subterm = this.castIfNeccessary(subterm, term.sub(i).sort(), fun.argSort(i));
-			}
-			subterms.add(subterm);
-		    }
-		    ArrayList<Sort> sorts = new ArrayList<Sort>();
-		    for (int i = 0; i < fun.arity(); i++) {
-			sorts.add(fun.argSort(i));
-		    }
-		    this.addFunction(fun, sorts, fun.sort());
-
-		    return translateFunc(fun, subterms);
+		   return translateAsUninterpretedFunction(fun, quantifiedVars,
+			    term.subs(), services);
 		}
 	    }
 	} else {
@@ -1629,6 +1811,39 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	}
     }
     
+    private StringBuffer translateAsUninterpretedFunction(Function fun, 
+	    Vector<QuantifiableVariable> quantifiedVars, ImmutableArray<Term> subs,
+	    Services services) throws IllegalFormulaException{
+	    // an uninterpreted function. just
+	    // translate it as such
+	    ArrayList<StringBuffer> subterms = new ArrayList<StringBuffer>();
+	    int i=0;
+	    for (Term sub :  subs) {
+		//make type casts, if neccessary
+		StringBuffer subterm = translateTerm(sub, quantifiedVars,
+			services);
+		if (this.isMultiSorted()) {
+		    subterm = this.castIfNeccessary(subterm, sub.sort(), fun.argSort(i));
+		}
+		subterms.add(subterm);
+		i++;
+	    }
+
+	    this.addFunction(fun, getArgSorts(fun), fun.sort());
+	
+	    return translateFunc(fun, subterms);
+    }
+    
+    private boolean isNumberSymbol(Services services, Operator op){
+	return op == services.getTypeConverter().getIntegerLDT()
+	.getNumberSymbol();
+    }
+    
+    private boolean isComplexMultiplication(Services services,Term t1, Term t2) {
+	return !isNumberSymbol(services,t1.op()) && !isNumberSymbol(services, t2.op());
+	
+    }
+
     /** This stringbuffer is used as predicate name for casts from int-valued to u-valued obects */
     private StringBuffer castPredicate;
     
@@ -2018,5 +2233,31 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	
 	return result;	
 	}
+    
+    /**
+     * Returns the maximum number that is supported by the solver. 
+     * This limit is only considered if <code>hasNumberLimit</code>
+     * returns <code>true</code>.
+     * */
+    protected long getMaxNumber(){
+	return 0;
+    }
 
+    /**
+     * Returns the minimum number that is supported by the solver. 
+     * This limit is only considered if <code>hasNumberLimit</code>
+     * returns <code>true</code>.
+     * */
+    protected long getMinNumber(){
+	
+	return 0;
+    }
+    
+    /**
+     * returns <code>true</code> if the format supports only integers within
+     * a certain interval.
+     */
+    protected boolean hasNumberLimit(){
+	return false;
+    }
 }

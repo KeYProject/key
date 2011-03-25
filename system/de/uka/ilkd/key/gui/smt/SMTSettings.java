@@ -63,6 +63,10 @@ class SettingsData{
     
     private static final String USE_BUILT_IN_UNIQUENESS = "[SMTSettings]UseBuiltUniqueness";
     
+    private static final String USE_UNINTERPRETED_MULTIPLICATION = "[SMTSettings]useUninterpretedMultiplication";
+    
+    private static final String USE_CONSTANTS_FOR_BIGSMALL_INTEGERS = "[SMTSettings]useConstantsForBigOrSmallIntegers";
+    
     public final static int    PROGRESS_MODE_USER = 0;
     public final static int    PROGRESS_MODE_CLOSE = 1;
     public final static int    PROGRESS_MODE_CLOSE_FIRST = 2;
@@ -77,6 +81,8 @@ class SettingsData{
     public boolean useExplicitTypeHierarchy     = false;
     public boolean useNullInstantiation         = true;
     public boolean useBuiltInUniqueness          = false;
+    public boolean useUIMultiplication          = true;
+    public boolean useConstantsForIntegers     = true;
     public long    timeout                      = 5000;
     public int     maxConcurrentProcesses        = 5;
     public int     maxGenericSorts               = 2;
@@ -103,6 +109,8 @@ class SettingsData{
 	this.modeOfProgressDialog          = data.modeOfProgressDialog;
 	this.tacletSelection	           = data.tacletSelection;
 	this.useBuiltInUniqueness          = data.useBuiltInUniqueness;
+	this.useUIMultiplication           = data.useUIMultiplication;
+	this.useConstantsForIntegers	   = data.useConstantsForIntegers;
 	
 	
 	for(Entry<SolverType, SolverData> entry : data.dataOfSolvers.entrySet()){
@@ -175,6 +183,9 @@ class SettingsData{
     	activeSolver             = read(props,ACTIVE_SOLVER,activeSolver);
     	tacletSelection          = read(props,TACLET_SELECTION,tacletSelection);
     	
+    	useUIMultiplication      = read(props,USE_UNINTERPRETED_MULTIPLICATION,useUIMultiplication);
+    	useConstantsForIntegers  = read(props,USE_CONSTANTS_FOR_BIGSMALL_INTEGERS,useConstantsForIntegers);
+    	
     	for(SolverData solverData : dataOfSolvers.values()){
     	    solverData.readSettings(props);
     	}
@@ -195,6 +206,8 @@ class SettingsData{
         store(props,MAX_GENERIC_SORTS,maxGenericSorts);
         store(props,TACLET_SELECTION,tacletSelection);
         store(props,USE_BUILT_IN_UNIQUENESS,useBuiltInUniqueness);
+        store(props,USE_UNINTERPRETED_MULTIPLICATION,useUIMultiplication);
+        store(props,USE_CONSTANTS_FOR_BIGSMALL_INTEGERS,useConstantsForIntegers);
         
     	for(SolverData solverData : dataOfSolvers.values()){
     	    solverData.writeSettings(props);
@@ -598,6 +611,20 @@ public class SMTSettings implements Settings, de.uka.ilkd.key.smt.SMTSettings{
 	    }
 	}
 	return index;
+    }
+
+
+
+    @Override
+    public boolean useAssumptionsForBigSmallIntegers() {
+	return settingsData.useConstantsForIntegers;
+    }
+
+
+
+    @Override
+    public boolean useUninterpretedMultiplicationIfNecessary() {
+	return settingsData.useUIMultiplication;
     }
     
 

@@ -17,6 +17,8 @@ import java.awt.event.ActionListener;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Iterator;
@@ -104,8 +106,13 @@ public class SolverListener implements SolverLauncherListener {
 	    int problemIndex = problem.getProblemIndex();
 	    
 	    if (problem.solver.getException() != null) {
+		
+		StringWriter writer = new StringWriter();
+		
+		problem.solver	
+                .getException().printStackTrace(new PrintWriter(writer));
 		Information info = new Information("Error-Message", problem.solver
-	                .getException().toString()
+	                .getException().toString()+"\n\n" + writer.toString()
 	        	,problem.solver.name());
 		getPanel(problem).addInformation(
 		        problemIndex, info);

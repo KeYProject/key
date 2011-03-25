@@ -10,10 +10,7 @@
 
 package de.uka.ilkd.key.smt;
 
-/**
- * @author niederma
- *
- */
+
 public class IllegalNumberException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;

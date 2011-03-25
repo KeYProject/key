@@ -85,7 +85,7 @@ public class SettingsDialog {
 	if (jDialog == null) {
 	    jDialog = new JDialog();
 
-	    int left = getOptionTree().getPreferredSize().width, right = 600, height = getOptionTable()
+	    int left = getOptionTree().getPreferredSize().width, right = 650, height = getOptionTable()
 		    .getPreferredScrollableViewportSize().height;
 
 	    jDialog.setSize(new Dimension(left + right, (int) (1.25 * height)));
