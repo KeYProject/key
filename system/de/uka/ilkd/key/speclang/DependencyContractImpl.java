@@ -256,11 +256,14 @@ public final class DependencyContractImpl implements DependencyContract {
     
     @Override
     public String getHTMLText(Services services) {
-	final String pre = LogicPrinter.quickPrintTerm(originalPre, services);
+	final String pre = LogicPrinter.quickPrintTerm(originalPre, services)
+				       .replace("\n", " ");
         final String mby = hasMby() 
         	           ? LogicPrinter.quickPrintTerm(originalMby, services)
+        	        	         .replace("\n", " ")
         	           : null;
-        final String dep = LogicPrinter.quickPrintTerm(originalDep, services);
+        final String dep = LogicPrinter.quickPrintTerm(originalDep, services)
+         			       .replace("\n", " ");
                       
         return "<html>"
                 + "<b>pre</b> "

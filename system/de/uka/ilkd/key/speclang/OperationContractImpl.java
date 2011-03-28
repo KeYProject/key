@@ -478,12 +478,16 @@ public final class OperationContractImpl implements OperationContract {
 	sig.append(originalExcVar);
 	sig.append(")");
 	
-        final String pre  = LogicPrinter.quickPrintTerm(originalPre, services);
+        final String pre  = LogicPrinter.quickPrintTerm(originalPre, services)
+        			        .replace("\n", " ");
         final String mby  = hasMby() 
         		    ? LogicPrinter.quickPrintTerm(originalMby, services)
+        			          .replace("\n", " ")
         	            : null;        
-        final String post = LogicPrinter.quickPrintTerm(originalPost, services);
-        final String mod  = LogicPrinter.quickPrintTerm(originalMod, services);
+        final String post = LogicPrinter.quickPrintTerm(originalPost, services)
+                                        .replace("\n", " ");
+        final String mod  = LogicPrinter.quickPrintTerm(originalMod, services)
+        				.replace("\n", " ");
                       
         return "<html>"
                 + "<i>" + LogicPrinter.escapeHTML(sig.toString()) + "</i>"

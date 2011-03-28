@@ -26,7 +26,9 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.mgt.ProofStatus;
@@ -306,8 +308,21 @@ public final class ProofManagementDialog extends JDialog {
         	    Arrays.sort(targetsArr, new Comparator<ObserverFunction>() {
         		public int compare(ObserverFunction o1, 
         			           ObserverFunction o2) {
-        		    return o1.name().toString()
-        		                    .compareTo(o2.name().toString());
+                	    if(o1 instanceof ProgramMethod 
+                     	       && !(o2 instanceof ProgramMethod)) {
+                     		return -1;
+                     	    } else if(!(o1 instanceof ProgramMethod) 
+                     		      && o2 instanceof ProgramMethod) {
+                     		return 1;
+                     	    } else {
+                     		String s1 = o1.name() instanceof ProgramElementName 
+                     		            ? ((ProgramElementName)o1.name()).getProgramName()
+                     		            : o1.name().toString();
+                     		String s2 = o2.name() instanceof ProgramElementName 
+                     		            ? ((ProgramElementName)o2.name()).getProgramName()
+                     		            : o2.name().toString();
+                     		return s1.compareTo(s2);
+                     	    }
         		}
         	    });
         	    for(ObserverFunction target : targetsArr) {
