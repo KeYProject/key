@@ -75,9 +75,11 @@ public class Proof implements Named {
     private AbbrevMap abbreviations = new AbbrevMap();
 
     /** User constraint */
+    @Deprecated
     private ConstraintTableModel userConstraint = new ConstraintTableModel ();    
 
     /** Deliverer for new metavariables */
+    @Deprecated
     private MetavariableDeliverer metavariableDeliverer;
 
     /** the environment of the proof with specs and java model*/
@@ -324,10 +326,12 @@ public class Proof implements Named {
     /** returns the user constraint (table model)
      * @return the user constraint
      */
+    @Deprecated
     public ConstraintTableModel getUserConstraint() {
 	return userConstraint;
     }
 
+    @Deprecated
     private void addConstraintListener() {
 	getUserConstraint ()
 	    .addConstraintTableListener ( new ConstraintTableListener () {
@@ -355,6 +359,7 @@ public class Proof implements Named {
     }
     
     /** @return Deliverer of new metavariables (with unique names)*/
+    @Deprecated    
     public MetavariableDeliverer getMetavariableDeliverer () {
 	return metavariableDeliverer;
     }

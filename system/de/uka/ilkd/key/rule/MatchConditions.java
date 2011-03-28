@@ -32,7 +32,9 @@ public class MatchConditions {
                               RenameTable.EMPTY_TABLE);
 
     private SVInstantiations   instantiations   = SVInstantiations.EMPTY_SVINSTANTIATIONS;
+    @Deprecated
     private Constraint         constraint       = Constraint.BOTTOM;
+    @Deprecated
     private ImmutableSet<Metavariable>  newMetavariables = DefaultImmutableSet.<Metavariable>nil();
 
     private RenameTable renameTable = RenameTable.EMPTY_TABLE;
@@ -60,10 +62,12 @@ public class MatchConditions {
                                          constraint, newMetavariables, renameTable );
     }
 
+    @Deprecated
     public Constraint         getConstraint       () {
 	return constraint;
     }
 
+    @Deprecated
     public MatchConditions    setConstraint       ( Constraint         p_constraint ) {
 	if ( constraint == p_constraint )
 	    return this;
@@ -72,10 +76,12 @@ public class MatchConditions {
                                          renameTable );
     }
 
+    @Deprecated
     public ImmutableSet<Metavariable> getNewMetavariables () {
 	return newMetavariables;
     }
 
+    @Deprecated
     public MatchConditions    setNewMetavariables ( ImmutableSet<Metavariable>  p_newMetavariables ) {
 	if ( newMetavariables == p_newMetavariables )
 	    return this;
@@ -83,7 +89,7 @@ public class MatchConditions {
 	    return new MatchConditions ( instantiations, constraint, p_newMetavariables, renameTable );
     }
 
-    
+    @Deprecated
     public MatchConditions    addNewMetavariable  ( Metavariable       p_mv ) {
 	return new MatchConditions ( instantiations, constraint, newMetavariables.add ( p_mv ), 
                                      renameTable );

@@ -19,7 +19,9 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 
-
+/**
+ * Resolver for method calls in specifications.
+ */
 public final class SLMethodResolver extends SLExpressionResolver {
   
     public SLMethodResolver(JavaInfo javaInfo, 

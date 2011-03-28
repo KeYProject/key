@@ -13,7 +13,9 @@ package de.uka.ilkd.key.speclang.jml.pretranslation;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.speclang.PositionedString;
 
-
+/**
+ * A JML field declaration (ghost or model) in textual form.
+ */
 public final class TextualJMLFieldDecl extends TextualJMLConstruct {
     
     private final PositionedString decl;

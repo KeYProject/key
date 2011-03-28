@@ -26,6 +26,7 @@ import de.uka.ilkd.key.util.Debug;
  * This derivative does also detect subtrees which are completely
  * closed
  */
+@Deprecated
 public class BranchRestricter extends Restricter {
 
     Node       node           = null;

@@ -12,7 +12,10 @@ package de.uka.ilkd.key.speclang;
 
 import de.uka.ilkd.key.java.Position;
 
-
+/**
+ * A string with associated position information (file and line number). The
+ * position information is used for error reporting.
+ */
 public class PositionedString {
    
     public final String text;

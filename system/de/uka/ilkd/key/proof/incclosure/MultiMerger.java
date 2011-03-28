@@ -21,6 +21,7 @@ import de.uka.ilkd.key.util.Debug;
 /**
  * Class for merging an arbitrary number of constraint streams
  */
+@Deprecated
 public class MultiMerger implements Merger {
 
     /**

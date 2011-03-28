@@ -15,6 +15,9 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 
+/**
+ * Wraps a list of expressions.
+ */
 public final class SLParameters {
     
     private final ImmutableList<SLExpression> parameters;

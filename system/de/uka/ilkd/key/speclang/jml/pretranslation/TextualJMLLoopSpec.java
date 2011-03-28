@@ -18,6 +18,10 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.speclang.PositionedString;
 
 
+/**
+ * A JML loop specification (invariant, assignable clause, decreases 
+ * clause, ...) in textual form.
+ */
 public final class TextualJMLLoopSpec extends TextualJMLConstruct {
 
     private ImmutableList<PositionedString> invariant          

@@ -638,15 +638,18 @@ public class Goal  {
            ruleAppIndex.removeNoPosTacletApp(it.next ());
     }
 
-    
+
+    @Deprecated    
     public Constraint getClosureConstraint () {
 	return node ().getClosureConstraint ();
     }
 
+    @Deprecated    
     public void addClosureConstraint ( Constraint c ) {
 	node ().addClosureConstraint ( c );
     }
 
+    @Deprecated
     public void addRestrictedMetavariable ( Metavariable mv ) {
 	node ().addRestrictedMetavariable ( mv );
     }

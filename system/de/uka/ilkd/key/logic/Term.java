@@ -118,6 +118,7 @@ public interface Term extends SVSubstitute {
      * the variables in <code>freeVars</code> are bound by some quantifier above)
      * @return the set of metavariables
      */
+    @Deprecated
     public ImmutableSet<Metavariable> metaVars();       
     
     /** 

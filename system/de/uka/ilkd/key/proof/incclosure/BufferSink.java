@@ -19,6 +19,7 @@ import de.uka.ilkd.key.logic.op.Metavariable;
  * Sink buffering all constraints that are pushed using "put",
  * offering the possibility to reset the tree of sinks
  */
+@Deprecated
 public class BufferSink implements Sink {
 
     private Constraint buffer;

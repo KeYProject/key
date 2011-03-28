@@ -28,6 +28,11 @@ import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 
 
+/**
+ * A class axiom that connects an observer symbol representing a Java
+ * method (i.e., an object of type ProgramMethod), with the corresponding
+ * method body.
+ */
 public final class QueryAxiom implements ClassAxiom {
     
     private static final TermBuilder TB = TermBuilder.DF;

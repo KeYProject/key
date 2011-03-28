@@ -44,14 +44,18 @@ public class Node {
     private boolean              closed              = false;
 
     /** Root sink if this is a root node */
+    @Deprecated
     private BufferSink           rootSink            = null;
 
+    @Deprecated
     private BufferSink           localSink;
 
     /** Parent of all sinks on this branch */
+    @Deprecated
     private Sink                 branchSink;
 
     /** For children.size()>1 this merger will be used */
+    @Deprecated
     private MultiMerger          forkMerger          = null;
 
     /** contains non-logical content, used for user feedback */
@@ -253,6 +257,7 @@ public class Node {
      * ultimately more than one sink is needed, the first call to this
      * method MUST have p_count>1.
      */
+    @Deprecated
     public Iterator<Sink> reserveSinks ( int p_count ) {
 	if ( p_count == 1 && forkMerger == null )
 	    return ImmutableSLList.<Sink>nil().prepend ( branchSink ).iterator ();
@@ -281,6 +286,7 @@ public class Node {
      * remove the connection between the children sinks and the branch
      * sink.
      */
+    @Deprecated
     public void cutChildrenSinks () {
 	if ( forkMerger != null )
 	    forkMerger = null;
@@ -288,13 +294,13 @@ public class Node {
 	resetBranchSink ();
     }
 
-    /**
-     * 
-     */
+
+    @Deprecated
     public void resetBranchSink () {
         localSink.reset ();
     }
 
+    @Deprecated
     public BufferSink insertLocalRootSink () {
         Debug.assertFalse ( forkMerger == null,
                             "insertLocalRootSink() must only be called for " +
@@ -306,6 +312,7 @@ public class Node {
         return localRoot;
     }
     
+    @Deprecated
     public void removeLocalRootSink () {
         Debug.assertFalse ( forkMerger == null,
                             "removeLocalRootSink() must only be called for " +
@@ -552,18 +559,22 @@ public class Node {
     }
 
 
+    @Deprecated
     public Constraint getClosureConstraint () {
 	return localSink.getConstraint ();
     }
 
+    @Deprecated
     public void addClosureConstraint ( Constraint c ) {
 	localSink.put ( c );
     }
 
+    @Deprecated
     public void addRestrictedMetavariable ( Metavariable mv ) {
 	localSink.addRestriction ( mv );
     }
 
+    @Deprecated
     public ImmutableSet<Metavariable> getRestrictedMetavariables () {
 	if ( branchSink instanceof Restricter )
 	    return ((Restricter)branchSink).getRestrictions ();
@@ -571,10 +582,12 @@ public class Node {
 	    return DefaultImmutableSet.<Metavariable>nil();
     }
 
+    @Deprecated
     public BufferSink getRootSink () {
 	return rootSink;
     }
 
+    @Deprecated
     public Sink getBranchSink () {
 	return branchSink;
     }

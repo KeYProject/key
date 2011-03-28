@@ -20,6 +20,7 @@ import de.uka.ilkd.key.logic.op.TermSV;
  * TermSV, the second one a FormulaSV, representing a "c new depending
  * on phi" statement within a varcond of a taclet
  */
+@Deprecated
 public class NewDependingOn {
 
     private SchemaVariable first;

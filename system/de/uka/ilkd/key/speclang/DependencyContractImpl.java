@@ -22,7 +22,9 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
 
-
+/**
+ * Standard implementation of the DependencyContract interface.
+ */
 public final class DependencyContractImpl implements DependencyContract {
     
     private static final TermBuilder TB = TermBuilder.DF;

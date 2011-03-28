@@ -37,6 +37,9 @@ import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 
 
+/**
+ * A class axiom corresponding to a JML* represents clause.
+ */
 public final class RepresentsAxiom implements ClassAxiom {
     
     private static final TermBuilder TB = TermBuilder.DF;

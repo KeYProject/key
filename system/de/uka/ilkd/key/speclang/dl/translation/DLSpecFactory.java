@@ -30,7 +30,7 @@ import de.uka.ilkd.key.speclang.*;
 
 /**
  * A factory for creating class invariants and operation contracts from DL
- * specifications.
+ * specifications. For an example, see java_dl/DLContractChooser.
  */
 public final class DLSpecFactory {
 

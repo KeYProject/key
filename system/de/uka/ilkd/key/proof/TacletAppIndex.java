@@ -440,6 +440,7 @@ public class TacletAppIndex  {
         return seq;
     }
 
+    @Deprecated
     private Constraint getUserConstraint() {
         return getProof ().getUserConstraint ().getConstraint ();
     }

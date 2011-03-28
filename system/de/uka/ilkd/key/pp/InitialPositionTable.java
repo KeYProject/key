@@ -105,6 +105,7 @@ public class InitialPositionTable extends PositionTable{
 	return p;
     }
 
+    @Deprecated
     private ImmutableList<Integer> prependPathBelowMV(ImmutableList<Integer> p,
                                              PosInOccurrence pio,
                                              SequentPrintFilterEntry entry) {
@@ -129,6 +130,7 @@ public class InitialPositionTable extends PositionTable{
      * @return true iff the display constraint is compatible with
      *         <code>pio</code>
      */
+    @Deprecated
     private boolean checkCompatibleDisplayConstraint (PosInOccurrence pio,
                                                       SequentPrintFilterEntry entry) {
         final Term mvTerm =

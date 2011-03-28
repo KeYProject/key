@@ -11,7 +11,10 @@
 package de.uka.ilkd.key.speclang;
 
 
-
+/**
+ * Common superinterface of all constructs created by the specification
+ * language front ends and managed by SpecificationRepository.
+ */
 public interface SpecificationElement {
     
 }

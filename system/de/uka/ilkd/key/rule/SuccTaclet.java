@@ -124,7 +124,4 @@ public class SuccTaclet extends FindTaclet{
 	b.setFind(find());
 	return super.setName(s, b);
     }
-
-   
-
 }

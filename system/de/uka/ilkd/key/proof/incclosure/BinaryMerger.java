@@ -23,6 +23,7 @@ import de.uka.ilkd.key.logic.op.Metavariable;
 /**
  * Class for merging two constraint streams
  */
+@Deprecated
 public class BinaryMerger implements Merger {
 
     private MergerSink leftSink  = new MergerSink ();

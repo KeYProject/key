@@ -306,6 +306,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
 	return getProof ().getServices ();
     }
 
+    @Deprecated
     private Constraint getUserConstraint() {
         return getProof ().getUserConstraint ().getConstraint ();
     }

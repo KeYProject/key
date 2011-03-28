@@ -23,6 +23,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.VariableNameProposer;
 
+@Deprecated
 public class MetavariableDeliverer {
 
   

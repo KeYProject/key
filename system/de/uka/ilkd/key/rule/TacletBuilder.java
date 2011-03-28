@@ -44,6 +44,7 @@ public abstract class TacletBuilder {
     protected ImmutableList<TacletGoalTemplate> goals= ImmutableSLList.<TacletGoalTemplate>nil();
     protected ImmutableList<RuleSet> ruleSets    = ImmutableSLList.<RuleSet>nil();
     protected TacletAttributes attrs        = new TacletAttributes(); 
+    @Deprecated
     protected Constraint constraint         = Constraint.BOTTOM;
     /** List of additional generic conditions on the instantiations of
      * schema variables. */
@@ -122,6 +123,7 @@ public abstract class TacletBuilder {
     
     /** sets the constraint that has to be satisfied if the Taclet
      * should be valid */
+    @Deprecated
     public void setConstraint(Constraint constraint) {
 	this.constraint=constraint;
     }

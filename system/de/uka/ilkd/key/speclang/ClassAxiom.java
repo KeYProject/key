@@ -20,6 +20,14 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.Pair;
 
 
+/**
+ * An axiom originating from a (JML) specification, belonging to a particular
+ * class, and constraining a particular observer symbol. A class axiom always
+ * has an associated visibility. Te visibility determines in which proofs the 
+ * axiom is available, in accordance with the visibility rules of Java. If 
+ * visible, it is made available not as a formula, but as one or many taclets 
+ * (for performance reasons).
+ */
 public interface ClassAxiom extends SpecificationElement {
         
     /**

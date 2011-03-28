@@ -317,6 +317,7 @@ public class PositionTable {
      * @returns  the PosInOccurrence with the added information that
      *           we are inside a MV instantiation.
      */
+    @Deprecated
     private PosInOccurrence goInMetavariable(
  			       Metavariable mv,
                                SequentPrintFilterEntry filterEntry,
@@ -341,10 +342,6 @@ public class PositionTable {
 	while ( i-- != 0 ) list = list.tail ();
 	return list.head ();
     }
-
-
-
-
 }
 
 

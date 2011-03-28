@@ -23,7 +23,7 @@ import de.uka.ilkd.key.logic.Sequent;
  * Select the formulas of the sequent that should be printed, using
  * the user constraint
  */
-
+@Deprecated
 public class ConstraintSequentPrintFilter implements SequentPrintFilter {
 
     protected Sequent              originalSequent;

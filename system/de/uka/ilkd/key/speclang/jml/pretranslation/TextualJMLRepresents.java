@@ -13,7 +13,9 @@ package de.uka.ilkd.key.speclang.jml.pretranslation;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.speclang.PositionedString;
 
-
+/**
+ * A JML represents clause in textual form.
+ */
 public final class TextualJMLRepresents extends TextualJMLConstruct {
     
     private final PositionedString represents;

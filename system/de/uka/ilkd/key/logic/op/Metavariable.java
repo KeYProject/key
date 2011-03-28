@@ -12,6 +12,7 @@ package de.uka.ilkd.key.logic.op;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.sort.Sort;
 
+@Deprecated
 public final class Metavariable extends AbstractSortedOperator
     implements ParsableVariable, Comparable<Metavariable> {
 

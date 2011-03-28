@@ -25,6 +25,7 @@ import de.uka.ilkd.key.logic.op.Metavariable;
  * element.
  */
 
+@Deprecated
 public interface Constraint {
 
     /** unsatisfiable Constraint */
@@ -154,6 +155,7 @@ public interface Constraint {
     String toString();
 
     /** Constraint class for representating the TOP (unsatisfiable) constraint. */
+    @Deprecated
     class Top implements Constraint {
 
 	/** creation of TOP */

@@ -15,6 +15,10 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
+/**
+ * Resolves types occurring explicitly in specification expressions
+ * (e.g. as part of a static method call MyClass.m()).
+ */
 public final class SLTypeResolver extends SLExpressionResolver {
 
     public SLTypeResolver(JavaInfo javaInfo, 

@@ -103,6 +103,7 @@ public abstract class Taclet implements Rule, Named {
      * variables of a given formula(SV)
      * Used by skolemization rules.
      */
+    @Deprecated
     private final ImmutableList<NewDependingOn> varsNewDependingOn;
 
     /** Additional generic conditions for schema variable instantiations. */
@@ -126,6 +127,7 @@ public abstract class Taclet implements Rule, Named {
     /** 
      * constraint under which the Taclet is valid 
      */
+    @Deprecated
     private final Constraint constraint;
    
     /**

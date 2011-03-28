@@ -24,7 +24,7 @@ import de.uka.ilkd.key.proof.incclosure.Sink;
 
 /** Table model storing a raw constraint as a vector of equalities
  * (term pairs) */
-
+@Deprecated
 public class ConstraintTableModel extends AbstractTableModel {
 
     /** Vector of term pairs representing equalities */

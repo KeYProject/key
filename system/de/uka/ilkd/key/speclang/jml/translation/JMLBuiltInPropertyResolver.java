@@ -21,6 +21,9 @@ import de.uka.ilkd.key.speclang.translation.SLResolverManager;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
 
+/**
+ * Resolver for built-in JML operators. Currently only handles array length.
+ */
 public final class JMLBuiltInPropertyResolver extends SLExpressionResolver {
     
     private final SeqLDT seqLDT;

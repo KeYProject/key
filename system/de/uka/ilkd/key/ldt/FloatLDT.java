@@ -22,7 +22,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.util.ExtList;
 
 /**
- * Complete this class if you want to add support for the Java double type.
+ * Complete this class if you want to add support for the Java float type.
  * 
  * At the moment this class contains only stubs.
  */

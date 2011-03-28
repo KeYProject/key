@@ -20,6 +20,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 public class ConstrainedFormula implements java.io.Serializable {
 
     private final Term term;
+    @Deprecated
     private final Constraint constraint;
 
     private final int hashCode;

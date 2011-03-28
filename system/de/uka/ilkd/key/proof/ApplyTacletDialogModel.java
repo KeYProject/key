@@ -48,6 +48,7 @@ public class ApplyTacletDialogModel {
     /** namespace of variables */
     private NamespaceSet nss;
     private Services services ;
+    @Deprecated
     private Constraint userConstraint;
     private AbbrevMap scm;
     private Proof proof;

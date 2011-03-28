@@ -36,6 +36,7 @@ public interface RuleApp {
     /**
      * returns the constraint under which a rule is applicable
      */
+    @Deprecated
     Constraint       constraint ();
 
 

@@ -37,6 +37,7 @@ public class TermTacletAppIndex {
     private final ImmutableList<TermTacletAppIndex> subtermIndices;
     /** the constraint that is used to extend the considered term below
      *  metavariables */
+    @Deprecated
     private final Constraint displayConstraint;
     /** */
     private final RuleFilter ruleFilter;
@@ -173,6 +174,7 @@ public class TermTacletAppIndex {
      * given by the user constraint. In any case the object points to
      * the same position of a term as the <code>pos</code> parameter
      */
+    @Deprecated
     private static PosInOccurrence
                    handleDisplayConstraint(PosInOccurrence pos,
                                            Constraint displayConstraint) {

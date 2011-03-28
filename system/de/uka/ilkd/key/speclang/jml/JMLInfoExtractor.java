@@ -18,6 +18,11 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 
+/**
+ * Helper class used by the JML translation. Provides methods that look for
+ * certain keywords (such as "pure") in comments, and that help in desugaring
+ * such keywords.
+ */
 public final class JMLInfoExtractor {
     
     //-------------------------------------------------------------------------

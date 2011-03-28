@@ -33,6 +33,7 @@ public interface SequentPrintFilterEntry {
     /**
      * Constraint for metavariable instantiations
      */
+    @Deprecated
     Constraint         getDisplayConstraint ();
 
 }

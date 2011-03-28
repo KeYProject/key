@@ -45,6 +45,7 @@ public class PosInOccurrence {
     private final PosInTerm metaPosInTerm;
 
     // Descend into metavariables instantiations
+    @Deprecated
     private final Term      metaTerm;
 
     /** the position in cfma.formula() */
@@ -228,6 +229,7 @@ public class PosInOccurrence {
      *  The usage of this method is strongly discouraged, use 
      * {@link PosInOccurrence#iterator} instead.    
      */
+    @Deprecated
     public PosInTerm posInTermBelowMetavariable () {
 	return metaPosInTerm;
     }     
@@ -281,6 +283,7 @@ public class PosInOccurrence {
      * this position, allowing to walk down the term further "inside"
      * the metavariable.
      */
+    @Deprecated
     public PosInOccurrence setTermBelowMetavariable ( Term p_metaTerm ) {
 	if (Debug.ENABLE_ASSERTION) {
             Debug.assertTrue ( metaTerm == null &&
@@ -313,6 +316,7 @@ public class PosInOccurrence {
     /** The usage of this method is strongly discouraged, use 
      * {@link PosInOccurrence#iterator} instead if possible.
      */     
+    @Deprecated
     public Term termBelowMetavariable () {
 	return metaTerm;
     }
@@ -359,6 +363,7 @@ public class PosInOccurrence {
 
     
     private class PIOPathIteratorImpl implements PIOPathIterator {
+	@Deprecated
 	boolean           belowMetavariable = false;
 	int               child;
 	int               count             = 0;

@@ -13,6 +13,7 @@ package de.uka.ilkd.key.proof.incclosure;
 import java.util.Iterator;
 
 
+@Deprecated
 public interface Merger {
 
     /**

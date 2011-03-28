@@ -25,7 +25,12 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.ExtList;
 
-
+/**
+ * An "LDT" or "language data type" class corresponds to a standard rule file 
+ * shipped with KeY. Usually, this rule file declares a sort (such as "int")
+ * and a number of operators.  The LDT class provides a programming interface to 
+ * access these entities, and it assists the type converter in handling them.
+ */
 public abstract class LDT implements Named {
     
     private final Name name;

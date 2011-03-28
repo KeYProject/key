@@ -568,6 +568,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
             }
         }
 
+        @Deprecated
         private Constraint getUserConstraint () {
             return getProof ().getUserConstraint().getConstraint();
         }

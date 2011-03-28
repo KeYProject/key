@@ -22,6 +22,9 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 
+/**
+ * Resolver for attributes (i.e., fields). 
+ */
 public final class SLAttributeResolver extends SLExpressionResolver {
     
     public SLAttributeResolver(JavaInfo javaInfo, 

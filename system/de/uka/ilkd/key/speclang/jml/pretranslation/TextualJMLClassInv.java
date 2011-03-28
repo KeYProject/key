@@ -14,6 +14,9 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.speclang.PositionedString;
 
 
+/**
+ * A JML class invariant declaration in textual form.
+ */
 public final class TextualJMLClassInv extends TextualJMLConstruct {
     
     private final PositionedString inv;

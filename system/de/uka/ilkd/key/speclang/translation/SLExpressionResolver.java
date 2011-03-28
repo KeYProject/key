@@ -21,6 +21,12 @@ import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.reference.PackageReference;
 import de.uka.ilkd.key.logic.TermBuilder;
 
+/**
+ * Expression resolvers are used by specification parsers (e.g. for JML
+ * or OCL) to translate complex expressions to terms. Subclasses of this
+ * abstract base class deal with specific operators that may occur in
+ * specification expressions.
+ */
 public abstract class SLExpressionResolver {
     
     protected static final TermBuilder TB = TermBuilder.DF;        

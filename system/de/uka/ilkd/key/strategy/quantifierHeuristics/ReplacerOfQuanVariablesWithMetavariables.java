@@ -24,6 +24,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * all existential variables. The variables with new created metavariables or 
  * constant functions are store to a map <code>mapQM</code>.
  */
+@Deprecated
 class ReplacerOfQuanVariablesWithMetavariables {
 
     final private static TermBuilder tb = TermBuilder.DF;

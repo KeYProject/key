@@ -17,6 +17,7 @@ import de.uka.ilkd.key.logic.op.Metavariable;
 /**
  * Interface for the closure constraint consuming classes
  */
+@Deprecated
 public interface Sink {
 
     /**

@@ -11,6 +11,7 @@
 package de.uka.ilkd.key.logic;
 
 /** ConstraintContainer wraps constraints */
+@Deprecated
 public class ConstraintContainer {
     private Constraint co;
     

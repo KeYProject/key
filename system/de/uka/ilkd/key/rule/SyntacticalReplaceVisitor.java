@@ -42,6 +42,7 @@ import de.uka.ilkd.key.util.Debug;
 public final class SyntacticalReplaceVisitor extends Visitor { 	
 
     private final SVInstantiations svInst;
+    @Deprecated
     private final Constraint metavariableInst;
     private ImmutableMap<SchemaVariable,Term> newInstantiations =
                                 DefaultImmutableMap.<SchemaVariable,Term>nilMap();
@@ -524,6 +525,7 @@ public final class SyntacticalReplaceVisitor extends Visitor {
      * Instantiate the given TermSV with a new metavariable
      * @return true iff the instantiation succeeded
      */
+    @Deprecated
     private boolean instantiateWithMV ( Term visited ) {
 	if ( newInstantiations == null ) return false;
 

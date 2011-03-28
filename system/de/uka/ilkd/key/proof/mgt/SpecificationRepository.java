@@ -48,6 +48,11 @@ import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 
 
+/**
+ * Central storage for all specification elements, such as contracts, class 
+ * axioms, and loop invariants. Provides methods for adding such elements to the
+ * repository, and for retrieving them afterwards.
+ */
 public final class SpecificationRepository {
     
     private static final String CONTRACT_COMBINATION_MARKER = "#";

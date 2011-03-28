@@ -64,6 +64,7 @@ public final class ProblemLoader implements Runnable {
     private ImmutableList<PosInOccurrence> builtinIfInsts;
     private int currIfInstFormula;
     private PosInTerm currIfInstPosInTerm;
+    @Deprecated
     private Constraint matchConstraint = null;
 
 

@@ -32,7 +32,10 @@ import de.uka.ilkd.key.speclang.translation.SLWarningException;
 
 /**
  * Extracts JML class invariants and operation contracts from JML comments. 
- * This is the public interface to the jml package.
+ * This is the public interface to the jml package. Note that internally,
+ * this class is highly similar to the class recoderext.JMLTransformer; 
+ * if you change one of these classes, you probably need to change the other 
+ * as well.
  */
 public final class JMLSpecExtractor implements SpecExtractor {
 

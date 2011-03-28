@@ -14,6 +14,10 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.speclang.PositionedString;
 
 
+/**
+ * A JML depends / accessible clause for a model field in textual form.
+ * Note that such clauses for *methods* are part of TextualJMLSpecCase.
+ */
 public final class TextualJMLDepends extends TextualJMLConstruct {
     
     private final PositionedString depends;

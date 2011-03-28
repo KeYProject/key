@@ -54,11 +54,13 @@ public abstract class TacletApp implements RuleApp {
     /**
      * constraint under which the taclet application can be performed
      */
+    @Deprecated
     protected final Constraint matchConstraint;
 
     /**
      * metavariables that have been created during the matching
      */
+    @Deprecated
     protected final ImmutableSet<Metavariable> matchNewMetavariables;
 
     /**
@@ -216,10 +218,12 @@ public abstract class TacletApp implements RuleApp {
 	return instantiations;
     }
 
+    @Deprecated
     public Constraint constraint() {
 	return matchConstraint;
     }
 
+    @Deprecated
     public ImmutableSet<Metavariable> newMetavariables() {
 	return matchNewMetavariables;
     }
@@ -730,6 +734,7 @@ public abstract class TacletApp implements RuleApp {
      * instantiations to metavariables and user constraint entries if possible.
      * Pre-condition: this.sufficientlyComplete()
      */
+    @Deprecated
     public TacletApp instantiateWithMV(Goal p_goal) {
 
 	Debug.assertTrue(this.sufficientlyComplete(p_goal.proof().getServices()),
@@ -806,6 +811,7 @@ public abstract class TacletApp implements RuleApp {
      *            a constraint that unifies each temporary metavariable with the
      *            corresponding definite metavariable
      */
+    @Deprecated
     private static SVInstantiations removeTemporaryMVsFromInstantiations(
 	    SVInstantiations insts, 
 	    Constraint replaceC,
@@ -843,6 +849,7 @@ public abstract class TacletApp implements RuleApp {
      * @param services
      *            the Services
      */
+    @Deprecated
     private static Constraint removeTemporaryMVsFromConstraint(
 	    Constraint constr, ImmutableSet<Metavariable> removeVars,
 	    Constraint replaceC, Services services) {
@@ -857,6 +864,7 @@ public abstract class TacletApp implements RuleApp {
      *         with a metavariable instead of a term, and to add the real
      *         instantiation to the user constraint
      */
+    @Deprecated
     private boolean introduceMVFor(
 	    ImmutableMapEntry<SchemaVariable,InstantiationEntry> entry, SchemaVariable sv) {
 	return sv instanceof TermSV
@@ -901,6 +909,7 @@ public abstract class TacletApp implements RuleApp {
      * 
      * @return an appropriate mv, or null if for some reason the creation failed
      */
+    @Deprecated
     private Metavariable getMVFor(SchemaVariable sv, 
 	    			  Proof proof, 
 	    			  Goal goal,
@@ -1461,6 +1470,7 @@ public abstract class TacletApp implements RuleApp {
      * 
      * @return true iff p_var is a termSV with empty prefix
      */
+    @Deprecated
     public boolean canUseMVAPriori(SchemaVariable p_var) {
 	return false;//metavariables are disabled;
 //	if (!(p_var instanceof TermSV) || fixedVars.contains(p_var))
@@ -1478,6 +1488,7 @@ public abstract class TacletApp implements RuleApp {
      * @param p_term
      *            Term to instantiate the schemavariable with
      */
+    @Deprecated
     protected boolean canUseMVAPosteriori(SchemaVariable p_var, Term p_term) {
 	// disabled
 	return false;

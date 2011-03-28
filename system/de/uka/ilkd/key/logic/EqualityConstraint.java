@@ -35,7 +35,7 @@ import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
  * (cycles, unification failed) the Constraint TOP of interface
  * Constraint is returned.
  */
-
+@Deprecated
 public class EqualityConstraint implements Constraint {
     
     /** contains a boolean value */ 

@@ -28,7 +28,13 @@ import de.uka.ilkd.key.rule.TacletGoalTemplate;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 
-
+/**
+ * A class axiom which is essentially of the form "o.<inv> -> phi": it demands
+ * that the invariants of the objects of a particular class imply a particular
+ * formula. These axioms are logically weaker than the full definitions of <inv>
+ * expressed as RepresentsAxioms, but they may have higher visibility, making
+ * them available in proofs where the corresponing full definition is not.
+ */
 public final class PartialInvAxiom implements ClassAxiom {
     
     private static final TermBuilder TB = TermBuilder.DF;

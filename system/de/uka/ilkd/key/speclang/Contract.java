@@ -18,6 +18,9 @@ import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 
+/**
+ * A contractual agreement about an ObserverFunction.
+ */
 public interface Contract extends SpecificationElement {
     
     public static final int INVALID_ID = -1;    

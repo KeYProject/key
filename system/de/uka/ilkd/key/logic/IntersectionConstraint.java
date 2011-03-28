@@ -24,7 +24,7 @@ import de.uka.ilkd.key.logic.op.Metavariable;
  * means the constraint allowing an instantiation of metavariables iff there
  * exists a constraint within the set allowing this instantiation.
  */
-
+@Deprecated
 public class IntersectionConstraint implements Constraint {
 
     /**

@@ -37,7 +37,14 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.*;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
 
-public class JMLTransformer extends RecoderModelTransformer {
+/**
+ * RecodeR transformation that parses JML comments, and attaches code-like
+ * specifications (ghost fields, set statements, model methods) directly to the 
+ * RecodeR AST. Note that internally, this class is highly similar to the class 
+ * jml.JMLTransformer; if you change one of these classes, you probably need 
+ * to change the other as well.
+ */
+public final class JMLTransformer extends RecoderModelTransformer {
     
     private static final ImmutableList<String> javaMods
         = ImmutableSLList.<String>nil().prepend(new String[]{"abstract",

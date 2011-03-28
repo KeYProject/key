@@ -23,7 +23,8 @@ import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
 
-/** This class inherits from LDT and implements all method that are
+/** 
+ * This class inherits from LDT and implements all method that are
  * necessary to handle the primitive type boolean.
  */
 public final class BooleanLDT extends LDT {

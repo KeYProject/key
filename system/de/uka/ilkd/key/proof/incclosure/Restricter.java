@@ -20,6 +20,7 @@ import de.uka.ilkd.key.logic.op.Metavariable;
  * Sink removing given metavariables from passing constraints, thus
  * making variables local
  */
+@Deprecated
 public class Restricter implements Sink {
 
     /**

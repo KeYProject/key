@@ -18,7 +18,11 @@ import de.uka.ilkd.key.logic.op.ParsableVariable;
 
 
 /**
- * A class invariant.
+ * A class invariant. Objects of type ClassInvariant are an intermediate result 
+ * of the specification language front ends; ultimately, they give rise to 
+ * instances of the ClassAxiom class (more precisely, of its subclasses 
+ * RepresentsAxiom and PartialInvAxiom), through which class invariants are
+ * actually used in proofs.
  */
 public interface ClassInvariant extends SpecificationElement {
         

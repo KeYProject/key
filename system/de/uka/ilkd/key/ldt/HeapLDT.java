@@ -25,6 +25,11 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.ExtList;
 
 
+/**
+ * LDT responsible for the "Heap" sort, and the associated "Field" sort. Besides
+ * offering the usual LDT functionality, this class is also responsible for
+ * creating and managing the constant symbols representing fields. 
+ */
 public final class HeapLDT extends LDT {
     
     public static final Name NAME = new Name("Heap");    
@@ -122,6 +127,10 @@ public final class HeapLDT extends LDT {
     //public interface
     //-------------------------------------------------------------------------
     
+    /**
+     * Given a constant symbol representing a field, this method returns a
+     * simplified name of the constant symbol to be used for pretty printing.
+     */
     public String getPrettyFieldName(Function fieldSymbol) {
 	String name = fieldSymbol.name().toString();
 	int index = name.indexOf("::");
@@ -136,6 +145,11 @@ public final class HeapLDT extends LDT {
 	}
     }
     
+    
+    /**
+     * Extracts the name of the enclosing class from the name of a constant
+     * symbol representing a field.
+     */
     public String getClassName(Function fieldSymbol) {
 	String name = fieldSymbol.name().toString();
 	int index = name.indexOf("::");
@@ -147,16 +161,27 @@ public final class HeapLDT extends LDT {
     }
     
     
+    /**
+     * Returns the sort "Field".
+     */
     public Sort getFieldSort() {
 	return fieldSort;
     }
     
     
+    /**
+     * Returns the select function for the given sort.
+     */
     public Function getSelect(Sort instanceSort, Services services) {
 	return select.getInstanceFor(instanceSort, services);
     }
     
     
+    /**
+     * If the passed operator is an instance of "select", this method returns
+     * the sort of the function (identical to its return type); otherwise, 
+     * returns null.
+     */
     public Sort getSortOfSelect(Operator op) {
 	if(op instanceof SortDependingFunction 
            && ((SortDependingFunction)op).isSimilar(select)) {
@@ -254,6 +279,15 @@ public final class HeapLDT extends LDT {
     }
     
     
+    /**
+     * Given a "program variable" representing a field or a model field, 
+     * returns the function symbol representing the same field. For
+     * normal fields (Java or ghost fields), this function symbol is a 
+     * constant symbol of type "Field". For model fields, it is an observer
+     * function symbol. If the appropriate symbol does not yet exist in the 
+     * namespace, this method creates and adds it to the namespace as a
+     * side effect.
+     */
     public Function getFieldSymbolForPV(LocationVariable fieldPV, 
 	    				Services services) {
 	assert fieldPV.isMember();	

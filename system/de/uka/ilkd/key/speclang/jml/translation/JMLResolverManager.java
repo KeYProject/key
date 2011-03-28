@@ -22,6 +22,9 @@ import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.translation.*;
 
 
+/**
+ * Resolver manager for JML.
+ */
 final class JMLResolverManager extends SLResolverManager {
 
     public JMLResolverManager(JavaInfo javaInfo,

@@ -17,6 +17,10 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.speclang.PositionedString;
 
 
+/**
+ * A JML specification case (i.e., more or less an operation contract) in 
+ * textual form.
+ */
 public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     private final Behavior behavior;

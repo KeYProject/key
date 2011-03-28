@@ -18,8 +18,9 @@ import de.uka.ilkd.key.logic.op.*;
 
 
 /**
- * A contract about an operation, consisting of a precondition, a 
- * postcondition, a modifies clause, a depends clause, and a modality.
+ * A contract about an operation (i.e., a method or a constructor), consisting 
+ * of a precondition, a postcondition, a modifies clause, a measured-by clause, 
+ * and a modality.
  */
 public interface OperationContract extends Contract {
     
