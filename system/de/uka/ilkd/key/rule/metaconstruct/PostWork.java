@@ -22,10 +22,10 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 /**
  * creates an assignment instantiationOf(#newObjectsV).<initialized> = true
  */
-public class PostWork extends ProgramMetaConstruct {
+public class PostWork extends ProgramTransformer {
     
     
-     /** creates a typeof ProgramMetaConstruct 
+     /** creates a typeof ProgramTransformer 
      * @param newObjectSV the instance of expression contained by 
      * the meta construct 
      */
@@ -38,7 +38,7 @@ public class PostWork extends ProgramMetaConstruct {
      * program transformation 
      * @return the transformated program
      */
-    public ProgramElement symbolicExecution(ProgramElement pe,
+    public ProgramElement transform(ProgramElement pe,
 					    Services services,
 					    SVInstantiations svInst) {       
 	final ProgramVariable newObject = 

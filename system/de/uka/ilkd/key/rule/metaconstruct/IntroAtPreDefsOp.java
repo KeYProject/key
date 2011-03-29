@@ -23,7 +23,7 @@ import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
+import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.LoopInvariant;
@@ -32,7 +32,7 @@ import de.uka.ilkd.key.util.Pair;
 
 
 
-public final class IntroAtPreDefsOp extends AbstractMetaOperator {
+public final class IntroAtPreDefsOp extends AbstractTermTransformer {
           
     public IntroAtPreDefsOp() {
         super(new Name("#introAtPreDefs"), 1);

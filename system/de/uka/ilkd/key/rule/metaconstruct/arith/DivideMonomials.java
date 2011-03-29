@@ -13,14 +13,14 @@ package de.uka.ilkd.key.rule.metaconstruct.arith;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
+import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
 /**
  * Metaoperator for computing the result of dividing one monomial by another
  */
-public final class DivideMonomials extends AbstractMetaOperator {
+public final class DivideMonomials extends AbstractTermTransformer {
 
     public DivideMonomials() {
         super ( new Name ( "#divideMonomials" ), 2 );

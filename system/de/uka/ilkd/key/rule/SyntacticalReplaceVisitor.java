@@ -597,8 +597,8 @@ public final class SyntacticalReplaceVisitor extends Visitor {
      * @param subtreeRoot root of the subtree which the visitor leaves.
      */
     public void subtreeLeft(Term subtreeRoot){
-	if (subtreeRoot.op() instanceof MetaOperator) {
-	    MetaOperator mop = (MetaOperator) subtreeRoot.op();
+	if (subtreeRoot.op() instanceof TermTransformer) {
+	    TermTransformer mop = (TermTransformer) subtreeRoot.op();
 	    pushNew(mop.calculate((Term)subStack.pop(),svInst, getServices()));
 	} 
    }

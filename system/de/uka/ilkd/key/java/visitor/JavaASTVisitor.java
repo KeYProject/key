@@ -21,7 +21,7 @@ import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.AbstractProgramElement;
-import de.uka.ilkd.key.rule.metaconstruct.ProgramMetaConstruct;
+import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 
 /** 
@@ -622,7 +622,7 @@ public abstract class JavaASTVisitor extends JavaASTWalker
     }
 
     @Override
-    public void performActionOnProgramMetaConstruct(ProgramMetaConstruct x) {
+    public void performActionOnProgramMetaConstruct(ProgramTransformer x) {
 	doDefaultAction(x);
     }
 

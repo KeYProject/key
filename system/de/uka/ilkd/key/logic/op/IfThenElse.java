@@ -71,10 +71,10 @@ public final class IfThenElse extends AbstractOperator {
         final Sort s2 = terms.get(1).sort();
         final Sort s3 = terms.get(2).sort();
         if(s2 instanceof ProgramSVSort
-             || s2 == AbstractMetaOperator.METASORT ) { 
+             || s2 == AbstractTermTransformer.METASORT ) { 
             return s3; 
         } else if(s3 instanceof ProgramSVSort
-        	  || s3 == AbstractMetaOperator.METASORT ) {
+        	  || s3 == AbstractTermTransformer.METASORT ) {
             return s2;
         } else {           
             return getCommonSuperSort(s2, s3);

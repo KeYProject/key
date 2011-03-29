@@ -22,7 +22,7 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
+import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -243,7 +243,7 @@ public class Polynomial {
                 analyse ( polynomial.sub ( 1 ) );
             } else if ( op == numbers ) {
                 final BigInteger c =
-                    new BigInteger ( AbstractMetaOperator
+                    new BigInteger ( AbstractTermTransformer
                                      .convertToDecimalString ( polynomial, services ) );
                 constantPart = constantPart.add ( c );
             } else if ( op instanceof SortDependingFunction

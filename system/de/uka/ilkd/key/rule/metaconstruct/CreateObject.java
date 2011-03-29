@@ -30,7 +30,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * another implicit method <code>lt;prepare&gt;</code> for setting the fields
  * values.
  */
-public class CreateObject extends ProgramMetaConstruct {
+public class CreateObject extends ProgramTransformer {
 
     public CreateObject(ProgramElement newExpr) {	
 	super("create-object", newExpr); 
@@ -41,7 +41,7 @@ public class CreateObject extends ProgramMetaConstruct {
      * creates and returns a method reference to the implicit '<createObject>'
      * method 
      */
-    public ProgramElement symbolicExecution(ProgramElement pe, 
+    public ProgramElement transform(ProgramElement pe, 
 					    Services services,
 					    SVInstantiations svInst) {
 	

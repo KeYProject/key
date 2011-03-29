@@ -23,8 +23,8 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /** 
- * Program meta constructs are used for schematic transformations that
- * cannot be expressed in form of schematic formulas of taclets. For
+ * ProgramTransformers are used to describe schematic transformations 
+ * that cannot be expressed by the taclet language itself. For
  * example:
  * <ol>  
  * <li> transformations needing access to the java (type) model, e.g
@@ -37,7 +37,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * validate (verify) rules and import nearly the complete power of Java into
  * taclets.
  */
-public abstract class ProgramMetaConstruct extends JavaNonTerminalProgramElement
+public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
     implements StatementContainer, Statement, Expression, TypeReference {
 
     /** the name of the meta construct */
@@ -45,20 +45,20 @@ public abstract class ProgramMetaConstruct extends JavaNonTerminalProgramElement
     /** the encapsulated program element */
     private ProgramElement body;
 
-    /** creates a ProgramMetaConstruct 
+    /** creates a ProgramTransformer 
      * @param name the Name of the meta construct 
      * @param body the ProgramElement contained by the meta construct 
      */
-    public ProgramMetaConstruct(Name name, ProgramElement body) {
+    public ProgramTransformer(Name name, ProgramElement body) {
 	this.name = name;
 	this.body = body;
     }
 
-    /** creates a ProgramMetaConstruct 
+    /** creates a ProgramTransformer 
      * @param name the String with the name of the meta construct
      * @param body the ProgramElement contained by the meta construct 
      */
-    public ProgramMetaConstruct(String name, ProgramElement body) {
+    public ProgramTransformer(String name, ProgramElement body) {
 	this(new Name(name), body);
     }
 
@@ -70,7 +70,7 @@ public abstract class ProgramMetaConstruct extends JavaNonTerminalProgramElement
      * @param svInst the instantiations of the schemavariables 
      * @return the transformated program
      */
-    public abstract ProgramElement symbolicExecution
+    public abstract ProgramElement transform
 	(ProgramElement pe, Services services, SVInstantiations svInst);
     
     /** returns the name of the meta construct 
@@ -120,7 +120,7 @@ public abstract class ProgramMetaConstruct extends JavaNonTerminalProgramElement
 	    return null;
 	} else {
 	    throw new ArrayIndexOutOfBoundsException
-		("A ProgramMetaConstruct contains only one statement ");
+		("A ProgramTransformer contains only one statement ");
 	}
     }
 

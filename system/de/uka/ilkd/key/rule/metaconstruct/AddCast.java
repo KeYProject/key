@@ -20,7 +20,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
-public final class AddCast extends AbstractMetaOperator {
+public final class AddCast extends AbstractTermTransformer {
     
     private static final TermBuilder TB = TermBuilder.DF;
     

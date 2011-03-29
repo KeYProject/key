@@ -16,7 +16,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
+import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -38,7 +38,7 @@ public abstract class AbstractDividePolynomialsProjection implements ProjectionT
 
         final Services services = goal.proof ().getServices ();
         final BigInteger coeff =
-            new BigInteger ( AbstractMetaOperator
+            new BigInteger ( AbstractTermTransformer
                              .convertToDecimalString ( coeffT, services ) );
 
         return quotient ( coeff, polyT, services );

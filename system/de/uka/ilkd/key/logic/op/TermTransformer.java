@@ -15,19 +15,17 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
- * This is the interface for MetaOperators, which are used to do complex term
- * transformation when applying a taclet. Often these transformations cannot be
- * described with the taclet scheme (or trying to do so would result in a huge
- * number of rules).
+ * TermTransformer perform complex term transformation which cannot be
+ * (efficiently or at all) described by taclets.
  */
-public interface MetaOperator extends SortedOperator {
+public interface TermTransformer extends SortedOperator {
 
     /**
      * The method calculates the resulting term. The top level operator of the
-     * specified term has to be this MetaOperator.
+     * specified term has to be this TermTransformer.
      */
     Term calculate(Term term, SVInstantiations svInst, Services services);
 
-    public MetaOperator getParamMetaOperator(String param);
+    public TermTransformer getParamMetaOperator(String param);
 
 }

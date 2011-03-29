@@ -17,7 +17,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
+import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.ArraySort;
@@ -29,7 +29,7 @@ import de.uka.ilkd.key.util.Debug;
  * Creates an <tt>Type::instance(..)</tt> term for the component type of the
  * array. The component type has to be a reference type.
  */
-public final class ArrayBaseInstanceOf extends AbstractMetaOperator {
+public final class ArrayBaseInstanceOf extends AbstractTermTransformer {
 
     public ArrayBaseInstanceOf() {
         super(new Name("#arrayBaseInstanceOf"), 2);

@@ -803,7 +803,7 @@ options {
             }
 	    SchemaVariable sv = (SchemaVariable) attribute;            
             if(sv.sort() instanceof ProgramSVSort 
-                || sv.sort() == AbstractMetaOperator.METASORT) {
+                || sv.sort() == AbstractTermTransformer.METASORT) {
                 semanticError("Cannot use schema variable " + sv + " as an attribute"); 
             }
             result = TermBuilder.DF.select(getServices(), 
@@ -1126,9 +1126,9 @@ options {
 	return result;
     }
 
-    private boolean isMetaOperator() throws TokenStreamException {  
+    private boolean isTermTransformer() throws TokenStreamException {  
     if((LA(1) == IDENT &&
-         AbstractMetaOperator.name2metaop(LT(1).getText())!=null)
+         AbstractTermTransformer.name2metaop(LT(1).getText())!=null)
        || LA(1) == IN_TYPE)
       return true;
     return false;
@@ -2843,7 +2843,7 @@ accesstermlist returns [HashSet accessTerms = new HashSet()] {Term t = null;}:
 
 term130 returns [Term a = null]
     :
-        {isMetaOperator()}? a = specialTerm
+        {isTermTransformer()}? a = specialTerm
     |   a = funcpredvarterm
     |   LPAREN a = term RPAREN 
     |   TRUE  { a = tf.createTerm(Junctor.TRUE); }
@@ -3989,13 +3989,13 @@ ruleset[Vector rs]
         }
     ;
 
-metaId returns [MetaOperator v = null] 
+metaId returns [TermTransformer v = null] 
 {
   String id = null;
 }
 :
   id = simple_ident {
-     v = AbstractMetaOperator.name2metaop(id);
+     v = AbstractTermTransformer.name2metaop(id);
      if (v == null)
        semanticError("Unknown metaoperator: "+id);
   }
@@ -4005,7 +4005,7 @@ metaTerm returns [Term result = null]
 {
     LinkedList al = new LinkedList();
     String param = null;
-    MetaOperator vf = null;
+    TermTransformer vf = null;
     Term t = null;
 } 
     :
@@ -4023,7 +4023,7 @@ metaTerm returns [Term result = null]
             )* RPAREN )?
             {   
 	        if(param != null) {
-		  MetaOperator nvf = vf.getParamMetaOperator(param);
+		  TermTransformer nvf = vf.getParamMetaOperator(param);
 		  if(nvf == null) {
                     semanticError("Meta operator "+vf.name()+" is not a parametric meta operator.");
 		  }else {

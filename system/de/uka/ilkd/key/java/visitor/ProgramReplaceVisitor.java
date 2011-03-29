@@ -18,7 +18,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.AbstractProgramElement;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.metaconstruct.ProgramMetaConstruct;
+import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -110,13 +110,13 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
     }
 
 
-    public void performActionOnProgramMetaConstruct(ProgramMetaConstruct x) {
+    public void performActionOnProgramMetaConstruct(ProgramTransformer x) {
 	ProgramReplaceVisitor trans = new ProgramReplaceVisitor(x.body(), services,
 								svinsts,
 								allowPartialReplacement);
 	trans.start();
 	ProgramElement localresult = trans.result();
-	localresult = x.symbolicExecution(localresult, services, svinsts);
+	localresult = x.transform(localresult, services, svinsts);
 	addChild(localresult);
 	changed();
     }

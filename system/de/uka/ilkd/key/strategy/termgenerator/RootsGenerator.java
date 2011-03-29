@@ -20,7 +20,7 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
+import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Goal;
@@ -66,7 +66,7 @@ public class RootsGenerator implements TermGenerator {
         assert op.arity () == 2;
         
         final BigInteger lit =
-            new BigInteger ( AbstractMetaOperator
+            new BigInteger ( AbstractTermTransformer
                              .convertToDecimalString ( powerRel.sub ( 1 ),
                                                        services ) );
         

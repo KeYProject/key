@@ -15,11 +15,11 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
+import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
-public class MetaSub extends AbstractMetaOperator {
+public class MetaSub extends AbstractTermTransformer {
 
     public MetaSub() {
 	super(new Name("#sub"), 2);

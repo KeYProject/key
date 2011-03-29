@@ -38,7 +38,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * }}  
  * </code> becomes          
  */
-public class UnwindLoop extends ProgramMetaConstruct implements MetaConstructWithSV {
+public class UnwindLoop extends ProgramTransformer implements MetaConstructWithSV {
 
     /** the outer label that is used to leave the while loop ('l1') */
     private final SchemaVariable outerLabel;
@@ -46,7 +46,7 @@ public class UnwindLoop extends ProgramMetaConstruct implements MetaConstructWit
     private final SchemaVariable innerLabel;
     
 
-    /** creates an unwind-loop ProgramMetaConstruct 
+    /** creates an unwind-loop ProgramTransformer 
      * @param loop the LoopStatement contained by the meta construct 
      */
     public UnwindLoop(SchemaVariable innerLabel, SchemaVariable outerLabel, 
@@ -63,7 +63,7 @@ public class UnwindLoop extends ProgramMetaConstruct implements MetaConstructWit
      * @param svInst the instantiations esp. of the inner and outer label 
      * @return the transformated program
      */
-    public ProgramElement symbolicExecution(ProgramElement pe,
+    public ProgramElement transform(ProgramElement pe,
 					    Services services,
 					    SVInstantiations svInst) {
 	if (!(pe instanceof LoopStatement)) {

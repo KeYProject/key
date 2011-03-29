@@ -58,7 +58,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * @author MU
  */
 
-public class ForToWhile extends ProgramMetaConstruct implements
+public class ForToWhile extends ProgramTransformer implements
         MetaConstructWithSV {
 
     /**
@@ -72,7 +72,7 @@ public class ForToWhile extends ProgramMetaConstruct implements
     private final SchemaVariable innerLabel;
 
     /**
-     * creates an loop to while - ProgramMetaConstruct
+     * creates an loop to while - ProgramTransformer
      * 
      * @param loop
      *            the LoopStatement contained by the meta construct
@@ -93,7 +93,7 @@ public class ForToWhile extends ProgramMetaConstruct implements
     /**
      * performs the necessary transformation using a LoopToWhileTransformation
      */
-    public ProgramElement symbolicExecution(ProgramElement pe,
+    public ProgramElement transform(ProgramElement pe,
             Services services, SVInstantiations svInst) {
 
         WhileLoopTransformation w = new ForToWhileTransformation(pe,

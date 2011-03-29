@@ -19,7 +19,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
 
-public final class MemberPVToField extends AbstractMetaOperator {  
+public final class MemberPVToField extends AbstractTermTransformer {  
 
     public MemberPVToField() {
         super(new Name("#memberPVToField"), 1);

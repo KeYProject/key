@@ -19,9 +19,9 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-public class TypeOf extends ProgramMetaConstruct {
+public class TypeOf extends ProgramTransformer {
     
-     /** creates a typeof ProgramMetaConstruct 
+     /** creates a typeof ProgramTransformer 
      * @param pe the instance of expression contained by 
      * the meta construct 
      */
@@ -34,7 +34,7 @@ public class TypeOf extends ProgramMetaConstruct {
      * program transformation 
      * @return the transformated program
      */
-    public ProgramElement symbolicExecution(ProgramElement pe,
+    public ProgramElement transform(ProgramElement pe,
 					    Services services,
 					    SVInstantiations insts) {
 

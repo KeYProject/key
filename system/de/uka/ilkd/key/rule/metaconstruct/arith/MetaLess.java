@@ -15,11 +15,11 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
+import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
-public class MetaLess extends AbstractMetaOperator {
+public class MetaLess extends AbstractTermTransformer {
 
     public MetaLess() {
 	super(new Name("#less"), 2);

@@ -48,7 +48,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * @author mulbrich
  */
 
-public final class EnhancedForInvRule extends AbstractMetaOperator {
+public final class EnhancedForInvRule extends AbstractTermTransformer {
 
     private static final boolean FORMALPARAM_AS_STATEMENT = false;
     private static final TermBuilder TB = TermBuilder.DF;    
@@ -153,7 +153,7 @@ public final class EnhancedForInvRule extends AbstractMetaOperator {
      * Extract from the given term: - loop - inv - post
      * 
      * @param term
-     *            the instantiated Term passed to the MetaOperator
+     *            the instantiated Term passed to the TermTransformer
      * @param services
      *            the Services providing access to signature and type model
      */
@@ -193,7 +193,7 @@ public final class EnhancedForInvRule extends AbstractMetaOperator {
      * 
      * 
      * 
-     * @see de.uka.ilkd.key.logic.op.AbstractMetaOperator#calculate(de.uka.ilkd.key.logic.Term,
+     * @see de.uka.ilkd.key.logic.op.AbstractTermTransformer#calculate(de.uka.ilkd.key.logic.Term,
      *      de.uka.ilkd.key.rule.inst.SVInstantiations,
      *      de.uka.ilkd.key.java.Services)
      */

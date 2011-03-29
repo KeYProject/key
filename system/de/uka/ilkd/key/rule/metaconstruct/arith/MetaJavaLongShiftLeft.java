@@ -15,11 +15,11 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
+import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
-public final class MetaJavaLongShiftLeft extends AbstractMetaOperator {
+public final class MetaJavaLongShiftLeft extends AbstractTermTransformer {
 
     public MetaJavaLongShiftLeft() {
 	super(new Name("#JavaLongShiftLeft"), 2);

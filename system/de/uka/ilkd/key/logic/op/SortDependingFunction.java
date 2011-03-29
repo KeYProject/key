@@ -168,7 +168,7 @@ public final class SortDependingFunction extends Function {
 	}
 	
 	assert !(sortDependingOn instanceof ProgramSVSort);
-	assert sortDependingOn != AbstractMetaOperator.METASORT;
+	assert sortDependingOn != AbstractTermTransformer.METASORT;
 	
 	SortDependingFunction result 
 		= (SortDependingFunction) 

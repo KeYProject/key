@@ -354,7 +354,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 			    false);
 
 	final WhileInvRule wir 
-		= (WhileInvRule) AbstractMetaOperator.WHILE_INV_RULE;
+		= (WhileInvRule) AbstractTermTransformer.WHILE_INV_RULE;
 	SVInstantiations svInst 
 		= SVInstantiations.EMPTY_SVINSTANTIATIONS.replace(
 					null, 
