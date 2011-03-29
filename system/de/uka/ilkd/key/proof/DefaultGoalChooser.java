@@ -172,7 +172,7 @@ public class DefaultGoalChooser implements IGoalChooser {
         else {
             if ( selectedList.isEmpty ()
                     || (currentSubtreeRoot != null 
-                            && isSatisfiableSubtree ( currentSubtreeRoot )) )
+                            && !isSatisfiableSubtree ( currentSubtreeRoot )) )
                 setupGoals ( goalList.prepend ( selectedList ) );
         }
     }
@@ -289,7 +289,7 @@ public class DefaultGoalChooser implements IGoalChooser {
         while ( childrenIt.hasNext () ) {
             final Node child = childrenIt.next ();
 
-            if (!isSatisfiableSubtree ( child )
+            if (isSatisfiableSubtree ( child )
                     && findMinimalSubtreeBelow ( child ))
                 return true;
         }
@@ -320,7 +320,7 @@ public class DefaultGoalChooser implements IGoalChooser {
      * PRECONDITION: all goals have satisfiable constraints
      */
     protected void findMinimalSubtree ( Node p_startNode ) {
-	while ( isSatisfiableSubtree ( p_startNode ) )
+	while ( !isSatisfiableSubtree ( p_startNode ) )
 	    p_startNode = p_startNode.parent ();
 
 	if ( !findMinimalSubtreeBelow ( p_startNode ) )
