@@ -90,9 +90,6 @@ public class NoFindTaclet extends Taclet {
 	TacletApp                    tacletApp        = (TacletApp) ruleApp;
 	MatchConditions              mc               = tacletApp.matchConditions ();
 
-	// Restrict introduced metavariables to the subtree
-	setRestrictedMetavariables ( goal, mc );
-
 	ImmutableList<Goal>                   newGoals         =
 	    checkIfGoals ( goal,
 			   tacletApp.ifFormulaInstantiations (),

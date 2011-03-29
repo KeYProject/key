@@ -261,11 +261,9 @@ public class TestCollisionResolving extends TestCase {
 
 	NoPosTacletApp app0 = NoPosTacletApp.createNoPosTacletApp ( taclet );
 	app0 = app0.matchFind ( pos,
-				       semiseq.get(0).constraint(),
-				       services,
-				       Constraint.BOTTOM);
+				       services);
 	app0 = (NoPosTacletApp)app0.findIfFormulaInstantiations 
-	( seq, services, Constraint.BOTTOM ).head ();
+	( seq, services ).head ();
 	TacletApp app = app0.setPosInOccurrence ( pos, services );
 	/*
 	IList<SVInstantiations> sviList=taclet.matchIf

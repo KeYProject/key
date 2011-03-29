@@ -11,7 +11,6 @@
 package de.uka.ilkd.key.pp;
 
 import de.uka.ilkd.key.logic.ConstrainedFormula;
-import de.uka.ilkd.key.logic.Constraint;
 
 
 /**
@@ -29,11 +28,5 @@ public interface SequentPrintFilterEntry {
      * Original formula from sequent
      */
     ConstrainedFormula getOriginalFormula   ();
-
-    /**
-     * Constraint for metavariable instantiations
-     */
-    @Deprecated
-    Constraint         getDisplayConstraint ();
 
 }

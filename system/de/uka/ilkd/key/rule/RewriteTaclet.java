@@ -136,8 +136,7 @@ public final class RewriteTaclet extends FindTaclet {
     public MatchConditions checkUpdatePrefix
 	( PosInOccurrence p_pos,
 	  MatchConditions p_mc,
-	  Services        p_services,
-	  Constraint      p_userConstraint ) {
+	  Services        p_services ) {
 	if ( getStateRestriction() == NONE)  
 	    return p_mc;
 
@@ -253,7 +252,7 @@ public final class RewriteTaclet extends FindTaclet {
     }
 
 
-    /** CONSTRAINT NOT USED 
+    /** 
      * applies the replacewith part of Taclets
      * @param gt TacletGoalTemplate used to get the replaceexpression in the Taclet
      * @param goal the Goal where the rule is applied
@@ -272,12 +271,8 @@ public final class RewriteTaclet extends FindTaclet {
         	    			         posOfFind, 
         	    			         services, 
         	    			         matchCond);
-	    assert matchCond.getConstraint () == Constraint.BOTTOM : "metavariables are disabled";
-	    if ( createCopies ( goal, posOfFind, matchCond ) ) {
-                goal.addFormula ( cf, posOfFind );
-	    } else {
-                goal.changeFormula ( cf, posOfFind );
-	    }
+
+            goal.changeFormula ( cf, posOfFind );
 	} else {
 	    // Then there was no replacewith...
 	    // This is strange in a RewriteTaclet, but who knows...

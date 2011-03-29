@@ -789,7 +789,6 @@ public final class LogicPrinter {
      */
     public void printConstrainedFormula(ConstrainedFormula cfma)
         throws IOException {
-	assert cfma.constraint().isBottom() : "metavariables are disabled";
 	printTerm(cfma.formula());
     }
 

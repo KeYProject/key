@@ -468,8 +468,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
     
     @Override
     public boolean isApplicable(Goal goal, 
-                                PosInOccurrence pio, 
-                                Constraint userConstraint) {
+                                PosInOccurrence pio) {
 	if(pio == null) {
 	    return false;
 	}

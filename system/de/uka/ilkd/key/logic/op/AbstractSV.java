@@ -126,16 +126,14 @@ abstract class AbstractSV extends AbstractSortedOperator
         		                         inst.getExecutionContext(), 
         				         services);
         if(t != null) {
-            final Constraint c 
-            	= matchCond.getConstraint().unify(t, term, services);
-            if(!c.isSatisfiable()) {
-                Debug.out("FAILED. Adding instantiations leads to unsatisfiable"
-                          + " constraint.", 
-                          this, 
-                          term);
-                return null;
+            if(!t.equalsModRenaming(term)) {
+        	Debug.out("FAILED. Adding instantiations leads to unsatisfiable"
+        		+ " constraint.", 
+        		this, 
+        		term);
+        	return null;
             } else {
-                return matchCond.setConstraint(c);
+        	return matchCond;
             }
         }
 

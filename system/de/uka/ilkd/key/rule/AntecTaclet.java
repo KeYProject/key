@@ -77,19 +77,13 @@ public class AntecTaclet extends FindTaclet{
 	if (gt instanceof AntecSuccTacletGoalTemplate) {
 	    final Sequent replWith = ((AntecSuccTacletGoalTemplate)gt).replaceWith();
 
-            if ( createCopies ( goal, posOfFind, matchCond ) ) {
-                addToAntec ( replWith.antecedent (),
-                             goal,
-                             posOfFind,
-                             services,
-                             matchCond );
-            } else {
-                replaceAtPos ( replWith.antecedent (),
-                               goal,
-                               posOfFind,
-                               services,
-                               matchCond );
-            }
+
+	    replaceAtPos ( replWith.antecedent (),
+		    goal,
+		    posOfFind,
+		    services,
+		    matchCond );
+
 	    addToSucc(replWith.succedent(), goal, 
 		      null, services, matchCond);	   	    	    
 	    

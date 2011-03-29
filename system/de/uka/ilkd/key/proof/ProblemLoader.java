@@ -520,11 +520,8 @@ public final class ProblemLoader implements Runnable {
             }
         }
 
-        final Constraint userConstraint 
-        	= mediator.getUserConstraint().getConstraint();
-        
         if (currContract != null) {
-            ourApp = new ContractRuleApp(pos, userConstraint, currContract);
+            ourApp = new ContractRuleApp(pos, currContract);
             currContract = null;
             if(builtinIfInsts != null) {
         	ourApp.setIfInsts(builtinIfInsts);
@@ -569,17 +566,6 @@ public final class ProblemLoader implements Runnable {
         Services services = mediator.getServices();
         
 
-        if (matchConstraint != Constraint.BOTTOM) {
-            ourApp = ourApp.setMatchConditions(new MatchConditions(
-        	    ourApp.instantiations(), 
-        	    matchConstraint, 
-        	    ourApp.newMetavariables(), 
-        	    RenameTable.EMPTY_TABLE),
-        	    services);
-        }
-
-        Constraint userC = mediator.getUserConstraint().getConstraint();
-
         if (currFormula != 0) { // otherwise we have no pos
             pos = PosInOccurrence.findInSequent(currGoal.sequent(),
                                                 currFormula,
@@ -587,14 +573,7 @@ public final class ProblemLoader implements Runnable {
 //System.err.print("Want to apply "+currTacletName+" at "+currGoal);
              //this is copied from TermTacletAppIndex :-/
 
-            Constraint c = pos.constrainedFormula().constraint();
-            if ( pos.termBelowMetavariable() != null ) {
-                c = c.unify(
-                   pos.constrainedFormula().formula().subAt(pos.posInTerm()),
-                   pos.termBelowMetavariable(), mediator.getServices());
-                if (!c.isSatisfiable()) return null;
-            }
-            ourApp = ((NoPosTacletApp)ourApp).matchFind(pos, c, services, userC);
+            ourApp = ((NoPosTacletApp)ourApp).matchFind(pos, services);
             ourApp = ourApp.setPosInOccurrence(pos, services);
         }
 
@@ -602,7 +581,7 @@ public final class ProblemLoader implements Runnable {
         ourApp = constructInsts(ourApp, services);
 
         ourApp = ourApp.setIfFormulaInstantiations(ifFormulaList,
-                                                   services, userC);
+                                                   services);
 
         if (!ourApp.sufficientlyComplete(services)) {
             ourApp = ourApp.tryToInstantiate(proof.getServices());

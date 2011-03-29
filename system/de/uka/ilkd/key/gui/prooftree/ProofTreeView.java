@@ -14,23 +14,63 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Vector;
 
-import javax.swing.*;
-import javax.swing.event.*;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.Icon;
+import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
+import javax.swing.JTextField;
+import javax.swing.JTree;
+import javax.swing.KeyStroke;
+import javax.swing.ToolTipManager;
+import javax.swing.UIManager;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.event.TreeModelEvent;
+import javax.swing.event.TreeModelListener;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.plaf.TreeUI;
 import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.plaf.metal.MetalTreeUI;
 import javax.swing.text.Position;
-import javax.swing.tree.*;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeCellRenderer;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.gui.*;
+import de.uka.ilkd.key.gui.AutoModeListener;
+import de.uka.ilkd.key.gui.GUIEvent;
+import de.uka.ilkd.key.gui.GUIListener;
+import de.uka.ilkd.key.gui.IconFactory;
+import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.gui.KeYSelectionEvent;
+import de.uka.ilkd.key.gui.KeYSelectionListener;
+import de.uka.ilkd.key.gui.RuleAppListener;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
@@ -337,9 +377,8 @@ public class ProofTreeView extends JPanel {
 
         Object node = path.getLastPathComponent();
 
-	if ( node instanceof GUIBranchNode &&
-	     mediator ().getUserConstraint ().displayClosed
-	     ( ((GUIBranchNode)node).getNode () ) ) {
+	if ( node instanceof GUIBranchNode && 
+		((GUIBranchNode)node).getNode ().isClosed() ) {
 	    delegateView.collapsePath ( path );
 	    return;
 	}
@@ -607,17 +646,10 @@ public class ProofTreeView extends JPanel {
 		    (tree, value, sel, expanded, leaf, row, hasFocus);
 		setBackgroundNonSelectionColor(BISQUE_COLOR);
 		if (value instanceof GUIBranchNode) {
-		    if ( mediator ().getUserConstraint ().displayClosed
-			 ( ((GUIBranchNode)value).getNode() ) ) {
+		    if ( ((GUIBranchNode)value).getNode().isClosed() ) {
 			// all goals below this node are closed
 			this.setIcon(IconFactory.provedFolderIcon());
-		    } else if ( ((GUIBranchNode)value).getNode().getBranchSink ()
-				.getResetConstraint ().isSatisfiable () ) {
-			// a instantiation of the metavariables does
-			// exist that makes the remaining goals of
-			// this subtree closed
-			this.setIcon(IconFactory.closableFolderIcon());			
-		    }		    
+		    }
 		}
 		return this;
 	    }
@@ -641,8 +673,7 @@ public class ProofTreeView extends JPanel {
 	    
 	    if (node.leaf()) {
 		Goal goal = proof.getGoal(node);
-		if ( goal == null ||
-		     mediator ().getUserConstraint ().displayClosed ( node ) ) {
+		if ( goal == null || node.isClosed() ) {
 		    tree_cell.setForeground(Color.green);
 		    tree_cell.setIcon(IconFactory.keyHoleClosed(20,20));
 		    ProofTreeView.this.setToolTipText("Closed Goal");
@@ -653,11 +684,6 @@ public class ProofTreeView extends JPanel {
 		        tree_cell.setIcon(IconFactory.keyHoleInteractive(20, 20));
 		        ProofTreeView.this.setToolTipText("Disabled Goal");
 		        tree_cell.setToolTipText("Interactive goal - no automatic rule application");
-		    } else if ( goal.getClosureConstraint ().isSatisfiable () ) {
-			tree_cell.setForeground(Color.blue);
-			tree_cell.setIcon(IconFactory.keyHole(20, 20));
-			ProofTreeView.this.setToolTipText("Closable Goal");
-			tree_cell.setToolTipText("A goal that can be closed");
 		    } else {
 			tree_cell.setForeground(Color.red);
 			tree_cell.setIcon(IconFactory.keyHole(20, 20));
@@ -835,9 +861,7 @@ public class ProofTreeView extends JPanel {
 		ExpansionState.expandAll(delegateView, branch);
             } else if (e.getSource() == expandGoals) {
                 for (final Goal g : proof.openGoals()) {
-                    final Node n = g.node ();
-                    if ( !mediator ().getUserConstraint ().displayClosed ( n ) )
-                        makeNodeExpanded ( n );
+                    makeNodeExpanded ( g.node () );
                 }
 		collapseClosedNodes ();
 		// do not show selected node if it is not on the path to an
@@ -860,16 +884,14 @@ public class ProofTreeView extends JPanel {
 		Iterator<Goal> it = proof.openGoals ().iterator ();
 		Node n;
 		while ( it.hasNext () ) {
-		    n = it.next ().node ();
-		    if ( !mediator ().getUserConstraint ().displayClosed ( n ) ) {
-			GUIProofTreeNode node = delegateModel.getProofTreeNode(n);
-			if (node==null) break;
-			TreeNode[] obs=node.getPath();
-			TreePath tp = new TreePath(obs);
-			if (branch.isDescendant(tp)) {
-				delegateView.makeVisible(tp);
-			}
-		    }
+		    n = it.next ().node ();		  
+		    GUIProofTreeNode node = delegateModel.getProofTreeNode(n);
+		    if (node==null) break;
+		    TreeNode[] obs=node.getPath();
+		    TreePath tp = new TreePath(obs);
+		    if (branch.isDescendant(tp)) {
+			delegateView.makeVisible(tp);
+		    }		    
 		}
             } else if (e.getSource() == collapseAll) {
 		ExpansionState.collapseAll(delegateView);

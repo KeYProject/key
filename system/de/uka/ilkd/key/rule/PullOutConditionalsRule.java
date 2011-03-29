@@ -82,8 +82,7 @@ public final class PullOutConditionalsRule implements BuiltInRule {
     
     @Override    
     public boolean isApplicable(Goal goal, 
-                                PosInOccurrence pio, 
-                                Constraint userConstraint) {
+                                PosInOccurrence pio) {
 	//pio must be top level formula
 	if(pio == null || !pio.isTopLevel()) {
 	    return false;

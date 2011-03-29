@@ -11,7 +11,6 @@
 package de.uka.ilkd.key.rule;
 
 
-import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
@@ -27,13 +26,11 @@ public class ContractRuleApp extends BuiltInRuleApp {
     private final Contract instantiation;
     
     public ContractRuleApp(PosInOccurrence pio,
-	    		   Constraint userConstraint,
 	    		   Contract instantiation) {
         super(instantiation instanceof OperationContract 
               ? UseOperationContractRule.INSTANCE
               : UseDependencyContractRule.INSTANCE,
-              pio, 
-              userConstraint);
+              pio);
         this.instantiation = instantiation;
     }   
     

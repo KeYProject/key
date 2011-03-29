@@ -177,7 +177,7 @@ public class TestSchemaModalOperators extends TestCase {
 					PosInTerm.TOP_LEVEL,
 					false);
 	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
-		    getTacletAppAt(TacletFilter.TRUE, applyPos, null, Constraint.BOTTOM);	
+		    getTacletAppAt(TacletFilter.TRUE, applyPos, null);	
 	assertTrue("Too many or zero rule applications.",rApplist.size()==1);
 	RuleApp rApp=rApplist.head();
 	assertTrue("Rule App should be complete", rApp.complete());
@@ -211,7 +211,7 @@ public class TestSchemaModalOperators extends TestCase {
 					PosInTerm.TOP_LEVEL,
 					false);
 	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
-		    getTacletAppAt(TacletFilter.TRUE, applyPos, null, Constraint.BOTTOM);	
+		    getTacletAppAt(TacletFilter.TRUE, applyPos, null);	
 	assertTrue("Too many or zero rule applications.",rApplist.size()==1);
 	RuleApp rApp=rApplist.head();
 	assertTrue("Rule App should be complete", rApp.complete());
@@ -241,7 +241,7 @@ public class TestSchemaModalOperators extends TestCase {
 					PosInTerm.TOP_LEVEL,
 					false);
 	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
-		    getTacletAppAt(TacletFilter.TRUE, applyPos, null, Constraint.BOTTOM);	
+		    getTacletAppAt(TacletFilter.TRUE, applyPos, null);	
 	assertTrue("Too many or zero rule applications.",rApplist.size()==1);
 	RuleApp rApp=rApplist.head();
 	assertTrue("Rule App should be complete", rApp.complete());

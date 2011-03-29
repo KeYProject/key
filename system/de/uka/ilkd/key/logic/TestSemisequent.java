@@ -48,13 +48,13 @@ public class TestSemisequent extends TestCase {
 
 	
 	con=new ConstrainedFormula[7];
-	con[0]=new ConstrainedFormula(t_p, Constraint.BOTTOM);
-	con[1]=new ConstrainedFormula(t_q, Constraint.BOTTOM);
-	con[2]=new ConstrainedFormula(t_r, Constraint.BOTTOM);
-	con[3]=new ConstrainedFormula(t_r, Constraint.BOTTOM);
-	con[4]=new ConstrainedFormula(t_a, Constraint.BOTTOM);
-	con[5]=new ConstrainedFormula(t_b, Constraint.BOTTOM);
-	con[6]=new ConstrainedFormula(t_c, Constraint.BOTTOM);
+	con[0]=new ConstrainedFormula(t_p);
+	con[1]=new ConstrainedFormula(t_q);
+	con[2]=new ConstrainedFormula(t_r);
+	con[3]=new ConstrainedFormula(t_r);
+	con[4]=new ConstrainedFormula(t_a);
+	con[5]=new ConstrainedFormula(t_b);
+	con[6]=new ConstrainedFormula(t_c);
 
 	Sort s = new SortImpl(new Name("test"));
 	Function f = new Function(new Name("f"), s, new Sort[]{});
@@ -73,7 +73,7 @@ public class TestSemisequent extends TestCase {
 	Semisequent seq=Semisequent.EMPTY_SEMISEQUENT;
 	seq=extract(seq.insert(0,con[0]));
 	seq=extract(seq.insert(1,con[1]));
-	ConstrainedFormula eq2con0 = new ConstrainedFormula(con[0].formula(), Constraint.BOTTOM);
+	ConstrainedFormula eq2con0 = new ConstrainedFormula(con[0].formula());
 	assertTrue("Contains should test of identity and not equality.", !seq.contains(eq2con0));
     }
 
@@ -81,7 +81,7 @@ public class TestSemisequent extends TestCase {
 	Semisequent seq=Semisequent.EMPTY_SEMISEQUENT;
 	seq=extract(seq.insert(0,con[0]));
 	seq=extract(seq.insert(1,con[1]));
-	ConstrainedFormula eq2con0 = new ConstrainedFormula(con[0].formula(), Constraint.BOTTOM);
+	ConstrainedFormula eq2con0 = new ConstrainedFormula(con[0].formula());
 	assertTrue("Contains tests of equality and should find the formula.", seq.containsEqual(eq2con0));
     }
 

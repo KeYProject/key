@@ -56,7 +56,6 @@ public class IfFormulaInstDirect implements IfFormulaInstantiation {
     }
 
     public String toString(Services services) {
-        return ProofSaver.printAnything(cf.formula(), 
-                services)+(cf.constraint().isBottom() ? "" : "<<"+cf.constraint());       
+        return ProofSaver.printAnything(cf.formula(), services);       
     }
 }

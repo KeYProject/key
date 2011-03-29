@@ -78,20 +78,13 @@ public class SuccTaclet extends FindTaclet{
 
 	    addToAntec(replWith.antecedent(), goal, 
 		       null, services, matchCond);	   	    	    
-            if ( createCopies ( goal, posOfFind, matchCond ) ) {
-                addToSucc ( replWith.succedent (),
-                            goal,
-                            posOfFind,
-                            services,
-                            matchCond );
-            } else {
-                replaceAtPos ( replWith.succedent (),
-                               goal,
-                               posOfFind,
-                               services,
-                               matchCond );
-            }
 
+	    replaceAtPos ( replWith.succedent (),
+		    goal,
+		    posOfFind,
+		    services,
+		    matchCond );
+           
 	} else {
 	    // Then there was no replacewith...
 	}

@@ -42,15 +42,14 @@ public class BuiltInRuleAppIndex implements java.io.Serializable {
      * for the given goal and position
      */
     public ImmutableList<RuleApp> getBuiltInRule(Goal            goal, 
-						 PosInOccurrence pos, 
-						 Constraint      userConstraint) {
+						 PosInOccurrence pos) {
 
 	ImmutableList<RuleApp> result = ImmutableSLList.<RuleApp>nil();
 
         for (BuiltInRule builtInRule : index.rules()) {
             BuiltInRule bir = builtInRule;
-            if (bir.isApplicable(goal, pos, userConstraint)) {
-                RuleApp app = new BuiltInRuleApp(bir, pos, userConstraint);
+            if (bir.isApplicable(goal, pos)) {
+                RuleApp app = new BuiltInRuleApp(bir, pos);
                 result = result.prepend(app);
             }
         }
@@ -78,25 +77,23 @@ public class BuiltInRuleAppIndex implements java.io.Serializable {
     	return newRuleListener;
     }
 
-    public void scanApplicableRules (Goal       goal,
-				     Constraint userConstraint) {
-	scanSimplificationRule ( goal, userConstraint, getNewRulePropagator () );
+    public void scanApplicableRules (Goal       goal) {
+	scanSimplificationRule ( goal, getNewRulePropagator () );
     }
 
     private void scanSimplificationRule ( Goal       goal,
-					  Constraint userConstraint, 
 					  NewRuleListener listener ) {
         for (BuiltInRule builtInRule : index.rules()) {
             final BuiltInRule bir = builtInRule;
             
-            if(bir.isApplicable(goal, null, userConstraint)) {
-                BuiltInRuleApp app = new BuiltInRuleApp(bir, null, userConstraint );                            
+            if(bir.isApplicable(goal, null)) {
+                BuiltInRuleApp app = new BuiltInRuleApp(bir, null );                            
                 listener.ruleAdded ( app, null );
             }
             
             
-            scanSimplificationRule(bir, goal, false, userConstraint, listener);
-            scanSimplificationRule(bir, goal, true, userConstraint, listener);
+            scanSimplificationRule(bir, goal, false, listener);
+            scanSimplificationRule(bir, goal, true, listener);
         }
     }
 
@@ -105,14 +102,13 @@ public class BuiltInRuleAppIndex implements java.io.Serializable {
     private void scanSimplificationRule ( BuiltInRule rule,
 					  Goal        goal,
 					  boolean     antec,
-					  Constraint  userConstraint, 
 					  NewRuleListener listener ) {
 	final Node                   node = goal.node ();
 	final Sequent                seq  = node.sequent ();
 
         for (Object o : (antec ? seq.antecedent() : seq.succedent())) {
             final ConstrainedFormula cfma = (ConstrainedFormula) o;
-            scanSimplificationRule(rule, goal, antec, userConstraint, cfma, listener);
+            scanSimplificationRule(rule, goal, antec, cfma, listener);
         }
     }
 
@@ -120,15 +116,14 @@ public class BuiltInRuleAppIndex implements java.io.Serializable {
     private void scanSimplificationRule ( BuiltInRule rule, 
                                           Goal goal, 
                                           boolean antec, 
-                                          Constraint userConstraint, 
                                           ConstrainedFormula cfma, 
                                           NewRuleListener listener ) {
         final PosInOccurrence    pos = new PosInOccurrence 
 		( cfma, PosInTerm.TOP_LEVEL, antec );
         if(rule instanceof UseDependencyContractRule) {//HACK
             scanSimplificationRule(rule, goal, pos, listener);
-        } else if (rule.isApplicable ( goal, pos, userConstraint ) ) {
-            BuiltInRuleApp app = new BuiltInRuleApp(rule, pos, userConstraint );                            
+        } else if (rule.isApplicable ( goal, pos ) ) {
+            BuiltInRuleApp app = new BuiltInRuleApp(rule, pos );                            
             listener.ruleAdded ( app, pos );
         }
     }
@@ -138,8 +133,8 @@ public class BuiltInRuleAppIndex implements java.io.Serializable {
 	    				  Goal goal,
                                           PosInOccurrence pos,
                                           NewRuleListener listener ) {
-        if (rule.isApplicable ( goal, pos, Constraint.BOTTOM ) ) {
-            BuiltInRuleApp app = new BuiltInRuleApp(rule, pos, Constraint.BOTTOM );                            
+        if (rule.isApplicable ( goal, pos ) ) {
+            BuiltInRuleApp app = new BuiltInRuleApp(rule, pos );                            
             listener.ruleAdded ( app, pos );
         }
         for(int i = 0, n = pos.subTerm().arity(); i < n; i++) {
@@ -148,9 +143,8 @@ public class BuiltInRuleAppIndex implements java.io.Serializable {
     }     
 
     public void reportRuleApps ( NewRuleListener l,
-                                 Goal goal,
-                                 Constraint userConstraint ) {
-        scanSimplificationRule( goal, userConstraint, l );
+                                 Goal goal ) {
+        scanSimplificationRule( goal, l );
     }
     
     /** 
@@ -159,16 +153,15 @@ public class BuiltInRuleAppIndex implements java.io.Serializable {
      */  
     public void sequentChanged ( Goal goal, SequentChangeInfo sci ) {
         final Proof proof = goal.proof();
-        final Constraint userConstraint = proof.getUserConstraint().getConstraint();
         
-        scanAddedFormulas ( goal, true, sci, userConstraint );
-        scanAddedFormulas ( goal, false, sci, userConstraint );
+        scanAddedFormulas ( goal, true, sci );
+        scanAddedFormulas ( goal, false, sci );
         
-        scanModifiedFormulas ( goal, true, sci, userConstraint );
-        scanModifiedFormulas ( goal, false, sci, userConstraint );
+        scanModifiedFormulas ( goal, true, sci );
+        scanModifiedFormulas ( goal, false, sci );
     }
     
-    private void scanAddedFormulas ( Goal goal, boolean antec, SequentChangeInfo sci, final Constraint userConstraint ) {
+    private void scanAddedFormulas ( Goal goal, boolean antec, SequentChangeInfo sci ) {
         ImmutableList<ConstrainedFormula> cfmas = sci.addedFormulas( antec );
         final NewRuleListener listener = getNewRulePropagator();
         while ( !cfmas.isEmpty() ) {
@@ -176,14 +169,14 @@ public class BuiltInRuleAppIndex implements java.io.Serializable {
             for (BuiltInRule builtInRule : index.rules()) {
                 final BuiltInRule rule = builtInRule;
                 scanSimplificationRule(rule, goal, antec,
-                        userConstraint, cfma, listener);
+                        cfma, listener);
             }
             cfmas = cfmas.tail();
         }
     }
 
 
-    private void scanModifiedFormulas ( Goal goal, boolean antec, SequentChangeInfo sci, final Constraint userConstraint ) {
+    private void scanModifiedFormulas ( Goal goal, boolean antec, SequentChangeInfo sci ) {
         
         final NewRuleListener listener = getNewRulePropagator();
         ImmutableList<FormulaChangeInfo> fcis = sci.modifiedFormulas( antec );
@@ -193,7 +186,7 @@ public class BuiltInRuleAppIndex implements java.io.Serializable {
             final ConstrainedFormula cfma = fci.getNewFormula();
             for (BuiltInRule builtInRule : index.rules()) {
                 final BuiltInRule rule = builtInRule;
-                scanSimplificationRule(rule, goal, antec, userConstraint, cfma, listener);
+                scanSimplificationRule(rule, goal, antec, cfma, listener);
             }
             fcis = fcis.tail();
         }

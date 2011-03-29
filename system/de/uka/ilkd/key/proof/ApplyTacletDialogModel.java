@@ -59,9 +59,8 @@ public class ApplyTacletDialogModel {
      */
     public ApplyTacletDialogModel(TacletApp app, Sequent seq,
 				  Services services,
-				  Constraint userConstraint,
-				  NamespaceSet nss, AbbrevMap scm,
-				  Goal goal) {
+				  NamespaceSet nss,
+				  AbbrevMap scm, Goal goal) {
 	this.app = app;
 	this.seq = seq;
 	this.services = services;
@@ -142,8 +141,7 @@ public class ApplyTacletDialogModel {
 							      succCand .iterator () ),
 							    ifFma,
 							    matchCond,
-							    services,
-							    userConstraint ).getFormulas (),
+							    services ).getFormulas (),
 					services, nss, scm);
 	    }
 	} else
@@ -167,7 +165,7 @@ public class ApplyTacletDialogModel {
 
 	try {
 	    tacletApp = tacletApp.setIfFormulaInstantiations
-		( instList, services, userConstraint );
+		( instList, services );
 	} catch ( SortException e ) {
 	    throw new SortMismatchException ( "'\\assumes'-sequent", null, 0, 0 );
 	}

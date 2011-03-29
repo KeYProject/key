@@ -10,11 +10,7 @@
 
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.collection.DefaultImmutableSet;
-import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.RenameTable;
-import de.uka.ilkd.key.logic.op.Metavariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -27,26 +23,16 @@ public class MatchConditions {
 
     public static final MatchConditions EMPTY_MATCHCONDITIONS =
 	new MatchConditions ( SVInstantiations.EMPTY_SVINSTANTIATIONS,
-			      Constraint.BOTTOM,
-			      DefaultImmutableSet.<Metavariable>nil(),
-                              RenameTable.EMPTY_TABLE);
+			      RenameTable.EMPTY_TABLE);
 
     private SVInstantiations   instantiations   = SVInstantiations.EMPTY_SVINSTANTIATIONS;
-    @Deprecated
-    private Constraint         constraint       = Constraint.BOTTOM;
-    @Deprecated
-    private ImmutableSet<Metavariable>  newMetavariables = DefaultImmutableSet.<Metavariable>nil();
-
+ 
     private RenameTable renameTable = RenameTable.EMPTY_TABLE;
 
     
     public MatchConditions ( SVInstantiations   p_instantiations,
-			     Constraint         p_constraint,
-			     ImmutableSet<Metavariable>  p_newMetavariables,
-                             RenameTable        p_renameTable) {
-	instantiations   = p_instantiations;
-	constraint       = p_constraint;
-	newMetavariables = p_newMetavariables;
+			     RenameTable        p_renameTable) {
+	instantiations   = p_instantiations;	
         renameTable      = p_renameTable; 
     }
 
@@ -59,50 +45,15 @@ public class MatchConditions {
 	    return this;
 	else
 	    return new MatchConditions ( p_instantiations, 
-                                         constraint, newMetavariables, renameTable );
-    }
-
-    @Deprecated
-    public Constraint         getConstraint       () {
-	return constraint;
-    }
-
-    @Deprecated
-    public MatchConditions    setConstraint       ( Constraint         p_constraint ) {
-	if ( constraint == p_constraint )
-	    return this;
-	else
-	    return new MatchConditions ( instantiations, p_constraint, newMetavariables, 
                                          renameTable );
-    }
-
-    @Deprecated
-    public ImmutableSet<Metavariable> getNewMetavariables () {
-	return newMetavariables;
-    }
-
-    @Deprecated
-    public MatchConditions    setNewMetavariables ( ImmutableSet<Metavariable>  p_newMetavariables ) {
-	if ( newMetavariables == p_newMetavariables )
-	    return this;
-	else
-	    return new MatchConditions ( instantiations, constraint, p_newMetavariables, renameTable );
-    }
-
-    @Deprecated
-    public MatchConditions    addNewMetavariable  ( Metavariable       p_mv ) {
-	return new MatchConditions ( instantiations, constraint, newMetavariables.add ( p_mv ), 
-                                     renameTable );
     }
     
     public MatchConditions extendRenameTable() {        
-        return new MatchConditions(instantiations, constraint, newMetavariables, 
-                                   renameTable.extend());
+        return new MatchConditions(instantiations, renameTable.extend());
     }    
 
     public MatchConditions addRenaming(QuantifiableVariable q1, QuantifiableVariable q2) {        
-        return new MatchConditions(instantiations, constraint, newMetavariables, 
-                                   renameTable.assign(q1, q2));
+        return new MatchConditions(instantiations, renameTable.assign(q1, q2));
     }    
     
     public RenameTable renameTable() {
@@ -110,8 +61,7 @@ public class MatchConditions {
     }
 
     public MatchConditions shrinkRenameTable() {      
-        return new MatchConditions(instantiations, constraint, newMetavariables, 
-                                   renameTable.parent());
+        return new MatchConditions(instantiations, renameTable.parent());
     }
 
     

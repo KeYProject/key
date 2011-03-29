@@ -420,16 +420,13 @@ public class Goal  {
      * of the goal and to the current RuleAppIndex.
      * @param rule the Taclet of the TacletApp to create
      * @param insts the given instantiations of the TacletApp to be created
-     * @param constraint the constraint under which the taclet can be applied
      */
     public void addTaclet(Taclet           rule,
 			  SVInstantiations insts,
-			  Constraint       constraint,
-                          boolean          isAxiom) {		
+			  boolean          isAxiom) {		
 	NoPosTacletApp tacletApp =
 	    NoPosTacletApp.createFixedNoPosTacletApp(rule, 
 		    				     insts, 
-		    				     constraint,
 		    				     proof().getServices());
 	if (tacletApp != null) {
 	    addNoPosTacletApp(tacletApp);
@@ -694,13 +691,13 @@ public class Goal  {
             // this happens for the simplify decision procedure
             // we do nothing in this case
         } else if ( goalList.isEmpty() ) {
-            proof.closeGoal ( this, ruleApp.constraint () );           
+            proof.closeGoal ( this, Constraint.BOTTOM );           
         } else {
             proof.replace ( this, goalList );
             if ( ruleApp instanceof TacletApp &&
                     ((TacletApp)ruleApp).taclet ().closeGoal () )
                 // the first new goal is the one to be closed
-                proof.closeGoal ( goalList.head (), ruleApp.constraint () );
+                proof.closeGoal ( goalList.head (), Constraint.BOTTOM );
         }
 
         final RuleAppInfo ruleAppInfo = journal.getRuleAppInfo(p_ruleApp);

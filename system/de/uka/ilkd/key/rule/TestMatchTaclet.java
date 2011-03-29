@@ -342,25 +342,23 @@ public class TestMatchTaclet extends TestCase {
 
 	Sequent seq = Sequent.createSequent
 	    (Semisequent.EMPTY_SEMISEQUENT.insert
-	     (0, new ConstrainedFormula(match.sub(0), 
-					Constraint.BOTTOM)).semisequent(), 
+	     (0, new ConstrainedFormula(match.sub(0))).semisequent(), 
 	     Semisequent.EMPTY_SEMISEQUENT);
 
 	assertTrue("An area conflict should happen because there is a free"+
 		   " variable and the matching part is in the if and addrule", 
 		   NoPosTacletApp.createNoPosTacletApp ( if_addrule_conflict )
-		   .findIfFormulaInstantiations ( seq, services, Constraint.BOTTOM ).size() == 0);
+		   .findIfFormulaInstantiations ( seq, services ).size() == 0);
 	       
  	// we bind the free variable now a match should be found
 	seq = Sequent.createSequent
 	    (Semisequent.EMPTY_SEMISEQUENT.insert(0, new ConstrainedFormula
-		(match, 
-		 Constraint.BOTTOM)).semisequent(), 
+		(match)).semisequent(), 
 	     Semisequent.EMPTY_SEMISEQUENT );
 
 	assertTrue("No area conflict should happen because all variables are bound.", 
 		   NoPosTacletApp.createNoPosTacletApp ( if_addrule_conflict )
-		   .findIfFormulaInstantiations ( seq, services, Constraint.BOTTOM ).size() != 0);
+		   .findIfFormulaInstantiations ( seq, services ).size() != 0);
     }
 
 
@@ -375,8 +373,7 @@ public class TestMatchTaclet extends TestCase {
 	((FindTaclet)find_addrule_conflict,
 	        find_addrule_conflict.match(match.sub(0), 
 	                find_addrule_conflict.find(), false,
-	                MatchConditions.EMPTY_MATCHCONDITIONS, services, 
-	                Constraint.BOTTOM).getInstantiations(),
+	                MatchConditions.EMPTY_MATCHCONDITIONS, services).getInstantiations(),
                     new PosInOccurrence(new ConstrainedFormula(match),
                             PosInTerm.TOP_LEVEL.down(0), true), services);
         
@@ -391,8 +388,7 @@ public class TestMatchTaclet extends TestCase {
 	((FindTaclet)find_addrule_conflict,
             find_addrule_conflict.match(match, 
                     find_addrule_conflict.find(), false,
-                    MatchConditions.EMPTY_MATCHCONDITIONS, services, 
-                    Constraint.BOTTOM).getInstantiations(),
+                    MatchConditions.EMPTY_MATCHCONDITIONS, services).getInstantiations(),
                     new PosInOccurrence(new ConstrainedFormula(match),
                             PosInTerm.TOP_LEVEL, true), services);
 	assertTrue("A match should have been found,"+
@@ -413,7 +409,7 @@ public class TestMatchTaclet extends TestCase {
 	(if_find_clash,
             if_find_clash.match(match.sub(0), if_find_clash.find(), false, 
                MatchConditions.EMPTY_MATCHCONDITIONS, 
-               services, Constraint.BOTTOM).getInstantiations(),
+               services).getInstantiations(),
                new PosInOccurrence(new ConstrainedFormula(match.sub(0)),
                        PosInTerm.TOP_LEVEL.down(0), true), services);
         
@@ -424,7 +420,7 @@ public class TestMatchTaclet extends TestCase {
 
 	assertTrue("Match not found", 
 		   if_find_clash.match(match, if_find_clash.find(), false,
-				       MatchConditions.EMPTY_MATCHCONDITIONS, services, Constraint.BOTTOM) != null);	           
+				       MatchConditions.EMPTY_MATCHCONDITIONS, services) != null);	           
     }
 
     public void testRWVarOccursInAddAndIf() {
@@ -435,7 +431,7 @@ public class TestMatchTaclet extends TestCase {
 	assertTrue("Match not found but should exist"+
 		   " because add and if are same area",
                    if_add_no_clash.match(match.sub(0), if_add_no_clash.find(), false,
-					 MatchConditions.EMPTY_MATCHCONDITIONS, services, Constraint.BOTTOM) != null); 
+					 MatchConditions.EMPTY_MATCHCONDITIONS, services) != null); 
     }
     
 
@@ -450,7 +446,7 @@ public class TestMatchTaclet extends TestCase {
 		   (not_free_conflict,
 		    not_free_conflict.match
 		    (free_in, not_free_conflict.find(), false,
-		     MatchConditions.EMPTY_MATCHCONDITIONS, services, Constraint.BOTTOM), services) == null);
+		     MatchConditions.EMPTY_MATCHCONDITIONS, services), services) == null);
 
 	Term not_free_in = TacletForTests.parseTerm("\\forall testSort z; (p(z) & p(c))");
  	assertTrue("Match should be found because .. not free in.. "+
@@ -458,7 +454,7 @@ public class TestMatchTaclet extends TestCase {
 		   (not_free_conflict,
 		    not_free_conflict.match
 		    (not_free_in, not_free_conflict.find(), false,
-		     MatchConditions.EMPTY_MATCHCONDITIONS, services, Constraint.BOTTOM), services) != null);
+		     MatchConditions.EMPTY_MATCHCONDITIONS, services), services) != null);
     }
 
 
@@ -472,14 +468,14 @@ public class TestMatchTaclet extends TestCase {
 	     (0, new ConstrainedFormula(closeable_two)).semisequent()); 	
 	TacletIndex index = new TacletIndex();
 	index.add(close_rule.taclet());
-        PosInOccurrence pio = new PosInOccurrence(new ConstrainedFormula(closeable_two, Constraint.BOTTOM),
+        PosInOccurrence pio = new PosInOccurrence(new ConstrainedFormula(closeable_two),
                 PosInTerm.TOP_LEVEL, false);
 
 	TacletApp tacletApp = index.getSuccedentTaclet(pio,
 	                                               new IHTacletFilter (true, ImmutableSLList.<RuleSet>nil()),
-	                                               services, Constraint.BOTTOM).iterator().next();
+	                                               services).iterator().next();
 	assertTrue("Match should be possible(modulo renaming)",
-		   tacletApp.findIfFormulaInstantiations ( seq, services, Constraint.BOTTOM ).size()>0);
+		   tacletApp.findIfFormulaInstantiations ( seq, services ).size()>0);
     }
    
     // a greater test 
@@ -505,13 +501,13 @@ public class TestMatchTaclet extends TestCase {
 		   "only the term that is matched has an update and the "+
 		   "template it is matched to has none.",
 		   all_left.match(match, ((FindTaclet)all_left).find(), 
-				  true, MatchConditions.EMPTY_MATCHCONDITIONS, services, Constraint.BOTTOM)!=null);
+				  true, MatchConditions.EMPTY_MATCHCONDITIONS, services)!=null);
 		
 	Term match2 = TacletForTests.parseTerm("\\<{int i;}\\>{i:=Z(2(#))} true");
 	match2 = match2.sub(0);
 	assertTrue("Instantiations should be found.",
 		   assign_n.match(match2, ((FindTaclet)assign_n).find(), 
-				  true, MatchConditions.EMPTY_MATCHCONDITIONS, services, Constraint.BOTTOM)!=null);
+				  true, MatchConditions.EMPTY_MATCHCONDITIONS, services)!=null);
     }
 
 

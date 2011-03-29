@@ -74,14 +74,6 @@ public class Proof implements Named {
     /** maps the Abbreviations valid for this proof to their corresponding terms.*/
     private AbbrevMap abbreviations = new AbbrevMap();
 
-    /** User constraint */
-    @Deprecated
-    private ConstraintTableModel userConstraint = new ConstraintTableModel ();    
-
-    /** Deliverer for new metavariables */
-    @Deprecated
-    private MetavariableDeliverer metavariableDeliverer;
-
     /** the environment of the proof with specs and java model*/
     private ProofEnvironment proofEnv;
     
@@ -115,9 +107,6 @@ public class Proof implements Named {
         assert services != null : "Tried to create proof without valid services.";
 	this.services = services.copyProofSpecific(this);
         this.settings = settings;
-        
-        metavariableDeliverer = new MetavariableDeliverer ( this );
-        addConstraintListener ();
 
         addStrategyListener ();
     }
@@ -321,26 +310,6 @@ public class Proof implements Named {
         while ( it.hasNext () )
             it.next ().setGoalStrategy(ourStrategy);
     }
-
-
-    /** returns the user constraint (table model)
-     * @return the user constraint
-     */
-    @Deprecated
-    public ConstraintTableModel getUserConstraint() {
-	return userConstraint;
-    }
-
-    @Deprecated
-    private void addConstraintListener() {
-	getUserConstraint ()
-	    .addConstraintTableListener ( new ConstraintTableListener () {
-		    public void constraintChanged ( ConstraintTableEvent e ) {
-			clearAndDetachRuleAppIndexes ();
-		}
-	    });
-    }
-    
     private void addStrategyListener () {
         getSettings().getStrategySettings()
             .addSettingsListener ( new SettingsListener () {
@@ -358,13 +327,7 @@ public class Proof implements Named {
             it.next ().clearAndDetachRuleAppIndex ();
     }
     
-    /** @return Deliverer of new metavariables (with unique names)*/
-    @Deprecated    
-    public MetavariableDeliverer getMetavariableDeliverer () {
-	return metavariableDeliverer;
-    }
-    
-    
+ 
     public JavaModel getJavaModel() {
         return proofEnv.getJavaModel();
     }

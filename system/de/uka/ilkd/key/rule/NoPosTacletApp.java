@@ -17,11 +17,15 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.RenameTable;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.ModalOperatorSV;
+import de.uka.ilkd.key.logic.op.ProgramSV;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SkolemTermSV;
+import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
@@ -65,38 +69,17 @@ public class NoPosTacletApp extends TacletApp {
 			     Services         services) {
 	return createNoPosTacletApp ( taclet,
 				      instantiations,
-				      Constraint.BOTTOM,
-				       DefaultImmutableSet.<Metavariable>nil(),
 				      null,
-				      services);
+				       services);
     }
 
     public static NoPosTacletApp
-	createNoPosTacletApp(Taclet             taclet, 
-			     SVInstantiations   instantiations,
-			     Constraint         matchConstraint,
-			     ImmutableSet<Metavariable>  matchNewMetavariables,
-			     Services           services) {
-	return createNoPosTacletApp ( taclet,
-				      instantiations,
-				      matchConstraint,
-				      matchNewMetavariables,
-				      null,
-				      services);
-    }
- 
-    public static NoPosTacletApp
 	createNoPosTacletApp(Taclet                       taclet, 
 			     SVInstantiations             instantiations,
-			     Constraint                   matchConstraint,
-			     ImmutableSet<Metavariable>            matchNewMetavariables,
 			     ImmutableList<IfFormulaInstantiation> ifInstantiations,
 			     Services                     services) {
 	Debug.assertTrue ( ifInstsCorrectSize ( taclet, ifInstantiations ),
 			   "If instantiations list has wrong size" );
-
-	if ( !matchConstraint.isSatisfiable () )
-	    return null;
 
 	SVInstantiations inst = resolveCollisionVarSV(taclet, 
 						      instantiations,
@@ -104,8 +87,6 @@ public class NoPosTacletApp extends TacletApp {
 	if (checkVarCondNotFreeIn(taclet, inst)) {
 	    return new NoPosTacletApp(taclet,
 				      inst,
-				      matchConstraint,
-				      matchNewMetavariables,
 				      ifInstantiations);
 	} 
 	return null;
@@ -116,8 +97,6 @@ public class NoPosTacletApp extends TacletApp {
 						      Services           services) {
 	return createNoPosTacletApp ( taclet,
 				      matchCond.getInstantiations   (),
-				      matchCond.getConstraint       (),
-				      matchCond.getNewMetavariables (),
 				      null,
 				      services);
     }
@@ -133,12 +112,9 @@ public class NoPosTacletApp extends TacletApp {
     public static NoPosTacletApp
 	createFixedNoPosTacletApp( Taclet             taclet,
 				   SVInstantiations   instantiations,
-				   Constraint         constraint,
 				   Services           services) {
 	NoPosTacletApp res = createNoPosTacletApp ( taclet,
 						    instantiations,
-						    constraint,
-						    DefaultImmutableSet.<Metavariable>nil(),
 						    null,
 						    services);
 	// Make the given SVs fixed
@@ -167,13 +143,9 @@ public class NoPosTacletApp extends TacletApp {
      */
     private NoPosTacletApp(Taclet                       taclet,
 			   SVInstantiations             instantiations,
-			   Constraint                   matchConstraint,
-			   ImmutableSet<Metavariable>            matchNewMetavariables,
 			   ImmutableList<IfFormulaInstantiation> ifInstantiations) {
 	super(taclet,
 	      instantiations,
-	      matchConstraint,
-	      matchNewMetavariables,
 	      ifInstantiations);
     }
 
@@ -224,15 +196,11 @@ public class NoPosTacletApp extends TacletApp {
 	    return createNoPosTacletApp(taclet(), 
 					instantiations()
 					.addInteresting(sv, term, services),
-					constraint       (),
-					newMetavariables (),
 					ifFormulaInstantiations (),
 					services);
 	else
 	    return createNoPosTacletApp(taclet(), 
 					instantiations().add(sv, term, services),
-					constraint       (),
-					newMetavariables (),
 					ifFormulaInstantiations (),
 					services);
     }
@@ -246,16 +214,12 @@ public class NoPosTacletApp extends TacletApp {
 	if (interesting) {
 	    return createNoPosTacletApp(taclet(), 
 		    			instantiations().addInterestingList(sv, list, services), 
-		    			constraint(),
-		    			newMetavariables(), 
 		    			ifFormulaInstantiations(),
 		    			services);
 	} else {
 	    return createNoPosTacletApp(taclet(), 
 		    			instantiations().addList(sv, list, services), 
-		    			constraint(), 
-		    			newMetavariables(),
-		    			ifFormulaInstantiations(),
+		    			ifFormulaInstantiations(), 
 		    			services);
 	}
     }
@@ -279,15 +243,11 @@ public class NoPosTacletApp extends TacletApp {
 	    return createNoPosTacletApp(taclet(), 
 					instantiations()
 					.addInteresting(sv, pe, services),
-					constraint       (),
-					newMetavariables (),
 					ifFormulaInstantiations (),
 					services);
 	} else { 
 	    return createNoPosTacletApp(taclet(), 
 					instantiations().add(sv, pe, services),
-					constraint       (),
-					newMetavariables (),
 					ifFormulaInstantiations (),
 					services);
 	}
@@ -306,8 +266,6 @@ public class NoPosTacletApp extends TacletApp {
 	    			      Services services) {
 	return new NoPosTacletApp(taclet(),
 				  svi.union(instantiations(), services),
-				  constraint       (),
-				  newMetavariables (),
 				  ifFormulaInstantiations ());
     }
 
@@ -324,8 +282,6 @@ public class NoPosTacletApp extends TacletApp {
     protected TacletApp setInstantiation(SVInstantiations svi,
 	    				 Services services) {
 	return new NoPosTacletApp(taclet(), svi,
-				  constraint       (),
-				  newMetavariables (),
 				  ifFormulaInstantiations ());
     }
 
@@ -339,8 +295,6 @@ public class NoPosTacletApp extends TacletApp {
 	    				Services services) {
 	return createNoPosTacletApp( taclet(),
 				     mc.getInstantiations   (),
-				     mc.getConstraint       (),
-				     mc.getNewMetavariables (),
 				     ifFormulaInstantiations (),
 				     services);
     }
@@ -356,8 +310,6 @@ public class NoPosTacletApp extends TacletApp {
 					       Services                     services) {
 	return createNoPosTacletApp( taclet(),
 				     mc.getInstantiations   (),
-				     mc.getConstraint       (),
-				     mc.getNewMetavariables (),
 				     ifInstantiations,
 				     services);
     }
@@ -407,10 +359,8 @@ public class NoPosTacletApp extends TacletApp {
      * @return TacletApp with the resulting instantiations or null
      */
     public NoPosTacletApp matchFind(PosInOccurrence pos,
-				    Constraint      termConstraint,
-				    Services        services,
-				    Constraint      userConstraint) {
-        NoPosTacletApp result = matchFind(pos, termConstraint, services, userConstraint, null);
+				    Services        services) {
+        NoPosTacletApp result = matchFind(pos, services, null);
 	return result;
     }
 
@@ -421,34 +371,27 @@ public class NoPosTacletApp extends TacletApp {
        anyway).
      */
     public NoPosTacletApp matchFind(PosInOccurrence pos,
-				    Constraint      termConstraint,
 				    Services        services,
-				    Constraint      userConstraint,
-                                    Term t) {
+				    Term t) {
         if ((t==null) && (pos!=null)) t = pos.subTerm ();
 
-        MatchConditions mc = setupMatchConditions(pos, services, userConstraint);
+        MatchConditions mc = setupMatchConditions(pos, services);
         
         if ( mc == null )
             return null;
         
         MatchConditions res = null;
-	if (taclet() instanceof FindTaclet) {
-	    Constraint c = mc.getConstraint ().join ( termConstraint, 
-                    services );
-	    if ( c.isSatisfiable () ) {
+	if (taclet() instanceof FindTaclet) {	   
 		res = ((FindTaclet)taclet())
 		    .matchFind ( t,
-				 mc.setConstraint ( c ),
-				 services,
-				 userConstraint );
+				 mc,
+				 services );
 		// the following check will partly be repeated within the
 		// constructor; this could be optimised
 		if ( res == null ||
 		     !checkVarCondNotFreeIn(taclet(), 
                              res.getInstantiations(), pos) )
 		    return null;
-	    } 
 	} else {
 	    res = mc;
 	}
@@ -473,22 +416,18 @@ public class NoPosTacletApp extends TacletApp {
 
     
     protected MatchConditions setupMatchConditions(PosInOccurrence pos,
-		  				   Services services,
-						   Constraint userConstraint) {
+		  				   Services services) {
 	SVInstantiations svInst = taclet() instanceof NoFindTaclet ? 
                 instantiations   () : instantiations   ().clearUpdateContext ();
         
                 MatchConditions mc  =
 	    new MatchConditions ( svInst,
-				  constraint       (),
-				  newMetavariables (),
-                                  RenameTable.EMPTY_TABLE);
+				  RenameTable.EMPTY_TABLE);
         
 	if ( taclet() instanceof RewriteTaclet ) {
 	    mc = ((RewriteTaclet)taclet ()).checkUpdatePrefix ( pos,
 								mc,
-								services,
-								userConstraint );
+								services );
 	    if (mc==null) {
                 Debug.out("NoPosTacletApp: Update prefix check failed.");
             }

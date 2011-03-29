@@ -97,8 +97,7 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
     }
     
     public String toString (Services services) {
-        return ProofSaver.printAnything(cf.formula(), services)+
-            (cf.constraint().isBottom() ? "" : "<<"+cf.constraint());
+        return ProofSaver.printAnything(cf.formula(), services);
     }
 
     public boolean equals(Object p_obj) {

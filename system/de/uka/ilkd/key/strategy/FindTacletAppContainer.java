@@ -61,11 +61,7 @@ public class FindTacletAppContainer extends TacletAppContainer {
     	    p_goal.getFormulaTagManager().getPosForTag(positionTag);
 	if ( topPos == null )
 	    // the formula does not exist anymore, bail out
-	    return false;
-	if ( !topPos.constrainedFormula().constraint().equals
-	     ( applicationPosition.constrainedFormula().constraint() ) )
-	    // the constraint of the formula has changed, bail out
-	    return false;
+	    return false;	
 	if ( subformulaOrPreceedingUpdateHasChanged ( p_goal ) )
 	    return false;
 	return true;

@@ -188,24 +188,6 @@ public class KeYMediator {
        return getProof().getServices();
     }
 
-    /** returns the user constraint (table model)
-     * @return the user constraint
-     */
-    public ConstraintTableModel getUserConstraint() {
-	if ( getProof () == null )
-	    return null;
-	else
-	    return getProof ().getUserConstraint ();
-    }
-
-    /** @return Deliverer of new metavariables (with unique names)*/
-    public MetavariableDeliverer getMetavariableDeliverer () {
-	if ( getProof () == null )
-	    return null;
-	else
-	    return getProof ().getMetavariableDeliverer ();
-    }
-
     /** simplified user interface? */
     public boolean stupidMode() {
        return stupidMode;
@@ -393,8 +375,7 @@ public class KeYMediator {
             if (stupidMode && !firstApp.complete()) {                
                 ImmutableList<TacletApp> ifSeqCandidates =
                     firstApp.findIfFormulaInstantiations(goal.sequent(),
-		        getServices(),
-                        getUserConstraint().getConstraint());
+		        getServices());
                 
                 if (ifSeqCandidates.size() == 1) {
                     ifSeqInteraction = false;
@@ -443,7 +424,7 @@ public class KeYMediator {
 	assert goal != null;
 
 	ImmutableSet<RuleApp> set = interactiveProver.
-	    getBuiltInRuleApp(rule, pos, getUserConstraint().getConstraint());
+	    getBuiltInRuleApp(rule, pos);
 	if (set.size() > 1) {
 	    System.err.println("keymediator:: Expected a single app. If " +
 		      "it is OK that there are more than one " +
@@ -503,7 +484,7 @@ public class KeYMediator {
      */
     public ImmutableList<BuiltInRule> getBuiltInRule(PosInOccurrence pos) {
 	return interactiveProver.getBuiltInRule
-	    (pos, getUserConstraint().getConstraint());
+	    (pos);
     }
 
     /** adds a listener to the KeYSelectionModel, so that the listener

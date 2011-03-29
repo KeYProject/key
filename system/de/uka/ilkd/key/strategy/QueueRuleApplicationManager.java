@@ -90,8 +90,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
         // necessarily this object
         getGoal ().ruleAppIndex ()
                   .reportAutomatedRuleApps ( getGoal ().getRuleAppManager (),
-                                             getServices (),
-                                             getUserConstraint () );
+                                             getServices () );
         //        printQueue(queue);
     }
 
@@ -304,11 +303,6 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
 
     private Services getServices() {
 	return getProof ().getServices ();
-    }
-
-    @Deprecated
-    private Constraint getUserConstraint() {
-        return getProof ().getUserConstraint ().getConstraint ();
     }
 
     private Proof getProof() {

@@ -205,10 +205,8 @@ public final class OneStepSimplifier implements BuiltInRule,
 	  	        		   int indexNr) {
 	final ImmutableList<NoPosTacletApp> apps 
 		= indices[indexNr].getRewriteTaclet(pos, 
-						    Constraint.BOTTOM, 
 						    TacletFilter.TRUE, 
-						    services, 
-						    Constraint.BOTTOM);
+						    services);
 	for(TacletApp app : apps) {
 	    app = app.setPosInOccurrence(pos, services);
 	    if(app == null) {
@@ -459,8 +457,7 @@ public final class OneStepSimplifier implements BuiltInRule,
     
     @Override    
     public boolean isApplicable(Goal goal, 
-                                PosInOccurrence pio, 
-                                Constraint userConstraint) {
+                                PosInOccurrence pio) {
 	//abort if switched off
 	if(!active) {
 	    return false;

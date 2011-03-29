@@ -177,8 +177,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
     @Override
     public boolean isApplicable(Goal goal, 
-	    			PosInOccurrence pio,
-	    			Constraint userConstraint) {
+	    			PosInOccurrence pio) {
 	//focus must be top level succedent
 	if(pio == null || !pio.isTopLevel() || pio.isInAntec()) {
 	    return false;

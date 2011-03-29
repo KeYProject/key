@@ -16,7 +16,6 @@ package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 
@@ -32,13 +31,6 @@ public interface RuleApp {
      * a position in the corresponding formula) of this rule application
      */
     PosInOccurrence posInOccurrence();
-
-    /**
-     * returns the constraint under which a rule is applicable
-     */
-    @Deprecated
-    Constraint       constraint ();
-
 
     /** applies the specified rule at the specified position 
      * if all schema variables have been instantiated

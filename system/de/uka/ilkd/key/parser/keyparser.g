@@ -3415,14 +3415,14 @@ termorseq returns [Object o]
                     // A sequent with only head in the antecedent.
                     Semisequent ant = Semisequent.EMPTY_SEMISEQUENT;
                     ant = ant.insertFirst(
-                                          new ConstrainedFormula(head, Constraint.BOTTOM)).semisequent();
+                                          new ConstrainedFormula(head)).semisequent();
                     o = Sequent.createSequent(ant,ss);
                 }
             } else {
                 // A sequent.  Prepend head to the antecedent.
                 Semisequent newAnt = s.antecedent();
                 newAnt = newAnt .insertFirst(
-                                             new ConstrainedFormula(head, Constraint.BOTTOM)).semisequent();
+                                             new ConstrainedFormula(head)).semisequent();
                 o = Sequent.createSequent(newAnt,s.succedent());
             }
         }
@@ -3441,7 +3441,7 @@ semisequent returns [Semisequent ss]
     :
         /* empty */ | 
         head=term ( COMMA ss=semisequent ) ? 
-        { ss = ss.insertFirst(new ConstrainedFormula(head, Constraint.BOTTOM)).semisequent(); }
+        { ss = ss.insertFirst(new ConstrainedFormula(head)).semisequent(); }
     ;
 
 varexplist[TacletBuilder b] : varexp[b] ( COMMA varexp[b] ) * ;

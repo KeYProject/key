@@ -11,7 +11,6 @@
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 
 
@@ -34,11 +33,10 @@ class UninstantiatedNoPosTacletApp extends NoPosTacletApp {
      * @see de.uka.ilkd.key.rule.NoPosTacletApp#setupMatchConditions(de.uka.ilkd.key.logic.PosInOccurrence, de.uka.ilkd.key.java.Services, de.uka.ilkd.key.logic.Constraint)
      */
     protected MatchConditions setupMatchConditions (PosInOccurrence pos,
-                                                    Services services,
-                                                    Constraint userConstraint) {
+                                                    Services services) {
         if ( taclet() instanceof RewriteTaclet )
             return ((RewriteTaclet)taclet ()).checkUpdatePrefix
-            ( pos, MatchConditions.EMPTY_MATCHCONDITIONS, services, userConstraint );
+            ( pos, MatchConditions.EMPTY_MATCHCONDITIONS, services );
 
         return MatchConditions.EMPTY_MATCHCONDITIONS;
     }

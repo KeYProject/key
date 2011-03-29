@@ -154,34 +154,17 @@ public class Semisequent implements Iterable<ConstrainedFormula> {
 	ImmutableList<ConstrainedFormula> searchList = semiCI.getFormulaList();
 	ImmutableList<ConstrainedFormula> newSeqList = ImmutableSLList.<ConstrainedFormula>nil();
 	ConstrainedFormula       cf;
-	Constraint               c;
 	int                      pos        = -1;
 
 	while ( !searchList.isEmpty() ) {
 	    ++pos;
 	    cf         = searchList.head ();
 	    searchList = searchList.tail();	    
-
-            // for the moment we do not remove redundancy if intersection sorts are required
-            // Attention: just replacing null by new Services () slows KeY down by factor 3
-	    c          = Constraint.BOTTOM.unify ( cf     .formula (),
-						   conForm.formula (), 
-                                                   null );
-            
 	    
-	    if ( c.isAsWeakAs ( cf     .constraint () ) ||
-		 c.isAsWeakAs ( conForm.constraint () ) ) {
-		if ( cf.constraint ().isAsWeakAs   ( conForm.constraint () ) ) {		  
-		    semiCI.rejectedFormula( cf );
-                    return semiCI; // semisequent already contains formula
-		} else if ( cf.constraint ().isAsStrongAs 
-			    ( conForm.constraint () ) ) {                  
-                    semiCI.removedFormula(pos, cf);
-		    if ( idx > pos )
-			--idx;
-		    --pos;			
-		    continue;          // formula of the semisequent can be removed
-		}
+	    if (cf.formula().equalsModRenaming(conForm.formula())) {		  
+		semiCI.rejectedFormula( cf );
+		return semiCI; // semisequent already contains formula
+
 	    }
 	    newSeqList = newSeqList.prepend ( cf );	    	    
 	}           

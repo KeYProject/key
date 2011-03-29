@@ -150,8 +150,7 @@ public class NonGoalInfoView extends JTextArea {
     
     public NonGoalInfoView (Node node, KeYMediator mediator) {
 	filter = new ConstraintSequentPrintFilter 
-	    ( node.sequent (), 
-	      mediator.getUserConstraint ().getConstraint () );
+	    ( node.sequent () );
 	printer = new LogicPrinter
 	    (new ProgramPrinter(null), 
 	     mediator.getNotationInfo(),

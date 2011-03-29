@@ -511,8 +511,7 @@ public class Node {
 	RuleApp rap = getAppliedRuleApp();
         if (rap == null) {
 	    Goal goal = proof().getGoal(this);
-	    if ( goal == null
-                 || proof ().getUserConstraint ().displayClosed ( this ) )
+	    if ( goal == null || this.isClosed() )
                 return "Closed goal";
             else if(goal.isAutomatic())
                 return "OPEN GOAL";

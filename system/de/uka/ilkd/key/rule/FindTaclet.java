@@ -92,18 +92,15 @@ public abstract class FindTaclet extends Taclet {
      *       <tt> matchCond.getConstraint ().isSatisfiable () </tt>
      * must return true
      * @param services the Services 
-     * @param userConstraint a Constraint derived from user defined 
-     * instantiations of meta variables
      * @return the found schema variable mapping or <tt>null</tt> if 
      * the matching failed
      */
     public MatchConditions matchFind(Term term,
             MatchConditions matchCond,
-            Services services,
-            Constraint userConstraint) {
+            Services services) {
         return match(term, find(), 
                 ignoreTopLevelUpdates(),
-                matchCond, services, userConstraint);
+                matchCond, services);
     }
 
     /** CONSTRAINT NOT USED 
@@ -152,9 +149,6 @@ public abstract class FindTaclet extends Taclet {
 
 	TacletApp                    tacletApp        = (TacletApp) ruleApp;
 	MatchConditions              mc               = tacletApp.matchConditions ();
-
-	// Restrict introduced metavariables to the subtree
-	setRestrictedMetavariables ( goal, mc );
 
 	ImmutableList<Goal>                   newGoals         =
 	    checkIfGoals ( goal,
@@ -249,45 +243,6 @@ public abstract class FindTaclet extends Taclet {
 	return super.setName(s, b); 
     }
 
-    /**
-     * Determine whether a replacewith-part is really supposed to modify
-     * concerned formulas when applying a taclet (otherwise copies of the
-     * formulas are created). Copies are created whenever the constraint of the
-     * new formulas is stronger than the conjunction of the original
-     * find-formula constraint and the user constraint. (Taking the user
-     * constraint into account at this point ensures that the existence of the
-     * user constraint is transparent to the user, and is a temporary solution
-     * to cope with the absence of disunification constraints).
-     * 
-     * UPDATE: for the time being we are only considering the old constraint of
-     * the formula (as the user constraint is more or less disable in
-     * <code>TacletApp. canUseMVAPosteriori</code> right now)
-     * 
-     * @param goal
-     *            the goal to which the taclet is applied
-     * @param posOfFind
-     *            position of the find-formula (which is the formula whose
-     *            constraint is considered as the original formula constraint)
-     * @param matchCond
-     *            results of matching the taclet, in particular the new
-     *            constraint that is attached to formulas added by replacewith
-     * @return true iff replacewith is supposed to create copies of concerned
-     *         formulas
-     */
-    protected boolean createCopies (Goal goal,
-                                    PosInOccurrence posOfFind,
-                                    MatchConditions matchCond) {
-//        final Proof proof = goal.proof (); 
-//        final Constraint userConstraint =
-//            proof.getUserConstraint ().getConstraint ();
-        final Constraint oriConstraint =
-            posOfFind.constrainedFormula ().constraint ();
-//        final Constraint combinedConstraint =
-//            userConstraint.join ( oriConstraint, proof.getServices() );
-        final Constraint newConstraint = matchCond.getConstraint ();
-        return !newConstraint.isAsWeakAs ( oriConstraint );
-    }
-    
 
     /**
      * returns the variables that occur bound in the find part

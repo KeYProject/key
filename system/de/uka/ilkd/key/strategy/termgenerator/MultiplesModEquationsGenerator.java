@@ -160,7 +160,6 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
         final List<CofactorPolynomial> res = new ArrayList<CofactorPolynomial> ();
      
         for (final ConstrainedFormula cfm : goal.sequent ().antecedent ()) {
-            if ( !cfm.constraint ().isBottom () ) continue;
 
             final Term t = cfm.formula();
             if ( t.op () != Equality.EQUALS

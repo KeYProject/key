@@ -77,10 +77,6 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
         }
 
         
-        if ( !newApp.constraint ().equals ( cmp.constraint () ) )
-            return false;
-
-        
         // compare the if-sequent instantiations
         if ( newApp.ifFormulaInstantiations () == null
                 || cmp.ifFormulaInstantiations () == null ) {  

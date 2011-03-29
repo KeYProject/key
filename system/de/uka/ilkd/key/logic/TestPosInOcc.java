@@ -37,7 +37,7 @@ public class TestPosInOcc extends TestCase {
 	terms[2]     = TB.func ( p, new Term[] { terms[1] } );
 
 	PosInOccurrence pio = new PosInOccurrence
-	    ( new ConstrainedFormula ( terms[2], Constraint.BOTTOM ),
+	    ( new ConstrainedFormula ( terms[2] ),
 	      PosInTerm.TOP_LEVEL,
 	    true);
 

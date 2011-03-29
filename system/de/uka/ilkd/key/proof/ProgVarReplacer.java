@@ -142,8 +142,6 @@ public final class ProgVarReplacer {
 		 	= NoPosTacletApp.createNoPosTacletApp(
 				noPosTacletApp.taclet(),
 		    		newInsts,
-				noPosTacletApp.constraint(),
-				noPosTacletApp.newMetavariables(),
 				noPosTacletApp.ifFormulaInstantiations(),
 				services);
 		appsToBeRemoved = appsToBeRemoved.add(noPosTacletApp);
@@ -276,7 +274,7 @@ public final class ProgVarReplacer {
 	final Term newFormula = replace(cf.formula());
 
 	if(newFormula != cf.formula()) {
-            result = new ConstrainedFormula(newFormula, cf.constraint());
+            result = new ConstrainedFormula(newFormula);
 	}
         return result;
     }

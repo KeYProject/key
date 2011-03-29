@@ -15,7 +15,11 @@ import junit.framework.TestCase;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.ConstrainedFormula;
+import de.uka.ilkd.key.logic.Constraint;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Metavariable;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
@@ -110,17 +114,16 @@ public class TestTermTacletAppIndex extends TestCase{
                                                     false );
 
         TermTacletAppIndex termIdx =
-            TermTacletAppIndex.create ( pio, serv, Constraint.BOTTOM, ruleIdx,
-                                        NullNewRuleListener.INSTANCE,
-                                        TacletFilter.TRUE, cache );
+            TermTacletAppIndex.create ( pio, serv, ruleIdx, NullNewRuleListener.INSTANCE,
+                                        TacletFilter.TRUE,
+                                        cache );
 
         checkTermIndex ( pio, termIdx );
 
         // this should not alter the index, as the formula actually
         // did not change
-        termIdx = termIdx.update ( pio.down ( 0 ), serv, Constraint.BOTTOM,
-                                   ruleIdx, NullNewRuleListener.INSTANCE,
-                                   cache );
+        termIdx = termIdx.update ( pio.down ( 0 ), serv, ruleIdx,
+                                   NullNewRuleListener.INSTANCE, cache );
 
         checkTermIndex ( pio, termIdx );
 
@@ -131,16 +134,16 @@ public class TestTermTacletAppIndex extends TestCase{
                                                      PosInTerm.TOP_LEVEL, false );
 
         termIdx = termIdx.update ( pio2.down ( 0 ).down ( 0 ).down ( 0 ), serv,
-                                   Constraint.BOTTOM, ruleIdx,
-                                   NullNewRuleListener.INSTANCE, cache );
+                                   ruleIdx, NullNewRuleListener.INSTANCE,
+                                   cache );
         checkTermIndex2 ( pio2, termIdx );
 
         // add a new taclet to the index
         ruleIdx.add ( remove_ff );
         SetRuleFilter filter = new SetRuleFilter ();
         filter.addRuleToSet ( ruleIdx.lookup ( remove_ff.taclet().name () ).rule () );
-        termIdx = termIdx.addTaclets ( filter, pio2, serv, Constraint.BOTTOM,
-                                       ruleIdx, NullNewRuleListener.INSTANCE );
+        termIdx = termIdx.addTaclets ( filter, pio2, serv, ruleIdx,
+                                       NullNewRuleListener.INSTANCE );
         checkTermIndex3 ( pio2, termIdx );
     }
 
@@ -153,8 +156,7 @@ public class TestTermTacletAppIndex extends TestCase{
     }
 
     private PosInOccurrence down ( PosInOccurrence pio, int i ) {
-	return handleDisplayConstraint(pio.down(i),
-	                               pio.constrainedFormula().constraint());
+	return pio.down(i);
     }
 
     private void checkTermIndex(PosInOccurrence pio,
@@ -203,32 +205,6 @@ public class TestTermTacletAppIndex extends TestCase{
 				   ImmutableList<Taclet>         p_template ) {
 	assertTrue ( p_toCheck.size () == p_template.size () );
         for (NoPosTacletApp aP_toCheck : p_toCheck) assertTrue(p_template.contains(aP_toCheck.taclet()));
-    }
-
-    /**
-     * Check whether the given term is a metavariable, and replace it
-     * with a concrete term provided that such a term is determined by
-     * the user constraint
-     * @return A <code>PosInOccurrence</code> object in which
-     * eventually the metavariable has been replaced with a term as
-     * given by the user constraint. In any case the object points to
-     * the same position of a term as the <code>pos</code> parameter
-     */
-    private static PosInOccurrence handleDisplayConstraint
-	( PosInOccurrence pos, Constraint displayConstraint ) {
-
-	Term term = pos.subTerm ();
-
-	if ( term.op () instanceof Metavariable ) {
-	    if ( pos.termBelowMetavariable () == null ) {
-		Term metaTerm = displayConstraint
-		    .getInstantiation ( (Metavariable)term.op () );
-		if ( metaTerm.op () != term.op () )
-		    return pos.setTermBelowMetavariable ( metaTerm );
-	    }
-	}
-
-	return pos;
     }
     
 }

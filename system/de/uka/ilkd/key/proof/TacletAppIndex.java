@@ -19,7 +19,12 @@ import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.FindTaclet;
+import de.uka.ilkd.key.rule.NoFindTaclet;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.PosTacletApp;
+import de.uka.ilkd.key.rule.RewriteTaclet;
+import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Debug;
 
 
@@ -158,14 +163,12 @@ public class TacletAppIndex  {
 
         antecIndex = new SemisequentTacletAppIndex ( getSequent (), true,
                                                      getServices (),
-                                                     getUserConstraint (),
                                                      tacletIndex (),
                                                      getNewRulePropagator (),
                                                      getRuleFilter (),
                                                      indexCaches );
         succIndex = new SemisequentTacletAppIndex ( getSequent (), false,
                                                     getServices (),
-                                                    getUserConstraint (),
                                                     tacletIndex (),
                                                     getNewRulePropagator (),
                                                     getRuleFilter (),
@@ -198,12 +201,10 @@ public class TacletAppIndex  {
 
     private ImmutableList<TacletApp> getFindTacletWithPos ( PosInOccurrence pos,
                                                    TacletFilter    filter,
-                                                   Services        services, 
-                                                   Constraint      userConstraint ) {
+                                                   Services        services ) {
         Debug.assertFalse ( pos == null );
         ImmutableList<NoPosTacletApp> tacletInsts = getFindTaclet ( pos, filter,
-                                                           services,
-                                                           userConstraint );
+                                                           services );
         return createTacletApps ( tacletInsts, pos, services );
     }
 
@@ -214,12 +215,10 @@ public class TacletAppIndex  {
      */
     public ImmutableList<TacletApp> getTacletAppAt(PosInOccurrence pos,
                                           TacletFilter    filter,
-                                          Services        services,
-                                          Constraint      userConstraint) {
-        ImmutableList<TacletApp> sal = getFindTacletWithPos ( pos, filter, services,
-                                                     userConstraint );
+                                          Services        services) {
+        ImmutableList<TacletApp> sal = getFindTacletWithPos ( pos, filter, services );
         return prepend ( sal,
-                         getNoFindTaclet ( filter, services, userConstraint ) );
+                         getNoFindTaclet ( filter, services ) );
     }
     
     /** creates TacletApps out of each single NoPosTacletApp object
@@ -267,11 +266,9 @@ public class TacletAppIndex  {
      * @return list of all possible instantiations
      */
     public ImmutableList<NoPosTacletApp> getNoFindTaclet(TacletFilter filter,
-                                                Services services,
-                                                Constraint userConstraint) {
+                                                Services services) {
         RuleFilter effectiveFilter = new AndRuleFilter ( filter, ruleFilter );
-        return tacletIndex ().getNoFindTaclet ( effectiveFilter, services,
-                                                userConstraint );
+        return tacletIndex ().getNoFindTaclet ( effectiveFilter, services );
     }
 
     /** 
@@ -285,11 +282,10 @@ public class TacletAppIndex  {
      */
     public ImmutableList<NoPosTacletApp> getRewriteTaclet(PosInOccurrence pos, 
                                                  TacletFilter    filter,
-                                                 Services        services,
-                                                 Constraint      userConstraint) { 
+                                                 Services        services) { 
 
         final Iterator<NoPosTacletApp> it =
-            getFindTaclet ( pos, filter, services, userConstraint ).iterator();
+            getFindTaclet ( pos, filter, services ).iterator();
 
         ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
 
@@ -311,8 +307,7 @@ public class TacletAppIndex  {
      */
     public ImmutableList<NoPosTacletApp> getFindTaclet(PosInOccurrence pos,
                                               TacletFilter    filter,
-                                              Services        services,
-                                              Constraint      userConstraint) { 
+                                              Services        services) { 
         return getIndex ( pos ).getTacletAppAt ( pos, filter );
     }
 
@@ -333,7 +328,7 @@ public class TacletAppIndex  {
         final ImmutableList<TacletApp> findTaclets =
             getIndex ( pos ).getTacletAppAtAndBelow ( pos, filter, services );
         return prepend ( findTaclets,
-                         getNoFindTaclet ( filter, services, userConstraint ) );
+                         getNoFindTaclet ( filter, services ) );
     }
 
     /** 
@@ -352,12 +347,10 @@ public class TacletAppIndex  {
         seq = sci.sequent ();
 
         antecIndex = antecIndex.sequentChanged ( sci, getServices (),
-                                                 getUserConstraint (),
                                                  tacletIndex (),
                                                  getNewRulePropagator () );
 
         succIndex = succIndex.sequentChanged ( sci, getServices (),
-                                               getUserConstraint (),
                                                tacletIndex (),
                                                getNewRulePropagator () );
     }
@@ -392,12 +385,10 @@ public class TacletAppIndex  {
 
         antecIndex = antecIndex.addTaclets ( newTaclets, getSequent (),
                                              getServices (),
-                                             getUserConstraint (),
                                              tacletIndex (),
                                              getNewRulePropagator () );
         succIndex = succIndex.addTaclets ( newTaclets, getSequent (),
                                            getServices (),
-                                           getUserConstraint (),
                                            tacletIndex (),
                                            getNewRulePropagator () );
     }
@@ -440,11 +431,6 @@ public class TacletAppIndex  {
         return seq;
     }
 
-    @Deprecated
-    private Constraint getUserConstraint() {
-        return getProof ().getUserConstraint ().getConstraint ();
-    }
-
     private Services getServices() {
         return getProof ().getServices ();
     }
@@ -470,14 +456,12 @@ public class TacletAppIndex  {
      * every cached taclet app.
      */
     public void reportRuleApps (NewRuleListener l,
-                                Services services,
-                                Constraint userConstraint) {
+                                Services services) {
         if ( antecIndex != null ) antecIndex.reportRuleApps ( l );
         if ( succIndex != null ) succIndex.reportRuleApps ( l );
 
         for (NoPosTacletApp noPosTacletApp : getNoFindTaclet(TacletFilter.TRUE,
-                services,
-                userConstraint))
+                services))
             l.ruleAdded(noPosTacletApp, null);
     }
 }

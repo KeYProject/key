@@ -288,10 +288,8 @@ public class CreateTacletForTests extends TestCase {
 	    System.err.println("Parser Error or Input Error");
 	    fail("Parser Error");
 	}	
-	ConstrainedFormula cf=new ConstrainedFormula(t_test1, 
-						   Constraint.BOTTOM);
-	ConstrainedFormula cf2=new ConstrainedFormula(t_test1, 
-						    Constraint.BOTTOM);
+	ConstrainedFormula cf=new ConstrainedFormula(t_test1);
+	ConstrainedFormula cf2=new ConstrainedFormula(t_test1);
 	seq_test1 = Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT,
 		    Semisequent.EMPTY_SEMISEQUENT.insert(0,cf).semisequent()); 
 	seq_test2 = Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT
@@ -338,14 +336,13 @@ public class CreateTacletForTests extends TestCase {
 	seq_testNat=Sequent.createSequent
 	    (Semisequent.EMPTY_SEMISEQUENT,
 	     Semisequent.EMPTY_SEMISEQUENT.insert
-	     (0, new ConstrainedFormula(tnat, Constraint.BOTTOM)).semisequent());
+	     (0, new ConstrainedFormula(tnat)).semisequent());
 
 
 	z = new LogicVariable(new Name("z"),sort1);
        	Term t_z=tf.createTerm(z,new Term[0]);
 	Term t_allzpz=TermBuilder.DF.all(z, tf.createTerm(func_p,new Term[]{t_z}));
- 	ConstrainedFormula cf3=new ConstrainedFormula(t_allzpz, 
-						    Constraint.BOTTOM);
+ 	ConstrainedFormula cf3=new ConstrainedFormula(t_allzpz);
  	seq_testAll=Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT, 
  					  Semisequent.EMPTY_SEMISEQUENT
 					  .insert(0,cf3).semisequent()); 

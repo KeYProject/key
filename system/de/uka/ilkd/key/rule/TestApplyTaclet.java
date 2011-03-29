@@ -131,7 +131,7 @@ public class TestApplyTaclet extends TestCase{
 					PosInTerm.TOP_LEVEL,
 					false);
 	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
-		    getTacletAppAt(TacletFilter.TRUE, applyPos, null, Constraint.BOTTOM);	
+		    getTacletAppAt(TacletFilter.TRUE, applyPos, null);	
 	assertTrue("Too many or zero rule applications.",rApplist.size()==1);
 	RuleApp rApp=rApplist.head();
 	assertTrue("Rule App should be complete", rApp.complete());
@@ -158,7 +158,7 @@ public class TestApplyTaclet extends TestCase{
 			    false);
 	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
 	    getTacletAppAt(TacletFilter.TRUE, applyPos,
-			   null, Constraint.BOTTOM);	
+			   null);	
 	assertTrue("Too many or zero rule applications.",rApplist.size()==1);
 	RuleApp rApp=rApplist.head();
 	assertTrue("Rule App should be complete", rApp.complete());
@@ -173,7 +173,7 @@ public class TestApplyTaclet extends TestCase{
 		     fma.sub(1));  
 	ImmutableList<NoPosTacletApp> nfapp=goals.head().indexOfTaclets().getNoFindTaclet
 	    (new IHTacletFilter ( true, ImmutableSLList.<RuleSet>nil() ), 
-	     null, Constraint.BOTTOM);
+	     null);
 	Term aimpb=TacletForTests.parseTerm("A -> B");
 	assertTrue("Cut Rule should be inserted to TacletIndex.", nfapp.size()==1);
 	assertTrue("Inserted cut rule's b should be instantiated to A -> B.",
@@ -206,7 +206,7 @@ public class TestApplyTaclet extends TestCase{
 				  PosInTerm.TOP_LEVEL,
 				  false);	
 	ImmutableList<TacletApp> rApplist = goal.ruleAppIndex().
-		    getTacletAppAt(TacletFilter.TRUE, applyPos, null, Constraint.BOTTOM);
+		    getTacletAppAt(TacletFilter.TRUE, applyPos, null);
 	assertTrue("Too many or zero rule applications.", rApplist.size()==1);
 	RuleApp rApp=rApplist.head();
 	rApp = ((TacletApp)rApp).tryToInstantiate ( TacletForTests.services() );
@@ -232,20 +232,20 @@ public class TestApplyTaclet extends TestCase{
 	     false);
  	ImmutableList<TacletApp> rApplist
 	    = goal.ruleAppIndex().getTacletAppAt(TacletFilter.TRUE,
-                applyPos, null, Constraint.BOTTOM);
+                applyPos, null);
  	assertTrue("Too many or zero rule applications.\napp list:"+rApplist,rApplist.size()==1);
 
  	TacletApp rApp=rApplist.head();
 	ImmutableList<TacletApp> appList = 
 	    rApp.findIfFormulaInstantiations ( goal.sequent (), 
-	                                       TacletForTests.services(), Constraint.BOTTOM );
+	                                       TacletForTests.services() );
 	assertTrue("Match Failed.", !appList.isEmpty());
 	assertTrue("Too many matches.", appList.size()==1);
 	assertTrue("Wrong match found.", appList.head().instantiations()==rApp.instantiations());
 	assertTrue("Rule App should be complete", appList.head().complete());
  	ImmutableList<Goal> goals=appList.head ().execute(goal, TacletForTests.services());
 	assertTrue("Wrong number of goals for close.", goals.size()==1);		
-	proof[2].closeGoal ( goals.head (), appList.head ().constraint () );
+	proof[2].closeGoal ( goals.head (), Constraint.BOTTOM);
 	assertTrue("Proof should be closed.", proof[2].closed ());		
 	/*
  	IList<SVInstantiations> svilist=rApp.taclet().matchIf(goal.sequent(),
@@ -272,7 +272,7 @@ public class TestApplyTaclet extends TestCase{
 	     true);
  	ImmutableList<TacletApp> rApplist
 	    = goal.ruleAppIndex().getTacletAppAt(TacletFilter.TRUE,
-	            applyPos, null, Constraint.BOTTOM);
+	            applyPos, null);
  	assertTrue("Too many or zero rule applications.",rApplist.size()==1);
  	RuleApp rApp=rApplist.head();
 	assertTrue("Rule App should be complete", rApp.complete());
@@ -314,7 +314,7 @@ public class TestApplyTaclet extends TestCase{
 				  PosInTerm.TOP_LEVEL.down(1).down(0).down(0),
 				  false);
  	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
-	    getTacletAppAt(TacletFilter.TRUE, pos, null, Constraint.BOTTOM);	
+	    getTacletAppAt(TacletFilter.TRUE, pos, null);	
 
 	assertTrue("Too many or zero rule applications.",rApplist.size()==1);
 	RuleApp rApp=rApplist.head();
@@ -338,7 +338,7 @@ public class TestApplyTaclet extends TestCase{
 				  PosInTerm.TOP_LEVEL,
 				  false);
  	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
- 		    getTacletAppAt(TacletFilter.TRUE, pos, null, Constraint.BOTTOM);	
+ 		    getTacletAppAt(TacletFilter.TRUE, pos, null);	
 	assertTrue("Too many or zero rule applications.",rApplist.size()==1);
 	TacletApp rApp=rApplist.head().addInstantiation
 	    ((SchemaVariable)TacletForTests.getVariables().lookup(new Name("b")), 
@@ -512,7 +512,7 @@ public class TestApplyTaclet extends TestCase{
 	tacletIndex.add ( wh0 );
 	Goal goal = createGoal ( proof[4].root(), tacletIndex );
 	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
-	    getTacletAppAt(TacletFilter.TRUE, pio, null, Constraint.BOTTOM);
+	    getTacletAppAt(TacletFilter.TRUE, pio, null);
 
         final TacletApp app = rApplist.head();
         assertTrue("#e2 not instantiated", app.instantiations().isInstantiated(e2));
@@ -542,7 +542,7 @@ public class TestApplyTaclet extends TestCase{
 	tacletIndex.add ( cdr );
 	Goal goal = createGoal ( proof[1].root(), tacletIndex );
 	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
-	    getTacletAppAt(TacletFilter.TRUE, pio, null, Constraint.BOTTOM);
+	    getTacletAppAt(TacletFilter.TRUE, pio, null);
 	ImmutableList<Goal> goals=rApplist.head().execute(goal, TacletForTests.services);
 
 	assertTrue("Expected two goals", goals.size()==2);
@@ -581,7 +581,7 @@ public class TestApplyTaclet extends TestCase{
 
 	ImmutableList<TacletApp> rApplist = goal.ruleAppIndex().
 	    getTacletAppAt(TacletFilter.TRUE, 
-			   pio, null, Constraint.BOTTOM);
+			   pio, null);
 	ImmutableList<Goal> goals = rApplist.head().
 	    execute(goal, TacletForTests.services());
 
@@ -607,7 +607,7 @@ public class TestApplyTaclet extends TestCase{
 
 	ImmutableList<TacletApp> rApplist = goal.ruleAppIndex().
 	    getTacletAppAt(TacletFilter.TRUE, 
-			   pio, null, Constraint.BOTTOM);
+			   pio, null);
 	ImmutableList<Goal> goals = rApplist.head().
 	    execute(goal, TacletForTests.services());
 
@@ -638,7 +638,7 @@ public class TestApplyTaclet extends TestCase{
 
 	ImmutableList<TacletApp> rApplist = goal.ruleAppIndex().
 	    getTacletAppAt(TacletFilter.TRUE, 
-			   pio, null, Constraint.BOTTOM);
+			   pio, null);
 	ImmutableList<Goal> goals = rApplist.head().
 	    execute(goal, TacletForTests.services());
 	
@@ -654,7 +654,7 @@ public class TestApplyTaclet extends TestCase{
 
 	rApplist = goal.ruleAppIndex().
 	    getTacletAppAt(TacletFilter.TRUE, 
-			   pio, null, Constraint.BOTTOM);
+			   pio, null);
 
 	goals = rApplist.head().
 	    execute(goal, TacletForTests.services());
@@ -694,7 +694,7 @@ public class TestApplyTaclet extends TestCase{
         for (TacletApp aRApplist : rApplist)
             appList = appList.prepend
                     (aRApplist.findIfFormulaInstantiations
-                            (goal.sequent(), services, Constraint.BOTTOM));
+                            (goal.sequent(), services));
 
 	assertTrue("Expected one match.", appList.size()==1);
 	assertTrue("Rule App should be complete", appList.head().complete());
@@ -729,14 +729,13 @@ public class TestApplyTaclet extends TestCase{
 	while ( appIt.hasNext () )
 	    appList = appList.prepend
 		( appIt.next ().findIfFormulaInstantiations ( goal.sequent (), 
-		        services,
-		        Constraint.BOTTOM ) );
+		        services ) );
 
 	assertTrue("Did not expect a match.", appList.size()==0);
 
 	Term ifterm = TacletForTests.parseTerm("{i:=0}(f(const)=f(f(const)))");
 	ConstrainedFormula ifformula =
-	    new ConstrainedFormula ( ifterm, Constraint.BOTTOM );
+	    new ConstrainedFormula ( ifterm );
 	ImmutableList<IfFormulaInstantiation> ifInsts =
 	    ImmutableSLList.<IfFormulaInstantiation>nil().prepend
 	    ( new IfFormulaInstDirect ( ifformula ) );
@@ -744,8 +743,7 @@ public class TestApplyTaclet extends TestCase{
 	while ( appIt.hasNext () ) {
 	    TacletApp a =
 		appIt.next ().setIfFormulaInstantiations ( ifInsts,
-							   TacletForTests.services(),
-							   Constraint.BOTTOM );
+							   TacletForTests.services() );
 	    if ( a != null )
 		appList = appList.prepend ( a );
 	}

@@ -15,7 +15,6 @@ import java.util.Iterator;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.ConstrainedFormula;
-import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.Sequent;
 
 
@@ -28,15 +27,11 @@ public class ConstraintSequentPrintFilter implements SequentPrintFilter {
 
     protected Sequent              originalSequent;
 
-    protected Constraint           userConstraint;
-
     protected ImmutableList<SequentPrintFilterEntry> antec = null;
     protected ImmutableList<SequentPrintFilterEntry> succ  = null;
 
-    public ConstraintSequentPrintFilter ( Sequent    p_s,
-					  Constraint p_userConstraint ) {
-	originalSequent = p_s;
-	userConstraint  = p_userConstraint;
+    public ConstraintSequentPrintFilter ( Sequent    p_s ) {
+	originalSequent = p_s;	
     }
 
     protected void filterSequent () {
@@ -57,34 +52,10 @@ public class ConstraintSequentPrintFilter implements SequentPrintFilter {
     }
 
     protected SequentPrintFilterEntry filterFormula ( ConstrainedFormula p_cfma ) {
-	/*
-	  return new Entry ( new ConstrainedFormula ( p_cfma.formula (),
-	  Constraint.BOTTOM ),
-	  p_cfma,
-	  Constraint.BOTTOM );
-	*/
-
-	if ( p_cfma.constraint ().isAsWeakAs ( userConstraint ) )
-	    return new Entry ( new ConstrainedFormula ( p_cfma.formula (),
-							Constraint.BOTTOM ),
-			       p_cfma,
-			       userConstraint );
-	else {
-	    return new Entry ( p_cfma,
-			       p_cfma,
-			       determineDisplayConstraint
-			       ( p_cfma, userConstraint ) );
-	}
+	return new Entry ( p_cfma,
+		p_cfma );
     }
 
-    public static Constraint
-	determineDisplayConstraint ( ConstrainedFormula p_cfma,
-				     Constraint         p_userConstraint ) {
-	Constraint c = p_userConstraint.join ( p_cfma.constraint (), null );
-	if ( c.isSatisfiable () )
-	    return c;
-	return p_cfma.constraint ();
-    }
 
     /**
      * @return the original sequent
@@ -112,14 +83,11 @@ public class ConstraintSequentPrintFilter implements SequentPrintFilter {
 	final ConstrainedFormula filteredFormula;
 	final ConstrainedFormula originalFormula;
 
-	final Constraint         displayConstraint;
 
 	public Entry ( ConstrainedFormula p_filteredFormula,
-		       ConstrainedFormula p_originalFormula,
-		       Constraint         p_displayConstraint ) {
+		       ConstrainedFormula p_originalFormula ) {
 	    filteredFormula   = p_filteredFormula;
 	    originalFormula   = p_originalFormula;
-	    displayConstraint = p_displayConstraint;
 	}
 
 	/**
@@ -136,12 +104,6 @@ public class ConstraintSequentPrintFilter implements SequentPrintFilter {
 	    return originalFormula;
 	}
 
-	/**
-	 * Constraint for metavariable instantiations
-	 */
-	public Constraint         getDisplayConstraint () {
-	    return displayConstraint;
-	}
     }
 
 }

@@ -11,14 +11,11 @@
 
 package de.uka.ilkd.key.strategy.termProjection;
 
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Debug;
 
@@ -56,22 +53,8 @@ public class SVInstantiationProjection implements ProjectionToTerm {
                                 " (taclet " + tapp.taclet().name() + ")" );
             return null;
         }
-        return instMVs ( (Term)instObj, tapp, goal );
+        return (Term)instObj;
     }
 
-    private static Term instMVs(Term te, TacletApp tacletApp, Goal goal) {
-        final Services services = goal.proof ().getServices ();
-        final Constraint uc = goal.proof ().getUserConstraint ().getConstraint ();
-        final Constraint tacletConstraint = tacletApp.constraint ();
-        final Constraint displayConstraint = tacletConstraint.join ( uc, services );
-        
-        if ( displayConstraint.isBottom () ) return te;
-    
-        // Substitute metavariables of the term
-        final SyntacticalReplaceVisitor srv =
-            new SyntacticalReplaceVisitor ( displayConstraint );
-        te.execPostOrder ( srv );
-        return srv.getTerm ();
-    }
 
 }

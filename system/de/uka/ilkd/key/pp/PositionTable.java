@@ -15,8 +15,6 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.ConstrainedFormula;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Metavariable;
 
 /**
  * A PositionTable describes the start and end positions of substrings
@@ -288,51 +286,15 @@ public class PositionTable {
 	    return PosInSequent.createCfmaPos(pio);
 	} else {
 	    int subNo  =  posList.head().intValue();
-	    PosInOccurrence subpio = pio.down ( subNo );
-	    Term subterm = subpio.subTerm();
+	    PosInOccurrence subpio = pio.down ( subNo );	   
 
-	    if ( subpio.termBelowMetavariable() == null &&
-		 subterm.op() instanceof Metavariable ) {
-		subpio = goInMetavariable((Metavariable)subterm.op(),
-					  filterEntry,
-					  subpio);
-	    }
+	  
 	    return child[subNo].getTermPIS(filterEntry,
 					   posList.tail(),
 					   subpio);
 	}
     }
     
-    /** Handles the special case for <code>getTermPIS()</code> when
-     * the position moves below a Metavariable.  The SequentPrintFilter
-     * can replace Metavariables by their instantiation according to
-     * the user constraint.  When the user selects a position
-     * inside such an instantiation, this needs to be recorded.
-     * @param mv      a Metavariable
-     * @param filterEntry the print filter entry that contains
-     *                information about which constrained formula we
-     *                are in and how the constraint and metavariables
-     *                were printed.
-     * @param pos     the PosInOccurrence leading to the meta variable
-     * @returns  the PosInOccurrence with the added information that
-     *           we are inside a MV instantiation.
-     */
-    @Deprecated
-    private PosInOccurrence goInMetavariable(
- 			       Metavariable mv,
-                               SequentPrintFilterEntry filterEntry,
-			       PosInOccurrence pos) {
-	Term t = filterEntry
-	    .getDisplayConstraint()
-	    .getInstantiation(mv);
-	if ( t.op() != mv ) {
-	    return pos.setTermBelowMetavariable(t);
-	} else {
-	    return pos;
-	}
-    }
-
-
     private static SequentPrintFilterEntry 
 	getFilterEntry(int cfmaNo, 
 		       SequentPrintFilter filter) {

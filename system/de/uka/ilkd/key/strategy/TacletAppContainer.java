@@ -547,8 +547,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
             final IfMatchResult mr = getTaclet ().matchIf ( formulas.iterator (),
                                                             p_ifSeqTail.head ().formula (),
                                                             p_matchCond,
-                                                            getServices (),
-                                                            getUserConstraint () );
+                                                            getServices () );
 
             // For each matching formula call the method again to match
             // the remaining terms
@@ -568,11 +567,6 @@ public abstract class TacletAppContainer extends RuleAppContainer {
             }
         }
 
-        @Deprecated
-        private Constraint getUserConstraint () {
-            return getProof ().getUserConstraint().getConstraint();
-        }
-
         private Proof getProof () {
             return goal.proof();
         }
@@ -585,8 +579,6 @@ public abstract class TacletAppContainer extends RuleAppContainer {
             return NoPosTacletApp.createNoPosTacletApp(
         	    getTaclet(),
                     p_matchCond.getInstantiations(), 
-                    p_matchCond.getConstraint(),
-                    p_matchCond.getNewMetavariables(), 
                     p_alreadyMatched,
                     getServices());
         }

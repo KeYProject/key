@@ -11,7 +11,6 @@
 package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.logic.op.Metavariable;
-import de.uka.ilkd.key.util.Debug;
 
 /**
  * This class describes a position in an occurrence of a term. A
@@ -76,11 +75,7 @@ public class PosInOccurrence {
        
     
     private int computeHash () {
-        int res = constrainedFormula().hashCode() * 13 + posInTerm().hashCode();
-	if ( termBelowMetavariable() != null )
-    	    res += termBelowMetavariable().hashCode() * 13 +
-    	        posInTermBelowMetavariable().hashCode();
-    	return res;
+        return constrainedFormula().hashCode() * 13 + posInTerm().hashCode();	
     }
     
     
@@ -97,12 +92,7 @@ public class PosInOccurrence {
      *         positions (<code>isTopLevel()</code> have depth zero
      */
     public int depth () {
-        int res = posInTerm ().depth ();
-
-        if ( termBelowMetavariable () != null )
-            res += posInTermBelowMetavariable ().depth ();
-
-        return res;
+        return posInTerm ().depth ();
     }
 
     /**
@@ -112,11 +102,7 @@ public class PosInOccurrence {
      * {@link de.uka.ilkd.key.logic.PosInTerm}.
      */
     public PosInOccurrence down(int i) {
-        if ( metaTerm == null )
-	    return new PosInOccurrence(cfma, posInTerm.down(i), inAntec);
-	else
-	    return new PosInOccurrence(cfma, posInTerm, metaTerm, metaPosInTerm.down(i),
-				       inAntec);
+	return new PosInOccurrence(cfma, posInTerm.down(i), inAntec);
     }
     
     /** 
@@ -158,17 +144,9 @@ public class PosInOccurrence {
     }
 
     private boolean equalsHelp (final PosInOccurrence cmp) {
-        if ( isInAntec () == cmp.isInAntec () ) {
-            if ( !posInTerm ().equals ( cmp.posInTerm () ) ) return false;
-
-            if ( termBelowMetavariable () == null )
-                return cmp.termBelowMetavariable () == null;
-            else
-                return termBelowMetavariable ()
-                               .equals ( cmp.termBelowMetavariable () )
-                       && posInTermBelowMetavariable ()
-                               .equals ( cmp.posInTermBelowMetavariable () );
-        }
+	if ( isInAntec () == cmp.isInAntec () ) {
+	    return posInTerm ().equals ( cmp.posInTerm () );
+	}
         return false;
     }
 
@@ -260,8 +238,6 @@ public class PosInOccurrence {
 
                 return new PosInOccurrence ( p_newFormula,
                                              posInTerm (),
-                                             termBelowMetavariable (),
-                                             posInTermBelowMetavariable (),                                          
                                              inAntec );
             }
 
@@ -277,26 +253,7 @@ public class PosInOccurrence {
                                      inAntec);
     }
 
-        
-    /**
-     * If "this" points to a metavariable, a term can be inserted at
-     * this position, allowing to walk down the term further "inside"
-     * the metavariable.
-     */
-    @Deprecated
-    public PosInOccurrence setTermBelowMetavariable ( Term p_metaTerm ) {
-	if (Debug.ENABLE_ASSERTION) {
-            Debug.assertTrue ( metaTerm == null &&
-                    ( constrainedFormula().formula().subAt(posInTerm).op()
-                            instanceof Metavariable ) &&
-			   p_metaTerm.sort().extendsTrans
-			   ( constrainedFormula().formula().subAt(posInTerm).sort() ),
-			   "Illegal position (no metavariable) or incompatible sorts" );
-        }
-
-	return new PosInOccurrence(cfma, posInTerm, p_metaTerm, PosInTerm.TOP_LEVEL,
-	        inAntec);
-    }
+       
     
 
     /**
@@ -311,16 +268,6 @@ public class PosInOccurrence {
 	}
 	return subTermCache;
     }
-
-
-    /** The usage of this method is strongly discouraged, use 
-     * {@link PosInOccurrence#iterator} instead if possible.
-     */     
-    @Deprecated
-    public Term termBelowMetavariable () {
-	return metaTerm;
-    }
-
 
     /**
      * Ascend to the top node of the formula this object points to 
@@ -338,11 +285,8 @@ public class PosInOccurrence {
     public String toString() {
 	String res = "Term "+
 	    posInTerm()+" of "+ constrainedFormula();
-	if ( termBelowMetavariable() != null )
-	    res +=  " / Term "+
-		posInTermBelowMetavariable()+" of "+ termBelowMetavariable();
+	
 	return res;
-//            formulaNumberInSequent()+" th formula";
 
     }
 
@@ -353,18 +297,14 @@ public class PosInOccurrence {
      */
     public PosInOccurrence up() {
 	assert !isTopLevel() : "not possible to go up from top level position";
-	if ( metaTerm == null || metaPosInTerm == PosInTerm.TOP_LEVEL )
-	    return new PosInOccurrence(cfma, posInTerm.up(), 
-				       inAntec);
-	else
-	    return new PosInOccurrence(cfma, posInTerm, metaTerm, metaPosInTerm.up(),
-				       inAntec);	    
+
+	return new PosInOccurrence(cfma, posInTerm.up(), 
+		inAntec);
+
     }
 
     
-    private class PIOPathIteratorImpl implements PIOPathIterator {
-	@Deprecated
-	boolean           belowMetavariable = false;
+    private class PIOPathIteratorImpl implements PIOPathIterator {	
 	int               child;
 	int               count             = 0;
 	IntIterator       currentPathIt;
@@ -402,19 +342,11 @@ public class PosInOccurrence {
 	    // the object is created only now to make the method
 	    // <code>next()</code> faster
 
-	    final PosInOccurrence pio;
-	    if ( belowMetavariable ) {
-	        pio = new PosInOccurrence ( cfma,
-                                            posInTerm,
-                                            metaTerm,
-                                            firstN ( metaPosInTerm,
-                                                     count - posInTerm.depth () - 1 ),
-                                            inAntec );
-	    } else {
-	        pio = new PosInOccurrence ( cfma,
-                                            firstN ( posInTerm, count - 1 ),
-                                            inAntec );            
-	    }
+	    final PosInOccurrence pio;	   
+	    pio = new PosInOccurrence ( cfma,
+		    firstN ( posInTerm, count - 1 ),
+		    inAntec );            
+
         
 	    return pio;
 	}
@@ -447,19 +379,7 @@ public class PosInOccurrence {
 
 	    if ( currentPathIt.hasNext () )
 		res = currentPathIt.next ();
-	    else if ( !belowMetavariable &&
-		      termBelowMetavariable () != null ) {
-		belowMetavariable = true;
-		currentPathIt     = posInTermBelowMetavariable ().iterator ();
-		currentSubTerm    = termBelowMetavariable ();
-
-		if ( currentPathIt.hasNext () )
-		    res = currentPathIt.next ();
-		else {
-		    res           =  -1 ;
-		    currentPathIt = null;
-		}
-	    } else {
+	    else {
 		res           =  -1 ;
 		currentPathIt = null;
 	    }

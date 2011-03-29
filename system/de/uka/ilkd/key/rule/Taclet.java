@@ -323,8 +323,6 @@ public abstract class Taclet implements Rule, Named {
      * required because of formerly matchings
      * @param services the Services object encapsulating information
      * about the java datastructures like (static)types etc.
-     * @param userConstraint current user constraint (which is in some
-     * situations used to find instantiations)
      * @return the new MatchConditions needed to match template with
      * term , if possible, null otherwise
      */
@@ -332,11 +330,10 @@ public abstract class Taclet implements Rule, Named {
 				    Term            template,
 				    boolean         ignoreUpdates,
 				    MatchConditions matchCond,
-				    Services        services,
-				    Constraint      userConstraint) {
+				    Services        services) {
 	Debug.out("Start Matching rule: ", name);
 	matchCond = matchHelp(term, template, ignoreUpdates, matchCond, 
-		 services, userConstraint);	
+		 services);	
 	Debug.out(matchCond == null ? "Failed: " : "Succeeded: ", name);
 	return matchCond == null ? null : checkConditions(matchCond, services);
     }
@@ -361,7 +358,7 @@ public abstract class Taclet implements Rule, Named {
 				    MatchConditions matchCond,
 				    Services        services,
 				    Constraint      userConstraint) {
-	return match(term, template, false, matchCond, services, userConstraint);
+	return match(term, template, false, matchCond, services);
     }
 
 
@@ -531,8 +528,6 @@ public abstract class Taclet implements Rule, Named {
      * e.g. wanted if an if-sequent is matched
      * @param matchCond the MatchConditions to be obeyed by a
      * successfull match
-     * @param userConstraint current user constraint (which is in some
-     * situations used to find instantiations)
      * @return the new MatchConditions needed to match template with
      * term, if possible, null otherwise
      *
@@ -543,8 +538,7 @@ public abstract class Taclet implements Rule, Named {
 				      final Term             template, 
 				      final boolean          ignoreUpdates,
 				      MatchConditions  	     matchCond,
-				      final Services         services,
-				      final Constraint       userConstraint) {
+				      final Services         services) {
 	Debug.out("Match: ", template);
 	Debug.out("With: ",  term);
         
@@ -567,8 +561,7 @@ public abstract class Taclet implements Rule, Named {
 		    	     template,
 			     true, 
 			     matchCond, 
-			     services, 
-			     userConstraint);
+			     services);
 	}
     
 	if(templateOp instanceof SchemaVariable && templateOp.arity() == 0) {
@@ -602,8 +595,7 @@ public abstract class Taclet implements Rule, Named {
 		    		  template.sub(i), 
 		    		  false,
 				  matchCond, 
-				  services, 
-				  userConstraint);
+				  services);
 	    if (matchCond == null) {		      
 	        return null; //FAILED
 	    } 
@@ -631,44 +623,30 @@ public abstract class Taclet implements Rule, Named {
     public IfMatchResult matchIf ( Iterator<IfFormulaInstantiation> p_toMatch,
 				   Term                             p_template,
 				   MatchConditions                  p_matchCond,
-				   Services                         p_services,
-				   Constraint                       p_userConstraint ) {
-	ImmutableList<IfFormulaInstantiation>     resFormulas =
-	    ImmutableSLList.<IfFormulaInstantiation>nil();
-	ImmutableList<MatchConditions>            resMC       =
-	    ImmutableSLList.<MatchConditions>nil();
+				   Services                         p_services ) {
+	ImmutableList<IfFormulaInstantiation> resFormulas = ImmutableSLList
+	        .<IfFormulaInstantiation> nil();
+	ImmutableList<MatchConditions> resMC = ImmutableSLList
+	        .<MatchConditions> nil();
 
-	Term                             updateFormula;
-	if ( p_matchCond.getInstantiations ().getUpdateContext().isEmpty() )
+	Term updateFormula;
+	if (p_matchCond.getInstantiations().getUpdateContext().isEmpty())
 	    updateFormula = p_template;
 	else
-	    updateFormula 
-	    	= TB.applySequential(p_matchCond.getInstantiations()
-				                .getUpdateContext(), 
-				     p_template);
+	    updateFormula = TB.applySequential(p_matchCond.getInstantiations()
+		    .getUpdateContext(), p_template);
 
-	IfFormulaInstantiation           cf;
-	Constraint                       newConstraint;
-	MatchConditions                  newMC;
-        
-	while ( p_toMatch.hasNext () ) {
-	    cf            = p_toMatch.next ();	   
-	    
-	    newConstraint = p_matchCond.getConstraint ()
-		.join ( cf.getConstrainedFormula ().constraint (), 
-                        p_services );
+	IfFormulaInstantiation cf;
+	MatchConditions newMC;
 
-	    if ( newConstraint.isSatisfiable () ) {
-		newMC = match ( cf.getConstrainedFormula ().formula (),
-				updateFormula,
-				false,
-				p_matchCond.setConstraint ( newConstraint ),
-				p_services,
-				p_userConstraint );
-		if ( newMC != null ) {
-		    resFormulas = resFormulas.prepend ( cf );
-		    resMC       = resMC      .prepend ( newMC );
-		}
+	while (p_toMatch.hasNext()) {
+	    cf = p_toMatch.next();
+
+	    newMC = match(cf.getConstrainedFormula().formula(), updateFormula,
+		    false, p_matchCond, p_services);
+	    if (newMC != null) {
+		resFormulas = resFormulas.prepend(cf);
+		resMC = resMC.prepend(newMC);
 	    }
 	}
 
@@ -686,8 +664,7 @@ public abstract class Taclet implements Rule, Named {
      */
     public MatchConditions matchIf ( Iterator<IfFormulaInstantiation> p_toMatch,
 				     MatchConditions                  p_matchCond,
-				     Services                         p_services,
-				     Constraint                       p_userConstraint ) {
+				     Services                         p_services ) {
 
 	Iterator<ConstrainedFormula>     itIfSequent   = ifSequent () .iterator ();
 
@@ -698,8 +675,7 @@ public abstract class Taclet implements Rule, Named {
 				.prepend ( p_toMatch.next () ).iterator (),
 			      itIfSequent.next ().formula (),
 			      p_matchCond,
-			      p_services,
-			      p_userConstraint ).getMatchConditions ();
+			      p_services ).getMatchConditions ();
 
 	    if ( newMC.isEmpty() )
 		return null;
@@ -896,8 +872,7 @@ public abstract class Taclet implements Rule, Named {
 				      MatchConditions mc) {	
 	final SyntacticalReplaceVisitor srVisitor = 
 	    new SyntacticalReplaceVisitor(services,
-                                      mc.getInstantiations(),
-                                      mc.getConstraint());
+                                      mc.getInstantiations());
 	term.execPostOrder(srVisitor);
 
 	return srVisitor.getTerm();
@@ -952,8 +927,7 @@ public abstract class Taclet implements Rule, Named {
             		           	             instantiatedFormula);         
 	} 
 	        
-	return new ConstrainedFormula(instantiatedFormula, 
-                matchCond.getConstraint());
+	return new ConstrainedFormula(instantiatedFormula);
     }
 		
     /**
@@ -1179,7 +1153,7 @@ public abstract class Taclet implements Rule, Named {
 			    				  services );
 	    }
 
-	    goal.addTaclet(tacletToAdd, neededInstances, matchCond.getConstraint (), true);
+	    goal.addTaclet(tacletToAdd, neededInstances, true);
 	}
     }
 
@@ -1292,24 +1266,13 @@ public abstract class Taclet implements Rule, Named {
 	    while ( itGoal.hasNext () )
 		p_goal = itGoal.next ();
 
-	    addToPosWithoutInst ( new ConstrainedFormula ( ifObl,
-							   Constraint.BOTTOM ),
+	    addToPosWithoutInst ( new ConstrainedFormula ( ifObl ),
 				  p_goal,
 				  null,
 				  false );
 	}
 	
 	return res;
-    }
-
-    /**
-     * Restrict introduced metavariables to the subtree
-     */
-    protected void setRestrictedMetavariables ( Goal            p_goal,
-						MatchConditions p_matchCond ) {
-	for (final Metavariable mv : p_matchCond.getNewMetavariables ()) {
-	    p_goal.addRestrictedMetavariable ( mv );
-	}
     }
 
     /**

@@ -109,12 +109,9 @@ public abstract class GUIAbstractTreeNode implements TreeNode {
         if ( !getProofTreeModel ().hideClosedSubtrees () )
             return null;
         
-        final ConstraintTableModel userConstraint = n.proof ()
-            .getUserConstraint ();
-    
         Node nextN = null;
         for ( int i = 0; i != n.childrenCount (); ++i ) {
-            if ( !userConstraint.displayClosed ( n.child ( i ) ) ) {
+            if ( ! n.child ( i ).isClosed() ) {
                 if ( nextN != null ) return null;
                 nextN = n.child ( i );
             }

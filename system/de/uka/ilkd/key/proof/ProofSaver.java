@@ -111,7 +111,6 @@ public class ProofSaver {
           ps.println("\\proof {");
           ps.println(writeLog(proof));
           ps.println("(autoModeTime \"" + proof.getAutoModeTime() + "\")\n");
-          printUserConstraints(ps);
           ps.println(node2Proof(proof.root()));
           ps.println("}");
 
@@ -139,24 +138,7 @@ public class ProofSaver {
       return errorMsg; // null if success
    }
    
-   private String mc2Proof(MatchConditions mc) {
-        if (mc != null) {
-            Constraint c = mc.getConstraint();
-            if (c instanceof EqualityConstraint && !c.isBottom()) {
-                Services s = mediator.getServices();
-                String res = "";
-                Iterator<Metavariable> it = ((EqualityConstraint) c)
-                        .restrictedMetavariables();
-                while (it.hasNext()) {
-                    Metavariable mv = it.next();
-                    res = res + " (matchconstraint \"" + mv.name() + "="
-                            + printTerm(c.getInstantiation(mv), s) + "\")";
-                }
-                return res;
-            }
-        }
-        return "";
-    }
+ 
 
     private String newNames2Proof(Node n) {
         String s = "";
@@ -174,22 +156,6 @@ public class ProofSaver {
         return " (newnames \"" + s.substring(1) + "\")";
     }
 
-    private void printUserConstraints(PrintWriter ps) {
-        ConstraintTableModel uCons = proof.getUserConstraint();
-        Services s = mediator.getServices();
-
-        if (uCons.getRowCount() > 0) {
-
-            for (int i = 0; i < uCons.getRowCount(); i++) {
-                ps.println("(userconstraint \"" + printTerm((Term) uCons
-                        .getValueAt(i, 0), s)
-                        + "=" + printTerm((Term) uCons.getValueAt(i, 1), s)
-                        + "\")");
-            }
-
-        }
-
-    }
 
    private void printSingleNode(Node node, String prefix, StringBuffer tree) {
 
@@ -213,7 +179,6 @@ public class ProofSaver {
          tree.append("\"");
          tree.append(posInOccurrence2Proof(node.sequent(),
                                            appliedRuleApp.posInOccurrence()));
-         tree.append(mc2Proof(((TacletApp)appliedRuleApp).matchConditions()));
          tree.append(newNames2Proof(node));
          tree.append(getInteresting(((TacletApp)appliedRuleApp).instantiations()));
          ImmutableList<IfFormulaInstantiation> l =

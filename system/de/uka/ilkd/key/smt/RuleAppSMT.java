@@ -44,11 +44,6 @@ public class RuleAppSMT implements RuleApp {
     }
 
     @Override
-    public Constraint constraint() {
-	return Constraint.BOTTOM;
-    }
-
-    @Override
     public ImmutableList<Goal> execute(Goal goal, Services services) {
 	goal.addAppliedRuleApp(this);
 
@@ -74,8 +69,7 @@ public class RuleAppSMT implements RuleApp {
 	private Name name = new Name("SMTRule");
 
 	@Override
-	public boolean isApplicable(Goal goal, PosInOccurrence pio,
-	        Constraint userConstraint) {
+	public boolean isApplicable(Goal goal, PosInOccurrence pio) {
 	    return false;
 	}
 

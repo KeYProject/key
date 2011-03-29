@@ -140,14 +140,14 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                                                      KeYMediator medi) {
         return new ApplyTacletDialogModel(
             app, goal.sequent(), medi.getServices(),
-	    medi.getUserConstraint ().getConstraint(),
 	    new NamespaceSet(medi.var_ns(),
 			     medi.func_ns(),
 			     medi.sort_ns(),
 			     medi.heur_ns(),
 			     medi.choice_ns(),
 			     goal.createGlobalProgVarNamespace()),
-	    medi.getNotationInfo().getAbbrevMap(), goal);
+	    medi.getNotationInfo().getAbbrevMap(),
+	    goal);
     }
     
 
