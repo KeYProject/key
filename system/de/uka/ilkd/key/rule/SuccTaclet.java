@@ -32,7 +32,6 @@ public class SuccTaclet extends FindTaclet{
      * the if-sequent, the variable conditions
      * @param goalTemplates a list of goal descriptions.
      * @param heuristics a list of heurisics for the Taclet
-     * @param constraint the Constraint under which the Taclet is valid
      * @param attrs attributes for the Taclet; these are boolean values
      * indicating a noninteractive or recursive use of the Taclet. 
      * @param find the find term of the Taclet
@@ -42,12 +41,11 @@ public class SuccTaclet extends FindTaclet{
     public SuccTaclet(Name name, TacletApplPart applPart,  
 		    ImmutableList<TacletGoalTemplate> goalTemplates, 
 		    ImmutableList<RuleSet> heuristics,
-		    Constraint constraint,
 		    TacletAttributes attrs,
-		    Term find,ImmutableMap<SchemaVariable,TacletPrefix> prefixMap,
-		    ImmutableSet<Choice> choices){
-	super(name, applPart, goalTemplates, heuristics, constraint,
-	      attrs, find, prefixMap, choices);
+		    Term find,
+		    ImmutableMap<SchemaVariable,TacletPrefix> prefixMap,ImmutableSet<Choice> choices){
+	super(name, applPart, goalTemplates, heuristics, attrs,
+	      find, prefixMap, choices);
 	cacheMatchInfo();
     }	
 

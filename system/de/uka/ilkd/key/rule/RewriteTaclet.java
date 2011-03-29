@@ -66,7 +66,6 @@ public final class RewriteTaclet extends FindTaclet {
      * the if-sequent, the variable conditions
      * @param goalTemplates a list of goal descriptions.
      * @param ruleSets a list of rule sets for the Taclet
-     * @param constraint the Constraint under which the Taclet is valid
      * @param attrs the TacletAttributes; these are boolean values
      * indicating a noninteractive or recursive use of the Taclet. 
      * @param find the find term of the Taclet
@@ -79,14 +78,13 @@ public final class RewriteTaclet extends FindTaclet {
     public RewriteTaclet(Name name, TacletApplPart applPart,  
 			 ImmutableList<TacletGoalTemplate>  goalTemplates, 
 			 ImmutableList<RuleSet>             ruleSets,
-			 Constraint                constraint,
 			 TacletAttributes          attrs,
-			 Term                      find, 
-			 ImmutableMap<SchemaVariable,TacletPrefix> prefixMap,
+			 Term                      find,
+			 ImmutableMap<SchemaVariable,TacletPrefix> prefixMap, 
 			 int                       p_stateRestriction,
 			 ImmutableSet<Choice> choices){
-	super(name, applPart, goalTemplates, ruleSets, constraint,
-	      attrs, find, prefixMap, choices);
+	super(name, applPart, goalTemplates, ruleSets, attrs,
+	      find, prefixMap, choices);
 	stateRestriction = p_stateRestriction;
 	
 	cacheMatchInfo();

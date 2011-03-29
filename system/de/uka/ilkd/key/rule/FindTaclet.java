@@ -55,8 +55,6 @@ public abstract class FindTaclet extends Taclet {
      * applying the Taclet)
      * @param ruleSets a IList<RuleSet> that contains all rule sets the Taclet
      *      is attached to
-     * @param constraint the Constraint of the Taclet (has to be fulfilled in
-     * order to achieve this Taclet)
      * @param attrs the TacletAttributes encoding if the Taclet is non-interactive,
      * recursive or something like that
      * @param find the Term that is the pattern that has to be found in a
@@ -67,12 +65,11 @@ public abstract class FindTaclet extends Taclet {
     public FindTaclet(Name name, TacletApplPart applPart,  
 		      ImmutableList<TacletGoalTemplate> goalTemplates, 
 		      ImmutableList<RuleSet> ruleSets,
-		      Constraint constraint, TacletAttributes attrs,
-		      Term find,
+		      TacletAttributes attrs, Term find,
 		      ImmutableMap<SchemaVariable,TacletPrefix> prefixMap,
 		      ImmutableSet<Choice> choices){
-	super(name, applPart, goalTemplates, ruleSets, constraint, attrs,
-	      prefixMap, choices);
+	super(name, applPart, goalTemplates, ruleSets, attrs, prefixMap,
+	      choices);
 	this.find = find;
     }
     

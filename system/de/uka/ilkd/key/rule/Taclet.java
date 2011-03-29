@@ -13,12 +13,38 @@ package de.uka.ilkd.key.rule;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import de.uka.ilkd.key.collection.*;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableMap;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.ContextStatementBlock;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceData;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.BoundVarsVisitor;
+import de.uka.ilkd.key.logic.Choice;
+import de.uka.ilkd.key.logic.ConstrainedFormula;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Named;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.RenameTable;
+import de.uka.ilkd.key.logic.RenamingTable;
+import de.uka.ilkd.key.logic.Semisequent;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.VariableNamer;
+import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.Metavariable;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.SVSubstitute;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.inst.GenericSortCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -124,12 +150,6 @@ public abstract class Taclet implements Rule, Named {
      */
     private final boolean noninteractive;
     
-    /** 
-     * constraint under which the Taclet is valid 
-     */
-    @Deprecated
-    private final Constraint constraint;
-   
     /**
      * map from a schemavariable to its prefix. The prefix is used to test
      * correct instantiations of the schemavariables by resolving/avoiding
@@ -171,7 +191,6 @@ public abstract class Taclet implements Rule, Named {
      * the if-sequence, the variable conditions
      * @param goalTemplates a list of goal descriptions.
      * @param ruleSets a list of rule sets for the Taclet
-     * @param constraint the Constraint under which the Taclet is valid
      * @param attrs attributes for the Taclet; these are boolean values
      * indicating a noninteractive or recursive use of the Taclet.      
      */
@@ -179,8 +198,7 @@ public abstract class Taclet implements Rule, Named {
 	   TacletApplPart           applPart,  
 	   ImmutableList<TacletGoalTemplate> goalTemplates, 
 	   ImmutableList<RuleSet>            ruleSets,
-	   Constraint               constraint, 
-	   TacletAttributes         attrs,
+	   TacletAttributes         attrs, 
 	   ImmutableMap<SchemaVariable,TacletPrefix> prefixMap,
 	   ImmutableSet<Choice> choices ){
 
@@ -193,12 +211,10 @@ public abstract class Taclet implements Rule, Named {
 	this.goalTemplates = goalTemplates;
 	this.ruleSets      = ruleSets;
 	noninteractive     = attrs.noninteractive();
-	this.constraint    = constraint;
 	this.choices       = choices;
 	this.prefixMap     = prefixMap;
         this.displayName   = attrs.displayName() == null ? 
                 name.toString() : attrs.displayName();
-        assert constraint.isBottom() : "metavariables are disabled";
     }
 
     protected void cacheMatchInfo() {
@@ -348,16 +364,13 @@ public abstract class Taclet implements Rule, Named {
      * required because of formerly matchings
      * @param services the Services object encapsulating information
      * about the java datastructures like (static)types etc.
-     * @param userConstraint current user constraint (which is in some
-     * situations used to find instantiations)
      * @return the new MatchConditions needed to match template with
      * term , if possible, null otherwise
      */
     protected MatchConditions match(Term            term,
 				    Term            template,
 				    MatchConditions matchCond,
-				    Services        services,
-				    Constraint      userConstraint) {
+				    Services        services) {
 	return match(term, template, false, matchCond, services);
     }
 
@@ -544,6 +557,7 @@ public abstract class Taclet implements Rule, Named {
         
 	final Operator sourceOp   = term.op ();
         final Operator templateOp = template.op ();
+        
         assert !(sourceOp instanceof Metavariable) : "metavariables are disabled";        
         assert !(templateOp instanceof Metavariable) : "metavariables are disabled";
         
@@ -732,13 +746,6 @@ public abstract class Taclet implements Rule, Named {
 	return varsNewDependingOn.iterator();
     } 
     
-    /** returns the Constraint under which the Taclet is
-     * valid */
-    public Constraint constraint() {
-	return constraint;
-    }
-
-
     /** returns an iterator over the goal descriptions.
      */
     public ImmutableList<TacletGoalTemplate> goalTemplates() {
@@ -1056,7 +1063,6 @@ public abstract class Taclet implements Rule, Named {
 	b.setName(new Name(s));
 	b.setDisplayName(displayName());
 	b.setIfSequent(ifSequent());
-	b.setConstraint(constraint());
 	b.addVarsNew(varsNew());
 	b.addVarsNotFreeIn(varsNotFreeIn);
 	return b.getTaclet();

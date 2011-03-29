@@ -39,7 +39,6 @@ public class NoFindTacletBuilder extends TacletBuilder {
 						   varsNewDependingOn,
 						   variableConditions),
 				goals, ruleSets,
-				constraint,
 				attrs,
 				prefixBuilder.getPrefixMap(),
 				choices);

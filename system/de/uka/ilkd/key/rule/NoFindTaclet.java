@@ -18,7 +18,6 @@ import de.uka.ilkd.key.collection.ImmutableMap;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -40,7 +39,6 @@ public class NoFindTaclet extends Taclet {
      * the if-sequent, the variable conditions
      * @param goalTemplates the IList<TacletGoalTemplate> containg all goal descriptions of the taclet to be created
      * @param ruleSets a list of rule sets for the Taclet
-     * @param constraint the Constraint under which the Taclet is valid
      * @param attrs attributes for the Taclet; these are boolean values
      * @param prefixMap a ImmMap<SchemaVariable,TacletPrefix> that contains the
      * prefix for each SchemaVariable in the Taclet
@@ -49,12 +47,11 @@ public class NoFindTaclet extends Taclet {
     public NoFindTaclet(Name name, TacletApplPart applPart,  
 		      ImmutableList<TacletGoalTemplate> goalTemplates, 
 		      ImmutableList<RuleSet> ruleSets, 
-		      Constraint constraint,
 		      TacletAttributes attrs,
 		      ImmutableMap<SchemaVariable,TacletPrefix> prefixMap,
 		      ImmutableSet<Choice> choices){
-	super(name, applPart, goalTemplates, ruleSets, constraint, attrs, 
-	      prefixMap, choices);
+	super(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, 
+	      choices);
 	cacheMatchInfo();
     } 
 

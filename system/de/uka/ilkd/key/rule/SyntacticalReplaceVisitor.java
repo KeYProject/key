@@ -17,9 +17,6 @@
  */
 package de.uka.ilkd.key.rule;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Stack;
 
 import de.uka.ilkd.key.collection.DefaultImmutableMap;

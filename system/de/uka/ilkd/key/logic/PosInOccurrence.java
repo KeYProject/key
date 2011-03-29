@@ -10,8 +10,6 @@
 
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.logic.op.Metavariable;
-
 /**
  * This class describes a position in an occurrence of a term. A
  * ConstrainedFormula and a PosInTerm determine an object of this 
@@ -38,14 +36,7 @@ public class PosInOccurrence {
     /**
      * is true iff the position is in the antecedent of a sequent. 
      */
-    private final boolean inAntec;   
-    
-
-    private final PosInTerm metaPosInTerm;
-
-    // Descend into metavariables instantiations
-    @Deprecated
-    private final Term      metaTerm;
+    private final boolean inAntec;
 
     /** the position in cfma.formula() */
     private final PosInTerm posInTerm;
@@ -53,23 +44,14 @@ public class PosInOccurrence {
     /**
      * The subterm this object points to, or <code>null</code>
      */
-    private Term subTermCache=null;
+    private Term subTermCache = null;
 
     public PosInOccurrence(ConstrainedFormula cfma, 
-			   PosInTerm posInTerm, 
-			   boolean inAntec) {
-        this(cfma, posInTerm, null, null, inAntec);
-    }
-
-    private PosInOccurrence(ConstrainedFormula cfma, 
             PosInTerm posInTerm,
-            Term metaTerm, PosInTerm metaPosInTerm,
             boolean inAntec) {	
 	this.inAntec=inAntec;
 	this.cfma=cfma;	
-	this.posInTerm=posInTerm;
-	this.metaTerm=metaTerm;
-	this.metaPosInTerm=metaPosInTerm;
+	this.posInTerm=posInTerm;	
 	this.hashCode = (short) computeHash ();
     }
        
@@ -156,9 +138,7 @@ public class PosInOccurrence {
      *         top-level, the result will be <code>-1</code>
      */
     public int getIndex() {
-        if ( metaTerm == null || metaPosInTerm == PosInTerm.TOP_LEVEL )
-                return posInTerm.getIndex ();
-        return metaPosInTerm.getIndex ();
+       return posInTerm.getIndex ();
     }
 
     public int hashCode () {
@@ -174,9 +154,7 @@ public class PosInOccurrence {
     }
 
     public boolean isTopLevel () {
-	return
-	    posInTerm == PosInTerm.TOP_LEVEL &&
-	    ( metaTerm == null || metaPosInTerm == PosInTerm.TOP_LEVEL );
+	return posInTerm == PosInTerm.TOP_LEVEL;
     }
 
     /**
@@ -204,15 +182,6 @@ public class PosInOccurrence {
     }
 
     /**
-     *  The usage of this method is strongly discouraged, use 
-     * {@link PosInOccurrence#iterator} instead.    
-     */
-    @Deprecated
-    public PosInTerm posInTermBelowMetavariable () {
-	return metaPosInTerm;
-    }     
-
-    /**
      * Replace the formula this object points to with the new formula given
      * 
      * @param p_newFormula
@@ -230,17 +199,7 @@ public class PosInOccurrence {
 
         while ( true ) {
             final int subNr = it.next ();
-
-
-            if ( newTerm.op () instanceof Metavariable && depth == posInTerm ().depth() ) {
-                // It is necessary to insert a term below the metavariable,
-                // as the iterator still holds further elements
-
-                return new PosInOccurrence ( p_newFormula,
-                                             posInTerm (),
-                                             inAntec );
-            }
-
+            
             if ( subNr == -1 ) break;
 
             newPosInTerm = newPosInTerm.down( subNr );
@@ -261,10 +220,7 @@ public class PosInOccurrence {
      */
     public Term subTerm () {
 	if ( subTermCache == null ) {
-	    if ( metaTerm == null )
-		subTermCache = constrainedFormula().formula().subAt(posInTerm);
-	    else
-		subTermCache = metaTerm.subAt ( metaPosInTerm );
+	    subTermCache = constrainedFormula().formula().subAt(posInTerm);
 	}
 	return subTermCache;
     }

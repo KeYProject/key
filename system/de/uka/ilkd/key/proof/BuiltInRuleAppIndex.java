@@ -18,7 +18,7 @@ import de.uka.ilkd.key.rule.BuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 
-public class BuiltInRuleAppIndex implements java.io.Serializable {
+public class BuiltInRuleAppIndex {
 
     private BuiltInRuleIndex index;
 
@@ -53,7 +53,6 @@ public class BuiltInRuleAppIndex implements java.io.Serializable {
                 result = result.prepend(app);
             }
         }
-
 	return result;
     }
 
@@ -151,9 +150,7 @@ public class BuiltInRuleAppIndex implements java.io.Serializable {
      * called if a formula has been replaced
      * @param sci SequentChangeInfo describing the change of the sequent 
      */  
-    public void sequentChanged ( Goal goal, SequentChangeInfo sci ) {
-        final Proof proof = goal.proof();
-        
+    public void sequentChanged ( Goal goal, SequentChangeInfo sci ) {        
         scanAddedFormulas ( goal, true, sci );
         scanAddedFormulas ( goal, false, sci );
         
