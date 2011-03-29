@@ -35,7 +35,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -50,7 +49,6 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -58,7 +56,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
-import javax.swing.JSlider;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
@@ -99,14 +96,11 @@ import de.uka.ilkd.key.gui.smt.SettingsDialog;
 import de.uka.ilkd.key.gui.smt.SolverListener;
 import de.uka.ilkd.key.gui.smt.TemporarySettings;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.pp.ConstraintSequentPrintFilter;
+import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.pp.SequentPrintFilter;
-import de.uka.ilkd.key.proof.ConstraintTableEvent;
-import de.uka.ilkd.key.proof.ConstraintTableListener;
-import de.uka.ilkd.key.proof.ConstraintTableModel;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.ProblemLoader;
@@ -173,10 +167,7 @@ public final class Main extends JFrame implements IMain {
     
     /** the strategy selection view */
     private StrategySelectionView strategySelectionView = null;
-    
-    /** the current user constraint */
-    private ConstraintTableModel userConstraint = null;
-    
+   
     /** contains a list of all proofs */
     private JScrollPane proofListView;
     
@@ -202,10 +193,7 @@ public final class Main extends JFrame implements IMain {
     private RecentFileMenu recentFiles;
     
     private boolean frozen = false;
-    
-    /** listener to changes of the user constraint */
-    private MainConstraintTableListener constraintListener;
-     
+   
     private static KeYFileChooser fileChooser = null;
     
     private static final String PARA = 
@@ -249,10 +237,6 @@ public final class Main extends JFrame implements IMain {
     
     /** external prover GUI elements */
     private SMTSettingsListener smtSettingsListener;
-    private JSlider ruletimeout;
-    private JLabel ruletimeoutlabel;
-    private JButton decisionProcedureInvocationButton;
-
     
     protected static String fileNameOnStartUp = null;
     
@@ -267,15 +251,10 @@ public final class Main extends JFrame implements IMain {
     
     private NotificationManager notificationManager;
 
-    /** The radio items shown in the SMT menu for the different available solvers */
-    private final ArrayList<JRadioButtonMenuItem> shownSMTRadioItems = new ArrayList<JRadioButtonMenuItem>();
-
     private ComplexButton smtComponent;
     
     /** The menu for the SMT solver options */
     public final JMenu smtOptions = new JMenu("SMT Solvers...");
-    
-    
     
     /**
      * creates prover -- private, use getInstance()
@@ -289,7 +268,6 @@ public final class Main extends JFrame implements IMain {
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         proofListener = new MainProofListener();
         guiListener = new MainGUIListener();
-        constraintListener = new MainConstraintTableListener();
         
         taskListener = (Main.batchMode ? (ProverTaskListener)
                 new MainTaskListenerBatchMode() : 
@@ -1630,8 +1608,7 @@ public final class Main extends JFrame implements IMain {
      * prints the content of the sequent view
      */
     public void printSequentView(Sequent sequent) {
-        SequentPrintFilter filter =
-            new ConstraintSequentPrintFilter ( sequent );
+        SequentPrintFilter filter = new IdentitySequentPrintFilter ( sequent );
         final LogicPrinter printer = new LogicPrinter
         (new ProgramPrinter(null), 
                 mediator().getNotationInfo(),
@@ -2269,14 +2246,6 @@ public final class Main extends JFrame implements IMain {
         }
     }
 
-
-    
-    class MainConstraintTableListener implements ConstraintTableListener {
-        public void constraintChanged(ConstraintTableEvent e) {
-            setProofNodeDisplay();
-        }
-    }
-    
     class MainTaskListenerBatchMode implements ProverTaskListener { // XXX
         public void taskStarted(String message, int size) {
             System.out.print(message+" ... ");

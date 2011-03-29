@@ -13,17 +13,12 @@ package de.uka.ilkd.key.proof;
 import java.util.*;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.RenamingTable;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.op.Metavariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.proof.incclosure.*;
 import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.util.Debug;
 
 public class Node {
     /** the proof the node belongs to */
@@ -42,21 +37,6 @@ public class Node {
     private ImmutableSet<ProgramVariable> globalProgVars      = DefaultImmutableSet.<ProgramVariable>nil();
 
     private boolean              closed              = false;
-
-    /** Root sink if this is a root node */
-    @Deprecated
-    private BufferSink           rootSink            = null;
-
-    @Deprecated
-    private BufferSink           localSink;
-
-    /** Parent of all sinks on this branch */
-    @Deprecated
-    private Sink                 branchSink;
-
-    /** For children.size()>1 this merger will be used */
-    @Deprecated
-    private MultiMerger          forkMerger          = null;
 
     /** contains non-logical content, used for user feedback */
     private NodeInfo             nodeInfo;
@@ -80,10 +60,6 @@ public class Node {
 
     public Node(Proof proof) {
 	this.proof = proof;
-	rootSink = new BufferSink ( null );
-	branchSink = new BranchRestricter ( rootSink );
-	((BranchRestricter)branchSink).setNode ( this );
-	localSink  = new BufferSink ( branchSink );
         serialNr = proof.getServices().getCounter("nodes").getCountPlusPlus(this);        
         nodeInfo = new NodeInfo(this);
     }
@@ -102,12 +78,10 @@ public class Node {
      * parent node.
      */
     public Node(Proof proof, Sequent seq, List<Node> children,
-		Node parent, Sink branchSink) {
+		Node parent) {
 	this.proof = proof;
 	this.seq=seq;	
 	this.parent=parent;
-	this.branchSink=branchSink;
-	localSink = new BufferSink ( branchSink );
 	if (children!=null) {this.children=children;}
         serialNr = proof.getServices().getCounter("nodes").getCountPlusPlus(this);
         nodeInfo = new NodeInfo(this);
@@ -251,77 +225,9 @@ public class Node {
     public boolean root() {
 	return parent==null;
     }  
-
-    /**
-     * Reserve p_count sinks meant for children and return them. If
-     * ultimately more than one sink is needed, the first call to this
-     * method MUST have p_count>1.
-     */
-    @Deprecated
-    public Iterator<Sink> reserveSinks ( int p_count ) {
-	if ( p_count == 1 && forkMerger == null )
-	    return ImmutableSLList.<Sink>nil().prepend ( branchSink ).iterator ();
-	else {
-	    int i = 0;
-
-	    if ( forkMerger == null )
-		forkMerger = new MultiMerger ( branchSink, p_count, 
-                proof().getServices() );
-	    else {
-		i = forkMerger.getArity ();
-		forkMerger.expand ( i + p_count );
-	    }
-
-	    Iterator<Sink> it = forkMerger.getSinks ();
-	    while ( i-- != 0 )
-		it.next ();
-
-	    return it;
-	}
-    }
-
-    /**
-     * Remove a possibly existing merger, restore the old state by
-     * calling "localSink.reset()". Currently this doesn't really
-     * remove the connection between the children sinks and the branch
-     * sink.
-     */
-    @Deprecated
-    public void cutChildrenSinks () {
-	if ( forkMerger != null )
-	    forkMerger = null;
-
-	resetBranchSink ();
-    }
-
-
-    @Deprecated
-    public void resetBranchSink () {
-        localSink.reset ();
-    }
-
-    @Deprecated
-    public BufferSink insertLocalRootSink () {
-        Debug.assertFalse ( forkMerger == null,
-                            "insertLocalRootSink() must only be called for " +
-                            "nodes with multiple children" );
         
-        final BufferSink localRoot = new BufferSink ( null );
-        forkMerger.setParent ( localRoot );
-
-        return localRoot;
-    }
-    
-    @Deprecated
-    public void removeLocalRootSink () {
-        Debug.assertFalse ( forkMerger == null,
-                            "removeLocalRootSink() must only be called for " +
-                            "nodes with multiple children" );
-
-        forkMerger.setParent ( branchSink );
-    }
-        
-    /** makes the given node a child of this node.
+    /**
+     *  makes the given node a child of this node.
      */
     public void add(Node child) {
         child.siblingNr = children.size();
@@ -557,57 +463,25 @@ public class Node {
 	return true;
     }
 
-
-    @Deprecated
-    public Constraint getClosureConstraint () {
-	return localSink.getConstraint ();
+ 
+    /** marks a node as closed */
+    Node close() {
+	closed = true;
+	if (parent != null && parent.isCloseable()) {
+	    return parent.close();
+	}	
+	return this;
     }
 
-    @Deprecated
-    public void addClosureConstraint ( Constraint c ) {
-	localSink.put ( c );
-    }
-
-    @Deprecated
-    public void addRestrictedMetavariable ( Metavariable mv ) {
-	localSink.addRestriction ( mv );
-    }
-
-    @Deprecated
-    public ImmutableSet<Metavariable> getRestrictedMetavariables () {
-	if ( branchSink instanceof Restricter )
-	    return ((Restricter)branchSink).getRestrictions ();
-	else
-	    return DefaultImmutableSet.<Metavariable>nil();
-    }
-
-    @Deprecated
-    public BufferSink getRootSink () {
-	return rootSink;
-    }
-
-    @Deprecated
-    public Sink getBranchSink () {
-	return branchSink;
-    }
-
-    /**
-     * This is called by "BranchRestricter" to indicate that the
-     * subtree below this Node is closed
-     */
-    public void subtreeCompletelyClosed () {
-	proof ().subtreeCompletelyClosed ( this );
-    }
-
-    
-    public void setClosed() {
-	final LinkedList<Node> subTreeNodes = new LinkedList<Node>();
-	subTreeNodes.add(this);	
-	while (!subTreeNodes.isEmpty()) {
-	    final Node n = subTreeNodes.removeFirst();
-	    n.closed = true;	    
-	    subTreeNodes.addAll(n.children);
+    /** checks if an inner node is closeable */
+    private boolean isCloseable() {
+	assert childrenCount() > 0;
+	for (int i = 0; i<childrenCount(); i++) {
+	    if ( !child (i).isClosed() ) {
+		return false;
+	    }
 	}
+	return true;
     }
 
     public boolean isClosed() {

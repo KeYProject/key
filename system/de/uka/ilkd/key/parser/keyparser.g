@@ -96,8 +96,6 @@ options {
       prooflabel2tag.put("contract", new Character('c'));
       prooflabel2tag.put("ifInst", new Character('x'));		
       prooflabel2tag.put("userinteraction", new Character('a'));
-      prooflabel2tag.put("userconstraint", new Character('o'));
-      prooflabel2tag.put("matchconstraint", new Character('m'));
       prooflabel2tag.put("newnames", new Character('w'));
       prooflabel2tag.put("autoModeTime", new Character('e'));
    }

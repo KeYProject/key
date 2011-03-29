@@ -12,7 +12,6 @@ package de.uka.ilkd.key.smt;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
@@ -49,7 +48,7 @@ public class RuleAppSMT implements RuleApp {
 
 	goal.split(1);
 
-	goal.proof().closeGoal(goal, Constraint.BOTTOM);
+	goal.proof().closeGoal(goal);
 	goal.node().getNodeInfo().setBranchLabel(title);
 	return null;
     }

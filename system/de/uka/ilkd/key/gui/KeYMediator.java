@@ -815,7 +815,6 @@ public class KeYMediator {
 
     class KeYMediatorProofTreeListener extends ProofTreeAdapter {
 	public void proofClosed(ProofTreeEvent e) {
-	    closedAGoal();        
 	    KeYMediator.this.notify
 	        (new ProofClosedNotificationEvent(e.getSource()));
 	}

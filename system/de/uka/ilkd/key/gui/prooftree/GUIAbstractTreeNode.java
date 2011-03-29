@@ -15,7 +15,6 @@ import java.util.LinkedList;
 
 import javax.swing.tree.TreeNode;
 
-import de.uka.ilkd.key.proof.ConstraintTableModel;
 import de.uka.ilkd.key.proof.Node;
 
 

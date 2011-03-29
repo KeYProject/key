@@ -449,7 +449,6 @@ public class SequentView extends JEditorPane implements Autoscroll {
     	setPrinter ( sp, null, s );
     }
 
-    // xxx remove?
     protected SequentPrintFilter getSequentPrintFilter() {
     	return filter;
     }

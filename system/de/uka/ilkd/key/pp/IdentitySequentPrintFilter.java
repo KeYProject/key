@@ -19,18 +19,16 @@ import de.uka.ilkd.key.logic.Sequent;
 
 
 /**
- * Select the formulas of the sequent that should be printed, using
- * the user constraint
+ * Identity Filter not doing anything 
  */
-@Deprecated
-public class ConstraintSequentPrintFilter implements SequentPrintFilter {
+public class IdentitySequentPrintFilter implements SequentPrintFilter {
 
     protected Sequent              originalSequent;
 
     protected ImmutableList<SequentPrintFilterEntry> antec = null;
     protected ImmutableList<SequentPrintFilterEntry> succ  = null;
 
-    public ConstraintSequentPrintFilter ( Sequent    p_s ) {
+    public IdentitySequentPrintFilter ( Sequent    p_s ) {
 	originalSequent = p_s;	
     }
 
@@ -52,8 +50,7 @@ public class ConstraintSequentPrintFilter implements SequentPrintFilter {
     }
 
     protected SequentPrintFilterEntry filterFormula ( ConstrainedFormula p_cfma ) {
-	return new Entry ( p_cfma,
-		p_cfma );
+	return new IdentityFilterEntry ( p_cfma );
     }
 
 
@@ -79,14 +76,11 @@ public class ConstraintSequentPrintFilter implements SequentPrintFilter {
     }
 
 
-    protected static class Entry implements SequentPrintFilterEntry {
-	final ConstrainedFormula filteredFormula;
+    private static class IdentityFilterEntry implements SequentPrintFilterEntry {
 	final ConstrainedFormula originalFormula;
 
 
-	public Entry ( ConstrainedFormula p_filteredFormula,
-		       ConstrainedFormula p_originalFormula ) {
-	    filteredFormula   = p_filteredFormula;
+	public IdentityFilterEntry ( ConstrainedFormula p_originalFormula) {
 	    originalFormula   = p_originalFormula;
 	}
 
@@ -94,7 +88,7 @@ public class ConstraintSequentPrintFilter implements SequentPrintFilter {
 	 * Formula to display
 	 */
 	public ConstrainedFormula getFilteredFormula   () {
-	    return filteredFormula;
+	    return originalFormula;
 	}
 
 	/**

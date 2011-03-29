@@ -327,18 +327,6 @@ public class NoPosTacletApp extends TacletApp {
 
     }
 
-
-    /**
-     * @return true iff the taclet instantiation can be made complete
-     * using metavariables
-     */
-    public boolean sufficientlyComplete(Services services) {
-	return ( taclet() instanceof NoFindTaclet ) &&
-	    instsSufficientlyComplete(services) &&
-	    ifInstsComplete ();
-    }
-
-
     protected ImmutableSet<QuantifiableVariable> contextVars(SchemaVariable sv) {
 	return DefaultImmutableSet.<QuantifiableVariable>nil();
     }

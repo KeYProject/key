@@ -485,7 +485,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
                 app = null;
             }
 
-            if (app != null && app.sufficientlyComplete(services)) {
+            if (app != null && app.complete()) {
                 result = result.prepend(app);
             }
         }

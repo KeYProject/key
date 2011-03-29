@@ -346,18 +346,6 @@ public class PosTacletApp extends TacletApp {
 	    ifInstsComplete ();
     }
 
-
-    /**
-     * @return true iff the taclet instantiation can be made complete
-     * using metavariables
-     */
-    public boolean sufficientlyComplete(Services services) {
-	return posInOccurrence() != null 
-	       && instsSufficientlyComplete(services) 
-	       && ifInstsComplete();
-    }
-
-
     /**
      * returns the PositionInOccurrence (representing a ConstrainedFormula and
      * a position in the corresponding formula)

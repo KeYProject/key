@@ -22,10 +22,7 @@ import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.RuleAppListener;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.Metavariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.proof.incclosure.BranchRestricter;
-import de.uka.ilkd.key.proof.incclosure.Sink;
 import de.uka.ilkd.key.proof.proofevent.NodeChangeJournal;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
 import de.uka.ilkd.key.rule.*;
@@ -526,8 +523,6 @@ public class Goal  {
 	Node parent = node(); // has to be stored because the node
 	                      // of this goal will be replaced
         if (n>0) {
-	    Iterator<Sink> itSinks = parent.reserveSinks ( n );
-	    BranchRestricter br;
 	    Node newNode = null;
 	    Goal newGoal = null;
 
@@ -538,20 +533,11 @@ public class Goal  {
 		    newGoal = copy();
 		}
 		// create new node and add to tree
-		if ( n > 1 ) {
-		    br = new BranchRestricter ( itSinks.next () );
-		    newNode = new Node(parent.proof(),
-				       parent.sequent(),
-				       null,
-				       parent,
-				       br);
-		    br.setNode ( newNode );
-		} else
-		    newNode = new Node(parent.proof(),
-				       parent.sequent(),
-				       null,
-				       parent,
-				       itSinks.next ());
+
+		newNode = new Node(parent.proof(),
+			parent.sequent(),
+			null,
+			parent);
 
 		// newNode.addNoPosTacletApps(parent.getNoPosTacletApps());
 		newNode.setGlobalProgVars(parent.getGlobalProgVars());
@@ -599,7 +585,6 @@ public class Goal  {
         removeTaclets();
 	setGlobalProgVars(parent.getGlobalProgVars());
 
-	parent.cutChildrenSinks ();
 	if (node.proof().env()!=null) { // do not break everything
 	                                // because of ProofMgt
 	    node.proof().mgt().ruleUnApplied(parent.getAppliedRuleApp());
@@ -635,22 +620,6 @@ public class Goal  {
            ruleAppIndex.removeNoPosTacletApp(it.next ());
     }
 
-
-    @Deprecated    
-    public Constraint getClosureConstraint () {
-	return node ().getClosureConstraint ();
-    }
-
-    @Deprecated    
-    public void addClosureConstraint ( Constraint c ) {
-	node ().addClosureConstraint ( c );
-    }
-
-    @Deprecated
-    public void addRestrictedMetavariable ( Metavariable mv ) {
-	node ().addRestrictedMetavariable ( mv );
-    }
-    
     public void setBranchLabel(String s) {
         node.getNodeInfo().setBranchLabel(s);
     }
@@ -691,13 +660,13 @@ public class Goal  {
             // this happens for the simplify decision procedure
             // we do nothing in this case
         } else if ( goalList.isEmpty() ) {
-            proof.closeGoal ( this, Constraint.BOTTOM );           
+            proof.closeGoal ( this );           
         } else {
             proof.replace ( this, goalList );
             if ( ruleApp instanceof TacletApp &&
                     ((TacletApp)ruleApp).taclet ().closeGoal () )
                 // the first new goal is the one to be closed
-                proof.closeGoal ( goalList.head (), Constraint.BOTTOM );
+                proof.closeGoal ( goalList.head () );
         }
 
         final RuleAppInfo ruleAppInfo = journal.getRuleAppInfo(p_ruleApp);

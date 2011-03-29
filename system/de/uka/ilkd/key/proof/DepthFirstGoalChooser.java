@@ -54,9 +54,7 @@ public class DepthFirstGoalChooser extends DefaultGoalChooser {
             final Goal g = newGoal;
 
             if (proof.openGoals().contains(g)) {
-                if (!allGoalsSatisfiable
-                        && g.getClosureConstraint()
-                        .isSatisfiable())
+                if (!allGoalsSatisfiable)
                     goalList = goalList.prepend(g);
                 else
                     prevGoalList = prevGoalList.prepend(g);

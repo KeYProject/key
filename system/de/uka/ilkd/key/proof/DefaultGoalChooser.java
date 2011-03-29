@@ -86,12 +86,8 @@ public class DefaultGoalChooser implements IGoalChooser {
         } else {
 
             for (Goal p_goal : p_goals) {
-                final Goal goal = p_goal;
-
-                if (goal.getClosureConstraint().isSatisfiable())
-                    goalList = goalList.prepend(goal);
-                else
-                    selectedList = selectedList.prepend(goal);
+                final Goal goal = p_goal;                
+                selectedList = selectedList.prepend(goal);
             }
 
             allGoalsSatisfiable = selectedList.isEmpty ();
@@ -217,9 +213,7 @@ public class DefaultGoalChooser implements IGoalChooser {
             final Goal g = newGoal;
 
             if (proof.openGoals().contains(g)) {
-                if (!allGoalsSatisfiable
-                        && g.getClosureConstraint()
-                        .isSatisfiable())
+                if (!allGoalsSatisfiable)
                     goalList = goalList.prepend(g);
                 else
                     prevGoalList = prevGoalList.prepend(g);
@@ -254,8 +248,7 @@ public class DefaultGoalChooser implements IGoalChooser {
         while ( it.hasNext () ) {
             final Goal goal = it.next ();
             if ( proof.openGoals ().contains ( goal ) ) {
-                if ( !allGoalsSatisfiable
-                        && goal.getClosureConstraint ().isSatisfiable () ) {
+                if ( !allGoalsSatisfiable ) {
                     goalList = goalList.prepend ( goal );
                     changed = true;
                 } else
@@ -336,7 +329,7 @@ public class DefaultGoalChooser implements IGoalChooser {
 
 
     protected boolean isSatisfiableSubtree ( Node p_root ) {
-	return p_root.getBranchSink ().getResetConstraint ().isSatisfiable ();
+	return !p_root.isClosed();
     }
 
 

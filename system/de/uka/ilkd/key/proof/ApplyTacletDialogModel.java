@@ -201,7 +201,7 @@ public class ApplyTacletDialogModel {
 	    e.getCause().getMessage();
 	}
        	
-	if ( rapp.sufficientlyComplete (services) )
+	if ( rapp.complete () )
 	    return "Instantiation is OK.";
 	else
 	    return "Instantiations are incomplete."; 

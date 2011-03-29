@@ -245,7 +245,7 @@ public class TestApplyTaclet extends TestCase{
 	assertTrue("Rule App should be complete", appList.head().complete());
  	ImmutableList<Goal> goals=appList.head ().execute(goal, TacletForTests.services());
 	assertTrue("Wrong number of goals for close.", goals.size()==1);		
-	proof[2].closeGoal ( goals.head (), Constraint.BOTTOM);
+	proof[2].closeGoal ( goals.head ());
 	assertTrue("Proof should be closed.", proof[2].closed ());		
 	/*
  	IList<SVInstantiations> svilist=rApp.taclet().matchIf(goal.sequent(),

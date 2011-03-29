@@ -92,11 +92,6 @@ public abstract class TacletApp implements RuleApp {
     private ImmutableSet<SchemaVariable> missingVars = null;
 
     /**
-     * subset of missingVars that cannot be instantiated using metavariables
-     */
-    private ImmutableSet<SchemaVariable> neededMissingVars = null;
-
-    /**
      * the instantiations of the following SVs must not be changed; they must
      * not be instantiated with metavariables either
      */
@@ -473,47 +468,6 @@ public abstract class TacletApp implements RuleApp {
 	return missingVars;
     }
 
-    /**
-     * Calculate needed SchemaVariables that have not been instantiated yet and
-     * cannot be instantiated using metavariables. This is a subset of
-     * calculateNonInstantiatedSV();
-     * 
-     * @return ImmutableSet<SchemaVariable> that need to be instantiated but are not
-     */
-    protected ImmutableSet<SchemaVariable> calculateNeededNonInstantiatedSV(
-	    						Services services) {
-	if (neededMissingVars == null) {
-	    Iterator<SchemaVariable> it = calculateNonInstantiatedSV()
-		    .iterator();
-	    SchemaVariable var;
-	    SVInstantiations svi = instantiations();
-
-	    neededMissingVars = DefaultImmutableSet.<SchemaVariable>nil();
-
-	    while (it.hasNext()) {
-		var = it.next();
-
-		if (canUseMVAPriori(var)) {
-		    GenericSortCondition c = GenericSortCondition
-			    .forceInstantiation(var.sort(), true);
-		    if (c == null)
-			continue; // then the sort is not generic
-		    else {
-			try {
-			    svi = svi.add(c, services);
-			    continue; // then the sort can be guessed
-			} catch (GenericSortException e) {
-			    Debug.out("Exception thrown by class TacletApp "
-				    + "at svi.add()");
-			}
-		    }
-		}
-
-		neededMissingVars = neededMissingVars.add(var);
-	    }
-	}
-	return neededMissingVars;
-    }
 
     /**
      * creates a new Tacletapp where the SchemaVariable sv is instantiated with
@@ -576,17 +530,6 @@ public abstract class TacletApp implements RuleApp {
      */
     public ImmutableSet<SchemaVariable> uninstantiatedVars() {
 	return calculateNonInstantiatedSV();
-    }
-
-    /**
-     * returns the variables that are currently uninstantiated and cannot be
-     * instantiated automatically using metavariables
-     * 
-     * @return ImmutableSet<SchemaVariable> with SchemaVariables that have not been
-     *         instantiated yet
-     */
-    public ImmutableSet<SchemaVariable> neededUninstantiatedVars(Services services) {
-	return calculateNeededNonInstantiatedSV(services);
     }
 
     /**
@@ -656,7 +599,7 @@ public abstract class TacletApp implements RuleApp {
 			getRealSort(sv, services));
 		app = app
 			.addCheckedInstantiation(sv, tb.var(v), services, true);
-	    } else if (!(sv instanceof TermSV && canUseMVAPriori(sv))) {
+	    } else {
 		return null;
 	    }
 	}
@@ -671,7 +614,7 @@ public abstract class TacletApp implements RuleApp {
 	    }
 	}
 
-	if (!app.sufficientlyComplete(services)) {
+	if (!app.complete()) {
 	    return null;
 	}
 	return app;
@@ -1089,20 +1032,7 @@ public abstract class TacletApp implements RuleApp {
      */
     public abstract boolean complete();
 
-    /**
-     * @return true iff the taclet instantiation can be made complete using
-     *         metavariables
-     */
-    public abstract boolean sufficientlyComplete(Services services);
-
-    /**
-     * @return true iff the SV instantiations can be made complete using
-     *         metavariables
-     */
-    public boolean instsSufficientlyComplete(Services services) {
-	return neededUninstantiatedVars(services).isEmpty();
-    }
-
+  
     /**
      * @return true iff the if instantiation list is not null or no if sequent
      *         is needed
@@ -1261,37 +1191,6 @@ public abstract class TacletApp implements RuleApp {
             }
         }
 	return null;
-    }
-
-    /**
-     * For a given SV of the taclet decide a priori whether an instantiation via
-     * metavariable is possible
-     * 
-     * @return true iff p_var is a termSV with empty prefix
-     */
-    @Deprecated
-    public boolean canUseMVAPriori(SchemaVariable p_var) {
-	return false;//metavariables are disabled;
-//	if (!(p_var instanceof TermSV) || fixedVars.contains(p_var))
-//	    return false;
-//	else {
-//	    TacletPrefix prefix = taclet().getPrefix(p_var);
-//	    return (prefix.prefix().size() == 0 && !prefix.context());
-//	}
-    }
-
-    /**
-     * For a given SV of the taclet decide a posteriori whether an instantiation
-     * via metavariable is possible
-     * 
-     * @param p_term
-     *            Term to instantiate the schemavariable with
-     */
-    @Deprecated
-    protected boolean canUseMVAPosteriori(SchemaVariable p_var, Term p_term) {
-	// disabled
-	return false;
-	// return canUseMVAPriori ( p_var ) && p_term.isRigid ();
     }
 
     /**
