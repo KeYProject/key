@@ -11,7 +11,6 @@
 package de.uka.ilkd.key.java.visitor;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import junit.framework.TestCase;

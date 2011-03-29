@@ -11,14 +11,12 @@
 package de.uka.ilkd.key.gui;
 
 import java.awt.*;
-import java.awt.Dialog.ModalExclusionType;
 import java.awt.event.*;
 import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.LinkedList;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -37,31 +35,17 @@ import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
-import de.uka.ilkd.key.gui.smt.ComplexButton;
-import de.uka.ilkd.key.gui.smt.ProgressDialog;
-import de.uka.ilkd.key.gui.smt.ProgressPanel;
-import de.uka.ilkd.key.gui.smt.SMTSettings;
-import de.uka.ilkd.key.gui.smt.SettingsDialog;
-import de.uka.ilkd.key.gui.smt.SolverListener;
-import de.uka.ilkd.key.gui.smt.TemporarySettings;
+import de.uka.ilkd.key.gui.smt.*;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.*;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
-
+import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.smt.SMTProblem;
-import de.uka.ilkd.key.smt.SolverException;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
-
-import de.uka.ilkd.key.rule.OneStepSimplifier;
-
-
-import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.KeYExceptionHandler;
-import de.uka.ilkd.key.util.KeYResourceManager;
-import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.key.util.*;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 

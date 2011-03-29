@@ -10,8 +10,6 @@
 
 package de.uka.ilkd.key.logic;
 
-import java.util.Iterator;
-
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 

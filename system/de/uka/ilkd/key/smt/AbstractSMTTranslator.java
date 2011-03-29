@@ -10,13 +10,11 @@
 
 package de.uka.ilkd.key.smt;
 
-import java.io.StringWriter;
 import java.util.*;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
@@ -27,7 +25,6 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.taclettranslation.DefaultTacletSetTranslation;
 import de.uka.ilkd.key.smt.taclettranslation.TacletFormula;
 import de.uka.ilkd.key.smt.taclettranslation.TacletSetTranslation;
-import de.uka.ilkd.key.strategy.feature.TernarySumFeature;
 import de.uka.ilkd.key.util.Debug;
 
 

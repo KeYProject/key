@@ -37,7 +37,6 @@ import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.proof.mgt.GlobalProofMgt;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.strategy.feature.AbstractBetaFeature;
 import de.uka.ilkd.key.strategy.feature.IfThenElseMalusFeature;

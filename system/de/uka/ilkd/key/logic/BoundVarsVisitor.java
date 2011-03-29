@@ -11,8 +11,6 @@
 
 package de.uka.ilkd.key.logic;
 
-import java.util.Iterator;
-
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;

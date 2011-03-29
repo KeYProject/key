@@ -35,8 +35,10 @@ package de.uka.ilkd.key.util;
  ******************************************************************************
  */
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 
 /**
  * <dl>
