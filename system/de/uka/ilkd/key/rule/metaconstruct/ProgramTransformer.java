@@ -12,6 +12,8 @@ package de.uka.ilkd.key.rule.metaconstruct;
 
 import java.io.IOException;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
@@ -20,6 +22,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /** 
@@ -235,6 +238,30 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
     protected final Expression attribute(ReferencePrefix prefix, 
 					 ProgramVariable field) {
 	return new FieldReference(field, prefix);
+    }
+    
+    /**
+     * get a list of schema variables that are needed by this entity when
+     * working given a SV instantiation set.
+     * 
+     * @param svInst
+     *            the instantiations of SV so far.
+     * @return a list of schema variables relevant for this entity;
+     */
+    public ImmutableList<SchemaVariable> needs() {
+	return ImmutableSLList.<SchemaVariable>nil();
+    }
+    
+    /**
+     * get a list of schema variables that are needed by this entity when
+     * working given a SV instantiation set.
+     * 
+     * @param svInst
+     *            the instatiations of SV so far.
+     * @return a list of schema variables relevant for this entity;
+     */
+    public ImmutableList<SchemaVariable> neededInstantiations(SVInstantiations svInst) {
+	return ImmutableSLList.<SchemaVariable>nil();
     }
 
 }

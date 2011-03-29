@@ -38,7 +38,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * }}  
  * </code> becomes          
  */
-public class UnwindLoop extends ProgramTransformer implements MetaConstructWithSV {
+public class UnwindLoop extends ProgramTransformer {
 
     /** the outer label that is used to leave the while loop ('l1') */
     private final SchemaVariable outerLabel;

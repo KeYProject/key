@@ -17,7 +17,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
-public class WhileInvRuleWrapper extends While implements MetaConstructWithSV {
+public class WhileInvRuleWrapper extends While {
 
     private Term wrappedElement;
 

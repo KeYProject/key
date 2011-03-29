@@ -58,8 +58,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * @author MU
  */
 
-public class ForToWhile extends ProgramTransformer implements
-        MetaConstructWithSV {
+public class ForToWhile extends ProgramTransformer {
 
     /**
      * the outer label that is used to leave the while loop ('l1')

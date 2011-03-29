@@ -128,9 +128,6 @@ public final class SortDependingFunction extends Function {
         }               
         return mc;
     }
-        
-    
- 
     
     //-------------------------------------------------------------------------
     //public interface
@@ -161,46 +158,46 @@ public final class SortDependingFunction extends Function {
     }
         
 
-    public SortDependingFunction getInstanceFor(Sort sortDependingOn, 
+    public SortDependingFunction getInstanceFor(Sort sort, 
 	    				        Services services) {
-	if(sortDependingOn == this.sortDependingOn) {
+	if(sort == this.sortDependingOn) {
 	    return this;
 	}
 	
-	assert !(sortDependingOn instanceof ProgramSVSort);
-	assert sortDependingOn != AbstractTermTransformer.METASORT;
+	assert !(sort instanceof ProgramSVSort);
+	assert sort != AbstractTermTransformer.METASORT;
 	
 	SortDependingFunction result 
 		= (SortDependingFunction) 
 		      services.getNamespaces()
 	                      .lookup(instantiateName(getKind(), 
-	                	      		      sortDependingOn));
+	                	      		      sort));
 	
 	//ugly: multiple generic sorts with the same name may exist over time 
 	if(result != null 
-	   && sortDependingOn instanceof GenericSort
-	   && result.getSortDependingOn() != sortDependingOn) {
+	   && sort instanceof GenericSort
+	   && result.getSortDependingOn() != sort) {
 	    result = new SortDependingFunction(template,
-		    			       sortDependingOn);
+		    			       sort);
 	    services.getNamespaces().functions().add(result);	    
 	}
 
 	if(result == null) {
 	    result = new SortDependingFunction(template,
-		    			       sortDependingOn);
+		    			       sort);
 	    services.getNamespaces().functions().addSafely(result);
 	}
 
-        assert result.getSortDependingOn() == sortDependingOn 
+        assert result.getSortDependingOn() == sort 
                : result + " depends on " + result.getSortDependingOn() 
                  + " (hash " + result.hashCode() + ")" 
-                 + " but should depend on " + sortDependingOn
-                 + " (hash " + sortDependingOn.hashCode() + ")";
+                 + " but should depend on " + sort
+                 + " (hash " + sort.hashCode() + ")";
         assert isSimilar(result) 
                : result + " should be similar to " + this;
         assert services.getNamespaces()
 	                      .lookup(instantiateName(getKind(), 
-	                	      		      sortDependingOn)) == result;
+	                	      		      sort)) == result;
 	
 	return result;	
     }

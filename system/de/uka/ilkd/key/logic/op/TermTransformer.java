@@ -25,6 +25,4 @@ public interface TermTransformer extends SortedOperator {
      * of parameter <tt>term</tt> has to be <em>this</em> term transformer.
      */
     Term transform(Term term, SVInstantiations svInst, Services services);
-
-
 }
