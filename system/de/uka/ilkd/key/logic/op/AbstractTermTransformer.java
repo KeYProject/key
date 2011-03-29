@@ -24,8 +24,8 @@ import de.uka.ilkd.key.util.Debug;
 
 
 /**
- * Common base class for meta operator implementations. 
- * The available singletons of meta operators are kept here.
+ * Abstract class factoring out commonalities of typcial term transformer implementations. 
+ * The available singletons of term transformers are kept here.
  */
 public abstract class AbstractTermTransformer extends AbstractSortedOperator 
                                            implements TermTransformer {
@@ -169,13 +169,7 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
 	
 	return result.toString();
     }
-    
-    
-    public TermTransformer getParamMetaOperator(String param) {
-	return null;
-    }
-    
-        
+            
     @Override    
     public MatchConditions match(SVSubstitute subst, MatchConditions mc,
             Services services) {

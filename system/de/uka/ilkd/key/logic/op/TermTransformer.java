@@ -26,6 +26,5 @@ public interface TermTransformer extends SortedOperator {
      */
     Term calculate(Term term, SVInstantiations svInst, Services services);
 
-    public TermTransformer getParamMetaOperator(String param);
 
 }

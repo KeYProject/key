@@ -4009,7 +4009,7 @@ metaTerm returns [Term result = null]
     Term t = null;
 } 
     :
-        (vf = metaId (COLON param = simple_ident)? 
+        (vf = metaId 
            ( LPAREN 
             t = term
             {
@@ -4021,15 +4021,7 @@ metaTerm returns [Term result = null]
                     al.add(t);
                 }   
             )* RPAREN )?
-            {   
-	        if(param != null) {
-		  TermTransformer nvf = vf.getParamMetaOperator(param);
-		  if(nvf == null) {
-                    semanticError("Meta operator "+vf.name()+" is not a parametric meta operator.");
-		  }else {
-		    vf = nvf;
-		  }
-		}
+            {   	      
                 result = tf.createTerm(vf, (Term[])al.toArray(AN_ARRAY_OF_TERMS));
             }         
         ) 
