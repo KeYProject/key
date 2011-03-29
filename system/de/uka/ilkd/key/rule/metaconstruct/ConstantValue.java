@@ -30,7 +30,7 @@ public final class ConstantValue extends AbstractTermTransformer {
     }
 
 
-    public Term calculate(Term term, SVInstantiations svInst, Services services) {
+    public Term transform(Term term, SVInstantiations svInst, Services services) {
 	term = term.sub ( 0 );
 	Operator op = term.op ();
 

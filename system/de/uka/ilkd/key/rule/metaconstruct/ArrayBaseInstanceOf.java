@@ -41,7 +41,7 @@ public final class ArrayBaseInstanceOf extends AbstractTermTransformer {
      * reference array sort or a term with an <tt>exactInstance</tt> symbol as top level 
      * depending on a reference array sort.
      */
-    public Term calculate(Term term, SVInstantiations svInst, Services services) {
+    public Term transform(Term term, SVInstantiations svInst, Services services) {
         final Term array = term.sub(0);
         final Term element = term.sub(1);
 

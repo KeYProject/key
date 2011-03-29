@@ -31,7 +31,7 @@ public final class AddCast extends AbstractTermTransformer {
     
 
     @Override
-    public Term calculate(Term term, 
+    public Term transform(Term term, 
 	    		  SVInstantiations svInst, 
 	    		  Services services ) {
 	Term sub = term.sub(0);

@@ -28,7 +28,7 @@ public final class DivideMonomials extends AbstractTermTransformer {
 
     
     /** calculates the resulting term. */
-    public Term calculate(Term term, SVInstantiations svInst, Services services) {
+    public Term transform(Term term, SVInstantiations svInst, Services services) {
         final Term arg1 = term.sub ( 0 );
         final Term arg2 = term.sub ( 1 );
 

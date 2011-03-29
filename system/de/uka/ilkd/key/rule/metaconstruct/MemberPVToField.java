@@ -27,7 +27,7 @@ public final class MemberPVToField extends AbstractTermTransformer {
     
 
     @Override
-    public Term calculate(Term term, 
+    public Term transform(Term term, 
 	    		  SVInstantiations svInst, 
 	    		  Services services ) {
         HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();	

@@ -40,7 +40,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
 
     
     @Override
-    public Term calculate(Term term, 
+    public Term transform(Term term, 
 	    		  SVInstantiations svInst, 
 	    		  Services services) {
         final Term target = term.sub(0);

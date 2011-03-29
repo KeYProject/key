@@ -599,7 +599,7 @@ public final class SyntacticalReplaceVisitor extends Visitor {
     public void subtreeLeft(Term subtreeRoot){
 	if (subtreeRoot.op() instanceof TermTransformer) {
 	    TermTransformer mop = (TermTransformer) subtreeRoot.op();
-	    pushNew(mop.calculate((Term)subStack.pop(),svInst, getServices()));
+	    pushNew(mop.transform((Term)subStack.pop(),svInst, getServices()));
 	} 
    }
 }

@@ -98,7 +98,7 @@ public class WhileInvRule extends AbstractTermTransformer {
     
     
     /** calculates the resulting term. */
-    public Term calculate(Term term, SVInstantiations svInst, Services services) {
+    public Term transform(Term term, SVInstantiations svInst, Services services) {
         
         // global initialisation
         init(term, services);

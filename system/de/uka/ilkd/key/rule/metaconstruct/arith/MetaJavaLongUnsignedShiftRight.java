@@ -27,7 +27,7 @@ public final class MetaJavaLongUnsignedShiftRight extends AbstractTermTransforme
     }
 
 
-    public Term calculate(Term term, SVInstantiations svInst, Services services) {
+    public Term transform(Term term, SVInstantiations svInst, Services services) {
 	Term arg1 = term.sub(0);
 	Term arg2 = term.sub(1);
 	BigInteger intArg1;

@@ -373,7 +373,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 					   TB.and(new Term[]{invTerm,
 						   	     frameCondition,
 						   	     variantPO}));
-	bodyTerm = wir.calculate(bodyTerm, svInst, services);
+	bodyTerm = wir.transform(bodyTerm, svInst, services);
 	final Term guardTrueBody = TB.box(guardJb, 
 					  TB.imp(guardTrueTerm, bodyTerm)); 
 

@@ -193,11 +193,11 @@ public final class EnhancedForInvRule extends AbstractTermTransformer {
      * 
      * 
      * 
-     * @see de.uka.ilkd.key.logic.op.AbstractTermTransformer#calculate(de.uka.ilkd.key.logic.Term,
+     * @see de.uka.ilkd.key.logic.op.AbstractTermTransformer#transform(de.uka.ilkd.key.logic.Term,
      *      de.uka.ilkd.key.rule.inst.SVInstantiations,
      *      de.uka.ilkd.key.java.Services)
      */
-    public Term calculate(Term term, SVInstantiations svInst, Services services) {
+    public Term transform(Term term, SVInstantiations svInst, Services services) {
 
         // global initialisation
         init(term, services);

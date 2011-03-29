@@ -44,7 +44,7 @@ public final class EnumConstantValue extends AbstractTermTransformer {
      * @throws IllegalArgumentException
      *             if the pv is neither a constant nor ntc.
      */
-    public Term calculate(Term term, SVInstantiations svInst, Services services) {
+    public Term transform(Term term, SVInstantiations svInst, Services services) {
         term = term.sub(0);
         Operator op = term.op();
 
