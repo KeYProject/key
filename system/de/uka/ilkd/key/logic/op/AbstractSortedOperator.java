@@ -20,7 +20,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 /** 
  * Abstract sorted operator class offering some common functionality.
  */
-abstract class AbstractSortedOperator extends AbstractOperator 
+public abstract class AbstractSortedOperator extends AbstractOperator 
                                       implements SortedOperator {
     
     private static final ImmutableArray<Sort> EMPTY_SORT_LIST 

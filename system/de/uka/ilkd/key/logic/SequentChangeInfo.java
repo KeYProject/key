@@ -22,7 +22,7 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
  * situation where this can happen is that a list of formulas had to be added to
  * the sequent and the list has not been redundance free.  
  */
-public class SequentChangeInfo implements java.io.Serializable {
+public class SequentChangeInfo {
 
   /** change information related to the antecedent, this means the
    * there added and removed formulas*/

@@ -10,18 +10,9 @@
 
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.collection.DefaultImmutableSet;
-import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.NameAbstractionTable;
-import de.uka.ilkd.key.logic.op.Metavariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 
@@ -47,7 +38,6 @@ final class TermImpl implements Term {
     private int depth = -1;
     private ThreeValuedTruth rigid = ThreeValuedTruth.UNKNOWN; 
     private ImmutableSet<QuantifiableVariable> freeVars = null;
-    private ImmutableSet<Metavariable> metaVars = null;
     private int hashcode = -1;
     
     
@@ -77,20 +67,16 @@ final class TermImpl implements Term {
     
     private void determineFreeVarsAndMetaVars() {
 	freeVars = DefaultImmutableSet.<QuantifiableVariable>nil();
-        metaVars = DefaultImmutableSet.<Metavariable>nil();
         
         if(op instanceof QuantifiableVariable) {
             freeVars = freeVars.add((QuantifiableVariable) op);
-        } else if(op instanceof Metavariable) {
-            metaVars = metaVars.add((Metavariable) op);
-        }
+        } 
         for(int i = 0, ar = arity(); i < ar; i++) {
 	    ImmutableSet<QuantifiableVariable> subFreeVars = sub(i).freeVars();
 	    for(int j = 0, sz = varsBoundHere(i).size(); j < sz; j++) {
 		subFreeVars = subFreeVars.remove(varsBoundHere(i).get(j));
 	    }
-	    freeVars = freeVars.union(subFreeVars);
-	    metaVars = metaVars.union(sub(i).metaVars());
+	    freeVars = freeVars.union(subFreeVars);	   
 	}
     }
     
@@ -212,16 +198,6 @@ final class TermImpl implements Term {
         }
         return freeVars;
     }
-    
-
-    @Override
-    public ImmutableSet<Metavariable> metaVars() {
-	if(metaVars == null) {
-	    determineFreeVarsAndMetaVars();
-	}
-	return metaVars;
-    }
-    
     
     @Override
     public void execPostOrder(Visitor visitor) {

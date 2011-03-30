@@ -906,24 +906,20 @@ options {
             return tf.createTerm(v);
         } else {
 	  if(isGlobalDeclTermParser())
-		semanticError(v + " is not a logic variable");
-          if ((!isProblemParser()) && (v instanceof Metavariable)) {
-             return tf.createTerm(v);
-          } else {
-  	     if(isTermParser())
+		semanticError(v + " is not a logic variable");          
+  	  if(isTermParser())
                semanticError(v + " is an unknown kind of variable.");
-	    if (inSchemaMode() && v instanceof SchemaVariable ) {
+	  if (inSchemaMode() && v instanceof SchemaVariable ) {
                return tf.createTerm(v);
-            } else {
-	    	String errorMessage = "";
-                if ( inSchemaMode() ) {
-       	          errorMessage += v +" is not a program, logic or schema variable";
-                } else {
-                  errorMessage += v +" is not a logic or program variable";
-                }
-                semanticError(errorMessage);
-            }
-	  }
+          } else {
+	       String errorMessage = "";
+               if ( inSchemaMode() ) {
+       	         errorMessage += v +" is not a program, logic or schema variable";
+               } else {
+                 errorMessage += v +" is not a logic or program variable";
+               }
+               semanticError(errorMessage);
+            }  
 	}
 	return null;
     }

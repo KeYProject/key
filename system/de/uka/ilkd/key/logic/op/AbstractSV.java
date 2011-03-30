@@ -13,7 +13,6 @@ package de.uka.ilkd.key.logic.op;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;

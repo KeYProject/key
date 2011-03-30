@@ -1510,11 +1510,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    Services services) throws IllegalFormulaException {
 	
 	//added, because meatavariables should not be translated.
-	if (term.op() instanceof Metavariable) {
-	    throw new IllegalFormulaException("The Formula contains a metavariable:\n" +
-	    		term.op().toString() + "\n" +
-	    		"Metavariables can not be translated.");
-	}
+	assert !(term.op() instanceof 
+		de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable):"Metavariables no longer supported";
 	
 	Operator op = term.op();
 	if (op == Junctor.NOT) {

@@ -33,7 +33,6 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
 import de.uka.ilkd.key.java.visitor.ProgramReplaceVisitor;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -41,7 +40,6 @@ import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Metavariable;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramSV;
@@ -55,6 +53,9 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.Constraint;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.EqualityConstraint;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable;
 import de.uka.ilkd.key.util.Debug;
 
 public final class SyntacticalReplaceVisitor extends Visitor { 	
@@ -211,7 +212,7 @@ public final class SyntacticalReplaceVisitor extends Visitor {
     private Term toTerm(Object o) {
 	if (o instanceof Term) {
 	    final Term t = (Term)o;
-            if ( t.metaVars ().size () != 0 && !metavariableInst.isBottom () ) {
+            if ( EqualityConstraint.metaVars (t).size () != 0 && !metavariableInst.isBottom () ) {
                 // use the visitor recursively for replacing metavariables that
                 // might occur in the term (if possible)
                 final SyntacticalReplaceVisitor srv =

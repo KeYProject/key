@@ -36,11 +36,7 @@ public class TestSchemaModalOperators extends TestCase {
                    "i=3", "\\[{ if(i==3) {i++;} else {i--;} }\\] i=3" };
     Proof[] proof;
     Proof   mvProof;
-    // mv=f(X,c)
-    Constraint 	consMV_f_X_c;
-    // mv=f(c,X)
-    Constraint 	consMV_f_c_X;
-
+   
     private static Semisequent parseTermForSemisequent(String t) {
 	if ("".equals(t)) { 
 	    return Semisequent.EMPTY_SEMISEQUENT;

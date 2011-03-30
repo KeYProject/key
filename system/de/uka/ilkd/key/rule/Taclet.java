@@ -38,7 +38,6 @@ import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.Metavariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -558,8 +557,8 @@ public abstract class Taclet implements Rule, Named {
 	final Operator sourceOp   = term.op ();
         final Operator templateOp = template.op ();
         
-        assert !(sourceOp instanceof Metavariable) : "metavariables are disabled";        
-        assert !(templateOp instanceof Metavariable) : "metavariables are disabled";
+        assert !(sourceOp instanceof de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable) : "metavariables are disabled";        
+        assert !(templateOp instanceof de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable) : "metavariables are disabled";
         
         if ( ignoreUpdates
              && sourceOp instanceof UpdateApplication

@@ -17,7 +17,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * has to satisfy. In opposition to terms a ConstrainedFormula is not
  * persistent.
  */
-public class ConstrainedFormula implements java.io.Serializable {
+public class ConstrainedFormula {
 
     private final Term term;
    

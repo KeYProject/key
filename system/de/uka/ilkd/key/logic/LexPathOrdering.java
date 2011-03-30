@@ -11,13 +11,17 @@
 package de.uka.ilkd.key.logic;
 
 import java.math.BigInteger;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.WeakHashMap;
 
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
-
 
 /**
  *
@@ -364,8 +368,7 @@ public class LexPathOrdering implements TermOrdering {
      * @return true iff <code>op</code> is a logic variable
      */
     private boolean isVar (Operator op) {
-        return op instanceof Metavariable
-               || op instanceof QuantifiableVariable;
+        return op instanceof QuantifiableVariable;
     }
 
     private int sign (int p) {

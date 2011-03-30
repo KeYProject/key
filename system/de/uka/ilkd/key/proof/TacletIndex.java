@@ -385,7 +385,7 @@ public final class TacletIndex  {
 	    	boolean ignoreUpdates) {
 	ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
 		
-	assert !(term.op() instanceof Metavariable) : "metavariables are disabled";
+	assert !(term.op() instanceof de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable) : "metavariables are disabled";
 
 	if (!term.javaBlock().isEmpty()) {
 	    prefixOccurrences.reset();

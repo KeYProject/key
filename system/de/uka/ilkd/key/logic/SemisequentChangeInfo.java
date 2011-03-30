@@ -18,7 +18,7 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
  * Records the changes made to a semisequent. Keeps track of added and
  * removed formula to the semisequents. 
  */
-public class SemisequentChangeInfo implements java.io.Serializable {
+public class SemisequentChangeInfo {
     
     /** contains the added formulas to the semisequent */
     private ImmutableList<ConstrainedFormula> added   = ImmutableSLList.<ConstrainedFormula>nil();
