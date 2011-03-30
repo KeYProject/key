@@ -60,8 +60,8 @@ public final class SpecificationRepository {
     
     private final Map<Pair<KeYJavaType,ObserverFunction>, ImmutableSet<Contract>> contracts 
     		= new LinkedHashMap<Pair<KeYJavaType,ObserverFunction>,ImmutableSet<Contract>>();
-    private final Map<Pair<KeYJavaType,ProgramMethod>, ImmutableSet<OperationContract>> operationContracts 
-    		= new LinkedHashMap<Pair<KeYJavaType,ProgramMethod>,ImmutableSet<OperationContract>>();    
+    private final Map<Pair<KeYJavaType,ProgramMethod>, ImmutableSet<FunctionalOperationContract>> operationContracts 
+    		= new LinkedHashMap<Pair<KeYJavaType,ProgramMethod>,ImmutableSet<FunctionalOperationContract>>();    
     private final Map<String,Contract> contractsByName
                 = new LinkedHashMap<String,Contract>();
     private final Map<KeYJavaType,ImmutableSet<ObserverFunction>> contractTargets
@@ -373,16 +373,16 @@ public final class SpecificationRepository {
      * Returns all registered (atomic) operation contracts for the passed 
      * operation.
      */
-    public ImmutableSet<OperationContract> getOperationContracts(
+    public ImmutableSet<FunctionalOperationContract> getOperationContracts(
 	    						KeYJavaType kjt, 
 	    						ProgramMethod pm) {
 	pm = (ProgramMethod) getCanonicalFormForKJT(pm, kjt);
 	final Pair<KeYJavaType,ProgramMethod> pair 
 		= new Pair<KeYJavaType,ProgramMethod>(kjt, pm);
-	final ImmutableSet<OperationContract> result 
+	final ImmutableSet<FunctionalOperationContract> result 
 		= operationContracts.get(pair);
         return result == null 
-               ? DefaultImmutableSet.<OperationContract>nil() 
+               ? DefaultImmutableSet.<FunctionalOperationContract>nil() 
                : result;	
     }
     
@@ -391,12 +391,12 @@ public final class SpecificationRepository {
      * Returns all registered (atomic) operation contracts for the passed 
      * operation which refer to the passed modality.
      */
-    public ImmutableSet<OperationContract> getOperationContracts(
+    public ImmutableSet<FunctionalOperationContract> getOperationContracts(
 	    				       KeYJavaType kjt,	    
 	    				       ProgramMethod pm,
 	    				       Modality modality) {
-	ImmutableSet<OperationContract> result = getOperationContracts(kjt, pm);
-	for(OperationContract contract : result) {
+	ImmutableSet<FunctionalOperationContract> result = getOperationContracts(kjt, pm);
+	for(FunctionalOperationContract contract : result) {
 	    if(!contract.getModality().equals(modality)) {
 		result = result.remove(contract);
 	    }
@@ -419,11 +419,11 @@ public final class SpecificationRepository {
             return contractsByName.get(baseNames[0]);
         }
         
-        ImmutableSet<OperationContract> baseContracts 
-            = DefaultImmutableSet.<OperationContract>nil();
+        ImmutableSet<FunctionalOperationContract> baseContracts 
+            = DefaultImmutableSet.<FunctionalOperationContract>nil();
         for(String baseName : baseNames) {
-            OperationContract baseContract 
-            	= (OperationContract) contractsByName.get(baseName);
+            FunctionalOperationContract baseContract 
+            	= (FunctionalOperationContract) contractsByName.get(baseName);
             if(baseContract == null) {
                 return null;
             }
@@ -520,11 +520,11 @@ public final class SpecificationRepository {
             contracts.put(impl, 
         	          getContracts(impl.first, impl.second).add(contract));
             
-            if(contract instanceof OperationContract) {
+            if(contract instanceof FunctionalOperationContract) {
         	operationContracts.put(new Pair<KeYJavaType,ProgramMethod>(impl.first, (ProgramMethod)impl.second), 
         		               getOperationContracts(impl.first, 
         		        	                     (ProgramMethod)impl.second)
-        		        	              .add((OperationContract)contract));
+        		        	              .add((FunctionalOperationContract)contract));
             }
             contractsByName.put(contract.getName(), contract);
             contractTargets.put(impl.first, 
@@ -547,8 +547,8 @@ public final class SpecificationRepository {
     /**
      * Creates a combined contract out of the passed atomic contracts.
      */
-    public OperationContract combineOperationContracts(
-                                    ImmutableSet<OperationContract> toCombine) {
+    public FunctionalOperationContract combineOperationContracts(
+                                    ImmutableSet<FunctionalOperationContract> toCombine) {
         assert toCombine != null && toCombine.size() > 0;
         for(Contract contract : toCombine) {            
             assert !contract.getName().contains(CONTRACT_COMBINATION_MARKER)
@@ -556,18 +556,18 @@ public final class SpecificationRepository {
         }
 
         //sort contracts alphabetically (for determinism)
-        OperationContract[] contractsArray 
-        	= toCombine.toArray(new OperationContract[toCombine.size()]);
-        Arrays.sort(contractsArray, new Comparator<OperationContract> () {
-            public int compare(OperationContract c1, OperationContract c2) {
+        FunctionalOperationContract[] contractsArray 
+        	= toCombine.toArray(new FunctionalOperationContract[toCombine.size()]);
+        Arrays.sort(contractsArray, new Comparator<FunctionalOperationContract> () {
+            public int compare(FunctionalOperationContract c1, FunctionalOperationContract c2) {
                 return c1.getName().compareTo(c2.getName());
             }
         });
         
         //split
-        OperationContract contract = contractsArray[0];
-        OperationContract[] others 
-            = new OperationContract[contractsArray.length - 1];
+        FunctionalOperationContract contract = contractsArray[0];
+        FunctionalOperationContract[] others 
+            = new FunctionalOperationContract[contractsArray.length - 1];
         System.arraycopy(contractsArray, 
                          1, 
                          others, 
@@ -576,7 +576,7 @@ public final class SpecificationRepository {
         
         //determine names
         StringBuffer nameSB = new StringBuffer(contract.getName());
-        for(OperationContract other : others) {
+        for(FunctionalOperationContract other : others) {
             nameSB.append(CONTRACT_COMBINATION_MARKER + other.getName());
         }
         

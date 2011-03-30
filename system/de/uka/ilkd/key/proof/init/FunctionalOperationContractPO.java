@@ -31,24 +31,20 @@ import de.uka.ilkd.key.java.statement.Branch;
 import de.uka.ilkd.key.java.statement.Catch;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.Try;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.speclang.InformationFlowContract;
-
+import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
 
 /**
- * The proof obligation for dependency contracts. 
+ * The proof obligation for operation contracts. 
  */
-public final class InformationFlowContractPO
+public final class FunctionalOperationContractPO
 	extends AbstractOperationContractPO {
     
-    public InformationFlowContractPO(InitConfig initConfig,
-	    InformationFlowContract contract) {
-	super(initConfig, contract.getName(), contract);
+    public FunctionalOperationContractPO(InitConfig initConfig, 
+	    		       FunctionalOperationContract contract) {
+    	super(initConfig, contract.getName(), contract);
     }
     
     
@@ -59,22 +55,11 @@ public final class InformationFlowContractPO
     /**
      * Builds the "general assumption". 
      */
-    private Term buildFreePre(ProgramVariable selfVar, KeYJavaType selfKJT,
-	    ImmutableList<ProgramVariable> paramVars,
-	    LocationVariable heapAtPreVar1, LocationVariable heapAtPreVar2)
-	    throws ProofInputException {
-
-	// TODO: Use parser to automatically build term from comments!?
-	
-	final Term heapAtPre1 = TB.var(heapAtPreVar1);
-	final Term heapAtPre2 = TB.var(heapAtPreVar2);
-	
-	final Term updateHeapAtPre1
-		= TB.elementary(services, TB.heap(services), heapAtPre1);
-	final Term updateHeapAtPre2
-	= TB.elementary(services, TB.heap(services), heapAtPre2);
-	
-        //"self != null"
+    private Term buildFreePre(ProgramVariable selfVar,
+	                      KeYJavaType selfKJT,
+                              ImmutableList<ProgramVariable> paramVars) 
+    		throws ProofInputException {
+	//"self != null"
 	final Term selfNotNull = generateSelfNotNull(selfVar);
         	      
         //"self.<created> = TRUE"
@@ -89,25 +74,17 @@ public final class InformationFlowContractPO
         Term paramsOK = generateParamsOK(paramVars);
         
         //initial value of measured_by clause
-        // TODO: check if this is ok for information flow!
         final Term mbyAtPreDef = generateMbyAtPreDef(selfVar, paramVars);
 
-        
-        final Term[] freePreTerms = new Term[] {
-        	TB.wellFormed(services, heapAtPre1),
-		TB.wellFormed(services, heapAtPre2),
-		selfNotNull,
-		TB.apply(updateHeapAtPre1, selfCreated),
-		TB.apply(updateHeapAtPre2, selfCreated),
-		TB.apply(updateHeapAtPre1, selfExactType),
-		TB.apply(updateHeapAtPre2, selfExactType),
-		paramsOK,
-		mbyAtPreDef };
-        
-        return TB.and(freePreTerms);
+        return TB.and(new Term[]{TB.wellFormedHeap(services), 
+        	       		 selfNotNull,
+        	       		 selfCreated,
+        	       		 selfExactType,
+        	       		 paramsOK,
+        	       		 mbyAtPreDef});
     }
-
-
+    
+    
     private JavaBlock buildJavaBlock(
 	    			ImmutableList<LocationVariable> formalParVars,
                                 ProgramVariable selfVar, 
@@ -124,7 +101,7 @@ public final class InformationFlowContractPO
 	    final Expression[] formalArray2 
 	    	= formalArray.toArray(new Expression[formalArray.size()]);
 	    final New n 
-	    	= new New(formalArray2, new TypeRef(contract.getKJT()), null);
+	    	= new New(formalArray2, new TypeRef(getContract().getKJT()), null);
 	    final CopyAssignment ca = new CopyAssignment(selfVar, n);
 	    sb = new StatementBlock(ca);
 	} else {
@@ -190,7 +167,7 @@ public final class InformationFlowContractPO
                                             exceptionVar);
         
         //create program term
-        final Term programTerm = TB.prog(Modality.BOX, jb, postTerm);
+        final Term programTerm = TB.prog(getContract().getModality(), jb, postTerm);
         
         //create update
         Term update = TB.elementary(services, heapAtPreVar, TB.heap(services));
@@ -223,21 +200,10 @@ public final class InformationFlowContractPO
         	= TB.selfVar(services, pm, contract.getKJT(), true);
         final ProgramVariable resultVar = TB.resultVar(services, pm, true);
         final ProgramVariable exceptionVar = TB.excVar(services, pm, true);
-	final LocationVariable heapAtPreVar1
-		= TB.heapAtPreVar(services, "heapAtPre1", true);
-	final LocationVariable heapAtPreVar2
-		= TB.heapAtPreVar(services, "heapAtPre2", true);
-	final LocationVariable heapAtPostVar1
-		= TB.heapAtPreVar(services, "heapAtPost1", true);
-	final LocationVariable heapAtPostVar2
-		= TB.heapAtPreVar(services, "heapAtPost2", true);
-     	final LocationVariable heapAtPreVar // TODO: needed?
-     		= TB.heapAtPreVar(services, "heapAtPre", true);
-     	final Map<Term,Term> normalToAtPre = new HashMap<Term,Term>();
-     	normalToAtPre.put(TB.var(heapAtPostVar1), TB.var(heapAtPreVar1));
-     	normalToAtPre.put(TB.var(heapAtPostVar2), TB.var(heapAtPreVar2));
-     	normalToAtPre.put(TB.heap(services), TB.var(heapAtPreVar)); // TODO: needed?
-     	
+     	final LocationVariable heapAtPreVar 
+		= TB.heapAtPreVar(services, "heapAtPre", true);
+        final Map<Term,Term> normalToAtPre = new HashMap<Term,Term>();
+        normalToAtPre.put(TB.heap(services), TB.var(heapAtPreVar));
         
         //register the variables so they are declared in proof header 
         //if the proof is saved to a file
@@ -245,35 +211,26 @@ public final class InformationFlowContractPO
         register(selfVar);
         register(resultVar);
         register(exceptionVar);
-        register(heapAtPreVar); // TODO: needed?
-        register(heapAtPreVar1);
-	register(heapAtPreVar2);
-	register(heapAtPostVar1);
-	register(heapAtPostVar2);
+        register(heapAtPreVar);
 
         //build precondition
-	final Term freePre = buildFreePre(selfVar, contract.getKJT(),
-	        paramVars, heapAtPreVar1, heapAtPreVar2);
-	final Term contractPre = contract.getPre(selfVar, paramVars, services);
-        final Term pre = TB.and(freePre, contractPre);
+        final Term pre = TB.and(buildFreePre(selfVar, 
+        	                             contract.getKJT(), 
+        	                             paramVars), 
+        	                contract.getPre(selfVar, paramVars, services));
                 
         //build program term
-//        final Term post = TB.and(contract.getPost(selfVar, 
-//                                    	   	  paramVars, 
-//                                    	   	  resultVar, 
-//                                    	   	  exceptionVar,
-//                                    	   	  heapAtPreVar,
-//                                    	   	  services),
-//                                 TB.frame(services, 
-//                                	  normalToAtPre, 
-//                                	  contract.getMod(selfVar, 
-//                                		  	  paramVars, 
-//                                		  	  services)));
-        final Term post = TB.frame(services, 
-        	normalToAtPre, 
-        	getContract().getMod(selfVar, 
-		  	  paramVars, 
-		  	  services));
+        final Term post = TB.and(getContract().getPost(selfVar, 
+                                    	   	  paramVars, 
+                                    	   	  resultVar, 
+                                    	   	  exceptionVar,
+                                    	   	  heapAtPreVar,
+                                    	   	  services),
+                                 TB.frame(services, 
+                                	  normalToAtPre, 
+                                	  getContract().getMod(selfVar, 
+                                		  	  paramVars, 
+                                		  	  services)));
         final Term progPost = buildProgramTerm(paramVars,
                                                selfVar,
                                                resultVar,
@@ -291,17 +248,18 @@ public final class InformationFlowContractPO
     
     @Override
     public boolean implies(ProofOblInput po) {
-        if(!(po instanceof InformationFlowContractPO)) {
+        if(!(po instanceof FunctionalOperationContractPO)) {
             return false;
         }
-        InformationFlowContractPO cPO = (InformationFlowContractPO) po;
-        return contract.equals(cPO.contract);
+        AbstractOperationContractPO cPO = (AbstractOperationContractPO) po;
+        return specRepos.splitContract(cPO.contract)
+                        .subset(specRepos.splitContract(contract));
     }
     
     
     @Override
-    public InformationFlowContract getContract() {
-        return (InformationFlowContract)contract;
+    public FunctionalOperationContract getContract() {
+        return (FunctionalOperationContract)contract;
     }
     
     
@@ -313,10 +271,10 @@ public final class InformationFlowContractPO
     
     @Override
     public boolean equals(Object o) {
-	if(!(o instanceof InformationFlowContractPO)) {
+	if(!(o instanceof FunctionalOperationContractPO)) {
 	    return false;
 	} else {
-	    return contract.equals(((InformationFlowContractPO)o).contract);
+	    return contract.equals(((AbstractOperationContractPO)o).contract);
 	}
     }
     

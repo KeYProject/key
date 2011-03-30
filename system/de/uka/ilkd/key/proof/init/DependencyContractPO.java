@@ -17,7 +17,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.DependencyContract;
-import de.uka.ilkd.key.speclang.OperationContract;
+import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
 
 /**
@@ -38,7 +38,7 @@ public final class DependencyContractPO extends AbstractPO
 	    			DependencyContract contract) {
     	super(initConfig, contract.getName());
     	this.contract = contract;
-    	assert !(contract instanceof OperationContract);
+    	assert !(contract instanceof FunctionalOperationContract);
     }
     
     
@@ -224,5 +224,63 @@ public final class DependencyContractPO extends AbstractPO
     @Override
     public int hashCode() {
         return contract.hashCode();
+    }
+
+
+
+    protected Term generateSelfNotNull(ProgramVariable selfVar) {
+        return selfVar == null || contract.getTarget().isConstructor()
+              ? TB.tt()
+              : TB.not(TB.equals(TB.var(selfVar), TB.NULL(services)));
+    }
+
+
+
+    protected Term generateSelfCreated(ProgramVariable selfVar) {
+        return selfVar == null || contract.getTarget().isConstructor()
+             ? TB.tt()
+             : TB.created(services, TB.var(selfVar));
+    }
+
+
+
+    protected Term generateSelfExactType(ProgramVariable selfVar, KeYJavaType selfKJT) {
+        final Term selfExactType
+           = selfVar == null || contract.getTarget().isConstructor()
+             ? TB.tt()
+             : TB.exactInstance(services, 
+        	                selfKJT.getSort(), 
+        	                TB.var(selfVar));
+        return selfExactType;
+    }
+
+
+
+    protected Term generateParamsOK(ImmutableList<ProgramVariable> paramVars) {
+        Term paramsOK = TB.tt();
+        for(ProgramVariable paramVar : paramVars) {
+            paramsOK = TB.and(paramsOK, TB.reachableValue(services, paramVar));
+        }
+        return paramsOK;
+    }
+
+
+
+    protected Term generateMbyAtPreDef(ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars) {
+        final Term mbyAtPreDef;
+        if(contract.hasMby()) {
+            final Function mbyAtPreFunc
+            	= new Function(new Name(TB.newName(services, "mbyAtPre")), 
+        		       services.getTypeConverter()
+        		               .getIntegerLDT()
+        		               .targetSort());
+            register(mbyAtPreFunc);
+            mbyAtPre = TB.func(mbyAtPreFunc);
+            final Term mby = contract.getMby(selfVar, paramVars, services);
+            mbyAtPreDef = TB.equals(mbyAtPre, mby);
+        } else {
+            mbyAtPreDef = TB.tt();
+        }
+        return mbyAtPreDef;
     }
 }

@@ -224,7 +224,7 @@ public final class DLSpecFactory {
      * (where the update and/or the #catchAll may be omitted) and a modifies 
      * clause.
      */
-    public OperationContract createDLOperationContract(String name, 
+    public FunctionalOperationContract createDLOperationContract(String name, 
 	    					       Term fma, 
 	    					       Term modifies)
 	    throws ProofInputException {
@@ -288,7 +288,7 @@ public final class DLSpecFactory {
 	final boolean isLibraryClass 
 		= ((TypeDeclaration)pm.getContainerType() 
 			              .getJavaType()).isLibraryClass();
-	return new OperationContractImpl(name,
+	return new FunctionalOperationContractImpl(name,
 					 pm.getContainerType(),		
 					 pm, 
 					 modality, 

@@ -444,28 +444,28 @@ public class JMLSpecFactory {
             ProgramMethod pm, ProgramVariableCollection progVars,
             ContractClauses clauses, Term post, ImmutableSet<Contract> result) {
 	if (clauses.diverges.equals(TB.ff())) {
-	    OperationContract contract
-	    	= new OperationContractImpl(
+	    FunctionalOperationContract contract
+	    	= new FunctionalOperationContractImpl(
 	    		name, pm, Modality.DIA, clauses.requires,
 	    		clauses.measuredBy, post, clauses.assignable, progVars,
 	    		false);
 	    result = result.add(contract);
 	} else if (clauses.diverges.equals(TB.tt())) {
-	    OperationContract contract
-	    	= new OperationContractImpl(
+	    FunctionalOperationContract contract
+	    	= new FunctionalOperationContractImpl(
 	    		name, pm, Modality.BOX, clauses.requires,
 	    		clauses.measuredBy, post, clauses.assignable, progVars,
 	    		false);
 	    result = result.add(contract);
 	} else {
-	    OperationContract contract1
-	    	= new OperationContractImpl(
+	    FunctionalOperationContract contract1
+	    	= new FunctionalOperationContractImpl(
 	    		name, pm, Modality.DIA,
 	    		TB.and(clauses.requires, TB.not(clauses.diverges)),
 	    		clauses.measuredBy, post, clauses.assignable,
 	    		progVars, false);
-	    OperationContract contract2
-	    	= new OperationContractImpl(name, pm, Modality.BOX,
+	    FunctionalOperationContract contract2
+	    	= new FunctionalOperationContractImpl(name, pm, Modality.BOX,
 	    		clauses.requires, clauses.measuredBy, post,
 	    		clauses.assignable, progVars, false);
 	    result = result.add(contract1).add(contract2);

@@ -32,7 +32,7 @@ import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
-import de.uka.ilkd.key.speclang.OperationContract;
+import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
@@ -219,12 +219,12 @@ public final class UseOperationContractRule implements BuiltInRule {
      * Returns the operation contracts which are applicable for the passed 
      * operation and the passed modality
      */
-    private static ImmutableSet<OperationContract> getApplicableContracts(
+    private static ImmutableSet<FunctionalOperationContract> getApplicableContracts(
 	    						  Services services, 
                                                           ProgramMethod pm, 
                                                           KeYJavaType kjt,
                                                           Modality modality) {
-        ImmutableSet<OperationContract> result 
+        ImmutableSet<FunctionalOperationContract> result 
                 = services.getSpecificationRepository()
                           .getOperationContracts(kjt, pm, modality);
         
@@ -244,13 +244,13 @@ public final class UseOperationContractRule implements BuiltInRule {
      * Chooses a contract to be applied. 
      * This is done either automatically or by asking the user.
      */
-    private static OperationContract configureContract(Services services, 
+    private static FunctionalOperationContract configureContract(Services services, 
                                                        ProgramMethod pm,
                                                        KeYJavaType kjt,
                                                        Modality modality) {
-	ImmutableSet<OperationContract> contracts
+	ImmutableSet<FunctionalOperationContract> contracts
                 = getApplicableContracts(services, pm, kjt, modality);
-	for(OperationContract c : contracts) {
+	for(FunctionalOperationContract c : contracts) {
 	    if(!services.getProof().mgt().isContractApplicable(c)) {
 		contracts = contracts.remove(c);
 	    }
@@ -260,8 +260,8 @@ public final class UseOperationContractRule implements BuiltInRule {
             return services.getSpecificationRepository()
                            .combineOperationContracts(contracts);
         } else {
-            OperationContract[] contractsArr 
-            	= contracts.toArray(new OperationContract[contracts.size()]);
+            FunctionalOperationContract[] contractsArr 
+            	= contracts.toArray(new FunctionalOperationContract[contracts.size()]);
             ContractConfigurator cc 
                     = new ContractConfigurator(Main.getInstance(),
                                                services,
@@ -269,7 +269,7 @@ public final class UseOperationContractRule implements BuiltInRule {
                                                "Contracts for " + pm.getName(),
                                                true);
             if(cc.wasSuccessful()) {
-                return (OperationContract) cc.getContract();
+                return (FunctionalOperationContract) cc.getContract();
             } else {
                 return null;
             }
@@ -506,7 +506,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 	}
 
         //there must be applicable contracts for the operation
-        final ImmutableSet<OperationContract> contracts 
+        final ImmutableSet<FunctionalOperationContract> contracts 
                 = getApplicableContracts(goal.proof().getServices(), 
                 	                 inst.pm, 
                 	                 inst.staticType, 
@@ -517,7 +517,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 
         //applying a contract here must not create circular dependencies 
         //between proofs
-        for(OperationContract contract : contracts) {
+        for(FunctionalOperationContract contract : contracts) {
             if(goal.proof().mgt().isContractApplicable(contract)) {
         	return true;
             }
@@ -536,12 +536,12 @@ public final class UseOperationContractRule implements BuiltInRule {
         final JavaBlock jb = inst.progPost.javaBlock();
         
         //configure contract
-        final OperationContract contract;
+        final FunctionalOperationContract contract;
         if(ruleApp instanceof ContractRuleApp) {
             //the contract is already fixed 
             //(probably because we're in the process of reading in a 
             //proof from a file)
-            contract = (OperationContract)((ContractRuleApp) ruleApp)
+            contract = (FunctionalOperationContract)((ContractRuleApp) ruleApp)
                                            .getInstantiation();            
         } else { 
             contract = configureContract(services, 

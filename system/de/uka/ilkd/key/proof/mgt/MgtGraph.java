@@ -60,7 +60,7 @@ public class MgtGraph {
 	        proofRank = proofRank +" "+node(o);
             else if (o instanceof KeYJavaType)
 	        classRank = classRank+" "+ node(o);
-	    else if (o instanceof OperationContract)
+	    else if (o instanceof FunctionalOperationContract)
 	        specRank = specRank +" " + node(o);
 	    else if (o instanceof ClassInvariant)
 	        specRank = specRank +" " + node(o);
@@ -176,8 +176,8 @@ public class MgtGraph {
     String node(Object o) {
         if (o instanceof Proof)
 	    return ""+o.hashCode();
-	else if (o instanceof OperationContract)
-	    return "\""+((OperationContract)o).getName().
+	else if (o instanceof FunctionalOperationContract)
+	    return "\""+((FunctionalOperationContract)o).getName().
 	        replace("normal_behavior operation contract", "ct")+"\"";
 	else if (o instanceof ClassInvariant)
 	    return "\""+((ClassInvariant)o).getDisplayName().

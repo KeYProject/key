@@ -27,7 +27,7 @@ import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.speclang.OperationContract;
+import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
 
 /**
@@ -169,10 +169,10 @@ class ContractSelectionPanel extends JPanel {
         } else if(selection.length == 1) {
             return (Contract) selection[0];
         } else {
-            ImmutableSet<OperationContract> contracts 
-            	= DefaultImmutableSet.<OperationContract>nil();
+            ImmutableSet<FunctionalOperationContract> contracts 
+            	= DefaultImmutableSet.<FunctionalOperationContract>nil();
             for(Object contract : selection) {
-        	contracts = contracts.add((OperationContract) contract);
+        	contracts = contracts.add((FunctionalOperationContract) contract);
             }        
             return services.getSpecificationRepository()
                            .combineOperationContracts(contracts);

@@ -34,7 +34,7 @@ import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.DependencyContract;
-import de.uka.ilkd.key.speclang.OperationContract;
+import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
@@ -237,10 +237,10 @@ public final class ProblemLoader implements Runnable {
         	   if(contract == null) {
         	       throw new RuntimeException("Contract not found: " 
         		                          + chooseContract);
-        	   } else if(contract instanceof OperationContract) {
-        	       po = new OperationContractPO(
+        	   } else if(contract instanceof FunctionalOperationContract) {
+        	       po = new FunctionalOperationContractPO(
         		       		initConfig, 
-        		       		(OperationContract)contract);
+        		       		(FunctionalOperationContract)contract);
         	   } else {
         	       po = new DependencyContractPO(
         		       		initConfig, 
