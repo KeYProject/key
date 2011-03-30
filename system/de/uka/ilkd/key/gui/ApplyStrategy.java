@@ -137,6 +137,7 @@ public class ApplyStrategy {
      * possible or the thread is interrupted.
      */
     Object doWork() {
+        mediator().resetNrGoalsClosedByHeuristics();
         time = System.currentTimeMillis();
         try{
 	   Debug.out("Strategy started.");
