@@ -26,7 +26,7 @@ import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
 /**
- * The objects of this class represent (local!) program variables and program 
+ * The objects of this class represent program variables and program 
  * constants  (resulting from static final declarations in programs; TODO: it is
  * weird that constants are a special case of variables).
  * 

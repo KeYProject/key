@@ -351,7 +351,9 @@ public final class UseDependencyContractRule implements BuiltInRule {
 		throw new RuntimeException(e);
 	    }
 	    String prettyprint = lp.toString();
-	    prettyprint = "<html><tt>" + LogicPrinter.escapeHTML(prettyprint) + "</tt></html>";
+	    prettyprint = "<html><tt>" 
+		          + LogicPrinter.escapeHTML(prettyprint, true) 
+		          + "</tt></html>";
 	    heaps[i++] = new TermStringWrapper(heap, prettyprint);
 	}
 	
