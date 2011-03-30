@@ -15,7 +15,6 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.DependencyContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
@@ -26,7 +25,6 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 public final class DependencyContractPO extends AbstractPO 
                                         implements ContractPO {
     
-    private final DependencyContract contract;
     private Term mbyAtPre;    
            
     
@@ -36,8 +34,7 @@ public final class DependencyContractPO extends AbstractPO
     
     public DependencyContractPO(InitConfig initConfig, 
 	    			DependencyContract contract) {
-    	super(initConfig, contract.getName());
-    	this.contract = contract;
+    	super(initConfig, contract.getName(), contract);
     	assert !(contract instanceof FunctionalOperationContract);
     }
     
@@ -146,7 +143,7 @@ public final class DependencyContractPO extends AbstractPO
 					     paramVars,
 					     anonHeap),
 			        contract.getPre(selfVar, paramVars, services));
-	final Term dep = contract.getDep(selfVar, paramVars, services);
+	final Term dep = getContract().getDep(selfVar, paramVars, services);
 	
 	//prepare update
 	final Term changedHeap 
@@ -200,8 +197,8 @@ public final class DependencyContractPO extends AbstractPO
     
     
     @Override
-    public Contract getContract() {
-        return contract;
+    public DependencyContract getContract() {
+        return (DependencyContract)contract;
     }
     
     
@@ -226,61 +223,4 @@ public final class DependencyContractPO extends AbstractPO
         return contract.hashCode();
     }
 
-
-
-    protected Term generateSelfNotNull(ProgramVariable selfVar) {
-        return selfVar == null || contract.getTarget().isConstructor()
-              ? TB.tt()
-              : TB.not(TB.equals(TB.var(selfVar), TB.NULL(services)));
-    }
-
-
-
-    protected Term generateSelfCreated(ProgramVariable selfVar) {
-        return selfVar == null || contract.getTarget().isConstructor()
-             ? TB.tt()
-             : TB.created(services, TB.var(selfVar));
-    }
-
-
-
-    protected Term generateSelfExactType(ProgramVariable selfVar, KeYJavaType selfKJT) {
-        final Term selfExactType
-           = selfVar == null || contract.getTarget().isConstructor()
-             ? TB.tt()
-             : TB.exactInstance(services, 
-        	                selfKJT.getSort(), 
-        	                TB.var(selfVar));
-        return selfExactType;
-    }
-
-
-
-    protected Term generateParamsOK(ImmutableList<ProgramVariable> paramVars) {
-        Term paramsOK = TB.tt();
-        for(ProgramVariable paramVar : paramVars) {
-            paramsOK = TB.and(paramsOK, TB.reachableValue(services, paramVar));
-        }
-        return paramsOK;
-    }
-
-
-
-    protected Term generateMbyAtPreDef(ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars) {
-        final Term mbyAtPreDef;
-        if(contract.hasMby()) {
-            final Function mbyAtPreFunc
-            	= new Function(new Name(TB.newName(services, "mbyAtPre")), 
-        		       services.getTypeConverter()
-        		               .getIntegerLDT()
-        		               .targetSort());
-            register(mbyAtPreFunc);
-            mbyAtPre = TB.func(mbyAtPreFunc);
-            final Term mby = contract.getMby(selfVar, paramVars, services);
-            mbyAtPreDef = TB.equals(mbyAtPre, mby);
-        } else {
-            mbyAtPreDef = TB.tt();
-        }
-        return mbyAtPreDef;
-    }
 }
