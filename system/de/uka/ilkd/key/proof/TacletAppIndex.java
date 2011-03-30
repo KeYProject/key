@@ -15,7 +15,6 @@ import java.util.Iterator;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
@@ -323,8 +322,7 @@ public class TacletAppIndex  {
      */
     public ImmutableList<TacletApp> getTacletAppAtAndBelow(PosInOccurrence pos,
                                                   TacletFilter    filter,
-                                                  Services        services,
-                                                  Constraint      userConstraint) {
+                                                  Services        services) {
         final ImmutableList<TacletApp> findTaclets =
             getIndex ( pos ).getTacletAppAtAndBelow ( pos, filter, services );
         return prepend ( findTaclets,

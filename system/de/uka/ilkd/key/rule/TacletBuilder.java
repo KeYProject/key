@@ -43,8 +43,6 @@ public abstract class TacletBuilder {
     protected ImmutableList<TacletGoalTemplate> goals= ImmutableSLList.<TacletGoalTemplate>nil();
     protected ImmutableList<RuleSet> ruleSets    = ImmutableSLList.<RuleSet>nil();
     protected TacletAttributes attrs        = new TacletAttributes(); 
-    @Deprecated
-    protected Constraint constraint         = Constraint.BOTTOM;
     /** List of additional generic conditions on the instantiations of
      * schema variables. */
     protected ImmutableList<VariableCondition> variableConditions       = ImmutableSLList.<VariableCondition>nil(); 
@@ -118,13 +116,6 @@ public abstract class TacletBuilder {
     public void setIfSequent(Sequent seq){
 	checkContainsFreeVarSV(seq, getName(), "sequent");	
 	this.ifseq=seq;
-    }
-    
-    /** sets the constraint that has to be satisfied if the Taclet
-     * should be valid */
-    @Deprecated
-    public void setConstraint(Constraint constraint) {
-	this.constraint=constraint;
     }
 
     /**

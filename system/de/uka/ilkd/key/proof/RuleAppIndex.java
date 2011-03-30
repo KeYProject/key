@@ -18,7 +18,6 @@ import java.util.List;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
@@ -192,29 +191,24 @@ public class RuleAppIndex  {
      * @param pos the position where to start from
      * @param services the Services object encapsulating information
      * about the java datastructures like (static)types etc.
-     * @param userConstraint the Constraint with user defined instantiations
-     * of meta variables
      * @return the possible rule applications 
      */
     public ImmutableList<TacletApp> getTacletAppAtAndBelow(TacletFilter    filter,
 						  PosInOccurrence pos,
-						  Services        services,
-						  Constraint      userConstraint) {
+						  Services        services) {
 	ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
 	if ( !autoMode ) {
 	    result = result.prepend 
 		( interactiveTacletAppIndex.getTacletAppAtAndBelow
 		  (pos,
 		   filter,
-		   services,
-		   userConstraint) ); 
+		   services) ); 
 	}
 	result = result.prepend 
 	    ( automatedTacletAppIndex.getTacletAppAtAndBelow
 	      (pos,
 	       filter,
-	       services,
-	       userConstraint) ); 
+	       services) ); 
 	return result;
     }
 

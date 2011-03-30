@@ -685,8 +685,7 @@ public class TestApplyTaclet extends TestCase{
 				  PosInTerm.TOP_LEVEL,
 				  false);
  	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
-	    getTacletAppAtAndBelow(TacletFilter.TRUE, pos, services, 
-                Constraint.BOTTOM);	
+	    getTacletAppAtAndBelow(TacletFilter.TRUE, pos, services);	
 
 	assertTrue("Expected four rule applications.",rApplist.size()==4);
 
@@ -720,7 +719,7 @@ public class TestApplyTaclet extends TestCase{
 				  false);
  	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
 	    getTacletAppAtAndBelow(TacletFilter.TRUE, pos, 
-                services, Constraint.BOTTOM);	
+                services);	
 
 	assertTrue("Expected three rule applications.",rApplist.size()==3);
 
@@ -786,7 +785,7 @@ public class TestApplyTaclet extends TestCase{
 				  PosInTerm.TOP_LEVEL,
 				 true);
  	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
-	    getTacletAppAtAndBelow(TacletFilter.TRUE, pos, services, Constraint.BOTTOM);	
+	    getTacletAppAtAndBelow(TacletFilter.TRUE, pos, services);	
 
 	assertTrue("Expected one rule application.",rApplist.size()==1);
 	assertTrue("Rule App should be complete", rApplist.head().complete());
@@ -801,7 +800,7 @@ public class TestApplyTaclet extends TestCase{
 				  false);
  	rApplist=goal.ruleAppIndex().
 	    getTacletAppAtAndBelow(TacletFilter.TRUE, pos, 
-                services, Constraint.BOTTOM);	
+                services);	
 
 	assertTrue("Expected one rule application.",rApplist.size()==1);
 	assertTrue("Rule App should be complete", rApplist.head().complete());
@@ -827,7 +826,7 @@ public class TestApplyTaclet extends TestCase{
 				  false);
 
  	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
-	    getTacletAppAtAndBelow(TacletFilter.TRUE, pos, null, Constraint.BOTTOM);	
+	    getTacletAppAtAndBelow(TacletFilter.TRUE, pos, null);	
 
 	assertTrue("Expected one rule application.",rApplist.size()==1);
 	assertTrue("Rule App should be complete", rApplist.head().complete());
@@ -864,7 +863,7 @@ public class TestApplyTaclet extends TestCase{
 				  false);
 
  	ImmutableList<TacletApp> rApplist = goal.ruleAppIndex().
-	    getTacletAppAtAndBelow(TacletFilter.TRUE, pos, null, Constraint.BOTTOM);	
+	    getTacletAppAtAndBelow(TacletFilter.TRUE, pos, null);	
 
 	assertTrue("Expected one rule application.", rApplist.size()==1);
 	assertTrue("Rule App should be complete.", rApplist.head().complete());
@@ -939,7 +938,7 @@ public class TestApplyTaclet extends TestCase{
                                   false);
 
         ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
-            getTacletAppAtAndBelow(TacletFilter.TRUE, pos, null, Constraint.BOTTOM);    
+            getTacletAppAtAndBelow(TacletFilter.TRUE, pos, null);    
 
         assertTrue("Expected one rule application.",rApplist.size()==1);
         assertTrue("Rule App should be complete", rApplist.head().complete());
@@ -970,7 +969,7 @@ public class TestApplyTaclet extends TestCase{
                                   false);
 
         ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
-            getTacletAppAtAndBelow(TacletFilter.TRUE, pos, null, Constraint.BOTTOM);    
+            getTacletAppAtAndBelow(TacletFilter.TRUE, pos, null);    
 
         assertTrue("Expected one rule application.",rApplist.size()==1);
         assertTrue("Rule App should be complete", rApplist.head().complete());
@@ -1002,7 +1001,7 @@ public class TestApplyTaclet extends TestCase{
                                   false);
 
         ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
-            getTacletAppAtAndBelow(TacletFilter.TRUE, pos, null, Constraint.BOTTOM);    
+            getTacletAppAtAndBelow(TacletFilter.TRUE, pos, null);    
 
         assertTrue("Expected one rule application.",rApplist.size()==1);
         assertTrue("Rule App should be complete", rApplist.head().complete());
