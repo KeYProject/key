@@ -49,14 +49,14 @@ public interface InformationFlowContract extends Contract {
     /**
      * Returns the parameters dependency sets of the contract.
      */
-    public Term getParameterDeps(ProgramVariable selfVar,
+    public Term getSaveFor(ProgramVariable selfVar,
                                  ImmutableList<ProgramVariable> paramVars,
                                  Services services);
     
     /**
      * Returns the parameters dependency sets of the contract.
      */
-    public Term getParameterDeps(Term heapTerm,
+    public Term getSaveFor(Term heapTerm,
                                  Term selfTerm, 
  	                         ImmutableList<Term> paramTerms,
                                  Services services);
@@ -80,14 +80,14 @@ public interface InformationFlowContract extends Contract {
     /**
      * Returns the declassification formula.
      */
-    public Term getDeclassification(ProgramVariable selfVar,
+    public Term getDeclassify(ProgramVariable selfVar,
 	                            ImmutableList<ProgramVariable> paramVars,
 	                            Services services);    
         
     /**
      * Returns the declassification formula.
      */
-    public Term getDeclassification(Term heapTerm,
+    public Term getDeclassify(Term heapTerm,
 	                            Term selfTerm,
 	                            ImmutableList<Term> paramTerms,
 	                            Services services);

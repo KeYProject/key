@@ -34,6 +34,7 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.speclang.jml.translation.ProgramVariableCollection;
 
 
 /**
@@ -165,6 +166,30 @@ public final class OperationContractImpl implements OperationContract {
              heapAtPreVar,
              INVALID_ID,
              toBeSaved);
+    }
+    
+    
+    /**
+     * Creates an operation contract.
+     * 
+     * @param baseName base name of the contract (does not have to be unique)
+     * @param pm 	the ProgramMethod to which the contract belongs
+     * @param modality the modality of the contract
+     * @param pre 	the precondition of the contract
+     * @param mby 	the measured_by clause of the contract 
+     * @param post 	the postcondition of the contract
+     * @param mod 	the modifies clause of the contract
+     * @param progVars collection of variables for the receiver object,
+     * 			operation parameters, operation result, thrown exception
+     * 			and the pre-heap
+     */
+    public OperationContractImpl(String baseName, ProgramMethod pm,
+	    Modality modality, Term pre, Term mby, Term post, Term mod,
+	    ProgramVariableCollection progVars, boolean toBeSaved) {
+	this(baseName, null, pm.getContainerType(), pm, modality, pre, mby,
+	        post, mod, progVars.selfVar, progVars.paramVars,
+	        progVars.resultVar, progVars.excVar, progVars.heapAtPreVar,
+	        INVALID_ID, toBeSaved);
     }
     
     

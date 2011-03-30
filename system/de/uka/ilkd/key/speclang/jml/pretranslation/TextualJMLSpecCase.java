@@ -40,8 +40,14 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
             = ImmutableSLList.<PositionedString>nil();
     private ImmutableList<PositionedString> signalsOnly 
             = ImmutableSLList.<PositionedString>nil();
-    private ImmutableList<PositionedString> diverges     
+    private ImmutableList<PositionedString> diverges
             = ImmutableSLList.<PositionedString>nil();
+    private ImmutableList<PositionedString> depends
+    	    = ImmutableSLList.<PositionedString>nil();
+    private ImmutableList<PositionedString> saveFor
+    	    = ImmutableSLList.<PositionedString>nil();
+    private ImmutableList<PositionedString> declassify
+    	    = ImmutableSLList.<PositionedString>nil();
     private PositionedString name = new PositionedString("");
 
     
@@ -109,6 +115,21 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     public void addDiverges(PositionedString ps) {
         diverges = diverges.append(ps);
     }
+
+    
+    public void addDepends(PositionedString ps) {
+        depends = depends.append(ps);
+    }
+    
+    
+    public void addSaveFor(PositionedString ps){
+        saveFor = saveFor.append(ps);
+    }
+    
+
+    public void addDeclassify(PositionedString ps) {
+        declassify = declassify.append(ps);
+    }
     
 
     public Behavior getBehavior() {
@@ -160,7 +181,19 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     public ImmutableList<PositionedString> getDiverges() {
         return diverges;
     }
-    
+
+    public ImmutableList<PositionedString> getDepends() {
+        return depends;
+    }
+
+    public ImmutableList<PositionedString> getSaveFor() {
+        return saveFor;
+    }
+
+    public ImmutableList<PositionedString> getDeclassify() {
+        return declassify;
+    }
+
     
     @Override
     public String toString() {
@@ -196,6 +229,18 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         while(it.hasNext()) {
             sb.append("diverges: ").append(it.next()).append("\n");
         }
+        it = depends.iterator();
+        while(it.hasNext()) {
+            sb.append("depends: ").append(it.next()).append("\n");
+        }
+        it = saveFor.iterator();
+        while(it.hasNext()) {
+            sb.append("saveFor: ").append(it.next()).append("\n");
+        }
+        it = declassify.iterator();
+        while(it.hasNext()) {
+            sb.append("declassify: ").append(it.next()).append("\n");
+        }
         
         return sb.toString();
     }
@@ -215,7 +260,10 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                && ensures.equals(sc.ensures)
                && signals.equals(sc.signals)
                && signalsOnly.equals(sc.signalsOnly)
-               && diverges.equals(sc.diverges);
+               && diverges.equals(sc.diverges)
+               && depends.equals(sc.depends)
+               && saveFor.equals(sc.saveFor)
+               && declassify.equals(sc.declassify);
     }
     
     
@@ -229,6 +277,9 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                + ensures.hashCode()
                + signals.hashCode()
                + signalsOnly.hashCode()
-               + diverges.hashCode();
+               + diverges.hashCode()
+               + depends.hashCode()
+               + saveFor.hashCode()
+               + declassify.hashCode();
     }
 }

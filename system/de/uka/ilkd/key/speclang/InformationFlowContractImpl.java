@@ -32,10 +32,13 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     private final String baseName;    
     private final String name;
     private final KeYJavaType kjt;
-    private final ObserverFunction target;
+    private final ProgramMethod pm;
     private final Term originalPre;
     private final Term originalMby;    
     private final Term originalDep;
+    private final Term originalMod;
+    private final Term originalSaveFor;
+    private final Term originalDeclassify;
     private final ProgramVariable originalSelfVar;
     private final ImmutableList<ProgramVariable> originalParamVars;
     private final int id;    
@@ -48,59 +51,50 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     private InformationFlowContractImpl(String baseName,
 	                           String name, 
 	                           KeYJavaType kjt,
-	    			   ObserverFunction target,
+	                           ProgramMethod pm,
 	    			   Term pre,
 	                  	   Term mby,	    			   
 	                  	   Term dep,
+	                  	   Term mod,
+	                  	   Term saveFor,
+	        	    	   Term declassify,
 	                  	   ProgramVariable selfVar,
 	                  	   ImmutableList<ProgramVariable> paramVars,
 	                  	   int id) {
 	assert baseName != null;
 	assert kjt != null;
-	assert target != null;
+	assert pm != null;
 	assert pre != null;
 	assert dep != null;
-        assert (selfVar == null) == target.isStatic();
+	assert mod != null;
+	assert saveFor != null;
+	assert declassify != null;
+        assert (selfVar == null) == pm.isStatic();
         assert paramVars != null;
-        assert paramVars.size() == target.arity() - (target.isStatic() ? 1 : 2);
+        assert paramVars.size() == pm.arity() - (pm.isStatic() ? 1 : 2);
 	this.baseName = baseName;
-        this.name                   = name != null 
-                                      ? name 
-                                      : baseName + " [id: " + id + " / " 
-                                        + target
-                                        + " for " 
-                                        + kjt.getJavaType().getName() 
-                                        + "]";
+	this.name = generateName(name, baseName, kjt, pm, id);
 	this.kjt = kjt;
-	this.target = target;
+	this.pm = pm;
 	this.originalPre = pre;
 	this.originalMby = mby;	
 	this.originalDep = dep;
+	this.originalMod = mod;
+	this.originalSaveFor = saveFor;
+	this.originalDeclassify = declassify;
 	this.originalSelfVar = selfVar;
 	this.originalParamVars = paramVars;
 	this.id = id;
     }
-    
-    
-    public InformationFlowContractImpl(String baseName, 
-	                          KeYJavaType kjt,
-	    			  ObserverFunction target,
-	    			  Term pre,
-	                  	  Term mby,	    			  
-	                  	  Term dep,
-	                  	  ProgramVariable selfVar,
-	                  	  ImmutableList<ProgramVariable> paramVars) {
-	this(baseName, 
-             null, 
-             kjt, 
-             target, 
-             pre, 
-             mby,             
-             dep, 
-             selfVar, 
-             paramVars, 
-             INVALID_ID);
-    }    
+
+
+    public InformationFlowContractImpl(String baseName, KeYJavaType kjt,
+	    ProgramMethod pm, Term pre, Term mby, Term dep, Term mod,
+	    Term saveFor, Term declassify, ProgramVariable selfVar,
+	    ImmutableList<ProgramVariable> paramVars) {
+	this(baseName, null, kjt, pm, pre, mby, dep, mod, saveFor,
+	        declassify, selfVar, paramVars, INVALID_ID);
+    }
     
     
     //-------------------------------------------------------------------------
@@ -126,8 +120,8 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
     
     @Override
-    public ObserverFunction getTarget() {
-	return target;
+    public ProgramMethod getTarget() {
+	return pm;
     }
     
     
@@ -145,17 +139,11 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
         assert services != null;
-	Map map = new HashMap();
-	map.put(originalSelfVar, selfVar);
-	for(ProgramVariable originalParamVar : originalParamVars) {
-	    map.put(originalParamVar, paramVars.head());
-	    paramVars = paramVars.tail();
-	}
-	OpReplacer or = new OpReplacer(map);
+	OpReplacer or = generateOperationReplacer(selfVar, paramVars);
 	return or.replace(originalPre);
     }
-    
-    
+
+
     @Override
     public Term getPre(Term heapTerm,
 	               Term selfTerm, 
@@ -166,14 +154,8 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 	assert paramTerms != null;
 	assert paramTerms.size() == originalParamVars.size();
 	assert services != null;
-	Map map = new HashMap();
-	map.put(TB.heap(services), heapTerm);
-	map.put(TB.var(originalSelfVar), selfTerm);
-	for(ProgramVariable originalParamVar : originalParamVars) {
-	    map.put(TB.var(originalParamVar), paramTerms.head());
-	    paramTerms = paramTerms.tail();
-	}	
-	OpReplacer or = new OpReplacer(map);
+	OpReplacer or = generateOperationReplacer(heapTerm, selfTerm,
+                paramTerms, services);
 	return or.replace(originalPre);
     }
     
@@ -188,13 +170,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
         assert services != null;
-	Map map = new HashMap();
-	map.put(originalSelfVar, selfVar);
-	for(ProgramVariable originalParamVar : originalParamVars) {
-	    map.put(originalParamVar, paramVars.head());
-	    paramVars = paramVars.tail();
-	}
-	OpReplacer or = new OpReplacer(map);
+	OpReplacer or = generateOperationReplacer(selfVar, paramVars);
 	return or.replace(originalMby);
     }
     
@@ -210,48 +186,136 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 	assert paramTerms != null;
 	assert paramTerms.size() == originalParamVars.size();
 	assert services != null;
-	Map map = new HashMap();
-	map.put(TB.heap(services), heapTerm);
-	map.put(TB.var(originalSelfVar), selfTerm);
-	for(ProgramVariable originalParamVar : originalParamVars) {
-	    map.put(TB.var(originalParamVar), paramTerms.head());
-	    paramTerms = paramTerms.tail();
-	}	
-	OpReplacer or = new OpReplacer(map);
+	OpReplacer or = generateOperationReplacer(heapTerm, selfTerm,
+                paramTerms, services);
 	return or.replace(originalMby);
     }    
     
     
     @Override
+    public Term getDep(ProgramVariable selfVar,
+	               ImmutableList<ProgramVariable> paramVars,
+	               Services services) {
+        assert (selfVar == null) == (originalSelfVar == null);
+        assert paramVars != null;
+        assert paramVars.size() == originalParamVars.size();
+        assert services != null;
+	OpReplacer or = generateOperationReplacer(selfVar, paramVars);
+	return or.replace(originalDep);
+    }
+    
+
+    @Override
+    public Term getDep(Term heapTerm,
+	               Term selfTerm, 
+	               ImmutableList<Term> paramTerms, 
+	               Services services) {
+	assert heapTerm != null;
+	assert (selfTerm == null) == (originalSelfVar == null);
+	assert paramTerms != null;
+	assert paramTerms.size() == originalParamVars.size();
+	assert services != null;
+	OpReplacer or = generateOperationReplacer(heapTerm, selfTerm,
+                paramTerms, services);
+	return or.replace(originalDep);
+    }
+
+    
+    @Override
+    public Term getMod(ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars, Services services) {
+	assert (selfVar == null) == (originalSelfVar == null);
+        assert paramVars != null;
+        assert paramVars.size() == originalParamVars.size();
+        assert services != null;
+	OpReplacer or = generateOperationReplacer(selfVar, paramVars);
+	return or.replace(originalMod);
+    }
+
+
+    @Override
+    public Term getMod(Term heapTerm, Term selfTerm,
+            ImmutableList<Term> paramTerms, Services services) {
+	assert heapTerm != null;
+	assert (selfTerm == null) == (originalSelfVar == null);
+	assert paramTerms != null;
+	assert paramTerms.size() == originalParamVars.size();
+	assert services != null;
+	OpReplacer or = generateOperationReplacer(heapTerm, selfTerm,
+                paramTerms, services);
+	return or.replace(originalMod);
+    }
+
+
+    @Override
+    public Term getSaveFor(ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars, Services services) {
+	assert (selfVar == null) == (originalSelfVar == null);
+        assert paramVars != null;
+        assert paramVars.size() == originalParamVars.size();
+        assert services != null;
+	OpReplacer or = generateOperationReplacer(selfVar, paramVars);
+	return or.replace(originalSaveFor);
+    }
+
+
+    @Override
+    public Term getSaveFor(Term heapTerm, Term selfTerm,
+            ImmutableList<Term> paramTerms, Services services) {
+	assert heapTerm != null;
+	assert (selfTerm == null) == (originalSelfVar == null);
+	assert paramTerms != null;
+	assert paramTerms.size() == originalParamVars.size();
+	assert services != null;
+	OpReplacer or = generateOperationReplacer(heapTerm, selfTerm,
+                paramTerms, services);
+	return or.replace(originalSaveFor);
+    }
+
+    
+    @Override
+    public Term getDeclassify(ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars, Services services) {
+	assert (selfVar == null) == (originalSelfVar == null);
+        assert paramVars != null;
+        assert paramVars.size() == originalParamVars.size();
+        assert services != null;
+	OpReplacer or = generateOperationReplacer(selfVar, paramVars);
+	return or.replace(originalDeclassify);
+    }
+
+
+    @Override
+    public Term getDeclassify(Term heapTerm, Term selfTerm,
+            ImmutableList<Term> paramTerms, Services services) {
+	assert heapTerm != null;
+	assert (selfTerm == null) == (originalSelfVar == null);
+	assert paramTerms != null;
+	assert paramTerms.size() == originalParamVars.size();
+	assert services != null;
+	OpReplacer or = generateOperationReplacer(heapTerm, selfTerm,
+                paramTerms, services);
+	return or.replace(originalDeclassify);
+    }
+
+    
+    @Override
     public InformationFlowContract setID(int newId) {
-        return new InformationFlowContractImpl(baseName,
-        	                          null,
-                			  kjt,        	                         
-                			  target,
-                			  originalPre,
-                			  originalMby,                			  
-                			  originalDep,
-                			  originalSelfVar,
-                			  originalParamVars,
-                			  newId);	
+	return new InformationFlowContractImpl(baseName, null, kjt, pm,
+	        originalPre, originalMby, originalDep, originalMod,
+	        originalSaveFor, originalDeclassify, originalSelfVar,
+	        originalParamVars, newId);
     }
     
     
     @Override
     public InformationFlowContract setTarget(KeYJavaType newKJT,
-	    		      	        ObserverFunction newTarget, 
-	    		      	        Services services) {
-        return new InformationFlowContractImpl(baseName,
-        				  null,
-                			  newKJT,        				 
-                			  newTarget,
-                			  originalPre,
-                			  originalMby,                			  
-                			  originalDep,
-                			  originalSelfVar,
-                			  originalParamVars,
-                			  id);	
-    }        
+	    ObserverFunction newPM, Services services) {
+	return new InformationFlowContractImpl(baseName, null, newKJT,
+		(ProgramMethod)newPM, originalPre, originalMby, originalDep, originalMod,
+	        originalSaveFor, originalDeclassify, originalSelfVar,
+	        originalParamVars, id);
+    }
     
     
     @Override
@@ -292,13 +356,28 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     
 
     @Override
-    public Term getDep(ProgramVariable selfVar,
-	               ImmutableList<ProgramVariable> paramVars,
-	               Services services) {
-        assert (selfVar == null) == (originalSelfVar == null);
-        assert paramVars != null;
-        assert paramVars.size() == originalParamVars.size();
-        assert services != null;
+    public String toString() {
+	return originalDep.toString();
+    }
+
+
+        
+    
+    
+    private String generateName(String name, String baseName, KeYJavaType kjt,
+	    ProgramMethod pm, int id) {
+	return name != null ? name : baseName
+	        + " [id: "
+	        + id
+	        + " / "
+	        + pm
+	        + (kjt.equals(pm.getContainerType()) ? "" : " for "
+	                + kjt.getJavaType().getName()) + "]";
+    }
+
+    
+    private OpReplacer generateOperationReplacer(ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars) {
 	Map map = new HashMap();
 	map.put(originalSelfVar, selfVar);
 	for(ProgramVariable originalParamVar : originalParamVars) {
@@ -306,20 +385,12 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 	    paramVars = paramVars.tail();
 	}
 	OpReplacer or = new OpReplacer(map);
-	return or.replace(originalDep);
+	return or;
     }
     
-
-    @Override
-    public Term getDep(Term heapTerm,
-	               Term selfTerm, 
-	               ImmutableList<Term> paramTerms, 
-	               Services services) {
-	assert heapTerm != null;
-	assert (selfTerm == null) == (originalSelfVar == null);
-	assert paramTerms != null;
-	assert paramTerms.size() == originalParamVars.size();
-	assert services != null;
+    
+    private OpReplacer generateOperationReplacer(Term heapTerm, Term selfTerm,
+            ImmutableList<Term> paramTerms, Services services) {
 	Map map = new HashMap();
 	map.put(TB.heap(services), heapTerm);
 	map.put(TB.var(originalSelfVar), selfTerm);
@@ -328,60 +399,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 	    paramTerms = paramTerms.tail();
 	}	
 	OpReplacer or = new OpReplacer(map);
-	return or.replace(originalDep);
+	return or;
     }    
-    
-    
-    @Override
-    public String toString() {
-	return originalDep.toString();
-    }
 
-
-    @Override
-    public Term getDeclassification(ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars, Services services) {
-	// TODO Auto-generated method stub
-	return null;
-    }
-
-
-    @Override
-    public Term getDeclassification(Term heapTerm, Term selfTerm,
-            ImmutableList<Term> paramTerms, Services services) {
-	// TODO Auto-generated method stub
-	return null;
-    }
-
-
-    @Override
-    public Term getMod(ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars, Services services) {
-	// TODO Auto-generated method stub
-	return null;
-    }
-
-
-    @Override
-    public Term getMod(Term heapTerm, Term selfTerm,
-            ImmutableList<Term> paramTerms, Services services) {
-	// TODO Auto-generated method stub
-	return null;
-    }
-
-
-    @Override
-    public Term getParameterDeps(ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars, Services services) {
-	// TODO Auto-generated method stub
-	return null;
-    }
-
-
-    @Override
-    public Term getParameterDeps(Term heapTerm, Term selfTerm,
-            ImmutableList<Term> paramTerms, Services services) {
-	// TODO Auto-generated method stub
-	return null;
-    }
 }
