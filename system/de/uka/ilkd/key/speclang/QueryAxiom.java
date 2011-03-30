@@ -181,7 +181,7 @@ public final class QueryAxiom implements ClassAxiom {
 	} else {
 	    final Term ifFormula 
 	    	= TB.exactInstance(services, kjt.getSort(), TB.var(selfSV));
-	    final ConstrainedFormula ifCf = new ConstrainedFormula(ifFormula);
+	    final SequentFormula ifCf = new SequentFormula(ifFormula);
 	    final Semisequent ifSemiSeq 
 	    	= Semisequent.EMPTY_SEMISEQUENT.insertFirst(ifCf).semisequent();
 	    ifSeq = Sequent.createAnteSequent(ifSemiSeq);
@@ -204,7 +204,7 @@ public final class QueryAxiom implements ClassAxiom {
 	//create added sequent
 	final Term addedFormula 
 		= TB.apply(update, TB.prog(Modality.BOX, jb, post));
-	final ConstrainedFormula addedCf = new ConstrainedFormula(addedFormula);
+	final SequentFormula addedCf = new SequentFormula(addedFormula);
 	final Semisequent addedSemiSeq = Semisequent.EMPTY_SEMISEQUENT
 	                                            .insertFirst(addedCf)
 	                                            .semisequent();

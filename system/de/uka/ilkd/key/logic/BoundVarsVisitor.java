@@ -49,7 +49,7 @@ public class BoundVarsVisitor extends Visitor{
      * visits a sequent
      */
     public void visit(Sequent visited) {
-        for (ConstrainedFormula cf : visited) {
+        for (SequentFormula cf : visited) {
             visit(cf.formula());
         }
     }

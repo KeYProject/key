@@ -31,9 +31,9 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
      */ 
     private final Sequent            seq;
     private final boolean antec;	// formula is in antecedent?
-    private final ConstrainedFormula cf;
+    private final SequentFormula cf;
 
-    public IfFormulaInstSeq(Sequent p_seq, boolean antec, ConstrainedFormula p_cf ) {
+    public IfFormulaInstSeq(Sequent p_seq, boolean antec, SequentFormula p_cf ) {
 	seq = p_seq;	
         this.antec = antec;
 	cf  = p_cf;
@@ -49,7 +49,7 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
     /**
      * @return the cf this is pointing to
      */
-    public ConstrainedFormula getConstrainedFormula () {
+    public SequentFormula getConstrainedFormula () {
 	return cf;
     }    
 
@@ -60,7 +60,7 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
 							       boolean antec ) {
 	
 	ImmutableList<IfFormulaInstantiation> res = ImmutableSLList.<IfFormulaInstantiation>nil();
-	Iterator<ConstrainedFormula>  it;
+	Iterator<SequentFormula>  it;
         if (antec) it = p_s.antecedent().iterator ();
            else it = p_s.succedent().iterator ();
 	while ( it.hasNext () ) {

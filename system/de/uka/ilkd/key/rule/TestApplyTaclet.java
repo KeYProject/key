@@ -92,8 +92,8 @@ public class TestApplyTaclet extends TestCase{
 	if ("".equals(t)) { 
 	    return Semisequent.EMPTY_SEMISEQUENT;
 	}
-	ConstrainedFormula cf0
-	    = new ConstrainedFormula(TacletForTests.parseTerm(t));
+	SequentFormula cf0
+	    = new SequentFormula(TacletForTests.parseTerm(t));
 	return Semisequent.EMPTY_SEMISEQUENT.insert(0, cf0).semisequent();
     }
 
@@ -379,13 +379,13 @@ public class TestApplyTaclet extends TestCase{
 	Goal goal=new Goal(proof.root(),new RuleAppIndex(index));
 	goals=goals.prepend(goal);
 	while (goals.size()!=0) {
-	    ConstrainedFormula cfma=null;
-	    ConstrainedFormula userCfma=null;   // in the real system the 
+	    SequentFormula cfma=null;
+	    SequentFormula userCfma=null;   // in the real system the 
 		                              //user would select this
 	    IList<TacletApp> rapplist=ImmSLList.<TacletApp>nil();
 	    out="\n"+out+("Goals: "+goals+"\n");
 	    goal=goals.head();
-	    Iterator<ConstrainedFormula>
+	    Iterator<SequentFormula>
 		it=goal.node().sequent().antecedent().iterator();
 	    while (it.hasNext()) {
 		userCfma=it.next();
@@ -613,7 +613,7 @@ public class TestApplyTaclet extends TestCase{
 
 
 	assertTrue("Expected one goal", goals.size()==1);
-	Iterator<ConstrainedFormula> it = goals.head().sequent().
+	Iterator<SequentFormula> it = goals.head().sequent().
 	    antecedent().iterator();
 	assertTrue("Expected 'A, B ==>', but is "+
 		   goals.head().sequent(), 
@@ -661,7 +661,7 @@ public class TestApplyTaclet extends TestCase{
 
 	assertTrue("Expected one goal", goals.size()==1);
 
-	Iterator<ConstrainedFormula> it = 
+	Iterator<SequentFormula> it = 
 	    goals.head().sequent().antecedent().iterator();
 
 	assertTrue("Expected 'A, B ==>', but is "+
@@ -733,8 +733,8 @@ public class TestApplyTaclet extends TestCase{
 	assertTrue("Did not expect a match.", appList.size()==0);
 
 	Term ifterm = TacletForTests.parseTerm("{i:=0}(f(const)=f(f(const)))");
-	ConstrainedFormula ifformula =
-	    new ConstrainedFormula ( ifterm );
+	SequentFormula ifformula =
+	    new SequentFormula ( ifterm );
 	ImmutableList<IfFormulaInstantiation> ifInsts =
 	    ImmutableSLList.<IfFormulaInstantiation>nil().prepend
 	    ( new IfFormulaInstDirect ( ifformula ) );

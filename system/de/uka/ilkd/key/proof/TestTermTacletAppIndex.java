@@ -15,7 +15,7 @@ import junit.framework.TestCase;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.ConstrainedFormula;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Term;
@@ -106,7 +106,7 @@ public class TestTermTacletAppIndex extends TestCase{
         ruleIdx.add ( remove_zero );
 
         Term term = TacletForTests.parseTerm ( "f(f(f(zero)))=one" );
-        ConstrainedFormula cfma = new ConstrainedFormula ( term );
+        SequentFormula cfma = new SequentFormula ( term );
 
         PosInOccurrence pio = new PosInOccurrence ( cfma, PosInTerm.TOP_LEVEL,
                                                     false );
@@ -127,7 +127,7 @@ public class TestTermTacletAppIndex extends TestCase{
 
         // now a real change
         Term term2 = TacletForTests.parseTerm ( "f(f(zero))=one" );
-        ConstrainedFormula cfma2 = new ConstrainedFormula ( term2 );
+        SequentFormula cfma2 = new SequentFormula ( term2 );
         PosInOccurrence pio2 = new PosInOccurrence ( cfma2,
                                                      PosInTerm.TOP_LEVEL, false );
 

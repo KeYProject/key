@@ -15,7 +15,7 @@ import java.util.LinkedList;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.logic.ConstrainedFormula;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -137,13 +137,13 @@ public class SMTProblem {
 	ImmutableList<Term> ante = ImmutableSLList.nil();
 
 	ante = ante.append(TermBuilder.DF.tt());
-	for (ConstrainedFormula f : s.antecedent()) {
+	for (SequentFormula f : s.antecedent()) {
 	    ante = ante.append(f.formula());
 	}
 
 	ImmutableList<Term> succ = ImmutableSLList.nil();
 	succ = succ.append(TermBuilder.DF.ff());
-	for (ConstrainedFormula f : s.succedent()) {
+	for (SequentFormula f : s.succedent()) {
 	    succ = succ.append(f.formula());
 	}
 

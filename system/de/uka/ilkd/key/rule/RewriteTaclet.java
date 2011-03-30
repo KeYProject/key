@@ -212,7 +212,7 @@ public final class RewriteTaclet extends FindTaclet {
     }
     
 
-    private ConstrainedFormula applyReplacewithHelper(
+    private SequentFormula applyReplacewithHelper(
 	    				RewriteTacletGoalTemplate gt, 
 				 	PosInOccurrence    posOfFind,
 				 	Services           services,
@@ -230,12 +230,12 @@ public final class RewriteTaclet extends FindTaclet {
 	if(term == formula) {
 	    return posOfFind.constrainedFormula();
 	} else {
-	    return new ConstrainedFormula(formula);
+	    return new SequentFormula(formula);
 	}
     }
     
     
-    public ConstrainedFormula getRewriteResult(Services services, 
+    public SequentFormula getRewriteResult(Services services, 
 	    				       TacletApp app) {
 	assert goalTemplates().size() == 1;
 	assert goalTemplates().head().sequent().isEmpty();	
@@ -264,7 +264,7 @@ public final class RewriteTaclet extends FindTaclet {
 				    Services           services,
 				    MatchConditions    matchCond) {
 	if ( gt instanceof RewriteTacletGoalTemplate ) {
-            ConstrainedFormula cf 
+            SequentFormula cf 
             	= applyReplacewithHelper((RewriteTacletGoalTemplate)gt, 
         	    			         posOfFind, 
         	    			         services, 

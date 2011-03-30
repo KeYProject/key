@@ -14,7 +14,7 @@ package de.uka.ilkd.key.rule;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.*;
-import de.uka.ilkd.key.logic.ConstrainedFormula;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
@@ -95,7 +95,7 @@ public class TacletPrefixBuilder {
     
 
     private void visit(Sequent s) {
-        for (final ConstrainedFormula cf : s) {
+        for (final SequentFormula cf : s) {
             visit(cf.formula());
         }
     }

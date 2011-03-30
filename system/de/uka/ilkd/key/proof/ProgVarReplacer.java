@@ -68,15 +68,15 @@ public final class ProgVarReplacer {
                               int idx) {
         assert next.modifiedFormulas().isEmpty();
 
-        Iterator<ConstrainedFormula> remIt = next.removedFormulas().iterator();
+        Iterator<SequentFormula> remIt = next.removedFormulas().iterator();
         assert remIt.hasNext();
-        ConstrainedFormula remCf = remIt.next();
+        SequentFormula remCf = remIt.next();
         assert !remIt.hasNext();
         base.removedFormula(idx, remCf);
 
-        Iterator<ConstrainedFormula> addIt = next.addedFormulas().iterator();
+        Iterator<SequentFormula> addIt = next.addedFormulas().iterator();
         assert addIt.hasNext();
-        ConstrainedFormula addCf = addIt.next();
+        SequentFormula addCf = addIt.next();
         assert !addIt.hasNext();
         base.addedFormula(idx, addCf);
 
@@ -247,11 +247,11 @@ public final class ProgVarReplacer {
         result.setFormulaList(s.toList());
         result.setSemisequent(s);
 
-        final Iterator<ConstrainedFormula> it = s.iterator();
+        final Iterator<SequentFormula> it = s.iterator();
         
         for (int formulaNumber = 0; it.hasNext(); formulaNumber++) {            
-            final ConstrainedFormula oldcf = it.next();
-            final ConstrainedFormula newcf = replace(oldcf);
+            final SequentFormula oldcf = it.next();
+            final SequentFormula newcf = replace(oldcf);
 
             if(newcf != oldcf) {
                 SemisequentChangeInfo semiCI
@@ -268,13 +268,13 @@ public final class ProgVarReplacer {
     /**
      * replaces in a constrained formula
      */
-    public ConstrainedFormula replace(ConstrainedFormula cf) {
-        ConstrainedFormula result = cf;
+    public SequentFormula replace(SequentFormula cf) {
+        SequentFormula result = cf;
 
 	final Term newFormula = replace(cf.formula());
 
 	if(newFormula != cf.formula()) {
-            result = new ConstrainedFormula(newFormula);
+            result = new SequentFormula(newFormula);
 	}
         return result;
     }

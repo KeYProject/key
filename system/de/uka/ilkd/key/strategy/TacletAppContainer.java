@@ -17,7 +17,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.ConstrainedFormula;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Semisequent;
@@ -467,7 +467,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         private boolean isNewFormulaDirect (IfFormulaInstantiation p_ifInstantiation) {
             final boolean antec = ( (IfFormulaInstSeq)p_ifInstantiation ).inAntec ();
 
-            final ConstrainedFormula cfma = p_ifInstantiation.getConstrainedFormula ();
+            final SequentFormula cfma = p_ifInstantiation.getConstrainedFormula ();
             final PosInOccurrence pio = new PosInOccurrence ( cfma,
                                                               PosInTerm.TOP_LEVEL,
                                                               antec );
@@ -534,8 +534,8 @@ public abstract class TacletAppContainer extends RuleAppContainer {
          *            formula that has been modified recently
          */
         private void findIfFormulaInstantiationsHelp
-            ( ImmutableList<ConstrainedFormula>      p_ifSeqTail,
-              ImmutableList<ConstrainedFormula>      p_ifSeqTail2nd,
+            ( ImmutableList<SequentFormula>      p_ifSeqTail,
+              ImmutableList<SequentFormula>      p_ifSeqTail2nd,
               ImmutableList<IfFormulaInstantiation>  p_alreadyMatched,
               MatchConditions               p_matchCond,
               boolean                       p_alreadyMatchedNewFor ) {
@@ -600,10 +600,10 @@ public abstract class TacletAppContainer extends RuleAppContainer {
                     getServices());
         }
 
-        private ImmutableList<ConstrainedFormula> createSemisequentList ( Semisequent p_ss ) {
-            ImmutableList<ConstrainedFormula> res = ImmutableSLList.<ConstrainedFormula>nil();
+        private ImmutableList<SequentFormula> createSemisequentList ( Semisequent p_ss ) {
+            ImmutableList<SequentFormula> res = ImmutableSLList.<SequentFormula>nil();
 
-            for (final ConstrainedFormula cf : p_ss) {
+            for (final SequentFormula cf : p_ss) {
                 res = res.prepend ( cf );
             }
             return res; 

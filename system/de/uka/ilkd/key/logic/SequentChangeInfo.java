@@ -154,11 +154,11 @@ public class SequentChangeInfo {
    * of a sequent (true means antecedent; false means succedent)
    * @return list of formulas added to the selected semisequent 
    */
-  public ImmutableList<ConstrainedFormula> addedFormulas(boolean antec) {
+  public ImmutableList<SequentFormula> addedFormulas(boolean antec) {
     return antec ? (antecedent != null ? antecedent.addedFormulas()
-		    : ImmutableSLList.<ConstrainedFormula>nil()) :
+		    : ImmutableSLList.<SequentFormula>nil()) :
       (succedent != null ? succedent.addedFormulas() : 
-       ImmutableSLList.<ConstrainedFormula>nil());
+       ImmutableSLList.<SequentFormula>nil());
   }
 
   /** 
@@ -166,7 +166,7 @@ public class SequentChangeInfo {
    * the formulas added to each semisequent.
    * @return list of formulas added to sequent 
    */
-  public ImmutableList<ConstrainedFormula> addedFormulas() {
+  public ImmutableList<SequentFormula> addedFormulas() {
     return addedFormulas(true).size() > addedFormulas(false).size() ?
 	addedFormulas(false).prepend(addedFormulas(true)) : 
 	addedFormulas(true).prepend(addedFormulas(false));
@@ -181,11 +181,11 @@ public class SequentChangeInfo {
    * of a sequent (true means antecedent; false means succedent)
    * @return list of formulas removed from the selected semisequent 
    */
-  public ImmutableList<ConstrainedFormula> removedFormulas(boolean antec) {
+  public ImmutableList<SequentFormula> removedFormulas(boolean antec) {
     return antec ? (antecedent != null ? antecedent.removedFormulas()
-		    : ImmutableSLList.<ConstrainedFormula>nil()) :
+		    : ImmutableSLList.<SequentFormula>nil()) :
       (succedent != null ? succedent.removedFormulas() : 
-       ImmutableSLList.<ConstrainedFormula>nil());
+       ImmutableSLList.<SequentFormula>nil());
   }
 
   /** 
@@ -193,7 +193,7 @@ public class SequentChangeInfo {
    * concatenated list of the formulas removed from each semisequent.
    * @return list of formulas removed from the sequent 
    */
-  public ImmutableList<ConstrainedFormula> removedFormulas() {
+  public ImmutableList<SequentFormula> removedFormulas() {
     return removedFormulas(true).size() > removedFormulas(false).size() ?
 	removedFormulas(false).prepend(removedFormulas(true)) : 
 	removedFormulas(true).prepend(removedFormulas(false));
@@ -234,18 +234,18 @@ public class SequentChangeInfo {
    * of a sequent (true means antecedent; false means succedent)
    * @return list of formulas rejected when trying to add to the selected semisequent
    */
-  public ImmutableList<ConstrainedFormula> rejectedFormulas(boolean antec) {
+  public ImmutableList<SequentFormula> rejectedFormulas(boolean antec) {
       return antec ? (antecedent != null ? antecedent.rejectedFormulas()
-                      : ImmutableSLList.<ConstrainedFormula>nil()) :
+                      : ImmutableSLList.<SequentFormula>nil()) :
           (succedent != null ? succedent.rejectedFormulas() : 
-           ImmutableSLList.<ConstrainedFormula>nil());
+           ImmutableSLList.<SequentFormula>nil());
   }
 
   /** 
    * Returns the formulas that have been rejected when trying to add as being redundant.
    * @return list of rejected formulas 
    */
-  public ImmutableList<ConstrainedFormula> rejectedFormulas() {
+  public ImmutableList<SequentFormula> rejectedFormulas() {
     return rejectedFormulas(true).size() > rejectedFormulas(false).size() ?
         rejectedFormulas(false).prepend(rejectedFormulas(true)) : 
         rejectedFormulas(true).prepend(rejectedFormulas(false));

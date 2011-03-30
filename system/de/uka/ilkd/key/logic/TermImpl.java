@@ -65,7 +65,7 @@ final class TermImpl implements Term {
     //internal methods
     //------------------------------------------------------------------------- 
     
-    private void determineFreeVarsAndMetaVars() {
+    private void determineFreeVars() {
 	freeVars = DefaultImmutableSet.<QuantifiableVariable>nil();
         
         if(op instanceof QuantifiableVariable) {
@@ -194,7 +194,7 @@ final class TermImpl implements Term {
     @Override
     public ImmutableSet<QuantifiableVariable> freeVars() {
         if(freeVars == null) {
-            determineFreeVarsAndMetaVars();
+            determineFreeVars();
         }
         return freeVars;
     }

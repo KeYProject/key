@@ -694,7 +694,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 	} else {
 	    mbyOk = TB.tt();
 	}
-        preGoal.changeFormula(new ConstrainedFormula(
+        preGoal.changeFormula(new SequentFormula(
         			TB.applySequential(new Term[]{inst.u, 
         						      heapAtPreUpdate}, 
         	                                   TB.and(new Term[]{pre, 
@@ -718,14 +718,14 @@ public final class UseOperationContractRule implements BuiltInRule {
                            TB.prog(inst.mod,
                                    JavaBlock.createJavaBlock(postSB),
                                    inst.progPost.sub(0)));
-        postGoal.addFormula(new ConstrainedFormula(TB.wellFormed(services, 
+        postGoal.addFormula(new SequentFormula(TB.wellFormed(services, 
         	                                                 anonHeap)), 
         	            true, 
         	            false);
-        postGoal.changeFormula(new ConstrainedFormula(TB.apply(inst.u, 
+        postGoal.changeFormula(new SequentFormula(TB.apply(inst.u, 
         						       normalPost)),
         	               ruleApp.posInOccurrence());
-        postGoal.addFormula(new ConstrainedFormula(postAssumption), 
+        postGoal.addFormula(new SequentFormula(postAssumption), 
         	            true, 
         	            false);
         
@@ -737,14 +737,14 @@ public final class UseOperationContractRule implements BuiltInRule {
                        TB.prog(inst.mod,
                                JavaBlock.createJavaBlock(excPostSB), 
                                inst.progPost.sub(0)));
-        excPostGoal.addFormula(new ConstrainedFormula(TB.wellFormed(services, 
+        excPostGoal.addFormula(new SequentFormula(TB.wellFormed(services, 
                 				                    anonHeap)), 
                 	       true, 
                 	       false);        
-        excPostGoal.changeFormula(new ConstrainedFormula(TB.apply(inst.u, 
+        excPostGoal.changeFormula(new SequentFormula(TB.apply(inst.u, 
         						          excPost)),
         	                  ruleApp.posInOccurrence());        
-        excPostGoal.addFormula(new ConstrainedFormula(excPostAssumption), 
+        excPostGoal.addFormula(new SequentFormula(excPostAssumption), 
         	               true, 
         	               false);
         
@@ -753,7 +753,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         if(nullGoal != null) {
             final Term actualSelfNotNull 
             	= TB.not(TB.equals(inst.actualSelf, TB.NULL(services)));
-            nullGoal.changeFormula(new ConstrainedFormula(TB.apply(
+            nullGoal.changeFormula(new SequentFormula(TB.apply(
         	    				inst.u, 
         					actualSelfNotNull)),
         	                   ruleApp.posInOccurrence());                    

@@ -23,7 +23,7 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.ClashFreeSubst;
-import de.uka.ilkd.key.logic.ConstrainedFormula;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.PIOPathIterator;
@@ -302,7 +302,7 @@ public abstract class TacletApp implements RuleApp {
      */
     private static Term getTermBelowQuantifier(Taclet taclet,
 	    				       SchemaVariable varSV) {
-	Iterator<ConstrainedFormula> it = taclet.ifSequent().iterator();
+	Iterator<SequentFormula> it = taclet.ifSequent().iterator();
 	while (it.hasNext()) {
 	    Term result = getTermBelowQuantifier(varSV, it.next().formula());
 	    if (result != null) {
@@ -950,8 +950,8 @@ public abstract class TacletApp implements RuleApp {
      *            formulas of the if sequent
      */
     private ImmutableList<TacletApp> findIfFormulaInstantiationsHelp(
-	    ImmutableList<ConstrainedFormula> p_ifSeqTail,
-	    ImmutableList<ConstrainedFormula> p_ifSeqTail2nd,
+	    ImmutableList<SequentFormula> p_ifSeqTail,
+	    ImmutableList<SequentFormula> p_ifSeqTail2nd,
 	    ImmutableList<IfFormulaInstantiation> p_toMatch,
 	    ImmutableList<IfFormulaInstantiation> p_toMatch2nd,
 	    ImmutableList<IfFormulaInstantiation> p_alreadyMatched,
@@ -993,10 +993,10 @@ public abstract class TacletApp implements RuleApp {
 	return res;
     }
 
-    private ImmutableList<ConstrainedFormula> createSemisequentList(Semisequent p_ss) {
-	ImmutableList<ConstrainedFormula> res = ImmutableSLList.<ConstrainedFormula>nil();
+    private ImmutableList<SequentFormula> createSemisequentList(Semisequent p_ss) {
+	ImmutableList<SequentFormula> res = ImmutableSLList.<SequentFormula>nil();
 
-        for (Object p_s : p_ss) res = res.prepend((ConstrainedFormula) p_s);
+        for (Object p_s : p_ss) res = res.prepend((SequentFormula) p_s);
 
 	return res;
     }
@@ -1042,7 +1042,7 @@ public abstract class TacletApp implements RuleApp {
     }
 
     /**
-     * returns the PositionInOccurrence (representing a ConstrainedFormula and a
+     * returns the PositionInOccurrence (representing a SequentFormula and a
      * position in the corresponding formula)
      * 
      * @return the PosInOccurrence

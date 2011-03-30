@@ -166,8 +166,8 @@ public final class PullOutConditionalsRule implements BuiltInRule {
 	
 	//replace
 	final OpReplacer or = new OpReplacer(map);
-	final ConstrainedFormula newCF 
-		= new ConstrainedFormula(or.replace(focus));
+	final SequentFormula newCF 
+		= new SequentFormula(or.replace(focus));
 	result.head().changeFormula(newCF, ruleApp.posInOccurrence());
 	
 	//add definitions
@@ -180,8 +180,8 @@ public final class PullOutConditionalsRule implements BuiltInRule {
 		final Term term2 = TB.ife(or.replace(term.sub(0)), 
 		                      	  or.replace(term.sub(1)),
 		                      	  or.replace(term.sub(2)));
-		final ConstrainedFormula defCF 
-	    		= new ConstrainedFormula(TB.equals(term2, abbrev));
+		final SequentFormula defCF 
+	    		= new SequentFormula(TB.equals(term2, abbrev));
 		result.head().addFormula(defCF, true, false);
 	    }
 	}

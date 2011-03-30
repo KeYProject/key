@@ -166,7 +166,7 @@ public class Proof implements Named {
          BuiltInRuleIndex builtInRules, Services services, ProofSettings settings) {
         this ( name, Sequent.createSuccSequent
                  (Semisequent.EMPTY_SEMISEQUENT.insert(0, 
-                         new ConstrainedFormula(problem)).semisequent()), 
+                         new SequentFormula(problem)).semisequent()), 
                  rules, builtInRules, services, settings );
         problemHeader = header;
     }

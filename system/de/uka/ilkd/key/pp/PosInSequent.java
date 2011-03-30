@@ -39,11 +39,11 @@ public class PosInSequent {
     }
 
     /**
-     * creates a PosInSequent that points to a ConstrainedFormula described by
+     * creates a PosInSequent that points to a SequentFormula described by
      * a PosInOccurrence. Additionally a boolean indicates whether the
-     * the whole ConstrainedFormula or just the formula is meant.
+     * the whole SequentFormula or just the formula is meant.
      * @param posInOcc the PositionInOccurrence describing the
-     * ConstrainedFormula and maybe a subterm of its formula.
+     * SequentFormula and maybe a subterm of its formula.
      */
     public static PosInSequent createCfmaPos(PosInOccurrence posInOcc) {
 	return new PosInSequent(posInOcc, false);
@@ -99,7 +99,7 @@ public class PosInSequent {
 
     /**
      * returns the PosInOccurrence if the PosInSequent marks a
-     * ConstrainedFormula or parts of it, null otherwise.
+     * SequentFormula or parts of it, null otherwise.
      */	
     public PosInOccurrence getPosInOccurrence() {
 	return posInOcc;

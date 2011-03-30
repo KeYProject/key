@@ -12,7 +12,7 @@ package de.uka.ilkd.key.pp;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.logic.ConstrainedFormula;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.IntIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 
@@ -89,7 +89,7 @@ public class InitialPositionTable extends PositionTable{
 
     /** Returns the path for a given PosInOccurrence.  This is 
      * built up from the initial 0, the number of the 
-     * ConstrainedFormula in the sequent, the position in the 
+     * SequentFormula in the sequent, the position in the 
      * constrained formula, and possibly inside a Metavariable
      * instantiation. */
     public ImmutableList<Integer> pathForPosition(PosInOccurrence pio,
@@ -116,7 +116,7 @@ public class InitialPositionTable extends PositionTable{
 
     /** Returns the index of the constrained formula in the sequent
      * as printed. */
-    private int indexOfCfma(ConstrainedFormula cfma,
+    private int indexOfCfma(SequentFormula cfma,
 			    SequentPrintFilter filter) {
 	ImmutableList<SequentPrintFilterEntry> list =
 	    filter.getAntec().append(filter.getSucc());
@@ -133,7 +133,7 @@ public class InitialPositionTable extends PositionTable{
      * Returns the <code>SequentPrintFilterEntry</code> for the given
      * constrained formula from the <code>filter</code>.
      */
-    private SequentPrintFilterEntry entryForCfma (ConstrainedFormula cfma,
+    private SequentPrintFilterEntry entryForCfma (SequentFormula cfma,
                                                   SequentPrintFilter filter) {
         ImmutableList<SequentPrintFilterEntry> list =
             filter.getAntec ().append ( filter.getSucc () );

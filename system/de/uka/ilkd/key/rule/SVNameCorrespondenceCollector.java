@@ -77,7 +77,7 @@ public class SVNameCorrespondenceCollector extends Visitor {
      * @param semiseq the Semisequent to visit
      */
     private void visit(Semisequent semiseq) {
-        for (ConstrainedFormula cf : semiseq) {
+        for (SequentFormula cf : semiseq) {
             cf.formula().execPostOrder(this);
         }
     }

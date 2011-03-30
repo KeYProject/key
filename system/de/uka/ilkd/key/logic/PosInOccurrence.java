@@ -12,7 +12,7 @@ package de.uka.ilkd.key.logic;
 
 /**
  * This class describes a position in an occurrence of a term. A
- * ConstrainedFormula and a PosInTerm determine an object of this 
+ * SequentFormula and a PosInTerm determine an object of this 
  * class exactly. 
  */
 public class PosInOccurrence {
@@ -27,7 +27,7 @@ public class PosInOccurrence {
     /**
      * the constrained formula the pos in occurrence describes
      */
-    private final ConstrainedFormula cfma;
+    private final SequentFormula cfma;
 
     // saves 8 bytes (due to allignment issues) per instance if we use a 
     // short here instead of an int
@@ -46,7 +46,7 @@ public class PosInOccurrence {
      */
     private Term subTermCache = null;
 
-    public PosInOccurrence(ConstrainedFormula cfma, 
+    public PosInOccurrence(SequentFormula cfma, 
             PosInTerm posInTerm,
             boolean inAntec) {	
 	this.inAntec=inAntec;
@@ -62,10 +62,10 @@ public class PosInOccurrence {
     
     
     /**
-     * returns the ConstrainedFormula that determines the occurrence of
+     * returns the SequentFormula that determines the occurrence of
      * this PosInOccurrence 
      */
-    public ConstrainedFormula constrainedFormula() {
+    public SequentFormula constrainedFormula() {
 	return cfma;
     }
 
@@ -173,8 +173,8 @@ public class PosInOccurrence {
      * The usage of this method is strongly discouraged, use 
      * {@link PosInOccurrence#iterator} instead.     
      * describes the exact occurence of the refered term inside 
-     * {@link ConstrainedFormula#formula()} 
-     * @returns the position in the formula of the ConstrainedFormula of
+     * {@link SequentFormula#formula()} 
+     * @returns the position in the formula of the SequentFormula of
      * this PosInOccurrence. 
      */
     public PosInTerm posInTerm() {
@@ -191,7 +191,7 @@ public class PosInOccurrence {
      *         object does within the formula <code>constrainedFormula()</code>.
      *         It is not tested whether this position exists within <code>p_newFormula</code>
      */
-    public PosInOccurrence replaceConstrainedFormula (ConstrainedFormula p_newFormula) {
+    public PosInOccurrence replaceConstrainedFormula (SequentFormula p_newFormula) {
         final PIOPathIterator it = iterator ();
         Term newTerm = p_newFormula.formula ();
         PosInTerm newPosInTerm = PosInTerm.TOP_LEVEL;

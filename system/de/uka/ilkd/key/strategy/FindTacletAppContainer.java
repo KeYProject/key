@@ -81,7 +81,7 @@ public class FindTacletAppContainer extends TacletAppContainer {
 	    final FormulaChangeInfo info = infoList.head ();
 	    infoList = infoList.tail ();
 	    
-	    final ConstrainedFormula newFormula = info.getNewFormula();
+	    final SequentFormula newFormula = info.getNewFormula();
         if ( newFormula == applicationPosition.constrainedFormula() )
             // then there were no relevant modifications since the creation
             // of the rule app object
@@ -108,7 +108,7 @@ public class FindTacletAppContainer extends TacletAppContainer {
      * is established by a modification that occurred inside an update 
      */
     private boolean independentSubformulas(PosInOccurrence changePos,
-                                           ConstrainedFormula newFormula) {
+                                           SequentFormula newFormula) {
         final PIOPathIterator changePIO = changePos.iterator ();
         final PIOPathIterator appPIO = applicationPosition.iterator ();
 

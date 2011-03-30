@@ -14,7 +14,7 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.ImmutableMap;
 import de.uka.ilkd.key.collection.ImmutableMapEntry;
-import de.uka.ilkd.key.logic.ConstrainedFormula;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
@@ -51,7 +51,7 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
      * search for the same or an equal formula
      */
     protected abstract boolean semiSequentContains(Semisequent semisequent,
-                                                   ConstrainedFormula cfma);
+                                                   SequentFormula cfma);
 
 
     /**
@@ -146,7 +146,7 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
     protected boolean noDuplicateFindTaclet(TacletApp app,
                                             PosInOccurrence pos,
                                             Goal goal) {
-        final ConstrainedFormula focusFor = pos.constrainedFormula ();
+        final SequentFormula focusFor = pos.constrainedFormula ();
         final boolean antec = pos.isInAntec ();
     
         Node node = goal.node ();

@@ -323,7 +323,7 @@ public class ProofSaver {
        for (IfFormulaInstantiation aL : l) {
            IfFormulaInstantiation iff = aL;
            if (iff instanceof IfFormulaInstSeq) {
-               ConstrainedFormula f = iff.getConstrainedFormula();
+               SequentFormula f = iff.getConstrainedFormula();
                s += " (ifseqformula \"" +
                        node.sequent().formulaNumberInSequent(
                                ((IfFormulaInstSeq) iff).inAntec(), f) +

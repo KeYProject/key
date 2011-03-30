@@ -106,7 +106,7 @@ public class BuiltInRuleAppIndex {
 	final Sequent                seq  = node.sequent ();
 
         for (Object o : (antec ? seq.antecedent() : seq.succedent())) {
-            final ConstrainedFormula cfma = (ConstrainedFormula) o;
+            final SequentFormula cfma = (SequentFormula) o;
             scanSimplificationRule(rule, goal, antec, cfma, listener);
         }
     }
@@ -115,7 +115,7 @@ public class BuiltInRuleAppIndex {
     private void scanSimplificationRule ( BuiltInRule rule, 
                                           Goal goal, 
                                           boolean antec, 
-                                          ConstrainedFormula cfma, 
+                                          SequentFormula cfma, 
                                           NewRuleListener listener ) {
         final PosInOccurrence    pos = new PosInOccurrence 
 		( cfma, PosInTerm.TOP_LEVEL, antec );
@@ -159,10 +159,10 @@ public class BuiltInRuleAppIndex {
     }
     
     private void scanAddedFormulas ( Goal goal, boolean antec, SequentChangeInfo sci ) {
-        ImmutableList<ConstrainedFormula> cfmas = sci.addedFormulas( antec );
+        ImmutableList<SequentFormula> cfmas = sci.addedFormulas( antec );
         final NewRuleListener listener = getNewRulePropagator();
         while ( !cfmas.isEmpty() ) {
-            final ConstrainedFormula cfma = cfmas.head();
+            final SequentFormula cfma = cfmas.head();
             for (BuiltInRule builtInRule : index.rules()) {
                 final BuiltInRule rule = builtInRule;
                 scanSimplificationRule(rule, goal, antec,
@@ -180,7 +180,7 @@ public class BuiltInRuleAppIndex {
 
         while ( !fcis.isEmpty() ) {
             final FormulaChangeInfo fci = fcis.head();               
-            final ConstrainedFormula cfma = fci.getNewFormula();
+            final SequentFormula cfma = fci.getNewFormula();
             for (BuiltInRule builtInRule : index.rules()) {
                 final BuiltInRule rule = builtInRule;
                 scanSimplificationRule(rule, goal, antec, cfma, listener);

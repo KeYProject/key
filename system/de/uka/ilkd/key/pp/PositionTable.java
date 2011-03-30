@@ -12,7 +12,7 @@ package de.uka.ilkd.key.pp;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.logic.ConstrainedFormula;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 
@@ -55,7 +55,7 @@ public class PositionTable {
 
     /**
      * creates a new PositionTable with the number of subterms (or number of
-     * ConstrainedFormula in a Semisequent, or the number of Semisequents in a
+     * SequentFormula in a Semisequent, or the number of Semisequents in a
      * Sequent, etc.)
      * @param rows the number of direct sub-elements in the term whose
      * position information is represented by the constructed object.
@@ -256,7 +256,7 @@ public class PositionTable {
 	SequentPrintFilterEntry filterEntry = 
 	    getFilterEntry(cfmaNo, filter);
 
-	ConstrainedFormula cfma = filterEntry.getOriginalFormula();
+	SequentFormula cfma = filterEntry.getOriginalFormula();
 
 	PosInOccurrence currentPos = 
 	    new PosInOccurrence ( cfma, PosInTerm.TOP_LEVEL,

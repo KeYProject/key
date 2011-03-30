@@ -26,7 +26,7 @@ import de.uka.ilkd.key.java.declaration.modifier.Protected;
 import de.uka.ilkd.key.java.declaration.modifier.Public;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.logic.ConstrainedFormula;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Semisequent;
@@ -315,8 +315,8 @@ public final class SpecificationRepository {
 	//create taclet
 	final RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();
 	tacletBuilder.setFind(TB.func(unlimited, subs));
-	final ConstrainedFormula cf 
-		= new ConstrainedFormula(TB.equals(limitedTerm, unlimitedTerm));
+	final SequentFormula cf 
+		= new SequentFormula(TB.equals(limitedTerm, unlimitedTerm));
 	final Sequent addedSeq 
 		= Sequent.createAnteSequent(Semisequent.EMPTY_SEMISEQUENT
 			                               .insertFirst(cf)

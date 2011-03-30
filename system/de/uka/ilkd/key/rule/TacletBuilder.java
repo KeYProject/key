@@ -60,7 +60,7 @@ public abstract class TacletBuilder {
     }
 
     private static boolean containsFreeVarSV(Sequent sequent) {
-	for (final ConstrainedFormula cf : sequent) {
+	for (final SequentFormula cf : sequent) {
 	    if (containsFreeVarSV(cf.formula())) {
 		return true;
 	    }

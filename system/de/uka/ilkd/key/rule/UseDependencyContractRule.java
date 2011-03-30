@@ -64,7 +64,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
     
     private List<Term> getEqualityDefs(Term term, Sequent seq) {
 	final List<Term> result = new LinkedList<Term>();
-	for(ConstrainedFormula cf : seq.antecedent()) {
+	for(SequentFormula cf : seq.antecedent()) {
 	    final Term formula = cf.formula();
 	    if(formula.op() instanceof Equality 
 	       && formula.sub(1).equals(term)) {
@@ -79,7 +79,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	    						    	   Sequent seq){
 	final List<Pair<Term,PosInOccurrence>> result 
 		= new LinkedList<Pair<Term,PosInOccurrence>>();
-	for(ConstrainedFormula cf : seq.antecedent()) {
+	for(SequentFormula cf : seq.antecedent()) {
 	    final Term formula = cf.formula();
 	    if(formula.op() instanceof Equality 
 	       && formula.sub(1).equals(term)) {
@@ -94,7 +94,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
     
     private ImmutableSet<Term> addEqualDefs(ImmutableSet<Term> terms, Goal g) {
 	ImmutableSet<Term> result = terms;
-	for(ConstrainedFormula cf : g.sequent().antecedent()) {
+	for(SequentFormula cf : g.sequent().antecedent()) {
 	    final Term formula = cf.formula();
 	    if(formula.op() instanceof Equality 
 	        && terms.contains(formula.sub(1))) {
@@ -265,12 +265,12 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	assert focus.op() instanceof ObserverFunction;
 	final Map<Term, PosInOccurrence> result 
 		= new HashMap<Term, PosInOccurrence>();
-	for(ConstrainedFormula cf : seq.antecedent()) {
+	for(SequentFormula cf : seq.antecedent()) {
 	    final PosInOccurrence pos 
 	    	= new PosInOccurrence(cf, PosInTerm.TOP_LEVEL, true);
 	    collectBaseOccsHelper(focus, pos, result);
 	}
-	for(ConstrainedFormula cf : seq.succedent()) {
+	for(SequentFormula cf : seq.succedent()) {
 	    final PosInOccurrence pos 
 	    	= new PosInOccurrence(cf, PosInTerm.TOP_LEVEL, false);
 	    collectBaseOccsHelper(focus, pos, result);
@@ -635,7 +635,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
         	                + changeString);
         
         //create "Pre" branch
-        preGoal.addFormula(new ConstrainedFormula(cutFormula),
+        preGoal.addFormula(new SequentFormula(cutFormula),
         		   false,
         		   true);
         
@@ -643,8 +643,8 @@ public final class UseDependencyContractRule implements BuiltInRule {
         final Term[] subs = focus.subs().toArray(new Term[focus.arity()]);
         subs[0] = baseHeapAndChangedLocs.first;
         final Term termWithBaseHeap = TB.func(target, subs);
-        postGoal.addFormula(new ConstrainedFormula(TB.equals(focus, termWithBaseHeap)), true, false);
-        postGoal.addFormula(new ConstrainedFormula(cutFormula),
+        postGoal.addFormula(new SequentFormula(TB.equals(focus, termWithBaseHeap)), true, false);
+        postGoal.addFormula(new SequentFormula(cutFormula),
         	 	    true,
         	 	    false);
         

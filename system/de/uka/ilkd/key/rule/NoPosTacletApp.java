@@ -333,7 +333,7 @@ public class NoPosTacletApp extends TacletApp {
 
 
     /**
-     * returns the PositionInOccurrence (representing a ConstrainedFormula and
+     * returns the PositionInOccurrence (representing a SequentFormula and
      * a position in the corresponding formula)
      * @return the PosInOccurrence
      */

@@ -124,7 +124,7 @@ public class ApplyTacletDialogModel {
 	    ImmutableList<IfFormulaInstantiation> succCand  =
 		IfFormulaInstSeq.createList ( seq, false );
 
-	    Iterator<ConstrainedFormula> it        = ifseq.iterator();
+	    Iterator<SequentFormula> it        = ifseq.iterator();
 	    Term                         ifFma;
 	    MatchConditions              matchCond = app.matchConditions ();
 

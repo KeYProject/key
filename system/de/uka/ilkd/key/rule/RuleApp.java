@@ -27,7 +27,7 @@ public interface RuleApp {
     Rule rule();
 
     /**
-     * returns the PositionInOccurrence (representing a ConstrainedFormula and
+     * returns the PositionInOccurrence (representing a SequentFormula and
      * a position in the corresponding formula) of this rule application
      */
     PosInOccurrence posInOccurrence();

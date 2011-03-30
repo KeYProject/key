@@ -57,7 +57,7 @@ public class NodeReplacement {
     }
 
     private void addNodeChange ( SequentChangeInfo p_sci ) {
-        Iterator<ConstrainedFormula> it;
+        Iterator<SequentFormula> it;
         Iterator<FormulaChangeInfo>  it2;
      
         //---
@@ -115,7 +115,7 @@ public class NodeReplacement {
     
     }
 
-    private void addAddedChange   ( ConstrainedFormula p_cf,
+    private void addAddedChange   ( SequentFormula p_cf,
 				    boolean            p_inAntec ) {
 	Sequent     oldS  = parent.sequent ();
 	Semisequent oldSS = ( p_inAntec          ?
@@ -143,7 +143,7 @@ public class NodeReplacement {
      * @param p_cf
      * @param p_inAntec
      */
-    private void addAddedRedundantChange(ConstrainedFormula p_cf,
+    private void addAddedRedundantChange(SequentFormula p_cf,
             boolean p_inAntec) {
 
         final PosInOccurrence pio = new PosInOccurrence(p_cf, PosInTerm.TOP_LEVEL,
@@ -155,7 +155,7 @@ public class NodeReplacement {
     
     
 
-    private void addRemovedChange ( ConstrainedFormula p_cf,
+    private void addRemovedChange ( SequentFormula p_cf,
 				    boolean            p_inAntec ) {
 	Sequent     oldS  = parent.sequent ();
 	Semisequent oldSS = ( p_inAntec          ?
@@ -176,7 +176,7 @@ public class NodeReplacement {
 	changes = changes.prepend ( p_nc );
     }
 
-    private void removeNodeChanges ( ConstrainedFormula p_cf,
+    private void removeNodeChanges ( SequentFormula p_cf,
 				     boolean            p_inAntec ) {
 	Iterator<NodeChange> it     = changes.iterator ();
 	changes                     = ImmutableSLList.<NodeChange>nil();

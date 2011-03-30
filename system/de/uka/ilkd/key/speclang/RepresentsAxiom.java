@@ -342,8 +342,8 @@ public final class RepresentsAxiom implements ClassAxiom {
 	//assemble formula
 	final Term guardedAxiom 
 		= TB.imp(TB.and(exactInstance, axiomSatisfiable), schemaAxiom);
-	final ConstrainedFormula guardedAxiomCf 
-		= new ConstrainedFormula(guardedAxiom);
+	final SequentFormula guardedAxiomCf 
+		= new SequentFormula(guardedAxiom);
 	
 	//create taclet
 	final Term findTerm = target.isStatic() 
@@ -425,7 +425,7 @@ public final class RepresentsAxiom implements ClassAxiom {
 	} else {
 	    final Term ifFormula 
 	    	= TB.exactInstance(services, kjt.getSort(), TB.var(selfSV));
-	    final ConstrainedFormula ifCf = new ConstrainedFormula(ifFormula);
+	    final SequentFormula ifCf = new SequentFormula(ifFormula);
 	    final Semisequent ifSemiSeq 
 	    	= Semisequent.EMPTY_SEMISEQUENT.insertFirst(ifCf).semisequent();
 	    ifSeq = Sequent.createAnteSequent(ifSemiSeq);
@@ -480,7 +480,7 @@ public final class RepresentsAxiom implements ClassAxiom {
                 	        		   	       TB.var(targetSV), 
                 	        		   	       schemaAxiom)));
         }
-        ConstrainedFormula addedCf = new ConstrainedFormula(axiomSatisfiable);
+        SequentFormula addedCf = new SequentFormula(axiomSatisfiable);
 	final Semisequent addedSemiSeq 
 	    	= Semisequent.EMPTY_SEMISEQUENT.insertFirst(addedCf)
 	    	                               .semisequent();

@@ -262,19 +262,19 @@ public class Goal  {
    
     /** adds a formula to the sequent before the given position
      * and informs the rule appliccation index about this change
-     * @param cf the ConstrainedFormula to be added
+     * @param cf the SequentFormula to be added
      * @param p PosInOccurrence encodes the position 
      */
-    public void addFormula(ConstrainedFormula cf, PosInOccurrence p) {
+    public void addFormula(SequentFormula cf, PosInOccurrence p) {
 	setSequent(sequent().addFormula(cf, p));	
     }
 
     /** adds a list of formulas to the sequent before the given position
      * and informs the rule appliccation index about this change
-     * @param insertions the IList<ConstrainedFormula> to be added
+     * @param insertions the IList<SequentFormula> to be added
      * @param p PosInOccurrence encodes the position 
      */
-    public void addFormula(ImmutableList<ConstrainedFormula> insertions, PosInOccurrence p) {
+    public void addFormula(ImmutableList<SequentFormula> insertions, PosInOccurrence p) {
 	if ( !insertions.isEmpty() ) {	  
 	    setSequent(sequent().addFormula(insertions, p));
 	}
@@ -283,13 +283,13 @@ public class Goal  {
     /** adds a list of formulas to the antecedent or succedent of a  
      * sequent. Either at its front or back.
      * and informs the rule appliccation index about this change
-     * @param insertions the IList<ConstrainedFormula> to be added
-     * @param inAntec boolean true(false) if ConstrainedFormula has to be
+     * @param insertions the IList<SequentFormula> to be added
+     * @param inAntec boolean true(false) if SequentFormula has to be
      * added to antecedent (succedent) 
      * @param first boolean true if at the front, if false then cf is
      * added at the back
      */
-    public void addFormula ( ImmutableList<ConstrainedFormula> insertions, 
+    public void addFormula ( ImmutableList<SequentFormula> insertions, 
 			     boolean inAntec, boolean first ) {
 	if ( !insertions.isEmpty() ) {
 	    setSequent(sequent().
@@ -300,13 +300,13 @@ public class Goal  {
     /** adds a formula to the antecedent or succedent of a
      * sequent. Either at its front or back
      * and informs the rule appliccation index about this change
-     * @param cf the ConstrainedFormula to be added
-     * @param inAntec boolean true(false) if ConstrainedFormula has to be
+     * @param cf the SequentFormula to be added
+     * @param inAntec boolean true(false) if SequentFormula has to be
      * added to antecedent (succedent) 
      * @param first boolean true if at the front, if false then cf is
      * added at the back
      */
-    public void addFormula ( ConstrainedFormula cf, boolean inAntec,
+    public void addFormula ( SequentFormula cf, boolean inAntec,
 			     boolean first ) {
 	setSequent(sequent().addFormula(cf, inAntec, first));
     }
@@ -376,20 +376,20 @@ public class Goal  {
     /** 
      * replaces a formula at the given position  
      * and informs the rule application index about this change
-     * @param cf the ConstrainedFormula replacing the old one
+     * @param cf the SequentFormula replacing the old one
      * @param p the PosInOccurrence encoding the position 
      */
-    public void changeFormula(ConstrainedFormula cf, PosInOccurrence p) {	
+    public void changeFormula(SequentFormula cf, PosInOccurrence p) {	
 	setSequent(sequent().changeFormula(cf, p));
     }
 
     /** 
      * replaces a formula at the given position  
      * and informs the rule appliccation index about this change
-     * @param replacements the ConstrainedFormula replacing the old one
+     * @param replacements the SequentFormula replacing the old one
      * @param p PosInOccurrence encodes the position 
      */
-    public void changeFormula(ImmutableList<ConstrainedFormula> replacements, 
+    public void changeFormula(ImmutableList<SequentFormula> replacements, 
 			      PosInOccurrence p) {
 	setSequent(sequent().changeFormula(replacements, p));
     }

@@ -138,8 +138,8 @@ public class TestTacletParser extends TestCase {
 	}
     }
 
-    public ConstrainedFormula cf(String s) {
-	return new ConstrainedFormula(parseFma(s));
+    public SequentFormula cf(String s) {
+	return new SequentFormula(parseFma(s));
     }
     
     public Semisequent sseq(String s) {

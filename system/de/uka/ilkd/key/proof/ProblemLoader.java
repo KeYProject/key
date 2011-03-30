@@ -31,7 +31,7 @@ import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.ConstrainedFormula;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -379,7 +379,7 @@ public final class ProblemLoader implements Runnable {
         case 'd' : // ifdirectformula      
             ifFormulaList = ifFormulaList.append(
                 new IfFormulaInstDirect(
-                    new ConstrainedFormula(parseTerm(s, proof))));
+                    new SequentFormula(parseTerm(s, proof))));
             break;
         case 'u' : //UserLog
             if(proof.userLog==null)

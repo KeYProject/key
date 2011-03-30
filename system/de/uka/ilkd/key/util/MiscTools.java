@@ -229,13 +229,13 @@ public final class MiscTools {
      * Removes all formulas from the passed goal.
      */
     public static void clearGoal(Goal goal) {
-	for(ConstrainedFormula cf : goal.sequent().antecedent()) {
+	for(SequentFormula cf : goal.sequent().antecedent()) {
             PosInOccurrence pio = new PosInOccurrence(cf, 
                                                       PosInTerm.TOP_LEVEL, 
                                                       true);
             goal.removeFormula(pio);
         }
-	for(ConstrainedFormula cf : goal.sequent().succedent()) {
+	for(SequentFormula cf : goal.sequent().succedent()) {
             PosInOccurrence pio = new PosInOccurrence(cf, 
                                                       PosInTerm.TOP_LEVEL, 
                                                       false);

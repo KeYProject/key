@@ -10,7 +10,7 @@
 
 package de.uka.ilkd.key.pp;
 
-import de.uka.ilkd.key.logic.ConstrainedFormula;
+import de.uka.ilkd.key.logic.SequentFormula;
 
 
 /**
@@ -22,11 +22,11 @@ public interface SequentPrintFilterEntry {
     /**
      * Formula to display
      */
-    ConstrainedFormula getFilteredFormula   ();
+    SequentFormula getFilteredFormula   ();
 
     /**
      * Original formula from sequent
      */
-    ConstrainedFormula getOriginalFormula   ();
+    SequentFormula getOriginalFormula   ();
 
 }

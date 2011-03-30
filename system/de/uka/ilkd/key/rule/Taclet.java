@@ -24,7 +24,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceData;
 import de.uka.ilkd.key.logic.BoundVarsVisitor;
 import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.ConstrainedFormula;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -679,7 +679,7 @@ public abstract class Taclet implements Rule, Named {
 				     MatchConditions                  p_matchCond,
 				     Services                         p_services ) {
 
-	Iterator<ConstrainedFormula>     itIfSequent   = ifSequent () .iterator ();
+	Iterator<SequentFormula>     itIfSequent   = ifSequent () .iterator ();
 
 	ImmutableList<MatchConditions>            newMC;	
 	
@@ -886,7 +886,7 @@ public abstract class Taclet implements Rule, Named {
     
 
     /**
-     * adds ConstrainedFormula to antecedent or succedent depending on
+     * adds SequentFormula to antecedent or succedent depending on
      * position information or the boolean antec 
      * contrary to "addToPos" frm will not be modified
      * @param frm the formula that should be added
@@ -895,7 +895,7 @@ public abstract class Taclet implements Rule, Named {
      * @param antec boolean true(false) if elements have to be added to the
      * antecedent(succedent) (only looked at if pos == null)
      */
-    private void addToPosWithoutInst(ConstrainedFormula frm,
+    private void addToPosWithoutInst(SequentFormula frm,
 				     Goal goal,			  
 				     PosInOccurrence pos,
 				     boolean antec) {
@@ -912,14 +912,14 @@ public abstract class Taclet implements Rule, Named {
     /** 
      * the given constrained formula is instantiated and then
      * the result (usually a complete instantiated formula) is returned.
-     * @param schemaFormula the ConstrainedFormula to be instantiated
+     * @param schemaFormula the SequentFormula to be instantiated
      * @param services the Services object carrying ja related information
      * @param matchCond the MatchConditions object with the instantiations of
      * the schemavariables, constraints etc.
-     * @return the as far as possible instantiated ConstrainedFormula
+     * @return the as far as possible instantiated SequentFormula
      */
-    private ConstrainedFormula 
-	instantiateReplacement(ConstrainedFormula schemaFormula,
+    private SequentFormula 
+	instantiateReplacement(SequentFormula schemaFormula,
 			       Services           services,
 			       MatchConditions    matchCond) { 
 
@@ -933,7 +933,7 @@ public abstract class Taclet implements Rule, Named {
             		           	             instantiatedFormula);         
 	} 
 	        
-	return new ConstrainedFormula(instantiatedFormula);
+	return new SequentFormula(instantiatedFormula);
     }
 		
     /**
@@ -945,11 +945,11 @@ public abstract class Taclet implements Rule, Named {
      * Schemavariables to concrete logic elements
      * @return the instanted formulas of the semisquent as list
      */
-    private ImmutableList<ConstrainedFormula> instantiateSemisequent(Semisequent semi, Services services, 
+    private ImmutableList<SequentFormula> instantiateSemisequent(Semisequent semi, Services services, 
             MatchConditions matchCond) {       
         
-        ImmutableList<ConstrainedFormula> replacements = ImmutableSLList.<ConstrainedFormula>nil();
-        final Iterator<ConstrainedFormula> it = semi.iterator();        
+        ImmutableList<SequentFormula> replacements = ImmutableSLList.<SequentFormula>nil();
+        final Iterator<SequentFormula> it = semi.iterator();        
         
         while (it.hasNext()) {
             replacements = replacements.append
@@ -1000,7 +1000,7 @@ public abstract class Taclet implements Rule, Named {
 			    boolean antec,
 			    Services services, 
 			    MatchConditions matchCond ) {
-	final ImmutableList<ConstrainedFormula> replacements = 
+	final ImmutableList<SequentFormula> replacements = 
             instantiateSemisequent(semi, services, matchCond);
 	
 	if (pos != null) {
@@ -1011,7 +1011,7 @@ public abstract class Taclet implements Rule, Named {
     }
 
     /**
-     * adds ConstrainedFormula to antecedent depending on
+     * adds SequentFormula to antecedent depending on
      * position information (if none is handed over it is added at the
      * head of the antecedent). Of course it has to be ensured that
      * the position information describes one occurrence in the
@@ -1033,7 +1033,7 @@ public abstract class Taclet implements Rule, Named {
     }
 
     /**
-     * adds ConstrainedFormula to succedent depending on
+     * adds SequentFormula to succedent depending on
      * position information (if none is handed over it is added at the
      * head of the succedent). Of course it has to be ensured that
      * the position information describes one occurrence in the
@@ -1271,7 +1271,7 @@ public abstract class Taclet implements Rule, Named {
 	    while ( itGoal.hasNext () )
 		p_goal = itGoal.next ();
 
-	    addToPosWithoutInst ( new ConstrainedFormula ( ifObl ),
+	    addToPosWithoutInst ( new SequentFormula ( ifObl ),
 				  p_goal,
 				  null,
 				  false );

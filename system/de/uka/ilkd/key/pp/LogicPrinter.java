@@ -237,7 +237,7 @@ public final class LogicPrinter {
     
     
     private static void collectSchemaVarsHelper(Sequent s, OpCollector oc) {
-	for(ConstrainedFormula cf : s) {
+	for(SequentFormula cf : s) {
 	    cf.formula().execPostOrder(oc);
 	}
     }
@@ -787,7 +787,7 @@ public final class LogicPrinter {
      *
      * @param cfma the constrained formula to be printed
      */
-    public void printConstrainedFormula(ConstrainedFormula cfma)
+    public void printConstrainedFormula(SequentFormula cfma)
         throws IOException {
 	printTerm(cfma.formula());
     }

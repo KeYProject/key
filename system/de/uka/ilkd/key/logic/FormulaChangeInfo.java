@@ -19,19 +19,19 @@ public class FormulaChangeInfo {
     /** position within the original formula */
     private final PosInOccurrence    positionOfModification;
     /** modified formula */
-    private final ConstrainedFormula newFormula;
+    private final SequentFormula newFormula;
 
     public FormulaChangeInfo(PosInOccurrence positionOfModification,
-			     ConstrainedFormula newFormula) {
+			     SequentFormula newFormula) {
 	this.newFormula = newFormula;
 	this.positionOfModification = positionOfModification;
     }
 
-    public ConstrainedFormula getNewFormula() {
+    public SequentFormula getNewFormula() {
 	return newFormula;
     }
 
-    public ConstrainedFormula getOriginalFormula() {
+    public SequentFormula getOriginalFormula() {
 	return getPositionOfModification ().constrainedFormula ();
     }
 

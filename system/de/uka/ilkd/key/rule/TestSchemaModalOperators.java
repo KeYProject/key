@@ -41,8 +41,8 @@ public class TestSchemaModalOperators extends TestCase {
 	if ("".equals(t)) { 
 	    return Semisequent.EMPTY_SEMISEQUENT;
 	}
-	ConstrainedFormula cf0
-	    = new ConstrainedFormula(TacletForTests.parseTerm(t));
+	SequentFormula cf0
+	    = new SequentFormula(TacletForTests.parseTerm(t));
 	return Semisequent.EMPTY_SEMISEQUENT.insert(0, cf0).semisequent();
     }
 
@@ -86,10 +86,10 @@ public class TestSchemaModalOperators extends TestCase {
 	consMV_f_c_X = Constraint.BOTTOM.unify(t_mv, t_f_c_X);
 	consMV_f_X_c = Constraint.BOTTOM.unify(t_mv, t_f_X_c);
 
-	ConstrainedFormula cf1 = 
-	    new ConstrainedFormula(TacletForTests.parseTerm("A & B"), consMV_f_c_X);
-	ConstrainedFormula cf2 = 
-	    new ConstrainedFormula(TacletForTests.parseTerm("!(A | B)"), consMV_f_X_c);
+	SequentFormula cf1 = 
+	    new SequentFormula(TacletForTests.parseTerm("A & B"), consMV_f_c_X);
+	SequentFormula cf2 = 
+	    new SequentFormula(TacletForTests.parseTerm("!(A | B)"), consMV_f_X_c);
 
 	Sequent seq = Sequent.createSequent
 	    (Semisequent.EMPTY_SEMISEQUENT.insertLast(cf1).semisequent(),

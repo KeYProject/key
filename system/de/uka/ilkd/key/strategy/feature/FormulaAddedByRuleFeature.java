@@ -10,7 +10,7 @@
 
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.logic.ConstrainedFormula;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.Goal;
@@ -39,7 +39,7 @@ public class FormulaAddedByRuleFeature extends BinaryFeature {
     public boolean filter (RuleApp app, PosInOccurrence pos, Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find";
 
-        final ConstrainedFormula cfma = pos.constrainedFormula ();
+        final SequentFormula cfma = pos.constrainedFormula ();
         final boolean antec = pos.isInAntec ();
         
         Node node = goal.node ();

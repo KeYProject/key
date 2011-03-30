@@ -14,7 +14,7 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.logic.ConstrainedFormula;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Sequent;
 
 
@@ -36,7 +36,7 @@ public class IdentitySequentPrintFilter implements SequentPrintFilter {
 	if ( antec != null )
 	    return;
 
-	Iterator<ConstrainedFormula> it;
+	Iterator<SequentFormula> it;
 
 	antec = ImmutableSLList.<SequentPrintFilterEntry>nil();
 	it    = originalSequent.antecedent ().iterator ();
@@ -49,7 +49,7 @@ public class IdentitySequentPrintFilter implements SequentPrintFilter {
 	    succ  = succ .append ( filterFormula ( it.next () ) );
     }
 
-    protected SequentPrintFilterEntry filterFormula ( ConstrainedFormula p_cfma ) {
+    protected SequentPrintFilterEntry filterFormula ( SequentFormula p_cfma ) {
 	return new IdentityFilterEntry ( p_cfma );
     }
 
@@ -77,24 +77,24 @@ public class IdentitySequentPrintFilter implements SequentPrintFilter {
 
 
     private static class IdentityFilterEntry implements SequentPrintFilterEntry {
-	final ConstrainedFormula originalFormula;
+	final SequentFormula originalFormula;
 
 
-	public IdentityFilterEntry ( ConstrainedFormula p_originalFormula) {
+	public IdentityFilterEntry ( SequentFormula p_originalFormula) {
 	    originalFormula   = p_originalFormula;
 	}
 
 	/**
 	 * Formula to display
 	 */
-	public ConstrainedFormula getFilteredFormula   () {
+	public SequentFormula getFilteredFormula   () {
 	    return originalFormula;
 	}
 
 	/**
 	 * Original formula from sequent
 	 */
-	public ConstrainedFormula getOriginalFormula   () {
+	public SequentFormula getOriginalFormula   () {
 	    return originalFormula;
 	}
 

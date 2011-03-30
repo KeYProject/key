@@ -332,7 +332,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 	// \replacewith (==> inv );
 	final Term reachableState = TB.and(TB.wellFormedHeap(services), 
 		                           reachableIn);
-	initGoal.changeFormula(new ConstrainedFormula(
+	initGoal.changeFormula(new SequentFormula(
 		                 TB.apply(inst.u, 
 		                         TB.and(invTerm, reachableState))),
 			         ruleApp.posInOccurrence());
@@ -343,12 +343,12 @@ public final class WhileInvariantRule implements BuiltInRule {
         //                         (\[{ method-frame(#ex):{#typeof(#e) #v1 = #e;} }\]#v1=TRUE ->
         //                          #whileInvRule(\[{.. while (#e) #s ...}\]post, 
         //                               #locDepFunc(anon1, \[{.. while (#e) #s ...}\]post) & inv)),anon1));
-	bodyGoal.addFormula(new ConstrainedFormula(TB.wellFormed(services, 
+	bodyGoal.addFormula(new SequentFormula(TB.wellFormed(services, 
 		 	    					 anonHeap)), 
 		 	    true, 
 		 	    false);		
 
-	bodyGoal.addFormula(new ConstrainedFormula(uAnonInvVariantNonNeg), 
+	bodyGoal.addFormula(new SequentFormula(uAnonInvVariantNonNeg), 
 			    true, 
 			    false);
 
@@ -376,7 +376,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 	final Term guardTrueBody = TB.box(guardJb, 
 					  TB.imp(guardTrueTerm, bodyTerm)); 
 
-	bodyGoal.changeFormula(new ConstrainedFormula(TB.applySequential(
+	bodyGoal.changeFormula(new SequentFormula(TB.applySequential(
 						uBeforeLoopDefAnonVariant, 
 						guardTrueBody)), 
                                ruleApp.posInOccurrence());
@@ -385,11 +385,11 @@ public final class WhileInvariantRule implements BuiltInRule {
 	// \replacewith (==> #introNewAnonUpdate(#modifies, inv ->
 	// (\[{ method-frame(#ex):{#typeof(#e) #v1 = #e;} }\]
 	// (#v1=FALSE -> \[{.. ...}\]post)),anon2))
-	useGoal.addFormula(new ConstrainedFormula(TB.wellFormed(services, 
+	useGoal.addFormula(new SequentFormula(TB.wellFormed(services, 
 		 						anonHeap)), 
 		 	   true, 
 		 	   false);		
-	useGoal.addFormula(new ConstrainedFormula(uAnonInv), true, false);
+	useGoal.addFormula(new SequentFormula(uAnonInv), true, false);
 
 	Term restPsi = TB.prog(dia ? Modality.DIA : Modality.BOX,
 			       MiscTools.removeActiveStatement(
@@ -398,7 +398,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                                inst.progPost.sub(0));
 	Term guardFalseRestPsi = TB.box(guardJb, 
 					TB.imp(guardFalseTerm, restPsi));
-	useGoal.changeFormula(new ConstrainedFormula(TB.applySequential(
+	useGoal.changeFormula(new SequentFormula(TB.applySequential(
 							uAnon,
 							guardFalseRestPsi)), 
                               ruleApp.posInOccurrence());
