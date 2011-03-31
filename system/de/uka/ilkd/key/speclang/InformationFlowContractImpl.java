@@ -65,10 +65,10 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 	assert kjt != null;
 	assert pm != null;
 	assert pre != null;
-	assert dep != null;
+//	assert dep != null;
 	assert mod != null;
-	assert saveFor != null;
-	assert declassify != null;
+//	assert saveFor != null;
+//	assert declassify != null;
         assert (selfVar == null) == pm.isStatic();
         assert paramVars != null;
         assert paramVars.size() == pm.arity() - (pm.isStatic() ? 1 : 2);
