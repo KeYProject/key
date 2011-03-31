@@ -26,10 +26,6 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
 
     private ImmutableList<PositionedString> invariant          
             = ImmutableSLList.<PositionedString>nil();
-    private ImmutableList<PositionedString> skolemDeclarations 
-            = ImmutableSLList.<PositionedString>nil();
-    private ImmutableList<PositionedString> predicates         
-            = ImmutableSLList.<PositionedString>nil();
     private ImmutableList<PositionedString> assignable         
             = ImmutableSLList.<PositionedString>nil();
     private PositionedString variant                  
@@ -46,16 +42,6 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
     }
     
     
-    public void addSkolemDeclaration(PositionedString ps) {
-        skolemDeclarations = skolemDeclarations.append(ps);
-    }
-    
-    
-    public void addPredicates(PositionedString ps) {
-        predicates = predicates.append(ps);
-    }
-
-    
     public void addAssignable(PositionedString ps) {
         assignable = assignable.append(ps);
     }
@@ -69,16 +55,6 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
     
     public ImmutableList<PositionedString> getInvariant() {
         return invariant;
-    }
-    
-    
-    public ImmutableList<PositionedString> getSkolemDeclarations() {
-        return skolemDeclarations;
-    }
-    
-    
-    public ImmutableList<PositionedString> getPredicates() {
-        return predicates;
     }
     
     
@@ -101,14 +77,6 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
         while(it.hasNext()) {
             sb.append("invariant: " + it.next() + "\n");
         }
-        it = skolemDeclarations.iterator();
-        while(it.hasNext()) {
-            sb.append("skolem_constant: " + it.next() + "\n");
-        }
-        it = predicates.iterator();
-        while(it.hasNext()) {
-            sb.append("loop_predicate: " + it.next() + "\n");
-        }
         it = assignable.iterator();
         while(it.hasNext()) {
             sb.append("assignable: " + it.next() + "\n");
@@ -129,8 +97,6 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
         TextualJMLLoopSpec ls = (TextualJMLLoopSpec) o;
         return mods.equals(ls.mods)
                && invariant.equals(ls.invariant)
-               && skolemDeclarations.equals(ls.skolemDeclarations)
-               && predicates.equals(ls.predicates)
                && assignable.equals(ls.assignable)
                && (variant == null && ls.variant == null
                    || variant != null && variant.equals(ls.variant));
@@ -141,8 +107,6 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
     public int hashCode() {
         return mods.hashCode()
                 + invariant.hashCode() 
-                + skolemDeclarations.hashCode() 
-                + predicates.hashCode() 
                 + assignable.hashCode();
     }
 }

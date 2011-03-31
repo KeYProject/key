@@ -1040,8 +1040,6 @@ loop_specification[ImmutableList<String> mods]
     	options { greedy = true; }
     	:
     	    ps=loop_invariant       { ls.addInvariant(ps); }
-    	|   ps=skolem_declaration   { ls.addSkolemDeclaration(ps); }
-        |   ps=loop_predicates      { ls.addPredicates(ps); }
         |   ps=assignable_clause    { ls.addAssignable(ps); }
         |   ps=variant_function     { ls.setVariant(ps); } 
     )+
@@ -1060,18 +1058,6 @@ maintaining_keyword
     |   MAINTAINING_REDUNDANTLY
     |   LOOP_INVARIANT
     |   LOOP_INVARIANT_REDUNDANTLY
-;
-
-
-skolem_declaration returns [PositionedString result = null]
-:
-    SKOLEM_CONSTANT result=expression
-;
-
-
-loop_predicates returns [PositionedString result = null]
-:
-    LOOP_PREDICATE result=expression
 ;
 
 

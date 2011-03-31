@@ -10,8 +10,6 @@
 
 package de.uka.ilkd.key.speclang;
 
-
-import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -37,13 +35,6 @@ public interface LoopInvariant extends SpecificationElement {
             		     Services services);
     
     /**
-     * Returns the set of loop predicates.
-     */
-    public ImmutableSet<Term> getPredicates(Term selfTerm, 
-            			   	    Term heapAtPre,
-            			   	    Services services);
-    
-    /**
      * Returns the modifies clause.
      */
     public Term getModifies(Term selfTerm, 
@@ -56,12 +47,6 @@ public interface LoopInvariant extends SpecificationElement {
     public Term getVariant(Term selfTerm, 
             		   Term heapAtPre,
             		   Services services);
-    
-    /**
-     * Tells whether using heuristics for generating additional loop predicates 
-     * is allowed or not.
-     */
-    public boolean getPredicateHeuristicsAllowed();
     
     /**
      * Returns the term internally used for self. 
@@ -89,24 +74,6 @@ public interface LoopInvariant extends SpecificationElement {
             			      Term selfTerm,
             			      Term heapAtPre,
             			      Services services); 
-    
-    /**
-     * Returns a new loop invariant where the loop predicates have been 
-     * replaced with the passed ones.
-     */
-    public LoopInvariant setPredicates(ImmutableSet<Term> predicates, 
-            			       Term selfTerm,
-            			       Term heapAtPre,
-            			       Services services);
-    
-    /**
-     * Returns a new loop invariant where the flag for predicate generation
-     * heuristics has been set to the passed value. Take care: the variables 
-     * used for the receiver, parameters, and local variables must stay the 
-     * same!
-     */
-    public LoopInvariant setPredicateHeuristicsAllowed(
-                                        boolean predicateHeuristicsAllowed);
     
     /** 
      * Loop invariants can be visited like source elements:

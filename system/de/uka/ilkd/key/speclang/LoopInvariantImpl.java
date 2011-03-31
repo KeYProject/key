@@ -14,8 +14,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.collection.DefaultImmutableSet;
-import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -30,12 +28,10 @@ public final class LoopInvariantImpl implements LoopInvariant {
         
     private final LoopStatement loop;
     private final Term originalInvariant;
-    private final ImmutableSet<Term> originalPredicates;
     private final Term originalModifies;
     private final Term originalVariant;
     private final Term originalSelfTerm;
     private final Term originalHeapAtPre;
-    private final boolean predicateHeuristicsAllowed;
     
     
     //-------------------------------------------------------------------------
@@ -46,33 +42,25 @@ public final class LoopInvariantImpl implements LoopInvariant {
      * Creates a loop invariant.
      * @param loop the loop to which the invariant belongs
      * @param invariant the invariant formula
-     * @param predicates the loop predicates
      * @param modifies the modifier set
      * @param variant the variant term
      * @param selfTerm the term used for the receiver object
      * @param heapAtPre the term used for the at pre heap
-     * @param predicateHeuristicsAllowed whether heuristics for generating
-     *        additional loop predicates are allowed
      */
     public LoopInvariantImpl(LoopStatement loop,
                              Term invariant,
-                             ImmutableSet<Term> predicates,
                              Term modifies,  
                              Term variant, 
                              Term selfTerm,
-                             Term heapAtPre,
-                             boolean predicateHeuristicsAllowed) {
+                             Term heapAtPre) {
         assert loop != null;
-        assert predicates != null;
         assert modifies != null;
         assert heapAtPre != null;
         this.loop                       = loop;
 	this.originalInvariant          = invariant;
-        this.originalPredicates         = predicates;
         this.originalVariant            = variant;
         this.originalModifies           = modifies;
         this.originalSelfTerm           = selfTerm;   
-        this.predicateHeuristicsAllowed = predicateHeuristicsAllowed;
         this.originalHeapAtPre          = heapAtPre;
     }
     
@@ -85,12 +73,10 @@ public final class LoopInvariantImpl implements LoopInvariant {
 	    		     Term heapAtPre) {
         this(loop, 
              null, 
-             DefaultImmutableSet.<Term>nil(), 
              null, 
              null, 
              selfTerm,
-             null,
-             true);
+             null);
     }
     
     
@@ -164,16 +150,6 @@ public final class LoopInvariantImpl implements LoopInvariant {
     }
     
     
-    public ImmutableSet<Term> getPredicates(Term selfTerm,
-            				    Term heapAtPre,
-            				    Services services) {
-        assert (selfTerm == null) == (originalSelfTerm == null);
-        Map replaceMap = getReplaceMap(selfTerm, heapAtPre, services);
-        OpReplacer or = new OpReplacer(replaceMap);
-        return or.replace(originalPredicates);
-    }
-
-    
     @Override
     public Term getModifies(Term selfTerm,
             		    Term heapAtPre,
@@ -199,12 +175,6 @@ public final class LoopInvariantImpl implements LoopInvariant {
     
     
     @Override
-    public boolean getPredicateHeuristicsAllowed() {
-        return predicateHeuristicsAllowed;
-    }
-    
-    
-    @Override
     public Term getInternalSelfTerm() {
         return originalSelfTerm;
     }
@@ -220,12 +190,10 @@ public final class LoopInvariantImpl implements LoopInvariant {
     public LoopInvariant setLoop(LoopStatement loop) {
         return new LoopInvariantImpl(loop,
                                      originalInvariant,
-                                     originalPredicates,
                                      originalModifies,
                                      originalVariant,
                                      originalSelfTerm,
-                                     originalHeapAtPre,
-                                     predicateHeuristicsAllowed);
+                                     originalHeapAtPre);
     }
     
     
@@ -240,45 +208,10 @@ public final class LoopInvariantImpl implements LoopInvariant {
         OpReplacer or = new OpReplacer(inverseReplaceMap);
         return new LoopInvariantImpl(loop, 
                                      or.replace(invariant), 
-                                     originalPredicates,  
                                      originalModifies, 
                                      originalVariant, 
                                      originalSelfTerm,
-                                     originalHeapAtPre,
-                                     predicateHeuristicsAllowed);
-    }
-    
-
-    public LoopInvariant setPredicates(ImmutableSet<Term> predicates, 
-            Term selfTerm,
-            Term heapAtPre,
-            Services services) {
-        assert (selfTerm == null) == (originalSelfTerm == null);
-        Map inverseReplaceMap 
-            = getInverseReplaceMap(selfTerm, heapAtPre, services);
-        OpReplacer or = new OpReplacer(inverseReplaceMap);
-        return new LoopInvariantImpl(loop,
-                                     originalInvariant,
-                                     or.replace(predicates),
-                                     originalModifies,
-                                     originalVariant,
-                                     originalSelfTerm,
-                                     originalHeapAtPre,
-                                     predicateHeuristicsAllowed);
-    }
-    
-    
-    @Override
-    public LoopInvariant setPredicateHeuristicsAllowed(
-                                        boolean predicateHeuristicsAllowed) {
-        return new LoopInvariantImpl(loop,
-                                     originalInvariant,
-                                     originalPredicates,
-                                     originalModifies,
-                                     originalVariant,
-                                     originalSelfTerm,
-                                     originalHeapAtPre,
-                                     predicateHeuristicsAllowed);
+                                     originalHeapAtPre);
     }
     
     
@@ -292,8 +225,6 @@ public final class LoopInvariantImpl implements LoopInvariant {
     public String toString() {
         return "invariant: " 
                 + originalInvariant 
-                + "; predicates: " 
-                + originalPredicates 
                 + "; modifies: " 
                 + originalModifies
                 + "; variant: "

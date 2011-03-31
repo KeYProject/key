@@ -102,24 +102,18 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                 }
                 final Term newInvariant 
                     = inv.getInvariant(selfTerm, heapAtPre, services);
-                final ImmutableSet<Term> newPredicates
-                    = inv.getPredicates(selfTerm, heapAtPre, services);
                 final Term newModifies
                     = inv.getModifies(selfTerm, heapAtPre, services);
                 final Term newVariant
                     = inv.getVariant(selfTerm, heapAtPre, services);
-                boolean newPredicateHeuristicsAllowed
-                    = inv.getPredicateHeuristicsAllowed();
                 
                 final LoopInvariant newInv 
                     = new LoopInvariantImpl(loop, 
                                             newInvariant, 
-                                            newPredicates,
                                             newModifies, 
                                             newVariant, 
                                             selfTerm,
-                                            heapAtPre,
-                                            newPredicateHeuristicsAllowed);
+                                            heapAtPre);
                 services.getSpecificationRepository().setLoopInvariant(newInv);                
             }
         }

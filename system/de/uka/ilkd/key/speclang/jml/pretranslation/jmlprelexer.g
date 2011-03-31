@@ -72,7 +72,6 @@ tokens {
     INVARIANT_RED 		= "invariant_redundantly";
     LOOP_INVARIANT  		= "loop_invariant";
     LOOP_INVARIANT_RED  	= "loop_invariant_redundantly";
-    LOOP_PREDICATE 		= "loop_predicate";
     MAINTAINING  		= "maintaining";
     MAINTAINING_REDUNDANTLY	= "maintaining_redundantly";
     MAPS			= "maps";
@@ -110,7 +109,6 @@ tokens {
     SIGNALS_ONLY 		= "signals_only";
     SIGNALS_ONLY_RED 		= "signals_only_redundantly";
     SIGNALS_RED 		= "signals_redundantly";
-    SKOLEM_CONSTANT 		= "skolem_constant";
     SPEC_BIGINT_MATH 		= "spec_bigint_math";
     SPEC_JAVA_MATH 		= "spec_java_math";
     SPEC_PROTECTED 		= "spec_protected";
