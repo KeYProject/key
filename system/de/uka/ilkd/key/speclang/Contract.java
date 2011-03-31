@@ -16,6 +16,8 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
 
 
 /**
@@ -113,4 +115,11 @@ public interface Contract extends SpecificationElement {
      * Precondition: toBeSaved() must be true.
      */
     public String proofToString(Services services);
+    
+    
+    /**
+     * Returns the proof obligation to a contract.
+     */
+    public ProofOblInput getProofOblInput(InitConfig initConfig,
+	    Contract contract);
 }

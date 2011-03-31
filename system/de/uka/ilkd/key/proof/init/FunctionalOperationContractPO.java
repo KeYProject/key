@@ -40,7 +40,7 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
  * The proof obligation for operation contracts. 
  */
 public final class FunctionalOperationContractPO
-	extends AbstractOperationContractPO {
+	extends AbstOpContractPO {
     
     public FunctionalOperationContractPO(InitConfig initConfig, 
 	    		       FunctionalOperationContract contract) {
@@ -251,7 +251,7 @@ public final class FunctionalOperationContractPO
         if(!(po instanceof FunctionalOperationContractPO)) {
             return false;
         }
-        AbstractOperationContractPO cPO = (AbstractOperationContractPO) po;
+        AbstOpContractPO cPO = (AbstOpContractPO) po;
         return specRepos.splitContract(cPO.contract)
                         .subset(specRepos.splitContract(contract));
     }
@@ -274,7 +274,7 @@ public final class FunctionalOperationContractPO
 	if(!(o instanceof FunctionalOperationContractPO)) {
 	    return false;
 	} else {
-	    return contract.equals(((AbstractOperationContractPO)o).contract);
+	    return contract.equals(((AbstOpContractPO)o).contract);
 	}
     }
     

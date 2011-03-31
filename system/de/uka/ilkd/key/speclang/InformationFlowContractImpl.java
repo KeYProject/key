@@ -21,11 +21,15 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.proof.init.InformationFlowContractPO;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
 
 /**
  * Standard implementation of the DependencyContract interface.
  */
-public final class InformationFlowContractImpl implements InformationFlowContract {
+public final class InformationFlowContractImpl
+	implements InformationFlowContract {
     
     private static final TermBuilder TB = TermBuilder.DF;
     
@@ -320,23 +324,43 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     
     @Override
     public String getHTMLText(Services services) {
-	final String pre = LogicPrinter.quickPrintTerm(originalPre, services)
-				       .replace("\n", " ");
-        final String mby = hasMby() 
-        	           ? LogicPrinter.quickPrintTerm(originalMby, services)
-        	        	         .replace("\n", " ")
-        	           : null;
-        final String dep = LogicPrinter.quickPrintTerm(originalDep, services)
-         			       .replace("\n", " ");
+	// TODO: Check for correctness!!
+	final StringBuffer sig = new StringBuffer();
+	if(pm.isConstructor()) {
+	    sig.append(originalSelfVar);
+	    sig.append(" = new ");
+	}
+	if(!pm.isStatic() && !pm.isConstructor()) {
+	    sig.append(originalSelfVar);
+	    sig.append(".");
+	}
+	sig.append(pm.getName());
+	sig.append("(");
+	for(ProgramVariable pv : originalParamVars) {
+	    sig.append(pv.name()).append(", ");
+	}
+	if(!originalParamVars.isEmpty()) {
+	    sig.setLength(sig.length() - 2);
+	}
+	sig.append(")");
+	
+        final String pre  = LogicPrinter.quickPrintTerm(originalPre, services);
+        final String mby  = hasMby() 
+        		    ? LogicPrinter.quickPrintTerm(originalMby, services)
+        	            : null;        
+        final String mod  = LogicPrinter.quickPrintTerm(originalMod, services);
                       
         return "<html>"
-                + "<b>pre</b> "
-                + LogicPrinter.escapeHTML(pre)
-                + "<br><b>dep</b> "
-                + LogicPrinter.escapeHTML(dep)
+                + "<i>" + LogicPrinter.escapeHTML(sig.toString(), false) + "</i>"
+                + "<br><b>pre</b> "
+                + LogicPrinter.escapeHTML(pre, false)
+                + "<br><b>mod</b> "
+                + LogicPrinter.escapeHTML(mod, false)
                 + (hasMby() 
-                   ? "<br><b>measured-by</b> " + LogicPrinter.escapeHTML(mby)
+                   ? "<br><b>measured-by</b> " + LogicPrinter.escapeHTML(mby, 
+                	   						 false)
                    : "")                
+                + "<br><b>termination</b> "
                 + "</html>";
     }    
     
@@ -400,6 +424,14 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 	}	
 	OpReplacer or = new OpReplacer(map);
 	return or;
-    }    
+    }
+
+
+    @Override
+    public ProofOblInput getProofOblInput(InitConfig initConfig,
+	    Contract contract) {
+	return new InformationFlowContractPO(initConfig,
+	        (InformationFlowContract) contract);
+    }
 
 }

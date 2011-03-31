@@ -44,7 +44,7 @@ import de.uka.ilkd.key.speclang.InformationFlowContract;
  * The proof obligation for dependency contracts. 
  */
 public final class InformationFlowContractPO
-	extends AbstractOperationContractPO {
+	extends AbstOpContractPO {
     
     public InformationFlowContractPO(InitConfig initConfig,
 	    InformationFlowContract contract) {

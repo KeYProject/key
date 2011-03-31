@@ -21,6 +21,9 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.proof.init.DependencyContractPO;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
 
 /**
  * Standard implementation of the DependencyContract interface.
@@ -334,4 +337,13 @@ public final class DependencyContractImpl implements DependencyContract {
     public String toString() {
 	return originalDep.toString();
     }
+
+
+    @Override
+    public ProofOblInput getProofOblInput(InitConfig initConfig,
+	    Contract contract) {
+	return new DependencyContractPO(initConfig,
+	        (DependencyContract) contract);
+    }
+
 }

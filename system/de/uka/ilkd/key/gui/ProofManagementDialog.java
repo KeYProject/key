@@ -496,16 +496,8 @@ public final class ProofManagementDialog extends JDialog {
 		boolean allClosed = true;		
 		boolean lemmasLeft = false;
 		for(Contract contract : contracts) {
-		    final ProofOblInput po;
-		    if(contract instanceof FunctionalOperationContract) {
-			po = new FunctionalOperationContractPO(
-					initConfig, 
-					(FunctionalOperationContract)contract);
-		    } else {
-			po = new DependencyContractPO(
-					initConfig, 
-				        (DependencyContract)contract);
-		    }
+		    final ProofOblInput po
+		    	= contract.getProofOblInput(initConfig, contract);
 		    Proof proof = findPreferablyClosedProof(po);
 		    if(proof == null) {
 			allClosed = false;

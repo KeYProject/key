@@ -34,6 +34,9 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.speclang.jml.translation.ProgramVariableCollection;
 
 
@@ -840,5 +843,13 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 		+ originalMod
 		+ "; termination: "
 		+ getModality();
+    }
+
+
+    @Override
+    public ProofOblInput getProofOblInput(InitConfig initConfig,
+	    Contract contract) {
+	return new FunctionalOperationContractPO(initConfig,
+	        (FunctionalOperationContract) contract);
     }
 }
