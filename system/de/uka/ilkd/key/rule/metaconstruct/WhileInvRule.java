@@ -28,7 +28,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
-public class WhileInvRule extends AbstractMetaOperator {
+public class WhileInvRule extends AbstractTermTransformer {
 
     /** the outer label that is used to leave the while loop ('l1') */
     private final SchemaVariable outerLabel = 
@@ -69,7 +69,7 @@ public class WhileInvRule extends AbstractMetaOperator {
    
     /**
      * initialises this meta operator
-     * @param term the instantiated Term passed to the MetaOperator 
+     * @param term the instantiated Term passed to the TermTransformer 
      * @param services the Services providing access to signature and
      * type model
      */
@@ -98,7 +98,7 @@ public class WhileInvRule extends AbstractMetaOperator {
     
     
     /** calculates the resulting term. */
-    public Term calculate(Term term, SVInstantiations svInst, Services services) {
+    public Term transform(Term term, SVInstantiations svInst, Services services) {
         
         // global initialisation
         init(term, services);

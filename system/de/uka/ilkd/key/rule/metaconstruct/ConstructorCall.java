@@ -35,7 +35,7 @@ import de.uka.ilkd.key.util.Debug;
  * <code>&lt;init&gt;</code> that is mainly the constructor but in its
  * normalform.
  */
-public class ConstructorCall extends ProgramMetaConstruct {
+public class ConstructorCall extends ProgramTransformer {
 
     private static final String NORMALFORM_IDENTIFIER = 	    
 		de.uka.ilkd.key.java.recoderext.
@@ -75,7 +75,7 @@ public class ConstructorCall extends ProgramMetaConstruct {
      * unneccessary proof branches. As <code>newObject</code> can never be 
      * <code>null</code> no null pointer check is necessary.  
      */    
-    public ProgramElement symbolicExecution
+    public ProgramElement transform
 	(ProgramElement pe, Services services, SVInstantiations svInst) {
 
 	final New constructorReference = (New) pe;	

@@ -13,7 +13,6 @@ package de.uka.ilkd.key.logic.op;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -126,16 +125,14 @@ abstract class AbstractSV extends AbstractSortedOperator
         		                         inst.getExecutionContext(), 
         				         services);
         if(t != null) {
-            final Constraint c 
-            	= matchCond.getConstraint().unify(t, term, services);
-            if(!c.isSatisfiable()) {
-                Debug.out("FAILED. Adding instantiations leads to unsatisfiable"
-                          + " constraint.", 
-                          this, 
-                          term);
-                return null;
+            if(!t.equalsModRenaming(term)) {
+        	Debug.out("FAILED. Adding instantiations leads to unsatisfiable"
+        		+ " constraint.", 
+        		this, 
+        		term);
+        	return null;
             } else {
-                return matchCond.setConstraint(c);
+        	return matchCond;
             }
         }
 

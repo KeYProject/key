@@ -86,7 +86,7 @@ public class TestCollisionResolving extends TestCase {
 	     (term, 
 	      coll_varSV.find(),
 	      MatchConditions.EMPTY_MATCHCONDITIONS,
-	      null, Constraint.BOTTOM),
+	      null),
 	      services);
 
 	SchemaVariable b 
@@ -131,7 +131,7 @@ public class TestCollisionResolving extends TestCase {
 	FindTaclet coll_varSV = (FindTaclet) TacletForTests.getTaclet
 	    ("TestCollisionResolving_coll_context").taclet();
 
-	PosInOccurrence pos=new PosInOccurrence(new ConstrainedFormula(term),
+	PosInOccurrence pos=new PosInOccurrence(new SequentFormula(term),
 						PosInTerm.TOP_LEVEL.down(0),
 						true);
 
@@ -140,7 +140,7 @@ public class TestCollisionResolving extends TestCase {
 					      (term.sub(0), 
 					       coll_varSV.find(),
 					       MatchConditions.EMPTY_MATCHCONDITIONS,
-					       null, Constraint.BOTTOM),pos, services);
+					       null),pos, services);
 
 	SchemaVariable b 
 	    = (SchemaVariable) TacletForTests.getVariables().lookup(new Name("b"));
@@ -162,14 +162,14 @@ public class TestCollisionResolving extends TestCase {
 		
 	FindTaclet taclet = (FindTaclet) TacletForTests.getTaclet
 	    ("TestCollisionResolving_ns1").taclet();
-	PosInOccurrence pos=new PosInOccurrence(new ConstrainedFormula(term),
+	PosInOccurrence pos=new PosInOccurrence(new SequentFormula(term),
 						PosInTerm.TOP_LEVEL.down(0),
 						true);
 	TacletApp app 
 	    = PosTacletApp.createPosTacletApp(taclet, 
 					      taclet.match(term.sub(0), taclet.find(),
 							   MatchConditions.EMPTY_MATCHCONDITIONS,
-							   null, Constraint.BOTTOM),
+							   null),
 			                      pos,
 			                      services);
 	TacletApp app1=app.prepareUserInstantiation(services);
@@ -251,9 +251,9 @@ public class TestCollisionResolving extends TestCase {
 	    ("TestCollisionResolving_name_conflict").taclet();
 	Semisequent semiseq
 	    = Semisequent.EMPTY_SEMISEQUENT
-	    .insert(0, new ConstrainedFormula(TacletForTests.parseTerm
+	    .insert(0, new SequentFormula(TacletForTests.parseTerm
 					      ("\\forall s x; p(x)"))).semisequent()
-	    .insert(1, new ConstrainedFormula(TacletForTests.parseTerm
+	    .insert(1, new SequentFormula(TacletForTests.parseTerm
 					      ("\\exists s x; p(x)"))).semisequent();
 	Sequent seq=Sequent.createSuccSequent(semiseq);
 	PosInOccurrence pos=new PosInOccurrence(semiseq.get(0),
@@ -261,11 +261,9 @@ public class TestCollisionResolving extends TestCase {
 
 	NoPosTacletApp app0 = NoPosTacletApp.createNoPosTacletApp ( taclet );
 	app0 = app0.matchFind ( pos,
-				       semiseq.get(0).constraint(),
-				       services,
-				       Constraint.BOTTOM);
+				       services);
 	app0 = (NoPosTacletApp)app0.findIfFormulaInstantiations 
-	( seq, services, Constraint.BOTTOM ).head ();
+	( seq, services ).head ();
 	TacletApp app = app0.setPosInOccurrence ( pos, services );
 	/*
 	IList<SVInstantiations> sviList=taclet.matchIf
@@ -362,9 +360,9 @@ public class TestCollisionResolving extends TestCase {
 	    ("TestCollisionResolving_name_conflict_with_context").taclet();
 	Semisequent semiseq
 	    = Semisequent.EMPTY_SEMISEQUENT
-	    .insert(0, new ConstrainedFormula(TacletForTests.parseTerm("ex x:s"
+	    .insert(0, new SequentFormula(TacletForTests.parseTerm("ex x:s"
 								    +".p(x)")))
-	    .insert(1, new ConstrainedFormula(TacletForTests.parseTerm("all x:s"
+	    .insert(1, new SequentFormula(TacletForTests.parseTerm("all x:s"
 								    +".p(x)")));
 	Sequent seq=Sequent.createSuccSequent(semiseq);
 	PosInOccurrence pos=new PosInOccurrence(semiseq.get(1),
@@ -391,12 +389,12 @@ public class TestCollisionResolving extends TestCase {
 	FindTaclet taclet = (FindTaclet) TacletForTests.getTaclet
 	    ("TestCollisionResolving_name_conflict_with_context2").taclet();
 	Term term=TacletForTests.parseTerm("\\forall s x; p(x)");
-	PosInOccurrence pos=new PosInOccurrence(new ConstrainedFormula(term),
+	PosInOccurrence pos=new PosInOccurrence(new SequentFormula(term),
 						PosInTerm.TOP_LEVEL.down(0),
 						true);
 	MatchConditions mc=taclet.match(term.sub(0), taclet.find(),
 					MatchConditions.EMPTY_MATCHCONDITIONS,
-					null, Constraint.BOTTOM);
+					null);
 	TacletApp app 
 	    = PosTacletApp.createPosTacletApp(taclet, mc, pos, services);
 	TacletApp app1=app.prepareUserInstantiation(services);

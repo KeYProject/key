@@ -13,7 +13,6 @@ package de.uka.ilkd.key.rule;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 
@@ -25,25 +24,21 @@ public class BuiltInRuleApp implements RuleApp {
    
     private BuiltInRule builtInRule;
     private PosInOccurrence pio;
-    private Constraint userConstraint;
     private ImmutableList<PosInOccurrence> ifInsts 
     	= ImmutableSLList.nil();
 
    
     public BuiltInRuleApp(BuiltInRule builtInRule, 
-			  PosInOccurrence pio,
-			  Constraint userConstraint) {
+			  PosInOccurrence pio) {
 	this.builtInRule    = builtInRule;
 	this.pio            = pio;
-	this.userConstraint = userConstraint;        
     }
     
     
     public BuiltInRuleApp(BuiltInRule builtInRule, 
 			  PosInOccurrence pio,
-			  Constraint userConstraint,
 			  ImmutableList<PosInOccurrence> ifInsts) {
-	this(builtInRule, pio, userConstraint);
+	this(builtInRule, pio);
 	this.ifInsts = ifInsts;
     }
     
@@ -57,7 +52,7 @@ public class BuiltInRuleApp implements RuleApp {
     }
 
     /**
-     * returns the PositionInOccurrence (representing a ConstrainedFormula and
+     * returns the PositionInOccurrence (representing a SequentFormula and
      * a position in the corresponding formula) of this rule application
      */
     @Override
@@ -79,22 +74,6 @@ public class BuiltInRuleApp implements RuleApp {
 	    goal.removeAppliedRuleApp();
 	return result;
     }
-
-    /**
-     * returns the constraint under which a rule is applicable
-     */
-    @Override    
-    public Constraint constraint () {
-	return Constraint.BOTTOM;
-    }
-
-    /**
-     * returns the user constraint
-     */
-    public Constraint userConstraint () {
-	return userConstraint;
-    }
-    
     
     public void setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {
 	assert ifInsts != null;

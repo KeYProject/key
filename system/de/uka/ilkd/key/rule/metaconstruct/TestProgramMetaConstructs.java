@@ -50,7 +50,7 @@ public class TestProgramMetaConstructs extends TestCase {
 	    new DoBreak(labeledBlock);
 	
 	ProgramElement result = rmLabel.
-	    symbolicExecution
+	    transform
 	    (rmLabel.body(), new Services(),
 	     SVInstantiations.EMPTY_SVINSTANTIATIONS);
 	assertTrue(result instanceof Break);
@@ -86,8 +86,8 @@ public class TestProgramMetaConstructs extends TestCase {
  	    TacletForTests.parsePrg(" { int i; int j; i=j; }");
 	Expression expr=(Expression)((Assignment)block.getStatementAt(2))
 	    .getChildAt(1);
-	ProgramMetaConstruct typeof = new TypeOf(expr);
-	assertTrue(((TypeRef) typeof.symbolicExecution(expr, services,
+	ProgramTransformer typeof = new TypeOf(expr);
+	assertTrue(((TypeRef) typeof.transform(expr, services,
             SVInstantiations.EMPTY_SVINSTANTIATIONS)).getName().equals("int"));
     }
 
@@ -103,7 +103,7 @@ public class TestProgramMetaConstructs extends TestCase {
 
 	SVInstantiations inst = SVInstantiations.EMPTY_SVINSTANTIATIONS;
 	try {
-	    wlt.symbolicExecution( l, new Services (), inst );
+	    wlt.transform( l, new Services (), inst );
 	} catch ( java.util.NoSuchElementException e ) {
 	    assertTrue ( " Problem with empty while-blocks. See Bug #183 ", false); 
 	}

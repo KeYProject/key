@@ -18,11 +18,18 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.WeakHashMap;
 
-import javax.swing.*;
+import javax.swing.AbstractListModel;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JList;
+import javax.swing.JPopupMenu;
+import javax.swing.ListCellRenderer;
+import javax.swing.ListSelectionModel;
+import javax.swing.UIManager;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
@@ -34,7 +41,11 @@ import de.uka.ilkd.key.gui.prooftree.DisableGoal;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.ProgramPrinter;
-import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofEvent;
+import de.uka.ilkd.key.proof.ProofTreeEvent;
+import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.util.Debug;
 
 public class GoalList extends JList {
@@ -531,11 +542,7 @@ public class GoalList extends JList {
         private int delegateSize;
 
         private Proof proof = null;
-        /**
-         * Listen for modification of the user constraint
-         */
-        private final UCListener ucListener = new UCListener ();
-
+      
         /**
          * List of <code>Integer</code> objects that determine the (strictly
          * monotonic) mapping of the row indexes of this model to the rows of
@@ -567,14 +574,8 @@ public class GoalList extends JList {
          */
         protected void setProof (Proof p) {
             delegate.removeListDataListener ( delegateListener );
-
-            if ( proof != null ) {
-                proof.getUserConstraint ().removeConstraintTableListener ( ucListener );
-            }
+          
             proof = p;
-            if ( proof != null ) {
-                proof.getUserConstraint ().addConstraintTableListener ( ucListener );
-            }
 
             delegate.setProof ( p );
             setup ();
@@ -584,8 +585,7 @@ public class GoalList extends JList {
 
         private boolean isHiddenGoal (final Goal goal) {
             return
-                 proof != null
-                 && proof.getUserConstraint ().displayClosed ( goal.node () );
+                 proof != null && /* that afterwards should always be false as goals exist only for open nodes*/goal.node ().isClosed ();
         }
 
         private void setup () {
@@ -727,17 +727,6 @@ public class GoalList extends JList {
             }
         }
 
-        private class UCListener implements ConstraintTableListener {
-
-            /*
-             * (non-Javadoc)
-             * 
-             * @see de.uka.ilkd.key.proof.ConstraintTableListener#constraintChanged(de.uka.ilkd.key.proof.ConstraintTableEvent)
-             */
-            public void constraintChanged (ConstraintTableEvent e) {
-                setup ();
-            }
-        }
     }
     
     private final static int MAX_DISPLAYED_SEQUENT_LENGTH = 100;
@@ -787,9 +776,7 @@ public class GoalList extends JList {
 	    if (value instanceof Goal) {
 	        final Sequent seq = ((Goal)value).sequent();
 	        valueStr = seqToString (seq);
-
-		if ( ((Goal)value).getClosureConstraint ().isSatisfiable () )
-		    col = Color.blue;		
+		
 		statusIcon = ((Goal)value).isAutomatic() ? keyIcon : disabledGoalIcon;
 	    } else {
 		valueStr   = ""+value;

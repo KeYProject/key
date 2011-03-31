@@ -17,16 +17,22 @@ import java.util.List;
 
 import javax.swing.SwingUtilities;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.logic.Constraint;
-import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.pp.PosInSequent;
-import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofEvent;
+import de.uka.ilkd.key.proof.RuleAppIndex;
+import de.uka.ilkd.key.proof.TacletFilter;
+import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedRuleApplicationManager;
 import de.uka.ilkd.key.util.Debug;
@@ -245,15 +251,12 @@ public class InteractiveProver {
      * 
      * @param pos
      *            the PosInSequent where to look for applicable rules
-     * @param userConstraint
-     *            the user defined constraint
      */
-    public ImmutableList<BuiltInRule> getBuiltInRule(PosInOccurrence pos, 
-						 Constraint   userConstraint) {
+    public ImmutableList<BuiltInRule> getBuiltInRule(PosInOccurrence pos) {
 	ImmutableList<BuiltInRule> rules = ImmutableSLList.<BuiltInRule>nil();
 
         for (RuleApp ruleApp : getInteractiveRuleAppIndex().getBuiltInRules
-                (focusedGoal, pos, userConstraint)) {
+                (focusedGoal, pos)) {
             BuiltInRule r = (BuiltInRule) ruleApp.rule();
             if (!rules.contains(r)) {
                 rules = rules.prepend(r);
@@ -280,20 +283,15 @@ public class InteractiveProver {
      *            the BuiltInRule for which the applications are collected
      * @param pos
      *            the PosInSequent the position information
-     * @param userConstraint
-     *            the user defined constraint
      * @return a SetOf<RuleApp> with all possible rule applications
      */
     public ImmutableSet<RuleApp> getBuiltInRuleApp(BuiltInRule rule, 
-					  PosInOccurrence     pos,
-					  Constraint       userConstraint) {
+					  PosInOccurrence     pos) {
 	
 	ImmutableSet<RuleApp> result = DefaultImmutableSet.<RuleApp>nil();
 
         for (final RuleApp app : getInteractiveRuleAppIndex().
-                getBuiltInRules(focusedGoal,
-                        pos,
-                        userConstraint)) {
+                getBuiltInRules(focusedGoal, pos)) {
             if (app.rule() == rule) {
                 result = result.add(app);
             }
@@ -315,11 +313,9 @@ public class InteractiveProver {
     {
         ImmutableSet<RuleApp> result = DefaultImmutableSet.<RuleApp>nil();
         ImmutableList<BuiltInRule> match = ImmutableSLList.<BuiltInRule>nil();
-        
-        final Constraint userConstraint = mediator.getUserConstraint().getConstraint();
-        
+                
         //get all possible rules for current position in sequent
-        ImmutableList<BuiltInRule> list = getBuiltInRule(pos, userConstraint);
+        ImmutableList<BuiltInRule> list = getBuiltInRule(pos);
         
         Iterator<BuiltInRule> iter = list.iterator();
         
@@ -333,7 +329,7 @@ public class InteractiveProver {
         
         //find all applications for matched rules
         while (iter.hasNext()) {
-            result = result.union(getBuiltInRuleApp(iter.next(), pos, userConstraint));
+            result = result.union(getBuiltInRuleApp(iter.next(), pos));
         }
         
         return result;
@@ -348,8 +344,7 @@ public class InteractiveProver {
     ImmutableList<TacletApp> getNoFindTaclet() {
 	return filterTaclet(getInteractiveRuleAppIndex ().
 		       getNoFindTaclet(TacletFilter.TRUE,
-				       mediator.getServices(),
-				       mediator.getUserConstraint().getConstraint()));
+				       mediator.getServices()));
     }    
 
     /** collects all applicable FindTaclets of the current goal
@@ -363,8 +358,7 @@ public class InteractiveProver {
             return filterTaclet(getInteractiveRuleAppIndex ().
 			      getFindTaclet(TacletFilter.TRUE,
 	 	                            pos.getPosInOccurrence(),
-		                            mediator.getServices(),
-					    mediator.getUserConstraint().getConstraint()));
+		                            mediator.getServices()));
 	}
 	return ImmutableSLList.<TacletApp>nil();
     }
@@ -378,8 +372,7 @@ public class InteractiveProver {
 	    return filterTaclet(getInteractiveRuleAppIndex ().
 		   getRewriteTaclet(TacletFilter.TRUE,
 				    pos.getPosInOccurrence(),
-				    mediator.getServices(),
-				    mediator.getUserConstraint().getConstraint())); 
+				    mediator.getServices())); 
 	}
 
 	return ImmutableSLList.<TacletApp>nil();
@@ -418,18 +411,15 @@ public class InteractiveProver {
 	ImmutableSet<TacletApp> result = DefaultImmutableSet.<TacletApp>nil();
         ImmutableList<TacletApp> fittingApps = ImmutableSLList.<TacletApp>nil();
         final RuleAppIndex index          = goal.ruleAppIndex();
-	final Constraint   userConstraint =
-            mediator.getUserConstraint().getConstraint();
+
 	if ( pos == null ) {
         for (NoPosTacletApp noPosTacletApp : index.getNoFindTaclet(filter,
-                mediator.getServices(),
-                userConstraint))
+                mediator.getServices()))
             fittingApps = fittingApps.prepend(noPosTacletApp);
         } else 
             fittingApps = index.getTacletAppAt ( filter,
                                                  pos, 
-			                         mediator.getServices(),
-					         userConstraint );
+			                         mediator.getServices() );
 
         // filter fitting applications
         for (TacletApp app : fittingApps) {
@@ -495,21 +485,15 @@ public class InteractiveProver {
                 ImmutableList<TacletApp> ifCandidates =
                         app.findIfFormulaInstantiations(
                                 mediator().getSelectedGoal().sequent(),
-                                mediator().getServices(),
-                                mediator().getUserConstraint().getConstraint());
+                                mediator().getServices());
                 if (ifCandidates.size() == 0) continue; // skip this app
             }
 
-            // for the moment, just remove taclets which are
-            // inconsistent with user constraint 
-            // (introduction of new sorts not allowed)                     
-            if (mediator().getUserConstraint().getConstraint()
-                    .join(app.constraint(), null).isSatisfiable()) {
-                Taclet taclet = app.taclet();
-                if (!applicableRules.contains(taclet)) {
-                    applicableRules.add(taclet);
-                    result = result.prepend(app);
-                }
+
+            Taclet taclet = app.taclet();
+            if (!applicableRules.contains(taclet)) {
+        	applicableRules.add(taclet);
+        	result = result.prepend(app);
             }
         }
        	return result;

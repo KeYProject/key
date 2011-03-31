@@ -10,13 +10,9 @@
 
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.collection.DefaultImmutableSet;
-import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.logic.op.Metavariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.collection.*;
+import de.uka.ilkd.key.java.NameAbstractionTable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 
@@ -42,7 +38,6 @@ final class TermImpl implements Term {
     private int depth = -1;
     private ThreeValuedTruth rigid = ThreeValuedTruth.UNKNOWN; 
     private ImmutableSet<QuantifiableVariable> freeVars = null;
-    private ImmutableSet<Metavariable> metaVars = null;
     private int hashcode = -1;
     
     
@@ -70,26 +65,20 @@ final class TermImpl implements Term {
     //internal methods
     //------------------------------------------------------------------------- 
     
-    private void determineFreeVarsAndMetaVars() {
+    private void determineFreeVars() {
 	freeVars = DefaultImmutableSet.<QuantifiableVariable>nil();
-        metaVars = DefaultImmutableSet.<Metavariable>nil();
         
         if(op instanceof QuantifiableVariable) {
             freeVars = freeVars.add((QuantifiableVariable) op);
-        } else if(op instanceof Metavariable) {
-            metaVars = metaVars.add((Metavariable) op);
-        }
+        } 
         for(int i = 0, ar = arity(); i < ar; i++) {
 	    ImmutableSet<QuantifiableVariable> subFreeVars = sub(i).freeVars();
 	    for(int j = 0, sz = varsBoundHere(i).size(); j < sz; j++) {
 		subFreeVars = subFreeVars.remove(varsBoundHere(i).get(j));
 	    }
-	    freeVars = freeVars.union(subFreeVars);
-	    metaVars = metaVars.union(sub(i).metaVars());
+	    freeVars = freeVars.union(subFreeVars);	   
 	}
     }
-    
-    
     
     
     //-------------------------------------------------------------------------
@@ -205,20 +194,10 @@ final class TermImpl implements Term {
     @Override
     public ImmutableSet<QuantifiableVariable> freeVars() {
         if(freeVars == null) {
-            determineFreeVarsAndMetaVars();
+            determineFreeVars();
         }
         return freeVars;
     }
-    
-
-    @Override
-    public ImmutableSet<Metavariable> metaVars() {
-	if(metaVars == null) {
-	    determineFreeVarsAndMetaVars();
-	}
-	return metaVars;
-    }
-    
     
     @Override
     public void execPostOrder(Visitor visitor) {
@@ -250,12 +229,185 @@ final class TermImpl implements Term {
         if (!(o instanceof Term)) {
 	    return false;
 	}
-	final Constraint constraint = Constraint.BOTTOM.unify(this, 
-							      (Term) o, 
-							      null);
-
-	return constraint == Constraint.BOTTOM;	
+	return unifyHelp ( this, ((Term) o),
+           ImmutableSLList.<QuantifiableVariable>nil(), 
+           ImmutableSLList.<QuantifiableVariable>nil(),
+           null);
     }
+    
+    // 
+    // equals modulo renaming logic
+    
+    
+    /**
+     * compare two quantifiable variables if they are equal modulo renaming
+     * 
+     * @param ownVar
+     *            first QuantifiableVariable to be compared
+     * @param cmpVar
+     *            second QuantifiableVariable to be compared
+     * @param ownBoundVars
+     *            variables bound above the current position
+     * @param cmpBoundVars
+     *            variables bound above the current position
+     */
+    private static boolean compareBoundVariables(QuantifiableVariable ownVar,
+	    QuantifiableVariable cmpVar,
+	    ImmutableList<QuantifiableVariable> ownBoundVars,
+	    ImmutableList<QuantifiableVariable> cmpBoundVars) {
+
+	final int ownNum = indexOf(ownVar, ownBoundVars);
+	final int cmpNum = indexOf(cmpVar, cmpBoundVars);
+
+	if (ownNum == -1 && cmpNum == -1)
+	    // if both variables are not bound the variables have to be the
+	    // same object
+	    return ownVar == cmpVar;
+
+	// otherwise the variables have to be bound at the same point (and both
+	// be bound)
+	return ownNum == cmpNum;
+    }
+
+    /**
+     * @return the index of the first occurrence of <code>var</code> in
+     *         <code>list</code>, or <code>-1</code> if the variable is not an
+     *         element of the list
+     */
+    private static int indexOf(QuantifiableVariable var,
+	    ImmutableList<QuantifiableVariable> list) {
+	int res = 0;
+	while (!list.isEmpty()) {
+	    if (list.head() == var)
+		return res;
+	    ++res;
+	    list = list.tail();
+	}
+	return -1;
+    }
+
+    /**
+     * Compares two terms modulo bound renaming
+     * 
+     * @param t0
+     *            the first term
+     * @param t1
+     *            the second term
+     * @param ownBoundVars
+     *            variables bound above the current position
+     * @param cmpBoundVars
+     *            variables bound above the current position
+     * @return <code>true</code> is returned iff the terms are equal modulo
+     *         bound renaming
+     */
+    private boolean unifyHelp(Term t0, Term t1,
+	    ImmutableList<QuantifiableVariable> ownBoundVars,
+	    ImmutableList<QuantifiableVariable> cmpBoundVars,
+	    NameAbstractionTable nat) {
+
+	if (t0 == t1 && ownBoundVars.equals(cmpBoundVars))
+	    return true;
+
+	final Operator op0 = t0.op();
+
+	if (op0 instanceof QuantifiableVariable)
+	    return handleQuantifiableVariable(t0, t1, ownBoundVars,
+		    cmpBoundVars);
+
+	final Operator op1 = t1.op();
+
+	if (!(op0 instanceof ProgramVariable) && op0 != op1)
+	    return false;
+
+	if (t0.sort() != t1.sort() || t0.arity() != t1.arity())
+	    return false;
+
+	nat = handleJava(t0, t1, nat);
+	if (nat == FAILED)
+	    return false;
+
+	return descendRecursively(t0, t1, ownBoundVars, cmpBoundVars, nat);
+    }
+
+    private boolean handleQuantifiableVariable(Term t0, Term t1,
+	    ImmutableList<QuantifiableVariable> ownBoundVars,
+	    ImmutableList<QuantifiableVariable> cmpBoundVars) {
+	if (!((t1.op() instanceof QuantifiableVariable) && compareBoundVariables(
+	        (QuantifiableVariable) t0.op(), (QuantifiableVariable) t1.op(),
+	        ownBoundVars, cmpBoundVars)))
+	    return false;
+	return true;
+    }
+
+    /**
+     * used to encode that <tt>handleJava</tt> results in an unsatisfiable
+     * constraint (faster than using exceptions)
+     */
+    private static NameAbstractionTable FAILED = new NameAbstractionTable();
+
+    private static NameAbstractionTable handleJava(Term t0, Term t1,
+	    NameAbstractionTable nat) {
+
+	if (!t0.javaBlock().isEmpty() || !t1.javaBlock().isEmpty()) {
+	    nat = checkNat(nat);
+	    if (!t0.javaBlock().equalsModRenaming(t1.javaBlock(), nat)) {
+		return FAILED;
+	    }
+	}
+
+	if (!(t0.op() instanceof SchemaVariable)
+	        && t0.op() instanceof ProgramVariable) {
+	    if (!(t1.op() instanceof ProgramVariable)) {
+		return FAILED;
+	    }
+	    nat = checkNat(nat);
+	    if (!((ProgramVariable) t0.op()).equalsModRenaming(
+		    (ProgramVariable) t1.op(), nat)) {
+		return FAILED;
+	    }
+	}
+
+	return nat;
+    }
+
+    private boolean descendRecursively(Term t0, Term t1,
+	    ImmutableList<QuantifiableVariable> ownBoundVars,
+	    ImmutableList<QuantifiableVariable> cmpBoundVars,
+	    NameAbstractionTable nat) {
+
+	for (int i = 0; i < t0.arity(); i++) {
+	    ImmutableList<QuantifiableVariable> subOwnBoundVars = ownBoundVars;
+	    ImmutableList<QuantifiableVariable> subCmpBoundVars = cmpBoundVars;
+
+	    if (t0.varsBoundHere(i).size() != t1.varsBoundHere(i).size())
+		return false;
+	    for (int j = 0; j < t0.varsBoundHere(i).size(); j++) {
+		final QuantifiableVariable ownVar = t0.varsBoundHere(i).get(j);
+		final QuantifiableVariable cmpVar = t1.varsBoundHere(i).get(j);
+		if (ownVar.sort() != cmpVar.sort())
+		    return false;
+
+		subOwnBoundVars = subOwnBoundVars.prepend(ownVar);
+		subCmpBoundVars = subCmpBoundVars.prepend(cmpVar);
+	    }
+
+	    boolean newConstraint = unifyHelp(t0.sub(i), t1.sub(i),
+		    subOwnBoundVars, subCmpBoundVars, nat);
+
+	    if (!newConstraint)
+		return false;
+	}
+
+	return true;
+    }
+
+    private static NameAbstractionTable checkNat(NameAbstractionTable nat) {
+	if (nat == null)
+	    return new NameAbstractionTable();
+	return nat;
+    }
+    
+    // end of equals modulo renaming logic
     
 
     /**
@@ -340,4 +492,8 @@ final class TermImpl implements Term {
 	
         return sb.toString();
     }
+   
+
+
+ 
 }

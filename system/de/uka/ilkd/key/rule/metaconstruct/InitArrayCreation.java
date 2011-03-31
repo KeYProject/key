@@ -214,7 +214,7 @@ public class InitArrayCreation extends InitArray {
     }
     
 
-    public ProgramElement symbolicExecution(ProgramElement pe, 
+    public ProgramElement transform(ProgramElement pe, 
 					    Services services,
 					    SVInstantiations svInst) {
 

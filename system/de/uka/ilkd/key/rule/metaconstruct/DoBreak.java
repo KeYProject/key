@@ -26,10 +26,10 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  *  l1:l2:{...} 
  * </code>
  */
-public class DoBreak extends ProgramMetaConstruct {
+public class DoBreak extends ProgramTransformer {
     
 
-     /** creates a do-break ProgramMetaConstruct 
+     /** creates a do-break ProgramTransformer 
      * @param labeledBreak the LabeledStatement contained by 
      * the meta construct 
      */
@@ -72,7 +72,7 @@ public class DoBreak extends ProgramMetaConstruct {
      * about the java programs
      * @return the transformated program
      */
-    public ProgramElement symbolicExecution(ProgramElement pe,
+    public ProgramElement transform(ProgramElement pe,
 					    Services services,
 					    SVInstantiations insts) {	
 	// get label of break

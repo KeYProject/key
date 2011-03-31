@@ -13,13 +13,13 @@ package de.uka.ilkd.key.rule.metaconstruct.arith;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
+import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
 * Metaoperator for computing the result of dividing one monomial by another
 */
-public final class DivideLCRMonomials extends AbstractMetaOperator {
+public final class DivideLCRMonomials extends AbstractTermTransformer {
 
     public DivideLCRMonomials() {
         super ( new Name ( "#divideLCRMonomials" ), 2 );
@@ -27,7 +27,7 @@ public final class DivideLCRMonomials extends AbstractMetaOperator {
 
 
     /** calculates the resulting term. */
-    public Term calculate(Term term, SVInstantiations svInst, Services services) {
+    public Term transform(Term term, SVInstantiations svInst, Services services) {
         final Term arg1 = term.sub ( 0 );
         final Term arg2 = term.sub ( 1 );
 

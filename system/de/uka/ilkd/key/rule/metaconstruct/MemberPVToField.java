@@ -19,7 +19,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
 
-public final class MemberPVToField extends AbstractMetaOperator {  
+public final class MemberPVToField extends AbstractTermTransformer {  
 
     public MemberPVToField() {
         super(new Name("#memberPVToField"), 1);
@@ -27,7 +27,7 @@ public final class MemberPVToField extends AbstractMetaOperator {
     
 
     @Override
-    public Term calculate(Term term, 
+    public Term transform(Term term, 
 	    		  SVInstantiations svInst, 
 	    		  Services services ) {
         HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();	

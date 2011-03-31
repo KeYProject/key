@@ -21,17 +21,49 @@ import java.util.Vector;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.*;
+import de.uka.ilkd.key.gui.DefaultTaskFinishedInfo;
+import de.uka.ilkd.key.gui.IMain;
+import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.gui.ProofManagementDialog;
+import de.uka.ilkd.key.gui.ProverTaskListener;
+import de.uka.ilkd.key.gui.SwingWorker;
+import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.ProgramSV;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SkolemTermSV;
+import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
-import de.uka.ilkd.key.proof.init.*;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.proof.init.DependencyContractPO;
+import de.uka.ilkd.key.proof.init.EnvInput;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.KeYFile;
+import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
+import de.uka.ilkd.key.proof.init.OperationContractPO;
+import de.uka.ilkd.key.proof.init.ProblemInitializer;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.rule.BuiltInRuleApp;
+import de.uka.ilkd.key.rule.ContractRuleApp;
+import de.uka.ilkd.key.rule.IfFormulaInstDirect;
+import de.uka.ilkd.key.rule.IfFormulaInstSeq;
+import de.uka.ilkd.key.rule.IfFormulaInstantiation;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.DependencyContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
@@ -64,17 +96,6 @@ public final class ProblemLoader implements Runnable {
     private ImmutableList<PosInOccurrence> builtinIfInsts;
     private int currIfInstFormula;
     private PosInTerm currIfInstPosInTerm;
-    @Deprecated
-    private Constraint matchConstraint = null;
-
-
-    /* Proofs with meta variables have a special issue.
-       When loading, rules are applied in an order different to the original
-       one, sometimes yielding shorter proofs. The goal we are looking
-       at might already have been closed. Then we need to ignore the
-       rest of the current branch in the proof script.
-    */
-    private int ignoreBranchRest;
 
 
     ProblemInitializer init;
@@ -306,7 +327,6 @@ public final class ProblemLoader implements Runnable {
         
         //start no new commands until the ignored branch closes
         //count sub-branches though
-        if ((ignoreBranchRest > 0)&&(id!='b')) return; 
         switch (id) {
         case 'b' :
             stack.push(children);
@@ -316,12 +336,6 @@ public final class ProblemLoader implements Runnable {
             if (currNode == null) currNode = children.next();
             // otherwise we already fetched the node at branch point
             currGoal      = proof.getGoal(currNode);
-            // the goal may already have been closed due to the metavariable
-            // issue described in the declaration of ignoreBranchRest
-            if (currGoal==null) {
-                ignoreBranchRest = stack.size();
-                break;
-            }
             mediator.getSelectionModel().setSelectedGoal(currGoal);
             currTacletName= s;
             // set default state
@@ -329,7 +343,6 @@ public final class ProblemLoader implements Runnable {
             currPosInTerm = PosInTerm.TOP_LEVEL;
             loadedInsts   = null;
             ifFormulaList = ImmutableSLList.<IfFormulaInstantiation>nil();
-            matchConstraint = Constraint.BOTTOM;
             break;
 
         case 'f' : //formula
@@ -366,7 +379,7 @@ public final class ProblemLoader implements Runnable {
         case 'd' : // ifdirectformula      
             ifFormulaList = ifFormulaList.append(
                 new IfFormulaInstDirect(
-                    new ConstrainedFormula(parseTerm(s, proof))));
+                    new SequentFormula(parseTerm(s, proof))));
             break;
         case 'u' : //UserLog
             if(proof.userLog==null)
@@ -405,26 +418,6 @@ public final class ProblemLoader implements Runnable {
             }
             currIfInstFormula = 0;
             currIfInstPosInTerm = PosInTerm.TOP_LEVEL;
-            break;            
-        case 'o' : //userconstraint
-            assert false : "metavariables are disabled";
-            break;
-        case 'm' : //matchconstraint
-            final int index = s.indexOf('=');
-
-            if (index < 0) {
-                break;
-            }
-
-            final Term left = parseTerm(s.substring(0, index), proof);
-            final Term right = parseTerm(s.substring(index + 1), proof);
-
-            if (!(left.sort().extendsTrans(right.sort()) || right.sort()
-                    .extendsTrans(left.sort()))) {
-                break;
-            }
-
-            matchConstraint = matchConstraint.unify(left, right, null);
             break;
         case 'w' : //newnames
             final String[] newNames = s.split(",");
@@ -448,12 +441,9 @@ public final class ProblemLoader implements Runnable {
     public void endExpr(char id, int linenr) {
         //System.out.println("end "+id);
         //read no new commands until ignored branch closes
-        if ((ignoreBranchRest > 0)&&(id!='b')) return; 
         switch (id) {
         case 'b' :
-            children = (Iterator<Node>) stack.pop();
-            // reached end of ignored branch?
-            if (stack.size() < ignoreBranchRest) ignoreBranchRest = 0;
+            children = (Iterator<Node>) stack.pop();           
             break;
         case 'a' :
             if (currNode != null) {
@@ -520,11 +510,8 @@ public final class ProblemLoader implements Runnable {
             }
         }
 
-        final Constraint userConstraint 
-        	= mediator.getUserConstraint().getConstraint();
-        
         if (currContract != null) {
-            ourApp = new ContractRuleApp(pos, userConstraint, currContract);
+            ourApp = new ContractRuleApp(pos, currContract);
             currContract = null;
             if(builtinIfInsts != null) {
         	ourApp.setIfInsts(builtinIfInsts);
@@ -569,17 +556,6 @@ public final class ProblemLoader implements Runnable {
         Services services = mediator.getServices();
         
 
-        if (matchConstraint != Constraint.BOTTOM) {
-            ourApp = ourApp.setMatchConditions(new MatchConditions(
-        	    ourApp.instantiations(), 
-        	    matchConstraint, 
-        	    ourApp.newMetavariables(), 
-        	    RenameTable.EMPTY_TABLE),
-        	    services);
-        }
-
-        Constraint userC = mediator.getUserConstraint().getConstraint();
-
         if (currFormula != 0) { // otherwise we have no pos
             pos = PosInOccurrence.findInSequent(currGoal.sequent(),
                                                 currFormula,
@@ -587,14 +563,7 @@ public final class ProblemLoader implements Runnable {
 //System.err.print("Want to apply "+currTacletName+" at "+currGoal);
              //this is copied from TermTacletAppIndex :-/
 
-            Constraint c = pos.constrainedFormula().constraint();
-            if ( pos.termBelowMetavariable() != null ) {
-                c = c.unify(
-                   pos.constrainedFormula().formula().subAt(pos.posInTerm()),
-                   pos.termBelowMetavariable(), mediator.getServices());
-                if (!c.isSatisfiable()) return null;
-            }
-            ourApp = ((NoPosTacletApp)ourApp).matchFind(pos, c, services, userC);
+            ourApp = ((NoPosTacletApp)ourApp).matchFind(pos, services);
             ourApp = ourApp.setPosInOccurrence(pos, services);
         }
 
@@ -602,9 +571,9 @@ public final class ProblemLoader implements Runnable {
         ourApp = constructInsts(ourApp, services);
 
         ourApp = ourApp.setIfFormulaInstantiations(ifFormulaList,
-                                                   services, userC);
+                                                   services);
 
-        if (!ourApp.sufficientlyComplete(services)) {
+        if (!ourApp.complete()) {
             ourApp = ourApp.tryToInstantiate(proof.getServices());
         }
 

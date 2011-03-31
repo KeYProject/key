@@ -33,7 +33,7 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.metaconstruct.ProgramMetaConstruct;
+import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -865,7 +865,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printProgramMetaConstruct(ProgramMetaConstruct x)
+    public void printProgramMetaConstruct(ProgramTransformer x)
 	throws java.io.IOException {
         printHeader(x);
         write(x.name().toString());

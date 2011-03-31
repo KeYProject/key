@@ -11,8 +11,6 @@
 
 package de.uka.ilkd.key.java.recoderext;
 
-import java.io.IOException;
-
 import recoder.java.*;
 import recoder.java.reference.*;
 import recoder.java.statement.JavaStatement;

@@ -81,7 +81,7 @@ public class TestTacletBuild extends TestCase {
 	Term t1=TermBuilder.DF.all((QuantifiableVariable)u, A);
 	Sequent seq = Sequent.createSuccSequent
 	    (Semisequent.EMPTY_SEMISEQUENT.insert
-	     (0, new ConstrainedFormula(t1)).semisequent());
+	     (0, new SequentFormula(t1)).semisequent());
 	Term t2=TermBuilder.DF.ex((QuantifiableVariable)u, A);
 	SuccTacletBuilder sb=new SuccTacletBuilder();
 	sb.setIfSequent(seq);
@@ -107,8 +107,8 @@ public class TestTacletBuild extends TestCase {
 	Term t2=TermBuilder.DF.ex((QuantifiableVariable)u, A);
 	Sequent seq = Sequent.createSuccSequent
 	    (Semisequent.EMPTY_SEMISEQUENT
-	     .insert(0, new ConstrainedFormula(t1)).semisequent()
-	     .insert(1, new ConstrainedFormula(t2)).semisequent());
+	     .insert(0, new SequentFormula(t1)).semisequent()
+	     .insert(1, new SequentFormula(t2)).semisequent());
 	SuccTacletBuilder sb=new SuccTacletBuilder();
 	sb.setIfSequent(seq);
 	sb.setFind(A);

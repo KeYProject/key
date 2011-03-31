@@ -81,15 +81,7 @@ public final class ProgramVariableCollector extends JavaASTVisitor {
         if(inv != null) {
             inv.execPostOrder(tpvc);
         }
-        
-        //predicates
-        ImmutableSet<Term> preds = x.getPredicates(selfTerm, 
-        					   heapAtPre, 
-        					   services);
-        for(Term pred : preds) {
-            pred.execPostOrder(tpvc);
-        }
-        
+                
         //modifies
         Term mod = x.getModifies(selfTerm, heapAtPre, services);
         if(mod != null) {

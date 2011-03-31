@@ -20,7 +20,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
-public final class AddCast extends AbstractMetaOperator {
+public final class AddCast extends AbstractTermTransformer {
     
     private static final TermBuilder TB = TermBuilder.DF;
     
@@ -31,7 +31,7 @@ public final class AddCast extends AbstractMetaOperator {
     
 
     @Override
-    public Term calculate(Term term, 
+    public Term transform(Term term, 
 	    		  SVInstantiations svInst, 
 	    		  Services services ) {
 	Term sub = term.sub(0);

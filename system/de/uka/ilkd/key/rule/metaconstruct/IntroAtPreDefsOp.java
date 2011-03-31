@@ -23,7 +23,7 @@ import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
+import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.LoopInvariant;
@@ -32,7 +32,7 @@ import de.uka.ilkd.key.util.Pair;
 
 
 
-public final class IntroAtPreDefsOp extends AbstractMetaOperator {
+public final class IntroAtPreDefsOp extends AbstractTermTransformer {
           
     public IntroAtPreDefsOp() {
         super(new Name("#introAtPreDefs"), 1);
@@ -40,7 +40,7 @@ public final class IntroAtPreDefsOp extends AbstractMetaOperator {
 
     
     @Override
-    public Term calculate(Term term, 
+    public Term transform(Term term, 
 	    		  SVInstantiations svInst, 
 	    		  Services services) {
         final Term target = term.sub(0);
@@ -102,24 +102,18 @@ public final class IntroAtPreDefsOp extends AbstractMetaOperator {
                 }
                 final Term newInvariant 
                     = inv.getInvariant(selfTerm, heapAtPre, services);
-                final ImmutableSet<Term> newPredicates
-                    = inv.getPredicates(selfTerm, heapAtPre, services);
                 final Term newModifies
                     = inv.getModifies(selfTerm, heapAtPre, services);
                 final Term newVariant
                     = inv.getVariant(selfTerm, heapAtPre, services);
-                boolean newPredicateHeuristicsAllowed
-                    = inv.getPredicateHeuristicsAllowed();
                 
                 final LoopInvariant newInv 
                     = new LoopInvariantImpl(loop, 
                                             newInvariant, 
-                                            newPredicates,
                                             newModifies, 
                                             newVariant, 
                                             selfTerm,
-                                            heapAtPre,
-                                            newPredicateHeuristicsAllowed);
+                                            heapAtPre);
                 services.getSpecificationRepository().setLoopInvariant(newInv);                
             }
         }

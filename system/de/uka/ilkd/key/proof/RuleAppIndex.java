@@ -18,7 +18,6 @@ import java.util.List;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
@@ -163,28 +162,23 @@ public class RuleAppIndex  {
      * @param pos the PosInOccurrence to focus
      * @param services the Services object encapsulating information
      * about the java datastructures like (static)types etc.
-     * @param userConstraint the Constraint with user defined instantiations
-     * of meta variables
      */
     public ImmutableList<TacletApp> getTacletAppAt(TacletFilter    filter,
 					  PosInOccurrence pos,
-					  Services        services,
-					  Constraint      userConstraint) { 
+					  Services        services) { 
 	ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
 	if ( !autoMode ) {
 	    result = result.prepend 
 		( interactiveTacletAppIndex.getTacletAppAt
 		  (pos,
 		   filter,
-		   services,
-		   userConstraint) ); 
+		   services) ); 
 	}
 	result = result.prepend 
 	    ( automatedTacletAppIndex.getTacletAppAt
 	      (pos,
 	       filter,
-	       services,
-	       userConstraint) ); 
+	       services) ); 
 	return result;
     }
     
@@ -197,29 +191,24 @@ public class RuleAppIndex  {
      * @param pos the position where to start from
      * @param services the Services object encapsulating information
      * about the java datastructures like (static)types etc.
-     * @param userConstraint the Constraint with user defined instantiations
-     * of meta variables
      * @return the possible rule applications 
      */
     public ImmutableList<TacletApp> getTacletAppAtAndBelow(TacletFilter    filter,
 						  PosInOccurrence pos,
-						  Services        services,
-						  Constraint      userConstraint) {
+						  Services        services) {
 	ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
 	if ( !autoMode ) {
 	    result = result.prepend 
 		( interactiveTacletAppIndex.getTacletAppAtAndBelow
 		  (pos,
 		   filter,
-		   services,
-		   userConstraint) ); 
+		   services) ); 
 	}
 	result = result.prepend 
 	    ( automatedTacletAppIndex.getTacletAppAtAndBelow
 	      (pos,
 	       filter,
-	       services,
-	       userConstraint) ); 
+	       services) ); 
 	return result;
     }
 
@@ -231,29 +220,24 @@ public class RuleAppIndex  {
      * @param pos the PosInOccurrence to focus
      * @param services the Services object encapsulating information
      * about the java datastructures like (static)types etc.
-     * @param userConstraint the Constraint with user defined instantiations
-     * of meta variables
      * @return list of all possible instantiations
      */
     public ImmutableList<NoPosTacletApp> getFindTaclet(TacletFilter    filter,
 					      PosInOccurrence pos,
-					      Services        services,
-					      Constraint      userConstraint) { 
+					      Services        services) { 
 	ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
 	if ( !autoMode ) {
 	    result = result.prepend 
 		( interactiveTacletAppIndex.getFindTaclet
 		  (pos,
 		   filter,
-		   services,
-		   userConstraint) ); 
+		   services) ); 
 	}
 	result = result.prepend 
 	    ( automatedTacletAppIndex.getFindTaclet
 	      (pos,
 	       filter,
-	       services,
-	       userConstraint) ); 
+	       services) ); 
 	return result;
     }
 
@@ -263,26 +247,21 @@ public class RuleAppIndex  {
      * @param filter the TacletFiler filtering the taclets of interest
      * @param services the Services object encapsulating information
      * about the java datastructures like (static)types etc.
-     * @param userConstraint the Constraint with user defined instantiations
-     * of meta variables
      * @return list of all possible instantiations
      */
     public ImmutableList<NoPosTacletApp> getNoFindTaclet(TacletFilter    filter,
-						Services        services,
-						Constraint      userConstraint) { 
+						Services        services) { 
 	ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
 	if ( !autoMode ) {
 	    result = result.prepend 
 		( interactiveTacletAppIndex.getNoFindTaclet
 		  (filter,
-		   services,
-		   userConstraint) ); 
+		   services) ); 
 	}
 	result = result.prepend 
 	    ( automatedTacletAppIndex.getNoFindTaclet
 	      (filter,
-	       services,
-	       userConstraint) ); 
+	       services) ); 
 	return result;
     }
 
@@ -295,29 +274,24 @@ public class RuleAppIndex  {
      * @param pos the PosInOccurrence to focus
      * @param services the Services object encapsulating information
      * about the java datastructures like (static)types etc.
-     * @param userConstraint the Constraint with user defined instantiations
-     * of meta variables
      * @return list of all possible instantiations
      */
     public ImmutableList<NoPosTacletApp> getRewriteTaclet (TacletFilter    filter,
 						  PosInOccurrence pos,
-						  Services        services,
-						  Constraint      userConstraint) { 
+						  Services        services) { 
 	ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
 	if ( !autoMode ) {
 	    result = result.prepend 
 		( interactiveTacletAppIndex.getRewriteTaclet
 		  (pos,
 		   filter,
-		   services,
-		   userConstraint) ); 
+		   services) ); 
 	}
 	result = result.prepend 
 	    ( automatedTacletAppIndex.getRewriteTaclet
 	      (pos,
 	       filter,
-	       services,
-	       userConstraint) ); 
+	       services) ); 
 	return result;
     }
 
@@ -327,10 +301,9 @@ public class RuleAppIndex  {
      * for the given goal, user defined constraint and position
      */
     public ImmutableList<RuleApp> getBuiltInRules(Goal g,
-	    PosInOccurrence pos, Constraint userConstraint) {
+	    PosInOccurrence pos) {
 	 	 	
-	 return builtInRuleAppIndex().getBuiltInRule(g, pos, 
-					 	     userConstraint);
+	 return builtInRuleAppIndex().getBuiltInRule(g, pos);
      }
 
     /**
@@ -410,25 +383,19 @@ public class RuleAppIndex  {
      * 
      * @param l the NewRuleListener 
      * @param services the Services
-     * @param userConstraint the Constraint capturing user defined instantiations
-     * of meta variables
      */
     public void reportAutomatedRuleApps (NewRuleListener l,
-                                         Services services,
-                                         Constraint userConstraint) {
-        automatedTacletAppIndex.reportRuleApps ( l, services, userConstraint );
-        builtInRuleAppIndex().reportRuleApps ( l, goal, userConstraint );
+                                         Services services) {
+        automatedTacletAppIndex.reportRuleApps ( l, services );
+        builtInRuleAppIndex().reportRuleApps ( l, goal );
     }
     
     /**
      * Report builtin rules to all registered NewRuleListener instances.
      * @param p_goal the Goal which to scan
-     * @param p_userConstraint the Constraint capturing user defined instantiations
-     * of meta variables 
      */
-    public void scanBuiltInRules (Goal p_goal,
-                                  Constraint p_userConstraint) {
-        builtInRuleAppIndex().scanApplicableRules(p_goal, p_userConstraint);
+    public void scanBuiltInRules (Goal p_goal) {
+        builtInRuleAppIndex().scanApplicableRules(p_goal);
     }
 
     /** 

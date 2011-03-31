@@ -13,12 +13,11 @@ package de.uka.ilkd.key.strategy;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.ImmutableHeap;
+import de.uka.ilkd.key.collection.ImmutableLeftistHeap;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.collection.ImmutableLeftistHeap;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.BooleanContainer;
-import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -90,8 +89,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
         // necessarily this object
         getGoal ().ruleAppIndex ()
                   .reportAutomatedRuleApps ( getGoal ().getRuleAppManager (),
-                                             getServices (),
-                                             getUserConstraint () );
+                                             getServices () );
         //        printQueue(queue);
     }
 
@@ -306,11 +304,6 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
 	return getProof ().getServices ();
     }
 
-    @Deprecated
-    private Constraint getUserConstraint() {
-        return getProof ().getUserConstraint ().getConstraint ();
-    }
-
     private Proof getProof() {
 	return getGoal ().proof ();
     }
@@ -360,7 +353,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
             if ( !tacletApp.ifInstsComplete() ) {
                 message = message + " (unmatched if-formulas)";
             }
-            if ( !tacletApp.instsSufficientlyComplete (goal.proof().getServices()) ) {
+            if ( !tacletApp.complete () ) {
                 message = message + " (incomplete)";
             }
         }

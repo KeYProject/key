@@ -19,7 +19,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
+import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.LRUCache;
@@ -250,7 +250,7 @@ public class Monomial {
                 analyse ( monomial.sub ( 1 ) );
             } else if ( monomial.op () == numbers ) {
                 final BigInteger c =
-                    new BigInteger ( AbstractMetaOperator
+                    new BigInteger ( AbstractTermTransformer
                                      .convertToDecimalString ( monomial, services ) );
                 coeff = coeff.multiply ( c );
             } else {

@@ -313,15 +313,11 @@ public final class TacletIndex  {
     private ImmutableList<NoPosTacletApp> getFindTaclet(ImmutableList<NoPosTacletApp> taclets,
 					       RuleFilter           filter,
 					       PosInOccurrence      pos,
-					       Constraint           termConstraint,
-					       Services             services,
-					       Constraint           userConstraint) { 
+					       Services             services) { 
 	return matchTaclets ( taclets,
 			      filter,
 			      pos,
-			      termConstraint,
-			      services,
-			      userConstraint );
+			      services );
     }
 
     /**
@@ -331,9 +327,7 @@ public final class TacletIndex  {
     private ImmutableList<NoPosTacletApp> matchTaclets(ImmutableList<NoPosTacletApp> tacletApps,
 					      RuleFilter           p_filter,
 					      PosInOccurrence      pos,
-					      Constraint           termConstraint,
-					      Services             services,
-					      Constraint           userConstraint) { 
+					      Services             services) { 
 	
         ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
 	if (tacletApps == null) {
@@ -346,7 +340,7 @@ public final class TacletIndex  {
 	    }
 	    
 	    final NoPosTacletApp newTacletApp =
-	        tacletApp.matchFind(pos, termConstraint, services, userConstraint);
+	        tacletApp.matchFind(pos, services);
 
 	    if (newTacletApp != null) {
 		result = result.prepend(newTacletApp);
@@ -391,7 +385,7 @@ public final class TacletIndex  {
 	    	boolean ignoreUpdates) {
 	ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
 		
-	assert !(term.op() instanceof Metavariable) : "metavariables are disabled";
+	assert !(term.op() instanceof de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable) : "metavariables are disabled";
 
 	if (!term.javaBlock().isEmpty()) {
 	    prefixOccurrences.reset();
@@ -471,91 +465,76 @@ public final class TacletIndex  {
     }
 
    /** get all Taclets for the antecedent.
-    * @param filter Only return taclets the filter selects
-    * @param pos the PosOfOccurrence describing the formula for which to look 
-    * for top level taclets    
-    * @param services the Services object encapsulating information
-    * about the java datastructures like (static)types etc.
+ * @param pos the PosOfOccurrence describing the formula for which to look 
+* for top level taclets    
+ * @param filter Only return taclets the filter selects
+ * @param services the Services object encapsulating information
+* about the java datastructures like (static)types etc.
     * @return IList<NoPosTacletApp> containing all applicable rules
     * and the corresponding instantiations to get the rule fit.
     */
     public ImmutableList<NoPosTacletApp> getAntecedentTaclet(PosInOccurrence pos,						    
 						    RuleFilter filter,
-						    Services   services,
-						    Constraint userConstraint) {                        
+						    Services   services) {                        
         return getTopLevelTaclets(antecList,
 				  filter,
 				  pos,
-				  services,
-				  userConstraint);
+				  services);
     }
 
   /** get all Taclets for the succedent.
-    * @param filter Only return taclets the filter selects
-    * @param pos the PosOfOccurrence describing the formula for which to look 
-    * for top level taclets 
-    * @param services the Services object encapsulating information
-    * about the java datastructures like (static)types etc.
+ * @param pos the PosOfOccurrence describing the formula for which to look 
+* for top level taclets 
+ * @param filter Only return taclets the filter selects
+ * @param services the Services object encapsulating information
+* about the java datastructures like (static)types etc.
     * @return IList<NoPosTacletApp> containing all applicable rules
     * and the corresponding instantiations to get the rule fit.
     */
     public ImmutableList<NoPosTacletApp> getSuccedentTaclet(PosInOccurrence pos,						  
 						   RuleFilter filter,
-						   Services   services,
-						   Constraint userConstraint) {       
+						   Services   services) {       
            
         return getTopLevelTaclets(succList,
 				  filter,
 				  pos,				  
-				  services,
-				  userConstraint);
+				  services);
     }
 
     private ImmutableList<NoPosTacletApp>
 	getTopLevelTaclets(HashMap<Object, ImmutableList<NoPosTacletApp>> findTaclets,
 			   RuleFilter filter,
 			   PosInOccurrence pos,			   
-			   Services services,
-			   Constraint userConstraint) {
+			   Services services) {
       
         assert pos.isTopLevel();
-        
-        final Constraint termConstraint = 
-            pos.constrainedFormula().constraint();
+              
         return
 	    getFindTaclet(getList(rwList, pos.subTerm(), true), 
 			  filter,
 			  pos,
-			  termConstraint,
-			  services,
-			  userConstraint)
+			  services)
             .prepend(getFindTaclet(getList(findTaclets, pos.subTerm(), true),
         			   filter,
         			   pos,
-        			   termConstraint,
-        			   services,
-        			   userConstraint));
+        			   services));
     }
 
 
   /** get all Rewrite-Taclets.
-    * @param filter Only return taclets the filter selects
-    * @param services the Services object encapsulating information
-    * about the java datastructures like (static)types etc.
+ * @param filter Only return taclets the filter selects
+ * @param services the Services object encapsulating information
+* about the java datastructures like (static)types etc.
     * @return IList<NoPosTacletApp> containing all applicable rules
     * and the corresponding instantiations to get the rule fit.
     */
     public ImmutableList<NoPosTacletApp> getRewriteTaclet(PosInOccurrence pos,
-						 Constraint      termConstraint,
 						 RuleFilter      filter,
-						 Services        services,
-						 Constraint      userConstraint) { 
+						 Services        services) { 
 	ImmutableList<NoPosTacletApp> result = matchTaclets(getList(rwList, pos.subTerm(), false),
 			    filter,
 			    pos,
-			    termConstraint,
-			    services,
-			    userConstraint);
+			    services);
 	return result;
     }
 
@@ -569,14 +548,11 @@ public final class TacletIndex  {
      * instantiations are necessary.
      */
     public ImmutableList<NoPosTacletApp> getNoFindTaclet(RuleFilter filter,
-	                                        Services   services,
-						Constraint userConstraint) {   
+	                                        Services   services) {   
 	return matchTaclets ( noFindList,
 			      filter,
 			      null,
-			      Constraint.BOTTOM,
-			      services,
-			      userConstraint );
+			      services );
     }
 
 

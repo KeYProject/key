@@ -48,9 +48,9 @@ public class TestVariableNamer extends TestCase {
     private final ProgramVariable x_2   = constructProgramVariable("x_2");
     private final ProgramVariable var_1 = constructProgramVariable("var_1");
     private final ProgramVariable var_2 = constructProgramVariable("var_2");
-    private final ConstrainedFormula formulaWithX    = constructFormula(x);
-    private final ConstrainedFormula formulaWithX_1  = constructFormula(x_1);
-    private final ConstrainedFormula formulaWithVar_1= constructFormula(var_1);
+    private final SequentFormula formulaWithX    = constructFormula(x);
+    private final SequentFormula formulaWithX_1  = constructFormula(x_1);
+    private final SequentFormula formulaWithVar_1= constructFormula(var_1);
     private final SchemaVariable variableSV =
     	  SchemaVariableFactory.createProgramSV(new ProgramElementName("sv"),
 						ProgramSVSort.VARIABLE,
@@ -74,23 +74,23 @@ public class TestVariableNamer extends TestCase {
     	return constructProgramVariable(pen);
     }
 
-    private ConstrainedFormula constructFormula(ProgramVariable containedVar) {
+    private SequentFormula constructFormula(ProgramVariable containedVar) {
     	Statement statement = new PostIncrement(containedVar);
     	StatementBlock statementBlock = new StatementBlock(statement);
     	JavaBlock javaBlock = JavaBlock.createJavaBlock(statementBlock);
 
 	Term term = TB.dia(javaBlock, TB.tt());
 
-	return new ConstrainedFormula(term);
+	return new SequentFormula(term);
     }
 
     
-    private PosInOccurrence constructPIO(ConstrainedFormula formula) {
+    private PosInOccurrence constructPIO(SequentFormula formula) {
     	return new PosInOccurrence(formula, PosInTerm.TOP_LEVEL, true);
     }
 
 
-    private Goal constructGoal(ConstrainedFormula containedFormula) {
+    private Goal constructGoal(SequentFormula containedFormula) {
     	Semisequent empty = Semisequent.EMPTY_SEMISEQUENT;
     	Semisequent ante = empty.insert(0, containedFormula).semisequent();
 	Semisequent succ = empty;
@@ -170,7 +170,7 @@ public class TestVariableNamer extends TestCase {
 	assertFalse(name.getProgramName().equals("x"));
 
 	ProgramVariable v = constructProgramVariable(name);
-	ConstrainedFormula formula = constructFormula(v);
+	SequentFormula formula = constructFormula(v);
 	Goal goal = constructGoal(formula);
 	PosInOccurrence pio = constructPIO(formula);
 	v = vn.rename(v, goal, pio);

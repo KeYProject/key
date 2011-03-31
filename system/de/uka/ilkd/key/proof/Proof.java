@@ -62,9 +62,6 @@ public class Proof implements Named {
     /** list with the open goals of the proof */ 
     private ImmutableList<Goal> openGoals = ImmutableSLList.<Goal>nil();
 
-    /** during closure this can be set by "subTreeCompletelyClosed" */
-    private Node closedSubtree = null;
-    
     /** declarations &c, read from a problem file or otherwise */
     private String problemHeader = "";
 
@@ -73,14 +70,6 @@ public class Proof implements Named {
 
     /** maps the Abbreviations valid for this proof to their corresponding terms.*/
     private AbbrevMap abbreviations = new AbbrevMap();
-
-    /** User constraint */
-    @Deprecated
-    private ConstraintTableModel userConstraint = new ConstraintTableModel ();    
-
-    /** Deliverer for new metavariables */
-    @Deprecated
-    private MetavariableDeliverer metavariableDeliverer;
 
     /** the environment of the proof with specs and java model*/
     private ProofEnvironment proofEnv;
@@ -115,9 +104,6 @@ public class Proof implements Named {
         assert services != null : "Tried to create proof without valid services.";
 	this.services = services.copyProofSpecific(this);
         this.settings = settings;
-        
-        metavariableDeliverer = new MetavariableDeliverer ( this );
-        addConstraintListener ();
 
         addStrategyListener ();
     }
@@ -180,7 +166,7 @@ public class Proof implements Named {
          BuiltInRuleIndex builtInRules, Services services, ProofSettings settings) {
         this ( name, Sequent.createSuccSequent
                  (Semisequent.EMPTY_SEMISEQUENT.insert(0, 
-                         new ConstrainedFormula(problem)).semisequent()), 
+                         new SequentFormula(problem)).semisequent()), 
                  rules, builtInRules, services, settings );
         problemHeader = header;
     }
@@ -321,26 +307,6 @@ public class Proof implements Named {
         while ( it.hasNext () )
             it.next ().setGoalStrategy(ourStrategy);
     }
-
-
-    /** returns the user constraint (table model)
-     * @return the user constraint
-     */
-    @Deprecated
-    public ConstraintTableModel getUserConstraint() {
-	return userConstraint;
-    }
-
-    @Deprecated
-    private void addConstraintListener() {
-	getUserConstraint ()
-	    .addConstraintTableListener ( new ConstraintTableListener () {
-		    public void constraintChanged ( ConstraintTableEvent e ) {
-			clearAndDetachRuleAppIndexes ();
-		}
-	    });
-    }
-    
     private void addStrategyListener () {
         getSettings().getStrategySettings()
             .addSettingsListener ( new SettingsListener () {
@@ -358,13 +324,7 @@ public class Proof implements Named {
             it.next ().clearAndDetachRuleAppIndex ();
     }
     
-    /** @return Deliverer of new metavariables (with unique names)*/
-    @Deprecated    
-    public MetavariableDeliverer getMetavariableDeliverer () {
-	return metavariableDeliverer;
-    }
-    
-    
+ 
     public JavaModel getJavaModel() {
         return proofEnv.getJavaModel();
     }
@@ -474,60 +434,27 @@ public class Proof implements Named {
      * Add the given constraint to the closure constraint of the given
      * goal, i.e. the given goal is closed if p_c is satisfied.
      */
-    public void closeGoal ( Goal p_goal, Constraint p_c ) {
-	p_goal.addClosureConstraint ( p_c );
+    public void closeGoal ( Goal p_goal ) {
+			
+	Node closedSubtree = p_goal.node().close();
 
-	removeClosedSubtree ();
+	boolean        b    = false;
+	Iterator<Node> it   = closedSubtree.leavesIterator ();
+	Goal           goal;
 
-	if ( closed () )
-	    fireProofClosed();
-    }
-    
-
-    /**
-     * This is called by a Node that is the root of a subtree that is
-     * closed
-     */
-    public void subtreeCompletelyClosed ( Node p_node ) {
-	// This method will be called for nodes with increasing
-	// distance to the root
-	if ( closedSubtree == null )
-	    closedSubtree = p_node;
-    }
-
-    
-    /**
-     * Use this information to remove the goals of the closed subtree
-     */
-    protected void removeClosedSubtree () {
-	// give the information that a subtree is closed
-	// to all nodes below this node
-	if (closedSubtree != null) 
-	    closedSubtree.setClosed();
-
-	if ( !closed () && closedSubtree != null ) {
-
-	    boolean        b    = false;
-	    Iterator<Node> it   = closedSubtree.leavesIterator ();
-	    Goal           goal;
-
-	    while ( it.hasNext () ) {
-		goal = getGoal ( it.next () );
-		if ( goal != null ) {
-		    b = true;
-		    remove ( goal );
-		}
+	while ( it.hasNext () ) {
+	    goal = getGoal ( it.next () );
+	    if ( goal != null ) {
+		b = true;
+		remove ( goal );
 	    }
-
-	    if ( b )
-		// For the moment it is necessary to fire the message ALWAYS
-		// in order to detect branch closing.
-		fireProofGoalsAdded ( ImmutableSLList.<Goal>nil() );		
 	}
 
-	closedSubtree = null;
+	if ( b )
+	    // For the moment it is necessary to fire the message ALWAYS
+	    // in order to detect branch closing.
+	    fireProofGoalsAdded ( ImmutableSLList.<Goal>nil() );		
     }
-
     
     /** removes the given goal from the list of open goals. Take care
      * removing the last goal will fire the proofClosed event
@@ -574,21 +501,11 @@ public class Proof implements Named {
     }
 
     
-    /** Return whether the remaining goals can be closed, i.e. whether
-     * the conjunction of the constraints of the open goals is
-     * satisfiable. In this case all remaining open goals are removed.
+    /** 
+     * returns true if the root node is marked as closed and all goals have been removed
      */
     public boolean closed () {
-	if ( root ().getRootSink ().isSatisfiable () ) {
-	    Goal goal;
-	    while ( !openGoals.isEmpty() ) {
-		goal      = openGoals.head ();
-		openGoals = openGoals.tail ();
-		fireProofGoalRemoved ( goal );
-	    }
-	    return true;
-	}
-	return false;
+	return root.isClosed() && openGoals.isEmpty();
     }
     
     

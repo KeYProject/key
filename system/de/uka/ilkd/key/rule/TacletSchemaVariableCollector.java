@@ -159,7 +159,7 @@ public class TacletSchemaVariableCollector extends Visitor {
      * @param semiseq the Semisequent to visit
      */
     private void visit(Semisequent semiseq) {
-        for (ConstrainedFormula aSemiseq : semiseq) {
+        for (SequentFormula aSemiseq : semiseq) {
             aSemiseq.formula().execPostOrder(this);
         }
     }

@@ -8,17 +8,23 @@
 //
 //
 
-package de.uka.ilkd.key.logic;
+package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.*;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.BooleanContainer;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 
@@ -61,6 +67,36 @@ public class EqualityConstraint implements Constraint {
     }
 
 
+    /* cache to speed up meta variable search */
+    private static WeakHashMap<Term, ImmutableSet<Metavariable>> mvCache = 
+	new WeakHashMap<Term, ImmutableSet<Metavariable>>(2000);
+    
+    
+    public static ImmutableSet<Metavariable> metaVars(Term t) {
+	
+	if (mvCache.containsKey(t)) {
+	    return mvCache.get(t);
+	}
+	
+        ImmutableSet<Metavariable> metaVars = DefaultImmutableSet.<Metavariable>nil();
+        
+        Operator op = t.op();
+        
+        if(op instanceof Metavariable) {
+            metaVars = metaVars.add((Metavariable) op);
+        }
+        for(int i = 0, ar = t.arity(); i < ar; i++) {
+	    metaVars = metaVars.union(metaVars(t.sub(i)));
+	}
+        
+        if (mvCache.size() > 10000) {
+            mvCache.clear();
+        }
+        mvCache.put(t, metaVars);
+        
+        return metaVars;
+    }
+    
     protected synchronized Object clone () {
 	EqualityConstraint res        =
 	    new EqualityConstraint ( (HashMap<Metavariable, Term>)map.clone () );
@@ -786,12 +822,12 @@ public class EqualityConstraint implements Constraint {
         Term               checkForCycle = term;
         
         while ( true ) {
-            for (Metavariable metavariable : checkForCycle.metaVars()) {
+            for (Metavariable metavariable : metaVars(checkForCycle)) {
                 final Metavariable termMV = metavariable;
                 if (!body.contains(termMV)) {
                     final Term termMVterm = getInstantiationIfExisting(termMV);
                     if (termMVterm != null) {
-                        if (termMVterm.metaVars().contains(mv))
+                        if (metaVars(termMVterm).contains(mv))
                             return true;
                     } else {
                         if (map.containsKey(termMV))
@@ -813,12 +849,12 @@ public class EqualityConstraint implements Constraint {
 
     private boolean hasCycleByInst (Metavariable mv, Term term) {
 
-        for (Metavariable metavariable : term.metaVars()) {
+        for (Metavariable metavariable : metaVars(term)) {
             final Metavariable termMV = metavariable;
             if (termMV == mv) return true;
             final Term termMVterm = getInstantiationIfExisting(termMV);
             if (termMVterm != null) {
-                if (termMVterm.metaVars().contains(mv)) return true;
+                if (metaVars(termMVterm).contains(mv)) return true;
             } else {
                 if (map.containsKey(termMV)
                         && hasCycle(mv, getDirectInstantiation(termMV)))

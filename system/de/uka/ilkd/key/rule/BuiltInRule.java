@@ -10,7 +10,6 @@
 
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 
@@ -29,8 +28,7 @@ public interface BuiltInRule extends Rule {
      * reasons)
      */
     boolean isApplicable(Goal            goal, 				
-			 PosInOccurrence pio,
-			 Constraint      userConstraint);
+			 PosInOccurrence pio);
     
 
 }

@@ -23,7 +23,7 @@ import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-public class ArrayPostDecl extends ProgramMetaConstruct {
+public class ArrayPostDecl extends ProgramTransformer {
 
     public ArrayPostDecl(SchemaVariable sv) {
 	super(new Name("array-post-declaration"), (ProgramSV)sv);
@@ -38,7 +38,7 @@ public class ArrayPostDecl extends ProgramMetaConstruct {
      * @param svInst the instantiations of the schema variables
      * @return the transformed program
      */
-    public ProgramElement symbolicExecution(ProgramElement pe,
+    public ProgramElement transform(ProgramElement pe,
 					    Services services,
 					    SVInstantiations svInst) {
 

@@ -36,17 +36,13 @@ public class TestSchemaModalOperators extends TestCase {
                    "i=3", "\\[{ if(i==3) {i++;} else {i--;} }\\] i=3" };
     Proof[] proof;
     Proof   mvProof;
-    // mv=f(X,c)
-    Constraint 	consMV_f_X_c;
-    // mv=f(c,X)
-    Constraint 	consMV_f_c_X;
-
+   
     private static Semisequent parseTermForSemisequent(String t) {
 	if ("".equals(t)) { 
 	    return Semisequent.EMPTY_SEMISEQUENT;
 	}
-	ConstrainedFormula cf0
-	    = new ConstrainedFormula(TacletForTests.parseTerm(t));
+	SequentFormula cf0
+	    = new SequentFormula(TacletForTests.parseTerm(t));
 	return Semisequent.EMPTY_SEMISEQUENT.insert(0, cf0).semisequent();
     }
 
@@ -90,10 +86,10 @@ public class TestSchemaModalOperators extends TestCase {
 	consMV_f_c_X = Constraint.BOTTOM.unify(t_mv, t_f_c_X);
 	consMV_f_X_c = Constraint.BOTTOM.unify(t_mv, t_f_X_c);
 
-	ConstrainedFormula cf1 = 
-	    new ConstrainedFormula(TacletForTests.parseTerm("A & B"), consMV_f_c_X);
-	ConstrainedFormula cf2 = 
-	    new ConstrainedFormula(TacletForTests.parseTerm("!(A | B)"), consMV_f_X_c);
+	SequentFormula cf1 = 
+	    new SequentFormula(TacletForTests.parseTerm("A & B"), consMV_f_c_X);
+	SequentFormula cf2 = 
+	    new SequentFormula(TacletForTests.parseTerm("!(A | B)"), consMV_f_X_c);
 
 	Sequent seq = Sequent.createSequent
 	    (Semisequent.EMPTY_SEMISEQUENT.insertLast(cf1).semisequent(),
@@ -153,7 +149,7 @@ public class TestSchemaModalOperators extends TestCase {
          MatchConditions mc=(t.match                                                   
                             (goal,                                                        
                              find,                                                
-                             MatchConditions.EMPTY_MATCHCONDITIONS, null, Constraint.BOTTOM));
+                             MatchConditions.EMPTY_MATCHCONDITIONS, null));
 	 assertNotNull(mc);
 	 assertNotNull(mc.getInstantiations().getInstantiation(osv));
 	 Debug.out("Match conditions: ", mc.getInstantiations());
@@ -177,7 +173,7 @@ public class TestSchemaModalOperators extends TestCase {
 					PosInTerm.TOP_LEVEL,
 					false);
 	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
-		    getTacletAppAt(TacletFilter.TRUE, applyPos, null, Constraint.BOTTOM);	
+		    getTacletAppAt(TacletFilter.TRUE, applyPos, null);	
 	assertTrue("Too many or zero rule applications.",rApplist.size()==1);
 	RuleApp rApp=rApplist.head();
 	assertTrue("Rule App should be complete", rApp.complete());
@@ -211,7 +207,7 @@ public class TestSchemaModalOperators extends TestCase {
 					PosInTerm.TOP_LEVEL,
 					false);
 	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
-		    getTacletAppAt(TacletFilter.TRUE, applyPos, null, Constraint.BOTTOM);	
+		    getTacletAppAt(TacletFilter.TRUE, applyPos, null);	
 	assertTrue("Too many or zero rule applications.",rApplist.size()==1);
 	RuleApp rApp=rApplist.head();
 	assertTrue("Rule App should be complete", rApp.complete());
@@ -241,7 +237,7 @@ public class TestSchemaModalOperators extends TestCase {
 					PosInTerm.TOP_LEVEL,
 					false);
 	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
-		    getTacletAppAt(TacletFilter.TRUE, applyPos, null, Constraint.BOTTOM);	
+		    getTacletAppAt(TacletFilter.TRUE, applyPos, null);	
 	assertTrue("Too many or zero rule applications.",rApplist.size()==1);
 	RuleApp rApp=rApplist.head();
 	assertTrue("Rule App should be complete", rApp.complete());

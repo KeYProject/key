@@ -7,9 +7,11 @@
 // See LICENSE.TXT for details.
 //
 //
-package de.uka.ilkd.key.logic.op;
+package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.op.AbstractSortedOperator;
+import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 @Deprecated
@@ -41,11 +43,6 @@ public final class Metavariable extends AbstractSortedOperator
     public Metavariable (Name name, Sort sort) {
         this ( name, sort, false );        
     }
-
-    public static Metavariable createTemporaryVariable (Name name, Sort sort) {
-        return new Metavariable ( name, sort, true );
-    }
-    
 
     @Override
     public String toString() {

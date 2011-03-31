@@ -678,16 +678,12 @@ public class JMLSpecFactory {
                             ProgramMethod pm,
                             LoopStatement loop,
                             ImmutableList<PositionedString> originalInvariant,
-                            ImmutableList<PositionedString> originalSkolemDeclarations,
-                            ImmutableList<PositionedString> originalPredicates,
                             ImmutableList<PositionedString> originalAssignable,
                             PositionedString originalVariant) 
             throws SLTranslationException {                
         assert pm != null;
         assert loop != null;
         assert originalInvariant != null;
-        assert originalSkolemDeclarations != null;
-        assert originalPredicates != null;
         assert originalAssignable != null;
         
         //create variables for self, parameters, other relevant local variables 
@@ -730,36 +726,6 @@ public class JMLSpecFactory {
             }
         }
 
-        
-        //translate skolem declarations
-        ImmutableList<ProgramVariable> freeVars = ImmutableSLList.<ProgramVariable>nil();
-        for(PositionedString expr : originalSkolemDeclarations) {
-            ImmutableList<ProgramVariable> translated 
-                = translator.translateVariableDeclaration(expr);
-            for(ProgramVariable pv : translated) {
-                freeVars = freeVars.prepend(pv);
-            }
-        }
-        
-        //translate predicates
-        ImmutableSet<Term> predicates = DefaultImmutableSet.<Term>nil();
-        for(PositionedString ps : originalPredicates) {
-            String[] exprs = ps.text.split(",", 0);
-            
-            for(int i = 0; i < exprs.length; i++) {
-                Term translated
-                    = translator.translateExpression(
-                            new PositionedString(exprs[i]), 
-                            pm.getContainerType(),
-                            selfVar, 
-                            paramVars.append(freeVars), 
-                            null, 
-                            null,
-                            heapAtPre);
-                predicates = predicates.add(translated);                
-            }
-        }
-        
         //translate assignable
         Term assignable;
         if(originalAssignable.isEmpty()) {
@@ -798,12 +764,10 @@ public class JMLSpecFactory {
         Term selfTerm = selfVar == null ? null : TB.var(selfVar);
         return new LoopInvariantImpl(loop,
                                      invariant,
-                                     predicates,
                                      assignable,
                                      variant,
                                      selfTerm,
-                                     heapAtPre,
-                                     true);
+                                     heapAtPre);
     }
     
     
@@ -815,8 +779,6 @@ public class JMLSpecFactory {
         return createJMLLoopInvariant(pm,
                                       loop,
                                       textualLoopSpec.getInvariant(),
-                                      textualLoopSpec.getSkolemDeclarations(),
-                                      textualLoopSpec.getPredicates(),
                                       textualLoopSpec.getAssignable(),
                                       textualLoopSpec.getVariant());
     }

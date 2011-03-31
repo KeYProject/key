@@ -17,11 +17,28 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.Semisequent;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
-import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.proof.FormulaTag;
+import de.uka.ilkd.key.proof.FormulaTagManager;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.rule.FindTaclet;
+import de.uka.ilkd.key.rule.IfFormulaInstSeq;
+import de.uka.ilkd.key.rule.IfFormulaInstantiation;
+import de.uka.ilkd.key.rule.IfMatchResult;
+import de.uka.ilkd.key.rule.MatchConditions;
+import de.uka.ilkd.key.rule.NoFindTaclet;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -190,7 +207,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
     }
 
     private boolean sufficientlyCompleteApp(TacletApp app, Services services) {
-        final ImmutableSet<SchemaVariable> needed = app.neededUninstantiatedVars (services);
+        final ImmutableSet<SchemaVariable> needed = app.uninstantiatedVars ();
         if ( needed.size () == 0 ) return true;
         for (SchemaVariable aNeeded : needed) {
             final SchemaVariable sv = aNeeded;
@@ -450,7 +467,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         private boolean isNewFormulaDirect (IfFormulaInstantiation p_ifInstantiation) {
             final boolean antec = ( (IfFormulaInstSeq)p_ifInstantiation ).inAntec ();
 
-            final ConstrainedFormula cfma = p_ifInstantiation.getConstrainedFormula ();
+            final SequentFormula cfma = p_ifInstantiation.getConstrainedFormula ();
             final PosInOccurrence pio = new PosInOccurrence ( cfma,
                                                               PosInTerm.TOP_LEVEL,
                                                               antec );
@@ -517,8 +534,8 @@ public abstract class TacletAppContainer extends RuleAppContainer {
          *            formula that has been modified recently
          */
         private void findIfFormulaInstantiationsHelp
-            ( ImmutableList<ConstrainedFormula>      p_ifSeqTail,
-              ImmutableList<ConstrainedFormula>      p_ifSeqTail2nd,
+            ( ImmutableList<SequentFormula>      p_ifSeqTail,
+              ImmutableList<SequentFormula>      p_ifSeqTail2nd,
               ImmutableList<IfFormulaInstantiation>  p_alreadyMatched,
               MatchConditions               p_matchCond,
               boolean                       p_alreadyMatchedNewFor ) {
@@ -547,8 +564,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
             final IfMatchResult mr = getTaclet ().matchIf ( formulas.iterator (),
                                                             p_ifSeqTail.head ().formula (),
                                                             p_matchCond,
-                                                            getServices (),
-                                                            getUserConstraint () );
+                                                            getServices () );
 
             // For each matching formula call the method again to match
             // the remaining terms
@@ -568,11 +584,6 @@ public abstract class TacletAppContainer extends RuleAppContainer {
             }
         }
 
-        @Deprecated
-        private Constraint getUserConstraint () {
-            return getProof ().getUserConstraint().getConstraint();
-        }
-
         private Proof getProof () {
             return goal.proof();
         }
@@ -585,16 +596,14 @@ public abstract class TacletAppContainer extends RuleAppContainer {
             return NoPosTacletApp.createNoPosTacletApp(
         	    getTaclet(),
                     p_matchCond.getInstantiations(), 
-                    p_matchCond.getConstraint(),
-                    p_matchCond.getNewMetavariables(), 
                     p_alreadyMatched,
                     getServices());
         }
 
-        private ImmutableList<ConstrainedFormula> createSemisequentList ( Semisequent p_ss ) {
-            ImmutableList<ConstrainedFormula> res = ImmutableSLList.<ConstrainedFormula>nil();
+        private ImmutableList<SequentFormula> createSemisequentList ( Semisequent p_ss ) {
+            ImmutableList<SequentFormula> res = ImmutableSLList.<SequentFormula>nil();
 
-            for (final ConstrainedFormula cf : p_ss) {
+            for (final SequentFormula cf : p_ss) {
                 res = res.prepend ( cf );
             }
             return res; 

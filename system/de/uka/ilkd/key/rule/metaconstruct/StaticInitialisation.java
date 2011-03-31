@@ -28,7 +28,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
 
-public class StaticInitialisation extends ProgramMetaConstruct {
+public class StaticInitialisation extends ProgramTransformer {
     
     public StaticInitialisation(Expression expr) {
 	super("static-initialisation", expr); 
@@ -39,7 +39,7 @@ public class StaticInitialisation extends ProgramMetaConstruct {
      * program transformation 
      * @return the transformated program
      */
-    public ProgramElement symbolicExecution(ProgramElement pe,
+    public ProgramElement transform(ProgramElement pe,
 					    Services services,
 					    SVInstantiations insts) {	
 	KeYJavaType typeToBeInitialised = null;

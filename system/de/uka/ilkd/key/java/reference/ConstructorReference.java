@@ -11,8 +11,6 @@
 
 package de.uka.ilkd.key.java.reference;
 
-import de.uka.ilkd.key.java.*;
-
 /**
  *  Constructor reference.
  *  @author <TT>AutoDoc</TT>

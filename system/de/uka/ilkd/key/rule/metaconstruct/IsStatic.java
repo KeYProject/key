@@ -18,9 +18,9 @@ import de.uka.ilkd.key.java.reference.VariableReference;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
-public class IsStatic extends ProgramMetaConstruct{
+public class IsStatic extends ProgramTransformer{
 
-    /** creates a typeof ProgramMetaConstruct 
+    /** creates a typeof ProgramTransformer 
      * @param pe the instance of expression contained by 
      * the meta construct 
      */
@@ -36,7 +36,7 @@ public class IsStatic extends ProgramMetaConstruct{
      * @param svInst the instantiations esp. of the inner and outer label 
      * @return the transformed program
      */
-    public ProgramElement symbolicExecution(ProgramElement pe,
+    public ProgramElement transform(ProgramElement pe,
 					    Services services,
 					    SVInstantiations svInst) {
 	if(pe instanceof VariableReference){

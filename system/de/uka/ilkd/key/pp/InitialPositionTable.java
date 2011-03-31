@@ -12,9 +12,9 @@ package de.uka.ilkd.key.pp;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.Metavariable;
-import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.IntIterator;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 
 /**
  * An InitialPositionTable is a PositionTable that describes the
@@ -89,67 +89,19 @@ public class InitialPositionTable extends PositionTable{
 
     /** Returns the path for a given PosInOccurrence.  This is 
      * built up from the initial 0, the number of the 
-     * ConstrainedFormula in the sequent, the position in the 
+     * SequentFormula in the sequent, the position in the 
      * constrained formula, and possibly inside a Metavariable
      * instantiation. */
     public ImmutableList<Integer> pathForPosition(PosInOccurrence pio,
 					 SequentPrintFilter filter) {
 	ImmutableList<Integer> p = ImmutableSLList.<Integer>nil();
 	
-	p = prependPathBelowMV(p,pio, entryForCfma(pio.constrainedFormula(),
-	                                           filter));
+	p = p;
 	p = prependPathInFormula(p,pio);
 	p = p.prepend(Integer.valueOf(indexOfCfma(pio.constrainedFormula(),
 					      filter)));
 	p = p.prepend(Integer.valueOf(0));
 	return p;
-    }
-
-    @Deprecated
-    private ImmutableList<Integer> prependPathBelowMV(ImmutableList<Integer> p,
-                                             PosInOccurrence pio,
-                                             SequentPrintFilterEntry entry) {
-	if ( pio.posInTermBelowMetavariable () == null
-             || !checkCompatibleDisplayConstraint ( pio, entry ) ) return p;
-
-        IntIterator pit = pio.posInTermBelowMetavariable ().reverseIterator ();
-        while ( pit.hasNext () ) {
-            p = p.prepend ( Integer.valueOf ( pit.next () ) );
-        }
-
-        return p;
-    }
-
-    /**
-     * Check that the term below the metavariable (as determined by the position
-     * <code> pio </code> is compatible with the display constraint, i.e. with
-     * the constraint that governs the shape of the current formula as
-     * displayed. As it is possible to modify the user constraint arbitrarily,
-     * this is not necessarily the case.
-     * 
-     * @return true iff the display constraint is compatible with
-     *         <code>pio</code>
-     */
-    @Deprecated
-    private boolean checkCompatibleDisplayConstraint (PosInOccurrence pio,
-                                                      SequentPrintFilterEntry entry) {
-        final Term mvTerm =
-            pio.constrainedFormula ().formula ().subAt ( pio.posInTerm () );
-        Debug.assertTrue ( mvTerm.op () instanceof Metavariable );
-        final Metavariable mv = (Metavariable)mvTerm.op ();
-
-        // The display constraint, joined with the statement that the focussed
-        // metavariable is instantiated with the mounted term.
-        final Constraint c = entry.getDisplayConstraint ()
-            .unify ( mvTerm, pio.termBelowMetavariable (), null );
-        if ( !c.isSatisfiable () ) return false;
-
-        // the term that is displayed instead of the metavariable
-        final Term displayedTerm = entry.getDisplayConstraint ().getInstantiation ( mv );
-        // the term that ought to be displayed according to the term position
-        final Term posTerm = c.getInstantiation ( mv );
-        
-        return posTerm.equals ( displayedTerm );
     }
 
     private ImmutableList<Integer> prependPathInFormula(ImmutableList<Integer> p,
@@ -164,7 +116,7 @@ public class InitialPositionTable extends PositionTable{
 
     /** Returns the index of the constrained formula in the sequent
      * as printed. */
-    private int indexOfCfma(ConstrainedFormula cfma,
+    private int indexOfCfma(SequentFormula cfma,
 			    SequentPrintFilter filter) {
 	ImmutableList<SequentPrintFilterEntry> list =
 	    filter.getAntec().append(filter.getSucc());
@@ -181,7 +133,7 @@ public class InitialPositionTable extends PositionTable{
      * Returns the <code>SequentPrintFilterEntry</code> for the given
      * constrained formula from the <code>filter</code>.
      */
-    private SequentPrintFilterEntry entryForCfma (ConstrainedFormula cfma,
+    private SequentPrintFilterEntry entryForCfma (SequentFormula cfma,
                                                   SequentPrintFilter filter) {
         ImmutableList<SequentPrintFilterEntry> list =
             filter.getAntec ().append ( filter.getSucc () );

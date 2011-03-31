@@ -503,28 +503,25 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 	sig.append(originalExcVar);
 	sig.append(")");
 	
-        final String pre  = LogicPrinter.quickPrintTerm(originalPre, services)
-        			        .replace("\n", " ");
+        final String pre  = LogicPrinter.quickPrintTerm(originalPre, services);
         final String mby  = hasMby() 
         		    ? LogicPrinter.quickPrintTerm(originalMby, services)
-        			          .replace("\n", " ")
         	            : null;        
-        final String post = LogicPrinter.quickPrintTerm(originalPost, services)
-                                        .replace("\n", " ");
-        final String mod  = LogicPrinter.quickPrintTerm(originalMod, services)
-        				.replace("\n", " ");
+        final String post = LogicPrinter.quickPrintTerm(originalPost, services);
+        final String mod  = LogicPrinter.quickPrintTerm(originalMod, services);
                       
         return "<html>"
-                + "<i>" + LogicPrinter.escapeHTML(sig.toString()) + "</i>"
+                + "<i>" + LogicPrinter.escapeHTML(sig.toString(), false) + "</i>"
                 + "<br><b>pre</b> "
-                + LogicPrinter.escapeHTML(pre)
+                + LogicPrinter.escapeHTML(pre, false)
                 + "<br><b>post</b> "
-                + LogicPrinter.escapeHTML(post)
+                + LogicPrinter.escapeHTML(post, false)
                 + "<br><b>mod</b> "
-                + LogicPrinter.escapeHTML(mod)
+                + LogicPrinter.escapeHTML(mod, false)
                 + (hasMby() 
-                        ? "<br><b>measured-by</b> " + LogicPrinter.escapeHTML(mby)
-                        : "")                
+                   ? "<br><b>measured-by</b> " + LogicPrinter.escapeHTML(mby, 
+                	   						 false)
+                   : "")                
                 + "<br><b>termination</b> "
                 + getModality()
                 + "</html>";

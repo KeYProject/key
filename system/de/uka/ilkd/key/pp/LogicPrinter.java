@@ -237,7 +237,7 @@ public final class LogicPrinter {
     
     
     private static void collectSchemaVarsHelper(Sequent s, OpCollector oc) {
-	for(ConstrainedFormula cf : s) {
+	for(SequentFormula cf : s) {
 	    cf.formula().execPostOrder(oc);
 	}
     }
@@ -787,9 +787,8 @@ public final class LogicPrinter {
      *
      * @param cfma the constrained formula to be printed
      */
-    public void printConstrainedFormula(ConstrainedFormula cfma)
+    public void printConstrainedFormula(SequentFormula cfma)
         throws IOException {
-	assert cfma.constraint().isBottom() : "metavariables are disabled";
 	printTerm(cfma.formula());
     }
 
@@ -1782,7 +1781,7 @@ public final class LogicPrinter {
      * @param text the String to be displayed as part of an HTML side
      * @return the text with special characters replaced
      */
-    public static String escapeHTML(String text) {
+    public static String escapeHTML(String text, boolean escapeWhitespace) {
          StringBuffer sb = new StringBuffer();
         
          for (int i = 0, sz = text.length(); i < sz; i++) {
@@ -1825,10 +1824,10 @@ public final class LogicPrinter {
                  sb.append("&#059;");
                  break;
              case '\n': 
-                 sb.append("<br>");
+                 sb.append(escapeWhitespace ? "<br>" : c);
                  break;            
              case ' ':
-             	 sb.append("&nbsp;");
+             	 sb.append(escapeWhitespace ? "&nbsp;" : c);
              	 break;
              default:
                  sb.append(c);

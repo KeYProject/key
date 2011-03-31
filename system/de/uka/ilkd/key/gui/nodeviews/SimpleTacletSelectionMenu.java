@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.event.ActionListener;
-import java.util.Iterator;
 
 import javax.swing.JMenu;
 

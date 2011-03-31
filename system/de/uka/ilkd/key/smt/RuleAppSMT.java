@@ -12,7 +12,6 @@ package de.uka.ilkd.key.smt;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
@@ -44,17 +43,12 @@ public class RuleAppSMT implements RuleApp {
     }
 
     @Override
-    public Constraint constraint() {
-	return Constraint.BOTTOM;
-    }
-
-    @Override
     public ImmutableList<Goal> execute(Goal goal, Services services) {
 	goal.addAppliedRuleApp(this);
 
 	goal.split(1);
 
-	goal.proof().closeGoal(goal, Constraint.BOTTOM);
+	goal.proof().closeGoal(goal);
 	goal.node().getNodeInfo().setBranchLabel(title);
 	return null;
     }
@@ -74,8 +68,7 @@ public class RuleAppSMT implements RuleApp {
 	private Name name = new Name("SMTRule");
 
 	@Override
-	public boolean isApplicable(Goal goal, PosInOccurrence pio,
-	        Constraint userConstraint) {
+	public boolean isApplicable(Goal goal, PosInOccurrence pio) {
 	    return false;
 	}
 

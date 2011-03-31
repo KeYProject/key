@@ -19,7 +19,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.ConstrainedFormula;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
@@ -159,8 +159,7 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
 
         final List<CofactorPolynomial> res = new ArrayList<CofactorPolynomial> ();
      
-        for (final ConstrainedFormula cfm : goal.sequent ().antecedent ()) {
-            if ( !cfm.constraint ().isBottom () ) continue;
+        for (final SequentFormula cfm : goal.sequent ().antecedent ()) {
 
             final Term t = cfm.formula();
             if ( t.op () != Equality.EQUALS

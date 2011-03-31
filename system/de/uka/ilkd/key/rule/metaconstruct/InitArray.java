@@ -32,7 +32,7 @@ import de.uka.ilkd.key.util.ExtList;
  * creating a creation expression with dimension expression and a list
  * of assignments (-> Java language specification, 15.10)
  */
-public abstract class InitArray extends ProgramMetaConstruct {
+public abstract class InitArray extends ProgramTransformer {
 
     public InitArray(String name, ProgramElement body) {
 	super(name, body);

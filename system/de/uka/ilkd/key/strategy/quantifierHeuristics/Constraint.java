@@ -8,11 +8,13 @@
 //
 //
 
-package de.uka.ilkd.key.logic;
+package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.op.Metavariable;
+import de.uka.ilkd.key.logic.BooleanContainer;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 
 /**
  * Abstract constraint interface for constraints offering unification of terms

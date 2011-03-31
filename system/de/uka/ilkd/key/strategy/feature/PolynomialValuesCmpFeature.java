@@ -16,7 +16,7 @@ import java.math.BigInteger;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
+import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
@@ -142,7 +142,7 @@ public abstract class PolynomialValuesCmpFeature extends BinaryTacletAppFeature 
         if ( coeffT == null ) return poly;
         
         final BigInteger coeff =
-            new BigInteger ( AbstractMetaOperator
+            new BigInteger ( AbstractTermTransformer
                              .convertToDecimalString ( coeffT, services ) );
         return poly.multiply ( coeff );
     }

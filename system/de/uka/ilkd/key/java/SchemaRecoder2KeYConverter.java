@@ -67,10 +67,10 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
      * convert a program meta construct creating a new object corresponding to
      * the name.
      * 
-     * If you add a ProgramMetaConstruct to the system you will most propably
+     * If you add a ProgramTransformer to the system you will most propably
      * have to register it here.
      */
-    public ProgramMetaConstruct convert(
+    public ProgramTransformer convert(
             de.uka.ilkd.key.java.recoderext.RKeYMetaConstruct mc) {
 
         ExtList list = new ExtList();
@@ -147,7 +147,7 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
      * 
      * If you have an expression meta construct you will have to add it here.
      */
-    public ProgramMetaConstruct convert(
+    public ProgramTransformer convert(
             de.uka.ilkd.key.java.recoderext.RKeYMetaConstructExpression mc) {
         ExtList list = new ExtList();
         String mcName = mc.getName();
@@ -169,7 +169,7 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
      * 
      * If you have a type meta construct you will have to add it here.
      */
-    public ProgramMetaConstruct convert(
+    public ProgramTransformer convert(
             de.uka.ilkd.key.java.recoderext.RKeYMetaConstructType mc) {
         ExtList list = new ExtList();
         list.add(callConvert(mc.getChild()));

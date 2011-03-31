@@ -22,7 +22,7 @@ import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.AbstractProgramElement;
-import de.uka.ilkd.key.rule.metaconstruct.ProgramMetaConstruct;
+import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 
 /**
@@ -52,7 +52,7 @@ public interface Visitor {
 	    ProgramMethod x);
 
     void performActionOnProgramMetaConstruct(
-	    ProgramMetaConstruct x);
+	    ProgramTransformer x);
 
     void performActionOnContextStatementBlock(
 	    ContextStatementBlock x);

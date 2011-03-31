@@ -42,7 +42,7 @@ import de.uka.ilkd.key.util.ExtList;
  * 
  */
 
-public class EnhancedForElimination extends ProgramMetaConstruct {
+public class EnhancedForElimination extends ProgramTransformer {
 
     private Services services;
 
@@ -76,12 +76,12 @@ public class EnhancedForElimination extends ProgramMetaConstruct {
      * @see #makeIterableForLoop(LocalVariableDeclaration, Expression,
      *      Statement)
      * 
-     * @see de.uka.ilkd.key.rule.metaconstruct.ProgramMetaConstruct#symbolicExecution(de.uka.ilkd.key.java.ProgramElement,
+     * @see de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer#transform(de.uka.ilkd.key.java.ProgramElement,
      *      de.uka.ilkd.key.java.Services,
      *      de.uka.ilkd.key.rule.inst.SVInstantiations)
      */
     @Override
-    public ProgramElement symbolicExecution(ProgramElement pe,
+    public ProgramElement transform(ProgramElement pe,
             Services services, SVInstantiations svInst) {
 
         assert pe instanceof EnhancedFor : "Only works on enhanced fors";

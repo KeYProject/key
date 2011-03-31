@@ -14,18 +14,46 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 
-import de.uka.ilkd.key.collection.*;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableMapEntry;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.ClashFreeSubst;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.PIOPathIterator;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.RenameTable;
+import de.uka.ilkd.key.logic.Semisequent;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.VariableNamer;
+import de.uka.ilkd.key.logic.op.FormulaSV;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.ProgramSV;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SkolemTermSV;
+import de.uka.ilkd.key.logic.op.TermSV;
+import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.TacletInstantiationsTableModel;
 import de.uka.ilkd.key.proof.VariableNameProposer;
-import de.uka.ilkd.key.rule.inst.*;
+import de.uka.ilkd.key.rule.inst.GenericSortCondition;
+import de.uka.ilkd.key.rule.inst.GenericSortException;
+import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
+import de.uka.ilkd.key.rule.inst.InstantiationEntry;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.inst.TermInstantiation;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -52,18 +80,6 @@ public abstract class TacletApp implements RuleApp {
     protected final SVInstantiations instantiations;
 
     /**
-     * constraint under which the taclet application can be performed
-     */
-    @Deprecated
-    protected final Constraint matchConstraint;
-
-    /**
-     * metavariables that have been created during the matching
-     */
-    @Deprecated
-    protected final ImmutableSet<Metavariable> matchNewMetavariables;
-
-    /**
      * choosen instantiations for the if sequent formulas
      */
     protected final ImmutableList<IfFormulaInstantiation> ifInstantiations;
@@ -74,11 +90,6 @@ public abstract class TacletApp implements RuleApp {
      * addrule-sections have to be ignored
      */
     private ImmutableSet<SchemaVariable> missingVars = null;
-
-    /**
-     * subset of missingVars that cannot be instantiated using metavariables
-     */
-    private ImmutableSet<SchemaVariable> neededMissingVars = null;
 
     /**
      * the instantiations of the following SVs must not be changed; they must
@@ -98,18 +109,14 @@ public abstract class TacletApp implements RuleApp {
      */
     TacletApp(Taclet taclet) {
 	this(taclet, SVInstantiations.EMPTY_SVINSTANTIATIONS,
-		Constraint.BOTTOM, DefaultImmutableSet.<Metavariable>nil(), null);
+		null);
     }
 
     TacletApp(Taclet taclet, 
 	      SVInstantiations instantiations,
-	      Constraint matchConstraint,
-	      ImmutableSet<Metavariable> matchNewMetavariables,
 	      ImmutableList<IfFormulaInstantiation> ifInstantiations) {
 	this.taclet = taclet;
 	this.instantiations = instantiations;
-	this.matchConstraint = matchConstraint;
-	this.matchNewMetavariables = matchNewMetavariables;
 	this.ifInstantiations = ifInstantiations;
     }
 
@@ -118,8 +125,7 @@ public abstract class TacletApp implements RuleApp {
      * required instantiations.
      */
     TacletApp(Taclet taclet, SVInstantiations instantiations) {
-	this(taclet, instantiations, Constraint.BOTTOM,
-		DefaultImmutableSet.<Metavariable>nil(), null);
+	this(taclet, instantiations, null);
     }
 
     /**
@@ -218,19 +224,8 @@ public abstract class TacletApp implements RuleApp {
 	return instantiations;
     }
 
-    @Deprecated
-    public Constraint constraint() {
-	return matchConstraint;
-    }
-
-    @Deprecated
-    public ImmutableSet<Metavariable> newMetavariables() {
-	return matchNewMetavariables;
-    }
-
     public MatchConditions matchConditions() {
-	return new MatchConditions(instantiations(), constraint(),
-		newMetavariables(), RenameTable.EMPTY_TABLE);
+	return new MatchConditions(instantiations(), RenameTable.EMPTY_TABLE);
     }
 
     public ImmutableList<IfFormulaInstantiation> ifFormulaInstantiations() {
@@ -307,7 +302,7 @@ public abstract class TacletApp implements RuleApp {
      */
     private static Term getTermBelowQuantifier(Taclet taclet,
 	    				       SchemaVariable varSV) {
-	Iterator<ConstrainedFormula> it = taclet.ifSequent().iterator();
+	Iterator<SequentFormula> it = taclet.ifSequent().iterator();
 	while (it.hasNext()) {
 	    Term result = getTermBelowQuantifier(varSV, it.next().formula());
 	    if (result != null) {
@@ -473,47 +468,6 @@ public abstract class TacletApp implements RuleApp {
 	return missingVars;
     }
 
-    /**
-     * Calculate needed SchemaVariables that have not been instantiated yet and
-     * cannot be instantiated using metavariables. This is a subset of
-     * calculateNonInstantiatedSV();
-     * 
-     * @return ImmutableSet<SchemaVariable> that need to be instantiated but are not
-     */
-    protected ImmutableSet<SchemaVariable> calculateNeededNonInstantiatedSV(
-	    						Services services) {
-	if (neededMissingVars == null) {
-	    Iterator<SchemaVariable> it = calculateNonInstantiatedSV()
-		    .iterator();
-	    SchemaVariable var;
-	    SVInstantiations svi = instantiations();
-
-	    neededMissingVars = DefaultImmutableSet.<SchemaVariable>nil();
-
-	    while (it.hasNext()) {
-		var = it.next();
-
-		if (canUseMVAPriori(var)) {
-		    GenericSortCondition c = GenericSortCondition
-			    .forceInstantiation(var.sort(), true);
-		    if (c == null)
-			continue; // then the sort is not generic
-		    else {
-			try {
-			    svi = svi.add(c, services);
-			    continue; // then the sort can be guessed
-			} catch (GenericSortException e) {
-			    Debug.out("Exception thrown by class TacletApp "
-				    + "at svi.add()");
-			}
-		    }
-		}
-
-		neededMissingVars = neededMissingVars.add(var);
-	    }
-	}
-	return neededMissingVars;
-    }
 
     /**
      * creates a new Tacletapp where the SchemaVariable sv is instantiated with
@@ -576,17 +530,6 @@ public abstract class TacletApp implements RuleApp {
      */
     public ImmutableSet<SchemaVariable> uninstantiatedVars() {
 	return calculateNonInstantiatedSV();
-    }
-
-    /**
-     * returns the variables that are currently uninstantiated and cannot be
-     * instantiated automatically using metavariables
-     * 
-     * @return ImmutableSet<SchemaVariable> with SchemaVariables that have not been
-     *         instantiated yet
-     */
-    public ImmutableSet<SchemaVariable> neededUninstantiatedVars(Services services) {
-	return calculateNeededNonInstantiatedSV(services);
     }
 
     /**
@@ -656,7 +599,7 @@ public abstract class TacletApp implements RuleApp {
 			getRealSort(sv, services));
 		app = app
 			.addCheckedInstantiation(sv, tb.var(v), services, true);
-	    } else if (!(sv instanceof TermSV && canUseMVAPriori(sv))) {
+	    } else {
 		return null;
 	    }
 	}
@@ -671,7 +614,7 @@ public abstract class TacletApp implements RuleApp {
 	    }
 	}
 
-	if (!app.sufficientlyComplete(services)) {
+	if (!app.complete()) {
 	    return null;
 	}
 	return app;
@@ -727,200 +670,6 @@ public abstract class TacletApp implements RuleApp {
 	    Debug.fail("TacletApp cannot be made complete");
 	}
 	return insts;
-    }
-
-    /**
-     * Make the instantiation complete using metavariables and convert plain
-     * instantiations to metavariables and user constraint entries if possible.
-     * Pre-condition: this.sufficientlyComplete()
-     */
-    @Deprecated
-    public TacletApp instantiateWithMV(Goal p_goal) {
-
-	Debug.assertTrue(this.sufficientlyComplete(p_goal.proof().getServices()),
-		"TacletApp cannot be made complete");
-
-	final Proof proof = p_goal.proof();
-
-	Services services = proof.getServices();
-
-	SVInstantiations insts = instantiations();
-	ImmutableSet<Metavariable> newVars = newMetavariables();
-	assert newVars.isEmpty() : "metavariables are disabled";
-	Constraint constr = constraint();
-
-	if (!newVars.isEmpty()) {
-	    // Replace temporary metavariables that were introduced
-	    // when matching the taclet with real MVs
-	    final Iterator<Metavariable> mvIt = newVars.iterator();
-	    newVars = DefaultImmutableSet.<Metavariable>nil();
-	    ImmutableSet<Metavariable> removeVars = DefaultImmutableSet.<Metavariable>nil();
-	    Constraint replaceC = Constraint.BOTTOM;
-	    while (mvIt.hasNext()) {
-		final Metavariable mv = mvIt.next();
-		if (mv.isTemporaryVariable()) {
-		    String s = "" + mv.name();
-		    s += "_" + MetavariableDeliverer.mv_Counter(s, p_goal);
-		    final Metavariable newMV = proof.getMetavariableDeliverer()
-			    .createNewVariable(s, mv.sort());
-		    newVars = newVars.add(newMV);
-		    removeVars = removeVars.add(mv);
-		    final Term newT = TB.var(newMV);
-		    final Term t = TB.var(mv);
-		    replaceC = replaceC.unify(t, newT, services);
-		} else
-		    newVars = newVars.add(mv);
-	    }
-
-	    if (!replaceC.isBottom()) {
-		constr = removeTemporaryMVsFromConstraint(constr, removeVars,
-			replaceC, services);
-		insts = removeTemporaryMVsFromInstantiations(insts, 
-							     replaceC,
-							     services);
-	    }
-	}
-
-	// Replace plain instantiations of termSV
-
-	final Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry>> it = insts
-		.pairIterator();
-
-	while (it.hasNext()) {
-	    final ImmutableMapEntry<SchemaVariable,InstantiationEntry> entry = it.next();
-	    final SchemaVariable sv = entry.key();
-
-	    if (introduceMVFor(entry, sv)) {
-		final Metavariable mv = getMVFor(sv, proof, p_goal, insts);
-		newVars = newVars.add(mv);
-		final Term t = TB.var(mv);
-		proof.getUserConstraint().addEquality(t,
-			((TermInstantiation) entry.value()).getTerm());
-		insts = insts.replace(sv, t, services);
-	    }
-	}
-
-	return handleUninstantiatedSVs(proof, p_goal, insts, constr, newVars);
-    }
-
-    /**
-     * Replace temporary metavariables (that were introduced when matching the
-     * taclet parts) within <code>insts</code> with definite metavariables
-     * 
-     * @param replaceC
-     *            a constraint that unifies each temporary metavariable with the
-     *            corresponding definite metavariable
-     */
-    @Deprecated
-    private static SVInstantiations removeTemporaryMVsFromInstantiations(
-	    SVInstantiations insts, 
-	    Constraint replaceC,
-	    Services services) {
-	final Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry>> it = insts
-		.pairIterator();
-
-	while (it.hasNext()) {
-	    final ImmutableMapEntry<SchemaVariable,InstantiationEntry> entry = it.next();
-	    final SchemaVariable sv = entry.key();
-
-	    if (sv instanceof FormulaSV || sv instanceof TermSV) {
-		final Object inst = entry.value().getInstantiation();
-		// NB: this only works because of the implementation of
-		// <code>Metavariable.compareTo</code>, in which temporary MVs
-		// are regarded as greater than normal MVs
-		final SyntacticalReplaceVisitor srVisitor = new SyntacticalReplaceVisitor(
-			replaceC);
-		((Term) inst).execPostOrder(srVisitor);
-		insts = insts.replace(sv, srVisitor.getTerm(), services);
-	    }
-	}
-	return insts;
-    }
-
-    /**
-     * Replace temporary metavariables (that were introduced when matching the
-     * taclet parts) within <code>constr</code> with definite metavariables
-     * 
-     * @param removeVars
-     *            the set of temporary metavariables to be removed
-     * @param replaceC
-     *            a constraint that unifies each temporary metavariable with the
-     *            corresponding definite metavariable
-     * @param services
-     *            the Services
-     */
-    @Deprecated
-    private static Constraint removeTemporaryMVsFromConstraint(
-	    Constraint constr, ImmutableSet<Metavariable> removeVars,
-	    Constraint replaceC, Services services) {
-	// that's tricky ...
-	constr = constr.join(replaceC, services);
-	return constr.removeVariables(removeVars);
-    }
-
-    /**
-     * @return true iff it is possible to use a metavariable to make the given
-     *         instantiation indirect, i.e. to instantiate the schema variable
-     *         with a metavariable instead of a term, and to add the real
-     *         instantiation to the user constraint
-     */
-    @Deprecated
-    private boolean introduceMVFor(
-	    ImmutableMapEntry<SchemaVariable,InstantiationEntry> entry, SchemaVariable sv) {
-	return sv instanceof TermSV
-		&& !taclet().getIfFindVariables().contains(sv)
-		&& canUseMVAPosteriori(sv, ((TermInstantiation) entry.value())
-			.getTerm());
-    }
-
-    /**
-     * Instantiate all uninstantiated schema variables with metavariables; it is
-     * assumed that this is possible (currently checked using an assertion)
-     * 
-     * @return a new taclet app in which all schema variables are instantiated
-     */
-    private TacletApp handleUninstantiatedSVs(Proof proof, 
-	    				      Goal goal,
-	    				      SVInstantiations insts, 
-	    				      Constraint constr, 
-	    				      ImmutableSet<Metavariable> newVars) {
-	insts = forceGenericSortInstantiations(insts, proof.getServices());
-
-	for (final SchemaVariable sv : uninstantiatedVars()) {
-	    Debug.assertTrue(canUseMVAPriori(sv),
-		    "Should be able to instantiate " + sv
-			    + " using metavariables, but am not");
-
-	    final Metavariable mv = getMVFor(sv, proof, goal, insts);
-	    newVars = newVars.add(mv);
-	    final Term t = TB.var(mv);
-	    insts = insts.add(sv, t, proof.getServices());
-	}
-
-	return setMatchConditions(new MatchConditions(insts, 
-						      constr, 
-						      newVars,
-						      RenameTable.EMPTY_TABLE),
-				  proof.getServices());
-    }
-
-    /**
-     * Create a Metavariable the given SchemaVariable can be instantiated with
-     * 
-     * @return an appropriate mv, or null if for some reason the creation failed
-     */
-    @Deprecated
-    private Metavariable getMVFor(SchemaVariable sv, 
-	    			  Proof proof, 
-	    			  Goal goal,
-	    			  SVInstantiations insts) {
-	final Sort realSort = insts.getGenericSortInstantiations().getRealSort(
-		sv, proof.getServices());
-
-	String nameProposal = TacletInstantiationsTableModel
-		.getBaseNameProposalForMetavariable(goal, this, sv);
-	return proof.getMetavariableDeliverer().createNewVariable(nameProposal,
-		realSort);
     }
 
     /**
@@ -1146,14 +895,13 @@ public abstract class TacletApp implements RuleApp {
      */
     public TacletApp setIfFormulaInstantiations(
 	    ImmutableList<IfFormulaInstantiation> p_list, 
-	    Services p_services,
-	    Constraint p_userConstraint) {
+	    Services p_services) {
 	assert p_list != null && ifInstsCorrectSize(taclet, p_list)
 		&& ifInstantiations == null : "If instantiations list has wrong size or is null "
 		+ "or the if formulas have already been instantiated";
 
 	MatchConditions mc = taclet().matchIf(p_list.iterator(),
-		matchConditions(), p_services, p_userConstraint);
+		matchConditions(), p_services);
 
 	return mc == null ? null : setAllInstantiations(mc, p_list, p_services);
     }
@@ -1166,8 +914,7 @@ public abstract class TacletApp implements RuleApp {
      */
     public ImmutableList<TacletApp> findIfFormulaInstantiations(
 	    Sequent p_seq,
-	    Services p_services, 
-	    Constraint p_userConstraint) {
+	    Services p_services) {
 
 	Debug.assertTrue(ifInstantiations == null,
 		"The if formulas have already been instantiated");
@@ -1182,7 +929,7 @@ public abstract class TacletApp implements RuleApp {
 		IfFormulaInstSeq.createList(p_seq, false), IfFormulaInstSeq
 			.createList(p_seq, true),
 		ImmutableSLList.<IfFormulaInstantiation>nil(), matchConditions(),
-		p_services, p_userConstraint);
+		p_services);
 
     }
 
@@ -1203,13 +950,12 @@ public abstract class TacletApp implements RuleApp {
      *            formulas of the if sequent
      */
     private ImmutableList<TacletApp> findIfFormulaInstantiationsHelp(
-	    ImmutableList<ConstrainedFormula> p_ifSeqTail,
-	    ImmutableList<ConstrainedFormula> p_ifSeqTail2nd,
+	    ImmutableList<SequentFormula> p_ifSeqTail,
+	    ImmutableList<SequentFormula> p_ifSeqTail2nd,
 	    ImmutableList<IfFormulaInstantiation> p_toMatch,
 	    ImmutableList<IfFormulaInstantiation> p_toMatch2nd,
 	    ImmutableList<IfFormulaInstantiation> p_alreadyMatched,
-	    MatchConditions p_matchCond, Services p_services,
-	    Constraint p_userConstraint) {
+	    MatchConditions p_matchCond, Services p_services) {
 
 	while (p_ifSeqTail.isEmpty()) {
 	    if (p_ifSeqTail2nd == null) {
@@ -1230,8 +976,7 @@ public abstract class TacletApp implements RuleApp {
 
 	// Match the current formula
 	IfMatchResult mr = taclet().matchIf(p_toMatch.iterator(),
-		p_ifSeqTail.head().formula(), p_matchCond, p_services,
-		p_userConstraint);
+		p_ifSeqTail.head().formula(), p_matchCond, p_services);
 
 	// For each matching formula call the method again to match
 	// the remaining terms
@@ -1242,17 +987,16 @@ public abstract class TacletApp implements RuleApp {
 	while (itCand.hasNext()) {
 	    res = res.prepend(findIfFormulaInstantiationsHelp(p_ifSeqTail,
 		    p_ifSeqTail2nd, p_toMatch, p_toMatch2nd, p_alreadyMatched
-			    .prepend(itCand.next()), itMC.next(), p_services,
-		    p_userConstraint));
+			    .prepend(itCand.next()), itMC.next(), p_services));
 	}
 
 	return res;
     }
 
-    private ImmutableList<ConstrainedFormula> createSemisequentList(Semisequent p_ss) {
-	ImmutableList<ConstrainedFormula> res = ImmutableSLList.<ConstrainedFormula>nil();
+    private ImmutableList<SequentFormula> createSemisequentList(Semisequent p_ss) {
+	ImmutableList<SequentFormula> res = ImmutableSLList.<SequentFormula>nil();
 
-        for (Object p_s : p_ss) res = res.prepend((ConstrainedFormula) p_s);
+        for (Object p_s : p_ss) res = res.prepend((SequentFormula) p_s);
 
 	return res;
     }
@@ -1274,8 +1018,6 @@ public abstract class TacletApp implements RuleApp {
 	return PosTacletApp.createPosTacletApp(
 		(FindTaclet) taclet(),
 		instantiations(), 
-		constraint(), 
-		newMetavariables(),
 		ifFormulaInstantiations(), 
 		pos,
 		services);
@@ -1290,20 +1032,7 @@ public abstract class TacletApp implements RuleApp {
      */
     public abstract boolean complete();
 
-    /**
-     * @return true iff the taclet instantiation can be made complete using
-     *         metavariables
-     */
-    public abstract boolean sufficientlyComplete(Services services);
-
-    /**
-     * @return true iff the SV instantiations can be made complete using
-     *         metavariables
-     */
-    public boolean instsSufficientlyComplete(Services services) {
-	return neededUninstantiatedVars(services).isEmpty();
-    }
-
+  
     /**
      * @return true iff the if instantiation list is not null or no if sequent
      *         is needed
@@ -1313,7 +1042,7 @@ public abstract class TacletApp implements RuleApp {
     }
 
     /**
-     * returns the PositionInOccurrence (representing a ConstrainedFormula and a
+     * returns the PositionInOccurrence (representing a SequentFormula and a
      * position in the corresponding formula)
      * 
      * @return the PosInOccurrence
@@ -1462,37 +1191,6 @@ public abstract class TacletApp implements RuleApp {
             }
         }
 	return null;
-    }
-
-    /**
-     * For a given SV of the taclet decide a priori whether an instantiation via
-     * metavariable is possible
-     * 
-     * @return true iff p_var is a termSV with empty prefix
-     */
-    @Deprecated
-    public boolean canUseMVAPriori(SchemaVariable p_var) {
-	return false;//metavariables are disabled;
-//	if (!(p_var instanceof TermSV) || fixedVars.contains(p_var))
-//	    return false;
-//	else {
-//	    TacletPrefix prefix = taclet().getPrefix(p_var);
-//	    return (prefix.prefix().size() == 0 && !prefix.context());
-//	}
-    }
-
-    /**
-     * For a given SV of the taclet decide a posteriori whether an instantiation
-     * via metavariable is possible
-     * 
-     * @param p_term
-     *            Term to instantiate the schemavariable with
-     */
-    @Deprecated
-    protected boolean canUseMVAPosteriori(SchemaVariable p_var, Term p_term) {
-	// disabled
-	return false;
-	// return canUseMVAPriori ( p_var ) && p_term.isRigid ();
     }
 
     /**

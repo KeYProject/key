@@ -12,7 +12,7 @@ package de.uka.ilkd.key.strategy.feature;
 
 import java.util.Iterator;
 
-import de.uka.ilkd.key.logic.ConstrainedFormula;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -41,7 +41,7 @@ public class SeqContainsExecutableCodeFeature extends BinaryFeature {
             || containsExec ( goal.sequent ().antecedent().iterator () );
     }
 
-    private boolean containsExec(Iterator<ConstrainedFormula> it) {
+    private boolean containsExec(Iterator<SequentFormula> it) {
         while ( it.hasNext () ) {
             if ( tf.compute ( it.next ().formula () ).equals (
                  BinaryTermFeature.ZERO_COST ) )

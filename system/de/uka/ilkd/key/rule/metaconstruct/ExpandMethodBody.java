@@ -29,7 +29,7 @@ import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-public class ExpandMethodBody extends ProgramMetaConstruct {
+public class ExpandMethodBody extends ProgramTransformer {
 
     static int counter = 0;
 
@@ -49,7 +49,7 @@ public class ExpandMethodBody extends ProgramMetaConstruct {
      * @param svInst the instantiations esp. of the inner and outer label 
      * @return the transformed program
      */
-    public ProgramElement symbolicExecution(ProgramElement pe,
+    public ProgramElement transform(ProgramElement pe,
 					    Services services,
 					    SVInstantiations svInst) {
 

@@ -32,7 +32,6 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.configuration.StrategySettings;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
-import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.proofevent.NodeReplacement;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
@@ -94,7 +93,7 @@ public class ApplyStrategy {
             app = g.getRuleAppManager().next();
             //Hack: built in rules may become applicable without BuiltInRuleAppIndex noticing---->
             if(app == null) {
-        	g.ruleAppIndex().scanBuiltInRules(g, Constraint.BOTTOM);
+        	g.ruleAppIndex().scanBuiltInRules(g);
         	app = g.getRuleAppManager().next();
             }
             //<-------
@@ -138,6 +137,7 @@ public class ApplyStrategy {
      * possible or the thread is interrupted.
      */
     Object doWork() {
+        mediator().resetNrGoalsClosedByHeuristics();
         time = System.currentTimeMillis();
         try{
 	   Debug.out("Strategy started.");

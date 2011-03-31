@@ -13,7 +13,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
+import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramConstant;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -22,7 +22,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * Replace a program variable that is a compile-time constant with the
  * value of the initializer
  */
-public final class ConstantValue extends AbstractMetaOperator {
+public final class ConstantValue extends AbstractTermTransformer {
 
 
     public ConstantValue() {
@@ -30,7 +30,7 @@ public final class ConstantValue extends AbstractMetaOperator {
     }
 
 
-    public Term calculate(Term term, SVInstantiations svInst, Services services) {
+    public Term transform(Term term, SVInstantiations svInst, Services services) {
 	term = term.sub ( 0 );
 	Operator op = term.op ();
 

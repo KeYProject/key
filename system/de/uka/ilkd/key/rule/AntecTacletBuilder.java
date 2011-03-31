@@ -91,7 +91,6 @@ public class AntecTacletBuilder extends FindTacletBuilder{
 						varsNewDependingOn,
 						variableConditions),
 			     goals, ruleSets,
-			     constraint,
 			     attrs,
 			     find,
 			     prefixBuilder.getPrefixMap(),

@@ -17,9 +17,9 @@ import de.uka.ilkd.key.java.reference.FieldReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-public class ArrayLength extends ProgramMetaConstruct {
+public class ArrayLength extends ProgramTransformer {
     
-     /** creates a typeof ProgramMetaConstruct 
+     /** creates a typeof ProgramTransformer 
      * @param expr the instance of expression contained by 
      * the meta construct 
      */
@@ -32,7 +32,7 @@ public class ArrayLength extends ProgramMetaConstruct {
      * program transformation 
      * @return the transformated program
      */
-    public ProgramElement symbolicExecution(ProgramElement pe,
+    public ProgramElement transform(ProgramElement pe,
 					    Services services,
 					    SVInstantiations insts) {
 	return new FieldReference

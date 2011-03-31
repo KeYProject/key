@@ -379,9 +379,9 @@ public final class ProblemInitializer {
     private void populateNamespaces(Proof proof) {
 	final NamespaceSet namespaces = proof.getNamespaces();
 	final Goal rootGoal = proof.openGoals().head();
-	Iterator<ConstrainedFormula> it = proof.root().sequent().iterator();
+	Iterator<SequentFormula> it = proof.root().sequent().iterator();
 	while(it.hasNext()) {
-	    ConstrainedFormula cf = it.next();
+	    SequentFormula cf = it.next();
 	    populateNamespaces(cf.formula(), namespaces, rootGoal);
 	}
     }

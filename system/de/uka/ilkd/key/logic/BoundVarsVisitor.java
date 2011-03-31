@@ -11,8 +11,6 @@
 
 package de.uka.ilkd.key.logic;
 
-import java.util.Iterator;
-
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -51,7 +49,7 @@ public class BoundVarsVisitor extends Visitor{
      * visits a sequent
      */
     public void visit(Sequent visited) {
-        for (ConstrainedFormula cf : visited) {
+        for (SequentFormula cf : visited) {
             visit(cf.formula());
         }
     }

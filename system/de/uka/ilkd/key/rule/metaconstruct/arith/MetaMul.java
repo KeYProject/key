@@ -15,18 +15,18 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
+import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
-public class MetaMul extends AbstractMetaOperator {
+public class MetaMul extends AbstractTermTransformer {
 
     public MetaMul() {
 	super(new Name("#mul"), 2);
     }
 
 
-    public Term calculate(Term term, SVInstantiations svInst, Services services) {
+    public Term transform(Term term, SVInstantiations svInst, Services services) {
 	Term arg1 = term.sub(0);
 	Term arg2 = term.sub(1);
 	BigInteger bigIntArg1;

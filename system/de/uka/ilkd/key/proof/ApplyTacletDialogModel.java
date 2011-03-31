@@ -48,8 +48,7 @@ public class ApplyTacletDialogModel {
     /** namespace of variables */
     private NamespaceSet nss;
     private Services services ;
-    @Deprecated
-    private Constraint userConstraint;
+ 
     private AbbrevMap scm;
     private Proof proof;
   
@@ -59,13 +58,11 @@ public class ApplyTacletDialogModel {
      */
     public ApplyTacletDialogModel(TacletApp app, Sequent seq,
 				  Services services,
-				  Constraint userConstraint,
-				  NamespaceSet nss, AbbrevMap scm,
-				  Goal goal) {
+				  NamespaceSet nss,
+				  AbbrevMap scm, Goal goal) {
 	this.app = app;
 	this.seq = seq;
 	this.services = services;
-	this.userConstraint = userConstraint;
 	this.nss = nss;
 	this.scm = scm;
 	this.proof = goal.proof();
@@ -127,7 +124,7 @@ public class ApplyTacletDialogModel {
 	    ImmutableList<IfFormulaInstantiation> succCand  =
 		IfFormulaInstSeq.createList ( seq, false );
 
-	    Iterator<ConstrainedFormula> it        = ifseq.iterator();
+	    Iterator<SequentFormula> it        = ifseq.iterator();
 	    Term                         ifFma;
 	    MatchConditions              matchCond = app.matchConditions ();
 
@@ -142,8 +139,7 @@ public class ApplyTacletDialogModel {
 							      succCand .iterator () ),
 							    ifFma,
 							    matchCond,
-							    services,
-							    userConstraint ).getFormulas (),
+							    services ).getFormulas (),
 					services, nss, scm);
 	    }
 	} else
@@ -167,7 +163,7 @@ public class ApplyTacletDialogModel {
 
 	try {
 	    tacletApp = tacletApp.setIfFormulaInstantiations
-		( instList, services, userConstraint );
+		( instList, services );
 	} catch ( SortException e ) {
 	    throw new SortMismatchException ( "'\\assumes'-sequent", null, 0, 0 );
 	}
@@ -203,7 +199,7 @@ public class ApplyTacletDialogModel {
 	    e.getCause().getMessage();
 	}
        	
-	if ( rapp.sufficientlyComplete (services) )
+	if ( rapp.complete () )
 	    return "Instantiation is OK.";
 	else
 	    return "Instantiations are incomplete."; 

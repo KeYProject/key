@@ -15,7 +15,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
+import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -23,7 +23,7 @@ import de.uka.ilkd.key.util.Debug;
 
 
 
-public final class MetaDiv extends AbstractMetaOperator {
+public final class MetaDiv extends AbstractTermTransformer {
 
     public MetaDiv() {
 	super(new Name("#div"), 2);
@@ -50,7 +50,7 @@ public final class MetaDiv extends AbstractMetaOperator {
 
 
     /** calculates the resulting term. */
-    public Term calculate(Term term, SVInstantiations svInst, Services services) {
+    public Term transform(Term term, SVInstantiations svInst, Services services) {
 	Term arg1 = term.sub(0);
 	Term arg2 = term.sub(1);
 	BigInteger bigIntArg1;

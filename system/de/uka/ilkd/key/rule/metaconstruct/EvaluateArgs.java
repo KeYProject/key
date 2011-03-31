@@ -29,9 +29,9 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
-public class EvaluateArgs extends ProgramMetaConstruct{
+public class EvaluateArgs extends ProgramTransformer{
 
-    /** creates a typeof ProgramMetaConstruct 
+    /** creates a typeof ProgramTransformer 
      * @param pe the instance of expression contained by 
      * the meta construct 
      */
@@ -59,7 +59,7 @@ public class EvaluateArgs extends ProgramMetaConstruct{
 
 
     @Override
-    public ProgramElement symbolicExecution(ProgramElement pe,
+    public ProgramElement transform(ProgramElement pe,
 					    Services services,
 					    SVInstantiations svInst) {
 

@@ -66,7 +66,6 @@ public final class RewriteTaclet extends FindTaclet {
      * the if-sequent, the variable conditions
      * @param goalTemplates a list of goal descriptions.
      * @param ruleSets a list of rule sets for the Taclet
-     * @param constraint the Constraint under which the Taclet is valid
      * @param attrs the TacletAttributes; these are boolean values
      * indicating a noninteractive or recursive use of the Taclet. 
      * @param find the find term of the Taclet
@@ -79,14 +78,13 @@ public final class RewriteTaclet extends FindTaclet {
     public RewriteTaclet(Name name, TacletApplPart applPart,  
 			 ImmutableList<TacletGoalTemplate>  goalTemplates, 
 			 ImmutableList<RuleSet>             ruleSets,
-			 Constraint                constraint,
 			 TacletAttributes          attrs,
-			 Term                      find, 
-			 ImmutableMap<SchemaVariable,TacletPrefix> prefixMap,
+			 Term                      find,
+			 ImmutableMap<SchemaVariable,TacletPrefix> prefixMap, 
 			 int                       p_stateRestriction,
 			 ImmutableSet<Choice> choices){
-	super(name, applPart, goalTemplates, ruleSets, constraint,
-	      attrs, find, prefixMap, choices);
+	super(name, applPart, goalTemplates, ruleSets, attrs,
+	      find, prefixMap, choices);
 	stateRestriction = p_stateRestriction;
 	
 	cacheMatchInfo();
@@ -136,8 +134,7 @@ public final class RewriteTaclet extends FindTaclet {
     public MatchConditions checkUpdatePrefix
 	( PosInOccurrence p_pos,
 	  MatchConditions p_mc,
-	  Services        p_services,
-	  Constraint      p_userConstraint ) {
+	  Services        p_services ) {
 	if ( getStateRestriction() == NONE)  
 	    return p_mc;
 
@@ -215,7 +212,7 @@ public final class RewriteTaclet extends FindTaclet {
     }
     
 
-    private ConstrainedFormula applyReplacewithHelper(
+    private SequentFormula applyReplacewithHelper(
 	    				RewriteTacletGoalTemplate gt, 
 				 	PosInOccurrence    posOfFind,
 				 	Services           services,
@@ -233,12 +230,12 @@ public final class RewriteTaclet extends FindTaclet {
 	if(term == formula) {
 	    return posOfFind.constrainedFormula();
 	} else {
-	    return new ConstrainedFormula(formula);
+	    return new SequentFormula(formula);
 	}
     }
     
     
-    public ConstrainedFormula getRewriteResult(Services services, 
+    public SequentFormula getRewriteResult(Services services, 
 	    				       TacletApp app) {
 	assert goalTemplates().size() == 1;
 	assert goalTemplates().head().sequent().isEmpty();	
@@ -253,7 +250,7 @@ public final class RewriteTaclet extends FindTaclet {
     }
 
 
-    /** CONSTRAINT NOT USED 
+    /** 
      * applies the replacewith part of Taclets
      * @param gt TacletGoalTemplate used to get the replaceexpression in the Taclet
      * @param goal the Goal where the rule is applied
@@ -267,17 +264,13 @@ public final class RewriteTaclet extends FindTaclet {
 				    Services           services,
 				    MatchConditions    matchCond) {
 	if ( gt instanceof RewriteTacletGoalTemplate ) {
-            ConstrainedFormula cf 
+            SequentFormula cf 
             	= applyReplacewithHelper((RewriteTacletGoalTemplate)gt, 
         	    			         posOfFind, 
         	    			         services, 
         	    			         matchCond);
-	    assert matchCond.getConstraint () == Constraint.BOTTOM : "metavariables are disabled";
-	    if ( createCopies ( goal, posOfFind, matchCond ) ) {
-                goal.addFormula ( cf, posOfFind );
-	    } else {
-                goal.changeFormula ( cf, posOfFind );
-	    }
+
+            goal.changeFormula ( cf, posOfFind );
 	} else {
 	    // Then there was no replacewith...
 	    // This is strange in a RewriteTaclet, but who knows...

@@ -9,7 +9,6 @@
 
 package de.uka.ilkd.key.gui;
 
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.util.ProgressMonitor;
 

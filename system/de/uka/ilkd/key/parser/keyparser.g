@@ -96,8 +96,6 @@ options {
       prooflabel2tag.put("contract", new Character('c'));
       prooflabel2tag.put("ifInst", new Character('x'));		
       prooflabel2tag.put("userinteraction", new Character('a'));
-      prooflabel2tag.put("userconstraint", new Character('o'));
-      prooflabel2tag.put("matchconstraint", new Character('m'));
       prooflabel2tag.put("newnames", new Character('w'));
       prooflabel2tag.put("autoModeTime", new Character('e'));
    }
@@ -803,7 +801,7 @@ options {
             }
 	    SchemaVariable sv = (SchemaVariable) attribute;            
             if(sv.sort() instanceof ProgramSVSort 
-                || sv.sort() == AbstractMetaOperator.METASORT) {
+                || sv.sort() == AbstractTermTransformer.METASORT) {
                 semanticError("Cannot use schema variable " + sv + " as an attribute"); 
             }
             result = TermBuilder.DF.select(getServices(), 
@@ -908,24 +906,20 @@ options {
             return tf.createTerm(v);
         } else {
 	  if(isGlobalDeclTermParser())
-		semanticError(v + " is not a logic variable");
-          if ((!isProblemParser()) && (v instanceof Metavariable)) {
-             return tf.createTerm(v);
-          } else {
-  	     if(isTermParser())
+		semanticError(v + " is not a logic variable");          
+  	  if(isTermParser())
                semanticError(v + " is an unknown kind of variable.");
-	    if (inSchemaMode() && v instanceof SchemaVariable ) {
+	  if (inSchemaMode() && v instanceof SchemaVariable ) {
                return tf.createTerm(v);
-            } else {
-	    	String errorMessage = "";
-                if ( inSchemaMode() ) {
-       	          errorMessage += v +" is not a program, logic or schema variable";
-                } else {
-                  errorMessage += v +" is not a logic or program variable";
-                }
-                semanticError(errorMessage);
-            }
-	  }
+          } else {
+	       String errorMessage = "";
+               if ( inSchemaMode() ) {
+       	         errorMessage += v +" is not a program, logic or schema variable";
+               } else {
+                 errorMessage += v +" is not a logic or program variable";
+               }
+               semanticError(errorMessage);
+            }  
 	}
 	return null;
     }
@@ -1126,9 +1120,9 @@ options {
 	return result;
     }
 
-    private boolean isMetaOperator() throws TokenStreamException {  
+    private boolean isTermTransformer() throws TokenStreamException {  
     if((LA(1) == IDENT &&
-         AbstractMetaOperator.name2metaop(LT(1).getText())!=null)
+         AbstractTermTransformer.name2metaop(LT(1).getText())!=null)
        || LA(1) == IN_TYPE)
       return true;
     return false;
@@ -2843,7 +2837,7 @@ accesstermlist returns [HashSet accessTerms = new HashSet()] {Term t = null;}:
 
 term130 returns [Term a = null]
     :
-        {isMetaOperator()}? a = specialTerm
+        {isTermTransformer()}? a = specialTerm
     |   a = funcpredvarterm
     |   LPAREN a = term RPAREN 
     |   TRUE  { a = tf.createTerm(Junctor.TRUE); }
@@ -3415,14 +3409,14 @@ termorseq returns [Object o]
                     // A sequent with only head in the antecedent.
                     Semisequent ant = Semisequent.EMPTY_SEMISEQUENT;
                     ant = ant.insertFirst(
-                                          new ConstrainedFormula(head, Constraint.BOTTOM)).semisequent();
+                                          new SequentFormula(head)).semisequent();
                     o = Sequent.createSequent(ant,ss);
                 }
             } else {
                 // A sequent.  Prepend head to the antecedent.
                 Semisequent newAnt = s.antecedent();
                 newAnt = newAnt .insertFirst(
-                                             new ConstrainedFormula(head, Constraint.BOTTOM)).semisequent();
+                                             new SequentFormula(head)).semisequent();
                 o = Sequent.createSequent(newAnt,s.succedent());
             }
         }
@@ -3441,7 +3435,7 @@ semisequent returns [Semisequent ss]
     :
         /* empty */ | 
         head=term ( COMMA ss=semisequent ) ? 
-        { ss = ss.insertFirst(new ConstrainedFormula(head, Constraint.BOTTOM)).semisequent(); }
+        { ss = ss.insertFirst(new SequentFormula(head)).semisequent(); }
     ;
 
 varexplist[TacletBuilder b] : varexp[b] ( COMMA varexp[b] ) * ;
@@ -3989,13 +3983,13 @@ ruleset[Vector rs]
         }
     ;
 
-metaId returns [MetaOperator v = null] 
+metaId returns [TermTransformer v = null] 
 {
   String id = null;
 }
 :
   id = simple_ident {
-     v = AbstractMetaOperator.name2metaop(id);
+     v = AbstractTermTransformer.name2metaop(id);
      if (v == null)
        semanticError("Unknown metaoperator: "+id);
   }
@@ -4005,11 +3999,11 @@ metaTerm returns [Term result = null]
 {
     LinkedList al = new LinkedList();
     String param = null;
-    MetaOperator vf = null;
+    TermTransformer vf = null;
     Term t = null;
 } 
     :
-        (vf = metaId (COLON param = simple_ident)? 
+        (vf = metaId 
            ( LPAREN 
             t = term
             {
@@ -4021,15 +4015,7 @@ metaTerm returns [Term result = null]
                     al.add(t);
                 }   
             )* RPAREN )?
-            {   
-	        if(param != null) {
-		  MetaOperator nvf = vf.getParamMetaOperator(param);
-		  if(nvf == null) {
-                    semanticError("Meta operator "+vf.name()+" is not a parametric meta operator.");
-		  }else {
-		    vf = nvf;
-		  }
-		}
+            {   	      
                 result = tf.createTerm(vf, (Term[])al.toArray(AN_ARRAY_OF_TERMS));
             }         
         ) 

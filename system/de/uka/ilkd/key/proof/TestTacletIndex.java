@@ -101,28 +101,28 @@ public class TestTacletIndex extends TestCase{
 	Term term_p1 = TacletForTests.parseTerm("p(one, zero)");	
 	ImmutableList<RuleSet> listofHeuristic=ImmutableSLList.<RuleSet>nil();
         listofHeuristic=listofHeuristic.prepend(h3);
-        PosInOccurrence pos = new PosInOccurrence(new ConstrainedFormula(term_p1, Constraint.BOTTOM),
+        PosInOccurrence pos = new PosInOccurrence(new SequentFormula(term_p1),
                 PosInTerm.TOP_LEVEL, true);
   	assertTrue("Noninteractive antecrule is not in list, but none of its"+
 		   "heuristics is active.",
 		   isRuleIn(variante_one.getAntecedentTaclet(pos,
 			    new IHTacletFilter (true, listofHeuristic),
-   			    null, Constraint.BOTTOM),ruleRewriteNonH1H2)); 
+   			    null),ruleRewriteNonH1H2)); 
 
  	assertTrue("Noninteractive antecrule is in list, but one of its "+
 		   "heuristics is active.",
 		   !isRuleIn(variante_one.getAntecedentTaclet(pos,
 		             new IHTacletFilter (true, listofHeuristic.prepend(h1)),
-			     null, Constraint.BOTTOM),ruleRewriteNonH1H2));  
+			     null),ruleRewriteNonH1H2));  
 
   	assertTrue("Noninteractive nofindrule is not in list, but none of its "+
 		   "heuristics is active.",
 		   isRuleIn(variante_one.getNoFindTaclet(new IHTacletFilter (true, ImmutableSLList.<RuleSet>nil()),
-   			    null, Constraint.BOTTOM),ruleNoFindNonH1H2H3));  
+   			    null),ruleNoFindNonH1H2H3));  
 
  	assertTrue("Noninteractive nofindrule is in list, but one of its "+
 		   "heuristics is active.",
-		   !isRuleIn(variante_one.getNoFindTaclet(new IHTacletFilter (true, listofHeuristic), null, Constraint.BOTTOM),ruleNoFindNonH1H2H3));
+		   !isRuleIn(variante_one.getNoFindTaclet(new IHTacletFilter (true, listofHeuristic), null),ruleNoFindNonH1H2H3));
 	
     }
 
@@ -134,7 +134,7 @@ public class TestTacletIndex extends TestCase{
 
 	Term term_p1 = TacletForTests.parseTerm("p(one, zero)");	
 
-        ConstrainedFormula cfma = new ConstrainedFormula(term_p1, Constraint.BOTTOM);
+        SequentFormula cfma = new SequentFormula(term_p1);
         
         PosInOccurrence posSucc  = new PosInOccurrence(cfma, PosInTerm.TOP_LEVEL, false);
         
@@ -142,25 +142,24 @@ public class TestTacletIndex extends TestCase{
 		   " not in succ list.",
 		   isRuleIn(variante_one.getSuccedentTaclet(posSucc,
 		            new IHTacletFilter (true, listofHeuristic),
-		            services, Constraint.BOTTOM), ruleSucc)); 
+		            services), ruleSucc)); 
         
   	assertTrue("ruleSucc has no heuristics, but is"+
 		   " in rewrite list.",
-		   !isRuleIn(variante_one.getRewriteTaclet(posSucc, Constraint.BOTTOM,
-		             new IHTacletFilter (true, listofHeuristic),
-		             services, Constraint.BOTTOM),ruleSucc)); 
+		   !isRuleIn(variante_one.getRewriteTaclet(posSucc, new IHTacletFilter (true, listofHeuristic),
+		             services),ruleSucc)); 
 
 
   	assertTrue("ruleSucc has no heuristics, but is"+
 		   " in heuristic succ list.",
 		   !isRuleIn(variante_one.getSuccedentTaclet(posSucc,
 		             new IHTacletFilter (false, listofHeuristic),
-		             services, Constraint.BOTTOM),ruleSucc)); 
+		             services),ruleSucc)); 
 
   	assertTrue("ruleSucc has no heuristics, but is"+
 		   " in heuristic of nofind list.",
 		   !isRuleIn(variante_one.getNoFindTaclet(new IHTacletFilter (false,
-   			     listofHeuristic), services, Constraint.BOTTOM),ruleSucc));
+   			     listofHeuristic), services),ruleSucc));
     }
 
     public void testNoMatchingFindRule() {
@@ -169,16 +168,16 @@ public class TestTacletIndex extends TestCase{
 
 	Term term_p2 = TacletForTests.parseTerm("\\forall nat z; p(z, one)").sub(0);
 	
-        PosInOccurrence posAntec = new PosInOccurrence(new ConstrainedFormula(term_p2, Constraint.BOTTOM),
+        PosInOccurrence posAntec = new PosInOccurrence(new SequentFormula(term_p2),
                 PosInTerm.TOP_LEVEL, true);
-        PosInOccurrence posSucc = new PosInOccurrence(new ConstrainedFormula(term_p2, Constraint.BOTTOM),
+        PosInOccurrence posSucc = new PosInOccurrence(new SequentFormula(term_p2),
                 PosInTerm.TOP_LEVEL, true);
 
         
  	assertTrue("rule matched, but no match possible",
 		   !isRuleIn(variante_one.getAntecedentTaclet(posAntec,
 		                                              new IHTacletFilter (true, listofHeuristic),
-		                                              services, Constraint.BOTTOM), 
+		                                              services), 
 			     ruleRewriteNonH1H2));
  
 
@@ -187,7 +186,7 @@ public class TestTacletIndex extends TestCase{
  	assertTrue("ruleSucc matched but matching not possible",
 		   !isRuleIn(variante_one.getSuccedentTaclet(posSucc,
 		             new IHTacletFilter (true, listofHeuristic),
-			     services, Constraint.BOTTOM),ruleSucc));		
+			     services),ruleSucc));		
     }
 
     public void testMatchConflictOccurs() {
@@ -202,13 +201,13 @@ public class TestTacletIndex extends TestCase{
 	Term term_p4 = TacletForTests.parseTerm("p(zero, one)");
 
 	ImmutableList<RuleSet> listofHeuristic=ImmutableSLList.<RuleSet>nil();
-        PosInOccurrence posAntec = new PosInOccurrence(new ConstrainedFormula(term_p4, Constraint.BOTTOM),
+        PosInOccurrence posAntec = new PosInOccurrence(new SequentFormula(term_p4),
                 PosInTerm.TOP_LEVEL, true);
 	
  	assertTrue("rule matched, but no match possible",
 		   !isRuleIn(ruleIdx.getAntecedentTaclet(posAntec,
 		             new IHTacletFilter (true, listofHeuristic),
-   			     services, Constraint.BOTTOM),ruleMisMatch));
+   			     services),ruleMisMatch));
  
     }
 
@@ -217,7 +216,7 @@ public class TestTacletIndex extends TestCase{
 	ruleIdx.add(notfreeconflict);
 
 	Term term_p5 = TacletForTests.parseTerm("\\forall nat z; p(f(z), z)");
-	ConstrainedFormula cfma_p5 = new ConstrainedFormula(term_p5);
+	SequentFormula cfma_p5 = new SequentFormula(term_p5);
 	Sequent seq_p5 = Sequent.createAnteSequent
 	    (Semisequent.EMPTY_SEMISEQUENT.insertFirst(cfma_p5).semisequent());
 	PosInOccurrence pio_p5 = new PosInOccurrence
@@ -227,13 +226,13 @@ public class TestTacletIndex extends TestCase{
 	assertTrue("No rule should match",
 		   !isRuleIn(appIdx.getTacletAppAt
 			     (TacletFilter.TRUE, pio_p5,
-			     null, Constraint.BOTTOM),
+			     null),
 			     notfreeconflict));
 
 	Term term_p6 = TacletForTests.
 	    parseTerm("\\forall nat z; p(zero, z)");
 
-	ConstrainedFormula cfma_p6 = new ConstrainedFormula(term_p6);
+	SequentFormula cfma_p6 = new SequentFormula(term_p6);
 	Sequent seq_p6 = Sequent.createAnteSequent
 	    (Semisequent.EMPTY_SEMISEQUENT.insertFirst(cfma_p6).semisequent());
 	PosInOccurrence pio_p6 = new PosInOccurrence
@@ -243,7 +242,7 @@ public class TestTacletIndex extends TestCase{
 	assertTrue("One rule should match", isRuleIn
 		   (appIdx.
 		    getTacletAppAt(TacletFilter.TRUE, pio_p6,
-		                   null, Constraint.BOTTOM),
+		                   null),
 		    notfreeconflict));
 	    
     }

@@ -13,7 +13,7 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.metaconstruct.MetaConstructWithSV;
+import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 
 /** 
  * This visitor is used to collect all appearing SchemaVariables in a 
@@ -68,16 +68,13 @@ public class ProgramSVCollector extends JavaASTWalker {
      * Not only schema variables must be taken into consideration, but also
      * program meta constructs with implicit schema variables containment
      * 
-     * @see MetaConstructWithSV
+     * @see ProgramTransformerWithSV
      */
-    protected void doAction(ProgramElement node) {
-	// System.out.println("bbbbbbbbbbbbbbb "+node+(node instanceof
-	// WhileInvRuleWrapper));
+    protected void doAction(ProgramElement node) {	
 	if (node instanceof SchemaVariable) {
 	    result = result.prepend((SchemaVariable) node);
-	} else if (node instanceof MetaConstructWithSV) {
-	    MetaConstructWithSV mc = (MetaConstructWithSV)node;
-	    result = result.prepend(mc.neededInstantiations(instantiations));
+	} else if (node instanceof ProgramTransformer) {
+	    result = result.prepend(((ProgramTransformer)node).neededInstantiations(instantiations));
 	}
     }
 }

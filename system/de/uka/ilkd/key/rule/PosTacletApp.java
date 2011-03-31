@@ -17,10 +17,8 @@ import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Metavariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -63,44 +61,20 @@ public class PosTacletApp extends TacletApp {
 			   Services services) { 
 	return createPosTacletApp ( taclet,
 				    instantiations,
-				    Constraint.BOTTOM,
-				    DefaultImmutableSet.<Metavariable>nil(),
 				    null,
 				    pos,
 				    services);
     }
-
-
-    public static PosTacletApp
-	createPosTacletApp(FindTaclet         taclet, 
-			   SVInstantiations   instantiations,
-			   Constraint         matchConstraint,
-			   ImmutableSet<Metavariable>  matchNewMetavariables,
-			   PosInOccurrence    pos,
-			   Services           services) { 
-	return createPosTacletApp ( taclet,
-				    instantiations,
-				    matchConstraint,
-				    matchNewMetavariables,
-				    null,
-				    pos,
-				    services);	
-    }
-
+    
     public static PosTacletApp
 	createPosTacletApp(FindTaclet                   taclet, 
 			   SVInstantiations             instantiations,
-			   Constraint                   matchConstraint,
-			   ImmutableSet<Metavariable>            matchNewMetavariables,
 			   ImmutableList<IfFormulaInstantiation> ifInstantiations,
 			   PosInOccurrence              pos,
 			   Services                     services) { 
 	Debug.assertTrue ( ifInstsCorrectSize ( taclet, ifInstantiations ),
 			   "If instantiations list has wrong size" );
         
-	if ( !matchConstraint.isSatisfiable () )
-	    return null;
-
 	instantiations=resolveCollisionWithContext(
 		taclet, 
 		resolveCollisionVarSV(taclet, instantiations, services), 
@@ -109,8 +83,6 @@ public class PosTacletApp extends TacletApp {
 	if (checkVarCondNotFreeIn(taclet, instantiations, pos)) {
 	    return new PosTacletApp(taclet,
 				    instantiations,
-				    matchConstraint,
-				    matchNewMetavariables,
 				    ifInstantiations,
 				    pos);
 	}
@@ -124,8 +96,6 @@ public class PosTacletApp extends TacletApp {
 						  Services           services) {
 	return createPosTacletApp ( taclet,
 				    matchCond.getInstantiations   (),
-				    matchCond.getConstraint       (),
-				    matchCond.getNewMetavariables (),
 				    null,
 				    pos,
 				    services);
@@ -146,20 +116,16 @@ public class PosTacletApp extends TacletApp {
     /** creates a PosTacletApp for the given taclet with some known instantiations
      * and a position information
      * @param taclet the FindTaclet 
+     * @param instantiations the SVInstantiations
      * @param pos the PosInOccurrence storing the position where to apply the 
      * Taclet
-     * @param instantiations the SVInstantiations
      */
     private PosTacletApp(FindTaclet                   taclet,
 			 SVInstantiations             instantiations,
-			 Constraint                   matchConstraint,
-			 ImmutableSet<Metavariable>            matchNewMetavariables,
 			 ImmutableList<IfFormulaInstantiation> ifInstantiations,
 			 PosInOccurrence              pos) { 
 	super(taclet,
 	      instantiations,
-	      matchConstraint,
-	      matchNewMetavariables,
 	      ifInstantiations);
 	this.pos = pos;
     }
@@ -244,16 +210,12 @@ public class PosTacletApp extends TacletApp {
 	    return createPosTacletApp((FindTaclet)taclet(), 
 				      instantiations()
 				      .addInteresting(sv, term, services),
-				      constraint       (),
-				      newMetavariables (),
 				      ifFormulaInstantiations (),
 				      posInOccurrence  (),
 				      services);
 	else
 	    return createPosTacletApp((FindTaclet)taclet(), 
 				      instantiations().add(sv, term, services),
-				      constraint       (),
-				      newMetavariables (),
 				      ifFormulaInstantiations (),
 				      posInOccurrence  (),
 				      services);
@@ -272,8 +234,6 @@ public class PosTacletApp extends TacletApp {
 	    return createPosTacletApp((FindTaclet)taclet(), 
 				      instantiations()
 				      .addInteresting(sv, pe, services),
-				      constraint       (),
-				      newMetavariables (),
 				      ifFormulaInstantiations (),
 				      posInOccurrence  (),
 				      services);
@@ -281,8 +241,6 @@ public class PosTacletApp extends TacletApp {
 	    return createPosTacletApp((FindTaclet)taclet(), 
 				      instantiations()
 				      .add(sv, pe, services),
-				      constraint       (),
-				      newMetavariables (),
 				      ifFormulaInstantiations (),
 				      posInOccurrence  (),
 				      services);
@@ -297,16 +255,12 @@ public class PosTacletApp extends TacletApp {
 	if (interesting) {
 	    return createPosTacletApp((FindTaclet) taclet(), 
 		    		      instantiations().addInterestingList(sv, list, services), 
-		    		      constraint(), 
-		    		      newMetavariables(),
 		    		      ifFormulaInstantiations(), 
 		    		      posInOccurrence(),
 		    		      services);
 	} else {
 	    return createPosTacletApp((FindTaclet) taclet(), 
 		    		      instantiations().addList(sv, list, services), 
-		    		      constraint(), 
-		    		      newMetavariables(),
 		    		      ifFormulaInstantiations(), 
 		    		      posInOccurrence(),
 		    		      services);
@@ -326,8 +280,6 @@ public class PosTacletApp extends TacletApp {
     public TacletApp addInstantiation(SVInstantiations svi, Services services) {
 	return createPosTacletApp((FindTaclet)taclet(), 
 				  svi.union(instantiations(), services),
-				  constraint       (),
-				  newMetavariables (),
 				  ifFormulaInstantiations (),
 				  posInOccurrence  (),
 				  services);
@@ -346,8 +298,6 @@ public class PosTacletApp extends TacletApp {
 	    			         Services services) {
 	return createPosTacletApp((FindTaclet)taclet(),
 				  svi,
-				  constraint       (),
-				  newMetavariables (),
 				  ifFormulaInstantiations (),
 				  posInOccurrence  (),
 				  services);
@@ -363,8 +313,6 @@ public class PosTacletApp extends TacletApp {
 	    				Services services) {
 	return createPosTacletApp( (FindTaclet)taclet(),
 				   mc.getInstantiations   (),
-				   mc.getConstraint       (),
-				   mc.getNewMetavariables (),
 				   ifFormulaInstantiations (),
 				   posInOccurrence (),
 				   services);
@@ -381,8 +329,6 @@ public class PosTacletApp extends TacletApp {
 					       Services                     services) {	
 	return createPosTacletApp( (FindTaclet)taclet(),
 				   mc.getInstantiations   (),
-				   mc.getConstraint       (),
-				   mc.getNewMetavariables (),
 				   ifInstantiations,
 				   posInOccurrence (),
 				   services);
@@ -400,20 +346,8 @@ public class PosTacletApp extends TacletApp {
 	    ifInstsComplete ();
     }
 
-
     /**
-     * @return true iff the taclet instantiation can be made complete
-     * using metavariables
-     */
-    public boolean sufficientlyComplete(Services services) {
-	return posInOccurrence() != null 
-	       && instsSufficientlyComplete(services) 
-	       && ifInstsComplete();
-    }
-
-
-    /**
-     * returns the PositionInOccurrence (representing a ConstrainedFormula and
+     * returns the PositionInOccurrence (representing a SequentFormula and
      * a position in the corresponding formula)
      * @return the PosInOccurrence
      */

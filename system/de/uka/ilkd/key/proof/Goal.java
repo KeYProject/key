@@ -22,10 +22,7 @@ import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.RuleAppListener;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.Metavariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.proof.incclosure.BranchRestricter;
-import de.uka.ilkd.key.proof.incclosure.Sink;
 import de.uka.ilkd.key.proof.proofevent.NodeChangeJournal;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
 import de.uka.ilkd.key.rule.*;
@@ -265,19 +262,19 @@ public class Goal  {
    
     /** adds a formula to the sequent before the given position
      * and informs the rule appliccation index about this change
-     * @param cf the ConstrainedFormula to be added
+     * @param cf the SequentFormula to be added
      * @param p PosInOccurrence encodes the position 
      */
-    public void addFormula(ConstrainedFormula cf, PosInOccurrence p) {
+    public void addFormula(SequentFormula cf, PosInOccurrence p) {
 	setSequent(sequent().addFormula(cf, p));	
     }
 
     /** adds a list of formulas to the sequent before the given position
      * and informs the rule appliccation index about this change
-     * @param insertions the IList<ConstrainedFormula> to be added
+     * @param insertions the IList<SequentFormula> to be added
      * @param p PosInOccurrence encodes the position 
      */
-    public void addFormula(ImmutableList<ConstrainedFormula> insertions, PosInOccurrence p) {
+    public void addFormula(ImmutableList<SequentFormula> insertions, PosInOccurrence p) {
 	if ( !insertions.isEmpty() ) {	  
 	    setSequent(sequent().addFormula(insertions, p));
 	}
@@ -286,13 +283,13 @@ public class Goal  {
     /** adds a list of formulas to the antecedent or succedent of a  
      * sequent. Either at its front or back.
      * and informs the rule appliccation index about this change
-     * @param insertions the IList<ConstrainedFormula> to be added
-     * @param inAntec boolean true(false) if ConstrainedFormula has to be
+     * @param insertions the IList<SequentFormula> to be added
+     * @param inAntec boolean true(false) if SequentFormula has to be
      * added to antecedent (succedent) 
      * @param first boolean true if at the front, if false then cf is
      * added at the back
      */
-    public void addFormula ( ImmutableList<ConstrainedFormula> insertions, 
+    public void addFormula ( ImmutableList<SequentFormula> insertions, 
 			     boolean inAntec, boolean first ) {
 	if ( !insertions.isEmpty() ) {
 	    setSequent(sequent().
@@ -303,13 +300,13 @@ public class Goal  {
     /** adds a formula to the antecedent or succedent of a
      * sequent. Either at its front or back
      * and informs the rule appliccation index about this change
-     * @param cf the ConstrainedFormula to be added
-     * @param inAntec boolean true(false) if ConstrainedFormula has to be
+     * @param cf the SequentFormula to be added
+     * @param inAntec boolean true(false) if SequentFormula has to be
      * added to antecedent (succedent) 
      * @param first boolean true if at the front, if false then cf is
      * added at the back
      */
-    public void addFormula ( ConstrainedFormula cf, boolean inAntec,
+    public void addFormula ( SequentFormula cf, boolean inAntec,
 			     boolean first ) {
 	setSequent(sequent().addFormula(cf, inAntec, first));
     }
@@ -379,20 +376,20 @@ public class Goal  {
     /** 
      * replaces a formula at the given position  
      * and informs the rule application index about this change
-     * @param cf the ConstrainedFormula replacing the old one
+     * @param cf the SequentFormula replacing the old one
      * @param p the PosInOccurrence encoding the position 
      */
-    public void changeFormula(ConstrainedFormula cf, PosInOccurrence p) {	
+    public void changeFormula(SequentFormula cf, PosInOccurrence p) {	
 	setSequent(sequent().changeFormula(cf, p));
     }
 
     /** 
      * replaces a formula at the given position  
      * and informs the rule appliccation index about this change
-     * @param replacements the ConstrainedFormula replacing the old one
+     * @param replacements the SequentFormula replacing the old one
      * @param p PosInOccurrence encodes the position 
      */
-    public void changeFormula(ImmutableList<ConstrainedFormula> replacements, 
+    public void changeFormula(ImmutableList<SequentFormula> replacements, 
 			      PosInOccurrence p) {
 	setSequent(sequent().changeFormula(replacements, p));
     }
@@ -420,16 +417,13 @@ public class Goal  {
      * of the goal and to the current RuleAppIndex.
      * @param rule the Taclet of the TacletApp to create
      * @param insts the given instantiations of the TacletApp to be created
-     * @param constraint the constraint under which the taclet can be applied
      */
     public void addTaclet(Taclet           rule,
 			  SVInstantiations insts,
-			  Constraint       constraint,
-                          boolean          isAxiom) {		
+			  boolean          isAxiom) {		
 	NoPosTacletApp tacletApp =
 	    NoPosTacletApp.createFixedNoPosTacletApp(rule, 
 		    				     insts, 
-		    				     constraint,
 		    				     proof().getServices());
 	if (tacletApp != null) {
 	    addNoPosTacletApp(tacletApp);
@@ -529,8 +523,6 @@ public class Goal  {
 	Node parent = node(); // has to be stored because the node
 	                      // of this goal will be replaced
         if (n>0) {
-	    Iterator<Sink> itSinks = parent.reserveSinks ( n );
-	    BranchRestricter br;
 	    Node newNode = null;
 	    Goal newGoal = null;
 
@@ -541,20 +533,11 @@ public class Goal  {
 		    newGoal = copy();
 		}
 		// create new node and add to tree
-		if ( n > 1 ) {
-		    br = new BranchRestricter ( itSinks.next () );
-		    newNode = new Node(parent.proof(),
-				       parent.sequent(),
-				       null,
-				       parent,
-				       br);
-		    br.setNode ( newNode );
-		} else
-		    newNode = new Node(parent.proof(),
-				       parent.sequent(),
-				       null,
-				       parent,
-				       itSinks.next ());
+
+		newNode = new Node(parent.proof(),
+			parent.sequent(),
+			null,
+			parent);
 
 		// newNode.addNoPosTacletApps(parent.getNoPosTacletApps());
 		newNode.setGlobalProgVars(parent.getGlobalProgVars());
@@ -602,7 +585,6 @@ public class Goal  {
         removeTaclets();
 	setGlobalProgVars(parent.getGlobalProgVars());
 
-	parent.cutChildrenSinks ();
 	if (node.proof().env()!=null) { // do not break everything
 	                                // because of ProofMgt
 	    node.proof().mgt().ruleUnApplied(parent.getAppliedRuleApp());
@@ -638,22 +620,6 @@ public class Goal  {
            ruleAppIndex.removeNoPosTacletApp(it.next ());
     }
 
-
-    @Deprecated    
-    public Constraint getClosureConstraint () {
-	return node ().getClosureConstraint ();
-    }
-
-    @Deprecated    
-    public void addClosureConstraint ( Constraint c ) {
-	node ().addClosureConstraint ( c );
-    }
-
-    @Deprecated
-    public void addRestrictedMetavariable ( Metavariable mv ) {
-	node ().addRestrictedMetavariable ( mv );
-    }
-    
     public void setBranchLabel(String s) {
         node.getNodeInfo().setBranchLabel(s);
     }
@@ -694,13 +660,13 @@ public class Goal  {
             // this happens for the simplify decision procedure
             // we do nothing in this case
         } else if ( goalList.isEmpty() ) {
-            proof.closeGoal ( this, ruleApp.constraint () );           
+            proof.closeGoal ( this );           
         } else {
             proof.replace ( this, goalList );
             if ( ruleApp instanceof TacletApp &&
                     ((TacletApp)ruleApp).taclet ().closeGoal () )
                 // the first new goal is the one to be closed
-                proof.closeGoal ( goalList.head (), ruleApp.constraint () );
+                proof.closeGoal ( goalList.head () );
         }
 
         final RuleAppInfo ruleAppInfo = journal.getRuleAppInfo(p_ruleApp);

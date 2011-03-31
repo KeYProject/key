@@ -76,7 +76,7 @@ class Instantiation {
 
     private static ImmutableSet<Term> sequentToTerms(Sequent seq) {
 	ImmutableSet<Term> res = DefaultImmutableSet.<Term> nil();
-	for (final ConstrainedFormula cf : seq) {
+	for (final SequentFormula cf : seq) {
 	    res = res.add(cf.formula());
 	}
 	return res;
@@ -151,13 +151,13 @@ class Instantiation {
      */
     private ImmutableSet<Term> initAssertLiterals(Sequent seq) {
 	ImmutableSet<Term> assertLits = DefaultImmutableSet.<Term> nil();
-	for (final ConstrainedFormula cf : seq.antecedent()) {
+	for (final SequentFormula cf : seq.antecedent()) {
 	    final Term atom = cf.formula();
 	    final Operator op = atom.op();
             if ( !( op == Quantifier.ALL || op == Quantifier.EX ) )
 		assertLits = assertLits.add(atom);
 	}
-	for (final ConstrainedFormula cf : seq.succedent()) {
+	for (final SequentFormula cf : seq.succedent()) {
 	    final Term atom = cf.formula();
 	    final Operator op = atom.op();
             if ( !( op == Quantifier.ALL || op == Quantifier.EX ) )

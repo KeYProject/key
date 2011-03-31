@@ -76,7 +76,6 @@ public class RewriteTacletBuilder extends FindTacletBuilder{
 						    varsNewDependingOn,
 						    variableConditions),
 				 goals, ruleSets,
-				 constraint,
 				 attrs,
 				 find,
 				 prefixBuilder.getPrefixMap(),

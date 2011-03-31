@@ -201,7 +201,7 @@ public class KeYSelectionModel {
 	    g = it.next ();
 	    if ( firstG == null )
 		firstG = g;
-	    if ( g.getClosureConstraint ().isSatisfiable () )
+	    if ( false /* g.getClosureConstraint ().isSatisfiable () */)
 		g = null;
 	}
 

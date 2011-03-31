@@ -10,17 +10,61 @@
 
 package de.uka.ilkd.key.gui;
 
-import java.awt.*;
-import java.awt.Dialog.ModalExclusionType;
-import java.awt.event.*;
-import java.io.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Cursor;
+import java.awt.Desktop;
+import java.awt.FlowLayout;
+import java.awt.Frame;
+import java.awt.GridBagLayout;
+import java.awt.Point;
+import java.awt.TextArea;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.LinkedList;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.ButtonGroup;
+import javax.swing.Icon;
+import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
+import javax.swing.JToolBar;
+import javax.swing.JViewport;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
+import javax.swing.ToolTipManager;
+import javax.swing.WindowConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -28,7 +72,16 @@ import javax.swing.event.MouseInputAdapter;
 import javax.swing.text.JTextComponent;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.gui.configuration.*;
+import de.uka.ilkd.key.gui.configuration.ChoiceSelector;
+import de.uka.ilkd.key.gui.configuration.Config;
+import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
+import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
+import de.uka.ilkd.key.gui.configuration.GeneralSettings;
+import de.uka.ilkd.key.gui.configuration.PathConfig;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.gui.configuration.SettingsListener;
+import de.uka.ilkd.key.gui.configuration.StrategySettings;
+import de.uka.ilkd.key.gui.configuration.ViewSelector;
 import de.uka.ilkd.key.gui.nodeviews.NonGoalInfoView;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.gui.notification.NotificationManager;
@@ -38,26 +91,31 @@ import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.gui.smt.ComplexButton;
-import de.uka.ilkd.key.gui.smt.ProgressDialog;
-import de.uka.ilkd.key.gui.smt.ProgressPanel;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
 import de.uka.ilkd.key.gui.smt.SettingsDialog;
 import de.uka.ilkd.key.gui.smt.SolverListener;
 import de.uka.ilkd.key.gui.smt.TemporarySettings;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.pp.*;
-import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
+import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.pp.ProgramPrinter;
+import de.uka.ilkd.key.pp.SequentPrintFilter;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.ProblemLoader;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofEvent;
+import de.uka.ilkd.key.proof.ProofSaver;
+import de.uka.ilkd.key.proof.ProofTreeAdapter;
+import de.uka.ilkd.key.proof.ProofTreeEvent;
+import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
-
+import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.smt.SMTProblem;
-import de.uka.ilkd.key.smt.SolverException;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
-
-import de.uka.ilkd.key.rule.OneStepSimplifier;
-
-
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.key.util.KeYResourceManager;
@@ -109,10 +167,7 @@ public final class Main extends JFrame implements IMain {
     
     /** the strategy selection view */
     private StrategySelectionView strategySelectionView = null;
-    
-    /** the current user constraint */
-    private ConstraintTableModel userConstraint = null;
-    
+   
     /** contains a list of all proofs */
     private JScrollPane proofListView;
     
@@ -138,10 +193,7 @@ public final class Main extends JFrame implements IMain {
     private RecentFileMenu recentFiles;
     
     private boolean frozen = false;
-    
-    /** listener to changes of the user constraint */
-    private MainConstraintTableListener constraintListener;
-     
+   
     private static KeYFileChooser fileChooser = null;
     
     private static final String PARA = 
@@ -185,10 +237,6 @@ public final class Main extends JFrame implements IMain {
     
     /** external prover GUI elements */
     private SMTSettingsListener smtSettingsListener;
-    private JSlider ruletimeout;
-    private JLabel ruletimeoutlabel;
-    private JButton decisionProcedureInvocationButton;
-
     
     protected static String fileNameOnStartUp = null;
     
@@ -203,15 +251,10 @@ public final class Main extends JFrame implements IMain {
     
     private NotificationManager notificationManager;
 
-    /** The radio items shown in the SMT menu for the different available solvers */
-    private final ArrayList<JRadioButtonMenuItem> shownSMTRadioItems = new ArrayList<JRadioButtonMenuItem>();
-
     private ComplexButton smtComponent;
     
     /** The menu for the SMT solver options */
     public final JMenu smtOptions = new JMenu("SMT Solvers...");
-    
-    
     
     /**
      * creates prover -- private, use getInstance()
@@ -225,7 +268,6 @@ public final class Main extends JFrame implements IMain {
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         proofListener = new MainProofListener();
         guiListener = new MainGUIListener();
-        constraintListener = new MainConstraintTableListener();
         
         taskListener = (Main.batchMode ? (ProverTaskListener)
                 new MainTaskListenerBatchMode() : 
@@ -922,7 +964,6 @@ public final class Main extends JFrame implements IMain {
 		    "Proof Statistics", JOptionPane.INFORMATION_MESSAGE);
 	}
     }
-
     
     protected void makePrettyView() {
         if (mediator().ensureProofLoadedSilent()) {
@@ -1567,10 +1608,7 @@ public final class Main extends JFrame implements IMain {
      * prints the content of the sequent view
      */
     public void printSequentView(Sequent sequent) {
-        SequentPrintFilter filter =
-            new ConstraintSequentPrintFilter ( sequent,
-                    mediator ().getUserConstraint ()
-                    .getConstraint () );
+        SequentPrintFilter filter = new IdentitySequentPrintFilter ( sequent );
         final LogicPrinter printer = new LogicPrinter
         (new ProgramPrinter(null), 
                 mediator().getNotationInfo(),
@@ -2029,8 +2067,7 @@ public final class Main extends JFrame implements IMain {
                 sequentView.setPrinter(printer, null);
                 return;
             }
-            if ( goal != null &&
-                    !mediator.getUserConstraint ().displayClosed ( goal.node () ) ){
+            if ( goal != null && !goal.node ().isClosed() ){
                 printSequentView(goal.sequent());
             } else {
                 NonGoalInfoView innerNodeView = 
@@ -2070,16 +2107,6 @@ public final class Main extends JFrame implements IMain {
             disableCurrentGoalView = false;	    
             goalView.setViewportView(null);
             
-            if ( userConstraint != null )
-                userConstraint
-                .removeConstraintTableListener ( constraintListener );
-            
-            userConstraint = (proof != null) ? proof.getUserConstraint() :
-                null;
-            
-            if ( userConstraint != null )
-                userConstraint
-                .addConstraintTableListener ( constraintListener );
             setProofNodeDisplay();
             smtSettingsListener.settingsChanged(new GUIEvent((proof != null ? 
         	    proof.getSettings() : ProofSettings.DEFAULT_SETTINGS).getSMTSettings()));
@@ -2219,14 +2246,6 @@ public final class Main extends JFrame implements IMain {
         }
     }
 
-
-    
-    class MainConstraintTableListener implements ConstraintTableListener {
-        public void constraintChanged(ConstraintTableEvent e) {
-            setProofNodeDisplay();
-        }
-    }
-    
     class MainTaskListenerBatchMode implements ProverTaskListener { // XXX
         public void taskStarted(String message, int size) {
             System.out.print(message+" ... ");

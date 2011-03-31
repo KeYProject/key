@@ -11,7 +11,7 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.logic.ConstrainedFormula;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.proof.Goal;
@@ -56,7 +56,7 @@ public class NonDuplicateAppFeature extends AbstractNonDuplicateAppFeature {
     }
 
     protected boolean semiSequentContains(Semisequent semisequent,
-                                          ConstrainedFormula cfma) {
+                                          SequentFormula cfma) {
         return semisequent.contains ( cfma );
     }
 }

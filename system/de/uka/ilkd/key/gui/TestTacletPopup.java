@@ -87,8 +87,8 @@ public class TestTacletPopup {
 	impleftbuilder.setName(new Name("imp-left"));
 	Sequent ante = Sequent.createSequent
 	    (Semisequent.EMPTY_SEMISEQUENT.insert
-	     (0, new ConstrainedFormula
-		 (t_b0, Constraint.BOTTOM)).semisequent(),
+	     (0, new SequentFormula
+		 (t_b0)).semisequent(),
 	     Semisequent.EMPTY_SEMISEQUENT); 
 	impleftbuilder.addTacletGoalTemplate(new
 	    AntecSuccTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
@@ -96,7 +96,7 @@ public class TestTacletPopup {
 				      ante));
 	Sequent succ=Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT,
 		    Semisequent.EMPTY_SEMISEQUENT.insert(0, new
-			ConstrainedFormula(t_b, Constraint.BOTTOM)).semisequent()); 
+			SequentFormula(t_b)).semisequent()); 
 	impleftbuilder.addTacletGoalTemplate(new
 	    AntecSuccTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
 				      ImmutableSLList.<Taclet>nil(),
@@ -109,9 +109,9 @@ public class TestTacletPopup {
 	imprightbuilder.setFind(t_bimpb0);
 	Sequent seq=Sequent.createSequent
 	    (Semisequent.EMPTY_SEMISEQUENT.insert(0,new
-		ConstrainedFormula(t_b, Constraint.BOTTOM)).semisequent(),
+		SequentFormula(t_b)).semisequent(),
 	     Semisequent.EMPTY_SEMISEQUENT.insert(0, new
-		 ConstrainedFormula(t_b0, Constraint.BOTTOM)).semisequent()); 
+		 SequentFormula(t_b0)).semisequent()); 
 	imprightbuilder.addTacletGoalTemplate(new
 	    AntecSuccTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
 				      ImmutableSLList.<Taclet>nil(),
@@ -126,7 +126,7 @@ public class TestTacletPopup {
 	notleftbuilder.setFind(t_notb);
 	seq=Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT,
 		    Semisequent.EMPTY_SEMISEQUENT.insert(0, new
-			ConstrainedFormula(t_b, Constraint.BOTTOM)).semisequent()); 
+			SequentFormula(t_b)).semisequent()); 
 	notleftbuilder.addTacletGoalTemplate(new
 	    AntecSuccTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
 				      ImmutableSLList.<Taclet>nil(),
@@ -139,7 +139,7 @@ public class TestTacletPopup {
 	SuccTacletBuilder notrightbuilder=new SuccTacletBuilder();
 	notrightbuilder.setFind(t_notb);
 	seq=Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT.insert(0,new
-			ConstrainedFormula(t_b, Constraint.BOTTOM)).semisequent(),
+			SequentFormula(t_b)).semisequent(),
 		    Semisequent.EMPTY_SEMISEQUENT); 
 	notrightbuilder.addTacletGoalTemplate(new
 	    AntecSuccTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
@@ -152,14 +152,14 @@ public class TestTacletPopup {
 	// add(b=>) add(=>b)
 	NoFindTacletBuilder nfbuilder=new NoFindTacletBuilder();
 	seq=Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT.insert(0,new
-			ConstrainedFormula(t_b, Constraint.BOTTOM)).semisequent(),
+			SequentFormula(t_b)).semisequent(),
 		    Semisequent.EMPTY_SEMISEQUENT); 
 	nfbuilder.addTacletGoalTemplate(new
 	    TacletGoalTemplate(seq, ImmutableSLList.<Taclet>nil()));
 
 	seq=Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT,
 		    Semisequent.EMPTY_SEMISEQUENT.insert(0,new
-			ConstrainedFormula(t_b, Constraint.BOTTOM)).semisequent());
+			SequentFormula(t_b)).semisequent());
 		     
 	nfbuilder.addTacletGoalTemplate(new
 	    TacletGoalTemplate(seq, ImmutableSLList.<Taclet>nil()));
@@ -175,7 +175,7 @@ public class TestTacletPopup {
 	SuccTacletBuilder closebuilder=new SuccTacletBuilder();
 	closebuilder.setFind(t_b);
 	seq=Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT.insert(0,new
-			ConstrainedFormula(t_b, Constraint.BOTTOM)).semisequent(),
+			SequentFormula(t_b)).semisequent(),
 		    Semisequent.EMPTY_SEMISEQUENT); 
 	closebuilder.setIfSequent(seq);
 	closebuilder.setName(new Name("close"));
@@ -190,7 +190,7 @@ public class TestTacletPopup {
 	RewriteTacletBuilder rwbuilder=new RewriteTacletBuilder();
 	rwbuilder.setFind(t_bimpb0);
 	seq=Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT.insert(0,new
-			ConstrainedFormula(t_b, Constraint.BOTTOM)).semisequent(),
+			SequentFormula(t_b)).semisequent(),
 		    Semisequent.EMPTY_SEMISEQUENT); 
 	rwbuilder.addTacletGoalTemplate(new
 	    RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
@@ -210,7 +210,7 @@ public class TestTacletPopup {
 	allrightbuilder.setFind(t_allxb);
 	seq=Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT,
 		    Semisequent.EMPTY_SEMISEQUENT.insert(0,new
-			ConstrainedFormula(t_subxt0b, Constraint.BOTTOM)).semisequent());
+			SequentFormula(t_subxt0b)).semisequent());
 
 	allrightbuilder.addTacletGoalTemplate(new
 	    AntecSuccTacletGoalTemplate(seq,
@@ -225,7 +225,7 @@ public class TestTacletPopup {
 	AntecTacletBuilder allleftbuilder=new AntecTacletBuilder();
 	allleftbuilder.setFind(t_allxb);
 	seq=Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT.insert(0,new
-	    ConstrainedFormula(t_subxt0b, Constraint.BOTTOM)).semisequent(),
+	    SequentFormula(t_subxt0b)).semisequent(),
 				  Semisequent.EMPTY_SEMISEQUENT);
 
 	allleftbuilder.addTacletGoalTemplate(new
@@ -241,9 +241,9 @@ public class TestTacletPopup {
 
 	remove_and_leftbuilder.setFind(t_bandb0);
 	seq=Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT.insert(0,new
-	    ConstrainedFormula
-	    (t_b0, Constraint.BOTTOM)).semisequent().insert(0,new
-		ConstrainedFormula(t_b, Constraint.BOTTOM)).semisequent(),
+	    SequentFormula
+	    (t_b0)).semisequent().insert(0,new
+		SequentFormula(t_b)).semisequent(),
 				  Semisequent.EMPTY_SEMISEQUENT);
 
 	remove_and_leftbuilder.addTacletGoalTemplate(new
@@ -258,7 +258,7 @@ public class TestTacletPopup {
 	AntecTacletBuilder remove_or_leftbuilder=new AntecTacletBuilder();
 	remove_or_leftbuilder.setFind(t_borb0);
 	seq=Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT.insert(0,new
-	    ConstrainedFormula(t_b, Constraint.BOTTOM)).semisequent(),
+	    SequentFormula(t_b)).semisequent(),
 				  Semisequent.EMPTY_SEMISEQUENT);
 
 	remove_or_leftbuilder.addTacletGoalTemplate(new
@@ -267,7 +267,7 @@ public class TestTacletPopup {
 				      seq));
 
 	seq=Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT.insert(0,new
-	    ConstrainedFormula(t_b0, Constraint.BOTTOM)).semisequent(), 
+	    SequentFormula(t_b0)).semisequent(), 
 				  Semisequent.EMPTY_SEMISEQUENT);
 
 	remove_or_leftbuilder.addTacletGoalTemplate(new
@@ -284,8 +284,8 @@ public class TestTacletPopup {
 	remove_and_rightbuilder.setFind(t_bandb0);
 	seq=Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT, 
 				  Semisequent.EMPTY_SEMISEQUENT.insert
-				  (0, new ConstrainedFormula
-				      (t_b, Constraint.BOTTOM)).semisequent());
+				  (0, new SequentFormula
+				      (t_b)).semisequent());
 
 	remove_and_rightbuilder.addTacletGoalTemplate(new
 	    AntecSuccTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
@@ -295,7 +295,7 @@ public class TestTacletPopup {
 	seq=Sequent.createSequent
 	    (Semisequent.EMPTY_SEMISEQUENT, 
 	     Semisequent.EMPTY_SEMISEQUENT.insert
-	     (0, new ConstrainedFormula(t_b0, Constraint.BOTTOM)).semisequent());
+	     (0, new SequentFormula(t_b0)).semisequent());
 
 	remove_and_rightbuilder.addTacletGoalTemplate(new
 	    AntecSuccTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
@@ -312,8 +312,8 @@ public class TestTacletPopup {
 	remove_or_rightbuilder.setFind(t_borb0);
 	seq=Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT, 
 				  Semisequent.EMPTY_SEMISEQUENT.insert(0,new
-	    ConstrainedFormula(t_b0, Constraint.BOTTOM)).semisequent().insert(0,new
-		ConstrainedFormula(t_b, Constraint.BOTTOM)).semisequent());
+	    SequentFormula(t_b0)).semisequent().insert(0,new
+		SequentFormula(t_b)).semisequent());
 
 
 	remove_or_rightbuilder.addTacletGoalTemplate(new
@@ -474,8 +474,8 @@ public class TestTacletPopup {
 	    //fail("Parser Error");
 	}	
 
-	ConstrainedFormula cf=new ConstrainedFormula(t_test1, Constraint.BOTTOM);
-	ConstrainedFormula cf2=new ConstrainedFormula(t_test1, Constraint.BOTTOM);
+	SequentFormula cf=new SequentFormula(t_test1);
+	SequentFormula cf2=new SequentFormula(t_test1);
 	seq_test1=Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT,
 		    Semisequent.EMPTY_SEMISEQUENT.insert(0,cf).semisequent()); 
 
@@ -492,8 +492,7 @@ public class TestTacletPopup {
 	Term t_z = TB.var(z);
 	Term t_allzpz
 	    = TB.all(z, TB.func(p, new Term[]{t_z}));
-	ConstrainedFormula cf3 = new ConstrainedFormula(t_allzpz, 
-						    Constraint.BOTTOM);
+	SequentFormula cf3 = new SequentFormula(t_allzpz);
 	seq_testAll=Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT, 
 					  Semisequent.EMPTY_SEMISEQUENT
 					  .insert(0,cf3).semisequent()); 
@@ -530,7 +529,7 @@ public class TestTacletPopup {
 	seq_testNat=Sequent.createSequent
 	    (Semisequent.EMPTY_SEMISEQUENT,
 	     Semisequent.EMPTY_SEMISEQUENT.insert
-	     (0, new ConstrainedFormula(tnat, Constraint.BOTTOM)).semisequent());
+	     (0, new SequentFormula(tnat)).semisequent());
 
 
     }

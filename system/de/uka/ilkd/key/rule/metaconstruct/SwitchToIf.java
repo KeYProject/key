@@ -33,13 +33,13 @@ import de.uka.ilkd.key.util.ExtList;
 /** This class is used to perform program transformations needed 
  * for the symbolic execution of a switch-case statement.
  */
-public class SwitchToIf extends ProgramMetaConstruct {
+public class SwitchToIf extends ProgramTransformer {
 
     public static int labelCount = 0;
     private boolean noNewBreak = true;
 
 
-     /** creates a switch-to-if ProgramMetaConstruct 
+     /** creates a switch-to-if ProgramTransformer 
      * @param _switch the Statement contained by the meta construct 
      */
     public SwitchToIf(SchemaVariable _switch) {
@@ -51,7 +51,7 @@ public class SwitchToIf extends ProgramMetaConstruct {
      * program transformation 
      * @return the transformated program
      */
-    public ProgramElement symbolicExecution(ProgramElement pe,
+    public ProgramElement transform(ProgramElement pe,
 					    Services services,
 					    SVInstantiations insts) {
 	Switch sw = (Switch) pe;

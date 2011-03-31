@@ -23,7 +23,11 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofTreeAdapter;
+import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.util.Debug;
 
 /** An implementation of TreeModel that can be displayed using the
@@ -433,12 +437,10 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
                 if ( nextN == null ) break;
                 node = nextN;
             }
-            final ConstraintTableModel userConstraint = node.proof ()
-                .getUserConstraint ();
-
+           
             for ( int i = 0; i != node.childrenCount (); ++i )
-                if (!treeNode.getProofTreeModel().hideClosedSubtrees() || !userConstraint
-                    .displayClosed ( node.child ( i ) ) )
+                if (!treeNode.getProofTreeModel().hideClosedSubtrees() || 
+                	!node.child ( i ).isClosed () )
                 workingList.add ( node.child ( i ) );
         }
     }

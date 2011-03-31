@@ -12,7 +12,6 @@ package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.logic.op.Metavariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
@@ -111,15 +110,6 @@ public interface Term extends SVSubstitute {
      * The set of free quantifiable variables occurring in this term.
      */
     public ImmutableSet<QuantifiableVariable> freeVars();
-    
-    /** 
-     * returns the set of metavariables that are part of this term 
-     * (metavariables are thought as placeholder for some ground term, whereas
-     * the variables in <code>freeVars</code> are bound by some quantifier above)
-     * @return the set of metavariables
-     */
-    @Deprecated
-    public ImmutableSet<Metavariable> metaVars();       
     
     /** 
      * The visitor is handed through till the bottom of the tree and

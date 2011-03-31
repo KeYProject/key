@@ -17,26 +17,45 @@
  */
 package de.uka.ilkd.key.rule;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Stack;
 
 import de.uka.ilkd.key.collection.DefaultImmutableMap;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableMap;
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.ContextStatementBlock;
+import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
+import de.uka.ilkd.key.java.JavaProgramElement;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
 import de.uka.ilkd.key.java.visitor.ProgramReplaceVisitor;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.Visitor;
+import de.uka.ilkd.key.logic.op.ElementaryUpdate;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ModalOperatorSV;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ProgramSV;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SortDependingFunction;
+import de.uka.ilkd.key.logic.op.SubstOp;
+import de.uka.ilkd.key.logic.op.TermTransformer;
+import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
-import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.Constraint;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.EqualityConstraint;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable;
 import de.uka.ilkd.key.util.Debug;
 
 public final class SyntacticalReplaceVisitor extends Visitor { 	
@@ -46,8 +65,6 @@ public final class SyntacticalReplaceVisitor extends Visitor {
     private final Constraint metavariableInst;
     private ImmutableMap<SchemaVariable,Term> newInstantiations =
                                 DefaultImmutableMap.<SchemaVariable,Term>nilMap();
-    private final boolean forceSVInst;
-    private final Name svInstBasename;
     private Services services;
     private Term computedResult = null;
     private TypeConverter typeConverter = null;
@@ -71,43 +88,24 @@ public final class SyntacticalReplaceVisitor extends Visitor {
 
 
     /**
-     * @param forceSVInst iff true instantiate uninstantiated SVs by
-     * creating new metavariables or new bound logicvariables
      */
     public SyntacticalReplaceVisitor(Services              services, 
 				     SVInstantiations      svInst,
 				     Constraint            metavariableInst,
-				     boolean               forceSVInst,
-
-				     Name                  svInstBasename,
 				     boolean               allowPartialReplacement,
+
 				     boolean               resolveSubsts) { 
 	this.services         = services;	
 	this.svInst           = svInst;
 	this.metavariableInst = metavariableInst;
-	this.forceSVInst      = forceSVInst;
-	this.svInstBasename   = svInstBasename;
 	this.allowPartialReplacement = allowPartialReplacement;
 	this.resolveSubsts    = resolveSubsts;
 	subStack = new Stack<Object>(); // of Term
     }
 
-    public SyntacticalReplaceVisitor(Services              services, 
-				     SVInstantiations      svInst,
-				     Constraint            metavariableInst,
-				     boolean               forceSVInst,
-				     Name                  svInstBasename) {
-	this ( services, 
-	       svInst,
-	       metavariableInst,
-	       forceSVInst,
-	       svInstBasename,
-	       false, true );
-    }
-
     public SyntacticalReplaceVisitor(Services services, 
 				     SVInstantiations svInst) { 
-	this ( services, svInst, Constraint.BOTTOM, false, null, false, true );
+	this ( services, svInst, Constraint.BOTTOM, false, true );
     }
 
     public SyntacticalReplaceVisitor(Services services, 
@@ -115,13 +113,13 @@ public final class SyntacticalReplaceVisitor extends Visitor {
 	this ( services,
 	       SVInstantiations.EMPTY_SVINSTANTIATIONS,
 	       metavariableInst, 
-	       false, null, false, true );
+	       false, true );
     }
 
     public SyntacticalReplaceVisitor(Services services, 
                                      SVInstantiations svInst,
                                      Constraint metavariableInst) { 
-        this ( services, svInst, metavariableInst, false, null, false, true );
+        this ( services, svInst, metavariableInst, false, true );
     }
 
     public SyntacticalReplaceVisitor(Constraint metavariableInst) { 
@@ -203,31 +201,7 @@ public final class SyntacticalReplaceVisitor extends Visitor {
 	return result;
     }
 
-    /**
-     * Pop the top-most <code>n</code> objects from the subterm stack,
-     * together with possibly interleaving newmarkers, store everything in
-     * <code>store</code>. The top element of the stack will be the last
-     * element of list <code>store</code>
-     */
-    private void popN (int n, LinkedList<Object> store) {
-        for ( int i = 0; i < n; i++ ) {
-            store.addFirst ( subStack.pop () );
-            if ( subStack.peek () == newMarker ) {
-                store.addFirst ( subStack.pop () );
-            }
-        }
-    }
-
-    /**
-     * Push the given objects on the subterm stack, in the order in which they
-     * are returned by the method <code>iterator</code>
-     */
-    private void push (Collection<Object> store) {
-        final Iterator<Object> it = store.iterator ();
-        while ( it.hasNext () )
-            subStack.push ( it.next () );
-    }
-
+ 
     private void pushNew(Object t) {
 	if (subStack.empty() || subStack.peek() != newMarker) {
 	    subStack.push(newMarker);
@@ -235,60 +209,10 @@ public final class SyntacticalReplaceVisitor extends Visitor {
 	subStack.push(t);	
     }
 
-    
-    private void pushNewAt(Object[] t, int posFromTop) {
-
-	final LinkedList<Object> store = new LinkedList<Object>();
-	popN ( posFromTop, store );
-
-	for (int i = 0; i<t.length; i++) {
-	    pushNew(t[i]);	
-	}
-
-        push ( store );
-    }
-
-
-    private void replaceAt (Object[] t, int posFromTop, int length) {
-
-	final LinkedList<Object> store = new LinkedList<Object>();
-	popN ( posFromTop, store );
-
-	// remove 
-	popN ( length, new LinkedList<Object> () );
-
-	// add new 
-	for (int i = 0; i<t.length; i++) {	    
-	    pushNew(t[i]);	
-	}
-
-        push ( store );
-    }
-
-
-    private Term[] peek(int pos, int length) {
-
-	final Term[] result = new Term[length];
-
-	final LinkedList<Object> store = new LinkedList<Object>();
-	popN ( pos + length, store );
-
-	final Iterator<Object> it = store.iterator ();
-        for ( int i = 0; i < length; i++ ) {
-            Object o = it.next ();
-            if ( o == newMarker ) o = it.next ();
-            result[i] = (Term)o;
-        }
-
-        push ( store );
-
-	return result;
-    }
-
     private Term toTerm(Object o) {
 	if (o instanceof Term) {
 	    final Term t = (Term)o;
-            if ( t.metaVars ().size () != 0 && !metavariableInst.isBottom () ) {
+            if ( EqualityConstraint.metaVars (t).size () != 0 && !metavariableInst.isBottom () ) {
                 // use the visitor recursively for replacing metavariables that
                 // might occur in the term (if possible)
                 final SyntacticalReplaceVisitor srv =
@@ -386,14 +310,10 @@ public final class SyntacticalReplaceVisitor extends Visitor {
         	    boundVar = ((QuantifiableVariable) ((Term) svInst
         		    .getInstantiation(boundSchemaVariable))
         		    .op());
-        	} else {
-        	    if (forceSVInst) {
-        		boundVar = createTemporaryLV(boundSchemaVariable);
-        	    } else {
-        		// this case may happen for PO generation of
-        		// taclets
-        		boundVar = (QuantifiableVariable)boundSchemaVariable;
-        	    }
+        	} else {        	  
+        	    // this case may happen for PO generation of
+        	    // taclets
+        	    boundVar = (QuantifiableVariable)boundSchemaVariable;        	    
         	}
         	varsChanged = true;
             } 
@@ -407,9 +327,7 @@ public final class SyntacticalReplaceVisitor extends Visitor {
     
 
     /**
-     * if in forceSVInst mode and a metavariable could not be created, execution is 
-     * aborted by a thrown IllegalInstantiationException. If you start this visitor in
-     * forceSVInst mode you have to take care of catching this exception
+     * performs the syntactic replacement of schemavariables with their instantiations	
      */
     public void visit(Term visited) {
 	// Sort equality has to be ensured before calling this method
@@ -419,12 +337,6 @@ public final class SyntacticalReplaceVisitor extends Visitor {
                 && svInst.isInstantiated((SchemaVariable) visitedOp)
                 && (! (visitedOp instanceof ProgramSV && ((ProgramSV) visitedOp).isListSV()))) {                
             pushNew(toTerm(svInst.getInstantiation((SchemaVariable) visitedOp)));
-        } else if (forceSVInst && visitedOp instanceof SchemaVariable && visitedOp.arity() == 0
-                && visitedOp instanceof TermSV) {
-            	if (!instantiateWithMV(visited)) {
-            	    throw new IllegalInstantiationException("Could not force instantiation with metavariable");
-            	}
-                // then we are done ...
         } else if((visitedOp instanceof Metavariable)
                  && metavariableInst.getInstantiation((Metavariable) visitedOp) != visitedOp) {
             pushNew(metavariableInst.getInstantiation((Metavariable) visitedOp));
@@ -479,24 +391,6 @@ public final class SyntacticalReplaceVisitor extends Visitor {
         }
     }
     
-    /**
-     * @param boundSchemaVariable
-     * @return the temporary variable to use
-     */
-    private LogicVariable createTemporaryLV (SchemaVariable boundSchemaVariable) {
-        final Term t = newInstantiations.get ( boundSchemaVariable );
-        if ( t != null ) return (LogicVariable)t.op ();
-        
-        final Sort realSort = svInst.getGenericSortInstantiations ()
-                                .getRealSort ( boundSchemaVariable.sort (), getServices() );
-        final LogicVariable v = new LogicVariable ( new Name ( "TempLV" ),
-                                                    realSort );
-        
-        newInstantiations = newInstantiations.put ( boundSchemaVariable,
-                                                    tf.createTerm ( v ) );
-        return v;
-    }
-
     private Operator handleSortDependingSymbol (SortDependingFunction depOp) {
         final Sort depSort = depOp.getSortDependingOn ();
         
@@ -516,40 +410,6 @@ public final class SyntacticalReplaceVisitor extends Visitor {
 	if (resolveSubsts && t.op() instanceof SubstOp)
 	    return ((SubstOp)t.op ()).apply ( t );
 	return t;
-    }
-
-
-    /**
-     * PRECONDITION: visited.op() instanceof SchemaVariable &&
-     *               ((SchemaVariable)visited.op()).isTermSV ()
-     * Instantiate the given TermSV with a new metavariable
-     * @return true iff the instantiation succeeded
-     */
-    @Deprecated
-    private boolean instantiateWithMV ( Term visited ) {
-	if ( newInstantiations == null ) return false;
-
-	final SchemaVariable sv = (SchemaVariable)visited.op ();
-
-	Term t = newInstantiations.get ( sv );
-
-	if ( t == null ) {
-	    final Sort realSort = svInst.getGenericSortInstantiations ()
-	                                .getRealSort ( visited.sort (), getServices() );
-            final Metavariable mv = MetavariableDeliverer.createNewMatchVariable
-                                        ( svInstBasename.toString (), realSort, getServices() );
-
-            if ( mv == null ) {
-                newInstantiations = null;
-                return false;
-            } else {
-                t = tf.createTerm ( mv );
-                newInstantiations = newInstantiations.put ( sv, t );
-            }
-        }
-
-	pushNew ( t );
-	return true;
     }
 
     /**
@@ -597,9 +457,9 @@ public final class SyntacticalReplaceVisitor extends Visitor {
      * @param subtreeRoot root of the subtree which the visitor leaves.
      */
     public void subtreeLeft(Term subtreeRoot){
-	if (subtreeRoot.op() instanceof MetaOperator) {
-	    MetaOperator mop = (MetaOperator) subtreeRoot.op();
-	    pushNew(mop.calculate((Term)subStack.pop(),svInst, getServices()));
+	if (subtreeRoot.op() instanceof TermTransformer) {
+	    TermTransformer mop = (TermTransformer) subtreeRoot.op();
+	    pushNew(mop.transform((Term)subStack.pop(),svInst, getServices()));
 	} 
    }
 }

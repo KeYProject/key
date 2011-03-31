@@ -13,7 +13,7 @@ package de.uka.ilkd.key.proof;
 import junit.framework.TestCase;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.ConstrainedFormula;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.rule.TacletForTests;
@@ -43,7 +43,7 @@ public class TestGoal extends TestCase {
 
     public void testSetBack0() {
 	Sequent seq=Sequent.createSuccSequent
-	    (Semisequent.EMPTY_SEMISEQUENT.insert(0,new ConstrainedFormula
+	    (Semisequent.EMPTY_SEMISEQUENT.insert(0,new SequentFormula
 		(TacletForTests.parseTerm("A"))).semisequent());
 	Goal g=new Goal(new Node(proof, seq), 
 			new RuleAppIndex(new TacletAppIndex(new TacletIndex()),
@@ -80,7 +80,7 @@ public class TestGoal extends TestCase {
 
     public void invalidtestSetBack1() {
 	Sequent seq=Sequent.createSuccSequent
-	    (Semisequent.EMPTY_SEMISEQUENT.insert(0,new ConstrainedFormula
+	    (Semisequent.EMPTY_SEMISEQUENT.insert(0,new SequentFormula
 		(TacletForTests.parseTerm("A"))).semisequent());
 	Goal g=new Goal(new Node(proof, seq), 
 			new RuleAppIndex(new TacletAppIndex(new TacletIndex()),

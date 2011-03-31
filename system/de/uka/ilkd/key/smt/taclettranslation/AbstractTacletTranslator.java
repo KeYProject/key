@@ -22,7 +22,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.ConstrainedFormula;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Semisequent;
@@ -289,7 +289,7 @@ public abstract class AbstractTacletTranslator implements TacletTranslator,
      *             if the sequent is not supported.
      */
     protected void checkSequent(Sequent s) throws IllegalTacletException {
-	for (ConstrainedFormula cf : s) {
+	for (SequentFormula cf : s) {
 	    checkTerm(cf.formula());
 	}
 
@@ -364,7 +364,7 @@ public abstract class AbstractTacletTranslator implements TacletTranslator,
      */
     private ImmutableList<Term> getFormulaeOfSemisequent(Semisequent s) {
 	ImmutableList<Term> terms = ImmutableSLList.nil();
-	for (ConstrainedFormula cf : s) {
+	for (SequentFormula cf : s) {
 	    terms = terms.append(cf.formula());
 	}
 	return terms;

@@ -10,13 +10,11 @@
 
 package de.uka.ilkd.key.smt;
 
-import java.io.StringWriter;
 import java.util.*;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
@@ -27,7 +25,6 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.taclettranslation.DefaultTacletSetTranslation;
 import de.uka.ilkd.key.smt.taclettranslation.TacletFormula;
 import de.uka.ilkd.key.smt.taclettranslation.TacletSetTranslation;
-import de.uka.ilkd.key.strategy.feature.TernarySumFeature;
 import de.uka.ilkd.key.util.Debug;
 
 
@@ -1513,11 +1510,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    Services services) throws IllegalFormulaException {
 	
 	//added, because meatavariables should not be translated.
-	if (term.op() instanceof Metavariable) {
-	    throw new IllegalFormulaException("The Formula contains a metavariable:\n" +
-	    		term.op().toString() + "\n" +
-	    		"Metavariables can not be translated.");
-	}
+	assert !(term.op() instanceof 
+		de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable):"Metavariables no longer supported";
 	
 	Operator op = term.op();
 	if (op == Junctor.NOT) {

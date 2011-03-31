@@ -20,7 +20,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 /** 
  * Abstract sorted operator class offering some common functionality.
  */
-abstract class AbstractSortedOperator extends AbstractOperator 
+public abstract class AbstractSortedOperator extends AbstractOperator 
                                       implements SortedOperator {
     
     private static final ImmutableArray<Sort> EMPTY_SORT_LIST 
@@ -100,9 +100,9 @@ abstract class AbstractSortedOperator extends AbstractOperator
     private boolean possibleSub(int at, Term possibleSub) {
 	final Sort s = possibleSub.sort();
 	
-	return s == AbstractMetaOperator.METASORT
+	return s == AbstractTermTransformer.METASORT
 	       || s instanceof ProgramSVSort
-	       || argSort(at) == AbstractMetaOperator.METASORT
+	       || argSort(at) == AbstractTermTransformer.METASORT
 	       || argSort(at) instanceof ProgramSVSort
 	       || s.extendsTrans(argSort(at));
     }

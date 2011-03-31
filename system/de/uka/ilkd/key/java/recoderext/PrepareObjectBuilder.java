@@ -16,7 +16,6 @@ import recoder.abstraction.ClassType;
 import recoder.abstraction.Field;
 import recoder.java.*;
 import recoder.java.declaration.*;
-import recoder.java.declaration.*;
 import recoder.java.declaration.modifier.Private;
 import recoder.java.declaration.modifier.Protected;
 import recoder.java.reference.*;

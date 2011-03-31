@@ -225,9 +225,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
 
         if ( ( getValueAt(irow, icol) == null  ||
                ((String)getValueAt(irow, icol)).length() == 0 ) &&
-               !originalApp.sufficientlyComplete(services) &&
-             !originalApp.canUseMVAPriori ( (SchemaVariable)getValueAt(irow, 0) ) 
-         ) {
+               !originalApp.complete() ) {
             throw new MissingInstantiationException
                 ("" + getValueAt(irow, 0), irow, 0, false);
         }

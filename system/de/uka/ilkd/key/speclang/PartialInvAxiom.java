@@ -118,7 +118,7 @@ public final class PartialInvAxiom implements ClassAxiom {
 	    result = result.union(limited.second);
 	    
 	    //create added sequent
-	    final ConstrainedFormula addedCf = new ConstrainedFormula(limitedAxiom);	    
+	    final SequentFormula addedCf = new SequentFormula(limitedAxiom);	    
 	    final Semisequent addedSemiSeq 
 	    	= Semisequent.EMPTY_SEMISEQUENT.insertFirst(addedCf) 
 	    	                               .semisequent();
@@ -153,8 +153,8 @@ public final class PartialInvAxiom implements ClassAxiom {
 	    if(i == 1) {
 		assert !target.isStatic();
 		final Term ifFormula = TB.equals(TB.var(selfSV), TB.var(eqSV));
-		final ConstrainedFormula ifCf 
-			= new ConstrainedFormula(ifFormula);
+		final SequentFormula ifCf 
+			= new SequentFormula(ifFormula);
 		final Semisequent ifSemiSeq 
 		    	= Semisequent.EMPTY_SEMISEQUENT.insertFirst(ifCf)
 		                                       .semisequent();

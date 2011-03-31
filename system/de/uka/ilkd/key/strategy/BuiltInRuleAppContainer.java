@@ -73,8 +73,7 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
     private boolean isStillApplicable(Goal goal) {
 	if(applicationPosition == null) {
 	    return bir.rule().isApplicable(goal, 
-		    			   null, 
-		    			   goal.getClosureConstraint());	    
+		    			   null);	    
 	} else {
             final PosInOccurrence topPos 
     		= goal.getFormulaTagManager().getPosForTag(positionTag);
@@ -162,9 +161,8 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
         }
         
         final BuiltInRule rule = (BuiltInRule) bir.rule();
-        final Constraint userConstraint = bir.userConstraint();
         final ImmutableList<PosInOccurrence> ifInsts = bir.ifInsts();
 	
-        return new BuiltInRuleApp(rule, pio, userConstraint, ifInsts);
+        return new BuiltInRuleApp(rule, pio, ifInsts);
     }
 }

@@ -25,7 +25,7 @@ import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-public class MultipleVarDecl extends ProgramMetaConstruct {
+public class MultipleVarDecl extends ProgramTransformer {
 
     public MultipleVarDecl(SchemaVariable sv) {
 	super(new Name("multiple-var-decl"), (ProgramSV)sv);
@@ -41,7 +41,7 @@ public class MultipleVarDecl extends ProgramMetaConstruct {
      * @param svInst the instantiations esp. of the inner and outer label 
      * @return the transformed program
      */
-    public ProgramElement symbolicExecution(ProgramElement pe,
+    public ProgramElement transform(ProgramElement pe,
 					    Services services,
 					    SVInstantiations svInst) {
 	VariableDeclaration vardecl = (VariableDeclaration)pe;

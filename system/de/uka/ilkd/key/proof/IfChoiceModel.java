@@ -125,8 +125,7 @@ public class IfChoiceModel extends DefaultComboBoxModel {
 		    ProofSaver.printAnything(ifFma, services), pos, -1, true);
 	    }
 
-	    return new IfFormulaInstDirect ( new ConstrainedFormula ( parseFormula(manualInput),
-								      Constraint.BOTTOM ) );
+	    return new IfFormulaInstDirect ( new SequentFormula ( parseFormula(manualInput) ) );
 	} catch (antlr.RecognitionException are) {
  	    throw new SVInstantiationParserException
  		( manualInput, pos, are.getColumn(), 

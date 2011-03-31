@@ -43,7 +43,7 @@ import de.uka.ilkd.key.util.Debug;
 /** 
  * Symbolically executes a method invocation
  */ 
-public class MethodCall extends ProgramMetaConstruct {
+public class MethodCall extends ProgramTransformer {
 
 
 
@@ -176,7 +176,7 @@ public class MethodCall extends ProgramMetaConstruct {
      * @param svInst the instantiations esp. of the inner and outer label 
      * @return the transformed program
      */
-    public ProgramElement symbolicExecution(ProgramElement pe,
+    public ProgramElement transform(ProgramElement pe,
 					    Services services,
 					    SVInstantiations svInst) {
 

@@ -11,7 +11,6 @@
 package de.uka.ilkd.key.gui;
 
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.LinkedList;
 
 import javax.swing.BorderFactory;

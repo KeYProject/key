@@ -18,10 +18,10 @@ import de.uka.ilkd.key.java.statement.For;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
-public class Unpack extends ProgramMetaConstruct {
+public class Unpack extends ProgramTransformer {
 
 
-    /** creates a typeof ProgramMetaConstruct 
+    /** creates a typeof ProgramTransformer 
      * @param loop the instance of expression contained by 
      * the meta construct 
      */
@@ -34,7 +34,7 @@ public class Unpack extends ProgramMetaConstruct {
      * program transformation 
      * @return the transformated program
      */
-    public ProgramElement symbolicExecution(ProgramElement pe,
+    public ProgramElement transform(ProgramElement pe,
 	    Services services,
 	    SVInstantiations svInst) {
 	Debug.assertTrue(pe instanceof For, 

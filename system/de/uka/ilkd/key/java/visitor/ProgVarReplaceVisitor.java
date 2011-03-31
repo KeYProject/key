@@ -229,13 +229,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             = replaceVariablesInTerm(inv.getInvariant(selfTerm, 
                                                       heapAtPre, 
                                                       services));
-        
-        //predicates
-        ImmutableSet<Term> newPredicates 
-            = replaceVariablesInTerms(inv.getPredicates(selfTerm, 
-                                                        heapAtPre, 
-                                                        services));
-        
+                
         //modifies
         Term newModifies
             = replaceVariablesInTerm(inv.getModifies(selfTerm, 
@@ -251,18 +245,14 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         
         Term newSelfTerm = replaceVariablesInTerm(selfTerm); 
         Term newHeapAtPre = replaceVariablesInTerm(heapAtPre);
-        boolean newPredicateHeuristicsAllowed
-            = inv.getPredicateHeuristicsAllowed();
 
         LoopInvariant newInv 
             = new LoopInvariantImpl(newLoop, 
                                     newInvariant, 
-                                    newPredicates,
                                     newModifies, 
                                     newVariant, 
                                     newSelfTerm,
-                                    newHeapAtPre,
-                                    newPredicateHeuristicsAllowed);
+                                    newHeapAtPre);
         services.getSpecificationRepository().setLoopInvariant(newInv);
     }
 }

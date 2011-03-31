@@ -24,7 +24,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * <code>&lt;init&gt;</code> that is mainly the constructor but in its
  * normalform.
  */
-public class SpecialConstructorCall extends ProgramMetaConstruct {
+public class SpecialConstructorCall extends ProgramTransformer {
 
     private static final ProgramElementName NORMALFORM_IDENTIFIER = 
         new ProgramElementName
@@ -43,7 +43,7 @@ public class SpecialConstructorCall extends ProgramMetaConstruct {
      * returns the result. Thereby all necessary references are
      * resolved.     
      */
-    public ProgramElement symbolicExecution
+    public ProgramElement transform
 	(ProgramElement pe, Services services, SVInstantiations svInst) {
 
 	SpecialConstructorReference constructorReference = 

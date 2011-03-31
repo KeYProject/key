@@ -16,7 +16,6 @@ import java.lang.ref.WeakReference;
 
 import javax.swing.tree.TreeNode;
 
-import de.uka.ilkd.key.proof.ConstraintTableModel;
 import de.uka.ilkd.key.proof.Node;
 
 class GUIBranchNode extends GUIAbstractTreeNode 
@@ -76,13 +75,9 @@ class GUIBranchNode extends GUIAbstractTreeNode
             if ( nextN == null ) break;
             n = nextN;
         }
-            
-        final ConstraintTableModel userConstraint = n.proof ()
-            .getUserConstraint ();
 
         for (int i = 0; i != n.childrenCount(); ++i) {
-            if (!getProofTreeModel().hideClosedSubtrees() || !userConstraint
-                .displayClosed ( n.child ( i ) ) ) {
+            if (!getProofTreeModel().hideClosedSubtrees() || !n.child ( i ).isClosed() ) {
                 childrenCache[count] = findBranch ( n.child(i) );
                 count++;
             }
@@ -110,11 +105,9 @@ class GUIBranchNode extends GUIAbstractTreeNode
             if ( nextN == null ) break;
             n = nextN;
         }
-        final ConstraintTableModel userConstraint = n.proof ()
-            .getUserConstraint ();
+       
         for (int i = 0; i != n.childrenCount(); ++i) {
-            if (!getProofTreeModel().hideClosedSubtrees() || !userConstraint
-                .displayClosed ( n.child ( i ) ) ) {
+            if (!getProofTreeModel().hideClosedSubtrees() || !n.child ( i ).isClosed() ) {
                 count++;
             }
         }
