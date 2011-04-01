@@ -10,8 +10,6 @@
 
 package de.uka.ilkd.key.proof.init;
 
-import java.util.LinkedList;
-import java.util.List;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -49,12 +47,13 @@ public abstract class AbstractPO implements ProofOblInput {
     protected final SpecificationRepository specRepos;
     protected final String name;
 
-    private final List<ProgramVariable> introducedProgVars 
-    	= new LinkedList<ProgramVariable>();
-    private final List<Function> introducedFuncs
-    	= new LinkedList<Function>();
-    private final List<Function> introducedPreds
-    	= new LinkedList<Function>();
+    // obviously not used any more...
+//    private final List<ProgramVariable> introducedProgVars 
+//    	= new LinkedList<ProgramVariable>();
+//    private final List<Function> introducedFuncs
+//    	= new LinkedList<Function>();
+//    private final List<Function> introducedPreds
+//    	= new LinkedList<Function>();
     private ImmutableSet<NoPosTacletApp> taclets;    
     private String header;
     private ProofAggregate proofAggregate;    
@@ -176,7 +175,8 @@ public abstract class AbstractPO implements ProofOblInput {
     
     protected final void register(ProgramVariable pv) {
 	if(pv != null) {
-	    introducedProgVars.add(pv);
+//	    introducedProgVars.add(pv);
+	    services.getNamespaces().programVariables().addSafely(pv);
 	}
     }
     
@@ -192,9 +192,12 @@ public abstract class AbstractPO implements ProofOblInput {
 	if(f != null) {
 	    assert f.sort() != Sort.UPDATE;
 	    if(f.sort() == Sort.FORMULA) {
-		introducedPreds.add(f);
+//		introducedPreds.add(f);
+		// TODO: correct?
+		services.getNamespaces().functions().addSafely(f);
 	    } else {
-		introducedFuncs.add(f);
+//		introducedFuncs.add(f);
+		services.getNamespaces().functions().addSafely(f);
 	    }
 	}
     }

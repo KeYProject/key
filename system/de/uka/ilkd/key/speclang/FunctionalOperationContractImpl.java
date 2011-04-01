@@ -847,7 +847,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 
 
     @Override
-    public ProofOblInput getProofOblInput(InitConfig initConfig,
+    public ProofOblInput createProofObl(InitConfig initConfig,
 	    Contract contract) {
 	return new FunctionalOperationContractPO(initConfig,
 	        (FunctionalOperationContract) contract);

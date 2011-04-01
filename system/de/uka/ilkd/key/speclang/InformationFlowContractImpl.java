@@ -381,7 +381,10 @@ public final class InformationFlowContractImpl
 
     @Override
     public String toString() {
-	return originalDep.toString();
+	// TODO: all fields should be printed!!
+	return "pre: " + originalPre
+		+ "; mby: " + originalMby
+		+ "; mod: " + originalMod;
     }
 
 
@@ -428,7 +431,7 @@ public final class InformationFlowContractImpl
 
 
     @Override
-    public ProofOblInput getProofOblInput(InitConfig initConfig,
+    public ProofOblInput createProofObl(InitConfig initConfig,
 	    Contract contract) {
 	return new InformationFlowContractPO(initConfig,
 	        (InformationFlowContract) contract);

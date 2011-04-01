@@ -118,8 +118,8 @@ public interface Contract extends SpecificationElement {
     
     
     /**
-     * Returns the proof obligation to a contract.
+     * Returns a proof obligation to the passed contract and initConfig.
      */
-    public ProofOblInput getProofOblInput(InitConfig initConfig,
+    public ProofOblInput createProofObl(InitConfig initConfig,
 	    Contract contract);
 }

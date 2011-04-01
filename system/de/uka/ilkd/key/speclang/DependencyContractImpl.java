@@ -340,7 +340,7 @@ public final class DependencyContractImpl implements DependencyContract {
 
 
     @Override
-    public ProofOblInput getProofOblInput(InitConfig initConfig,
+    public ProofOblInput createProofObl(InitConfig initConfig,
 	    Contract contract) {
 	return new DependencyContractPO(initConfig,
 	        (DependencyContract) contract);

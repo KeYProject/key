@@ -10,14 +10,25 @@
 
 package de.uka.ilkd.key.java;
 
+import java.io.StringReader;
 import java.util.HashMap;
 
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.java.recoderext.SchemaCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.logic.InnerVariableNamer;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.VariableNamer;
+import de.uka.ilkd.key.parser.DefaultTermParser;
+import de.uka.ilkd.key.parser.IdDeclaration;
+import de.uka.ilkd.key.parser.KeYLexer;
+import de.uka.ilkd.key.parser.KeYParser;
+import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.parser.ParserException;
+import de.uka.ilkd.key.parser.ParserMode;
+import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.Counter;
 import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.proof.Node;
@@ -284,4 +295,5 @@ public class Services{
     public Proof getProof() {
 	return proof;
     }
+
 }

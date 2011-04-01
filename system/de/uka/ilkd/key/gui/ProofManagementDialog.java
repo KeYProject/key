@@ -380,11 +380,7 @@ public final class ProofManagementDialog extends JDialog {
 	final Contract contract = getActiveContractPanel().getContract();
 	return contract == null
 	       ? null
-	       : contract instanceof FunctionalOperationContract 
-	         ? new FunctionalOperationContractPO(initConfig, 
-	        	 		   (FunctionalOperationContract)contract)
-	           : new DependencyContractPO(initConfig, 
-	        	   	              (DependencyContract)contract);
+	       : contract.createProofObl(initConfig, contract);
     }
     
     
@@ -497,7 +493,7 @@ public final class ProofManagementDialog extends JDialog {
 		boolean lemmasLeft = false;
 		for(Contract contract : contracts) {
 		    final ProofOblInput po
-		    	= contract.getProofOblInput(initConfig, contract);
+		    	= contract.createProofObl(initConfig, contract);
 		    Proof proof = findPreferablyClosedProof(po);
 		    if(proof == null) {
 			allClosed = false;

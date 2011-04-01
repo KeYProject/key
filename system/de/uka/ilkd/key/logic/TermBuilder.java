@@ -10,6 +10,7 @@
 
 package de.uka.ilkd.key.logic;
 
+import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,6 +28,9 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.parser.DefaultTermParser;
+import de.uka.ilkd.key.parser.ParserException;
+import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.OpReplacer;
 
 
@@ -55,6 +59,26 @@ public final class TermBuilder {
         return tf;
     }
     
+    
+    //-------------------------------------------------------------------------
+    // build terms using the KeY parser
+    //-------------------------------------------------------------------------
+    
+    /** 
+     * Parses the given string that represents the term (or formula)
+     * using the default namespaces.
+     * 
+     * @param s the String to parse
+     */
+    public Term parseTerm(String s, Services services)
+        throws ParserException
+    {
+	AbbrevMap abbr = (services.getProof() == null)
+	               ? null : services.getProof().abbreviations();
+        Term term = new DefaultTermParser().parse(
+           new StringReader(s), null, services, services.getNamespaces(), abbr);
+        return term;
+    }
     
     
     //-------------------------------------------------------------------------
@@ -174,16 +198,46 @@ public final class TermBuilder {
     
     
     /**
+     * Creates program variables for the parameters. Take care to register them
+     * in the namespaces!
+     */
+    public ImmutableList<ProgramVariable> paramVars(Services services,
+	    String postfix, ObserverFunction obs, boolean makeNamesUnique) {
+	final ImmutableList<ProgramVariable> paramVars 
+		= paramVars(services, obs, true);
+	ImmutableList<ProgramVariable> result 
+        	= ImmutableSLList.<ProgramVariable>nil();
+        for(ProgramVariable paramVar : paramVars) {
+            ProgramElementName pen 
+                = new ProgramElementName(paramVar.name() + postfix);            
+            LocationVariable formalParamVar
+            	= new LocationVariable(pen, paramVar.getKeYJavaType());
+            result = result.append(formalParamVar);
+        }
+        return result;
+    }
+    
+    
+    /**
      * Creates a program variable for the result. Take care to register it
      * in the namespaces.
      */
     public LocationVariable resultVar(Services services, 
                                       ProgramMethod pm,
                                       boolean makeNameUnique) {
+	return resultVar(services, "result", pm, makeNameUnique);
+    }
+    
+    
+    /**
+     * Creates a program variable for the result with passed name. Take care to
+     * register it in the namespaces.
+     */
+    public LocationVariable resultVar(Services services, String name,
+	    ProgramMethod pm, boolean makeNameUnique) {
 	if(pm.getKeYJavaType() == null || pm.isConstructor()) {
 	    return null;
 	} else {
-	    String name = "result";
 	    if(makeNameUnique) {
 		name = newName(services, name);
 	    }
@@ -200,7 +254,18 @@ public final class TermBuilder {
     public LocationVariable excVar(Services services, 
                                    ProgramMethod pm,
                                    boolean makeNameUnique) {
-	String name = "exc";
+	return excVar(services, "exc", pm, makeNameUnique);
+    }
+    
+    
+    /**
+     * Creates a program variable for the thrown exception. Take care to 
+     * register it in the namespaces.
+     */
+    public LocationVariable excVar(Services services,
+	    			   String name,
+                                   ProgramMethod pm,
+                                   boolean makeNameUnique) {
 	if(makeNameUnique) {
 	    name = newName(services, name);
 	}	
