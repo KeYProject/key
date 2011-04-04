@@ -474,7 +474,7 @@ public final class TermBuilder {
     }
 
     
-    public Term and(Term[] subTerms) {
+    public Term and(Term... subTerms) {
         Term result = tt();
         for(int i = 0; i < subTerms.length; i++) {
             result = and(result, subTerms[i]);

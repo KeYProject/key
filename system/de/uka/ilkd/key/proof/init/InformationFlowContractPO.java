@@ -92,17 +92,14 @@ public final class InformationFlowContractPO
         final Term mbyAtPreDef2
         	= TB.apply(updateHeapAtPre2, generateMbyAtPreDef(selfVar, paramVars2));
         
-        
-        final Term[] freePreTerms = new Term[] {
+        return TB.and(
         	simpleFreePre,
 		TB.apply(updateHeapAtPre1, selfExactType),
 		TB.apply(updateHeapAtPre2, selfExactType),
 		paramsOK1,
 		paramsOK2,
 		mbyAtPreDef1,
-		mbyAtPreDef2 };
-        
-        return TB.and(freePreTerms);
+		mbyAtPreDef2);
     }
 
 
@@ -251,12 +248,11 @@ public final class InformationFlowContractPO
 		= TB.elementary(services, TB.heap(services), TB.var(heapAtPreVar2));
 	
         //build precondition
-	final Term[] preTerms = {
-		buildFreePre(selfVar, contract.getKJT(), paramVars1, paramVars2,
+        final Term pre = TB.and(
+        	buildFreePre(selfVar, contract.getKJT(), paramVars1, paramVars2,
 			updateHeapAtPre1, updateHeapAtPre2),
 		TB.apply(updateHeapAtPre1, contract.getPre(selfVar, paramVars1, services)),
-		TB.apply(updateHeapAtPre2, contract.getPre(selfVar, paramVars2, services)) };
-        final Term pre = TB.and(preTerms);
+		TB.apply(updateHeapAtPre2, contract.getPre(selfVar, paramVars2, services)));
                 
         // build second program term
         final Term postSecondProg
@@ -272,13 +268,11 @@ public final class InformationFlowContractPO
 		    TB.and(postfirstProg, secondProg));
         
         // build inputOutputRelations
-        final Term inout = TB.and(
-        	TB.tt(),
-        	TB.frame(services, 
+        final Term frame = TB.frame(
+        	services, 
         	normalToAtPre, 
-        	getContract().getMod(selfVar, 
-		  	  paramVars1, 
-		  	  services)));
+        	getContract().getMod(selfVar, paramVars1, services)); 
+        final Term inout = TB.and(TB.tt(), frame);
         
         //save in field
         poTerms = new Term[]{TB.imp(TB.and(pre, firstProg), inout)};

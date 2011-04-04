@@ -133,15 +133,15 @@ public final class NotationInfo {
     private void createDefaultNotationTable() {
 	tbl = new HashMap<Object,Notation>();
 	
-	tbl.put(Junctor.TRUE ,new Notation.Constant("true", 130));
-	tbl.put(Junctor.FALSE,new Notation.Constant("false", 130));
-	tbl.put(Junctor.NOT,new Notation.Prefix("!" ,60,60));
-	tbl.put(Junctor.AND,new Notation.Infix("&"  ,50,50,60));
-	tbl.put(Junctor.OR, new Notation.Infix("|"  ,40,40,50));
-	tbl.put(Junctor.IMP,new Notation.Infix("->" ,30,40,30));
-	tbl.put(Equality.EQV,new Notation.Infix("<->",20,20,30));
-	tbl.put(Quantifier.ALL,new Notation.Quantifier("\\forall", 60, 60));
-	tbl.put(Quantifier.EX, new Notation.Quantifier("\\exists", 60, 60));
+	tbl.put(Junctor.TRUE ,new Notation.Constant("\u22A4", 130));
+	tbl.put(Junctor.FALSE,new Notation.Constant("\u22A5", 130));
+	tbl.put(Junctor.NOT,new Notation.Prefix("¬" ,60,60));
+	tbl.put(Junctor.AND,new Notation.Infix("\u2227"  ,50,50,60));
+	tbl.put(Junctor.OR, new Notation.Infix("\u2228"  ,40,40,50));
+	tbl.put(Junctor.IMP,new Notation.Infix("\u279C" ,30,40,30));
+	tbl.put(Equality.EQV,new Notation.Infix("\u2194",20,20,30));
+	tbl.put(Quantifier.ALL,new Notation.Quantifier("\u2200", 60, 60));
+	tbl.put(Quantifier.EX, new Notation.Quantifier("\u2203", 60, 60));
 	tbl.put(Modality.DIA,new Notation.ModalityNotation("\\<","\\>", 60, 60));
 	tbl.put(Modality.BOX,new Notation.ModalityNotation("\\[","\\]", 60, 60));
 	tbl.put(IfThenElse.IF_THEN_ELSE, new Notation.IfThenElse(130, "\\if"));
@@ -174,8 +174,8 @@ public final class NotationInfo {
 	tbl.put(integerLDT.getCharSymbol(), new Notation.CharLiteral());
 	tbl.put(integerLDT.getLessThan(), new Notation.Infix("<", 80, 90, 90));
 	tbl.put(integerLDT.getGreaterThan(), new Notation.Infix("> ", 80, 90, 90));
-	tbl.put(integerLDT.getLessOrEquals(), new Notation.Infix("<=", 80, 90, 90));
-	tbl.put(integerLDT.getGreaterOrEquals(), new Notation.Infix(">=", 80, 90, 90));
+	tbl.put(integerLDT.getLessOrEquals(), new Notation.Infix("\u2264", 80, 90, 90));
+	tbl.put(integerLDT.getGreaterOrEquals(), new Notation.Infix("\u2265", 80, 90, 90));
 	tbl.put(integerLDT.getSub(), new Notation.Infix("-", 90, 90, 91));
 	tbl.put(integerLDT.getAdd(), new Notation.Infix("+", 90, 90, 91));
 	tbl.put(integerLDT.getMul(), new Notation.Infix("*", 100, 100, 101));
@@ -195,11 +195,15 @@ public final class NotationInfo {
 	final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
 	tbl.put(setLDT.getEmpty(), new Notation.Constant("{}", 130));
 	tbl.put(setLDT.getSingleton(), new Notation.SingletonNotation());
-	tbl.put(setLDT.getUnion(), new Notation.Infix("\\cup", 130, 0, 0));
-	tbl.put(setLDT.getIntersect(), new Notation.Infix("\\cap", 130, 0, 0));
-	tbl.put(setLDT.getSetMinus(), new Notation.Infix("\\setMinus", 130, 0, 0));
-	tbl.put(setLDT.getElementOf(), new Notation.ElementOfNotation());	
-	tbl.put(setLDT.getSubset(), new Notation.Infix("\\subset", 130, 0, 0));
+	tbl.put(setLDT.getUnion(), new Notation.Infix("\u222a", 130, 0, 0));
+	tbl.put(setLDT.getIntersect(), new Notation.Infix("\u2229", 130, 0, 0));
+	tbl.put(setLDT.getSetMinus(), new Notation.Infix("\u2216", 130, 0, 0));
+	tbl.put(setLDT.getElementOf(), new Notation.ElementOfNotation());
+	tbl.put(setLDT.getSubset(), new Notation.Infix("\u2286", 130, 0, 0));
+	//$mem = \ \u220a\ 
+	//$dom_restrict = \ \u22B2\ 
+	//$rng_restrict = \ \u22B3\ 
+	//$complement = \u2201
 	
 	//string operators
 	final CharListLDT charListLDT 
