@@ -11,6 +11,7 @@
 package de.uka.ilkd.key.speclang;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -24,6 +25,7 @@ import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.InformationFlowContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.util.LinkedHashMap;
 
 /**
  * Standard implementation of the DependencyContract interface.
@@ -391,26 +393,24 @@ public final class InformationFlowContractImpl
         
     
     
-    private String generateName(String name, String baseName, KeYJavaType kjt,
-	    ProgramMethod pm, int id) {
-	return name != null ? name : baseName
+    private String generateName(String myName, String myBaseName,
+	    KeYJavaType myKjt, ProgramMethod myPm, int myId) {
+	return myName != null ? myName : myBaseName
 	        + " [id: "
-	        + id
+	        + myId
 	        + " / "
-	        + pm
-	        + (kjt.equals(pm.getContainerType()) ? "" : " for "
-	                + kjt.getJavaType().getName()) + "]";
+	        + myPm
+	        + (myKjt.equals(myPm.getContainerType()) ? "" : " for "
+	                + myKjt.getJavaType().getName()) + "]";
     }
 
     
     private OpReplacer generateOperationReplacer(ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars) {
-	Map map = new HashMap();
+	LinkedHashMap<ProgramVariable, ProgramVariable> map
+		= new LinkedHashMap<ProgramVariable, ProgramVariable>();
 	map.put(originalSelfVar, selfVar);
-	for(ProgramVariable originalParamVar : originalParamVars) {
-	    map.put(originalParamVar, paramVars.head());
-	    paramVars = paramVars.tail();
-	}
+	map.putAll(originalParamVars, paramVars);
 	OpReplacer or = new OpReplacer(map);
 	return or;
     }
@@ -418,13 +418,12 @@ public final class InformationFlowContractImpl
     
     private OpReplacer generateOperationReplacer(Term heapTerm, Term selfTerm,
             ImmutableList<Term> paramTerms, Services services) {
-	Map map = new HashMap();
+	LinkedHashMap<Term, Term> map
+		= new LinkedHashMap<Term, Term>();
 	map.put(TB.heap(services), heapTerm);
 	map.put(TB.var(originalSelfVar), selfTerm);
-	for(ProgramVariable originalParamVar : originalParamVars) {
-	    map.put(TB.var(originalParamVar), paramTerms.head());
-	    paramTerms = paramTerms.tail();
-	}	
+	ImmutableList<Term> originalParamTerms = TB.var(originalParamVars);
+	map.putAll(originalParamTerms, paramTerms);
 	OpReplacer or = new OpReplacer(map);
 	return or;
     }

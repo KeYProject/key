@@ -314,6 +314,24 @@ public final class TermBuilder {
     }
     
     
+    public ImmutableList<Term> var(ProgramVariable ... vs) {
+	ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+	for (ProgramVariable v : vs) {
+	    result = result.append(tf.createTerm(v));
+	}
+        return result;
+    }
+    
+    
+    public ImmutableList<Term> var(Iterable<ProgramVariable> vs) {
+	ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+	for (ProgramVariable v : vs) {
+	    result = result.append(tf.createTerm(v));
+	}
+        return result;
+    }
+    
+    
     public Term var(SchemaVariable v) {
 	return tf.createTerm(v);
     }
@@ -474,7 +492,7 @@ public final class TermBuilder {
     }
 
     
-    public Term and(Term... subTerms) {
+    public Term and(Term ... subTerms) {
         Term result = tt();
         for(int i = 0; i < subTerms.length; i++) {
             result = and(result, subTerms[i]);
@@ -1328,7 +1346,8 @@ public final class TermBuilder {
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	final LogicVariable heapLV 
 		= new LogicVariable(new Name("h"), heapLDT.targetSort());
-	final Map map = new HashMap();
+	final Map<LocationVariable, LogicVariable> map
+		= new HashMap<LocationVariable, LogicVariable>();
 	map.put(heapLDT.getHeap(), heapLV);
 	final OpReplacer or = new OpReplacer(map);
 	t = or.replace(t);
