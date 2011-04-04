@@ -1,0 +1,34 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
+//
+//
+/** represents a java label
+ */
+package de.uka.ilkd.key.java;
+
+import de.uka.ilkd.key.java.visitor.Visitor;
+
+public interface Label extends TerminalProgramElement {
+
+    Comment[] getComments();
+
+    SourceElement getFirstElement();
+
+    SourceElement getLastElement();
+
+    void prettyPrint(PrettyPrinter w) throws java.io.IOException;
+
+    void visit(Visitor v);
+
+    Position getStartPosition();
+
+    Position getEndPosition();
+
+    Position getRelativePosition();
+
+}
