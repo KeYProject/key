@@ -10,10 +10,6 @@
 
 package de.uka.ilkd.key.proof.init;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
 import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Statement;
@@ -38,6 +34,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
+import de.uka.ilkd.key.util.LinkedHashMap;
 
 
 
@@ -220,10 +217,7 @@ public final class InformationFlowContractPO
 		= TB.heapAtPreVar(services, "heapAtPost1", true);
 	final LocationVariable heapAtPostVar2
 		= TB.heapAtPreVar(services, "heapAtPost2", true);
-     	final Map<Term,Term> normalToAtPre = new HashMap<Term,Term>();
-     	normalToAtPre.put(TB.var(heapAtPostVar1), TB.var(heapAtPreVar1));
-     	normalToAtPre.put(TB.var(heapAtPostVar2), TB.var(heapAtPreVar2));
-     	
+	
         
         //register the variables so they are declared in proof header 
         //if the proof is saved to a file
@@ -246,6 +240,10 @@ public final class InformationFlowContractPO
 		= TB.elementary(services, TB.heap(services), TB.var(heapAtPreVar1));
 	final Term updateHeapAtPre2
 		= TB.elementary(services, TB.heap(services), TB.var(heapAtPreVar2));
+	final Term updateHeapAtPost1
+		= TB.elementary(services, TB.heap(services), TB.var(heapAtPostVar1));
+	final Term updateHeapAtPost2
+		= TB.elementary(services, TB.heap(services), TB.var(heapAtPostVar2));
 	
         //build precondition
         final Term pre = TB.and(
@@ -268,14 +266,25 @@ public final class InformationFlowContractPO
 		    TB.and(postfirstProg, secondProg));
         
         // build inputOutputRelations
-        final Term frame = TB.frame(
+        final Term inout = TB.tt();
+        
+        // build frame
+        final Term frame1Tail = TB.frame(
         	services, 
-        	normalToAtPre, 
-        	getContract().getMod(selfVar, paramVars1, services)); 
-        final Term inout = TB.and(TB.tt(), frame);
+        	new LinkedHashMap<Term,Term>(TB.heap(services), TB.var(heapAtPreVar1)), 
+        	getContract().getMod(selfVar, paramVars1, services));
+        final Term frame1 = TB.apply(updateHeapAtPost1, frame1Tail);
+        final Term frame2Tail = TB.frame(
+        	services, 
+        	new LinkedHashMap<Term,Term>(TB.heap(services), TB.var(heapAtPreVar2)), 
+        	getContract().getMod(selfVar, paramVars2, services));
+        final Term frame2 = TB.apply(updateHeapAtPost2, frame2Tail);
+        
+        // build post
+        final Term post = TB.and(inout, frame1, frame2);
         
         //save in field
-        poTerms = new Term[]{TB.imp(TB.and(pre, firstProg), inout)};
+        poTerms = new Term[]{TB.imp(TB.and(pre, firstProg), post)};
         
         //add axioms
         collectClassAxioms(contract.getKJT());
