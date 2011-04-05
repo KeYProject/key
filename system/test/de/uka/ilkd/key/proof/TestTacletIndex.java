@@ -55,7 +55,7 @@ public class TestTacletIndex extends TestCase{
     public void setUp() {
 	TacletForTests.parse(System.getProperty("key.home")+
            java.io.File.separator+"system"+java.io.File.separator+
-           "de/uka/ilkd/key/proof/ruleForTestTacletIndex.taclet");
+           "test/de/uka/ilkd/key/proof/ruleForTestTacletIndex.taclet");
 
 	h1 = (RuleSet)TacletForTests.getHeuristics().lookup(new Name("h1"));
 	h2 = (RuleSet)TacletForTests.getHeuristics().lookup(new Name("h2"));

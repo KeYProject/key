@@ -54,7 +54,7 @@ public class TestTermTacletAppIndex extends TestCase{
     public void setUp() {
         TacletForTests.parse(System.getProperty("key.home")+
                 java.io.File.separator+"system"+java.io.File.separator+
-        "de/uka/ilkd/key/proof/ruleForTestTacletIndex.taclet");
+        "test/de/uka/ilkd/key/proof/ruleForTestTacletIndex.taclet");
 
         ruleRewriteNonH1H2 = NoPosTacletApp.createNoPosTacletApp(taclet("rewrite_noninteractive_h1_h2"));
         ruleNoFindNonH1H2H3 = NoPosTacletApp.createNoPosTacletApp(taclet("nofind_noninteractive_h1_h2_h3"));

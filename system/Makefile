@@ -7,10 +7,12 @@
 # See LICENSE.TXT for details.
 
 SHELL=/bin/sh
-#comon prefix
+# comon prefix
 PFX=de/uka/ilkd/key/
-#source directory
+# source directory
 SRC=src/
+# test directory
+TEST=test/
 
 #
 #the path where to put the binaries.  This should be different from
@@ -305,7 +307,7 @@ endif
 argfile.normal: javaFiles
 	@echo [Collecting Java files to compile]
 	@cat javaFiles > argfile.normal
-	@echo "src/TestKey.java" >> argfile.normal 
+	@echo "test/TestKey.java" >> argfile.normal 
 ## make gjava -> java
 
 

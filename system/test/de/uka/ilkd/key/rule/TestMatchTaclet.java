@@ -71,7 +71,7 @@ public class TestMatchTaclet extends TestCase {
     public void setUp() {
         TacletForTests.setStandardFile(System.getProperty("key.home")
                 + java.io.File.separator + "system" + java.io.File.separator
-                + "de/uka/ilkd/key/logic/testRuleMatch.txt");
+                + "test/de/uka/ilkd/key/logic/testRuleMatch.txt");
         TacletForTests.parse();
     
         services = TacletForTests.services();
