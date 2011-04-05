@@ -304,18 +304,21 @@ public final class InformationFlowContractPO extends AbstOpContractPO {
         return contract.hashCode();
     }
 
+    @Override
     protected Term generateSelfNotNull(ProgramVariable selfVar) {
         return selfVar == null || getContract().getTarget().isConstructor()
                 ? TB.tt()
                 : TB.not(TB.equals(TB.var(selfVar), TB.NULL(services)));
     }
 
+    @Override
     protected Term generateSelfCreated(ProgramVariable selfVar) {
         return selfVar == null || getContract().getTarget().isConstructor()
                 ? TB.tt()
                 : TB.created(services, TB.var(selfVar));
     }
 
+    @Override
     protected Term generateSelfExactType(ProgramVariable selfVar, KeYJavaType selfKJT) {
         final Term selfExactType = selfVar == null || getContract().getTarget().isConstructor()
                 ? TB.tt()
@@ -325,6 +328,7 @@ public final class InformationFlowContractPO extends AbstOpContractPO {
         return selfExactType;
     }
 
+    @Override
     protected Term generateParamsOK(ImmutableList<ProgramVariable> paramVars) {
         Term paramsOK = TB.tt();
         for (ProgramVariable paramVar : paramVars) {
@@ -333,6 +337,7 @@ public final class InformationFlowContractPO extends AbstOpContractPO {
         return paramsOK;
     }
 
+    @Override
     protected Term generateMbyAtPreDef(ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars) {
         final Term mbyAtPreDef;
         if (contract.hasMby()) {
