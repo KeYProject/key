@@ -8,15 +8,17 @@
 //
 //
 
-package de.uka.ilkd.key.smt.taclettranslation;
+package de.uka.ilkd.key.taclettranslation.assumptions;
 
 import java.util.Collection;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
+import de.uka.ilkd.key.taclettranslation.TacletFormula;
 
-class DefaultTacletFormula implements TacletFormula {
+public class AssumptionFormula implements TacletFormula {
 
     Taclet taclet;
     Collection<Term> formula;
@@ -27,7 +29,7 @@ class DefaultTacletFormula implements TacletFormula {
 	return conditions;
     }
 
-    public DefaultTacletFormula(Taclet taclet, Collection<Term> formula,
+    public AssumptionFormula(Taclet taclet, Collection<Term> formula,
 	    String status)  {
 	this.taclet = taclet;
 	this.formula = formula;
@@ -36,7 +38,7 @@ class DefaultTacletFormula implements TacletFormula {
     
     
 
-    public DefaultTacletFormula(Taclet taclet, Collection<Term> formula,
+    public AssumptionFormula(Taclet taclet, Collection<Term> formula,
 	    String status, TacletConditions conditions) throws IllegalTacletException {
 	super();
 	this.taclet = taclet;

@@ -8,7 +8,7 @@
 //
 //
 
-package de.uka.ilkd.key.smt.taclettranslation;
+package de.uka.ilkd.key.taclettranslation.assumptions;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;

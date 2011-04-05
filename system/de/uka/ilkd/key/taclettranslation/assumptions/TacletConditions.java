@@ -8,7 +8,7 @@
 //
 // 
 
-package de.uka.ilkd.key.smt.taclettranslation;
+package de.uka.ilkd.key.taclettranslation.assumptions;
 
 import java.util.Iterator;
 
@@ -26,6 +26,7 @@ import de.uka.ilkd.key.rule.conditions.TypeCondition;
 import de.uka.ilkd.key.rule.conditions.TypeComparisonCondition.Mode;
 import de.uka.ilkd.key.rule.conditions.TypeResolver.GenericSortResolver;
 import de.uka.ilkd.key.rule.conditions.TypeResolver.NonGenericSortResolver;
+import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
 
 /**
  * This class is used for wrapping all variable conditions of a taclet

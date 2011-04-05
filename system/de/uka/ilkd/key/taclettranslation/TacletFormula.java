@@ -8,7 +8,7 @@
 //
 //
 
-package de.uka.ilkd.key.smt.taclettranslation;
+package de.uka.ilkd.key.taclettranslation;
 
 import java.util.Collection;
 
@@ -47,7 +47,10 @@ public interface TacletFormula {
     String getStatus();
     
 
-
+    /**
+     * It can be that a taclet is translated into several formulas, i.e. in the case
+     * that the generics are instantiated. This method returns the set of resulting formulas. 
+     */
     Collection<Term> getInstantiations();
     
 }

@@ -8,7 +8,7 @@
 //
 //
 
-package de.uka.ilkd.key.smt.taclettranslation;
+package de.uka.ilkd.key.taclettranslation;
 
 public class IllegalTacletException extends Exception {
     /**

@@ -1,60 +1,35 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
-
-package de.uka.ilkd.key.smt.taclettranslation;
+package de.uka.ilkd.key.taclettranslation.assumptions;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.FormulaSV;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IfThenElse;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
-import de.uka.ilkd.key.logic.op.TermSV;
-import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletGoalTemplate;
-import de.uka.ilkd.key.rule.VariableCondition;
-import de.uka.ilkd.key.rule.conditions.AbstractOrInterfaceType;
-import de.uka.ilkd.key.rule.conditions.ArrayComponentTypeCondition;
 import de.uka.ilkd.key.rule.conditions.TypeComparisonCondition;
-import de.uka.ilkd.key.rule.conditions.TypeCondition;
 import de.uka.ilkd.key.rule.conditions.TypeComparisonCondition.Mode;
+import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
+import de.uka.ilkd.key.taclettranslation.SkeletonGenerator;
+import de.uka.ilkd.key.taclettranslation.TacletFormula;
+import de.uka.ilkd.key.taclettranslation.TacletTranslator;
+
 
 
 interface VariablePool {
@@ -64,7 +39,7 @@ interface VariablePool {
     LogicVariable getLogicVariable(Name name, Sort sort);
 }
 
-public abstract class AbstractTacletTranslator implements TacletTranslator,
+public class AssumptionGenerator implements TacletTranslator,
         VariablePool {
 
     // only for testing.
@@ -85,36 +60,17 @@ public abstract class AbstractTacletTranslator implements TacletTranslator,
 
     
 
-    AbstractTacletTranslator(Services services) {
+    public AssumptionGenerator(Services services) {
 	this.services = services;
 
     }
     
-    private String getContent(Term term){
-	return term.op().getClass().getSimpleName()+": "+term.op();
-    }
     
-    private String termToString(Term term){
-	String res ="";
-	return termToString(term,"");
-    }
     
-    private String termToString(Term term,String depth){
-	String res ="";
-	res +=depth+ getContent(term);
+    
+    public TacletFormula translate(Taclet t, ImmutableSet<Sort> sorts, int maxGeneric) throws IllegalTacletException {
 
-	for(Term sub : term.subs()){
-	    res += "\n" + termToString(sub,depth+"-");
-	}
-	return res;
-    }
 
-    public TacletFormula translate(Taclet t, ImmutableSet<Sort> sorts,
-	    ImmutableSet<Term> attributeTerms, int maxGeneric) throws IllegalTacletException {
-
-	// check the taclet. If this translator is not able
-	// to translate the taclet throw IllegalTacletException.
-	check(t);
 	
 
 	// determine the variable conditions.
@@ -124,7 +80,7 @@ public abstract class AbstractTacletTranslator implements TacletTranslator,
 //	// variables
 //	// and do not quantify the variables.
 
-	Term term = translateTaclet(t, sorts);
+	Term term = SkeletonGenerator.FindTacletTranslator.translate(t);
 	
 
 
@@ -133,8 +89,6 @@ public abstract class AbstractTacletTranslator implements TacletTranslator,
 	term = rebuildTerm(term);
 	
 
-	
-//	// translate attributes
 
 	Collection<Term> result = new LinkedList<Term>();
 	result.add(term);
@@ -160,215 +114,10 @@ public abstract class AbstractTacletTranslator implements TacletTranslator,
 	}
 
 
-	return new DefaultTacletFormula(t, result, "", conditions);
+	return new AssumptionFormula(t, result, "", conditions);
 
 
 	
-    }
-
-
-
-
-    /**
-     * Override this method to introduce a translating mechanism for taclets.
-     * This mechanism should not translate generic types. This is done by
-     * <code>translateGeneric</code>.
-     * 
-     * @param t
-     *            taclet to be translated.
-     * @param sorts
-     *            the sorts that are used in the current proof.
-     * @return returns the translation of the taclet.
-     */
-    protected abstract Term translateTaclet(Taclet t, ImmutableSet<Sort> sorts)
-	    throws IllegalTacletException;
-
-    /**
-     * Translates a sequent to a term by using the following translations rules:
-     * T ==> D is translated to: And(T)->Or(D).<br>
-     * And(s): conjunction between all formulae in set s. Or(s): disjunction
-     * between all formulae in set s.
-     * 
-     * @param s
-     *            The sequent to be translated.
-     * @return the resulting term of the translation or <code>null</code> if
-     *         both antecedent and succendent are empty.
-     */
-    protected Term translate(Sequent s) {
-	TermBuilder builder = TermBuilder.DF;
-
-	ImmutableList<Term> ante = getFormulaeOfSemisequent(s.antecedent());
-	ImmutableList<Term> succ = getFormulaeOfSemisequent(s.succedent());
-
-	if (ante.size() == 0 && succ.size() == 0)
-	    return null;
-	if (succ.size() == 0)
-	    return builder.not(builder.and(ante));
-	if (ante.size() == 0)
-	    return builder.or(succ);
-
-	return builder.imp(builder.and(ante), builder.or(succ));
-    }
-
-    /**
-     * Because the taclet translation follows a bottom up approach, there are
-     * taclets that can not be translated yet. This method check whether there
-     * are general conditions that make a translation impossible.
-     * 
-     * @param t
-     *            Taclet to be checked
-     * @throws IllegalTacletException
-     *             if the taclet can not be translated because of general
-     *             reasons.
-     */
-    protected void checkGeneralConditions(Taclet t)
-	    throws IllegalTacletException {
-
-	Iterator<VariableCondition> it = t.getVariableConditions();
-	while (it.hasNext()) {
-	    VariableCondition vc = it.next();
-	   
-	 
-	    if (!(vc instanceof TypeComparisonCondition)
-		    && !(vc instanceof TypeCondition)
-		    && !(vc instanceof AbstractOrInterfaceType)
-		    && !(vc instanceof ArrayComponentTypeCondition)) {
-		throw new IllegalTacletException(
-		        "The taclet has at least one variable condition"
-		                + " that is not supported: " + vc.toString()
-		                + ": " + Taclet.class.getName());
-	    }
-	}
-
-
-	// Check for addrules, they are in general not allowed.
-	checkGoalTemplates(t);
-
-	// Check the assume-sequent.
-	checkSequent(t.ifSequent());
-    }
-
-    /**
-     * Checks whether the taclet has addrules.<br>
-     * 
-     * @param t
-     *            taclet to be checked.
-     * @throws IllegalTacletException
-     *             if the taclet is not translatable.
-     */
-    private void checkGoalTemplates(Taclet t) throws IllegalTacletException {
-	for (TacletGoalTemplate template : t.goalTemplates()) {
-	    if (template.rules().size() > 0) {
-		throw new IllegalTacletException("The taclet has addrules.");
-	    }
-	    // Check the add-sequent of the goal template
-	    checkSequent(template.sequent());
-	    // If the subclass must check the template, too:
-	    // delegate the check to the subclass.
-	    checkGoalTemplate(template);
-	}
-
-    }
-
-    /**
-     * Override this method if you want to check a goal template in a sub class.
-     * 
-     * @param template
-     * @throws IllegalTacletException
-     *             if the template is not translatable.
-     */
-    protected void checkGoalTemplate(TacletGoalTemplate template)
-	    throws IllegalTacletException {
-    }
-
-    /**
-     * Checks the sequent by checking every term within in this sequent.
-     * 
-     * @param s
-     * @throws IllegalTacletException
-     *             if the sequent is not supported.
-     */
-    protected void checkSequent(Sequent s) throws IllegalTacletException {
-	for (SequentFormula cf : s) {
-	    checkTerm(cf.formula());
-	}
-
-    }
-
-    /**
-     * Checks whether a operator is supported. This method contains operators
-     * every taclet should support. Override this method if a special taclet
-     * should support more operators.
-     * 
-     * @param op
-     *            the operator to be checked.
-     * @throws IllegalTacletException
-     *             if the operator is not supported.
-     */
-
-    protected void checkOperator(Operator op) throws IllegalTacletException {
-
-	if ((op instanceof Junctor)
-	        || (op instanceof Equality)
-	        || (op instanceof Quantifier)
-	        || (op instanceof TermSV)
-	        || (op instanceof Function)
-	        || (op instanceof IfThenElse)
-	        || (op instanceof VariableSV)
-	        || (op instanceof LocationVariable)
-
-	) {
-	    return;
-	}
-	throw new IllegalTacletException("The operator " + op.toString()
-	        + " is not supported. Class: " + op.getClass().getName());
-
-    }
-
-    /**
-     * Checks the given term by checking the operator of the term and by
-     * checking the subterms.
-     * 
-     * @param term
-     *            the operator to be checked.
-     * @throws IllegalTacletException
-     *             if the term is not supported.
-     */
-    protected void checkTerm(Term term) throws IllegalTacletException {
-	checkOperator(term.op());
-
-	for (TranslationListener l : listener) {
-	    if (term.sort() != null && !(term.sort() instanceof GenericSort)) {
-		if (term.sort().equals(Sort.FORMULA)) {
-		    if (term.op() instanceof FormulaSV) {
-			l.eventFormulaSV((SchemaVariable) term.op());
-		    }
-
-		} else {
-		    l.eventSort(term.sort());
-		}
-
-	    }
-	}
-	for (int i = 0; i < term.arity(); i++) {
-	    checkTerm(term.sub(i));
-	}
-    }
-
-    /**
-     * Collects all formulae of a semisequent in a set.
-     * 
-     * @param s
-     *            Semisequent.
-     * @return A list of all formulae of the semisequent <code>s </code>.
-     */
-    private ImmutableList<Term> getFormulaeOfSemisequent(Semisequent s) {
-	ImmutableList<Term> terms = ImmutableSLList.nil();
-	for (SequentFormula cf : s) {
-	    terms = terms.append(cf.formula());
-	}
-	return terms;
-
     }
 
     /**
@@ -382,9 +131,10 @@ public abstract class AbstractTacletTranslator implements TacletTranslator,
      * @return returns the new term.
      */
 
-    protected Term rebuildTerm(Term term) {
+    private Term rebuildTerm(Term term) {
 
-	ImmutableArray<QuantifiableVariable> variables = new ImmutableArray<QuantifiableVariable>();
+	ImmutableArray<QuantifiableVariable> variables =
+	    new ImmutableArray<QuantifiableVariable>();
 	Term[] subTerms = new Term[term.arity()];
 
 	variables = term.boundVars();
@@ -424,19 +174,10 @@ public abstract class AbstractTacletTranslator implements TacletTranslator,
 	return res;
     }
     
-    static public Term getObject(Term attributeTerm){
-	if(attributeTerm.arity() > 0){
-	    attributeTerm = getObject(attributeTerm.sub(0));
-	}
-	
-	return attributeTerm;
-    }
 
     static public boolean isAbstractOrInterface(Sort sort, Services services) {
 	if (!isReferenceSort(sort, services))
 	    return false;
-	
-
 	return sort.isAbstract();
 
     }
@@ -718,6 +459,7 @@ public abstract class AbstractTacletTranslator implements TacletTranslator,
 
 	TermBuilder tb = TermBuilder.DF;
 
+	// translate schema variables into logical variables
 	if (term.op() instanceof SchemaVariable) {
 	    if (term.sort().equals(Sort.FORMULA)) {
 
@@ -729,6 +471,8 @@ public abstract class AbstractTacletTranslator implements TacletTranslator,
 
 	}
 
+	// It can be that a quantifiable variable is not a logical variable but a schema 
+	// variable. In this case the schema variable is replaced with a logical varibale.
 	if (term.op() instanceof Quantifier) {
 	    LinkedList<QuantifiableVariable> list = new LinkedList<QuantifiableVariable>();
 
@@ -757,10 +501,5 @@ public abstract class AbstractTacletTranslator implements TacletTranslator,
 	this.listener.remove(list);
     }
 
-    /**
-     * @param t
-     * @throws IllegalTacletException
-     */
-    protected abstract void check(Taclet t) throws IllegalTacletException;
 
 }

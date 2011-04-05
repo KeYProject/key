@@ -8,7 +8,7 @@
 //
 //
 
-package de.uka.ilkd.key.smt.taclettranslation;
+package de.uka.ilkd.key.taclettranslation.assumptions;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,6 +34,7 @@ import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
 
 
 class GenericTranslator {
@@ -57,7 +58,7 @@ class GenericTranslator {
 	    throws IllegalTacletException {
 	this.services = serv;
 
-	HashSet<GenericSort> generics = AbstractTacletTranslator.collectGenerics(term); 
+	HashSet<GenericSort> generics = AssumptionGenerator.collectGenerics(term); 
 	ImmutableList<Term> list = instantiateGeneric(term,
 	        generics, sorts, t, conditions, maxGeneric);
 	Collection<Term> result = new LinkedList<Term>();
@@ -76,7 +77,7 @@ class GenericTranslator {
 	
 	if (list.size() > 0) {
 	    for (Term gt : list) {
-		result.add(AbstractTacletTranslator.quantifyTerm(gt));
+		result.add(AssumptionGenerator.quantifyTerm(gt));
 
 	    }
 	    if (appendGenericTerm) {
@@ -227,11 +228,11 @@ class GenericTranslator {
 
 	return !((inst instanceof GenericSort)
 	        || (inst.equals(Sort.ANY))
-	        || (conditions.containsIsReferenceCondition(generic) > 0 && !AbstractTacletTranslator
+	        || (conditions.containsIsReferenceCondition(generic) > 0 && !AssumptionGenerator
 	                .isReferenceSort(inst,services))
-	        || (conditions.containsNotAbstractInterfaceCondition(generic) && AbstractTacletTranslator
+	        || (conditions.containsNotAbstractInterfaceCondition(generic) && AssumptionGenerator
 	                .isAbstractOrInterface(inst,services)) || (conditions
-	        .containsAbstractInterfaceCondition(generic) && !AbstractTacletTranslator
+	        .containsAbstractInterfaceCondition(generic) && !AssumptionGenerator
 	        .isAbstractOrInterface(inst,services)));
     }
 
@@ -279,10 +280,10 @@ class GenericTranslator {
 	}
 	instTable = instSorts.toArray(instTable);
 
-	byte[][] referenceTable = AbstractTacletTranslator.generateReferenceTable(instSorts.size(),
+	byte[][] referenceTable = AssumptionGenerator.generateReferenceTable(instSorts.size(),
 	        genericSorts.size());
 
-	AbstractTacletTranslator.checkTable(referenceTable, instTable, genericTable, conditions,services);
+	AssumptionGenerator.checkTable(referenceTable, instTable, genericTable, conditions,services);
 
 	for (int r = 0; r < referenceTable.length; r++) {
 	    Term temp = null;

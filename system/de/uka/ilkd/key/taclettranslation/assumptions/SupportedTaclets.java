@@ -8,7 +8,7 @@
 //
 //
 
-package de.uka.ilkd.key.smt.taclettranslation;
+package de.uka.ilkd.key.taclettranslation.assumptions;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -20,7 +20,6 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.smt.taclettranslation.TreeItem.SelectionMode;
 
 /**
  * Change this file if you want to change the set of taclets that can be used
@@ -30,10 +29,10 @@ import de.uka.ilkd.key.smt.taclettranslation.TreeItem.SelectionMode;
  * translating.
  * 
  */
-public final class UsedTaclets {
+public final class SupportedTaclets {
     
     
-    public static final UsedTaclets INSTANCE = new UsedTaclets();
+    public static final SupportedTaclets INSTANCE = new SupportedTaclets();
     
     /**
      * The taclets that could be used for external provers.
@@ -41,7 +40,7 @@ public final class UsedTaclets {
 
     private HashMap<String, TreeItem> tacletNames = new HashMap<String, TreeItem>();
     
-    private UsedTaclets(){
+    private SupportedTaclets(){
 	getTreeModel();
     }
 
@@ -96,7 +95,7 @@ public final class UsedTaclets {
      *            the name of the taclet
      * @return <code>true</code> if the taclet can be used for external provers.
      */
-    boolean contains(String tacletname) {
+    public boolean contains(String tacletname) {
 
 
 	boolean found = false;
@@ -111,7 +110,7 @@ public final class UsedTaclets {
 	if (found == false)
 	    return false;
 	TreeItem item = tacletNames.get(tacletname);
-	return item != null && item.getMode() == SelectionMode.all;
+	return item != null && item.getMode() == TreeItem.SelectionMode.all;
 	// return usedTaclets.contains(tacletname);
     }
 
@@ -121,7 +120,7 @@ public final class UsedTaclets {
     
     private void selectNothing(){
 	for(TreeItem item : tacletNames.values()){
-	    item.setMode(SelectionMode.nothing);
+	    item.setMode(TreeItem.SelectionMode.nothing);
 	}
 	
     }
@@ -146,7 +145,7 @@ public final class UsedTaclets {
     }
     
     private void selectAll(TreeNode node){
-	treeItem(node).setMode(SelectionMode.all);
+	treeItem(node).setMode(TreeItem.SelectionMode.all);
 	for(int i=0; i < node.getChildCount(); i ++){
 	    selectAll(node.getChildAt(i));
 	}
@@ -159,10 +158,10 @@ public final class UsedTaclets {
     
 
     
-    private SelectionMode validateSelectionMode(TreeNode node){
+    private TreeItem.SelectionMode validateSelectionMode(TreeNode node){
 	TreeItem item = treeItem(node);
 	if(node.isLeaf()){
-	    if(item.getMode() == SelectionMode.all){
+	    if(item.getMode() == TreeItem.SelectionMode.all){
 		item.setSelectedChildCount(1);
 	    }else{
 		item.setSelectedChildCount(0);
@@ -177,10 +176,10 @@ public final class UsedTaclets {
 	for(int i=0; i < node.getChildCount(); i++){
 	    
 	    TreeNode child = node.getChildAt(i);
-	    SelectionMode childMode = validateSelectionMode(child);
-	    if(childMode.equals(SelectionMode.all)){
+	    TreeItem.SelectionMode childMode = validateSelectionMode(child);
+	    if(childMode.equals(TreeItem.SelectionMode.all)){
 		iAll++;
-	    }else if(childMode.equals(SelectionMode.nothing)){
+	    }else if(childMode.equals(TreeItem.SelectionMode.nothing)){
 		iNothing++;
 	    }
 	    TreeItem childItem = treeItem(child);
@@ -191,12 +190,12 @@ public final class UsedTaclets {
 	}
 	
 	if(iAll == node.getChildCount()){
-	    item.setMode(SelectionMode.all);
+	    item.setMode(TreeItem.SelectionMode.all);
 	    
 	}else if(iNothing == node.getChildCount()){
-	    item.setMode(SelectionMode.nothing);
+	    item.setMode(TreeItem.SelectionMode.nothing);
 	}else {
-	    item.setMode(SelectionMode.user);
+	    item.setMode(TreeItem.SelectionMode.user);
 	}
 	
 	return item.getMode();
@@ -594,6 +593,93 @@ public final class UsedTaclets {
 	    }
 	}
 	return list;
+    }
+    
+    
+    /**
+     * TreeItem represents the user data in a tree model.
+     * 
+     */
+    public static class TreeItem {
+        public enum SelectionMode {all,nothing,user};
+        private String text;
+
+        private SelectionMode mode = SelectionMode.nothing;
+        private int selectedChildCount = 0;
+        private int childCount = 0;
+        private int genericCount =0;
+        private SupportedTaclets.Category category = SupportedTaclets.Category.NO_CATEGORY;
+        
+
+        TreeItem(String text, int genericCount){
+    	this.text = text;
+    	this.genericCount = genericCount;
+        }
+
+        TreeItem(String text, SupportedTaclets.Category cat){
+    	this.text = text;
+    	this.category = cat;
+        }
+        
+        TreeItem(String text, boolean checked){
+    	this.text = text;
+
+        
+        }
+        
+        
+        
+        public SupportedTaclets.Category getCategory() {
+            return category;
+        }
+
+        public int getGenericCount(){
+    	return genericCount;
+        }
+        
+        public int getSelectedChildCount() {
+            return selectedChildCount;
+        }
+
+        public void setSelectedChildCount(int selectedChildCount) {
+            this.selectedChildCount = selectedChildCount;
+        }
+
+        public int getChildCount() {
+            return childCount;
+        }
+
+        public void setChildCount(int childCount) {
+            this.childCount = childCount;
+        }
+
+        public SelectionMode getMode() {
+            return mode;
+        }
+
+        public void setMode(SelectionMode mode) {
+            this.mode = mode;
+        }
+
+
+        public String toComplexString(){
+    	return mode.name()+";"+category.name()+";"+text;
+        }
+
+        public String toString(){
+    	return text;
+        }
+        
+        public int hashCode(){
+    	return text.hashCode();
+        }
+        
+
+        
+        
+        
+        
+        
     }
 
 }

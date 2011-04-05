@@ -28,8 +28,13 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.taclettranslation.assumptions.AssumptionGenerator;
+import de.uka.ilkd.key.taclettranslation.assumptions.AssumptionFormula;
+import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets;
+import de.uka.ilkd.key.taclettranslation.assumptions.TranslationListener;
+import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
+import de.uka.ilkd.key.taclettranslation.TacletFormula;
 
 public final class DefaultTacletSetTranslation 
 			implements TacletSetTranslation,TranslationListener {
@@ -64,27 +69,14 @@ public final class DefaultTacletSetTranslation
      */
     private Collection<Taclet> taclets = new LinkedList<Taclet>();
 
-    /**
-     * List of taclet translators. If you want to add translators use
-     * <code>add</code>. When a taclet is translated the first translator in the
-     * list is chosen which fits the taclet.
-     */
-    private ImmutableList<TacletTranslator> translators = ImmutableSLList.nil();
 
-    /**
-     * List of used heuristics. Use <code>add</code> and <code>remove</code> to
-     * change the list.
-     */
-    private ImmutableList<String> heuristics = ImmutableSLList.nil();
+    private final AssumptionGenerator assumptionGenerator;
+    
+
     
     private ImmutableSet<Sort> usedFormulaSorts = DefaultImmutableSet.nil();
     
-    
-    /**
-     * Attribute terms that have been used in the proof.
-     */
-    private ImmutableSet<Term> usedAttributeTerms = DefaultImmutableSet.nil();
-    
+
     /**
      * Sorts that have been used while translating the set of taclets.
      */
@@ -104,37 +96,19 @@ public final class DefaultTacletSetTranslation
     private int maxGeneric =2;
 
     public DefaultTacletSetTranslation(Services services) {
-	TacletTranslator tt = new FindTacletTranslator(services);
-	tt.addListener(this);
-	translators = translators.append(tt);
+	assumptionGenerator = new AssumptionGenerator(services);
+	assumptionGenerator.addListener(this);
+	
+	//translators = translators.append(tt);
 	this.services = services;
 	
     }
 
-    /**
-     * Checks whether the given taclet contains at least one heuristic of the
-     * list <code>heuristics</code>.
-     * 
-     * @param t
-     *            taclet to be checked.
-     * @return <code>true</code> if the taclet contains one of the given
-     *         heuristic otherwise <code>false</code>.
-     */
-    public boolean checkHeuristic(Taclet t) {
-	for (String h : heuristics) {
-	    for (RuleSet rs : t.getRuleSets()) {
-		if (rs.name().toString().equals(h))
-		    return true;
-	    }
-	    
-	}
-	return false;
-    }
+
     
 
 
-    public ImmutableList<TacletFormula> getTranslation(ImmutableSet<Sort> sorts, 
-	    ImmutableSet<Term> attributeTerms, int max) {
+    public ImmutableList<TacletFormula> getTranslation(ImmutableSet<Sort> sorts, int max) {
 	this.maxGeneric = max;
 	// only translate once.
 	if (!translate)
@@ -145,32 +119,24 @@ public final class DefaultTacletSetTranslation
 	translation = ImmutableSLList.nil();
        
 	ImmutableSet<Sort> emptySetSort = DefaultImmutableSet.nil();
-	ImmutableSet<Term> emptySetTerm = DefaultImmutableSet.nil();
+
 	usedFormulaSorts = (sorts == null ?emptySetSort :sorts);
-	usedAttributeTerms = (attributeTerms == null ? emptySetTerm :attributeTerms);
 	
 
 	for (Taclet t : taclets) {
 	    
-	    if (UsedTaclets.INSTANCE.contains(t.name().toString())) {
+	    if (SupportedTaclets.INSTANCE.contains(t.name().toString())) {
 	
-	
-	    int i=0;
-	    for (TacletTranslator translator : translators) {
-		try { // check for the right translator 
-		
-		    translation = translation.append(translator.translate(t,sorts,attributeTerms,max));
-		    break; // translate only once a time.
-		} catch (IllegalTacletException e) {
-		    if(i == translators.size()-1){
-			   notTranslated = notTranslated
-			    .append(new DefaultTacletFormula(t, null, e
-			            .getMessage()));
-		    }
-	
-		}
-		i++;
-	    }
+	     try{
+		 TacletFormula result = 
+        	assumptionGenerator.translate(t, sorts, max);
+		 translation = translation.append(result);
+            
+	     } catch(IllegalTacletException e){
+		 notTranslated = notTranslated
+		    .append(new AssumptionFormula(t, null, e
+		            .getMessage())); 
+	     }
 	    }
 	}
 
@@ -189,21 +155,11 @@ public final class DefaultTacletSetTranslation
 	return notTranslated;
     }
 
-    public void addHeuristic(String h) {
-	heuristics = heuristics.append(h);
-
-    }
-
-    public boolean removeHeursitic(String h) {
-	int size = heuristics.size();
-	heuristics = heuristics.removeFirst(h);
-	return size == heuristics.size() + 1;
-    }
 
     
     public void update() {
 	translate = true;
-	getTranslation(usedFormulaSorts,usedAttributeTerms,maxGeneric);
+	getTranslation(usedFormulaSorts,maxGeneric);
 
     }
 
@@ -225,7 +181,7 @@ public final class DefaultTacletSetTranslation
     }
     
     public String toString(){
-	ImmutableList<TacletFormula> list = getTranslation(usedFormulaSorts, usedAttributeTerms,maxGeneric);
+	ImmutableList<TacletFormula> list = getTranslation(usedFormulaSorts, maxGeneric);
         String toStore = "";
         toStore = "//"+Calendar.getInstance().getTime().toString()+"\n";
         
@@ -258,15 +214,7 @@ public final class DefaultTacletSetTranslation
         
 
         
-        if(usedAttributeTerms.size() > 0){
-            toStore+="\\programVariables{\n\n";
-            for(Term term : usedAttributeTerms){
-        	term = AbstractTacletTranslator.getObject(term);
-        	
-        	toStore += term.sort() + " "+term+";\n";
-            }
-            toStore+="}\n\n"; 
-        }
+
         
         
         if(!usedFormulaSV.isEmpty()){

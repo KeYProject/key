@@ -96,6 +96,7 @@ import de.uka.ilkd.key.gui.smt.SettingsDialog;
 import de.uka.ilkd.key.gui.smt.SolverListener;
 import de.uka.ilkd.key.gui.smt.TemporarySettings;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
@@ -113,9 +114,12 @@ import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
+import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
+import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
+import de.uka.ilkd.key.taclettranslation.SkeletonGenerator;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.key.util.KeYResourceManager;
@@ -496,6 +500,40 @@ public final class Main extends JFrame implements IMain {
         
 
         toolBar.addSeparator();
+        JButton test = new JButton("Test");
+        test.addActionListener(new ActionListener() {
+	    @Override
+	    public void actionPerformed(ActionEvent e) {
+		System.out.println("START TEST");
+		Proof proof = mediator().getProof();
+		if(proof != null){
+		    Taclet taclet = find("boolean_equal_2");
+		    if(taclet!= null){
+			try {
+	                   Term t = SkeletonGenerator.FindTacletTranslator.translate(taclet);
+	                   System.out.println(LogicPrinter.quickPrintTerm(t, proof.getServices()));
+                        } catch (IllegalTacletException e1) {
+	                    e1.printStackTrace();
+                        }
+		    }else{
+			System.out.println("Taclet does not exist.");
+		    }
+		}		
+	    }
+	    
+	    private Taclet find(String name){
+		Proof proof = mediator().getProof();
+		for(Taclet taclet : proof.env().getInitConfig().getTaclets()){
+		    if(taclet.name().toString().equals(name)){
+			return taclet;
+		    }
+		}
+		return null;
+	    }
+	});
+        toolBar.add(test);
+        toolBar.addSeparator();
+        
         
         final JButton goalBackButton = new JButton();
         goalBackButton.setAction(new UndoLastStep(false));
