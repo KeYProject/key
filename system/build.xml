@@ -4,6 +4,7 @@
   <property environment="env" /> <!-- include environment variables -->
 
   <property name="src.dir"   value="${basedir}/src" />
+  <property name="test.dir"   value="${basedir}/test" />
   <property name="build.dir" value="${basedir}/binary" />
   <property name="dist.dir"  value="${basedir}/binary" />
   <property name="gen.dir"  value="${basedir}/genSrc" />
@@ -70,16 +71,15 @@
   	<copy todir="${build.dir}">
     	    <fileset dir="${basedir}/resources/"/>
         </copy>
-     <javac srcdir= "${src.dir}:${gen.dir}"
+     <javac srcdir= "${src.dir}:${gen.dir}:${test.dir}"
            destdir="${dist.dir}"
            source="1.6"
      	   deprecation="on"
            debug="on"
            depend="${build.depend}"
            optimize="off">
-        <include name="${src.dir}/de/**" />
-        <include name="${src.dir}/recoder/**" />
-        <include name="${src.dir}/TestKey.java" />
+        <include name="${src.dir}/**" />
+        <include name="${test.dir}/**" />
       <classpath>
         <pathelement location="${ext.dir}/antlr.jar" />
         <pathelement location="${ext.dir}/recoderKey.jar" />
@@ -174,7 +174,7 @@
 
   <target name="schemajavaparser"> 
     	<copy tofile="${gen.dir}/de/uka/ilkd/key/parser/schemajava/Token.java">
-            <fileset file="${basedir}/de/uka/ilkd/key/parser/schemajava/Token.java.source"/>
+            <fileset file="${src.dir}/de/uka/ilkd/key/parser/schemajava/Token.java.source"/>
     	</copy>
 
      <javacc
@@ -185,7 +185,7 @@
 
   <target name="proofjavaparser"> 
     	<copy tofile="${gen.dir}/de/uka/ilkd/key/parser/proofjava/Token.java">
-            <fileset file="${basedir}/de/uka/ilkd/key/parser/proofjava/Token.java.source"/>
+            <fileset file="${src.dir}/de/uka/ilkd/key/parser/proofjava/Token.java.source"/>
     	</copy>
 	<javacc
 	    target="${src.dir}/de/uka/ilkd/key/parser/proofjava/ProofJavaParser.jj"
