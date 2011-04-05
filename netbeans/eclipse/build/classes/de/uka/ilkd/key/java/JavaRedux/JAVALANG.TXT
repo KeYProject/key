@@ -1,0 +1,57 @@
+# This file is part of KeY - Integrated Deductive Software Design
+# Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+#                         Universitaet Koblenz-Landau, Germany
+#                         Chalmers University of Technology, Sweden
+#
+# The KeY system is protected by the GNU General Public License. 
+# See LICENSE.TXT for details.
+
+# This file lists all files that are known to the KeY system
+# without any additional classpath.
+
+# All files but Enum.java are created with Stubmaker
+# Enum.java is manually created!
+
+# java.lang.Object has been modified manually!
+
+java/lang/Object.java
+
+java/lang/annotation/Annotation.java
+java/lang/ArithmeticException.java
+java/lang/ArrayIndexOutOfBoundsException.java
+java/lang/ArrayStoreException.java
+java/lang/AssertionError.java
+java/lang/Class.java
+java/lang/ClassCastException.java
+java/lang/CloneNotSupportedException.java
+java/lang/Cloneable.java
+java/lang/Comparable.java
+java/lang/Enum.java
+java/lang/Error.java
+java/lang/Exception.java
+java/lang/ExceptionInInitializerError.java
+java/lang/IllegalArgumentException.java
+java/lang/IndexOutOfBoundsException.java
+java/lang/InterruptedException.java
+java/lang/Iterable.java
+java/lang/LinkageError.java
+java/lang/NegativeArraySizeException.java
+java/lang/NoClassDefFoundError.java
+java/lang/NullPointerException.java
+java/lang/NumberFormatException.java
+java/lang/VirtualMachineError.java
+java/lang/OutOfMemoryError.java
+java/lang/Runnable.java
+java/lang/RuntimeException.java
+java/lang/String.java
+java/lang/StringBuffer.java
+java/lang/Thread.java
+java/lang/Throwable.java
+java/util/Collection.java
+java/util/Iterator.java
+java/util/List.java
+java/util/ListIterator.java
+java/util/Map.java
+java/util/Set.java
+java/io/IOException.java
+java/io/Serializable.java

@@ -83,7 +83,7 @@ public final class SpecificationRepository {
     private final Services services;
     
     private int contractCounter = 0;
-    private int libraryContractCounter = -10000;
+    private int libraryContractCounter = -1;
     
     
     
@@ -493,8 +493,8 @@ public final class SpecificationRepository {
 	
 	//set id
 	if(((TypeDeclaration)contract.getKJT().getJavaType()).isLibraryClass()) {
-	    contract = contract.setID(libraryContractCounter++);
-	    assert libraryContractCounter < -1 : "too many library contracts";
+	    contract = contract.setID(libraryContractCounter--);
+	    assert libraryContractCounter > Integer.MIN_VALUE : "too many library contracts";
 	} else {
 	    contract = contract.setID(contractCounter++);
 	}

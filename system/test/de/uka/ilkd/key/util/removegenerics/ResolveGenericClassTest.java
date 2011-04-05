@@ -22,15 +22,6 @@ public class ResolveGenericClassTest extends TestCase {
     
     protected CrossReferenceServiceConfiguration sc = new CrossReferenceServiceConfiguration();
 
-    @Override
-    protected void setUp() throws Exception {
-        // dummy method for netbeans test suite generation
-    }
-
-    public void testNothing() throws Exception {
-        // dummy method for netbeans test suite generation
-    }
-
     public CompilationUnit registerCU(String compilationUnit) throws ParserException {
         ProgramFactory f = sc.getProgramFactory();
         CompilationUnit cu = f.parseCompilationUnit(compilationUnit);

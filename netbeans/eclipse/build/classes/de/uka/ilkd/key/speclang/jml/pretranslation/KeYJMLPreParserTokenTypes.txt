@@ -1,0 +1,131 @@
+// $ANTLR 2.7.2: jmlpreparser.g -> KeYJMLPreParserTokenTypes.txt$
+KeYJMLPreParser    // output token vocab name
+ABSTRACT="abstract"=4
+ACCESSIBLE="accessible"=5
+ACCESSIBLE_REDUNDANTLY="accessible_redundantly"=6
+ALSO="also"=7
+ASSERT="assert"=8
+ASSERT_REDUNDANTLY="assert_redundantly"=9
+ASSUME="assume"=10
+ASSUME_REDUNDANTLY="assume_redundantly"=11
+ASSIGNABLE="assignable"=12
+ASSIGNABLE_RED="assignable_redundantly"=13
+BEHAVIOR="behavior"=14
+BEHAVIOUR="behaviour"=15
+CAPTURES="captures"=16
+CAPTURES_RED="captures_redundantly"=17
+CODE="code"=18
+CODE_BIGINT_MATH="code_bigint_math"=19
+CODE_JAVA_MATH="code_java_math"=20
+CODE_SAFE_MATH="code_safe_math"=21
+CONST="const"=22
+CONSTRAINT="constraint"=23
+CONSTRAINT_RED="constraint_redundantly"=24
+DECREASES="decreases"=25
+DECREASES_REDUNDANTLY="decreases_redundantly"=26
+DECREASING="decreasing"=27
+DECREASING_REDUNDANTLY="decreasing_redundantly"=28
+DIVERGES="diverges"=29
+DIVERGES_RED="diverges_redundantly"=30
+DURATION="duration"=31
+DURATION_RED="duration_redundantly"=32
+ENSURES="ensures"=33
+ENSURES_RED="ensures_redundantly"=34
+EXCEPTIONAL_BEHAVIOR="exceptional_behavior"=35
+EXCEPTIONAL_BEHAVIOUR="exceptional_behaviour"=36
+FINAL="final"=37
+FOR_EXAMPLE="for_example"=38
+FORALL="forall"=39
+GHOST="ghost"=40
+HELPER="helper"=41
+IMPLIES_THAT="implies_that"=42
+IN="in"=43
+IN_RED="in_redundantly"=44
+INITIALLY="initially"=45
+INSTANCE="instance"=46
+INVARIANT="invariant"=47
+INVARIANT_RED="invariant_redundantly"=48
+LOOP_INVARIANT="loop_invariant"=49
+LOOP_INVARIANT_RED="loop_invariant_redundantly"=50
+MAINTAINING="maintaining"=51
+MAINTAINING_REDUNDANTLY="maintaining_redundantly"=52
+MAPS="maps"=53
+MAPS_RED="maps_redundantly"=54
+MEASURED_BY="measured_by"=55
+MEASURED_BY_REDUNDANTLY="measured_by_redundantly"=56
+MODEL="model"=57
+MODIFIABLE="modifiable"=58
+MODIFIABLE_RED="modifiable_redundantly"=59
+MODIFIES="modifies"=60
+MODIFIES_RED="modifies_redundantly"=61
+MONITORS_FOR="monitors_for"=62
+NATIVE="native"=63
+NON_NULL="non_null"=64
+NORMAL_BEHAVIOR="normal_behavior"=65
+NORMAL_BEHAVIOUR="normal_behaviour"=66
+NOWARN="nowarn"=67
+NULLABLE="nullable"=68
+NULLABLE_BY_DEFAULT="nullable_by_default"=69
+OLD="old"=70
+PRIVATE="private"=71
+PROTECTED="protected"=72
+PUBLIC="public"=73
+PURE="pure"=74
+READABLE="readable"=75
+REPRESENTS="represents"=76
+REPRESENTS_RED="represents_redundantly"=77
+REQUIRES="requires"=78
+REQUIRES_RED="requires_redundantly"=79
+SCOPE_SAFE="scopeSafe"=80
+ARBITRARY_SCOPE="arbitraryScope"=81
+ARBITRARY_SCOPE_THIS="arbitraryScopeThis"=82
+SET="set"=83
+SIGNALS="signals"=84
+SIGNALS_ONLY="signals_only"=85
+SIGNALS_ONLY_RED="signals_only_redundantly"=86
+SIGNALS_RED="signals_redundantly"=87
+SPEC_BIGINT_MATH="spec_bigint_math"=88
+SPEC_JAVA_MATH="spec_java_math"=89
+SPEC_PROTECTED="spec_protected"=90
+SPEC_PUBLIC="spec_public"=91
+SPEC_NAME="name"=92
+SPEC_SAFE_MATH="spec_safe_math"=93
+STATIC="static"=94
+STRICTFP="strictfp"=95
+SYNCHRONIZED="synchronized"=96
+TRANSIENT="transient"=97
+UNINITIALIZED="uninitialized"=98
+VOLATILE="volatile"=99
+WHEN="when"=100
+WHEN_RED="when_redundantly"=101
+WORKING_SPACE="working_space"=102
+WORKING_SPACE_RED="working_space_redundantly"=103
+WORKING_SPACE_SINGLE_ITERATION="working_space_single_iteration"=104
+WORKING_SPACE_SINGLE_ITERATION_PARAM="working_space_single_iteration_param"=105
+WORKING_SPACE_SINGLE_ITERATION_LOCAL="working_space_single_iteration_local"=106
+WORKING_SPACE_SINGLE_ITERATION_CONSTRUCTED="working_space_single_iteration_constructed"=107
+WORKING_SPACE_SINGLE_ITERATION_REENTRANT="working_space_single_iteration_reentrant"=108
+WORKING_SPACE_CONSTRUCTED="working_space_constructed"=109
+WORKING_SPACE_LOCAL="working_space_local"=110
+WORKING_SPACE_CALLER="working_space_caller"=111
+WORKING_SPACE_REENTRANT="working_space_reentrant"=112
+WRITABLE="writable"=113
+SL_COMMENT("a single-line non-specification comment")=114
+ML_COMMENT("a multi-line non-specification comment")=115
+PARAM_DECL("a parameter declaration")=116
+LETTER("a letter")=117
+DIGIT("a digit")=118
+WS("white space")=119
+IDENT("an identifier")=120
+PARAM_LIST("a parameter list")=121
+NEST_START=122
+NEST_END=123
+BODY("a method body")=124
+INITIALISER("an initialiser")=125
+SEMICOLON("a semicolon")=126
+STRING_LITERAL("a string in double quotes")=127
+ESC=128
+EXPRESSION=129
+EXSURES=130
+EXSURES_RED=131
+LOOP_INVARIANT_REDUNDANTLY=132

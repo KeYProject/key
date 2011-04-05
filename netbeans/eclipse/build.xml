@@ -71,4 +71,11 @@
     nbproject/build-impl.xml file. 
 
     -->
+
+    <target name="-post-compile">
+        <copy todir="${build.classes.dir}">
+            <fileset dir="${basedir}/../../system/resources/"/>
+        </copy>
+    </target>
+    
 </project>

@@ -1,0 +1,66 @@
+SET JDK=%JAVA_HOME%
+
+rem Do not use empty JAVA_OPTIONS under Win95/98/Me
+rem Do not use values with "=" under Win95/98/Me
+SET JAVA_OPTIONS="-Xms64m -Xmx768m"
+
+SET HOME=%HOMEDRIVE%%HOMEPATH%
+
+rem #############
+rem KeY CLASSPATH
+rem #############
+
+set key_ext_jars=antlr.jar recoderKey.jar 
+
+set keyclasspath=%KEY_HOME%\system\key.jar
+
+if not exist "%KEY_LIB%\antlr.jar" (goto MISSING_LIBRARY ) else (set keyclasspath=%keyclasspath%;%KEY_LIB%\antlr.jar)
+if not exist "%KEY_LIB%\recoderKey.jar" (goto MISSING_LIBRARY ) else (set keyclasspath=%keyclasspath%;%KEY_LIB%\recoderKey.jar)
+set keysysprops=""
+
+
+if not exist "%HOME%\.key" goto CREATE_DEFAULT_CONFIG
+
+:RETURN_TO_CALLER:
+rem  Fallback for KeY-specific binaries
+set PATH=%PATH%;%KEY_LIB%
+
+if not .%OS%.==.Windows_NT. goto WIN95
+
+
+
+:WINNT
+SET PATH=%JDK%\bin;%PATH%
+
+"%JDK%\bin\java" -Dkey.home="%KEY_HOME%" -Dkey.simplify.logdir="%KEY_SIMPLIFY_LOG_DIR%" "%JAVA_OPTIONS%" -cp "%keyclasspath%" de.uka.ilkd.key.gui.Main %1 %2 %3 %4 %5 %6 %7
+exit /b
+
+:WIN95
+SET PATH="%JDK%\bin;%PATH%"
+if .%JDK%. == .. goto ERROR_IN_ENVIRONMENT
+if .%JAVA_OPTIONS%. == .. goto ERROR_IN_ENVIRONMENT
+if not errorlevel 1 goto AFTER_PATH
+:ERROR_IN_ENVIRONMENT
+if .%1.==.-recursive. goto PRINT_ERROR
+echo Increasing environment space
+command.com /E:16384 /C startProver.bat -recursive %1 %2 %3 %4 %5 %6 %7
+exit /b
+:PRINT_ERROR
+echo.
+echo ERROR WHEN RUNNING startProver.bat - "Out of environment space".
+echo Increase environment space using batch-file with command:
+echo "command.com /E:16384 /C startProver.bat"
+exit /b
+:CREATE_DEFAULT_CONFIG
+md "%HOME%\.key"
+goto RETURN_TO_CALLER
+:AFTER_PATH
+if .%1.==.-recursive. shift 1
+rem This Java command specifies the MaxPermSize parameter directly because under Win95/98/Me
+rem it is impossible to assign an environment variable value containing an equal sign (=)
+"%JDK%\bin\java" -Dkey.home="%KEY_HOME%"  -Dkey.simplify.logdir="%KEY_SIMPLIFY_LOG_DIR%" "%JAVA_OPTIONS%" "-XX:MaxPermSize=64m" -cp "%keyclasspath%" de.uka.ilkd.key.gui.Main %1 %2 %3 %4 %5 %6 %7
+
+:MISSING_LIBRARY
+echo Missing Library. Please copy all libraries to %KEY_LIB%.
+echo At least one of the following libraries has not been found: antlr.jar recoderKey.jar 
+exit /b
