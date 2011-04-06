@@ -315,18 +315,14 @@ public final class TermBuilder {
     
     
     public ImmutableList<Term> var(ProgramVariable ... vs) {
-	ImmutableList<Term> result = ImmutableSLList.<Term>nil();
-	for (ProgramVariable v : vs) {
-	    result = result.append(tf.createTerm(v));
-	}
-        return result;
+	return var(vs);
     }
     
     
     public ImmutableList<Term> var(Iterable<ProgramVariable> vs) {
 	ImmutableList<Term> result = ImmutableSLList.<Term>nil();
 	for (ProgramVariable v : vs) {
-	    result = result.append(tf.createTerm(v));
+	    result = result.append(var(v));
 	}
         return result;
     }

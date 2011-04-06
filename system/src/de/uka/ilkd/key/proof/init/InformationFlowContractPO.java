@@ -34,6 +34,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.util.LinkedHashMap;
+import java.util.Iterator;
 
 /**
  * The proof obligation for dependency contracts. 
@@ -62,14 +63,14 @@ public final class InformationFlowContractPO extends AbstOpContractPO {
 
         final Term simpleFreePre =
                 TB.parseTerm(
-                    "  wellFormed(heapAtPre1)"
-                    + "& wellFormed(heapAtPre2)"
-                    + "& self != null"
-                    + "& { heap := heapAtPre1 }"
-                    + "  self.<created> = TRUE"
-                    + "& { heap := heapAtPre2 }"
-                    + "  self.<created> = TRUE",
-                    services);
+                "  wellFormed(heapAtPre1)"
+                + "& wellFormed(heapAtPre2)"
+                + "& self != null"
+                + "& { heap := heapAtPre1 }"
+                + "  self.<created> = TRUE"
+                + "& { heap := heapAtPre2 }"
+                + "  self.<created> = TRUE",
+                services);
 
         //"MyClass::exactInstance(self) = TRUE"
         final Term selfExactType = generateSelfExactType(vs.selfVar, selfKJT);
@@ -85,12 +86,12 @@ public final class InformationFlowContractPO extends AbstOpContractPO {
         //initial value of measured_by clause
         final Term mbyAtPreDef1 =
                 TB.apply(
-                    updateHeapAtPre1,
-                    generateMbyAtPreDef(vs.selfVar, vs.paramVars1));
+                updateHeapAtPre1,
+                generateMbyAtPreDef(vs.selfVar, vs.paramVars1));
         final Term mbyAtPreDef2 =
                 TB.apply(
-                    updateHeapAtPre2,
-                    generateMbyAtPreDef(vs.selfVar, vs.paramVars2));
+                updateHeapAtPre2,
+                generateMbyAtPreDef(vs.selfVar, vs.paramVars2));
 
         return TB.and(
                 simpleFreePre,
@@ -102,6 +103,48 @@ public final class InformationFlowContractPO extends AbstOpContractPO {
                 mbyAtPreDef2);
     }
 
+    private Term buildInputOutputRelations(ProofObligationVariables vs)
+            throws ParserException {
+        final ImmutableList<ImmutableList<Term>> secureFors =
+                getContract().getSecureFors(vs.selfVar, vs.paramVars1, services);
+        ImmutableList<Term> inputOutputRelations =
+                ImmutableSLList.<Term>nil();
+        for (ImmutableList<Term> secureFor : secureFors) {
+            assert secureFor.size() == vs.paramVars1.size() + 1;
+            ImmutableList<Term> inputRelations =
+                    ImmutableSLList.<Term>nil();
+            final Term returnLocs = secureFor.head();
+            final Term eqAtLocs =
+                    TB.parseTerm(
+                            "equalsAtLocs(heapAtPre1, heapAtPre2, "
+                                + returnLocs + ", " + returnLocs + ")",
+                            services);
+            inputRelations = inputRelations.append(eqAtLocs);
+            final ImmutableList<Term> paramsLocs = secureFor.tail();
+            final Iterator<ProgramVariable> paramVars1It = vs.paramVars1.iterator();
+            final Iterator<ProgramVariable> paramVars2It = vs.paramVars2.iterator();
+            for (Term paramLocs : paramsLocs) {
+                final Term param1 = TB.var(paramVars1It.next());
+                final Term param2 = TB.var(paramVars2It.next());
+                final Term eq =
+                        TB.parseTerm(
+                              "    \\subset(" + paramLocs + ", " + returnLocs + ")"
+                            + " -> equals(heapAtPre1, " + param1 + ", "
+                            + "           heapAtPre2, " + param2 + ")",
+                            services);
+                inputRelations = inputRelations.append(eq);
+            }
+            final Term inputRelation = TB.and(inputRelations);
+            final Term outputRelation =
+                    TB.parseTerm(
+                        "equals(heapAtPost1, result1, heapAtPost2, result2)",
+                        services);
+            final Term inputOutputRelation = TB.imp(inputRelation, outputRelation);
+            inputOutputRelations = inputOutputRelations.append(inputOutputRelation);
+        }
+        return TB.and(inputOutputRelations);
+    }
+
     private JavaBlock buildJavaBlock(
             ImmutableList<ProgramVariable> formalParVars,
             ProgramVariable selfVar,
@@ -110,8 +153,8 @@ public final class InformationFlowContractPO extends AbstOpContractPO {
         //create method call
         final ImmutableArray<Expression> formalArray =
                 new ImmutableArray<Expression>(
-                    formalParVars.toArray(
-                        new ProgramVariable[formalParVars.size()]));
+                formalParVars.toArray(
+                new ProgramVariable[formalParVars.size()]));
         final StatementBlock sb;
         if (getContract().getTarget().isConstructor()) {
             assert selfVar != null;
@@ -144,9 +187,9 @@ public final class InformationFlowContractPO extends AbstOpContractPO {
         final VariableSpecification eSpec = new VariableSpecification(eVar);
         final ParameterDeclaration excDecl = new ParameterDeclaration(
                 new Modifier[0],
-                                                                      excTypeRef,
-                                                                      eSpec,
-                                                                      false);
+                excTypeRef,
+                eSpec,
+                false);
         final CopyAssignment assignStat = new CopyAssignment(exceptionVar, eVar);
         final Catch catchStat = new Catch(excDecl,
                                           new StatementBlock(assignStat));
@@ -161,9 +204,11 @@ public final class InformationFlowContractPO extends AbstOpContractPO {
     }
 
     private Term buildProgramTerm(ImmutableList<ProgramVariable> paramVars,
-            ProgramVariable selfVar, ProgramVariable resultVar,
-            ProgramVariable exceptionVar, LocationVariable heapAtPreVar,
-            Term postTerm) {
+                                  ProgramVariable selfVar,
+                                  ProgramVariable resultVar,
+                                  ProgramVariable exceptionVar,
+                                  LocationVariable heapAtPreVar,
+                                  Term postTerm) {
 
         //create java block
         final JavaBlock jb = buildJavaBlock(paramVars,
@@ -175,7 +220,8 @@ public final class InformationFlowContractPO extends AbstOpContractPO {
         final Term programTerm = TB.prog(Modality.BOX, jb, postTerm);
 
         //create update
-        Term update = TB.elementary(services, TB.heap(services), TB.var(heapAtPreVar));
+        Term update = TB.elementary(services, TB.heap(services), TB.var(
+                heapAtPreVar));
 //        Iterator<LocationVariable> formalParamIt = formalParamVars.iterator();
 //        Iterator<ProgramVariable> paramIt        = paramVars.iterator();
 //        while(formalParamIt.hasNext()) {
@@ -192,82 +238,97 @@ public final class InformationFlowContractPO extends AbstOpContractPO {
     //public interface
     //-------------------------------------------------------------------------        
     @Override
-    public void readProblem() throws ProofInputException {
+    public void readProblem()
+            throws ProofInputException {
         try {
             final ProgramMethod pm = getContract().getTarget();
             final ProofObligationVariables vs = new ProofObligationVariables(pm);
 
             // often used terms
             final Term updateHeapAtPre1 =
-                    TB.elementary(
-                        services,
-                        TB.heap(services),
-                        TB.var(vs.heapAtPreVar1));
+                    TB.elementary(services,
+                                  TB.heap(services),
+                                  TB.var(vs.heapAtPreVar1));
             final Term updateHeapAtPre2 =
-                    TB.elementary(
-                        services,
-                        TB.heap(services),
-                        TB.var(vs.heapAtPreVar2));
+                    TB.elementary(services,
+                                  TB.heap(services),
+                                  TB.var(vs.heapAtPreVar2));
             final Term updateHeapAtPost1 =
-                    TB.elementary(
-                        services,
-                        TB.heap(services),
-                        TB.var(vs.heapAtPostVar1));
+                    TB.elementary(services,
+                                  TB.heap(services),
+                                  TB.var(vs.heapAtPostVar1));
             final Term updateHeapAtPost2 =
-                    TB.elementary(
-                        services,
-                        TB.heap(services),
-                        TB.var(vs.heapAtPostVar2));
+                    TB.elementary(services,
+                                  TB.heap(services),
+                                  TB.var(vs.heapAtPostVar2));
 
             // build precondition
-            final Term pre =
-                    TB.and(
-                        buildFreePre(vs, contract.getKJT(),
-                        updateHeapAtPre1, updateHeapAtPre2),
-                        TB.apply(
-                            updateHeapAtPre1,
-                            contract.getPre(vs.selfVar, vs.paramVars1, services)),
-                        TB.apply(
-                            updateHeapAtPre2,
-                            contract.getPre(vs.selfVar, vs.paramVars2, services)));
+            final Term freePre =
+                    buildFreePre(vs, contract.getKJT(), updateHeapAtPre1,
+                                 updateHeapAtPre2);
+            final Term pre1 =
+                    TB.apply(updateHeapAtPre1,
+                             contract.getPre(vs.selfVar,
+                                             vs.paramVars1,
+                                             services));
+            final Term pre2 =
+                    TB.apply(updateHeapAtPre2,
+                             contract.getPre(vs.selfVar,
+                                             vs.paramVars2,
+                                             services));
+            final Term pre = TB.and(freePre, pre1, pre2);
 
             // build second program term
             final Term postSecondProg = TB.parseTerm(
                     "result2 = resultValue & heapAtPost2 = heap", services);
             final Term secondProg = buildProgramTerm(vs.paramVars2, vs.selfVar,
-                                                     vs.resultValueVar, vs.exceptionVar2, vs.heapAtPreVar2,
+                                                     vs.resultValueVar,
+                                                     vs.exceptionVar2,
+                                                     vs.heapAtPreVar2,
                                                      postSecondProg);
 
             // build first program term
             final Term postfirstProg = TB.parseTerm(
                     "result1 = resultValue & heapAtPost1 = heap", services);
             final Term firstProg = buildProgramTerm(vs.paramVars1, vs.selfVar,
-                                                    vs.resultValueVar, vs.exceptionVar1, vs.heapAtPreVar1, TB.and(postfirstProg, secondProg));
-
-            // build inputOutputRelations
-            final Term inout = TB.tt();
-
-            // build frame
-            final Term frame1Tail = TB.frame(services,
-                                             new LinkedHashMap<Term, Term>(TB.heap(services), TB.var(vs.heapAtPreVar1)), getContract().getMod(
-                    vs.selfVar, vs.paramVars1, services));
-            final Term frame1 = TB.apply(updateHeapAtPost1, frame1Tail);
-            final Term frame2Tail = TB.frame(services,
-                                             new LinkedHashMap<Term, Term>(TB.heap(services), TB.var(vs.heapAtPreVar2)), getContract().getMod(
-                    vs.selfVar, vs.paramVars2, services));
-            final Term frame2 = TB.apply(updateHeapAtPost2, frame2Tail);
+                                                    vs.resultValueVar,
+                                                    vs.exceptionVar1,
+                                                    vs.heapAtPreVar1, TB.and(
+                    postfirstProg, secondProg));
 
             // build post
-            final Term post = TB.and(inout, frame1, frame2);
+            final Term inOutRelations = buildInputOutputRelations(vs);
 
-            // save in field
-            poTerms = new Term[]{TB.imp(TB.and(pre, firstProg), post)};
+            final LinkedHashMap<Term, Term> heapReplaceMap1 =
+                    new LinkedHashMap<Term, Term>(TB.heap(services),
+                                                  TB.var(vs.heapAtPreVar1));
+            final Term modContract1 =
+                    getContract().getMod(vs.selfVar, vs.paramVars1, services);
+            final Term frame1Tail =
+                    TB.frame(services, heapReplaceMap1, modContract1);
+            final Term frame1 = TB.apply(updateHeapAtPost1, frame1Tail);
+
+            final LinkedHashMap<Term, Term> heapReplaceMap2 =
+                    new LinkedHashMap<Term, Term>(TB.heap(services),
+                                                  TB.var(vs.heapAtPreVar2));
+            final Term modContract2 =
+                    getContract().getMod(vs.selfVar, vs.paramVars2, services);
+            final Term frame2Tail =
+                    TB.frame(services, heapReplaceMap2, modContract2);
+            final Term frame2 = TB.apply(updateHeapAtPost2, frame2Tail);
+
+            final Term post = TB.and(inOutRelations, frame1, frame2);
+
+            // create and assign final problem term
+            poTerms = new Term[]{
+                        TB.imp(TB.and(pre, firstProg), post)
+                    };
 
             // add axioms
             collectClassAxioms(contract.getKJT());
 
         } catch (ParserException e) {
-            assert (false);
+            assert (false) : e.toString();
         }
     }
 
@@ -307,25 +368,25 @@ public final class InformationFlowContractPO extends AbstOpContractPO {
     @Override
     protected Term generateSelfNotNull(ProgramVariable selfVar) {
         return selfVar == null || getContract().getTarget().isConstructor()
-                ? TB.tt()
-                : TB.not(TB.equals(TB.var(selfVar), TB.NULL(services)));
+               ? TB.tt()
+               : TB.not(TB.equals(TB.var(selfVar), TB.NULL(services)));
     }
 
     @Override
     protected Term generateSelfCreated(ProgramVariable selfVar) {
         return selfVar == null || getContract().getTarget().isConstructor()
-                ? TB.tt()
-                : TB.created(services, TB.var(selfVar));
+               ? TB.tt()
+               : TB.created(services, TB.var(selfVar));
     }
 
     @Override
-    protected Term generateSelfExactType(ProgramVariable selfVar, KeYJavaType selfKJT) {
-        final Term selfExactType = selfVar == null || getContract().getTarget().isConstructor()
-                ? TB.tt()
-                : TB.exactInstance(services,
-                                   selfKJT.getSort(),
-                                   TB.var(selfVar));
-        return selfExactType;
+    protected Term generateSelfExactType(ProgramVariable selfVar,
+                                         KeYJavaType selfKJT) {
+        if (selfVar == null || getContract().getTarget().isConstructor()) {
+            return TB.tt();
+        } else {
+            return TB.exactInstance(services, selfKJT.getSort(), TB.var(selfVar));
+        }
     }
 
     @Override
@@ -338,11 +399,13 @@ public final class InformationFlowContractPO extends AbstOpContractPO {
     }
 
     @Override
-    protected Term generateMbyAtPreDef(ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars) {
+    protected Term generateMbyAtPreDef(ProgramVariable selfVar,
+                                       ImmutableList<ProgramVariable> paramVars) {
         final Term mbyAtPreDef;
         if (contract.hasMby()) {
-            final Function mbyAtPreFunc = new Function(new Name(TB.newName(services, "mbyAtPre")),
-                                                       services.getTypeConverter().getIntegerLDT().targetSort());
+            final Function mbyAtPreFunc =
+                    new Function(new Name(TB.newName(services, "mbyAtPre")),
+                                 services.getTypeConverter().getIntegerLDT().targetSort());
             register(mbyAtPreFunc);
             mbyAtPre = TB.func(mbyAtPreFunc);
             final Term mby = contract.getMby(selfVar, paramVars, services);

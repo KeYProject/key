@@ -139,7 +139,30 @@ final class JMLTranslator {
         final Term result = parser.parseAssignable();
         return result;
     }
-    
+
+    /**
+     * Translates an expression as it occurs in JML assignable-clauses.
+     */
+    public ImmutableList<Term> translateSecureForExpression(
+                                    	PositionedString assignableExpr,
+                                        KeYJavaType specInClass,
+                                        ProgramVariable selfVar,
+                                        ImmutableList<ProgramVariable> paramVars)
+            throws SLTranslationException {
+
+        final KeYJMLParser parser = new KeYJMLParser(assignableExpr,
+                                               	     services,
+                                               	     specInClass,
+                                               	     selfVar,
+                                               	     paramVars,
+                                               	     null,
+                                               	     null,
+                                               	     null);
+
+        final ImmutableList<Term> result = parser.parseSecureFor();
+        return result;
+    }
+
     
     /**
      * Translates an expression as it occurs in JML represents-clauses.

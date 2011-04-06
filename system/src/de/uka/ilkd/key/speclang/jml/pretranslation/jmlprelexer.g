@@ -104,6 +104,7 @@ tokens {
     SCOPE_SAFE 			= "scopeSafe";
     ARBITRARY_SCOPE 	= "arbitraryScope";
     ARBITRARY_SCOPE_THIS = "arbitraryScopeThis";
+    SECURE_FOR                  = "secure_for";
     SET 			= "set";
     SIGNALS 			= "signals";
     SIGNALS_ONLY 		= "signals_only";

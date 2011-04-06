@@ -63,7 +63,7 @@ public class Function extends AbstractSortedOperator {
     }    
     
     
-    public Function(Name name, Sort sort, Sort[] argSorts) {
+    public Function(Name name, Sort sort, Sort ... argSorts) {
 	this(name, sort, argSorts, null, false);
     }
     

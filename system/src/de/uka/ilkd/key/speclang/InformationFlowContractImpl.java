@@ -9,8 +9,8 @@
 //
 package de.uka.ilkd.key.speclang;
 
-
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
@@ -38,7 +38,7 @@ public final class InformationFlowContractImpl
     private final Term originalMby;
     private final Term originalDep;
     private final Term originalMod;
-    private final Term originalSaveFor;
+    private final ImmutableList<ImmutableList<Term>> originalSecureFor;
     private final Term originalDeclassify;
     private final ProgramVariable originalSelfVar;
     private final ImmutableList<ProgramVariable> originalParamVars;
@@ -55,7 +55,7 @@ public final class InformationFlowContractImpl
                                         Term mby,
                                         Term dep,
                                         Term mod,
-                                        Term saveFor,
+                                        ImmutableList<ImmutableList<Term>> saveFor,
                                         Term declassify,
                                         ProgramVariable selfVar,
                                         ImmutableList<ProgramVariable> paramVars,
@@ -79,7 +79,7 @@ public final class InformationFlowContractImpl
         this.originalMby = mby;
         this.originalDep = dep;
         this.originalMod = mod;
-        this.originalSaveFor = saveFor;
+        this.originalSecureFor = saveFor;
         this.originalDeclassify = declassify;
         this.originalSelfVar = selfVar;
         this.originalParamVars = paramVars;
@@ -93,11 +93,11 @@ public final class InformationFlowContractImpl
                                        Term mby,
                                        Term dep,
                                        Term mod,
-                                       Term saveFor,
+                                       ImmutableList<ImmutableList<Term>> secureFor,
                                        Term declassify,
                                        ProgramVariable selfVar,
                                        ImmutableList<ProgramVariable> paramVars) {
-        this(baseName, null, kjt, pm, pre, mby, dep, mod, saveFor,
+        this(baseName, null, kjt, pm, pre, mby, dep, mod, secureFor,
              declassify, selfVar, paramVars, INVALID_ID);
     }
 
@@ -137,8 +137,8 @@ public final class InformationFlowContractImpl
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
         assert services != null;
-        OpReplacer or = generateOperationReplacer(selfVar, paramVars);
-        return or.replace(originalPre);
+        return getPre(TB.heap(services), TB.var(selfVar), TB.var(paramVars),
+                      services);
     }
 
     @Override
@@ -151,9 +151,7 @@ public final class InformationFlowContractImpl
         assert paramTerms != null;
         assert paramTerms.size() == originalParamVars.size();
         assert services != null;
-        OpReplacer or = generateOperationReplacer(heapTerm, selfTerm,
-                                                  paramTerms, services);
-        return or.replace(originalPre);
+        return replace(heapTerm, selfTerm, paramTerms, services, originalPre);
     }
 
     @Override
@@ -165,8 +163,8 @@ public final class InformationFlowContractImpl
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
         assert services != null;
-        OpReplacer or = generateOperationReplacer(selfVar, paramVars);
-        return or.replace(originalMby);
+        return getMby(TB.heap(services), TB.var(selfVar), TB.var(paramVars),
+                      services);
     }
 
     @Override
@@ -180,9 +178,7 @@ public final class InformationFlowContractImpl
         assert paramTerms != null;
         assert paramTerms.size() == originalParamVars.size();
         assert services != null;
-        OpReplacer or = generateOperationReplacer(heapTerm, selfTerm,
-                                                  paramTerms, services);
-        return or.replace(originalMby);
+        return replace(heapTerm, selfTerm, paramTerms, services, originalMby);
     }
 
     @Override
@@ -193,8 +189,8 @@ public final class InformationFlowContractImpl
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
         assert services != null;
-        OpReplacer or = generateOperationReplacer(selfVar, paramVars);
-        return or.replace(originalDep);
+        return getDep(TB.heap(services), TB.var(selfVar), TB.var(paramVars),
+                      services);
     }
 
     @Override
@@ -207,9 +203,7 @@ public final class InformationFlowContractImpl
         assert paramTerms != null;
         assert paramTerms.size() == originalParamVars.size();
         assert services != null;
-        OpReplacer or = generateOperationReplacer(heapTerm, selfTerm,
-                                                  paramTerms, services);
-        return or.replace(originalDep);
+        return replace(heapTerm, selfTerm, paramTerms, services, originalDep);
     }
 
     @Override
@@ -220,8 +214,8 @@ public final class InformationFlowContractImpl
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
         assert services != null;
-        OpReplacer or = generateOperationReplacer(selfVar, paramVars);
-        return or.replace(originalMod);
+        return getMod(TB.heap(services), TB.var(selfVar), TB.var(paramVars),
+                      services);
     }
 
     @Override
@@ -234,36 +228,41 @@ public final class InformationFlowContractImpl
         assert paramTerms != null;
         assert paramTerms.size() == originalParamVars.size();
         assert services != null;
-        OpReplacer or = generateOperationReplacer(heapTerm, selfTerm,
-                                                  paramTerms, services);
-        return or.replace(originalMod);
+        return replace(heapTerm, selfTerm, paramTerms, services, originalMod);
     }
 
     @Override
-    public Term getSaveFor(ProgramVariable selfVar,
-                           ImmutableList<ProgramVariable> paramVars,
-                           Services services) {
+    public ImmutableList<ImmutableList<Term>> getSecureFors(ProgramVariable selfVar,
+                                          ImmutableList<ProgramVariable> paramVars,
+                                          Services services) {
         assert (selfVar == null) == (originalSelfVar == null);
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
         assert services != null;
-        OpReplacer or = generateOperationReplacer(selfVar, paramVars);
-        return or.replace(originalSaveFor);
+        return getSecureFors(TB.heap(services), TB.var(selfVar),
+                          TB.var(paramVars), services);
     }
 
     @Override
-    public Term getSaveFor(Term heapTerm,
-                           Term selfTerm,
-                           ImmutableList<Term> paramTerms,
-                           Services services) {
+    public ImmutableList<ImmutableList<Term>> getSecureFors(Term heapTerm,
+                                          Term selfTerm,
+                                          ImmutableList<Term> paramTerms,
+                                          Services services) {
         assert heapTerm != null;
         assert (selfTerm == null) == (originalSelfVar == null);
         assert paramTerms != null;
         assert paramTerms.size() == originalParamVars.size();
         assert services != null;
-        OpReplacer or = generateOperationReplacer(heapTerm, selfTerm,
-                                                  paramTerms, services);
-        return or.replace(originalSaveFor);
+        ImmutableList<ImmutableList<Term>> result = ImmutableSLList.<ImmutableList<Term>>nil();
+        for (ImmutableList<Term> origTerms : originalSecureFor) {
+            ImmutableList<Term> clause = ImmutableSLList.<Term>nil();
+            for (Term origTerm : origTerms) {
+                clause = clause.append(replace(heapTerm, selfTerm, paramTerms,
+                                               services, origTerm));
+            }
+            result = result.append(clause);
+        }
+        return result;
     }
 
     @Override
@@ -274,8 +273,8 @@ public final class InformationFlowContractImpl
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
         assert services != null;
-        OpReplacer or = generateOperationReplacer(selfVar, paramVars);
-        return or.replace(originalDeclassify);
+        return getDeclassify(TB.heap(services), TB.var(selfVar),
+                             TB.var(paramVars), services);
     }
 
     @Override
@@ -288,9 +287,8 @@ public final class InformationFlowContractImpl
         assert paramTerms != null;
         assert paramTerms.size() == originalParamVars.size();
         assert services != null;
-        OpReplacer or = generateOperationReplacer(heapTerm, selfTerm,
-                                                  paramTerms, services);
-        return or.replace(originalDeclassify);
+        return replace(heapTerm, selfTerm, paramTerms, services,
+                       originalDeclassify);
     }
 
     @Override
@@ -298,7 +296,7 @@ public final class InformationFlowContractImpl
         return new InformationFlowContractImpl(baseName, null, kjt, pm,
                                                originalPre, originalMby,
                                                originalDep, originalMod,
-                                               originalSaveFor,
+                                               originalSecureFor,
                                                originalDeclassify,
                                                originalSelfVar,
                                                originalParamVars, newId);
@@ -312,7 +310,7 @@ public final class InformationFlowContractImpl
                                                (ProgramMethod) newPM,
                                                originalPre, originalMby,
                                                originalDep, originalMod,
-                                               originalSaveFor,
+                                               originalSecureFor,
                                                originalDeclassify,
                                                originalSelfVar,
                                                originalParamVars, id);
@@ -362,8 +360,8 @@ public final class InformationFlowContractImpl
 
     @Override
     public boolean toBeSaved() {
-        return false; //because dependency contracts currently cannot be
-        //specified directly in DL
+        return false;   // because information flow contracts currently cannot
+                        // be specified directly in DL
     }
 
     @Override
@@ -397,27 +395,18 @@ public final class InformationFlowContractImpl
                                          + "]";
     }
 
-    private OpReplacer generateOperationReplacer(ProgramVariable selfVar,
-                                                 ImmutableList<ProgramVariable> paramVars) {
-        LinkedHashMap<ProgramVariable, ProgramVariable> map =
-                new LinkedHashMap<ProgramVariable, ProgramVariable>();
-        map.put(originalSelfVar, selfVar);
-        map.putAll(originalParamVars, paramVars);
-        OpReplacer or = new OpReplacer(map);
-        return or;
-    }
-
-    private OpReplacer generateOperationReplacer(Term heapTerm,
-                                                 Term selfTerm,
-                                                 ImmutableList<Term> paramTerms,
-                                                 Services services) {
+    private Term replace(Term heapTerm,
+                         Term selfTerm,
+                         ImmutableList<Term> paramTerms,
+                         Services services,
+                         Term originalTerm) {
         LinkedHashMap<Term, Term> map = new LinkedHashMap<Term, Term>();
         map.put(TB.heap(services), heapTerm);
         map.put(TB.var(originalSelfVar), selfTerm);
         ImmutableList<Term> originalParamTerms = TB.var(originalParamVars);
         map.putAll(originalParamTerms, paramTerms);
         OpReplacer or = new OpReplacer(map);
-        return or;
+        return or.replace(originalTerm);
     }
 
     @Override

@@ -237,7 +237,22 @@ options {
 
 	return result;
     }
-    
+
+
+    public ImmutableList<Term> parseSecureFor() throws SLTranslationException {
+    	ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+
+	this.currentlyParsing = true;
+	try {
+	    result = secureforclause();
+	} catch (antlr.ANTLRException e) {
+	    throw excManager.convertException(e);
+	}
+	this.currentlyParsing = false;
+
+	return result;
+    }
+
     
     public Pair<ObserverFunction,Term> parseRepresents() throws SLTranslationException {
     	Pair<ObserverFunction,Term> result = null;
@@ -506,7 +521,18 @@ assignableclause returns [Term result = null] throws SLTranslationException
 :
     result=storereflist
     ;
-    
+
+
+secureforclause returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException
+{
+    ImmutableList<Term> mod = ImmutableSLList.<Term>nil();
+}
+:
+    result=storereflist { result = result.append(mod); }
+        LBRACE ( mod=storereflist { result = result.append(mod); } )*
+        RBRACE
+    ;
+
 
 storereflist returns [Term result = null] throws SLTranslationException
 {

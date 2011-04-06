@@ -234,9 +234,9 @@ public class PrettyPrinter {
         level += delta;
     }
 
-    private static char[] BLANKS = new char[128];
+    private static final char[] BLANKS = new char[128];
 
-    private static char[] FEEDS = new char[8];
+    private static final char[] FEEDS = new char[8];
 
     static {
         for (int i = 0; i < FEEDS.length; i++) {
@@ -314,7 +314,7 @@ public class PrettyPrinter {
     */
     protected static String encodeUnicodeChars(String str) {
         int len = str.length();
-        StringBuffer buf = new StringBuffer(len + 4);
+        StringBuilder buf = new StringBuilder(len + 4);
         for (int i = 0; i < len; i += 1) {
             char c = str.charAt(i);
             if (c >= 0x0100) {

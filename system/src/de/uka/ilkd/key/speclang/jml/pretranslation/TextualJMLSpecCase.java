@@ -44,7 +44,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
             = ImmutableSLList.<PositionedString>nil();
     private ImmutableList<PositionedString> depends
     	    = ImmutableSLList.<PositionedString>nil();
-    private ImmutableList<PositionedString> saveFor
+    private ImmutableList<PositionedString> secureFor
     	    = ImmutableSLList.<PositionedString>nil();
     private ImmutableList<PositionedString> declassify
     	    = ImmutableSLList.<PositionedString>nil();
@@ -106,7 +106,11 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     public void addSignalsOnly(PositionedString ps) {
         signalsOnly = signalsOnly.append(ps);
     }
-    
+
+    public void addSecureFor(PositionedString ps) {
+	secureFor = secureFor.append(ps);
+    }
+
     public void setWorkingSpace(PositionedString ps){
         workingSpace = ps;
     }
@@ -122,8 +126,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
     
     
-    public void addSaveFor(PositionedString ps){
-        saveFor = saveFor.append(ps);
+    public void addsecureFor(PositionedString ps){
+        secureFor = secureFor.append(ps);
     }
     
 
@@ -186,8 +190,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return depends;
     }
 
-    public ImmutableList<PositionedString> getSaveFor() {
-        return saveFor;
+    public ImmutableList<PositionedString> getSecureFor() {
+        return secureFor;
     }
 
     public ImmutableList<PositionedString> getDeclassify() {
@@ -233,7 +237,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         while(it.hasNext()) {
             sb.append("depends: ").append(it.next()).append("\n");
         }
-        it = saveFor.iterator();
+        it = secureFor.iterator();
         while(it.hasNext()) {
             sb.append("saveFor: ").append(it.next()).append("\n");
         }
@@ -262,7 +266,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                && signalsOnly.equals(sc.signalsOnly)
                && diverges.equals(sc.diverges)
                && depends.equals(sc.depends)
-               && saveFor.equals(sc.saveFor)
+               && secureFor.equals(sc.secureFor)
                && declassify.equals(sc.declassify);
     }
     
@@ -279,7 +283,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                + signalsOnly.hashCode()
                + diverges.hashCode()
                + depends.hashCode()
-               + saveFor.hashCode()
+               + secureFor.hashCode()
                + declassify.hashCode();
     }
 }
