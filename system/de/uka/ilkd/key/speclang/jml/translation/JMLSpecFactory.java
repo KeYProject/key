@@ -468,6 +468,37 @@ public class JMLSpecFactory {
         			       textualInv.getInv());
     }
     
+    public InitiallyClause createJMLInitiallyClause(KeYJavaType kjt, VisibilityModifier visibility, PositionedString original) throws SLTranslationException{
+	assert kjt != null;
+        assert original != null;
+        
+        //create variable for self
+        ProgramVariable selfVar = TB.selfVar(services, kjt, false);
+        
+        //translate expression
+        Term inv = translator.translateExpression(original,
+        					  kjt,
+        					  selfVar,
+        					  null,
+        					  null,
+        					  null,
+        					  null);        
+        //create invariant
+        String name = getInvName();
+        return new InitiallyClauseImpl(name,
+                                      name,
+                                      kjt, 
+                                      visibility,
+                                      inv,
+                                      selfVar);
+    }
+    
+    public InitiallyClause createJMLInitiallyClause(KeYJavaType kjt, TextualJMLInitially textualInv) throws SLTranslationException {
+        return createJMLInitiallyClause(kjt,
+	       getVisibility(textualInv),
+	       textualInv.getInv());
+    }
+    
     
     public ClassAxiom createJMLRepresents(KeYJavaType kjt,
 	    				  VisibilityModifier visibility,

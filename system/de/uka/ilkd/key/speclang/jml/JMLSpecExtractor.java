@@ -269,7 +269,8 @@ public final class JMLSpecExtractor implements SpecExtractor {
         		result = result.add(inv);
         	    } else if(c instanceof TextualJMLInitially) {
         	        TextualJMLInitially textualRep = (TextualJMLInitially) c;
-        	        System.out.println("initially clauses to be supported...."); //XXX
+        	        InitiallyClause inc = jsf.createJMLInitiallyClause(kjt, textualRep);
+        	        result = result.add(inc);
         	    } else if(c instanceof TextualJMLRepresents) {
         		TextualJMLRepresents textualRep = (TextualJMLRepresents) c;
         		ClassAxiom rep 
