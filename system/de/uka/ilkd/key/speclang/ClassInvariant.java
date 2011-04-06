@@ -12,7 +12,6 @@ package de.uka.ilkd.key.speclang;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
 
@@ -26,26 +25,6 @@ import de.uka.ilkd.key.logic.op.ParsableVariable;
  */
 public interface ClassInvariant extends SpecificationElement {
         
-    /**
-     * Returns the unique internal name of the invariant.
-     */
-    public String getName();
-    
-    /**
-     * Returns the displayed name of the invariant.
-     */
-    public String getDisplayName();
-
-    /**
-     * Returns the KeYJavaType representing the class/interface to which the 
-     * invariant belongs.
-     */
-    public KeYJavaType getKJT();
-    
-    /**
-     * Returns the visibility of the invariant (null for default visibility)
-     */
-    public VisibilityModifier getVisibility();     
     
     /**
      * Returns the invariant formula without implicit all-quantification over

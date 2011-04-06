@@ -228,7 +228,7 @@ modifier returns [String result = null]:
 
 
 //-----------------------------------------------------------------------------
-//class invariants
+//class invariants and initially clauses
 //-----------------------------------------------------------------------------
 
 class_invariant[ImmutableList<String> mods] 
@@ -253,6 +253,20 @@ invariant_keyword
 ;
 
 
+
+initially_clause[ImmutableList<String> mods] 
+        returns [ImmutableList<TextualJMLConstruct> result = null] 
+        throws SLTranslationException 
+{
+    PositionedString ps;
+} 
+:
+    INITIALLY ps=expression
+    {
+        TextualJMLInitially ini = new TextualJMLInitially(mods, ps);
+        result = ImmutableSLList.<TextualJMLConstruct>nil().prepend(ini);
+    }
+;
 
 //-----------------------------------------------------------------------------
 //method specifications
@@ -881,20 +895,6 @@ constraint_keyword
     |   CONSTRAINT_RED
 ;
 
-    
-initially_clause[ImmutableList<String> mods] 
-	returns [ImmutableList<TextualJMLConstruct> result = null] 
-	throws SLTranslationException 
-{
-    PositionedString ps;
-} 
-:
-    INITIALLY ps=expression
-    {
-    	raiseNotSupported("initially clauses");
-    	result = ImmutableSLList.<TextualJMLConstruct>nil();
-    }
-;
     
 
 monitors_for_clause[ImmutableList<String> mods] 

@@ -23,6 +23,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.statement.CatchAllStatement;
@@ -815,5 +816,18 @@ public final class OperationContractImpl implements OperationContract {
 		+ originalMod
 		+ "; termination: "
 		+ getModality();
+    }
+
+
+    @Override
+    public String getDisplayName() {
+	return getName();
+    }
+
+
+    @Override
+    public VisibilityModifier getVisibility() {
+	assert false; // this is currently not applicable for contracts
+	return null;
     }
 }

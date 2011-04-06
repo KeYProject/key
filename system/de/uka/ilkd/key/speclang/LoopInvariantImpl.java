@@ -15,6 +15,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.*;
@@ -229,5 +231,31 @@ public final class LoopInvariantImpl implements LoopInvariant {
                 + originalModifies
                 + "; variant: "
                 + originalVariant;
+    }
+
+
+    @Override
+    public String getDisplayName() {
+	return "loop invariant";
+    }
+
+
+    @Override
+    public KeYJavaType getKJT() {
+	assert false;
+	return null;
+    }
+
+
+    @Override
+    public String getName() {
+	return "loop invariant";
+    }
+
+
+    @Override
+    public VisibilityModifier getVisibility() {
+	assert false;
+	return null;
     }
 }

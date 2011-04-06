@@ -249,4 +249,10 @@ public final class QueryAxiom implements ClassAxiom {
     public String toString() {
 	return "query axiom for " + target;
     }
+
+
+    @Override
+    public String getDisplayName() {
+	return getName();
+    }
 }

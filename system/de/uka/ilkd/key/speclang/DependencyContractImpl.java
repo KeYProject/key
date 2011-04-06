@@ -16,6 +16,7 @@ import java.util.Map;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
@@ -333,5 +334,17 @@ public final class DependencyContractImpl implements DependencyContract {
     @Override
     public String toString() {
 	return originalDep.toString();
+    }
+
+
+    @Override
+    public String getDisplayName() {
+	return getName();
+    }
+
+
+    @Override
+    public VisibilityModifier getVisibility() {
+	return null;
     }
 }
