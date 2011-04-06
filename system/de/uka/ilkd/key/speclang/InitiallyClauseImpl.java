@@ -13,13 +13,18 @@ package de.uka.ilkd.key.speclang;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
+import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
+import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
 
 /**
@@ -34,6 +39,8 @@ public final class InitiallyClauseImpl implements InitiallyClause {
     private final VisibilityModifier visibility;    
     private final Term originalInv;
     private final ParsableVariable originalSelfVar;
+    private final PositionedString originalSpec;
+    private JMLSpecFactory sf;
     
     
     //-------------------------------------------------------------------------
@@ -55,7 +62,7 @@ public final class InitiallyClauseImpl implements InitiallyClause {
                               KeYJavaType kjt, 
                               VisibilityModifier visibility,                              
                               Term inv,
-                              ParsableVariable selfVar) {
+                              ParsableVariable selfVar, PositionedString originalSpec) {
         assert name != null && !name.equals("");
         assert displayName != null && !displayName.equals("");
 	assert kjt != null;
@@ -68,6 +75,7 @@ public final class InitiallyClauseImpl implements InitiallyClause {
         this.originalSelfVar = selfVar;
         final OpCollector oc = new OpCollector();
         originalInv.execPostOrder(oc);
+        this.originalSpec = originalSpec;
     }
     
 
@@ -135,4 +143,41 @@ public final class InitiallyClauseImpl implements InitiallyClause {
     public String toString() {
         return originalInv.toString();
     }
+    
+    @Override
+    public InitiallyClause setKJT(KeYJavaType newKjt) {
+	return new InitiallyClauseImpl(name, 
+                                      displayName,
+                                      newKjt, 
+                                      visibility,
+                                      originalInv,
+                                      originalSelfVar,originalSpec);
+    }
+    
+    public void setSpecFactory(JMLSpecFactory sf){
+	this.sf = sf;
+    }
+    
+    private ImmutableSet<Contract> toContract(ProgramMethod pm) throws SLTranslationException{
+	if (sf==null) throw new SLTranslationException("No SpecFactory given");
+	if (! pm.isConstructor()) throw new SLTranslationException("Initially clauses only apply to constructors, not to method "+pm);
+	final ImmutableList<PositionedString> empty = ImmutableSLList.<PositionedString>nil();
+	final ImmutableList<PositionedString> clause = ImmutableSLList.<PositionedString>nil().append(originalSpec);
+	final ImmutableList<PositionedString> exclause = ImmutableSLList.<PositionedString>nil().append(new PositionedString("(Exception)"+ originalSpec.toPlainString()));
+	final ImmutableList<PositionedString> dtrue = ImmutableSLList.<PositionedString>nil().append(new PositionedString("true"));
+	return sf.createJMLOperationContracts(pm, Behavior.NONE, new PositionedString(getName()), empty, empty, empty, empty, clause, exclause, empty, dtrue);
+    }
+    //TODO: cleanup, look after visibility
+    public ImmutableSet<Contract> toContracts(ImmutableList<ProgramMethod> pms) {
+	ImmutableSet<Contract> res = DefaultImmutableSet.<Contract>nil();
+	try {
+	for (ProgramMethod pm: pms){
+	    res = res.union(toContract(pm));
+	}
+	} catch (SLTranslationException e){
+	    e.printStackTrace();
+	}
+	return res;
+    }
+    
 }

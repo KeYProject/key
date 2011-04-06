@@ -67,7 +67,7 @@ public final class SpecificationRepository {
     private final Map<KeYJavaType,ImmutableSet<ObserverFunction>> contractTargets
     		= new LinkedHashMap<KeYJavaType,ImmutableSet<ObserverFunction>>();    
     private final Map<KeYJavaType,ImmutableSet<ClassInvariant>> invs
-    		= new LinkedHashMap<KeYJavaType, ImmutableSet<ClassInvariant>>();
+    		= new LinkedHashMap<KeYJavaType, ImmutableSet<ClassInvariant>>(); 
     private final Map<KeYJavaType,ImmutableSet<ClassAxiom>> axioms
     		= new LinkedHashMap<KeYJavaType, ImmutableSet<ClassAxiom>>();
     private final Map<ProofOblInput,ImmutableSet<Proof>> proofs
@@ -637,6 +637,33 @@ public final class SpecificationRepository {
         }
     }
     
+    /**
+     * Registers the passed initially clause as a new contract to all constructors of the KJT of inv.
+     */
+    public void addInitiallyClause(InitiallyClause inv) {
+	// collect constructors
+        final KeYJavaType kjt = inv.getKJT();
+        ImmutableList<ProgramMethod> constructors= ImmutableSLList.nil();
+        final ImmutableList<KeYJavaType> subs = services.getJavaInfo().getAllSubtypes(kjt).append(kjt);
+        for (KeYJavaType sub: subs){
+            for (ProgramMethod pm: services.getJavaInfo().getConstructors(sub)){
+        	constructors = constructors.append(pm);
+            } // TODO: need to change KJT for subtypes
+        }
+        // create contracts
+        final ImmutableSet<Contract> conts = inv.toContracts(constructors);
+        addContracts(conts);
+    }
+    
+    
+    /**
+     * Registers the passed initially clauses as new contracts to all constructors of their KJT.
+     */
+    public void addInitiallyClause(ImmutableSet<InitiallyClause> toAdd) {
+        for(InitiallyClause inv : toAdd) {
+            addInitiallyClause(inv);
+        }
+    }
     
     /**
      * Returns all class axioms visible in the passed class, including
@@ -881,12 +908,14 @@ public final class SpecificationRepository {
 		addContract((Contract)spec);
 	    } else if(spec instanceof ClassInvariant) {
 		addClassInvariant((ClassInvariant)spec);
+	    } else if(spec instanceof InitiallyClause){
+		addInitiallyClause((InitiallyClause)spec);
 	    } else if(spec instanceof ClassAxiom) {
 		addClassAxiom((ClassAxiom)spec);
 	    } else if(spec instanceof LoopInvariant) {
 		setLoopInvariant((LoopInvariant)spec);
 	    } else {
-		assert false : "unexpected spec: " + spec;
+		assert false : "unexpected spec: " + spec +"\n("+spec.getClass()+")";
 	    }
 	}
     }

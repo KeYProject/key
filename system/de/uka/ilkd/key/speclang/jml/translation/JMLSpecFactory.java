@@ -70,6 +70,10 @@ public class JMLSpecFactory {
         return "JML class invariant nr " + invCounter++;
     }
     
+    private String getInicName(){
+	return "JML initially clause";
+    }
+    
     
     private String getContractName(ProgramMethod programMethod, 
 	                           Behavior behavior) {
@@ -136,7 +140,7 @@ public class JMLSpecFactory {
     /**
      * Creates operation contracts out of the passed JML specification.
      */
-    private ImmutableSet<Contract> createJMLOperationContracts(
+    public ImmutableSet<Contract> createJMLOperationContracts(
                                 ProgramMethod pm,
                                 Behavior originalBehavior,                              
                                 PositionedString customName,
@@ -484,13 +488,16 @@ public class JMLSpecFactory {
         					  null,
         					  null);        
         //create invariant
-        String name = getInvName();
-        return new InitiallyClauseImpl(name,
+        String name = getInicName();
+        InitiallyClauseImpl res = new InitiallyClauseImpl(name,
                                       name,
                                       kjt, 
                                       visibility,
                                       inv,
-                                      selfVar);
+                                      selfVar,original);
+        res.setSpecFactory(this);
+        return res;
+        
     }
     
     public InitiallyClause createJMLInitiallyClause(KeYJavaType kjt, TextualJMLInitially textualInv) throws SLTranslationException {

@@ -30,7 +30,6 @@ public final class TextualJMLInitially extends TextualJMLConstruct {
         this.inv = inv;
     }
     
-    //XXX
     public PositionedString getInv() {
         return inv;
     }
