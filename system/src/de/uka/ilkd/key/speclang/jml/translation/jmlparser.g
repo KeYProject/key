@@ -524,14 +524,31 @@ assignableclause returns [Term result = null] throws SLTranslationException
 
 
 secureforclause returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException
+:
+    result = secureforarglist
+    ;
+
+oldsecureforclause returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException
 {
-    ImmutableList<Term> mod = ImmutableSLList.<Term>nil();
+    Term term = null;
+    ImmutableList<Term> args = ImmutableSLList.<Term>nil();
 }
 :
-    result=storereflist { result = result.append(mod); }
-        LBRACE ( mod=storereflist { result = result.append(mod); } )*
-        RBRACE
+    term = storeref { result = result.append(term); }
+        LBRACE ( args = secureforarglist { result = result.append(args); } )? RBRACE
     ;
+
+
+secureforarglist returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException
+{
+    Term term = null;
+}
+:
+    NOTHING
+    |   term = storeref { result = result.append(term); }
+        (COMMA term = storeref { result = result.append(term); })*
+    ;
+
 
 
 storereflist returns [Term result = null] throws SLTranslationException

@@ -1,3 +1,0 @@
-Manifest-Version: 1.0
-Main-Class: de.uka.ilkd.key.util.install.Installer
-SplashScreen-Image: de/uka/ilkd/key/gui/images/key-color.gif

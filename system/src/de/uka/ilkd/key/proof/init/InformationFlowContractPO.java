@@ -128,7 +128,7 @@ public final class InformationFlowContractPO extends AbstOpContractPO {
                 final Term param2 = TB.var(paramVars2It.next());
                 final Term eq =
                         TB.parseTerm(
-                              "    \\subset(" + paramLocs + ", " + returnLocs + ")"
+                              "    subset(" + paramLocs + ", " + returnLocs + ")"
                             + " -> equals(heapAtPre1, " + param1 + ", "
                             + "           heapAtPre2, " + param2 + ")",
                             services);
