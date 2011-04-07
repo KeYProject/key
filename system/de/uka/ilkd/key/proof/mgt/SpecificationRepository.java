@@ -44,6 +44,7 @@ import de.uka.ilkd.key.rule.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.*;
+import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 
@@ -641,25 +642,29 @@ public final class SpecificationRepository {
      * Registers the passed initially clause as a new contract to all constructors of the KJT of inv.
      */
     public void addInitiallyClause(InitiallyClause inv) {
-	// collect constructors
         final KeYJavaType kjt = inv.getKJT();
-        ImmutableList<ProgramMethod> constructors= ImmutableSLList.nil();
-        final ImmutableList<KeYJavaType> subs = services.getJavaInfo().getAllSubtypes(kjt).append(kjt);
-        for (KeYJavaType sub: subs){
-            for (ProgramMethod pm: services.getJavaInfo().getConstructors(sub)){
-        	constructors = constructors.append(pm);
-            } // TODO: need to change KJT for subtypes
+        for (ProgramMethod pm: services.getJavaInfo().getConstructors(kjt)){
+            if (!JMLInfoExtractor.isHelper(pm)){
+        	addContracts(inv.toContract(pm));
+            }
         }
-        // create contracts
-        final ImmutableSet<Contract> conts = inv.toContracts(constructors);
-        addContracts(conts);
+        if (!(inv.getVisibility() instanceof Private)){
+            final ImmutableList<KeYJavaType> subs = services.getJavaInfo().getAllSubtypes(kjt);
+            for (KeYJavaType sub: subs){
+        	InitiallyClause subInc = inv.setKJT(sub);
+        	for (ProgramMethod pm: services.getJavaInfo().getConstructors(sub)){
+        	    if (!JMLInfoExtractor.isHelper(pm)){
+        		addContracts(subInc.toContract(pm));
+        	    }
+        	}
+            }}
     }
     
     
     /**
      * Registers the passed initially clauses as new contracts to all constructors of their KJT.
      */
-    public void addInitiallyClause(ImmutableSet<InitiallyClause> toAdd) {
+    public void addInitiallyClauses(ImmutableSet<InitiallyClause> toAdd) {
         for(InitiallyClause inv : toAdd) {
             addInitiallyClause(inv);
         }

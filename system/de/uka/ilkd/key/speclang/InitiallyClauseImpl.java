@@ -14,14 +14,19 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.collection.*;
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.Type;
+import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
@@ -41,6 +46,7 @@ public final class InitiallyClauseImpl implements InitiallyClause {
     private final ParsableVariable originalSelfVar;
     private final PositionedString originalSpec;
     private JMLSpecFactory sf;
+    private Services services;
     
     
     //-------------------------------------------------------------------------
@@ -86,7 +92,7 @@ public final class InitiallyClauseImpl implements InitiallyClause {
     
     private Map<Operator, Operator> getReplaceMap(
                 ParsableVariable selfVar, 
-                Services services) {
+                @SuppressWarnings("hiding") Services services) {
         Map<Operator, Operator> result = new LinkedHashMap<Operator, Operator>();
         
         if(selfVar != null && originalSelfVar != null) {
@@ -122,7 +128,7 @@ public final class InitiallyClauseImpl implements InitiallyClause {
     
     
     @Override
-    public Term getClause(ParsableVariable selfVar, Services services) {
+    public Term getClause(ParsableVariable selfVar, @SuppressWarnings("hiding") Services services) {
         final Map<Operator, Operator> replaceMap 
         	= getReplaceMap(selfVar, services);
         final OpReplacer or = new OpReplacer(replaceMap);
@@ -146,38 +152,82 @@ public final class InitiallyClauseImpl implements InitiallyClause {
     
     @Override
     public InitiallyClause setKJT(KeYJavaType newKjt) {
-	return new InitiallyClauseImpl(name, 
+	InitiallyClauseImpl res= new InitiallyClauseImpl(name, 
                                       displayName,
                                       newKjt, 
                                       visibility,
                                       originalInv,
                                       originalSelfVar,originalSpec);
+	res.setSpecFactory(sf,services);
+	return res;
     }
     
-    public void setSpecFactory(JMLSpecFactory sf){
+    // HACK
+    public void setSpecFactory(JMLSpecFactory sf, Services s){
 	this.sf = sf;
+	services = s;
     }
     
-    private ImmutableSet<Contract> toContract(ProgramMethod pm) throws SLTranslationException{
-	if (sf==null) throw new SLTranslationException("No SpecFactory given");
-	if (! pm.isConstructor()) throw new SLTranslationException("Initially clauses only apply to constructors, not to method "+pm);
-	final ImmutableList<PositionedString> empty = ImmutableSLList.<PositionedString>nil();
-	final ImmutableList<PositionedString> clause = ImmutableSLList.<PositionedString>nil().append(originalSpec);
-	final ImmutableList<PositionedString> exclause = ImmutableSLList.<PositionedString>nil().append(new PositionedString("(Exception)"+ originalSpec.toPlainString()));
-	final ImmutableList<PositionedString> dtrue = ImmutableSLList.<PositionedString>nil().append(new PositionedString("true"));
-	return sf.createJMLOperationContracts(pm, Behavior.NONE, new PositionedString(getName()), empty, empty, empty, empty, clause, exclause, empty, dtrue);
-    }
-    //TODO: cleanup, look after visibility
-    public ImmutableSet<Contract> toContracts(ImmutableList<ProgramMethod> pms) {
-	ImmutableSet<Contract> res = DefaultImmutableSet.<Contract>nil();
-	try {
-	for (ProgramMethod pm: pms){
-	    res = res.union(toContract(pm));
-	}
-	} catch (SLTranslationException e){
-	    e.printStackTrace();
+    
+    private ImmutableList<PositionedString> createPrecond(ProgramMethod pm){
+	ImmutableList<PositionedString> res = ImmutableSLList.<PositionedString>nil();
+	for (ParameterDeclaration p: pm.getMethodDeclaration().getParameters()){
+	    if (!JMLInfoExtractor.parameterIsNullable(pm, p)) {
+		res = res.append(createNonNullPositionedString(p.getVariableSpecification().getName(), p.getVariableSpecification().getProgramVariable().getKeYJavaType(), false, originalSpec.fileName, originalSpec.pos));
+	    }
 	}
 	return res;
     }
     
+    /**
+     * creates a JML specification expressing that the given variable/field is not null and in case of a reference
+     * array type that also its elements are non-null 
+     * In case of implicit fields or primitive typed fields/variables the empty set is returned 
+     * @param varName the String specifying the variable/field name
+     * @param kjt1 the KeYJavaType representing the variables/field declared type
+     * @param isImplicitVar a boolean indicating if the the field is an implicit one (in which case no 
+     * @param fileName the String containing the filename where the field/variable has been declared
+     * @param pos the Position where to place this implicit specification
+     * @return set of formulas specifying non-nullity for field/variables
+     */  
+    private ImmutableList<PositionedString> createNonNullPositionedString(String varName, KeYJavaType kjt1, 
+	    boolean isImplicitVar, String fileName, Position pos) {
+	ImmutableList<PositionedString> result = ImmutableSLList.<PositionedString>nil(); 
+	final Type varType  = kjt1.getJavaType(); 
+
+	
+	if (services.getTypeConverter().isReferenceType(varType) && !isImplicitVar) {
+
+	    PositionedString ps 
+	    = new PositionedString(varName + " != null", fileName, pos);
+	    result = result.append(ps);
+	    if (varType instanceof ArrayType && 
+		    services.getTypeConverter().
+		    isReferenceType(((ArrayType)varType).getBaseType().getKeYJavaType())) {
+		final PositionedString arrayElementsNonNull 
+		= new PositionedString("(\\forall int i; 0 <= i && i < " + varName + ".length;" 
+			+ varName + "[i]" + " != null)", 
+			fileName, 
+			pos);
+		result = result.append(arrayElementsNonNull);
+	    }
+	}
+	return result;
+    }
+    
+    public ImmutableSet<Contract> toContract(ProgramMethod pm) { 
+	try {
+	    if (sf==null) throw new SLTranslationException("Contract for initially clause could not be created because no SpecFactory given");
+	    if (! pm.isConstructor()) throw new SLTranslationException("Initially clauses only apply to constructors, not to method "+pm);
+	    final ImmutableList<PositionedString> empty = ImmutableSLList.<PositionedString>nil();
+	    final ImmutableList<PositionedString> precond = createPrecond(pm);
+	    final ImmutableList<PositionedString> clause = ImmutableSLList.<PositionedString>nil().append(originalSpec);
+	    final ImmutableList<PositionedString> exclause = ImmutableSLList.<PositionedString>nil().append(new PositionedString("(Exception)"+ originalSpec.text, originalSpec.fileName, originalSpec.pos));
+	    final ImmutableList<PositionedString> dtrue = ImmutableSLList.<PositionedString>nil().append(new PositionedString("true"));
+	    return sf.createJMLOperationContracts(pm, Behavior.NONE, new PositionedString(getName()), precond, empty, empty, empty, clause, exclause, empty, dtrue);
+	} catch (SLTranslationException e){ 
+	    services.getExceptionHandler().reportException(e);
+	    return null;
+	}
+    }
 }

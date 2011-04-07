@@ -265,6 +265,7 @@ initially_clause[ImmutableList<String> mods]
     {
         TextualJMLInitially ini = new TextualJMLInitially(mods, ps);
         result = ImmutableSLList.<TextualJMLConstruct>nil().prepend(ini);
+        for (String s: mods) {if (!(s.equals("public")||s.equals("private")||s.equals("protected"))) raiseError("modifier "+s+" not allowed in initially clause");}
     }
 ;
 

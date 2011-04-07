@@ -495,7 +495,7 @@ public class JMLSpecFactory {
                                       visibility,
                                       inv,
                                       selfVar,original);
-        res.setSpecFactory(this);
+        res.setSpecFactory(this,services);
         return res;
         
     }

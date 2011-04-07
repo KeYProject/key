@@ -45,11 +45,7 @@ public class PositionedString {
     public PositionedString(String text) {
         this(text, null);
     }
-    
-    public String toPlainString(){
-	return text;
-    }
-    
+        
     
     public String toString() {
         return text + " (" + fileName + ", " + pos + ")";
