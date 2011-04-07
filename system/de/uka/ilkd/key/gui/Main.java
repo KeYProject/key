@@ -1184,6 +1184,16 @@ public final class Main extends JFrame implements IMain {
             }
         });
         
+        JMenuItem userTacletsItem = new JMenuItem("Load User-defined Taclets ...");
+        userTacletsItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (mediator().ensureProofLoaded()) {
+                    loadUserTaclets();
+                }
+            }
+        });
+        
+        
         registerAtMenu(fileMenu, loadExample);        
         registerAtMenu(fileMenu, load);
         registerAtMenu(fileMenu, loadRecent);
@@ -1193,7 +1203,7 @@ public final class Main extends JFrame implements IMain {
         addSeparator(fileMenu);
         
         registerAtMenu(fileMenu, proofManagement);
-        
+        registerAtMenu(fileMenu, userTacletsItem);
         addSeparator(fileMenu);
         
         recentFiles = new RecentFileMenu(new ActionListener() {
@@ -1425,6 +1435,20 @@ public final class Main extends JFrame implements IMain {
         return options;
     }
     
+    
+    private void loadUserTaclets() {
+        final KeYFileChooser localFileChooser = getFileChooser ("Choose file to "
+                +"load taclets "
+                +"from ...");
+        boolean loaded = localFileChooser.showOpenDialog ( Main.this );
+        if (!loaded)
+            return;
+        
+        final File file = localFileChooser.getSelectedFile ();
+        
+
+    }
+    
     /**
      * update the selection menu for Decisionprocedures.
      * Remove those, that are not installed anymore, add those, that got installed.
@@ -1447,6 +1471,8 @@ public final class Main extends JFrame implements IMain {
 
 
     }
+    
+    
     
     private void updateDPSelectionMenu(){
 	       smtComponent.setItems(null);
