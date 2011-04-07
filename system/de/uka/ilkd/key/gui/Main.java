@@ -504,6 +504,7 @@ public final class Main extends JFrame implements IMain {
         test.addActionListener(new ActionListener() {
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
+		new LemmaSelectionDialog();
 		System.out.println("START TEST");
 		Proof proof = mediator().getProof();
 		if(proof != null){

@@ -10,7 +10,7 @@
 
 package de.uka.ilkd.key.taclettranslation;
 
-public class IllegalTacletException extends Exception {
+public class IllegalTacletException extends RuntimeException {
     /**
      * 
      */
