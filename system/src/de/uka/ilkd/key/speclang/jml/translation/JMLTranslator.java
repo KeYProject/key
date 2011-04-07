@@ -163,6 +163,30 @@ final class JMLTranslator {
         return result;
     }
 
+
+    /**
+     * Translates an expression as it occurs in JML assignable-clauses.
+     */
+    public ImmutableList<Term> translateDeclassifyExpression(
+                                    	PositionedString assignableExpr,
+                                        KeYJavaType specInClass,
+                                        ProgramVariable selfVar,
+                                        ImmutableList<ProgramVariable> paramVars)
+            throws SLTranslationException {
+
+        final KeYJMLParser parser = new KeYJMLParser(assignableExpr,
+                                               	     services,
+                                               	     specInClass,
+                                               	     selfVar,
+                                               	     paramVars,
+                                               	     null,
+                                               	     null,
+                                               	     null);
+
+        final ImmutableList<Term> result = parser.parseDeclassify();
+        return result;
+    }
+
     
     /**
      * Translates an expression as it occurs in JML represents-clauses.

@@ -526,6 +526,7 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 	|   ps=signals_only_clause   { sc.addSignalsOnly(ps); }
 	|   ps=diverges_clause       { sc.addDiverges(ps); }
         |   ps=secure_for_clause     { sc.addSecureFor(ps); }
+        |   ps=declassify_clause     { sc.addDeclassify(ps); }
 	|   ps=measured_by_clause    { sc.addMeasuredBy(ps); }
 	|   ps=name_clause           { sc.addName(ps);}
 	|   captures_clause 
@@ -675,6 +676,20 @@ secure_for_clause
 secure_for_keyword
 :
         SECURE_FOR
+;
+
+
+declassify_clause
+	returns [PositionedString result = null]
+	throws SLTranslationException
+:
+    declassify_keyword result=expression
+;
+
+
+secure_for_keyword
+:
+        DECLASSIFY
 ;
 
 

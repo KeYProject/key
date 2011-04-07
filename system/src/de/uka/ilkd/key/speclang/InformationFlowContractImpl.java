@@ -23,6 +23,8 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.util.LinkedHashMap;
 
+
+
 /**
  * Standard implementation of the DependencyContract interface.
  */
@@ -39,7 +41,7 @@ public final class InformationFlowContractImpl
     private final Term originalDep;
     private final Term originalMod;
     private final ImmutableList<ImmutableList<Term>> originalSecureFor;
-    private final Term originalDeclassify;
+    private final ImmutableList<ImmutableList<Term>> originalDeclassify;
     private final ProgramVariable originalSelfVar;
     private final ImmutableList<ProgramVariable> originalParamVars;
     private final int id;
@@ -47,6 +49,7 @@ public final class InformationFlowContractImpl
     //-------------------------------------------------------------------------
     //constructors
     //-------------------------------------------------------------------------
+
     private InformationFlowContractImpl(String baseName,
                                         String name,
                                         KeYJavaType kjt,
@@ -56,7 +59,7 @@ public final class InformationFlowContractImpl
                                         Term dep,
                                         Term mod,
                                         ImmutableList<ImmutableList<Term>> saveFor,
-                                        Term declassify,
+                                        ImmutableList<ImmutableList<Term>> declassify,
                                         ProgramVariable selfVar,
                                         ImmutableList<ProgramVariable> paramVars,
                                         int id) {
@@ -86,6 +89,7 @@ public final class InformationFlowContractImpl
         this.id = id;
     }
 
+
     public InformationFlowContractImpl(String baseName,
                                        KeYJavaType kjt,
                                        ProgramMethod pm,
@@ -94,7 +98,7 @@ public final class InformationFlowContractImpl
                                        Term dep,
                                        Term mod,
                                        ImmutableList<ImmutableList<Term>> secureFor,
-                                       Term declassify,
+                                       ImmutableList<ImmutableList<Term>> declassify,
                                        ProgramVariable selfVar,
                                        ImmutableList<ProgramVariable> paramVars) {
         this(baseName, null, kjt, pm, pre, mby, dep, mod, secureFor,
@@ -104,30 +108,36 @@ public final class InformationFlowContractImpl
     //-------------------------------------------------------------------------
     //public interface
     //-------------------------------------------------------------------------    
+
     @Override
     public String getName() {
         return name;
     }
+
 
     @Override
     public int id() {
         return id;
     }
 
+
     @Override
     public KeYJavaType getKJT() {
         return kjt;
     }
+
 
     @Override
     public ProgramMethod getTarget() {
         return pm;
     }
 
+
     @Override
     public boolean hasMby() {
         return originalMby != null;
     }
+
 
     @Override
     public Term getPre(ProgramVariable selfVar,
@@ -141,6 +151,7 @@ public final class InformationFlowContractImpl
                       services);
     }
 
+
     @Override
     public Term getPre(Term heapTerm,
                        Term selfTerm,
@@ -151,8 +162,9 @@ public final class InformationFlowContractImpl
         assert paramTerms != null;
         assert paramTerms.size() == originalParamVars.size();
         assert services != null;
-        return replace(heapTerm, selfTerm, paramTerms, services, originalPre);
+        return replace(originalPre, heapTerm, selfTerm, paramTerms, services);
     }
+
 
     @Override
     public Term getMby(ProgramVariable selfVar,
@@ -167,6 +179,7 @@ public final class InformationFlowContractImpl
                       services);
     }
 
+
     @Override
     public Term getMby(Term heapTerm,
                        Term selfTerm,
@@ -178,8 +191,9 @@ public final class InformationFlowContractImpl
         assert paramTerms != null;
         assert paramTerms.size() == originalParamVars.size();
         assert services != null;
-        return replace(heapTerm, selfTerm, paramTerms, services, originalMby);
+        return replace(originalMby, heapTerm, selfTerm, paramTerms, services);
     }
+
 
     @Override
     public Term getDep(ProgramVariable selfVar,
@@ -193,6 +207,7 @@ public final class InformationFlowContractImpl
                       services);
     }
 
+
     @Override
     public Term getDep(Term heapTerm,
                        Term selfTerm,
@@ -203,8 +218,9 @@ public final class InformationFlowContractImpl
         assert paramTerms != null;
         assert paramTerms.size() == originalParamVars.size();
         assert services != null;
-        return replace(heapTerm, selfTerm, paramTerms, services, originalDep);
+        return replace(originalDep, heapTerm, selfTerm, paramTerms, services);
     }
+
 
     @Override
     public Term getMod(ProgramVariable selfVar,
@@ -218,6 +234,7 @@ public final class InformationFlowContractImpl
                       services);
     }
 
+
     @Override
     public Term getMod(Term heapTerm,
                        Term selfTerm,
@@ -228,47 +245,44 @@ public final class InformationFlowContractImpl
         assert paramTerms != null;
         assert paramTerms.size() == originalParamVars.size();
         assert services != null;
-        return replace(heapTerm, selfTerm, paramTerms, services, originalMod);
+        return replace(originalMod, heapTerm, selfTerm, paramTerms, services);
     }
 
+
     @Override
-    public ImmutableList<ImmutableList<Term>> getSecureFors(ProgramVariable selfVar,
-                                          ImmutableList<ProgramVariable> paramVars,
-                                          Services services) {
+    public ImmutableList<ImmutableList<Term>> getSecureFors(
+            ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars,
+            Services services) {
         assert (selfVar == null) == (originalSelfVar == null);
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
         assert services != null;
         return getSecureFors(TB.heap(services), TB.var(selfVar),
-                          TB.var(paramVars), services);
+                             TB.var(paramVars), services);
     }
+
 
     @Override
     public ImmutableList<ImmutableList<Term>> getSecureFors(Term heapTerm,
-                                          Term selfTerm,
-                                          ImmutableList<Term> paramTerms,
-                                          Services services) {
+                                                            Term selfTerm,
+                                                            ImmutableList<Term> paramTerms,
+                                                            Services services) {
         assert heapTerm != null;
         assert (selfTerm == null) == (originalSelfVar == null);
         assert paramTerms != null;
         assert paramTerms.size() == originalParamVars.size();
         assert services != null;
-        ImmutableList<ImmutableList<Term>> result = ImmutableSLList.<ImmutableList<Term>>nil();
-        for (ImmutableList<Term> origTerms : originalSecureFor) {
-            ImmutableList<Term> clause = ImmutableSLList.<Term>nil();
-            for (Term origTerm : origTerms) {
-                clause = clause.append(replace(heapTerm, selfTerm, paramTerms,
-                                               services, origTerm));
-            }
-            result = result.append(clause);
-        }
-        return result;
+        return replace(originalSecureFor, heapTerm, selfTerm, paramTerms,
+                       services);
     }
 
+
     @Override
-    public Term getDeclassify(ProgramVariable selfVar,
-                              ImmutableList<ProgramVariable> paramVars,
-                              Services services) {
+    public ImmutableList<ImmutableList<Term>> getDeclassify(
+            ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars,
+            Services services) {
         assert (selfVar == null) == (originalSelfVar == null);
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
@@ -277,19 +291,21 @@ public final class InformationFlowContractImpl
                              TB.var(paramVars), services);
     }
 
+
     @Override
-    public Term getDeclassify(Term heapTerm,
-                              Term selfTerm,
-                              ImmutableList<Term> paramTerms,
-                              Services services) {
+    public ImmutableList<ImmutableList<Term>> getDeclassify(Term heapTerm,
+                                                            Term selfTerm,
+                                                            ImmutableList<Term> paramTerms,
+                                                            Services services) {
         assert heapTerm != null;
         assert (selfTerm == null) == (originalSelfVar == null);
         assert paramTerms != null;
         assert paramTerms.size() == originalParamVars.size();
         assert services != null;
-        return replace(heapTerm, selfTerm, paramTerms, services,
-                       originalDeclassify);
+        return replace(originalDeclassify, heapTerm, selfTerm, paramTerms,
+                       services);
     }
+
 
     @Override
     public InformationFlowContract setID(int newId) {
@@ -301,6 +317,7 @@ public final class InformationFlowContractImpl
                                                originalSelfVar,
                                                originalParamVars, newId);
     }
+
 
     @Override
     public InformationFlowContract setTarget(KeYJavaType newKJT,
@@ -315,6 +332,7 @@ public final class InformationFlowContractImpl
                                                originalSelfVar,
                                                originalParamVars, id);
     }
+
 
     @Override
     public String getHTMLText(Services services) {
@@ -358,17 +376,20 @@ public final class InformationFlowContractImpl
                + "</html>";
     }
 
+
     @Override
     public boolean toBeSaved() {
         return false;   // because information flow contracts currently cannot
-                        // be specified directly in DL
+        // be specified directly in DL
     }
+
 
     @Override
     public String proofToString(Services services) {
         assert false;
         return null;
     }
+
 
     @Override
     public String toString() {
@@ -377,6 +398,7 @@ public final class InformationFlowContractImpl
                + "; mby: " + originalMby
                + "; mod: " + originalMod;
     }
+
 
     private String generateName(String myName,
                                 String myBaseName,
@@ -395,11 +417,12 @@ public final class InformationFlowContractImpl
                                          + "]";
     }
 
-    private Term replace(Term heapTerm,
+
+    private Term replace(Term originalTerm,
+                         Term heapTerm,
                          Term selfTerm,
                          ImmutableList<Term> paramTerms,
-                         Services services,
-                         Term originalTerm) {
+                         Services services) {
         LinkedHashMap<Term, Term> map = new LinkedHashMap<Term, Term>();
         map.put(TB.heap(services), heapTerm);
         map.put(TB.var(originalSelfVar), selfTerm);
@@ -408,6 +431,28 @@ public final class InformationFlowContractImpl
         OpReplacer or = new OpReplacer(map);
         return or.replace(originalTerm);
     }
+
+
+    private ImmutableList<ImmutableList<Term>> replace(
+            ImmutableList<ImmutableList<Term>> original,
+            Term heapTerm,
+            Term selfTerm,
+            ImmutableList<Term> paramTerms,
+            Services services) {
+        ImmutableList<ImmutableList<Term>> result =
+                ImmutableSLList.<ImmutableList<Term>>nil();
+        for (ImmutableList<Term> origTerms : original) {
+            ImmutableList<Term> clause =
+                    ImmutableSLList.<Term>nil();
+            for (Term origTerm : origTerms) {
+                clause = clause.append(replace(origTerm, heapTerm, selfTerm,
+                                               paramTerms, services));
+            }
+            result = result.append(clause);
+        }
+        return result;
+    }
+
 
     @Override
     public ProofOblInput createProofObl(InitConfig initConfig,

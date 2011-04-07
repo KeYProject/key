@@ -68,7 +68,7 @@ public class JMLSpecFactory {
         public Term signalsOnly;
         public Term diverges;
         public ImmutableList<ImmutableList<Term>> saveFor;
-        public Term declassify;
+        public ImmutableList<ImmutableList<Term>> declassify;
     }
 
     //-------------------------------------------------------------------------
@@ -220,7 +220,6 @@ public class JMLSpecFactory {
             ImmutableList<ProgramVariable> paramVars,
             ImmutableList<PositionedString> originalSecureFor)
             throws SLTranslationException {
-        // TODO Auto-generated method stub
         if (originalSecureFor.isEmpty()) {
             return ImmutableSLList.<ImmutableList<Term>>nil();
         } else {
@@ -238,12 +237,27 @@ public class JMLSpecFactory {
         }
     }
 
-    private Term translateDeclassify(ProgramMethod pm,
-                                     ProgramVariable selfVar,
-                                     ImmutableList<ProgramVariable> paramVars,
-                                     ImmutableList<PositionedString> declassify) {
-        // TODO Auto-generated method stub
-        return null;
+    private ImmutableList<ImmutableList<Term>> translateDeclassify(
+            ProgramMethod pm,
+            ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars,
+            ImmutableList<PositionedString> originalDeclassify)
+            throws SLTranslationException {
+        if (originalDeclassify.isEmpty()) {
+            return ImmutableSLList.<ImmutableList<Term>>nil();
+        } else {
+            ImmutableList<ImmutableList<Term>> declass =
+                    ImmutableSLList.<ImmutableList<Term>>nil();
+            for (PositionedString expr : originalDeclassify) {
+                ImmutableList<Term> translated =
+                        translator.translateDeclassifyExpression(expr,
+                                                                 pm.getContainerType(),
+                                                                 selfVar,
+                                                                 paramVars);
+                declass = declass.append(translated);
+            }
+            return declass;
+        }
     }
 
     private Term translateDeverges(ProgramMethod pm,

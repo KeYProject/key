@@ -46,6 +46,7 @@ tokens {
     CONST 			= "const";
     CONSTRAINT			= "constraint";
     CONSTRAINT_RED		= "constraint_redundantly";
+    DECLASSIFY                  = "declassify"
     DECREASES  			= "decreases";
     DECREASES_REDUNDANTLY  	= "decreases_redundantly";
     DECREASING  		= "decreasing";
@@ -102,8 +103,8 @@ tokens {
     REQUIRES 			= "requires";
     REQUIRES_RED 		= "requires_redundantly";
     SCOPE_SAFE 			= "scopeSafe";
-    ARBITRARY_SCOPE 	= "arbitraryScope";
-    ARBITRARY_SCOPE_THIS = "arbitraryScopeThis";
+    ARBITRARY_SCOPE             = "arbitraryScope";
+    ARBITRARY_SCOPE_THIS        = "arbitraryScopeThis";
     SECURE_FOR                  = "secure_for";
     SET 			= "set";
     SIGNALS 			= "signals";
@@ -114,7 +115,7 @@ tokens {
     SPEC_JAVA_MATH 		= "spec_java_math";
     SPEC_PROTECTED 		= "spec_protected";
     SPEC_PUBLIC 		= "spec_public";
-    SPEC_NAME           = "name";
+    SPEC_NAME                   = "name";
     SPEC_SAFE_MATH 		= "spec_safe_math";
     STATIC 			= "static";
     STRICTFP 			= "strictfp";

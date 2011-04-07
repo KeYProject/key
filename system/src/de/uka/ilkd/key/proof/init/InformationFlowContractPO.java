@@ -36,6 +36,8 @@ import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.util.LinkedHashMap;
 import java.util.Iterator;
 
+
+
 /**
  * The proof obligation for dependency contracts. 
  */
@@ -50,6 +52,7 @@ public final class InformationFlowContractPO extends AbstOpContractPO {
     //-------------------------------------------------------------------------
     //internal methods
     //-------------------------------------------------------------------------    
+
     /**
      * Builds the "general assumption". 
      * @throws ParserException 
@@ -103,6 +106,7 @@ public final class InformationFlowContractPO extends AbstOpContractPO {
                 mbyAtPreDef2);
     }
 
+
     private Term buildInputOutputRelations(ProofObligationVariables vs)
             throws ParserException {
         final ImmutableList<ImmutableList<Term>> secureFors =
@@ -111,39 +115,87 @@ public final class InformationFlowContractPO extends AbstOpContractPO {
                 ImmutableSLList.<Term>nil();
         for (ImmutableList<Term> secureFor : secureFors) {
             assert secureFor.size() == vs.paramVars1.size() + 1;
-            ImmutableList<Term> inputRelations =
-                    ImmutableSLList.<Term>nil();
-            final Term returnLocs = secureFor.head();
-            final Term eqAtLocs =
-                    TB.parseTerm(
-                            "equalsAtLocs(heapAtPre1, heapAtPre2, "
-                                + returnLocs + ", " + returnLocs + ")",
-                            services);
-            inputRelations = inputRelations.append(eqAtLocs);
-            final ImmutableList<Term> paramsLocs = secureFor.tail();
-            final Iterator<ProgramVariable> paramVars1It = vs.paramVars1.iterator();
-            final Iterator<ProgramVariable> paramVars2It = vs.paramVars2.iterator();
-            for (Term paramLocs : paramsLocs) {
-                final Term param1 = TB.var(paramVars1It.next());
-                final Term param2 = TB.var(paramVars2It.next());
-                final Term eq =
-                        TB.parseTerm(
-                              "    subset(" + paramLocs + ", " + returnLocs + ")"
-                            + " -> equals(heapAtPre1, " + param1 + ", "
-                            + "           heapAtPre2, " + param2 + ")",
-                            services);
-                inputRelations = inputRelations.append(eq);
-            }
-            final Term inputRelation = TB.and(inputRelations);
-            final Term outputRelation =
-                    TB.parseTerm(
-                        "equals(heapAtPost1, result1, heapAtPost2, result2)",
-                        services);
-            final Term inputOutputRelation = TB.imp(inputRelation, outputRelation);
-            inputOutputRelations = inputOutputRelations.append(inputOutputRelation);
+            final Term resultLocSet = secureFor.head();
+            Term inputOutputRelation =
+                    buildInputOutputRelation(resultLocSet, secureFor, vs);
+            inputOutputRelations = inputOutputRelations.append(
+                    inputOutputRelation);
         }
         return TB.and(inputOutputRelations);
     }
+
+
+    private Term buildInputOutputRelation(Term referenceLocSet,
+                                          ImmutableList<Term> secureFor,
+                                          ProofObligationVariables vs)
+            throws ParserException {
+        // LocSets of the parameters without the result LocSet
+        final ImmutableList<Term> paramLocSets = secureFor.tail();
+
+        final ImmutableList<Term> inputRelations =
+                buildEqualsRelations(referenceLocSet, paramLocSets,
+                                     vs.paramVars1.iterator(),
+                                     vs.paramVars2.iterator(),
+                                     TB.var(vs.heapAtPreVar1),
+                                     TB.var(vs.heapAtPreVar2));
+        final ImmutableList<Term> outputRelations =
+                buildEqualsRelations(referenceLocSet, secureFor,
+                                     vs.paramVars1.prepend(vs.resultVar1).iterator(),
+                                     vs.paramVars2.prepend(vs.resultVar2).iterator(),
+                                     TB.var(vs.heapAtPostVar1),
+                                     TB.var(vs.heapAtPostVar2));
+        return TB.imp(TB.and(inputRelations), TB.and(outputRelations));
+    }
+
+
+    private ImmutableList<Term> buildEqualsRelations(Term referenceLocSet,
+                                                     ImmutableList<Term> paramLocSets,
+                                                     Iterator<ProgramVariable> paramVars1It,
+                                                     Iterator<ProgramVariable> paramVars2It,
+                                                     Term heap1,
+                                                     Term heap2)
+            throws ParserException {
+        ImmutableList<Term> inputRelations = ImmutableSLList.<Term>nil();
+        for (Term paramLocSet : paramLocSets) {
+            inputRelations =
+                    inputRelations.append(
+                    buildParamEqualsRelation(referenceLocSet,
+                                             paramLocSet,
+                                             paramVars1It.next(),
+                                             paramVars2It.next(),
+                                             heap1,
+                                             heap2));
+        }
+        inputRelations =
+                inputRelations.append(buildMainEqualsRelation(referenceLocSet));
+        return inputRelations;
+    }
+
+
+    private Term buildMainEqualsRelation(Term referenceLocSet)
+            throws ParserException {
+        return TB.parseTerm("equalsAtLocs(heapAtPre1, heapAtPre2, "
+                            + referenceLocSet + ", " + referenceLocSet + ")",
+                            services);
+    }
+
+
+    private Term buildParamEqualsRelation(Term referenceLocSet,
+                                          Term paramLocSet,
+                                          ProgramVariable paramVar1,
+                                          ProgramVariable paramVar2,
+                                          Term heap1,
+                                          Term heap2)
+            throws ParserException {
+        final Term param1 = TB.var(paramVar1);
+        final Term param2 = TB.var(paramVar2);
+        return TB.parseTerm("    subset(" + paramLocSet + ", " + referenceLocSet
+                            + ")"
+                            + " -> equals(" + heap1 + ", " + param1 + ", "
+                            + "           " + heap2 + ", " + param2 + ")",
+                            services);
+    }
+
 
     private JavaBlock buildJavaBlock(
             ImmutableList<ProgramVariable> formalParVars,
@@ -152,8 +204,7 @@ public final class InformationFlowContractPO extends AbstOpContractPO {
             ProgramVariable exceptionVar) {
         //create method call
         final ImmutableArray<Expression> formalArray =
-                new ImmutableArray<Expression>(
-                formalParVars.toArray(
+                new ImmutableArray<Expression>(formalParVars.toArray(
                 new ProgramVariable[formalParVars.size()]));
         final StatementBlock sb;
         if (getContract().getTarget().isConstructor()) {
@@ -167,41 +218,35 @@ public final class InformationFlowContractPO extends AbstOpContractPO {
             sb = new StatementBlock(ca);
         } else {
             final MethodBodyStatement call =
-                    new MethodBodyStatement(getContract().getTarget(),
-                                            selfVar,
-                                            resultVar,
-                                            formalArray);
+                    new MethodBodyStatement(getContract().getTarget(), selfVar,
+                                            resultVar, formalArray);
             sb = new StatementBlock(call);
         }
-
         //create variables for try statement
-        final KeYJavaType eType = javaInfo.getTypeByClassName(
-                "java.lang.Exception");
+        final KeYJavaType eType =
+                javaInfo.getTypeByClassName("java.lang.Exception");
         final TypeReference excTypeRef = javaInfo.createTypeReference(eType);
         final ProgramElementName ePEN = new ProgramElementName("e");
         final ProgramVariable eVar = new LocationVariable(ePEN, eType);
-
         //create try statement
-        final CopyAssignment nullStat = new CopyAssignment(exceptionVar,
-                                                           NullLiteral.NULL);
+        final CopyAssignment nullStat =
+                new CopyAssignment(exceptionVar, NullLiteral.NULL);
         final VariableSpecification eSpec = new VariableSpecification(eVar);
-        final ParameterDeclaration excDecl = new ParameterDeclaration(
-                new Modifier[0],
-                excTypeRef,
-                eSpec,
-                false);
-        final CopyAssignment assignStat = new CopyAssignment(exceptionVar, eVar);
-        final Catch catchStat = new Catch(excDecl,
-                                          new StatementBlock(assignStat));
+        final ParameterDeclaration excDecl =
+                new ParameterDeclaration(new Modifier[0], excTypeRef, eSpec,
+                                         false);
+        final CopyAssignment assignStat =
+                new CopyAssignment(exceptionVar, eVar);
+        final Catch catchStat =
+                new Catch(excDecl, new StatementBlock(assignStat));
         final Try tryStat = new Try(sb, new Branch[]{catchStat});
-        final StatementBlock sb2 = new StatementBlock(new Statement[]{nullStat,
-                                                                      tryStat});
-
+        final StatementBlock sb2 =
+                new StatementBlock(new Statement[]{nullStat, tryStat});
         //create java block
         JavaBlock result = JavaBlock.createJavaBlock(sb2);
-
         return result;
     }
+
 
     private Term buildProgramTerm(ImmutableList<ProgramVariable> paramVars,
                                   ProgramVariable selfVar,
@@ -237,6 +282,7 @@ public final class InformationFlowContractPO extends AbstOpContractPO {
     //-------------------------------------------------------------------------
     //public interface
     //-------------------------------------------------------------------------        
+
     @Override
     public void readProblem()
             throws ProofInputException {
@@ -332,6 +378,7 @@ public final class InformationFlowContractPO extends AbstOpContractPO {
         }
     }
 
+
     @Override
     public boolean implies(ProofOblInput po) {
         if (!(po instanceof InformationFlowContractPO)) {
@@ -341,15 +388,18 @@ public final class InformationFlowContractPO extends AbstOpContractPO {
         return contract.equals(cPO.contract);
     }
 
+
     @Override
     public InformationFlowContract getContract() {
         return (InformationFlowContract) contract;
     }
 
+
     @Override
     public Term getMbyAtPre() {
         return mbyAtPre;
     }
+
 
     @Override
     public boolean equals(Object o) {
@@ -360,10 +410,12 @@ public final class InformationFlowContractPO extends AbstOpContractPO {
         }
     }
 
+
     @Override
     public int hashCode() {
         return contract.hashCode();
     }
+
 
     @Override
     protected Term generateSelfNotNull(ProgramVariable selfVar) {
@@ -372,12 +424,14 @@ public final class InformationFlowContractPO extends AbstOpContractPO {
                : TB.not(TB.equals(TB.var(selfVar), TB.NULL(services)));
     }
 
+
     @Override
     protected Term generateSelfCreated(ProgramVariable selfVar) {
         return selfVar == null || getContract().getTarget().isConstructor()
                ? TB.tt()
                : TB.created(services, TB.var(selfVar));
     }
+
 
     @Override
     protected Term generateSelfExactType(ProgramVariable selfVar,
@@ -389,6 +443,7 @@ public final class InformationFlowContractPO extends AbstOpContractPO {
         }
     }
 
+
     @Override
     protected Term generateParamsOK(ImmutableList<ProgramVariable> paramVars) {
         Term paramsOK = TB.tt();
@@ -397,6 +452,7 @@ public final class InformationFlowContractPO extends AbstOpContractPO {
         }
         return paramsOK;
     }
+
 
     @Override
     protected Term generateMbyAtPreDef(ProgramVariable selfVar,
@@ -416,6 +472,8 @@ public final class InformationFlowContractPO extends AbstOpContractPO {
         return mbyAtPreDef;
     }
 
+
+
     /**
      * Prepare program and location variables.
      * 
@@ -430,6 +488,7 @@ public final class InformationFlowContractPO extends AbstOpContractPO {
         final ProgramVariable exceptionVar1, exceptionVar2;
         final LocationVariable heapAtPreVar1, heapAtPreVar2;
         final LocationVariable heapAtPostVar1, heapAtPostVar2;
+
 
         ProofObligationVariables(ProgramMethod pm) {
             selfVar = TB.selfVar(services, pm, contract.getKJT(), true);

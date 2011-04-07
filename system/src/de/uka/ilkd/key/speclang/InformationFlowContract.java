@@ -48,30 +48,34 @@ public interface InformationFlowContract extends OperationContract {
     /**
      * Returns the parameters dependency sets of the contract.
      */
-    public ImmutableList<ImmutableList<Term>> getSecureFors(ProgramVariable selfVar,
-                                          ImmutableList<ProgramVariable> paramVars,
-                                          Services services);
+    public ImmutableList<ImmutableList<Term>> getSecureFors(
+            ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars,
+            Services services);
 
     /**
      * Returns the parameters dependency sets of the contract.
      */
-    public ImmutableList<ImmutableList<Term>> getSecureFors(Term heapTerm,
-                                          Term selfTerm,
-                                          ImmutableList<Term> paramTerms,
-                                          Services services);
+    public ImmutableList<ImmutableList<Term>> getSecureFors(
+            Term heapTerm,
+            Term selfTerm,
+            ImmutableList<Term> paramTerms,
+            Services services);
 
     /**
      * Returns the declassification formula.
      */
-    public Term getDeclassify(ProgramVariable selfVar,
-                              ImmutableList<ProgramVariable> paramVars,
-                              Services services);
+    public ImmutableList<ImmutableList<Term>> getDeclassify(
+            ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars,
+            Services services);
 
     /**
      * Returns the declassification formula.
      */
-    public Term getDeclassify(Term heapTerm,
-                              Term selfTerm,
-                              ImmutableList<Term> paramTerms,
-                              Services services);
+    public ImmutableList<ImmutableList<Term>> getDeclassify(
+            Term heapTerm,
+            Term selfTerm,
+            ImmutableList<Term> paramTerms,
+            Services services);
 }

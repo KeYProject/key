@@ -253,6 +253,21 @@ options {
 	return result;
     }
 
+
+    public ImmutableList<Term> parseDeclassify() throws SLTranslationException {
+    	ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+
+	this.currentlyParsing = true;
+	try {
+	    result = declassifyclause();
+	} catch (antlr.ANTLRException e) {
+	    throw excManager.convertException(e);
+	}
+	this.currentlyParsing = false;
+
+	return result;
+    }
+
     
     public Pair<ObserverFunction,Term> parseRepresents() throws SLTranslationException {
     	Pair<ObserverFunction,Term> result = null;
@@ -523,19 +538,19 @@ assignableclause returns [Term result = null] throws SLTranslationException
     ;
 
 
+storereflist returns [Term result = null] throws SLTranslationException
+{
+    Term mod = null;
+}
+:
+    result=storeref
+	(COMMA mod=storeref { result = TB.union(services, result, mod); } )*
+    ;
+
+
 secureforclause returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException
 :
     result = secureforarglist
-    ;
-
-oldsecureforclause returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException
-{
-    Term term = null;
-    ImmutableList<Term> args = ImmutableSLList.<Term>nil();
-}
-:
-    term = storeref { result = result.append(term); }
-        LBRACE ( args = secureforarglist { result = result.append(args); } )? RBRACE
     ;
 
 
@@ -550,14 +565,18 @@ secureforarglist returns  [ImmutableList<Term> result = ImmutableSLList.<Term>ni
     ;
 
 
-
-storereflist returns [Term result = null] throws SLTranslationException
+declassifyclause returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException
 {
-    Term mod = null;
+    Term declass = null;
+    Term from = null;
+    Term to = null;
+    Term if = null;
 }
 :
-    result=storeref 
-	(COMMA mod=storeref { result = TB.union(services, result, mod); } )*
+    declass = predicate { result = result.append(declass) }
+    FROM from = storereflist { result = result.append(from)}
+    TO to = storereflist { result = result.append(to)}
+    (IF if = predicate { result = result.append(if) } )?
     ;
 
 

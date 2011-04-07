@@ -720,7 +720,9 @@ public final class TermBuilder {
 	    throw new TermCreationException("Not an update: " + update);
 	} else if(update.op() == UpdateJunctor.SKIP) {
 	    return target;
-	} else {
+	} else if(target.equals(tt())) {
+            return tt();
+        } else {
 	    return tf.createTerm(UpdateApplication.UPDATE_APPLICATION,
 		        	 update, 
 		        	 target);

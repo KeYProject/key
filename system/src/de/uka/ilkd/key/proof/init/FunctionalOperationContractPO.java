@@ -7,7 +7,6 @@
 // See LICENSE.TXT for details.
 //
 //
-
 package de.uka.ilkd.key.proof.init;
 
 import java.util.HashMap;
@@ -36,35 +35,35 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
 
+
 /**
  * The proof obligation for operation contracts. 
  */
 public final class FunctionalOperationContractPO
-	extends AbstOpContractPO {
-    
-    public FunctionalOperationContractPO(InitConfig initConfig, 
-	    		       FunctionalOperationContract contract) {
-    	super(initConfig, contract.getName(), contract);
+        extends AbstOpContractPO {
+
+    public FunctionalOperationContractPO(InitConfig initConfig,
+                                         FunctionalOperationContract contract) {
+        super(initConfig, contract.getName(), contract);
     }
-    
-    
+
+
     //-------------------------------------------------------------------------
     //internal methods
     //-------------------------------------------------------------------------    
-    
     /**
      * Builds the "general assumption". 
      */
     private Term buildFreePre(ProgramVariable selfVar,
-	                      KeYJavaType selfKJT,
-                              ImmutableList<ProgramVariable> paramVars) 
-    		throws ProofInputException {
-	//"self != null"
-	final Term selfNotNull = generateSelfNotNull(selfVar);
-        	      
+                              KeYJavaType selfKJT,
+                              ImmutableList<ProgramVariable> paramVars)
+            throws ProofInputException {
+        //"self != null"
+        final Term selfNotNull = generateSelfNotNull(selfVar);
+
         //"self.<created> = TRUE"
         final Term selfCreated = generateSelfCreated(selfVar);
-             
+
         //"MyClass::exactInstance(self) = TRUE"
         final Term selfExactType = generateSelfExactType(selfVar, selfKJT);
 
@@ -72,139 +71,139 @@ public final class FunctionalOperationContractPO
         //- "p_i.<created> = TRUE | p_i = null" for object parameters, and
         //- "inBounds(p_i)" for integer parameters
         Term paramsOK = generateParamsOK(paramVars);
-        
+
         //initial value of measured_by clause
         final Term mbyAtPreDef = generateMbyAtPreDef(selfVar, paramVars);
 
-        return TB.and(new Term[]{TB.wellFormedHeap(services), 
-        	       		 selfNotNull,
-        	       		 selfCreated,
-        	       		 selfExactType,
-        	       		 paramsOK,
-        	       		 mbyAtPreDef});
+        return TB.and(new Term[]{TB.wellFormedHeap(services),
+                                 selfNotNull,
+                                 selfCreated,
+                                 selfExactType,
+                                 paramsOK,
+                                 mbyAtPreDef});
     }
-    
-    
+
+
     private JavaBlock buildJavaBlock(
-	    			ImmutableList<LocationVariable> formalParVars,
-                                ProgramVariable selfVar, 
-                                ProgramVariable resultVar,
-                                ProgramVariable exceptionVar) {        
+            ImmutableList<LocationVariable> formalParVars,
+            ProgramVariable selfVar,
+            ProgramVariable resultVar,
+            ProgramVariable exceptionVar) {
         //create method call
-	final ImmutableArray<Expression> formalArray 
-		= new ImmutableArray<Expression>(formalParVars.toArray(
-			            new ProgramVariable[formalParVars.size()]));
-	final StatementBlock sb;
-	if(getContract().getTarget().isConstructor()) {
-	    assert selfVar != null;
-	    assert resultVar == null;
-	    final Expression[] formalArray2 
-	    	= formalArray.toArray(new Expression[formalArray.size()]);
-	    final New n 
-	    	= new New(formalArray2, new TypeRef(getContract().getKJT()), null);
-	    final CopyAssignment ca = new CopyAssignment(selfVar, n);
-	    sb = new StatementBlock(ca);
-	} else {
-	    final MethodBodyStatement call 
-		= new MethodBodyStatement(getContract().getTarget(),
-					  selfVar,
-					  resultVar,
-					  formalArray);
-	    sb = new StatementBlock(call);
-	}
+        final ImmutableArray<Expression> formalArray = new ImmutableArray<Expression>(formalParVars.toArray(
+                new ProgramVariable[formalParVars.size()]));
+        final StatementBlock sb;
+        if (getContract().getTarget().isConstructor()) {
+            assert selfVar != null;
+            assert resultVar == null;
+            final Expression[] formalArray2 = formalArray.toArray(
+                    new Expression[formalArray.size()]);
+            final New n = new New(formalArray2, new TypeRef(
+                    getContract().getKJT()), null);
+            final CopyAssignment ca = new CopyAssignment(selfVar, n);
+            sb = new StatementBlock(ca);
+        } else {
+            final MethodBodyStatement call =
+                    new MethodBodyStatement(getContract().getTarget(),
+                                            selfVar,
+                                            resultVar,
+                                            formalArray);
+            sb = new StatementBlock(call);
+        }
 
         //create variables for try statement
-        final KeYJavaType eType 
-        	= javaInfo.getTypeByClassName("java.lang.Exception");
+        final KeYJavaType eType = javaInfo.getTypeByClassName(
+                "java.lang.Exception");
         final TypeReference excTypeRef = javaInfo.createTypeReference(eType);
         final ProgramElementName ePEN = new ProgramElementName("e");
         final ProgramVariable eVar = new LocationVariable(ePEN, eType);
-        
+
         //create try statement
-        final CopyAssignment nullStat = new CopyAssignment(exceptionVar, 
+        final CopyAssignment nullStat = new CopyAssignment(exceptionVar,
                                                            NullLiteral.NULL);
         final VariableSpecification eSpec = new VariableSpecification(eVar);
-        final ParameterDeclaration excDecl 
-        	= new ParameterDeclaration(new Modifier[0],
-        				   excTypeRef,
-        				   eSpec,
-        				   false);
+        final ParameterDeclaration excDecl = new ParameterDeclaration(
+                new Modifier[0],
+                                                                      excTypeRef,
+                                                                      eSpec,
+                                                                      false);
         final CopyAssignment assignStat = new CopyAssignment(exceptionVar, eVar);
-        final Catch catchStat = new Catch(excDecl, new StatementBlock(assignStat));
+        final Catch catchStat = new Catch(excDecl,
+                                          new StatementBlock(assignStat));
         final Try tryStat = new Try(sb, new Branch[]{catchStat});
-        final StatementBlock sb2 = new StatementBlock(new Statement[]{nullStat, 
-        							      tryStat});
-                
+        final StatementBlock sb2 = new StatementBlock(new Statement[]{nullStat,
+                                                                      tryStat});
+
         //create java block
         JavaBlock result = JavaBlock.createJavaBlock(sb2);
-        
+
         return result;
     }
-    
-    
+
+
     private Term buildProgramTerm(ImmutableList<ProgramVariable> paramVars,
-                                  ProgramVariable selfVar, 
+                                  ProgramVariable selfVar,
                                   ProgramVariable resultVar,
                                   ProgramVariable exceptionVar,
                                   LocationVariable heapAtPreVar,
                                   Term postTerm) {
         //create formal parameters
-        ImmutableList<LocationVariable> formalParamVars 
-        	= ImmutableSLList.<LocationVariable>nil();
-        for(ProgramVariable paramVar : paramVars) {
-            ProgramElementName pen 
-                = new ProgramElementName("_" + paramVar.name());            
-            LocationVariable formalParamVar
-            	= new LocationVariable(pen, paramVar.getKeYJavaType());
+        ImmutableList<LocationVariable> formalParamVars =
+                ImmutableSLList.<LocationVariable>nil();
+        for (ProgramVariable paramVar : paramVars) {
+            ProgramElementName pen = new ProgramElementName("_"
+                                                            + paramVar.name());
+            LocationVariable formalParamVar =
+                    new LocationVariable(pen, paramVar.getKeYJavaType());
             formalParamVars = formalParamVars.append(formalParamVar);
             register(formalParamVar);
         }
-        
+
         //create java block
         final JavaBlock jb = buildJavaBlock(formalParamVars,
                                             selfVar,
                                             resultVar,
                                             exceptionVar);
-        
+
         //create program term
-        final Term programTerm = TB.prog(getContract().getModality(), jb, postTerm);
-        
+        final Term programTerm = TB.prog(getContract().getModality(), jb,
+                                         postTerm);
+
         //create update
         Term update = TB.elementary(services, heapAtPreVar, TB.heap(services));
         Iterator<LocationVariable> formalParamIt = formalParamVars.iterator();
-        Iterator<ProgramVariable> paramIt        = paramVars.iterator();
-        while(formalParamIt.hasNext()) {
-            Term paramUpdate = TB.elementary(services, 
-        	    			     formalParamIt.next(), 
-        	    			     TB.var(paramIt.next()));
+        Iterator<ProgramVariable> paramIt = paramVars.iterator();
+        while (formalParamIt.hasNext()) {
+            Term paramUpdate = TB.elementary(services,
+                                             formalParamIt.next(),
+                                             TB.var(paramIt.next()));
             update = TB.parallel(update, paramUpdate);
         }
-        
+
         return TB.apply(update, programTerm);
     }
-           
-    
-    
+
+
     //-------------------------------------------------------------------------
     //public interface
     //-------------------------------------------------------------------------        
-    
     @Override
-    public void readProblem() throws ProofInputException {
-	final ProgramMethod pm = getContract().getTarget();
-	
+    public void readProblem()
+            throws ProofInputException {
+        final ProgramMethod pm = getContract().getTarget();
+
         //prepare variables, program method, heapAtPre
-        final ImmutableList<ProgramVariable> paramVars 
-        	= TB.paramVars(services, pm, true);
-        final ProgramVariable selfVar 
-        	= TB.selfVar(services, pm, contract.getKJT(), true);
+        final ImmutableList<ProgramVariable> paramVars = TB.paramVars(services,
+                                                                      pm, true);
+        final ProgramVariable selfVar = TB.selfVar(services, pm,
+                                                   contract.getKJT(), true);
         final ProgramVariable resultVar = TB.resultVar(services, pm, true);
         final ProgramVariable exceptionVar = TB.excVar(services, pm, true);
-     	final LocationVariable heapAtPreVar 
-		= TB.heapAtPreVar(services, "heapAtPre", true);
-        final Map<Term,Term> normalToAtPre = new HashMap<Term,Term>();
+        final LocationVariable heapAtPreVar = TB.heapAtPreVar(services,
+                                                              "heapAtPre", true);
+        final Map<Term, Term> normalToAtPre = new HashMap<Term, Term>();
         normalToAtPre.put(TB.heap(services), TB.var(heapAtPreVar));
-        
+
         //register the variables so they are declared in proof header 
         //if the proof is saved to a file
         register(paramVars);
@@ -214,71 +213,71 @@ public final class FunctionalOperationContractPO
         register(heapAtPreVar);
 
         //build precondition
-        final Term pre = TB.and(buildFreePre(selfVar, 
-        	                             contract.getKJT(), 
-        	                             paramVars), 
-        	                contract.getPre(selfVar, paramVars, services));
-                
+        final Term pre = TB.and(buildFreePre(selfVar,
+                                             contract.getKJT(),
+                                             paramVars),
+                                contract.getPre(selfVar, paramVars, services));
+
         //build program term
-        final Term post = TB.and(getContract().getPost(selfVar, 
-                                    	   	  paramVars, 
-                                    	   	  resultVar, 
-                                    	   	  exceptionVar,
-                                    	   	  heapAtPreVar,
-                                    	   	  services),
-                                 TB.frame(services, 
-                                	  normalToAtPre, 
-                                	  getContract().getMod(selfVar, 
-                                		  	  paramVars, 
-                                		  	  services)));
+        final Term post = TB.and(getContract().getPost(selfVar,
+                                                       paramVars,
+                                                       resultVar,
+                                                       exceptionVar,
+                                                       heapAtPreVar,
+                                                       services),
+                                 TB.frame(services,
+                                          normalToAtPre,
+                                          getContract().getMod(selfVar,
+                                                               paramVars,
+                                                               services)));
         final Term progPost = buildProgramTerm(paramVars,
                                                selfVar,
                                                resultVar,
                                                exceptionVar,
                                                heapAtPreVar,
                                                post);
-                
+
         //save in field
         poTerms = new Term[]{TB.imp(pre, progPost)};
-        
+
         //add axioms
         collectClassAxioms(contract.getKJT());
     }
-    
-    
+
+
     @Override
     public boolean implies(ProofOblInput po) {
-        if(!(po instanceof FunctionalOperationContractPO)) {
+        if (!(po instanceof FunctionalOperationContractPO)) {
             return false;
         }
         AbstOpContractPO cPO = (AbstOpContractPO) po;
-        return specRepos.splitContract(cPO.contract)
-                        .subset(specRepos.splitContract(contract));
+        return specRepos.splitContract(cPO.contract).subset(specRepos.splitContract(
+                contract));
     }
-    
-    
+
+
     @Override
     public FunctionalOperationContract getContract() {
-        return (FunctionalOperationContract)contract;
+        return (FunctionalOperationContract) contract;
     }
-    
-    
+
+
     @Override
     public Term getMbyAtPre() {
-	return mbyAtPre;
+        return mbyAtPre;
     }
-    
-    
+
+
     @Override
     public boolean equals(Object o) {
-	if(!(o instanceof FunctionalOperationContractPO)) {
-	    return false;
-	} else {
-	    return contract.equals(((AbstOpContractPO)o).contract);
-	}
+        if (!(o instanceof FunctionalOperationContractPO)) {
+            return false;
+        } else {
+            return contract.equals(((AbstOpContractPO) o).contract);
+        }
     }
-    
-    
+
+
     @Override
     public int hashCode() {
         return contract.hashCode();
@@ -287,46 +286,46 @@ public final class FunctionalOperationContractPO
 
     protected Term generateSelfNotNull(ProgramVariable selfVar) {
         return selfVar == null || getContract().getTarget().isConstructor()
-              ? TB.tt()
-              : TB.not(TB.equals(TB.var(selfVar), TB.NULL(services)));
+               ? TB.tt()
+               : TB.not(TB.equals(TB.var(selfVar), TB.NULL(services)));
     }
 
 
     protected Term generateSelfCreated(ProgramVariable selfVar) {
         return selfVar == null || getContract().getTarget().isConstructor()
-             ? TB.tt()
-             : TB.created(services, TB.var(selfVar));
+               ? TB.tt()
+               : TB.created(services, TB.var(selfVar));
     }
 
 
-    protected Term generateSelfExactType(ProgramVariable selfVar, KeYJavaType selfKJT) {
-        final Term selfExactType
-           = selfVar == null || getContract().getTarget().isConstructor()
-             ? TB.tt()
-             : TB.exactInstance(services, 
-        	                selfKJT.getSort(), 
-        	                TB.var(selfVar));
+    protected Term generateSelfExactType(ProgramVariable selfVar,
+                                         KeYJavaType selfKJT) {
+        final Term selfExactType = selfVar == null
+                                   || getContract().getTarget().isConstructor()
+                                   ? TB.tt()
+                                   : TB.exactInstance(services,
+                                                      selfKJT.getSort(),
+                                                      TB.var(selfVar));
         return selfExactType;
     }
 
 
     protected Term generateParamsOK(ImmutableList<ProgramVariable> paramVars) {
         Term paramsOK = TB.tt();
-        for(ProgramVariable paramVar : paramVars) {
+        for (ProgramVariable paramVar : paramVars) {
             paramsOK = TB.and(paramsOK, TB.reachableValue(services, paramVar));
         }
         return paramsOK;
     }
 
 
-    protected Term generateMbyAtPreDef(ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars) {
+    protected Term generateMbyAtPreDef(ProgramVariable selfVar,
+                                       ImmutableList<ProgramVariable> paramVars) {
         final Term mbyAtPreDef;
-        if(contract.hasMby()) {
-            final Function mbyAtPreFunc
-            	= new Function(new Name(TB.newName(services, "mbyAtPre")), 
-        		       services.getTypeConverter()
-        		               .getIntegerLDT()
-        		               .targetSort());
+        if (contract.hasMby()) {
+            final Function mbyAtPreFunc =
+                    new Function(new Name(TB.newName(services, "mbyAtPre")),
+                                 services.getTypeConverter().getIntegerLDT().targetSort());
             register(mbyAtPreFunc);
             mbyAtPre = TB.func(mbyAtPreFunc);
             final Term mby = contract.getMby(selfVar, paramVars, services);
