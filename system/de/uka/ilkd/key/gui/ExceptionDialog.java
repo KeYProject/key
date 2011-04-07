@@ -72,13 +72,18 @@ public class ExceptionDialog extends JDialog {
 
 
     private JPanel createButtonPanel() {
+	JButton reloadButton = new JButton("Reload");
 	 JButton closeButton = new JButton( "Close" );
          JCheckBox detailsBox  = new JCheckBox("Show Details");
          detailsBox.setSelected(false);
 	 JPanel bPanel = new JPanel();
+	 bPanel.add(reloadButton);
 	 bPanel.add(closeButton);
 	 bPanel.add(detailsBox);
 
+	 reloadButton.setAction(Main.openMostRecentFileAction);
+	 reloadButton.addActionListener(new ActionListener(){public void actionPerformed(ActionEvent e){setVisible(false);dispose();}});
+	 
 	 ActionListener closeListener = new ActionListener() {
 		 public void actionPerformed( ActionEvent e ) {
 		     setVisible(false);
