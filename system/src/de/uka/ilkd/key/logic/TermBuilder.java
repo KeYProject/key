@@ -353,7 +353,7 @@ public final class TermBuilder {
     }
     
     
-    public Term func(Function f, Term[] s) {
+    public Term func(Function f, Term ... s) {
         return tf.createTerm(f, s, null, null);
     }
     
@@ -636,7 +636,17 @@ public final class TermBuilder {
 	    throw new TermCreationException("Not a legal lhs: " + lhs);
 	}
     }    
-    
+
+
+    public Term elementary(Services services, Term heapTerm) {
+        return elementary(services, heap(services), heapTerm);
+    }
+
+
+    public Term elementary(Services services, LocationVariable heap) {
+        return elementary(services, var(heap));
+    }
+
     
     public Term skip() {
 	return tf.createTerm(UpdateJunctor.SKIP);

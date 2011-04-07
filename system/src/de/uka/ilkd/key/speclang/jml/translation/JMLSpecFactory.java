@@ -33,6 +33,8 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 
+
+
 /**
  * A factory for creating class invariants and operation contracts
  * from textual JML specifications. This is the public interface to the 
@@ -48,6 +50,7 @@ public class JMLSpecFactory {
     //-------------------------------------------------------------------------
     //constructors
     //-------------------------------------------------------------------------
+
     public JMLSpecFactory(Services services) {
         assert services != null;
         this.services = services;
@@ -57,6 +60,8 @@ public class JMLSpecFactory {
     //-------------------------------------------------------------------------
     //internal classes
     //-------------------------------------------------------------------------
+
+
     private class ContractClauses {
 
         public Term requires;
@@ -69,19 +74,23 @@ public class JMLSpecFactory {
         public Term diverges;
         public ImmutableList<ImmutableList<Term>> saveFor;
         public ImmutableList<ImmutableList<Term>> declassify;
+        public ImmutableList<ImmutableList<Term>> declassifyVar;
     }
 
     //-------------------------------------------------------------------------
     //internal methods
     //-------------------------------------------------------------------------
+
     private String getInvName() {
         return "JML class invariant nr " + invCounter++;
     }
+
 
     private String getContractName(ProgramMethod programMethod,
                                    Behavior behavior) {
         return "JML " + behavior.toString() + "operation contract";
     }
+
 
     /**
      * Collects local variables of the passed statement that are visible for 
@@ -138,6 +147,7 @@ public class JMLSpecFactory {
         return null;
     }
 
+
     private VisibilityModifier getVisibility(
             TextualJMLConstruct textualConstruct) {
         for (String mod : textualConstruct.getMods()) {
@@ -155,6 +165,7 @@ public class JMLSpecFactory {
     /* Create variables for self, parameters, result, exception,
      * and the map for atPre-Functions
      */
+
     private ProgramVariableCollection createProgramVaribales(ProgramMethod pm) {
         ProgramVariableCollection progVar = new ProgramVariableCollection();
         progVar.selfVar = TB.selfVar(services, pm, pm.getContainerType(), false);
@@ -165,6 +176,7 @@ public class JMLSpecFactory {
         progVar.heapAtPre = TB.var(progVar.heapAtPreVar);
         return progVar;
     }
+
 
     private ContractClauses translateJMLClauses(ProgramMethod pm,
                                                 TextualJMLSpecCase textualSpecCase,
@@ -211,8 +223,13 @@ public class JMLSpecFactory {
                 translateDeclassify(pm, progVars.selfVar,
                                     progVars.paramVars,
                                     textualSpecCase.getDeclassify());
+        clauses.declassifyVar =
+                translateDeclassifyVar(pm, progVars.selfVar,
+                                       progVars.paramVars,
+                                       textualSpecCase.getDeclassifyVar());
         return clauses;
     }
+
 
     private ImmutableList<ImmutableList<Term>> translateSecureFor(
             ProgramMethod pm,
@@ -237,6 +254,7 @@ public class JMLSpecFactory {
         }
     }
 
+
     private ImmutableList<ImmutableList<Term>> translateDeclassify(
             ProgramMethod pm,
             ProgramVariable selfVar,
@@ -260,6 +278,31 @@ public class JMLSpecFactory {
         }
     }
 
+
+    private ImmutableList<ImmutableList<Term>> translateDeclassifyVar(
+            ProgramMethod pm,
+            ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars,
+            ImmutableList<PositionedString> originalDeclassifyVar)
+            throws SLTranslationException {
+        if (originalDeclassifyVar.isEmpty()) {
+            return ImmutableSLList.<ImmutableList<Term>>nil();
+        } else {
+            ImmutableList<ImmutableList<Term>> declass =
+                    ImmutableSLList.<ImmutableList<Term>>nil();
+            for (PositionedString expr : originalDeclassifyVar) {
+                ImmutableList<Term> translated =
+                        translator.translateDeclassifyVarExpression(expr,
+                                                                    pm.getContainerType(),
+                                                                    selfVar,
+                                                                    paramVars);
+                declass = declass.append(translated);
+            }
+            return declass;
+        }
+    }
+
+
     private Term translateDeverges(ProgramMethod pm,
                                    ProgramVariable selfVar,
                                    ImmutableList<ProgramVariable> paramVars,
@@ -280,6 +323,7 @@ public class JMLSpecFactory {
         return diverges;
     }
 
+
     private Term translateSignalsOnly(ProgramMethod pm,
                                       ProgramVariable excVar,
                                       Behavior originalBehavior,
@@ -298,6 +342,7 @@ public class JMLSpecFactory {
             return signalsOnly;
         }
     }
+
 
     private Term translateSignals(
             ProgramMethod pm,
@@ -327,6 +372,7 @@ public class JMLSpecFactory {
         }
     }
 
+
     private Term translateEnsures(ProgramMethod pm,
                                   ProgramVariable selfVar,
                                   ImmutableList<ProgramVariable> paramVars,
@@ -355,6 +401,7 @@ public class JMLSpecFactory {
         }
     }
 
+
     private Term translateAccessible(ProgramMethod pm,
                                      ProgramVariable selfVar,
                                      ImmutableList<ProgramVariable> paramVars,
@@ -377,6 +424,7 @@ public class JMLSpecFactory {
         return accessible;
     }
 
+
     private Term translateRequires(ProgramMethod pm,
                                    ProgramVariable selfVar,
                                    ImmutableList<ProgramVariable> paramVars,
@@ -393,6 +441,7 @@ public class JMLSpecFactory {
         }
         return requires;
     }
+
 
     private Term translateMeasuredBy(ProgramMethod pm,
                                      ProgramVariable selfVar,
@@ -418,6 +467,7 @@ public class JMLSpecFactory {
         return measuredBy;
     }
 
+
     private Term translateAssignable(ProgramMethod pm,
                                      ProgramVariable selfVar,
                                      ImmutableList<ProgramVariable> paramVars,
@@ -438,6 +488,7 @@ public class JMLSpecFactory {
         return assignable;
     }
 
+
     private String generateName(ProgramMethod pm,
                                 TextualJMLSpecCase textualSpecCase,
                                 Behavior originalBehavior) {
@@ -446,6 +497,7 @@ public class JMLSpecFactory {
                        : getContractName(pm, originalBehavior));
         return name;
     }
+
 
     private Term generatePostCondition(ProgramVariableCollection progVars,
                                        ContractClauses clauses,
@@ -460,6 +512,7 @@ public class JMLSpecFactory {
         Term post = TB.and(post1, post2);
         return post;
     }
+
 
     /**
      * Generate functional operation contracts.
@@ -511,6 +564,7 @@ public class JMLSpecFactory {
         return result;
     }
 
+
     /**
      * Generate dependency operation contract out of the JML accessible clause.
      * 
@@ -538,6 +592,7 @@ public class JMLSpecFactory {
         return result;
     }
 
+
     /**
      * Generate non-interference operation contract out of the JML
      * secure_for and declassify clauses.
@@ -560,7 +615,7 @@ public class JMLSpecFactory {
                 "Non-interference contract", pm.getContainerType(), pm,
                 clauses.requires, clauses.measuredBy,
                 clauses.accessible, clauses.assignable, clauses.saveFor,
-                clauses.declassify, progVars.selfVar,
+                clauses.declassify, clauses.declassifyVar, progVars.selfVar,
                 progVars.paramVars);
         result = result.add(ifContract);
 
@@ -570,6 +625,7 @@ public class JMLSpecFactory {
     //-------------------------------------------------------------------------
     //public interface
     //-------------------------------------------------------------------------
+
     public ClassInvariant createJMLClassInvariant(KeYJavaType kjt,
                                                   VisibilityModifier visibility,
                                                   PositionedString originalInv)
@@ -598,6 +654,7 @@ public class JMLSpecFactory {
                                       selfVar);
     }
 
+
     public ClassInvariant createJMLClassInvariant(
             KeYJavaType kjt,
             TextualJMLClassInv textualInv)
@@ -606,6 +663,7 @@ public class JMLSpecFactory {
                                        getVisibility(textualInv),
                                        textualInv.getInv());
     }
+
 
     public ClassAxiom createJMLRepresents(KeYJavaType kjt,
                                           VisibilityModifier visibility,
@@ -634,6 +692,7 @@ public class JMLSpecFactory {
                                    selfVar);
     }
 
+
     public ClassAxiom createJMLRepresents(KeYJavaType kjt,
                                           TextualJMLRepresents textualRep)
             throws SLTranslationException {
@@ -642,6 +701,7 @@ public class JMLSpecFactory {
                                    textualRep.getRepresents(),
                                    textualRep.getMods().contains("static"));
     }
+
 
     public Contract createJMLDependencyContract(KeYJavaType kjt,
                                                 TextualJMLDepends textualDep)
@@ -674,6 +734,7 @@ public class JMLSpecFactory {
                                           paramVars);
     }
 
+
     /**
      * Creates operation contracts out of the passed JML specification.
      */
@@ -705,6 +766,7 @@ public class JMLSpecFactory {
 
         return result;
     }
+
 
     public LoopInvariant createJMLLoopInvariant(
             ProgramMethod pm,
@@ -798,6 +860,7 @@ public class JMLSpecFactory {
                                      selfTerm,
                                      heapAtPre);
     }
+
 
     public LoopInvariant createJMLLoopInvariant(
             ProgramMethod pm,

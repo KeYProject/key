@@ -527,6 +527,7 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 	|   ps=diverges_clause       { sc.addDiverges(ps); }
         |   ps=secure_for_clause     { sc.addSecureFor(ps); }
         |   ps=declassify_clause     { sc.addDeclassify(ps); }
+        |   ps=declassify_var_clause { sc.addDeclassifyVar(ps); }
 	|   ps=measured_by_clause    { sc.addMeasuredBy(ps); }
 	|   ps=name_clause           { sc.addName(ps);}
 	|   captures_clause 
@@ -690,6 +691,20 @@ declassify_clause
 declassify_keyword
 :
         DECLASSIFY
+;
+
+
+declassify_var_clause
+	returns [PositionedString result = null]
+	throws SLTranslationException
+:
+    declassify_var_keyword result=expression
+;
+
+
+declassify_var_keyword
+:
+        DECLASSIFY_VAR
 ;
 
 

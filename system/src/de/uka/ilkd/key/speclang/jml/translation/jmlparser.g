@@ -268,6 +268,21 @@ options {
 	return result;
     }
 
+
+    public ImmutableList<Term> parseDeclassifyVar() throws SLTranslationException {
+    	ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+
+	this.currentlyParsing = true;
+	try {
+	    result = declassifyvarclause();
+	} catch (antlr.ANTLRException e) {
+	    throw excManager.convertException(e);
+	}
+	this.currentlyParsing = false;
+
+	return result;
+    }
+
     
     public Pair<ObserverFunction,Term> parseRepresents() throws SLTranslationException {
     	Pair<ObserverFunction,Term> result = null;
@@ -574,6 +589,21 @@ declassifyclause returns  [ImmutableList<Term> result = ImmutableSLList.<Term>ni
 }
 :
     declass = predicate { result = result.append(declass); }
+    FROM frompart = storereflist { result = result.append(frompart);}
+    TO topart = storereflist { result = result.append(topart); }
+    (IF ifpart = predicate { result = result.append(ifpart); })*
+    ;
+
+
+declassifyvarclause returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException
+{
+    SLExpression declass = null;
+    Term frompart = null;
+    Term topart = null;
+    Term ifpart = null;
+}
+:
+    declass = expression { result = result.append(declass.getTerm()); }
     FROM frompart = storereflist { result = result.append(frompart);}
     TO topart = storereflist { result = result.append(topart); }
     (IF ifpart = predicate { result = result.append(ifpart); })*

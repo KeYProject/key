@@ -42,6 +42,7 @@ public final class InformationFlowContractImpl
     private final Term originalMod;
     private final ImmutableList<ImmutableList<Term>> originalSecureFor;
     private final ImmutableList<ImmutableList<Term>> originalDeclassify;
+    private final ImmutableList<ImmutableList<Term>> originalDeclassifyVar;
     private final ProgramVariable originalSelfVar;
     private final ImmutableList<ProgramVariable> originalParamVars;
     private final int id;
@@ -60,6 +61,7 @@ public final class InformationFlowContractImpl
                                         Term mod,
                                         ImmutableList<ImmutableList<Term>> saveFor,
                                         ImmutableList<ImmutableList<Term>> declassify,
+                                        ImmutableList<ImmutableList<Term>> declassifyVar,
                                         ProgramVariable selfVar,
                                         ImmutableList<ProgramVariable> paramVars,
                                         int id) {
@@ -69,8 +71,9 @@ public final class InformationFlowContractImpl
         assert pre != null;
 //	assert dep != null;
         assert mod != null;
-//	assert saveFor != null;
-//	assert declassify != null;
+        assert saveFor != null;
+        assert declassify != null;
+        assert declassifyVar != null;
         assert (selfVar == null) == pm.isStatic();
         assert paramVars != null;
         assert paramVars.size() == pm.arity() - (pm.isStatic() ? 1 : 2);
@@ -84,6 +87,7 @@ public final class InformationFlowContractImpl
         this.originalMod = mod;
         this.originalSecureFor = saveFor;
         this.originalDeclassify = declassify;
+        this.originalDeclassifyVar = declassifyVar;
         this.originalSelfVar = selfVar;
         this.originalParamVars = paramVars;
         this.id = id;
@@ -99,10 +103,11 @@ public final class InformationFlowContractImpl
                                        Term mod,
                                        ImmutableList<ImmutableList<Term>> secureFor,
                                        ImmutableList<ImmutableList<Term>> declassify,
+                                       ImmutableList<ImmutableList<Term>> declassifyVar,
                                        ProgramVariable selfVar,
                                        ImmutableList<ProgramVariable> paramVars) {
         this(baseName, null, kjt, pm, pre, mby, dep, mod, secureFor,
-             declassify, selfVar, paramVars, INVALID_ID);
+             declassify, declassifyVar, selfVar, paramVars, INVALID_ID);
     }
 
     //-------------------------------------------------------------------------
@@ -308,12 +313,42 @@ public final class InformationFlowContractImpl
 
 
     @Override
+    public ImmutableList<ImmutableList<Term>> getDeclassifyVar(
+            ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars,
+            Services services) {
+        assert (selfVar == null) == (originalSelfVar == null);
+        assert paramVars != null;
+        assert paramVars.size() == originalParamVars.size();
+        assert services != null;
+        return getDeclassifyVar(TB.heap(services), TB.var(selfVar),
+                             TB.var(paramVars), services);
+    }
+
+
+    @Override
+    public ImmutableList<ImmutableList<Term>> getDeclassifyVar(Term heapTerm,
+                                                            Term selfTerm,
+                                                            ImmutableList<Term> paramTerms,
+                                                            Services services) {
+        assert heapTerm != null;
+        assert (selfTerm == null) == (originalSelfVar == null);
+        assert paramTerms != null;
+        assert paramTerms.size() == originalParamVars.size();
+        assert services != null;
+        return replace(originalDeclassifyVar, heapTerm, selfTerm, paramTerms,
+                       services);
+    }
+
+
+    @Override
     public InformationFlowContract setID(int newId) {
         return new InformationFlowContractImpl(baseName, null, kjt, pm,
                                                originalPre, originalMby,
                                                originalDep, originalMod,
                                                originalSecureFor,
                                                originalDeclassify,
+                                               originalDeclassifyVar,
                                                originalSelfVar,
                                                originalParamVars, newId);
     }
@@ -329,6 +364,7 @@ public final class InformationFlowContractImpl
                                                originalDep, originalMod,
                                                originalSecureFor,
                                                originalDeclassify,
+                                               originalDeclassifyVar,
                                                originalSelfVar,
                                                originalParamVars, id);
     }

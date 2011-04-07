@@ -47,6 +47,7 @@ tokens {
     CONSTRAINT			= "constraint";
     CONSTRAINT_RED		= "constraint_redundantly";
     DECLASSIFY                  = "declassify";
+    DECLASSIFY_VAR              = "declassify_var";
     DECREASES  			= "decreases";
     DECREASES_REDUNDANTLY  	= "decreases_redundantly";
     DECREASING  		= "decreasing";

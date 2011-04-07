@@ -48,6 +48,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     	    = ImmutableSLList.<PositionedString>nil();
     private ImmutableList<PositionedString> declassify
     	    = ImmutableSLList.<PositionedString>nil();
+    private ImmutableList<PositionedString> declassifyVar
+    	    = ImmutableSLList.<PositionedString>nil();
     private PositionedString name = new PositionedString("");
 
     
@@ -134,7 +136,12 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     public void addDeclassify(PositionedString ps) {
         declassify = declassify.append(ps);
     }
-    
+
+
+    public void addDeclassifyVar(PositionedString ps) {
+        declassifyVar = declassifyVar.append(ps);
+    }
+
 
     public Behavior getBehavior() {
         return behavior;
@@ -198,6 +205,10 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return declassify;
     }
 
+    public ImmutableList<PositionedString> getDeclassifyVar() {
+        return declassifyVar;
+    }
+
     
     @Override
     public String toString() {
@@ -245,6 +256,10 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         while(it.hasNext()) {
             sb.append("declassify: ").append(it.next()).append("\n");
         }
+        it = declassifyVar.iterator();
+        while(it.hasNext()) {
+            sb.append("declassifyVar: ").append(it.next()).append("\n");
+        }
         
         return sb.toString();
     }
@@ -267,7 +282,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                && diverges.equals(sc.diverges)
                && depends.equals(sc.depends)
                && secureFor.equals(sc.secureFor)
-               && declassify.equals(sc.declassify);
+               && declassify.equals(sc.declassify)
+               && declassifyVar.equals(sc.declassifyVar);
     }
     
     
@@ -284,6 +300,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                + diverges.hashCode()
                + depends.hashCode()
                + secureFor.hashCode()
-               + declassify.hashCode();
+               + declassify.hashCode()
+               + declassifyVar.hashCode();
     }
 }

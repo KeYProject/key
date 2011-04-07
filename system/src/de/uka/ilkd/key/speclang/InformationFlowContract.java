@@ -16,6 +16,8 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
+
+
 /**
  * A contract about the dependencies of an observer symbol, consisting of 
  * a precondition, a depends clause, and a measured-by clause.
@@ -25,10 +27,12 @@ public interface InformationFlowContract extends OperationContract {
     @Override
     public InformationFlowContract setID(int id);
 
+
     @Override
     public InformationFlowContract setTarget(KeYJavaType newKJT,
                                              ObserverFunction newTarget,
                                              Services services);
+
 
     /**
      * Returns the dependency set of the contract.
@@ -36,6 +40,7 @@ public interface InformationFlowContract extends OperationContract {
     public Term getDep(ProgramVariable selfVar,
                        ImmutableList<ProgramVariable> paramVars,
                        Services services);
+
 
     /**
      * Returns the dependency set of the contract.
@@ -45,6 +50,7 @@ public interface InformationFlowContract extends OperationContract {
                        ImmutableList<Term> paramTerms,
                        Services services);
 
+
     /**
      * Returns the parameters dependency sets of the contract.
      */
@@ -52,6 +58,7 @@ public interface InformationFlowContract extends OperationContract {
             ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars,
             Services services);
+
 
     /**
      * Returns the parameters dependency sets of the contract.
@@ -62,18 +69,39 @@ public interface InformationFlowContract extends OperationContract {
             ImmutableList<Term> paramTerms,
             Services services);
 
+
     /**
-     * Returns the declassification formula.
+     * Returns the declassification formulas.
      */
     public ImmutableList<ImmutableList<Term>> getDeclassify(
             ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars,
             Services services);
 
+
     /**
-     * Returns the declassification formula.
+     * Returns the declassification formulas.
      */
     public ImmutableList<ImmutableList<Term>> getDeclassify(
+            Term heapTerm,
+            Term selfTerm,
+            ImmutableList<Term> paramTerms,
+            Services services);
+
+
+    /**
+     * Returns the variable declassification formulas.
+     */
+    public ImmutableList<ImmutableList<Term>> getDeclassifyVar(
+            ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars,
+            Services services);
+
+
+    /**
+     * Returns the variable declassification formulas.
+     */
+    public ImmutableList<ImmutableList<Term>> getDeclassifyVar(
             Term heapTerm,
             Term selfTerm,
             ImmutableList<Term> paramTerms,

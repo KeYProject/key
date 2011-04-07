@@ -28,6 +28,7 @@ import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
@@ -57,23 +58,21 @@ public final class InformationFlowContractPO extends AbstOpContractPO {
      * Builds the "general assumption". 
      * @throws ParserException 
      */
-    private Term buildFreePre(
-            ProofObligationVariables vs,
-            KeYJavaType selfKJT,
-            Term updateHeapAtPre1,
-            Term updateHeapAtPre2)
+    private Term buildFreePre(ProofObligationVariables vs,
+                              KeYJavaType selfKJT)
             throws ProofInputException, ParserException {
 
+        final Term updateHeapAtPre1 = TB.elementary(services, vs.heapAtPreVar1);
+        final Term updateHeapAtPre2 = TB.elementary(services, vs.heapAtPreVar2);
         final Term simpleFreePre =
-                TB.parseTerm(
-                "  wellFormed(heapAtPre1)"
-                + "& wellFormed(heapAtPre2)"
-                + "& self != null"
-                + "& { heap := heapAtPre1 }"
-                + "  self.<created> = TRUE"
-                + "& { heap := heapAtPre2 }"
-                + "  self.<created> = TRUE",
-                services);
+                TB.parseTerm("  wellFormed(heapAtPre1)"
+                             + "& wellFormed(heapAtPre2)"
+                             + "& self != null"
+                             + "& { heap := heapAtPre1 }"
+                             + "  self.<created> = TRUE"
+                             + "& { heap := heapAtPre2 }"
+                             + "  self.<created> = TRUE",
+                             services);
 
         //"MyClass::exactInstance(self) = TRUE"
         final Term selfExactType = generateSelfExactType(vs.selfVar, selfKJT);
@@ -88,22 +87,19 @@ public final class InformationFlowContractPO extends AbstOpContractPO {
 
         //initial value of measured_by clause
         final Term mbyAtPreDef1 =
-                TB.apply(
-                updateHeapAtPre1,
-                generateMbyAtPreDef(vs.selfVar, vs.paramVars1));
+                TB.apply(updateHeapAtPre1,
+                         generateMbyAtPreDef(vs.selfVar, vs.paramVars1));
         final Term mbyAtPreDef2 =
-                TB.apply(
-                updateHeapAtPre2,
-                generateMbyAtPreDef(vs.selfVar, vs.paramVars2));
+                TB.apply(updateHeapAtPre2,
+                         generateMbyAtPreDef(vs.selfVar, vs.paramVars2));
 
-        return TB.and(
-                simpleFreePre,
-                TB.apply(updateHeapAtPre1, selfExactType),
-                TB.apply(updateHeapAtPre2, selfExactType),
-                paramsOK1,
-                paramsOK2,
-                mbyAtPreDef1,
-                mbyAtPreDef2);
+        return TB.and(simpleFreePre,
+                      TB.apply(updateHeapAtPre1, selfExactType),
+                      TB.apply(updateHeapAtPre2, selfExactType),
+                      paramsOK1,
+                      paramsOK2,
+                      mbyAtPreDef1,
+                      mbyAtPreDef2);
     }
 
 
@@ -111,15 +107,22 @@ public final class InformationFlowContractPO extends AbstOpContractPO {
             throws ParserException {
         final ImmutableList<ImmutableList<Term>> secureFors =
                 getContract().getSecureFors(vs.selfVar, vs.paramVars1, services);
-        ImmutableList<Term> inputOutputRelations =
-                ImmutableSLList.<Term>nil();
+        final ImmutableList<ImmutableList<Term>> declassClause =
+                getContract().getDeclassify(vs.selfVar, vs.paramVars1, services);
+        final ImmutableList<ImmutableList<Term>> declassVarClause =
+                getContract().getDeclassifyVar(vs.selfVar, vs.paramVars1,
+                                               services);
+
+        ImmutableList<Term> inputOutputRelations = ImmutableSLList.<Term>nil();
         for (ImmutableList<Term> secureFor : secureFors) {
             assert secureFor.size() == vs.paramVars1.size() + 1;
             final Term resultLocSet = secureFor.head();
             Term inputOutputRelation =
-                    buildInputOutputRelation(resultLocSet, secureFor, vs);
-            inputOutputRelations = inputOutputRelations.append(
-                    inputOutputRelation);
+                    buildInputOutputRelation(resultLocSet, secureFor,
+                                             declassClause, declassVarClause,
+                                             vs);
+            inputOutputRelations =
+                    inputOutputRelations.append(inputOutputRelation);
         }
         return TB.and(inputOutputRelations);
     }
@@ -127,17 +130,28 @@ public final class InformationFlowContractPO extends AbstOpContractPO {
 
     private Term buildInputOutputRelation(Term referenceLocSet,
                                           ImmutableList<Term> secureFor,
+                                          ImmutableList<ImmutableList<Term>> declassClause,
+                                          ImmutableList<ImmutableList<Term>> declassVarClause,
                                           ProofObligationVariables vs)
             throws ParserException {
         // LocSets of the parameters without the result LocSet
         final ImmutableList<Term> paramLocSets = secureFor.tail();
 
-        final ImmutableList<Term> inputRelations =
+        final ImmutableList<Term> inputEqRelations =
                 buildEqualsRelations(referenceLocSet, paramLocSets,
                                      vs.paramVars1.iterator(),
                                      vs.paramVars2.iterator(),
                                      TB.var(vs.heapAtPreVar1),
                                      TB.var(vs.heapAtPreVar2));
+        final ImmutableList<Term> declassifyRelations =
+                buildDeclassifyRelations(vs, declassClause);
+        final ImmutableList<Term> declassifyVarRelations =
+                buildDeclassifyVarRelations(vs, declassVarClause);
+
+        ImmutableList<Term> inputRelations = inputEqRelations;
+        inputRelations = inputRelations.append(declassifyRelations);
+        inputRelations = inputRelations.append(declassifyVarRelations);
+
         final ImmutableList<Term> outputRelations =
                 buildEqualsRelations(referenceLocSet, secureFor,
                                      vs.paramVars1.prepend(vs.resultVar1).iterator(),
@@ -194,6 +208,85 @@ public final class InformationFlowContractPO extends AbstOpContractPO {
                             + " -> equals(" + heap1 + ", " + param1 + ", "
                             + "           " + heap2 + ", " + param2 + ")",
                             services);
+    }
+
+
+    private ImmutableList<Term> buildDeclassifyRelations(
+            ProofObligationVariables vs,
+            ImmutableList<ImmutableList<Term>> declassClause)
+            throws ParserException {
+        ImmutableList<Term> declassifications = ImmutableSLList.<Term>nil();
+        for (ImmutableList<Term> declassification : declassClause) {
+            declassifications =
+                    declassifications.append(
+                    buildDeclassifyRelation(vs, declassification));
+        }
+        return declassifications;
+    }
+
+
+    private Term buildDeclassifyRelation(ProofObligationVariables vs,
+                                         ImmutableList<Term> declassClause)
+            throws ParserException {
+        final Term declassification = declassClause.head();
+        final Term from = declassClause.tail().head();
+        final Term to = declassClause.tail().tail().head();
+        Term ifTerm = null;
+        if (!declassClause.tail().tail().tail().isEmpty()) {
+            ifTerm = declassClause.tail().tail().tail().head();
+        }
+
+        final Term eqPart1 =
+                TB.apply(TB.elementary(services, vs.heapAtPreVar1),
+                         declassification);
+        final Term eqPart2 =
+                TB.apply(TB.elementary(services, vs.heapAtPreVar2),
+                         declassification);
+        Term declassTerm =
+                TB.equals(eqPart1, eqPart2);
+
+        if (ifTerm != null) {
+            declassTerm = TB.imp(ifTerm, declassTerm);
+        }
+        return declassTerm;
+    }
+
+
+    private ImmutableList<Term> buildDeclassifyVarRelations(
+            ProofObligationVariables vs,
+            ImmutableList<ImmutableList<Term>> declassVarClauses)
+            throws ParserException {
+        ImmutableList<Term> declassifications = ImmutableSLList.<Term>nil();
+        for (ImmutableList<Term> declassVarClause : declassVarClauses) {
+            declassifications =
+                    declassifications.append(
+                    buildDeclassifyVarRelation(vs, declassVarClause));
+        }
+        return declassifications;
+    }
+
+
+    private Term buildDeclassifyVarRelation(ProofObligationVariables vs,
+                                            ImmutableList<Term> declassVarClause)
+            throws ParserException {
+        final Term declassVar = declassVarClause.head();
+        final Term from = declassVarClause.tail().head();
+        final Term to = declassVarClause.tail().tail().head();
+        Term ifTerm = null;
+        if (!declassVarClause.tail().tail().tail().isEmpty()) {
+            ifTerm = declassVarClause.tail().tail().tail().head();
+        }
+
+        Namespace funcNS = services.getNamespaces().functions();
+        Function eq = (Function)  funcNS.lookup(new Name("equals"));
+        Term declassTerm =
+                TB.func(eq, TB.var(vs.heapAtPostVar1), declassVar,
+                        TB.var(vs.heapAtPreVar2), declassVar);
+
+        if (ifTerm != null) {
+            declassTerm = TB.imp(ifTerm, declassTerm);
+        }
+        return declassTerm;
     }
 
 
@@ -265,8 +358,8 @@ public final class InformationFlowContractPO extends AbstOpContractPO {
         final Term programTerm = TB.prog(Modality.BOX, jb, postTerm);
 
         //create update
-        Term update = TB.elementary(services, TB.heap(services), TB.var(
-                heapAtPreVar));
+//        Term update = TB.elementary(services, TB.heap(services), TB.var(
+//                heapAtPreVar));
 //        Iterator<LocationVariable> formalParamIt = formalParamVars.iterator();
 //        Iterator<ProgramVariable> paramIt        = paramVars.iterator();
 //        while(formalParamIt.hasNext()) {
@@ -276,7 +369,7 @@ public final class InformationFlowContractPO extends AbstOpContractPO {
 //            update = TB.parallel(update, paramUpdate);
 //        }
 
-        return TB.apply(update, programTerm);
+        return TB.apply(TB.elementary(services, heapAtPreVar), programTerm);
     }
 
     //-------------------------------------------------------------------------
@@ -290,35 +383,15 @@ public final class InformationFlowContractPO extends AbstOpContractPO {
             final ProgramMethod pm = getContract().getTarget();
             final ProofObligationVariables vs = new ProofObligationVariables(pm);
 
-            // often used terms
-            final Term updateHeapAtPre1 =
-                    TB.elementary(services,
-                                  TB.heap(services),
-                                  TB.var(vs.heapAtPreVar1));
-            final Term updateHeapAtPre2 =
-                    TB.elementary(services,
-                                  TB.heap(services),
-                                  TB.var(vs.heapAtPreVar2));
-            final Term updateHeapAtPost1 =
-                    TB.elementary(services,
-                                  TB.heap(services),
-                                  TB.var(vs.heapAtPostVar1));
-            final Term updateHeapAtPost2 =
-                    TB.elementary(services,
-                                  TB.heap(services),
-                                  TB.var(vs.heapAtPostVar2));
-
             // build precondition
-            final Term freePre =
-                    buildFreePre(vs, contract.getKJT(), updateHeapAtPre1,
-                                 updateHeapAtPre2);
+            final Term freePre = buildFreePre(vs, contract.getKJT());
             final Term pre1 =
-                    TB.apply(updateHeapAtPre1,
+                    TB.apply(TB.elementary(services, vs.heapAtPreVar1),
                              contract.getPre(vs.selfVar,
                                              vs.paramVars1,
                                              services));
             final Term pre2 =
-                    TB.apply(updateHeapAtPre2,
+                    TB.apply(TB.elementary(services, vs.heapAtPreVar2),
                              contract.getPre(vs.selfVar,
                                              vs.paramVars2,
                                              services));
@@ -352,7 +425,9 @@ public final class InformationFlowContractPO extends AbstOpContractPO {
                     getContract().getMod(vs.selfVar, vs.paramVars1, services);
             final Term frame1Tail =
                     TB.frame(services, heapReplaceMap1, modContract1);
-            final Term frame1 = TB.apply(updateHeapAtPost1, frame1Tail);
+            final Term frame1 =
+                    TB.apply(TB.elementary(services, vs.heapAtPostVar1),
+                             frame1Tail);
 
             final LinkedHashMap<Term, Term> heapReplaceMap2 =
                     new LinkedHashMap<Term, Term>(TB.heap(services),
@@ -361,7 +436,9 @@ public final class InformationFlowContractPO extends AbstOpContractPO {
                     getContract().getMod(vs.selfVar, vs.paramVars2, services);
             final Term frame2Tail =
                     TB.frame(services, heapReplaceMap2, modContract2);
-            final Term frame2 = TB.apply(updateHeapAtPost2, frame2Tail);
+            final Term frame2 =
+                    TB.apply(TB.elementary(services, vs.heapAtPostVar2),
+                             frame2Tail);
 
             final Term post = TB.and(inOutRelations, frame1, frame2);
 
