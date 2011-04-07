@@ -568,15 +568,15 @@ secureforarglist returns  [ImmutableList<Term> result = ImmutableSLList.<Term>ni
 declassifyclause returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException
 {
     Term declass = null;
-    Term from = null;
-    Term to = null;
-    Term if = null;
+    Term frompart = null;
+    Term topart = null;
+    Term ifpart = null;
 }
 :
-    declass = predicate { result = result.append(declass) }
-    FROM from = storereflist { result = result.append(from)}
-    TO to = storereflist { result = result.append(to)}
-    (IF if = predicate { result = result.append(if) } )?
+    declass = predicate { result = result.append(declass); }
+    FROM frompart = storereflist { result = result.append(frompart);}
+    TO topart = storereflist { result = result.append(topart); }
+    (IF ifpart = predicate { result = result.append(ifpart); })*
     ;
 
 

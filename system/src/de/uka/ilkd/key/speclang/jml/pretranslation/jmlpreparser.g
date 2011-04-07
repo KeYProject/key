@@ -687,7 +687,7 @@ declassify_clause
 ;
 
 
-secure_for_keyword
+declassify_keyword
 :
         DECLASSIFY
 ;
