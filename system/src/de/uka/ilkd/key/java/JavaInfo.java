@@ -24,6 +24,8 @@ import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.DoubleLDT;
 import de.uka.ilkd.key.ldt.FloatLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
+import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -401,9 +403,11 @@ public final class JavaInfo {
 	    } else if(type == PrimitiveType.JAVA_DOUBLE) {
 		sort = (Sort) sorts.lookup(DoubleLDT.NAME);
 	    } else if(type == PrimitiveType.JAVA_LOCSET) {
-		sort = services.getTypeConverter().getLocSetLDT().targetSort();
+                sort = (Sort) sorts.lookup(LocSetLDT.NAME);
+//		sort = services.getTypeConverter().getLocSetLDT().targetSort();
 	    } else if(type == PrimitiveType.JAVA_SEQ) {
-		sort = services.getTypeConverter().getSeqLDT().targetSort();
+                sort = (Sort) sorts.lookup(SeqLDT.NAME);
+//		sort = services.getTypeConverter().getSeqLDT().targetSort();
 	    } else {
 		assert false : "unexpected primitive type: " + type;
 	    	sort = null;

@@ -59,7 +59,7 @@ public class TestClashFreeSubst extends TestCase {
 	services = new Services();
 	nss = services.getNamespaces();
 	
-	String sorts = "\\sorts{boolean;int;}";
+	String sorts = "\\sorts{boolean;int;LocSet;}";
 	KeYParser basicSortsParser = new KeYParser(ParserMode.DECLARATION, new KeYLexer(new StringReader(sorts),null),
 			      "No file. Call of parser from logic/TestClashFreeSubst.java",
 			      services, nss);

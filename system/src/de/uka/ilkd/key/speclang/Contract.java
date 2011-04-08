@@ -25,7 +25,7 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
  */
 public interface Contract extends SpecificationElement {
     
-    public static final int INVALID_ID = -1;    
+    public static final int INVALID_ID = Integer.MIN_VALUE;
         
     
     /**
