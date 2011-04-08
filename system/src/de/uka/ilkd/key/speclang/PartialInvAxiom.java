@@ -188,4 +188,10 @@ public final class PartialInvAxiom implements ClassAxiom {
     public String toString() {
 	return inv.toString();
     }
+
+
+    @Override
+    public String getDisplayName() {
+	return getName();
+    }
 }

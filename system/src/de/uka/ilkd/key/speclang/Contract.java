@@ -27,10 +27,6 @@ public interface Contract extends SpecificationElement {
     
     public static final int INVALID_ID = -1;    
         
-    /**
-     * Returns the name of the contract.
-     */
-    public String getName();
     
     /**
      * Returns the id number of the contract. If a contract has instances for
@@ -38,11 +34,6 @@ public interface Contract extends SpecificationElement {
      * The id is either non-negative or equal to INVALID_ID.
      */
     public int id();
-    
-    /**
-     * Returns the KeYJavaType to which the contract belongs.
-     */
-    public KeYJavaType getKJT();    
     
     /**
      * Returns the contracted function symbol.

@@ -7,6 +7,7 @@
 // See LICENSE.TXT for details.
 //
 //
+
 package de.uka.ilkd.key.speclang.jml.translation;
 
 import de.uka.ilkd.key.collection.*;
@@ -43,10 +44,13 @@ import de.uka.ilkd.key.util.Triple;
 public class JMLSpecFactory {
 
     private static final TermBuilder TB = TermBuilder.DF;
+    
     private final Services services;
     private final JMLTranslator translator;
+    
     private int invCounter;
 
+    
     //-------------------------------------------------------------------------
     //constructors
     //-------------------------------------------------------------------------
@@ -85,6 +89,10 @@ public class JMLSpecFactory {
         return "JML class invariant nr " + invCounter++;
     }
 
+    private String getInicName(){
+	return "JML initially clause";
+    }
+    
 
     private String getContractName(ProgramMethod programMethod,
                                    Behavior behavior) {
@@ -126,8 +134,8 @@ public class JMLSpecFactory {
                     result = result.prepend(pv);
                 }
             } else if (s instanceof StatementContainer) {
-                ImmutableList<ProgramVariable> lpv = collectLocalVariables(
-                        (StatementContainer) s, loop);
+                ImmutableList< ProgramVariable > lpv =
+                    collectLocalVariables((StatementContainer) s, loop);
                 if (lpv != null) {
                     result = result.prepend(lpv);
                     return result;
@@ -135,8 +143,8 @@ public class JMLSpecFactory {
             } else if (s instanceof BranchStatement) {
                 BranchStatement bs = (BranchStatement) s;
                 for (int j = 0, n = bs.getBranchCount(); j < n; j++) {
-                    ImmutableList<ProgramVariable> lpv = collectLocalVariables(bs.getBranchAt(
-                            j), loop);
+                    ImmutableList< ProgramVariable > lpv =
+                        collectLocalVariables(bs.getBranchAt(j), loop);
                     if (lpv != null) {
                         result = result.prepend(lpv);
                         return result;
@@ -664,6 +672,40 @@ public class JMLSpecFactory {
                                        textualInv.getInv());
     }
 
+    public InitiallyClause createJMLInitiallyClause(KeYJavaType kjt, VisibilityModifier visibility, PositionedString original) throws SLTranslationException{
+	assert kjt != null;
+        assert original != null;
+        
+        //create variable for self
+        ProgramVariable selfVar = TB.selfVar(services, kjt, false);
+        
+        //translate expression
+        Term inv = translator.translateExpression(original,
+        					  kjt,
+        					  selfVar,
+        					  null,
+        					  null,
+        					  null,
+        					  null);        
+        //create invariant
+        String name = getInicName();
+        InitiallyClauseImpl res = new InitiallyClauseImpl(name,
+                                      name,
+                                      kjt, 
+                                      visibility,
+                                      inv,
+                                      selfVar,original);
+        res.setSpecFactory(this,services);
+        return res;
+        
+    }
+    
+    public InitiallyClause createJMLInitiallyClause(KeYJavaType kjt, TextualJMLInitially textualInv) throws SLTranslationException {
+        return createJMLInitiallyClause(kjt,
+	       getVisibility(textualInv),
+	       textualInv.getInv());
+    }
+    
 
     public ClassAxiom createJMLRepresents(KeYJavaType kjt,
                                           VisibilityModifier visibility,
@@ -674,8 +716,8 @@ public class JMLSpecFactory {
         assert originalRep != null;
 
         //create variable for self
-        final ProgramVariable selfVar = isStatic ? null : TB.selfVar(services,
-                                                                     kjt, false);
+        final ProgramVariable selfVar =
+        	isStatic ? null : TB.selfVar(services, kjt, false);
 
         //translate expression
         final Pair<ObserverFunction, Term> rep =
@@ -705,8 +747,8 @@ public class JMLSpecFactory {
 
     public Contract createJMLDependencyContract(KeYJavaType kjt,
                                                 TextualJMLDepends textualDep)
+                                                PositionedString originalDep) 
             throws SLTranslationException {
-        PositionedString originalDep = textualDep.getDepends();
         assert kjt != null;
         assert originalDep != null;
 
@@ -721,9 +763,8 @@ public class JMLSpecFactory {
         assert dep.first.arity() <= 2;
 
         //create dependency contract
-        final ImmutableList<ProgramVariable> paramVars = TB.paramVars(services,
-                                                                      dep.first,
-                                                                      false);
+        final ImmutableList<ProgramVariable> paramVars =
+        	TB.paramVars(services, dep.first, false);        
         return new DependencyContractImpl("JML depends clause",
                                           kjt,
                                           dep.first,
@@ -735,6 +776,13 @@ public class JMLSpecFactory {
     }
 
 
+    public Contract createJMLDependencyContract(KeYJavaType kjt, 
+	   				        TextualJMLDepends textualDep)
+    	throws SLTranslationException {
+	return createJMLDependencyContract(kjt, textualDep.getDepends());
+    }
+    
+    
     /**
      * Creates operation contracts out of the passed JML specification.
      */
@@ -783,8 +831,8 @@ public class JMLSpecFactory {
         //create variables for self, parameters, other relevant local variables 
         //(disguised as parameters to the translator) and the map for 
         //atPre-Functions
-        ProgramVariable selfVar = TB.selfVar(services, pm, pm.getContainerType(),
-                                             false);
+        ProgramVariable selfVar =
+                 TB.selfVar(services, pm, pm.getContainerType(), false);
         ImmutableList<ProgramVariable> paramVars =
                 ImmutableSLList.<ProgramVariable>nil();
         int numParams = pm.getParameterDeclarationCount();
@@ -795,8 +843,8 @@ public class JMLSpecFactory {
                     (ProgramVariable) pd.getVariableSpecification().getProgramVariable());
         }
 
-        ImmutableList<ProgramVariable> localVars = collectLocalVariables(
-                pm.getBody(), loop);
+        ImmutableList<ProgramVariable> localVars =
+            collectLocalVariables(pm.getBody(), loop);        
         paramVars = paramVars.append(localVars);
         Term heapAtPre = TB.var(TB.heapAtPreVar(services, "heapAtPre", false));
 

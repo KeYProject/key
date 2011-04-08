@@ -12,8 +12,6 @@ package de.uka.ilkd.key.speclang;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.Taclet;
@@ -23,33 +21,19 @@ import de.uka.ilkd.key.util.Pair;
 /**
  * An axiom originating from a (JML) specification, belonging to a particular
  * class, and constraining a particular observer symbol. A class axiom always
- * has an associated visibility. Te visibility determines in which proofs the 
+ * has an associated visibility. The visibility determines in which proofs the 
  * axiom is available, in accordance with the visibility rules of Java. If 
  * visible, it is made available not as a formula, but as one or many taclets 
  * (for performance reasons).
  */
 public interface ClassAxiom extends SpecificationElement {
         
-    /**
-     * Returns the name of the axiom
-     */
-    public String getName();
     
     /**
      * Returns the axiomatised function symbol. 
      */
     public ObserverFunction getTarget();
-    
-    /**
-     * Returns the KeYJavaType representing the class/interface to which the 
-     * axiom belongs.
-     */
-    public KeYJavaType getKJT();
-    
-    /**
-     * Returns the visibility of the invariant (null for default visibility)
-     */    
-    public VisibilityModifier getVisibility();
+ 
     
     /**
      * Returns the pairs (kjt, obs) for which there is an occurrence of

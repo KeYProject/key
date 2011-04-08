@@ -41,7 +41,7 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationException;
  * RecodeR transformation that parses JML comments, and attaches code-like
  * specifications (ghost fields, set statements, model methods) directly to the 
  * RecodeR AST. Note that internally, this class is highly similar to the class 
- * jml.JMLTransformer; if you change one of these classes, you probably need 
+ * speclang.jml.SpecExtractor; if you change one of these classes, you probably need 
  * to change the other as well.
  */
 public final class JMLTransformer extends RecoderModelTransformer {

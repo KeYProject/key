@@ -44,6 +44,7 @@ import de.uka.ilkd.key.rule.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.*;
+import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 
@@ -67,7 +68,7 @@ public final class SpecificationRepository {
     private final Map<KeYJavaType,ImmutableSet<ObserverFunction>> contractTargets
     		= new LinkedHashMap<KeYJavaType,ImmutableSet<ObserverFunction>>();    
     private final Map<KeYJavaType,ImmutableSet<ClassInvariant>> invs
-    		= new LinkedHashMap<KeYJavaType, ImmutableSet<ClassInvariant>>();
+    		= new LinkedHashMap<KeYJavaType, ImmutableSet<ClassInvariant>>(); 
     private final Map<KeYJavaType,ImmutableSet<ClassAxiom>> axioms
     		= new LinkedHashMap<KeYJavaType, ImmutableSet<ClassAxiom>>();
     private final Map<ProofOblInput,ImmutableSet<Proof>> proofs
@@ -637,6 +638,37 @@ public final class SpecificationRepository {
         }
     }
     
+    /**
+     * Registers the passed initially clause as a new contract to all constructors of the KJT of inv.
+     */
+    public void addInitiallyClause(InitiallyClause inv) {
+        final KeYJavaType kjt = inv.getKJT();
+        for (ProgramMethod pm: services.getJavaInfo().getConstructors(kjt)){
+            if (!JMLInfoExtractor.isHelper(pm)){
+        	addContracts(inv.toContract(pm));
+            }
+        }
+        if (!(inv.getVisibility() instanceof Private)){
+            final ImmutableList<KeYJavaType> subs = services.getJavaInfo().getAllSubtypes(kjt);
+            for (KeYJavaType sub: subs){
+        	InitiallyClause subInc = inv.setKJT(sub);
+        	for (ProgramMethod pm: services.getJavaInfo().getConstructors(sub)){
+        	    if (!JMLInfoExtractor.isHelper(pm)){
+        		addContracts(subInc.toContract(pm));
+        	    }
+        	}
+            }}
+    }
+    
+    
+    /**
+     * Registers the passed initially clauses as new contracts to all constructors of their KJT.
+     */
+    public void addInitiallyClauses(ImmutableSet<InitiallyClause> toAdd) {
+        for(InitiallyClause inv : toAdd) {
+            addInitiallyClause(inv);
+        }
+    }
     
     /**
      * Returns all class axioms visible in the passed class, including
@@ -881,12 +913,14 @@ public final class SpecificationRepository {
 		addContract((Contract)spec);
 	    } else if(spec instanceof ClassInvariant) {
 		addClassInvariant((ClassInvariant)spec);
+	    } else if(spec instanceof InitiallyClause){
+		addInitiallyClause((InitiallyClause)spec);
 	    } else if(spec instanceof ClassAxiom) {
 		addClassAxiom((ClassAxiom)spec);
 	    } else if(spec instanceof LoopInvariant) {
 		setLoopInvariant((LoopInvariant)spec);
 	    } else {
-		assert false : "unexpected spec: " + spec;
+		assert false : "unexpected spec: " + spec +"\n("+spec.getClass()+")";
 	    }
 	}
     }

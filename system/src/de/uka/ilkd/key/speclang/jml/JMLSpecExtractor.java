@@ -33,7 +33,7 @@ import de.uka.ilkd.key.speclang.translation.SLWarningException;
 /**
  * Extracts JML class invariants and operation contracts from JML comments. 
  * This is the public interface to the jml package. Note that internally,
- * this class is highly similar to the class recoderext.JMLTransformer; 
+ * this class is highly similar to the class java.recoderext.JMLTransformer; 
  * if you change one of these classes, you probably need to change the other 
  * as well.
  */
@@ -267,6 +267,10 @@ public final class JMLSpecExtractor implements SpecExtractor {
         		ClassInvariant inv 
         			= jsf.createJMLClassInvariant(kjt, textualInv);
         		result = result.add(inv);
+        	    } else if(c instanceof TextualJMLInitially) {
+        	        TextualJMLInitially textualRep = (TextualJMLInitially) c;
+        	        InitiallyClause inc = jsf.createJMLInitiallyClause(kjt, textualRep);
+        	        result = result.add(inc);
         	    } else if(c instanceof TextualJMLRepresents) {
         		TextualJMLRepresents textualRep = (TextualJMLRepresents) c;
         		ClassAxiom rep 

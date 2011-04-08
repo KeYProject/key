@@ -52,11 +52,7 @@ public final class JMLInfoExtractor {
     
     
     
-    //-------------------------------------------------------------------------
-    //public interface
-    //-------------------------------------------------------------------------
-    
-    public static boolean hasJMLModifier(TypeDeclaration td, String mod) {
+    private static boolean hasJMLModifier(TypeDeclaration td, String mod) {
         ImmutableList<Comment> coms = ImmutableSLList.<Comment>nil();
         
         // Either mod is attached to the declaration itself ...
@@ -75,26 +71,9 @@ public final class JMLInfoExtractor {
         return checkFor(mod, coms);
     }    
     
+
     
-    public static boolean hasJMLModifier(FieldDeclaration fd, String mod) {
-        ImmutableList<Comment> coms = ImmutableSLList.<Comment>nil();
-	
-	// Either mod is attached to the declaration itself ...
-        coms = coms.prepend(fd.getComments());
-                
-        // ... or to a modifier ...
-        for(Modifier m : fd.getModifiers()) {
-            coms = coms.prepend(m.getComments());
-        } 
-        
-        // ... or to the type
-        coms = coms.prepend(fd.getTypeReference().getComments());
-        
-        return checkFor(mod, coms);
-    }
-    
-    
-    public static boolean hasJMLModifier(ProgramMethod pm, String mod) {
+    private static boolean hasJMLModifier(ProgramMethod pm, String mod) {
         ImmutableList<Comment> coms = ImmutableSLList.<Comment>nil();
         final MethodDeclaration method = pm.getMethodDeclaration();
         
@@ -124,6 +103,28 @@ public final class JMLInfoExtractor {
         
         return checkFor(mod, coms);
     }    
+    
+    
+    //-------------------------------------------------------------------------
+    //public interface
+    //-------------------------------------------------------------------------
+    
+    public static boolean hasJMLModifier(FieldDeclaration fd, String mod) {
+        ImmutableList<Comment> coms = ImmutableSLList.<Comment>nil();
+	
+	// Either mod is attached to the declaration itself ...
+        coms = coms.prepend(fd.getComments());
+                
+        // ... or to a modifier ...
+        for(Modifier m : fd.getModifiers()) {
+            coms = coms.prepend(m.getComments());
+        } 
+        
+        // ... or to the type
+        coms = coms.prepend(fd.getTypeReference().getComments());
+        
+        return checkFor(mod, coms);
+    }
     
     
     /**
@@ -223,7 +224,19 @@ public final class JMLInfoExtractor {
         MethodDeclaration md = pm.getMethodDeclaration();
         ParameterDeclaration pd = md.getParameterDeclarationAt(pos);
 
-        ImmutableList<Comment> comments = ImmutableSLList.<Comment>nil();
+        return parameterIsNullable(pm, pd);
+    }
+
+
+    /**
+     * Returns true iff the parameter of the given method
+     * is declared "nullable" (implicitly or explicitly). 
+     * Warning: weird things may happen if the parameter doesn't belong to the method.
+     */
+    public static boolean parameterIsNullable(ProgramMethod pm,
+            ParameterDeclaration pd) {
+	assert pm.getMethodDeclaration().getParameters().contains(pd): "parameter "+pd+" does not belong to method declaration "+pm;
+	ImmutableList<Comment> comments = ImmutableSLList.<Comment>nil();
         comments = comments.prepend(pd.getComments());
         comments = comments.prepend(pd.getTypeReference().getComments());
         comments = comments.prepend(pd.getVariableSpecification()

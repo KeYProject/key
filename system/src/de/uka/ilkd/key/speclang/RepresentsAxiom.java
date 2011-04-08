@@ -521,4 +521,10 @@ public final class RepresentsAxiom implements ClassAxiom {
     public String toString() {
 	return originalRep.toString();
     }
+
+
+    @Override
+    public String getDisplayName() {
+	return getName();
+    }
 }
