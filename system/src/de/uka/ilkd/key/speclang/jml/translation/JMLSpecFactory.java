@@ -7,7 +7,6 @@
 // See LICENSE.TXT for details.
 //
 //
-
 package de.uka.ilkd.key.speclang.jml.translation;
 
 import de.uka.ilkd.key.collection.*;
@@ -44,17 +43,14 @@ import de.uka.ilkd.key.util.Triple;
 public class JMLSpecFactory {
 
     private static final TermBuilder TB = TermBuilder.DF;
-    
     private final Services services;
     private final JMLTranslator translator;
-    
     private int invCounter;
 
-    
+
     //-------------------------------------------------------------------------
     //constructors
     //-------------------------------------------------------------------------
-
     public JMLSpecFactory(Services services) {
         assert services != null;
         this.services = services;
@@ -76,7 +72,7 @@ public class JMLSpecFactory {
         public Term signals;
         public Term signalsOnly;
         public Term diverges;
-        public ImmutableList<ImmutableList<Term>> saveFor;
+        public ImmutableList<ImmutableList<Term>> secureFor;
         public ImmutableList<ImmutableList<Term>> declassify;
         public ImmutableList<ImmutableList<Term>> declassifyVar;
     }
@@ -89,10 +85,11 @@ public class JMLSpecFactory {
         return "JML class invariant nr " + invCounter++;
     }
 
-    private String getInicName(){
-	return "JML initially clause";
+
+    private String getInicName() {
+        return "JML initially clause";
     }
-    
+
 
     private String getContractName(ProgramMethod programMethod,
                                    Behavior behavior) {
@@ -134,8 +131,8 @@ public class JMLSpecFactory {
                     result = result.prepend(pv);
                 }
             } else if (s instanceof StatementContainer) {
-                ImmutableList< ProgramVariable > lpv =
-                    collectLocalVariables((StatementContainer) s, loop);
+                ImmutableList<ProgramVariable> lpv =
+                        collectLocalVariables((StatementContainer) s, loop);
                 if (lpv != null) {
                     result = result.prepend(lpv);
                     return result;
@@ -143,8 +140,8 @@ public class JMLSpecFactory {
             } else if (s instanceof BranchStatement) {
                 BranchStatement bs = (BranchStatement) s;
                 for (int j = 0, n = bs.getBranchCount(); j < n; j++) {
-                    ImmutableList< ProgramVariable > lpv =
-                        collectLocalVariables(bs.getBranchAt(j), loop);
+                    ImmutableList<ProgramVariable> lpv =
+                            collectLocalVariables(bs.getBranchAt(j), loop);
                     if (lpv != null) {
                         result = result.prepend(lpv);
                         return result;
@@ -224,7 +221,7 @@ public class JMLSpecFactory {
         clauses.diverges = translateDeverges(pm, progVars.selfVar,
                                              progVars.paramVars,
                                              textualSpecCase.getDiverges());
-        clauses.saveFor = translateSecureFor(pm, progVars.selfVar,
+        clauses.secureFor = translateSecureFor(pm, progVars.selfVar,
                                              progVars.paramVars,
                                              textualSpecCase.getSecureFor());
         clauses.declassify =
@@ -541,8 +538,8 @@ public class JMLSpecFactory {
             ProgramMethod pm,
             ProgramVariableCollection progVars,
             ContractClauses clauses,
-            Term post,
-            ImmutableSet<Contract> result) {
+            Term post) {
+        ImmutableSet<Contract> result = DefaultImmutableSet.<Contract>nil();
         if (clauses.diverges.equals(TB.ff())) {
             FunctionalOperationContract contract = new FunctionalOperationContractImpl(
                     name, pm, Modality.DIA, clauses.requires,
@@ -587,8 +584,8 @@ public class JMLSpecFactory {
     private ImmutableSet<Contract> createDependencyOperationContract(
             ProgramMethod pm,
             ProgramVariableCollection progVars,
-            ContractClauses clauses,
-            ImmutableSet<Contract> result) {
+            ContractClauses clauses) {
+        ImmutableSet<Contract> result = DefaultImmutableSet.<Contract>nil();
         if (clauses.accessible != null) {
             final Contract depContract = new DependencyContractImpl(
                     "JML accessible clause", pm.getContainerType(), pm,
@@ -617,16 +614,16 @@ public class JMLSpecFactory {
     private ImmutableSet<Contract> createInformationFlowOperationContract(
             ProgramMethod pm,
             ProgramVariableCollection progVars,
-            ContractClauses clauses,
-            ImmutableSet<Contract> result) {
-        final Contract ifContract = new InformationFlowContractImpl(
-                "Non-interference contract", pm.getContainerType(), pm,
-                clauses.requires, clauses.measuredBy,
-                clauses.accessible, clauses.assignable, clauses.saveFor,
-                clauses.declassify, clauses.declassifyVar, progVars.selfVar,
-                progVars.paramVars);
-        result = result.add(ifContract);
-
+            ContractClauses clauses) {
+        ImmutableSet<Contract> result = DefaultImmutableSet.<Contract>nil();
+        if (!clauses.secureFor.isEmpty()) {
+            result = result.add(new InformationFlowContractImpl(
+                    "Non-interference contract", pm.getContainerType(), pm,
+                    clauses.requires, clauses.measuredBy,
+                    clauses.accessible, clauses.assignable, clauses.secureFor,
+                    clauses.declassify, clauses.declassifyVar, progVars.selfVar,
+                    progVars.paramVars));
+        }
         return result;
     }
 
@@ -672,40 +669,47 @@ public class JMLSpecFactory {
                                        textualInv.getInv());
     }
 
-    public InitiallyClause createJMLInitiallyClause(KeYJavaType kjt, VisibilityModifier visibility, PositionedString original) throws SLTranslationException{
-	assert kjt != null;
+
+    public InitiallyClause createJMLInitiallyClause(KeYJavaType kjt,
+                                                    VisibilityModifier visibility,
+                                                    PositionedString original)
+            throws SLTranslationException {
+        assert kjt != null;
         assert original != null;
-        
+
         //create variable for self
         ProgramVariable selfVar = TB.selfVar(services, kjt, false);
-        
+
         //translate expression
         Term inv = translator.translateExpression(original,
-        					  kjt,
-        					  selfVar,
-        					  null,
-        					  null,
-        					  null,
-        					  null);        
+                                                  kjt,
+                                                  selfVar,
+                                                  null,
+                                                  null,
+                                                  null,
+                                                  null);
         //create invariant
         String name = getInicName();
         InitiallyClauseImpl res = new InitiallyClauseImpl(name,
-                                      name,
-                                      kjt, 
-                                      visibility,
-                                      inv,
-                                      selfVar,original);
-        res.setSpecFactory(this,services);
+                                                          name,
+                                                          kjt,
+                                                          visibility,
+                                                          inv,
+                                                          selfVar, original);
+        res.setSpecFactory(this, services);
         return res;
-        
+
     }
-    
-    public InitiallyClause createJMLInitiallyClause(KeYJavaType kjt, TextualJMLInitially textualInv) throws SLTranslationException {
+
+
+    public InitiallyClause createJMLInitiallyClause(KeYJavaType kjt,
+                                                    TextualJMLInitially textualInv)
+            throws SLTranslationException {
         return createJMLInitiallyClause(kjt,
-	       getVisibility(textualInv),
-	       textualInv.getInv());
+                                        getVisibility(textualInv),
+                                        textualInv.getInv());
     }
-    
+
 
     public ClassAxiom createJMLRepresents(KeYJavaType kjt,
                                           VisibilityModifier visibility,
@@ -717,7 +721,7 @@ public class JMLSpecFactory {
 
         //create variable for self
         final ProgramVariable selfVar =
-        	isStatic ? null : TB.selfVar(services, kjt, false);
+                isStatic ? null : TB.selfVar(services, kjt, false);
 
         //translate expression
         final Pair<ObserverFunction, Term> rep =
@@ -746,7 +750,7 @@ public class JMLSpecFactory {
 
 
     public Contract createJMLDependencyContract(KeYJavaType kjt,
-                                                PositionedString originalDep) 
+                                                PositionedString originalDep)
             throws SLTranslationException {
         assert kjt != null;
         assert originalDep != null;
@@ -763,7 +767,7 @@ public class JMLSpecFactory {
 
         //create dependency contract
         final ImmutableList<ProgramVariable> paramVars =
-        	TB.paramVars(services, dep.first, false);        
+                TB.paramVars(services, dep.first, false);
         return new DependencyContractImpl("JML depends clause",
                                           kjt,
                                           dep.first,
@@ -775,13 +779,13 @@ public class JMLSpecFactory {
     }
 
 
-    public Contract createJMLDependencyContract(KeYJavaType kjt, 
-	   				        TextualJMLDepends textualDep)
-    	throws SLTranslationException {
-	return createJMLDependencyContract(kjt, textualDep.getDepends());
+    public Contract createJMLDependencyContract(KeYJavaType kjt,
+                                                TextualJMLDepends textualDep)
+            throws SLTranslationException {
+        return createJMLDependencyContract(kjt, textualDep.getDepends());
     }
-    
-    
+
+
     /**
      * Creates operation contracts out of the passed JML specification.
      */
@@ -804,12 +808,14 @@ public class JMLSpecFactory {
 
         // create contracts
         ImmutableSet<Contract> result = DefaultImmutableSet.<Contract>nil();
-        result = createFunctionalOperationContracts(name, pm, progVars,
-                                                    clauses, post, result);
-        result = createDependencyOperationContract(pm, progVars, clauses,
-                                                   result);
-        result = createInformationFlowOperationContract(pm, progVars, clauses,
-                                                        result);
+        result = result.union(createFunctionalOperationContracts(name, pm,
+                                                                 progVars,
+                                                                 clauses, post));
+        result = result.union(createDependencyOperationContract(pm, progVars,
+                                                                clauses));
+        result = result.union(createInformationFlowOperationContract(pm,
+                                                                     progVars,
+                                                                     clauses));
 
         return result;
     }
@@ -831,7 +837,7 @@ public class JMLSpecFactory {
         //(disguised as parameters to the translator) and the map for 
         //atPre-Functions
         ProgramVariable selfVar =
-                 TB.selfVar(services, pm, pm.getContainerType(), false);
+                TB.selfVar(services, pm, pm.getContainerType(), false);
         ImmutableList<ProgramVariable> paramVars =
                 ImmutableSLList.<ProgramVariable>nil();
         int numParams = pm.getParameterDeclarationCount();
@@ -843,7 +849,7 @@ public class JMLSpecFactory {
         }
 
         ImmutableList<ProgramVariable> localVars =
-            collectLocalVariables(pm.getBody(), loop);        
+                collectLocalVariables(pm.getBody(), loop);
         paramVars = paramVars.append(localVars);
         Term heapAtPre = TB.var(TB.heapAtPreVar(services, "heapAtPre", false));
 

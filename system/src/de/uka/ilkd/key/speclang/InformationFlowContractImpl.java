@@ -146,6 +146,19 @@ public final class InformationFlowContractImpl
 
 
     @Override
+    public boolean hasSecureFor() {
+        return !originalSecureFor.isEmpty();
+    }
+
+
+    @Override
+    public boolean hasDeclassify() {
+        return !originalDeclassify.isEmpty()
+               || !originalDeclassifyVar.isEmpty();
+    }
+
+
+    @Override
     public Term getPre(ProgramVariable selfVar,
                        ImmutableList<ProgramVariable> paramVars,
                        Services services) {
@@ -323,15 +336,15 @@ public final class InformationFlowContractImpl
         assert paramVars.size() == originalParamVars.size();
         assert services != null;
         return getDeclassifyVar(TB.heap(services), TB.var(selfVar),
-                             TB.var(paramVars), services);
+                                TB.var(paramVars), services);
     }
 
 
     @Override
     public ImmutableList<ImmutableList<Term>> getDeclassifyVar(Term heapTerm,
-                                                            Term selfTerm,
-                                                            ImmutableList<Term> paramTerms,
-                                                            Services services) {
+                                                               Term selfTerm,
+                                                               ImmutableList<Term> paramTerms,
+                                                               Services services) {
         assert heapTerm != null;
         assert (selfTerm == null) == (originalSelfVar == null);
         assert paramTerms != null;
@@ -373,7 +386,18 @@ public final class InformationFlowContractImpl
 
     @Override
     public String getHTMLText(Services services) {
-        // TODO: Check for correctness!!
+        return "<html>"
+               + getHTMLSignature()
+               + getHTMLFor(originalPre, "<b>pre</b>", services)
+               + getHTMLFor(originalMod, "<b>mod</b>", services)
+               + getHTMLFor(originalMby, "<b>measured-by</b>", services)
+               + getHTMLForSecureFor(services)
+               + getHTMLForDeclassify(services)
+               + "</html>";
+    }
+
+
+    private String getHTMLSignature() {
         final StringBuffer sig = new StringBuffer();
         if (pm.isConstructor()) {
             sig.append(originalSelfVar);
@@ -393,24 +417,59 @@ public final class InformationFlowContractImpl
         }
         sig.append(")");
 
-        final String pre = LogicPrinter.quickPrintTerm(originalPre, services);
-        final String mby = hasMby()
-                           ? LogicPrinter.quickPrintTerm(originalMby, services)
-                           : null;
-        final String mod = LogicPrinter.quickPrintTerm(originalMod, services);
+        return "<i>" + LogicPrinter.escapeHTML(sig.toString(), false) + "</i>";
+    }
 
-        return "<html>"
-               + "<i>" + LogicPrinter.escapeHTML(sig.toString(), false) + "</i>"
-               + "<br><b>pre</b> "
-               + LogicPrinter.escapeHTML(pre, false)
-               + "<br><b>mod</b> "
-               + LogicPrinter.escapeHTML(mod, false)
-               + (hasMby()
-                  ? "<br><b>measured-by</b> " + LogicPrinter.escapeHTML(mby,
-                                                                        false)
-                  : "")
-               + "<br><b>termination</b> "
-               + "</html>";
+
+    private String getHTMLFor(Term originalTerm,
+                              String htmlName,
+                              Services services) {
+        if (originalTerm == null) {
+            return "";
+        } else {
+            final String quickPrint =
+                    LogicPrinter.quickPrintTerm(originalTerm, services);
+            return "<br>"
+                   + htmlName + " "
+                   + LogicPrinter.escapeHTML(quickPrint, false);
+        }
+    }
+
+
+    private String getHTMLForDeclassify(Services services) {
+        String declassify = "";
+        if (hasDeclassify()) {
+            final String quickPrint =
+                    LogicPrinter.quickPrintTerm(
+                    originalDeclassify.head().head(),
+                    services);
+            declassify = "<br><b>declassify</b> ";
+            declassify += LogicPrinter.escapeHTML(quickPrint, false);
+        }
+        return declassify;
+    }
+
+
+    private String getHTMLForSecureFor(Services services) {
+        String secureFor = "";
+        if (hasSecureFor()) {
+            secureFor = "<br><b>secure-for</b> ";
+            for (Term dep : originalSecureFor.head()) {
+                final String quickPrint =
+                        LogicPrinter.quickPrintTerm(dep, services);
+                secureFor += LogicPrinter.escapeHTML(quickPrint, false);
+            }
+        }
+        return secureFor;
+    }
+
+
+    @Override
+    public String toString() {
+        // TODO: all fields should be printed!!
+        return "pre: " + originalPre
+               + "; mby: " + originalMby
+               + "; mod: " + originalMod;
     }
 
 
@@ -425,15 +484,6 @@ public final class InformationFlowContractImpl
     public String proofToString(Services services) {
         assert false;
         return null;
-    }
-
-
-    @Override
-    public String toString() {
-        // TODO: all fields should be printed!!
-        return "pre: " + originalPre
-               + "; mby: " + originalMby
-               + "; mod: " + originalMod;
     }
 
 
@@ -501,13 +551,13 @@ public final class InformationFlowContractImpl
 
     @Override
     public String getDisplayName() {
-	return getName();
+        return getName();
     }
 
 
     @Override
     public VisibilityModifier getVisibility() {
-	assert false; // this is currently not applicable for contracts
-	return null;
+        assert false; // this is currently not applicable for contracts
+        return null;
     }
 }

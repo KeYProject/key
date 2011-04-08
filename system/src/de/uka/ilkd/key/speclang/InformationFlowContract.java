@@ -106,4 +106,11 @@ public interface InformationFlowContract extends OperationContract {
             Term selfTerm,
             ImmutableList<Term> paramTerms,
             Services services);
+
+
+    public boolean hasSecureFor();
+
+
+    public boolean hasDeclassify();
+
 }
