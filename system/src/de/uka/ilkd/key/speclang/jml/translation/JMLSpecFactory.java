@@ -746,7 +746,6 @@ public class JMLSpecFactory {
 
 
     public Contract createJMLDependencyContract(KeYJavaType kjt,
-                                                TextualJMLDepends textualDep)
                                                 PositionedString originalDep) 
             throws SLTranslationException {
         assert kjt != null;

@@ -852,6 +852,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 	    Contract contract) {
 	return new FunctionalOperationContractPO(initConfig,
 	        (FunctionalOperationContract) contract);
+    }
 
 	        	        
     @Override

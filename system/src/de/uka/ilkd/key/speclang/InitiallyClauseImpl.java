@@ -28,6 +28,7 @@ import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
 import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
@@ -214,17 +215,22 @@ public final class InitiallyClauseImpl implements InitiallyClause {
 	}
 	return result;
     }
+
     
+    @Override
     public ImmutableSet<Contract> toContract(ProgramMethod pm) { 
 	try {
 	    if (sf==null) throw new SLTranslationException("Contract for initially clause could not be created because no SpecFactory given");
 	    if (! pm.isConstructor()) throw new SLTranslationException("Initially clauses only apply to constructors, not to method "+pm);
-	    final ImmutableList<PositionedString> empty = ImmutableSLList.<PositionedString>nil();
-	    final ImmutableList<PositionedString> precond = createPrecond(pm);
-	    final ImmutableList<PositionedString> clause = ImmutableSLList.<PositionedString>nil().append(originalSpec);
-	    final ImmutableList<PositionedString> exclause = ImmutableSLList.<PositionedString>nil().append(new PositionedString("(Exception)"+ originalSpec.text, originalSpec.fileName, originalSpec.pos));
-	    final ImmutableList<PositionedString> dtrue = ImmutableSLList.<PositionedString>nil().append(new PositionedString("true"));
-	    return sf.createJMLOperationContracts(pm, Behavior.NONE, new PositionedString(getName()), precond, empty, empty, empty, clause, exclause, empty, dtrue);
+            final TextualJMLSpecCase specCase =
+                    new TextualJMLSpecCase(ImmutableSLList.<String>nil(),
+                                           Behavior.NONE);
+            specCase.addName(new PositionedString(getName()));
+            specCase.addRequires(createPrecond(pm));
+            specCase.addEnsures(originalSpec);
+            specCase.addSignals(new PositionedString("(Exception)"+ originalSpec.text, originalSpec.fileName, originalSpec.pos));
+            specCase.addDiverges(new PositionedString("true"));
+	    return sf.createJMLOperationContracts(pm, specCase);
 	} catch (SLTranslationException e){ 
 	    services.getExceptionHandler().reportException(e);
 	    return null;

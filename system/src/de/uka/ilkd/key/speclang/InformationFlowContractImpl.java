@@ -13,6 +13,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
@@ -495,5 +496,18 @@ public final class InformationFlowContractImpl
                                         Contract contract) {
         return new InformationFlowContractPO(initConfig,
                                              (InformationFlowContract) contract);
+    }
+
+
+    @Override
+    public String getDisplayName() {
+	return getName();
+    }
+
+
+    @Override
+    public VisibilityModifier getVisibility() {
+	assert false; // this is currently not applicable for contracts
+	return null;
     }
 }
