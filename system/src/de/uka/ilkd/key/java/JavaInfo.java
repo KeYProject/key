@@ -404,10 +404,8 @@ public final class JavaInfo {
 		sort = (Sort) sorts.lookup(DoubleLDT.NAME);
 	    } else if(type == PrimitiveType.JAVA_LOCSET) {
                 sort = (Sort) sorts.lookup(LocSetLDT.NAME);
-//		sort = services.getTypeConverter().getLocSetLDT().targetSort();
 	    } else if(type == PrimitiveType.JAVA_SEQ) {
                 sort = (Sort) sorts.lookup(SeqLDT.NAME);
-//		sort = services.getTypeConverter().getSeqLDT().targetSort();
 	    } else {
 		assert false : "unexpected primitive type: " + type;
 	    	sort = null;
