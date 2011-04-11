@@ -145,7 +145,7 @@ public final class DependencyContractImpl implements DependencyContract {
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
         assert services != null;
-	Map map = new HashMap();
+	Map<SVSubstitute, SVSubstitute> map = new HashMap<SVSubstitute, SVSubstitute>();
 	map.put(originalSelfVar, selfVar);
 	for(ProgramVariable originalParamVar : originalParamVars) {
 	    map.put(originalParamVar, paramVars.head());
@@ -166,7 +166,7 @@ public final class DependencyContractImpl implements DependencyContract {
 	assert paramTerms != null;
 	assert paramTerms.size() == originalParamVars.size();
 	assert services != null;
-	Map map = new HashMap();
+	Map<SVSubstitute, SVSubstitute> map = new HashMap<SVSubstitute, SVSubstitute>();
 	map.put(TB.heap(services), heapTerm);
 	map.put(TB.var(originalSelfVar), selfTerm);
 	for(ProgramVariable originalParamVar : originalParamVars) {
@@ -188,7 +188,7 @@ public final class DependencyContractImpl implements DependencyContract {
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
         assert services != null;
-	Map map = new HashMap();
+	Map<SVSubstitute, SVSubstitute> map = new HashMap<SVSubstitute, SVSubstitute>();
 	map.put(originalSelfVar, selfVar);
 	for(ProgramVariable originalParamVar : originalParamVars) {
 	    map.put(originalParamVar, paramVars.head());
@@ -210,7 +210,7 @@ public final class DependencyContractImpl implements DependencyContract {
 	assert paramTerms != null;
 	assert paramTerms.size() == originalParamVars.size();
 	assert services != null;
-	Map map = new HashMap();
+	Map<SVSubstitute, SVSubstitute> map = new HashMap<SVSubstitute, SVSubstitute>();
 	map.put(TB.heap(services), heapTerm);
 	map.put(TB.var(originalSelfVar), selfTerm);
 	for(ProgramVariable originalParamVar : originalParamVars) {
@@ -299,7 +299,7 @@ public final class DependencyContractImpl implements DependencyContract {
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
         assert services != null;
-	Map map = new HashMap();
+	Map<SVSubstitute, SVSubstitute> map = new HashMap<SVSubstitute, SVSubstitute>();
 	map.put(originalSelfVar, selfVar);
 	for(ProgramVariable originalParamVar : originalParamVars) {
 	    map.put(originalParamVar, paramVars.head());
@@ -320,7 +320,7 @@ public final class DependencyContractImpl implements DependencyContract {
 	assert paramTerms != null;
 	assert paramTerms.size() == originalParamVars.size();
 	assert services != null;
-	Map map = new HashMap();
+	Map<SVSubstitute, SVSubstitute> map = new HashMap<SVSubstitute, SVSubstitute>();
 	map.put(TB.heap(services), heapTerm);
 	map.put(TB.var(originalSelfVar), selfTerm);
 	for(ProgramVariable originalParamVar : originalParamVars) {
