@@ -106,6 +106,8 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
             assert false;
         }
         
+        final Feature queryF = querySpecFeature(longConst(5000));
+        
         final Feature depSpecF;
         final String depProp
         	= strategyProperties.getProperty(
@@ -148,6 +150,7 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
               pullOutConditionalsF,
              // smtF, 
               methodSpecF, 
+              queryF,
               depSpecF,
               loopInvF,
               ifMatchedF,
@@ -165,6 +168,13 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
 	filter.addRuleToSet(UseOperationContractRule.INSTANCE);
         return ConditionalFeature.createConditional(filter, cost);        
     }
+
+    private Feature querySpecFeature(Feature cost) {
+	SetRuleFilter filter = new SetRuleFilter();
+	filter.addRuleToSet(QueryExpand.INSTANCE);
+        return ConditionalFeature.createConditional(filter, cost);        
+    }
+
     
     private Feature oneStepSimplificationFeature(Feature cost) {
 	SetRuleFilter filter = new SetRuleFilter();

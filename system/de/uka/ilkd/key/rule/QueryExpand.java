@@ -29,9 +29,9 @@ import de.uka.ilkd.key.proof.VariableNameProposer;
  */
 public class QueryExpand implements BuiltInRule {
 
-    public static final BuiltInRule QUERY_EXPAND_RULE = new QueryExpand();
+    public static final BuiltInRule INSTANCE = new QueryExpand();
     
-    private static Name QUERY_DEF_NAME = new Name("Use Query-Definition");
+    private static Name QUERY_DEF_NAME = new Name("Evaluate Query");
     
     
     @Override
@@ -63,12 +63,12 @@ public class QueryExpand implements BuiltInRule {
 	    new LocationVariable(
 		    new ProgramElementName(VariableNameProposer.DEFAULT.
 			    getNameProposal("result", services, goal.node())), 
-		    method.getContainerType());
+		    method.getKeYJavaType());
 
 	
 	final MethodReference mr = new MethodReference(args, method.getProgramElementName(), callee);
 	final Function placeHolderResult = new Function(new Name(VariableNameProposer.DEFAULT.
-		    getNameProposal("res"+method.getName(), services, goal.node())), query.sort());
+		    getNameProposal("res_"+method.getName(), services, goal.node())), query.sort());
 	
 	// construct method call   {heap:=h || p1:arg1 || ... || pn:=argn} \[ res = o.m(p1,..,pn); \] (c = res) 
 	
@@ -142,18 +142,19 @@ public class QueryExpand implements BuiltInRule {
     public String displayName() {
 	return QUERY_DEF_NAME.toString();
     }
+    
+    @Override
+    public String toString() {
+        return displayName();
+    }
 
     @Override
-    public boolean isApplicable(Goal goal, PosInOccurrence pio) {
-	if (pio.subTerm().op() instanceof ProgramMethod) {
-	    Term focus = pio.constrainedFormula().formula();
-	    if (focus.op() instanceof UpdateApplication) {
-		return false;
-	    }
-	    IntIterator it = pio.iterator();
-	    while (it.hasNext()) {
-		focus = focus.sub(it.next());
-		if (focus.op() instanceof UpdateApplication) {
+    public boolean isApplicable(Goal goal, PosInOccurrence pio) {	
+	if (pio!=null && pio.subTerm().op() instanceof ProgramMethod) {
+	    PIOPathIterator it = pio.iterator();
+	    while ( it.next() != -1 ) {
+		Term focus = it.getSubTerm();
+		if (focus.op() instanceof UpdateApplication || focus.op() instanceof Modality) {
 		    return false;
 		}
 	    }
