@@ -140,9 +140,9 @@ SEQREVERSE : "\\seq_reverse";
 
 MEASURED_BY : "\\measured_by";
 
-FROM : "from";
-TO : "to";
-IF : "if";
+FROM : "\\from";
+TO : "\\to";
+IF : "\\if";
 
 
 LT_DISPATCH

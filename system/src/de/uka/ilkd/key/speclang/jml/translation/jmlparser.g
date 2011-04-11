@@ -574,8 +574,7 @@ secureforarglist returns  [ImmutableList<Term> result = ImmutableSLList.<Term>ni
     Term term = null;
 }
 :
-    NOTHING
-    |   term = storeref { result = result.append(term); }
+    term = storeref { result = result.append(term); }
         (COMMA term = storeref { result = result.append(term); })*
     ;
 
