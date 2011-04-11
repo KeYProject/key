@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.rule;
 
+import java.util.HashMap;
+
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Expression;
@@ -15,6 +17,7 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.VariableNameProposer;
 
 
@@ -102,9 +105,12 @@ public class QueryExpand implements BuiltInRule {
 	
 	// replace old query		
 	g.addFormula(new SequentFormula(topLevel), true, true);	
-	g.addFormula(new SequentFormula(tb.equals(query, tb.func(placeHolderResult))), true, true);
 	
-	
+	HashMap<Term,Term> map = new HashMap<Term,Term>();
+	map.put(pio.subTerm(), tb.func(placeHolderResult));
+	OpReplacer op = new OpReplacer(map);
+	g.changeFormula(new SequentFormula(op.replace(pio.constrainedFormula().formula())), pio.topLevel());
+		
 	//register variables in namespace
 	for (Expression pv : args) { // add new program variables for arguments
 	    g.addProgramVariable((ProgramVariable) pv);
