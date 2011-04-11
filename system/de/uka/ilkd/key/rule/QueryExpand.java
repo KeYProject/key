@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.rule;
 
-import java.util.HashMap;
-
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Expression;
@@ -13,11 +11,25 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.IntIterator;
+import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.PIOPathIterator;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.VariableNameProposer;
 
 
@@ -36,6 +48,49 @@ public class QueryExpand implements BuiltInRule {
     
     private static Name QUERY_DEF_NAME = new Name("Evaluate Query");
     
+    
+    
+    /**
+     * Replaces in a term.
+     */
+    public Term replace(Term term, Term with, IntIterator it) {
+	if ( !it.hasNext() ) {
+	    return with;
+	}
+
+	final int arity = term.arity();
+	final Term newSubTerms[] = new Term[arity];    
+	boolean changedSubTerm = false;
+	int next = it.next();
+	for(int i = 0; i < arity; i++) {
+	    Term subTerm = term.sub(i);
+	    if (i == next) {
+		newSubTerms[i] = replace(subTerm, with, it);
+		if(newSubTerms[i] != subTerm) {
+		    changedSubTerm = true;
+		}
+	    } else {
+		newSubTerms[i] = subTerm;
+	    }
+
+	}
+
+	final ImmutableArray<QuantifiableVariable> newBoundVars = term.boundVars();
+
+	final Term result;
+	if(changedSubTerm) {
+	    result = TermFactory.DEFAULT.createTerm(term.op(),
+		    newSubTerms,
+		    newBoundVars,
+		    term.javaBlock());
+	} else {
+	    result = term;
+	}
+
+	return result;
+    }  
+    
+
     
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services,
@@ -106,10 +161,9 @@ public class QueryExpand implements BuiltInRule {
 	// replace old query		
 	g.addFormula(new SequentFormula(topLevel), true, true);	
 	
-	HashMap<Term,Term> map = new HashMap<Term,Term>();
-	map.put(pio.subTerm(), tb.func(placeHolderResult));
-	OpReplacer op = new OpReplacer(map);
-	g.changeFormula(new SequentFormula(op.replace(pio.constrainedFormula().formula())), pio.topLevel());
+	final Term newFormula = replace(pio.constrainedFormula().formula(), 
+		tb.func(placeHolderResult), pio.posInTerm().iterator());
+	g.changeFormula(new SequentFormula(newFormula), pio.topLevel());
 		
 	//register variables in namespace
 	for (Expression pv : args) { // add new program variables for arguments
@@ -155,8 +209,17 @@ public class QueryExpand implements BuiltInRule {
     }
 
     @Override
+    /** 
+     * Important the correctness of the implementation of this rule relies on the following side-conditions:
+     * <ul>
+     * <li>the query term has no free variables</li>
+     * <li>the query term does not occur below an update or a modality</li>
+     * </ul>
+     * If you want to change this you need to adapt the application logic by adding preceeding updates in front of the new added formula and/or
+     * to take care of free variables when introducing the skolemfunction symbol and when replacing the query term by the skolem function.
+     */
     public boolean isApplicable(Goal goal, PosInOccurrence pio) {	
-	if (pio!=null && pio.subTerm().op() instanceof ProgramMethod) {
+	if (pio!=null && pio.subTerm().op() instanceof ProgramMethod && pio.subTerm().freeVars().isEmpty()) {
 	    PIOPathIterator it = pio.iterator();
 	    while ( it.next() != -1 ) {
 		Term focus = it.getSubTerm();

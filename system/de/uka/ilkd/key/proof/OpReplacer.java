@@ -124,9 +124,7 @@ public class OpReplacer {
         }
     
         return result;
-    }  
-    
-    
+    }      
     
     /**
      * Replaces in a list of terms.
