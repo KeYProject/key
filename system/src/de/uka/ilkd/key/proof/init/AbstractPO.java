@@ -10,28 +10,12 @@
 package de.uka.ilkd.key.proof.init;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
-import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.Modifier;
-import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.expression.literal.NullLiteral;
-import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
-import de.uka.ilkd.key.java.expression.operator.New;
-import de.uka.ilkd.key.java.reference.TypeRef;
-import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.java.statement.Branch;
-import de.uka.ilkd.key.java.statement.Catch;
-import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
@@ -60,13 +44,6 @@ public abstract class AbstractPO implements ProofOblInput {
     protected final HeapLDT heapLDT;
     protected final SpecificationRepository specRepos;
     protected final String name;
-    // obviously not used any more...
-//    private final List<ProgramVariable> introducedProgVars 
-//    	= new LinkedList<ProgramVariable>();
-//    private final List<Function> introducedFuncs
-//    	= new LinkedList<Function>();
-//    private final List<Function> introducedPreds
-//    	= new LinkedList<Function>();
     private ImmutableSet<NoPosTacletApp> taclets;
     private String header;
     private ProofAggregate proofAggregate;
@@ -182,9 +159,9 @@ public abstract class AbstractPO implements ProofOblInput {
 
 
     protected final void register(ProgramVariable pv) {
-        if (pv != null) {
-//	    introducedProgVars.add(pv);
-            services.getNamespaces().programVariables().addSafely(pv);
+        Namespace progVarNames = services.getNamespaces().programVariables();
+        if (pv != null && progVarNames.lookup(pv.name()) == null) {
+            progVarNames.addSafely(pv);
         }
     }
 
@@ -197,15 +174,13 @@ public abstract class AbstractPO implements ProofOblInput {
 
 
     protected final void register(Function f) {
-        if (f != null) {
+        Namespace functionNames = services.getNamespaces().functions();
+        if (f != null && functionNames.lookup(f.name()) == null) {
             assert f.sort() != Sort.UPDATE;
             if (f.sort() == Sort.FORMULA) {
-//		introducedPreds.add(f);
-                // TODO: correct?
-                services.getNamespaces().functions().addSafely(f);
+                functionNames.addSafely(f);
             } else {
-//		introducedFuncs.add(f);
-                services.getNamespaces().functions().addSafely(f);
+                functionNames.addSafely(f);
             }
         }
     }

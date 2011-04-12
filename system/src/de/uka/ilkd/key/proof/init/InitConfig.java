@@ -342,22 +342,21 @@ public class InitConfig {
     }
 
 
-
     /** returns a copy of this initial configuration copying the namespaces,
      * the contained JavaInfo while using the immutable set of taclets in the
      * copy
      */
     public InitConfig copy() {
         InitConfig ic = new InitConfig(services.copyPreservesLDTInformation(),
-        			       profile);
+                                       profile);
         ic.setActivatedChoices(activatedChoices);
         ic.category2DefaultChoice = ((HashMap) category2DefaultChoice.clone());
-        ic.setTaclet2Builder((HashMap<Taclet, TacletBuilder>) taclet2Builder.clone());
+        ic.setTaclet2Builder(
+                (HashMap<Taclet, TacletBuilder>) taclet2Builder.clone());
         ic.setTaclets(taclets);
         ic.originalKeYFileName = originalKeYFileName;
         return ic;
     }
-
     
 
     public String toString() {
