@@ -409,7 +409,7 @@ public final class TermBuilder {
     
     
     public Term all(ImmutableArray<QuantifiableVariable> qv, Term t2) {
-	if(qv.size() == 0) {
+	if(qv.isEmpty()) {
 	    throw new TermCreationException("Cannot quantify over 0 variables");
 	}
         Term result = t2;
@@ -434,7 +434,7 @@ public final class TermBuilder {
     
     
     public Term ex(ImmutableArray<QuantifiableVariable> qv, Term t2) {
-	if(qv.size() == 0) {
+	if(qv.isEmpty()) {
 	    throw new TermCreationException("Cannot quantify over 0 variables");
 	}	
         Term result = t2;
@@ -448,7 +448,32 @@ public final class TermBuilder {
     public Term ex(QuantifiableVariable[] qv, Term t2) {
         return ex(new ImmutableArray<QuantifiableVariable>(qv), t2);
     }
-    
+
+
+//    public Term sum(QuantifiableVariable qv, Term t) {
+//        return tf.createTerm(,
+//    	                     new ImmutableArray<Term>(t),
+//    	                     new ImmutableArray<QuantifiableVariable>(qv),
+//    	                     null);
+//    }
+//
+//
+//    public Term sum(ImmutableArray<QuantifiableVariable> qv, Term t2) {
+//	if(qv.isEmpty()) {
+//	    throw new TermCreationException("Cannot quantify over 0 variables");
+//	}
+//        Term result = t2;
+//        for (int i = qv.size() - 1; i >= 0; i--) {
+//            result = sum(qv.get(i), result);
+//        }
+//        return result;
+//    }
+//
+//
+//    public Term sum(QuantifiableVariable[] qv, Term t2) {
+//	return sum(new ImmutableArray<QuantifiableVariable>(qv), t2);
+//    }
+
     
     public Term allClose(Term t) {
 	ImmutableSet<QuantifiableVariable> freeVars = t.freeVars();
@@ -715,7 +740,7 @@ public final class TermBuilder {
     
     
     public Term sequential(ImmutableList<Term> updates) {
-	if(updates.size() == 0) {
+	if(updates.isEmpty()) {
 	    return skip();
 	} else if(updates.size() == 1) {
 	    return updates.head();
@@ -780,7 +805,7 @@ public final class TermBuilder {
     
     
     public Term applySequential(ImmutableList<Term> updates, Term target) {
-	if(updates.size() == 0) {
+	if(updates.isEmpty()) {
 	    return target;
 	} else {
 	    return apply(updates.head(), 

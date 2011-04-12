@@ -27,11 +27,15 @@ import de.uka.ilkd.key.util.Triple;
  */
 final class JMLTranslator {
 
-    private final Services services;
+    private static final JMLTranslator instance = new JMLTranslator();
 
 
-    public JMLTranslator(Services services) {
-        this.services = services;
+    private JMLTranslator() {
+    }
+
+
+    public static JMLTranslator getInstance() {
+        return instance;
     }
 
 
@@ -44,7 +48,8 @@ final class JMLTranslator {
                                     ImmutableList<ProgramVariable> paramVars,
                                     ProgramVariable resultVar,
                                     ProgramVariable excVar,
-                                    Term heapAtPre)
+                                    Term heapAtPre,
+                                    Services services)
             throws SLTranslationException {
         assert expr != null;
         assert specInClass != null;
@@ -77,7 +82,8 @@ final class JMLTranslator {
             ImmutableList<ProgramVariable> paramVars,
             ProgramVariable resultVar,
             ProgramVariable excVar,
-            Term heapAtPre)
+            Term heapAtPre,
+            Services services)
             throws SLTranslationException {
 
         final KeYJMLParser parser = new KeYJMLParser(signalsExpr,
@@ -100,7 +106,8 @@ final class JMLTranslator {
     public Term translateSignalsOnlyExpression(
             PositionedString signalsOnlyExpr,
             KeYJavaType specInClass,
-            ProgramVariable excVar)
+            ProgramVariable excVar,
+            Services services)
             throws SLTranslationException {
 
         final KeYJMLParser parser = new KeYJMLParser(signalsOnlyExpr,
@@ -124,7 +131,8 @@ final class JMLTranslator {
             PositionedString assignableExpr,
             KeYJavaType specInClass,
             ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars)
+            ImmutableList<ProgramVariable> paramVars,
+            Services services)
             throws SLTranslationException {
 
         final KeYJMLParser parser = new KeYJMLParser(assignableExpr,
@@ -145,7 +153,8 @@ final class JMLTranslator {
             PositionedString assignableExpr,
             KeYJavaType specInClass,
             ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars)
+            ImmutableList<ProgramVariable> paramVars,
+            Services services)
             throws SLTranslationException {
 
         final KeYJMLParser parser = new KeYJMLParser(assignableExpr,
@@ -166,7 +175,8 @@ final class JMLTranslator {
             PositionedString assignableExpr,
             KeYJavaType specInClass,
             ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars)
+            ImmutableList<ProgramVariable> paramVars,
+            Services services)
             throws SLTranslationException {
 
         final KeYJMLParser parser = new KeYJMLParser(assignableExpr,
@@ -187,7 +197,8 @@ final class JMLTranslator {
             PositionedString assignableExpr,
             KeYJavaType specInClass,
             ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars)
+            ImmutableList<ProgramVariable> paramVars,
+            Services services)
             throws SLTranslationException {
 
         final KeYJMLParser parser = new KeYJMLParser(assignableExpr,
@@ -210,7 +221,8 @@ final class JMLTranslator {
     public Pair<ObserverFunction, Term> translateRepresentsExpression(
             PositionedString representsExpr,
             KeYJavaType specInClass,
-            ProgramVariable selfVar)
+            ProgramVariable selfVar,
+            Services services)
             throws SLTranslationException {
 
         final KeYJMLParser parser = new KeYJMLParser(representsExpr,
@@ -233,7 +245,8 @@ final class JMLTranslator {
     public Triple<ObserverFunction, Term, Term> translateDependsExpression(
             PositionedString accessibleExpr,
             KeYJavaType specInClass,
-            ProgramVariable selfVar)
+            ProgramVariable selfVar,
+            Services services)
             throws SLTranslationException {
 
         final KeYJMLParser parser = new KeYJMLParser(accessibleExpr,
@@ -252,7 +265,8 @@ final class JMLTranslator {
 
 
     public ImmutableList<ProgramVariable> translateVariableDeclaration(
-            PositionedString variableDecl)
+            PositionedString variableDecl,
+            Services services)
             throws SLTranslationException {
         final KeYJMLParser parser = new KeYJMLParser(variableDecl,
                                                      services,

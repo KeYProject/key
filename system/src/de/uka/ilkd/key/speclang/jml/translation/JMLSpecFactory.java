@@ -54,7 +54,7 @@ public class JMLSpecFactory {
     public JMLSpecFactory(Services services) {
         assert services != null;
         this.services = services;
-        this.translator = new JMLTranslator(services);
+        this.translator = JMLTranslator.getInstance();
     }
 
     //-------------------------------------------------------------------------
@@ -252,7 +252,8 @@ public class JMLSpecFactory {
                         translator.translateSecureForExpression(expr,
                                                                 pm.getContainerType(),
                                                                 selfVar,
-                                                                paramVars);
+                                                                paramVars,
+                                                                services);
                 secureFor = secureFor.append(translated);
             }
             return secureFor;
@@ -276,7 +277,8 @@ public class JMLSpecFactory {
                         translator.translateDeclassifyExpression(expr,
                                                                  pm.getContainerType(),
                                                                  selfVar,
-                                                                 paramVars);
+                                                                 paramVars,
+                                                                 services);
                 declass = declass.append(translated);
             }
             return declass;
@@ -300,7 +302,8 @@ public class JMLSpecFactory {
                         translator.translateDeclassifyVarExpression(expr,
                                                                     pm.getContainerType(),
                                                                     selfVar,
-                                                                    paramVars);
+                                                                    paramVars,
+                                                                    services);
                 declass = declass.append(translated);
             }
             return declass;
@@ -322,7 +325,8 @@ public class JMLSpecFactory {
                     paramVars,
                     null,
                     null,
-                    null);
+                    null,
+                    services);
             diverges = TB.or(diverges, translated);
         }
         return diverges;
@@ -341,7 +345,7 @@ public class JMLSpecFactory {
             Term signalsOnly = TB.tt();
             for (PositionedString expr : originalSignalsOnly) {
                 Term translated = translator.translateSignalsOnlyExpression(
-                        expr, pm.getContainerType(), excVar);
+                        expr, pm.getContainerType(), excVar, services);
                 signalsOnly = TB.and(signalsOnly, translated);
             }
             return signalsOnly;
@@ -370,7 +374,8 @@ public class JMLSpecFactory {
                                                               pm.getContainerType(),
                                                               selfVar, paramVars,
                                                               resultVar,
-                                                              excVar, heapAtPre);
+                                                              excVar, heapAtPre,
+                                                              services);
                 signals = TB.and(signals, translated);
             }
             return signals;
@@ -399,7 +404,8 @@ public class JMLSpecFactory {
                                                                  paramVars,
                                                                  resultVar,
                                                                  excVar,
-                                                                 heapAtPre);
+                                                                 heapAtPre,
+                                                                 services);
                 ensures = TB.and(ensures, translated);
             }
             return ensures;
@@ -422,7 +428,8 @@ public class JMLSpecFactory {
                         expr,
                         pm.getContainerType(),
                         selfVar,
-                        paramVars);
+                        paramVars,
+                        services);
                 accessible = TB.union(services, accessible, translated);
             }
         }
@@ -441,7 +448,8 @@ public class JMLSpecFactory {
             Term translated = translator.translateExpression(expr,
                                                              pm.getContainerType(),
                                                              selfVar, paramVars,
-                                                             null, null, null);
+                                                             null, null, null,
+                                                             services);
             requires = TB.and(requires, translated);
         }
         return requires;
@@ -465,7 +473,8 @@ public class JMLSpecFactory {
                                                                  selfVar,
                                                                  paramVars, null,
                                                                  null,
-                                                                 null);
+                                                                 null,
+                                                                 services);
                 measuredBy = TB.add(services, measuredBy, translated);
             }
         }
@@ -485,8 +494,12 @@ public class JMLSpecFactory {
         } else {
             assignable = TB.empty(services);
             for (PositionedString expr : originalAssignable) {
-                Term translated = translator.translateAssignableExpression(
-                        expr, pm.getContainerType(), selfVar, paramVars);
+                Term translated =
+                        translator.translateAssignableExpression(expr,
+                                                                 pm.getContainerType(),
+                                                                 selfVar,
+                                                                 paramVars,
+                                                                 services);
                 assignable = TB.union(services, assignable, translated);
             }
         }
@@ -648,7 +661,8 @@ public class JMLSpecFactory {
                                                   null,
                                                   null,
                                                   null,
-                                                  null);
+                                                  null,
+                                                  services);
         //create invariant
         String name = getInvName();
         return new ClassInvariantImpl(name,
@@ -687,7 +701,8 @@ public class JMLSpecFactory {
                                                   null,
                                                   null,
                                                   null,
-                                                  null);
+                                                  null,
+                                                  services);
         //create invariant
         String name = getInicName();
         InitiallyClauseImpl res = new InitiallyClauseImpl(name,
@@ -727,7 +742,8 @@ public class JMLSpecFactory {
         final Pair<ObserverFunction, Term> rep =
                 translator.translateRepresentsExpression(originalRep,
                                                          kjt,
-                                                         selfVar);
+                                                         selfVar,
+                                                         services);
         //create class axiom
         return new RepresentsAxiom("JML represents clause for "
                                    + rep.first.name().toString(),
@@ -760,9 +776,8 @@ public class JMLSpecFactory {
 
         //translate expression
         Triple<ObserverFunction, Term, Term> dep =
-                translator.translateDependsExpression(originalDep,
-                                                      kjt,
-                                                      selfVar);
+                translator.translateDependsExpression(originalDep, kjt,
+                                                      selfVar, services);
         assert dep.first.arity() <= 2;
 
         //create dependency contract
@@ -867,7 +882,8 @@ public class JMLSpecFactory {
                         paramVars,
                         null,
                         null,
-                        heapAtPre);
+                        heapAtPre,
+                        services);
                 invariant = TB.and(invariant, translated);
             }
         }
@@ -883,7 +899,8 @@ public class JMLSpecFactory {
                         expr,
                         pm.getContainerType(),
                         selfVar,
-                        paramVars);
+                        paramVars,
+                        services);
                 assignable = TB.union(services, assignable, translated);
             }
         }
@@ -900,7 +917,8 @@ public class JMLSpecFactory {
                     paramVars,
                     null,
                     null,
-                    heapAtPre);
+                    heapAtPre,
+                    services);
             variant = translated;
         }
 

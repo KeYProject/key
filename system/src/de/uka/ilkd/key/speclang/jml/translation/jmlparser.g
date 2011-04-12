@@ -2012,6 +2012,12 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
 		}
 	    }	    
 
+            String dlName = JMLTranslation.toDlName(q.getText());
+            Operation quant = (Function) services.getNamespaces().functions().lookup(dlName);
+            result = TB.quantifier(quant, declVars.second.toArray(new LogicVariable[declVars.second.size()]), p, t);
+
+
+            /*XXX
 	    if (q.getText().equals("\\forall")) {
 		if (p != null) {
 		    t = TB.imp(p, t);
@@ -2030,7 +2036,6 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
 	    else if (q.getText().equals("\\max")) {
 	        raiseNotSupported("\\max");
 	    }
-	    /*XXX
 	    else if (q.getText().equals("\\num_of")) {
             	LogicVariable lv = declVars.head();
             	p=p.sub(0);
@@ -2043,12 +2048,12 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
                 } else {
                     raiseError("only \\num_of expressions of form (\\sum int i; l<=i && i<u; t) are permitted");
             	}
-	    }*/
+	    }
 	    else if (q.getText().equals("\\product")) {
 		raiseNotSupported("\\product");
 	    }
-	    /*XXX	    
 	    else if (q.getText().equals("\\sum")) {
+
                 LogicVariable lv = declVars.head();
             	p=p.sub(0);
             
@@ -2061,10 +2066,10 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
                 } else {
                     raiseError("only \\sum expressions of form (\\sum int i; l<=i && i<u; t) are permitted");
                 }
-	    }*/ 
+	    }
 	    else {
 		raiseError("Unknown quantifier: " + q.getText() + "!");
-	    }
+	    }*/
 	}
 	RPAREN
 ;
