@@ -467,10 +467,9 @@ public final class TermBuilder {
     
     public Term and(Term ... subTerms) {
         Term result = tt();
-        for(int i = 0; i < subTerms.length; i++) {
-            result = and(result, subTerms[i]);
-        }
-
+        for(Term sub : subTerms) {
+	    result = and(result, sub);
+	}
         return result;
     }
     
@@ -498,9 +497,14 @@ public final class TermBuilder {
     
     
     public Term or(Term... subTerms) {
-        return or(subTerms);
+        Term result = ff();
+        for(Term sub : subTerms) {
+            result = or(result, sub);
+        }
+        return result;
     }
-    
+
+
     public Term or(Iterable<Term> subTerms) {
 	Term result = ff();
 	for(Term sub : subTerms) {

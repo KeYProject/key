@@ -289,14 +289,14 @@ final class JMLTranslator {
 
 
     public ImmutableList<Term> translateDeclassifyExpression(
-            PositionedString assignableExpr,
+            PositionedString declassExpr,
             KeYJavaType specInClass,
             ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars,
             Services services)
             throws SLTranslationException {
 
-        final KeYJMLParser parser = new KeYJMLParser(assignableExpr,
+        final KeYJMLParser parser = new KeYJMLParser(declassExpr,
                                                      services,
                                                      specInClass,
                                                      selfVar,
@@ -304,7 +304,6 @@ final class JMLTranslator {
                                                      null,
                                                      null,
                                                      null);
-
         final ImmutableList<Term> result = parser.parseDeclassify();
         return result;
     }

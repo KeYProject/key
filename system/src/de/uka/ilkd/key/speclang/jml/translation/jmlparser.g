@@ -591,6 +591,7 @@ declassifyclause returns  [ImmutableList<Term> result = ImmutableSLList.<Term>ni
     (FROM frompart = storereflist { result = result.append(frompart);})?
     (TO topart = storereflist { result = result.append(topart); })?
     (IF ifpart = predicate { result = result.append(ifpart); })?
+    SEMI
     ;
 
 
@@ -606,6 +607,7 @@ declassifyvarclause returns  [ImmutableList<Term> result = ImmutableSLList.<Term
     (FROM frompart = storereflist { result = result.append(frompart);})?
     (TO topart = storereflist { result = result.append(topart); })?
     (IF ifpart = predicate { result = result.append(ifpart); })?
+    SEMI
     ;
 
 

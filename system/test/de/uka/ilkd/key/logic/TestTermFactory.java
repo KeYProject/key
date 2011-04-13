@@ -198,12 +198,13 @@ public class TestTermFactory extends TestCase {
 
     public void testQuantifierWithNoBoundSubTerms() {
 	Exception exc=new Exception();
+        Term result = null;
 	try {
-	    TermBuilder.DF.all(ImmutableSLList.<QuantifiableVariable>nil(), t1());
+	    result=TermBuilder.DF.all(ImmutableSLList.<QuantifiableVariable>nil(), t1());
 	} catch (TermCreationException e) {
 	    exc=e;	    
 	}
-	assertTrue(exc instanceof TermCreationException);
+	Assert.assertEquals(result, t1());
     }
     
 
