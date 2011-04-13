@@ -20,6 +20,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 public final class Quantifier extends AbstractSortedOperator {
     public static final Name ALL_NAME = new Name("all");
     public static final Name EX_NAME = new Name("exists");
+    public static final Name SUM_NAME = new Name("bsum");
     
     /** 
      * the ususal 'forall' operator 'all' (be A a formula then       

@@ -438,6 +438,40 @@ public final class TermBuilder {
         return result;
     }
 
+
+    public Term bsum(QuantifiableVariable qv,
+                     Term a,
+                     Term b,
+                     Term t,
+                     Services services) {
+        Function bsum = services.getTypeConverter().getIntegerLDT().getBsum();
+        return func(bsum,
+                    new Term[]{a, b, t},
+                    new ImmutableArray<QuantifiableVariable>(qv));
+    }
+
+
+//    public Term min(QuantifiableVariable qv, Term t, Services services) {
+//        Quantifier q =
+//                (Quantifier)services.getNamespaces().functions().lookup(
+//                    Quantifier.MIN_NAME);
+//        return tf.createTerm(q,
+//    	                     new ImmutableArray<Term>(t),
+//    	                     new ImmutableArray<QuantifiableVariable>(qv),
+//    	                     null);
+//    }
+//
+//
+//    public Term max(QuantifiableVariable qv, Term t, Services services) {
+//        Quantifier q =
+//                (Quantifier)services.getNamespaces().functions().lookup(
+//                    Quantifier.MAX_NAME);
+//        return tf.createTerm(q,
+//    	                     new ImmutableArray<Term>(t),
+//    	                     new ImmutableArray<QuantifiableVariable>(qv),
+//    	                     null);
+//    }
+
     
     public Term not(Term t) {
 	if(t.op() == Junctor.TRUE) {

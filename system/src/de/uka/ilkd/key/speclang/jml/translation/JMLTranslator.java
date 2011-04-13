@@ -9,17 +9,22 @@
 //
 package de.uka.ilkd.key.speclang.jml.translation;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.PrimitiveType;
+import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermCreationException;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.speclang.translation.SLExpression;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.LinkedHashMap;
 import de.uka.ilkd.key.util.Pair;
@@ -91,7 +96,7 @@ final class JMLTranslator {
         }
 
         public abstract Term combineQuantifiedTerms(Term t1,
-                                                      Term t2)
+                                                    Term t2)
                 throws SLTranslationException;
 
         public abstract Term translateQuantifier(QuantifiableVariable qv,
@@ -113,7 +118,7 @@ final class JMLTranslator {
             }
             @Override
             public Term combineQuantifiedTerms(Term t1,
-                                                 Term t2)
+                                               Term t2)
                     throws SLTranslationException {
                 return TB.imp(t1, t2);
             }
@@ -127,7 +132,7 @@ final class JMLTranslator {
             }
             @Override
             public Term combineQuantifiedTerms(Term t1,
-                                                 Term t2)
+                                               Term t2)
                     throws SLTranslationException {
                 return TB.and(t1, t2);
             }
@@ -136,7 +141,26 @@ final class JMLTranslator {
 //        translationMethods.put("\\max", new Name("max"));
 //        translationMethods.put("\\num_of", new Name("num_of"));
 //        translationMethods.put("\\product", new Name("product"));
-//        translationMethods.put("\\sum", new Name("bsum"));
+//        translationMethods.put("\\sum", new Name("sum"));
+        translationMethods.put("\\bsum", new JMLTranslationMethod() {
+            @Override
+            public Term translate(Object... params)
+                    throws SLTranslationException {
+                SLExpression a = (SLExpression) params[0];
+                SLExpression b = (SLExpression) params[1];
+                SLExpression t = (SLExpression) params[2];
+                Pair<KeYJavaType, ImmutableList<LogicVariable>> decls =
+                        (Pair<KeYJavaType, ImmutableList<LogicVariable>>) params[3];
+                Services services = (Services)params[4];
+                if (!decls.first.getJavaType().equals(PrimitiveType.JAVA_INT)) {
+                    throw new SLTranslationException("bounded sum variable must be of type int");
+                } else if (decls.second.size() != 1) {
+                    throw new SLTranslationException("bounded sum must declare exactly one variable");
+                }
+                LogicVariable qv = (LogicVariable) decls.second.head();
+                return TB.bsum(qv, a.getTerm(), b.getTerm(), t.getTerm(), services);
+            }
+        });
 
     }
 

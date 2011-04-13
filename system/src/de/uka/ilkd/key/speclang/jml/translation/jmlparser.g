@@ -2012,7 +2012,8 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
 bsumterm returns [SLExpression result=null] throws SLTranslationException
 {
     SLExpression a = null;
-    SLExpression b = null; 
+    SLExpression b = null;
+    SLExpression t = null;
     Pair<KeYJavaType,ImmutableList<LogicVariable>> decls = null;
 }:
         LPAREN
@@ -2023,20 +2024,10 @@ bsumterm returns [SLExpression result=null] throws SLTranslationException
         } 
         SEMI
         (
-            a=expression SEMI  b=expression SEMI result=expression
+            a=expression SEMI  b=expression SEMI t=expression
         )
         {
-            if(!decls.first.getJavaType().equals(PrimitiveType.JAVA_INT)) {
-                raiseError("bounded sum variable must be of type int");
-            } else if(decls.second.size() != 1) {
-                raiseError("bounded sum must declare exactly one variable");
-            }
-            LogicVariable lv = (LogicVariable) decls.second.head();
-            Function bsum = intLDT.getBsum();
-            Term t = TB.func(bsum, 
-                             new Term[]{a.getTerm(), b.getTerm(), result.getTerm()},
-                             new ImmutableArray<QuantifiableVariable>(lv));
-	    result = new SLExpression(t);
+            result = new SLExpression(JMLTranslator.getInstance().translate(q.getText(), a, b, t, services));
             resolverManager.popLocalVariablesNamespace();
         }
         RPAREN
