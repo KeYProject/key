@@ -14,13 +14,7 @@ import junit.framework.Assert;
 import junit.framework.TestCase;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermCreationException;
-import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.TermImpl;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
@@ -142,7 +136,7 @@ public class TestTermFactory extends TestCase {
     }
 
     public void testQuantifierTerm() {
-	Term t_forallx_px=TermBuilder.DF.all(new LogicVariable[]{x},t1());
+	Term t_forallx_px=TermBuilder.DF.all(ImmutableSLList.<QuantifiableVariable>nil().append(x),t1());
 	Assert.assertEquals(t_forallx_px,
 			    new TermImpl(Quantifier.ALL,new ImmutableArray<Term>(t1()), new ImmutableArray<QuantifiableVariable>(x), null));
     }
@@ -205,7 +199,7 @@ public class TestTermFactory extends TestCase {
     public void testQuantifierWithNoBoundSubTerms() {
 	Exception exc=new Exception();
 	try {
-	    TermBuilder.DF.all(new LogicVariable[]{}, t1());
+	    TermBuilder.DF.all(ImmutableSLList.<QuantifiableVariable>nil(), t1());
 	} catch (TermCreationException e) {
 	    exc=e;	    
 	}

@@ -34,7 +34,7 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
      * @param array the array of the elements to be prepended
      * @return IList<T> the new list
      */
-    ImmutableList<T> prepend(T[] array);
+    ImmutableList<T> prepend(T... array);
 
     /** appends element to the list (non-destructive)
      * @param element to be added at the end
@@ -53,7 +53,7 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
      * @param array the array to be appended
      * @return IList<T> the new list
      */
-    ImmutableList<T> append(T[] array);
+    ImmutableList<T> append(T... array);
 
     /** @return <T> the first element in list */
     T head();
@@ -71,6 +71,7 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
     ImmutableList<T> reverse();
 
     /** @return Iterator<T> of this list */
+    @Override
     Iterator<T> iterator();
 
     /** @return boolean is true iff. obj is in List */

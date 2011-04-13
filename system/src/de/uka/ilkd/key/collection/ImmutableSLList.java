@@ -45,6 +45,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
     /**
      * Reverses this list (O(N))
      */
+    @Override
     public ImmutableList<T> reverse() {
 	if ( size () <= 1 )
 	    return this;
@@ -61,6 +62,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
     /**
      * Convert the list to a Java array (O(n))
      */
+    @Override
     public <S> S[] toArray(S[] array) {
 	S[] result;
 	if (array.length < size()) {
@@ -81,7 +83,8 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
      * @param array the array of the elements to be prepended
      * @return IList<T> the new list
      */
-    public ImmutableList<T> prepend(T[] array) {
+    @Override
+    public ImmutableList<T> prepend(T... array) {
 	return prepend ( array, array.length );
     }
 
@@ -104,6 +107,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
      * @param n an int specifying the number of elements to be truncated
      * @return IList<T> this list without the first <code>n</code> elements
      */
+    @Override
     public ImmutableList<T> take(int n) {
 	if ( n < 0 || n > size () )
 	    throw new IndexOutOfBoundsException
@@ -158,6 +162,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 	 * @param e the <T> to be prepended
 	 * @return IList<T> the new list
 	 */
+        @Override
 	public ImmutableList<S> prepend(S e) {
 	    return new Cons<S>(e, this);
 	}
@@ -166,6 +171,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 	 * @param list the IList<T> to be prepended
 	 * @return IList<T> the new list
 	 */
+        @Override
 	public ImmutableList<S> prepend(ImmutableList<S> list) {
 	    if (list.isEmpty()) {
 		return this;
@@ -181,6 +187,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 	 * @param e the <T> to be prepended
 	 * @return IList<T> the new list
 	 */
+        @Override
 	public ImmutableList<S> append(S e) {
 	    return new Cons<S>(e).prepend(this);
 	}
@@ -189,6 +196,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 	 * @param list the IList<T> to be appended
 	 * @return IList<T> the new list
 	 */
+        @Override
 	public ImmutableList<S> append(ImmutableList<S> list) {
 	    return list.prepend(this);
 	}
@@ -197,16 +205,19 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 	 * @param array the array to be appended
 	 * @return IList<T> the new list
 	 */
+        @Override
 	public ImmutableList<S> append(S[] array) {
 	    return ((ImmutableList<S>) nil()).prepend ( array ).prepend ( this );
 	}
 
 	/** @return <T> first element in list */
+        @Override
 	public S head() {
 	    return element;
 	}
 
 	/** @return IList<T> tail of the list */
+        @Override
 	public ImmutableList<S> tail() {
 	    return cons;
 	}
@@ -216,6 +227,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
          * java.util.Collections use
 	 * @return the hashcode of the list
          */
+        @Override
 	public int hashCode() {
 	    if (hashCode == -1) {
 		hashCode = (element == null ? 0 : element.hashCode()) +
@@ -229,16 +241,19 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 
 
 	/** @return iterator through list */
+        @Override
 	public Iterator<S> iterator() {
 	    return new SLListIterator<S>(this);
 	}
 
 	/** @return int the number of elements in list */
+        @Override
 	public int size() {
 	    return size;
 	}
 
 	/** @return boolean true iff. obj in list */
+        @Override
 	public boolean contains(S obj) {
 	    ImmutableList<S> list = this;
 	    S       t;
@@ -252,6 +267,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 	}
 
 	/** @return true iff the list is empty */
+        @Override
 	public boolean isEmpty() {
 	    return false;
 	}
@@ -260,6 +276,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 	/** removes first occurrences of obj (O(n))
 	 * @return new list
 	 */
+        @Override
 	public ImmutableList<S> removeFirst(S obj) {
 	    S[]       res            = (S[]) new Object [ size () ];
 	    int         i              = 0;
@@ -285,6 +302,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 	 * removes all occurrences of obj (O(n))
 	 * @return new list
 	 */
+        @Override
 	public ImmutableList<S> removeAll(S obj) {
 	    S[]       res            = (S[]) new Object [ size () ];
 	    int         i              = 0;
@@ -306,6 +324,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 	}
 
 
+        @Override
 	public boolean equals(Object o) {
 	    if ( ! ( o instanceof ImmutableList ) )
 		return false;
@@ -326,6 +345,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
         }
 
 
+        @Override
 	public String toString() {
 	    Iterator<S> it    = this.iterator();
 	    StringBuilder str = new StringBuilder("[");
@@ -354,6 +374,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 	}
 
 	/** @return next element in list */
+        @Override
 	public T next() {
 	    T element = list.head();
 	    list = list.tail();
@@ -362,6 +383,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 
 	/** @return true iff there are unseen elements in the list
 	 */
+        @Override
 	public boolean hasNext() {
 	    return !list.isEmpty();
 	}
@@ -370,6 +392,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 	 * throws an unsupported operation exception as removing elements
 	 * is not allowed on immutable lists
 	 */
+        @Override
 	public void remove() {
 	    throw new UnsupportedOperationException("Removing elements via an iterator" +
 	    " is not supported for immutable datastructures.");
@@ -400,66 +423,82 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
             return nil();
 	}
 
+        @Override
 	public int size() {
 	    return 0;
 	}
 
+        @Override
 	public boolean equals ( Object o ) {
 	    return o instanceof NIL;
 	}
 
+        @Override
 	public int hashCode() {
 	    return 0;
 	}
 
+        @Override
 	public ImmutableList<S> prepend(S element) {
 	    return new Cons<S>(element);
 	}
 
+        @Override
 	public ImmutableList<S> prepend(ImmutableList<S> list) {
 	    return list;
 	}
 
+        @Override
 	public ImmutableList<S> append(S element) {
 	    return new Cons<S>(element);
 	}
 
+        @Override
 	public ImmutableList<S> append(ImmutableList<S> list) {
 	    return list;
 	}
 
-	public ImmutableList<S> append(S[] array) {
+        @Override
+	public ImmutableList<S> append(S... array) {
 	    return prepend ( array );
 	}
 
+        @Override
 	public boolean contains(S obj) {
 	    return false;
 	}
 
+        @Override
 	public boolean isEmpty() {
 	    return true;
 	}
 
+        @Override
 	public Iterator<S> iterator() {
 	    return iterator;
 	}
 
+        @Override
 	public S head() {
 	    return null;
 	}
 
+        @Override
 	public ImmutableList<S> tail() {
 	    return this;
 	}
 
+        @Override
 	public ImmutableList<S> removeAll(S obj) {
 	    return this;
 	}
 
+        @Override
 	public ImmutableList<S> removeFirst(S obj) {
 	    return this;
 	}
 
+        @Override
 	public String toString() {
 	    return "[]";
 	}
@@ -474,6 +513,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 	    }
 
 	    /** @return next element in list */
+            @Override
 	    public S next() {
 		return null;
 	    }
@@ -481,6 +521,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 	    /**
 	     * @return true iff there are unseen elements in the list
 	     */
+            @Override
 	    public boolean hasNext() {
 		return false;
 	    }
@@ -489,6 +530,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 	     * throws an unsupported operation exception as removing elements
 	     * is not allowed on immutable lists
 	     */
+            @Override
 	    public void remove() {
 	    	throw new UnsupportedOperationException("Removing elements via an iterator" +
 	    	" is not supported for immutable datastructures.");

@@ -10,6 +10,7 @@
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
@@ -17,20 +18,22 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * quantifier, respectively.
  */
 public final class Quantifier extends AbstractSortedOperator {
+    public static final Name ALL_NAME = new Name("all");
+    public static final Name EX_NAME = new Name("exists");
     
     /** 
      * the ususal 'forall' operator 'all' (be A a formula then       
      * 'all x.A' is true if and only if for all elements d of the
      * universe A{x<-d} (x substitued with d) is true 
      */
-    public static final Quantifier ALL = new Quantifier(new Name("all"));
+    public static final Quantifier ALL = new Quantifier(ALL_NAME);
     
     /** 
      * the ususal 'exists' operator 'ex' (be A a formula then       
      * 'ex x.A' is true if and only if there is at least one elements
      * d of the universe such that A{x<-d} (x substitued with d) is true 
      */     
-    public static final Quantifier EX = new Quantifier(new Name("exist"));
+    public static final Quantifier EX = new Quantifier(EX_NAME);
 
 
     private Quantifier(Name name) {
@@ -39,5 +42,5 @@ public final class Quantifier extends AbstractSortedOperator {
               Sort.FORMULA, 
               new Boolean[]{true}, 
               true);
-    }    
+    }
 }

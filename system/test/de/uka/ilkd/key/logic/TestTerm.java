@@ -10,6 +10,7 @@
 
 package de.uka.ilkd.key.logic;
 
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
@@ -104,8 +105,9 @@ public class TestTerm extends TestCase {
    public void testFreeVars4() {
 	Term t_allxt1=TB.all(x, t2());
 	Term t_allxt1_andt2=tf.createTerm(Junctor.AND,t_allxt1,t1());
-	Term t_exw_allxt1_andt2=TB.ex(new LogicVariable[]{w,x}, 
-							t_allxt1_andt2); 
+	Term t_exw_allxt1_andt2 =
+                TB.ex(ImmutableSLList.<QuantifiableVariable>nil().append(w, x),
+                     t_allxt1_andt2);
 	assertTrue(!t_exw_allxt1_andt2.freeVars().contains(w)
 		   && !t_exw_allxt1_andt2.freeVars().contains(x));
     }

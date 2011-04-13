@@ -2002,74 +2002,7 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
 	    p = convertToFormula(p);
 	    Term t = convertToFormula(expr.getTerm());
 	    
-	    //add implicit "non-null and created" guards for reference types, 
-	    //"in-bounds" guards for integer types
-	    Term nullTerm = TB.NULL(services);
-	    for(LogicVariable lv : declVars.second) {
-	        p = TB.and(p, TB.reachableValue(services, TB.var(lv), declVars.first));
-	    	if(lv.sort().extendsTrans(services.getJavaInfo().objectSort()) && !nullable) {
-		    p = TB.and(p, TB.not(TB.equals(TB.var(lv), nullTerm)));
-		}
-	    }	    
-
-            String dlName = JMLTranslation.toDlName(q.getText());
-            Operation quant = (Function) services.getNamespaces().functions().lookup(dlName);
-            result = TB.quantifier(quant, declVars.second.toArray(new LogicVariable[declVars.second.size()]), p, t);
-
-
-            /*XXX
-	    if (q.getText().equals("\\forall")) {
-		if (p != null) {
-		    t = TB.imp(p, t);
-		}
-		result = TB.all(declVars.second.toArray(new LogicVariable[declVars.second.size()]), t);
-	    }
-	    else if (q.getText().equals("\\exists")) {
-		if (p != null) {
-		    t = TB.and(p, t);
-		}
-		result = TB.ex(declVars.second.toArray(new LogicVariable[declVars.second.size()]), t);
-	    }
-	    else if (q.getText().equals("\\min")) {
-	    	raiseNotSupported("\\min");
-	    }
-	    else if (q.getText().equals("\\max")) {
-	        raiseNotSupported("\\max");
-	    }
-	    else if (q.getText().equals("\\num_of")) {
-            	LogicVariable lv = declVars.head();
-            	p=p.sub(0);
-            	if(p!=null && isBoundedSum(p, lv) && p.sub(0).op()!=Junctor.AND){
-	                result = TermFactory.DEFAULT.createBoundedNumericalQuantifierTerm(BoundedNumericalQuantifier.BSUM, 
-        	                lowerBound(p, lv), upperBound(p, lv), TB.ife(
-                	                t, TB.zTerm(services, "1"), TB.zTerm(services, "0")),
-                        	        new ImmutableArray<QuantifiableVariable>(lv));
-                                       
-                } else {
-                    raiseError("only \\num_of expressions of form (\\sum int i; l<=i && i<u; t) are permitted");
-            	}
-	    }
-	    else if (q.getText().equals("\\product")) {
-		raiseNotSupported("\\product");
-	    }
-	    else if (q.getText().equals("\\sum")) {
-
-                LogicVariable lv = declVars.head();
-            	p=p.sub(0);
-            
-            	if(isBoundedSum(p, lv)) {
-	            if(p.arity()>0 && p.sub(0).op()==Junctor.AND) {
-                        t = TB.ife(p.sub(1), t, TB.zTerm(services, "0"));
-                    }
-                    result = TermFactory.DEFAULT.createBoundedNumericalQuantifierTerm(BoundedNumericalQuantifier.BSUM, 
-                            lowerBound(p, lv), upperBound(p, lv), t, new ImmutableArray<QuantifiableVariable>(lv));
-                } else {
-                    raiseError("only \\sum expressions of form (\\sum int i; l<=i && i<u; t) are permitted");
-                }
-	    }
-	    else {
-		raiseError("Unknown quantifier: " + q.getText() + "!");
-	    }*/
+	    result = JMLTranslator.getInstance().translate(q.getText(), declVars, p, t, nullable, services);
 	}
 	RPAREN
 ;

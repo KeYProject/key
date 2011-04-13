@@ -184,20 +184,20 @@ class GenericTranslator {
 	}
 
 	if (term.op() instanceof Quantifier) {
-	    QuantifiableVariable[] copy = new QuantifiableVariable[term.boundVars().size()];
-	    int i = 0;
-
+	    ImmutableList<QuantifiableVariable> copy =
+                    ImmutableSLList.<QuantifiableVariable>nil();
 	    for (QuantifiableVariable var : term.boundVars()) {
-		copy[i] = var;
-		if (copy[i].sort() instanceof GenericSort) {
-		
-		    copy[i] =     pool.getInstantiationOfLogicVar(
-			    instantiation, pool.getLogicVariable(copy[i].name(),
-				    instantiation));
-		}
-
-		i++;
-	    }
+                if (var.sort() instanceof GenericSort) {
+                    copy = copy.append(
+                                pool.getInstantiationOfLogicVar(
+                                    instantiation,
+                                    pool.getLogicVariable(
+                                        var.name(),
+                                        instantiation)));
+                } else {
+                    copy = copy.append(var);
+                }
+            }
 	    if ((term.op()).equals(Quantifier.ALL)) {
 		term = TermBuilder.DF.all(copy, subTerms[0]);
 	    }

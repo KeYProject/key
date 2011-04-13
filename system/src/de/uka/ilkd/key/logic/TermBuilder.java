@@ -406,86 +406,38 @@ public final class TermBuilder {
     	                     new ImmutableArray<QuantifiableVariable>(qv), 
     	                     null);
     }
-    
-    
-    public Term all(ImmutableArray<QuantifiableVariable> qv, Term t2) {
-	if(qv.isEmpty()) {
-	    throw new TermCreationException("Cannot quantify over 0 variables");
-	}
-        Term result = t2;
-        for (int i = qv.size() - 1; i >= 0; i--) {
-            result = all(qv.get(i), result); 
+
+
+    public Term all(Iterable<QuantifiableVariable> qvs, Term t) {
+        Term result = t;
+        for (QuantifiableVariable fv : qvs) {
+            result = all(fv, result);
         }
         return result;
-    }    
-    
-    
-    public Term all(QuantifiableVariable[] qv, Term t2) {
-	return all(new ImmutableArray<QuantifiableVariable>(qv), t2);
     }
-    
-    
+
+
+    public Term allClose(Term t) {
+	return all(t.freeVars(), t);
+    }
+
+
     public Term ex(QuantifiableVariable qv, Term t) {
 	return tf.createTerm(Quantifier.EX, 
 			     new ImmutableArray<Term>(t),
 			     new ImmutableArray<QuantifiableVariable>(qv),
 			     null);
     }
-    
-    
-    public Term ex(ImmutableArray<QuantifiableVariable> qv, Term t2) {
-	if(qv.isEmpty()) {
-	    throw new TermCreationException("Cannot quantify over 0 variables");
-	}	
-        Term result = t2;
-        for (int i = qv.size() - 1; i >= 0; i--) {
-            result = ex(qv.get(i), result); 
+
+
+    public Term ex(Iterable<QuantifiableVariable> qvs, Term t) {
+        Term result = t;
+        for (QuantifiableVariable fv : qvs) {
+            result = ex(fv, result);
         }
         return result;
-    }        
-    
-    
-    public Term ex(QuantifiableVariable[] qv, Term t2) {
-        return ex(new ImmutableArray<QuantifiableVariable>(qv), t2);
     }
 
-
-//    public Term sum(QuantifiableVariable qv, Term t) {
-//        return tf.createTerm(,
-//    	                     new ImmutableArray<Term>(t),
-//    	                     new ImmutableArray<QuantifiableVariable>(qv),
-//    	                     null);
-//    }
-//
-//
-//    public Term sum(ImmutableArray<QuantifiableVariable> qv, Term t2) {
-//	if(qv.isEmpty()) {
-//	    throw new TermCreationException("Cannot quantify over 0 variables");
-//	}
-//        Term result = t2;
-//        for (int i = qv.size() - 1; i >= 0; i--) {
-//            result = sum(qv.get(i), result);
-//        }
-//        return result;
-//    }
-//
-//
-//    public Term sum(QuantifiableVariable[] qv, Term t2) {
-//	return sum(new ImmutableArray<QuantifiableVariable>(qv), t2);
-//    }
-
-    
-    public Term allClose(Term t) {
-	ImmutableSet<QuantifiableVariable> freeVars = t.freeVars();
-	if(freeVars.isEmpty()) {
-	    return t;
-	} else {
-	    return all(freeVars.toArray(
-		    		new QuantifiableVariable[freeVars.size()]), 
-		       t);
-	}
-    }
-    
     
     public Term not(Term t) {
 	if(t.op() == Junctor.TRUE) {
@@ -545,15 +497,11 @@ public final class TermBuilder {
     }
     
     
-    public Term or(Term[] subTerms) {
-        Term result = ff();
-        for(int i = 0; i < subTerms.length; i++) {
-            result = or(result, subTerms[i]);
-        }
-        return result;
+    public Term or(Term... subTerms) {
+        return or(subTerms);
     }
     
-    public Term or(ImmutableList<Term> subTerms) {
+    public Term or(Iterable<Term> subTerms) {
 	Term result = ff();
 	for(Term sub : subTerms) {
 	    result = or(result, sub);
@@ -1344,24 +1292,28 @@ public final class TermBuilder {
 	final OpReplacer or = new OpReplacer(normalToAtPre);
 	final Term modAtPre = or.replace(mod);
 	final Term createdAtPre = or.replace(created(services, objVarTerm));
-	
-	return all(new QuantifiableVariable[]{objVar, fieldVar},
-		   or(new Term[]{elementOf(services,
-			   	    	   objVarTerm,
-			   	    	   fieldVarTerm,
-			   	    	   modAtPre),
-			   	 and(not(equals(objVarTerm, NULL(services))),
-			             not(createdAtPre)),
-			   	 equals(select(services,
-			   		       Sort.ANY,
-			   		       heap(services),
-			   		       objVarTerm,
-			   		       fieldVarTerm),
-			   		select(services,
-			   		       Sort.ANY,
-			   		       or.replace(heap(services)),
-			   		       objVarTerm,
-			   		       fieldVarTerm))}));
+
+        ImmutableList<QuantifiableVariable> quantVars =
+                ImmutableSLList.<QuantifiableVariable>nil();
+        quantVars = quantVars.append(objVar);
+        quantVars = quantVars.append(fieldVar);
+	return all(quantVars,
+		   or(elementOf(services,
+                                objVarTerm,
+                                fieldVarTerm,
+                                modAtPre),
+                      and(not(equals(objVarTerm, NULL(services))),
+                      not(createdAtPre)),
+                      equals(select(services,
+                                    Sort.ANY,
+                                    heap(services),
+                                    objVarTerm,
+                                    fieldVarTerm),
+                             select(services,
+                                    Sort.ANY,
+                                    or.replace(heap(services)),
+                                    objVarTerm,
+                                    fieldVarTerm))));
     }
     
     

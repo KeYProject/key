@@ -10,6 +10,7 @@
 
 package de.uka.ilkd.key.logic;
 
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -210,7 +211,7 @@ public class TestClashFreeSubst extends TestCase {
 			    top.varsBoundHere(0).get(i);
 		    }
 		    subStack.pop();
-		    subStack.push(TermBuilder.DF.all(bv, top.sub(0)));
+		    subStack.push(TermBuilder.DF.all(ImmutableSLList.<QuantifiableVariable>nil().append(bv), top.sub(0)));
 		    return;
 		}
 	    }
