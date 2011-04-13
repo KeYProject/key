@@ -35,6 +35,7 @@ tokens {
     ASSUME_REDUNDANTLY          = "assume_redundantly";
     ASSIGNABLE 			= "assignable";
     ASSIGNABLE_RED 		= "assignable_redundantly";
+    AXIOM                       = "axiom";
     BEHAVIOR 			= "behavior";
     BEHAVIOUR 			= "behaviour";
     CAPTURES 			= "captures";
@@ -58,6 +59,7 @@ tokens {
     ENSURES_RED 		= "ensures_redundantly";
     EXCEPTIONAL_BEHAVIOR 	= "exceptional_behavior";
     EXCEPTIONAL_BEHAVIOUR 	= "exceptional_behaviour";
+    EXTRACT                     = "extract";
     FINAL 			= "final";
     FOR_EXAMPLE			= "for_example";
     FORALL			= "forall";
@@ -83,6 +85,7 @@ tokens {
     MODIFIABLE_RED		= "modifiable_redundantly";
     MODIFIES			= "modifies";
     MODIFIES_RED		= "modifies_redundantly";
+    MONITORED                   = "monitored";
     MONITORS_FOR		= "monitors_for";
     NATIVE			= "native";
     NON_NULL 			= "non_null";

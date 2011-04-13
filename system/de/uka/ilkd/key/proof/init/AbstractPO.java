@@ -86,7 +86,7 @@ public abstract class AbstractPO implements ProofOblInput {
 	    				Pair<Sort, ObserverFunction> usedObs,
 	    				ImmutableSet<ClassAxiom> axioms) {
 	for(ClassAxiom axiom : axioms) {
-	    if(!(axiom.getTarget().equals(usedObs.second) 
+	    if(axiom.getTarget()==null || !(axiom.getTarget().equals(usedObs.second) 
 		 && usedObs.first.extendsTrans(axiom.getKJT().getSort()))) {
 		axioms = axioms.remove(axiom);
 	    }

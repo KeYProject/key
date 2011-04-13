@@ -18,6 +18,7 @@ import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.SVSubstitute;
 
 
 /**
@@ -28,14 +29,14 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 public class OpReplacer {
     private static final TermFactory TF = TermFactory.DEFAULT;
     
-    private final Map /*Operator -> Operator, Term -> Term*/ map;
+    private final Map<? extends SVSubstitute, ? extends SVSubstitute> /*Operator -> Operator, Term -> Term*/ map;
     
     
     /**
      * @param map mapping from the operators/terms to be replaced to the ones to 
      * replace them with
      */
-    public OpReplacer(Map /*Operator -> Operator, Term -> Term*/ map) {
+    public OpReplacer(Map<? extends SVSubstitute, ? extends SVSubstitute> /*Operator -> Operator, Term -> Term*/ map) {
 	assert map != null;
         this.map = map;
     }
@@ -155,11 +156,11 @@ public class OpReplacer {
     /**
      * Replaces in a map from Operator to Term.
      */
-    public Map<Operator, Term> replace(/*in*/ Map<Operator, Term> map) {
+    public Map<Operator, Term> replace(/*in*/ Map<Operator, Term> mapp) {
         
         Map<Operator,Term> result = new HashMap<Operator, Term>();
         
-        final Iterator<Map.Entry<Operator, Term>> it = map.entrySet().iterator();
+        final Iterator<Map.Entry<Operator, Term>> it = mapp.entrySet().iterator();
         while(it.hasNext()) {
             final Map.Entry<Operator, Term> entry = it.next();
             result.put(replace(entry.getKey()), replace(entry.getValue()));
