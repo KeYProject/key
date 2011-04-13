@@ -83,20 +83,19 @@ final class JMLTranslator {
                                          Term t1,
                                          Term t2)
                 throws SLTranslationException {
-            if (!qvs.iterator().hasNext()) {
-                throw new TermCreationException(
-                        "Cannot quantify over 0 variables");
-            }
-            Term result = t2;
+            Term result = combineQuantifiedTerms(t1, t2);
             for (LogicVariable qv : qvs) {
-                result = translateQuantifier(qv, t1, result);
+                result = translateQuantifier(qv, result);
             }
             return result;
         }
 
+        public abstract Term combineQuantifiedTerms(Term t1,
+                                                      Term t2)
+                throws SLTranslationException;
+
         public abstract Term translateQuantifier(QuantifiableVariable qv,
-                                                 Term t1,
-                                                 Term t2)
+                                                 Term t)
                 throws SLTranslationException;
     }
 
@@ -108,19 +107,29 @@ final class JMLTranslator {
         translationMethods.put("\\forall", new JMLQuantifierTranslationMethod() {
             @Override
             public Term translateQuantifier(QuantifiableVariable qv,
-                                            Term t1,
-                                            Term t2)
+                                            Term t)
                     throws SLTranslationException {
-                return TB.all(qv, TB.imp(t1, t2));
+                return TB.all(qv, t);
+            }
+            @Override
+            public Term combineQuantifiedTerms(Term t1,
+                                                 Term t2)
+                    throws SLTranslationException {
+                return TB.imp(t1, t2);
             }
         });
         translationMethods.put("\\exists", new JMLQuantifierTranslationMethod() {
             @Override
             public Term translateQuantifier(QuantifiableVariable qv,
-                                            Term t1,
-                                            Term t2)
+                                            Term t)
                     throws SLTranslationException {
-                return TB.ex(qv, TB.and(t1, t2));
+                return TB.ex(qv, t);
+            }
+            @Override
+            public Term combineQuantifiedTerms(Term t1,
+                                                 Term t2)
+                    throws SLTranslationException {
+                return TB.and(t1, t2);
             }
         });
 //        translationMethods.put("\\min", new Name("min"));
