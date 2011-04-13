@@ -72,6 +72,7 @@ import javax.swing.event.MouseInputAdapter;
 import javax.swing.text.JTextComponent;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.ChoiceSelector;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
@@ -112,6 +113,8 @@ import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.proof.init.JavaProfile;
+import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Taclet;
@@ -120,6 +123,8 @@ import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
 import de.uka.ilkd.key.taclettranslation.SkeletonGenerator;
+import de.uka.ilkd.key.taclettranslation.lemma.ProofObligationCreator;
+import de.uka.ilkd.key.taclettranslation.lemma.TacletLoader;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.key.util.KeYResourceManager;
@@ -1446,7 +1451,23 @@ public final class Main extends JFrame implements IMain {
         
         final File file = localFileChooser.getSelectedFile ();
         
+        TacletLoader tacletLoader = new TacletLoader();
+        try {
+            KeYUserProblemFile keyFile = new KeYUserProblemFile(file.getName(), file, progressMonitor);
+            
+	    ImmutableSet<Taclet> taclets = 
+		tacletLoader.load(keyFile, mediator().getSelectedProof().env().getInitConfig());
 
+	    LemmaSelectionDialog dialog = new LemmaSelectionDialog();
+	    taclets = dialog.showModal(taclets);
+	    
+	    mediator().getSelectedProof().env().registerProof(keyFile,ProofObligationCreator.create(taclets,
+		    mediator().getSelectedProof().env().getInitConfig() ));
+	    
+	    
+        } catch (ProofInputException e) {
+	    e.printStackTrace();
+        }
     }
     
     /**
