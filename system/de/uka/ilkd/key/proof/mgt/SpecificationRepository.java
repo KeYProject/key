@@ -720,13 +720,11 @@ public final class SpecificationRepository {
 		result = result.add(queryAxiom);
 	    }
 	}
-	
 	//add axioms for enclosing class, if applicable
 	final KeYJavaType enclosingKJT = getEnclosingKJT(kjt);
 	if(enclosingKJT != null) {
 	    result = result.union(getClassAxioms(enclosingKJT));
 	}
-	
 	return result;
     }
     

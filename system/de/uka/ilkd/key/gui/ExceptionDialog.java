@@ -77,7 +77,7 @@ public class ExceptionDialog extends JDialog {
          JCheckBox detailsBox  = new JCheckBox("Show Details");
          detailsBox.setSelected(false);
 	 JPanel bPanel = new JPanel();
-	 bPanel.add(reloadButton);
+	 //bPanel.add(reloadButton); // XXX useful for debugging
 	 bPanel.add(closeButton);
 	 bPanel.add(detailsBox);
 

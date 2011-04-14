@@ -33,17 +33,27 @@ public class Counter {
     public int getCount() {
         return count;
     }
+    
+    public int getCountPlusPlus(){
+	return count++;
+    }
 
+    /**@deprecated
+     */
     public int getCountPlusPlus(Node undoAnchor) {
 //        undoAnchors.push(new NodeAnchor(undoAnchor));
         return count++;
     }
     
+    /**@deprecated
+     */
     public int getCountPlusPlusWithParent(Node undoAnchor) {
 //        undoAnchors.push(new NodeAnchor(undoAnchor, true));
         return count++;
     }
     
+    /**@deprecated
+     */
     public void undo(Node node) {
 /*        if (undoAnchors.size()==0) {
             de.uka.ilkd.key.util.Debug.assertTrue(count==0,

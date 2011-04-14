@@ -563,7 +563,7 @@ public class JMLSpecFactory {
 	final Term ax 
 	= translator.translateExpression(originalRep,kjt,selfVar,null,null,null,null);
 	//create class axiom
-	return new ClassAxiomImpl("JML axiom in "+kjt,kjt, new Public(),ax,selfVar);
+	return new ClassAxiomImpl("class axiom in "+kjt.getFullName(),kjt, new Public(),ax,selfVar);
     }
     
     

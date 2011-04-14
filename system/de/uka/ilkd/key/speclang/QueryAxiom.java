@@ -33,9 +33,7 @@ import de.uka.ilkd.key.util.Pair;
  * method (i.e., an object of type ProgramMethod), with the corresponding
  * method body.
  */
-public final class QueryAxiom implements ClassAxiom {
-    
-    private static final TermBuilder TB = TermBuilder.DF;
+public final class QueryAxiom extends ClassAxiom {
     
     private final String name;
     private final ProgramMethod target;    
