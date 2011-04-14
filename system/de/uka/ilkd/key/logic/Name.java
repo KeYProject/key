@@ -11,20 +11,33 @@
 package de.uka.ilkd.key.logic;
 
 /**
- * A Name object is created to represent the name of an object which
- * usually implements the interface {@link Named}.
+ * A Name object is created to represent the name of an object which usually
+ * implements the interface {@link Named}.
+ * 
+ * <p>
+ * It wraps a string object. To save memory and to speed up equality checks, the
+ * wrapped strings are stored in their {@linkplain String#intern() interned}
+ * representation.
+ * 
+ * <p>
+ * TODO Reconsider hash caching: 
+ * This implementation precalculates and caches
+ * the string's hashvalue. Since {@link String#hashCode()} itself also caches
+ * the value, there is no immediate need to do this here a second time.
  */
-public class Name {
-    
-    protected final String nameString;
+public class Name implements Comparable<Name> {
+
+    private static final String NONAME = "_noname_";
+
+    private final /*@Interned*/ String nameString;
 
     private final int hashCode;
 
-    /** 
-     * creates a name object 
+    /**
+     * creates a name object
      */
     public Name(String n) {
-	nameString = (n==null ? "_noname_" : n.intern()); 
+	nameString = (n == null ? NONAME : n).intern();
 	hashCode = nameString.hashCode();
     }
 
@@ -33,14 +46,16 @@ public class Name {
     }
 
     public boolean equals(Object o) {
-	if (! (o instanceof Name)) {
+	if (!(o instanceof Name)) {
 	    return false;
 	}
-	return nameString.equals(((Name)o).nameString);
+	// since ALL nameStrings are interned, equality can be safely reduced to
+	// identity in THIS case:
+	return nameString == ((Name) o).nameString;
     }
 
-    public int compareTo(Object o) {
-	return nameString.compareTo(((Name)o).nameString);
+    public int compareTo(Name o) {
+	return nameString.compareTo(o.nameString);
     }
 
     public int hashCode() {
