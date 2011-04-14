@@ -73,6 +73,7 @@ import javax.swing.text.JTextComponent;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.gui.TacletSoundnessPOLoader.LoaderListener;
 import de.uka.ilkd.key.gui.configuration.ChoiceSelector;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
@@ -107,6 +108,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.ProblemLoader;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.ProofSaver;
 import de.uka.ilkd.key.proof.ProofTreeAdapter;
@@ -114,10 +116,15 @@ import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
+import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
@@ -513,17 +520,9 @@ public final class Main extends JFrame implements IMain {
 		System.out.println("START TEST");
 		Proof proof = mediator().getProof();
 		if(proof != null){
-		    Taclet taclet = find("boolean_equal_2");
-		    if(taclet!= null){
-			try {
-	                   Term t = SkeletonGenerator.FindTacletTranslator.translate(taclet);
-	                   System.out.println(LogicPrinter.quickPrintTerm(t, proof.getServices()));
-                        } catch (IllegalTacletException e1) {
-	                    e1.printStackTrace();
-                        }
-		    }else{
-			System.out.println("Taclet does not exist.");
-		    }
+		    ProofEnvironment env = mediator().getSelectedProof().env();
+
+		    
 		}		
 	    }
 	    
@@ -1446,29 +1445,45 @@ public final class Main extends JFrame implements IMain {
                 +"load taclets "
                 +"from ...");
         boolean loaded = localFileChooser.showOpenDialog ( Main.this );
-        if (!loaded)
+       
+        if (!loaded){
             return;
-        
-        final File file = localFileChooser.getSelectedFile ();
-        
-        TacletLoader tacletLoader = new TacletLoader();
-        try {
-            KeYUserProblemFile keyFile = new KeYUserProblemFile(file.getName(), file, progressMonitor);
-            
-	    ImmutableSet<Taclet> taclets = 
-		tacletLoader.load(keyFile, mediator().getSelectedProof().env().getInitConfig());
-
-	    LemmaSelectionDialog dialog = new LemmaSelectionDialog();
-	    taclets = dialog.showModal(taclets);
-	    
-	    mediator().getSelectedProof().env().registerProof(keyFile,ProofObligationCreator.create(taclets,
-		    mediator().getSelectedProof().env().getInitConfig() ));
-	    
-	    
-        } catch (ProofInputException e) {
-	    e.printStackTrace();
         }
+        final Proof proof = mediator().getSelectedProof();
+        final File file = localFileChooser.getSelectedFile ();
+        LoaderListener listener = 	new LoaderListener() {
+	     @Override
+		    public void stopped(Throwable exception) {
+		        // TODO: handle the exception
+			throw new RuntimeException(exception);		
+		    }		    
+		    @Override
+		    public void stopped(ProofAggregate p, ImmutableSet<Taclet> taclets) {
+			mediator().startInterface(true);
+			if(p != null){
+			    Main.this.addProblem(p);
+			    // add only the taclets to the goals if 
+			    // the proof obligations were added successfully.
+			    for(Taclet taclet : taclets){
+				for(Goal goal : proof.openGoals()){
+				    goal.addTaclet(taclet, 
+					     SVInstantiations.EMPTY_SVINSTANTIATIONS,false);
+				}
+			    }
+			}
+		    }
+		    
+		    @Override
+		    public void started() {
+			mediator().stopInterface(true);			
+		    }
+		};
+        TacletSoundnessPOLoader loader = new TacletSoundnessPOLoader(progressMonitor, 
+        	file,proof.env() ,listener);
+        loader.start();
     }
+    
+    
     
     /**
      * update the selection menu for Decisionprocedures.

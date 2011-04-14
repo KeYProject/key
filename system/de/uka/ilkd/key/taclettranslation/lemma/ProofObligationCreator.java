@@ -15,6 +15,7 @@ public class ProofObligationCreator {
 	int i=0; 
 	for(Taclet taclet : taclets){
 	    singleProofs[i] = create(taclet, initConfig);
+	    System.out.println(singleProofs[i]);
 	    i++;
 	}
 	
@@ -29,6 +30,7 @@ public class ProofObligationCreator {
 	LemmaGenerator generator = new DefaultLemmaGenerator();
 	TacletFormula formula = generator.translate(taclet, initConfig.getServices());
 	String name = taclet.name().toString();
+
 	return ProofAggregate.createProofAggregate(new Proof(name,
                 formula.getFormula(),
                 "NOT YET IMPLEMENTED",
