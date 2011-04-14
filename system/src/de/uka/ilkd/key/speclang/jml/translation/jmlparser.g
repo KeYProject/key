@@ -2004,7 +2004,7 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
 	    p = convertToFormula(p);
 	    Term t = convertToFormula(expr.getTerm());
 	    
-	    result = JMLTranslator.getInstance().translate(q.getText(), declVars, p, t, nullable, services);
+	    result = JMLTranslator.getInstance().translate(q.getText(), p, t, declVars.first, declVars.second, nullable, services);
 	}
 	RPAREN
 ;
@@ -2027,7 +2027,7 @@ bsumterm returns [SLExpression result=null] throws SLTranslationException
             a=expression SEMI  b=expression SEMI t=expression
         )
         {
-            result = new SLExpression(JMLTranslator.getInstance().translate(q.getText(), a, b, t, services));
+            result = new SLExpression(JMLTranslator.getInstance().translate(q.getText(), a, b, t, decls.first, decls.second, services));
             resolverManager.popLocalVariablesNamespace();
         }
         RPAREN

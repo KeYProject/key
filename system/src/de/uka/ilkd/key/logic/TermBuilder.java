@@ -900,7 +900,16 @@ public final class TermBuilder {
             return func(integerLDT.getAdd(), t1, t2);
         }
     }
-    
+
+
+    public Term inInt(Term var,
+                      Services services) {
+        Function f =
+                (Function) services.getNamespaces().functions().lookup(
+                new Name("inInt"));
+        return func(f, var);
+    }
+
     
     
     //-------------------------------------------------------------------------

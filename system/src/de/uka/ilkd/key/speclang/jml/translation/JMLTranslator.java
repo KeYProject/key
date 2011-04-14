@@ -9,16 +9,12 @@
 //
 package de.uka.ilkd.key.speclang.jml.translation;
 
-import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermCreationException;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -29,6 +25,7 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.LinkedHashMap;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
+import java.util.Arrays;
 
 
 
@@ -62,17 +59,22 @@ final class JMLTranslator {
         @Override
         public Term translate(Object... params)
                 throws SLTranslationException {
-            Pair<KeYJavaType, ImmutableList<LogicVariable>> declVars =
-                    (Pair<KeYJavaType, ImmutableList<LogicVariable>>) params[0];
-            Term preTerm = (Term) params[1];
-            Term bodyTerm = (Term) params[2];
-            boolean nullable = (Boolean) params[3];
-            Services services = (Services) params[4];
+            checkParameters(params,
+                            Term.class, Term.class, KeYJavaType.class,
+                            ImmutableList.class, Boolean.class, Services.class);
+            Term preTerm = (Term) params[0];
+            Term bodyTerm = (Term) params[1];
+            KeYJavaType declsType = (KeYJavaType) params[2];
+            ImmutableList<LogicVariable> declVars =
+                    (ImmutableList<LogicVariable>) params[3];
+            boolean nullable = (Boolean) params[4];
+            Services services = (Services) params[5];
+
             Term nullTerm = TB.NULL(services);
-            for (LogicVariable lv : declVars.second) {
+            for (LogicVariable lv : declVars) {
                 preTerm = TB.and(preTerm,
                                  TB.reachableValue(services, TB.var(lv),
-                                                   declVars.first));
+                                                   declsType));
                 if (lv.sort().extendsTrans(services.getJavaInfo().objectSort())
                     && !nullable) {
                     preTerm = TB.and(preTerm, TB.not(TB.equals(TB.var(lv),
@@ -80,7 +82,7 @@ final class JMLTranslator {
                 }
             }
 
-            return translateQuantifiers(declVars.second, preTerm, bodyTerm);
+            return translateQuantifiers(declVars, preTerm, bodyTerm);
         }
 
 
@@ -146,22 +148,27 @@ final class JMLTranslator {
             @Override
             public Term translate(Object... params)
                     throws SLTranslationException {
+                checkParameters(params,
+                                SLExpression.class, SLExpression.class,
+                                SLExpression.class, KeYJavaType.class,
+                                ImmutableList.class, Services.class);
                 SLExpression a = (SLExpression) params[0];
                 SLExpression b = (SLExpression) params[1];
                 SLExpression t = (SLExpression) params[2];
-                Pair<KeYJavaType, ImmutableList<LogicVariable>> decls =
-                        (Pair<KeYJavaType, ImmutableList<LogicVariable>>) params[3];
-                Services services = (Services)params[4];
-                if (!decls.first.getJavaType().equals(PrimitiveType.JAVA_INT)) {
+                KeYJavaType declsType = (KeYJavaType) params[3];
+                ImmutableList<LogicVariable> declVars =
+                        (ImmutableList<LogicVariable>) params[4];
+                Services services = (Services)params[5];
+
+                if (!declsType.getJavaType().equals(PrimitiveType.JAVA_INT)) {
                     throw new SLTranslationException("bounded sum variable must be of type int");
-                } else if (decls.second.size() != 1) {
+                } else if (declVars.size() != 1) {
                     throw new SLTranslationException("bounded sum must declare exactly one variable");
                 }
-                LogicVariable qv = (LogicVariable) decls.second.head();
+                LogicVariable qv = (LogicVariable) declVars.head();
                 return TB.bsum(qv, a.getTerm(), b.getTerm(), t.getTerm(), services);
             }
         });
-
     }
 
 
@@ -183,11 +190,29 @@ final class JMLTranslator {
             throw new SLTranslationException(
                     "Unknown translation for JML-keyword \""
                     + jmlKeyword
-                    + "\". The keyword seems not to be supported jet.");
+                    + "\". The keyword seems not to be supported yet.");
         }
     }
 
 
+    private void checkParameters(Object[] params,
+                                 Class... classes)
+            throws SLTranslationException {
+        boolean ok = true;
+        ok &= params.length == classes.length;
+        for (int i = 0; i < params.length && ok; i++) {
+            ok &= classes[i].isInstance(params[i]);
+        }
+        if (!ok) {
+            throw new SLTranslationException(
+                    "Parameters do not match the expected Types:\n"
+                    + "  Parameters where: " + Arrays.toString(params) + "\n"
+                    + "  Types where: " + Arrays.toString(classes));
+        }
+    }
+
+    
+    // TODO: refactor!
 
     /**
      * Translates a normal top-level JML expression, i.e. a formula.
