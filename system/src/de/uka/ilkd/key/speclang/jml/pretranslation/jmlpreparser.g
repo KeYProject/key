@@ -574,7 +574,7 @@ assignable_clause
 	returns [PositionedString result = null] 
 	throws SLTranslationException
 :
-    assignable_keyword result=expression
+    assignable_keyword result=expression { result = result.prepend("assignable "); }
 ;
 
 
@@ -593,7 +593,7 @@ accessible_clause
 	returns [PositionedString result = null] 
 	throws SLTranslationException
 :
-    accessible_keyword result=expression
+    accessible_keyword result=expression { result = result.prepend("accessible "); }
 ;
 
 
@@ -623,7 +623,7 @@ ensures_clause
 	returns [PositionedString result = null] 
 	throws SLTranslationException
 :
-    ensures_keyword result=expression
+    ensures_keyword result=expression { result = result.prepend("ensures "); }
 ;
 
 
@@ -638,7 +638,7 @@ signals_clause
 	returns [PositionedString result = null] 
 	throws SLTranslationException
 :
-    signals_keyword result=expression
+    signals_keyword result=expression { result = result.prepend("signals "); }
 ;
 
 
@@ -655,7 +655,7 @@ signals_only_clause
 	returns [PositionedString result = null] 
 	throws SLTranslationException
 :
-    signals_only_keyword result=expression
+    signals_only_keyword result=expression { result = result.prepend("signals_only "); }
 ;
 
 
@@ -685,13 +685,7 @@ secure_for_clause
 	returns [PositionedString result = null]
 	throws SLTranslationException
 :
-    secure_for_keyword result=expression
-;
-
-
-secure_for_keyword
-:
-        SECURE_FOR
+    s:SECURE_FOR result=expression { result = result.prepend(s.getText() + " "); }
 ;
 
 
@@ -699,13 +693,7 @@ declassify_clause
 	returns [PositionedString result = null]
 	throws SLTranslationException
 :
-    declassify_keyword result=expression
-;
-
-
-declassify_keyword
-:
-        DECLASSIFY
+    d:DECLASSIFY result=expression { result = result.prepend(d.getText() + " "); }
 ;
 
 
@@ -713,13 +701,7 @@ declassify_var_clause
 	returns [PositionedString result = null]
 	throws SLTranslationException
 :
-    declassify_var_keyword result=expression
-;
-
-
-declassify_var_keyword
-:
-        DECLASSIFY_VAR
+    d:DECLASSIFY_VAR result=expression { result = result.prepend(d.getText() + " "); }
 ;
 
 
@@ -881,7 +863,7 @@ represents_clause[ImmutableList<String> mods]
     represents_keyword ps=expression
     {
     	TextualJMLRepresents rc 
-    		= new TextualJMLRepresents(mods, ps);
+    		= new TextualJMLRepresents(mods, ps.prepend("represents "));
 	result = ImmutableSLList.<TextualJMLConstruct>nil().prepend(rc);
     }
 ;
@@ -909,7 +891,7 @@ depends_clause[ImmutableList<String> mods]
     accessible_keyword ps=expression
     {
     	TextualJMLDepends d 
-    		= new TextualJMLDepends(mods, ps);
+    		= new TextualJMLDepends(mods, ps.prepend("depends "));
 	result = ImmutableSLList.<TextualJMLConstruct>nil().prepend(d);
     }
 ;

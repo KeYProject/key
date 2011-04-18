@@ -30,7 +30,6 @@ import de.uka.ilkd.key.proof.ProofSaver;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.HelperClassForTests;
-import org.junit.Assert;
 
 
 
@@ -122,7 +121,7 @@ public class TestJMLTranslator extends TestCase {
         Term result = null;
 
         try {
-            result = translator.translateExpression(new PositionedString("true"),
+            result = translator.<Term>parse(new PositionedString("true"),
                                                     testClassType,
                                                     null, null, null, null, null,
                                                     services);
@@ -141,7 +140,7 @@ public class TestJMLTranslator extends TestCase {
         ProgramVariable selfVar = buildSelfVarAsProgVar();
 
         try {
-            result = translator.translateExpression(new PositionedString("this"),
+            result = translator.<Term>parse(new PositionedString("this"),
                                                     testClassType,
                                                     selfVar, null, null, null,
                                                     null, services);
@@ -160,7 +159,7 @@ public class TestJMLTranslator extends TestCase {
         ProgramVariable selfVar = buildSelfVarAsProgVar();
 
         try {
-            result = translator.translateExpression(new PositionedString(
+            result = translator.<Term>parse(new PositionedString(
                     "(b <= s &&  i > 5) ==> this != instance"), testClassType,
                                                     selfVar, null, null, null,
                                                     null, services);
@@ -184,7 +183,7 @@ public class TestJMLTranslator extends TestCase {
         ProgramVariable i = javaInfo.getAttribute("testPackage.TestClass::i");
 
         try {
-            result = translator.translateExpression(new PositionedString(
+            result = translator.<Term>parse(new PositionedString(
                     "this.i"), testClassType,
                                                     selfVar, null, null, null,
                                                     null, services);
@@ -208,7 +207,7 @@ public class TestJMLTranslator extends TestCase {
                                                          testClassType);
 
         try {
-            result = translator.translateExpression(new PositionedString(
+            result = translator.<Term>parse(new PositionedString(
                     "this.getOne()"),
                                                     testClassType, selfVar, null,
                                                     null, null,
@@ -227,7 +226,7 @@ public class TestJMLTranslator extends TestCase {
         Term result = null;
 
         try {
-            result = translator.translateExpression(
+            result = translator.<Term>parse(
                     new PositionedString(
                     "(\\forall int i; (0 <= i && i <= 2147483647) )"),
                     testClassType, null, null, null, null,
@@ -262,7 +261,7 @@ public class TestJMLTranslator extends TestCase {
         Term result = null;
 
         try {
-            result = translator.translateExpression(
+            result = translator.<Term>parse(
                     new PositionedString(
                     "(\\exists int i; (0 <= i && i <= 2147483647) )"),
                     testClassType, null, null, null, null,
@@ -297,7 +296,7 @@ public class TestJMLTranslator extends TestCase {
         Term result = null;
 
         try {
-            result = translator.translateExpression(
+            result = translator.<Term>parse(
                     new PositionedString(
                     "(\\bsum int i; 0; 2147483647; i) )"),
                     testClassType, null, null, null, null,
@@ -327,7 +326,7 @@ public class TestJMLTranslator extends TestCase {
         Term result = null;
 
         try {
-            result = translator.translateExpression(
+            result = translator.<Term>parse(
                     new PositionedString(
                     "(\\exists TestClass t; t != null; t.i == 0) )"),
                     testClassType, null, null, null, null,
@@ -352,7 +351,7 @@ public class TestJMLTranslator extends TestCase {
 
 
         try {
-            result = translator.translateExpression(new PositionedString(
+            result = translator.<Term>parse(new PositionedString(
                     "this.i == \\old(this.i)"),
                                                     testClassType, selfVar, null,
                                                     null, excVar, heapAtPre,
@@ -386,7 +385,7 @@ public class TestJMLTranslator extends TestCase {
         ProgramVariable resultVar = buildResultVar(pm);
 
         try {
-            result = translator.translateExpression(new PositionedString(
+            result = translator.<Term>parse(new PositionedString(
                     "\\result == 1"),
                                                     testClassType, selfVar, null,
                                                     resultVar, excVar, heapAtPre,
@@ -410,7 +409,7 @@ public class TestJMLTranslator extends TestCase {
                 "testPackage.TestClass::array");
 
         try {
-            result = translator.translateExpression(new PositionedString(
+            result = translator.<Term>parse(new PositionedString(
                     "\\nonnullelements(this.array)"),
                                                     testClassType,
                                                     selfVar,
@@ -436,7 +435,7 @@ public class TestJMLTranslator extends TestCase {
         ProgramVariable selfVar = buildSelfVarAsProgVar();
 
         try {
-            result = translator.translateExpression(new PositionedString(
+            result = translator.<Term>parse(new PositionedString(
                     "\\is_initialized(testPackage.TestClass)"),
                                                     testClassType,
                                                     selfVar,
@@ -464,7 +463,7 @@ public class TestJMLTranslator extends TestCase {
         ProgramVariable selfVar = buildSelfVarAsProgVar();
 
         try {
-            result = translator.translateExpression(
+            result = translator.<Term>parse(
                     new PositionedString(" i == 0x12 "),
                     testClassType, selfVar, null, null, null, null, services);
         } catch (SLTranslationException e) {
@@ -491,7 +490,7 @@ public class TestJMLTranslator extends TestCase {
                                                      signature, testClassType);
 
         try {
-            result = translator.translateExpression(
+            result = translator.<Term>parse(
                     new PositionedString("this.m((int)4 + 2) == this.m(i)"),
                     testClassType,
                     selfVar, null, null, null, null, services);
@@ -520,7 +519,7 @@ public class TestJMLTranslator extends TestCase {
                                                      signature, testClassType);
 
         try {
-            result = translator.translateExpression(
+            result = translator.<Term>parse(
                     new PositionedString("this.m(l) == this.m((long)i + 3)"),
                     testClassType, selfVar,
                     null, null, null, null, services);
@@ -549,7 +548,7 @@ public class TestJMLTranslator extends TestCase {
                                                      signature, testClassType);
 
         try {
-            result = translator.translateExpression(
+            result = translator.<Term>parse(
                     new PositionedString("this.m(s + 4) == this.m(+b)"),
                     testClassType, selfVar,
                     null, null, null, null, services);
@@ -577,7 +576,7 @@ public class TestJMLTranslator extends TestCase {
                                                      testClassType);
 
         try {
-            result = translator.translateExpression(
+            result = translator.<Term>parse(
                     new PositionedString(
                     "testPackage.TestClass.staticMethod() == 4"), testClassType,
                     selfVar,
@@ -598,7 +597,7 @@ public class TestJMLTranslator extends TestCase {
         ProgramVariable selfVar = buildSelfVarAsProgVar();
 
         try {
-            result = translator.translateExpression(
+            result = translator.<Term>parse(
                     new PositionedString(
                     "( \\exists TestClass t; t != null; \\typeof(t) <: \\type(java.lang.Object) )"),
                     testClassType, selfVar,
@@ -624,7 +623,7 @@ public class TestJMLTranslator extends TestCase {
                 "testPackage.TestClass::array");
 
         try {
-            result = translator.translateExpression(new PositionedString(
+            result = translator.<Term>parse(new PositionedString(
                     "(\\forall TestClass a;a.array == array; a == this)"),
                                                     testClassType,
                                                     selfVar,

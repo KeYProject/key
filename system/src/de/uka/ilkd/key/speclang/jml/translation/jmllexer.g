@@ -36,10 +36,20 @@ tokens {
     THIS = "this";
     TRUE = "true";    
     VOID = "void";
+
+    ACCESSIBLE                  = "accessible";
+    ASSIGNABLE 			= "assignable";
+    ENSURES 			= "ensures";
+    DECLASSIFY                  = "declassify";
+    DECLASSIFY_VAR              = "declassify_var";
+    DEPENDS                     = "depends";
+    REPRESENTS			= "represents";
+    SECURE_FOR                  = "secure_for";
+    SIGNALS 			= "signals";
+    SIGNALS_ONLY 		= "signals_only";
 }
 
 AND : "&";
-ANTIV : "<=!=>";
 BIGINT : "\\bigint";
 BITWISENOT : "~";
 BSUM : "\\bsum";  //KeY extension, not official JML
@@ -52,9 +62,7 @@ DOT : ".";
 DOTDOT : "..";
 DURATION : "\\duration";
 ELEMTYPE : "\\elemtype";
-EQUAL : "==";
 EQUAL_SINGLE : "=";
-EQV : "<==>";
 EVERYTHING : "\\everything";
 FRESH : "\\fresh"; 
 GEQ : ">=";
@@ -87,7 +95,6 @@ NULLABLE : "\\nullable";
 NOT : "!";
 NOT_MODIFIED : "\\not_modified";
 NOT_SPECIFIED : "\\not_specified";
-NOTEQUAL : "!=";
 NOTHING : "\\nothing";
 NOWARN : "\\nowarn";
 OLD : "\\old";
@@ -143,6 +150,9 @@ MEASURED_BY : "\\measured_by";
 FROM : "\\from";
 TO : "\\to";
 IF : "\\if";
+
+EQV_ANTIV: "<==>" | "<=!=>";
+EQ_NEQ : "==" | "!=";
 
 
 LT_DISPATCH

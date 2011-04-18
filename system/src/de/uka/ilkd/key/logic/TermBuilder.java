@@ -17,10 +17,10 @@ import java.util.Map;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
@@ -610,6 +610,19 @@ public final class TermBuilder {
     public Term exactInstance(Services services, Sort s, Term t) {
 	return equals(func(s.getExactInstanceofSymbol(services), t), 
 		      TRUE(services));
+    }
+
+
+    /**
+     * If a is a boolean literal, the method returns the literal as a Formula.
+     */
+    public Term convertToFormula(Term a, Services services) {
+        BooleanLDT booleanLDT = services.getTypeConverter().getBooleanLDT();
+	if(a.sort() == booleanLDT.targetSort()) {
+	    return equals(a, TRUE(services));
+	}
+
+	return a;
     }
     
     

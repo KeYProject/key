@@ -104,13 +104,13 @@ public final class JMLSpecExtractor implements SpecExtractor {
  
     private String getDefaultSignalsOnly(ProgramMethod pm) {
         if(pm.getThrown() == null) {
-            return "\\nothing;";
+            return "signals_only \\nothing;";
         }
 
         ImmutableArray<TypeReference> exceptions = pm.getThrown().getExceptions();
 
         if(exceptions == null) {
-            return "\\nothing;";
+            return "signals_only \\nothing;";
         }
 
         String exceptionsString = "";
@@ -134,7 +134,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
             exceptionsString 
                 = exceptionsString.substring(0, exceptionsString.length() - 2);
         }
-        return exceptionsString + ";";
+        return "signals_only " + exceptionsString + ";";
     }
 
     
@@ -163,7 +163,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
 		    services.getTypeConverter().
 		    isReferenceType(((ArrayType)varType).getBaseType().getKeYJavaType())) {
 		final PositionedString arrayElementsNonNull 
-		= new PositionedString("(\\forall int i; 0 <= i && i < " + varName + ".length;" 
+		= new PositionedString("(\\forall int i; 0 <= i && i < " + varName + ".length;"
 			+ varName + "[i]" + " != null)", 
 			fileName, 
 			pos);
@@ -343,8 +343,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
             //add purity
             if(isPure) {
-                //specCase.addDiverges(new PositionedString("false"));
-                specCase.addAssignable(new PositionedString("\\nothing"));
+                specCase.addAssignable(new PositionedString("assignable \\nothing"));
             }
             
             //add invariants
@@ -353,10 +352,10 @@ public final class JMLSpecExtractor implements SpecExtractor {
         	    specCase.addRequires(new PositionedString("<inv>"));
         	}
         	if(specCase.getBehavior() != Behavior.EXCEPTIONAL_BEHAVIOR) {
-        	    specCase.addEnsures(new PositionedString("<inv>"));
+        	    specCase.addEnsures(new PositionedString("ensures <inv>"));
         	}
         	if(specCase.getBehavior() != Behavior.NORMAL_BEHAVIOR) {
-        	    specCase.addSignals(new PositionedString("(Exception e) <inv>"));
+        	    specCase.addSignals(new PositionedString("signals (Exception e) <inv>"));
         	}
             }
                         
@@ -391,7 +390,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
         	    createNonNullPositionedString("\\result", resultType, false, 
         		    fileName, pm.getStartPosition());
         	for (PositionedString nonNull : resultNonNull) {
-        	    specCase.addEnsures(nonNull);
+        	    specCase.addEnsures(nonNull.prepend("ensures "));
         	}               
             }
 

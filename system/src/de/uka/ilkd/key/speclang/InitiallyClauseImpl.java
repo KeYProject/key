@@ -227,7 +227,7 @@ public final class InitiallyClauseImpl implements InitiallyClause {
                                            Behavior.NONE);
             specCase.addName(new PositionedString(getName()));
             specCase.addRequires(createPrecond(pm));
-            specCase.addEnsures(originalSpec);
+            specCase.addEnsures(originalSpec.prepend("ensures "));
             specCase.addSignals(new PositionedString("(Exception)"+ originalSpec.text, originalSpec.fileName, originalSpec.pos));
             specCase.addDiverges(new PositionedString("true"));
 	    return sf.createJMLOperationContracts(pm, specCase);

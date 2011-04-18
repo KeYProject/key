@@ -45,7 +45,12 @@ public class PositionedString {
     public PositionedString(String text) {
         this(text, null);
     }
-        
+
+
+    public PositionedString prepend(String text) {
+        return new PositionedString(text + this.text.trim(), this.fileName, this.pos);
+    }
+    
     
     public String toString() {
         return text + " (" + fileName + ", " + pos + ")";

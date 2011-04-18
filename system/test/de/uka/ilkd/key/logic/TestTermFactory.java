@@ -21,7 +21,7 @@ import de.uka.ilkd.key.logic.sort.SortImpl;
 
 /** class tests the term factory
 */
-public class TestTermFactory extends TestCase { 
+public class TestTermFactory extends TestCase {
     
 
     private static final TermFactory tf = TermFactory.DEFAULT;
