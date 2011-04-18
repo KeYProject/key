@@ -498,17 +498,18 @@ signalsclause returns [Term result=null] throws SLTranslationException
     ;
 
 
-signalsonlyclause returns [ImmutableList<KeYJavaType> result = ImmutableSLList.<KeYJavaType>nil()]
+signalsonlyclause returns [Term result = null]
 throws SLTranslationException {
-    KeYJavaType t=null;
+    ImmutableList<KeYJavaType> typeList = ImmutableSLList.<KeYJavaType>nil();
+    KeYJavaType type = null;
 }
 :
     sigo:SIGNALS_ONLY
     (   NOTHING
-      | t=referencetype { result = result.append(t); }
-        (COMMA t=referencetype { result = result.append(t); })*
+      | type = referencetype { typeList = typeList.append(type); }
+        (COMMA type = referencetype { typeList = typeList.append(type); })*
     )
-    { result = translator.<ImmutableList<KeYJavaType>>translate(sigo.getText(), result, this.excVar, services); }
+    { result = translator.<Term>translate(sigo.getText(), typeList, this.excVar, services); }
     ;
 
 

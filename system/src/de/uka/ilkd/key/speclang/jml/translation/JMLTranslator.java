@@ -465,8 +465,8 @@ final class JMLTranslator {
         } catch (ClassCastException e) {
             throw new SLTranslationException(
                     "Return value does not match the expected return type:\n"
-                    + "  Return type was: " + result.getClass() + "\n"
-                    + "  Tried conversion was: " + e.getMessage());
+                    + "Return type was: " + result.getClass() + "\n"
+                    + "Tried conversion was: " + e.getMessage());
         }
     }
 
