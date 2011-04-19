@@ -1092,7 +1092,7 @@ public final class LogicPrinter {
 	markEndSub();
 
 	layouter.print(")").end();
-	layouter.print(" \u2208 ");
+	layouter.print(" \\in ");
 	
 	markStartSub();	 
 	printTerm(t.sub(2));
