@@ -95,6 +95,7 @@ my %erroneous;
      chop($dotkey);
      unlink($dotkey."auto.0.proof")
    }
+   print "\nStatus: $counter examples tested. $errors errors occurred.\n";
  }
 
 
@@ -135,7 +136,8 @@ my %erroneous;
     chop($dotkey);
     chop($dotkey);
     chop($dotkey);
-    unlink($dotkey."auto.0.proof")
+    unlink($dotkey."auto.0.proof");
+    print "\nStatus: $counter examples tested. $errors errors occurred.\n";
   }
 
 

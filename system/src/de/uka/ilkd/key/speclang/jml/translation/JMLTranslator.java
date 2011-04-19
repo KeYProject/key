@@ -168,7 +168,7 @@ final class JMLTranslator {
             @Override
             public Term translate(Object... params)
                     throws SLTranslationException {
-                checkParameters(params, LogicVariable.class, Term.class,
+                checkParameters(params, Term.class, LogicVariable.class,
                         ProgramVariable.class, KeYJavaType.class,
                         Services.class);
                 Term result = (Term) params[0];
