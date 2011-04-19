@@ -95,7 +95,7 @@ my %erroneous;
      chop($dotkey);
      unlink($dotkey."auto.0.proof")
    }
-   print "\nStatus: $counter examples tested. $errors errors occurred.\n";
+   print "\nStatus: $counter examples tested. $errors errors occurred.\n\n";
  }
 
 
@@ -141,7 +141,7 @@ my %erroneous;
   }
 
 
-print "\n$correct/$counter prover runs according to spec. $errors errors occurred.\n";
+print "\n$correct/$counter prover runs according to spec. $errors errors occurred.\n\n";
 my $text = &produceResultText;
 if ($text) {
   print $text;

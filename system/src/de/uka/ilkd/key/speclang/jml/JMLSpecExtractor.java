@@ -281,7 +281,10 @@ public final class JMLSpecExtractor implements SpecExtractor {
         		Contract depContract 
         			= jsf.createJMLDependencyContract(kjt, textualDep);
         		result = result.add(depContract);
-        	    }
+        	    } else if (c instanceof TextualJMLClassAxiom){
+        		ClassAxiom ax = jsf.createJMLClassAxiom(kjt, (TextualJMLClassAxiom)c);
+        		result = result.add(ax);
+        	    } // else might be some other specification
         	} catch (SLWarningException e) {
         	    warnings = warnings.add(e.getWarning());
         	}

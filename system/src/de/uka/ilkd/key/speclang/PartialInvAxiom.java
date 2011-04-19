@@ -35,9 +35,7 @@ import de.uka.ilkd.key.util.Pair;
  * expressed as RepresentsAxioms, but they may have higher visibility, making
  * them available in proofs where the corresponing full definition is not.
  */
-public final class PartialInvAxiom implements ClassAxiom {
-    
-    private static final TermBuilder TB = TermBuilder.DF;
+public final class PartialInvAxiom extends ClassAxiom {
     
     private final ClassInvariant inv;
     private final ObserverFunction target;
@@ -106,14 +104,14 @@ public final class PartialInvAxiom implements ClassAxiom {
 		  		     TB.var(heapSV), 
 		    		     inv.getInv(selfSV, services));
 	    final Pair<Term,ImmutableSet<VariableSV>> replaceBoundLVsPair 
-	    	= RepresentsAxiom.replaceBoundLVsWithSVs(rawAxiom);
+	    	= replaceBoundLVsWithSVs(rawAxiom);
 	    final Term schemaAxiom = replaceBoundLVsPair.first;
 	    final ImmutableSet<VariableSV> boundSVs 
 		= replaceBoundLVsPair.second;	    
 	    
 	    //limit observers
 	    final Pair<Term, ImmutableSet<Taclet>> limited 
-	    	= RepresentsAxiom.limitTerm(schemaAxiom, toLimit, services);
+	    	= limitTerm(schemaAxiom, toLimit, services);
 	    final Term limitedAxiom = limited.first;
 	    result = result.union(limited.second);
 	    

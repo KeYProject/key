@@ -144,6 +144,7 @@ classlevel_element[ImmutableList<String> mods]
     |   result=represents_clause[mods]    
     |   result=history_constraint[mods]
     |   result=initially_clause[mods]
+    |   result=class_axiom[mods]
     |   result=monitors_for_clause[mods]
     |   result=readable_if_clause[mods]
     |   result=writable_if_clause[mods]
@@ -228,7 +229,7 @@ modifier returns [String result = null]:
 
 
 //-----------------------------------------------------------------------------
-//class invariants and initially clauses
+//class invariants and alike
 //-----------------------------------------------------------------------------
 
 class_invariant[ImmutableList<String> mods] 
@@ -253,6 +254,22 @@ invariant_keyword
 ;
 
 
+class_axiom[ImmutableList<String> mods] 
+            returns [ImmutableList<TextualJMLConstruct> result = null] 
+                     throws SLTranslationException
+                     {
+    PositionedString ps;
+                     }
+:
+    AXIOM ps=expression
+    {
+                         TextualJMLClassAxiom ax = new TextualJMLClassAxiom(mods, ps);
+                         result = ImmutableSLList.<TextualJMLConstruct>nil().prepend(ax);
+                         // axiom statements may not be prefixed with any modifiers (see Sect. 8 of the JML reference manual)
+                         if (!mods.isEmpty()) 
+                             raiseNotSupported("modifiers in axiom clause");
+    }
+                     ;
 
 initially_clause[ImmutableList<String> mods] 
         returns [ImmutableList<TextualJMLConstruct> result = null] 
@@ -263,9 +280,12 @@ initially_clause[ImmutableList<String> mods]
 :
     INITIALLY ps=expression
     {
-        TextualJMLInitially ini = new TextualJMLInitially(mods, ps);
-        result = ImmutableSLList.<TextualJMLConstruct>nil().prepend(ini);
-        for (String s: mods) {if (!(s.equals("public")||s.equals("private")||s.equals("protected"))) raiseError("modifier "+s+" not allowed in initially clause");}
+    TextualJMLInitially ini = new TextualJMLInitially(mods, ps);
+    result = ImmutableSLList.<TextualJMLConstruct>nil().prepend(ini);
+    for (String s: mods) {
+        if (!(s.equals("public")||s.equals("private")||s.equals("protected"))) 
+            raiseNotSupported("modifier "+s+" in initially clause");
+        }
     }
 ;
 
