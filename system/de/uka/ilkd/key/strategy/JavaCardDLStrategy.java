@@ -106,7 +106,7 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
             assert false;
         }
         
-        final Feature queryF = querySpecFeature(longConst(5000));
+        final Feature queryF = querySpecFeature(inftyConst());//longConst(5000));
         
         final Feature depSpecF;
         final String depProp
