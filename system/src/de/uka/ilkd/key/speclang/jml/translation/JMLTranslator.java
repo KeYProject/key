@@ -100,38 +100,6 @@ final class JMLTranslator {
                         mby == null ? null : mby.getTerm());
             }
         });
-        translationMethods.put("declassify", new JMLTranslationMethod() {
-            @Override
-            public ImmutableList translate(Object... params)
-                    throws SLTranslationException {
-                checkParameters(params, Term.class, Term.class, Term.class,
-                                Term.class, Services.class);
-                Term declass = (Term) params[0];
-                Term frompart = (Term) params[1];
-                Term topart = (Term) params[2];
-                Term ifpart = (Term) params[3];
-
-                ImmutableList<Term> result = ImmutableSLList.<Term>nil();
-                return result.append(declass).append(frompart).append(topart).append(
-                        ifpart);
-            }
-        });
-        translationMethods.put("declassify_var", new JMLTranslationMethod() {
-            @Override
-            public ImmutableList translate(Object... params)
-                    throws SLTranslationException {
-                checkParameters(params, Term.class, Term.class, Term.class,
-                                Term.class, Services.class);
-                Term declass = (Term) params[0];
-                Term frompart = (Term) params[1];
-                Term topart = (Term) params[2];
-                Term ifpart = (Term) params[3];
-
-                ImmutableList<Term> result = ImmutableSLList.<Term>nil();
-                return result.append(declass).append(frompart).append(topart).append(
-                        ifpart);
-            }
-        });
         translationMethods.put("ensures", new JMLTranslationMethod() {
             @Override
             public Term translate(Object... params)
@@ -154,14 +122,6 @@ final class JMLTranslator {
                 return new Pair<ObserverFunction,Term>(
                      (ObserverFunction) lhs.getTerm().op(),
                      t);
-            }
-        });
-        translationMethods.put("secure_for", new JMLTranslationMethod() {
-            @Override
-            public ImmutableList translate(Object... params)
-                    throws SLTranslationException {
-                checkParameters(params, ImmutableList.class, Services.class);
-                return (ImmutableList) params[0];
             }
         });
         translationMethods.put("signals", new JMLTranslationMethod() {

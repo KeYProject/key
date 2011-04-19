@@ -47,8 +47,6 @@ tokens {
     CONST 			= "const";
     CONSTRAINT			= "constraint";
     CONSTRAINT_RED		= "constraint_redundantly";
-    DECLASSIFY                  = "declassify";
-    DECLASSIFY_VAR              = "declassify_var";
     DECREASES  			= "decreases";
     DECREASES_REDUNDANTLY  	= "decreases_redundantly";
     DECREASING  		= "decreasing";
@@ -109,7 +107,6 @@ tokens {
     SCOPE_SAFE 			= "scopeSafe";
     ARBITRARY_SCOPE             = "arbitraryScope";
     ARBITRARY_SCOPE_THIS        = "arbitraryScopeThis";
-    SECURE_FOR                  = "secure_for";
     SET 			= "set";
     SIGNALS 			= "signals";
     SIGNALS_ONLY 		= "signals_only";

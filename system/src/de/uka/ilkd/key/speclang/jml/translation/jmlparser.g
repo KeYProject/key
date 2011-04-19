@@ -327,11 +327,8 @@ top returns [Object result = null] throws  SLTranslationException
         result = accessibleclause
     |   result = assignableclause
     |   result = dependsclause
-    |   result = declassifyclause
-    |   result = declassifyvarclause
     |   result = ensuresclause
     |   result = representsclause
-    |   result = secureforclause
     |   result = signalsclause
     |   result = signalsonlyclause
     |   result = termexpression
@@ -349,42 +346,6 @@ assignableclause returns [Term result = null] throws SLTranslationException
 :
     ass:ASSIGNABLE result=storereflist
         { result = translator.<Term>translate(ass.getText(), result, services); }
-    ;
-
-
-declassifyclause returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException
-{
-    Term declass = null;
-    Term frompart = null;
-    Term topart = null;
-    Term ifpart = null;
-}
-:
-    del:DECLASSIFY declass = predicate
-    (FROM frompart = storereflist)?
-    (TO topart = storereflist)?
-    (IF ifpart = predicate)?
-    SEMI
-    { result = translator.<ImmutableList<Term>>translate(
-            del.getText(), declass, frompart, topart, ifpart, services); }
-    ;
-
-
-declassifyvarclause returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException
-{
-    Term declass = null;
-    Term frompart = null;
-    Term topart = null;
-    Term ifpart = null;
-}
-:
-    delv:DECLASSIFY_VAR declass = termexpression
-    (FROM frompart = storereflist)?
-    (TO topart = storereflist)?
-    (IF ifpart = predicate)?
-    SEMI
-    { result = translator.<ImmutableList<Term>>translate(
-            delv.getText(), declass, frompart, topart, ifpart, services); }
     ;
 
 
@@ -458,17 +419,6 @@ representsclause returns [Pair<ObserverFunction,Term> result=null] throws SLTran
         )
     )
     { result = translator.<Pair<ObserverFunction,Term>>translate(rep.getText(), lhs, t, services); }
-    ;
-
-
-secureforclause returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException {
-    Term term = null;
-}
-:
-    sec:SECURE_FOR term = storeref { result = result.append(term); }
-    (COMMA term = storeref { result = result.append(term); })*
-    SEMI
-        { result = translator.<ImmutableList<Term>>translate(sec.getText(), result, services); }
     ;
 
 

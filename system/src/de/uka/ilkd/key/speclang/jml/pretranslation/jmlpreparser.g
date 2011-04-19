@@ -560,9 +560,6 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 	|   ps=signals_clause        { sc.addSignals(ps); }
 	|   ps=signals_only_clause   { sc.addSignalsOnly(ps); }
 	|   ps=diverges_clause       { sc.addDiverges(ps); }
-        |   ps=secure_for_clause     { sc.addSecureFor(ps); }
-        |   ps=declassify_clause     { sc.addDeclassify(ps); }
-        |   ps=declassify_var_clause { sc.addDeclassifyVar(ps); }
 	|   ps=measured_by_clause    { sc.addMeasuredBy(ps); }
 	|   ps=name_clause           { sc.addName(ps);}
 	|   captures_clause 
@@ -698,30 +695,6 @@ diverges_keyword
 :
     	DIVERGES 
     |   DIVERGES_RED
-;
-
-
-secure_for_clause
-	returns [PositionedString result = null]
-	throws SLTranslationException
-:
-    s:SECURE_FOR result=expression { result = result.prepend(s.getText() + " "); }
-;
-
-
-declassify_clause
-	returns [PositionedString result = null]
-	throws SLTranslationException
-:
-    d:DECLASSIFY result=expression { result = result.prepend(d.getText() + " "); }
-;
-
-
-declassify_var_clause
-	returns [PositionedString result = null]
-	throws SLTranslationException
-:
-    d:DECLASSIFY_VAR result=expression { result = result.prepend(d.getText() + " "); }
 ;
 
 

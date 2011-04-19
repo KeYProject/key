@@ -72,9 +72,6 @@ public class JMLSpecFactory {
         public Term signals;
         public Term signalsOnly;
         public Term diverges;
-        public ImmutableList<ImmutableList<Term>> secureFor;
-        public ImmutableList<ImmutableList<Term>> declassify;
-        public ImmutableList<ImmutableList<Term>> declassifyVar;
     }
 
     //-------------------------------------------------------------------------
@@ -221,17 +218,6 @@ public class JMLSpecFactory {
         clauses.diverges = translateDeverges(pm, progVars.selfVar,
                                              progVars.paramVars,
                                              textualSpecCase.getDiverges());
-        clauses.secureFor = translateSecureFor(pm, progVars.selfVar,
-                                             progVars.paramVars,
-                                             textualSpecCase.getSecureFor());
-        clauses.declassify =
-                translateDeclassify(pm, progVars.selfVar,
-                                    progVars.paramVars,
-                                    textualSpecCase.getDeclassify());
-        clauses.declassifyVar =
-                translateDeclassifyVar(pm, progVars.selfVar,
-                                       progVars.paramVars,
-                                       textualSpecCase.getDeclassifyVar());
         return clauses;
     }
 
@@ -587,34 +573,6 @@ public class JMLSpecFactory {
     }
 
 
-    /**
-     * Generate non-interference operation contract out of the JML
-     * secure_for and declassify clauses.
-     * 
-     * @param pm    the ProgramMethod to which the contract belongs
-     * @param progVars  collection of variables for the receiver object,
-     *          operation parameters, operation result, thrown exception
-     *          and the pre-heap
-     * @param clauses   pre-translated JML clauses
-     * @param result    immutable set of already generated operation contracts
-     * @return      operation contracts including a new non-interference
-     *          contract
-     */
-    private ImmutableSet<Contract> createInformationFlowOperationContract(
-            ProgramMethod pm,
-            ProgramVariableCollection progVars,
-            ContractClauses clauses) {
-        ImmutableSet<Contract> result = DefaultImmutableSet.<Contract>nil();
-        if (!clauses.secureFor.isEmpty()) {
-            result = result.add(new InformationFlowContractImpl(
-                    "Non-interference contract", pm.getContainerType(), pm,
-                    clauses.requires, clauses.measuredBy,
-                    clauses.accessible, clauses.assignable, clauses.secureFor,
-                    clauses.declassify, clauses.declassifyVar, progVars.selfVar,
-                    progVars.paramVars));
-        }
-        return result;
-    }
 
     //-------------------------------------------------------------------------
     //public interface
@@ -825,9 +783,6 @@ public class JMLSpecFactory {
                                                                  clauses, post));
         result = result.union(createDependencyOperationContract(pm, progVars,
                                                                 clauses));
-        result = result.union(createInformationFlowOperationContract(pm,
-                                                                     progVars,
-                                                                     clauses));
 
         return result;
     }
