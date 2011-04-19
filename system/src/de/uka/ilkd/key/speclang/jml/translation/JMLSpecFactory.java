@@ -511,16 +511,16 @@ public class JMLSpecFactory {
     /**
      * Generate functional operation contracts.
      * 
-     * @param name	base name of the contract (does not have to be unique)
-     * @param pm	the ProgramMethod to which the contract belongs
-     * @param progVars	pre-generated collection of variables for the receiver
-     * 			object, operation parameters, operation result, thrown
-     * 			exception and the pre-heap
-     * @param clauses	pre-translated JML clauses
-     * @param post	pre-generated post condition
-     * @param result	immutable set of already generated operation contracts 
-     * @return		operation contracts including new functional operation
-     * 			contracts
+     * @param name  base name of the contract (does not have to be unique)
+     * @param pm    the ProgramMethod to which the contract belongs
+     * @param progVars  pre-generated collection of variables for the receiver
+     *          object, operation parameters, operation result, thrown
+     *          exception and the pre-heap
+     * @param clauses   pre-translated JML clauses
+     * @param post  pre-generated post condition
+     * @param result    immutable set of already generated operation contracts 
+     * @return      operation contracts including new functional operation
+     *          contracts
      */
     private ImmutableSet<Contract> createFunctionalOperationContracts(
             String name,
@@ -562,13 +562,13 @@ public class JMLSpecFactory {
     /**
      * Generate dependency operation contract out of the JML accessible clause.
      * 
-     * @param pm	the ProgramMethod to which the contract belongs
-     * @param progVars	collection of variables for the receiver object,
-     * 			operation parameters, operation result, thrown exception
-     * 			and the pre-heap
-     * @param clauses	pre-translated JML clauses
-     * @param result	immutable set of already generated operation contracts
-     * @return		operation contracts including a new dependency contract
+     * @param pm    the ProgramMethod to which the contract belongs
+     * @param progVars  collection of variables for the receiver object,
+     *          operation parameters, operation result, thrown exception
+     *          and the pre-heap
+     * @param clauses   pre-translated JML clauses
+     * @param result    immutable set of already generated operation contracts
+     * @return      operation contracts including a new dependency contract
      */
     private ImmutableSet<Contract> createDependencyOperationContract(
             ProgramMethod pm,
@@ -591,14 +591,14 @@ public class JMLSpecFactory {
      * Generate non-interference operation contract out of the JML
      * secure_for and declassify clauses.
      * 
-     * @param pm	the ProgramMethod to which the contract belongs
-     * @param progVars	collection of variables for the receiver object,
-     * 			operation parameters, operation result, thrown exception
-     * 			and the pre-heap
-     * @param clauses	pre-translated JML clauses
-     * @param result	immutable set of already generated operation contracts
-     * @return		operation contracts including a new non-interference
-     * 			contract
+     * @param pm    the ProgramMethod to which the contract belongs
+     * @param progVars  collection of variables for the receiver object,
+     *          operation parameters, operation result, thrown exception
+     *          and the pre-heap
+     * @param clauses   pre-translated JML clauses
+     * @param result    immutable set of already generated operation contracts
+     * @return      operation contracts including a new non-interference
+     *          contract
      */
     private ImmutableSet<Contract> createInformationFlowOperationContract(
             ProgramMethod pm,
