@@ -733,6 +733,34 @@ public class JMLSpecFactory {
     }
 
 
+    /**
+     * Creates a class axiom from a textual JML representation.
+     * As JML axioms are always without modifiers, they are implicitly non-static and public.
+     * @param kjt the type where the axiom is declared
+     * @param textual textual representation
+     * @throws SLTranslationException
+     */
+    public ClassAxiom createJMLClassAxiom(KeYJavaType kjt,
+                                          TextualJMLClassAxiom textual)
+            throws SLTranslationException {
+        PositionedString originalRep = textual.getAxiom();
+        assert kjt != null;
+        assert originalRep != null;
+
+        //create variable for self
+        final ProgramVariable selfVar = TB.selfVar(services, kjt, false);
+
+        //translate expression
+        final Term ax =
+                translator.<Term>parse(originalRep, kjt, selfVar, null, null,
+                                       null, null, services);
+        
+        //create class axiom
+        return new ClassAxiomImpl("class axiom in " + kjt.getFullName(), kjt,
+                                  new Public(), ax, selfVar);
+    }
+
+
     public Contract createJMLDependencyContract(KeYJavaType kjt,
                                                 PositionedString originalDep)
             throws SLTranslationException {
