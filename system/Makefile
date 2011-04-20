@@ -144,10 +144,10 @@ doc: argfile
 
 ## new one produces better output (package index) but is more fragile.
 ## didn't want to use perl ;)
-	@find de/ -name '*.java' | xargs grep -h "^package\|^overview" |\
+	@find $(SRC) -name '*.java' | xargs grep -h "^package\|^overview" |\
 	cut -d" " -f2 | cut -d";" -f1 | sort | uniq | grep "^de.uka" | \
 	xargs $(JAVADOC) $(JAVADOC_OPTIONS) -source 1.6 -classpath $(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH) \
-	-sourcepath $(GENERATED_SRC_PATH):. -d doc \
+	-sourcepath $(GENERATED_SRC_PATH):$(SRC):$(TEST) -d doc \
 	-link http://recoder.sourceforge.net/doc/api \
 	-link http://download.oracle.com/javase/6/docs/api/ \
 	-link http://www.antlr.org \
