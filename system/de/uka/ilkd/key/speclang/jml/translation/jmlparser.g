@@ -1882,7 +1882,21 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
     |   SEQREVERSE LPAREN e1=expression RPAREN
         {
             result = new SLExpression(TB.seqReverse(services, e1.getTerm()));
-        }                         
+        }   
+    |   SEQREPLACE LPAREN e1=expression COMMA e2=expression COMMA e3=expression RPAREN
+        {
+            // short for "e1[0..e2-1]+e3+e1[e2+1..e1.length-1]"
+            final Term minusOne = TB.zTerm(services, "-1");
+            final Term ante = TB.seqSub(services, e1.getTerm(), TB.zero(services), TB.add(services, e2.getTerm(), minusOne));
+            final Term insert = TB.seqSingleton(services, e3.getTerm());
+            final Term post = TB.seqSub(services, e1.getTerm(), TB.add(services, e2.getTerm(), TB.one(services)), TB.add(services, TB.seqLen(services, e1.getTerm()), minusOne));
+            final Term put = TB.seqConcat(services, ante, TB.seqConcat(services, insert, post));
+            result = new SLExpression(put);
+        }
+    |   INDEXOF LPAREN e1=expression COMMA e2=expression RPAREN
+        {
+            result = new SLExpression(TB.indexOf(services,e1.getTerm(),e2.getTerm()));
+        }
 
     |   LPAREN result=expression RPAREN
 ;

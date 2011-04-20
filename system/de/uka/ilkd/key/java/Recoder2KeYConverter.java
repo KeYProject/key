@@ -648,26 +648,26 @@ public class Recoder2KeYConverter {
     }
     
     
-    public EmptySetLiteral convert(de.uka.ilkd.key.java.recoderext.EmptySetLiteral e) {
+    public EmptySetLiteral convert(de.uka.ilkd.key.java.recoderext.ldt.EmptySetLiteral e) {
 	return EmptySetLiteral.INSTANCE;
     }
     
-    public Singleton convert(de.uka.ilkd.key.java.recoderext.Singleton e) {
+    public Singleton convert(de.uka.ilkd.key.java.recoderext.ldt.Singleton e) {
         ExtList children = collectChildren(e);	
 	return new Singleton(children);
     }        
     
-    public SetUnion convert(de.uka.ilkd.key.java.recoderext.SetUnion e) {
+    public SetUnion convert(de.uka.ilkd.key.java.recoderext.ldt.SetUnion e) {
         ExtList children = collectChildren(e);	
 	return new SetUnion(children);
     }
     
-    public Intersect convert(de.uka.ilkd.key.java.recoderext.Intersect e) {
+    public Intersect convert(de.uka.ilkd.key.java.recoderext.ldt.Intersect e) {
         ExtList children = collectChildren(e);	
 	return new Intersect(children);
     }
     
-    public SetMinus convert(de.uka.ilkd.key.java.recoderext.SetMinus e) {
+    public SetMinus convert(de.uka.ilkd.key.java.recoderext.ldt.SetMinus e) {
         ExtList children = collectChildren(e);	
 	return new SetMinus(children);
     }
@@ -678,26 +678,30 @@ public class Recoder2KeYConverter {
     }
     
     
-    public EmptySeqLiteral convert(de.uka.ilkd.key.java.recoderext.EmptySeqLiteral e) {
+    public EmptySeqLiteral convert(de.uka.ilkd.key.java.recoderext.ldt.EmptySeqLiteral e) {
 	return EmptySeqLiteral.INSTANCE;
     }    
     
-    public SeqSingleton convert(de.uka.ilkd.key.java.recoderext.SeqSingleton e) {
+    public SeqSingleton convert(de.uka.ilkd.key.java.recoderext.ldt.SeqSingleton e) {
         ExtList children = collectChildren(e);	
 	return new SeqSingleton(children);
     }
     
-    public SeqConcat convert(de.uka.ilkd.key.java.recoderext.SeqConcat e) {
+    public SeqConcat convert(de.uka.ilkd.key.java.recoderext.ldt.SeqConcat e) {
         ExtList children = collectChildren(e);	
 	return new SeqConcat(children);
     }
     
-    public SeqSub convert(de.uka.ilkd.key.java.recoderext.SeqSub e) {
+    public SeqSub convert(de.uka.ilkd.key.java.recoderext.ldt.SeqSub e) {
         ExtList children = collectChildren(e);	
 	return new SeqSub(children);
-    }    
+    }
     
-    public SeqReverse convert(de.uka.ilkd.key.java.recoderext.SeqReverse e) {
+    public SeqIndexOf convert(de.uka.ilkd.key.java.recoderext.ldt.SeqIndexOf e){
+	return new SeqIndexOf(collectChildren(e));
+    }
+    
+    public SeqReverse convert(de.uka.ilkd.key.java.recoderext.ldt.SeqReverse e) {
         ExtList children = collectChildren(e);	
 	return new SeqReverse(children);
     }    

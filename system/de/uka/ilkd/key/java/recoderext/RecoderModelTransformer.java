@@ -25,6 +25,7 @@ import recoder.java.reference.VariableReference;
 import recoder.kit.TwoPassTransformation;
 import recoder.service.DefaultCrossReferenceSourceInfo;
 import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.java.recoderext.ldt.*;
 
 /**
  * The Java DL requires some implicit fields, that are available in each

@@ -79,6 +79,8 @@ public interface Visitor {
     
     void performActionOnSeqConcat(SeqConcat x);
     
+    void performActionOnSeqIndexOf(SeqIndexOf x);
+    
     void performActionOnSeqSub(SeqSub x);
     
     void performActionOnSeqReverse(SeqReverse x);

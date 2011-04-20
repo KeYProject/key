@@ -1004,6 +1004,18 @@ public class PrettyPrinter {
         write(")");
         printFooter(x);
     }    
+
+    public void printIndexOf(de.uka.ilkd.key.java.expression.operator.SeqIndexOf x) throws java.io.IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+        writeToken(0, "\\indexOf", x);
+        write("(");
+        writeElement(0, x.getChildAt(0));
+        write(",");
+        writeElement(0, x.getChildAt(1));
+        write(")");
+        printFooter(x);
+    }    
     
     public void printSeqSub(de.uka.ilkd.key.java.expression.operator.SeqSub x) throws java.io.IOException {
         printHeader(x);

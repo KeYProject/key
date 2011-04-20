@@ -8,7 +8,7 @@
 //
 //
 
-package de.uka.ilkd.key.java.recoderext;
+package de.uka.ilkd.key.java.recoderext.ldt;
 
 import recoder.java.Expression;
 import recoder.java.SourceVisitor;

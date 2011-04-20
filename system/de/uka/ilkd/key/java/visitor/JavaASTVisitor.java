@@ -197,6 +197,12 @@ public abstract class JavaASTVisitor extends JavaASTWalker
 	doDefaultAction(x);
     }
     
+
+    @Override
+    public void performActionOnSeqIndexOf(SeqIndexOf x) {
+	doDefaultAction(x);
+    }
+    
     @Override
     public void performActionOnBreak(Break x) {
 	doDefaultAction(x);
