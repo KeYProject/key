@@ -3,7 +3,8 @@
 
   <property environment="env" /> <!-- include environment variables -->
 
-  <property name="src.dir"   value="${basedir}" />
+  <property name="src.dir"   value="${basedir}/src" />
+  <property name="test.dir"   value="${basedir}/test" />
   <property name="build.dir" value="${basedir}/binary" />
   <property name="dist.dir"  value="${basedir}/binary" />
   <property name="gen.dir"  value="${basedir}/genSrc" />
@@ -70,21 +71,18 @@
   	<copy todir="${build.dir}">
     	    <fileset dir="${basedir}/resources/"/>
         </copy>
-     <javac srcdir= "${src.dir}:${gen.dir}"
+     <javac srcdir= "${src.dir}:${gen.dir}:${test.dir}"
            destdir="${dist.dir}"
            source="1.6"
      	   deprecation="on"
            debug="on"
            depend="${build.depend}"
            optimize="off">
-        <include name="de/**" />
-        <include name="recoder/**" />
-        <include name="TestKey.java" />
       <classpath>
-        <pathelement location="${ext.dir}/antlr.jar" />
-        <pathelement location="${ext.dir}/recoderKey.jar" />
-        <pathelement location="${ext.dir}/javacc.jar" />
-        <pathelement location="${ext.dir}/junit.jar" />
+        <pathelement location="${ext.dir}/antlr.jar"/>
+        <pathelement location="${ext.dir}/recoderKey.jar"/>
+        <pathelement location="${ext.dir}/javacc.jar"/>
+        <pathelement location="${ext.dir}/junit.jar"/>
       </classpath>
     </javac>
   </target>
@@ -109,7 +107,7 @@
 
   <target name="keylexer">
      <antlr
-         target="de/uka/ilkd/key/parser/lexer.g"
+         target="${src.dir}/de/uka/ilkd/key/parser/lexer.g"
          outputdirectory="${gen.dir}/de/uka/ilkd/key/parser">
         <classpath>
            <pathelement location="${ext.dir}/antlr.jar" />
@@ -120,7 +118,7 @@
 
   <target name="keyparser"  depends="keylexer">
      <antlr
-         target="de/uka/ilkd/key/parser/keyparser.g"
+         target="${src.dir}/de/uka/ilkd/key/parser/keyparser.g"
          outputdirectory="${gen.dir}/de/uka/ilkd/key/parser">
         <classpath>
            <pathelement location="${ext.dir}/antlr.jar" />
@@ -131,7 +129,7 @@
 	
 	<target name="jmlprelexer">
 	     <antlr
-	         target="de/uka/ilkd/key/speclang/jml/pretranslation/jmlprelexer.g"
+	         target="${src.dir}/de/uka/ilkd/key/speclang/jml/pretranslation/jmlprelexer.g"
 	         outputdirectory="${gen.dir}/de/uka/ilkd/key/speclang/jml/pretranslation">
 	        <classpath>
 	           <pathelement location="${ext.dir}/antlr.jar" />
@@ -142,7 +140,7 @@
 
 	  <target name="jmlpreparser"  depends="jmlprelexer">
 	     <antlr
-	         target="de/uka/ilkd/key/speclang/jml/pretranslation/jmlpreparser.g"
+	         target="${src.dir}/de/uka/ilkd/key/speclang/jml/pretranslation/jmlpreparser.g"
 	         outputdirectory="${gen.dir}/de/uka/ilkd/key/speclang/jml/pretranslation">
 	        <classpath>
 	           <pathelement location="${ext.dir}/antlr.jar" />
@@ -152,7 +150,7 @@
 
 	<target name="jmllexer">
 	     <antlr
-	         target="de/uka/ilkd/key/speclang/jml/translation/jmllexer.g"
+	         target="${src.dir}/de/uka/ilkd/key/speclang/jml/translation/jmllexer.g"
 	         outputdirectory="${gen.dir}/de/uka/ilkd/key/speclang/jml/translation">
 	        <classpath>
 	           <pathelement location="${ext.dir}/antlr.jar" />
@@ -163,7 +161,7 @@
 
 	  <target name="jmlparser"  depends="jmllexer">
 	     <antlr
-	         target="de/uka/ilkd/key/speclang/jml/translation/jmlparser.g"
+	         target="${src.dir}/de/uka/ilkd/key/speclang/jml/translation/jmlparser.g"
 	         outputdirectory="${gen.dir}/de/uka/ilkd/key/speclang/jml/translation">
 	        <classpath>
 	           <pathelement location="${ext.dir}/antlr.jar" />
@@ -174,21 +172,21 @@
 
   <target name="schemajavaparser"> 
     	<copy tofile="${gen.dir}/de/uka/ilkd/key/parser/schemajava/Token.java">
-            <fileset file="${basedir}/de/uka/ilkd/key/parser/schemajava/Token.java.source"/>
+            <fileset file="${src.dir}/de/uka/ilkd/key/parser/schemajava/Token.java.source"/>
     	</copy>
 
      <javacc
-         target="de/uka/ilkd/key/parser/schemajava/SchemaJavaParser.jj"
+         target="${src.dir}/de/uka/ilkd/key/parser/schemajava/SchemaJavaParser.jj"
          outputdirectory="${gen.dir}/de/uka/ilkd/key/parser/schemajava"     	 
          javacchome="${ext.dir}" />
   </target>
 
   <target name="proofjavaparser"> 
     	<copy tofile="${gen.dir}/de/uka/ilkd/key/parser/proofjava/Token.java">
-            <fileset file="${basedir}/de/uka/ilkd/key/parser/proofjava/Token.java.source"/>
+            <fileset file="${src.dir}/de/uka/ilkd/key/parser/proofjava/Token.java.source"/>
     	</copy>
 	<javacc
-	    target="de/uka/ilkd/key/parser/proofjava/ProofJavaParser.jj"
+	    target="${src.dir}/de/uka/ilkd/key/parser/proofjava/ProofJavaParser.jj"
 	    outputdirectory="${gen.dir}/de/uka/ilkd/key/parser/proofjava"
 	    javacchome="${ext.dir}" 
 	/>
