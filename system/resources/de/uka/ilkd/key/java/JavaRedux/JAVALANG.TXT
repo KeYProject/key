@@ -12,6 +12,8 @@
 # All files but Enum.java are created with Stubmaker
 # Enum.java is manually created!
 
+# java.lang.Object has been modified manually!
+
 java/lang/Object.java
 
 java/lang/annotation/Annotation.java
