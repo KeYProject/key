@@ -87,6 +87,7 @@ import de.uka.ilkd.key.gui.configuration.StrategySettings;
 import de.uka.ilkd.key.gui.configuration.ViewSelector;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmaSelectionDialog;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataAutoModeOptions;
+import de.uka.ilkd.key.gui.lemmatagenerator.LemmataHandler;
 import de.uka.ilkd.key.gui.lemmatagenerator.TacletSoundnessPOLoader;
 import de.uka.ilkd.key.gui.lemmatagenerator.TacletSoundnessPOLoader.LoaderListener;
 import de.uka.ilkd.key.gui.nodeviews.NonGoalInfoView;
@@ -102,6 +103,7 @@ import de.uka.ilkd.key.gui.smt.SMTSettings;
 import de.uka.ilkd.key.gui.smt.SettingsDialog;
 import de.uka.ilkd.key.gui.smt.SolverListener;
 import de.uka.ilkd.key.gui.smt.TemporarySettings;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
@@ -122,6 +124,7 @@ import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
+import de.uka.ilkd.key.proof.init.ProblemInitializer.ProblemInitializerListener;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
@@ -384,6 +387,62 @@ public final class Main extends JFrame implements IMain {
             ruleView.updateUI();
         if (proofListView != null)
             proofListView.updateUI();
+    }
+    
+    public ProblemInitializer createProblemInitializer(){
+	ProblemInitializer pi = new ProblemInitializer(getProgressMonitor(),
+		mediator().getProfile(), new Services(mediator().getExceptionHandler()),true,
+		new ProblemInitializerListener(){
+
+		    @Override
+                    public void progressStarted(Object sender) {
+			 mediator().stopInterface(true);
+	                
+                    }
+
+		    @Override
+                    public void progressStopped(Object sender) {
+			 mediator().startInterface(true);
+	                
+                    }
+
+		    @Override
+                    public void proofCreated(ProblemInitializer sender,
+                            ProofAggregate proofAggregate) {
+			addProblem(proofAggregate);
+			resetStatus(sender);
+                    }
+		    
+		    @Override
+		    public void resetStatus(Object sender) {
+			setStandardStatusLine();
+		    }
+
+		    @Override
+                    public void reportStatus(Object sender,
+                            String status, int progressMax) {
+			setStatusLine(status, progressMax);
+	                
+                    }
+
+		    @Override
+                    public void reportStatus(Object sender,
+                            String status) {
+			setStatusLine(status);
+	                
+                    }
+
+		    @Override
+                    public void reportException(Object sender,
+                            ProofOblInput input, Exception e) {
+			reportStatus(sender,input.name() + " failed");
+	                
+                    }
+
+	
+	    
+	});
+	return pi;
     }
     
     /**
@@ -1484,7 +1543,7 @@ public final class Main extends JFrame implements IMain {
 		    }
 		};
         TacletSoundnessPOLoader loader = new TacletSoundnessPOLoader(progressMonitor, 
-        	file,proof.env() ,listener);
+        	file,proof.env() ,listener,new LemmaSelectionDialog());
         loader.start();
     }
     
@@ -2494,11 +2553,15 @@ public final class Main extends JFrame implements IMain {
 	}catch(Throwable e){
 	    System.out.println("An error occured while reading the parameters:");
 	    System.out.println(e.getMessage());
+	    e.printStackTrace();
 	    System.exit(1);
 	    return;
 	}
+	KeYMediator mediator = getInstance(false).mediator();
 	System.out.println(opt);
-	
+	LemmataHandler handler = new LemmataHandler(opt,
+		mediator.getProfile());
+	handler.start();
     }
 
     private static void printUsageAndExit() {

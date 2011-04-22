@@ -5,10 +5,10 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 public class LemmataAutoModeOptions {
-    private static final String MAX_RULES = "-maxRules";
-    private static final String PATH_OF_RULE_FILE = "-pathOfRuleFile";
-    private static final String PATH_OF_RESULT = "-pathOfResult";
-    private static final String TIMEOUT = "-timeout";
+    private static final String MAX_RULES = ":maxRules";
+    private static final String PATH_OF_RULE_FILE = ":pathOfRuleFile";
+    private static final String PATH_OF_RESULT = ":pathOfResult";
+    private static final String TIMEOUT = ":timeout";
     
     
     /**
@@ -29,7 +29,7 @@ public class LemmataAutoModeOptions {
      * The time out for each proof. If <code>timeout<0</code> no time out 
      * is used.
      */
-    private int timeout = -1;
+    private long timeout = -1;
     
     /**
      * The maximum number of rules that are used within a proof.
@@ -64,7 +64,7 @@ public class LemmataAutoModeOptions {
 	Iterator<String> it = options.iterator();
 	while(it.hasNext()){
 	    String option = it.next();
-	    if(option.startsWith("-")){
+	    if(option.startsWith(":")){
 		if(it.hasNext()){
 		  read(option,it.next());  
 		}else{
@@ -89,13 +89,20 @@ public class LemmataAutoModeOptions {
 	    pathOfRuleFile = value;
 	}
 	if(key.equals(TIMEOUT)){
-	    timeout =Integer.parseInt(value);
+	    timeout =Long.parseLong(value);
 	}	
     }
     
+    public String getPathOfRuleFile() {
+	return pathOfRuleFile;
+    }
     
-    
-    
+    public int getMaxNumberOfRules() {
+	return maxRules;
+    }
+    public long getTimeout() {
+	return timeout;
+    }
     
     private void checkForValidity(){
         File test = new File(pathOfRuleFile);

@@ -25,6 +25,7 @@ import javax.swing.border.TitledBorder;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.gui.lemmatagenerator.TacletSoundnessPOLoader.TacletFilter;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 
@@ -129,7 +130,7 @@ class TacletChooser extends JPanel{
 }
 
 
-public class LemmaSelectionDialog extends JDialog{
+public class LemmaSelectionDialog extends JDialog implements TacletFilter{
     
     private static final long serialVersionUID = 1L;
 
@@ -238,6 +239,11 @@ public class LemmaSelectionDialog extends JDialog{
 	    tacletChooser = new TacletChooser();
 	}
 	return tacletChooser;
+    }
+
+    @Override
+    public ImmutableSet<Taclet> filter(ImmutableSet<Taclet> taclets) {
+	return showModal(taclets);
     }
     
     

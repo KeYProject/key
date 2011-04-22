@@ -238,7 +238,7 @@ public final class ProblemLoader implements Runnable {
        try{
            try{
                envInput = createEnvInput(file);
-               init = new ProblemInitializer(main); 
+               init = main.createProblemInitializer(); 
                InitConfig initConfig = init.prepare(envInput);
 
                final String chooseContract;

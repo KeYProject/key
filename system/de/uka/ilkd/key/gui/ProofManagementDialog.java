@@ -411,7 +411,7 @@ public final class ProofManagementDialog extends JDialog {
     private void findOrStartProof(ProofOblInput po) {
         Proof proof = findPreferablyClosedProof(po);
         if(proof == null) {
-            ProblemInitializer pi = new ProblemInitializer(Main.getInstance());
+            ProblemInitializer pi = Main.getInstance().createProblemInitializer();
             try {
                 pi.startProver(initConfig, po);
             } catch(ProofInputException exc) {

@@ -8,7 +8,9 @@ import javax.swing.SwingUtilities;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
+import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.Taclet;
@@ -23,6 +25,8 @@ public class TacletSoundnessPOLoader {
     private LinkedList<LoaderListener> listeners = new LinkedList<LoaderListener>();
     private ProofAggregate  resultingProof;
     private ImmutableSet<Taclet> resultingTaclets = DefaultImmutableSet.nil();
+    private ProblemInitializer problemInitialzer; 
+    private TacletFilter tacletFilter;
     
     static public interface LoaderListener{
 	public void started();
@@ -30,11 +34,15 @@ public class TacletSoundnessPOLoader {
 	public void stopped(Throwable exception); 
     }  
     
+    static public interface TacletFilter{
+	public ImmutableSet<Taclet> filter(ImmutableSet<Taclet> taclets);
+    }
+    
     
     public TacletSoundnessPOLoader(
             ProgressMonitor progressMonitor, File file,
-            ProofEnvironment env, LoaderListener listener) {
-	this(progressMonitor, file, env);
+            ProofEnvironment env, LoaderListener listener,TacletFilter filter) {
+	this(progressMonitor, file, env,filter);
 	if(listener != null){
 	    listeners.add(listener);
 	}
@@ -42,17 +50,20 @@ public class TacletSoundnessPOLoader {
     
     public TacletSoundnessPOLoader(
             ProgressMonitor progressMonitor, File file,
-            ProofEnvironment referenceEnv) {
+            ProofEnvironment referenceEnv,TacletFilter filter) {
 	super();
 	this.progressMonitor = progressMonitor;
 	this.file = file;
 	this.env = referenceEnv;
+	this.tacletFilter = filter;
     }
     
     public TacletSoundnessPOLoader(
             ProgressMonitor progressMonitor, File file,
-            LoaderListener listener) {
-	this(progressMonitor, file, null,listener);
+            LoaderListener listener,ProblemInitializer problemInitializer,
+            TacletFilter filter) {
+	this(progressMonitor, file, null,listener,filter);
+	this.problemInitialzer = problemInitializer;
     }
     
     
@@ -106,18 +117,22 @@ public class TacletSoundnessPOLoader {
     private void doWork() throws ProofInputException{
 	TacletLoader tacletLoader = new TacletLoader();
 	KeYUserProblemFile keyFile = new KeYUserProblemFile(file.getName(), file, progressMonitor);
+	InitConfig initConfig;
+	if(env == null){
+	    initConfig = problemInitialzer.prepare(keyFile);
+	    env = new ProofEnvironment(initConfig); 
+	}
+	initConfig = env.getInitConfig(); 
+	
 	ImmutableSet<Taclet> taclets = 
-	    tacletLoader.load(keyFile, env.getInitConfig());
+	    tacletLoader.load(keyFile, initConfig);
 
 
-	// let the user select specific taclets.
-	LemmaSelectionDialog dialog = new LemmaSelectionDialog();
-	resultingTaclets = dialog.showModal(taclets);
-
+	resultingTaclets = tacletFilter.filter(taclets);
 	
 
-	ProofAggregate p = ProofObligationCreator.create(getResultingTaclets(), env.getInitConfig());
-
+	ProofAggregate p = ProofObligationCreator.create(getResultingTaclets(), initConfig);
+        
 	env.registerProof(keyFile,p);
 	resultingProof = p;
     }
