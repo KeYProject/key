@@ -19,7 +19,7 @@ import de.uka.ilkd.key.util.ProgressMonitor;
 public class TacletSoundnessPOLoader {
     private final ProgressMonitor progressMonitor;
     private final File    file;
-    private final ProofEnvironment env;
+    private ProofEnvironment env;
     private LinkedList<LoaderListener> listeners = new LinkedList<LoaderListener>();
     private ProofAggregate  resultingProof;
     private ImmutableSet<Taclet> resultingTaclets = DefaultImmutableSet.nil();
@@ -35,16 +35,24 @@ public class TacletSoundnessPOLoader {
             ProgressMonitor progressMonitor, File file,
             ProofEnvironment env, LoaderListener listener) {
 	this(progressMonitor, file, env);
-	listeners.add(listener);
+	if(listener != null){
+	    listeners.add(listener);
+	}
     }
     
     public TacletSoundnessPOLoader(
             ProgressMonitor progressMonitor, File file,
-            ProofEnvironment env) {
+            ProofEnvironment referenceEnv) {
 	super();
 	this.progressMonitor = progressMonitor;
 	this.file = file;
-	this.env = env;
+	this.env = referenceEnv;
+    }
+    
+    public TacletSoundnessPOLoader(
+            ProgressMonitor progressMonitor, File file,
+            LoaderListener listener) {
+	this(progressMonitor, file, null,listener);
     }
     
     
