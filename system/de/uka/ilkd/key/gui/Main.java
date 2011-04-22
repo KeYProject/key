@@ -37,6 +37,8 @@ import java.io.PrintWriter;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -73,7 +75,6 @@ import javax.swing.text.JTextComponent;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.TacletSoundnessPOLoader.LoaderListener;
 import de.uka.ilkd.key.gui.configuration.ChoiceSelector;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
@@ -84,6 +85,10 @@ import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.configuration.SettingsListener;
 import de.uka.ilkd.key.gui.configuration.StrategySettings;
 import de.uka.ilkd.key.gui.configuration.ViewSelector;
+import de.uka.ilkd.key.gui.lemmatagenerator.LemmaSelectionDialog;
+import de.uka.ilkd.key.gui.lemmatagenerator.LemmataAutoModeOptions;
+import de.uka.ilkd.key.gui.lemmatagenerator.TacletSoundnessPOLoader;
+import de.uka.ilkd.key.gui.lemmatagenerator.TacletSoundnessPOLoader.LoaderListener;
 import de.uka.ilkd.key.gui.nodeviews.NonGoalInfoView;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.gui.notification.NotificationManager;
@@ -1452,7 +1457,7 @@ public final class Main extends JFrame implements IMain {
         final Proof proof = mediator().getSelectedProof();
         final File file = localFileChooser.getSelectedFile ();
         LoaderListener listener = 	new LoaderListener() {
-	     @Override
+	     @Override 
 		    public void stopped(Throwable exception) {
 		        // TODO: handle the exception
 			throw new RuntimeException(exception);		
@@ -2433,7 +2438,15 @@ public final class Main extends JFrame implements IMain {
 		    de.uka.ilkd.key.util.Debug.ENABLE_ASSERTION = true;
 		} else if (opt[index].equals("NO_JMLSPECS")) {
 		    GeneralSettings.disableSpecs = true;
-		} else if (opt[index].equals("AUTO")) {
+		} else if (opt[index].equals("JUSTIFYRULES")){
+		  LinkedList<String> options = new LinkedList<String>();
+		  for(int i = index+1; i < opt.length; i++){
+		      options.add(opt[i]);
+		  }
+		  evaluateLemmataOptions(options);
+		  // is last option 
+		  break; 
+		}else if (opt[index].equals("AUTO")) {
 		    batchMode = true;
                     visible = false;
 		} else if (opt[index].equals("TIMEOUT")) {
@@ -2472,6 +2485,20 @@ public final class Main extends JFrame implements IMain {
 	} else {
 	    System.out.println("Not using assertions ...");	   
 	}
+    }
+    
+    private static void evaluateLemmataOptions(LinkedList<String>  options){
+	LemmataAutoModeOptions opt;
+	try{
+	    opt = new LemmataAutoModeOptions(options);
+	}catch(Throwable e){
+	    System.out.println("An error occured while reading the parameters:");
+	    System.out.println(e.getMessage());
+	    System.exit(1);
+	    return;
+	}
+	System.out.println(opt);
+	
     }
 
     private static void printUsageAndExit() {

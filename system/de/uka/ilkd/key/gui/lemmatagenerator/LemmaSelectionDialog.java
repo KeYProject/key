@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.gui;
+package de.uka.ilkd.key.gui.lemmatagenerator;
 
 
 
@@ -142,7 +142,7 @@ public class LemmaSelectionDialog extends JDialog{
 
     
 
-    LemmaSelectionDialog(){
+    public LemmaSelectionDialog(){
 
 	this.setLayout(new BoxLayout(this.getContentPane(), BoxLayout.X_AXIS));
 	this.getContentPane().add(Box.createHorizontalStrut(10));

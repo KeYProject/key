@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.gui;
+package de.uka.ilkd.key.gui.lemmatagenerator;
 
 import java.io.File;
 import java.util.LinkedList;
@@ -24,7 +24,7 @@ public class TacletSoundnessPOLoader {
     private ProofAggregate  resultingProof;
     private ImmutableSet<Taclet> resultingTaclets = DefaultImmutableSet.nil();
     
-    static interface LoaderListener{
+    static public interface LoaderListener{
 	public void started();
 	public void stopped(ProofAggregate p,  ImmutableSet<Taclet> taclets);
 	public void stopped(Throwable exception); 
