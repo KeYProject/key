@@ -25,56 +25,56 @@ import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 public class LemmataHandler implements TacletFilter{
     private final LemmataAutoModeOptions options;
     private final Profile profile;
-    private final Listener listener = new Listener();
     
     public LemmataHandler(LemmataAutoModeOptions options, Profile profile){
 	this.options = options;
 	this.profile = profile;
-	
     }
     
-    public void loadLemata(){
-       
+ 
+    public void println(String s){
+	if(options.getPrintStream()!=null){
+	    options.getPrintStream().println(s);
+	}
     }
     
-    private void loadProblem(){
-	
+    public void print(String s){
+	if(options.getPrintStream()!=null){
+	    options.getPrintStream().print(s);
+	}
     }
     
-    public void proveLemata(){
-	
+    public void printException(Throwable t){
+	if(options.getPrintStream() !=null){
+	    t.printStackTrace(options.getPrintStream());
+	}
     }
-    
-    
     
     public void start(){
-	System.out.println("START");
+	println("Start problem creation:");
 	ProblemInitializer pi = createProblemInitializer();
 	File file = new File(options.getPathOfRuleFile());
 	LoaderListener loaderListener = new LoaderListener() {
 	    
 	    @Override
 	    public void stopped(Throwable exception) {
-		// TODO Auto-generated method stub
-		
+		printException(exception);
 	    }
 	    
 	    @Override
 	    public void stopped(ProofAggregate pa, ImmutableSet<Taclet> taclets) {
-		System.out.println("Proof created");
-		
-		for(Proof p : pa.getProofs()){
-		    System.out.println(p);
+		println("Proofs have been created for");
+		if(options.getPrintStream() != null){
+		    for(Proof p : pa.getProofs()){
+			println("Taclet: "+p.name());
+		    }		
 		}
 		startProofs(pa);
-	
-		
 	    }
 	    
 	    @Override
 	    public void started() {
-		// TODO Auto-generated method stub
-		
+		println("Start loading the problem");
 	    }
 	};
 	TacletSoundnessPOLoader loader = new TacletSoundnessPOLoader(null,
@@ -83,20 +83,22 @@ public class LemmataHandler implements TacletFilter{
     }
     
     private void startProofs(ProofAggregate pa){
+	println("Start the proving:");
 	for(Proof p : pa.getProofs()){
 	    startProof(p);
 	}
     }
     
     private void startProof(Proof proof){
-	System.out.println("Proof: " + proof.name());
+	print(proof.name()+"...");
         AutomaticProver prover = new AutomaticProver();
         try{
-        prover.start(proof, options.getMaxNumberOfRules(),options.getTimeout());
+            prover.start(proof, options.getMaxNumberOfRules(),options.getTimeout());
+            println(proof.closed()?"closed":"not closed");
         }catch(InterruptedException exception){
-            System.out.println("Proof has been interrupted: Timeout");
+           println("time out");
         }
-	System.out.println("Closed" + proof.closed());
+	
     }
     
     
@@ -105,54 +107,51 @@ public class LemmataHandler implements TacletFilter{
 		false,new Listener()); 
     }
     
-    private static class Listener implements ProblemInitializerListener
+    private class Listener implements ProblemInitializerListener
                 {
 
 	@Override
         public void proofCreated(ProblemInitializer sender,
                 ProofAggregate proofAggregate) {
-	    System.out.println("Proof created");
+	    println("The proofs have been initialized.");
         }
 
 	@Override
         public void progressStarted(Object sender) {
-	    System.out.println("Progress started");
+	    println("Process of initializing the proofs has been started.");
         }
 
 	@Override
         public void progressStopped(Object sender) {
-	    System.out.println("Progress stopped");
+	    println("Process of initializing the proofs has been stopped.");
         }
 
 	@Override
         public void reportStatus(Object sender, String status, int progress) {
-	    System.out.println("Status: " + status);
+	   println("Status: "+status);
         }
 
 	@Override
         public void reportStatus(Object sender, String status) {
-	    System.out.println("Status: " + status );
+	   println("Status: " + status );
         }
 
 	@Override
         public void resetStatus(Object sender) {
-
+	    
         }
 
 	@Override
         public void reportException(Object sender, ProofOblInput input,
                 Exception e) {
-	    System.out.println("ERROR:");
-	    System.out.println(e.getMessage());
+	    printException(e);
         }	
 	
     }
 
     @Override
     public ImmutableSet<Taclet> filter(ImmutableSet<Taclet> taclets) {
-	for(Taclet taclet : taclets){
-	    System.out.println("Taclet: " + taclet.displayName());
-	}
+	
 	return taclets;
     }
 

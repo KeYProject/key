@@ -1,14 +1,20 @@
 package de.uka.ilkd.key.gui.lemmatagenerator;
 
 import java.io.File;
+import java.io.PrintStream;
 import java.util.Iterator;
 import java.util.LinkedList;
 
 public class LemmataAutoModeOptions {
-    private static final String MAX_RULES = ":maxRules";
-    private static final String PATH_OF_RULE_FILE = ":pathOfRuleFile";
-    private static final String PATH_OF_RESULT = ":pathOfResult";
-    private static final String TIMEOUT = ":timeout";
+    private static final String TERMINAL = "terminal";
+    private static final String KEY_PREFIX = "?";
+    private static final String MAX_RULES = KEY_PREFIX+"maxRules";
+    private static final String PATH_OF_RULE_FILE = KEY_PREFIX+"pathOfRuleFile";
+    private static final String PATH_OF_RESULT = KEY_PREFIX+"pathOfResult";
+    private static final String TIMEOUT = KEY_PREFIX+"timeout";
+    private static final String PRINT = KEY_PREFIX+"print";
+   
+    
     
     
     /**
@@ -37,6 +43,8 @@ public class LemmataAutoModeOptions {
     private int maxRules = 10000;
 
     private String pathOfResult = "";
+    
+    private PrintStream printStream = null;
 
     public LemmataAutoModeOptions(String pathRuleFile, int timeout,
             int maxRules, String pathResult) {
@@ -64,7 +72,7 @@ public class LemmataAutoModeOptions {
 	Iterator<String> it = options.iterator();
 	while(it.hasNext()){
 	    String option = it.next();
-	    if(option.startsWith(":")){
+	    if(option.startsWith(KEY_PREFIX)){
 		if(it.hasNext()){
 		  read(option,it.next());  
 		}else{
@@ -90,7 +98,12 @@ public class LemmataAutoModeOptions {
 	}
 	if(key.equals(TIMEOUT)){
 	    timeout =Long.parseLong(value);
-	}	
+	}
+	if(key.equals(PRINT)){
+	    if(value.equals(TERMINAL)){
+		printStream = System.out;
+	    }
+	}
     }
     
     public String getPathOfRuleFile() {
@@ -102,6 +115,10 @@ public class LemmataAutoModeOptions {
     }
     public long getTimeout() {
 	return timeout;
+    }
+    
+    public PrintStream getPrintStream(){
+	return printStream;
     }
     
     private void checkForValidity(){

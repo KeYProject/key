@@ -1817,9 +1817,13 @@ public final class Main extends JFrame implements IMain {
     
     protected void saveProof(File proofFile) {
         String filename = proofFile.getAbsolutePath();    
-        ProofSaver saver = new ProofSaver(this, filename);
-        String errorMsg = saver.save();
-        
+        ProofSaver saver = new ProofSaver(mediator().getSelectedProof(), filename,this.getInternalVersion());
+        String errorMsg ;
+        try{
+         errorMsg= saver.save();
+        }catch(IOException e){
+          errorMsg = e.toString();              
+        }
         if (errorMsg != null) {
             notify(new GeneralFailureEvent
                     ("Saving Proof failed.\n Error: " + errorMsg));
