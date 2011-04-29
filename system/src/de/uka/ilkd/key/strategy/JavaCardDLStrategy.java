@@ -525,7 +525,7 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
 	
 	bindRuleSet ( d, "stringsSimplify", longConst ( -5000 ) ); 
 	
-	bindRuleSet ( d, "stringsExpandLengthConcat", longConst ( -8000 ) ); 
+	bindRuleSet ( d, "stringsExpandLengthConcat", longConst ( -3000 ) ); 
 
 	bindRuleSet ( d, "stringsLengthInvariant",  
 		ifZero ( applyTF ( instOf("str"), stringLiteral ) , 
