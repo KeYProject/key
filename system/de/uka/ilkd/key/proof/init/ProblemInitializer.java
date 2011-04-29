@@ -81,17 +81,11 @@ public final class ProblemInitializer {
 	this.progMon = mon;
 	this.listener = listener;
 	this.registerProof = registerProof;
-        /*this.main       = main;
-        this.progMon    = main == null ? null : main.getProgressMonitor();
-        this.profile    = main == null ? null : main.mediator().getProfile();
-        this.services   = main == null ? null : new Services(main.mediator().getExceptionHandler());
- 	*/
     }
   
     
     public ProblemInitializer(Profile profile) {
 	assert profile != null;
-	//this.main       = null;
         this.progMon    = null;
         this.listener   = null;
         this.profile    = profile;
@@ -112,9 +106,7 @@ public final class ProblemInitializer {
 	if(listener != null){
 	    listener.reportStatus(this,status);
 	}
-	//if (main != null) {
-	  //  main.setStatusLine(status);	
-	//}
+
     }
 
     
@@ -131,39 +123,7 @@ public final class ProblemInitializer {
     }
     
 
-    /** 
-     * displays the standard status line
-     */
-//    private void reportReady() {
-//	if(progressStateListener != null){
-//	    progressStateListener.reportStatus(status);
-//	}
-//
-//	if (main != null) {
-//	    main.setStandardStatusLine();
-//	}
-//    }
-    
-    
-//    private void stopInterface() {
-//	if(listener != null){
-//	    listener.started(this);
-//	}	
-////	if(main != null) {
-////	    main.mediator().stopInterface(true);
-////	}
-//    }
-    
-    
-//    private void startInterface() {
-//	if(listener != null){
-//	    listener.stopped(this);
-//	}
-////	if(main != null) {
-////	    main.mediator().startInterface(true);
-////        }
-//    }
-    
+  
     
     /**
      * Helper for readIncludes().
@@ -449,9 +409,9 @@ public final class ProblemInitializer {
     }
 
 
-    private void setUpProofHelper(ProofOblInput problem, InitConfig initConfig) 
+    private void setUpProofHelper(ProofOblInput problem,ProofAggregate pl, InitConfig initConfig) 
 	throws ProofInputException {
-	ProofAggregate pl = problem.getPO();
+	//ProofAggregate pl = problem.getPO();
 	if(pl == null) {
 	   throw new ProofInputException("No proof");
 	}
@@ -564,13 +524,13 @@ public final class ProblemInitializer {
             //read problem
     	    reportStatus("Loading problem \"" + po.name() + "\"");
     	    po.readProblem();
-    	    
+    	    ProofAggregate pa = po.getPO();
     	    //final work
-    	    setUpProofHelper(po, initConfig);
-    	    
+    	    setUpProofHelper(po, pa,initConfig);
+
 	    //done
     	    if(listener != null){
-                listener.proofCreated(this, po.getPO());
+                listener.proofCreated(this, pa);
             }
                	    
         } catch (ProofInputException e) {    

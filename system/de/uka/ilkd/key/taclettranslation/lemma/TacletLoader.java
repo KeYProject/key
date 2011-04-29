@@ -27,11 +27,9 @@ public class TacletLoader {
     
     public ImmutableSet<Taclet> load(KeYUserProblemFile keyFile,InitConfig reference)
     throws ProofInputException{
- 
 	// this ensures that necessary Java types are loaded
 	InitConfig config = createInitConfig(reference);
 	keyFile.setInitConfig(config);
-
 	keyFile.readRulesAndProblem();	
 	return config.getTaclets();
     }

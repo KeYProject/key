@@ -1,30 +1,32 @@
 package de.uka.ilkd.key.gui.lemmatagenerator;
 
 import java.io.File;
-import java.util.EventObject;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Vector;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.ApplyStrategy;
-import de.uka.ilkd.key.gui.InteractiveProver;
-import de.uka.ilkd.key.gui.lemmatagenerator.TacletSoundnessPOLoader.LoaderListener;
-import de.uka.ilkd.key.gui.lemmatagenerator.TacletSoundnessPOLoader.TacletFilter;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.proof.ProblemLoader;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.ProofSaver;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProblemInitializer.ProblemInitializerListener;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.taclettranslation.TacletSoundnessPOLoader;
+import de.uka.ilkd.key.taclettranslation.TacletSoundnessPOLoader.LoaderListener;
+import de.uka.ilkd.key.taclettranslation.TacletSoundnessPOLoader.TacletFilter;
+import de.uka.ilkd.key.taclettranslation.TacletSoundnessPOLoader.TacletInfo;
 import de.uka.ilkd.key.taclettranslation.lemma.AutomaticProver;
-import de.uka.ilkd.key.util.ExtList;
-import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
 public class LemmataHandler implements TacletFilter{
     private final LemmataAutoModeOptions options;
     private final Profile profile;
+ 
     
     public LemmataHandler(LemmataAutoModeOptions options, Profile profile){
 	this.options = options;
@@ -50,26 +52,32 @@ public class LemmataHandler implements TacletFilter{
 	}
     }
     
-    public void start(){
+    public void start() throws IOException{
 	println("Start problem creation:");
+	println(options.toString());
 	ProblemInitializer pi = createProblemInitializer();
 	File file = new File(options.getPathOfRuleFile());
 	LoaderListener loaderListener = new LoaderListener() {
 	    
 	    @Override
 	    public void stopped(Throwable exception) {
-		printException(exception);
+		handleException(exception);
 	    }
 	    
 	    @Override
 	    public void stopped(ProofAggregate pa, ImmutableSet<Taclet> taclets) {
+		if(pa == null){
+		    println("There is no taclet to be proven.");
+		    return;
+		}
 		println("Proofs have been created for");
 		if(options.getPrintStream() != null){
 		    for(Proof p : pa.getProofs()){
-			println("Taclet: "+p.name());
+			println(p.name().toString());
 		    }		
 		}
 		startProofs(pa);
+	
 	    }
 	    
 	    @Override
@@ -78,15 +86,42 @@ public class LemmataHandler implements TacletFilter{
 	    }
 	};
 	TacletSoundnessPOLoader loader = new TacletSoundnessPOLoader(null,
-		file , loaderListener, pi,this );
+		file ,createDummyKeYFile(), loaderListener, pi,this );
 	loader.start();	
+    }
+    
+    private File createDummyKeYFile() throws IOException{
+	File file = new File(options.getHomePath()+File.separator+"lemmataGenDummy.key");
+	file.deleteOnExit();
+	String s = "\\problem{true}";
+	FileWriter writer = new FileWriter(file);
+	writer.write(s);
+	writer.close();
+	return file;	
+    }
+    
+    private void handleException(Throwable exception){
+	printException(exception);
     }
     
     private void startProofs(ProofAggregate pa){
 	println("Start the proving:");
 	for(Proof p : pa.getProofs()){
-	    startProof(p);
+	    try{
+		startProof(p);
+		if(options.isSavingResultsToFile()){
+		    saveProof(p);
+		}
+	    }catch(Throwable e){
+		handleException(e);
+	    }
 	}
+    }
+    
+    private void saveProof(Proof p) throws IOException{
+	   ProofSaver saver = new ProofSaver(p,options.createProofPath(p), 
+	   options.getInternalVersion());
+	   saver.save();
     }
     
     private void startProof(Proof proof){
@@ -150,9 +185,15 @@ public class LemmataHandler implements TacletFilter{
     }
 
     @Override
-    public ImmutableSet<Taclet> filter(ImmutableSet<Taclet> taclets) {
+    public ImmutableSet<Taclet> filter(Vector<TacletInfo> taclets) {
+	ImmutableSet<Taclet> set = DefaultImmutableSet.nil();
+	for(TacletInfo tacletInfo : taclets){
+	    if(!tacletInfo.isAlreadyInUse()){
+		set = set.add(tacletInfo.getTaclet());
+	    }
+	}
 	
-	return taclets;
+	return set;
     }
 
     

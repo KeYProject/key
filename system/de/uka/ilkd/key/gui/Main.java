@@ -88,8 +88,6 @@ import de.uka.ilkd.key.gui.configuration.ViewSelector;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmaSelectionDialog;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataAutoModeOptions;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataHandler;
-import de.uka.ilkd.key.gui.lemmatagenerator.TacletSoundnessPOLoader;
-import de.uka.ilkd.key.gui.lemmatagenerator.TacletSoundnessPOLoader.LoaderListener;
 import de.uka.ilkd.key.gui.nodeviews.NonGoalInfoView;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.gui.notification.NotificationManager;
@@ -138,6 +136,8 @@ import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
 import de.uka.ilkd.key.taclettranslation.SkeletonGenerator;
+import de.uka.ilkd.key.taclettranslation.TacletSoundnessPOLoader;
+import de.uka.ilkd.key.taclettranslation.TacletSoundnessPOLoader.LoaderListener;
 import de.uka.ilkd.key.taclettranslation.lemma.ProofObligationCreator;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletLoader;
 import de.uka.ilkd.key.util.Debug;
@@ -1528,6 +1528,10 @@ public final class Main extends JFrame implements IMain {
 			    Main.this.addProblem(p);
 			    // add only the taclets to the goals if 
 			    // the proof obligations were added successfully.
+			    ImmutableSet<Taclet> base =
+			    proof.env().getInitConfig().getTaclets();
+			    base = base.union(taclets);
+			    proof.env().getInitConfig().setTaclets(base);
 			    for(Taclet taclet : taclets){
 				for(Goal goal : proof.openGoals()){
 				    goal.addTaclet(taclet, 
@@ -1543,7 +1547,7 @@ public final class Main extends JFrame implements IMain {
 		    }
 		};
         TacletSoundnessPOLoader loader = new TacletSoundnessPOLoader(progressMonitor, 
-        	file,proof.env() ,listener,new LemmaSelectionDialog());
+        	file,null,proof.env() ,listener,new LemmaSelectionDialog());
         loader.start();
     }
     
@@ -2553,7 +2557,10 @@ public final class Main extends JFrame implements IMain {
     private static void evaluateLemmataOptions(LinkedList<String>  options){
 	LemmataAutoModeOptions opt;
 	try{
-	    opt = new LemmataAutoModeOptions(options);
+	    
+	    opt = new LemmataAutoModeOptions(options,getInstance(false).getInternalVersion(), 
+		    PathConfig.KEY_CONFIG_DIR
+		    );
 	}catch(Throwable e){
 	    System.out.println("An error occured while reading the parameters:");
 	    System.out.println(e.getMessage());
@@ -2562,11 +2569,17 @@ public final class Main extends JFrame implements IMain {
 	    return;
 	}
 	KeYMediator mediator = getInstance(false).mediator();
-	System.out.println(opt);
+
+	try{
 	LemmataHandler handler = new LemmataHandler(opt,
-		mediator.getProfile());
+			mediator.getProfile());
 	handler.start();
-    }
+	}
+	catch(IOException exception){
+	    System.out.println("Could not create dummy file: " + exception);
+	}
+
+   }
 
     private static void printUsageAndExit() {
         System.out.println("File not found or unrecognized option.\n");
