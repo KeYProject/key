@@ -441,71 +441,74 @@ public final class ProblemInitializer {
      * Creates an initConfig / a proof environment and reads an EnvInput into it
      */
     public InitConfig prepare(EnvInput envInput) throws ProofInputException {
-	stopInterface();
-	alreadyParsed.clear();
+        stopInterface();
+        alreadyParsed.clear();
 
-	//the first time, read in standard rules
-	if(baseConfig == null) {
-	    baseConfig = new InitConfig(services, profile);
+        //the first time, read in standard rules
+        if(baseConfig == null) {
+            baseConfig = new InitConfig(services, profile);
 
-	    RuleSource tacletBase = profile.getStandardRules().getTacletBase();
-	    if(tacletBase != null) {
-    	    	KeYFile tacletBaseFile
-    	    	    = new KeYFile("taclet base", 
-    	    		          profile.getStandardRules().getTacletBase(),
-			          progMon);
-    	    	readEnvInput(tacletBaseFile, baseConfig);
-	    }	    
-	}
-	
-	//create initConfig
+            RuleSource tacletBase = profile.getStandardRules().getTacletBase();
+            if(tacletBase != null) {
+                KeYFile tacletBaseFile
+                = new KeYFile("taclet base", 
+                        profile.getStandardRules().getTacletBase(),
+                        progMon);
+                readEnvInput(tacletBaseFile, baseConfig);
+            }	    
+        }
+
+        //create initConfig
         InitConfig initConfig = baseConfig.copy();
 
-	//register built in rules
+        //register built in rules
         for(Rule r : profile.getStandardRules().getStandardBuiltInRules()) {
-    	    initConfig.getProofEnv().registerRule(r, 
-    		    				  profile.getJustification(r));
+            initConfig.getProofEnv().registerRule(r, 
+                    profile.getJustification(r));
         }
-        
-	//read Java
+
+        //read Java
         readJava(envInput, initConfig);
-        
+
         //register function and predicate symbols defined by Java program
         final JavaInfo javaInfo = initConfig.getServices().getJavaInfo();
         final Namespace functions 
-        	= initConfig.getServices().getNamespaces().functions();
+        = initConfig.getServices().getNamespaces().functions();
         final HeapLDT heapLDT 
-        	= initConfig.getServices().getTypeConverter().getHeapLDT();
+        = initConfig.getServices().getTypeConverter().getHeapLDT();
         assert heapLDT != null;
-        functions.add(initConfig.getServices().getJavaInfo().getInv());
-        for(KeYJavaType kjt : javaInfo.getAllKeYJavaTypes()) {
-            final Type type = kjt.getJavaType();
-            if(type instanceof ClassDeclaration 
-        	     || type instanceof InterfaceDeclaration) {
-        	for(Field f : javaInfo.getAllFields((TypeDeclaration)type)) {
-        	    final ProgramVariable pv 
-        	    	= (ProgramVariable)f.getProgramVariable();
-        	    if(pv instanceof LocationVariable) {
-        		heapLDT.getFieldSymbolForPV((LocationVariable)pv, 
-        					    initConfig.getServices());
-        	    }
-        	}
+        if (javaInfo != null) { // XXX what if javaInfo == null ???
+            functions.add(javaInfo.getInv());
+            for(KeYJavaType kjt : javaInfo.getAllKeYJavaTypes()) {
+                final Type type = kjt.getJavaType();
+                if(type instanceof ClassDeclaration 
+                        || type instanceof InterfaceDeclaration) {
+                    for(Field f : javaInfo.getAllFields((TypeDeclaration)type)) {
+                        final ProgramVariable pv 
+                        = (ProgramVariable)f.getProgramVariable();
+                        if(pv instanceof LocationVariable) {
+                            heapLDT.getFieldSymbolForPV((LocationVariable)pv, 
+                                    initConfig.getServices());
+                        }
+                    }
+                }
+                for(ProgramMethod pm
+                        : javaInfo.getAllProgramMethodsLocallyDeclared(kjt)) {
+                    if(pm.getKeYJavaType() != null) {
+                        functions.add(pm);
+                    }
+                }
             }
-            for(ProgramMethod pm
-        	    : javaInfo.getAllProgramMethodsLocallyDeclared(kjt)) {
-        	if(pm.getKeYJavaType() != null) {
-        	    functions.add(pm);
-        	}
-            }
-        }
+        } // XXX if ji != null
+        else new Exception("javaInfo == null again").printStackTrace();
 
         //read envInput
         readEnvInput(envInput, initConfig);
-        
+
         //done
         reportReady();
-	startInterface();
-	return initConfig;
+        startInterface();
+        return initConfig;
     }
 
     

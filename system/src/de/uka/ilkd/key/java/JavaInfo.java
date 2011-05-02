@@ -1258,7 +1258,9 @@ public final class JavaInfo {
         return length;
     }
     
-    
+    /**
+     * Returns the special symbol <code>&lt;inv&gt;</code> which stands for the class invariant of an object.
+     */
     public ObserverFunction getInv() {
 	if(inv == null) {
 	    inv = new ObserverFunction("<inv>",

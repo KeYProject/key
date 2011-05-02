@@ -357,6 +357,7 @@ public class Recoder2KeY implements JavaReader {
                 String extraMsg = "Consider using a classpath if this is a classtype that cannot be resolved\n";
                 reportError(extraMsg + ex.getCause().getMessage(), ex);
             } else {
+                    ex.printStackTrace();
                 reportError(ex.getMessage(), ex);
             }
         }

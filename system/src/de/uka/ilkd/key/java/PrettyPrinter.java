@@ -364,13 +364,15 @@ public class PrettyPrinter {
     }
 
     protected Position getRelativePosition(SourceElement first) {
-	//	System.out.println(indentMap);
-	if (indentMap.containsKey(first)) {
-	    return indentMap.get(first);
-	} else {
-	    if (first!=null) return first.getRelativePosition();
-	    else return Position.UNDEFINED;
-	}
+        try {
+        if (indentMap.containsKey(first)) {
+            return indentMap.get(first);
+        } else {
+            if (first!=null) return first.getRelativePosition();
+            
+        }} finally {
+            return Position.UNDEFINED;
+        }
     }
 
     /**
