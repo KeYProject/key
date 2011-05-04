@@ -19,6 +19,8 @@ import de.uka.ilkd.key.util.ProgressMonitor;
 public class TacletLoader {
     private InitConfig createInitConfig(InitConfig reference){
 	  InitConfig newConfig =  reference.copy();
+	
+	  
 	  newConfig.setTaclets ( DefaultImmutableSet.<Taclet>nil() );
 	  newConfig.setTaclet2Builder ( new HashMap<Taclet, TacletBuilder> () );
 
@@ -29,8 +31,16 @@ public class TacletLoader {
     throws ProofInputException{
 	// this ensures that necessary Java types are loaded
 	InitConfig config = createInitConfig(reference);
+	
+	
+	
 	keyFile.setInitConfig(config);
-	keyFile.readRulesAndProblem();	
+	keyFile.readRulesAndProblem();
+	
+	/*keyFile.readIncludes();
+	keyFile.readJavaPath();
+	keyFile.readSorts();
+	keyFile.readRulesAndProblem();	*/
 	return config.getTaclets();
     }
     

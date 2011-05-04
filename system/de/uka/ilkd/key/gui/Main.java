@@ -134,12 +134,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
-import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
-import de.uka.ilkd.key.taclettranslation.SkeletonGenerator;
 import de.uka.ilkd.key.taclettranslation.TacletSoundnessPOLoader;
 import de.uka.ilkd.key.taclettranslation.TacletSoundnessPOLoader.LoaderListener;
-import de.uka.ilkd.key.taclettranslation.lemma.ProofObligationCreator;
-import de.uka.ilkd.key.taclettranslation.lemma.TacletLoader;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.key.util.KeYResourceManager;
@@ -280,6 +276,55 @@ public final class Main extends JFrame implements IMain {
     /** The menu for the SMT solver options */
     public final JMenu smtOptions = new JMenu("SMT Solvers...");
     
+    
+    private final ProblemInitializerListener piListener = new ProblemInitializerListener(){
+
+	    @Override
+        public void progressStarted(Object sender) {
+		 mediator().stopInterface(true);
+            
+        }
+
+	    @Override
+        public void progressStopped(Object sender) {
+		 mediator().startInterface(true);
+            
+        }
+
+	    @Override
+        public void proofCreated(ProblemInitializer sender,
+                ProofAggregate proofAggregate) {
+		addProblem(proofAggregate);
+		resetStatus(sender);
+        }
+	    
+	    @Override
+	    public void resetStatus(Object sender) {
+		setStandardStatusLine();
+	    }
+
+	    @Override
+        public void reportStatus(Object sender,
+                String status, int progressMax) {
+		setStatusLine(status, progressMax);
+            
+        }
+
+	    @Override
+        public void reportStatus(Object sender,
+                String status) {
+		setStatusLine(status);
+            
+        }
+
+	    @Override
+        public void reportException(Object sender,
+                ProofOblInput input, Exception e) {
+		reportStatus(sender,input.name() + " failed");
+            
+        }
+    };
+    
     /**
      * creates prover -- private, use getInstance()
      * 
@@ -391,57 +436,7 @@ public final class Main extends JFrame implements IMain {
     
     public ProblemInitializer createProblemInitializer(){
 	ProblemInitializer pi = new ProblemInitializer(getProgressMonitor(),
-		mediator().getProfile(), new Services(mediator().getExceptionHandler()),true,
-		new ProblemInitializerListener(){
-
-		    @Override
-                    public void progressStarted(Object sender) {
-			 mediator().stopInterface(true);
-	                
-                    }
-
-		    @Override
-                    public void progressStopped(Object sender) {
-			 mediator().startInterface(true);
-	                
-                    }
-
-		    @Override
-                    public void proofCreated(ProblemInitializer sender,
-                            ProofAggregate proofAggregate) {
-			addProblem(proofAggregate);
-			resetStatus(sender);
-                    }
-		    
-		    @Override
-		    public void resetStatus(Object sender) {
-			setStandardStatusLine();
-		    }
-
-		    @Override
-                    public void reportStatus(Object sender,
-                            String status, int progressMax) {
-			setStatusLine(status, progressMax);
-	                
-                    }
-
-		    @Override
-                    public void reportStatus(Object sender,
-                            String status) {
-			setStatusLine(status);
-	                
-                    }
-
-		    @Override
-                    public void reportException(Object sender,
-                            ProofOblInput input, Exception e) {
-			reportStatus(sender,input.name() + " failed");
-	                
-                    }
-
-	
-	    
-	});
+		mediator().getProfile(), new Services(mediator().getExceptionHandler()),true,piListener);
 	return pi;
     }
     
@@ -576,32 +571,7 @@ public final class Main extends JFrame implements IMain {
         
 
         toolBar.addSeparator();
-        JButton test = new JButton("Test");
-        test.addActionListener(new ActionListener() {
-	    @Override
-	    public void actionPerformed(ActionEvent e) {
-		new LemmaSelectionDialog();
-		System.out.println("START TEST");
-		Proof proof = mediator().getProof();
-		if(proof != null){
-		    ProofEnvironment env = mediator().getSelectedProof().env();
 
-		    
-		}		
-	    }
-	    
-	    private Taclet find(String name){
-		Proof proof = mediator().getProof();
-		for(Taclet taclet : proof.env().getInitConfig().getTaclets()){
-		    if(taclet.name().toString().equals(name)){
-			return taclet;
-		    }
-		}
-		return null;
-	    }
-	});
-        toolBar.add(test);
-        toolBar.addSeparator();
         
         
         final JButton goalBackButton = new JButton();
@@ -1546,8 +1516,9 @@ public final class Main extends JFrame implements IMain {
 			mediator().stopInterface(true);			
 		    }
 		};
+		
         TacletSoundnessPOLoader loader = new TacletSoundnessPOLoader(progressMonitor, 
-        	file,null,proof.env() ,listener,new LemmaSelectionDialog());
+        	file,proof.env() ,listener,piListener,new LemmaSelectionDialog());
         loader.start();
     }
     
@@ -2574,6 +2545,9 @@ public final class Main extends JFrame implements IMain {
 	LemmataHandler handler = new LemmataHandler(opt,
 			mediator.getProfile());
 	handler.start();
+	}
+	catch(ProofInputException exception){
+	    System.out.println("Could not create dummy file: " + exception);
 	}
 	catch(IOException exception){
 	    System.out.println("Could not create dummy file: " + exception);

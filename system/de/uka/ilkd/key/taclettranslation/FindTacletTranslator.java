@@ -128,9 +128,12 @@ public class FindTacletTranslator extends AbstractSkeletonGenerator {
 	Term add = template.sequent() != null ? translate(template.sequent())
 		: STD_ADD;
 	Term rep = replace == null ? STD_REPLACE : translate(replace);
-	if (add == null)
+	if (add == null){
 	    add = STD_ADD;
-	
+	}
+	if(rep == null){
+	    rep = STD_REPLACE;
+	}
 	Term term = tb.or(rep, add);
 	return term;
     }

@@ -4,10 +4,8 @@ package de.uka.ilkd.key.gui.lemmatagenerator;
 
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.ScrollPane;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Collection;
 import java.util.Vector;
 
 import javax.swing.Box;
@@ -19,7 +17,6 @@ import javax.swing.JDialog;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.TitledBorder;
 
@@ -43,6 +40,18 @@ class TacletChooser extends JPanel{
     private JScrollPane rightPane;
     
     private final DefaultListCellRenderer cellRenderer = new DefaultListCellRenderer(){
+	
+	private  String createAdditonalInfo(TacletInfo info){
+	    String s = "";
+	    if(info.isNotSupported()){
+		return " (is not supported)";
+	    }
+	    if(info.isAlreadyInUse()){
+		return " (is already in use)";
+	    }
+	    return s;
+	}
+	
         private static final long serialVersionUID = 1L;
 	    public Component getListCellRendererComponent
 		    (JList list,
@@ -55,7 +64,7 @@ class TacletChooser extends JPanel{
 		    if (value instanceof TacletInfo) {
 			TacletInfo info = ((TacletInfo)value);
 			value = info.getTaclet().name().toString() + 
-			(info.isAlreadyInUse()? " (already in use)":"");
+			createAdditonalInfo(info);
 		    }
 		    return super.getListCellRendererComponent(list, value, 
 							      index, 
@@ -133,7 +142,8 @@ class TacletChooser extends JPanel{
 	        
 	        @Override
 	        public void actionPerformed(ActionEvent e) {
-	            cut(getSelectedList().getSelectedValues(),getSelectionModel(),getTacletModel());
+	            cut(getSelectedList().getSelectedValues(),getSelectionModel(),getTacletModel(),
+	        	    getTacletList());
 	        }
 	    });
 	}
@@ -148,7 +158,9 @@ class TacletChooser extends JPanel{
 	        
 	        @Override
 	        public void actionPerformed(ActionEvent e) {
-	            cut(getTacletList().getSelectedValues(),getTacletModel(),getSelectionModel());
+	            
+	            cut(getTacletList().getSelectedValues(),getTacletModel(),getSelectionModel(),
+	        	    getSelectedList());
 	        }
 	    });
 	}
@@ -156,10 +168,22 @@ class TacletChooser extends JPanel{
 	    
     }
 
-    private void cut(Object [] values, DefaultListModel src, DefaultListModel dest){
+    private void cut(Object [] values, DefaultListModel src, DefaultListModel dest, JList destList){
+	if(values.length == 0){
+	    return;
+	}
+	int added =0;
 	for(Object value : values){
-	    src.removeElement(value);
-	    dest.addElement(value);
+	    TacletInfo info = (TacletInfo) value;
+	    if(!info.isAlreadyInUse() && !info.isNotSupported()){
+		src.removeElement(value);
+		dest.addElement(value);
+		added++;
+	    }
+	    
+	}
+	if(added>0){
+	destList.setSelectionInterval(dest.size()-added, dest.size()-1);
 	}
     }
     
@@ -214,6 +238,7 @@ class TacletChooser extends JPanel{
     }
     
     public void removeSelection(){
+	getSelectedList().setSelectedIndices(new int[0]);
 	getTacletList().setSelectedIndices(new int[0]);
     }
 }
@@ -300,7 +325,7 @@ public class LemmaSelectionDialog extends JDialog implements TacletFilter{
     
    
     private void tacletsSelected(){
-
+	
 	dispose();
     }
     
