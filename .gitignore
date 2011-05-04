@@ -30,3 +30,6 @@ system/warning.msg
 tags
 *.tgz
 *.tar
+/netbeans/eclipse/build/
+/netbeans/eclipse/nbproject/private/
+/netbeans/eclipse/dist/
