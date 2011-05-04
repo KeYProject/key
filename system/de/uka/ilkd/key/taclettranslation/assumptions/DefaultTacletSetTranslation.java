@@ -8,7 +8,7 @@
 //
 //
 
-package de.uka.ilkd.key.smt.taclettranslation;
+package de.uka.ilkd.key.taclettranslation.assumptions;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -29,10 +29,6 @@ import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.taclettranslation.assumptions.AssumptionGenerator;
-import de.uka.ilkd.key.taclettranslation.assumptions.AssumptionFormula;
-import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets;
-import de.uka.ilkd.key.taclettranslation.assumptions.TranslationListener;
 import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
 
