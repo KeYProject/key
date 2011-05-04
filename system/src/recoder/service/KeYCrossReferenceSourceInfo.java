@@ -40,7 +40,6 @@ import recoder.service.ChangeHistory;
 import recoder.service.DefaultCrossReferenceSourceInfo;
 import recoder.service.NameInfo;
 import recoder.service.UnresolvedReferenceException;
-import de.uka.ilkd.key.java.recoderext.AllFields;
 import de.uka.ilkd.key.java.recoderext.ClassFileDeclarationBuilder;
 import de.uka.ilkd.key.java.recoderext.ldt.*;
 import de.uka.ilkd.key.java.recoderext.EnumClassDeclaration;

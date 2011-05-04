@@ -17,44 +17,52 @@ import recoder.java.expression.Operator;
 
 public class SeqIndexOf extends Operator {
 
-    public SeqIndexOf(Expression lhs, Expression rhs) {
-	super(lhs, rhs);
-	makeParentRoleValid();
+    private static final long serialVersionUID = -6353396950660375581L;
+
+
+    /**
+     * Creates an "index of" operator.
+     * @param seq Sequence to operate on
+     * @param elem The element to look for in the sequence
+     */
+    public SeqIndexOf(Expression seq, Expression elem) {
+        super(seq, elem);
+        makeParentRoleValid();
     }
 
 
     protected SeqIndexOf(SeqIndexOf proto) {
-	super(proto);
-	makeParentRoleValid();
+        super(proto);
+        makeParentRoleValid();
     }
-    
+
 
     @Override    
     public SeqIndexOf deepClone() {
-	return new SeqIndexOf(this);
+        return new SeqIndexOf(this);
     }
 
 
     @Override    
     public int getArity() {
-	return 2;
+        return 2;
     }
 
-    
+
     @Override    
     public int getPrecedence() {
-	return 0;
+        return 0;
     }
 
-    
+
     @Override    
     public int getNotation() {
-	return PREFIX;
+        return PREFIX;
     }
-   
-    
+
+
     @Override    
     public void accept(SourceVisitor v) {
-	
+
     }
 }

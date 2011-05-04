@@ -672,7 +672,7 @@ public class Recoder2KeYConverter {
 	return new SetMinus(children);
     }
     
-    public AllFields convert(de.uka.ilkd.key.java.recoderext.AllFields e) {
+    public AllFields convert(de.uka.ilkd.key.java.recoderext.ldt.AllFields e) {
         ExtList children = collectChildren(e);	
 	return new AllFields(children);
     }

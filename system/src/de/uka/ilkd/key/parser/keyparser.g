@@ -240,7 +240,7 @@ options {
 		     Services services,
 		     NamespaceSet nss) {
 	this(mode, lexer, 
-	     new Recoder2KeY(
+	     new Recoder2KeY(services,
 		new KeYCrossReferenceServiceConfiguration(
 		   services.getExceptionHandler()), 
 		services.getJavaInfo().rec2key(), new NamespaceSet(), 

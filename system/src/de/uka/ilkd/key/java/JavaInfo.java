@@ -1168,7 +1168,7 @@ public final class JavaInfo {
     public ImmutableList<KeYJavaType> getAllSubtypes(KeYJavaType type) {
         return kpmi.getAllSubtypes(type);
     }
-    
+
     /**
      * returns all supertypes of a given type
      * @param type the KeYJavaType whose supertypes are returned
@@ -1176,13 +1176,23 @@ public final class JavaInfo {
      */
     public ImmutableList<KeYJavaType> getAllSupertypes(KeYJavaType type) {
         if (type.getJavaType() instanceof ArrayType) {
-            ImmutableList<KeYJavaType> arraySupertypes = ImmutableSLList.<KeYJavaType>nil();
-            for (Sort sort : type.getSort().extendsSorts()) {
-                type.getSort().extendsSorts().iterator();
-            }
-            return arraySupertypes;
+            ImmutableList<KeYJavaType> res = ImmutableSLList.<KeYJavaType>nil();
+            for (Sort s: getSuperSorts(type.getSort()))
+                res = res.append(getKeYJavaType(s));
+            return res;
         }
         return kpmi.getAllSupertypes(type);
+    }
+
+    // XXX or should I have kept the empty loop that was here before???
+    private ImmutableList<Sort> getSuperSorts(Sort sort){
+        ImmutableList<Sort> res = ImmutableSLList.<Sort>nil();
+        final Sort object = getJavaLangObject().getSort();
+        if (sort != object)
+            for (Sort exsort: sort.extendsSorts(services)) {
+                res = res.append(getSuperSorts(exsort)).append(exsort);
+            }
+        return res;
     }
 
     /**

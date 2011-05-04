@@ -2710,6 +2710,8 @@ Expression UnaryExpression() :
   result = PreDecrementExpression()
 |
   result = UnaryExpressionNotPlusMinus()
+|
+  result = IndexOfExpression()
 )
   { 
     checkConstruction(result);
@@ -2787,6 +2789,21 @@ Expression UnaryExpressionNotPlusMinus() :
         return result;
     }
 
+}
+
+Expression IndexOfExpression() :
+{
+    Expression result;
+    Expression expr;
+}
+{
+    "\\indexOf" "(" expr = Expression() "," result = Expression() ")"
+    {
+        result = new SeqIndexOf(expr,result);
+        checkConstruction(result);
+        setPrefixInfo(result);
+        return result;
+    }
 }
 
 // This production is to determine lookahead only. The LOOKAHEAD specifications

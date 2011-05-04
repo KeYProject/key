@@ -147,8 +147,8 @@ public class Recoder2KeY implements JavaReader {
      * @param tc
      *            the type converter, not null
      */
-    public Recoder2KeY(KeYCrossReferenceServiceConfiguration servConf, KeYRecoderMapping rec2key, NamespaceSet nss, TypeConverter tc) {
-        this(servConf, null, rec2key, nss, tc);
+    public Recoder2KeY(Services services, KeYCrossReferenceServiceConfiguration servConf, KeYRecoderMapping rec2key, NamespaceSet nss, TypeConverter tc) {
+        this(services, servConf, null, rec2key, nss, tc);
     }
 
     /**
@@ -163,10 +163,10 @@ public class Recoder2KeY implements JavaReader {
      * @param services
      *            services to retrieve objects from, not null
      * @param nss
-     *            nthe namespaces to work upon, not null
+     *            the namespaces to work upon, not null
      */
     public Recoder2KeY(Services services, NamespaceSet nss) {
-        this(services.getJavaInfo().getKeYProgModelInfo().getServConf(), null, services.getJavaInfo().rec2key(), nss, services.getTypeConverter());
+        this(services,services.getJavaInfo().getKeYProgModelInfo().getServConf(), null, services.getJavaInfo().rec2key(), nss, services.getTypeConverter());
     }
 
     /**
@@ -189,7 +189,7 @@ public class Recoder2KeY implements JavaReader {
      * @throws IllegalArgumentException
      *             if arguments are not valid (null e.g.)
      */
-    public Recoder2KeY(KeYCrossReferenceServiceConfiguration servConf, String classPath, 
+    private Recoder2KeY(Services services, KeYCrossReferenceServiceConfiguration servConf, String classPath, 
 	    KeYRecoderMapping rec2key, NamespaceSet nss, TypeConverter tc) {
 
         if (servConf == null)
@@ -207,7 +207,7 @@ public class Recoder2KeY implements JavaReader {
         this.servConf = servConf;
         this.mapping = rec2key;
         this.converter = makeConverter();
-        this.typeConverter = new Recoder2KeYTypeConverter(tc, nss, this);
+        this.typeConverter = new Recoder2KeYTypeConverter(services, tc, nss, this);
         
         // set up recoder:
         recoder.util.Debug.setLevel(500);
@@ -217,6 +217,8 @@ public class Recoder2KeY implements JavaReader {
         servConf.getProjectSettings().setProperty(PropertyNames.CLASS_SEARCH_MODE, "");
 
     }
+    
+    
     
     /**
      * create the ast converter. This is overwritten in SchemaRecoder2KeY to use

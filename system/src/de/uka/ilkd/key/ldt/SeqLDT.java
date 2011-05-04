@@ -15,10 +15,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.EmptySeqLiteral;
-import de.uka.ilkd.key.java.expression.operator.SeqConcat;
-import de.uka.ilkd.key.java.expression.operator.SeqReverse;
-import de.uka.ilkd.key.java.expression.operator.SeqSingleton;
-import de.uka.ilkd.key.java.expression.operator.SeqSub;
+import de.uka.ilkd.key.java.expression.operator.*;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
@@ -55,7 +52,7 @@ public final class SeqLDT extends LDT {
         seqConcat     = addFunction(services, "seqConcat");
         seqSub        = addFunction(services, "seqSub");
         seqReverse    = addFunction(services, "seqReverse");
-        seqIndexOf    = null; //addFunction(services, "seqIndexOf"); XXX
+        seqIndexOf    = addFunction(services, "seqIndexOf"); //XXX
     }
     
     
@@ -121,7 +118,8 @@ public final class SeqLDT extends LDT {
 	return op instanceof SeqSingleton
 	       || op instanceof SeqConcat
 	       || op instanceof SeqSub
-	       || op instanceof SeqReverse;
+	       || op instanceof SeqReverse
+	       || op instanceof SeqIndexOf;
     }
 
 
@@ -144,6 +142,8 @@ public final class SeqLDT extends LDT {
 	    return seqSub;
 	} else if(op instanceof SeqReverse) {
 	    return seqReverse;
+	} else if(op instanceof SeqIndexOf) {
+	    return seqIndexOf;
 	}
 	assert false;
 	return null;
