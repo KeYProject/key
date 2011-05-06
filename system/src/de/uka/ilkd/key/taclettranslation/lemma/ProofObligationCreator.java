@@ -5,6 +5,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
 
 public class ProofObligationCreator {
@@ -14,8 +15,8 @@ public class ProofObligationCreator {
     }
     
     
-    static public ProofAggregate create(ImmutableSet<Taclet> taclets, InitConfig initConfig){
-	
+    static public ProofAggregate create(ImmutableSet<Taclet> taclets, InitConfig initConfig, ImmutableSet<Taclet> axioms){
+	initConfig.setTaclets(initConfig.getTaclets().union(axioms));
 	ProofAggregate[] singleProofs = new ProofAggregate[taclets.size()];
 	int i=0; 
 	for(Taclet taclet : taclets){

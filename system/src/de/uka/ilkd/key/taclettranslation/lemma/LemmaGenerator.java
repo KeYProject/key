@@ -2,6 +2,7 @@ package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
@@ -16,6 +17,8 @@ import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
@@ -71,10 +74,13 @@ class DefaultLemmaGenerator implements LemmaGenerator{
     // Describes how a schema variables mapped to another operator, e.g. logical variable.
     private HashMap<SchemaVariable,Term> mapping = new HashMap<SchemaVariable,Term>();
     
+    
+    
     @Override
     public TacletFormula translate(Taclet taclet, Services services) {
+            System.out.println(taclet.name());
 	Term formula = SkeletonGenerator.FindTacletTranslator.translate(taclet);
-	formula = rebuild(taclet, formula, services);
+	formula = rebuild(taclet, formula, services,new HashSet<QuantifiableVariable>());
 	return new LemmaFormula(taclet, formula);
     }
 
@@ -82,6 +88,7 @@ class DefaultLemmaGenerator implements LemmaGenerator{
 	if(term.op() instanceof SchemaVariable){
 	    return getInstantiation(taclet, (SchemaVariable)term.op(), services);
 	}
+	
 	return term;
     }
     
@@ -98,8 +105,18 @@ class DefaultLemmaGenerator implements LemmaGenerator{
 	Term instantiation = mapping.get(var);
 	if(instantiation == null){
 	    instantiation = createInstantiation(owner,var,services);
+	    mapping.put(var, instantiation);
 	}
 	return instantiation;
+    }
+    
+    private Term getInstantation(Taclet owner, VariableSV var, Services services){
+           Term instantiation = mapping.get(var);
+           if(instantiation == null){
+                  instantiation = createInstantiation(owner,var,services);
+                  mapping.put(var, instantiation);
+           }
+           return instantiation;
     }
     
     private Term createInstantiation(Taclet owner,SchemaVariable sv, Services services){
@@ -118,6 +135,8 @@ class DefaultLemmaGenerator implements LemmaGenerator{
 	    		"SchemaVariable: " + sv.name().toString()+"\n"
 	    		);
     }
+    
+
     
     /**
      * Creates the instantiation for a schema variable of type variable, i.e a new logical
@@ -197,18 +216,28 @@ class DefaultLemmaGenerator implements LemmaGenerator{
     
     
     
-    private Term rebuild(Taclet taclet, Term term, Services services){
+    private Term rebuild(Taclet taclet, Term term, Services services, HashSet<QuantifiableVariable> boundedVariables){
 	Term [] newSubs = new Term[term.arity()];
 	int i=0; 
+	LinkedList<QuantifiableVariable> qvars = new LinkedList<QuantifiableVariable>();
+	for(QuantifiableVariable qvar : term.boundVars()){
+         boundedVariables.add(qvar); 
+         if(qvar instanceof VariableSV){
+              qvars.add((QuantifiableVariable)getInstantation(taclet, (VariableSV)qvar, services).op());     
+         }
+    }
+	
 	for(Term sub : term.subs()){
 	    newSubs[i] = replace(taclet,sub,services);
-	    if(newSubs[i] == null){
-		newSubs[i] = rebuild(taclet,sub,services);
-	    }
+	    //if(newSubs[i] == null){
+	     //       newSubs[i] = rebuild(taclet,sub,services);
+		newSubs[i] = rebuild(taclet,newSubs[i],services, boundedVariables);
+	    //}
 	    i++;
 	}
+
 	return TermFactory.DEFAULT.createTerm(term.op(),newSubs,
-		                               term.boundVars(),
+		                               new ImmutableArray<QuantifiableVariable>(qvars),
 		                               term.javaBlock());
     }
     

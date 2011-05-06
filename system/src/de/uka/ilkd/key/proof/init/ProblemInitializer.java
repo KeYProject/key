@@ -310,7 +310,7 @@ public final class ProblemInitializer {
     }
     
     
-    private void readEnvInput(EnvInput envInput, 
+    public final void readEnvInput(EnvInput envInput, 
 			      InitConfig initConfig) 
     		throws ProofInputException {
 	if(alreadyParsed.add(envInput)){
@@ -458,10 +458,14 @@ public final class ProblemInitializer {
     	    	readEnvInput(tacletBaseFile, baseConfig);
 	    }	    
 	}
+	  return prepare(envInput, baseConfig);
 	
-	//create initConfig
-        InitConfig initConfig = baseConfig.copy();
-
+	}
+    
+    public InitConfig prepare(EnvInput envInput, InitConfig referenceConfig)throws ProofInputException{
+        //create initConfig
+         InitConfig initConfig = referenceConfig.copy();
+        
 	//register built in rules
         for(Rule r : profile.getStandardRules().getStandardBuiltInRules()) {
     	    initConfig.getProofEnv().registerRule(r, 

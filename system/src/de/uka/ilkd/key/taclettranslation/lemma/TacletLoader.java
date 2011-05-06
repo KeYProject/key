@@ -17,13 +17,14 @@ import de.uka.ilkd.key.util.ProgressMonitor;
 
 
 public class TacletLoader {
+    public static TacletLoader INSTANCE = new TacletLoader();
     private InitConfig createInitConfig(InitConfig reference){
 	  InitConfig newConfig =  reference.copy();
 	
 	  
 	  newConfig.setTaclets ( DefaultImmutableSet.<Taclet>nil() );
 	  newConfig.setTaclet2Builder ( new HashMap<Taclet, TacletBuilder> () );
-
+	
           return newConfig;
     }
     
@@ -37,6 +38,7 @@ public class TacletLoader {
 	keyFile.setInitConfig(config);
 	keyFile.readRulesAndProblem();
 	
+
 	/*keyFile.readIncludes();
 	keyFile.readJavaPath();
 	keyFile.readSorts();

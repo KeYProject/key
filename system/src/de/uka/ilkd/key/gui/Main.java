@@ -1479,7 +1479,7 @@ public final class Main extends JFrame implements IMain {
                 +"load taclets "
                 +"from ...");
         boolean loaded = localFileChooser.showOpenDialog ( Main.this );
-       
+
         if (!loaded){
             return;
         }
@@ -1516,9 +1516,17 @@ public final class Main extends JFrame implements IMain {
 			mediator().stopInterface(true);			
 		    }
 		};
-		
+	
+        final KeYFileChooser localAxiomChooser = getFileChooser ("Choose file to "
+                        +"load axioms "
+                        +"from ...");
+        boolean axiomsLoaded = localAxiomChooser.showOpenDialog ( Main.this );
+		LinkedList<File> files = new LinkedList<File>();
+		if(axiomsLoaded){
+		        files.add(localAxiomChooser.getSelectedFile());
+		}
         TacletSoundnessPOLoader loader = new TacletSoundnessPOLoader(progressMonitor, 
-        	file,proof.env() ,listener,piListener,new LemmaSelectionDialog());
+        	file,proof.env() ,listener,piListener,new LemmaSelectionDialog(),files);
         loader.start();
     }
     
