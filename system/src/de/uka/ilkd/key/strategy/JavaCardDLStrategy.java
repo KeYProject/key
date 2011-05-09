@@ -95,18 +95,22 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final String methProp 
         	= strategyProperties.getProperty(
         		StrategyProperties.METHOD_OPTIONS_KEY);        
+        final Feature queryF;
         if(methProp.equals(StrategyProperties.METHOD_CONTRACT)) {   
             methodSpecF = methodSpecFeature(longConst(-20));
+            queryF = querySpecFeature(longConst(-20));
         } else if(methProp.equals(StrategyProperties.METHOD_EXPAND)) {  
             methodSpecF = methodSpecFeature(inftyConst());
+            queryF = querySpecFeature(inftyConst());
         } else if(methProp.equals(StrategyProperties.METHOD_NONE)) {   
             methodSpecF = methodSpecFeature(inftyConst());
+            queryF = querySpecFeature(inftyConst());
         } else {
             methodSpecF = null;
+            queryF = null;
             assert false;
         }
         
-        final Feature queryF = querySpecFeature(inftyConst());//longConst(5000));
         
         final Feature depSpecF;
         final String depProp
@@ -437,8 +441,8 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
 	// establish normalform 
 
 	// tf below only for test
-	final TermFeature stringLiteral = or( op (charListLDT.getClEmpty()), 
-		                              op ( charListLDT.getClCons() ) );
+	final TermFeature stringLiteral = rec ( any(), or ( or ( op (charListLDT.getClEmpty()), 
+		                                op ( charListLDT.getClCons() ) ), tf.charLiteral) );
 
 	Feature belowModOpPenality = ifZero  ( isBelow ( ff.modalOperator ),
 		  longConst ( 500 ) );	

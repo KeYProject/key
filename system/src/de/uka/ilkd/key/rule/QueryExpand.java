@@ -45,11 +45,11 @@ import de.uka.ilkd.key.proof.VariableNameProposer;
 public class QueryExpand implements BuiltInRule {
 
     public static final BuiltInRule INSTANCE = new QueryExpand();
-    
+
     private static Name QUERY_DEF_NAME = new Name("Evaluate Query");
-    
-    
-    
+
+
+
     /**
      * Replaces in a term.
      */
@@ -89,21 +89,21 @@ public class QueryExpand implements BuiltInRule {
 
 	return result;
     }  
-    
 
-    
+
+
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services,
 	    RuleApp ruleApp) {
 
 	final PosInOccurrence pio = ruleApp.posInOccurrence();
 	final Term query = pio.subTerm();
-	
+
 	final ProgramMethod method = (ProgramMethod)query.op();
-	
-	
+
+
 	final ImmutableArray<Expression> args = getArgumentVariables(method.getParameters(), goal.node(), services);
-	
+
 	final ProgramVariable callee;
 	int offset;
 	if (method.isStatic()) {
@@ -113,58 +113,58 @@ public class QueryExpand implements BuiltInRule {
 	    callee = new LocationVariable(
 		    new ProgramElementName(VariableNameProposer.DEFAULT.
 			    getNameProposal("callee", services, goal.node())),
-		    method.getContainerType());
+			    services.getJavaInfo().getKeYJavaType(query.sub(1).sort()));
 	    offset = 1;
 	}
-	
+
 	final ProgramVariable result = 
 	    new LocationVariable(
 		    new ProgramElementName(VariableNameProposer.DEFAULT.
 			    getNameProposal("result", services, goal.node())), 
-		    method.getKeYJavaType());
+			    method.getKeYJavaType());
 
-	
+
 	final MethodReference mr = new MethodReference(args, method.getProgramElementName(), callee);
 	final Function placeHolderResult = new Function(new Name(VariableNameProposer.DEFAULT.
-		    getNameProposal("res_"+method.getName(), services, goal.node())), query.sort());
-	
+		getNameProposal("res_"+method.getName(), services, goal.node())), query.sort());
+
 	// construct method call   {heap:=h || p1:arg1 || ... || pn:=argn} \[ res = o.m(p1,..,pn); \] (c = res) 
-	
+
 	final CopyAssignment assignment = new CopyAssignment(result, mr);
 	final MethodFrame mf = new MethodFrame(null, 
 		new ExecutionContext(new TypeRef(method.getContainerType()), null),
 		new StatementBlock(assignment));
 	final JavaBlock jb = JavaBlock.createJavaBlock(new StatementBlock(mf));	
-	
+
 	final TermBuilder tb = TermBuilder.DF;
 	final Term methodCall = tb.box(jb, tb.equals(tb.func(placeHolderResult), tb.var(result)));
-	
-	
+
+
 	Term update = tb.elementary(services, services.getTypeConverter().getHeapLDT().getHeap(), query.sub(0));
 	if (callee != null) {
 	    update = tb.parallel(tb.elementary(services, tb.var(callee), query.sub(1)), update);
 	}
-	
+
 	final Term[] argUpdates = new Term[args.size()]; 
 	for (int i = 0; i<args.size(); i++) {
 	    argUpdates[i] = tb.elementary(services, tb.var((ProgramVariable)args.get(i)), query.sub(offset+1+i));
 	}
-	
+
 	update = tb.parallel(update, tb.parallel(argUpdates));
-	
+
 	Term topLevel = tb.apply(update, methodCall);
-	
+
 	// new goal
 	ImmutableList<Goal> newGoal = goal.split(1);
 	Goal g = newGoal.head();
-	
+
 	// replace old query		
 	g.addFormula(new SequentFormula(topLevel), true, true);	
-	
+
 	final Term newFormula = replace(pio.constrainedFormula().formula(), 
 		tb.func(placeHolderResult), pio.posInTerm().iterator());
 	g.changeFormula(new SequentFormula(newFormula), pio.topLevel());
-		
+
 	//register variables in namespace
 	for (Expression pv : args) { // add new program variables for arguments
 	    g.addProgramVariable((ProgramVariable) pv);
@@ -172,24 +172,24 @@ public class QueryExpand implements BuiltInRule {
 	g.addProgramVariable(callee);
 	g.addProgramVariable(result);
 	services.getNamespaces().functions().add(placeHolderResult);
-	
+
 	return newGoal;
     }
 
     private ImmutableArray<Expression> getArgumentVariables(
-            ImmutableArray<ParameterDeclaration> paramDecls, Node n, Services services) {
+	    ImmutableArray<ParameterDeclaration> paramDecls, Node n, Services services) {
 
 	final Expression[] args = new Expression[paramDecls.size()];
 	int i = 0;
 	for (ParameterDeclaration pdecl : paramDecls) {
 	    final ProgramElementName argVarName = 
 		new ProgramElementName(VariableNameProposer.DEFAULT.
-			    getNameProposal(pdecl.getVariableSpecification().getName(), services, n));
+			getNameProposal(pdecl.getVariableSpecification().getName(), services, n));
 
 	    args[i] = new LocationVariable(argVarName, pdecl.getVariableSpecification().getProgramVariable().getKeYJavaType());
 	    i++;
 	}
-			
+
 	return new ImmutableArray<Expression>(args);
     }
 
@@ -202,10 +202,10 @@ public class QueryExpand implements BuiltInRule {
     public String displayName() {
 	return QUERY_DEF_NAME.toString();
     }
-    
+
     @Override
     public String toString() {
-        return displayName();
+	return displayName();
     }
 
     @Override
