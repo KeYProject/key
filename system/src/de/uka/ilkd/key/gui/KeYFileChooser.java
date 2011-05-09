@@ -10,6 +10,7 @@
 
 package de.uka.ilkd.key.gui;
 
+import java.awt.Component;
 import java.io.File;
 
 import javax.swing.JFileChooser;
@@ -71,7 +72,7 @@ public class KeYFileChooser {
 		                         : JFileChooser.FILES_AND_DIRECTORIES);        
     }
 
-    public boolean showSaveDialog(Main main, String defaultName) {
+    public boolean showSaveDialog(Component parent, String defaultName) {
 	if(defaultName != null) {
 	    File file = new File(fileChooser.getCurrentDirectory(), 
 		    		 defaultName);
@@ -79,13 +80,13 @@ public class KeYFileChooser {
 	}
 	
         setSaveDialog(true);
-	int result = fileChooser.showSaveDialog(main);
+	int result = fileChooser.showSaveDialog(parent);
 	return (result == JFileChooser.APPROVE_OPTION);
     }
 
-    public boolean showOpenDialog(Main main) {
+    public boolean showOpenDialog(Component component) {
         setSaveDialog(false);
-	int result = fileChooser.showOpenDialog(main);
+	int result = fileChooser.showOpenDialog(component);
 	return (result == JFileChooser.APPROVE_OPTION);
     }
 

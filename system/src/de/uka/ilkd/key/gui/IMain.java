@@ -10,6 +10,7 @@
 package de.uka.ilkd.key.gui;
 
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
+import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 /** 
@@ -81,4 +82,6 @@ public interface IMain {
      * @param event the NotificationEvent
      */
     public abstract void notify(NotificationEvent event);
+    
+    public abstract ProblemInitializer createProblemInitializer();
 }

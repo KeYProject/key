@@ -28,9 +28,10 @@ import de.uka.ilkd.key.rule.Taclet;
 
 import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
-import de.uka.ilkd.key.smt.taclettranslation.TreeItem;
-import de.uka.ilkd.key.smt.taclettranslation.UsedTaclets;
-import de.uka.ilkd.key.smt.taclettranslation.TreeItem.SelectionMode;
+import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets;
+import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets.TreeItem;
+import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets.TreeItem.SelectionMode;
+
 
 
 class SettingsData{
@@ -513,7 +514,7 @@ public class SMTSettings implements Settings, de.uka.ilkd.key.smt.SMTSettings{
 
     @Override
     public boolean makesUseOfTaclets() {
-	 	TreeItem item = ((TreeItem)((DefaultMutableTreeNode)UsedTaclets.INSTANCE.getTreeModel()
+	 	TreeItem item = ((TreeItem)((DefaultMutableTreeNode)SupportedTaclets.INSTANCE.getTreeModel()
 		.getRoot()).getUserObject());
 	return item.getMode() == SelectionMode.all || item.getMode() == SelectionMode.user;
 
@@ -565,7 +566,7 @@ public class SMTSettings implements Settings, de.uka.ilkd.key.smt.SMTSettings{
     
     private String tacletAssignmentToString(){
 	StringBuffer s= new StringBuffer();
-	tacletAssignmentToString((TreeNode)UsedTaclets.INSTANCE.getTreeModel().getRoot()
+	tacletAssignmentToString((TreeNode)SupportedTaclets.INSTANCE.getTreeModel().getRoot()
 		  , s);
 	return s.toString();
     }
@@ -582,9 +583,9 @@ public class SMTSettings implements Settings, de.uka.ilkd.key.smt.SMTSettings{
     }
     
     private void tacletAssignmentFromString(String s){
-	tacletAssignmentFromString((TreeNode)UsedTaclets.INSTANCE.getTreeModel().getRoot(),
+	tacletAssignmentFromString((TreeNode)SupportedTaclets.INSTANCE.getTreeModel().getRoot(),
 		s, 0);
-	UsedTaclets.INSTANCE.validateSelectionModes();
+	SupportedTaclets.INSTANCE.validateSelectionModes();
     }
     
     

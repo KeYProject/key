@@ -204,7 +204,7 @@ public class ApplyStrategy {
         maxApplications = maxSteps;
         this.timeout = timeout;
         countApplied = 0; 
-        StrategySettings sSettings =medi.getProof().getSettings().getStrategySettings();
+        StrategySettings sSettings =proof.getSettings().getStrategySettings();
        	medi.getProfile().setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);//XXX
 
 	this.goalChooser = medi.getProfile().getSelectedGoalChooserBuilder().create();//Use this independently of StrategyProperties.GOALCHOOSER_OPTIONS_KEY

@@ -298,7 +298,7 @@ public class TestJMLTranslator extends TestCase {
         try {
             result = translator.<Term>parse(
                     new PositionedString(
-                    "(\\bsum int i; 0; 2147483647; i) )"),
+                    "(\\bsum int i; 0; 2147483647; i)"),
                     testClassType, null, null, null, null,
                     null, services);
         } catch (SLTranslationException e) {
@@ -328,7 +328,7 @@ public class TestJMLTranslator extends TestCase {
         try {
             result = translator.<Term>parse(
                     new PositionedString(
-                    "(\\exists TestClass t; t != null; t.i == 0) )"),
+                    "(\\exists TestClass t; t != null; t.i == 0)"),
                     testClassType, null, null, null, null,
                     null, services);
         } catch (SLTranslationException e) {

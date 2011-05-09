@@ -26,12 +26,12 @@ import de.uka.ilkd.key.pp.ProgramPrinter;
 public class ProofSaverLatex extends ProofSaver {
 
 
-   public ProofSaverLatex(IMain main, String filename) {
-      super(main, filename);
+   public ProofSaverLatex(Proof proof, String filename, String internalVersion) {
+      super(proof, filename,internalVersion);
    }
    
    
-   public String save() {
+   public String save() throws IOException{
       String errorMsg = null;
       FileOutputStream fos = null;
       PrintStream ps = null;
@@ -60,11 +60,11 @@ public class ProofSaverLatex extends ProofSaver {
           errorMsg += "No proof present?";
           e.printStackTrace();
       } finally {
-          try {
+         // try {
 	      if (fos != null) fos.close();
-          } catch (IOException ioe) {
-	      mediator.notify(new GeneralFailureEvent("IO Error: "+ioe));
-          }          
+          //} catch (IOException ioe) {
+	//     mediator.notify(new GeneralFailureEvent("IO Error: "+ioe));
+          //}          
       }	   
       return errorMsg; // null if success
    }

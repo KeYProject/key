@@ -1,0 +1,218 @@
+package de.uka.ilkd.key.taclettranslation.lemma;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.Visitor;
+import de.uka.ilkd.key.logic.op.FormulaSV;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.TermSV;
+import de.uka.ilkd.key.logic.op.VariableSV;
+import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletPrefix;
+import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
+import de.uka.ilkd.key.taclettranslation.SkeletonGenerator;
+import de.uka.ilkd.key.taclettranslation.TacletFormula;
+import de.uka.ilkd.key.taclettranslation.TacletTranslator;
+
+public interface LemmaGenerator extends TacletTranslator {
+    
+    public TacletFormula translate(Taclet taclet, Services services);
+    
+
+}
+
+class LemmaFormula implements TacletFormula{
+    private Taclet taclet;
+    private LinkedList<Term>  formula = new LinkedList<Term>();
+    
+    public LemmaFormula(Taclet taclet, Term formula) {
+	this.taclet = taclet;
+	this.formula.add(formula);
+    }
+    
+    @Override
+    public Taclet getTaclet() {
+	return taclet;
+    }
+
+    @Override
+    public Term getFormula() {
+	return formula.getFirst();
+    }
+
+    @Override
+    public String getStatus() {
+	return "";
+    }
+
+    @Override
+    public Collection<Term> getInstantiations() {
+	return formula;
+    }
+    
+}
+
+
+class DefaultLemmaGenerator implements LemmaGenerator{
+
+    // Describes how a schema variables mapped to another operator, e.g. logical variable.
+    private HashMap<SchemaVariable,Term> mapping = new HashMap<SchemaVariable,Term>();
+    
+    @Override
+    public TacletFormula translate(Taclet taclet, Services services) {
+	Term formula = SkeletonGenerator.FindTacletTranslator.translate(taclet);
+	formula = rebuild(taclet, formula, services);
+	return new LemmaFormula(taclet, formula);
+    }
+
+    private Term replace(Taclet taclet,Term term, Services services){
+	if(term.op() instanceof SchemaVariable){
+	    return getInstantiation(taclet, (SchemaVariable)term.op(), services);
+	}
+	return term;
+    }
+    
+    
+    /**
+     * Returns the instantiation for a certain schema variable, i.e. the skolem term that
+     * is used for the instantiation. 
+     * @param owner The taclet the schema variable belongs to.
+     * @param var   The variable to be instantiated.
+     * @param services
+     * @return instantiation of the schema variable <code>var</code>.
+     */
+    private Term getInstantiation(Taclet owner, SchemaVariable var, Services services){
+	Term instantiation = mapping.get(var);
+	if(instantiation == null){
+	    instantiation = createInstantiation(owner,var,services);
+	}
+	return instantiation;
+    }
+    
+    private Term createInstantiation(Taclet owner,SchemaVariable sv, Services services){
+	if(sv instanceof VariableSV){
+	    return createInstantiation(owner, (VariableSV) sv, services);
+	}
+	if(sv instanceof TermSV){
+	    return createInstantiation(owner, (TermSV) sv, services);
+	}
+	if(sv instanceof FormulaSV){
+	   return createInstantiation(owner, (FormulaSV) sv, services);
+	}
+	throw new IllegalTacletException("The taclet contains a schema variable which" +
+	    		"is not supported.\n" +
+	    		"Taclet: " + owner.name().toString() +"\n" +
+	    		"SchemaVariable: " + sv.name().toString()+"\n"
+	    		);
+    }
+    
+    /**
+     * Creates the instantiation for a schema variable of type variable, i.e a new logical
+     * variable is returned.
+     * @param owner   the taclet the schema variable belongs to.
+     * @param sv      the schema variable to be instantiated.
+     * @param services some information about the proof currently considered.
+     * @return a term that can be used for instantiating the schema variable.
+     */
+    private Term createInstantiation(Taclet owner, VariableSV sv, Services services){
+	Name name = createUniqueName(services, sv.sort());
+	return TermFactory.DEFAULT.createTerm(new LogicVariable(name, sv.sort()));
+    }
+    
+    /**
+     * Creates the instantiation for a schema variable of type term. Mainly a skolem function
+     * is returned that depends on the prefix of <code>sv</code>. 
+     */
+    private Term createInstantiation(Taclet owner, TermSV sv, Services services){
+	return createSimpleInstantiation(owner, sv, services);
+   }
+    
+
+    
+    /**
+     * Creates the instantiation for a schema variable of type term. Mainly a skolem function
+     * is returned that depends on the prefix of <code>sv</code>. 
+     */
+    private Term createInstantiation(Taclet owner, FormulaSV sv, Services services){
+	return createSimpleInstantiation(owner, sv, services);
+    }
+    
+    /**
+    * Since only taclets are supported that contain only FOL-constituents, there is no need 
+    * to make it also dependend on program variables. (See: Ensuring the Correctness of Lightweight Tactics
+    * for JavaCard Dynamic Logic.)
+    * This method is used for both Formula schema variables and Term schema variables. 
+    */
+    private Term createSimpleInstantiation(Taclet owner, SchemaVariable sv, Services services){
+	ImmutableSet<SchemaVariable> prefix = owner.getPrefix(sv).prefix();
+	
+	Sort [] argSorts = computeArgSorts(prefix);
+	Term [] args	 = computeArgs(owner, prefix, services);
+	Name    name 	 = createUniqueName(services, sv.sort());
+	
+	
+	Function function = new Function(name,sv.sort(),argSorts);
+	return TermBuilder.DF.func(function, args);
+    }
+    
+    private Name createUniqueName(Services services, Sort sort){
+	return  new Name(TermBuilder.DF.newName(services, sort));
+    }
+    
+
+    
+    
+    private Sort [] computeArgSorts(ImmutableSet<SchemaVariable> svSet){
+	Sort [] argSorts = new Sort[svSet.size()];
+	int i=0;
+	for(SchemaVariable sv : svSet){
+	    argSorts[i] = sv.sort();	    
+	    i++;
+	}
+	return argSorts;
+    }
+    
+    private Term [] computeArgs(Taclet owner, ImmutableSet<SchemaVariable> svSet, Services services){
+	Term [] args = new Term[svSet.size()];
+	int i=0;
+	for(SchemaVariable sv : svSet){
+	    args[i] = getInstantiation(owner, sv, services);	    
+	    i++;
+	}
+	return args;
+    }
+    
+    
+    
+    private Term rebuild(Taclet taclet, Term term, Services services){
+	Term [] newSubs = new Term[term.arity()];
+	int i=0; 
+	for(Term sub : term.subs()){
+	    newSubs[i] = replace(taclet,sub,services);
+	    if(newSubs[i] == null){
+		newSubs[i] = rebuild(taclet,sub,services);
+	    }
+	    i++;
+	}
+	return TermFactory.DEFAULT.createTerm(term.op(),newSubs,
+		                               term.boundVars(),
+		                               term.javaBlock());
+    }
+    
+    
+}
+
+

@@ -41,9 +41,10 @@ import de.uka.ilkd.key.gui.KeYSelectionListener;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.smt.taclettranslation.TreeItem;
-import de.uka.ilkd.key.smt.taclettranslation.UsedTaclets;
-import de.uka.ilkd.key.smt.taclettranslation.TreeItem.SelectionMode;
+import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets;
+import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets.TreeItem;
+import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets.TreeItem.SelectionMode;
+
 
 interface InfoListener {
     void eventShowInfo(TreeItem item, TreeNode node);
@@ -92,7 +93,7 @@ public class TacletTranslationSelection {
 	if (selectionTree == null) {
 
 	    selectionTree = new JTree();
-	    selectionTree.setModel(UsedTaclets.INSTANCE.getTreeModel());
+	    selectionTree.setModel(SupportedTaclets.INSTANCE.getTreeModel());
 	    selectionTree.setCellRenderer(getTreeCellRenderer());
 	    selectionTree.setCellEditor(getTreeCellEditor());
 	    selectionTree.setEditable(true);
@@ -179,7 +180,7 @@ abstract class TreePanel extends JPanel {
 
 	propergateToRoot(node, SelectionMode.user);
 
-	UsedTaclets.INSTANCE.validateSelectionModes();
+	SupportedTaclets.INSTANCE.validateSelectionModes();
 
 	tree.validate();
 	tree.repaint();

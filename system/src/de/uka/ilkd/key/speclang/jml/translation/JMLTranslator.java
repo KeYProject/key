@@ -240,7 +240,7 @@ final class JMLTranslator {
                 }
                 LogicVariable qv = (LogicVariable) declVars.head();
                 Term resultTerm = TB.bsum(qv, a.getTerm(), b.getTerm(), t.getTerm(), services);
-                return new SLExpression(resultTerm);
+                return new SLExpression(resultTerm, t.getType());
             }
         });
 //        translationMethods.put("\\min", new Name("min"));
