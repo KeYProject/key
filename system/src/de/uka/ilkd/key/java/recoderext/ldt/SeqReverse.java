@@ -16,7 +16,7 @@ import recoder.java.expression.Operator;
 import recoder.list.generic.ASTArrayList;
 
 
-public class SeqReverse extends Operator {
+public class SeqReverse extends LDTPrefixConstruct {
 
     public SeqReverse(Expression e) {
 	children = new ASTArrayList<Expression>(getArity());
@@ -44,19 +44,7 @@ public class SeqReverse extends Operator {
 
     
     @Override    
-    public int getPrecedence() {
-	return 0;
-    }
-
-    
-    @Override    
     public int getNotation() {
 	return PREFIX;
-    }
-   
-    
-    @Override    
-    public void accept(SourceVisitor v) {
-	
     }
 }

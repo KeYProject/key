@@ -15,7 +15,7 @@ import recoder.java.SourceVisitor;
 import recoder.java.expression.Operator;
 
 
-public class AllFields extends Operator {
+public class AllFields extends LDTPrefixConstruct {
 
     public AllFields(Expression lhs) {
 	super(lhs);
@@ -42,19 +42,8 @@ public class AllFields extends Operator {
 
     
     @Override    
-    public int getPrecedence() {
-	return 0;
-    }
-
-    
-    @Override    
     public int getNotation() {
 	return PREFIX;
     }
    
-    
-    @Override    
-    public void accept(SourceVisitor v) {
-	
-    }
 }

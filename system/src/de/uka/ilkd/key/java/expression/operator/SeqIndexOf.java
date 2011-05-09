@@ -20,6 +20,11 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.util.ExtList;
 
+/**
+ * Represents a function giving the index of some element in a sequence (if it exists).
+ * @author bruns
+ *
+ */
 public class SeqIndexOf extends Operator {
 
     public SeqIndexOf(ExtList children) {

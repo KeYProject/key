@@ -15,7 +15,7 @@ import recoder.java.SourceVisitor;
 import recoder.java.expression.Operator;
 
 
-public class SetUnion extends Operator {
+public class SetUnion extends LDTPrefixConstruct {
 
     public SetUnion(Expression lhs, Expression rhs) {
 	super(lhs, rhs);
@@ -42,19 +42,7 @@ public class SetUnion extends Operator {
 
     
     @Override    
-    public int getPrecedence() {
-	return 0;
-    }
-
-    
-    @Override    
     public int getNotation() {
 	return PREFIX;
-    }
-   
-    
-    @Override    
-    public void accept(SourceVisitor v) {
-	
     }
 }

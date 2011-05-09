@@ -275,6 +275,9 @@ public class ProofJavaParser {
         static final int ARGUMENTS       =  4;
         /** production was <pre>super</pre> */
         static final int SUPER 			 =  5;
+        
+        /** production was <pre>"[" Expression ".." Expression "]"</pre> */
+        static final int RANGE = 12061982;
 
         /** indicates the type of the result */
         int                   type = UNDEFINED;
@@ -285,6 +288,8 @@ public class ProofJavaParser {
         
         /** valid iff <tt>type</tt> is <tt>IDENTIFIER</tt> */
         Identifier            id   = null;
+        
+        SeqSubRangeSuffix range = null;
     
         /** valid iff <tt>type</tt> is <tt>ARGUMENTS</tt> */
         ASTList<Expression> args = null;
@@ -321,7 +326,13 @@ public class ProofJavaParser {
         /** production was <pre>Name</pre> */
         static final int QUALIFIED_NAME   =  6;
         /** production was <pre>"@(" Expression ")"</pre> */
-        static final int PASSIVE_EXPR =  7;    
+        static final int PASSIVE_EXPR =  7; 
+        
+        /** production was something like <pre>"&93;seq_reverse(" Expression ")"</pre>.
+         * Extension to Java/JML with LDTs.
+         * @since 1.7.2118
+         */
+        static final int LDT_CONSTRUCT = 42;
     
         /** indicates the type of the result */
         int           type    = UNDEFINED;
@@ -2264,7 +2275,7 @@ Expression Expression() :
  */
 {
     Expression result;
-    Expression expr, expr2;
+    Expression expr;
     Assignment op;
     ASTList<Expression> leftRight = new ASTArrayList<Expression>();
 }
@@ -2280,7 +2291,22 @@ Expression Expression() :
           result = op;
       }
     ]
-    |
+  )
+  {
+      checkConstruction(result);
+      setPostfixInfo(result);
+      return result;
+  }
+}
+
+Expression LDTConstructor() :
+{
+    Expression result;
+    Expression expr, expr2;
+}
+
+{
+    (
     "\\singleton" "(" expr = Expression() ")"
     {
         result = new Singleton(expr);
@@ -2334,15 +2360,24 @@ Expression Expression() :
         result = new SeqReverse(expr);
         setPrefixInfo(result);
     }
-  )
-  {
+    |
+    "\\seq_put" "(" expr = Expression() "," expr2 = Expression() "," result = Expression() ")"
+    {
+        // desugaring
+        final Expression one = factory.createIntLiteral(1);
+        final Expression first = new SeqSub(expr, factory.createIntLiteral(0), factory.createMinus(expr2, one));
+        final Expression second = new SeqSingleton(result);
+        final Expression third = new SeqSub(expr, factory.createPlus(expr2,one), factory.createMinus(new SeqLength(expr),one));
+        result = new SeqConcat(first, new SeqConcat(second, third));
+        setPrefixInfo(result);
+    }
+    )
+    {
       checkConstruction(result);
       setPostfixInfo(result);
       return result;
   }
 }
-
-
 
 Assignment AssignmentOperator() :
 {
@@ -2921,6 +2956,9 @@ Expression PrimaryExpression() :
       case PrimaryPrefixReturnValue.PASSIVE_EXPR:
           tmpResult = (PassiveExpression)prefix.expr;
           break;
+      case PrimaryPrefixReturnValue.LDT_CONSTRUCT:
+          tmpResult = (LDTPrefixConstruct) prefix.expr;
+          break;
       default:
           throw new ParseException("Unknown prefix");
       }
@@ -2976,10 +3014,12 @@ Expression PrimaryExpression() :
           }
           break;
       case PrimarySuffixReturnValue.INDEX_EXPR:
+          // suffix is either array / sequence access or subsequence construction
           if (tmpResult instanceof UncollatedReferenceQualifier ||
               tmpResult instanceof MethodReference ||
               tmpResult instanceof ParenthesizedExpression ||
               //tmpResult instanceof ThisReference || // this[i] in array initialization
+              tmpResult instanceof LDTPrefixConstruct ||
               tmpResult instanceof VariableReference) {
                   // Now we know that this is an array reference
               ASTList<Expression> indicees = new ASTArrayList<Expression>(1);
@@ -2999,6 +3039,14 @@ Expression PrimaryExpression() :
                 (would have to be in parentheses), SuperReference, ...
               */
           }
+          break;
+      case PrimarySuffixReturnValue.RANGE:
+          // suffix begins with ".."
+          if (result != null){
+              // there has been a range before
+              throw new ParseException("Everything has an end, only the saugage has two. (Do not use multiple "".."" in a range expression.)");
+          }
+          result = new SeqSubRangeSuffix((Expression)tmpResult, suffix.expr);
           break;
       case PrimarySuffixReturnValue.IDENTIFIER:
           tmpResult = factory.createUncollatedReferenceQualifier(tmpResult, suffix.id);
@@ -3133,6 +3181,13 @@ PrimaryPrefixReturnValue PrimaryPrefix() :
         prefix.type = PrimaryPrefixReturnValue.QUALIFIED_NAME;
         prefix.name = qn;
   }
+|
+    expr = LDTConstructor() 
+    {
+        // XXX now primary expression (otherwise could not use expressions like \seq_reverse(x).length
+        prefix.type = PrimaryPrefixReturnValue.LDT_CONSTRUCT;
+        prefix.expr = expr;
+    }
 )
   {
       return prefix;
@@ -3142,7 +3197,7 @@ PrimaryPrefixReturnValue PrimaryPrefix() :
 PrimarySuffixReturnValue PrimarySuffix() :
 {
     // reuses global suffix field
-    Expression               expr;
+    Expression               expr; 
     ASTList<Expression>    args;
     Identifier               id;
     Literal                  lit;
@@ -3150,6 +3205,15 @@ PrimarySuffixReturnValue PrimarySuffix() :
 }
 {
 (
+        //XXX it causes several warnings about nondeterminism. can those be ignored?
+  LOOKAHEAD(2)
+  ".." expr = Expression()
+  {
+      // subsequence range expression
+      suffix.type = PrimarySuffixReturnValue.RANGE;
+      suffix.expr = expr;
+  }
+|
   LOOKAHEAD(2)
   "." "this"
   {
@@ -3176,10 +3240,12 @@ PrimarySuffixReturnValue PrimarySuffix() :
   {
   	  suffix.type = suffix.IDENTIFIER;
   }
-|  "[" expr = Expression() "]"
+| 
+  "[" expr = Expression() "]"
   {
-      suffix.type = PrimarySuffixReturnValue.INDEX_EXPR;
-      suffix.expr = expr;
+    // can be simple array access, or subsequence construction
+    suffix.type = PrimarySuffixReturnValue.INDEX_EXPR;
+    suffix.expr = expr;
   }
 |
   "."

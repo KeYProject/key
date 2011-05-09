@@ -15,7 +15,7 @@ import recoder.java.SourceVisitor;
 import recoder.java.expression.Operator;
 
 
-public class Intersect extends Operator {
+public class Intersect extends LDTPrefixConstruct {
 
     public Intersect(Expression lhs, Expression rhs) {
 	super(lhs, rhs);
@@ -50,11 +50,5 @@ public class Intersect extends Operator {
     @Override    
     public int getNotation() {
 	return PREFIX;
-    }
-   
-    
-    @Override    
-    public void accept(SourceVisitor v) {
-	
     }
 }

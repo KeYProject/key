@@ -14,35 +14,55 @@ import recoder.java.Expression;
 import recoder.java.SourceVisitor;
 import recoder.java.expression.Operator;
 
+/**
+ * @since 1.7.2118
+ * @author bruns
+ *
+ */
+public class SeqLength extends Operator {
 
-public class Singleton extends LDTPrefixConstruct {
+    private static final long serialVersionUID = 0;
 
-    public Singleton(Expression lhs) {
-	super(lhs);
-	makeParentRoleValid();
+
+    public SeqLength(Expression seq) {
+        super(seq);
+        makeParentRoleValid();
     }
 
 
-    protected Singleton(Singleton proto) {
-	super(proto);
-	makeParentRoleValid();
+    protected SeqLength(SeqLength proto) {
+        super(proto);
+        makeParentRoleValid();
     }
-    
+
 
     @Override    
-    public Singleton deepClone() {
-	return new Singleton(this);
+    public SeqLength deepClone() {
+        return new SeqLength(this);
     }
 
 
     @Override    
     public int getArity() {
-	return 1;
+        return 1;
     }
 
-    
+
+    @Override    
+    public int getPrecedence() {
+        return 0;
+    }
+
+
     @Override    
     public int getNotation() {
-	return PREFIX;
+        return POSTFIX;
     }
+
+
+    @Override    
+    public void accept(SourceVisitor v) {
+
+    }
+
 }

@@ -15,7 +15,7 @@ import recoder.java.SourceVisitor;
 import recoder.java.expression.Operator;
 
 
-public class SeqSingleton extends Operator {
+public class SeqSingleton extends LDTPrefixConstruct {
 
     public SeqSingleton(Expression lhs) {
 	super(lhs);
@@ -42,19 +42,7 @@ public class SeqSingleton extends Operator {
 
     
     @Override    
-    public int getPrecedence() {
-	return 0;
-    }
-
-    
-    @Override    
     public int getNotation() {
 	return PREFIX;
-    }
-   
-    
-    @Override    
-    public void accept(SourceVisitor v) {
-	
     }
 }

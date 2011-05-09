@@ -12,11 +12,12 @@ package de.uka.ilkd.key.java.recoderext.ldt;
 
 import recoder.java.Expression;
 import recoder.java.SourceVisitor;
-import recoder.java.expression.Operator;
 import recoder.list.generic.ASTArrayList;
 
 
-public class SeqSub extends Operator {
+public class SeqSub extends LDTPrefixConstruct {
+    private static final long serialVersionUID = 1L;
+
 
     public SeqSub(Expression e1, Expression e2, Expression e3) {
 	children = new ASTArrayList<Expression>(getArity());
@@ -24,6 +25,10 @@ public class SeqSub extends Operator {
 	children.add(e2);
 	children.add(e3);
 	makeParentRoleValid();
+    }
+    
+    public SeqSub(Expression seq, SeqSubRangeSuffix range){
+        this(seq, range.getChildAt(0), range.getChildAt(1));
     }
 
 
@@ -46,20 +51,9 @@ public class SeqSub extends Operator {
 
     
     @Override    
-    public int getPrecedence() {
-	return 0;
-    }
-
-    
-    @Override    
     public int getNotation() {
 	return PREFIX;
     }
-   
-    
-    @Override    
-    public void accept(SourceVisitor v) {
-	
-    }
+
     
 }
