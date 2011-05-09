@@ -1109,7 +1109,7 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 	    if (check instanceof ProgramVariable) {
 		Namespace ns = services.getNamespaces().sorts();
 		Sort stringSort = (Sort)ns.lookup(new Name("java.lang.String"));
-		return stringSort instanceof ObjectSort && 
+		return ((ProgramVariable)check).sort() instanceof ObjectSort && 
 		 !((ProgramVariable)check).getKeYJavaType().getSort().equals(stringSort);
 	    }
 	    return false;
