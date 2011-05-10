@@ -2,14 +2,7 @@ package java.lang;
 
 public class Object {  
 
-    //@ public model \locset equivalenceLocs;
-    //@ accessible equivalenceLocs: equivalenceLocs;
     
-    //@ public model \locset equivalenceRecursionLocs;
-    //@ accessible equivalenceRecursionLocs: equivalenceRecursionLocs;
-
-
-
     /*@ public normal_behavior
       @   assignable \nothing;
       @*/
