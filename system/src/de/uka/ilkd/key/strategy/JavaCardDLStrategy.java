@@ -95,22 +95,28 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final String methProp 
         	= strategyProperties.getProperty(
         		StrategyProperties.METHOD_OPTIONS_KEY);        
-        final Feature queryF;
         if(methProp.equals(StrategyProperties.METHOD_CONTRACT)) {   
             methodSpecF = methodSpecFeature(longConst(-20));
-            queryF = querySpecFeature(longConst(-20));
         } else if(methProp.equals(StrategyProperties.METHOD_EXPAND)) {  
             methodSpecF = methodSpecFeature(inftyConst());
-            queryF = querySpecFeature(inftyConst());
         } else if(methProp.equals(StrategyProperties.METHOD_NONE)) {   
             methodSpecF = methodSpecFeature(inftyConst());
-            queryF = querySpecFeature(inftyConst());
         } else {
             methodSpecF = null;
-            queryF = null;
             assert false;
         }
-        
+
+        final String queryProp = strategyProperties
+        .getProperty(StrategyProperties.QUERY_OPTIONS_KEY);
+        final Feature queryF;
+        if (queryProp.equals(StrategyProperties.QUERY_ON)) {
+                queryF = querySpecFeature(longConst(200));
+        } else if (queryProp.equals(StrategyProperties.QUERY_OFF)) {
+                queryF = querySpecFeature(inftyConst());
+        } else {
+                queryF = null;
+                assert false;
+        }
         
         final Feature depSpecF;
         final String depProp
