@@ -28,6 +28,7 @@ import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.VariableNameProposer;
@@ -218,16 +219,22 @@ public class QueryExpand implements BuiltInRule {
      * If you want to change this you need to adapt the application logic by adding preceeding updates in front of the new added formula and/or
      * to take care of free variables when introducing the skolemfunction symbol and when replacing the query term by the skolem function.
      */
-    public boolean isApplicable(Goal goal, PosInOccurrence pio) {	
+    public boolean isApplicable(Goal goal, PosInOccurrence pio) {		
 	if (pio!=null && pio.subTerm().op() instanceof ProgramMethod && pio.subTerm().freeVars().isEmpty()) {
-	    PIOPathIterator it = pio.iterator();
-	    while ( it.next() != -1 ) {
-		Term focus = it.getSubTerm();
-		if (focus.op() instanceof UpdateApplication || focus.op() instanceof Modality) {
-		    return false;
+	    final Term pmTerm = pio.subTerm();
+	    ProgramMethod pm = (ProgramMethod) pmTerm.op();
+	    final Sort nullSort = goal.proof().getServices().getJavaInfo().getNullType().getSort();
+	    if (!pm.isStatic() && pmTerm.sub(1).sort() instanceof Object && 
+		    !pmTerm.sub(1).sort().extendsTrans(nullSort)) {
+		PIOPathIterator it = pio.iterator();
+		while ( it.next() != -1 ) {
+		    Term focus = it.getSubTerm();
+		    if (focus.op() instanceof UpdateApplication || focus.op() instanceof Modality) {
+			return false;
+		    }
 		}
+		return true;
 	    }
-	    return true;
 	}
 	return false;
     }
