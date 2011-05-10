@@ -8,30 +8,30 @@
 //
 //
 
-package de.uka.ilkd.key.java.recoderext.ldt;
+package de.uka.ilkd.key.java.recoderext.adt;
 
 import recoder.java.Expression;
 import recoder.java.SourceVisitor;
 import recoder.java.expression.Operator;
 
 
-public class SetUnion extends LDTPrefixConstruct {
+public class SetMinus extends ADTPrefixConstruct {
 
-    public SetUnion(Expression lhs, Expression rhs) {
+    public SetMinus(Expression lhs, Expression rhs) {
 	super(lhs, rhs);
 	makeParentRoleValid();
     }
 
 
-    protected SetUnion(SetUnion proto) {
+    protected SetMinus(SetMinus proto) {
 	super(proto);
 	makeParentRoleValid();
     }
     
 
     @Override    
-    public SetUnion deepClone() {
-	return new SetUnion(this);
+    public SetMinus deepClone() {
+	return new SetMinus(this);
     }
 
 

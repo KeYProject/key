@@ -8,36 +8,36 @@
 //
 //
 
-package de.uka.ilkd.key.java.recoderext.ldt;
+package de.uka.ilkd.key.java.recoderext.adt;
 
 import recoder.java.Expression;
 import recoder.java.SourceVisitor;
 import recoder.java.expression.Operator;
 
 
-public class SeqConcat extends LDTPrefixConstruct {
+public class AllFields extends ADTPrefixConstruct {
 
-    public SeqConcat(Expression lhs, Expression rhs) {
-	super(lhs, rhs);
+    public AllFields(Expression lhs) {
+	super(lhs);
 	makeParentRoleValid();
     }
 
 
-    protected SeqConcat(SeqConcat proto) {
+    protected AllFields(AllFields proto) {
 	super(proto);
 	makeParentRoleValid();
     }
     
 
     @Override    
-    public SeqConcat deepClone() {
-	return new SeqConcat(this);
+    public AllFields deepClone() {
+	return new AllFields(this);
     }
 
 
     @Override    
     public int getArity() {
-	return 2;
+	return 1;
     }
 
     
@@ -45,4 +45,5 @@ public class SeqConcat extends LDTPrefixConstruct {
     public int getNotation() {
 	return PREFIX;
     }
+   
 }

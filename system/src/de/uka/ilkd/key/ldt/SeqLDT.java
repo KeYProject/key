@@ -15,7 +15,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.EmptySeqLiteral;
-import de.uka.ilkd.key.java.expression.operator.*;
+import de.uka.ilkd.key.java.expression.operator.adt.*;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
@@ -52,7 +52,7 @@ public final class SeqLDT extends LDT {
         seqConcat     = addFunction(services, "seqConcat");
         seqSub        = addFunction(services, "seqSub");
         seqReverse    = addFunction(services, "seqReverse");
-        seqIndexOf    = addFunction(services, "seqIndexOf"); //XXX
+        seqIndexOf    = addFunction(services, "seqIndexOf");
     }
     
     
@@ -119,7 +119,9 @@ public final class SeqLDT extends LDT {
 	       || op instanceof SeqConcat
 	       || op instanceof SeqSub
 	       || op instanceof SeqReverse
-	       || op instanceof SeqIndexOf;
+	       || op instanceof SeqIndexOf
+	       || op instanceof SeqGet
+	       || op instanceof SeqLength;
     }
 
 
@@ -144,6 +146,10 @@ public final class SeqLDT extends LDT {
 	    return seqReverse;
 	} else if(op instanceof SeqIndexOf) {
 	    return seqIndexOf;
+	} else if(op instanceof SeqGet){
+	    return seqGet;
+	} else if(op instanceof SeqLength){
+	    return seqLen;
 	}
 	assert false;
 	return null;

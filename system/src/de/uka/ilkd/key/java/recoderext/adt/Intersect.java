@@ -8,36 +8,42 @@
 //
 //
 
-package de.uka.ilkd.key.java.recoderext.ldt;
+package de.uka.ilkd.key.java.recoderext.adt;
 
 import recoder.java.Expression;
 import recoder.java.SourceVisitor;
 import recoder.java.expression.Operator;
 
 
-public class AllFields extends LDTPrefixConstruct {
+public class Intersect extends ADTPrefixConstruct {
 
-    public AllFields(Expression lhs) {
-	super(lhs);
+    public Intersect(Expression lhs, Expression rhs) {
+	super(lhs, rhs);
 	makeParentRoleValid();
     }
 
 
-    protected AllFields(AllFields proto) {
+    protected Intersect(Intersect proto) {
 	super(proto);
 	makeParentRoleValid();
     }
     
 
     @Override    
-    public AllFields deepClone() {
-	return new AllFields(this);
+    public Intersect deepClone() {
+	return new Intersect(this);
     }
 
 
     @Override    
     public int getArity() {
-	return 1;
+	return 2;
+    }
+
+    
+    @Override    
+    public int getPrecedence() {
+	return 0;
     }
 
     
@@ -45,5 +51,4 @@ public class AllFields extends LDTPrefixConstruct {
     public int getNotation() {
 	return PREFIX;
     }
-   
 }

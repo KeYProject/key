@@ -55,7 +55,7 @@ header {
   import de.uka.ilkd.key.java.StatementBlock;
   import de.uka.ilkd.key.java.declaration.VariableDeclaration;
   import de.uka.ilkd.key.java.recoderext.*;
-  import de.uka.ilkd.key.java.recoderext.ldt.*;
+  import de.uka.ilkd.key.java.recoderext.adt.*;
   import de.uka.ilkd.key.pp.AbbrevMap;
   import de.uka.ilkd.key.pp.LogicPrinter;
 }

@@ -8,30 +8,30 @@
 //
 //
 
-package de.uka.ilkd.key.java.recoderext.ldt;
+package de.uka.ilkd.key.java.recoderext.adt;
 
 import recoder.java.Expression;
 import recoder.java.SourceVisitor;
 import recoder.java.expression.Operator;
 
 
-public class Singleton extends LDTPrefixConstruct {
+public class SeqSingleton extends ADTPrefixConstruct {
 
-    public Singleton(Expression lhs) {
+    public SeqSingleton(Expression lhs) {
 	super(lhs);
 	makeParentRoleValid();
     }
 
 
-    protected Singleton(Singleton proto) {
+    protected SeqSingleton(SeqSingleton proto) {
 	super(proto);
 	makeParentRoleValid();
     }
     
 
     @Override    
-    public Singleton deepClone() {
-	return new Singleton(this);
+    public SeqSingleton deepClone() {
+	return new SeqSingleton(this);
     }
 
 
@@ -44,5 +44,10 @@ public class Singleton extends LDTPrefixConstruct {
     @Override    
     public int getNotation() {
 	return PREFIX;
+    }
+    
+    @Override
+    public String toSource(){
+        return "\\seq_singleton("+children.get(0)+")";
     }
 }

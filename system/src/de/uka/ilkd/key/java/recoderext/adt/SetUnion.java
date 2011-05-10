@@ -8,36 +8,36 @@
 //
 //
 
-package de.uka.ilkd.key.java.recoderext.ldt;
+package de.uka.ilkd.key.java.recoderext.adt;
 
 import recoder.java.Expression;
 import recoder.java.SourceVisitor;
 import recoder.java.expression.Operator;
 
 
-public class SeqSingleton extends LDTPrefixConstruct {
+public class SetUnion extends ADTPrefixConstruct {
 
-    public SeqSingleton(Expression lhs) {
-	super(lhs);
+    public SetUnion(Expression lhs, Expression rhs) {
+	super(lhs, rhs);
 	makeParentRoleValid();
     }
 
 
-    protected SeqSingleton(SeqSingleton proto) {
+    protected SetUnion(SetUnion proto) {
 	super(proto);
 	makeParentRoleValid();
     }
     
 
     @Override    
-    public SeqSingleton deepClone() {
-	return new SeqSingleton(this);
+    public SetUnion deepClone() {
+	return new SetUnion(this);
     }
 
 
     @Override    
     public int getArity() {
-	return 1;
+	return 2;
     }
 
     

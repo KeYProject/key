@@ -8,44 +8,49 @@
 //
 //
 
-package de.uka.ilkd.key.java.recoderext.ldt;
+package de.uka.ilkd.key.java.recoderext.adt;
 
 import recoder.java.Expression;
 import recoder.java.SourceVisitor;
+import recoder.java.expression.Operator;
 
 /**
- * Sequence getter operation.
+ * @since 1.7.2118
  * @author bruns
- * @since 1.7.2119
+ *
  */
-public class SeqGet extends LDTPrefixConstruct {
-    
-    /**
-     * Creates a sequence getter operator.
-     * @param seq Sequence to operate on
-     * @param idx Index position (from 0 to length-1)
-     */
-    public SeqGet(Expression seq, Expression idx) {
-        super(seq, idx);
+public class SeqLength extends Operator {
+
+    private static final long serialVersionUID = 0;
+
+
+    public SeqLength(Expression seq) {
+        super(seq);
         makeParentRoleValid();
     }
 
 
-    protected SeqGet(SeqGet proto) {
+    protected SeqLength(SeqLength proto) {
         super(proto);
         makeParentRoleValid();
     }
 
 
     @Override    
-    public SeqGet deepClone() {
-        return new SeqGet(this);
+    public SeqLength deepClone() {
+        return new SeqLength(this);
     }
 
 
     @Override    
     public int getArity() {
-        return 2;
+        return 1;
+    }
+
+
+    @Override    
+    public int getPrecedence() {
+        return 0;
     }
 
 
@@ -53,4 +58,15 @@ public class SeqGet extends LDTPrefixConstruct {
     public int getNotation() {
         return POSTFIX;
     }
+
+
+    @Override    
+    public void accept(SourceVisitor v) {
+
+    }
+    
+    public String toSource(){
+        return children.get(0).toSource()+".length";
+    }
+
 }

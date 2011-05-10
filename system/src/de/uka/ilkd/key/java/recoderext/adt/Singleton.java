@@ -8,42 +8,36 @@
 //
 //
 
-package de.uka.ilkd.key.java.recoderext.ldt;
+package de.uka.ilkd.key.java.recoderext.adt;
 
 import recoder.java.Expression;
 import recoder.java.SourceVisitor;
 import recoder.java.expression.Operator;
 
 
-public class Intersect extends LDTPrefixConstruct {
+public class Singleton extends ADTPrefixConstruct {
 
-    public Intersect(Expression lhs, Expression rhs) {
-	super(lhs, rhs);
+    public Singleton(Expression lhs) {
+	super(lhs);
 	makeParentRoleValid();
     }
 
 
-    protected Intersect(Intersect proto) {
+    protected Singleton(Singleton proto) {
 	super(proto);
 	makeParentRoleValid();
     }
     
 
     @Override    
-    public Intersect deepClone() {
-	return new Intersect(this);
+    public Singleton deepClone() {
+	return new Singleton(this);
     }
 
 
     @Override    
     public int getArity() {
-	return 2;
-    }
-
-    
-    @Override    
-    public int getPrecedence() {
-	return 0;
+	return 1;
     }
 
     

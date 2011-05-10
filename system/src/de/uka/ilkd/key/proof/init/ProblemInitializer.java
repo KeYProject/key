@@ -477,7 +477,7 @@ public final class ProblemInitializer {
         final HeapLDT heapLDT 
         = initConfig.getServices().getTypeConverter().getHeapLDT();
         assert heapLDT != null;
-        if (javaInfo != null) { // XXX what if javaInfo == null ???
+        if (javaInfo != null) {
             functions.add(javaInfo.getInv());
             for(KeYJavaType kjt : javaInfo.getAllKeYJavaTypes()) {
                 final Type type = kjt.getJavaType();
@@ -499,8 +499,8 @@ public final class ProblemInitializer {
                     }
                 }
             }
-        } // XXX if ji != null
-        else new Exception("javaInfo == null again").printStackTrace();
+        } else
+                throw new ProofInputException("Problem initialization without JavaInfo!");
 
         //read envInput
         readEnvInput(envInput, initConfig);

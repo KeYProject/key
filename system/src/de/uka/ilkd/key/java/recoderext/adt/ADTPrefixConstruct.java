@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.java.recoderext.ldt;
+package de.uka.ilkd.key.java.recoderext.adt;
 
 import recoder.java.Expression;
 import recoder.java.SourceVisitor;
@@ -6,23 +6,23 @@ import recoder.java.expression.Operator;
 import recoder.java.reference.ReferencePrefix;
 import recoder.java.reference.ReferenceSuffix;
 
-public abstract class LDTPrefixConstruct extends Operator implements ReferencePrefix {
+public abstract class ADTPrefixConstruct extends Operator implements ReferencePrefix {
     
     private ReferenceSuffix suffix;
     
-    public LDTPrefixConstruct(){
+    public ADTPrefixConstruct(){
         super();
     }
     
-    public LDTPrefixConstruct(Expression unary){
+    public ADTPrefixConstruct(Expression unary){
         super(unary);
     }
     
-    public LDTPrefixConstruct(Expression lhs, Expression rhs){
+    public ADTPrefixConstruct(Expression lhs, Expression rhs){
         super(lhs,rhs);
     }
     
-    protected LDTPrefixConstruct(LDTPrefixConstruct proto){
+    protected ADTPrefixConstruct(ADTPrefixConstruct proto){
         super(proto);
     }
 
@@ -38,12 +38,18 @@ public abstract class LDTPrefixConstruct extends Operator implements ReferencePr
 
     @Override
     public void accept(SourceVisitor arg0) {
-        // TODO Auto-generated method stub
+        // SourceVisitors in RecodeR currently are only used to perform the toSource() operation.
+        // One of them needs to be implemented in order for source code to be reproduced.
     }
     
     @Override
     public int getPrecedence(){
         return 0; // TODO remove from subclasses
+    }
+    
+    @Override
+    public String toString(){
+        return toSource();
     }
 
 }

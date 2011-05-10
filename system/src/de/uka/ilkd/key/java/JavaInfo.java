@@ -1184,7 +1184,6 @@ public final class JavaInfo {
         return kpmi.getAllSupertypes(type);
     }
 
-    // XXX or should I have kept the empty loop that was here before???
     private ImmutableList<Sort> getSuperSorts(Sort sort){
         ImmutableList<Sort> res = ImmutableSLList.<Sort>nil();
         final Sort object = getJavaLangObject().getSort();

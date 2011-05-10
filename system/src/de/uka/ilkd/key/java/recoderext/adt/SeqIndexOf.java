@@ -8,7 +8,7 @@
 //
 //
 
-package de.uka.ilkd.key.java.recoderext.ldt;
+package de.uka.ilkd.key.java.recoderext.adt;
 
 import recoder.java.Expression;
 import recoder.java.SourceVisitor;
@@ -64,5 +64,10 @@ public class SeqIndexOf extends Operator {
     @Override    
     public void accept(SourceVisitor v) {
 
+    }
+    
+    @Override
+    public String toSource(){
+        return "\\indexOf("+children.get(0).toSource()+","+children.get(1).toSource()+")";
     }
 }

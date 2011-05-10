@@ -9,7 +9,7 @@
 //
 
 
-package de.uka.ilkd.key.java.expression.operator;
+package de.uka.ilkd.key.java.expression.operator.adt;
 
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
@@ -20,45 +20,49 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.util.ExtList;
 
-public class SeqReverse extends Operator {
+/**
+ * Represents a function giving the index of some element in a sequence (if it exists).
+ * @author bruns
+ *
+ */
+public class SeqIndexOf extends Operator {
 
-    public SeqReverse(ExtList children) {
+    public SeqIndexOf(ExtList children) {
         super(children);
     }
 
 
-    @Override    
+    @Override
     public int getPrecedence() {
         return 0;
     }
 
-
-    @Override    
-    public int getNotation() {
-        return PREFIX;
-    }
-
-
-    @Override    
+    @Override
     public void visit(Visitor v) {
-	v.performActionOnSeqReverse(this);
+	v.performActionOnSeqIndexOf(this);
     }
 
-
-    @Override    
+    @Override
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printSeqReverse(this);
+        p.printIndexOf(this);
     }
-    
-    
+
+
     @Override
     public int getArity() {
-	return 1;
+        return 2;
     }
-    
-    
+
+
     @Override
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
-	return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SEQ);
-    }    
+        return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT);
+    }
+
+
+    @Override
+    public int getNotation() {
+        return Operator.PREFIX;
+    }
+
 }

@@ -9,15 +9,16 @@
 //
 
 
-package de.uka.ilkd.key.java.expression.operator;
+package de.uka.ilkd.key.java.expression.operator.adt;
 
 import de.uka.ilkd.key.java.PrettyPrinter;
+import de.uka.ilkd.key.java.expression.operator.BinaryOperator;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.util.ExtList;
 
-public class SetMinus extends BinaryOperator {
+public class SeqConcat extends BinaryOperator {
 
-    public SetMinus(ExtList children) {
+    public SeqConcat(ExtList children) {
         super(children);
     }
 
@@ -33,12 +34,12 @@ public class SetMinus extends BinaryOperator {
 
 
     public void visit(Visitor v) {
-	v.performActionOnSetMinus(this);
+	v.performActionOnSeqConcat(this);
     }
 
     
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printSetMinus(this);
+        p.printSeqConcat(this);
     }
 
 }

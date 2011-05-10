@@ -8,41 +8,48 @@
 //
 //
 
-package de.uka.ilkd.key.java.recoderext.ldt;
+package de.uka.ilkd.key.java.recoderext.adt;
 
 import recoder.java.Expression;
 import recoder.java.SourceVisitor;
 import recoder.java.expression.Operator;
+import recoder.list.generic.ASTArrayList;
 
 
-public class SetMinus extends LDTPrefixConstruct {
+public class SeqReverse extends ADTPrefixConstruct {
 
-    public SetMinus(Expression lhs, Expression rhs) {
-	super(lhs, rhs);
+    public SeqReverse(Expression e) {
+	children = new ASTArrayList<Expression>(getArity());
+	children.add(e);
 	makeParentRoleValid();
     }
 
 
-    protected SetMinus(SetMinus proto) {
+    protected SeqReverse(SeqReverse proto) {
 	super(proto);
 	makeParentRoleValid();
     }
     
 
     @Override    
-    public SetMinus deepClone() {
-	return new SetMinus(this);
+    public SeqReverse deepClone() {
+	return new SeqReverse(this);
     }
 
 
     @Override    
     public int getArity() {
-	return 2;
+	return 1;
     }
 
     
     @Override    
     public int getNotation() {
 	return PREFIX;
+    }
+    
+    @Override
+    public String toSource(){
+        return "\\seq_reverse("+children.get(0).toSource()+")";
     }
 }

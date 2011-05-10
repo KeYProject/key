@@ -8,16 +8,13 @@
 //
 //
 
-package de.uka.ilkd.key.java.recoderext.ldt;
+package de.uka.ilkd.key.java.recoderext.adt;
 
 import recoder.java.Expression;
-import recoder.java.SourceVisitor;
 import recoder.list.generic.ASTArrayList;
 
 
-public class SeqSub extends LDTPrefixConstruct {
-    private static final long serialVersionUID = 1L;
-
+public class SeqSub extends ADTPrefixConstruct {
 
     public SeqSub(Expression e1, Expression e2, Expression e3) {
 	children = new ASTArrayList<Expression>(getArity());
@@ -27,8 +24,8 @@ public class SeqSub extends LDTPrefixConstruct {
 	makeParentRoleValid();
     }
     
-    public SeqSub(Expression seq, SeqSubRangeSuffix range){
-        this(seq, range.getChildAt(0), range.getChildAt(1));
+    public SeqSub(ADTPrefixConstruct seq, RangeExpression range){
+        this((Expression) seq, (Expression) range.getChildAt(0), (Expression) range.getChildAt(1));
     }
 
 
@@ -53,6 +50,11 @@ public class SeqSub extends LDTPrefixConstruct {
     @Override    
     public int getNotation() {
 	return PREFIX;
+    }
+    
+    @Override
+    public String toSource(){
+        return children.get(0).toSource()+"["+children.get(1)+".."+children.get(2)+"]";
     }
 
     
