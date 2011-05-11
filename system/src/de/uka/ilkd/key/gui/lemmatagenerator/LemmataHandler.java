@@ -60,6 +60,7 @@ public class LemmataHandler implements TacletFilter {
                 println(options.toString());
 
                 File file = new File(options.getPathOfRuleFile());
+                File fileForDefinitions =  options.getPathOfRuleFile() != "" ? new File(options.getPathOfDefinitionFile()) :file;
                 Collection<File> filesForAxioms = createFilesForAxioms(options.getFilesForAxioms());
                 
                 LoaderListener loaderListener = new LoaderListener() {
@@ -93,7 +94,7 @@ public class LemmataHandler implements TacletFilter {
                 };
                 TacletSoundnessPOLoader loader = new TacletSoundnessPOLoader(
                                 null, file, createEnvironment(),
-                                loaderListener, new Listener(), this,filesForAxioms);
+                                loaderListener, new Listener(), this,filesForAxioms,fileForDefinitions);
                 loader.start();
         }
         
@@ -177,12 +178,12 @@ public class LemmataHandler implements TacletFilter {
 
                 @Override
                 public void progressStarted(Object sender) {
-                        println("Process of initializing the proofs has been started.");
+            
                 }
 
                 @Override
                 public void progressStopped(Object sender) {
-                        println("Process of initializing the proofs has been stopped.");
+        
                 }
 
                 @Override

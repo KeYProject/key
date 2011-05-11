@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.util.LinkedList;
-import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;

@@ -22,6 +22,7 @@ public class LemmataAutoModeOptions {
         private static final String SAVE_RESULTS_TO_FILE = KEY_PREFIX
                         + "saveProofToFile";
         private static final String FILE_FOR_AXIOMS = KEY_PREFIX + "axioms";
+        private static final String FILE_FOR_DEFINITION = KEY_PREFIX +"definitions";
 
         private static final String PROOF_POSTFIX = ".key.proof";
 
@@ -50,6 +51,8 @@ public class LemmataAutoModeOptions {
         private int maxRules = 10000;
 
         private String pathOfResult = "";
+        
+        private String pathOfDefinitionFile ="";
 
         private PrintStream printStream = System.out;
 
@@ -138,6 +141,9 @@ public class LemmataAutoModeOptions {
                 if (key.equals(FILE_FOR_AXIOMS)) {
                         filesForAxioms.add(value);
                 }
+                if (key.equals(FILE_FOR_DEFINITION)) {
+                        pathOfDefinitionFile = value;
+                }
         }
 
         private boolean readBoolean(String value, boolean def) {
@@ -149,6 +155,9 @@ public class LemmataAutoModeOptions {
                 return def;
         }
 
+        public String getPathOfDefinitionFile() {
+                return pathOfDefinitionFile;
+        }
         public String getHomePath() {
                 return homePath;
         }

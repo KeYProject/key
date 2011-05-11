@@ -243,7 +243,6 @@ class TacletChooser extends JPanel{
     }
 }
 
-
 public class LemmaSelectionDialog extends JDialog implements TacletFilter{
     
     private static final long serialVersionUID = 1L;
@@ -264,6 +263,7 @@ public class LemmaSelectionDialog extends JDialog implements TacletFilter{
 	this.getContentPane().add(getContentPanel());
 	this.getContentPane().add(Box.createHorizontalStrut(10));
 	this.setMinimumSize(new Dimension(300,300));
+	this.setLocationByPlatform(true);
 
 	this.pack();
 

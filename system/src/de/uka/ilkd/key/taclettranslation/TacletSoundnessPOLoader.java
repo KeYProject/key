@@ -11,7 +11,6 @@ import javax.swing.SwingUtilities;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -32,6 +31,7 @@ public class TacletSoundnessPOLoader {
     private final ProgressMonitor progressMonitor;
     private final File    file;
     private final Collection<File>  filesForAxioms = new LinkedList<File>();
+    private final File    fileForDefinitions;
 
     private ProofEnvironment env;
     private LinkedList<LoaderListener> listeners = new LinkedList<LoaderListener>();
@@ -79,19 +79,21 @@ public class TacletSoundnessPOLoader {
                     ProgressMonitor progressMonitor, File file,
                     ProofEnvironment referenceEnv,LoaderListener listener,ProblemInitializerListener piListener
                     ,TacletFilter filter){
-       this(progressMonitor, file, referenceEnv, listener, piListener, filter, null);     
+       this(progressMonitor, file, referenceEnv, listener, piListener, filter, null,file);     
     }
 
     
     public TacletSoundnessPOLoader(
             ProgressMonitor progressMonitor, File file,
             ProofEnvironment referenceEnv,LoaderListener listener,ProblemInitializerListener piListener
-            ,TacletFilter filter,Collection<File> filesForAxioms) {
+            ,TacletFilter filter,Collection<File> filesForAxioms, File fileForDefinitions) {
 	super();
 	this.progressMonitor = progressMonitor;
 	this.file = file;
 	this.env = referenceEnv;
 	this.tacletFilter = filter;
+	this.fileForDefinitions = fileForDefinitions==null? file : fileForDefinitions;
+	
 	if(filesForAxioms != null){
 	   this.filesForAxioms.addAll(filesForAxioms);
 	}
@@ -183,12 +185,13 @@ public class TacletSoundnessPOLoader {
         ImmutableSet<Taclet> axioms = DefaultImmutableSet.nil();
         for(File f : files){
             KeYUserProblemFile keyFile = new KeYUserProblemFile(f.getName(), f, pm);
-            //pi.readEnvInput(keyFile, initConfig);
             ImmutableSet<Taclet> taclets= TacletLoader.INSTANCE.load(keyFile, initConfig);
             proofEnvForTaclets.registerRules(taclets, AxiomJustification.INSTANCE);
             axioms =  axioms.union(taclets);
         }
-        System.out.println("SIZE: "+axioms.size());
+
+ 
+       
         return axioms;
     }
     
@@ -199,13 +202,15 @@ public class TacletSoundnessPOLoader {
             KeYUserProblemFile keyFile = new KeYUserProblemFile(file.getName(), file, progressMonitor);
             InitConfig initConfig;
 
-            KeYUserProblemFile keyFileDefs =new KeYUserProblemFile("Base",filesForAxioms.isEmpty() ? file :  filesForAxioms.iterator().next(), progressMonitor);
+            KeYUserProblemFile keyFileDefs =
+                    new KeYUserProblemFile("Definitions",fileForDefinitions , progressMonitor);
             
             initConfig = problemInitializer.prepare(keyFileDefs);
 
             keyFileDefs.close();
             
-            ImmutableSet<Taclet> axioms = readAxioms(filesForAxioms, initConfig, progressMonitor, problemInitializer,env);
+            ImmutableSet<Taclet> axioms = readAxioms(filesForAxioms, initConfig,
+                            progressMonitor, problemInitializer,env);
      
          
             ImmutableSet<Taclet> taclets = 
@@ -243,7 +248,8 @@ public class TacletSoundnessPOLoader {
     private ProofAggregate registerProof(ProofEnvironment proofEnvForTaclets, ImmutableSet<Taclet> taclets, 
 	    KeYUserProblemFile keyFile,ImmutableSet<Taclet> axioms){
         
-	ProofAggregate p = ProofObligationCreator.create(taclets, proofEnvForTaclets.getInitConfig(),axioms);
+	ProofAggregate p = ProofObligationCreator.INSTANCE.create(taclets, proofEnvForTaclets.getInitConfig(),axioms,
+	                piListener);
         proofEnvForTaclets.registerRules(taclets, AxiomJustification.INSTANCE);
         proofEnvForTaclets.registerProof(keyFile,p);
 	return p;
