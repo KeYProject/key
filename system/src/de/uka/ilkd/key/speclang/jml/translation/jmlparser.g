@@ -324,7 +324,7 @@ options {
 
 top returns [Object result = null] throws  SLTranslationException
 :
-        result = accessibleclause
+    (   result = accessibleclause
     |   result = assignableclause
     |   result = dependsclause
     |   result = ensuresclause
@@ -332,6 +332,8 @@ top returns [Object result = null] throws  SLTranslationException
     |   result = signalsclause
     |   result = signalsonlyclause
     |   result = termexpression
+    )
+    (SEMI)? EOF
     ;
 
 
