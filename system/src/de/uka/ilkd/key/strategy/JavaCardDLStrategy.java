@@ -105,6 +105,18 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
             methodSpecF = null;
             assert false;
         }
+
+        final String queryProp = strategyProperties
+        .getProperty(StrategyProperties.QUERY_OPTIONS_KEY);
+        final Feature queryF;
+        if (queryProp.equals(StrategyProperties.QUERY_ON)) {
+                queryF = querySpecFeature(longConst(200));
+        } else if (queryProp.equals(StrategyProperties.QUERY_OFF)) {
+                queryF = querySpecFeature(inftyConst());
+        } else {
+                queryF = null;
+                assert false;
+        }
         
         final Feature depSpecF;
         final String depProp
@@ -148,6 +160,7 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
               pullOutConditionalsF,
              // smtF, 
               methodSpecF, 
+              queryF,
               depSpecF,
               loopInvF,
               ifMatchedF,
@@ -165,6 +178,13 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
 	filter.addRuleToSet(UseOperationContractRule.INSTANCE);
         return ConditionalFeature.createConditional(filter, cost);        
     }
+
+    private Feature querySpecFeature(Feature cost) {
+	SetRuleFilter filter = new SetRuleFilter();
+	filter.addRuleToSet(QueryExpand.INSTANCE);
+        return ConditionalFeature.createConditional(filter, cost);        
+    }
+
     
     private Feature oneStepSimplificationFeature(Feature cost) {
 	SetRuleFilter filter = new SetRuleFilter();
@@ -427,8 +447,8 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
 	// establish normalform 
 
 	// tf below only for test
-	final TermFeature stringLiteral = or( op (charListLDT.getClEmpty()), 
-		                              op ( charListLDT.getClCons() ) );
+	final TermFeature stringLiteral = rec ( any(), or ( or ( op (charListLDT.getClEmpty()), 
+		                                op ( charListLDT.getClCons() ) ), tf.charLiteral) );
 
 	Feature belowModOpPenality = ifZero  ( isBelow ( ff.modalOperator ),
 		  longConst ( 500 ) );	
@@ -515,7 +535,7 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
 	
 	bindRuleSet ( d, "stringsSimplify", longConst ( -5000 ) ); 
 	
-	bindRuleSet ( d, "stringsExpandLengthConcat", longConst ( -8000 ) ); 
+	bindRuleSet ( d, "stringsExpandLengthConcat", longConst ( -3000 ) ); 
 
 	bindRuleSet ( d, "stringsLengthInvariant",  
 		ifZero ( applyTF ( instOf("str"), stringLiteral ) , 

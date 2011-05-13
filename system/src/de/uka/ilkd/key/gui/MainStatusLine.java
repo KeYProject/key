@@ -86,7 +86,7 @@ class MainStatusLine extends JPanel {
      */
     public void reset () {
 	setProgressPanelVisible ( false );
-	setStatusText ("Integrated Deductive Software Design: Ready" );
+	setStatusText ("Integrated Deductive Software Design: Ready  (Hint: type F3 to search in sequents.)" );
     }
 
     /**

@@ -51,7 +51,6 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 public final class EnhancedForInvRule extends AbstractTermTransformer {
 
     private static final boolean FORMALPARAM_AS_STATEMENT = false;
-    private static final TermBuilder TB = TermBuilder.DF;    
 
     /*
      * list of breaks that lead to abrupt termination of the loop to be

@@ -22,9 +22,9 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.smt.taclettranslation.DefaultTacletSetTranslation;
-import de.uka.ilkd.key.smt.taclettranslation.TacletFormula;
-import de.uka.ilkd.key.smt.taclettranslation.TacletSetTranslation;
+import de.uka.ilkd.key.taclettranslation.TacletFormula;
+import de.uka.ilkd.key.taclettranslation.assumptions.DefaultTacletSetTranslation;
+import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
 import de.uka.ilkd.key.util.Debug;
 
 
@@ -174,8 +174,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     private TacletSetTranslation tacletSetTranslation = null;
     
     //private Collection<Taclet> taclets= new LinkedList<Taclet>();
-    
-    private HashSet<Term> usedAttributeTerms = new HashSet<Term>();
+
     
     
     /**Assumptions made of taclets - the translation of <code>tacletFormulae</code>*/
@@ -2197,12 +2196,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	
 
 	
-	ImmutableSet<Term> terms = DefaultImmutableSet.nil();
-	for(Term term : usedAttributeTerms){
-	    terms = terms.add(term);
-	}
+
 	
-	for(TacletFormula tf :  tacletSetTranslation.getTranslation(sorts,terms,
+	for(TacletFormula tf :  tacletSetTranslation.getTranslation(sorts,
 		settings.getMaxNumberOfGenerics())){
 	    for(Term subterm : tf.getInstantiations()){
 		 try{

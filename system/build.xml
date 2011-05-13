@@ -13,6 +13,7 @@
   <condition property="ext.dir" value="${env.KEY_LIB}">
   	<isset property="env.KEY_LIB"/>
   </condition>
+	
   <property name="ext.dir" value="${basedir}/../key-ext-jars"   />
 	
   <property name="instrument.dir" value="${basedir}/instrumented/" />
@@ -22,6 +23,9 @@
 
   <property file="local.properties" />
 
+  <property name="test.reports"   value="${basedir}/testresults/" />
+
+	
   <path id="jcoverage">
     <fileset dir="${ext.dir}">
       <include name="jcoverage.jar"/>
@@ -31,7 +35,34 @@
   <target name="info">
     <echo message="Target info is obsolete, use ant -projecthelp instead." />
   </target>
+	
+    <target name="jtest" depends="compile">
+     <junit printsummary="yes" haltonfailure="yes">
+     <jvmarg value="-Xmx2048m"/>
+     <jvmarg value="-Dkey.home=${env.KEY_HOME}"/>
+     <classpath>
+      <pathelement location="${ext.dir}/antlr.jar"/>
+      <pathelement location="${ext.dir}/recoderKey.jar"/>
+      <pathelement location="${ext.dir}/javacc.jar"/>
+      <pathelement location="${ext.dir}/junit.jar"/>
+      <pathelement path="${dist.dir}"/>
+    </classpath>
 
+   <formatter type="xml"/>
+
+   <batchtest fork="yes" todir="${test.reports}">
+     <fileset dir="${test.dir}">
+       <include name="**/Test*.java"/>
+       <exclude name="TestKey.java"/>
+       <exclude name="**/TestCommons.java"/>
+       <exclude name="**/TestSMTBenchmark.java"/>
+       <exclude name="**/TestSMTSolver.java"/>
+        <exclude name="**/TestTriggersSet.java"/>
+     </fileset>
+   </batchtest>
+  </junit>
+  </target>
+  	
   <target name="prepare">
   	<echo message="Please set (if you have not yet done so)  the environment variable ANT_OPTS to -Xms512m -Xmx512m" />
   	
@@ -42,6 +73,7 @@
 	<mkdir dir="${gen.dir}/de/uka/ilkd/key/speclang/jml/translation"/>
   	
 	<mkdir dir="${build.dir}"/>
+  	<mkdir dir="${test.reports}" />
 
   </target>
 
@@ -74,7 +106,7 @@
      <javac srcdir= "${src.dir}:${gen.dir}:${test.dir}"
            destdir="${dist.dir}"
            source="1.6"
-     	   deprecation="on"
+     	   deprecation="off"
            debug="on"
            depend="${build.depend}"
            optimize="off">
@@ -91,6 +123,7 @@
 	<delete failonerror="true" includeemptydirs="true"> 
 		<fileset dir="${build.dir}"/>
 		<fileset dir="${gen.dir}"/>
+		<fileset dir="${test.reports}"/>
 		<fileset file="${basedir}/key.jar"/>
 	</delete>
   </target>

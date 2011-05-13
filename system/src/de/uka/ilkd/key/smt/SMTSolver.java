@@ -10,7 +10,7 @@
 
 package de.uka.ilkd.key.smt;
 
-import de.uka.ilkd.key.smt.taclettranslation.TacletSetTranslation;
+import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
 
 /**
  * The SMTSolver interface represents a solver process (e.g. Z3, Simplify,...)
