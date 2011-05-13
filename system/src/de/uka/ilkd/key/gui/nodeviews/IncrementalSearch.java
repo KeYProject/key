@@ -56,7 +56,7 @@ public class IncrementalSearch implements KeyListener, DocumentListener {
 
     private SequentView seqView;
 
-    private JDialog searchDialog;
+    private SearchDialog searchDialog;
 
     /**
      * create and initialize a new incremental search run
@@ -172,7 +172,7 @@ public class IncrementalSearch implements KeyListener, DocumentListener {
             highlightNext();
             return;
         default:
-            searchStr += ch;
+            searchStr = searchDialog.getText();
             break;
         }
         searchPattern();
@@ -281,7 +281,10 @@ public class IncrementalSearch implements KeyListener, DocumentListener {
 
 
     private class SearchDialog extends JDialog {
+        
         JTextField textField;
+
+
         public SearchDialog() {
             super((JDialog)null, "Search", false);
             textField = new JTextField();
@@ -304,6 +307,11 @@ public class IncrementalSearch implements KeyListener, DocumentListener {
         @Override
         public void requestFocus() {
             textField.requestFocus();
+        }
+
+
+        public String getText() {
+            return textField.getText();
         }
 
         
