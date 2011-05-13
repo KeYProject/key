@@ -97,7 +97,9 @@ public final class ProofManagementDialog extends JDialog {
 			 					      index, 
 			 					      isSelected, 
 			 					      cellHasFocus);
+
 		if(result instanceof JLabel) {
+		     
 		    ProofStatus ps 
 		     	= ((ProofWrapper)value).proof.mgt().getStatus();
 		    JLabel label = (JLabel) result;

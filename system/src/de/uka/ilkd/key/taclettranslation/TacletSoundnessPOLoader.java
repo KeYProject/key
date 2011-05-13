@@ -12,12 +12,16 @@ import javax.swing.SwingUtilities;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.proof.CompoundProof;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.SingleProof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProblemInitializer.ProblemInitializerListener;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.FindTaclet;
@@ -232,35 +236,49 @@ public class TacletSoundnessPOLoader {
             }
             
 
-            resultingProof = registerProof(env, getResultingTaclets(), keyFile,axioms);
+            resultingProof = createProof(env, getResultingTaclets(), keyFile,axioms);
 
 
     }
     
     
     
-   
-    
-    private ImmutableSet<Taclet> getAlreadyInUseTaclets(){
-	return env.getInitConfig().getTaclets();
-    }
-    
-    private ProofAggregate registerProof(ProofEnvironment proofEnvForTaclets, ImmutableSet<Taclet> taclets, 
-	    KeYUserProblemFile keyFile,ImmutableSet<Taclet> axioms){
+        private ImmutableSet<Taclet> getAlreadyInUseTaclets() {
+                return env.getInitConfig().getTaclets();
+        }
+
+        private ProofAggregate createProof(ProofEnvironment proofEnvForTaclets,
+                        ImmutableSet<Taclet> taclets,
+                        KeYUserProblemFile keyFile, ImmutableSet<Taclet> axioms) {
+
+                ProofAggregate p = ProofObligationCreator.INSTANCE.create(
+                                taclets, proofEnvForTaclets.getInitConfig(),
+                                axioms, piListener);
+                proofEnvForTaclets.registerRules(taclets,
+                                AxiomJustification.INSTANCE);
+                registerProofs(p, proofEnvForTaclets, keyFile);
+                return p;
+        }
         
-	ProofAggregate p = ProofObligationCreator.INSTANCE.create(taclets, proofEnvForTaclets.getInitConfig(),axioms,
-	                piListener);
-        proofEnvForTaclets.registerRules(taclets, AxiomJustification.INSTANCE);
-        proofEnvForTaclets.registerProof(keyFile,p);
-	return p;
-    }
-    
-    public ProofAggregate getResultingProof() {
-	return resultingProof;
-    }
-    public ImmutableSet<Taclet> getResultingTaclets() {
-	return resultingTaclets;
-    }
+        public void registerProofs(ProofAggregate aggregate, ProofEnvironment env, ProofOblInput keyFile){
+                if(aggregate instanceof CompoundProof){
+                        CompoundProof cp = (CompoundProof) aggregate;
+                        for(ProofAggregate child : cp.getChildren()){
+                                registerProofs(child, env, keyFile);
+                        }
+                }else{
+                        assert aggregate instanceof SingleProof;
+                        env.registerProof(keyFile, aggregate);
+                }
+        }
+
+        public ProofAggregate getResultingProof() {
+                return resultingProof;
+        }
+
+        public ImmutableSet<Taclet> getResultingTaclets() {
+                return resultingTaclets;
+        }
   
 
 }

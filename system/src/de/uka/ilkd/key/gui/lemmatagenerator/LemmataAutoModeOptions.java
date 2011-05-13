@@ -202,6 +202,7 @@ public class LemmataAutoModeOptions {
                         throwError("Error while setting the folder of the results:\n"
                                         + pathOfRuleFile + " is not a folder.");
                 }
+                
         }
 
         private void throwError(String error) {
@@ -210,8 +211,10 @@ public class LemmataAutoModeOptions {
 
         private String generatePath(String path, String reference) {
                 if (path.equals("")) {
-                        int index = reference.lastIndexOf(File.separator);
-                        path = reference.substring(0, index + 1);
+                        File temp = new File(reference);
+                        System.out.println(temp.getAbsolutePath());
+                        int index = temp.getAbsolutePath().lastIndexOf(File.separator);
+                        path = temp.getAbsolutePath().substring(0, index + 1);
                 }
                 return path;
         }

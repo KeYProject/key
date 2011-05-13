@@ -161,7 +161,8 @@ public class LemmataHandler implements TacletFilter {
                 try {
                         prover.start(proof, options.getMaxNumberOfRules(),
                                         options.getTimeout());
-                        println(proof.closed() ? "closed" : ("not closed (open goals: "+proof.openGoals().size()+" nodes: "+proof.countNodes()+")"));
+                        println(proof.closed() ? "closed" : ("not closed (open goals: "+proof.openGoals().size()
+                                        +" nodes: "+proof.countNodes()+")"));
                 } catch (InterruptedException exception) {
                         println("time out");
                 }

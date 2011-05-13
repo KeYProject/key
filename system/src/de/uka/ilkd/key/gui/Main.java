@@ -242,6 +242,8 @@ public final class Main extends JFrame implements IMain {
     /** action for opening the proof management dialog */
     public static ProofManagementAction proofManagementAction;
     
+    public static LoadUserDefinedTacletsAction loadUserDefinedTacletsAction;
+    
 
     public static final String AUTO_MODE_TEXT = "Start/stop automated proof search";
 
@@ -524,6 +526,7 @@ public final class Main extends JFrame implements IMain {
         editMostRecentFileAction  = new EditMostRecentFile();
         saveFileAction            = new SaveFile();
         proofManagementAction     = new ProofManagementAction();
+        loadUserDefinedTacletsAction = new LoadUserDefinedTacletsAction();
 
 	// ============================================================
 	// ==================  create empty views =====================
@@ -1223,15 +1226,8 @@ public final class Main extends JFrame implements IMain {
             }
         });
         
-        JMenuItem userTacletsItem = new JMenuItem("Load User-defined Taclets ...");
-        userTacletsItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+        JMenuItem userTacletsItem = new JMenuItem(loadUserDefinedTacletsAction);
       
-                if (mediator().ensureProofLoaded()) {
-                    loadUserTaclets();
-                }
-            }
-        });
         
         
         registerAtMenu(fileMenu, loadExample);        
@@ -1475,64 +1471,6 @@ public final class Main extends JFrame implements IMain {
         return options;
     }
     
-    
-    private void loadUserTaclets() {
-
-            FileChooser chooser = new FileChooser();
-
-            boolean loaded = chooser.showAsDialog();
-
-            if (!loaded){
-                    return;
-            }
-            final Proof proof = mediator().getSelectedProof();
-            final File fileForLemmata = chooser.getFileForLemmata();
-            final File fileForDefinitions = chooser.getFileForDefinitions();
-
-
-            List<File> filesForAxioms = chooser.getFilesForAxioms();
-
-
-
-            LoaderListener listener = 	new LoaderListener() {
-                    @Override 
-                    public void stopped(Throwable exception) {
-                            // TODO: handle the exception
-                            throw new RuntimeException(exception);		
-                    }		    
-                    @Override
-                    public void stopped(ProofAggregate p, ImmutableSet<Taclet> taclets) {
-                            mediator().startInterface(true);
-                            if(p != null){
-                                    Main.this.addProblem(p);
-                                    // add only the taclets to the goals if 
-                                    // the proof obligations were added successfully.
-                                    ImmutableSet<Taclet> base =
-                                            proof.env().getInitConfig().getTaclets();
-                                    base = base.union(taclets);
-                                    proof.env().getInitConfig().setTaclets(base);
-                                    for(Taclet taclet : taclets){
-                                            for(Goal goal : proof.openGoals()){
-                                                    goal.addTaclet(taclet, 
-                                                                    SVInstantiations.EMPTY_SVINSTANTIATIONS,false);
-                                            }
-                                    }
-                            }
-                    }
-
-                    @Override
-                    public void started() {
-                            mediator().stopInterface(true);			
-                    }
-            };
-
-
-            TacletSoundnessPOLoader loader = new TacletSoundnessPOLoader(progressMonitor, 
-                            fileForLemmata,proof.env() ,listener,piListener,
-                            new LemmaSelectionDialog(),filesForAxioms,
-                            fileForDefinitions);
-            loader.start();
-    }
     
     
     
@@ -2121,6 +2059,79 @@ public final class Main extends JFrame implements IMain {
         public void actionPerformed(ActionEvent e) {
             showProofManagement();
         }
+    }
+    
+    private final class LoadUserDefinedTacletsAction extends AbstractAction{
+
+
+        private static final long serialVersionUID = 1L;
+
+        public LoadUserDefinedTacletsAction() {
+                putValue(NAME, "Load User-Defined Taclets...");
+                putValue(SHORT_DESCRIPTION, "Loads additional taclets and creates the corresponding proofs.");
+                mediator.enableWhenProof(this);
+        }
+            
+        @Override
+        public void actionPerformed(ActionEvent e) {
+                FileChooser chooser = new FileChooser();
+
+                boolean loaded = chooser.showAsDialog();
+
+                if (!loaded){
+                        return;
+                }
+                final Proof proof = mediator().getSelectedProof();
+                final File fileForLemmata = chooser.getFileForLemmata();
+                final File fileForDefinitions = chooser.getFileForDefinitions();
+
+                
+                List<File> filesForAxioms = chooser.getFilesForAxioms();
+
+
+
+                LoaderListener listener =   new LoaderListener() {
+                        @Override 
+                        public void stopped(Throwable exception) {
+                                // TODO: handle the exception
+                                throw new RuntimeException(exception);      
+                        }           
+                        @Override
+                        public void stopped(ProofAggregate p, ImmutableSet<Taclet> taclets) {
+                                mediator().startInterface(true);
+                                if(p != null){
+                                        
+                                        Main.this.addProblem(p);
+                                        // add only the taclets to the goals if 
+                                        // the proof obligations were added successfully.
+                                        ImmutableSet<Taclet> base =
+                                                proof.env().getInitConfig().getTaclets();
+                                        base = base.union(taclets);
+                                        proof.env().getInitConfig().setTaclets(base);
+                                        for(Taclet taclet : taclets){
+                                                for(Goal goal : proof.openGoals()){
+                                                        goal.addTaclet(taclet, 
+                                                           SVInstantiations.EMPTY_SVINSTANTIATIONS,false);
+                                                }
+                                        }
+                                }
+                        }
+
+                        @Override
+                        public void started() {
+                                mediator().stopInterface(true);         
+                        }
+                };
+
+
+                TacletSoundnessPOLoader loader = new TacletSoundnessPOLoader(progressMonitor, 
+                                fileForLemmata,proof.env() ,listener,piListener,
+                                new LemmaSelectionDialog(),filesForAxioms,
+                                fileForDefinitions);
+                loader.start();
+                
+        }
+            
     }
     
     

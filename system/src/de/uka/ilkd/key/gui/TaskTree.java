@@ -181,7 +181,7 @@ public class TaskTree extends JPanel {
 	
 	/** invoked if all goals of the proof are closed
 	 */
-	public void proofClosed(ProofTreeEvent e) {	     
+	public void proofClosed(ProofTreeEvent e) {	
 	    delegateView.repaint();
 	}
 	
