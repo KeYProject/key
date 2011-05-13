@@ -414,6 +414,7 @@ public class SequentView extends JEditorPane implements Autoscroll {
 	        errorocc = false;
 	        try {
 		    setText(printer.toString());
+
 	        } catch (Error e) {
 		    System.err.println("Error occurred while printing Sequent!");
 		    errorocc = true;

@@ -10,22 +10,27 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.Color;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import javax.swing.JComponent;
 
-import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.util.Pair;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+import javax.swing.JDialog;
+import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 /**
  * Implements an incremental search for the sequent view. The incremental search
@@ -34,12 +39,15 @@ import java.util.List;
  * pressing the function key <code>F3</code>.
  * 
  */
-public class IncrementalSearch implements KeyListener, FocusListener {
+public class IncrementalSearch implements KeyListener, DocumentListener {
 
     public static final Color SEARCH_HIGHLIGHT_COLOR_1 =
             new Color(255, 140, 0, 178);
     public static final Color SEARCH_HIGHLIGHT_COLOR_2 =
             new Color(255, 140, 0, 76);
+
+
+    private static IncrementalSearch instance = new IncrementalSearch();
 
     private String searchStr;
 
@@ -48,7 +56,7 @@ public class IncrementalSearch implements KeyListener, FocusListener {
 
     private SequentView seqView;
 
-    private IMain main;
+    private JDialog searchDialog;
 
     /**
      * create and initialize a new incremental search run
@@ -56,75 +64,75 @@ public class IncrementalSearch implements KeyListener, FocusListener {
      * @param seqView
      *            the SequentView where to perform an incremental search
      */
-    public IncrementalSearch(SequentView seqView) {
-
-        if (alreadyRegistered(seqView)) {
-            return;
-        }
-
-        this.seqView = seqView;
-
-        init();
-
-        if (seqView.mediator().mainFrame() instanceof IMain) {
-            main = (IMain) seqView.mediator().mainFrame();
-        }
-
-        printStatus("Search: " + searchStr);
-
-    }
-
-    /**
-     * checks if an incremental search is already taken place at the specified
-     * sequent view
-     * 
-     * @param comp
-     *            the JComponent to be checked
-     * @return true if incremental search has been already activated for the
-     *         component
-     */
-    private boolean alreadyRegistered(JComponent comp) {
-        KeyListener[] l = comp.getKeyListeners();
-        for (KeyListener aL : l) {
-            if (aL instanceof IncrementalSearch) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * initialises the incremental search
-     */
-    private void init() {
+    private IncrementalSearch() {
+        seqView = null;
         searchStr = "";
         searchResults = new ArrayList<Pair<Integer,Object>>();
-
-        seqView.addKeyListener(this);
-        seqView.addFocusListener(this);
+        searchDialog = new SearchDialog();
+        searchDialog.addKeyListener(this);
     }
+
+    public static IncrementalSearch getInstance(){
+        return instance;
+    }
+
+
+    public void highlightNext() {
+        if (!searchResults.isEmpty()) {
+            resetExtraHighlight();
+            resultIteratorPos = (resultIteratorPos + 1) % searchResults.size();
+            setExtraHighlight(resultIteratorPos);
+        }
+    }
+
+
+    public void highlightPrev() {
+        if (!searchResults.isEmpty()) {
+            resetExtraHighlight();
+            resultIteratorPos =
+                    (resultIteratorPos - 1 + searchResults.size()) %
+                    searchResults.size();
+            setExtraHighlight(resultIteratorPos);
+        }
+    }
+
+    
+    public void initSearch(SequentView seqView) {
+        if (seqView == null || this.seqView == seqView) {
+            return;
+        } else if (this.seqView != null) {
+            disableSearch();
+        }
+        this.seqView = seqView;
+        this.seqView.getDocument().addDocumentListener(this);
+        searchDialog.setVisible(true);
+        searchPattern();
+    }
+
 
     /**
      * disable this searcher
      */
-    private void disableSearchMode() {
-        seqView.removeKeyListener(this);
-        seqView.removeFocusListener(this);
-        remonveHighlights();
-
-        searchStr = "";
-
-        if (main != null) {
-            main.setStandardStatusLine();
-        }
+    private void disableSearch() {
+        searchDialog.setVisible(false);
+        clearSearchResults();
+        seqView.getDocument().removeDocumentListener(this);
+        seqView = null;
     }
 
-    private void remonveHighlights() {
+
+    private void clearSearchResults() {
         for (Pair result : searchResults) {
             seqView.removeHighlight(result.second);
         }
         searchResults.clear();
     }
+
+
+    public boolean isInitialised() {
+        return seqView != null;
+    }
+
 
     /**
      * disables the incremental searcher when the function key <code>F3</code>
@@ -132,27 +140,19 @@ public class IncrementalSearch implements KeyListener, FocusListener {
      */
     public void keyPressed(KeyEvent e) {
         if (e.isShiftDown() && e.getKeyCode() == KeyEvent.VK_F3) {
-            if (!searchResults.isEmpty()) {
-                resetExtraHighlight();
-                resultIteratorPos =
-                        (resultIteratorPos - 1 + searchResults.size()) % searchResults.size();
-                setExtraHighlight(resultIteratorPos);
-            }
+            highlightPrev();
         } else if (e.getKeyCode() == KeyEvent.VK_F3) {
-            if (!searchResults.isEmpty()) {
-                resetExtraHighlight();
-                resultIteratorPos =
-                        (resultIteratorPos + 1) % searchResults.size();
-                setExtraHighlight(resultIteratorPos);
-            }
+            highlightNext();
         }
     }
 
+    
     /**
      * does nothing
      */
     public void keyReleased(KeyEvent e) {
     }
+
 
     /**
      * constructs the string to serach for
@@ -161,14 +161,11 @@ public class IncrementalSearch implements KeyListener, FocusListener {
         final char ch = e.getKeyChar();
         switch (ch) {
         case KeyEvent.VK_ESCAPE:
-            disableSearchMode();
+            disableSearch();
             return;
         case KeyEvent.VK_BACK_SPACE:
             if (searchStr.length() > 1) {
                 searchStr = searchStr.substring(0, searchStr.length() - 1);
-            } else {
-                disableSearchMode();
-                return;
             }
             break;
         default:
@@ -178,16 +175,20 @@ public class IncrementalSearch implements KeyListener, FocusListener {
         searchPattern();
     }
 
+    
     /**
      * searches for the occurence of the specified string
      */
-    private void searchPattern() {
+    public void searchPattern() {
+        if (seqView.getText() == null) {
+            return;
+        }
        
         String escaped = searchStr.replaceAll
             ("([\\+ | \\* | \\| | \\\\ | \\[ | \\] | \\{ | \\} | \\( | \\)])", 
             "\\\\$1");       
 
-        remonveHighlights();
+        clearSearchResults();
         searchResults.clear();
         resultIteratorPos = 0;
 
@@ -229,20 +230,21 @@ public class IncrementalSearch implements KeyListener, FocusListener {
         } else {
             seqView.updateUpdateHighlights();
         }
-
-        printStatus(status);
     }
 
+    
     private void setExtraHighlight(int resultIndex) {
         resetHighlight(resultIndex,
                        seqView.getColorHighlight(SEARCH_HIGHLIGHT_COLOR_1));
         seqView.setCaretPosition(searchResults.get(resultIndex).first);
     }
 
+
     private void resetExtraHighlight() {
         resetHighlight(resultIteratorPos,
                        seqView.getColorHighlight(SEARCH_HIGHLIGHT_COLOR_2));
     }
+
 
     private void resetHighlight(int resultIndex, Object highlight) {
         int pos = searchResults.get(resultIndex).first;
@@ -254,28 +256,73 @@ public class IncrementalSearch implements KeyListener, FocusListener {
         searchResults.set(resultIndex, highlightPair);
     }
 
-    /**
-     * prints the given String in the statusline
-     */
-    private void printStatus(String text) {
-        if (main != null) {
-            main.setStatusLine(text);
+
+    public void requestFocus() {
+        searchDialog.requestFocus();
+    }
+
+
+    @Override
+    public void insertUpdate(DocumentEvent e) {
+        searchPattern();
+    }
+
+
+    @Override
+    public void removeUpdate(DocumentEvent e) {
+        searchPattern();
+    }
+
+
+    @Override
+    public void changedUpdate(DocumentEvent e) {
+        searchPattern();
+    }
+
+
+
+    private class SearchDialog extends JDialog {
+        JTextField textField;
+        public SearchDialog() {
+            super((JDialog)null, "Search", false);
+            textField = new JTextField();
+            getContentPane().add(textField);
+            setAlwaysOnTop(true);
+            addWindowListener(new WindowAdapter() {
+                public void windowClosing(WindowEvent e) {
+                    disableSearch();
+                }
+            });
         }
-    }
 
-    // the methods below implement the focus listener
-    // incremental search is aborted if the sequent view has no
-    // longer the focus
 
-    public void focusGained(FocusEvent e) {
+        @Override
+        public void addKeyListener(KeyListener l) {
+            textField.addKeyListener(l);
+        }
 
-    }
+        
+        @Override
+        public void requestFocus() {
+            textField.requestFocus();
+        }
 
-    /**
-     * aborts incremental search, if the observed component looses the focus
-     */
-    public void focusLost(FocusEvent e) {
-        disableSearchMode();
-        seqView.removeFocusListener(this);
+        
+        @Override
+        public void setVisible(boolean b) {
+            Dimension dim =
+                    new JTextField("12345678901234567890").getPreferredSize();
+            int x = seqView.getBounds().width - dim.width;
+            int y = seqView.getBounds().height - dim.height;
+            Container parent = seqView.getParent();
+            while (parent != null) {
+                x += parent.getBounds().width;
+                y += parent.getBounds().height;
+                parent = parent.getParent();
+            }
+            Rectangle bounds = new Rectangle(new Point(x, y), dim);
+            setBounds(bounds);
+            super.setVisible(b);
+        }
     }
 }
