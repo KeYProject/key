@@ -22,6 +22,10 @@ import javax.swing.JComponent;
 
 import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.pp.Range;
+import de.uka.ilkd.key.util.Pair;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Implements an incremental search for the sequent view. The incremental search
@@ -32,15 +36,19 @@ import de.uka.ilkd.key.pp.Range;
  */
 public class IncrementalSearch implements KeyListener, FocusListener {
 
-    private int         startPos;
+    public static final Color SEARCH_HIGHLIGHT_COLOR_1 =
+            new Color(255, 140, 0, 178);
+    public static final Color SEARCH_HIGHLIGHT_COLOR_2 =
+            new Color(255, 140, 0, 76);
 
-    private String      searchStr;
+    private String searchStr;
 
-    private Object      searchHighlight;
+    private List<Pair<Integer,Object>> searchResults;
+    private int resultIteratorPos;
 
     private SequentView seqView;
 
-    private IMain        main;
+    private IMain main;
 
     /**
      * create and initialize a new incremental search run
@@ -90,8 +98,7 @@ public class IncrementalSearch implements KeyListener, FocusListener {
      */
     private void init() {
         searchStr = "";
-        startPos = seqView.getCaret().getMark();
-        searchHighlight = seqView.getColorHighlight(Color.RED);
+        searchResults = new ArrayList<Pair<Integer,Object>>();
 
         seqView.addKeyListener(this);
         seqView.addFocusListener(this);
@@ -103,14 +110,20 @@ public class IncrementalSearch implements KeyListener, FocusListener {
     private void disableSearchMode() {
         seqView.removeKeyListener(this);
         seqView.removeFocusListener(this);
-        seqView.removeHighlight(searchHighlight);
+        remonveHighlights();
 
         searchStr = "";
-        startPos = 0;
 
         if (main != null) {
             main.setStandardStatusLine();
         }
+    }
+
+    private void remonveHighlights() {
+        for (Pair result : searchResults) {
+            seqView.removeHighlight(result.second);
+        }
+        searchResults.clear();
     }
 
     /**
@@ -118,10 +131,20 @@ public class IncrementalSearch implements KeyListener, FocusListener {
      * is pressed
      */
     public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_F3) {
-            startPos = startPos + 1;
-            seqView.setCaretPosition(startPos);
-            searchPattern();
+        if (e.isShiftDown() && e.getKeyCode() == KeyEvent.VK_F3) {
+            if (!searchResults.isEmpty()) {
+                resetExtraHighlight();
+                resultIteratorPos =
+                        (resultIteratorPos - 1 + searchResults.size()) % searchResults.size();
+                setExtraHighlight(resultIteratorPos);
+            }
+        } else if (e.getKeyCode() == KeyEvent.VK_F3) {
+            if (!searchResults.isEmpty()) {
+                resetExtraHighlight();
+                resultIteratorPos =
+                        (resultIteratorPos + 1) % searchResults.size();
+                setExtraHighlight(resultIteratorPos);
+            }
         }
     }
 
@@ -163,8 +186,10 @@ public class IncrementalSearch implements KeyListener, FocusListener {
         String escaped = searchStr.replaceAll
             ("([\\+ | \\* | \\| | \\\\ | \\[ | \\] | \\{ | \\} | \\( | \\)])", 
             "\\\\$1");       
-            
-        seqView.disableHighlights();
+
+        remonveHighlights();
+        searchResults.clear();
+        resultIteratorPos = 0;
 
         int caseInsensitiveFlag = 0;
 
@@ -187,18 +212,46 @@ public class IncrementalSearch implements KeyListener, FocusListener {
 
         String status = "Search: " + searchStr;
 
-        if (m.find(startPos)) {
-            int foundAt = m.start();
-            startPos = foundAt;
-            seqView.setCaretPosition(foundAt);
-            seqView.paintHighlight(new Range(foundAt, foundAt
-                    + searchStr.length()), searchHighlight);
-        } else {
-            startPos = 0;
+        boolean loopNotEnterd = true;
+        while (m.find()) {
+                int foundAt = m.start();
+                Object highlight = seqView.getColorHighlight(SEARCH_HIGHLIGHT_COLOR_2);
+                searchResults.add(new Pair<Integer,Object>(foundAt, highlight));
+                seqView.paintHighlight(new Range(foundAt, foundAt
+                        + searchStr.length()), highlight);
+                if (loopNotEnterd) {
+                    setExtraHighlight(0);
+                    loopNotEnterd = false;
+                }
+        }
+        if (loopNotEnterd) {
             status += " (not found)";
+        } else {
+            seqView.updateUpdateHighlights();
         }
 
         printStatus(status);
+    }
+
+    private void setExtraHighlight(int resultIndex) {
+        resetHighlight(resultIndex,
+                       seqView.getColorHighlight(SEARCH_HIGHLIGHT_COLOR_1));
+        seqView.setCaretPosition(searchResults.get(resultIndex).first);
+    }
+
+    private void resetExtraHighlight() {
+        resetHighlight(resultIteratorPos,
+                       seqView.getColorHighlight(SEARCH_HIGHLIGHT_COLOR_2));
+    }
+
+    private void resetHighlight(int resultIndex, Object highlight) {
+        int pos = searchResults.get(resultIndex).first;
+        seqView.removeHighlight(searchResults.get(resultIndex).second);
+        Pair<Integer, Object> highlightPair =
+                new Pair<Integer, Object>(pos, highlight);
+        seqView.paintHighlight(new Range(pos, pos + searchStr.length()), highlight);
+        seqView.updateUpdateHighlights();
+        searchResults.set(resultIndex, highlightPair);
     }
 
     /**
