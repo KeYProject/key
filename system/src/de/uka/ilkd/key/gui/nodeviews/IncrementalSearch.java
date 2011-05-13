@@ -168,6 +168,9 @@ public class IncrementalSearch implements KeyListener, DocumentListener {
                 searchStr = searchStr.substring(0, searchStr.length() - 1);
             }
             break;
+        case KeyEvent.VK_ENTER:
+            highlightNext();
+            return;
         default:
             searchStr += ch;
             break;
@@ -211,8 +214,6 @@ public class IncrementalSearch implements KeyListener, DocumentListener {
         
         Matcher m = p.matcher(seqView.getText());
 
-        String status = "Search: " + searchStr;
-
         boolean loopNotEnterd = true;
         while (m.find()) {
                 int foundAt = m.start();
@@ -225,9 +226,7 @@ public class IncrementalSearch implements KeyListener, DocumentListener {
                     loopNotEnterd = false;
                 }
         }
-        if (loopNotEnterd) {
-            status += " (not found)";
-        } else {
+        if (!loopNotEnterd) {
             seqView.updateUpdateHighlights();
         }
     }
@@ -310,18 +309,20 @@ public class IncrementalSearch implements KeyListener, DocumentListener {
         
         @Override
         public void setVisible(boolean b) {
-            Dimension dim =
-                    new JTextField("12345678901234567890").getPreferredSize();
-            int x = seqView.getBounds().width - dim.width;
-            int y = seqView.getBounds().height - dim.height;
-            Container parent = seqView.getParent();
-            while (parent != null) {
-                x += parent.getBounds().width;
-                y += parent.getBounds().height;
-                parent = parent.getParent();
+            if (seqView != null && seqView.getBounds() != null) {
+                Dimension dim =
+                        new JTextField("12345678901234567890").getPreferredSize();
+                int x = seqView.getBounds().width - dim.width;
+                int y = seqView.getBounds().height - dim.height;
+                Container parent = seqView.getParent();
+                while (parent != null) {
+                    x += parent.getBounds().width;
+                    y += parent.getBounds().height;
+                    parent = parent.getParent();
+                }
+                Rectangle bounds = new Rectangle(new Point(x, y), dim);
+                setBounds(bounds);
             }
-            Rectangle bounds = new Rectangle(new Point(x, y), dim);
-            setBounds(bounds);
             super.setVisible(b);
         }
     }
