@@ -171,6 +171,7 @@ public class IncrementalSearch {
      */
     public void searchPattern() {
         if (seqView.getText() == null || searchStr.equals("")) {
+            clearSearchResults();
             return;
         }
        
