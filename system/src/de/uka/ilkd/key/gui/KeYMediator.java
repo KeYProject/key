@@ -11,8 +11,6 @@
 package de.uka.ilkd.key.gui;
 
 import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -53,6 +51,7 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.feature.AbstractBetaFeature;
 import de.uka.ilkd.key.strategy.feature.IfThenElseMalusFeature;
 import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.util.GuiUtilities;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
@@ -272,7 +271,7 @@ public class KeYMediator {
             Runnable swingProzac = new Runnable() {
                public void run() { setProofHelper(pp); }
             };
-	    invokeAndWait(swingProzac);
+            GuiUtilities.invokeAndWait(swingProzac);
         }        
     }
 
@@ -715,46 +714,10 @@ public class KeYMediator {
 	    dlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 	    dlg.getContentPane().add((Component)message);
 	    dlg.pack();
-	    setCenter(dlg, mainFrame());
+	    GuiUtilities.setCenter(dlg, mainFrame());
 	    dlg.setVisible(true);
 	}
     }
-
-    /**
-     * Center a component within a parental component.
-     * @param comp the component to be centered.
-     * @param parent center relative to what. <code>null</code> to center relative to screen.
-     * @see #setCenter(Component)
-     */
-    public static void setCenter(Component comp, Component parent) {
-	if (parent == null) {
-	    setCenter(comp);
-	    return;
-	} 
-	Dimension dlgSize = comp.getPreferredSize();
-	Dimension frmSize = parent.getSize();
-	Point	  loc = parent.getLocation();
-	if (dlgSize.width < frmSize.width && dlgSize.height < frmSize.height)
-	    comp.setLocation((frmSize.width - dlgSize.width) / 2 + loc.x, (frmSize.height - dlgSize.height) / 2 + loc.y);
-	else
-	    setCenter(comp);
-    } 
-
-    /**
-     * Center a component on the screen.
-     * @param comp the component to be centered relative to the screen.
-     *  It must already have its final size set.
-     * @preconditions comp.getSize() as on screen.
-     */
-    public static void setCenter(Component comp) {
-	Dimension screenSize = comp.getToolkit().getScreenSize();
-	Dimension frameSize = comp.getSize();
-	if (frameSize.height > screenSize.height)
-	    frameSize.height = screenSize.height;
-	if (frameSize.width > screenSize.width)
-	    frameSize.width = screenSize.width;
-	comp.setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
-    } 
 
     private int goalsClosedByAutoMode=0;
 
@@ -785,7 +748,7 @@ public class KeYMediator {
             }
          }
       };
-      invokeAndWait(interfaceSignaller);
+      GuiUtilities.invokeAndWait(interfaceSignaller);
    }
 
    public void startInterface(boolean fullStop) {
@@ -799,26 +762,11 @@ public class KeYMediator {
                 keySelectionModel.fireSelectedProofChanged();
          }
       };
-      invokeAndWait(interfaceSignaller);
+      GuiUtilities.invokeAndWait(interfaceSignaller);
    }
    
 
-   public static void invokeAndWait(Runnable runner) {
-        if (SwingUtilities.isEventDispatchThread()) runner.run();
-        else {
-            try{
-               SwingUtilities.invokeAndWait(runner);
-            } catch(InterruptedException e) {
-	        System.err.println(e);
-	        e.printStackTrace();
-            } catch(java.lang.reflect.InvocationTargetException ite) {
-	       Throwable targetExc = ite.getTargetException();
-               System.err.println(targetExc);
-	       targetExc.printStackTrace();
-               ite.printStackTrace();
-            }
-        }
-    }
+  
     
     
     public boolean autoMode() {

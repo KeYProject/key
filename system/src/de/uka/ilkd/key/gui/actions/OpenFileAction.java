@@ -7,6 +7,7 @@ import java.io.File;
 import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.util.GuiUtilities;
 
 public class OpenFileAction extends MainWindowAction {
     
@@ -20,7 +21,7 @@ public class OpenFileAction extends MainWindowAction {
     
     public void actionPerformed(ActionEvent e) {
         KeYFileChooser keYFileChooser = 
-            MainWindow.getFileChooser("Select file to load proof or problem");
+            GuiUtilities.getFileChooser("Select file to load proof or problem");
         
         boolean loaded = keYFileChooser.showOpenDialog(mainWindow);
         

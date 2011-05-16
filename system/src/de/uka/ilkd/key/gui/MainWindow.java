@@ -11,17 +11,14 @@
 package de.uka.ilkd.key.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Cursor;
-import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridBagLayout;
 import java.awt.Point;
-import java.awt.TextArea;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -123,6 +120,7 @@ import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.util.GuiUtilities;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.key.util.MiscTools;
 
@@ -194,8 +192,6 @@ public final class MainWindow extends JFrame  {
     
     public boolean frozen = false;
    
-    private static KeYFileChooser fileChooser = null;
-    
     private static final String PARA = 
        "<p style=\"font-family: lucida;font-size: 12pt;font-weight: bold\">";
        
@@ -252,12 +248,16 @@ public final class MainWindow extends JFrame  {
     /**
      * creates prover -- private, use {@link #createInstance(String)}
      * 
-     * @param title
-     *            the String containing the frame's title
      */
     private MainWindow() {
     }
     
+    /**
+     * initialize the singleton object of this class.
+     * 
+     * @param title
+     *            the frame's title
+     */
     private void initialize(String title) {
         setTitle(title);
         setIconImage(IconFactory.keyLogo());
@@ -287,11 +287,6 @@ public final class MainWindow extends JFrame  {
         
         addWindowListener(exitMainAction.windowListener);
         
-    }
-    
-    // TODO remove this as soon as batch mode is not an option here any more
-    public void setUserInterface(UserInterface userInterface) {
-        this.userInterface = userInterface;
     }
     
     private void initNotification() {
@@ -362,16 +357,6 @@ public final class MainWindow extends JFrame  {
         super.setVisible(v && visible);
     }
     
-    /** paints empty view */
-    private void paintEmptyViewComponent(JComponent pane, String name) { 	
-	pane.setBorder(new TitledBorder(name));
-	pane.setBackground(Color.white);
-	if (pane instanceof JScrollPane) {
-	    ((JScrollPane) pane).getViewport().setBackground(Color.white);
-        }
-	pane.setMinimumSize(new java.awt.Dimension(150,0));
-    }
-    
     /** initialised, creates GUI and lays out the main frame */
     private void layoutMain() {
         // set overall layout manager
@@ -430,14 +415,14 @@ public final class MainWindow extends JFrame  {
         toolBarPanel.add(fileOpToolBar);
         
         // FIXME double entry?
-        getContentPane().add(getClipBoardArea(), BorderLayout.PAGE_START);
+        getContentPane().add(GuiUtilities.getClipBoardArea(), BorderLayout.PAGE_START);
         getContentPane().add(toolBarPanel, BorderLayout.PAGE_START);
         
         // create tabbed pane
         tabbedPane = createTabbedPane();
 
         proofListView.setPreferredSize(new java.awt.Dimension(250, 100));
-        paintEmptyViewComponent(proofListView, "Proofs");
+        GuiUtilities.paintEmptyViewComponent(proofListView, "Proofs");
         
         JSplitPane leftPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, proofListView, tabbedPane);
         leftPane.setOneTouchExpandable(true);
@@ -471,7 +456,7 @@ public final class MainWindow extends JFrame  {
         "copy");
         goalView.getActionMap().put("copy", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                copyHighlightToClipboard(sequentView);
+                GuiUtilities.copyHighlightToClipboard(sequentView);
             }
         });
     }
@@ -534,7 +519,7 @@ public final class MainWindow extends JFrame  {
     
     private void createViews() {
 	goalView = new JScrollPane();
-	paintEmptyViewComponent(goalView, "Current Goal");	
+	GuiUtilities.paintEmptyViewComponent(goalView, "Current Goal");	
 
 //	proofView = new JPanel();
 //        proofView.setLayout(new BorderLayout(0,0));
@@ -542,7 +527,7 @@ public final class MainWindow extends JFrame  {
 //	paintEmptyViewComponent(proofView, "Proof");
 
 	openGoalsView = new JScrollPane();
-	paintEmptyViewComponent(openGoalsView, "Open Goals");
+	GuiUtilities.paintEmptyViewComponent(openGoalsView, "Open Goals");
 	
         proofListView = new JScrollPane();
 
@@ -614,7 +599,7 @@ public final class MainWindow extends JFrame  {
      * Make the status line display a standard message, make progress bar and abort button invisible
      */
     public void setStandardStatusLine() {
-	invokeOnEventQueue(new Runnable() {
+        GuiUtilities.invokeOnEventQueue(new Runnable() {
 	    public void run() {
 		setStandardStatusLineImmediately();
 	    }
@@ -639,7 +624,7 @@ public final class MainWindow extends JFrame  {
      * the progress bar range to the given value, set the current progress to zero
      */
     public void setStatusLine(final String str, final int max) {
-	invokeOnEventQueue(new Runnable() {
+        GuiUtilities.invokeOnEventQueue(new Runnable() {
 	    public void run() {
 		setStatusLineImmediately(str, max);
 	    }
@@ -726,36 +711,6 @@ public final class MainWindow extends JFrame  {
         proofList.setSize(proofList.getPreferredSize());
         proofListView.setViewportView(proofList);
     }
-    
-    private static java.awt.TextArea clipBoardTextArea;
-
-    private static TextArea getClipBoardArea() {
-	if (clipBoardTextArea == null) {
-	    clipBoardTextArea = new java.awt.TextArea(
-		    "",10,10,java.awt.TextArea.SCROLLBARS_NONE) {
-		public java.awt.Dimension getMaximumSize() {
-		    return new java.awt.Dimension(0,0);
-		}
-	    };
-	}
-	return clipBoardTextArea;
-    }
-
- 
-    
-    public static void copyHighlightToClipboard(SequentView view) {
-        String s = view.getHighlightedText();
-        // now CLIPBOARD
-        java.awt.datatransfer.StringSelection ss = 
-            new java.awt.datatransfer.StringSelection(s);
-        final TextArea clipBoard = getClipBoardArea();
-        clipBoard.getToolkit().getSystemClipboard().setContents(ss,ss);
-        // now PRIMARY
-        clipBoard.setText(s);
-        clipBoard.selectAll();
-    }
-    
-    // ------------------ MENU -------------------------------
     
     /** creates menubar entries and adds them to menu bar */
     private JMenuBar createMenuBar() {
@@ -1035,21 +990,9 @@ public final class MainWindow extends JFrame  {
     }
     
     
-    public static KeYFileChooser getFileChooser(String title) {
-        if (fileChooser == null) {
-            String initDir = Main.getFileNameOnStartUp() == null 
-                             ? System.getProperty("user.dir")
-                             : Main.getFileNameOnStartUp();
-            fileChooser = new KeYFileChooser(initDir);
-        }
-        fileChooser.setDialogTitle(title);
-        fileChooser.prepare();
-        return fileChooser;
-    }
-    
     /** saves a proof */
     private void saveProof() {
-        final KeYFileChooser jFC = getFileChooser("Choose filename to save proof");
+        final KeYFileChooser jFC = GuiUtilities.getFileChooser("Choose filename to save proof");
         final String defaultName 
         	= MiscTools.toValidFileName(mediator.getSelectedProof()
         		                            .name()
@@ -1144,7 +1087,7 @@ public final class MainWindow extends JFrame  {
             }
         };
 
-        KeYMediator.invokeAndWait(guiUpdater);
+        GuiUtilities.invokeAndWait(guiUpdater);
     }
     
     private Proof setUpNewProof(Proof proof) {
@@ -1152,10 +1095,6 @@ public final class MainWindow extends JFrame  {
         return proof;
     }
     
-  
-    
-    
-
     private final class SMTSettingsListener implements SettingsListener {	
 	private SMTSettings settings;
 
@@ -1890,7 +1829,7 @@ public final class MainWindow extends JFrame  {
         }
         
         if(visible && !instance.isVisible()) {
-            invokeOnEventQueue(new Runnable() {
+            GuiUtilities.invokeOnEventQueue(new Runnable() {
                 public void run() {                            
                     instance.setVisible(true);
                 }
@@ -1898,14 +1837,6 @@ public final class MainWindow extends JFrame  {
         }
         
         return instance;
-    }
-
-    public static void invokeOnEventQueue(Runnable runnable) {
-        if(EventQueue.isDispatchThread()) {
-            runnable.run();
-        } else {
-            SwingUtilities.invokeLater(runnable);
-        }
     }
 
     public static void createInstance(String title) {

@@ -6,6 +6,7 @@ import java.awt.event.KeyEvent;
 import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.util.GuiUtilities;
 import de.uka.ilkd.key.util.MiscTools;
 
 /**
@@ -25,7 +26,7 @@ public final class SaveFileAction extends MainWindowAction {
     
     public void actionPerformed(ActionEvent e) {
         if (mainWindow.getMediator().ensureProofLoaded()) {
-            final KeYFileChooser jFC = MainWindow.getFileChooser("Choose filename to save proof");
+            final KeYFileChooser jFC = GuiUtilities.getFileChooser("Choose filename to save proof");
             
             final String defaultName 
             	= MiscTools.toValidFileName(mainWindow.getMediator().getSelectedProof()

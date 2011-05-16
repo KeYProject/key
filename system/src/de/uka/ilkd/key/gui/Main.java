@@ -15,6 +15,7 @@ import de.uka.ilkd.key.ui.BatchMode;
 import de.uka.ilkd.key.ui.ConsoleUserInterface;
 import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.util.GuiUtilities;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
 /**
@@ -60,7 +61,7 @@ public class Main {
             MainWindow.visible = false;
         }
 
-        KeYMediator.invokeAndWait(new Runnable() {
+        GuiUtilities.invokeAndWait(new Runnable() {
             public void run() {
                 MainWindow.createInstance("KeY " + KeYResourceManager.getManager().getVersion());                
             }
@@ -200,7 +201,7 @@ public class Main {
     /**
      * @return the fileNameOnStartUp
      */
-    static String getFileNameOnStartUp() {
+    public static String getFileNameOnStartUp() {
         return fileNameOnStartUp;
     }
 
