@@ -13,7 +13,6 @@ package de.uka.ilkd.key.gui;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
-import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -31,13 +30,26 @@ import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.notification.events.ProofClosedNotificationEvent;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.PosInSequent;
-import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofEvent;
+import de.uka.ilkd.key.proof.ProofTreeAdapter;
+import de.uka.ilkd.key.proof.ProofTreeEvent;
+import de.uka.ilkd.key.proof.ProofTreeRemovedNodeEvent;
+import de.uka.ilkd.key.proof.TacletFilter;
+import de.uka.ilkd.key.proof.TermTacletAppIndexCacheSet;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.feature.AbstractBetaFeature;
 import de.uka.ilkd.key.strategy.feature.IfThenElseMalusFeature;
 import de.uka.ilkd.key.util.Debug;
@@ -93,19 +105,20 @@ public class KeYMediator {
 	defaultExceptionHandler = new KeYRecoderExcHandler();
     }
 
-    public void addinterruptListener(InterruptListener il) {
-	this.interruptListener.add(il);
-    }
+// not used
+//    public void addinterruptListener(InterruptListener il) {
+//	this.interruptListener.add(il);
+//    }
     
-    public void removeInterruptListener(InterruptListener il) {
-	this.interruptListener.remove(il);
-    }
+//    public void removeInterruptListener(InterruptListener il) {
+//	this.interruptListener.remove(il);
+//    }
     
-    public void interrupted(ActionEvent e) {
-	for (InterruptListener il : interruptListener) {
-	    il.interruptionPerformed(e);
-	}
-    }
+//    public void interrupted(ActionEvent e) {
+//	for (InterruptListener il : interruptListener) {
+//	    il.interruptionPerformed(e);
+//	}
+//    }
     
     /** returns the used NotationInfo
      * @return the used NotationInfo
@@ -923,7 +936,7 @@ public class KeYMediator {
         if (profile == null) {               
             profile = ProofSettings.DEFAULT_SETTINGS.getProfile();   
             if (profile == null) {
-                profile = new JavaProfile((IMain) this.mainFrame());
+                profile = new JavaProfile();
             }
         }
         return profile;
@@ -958,6 +971,7 @@ public class KeYMediator {
     /** 
      * returns the prover task listener of the main frame
      */
+    // TODO used 1 time, drop it? (MU)
     public ProverTaskListener getProverTaskListener() {
         return mainFrame.getUserInterface();
     }

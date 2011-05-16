@@ -141,7 +141,8 @@ public final class AutoModeAction extends MainWindowAction {
 	if (!mainWindow.frozen)
 	    getMediator().startAutoMode();
 	else {
-	    getMediator().interrupted(e);
+	    // this interface is no longer used (MU)
+//	    getMediator().interrupted(e);
 	    getMediator().stopAutoMode();
 	}
     }
