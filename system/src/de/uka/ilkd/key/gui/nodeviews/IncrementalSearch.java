@@ -170,8 +170,9 @@ public class IncrementalSearch {
      * searches for the occurence of the specified string
      */
     public void searchPattern() {
-        if (seqView.getText() == null || searchStr.equals("")) {
+        if (seqView == null || seqView.getText() == null || searchStr.equals("")) {
             clearSearchResults();
+            searchDialog.deactivateAllertColor();
             return;
         }
        
@@ -202,20 +203,23 @@ public class IncrementalSearch {
         
         Matcher m = p.matcher(seqView.getText());
 
-        boolean loopNotEnterd = true;
+        boolean loopEnterd = false;
         while (m.find()) {
                 int foundAt = m.start();
                 Object highlight = seqView.getColorHighlight(SEARCH_HIGHLIGHT_COLOR_2);
                 searchResults.add(new Pair<Integer,Object>(foundAt, highlight));
                 seqView.paintHighlight(new Range(foundAt, foundAt
                         + searchStr.length()), highlight);
-                if (loopNotEnterd) {
+                if (!loopEnterd) {
                     setExtraHighlight(0);
-                    loopNotEnterd = false;
+                    loopEnterd = true;
                 }
         }
-        if (!loopNotEnterd) {
+        if (loopEnterd) {
             seqView.updateUpdateHighlights();
+            searchDialog.deactivateAllertColor();
+        } else {
+            searchDialog.activateAllertColor();
         }
     }
 
@@ -252,8 +256,9 @@ public class IncrementalSearch {
     
 
     private class SearchDialog extends JDialog {
+        public final Color ALLERT_COLOR = new Color(255, 178, 178);
         
-        JTextField textField;
+        private JTextField textField;
 
 
         public SearchDialog() {
@@ -300,6 +305,16 @@ public class IncrementalSearch {
 
         public String getText() {
             return textField.getText();
+        }
+
+
+        public void activateAllertColor() {
+            textField.setBackground(ALLERT_COLOR);
+        }
+
+
+        public void deactivateAllertColor() {
+            textField.setBackground(Color.WHITE);
         }
 
         
