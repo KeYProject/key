@@ -38,6 +38,8 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
+import de.uka.ilkd.key.gui.IconFactory;
+
 public class SMTSettingsDialog {
     public final static SMTSettingsDialog INSTANCE = new SMTSettingsDialog();
     public final static Component EMPTY_LINE = createSeperator();
@@ -94,6 +96,7 @@ public class SMTSettingsDialog {
 	    jDialog.setLocationByPlatform(true);
 	    getSplitPane().setDividerLocation(
 		    (int) (1.5 * getOptionTree().getPreferredSize().width));
+	    jDialog.setIconImage(IconFactory.keyLogo());
 
 	}
 	return jDialog;

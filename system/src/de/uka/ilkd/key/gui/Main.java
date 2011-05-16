@@ -1075,6 +1075,7 @@ public final class Main extends JFrame implements IMain {
         text.setCaretPosition(0);
         scroll.setViewportView(text);
         JFrame fr = new JFrame("KeY License");
+        fr.setIconImage(IconFactory.keyLogo());
         fr.getContentPane().setLayout(new BorderLayout());
         fr.getContentPane().add(scroll,BorderLayout.CENTER);
         JButton ok = new JButton("OK");
@@ -1092,7 +1093,7 @@ public final class Main extends JFrame implements IMain {
     public void showAbout() {
         String aspects = compiledAspects();
         JOptionPane pane =new JOptionPane(
-                COPYRIGHT+"\n\nWWW: http://key-project.org\n\nVersion "+
+                COPYRIGHT+"\n\nWWW: http://key-project.org/\n\nVersion "+
                 VERSION
                 + ((aspects.length()==0) ? "":
                     "\nCompiled with Aspects:\n"+aspects)
