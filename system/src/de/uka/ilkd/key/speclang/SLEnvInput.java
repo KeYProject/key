@@ -27,7 +27,7 @@ import javax.swing.*;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.GeneralSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.JavaInfo;
@@ -109,11 +109,11 @@ public final class SLEnvInput extends AbstractEnvInput {
     
     
     private void showWarningDialog(ImmutableSet<PositionedString> warnings) {
-        if(!Main.visible) {
+        if(!MainWindow.visible) {
             return;
         }
                 
-        final JDialog dialog = new JDialog(Main.getInstance(), 
+        final JDialog dialog = new JDialog(MainWindow.getInstance(), 
                                            getLanguage() + " warning", 
                                            true);
         dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -163,7 +163,7 @@ public final class SLEnvInput extends AbstractEnvInput {
             JComponent.WHEN_IN_FOCUSED_WINDOW);
         
         dialog.setSize(700, 300);
-        dialog.setLocationRelativeTo(Main.getInstance());
+        dialog.setLocationRelativeTo(MainWindow.getInstance());
         dialog.setVisible(true);
         dialog.dispose();
     }

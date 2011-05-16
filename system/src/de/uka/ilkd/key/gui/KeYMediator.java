@@ -47,7 +47,7 @@ import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
 public class KeYMediator {
 
-    private IMain mainFrame;
+    private MainWindow mainFrame;
 
 
     private InteractiveProver interactiveProver;
@@ -80,8 +80,8 @@ public class KeYMediator {
     /** creates the KeYMediator with a reference to the application's
      * main frame and the current proof settings
     */
-    public KeYMediator(IMain mainFrame) {
-	this.mainFrame = mainFrame;
+    public KeYMediator(MainWindow mainWindow) {
+	this.mainFrame = mainWindow;
 	notationInfo        = new NotationInfo();
 	proofListener       = new KeYMediatorProofListener();
 	proofTreeListener   = new KeYMediatorProofTreeListener();
@@ -959,6 +959,6 @@ public class KeYMediator {
      * returns the prover task listener of the main frame
      */
     public ProverTaskListener getProverTaskListener() {
-        return mainFrame.getProverTaskListener();
+        return mainFrame.getUserInterface();
     }
 }
