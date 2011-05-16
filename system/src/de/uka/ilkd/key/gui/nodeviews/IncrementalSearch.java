@@ -10,6 +10,7 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.Color;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.regex.Matcher;
@@ -23,6 +24,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
@@ -39,7 +41,7 @@ import javax.swing.event.DocumentListener;
  * pressing the function key <code>F3</code>.
  * 
  */
-public class IncrementalSearch implements KeyListener, DocumentListener {
+public class IncrementalSearch {
 
     public static final Color SEARCH_HIGHLIGHT_COLOR_1 =
             new Color(255, 140, 0, 178);
@@ -69,9 +71,39 @@ public class IncrementalSearch implements KeyListener, DocumentListener {
         searchStr = "";
         searchResults = new ArrayList<Pair<Integer,Object>>();
         searchDialog = new SearchDialog();
-        searchDialog.addKeyListener(this);
+        searchDialog.addKeyListener(new KeyListener() {
+
+            @Override
+            public void keyTyped(KeyEvent e) {
+                final char ch = e.getKeyChar();
+                switch (ch) {
+                case KeyEvent.VK_ESCAPE:
+                    disableSearch();
+                    return;
+                case KeyEvent.VK_ENTER:
+                    highlightNext();
+                    return;
+                }
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.isShiftDown() && e.getKeyCode() == KeyEvent.VK_F3) {
+                    highlightPrev();
+                } else if (e.getKeyCode() == KeyEvent.VK_F3) {
+                    highlightNext();
+                }
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+            }
+
+        });
+        searchDialog.addDocumentListener(new DocumentListenerAdapter());
     }
 
+    
     public static IncrementalSearch getInstance(){
         return instance;
     }
@@ -104,7 +136,7 @@ public class IncrementalSearch implements KeyListener, DocumentListener {
             disableSearch();
         }
         this.seqView = seqView;
-        this.seqView.getDocument().addDocumentListener(this);
+        this.seqView.getDocument().addDocumentListener(new DocumentListenerAdapter());
         searchDialog.setVisible(true);
         searchPattern();
     }
@@ -116,7 +148,7 @@ public class IncrementalSearch implements KeyListener, DocumentListener {
     private void disableSearch() {
         searchDialog.setVisible(false);
         clearSearchResults();
-        seqView.getDocument().removeDocumentListener(this);
+        seqView.getDocument().removeDocumentListener(new DocumentListenerAdapter());
         seqView = null;
     }
 
@@ -135,55 +167,10 @@ public class IncrementalSearch implements KeyListener, DocumentListener {
 
 
     /**
-     * disables the incremental searcher when the function key <code>F3</code>
-     * is pressed
-     */
-    public void keyPressed(KeyEvent e) {
-        if (e.isShiftDown() && e.getKeyCode() == KeyEvent.VK_F3) {
-            highlightPrev();
-        } else if (e.getKeyCode() == KeyEvent.VK_F3) {
-            highlightNext();
-        }
-    }
-
-    
-    /**
-     * does nothing
-     */
-    public void keyReleased(KeyEvent e) {
-    }
-
-
-    /**
-     * constructs the string to serach for
-     */
-    public void keyTyped(KeyEvent e) {
-        final char ch = e.getKeyChar();
-        switch (ch) {
-        case KeyEvent.VK_ESCAPE:
-            disableSearch();
-            return;
-        case KeyEvent.VK_BACK_SPACE:
-            if (searchStr.length() > 1) {
-                searchStr = searchStr.substring(0, searchStr.length() - 1);
-            }
-            break;
-        case KeyEvent.VK_ENTER:
-            highlightNext();
-            return;
-        default:
-            searchStr = searchDialog.getText();
-            break;
-        }
-        searchPattern();
-    }
-
-    
-    /**
      * searches for the occurence of the specified string
      */
     public void searchPattern() {
-        if (seqView.getText() == null) {
+        if (seqView.getText() == null || searchStr.equals("")) {
             return;
         }
        
@@ -261,24 +248,7 @@ public class IncrementalSearch implements KeyListener, DocumentListener {
     }
 
 
-    @Override
-    public void insertUpdate(DocumentEvent e) {
-        searchPattern();
-    }
-
-
-    @Override
-    public void removeUpdate(DocumentEvent e) {
-        searchPattern();
-    }
-
-
-    @Override
-    public void changedUpdate(DocumentEvent e) {
-        searchPattern();
-    }
-
-
+    
 
     private class SearchDialog extends JDialog {
         
@@ -288,6 +258,18 @@ public class IncrementalSearch implements KeyListener, DocumentListener {
         public SearchDialog() {
             super((JDialog)null, "Search", false);
             textField = new JTextField();
+            textField.setToolTipText("<html>"
+                                     + "This search dialog features "
+                                     + "<b>drag'n'drop</b> and "
+                                     + "<b>copy'n'paste</b>.<br>"
+                                     + "Further more the following shurtcuts "
+                                     + "can be used:<br>"
+                                     + "<b>ENTER</b> or <b>F3</b>: "
+                                     + "highlight next occurrence<br>"
+                                     + "<b>SHIFT F3</b>: "
+                                     + "highlight previous occurrence<br>"
+                                     + "<b>ESC</b>: disable search"
+                                     + "</html>");
             getContentPane().add(textField);
             setAlwaysOnTop(true);
             addWindowListener(new WindowAdapter() {
@@ -301,6 +283,11 @@ public class IncrementalSearch implements KeyListener, DocumentListener {
         @Override
         public void addKeyListener(KeyListener l) {
             textField.addKeyListener(l);
+        }
+
+
+        public void addDocumentListener(DocumentListener l) {
+            textField.getDocument().addDocumentListener(l);
         }
 
         
@@ -332,6 +319,30 @@ public class IncrementalSearch implements KeyListener, DocumentListener {
                 setBounds(bounds);
             }
             super.setVisible(b);
+        }
+    }
+
+
+    private class DocumentListenerAdapter implements DocumentListener {
+
+        @Override
+        public void insertUpdate(DocumentEvent e) {
+            searchStr = searchDialog.getText();
+            searchPattern();
+        }
+
+
+        @Override
+        public void removeUpdate(DocumentEvent e) {
+            searchStr = searchDialog.getText();
+            searchPattern();
+        }
+
+
+        @Override
+        public void changedUpdate(DocumentEvent e) {
+            searchStr = searchDialog.getText();
+            searchPattern();
         }
     }
 }
