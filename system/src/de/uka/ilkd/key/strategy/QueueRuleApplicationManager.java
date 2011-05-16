@@ -101,7 +101,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
     public void ruleAdded(RuleApp rule, PosInOccurrence pos) {
         //System.out.println ( "Rule added: " + rule + "\n");
         
-        //	ensureQueueExists ();
+        	//ensureQueueExists ();
 
         if ( queue == null )
             // then the heap has to be rebuilt completely anyway, and the new
@@ -109,6 +109,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
             return;
         final Iterator<RuleAppContainer> iterator = RuleAppContainer.createAppContainers
         	           ( rule, pos, getGoal (), getStrategy () ).iterator ();
+        ensureQueueExists();
         push ( iterator,  PRIMARY_QUEUE );
     }
 

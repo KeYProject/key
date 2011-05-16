@@ -178,7 +178,7 @@ public abstract class LDT implements Named {
      * translate
      * @param sub the logic subterms of the java operator
      * @param services the Services 
-     * @param ec the ExecutionContext in which the expression is evaluated    * @param services TODO
+     * @param ec the ExecutionContext in which the expression is evaluated    
      * @return  true if the LDT offers an operation for the given java
      * operator and the subterm
      */

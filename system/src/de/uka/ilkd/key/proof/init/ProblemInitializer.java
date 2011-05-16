@@ -16,7 +16,6 @@ import java.util.*;
 import recoder.io.PathList;
 import recoder.io.ProjectSettings;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -39,6 +38,7 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.init.LDTInput.LDTInputListener;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.GlobalProofMgt;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
@@ -49,33 +49,47 @@ import de.uka.ilkd.key.util.ProgressMonitor;
 
 
 public final class ProblemInitializer {
+
     
+    public static interface ProblemInitializerListener{
+	public void proofCreated(ProblemInitializer sender, ProofAggregate proofAggregate);
+	public void progressStarted(Object sender);
+	public void progressStopped(Object sender);
+	public void reportStatus(Object sender, String status, int progress);
+	public void reportStatus(Object sender, String status);
+	public void resetStatus(Object sender);
+	public void reportException(Object sender, ProofOblInput input, Exception e);
+    }    
     private static InitConfig baseConfig;
  
-    private final IMain main;
+    //private final IMain main;
     private final Profile profile;
     private final Services services;
     private final ProgressMonitor progMon;
     private final HashSet<EnvInput> alreadyParsed = new LinkedHashSet<EnvInput>();
-    
-    
+    private final ProblemInitializerListener listener;
+    private final boolean registerProof;
     //-------------------------------------------------------------------------
     //constructors
     //------------------------------------------------------------------------- 
     
-    public ProblemInitializer(IMain main) {
-        this.main       = main;
-        this.progMon    = main == null ? null : main.getProgressMonitor();
-        this.profile    = main == null ? null : main.mediator().getProfile();
-        this.services   = main == null ? null : new Services(main.mediator().getExceptionHandler());
+    public ProblemInitializer(ProgressMonitor mon,
+	                      Profile profile, Services services, boolean registerProof,
+	                      ProblemInitializerListener listener) {
+	this.profile = profile;
+	this.services = services;
+	this.progMon = mon;
+	this.listener = listener;
+	this.registerProof = registerProof;
     }
   
     
     public ProblemInitializer(Profile profile) {
 	assert profile != null;
-	this.main       = null;
         this.progMon    = null;
+        this.listener   = null;
         this.profile    = profile;
+        this.registerProof = false;
         this.services   = new Services();
     }
     
@@ -89,9 +103,10 @@ public final class ProblemInitializer {
      * displays the status report in the status line
      */
     private void reportStatus(String status) {
-	if (main != null) {
-	    main.setStatusLine(status);	
+	if(listener != null){
+	    listener.reportStatus(this,status);
 	}
+
     }
 
     
@@ -102,35 +117,13 @@ public final class ProblemInitializer {
      * @param progressMax an int describing what is 100 per cent
      */
     private void reportStatus(String status, int progressMax) {
-	if (main != null) {
-	    main.setStatusLine(status, progressMax);	
+	if(listener != null){
+	    listener.reportStatus(this,status,progressMax);
 	}
     }
     
 
-    /** 
-     * displays the standard status line
-     */
-    private void reportReady() {
-	if (main != null) {
-	    main.setStandardStatusLine();
-	}
-    }
-    
-    
-    private void stopInterface() {
-	if(main != null) {
-	    main.mediator().stopInterface(true);
-	}
-    }
-    
-    
-    private void startInterface() {
-	if(main != null) {
-	    main.mediator().startInterface(true);
-        }
-    }
-    
+  
     
     /**
      * Helper for readIncludes().
@@ -151,7 +144,14 @@ public final class ProblemInitializer {
 	    keyFile[i++] = new KeYFile(name, in.get(name), progMon);
 	}
 
-        LDTInput ldtInp = new LDTInput(keyFile, main);
+        LDTInput ldtInp = new LDTInput(keyFile, new LDTInputListener() {
+	    @Override
+	    public void reportStatus(String status, int progress) {
+		if(listener != null){
+		    listener.reportStatus(ProblemInitializer.this, status, progress);
+		}		
+	    }
+	});
 	
 	//read the LDTInput
 	readEnvInput(ldtInp, initConfig);
@@ -310,7 +310,7 @@ public final class ProblemInitializer {
     }
     
     
-    private void readEnvInput(EnvInput envInput, 
+    public final void readEnvInput(EnvInput envInput, 
 			      InitConfig initConfig) 
     		throws ProofInputException {
 	if(alreadyParsed.add(envInput)){
@@ -400,7 +400,8 @@ public final class ProblemInitializer {
 	env.setRuleConfig(ruleConfig);
 	
 	//register the proof environment
-	if(main != null) {
+	//if(main != null) {
+	 if(registerProof){
 	    GlobalProofMgt.getInstance().registerProofEnvironment(env);
 	}
     	               	
@@ -408,9 +409,9 @@ public final class ProblemInitializer {
     }
 
 
-    private void setUpProofHelper(ProofOblInput problem, InitConfig initConfig) 
+    private void setUpProofHelper(ProofOblInput problem,ProofAggregate pl, InitConfig initConfig) 
 	throws ProofInputException {
-	ProofAggregate pl = problem.getPO();
+	//ProofAggregate pl = problem.getPO();
 	if(pl == null) {
 	   throw new ProofInputException("No proof");
 	}
@@ -426,9 +427,7 @@ public final class ProblemInitializer {
 	    populateNamespaces(proofs[i]);
 	}
 	initConfig.getProofEnv().registerProof(problem, pl);
-	if(main != null) {
-            main.addProblem(pl);
-        }
+
     }
     
     
@@ -441,7 +440,9 @@ public final class ProblemInitializer {
      * Creates an initConfig / a proof environment and reads an EnvInput into it
      */
     public InitConfig prepare(EnvInput envInput) throws ProofInputException {
-	stopInterface();
+	if(listener != null){
+	    listener.progressStarted(this);
+	}
 	alreadyParsed.clear();
 
 	//the first time, read in standard rules
@@ -457,10 +458,14 @@ public final class ProblemInitializer {
     	    	readEnvInput(tacletBaseFile, baseConfig);
 	    }	    
 	}
+	  return prepare(envInput, baseConfig);
 	
-	//create initConfig
-        InitConfig initConfig = baseConfig.copy();
-
+	}
+    
+    public InitConfig prepare(EnvInput envInput, InitConfig referenceConfig)throws ProofInputException{
+        //create initConfig
+         InitConfig initConfig = referenceConfig.copy();
+        
 	//register built in rules
         for(Rule r : profile.getStandardRules().getStandardBuiltInRules()) {
     	    initConfig.getProofEnv().registerRule(r, 
@@ -503,8 +508,9 @@ public final class ProblemInitializer {
         readEnvInput(envInput, initConfig);
         
         //done
-        reportReady();
-	startInterface();
+        if(listener !=null){
+           listener.progressStopped(this); 
+        }
 	return initConfig;
     }
 
@@ -512,7 +518,9 @@ public final class ProblemInitializer {
     public void startProver(InitConfig initConfig, ProofOblInput po) 
     		throws ProofInputException {
 	assert initConfig != null;
-	stopInterface();	
+	if(listener!= null){
+	    listener.progressStarted(this);
+	}
         try {
             //determine environment
             initConfig = determineEnvironment(po, initConfig);
@@ -520,17 +528,26 @@ public final class ProblemInitializer {
             //read problem
     	    reportStatus("Loading problem \"" + po.name() + "\"");
     	    po.readProblem();
-    	    
+    	    ProofAggregate pa = po.getPO();
     	    //final work
-    	    setUpProofHelper(po, initConfig);
-    	    
+    	    setUpProofHelper(po, pa,initConfig);
+
 	    //done
-	    reportReady();    	    
-        } catch (ProofInputException e) {           
-            reportStatus(po.name() + " failed");
+    	    if(listener != null){
+                listener.proofCreated(this, pa);
+            }
+               	    
+        } catch (ProofInputException e) {    
+            if(listener != null){
+        	listener.reportException(this, po, e);
+            }
+           
             throw e;            
         } finally {
-            startInterface();            
+            if(listener != null){
+        	listener.progressStopped(this);
+            }
+                   
         }    
     }
     

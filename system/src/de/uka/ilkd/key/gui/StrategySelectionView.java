@@ -45,6 +45,7 @@ public final class StrategySelectionView extends JPanel {
     ButtonGroup loopGroup = new ButtonGroup();
     ButtonGroup methodGroup = new ButtonGroup();
     ButtonGroup depGroup = new ButtonGroup();
+    ButtonGroup queryGroup = new ButtonGroup();
     ButtonGroup nonLinArithGroup = new ButtonGroup();
     ButtonGroup quantifierGroup = new ButtonGroup();
     ButtonGroup stopModeGroup = new ButtonGroup();    
@@ -66,6 +67,8 @@ public final class StrategySelectionView extends JPanel {
     private JRadioButtonHashMap splittingDelayed;
     private JRadioButtonHashMap depOn;
     private JRadioButtonHashMap depOff;
+    private JRadioButtonHashMap queryOn;
+    private JRadioButtonHashMap queryOff;
     private JRadioButtonHashMap nonLinArithNone;
     private JRadioButtonHashMap nonLinArithDefOps;
     private JRadioButtonHashMap nonLinArithCompletion;
@@ -313,6 +316,31 @@ public final class StrategySelectionView extends JPanel {
         ++yCoord;
         addJavaDLOptionSpace ( javaDLOptionsLayout, yCoord );
 
+        ////////////////////////////////////////////////////////////////////////
+
+        ++yCoord;
+        
+        addJavaDLOption ( new JLabel ( "Query treatment" ),
+                    javaDLOptionsLayout, 1, yCoord, 7 );
+        
+        ++yCoord;
+
+        queryOn = new JRadioButtonHashMap("On", 
+                StrategyProperties.QUERY_ON, false, false);
+        queryGroup.add(queryOn);
+        addJavaDLOption ( queryOn, javaDLOptionsLayout, 2, yCoord, 2 );        
+        
+        queryOff = new JRadioButtonHashMap("Off", 
+                StrategyProperties.QUERY_OFF, false, false);
+        queryOff.setToolTipText ( "<html>Rewrite query to a method call so that contracts or inlining can be used.</html>" );
+        queryGroup.add(queryOff);
+        addJavaDLOption ( queryOff, javaDLOptionsLayout, 4, yCoord, 2 );
+
+        
+        ++yCoord;
+        addJavaDLOptionSpace ( javaDLOptionsLayout, yCoord );
+       
+        
   
         ++yCoord;
         
@@ -541,6 +569,8 @@ public final class StrategySelectionView extends JPanel {
         rdBut18.addActionListener(optListener);
         depOn.addActionListener(optListener);
         depOff.addActionListener(optListener);
+        queryOn.addActionListener(optListener);
+        queryOff.addActionListener(optListener);
         splittingNormal.addActionListener(optListener);
         splittingDelayed.addActionListener(optListener);
         splittingOff.addActionListener(optListener);
@@ -785,6 +815,10 @@ public final class StrategySelectionView extends JPanel {
             JRadioButton bDepActive = getStrategyOptionButton(activeDepOptions, 
                     StrategyProperties.DEP_OPTIONS_KEY);
             bDepActive.setSelected(true);   
+            String activeQueryOptions = p.getProperty(StrategyProperties.QUERY_OPTIONS_KEY);
+            JRadioButton bQueryActive = getStrategyOptionButton(activeQueryOptions, 
+                    StrategyProperties.QUERY_OPTIONS_KEY);
+            bQueryActive.setSelected(true);   
             String activeNonLinArithOptions = p.getProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY);
             JRadioButton bNonLinArithActive = getStrategyOptionButton(activeNonLinArithOptions, 
                     StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY);
@@ -897,6 +931,8 @@ public final class StrategySelectionView extends JPanel {
                        methodGroup.getSelection().getActionCommand());
         p.setProperty( StrategyProperties.DEP_OPTIONS_KEY, 
                        depGroup.getSelection().getActionCommand());
+        p.setProperty( StrategyProperties.QUERY_OPTIONS_KEY, 
+                       queryGroup.getSelection().getActionCommand());
         p.setProperty( StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY, 
                        nonLinArithGroup.getSelection().getActionCommand());
         p.setProperty( StrategyProperties.QUANTIFIERS_OPTIONS_KEY, 

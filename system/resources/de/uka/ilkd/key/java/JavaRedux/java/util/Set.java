@@ -7,18 +7,32 @@ public interface Set extends java.util.Collection
 {
 
    public int size();
+   
    public boolean isEmpty();
+   
    public boolean contains(java.lang.Object arg0);
+   
    public java.util.Iterator iterator();
+   
    public java.lang.Object[] toArray();
+   
    public java.lang.Object[] toArray(java.lang.Object[] arg0);
+   
    public boolean add(java.lang.Object arg0);
+   
    public boolean remove(java.lang.Object arg0);
+   
    public boolean containsAll(java.util.Collection arg0);
+   
    public boolean addAll(java.util.Collection arg0);
+   
    public boolean retainAll(java.util.Collection arg0);
+   
    public boolean removeAll(java.util.Collection arg0);
+   
    public void clear();
+   
    public boolean equals(java.lang.Object arg0);
+   
    public int hashCode();
 }

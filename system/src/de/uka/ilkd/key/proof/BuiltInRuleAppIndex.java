@@ -15,6 +15,7 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.BuiltInRuleApp;
+import de.uka.ilkd.key.rule.QueryExpand;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 
@@ -119,7 +120,7 @@ public class BuiltInRuleAppIndex {
                                           NewRuleListener listener ) {
         final PosInOccurrence    pos = new PosInOccurrence 
 		( cfma, PosInTerm.TOP_LEVEL, antec );
-        if(rule instanceof UseDependencyContractRule) {//HACK
+        if(rule instanceof UseDependencyContractRule || rule instanceof QueryExpand) {//HACK
             scanSimplificationRule(rule, goal, pos, listener);
         } else if (rule.isApplicable ( goal, pos ) ) {
             BuiltInRuleApp app = new BuiltInRuleApp(rule, pos );                            

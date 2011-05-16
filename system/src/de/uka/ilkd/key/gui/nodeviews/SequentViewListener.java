@@ -30,6 +30,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.rule.BuiltInRule;
+import javax.swing.KeyStroke;
 
 
 
@@ -222,7 +223,14 @@ class SequentViewListener extends MouseInputAdapter
      * @see java.awt.event.KeyListener#keyPressed(java.awt.event.KeyEvent)
      */
     public void keyPressed(KeyEvent e) {
-      if ((e.getModifiersEx() & InputEvent.ALT_DOWN_MASK) != 0) {
+        if (e.getKeyCode() == KeyEvent.VK_F3) {
+            IncrementalSearch search = IncrementalSearch.getInstance();
+            if (!search.isInitialised()) {
+                search.initSearch(seqView);
+            } else {
+                search.requestFocus();
+            }
+        } else if ((e.getModifiersEx() & InputEvent.ALT_DOWN_MASK) != 0) {
             synchronized(this) {
                 showTermInfo = true;	    
             }
@@ -253,13 +261,8 @@ class SequentViewListener extends MouseInputAdapter
     /* (non-Javadoc)
      * @see java.awt.event.KeyListener#keyTyped(java.awt.event.KeyEvent)
      */
-    public void keyTyped(KeyEvent e) { 
-        final char ch = e.getKeyChar();                             
-        if (ch == '/') {    
-            synchronized(IncrementalSearch.class) {
-                new IncrementalSearch(seqView);
-            }
-        }                        
+    public void keyTyped(KeyEvent e) {                        
+        
     }
    
     public DragGestureListener getDragGestureListener() {

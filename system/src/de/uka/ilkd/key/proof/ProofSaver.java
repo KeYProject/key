@@ -40,17 +40,21 @@ import de.uka.ilkd.key.rule.inst.*;
  */
 public class ProofSaver {
 
-   protected IMain main;
-   protected KeYMediator mediator;
-   protected String filename;
-   protected Proof proof;
+   //protected IMain main;
+   //protected KeYMediator mediator;
+   final protected String filename;
+   final protected Proof proof;
+   final protected String internalVersion;
+   
    LogicPrinter printer;
    
-   public ProofSaver(IMain main, String filename) {
-      this.main = main;
-      this.mediator = main.mediator();
+   public ProofSaver(Proof proof, String filename, String internalVersion) {
+      //this.main = main;
+      //this.mediator = main.mediator();
       this.filename = filename;
-      this.proof = mediator.getSelectedProof();
+      this.proof = proof;//mediator.getSelectedProof();
+      this.internalVersion = internalVersion;
+      
    }
 
    public StringBuffer writeLog(Proof p){
@@ -61,7 +65,7 @@ public class ProofSaver {
     if(p.keyVersionLog==null)
         p.keyVersionLog = new Vector<String>();
     p.userLog.add(System.getProperty("user.name"));
-    p.keyVersionLog.add(main.getInternalVersion());
+    p.keyVersionLog.add(internalVersion);
     int s = p.userLog.size();
     for(int i=0; i<s; i++){
 	logstr.append("(keyLog \""+i+"\" (keyUser \""+
@@ -74,7 +78,7 @@ public class ProofSaver {
    public String writeSettings(ProofSettings ps){
     	return new String ("\\settings {\n\""+escapeCharacters(ps.settingsToString())+"\"\n}\n");
    }
-   public String save() {
+   public String save() throws IOException {
       String errorMsg = null;
       FileOutputStream fos = null;
       PrintWriter ps = null;
@@ -124,15 +128,15 @@ public class ProofSaver {
           errorMsg = e.toString();
           e.printStackTrace();
       } finally {
-          try {
+          //try {
 	      if (fos != null) fos.close();
 	      if (ps != null) {
 		  ps.flush();
 		  ps.close();
 	      }
-          } catch (IOException ioe) {
-	      mediator.notify(new GeneralFailureEvent(ioe.toString()));
-          }          
+          //} catch (IOException ioe) {
+	    //  mediator.notify(new GeneralFailureEvent(ioe.toString()));
+          //}          
       }	  
       return errorMsg; // null if success
    }

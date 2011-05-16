@@ -37,6 +37,7 @@ import java.io.PrintWriter;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedList;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -72,6 +73,7 @@ import javax.swing.event.MouseInputAdapter;
 import javax.swing.text.JTextComponent;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.ChoiceSelector;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
@@ -82,6 +84,10 @@ import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.configuration.SettingsListener;
 import de.uka.ilkd.key.gui.configuration.StrategySettings;
 import de.uka.ilkd.key.gui.configuration.ViewSelector;
+import de.uka.ilkd.key.gui.lemmatagenerator.FileChooser;
+import de.uka.ilkd.key.gui.lemmatagenerator.LemmaSelectionDialog;
+import de.uka.ilkd.key.gui.lemmatagenerator.LemmataAutoModeOptions;
+import de.uka.ilkd.key.gui.lemmatagenerator.LemmataHandler;
 import de.uka.ilkd.key.gui.nodeviews.NonGoalInfoView;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.gui.notification.NotificationManager;
@@ -95,6 +101,7 @@ import de.uka.ilkd.key.gui.smt.SMTSettings;
 import de.uka.ilkd.key.gui.smt.SettingsDialog;
 import de.uka.ilkd.key.gui.smt.SolverListener;
 import de.uka.ilkd.key.gui.smt.TemporarySettings;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -105,22 +112,33 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.ProblemLoader;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.ProofSaver;
 import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.proof.init.JavaProfile;
+import de.uka.ilkd.key.proof.init.ProblemInitializer;
+import de.uka.ilkd.key.proof.init.ProblemInitializer.ProblemInitializerListener;
+import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
+import de.uka.ilkd.key.taclettranslation.TacletSoundnessPOLoader;
+import de.uka.ilkd.key.taclettranslation.TacletSoundnessPOLoader.LoaderListener;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ProgressMonitor;
+import java.awt.GraphicsEnvironment;
+import java.util.List;
 
 
 public final class Main extends JFrame implements IMain {
@@ -221,6 +239,8 @@ public final class Main extends JFrame implements IMain {
     /** action for opening the proof management dialog */
     public static ProofManagementAction proofManagementAction;
     
+    public static LoadUserDefinedTacletsAction loadUserDefinedTacletsAction;
+    
 
     public static final String AUTO_MODE_TEXT = "Start/stop automated proof search";
 
@@ -256,6 +276,55 @@ public final class Main extends JFrame implements IMain {
     /** The menu for the SMT solver options */
     public final JMenu smtOptions = new JMenu("SMT Solvers...");
     
+    
+    private final ProblemInitializerListener piListener = new ProblemInitializerListener(){
+
+	    @Override
+        public void progressStarted(Object sender) {
+		 mediator().stopInterface(true);
+            
+        }
+
+	    @Override
+        public void progressStopped(Object sender) {
+		 mediator().startInterface(true);
+            
+        }
+
+	    @Override
+        public void proofCreated(ProblemInitializer sender,
+                ProofAggregate proofAggregate) {
+		addProblem(proofAggregate);
+		resetStatus(sender);
+        }
+	    
+	    @Override
+	    public void resetStatus(Object sender) {
+		setStandardStatusLine();
+	    }
+
+	    @Override
+        public void reportStatus(Object sender,
+                String status, int progressMax) {
+		setStatusLine(status, progressMax);
+            
+        }
+
+	    @Override
+        public void reportStatus(Object sender,
+                String status) {
+		setStatusLine(status);
+            
+        }
+
+	    @Override
+        public void reportException(Object sender,
+                ProofOblInput input, Exception e) {
+		reportStatus(sender,input.name() + " failed");
+            
+        }
+    };
+    
     /**
      * creates prover -- private, use getInstance()
      * 
@@ -283,7 +352,9 @@ public final class Main extends JFrame implements IMain {
         
         SwingUtilities.updateComponentTreeUI(this);
         ToolTipManager.sharedInstance().setDismissDelay(30000);
-        setSize(1000, 750);
+        GraphicsEnvironment env =
+                GraphicsEnvironment.getLocalGraphicsEnvironment();
+        setBounds(env.getMaximumWindowBounds());
         addWindowListener(new MainListener());
         
     }
@@ -363,6 +434,12 @@ public final class Main extends JFrame implements IMain {
             ruleView.updateUI();
         if (proofListView != null)
             proofListView.updateUI();
+    }
+    
+    public ProblemInitializer createProblemInitializer(){
+	ProblemInitializer pi = new ProblemInitializer(getProgressMonitor(),
+		mediator().getProfile(), new Services(mediator().getExceptionHandler()),true,piListener);
+	return pi;
     }
     
     /**
@@ -448,6 +525,7 @@ public final class Main extends JFrame implements IMain {
         editMostRecentFileAction  = new EditMostRecentFile();
         saveFileAction            = new SaveFile();
         proofManagementAction     = new ProofManagementAction();
+        loadUserDefinedTacletsAction = new LoadUserDefinedTacletsAction();
 
 	// ============================================================
 	// ==================  create empty views =====================
@@ -496,6 +574,8 @@ public final class Main extends JFrame implements IMain {
         
 
         toolBar.addSeparator();
+
+        
         
         final JButton goalBackButton = new JButton();
         goalBackButton.setAction(new UndoLastStep(false));
@@ -1145,6 +1225,10 @@ public final class Main extends JFrame implements IMain {
             }
         });
         
+        JMenuItem userTacletsItem = new JMenuItem(loadUserDefinedTacletsAction);
+      
+        
+        
         registerAtMenu(fileMenu, loadExample);        
         registerAtMenu(fileMenu, load);
         registerAtMenu(fileMenu, loadRecent);
@@ -1154,7 +1238,7 @@ public final class Main extends JFrame implements IMain {
         addSeparator(fileMenu);
         
         registerAtMenu(fileMenu, proofManagement);
-        
+        registerAtMenu(fileMenu, userTacletsItem);
         addSeparator(fileMenu);
         
         recentFiles = new RecentFileMenu(new ActionListener() {
@@ -1386,6 +1470,9 @@ public final class Main extends JFrame implements IMain {
         return options;
     }
     
+    
+    
+    
     /**
      * update the selection menu for Decisionprocedures.
      * Remove those, that are not installed anymore, add those, that got installed.
@@ -1408,6 +1495,8 @@ public final class Main extends JFrame implements IMain {
 
 
     }
+    
+    
     
     private void updateDPSelectionMenu(){
 	       smtComponent.setItems(null);
@@ -1652,9 +1741,13 @@ public final class Main extends JFrame implements IMain {
     
     protected void saveProof(File proofFile) {
         String filename = proofFile.getAbsolutePath();    
-        ProofSaver saver = new ProofSaver(this, filename);
-        String errorMsg = saver.save();
-        
+        ProofSaver saver = new ProofSaver(mediator().getSelectedProof(), filename,this.getInternalVersion());
+        String errorMsg ;
+        try{
+         errorMsg= saver.save();
+        }catch(IOException e){
+          errorMsg = e.toString();              
+        }
         if (errorMsg != null) {
             notify(new GeneralFailureEvent
                     ("Saving Proof failed.\n Error: " + errorMsg));
@@ -1965,6 +2058,79 @@ public final class Main extends JFrame implements IMain {
         public void actionPerformed(ActionEvent e) {
             showProofManagement();
         }
+    }
+    
+    private final class LoadUserDefinedTacletsAction extends AbstractAction{
+
+
+        private static final long serialVersionUID = 1L;
+
+        public LoadUserDefinedTacletsAction() {
+                putValue(NAME, "Load User-Defined Taclets...");
+                putValue(SHORT_DESCRIPTION, "Loads additional taclets and creates the corresponding proofs.");
+                mediator.enableWhenProof(this);
+        }
+            
+        @Override
+        public void actionPerformed(ActionEvent e) {
+                FileChooser chooser = new FileChooser();
+
+                boolean loaded = chooser.showAsDialog();
+
+                if (!loaded){
+                        return;
+                }
+                final Proof proof = mediator().getSelectedProof();
+                final File fileForLemmata = chooser.getFileForLemmata();
+                final File fileForDefinitions = chooser.getFileForDefinitions();
+
+                
+                List<File> filesForAxioms = chooser.getFilesForAxioms();
+
+
+
+                LoaderListener listener =   new LoaderListener() {
+                        @Override 
+                        public void stopped(Throwable exception) {
+                                // TODO: handle the exception
+                                throw new RuntimeException(exception);      
+                        }           
+                        @Override
+                        public void stopped(ProofAggregate p, ImmutableSet<Taclet> taclets) {
+                                mediator().startInterface(true);
+                                if(p != null){
+                                        
+                                        Main.this.addProblem(p);
+                                        // add only the taclets to the goals if 
+                                        // the proof obligations were added successfully.
+                                        ImmutableSet<Taclet> base =
+                                                proof.env().getInitConfig().getTaclets();
+                                        base = base.union(taclets);
+                                        proof.env().getInitConfig().setTaclets(base);
+                                        for(Taclet taclet : taclets){
+                                                for(Goal goal : proof.openGoals()){
+                                                        goal.addTaclet(taclet, 
+                                                           SVInstantiations.EMPTY_SVINSTANTIATIONS,false);
+                                                }
+                                        }
+                                }
+                        }
+
+                        @Override
+                        public void started() {
+                                mediator().stopInterface(true);         
+                        }
+                };
+
+
+                TacletSoundnessPOLoader loader = new TacletSoundnessPOLoader(progressMonitor, 
+                                fileForLemmata,proof.env() ,listener,piListener,
+                                new LemmaSelectionDialog(),filesForAxioms,
+                                fileForDefinitions);
+                loader.start();
+                
+        }
+            
     }
     
     
@@ -2332,7 +2498,15 @@ public final class Main extends JFrame implements IMain {
 		    de.uka.ilkd.key.util.Debug.ENABLE_ASSERTION = true;
 		} else if (opt[index].equals("NO_JMLSPECS")) {
 		    GeneralSettings.disableSpecs = true;
-		} else if (opt[index].equals("AUTO")) {
+		} else if (opt[index].equals("JUSTIFYRULES")){
+		  LinkedList<String> options = new LinkedList<String>();
+		  for(int i = index+1; i < opt.length; i++){
+		      options.add(opt[i]);
+		  }
+		  evaluateLemmataOptions(options);
+		  // is last option 
+		  break; 
+		}else if (opt[index].equals("AUTO")) {
 		    batchMode = true;
                     visible = false;
 		} else if (opt[index].equals("TIMEOUT")) {
@@ -2372,6 +2546,36 @@ public final class Main extends JFrame implements IMain {
 	    System.out.println("Not using assertions ...");	   
 	}
     }
+    
+    private static void evaluateLemmataOptions(LinkedList<String>  options){
+	LemmataAutoModeOptions opt;
+	try{
+	    
+	    opt = new LemmataAutoModeOptions(options,getInstance(false).getInternalVersion(), 
+		    PathConfig.KEY_CONFIG_DIR
+		    );
+	}catch(Throwable e){
+	    System.out.println("An error occured while reading the parameters:");
+	    System.out.println(e.getMessage());
+	    e.printStackTrace();
+	    System.exit(1);
+	    return;
+	}
+	KeYMediator mediator = getInstance(false).mediator();
+
+	try{
+	LemmataHandler handler = new LemmataHandler(opt,
+			mediator.getProfile());
+	handler.start();
+	}
+	catch(ProofInputException exception){
+	    System.out.println("Could not create dummy file: " + exception);
+	}
+	catch(IOException exception){
+	    System.out.println("Could not create dummy file: " + exception);
+	}
+
+   }
 
     private static void printUsageAndExit() {
         System.out.println("File not found or unrecognized option.\n");

@@ -8,8 +8,15 @@
 //
 //
 
-package de.uka.ilkd.key.smt.test;
+package de.uka.ilkd.key.taclettranslation;
 
-public class TestSolvers {
+public class IllegalTacletException extends RuntimeException {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
 
+    public IllegalTacletException(String msg) {
+	super(msg);
+    }
 }

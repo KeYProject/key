@@ -27,10 +27,14 @@ import de.uka.ilkd.key.ldt.*;
  * use all declared sorts in all rules.
  */
 public class LDTInput implements EnvInput {
+    public interface LDTInputListener {
+	public void reportStatus(String status, int progress);
+    }
+    
     private static final String NAME = "language data types";
 
     private final KeYFile[] keyFiles;
-    private final IMain main;
+    private final LDTInputListener listener;
 
     private InitConfig initConfig = null;
 
@@ -40,9 +44,9 @@ public class LDTInput implements EnvInput {
      * @param keyFiles an array containing the LDT .key files
      * @param main the main class used to report the progress of reading
      */
-    public LDTInput(KeYFile[] keyFiles, IMain main) {
+    public LDTInput(KeYFile[] keyFiles, LDTInputListener listener) {
 	this.keyFiles = keyFiles;
-	this.main=main;
+	this.listener=listener;
     }
         
     
@@ -120,8 +124,8 @@ public class LDTInput implements EnvInput {
 	    keyFiles[i].readFuncAndPred();
 	}
 	for (int i=0; i<keyFiles.length; i++) {
-	    if (main != null) {
-		main.setStatusLine("Reading " + keyFiles[i].name(), 
+	    if (listener != null) {
+		listener.reportStatus("Reading " + keyFiles[i].name(), 
 				   keyFiles[i].getNumberOfChars());
 	    }
 	    keyFiles[i].readRulesAndProblem();

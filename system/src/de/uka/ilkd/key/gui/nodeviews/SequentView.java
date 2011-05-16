@@ -55,9 +55,13 @@ import de.uka.ilkd.key.util.Debug;
  */
 public class SequentView extends JEditorPane implements Autoscroll {
             
-    public static final Color DEFAULT_HIGHLIGHT_COLOR = Color.yellow;
+    public static final Color DEFAULT_HIGHLIGHT_COLOR = new Color(70, 100, 170, 76);
 
-    public static final Color UPDATE_HIGHLIGHT_COLOR = new Color(255, 230, 230);
+    public static final Color ADDITIONAL_HIGHLIGHT_COLOR = new Color(0, 0, 0, 38);
+
+    public static final Color UPDATE_HIGHLIGHT_COLOR = new Color(0, 150, 130, 38);
+
+    public static final Color BACKGROUND_COLOR = new Color(249, 249, 249);
 
     // the default tag of the highlight
     private Object defaultHighlight;
@@ -122,10 +126,12 @@ public class SequentView extends JEditorPane implements Autoscroll {
 	setMediator(mediator);
 	// view cannot be edited
 	setEditable(false);
+        // set background color
+        setBackground(BACKGROUND_COLOR);
 	// disables selection
 	setSelectionColor(getBackground());
 	// sets the painter for the highlightning
-	setHighlighter(new DefaultHighlighter());	
+	setHighlighter(new DefaultHighlighter());
 	//sets initial highlight (not visible) and stores its tag
 
         // REMARK: THE ORDER FOR ADDING HIGHLIGHTS IS CRUCIAL
@@ -133,7 +139,7 @@ public class SequentView extends JEditorPane implements Autoscroll {
 	// Adding highlight H1 before highlight H2 ensures that 
 	// H1 can overwrite overlapping parts of H2 !!!
         	        
-	additionalHighlight = getColorHighlight(Color.lightGray); 		
+	additionalHighlight = getColorHighlight(ADDITIONAL_HIGHLIGHT_COLOR);
 	defaultHighlight = getColorHighlight(DEFAULT_HIGHLIGHT_COLOR);
 	
 	currentHighlight = defaultHighlight;
@@ -310,8 +316,7 @@ public class SequentView extends JEditorPane implements Autoscroll {
         disableHighlight(currentHighlight);
         disableHighlight(additionalHighlight);        
     }
-    
-    
+
     /**
      * returns the highlight painter for the specified color 
      * @param color the Color the HighlightPainter shall use    
@@ -409,6 +414,7 @@ public class SequentView extends JEditorPane implements Autoscroll {
 	        errorocc = false;
 	        try {
 		    setText(printer.toString());
+
 	        } catch (Error e) {
 		    System.err.println("Error occurred while printing Sequent!");
 		    errorocc = true;

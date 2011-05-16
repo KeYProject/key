@@ -72,7 +72,7 @@ public class LogFile {
       @    ensures (\forall int i; 0 <= i && i < logArray.length;
       @                            logArray[i].balance <= \result.balance);
       @ */
-    public /*@pure@*/ LogRecord getMaximumRecord() {
+    public /*@ pure @*/ LogRecord getMaximumRecord() {
 	LogRecord max = logArray[0];
 	int i = 1;    
 	/*@ loop_invariant 0 <= i && i <= logArray.length 

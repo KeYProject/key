@@ -26,13 +26,13 @@ public class TestTermFactory extends TestCase {
 
     private static final TermFactory tf = TermFactory.DEFAULT;
     private Term et1;
-    private Sort sort1=new SortImpl(new Name("S1"));
-    private Sort sort2=new SortImpl(new Name("S2"));
-    private Sort sort3=new SortImpl(new Name("S3"));
-    private Sort osort1=new SortImpl(new Name("os1"));
-    private Sort osort2=new SortImpl(new Name("os2"), osort1);
-    private Sort osort3=new SortImpl(new Name("os3"), osort1);
-    private Sort osort4=new SortImpl(new Name("os4"), 
+    private Sort sort1  = new SortImpl(new Name("S1"));
+    private Sort sort2  = new SortImpl(new Name("S2"));
+    private Sort sort3  = new SortImpl(new Name("S3"));
+    private Sort osort1 = new SortImpl(new Name("os1"));
+    private Sort osort2 = new SortImpl(new Name("os2"), osort1);
+    private Sort osort3 = new SortImpl(new Name("os3"), osort1);
+    private Sort osort4 = new SortImpl(new Name("os4"), 
 						  DefaultImmutableSet.<Sort>nil()
 						  .add(osort2).add(osort3), false);
     
