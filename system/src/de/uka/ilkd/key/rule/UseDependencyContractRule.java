@@ -19,7 +19,7 @@ import java.util.Map;
 import javax.swing.JOptionPane;
 
 import de.uka.ilkd.key.collection.*;
-import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -360,7 +360,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	//open dialog
 	final TermStringWrapper heapWrapper 
 		= (TermStringWrapper)JOptionPane.showInputDialog(
-				Main.getInstance(),
+				MainWindow.getInstance(),
 				"Please select a base heap:",
 				"Instantiation",
 				JOptionPane.QUESTION_MESSAGE,
@@ -397,7 +397,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	
 	//choose a step
 	final PosInOccurrence step;
-	if(Main.getInstance().mediator().autoMode()) {
+	if(MainWindow.getInstance().getMediator().autoMode()) {
 	    step = findStepInIfInsts(steps, app, services);
 	    assert step != null 
 	           : "The strategy failed to properly "

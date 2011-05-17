@@ -11,9 +11,6 @@
 package de.uka.ilkd.key.gui;
 
 import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -31,23 +28,37 @@ import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.notification.events.ProofClosedNotificationEvent;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.PosInSequent;
-import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofEvent;
+import de.uka.ilkd.key.proof.ProofTreeAdapter;
+import de.uka.ilkd.key.proof.ProofTreeEvent;
+import de.uka.ilkd.key.proof.ProofTreeRemovedNodeEvent;
+import de.uka.ilkd.key.proof.TacletFilter;
+import de.uka.ilkd.key.proof.TermTacletAppIndexCacheSet;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.feature.AbstractBetaFeature;
 import de.uka.ilkd.key.strategy.feature.IfThenElseMalusFeature;
 import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.util.GuiUtilities;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
 
 public class KeYMediator {
 
-    private IMain mainFrame;
+    private MainWindow mainFrame;
 
 
     private InteractiveProver interactiveProver;
@@ -80,8 +91,8 @@ public class KeYMediator {
     /** creates the KeYMediator with a reference to the application's
      * main frame and the current proof settings
     */
-    public KeYMediator(IMain mainFrame) {
-	this.mainFrame = mainFrame;
+    public KeYMediator(MainWindow mainWindow) {
+	this.mainFrame = mainWindow;
 	notationInfo        = new NotationInfo();
 	proofListener       = new KeYMediatorProofListener();
 	proofTreeListener   = new KeYMediatorProofTreeListener();
@@ -93,19 +104,20 @@ public class KeYMediator {
 	defaultExceptionHandler = new KeYRecoderExcHandler();
     }
 
-    public void addinterruptListener(InterruptListener il) {
-	this.interruptListener.add(il);
-    }
+// not used
+//    public void addinterruptListener(InterruptListener il) {
+//	this.interruptListener.add(il);
+//    }
     
-    public void removeInterruptListener(InterruptListener il) {
-	this.interruptListener.remove(il);
-    }
+//    public void removeInterruptListener(InterruptListener il) {
+//	this.interruptListener.remove(il);
+//    }
     
-    public void interrupted(ActionEvent e) {
-	for (InterruptListener il : interruptListener) {
-	    il.interruptionPerformed(e);
-	}
-    }
+//    public void interrupted(ActionEvent e) {
+//	for (InterruptListener il : interruptListener) {
+//	    il.interruptionPerformed(e);
+//	}
+//    }
     
     /** returns the used NotationInfo
      * @return the used NotationInfo
@@ -259,7 +271,7 @@ public class KeYMediator {
             Runnable swingProzac = new Runnable() {
                public void run() { setProofHelper(pp); }
             };
-	    invokeAndWait(swingProzac);
+            GuiUtilities.invokeAndWait(swingProzac);
         }        
     }
 
@@ -702,46 +714,10 @@ public class KeYMediator {
 	    dlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 	    dlg.getContentPane().add((Component)message);
 	    dlg.pack();
-	    setCenter(dlg, mainFrame());
+	    GuiUtilities.setCenter(dlg, mainFrame());
 	    dlg.setVisible(true);
 	}
     }
-
-    /**
-     * Center a component within a parental component.
-     * @param comp the component to be centered.
-     * @param parent center relative to what. <code>null</code> to center relative to screen.
-     * @see #setCenter(Component)
-     */
-    public static void setCenter(Component comp, Component parent) {
-	if (parent == null) {
-	    setCenter(comp);
-	    return;
-	} 
-	Dimension dlgSize = comp.getPreferredSize();
-	Dimension frmSize = parent.getSize();
-	Point	  loc = parent.getLocation();
-	if (dlgSize.width < frmSize.width && dlgSize.height < frmSize.height)
-	    comp.setLocation((frmSize.width - dlgSize.width) / 2 + loc.x, (frmSize.height - dlgSize.height) / 2 + loc.y);
-	else
-	    setCenter(comp);
-    } 
-
-    /**
-     * Center a component on the screen.
-     * @param comp the component to be centered relative to the screen.
-     *  It must already have its final size set.
-     * @preconditions comp.getSize() as on screen.
-     */
-    public static void setCenter(Component comp) {
-	Dimension screenSize = comp.getToolkit().getScreenSize();
-	Dimension frameSize = comp.getSize();
-	if (frameSize.height > screenSize.height)
-	    frameSize.height = screenSize.height;
-	if (frameSize.width > screenSize.width)
-	    frameSize.width = screenSize.width;
-	comp.setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
-    } 
 
     private int goalsClosedByAutoMode=0;
 
@@ -772,7 +748,7 @@ public class KeYMediator {
             }
          }
       };
-      invokeAndWait(interfaceSignaller);
+      GuiUtilities.invokeAndWait(interfaceSignaller);
    }
 
    public void startInterface(boolean fullStop) {
@@ -786,26 +762,11 @@ public class KeYMediator {
                 keySelectionModel.fireSelectedProofChanged();
          }
       };
-      invokeAndWait(interfaceSignaller);
+      GuiUtilities.invokeAndWait(interfaceSignaller);
    }
    
 
-   public static void invokeAndWait(Runnable runner) {
-        if (SwingUtilities.isEventDispatchThread()) runner.run();
-        else {
-            try{
-               SwingUtilities.invokeAndWait(runner);
-            } catch(InterruptedException e) {
-	        System.err.println(e);
-	        e.printStackTrace();
-            } catch(java.lang.reflect.InvocationTargetException ite) {
-	       Throwable targetExc = ite.getTargetException();
-               System.err.println(targetExc);
-	       targetExc.printStackTrace();
-               ite.printStackTrace();
-            }
-        }
-    }
+  
     
     
     public boolean autoMode() {
@@ -923,7 +884,7 @@ public class KeYMediator {
         if (profile == null) {               
             profile = ProofSettings.DEFAULT_SETTINGS.getProfile();   
             if (profile == null) {
-                profile = new JavaProfile((IMain) this.mainFrame());
+                profile = new JavaProfile();
             }
         }
         return profile;
@@ -958,7 +919,8 @@ public class KeYMediator {
     /** 
      * returns the prover task listener of the main frame
      */
+    // TODO used 1 time, drop it? (MU)
     public ProverTaskListener getProverTaskListener() {
-        return mainFrame.getProverTaskListener();
+        return mainFrame.getUserInterface();
     }
 }

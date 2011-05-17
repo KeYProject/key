@@ -70,7 +70,7 @@ public final class ProofManagementDialog extends JDialog {
     //-------------------------------------------------------------------------
 
     private ProofManagementDialog(InitConfig initConfig, String title) {
-	super(Main.getInstance(), title, true);
+	super(MainWindow.getInstance(), title, true);
 	this.initConfig = initConfig;
 	this.services   = initConfig.getServices();
 	this.specRepos  = initConfig.getServices().getSpecificationRepository();
@@ -244,7 +244,7 @@ public final class ProofManagementDialog extends JDialog {
         getContentPane().setLayout(new BoxLayout(getContentPane(), 
                                                  BoxLayout.Y_AXIS));	
 	pack();
-	final Point mainLoc = Main.getInstance().getLocation();
+	final Point mainLoc = MainWindow.getInstance().getLocation();
 	setLocation(mainLoc.x + 20, mainLoc.y + 20);
     }
     
@@ -409,14 +409,14 @@ public final class ProofManagementDialog extends JDialog {
     private void findOrStartProof(ProofOblInput po) {
         Proof proof = findPreferablyClosedProof(po);
         if(proof == null) {
-            ProblemInitializer pi = Main.getInstance().createProblemInitializer();
+            ProblemInitializer pi = MainWindow.getInstance().createProblemInitializer();
             try {
                 pi.startProver(initConfig, po);
             } catch(ProofInputException exc) {
-        	new ExceptionDialog(Main.getInstance(), exc);
+        	new ExceptionDialog(MainWindow.getInstance(), exc);
             }
         } else {
-            Main.getInstance().mediator().setProof(proof);
+            MainWindow.getInstance().getMediator().setProof(proof);
         }
         startedProof = true;
     }

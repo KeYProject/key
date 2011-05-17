@@ -12,7 +12,7 @@ package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.gui.ContractConfigurator;
-import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
@@ -256,14 +256,14 @@ public final class UseOperationContractRule implements BuiltInRule {
 	    }
 	}
 	assert !contracts.isEmpty();
-        if(Main.getInstance().mediator().autoMode()) {
+        if(MainWindow.getInstance().getMediator().autoMode()) {
             return services.getSpecificationRepository()
                            .combineOperationContracts(contracts);
         } else {
             FunctionalOperationContract[] contractsArr 
             	= contracts.toArray(new FunctionalOperationContract[contracts.size()]);
             ContractConfigurator cc 
-                    = new ContractConfigurator(Main.getInstance(),
+                    = new ContractConfigurator(MainWindow.getInstance(),
                                                services,
                                                contractsArr,
                                                "Contracts for " + pm.getName(),

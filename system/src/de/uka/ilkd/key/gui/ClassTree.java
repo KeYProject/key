@@ -30,7 +30,7 @@ import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.util.Pair;
 
 
-class ClassTree extends JTree {
+public class ClassTree extends JTree {
     
     private final Map<Pair<KeYJavaType,ObserverFunction>,Icon> targetIcons;
     

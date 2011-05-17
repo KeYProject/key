@@ -41,7 +41,7 @@ public abstract class AbstractProfile implements Profile {
     private GoalChooserBuilder prototype;
 
     protected AbstractProfile(String standardRuleFilename,
-            ImmutableSet<GoalChooserBuilder> supportedGCB, IMain main) {
+            ImmutableSet<GoalChooserBuilder> supportedGCB) {
 
         standardRules = new RuleCollection(RuleSource
                 .initRuleFile(standardRuleFilename),
@@ -68,14 +68,10 @@ public abstract class AbstractProfile implements Profile {
     }
 
     public AbstractProfile(String standardRuleFilename) {
-        this(standardRuleFilename, null);
-    }
-
-    public AbstractProfile(String standardRuleFilename, IMain main) {
         this(standardRuleFilename,
                 DefaultImmutableSet.<GoalChooserBuilder>nil().
                 add(new DefaultGoalChooserBuilder()).
-                add(new DepthFirstGoalChooserBuilder()), main);
+                add(new DepthFirstGoalChooserBuilder()));
     }
 
     public RuleCollection getStandardRules() {
