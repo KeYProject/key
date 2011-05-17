@@ -555,8 +555,8 @@ public class KeYMediator {
     /** returns the main frame
      * @return the main frame 
      */
-    public JFrame mainFrame() {
-	return mainFrame instanceof JFrame ? (JFrame) mainFrame : null;
+    public MainWindow mainFrame() {
+	return mainFrame;
     }
 
     /** notifies that a node that is not a goal has been chosen

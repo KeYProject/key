@@ -495,7 +495,6 @@ public final class MainWindow extends JFrame  {
         fileOperations.add(saveFileAction);        
         fileOperations.addSeparator();
         fileOperations.add(proofManagementAction);
-        fileOperations.add(loadUserDefinedTacletsAction);
 	
         return fileOperations;
     }
@@ -737,6 +736,7 @@ public final class MainWindow extends JFrame  {
         fileMenu.add(saveFileAction);
         fileMenu.addSeparator();
         fileMenu.add(proofManagementAction);
+        fileMenu.add(loadUserDefinedTacletsAction);
         fileMenu.addSeparator();
         fileMenu.add(recentFiles.getMenu());
         fileMenu.addSeparator();
