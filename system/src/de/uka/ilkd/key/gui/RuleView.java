@@ -14,8 +14,11 @@ package de.uka.ilkd.key.gui;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.FlowLayout;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
@@ -29,6 +32,7 @@ import de.uka.ilkd.key.proof.RuleTreeModel;
 import de.uka.ilkd.key.rule.Taclet;
 
 public class RuleView extends JPanel implements TreeSelectionListener, java.io.Serializable {
+
 
     protected RuleTreeModel ruleViewModel    = null;
     protected JTree ruleTree;
@@ -91,7 +95,8 @@ public class RuleView extends JPanel implements TreeSelectionListener, java.io.S
     protected void layoutPane() {
 	setLayout(new BorderLayout());
 	ruleTree = new JTree(new String[]{"No proof loaded"});
-	add(ruleTree, BorderLayout.CENTER);
+	JScrollPane jp = new JScrollPane(ruleTree);
+	add(jp, BorderLayout.CENTER);
     }
 
 
