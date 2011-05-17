@@ -65,6 +65,7 @@ import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
+import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
@@ -211,7 +212,7 @@ public final class Main extends JFrame implements IMain {
     private RecentFileMenu recentFiles;
     
     private boolean frozen = false;
-   
+       
     private static KeYFileChooser fileChooser = null;
     
     private static final String PARA = 
@@ -356,8 +357,8 @@ public final class Main extends JFrame implements IMain {
                 GraphicsEnvironment.getLocalGraphicsEnvironment();
         setBounds(env.getMaximumWindowBounds());
         addWindowListener(new MainListener());
-        
     }
+
     
     private void initNotification() {
         if (!batchMode) {
@@ -511,6 +512,7 @@ public final class Main extends JFrame implements IMain {
     
     /** lays out the main frame */
     protected void layoutMain() {
+        setLaF();
         // set overall layout manager
         getContentPane().setLayout(new BorderLayout());
         
@@ -663,7 +665,18 @@ public final class Main extends JFrame implements IMain {
         getContentPane().add(statusLine, BorderLayout.SOUTH);
     }
     
-
+    /**
+     * Tries to set the system look and feel if this option is activated.
+     */
+    private void setLaF() {
+        
+        try{ // TODO: can only use default settings when no proof is loaded yet
+            if (ProofSettings.DEFAULT_SETTINGS.getViewSettings().useSystemLaF())
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 
     
     
@@ -1303,6 +1316,19 @@ public final class Main extends JFrame implements IMain {
     protected JMenu createViewMenu() {
         JMenu view = new JMenu("View");
         view.setMnemonic(KeyEvent.VK_V);
+        
+        JMenuItem laf = new JCheckBoxMenuItem("Use system look and feel (experimental)");
+        laf.setToolTipText("If checked KeY tries to appear in the look and feel of your window manager, if not in the default Java LaF (aka Metal).");
+        final de.uka.ilkd.key.gui.configuration.ViewSettings vs = ProofSettings.DEFAULT_SETTINGS.getViewSettings();
+        laf.setSelected(vs.useSystemLaF());
+        laf.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                vs.setUseSystemLaF(((JCheckBoxMenuItem)e.getSource()).
+                isSelected());
+                // TODO: inform that this requires a restart
+                System.out.println("Info: Look and feel changed for next start of KeY.");
+            }});
+        registerAtMenu(view, laf);
         
         JMenuItem pretty = new JCheckBoxMenuItem("Use pretty syntax");
         pretty.setAccelerator(KeyStroke.getKeyStroke
