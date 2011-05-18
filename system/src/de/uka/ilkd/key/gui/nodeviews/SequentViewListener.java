@@ -234,6 +234,9 @@ class SequentViewListener extends MouseInputAdapter
             } else {
                 search.requestFocus();
             }
+        } else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+            IncrementalSearch search = IncrementalSearch.getInstance();
+            search.disableSearch();
         } else if ((e.getModifiersEx() & InputEvent.ALT_DOWN_MASK) != 0) {
             synchronized(this) {
                 showTermInfo = true;	    

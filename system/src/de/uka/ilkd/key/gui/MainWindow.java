@@ -31,6 +31,8 @@ import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -123,6 +125,7 @@ import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.GuiUtilities;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.key.util.PreferenceSaver;
 
 
 @SuppressWarnings("serial")
@@ -235,6 +238,9 @@ public final class MainWindow extends JFrame  {
 //    private ProverTaskListener taskListener;
     
     private NotificationManager notificationManager;
+    
+    private PreferenceSaver prefSaver = 
+        new PreferenceSaver(Preferences.userNodeForPackage(MainWindow.class));
 
     private ComplexButton smtComponent;
     
@@ -279,11 +285,6 @@ public final class MainWindow extends JFrame  {
         
         SwingUtilities.updateComponentTreeUI(this);
         ToolTipManager.sharedInstance().setDismissDelay(30000);
-        setSize(1000, 750);
-        
-        GraphicsEnvironment env =
-            GraphicsEnvironment.getLocalGraphicsEnvironment();
-        setBounds(env.getMaximumWindowBounds());
         
         addWindowListener(exitMainAction.windowListener);
         
@@ -459,6 +460,9 @@ public final class MainWindow extends JFrame  {
                 GuiUtilities.copyHighlightToClipboard(sequentView);
             }
         });
+        
+        setSize(1000, 750);
+        prefSaver.load(this);
     }
 
     private JTabbedPane createTabbedPane() {
@@ -1872,6 +1876,15 @@ public final class MainWindow extends JFrame  {
 
     public Action getOpenMostRecentFileAction() {
         return openMostRecentFileAction;
+    }
+
+    public void savePreferences() {
+        try {
+            prefSaver.save(this);
+        } catch (BackingStoreException e) {
+            // it is not tragic if the preferences cannot be stored.
+            e.printStackTrace();
+        }
     }
 
 }

@@ -145,11 +145,13 @@ public class IncrementalSearch {
     /**
      * disable this searcher
      */
-    private void disableSearch() {
+    public void disableSearch() {
         searchDialog.setVisible(false);
-        clearSearchResults();
-        seqView.getDocument().removeDocumentListener(new DocumentListenerAdapter());
-        seqView = null;
+        if (seqView != null) {
+            clearSearchResults();
+            seqView.getDocument().removeDocumentListener(new DocumentListenerAdapter());
+            seqView = null;
+        }
     }
 
 
@@ -210,10 +212,7 @@ public class IncrementalSearch {
                 searchResults.add(new Pair<Integer,Object>(foundAt, highlight));
                 seqView.paintHighlight(new Range(foundAt, foundAt
                         + searchStr.length()), highlight);
-                if (!loopEnterd) {
-                    setExtraHighlight(0);
-                    loopEnterd = true;
-                }
+                loopEnterd = true;
         }
         if (loopEnterd) {
             seqView.updateUpdateHighlights();
@@ -257,6 +256,8 @@ public class IncrementalSearch {
 
     private class SearchDialog extends JDialog {
         public final Color ALLERT_COLOR = new Color(255, 178, 178);
+        public final Dimension INIT_SIZE =
+                new JDialog().getContentPane().add(new JTextField("12345678901234567890")).getPreferredSize();
         
         private JTextField textField;
 
@@ -320,18 +321,21 @@ public class IncrementalSearch {
         
         @Override
         public void setVisible(boolean b) {
-            if (seqView != null && seqView.getBounds() != null) {
-                Dimension dim =
-                        new JTextField("12345678901234567890").getPreferredSize();
-                int x = seqView.getBounds().width - dim.width;
-                int y = seqView.getBounds().height - dim.height;
+            if (seqView != null
+                    && seqView.getParent() != null
+                    && seqView.getParent().getBounds() != null) {
                 Container parent = seqView.getParent();
+                // dimension of scroll pane minus frame dimension
+                int x = parent.getBounds().width - INIT_SIZE.width;
+                int y = parent.getBounds().height - INIT_SIZE.height;
+                // plus parent positions
+                parent = parent.getParent();
                 while (parent != null) {
-                    x += parent.getBounds().width;
-                    y += parent.getBounds().height;
+                    x += parent.getBounds().x;
+                    y += parent.getBounds().y;
                     parent = parent.getParent();
                 }
-                Rectangle bounds = new Rectangle(new Point(x, y), dim);
+                Rectangle bounds = new Rectangle(new Point(x, y), INIT_SIZE);
                 setBounds(bounds);
             }
             super.setVisible(b);
