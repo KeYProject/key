@@ -20,6 +20,7 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProblemInitializer.ProblemInitializerListener;
+import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
@@ -210,6 +211,9 @@ public class TacletSoundnessPOLoader {
                     new KeYUserProblemFile("Definitions",fileForDefinitions , progressMonitor);
             
             initConfig = problemInitializer.prepare(keyFileDefs);
+            
+         
+                        
 
             keyFileDefs.close();
             
@@ -250,12 +254,13 @@ public class TacletSoundnessPOLoader {
         private ProofAggregate createProof(ProofEnvironment proofEnvForTaclets,
                         ImmutableSet<Taclet> taclets,
                         KeYUserProblemFile keyFile, ImmutableSet<Taclet> axioms) {
-
-                ProofAggregate p = ProofObligationCreator.INSTANCE.create(
+                ProofObligationCreator creator = new ProofObligationCreator();
+                ProofAggregate p = creator.create(
                                 taclets, proofEnvForTaclets.getInitConfig(),
                                 axioms, piListener);
                 proofEnvForTaclets.registerRules(taclets,
                                 AxiomJustification.INSTANCE);
+                
                 registerProofs(p, proofEnvForTaclets, keyFile);
                 return p;
         }

@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Set;
+import java.util.TreeSet;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -16,6 +18,7 @@ import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -31,6 +34,7 @@ import de.uka.ilkd.key.taclettranslation.TacletTranslator;
 public interface LemmaGenerator extends TacletTranslator {
 
         public TacletFormula translate(Taclet taclet, Services services);
+
 
 }
 
@@ -67,10 +71,14 @@ class LemmaFormula implements TacletFormula {
 
 class DefaultLemmaGenerator implements LemmaGenerator {
 
-        // Describes how a schema variables mapped to another operator, e.g.
+        // Describes how a schema variable is mapped to another operator, e.g.
         // logical variable.
         private HashMap<SchemaVariable, Term> mapping = new HashMap<SchemaVariable, Term>();
+       
+        
 
+        
+        
         @Override
         public TacletFormula translate(Taclet taclet, Services services) {
                 Term formula = SkeletonGenerator.FindTacletTranslator
@@ -80,6 +88,8 @@ class DefaultLemmaGenerator implements LemmaGenerator {
                 checkForIllegalOps(formula, taclet);
                 return new LemmaFormula(taclet, formula);
         }
+        
+
 
         private Term replace(Taclet taclet, Term term, Services services) {
                 if (term.op() instanceof SchemaVariable) {
@@ -121,6 +131,8 @@ class DefaultLemmaGenerator implements LemmaGenerator {
                         instantiation = createInstantiation(owner, var,
                                         services);
                         mapping.put(var, instantiation);
+                        
+         
                 }
                 return instantiation;
         }
@@ -183,8 +195,10 @@ class DefaultLemmaGenerator implements LemmaGenerator {
         private Term createInstantiation(Taclet owner, VariableSV sv,
                         Services services) {
                 Name name = createUniqueName(services, sv.name().toString());
-                return TermFactory.DEFAULT.createTerm(new LogicVariable(name,
-                                sv.sort()));
+                LogicVariable variable = new LogicVariable(name,
+                                sv.sort());
+                services.getNamespaces().variables().add(variable);
+                return TermFactory.DEFAULT.createTerm(variable);
         }
 
         /**
@@ -224,6 +238,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
                 Name name = createUniqueName(services, sv.name().toString());
 
                 Function function = new Function(name, sv.sort(), argSorts);
+                services.getNamespaces().functions().add(function);
                 return TermBuilder.DF.func(function, args);
         }
 
