@@ -1749,6 +1749,8 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
 	}
 	RPAREN
 ;
+	
+
 
 bsumterm returns [SLExpression result=null] throws SLTranslationException
 {

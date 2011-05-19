@@ -10,19 +10,13 @@
 package de.uka.ilkd.key.speclang.jml.translation;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermCreationException;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.ObserverFunction;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.PositionedString;
@@ -247,7 +241,18 @@ final class JMLTranslator {
 //        translationMethods.put("\\max", new Name("max"));
 //        translationMethods.put("\\num_of", new Name("num_of"));
 //        translationMethods.put("\\product", new Name("product"));
-//        translationMethods.put("\\sum", new Name("sum"));
+        translationMethods.put("\\sum", new JMLBoundedNumericalQuantifierTranslationMethod(){
+                @Override
+                public Term emptyRangeValue() {
+                        return TB.zero(services);
+                }
+                @Override
+                public Term translateBoundedNumericalQuantifier(
+                                QuantifiableVariable qv, Term lo, Term hi,
+                                Term body) {
+                        return TB.bsum(qv, lo, hi, body, services);               } 
+        }
+        );
 
         // operators
         translationMethods.put("<==>", new JMLEqualityTranslationMethod() {
@@ -438,6 +443,9 @@ final class JMLTranslator {
     
     private abstract class JMLQuantifierTranslationMethod implements
             JMLTranslationMethod {
+            
+            protected Services services;
+
 
         /**
          * Add implicit "non-null" and "created" guards for reference types,
@@ -452,6 +460,7 @@ final class JMLTranslator {
          * @return
          * @throws SLTranslationException
          */
+        @SuppressWarnings("unchecked")
         @Override
         public Term translate(Object... params)
                 throws SLTranslationException {
@@ -464,7 +473,7 @@ final class JMLTranslator {
             ImmutableList<LogicVariable> declVars =
                     (ImmutableList<LogicVariable>) params[3];
             boolean nullable = (Boolean) params[4];
-            Services services = (Services) params[5];
+            services = (Services) params[5];
 
             Term nullTerm = TB.NULL(services);
             for (LogicVariable lv : declVars) {
@@ -502,7 +511,99 @@ final class JMLTranslator {
                 throws SLTranslationException;
     }
 
-    
+    private abstract class JMLBoundedNumericalQuantifierTranslationMethod extends JMLQuantifierTranslationMethod {
+            final static String notBounded = "Only numerical quantifier expressions of form (\\sum int i; l<=i && i<u; t) are permitted";
+            final static String notInt = "Bounded numerical quantifier variable must be of type int.";
+
+
+            private  boolean isBoundedNumerical(Term a, LogicVariable lv){
+                    return lowerBound(a,lv)!=null && upperBound(a,lv)!=null;
+            }
+
+            /**
+             * Extracts lower bound from <code>a</code> if it matches the pattern.
+             * @param a guard to be disected
+             * @param lv variable bound by quantifier
+             * @return lower bound term (or null)
+             */
+            private  Term lowerBound(Term a, LogicVariable lv){
+                    if(a.arity()>0 && a.sub(0).op()==Junctor.AND){
+                            a=a.sub(0);
+                    }
+                    if(a.arity()==2 && a.op()== Junctor.AND && a.sub(0).arity()==2 && a.sub(0).sub(1).op()==lv
+                                    && a.sub(0).op().equals(services.getTypeConverter().getIntegerLDT().getLessOrEquals())){
+                            return a.sub(0).sub(0);
+                    }
+                    return null;
+            }
+
+            /**
+             * Extracts upper bound from <code>a</code> if it matches the pattern.
+             * @param a guard to be disected
+             * @param lv variable bound by quantifier
+             * @return upper bound term (or null)
+             */
+            private Term upperBound(Term a, LogicVariable lv){
+                    if(a.arity()>0 && a.sub(0).op()==Junctor.AND){
+                            a=a.sub(0);
+                    }   
+                    if(a.arity()==2 && a.op()==Junctor.AND && a.sub(1).arity()==2 && a.sub(1).sub(0).op()==lv
+                                    && a.sub(1).op().equals(services.getTypeConverter().getIntegerLDT().getLessThan())){
+                            return a.sub(1).sub(1);
+                    }
+                    return null;
+            }
+
+
+            @Override
+            public Term translate(Object... params)
+            throws SLTranslationException {
+                    checkParameters(params,
+                                    Term.class, Term.class, KeYJavaType.class,
+                                    ImmutableList.class, Boolean.class, Services.class);
+                    KeYJavaType declsType = (KeYJavaType) params[2];
+                    if (!declsType.getJavaType().equals(PrimitiveType.JAVA_INT))
+                            throw new SLTranslationException(notInt);
+                    return super.translate(params);
+            }
+
+            @Override
+            public Term translateQuantifiers(Iterable<LogicVariable> qvs, Term t1, Term t2)
+            throws SLTranslationException {
+                    Iterator<LogicVariable> it = qvs.iterator();
+                    LogicVariable lv = it.next();
+                    if (it.hasNext() || !isBoundedNumerical(t1, lv)){
+                            throw new SLTranslationException(notBounded);
+                    } else {
+                            if (t1.arity()>0 && t1.sub(0).op()==Junctor.AND)
+                                    t2 = TB.ife(t1.sub(1), t2, emptyRangeValue());
+                            return translateBoundedNumericalQuantifier(lv, lowerBound(t1, lv), upperBound(t1, lv), t2);
+                    }
+            }
+
+            /** Creates a term for a bounded numerical quantifier (e.g., sum).*/
+            public abstract Term translateBoundedNumericalQuantifier(QuantifiableVariable qv, Term lo, Term hi, Term body);
+
+            /** Gives the defined term for an empty range to quantify over (e.g., zero for sum). */
+            public abstract Term emptyRangeValue ();
+
+            /** Should not be called. */
+            @Override
+            @Deprecated
+            public Term combineQuantifiedTerms(Term t1, Term t2){
+                    assert false;
+                    return null;
+            }
+            /** Should not be called. */
+            @Override
+            @Deprecated
+            public Term translateQuantifier(QuantifiableVariable qv,
+                            Term t){
+                    assert false;
+                    return null;
+            }
+    }
+
 
     private abstract class JMLEqualityTranslationMethod implements
             JMLTranslationMethod {
