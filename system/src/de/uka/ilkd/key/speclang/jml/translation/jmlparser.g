@@ -231,31 +231,6 @@ options {
 	return or.replace(term);
     }
 
-    private boolean isBoundedSum(Term a, LogicVariable lv){
-        return lowerBound(a,lv)!=null && upperBound(a,lv)!=null;
-    }
-    
-    private Term lowerBound(Term a, LogicVariable lv){
-        if(a.arity()>0 && a.sub(0).op()==Junctor.AND){
-            a=a.sub(0);
-        }
-        if(a.arity()==2 && a.op()==Junctor.AND && a.sub(0).arity()==2 && a.sub(0).sub(1).op()==lv
-                && a.sub(0).op().equals(intLDT.getLessOrEquals())){
-            return a.sub(0).sub(0);
-        }
-        return null;
-    }
-   
-    private Term upperBound(Term a, LogicVariable lv){
-        if(a.arity()>0 && a.sub(0).op()==Junctor.AND){
-            a=a.sub(0);
-        }   
-        if(a.arity()==2 && a.op()==Junctor.AND && a.sub(1).arity()==2 && a.sub(1).sub(0).op()==lv
-                && a.sub(1).op().equals(intLDT.getLessThan())){
-            return a.sub(1).sub(1);
-        }
-        return null;
-    }
 
 
     private String createSignatureString(ImmutableList<SLExpression> signature) {
@@ -1433,7 +1408,34 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 	}
     |   NOT_MODIFIED LPAREN t=storereflist RPAREN
         {
-            raiseNotSupported("\\not_modified");
+        if (heapAtPre == null) {
+            raiseError("JML construct " +
+                   "\\not_modified not allowed in this context.");
+            }
+        // collect variables from storereflist
+        java.util.List<Term> storeRefs = new java.util.ArrayList<Term>();
+        final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
+        while (t.op() == ldt.getUnion()){
+            storeRefs.add(t.sub(0));
+            t = t.sub(1);
+        }
+        storeRefs.add(t);
+        // construct equality predicates
+        Term res = TB.tt();
+        for (Term sr: storeRefs){
+            if (sr.op() == ldt.getSingleton()){
+                Term ref = TB.dot(services, Sort.ANY, sr.sub(0), sr.sub(1));
+                res = TB.and(res, TB.equals(ref,convertToOld(ref)));
+            } else if (sr.op() == ldt.getEmpty()){
+                // do nothing
+            } else if (sr.op() == ldt.getAllLocs()){
+                raiseNotSupported("\\not_modified(\\everything)");
+                //res = TB.and(res, TB.all(new LogicVariable("f", xxxfieldsort), TB.all(new LogicVariable("o", services.getJavaInfo().getJavaLangObject()), term)));
+            } else {
+                raiseError("Term "+sr+" is not a valid store-ref expression.");
+            }
+        }
+        result = new SLExpression(res);
         } 
 	
     |   FRESH LPAREN list=expressionlist RPAREN
