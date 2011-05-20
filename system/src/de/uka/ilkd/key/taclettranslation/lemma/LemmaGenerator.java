@@ -194,10 +194,9 @@ class DefaultLemmaGenerator implements LemmaGenerator {
          */
         private Term createInstantiation(Taclet owner, VariableSV sv,
                         Services services) {
-                Name name = createUniqueName(services, sv.name().toString());
+                Name name = createUniqueName(services, "v_"+sv.name().toString());
                 LogicVariable variable = new LogicVariable(name,
                                 sv.sort());
-                services.getNamespaces().variables().add(variable);
                 return TermFactory.DEFAULT.createTerm(variable);
         }
 
@@ -235,10 +234,9 @@ class DefaultLemmaGenerator implements LemmaGenerator {
 
                 Sort[] argSorts = computeArgSorts(prefix);
                 Term[] args = computeArgs(owner, prefix, services);
-                Name name = createUniqueName(services, sv.name().toString());
+                Name name = createUniqueName(services, "f_"+sv.name().toString());
 
                 Function function = new Function(name, sv.sort(), argSorts);
-                services.getNamespaces().functions().add(function);
                 return TermBuilder.DF.func(function, args);
         }
 
