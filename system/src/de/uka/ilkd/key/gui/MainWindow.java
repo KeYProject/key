@@ -16,7 +16,6 @@ import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.FlowLayout;
 import java.awt.Frame;
-import java.awt.GraphicsEnvironment;
 import java.awt.GridBagLayout;
 import java.awt.Point;
 import java.awt.Toolkit;
@@ -956,6 +955,7 @@ public final class MainWindow extends JFrame  {
         }
         goalView.setViewportView(goalViewPane);
         goalView.setBorder(new TitledBorder(borderTitle));
+        goalView.setBackground(goalViewPane.getBackground());
         goalView.validate();
         validate();
     }
