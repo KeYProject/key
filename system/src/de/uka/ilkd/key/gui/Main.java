@@ -1691,6 +1691,7 @@ public final class Main extends JFrame implements IMain {
         }
         goalView.setViewportView(goalViewPane);
         goalView.setBorder(new TitledBorder(borderTitle));
+        goalView.setBackground(goalViewPane.getBackground());
         goalView.validate();
         validate();
     }

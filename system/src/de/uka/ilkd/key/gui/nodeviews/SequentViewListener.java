@@ -279,7 +279,8 @@ class SequentViewListener extends MouseInputAdapter
 	 */	
 	public void dragGestureRecognized(DragGestureEvent dgEvent) {	
 	    final Object oldHighlight = seqView.getCurrentHighlight();	
-	    final Object dndHighlight = seqView.getColorHighlight(Color.green);            
+	    final Object dndHighlight =
+                    seqView.getColorHighlight(SequentView.DND_HIGHLIGHT_COLOR);
 	    seqView.updateUpdateHighlights();
 	
 	    seqView.setCurrentHighlight(dndHighlight);
