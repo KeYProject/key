@@ -47,11 +47,15 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu
     private TacletApp selectedTaclet;
     /** the services */
     protected Services services;
+    
+    /** the base title; used title = basetitle + ( nrOfItems ) */
+    private String baseTitle;
 
     public InsertionTacletBrowserMenuItem(String title, JFrame parent, 
             NotationInfo notInfo, Services services) {
         
         super(title);
+        this.baseTitle = title;
         this.parent = parent;
         this.notInfo = notInfo;
         this.services = services;
@@ -101,6 +105,7 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu
             
         });
         add(appItem);
+        setText(baseTitle + " (" + getAppSize() + (getAppSize() != 1 ? " items" : " item") +")");
     }
 
 
