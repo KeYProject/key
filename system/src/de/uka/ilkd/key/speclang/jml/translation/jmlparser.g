@@ -223,6 +223,7 @@ options {
     /**
      * Converts a term so that all of its non-rigid operators refer to the pre-state.
      */
+    // TODO: remove when all clients have been moved to JMLTranslator
     private Term convertToOld(Term term) {
 	assert heapAtPre != null;
 	Map map = new LinkedHashMap();
@@ -1408,34 +1409,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 	}
     |   NOT_MODIFIED LPAREN t=storereflist RPAREN
         {
-        if (heapAtPre == null) {
-            raiseError("JML construct " +
-                   "\\not_modified not allowed in this context.");
-            }
-        // collect variables from storereflist
-        java.util.List<Term> storeRefs = new java.util.ArrayList<Term>();
-        final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
-        while (t.op() == ldt.getUnion()){
-            storeRefs.add(t.sub(0));
-            t = t.sub(1);
-        }
-        storeRefs.add(t);
-        // construct equality predicates
-        Term res = TB.tt();
-        for (Term sr: storeRefs){
-            if (sr.op() == ldt.getSingleton()){
-                Term ref = TB.dot(services, Sort.ANY, sr.sub(0), sr.sub(1));
-                res = TB.and(res, TB.equals(ref,convertToOld(ref)));
-            } else if (sr.op() == ldt.getEmpty()){
-                // do nothing
-            } else if (sr.op() == ldt.getAllLocs()){
-                raiseNotSupported("\\not_modified(\\everything)");
-                //res = TB.and(res, TB.all(new LogicVariable("f", xxxfieldsort), TB.all(new LogicVariable("o", services.getJavaInfo().getJavaLangObject()), term)));
-            } else {
-                raiseError("Term "+sr+" is not a valid store-ref expression.");
-            }
-        }
-        result = new SLExpression(res);
+        result = new SLExpression(translator.<Term>translate("\\not_modified",services, heapAtPre, t));
         } 
 	
     |   FRESH LPAREN list=expressionlist RPAREN
@@ -1565,6 +1539,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
     |   INVARIANT_FOR LPAREN result=expression RPAREN 
 	{
 	    raiseNotSupported("\\invariant_for");
+	    
 	} 
 	
     |   ( LPAREN LBLNEG ) => LPAREN LBLNEG IDENT result=expression RPAREN

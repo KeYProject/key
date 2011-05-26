@@ -10,9 +10,13 @@
 package de.uka.ilkd.key.speclang.jml.translation;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
+import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermCreationException;
@@ -26,6 +30,8 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationExceptionManager;
 import de.uka.ilkd.key.util.LinkedHashMap;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
+
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -253,6 +259,57 @@ final class JMLTranslator {
                         return TB.bsum(qv, lo, hi, body, services);               } 
         }
         );
+        
+        // primary expressions
+        translationMethods.put("\\not_modified", new JMLPostExpressionTranslationMethod(){
+
+            @Override
+            protected String name() {
+                return "\\not_modified";
+            }
+
+            @Override
+            protected Term translate(Services services, Term heapAtPre, Object[] params) throws SLTranslationException {
+                checkParameters(params, Term.class);
+                Term t = (Term) params[0];
+                
+                // collect variables from storereflist
+                java.util.List<Term> storeRefs = new java.util.ArrayList<Term>();
+                final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
+                final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+                while (t.op() == ldt.getUnion()){
+                    storeRefs.add(t.sub(0));
+                    t = t.sub(1);
+                }
+                storeRefs.add(t);
+                // construct equality predicates
+                Term res = TB.tt();
+                for (Term sr: storeRefs){
+                    if (sr.op() == ldt.getSingleton()){
+                        final Term ref = TB.dot(services, Sort.ANY, sr.sub(0), sr.sub(1));
+                        res = TB.and(res, TB.equals(ref,convertToOld(services, heapAtPre, ref)));
+                    } else if (sr.op() == ldt.getEmpty()){
+                        // do nothing
+                    } else if (sr.op().equals(ldt.getSetMinus()) && sr.sub(0).op().equals(ldt.getAllLocs()) && sr.sub(1).op().equals(ldt.getFreshLocs())){
+                        // this is the case for "\everything"
+                        final JavaInfo ji = services.getJavaInfo();
+                        final LogicVariable fld = new LogicVariable(new Name("f"), heapLDT.getFieldSort());
+                        final LogicVariable obj = new LogicVariable(new Name("o"), ji.objectSort());
+                        final Term objTerm = TB.var(obj);
+                        final Term fldTerm = TB.var(fld);
+                        final Term ref = TB.dot(services, Sort.ANY, objTerm, fldTerm);
+                        final Term fresh = TB.subset(services, TB.singleton(services, objTerm, fldTerm ), TB.freshLocs(services, heapAtPre));
+                        final Term bodyTerm = TB.or(TB.equals(ref, convertToOld(services, heapAtPre, ref)),fresh);
+                        res = TB.and(res, TB.all(fld, TB.all(obj, bodyTerm)));
+                    } else {
+                        // all other results are not meant to occur
+                        throw new SLTranslationException("Term "+sr+" is not a valid store-ref expression.");
+                    }
+                }
+                return res;
+            }
+
+        });
 
         // operators
         translationMethods.put("<==>", new JMLEqualityTranslationMethod() {
@@ -602,6 +659,50 @@ final class JMLTranslator {
                     assert false;
                     return null;
             }
+    }
+    
+    /**
+     * Translation method for expressions only allowed to appear in a postcondition.
+     * @author bruns
+     *
+     */
+    private abstract class JMLPostExpressionTranslationMethod implements JMLTranslationMethod {
+
+        protected void assertPost (Term heapAtPre) throws SLTranslationException{
+            if (heapAtPre == null){
+                throw new SLTranslationException("JML construct "+name()+" not allowed in this context.");
+            }
+        }
+        
+
+        /**
+         * Converts a term so that all of its non-rigid operators refer to the pre-state.
+         */
+        protected Term convertToOld(Services services, Term heapAtPre, Term term) {
+            assert heapAtPre != null;
+            Map<Term,Term> map = new LinkedHashMap<Term, Term>();
+            map.put(TB.heap(services), heapAtPre);
+            OpReplacer or = new OpReplacer(map);
+            return or.replace(term);
+        }
+
+        /**
+         * Name of this translation method;
+         */
+        protected abstract String name();
+
+        protected abstract Term translate (Services services, Term heapAtPre, Object[] params) throws SLTranslationException;
+
+        public Term translate (Object ... params) throws SLTranslationException{
+            if (!(params[0] instanceof Services && params[1] instanceof Term))
+                throw new SLTranslationException(
+                        "Parameter 2 does not match the expected type.\n"
+                        + "Parameter type was: " + params[1].getClass().getName()
+                        + "\nExpected type was:  Term");
+            Term heapAtPre = (Term) params[1];
+            assertPost(heapAtPre);
+            return translate((Services)params[0], heapAtPre, Arrays.copyOfRange(params, 1, params.length-1));
+        }
     }
 
 
