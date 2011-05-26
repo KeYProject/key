@@ -261,6 +261,24 @@ final class JMLTranslator {
         );
         
         // primary expressions
+        translationMethods.put("\\invariant_for", new JMLTranslationMethod(){
+
+            /**
+             * @param params[0] Services
+             * @param params[1] SLExpression giving the object
+             */
+            @Override
+            public SLExpression translate(Object... params)
+                    throws SLTranslationException {
+                checkParameters(params, Services.class, SLExpression.class);
+                final Services services = (Services) params[0];
+                Function inv = services.getJavaInfo().getInv();
+                Term obj = ((SLExpression)params[1]).getTerm();
+                return new SLExpression(TB.func(inv, TB.heap(services), obj));
+            }
+            
+        });
+        
         translationMethods.put("\\not_modified", new JMLPostExpressionTranslationMethod(){
 
             @Override
@@ -268,6 +286,11 @@ final class JMLTranslator {
                 return "\\not_modified";
             }
 
+            /**
+             * @param services Services
+             * @param heapAtPre The pre-state heap (since we are in a post-condition)
+             * @param params Must be of length 1 with a Term (store-ref expression)
+             */
             @Override
             protected Term translate(Services services, Term heapAtPre, Object[] params) throws SLTranslationException {
                 checkParameters(params, Term.class);

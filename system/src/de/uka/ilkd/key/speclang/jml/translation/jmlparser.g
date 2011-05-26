@@ -1538,7 +1538,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 	
     |   INVARIANT_FOR LPAREN result=expression RPAREN 
 	{
-	    raiseNotSupported("\\invariant_for");
+	    result = translator.<SLExpression>translate("\\invariant_for",services,result);
 	    
 	} 
 	
