@@ -13,17 +13,13 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.logic.op.TermSV;
-import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.util.pp.Backend;
 import de.uka.ilkd.key.util.pp.StringBackend;
 
 public class UserDefinedSymbols {
@@ -49,7 +45,7 @@ public class UserDefinedSymbols {
         final ImmutableSet<Taclet> axioms;
         private final NamespaceSet referenceNamespaces;
         private String ruleHeader = null;
-        private String header = null;
+      
 
         public UserDefinedSymbols(NamespaceSet referenceNamespaces,
                         ImmutableSet<Taclet> axioms) {
@@ -315,43 +311,7 @@ public class UserDefinedSymbols {
         }
 
 
-        private StringBuffer createHeaderFor(String type, Set<Named> symbols) {
-                StringBuffer buffer = new StringBuffer(type);
-                buffer.append("{");
-                for (Named symbol : symbols) {
-                        buffer.append("\n");
-                        if(symbol instanceof FormulaSV){
-                                buffer.append("\\formula ");
-                        }
-                        if(symbol instanceof TermSV){
-                                buffer.append("\\term ");
-                        }
-                        if(symbol instanceof VariableSV){
-                                buffer.append("\\variable ");
-                        }
-                        if (symbol instanceof SortedOperator) {
-                                Sort sort = ((SortedOperator) symbol).sort();
-                                if (sort != Sort.FORMULA) {
-                                        buffer.append(sort.name() + " ");
-                                }
-                        }
-                        buffer.append(symbol.name());
-                        if (symbol instanceof Function) {
-                                Function op = (Function) symbol;
-                                for (int i = 0; i < op.arity(); i++) {
-                                        buffer.append(i == 0 ? "(" : ",");
-                                        buffer.append(op.argSort(i));
-                                        buffer.append(i == op.arity() - 1 ? ")"
-                                                        : "");
-                                }
-                        }
-                        
-                        
-                        buffer.append(";");
-                }
-                buffer.append("\n}");
-                return buffer;
-        }
+
 
         public String toString() {
 

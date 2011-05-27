@@ -3,9 +3,8 @@ package de.uka.ilkd.key.taclettranslation.lemma;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Set;
-import java.util.TreeSet;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -18,7 +17,6 @@ import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -26,16 +24,19 @@ import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
 import de.uka.ilkd.key.taclettranslation.SkeletonGenerator;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
 import de.uka.ilkd.key.taclettranslation.TacletTranslator;
 
+/**
+ * A Lemma Generator translates a taclet to its corresponding 
+ * first order logic formula thats validity implies the validity
+ * of the taclet.
+ */
 public interface LemmaGenerator extends TacletTranslator {
-
-        public TacletFormula translate(Taclet taclet, Services services);
-
-
+         public TacletFormula translate(Taclet taclet, Services services);
 }
 
 class LemmaFormula implements TacletFormula {
@@ -69,6 +70,12 @@ class LemmaFormula implements TacletFormula {
 
 }
 
+
+/**
+ * The default lemma generator: Supports only certain types of
+ * taclets. If a taclet is not supported, the generator throws 
+ * an exception. 
+ */
 class DefaultLemmaGenerator implements LemmaGenerator {
 
         // Describes how a schema variable is mapped to another operator, e.g.
@@ -81,6 +88,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
         
         @Override
         public TacletFormula translate(Taclet taclet, Services services) {
+                checkForIllegalConditions(taclet);
                 Term formula = SkeletonGenerator.FindTacletTranslator
                                 .translate(taclet);
                 formula = rebuild(taclet, formula, services,
@@ -98,6 +106,14 @@ class DefaultLemmaGenerator implements LemmaGenerator {
                 }
 
                 return term;
+        }
+        
+        private void checkForIllegalConditions(Taclet taclet){
+                Iterator<VariableCondition> it = taclet.getVariableConditions();
+                if(it.hasNext()){
+                        throw new IllegalTacletException("The given taclet " + taclet.name() 
+                                        + " contains variable conditions that are not supported.");    
+                }
         }
         
         private void checkForIllegalOps(Term formula, Taclet owner){
@@ -265,6 +281,10 @@ class DefaultLemmaGenerator implements LemmaGenerator {
                 return args;
         }
 
+        /**
+         * Rebuilds a term recursively and replaces all schema variables with
+         * skolem terms/variables. 
+         *   */
         private Term rebuild(Taclet taclet, Term term, Services services,
                         HashSet<QuantifiableVariable> boundedVariables) {
                 Term[] newSubs = new Term[term.arity()];

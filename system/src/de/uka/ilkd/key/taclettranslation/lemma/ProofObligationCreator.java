@@ -16,17 +16,29 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
 import de.uka.ilkd.key.taclettranslation.TacletVisitor;
 
-public class ProofObligationCreator {
-      
 
-        
+/**
+ * Creates for a given set of taclets the corresponding set of proof
+ * obligation. For more information see public method <code>create(...)</code>.
+ *
+ */
+public class ProofObligationCreator {       
 
         private String createName(ProofAggregate[] singleProofs) {
                 return "Side proofs for " + singleProofs.length + " lemmata.";
         }
         
         
-
+        /**
+         * Creates for each taclet in <code>taclets</code> a proof obligation 
+         * containing the corresponding FOL formula of the taclet.
+         * @param taclets  Sets of taclets the proof obligations should be created for.
+         * @param initConfig the initial configuration that should be used for creating the proofs.
+         * @param axioms The set of user-defined taclets that should be used as additional rules. This
+         * taclets are added to the single proof obligation so that they can be used for the proof.  
+         * @param listener a listener that observes the single steps. Used for status information.
+         * @return A proof aggregate containing the proofs created by this method.
+         */
         public ProofAggregate create(ImmutableSet<Taclet> taclets,
                         InitConfig initConfig, ImmutableSet<Taclet> axioms,
                         ProblemInitializerListener listener) {
