@@ -159,6 +159,16 @@ options {
 	    throws SLTranslationException {
 	throw excManager.createWarningException(feature + " not supported"); 
     }
+    
+    /**
+     * This is used for features without semantics such as labels or annotations.
+     * @author bruns
+     * @since 1.7.2178
+     */
+    private void addIgnoreWarning(String feature) {
+        String msg = feature + " is not supported and has been silently ignored.";
+        // TODO: wasn't there some collection of non-critical warnings ???
+    }
 	
 
     public Term parseExpression() throws SLTranslationException {
@@ -1544,18 +1554,13 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 	
     |   ( LPAREN LBLNEG ) => LPAREN LBLNEG IDENT result=expression RPAREN
 	{
-	    raiseNotSupported("\\lblneg");
+	    addIgnoreWarning("\\lblneg");
 	} 
 	
     |   ( LPAREN LBLPOS ) => LPAREN LBLPOS IDENT result=expression RPAREN 
 	{
-	    raiseNotSupported("\\lblpos");
+	    addIgnoreWarning("\\lblpos");
 	} 
-	
-    |   NOWARN 
-	{
-	    raiseNotSupported("\\nowarn");
-	}
 	 
     |   STRING_EQUAL LPAREN e1=expression COMMA e2=expression RPAREN
         {
