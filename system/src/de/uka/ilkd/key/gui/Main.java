@@ -136,9 +136,12 @@ import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.key.util.PreferenceSaver;
 import de.uka.ilkd.key.util.ProgressMonitor;
 import java.awt.GraphicsEnvironment;
 import java.util.List;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
 
 
 public final class Main extends JFrame implements IMain {
@@ -213,6 +216,9 @@ public final class Main extends JFrame implements IMain {
     private boolean frozen = false;
    
     private static KeYFileChooser fileChooser = null;
+    
+    private PreferenceSaver prefSaver =
+        new PreferenceSaver(Preferences.userNodeForPackage(Main.class));
     
     private static final String PARA = 
 
@@ -352,9 +358,6 @@ public final class Main extends JFrame implements IMain {
         
         SwingUtilities.updateComponentTreeUI(this);
         ToolTipManager.sharedInstance().setDismissDelay(30000);
-        GraphicsEnvironment env =
-                GraphicsEnvironment.getLocalGraphicsEnvironment();
-        setBounds(env.getMaximumWindowBounds());
         addWindowListener(new MainListener());
         
     }
@@ -622,6 +625,7 @@ public final class Main extends JFrame implements IMain {
         "Select strategy for automated proof search");
         
         tabbedPane.addTab("Rules", null, new JScrollPane(ruleView), "All available rules");
+        tabbedPane.setName("leftTabbed");
         tabbedPane.setSelectedIndex(0);
         tabbedPane.setPreferredSize(new java.awt.Dimension(250, 440));
         tabbedPane.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).getParent().remove(KeyStroke.getKeyStroke(KeyEvent.VK_UP, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
@@ -641,6 +645,7 @@ public final class Main extends JFrame implements IMain {
         }; // work around bug in
         // com.togethersoft.util.ui.plaf.metal.OIMetalSplitPaneUI
         
+        leftPane.setName("leftPane");
         leftPane.setOneTouchExpandable(true);
         
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPane, goalView) {
@@ -654,6 +659,7 @@ public final class Main extends JFrame implements IMain {
         }; // work around bug in
         // com.togethersoft.util.ui.plaf.metal.OIMetalSplitPaneUI
         splitPane.setResizeWeight(0); // the right pane is more important
+        splitPane.setName("splitPane");
         splitPane.setOneTouchExpandable(true);
         getContentPane().add(splitPane, BorderLayout.CENTER);
         
@@ -661,6 +667,12 @@ public final class Main extends JFrame implements IMain {
                 + "KeY is free software and comes with ABSOLUTELY NO WARRANTY."
                 + " See About | License.", getFont());
         getContentPane().add(statusLine, BorderLayout.SOUTH);
+        
+        GraphicsEnvironment env =
+            GraphicsEnvironment.getLocalGraphicsEnvironment();
+        setBounds(env.getMaximumWindowBounds());
+        
+        prefSaver.load(this);
     }
     
 
@@ -874,6 +886,13 @@ public final class Main extends JFrame implements IMain {
             mediator.fireShutDown(new GUIEvent(this));
 
             System.out.println("Have a nice day.");
+            
+            try {
+                prefSaver.save(this);
+            } catch (BackingStoreException e) {
+                e.printStackTrace();
+            }
+            
             System.exit(-1);
         }
         // Release threads waiting for the prover to exit
@@ -1672,6 +1691,7 @@ public final class Main extends JFrame implements IMain {
         }
         goalView.setViewportView(goalViewPane);
         goalView.setBorder(new TitledBorder(borderTitle));
+        goalView.setBackground(goalViewPane.getBackground());
         goalView.validate();
         validate();
     }

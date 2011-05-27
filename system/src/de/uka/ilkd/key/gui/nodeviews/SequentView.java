@@ -61,6 +61,8 @@ public class SequentView extends JEditorPane implements Autoscroll {
 
     public static final Color UPDATE_HIGHLIGHT_COLOR = new Color(0, 150, 130, 38);
 
+    public static final Color DND_HIGHLIGHT_COLOR = new Color(0, 150, 130, 104);
+
     public static final Color BACKGROUND_COLOR = new Color(249, 249, 249);
 
     // the default tag of the highlight
@@ -414,6 +416,7 @@ public class SequentView extends JEditorPane implements Autoscroll {
 	        errorocc = false;
 	        try {
 		    setText(printer.toString());
+
 	        } catch (Error e) {
 		    System.err.println("Error occurred while printing Sequent!");
 		    errorocc = true;

@@ -223,14 +223,17 @@ class SequentViewListener extends MouseInputAdapter
      * @see java.awt.event.KeyListener#keyPressed(java.awt.event.KeyEvent)
      */
     public void keyPressed(KeyEvent e) {
-      if (e.getKeyCode() == KeyEvent.VK_F3) {
-          synchronized(IncrementalSearch.class) {
-                new IncrementalSearch(seqView);
-          }
-          return;
-      }
-
-      if ((e.getModifiersEx() & InputEvent.ALT_DOWN_MASK) != 0) {
+        if (e.getKeyCode() == KeyEvent.VK_F3) {
+            IncrementalSearch search = IncrementalSearch.getInstance();
+            if (!search.isInitialised()) {
+                search.initSearch(seqView);
+            } else {
+                search.requestFocus();
+            }
+        } else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+            IncrementalSearch search = IncrementalSearch.getInstance();
+            search.disableSearch();
+        } else if ((e.getModifiersEx() & InputEvent.ALT_DOWN_MASK) != 0) {
             synchronized(this) {
                 showTermInfo = true;	    
             }
@@ -276,7 +279,8 @@ class SequentViewListener extends MouseInputAdapter
 	 */	
 	public void dragGestureRecognized(DragGestureEvent dgEvent) {	
 	    final Object oldHighlight = seqView.getCurrentHighlight();	
-	    final Object dndHighlight = seqView.getColorHighlight(Color.green);            
+	    final Object dndHighlight =
+                    seqView.getColorHighlight(SequentView.DND_HIGHLIGHT_COLOR);
 	    seqView.updateUpdateHighlights();
 	
 	    seqView.setCurrentHighlight(dndHighlight);
