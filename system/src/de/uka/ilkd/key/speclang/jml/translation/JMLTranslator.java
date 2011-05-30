@@ -12,6 +12,7 @@ package de.uka.ilkd.key.speclang.jml.translation;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -35,6 +36,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
 
+import antlr.Token;
+
 
 
 /**
@@ -44,6 +47,7 @@ final class JMLTranslator {
 
     private final static JMLTranslator instance = new JMLTranslator();
     private final static TermBuilder TB = TermBuilder.DF;
+    private SLTranslationExceptionManager excManager;
 
     private LinkedHashMap<String, JMLTranslationMethod> translationMethods;
 
@@ -415,6 +419,106 @@ final class JMLTranslator {
                 }
             }
         });
+        
+        // others
+        translationMethods.put("array reference", new JMLTranslationMethod(){
+
+            @Override
+            public Object translate(Object... params)
+            throws SLTranslationException {
+                checkParameters(params, Services.class, SLExpression.class, String.class, Token.class, SLExpression.class, SLExpression.class);
+                Services services = (Services)params[0];
+                SLExpression receiver = (SLExpression)params[1];
+                String fullyQualifiedName = (String)params[2];
+                Token lbrack = (Token)params[3];
+                SLExpression rangeFrom = (SLExpression)params[4];
+                SLExpression rangeTo = (SLExpression)params[5];
+                SLExpression result = null;
+                try{
+                    whatToDoFirst(receiver, fullyQualifiedName, lbrack);
+
+                    //arrays
+                    if(receiver.getType().getJavaType() instanceof ArrayType) {
+                        result = translateArrayReference(services, receiver,
+                                rangeFrom, rangeTo);
+
+                        //sequences 
+                    } else {
+                        result = translateSequenceReference(services, receiver,
+                                rangeFrom, rangeTo);   
+                    }
+                    return result;
+                }
+                catch (TermCreationException tce){
+                    raiseError(tce.getMessage());
+                    return null;
+                }}
+
+            private void whatToDoFirst(SLExpression receiver,
+                    String fullyQualifiedName, Token lbrack)
+                    throws SLTranslationException {
+                if(receiver == null) {
+                    raiseError("Array \"" + fullyQualifiedName + "\" not found.", lbrack);
+                } else if(receiver.isType()) {
+                    raiseError("Error in array expression: \"" + fullyQualifiedName +
+                            "\" is a type.", lbrack);
+                } else if(!(receiver.getType().getJavaType() instanceof ArrayType
+                        || receiver.getType().getJavaType().equals(PrimitiveType.JAVA_SEQ))) {
+                    raiseError("Cannot access " + receiver.getTerm() + " as an array.");
+                }
+            }
+
+            private SLExpression translateArrayReference(Services services,
+                    SLExpression receiver, SLExpression rangeFrom,
+                    SLExpression rangeTo) {
+                SLExpression result;
+                if (rangeFrom == null) {
+                    // We have a star. A star includes all components of an array even
+                    // those out of bounds. This makes proving easier.      
+                    Term t = TB.allFields(services, receiver.getTerm());
+                    result = new SLExpression(t);
+                } else if (rangeTo != null) {
+                    // We have "rangeFrom .. rangeTo"
+                    Term t = TB.arrayRange(services, 
+                            receiver.getTerm(), 
+                            rangeFrom.getTerm(), 
+                            rangeTo.getTerm());
+                    result = new SLExpression(t);
+                } else {
+                    // We have a regular array access
+                    Term t = TB.dotArr(services, 
+                            receiver.getTerm(),
+                            rangeFrom.getTerm());
+                    ArrayType arrayType = (ArrayType) receiver.getType().getJavaType();
+                    KeYJavaType elementType = arrayType.getBaseType().getKeYJavaType();                    
+                    result = new SLExpression(t, elementType);
+                }
+                return result;
+            }
+
+            private SLExpression translateSequenceReference(Services services,
+                    SLExpression receiver, SLExpression rangeFrom,
+                    SLExpression rangeTo) throws SLTranslationException {
+                if (rangeFrom == null){
+                    // a star
+                    return new SLExpression(TB.allFields(services, receiver.getTerm()));
+                } else
+                    if(rangeTo != null) {
+                        Term t = TB.seqSub(services, 
+                                receiver.getTerm(), 
+                                rangeFrom.getTerm(), 
+                                rangeTo.getTerm());
+                        return new SLExpression(t);
+                    } else {
+                        Term t = TB.seqGet(services, 
+                                Sort.ANY,
+                                receiver.getTerm(), 
+                                rangeFrom.getTerm());
+                        return new SLExpression(t);
+                    }
+            }
+
+        });
     }
 
 
@@ -427,8 +531,13 @@ final class JMLTranslator {
     public static JMLTranslator getInstance() {
         return instance;
     }
+    
+    public void setExceptionManager (SLTranslationExceptionManager sltem){
+        excManager = sltem;
+    }
 
 
+    @SuppressWarnings("unchecked")
     public <T> T translate(String jmlKeyword,
                           Object... params)
             throws SLTranslationException {
@@ -449,6 +558,7 @@ final class JMLTranslator {
     /**
      *
      */
+    @SuppressWarnings("unchecked")
     public <T> T parse(PositionedString expr,
                        KeYJavaType specInClass,
                        ProgramVariable selfVar,
@@ -471,7 +581,7 @@ final class JMLTranslator {
         this.<T>checkReturnType(result);
         return (T) result;
     }
-
+    
 
     //-------------------------------------------------------------------------
     // private methods
@@ -503,6 +613,7 @@ final class JMLTranslator {
     }
 
 
+    @SuppressWarnings("unchecked")
     private <T> void checkReturnType(Object result)
             throws SLTranslationException {
         try {
@@ -513,6 +624,42 @@ final class JMLTranslator {
                     + "Return type was: " + result.getClass() + "\n"
                     + "Tried conversion was: " + e.getMessage());
         }
+    }
+
+    private void raiseError(String msg) throws SLTranslationException {
+        if (excManager == null)
+            throw new SLTranslationException(msg);
+        else
+            throw excManager.createException(msg);
+    }
+
+
+    private void raiseError(String msg, Token t) throws SLTranslationException {
+        if (excManager == null)
+            throw new SLTranslationException(msg);
+        else
+            throw excManager.createException(msg, t);   
+    }
+
+
+    @SuppressWarnings("unused")
+    private void raiseNotSupported(String feature) 
+    throws SLTranslationException {
+        if (excManager == null)
+            throw new SLTranslationException(feature + " not supported");
+        else
+            throw excManager.createWarningException(feature + " not supported"); 
+    }
+
+    /**
+     * This is used for features without semantics such as labels or annotations.
+     * @author bruns
+     * @since 1.7.2178
+     */
+    @SuppressWarnings("unused")
+    private void addIgnoreWarning(String feature) {
+        String msg = feature + " is not supported and has been silently ignored.";
+        // TODO: wasn't there some collection of non-critical warnings ???
     }
 
 

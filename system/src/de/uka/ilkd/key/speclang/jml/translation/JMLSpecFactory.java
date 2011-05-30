@@ -215,7 +215,7 @@ public class JMLSpecFactory {
                 translateSignalsOnly(pm, progVars.excVar,
                                      originalBehavior,
                                      textualSpecCase.getSignalsOnly());
-        clauses.diverges = translateDeverges(pm, progVars.selfVar,
+        clauses.diverges = translateDiverges(pm, progVars.selfVar,
                                              progVars.paramVars,
                                              textualSpecCase.getDiverges());
         return clauses;
@@ -291,7 +291,7 @@ public class JMLSpecFactory {
     }
 
 
-    private Term translateDeverges(ProgramMethod pm,
+    private Term translateDiverges(ProgramMethod pm,
                                    ProgramVariable selfVar,
                                    ImmutableList<ProgramVariable> paramVars,
                                    ImmutableList<PositionedString> originalDiverges)

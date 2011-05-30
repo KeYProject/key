@@ -84,7 +84,6 @@ public abstract class SpecialConstructorReference
      *      @return an int giving the number of children of this node
      */
     public int getChildCount() {
-        //return (arguments != null) ? arguments.size()+1 : 1; // XXX why +1 ?
         return getExpressionCount();
     }
 

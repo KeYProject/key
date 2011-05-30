@@ -94,6 +94,8 @@ options {
 	this.excManager     = new SLTranslationExceptionManager(this,
 				    				fileName, 
 				    				offsetPos);
+	translator.setExceptionManager(excManager);
+	
 	this.selfVar	    = self;
 	this.paramVars      = paramVars;
 	this.resultVar      = result;
@@ -516,61 +518,9 @@ specarrayrefexpr[SLExpression receiver, String fullyQualifiedName, Token lbrack]
 	| MULT
     )
     {
-	if(receiver == null) {
-	    raiseError("Array \"" + fullyQualifiedName + "\" not found.", lbrack);
-	} else if(receiver.isType()) {
-	    raiseError("Error in array expression: \"" + fullyQualifiedName +
-		    "\" is a type.", lbrack);
-	} else if(!(receiver.getType().getJavaType() instanceof ArrayType
-	            || receiver.getType().getJavaType().equals(PrimitiveType.JAVA_SEQ))) {
-	    raiseError("Cannot access " + receiver.getTerm() + " as an array.");
-	}
-    
-    	//arrays
-    	if(receiver.getType().getJavaType() instanceof ArrayType) {
-	    if (rangeFrom == null) {
-	        // We have a star. A star includes all components of an array even
-	        // those out of bounds. This makes proving easier.	    
-	        Term t = TB.allFields(services, receiver.getTerm());
-    	        result = new SLExpression(t);
-	    } else if (rangeTo != null) {
-	        // We have "rangeFrom .. rangeTo"
-	        Term t = TB.arrayRange(services, 
-	    			       receiver.getTerm(), 
-	    			       rangeFrom.getTerm(), 
-	    			       rangeTo.getTerm());
-	        result = new SLExpression(t);
-	    } else {
-	        // We have a regular array access
-	        Term t = TB.dotArr(services, 
-	    		           receiver.getTerm(),
-	    	    	           rangeFrom.getTerm());
-	        ArrayType arrayType = (ArrayType) receiver.getType().getJavaType();
-	        KeYJavaType elementType = arrayType.getBaseType().getKeYJavaType();	    		       
-                result = new SLExpression(t, elementType);
-	    }
-	    
-	//sequences	
-	} else {
-	    if(rangeTo != null) {
-	        Term t = TB.seqSub(services, 
-	                           receiver.getTerm(), 
-	                           rangeFrom.getTerm(), 
-	                           rangeTo.getTerm());
-	        result = new SLExpression(t);
-	    } else {
-	    	Term t = TB.seqGet(services, 
-	    			   Sort.ANY,
-	    		           receiver.getTerm(), 
-	    		           rangeFrom.getTerm());
-	        result = new SLExpression(t);
-	    }	
-	}
+        result = translator.<SLExpression>translate("array reference", services, receiver, fullyQualifiedName, lbrack, rangeFrom, rangeTo);
     }
-    ;exception
-        catch [TermCreationException ex] {
-              raiseError(ex.getMessage());
-        }
+;
 
 
 storerefkeyword returns [Term result = null] throws SLTranslationException
@@ -1685,6 +1635,10 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
         {
             result = new SLExpression(TB.seqReverse(services, e1.getTerm()));
         }   
+    |   SEQGET LPAREN e1=expression COMMA e2=expression RPAREN
+        {
+        result = new SLExpression(TB.seqGet(services, Sort.ANY, e1.getTerm(), e2.getTerm()));
+        }
     |   SEQREPLACE LPAREN e1=expression COMMA e2=expression COMMA e3=expression RPAREN
         {
             // short for "e1[0..e2-1]+e3+e1[e2+1..e1.length-1]"

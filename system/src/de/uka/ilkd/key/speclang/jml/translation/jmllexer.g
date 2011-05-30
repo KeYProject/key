@@ -138,6 +138,7 @@ SUBSET : "\\subset";
 NEWELEMSFRESH : "\\new_elems_fresh";
 
 SEQ : "\\seq";
+SEQGET : "\\seq_get";
 SEQEMPTY : "\\seq_empty";
 SEQSINGLETON : "\\seq_singleton";
 SEQCONCAT : "\\seq_concat";
