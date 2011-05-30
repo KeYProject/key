@@ -1,44 +1,115 @@
+package vacid0.redblacktree;
+
+/**
+ * A node in a red-black tree.
+ * Nodes hold an integer key and a value and are either red or black.
+ * @author bruns
+ *
+ */
 class Node {
+
+    final static Node NIL = new Nil();
+
+    boolean isRed;
+    final int key;
+    int value;
     
-  final static Node NIL = new Nil();
+    //@ ghost int height;
 
-  boolean isRed;
-  int key;
-  int value;
-  
-  Node left, right;
+    Node parent, left, right;
 
-  // the red-black tree properties
-  //@ invariant (left == NIL && right == NIL) ==> !isRed;
-  //@ invariant isRed ==> !(left.isRed || right.isRed);
-  //@ invariant left.blackLeft() == right.blackRight;
-  //@ invariant height() > left.height() && height() > right.height();
-  
-  Node (int key, int value){
-      left = NIL;
-      right = NIL;
-      this.key = key;
-      this.value = value;
-  }
-  
-  /*@ pure @*/ int blackLeft (){
-      return left.blackLeft()+(left.isRed?0:1);
-  }
-  
-  /*@ pure @*/ int blackRight(){
-      return right.blackRight()+(right.isRed?0:1);
-  }
-  
-  //@ ensures \result >= 0;
-  /*@ pure @*/ int height (){
-      return 1+(left.height()>right.height?left.height:right.height);
-  }
-  
-  final class Nil extends Node {
-      Nil(){isRed=false;}
-      int blackLeft(){return 0;}
-      int blackRight(){return 0;}
-      int height(){return 0;}
-  }
-  
+    // the red-black tree properties
+    //@ public invariant isRed ==> !(left.isRed || right.isRed);
+    //@ public invariant left.blackLeft() == right.blackRight();
+    
+    //@ invariant this == NIL || height == (left.height > right.height ? left.height : right.height)+1;
+
+    Node (int key, int value){
+        parent = NIL;
+        left = NIL;
+        right = NIL;
+        this.key = key;
+        this.value = value;
+    }
+    
+    //@ helper
+    private Node(){
+        key = -1;
+    }
+
+    //@ measured_by height;
+    protected /*@ pure helper @*/ int blackLeft (){
+        return left.blackLeft()+(left.isRed?0:1);
+    }
+
+    //@ measured_by height;
+    protected /*@ pure helper @*/ int blackRight(){
+        return right.blackRight()+(right.isRed?0:1);
+    }
+   
+
+    /*@ normal_behavior
+      @   requires this != NIL;
+      @   ensures true;
+      @*/
+    /*@ helper @*/ void leftRotate (RedBlackTree t){
+        Node y = right;
+        Node p = parent;
+        if (y != NIL) {
+            //@ set y.height = height;
+            //@ set height = height -1;
+            y.parent = p;
+            right = y.left;
+            y.left = this;
+
+            if (p == null){
+                t.setRoot(y); 
+            } else {
+                if (p.left == this)
+                    p.left = y;
+                else p.right = y;
+            }
+        }
+    }
+
+    //@ requires this != NIL;
+    /*@ helper @*/ void rightRotate (RedBlackTree t){
+        Node y = left;
+        Node p = parent;
+        if (y != NIL){
+            //@ set y.height = height;
+            //@ set height = height -1;
+            y.parent = p;
+            left = y.right;
+            y.right = this;
+            if (p == null)
+                t.setRoot(y);
+            else
+                if (p.left == this)
+                    p.left = y;
+                else p.right = y;
+        }
+    }
+    
+
+    /** Special node for leaves that represent an empty data set.
+     * NIL is always black.
+     * @author bruns
+     */
+    public final static class Nil extends Node {
+        private Nil(){
+            super();
+            left = this;
+            right = this;
+            isRed=false;
+            //@ set height = 0;
+        }
+        protected int blackLeft(){
+            return 0;
+        }
+        protected int blackRight(){
+            return 0;
+        }
+    }
+
 }

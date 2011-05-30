@@ -1,8 +1,14 @@
-class Harness {
+package vacid0.redblacktree;
 
+/**
+ * Harness suggested by Leino and Moska&#0322; for runtime-checking the implementation.
+ * Not implementation-aware (makes only use of the map interface).
+ * @author bruns
+ *
+ */
+public class Harness {
 
-  //@ ensures true;
-  static void redBlackTestHarness() {
+  public static void redBlackTestHarness() {
     AbstractMap a = new RedBlackTree(0); 
     AbstractMap b = new RedBlackTree(1);
     a.replace(1, 1); b.replace(1, 10);
@@ -14,5 +20,8 @@ class Harness {
     assert(b.lookup(2) == 1 && b.lookup(42) == 1);
   }
 
+  public static void main(String[] arrrgggh){
+      redBlackTestHarness();
+  }
 
 }
