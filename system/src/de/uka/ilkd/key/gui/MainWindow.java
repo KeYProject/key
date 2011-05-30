@@ -894,7 +894,7 @@ public final class MainWindow extends JFrame  {
 	   }
     
     JCheckBoxMenuItem saveSMTFile;
-    private JCheckBoxMenuItem waitForAllProvers;
+//    private JCheckBoxMenuItem waitForAllProvers;
     
     private JMenuItem setupSpeclangMenu() {
         JMenu result = new JMenu("Specification Parser");       
@@ -1434,56 +1434,56 @@ public final class MainWindow extends JFrame  {
                               
     }
     
-    /**
-     * called when the batch mode has been finished 
-     * @param result the Object encapsulating informtation about the result, e.g.
-     * String "Error" if an error has occurred. 
-     * @param proof the Proof to which <tt>appliedRules</tt> rules have been 
-     * applied requiring <tt>time</tt> ms
-     * @param time the long giving the needed time in ms 
-     * @param appliedRules the int giving the number of applied rules
-     */
-    private void finishedBatchMode (Object result, 
-            Proof proof, long time, int appliedRules) {
-
-        if ( Main.getStatisticsFile() != null )
-            printStatistics ( Main.getStatisticsFile(), result, time, appliedRules );
-
-        if ("Error".equals ( result ) ) {
-            // Error in batchMode. Terminate with status -1.
-            System.exit ( -1 );
-        }
-
-        // Save the proof before exit.
-
-        String baseName = Main.getFileNameOnStartUp();
-        int idx = baseName.indexOf(".key");        
-        if (idx == -1) {
-            idx = baseName.indexOf(".proof");
-        }        
-        baseName = baseName.substring(0, idx==-1 ? baseName.length() : idx);
-
-        File f; 
-        int counter = 0;
-        do {           
-
-            f = new File(baseName + ".auto."+ counter +".proof");
-            counter++;
-        } while (f.exists());
-
-        MainWindow.getInstance ().saveProof ( f.getAbsolutePath() );
-        if (proof.openGoals ().size () == 0) {
-            // Says that all Proofs have succeeded
-            if (proof.getBasicTask().getStatus().getProofClosedButLemmasLeft()) {
-                // Says that the proof is closed by depends on (unproved) lemmas                
-                System.exit ( 0 ); //XXX, was: 2 
-            }
-            System.exit ( 0 ); 
-        } else {
-            // Says that there is at least one open Proof
-            System.exit ( 1 );
-        }
-    }
+//    /**
+//     * called when the batch mode has been finished 
+//     * @param result the Object encapsulating informtation about the result, e.g.
+//     * String "Error" if an error has occurred. 
+//     * @param proof the Proof to which <tt>appliedRules</tt> rules have been 
+//     * applied requiring <tt>time</tt> ms
+//     * @param time the long giving the needed time in ms 
+//     * @param appliedRules the int giving the number of applied rules
+//     */
+//    private void finishedBatchMode (Object result, 
+//            Proof proof, long time, int appliedRules) {
+//
+//        if ( Main.getStatisticsFile() != null )
+//            printStatistics ( Main.getStatisticsFile(), result, time, appliedRules );
+//
+//        if ("Error".equals ( result ) ) {
+//            // Error in batchMode. Terminate with status -1.
+//            System.exit ( -1 );
+//        }
+//
+//        // Save the proof before exit.
+//
+//        String baseName = Main.getFileNameOnStartUp();
+//        int idx = baseName.indexOf(".key");        
+//        if (idx == -1) {
+//            idx = baseName.indexOf(".proof");
+//        }        
+//        baseName = baseName.substring(0, idx==-1 ? baseName.length() : idx);
+//
+//        File f; 
+//        int counter = 0;
+//        do {           
+//
+//            f = new File(baseName + ".auto."+ counter +".proof");
+//            counter++;
+//        } while (f.exists());
+//
+//        MainWindow.getInstance ().saveProof ( f.getAbsolutePath() );
+//        if (proof.openGoals ().size () == 0) {
+//            // Says that all Proofs have succeeded
+//            if (proof.getBasicTask().getStatus().getProofClosedButLemmasLeft()) {
+//                // Says that the proof is closed by depends on (unproved) lemmas                
+//                System.exit ( 0 ); //XXX, was: 2 
+//            }
+//            System.exit ( 0 ); 
+//        } else {
+//            // Says that there is at least one open Proof
+//            System.exit ( 1 );
+//        }
+//    }
 
 //    class MainTaskListenerBatchMode implements ProverTaskListener { // XXX
 //        public void taskStarted(String message, int size) {

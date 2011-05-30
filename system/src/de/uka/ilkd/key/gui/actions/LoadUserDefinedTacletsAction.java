@@ -6,6 +6,7 @@ import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.SimpleExceptionDialog;
 import de.uka.ilkd.key.gui.lemmatagenerator.FileChooser;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmaSelectionDialog;
 import de.uka.ilkd.key.proof.Goal;
@@ -30,8 +31,7 @@ public class LoadUserDefinedTacletsAction extends MainWindowAction {
         getMediator().enableWhenProof(this);
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
+    private void loadTaclets() {
         FileChooser chooser = new FileChooser();
 
         boolean loaded = chooser.showAsDialog();
@@ -91,5 +91,18 @@ public class LoadUserDefinedTacletsAction extends MainWindowAction {
         loader.start();
 
     }
+    
+    private void handleException(Throwable exception){
+        String desc = exception.getMessage();
+        SimpleExceptionDialog.INSTANCE.showDialog("Error while loading taclets:", desc, exception); 
+    }
 
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        try {
+            loadTaclets();        
+        } catch(Throwable exception) {
+              handleException(exception);  
+        }
+    }
 }
