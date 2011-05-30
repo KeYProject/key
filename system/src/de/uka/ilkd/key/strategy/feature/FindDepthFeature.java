@@ -19,7 +19,7 @@ import de.uka.ilkd.key.strategy.RuleAppCost;
 
 /**
  * A feature that computes the depth of the find-position of a taclet (top-level
- * positions have depth zero) 
+ * positions have depth zero or if not a find taclet) 
  * 
  * TODO: eliminate this class and use term features instead
  */
@@ -30,9 +30,9 @@ public class FindDepthFeature implements Feature {
     private FindDepthFeature () {}
     
     public RuleAppCost compute ( RuleApp app, PosInOccurrence pos, Goal goal ) {
-        assert pos != null : "Feature is only applicable to rules with find";
+        //assert pos != null : "Feature is only applicable to rules with find";
 
-        return LongRuleAppCost.create ( pos.depth () );
+        return LongRuleAppCost.create ( pos == null ? 0 : pos.depth () );
     }
 
 }

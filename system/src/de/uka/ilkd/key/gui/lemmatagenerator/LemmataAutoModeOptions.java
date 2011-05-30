@@ -200,7 +200,7 @@ public class LemmataAutoModeOptions {
                 test = new File(pathOfResult);
                 if (!test.isDirectory()) {
                         throwError("Error while setting the folder of the results:\n"
-                                        + pathOfRuleFile + " is not a folder.");
+                                        + pathOfResult + " is not a folder.");
                 }
                 
         }
