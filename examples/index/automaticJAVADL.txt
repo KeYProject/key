@@ -109,7 +109,6 @@
 ./heap/SmansEtAl/Stack_Stack.key
 ./heap/SmansEtAl/Stack_switchContents.key
 ./heap/vacid0_01_SparseArray/Harness_sparseArrayTestHarness1.key
-./heap/vacid0_01_SparseArray/Harness_sparseArrayTestHarness2.key
 ./heap/vacid0_01_SparseArray/MemoryAllocator_alloc_unsigned.key
 ./heap/vacid0_01_SparseArray/MemoryAllocator_alloc.key
 ./heap/vacid0_01_SparseArray/SparseArray_get_dep.key
