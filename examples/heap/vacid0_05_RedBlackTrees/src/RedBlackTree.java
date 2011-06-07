@@ -257,9 +257,11 @@ public class RedBlackTree implements AbstractMap {
     /*@ normal_behavior
       @   requires x != Node.NIL && x.right != Node.NIL && \invariant_for(x);
       @   ensures x.parent == \old(x.right) && x.right == \old(x.right.left);
-      @   ensures x == \old(root) ? x.parent == root : x == root;
-      @   ensures \invariant_for(x);
-      @   assignable root, x.parent, x.parent.left, x.right, x.right.left, x.height, x.right.height;
+      @   ensures x.parent.left == x;     
+      @   ensures \old(root) == x || (\exists Node y; y == \old(x.parent); \old(x.parent.left) == x ? (y.left == x.parent && y.right == \old(x.parent.right)) : (y.left == \old(x.parent.left) && y.right == x.parent)); 
+      @   ensures root == (\old(root) == x ? x.parent : \old(root));
+      @   ensures \invariant_for(x.parent);
+      @   assignable root, x.parent, x.parent.left, x.parent.right; x.right, x.right.parent, x.right.left, x.height, x.right.height;
       @ also normal_behavior
       @   requires x != Node.NIL && x.right != Node.NIL;
       @   assignable \nothing;
@@ -286,11 +288,13 @@ public class RedBlackTree implements AbstractMap {
 
     /*@ normal_behavior
       @   requires x != Node.NIL && \invariant_for(x);
-      @   requires x.left != Node.NIL && \invariant_for(x.left);
-      @   ensures \invariant_for(x) && \invariant_for(\old(x.left));
+      @   requires x.left != Node.NIL;
+      @   ensures \invariant_for(x.parent);
       @   ensures x.parent == \old(x.left) && x.left == \old(x.left.right);
-      @   ensures x == \old(root) ? x.parent == root : x == root;
-      @   assignable root, x.parent, x.parent.right, x.left, x.left.right, x.height, x.left.height;
+      @   ensures x.parent.left == x;
+      @   ensures \old(root) == x || (\exists Node y; y == \old(x.parent); \old(x.parent.left) == x ? (y.left == x.parent && y.right == \old(x.parent.right)) : (y.left == \old(x.parent.left) && y.right == x.parent)); 
+      @   ensures root == (\old(root) == x ? x.parent : \old(root));
+      @   assignable root, x.parent, x.parent.left, x.parent.right, x.left, x.left.parent, x.left.right, x.height, x.left.height;
       @ also normal_behavior
       @   requires x != Node.NIL && x.left == Node.NIL;
       @   assignable \nothing;

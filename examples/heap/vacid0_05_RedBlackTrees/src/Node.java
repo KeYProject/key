@@ -33,6 +33,10 @@ public class Node {
     //@ ghost int height;
 
     Node parent, left, right;
+    
+    //@ model \locset footprint;
+    //@ represents footprint = isRed, key, value, parent, left, right, height;
+    //@ accessible footprint : footprint;
 
     // the red-black tree properties (`high-level' invariants)
     /*@ model boolean redBlackInvariant;
@@ -42,7 +46,7 @@ public class Node {
       @     && left.blackLeft() == right.blackRight()
       @     && (this == NIL || (left.redBlackInvariant && right.redBlackInvariant))
       @     && \invariant_for(this);
-      @ accessible redBlackInvariant : isRed, key, value, left, right \measured_by height;
+      @ accessible redBlackInvariant : footprint, left.footprint, right.footprint \measured_by height;
       @*/
     
 
@@ -51,6 +55,7 @@ public class Node {
     //@ invariant key >= 0;
     //@ invariant height == (this == NIL ? 0 :(left.height > right.height ? left.height : right.height)+1);
     //@ invariant \invariant_for(left) && \invariant_for(right);
+    //@ accessible \inv : footprint, left.footprint, right.footprint \measured_by height;
 
     //@ requires key >= 0;
     Node (int key, int value){
@@ -61,7 +66,7 @@ public class Node {
         this.value = value;
     }
 
-    //@ ensures true;
+    //@ helper
     private Node (){}
 
     //@ measured_by height;
