@@ -108,13 +108,6 @@
 ./heap/SmansEtAl/Stack_size.key
 ./heap/SmansEtAl/Stack_Stack.key
 ./heap/SmansEtAl/Stack_switchContents.key
-./heap/vacid0_01_SparseArray/Harness_sparseArrayTestHarness1.key
-./heap/vacid0_01_SparseArray/MemoryAllocator_alloc_unsigned.key
-./heap/vacid0_01_SparseArray/MemoryAllocator_alloc.key
-./heap/vacid0_01_SparseArray/SparseArray_get_dep.key
-./heap/vacid0_01_SparseArray/SparseArray_get.key
-./heap/vacid0_01_SparseArray/SparseArray_inv.key
-./heap/vacid0_01_SparseArray/SparseArray_SparseArray.key
 ./heap/vstte10_01_SumAndMax/SumAndMax_sumAndMax.key
 ./heap/vstte10_03_LinkedList/Node_cons.key
 ./heap/vstte10_03_LinkedList/Node_inv.key
