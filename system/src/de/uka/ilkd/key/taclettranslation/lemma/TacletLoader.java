@@ -11,39 +11,27 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletBuilder;
 
 
-
 public class TacletLoader {
-    public static TacletLoader INSTANCE = new TacletLoader();
-    private InitConfig createInitConfig(InitConfig reference){
-	  InitConfig newConfig =  reference.copy();
-	
-	  
-	  newConfig.setTaclets ( DefaultImmutableSet.<Taclet>nil() );
-	  newConfig.setTaclet2Builder ( new HashMap<Taclet, TacletBuilder> () );
-	
-          return newConfig;
-    }
-    
-    public ImmutableSet<Taclet> load(KeYUserProblemFile keyFile,InitConfig reference)
-    throws ProofInputException{
-	// this ensures that necessary Java types are loaded
-	InitConfig config = createInitConfig(reference);
-	
-	
-	
-	keyFile.setInitConfig(config);
-	keyFile.readRulesAndProblem();
-	
+        public static TacletLoader INSTANCE = new TacletLoader();
 
-	/*keyFile.readIncludes();
-	keyFile.readJavaPath();
-	keyFile.readSorts();
-	keyFile.readRulesAndProblem();	*/
-	return config.getTaclets();
-    }
-    
+        private InitConfig createInitConfig(InitConfig reference) {
+                InitConfig newConfig = reference.copy();
 
+                newConfig.setTaclets(DefaultImmutableSet.<Taclet> nil());
+                newConfig.setTaclet2Builder(new HashMap<Taclet, TacletBuilder>());
 
-    
-    
+                return newConfig;
+        }
+
+        public ImmutableSet<Taclet> load(KeYUserProblemFile keyFile,
+                        InitConfig reference) throws ProofInputException {
+                // this ensures that necessary Java types are loaded
+                InitConfig config = createInitConfig(reference);
+
+                keyFile.setInitConfig(config);
+                keyFile.readRulesAndProblem();
+
+                return config.getTaclets();
+        }
+
 }

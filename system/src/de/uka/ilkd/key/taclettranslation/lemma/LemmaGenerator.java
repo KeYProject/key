@@ -3,6 +3,7 @@ package de.uka.ilkd.key.taclettranslation.lemma;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
@@ -23,15 +24,19 @@ import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
 import de.uka.ilkd.key.taclettranslation.SkeletonGenerator;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
 import de.uka.ilkd.key.taclettranslation.TacletTranslator;
 
+/**
+ * A Lemma Generator translates a taclet to its corresponding 
+ * first order logic formula thats validity implies the validity
+ * of the taclet.
+ */
 public interface LemmaGenerator extends TacletTranslator {
-
-        public TacletFormula translate(Taclet taclet, Services services);
-
+         public TacletFormula translate(Taclet taclet, Services services);
 }
 
 class LemmaFormula implements TacletFormula {
@@ -65,14 +70,25 @@ class LemmaFormula implements TacletFormula {
 
 }
 
+
+/**
+ * The default lemma generator: Supports only certain types of
+ * taclets. If a taclet is not supported, the generator throws 
+ * an exception. 
+ */
 class DefaultLemmaGenerator implements LemmaGenerator {
 
-        // Describes how a schema variables mapped to another operator, e.g.
+        // Describes how a schema variable is mapped to another operator, e.g.
         // logical variable.
         private HashMap<SchemaVariable, Term> mapping = new HashMap<SchemaVariable, Term>();
+       
+        
 
+        
+        
         @Override
         public TacletFormula translate(Taclet taclet, Services services) {
+                checkForIllegalConditions(taclet);
                 Term formula = SkeletonGenerator.FindTacletTranslator
                                 .translate(taclet);
                 formula = rebuild(taclet, formula, services,
@@ -80,6 +96,8 @@ class DefaultLemmaGenerator implements LemmaGenerator {
                 checkForIllegalOps(formula, taclet);
                 return new LemmaFormula(taclet, formula);
         }
+        
+
 
         private Term replace(Taclet taclet, Term term, Services services) {
                 if (term.op() instanceof SchemaVariable) {
@@ -88,6 +106,14 @@ class DefaultLemmaGenerator implements LemmaGenerator {
                 }
 
                 return term;
+        }
+        
+        private void checkForIllegalConditions(Taclet taclet){
+                Iterator<VariableCondition> it = taclet.getVariableConditions();
+                if(it.hasNext()){
+                        throw new IllegalTacletException("The given taclet " + taclet.name() 
+                                        + " contains variable conditions that are not supported.");    
+                }
         }
         
         private void checkForIllegalOps(Term formula, Taclet owner){
@@ -121,6 +147,8 @@ class DefaultLemmaGenerator implements LemmaGenerator {
                         instantiation = createInstantiation(owner, var,
                                         services);
                         mapping.put(var, instantiation);
+                        
+         
                 }
                 return instantiation;
         }
@@ -182,9 +210,10 @@ class DefaultLemmaGenerator implements LemmaGenerator {
          */
         private Term createInstantiation(Taclet owner, VariableSV sv,
                         Services services) {
-                Name name = createUniqueName(services, sv.name().toString());
-                return TermFactory.DEFAULT.createTerm(new LogicVariable(name,
-                                sv.sort()));
+                Name name = createUniqueName(services, "v_"+sv.name().toString());
+                LogicVariable variable = new LogicVariable(name,
+                                sv.sort());
+                return TermFactory.DEFAULT.createTerm(variable);
         }
 
         /**
@@ -221,7 +250,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
 
                 Sort[] argSorts = computeArgSorts(prefix);
                 Term[] args = computeArgs(owner, prefix, services);
-                Name name = createUniqueName(services, sv.name().toString());
+                Name name = createUniqueName(services, "f_"+sv.name().toString());
 
                 Function function = new Function(name, sv.sort(), argSorts);
                 return TermBuilder.DF.func(function, args);
@@ -252,6 +281,10 @@ class DefaultLemmaGenerator implements LemmaGenerator {
                 return args;
         }
 
+        /**
+         * Rebuilds a term recursively and replaces all schema variables with
+         * skolem terms/variables. 
+         *   */
         private Term rebuild(Taclet taclet, Term term, Services services,
                         HashSet<QuantifiableVariable> boundedVariables) {
                 Term[] newSubs = new Term[term.arity()];

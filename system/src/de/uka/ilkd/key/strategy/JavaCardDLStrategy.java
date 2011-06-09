@@ -78,9 +78,13 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
     private Feature setupGlobalF(Feature dispatcher, Proof p_proof) {//        
         final Feature ifMatchedF = ifZero ( MatchedIfFeature.INSTANCE,
                                             longConst ( +1 ) );
-    
+        
+        final Feature findDepthF = ScaleFeature.createScaled(FindDepthFeature.INSTANCE, 500);
+          
+
 //        final Feature splitF =
 //            ScaleFeature.createScaled ( CountBranchFeature.INSTANCE, 400);
+
         final Feature ifThenElseF =
             ScaleFeature.createScaled ( IfThenElseMalusFeature.INSTANCE, 500);
     
@@ -124,9 +128,9 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
         		StrategyProperties.DEP_OPTIONS_KEY);
         final SetRuleFilter depFilter = new SetRuleFilter();
         depFilter.addRuleToSet(UseDependencyContractRule.INSTANCE);
-        if(depProp.equals(StrategyProperties.DEP_ON)) {
+        if (depProp.equals(StrategyProperties.DEP_ON)) {
             depSpecF = ConditionalFeature.createConditional(depFilter, 
-        	    					    longConst(5000));            
+        	    					    longConst(2500));            
         } else {
             depSpecF = ConditionalFeature.createConditional(depFilter, 
         	    					    inftyConst());
@@ -164,7 +168,8 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
               depSpecF,
               loopInvF,
               ifMatchedF,
-              ifThenElseF } );
+              ifThenElseF,
+              findDepthF} );
     }
     
     private Feature loopInvFeature(Feature cost) {
@@ -395,7 +400,8 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
         setupDefOpsPrimaryCategories ( d );
         
         setupSystemInvariantSimp(d);
-
+               
+        
         if ( quantifierInstantiatedEnabled() ) {
             setupFormulaNormalisation ( d, numbers );
         } else {

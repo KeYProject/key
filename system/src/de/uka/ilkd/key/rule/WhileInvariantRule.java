@@ -334,7 +334,8 @@ public final class WhileInvariantRule implements BuiltInRule {
 		                           reachableIn);
 	initGoal.changeFormula(new SequentFormula(
 		                 TB.apply(inst.u, 
-		                         TB.and(invTerm, reachableState))),
+		                         TB.and(variantNonNeg, 
+		                             TB.and(invTerm, reachableState)))),
 			         ruleApp.posInOccurrence());
 
 	//"Body Preserves Invariant":

@@ -1691,6 +1691,7 @@ public final class Main extends JFrame implements IMain {
         }
         goalView.setViewportView(goalViewPane);
         goalView.setBorder(new TitledBorder(borderTitle));
+        goalView.setBackground(goalViewPane.getBackground());
         goalView.validate();
         validate();
     }
@@ -2089,11 +2090,10 @@ public final class Main extends JFrame implements IMain {
                 putValue(SHORT_DESCRIPTION, "Loads additional taclets and creates the corresponding proofs.");
                 mediator.enableWhenProof(this);
         }
-            
-        @Override
-        public void actionPerformed(ActionEvent e) {
+        
+        private void loadTaclets(){
                 FileChooser chooser = new FileChooser();
-
+  
                 boolean loaded = chooser.showAsDialog();
 
                 if (!loaded){
@@ -2111,8 +2111,7 @@ public final class Main extends JFrame implements IMain {
                 LoaderListener listener =   new LoaderListener() {
                         @Override 
                         public void stopped(Throwable exception) {
-                                // TODO: handle the exception
-                                throw new RuntimeException(exception);      
+                                handleException(exception);
                         }           
                         @Override
                         public void stopped(ProofAggregate p, ImmutableSet<Taclet> taclets) {
@@ -2147,8 +2146,24 @@ public final class Main extends JFrame implements IMain {
                                 new LemmaSelectionDialog(),filesForAxioms,
                                 fileForDefinitions);
                 loader.start();
+                 
+        }
+        
+        private void handleException(Throwable exception){
+                String desc = exception.getMessage();
+                SimpleExceptionDialog.INSTANCE.showDialog("Error while loading taclets:",desc, exception); 
+        }
+        
+        @Override
+        public void actionPerformed(ActionEvent e) {
+                try{
+                      loadTaclets();        
+                }catch(Throwable exception){
+                      handleException(exception);  
+                }
                 
         }
+               
             
     }
     
