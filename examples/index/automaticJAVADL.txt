@@ -1,3 +1,18 @@
+# This file is part of KeY - Integrated Deductive Software Design
+# Copyright (C) 2001-2011 Universitaet Karlsruhe Germany
+#                         Universitaet Koblenz-Landau, Germany
+#                         and Chalmers University of Technology, Sweden
+#
+# The KeY system is protected by the GNU General Public License. 
+# See LICENSE.TXT for details.
+
+#
+# This file describes the benchmark problems which can
+# be closed automatically.
+#
+# It is used by bin/runAllProofs.pl.
+#
+
 ./heap/information_flow/ArrayList_contains.key
 ./heap/information_flow/ArrayList_get.key
 ./heap/information_flow/ArrayList_size.key
@@ -108,13 +123,19 @@
 ./heap/SmansEtAl/Stack_size.key
 ./heap/SmansEtAl/Stack_Stack.key
 ./heap/SmansEtAl/Stack_switchContents.key
-./heap/vacid0_01_SparseArray/Harness_sparseArrayTestHarness1.key
-./heap/vacid0_01_SparseArray/MemoryAllocator_alloc_unsigned.key
-./heap/vacid0_01_SparseArray/MemoryAllocator_alloc.key
-./heap/vacid0_01_SparseArray/SparseArray_get_dep.key
-./heap/vacid0_01_SparseArray/SparseArray_get.key
-./heap/vacid0_01_SparseArray/SparseArray_inv.key
-./heap/vacid0_01_SparseArray/SparseArray_SparseArray.key
+# the following benchmarks have been deactivated in
+# 	7c3150c097676f1ed710d28f6303996b53b59c7f:
+#  removed vacid test cases for the moment:
+#  some take currently too long to prove 
+#
+#./heap/vacid0_01_SparseArray/Harness_sparseArrayTestHarness1.key
+#./heap/vacid0_01_SparseArray/Harness_sparseArrayTestHarness2.key
+#./heap/vacid0_01_SparseArray/MemoryAllocator_alloc_unsigned.key
+#./heap/vacid0_01_SparseArray/MemoryAllocator_alloc.key
+#./heap/vacid0_01_SparseArray/SparseArray_get_dep.key
+#./heap/vacid0_01_SparseArray/SparseArray_get.key
+#./heap/vacid0_01_SparseArray/SparseArray_inv.key
+#./heap/vacid0_01_SparseArray/SparseArray_SparseArray.key
 ./heap/vstte10_01_SumAndMax/SumAndMax_sumAndMax.key
 ./heap/vstte10_03_LinkedList/Node_cons.key
 ./heap/vstte10_03_LinkedList/Node_inv.key
