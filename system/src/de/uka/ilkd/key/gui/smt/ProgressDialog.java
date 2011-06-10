@@ -74,6 +74,7 @@ public class ProgressDialog extends JDialog{
                 table.setModel(model,titles);
                 this.listener = listener;
                 this.setLocationByPlatform(true);
+                this.setTitle("SMT Interface");
              
                 setDefaultCloseOperation(DISPOSE_ON_CLOSE);
                 setModal(true);
@@ -172,6 +173,7 @@ public class ProgressDialog extends JDialog{
         private JButton getApplyButton() {
                 if(applyButton == null){
                        applyButton = new JButton("Apply");
+                       applyButton.setEnabled(false);
                        applyButton.addActionListener(new ActionListener() {
                         
                         @Override
@@ -225,9 +227,11 @@ public class ProgressDialog extends JDialog{
                 switch(modus){
                 case discardModus:
                         stopButton.setText("Discard");
+                        applyButton.setEnabled(true);
                         break;
                 case stopModus:
                         stopButton.setText("Stop");
+                        applyButton.setEnabled(false);
                         break;
                         
                 }
@@ -362,8 +366,7 @@ class ProgressTable extends JTable{
 
                 @Override
                 public Object getCellEditorValue() {
-                        // TODO Auto-generated method stub
-                        return null;
+                            return null;
                 }
                 
         }
@@ -415,11 +418,7 @@ class ProgressTable extends JTable{
                 this.setDefaultEditor(ProgressModel.ProcessColumn.class, editor);
                 init(getProgressPanelEditor(),this.getFont(),resolution,listener);
                 init(progressPanelRenderer,this.getFont(),resolution,listener);
-               // this.setRowHeight(40);
-                //this.setRowHeight(0,100);
-                
-               
-             
+          
         }
         
         private void init(ProgressPanel panel, Font font, int resolution, final  ProgressTableListener listener){
@@ -444,13 +443,10 @@ class ProgressTable extends JTable{
                 super.setModel(model);
                 for(int i=0; i < titles.length; i++){
                         TableColumn col = getTableHeader().getColumnModel().getColumn(i);
-                       
+
                         col.setHeaderValue(titles[i]);   
-                      //  col.setMinWidth(400);
-                        //col.setWidth(col.getPreferredWidth());
-                      //  col.sizeWidthToFit();
                         packColumn(this, i,5);
-                       
+                      
                 }
                 for(int i =0; i < model.getRowCount(); i++){
                         this.setRowHeight(progressPanelRenderer.getPreferredSize().height+5);
@@ -481,7 +477,7 @@ class ProgressTable extends JTable{
                 TableColumn col = colModel.getColumn(vColIndex);
                 int width = 0;
 
-                // Get width of column header
+  
                 TableCellRenderer renderer = col.getHeaderRenderer();
                 if (renderer == null) {
                     renderer = table.getTableHeader().getDefaultRenderer();
@@ -490,7 +486,7 @@ class ProgressTable extends JTable{
                     table, col.getHeaderValue(), false, false, 0, 0);
                 width = comp.getPreferredSize().width;
 
-                // Get maximum width of column data
+        
                 for (int r=0; r<table.getRowCount(); r++) {
                     renderer = table.getCellRenderer(r, vColIndex);
                     comp = renderer.getTableCellRendererComponent(
@@ -498,10 +494,9 @@ class ProgressTable extends JTable{
                     width = Math.max(width, comp.getPreferredSize().width);
                 }
 
-                // Add margin
+
                 width += 2*margin;
 
-                // Set the width
                 col.setPreferredWidth(width);
             }
         
