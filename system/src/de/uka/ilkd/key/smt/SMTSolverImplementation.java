@@ -282,8 +282,8 @@ final class SMTSolverImplementation implements SMTSolver, Runnable {
                         // uncomment for testing
                     //    Thread.sleep(10000);
                         // uncomment for testing
-                        Random random = new Random();
-                        Thread.sleep(random.nextInt(3000)+1000);
+                       // Random random = new Random();
+                        //Thread.sleep(random.nextInt(3000)+1000);
                        // throw new RuntimeException("Test exception");
                 } catch (Throwable e) {
                         interruptionOccurred(e);
