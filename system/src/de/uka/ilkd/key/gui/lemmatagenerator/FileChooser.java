@@ -5,6 +5,9 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyVetoException;
+import java.beans.VetoableChangeListener;
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,6 +17,7 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -23,6 +27,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import de.uka.ilkd.key.gui.KeYFileChooser;
 
@@ -52,12 +58,21 @@ public class FileChooser extends JPanel{
                 private File           chosenFile;
                 private JButton    chooseFileButton;
                 private JTextField fileField;
-                public SingleFileChooser(String title) {
-                        super(BoxLayout.X_AXIS);
+                public SingleFileChooser(String title, JCheckBox checkbox) {
+                        super(BoxLayout.Y_AXIS);
+                        Box box = Box.createHorizontalBox();
                         this.setBorder(BorderFactory.createTitledBorder(title));
-                        this.add(getFileField());
-                        this.add(Box.createHorizontalStrut(5));
-                        this.add(getChooseFileButton());
+                        box.add(getFileField());
+                        box.add(Box.createHorizontalStrut(5));
+                        box.add(getChooseFileButton());
+                        this.add(box);
+                        if(checkbox != null){
+                                box = Box.createHorizontalBox();
+                                box.add(getLemmaCheckBox());
+                                box.add(Box.createHorizontalGlue());
+                                this.add(Box.createVerticalStrut(5));
+                                this.add(box);
+                        }
                 }
                 
                 private JTextField getFileField() {
@@ -121,6 +136,8 @@ public class FileChooser extends JPanel{
         private JButton okayButton;
         private JButton cancelButton;
         
+        private JCheckBox lemmaCheckbox;
+        
         private boolean       closedByOkayButton = false;
         private final DefaultListModel listModel = new DefaultListModel();
         private static final Dimension MAX_DIM = new Dimension(Integer.MAX_VALUE,Integer.MAX_VALUE);
@@ -136,6 +153,7 @@ public class FileChooser extends JPanel{
              this.add(label);
              this.add(Box.createVerticalStrut(15));
              this.add(getLemmataFileChooser());
+  
              this.add(Box.createVerticalStrut(5));
              this.add(getDefinitionFileChooser());
              this.add(Box.createVerticalStrut(5));
@@ -162,7 +180,25 @@ public class FileChooser extends JPanel{
                 return definitionFileChooser.getChosenFile();
         }
         
+        private JCheckBox getLemmaCheckBox(){
+                if(lemmaCheckbox == null){
+                        lemmaCheckbox = new JCheckBox("Load taclets as lemmata.");
+                        lemmaCheckbox.setSelected(true);
+                        lemmaCheckbox.addActionListener(new ActionListener() {
+                                
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                        lemmaCheckbox.setSelected(true);
+                                        InfoDialog dialog = new InfoDialog("Some Question");
+                                        dialog.showDialog();
+                                        System.out.println("TEST");
+                                }
+                        });
+                }
+                return lemmaCheckbox;
+        }
 
+        
         
         private JList getAxiomsList() {
                 if(axiomsList == null){
@@ -238,7 +274,7 @@ public class FileChooser extends JPanel{
 
         private SingleFileChooser getLemmataFileChooser(){
                 if(lemmataFileChooser == null){
-                        lemmataFileChooser = new SingleFileChooser("User-Defined Taclets"){
+                        lemmataFileChooser = new SingleFileChooser("User-Defined Taclets",getLemmaCheckBox()){
                                 private static final long serialVersionUID = 1L;
                                 protected void fileHasBeenChosen(File file) {
                                         if(okayButton != null){
@@ -258,7 +294,7 @@ public class FileChooser extends JPanel{
         
         private SingleFileChooser getDefinitionFileChooser(){
                 if(definitionFileChooser == null){
-                        definitionFileChooser = new SingleFileChooser("Definitions");
+                        definitionFileChooser = new SingleFileChooser("Definitions",null);
                 }
                return definitionFileChooser;
         }
