@@ -4,86 +4,181 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
 import java.awt.Insets;
-import java.awt.Rectangle;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.util.ArrayList;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
+import javax.swing.AbstractAction;
 import javax.swing.AbstractCellEditor;
-import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 import javax.swing.plaf.basic.BasicProgressBarUI;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
-import javax.swing.table.TableModel;
 
 import de.uka.ilkd.key.gui.smt.ProgressModel.ProcessColumn.ProcessData;
-import de.uka.ilkd.key.java.declaration.modifier.Model;
+import de.uka.ilkd.key.gui.smt.ProgressTable.ProgressTableListener;
 
 
 
 
 public class NewProgressDialog extends JDialog{
 
+        private static final long serialVersionUID = 1L;
         private final ProgressTable   table;
         private JButton  applyButton;
         private JButton  stopButton;
         private JScrollPane scrollPane;
-        private JTable captionTable;
+        private JButton  infoButton;
+        private JPopupMenu infoMenu;
+        private JProgressBar progressBar;
+        private final ProgressDialogListener listener;
+        public enum Modus {stopModus,discardModus};
+        private Modus modus = Modus.stopModus;
+       
         
-        
+        public static interface ProgressDialogListener extends ProgressTableListener{
+                public void applyButtonClicked();
+                public void stopButtonClicked();
+                public void discardButtonClicked();
+                public void additionalInformationChosen(Object obj);
+              
+        }
      
      
         
   
         
-        public NewProgressDialog(ProgressModel model,String[] labelTitles,String ... titles) {
-                table = new ProgressTable(labelTitles); 
+        public NewProgressDialog(ProgressModel model,ProgressDialogListener listener, 
+                        int resolution, int progressBarMax,String[] labelTitles,String ... titles) {
+                table = new ProgressTable(resolution,listener,labelTitles); 
                 table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+                table.setModel(model,titles);
+                this.listener = listener;
+                this.setLocationByPlatform(true);
              
+                setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+                setModal(true);
                 this.setLayout(new BoxLayout(this.getContentPane(),BoxLayout.Y_AXIS));
                 Box buttonBox = Box.createHorizontalBox();
                 Box contentBox = Box.createVerticalBox();
-             
+                
+                buttonBox.add(getInfoButton());
                 buttonBox.add(Box.createHorizontalGlue());
                 buttonBox.add(getStopButton());
                 buttonBox.add(Box.createHorizontalStrut(5));
                 buttonBox.add(getApplyButton());
-                
+                contentBox.add(getProgressBar());
+                contentBox.add(Box.createVerticalStrut(5));
                 contentBox.add(getScrollPane());
+                getProgressBar().setMaximum(progressBarMax);
                 this.getContentPane().add(contentBox);
+                this.getContentPane().add(Box.createVerticalStrut(5));
                 this.getContentPane().add(buttonBox);
-                
-                table.setModel(model,titles);
+                this.getContentPane().add(Box.createVerticalStrut(5));
+              
               
                 this.pack();
         }
         
+        
+        public void setAdditionalInformation(String title,Color color, List<? extends Object> information){
+                getInfoButton().setText(title);
+                getInfoButton().setForeground(color);
+                infoMenu = new JPopupMenu();
+                Collections.sort(information,new Comparator<Object>() {
+
+                        @Override
+                        public int compare(Object o1, Object o2) {
+                               
+                                return o1.toString().compareTo(o2.toString());
+                        }
+                });
+                for(final Object obj : information){
+                     JMenuItem item = new JMenuItem(new AbstractAction(
+                        obj.toString()) {
+                        private static final long serialVersionUID = 1L;
+
+                    @Override
+                        public void actionPerformed(ActionEvent e) {
+                            listener.additionalInformationChosen(obj);
+                        }
+                    });
+                 
+                    infoMenu.add(item);
+                }
+                getInfoButton().setVisible(true);
+                
+        }
+        
+        public void setProgress(int value){
+                getProgressBar().setValue(value);
+        }
+        
+        public JProgressBar getProgressBar(){
+                if(progressBar == null){
+                        progressBar = new JProgressBar();
+                     
+                }
+                
+                return progressBar;
+        }
      
+        
+        private JButton getInfoButton(){
+                if(infoButton == null){
+                        infoButton = new JButton("Info");
+                        infoButton.setVisible(false);
+                        infoButton.addActionListener(new ActionListener() {
+                                
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                        JPopupMenu menu = getInfoMenu();
+                                        int width = Math.max(menu.getPreferredSize().width,infoButton.getWidth());
+                                            menu.setPopupSize(width, menu.getPreferredSize().height);
+                                            menu.show(infoButton,0 ,infoButton.getHeight());       
+                                }
+                        });
+                }
+                return infoButton;
+        }
+        
+        private JPopupMenu getInfoMenu(){
+                if(infoMenu == null){
+                        infoMenu = new JPopupMenu();
+                }
+                return infoMenu;
+        }
         
         
         private JButton getApplyButton() {
                 if(applyButton == null){
                        applyButton = new JButton("Apply");
+                       applyButton.addActionListener(new ActionListener() {
+                        
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                                listener.applyButtonClicked();
+                        }
+                });
                        
                 }
                 return applyButton;
@@ -91,9 +186,14 @@ public class NewProgressDialog extends JDialog{
         
         private JScrollPane getScrollPane() {
                 if(scrollPane == null){
-                        scrollPane = new JScrollPane(table,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-                                        JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS
+                        scrollPane = new JScrollPane(table,ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+                                        ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS
                                         );
+                        
+                        Dimension dim = new Dimension(table.getPreferredSize());
+                        dim.width += (Integer)UIManager.get("ScrollBar.width")+2;
+                        dim.height = scrollPane.getPreferredSize().height;
+                        scrollPane.setPreferredSize(dim);
                         
                 }
                 return scrollPane;
@@ -102,10 +202,36 @@ public class NewProgressDialog extends JDialog{
         private JButton getStopButton() {
                 if(stopButton == null){
                         stopButton = new JButton("Stop");
+                        stopButton.addActionListener(new ActionListener() {
+                                
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                        if(modus.equals(Modus.discardModus)){
+                                                listener.discardButtonClicked();
+                                        }
+                                        if(modus.equals(Modus.stopModus))
+                                        {
+                                                listener.stopButtonClicked();        
+                                        }
+                                        
+                                }
+                        });
                  }
                 return stopButton;
         }
         
+        public void setModus(Modus m){
+                modus = m;
+                switch(modus){
+                case discardModus:
+                        stopButton.setText("Discard");
+                        break;
+                case stopModus:
+                        stopButton.setText("Stop");
+                        break;
+                        
+                }
+        }
         
    
         
@@ -117,7 +243,7 @@ public class NewProgressDialog extends JDialog{
                 model.addColumn(new ProgressModel.ProcessColumn(4));
                 String [] infoLabels = {"Processed","Closed: ","Unkown: ","Counter Example:","Errors:"}; 
               
-                NewProgressDialog dialog = new NewProgressDialog(model,infoLabels,"","Z3","Simplify","Yices");
+                NewProgressDialog dialog = new NewProgressDialog(model,null,100,10,infoLabels,"","Z3","Simplify","Yices");
                 dialog.setVisible(true);
                 dialog.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
                 
@@ -139,8 +265,16 @@ public class NewProgressDialog extends JDialog{
 }
 
 class ProgressTable extends JTable{
-      
+
+        private static final long serialVersionUID = 1L;
+        private static final int NUMBER_OF_VISIBLE_ROWS = 8;
+        public interface ProgressTableListener{
+                public void infoButtonClicked(int column, int row);
+        }
+        
+        
         public static class ProgressPanel extends JPanel{
+                private static final long serialVersionUID = 1L;
                 private JProgressBar progressBar;
                 private JButton      infoButton;
                 
@@ -198,108 +332,27 @@ class ProgressTable extends JTable{
         }
         
         
-        public static class SummaryPanel extends JPanel{
-          
-                private JProgressBar      progressBar;
-                private JTable       table;
-                private final DefaultTableModel model    = new DefaultTableModel();
-                private Color colors [] ;
-                private final TableCellRenderer renderer = new DefaultTableCellRenderer() {
-                        
-                        @Override
-                        public Component getTableCellRendererComponent(JTable table,
-                                        Object value, boolean isSelected, boolean hasFocus,
-                                        int row, int column) {
-                                Component comp = super.getTableCellRendererComponent(table,value,
-                                                isSelected, hasFocus,row,column);
-                                comp.setForeground(colors[row]);
-                                return comp;
-                        }
-                };
-                
-                SummaryPanel(String [] labelTitles){
-                       // infoLabels = createInfoLabels(labelTitles,this.getFont());
-                        this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-                        this.add(Box.createHorizontalStrut(3));
-                        Box content = Box.createVerticalBox();
-                        content.add(Box.createVerticalStrut(5));
-                        content.add(getProgressBar());
-                        content.add(Box.createVerticalStrut(2));
-                        content.add(getTable());
-                        content.add(Box.createVerticalStrut(5));
-                        colors = new Color[labelTitles.length];
-                        
-                        String values [] = new String[labelTitles.length];
-                        for(int i=0; i < labelTitles.length; i++){
-                                values[i] = "-";
-                                colors[i] = Color.BLACK;
-                        }
-                        model.addColumn("",labelTitles);
-                        model.addColumn("",values);
-                     
-                        getTable().setModel(model);
-                        table.setAutoResizeMode(AUTO_RESIZE_OFF);
-                    
-                        table.getColumnModel().getColumn(0).setCellRenderer(renderer);
-                        table.getColumnModel().getColumn(1).setCellRenderer(renderer);
-                        int max=0;
-                        for(int i=0; i < labelTitles.length; i++){
-                                
-                                int width = table.getFontMetrics(table.getFont()).stringWidth(labelTitles[i]);
-                                max = max <  width? width :max; 
-                        }
-                        TableColumn col = getTable().getTableHeader().getColumnModel().getColumn(0);
-                        col.setMinWidth(max+5);
-                        col.setMaxWidth(max+5);        
-                         col = getTable().getTableHeader().getColumnModel().getColumn(1);
-                        col.setMinWidth(max/3);
-                        table.setPreferredScrollableViewportSize(table.getPreferredSize());
-                
-                        this.add(content);
-                        this.add(Box.createHorizontalStrut(3));
-                }
-                
-                JTable getTable(){
-                        if(table == null){
-                                table = new JTable();
-                                table.setShowVerticalLines(false);
-                                
-                               
-                        }
-                        return table;
-                }
-                
-                JProgressBar getProgressBar(){
-                        if(progressBar == null){
-                                progressBar = new JProgressBar();
-                        }
-                        return progressBar;
-                }
-                
-                public void setColor(int row, Color color){
-                       colors[row] = color;  
-                       table.repaint();
-                }
-                
-                public void setValue(int row, String value){
-                        model.setValueAt(value, row, 1);
-                        table.repaint();
-                }
-       
-        }
+        
         
         private final ProgressPanel progressPanelRenderer = new ProgressPanel();
         private  ProgressPanel progressPanelEditor ;
-        private final SummaryPanel summaryPanelRenderer;
+ 
+        
+
         private class ProgressCellEditor extends AbstractCellEditor implements
                                                 TableCellEditor{
+
+                private static final long serialVersionUID = 1L;
+
+
 
                 @Override
                 public Component getTableCellEditorComponent(JTable table,
                                 Object value, boolean isSelected, int row,
                                 int column) {
-                      
                         
+                        currentEditorCell.x = column;
+                        currentEditorCell.y = row;
                         ProcessData data = (ProcessData) value;
                         prepareProgressPanel(getProgressPanelEditor(), data);
                         return getProgressPanelEditor();
@@ -315,7 +368,7 @@ class ProgressTable extends JTable{
                 
         }
         
-        private ProgressModel progressModel = new ProgressModel();
+  
         
         
         
@@ -330,7 +383,7 @@ class ProgressTable extends JTable{
                     
                         @Override
                         protected Color getSelectionForeground() {
-                              return  data.getTextColor();
+                              return  data.getSelectedTextColor();
                         }
                         
                         protected Color getSelectionBackground() { return data.getTextColor(); }
@@ -344,9 +397,6 @@ class ProgressTable extends JTable{
                 public Component getTableCellRendererComponent(JTable table,
                                 Object value, boolean isSelected, boolean hasFocus,
                                 int row, int column) {
-                        if(row == 0){
-                           return summaryPanelRenderer;     
-                        }
                         ProcessData data = (ProcessData) value;
                         prepareProgressPanel(progressPanelRenderer, data);
                         return progressPanelRenderer;
@@ -355,24 +405,41 @@ class ProgressTable extends JTable{
         
         
         private final TableCellEditor editor = new ProgressCellEditor();
-        
+        private Point  currentEditorCell = new Point();
+  
   
         
-        public ProgressTable(String ...titles ) {
+        public ProgressTable(int resolution, ProgressTableListener listener,String ...titles ) {
                 this.setDefaultRenderer(ProgressModel.ProcessColumn.class,
                                 renderer);
                 this.setDefaultEditor(ProgressModel.ProcessColumn.class, editor);
-                progressPanelRenderer.setFont(this.getFont());
+                init(getProgressPanelEditor(),this.getFont(),resolution,listener);
+                init(progressPanelRenderer,this.getFont(),resolution,listener);
                // this.setRowHeight(40);
                 //this.setRowHeight(0,100);
-                summaryPanelRenderer = new SummaryPanel(titles);
+                
                
              
         }
         
+        private void init(ProgressPanel panel, Font font, int resolution, final  ProgressTableListener listener){
+                panel.setFont(font);
+                panel.progressBar.setMaximum(resolution);
+                panel.infoButton.addActionListener(new ActionListener() {
+                        
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                                listener.infoButtonClicked(currentEditorCell.x-1, currentEditorCell.y);
+                                
+                        }
+                });
+                
+                
+        }
+        
 
         public void setModel(ProgressModel model, String ... titles){
-                this.progressModel = model;
+        
                 assert titles.length == model.getColumnCount();
                 super.setModel(model);
                 for(int i=0; i < titles.length; i++){
@@ -386,11 +453,26 @@ class ProgressTable extends JTable{
                        
                 }
                 for(int i =0; i < model.getRowCount(); i++){
-                        this.setRowHeight(i,i == 0 ? summaryPanelRenderer.getPreferredSize().height : 40);
+                        this.setRowHeight(progressPanelRenderer.getPreferredSize().height+5);
                 }
                 
                 
                
+        }
+        
+        @Override
+        public Dimension getPreferredSize() {
+                Dimension dim = new Dimension(super.getPreferredSize());
+                dim.height = Math.min(NUMBER_OF_VISIBLE_ROWS * (progressPanelRenderer.getPreferredSize().height+5), dim.height);
+                return dim;
+        }
+        
+        @Override
+        public Dimension getPreferredScrollableViewportSize() {
+                Dimension dim = new Dimension(super.getPreferredScrollableViewportSize());
+                
+                dim.height = Math.min(NUMBER_OF_VISIBLE_ROWS * (progressPanelRenderer.getPreferredSize().height+5), dim.height);
+                return dim;
         }
         
         public static void packColumn(JTable table, int vColIndex, int margin) {
@@ -423,6 +505,8 @@ class ProgressTable extends JTable{
                 col.setPreferredWidth(width);
             }
         
+
+        
         private ProgressPanel getProgressPanelEditor(){
                 if(progressPanelEditor == null){
                         progressPanelEditor = new ProgressPanel();
@@ -439,249 +523,6 @@ class ProgressTable extends JTable{
                 }
                 super.tableChanged(e);
         }
-        
-}
-
-class ProgressModel extends AbstractTableModel{
-
-        private static interface Column{
-               Object getObject(int row);
-               int    getRowCount();
-               
-               boolean   isEditable();
-     
-        }
-        
-        public static class TitleColumn implements Column{
-                private final String []titles;
-                
-                public TitleColumn( String ... titles) {
-                        super();
-                        this.titles = titles;
-                  
-                }
-                
-                
-
-                @Override
-                public Object getObject(int row) {
-                         return titles[row];
-                }
-
-                @Override
-                public int getRowCount() {
-                        
-                        return titles.length;
-                }
-
-
-                @Override
-                public boolean isEditable() {
-                 
-                        return false;
-                }   
-                
-        }
-        
-        public static class ProcessColumn  implements Column{
-          
-                static class ProcessData{
-                        private  int   progress=0;
-                        private  String text="";
-                        private boolean isEditable = false;
-                        private Color textColor = Color.RED;
-                        private Color backgroundColor = Color.WHITE;
-                        private Color foregroundColor = Color.BLUE;
-                  
-                        public int getProgress() {
-                                return progress;
-                        }
-                        public String getText() {
-                                return text;
-                        }
-                  
-                        public boolean isEditable() {
-                                return isEditable;
-                        }
-                        
-                        public Color getBackgroundColor() {
-                                return backgroundColor;
-                        }
-                        
-                        public Color getTextColor() {
-                                return textColor;
-                        }
-                        
-                        public Color getForegroundColor() {
-                                return foregroundColor;
-                        }
-                        
-                }
-                
-             //   private final Object [] processes;           
-                public final ProcessData []  data;
-                private boolean isEditable = false;
-                
-                
-                public ProcessColumn(int size) {
-                        super();
-                        
-                        
-                        this.data = new ProcessData[size+1];
-                    
-                        for(int i=0; i < data.length; i++){
-                                data[i] = new ProcessData();
-                                
-                                                }
-                        
-                }
-
-                
-
-                @Override
-                public Object getObject(int row) {
-                      // if(row == 0){return title;}
-                       //progressBar.setValue(progress[row-1]);
-                       return data[row];
-                }
-                
-                public void setProgress(int value, int row){
-                        data[row].progress = value;
-                }
-                
-                public void setText(String value, int row){
-                        data[row].text = value;
-                }
-                
-                
-                @Override
-                public int getRowCount() {
-                        
-                        return data.length;
-                }
-
-
-                public void setEditable(boolean b) {
-                      isEditable = b;  
-                      for(int i=0; i < data.length; i++){
-                              data[i].isEditable = b;
-                      }
-                }
-
-
-
-                @Override
-                public boolean isEditable() {
-                   
-                        return isEditable;
-                }   
-                
-        }
-        
-        private ArrayList<Column> columns = new ArrayList<Column>();
-        
-        private int rowCount=-1;
-        
-        
-        
-        public ProgressModel() {
-                super();
-                
-        }
-        
-        public void addColumn(Column column) {
-             if(rowCount != -1 && rowCount != column.getRowCount()){
-                     throw new IllegalArgumentException("Columns must have the same number of rows.");
-             }
-             rowCount = column.getRowCount();
-             columns.add(column);
-        }
-        
-        public void setProgress(int value, int column, int row){
-                column++;
-                row++;
-                ProcessColumn col = (ProcessColumn)columns.get(column);
-                col.setProgress(value, row);
-                this.fireTableCellUpdated(row, column);
-        }
-        
-        public void setText(String text, int column, int row){
-                column++;
-                row++;
-                ProcessColumn col = (ProcessColumn)columns.get(column);
-                col.setText(text,row);
-                this.fireTableCellUpdated(row, column);
-        }
-        
-        public void setTextColor(Color color, int x, int y) {
-                x++; y++;
-                ProcessColumn col = (ProcessColumn)columns.get(x);
-                col.data[y].textColor = color;
-                
-                this.fireTableCellUpdated(x, y);
-        }
-        
-        public void setForegroundColor(Color color, int x, int y) {
-                x++; y++;
-                ProcessColumn col = (ProcessColumn)columns.get(x);
-                col.data[y].foregroundColor = color;
-                
-                this.fireTableCellUpdated(x, y);
-        }
-        
-        public void setBackgroundColor(Color color, int x, int y) {
-                x++; y++;
-                ProcessColumn col = (ProcessColumn)columns.get(x);
-                col.data[y].backgroundColor = color;
-                
-                this.fireTableCellUpdated(x, y);
-        }
-        
-        public void setEditable(boolean b){
-                for(Column column : columns){
-                      if(column instanceof ProcessColumn){
-                              ((ProcessColumn) column).setEditable(b);
-                      }
-                }
-        }
-
-        @Override
-        public int getColumnCount() {
-              
-                return columns.size();
-        }
-
-        @Override
-        public int getRowCount() {
-                
-                return rowCount;
-        }
-        
-        @Override
-        public boolean isCellEditable(int rowIndex, int columnIndex) {
-                
-                return rowIndex != 0 && columns.get(columnIndex).isEditable();
-        }
-        
-        
-        
-        @Override
-        public Class<?> getColumnClass(int columnIndex) {
-                return columns.get(columnIndex).getClass();
-
-        }
-
-        @Override
-        public Object getValueAt(int row, int col) {
-                
-                return columns.get(col).getObject(row);
-        }
-        
-        public Column getColumn(int col){
-                return columns.get(col);
-        }
-        
-        
         
 }
 
