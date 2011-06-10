@@ -40,7 +40,7 @@ import de.uka.ilkd.key.gui.smt.ProgressTable.ProgressTableListener;
 
 
 
-public class NewProgressDialog extends JDialog{
+public class ProgressDialog extends JDialog{
 
         private static final long serialVersionUID = 1L;
         private final ProgressTable   table;
@@ -67,7 +67,7 @@ public class NewProgressDialog extends JDialog{
         
   
         
-        public NewProgressDialog(ProgressModel model,ProgressDialogListener listener, 
+        public ProgressDialog(ProgressModel model,ProgressDialogListener listener, 
                         int resolution, int progressBarMax,String[] labelTitles,String ... titles) {
                 table = new ProgressTable(resolution,listener,labelTitles); 
                 table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
@@ -243,7 +243,7 @@ public class NewProgressDialog extends JDialog{
                 model.addColumn(new ProgressModel.ProcessColumn(4));
                 String [] infoLabels = {"Processed","Closed: ","Unkown: ","Counter Example:","Errors:"}; 
               
-                NewProgressDialog dialog = new NewProgressDialog(model,null,100,10,infoLabels,"","Z3","Simplify","Yices");
+                ProgressDialog dialog = new ProgressDialog(model,null,100,10,infoLabels,"","Z3","Simplify","Yices");
                 dialog.setVisible(true);
                 dialog.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
                 

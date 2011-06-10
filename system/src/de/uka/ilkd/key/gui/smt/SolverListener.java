@@ -30,8 +30,8 @@ import javax.swing.SwingUtilities;
 
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.smt.InformationWindow.Information;
-import de.uka.ilkd.key.gui.smt.NewProgressDialog.Modus;
-import de.uka.ilkd.key.gui.smt.NewProgressDialog.ProgressDialogListener;
+import de.uka.ilkd.key.gui.smt.ProgressDialog.Modus;
+import de.uka.ilkd.key.gui.smt.ProgressDialog.ProgressDialogListener;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.smt.RuleAppSMT;
 import de.uka.ilkd.key.smt.SMTProblem;
@@ -45,7 +45,7 @@ import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
 
 public class SolverListener implements SolverLauncherListener {
-        private NewProgressDialog progressDialog;
+        private ProgressDialog progressDialog;
        private ProgressModel progressModel ;
         // Every intern SMT problem refers to one solver
         private Collection<InternSMTProblem> problems = new LinkedList<InternSMTProblem>();
@@ -263,7 +263,7 @@ public class SolverListener implements SolverLauncherListener {
 
                  
 
-                progressDialog = new NewProgressDialog(
+                progressDialog = new ProgressDialog(
                                 progressModel,listener,RESOLUTION,smtproblems.size()*solverTypes.size(), new String[] {}, titles);
 
                 SwingUtilities.invokeLater(new Runnable() {
