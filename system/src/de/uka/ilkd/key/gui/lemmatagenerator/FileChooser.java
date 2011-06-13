@@ -5,9 +5,6 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyVetoException;
-import java.beans.VetoableChangeListener;
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
@@ -27,10 +24,11 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
+import javax.swing.WindowConstants;
+
 
 import de.uka.ilkd.key.gui.KeYFileChooser;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 
 
 
@@ -53,6 +51,9 @@ public class FileChooser extends JPanel{
                 "Technical Remarks:\nThe axioms must be stored in another file than the user-defined taclets. Furthermore the axioms " +
                 "are only loaded for the lemmata, but not for the current proof.";
 
+        private static final String INFO_TEXT1 = "";
+        private static final String INFO_TEXT2 = "";
+        
         private class SingleFileChooser extends Box{
                 private static final long serialVersionUID = 1L;
                 private File           chosenFile;
@@ -141,9 +142,10 @@ public class FileChooser extends JPanel{
         private boolean       closedByOkayButton = false;
         private final DefaultListModel listModel = new DefaultListModel();
         private static final Dimension MAX_DIM = new Dimension(Integer.MAX_VALUE,Integer.MAX_VALUE);
-              
+        private boolean firstTimeAddingAxioms = true;      
         public FileChooser(){
              this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+             
              
              JLabel label = new JLabel("Please choose the files that should be browsed for..."); 
              label.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -188,14 +190,43 @@ public class FileChooser extends JPanel{
                                 
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
-                                        lemmaCheckbox.setSelected(true);
-                                        InfoDialog dialog = new InfoDialog("Some Question");
-                                        dialog.showDialog();
-                                        System.out.println("TEST");
+                                        
+                                        InfoDialog infoDialog = new InfoDialog(INFO_TEXT1);
+                                        if(!lemmaCheckbox.isSelected()){
+                                            lemmaCheckbox.setSelected(true);    
+                                            if(ProofSettings.DEFAULT_SETTINGS
+                                                            .getLemmaGeneratorSettings()
+                                                            .isShowingDialogUsingAxioms() &&
+                                                            infoDialog.showDialog()){
+                                              changedToNotSelected();   
+                                              lemmaCheckbox.setSelected(false);  
+                                               ProofSettings.DEFAULT_SETTINGS
+                                              .getLemmaGeneratorSettings()
+                                              .showDialogUsingAxioms(infoDialog
+                                                              .showThisDialogNextTime());
+                                            }
+                                        }else{
+                                            changedToSelected();
+                                        }
+                                                                
                                 }
                         });
                 }
                 return lemmaCheckbox;
+        }
+        
+        private void enableAxiomFilePanel(boolean val){
+                getAddAxiomFileButton().setEnabled(val);
+                getRemoveAxiomFileButton().setEnabled(val);
+                getAxiomsList().setEnabled(val);
+        }
+        
+        private void changedToSelected(){
+                enableAxiomFilePanel(true);
+        }
+        
+        private void changedToNotSelected() {
+                enableAxiomFilePanel(false);
         }
 
         
@@ -308,6 +339,18 @@ public class FileChooser extends JPanel{
                         
                         @Override
                         public void actionPerformed(ActionEvent e) {
+                               
+                               if(firstTimeAddingAxioms && 
+                                               ProofSettings.DEFAULT_SETTINGS
+                                               .getLemmaGeneratorSettings().isShowingDialogAddingAxioms()){                                     
+                                       InfoDialog infoDialog = new InfoDialog(INFO_TEXT2);
+                                       firstTimeAddingAxioms = !infoDialog.showDialog();
+                                       ProofSettings.DEFAULT_SETTINGS
+                                       .getLemmaGeneratorSettings().showDialogAddingAxioms(infoDialog.showThisDialogNextTime());
+                                       if(firstTimeAddingAxioms){
+                                               return;
+                                       }
+                               }
                                File file = chooseFiles("File containing the axioms.");
                                if(file != null){
                                        listModel.addElement(file);
@@ -382,6 +425,7 @@ public class FileChooser extends JPanel{
                 if(dialog == null){
                         dialog = new JDialog();
                         dialog.setTitle("Files for Loading User-Defined Taclets...");
+                        dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
                         Container pane = dialog.getContentPane();
                 
                         pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
@@ -441,6 +485,11 @@ public class FileChooser extends JPanel{
               getDialog().setModal(true);
               getDialog().setVisible(true);
               return closedByOkayButton;
+        }
+        
+        public static void main(String [] args){
+                FileChooser chooser = new FileChooser();
+                chooser.showAsDialog();
         }
         
         

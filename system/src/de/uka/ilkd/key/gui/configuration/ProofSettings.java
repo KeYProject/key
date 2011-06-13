@@ -16,6 +16,7 @@ import java.util.Properties;
 
 
 import de.uka.ilkd.key.gui.GUIEvent;
+import de.uka.ilkd.key.gui.lemmatagenerator.LemmaGeneratorSettings;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
@@ -66,15 +67,27 @@ public class ProofSettings {
     /** profile */
     private Profile profile;
 
-    /** create a proof settings object */
+    private final static int STRATEGY_SETTINGS = 0;
+    private final static int GENERAL_SETTINGS  = 1;
+    private final static int CHOICE_SETTINGS    = 2;
+    private final static int SMT_SETTINGS      = 3;
+    private final static int VIEW_SETTINGS      = 4;
+    private final static int LEMMA_GENERATOR_SETTINGS = 5;
+    
+    /** create a proof settings object. 
+     * When you add a new settings object, PLEASE UPDATE 
+     * THE LIST ABOVE AND USE THOSE CONSTANTS INSTEAD OF USING INTEGERS DIRECTLY */
+ 
     public ProofSettings() {       	
 	settings = new Settings[] {
             new StrategySettings(),
             new GeneralSettings(),
 	    new ChoiceSettings(),
 	    SMTSettings.getInstance(),
-	    new ViewSettings()
+	    new ViewSettings(),
+	    new LemmaGeneratorSettings()
 	};
+	
 	for (int i = 0; i < settings.length; i++) { 
 	    settings[i].addSettingsListener(listener);
 	}        
@@ -222,40 +235,44 @@ public class ProofSettings {
      */
     public StrategySettings getStrategySettings() {
         ensureInitialized();
-        return (StrategySettings) settings[0];
+        return (StrategySettings) settings[STRATEGY_SETTINGS];
     }
 
     /** returns the ChoiceSettings object
      * @return the ChoiceSettings object
      */
     public ChoiceSettings getChoiceSettings() {
-	ensureInitialized();
-	return (ChoiceSettings) settings[2];
+            ensureInitialized();
+            return (ChoiceSettings) settings[CHOICE_SETTINGS];
     }
 
     public ProofSettings setChoiceSettings(ChoiceSettings cs) {
-	settings[2] = cs;
-        return this;
+            settings[CHOICE_SETTINGS] = cs;
+            return this;
     }
 
     /** returns the DecisionProcedureSettings object
      * @return the DecisionProcedureSettings object
      */
     public SMTSettings getSMTSettings() {
-	ensureInitialized();
-	return (SMTSettings) settings[3];
+            ensureInitialized();
+            return (SMTSettings) settings[SMT_SETTINGS];
     }
     
+    public LemmaGeneratorSettings getLemmaGeneratorSettings(){
+            ensureInitialized();
+            return (LemmaGeneratorSettings) settings[LEMMA_GENERATOR_SETTINGS];
+    }
 
 
     public GeneralSettings getGeneralSettings() {
-	ensureInitialized();
-	return (GeneralSettings) settings[1];
+            ensureInitialized();
+            return (GeneralSettings) settings[GENERAL_SETTINGS];
     }
 
     public ViewSettings getViewSettings() {
-	ensureInitialized();
-	return (ViewSettings) settings[4];
+            ensureInitialized();
+            return (ViewSettings) settings[VIEW_SETTINGS];
     }
 
     private class ProofSettingsListener implements SettingsListener {

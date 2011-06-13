@@ -37,12 +37,17 @@ public class InfoDialog extends JDialog{
                 this.getContentPane().add(box);
                 this.setModal(true);
                 this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+                this.setLocationByPlatform(true);
                 this.pack();
         }
         
         public boolean showDialog(){
                 this.setVisible(true);
                 return yesClicked;
+        }
+        
+        public boolean showThisDialogNextTime(){
+                return !showAgainBox.isSelected();
         }
         
         private JTextArea getInfoText(){
