@@ -72,7 +72,7 @@ public class ProofSettings {
     private final static int CHOICE_SETTINGS    = 2;
     private final static int SMT_SETTINGS      = 3;
     private final static int VIEW_SETTINGS      = 4;
-    private final static int LEMMA_GENERATOR_SETTINGS = 5;
+
     
     /** create a proof settings object. 
      * When you add a new settings object, PLEASE UPDATE 
@@ -84,8 +84,8 @@ public class ProofSettings {
             new GeneralSettings(),
 	    new ChoiceSettings(),
 	    SMTSettings.getInstance(),
-	    new ViewSettings(),
-	    new LemmaGeneratorSettings()
+	    new ViewSettings()
+
 	};
 	
 	for (int i = 0; i < settings.length; i++) { 
@@ -259,10 +259,7 @@ public class ProofSettings {
             return (SMTSettings) settings[SMT_SETTINGS];
     }
     
-    public LemmaGeneratorSettings getLemmaGeneratorSettings(){
-            ensureInitialized();
-            return (LemmaGeneratorSettings) settings[LEMMA_GENERATOR_SETTINGS];
-    }
+
 
 
     public GeneralSettings getGeneralSettings() {

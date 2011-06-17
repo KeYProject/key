@@ -27,4 +27,7 @@ public interface PathConfig {
      */
     public static final String RECENT_FILES_STORAGE = 
         KEY_CONFIG_DIR + File.separator + "recentFiles.props";
+    
+    public static final String PROOF_INDEPENDT_SETTINGS = 
+            KEY_CONFIG_DIR + File.separator + "proofIndependetSettings.props";
 }

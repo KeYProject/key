@@ -194,7 +194,7 @@ public class FileChooser extends JPanel{
                                         InfoDialog infoDialog = new InfoDialog(INFO_TEXT1);
                                         if(!lemmaCheckbox.isSelected()){
                                             lemmaCheckbox.setSelected(true);    
-                                            if(ProofSettings.DEFAULT_SETTINGS
+                                       /*     if(ProofSettings.DEFAULT_SETTINGS
                                                             .getLemmaGeneratorSettings()
                                                             .isShowingDialogUsingAxioms() &&
                                                             infoDialog.showDialog()){
@@ -204,7 +204,7 @@ public class FileChooser extends JPanel{
                                               .getLemmaGeneratorSettings()
                                               .showDialogUsingAxioms(infoDialog
                                                               .showThisDialogNextTime());
-                                            }
+                                            }*/
                                         }else{
                                             changedToSelected();
                                         }
@@ -340,7 +340,7 @@ public class FileChooser extends JPanel{
                         @Override
                         public void actionPerformed(ActionEvent e) {
                                
-                               if(firstTimeAddingAxioms && 
+                           /*    if(firstTimeAddingAxioms && 
                                                ProofSettings.DEFAULT_SETTINGS
                                                .getLemmaGeneratorSettings().isShowingDialogAddingAxioms()){                                     
                                        InfoDialog infoDialog = new InfoDialog(INFO_TEXT2);
@@ -350,7 +350,7 @@ public class FileChooser extends JPanel{
                                        if(firstTimeAddingAxioms){
                                                return;
                                        }
-                               }
+                               }*/
                                File file = chooseFiles("File containing the axioms.");
                                if(file != null){
                                        listModel.addElement(file);

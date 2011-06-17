@@ -167,52 +167,79 @@ class SettingsData{
      * represents the stored settings
      */
     public void readSettings(Properties props) {
-	timeout = read(props, TIMEOUT, timeout);
-	showResultsAfterExecution = read(props,SHOW_SMT_RES_DIA,showResultsAfterExecution);
-        useExplicitTypeHierarchy = read(props,EXPLICIT_TYPE_HIERARCHY,
-        	                                           useExplicitTypeHierarchy);
-        useNullInstantiation = read(props,INSTANTIATE_NULL_PREDICATES,
-        	                                       useNullInstantiation);
-        useBuiltInUniqueness = read(props,USE_BUILT_IN_UNIQUENESS,useBuiltInUniqueness);
-       	
-    	pathForSMTTranslation    = read(props, PATH_FOR_SMT_TRANSLATION, pathForSMTTranslation);
-    	pathForTacletTranslation =  read(props, PATH_FOR_TACLET_TRANSLATION, pathForTacletTranslation);
-    	modeOfProgressDialog     = read(props,PROGRESS_DIALOG_MODE,modeOfProgressDialog);
-    	maxConcurrentProcesses   = read(props,MAX_CONCURRENT_PROCESSES,maxConcurrentProcesses);
-    	maxGenericSorts          = read(props,MAX_GENERIC_SORTS,maxGenericSorts);
-
-    	activeSolver             = read(props,ACTIVE_SOLVER,activeSolver);
-    	tacletSelection          = read(props,TACLET_SELECTION,tacletSelection);
-    	
-    	useUIMultiplication      = read(props,USE_UNINTERPRETED_MULTIPLICATION,useUIMultiplication);
-    	useConstantsForIntegers  = read(props,USE_CONSTANTS_FOR_BIGSMALL_INTEGERS,useConstantsForIntegers);
-    	
-    	for(SolverData solverData : dataOfSolvers.values()){
-    	    solverData.readSettings(props);
-    	}
+            readProofDependentSettings(props);
+            readProofIndependentSettings(props);
     	
     }
     
+    public void readProofIndependentSettings(Properties props){
+            timeout = read(props, TIMEOUT, timeout);
+           showResultsAfterExecution = read(props,SHOW_SMT_RES_DIA,showResultsAfterExecution);
+           useExplicitTypeHierarchy = read(props,EXPLICIT_TYPE_HIERARCHY,
+                                                            useExplicitTypeHierarchy);
+           pathForSMTTranslation    = read(props, PATH_FOR_SMT_TRANSLATION, pathForSMTTranslation);
+           pathForTacletTranslation = read(props, PATH_FOR_TACLET_TRANSLATION, pathForTacletTranslation);
+           modeOfProgressDialog     = read(props,PROGRESS_DIALOG_MODE,modeOfProgressDialog);
+           maxConcurrentProcesses   = read(props,MAX_CONCURRENT_PROCESSES,maxConcurrentProcesses);
+                         
+           useUIMultiplication      = read(props,USE_UNINTERPRETED_MULTIPLICATION,useUIMultiplication);
+           useConstantsForIntegers  = read(props,USE_CONSTANTS_FOR_BIGSMALL_INTEGERS,useConstantsForIntegers);
+           for(SolverData solverData : dataOfSolvers.values()){
+                   solverData.readSettings(props);
+           }     
+    }
+    
+    public void readProofDependentSettings(Properties props){
+        
+            useExplicitTypeHierarchy = read(props,EXPLICIT_TYPE_HIERARCHY,
+                                                           useExplicitTypeHierarchy);
+            useNullInstantiation = read(props,INSTANTIATE_NULL_PREDICATES,
+                                                           useNullInstantiation);
+            useBuiltInUniqueness = read(props,USE_BUILT_IN_UNIQUENESS,useBuiltInUniqueness);
+                
+            maxGenericSorts          = read(props,MAX_GENERIC_SORTS,maxGenericSorts);
+            tacletSelection          = read(props,TACLET_SELECTION,tacletSelection);
+            useUIMultiplication      = read(props,USE_UNINTERPRETED_MULTIPLICATION,useUIMultiplication);
+            useConstantsForIntegers  = read(props,USE_CONSTANTS_FOR_BIGSMALL_INTEGERS,useConstantsForIntegers);
+                
+    }
+    
+    public void writeProofDependentSettings(Properties props){
+            
+          
+            store(props,EXPLICIT_TYPE_HIERARCHY,useExplicitTypeHierarchy);
+            store(props,INSTANTIATE_NULL_PREDICATES,useNullInstantiation);
+            store(props,MAX_GENERIC_SORTS,maxGenericSorts);
+            store(props,TACLET_SELECTION,tacletSelection);
+            store(props,USE_BUILT_IN_UNIQUENESS,useBuiltInUniqueness);
+            store(props,USE_UNINTERPRETED_MULTIPLICATION,useUIMultiplication);
+            store(props,USE_CONSTANTS_FOR_BIGSMALL_INTEGERS,useConstantsForIntegers);
+            
+            for(SolverData solverData : dataOfSolvers.values()){
+                solverData.writeSettings(props);
+            } 
+    }
+    
+   
+    public void writeProofIndependentSettings(Properties props){
+            store(props,TIMEOUT,timeout);
+            store(props,SHOW_SMT_RES_DIA,showResultsAfterExecution);
+            store(props,EXPLICIT_TYPE_HIERARCHY,useExplicitTypeHierarchy);
+            store(props,INSTANTIATE_NULL_PREDICATES,useNullInstantiation);
+            store(props,PROGRESS_DIALOG_MODE,modeOfProgressDialog);
+            store(props,PATH_FOR_SMT_TRANSLATION,pathForSMTTranslation);
+            store(props,PATH_FOR_TACLET_TRANSLATION,pathForTacletTranslation);
+            store(props,ACTIVE_SOLVER,activeSolver);
+            store(props,MAX_CONCURRENT_PROCESSES,maxConcurrentProcesses);
+            
+            for(SolverData solverData : dataOfSolvers.values()){
+                solverData.writeSettings(props);
+            }
+    }
     
     public void writeSettings(Properties props) {	
-        store(props,TIMEOUT,timeout);
-        store(props,SHOW_SMT_RES_DIA,showResultsAfterExecution);
-        store(props,EXPLICIT_TYPE_HIERARCHY,useExplicitTypeHierarchy);
-        store(props,INSTANTIATE_NULL_PREDICATES,useNullInstantiation);
-        store(props,PROGRESS_DIALOG_MODE,modeOfProgressDialog);
-        store(props,PATH_FOR_SMT_TRANSLATION,pathForSMTTranslation);
-        store(props,PATH_FOR_TACLET_TRANSLATION,pathForTacletTranslation);
-        store(props,ACTIVE_SOLVER,activeSolver);
-        store(props,MAX_CONCURRENT_PROCESSES,maxConcurrentProcesses);
-        store(props,MAX_GENERIC_SORTS,maxGenericSorts);
-        store(props,TACLET_SELECTION,tacletSelection);
-        store(props,USE_BUILT_IN_UNIQUENESS,useBuiltInUniqueness);
-        store(props,USE_UNINTERPRETED_MULTIPLICATION,useUIMultiplication);
-        store(props,USE_CONSTANTS_FOR_BIGSMALL_INTEGERS,useConstantsForIntegers);
-        
-    	for(SolverData solverData : dataOfSolvers.values()){
-    	    solverData.writeSettings(props);
-    	}
+            writeProofDependentSettings(props);
+            writeProofIndependentSettings(props);
     	
     }
     
@@ -323,9 +350,34 @@ public class SMTSettings implements Settings, de.uka.ilkd.key.smt.SMTSettings{
     private LinkedList<SettingsListener> listenerList = new LinkedList<SettingsListener>();
    
     
+    
+    
     private SettingsData settingsData = SettingsData.getDefaultSettingsData();
     
+    
+    public class ProofDependentSMTSettings implements Settings{
+        private LinkedList<SettingsListener> listenerList = new LinkedList<SettingsListener>();
      
+        @Override
+        public void addSettingsListener(SettingsListener l) {
+                listenerList.add(l);
+                
+        }
+
+        @Override
+        public void readSettings(Properties props) {
+                
+                
+        }
+
+        @Override
+        public void writeSettings(Properties props) {
+               
+                
+        }
+            
+    }
+    
     
     private Collection<Taclet>   tacletsForTranslation = null;
     private SolverTypeCollection activeSolverUnion = SolverTypeCollection.EMPTY_COLLECTION;
@@ -334,7 +386,7 @@ public class SMTSettings implements Settings, de.uka.ilkd.key.smt.SMTSettings{
     
     private static SMTSettings instance;
     
-    private SMTSettings(){
+    public SMTSettings(){
 	solverUnions.add(new SolverTypeCollection("Z3",1,SolverType.Z3_SOLVER));
 	solverUnions.add(new SolverTypeCollection("Yices",1,SolverType.YICES_SOLVER));
 	solverUnions.add(new SolverTypeCollection("CVC3",1,SolverType.CVC3_SOLVER));
