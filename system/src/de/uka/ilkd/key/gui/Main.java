@@ -80,6 +80,7 @@ import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
 import de.uka.ilkd.key.gui.configuration.GeneralSettings;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
+import de.uka.ilkd.key.gui.configuration.ProofIndependentSettingsHandler;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.configuration.SettingsListener;
 import de.uka.ilkd.key.gui.configuration.StrategySettings;
@@ -97,6 +98,7 @@ import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.gui.smt.ComplexButton;
+import de.uka.ilkd.key.gui.smt.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
 import de.uka.ilkd.key.gui.smt.SettingsDialog;
 import de.uka.ilkd.key.gui.smt.SolverListener;
@@ -262,7 +264,7 @@ public final class Main extends JFrame implements IMain {
     
     
     /** external prover GUI elements */
-    private SMTSettingsListener smtSettingsListener;
+   // private SMTSettingsListener smtSettingsListener;
     
     protected static String fileNameOnStartUp = null;
     
@@ -693,7 +695,8 @@ public final class Main extends JFrame implements IMain {
 		ComplexButton but = (ComplexButton) e.getSource();
 		if(but.getSelectedItem() instanceof SMTInvokeAction){
 		    SMTInvokeAction action = (SMTInvokeAction) but.getSelectedItem(); 
-		    SMTSettings.getInstance().setActiveSolverUnion(action.solverUnion);
+		    ProofIndependentSettingsHandler.DEFAULT_INSTANCE.getSMTSettings()
+		            .setActiveSolverUnion(action.solverUnion);
 		}
 	
 	    }
@@ -1432,8 +1435,8 @@ public final class Main extends JFrame implements IMain {
         // SMT solvers
 	createSMTMenu(options);
 
-	smtSettingsListener = 
-	    new SMTSettingsListener(ProofSettings.DEFAULT_SETTINGS.getSMTSettings());
+	//smtSettingsListener = 
+	  //  new SMTSettingsListener(ProofSettings.DEFAULT_SETTINGS.getSMTSettings());
                
         // specification languages
         JMenuItem speclangItem = setupSpeclangMenu();
@@ -1503,8 +1506,8 @@ public final class Main extends JFrame implements IMain {
 	
 	// TODO: Change this: only solver unions should be returned 
 	// that are installed.
-	Collection<SolverTypeCollection> solverUnions = ProofSettings.DEFAULT_SETTINGS.
-	                                  getSMTSettings().getUsableSolverUnions();
+	Collection<SolverTypeCollection> solverUnions = ProofIndependentSettingsHandler.DEFAULT_INSTANCE.getSMTSettings()
+	                                  .getUsableSolverUnions();
 	if(solverUnions == null || solverUnions.isEmpty()){
 	    updateDPSelectionMenu();
 	}else{
@@ -1542,7 +1545,7 @@ public final class Main extends JFrame implements IMain {
 		
 		smtComponent.setItems(actions);
 	            	
-		SolverTypeCollection active = ProofSettings.DEFAULT_SETTINGS.getSMTSettings().computeActiveSolverUnion();
+		SolverTypeCollection active = ProofIndependentSettingsHandler.DEFAULT_INSTANCE.getSMTSettings().computeActiveSolverUnion();
 		 
 		SMTInvokeAction activeAction = findAction(actions, active);
 		
@@ -1551,7 +1554,7 @@ public final class Main extends JFrame implements IMain {
 		    Object item = smtComponent.getTopItem();
 		    if(item instanceof SMTInvokeAction){
 			active = ((SMTInvokeAction)item).solverUnion;
-			ProofSettings.DEFAULT_SETTINGS.getSMTSettings().setActiveSolverUnion(active);
+			ProofIndependentSettingsHandler.DEFAULT_INSTANCE.getSMTSettings().setActiveSolverUnion(active);
 		    }else{
 			activeAction = null;
 		    }
@@ -1570,14 +1573,16 @@ public final class Main extends JFrame implements IMain {
     private void createSMTMenu(JMenu parent) {
 	/** menu for configuration of SMT solvers */
         
-        final SMTSettings smts = ProofSettings.DEFAULT_SETTINGS.getSMTSettings();
+        final ProofIndependentSettings piSettings = ProofIndependentSettingsHandler.DEFAULT_INSTANCE.getSMTSettings();
 
 	JMenuItem item = new JMenuItem("SMT Solvers...");
 	item.addActionListener(new ActionListener() {
 		   public void actionPerformed(ActionEvent e) {
-		  
-		       SettingsDialog.INSTANCE.showDialog(TemporarySettings.getInstance(
-			       ProofSettings.DEFAULT_SETTINGS.getSMTSettings()));
+		       Proof proof = mediator.getSelectedProof();
+		       
+		       SettingsDialog.INSTANCE.showDialog(TemporarySettings.getInstance(proof == null ? ProofSettings.DEFAULT_SETTINGS.getSMTSettings():
+                       proof.getSettings().getSMTSettings(),
+                       piSettings));
 		       
 		       
 		   }
@@ -1868,48 +1873,48 @@ public final class Main extends JFrame implements IMain {
         }
     }
     
-    private final class SMTSettingsListener implements SettingsListener {	
-	private SMTSettings settings;
-
-	public SMTSettingsListener(SMTSettings dps) {
-	    this.settings = dps;
-	    register();
-	}
-
-	private void register() {
-	    if (settings != null) {
-		settings.addSettingsListener(this);
-	    }
-	}
-
-	private void unregister() {
-	    if (settings != null) {
-		settings.removeSettingsListener(this);
-	    }
-	}
-	
-	public void update() {	   
-	    
-	    if (settings != null) {
-		updateSMTSelectMenu();
-
-	    } else {
-		assert false;
-	    }
-	}
-
-	public void settingsChanged(GUIEvent e) {
-	    if (e.getSource() instanceof SMTSettings) {
-		if (e.getSource() != settings) {
-		    unregister();
-		    settings = (SMTSettings) e.getSource();		    
-		    register();
-		}
-		update();
-	    }
-	}
-    }
-    
+//    private final class SMTSettingsListener implements SettingsListener {	
+//	private SMTSettings settings;
+//
+//	public SMTSettingsListener(SMTSettings dps) {
+//	    this.settings = dps;
+//	    register();
+//	}
+//
+//	private void register() {
+//	    if (settings != null) {
+//	            settings.addSettingsListener(this);
+//	    }
+//	}
+//
+//	private void unregister() {
+//	    if (settings != null) {
+//	            settings.removeSettingsListener(this);
+//	    }
+//	}
+//	
+//	public void update() {	   
+//	    
+//	    if (settings != null) {
+//		updateSMTSelectMenu();
+//
+//	    } else {
+//		assert false;
+//	    }
+//	}
+//
+//	public void settingsChanged(GUIEvent e) {
+//	    if (e.getSource() instanceof SMTSettings) {
+//		if (e.getSource() != settings) {
+//		    unregister();
+//		    settings = (SMTSettings) e.getSource();		    
+//		    register();
+//		}
+//		update();
+//	    }
+//	}
+//    }
+//    
     
     
     /**
@@ -2308,8 +2313,8 @@ public final class Main extends JFrame implements IMain {
             goalView.setViewportView(null);
             
             setProofNodeDisplay();
-            smtSettingsListener.settingsChanged(new GUIEvent((proof != null ? 
-        	    proof.getSettings() : ProofSettings.DEFAULT_SETTINGS).getSMTSettings()));
+//            smtSettingsListener.settingsChanged(new GUIEvent((proof != null ? 
+//        	    proof.getSettings() : ProofSettings.DEFAULT_SETTINGS).getSMTSettings()));
             makePrettyView();
         }
         
@@ -2923,7 +2928,8 @@ public final class Main extends JFrame implements IMain {
 	        @Override
 	        public void run() {
 	        
-	            SMTSettings settings = ProofSettings.DEFAULT_SETTINGS.getSMTSettings();
+	            SMTSettings settings = new SMTSettings(proof.getSettings().getSMTSettings(),
+	                            ProofIndependentSettingsHandler.DEFAULT_INSTANCE.getSMTSettings());
 	            SolverLauncher launcher = new SolverLauncher(settings);
 	            launcher.addListener(new SolverListener(settings));
 	            launcher.launch(solverUnion.getTypes(),

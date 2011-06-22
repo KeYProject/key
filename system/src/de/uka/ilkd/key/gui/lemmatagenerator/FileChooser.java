@@ -28,6 +28,7 @@ import javax.swing.WindowConstants;
 
 
 import de.uka.ilkd.key.gui.KeYFileChooser;
+import de.uka.ilkd.key.gui.configuration.ProofIndependentSettingsHandler;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 
 
@@ -194,17 +195,17 @@ public class FileChooser extends JPanel{
                                         InfoDialog infoDialog = new InfoDialog(INFO_TEXT1);
                                         if(!lemmaCheckbox.isSelected()){
                                             lemmaCheckbox.setSelected(true);    
-                                       /*     if(ProofSettings.DEFAULT_SETTINGS
+                                            if(ProofIndependentSettingsHandler.DEFAULT_INSTANCE
                                                             .getLemmaGeneratorSettings()
                                                             .isShowingDialogUsingAxioms() &&
                                                             infoDialog.showDialog()){
                                               changedToNotSelected();   
                                               lemmaCheckbox.setSelected(false);  
-                                               ProofSettings.DEFAULT_SETTINGS
+                                               ProofIndependentSettingsHandler.DEFAULT_INSTANCE
                                               .getLemmaGeneratorSettings()
                                               .showDialogUsingAxioms(infoDialog
                                                               .showThisDialogNextTime());
-                                            }*/
+                                            }
                                         }else{
                                             changedToSelected();
                                         }

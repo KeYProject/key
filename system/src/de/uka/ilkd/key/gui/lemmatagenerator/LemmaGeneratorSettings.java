@@ -56,13 +56,13 @@ public class LemmaGeneratorSettings implements de.uka.ilkd.key.gui.configuration
         }
 
         @Override
-        public void readSettings(Properties props) {
+        public void readSettings(Object sender, Properties props) {
                showDialogAddingAxioms = readBoolean(props,SHOW_DIALOG_ADDING_AXIOMS,true);
                showDialogUsingAxioms = readBoolean(props,SHOW_DIALOG_USING_AXIOMS,true);
         }
 
         @Override
-        public void writeSettings(Properties props) {
+        public void writeSettings(Object sender, Properties props) {
                 writeBoolean(props,SHOW_DIALOG_ADDING_AXIOMS ,showDialogAddingAxioms);
                 writeBoolean(props, SHOW_DIALOG_USING_AXIOMS, showDialogUsingAxioms);
                 

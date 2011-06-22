@@ -134,7 +134,7 @@ public class GeneralSettings implements Settings {
      * steps in order to change this object in a way that it
      * represents the stored settings
      */
-    public void readSettings(Properties props) {
+    public void readSettings(Object sender, Properties props) {
 	String val = props.getProperty(TACLET_FILTER);
 	if (val != null) {
 	    tacletFilter = Boolean.valueOf(val).booleanValue();
@@ -167,7 +167,7 @@ public class GeneralSettings implements Settings {
      * <key> = <value> (,<value>)* are allowed.
      * @param props the Properties object where to write the settings as (key, value) pair
      */
-    public void writeSettings(Properties props) {
+    public void writeSettings(Object sender, Properties props) {
 	props.setProperty(TACLET_FILTER, "" + tacletFilter);
         props.setProperty(DND_DIRECTION_SENSITIVE_KEY, "" + dndDirectionSensitive);
         props.setProperty(ONE_STEP_SIMPLIFICATION_KEY, "" + oneStepSimplification);        

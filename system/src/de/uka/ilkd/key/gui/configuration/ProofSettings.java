@@ -17,7 +17,7 @@ import java.util.Properties;
 
 import de.uka.ilkd.key.gui.GUIEvent;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmaGeneratorSettings;
-import de.uka.ilkd.key.gui.smt.SMTSettings;
+import de.uka.ilkd.key.gui.smt.ProofDependentSettings;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.util.Debug;
@@ -78,12 +78,12 @@ public class ProofSettings {
      * When you add a new settings object, PLEASE UPDATE 
      * THE LIST ABOVE AND USE THOSE CONSTANTS INSTEAD OF USING INTEGERS DIRECTLY */
  
-    public ProofSettings() {       	
+    private ProofSettings() {       	
 	settings = new Settings[] {
             new StrategySettings(),
             new GeneralSettings(),
 	    new ChoiceSettings(),
-	    SMTSettings.getInstance(),
+	    ProofDependentSettings.getDefaultSettingsData(),
 	    new ViewSettings()
 
 	};
@@ -100,11 +100,11 @@ public class ProofSettings {
         Settings[] s = toCopy.settings;
 
         for (int i = 0; i < s.length; i++) {
-            s[i].writeSettings(result);
+            s[i].writeSettings(this,result);
         }
         
         for (int i = settings.length - 1; i >= 0; i--) {
-            settings[i].readSettings(result);
+            settings[i].readSettings(this,result);
         }
         initialized = true;
         setProfile(toCopy.getProfile());
@@ -141,7 +141,7 @@ public class ProofSettings {
     try {
         Properties result = new Properties();
 	    for (int i = 0; i < s.length; i++) {
-	    s[i].writeSettings(result);
+	    s[i].writeSettings(this,result);
 	    }
 	    result.store(out, "Proof-Settings-Config-File");
 	} catch (IOException e){
@@ -203,7 +203,7 @@ public class ProofSettings {
 	    }
 
 	    for (int i = settings.length-1; i>=0 ;i--) { 
-	        settings[i].readSettings(props); 
+	        settings[i].readSettings(this,props); 
 	    }
 
 	    initialized = true;
@@ -254,9 +254,9 @@ public class ProofSettings {
     /** returns the DecisionProcedureSettings object
      * @return the DecisionProcedureSettings object
      */
-    public SMTSettings getSMTSettings() {
+    public ProofDependentSettings getSMTSettings() {
             ensureInitialized();
-            return (SMTSettings) settings[SMT_SETTINGS];
+            return (ProofDependentSettings) settings[SMT_SETTINGS];
     }
     
 
