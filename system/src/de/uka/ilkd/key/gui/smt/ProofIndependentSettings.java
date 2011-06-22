@@ -172,6 +172,8 @@ public class ProofIndependentSettings implements de.uka.ilkd.key.gui.configurati
                         solverData.writeSettings(props);
                 }
         }
+        
+
 
 
         public static class SolverData{
@@ -254,7 +256,7 @@ public class ProofIndependentSettings implements de.uka.ilkd.key.gui.configurati
                 return solverUnions;
         }
       
-      protected void fireSettingsChanged() {
+      public void fireSettingsChanged() {
               for (SettingsListener aListenerList : listeners) {
                       aListenerList.settingsChanged(new GUIEvent(this));
               }

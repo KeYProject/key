@@ -107,6 +107,7 @@ public class ProofSettings {
             settings[i].readSettings(this,result);
         }
         initialized = true;
+
         setProfile(toCopy.getProfile());
     }
 

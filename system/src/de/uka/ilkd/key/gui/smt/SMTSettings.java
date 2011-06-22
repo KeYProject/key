@@ -26,6 +26,7 @@ import de.uka.ilkd.key.rule.Taclet;
 
 
 import de.uka.ilkd.key.smt.SolverType;
+import de.uka.ilkd.key.smt.SolverTypeCollection;
 
 import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets;
 import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets.TreeItem;
@@ -34,7 +35,7 @@ import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets.TreeItem.S
 public class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings{
         private final ProofDependentSettings pdSettings;
         private final ProofIndependentSettings piSettings;
-        
+ 
         
 
         public SMTSettings(ProofDependentSettings pdSettings,
@@ -42,6 +43,7 @@ public class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings{
                 super();
                 this.pdSettings = pdSettings;
                 this.piSettings = piSettings;
+                
         }
         
         public void copy(SMTSettings settings){
@@ -82,16 +84,18 @@ public class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings{
         }
 
         @Override
-        public Collection<Taclet> getTaclets(Services services) {
-              
-                return null;
+        public Collection<Taclet> getTaclets() {
+              throw new RuntimeException("Not yet implemented");       
+               
         }
 
         @Override
         public long getTimeout() {
-              
+                
                 return piSettings.timeout;
         }
+        
+       
 
         @Override
         public boolean instantiateNullAssumption() {
@@ -101,11 +105,12 @@ public class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings{
 
         @Override
         public boolean makesUseOfTaclets() {
-              TreeItem item = ((TreeItem)((DefaultMutableTreeNode)SupportedTaclets.INSTANCE.getTreeModel()
-              .getRoot()).getUserObject());
-              return item.getMode() == SelectionMode.all || item.getMode() == SelectionMode.user;
+              
+              return pdSettings.supportedTaclets.getNamesOfSelectedTaclets().length > 0;
 
         }
+        
+        
 
         @Override
         public boolean useAssumptionsForBigSmallIntegers() {
@@ -130,6 +135,37 @@ public class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings{
                 
                 return pdSettings.useUIMultiplication;
         }
+        
+        public SupportedTaclets getSupportedTaclets(){
+                return pdSettings.supportedTaclets;
+        }
+        
+        public int getModeOfProgressDialog(){
+                return piSettings.modeOfProgressDialog;
+        }
+        
+        public boolean storeSMTTranslationToFile(){
+                return piSettings.storeSMTTranslationToFile;
+        }
+        
+        public boolean storeTacletTranslationToFile(){
+                return piSettings.storeTacletTranslationToFile;
+        }
+        
+        public String getPathForTacletTranslation(){
+                return piSettings.pathForTacletTranslation;
+        }
+        
+        public String getPathForSMTTranslation(){
+                return piSettings.pathForSMTTranslation;
+        }
+        
+        public void fireSettingsChanged(){
+                piSettings.fireSettingsChanged();
+                pdSettings.fireSettingsChanged();
+        }
+        
+       
         
 }
 

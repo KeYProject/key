@@ -42,8 +42,7 @@ public interface TacletSetTranslation {
      * @return returns the resulting formulae of the taclets. Each formula of
      *         the resulting set is associated with one taclet.
      */
-    public ImmutableList<TacletFormula> getTranslation(ImmutableSet<Sort> sorts,
-               int maxGeneric);
+    public ImmutableList<TacletFormula> getTranslation(ImmutableSet<Sort> sorts);
 
     /**
      * Returns all taclet that have not been translated. The reason can be got

@@ -1495,28 +1495,22 @@ public final class Main extends JFrame implements IMain {
     
     
     
-    /**
-     * update the selection menu for Decisionprocedures.
-     * Remove those, that are not installed anymore, add those, that got installed.
-     */
-    public void updateSMTSelectMenu() {
-	
-	//Collection<SMTRule> rules = ProofSettings.DEFAULT_SETTINGS.
-	  //                             getSMTSettings().getInstalledRules();
-	
-	// TODO: Change this: only solver unions should be returned 
-	// that are installed.
-	Collection<SolverTypeCollection> solverUnions = ProofIndependentSettingsHandler.DEFAULT_INSTANCE.getSMTSettings()
-	                                  .getUsableSolverUnions();
-	if(solverUnions == null || solverUnions.isEmpty()){
-	    updateDPSelectionMenu();
-	}else{
-	    updateDPSelectionMenu(solverUnions);
-	}
-	
+        /**
+         * update the selection menu for Decisionprocedures. Remove those, that
+         * are not installed anymore, add those, that got installed.
+         */
+        public void updateSMTSelectMenu() {
+             
 
+                Collection<SolverTypeCollection> solverUnions = ProofIndependentSettingsHandler.DEFAULT_INSTANCE
+                                .getSMTSettings().getUsableSolverUnions();
+                if (solverUnions == null || solverUnions.isEmpty()) {
+                        updateDPSelectionMenu();
+                } else {
+                        updateDPSelectionMenu(solverUnions);
+                }
 
-    }
+        }
     
     
     
@@ -1580,7 +1574,7 @@ public final class Main extends JFrame implements IMain {
 		   public void actionPerformed(ActionEvent e) {
 		       Proof proof = mediator.getSelectedProof();
 		       
-		       SettingsDialog.INSTANCE.showDialog(TemporarySettings.getInstance(proof == null ? ProofSettings.DEFAULT_SETTINGS.getSMTSettings():
+		       SettingsDialog.INSTANCE.showDialog(new TemporarySettings(proof == null ? ProofSettings.DEFAULT_SETTINGS.getSMTSettings():
                        proof.getSettings().getSMTSettings(),
                        piSettings));
 		       

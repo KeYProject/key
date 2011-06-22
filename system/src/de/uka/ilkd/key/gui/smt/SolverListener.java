@@ -28,7 +28,7 @@ import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
 
 
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
+
 import de.uka.ilkd.key.gui.smt.InformationWindow.Information;
 import de.uka.ilkd.key.gui.smt.ProgressDialog.Modus;
 import de.uka.ilkd.key.gui.smt.ProgressDialog.ProgressDialogListener;
@@ -148,7 +148,7 @@ public class SolverListener implements SolverLauncherListener {
                 if (!problemsWithException.isEmpty()) {
                       progressDialog.setAdditionalInformation("Exception for...", Color.RED,problemsWithException);
                 } else {
-                        if (settings.getModeOfProgressDialog() == SettingsData.PROGRESS_MODE_CLOSE) {
+                        if (settings.getModeOfProgressDialog() == ProofIndependentSettings.PROGRESS_MODE_CLOSE) {
                                 applyEvent(launcher);
                         }
                 }
@@ -490,8 +490,7 @@ public class SolverListener implements SolverLauncherListener {
 
         private void storeTacletTranslation(SMTSolver solver, Goal goal,
                         TacletSetTranslation translation) {
-                String path = ProofSettings.DEFAULT_SETTINGS.getSMTSettings()
-                                .getPathForTacletTranslation();
+                String path = settings.getPathForTacletTranslation();
                 path = finalizePath(path, solver, goal);
                 storeToFile(translation.toString(), path);
         }

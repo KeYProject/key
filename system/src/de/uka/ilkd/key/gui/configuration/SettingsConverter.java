@@ -41,7 +41,11 @@ public class SettingsConverter {
         
         public static String   read(Properties props, String key, String defaultVal){
                 String eth = props.getProperty(key);
-                return eth == null ? defaultVal : eth;
+                try{
+                return eth == null ? defaultVal : encode(eth);
+                }catch(Throwable e){
+                        return defaultVal;
+                }
         }
 
         public static int     read(Properties props, String key, int defaultVal){
@@ -87,7 +91,11 @@ public class SettingsConverter {
                 }
                 String [] result = val.split(list_separator);
                 for(int i=0; i < result.length; i++){
-                        result[i] = decode(result[i]);
+                        try{
+                        result[i] = encode(result[i]);
+                        }catch(Throwable e){
+                                return defaultVal;
+                        }
                 }
                 return result;
                 
@@ -97,7 +105,7 @@ public class SettingsConverter {
         public static void store(Properties props, String key, String []values){
                 String result = "";
                 for(int i=0; i < values.length; i ++){
-                        result += encode(values[i]);
+                        result += decode(values[i]);
                         result += i < values.length-1 ? "," :"";
                 }
                 props.setProperty(key, result);
@@ -107,7 +115,7 @@ public class SettingsConverter {
 
         public static void store(Properties props,String key, String value){
                 if(key != null && value != null){
-                        props.setProperty(key, value);
+                        props.setProperty(key, decode(value));
                 }
         }
 

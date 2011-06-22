@@ -10,36 +10,28 @@
 
 package de.uka.ilkd.key.gui.smt;
 
+import java.util.List;
+
 import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.SolverType;
 
 public class TemporarySettings extends Settings {
 
-        private static TemporarySettings settingsInstance = new TemporarySettings();
-
-        public static TemporarySettings getInstance(
-                        
-                        ProofDependentSettings pdSettings,
-                        ProofIndependentSettings piSettings) {
-                settingsInstance.newSession(piSettings, pdSettings);
-                return settingsInstance;
-        }
-
-        private SMTSettings originalSettings = new SMTSettings(ProofDependentSettings
-                        .getDefaultSettingsData(),ProofIndependentSettings
-                        .getDefaultSettingsData());
-        private SMTSettings temporarySettings = new SMTSettings(ProofDependentSettings
-                        .getDefaultSettingsData(),ProofIndependentSettings
-                        .getDefaultSettingsData());
+  
+        private final SMTSettings originalSettings;
+        private final SMTSettings temporarySettings;
     
 
 
 
-        private static DefaultTreeModel contentModel;
+        private DefaultTreeModel contentModel;
         private ContentItem defaultItem = null;
+        
       
 
         public final static String PROGRESS_MODE_USER = "Progress dialog remains open after executing solvers.";
@@ -58,84 +50,66 @@ public class TemporarySettings extends Settings {
                 return "";
         }
 
-        private TemporarySettings() {
-
+        public TemporarySettings(      
+                        ProofDependentSettings pdSettings,
+                        ProofIndependentSettings piSettings) {
+                originalSettings = new SMTSettings(pdSettings, piSettings);
+                temporarySettings = new SMTSettings(pdSettings.clone(), piSettings.clone());
+                createContentModel();
         }
 
-        private void newSession(ProofIndependentSettings pi,
-                        ProofDependentSettings pd) {
-                originalSettings = new SMTSettings(pd, pi);
-                temporarySettings = new SMTSettings(pd.clone(),pi.clone());
-                
-        }
 
         public void applyChanges() {
+ 
                 originalSettings.copy(temporarySettings);
-                //decSettings.fireSettingsChanged();
+                originalSettings.fireSettingsChanged();
         }
 
-        public DefaultTreeModel getContent() {
-                if (contentModel == null) {
-                        // DefaultMutableTreeNode root = new
-                        // DefaultMutableTreeNode();
-                        // root.setUserObject("Options");
-                        DefaultTableModel def = buildModel("Options",
-                                        getGeneralOptionsData());
-                        defaultItem = new ContentItem("Options", def);
-                        DefaultMutableTreeNode root = new DefaultMutableTreeNode();
-                        root.setUserObject(defaultItem);
+        private void createContentModel() {
+                DefaultTableModel def = buildModel("Options",
+                                getGeneralOptionsData());
+                defaultItem = new ContentItem("Options", def);
+                DefaultMutableTreeNode root = new DefaultMutableTreeNode();
+                root.setUserObject(defaultItem);
 
-                        DefaultMutableTreeNode solverOptions = new DefaultMutableTreeNode();
-                        solverOptions.setUserObject(new ContentItem("Solvers",
-                                        def));
-                        for (SolverType type : temporarySettings.getPiSettings()
-                                        .getSupportedSolvers()) {
-                                DefaultMutableTreeNode solver = new DefaultMutableTreeNode();
-                                solver
-                                                .setUserObject(new ContentItem(
-                                                                type.getName(),
-                                                                buildModel(
-                                                                                type
-                                                                                                .getName(),
-                                                                                getSolverData(type))));
-                                solverOptions.add(solver);
-                        }
-
-                        DefaultMutableTreeNode hierarchyOptions = new DefaultMutableTreeNode();
-                        hierarchyOptions
-                                        .setUserObject(new ContentItem(
-                                                        "Translation",
-                                                        buildModel(
-                                                                        "Translation",
-                                                                        getTranslationOptionData())));
-
-                        DefaultMutableTreeNode tacletOptions = new DefaultMutableTreeNode();
-                        tacletOptions
-                                        .setUserObject(new ContentItem(
-                                                        "Taclets",
-                                                        buildModel(
-                                                                        "Taclets",
-                                                                        getTacletOptionsData())));
-
-                        DefaultMutableTreeNode tacletSelection = new DefaultMutableTreeNode();
-                        tacletSelection.setUserObject(new ContentItem(
-                                        "Selection",
-                                        TacletTranslationSelection.INSTANCE
-                                                        .getSelectionTree()));
-                        tacletOptions.add(tacletSelection);
-
-                        root.add(solverOptions);
-                        root.add(hierarchyOptions);
-                        root.add(tacletOptions);
-
-                        contentModel = new DefaultTreeModel(root);
-                        // setModel(model);
-
-                } else {
-                        // init((DefaultMutableTreeNode)contentModel.getRoot());
+                DefaultMutableTreeNode solverOptions = new DefaultMutableTreeNode();
+                solverOptions.setUserObject(new ContentItem("Solvers", def));
+                for (SolverType type : temporarySettings.getPiSettings()
+                                .getSupportedSolvers()) {
+                        DefaultMutableTreeNode solver = new DefaultMutableTreeNode();
+                        solver.setUserObject(new ContentItem(type.getName(),
+                                        buildModel(type.getName(),
+                                                        getSolverData(type))));
+                        solverOptions.add(solver);
                 }
-                return contentModel;
 
+                DefaultMutableTreeNode hierarchyOptions = new DefaultMutableTreeNode();
+                hierarchyOptions.setUserObject(new ContentItem("Translation",
+                                buildModel("Translation",
+                                                getTranslationOptionData())));
+
+                DefaultMutableTreeNode tacletOptions = new DefaultMutableTreeNode();
+                tacletOptions.setUserObject(new ContentItem("Taclets",
+                                buildModel("Taclets", getTacletOptionsData())));
+
+                DefaultMutableTreeNode tacletSelection = new DefaultMutableTreeNode();
+                tacletSelection.setUserObject(new ContentItem("Selection",
+                                (new TacletTranslationSelection(
+                                                temporarySettings))
+                                                .getSelectionTree()));
+                tacletOptions.add(tacletSelection);
+
+                root.add(solverOptions);
+                root.add(hierarchyOptions);
+                root.add(tacletOptions);
+
+                contentModel = new DefaultTreeModel(root);
+                // setModel(model);
+
+        }
+        
+        public DefaultTreeModel getContentModel() {
+                return contentModel;
         }
 
         private TableComponent[] getTranslationOptionData() {
@@ -579,6 +553,12 @@ public class TemporarySettings extends Settings {
         @Override
         public ContentItem getDefaultItem() {
                 return defaultItem;
+        }
+
+        @Override
+        public DefaultTreeModel getContent() {
+           
+                return getContentModel();
         }
 
 }
