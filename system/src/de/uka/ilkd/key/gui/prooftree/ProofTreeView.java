@@ -502,7 +502,6 @@ public class ProofTreeView extends JPanel {
 
 	/** makes selected node visible of lastGoalNode */
 	public void makeSelectedNodeVisible(Node selectedNode) {
-            
             if (selectedNode != null ) {
                 if ( proof != selectedNode.proof() ) {
                     return;
@@ -516,8 +515,9 @@ public class ProofTreeView extends JPanel {
 	
 	/** focused node has changed */
 	public void selectedNodeChanged(KeYSelectionEvent e) {	    
-	    if (!ignoreNodeSelectionChange)
-	        makeSelectedNodeVisible(mediator.getSelectedNode());	    
+	    if (!ignoreNodeSelectionChange) {
+	        makeSelectedNodeVisible(mediator.getSelectedNode());	        
+	    }
 	}
 
 	/** the selected proof has changed (e.g. a new proof has been

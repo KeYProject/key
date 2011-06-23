@@ -514,7 +514,7 @@ public class Proof implements Named {
      * @param goal the Goal desribing the location where to set back
      * @return true iff undo operation was succesfull.
      */
-    public boolean setBack(Goal goal) {		
+    private boolean setBack(Goal goal) {		
 	if (goal != null) {
 	    Node parent = goal.node().parent();
 	    if (parent != null) {
@@ -532,11 +532,12 @@ public class Proof implements Named {
     /** Prunes away the subtree beneath <code>node</code>.
      *	<code>node</code> is going to be the last node on its
      * branch.
-     * @param node the node desribing the location where to set back
-     * @return true iff undo operation was succesfull.
+     * @param node the node describing the location where to set back
+     * @return true iff undo operation was successful.
      */
     public boolean setBack(final Node node) {
-	Goal goal = getGoal(node);
+	fireProofIsBeingPruned(node);
+    Goal goal = getGoal(node);
 	while (goal == null) {	
 	    final ImmutableList<Goal> goalList = getSubtreeGoals(node);
 	    if (!goalList.isEmpty()) {
@@ -565,6 +566,7 @@ public class Proof implements Named {
 	        return false;
 	    }
 	}
+    fireProofPruned(node);
 	return true;
     }
 
@@ -579,8 +581,8 @@ public class Proof implements Named {
 
     
     /** fires the event that the proof has been pruned at the given node */
-    protected void fireProofIsBeingPruned(Node node, Node removedNode) {
-        ProofTreeEvent e = new ProofTreeRemovedNodeEvent(this, node, removedNode);
+    protected void fireProofIsBeingPruned(Node below) {
+        ProofTreeEvent e = new ProofTreeEvent(this, below);
         for (int i = 0; i<listenerList.size(); i++) {
             listenerList.get(i).proofIsBeingPruned(e);
         }
@@ -588,8 +590,8 @@ public class Proof implements Named {
     
 
     /** fires the event that the proof has been pruned at the given node */
-    protected void fireProofPruned(Node node, Node removedNode) {
-	ProofTreeEvent e = new ProofTreeRemovedNodeEvent(this, node, removedNode);
+    protected void fireProofPruned(Node below) {
+	ProofTreeEvent e = new ProofTreeEvent(this, below);
 	for (int i = 0; i<listenerList.size(); i++) {
 	    listenerList.get(i).proofPruned(e);
 	}

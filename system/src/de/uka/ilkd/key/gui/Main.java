@@ -2865,6 +2865,7 @@ public final class Main extends JFrame implements IMain {
             } else {
                 mediator.setBack(mediator.getSelectedNode());
             }
+            ((ProofTreeView)proofView.getComponent(0)).makeNodeVisible(mediator.getSelectedNode());
         }        
     }
     
