@@ -61,6 +61,7 @@ public final class SupportedTaclets {
                                 item.setMode(SelectionMode.all);
                         }
                 }
+                this.validateSelectionModes();
         }
 
         private void copy(SupportedTaclets reference) {

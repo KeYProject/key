@@ -16,11 +16,18 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.SolverType;
 
-public class TemporarySettings extends Settings {
+public class SettingsModel{
+
+
+        public final static int OPTIONCOL=1; 
+        public final static int width []= {10,-1,30};
+        public final static TableSeperator seperator = new TableSeperator();
+
 
   
         private final SMTSettings originalSettings;
@@ -50,11 +57,12 @@ public class TemporarySettings extends Settings {
                 return "";
         }
 
-        public TemporarySettings(      
+        public SettingsModel(      
                         ProofDependentSettings pdSettings,
                         ProofIndependentSettings piSettings) {
                 originalSettings = new SMTSettings(pdSettings, piSettings);
                 temporarySettings = new SMTSettings(pdSettings.clone(), piSettings.clone());
+               
                 createContentModel();
         }
 
@@ -108,8 +116,33 @@ public class TemporarySettings extends Settings {
 
         }
         
+        private DefaultTableModel buildModel(String title, Object[] data) {
+                DefaultTableModel model = new DefaultTableModel();
+
+                model = new DefaultTableModel();
+                model.addColumn("");
+                model.addColumn(title);
+                model.addColumn("");
+
+                Object[] sep = { seperator, seperator, seperator };
+                model.addRow(sep);
+                for (int i = 0; i < data.length; i++) {
+                        Object[] dat = { sep[0], data[i], sep[0] };
+                        model.addRow(dat);
+                        model.addRow(sep);
+
+                }
+
+
+                return model;
+        }
+        
         public DefaultTreeModel getContentModel() {
                 return contentModel;
+        }
+        
+        public void storeAsDefault(){
+                ProofSettings.DEFAULT_SETTINGS.getSMTSettings().copy(temporarySettings.getPdSettings());
         }
 
         private TableComponent[] getTranslationOptionData() {
@@ -545,17 +578,12 @@ public class TemporarySettings extends Settings {
 
         }
 
-        /*
-         * (non-Javadoc)
-         * 
-         * @see de.uka.ilkd.key.gui.smt.Settings#getDefaultItem()
-         */
-        @Override
+
         public ContentItem getDefaultItem() {
                 return defaultItem;
         }
 
-        @Override
+      
         public DefaultTreeModel getContent() {
            
                 return getContentModel();

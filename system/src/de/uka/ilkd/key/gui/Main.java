@@ -102,7 +102,7 @@ import de.uka.ilkd.key.gui.smt.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
 import de.uka.ilkd.key.gui.smt.SettingsDialog;
 import de.uka.ilkd.key.gui.smt.SolverListener;
-import de.uka.ilkd.key.gui.smt.TemporarySettings;
+import de.uka.ilkd.key.gui.smt.SettingsModel;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
@@ -1574,7 +1574,7 @@ public final class Main extends JFrame implements IMain {
 		   public void actionPerformed(ActionEvent e) {
 		       Proof proof = mediator.getSelectedProof();
 		       
-		       SettingsDialog.INSTANCE.showDialog(new TemporarySettings(proof == null ? ProofSettings.DEFAULT_SETTINGS.getSMTSettings():
+		       SettingsDialog.INSTANCE.showDialog(new SettingsModel(proof == null ? ProofSettings.DEFAULT_SETTINGS.getSMTSettings():
                        proof.getSettings().getSMTSettings(),
                        piSettings));
 		       

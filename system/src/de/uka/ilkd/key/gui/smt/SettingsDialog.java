@@ -24,6 +24,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.AbstractCellEditor;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.DefaultButtonModel;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
@@ -41,10 +44,11 @@ import javax.swing.tree.TreePath;
 public class SettingsDialog {
         public final static SettingsDialog INSTANCE = new SettingsDialog();
         public final static Component EMPTY_LINE = createSeperator();
+        private static final int SPACE = 5;
 
-        Settings settings;
+        SettingsModel settings;
 
-        public void showDialog(Settings set) {
+        public void showDialog(SettingsModel set) {
                 this.settings = set;
 
                 init();
@@ -73,6 +77,7 @@ public class SettingsDialog {
         private JButton applyButton = null;
         private JButton okButton = null;
         private JButton cancelButton = null;
+        private JButton defaultButton = null;
 
         /**
          * This method initializes jDialog
@@ -215,45 +220,26 @@ public class SettingsDialog {
                 return optionTable;
         }
 
-        /**
-         * This method initializes panel
-         * 
-         * @return javax.swing.JPanel
-         */
+
         private JPanel getPanel() {
                 if (panel == null) {
-                        GridBagConstraints gridBagConstraints11 = new GridBagConstraints();
-                        gridBagConstraints11.gridx = 2;
-                        gridBagConstraints11.insets = new Insets(0, 5, 5, 5);
-                        gridBagConstraints11.anchor = GridBagConstraints.SOUTHEAST;
-                        gridBagConstraints11.weightx = 0.0;
-                        gridBagConstraints11.gridy = 1;
-                        GridBagConstraints gridBagConstraints10 = new GridBagConstraints();
-                        gridBagConstraints10.gridx = 1;
-                        gridBagConstraints10.insets = new Insets(0, 5, 5, 0);
-                        gridBagConstraints10.anchor = GridBagConstraints.SOUTHEAST;
-                        gridBagConstraints10.weightx = 0.0;
-                        gridBagConstraints10.gridy = 1;
-                        GridBagConstraints gridBagConstraints9 = new GridBagConstraints();
-                        gridBagConstraints9.fill = GridBagConstraints.BOTH;
-                        gridBagConstraints9.gridy = 0;
-                        gridBagConstraints9.weightx = 1.0;
-                        gridBagConstraints9.weighty = 1.0;
-                        gridBagConstraints9.gridwidth = 3;
-                        gridBagConstraints9.insets = new Insets(0, 0, 5, 0);
-                        gridBagConstraints9.gridx = 0;
-                        GridBagConstraints gridBagConstraints8 = new GridBagConstraints();
-                        gridBagConstraints8.gridx = 0;
-                        gridBagConstraints8.anchor = GridBagConstraints.SOUTHEAST;
-                        gridBagConstraints8.weightx = 1.0;
-                        gridBagConstraints8.insets = new Insets(0, 0, 5, 0);
-                        gridBagConstraints8.gridy = 1;
                         panel = new JPanel();
-                        panel.setLayout(new GridBagLayout());
-                        panel.add(getApplyButton(), gridBagConstraints8);
-                        panel.add(getSplitPane(), gridBagConstraints9);
-                        panel.add(getOkButton(), gridBagConstraints10);
-                        panel.add(getCancelButton(), gridBagConstraints11);
+                        panel.setLayout(new BoxLayout(panel,
+                                        BoxLayout.PAGE_AXIS));
+
+                        Box settingsBox = Box.createHorizontalBox();
+                        settingsBox.add(getSplitPane());
+
+                        Box buttonBox = Box.createHorizontalBox();
+                        buttonBox.add(getDefaultButton());
+                        buttonBox.add(Box.createHorizontalGlue());
+                        buttonBox.add(getApplyButton());
+                        buttonBox.add(Box.createHorizontalStrut(SPACE));
+                        buttonBox.add(getOkButton());
+                        buttonBox.add(Box.createHorizontalStrut(SPACE));
+                        buttonBox.add(getCancelButton());
+                        panel.add(settingsBox);
+                        panel.add(buttonBox);
                 }
                 return panel;
         }
@@ -278,6 +264,21 @@ public class SettingsDialog {
                 }
                 return applyButton;
         }
+        
+        private JButton getDefaultButton(){
+                if(defaultButton == null){
+                        defaultButton = new JButton("Set As Default");
+                        defaultButton.addActionListener(new ActionListener() {
+                                
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                      settings.storeAsDefault();
+                                        
+                                }
+                        });
+                }
+                return defaultButton;
+        }
 
         /**
          * This method initializes okButton
@@ -301,7 +302,6 @@ public class SettingsDialog {
 
         private void applyChanges() {
                 settings.applyChanges();
-
         }
 
         /**
@@ -340,16 +340,16 @@ public class SettingsDialog {
                 int width = 0;
 
                 for (int i = 0; i < model.getRowCount(); i++) {
-                        if (model.getValueAt(i, Settings.OPTIONCOL) instanceof TableComponent) {
+                        if (model.getValueAt(i, SettingsModel.OPTIONCOL) instanceof TableComponent) {
                                 final TableComponent component = ((TableComponent) model
                                                 .getValueAt(i,
-                                                                Settings.OPTIONCOL));
+                                                                SettingsModel.OPTIONCOL));
 
                                 if (component.getInfo() != null
                                                 && !(getOptionTable()
                                                                 .getModel()
                                                                 .getValueAt(i,
-                                                                                Settings.OPTIONCOL + 1) instanceof TableInfoButton)) {
+                                                                                SettingsModel.OPTIONCOL + 1) instanceof TableInfoButton)) {
 
                                         TableInfoButton button = new TableInfoButton(
                                                         model, component) {
@@ -368,9 +368,9 @@ public class SettingsDialog {
                                                                 if (isShowingInfo()
                                                                                 && row != -1) {
                                                                         Object o[] = {
-                                                                                        Settings.seperator,
+                                                                                        SettingsModel.seperator,
                                                                                         getExplanation(),
-                                                                                        Settings.seperator };
+                                                                                        SettingsModel.seperator };
                                                                         // getExplanation().getRendererComponent().setBackground(
                                                                         // getOptionTable().getBackground());
 
@@ -398,15 +398,15 @@ public class SettingsDialog {
 
                                         getOptionTable().getModel().setValueAt(
                                                         button, i,
-                                                        Settings.OPTIONCOL + 1);
+                                                        SettingsModel.OPTIONCOL + 1);
                                 }
 
                                 if ((getOptionTable().getModel().getValueAt(i,
-                                                Settings.OPTIONCOL + 1) instanceof TableInfoButton)) {
+                                                SettingsModel.OPTIONCOL + 1) instanceof TableInfoButton)) {
                                         TableInfoButton button = ((TableInfoButton) getOptionTable()
                                                         .getModel()
                                                         .getValueAt(i,
-                                                                        Settings.OPTIONCOL + 1));
+                                                                        SettingsModel.OPTIONCOL + 1));
 
                                         width = Math.max(
                                                         button.getEditorComponent()
@@ -425,10 +425,10 @@ public class SettingsDialog {
 
                 for (int i = 0; i < getOptionTable().getColumnModel()
                                 .getColumnCount(); i++) {
-                        if (Settings.OPTIONCOL != i) {
+                        if (SettingsModel.OPTIONCOL != i) {
                                 int w = width;
                                 if (i == 0)
-                                        w = Settings.width[i];
+                                        w = SettingsModel.width[i];
 
                                 getOptionTable().getColumnModel().getColumn(i)
                                                 .setWidth(w);
@@ -444,7 +444,7 @@ public class SettingsDialog {
 
         void removeModel(DefaultTableModel model) {
                 for (int i = 0; i < model.getRowCount(); i++) {
-                        if (model.getValueAt(i, Settings.OPTIONCOL + 1) instanceof TableComponent) {
+                        if (model.getValueAt(i, SettingsModel.OPTIONCOL + 1) instanceof TableComponent) {
 
                         }
                 }
