@@ -628,6 +628,8 @@ public class ProofTreeView extends JPanel {
 	                implements TreeCellRenderer,
 			           java.io.Serializable {
 
+    private Icon keyHole20x20 = IconFactory.keyHole(20, 20);       
+            
 	public Component getTreeCellRendererComponent(JTree tree,
 						      Object value,
 						      boolean sel,
@@ -686,7 +688,7 @@ public class ProofTreeView extends JPanel {
 		        tree_cell.setToolTipText("Interactive goal - no automatic rule application");
 		    } else {
 			tree_cell.setForeground(Color.red);
-			tree_cell.setIcon(IconFactory.keyHole(20, 20));
+			tree_cell.setIcon(keyHole20x20);
 			ProofTreeView.this.setToolTipText("Open Goal");
 			tree_cell.setToolTipText("An open goal");
 		    }                                                            

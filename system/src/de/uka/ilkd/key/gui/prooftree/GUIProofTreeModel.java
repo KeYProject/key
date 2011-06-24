@@ -22,9 +22,6 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
-import com.sun.medialib.mlib.mediaLibException;
-import com.sun.tools.internal.ws.processor.modeler.annotation.MakeSafeTypeVisitor;
-
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -108,13 +105,13 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
               pruningInProcess = null;   
       }
 
-        public void proofGoalRemoved (ProofTreeEvent e) {
-            if (pruningInProcess != null) return;
-            if ( hideClosedSubtrees () ) {
-                updateTree((TreeNode) null);
-            } else
-                proofStructureChanged ( e );
-        }
+      public void proofGoalRemoved (ProofTreeEvent e) {
+              if (pruningInProcess != null) return;
+              if ( hideClosedSubtrees () ) {
+                      updateTree((TreeNode) null);
+              } else
+                      proofStructureChanged ( e );
+      }
 
    }
 
