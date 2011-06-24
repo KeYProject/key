@@ -119,8 +119,8 @@ public final class DefaultTacletSetTranslation implements TacletSetTranslation,
 
                 usedFormulaSorts = (sorts == null ? emptySetSort : sorts);
 
-                for (Taclet t : taclets) {
-
+                for (Taclet t : settings.getTaclets()) {
+                        System.out.println("Translate: " + t.name().toString());
                         if (SupportedTaclets.REFERENCE.contains(t.name()
                                         .toString())) {
 
@@ -138,6 +138,8 @@ public final class DefaultTacletSetTranslation implements TacletSetTranslation,
                                                                         null,
                                                                         e.getMessage()));
                                 }
+                        }else{
+                                System.out.println("NOT SUPPORTED");
                         }
                 }
 

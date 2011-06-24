@@ -379,7 +379,7 @@ class TacletMenu extends JMenu {
 	        public void run() {
 	            
 	            SMTSettings settings = new SMTSettings(goal.proof().getSettings().getSMTSettings(),
-	                            ProofIndependentSettingsHandler.DEFAULT_INSTANCE.getSMTSettings());
+	                            ProofIndependentSettingsHandler.DEFAULT_INSTANCE.getSMTSettings(),goal.proof());
 	            SolverLauncher launcher = new SolverLauncher(settings);
 	            launcher.addListener(new SolverListener(settings));
 	            Collection<SMTProblem> list = new LinkedList<SMTProblem>();

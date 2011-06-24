@@ -18,6 +18,7 @@ import javax.swing.tree.DefaultTreeModel;
 
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.SolverType;
 
@@ -59,9 +60,9 @@ public class SettingsModel{
 
         public SettingsModel(      
                         ProofDependentSettings pdSettings,
-                        ProofIndependentSettings piSettings) {
-                originalSettings = new SMTSettings(pdSettings, piSettings);
-                temporarySettings = new SMTSettings(pdSettings.clone(), piSettings.clone());
+                        ProofIndependentSettings piSettings, Proof proof) {
+                originalSettings = new SMTSettings(pdSettings, piSettings, proof);
+                temporarySettings = new SMTSettings(pdSettings.clone(), piSettings.clone(),proof);
                
                 createContentModel();
         }

@@ -189,8 +189,8 @@ public final class SupportedTaclets {
                 if (found == false)
                         return false;
                 TreeItem item = tacletNames.get(tacletname);
-                return item != null
-                                && item.getMode() == TreeItem.SelectionMode.all;
+                System.out.println(item);
+                return item != null;
                 // return usedTaclets.contains(tacletname);
         }
 

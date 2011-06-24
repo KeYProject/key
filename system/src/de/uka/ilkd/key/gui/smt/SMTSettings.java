@@ -22,6 +22,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.Taclet;
 
 
@@ -35,20 +36,23 @@ import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets.TreeItem.S
 public class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings{
         private final ProofDependentSettings pdSettings;
         private final ProofIndependentSettings piSettings;
- 
+        private final Proof proof;
+        private LinkedList<Taclet> taclets = null;
         
 
         public SMTSettings(ProofDependentSettings pdSettings,
-                        ProofIndependentSettings piSettings) {
+                        ProofIndependentSettings piSettings, Proof proof) {
                 super();
                 this.pdSettings = pdSettings;
                 this.piSettings = piSettings;
+                this.proof   = proof;
                 
         }
         
         public void copy(SMTSettings settings){
                 pdSettings.copy(settings.pdSettings);
                 piSettings.copy(settings.piSettings);
+                taclets = settings.taclets;
         }
         
         public ProofDependentSettings getPdSettings() {
@@ -85,8 +89,18 @@ public class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings{
 
         @Override
         public Collection<Taclet> getTaclets() {
-              throw new RuntimeException("Not yet implemented");       
-               
+             if(taclets == null){
+                     taclets = new LinkedList<Taclet>();
+                     if(proof == null){
+                             return taclets;
+                     }
+                     for(Taclet taclet : proof.env().getInitConfig().getTaclets()){
+                             if(pdSettings.supportedTaclets.contains(taclet.name().toString())){
+                                     taclets.add(taclet);
+                             }
+                     }
+             }
+             return taclets;  
         }
 
         @Override
@@ -106,7 +120,7 @@ public class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings{
         @Override
         public boolean makesUseOfTaclets() {
               
-              return pdSettings.supportedTaclets.getNamesOfSelectedTaclets().length > 0;
+              return !getTaclets().isEmpty();
 
         }
         

@@ -1576,7 +1576,7 @@ public final class Main extends JFrame implements IMain {
 		       
 		       SettingsDialog.INSTANCE.showDialog(new SettingsModel(proof == null ? ProofSettings.DEFAULT_SETTINGS.getSMTSettings():
                        proof.getSettings().getSMTSettings(),
-                       piSettings));
+                       piSettings,proof));
 		       
 		       
 		   }
@@ -2923,7 +2923,7 @@ public final class Main extends JFrame implements IMain {
 	        public void run() {
 	        
 	            SMTSettings settings = new SMTSettings(proof.getSettings().getSMTSettings(),
-	                            ProofIndependentSettingsHandler.DEFAULT_INSTANCE.getSMTSettings());
+	                            ProofIndependentSettingsHandler.DEFAULT_INSTANCE.getSMTSettings(),proof);
 	            SolverLauncher launcher = new SolverLauncher(settings);
 	            launcher.addListener(new SolverListener(settings));
 	            launcher.launch(solverUnion.getTypes(),
