@@ -73,28 +73,22 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
         costComputationF = setupGlobalF ( costComputationDispatcher, p_proof );
         instantiationF = setupGlobalF ( instantiationDispatcher, p_proof );
         approvalF = add ( setupApprovalF ( p_proof ), approvalDispatcher );
-    }
-
+    }    
+    
+    
     private Feature setupGlobalF(Feature dispatcher, Proof p_proof) {//        
         final Feature ifMatchedF = ifZero ( MatchedIfFeature.INSTANCE,
                                             longConst ( +1 ) );
         
-        final Feature findDepthF = ScaleFeature.createScaled(FindDepthFeature.INSTANCE, 500);
-          
-
 //        final Feature splitF =
 //            ScaleFeature.createScaled ( CountBranchFeature.INSTANCE, 400);
 
-        final Feature ifThenElseF =
-            ScaleFeature.createScaled ( IfThenElseMalusFeature.INSTANCE, 500);
-    
 //        final Feature strengthenConstraints =
 //            ifHeuristics ( new String[] { "concrete", "closure" },
 //                           longConst ( 0 ),
 //                           ifZero ( ConstraintStrengthenFeatureUC.create ( p_proof ),
 //                                    inftyConst () ) );
-    
-            
+        
         final Feature methodSpecF;
         final String methProp 
         	= strategyProperties.getProperty(
@@ -167,9 +161,7 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
               queryF,
               depSpecF,
               loopInvF,
-              ifMatchedF,
-              ifThenElseF,
-              findDepthF} );
+              ifMatchedF});
     }
     
     private Feature loopInvFeature(Feature cost) {
@@ -230,7 +222,7 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
             
         final RuleSetDispatchFeature d = RuleSetDispatchFeature.create ();
             
-        bindRuleSet ( d, "closure", -9000 );
+        bindRuleSet ( d, "closure", -15000 );
         bindRuleSet ( d, "alpha", -7000 );
         bindRuleSet ( d, "delta", -6000 );
         bindRuleSet ( d, "simplify_boolean", -200 );
@@ -242,8 +234,13 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet ( d, "executeIntegerAssignment", -100 );
 
         bindRuleSet ( d, "javaIntegerSemantics", -5000 );
-            
-       
+        
+        
+        bindRuleSet (d, "update_elim", -8000);
+        bindRuleSet (d, "update_apply_on_update", -7000);
+        bindRuleSet (d, "update_join", -6000);
+        bindRuleSet (d, "update_apply", -5000);
+             
         setUpStringNormalisation ( d, p_proof.getServices() );
         
         setupSplitting ( d );
