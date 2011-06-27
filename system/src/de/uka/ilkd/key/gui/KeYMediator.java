@@ -39,7 +39,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
-import de.uka.ilkd.key.proof.ProofTreeRemovedNodeEvent;
 import de.uka.ilkd.key.proof.TacletFilter;
 import de.uka.ilkd.key.proof.TermTacletAppIndexCacheSet;
 import de.uka.ilkd.key.proof.init.JavaProfile;
@@ -243,7 +242,7 @@ public class KeYMediator {
     
     public void setBack(Goal goal) {
 	if (ensureProofLoaded()) {
-	    if (getProof() != null && getProof().setBack(goal)){
+	    if (getProof() != null && getProof().setBack(goal.node().parent())){
                 finishSetBack();
 	    }else{
                 popupWarning("Setting back the current goal is not possible.", 
@@ -775,20 +774,25 @@ public class KeYMediator {
 
 
     class KeYMediatorProofTreeListener extends ProofTreeAdapter {
-	public void proofClosed(ProofTreeEvent e) {
+	private boolean pruningInProcess;
+
+        public void proofClosed(ProofTreeEvent e) {
 	    KeYMediator.this.notify
 	        (new ProofClosedNotificationEvent(e.getSource()));
 	}
 
-	public void proofPruned(ProofTreeEvent e) {
-	    final ProofTreeRemovedNodeEvent ev = (ProofTreeRemovedNodeEvent) e;
-	    if (ev.getRemovedNode() == getSelectedNode()) {
-		SwingUtilities.invokeLater(new Runnable() {
-		    public void run() {
-			keySelectionModel.setSelectedNode(ev.getNode());
-		    }
-		});
-	    }
+	public void proofPruningInProcess(ProofTreeEvent e) {
+	    pruningInProcess = true;
+	}
+	
+	public void proofPruned(final ProofTreeEvent e) {	    
+	    SwingUtilities.invokeLater(new Runnable() {
+	        public void run () {
+	            if (!e.getSource().find(getSelectedNode())) {	
+                     keySelectionModel.setSelectedNode(e.getNode());                     
+                }
+            }});
+	        pruningInProcess = false;
 	}
     
 	public void proofGoalsAdded(ProofTreeEvent e) {
@@ -801,7 +805,7 @@ public class KeYMediator {
 	}
 
 	public void proofStructureChanged(ProofTreeEvent e) {
-	    if (autoMode()) return;
+	    if (autoMode() || pruningInProcess) return;
 	    Proof p = e.getSource();
 	    if (p == getSelectedProof()) {
 		Node sel_node = getSelectedNode();
