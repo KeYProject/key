@@ -141,7 +141,7 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
         }
         
         final Feature oneStepSimplificationF 
-        	= oneStepSimplificationFeature(longConst(-9000));
+        	= oneStepSimplificationFeature(longConst(-11000));
       //  final Feature smtF = smtFeature(inftyConst());
 
         return SumFeature.createSum ( new Feature [] {
@@ -185,12 +185,7 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
         return ConditionalFeature.createConditional(filter, cost);        
     }
     
-    private Feature pullOutConditionalsFeature(Feature cost) {
-	SetRuleFilter filter = new SetRuleFilter();
-	filter.addRuleToSet(PullOutConditionalsRule.INSTANCE);
-        return ConditionalFeature.createConditional(filter, cost);        
-    }     
-    
+   
     //private Feature smtFeature(Feature cost) {
 	//ClassRuleFilter filter = new ClassRuleFilter(SMTRule.class);
         //return ConditionalFeature.createConditional(filter, cost);        
