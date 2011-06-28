@@ -28,12 +28,12 @@ public class WindowUserInterface implements UserInterface {
 
     @Override
     public void progressStarted(Object sender) {
-        mainWindow.getMediator().startInterface(true);
+        mainWindow.getMediator().stopInterface(true);
     }
 
     @Override
     public void progressStopped(Object sender) {
-        mainWindow.getMediator().stopInterface(true);
+        mainWindow.getMediator().startInterface(true);
     }
 
     @Override
