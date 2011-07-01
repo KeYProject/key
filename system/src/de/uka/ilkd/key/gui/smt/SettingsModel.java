@@ -48,11 +48,11 @@ public class SettingsModel{
 
         public String getProgressMode(int index) {
                 switch (index) {
-                case ProofIndependentSettings.PROGRESS_MODE_USER:
+                case ProofIndependentSMTSettings.PROGRESS_MODE_USER:
                         return PROGRESS_MODE_USER;
-                case ProofIndependentSettings.PROGRESS_MODE_CLOSE:
+                case ProofIndependentSMTSettings.PROGRESS_MODE_CLOSE:
                         return PROGRESS_MODE_CLOSE;
-                case ProofIndependentSettings.PROGRESS_MODE_CLOSE_FIRST:
+                case ProofIndependentSMTSettings.PROGRESS_MODE_CLOSE_FIRST:
                         return PROGRESS_MODE_CLOSE_FIRST;
                 }
                 return "";
@@ -60,7 +60,7 @@ public class SettingsModel{
 
         public SettingsModel(      
                         ProofDependentSettings pdSettings,
-                        ProofIndependentSettings piSettings, Proof proof) {
+                        ProofIndependentSMTSettings piSettings, Proof proof) {
                 originalSettings = new SMTSettings(pdSettings, piSettings, proof);
                 temporarySettings = new SMTSettings(pdSettings.clone(), piSettings.clone(),proof);
                

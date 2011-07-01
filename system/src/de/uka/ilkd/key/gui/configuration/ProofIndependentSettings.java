@@ -8,13 +8,13 @@ import java.util.Properties;
 
 import de.uka.ilkd.key.gui.GUIEvent;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmaGeneratorSettings;
-import de.uka.ilkd.key.gui.smt.ProofIndependentSettings;
+import de.uka.ilkd.key.gui.smt.ProofIndependentSMTSettings;
 
 
 
-public class ProofIndependentSettingsHandler implements SettingsListener {
-        public static final ProofIndependentSettingsHandler DEFAULT_INSTANCE = new ProofIndependentSettingsHandler(PathConfig.PROOF_INDEPENDT_SETTINGS);
-        private final ProofIndependentSettings smtSettings = ProofIndependentSettings.getDefaultSettingsData();
+public class ProofIndependentSettings implements SettingsListener {
+        public static final ProofIndependentSettings DEFAULT_INSTANCE = new ProofIndependentSettings(PathConfig.PROOF_INDEPENDT_SETTINGS);
+        private final ProofIndependentSMTSettings smtSettings = ProofIndependentSMTSettings.getDefaultSettingsData();
         private final LemmaGeneratorSettings lemmaGeneratorSettings = new LemmaGeneratorSettings();
         private final String filename;
 
@@ -23,7 +23,7 @@ public class ProofIndependentSettingsHandler implements SettingsListener {
 
         
 
-        private ProofIndependentSettingsHandler(String filename) {
+        private ProofIndependentSettings(String filename) {
                 this.filename = filename;
                 for (Settings settings : settingsSet) {
                         settings.addSettingsListener(this);
@@ -81,7 +81,7 @@ public class ProofIndependentSettingsHandler implements SettingsListener {
       
 
         
-        public ProofIndependentSettings getSMTSettings() {
+        public ProofIndependentSMTSettings getSMTSettings() {
                return smtSettings;
         }
 

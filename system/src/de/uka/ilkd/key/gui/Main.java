@@ -80,7 +80,7 @@ import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
 import de.uka.ilkd.key.gui.configuration.GeneralSettings;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
-import de.uka.ilkd.key.gui.configuration.ProofIndependentSettingsHandler;
+import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.configuration.SettingsListener;
 import de.uka.ilkd.key.gui.configuration.StrategySettings;
@@ -98,7 +98,7 @@ import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.gui.smt.ComplexButton;
-import de.uka.ilkd.key.gui.smt.ProofIndependentSettings;
+import de.uka.ilkd.key.gui.smt.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
 import de.uka.ilkd.key.gui.smt.SettingsDialog;
 import de.uka.ilkd.key.gui.smt.SolverListener;
@@ -695,7 +695,7 @@ public final class Main extends JFrame implements IMain {
 		ComplexButton but = (ComplexButton) e.getSource();
 		if(but.getSelectedItem() instanceof SMTInvokeAction){
 		    SMTInvokeAction action = (SMTInvokeAction) but.getSelectedItem(); 
-		    ProofIndependentSettingsHandler.DEFAULT_INSTANCE.getSMTSettings()
+		    ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings()
 		            .setActiveSolverUnion(action.solverUnion);
 		}
 	
@@ -1502,7 +1502,7 @@ public final class Main extends JFrame implements IMain {
         public void updateSMTSelectMenu() {
              
 
-                Collection<SolverTypeCollection> solverUnions = ProofIndependentSettingsHandler.DEFAULT_INSTANCE
+                Collection<SolverTypeCollection> solverUnions = ProofIndependentSettings.DEFAULT_INSTANCE
                                 .getSMTSettings().getUsableSolverUnions();
                 if (solverUnions == null || solverUnions.isEmpty()) {
                         updateDPSelectionMenu();
@@ -1539,7 +1539,7 @@ public final class Main extends JFrame implements IMain {
 		
 		smtComponent.setItems(actions);
 	            	
-		SolverTypeCollection active = ProofIndependentSettingsHandler.DEFAULT_INSTANCE.getSMTSettings().computeActiveSolverUnion();
+		SolverTypeCollection active = ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().computeActiveSolverUnion();
 		 
 		SMTInvokeAction activeAction = findAction(actions, active);
 		
@@ -1548,7 +1548,7 @@ public final class Main extends JFrame implements IMain {
 		    Object item = smtComponent.getTopItem();
 		    if(item instanceof SMTInvokeAction){
 			active = ((SMTInvokeAction)item).solverUnion;
-			ProofIndependentSettingsHandler.DEFAULT_INSTANCE.getSMTSettings().setActiveSolverUnion(active);
+			ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().setActiveSolverUnion(active);
 		    }else{
 			activeAction = null;
 		    }
@@ -1567,7 +1567,7 @@ public final class Main extends JFrame implements IMain {
     private void createSMTMenu(JMenu parent) {
 	/** menu for configuration of SMT solvers */
         
-        final ProofIndependentSettings piSettings = ProofIndependentSettingsHandler.DEFAULT_INSTANCE.getSMTSettings();
+        final ProofIndependentSMTSettings piSettings = ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings();
 
 	JMenuItem item = new JMenuItem("SMT Solvers...");
 	item.addActionListener(new ActionListener() {
@@ -2923,7 +2923,7 @@ public final class Main extends JFrame implements IMain {
 	        public void run() {
 	        
 	            SMTSettings settings = new SMTSettings(proof.getSettings().getSMTSettings(),
-	                            ProofIndependentSettingsHandler.DEFAULT_INSTANCE.getSMTSettings(),proof);
+	                            ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),proof);
 	            SolverLauncher launcher = new SolverLauncher(settings);
 	            launcher.addListener(new SolverListener(settings));
 	            launcher.launch(solverUnion.getTypes(),

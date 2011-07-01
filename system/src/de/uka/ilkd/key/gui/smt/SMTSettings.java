@@ -35,13 +35,13 @@ import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets.TreeItem.S
 
 public class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings{
         private final ProofDependentSettings pdSettings;
-        private final ProofIndependentSettings piSettings;
+        private final ProofIndependentSMTSettings piSettings;
         private final Proof proof;
         private LinkedList<Taclet> taclets = null;
         
 
         public SMTSettings(ProofDependentSettings pdSettings,
-                        ProofIndependentSettings piSettings, Proof proof) {
+                        ProofIndependentSMTSettings piSettings, Proof proof) {
                 super();
                 this.pdSettings = pdSettings;
                 this.piSettings = piSettings;
@@ -59,7 +59,7 @@ public class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings{
                 return pdSettings;
         }
         
-        public ProofIndependentSettings getPiSettings() {
+        public ProofIndependentSMTSettings getPiSettings() {
                 return piSettings;
         }
 
@@ -95,7 +95,7 @@ public class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings{
                              return taclets;
                      }
                      for(Taclet taclet : proof.env().getInitConfig().getTaclets()){
-                             if(pdSettings.supportedTaclets.contains(taclet.name().toString())){
+                             if(pdSettings.supportedTaclets.contains(taclet.name().toString(),true)){
                                      taclets.add(taclet);
                              }
                      }

@@ -148,7 +148,7 @@ public class SolverListener implements SolverLauncherListener {
                 if (!problemsWithException.isEmpty()) {
                       progressDialog.setAdditionalInformation("Exception for...", Color.RED,problemsWithException);
                 } else {
-                        if (settings.getModeOfProgressDialog() == ProofIndependentSettings.PROGRESS_MODE_CLOSE) {
+                        if (settings.getModeOfProgressDialog() == ProofIndependentSMTSettings.PROGRESS_MODE_CLOSE) {
                                 applyEvent(launcher);
                         }
                 }

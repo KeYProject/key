@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.Properties;
 
 import de.uka.ilkd.key.gui.GUIEvent;
+import de.uka.ilkd.key.gui.configuration.SettingsConverter;
 import de.uka.ilkd.key.gui.configuration.SettingsListener;
 
 public class LemmaGeneratorSettings implements de.uka.ilkd.key.gui.configuration.Settings{
@@ -13,17 +14,7 @@ public class LemmaGeneratorSettings implements de.uka.ilkd.key.gui.configuration
         private static final String SHOW_DIALOG_ADDING_AXIOMS = "[LemmaGenerator]showDialogWhenAddingAxioms";
         private static final String SHOW_DIALOG_USING_AXIOMS =  "[LemmaGenerator]showDialogWhenUsingTacletsAsAxioms";
         
-        private boolean readBoolean(Properties properties, String key, boolean defaultValue){
-                String value = properties.getProperty(key);
-                if(value == null || !value.equals("true") || !value.equals("false")){
-                        return defaultValue;
-                }
-                return value.equals("true");
-        }
-        
-        private void writeBoolean(Properties properties, String key, boolean value){
-                properties.setProperty(key,value ? "true" : "false");
-        }
+
  
         private void fireSettingsChanged(){
                 for(SettingsListener listener : listeners){
@@ -57,14 +48,14 @@ public class LemmaGeneratorSettings implements de.uka.ilkd.key.gui.configuration
 
         @Override
         public void readSettings(Object sender, Properties props) {
-               showDialogAddingAxioms = readBoolean(props,SHOW_DIALOG_ADDING_AXIOMS,true);
-               showDialogUsingAxioms = readBoolean(props,SHOW_DIALOG_USING_AXIOMS,true);
+               showDialogAddingAxioms = SettingsConverter.read(props,SHOW_DIALOG_ADDING_AXIOMS,true);
+               showDialogUsingAxioms = SettingsConverter.read(props,SHOW_DIALOG_USING_AXIOMS,true);
         }
 
         @Override
         public void writeSettings(Object sender, Properties props) {
-                writeBoolean(props,SHOW_DIALOG_ADDING_AXIOMS ,showDialogAddingAxioms);
-                writeBoolean(props, SHOW_DIALOG_USING_AXIOMS, showDialogUsingAxioms);
+                SettingsConverter.store(props,SHOW_DIALOG_ADDING_AXIOMS ,showDialogAddingAxioms);
+                SettingsConverter.store(props, SHOW_DIALOG_USING_AXIOMS, showDialogUsingAxioms);
                 
         }
 

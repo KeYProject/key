@@ -14,7 +14,7 @@ import de.uka.ilkd.key.gui.configuration.SettingsListener;
 import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 
-public class ProofIndependentSettings implements de.uka.ilkd.key.gui.configuration.Settings{
+public class ProofIndependentSMTSettings implements de.uka.ilkd.key.gui.configuration.Settings{
         private static final String ACTIVE_SOLVER  = "[SMTSettings]ActiveSolver";
 
         private static final String TIMEOUT="[SMTSettings]SolverTimeout";
@@ -64,11 +64,11 @@ public class ProofIndependentSettings implements de.uka.ilkd.key.gui.configurati
         private LinkedList<SolverTypeCollection> solverUnions = new LinkedList<SolverTypeCollection>(); 
 
 
-        private ProofIndependentSettings(ProofIndependentSettings data) {
+        private ProofIndependentSMTSettings(ProofIndependentSMTSettings data) {
                 copy(data);
         }
         
-        public void copy(ProofIndependentSettings data){
+        public void copy(ProofIndependentSMTSettings data){
                 this.showResultsAfterExecution     = data.showResultsAfterExecution;
                 this.storeSMTTranslationToFile     = data.storeSMTTranslationToFile;
                 this.storeTacletTranslationToFile  = data.storeTacletTranslationToFile;
@@ -89,10 +89,10 @@ public class ProofIndependentSettings implements de.uka.ilkd.key.gui.configurati
         }
 
 
-        private static final ProofIndependentSettings DEFAULT_DATA = 
-                new ProofIndependentSettings();
+        private static final ProofIndependentSMTSettings DEFAULT_DATA = 
+                new ProofIndependentSMTSettings();
 
-        public static ProofIndependentSettings getDefaultSettingsData(){
+        public static ProofIndependentSMTSettings getDefaultSettingsData(){
                 return DEFAULT_DATA.clone();
         }
 
@@ -100,7 +100,7 @@ public class ProofIndependentSettings implements de.uka.ilkd.key.gui.configurati
                 return dataOfSolvers.keySet();
         }
 
-        private ProofIndependentSettings() {
+        private ProofIndependentSMTSettings() {
                 dataOfSolvers.put(SolverType.Z3_SOLVER, new SolverData(SolverType.Z3_SOLVER));
                 dataOfSolvers.put(SolverType.YICES_SOLVER, new SolverData(SolverType.YICES_SOLVER));
                 dataOfSolvers.put(SolverType.SIMPLIFY_SOLVER, new SolverData(SolverType.SIMPLIFY_SOLVER));
@@ -134,8 +134,8 @@ public class ProofIndependentSettings implements de.uka.ilkd.key.gui.configurati
 
 
 
-        public ProofIndependentSettings clone(){
-                return new ProofIndependentSettings(this);
+        public ProofIndependentSMTSettings clone(){
+                return new ProofIndependentSMTSettings(this);
         }
 
 
@@ -233,14 +233,6 @@ public class ProofIndependentSettings implements de.uka.ilkd.key.gui.configurati
                 return SolverTypeCollection.EMPTY_COLLECTION;
         }
 
-        private SolverTypeCollection getSolverUnion(String name) {
-                for (SolverTypeCollection union : solverUnions) {
-                        if (union.name().equals(name)) {
-                                return union;
-                        }
-                }
-                return SolverTypeCollection.EMPTY_COLLECTION;
-        }
 
         public Collection<SolverTypeCollection> getUsableSolverUnions() {
                 LinkedList<SolverTypeCollection> unions = new LinkedList<SolverTypeCollection>();

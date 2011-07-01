@@ -120,16 +120,7 @@ public final class SupportedTaclets {
 
         private TreeModel model = null;
 
-        /**
-         * Use this field, to allow only special taclets that are listed in the
-         * method <code>contains</code>. Use this method only for testing the
-         * taclet translation. If </code>testTaclets</code> is <code>null</code>
-         * all taclets listed in <code>contains</code> are used (should be the
-         * normal case).
-         */
-        final private String testTaclets[] = {// "identical_object_equal_index"
 
-        };
 
         /**
          * 
@@ -174,23 +165,11 @@ public final class SupportedTaclets {
          * @return <code>true</code> if the taclet can be used for external
          *         provers.
          */
-        public boolean contains(String tacletname) {
+        public boolean contains(String tacletname, boolean mustBeSelected) {
 
-                boolean found = false;
-                if (testTaclets == null || testTaclets.length == 0) {
-                        found = true;
-                }
-                for (int i = 0; i < (testTaclets == null ? 0
-                                : testTaclets.length); i++) {
-                        if (testTaclets[i].equals(tacletname)) {
-                                found = true;
-                        }
-                }
-                if (found == false)
-                        return false;
                 TreeItem item = tacletNames.get(tacletname);
-                System.out.println(item);
-                return item != null;
+            
+                return item != null && (!mustBeSelected || item.isSelected());
                 // return usedTaclets.contains(tacletname);
         }
 
@@ -543,7 +522,7 @@ public final class SupportedTaclets {
                                 Category.REACH_AXIOMS);
                 addTaclet(node24, "accDefinition", "reachDefinition");
 
-                TreeItem node25 = newNode(node19, "Lemata",
+                TreeItem node25 = newNode(node19, "Lemmata",
                                 Category.REACH_LEMATA);
                 addTaclet(node25, "reachZero", "reachOne", "reachNull",
                                 "reachNull2", "reachAddOne", "reachAddOne2",

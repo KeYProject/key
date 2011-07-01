@@ -21,7 +21,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.Main;
-import de.uka.ilkd.key.gui.configuration.ProofIndependentSettingsHandler;
+import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.smt.SMTMenuItem;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
@@ -159,7 +159,7 @@ class TacletMenu extends JMenu {
     }
     
         private void createSMTMenu(MenuControl control) {
-                Collection<SolverTypeCollection> solverUnions = ProofIndependentSettingsHandler.DEFAULT_INSTANCE
+                Collection<SolverTypeCollection> solverUnions = ProofIndependentSettings.DEFAULT_INSTANCE
                                 .getSMTSettings().getSolverUnions();
                 if (!solverUnions.isEmpty()) {
                         addSeparator();
@@ -379,7 +379,7 @@ class TacletMenu extends JMenu {
 	        public void run() {
 	            
 	            SMTSettings settings = new SMTSettings(goal.proof().getSettings().getSMTSettings(),
-	                            ProofIndependentSettingsHandler.DEFAULT_INSTANCE.getSMTSettings(),goal.proof());
+	                            ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),goal.proof());
 	            SolverLauncher launcher = new SolverLauncher(settings);
 	            launcher.addListener(new SolverListener(settings));
 	            Collection<SMTProblem> list = new LinkedList<SMTProblem>();

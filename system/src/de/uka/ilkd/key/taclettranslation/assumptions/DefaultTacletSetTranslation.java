@@ -122,7 +122,7 @@ public final class DefaultTacletSetTranslation implements TacletSetTranslation,
                 for (Taclet t : settings.getTaclets()) {
                         System.out.println("Translate: " + t.name().toString());
                         if (SupportedTaclets.REFERENCE.contains(t.name()
-                                        .toString())) {
+                                        .toString(),false)) {
 
                                 try {
                                         TacletFormula result = assumptionGenerator

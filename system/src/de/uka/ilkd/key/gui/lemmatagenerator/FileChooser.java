@@ -28,8 +28,9 @@ import javax.swing.WindowConstants;
 
 
 import de.uka.ilkd.key.gui.KeYFileChooser;
-import de.uka.ilkd.key.gui.configuration.ProofIndependentSettingsHandler;
+import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.gui.smt.ProofIndependentSMTSettings;
 
 
 
@@ -195,13 +196,16 @@ public class FileChooser extends JPanel{
                                         InfoDialog infoDialog = new InfoDialog(INFO_TEXT1);
                                         if(!lemmaCheckbox.isSelected()){
                                             lemmaCheckbox.setSelected(true);    
-                                            if(ProofIndependentSettingsHandler.DEFAULT_INSTANCE
+                                            if((ProofIndependentSettings.DEFAULT_INSTANCE
                                                             .getLemmaGeneratorSettings()
                                                             .isShowingDialogUsingAxioms() &&
-                                                            infoDialog.showDialog()){
+                                                            infoDialog.showDialog()) || 
+                                                            !ProofIndependentSettings.DEFAULT_INSTANCE
+                                                            .getLemmaGeneratorSettings()
+                                                            .isShowingDialogUsingAxioms()){
                                               changedToNotSelected();   
                                               lemmaCheckbox.setSelected(false);  
-                                               ProofIndependentSettingsHandler.DEFAULT_INSTANCE
+                                               ProofIndependentSettings.DEFAULT_INSTANCE
                                               .getLemmaGeneratorSettings()
                                               .showDialogUsingAxioms(infoDialog
                                                               .showThisDialogNextTime());
@@ -341,17 +345,17 @@ public class FileChooser extends JPanel{
                         @Override
                         public void actionPerformed(ActionEvent e) {
                                
-                           /*    if(firstTimeAddingAxioms && 
-                                               ProofSettings.DEFAULT_SETTINGS
-                                               .getLemmaGeneratorSettings().isShowingDialogAddingAxioms()){                                     
+                               if(firstTimeAddingAxioms && 
+                                               ProofIndependentSettings.DEFAULT_INSTANCE.
+                                               getLemmaGeneratorSettings().isShowingDialogAddingAxioms()){                                     
                                        InfoDialog infoDialog = new InfoDialog(INFO_TEXT2);
                                        firstTimeAddingAxioms = !infoDialog.showDialog();
-                                       ProofSettings.DEFAULT_SETTINGS
+                                       ProofIndependentSettings.DEFAULT_INSTANCE
                                        .getLemmaGeneratorSettings().showDialogAddingAxioms(infoDialog.showThisDialogNextTime());
                                        if(firstTimeAddingAxioms){
                                                return;
                                        }
-                               }*/
+                               }
                                File file = chooseFiles("File containing the axioms.");
                                if(file != null){
                                        listModel.addElement(file);
