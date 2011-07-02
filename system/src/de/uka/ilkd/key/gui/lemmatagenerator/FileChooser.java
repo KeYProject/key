@@ -195,20 +195,19 @@ public class FileChooser extends JPanel{
                                         
                                         InfoDialog infoDialog = new InfoDialog(INFO_TEXT1);
                                         if(!lemmaCheckbox.isSelected()){
-                                            lemmaCheckbox.setSelected(true);    
-                                            if((ProofIndependentSettings.DEFAULT_INSTANCE
-                                                            .getLemmaGeneratorSettings()
-                                                            .isShowingDialogUsingAxioms() &&
+                                            lemmaCheckbox.setSelected(true);   
+                                            boolean showDialogUsingAxioms = ProofIndependentSettings.DEFAULT_INSTANCE
+                                            .getLemmaGeneratorSettings()
+                                            .isShowingDialogUsingAxioms();
+                                            if((showDialogUsingAxioms &&
                                                             infoDialog.showDialog()) || 
-                                                            !ProofIndependentSettings.DEFAULT_INSTANCE
-                                                            .getLemmaGeneratorSettings()
-                                                            .isShowingDialogUsingAxioms()){
+                                                            !showDialogUsingAxioms){
                                               changedToNotSelected();   
                                               lemmaCheckbox.setSelected(false);  
                                                ProofIndependentSettings.DEFAULT_INSTANCE
                                               .getLemmaGeneratorSettings()
-                                              .showDialogUsingAxioms(infoDialog
-                                                              .showThisDialogNextTime());
+                                              .showDialogUsingAxioms(showDialogUsingAxioms && infoDialog
+                                                              .showThisDialogNextTime()  );
                                             }
                                         }else{
                                             changedToSelected();
@@ -495,6 +494,10 @@ public class FileChooser extends JPanel{
         public static void main(String [] args){
                 FileChooser chooser = new FileChooser();
                 chooser.showAsDialog();
+        }
+        
+        public boolean isLoadingAsLemmata(){
+                return this.getLemmaCheckBox().isSelected();
         }
         
         

@@ -72,7 +72,7 @@ public class LemmataHandler implements TacletFilter {
 
                         @Override
                         public void stopped(ProofAggregate pa,
-                                        ImmutableSet<Taclet> taclets) {
+                                        ImmutableSet<Taclet> taclets,boolean addAsAxioms) {
                                 if (pa == null) {
                                         println("There is no taclet to be proven.");
                                         return;
@@ -94,7 +94,7 @@ public class LemmataHandler implements TacletFilter {
                 };
                 TacletSoundnessPOLoader loader = new TacletSoundnessPOLoader(
                                 null, file, createEnvironment(),
-                                loaderListener, new Listener(), this,filesForAxioms,fileForDefinitions);
+                                loaderListener, new Listener(), this,filesForAxioms,fileForDefinitions,true);
                 loader.start();
         }
         

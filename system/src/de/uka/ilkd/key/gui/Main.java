@@ -2101,6 +2101,7 @@ public final class Main extends JFrame implements IMain {
                 final Proof proof = mediator().getSelectedProof();
                 final File fileForLemmata = chooser.getFileForLemmata();
                 final File fileForDefinitions = chooser.getFileForDefinitions();
+                final boolean loadAsLemmata = chooser.isLoadingAsLemmata();
 
                 
                 List<File> filesForAxioms = chooser.getFilesForAxioms();
@@ -2113,11 +2114,14 @@ public final class Main extends JFrame implements IMain {
                                 handleException(exception);
                         }           
                         @Override
-                        public void stopped(ProofAggregate p, ImmutableSet<Taclet> taclets) {
+                        public void stopped(ProofAggregate p, ImmutableSet<Taclet> taclets,boolean addAsAxioms) {
                                 mediator().startInterface(true);
                                 if(p != null){
-                                        
+                                   
                                         Main.this.addProblem(p);
+                                }
+                                
+                                if(p != null || addAsAxioms){
                                         // add only the taclets to the goals if 
                                         // the proof obligations were added successfully.
                                         ImmutableSet<Taclet> base =
@@ -2127,10 +2131,11 @@ public final class Main extends JFrame implements IMain {
                                         for(Taclet taclet : taclets){
                                                 for(Goal goal : proof.openGoals()){
                                                         goal.addTaclet(taclet, 
-                                                           SVInstantiations.EMPTY_SVINSTANTIATIONS,false);
+                                                                        SVInstantiations.EMPTY_SVINSTANTIATIONS,false);
                                                 }
                                         }
                                 }
+                                
                         }
 
                         @Override
@@ -2143,7 +2148,7 @@ public final class Main extends JFrame implements IMain {
                 TacletSoundnessPOLoader loader = new TacletSoundnessPOLoader(progressMonitor, 
                                 fileForLemmata,proof.env() ,listener,piListener,
                                 new LemmaSelectionDialog(),filesForAxioms,
-                                fileForDefinitions);
+                                fileForDefinitions,loadAsLemmata);
                 loader.start();
                  
         }

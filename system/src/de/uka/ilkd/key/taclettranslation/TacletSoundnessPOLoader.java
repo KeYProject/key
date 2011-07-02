@@ -35,6 +35,7 @@ public class TacletSoundnessPOLoader {
         private final File file;
         private final Collection<File> filesForAxioms = new LinkedList<File>();
         private final File fileForDefinitions;
+        private final boolean loadAsLemmata;
 
         private ProofEnvironment env;
         private LinkedList<LoaderListener> listeners = new LinkedList<LoaderListener>();
@@ -49,7 +50,7 @@ public class TacletSoundnessPOLoader {
                 public void started();
 
                 public void stopped(ProofAggregate p,
-                                ImmutableSet<Taclet> taclets);
+                                ImmutableSet<Taclet> taclets, boolean addAsAxioms);
 
                 public void stopped(Throwable exception);
         }
@@ -89,9 +90,9 @@ public class TacletSoundnessPOLoader {
                         File file, ProofEnvironment referenceEnv,
                         LoaderListener listener,
                         ProblemInitializerListener piListener,
-                        TacletFilter filter) {
+                        TacletFilter filter,boolean loadAsLemmata) {
                 this(progressMonitor, file, referenceEnv, listener, piListener,
-                                filter, null, file);
+                                filter, null, file,loadAsLemmata);
         }
 
         public TacletSoundnessPOLoader(ProgressMonitor progressMonitor,
@@ -99,7 +100,7 @@ public class TacletSoundnessPOLoader {
                         LoaderListener listener,
                         ProblemInitializerListener piListener,
                         TacletFilter filter, Collection<File> filesForAxioms,
-                        File fileForDefinitions) {
+                        File fileForDefinitions, boolean loadAsLemmata) {
                 super();
                 this.progressMonitor = progressMonitor;
                 this.file = file;
@@ -107,6 +108,7 @@ public class TacletSoundnessPOLoader {
                 this.tacletFilter = filter;
                 this.fileForDefinitions = fileForDefinitions == null ? file
                                 : fileForDefinitions;
+                this.loadAsLemmata = loadAsLemmata;
 
                 if (filesForAxioms != null) {
                         this.filesForAxioms.addAll(filesForAxioms);
@@ -160,7 +162,7 @@ public class TacletSoundnessPOLoader {
                                                 for (LoaderListener listener : listeners) {
                                                         listener.stopped(
                                                                         resultingProof,
-                                                                        getResultingTaclets());
+                                                                        getResultingTaclets(),!loadAsLemmata);
                                                 }
                                         }
                                 });
@@ -230,10 +232,12 @@ public class TacletSoundnessPOLoader {
                 initConfig = problemInitializer.prepare(keyFileDefs);
 
                 keyFileDefs.close();
-
-                ImmutableSet<Taclet> axioms = readAxioms(filesForAxioms,
+                
+                ImmutableSet<Taclet> emptySet = DefaultImmutableSet.nil();
+                // Axioms can only be loaded when the taclets are loaded as lemmata.
+                ImmutableSet<Taclet> axioms = loadAsLemmata ? readAxioms(filesForAxioms,
                                 initConfig, progressMonitor,
-                                problemInitializer, env);
+                                problemInitializer, env) :  emptySet;
 
                 ImmutableSet<Taclet> taclets = TacletLoader.INSTANCE.load(
                                 keyFile, initConfig);
@@ -251,8 +255,8 @@ public class TacletSoundnessPOLoader {
                         return;
                 }
 
-                resultingProof = createProof(env, getResultingTaclets(),
-                                keyFile, axioms);
+                resultingProof = loadAsLemmata ? createProof(env, getResultingTaclets(),
+                                keyFile, axioms) : null;
 
         }
 
