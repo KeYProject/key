@@ -20,7 +20,6 @@ import javax.swing.*;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.smt.SMTMenuItem;
@@ -39,6 +38,7 @@ import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
+import de.uka.ilkd.key.util.GuiUtilities;
 
 
 /**
@@ -404,7 +404,7 @@ class TacletMenu extends JMenu {
 	    } else {
 		if (((JMenuItem)e.getSource()).getText()
 		    .startsWith("to clipboard")){
-                    Main.copyHighlightToClipboard(sequentView);
+                    GuiUtilities.copyHighlightToClipboard(sequentView);
 		} else if(((JMenuItem)e.getSource()).getText().
 			  startsWith("Pop method frame")){
 		    //                        mediator.popMethodFrame();

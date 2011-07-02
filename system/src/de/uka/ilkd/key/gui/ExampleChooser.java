@@ -58,7 +58,7 @@ public final class ExampleChooser extends JDialog {
     //-------------------------------------------------------------------------
 
     private ExampleChooser(File examplesDir) {
-	super(Main.getInstance(), "Load Example", true);
+	super(MainWindow.getInstance(), "Load Example", true);
 	assert examplesDir != null;
 	assert examplesDir.isDirectory();
 	

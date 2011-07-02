@@ -11,7 +11,12 @@
 
 package de.uka.ilkd.key.gui;
 
-import java.awt.*;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -20,7 +25,17 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Iterator;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -109,10 +124,11 @@ public final class StrategySelectionView extends JPanel {
     Border loweredetched = 
 //        BorderFactory.createEtchedBorder(EtchedBorder.LOWERED);
         BorderFactory.createEmptyBorder();
-  
+
+    private final MainWindow mainWindow;
     
-    
-    public StrategySelectionView () {        
+    public StrategySelectionView (MainWindow mainWindow) {        
+        this.mainWindow = mainWindow;
         layoutPane();       
         refresh(mediator == null ? null : mediator.getSelectedProof());
 	setVisible( true );
@@ -488,7 +504,7 @@ public final class StrategySelectionView extends JPanel {
             }
         });
         
-        JButton go = new JButton(Main.autoModeAction);
+        JButton go = new JButton(mainWindow.getAutoModeAction());
 
         JPanel timeout = createTimeoutSpinner();
 

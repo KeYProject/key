@@ -18,12 +18,12 @@ my $automaticjavadl_txt = "automaticJAVADL.txt";
 my $not_provablejavadl_txt = "notProvableJavaDL.txt";
 chdir $bin_path;
 my $absolute_bin_path = &getcwd;
-print "$absolute_bin_path\n";
+# print "$absolute_bin_path\n";
 chdir $path_to_pe;
 
 if ($option{h}) {
   print "runs all proofs listed in the files: $automaticjavadl_txt and $not_provablejavadl_txt .\n";
-  print "They can be found in " .  $bin_path . "/" . $path_to_pe .  "\n\n";
+  print "They can be found in " . $bin_path . "/" . $path_to_pe . "/" . $path_to_automated .  "\n\n";
   print "Use '-m email\@address.com' to send the report as an email to the specified address.\n";
   print "Use '-h' to get this text (very necessary this line).\n";
   print "Use '-c' to get the debug messages from the smtp part if there are email problems.\n";
@@ -32,18 +32,18 @@ if ($option{h}) {
 
 
 open (HEADER_JAVADL, $path_to_automated . "headerJavaDL.txt") or
-  die $bin_path . "/" . $path_to_pe . "headerJavaDL.txt" . " couldn't be opened.";
+  die $path_to_automated . "headerJavaDL.txt" . " couldn't be opened.";
 binmode(HEADER_JAVADL);
 my @headerJavaDL = <HEADER_JAVADL>;
 close HEADER_JAVADL;
 
 open (AUTOMATIC, $path_to_automated . $automaticjavadl_txt) or
-  die $bin_path . "/" . $path_to_pe . $automaticjavadl_txt . " couldn't be opened.";
+  die $path_to_automated . $automaticjavadl_txt . " couldn't be opened.";
 my @automatic_JAVADL = <AUTOMATIC>;
 close AUTOMATIC;
 
 open (NOT_PROVABLE, $path_to_automated . $not_provablejavadl_txt) or
-  die  $bin_path . "/" . $path_to_pe . $not_provablejavadl_txt . " couldn't be opened.";
+  die $path_to_automated . $not_provablejavadl_txt . " couldn't be opened.";
 my @not_provableJavaDL = <NOT_PROVABLE>;
 close NOT_PROVABLE;
 

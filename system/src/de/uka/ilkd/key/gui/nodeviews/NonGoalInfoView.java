@@ -27,7 +27,7 @@ import javax.swing.text.Highlighter.HighlightPainter;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeAdapter;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
@@ -234,12 +234,12 @@ public class NonGoalInfoView extends JTextArea {
         try{
             unregisterListener();
         } catch (Throwable e) {
-            Main.getInstance().notify(new GeneralFailureEvent(e.getMessage()));
+            MainWindow.getInstance().notify(new GeneralFailureEvent(e.getMessage()));
         }finally{
                 try {
                     super.finalize();
                 } catch (Throwable e) {
-                    Main.getInstance().notify(new GeneralFailureEvent(e.getMessage()));
+                    MainWindow.getInstance().notify(new GeneralFailureEvent(e.getMessage()));
                 }
         }
     }
@@ -295,7 +295,9 @@ public class NonGoalInfoView extends JTextArea {
 	final Runnable safeScroller = new Runnable () {	 
 		public void run () {	 
 		    try {	 
-			final TextUI ui = getUI ();	 
+			final TextUI ui = getUI ();
+			if(ui == null)
+			    return;
 			final NonGoalInfoView t = NonGoalInfoView.this;	 
 			final Rectangle rect = ui.modelToView ( t, r.start () );	 
 			rect.add ( ui.modelToView ( t, r.end () ) );	 

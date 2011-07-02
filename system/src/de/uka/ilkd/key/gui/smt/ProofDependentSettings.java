@@ -1,6 +1,8 @@
 package de.uka.ilkd.key.gui.smt;
 
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Properties;
 
@@ -9,10 +11,8 @@ import javax.swing.tree.TreeNode;
 
 
 import de.uka.ilkd.key.gui.GUIEvent;
-import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.configuration.SettingsConverter;
 import de.uka.ilkd.key.gui.configuration.SettingsListener;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets;
 import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets.TreeItem;
 import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets.TreeItem.SelectionMode;
@@ -36,7 +36,7 @@ public class ProofDependentSettings implements de.uka.ilkd.key.gui.configuration
 
         private static final String USE_CONSTANTS_FOR_BIGSMALL_INTEGERS = "[SMTSettings]useConstantsForBigOrSmallIntegers";
 
-        private LinkedList<SettingsListener> listeners = new LinkedList<SettingsListener>();
+        private Collection<SettingsListener> listeners = new HashSet<SettingsListener>();
 
         public boolean useExplicitTypeHierarchy     = false;
         public boolean useNullInstantiation         = true;
@@ -54,12 +54,8 @@ public class ProofDependentSettings implements de.uka.ilkd.key.gui.configuration
                 supportedTaclets =  SupportedTaclets.REFERENCE;
         };
 
-        private ProofDependentSettings(ProofDependentSettings data) {
-
-            
-                copy(data);
-     
-                
+        private ProofDependentSettings(ProofDependentSettings data) {            
+                copy(data);                
         }
         
         public void copy(ProofDependentSettings data){
@@ -121,9 +117,9 @@ public class ProofDependentSettings implements de.uka.ilkd.key.gui.configuration
                 for (SettingsListener aListenerList : listeners) {
                         aListenerList.settingsChanged(new GUIEvent(this));
                 }
-                if(Main.instance != null){
-                        Main.instance.updateSMTSelectMenu();
-                }         
+           //     if(MainWindow.hasInstance()){
+              //          MainWindow.instance.updateSMTSelectMenu();
+             //   }         
         }
 
         @Override

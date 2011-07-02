@@ -605,7 +605,7 @@ public class Goal  {
 	setNode(parent);
 	removeAppliedRuleApp ();
         
-        updateRuleAppIndex();
+    updateRuleAppIndex();
         
 	return goalList;
     }

@@ -17,21 +17,20 @@ import java.io.File;
 import java.util.*;
 
 
-import javax.swing.tree.DefaultMutableTreeNode;
+
 
 import de.uka.ilkd.key.gui.configuration.PathConfig;
+import de.uka.ilkd.key.gui.configuration.SettingsListener;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.Taclet;
 
 
 import de.uka.ilkd.key.smt.SolverType;
-import de.uka.ilkd.key.smt.SolverTypeCollection;
+
 
 import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets;
-import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets.TreeItem;
-import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets.TreeItem.SelectionMode;
+
 
 public class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings{
         private final ProofDependentSettings pdSettings;
@@ -62,6 +61,7 @@ public class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings{
         public ProofIndependentSMTSettings getPiSettings() {
                 return piSettings;
         }
+
 
         @Override
         public String getCommand(SolverType type) {
@@ -178,6 +178,13 @@ public class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings{
                 piSettings.fireSettingsChanged();
                 pdSettings.fireSettingsChanged();
         }
+        
+        public void addListener(SettingsListener listener){
+                piSettings.addSettingsListener(listener);
+                pdSettings.addSettingsListener(listener);
+        }
+        
+
         
        
         

@@ -2,12 +2,14 @@ package de.uka.ilkd.key.gui.smt;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Properties;
 import java.util.Map.Entry;
 
 import de.uka.ilkd.key.gui.GUIEvent;
 import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.SettingsConverter;
 import de.uka.ilkd.key.gui.configuration.SettingsListener;
 
@@ -58,7 +60,7 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.gui.configur
         public String   pathForTacletTranslation   = "";
         public String   activeSolver               = "";
     
-        private LinkedList<SettingsListener> listeners = new LinkedList<SettingsListener>();
+        private Collection<SettingsListener> listeners = new HashSet<SettingsListener>();
 
         private SolverTypeCollection activeSolverUnion = SolverTypeCollection.EMPTY_COLLECTION;
         private LinkedList<SolverTypeCollection> solverUnions = new LinkedList<SolverTypeCollection>(); 
@@ -252,9 +254,7 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.gui.configur
               for (SettingsListener aListenerList : listeners) {
                       aListenerList.settingsChanged(new GUIEvent(this));
               }
-              if(Main.instance != null){
-                      Main.instance.updateSMTSelectMenu();
-              }         
+ 
       }
 
 @Override

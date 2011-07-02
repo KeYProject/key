@@ -215,6 +215,7 @@ public class InitConfig {
 
 
     public ImmutableSet<Taclet> getTaclets(){
+            System.out.println(taclets != null ? taclets.size() :0);
         return taclets;
     }
 
