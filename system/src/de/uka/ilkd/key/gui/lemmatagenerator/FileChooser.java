@@ -52,9 +52,13 @@ public class FileChooser extends JPanel{
                 "It is the responsibility of the user to guarantee this consistency.\n\n" +
                 "Technical Remarks:\nThe axioms must be stored in another file than the user-defined taclets. Furthermore the axioms " +
                 "are only loaded for the lemmata, but not for the current proof.";
-
-        private static final String INFO_TEXT1 = "";
-        private static final String INFO_TEXT2 = "";
+        
+        private static final String INFO_TEXT1 = "Be aware of the fact that you are going to load taclets without creating " +
+        		"corresponding proof obligations. In the case that the taclets that you want to load are unsound, the calculus will" +
+        		"become unsound!";
+        private static final String INFO_TEXT2 = "Be aware of the fact that you are going to load taclets without creating " +
+        		"corresponding proof obligations. In the case that the taclets that you want to load as axioms are unsound, the calculus will" +
+        		"become unsound!";
         
         private class SingleFileChooser extends Box{
                 private static final long serialVersionUID = 1L;

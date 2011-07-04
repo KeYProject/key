@@ -42,7 +42,7 @@ public class LoadUserDefinedTacletsAction extends MainWindowAction {
         final Proof proof = getMediator().getSelectedProof();
         final File fileForLemmata = chooser.getFileForLemmata();
         final File fileForDefinitions = chooser.getFileForDefinitions();
-        final boolean loadTacletsAsAxioms = !chooser.isLoadingAsLemmata();
+        final boolean loadAsLemmata = chooser.isLoadingAsLemmata();
 
         List<File> filesForAxioms = chooser.getFilesForAxioms();
 
@@ -90,7 +90,7 @@ public class LoadUserDefinedTacletsAction extends MainWindowAction {
         TacletSoundnessPOLoader loader = new TacletSoundnessPOLoader(
                     mainWindow.getUserInterface(), fileForLemmata, proof.env(), listener,
                     mainWindow.getUserInterface(), new LemmaSelectionDialog(), filesForAxioms,
-                                fileForDefinitions,loadTacletsAsAxioms
+                                fileForDefinitions,loadAsLemmata
                                 );
         loader.start();
 

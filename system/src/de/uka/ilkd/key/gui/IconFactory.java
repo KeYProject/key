@@ -29,6 +29,7 @@ public class IconFactory {
     private static Image keyHoleInteractive     = getImage("images/keyinteractive.gif");
     private static Image keyLogo             = getImage("images/key-color.gif");
     private static Image keyLogoSmall        = getImage("images/key-color-icon-square.png");
+    private static Image keyWarning          = getImage("images/warning.gif");
     private static Icon provedFolderIcon     = KeYFolderIcon.getKeYFolderIconClosed();
     private static Icon closableFolderIcon   = KeYFolderIcon.getKeYFolderIconClosable();
 
@@ -83,6 +84,12 @@ public class IconFactory {
     public static ImageIcon keyHole(int x, int y) {
 	return scaleIcon(keyHole,x,y);
     }
+    
+    public static ImageIcon keyWarning(int x, int y) {
+            return scaleIcon(keyWarning,x,y);
+            }
+            
+            
 
     public static ImageIcon keyHoleClosed(int x, int y) {
 	return scaleIcon(keyHoleClosed,x,y);
