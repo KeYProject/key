@@ -265,6 +265,7 @@ public class IncrementalSearch {
         public SearchDialog() {
             super((JDialog)null, "Search", false);
             textField = new JTextField();
+            textField.setPreferredSize(INIT_SIZE);
             textField.setToolTipText("<html>"
                                      + "This search dialog features "
                                      + "<b>drag'n'drop</b> and "
@@ -335,8 +336,8 @@ public class IncrementalSearch {
                     y += parent.getBounds().y;
                     parent = parent.getParent();
                 }
-                Rectangle bounds = new Rectangle(new Point(x, y), INIT_SIZE);
-                setBounds(bounds);
+                setLocation(x, y);
+                pack();
             }
             super.setVisible(b);
         }
