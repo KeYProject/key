@@ -425,11 +425,13 @@ public final class MainWindow extends JFrame  {
         GuiUtilities.paintEmptyViewComponent(proofListView, "Proofs");
         
         JSplitPane leftPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, proofListView, tabbedPane);
+        leftPane.setName("leftPane");
         leftPane.setOneTouchExpandable(true);
         
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPane, goalView);
         splitPane.setResizeWeight(0); // the right pane is more important
         splitPane.setOneTouchExpandable(true);
+        splitPane.setName("splitPane");
         getContentPane().add(splitPane, BorderLayout.CENTER);
         
 //      // work around bug in
@@ -461,6 +463,7 @@ public final class MainWindow extends JFrame  {
         });
         
         setSize(1000, 750);
+        setName("mainWindow");
         prefSaver.load(this);
     }
 
@@ -486,6 +489,7 @@ public final class MainWindow extends JFrame  {
 	pane.getInputMap(JComponent.WHEN_FOCUSED).getParent().remove(
 	        KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, Toolkit
 	                .getDefaultToolkit().getMenuShortcutKeyMask()));
+	pane.setName("leftTabbed");
 	
 	return pane;
     }
