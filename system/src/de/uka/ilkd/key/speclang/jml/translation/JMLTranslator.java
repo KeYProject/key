@@ -92,7 +92,7 @@ final class JMLTranslator {
                 if (!lhs.isTerm()
                     || !(lhs.getTerm().op() instanceof ObserverFunction)
                     || lhs.getTerm().sub(0).op() != heap) {
-                    excManager.createException("Depends clause with unexpected lhs: " + lhs);
+                    throw excManager.createException("Depends clause with unexpected lhs: " + lhs);
                 }
                 return new Triple<ObserverFunction, Term, Term>(
                         (ObserverFunction) lhs.getTerm().op(),
@@ -510,9 +510,9 @@ final class JMLTranslator {
         protected void checkSLExpressions(SLExpression expr1,
                                           SLExpression expr2,
                                           SLTranslationExceptionManager excManager,
-                                          String eqSymb) {
+                                          String eqSymb) throws SLTranslationException {
             if (expr1.isType() != expr2.isType()) {
-                excManager.createException(
+                throw excManager.createException(
                         "Cannot build equality expression (" + eqSymb
                         + ") between term and type.");
             }
@@ -541,7 +541,7 @@ final class JMLTranslator {
                     typeExpr = b;
                 } else {
                     if (b.getTerm() == null) {
-                        excManager.createException(
+                        throw excManager.createException(
                                 "Type equality only supported for expressions "
                                 + " of shape \"\\typeof(term) == \\type(Typename)\"");
                     }
@@ -557,7 +557,9 @@ final class JMLTranslator {
                         TB.TRUE(services)));
             }
 
-            return null;
+            // this should not be reached
+            throw excManager.createException("Equality must be between two terms or " +
+            		"two formulas, not term and formula.");
         }
 
 
@@ -575,17 +577,16 @@ final class JMLTranslator {
                     result = TB.equals(TB.convertToFormula(a, services),
                                        TB.convertToFormula(b, services));
                 }
+                return result;
             } catch (IllegalArgumentException e) {
-                excManager.createException(
+                throw excManager.createException(
                         "Illegal Arguments in equality expression.");
                 //"near " + LT(0));
             } catch (TermCreationException e) {
-                excManager.createException("Error in equality-expression\n"
+                throw excManager.createException("Error in equality-expression\n"
                                            + a.toString() + " == "
                                            + b.toString() + ".");
             }
-
-            return result;
         }
     }
 }
