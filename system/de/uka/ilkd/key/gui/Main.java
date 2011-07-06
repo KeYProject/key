@@ -95,6 +95,7 @@ import de.uka.ilkd.key.gui.smt.SMTSettings;
 import de.uka.ilkd.key.gui.smt.SettingsDialog;
 import de.uka.ilkd.key.gui.smt.SolverListener;
 import de.uka.ilkd.key.gui.smt.TemporarySettings;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -116,6 +117,7 @@ import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
+import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.key.util.KeYResourceManager;
@@ -2903,5 +2905,23 @@ public final class Main extends JFrame implements IMain {
     
     public static void setVisibleMode(boolean visible) {
 	Main.visible = visible;
-    }    
+    }
+    
+    
+    public LoopInvariant getLoopInvariant(LoopInvariant loopInvariant,
+	    					Services service,
+	    					boolean requiresVariant) {
+	return InvariantConfigurator.getInstance().getLoopInvariant(
+							loopInvariant,
+							service,
+							requiresVariant);
+    }
+	
+    public LoopInvariant getLoopInvariant(LoopInvariant loopInvariant,
+	    					Services service) {
+	return InvariantConfigurator.getInstance().getLoopInvariant(
+							loopInvariant,
+							service,
+							false);
+    }
 }

@@ -54,8 +54,8 @@ public final class LoopInvariantImpl implements LoopInvariant {
                              Term selfTerm,
                              Term heapAtPre) {
         assert loop != null;
-        assert modifies != null;
-        assert heapAtPre != null;
+        //assert modifies != null;
+        //assert heapAtPre != null;
         this.loop                       = loop;
 	this.originalInvariant          = invariant;
         this.originalVariant            = variant;
