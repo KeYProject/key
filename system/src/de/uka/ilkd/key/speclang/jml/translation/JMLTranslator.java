@@ -882,9 +882,10 @@ final class JMLTranslator {
         protected void checkSLExpressions(SLExpression expr1,
                                           SLExpression expr2,
                                           SLTranslationExceptionManager excManager,
-                                          String eqSymb) {
+                                          String eqSymb)
+        throws SLTranslationException {
             if (expr1.isType() != expr2.isType()) {
-                excManager.createException(
+                throw excManager.createException(
                         "Cannot build equality expression (" + eqSymb
                         + ") between term and type.");
             }
@@ -913,7 +914,7 @@ final class JMLTranslator {
                     typeExpr = b;
                 } else {
                     if (b.getTerm() == null) {
-                        excManager.createException(
+                        throw excManager.createException(
                                 "Type equality only supported for expressions "
                                 + " of shape \"\\typeof(term) == \\type(Typename)\"");
                     }
@@ -935,7 +936,7 @@ final class JMLTranslator {
 
         protected Term buildEqualityTerm(Term a,
                                          Term b,
-                                         SLTranslationExceptionManager excManager,
+                                         SLTranslationExceptionManager excManager1,
                                          Services services)
                 throws SLTranslationException {
 
@@ -948,11 +949,11 @@ final class JMLTranslator {
                                        TB.convertToFormula(b, services));
                 }
             } catch (IllegalArgumentException e) {
-                excManager.createException(
+                throw excManager1.createException(
                         "Illegal Arguments in equality expression.");
                 //"near " + LT(0));
             } catch (TermCreationException e) {
-                excManager.createException("Error in equality-expression\n"
+                throw excManager1.createException("Error in equality-expression\n"
                                            + a.toString() + " == "
                                            + b.toString() + ".");
             }
