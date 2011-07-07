@@ -240,7 +240,10 @@ public class ProofSaver {
       while (childrenIt.hasNext()) {
          Node child = childrenIt.next();
          tree.append(prefix);            
-         tree.append("(branch \" " + escapeCharacters(child.getNodeInfo().getBranchLabel()) + "\"\n");
+         String branchLabel = child.getNodeInfo().getBranchLabel();
+         // This assertion is related to bug #1099
+         assert branchLabel != null : "(null) branchlabel for node " + child;
+         tree.append("(branch \" " + escapeCharacters(branchLabel) + "\"\n");
 	 collectProof(child, prefix+"   ", tree);
          tree.append(prefix+")\n");
       }
