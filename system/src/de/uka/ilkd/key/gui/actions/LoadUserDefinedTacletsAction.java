@@ -18,26 +18,19 @@ import de.uka.ilkd.key.taclettranslation.TacletSoundnessPOLoader;
 import de.uka.ilkd.key.taclettranslation.TacletSoundnessPOLoader.LoaderListener;
 
 public class LoadUserDefinedTacletsAction extends MainWindowAction {
-    public enum Mode {ProveUserDefinedTaclets{
-            @Override
-        public String toString() {
-               return "";
-        }
-    }        
-            ,ProveKeYTaclets,ProveAndAddUserDefinedTaclets
-    
-           
-    };    
+    public enum Mode {ProveUserDefinedTaclets,ProveKeYTaclets,ProveAndAddUserDefinedTaclets};    
     private static final long serialVersionUID = 1L;
     private final Mode mode;
 
+    private static final String info [][] = {{"Load User-Defined Taclets...","Loads additional taclets and creates the corresponding proof..."},
+                                                {"User-Defined Taclets...","Loads additional taclets in order to prove them."},
+                                                {"KeY's Taclets","Creates a proof obligation for some selected taclets."}};
+    
     public LoadUserDefinedTacletsAction(MainWindow mainWindow,Mode mode) {
         super(mainWindow);
         this.mode = mode;
-        putValue(NAME, "Load User-Defined Taclets...");
-        putValue(
-                SHORT_DESCRIPTION,
-                    "Loads additional taclets and creates the corresponding proofs.");
+        putValue(NAME,info[mode.ordinal()][0]);
+        putValue(SHORT_DESCRIPTION,info[mode.ordinal()][1]);
 
         getMediator().enableWhenProof(this);
     }

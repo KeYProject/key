@@ -69,6 +69,7 @@ import de.uka.ilkd.key.gui.actions.ExitMainAction;
 import de.uka.ilkd.key.gui.actions.FontSizeAction;
 import de.uka.ilkd.key.gui.actions.LicenseAction;
 import de.uka.ilkd.key.gui.actions.LoadUserDefinedTacletsAction;
+import de.uka.ilkd.key.gui.actions.LoadUserDefinedTacletsAction.Mode;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.actions.MinimizeInteraction;
 import de.uka.ilkd.key.gui.actions.OneStepSimplificationToggleAction;
@@ -223,6 +224,8 @@ public final class MainWindow extends JFrame  {
     
     /** action for loading taclets onto a ongoing proof */
     private LoadUserDefinedTacletsAction loadUserDefinedTacletsAction;
+    private LoadUserDefinedTacletsAction loadUserDefinedTacletsForProvingAction;
+    private LoadUserDefinedTacletsAction loadKeYTaclets;
     
     /** action for proving taclets independently from the curren proof*/
     private ProveTacletsAction proveTacletsAction;
@@ -392,7 +395,10 @@ public final class MainWindow extends JFrame  {
         proofManagementAction     = new ProofManagementAction(this);
         exitMainAction            = new ExitMainAction(this);
         showActiveSettingsAction  = new ShowActiveSettingsAction(this);
-        loadUserDefinedTacletsAction = new LoadUserDefinedTacletsAction(this);
+        loadUserDefinedTacletsAction = new LoadUserDefinedTacletsAction(this,Mode.ProveAndAddUserDefinedTaclets);
+        loadUserDefinedTacletsForProvingAction = new LoadUserDefinedTacletsAction(this, Mode.ProveUserDefinedTaclets);
+        loadKeYTaclets            = new LoadUserDefinedTacletsAction(this, Mode.ProveKeYTaclets);
+        
         proveTacletsAction       = new ProveTacletsAction(this);
         
 	
