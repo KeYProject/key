@@ -160,11 +160,7 @@ public class InvariantConfigurator {
 		        new BoxLayout(getContentPane(), BoxLayout.PAGE_AXIS));
 		inputPane = new JTabbedPane();
 
-		/*
-	         * inputPane.addChangeListener(new ChangeListener() { public
-	         * void stateChanged(ChangeEvent e) {
-	         * tabbedPaneStatusChanged(e); } });
-	         */
+		
 
 		// Create the loop Reprepsentation on top
 		JScrollPane loopRepScrollPane = new JScrollPane();
@@ -257,7 +253,6 @@ public class InvariantConfigurator {
 		JButton applyButton = new JButton("apply");
 		JButton cancelButton = new JButton("cancel");
 		JButton storeButton = new JButton("store");
-		JButton saveButton = new JButton("save");
 
 		applyButton.addActionListener(new ActionListener() {
 		    public void actionPerformed(ActionEvent e) {
@@ -274,16 +269,11 @@ public class InvariantConfigurator {
 			storeActionPerformed(e);
 		    }
 		});
-		saveButton.addActionListener(new ActionListener() {
-		    public void actionPerformed(ActionEvent e) {
-			saveActionPerformed(e);
-		    }
-		});
+	
 
 		buttonPanel.add(applyButton);
 		buttonPanel.add(storeButton);
 		buttonPanel.add(cancelButton);
-		buttonPanel.add(saveButton);
 		getContentPane().add(buttonPanel);
 
 		this.pack();
@@ -301,15 +291,68 @@ public class InvariantConfigurator {
 	     * 
 	     * @param e
 	     */
-	    public void storeActionPerformed(ActionEvent e) {
+	    public void storeActionPerformed(ActionEvent aE) {
 		index = inputPane.getSelectedIndex();
+		String[] invs = invariants.get(index).clone();
+		
+		JTextArea invarea = new JTextArea(invs[0]);
+		JTextArea modarea = new JTextArea(invs[1]);
+		JTextArea vararea = new JTextArea(invs[2]);
+		
+		invarea.setBorder(new TitledBorder("Invariant:"));
+		modarea.setBorder(new TitledBorder("Modifies:"));
+		vararea.setBorder(new TitledBorder("Variant:"));
+		
+		invarea.getDocument().addDocumentListener(
+			    new DocumentListener() {
+			        public void removeUpdate(DocumentEvent e) {
+				    invUdatePerformed(e);
+			        }
+			        public void insertUpdate(DocumentEvent e) {
+				    invUdatePerformed(e);
+			        }
+			        public void changedUpdate(DocumentEvent e) {
+				    invUdatePerformed(e);
+			        }
+			    });
+		    modarea.getDocument().addDocumentListener(
+			    new DocumentListener() {
+			        public void removeUpdate(DocumentEvent e) {
+				    modUdatePerformed(e);
+			        }
+			        public void insertUpdate(DocumentEvent e) {
+				    modUdatePerformed(e);
+			        }
+			        public void changedUpdate(DocumentEvent e) {
+				    modUdatePerformed(e);
+			        }
+			    });
+		    vararea.getDocument().addDocumentListener(
+			    new DocumentListener() {
+			        public void removeUpdate(DocumentEvent e) {
+				    varUdatePerformed(e);
+			        }
+			        public void insertUpdate(DocumentEvent e) {
+				    varUdatePerformed(e);
+			        }
+			        public void changedUpdate(DocumentEvent e) {
+				    varUdatePerformed(e);
+			        }
+			    });
+		    
+		    
 
-		// JPanel dummy = inputPane.getTabComponentAt(index).c
-		// inputPane.addTab(title, component);
+		    JPanel dummy = new JPanel();
+		    dummy.add(invarea);
+		    dummy.add(modarea);
+		    dummy.add(vararea);
+		    dummy.setLayout(new BoxLayout(dummy, BoxLayout.PAGE_AXIS));
 
-		// add new Strings of the future invariant into invariants
+		    JScrollPane scrollPane = new JScrollPane();
+		    scrollPane.setLayout(new ScrollPaneLayout());
+		    dummy.add(scrollPane);
+		    inputPane.addTab("Inv " + (invariants.size()-1), dummy);
 
-		// add new tab to the input pane
 
 	    }
 
@@ -321,30 +364,9 @@ public class InvariantConfigurator {
 	     */
 	    public void applyActionPerformed(ActionEvent e) {
 		index = inputPane.getSelectedIndex();
-		// saveActionPerformed(e);
 		parse();
 	    }
 
-	    public void saveActionPerformed(ActionEvent e) {
-		index = inputPane.getSelectedIndex();
-		if (index >= 0) {
-
-		    String[] invs = new String[3];
-		    Component com = inputPane.getTabComponentAt(index);
-		    invs[0] = "";
-		    invs[1] = inputPane.getTabComponentAt(index).toString();
-		    invs[2] = inputPane.getTabComponentAt(index).toString();
-
-		    invariants.set(index, invs);
-		}
-	    }
-
-	    /*
-	     * might be useful someday public void
-	     * deleteActionPerformed(ActionEvent e) {
-	     * 
-	     * }
-	     */
 	    public void invUdatePerformed(DocumentEvent d) {
 		Document doc = d.getDocument();
 		index = inputPane.getSelectedIndex();
@@ -390,12 +412,13 @@ public class InvariantConfigurator {
 		Term variantTerm = null;
 		Term modifiesTerm = null;
 		try {
+		    
 		    invariantTerm = p.parse(new StringReader(invariants
-			    .get(index)[0]), Sort.ANY, services, null, null);
+			    .get(index)[0]), Sort.ANY, services, services.getNamespaces(), null);
 		    variantTerm = p.parse(new StringReader(invariants
-			    .get(index)[1]), Sort.ANY, services, null, null);
+			    .get(index)[1]), Sort.ANY, services, services.getNamespaces(), null);
 		    modifiesTerm = p.parse(new StringReader(invariants
-			    .get(index)[2]), Sort.ANY, services, null, null);
+			    .get(index)[2]), Sort.ANY, services, services.getNamespaces(), null);
 
 		    /*
 	             * Check if the Variant is required and empty
