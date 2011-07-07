@@ -45,6 +45,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -76,6 +77,7 @@ import de.uka.ilkd.key.gui.actions.OpenFileAction;
 import de.uka.ilkd.key.gui.actions.OpenMostRecentFileAction;
 import de.uka.ilkd.key.gui.actions.PrettyPrintToggleAction;
 import de.uka.ilkd.key.gui.actions.ProofManagementAction;
+import de.uka.ilkd.key.gui.actions.ProveTacletsAction;
 import de.uka.ilkd.key.gui.actions.SMTOptionsAction;
 import de.uka.ilkd.key.gui.actions.SaveFileAction;
 import de.uka.ilkd.key.gui.actions.ShowActiveSettingsAction;
@@ -221,6 +223,9 @@ public final class MainWindow extends JFrame  {
     
     /** action for loading taclets onto a ongoing proof */
     private LoadUserDefinedTacletsAction loadUserDefinedTacletsAction;
+    
+    /** action for proving taclets independently from the curren proof*/
+    private ProveTacletsAction proveTacletsAction;
     
     public static final String AUTO_MODE_TEXT = "Start/stop automated proof search";
 
@@ -388,6 +393,7 @@ public final class MainWindow extends JFrame  {
         exitMainAction            = new ExitMainAction(this);
         showActiveSettingsAction  = new ShowActiveSettingsAction(this);
         loadUserDefinedTacletsAction = new LoadUserDefinedTacletsAction(this);
+        proveTacletsAction       = new ProveTacletsAction(this);
         
 	
 	
@@ -738,7 +744,13 @@ public final class MainWindow extends JFrame  {
         fileMenu.add(saveFileAction);
         fileMenu.addSeparator();
         fileMenu.add(proofManagementAction);
+        
+        
         fileMenu.add(loadUserDefinedTacletsAction);
+        JMenu submenu = new JMenu("Prove...");
+        fileMenu.add(submenu);
+        
+        submenu.add(proveTacletsAction);
         fileMenu.addSeparator();
         fileMenu.add(recentFiles.getMenu());
         fileMenu.addSeparator();

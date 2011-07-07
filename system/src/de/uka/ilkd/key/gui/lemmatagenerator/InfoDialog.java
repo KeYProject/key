@@ -82,11 +82,11 @@ public class InfoDialog extends JDialog{
                 //System.out.println(getInfoTextHeight());
                // this.getInfoText().setPreferredSize(new Dimension(400, getInfoTextHeight()));
                 this.setMaximumSize(new Dimension(500,Integer.MAX_VALUE));
-                
+                this.setPreferredSize(new Dimension(500,400));
                 this.getInfoText().setMaximumSize(new Dimension(400,Integer.MAX_VALUE));
                 this.getInfoText().setPreferredSize(new Dimension(400, getInfoTextHeight()));
                 this.pack();
-                System.out.println(getInfoTextHeight());
+             
         }
         
         public int getInfoTextHeight() {

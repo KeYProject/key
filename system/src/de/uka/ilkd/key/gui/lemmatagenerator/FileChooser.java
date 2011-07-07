@@ -1,8 +1,10 @@
 package de.uka.ilkd.key.gui.lemmatagenerator;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -20,11 +22,14 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.WindowConstants;
+import javax.swing.border.LineBorder;
+import javax.swing.border.TitledBorder;
 
 
 import de.uka.ilkd.key.gui.KeYFileChooser;
@@ -60,15 +65,25 @@ public class FileChooser extends JPanel{
         		"corresponding proof obligations. In the case that the taclets that you want to load as axioms are unsound, the calculus will" +
         		"become unsound!";
         
+        
         private class SingleFileChooser extends Box{
                 private static final long serialVersionUID = 1L;
                 private File           chosenFile;
                 private JButton    chooseFileButton;
                 private JTextField fileField;
+                private String title;
+                
+                
+                
                 public SingleFileChooser(String title, JCheckBox checkbox) {
+           
                         super(BoxLayout.Y_AXIS);
+                        this.title = title;
                         Box box = Box.createHorizontalBox();
+                     
                         this.setBorder(BorderFactory.createTitledBorder(title));
+                        
+                      
                         box.add(getFileField());
                         box.add(Box.createHorizontalStrut(5));
                         box.add(getChooseFileButton());
@@ -100,7 +115,7 @@ public class FileChooser extends JPanel{
                                         
                                         @Override
                                         public void actionPerformed(ActionEvent arg0) {
-                                                File file = chooseFiles("File containing the lemmata.");
+                                                File file = chooseFiles(title);
                                                 if(file != null){
                                                         fileHasBeenChosen(file);
                                                         setChosenFile(file);

@@ -18,11 +18,22 @@ import de.uka.ilkd.key.taclettranslation.TacletSoundnessPOLoader;
 import de.uka.ilkd.key.taclettranslation.TacletSoundnessPOLoader.LoaderListener;
 
 public class LoadUserDefinedTacletsAction extends MainWindowAction {
-
+    public enum Mode {ProveUserDefinedTaclets{
+            @Override
+        public String toString() {
+               return "";
+        }
+    }        
+            ,ProveKeYTaclets,ProveAndAddUserDefinedTaclets
+    
+           
+    };    
     private static final long serialVersionUID = 1L;
+    private final Mode mode;
 
-    public LoadUserDefinedTacletsAction(MainWindow mainWindow) {
+    public LoadUserDefinedTacletsAction(MainWindow mainWindow,Mode mode) {
         super(mainWindow);
+        this.mode = mode;
         putValue(NAME, "Load User-Defined Taclets...");
         putValue(
                 SHORT_DESCRIPTION,
