@@ -227,7 +227,7 @@ public final class SpecificationRepository {
     private boolean axiomIsVisible(ClassAxiom ax, KeYJavaType visibleTo) {
 	final KeYJavaType kjt = ax.getKJT();
 	final String kjtPackage = "x"; //TODO: package information not yet available
-	final String visibleToPackage = "y";
+	final String visibleToPackage = "x";
 	final VisibilityModifier visibility = ax.getVisibility();
 	if(visibility == null) {
 	    return kjtPackage.equals(visibleToPackage);
