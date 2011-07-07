@@ -18,7 +18,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 
 import de.uka.ilkd.key.gui.GUIEvent;
-import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.configuration.Settings;
 import de.uka.ilkd.key.gui.configuration.SettingsListener;
@@ -400,8 +400,8 @@ public class SMTSettings implements Settings, de.uka.ilkd.key.smt.SMTSettings{
 	for (SettingsListener aListenerList : listenerList) {
             aListenerList.settingsChanged(new GUIEvent(this));
         }
-        if(Main.instance != null){
-            Main.instance.updateSMTSelectMenu();
+        if(MainWindow.instance != null){
+            MainWindow.instance.updateSMTSelectMenu();
         }      
     }
     

@@ -44,14 +44,15 @@ public final class OneStepSimplifier implements BuiltInRule,
     private static final TermBuilder TB = TermBuilder.DF;
     
     private static final ImmutableList<String> ruleSets 
-    	= ImmutableSLList.<String>nil().append("concrete")
-    	                               .append("simplify_literals")
-    	                               .append("elimQuantifier")
-    	                               .append("simplify")
-    	                               .append("simplify_enlarging");
+    	= ImmutableSLList.<String>nil().append("concrete")    	                            
+    	                               .append("update_elim")
+                                       .append("update_apply_on_update")
+                                       .append("update_apply")
+                                       .append("update_join")
+    	                               .append("elimQuantifier");
+
     private static final boolean[] bottomUp 
-    	= {false, false, false, false, true};
-  
+        = {false, false, true, true, true, false};
     private final Map<SequentFormula,Boolean> applicabilityCache 
     		= new LRUCache<SequentFormula,Boolean>(100);
    

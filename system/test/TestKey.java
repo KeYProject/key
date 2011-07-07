@@ -106,7 +106,7 @@ public class TestKey extends TestCase {
      
     public static junit.framework.Test suite() {
 	de.uka.ilkd.key.util.Debug.ENABLE_DEBUG = false;
-	de.uka.ilkd.key.gui.Main.setVisibleMode(false);
+	de.uka.ilkd.key.gui.MainWindow.setVisibleMode(false);
         
 	TestSuite suite = new TestSuite();
 	suite.addTest(createSuite(utilityTests, "Testing Utilities and Collections"));

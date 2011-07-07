@@ -36,9 +36,7 @@ header {
 
     import java.lang.RuntimeException;
     import java.math.BigInteger;
-    import java.util.Map;
-    import java.util.Iterator;
-    import java.util.LinkedHashMap;
+    import java.util.*;
 }
 
 class KeYJMLParser extends Parser;
@@ -741,18 +739,50 @@ andexpr returns [SLExpression result=null] throws SLTranslationException
 	)?
 ;
 
-
 equalityexpr returns [SLExpression result=null] throws SLTranslationException
 {
-    SLExpression right = null;
+	SLExpression right = null;
 }
-:
+	 :
 	result=relationalexpr 
 	(   eq:EQ_NEQ right=equalityexpr
-	    { result = translator.<SLExpression>translate(eq.getText(), result, right, excManager, services); }
+	        { result = translator.<SLExpression>translate(eq.getText(), result, right, excManager, services); }
 	)?
 ;
 
+//equalityexpr returns [SLExpression result=null] throws SLTranslationException
+//{
+//    Deque<Pair<Token,SLExpression>> right = null;
+//}
+//:
+//    result = relationalexpr
+//    right = equalityexprright
+//    { 
+//        assert right != null;
+//        for (Pair<Token,SLExpression> pair: right) { 
+//            result = translator.<SLExpression>translate(pair.first.getText(), result, pair.second, excManager, services);
+//        }
+//    }
+//;
+///** Helper method to make equality expressions left associative. */
+//equalityexprright returns [Deque<Pair<Token,SLExpression>> result= null] throws SLTranslationException
+//{
+//    SLExpression tmp = null;
+//}
+//:
+//    (EQ | NEQ) =>
+//        eq:EQ_NEQ
+//        tmp = relationalexpr
+//        result = equalityexprright
+//    {
+//        result.push(new Pair<Token,SLExpression>(eq,tmp));
+//    }
+//    |
+//    EMPTY
+//    {
+//        result = new ArrayDeque<Pair<Token,SLExpression>>();
+//    }
+//;
 
 relationalexpr returns [SLExpression result=null] throws SLTranslationException
 {
@@ -1009,12 +1039,8 @@ multexpr returns [SLExpression result=null] throws SLTranslationException
 
 
 unaryexpr returns [SLExpression result=null] throws SLTranslationException
-{
-    KeYJavaType type = null;
-}
 :
-(
-       PLUS result=unaryexpr
+    PLUS result=unaryexpr
 	{
 	    if (result.isType()) {
 		raiseError("Cannot build  +" + result.getType().getName() + ".");
@@ -1034,30 +1060,36 @@ unaryexpr returns [SLExpression result=null] throws SLTranslationException
 	    result = intHelper.buildUnaryMinusExpression(result);
 	}
     |
-	(LPAREN typespec RPAREN ) => 
-	   LPAREN type=typespec RPAREN result=unaryexpr
-	
+	(LPAREN typespec RPAREN ) => result = castexpr
     |
-	result=unaryexprnotplusminus
-)
-	 {
-	     if (type != null) {
-		 if (result.isType()) {
-		     raiseError("Casting of type variables not (yet) supported.");
-		 }
-		 assert result.isTerm();
-		 
-		 if(intHelper.isIntegerTerm(result)) {
-		     result = intHelper.buildCastExpression(type, result);
-		 } else {
-		     result = new SLExpression(
-		         TB.cast(services, type.getSort(), result.getTerm()), 
-		         type);
-		 }
-	     }
-	}
+	    result=unaryexprnotplusminus
 ;
 
+castexpr returns  [SLExpression result = null] throws SLTranslationException
+{
+    KeYJavaType type = null;
+}
+:
+LPAREN type=typespec RPAREN result=unaryexpr
+{
+    if (type != null) {
+    if (result.isType()) {
+        raiseError("Casting of type variables not (yet) supported.");
+    }
+    assert result.isTerm();
+    
+    if(intHelper.isIntegerTerm(result)) {
+        result = intHelper.buildCastExpression(type, result);
+    } else {
+        result = new SLExpression(
+            TB.cast(services, type.getSort(), result.getTerm()), 
+            type);
+    }
+    } else {
+        raiseError("Please provide a type to cast to.");
+    }
+}
+;
 
 unaryexprnotplusminus returns [SLExpression result=null] throws SLTranslationException
 {

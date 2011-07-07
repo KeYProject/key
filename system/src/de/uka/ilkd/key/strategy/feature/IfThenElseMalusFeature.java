@@ -52,7 +52,7 @@ public class IfThenElseMalusFeature implements Feature {
             if ( ind == -1 ) break;
 
             final Term t = it.getSubTerm ();
-            if ( t.op () instanceof IfThenElse && ind != 0 ) res++;
+            if ( t.op () instanceof IfThenElse) res = ind != 0 ? res + 1 : res - 1;           
         }
 
         resInt = LongRuleAppCost.create ( res );

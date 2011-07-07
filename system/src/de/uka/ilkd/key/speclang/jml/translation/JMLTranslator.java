@@ -96,7 +96,7 @@ final class JMLTranslator {
                 if (!lhs.isTerm()
                     || !(lhs.getTerm().op() instanceof ObserverFunction)
                     || lhs.getTerm().sub(0).op() != heap) {
-                    excManager.createException("Depends clause with unexpected lhs: " + lhs);
+                    throw excManager.createException("Depends clause with unexpected lhs: " + lhs);
                 }
                 return new Triple<ObserverFunction, Term, Term>(
                         (ObserverFunction) lhs.getTerm().op(),
@@ -930,7 +930,9 @@ final class JMLTranslator {
                         TB.TRUE(services)));
             }
 
-            return null;
+            // this should not be reached
+            throw excManager.createException("Equality must be between two terms or " +
+            		"two formulas, not term and formula.");
         }
 
 
@@ -948,6 +950,7 @@ final class JMLTranslator {
                     result = TB.equals(TB.convertToFormula(a, services),
                                        TB.convertToFormula(b, services));
                 }
+                return result;
             } catch (IllegalArgumentException e) {
                 throw excManager1.createException(
                         "Illegal Arguments in equality expression.");
@@ -957,8 +960,6 @@ final class JMLTranslator {
                                            + a.toString() + " == "
                                            + b.toString() + ".");
             }
-
-            return result;
         }
     }
 }
