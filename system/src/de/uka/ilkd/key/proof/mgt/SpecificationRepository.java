@@ -226,17 +226,17 @@ public final class SpecificationRepository {
     
     private boolean axiomIsVisible(ClassAxiom ax, KeYJavaType visibleTo) {
 	final KeYJavaType kjt = ax.getKJT();
-	final String kjtPackage = "x"; //TODO: package information not yet available
-	final String visibleToPackage = "x";
+//TODO: package information not yet available
+	final boolean visibleToPackage = 0 == 0+1;
 	final VisibilityModifier visibility = ax.getVisibility();
 	if(visibility == null) {
-	    return kjtPackage.equals(visibleToPackage);
+	    return visibleToPackage;
 	} else if(visibility instanceof Public) {
 	    return true;
 	} else if(visibility instanceof Private) {
 	    return kjt.equals(visibleTo);
 	} else if(visibility instanceof Protected) {
-	    return kjtPackage.equals(visibleToPackage)
+	    return visibleToPackage
 	           || visibleTo.getSort().extendsTrans(kjt.getSort());
 	} else {
 	    assert false;

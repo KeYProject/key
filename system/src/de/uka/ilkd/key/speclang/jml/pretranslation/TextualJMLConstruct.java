@@ -21,10 +21,18 @@ public abstract class TextualJMLConstruct {
     
     protected final ImmutableList<String> mods;
     
+    /** A user-provided identifier to keep an overview over large specification collections */
+    protected String name;
+    
     
     public TextualJMLConstruct(ImmutableList<String> mods) {
         assert mods != null;
         this.mods = mods;
+    }
+    
+    public TextualJMLConstruct(ImmutableList<String> mods, String name){
+        this(mods);
+        this.name = name;
     }
     
     

@@ -237,13 +237,22 @@ class_invariant[ImmutableList<String> mods]
 	throws SLTranslationException
 {
     PositionedString ps;
+    String name = null;
 }
 :
-    invariant_keyword ps=expression
+    invariant_keyword
+//    (name=axiom_name)?
+    ps=expression
     {
-    	TextualJMLClassInv inv = new TextualJMLClassInv(mods, ps);
+    	TextualJMLClassInv inv = name == null ? new TextualJMLClassInv(mods, ps) : new TextualJMLClassInv(mods, ps, name);
     	result = ImmutableSLList.<TextualJMLConstruct>nil().prepend(inv);
     }
+;
+
+axiom_name returns [String result = null] throws SLTranslationException
+:
+    AXIOM_NAME_BEGIN id:IDENT AXIOM_NAME_END
+    { result = id.getText(); }
 ;
 
 

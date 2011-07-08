@@ -137,7 +137,7 @@ tokens {
     WORKING_SPACE_LOCAL 		= "working_space_local";
     WORKING_SPACE_CALLER 		= "working_space_caller";
     WORKING_SPACE_REENTRANT 		= "working_space_reentrant";
-    WRITABLE			= "writable";    
+    WRITABLE			= "writable";   
 }
 
 
@@ -410,3 +410,21 @@ EXPRESSION
     )* 
     {parenthesesCounter == 0}? ';'
 ;
+    
+
+    AXIOM_NAME_BEGIN
+    options {
+      paraphrase = "`['";
+    }
+        :
+        '[' 
+        ;
+
+    AXIOM_NAME_END
+    options {
+      paraphrase = "`]'";
+    }
+        :
+        ']' 
+        ;
+  

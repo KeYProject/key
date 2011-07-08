@@ -28,6 +28,10 @@ public final class TextualJMLRepresents extends TextualJMLConstruct {
         this.represents = represents;
     }
     
+    public TextualJMLRepresents (ImmutableList<String> mods, PositionedString represents, String name){
+        this(mods,represents);
+        this.name = name;
+    }
     
     public PositionedString getRepresents() {
         return represents;
@@ -52,5 +56,9 @@ public final class TextualJMLRepresents extends TextualJMLConstruct {
     @Override
     public int hashCode() {
         return mods.hashCode() + represents.hashCode();
+    }
+    
+    public String getName(){
+        return name;
     }
 }
