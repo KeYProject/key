@@ -309,8 +309,23 @@ options {
             throws ParserException {
         // prepare namespaces
         NamespaceSet namespaces = services.getNamespaces().copy();
-
-        System.out.println(namespaces.programVariables());
+        Namespace programVariables = namespaces.programVariables();
+        
+        if(heapAtPre != null && heapAtPre.op() instanceof ProgramVariable) {
+            programVariables.add(heapAtPre.op());
+        }
+        
+        if(selfVar != null) {
+            programVariables.add(selfVar);
+        }
+        
+        if(resultVar != null) {
+            programVariables.add(resultVar);
+        }
+        
+        for (ProgramVariable param : paramVars) {
+            programVariables.add(param);
+        }
         
         SLExpression result = new SLExpression(TB.parseTerm(string, services, namespaces));
         return result;
