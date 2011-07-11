@@ -20,24 +20,21 @@ header {
     import de.uka.ilkd.key.java.Position;
     import de.uka.ilkd.key.java.Services;
     import de.uka.ilkd.key.java.abstraction.*;
-    import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
-    import de.uka.ilkd.key.java.declaration.ClassDeclaration;
     import de.uka.ilkd.key.java.expression.literal.StringLiteral;
     import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
     import de.uka.ilkd.key.ldt.*;
     import de.uka.ilkd.key.logic.*;
     import de.uka.ilkd.key.logic.op.*;
     import de.uka.ilkd.key.logic.sort.*;
+    import de.uka.ilkd.key.parser.ParserException;
     import de.uka.ilkd.key.proof.OpReplacer;
     import de.uka.ilkd.key.speclang.PositionedString;
     import de.uka.ilkd.key.speclang.translation.*;
     import de.uka.ilkd.key.util.Pair;
     import de.uka.ilkd.key.util.Triple;    
 
-    import java.lang.RuntimeException;
     import java.math.BigInteger;
     import java.util.Map;
-    import java.util.Iterator;
     import java.util.LinkedHashMap;
 }
 
@@ -147,13 +144,15 @@ options {
 
     private void raiseError(String msg) throws SLTranslationException {
 	throw excManager.createException(msg);
-    }
-    
+    }    
     
     private void raiseError(String msg, Token t) throws SLTranslationException {
 	throw excManager.createException(msg, t);
     }
     
+    private void raiseError(String msg, Token t, Exception cause) throws SLTranslationException {
+        throw excManager.createException(msg, t, cause);
+    }
     
     private void raiseNotSupported(String feature) 
 	    throws SLTranslationException {
@@ -305,6 +304,18 @@ options {
 	
 	return null;
     }
+    
+    private SLExpression parseEmbeddedJavaDL(String string) 
+            throws ParserException {
+        // prepare namespaces
+        NamespaceSet namespaces = services.getNamespaces().copy();
+
+        System.out.println(namespaces.programVariables());
+        
+        SLExpression result = new SLExpression(TB.parseTerm(string, services, namespaces));
+        return result;
+    }
+           
 
 
     private Term getFields(Term t) throws SLTranslationException {
@@ -1427,9 +1438,19 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 	    }
 	}
 	
-    |   INFORMAL_DESCRIPTION 
+    |   desc:INFORMAL_DESCRIPTION 
 	{
-	    raiseNotSupported("informal predicates");
+	    // was: raiseNotSupported("informal predicates");
+	    
+	    // strip leading and trailing (* ... *)
+            String text = desc.getText();
+            text = text.substring(2, text.length() - 2);
+            // System.out.println("Parse " + text);
+            try {
+                result = parseEmbeddedJavaDL(text);
+            } catch(ParserException ex) {
+                raiseError("Error in embedded JavaDL", desc, ex);
+            }
 	}
     |   NOT_MODIFIED LPAREN t=storereflist RPAREN
         {

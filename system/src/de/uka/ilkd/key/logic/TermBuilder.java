@@ -14,6 +14,8 @@ import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.sun.org.apache.xml.internal.resolver.helpers.Namespaces;
+
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -24,7 +26,26 @@ import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.ElementaryUpdate;
+import de.uka.ilkd.key.logic.op.Equality;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IfThenElse;
+import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.ObserverFunction;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ParsableVariable;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.Quantifier;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SubstOp;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.op.UpdateJunctor;
+import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -63,23 +84,42 @@ public final class TermBuilder {
     //-------------------------------------------------------------------------
     // build terms using the KeY parser
     //-------------------------------------------------------------------------
-    
-    /** 
-     * Parses the given string that represents the term (or formula)
-     * using the default namespaces.
+
+    /**
+     * Parses the given string that represents the term (or formula) using the
+     * service's namespaces.
      * 
-     * @param s the String to parse
+     * @param s
+     *            the String to parse
+     * @param services
+     *            the services to be used for parsing
      */
     public Term parseTerm(String s, Services services)
         throws ParserException
     {
-	AbbrevMap abbr = (services.getProof() == null)
-	               ? null : services.getProof().abbreviations();
+	return parseTerm(s, services, services.getNamespaces());
+    }
+
+    /**
+     * Parses the given string that represents the term (or formula) using the
+     * provided namespaces.
+     * 
+     * @param s
+     *            the String to parse
+     * @param services
+     *            the services to be used for parsing
+     * @param namespaces
+     *            the namespaces used for name lookup.
+     */
+    public Term parseTerm(String s, Services services, NamespaceSet namespaces)
+        throws ParserException
+    {
+        AbbrevMap abbr = (services.getProof() == null)
+                       ? null : services.getProof().abbreviations();
         Term term = new DefaultTermParser().parse(
-           new StringReader(s), null, services, services.getNamespaces(), abbr);
+           new StringReader(s), null, services, namespaces, abbr);
         return term;
     }
-    
     
     //-------------------------------------------------------------------------
     //naming
