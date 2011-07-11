@@ -31,6 +31,7 @@ public class RedBlackTree implements AbstractMap {
 
     private Node root;
     //@ invariant !root.isRed;
+    //@ invariant root.parent == Node.NIL;
     
     //@ invariant root.redBlackInvariant;
 
@@ -40,6 +41,8 @@ public class RedBlackTree implements AbstractMap {
     
     //@ ghost \seq theNodes;
     
+    /** Constructs RB tree with default value.
+     * @param d default value */
     public RedBlackTree (int d){
         //@ set theNodes = \seq_empty;
         deefolt = d;
@@ -159,6 +162,7 @@ public class RedBlackTree implements AbstractMap {
         else return x.value;
     }
     
+    //@ requires true;
     //@ ensures (\exists int i; 0 <= i && i < theNodes.length; ((Node)theNodes[i]).key == key) ? \result.key == key : \result == Node.NIL;
     private /*@ pure @*/ Node get(int key){
         Node x = root;
@@ -186,12 +190,17 @@ public class RedBlackTree implements AbstractMap {
     /*@ normal_behavior
       @ requires z != Node.NIL;
       @ requires \invariant_for(this);
+      @ ensures root == z <==> root.isRed;
+      @ ensures z.redBlackInvariant && z.isRed;
       @ assignable root, z.parent;
       @ helper
       @*/
     private void insert (Node z){
         Node x = root;
         Node y = Node.NIL;
+        /*@ maintaining y == Node.NIL || (y == x.parent && (y.left == x ? z.key < y.key : z.key > y.key));
+          @ decreasing x.height;
+          @*/
         while (x != Node.NIL){
             y = x;
             if (z.key < x.key)
@@ -212,10 +221,19 @@ public class RedBlackTree implements AbstractMap {
     /** &quot;Repairs&quot; the tree so red-black properties hold again; */
     /*@ normal_behavior
       @   requires z != Node.NIL && \invariant_for(z);
+      @   requires \invariant_for(z.parent);
+      @   requires z.isRed;
+      @   requires root == z <==> root.isRed;
       @   ensures \invariant_for(this);
       @ helper
       @*/
     private void insertFix(Node z) {
+        /*@ maintaining z.isRed;
+          @ maintaining z.parent == root ==> !z.parent.isRed;
+          @ maintaining z.redBlackInvariant;
+          @ maintaining z.parent == z.parent.parent.left ? z.parent.parent.right.redBlackInvariant : z.parent.parent.left.redBlackInvariant;
+          @ decreasing root.height - z.height;
+          @*/
         while (z.parent.isRed) {
             if (z.parent == z.parent.parent.left) {
                 Node y = z.parent.parent.right;
@@ -261,7 +279,7 @@ public class RedBlackTree implements AbstractMap {
       @   ensures \old(root) == x || (\exists Node y; y == \old(x.parent); \old(x.parent.left) == x ? (y.left == x.parent && y.right == \old(x.parent.right)) : (y.left == \old(x.parent.left) && y.right == x.parent)); 
       @   ensures root == (\old(root) == x ? x.parent : \old(root));
       @   ensures \invariant_for(x.parent);
-      @   assignable root, x.parent, x.parent.left, x.parent.right; x.right, x.right.parent, x.right.left, x.height, x.right.height;
+      @   assignable root, x.parent, x.parent.left, x.parent.right, x.right, x.right.parent, x.right.left, x.height, x.right.height;
       @ also normal_behavior
       @   requires x != Node.NIL && x.right != Node.NIL;
       @   assignable \nothing;

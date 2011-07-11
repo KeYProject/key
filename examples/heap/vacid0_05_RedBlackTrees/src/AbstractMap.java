@@ -16,25 +16,42 @@ package vacid0.redblacktree;
  * @author bruns
  *
  */
-interface AbstractMap{
+public interface AbstractMap{
 
-    //@ model instance int defaultValue;
-    //@ model instance int[] contents;
+    //@ final model instance int defaultValue;
+    //@ model instance \seq contents;
+    //@ model instance \locset footprint;
+    
+    //@ model instance boolean isEmpty;
+    //@ represents isEmpty = (\forall int i; 0 <= i; contents[i] == defaultValue);
 
-    //@ initially (\forall int i; 0 <= i; contents[i] == defaultValue);
+    //@ initially isEmpty;
+    
+    //@ accessible \inv : footprint;
+    //@ accessible contents : footprint;
+    //@ accessible footprint : footprint;
+    //@ invariant (\forall AbstractMap x; x != this; \disjoint(footprint,x.footprint));
 
     /** Set the value of key; add it if it is not in the map yet */
-    //@ requires key >= 0;
-    //@ ensures contents[key] == value;
+    /*@ normal_behavior
+      @ requires key >= 0;
+      @ ensures contents == \seq_put(\old(contents),key,value);
+      @ assignable footprint;
+      @*/
     public void replace (int key, int value);
 
     /** Remove key from the map */
-    //@ requires key >= 0;
-    //@ ensures contents[key] == defaultValue;
+    /*@ normal_behavior
+      @ requires key >= 0;
+      @ ensures contents == \seq_put(\old(contents),key,defaultValue);
+      @ assignable footprint;
+      @*/
     public void remove (int key);
 
     /** Lookup the key; if it is not in the map, return the default value */
-    //@ requires key >= 0;
-    //@ ensures \result == contents[key];
+    /*@ normal_behavior
+      @ requires key >= 0;
+      @ ensures \result == contents[key];
+      @*/
     public /*@ pure @*/ int lookup (int key);
 }
