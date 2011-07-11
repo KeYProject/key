@@ -305,34 +305,6 @@ options {
 	return null;
     }
     
-    private SLExpression parseEmbeddedJavaDL(String string) 
-            throws ParserException {
-        // prepare namespaces
-        NamespaceSet namespaces = services.getNamespaces().copy();
-        Namespace programVariables = namespaces.programVariables();
-        
-        if(heapAtPre != null && heapAtPre.op() instanceof ProgramVariable) {
-            programVariables.add(heapAtPre.op());
-        }
-        
-        if(selfVar != null) {
-            programVariables.add(selfVar);
-        }
-        
-        if(resultVar != null) {
-            programVariables.add(resultVar);
-        }
-        
-        for (ProgramVariable param : paramVars) {
-            programVariables.add(param);
-        }
-        
-        SLExpression result = new SLExpression(TB.parseTerm(string, services, namespaces));
-        return result;
-    }
-           
-
-
     private Term getFields(Term t) throws SLTranslationException {
         if(t.op().equals(locSetLDT.getUnion())) {
             final Term sub0 = getFields(t.sub(0));
@@ -1391,7 +1363,7 @@ decimalnumeral returns [SLExpression result=null] throws SLTranslationException
 
 jmlprimary returns [SLExpression result=null] throws SLTranslationException
 {
-    ImmutableList<SLExpression> list;
+    ImmutableList<SLExpression> list = null;
     SLExpression e1 = null;
     SLExpression e2 = null;
     SLExpression e3 = null;
@@ -1456,17 +1428,15 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
     |   desc:INFORMAL_DESCRIPTION 
 	{
 	    // was: raiseNotSupported("informal predicates");
-	    
-	    // strip leading and trailing (* ... *)
-            String text = desc.getText();
-            text = text.substring(2, text.length() - 2);
-            // System.out.println("Parse " + text);
-            try {
-                result = parseEmbeddedJavaDL(text);
-            } catch(ParserException ex) {
-                raiseError("Error in embedded JavaDL", desc, ex);
-            }
+	    result = translator.<SLExpression>translate("(* *)", services, desc, 
+	        selfVar, resultVar, paramVars, heapAtPre);
 	}
+	
+    |   escape:DL_ESCAPE LPAREN ( list=expressionlist )? RPAREN
+        {
+            result = translator.<SLExpression>translate("\\dl_", escape, list, services);
+        }
+        
     |   NOT_MODIFIED LPAREN t=storereflist RPAREN
         {
             raiseNotSupported("\\not_modified");

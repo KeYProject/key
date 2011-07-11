@@ -11,6 +11,7 @@
 package de.uka.ilkd.key.speclang.translation;
 
 import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 
 
@@ -53,6 +54,12 @@ public class SLTranslationException extends ProofInputException {
     }
     
     
+    public SLTranslationException(String message, Throwable cause) {
+        this(message);
+        initCause(cause);
+    }
+
+
     public String getFileName() {
         return fileName;
     }
