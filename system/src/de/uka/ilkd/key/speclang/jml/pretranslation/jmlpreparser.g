@@ -249,6 +249,7 @@ class_invariant[ImmutableList<String> mods]
     }
 ;
 
+/** Introduce a user-given name to axiom-like declarations. */
 axiom_name returns [String result = null] throws SLTranslationException
 :
     AXIOM_NAME_BEGIN id:IDENT AXIOM_NAME_END

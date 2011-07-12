@@ -225,25 +225,26 @@ public final class SpecificationRepository {
     
     
     private boolean axiomIsVisible(ClassAxiom ax, KeYJavaType visibleTo) {
-	final KeYJavaType kjt = ax.getKJT();
-//TODO: package information not yet available
-	final boolean visibleToPackage = 0 == 0+1;
-	final VisibilityModifier visibility = ax.getVisibility();
-	if(visibility == null) {
-	    return visibleToPackage;
-	} else if(visibility instanceof Public) {
-	    return true;
-	} else if(visibility instanceof Private) {
-	    return kjt.equals(visibleTo);
-	} else if(visibility instanceof Protected) {
-	    return visibleToPackage
-	           || visibleTo.getSort().extendsTrans(kjt.getSort());
-	} else {
-	    assert false;
-	    return false;
-	}
+        final KeYJavaType kjt = ax.getKJT();
+        //TODO: package information not yet available
+        // DISCUSSION: how should it be treated in the mean time? as public? Our specifications rarely stretch over different packages... 
+        final boolean visibleToPackage = true;
+        final VisibilityModifier visibility = ax.getVisibility();
+        if(visibility == null) {
+            return visibleToPackage;
+        } else if(visibility instanceof Public) {
+            return true;
+        } else if(visibility instanceof Private) {
+            return kjt.equals(visibleTo);
+        } else if(visibility instanceof Protected) {
+            return visibleToPackage
+            || visibleTo.getSort().extendsTrans(kjt.getSort());
+        } else {
+            assert false;
+            return false;
+        }
     }
-    
+
     
     private ImmutableSet<ClassAxiom> getVisibleAxiomsOfOtherClasses(
 	    						KeYJavaType visibleTo) {
