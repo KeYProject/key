@@ -40,6 +40,7 @@ import recoder.service.ChangeHistory;
 import recoder.service.DefaultCrossReferenceSourceInfo;
 import recoder.service.NameInfo;
 import recoder.service.UnresolvedReferenceException;
+import de.uka.ilkd.key.java.recoderext.DLEmbeddedExpression;
 import de.uka.ilkd.key.java.recoderext.AllFields;
 import de.uka.ilkd.key.java.recoderext.ClassFileDeclarationBuilder;
 import de.uka.ilkd.key.java.recoderext.EmptySeqLiteral;
@@ -617,6 +618,9 @@ public class KeYCrossReferenceSourceInfo
                   || expr instanceof SeqSub
                   || expr instanceof SeqReverse) {
 	    return seqType;
+	} else if(expr instanceof DLEmbeddedExpression) {
+	    // TODO This is not good at all, but does not fail.
+	    return null;
 	} else {
 	    return super.getType(expr);
 	}

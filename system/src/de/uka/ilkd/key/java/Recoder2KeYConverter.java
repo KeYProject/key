@@ -735,7 +735,7 @@ public class Recoder2KeYConverter {
         if(named == null || !(named instanceof Function)) {
             // TODO provide position information?!
             throw new ConvertException("In an embedded DL expression, " + name 
-                    + " is not a known DL function name in");
+                    + " is not a known DL function name. Line/Col:" + e.getStartPosition());
         }
         
         Function f = (Function) named;

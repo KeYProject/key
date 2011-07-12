@@ -1429,12 +1429,12 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 	{
 	    // was: raiseNotSupported("informal predicates");
 	    result = translator.<SLExpression>translate("(* *)", services, desc, 
-	        selfVar, resultVar, paramVars, heapAtPre);
+	        selfVar, resultVar, paramVars, heapAtPre, excManager);
 	}
 	
     |   escape:DL_ESCAPE LPAREN ( list=expressionlist )? RPAREN
         {
-            result = translator.<SLExpression>translate("\\dl_", escape, list, services);
+            result = translator.<SLExpression>translate("\\dl_", escape, list, services, excManager);
         }
         
     |   NOT_MODIFIED LPAREN t=storereflist RPAREN

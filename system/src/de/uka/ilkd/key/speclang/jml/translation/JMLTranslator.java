@@ -13,7 +13,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import antlr.Token;
-import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
@@ -37,9 +37,7 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.translation.SLExpression;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.speclang.translation.SLTranslationExceptionManager;
-import de.uka.ilkd.key.util.LinkedHashMap;
-import de.uka.ilkd.key.util.Pair;
-import de.uka.ilkd.key.util.Triple;
+import de.uka.ilkd.key.util.*;
 
 
 
@@ -342,7 +340,8 @@ final class JMLTranslator {
 
                 checkParameters(params, Services.class, Token.class,
                         LocationVariable.class, LocationVariable.class, 
-                        ImmutableList.class, Term.class);
+                        ImmutableList.class, Term.class, 
+                        SLTranslationExceptionManager.class);
                 
                 Services services = (Services) params[0];
                 Token desc = (Token) params[1]; 
@@ -351,6 +350,8 @@ final class JMLTranslator {
                 ImmutableList<LocationVariable> paramVars = 
                     (ImmutableList<LocationVariable>) params[4];
                 Term heapAtPre = (Term) params[5];
+                SLTranslationExceptionManager excMan = 
+                    (SLTranslationExceptionManager) params[6];
                 
                 // strip leading and trailing (* ... *)
                 String text = desc.getText();
@@ -380,9 +381,8 @@ final class JMLTranslator {
                 try {
                     result = new SLExpression(TB.parseTerm(text, services, namespaces));
                     return result;
-                } catch (ParserException e) {
-                    // TODO throw exception with line number information
-                    throw new SLTranslationException("Cannot parse embedded JavaDL: " + text, e);
+                } catch (ParserException ex) {
+                    throw excMan.createException("Cannot parse embedded JavaDL: " + text, desc, ex);
                 }
             }
         });
@@ -390,15 +390,23 @@ final class JMLTranslator {
         translationMethods.put("\\dl_", new JMLTranslationMethod() {
             @Override
             public Object translate(Object... params) throws SLTranslationException {
-                checkParameters(params, Token.class, ImmutableList.class, Services.class);
+                checkParameters(params, Token.class, ImmutableList.class, Services.class,
+                        SLTranslationExceptionManager.class);
+                
                 Token escape = (Token) params[0];
                 ImmutableList<SLExpression> list = (ImmutableList<SLExpression>) params[1];
                 Services services = (Services) params[2];
+                SLTranslationExceptionManager excMan = (SLTranslationExceptionManager) params[3];
 
                 // strip leading "\dl_"
                 String functName = escape.getText().substring(4);
                 Namespace funcs = services.getNamespaces().functions();
                 Named symbol = funcs.lookup(new Name(functName));
+                
+                if(symbol == null) {
+                    throw excMan.createException("Unknown function symbol " + functName, escape);
+                }
+                
                 assert symbol instanceof Function : "Expecting a function symbol in this namespace";
                 Function function = (Function) symbol;
                                     
@@ -418,9 +426,14 @@ final class JMLTranslator {
                 }
                                     
                 // TODO Catch TermCreationException and throw exception with line number
-                Term resultTerm = TB.func(function, args, null);
-                SLExpression result = new SLExpression(resultTerm);
-                return result;
+                try {
+                    Term resultTerm = TB.func(function, args, null);
+                    SLExpression result = new SLExpression(resultTerm);
+                    return result;
+                } catch (TermCreationException ex) {
+                    throw excMan.createException("Cannot create term " + function.name() + 
+                            "(" + MiscTools.join(args, ", ") + ")", escape, ex);
+                }
             }
         });
     }

@@ -172,6 +172,7 @@ public final class TypeConverter {
 	} else if(op instanceof DLEmbeddedExpression) {
 	    DLEmbeddedExpression emb = (DLEmbeddedExpression) op;
 	    Function f = emb.getFunctionSymbol();
+	    // TODO make a sensible error recovery
 	    return TB.func(f, subs);
 	} else {
 	    Debug.out("typeconverter: no data type model "+
