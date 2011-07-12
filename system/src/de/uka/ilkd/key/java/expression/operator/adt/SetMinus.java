@@ -9,20 +9,16 @@
 //
 
 
-package de.uka.ilkd.key.java.expression.operator;
+package de.uka.ilkd.key.java.expression.operator.adt;
 
 import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.expression.Operator;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.expression.operator.BinaryOperator;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.util.ExtList;
 
-public class AllFields extends Operator {
+public class SetMinus extends BinaryOperator {
 
-    public AllFields(ExtList children) {
+    public SetMinus(ExtList children) {
         super(children);
     }
 
@@ -38,19 +34,12 @@ public class AllFields extends Operator {
 
 
     public void visit(Visitor v) {
-	v.performActionOnAllFields(this);
+	v.performActionOnSetMinus(this);
     }
 
     
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printAllFields(this);
+        p.printSetMinus(this);
     }
 
-    public int getArity() {
-        return 1;
-    }
-
-    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
-	return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LOCSET);
-    }    
 }

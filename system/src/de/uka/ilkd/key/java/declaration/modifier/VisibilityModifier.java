@@ -21,7 +21,7 @@ import de.uka.ilkd.key.util.ExtList;
  */
 
 public abstract class VisibilityModifier 
-    extends Modifier {
+    extends Modifier implements Comparable<VisibilityModifier>{
 
     public VisibilityModifier() {
     }

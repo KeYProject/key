@@ -8,48 +8,60 @@
 //
 //
 
-package de.uka.ilkd.key.java.expression.operator;
+
+package de.uka.ilkd.key.java.expression.operator.adt;
 
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.util.ExtList;
 
-public class Singleton extends Operator {
+public class SeqSub extends Operator {
 
-    public Singleton(ExtList children) {
+    public SeqSub(ExtList children) {
         super(children);
     }
 
 
+    @Override    
     public int getPrecedence() {
         return 0;
     }
 
 
+    @Override    
     public int getNotation() {
         return PREFIX;
     }
 
 
+    @Override    
     public void visit(Visitor v) {
-	v.performActionOnSingleton(this);
+	v.performActionOnSeqSub(this);
     }
 
-    
+
+    @Override    
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printSingleton(this);
+        p.printSeqSub(this);
     }
-
+    
+    
+    @Override
     public int getArity() {
-        return 1;
+	return 3;
     }
-
+    
+    
+    @Override
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
-	return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LOCSET);
+	final TypeConverter tc=javaServ.getTypeConverter();
+	return tc.getPromotedType
+	    (tc.getKeYJavaType((de.uka.ilkd.key.java.Expression)getChildAt(0), ec),
+	     tc.getKeYJavaType((de.uka.ilkd.key.java.Expression)getChildAt(1), ec));
     }    
 }

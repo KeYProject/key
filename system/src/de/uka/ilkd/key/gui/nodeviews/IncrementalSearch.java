@@ -10,7 +10,6 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.Color;
-import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.regex.Matcher;
@@ -22,15 +21,19 @@ import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.util.Pair;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.event.ActionListener;
+import java.awt.FlowLayout;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JTextField;
+import javax.swing.border.LineBorder;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -51,14 +54,16 @@ public class IncrementalSearch {
 
     private static IncrementalSearch instance = new IncrementalSearch();
 
-    private String searchStr;
+    private final DocumentListenerAdapter documentListenerAdapter;
 
+    private String searchStr;
     private List<Pair<Integer,Object>> searchResults;
     private int resultIteratorPos;
 
     private SequentView seqView;
-
     private SearchDialog searchDialog;
+
+    private boolean regExpSearch;
 
     /**
      * create and initialize a new incremental search run
@@ -70,6 +75,8 @@ public class IncrementalSearch {
         seqView = null;
         searchStr = "";
         searchResults = new ArrayList<Pair<Integer,Object>>();
+        documentListenerAdapter = new DocumentListenerAdapter();
+        regExpSearch = false;
         searchDialog = new SearchDialog();
         searchDialog.addKeyListener(new KeyListener() {
 
@@ -100,7 +107,7 @@ public class IncrementalSearch {
             }
 
         });
-        searchDialog.addDocumentListener(new DocumentListenerAdapter());
+        searchDialog.addDocumentListener(documentListenerAdapter);
     }
 
     
@@ -136,7 +143,7 @@ public class IncrementalSearch {
             disableSearch();
         }
         this.seqView = seqView;
-        this.seqView.getDocument().addDocumentListener(new DocumentListenerAdapter());
+        this.seqView.getDocument().addDocumentListener(documentListenerAdapter);
         searchDialog.setVisible(true);
         searchPattern();
     }
@@ -149,7 +156,7 @@ public class IncrementalSearch {
         searchDialog.setVisible(false);
         if (seqView != null) {
             clearSearchResults();
-            seqView.getDocument().removeDocumentListener(new DocumentListenerAdapter());
+            seqView.getDocument().removeDocumentListener(documentListenerAdapter);
             seqView = null;
         }
     }
@@ -172,37 +179,37 @@ public class IncrementalSearch {
      * searches for the occurence of the specified string
      */
     public void searchPattern() {
+        clearSearchResults();
+
         if (seqView == null || seqView.getText() == null || searchStr.equals("")) {
-            clearSearchResults();
             searchDialog.deactivateAllertColor();
             return;
         }
-       
-        String escaped = searchStr.replaceAll
-            ("([\\+ | \\* | \\| | \\\\ | \\[ | \\] | \\{ | \\} | \\( | \\)])", 
-            "\\\\$1");       
 
-        clearSearchResults();
         searchResults.clear();
         resultIteratorPos = 0;
 
-        int caseInsensitiveFlag = 0;
-
-        // no capital letters used --> case insensitive matching
+        int searchFlag = 0;
         if (searchStr.toLowerCase().equals(searchStr)) {
-            caseInsensitiveFlag = Pattern.CASE_INSENSITIVE;
+            // no capital letters used --> case insensitive matching
+            searchFlag = searchFlag | Pattern.CASE_INSENSITIVE
+                    | Pattern.UNICODE_CASE;
+        }
+        if (!regExpSearch) {
+            // search for literal string instead of regExp
+            searchFlag = searchFlag | Pattern.LITERAL;
         }
 
-        
         Pattern p;
-        try { 
-            p = Pattern.compile(escaped, caseInsensitiveFlag);
-        } catch (PatternSyntaxException pse) {           
+        try {
+            p = Pattern.compile(searchStr, searchFlag);
+        } catch (PatternSyntaxException pse) {
+            searchDialog.activateAllertColor();
             return;
         } catch (IllegalArgumentException iae) {
+            searchDialog.activateAllertColor();
             return;
         }
-        
         Matcher m = p.matcher(seqView.getText());
 
         boolean loopEnterd = false;
@@ -210,8 +217,7 @@ public class IncrementalSearch {
                 int foundAt = m.start();
                 Object highlight = seqView.getColorHighlight(SEARCH_HIGHLIGHT_COLOR_2);
                 searchResults.add(new Pair<Integer,Object>(foundAt, highlight));
-                seqView.paintHighlight(new Range(foundAt, foundAt
-                        + searchStr.length()), highlight);
+                seqView.paintHighlight(new Range(foundAt, m.end()), highlight);
                 loopEnterd = true;
         }
         if (loopEnterd) {
@@ -252,6 +258,12 @@ public class IncrementalSearch {
     }
 
 
+    public void setRegExpSearch(boolean b) {
+        regExpSearch = b;
+        searchPattern();
+    }
+
+
     
 
     private class SearchDialog extends JDialog {
@@ -264,6 +276,18 @@ public class IncrementalSearch {
 
         public SearchDialog() {
             super((JDialog)null, "Search", false);
+            getContentPane().setLayout(new FlowLayout());
+            getContentPane().add(initTextField());
+            getContentPane().add(initRegExpCheckbox());
+            setAlwaysOnTop(true);
+            addWindowListener(new WindowAdapter() {
+                public void windowClosing(WindowEvent e) {
+                    disableSearch();
+                }
+            });
+        }
+
+        private JComponent initTextField() {
             textField = new JTextField();
             textField.setPreferredSize(INIT_SIZE);
             textField.setToolTipText("<html>"
@@ -278,13 +302,19 @@ public class IncrementalSearch {
                                      + "highlight previous occurrence<br>"
                                      + "<b>ESC</b>: disable search"
                                      + "</html>");
-            getContentPane().add(textField);
-            setAlwaysOnTop(true);
-            addWindowListener(new WindowAdapter() {
-                public void windowClosing(WindowEvent e) {
-                    disableSearch();
+            return textField;
+        }
+
+        private JComponent initRegExpCheckbox() {
+            JCheckBox checkBox = new JCheckBox("RegExp");
+            checkBox.addItemListener(new ItemListener() {
+                @Override
+                public void itemStateChanged(ItemEvent e) {
+                    regExpCheckBoxChanged((JCheckBox)e.getItemSelectable());
                 }
             });
+            checkBox.setSelected(regExpSearch);
+            return checkBox;
         }
 
 
@@ -319,7 +349,12 @@ public class IncrementalSearch {
             textField.setBackground(Color.WHITE);
         }
 
-        
+
+        private void regExpCheckBoxChanged(JCheckBox regExpBox) {
+            setRegExpSearch(regExpBox.isSelected());
+        }
+
+
         @Override
         public void setVisible(boolean b) {
             if (seqView != null

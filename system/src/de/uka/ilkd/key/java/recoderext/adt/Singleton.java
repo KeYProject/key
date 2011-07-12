@@ -8,53 +8,41 @@
 //
 //
 
-package de.uka.ilkd.key.java.recoderext;
+package de.uka.ilkd.key.java.recoderext.adt;
 
 import recoder.java.Expression;
 import recoder.java.SourceVisitor;
 import recoder.java.expression.Operator;
 
 
-public class SetUnion extends Operator {
+public class Singleton extends ADTPrefixConstruct {
 
-    public SetUnion(Expression lhs, Expression rhs) {
-	super(lhs, rhs);
+    public Singleton(Expression lhs) {
+	super(lhs);
 	makeParentRoleValid();
     }
 
 
-    protected SetUnion(SetUnion proto) {
+    protected Singleton(Singleton proto) {
 	super(proto);
 	makeParentRoleValid();
     }
     
 
     @Override    
-    public SetUnion deepClone() {
-	return new SetUnion(this);
+    public Singleton deepClone() {
+	return new Singleton(this);
     }
 
 
     @Override    
     public int getArity() {
-	return 2;
-    }
-
-    
-    @Override    
-    public int getPrecedence() {
-	return 0;
+	return 1;
     }
 
     
     @Override    
     public int getNotation() {
 	return PREFIX;
-    }
-   
-    
-    @Override    
-    public void accept(SourceVisitor v) {
-	
     }
 }

@@ -8,30 +8,32 @@
 //
 //
 
-package de.uka.ilkd.key.java.recoderext;
+package de.uka.ilkd.key.java.recoderext.adt;
 
 import recoder.java.Expression;
 import recoder.java.SourceVisitor;
 import recoder.java.expression.Operator;
+import recoder.list.generic.ASTArrayList;
 
 
-public class Singleton extends Operator {
+public class SeqReverse extends ADTPrefixConstruct {
 
-    public Singleton(Expression lhs) {
-	super(lhs);
+    public SeqReverse(Expression e) {
+	children = new ASTArrayList<Expression>(getArity());
+	children.add(e);
 	makeParentRoleValid();
     }
 
 
-    protected Singleton(Singleton proto) {
+    protected SeqReverse(SeqReverse proto) {
 	super(proto);
 	makeParentRoleValid();
     }
     
 
     @Override    
-    public Singleton deepClone() {
-	return new Singleton(this);
+    public SeqReverse deepClone() {
+	return new SeqReverse(this);
     }
 
 
@@ -42,19 +44,12 @@ public class Singleton extends Operator {
 
     
     @Override    
-    public int getPrecedence() {
-	return 0;
-    }
-
-    
-    @Override    
     public int getNotation() {
 	return PREFIX;
     }
-   
     
-    @Override    
-    public void accept(SourceVisitor v) {
-	
+    @Override
+    public String toSource(){
+        return "\\seq_reverse("+children.get(0).toSource()+")";
     }
 }

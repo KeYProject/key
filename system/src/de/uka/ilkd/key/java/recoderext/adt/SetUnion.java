@@ -8,30 +8,30 @@
 //
 //
 
-package de.uka.ilkd.key.java.recoderext;
+package de.uka.ilkd.key.java.recoderext.adt;
 
 import recoder.java.Expression;
 import recoder.java.SourceVisitor;
 import recoder.java.expression.Operator;
 
 
-public class SetMinus extends Operator {
+public class SetUnion extends ADTPrefixConstruct {
 
-    public SetMinus(Expression lhs, Expression rhs) {
+    public SetUnion(Expression lhs, Expression rhs) {
 	super(lhs, rhs);
 	makeParentRoleValid();
     }
 
 
-    protected SetMinus(SetMinus proto) {
+    protected SetUnion(SetUnion proto) {
 	super(proto);
 	makeParentRoleValid();
     }
     
 
     @Override    
-    public SetMinus deepClone() {
-	return new SetMinus(this);
+    public SetUnion deepClone() {
+	return new SetUnion(this);
     }
 
 
@@ -42,19 +42,7 @@ public class SetMinus extends Operator {
 
     
     @Override    
-    public int getPrecedence() {
-	return 0;
-    }
-
-    
-    @Override    
     public int getNotation() {
 	return PREFIX;
-    }
-   
-    
-    @Override    
-    public void accept(SourceVisitor v) {
-	
     }
 }

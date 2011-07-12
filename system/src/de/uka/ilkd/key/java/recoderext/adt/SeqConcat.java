@@ -8,44 +8,36 @@
 //
 //
 
-package de.uka.ilkd.key.java.recoderext;
+package de.uka.ilkd.key.java.recoderext.adt;
 
 import recoder.java.Expression;
 import recoder.java.SourceVisitor;
 import recoder.java.expression.Operator;
-import recoder.list.generic.ASTArrayList;
 
 
-public class SeqReverse extends Operator {
+public class SeqConcat extends ADTPrefixConstruct {
 
-    public SeqReverse(Expression e) {
-	children = new ASTArrayList<Expression>(getArity());
-	children.add(e);
+    public SeqConcat(Expression lhs, Expression rhs) {
+	super(lhs, rhs);
 	makeParentRoleValid();
     }
 
 
-    protected SeqReverse(SeqReverse proto) {
+    protected SeqConcat(SeqConcat proto) {
 	super(proto);
 	makeParentRoleValid();
     }
     
 
     @Override    
-    public SeqReverse deepClone() {
-	return new SeqReverse(this);
+    public SeqConcat deepClone() {
+	return new SeqConcat(this);
     }
 
 
     @Override    
     public int getArity() {
-	return 1;
-    }
-
-    
-    @Override    
-    public int getPrecedence() {
-	return 0;
+	return 2;
     }
 
     
@@ -53,10 +45,9 @@ public class SeqReverse extends Operator {
     public int getNotation() {
 	return PREFIX;
     }
-   
     
-    @Override    
-    public void accept(SourceVisitor v) {
-	
+    @Override
+    public String toSource(){
+        return "\\seq_concat("+children.get(0).toSource()+","+children.get(1).toSource()+")";
     }
 }

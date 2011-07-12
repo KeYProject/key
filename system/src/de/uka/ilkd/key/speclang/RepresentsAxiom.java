@@ -53,19 +53,31 @@ public final class RepresentsAxiom extends ClassAxiom {
 	                   VisibilityModifier visibility,
 	                   Term rep,
 	                   ProgramVariable selfVar) {
-	assert name != null;
-	assert kjt != null;
-	assert target != null;
-	assert rep.sort() == Sort.FORMULA;
-	assert (selfVar == null) == target.isStatic();
-	this.name = name;
-	this.target = target;
-	this.kjt = kjt;
-	this.visibility = visibility;
-	this.originalRep = rep;
-	this.originalSelfVar = selfVar;
+        this(name,null,target,kjt,visibility,rep,selfVar);
     }
     
+    
+    public RepresentsAxiom(String name,
+            String displayName,
+            ObserverFunction target, 
+                KeYJavaType kjt,
+                VisibilityModifier visibility,
+                Term rep,
+                ProgramVariable selfVar) {
+
+        assert name != null;
+        assert kjt != null;
+        assert target != null;
+        assert rep.sort() == Sort.FORMULA;
+        assert (selfVar == null) == target.isStatic();
+        this.name = name;
+        this.target = target;
+        this.kjt = kjt;
+        this.visibility = visibility;
+        this.originalRep = rep;
+        this.originalSelfVar = selfVar;
+        this.displayName = displayName;
+    }
     
     private boolean isFunctional() {
 	return originalRep.op() instanceof Equality
@@ -363,8 +375,4 @@ public final class RepresentsAxiom extends ClassAxiom {
     }
 
 
-    @Override
-    public String getDisplayName() {
-	return getName();
-    }
 }

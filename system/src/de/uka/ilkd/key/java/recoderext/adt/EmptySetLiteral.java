@@ -9,16 +9,16 @@
 //
 
 
-package de.uka.ilkd.key.java.recoderext;
+package de.uka.ilkd.key.java.recoderext.adt;
 
 import recoder.java.Expression;
 import recoder.java.SourceVisitor;
 import recoder.java.expression.Literal;
 
 
-public final class EmptySeqLiteral extends Literal {
+public final class EmptySetLiteral extends Literal {
     
-    public static final EmptySeqLiteral INSTANCE = new EmptySeqLiteral();
+    public static final EmptySetLiteral INSTANCE = new EmptySetLiteral();
     
     @Override
     public Expression deepClone() {

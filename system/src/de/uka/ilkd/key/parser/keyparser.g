@@ -55,6 +55,7 @@ header {
   import de.uka.ilkd.key.java.StatementBlock;
   import de.uka.ilkd.key.java.declaration.VariableDeclaration;
   import de.uka.ilkd.key.java.recoderext.*;
+  import de.uka.ilkd.key.java.recoderext.adt.*;
   import de.uka.ilkd.key.pp.AbbrevMap;
   import de.uka.ilkd.key.pp.LogicPrinter;
 }
@@ -239,7 +240,7 @@ options {
 		     Services services,
 		     NamespaceSet nss) {
 	this(mode, lexer, 
-	     new Recoder2KeY(
+	     new Recoder2KeY(services,
 		new KeYCrossReferenceServiceConfiguration(
 		   services.getExceptionHandler()), 
 		services.getJavaInfo().rec2key(), new NamespaceSet(), 
