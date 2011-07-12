@@ -381,6 +381,7 @@ final class JMLTranslator {
                     result = new SLExpression(TB.parseTerm(text, services, namespaces));
                     return result;
                 } catch (ParserException e) {
+                    // TODO throw exception with line number information
                     throw new SLTranslationException("Cannot parse embedded JavaDL: " + text, e);
                 }
             }
@@ -416,6 +417,7 @@ final class JMLTranslator {
                     }
                 }
                                     
+                // TODO Catch TermCreationException and throw exception with line number
                 Term resultTerm = TB.func(function, args, null);
                 SLExpression result = new SLExpression(resultTerm);
                 return result;

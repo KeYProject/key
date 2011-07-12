@@ -58,10 +58,6 @@ import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.util.SpecDataLocation;
 
 
-/**
- * @author mattias
- *
- */
 public class KeYCrossReferenceSourceInfo
     extends DefaultCrossReferenceSourceInfo {
 

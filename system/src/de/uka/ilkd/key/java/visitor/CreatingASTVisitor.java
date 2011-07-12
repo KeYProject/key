@@ -1206,6 +1206,26 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         def.doAction(x);	
     } 
     
+    @Override
+    public void performActionOnSeqReverse(SeqReverse x) {
+        DefaultAction def = new DefaultAction(x) {
+            ProgramElement createNewElement(ExtList changeList) {
+                return new SeqReverse(changeList);
+            }
+        };
+        def.doAction(x);        
+    } 
+    
+    @Override
+    public void performActionOnDLEmbeddedExpression(final DLEmbeddedExpression x) {
+        DefaultAction def = new DefaultAction(x) {
+            ProgramElement createNewElement(ExtList changeList) {
+                return new DLEmbeddedExpression(x.getFunctionSymbol(), changeList);
+            }
+        };
+        def.doAction(x);        
+    } 
+    
     
     @Override
     public void performActionOnSeqSub(SeqSub x) {

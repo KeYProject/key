@@ -1028,6 +1028,22 @@ public class PrettyPrinter {
         write(")");
         printFooter(x);
     }          
+    
+    public void printDLEmbeddedExpression(
+            DLEmbeddedExpression x) throws IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+        writeToken(0, "\\dl_" + x.getFunctionSymbol().name(), x);
+        write("(");
+        for (int i = 0; i < x.getChildCount(); i++) {
+            if(i != 0) {
+                write(",");
+            }
+            writeElement(0, x.getChildAt(i));
+        }
+        write(")");
+        printFooter(x); 
+    } 
 
     public void printStringLiteral(StringLiteral x) throws java.io.IOException {
         printHeader(x);
@@ -2793,6 +2809,6 @@ public class PrettyPrinter {
         }
         write(")");
 	output();
-    }    
+    }
 
 }

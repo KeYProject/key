@@ -13,6 +13,8 @@
 package de.uka.ilkd.key.java;
 
 import java.lang.reflect.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.util.*;
 
 import recoder.CrossReferenceServiceConfiguration;
@@ -20,26 +22,39 @@ import recoder.abstraction.ClassType;
 import recoder.abstraction.Type;
 import recoder.java.NonTerminalProgramElement;
 import recoder.list.generic.ASTList;
-import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.*;
+import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.abstraction.Field;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.declaration.modifier.*;
+import de.uka.ilkd.key.java.declaration.modifier.Ghost;
+import de.uka.ilkd.key.java.declaration.modifier.Model;
 import de.uka.ilkd.key.java.expression.*;
+import de.uka.ilkd.key.java.expression.PassiveExpression;
 import de.uka.ilkd.key.java.expression.literal.*;
+import de.uka.ilkd.key.java.expression.literal.EmptySeqLiteral;
+import de.uka.ilkd.key.java.expression.literal.EmptySetLiteral;
 import de.uka.ilkd.key.java.expression.operator.*;
-import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
-import de.uka.ilkd.key.java.recoderext.ImplicitIdentifier;
+import de.uka.ilkd.key.java.expression.operator.AllFields;
+import de.uka.ilkd.key.java.expression.operator.DLEmbeddedExpression;
+import de.uka.ilkd.key.java.expression.operator.Intersect;
+import de.uka.ilkd.key.java.expression.operator.SeqConcat;
+import de.uka.ilkd.key.java.expression.operator.SeqReverse;
+import de.uka.ilkd.key.java.expression.operator.SeqSingleton;
+import de.uka.ilkd.key.java.expression.operator.SeqSub;
+import de.uka.ilkd.key.java.expression.operator.SetMinus;
+import de.uka.ilkd.key.java.expression.operator.SetUnion;
+import de.uka.ilkd.key.java.expression.operator.Singleton;
+import de.uka.ilkd.key.java.recoderext.*;
 import de.uka.ilkd.key.java.reference.*;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.*;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.VariableNamer;
+import de.uka.ilkd.key.java.statement.CatchAllStatement;
+import de.uka.ilkd.key.java.statement.MethodBodyStatement;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.ExtList;
+import de.uka.ilkd.key.util.*;
 
 
 /**
@@ -89,9 +104,10 @@ public class Recoder2KeYConverter {
         return (CompilationUnit) result;
     }
 
-    public Recoder2KeYConverter(Recoder2KeY rec2key) {
+    public Recoder2KeYConverter(Recoder2KeY rec2key, NamespaceSet nss) {
         super();
         this.rec2key = rec2key;
+        this.namespaceSet = nss;
     }
 
     // -------- implementation part
@@ -145,6 +161,12 @@ public class Recoder2KeYConverter {
      * the associated Recoder2KeY object
      */
     private Recoder2KeY rec2key;
+    
+    /**
+     * The namespaces are here to provide some conversion functions access to
+     * previously defined logical symbols.
+     */
+    private final NamespaceSet namespaceSet;
 
     /**
      * retrieve a key type using the converter available from Recoder2KeY
@@ -677,7 +699,6 @@ public class Recoder2KeYConverter {
 	return new AllFields(children);
     }
     
-    
     public EmptySeqLiteral convert(de.uka.ilkd.key.java.recoderext.EmptySeqLiteral e) {
 	return EmptySeqLiteral.INSTANCE;
     }    
@@ -700,7 +721,26 @@ public class Recoder2KeYConverter {
     public SeqReverse convert(de.uka.ilkd.key.java.recoderext.SeqReverse e) {
         ExtList children = collectChildren(e);	
 	return new SeqReverse(children);
-    }    
+    }
+    
+    /**
+     * Resolve the function symbol which is embedded here to its logical
+     * counterpart.
+     */
+    public DLEmbeddedExpression convert(de.uka.ilkd.key.java.recoderext.DLEmbeddedExpression e) {
+        ExtList children = collectChildren(e);
+        String name = e.getFunctionName();
+        Named named = namespaceSet.functions().lookup(new Name(name));
+        
+        if(named == null || !(named instanceof Function)) {
+            // TODO provide position information?!
+            throw new ConvertException("In an embedded DL expression, " + name 
+                    + " is not a known DL function name in");
+        }
+        
+        Function f = (Function) named;
+        return new DLEmbeddedExpression(f, children);
+    }
 
     /** convert a recoder StringLiteral to a KeY StringLiteral */
     public StringLiteral convert(

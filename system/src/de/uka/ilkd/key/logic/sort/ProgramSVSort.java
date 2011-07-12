@@ -516,7 +516,9 @@ public abstract class ProgramSVSort extends AbstractSort {
 		|| pe instanceof AllFields
 		|| pe instanceof SeqSingleton
 		|| pe instanceof SeqConcat
-		|| pe instanceof SeqSub) {
+		|| pe instanceof SeqSub
+		|| pe instanceof SeqReverse
+		|| pe instanceof DLEmbeddedExpression) {
 		return true;
 	    }
 	    

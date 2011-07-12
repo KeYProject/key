@@ -577,6 +577,14 @@ TOKEN :
   >
 }
 
+// Token for JML embedding of JavaDL functions:
+TOKEN :
+{
+ < DL_EMBEDDED_FUNCTION:
+    "\\dl_" <LETTER> (<LETTER>|<DIGIT>)* 
+ >
+}
+
 
 
 /* SEPARATORS */
@@ -2333,6 +2341,8 @@ Expression Expression() :
         result = new SeqReverse(expr);
         setPrefixInfo(result);
     }
+    |
+    result = EmbeddedDLExpression()
   )
   {
       checkConstruction(result);
@@ -2341,7 +2351,27 @@ Expression Expression() :
   }
 }
 
-
+Expression EmbeddedDLExpression() :
+{
+   List<Expression> arguments = new ArrayList<Expression>();
+   Expression expr;
+   Token t;
+}
+{
+    t=<DL_EMBEDDED_FUNCTION> "(" 
+      (
+        expr = Expression() { arguments.add(expr); }
+        ( "," expr = Expression() { arguments.add(expr); } )*
+      )?  ")"
+      
+    { 
+      // strip leading "\dl_"
+      String functionName = t.image.substring(4);
+      DLEmbeddedExpression result = new DLEmbeddedExpression(functionName, arguments);
+      setPrefixInfo(result);
+      return result;
+    }
+}
 
 Assignment AssignmentOperator() :
 {
