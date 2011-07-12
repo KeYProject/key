@@ -1,6 +1,7 @@
 package java.lang;
 
 public class AssertionError extends java.lang.Error {
+    public AssertionError(){}
     public AssertionError(java.lang.Object detailMessage) {}
     public AssertionError(boolean detailMessage){}
     public AssertionError(char detailMessage)   {}
