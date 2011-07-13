@@ -303,7 +303,7 @@ public class InvariantConfigurator {
 	    }
 
 	    /**
-	     * copy the current invariant to another tabe
+	     * copy the current invariant to another tab
 	     * 
 	     * @param e
 	     */
@@ -373,9 +373,6 @@ public class InvariantConfigurator {
 		panel.add(vararea);
 		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
 
-		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setLayout(new ScrollPaneLayout());
-		panel.add(scrollPane);
 		inputPane.addTab("Inv " + (invariants.size() - 1), panel);
 
 	    }
