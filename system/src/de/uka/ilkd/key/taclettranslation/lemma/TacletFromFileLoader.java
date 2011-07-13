@@ -11,26 +11,31 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletBuilder;
 
 
-public class TacletLoader {
-        public static TacletLoader INSTANCE = new TacletLoader();
+public class TacletFromFileLoader implements de.uka.ilkd.key.taclettranslation.TacletSoundnessPOLoader.TacletLoader{
+        public static TacletFromFileLoader INSTANCE = new TacletFromFileLoader();
 
         private InitConfig createInitConfig(InitConfig reference) {
                 InitConfig newConfig = reference.copy();
 
                 newConfig.setTaclets(DefaultImmutableSet.<Taclet> nil());
                 newConfig.setTaclet2Builder(new HashMap<Taclet, TacletBuilder>());
-
+               
                 return newConfig;
         }
 
+        
         public ImmutableSet<Taclet> load(KeYUserProblemFile keyFile,
-                        InitConfig reference) throws ProofInputException {
+                        InitConfig reference) 
+                        {
                 // this ensures that necessary Java types are loaded
                 InitConfig config = createInitConfig(reference);
 
                 keyFile.setInitConfig(config);
-                keyFile.readRulesAndProblem();
-
+                try{
+                        keyFile.readRulesAndProblem();
+                }catch(Throwable e){
+                        throw new RuntimeException(e);
+                }
                 return config.getTaclets();
         }
 

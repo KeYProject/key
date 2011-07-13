@@ -3,6 +3,7 @@ package de.uka.ilkd.key.taclettranslation;
 import java.io.File;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.TreeSet;
 import java.util.Vector;
@@ -25,8 +26,9 @@ import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletBuilder;
 import de.uka.ilkd.key.taclettranslation.lemma.ProofObligationCreator;
-import de.uka.ilkd.key.taclettranslation.lemma.TacletLoader;
+import de.uka.ilkd.key.taclettranslation.lemma.TacletFromFileLoader;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
@@ -44,6 +46,7 @@ public class TacletSoundnessPOLoader {
                         .nil();
         private final ProblemInitializer problemInitializer;
         private final ProblemInitializerListener piListener;
+        private final TacletLoader       tacletLoader;
         private TacletFilter tacletFilter;
 
         static public interface LoaderListener {
@@ -57,6 +60,10 @@ public class TacletSoundnessPOLoader {
 
         static public interface TacletFilter {
                 public ImmutableSet<Taclet> filter(Vector<TacletInfo> taclets);
+        }
+        
+        static public interface TacletLoader{
+                public ImmutableSet<Taclet> load(KeYUserProblemFile file, InitConfig initConfig);
         }
 
         static public class TacletInfo {
@@ -90,9 +97,9 @@ public class TacletSoundnessPOLoader {
                         File file, ProofEnvironment referenceEnv,
                         LoaderListener listener,
                         ProblemInitializerListener piListener,
-                        TacletFilter filter,boolean loadAsLemmata) {
+                        TacletFilter filter,boolean loadAsLemmata,TacletLoader loader) {
                 this(progressMonitor, file, referenceEnv, listener, piListener,
-                                filter, null, file,loadAsLemmata);
+                                filter, null, file,loadAsLemmata,loader);
         }
 
         public TacletSoundnessPOLoader(ProgressMonitor progressMonitor,
@@ -100,7 +107,7 @@ public class TacletSoundnessPOLoader {
                         LoaderListener listener,
                         ProblemInitializerListener piListener,
                         TacletFilter filter, Collection<File> filesForAxioms,
-                        File fileForDefinitions, boolean loadAsLemmata) {
+                        File fileForDefinitions, boolean loadAsLemmata, TacletLoader loader) {
                 super();
                 this.progressMonitor = progressMonitor;
                 this.file = file;
@@ -109,6 +116,7 @@ public class TacletSoundnessPOLoader {
                 this.fileForDefinitions = fileForDefinitions == null ? file
                                 : fileForDefinitions;
                 this.loadAsLemmata = loadAsLemmata;
+                this.tacletLoader = loader;
 
                 if (filesForAxioms != null) {
                         this.filesForAxioms.addAll(filesForAxioms);
@@ -209,7 +217,7 @@ public class TacletSoundnessPOLoader {
                 for (File f : files) {
                         KeYUserProblemFile keyFile = new KeYUserProblemFile(
                                         f.getName(), f, pm);
-                        ImmutableSet<Taclet> taclets = TacletLoader.INSTANCE
+                        ImmutableSet<Taclet> taclets = TacletFromFileLoader.INSTANCE
                                         .load(keyFile, initConfig);
                         proofEnvForTaclets.registerRules(taclets,
                                         AxiomJustification.INSTANCE);
@@ -239,7 +247,7 @@ public class TacletSoundnessPOLoader {
                                 initConfig, progressMonitor,
                                 problemInitializer, env) :  emptySet;
 
-                ImmutableSet<Taclet> taclets = TacletLoader.INSTANCE.load(
+                ImmutableSet<Taclet> taclets = tacletLoader.load(
                                 keyFile, initConfig);
 
                 Vector<TacletInfo> collectionOfTacletInfo = createTacletInfo(
@@ -267,6 +275,7 @@ public class TacletSoundnessPOLoader {
         private ProofAggregate createProof(ProofEnvironment proofEnvForTaclets,
                         ImmutableSet<Taclet> taclets,
                         KeYUserProblemFile keyFile, ImmutableSet<Taclet> axioms) {
+                removeTaclets(proofEnvForTaclets.getInitConfig(),taclets);
                 ProofObligationCreator creator = new ProofObligationCreator();
                 ProofAggregate p = creator.create(taclets,
                                 proofEnvForTaclets.getInitConfig(), axioms,
@@ -276,6 +285,20 @@ public class TacletSoundnessPOLoader {
 
                 registerProofs(p, proofEnvForTaclets, keyFile);
                 return p;
+        }
+        
+        private void removeTaclets(InitConfig initConfig, ImmutableSet<Taclet> taclets){
+                ImmutableSet<Taclet> oldTaclets = initConfig.getTaclets();
+                ImmutableSet<Taclet> newTaclets = DefaultImmutableSet.nil();
+                HashMap<Taclet,TacletBuilder> map = initConfig.getTaclet2Builder();
+                for(Taclet taclet: oldTaclets){
+                        if(!taclets.contains(taclet)){
+                                newTaclets = newTaclets.add(taclet);
+                        }else{
+                                map.remove(taclet);
+                        }
+                }
+                initConfig.setTaclets(newTaclets);
         }
 
         public void registerProofs(ProofAggregate aggregate,

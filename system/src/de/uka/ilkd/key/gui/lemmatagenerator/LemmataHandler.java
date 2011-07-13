@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.gui.lemmatagenerator;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -9,24 +8,21 @@ import java.util.Vector;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.ProofSaver;
-import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProblemInitializer.ProblemInitializerListener;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.TacletSoundnessPOLoader;
 import de.uka.ilkd.key.taclettranslation.TacletSoundnessPOLoader.LoaderListener;
 import de.uka.ilkd.key.taclettranslation.TacletSoundnessPOLoader.TacletFilter;
 import de.uka.ilkd.key.taclettranslation.TacletSoundnessPOLoader.TacletInfo;
 import de.uka.ilkd.key.taclettranslation.lemma.AutomaticProver;
-import de.uka.ilkd.key.util.KeYRecoderExcHandler;
+import de.uka.ilkd.key.taclettranslation.lemma.TacletFromFileLoader;
 
 public class LemmataHandler implements TacletFilter {
         private final LemmataAutoModeOptions options;
@@ -93,8 +89,8 @@ public class LemmataHandler implements TacletFilter {
                         }
                 };
                 TacletSoundnessPOLoader loader = new TacletSoundnessPOLoader(
-                                null, file, createEnvironment(),
-                                loaderListener, new Listener(), this,filesForAxioms,fileForDefinitions,true);
+                                null, file,EnvironmentCreator.create(options.getHomePath(),null,new Listener(),profile),
+                                loaderListener, new Listener(), this,filesForAxioms,fileForDefinitions,true,TacletFromFileLoader.INSTANCE);
                 loader.start();
         }
         
@@ -106,29 +102,7 @@ public class LemmataHandler implements TacletFilter {
                 return list;
         }
 
-        private ProofEnvironment createEnvironment() throws IOException,
-                        ProofInputException {
-                File dummyFile = createDummyKeYFile();
-                KeYUserProblemFile dummyKeYFile = new KeYUserProblemFile(
-                                dummyFile.getName(), dummyFile, null);
 
-                ProblemInitializer pi = new ProblemInitializer(null, profile,
-                                new Services(new KeYRecoderExcHandler()),
-                                false, new Listener());
-
-                return pi.prepare(dummyKeYFile).getProofEnv();
-        }
-
-        private File createDummyKeYFile() throws IOException {
-                File file = new File(options.getHomePath() + File.separator
-                                + "lemmataGenDummy.key");
-                file.deleteOnExit();
-                String s = "\\problem{true}";
-                FileWriter writer = new FileWriter(file);
-                writer.write(s);
-                writer.close();
-                return file;
-        }
 
         private void handleException(Throwable exception) {
                 printException(exception);

@@ -128,13 +128,14 @@ public class ProofObligationCreator {
                 collectUserDefinedSymbols(formula.getFormula(), userDefinedSymbols);
    
                 String header = userDefinedSymbols.createHeader(initConfig.getServices());
+          
       
                 Proof proof = new Proof(name, formula.getFormula(), header,
                                 initConfig.createTacletIndex(),
                                 initConfig.createBuiltInRuleIndex(),
                                 initConfig.getServices());
          
-
+                     
                 userDefinedSymbols.addSymbolsToNamespaces(proof.getNamespaces());
    
                 return ProofAggregate.createProofAggregate(proof, name);

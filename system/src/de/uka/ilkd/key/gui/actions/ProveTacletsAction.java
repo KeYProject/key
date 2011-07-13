@@ -14,6 +14,7 @@ import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.TacletSoundnessPOLoader;
 import de.uka.ilkd.key.taclettranslation.TacletSoundnessPOLoader.LoaderListener;
+import de.uka.ilkd.key.taclettranslation.lemma.TacletFromFileLoader;
 
 public class ProveTacletsAction extends MainWindowAction{
         private static final long serialVersionUID = 1L;
@@ -66,7 +67,7 @@ public class ProveTacletsAction extends MainWindowAction{
                 TacletSoundnessPOLoader loader = new TacletSoundnessPOLoader(
                             mainWindow.getUserInterface(), fileForLemmata, proof.env(), listener,
                             mainWindow.getUserInterface(), new LemmaSelectionDialog(), filesForAxioms,
-                                        fileForDefinitions,loadAsLemmata
+                                        fileForDefinitions,loadAsLemmata,TacletFromFileLoader.INSTANCE
                                         );
                 loader.start();
 
