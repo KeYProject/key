@@ -4,6 +4,7 @@ public class StringSet {
     private /*@ spec_public @*/ int size;
 
     /*@ public instance invariant this.size > 0; @*/
+    /*@ private instance invariant \typeof(elements) == \type(String[]); @*/
 
     /*@ public instance invariant
       @   this.elements != null && this.elements.length == this.size;

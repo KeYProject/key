@@ -293,6 +293,7 @@
 ./standard_key/strings/charAt0.key
 ./standard_key/strings/charAt1.key
 ./standard_key/strings/concat1.key
+./standard_key/strings/concat2.key
 ./standard_key/strings/deriveLength1.key
 ./standard_key/strings/emptyStringLengthZero.key
 ./standard_key/strings/implicitBooleanStringConversion.key

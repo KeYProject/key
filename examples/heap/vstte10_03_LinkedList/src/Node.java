@@ -37,7 +37,7 @@ class Node {
     /*@ public normal_behaviour
       @   ensures 0 <= \result;      
       @   ensures \result < seq.length && seq[\result] == 0
-      @           || \result == seq.length:
+      @           || \result == seq.length;
       @   ensures (\forall int x; 0 <= x && x < \result; seq[x] != 0);
       @*/
     public /*@pure@*/ int search() {
