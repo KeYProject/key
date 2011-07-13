@@ -10,7 +10,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletBuilder;
 
-
+/*
 public class TacletFromFileLoader implements de.uka.ilkd.key.taclettranslation.TacletSoundnessPOLoader.TacletLoader{
         public static TacletFromFileLoader INSTANCE = new TacletFromFileLoader();
 
@@ -40,3 +40,4 @@ public class TacletFromFileLoader implements de.uka.ilkd.key.taclettranslation.T
         }
 
 }
+*/

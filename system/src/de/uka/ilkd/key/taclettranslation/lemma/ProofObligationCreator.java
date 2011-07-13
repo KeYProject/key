@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.taclettranslation.lemma;
 
+import java.util.Collection;
+
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
@@ -14,6 +16,7 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer.ProblemInitializerListener;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
+import de.uka.ilkd.key.taclettranslation.TacletSoundnessPOLoader.LoaderListener;
 import de.uka.ilkd.key.taclettranslation.TacletVisitor;
 
 
@@ -41,19 +44,25 @@ public class ProofObligationCreator {
          */
         public ProofAggregate create(ImmutableSet<Taclet> taclets,
                         InitConfig initConfig, ImmutableSet<Taclet> axioms,
-                        ProblemInitializerListener listener) {
+                        Collection<LoaderListener> listeners) {
                 initConfig.setTaclets(initConfig.getTaclets().union(axioms));
                 ProofAggregate[] singleProofs = new ProofAggregate[taclets
                                 .size()];
                 int i = 0;
-                listener.progressStarted(this);
+                for(LoaderListener listener : listeners){
+                        listener.progressStarted(this);
+          
+                }
                 UserDefinedSymbols symbolsForAxioms = analyzeTaclets(axioms,initConfig.namespaces());
                 
                 symbolsForAxioms.addSymbolsToNamespaces(initConfig.namespaces());
                 
                 for (Taclet taclet : taclets) {
-                        listener.reportStatus(this, "Create Lemma for "
+                        for(LoaderListener listener : listeners){
+                                listener.reportStatus(this, "Create Lemma for "
                                         + taclet.name());
+                                
+                        }
                         singleProofs[i] = create(taclet, initConfig,symbolsForAxioms);
                         i++;
                 }
@@ -62,7 +71,9 @@ public class ProofObligationCreator {
                                                 singleProofs,
                                                 createName(singleProofs));
                 // listener.progressStopped(this);
-                listener.resetStatus(this);
+                  for(LoaderListener listener : listeners){
+                          listener.resetStatus(this);
+                  }
                 return proofAggregate;
         }
         

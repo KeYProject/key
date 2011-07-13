@@ -26,7 +26,7 @@ public class EnvironmentCreator  {
                 ProblemInitializer pi = new ProblemInitializer(monitor, profile,
                                 new Services(new KeYRecoderExcHandler()),
                                 false, listener );
-
+               
                 return pi.prepare(dummyKeYFile).getProofEnv();
         }
 

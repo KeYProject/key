@@ -78,7 +78,6 @@ import de.uka.ilkd.key.gui.actions.OpenFileAction;
 import de.uka.ilkd.key.gui.actions.OpenMostRecentFileAction;
 import de.uka.ilkd.key.gui.actions.PrettyPrintToggleAction;
 import de.uka.ilkd.key.gui.actions.ProofManagementAction;
-import de.uka.ilkd.key.gui.actions.ProveTacletsAction;
 import de.uka.ilkd.key.gui.actions.SMTOptionsAction;
 import de.uka.ilkd.key.gui.actions.SaveFileAction;
 import de.uka.ilkd.key.gui.actions.ShowActiveSettingsAction;
@@ -227,8 +226,7 @@ public final class MainWindow extends JFrame  {
     private LemmaGenerationAction loadUserDefinedTacletsForProvingAction;
     private LemmaGenerationAction loadKeYTaclets;
     
-    /** action for proving taclets independently from the curren proof*/
-    private ProveTacletsAction proveTacletsAction;
+
     
     public static final String AUTO_MODE_TEXT = "Start/stop automated proof search";
 
@@ -395,11 +393,11 @@ public final class MainWindow extends JFrame  {
         proofManagementAction     = new ProofManagementAction(this);
         exitMainAction            = new ExitMainAction(this);
         showActiveSettingsAction  = new ShowActiveSettingsAction(this);
-        loadUserDefinedTacletsAction = new LemmaGenerationAction(this,Mode.ProveAndAddUserDefinedTaclets);
-        loadUserDefinedTacletsForProvingAction = new LemmaGenerationAction(this, Mode.ProveUserDefinedTaclets);
-        loadKeYTaclets            = new LemmaGenerationAction(this, Mode.ProveKeYTaclets);
+        loadUserDefinedTacletsAction = new LemmaGenerationAction.ProveAndAddTaclets(this);
+        loadUserDefinedTacletsForProvingAction = new LemmaGenerationAction.ProveUserDefinedTaclets(this);
+        loadKeYTaclets            = new LemmaGenerationAction.ProveKeYTaclets(this);
         
-        proveTacletsAction       = new ProveTacletsAction(this);
+       // proveTacletsAction       = new ProveTacletsAction(this);
         
 	
 	
@@ -756,7 +754,8 @@ public final class MainWindow extends JFrame  {
         JMenu submenu = new JMenu("Prove...");
         fileMenu.add(submenu);
         
-        submenu.add(proveTacletsAction);
+        submenu.add(loadUserDefinedTacletsForProvingAction);
+        submenu.add(loadKeYTaclets);
         fileMenu.addSeparator();
         fileMenu.add(recentFiles.getMenu());
         fileMenu.addSeparator();

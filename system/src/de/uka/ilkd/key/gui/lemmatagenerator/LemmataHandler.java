@@ -17,12 +17,10 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.taclettranslation.TacletSoundnessPOLoader;
 import de.uka.ilkd.key.taclettranslation.TacletSoundnessPOLoader.LoaderListener;
 import de.uka.ilkd.key.taclettranslation.TacletSoundnessPOLoader.TacletFilter;
 import de.uka.ilkd.key.taclettranslation.TacletSoundnessPOLoader.TacletInfo;
 import de.uka.ilkd.key.taclettranslation.lemma.AutomaticProver;
-import de.uka.ilkd.key.taclettranslation.lemma.TacletFromFileLoader;
 
 public class LemmataHandler implements TacletFilter {
         private final LemmataAutoModeOptions options;
@@ -87,11 +85,30 @@ public class LemmataHandler implements TacletFilter {
                         public void started() {
                                 println("Start loading the problem");
                         }
+
+                        @Override
+                        public void progressStarted(Object sender) {
+                                // TODO Auto-generated method stub
+                                
+                        }
+
+                        @Override
+                        public void reportStatus(Object sender, String string) {
+                                // TODO Auto-generated method stub
+                                
+                        }
+
+                        @Override
+                        public void resetStatus(Object sender) {
+                                // TODO Auto-generated method stub
+                                
+                        }
                 };
+                /*
                 TacletSoundnessPOLoader loader = new TacletSoundnessPOLoader(
                                 null, file,EnvironmentCreator.create(options.getHomePath(),null,new Listener(),profile),
-                                loaderListener, new Listener(), this,filesForAxioms,fileForDefinitions,true,TacletFromFileLoader.INSTANCE);
-                loader.start();
+                                loaderListener, new Listener(), this,filesForAxioms,fileForDefinitions,true);
+                loader.start();*/
         }
         
         private Collection<File> createFilesForAxioms(Collection<String> filenames){
