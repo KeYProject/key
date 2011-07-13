@@ -98,32 +98,8 @@ public final class WhileInvariantRule implements BuiltInRule {
 	LoopInvariant inv = services.getSpecificationRepository()
 	        .getLoopInvariant(loop);
 
-	System.out.println("winvrule: 101");
-	System.out.println(inv == null);
-	System.out.println("u = " + u.toString());
-	/*if (inv != null) {
-	    System.out.println("Heap = "
-		    + inv.getInternalHeapAtPre().toString()
-		    + "\n"
-		    + "selfTerm = "
-		    + inv.getInternalSelfTerm().toString()
-		    + "\n"
-		    + "inv = "
-		    + inv.getInvariant(inv.getInternalSelfTerm(), inv
-		            .getInternalHeapAtPre(), services)
-		    + "\n"
-		    + "mod = "
-		    + inv.getModifies(inv.getInternalSelfTerm(), inv
-		            .getInternalHeapAtPre(), services)
-		    + "\n"
-		    + "var = "
-		    + inv.getVariant(inv.getInternalSelfTerm(), inv
-		            .getInternalHeapAtPre(), services));
-	}*/
-
 	// New
 	if (inv == null) {
-	    System.out.println("winvrule 115 1 branch");
 	    inv = new LoopInvariantImpl(loop,
 		    MiscTools.getInnermostMethodFrame(progPost.javaBlock(),
 		            services) == null ? null : MiscTools.getSelfTerm(
@@ -135,7 +111,6 @@ public final class WhileInvariantRule implements BuiltInRule {
 	        .getInternalHeapAtPre(), services) == null) {// Invariant
 	    // is
 	    // needed
-	    System.out.println("winvrule 125 2 branch");
 	    inv = Main.getInstance().getLoopInvariant(inv, services, false);
 
 	} else if (progPost.op() == Modality.DIA
@@ -144,7 +119,6 @@ public final class WhileInvariantRule implements BuiltInRule {
 	    // is
 	    // needed
 
-	    System.out.println("winvrule 136 3 branch");
 
 	    inv = Main.getInstance().getLoopInvariant(inv, services, true);
 
@@ -160,7 +134,6 @@ public final class WhileInvariantRule implements BuiltInRule {
 	        : (ExecutionContext) innermostMethodFrame.getExecutionContext();
 
 	// cache and return result
-	System.out.println("invrule: 162");
 	Instantiation result = new Instantiation(u, progPost, loop, inv,
 	        selfTerm, innermostExecutionContext);
 	lastFocusTerm = focusTerm;

@@ -9,10 +9,12 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.parser.ParserException;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.LoopInvariantImpl;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -30,6 +32,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.ScrollPaneLayout;
@@ -53,6 +56,10 @@ public class InvariantConfigurator {
     private HashMap<LoopStatement, ArrayList<String[]>> mapLoopsToInvariants = null;
     private int index = 0;
     private LoopInvariant newInvariant = null;
+    private Goal goal = null;
+    
+    // Initialize the Parse
+    final DefaultTermParser p = new DefaultTermParser();
 
     // Methods
 
@@ -89,7 +96,7 @@ public class InvariantConfigurator {
 	if (loopInv == null) {
 	    return null;
 	}
-
+	
 	index = 0;
 	/**
 	 * The given LoopInvariant is put into the List and then handed to the
@@ -121,8 +128,7 @@ public class InvariantConfigurator {
 		    loopInv.getInternalHeapAtPre(), null).toString();
 	}
 
-	System.out.println("given inv:" + loopInvStr[0] + ", " + loopInvStr[1]
-	        + ", " + loopInvStr[2]);
+
 
 	if (!mapLoopsToInvariants.containsKey(loopInv.getLoop())) {
 	    // add the given Invariant
@@ -142,8 +148,7 @@ public class InvariantConfigurator {
 	    }
 	}
 
-	// Initialize the Parse
-	final DefaultTermParser p = new DefaultTermParser();
+
 
 	/*
 	 * local class makes the dialog
@@ -151,32 +156,27 @@ public class InvariantConfigurator {
 
 	class dialog extends JDialog {
 	    private JTabbedPane inputPane;
+	    private JPanel msgPanel = new JPanel();
 
 	    public dialog() {
 		super(Main.getInstance(), true);
-
+		// set Title and Layout
 		setTitle("Invariant Configurator");
 		getContentPane().setLayout(
 		        new BoxLayout(getContentPane(), BoxLayout.PAGE_AXIS));
 		inputPane = new JTabbedPane();
-
+		inputPane.setPreferredSize(new Dimension(200, 200));
 		
-
+		
 		// Create the loop Reprepsentation on top
 		JScrollPane loopRepScrollPane = new JScrollPane();
 		loopRepScrollPane.setLayout(new ScrollPaneLayout());
 		String source = loopInv.getLoop().toSource();
 		JTextArea loopRep = new JTextArea(source);
 		loopRep.setEditable(false);
+		loopRep.setPreferredSize(new Dimension(200, 200));
 		loopRep.setBorder(BorderFactory.createTitledBorder("Loop"));
-		loopRep.add(loopRepScrollPane);
-		// loopPanel.add(loopPrint);
-		// loopPanel.setLayout(new ScrollPaneLayout());
 
-		getContentPane().add(loopRep);
-
-		// Create the input panesgetContentPane
-		JScrollPane scrollPane;
 
 		JTextArea invarea = null;
 		JTextArea modarea = null;
@@ -188,6 +188,10 @@ public class InvariantConfigurator {
 		    modarea = new JTextArea(invariants.get(i)[1]);
 		    vararea = new JTextArea(invariants.get(i)[2]);
 
+		    invarea.setPreferredSize(new Dimension(100, 5));
+		    modarea.setPreferredSize(new Dimension(100, 5));
+		    vararea.setPreferredSize(new Dimension(100, 5));
+
 		    invarea.setBorder(new TitledBorder("Invariant:"));
 		    modarea.setBorder(new TitledBorder("Modifies:"));
 		    vararea.setBorder(new TitledBorder("Variant:"));
@@ -197,9 +201,11 @@ public class InvariantConfigurator {
 			        public void removeUpdate(DocumentEvent e) {
 				    invUdatePerformed(e);
 			        }
+
 			        public void insertUpdate(DocumentEvent e) {
 				    invUdatePerformed(e);
 			        }
+
 			        public void changedUpdate(DocumentEvent e) {
 				    invUdatePerformed(e);
 			        }
@@ -209,9 +215,11 @@ public class InvariantConfigurator {
 			        public void removeUpdate(DocumentEvent e) {
 				    modUdatePerformed(e);
 			        }
+
 			        public void insertUpdate(DocumentEvent e) {
 				    modUdatePerformed(e);
 			        }
+
 			        public void changedUpdate(DocumentEvent e) {
 				    modUdatePerformed(e);
 			        }
@@ -221,15 +229,15 @@ public class InvariantConfigurator {
 			        public void removeUpdate(DocumentEvent e) {
 				    varUdatePerformed(e);
 			        }
+
 			        public void insertUpdate(DocumentEvent e) {
 				    varUdatePerformed(e);
 			        }
+
 			        public void changedUpdate(DocumentEvent e) {
 				    varUdatePerformed(e);
 			        }
 			    });
-		    
-		    
 
 		    JPanel dummy = new JPanel();
 		    dummy.add(invarea);
@@ -237,14 +245,17 @@ public class InvariantConfigurator {
 		    dummy.add(vararea);
 		    dummy.setLayout(new BoxLayout(dummy, BoxLayout.PAGE_AXIS));
 
-		    scrollPane = new JScrollPane();
-		    scrollPane.setLayout(new ScrollPaneLayout());
-		    dummy.add(scrollPane);
+		  
 
 		    inputPane.addTab("Inv " + i, dummy);
+		    inputPane.validate();
 
 		}
-		getContentPane().add(inputPane);
+		
+		JSplitPane split = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
+						loopRep, inputPane);
+		split.setPreferredSize(new Dimension(400, 350));
+		getContentPane().add(split);
 
 		// Add the buttons
 		JPanel buttonPanel = new JPanel();
@@ -256,6 +267,7 @@ public class InvariantConfigurator {
 
 		applyButton.addActionListener(new ActionListener() {
 		    public void actionPerformed(ActionEvent e) {
+			System.out.println("Apply Button pressed!");
 			applyActionPerformed(e);
 		    }
 		});
@@ -269,13 +281,17 @@ public class InvariantConfigurator {
 			storeActionPerformed(e);
 		    }
 		});
-	
 
 		buttonPanel.add(applyButton);
 		buttonPanel.add(storeButton);
 		buttonPanel.add(cancelButton);
 		getContentPane().add(buttonPanel);
 
+		// msgPanel.setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
+		msgPanel.setVisible(false);
+
+		getContentPane().add(msgPanel);
+		
 		this.pack();
 		this.setVisible(true);
 	    }
@@ -294,65 +310,73 @@ public class InvariantConfigurator {
 	    public void storeActionPerformed(ActionEvent aE) {
 		index = inputPane.getSelectedIndex();
 		String[] invs = invariants.get(index).clone();
-		
+		invariants.add(invs);
+
 		JTextArea invarea = new JTextArea(invs[0]);
 		JTextArea modarea = new JTextArea(invs[1]);
 		JTextArea vararea = new JTextArea(invs[2]);
-		
+
 		invarea.setBorder(new TitledBorder("Invariant:"));
 		modarea.setBorder(new TitledBorder("Modifies:"));
 		vararea.setBorder(new TitledBorder("Variant:"));
-		
+
+		invarea.setPreferredSize(new Dimension(100, 5));
+		modarea.setPreferredSize(new Dimension(100, 5));
+		vararea.setPreferredSize(new Dimension(100, 5));
+
 		invarea.getDocument().addDocumentListener(
-			    new DocumentListener() {
-			        public void removeUpdate(DocumentEvent e) {
-				    invUdatePerformed(e);
-			        }
-			        public void insertUpdate(DocumentEvent e) {
-				    invUdatePerformed(e);
-			        }
-			        public void changedUpdate(DocumentEvent e) {
-				    invUdatePerformed(e);
-			        }
-			    });
-		    modarea.getDocument().addDocumentListener(
-			    new DocumentListener() {
-			        public void removeUpdate(DocumentEvent e) {
-				    modUdatePerformed(e);
-			        }
-			        public void insertUpdate(DocumentEvent e) {
-				    modUdatePerformed(e);
-			        }
-			        public void changedUpdate(DocumentEvent e) {
-				    modUdatePerformed(e);
-			        }
-			    });
-		    vararea.getDocument().addDocumentListener(
-			    new DocumentListener() {
-			        public void removeUpdate(DocumentEvent e) {
-				    varUdatePerformed(e);
-			        }
-			        public void insertUpdate(DocumentEvent e) {
-				    varUdatePerformed(e);
-			        }
-			        public void changedUpdate(DocumentEvent e) {
-				    varUdatePerformed(e);
-			        }
-			    });
-		    
-		    
+		        new DocumentListener() {
+			    public void removeUpdate(DocumentEvent e) {
+			        invUdatePerformed(e);
+			    }
 
-		    JPanel dummy = new JPanel();
-		    dummy.add(invarea);
-		    dummy.add(modarea);
-		    dummy.add(vararea);
-		    dummy.setLayout(new BoxLayout(dummy, BoxLayout.PAGE_AXIS));
+			    public void insertUpdate(DocumentEvent e) {
+			        invUdatePerformed(e);
+			    }
 
-		    JScrollPane scrollPane = new JScrollPane();
-		    scrollPane.setLayout(new ScrollPaneLayout());
-		    dummy.add(scrollPane);
-		    inputPane.addTab("Inv " + (invariants.size()-1), dummy);
+			    public void changedUpdate(DocumentEvent e) {
+			        invUdatePerformed(e);
+			    }
+		        });
+		modarea.getDocument().addDocumentListener(
+		        new DocumentListener() {
+			    public void removeUpdate(DocumentEvent e) {
+			        modUdatePerformed(e);
+			    }
 
+			    public void insertUpdate(DocumentEvent e) {
+			        modUdatePerformed(e);
+			    }
+
+			    public void changedUpdate(DocumentEvent e) {
+			        modUdatePerformed(e);
+			    }
+		        });
+		vararea.getDocument().addDocumentListener(
+		        new DocumentListener() {
+			    public void removeUpdate(DocumentEvent e) {
+			        varUdatePerformed(e);
+			    }
+
+			    public void insertUpdate(DocumentEvent e) {
+			        varUdatePerformed(e);
+			    }
+
+			    public void changedUpdate(DocumentEvent e) {
+			        varUdatePerformed(e);
+			    }
+		        });
+
+		JPanel panel = new JPanel();
+		panel.add(invarea);
+		panel.add(modarea);
+		panel.add(vararea);
+		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setLayout(new ScrollPaneLayout());
+		panel.add(scrollPane);
+		inputPane.addTab("Inv " + (invariants.size() - 1), panel);
 
 	    }
 
@@ -365,6 +389,7 @@ public class InvariantConfigurator {
 	    public void applyActionPerformed(ActionEvent e) {
 		index = inputPane.getSelectedIndex();
 		parse();
+		this.dispose();
 	    }
 
 	    public void invUdatePerformed(DocumentEvent d) {
@@ -378,31 +403,28 @@ public class InvariantConfigurator {
 		}
 
 	    }
-	    
+
 	    public void modUdatePerformed(DocumentEvent d) {
 		Document doc = d.getDocument();
 		index = inputPane.getSelectedIndex();
-		
+
 		String[] inv = invariants.get(index);
-		try { 
+		try {
 		    inv[1] = doc.getText(0, doc.getLength());
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 		}
 	    }
+
 	    public void varUdatePerformed(DocumentEvent d) {
 		Document doc = d.getDocument();
 		index = inputPane.getSelectedIndex();
-		
+
 		String[] inv = invariants.get(index);
-		try { 
+		try {
 		    inv[2] = doc.getText(0, doc.getLength());
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 		}
 	    }
-	    
-	    
 
 	    /**
 	     * Calls the parser and creates the Loopinvarant-attribute.
@@ -412,13 +434,16 @@ public class InvariantConfigurator {
 		Term variantTerm = null;
 		Term modifiesTerm = null;
 		try {
-		    
+		    index = inputPane.getSelectedIndex();
 		    invariantTerm = p.parse(new StringReader(invariants
-			    .get(index)[0]), Sort.ANY, services, services.getNamespaces(), null);
+			    .get(index)[0]), Sort.ANY, services, services
+			    .getNamespaces(), null);
 		    variantTerm = p.parse(new StringReader(invariants
-			    .get(index)[1]), Sort.ANY, services, services.getNamespaces(), null);
+			    .get(index)[1]), Sort.FORMULA, services, services
+			    .getNamespaces(), null);
 		    modifiesTerm = p.parse(new StringReader(invariants
-			    .get(index)[2]), Sort.ANY, services, services.getNamespaces(), null);
+			    .get(index)[2]), Sort.ANY, services, services
+			    .getNamespaces(), null);
 
 		    /*
 	             * Check if the Variant is required and empty
@@ -426,21 +451,29 @@ public class InvariantConfigurator {
 		    if (requiresVariant && variantTerm == null) {
 			throw new ParserException("Variant is required!",
 			        new Location(null, 2, 1));
+		    } else if (invariantTerm == null) {
+			throw new ParserException("Invariant is required!",
+			        new Location(null, 1, 1));
+		    } else {
+			newInvariant = new LoopInvariantImpl(loopInv.getLoop(),
+			        invariantTerm, modifiesTerm, variantTerm,
+			        loopInv.getInternalSelfTerm(), loopInv
+			                .getInternalHeapAtPre());
 		    }
-		    newInvariant = new LoopInvariantImpl(loopInv.getLoop(),
-			    invariantTerm, modifiesTerm, variantTerm, loopInv
-			            .getInternalSelfTerm(), loopInv
-			            .getInternalHeapAtPre());
-
 		} catch (ParserException e) {
-		    JOptionPane.showConfirmDialog(Main.getInstance(), e
-			    .getMessage());
+		    JTextArea errorMsg = new JTextArea(e.getMessage());
+		    msgPanel.remove(0);
+		    msgPanel.add(errorMsg, 0);
+		    msgPanel.setVisible(true);
+		    msgPanel.validate();
+		} finally {
 		}
 	    }
 	}
 
 	// Create the Dialog
 	dialog dia = new dialog();
+	dia.dispose();
 
 	return newInvariant;
     }
