@@ -19,6 +19,8 @@ public class OneStepSimplificationToggleAction extends MainWindowAction {
         setName("One Step Simplification");
         putValue(MNEMONIC_KEY, KeyEvent.VK_O);
         putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("control shift S"));
+        putValue(SHORT_DESCRIPTION, "Toggle the aggregation of simplification rules." +
+        		" Faster if on, more transparent if off.");
         
         Image image = IconFactory.getImage("images/toolbar/oneStepSimplifier.png");
         putValue(SMALL_ICON, IconFactory.scaleIcon(image, MainWindow.TOOLBAR_ICON_SIZE, 
