@@ -14,8 +14,6 @@ import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.sun.org.apache.xml.internal.resolver.helpers.Namespaces;
-
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
