@@ -78,7 +78,7 @@ final class JMLTranslator {
         });
         translationMethods.put("depends", new JMLTranslationMethod() {
             @Override
-            public Triple translate(Object... params)
+            public Triple<ObserverFunction, Term, Term> translate(Object... params)
                     throws SLTranslationException {
                 checkParameters(params, SLExpression.class, Term.class,
                                 SLExpression.class,
@@ -415,8 +415,20 @@ final class JMLTranslator {
                     // empty parameter list
                     args = new Term[0];
                 } else {
-                    args = new Term[list.size()];
+                
+                    Term heap = TB.heap(services);
+                    
+                    // special casing "implicit heap" arguments:
+                    // omitting one argument means first argument is "heap"
                     int i = 0;
+                    if(function.arity() == list.size() + 1 
+                            && function.argSort(0) == heap.sort()) {
+                        args = new Term[list.size() + 1];
+                        args[i++] = heap;
+                    } else {
+                        args = new Term[list.size()];
+                    }
+                    
                     for (SLExpression expr : list) {
                         if(!expr.isTerm()) {
                             throw new SLTranslationException("Expecting a term here, not: " + expr);
