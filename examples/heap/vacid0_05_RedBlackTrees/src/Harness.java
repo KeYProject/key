@@ -33,7 +33,21 @@ public class Harness {
     assert(a.lookup(1) == 0 && a.lookup(42) == 0);
     assert(b.lookup(2) == 1 && b.lookup(42) == 1);
   }
+  
+  //@ requires a.isEmpty && \invariant_for(a) && a.defaultValue == 0 && k >= 0;
+  public static void testEmpty(AbstractMap a, int k) {
+    assert a.lookup(k) == 0;
+  }
 
+  //@ requires a.isEmpty && \invariant_for(a) && a.defaultValue == 0;
+  public static void testSimpleReplaceAndRemove(AbstractMap a) {
+    a.replace(1, 1); 
+    assert(a.lookup(1) == 1);
+    assert(a.lookup(42) == 0);
+    a.remove(1);
+    assert(a.lookup(1) == 0);
+
+  }
   public static void main(String[] arrrgggh){
       redBlackTestHarness(new RedBlackTree(0), new RedBlackTree(1));
   //    System.out.println("Test harness successfully passed.");

@@ -49,6 +49,7 @@ import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
@@ -220,6 +221,9 @@ public final class MainWindow extends JFrame  {
     
     /** action for loading taclets onto a ongoing proof */
     private LoadUserDefinedTacletsAction loadUserDefinedTacletsAction;
+    
+    private OneStepSimplificationToggleAction oneStepSimplAction = 
+        new OneStepSimplificationToggleAction(this);
     
     public static final String AUTO_MODE_TEXT = "Start/stop automated proof search";
 
@@ -520,6 +524,10 @@ public final class MainWindow extends JFrame  {
         toolBar.add(comp.getSelectionComponent());
         toolBar.addSeparator();
         toolBar.add(new UndoLastStepAction(this, false));
+        JToggleButton oneStep = new JToggleButton(oneStepSimplAction);
+        oneStep.setHideActionText(true);
+        toolBar.addSeparator();
+        toolBar.add(oneStep);
 	return toolBar;
     }
     
@@ -794,7 +802,7 @@ public final class MainWindow extends JFrame  {
 	options.add(setupSpeclangMenu());
 	options.addSeparator();
         options.add(new JCheckBoxMenuItem(new MinimizeInteraction(this)));
-        options.add(new JCheckBoxMenuItem(new OneStepSimplificationToggleAction(this)));
+        options.add(new JCheckBoxMenuItem(oneStepSimplAction));
         
         return options;
         
