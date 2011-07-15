@@ -245,6 +245,9 @@ public final class SpecificationRepository {
         }
     }
 
+    private boolean isInheritable(SpecificationElement inv) {
+        return new Protected().compareTo(inv.getVisibility()) >= 0;
+    }
     
     private ImmutableSet<ClassAxiom> getVisibleAxiomsOfOtherClasses(
 	    						KeYJavaType visibleTo) {
@@ -611,7 +614,7 @@ public final class SpecificationRepository {
     
     /**
      * Registers the passed class invariant, and inherits it to all
-     * subclasses.
+     * subclasses if it is public or protected.
      */
     public void addClassInvariant(ClassInvariant inv) {
         final KeYJavaType kjt = inv.getKJT();
@@ -619,7 +622,7 @@ public final class SpecificationRepository {
         
         addClassAxiom(new PartialInvAxiom(inv, services));
         
-        if(!inv.isStatic()) {
+        if(!inv.isStatic() && isInheritable(inv)) {
             final ImmutableList<KeYJavaType> subs 
             	= services.getJavaInfo().getAllSubtypes(kjt);
             for(KeYJavaType sub : subs) {
@@ -649,7 +652,7 @@ public final class SpecificationRepository {
         	addContracts(inv.toContract(pm));
             }
         }
-        if (!(inv.getVisibility() instanceof Private)){
+        if (isInheritable(inv)){
             final ImmutableList<KeYJavaType> subs = services.getJavaInfo().getAllSubtypes(kjt);
             for (KeYJavaType sub: subs){
         	InitiallyClause subInc = inv.setKJT(sub);
