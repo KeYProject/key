@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Vector;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
@@ -203,7 +204,7 @@ public class LemmataHandler implements TacletFilter {
         }
 
         @Override
-        public ImmutableSet<Taclet> filter(Vector<TacletInfo> taclets) {
+        public ImmutableSet<Taclet> filter(List<TacletInfo> taclets) {
                 ImmutableSet<Taclet> set = DefaultImmutableSet.nil();
                 for (TacletInfo tacletInfo : taclets) {
                         if (!tacletInfo.isAlreadyInUse()

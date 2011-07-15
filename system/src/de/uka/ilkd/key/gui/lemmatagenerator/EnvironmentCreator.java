@@ -16,21 +16,32 @@ import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 public class EnvironmentCreator  {
-        public static ProofEnvironment create(String pathForDummyFile,ProgressMonitor monitor,
+        
+        private KeYUserProblemFile keyFile;
+        
+        public KeYUserProblemFile getKeyFile() {
+                if(keyFile == null){
+                        throw new IllegalStateException("You must call the method create before");
+                }
+                return keyFile;
+        }
+        
+        
+        public ProofEnvironment create(String pathForDummyFile,ProgressMonitor monitor,
                           ProblemInitializerListener listener, Profile profile) throws IOException,
         ProofInputException {
                 File dummyFile = createDummyKeYFile(pathForDummyFile);
-                KeYUserProblemFile dummyKeYFile = new KeYUserProblemFile(
+                keyFile = new KeYUserProblemFile(
                                 dummyFile.getName(), dummyFile, null);
 
                 ProblemInitializer pi = new ProblemInitializer(monitor, profile,
                                 new Services(new KeYRecoderExcHandler()),
                                 false, listener );
                
-                return pi.prepare(dummyKeYFile).getProofEnv();
+                return pi.prepare(keyFile).getProofEnv();
         }
 
-        public static File createDummyKeYFile(String pathForDummyFile) throws IOException {
+        public File createDummyKeYFile(String pathForDummyFile) throws IOException {
                 File file = new File(pathForDummyFile + File.separator
                                 + "lemmataGenDummy.key");
                 file.deleteOnExit();

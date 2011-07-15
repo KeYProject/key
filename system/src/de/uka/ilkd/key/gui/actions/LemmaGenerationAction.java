@@ -122,8 +122,8 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                     };
                     
                     TacletSoundnessPOLoader loader = new TacletSoundnessPOLoader(
-                                tacletLoader.getProofEnvForTaclets(), listener,
-                                new LemmaSelectionDialog(),true,tacletLoader);
+                                 listener,
+                                new LemmaSelectionDialog(),true,tacletLoader,true);
                     System.out.println("start loading pos");
                     loader.start();
 
@@ -155,36 +155,59 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
 
         @Override
         protected void loadTaclets() {
-               System.out.println("START");
-               TacletLoader tacletLoader = new TacletLoader.KeYsTacletsLoader(mainWindow.getUserInterface(),mainWindow.getUserInterface(),
-                               mainWindow.getMediator().getProfile());
-               System.out.println("taclet loader created");
-               LoaderListener listener = new AbstractLoaderListener() {
-                       @Override
-                       public void stopped(Throwable exception) {
-                             throw new RuntimeException(exception);
-                       }
+                FileChooser chooser = new FileChooser();
 
-                       @Override
-                       public void stopped(ProofAggregate p,
-                                   ImmutableSet<Taclet> taclets, boolean addAxioms) {
-                           getMediator().startInterface(true);
-                           if (p != null) {
+                boolean loaded = chooser.showAsDialog();
 
-                               mainWindow.addProblem(p);
-                           }
-                           
-                       }
-
-                   };
-                   
-                   TacletSoundnessPOLoader loader = new TacletSoundnessPOLoader(
-                               tacletLoader.getProofEnvForTaclets(), listener,
-                               new LemmaSelectionDialog(),true,tacletLoader);
-                   System.out.println("start loading pos");
-                   loader.start();
+                if (!loaded) {
+                    return;
+                }
+          
+                final File fileForLemmata = chooser.getFileForLemmata();
+                final File fileForDefinitions = chooser.getFileForDefinitions();
+                final boolean loadAsLemmata = chooser.isLoadingAsLemmata();
+                List<File> filesForAxioms = chooser.getFilesForAxioms();
+                final ProblemInitializer problemInitializer = new ProblemInitializer(mainWindow.getUserInterface(),
+                                mainWindow.getMediator().getProfile(), new Services(
+                                                new KeYRecoderExcHandler()),
+                                false, mainWindow.getUserInterface());
+                
+                TacletLoader tacletLoader = new TacletLoader.TacletFromFileLoader(mainWindow.getUserInterface(),
+                                                      mainWindow.getUserInterface(),
+                                                      problemInitializer,
+                                                      mainWindow.getMediator().getProfile(),
+                                                      fileForDefinitions ,
+                                                      fileForLemmata,
+                                                      filesForAxioms,
+                                                      null);
                
-        }
+                
+                
+
+                LoaderListener listener = new AbstractLoaderListener() {
+                    @Override
+                    public void stopped(Throwable exception) {
+                          throw new RuntimeException(exception);
+                    }
+
+                    @Override
+                    public void stopped(ProofAggregate p,
+                                ImmutableSet<Taclet> taclets, boolean addAxioms) {
+                        getMediator().startInterface(true);
+                        if (p != null) {
+
+                            mainWindow.addProblem(p);
+                        }                        
+                    }
+
+                };
+                
+                TacletSoundnessPOLoader loader = new TacletSoundnessPOLoader(
+                             listener,
+                            new LemmaSelectionDialog(),loadAsLemmata,tacletLoader,true);
+                loader.start();
+
+            }
 
         @Override
         protected String getTitle() {
@@ -229,11 +252,13 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                                 false, mainWindow.getUserInterface());
                 
                 TacletLoader tacletLoader = new TacletLoader.TacletFromFileLoader(mainWindow.getUserInterface(),
+                                                      mainWindow.getUserInterface(),
                                                       problemInitializer,
-                                                      proof.env(),
+                                                      mainWindow.getMediator().getProfile(),
                                                       fileForDefinitions ,
                                                       fileForLemmata,
-                                                      filesForAxioms);
+                                                      filesForAxioms,
+                                                      proof.env());
                
 
                 
@@ -275,8 +300,8 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                 };
                 
                 TacletSoundnessPOLoader loader = new TacletSoundnessPOLoader(
-                            proof.env(), listener,
-                            new LemmaSelectionDialog(),loadAsLemmata,tacletLoader);
+                            listener,
+                            new LemmaSelectionDialog(),loadAsLemmata,tacletLoader,false);
                 loader.start();
 
             }

@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.TreeSet;
 import java.util.Vector;
 
@@ -31,6 +32,7 @@ import de.uka.ilkd.key.util.ProgressMonitor;
 public class TacletSoundnessPOLoader {
 
         private final boolean loadAsLemmata;
+        private final boolean onlyForProving;
 
         private LinkedList<LoaderListener> listeners = new LinkedList<LoaderListener>();
         private ProofAggregate resultingProof;
@@ -57,7 +59,7 @@ public class TacletSoundnessPOLoader {
         }
 
         static public interface TacletFilter {
-                public ImmutableSet<Taclet> filter(Vector<TacletInfo> taclets);
+                public ImmutableSet<Taclet> filter(List<TacletInfo> taclets);
         }
         
    
@@ -92,15 +94,17 @@ public class TacletSoundnessPOLoader {
 
 
         public TacletSoundnessPOLoader(
-                        ProofEnvironment referenceEnv,
+                       
                         LoaderListener listener,
                         TacletFilter filter,
                         boolean loadAsLemmata,
-                        TacletLoader loader) {
+                        TacletLoader loader,
+                        boolean onlyForProving) {
                 super();
                 this.tacletLoader = loader;
                 this.tacletFilter = filter;
                 this.loadAsLemmata = loadAsLemmata;
+                this.onlyForProving = onlyForProving;
        
 
                 if (listener != null) {
@@ -225,7 +229,13 @@ public class TacletSoundnessPOLoader {
                 
                 proofEnvForTaclets.registerRules(taclets,
                                 AxiomJustification.INSTANCE);
-
+                
+                if(onlyForProving){
+                        for(Taclet taclet : proofEnvForTaclets.getInitConfig().getTaclets()){
+                                proofEnvForTaclets.getJustifInfo().addJustification(taclet, AxiomJustification.INSTANCE); 
+                        }
+                }
+                
                 registerProofs(p, proofEnvForTaclets, keyFile);
                 return p;
         }
@@ -252,9 +262,9 @@ public class TacletSoundnessPOLoader {
                                 registerProofs(child, proofEnv, keyFile);
                         }
                 } else {
-                        assert aggregate instanceof SingleProof;
+                      assert aggregate instanceof SingleProof;
                         proofEnv.registerProof(keyFile, aggregate);
-                }
+               }
         }
 
         public ProofAggregate getResultingProof() {
