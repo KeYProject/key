@@ -1685,7 +1685,11 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
         {
             result = new SLExpression(TB.indexOf(services,e1.getTerm(),e2.getTerm()));
         }
-
+    |
+        SEQCONTAINS LPAREN e1=expression COMMA e2=expression RPAREN
+        {
+            result = translator.<SLExpression>translate("\\contains", services, e1, e2);
+        }
     |   LPAREN result=expression RPAREN
 ;
 

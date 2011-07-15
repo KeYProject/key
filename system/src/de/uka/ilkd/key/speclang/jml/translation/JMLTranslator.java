@@ -283,6 +283,24 @@ final class JMLTranslator {
             
         });
         
+        translationMethods.put("\\contains", new JMLTranslationMethod(){
+            // this is a quick hack; to be removed eventually; hopefully there will be support for set ADTs soon, so this will be obsolete
+
+            /** @deprecated */
+            @Override
+            public Object translate(Object... params)
+                    throws SLTranslationException {
+                checkParameters(params, Services.class, SLExpression.class, SLExpression.class);
+                final Services services = (Services)params[0];
+                final Term seq = ((SLExpression)params[1]).getTerm();
+                final Term elem = ((SLExpression)params[2]).getTerm();
+                final LogicVariable i = new LogicVariable(new Name("i"), services.getJavaInfo().getPrimitiveKeYJavaType("int").getSort());
+                final Term body = TB.and(TB.leq(TB.zero(services), TB.var(i), services),TB.lt(TB.var(i), TB.seqLen(services, seq), services), TB.equals(TB.seqGet(services, Sort.ANY, seq, TB.var(i)), elem));
+                return new SLExpression(TB.ex(i, body));
+            }
+            
+        });
+        
         translationMethods.put("\\not_modified", new JMLPostExpressionTranslationMethod(){
 
             @Override

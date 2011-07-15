@@ -146,6 +146,7 @@ SEQSUB : "\\seq_sub";
 SEQREVERSE : "\\seq_reverse";
 SEQREPLACE : "\\seq_put";
 INDEXOF : "\\indexOf";
+SEQCONTAINS : "\\contains"; // temp workaround as long as sets are not yet implemented
 
 MEASURED_BY : "\\measured_by";
 
