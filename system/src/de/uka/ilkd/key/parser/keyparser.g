@@ -3451,6 +3451,7 @@ varexp[TacletBuilder b]
     | varcond_enum_const[b] 
     | varcond_free[b]  
     | varcond_hassort[b]
+    | varcond_fieldtype[b]
     | varcond_equalUnique[b]
     | varcond_new[b]
     | varcond_newlabel[b] 
@@ -3674,6 +3675,36 @@ varcond_hassort [TacletBuilder b]
      }
    }
 ;
+
+varcond_fieldtype [TacletBuilder b]
+{
+    ParsableVariable x = null;
+    Sort s = null;
+}
+:
+    FIELDTYPE
+    LPAREN
+    x=varId
+    COMMA 
+    s=any_sortId_check[true] 
+    RPAREN
+    {
+        if(!(s instanceof GenericSort)) {
+            throw new GenericSortException("sort",
+                                        "Generic sort expected", 
+                                        s,
+                                        getFilename(),
+                                        getLine(), 
+                                        getColumn());
+        } else if(!FieldTypeToSortCondition.checkSortedSV((SchemaVariable)x)) {
+            semanticError("Expected schema variable of kind EXPRESSION or TYPE, " 
+                          + "but is " + x);
+        } else {
+            b.addVariableCondition(new FieldTypeToSortCondition((SchemaVariable)x, 
+                                                               (GenericSort)s));
+        }
+    }
+;      
 
 varcond_enumtype [TacletBuilder b, boolean negated]
 {
