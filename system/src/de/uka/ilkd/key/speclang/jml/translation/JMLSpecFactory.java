@@ -78,11 +78,11 @@ public class JMLSpecFactory {
     //internal methods
     //-------------------------------------------------------------------------
 
-    private String getDefaultInvName(String name) {
+    private String getDefaultInvName(String name, KeYJavaType kjt) {
         if (name == null)
-        return "JML class invariant nr " + invCounter++;
+        return "JML class invariant nr " + invCounter++ +" in "+ kjt.getName();
         else
-            return "JML class invariant \""+name+"\" (nr "+ invCounter++ +")";
+            return "JML class invariant \""+name+"\" in "+kjt.getName()+ " (nr "+ invCounter++ +")";
     }
 
 
@@ -595,7 +595,7 @@ public class JMLSpecFactory {
         Term inv = translator.<Term>parse(originalInv, kjt, selfVar, null, null,
                                           null, null, services);
         //create invariant
-        String name = getDefaultInvName(null);
+        String name = getDefaultInvName(null,kjt);
         return new ClassInvariantImpl(name,
                                       name,
                                       kjt,
@@ -616,8 +616,8 @@ public class JMLSpecFactory {
         Term inv = translator.<Term>parse(textualInv.getInv(), kjt, selfVar, null, null,
                                           null, null, services);
         //create invariant
-        String name = getDefaultInvName(null);
-        String display = getDefaultInvName(textualInv.getName());
+        String name = getDefaultInvName(null,kjt);
+        String display = getDefaultInvName(textualInv.getName(),kjt);
         return new ClassInvariantImpl(name,
                                       display,
                                       kjt,

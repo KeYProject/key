@@ -205,4 +205,5 @@ public final class ClassAxiomImpl extends ClassAxiom {
     public ObserverFunction getTarget() {
 	return null;
     }
+
 }

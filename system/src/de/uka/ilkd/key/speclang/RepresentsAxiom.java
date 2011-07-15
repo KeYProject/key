@@ -86,6 +86,15 @@ public final class RepresentsAxiom extends ClassAxiom {
 		   || originalRep.sub(0).sub(1).op().equals(originalSelfVar));
     }
     
+    private Term instance(boolean finalClass, SchemaVariable selfSV, Services services){
+        return target.isStatic() || finalClass
+        ? TB.tt() 
+                /*: new Protected().compareTo(visibility) >= 0 ?
+                        // represents clause may be inherited
+                        TB.instance(services, kjt.getSort(), TB.var(selfSV))*/
+                        : TB.exactInstance(services, kjt.getSort(), TB.var(selfSV));
+    }
+
     
     private Term getAxiom(ParsableVariable heapVar, 
 	    		  ParsableVariable selfVar,
@@ -155,10 +164,7 @@ public final class RepresentsAxiom extends ClassAxiom {
 	final boolean finalClass 
 		= kjt.getJavaType() instanceof ClassDeclaration 
 	          && ((ClassDeclaration)kjt.getJavaType()).isFinal();
-	final Term exactInstance 
-		= target.isStatic() || finalClass
-		  ? TB.tt() 
-	          : TB.exactInstance(services, kjt.getSort(), TB.var(selfSV));
+		
 		  
         //prepare satisfiability guard
         final Term targetTerm 
@@ -193,7 +199,7 @@ public final class RepresentsAxiom extends ClassAxiom {
         	
 	//assemble formula
 	final Term guardedAxiom 
-		= TB.imp(TB.and(exactInstance, axiomSatisfiable), schemaAxiom);
+		= TB.imp(TB.and(instance(finalClass, selfSV, services), axiomSatisfiable), schemaAxiom);
 	final SequentFormula guardedAxiomCf 
 		= new SequentFormula(guardedAxiom);
 	
@@ -275,9 +281,7 @@ public final class RepresentsAxiom extends ClassAxiom {
 	if(target.isStatic() || finalClass) {
 	    ifSeq = null;
 	} else {
-	    final Term ifFormula 
-	    	= TB.exactInstance(services, kjt.getSort(), TB.var(selfSV));
-	    final SequentFormula ifCf = new SequentFormula(ifFormula);
+	    final SequentFormula ifCf = new SequentFormula(instance(false, selfSV, services));
 	    final Semisequent ifSemiSeq 
 	    	= Semisequent.EMPTY_SEMISEQUENT.insertFirst(ifCf).semisequent();
 	    ifSeq = Sequent.createAnteSequent(ifSemiSeq);
@@ -374,5 +378,11 @@ public final class RepresentsAxiom extends ClassAxiom {
 	return originalRep.toString();
     }
 
+
+    public RepresentsAxiom setKJT(KeYJavaType newKjt) {
+        String newName = "JML represents clause for " + target
+        		+ " (subclass " + newKjt.getName()+ ")";
+        return new RepresentsAxiom(newName, displayName, target, newKjt, visibility, originalRep, originalSelfVar);
+    }
 
 }

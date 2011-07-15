@@ -245,7 +245,7 @@ public final class SpecificationRepository {
         }
     }
 
-    private boolean isInheritable(SpecificationElement inv) {
+    private boolean isAtLeastProtected(SpecificationElement inv) {
         return new Protected().compareTo(inv.getVisibility()) >= 0;
     }
     
@@ -622,7 +622,7 @@ public final class SpecificationRepository {
         
         addClassAxiom(new PartialInvAxiom(inv, services));
         
-        if(!inv.isStatic() && isInheritable(inv)) {
+        if(!inv.isStatic() && isAtLeastProtected(inv)) {
             final ImmutableList<KeYJavaType> subs 
             	= services.getJavaInfo().getAllSubtypes(kjt);
             for(KeYJavaType sub : subs) {
@@ -652,7 +652,7 @@ public final class SpecificationRepository {
         	addContracts(inv.toContract(pm));
             }
         }
-        if (isInheritable(inv)){
+        if (isAtLeastProtected(inv)){
             final ImmutableList<KeYJavaType> subs = services.getJavaInfo().getAllSubtypes(kjt);
             for (KeYJavaType sub: subs){
         	InitiallyClause subInc = inv.setKJT(sub);
@@ -743,6 +743,16 @@ public final class SpecificationRepository {
             currentAxioms = DefaultImmutableSet.<ClassAxiom>nil();
         }
         axioms.put(kjt, currentAxioms.add(ax));
+        if (isAtLeastProtected(ax) && ax instanceof RepresentsAxiom){
+            final ImmutableList<KeYJavaType> subs = services.getJavaInfo().getAllSubtypes(kjt);
+            for (KeYJavaType sub: subs){
+                RepresentsAxiom subAx =  ((RepresentsAxiom)ax).setKJT(sub);
+                currentAxioms = axioms.get(sub);
+                if(currentAxioms == null) {
+                    currentAxioms = DefaultImmutableSet.<ClassAxiom>nil();
+                }
+                axioms.put(sub, currentAxioms.add(subAx));
+            }}
     }
     
     
