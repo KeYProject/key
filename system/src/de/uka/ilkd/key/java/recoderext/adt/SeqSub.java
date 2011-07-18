@@ -8,15 +8,13 @@
 //
 //
 
-package de.uka.ilkd.key.java.recoderext;
+package de.uka.ilkd.key.java.recoderext.adt;
 
 import recoder.java.Expression;
-import recoder.java.SourceVisitor;
-import recoder.java.expression.Operator;
 import recoder.list.generic.ASTArrayList;
 
 
-public class SeqSub extends Operator {
+public class SeqSub extends ADTPrefixConstruct {
 
     public SeqSub(Expression e1, Expression e2, Expression e3) {
 	children = new ASTArrayList<Expression>(getArity());
@@ -24,6 +22,10 @@ public class SeqSub extends Operator {
 	children.add(e2);
 	children.add(e3);
 	makeParentRoleValid();
+    }
+    
+    public SeqSub(ADTPrefixConstruct seq, RangeExpression range){
+        this((Expression) seq, (Expression) range.getChildAt(0), (Expression) range.getChildAt(1));
     }
 
 
@@ -46,20 +48,14 @@ public class SeqSub extends Operator {
 
     
     @Override    
-    public int getPrecedence() {
-	return 0;
-    }
-
-    
-    @Override    
     public int getNotation() {
 	return PREFIX;
     }
-   
     
-    @Override    
-    public void accept(SourceVisitor v) {
-	
+    @Override
+    public String toSource(){
+        return children.get(0).toSource()+"["+children.get(1)+".."+children.get(2)+"]";
     }
+
     
 }

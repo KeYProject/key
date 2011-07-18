@@ -16,6 +16,7 @@ import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.expression.PassiveExpression;
 import de.uka.ilkd.key.java.expression.literal.*;
 import de.uka.ilkd.key.java.expression.operator.*;
+import de.uka.ilkd.key.java.expression.operator.adt.*;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -199,6 +200,22 @@ public abstract class JavaASTVisitor extends JavaASTWalker
     
     @Override
     public void performActionOnDLEmbeddedExpression(DLEmbeddedExpression x) {
+        doDefaultAction(x);
+    }
+    
+
+    @Override
+    public void performActionOnSeqIndexOf(SeqIndexOf x) {
+	doDefaultAction(x);
+    }
+    
+    @Override
+    public void performActionOnSeqGet(SeqGet x){
+        doDefaultAction(x);
+    }
+    
+    @Override
+    public void performActionOnSeqLength(SeqLength x){
         doDefaultAction(x);
     }
     

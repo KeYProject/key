@@ -39,6 +39,7 @@ public abstract class ClassAxiom implements SpecificationElement {
         
 
     protected static final TermBuilder TB = TermBuilder.DF;
+    protected String displayName;
     
     public static Pair<Term, ImmutableSet<Taclet>> limitTerm(Term t, ImmutableSet<Pair<Sort, ObserverFunction>> toLimit, Services services) {
         ImmutableSet<Taclet> taclets = DefaultImmutableSet.nil();
@@ -212,4 +213,10 @@ public abstract class ClassAxiom implements SpecificationElement {
     public abstract ImmutableSet<Taclet> getTaclets(
 	    		ImmutableSet<Pair<Sort, ObserverFunction>> toLimit,
 	    		Services services);    
+
+    @Override
+    public String getDisplayName() {
+        return displayName == null ? getName() : displayName;
+    }
+    
 }

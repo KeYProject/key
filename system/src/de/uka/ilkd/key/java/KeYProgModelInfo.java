@@ -30,6 +30,7 @@ import de.uka.ilkd.key.util.KeYExceptionHandler;
 public class KeYProgModelInfo{
 
 
+    private Services services;
     private KeYCrossReferenceServiceConfiguration sc = null;
     private KeYRecoderMapping mapping;
     private TypeConverter typeConverter;
@@ -37,15 +38,16 @@ public class KeYProgModelInfo{
         new HashMap<KeYJavaType, HashMap<String, ProgramMethod>>();
     private KeYExceptionHandler exceptionHandler = null;
     
-    public KeYProgModelInfo(TypeConverter typeConverter, 
+    public KeYProgModelInfo(Services services, TypeConverter typeConverter, 
             KeYExceptionHandler keh){
- 	this(new KeYCrossReferenceServiceConfiguration(keh), 
+ 	this(services, new KeYCrossReferenceServiceConfiguration(keh), 
 	     new KeYRecoderMapping(), typeConverter);
 	exceptionHandler = keh;
     }
 
-    KeYProgModelInfo(KeYCrossReferenceServiceConfiguration crsc,
+    KeYProgModelInfo(Services services, KeYCrossReferenceServiceConfiguration crsc,
 		     KeYRecoderMapping krm, TypeConverter typeConverter) {
+        this.services = services;
 	 sc = crsc;
 	 this.typeConverter = typeConverter;
 	 this.mapping       = krm;	
@@ -648,7 +650,7 @@ public class KeYProgModelInfo{
     }
     
     private Recoder2KeY createRecoder2KeY(NamespaceSet nss) {
-	return new Recoder2KeY(sc, rec2key(), nss, typeConverter);
+	return new Recoder2KeY(services, sc, rec2key(), nss, typeConverter);
     }
 
     /**
@@ -815,7 +817,7 @@ public class KeYProgModelInfo{
     
 
     public KeYProgModelInfo copy() {
- 	return new KeYProgModelInfo(getServConf(), rec2key().copy(), 
+ 	return new KeYProgModelInfo(services, getServConf(), rec2key().copy(), 
  				    typeConverter);
     }
 }

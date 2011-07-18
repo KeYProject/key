@@ -445,9 +445,9 @@ public final class ProblemInitializer {
 	}
 	alreadyParsed.clear();
 
-	//the first time, read in standard rules
-	if(baseConfig == null) {
-	    baseConfig = new InitConfig(services, profile);
+        //the first time, read in standard rules
+        if(baseConfig == null) {
+            baseConfig = new InitConfig(services, profile);
 
 	    RuleSource tacletBase = profile.getStandardRules().getTacletBase();
 	    if(tacletBase != null) {
@@ -468,45 +468,48 @@ public final class ProblemInitializer {
         
 	//register built in rules
         for(Rule r : profile.getStandardRules().getStandardBuiltInRules()) {
-    	    initConfig.getProofEnv().registerRule(r, 
-    		    				  profile.getJustification(r));
+            initConfig.getProofEnv().registerRule(r, 
+                    profile.getJustification(r));
         }
-        
-	//read Java
+
+        //read Java
         readJava(envInput, initConfig);
-        
+
         //register function and predicate symbols defined by Java program
         final JavaInfo javaInfo = initConfig.getServices().getJavaInfo();
         final Namespace functions 
-        	= initConfig.getServices().getNamespaces().functions();
+        = initConfig.getServices().getNamespaces().functions();
         final HeapLDT heapLDT 
-        	= initConfig.getServices().getTypeConverter().getHeapLDT();
+        = initConfig.getServices().getTypeConverter().getHeapLDT();
         assert heapLDT != null;
-        functions.add(initConfig.getServices().getJavaInfo().getInv());
-        for(KeYJavaType kjt : javaInfo.getAllKeYJavaTypes()) {
-            final Type type = kjt.getJavaType();
-            if(type instanceof ClassDeclaration 
-        	     || type instanceof InterfaceDeclaration) {
-        	for(Field f : javaInfo.getAllFields((TypeDeclaration)type)) {
-        	    final ProgramVariable pv 
-        	    	= (ProgramVariable)f.getProgramVariable();
-        	    if(pv instanceof LocationVariable) {
-        		heapLDT.getFieldSymbolForPV((LocationVariable)pv, 
-        					    initConfig.getServices());
-        	    }
-        	}
+        if (javaInfo != null) {
+            functions.add(javaInfo.getInv());
+            for(KeYJavaType kjt : javaInfo.getAllKeYJavaTypes()) {
+                final Type type = kjt.getJavaType();
+                if(type instanceof ClassDeclaration 
+                        || type instanceof InterfaceDeclaration) {
+                    for(Field f : javaInfo.getAllFields((TypeDeclaration)type)) {
+                        final ProgramVariable pv 
+                        = (ProgramVariable)f.getProgramVariable();
+                        if(pv instanceof LocationVariable) {
+                            heapLDT.getFieldSymbolForPV((LocationVariable)pv, 
+                                    initConfig.getServices());
+                        }
+                    }
+                }
+                for(ProgramMethod pm
+                        : javaInfo.getAllProgramMethodsLocallyDeclared(kjt)) {
+                    if(pm.getKeYJavaType() != null) {
+                        functions.add(pm);
+                    }
+                }
             }
-            for(ProgramMethod pm
-        	    : javaInfo.getAllProgramMethodsLocallyDeclared(kjt)) {
-        	if(pm.getKeYJavaType() != null) {
-        	    functions.add(pm);
-        	}
-            }
-        }
+        } else
+                throw new ProofInputException("Problem initialization without JavaInfo!");
 
         //read envInput
         readEnvInput(envInput, initConfig);
-        
+
         //done
         if(listener !=null){
            listener.progressStopped(this); 

@@ -1476,6 +1476,11 @@ public final class TermBuilder {
 	return func(services.getTypeConverter().getSeqLDT().getSeqLen(), s);
     }
     
+    // TODO: doc
+    public Term indexOf(Services services, Term s, Term x){
+	return func(services.getTypeConverter().getSeqLDT().getSeqIndexOf(),s,x);
+    }
+    
     
     public Term seqEmpty(Services services) {
 	return func(services.getTypeConverter().getSeqLDT().getSeqEmpty());

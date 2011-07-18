@@ -47,6 +47,11 @@ public final class PartialInvAxiom extends ClassAxiom {
 	assert target != null;
     }
     
+    public PartialInvAxiom(ClassInvariant inv, String displayName, Services services){
+        this(inv, services);
+        this.displayName = displayName;
+    }
+    
     
     @Override
     public String getName() {
@@ -185,11 +190,5 @@ public final class PartialInvAxiom extends ClassAxiom {
     @Override
     public String toString() {
 	return inv.toString();
-    }
-
-
-    @Override
-    public String getDisplayName() {
-	return getName();
     }
 }

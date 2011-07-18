@@ -8,8 +8,7 @@
 //
 //
 
-
-package de.uka.ilkd.key.java.expression.operator;
+package de.uka.ilkd.key.java.expression.operator.adt;
 
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
@@ -20,9 +19,9 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.util.ExtList;
 
-public class SeqSingleton extends Operator {
+public class Singleton extends Operator {
 
-    public SeqSingleton(ExtList children) {
+    public Singleton(ExtList children) {
         super(children);
     }
 
@@ -38,12 +37,12 @@ public class SeqSingleton extends Operator {
 
 
     public void visit(Visitor v) {
-	v.performActionOnSeqSingleton(this);
+	v.performActionOnSingleton(this);
     }
 
     
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printSeqSingleton(this);
+        p.printSingleton(this);
     }
 
     public int getArity() {
@@ -51,6 +50,6 @@ public class SeqSingleton extends Operator {
     }
 
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
-	return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SEQ);
+	return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LOCSET);
     }    
 }

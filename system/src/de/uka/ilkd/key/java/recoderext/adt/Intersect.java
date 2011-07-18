@@ -8,36 +8,36 @@
 //
 //
 
-package de.uka.ilkd.key.java.recoderext;
+package de.uka.ilkd.key.java.recoderext.adt;
 
 import recoder.java.Expression;
 import recoder.java.SourceVisitor;
 import recoder.java.expression.Operator;
 
 
-public class SeqSingleton extends Operator {
+public class Intersect extends ADTPrefixConstruct {
 
-    public SeqSingleton(Expression lhs) {
-	super(lhs);
+    public Intersect(Expression lhs, Expression rhs) {
+	super(lhs, rhs);
 	makeParentRoleValid();
     }
 
 
-    protected SeqSingleton(SeqSingleton proto) {
+    protected Intersect(Intersect proto) {
 	super(proto);
 	makeParentRoleValid();
     }
     
 
     @Override    
-    public SeqSingleton deepClone() {
-	return new SeqSingleton(this);
+    public Intersect deepClone() {
+	return new Intersect(this);
     }
 
 
     @Override    
     public int getArity() {
-	return 1;
+	return 2;
     }
 
     
@@ -50,11 +50,5 @@ public class SeqSingleton extends Operator {
     @Override    
     public int getNotation() {
 	return PREFIX;
-    }
-   
-    
-    @Override    
-    public void accept(SourceVisitor v) {
-	
     }
 }

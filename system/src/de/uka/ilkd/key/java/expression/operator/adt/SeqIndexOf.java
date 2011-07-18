@@ -9,59 +9,60 @@
 //
 
 
-package de.uka.ilkd.key.java.expression.operator;
+package de.uka.ilkd.key.java.expression.operator.adt;
 
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.util.ExtList;
 
-public class SeqSub extends Operator {
+/**
+ * Represents a function giving the index of some element in a sequence (if it exists).
+ * @author bruns
+ *
+ */
+public class SeqIndexOf extends Operator {
 
-    public SeqSub(ExtList children) {
+    public SeqIndexOf(ExtList children) {
         super(children);
     }
 
 
-    @Override    
+    @Override
     public int getPrecedence() {
         return 0;
     }
 
-
-    @Override    
-    public int getNotation() {
-        return PREFIX;
-    }
-
-
-    @Override    
+    @Override
     public void visit(Visitor v) {
-	v.performActionOnSeqSub(this);
+	v.performActionOnSeqIndexOf(this);
     }
 
-
-    @Override    
+    @Override
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printSeqSub(this);
+        p.printIndexOf(this);
     }
-    
-    
+
+
     @Override
     public int getArity() {
-	return 3;
+        return 2;
     }
-    
-    
+
+
     @Override
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
-	final TypeConverter tc=javaServ.getTypeConverter();
-	return tc.getPromotedType
-	    (tc.getKeYJavaType((de.uka.ilkd.key.java.Expression)getChildAt(0), ec),
-	     tc.getKeYJavaType((de.uka.ilkd.key.java.Expression)getChildAt(1), ec));
-    }    
+        return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT);
+    }
+
+
+    @Override
+    public int getNotation() {
+        return Operator.PREFIX;
+    }
+
 }

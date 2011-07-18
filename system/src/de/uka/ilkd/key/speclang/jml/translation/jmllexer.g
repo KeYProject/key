@@ -96,7 +96,6 @@ NOT : "!";
 NOT_MODIFIED : "\\not_modified";
 NOT_SPECIFIED : "\\not_specified";
 NOTHING : "\\nothing";
-NOWARN : "\\nowarn";
 OLD : "\\old";
 OTHER : "\\other";
 OUTER_SCOPE : "\\outerScope"; //KeY extension, not official JML
@@ -139,11 +138,14 @@ SUBSET : "\\subset";
 NEWELEMSFRESH : "\\new_elems_fresh";
 
 SEQ : "\\seq";
+SEQGET : "\\seq_get";
 SEQEMPTY : "\\seq_empty";
 SEQSINGLETON : "\\seq_singleton";
 SEQCONCAT : "\\seq_concat";
 SEQSUB : "\\seq_sub";
 SEQREVERSE : "\\seq_reverse";
+SEQREPLACE : "\\seq_put";
+INDEXOF : "\\indexOf";
 
 MEASURED_BY : "\\measured_by";
 
@@ -223,6 +225,7 @@ QUANTIFIER
     |
         "\\sum"
     ;
+
     
 protected
 LETTER
@@ -323,6 +326,7 @@ options {
 	|	'\t'
 	|	'\n'  { newline(); }
 	|	'\r'
+	| PRAGMA (~';')* SEMI
         |       '\u000C'
         |       '@')
 		{ $setType(Token.SKIP); }
@@ -367,4 +371,13 @@ options {
 	)*
 	"*/"
 	{ $setType(Token.SKIP);  }
+	;
+
+
+	protected PRAGMA
+	    options {
+	        paraphrase = "lexical pragma (see Sect. 4.2 of JML reference)";
+	    }
+	    :
+	    "\\nowarn"
 	;

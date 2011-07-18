@@ -32,19 +32,9 @@ import de.uka.ilkd.key.java.declaration.modifier.Model;
 import de.uka.ilkd.key.java.expression.*;
 import de.uka.ilkd.key.java.expression.PassiveExpression;
 import de.uka.ilkd.key.java.expression.literal.*;
-import de.uka.ilkd.key.java.expression.literal.EmptySeqLiteral;
-import de.uka.ilkd.key.java.expression.literal.EmptySetLiteral;
 import de.uka.ilkd.key.java.expression.operator.*;
-import de.uka.ilkd.key.java.expression.operator.AllFields;
 import de.uka.ilkd.key.java.expression.operator.DLEmbeddedExpression;
-import de.uka.ilkd.key.java.expression.operator.Intersect;
-import de.uka.ilkd.key.java.expression.operator.SeqConcat;
-import de.uka.ilkd.key.java.expression.operator.SeqReverse;
-import de.uka.ilkd.key.java.expression.operator.SeqSingleton;
-import de.uka.ilkd.key.java.expression.operator.SeqSub;
-import de.uka.ilkd.key.java.expression.operator.SetMinus;
-import de.uka.ilkd.key.java.expression.operator.SetUnion;
-import de.uka.ilkd.key.java.expression.operator.Singleton;
+import de.uka.ilkd.key.java.expression.operator.adt.*;
 import de.uka.ilkd.key.java.recoderext.*;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -546,8 +536,9 @@ public class Recoder2KeYConverter {
             return Class.forName(className);
         } catch (ClassNotFoundException cnfe) {
             Debug.out("There is an AST class " +className + " missing at KeY.", cnfe);
-            throw new ConvertException("There is an AST class missing at KeY.",
-                    cnfe);
+            throw new ConvertException(this.getClass().toString()+" could not find a conversion from RecodeR class "+recoderClass.getClass()+".\n"
+                    +"Maybe you have added a class to package key.recoderext and did not add the equivalent to key.java.expression or its subpackages."
+                    ,cnfe);
         } catch (ExceptionInInitializerError initErr) {
             Debug.out("recoder2key: Failed initializing class.", initErr);
             throw new ConvertException("Failed initializing class.", initErr);
@@ -670,55 +661,63 @@ public class Recoder2KeYConverter {
     }
     
     
-    public EmptySetLiteral convert(de.uka.ilkd.key.java.recoderext.EmptySetLiteral e) {
+    public EmptySetLiteral convert(de.uka.ilkd.key.java.recoderext.adt.EmptySetLiteral e) {
 	return EmptySetLiteral.INSTANCE;
     }
     
-    public Singleton convert(de.uka.ilkd.key.java.recoderext.Singleton e) {
+    public Singleton convert(de.uka.ilkd.key.java.recoderext.adt.Singleton e) {
         ExtList children = collectChildren(e);	
 	return new Singleton(children);
     }        
     
-    public SetUnion convert(de.uka.ilkd.key.java.recoderext.SetUnion e) {
+    public SetUnion convert(de.uka.ilkd.key.java.recoderext.adt.SetUnion e) {
         ExtList children = collectChildren(e);	
 	return new SetUnion(children);
     }
     
-    public Intersect convert(de.uka.ilkd.key.java.recoderext.Intersect e) {
+    public Intersect convert(de.uka.ilkd.key.java.recoderext.adt.Intersect e) {
         ExtList children = collectChildren(e);	
 	return new Intersect(children);
     }
     
-    public SetMinus convert(de.uka.ilkd.key.java.recoderext.SetMinus e) {
+    public SetMinus convert(de.uka.ilkd.key.java.recoderext.adt.SetMinus e) {
         ExtList children = collectChildren(e);	
 	return new SetMinus(children);
     }
     
-    public AllFields convert(de.uka.ilkd.key.java.recoderext.AllFields e) {
+    public AllFields convert(de.uka.ilkd.key.java.recoderext.adt.AllFields e) {
         ExtList children = collectChildren(e);	
 	return new AllFields(children);
     }
     
-    public EmptySeqLiteral convert(de.uka.ilkd.key.java.recoderext.EmptySeqLiteral e) {
-	return EmptySeqLiteral.INSTANCE;
+    public EmptySeqLiteral convert(de.uka.ilkd.key.java.recoderext.adt.EmptySeqLiteral e) {
+        return EmptySeqLiteral.INSTANCE;
     }    
     
-    public SeqSingleton convert(de.uka.ilkd.key.java.recoderext.SeqSingleton e) {
+    public SeqSingleton convert(de.uka.ilkd.key.java.recoderext.adt.SeqSingleton e) {
         ExtList children = collectChildren(e);	
 	return new SeqSingleton(children);
     }
     
-    public SeqConcat convert(de.uka.ilkd.key.java.recoderext.SeqConcat e) {
+    public SeqConcat convert(de.uka.ilkd.key.java.recoderext.adt.SeqConcat e) {
         ExtList children = collectChildren(e);	
 	return new SeqConcat(children);
     }
     
-    public SeqSub convert(de.uka.ilkd.key.java.recoderext.SeqSub e) {
+    public SeqSub convert(de.uka.ilkd.key.java.recoderext.adt.SeqSub e) {
         ExtList children = collectChildren(e);	
 	return new SeqSub(children);
-    }    
+    }
     
-    public SeqReverse convert(de.uka.ilkd.key.java.recoderext.SeqReverse e) {
+    public SeqLength convert(de.uka.ilkd.key.java.recoderext.adt.SeqLength e){
+        return new SeqLength(collectChildren(e));
+    }
+    
+    public SeqIndexOf convert(de.uka.ilkd.key.java.recoderext.adt.SeqIndexOf e){
+	return new SeqIndexOf(collectChildren(e));
+    }
+    
+    public SeqReverse convert(de.uka.ilkd.key.java.recoderext.adt.SeqReverse e) {
         ExtList children = collectChildren(e);	
 	return new SeqReverse(children);
     }
@@ -740,6 +739,10 @@ public class Recoder2KeYConverter {
         
         Function f = (Function) named;
         return new DLEmbeddedExpression(f, children);
+    }
+    
+    public SeqGet convert(de.uka.ilkd.key.java.recoderext.adt.SeqGet e){
+        return new SeqGet(collectChildren(e));
     }
 
     /** convert a recoder StringLiteral to a KeY StringLiteral */

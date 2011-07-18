@@ -9,15 +9,20 @@
 //
 
 
-package de.uka.ilkd.key.java.expression.operator;
+package de.uka.ilkd.key.java.expression.operator.adt;
 
 import de.uka.ilkd.key.java.PrettyPrinter;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.expression.Operator;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.util.ExtList;
 
-public class SeqConcat extends BinaryOperator {
+public class SeqSingleton extends Operator {
 
-    public SeqConcat(ExtList children) {
+    public SeqSingleton(ExtList children) {
         super(children);
     }
 
@@ -33,12 +38,19 @@ public class SeqConcat extends BinaryOperator {
 
 
     public void visit(Visitor v) {
-	v.performActionOnSeqConcat(this);
+	v.performActionOnSeqSingleton(this);
     }
 
     
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printSeqConcat(this);
+        p.printSeqSingleton(this);
     }
 
+    public int getArity() {
+        return 1;
+    }
+
+    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
+	return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SEQ);
+    }    
 }
