@@ -87,12 +87,8 @@ public final class RepresentsAxiom extends ClassAxiom {
     }
     
     private Term instance(boolean finalClass, SchemaVariable selfSV, Services services){
-        return target.isStatic() || finalClass
-        ? TB.tt() 
-                /*: new Protected().compareTo(visibility) >= 0 ?
-                        // represents clause may be inherited
-                        TB.instance(services, kjt.getSort(), TB.var(selfSV))*/
-                        : TB.exactInstance(services, kjt.getSort(), TB.var(selfSV));
+        return target.isStatic() || finalClass || VisibilityModifier.allowsInheritance(visibility)
+        ? TB.tt() :TB.exactInstance(services, kjt.getSort(), TB.var(selfSV));
     }
 
     
@@ -281,10 +277,14 @@ public final class RepresentsAxiom extends ClassAxiom {
 	if(target.isStatic() || finalClass) {
 	    ifSeq = null;
 	} else {
-	    final SequentFormula ifCf = new SequentFormula(instance(false, selfSV, services));
-	    final Semisequent ifSemiSeq 
-	    	= Semisequent.EMPTY_SEMISEQUENT.insertFirst(ifCf).semisequent();
-	    ifSeq = Sequent.createAnteSequent(ifSemiSeq);
+	    final Term instanceTerm = instance(false, selfSV, services);
+	    final SequentFormula ifCf = new SequentFormula(instanceTerm);
+	    final Semisequent ifSemiSeq = Semisequent.EMPTY_SEMISEQUENT;
+	    // discard trivial antecedent
+	    if (!instanceTerm.equals(TB.tt())) {
+	        ifSemiSeq.insertFirst(ifCf).semisequent();
+	        ifSeq = Sequent.createAnteSequent(ifSemiSeq);
+	    } else ifSeq = null;
 	}
 	
 	//create taclet

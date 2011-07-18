@@ -230,23 +230,14 @@ public final class SpecificationRepository {
         // DISCUSSION: how should it be treated in the mean time? as public? Our specifications rarely stretch over different packages... 
         final boolean visibleToPackage = true;
         final VisibilityModifier visibility = ax.getVisibility();
-        if(visibility == null) {
-            return visibleToPackage;
-        } else if(visibility instanceof Public) {
+        if (VisibilityModifier.isPublic(visibility))
             return true;
-        } else if(visibility instanceof Private) {
+        if (VisibilityModifier.allowsInheritance(visibility))
+            return visibleTo.getSort().extendsTrans(kjt.getSort()) || visibleToPackage;
+        if (VisibilityModifier.isPackageVisible(visibility))
+            return visibleToPackage;
+        else
             return kjt.equals(visibleTo);
-        } else if(visibility instanceof Protected) {
-            return visibleToPackage
-            || visibleTo.getSort().extendsTrans(kjt.getSort());
-        } else {
-            assert false;
-            return false;
-        }
-    }
-
-    private boolean isAtLeastProtected(SpecificationElement inv) {
-        return new Protected().compareTo(inv.getVisibility()) >= 0;
     }
     
     private ImmutableSet<ClassAxiom> getVisibleAxiomsOfOtherClasses(
@@ -622,7 +613,7 @@ public final class SpecificationRepository {
         
         addClassAxiom(new PartialInvAxiom(inv, services));
         
-        if(!inv.isStatic() && isAtLeastProtected(inv)) {
+        if(!inv.isStatic() && VisibilityModifier.allowsInheritance(inv.getVisibility())) {
             final ImmutableList<KeYJavaType> subs 
             	= services.getJavaInfo().getAllSubtypes(kjt);
             for(KeYJavaType sub : subs) {
@@ -652,7 +643,7 @@ public final class SpecificationRepository {
         	addContracts(inv.toContract(pm));
             }
         }
-        if (isAtLeastProtected(inv)){
+        if (VisibilityModifier.allowsInheritance(inv.getVisibility())){
             final ImmutableList<KeYJavaType> subs = services.getJavaInfo().getAllSubtypes(kjt);
             for (KeYJavaType sub: subs){
         	InitiallyClause subInc = inv.setKJT(sub);
@@ -742,7 +733,7 @@ public final class SpecificationRepository {
         if(currentAxioms == null) {
             currentAxioms = DefaultImmutableSet.<ClassAxiom>nil();
         }
-        axioms.put(kjt, currentAxioms.add(ax));
+        axioms.put(kjt, currentAxioms.add(ax));/*
         if (isAtLeastProtected(ax) && ax instanceof RepresentsAxiom){
             final ImmutableList<KeYJavaType> subs = services.getJavaInfo().getAllSubtypes(kjt);
             for (KeYJavaType sub: subs){
@@ -752,7 +743,7 @@ public final class SpecificationRepository {
                     currentAxioms = DefaultImmutableSet.<ClassAxiom>nil();
                 }
                 axioms.put(sub, currentAxioms.add(subAx));
-            }}
+            }}*/
     }
     
     
