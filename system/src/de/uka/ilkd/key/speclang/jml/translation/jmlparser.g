@@ -1361,8 +1361,13 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 			   "\\old not allowed in this context.");
 	    }
 	    
-	    result = new SLExpression(convertToOld(result.getTerm()), 
-	                              result.getType());
+	    typ = result.getType();
+	    if(typ != null) {
+	      result = new SLExpression(convertToOld(result.getTerm()), 
+	                                result.getType());
+	    } else {
+	      result = new SLExpression(convertToOld(result.getTerm()));
+	    }
 	}
     |   
 	CREATED LPAREN result=expression RPAREN
