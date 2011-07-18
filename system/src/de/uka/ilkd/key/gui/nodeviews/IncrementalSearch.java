@@ -19,9 +19,9 @@ import java.util.regex.PatternSyntaxException;
 
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.util.Pair;
+import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
@@ -32,8 +32,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JTextField;
-import javax.swing.border.LineBorder;
-import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -276,9 +274,9 @@ public class IncrementalSearch {
 
         public SearchDialog() {
             super((JDialog)null, "Search", false);
-            getContentPane().setLayout(new FlowLayout());
-            getContentPane().add(initTextField());
-            getContentPane().add(initRegExpCheckbox());
+            getContentPane().setLayout(new BorderLayout());
+            getContentPane().add(initTextField(), BorderLayout.CENTER);
+            getContentPane().add(initRegExpCheckbox(), BorderLayout.EAST);
             setAlwaysOnTop(true);
             addWindowListener(new WindowAdapter() {
                 public void windowClosing(WindowEvent e) {
