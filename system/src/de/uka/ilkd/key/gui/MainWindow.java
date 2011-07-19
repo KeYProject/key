@@ -466,8 +466,11 @@ public final class MainWindow extends JFrame  {
             }
         });
         
+        // default size
         setSize(1000, 750);
         setName("mainWindow");
+        
+        // load preferred sizes from system preferences
         prefSaver.load(this);
     }
 
@@ -1836,7 +1839,6 @@ public final class MainWindow extends JFrame  {
      * @return the instance of Main
      * @throws Exception 
      */
-    // FIXME Do not change state in a getter method. 
     public static MainWindow getInstance(final boolean visible) throws IllegalStateException {
         
         if(instance == null) {
@@ -1844,13 +1846,14 @@ public final class MainWindow extends JFrame  {
             throw new IllegalStateException("There is no GUI main window. Sorry.");
         }
         
-        if(visible && !instance.isVisible()) {
-            GuiUtilities.invokeOnEventQueue(new Runnable() {
-                public void run() {                            
-                    instance.setVisible(true);
-                }
-            });
-        }
+        // in a getter method the state ought not be changed. -> Lead to trouble.
+//        if(visible && !instance.isVisible()) {
+//            GuiUtilities.invokeOnEventQueue(new Runnable() {
+//                public void run() {                            
+//                    instance.setVisible(true);
+//                }
+//            });
+//        }
         
         return instance;
     }

@@ -63,13 +63,14 @@ public class Main {
 
         GuiUtilities.invokeAndWait(new Runnable() {
             public void run() {
-                MainWindow.createInstance("KeY " + KeYResourceManager.getManager().getVersion());                
+                MainWindow.createInstance("KeY " + KeYResourceManager.getManager().getVersion());  
+                MainWindow key = MainWindow.getInstance();
+                key.setVisible(true);
+                key.loadCommandLineFile();
             }
         });
         
-        MainWindow key = MainWindow.getInstance();
         
-        key.loadCommandLineFile();
     }
 
     public static void evaluateOptions(String[] opt) {
