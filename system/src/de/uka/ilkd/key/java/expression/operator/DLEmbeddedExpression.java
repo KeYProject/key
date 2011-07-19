@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.java.expression.operator;
 
+import de.uka.ilkd.key.java.ConvertException;
+import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -44,11 +47,11 @@ public class DLEmbeddedExpression extends Operator {
         
         Sort sort = functionSymbol.sort();
         
-        KeYJavaType kjt = javaServ.getJavaInfo().getKeYJavaType(sort);
+        KeYJavaType kjt = getKeYJavaType(javaServ, sort);
         if(kjt != null) {
             return kjt;
         } else {
-            // FIXME FIXME FIXME Unknown types are maped to int.
+            // FIXME FIXME FIXME Unknown types are mapped to int.
             return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT);
         }
     }
@@ -71,5 +74,48 @@ public class DLEmbeddedExpression extends Operator {
     @Override    
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
         p.printDLEmbeddedExpression(this);
+    }
+
+    public void check(Services javaServ) throws ConvertException {
+        
+        if(functionSymbol == null)
+            throw new ConvertException("null function symbol");
+        
+        int expected = functionSymbol.arity();
+        int actual = children.size();
+        
+        if (expected != actual) {
+            throw new ConvertException("Function symbol " + functionSymbol
+                    + " requires " + expected
+                    + " arguments, but received only " + actual);
+        }
+        
+        for (int i = 0; i < expected; i++) {
+            Sort argSort = functionSymbol.argSort(i);
+            KeYJavaType kjtExpected = getKeYJavaType(javaServ, argSort);
+                
+            Expression child = children.get(i);
+            KeYJavaType kjtActual = javaServ.getTypeConverter().getKeYJavaType(child);
+            
+            // or use equals here?! Subtyping?!
+            if(kjtActual != kjtExpected) {
+                throw new ConvertException("Received " + child
+                        + " as argument " + i + " for function "
+                        + functionSymbol + ". Was expecting type "
+                        + kjtExpected + ", but received " + kjtActual);
+            }
+        }
+    }
+
+    private KeYJavaType getKeYJavaType(Services javaServ, Sort argSort) {
+        // JavaInfo returns wrong data for sort integer! We need to find it over
+        // other paths.
+        JavaInfo javaInfo = javaServ.getJavaInfo();
+        KeYJavaType intType = javaInfo.getPrimitiveKeYJavaType("int");
+        if(argSort == intType.getSort()) {
+            return intType;
+        } else {
+            return javaInfo.getKeYJavaType(argSort);
+        }
     }
 }

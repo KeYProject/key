@@ -604,8 +604,9 @@ public class KeYCrossReferenceSourceInfo
                   || expr instanceof SeqReverse) {
         return name2primitiveType.get("\\seq");
 	} else if(expr instanceof DLEmbeddedExpression) {
-	    // TODO This is not good at all, but does not fail.
-	    return null;
+	    // w/o further resolution, a type cannot be determined.
+	    // but this does not fail.
+	    return getNameInfo().getUnknownType();
 	} else if (expr instanceof SeqLength
 	        || expr instanceof SeqIndexOf){
 	    return name2primitiveType.get("int");

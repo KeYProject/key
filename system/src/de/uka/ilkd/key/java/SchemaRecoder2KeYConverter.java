@@ -59,9 +59,11 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
      *            the object to associate to
      * @param namespaceSet
      *            namespaces to resolve entity names
+     * @param services
+     *            services to be used
      */
-    public SchemaRecoder2KeYConverter(SchemaRecoder2KeY rec2key, NamespaceSet namespaceSet) {
-        super(rec2key, namespaceSet);
+    public SchemaRecoder2KeYConverter(SchemaRecoder2KeY rec2key, Services services, NamespaceSet namespaceSet) {
+        super(rec2key, services, namespaceSet);
     }
 
     // ------ conversion methods

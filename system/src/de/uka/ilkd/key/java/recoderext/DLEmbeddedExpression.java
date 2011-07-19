@@ -2,14 +2,19 @@ package de.uka.ilkd.key.java.recoderext;
 
 import java.util.List;
 
+import de.uka.ilkd.key.util.MiscTools;
+
+import recoder.abstraction.Type;
 import recoder.java.Expression;
 import recoder.java.SourceVisitor;
 import recoder.java.expression.Operator;
 import recoder.list.generic.ASTArrayList;
 
+// MU DOC
 public class DLEmbeddedExpression extends Operator {
 
     private final String functionName;
+
     /**
      * @return the functionName
      */
@@ -21,7 +26,7 @@ public class DLEmbeddedExpression extends Operator {
         this.functionName = functionName;
         children = new ASTArrayList<Expression>(arguments);
     }
-    
+
     /**
      * Arity of an embedded JavaDL Expression depends upon the number of
      * arguments.
@@ -48,7 +53,13 @@ public class DLEmbeddedExpression extends Operator {
 
     @Override
     public void accept(SourceVisitor v) {
-        // TODO Implement DLEmbeddedExpression.accept
+        // SourceVisitors in RecodeR currently are only used to perform the toSource() operation.
+        // One of them needs to be implemented in order for source code to be reproduced.
+    }
+    
+    @Override
+    public String toSource() {
+        return "\\dl_" + functionName + "(" + MiscTools.join(children, ",") + ")";
     }
 
 }

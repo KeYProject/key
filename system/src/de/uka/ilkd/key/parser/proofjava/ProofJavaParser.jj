@@ -2676,6 +2676,8 @@ Expression UnaryExpression() :
   result = UnaryExpressionNotPlusMinus()
 |
   result = ADTGetter()
+|
+  result = EmbeddedDLExpression()
 )
   { 
     checkConstruction(result);
@@ -3209,8 +3211,6 @@ Expression ADTConstructor() :
         result = new SeqConcat(first, new SeqConcat(second, third));
         setPrefixInfo(result);
     }
-    |
-    result = EmbeddedDLExpression()
     )
     {
       checkConstruction(result);

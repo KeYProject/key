@@ -72,6 +72,8 @@ public class Recoder2KeYConverter {
 
     // -------- public part
 
+    private final Services services;
+
     public ProgramElement process(recoder.java.ProgramElement pe) {
         Object result = callConvert(pe);
         assert result instanceof ProgramElement : "result must be a ProgramElement";
@@ -94,9 +96,10 @@ public class Recoder2KeYConverter {
         return (CompilationUnit) result;
     }
 
-    public Recoder2KeYConverter(Recoder2KeY rec2key, NamespaceSet nss) {
+    public Recoder2KeYConverter(Recoder2KeY rec2key, Services services, NamespaceSet nss) {
         super();
         this.rec2key = rec2key;
+        this.services = services;
         this.namespaceSet = nss;
     }
 
@@ -738,7 +741,11 @@ public class Recoder2KeYConverter {
         }
         
         Function f = (Function) named;
-        return new DLEmbeddedExpression(f, children);
+        DLEmbeddedExpression expression = new DLEmbeddedExpression(f, children);
+        
+        expression.check(services);
+        
+        return expression;
     }
     
     public SeqGet convert(de.uka.ilkd.key.java.recoderext.adt.SeqGet e){
