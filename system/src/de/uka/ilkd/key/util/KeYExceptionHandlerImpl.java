@@ -10,13 +10,15 @@
 
 package de.uka.ilkd.key.util;
 
+import java.util.*;
+
 
 public abstract class KeYExceptionHandlerImpl implements KeYExceptionHandler {
 
-    protected ExtList exceptions = null; 
+    protected List<Throwable> exceptions = null; 
 
     public KeYExceptionHandlerImpl() {
-	exceptions = new ExtList();
+	exceptions = new LinkedList<Throwable>();
     }
 
     
@@ -27,13 +29,13 @@ public abstract class KeYExceptionHandlerImpl implements KeYExceptionHandler {
 
     
     @Override    
-    public ExtList getExceptions() {
+    public List<Throwable> getExceptions() {
 	return exceptions;
     }
 
         
     @Override    
     public void clear() {
-	exceptions = new ExtList();	
+	exceptions.clear();
     }
 }

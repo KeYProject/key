@@ -1415,7 +1415,7 @@ public final class MainWindow extends JFrame  {
             if (!"".equals(info.getResult())) {
                 final KeYExceptionHandler exceptionHandler = 
                     ((ProblemLoader)info.getSource()).getExceptionHandler();
-                new ExceptionDialog(MainWindow.this,     
+                ExceptionDialog.showDialog(MainWindow.this,     
                         exceptionHandler.getExceptions());
                 exceptionHandler.clear();
             } else {
