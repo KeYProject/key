@@ -10,11 +10,13 @@
 
 package de.uka.ilkd.key.util;
 
+import java.util.List;
+
 public interface KeYExceptionHandler {
 
     public void reportException(Throwable e);
 
-    public ExtList getExceptions();
+    public List<Throwable> getExceptions();
 
     public void clear();
 }
