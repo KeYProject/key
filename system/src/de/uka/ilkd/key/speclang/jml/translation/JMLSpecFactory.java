@@ -726,9 +726,8 @@ public class JMLSpecFactory {
                                                                null,
                                                                null,
                                                                services);
-        System.out.println("type: "+kjt+"\ntarget: "+rep.first);
         // represents clauses must be unique per type
-        // TODO: if statement does not match
+        // TODO: if statement does not match (bug report #1104)
         for (Pair<KeYJavaType,ObserverFunction> p: modelFields){
             if (p.first.equals(kjt)&& p.second.equals(rep.first)){
                 throw new SLTranslationException("JML represents clauses must occur uniquely per type and target.");

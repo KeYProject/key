@@ -746,7 +746,6 @@ public final class SpecificationRepository {
         }
         if (ax instanceof RepresentsAxiom) {
             // there may only be one conjoined represents axiom per model field
-            // TODO: only one declaration per type is syntactically permitted, check this!
             RepresentsAxiom  oldRep = getRepresentsAxiom(kjt, ax);
             if (oldRep != null) {
                 final RepresentsAxiom newRep = oldRep.conjoin((RepresentsAxiom)ax);

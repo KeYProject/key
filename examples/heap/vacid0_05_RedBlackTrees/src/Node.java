@@ -30,13 +30,22 @@ public class Node {
     int key;
     int value;
     
-    //@ ghost int height;
+    //@ protected ghost int height;
 
     Node parent, left, right;
     
-    //@ model \locset footprint;
-    //@ represents footprint = isRed, key, value, parent, left, right, height;
-    //@ accessible footprint : footprint;
+    /*@ protected model \seq subtree;
+      @ represents subtree = \seq_concat(\seq_singleton(this), \seq_concat(left.subtree, right.subtree));
+      @ accessible subtree : treeFootprint \measured_by height;
+      @*/
+    
+    /*@ protected model \locset footprint;
+      @ represents footprint = isRed, key, value, parent, left, right, height;
+      @ accessible footprint : \nothing;
+      @ protected model \locset treeFootprint;
+      @ represents treeFootprint = footprint, left.treeFootprint, right.treeFootprint;
+      @ accessible treeFootprint : \set_union(left.treeFootprint,right.treeFootprint) \measured_by height;
+      @*/
 
     // the red-black tree properties (`high-level' invariants)
     /*@ model boolean redBlackInvariant;
@@ -46,27 +55,36 @@ public class Node {
       @     && left.blackLeft() == right.blackRight()
       @     && (this == NIL || (left.redBlackInvariant && right.redBlackInvariant))
       @     && \invariant_for(this);
-      @ accessible redBlackInvariant : footprint, left.footprint, right.footprint \measured_by height;
+      @ accessible redBlackInvariant : treeFootprint \measured_by height;
       @*/
     
 
     // `low-level' invariants
-    //@ invariant parent == NIL || parent.left == this || parent.right == this;
-    //@ invariant key >= 0;
-    //@ invariant height == (this == NIL ? 0 :(left.height > right.height ? left.height : right.height)+1);
-    //@ invariant \invariant_for(left) && \invariant_for(right);
-    //@ accessible \inv : footprint, left.footprint, right.footprint \measured_by height;
+    /*@ invariant parent == NIL || parent.left == this || parent.right == this;
+      @ invariant key >= 0;
+      @ invariant height == left.height > right.height ? left.height : right.height)+1;
+      @ invariant (\forall Node n; n != this; \disjoint(footprint, n.footprint));
+      @ invariant \disjoint(footprint, left.treeFootprint) && \disjoint(footprint, right.treeFootprint);
+      @ invariant \invariant_for(left) && \invariant_for(right);
+      @ accessible \inv : treeFootprint \measured_by height;
+      @*/
 
-    //@ requires key >= 0;
+    /*@ normal_behavior
+      @ requires key >= 0;
+      @ ensures parent == NIL && left == NIL && right == NIL && this.key == key && this.value == value && !isRed;
+      @ ensures \fresh(footprint);
+      @ accessible \nothing; 
+      @ pure
+      @*/
     Node (int key, int value){
         parent = NIL;
         left = NIL;
         right = NIL;
+        //@ set height = 1;
         this.key = key;
         this.value = value;
     }
 
-    //@ helper
     private Node (){}
 
     //@ measured_by height;
@@ -134,7 +152,16 @@ public class Node {
      * @author bruns
      */
     public final static class Nil extends Node {
-        //@ ensures true;
+        /*@ represents footprint = \empty;
+          @ represents treeFootprint = \empty;
+          @ represents subtree = \seq_empty;
+          @ accessible footprint : \nothing;
+          @ accessible treeFootprint : \nothing;
+          @ accessible subtree : \nothing;
+          @*/
+        
+        //@ invariant height == 0;
+        
         private Nil(){
             //@ set height = 0;
             parent = this;
