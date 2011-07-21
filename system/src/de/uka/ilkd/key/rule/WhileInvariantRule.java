@@ -93,12 +93,15 @@ public final class WhileInvariantRule implements BuiltInRule {
 	if (!(activeStatement instanceof While)) {
 	    return null;
 	}
-	final While loop = (While) activeStatement;
 
+
+        
+	final While loop = (While) activeStatement;
 	LoopInvariant inv = services.getSpecificationRepository()
 	        .getLoopInvariant(loop);
 
 	// New
+        if(!Main.getInstance().mediator().autoMode()) {
 	if (inv == null) {
 	    inv = new LoopInvariantImpl(loop,
 		    MiscTools.getInnermostMethodFrame(progPost.javaBlock(),
@@ -123,6 +126,14 @@ public final class WhileInvariantRule implements BuiltInRule {
 	    inv = Main.getInstance().getLoopInvariant(inv, services, true);
 
 	}
+        } else {
+            if(inv == null || inv.getInvariant(inv.getInternalSelfTerm(), inv
+	        .getInternalHeapAtPre(), services) == null || progPost.op() == Modality.DIA
+	        && inv.getVariant(inv.getInternalSelfTerm(), inv
+	                .getInternalHeapAtPre(), services) == null) {
+                return null;
+            }
+        }
 	// Old
 
 	// collect self, execution context
@@ -183,9 +194,13 @@ public final class WhileInvariantRule implements BuiltInRule {
 	}
 
 	// instantiation must succeed
-	Instantiation inst = instantiate(pio.subTerm(), goal.proof()
+        if(Main.getInstance().mediator().autoMode()) {
+            Instantiation inst = instantiate(pio.subTerm(), goal.proof()
 	        .getServices());
-	return inst != null;
+            return inst != null;
+        } else {
+            return true;
+        }
     }
 
     @Override
