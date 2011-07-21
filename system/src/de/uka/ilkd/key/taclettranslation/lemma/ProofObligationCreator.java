@@ -13,10 +13,9 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.ProblemInitializer.ProblemInitializerListener;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
-import de.uka.ilkd.key.taclettranslation.TacletSoundnessPOLoader.LoaderListener;
+import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.LoaderListener;
 import de.uka.ilkd.key.taclettranslation.TacletVisitor;
 
 
@@ -39,7 +38,7 @@ public class ProofObligationCreator {
          * @param initConfig the initial configuration that should be used for creating the proofs.
          * @param axioms The set of user-defined taclets that should be used as additional rules. This
          * taclets are added to the single proof obligation so that they can be used for the proof.  
-         * @param listener a listener that observes the single steps. Used for status information.
+         * @param listeners a listener that observes the single steps. Used for status information.
          * @return A proof aggregate containing the proofs created by this method.
          */
         public ProofAggregate create(ImmutableSet<Taclet> taclets,

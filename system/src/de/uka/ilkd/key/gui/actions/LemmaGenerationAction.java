@@ -16,9 +16,9 @@ import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.taclettranslation.TacletSoundnessPOLoader;
-import de.uka.ilkd.key.taclettranslation.TacletSoundnessPOLoader.LoaderListener;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletLoader;
+import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader;
+import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.LoaderListener;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
 public abstract class LemmaGenerationAction extends MainWindowAction {
@@ -43,7 +43,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
     abstract protected String getDescription();
     abstract protected boolean proofIsRequired();
     
-    private void handleException(Throwable exception){
+    protected final void handleException(Throwable exception){
         String desc = exception.getMessage();
         SimpleExceptionDialog.INSTANCE.showDialog("Error while loading taclets:", desc, exception); 
     }
@@ -106,7 +106,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                 LoaderListener listener = new AbstractLoaderListener(mainWindow) {
                         @Override
                         public void stopped(Throwable exception) {
-                              throw new RuntimeException(exception);
+                              handleException(exception);
                         }
 
                         @Override

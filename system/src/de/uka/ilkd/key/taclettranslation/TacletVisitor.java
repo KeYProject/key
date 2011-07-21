@@ -21,7 +21,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletGoalTemplate;
 
 public abstract class TacletVisitor extends Visitor {
-
+        private String failureDescription = null;
 
         private void visit(Semisequent semiseq) {
                 for (SequentFormula aSemiseq : semiseq) {
@@ -35,14 +35,19 @@ public abstract class TacletVisitor extends Visitor {
                 visit(seq.succedent());
         }
 
-        public void visit(Taclet taclet, boolean visitAddrules) {
+        public String visit(Taclet taclet, boolean visitAddrules) {
                 visit(taclet.ifSequent());
                 visitFindPart(taclet);
                 visitGoalTemplates(taclet, visitAddrules);
+                return failureDescription;
         }
         
-        public void visit(Taclet taclet){
-                visit(taclet,false);
+        public String visit(Taclet taclet){
+                return visit(taclet,false);
+        }
+        
+        protected final void failureOccurred(String description){
+                failureDescription = description;
         }
 
         protected void visitFindPart(Taclet taclet) {

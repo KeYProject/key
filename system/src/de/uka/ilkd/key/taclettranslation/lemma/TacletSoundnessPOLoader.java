@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.taclettranslation;
+package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -20,11 +20,8 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletBuilder;
-import de.uka.ilkd.key.taclettranslation.lemma.ProofObligationCreator;
-import de.uka.ilkd.key.taclettranslation.lemma.TacletLoader;
 
 public class TacletSoundnessPOLoader {
 
@@ -62,9 +59,10 @@ public class TacletSoundnessPOLoader {
    
 
         static public class TacletInfo {
-                private Taclet taclet;
-                private boolean alreadyInUse;
-                private boolean notSupported;
+                private final Taclet taclet;
+                private final boolean alreadyInUse;
+                private final boolean notSupported;
+                private final String   nameLowerCase;
 
                 public Taclet getTaclet() {
                         return taclet;
@@ -72,6 +70,10 @@ public class TacletSoundnessPOLoader {
 
                 public boolean isAlreadyInUse() {
                         return alreadyInUse;
+                }
+                
+                public String getNameLowerCase() {
+                        return nameLowerCase;
                 }
 
                 public boolean isNotSupported() {
@@ -84,6 +86,12 @@ public class TacletSoundnessPOLoader {
                         this.taclet = taclet;
                         this.alreadyInUse = alreadyInUse;
                         this.notSupported = notSupported;
+                        this.nameLowerCase = taclet.name().toString().toLowerCase();
+                }
+                
+                @Override
+                public String toString() {
+                        return taclet.name().toString()+ (notSupported ? " (not supported)" : isAlreadyInUse() ? "(already in use)" : "");
                 }
 
         }
@@ -182,12 +190,11 @@ public class TacletSoundnessPOLoader {
         }
 
         private boolean check(Taclet taclet) {
-                return !(taclet instanceof FindTaclet);
+                return DefaultLemmaGenerator.checkTaclet(taclet) != null;
         }
 
 
         private void doWork() throws ProofInputException {
-      
  
                 // Axioms can only be loaded when the taclets are loaded as lemmata.
                 ImmutableSet<Taclet> axioms = tacletLoader.loadAxioms();

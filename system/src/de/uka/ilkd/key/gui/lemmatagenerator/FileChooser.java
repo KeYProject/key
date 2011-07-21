@@ -1,10 +1,8 @@
 package de.uka.ilkd.key.gui.lemmatagenerator;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -22,20 +20,14 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.WindowConstants;
-import javax.swing.border.LineBorder;
-import javax.swing.border.TitledBorder;
-
 
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.gui.smt.ProofIndependentSMTSettings;
 
 
 
@@ -58,12 +50,14 @@ public class FileChooser extends JPanel{
                 "Technical Remarks:\nThe axioms must be stored in another file than the user-defined taclets. Furthermore the axioms " +
                 "are only loaded for the lemmata, but not for the current proof.";
         
-        private static final String INFO_TEXT1 = "Be aware of the fact that you are going to load taclets without creating " +
-        		"corresponding proof obligations. In the case that the taclets that you want to load are unsound, the calculus will" +
-        		"become unsound!";
-        private static final String INFO_TEXT2 = "Be aware of the fact that you are going to load taclets without creating " +
-        		"corresponding proof obligations. In the case that the taclets that you want to load as axioms are unsound, the calculus will" +
-        		"become unsound!";
+        private static final String INFO_TEXT1 = "Be aware of the fact that you are going to load taclets\n" +
+        		                                    "without creating corresponding proof obligations!\n"+
+        		                                    "In case that the taclets that you want to load are unsound,\n"+
+        		                                    "the calculus will become unsound!";
+        private static final String INFO_TEXT2 = "Be aware of the fact that you are going to load taclets\n" +
+        		                                    "without creating corresponding proof obligations!\n"+
+        		                                    "In case that the taclets that you want to load are unsound,\n"+
+        		                                    "the calculus will become unsound!";
         
         
         private class SingleFileChooser extends Box{
@@ -212,14 +206,14 @@ public class FileChooser extends JPanel{
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
                                         
-                                        InfoDialog infoDialog = new InfoDialog(INFO_TEXT1);
+                                        InfoDialog infoDialog = new InfoDialog();
                                         if(!lemmaCheckbox.isSelected()){
                                             lemmaCheckbox.setSelected(true);   
                                             boolean showDialogUsingAxioms = ProofIndependentSettings.DEFAULT_INSTANCE
                                             .getLemmaGeneratorSettings()
                                             .isShowingDialogUsingAxioms();
                                             if((showDialogUsingAxioms &&
-                                                            infoDialog.showDialog()) || 
+                                                            infoDialog.showDialog(INFO_TEXT1,FileChooser.this)) || 
                                                             !showDialogUsingAxioms){
                                               changedToNotSelected();   
                                               lemmaCheckbox.setSelected(false);  
@@ -366,8 +360,9 @@ public class FileChooser extends JPanel{
                                if(firstTimeAddingAxioms && 
                                                ProofIndependentSettings.DEFAULT_INSTANCE.
                                                getLemmaGeneratorSettings().isShowingDialogAddingAxioms()){                                     
-                                       InfoDialog infoDialog = new InfoDialog(INFO_TEXT2);
-                                       firstTimeAddingAxioms = !infoDialog.showDialog();
+                                      
+                                       InfoDialog infoDialog = new InfoDialog();
+                                       firstTimeAddingAxioms = !infoDialog.showDialog(INFO_TEXT2,FileChooser.this);
                                        ProofIndependentSettings.DEFAULT_INSTANCE
                                        .getLemmaGeneratorSettings().showDialogAddingAxioms(infoDialog.showThisDialogNextTime());
                                        if(firstTimeAddingAxioms){
@@ -472,7 +467,7 @@ public class FileChooser extends JPanel{
         
         private JButton getOkayButton(){
                 if(okayButton == null){
-                      okayButton  = new JButton("OK"); 
+                      okayButton  = new JButton("Okay"); 
                       Dimension dim = getCancelButton().getPreferredSize();
                       okayButton.setEnabled(false);
                       okayButton.setPreferredSize(dim);
@@ -486,6 +481,8 @@ public class FileChooser extends JPanel{
                 }
                 return okayButton;
          }
+        
+
         
         
         private JButton getCancelButton(){

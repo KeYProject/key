@@ -18,10 +18,10 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.taclettranslation.TacletSoundnessPOLoader.LoaderListener;
-import de.uka.ilkd.key.taclettranslation.TacletSoundnessPOLoader.TacletFilter;
-import de.uka.ilkd.key.taclettranslation.TacletSoundnessPOLoader.TacletInfo;
 import de.uka.ilkd.key.taclettranslation.lemma.AutomaticProver;
+import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.LoaderListener;
+import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletFilter;
+import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletInfo;
 
 public class LemmataHandler implements TacletFilter {
         private final LemmataAutoModeOptions options;
