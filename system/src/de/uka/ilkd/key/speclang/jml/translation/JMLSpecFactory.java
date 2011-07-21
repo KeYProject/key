@@ -9,6 +9,9 @@
 //
 package de.uka.ilkd.key.speclang.jml.translation;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
@@ -46,6 +49,7 @@ public class JMLSpecFactory {
     private final Services services;
     private final JMLTranslator translator;
     private int invCounter;
+    private Set<Pair<KeYJavaType,ObserverFunction>> modelFields;
 
 
     //-------------------------------------------------------------------------
@@ -55,6 +59,7 @@ public class JMLSpecFactory {
         assert services != null;
         this.services = services;
         this.translator = JMLTranslator.getInstance();
+        modelFields = new HashSet<Pair<KeYJavaType,ObserverFunction>>();
     }
 
     //-------------------------------------------------------------------------
@@ -685,6 +690,13 @@ public class JMLSpecFactory {
                                                                null,
                                                                null,
                                                                services);
+        // represents clauses must be unique per type
+        for (Pair<KeYJavaType,ObserverFunction> p: modelFields){
+            if (p.first.equals(kjt)&& p.second.equals(rep.first)){
+                throw new SLTranslationException("JML represents clauses must occur uniquely per type and target.", originalRep.fileName, originalRep.pos);
+            }
+        }
+        modelFields.add(new Pair<KeYJavaType, ObserverFunction>(kjt,rep.first));
         //create class axiom
         return new RepresentsAxiom("JML represents clause for "
                                    + rep.first.name().toString(),
@@ -714,6 +726,14 @@ public class JMLSpecFactory {
                                                                null,
                                                                null,
                                                                services);
+        System.out.println("type: "+kjt+"\ntarget: "+rep.first);
+        // represents clauses must be unique per type
+        // TODO: if statement does not match
+        for (Pair<KeYJavaType,ObserverFunction> p: modelFields){
+            if (p.first.equals(kjt)&& p.second.equals(rep.first)){
+                throw new SLTranslationException("JML represents clauses must occur uniquely per type and target.");
+            }
+        }
         //create class axiom
         String name = "JML represents clause for "
             + rep.first.name().toString();

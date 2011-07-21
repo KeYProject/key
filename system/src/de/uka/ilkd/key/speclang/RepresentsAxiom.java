@@ -384,5 +384,19 @@ public final class RepresentsAxiom extends ClassAxiom {
         		+ " (subclass " + newKjt.getName()+ ")";
         return new RepresentsAxiom(newName, displayName, target, newKjt, visibility, originalRep, originalSelfVar);
     }
+    
+    /** Conjoins two represents clauses with minimum visibility. 
+     *  An exception is thrown if the targets or types are different.
+     *  <b>Known issue</b>: public clauses in subclasses are hidden by protected clauses in superclasses;
+     *  this only applies to observers outside the package of the subclass (whenever package-privacy is implemented).
+     */
+    public RepresentsAxiom conjoin (RepresentsAxiom ax) {
+        if (!target.equals(ax.target) || !kjt.equals(ax.kjt)){
+            throw new RuntimeException("Tried to conjoin incompatible represents axioms.");
+        }
+        VisibilityModifier minVisibility = visibility == null ? (VisibilityModifier.isPrivate(ax.visibility) ? ax.visibility : null) : (visibility.compareTo(ax.visibility) >= 0 ? visibility : ax.visibility);
+        Term newRep = TB.and(originalRep, ax.originalRep);
+        return new RepresentsAxiom(name, displayName, target, kjt, minVisibility, newRep, originalSelfVar);
+    }
 
 }

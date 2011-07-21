@@ -22,8 +22,6 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.declaration.modifier.Private;
-import de.uka.ilkd.key.java.declaration.modifier.Protected;
-import de.uka.ilkd.key.java.declaration.modifier.Public;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -330,7 +328,20 @@ public final class SpecificationRepository {
     }
     
     
-    
+
+
+    private RepresentsAxiom getRepresentsAxiom (KeYJavaType kjt, ClassAxiom ax){
+        if (!(ax instanceof RepresentsAxiom) || axioms.get(kjt)== null)
+            return null;
+        RepresentsAxiom result = null;
+        for (ClassAxiom ca: axioms.get(kjt)){
+            if (ca instanceof RepresentsAxiom && (ca.getTarget().equals(ax.getTarget()))){
+                assert result == null : "More than one represents clause for "+ax.getTarget();
+                result = (RepresentsAxiom)ca;
+            }
+        }
+        return result;
+    }
     
     //-------------------------------------------------------------------------
     //public interface
@@ -733,17 +744,36 @@ public final class SpecificationRepository {
         if(currentAxioms == null) {
             currentAxioms = DefaultImmutableSet.<ClassAxiom>nil();
         }
-        axioms.put(kjt, currentAxioms.add(ax));/*
-        if (isAtLeastProtected(ax) && ax instanceof RepresentsAxiom){
-            final ImmutableList<KeYJavaType> subs = services.getJavaInfo().getAllSubtypes(kjt);
-            for (KeYJavaType sub: subs){
-                RepresentsAxiom subAx =  ((RepresentsAxiom)ax).setKJT(sub);
-                currentAxioms = axioms.get(sub);
-                if(currentAxioms == null) {
-                    currentAxioms = DefaultImmutableSet.<ClassAxiom>nil();
-                }
-                axioms.put(sub, currentAxioms.add(subAx));
-            }}*/
+        if (ax instanceof RepresentsAxiom) {
+            // there may only be one conjoined represents axiom per model field
+            // TODO: only one declaration per type is syntactically permitted, check this!
+            RepresentsAxiom  oldRep = getRepresentsAxiom(kjt, ax);
+            if (oldRep != null) {
+                final RepresentsAxiom newRep = oldRep.conjoin((RepresentsAxiom)ax);
+                axioms.put(kjt, currentAxioms.remove(oldRep).add(newRep));
+            } else {
+                axioms.put(kjt, currentAxioms.add(ax));
+            }
+            // inherit represents clauses to subclasses and conjoin together
+            if (VisibilityModifier.allowsInheritance(ax.getVisibility())){
+                final ImmutableList<KeYJavaType> subs = services.getJavaInfo().getAllSubtypes(kjt);
+                for (KeYJavaType sub: subs){
+                    RepresentsAxiom subAx =  ((RepresentsAxiom)ax).setKJT(sub);
+                    currentAxioms = axioms.get(sub);
+                    if(currentAxioms == null) {
+                        currentAxioms = DefaultImmutableSet.<ClassAxiom>nil();
+                    }
+                    oldRep = getRepresentsAxiom(sub, subAx);
+                    if (oldRep == null)
+                        axioms.put(sub, currentAxioms.add(subAx));
+                    else {
+                        final RepresentsAxiom newSubRep = oldRep.conjoin(subAx);
+                        axioms.put(sub, currentAxioms.remove(oldRep).add(newSubRep));
+                    }
+                }}
+        } else {
+            axioms.put(kjt, currentAxioms.add(ax));
+        }
     }
     
     
