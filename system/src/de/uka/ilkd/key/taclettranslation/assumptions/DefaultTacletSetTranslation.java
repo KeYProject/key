@@ -120,7 +120,6 @@ public final class DefaultTacletSetTranslation implements TacletSetTranslation,
                 usedFormulaSorts = (sorts == null ? emptySetSort : sorts);
 
                 for (Taclet t : settings.getTaclets()) {
-                        System.out.println("Translate: " + t.name().toString());
                         if (SupportedTaclets.REFERENCE.contains(t.name()
                                         .toString(),false)) {
 
@@ -139,7 +138,7 @@ public final class DefaultTacletSetTranslation implements TacletSetTranslation,
                                                                         e.getMessage()));
                                 }
                         }else{
-                                System.out.println("NOT SUPPORTED");
+                                throw new RuntimeException("Taclet "+ t.name() +" ist not supported");
                         }
                 }
 

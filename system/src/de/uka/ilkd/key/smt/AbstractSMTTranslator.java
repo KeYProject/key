@@ -2501,13 +2501,13 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         private ArrayList<StringBuffer> translateTaclets(Services services,
                         SMTSettings settings) throws IllegalFormulaException {
                 Collection<Taclet> taclets = settings.getTaclets();
-                System.out.println("TACLETS: " + taclets.size());
+
                 ArrayList<StringBuffer> result = new ArrayList<StringBuffer>();
                 if (!settings.makesUseOfTaclets() || taclets == null
                                 || taclets.isEmpty()) {
                         return result;
                 }
-                System.out.println("TRANSLATE ...");
+ 
                 tacletSetTranslation = new DefaultTacletSetTranslation(
                                 services, settings);
 
@@ -2543,10 +2543,10 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                 sorts = sorts.add(sort);
                         }
                 }
-                System.out.println("start");
+
                 for (TacletFormula tf : tacletSetTranslation
                                 .getTranslation(sorts)) {
-                        System.out.println(tf.getTaclet().name());
+
                         for (Term subterm : tf.getInstantiations()) {
                                 try {
                                         StringBuffer term = translateTerm(

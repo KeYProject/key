@@ -66,7 +66,7 @@ public class ProofDependentSettings implements de.uka.ilkd.key.gui.configuration
                 this.useBuiltInUniqueness          = data.useBuiltInUniqueness;
                 this.useUIMultiplication           = data.useUIMultiplication;
                 this.useConstantsForIntegers       = data.useConstantsForIntegers; 
-                System.out.println(supportedTaclets.ID);
+     
              
         }
 

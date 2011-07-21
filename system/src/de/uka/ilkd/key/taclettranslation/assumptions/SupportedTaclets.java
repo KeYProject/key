@@ -443,7 +443,6 @@ public final class SupportedTaclets {
                                 "superclasses_of_initialized_classes_are_prepared");
 
                 TreeItem node17 = newNode(root, "LocSets", Category.LOC_SETS);
-                System.out.println("ROOT: " + root.getChildCount());
                 TreeItem node20 = newNode(node17, "Axioms",
                                 Category.LOC_SETS_AXIOMS);
                 addTaclet(node20, "elementOfEmpty", "elementOfAllLocs",

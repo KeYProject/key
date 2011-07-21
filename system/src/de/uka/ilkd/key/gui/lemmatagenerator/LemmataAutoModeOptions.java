@@ -212,7 +212,6 @@ public class LemmataAutoModeOptions {
         private String generatePath(String path, String reference) {
                 if (path.equals("")) {
                         File temp = new File(reference);
-                        System.out.println(temp.getAbsolutePath());
                         int index = temp.getAbsolutePath().lastIndexOf(File.separator);
                         path = temp.getAbsolutePath().substring(0, index + 1);
                 }

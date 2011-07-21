@@ -79,7 +79,7 @@ public class InfoDialog extends JDialog{
                 this.setModal(true);
                 this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
                 this.setLocationByPlatform(true);
-                //System.out.println(getInfoTextHeight());
+
                // this.getInfoText().setPreferredSize(new Dimension(400, getInfoTextHeight()));
                 this.setMaximumSize(new Dimension(500,Integer.MAX_VALUE));
                 this.setPreferredSize(new Dimension(500,400));
@@ -158,7 +158,7 @@ public class InfoDialog extends JDialog{
         }
         
         public static void main(String [] args){
-                System.out.println("Start");
+
                 InfoDialog dialog =    new InfoDialog("adadjhafb jshbgfd jbsjfdbs jfdbsjdfbsjhfbjsfbjs asdasda asd asdasd ads adadjhafb jshbgfd jbsjfdbs jfdbsjdfbsjhfbjsfbjs asdasda asd asdasd ads adadjhafb jshbgfd jbsjfdbs jfdbsjdfbsjhfbjsfbjs asdasda asd asdasd ads adadjhafb jshbgfd jbsjfdbs jfdbsjdfbsjhfbjsfbjs asdasda asd asdasd ads adadjhafb jshbgfd jbsjfdbs jfdbsjdfbsjhfbjsfbjs asdasda asd asdasd ads");
                 
                 dialog.showDialog();

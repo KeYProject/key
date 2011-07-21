@@ -2,34 +2,24 @@ package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.SimpleExceptionDialog;
-import de.uka.ilkd.key.gui.configuration.PathConfig;
-import de.uka.ilkd.key.gui.lemmatagenerator.EnvironmentCreator;
 import de.uka.ilkd.key.gui.lemmatagenerator.FileChooser;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmaSelectionDialog;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.taclettranslation.TacletSoundnessPOLoader;
 import de.uka.ilkd.key.taclettranslation.TacletSoundnessPOLoader.LoaderListener;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletLoader;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
-import de.uka.ilkd.key.util.ProgressMonitor;
 
 public abstract class LemmaGenerationAction extends MainWindowAction {
     public enum Mode {ProveUserDefinedTaclets,ProveKeYTaclets,ProveAndAddUserDefinedTaclets};    
@@ -67,10 +57,19 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
         }
     }
     
-    private abstract class AbstractLoaderListener implements LoaderListener{
-            @Override
+    private abstract static class AbstractLoaderListener implements LoaderListener{
+        private final MainWindow mainWindow;
+        
+        
+            
+        private AbstractLoaderListener(MainWindow mainWindow) {
+                super();
+                this.mainWindow = mainWindow;
+        }
+
+        @Override
             public void started() {
-                getMediator().stopInterface(true);
+                mainWindow.getMediator().stopInterface(true);
             }
 
         @Override
@@ -89,7 +88,10 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
         }
     }
     
-    static public class ProveKeYTaclets extends LemmaGenerationAction{
+    public static class ProveKeYTaclets extends LemmaGenerationAction{
+
+
+        private static final long serialVersionUID = 1L;
 
         public ProveKeYTaclets(MainWindow mainWindow) {
                 super(mainWindow);
@@ -98,11 +100,10 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
         
         @Override
         protected void loadTaclets() {
-                System.out.println("START");
+
                 TacletLoader tacletLoader = new TacletLoader.KeYsTacletsLoader(mainWindow.getUserInterface(),mainWindow.getUserInterface(),
                                 mainWindow.getMediator().getProfile());
-                System.out.println("taclet loader created");
-                LoaderListener listener = new AbstractLoaderListener() {
+                LoaderListener listener = new AbstractLoaderListener(mainWindow) {
                         @Override
                         public void stopped(Throwable exception) {
                               throw new RuntimeException(exception);
@@ -124,7 +125,6 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                     TacletSoundnessPOLoader loader = new TacletSoundnessPOLoader(
                                  listener,
                                 new LemmaSelectionDialog(),true,tacletLoader,true);
-                    System.out.println("start loading pos");
                     loader.start();
 
             }
@@ -148,6 +148,9 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
     }
     
     static public class ProveUserDefinedTaclets extends LemmaGenerationAction{
+
+
+        private static final long serialVersionUID = 1L;
 
         public ProveUserDefinedTaclets(MainWindow mainWindow) {
                 super(mainWindow);
@@ -184,7 +187,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                 
                 
 
-                LoaderListener listener = new AbstractLoaderListener() {
+                LoaderListener listener = new AbstractLoaderListener(mainWindow) {
                     @Override
                     public void stopped(Throwable exception) {
                           throw new RuntimeException(exception);
@@ -263,7 +266,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
 
                 
 
-                LoaderListener listener = new AbstractLoaderListener() {
+                LoaderListener listener = new AbstractLoaderListener(mainWindow) {
                     @Override
                     public void stopped(Throwable exception) {
                           throw new RuntimeException(exception);

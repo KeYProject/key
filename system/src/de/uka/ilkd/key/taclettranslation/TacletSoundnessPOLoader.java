@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.taclettranslation;
 
-import java.io.File;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -27,7 +25,6 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletBuilder;
 import de.uka.ilkd.key.taclettranslation.lemma.ProofObligationCreator;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletLoader;
-import de.uka.ilkd.key.util.ProgressMonitor;
 
 public class TacletSoundnessPOLoader {
 
@@ -192,12 +189,11 @@ public class TacletSoundnessPOLoader {
         private void doWork() throws ProofInputException {
       
  
-                System.out.println("START");
                 // Axioms can only be loaded when the taclets are loaded as lemmata.
                 ImmutableSet<Taclet> axioms = tacletLoader.loadAxioms();
-                System.out.println("LOAD TACLETS");
+    
                 ImmutableSet<Taclet> taclets = tacletLoader.loadTaclets();
-                System.out.println("SIZE: " + taclets.size());
+        
 
                 Vector<TacletInfo> collectionOfTacletInfo = createTacletInfo(
                                 taclets, getAlreadyInUseTaclets());
