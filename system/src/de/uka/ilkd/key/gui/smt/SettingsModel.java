@@ -10,16 +10,12 @@
 
 package de.uka.ilkd.key.gui.smt;
 
-import java.util.List;
-
 import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.SolverType;
 
 public class SettingsModel{
@@ -59,12 +55,16 @@ public class SettingsModel{
         }
 
         public SettingsModel(      
-                        ProofDependentSettings pdSettings,
+                        ProofDependentSMTSettings pdSettings,
                         ProofIndependentSMTSettings piSettings, Proof proof) {
                 originalSettings = new SMTSettings(pdSettings, piSettings, proof);
                 temporarySettings = new SMTSettings(pdSettings.clone(), piSettings.clone(),proof);
                
                 createContentModel();
+        }
+        
+        public boolean areDefaultSettings(){
+                return originalSettings.getProof() == null;
         }
 
 
@@ -360,6 +360,8 @@ public class SettingsModel{
         }
 
         private TableComponent[] getGeneralOptionsData() {
+                temporarySettings.getPiSettings();
+                temporarySettings.getPiSettings();
                 TableComponent data[] = {
 
                                 new TableCheckBox() {
@@ -420,8 +422,8 @@ public class SettingsModel{
 
                                 new TableComboBox(
                                                 temporarySettings.getPiSettings().modeOfProgressDialog,
-                                                getProgressMode(temporarySettings.getPiSettings().PROGRESS_MODE_USER),
-                                                getProgressMode(temporarySettings.getPiSettings().PROGRESS_MODE_CLOSE)) {
+                                                getProgressMode(ProofIndependentSMTSettings.PROGRESS_MODE_USER),
+                                                getProgressMode(ProofIndependentSMTSettings.PROGRESS_MODE_CLOSE)) {
 
                                         public void eventChange() {
                                                 temporarySettings.getPiSettings().modeOfProgressDialog = getSelectedItemIndex();

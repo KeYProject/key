@@ -3,22 +3,19 @@ package de.uka.ilkd.key.gui.smt;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Properties;
 
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreeNode;
+
 
 
 import de.uka.ilkd.key.gui.GUIEvent;
 import de.uka.ilkd.key.gui.configuration.SettingsConverter;
 import de.uka.ilkd.key.gui.configuration.SettingsListener;
 import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets;
-import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets.TreeItem;
-import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets.TreeItem.SelectionMode;
 
 
-public class ProofDependentSettings implements de.uka.ilkd.key.gui.configuration.Settings {
+
+public class ProofDependentSMTSettings implements de.uka.ilkd.key.gui.configuration.Settings {
 
         private static final String EXPLICIT_TYPE_HIERARCHY = "[SMTSettings]explicitTypeHierarchy";
 
@@ -45,20 +42,19 @@ public class ProofDependentSettings implements de.uka.ilkd.key.gui.configuration
         public boolean useConstantsForIntegers     = true;
         public int     maxGenericSorts               = 2;
 
-        
-       // public String []  tacletSelection            = new String[0];
+
         public  SupportedTaclets supportedTaclets;
 
-        private ProofDependentSettings(){
+        private ProofDependentSMTSettings(){
  
                 supportedTaclets =  SupportedTaclets.REFERENCE;
         };
 
-        private ProofDependentSettings(ProofDependentSettings data) {            
+        private ProofDependentSMTSettings(ProofDependentSMTSettings data) {            
                 copy(data);                
         }
         
-        public void copy(ProofDependentSettings data){
+        public void copy(ProofDependentSMTSettings data){
                 supportedTaclets = new SupportedTaclets(data.supportedTaclets.getNamesOfSelectedTaclets());
                 this.useExplicitTypeHierarchy      = data.useExplicitTypeHierarchy;
                 this.useNullInstantiation          = data.useNullInstantiation;
@@ -71,17 +67,17 @@ public class ProofDependentSettings implements de.uka.ilkd.key.gui.configuration
         }
 
 
-        private static final ProofDependentSettings DEFAULT_DATA = 
-                new ProofDependentSettings();
+        private static final ProofDependentSMTSettings DEFAULT_DATA = 
+                new ProofDependentSMTSettings();
 
-        public static ProofDependentSettings getDefaultSettingsData(){
+        public static ProofDependentSMTSettings getDefaultSettingsData(){
                 return DEFAULT_DATA.clone();
         }
 
 
         
-        public ProofDependentSettings clone(){
-                return new ProofDependentSettings(this);
+        public ProofDependentSMTSettings clone(){
+                return new ProofDependentSMTSettings(this);
         }
 
 
@@ -94,7 +90,7 @@ public class ProofDependentSettings implements de.uka.ilkd.key.gui.configuration
                 useBuiltInUniqueness = SettingsConverter.read(props,USE_BUILT_IN_UNIQUENESS,useBuiltInUniqueness);
 
                 maxGenericSorts          = SettingsConverter.read(props,MAX_GENERIC_SORTS,maxGenericSorts);
-               // tacletSelection          = SettingsConverter.read(props,TACLET_SELECTION,tacletSelection);
+
                 useUIMultiplication      = SettingsConverter.read(props,USE_UNINTERPRETED_MULTIPLICATION,useUIMultiplication);
                 useConstantsForIntegers  = SettingsConverter.read(props,USE_CONSTANTS_FOR_BIGSMALL_INTEGERS,useConstantsForIntegers);
              
@@ -117,9 +113,7 @@ public class ProofDependentSettings implements de.uka.ilkd.key.gui.configuration
                 for (SettingsListener aListenerList : listeners) {
                         aListenerList.settingsChanged(new GUIEvent(this));
                 }
-           //     if(MainWindow.hasInstance()){
-              //          MainWindow.instance.updateSMTSelectMenu();
-             //   }         
+   
         }
 
         @Override
@@ -131,38 +125,5 @@ public class ProofDependentSettings implements de.uka.ilkd.key.gui.configuration
 
         
        
-       /*  private void tacletAssignmentFromString(String s) {
-        
-                tacletAssignmentFromString((TreeNode)supportedTaclets
-                                .getTreeModel().getRoot(), s, 0);
-                supportedTaclets.validateSelectionModes();
-        }*/
 
-        private int tacletAssignmentFromString(TreeNode node, String s,
-                        int index) {
-                if (index >= s.length() || index < 0)
-                        return -1;
-                TreeItem item = ((TreeItem) ((DefaultMutableTreeNode) node)
-                                .getUserObject());
-
-                String c = String.valueOf(s.charAt(index));
-
-                if (Integer.valueOf(c) == SelectionMode.all.ordinal()) {
-                        item.setMode(SelectionMode.all);
-                } else if (Integer.valueOf(c) == SelectionMode.user.ordinal()) {
-                        item.setMode(SelectionMode.user);
-                } else {
-                        item.setMode(SelectionMode.nothing);
-                }
-
-                index++;
-                for (int i = 0; i < node.getChildCount(); i++) {
-                        index = tacletAssignmentFromString(node.getChildAt(i),
-                                        s, index);
-                        if (index == -1) {
-                                break;
-                        }
-                }
-                return index;
-        }
 }

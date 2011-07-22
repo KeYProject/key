@@ -13,9 +13,6 @@ package de.uka.ilkd.key.gui.smt;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
@@ -26,9 +23,9 @@ import java.awt.event.MouseEvent;
 import javax.swing.AbstractCellEditor;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.DefaultButtonModel;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -50,8 +47,12 @@ public class SettingsDialog {
 
         public void showDialog(SettingsModel set) {
                 this.settings = set;
-
+          
                 init();
+                getInfoPanel().removeAll();
+                getInfoPanel().add(set.areDefaultSettings()?getInfoLabel(): getDefaultButton());
+                getInfoPanel().add(Box.createHorizontalGlue());
+                getJDialog().pack();
                 getJDialog().setModal(true);
                 getJDialog().setVisible(true);
 
@@ -78,6 +79,8 @@ public class SettingsDialog {
         private JButton okButton = null;
         private JButton cancelButton = null;
         private JButton defaultButton = null;
+        private JLabel  infoLabel = null;
+        private JPanel  infoPanel;
 
         /**
          * This method initializes jDialog
@@ -91,9 +94,10 @@ public class SettingsDialog {
 
                         int left = getOptionTree().getPreferredSize().width, right = 650, height = getOptionTable()
                                         .getPreferredScrollableViewportSize().height;
-
-                        jDialog.setSize(new Dimension(left + right,
-                                        (int) (1.25 * height)));
+                        Dimension dim = new Dimension(left + right,
+                                        (int) (1.25 * height));
+                        jDialog.setSize(dim);
+                        jDialog.setMinimumSize(dim);
                         jDialog.setTitle("Decision Procedure Settings");
                         jDialog.setContentPane(getJContentPane());
                         jDialog.setLocationByPlatform(true);
@@ -220,6 +224,13 @@ public class SettingsDialog {
                 return optionTable;
         }
 
+        private JPanel getInfoPanel(){
+                if(infoPanel == null){
+                        infoPanel = new JPanel();
+                        infoPanel.setLayout(new BoxLayout(infoPanel,BoxLayout.X_AXIS));
+                }
+                return infoPanel;
+        }
 
         private JPanel getPanel() {
                 if (panel == null) {
@@ -231,7 +242,10 @@ public class SettingsDialog {
                         settingsBox.add(getSplitPane());
 
                         Box buttonBox = Box.createHorizontalBox();
-                        buttonBox.add(getDefaultButton());
+                        buttonBox.add(Box.createHorizontalStrut(SPACE));
+                        
+                        
+                        buttonBox.add(getInfoPanel());
                         buttonBox.add(Box.createHorizontalGlue());
                         buttonBox.add(getApplyButton());
                         buttonBox.add(Box.createHorizontalStrut(SPACE));
@@ -242,6 +256,13 @@ public class SettingsDialog {
                         panel.add(buttonBox);
                 }
                 return panel;
+        }
+        
+        private JLabel getInfoLabel(){
+                if(infoLabel == null){
+                        infoLabel = new JLabel("No proof is selected: You are editing the default settings, now.");
+                }
+                return infoLabel;
         }
 
         /**

@@ -8,8 +8,6 @@ import java.util.Properties;
 import java.util.Map.Entry;
 
 import de.uka.ilkd.key.gui.GUIEvent;
-import de.uka.ilkd.key.gui.Main;
-import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.SettingsConverter;
 import de.uka.ilkd.key.gui.configuration.SettingsListener;
 

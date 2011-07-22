@@ -7,7 +7,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.configuration.SettingsListener;
-import de.uka.ilkd.key.gui.smt.ProofDependentSettings;
+import de.uka.ilkd.key.gui.smt.ProofDependentSMTSettings;
 import de.uka.ilkd.key.gui.smt.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.gui.smt.SettingsDialog;
 import de.uka.ilkd.key.gui.smt.SettingsModel;
@@ -27,8 +27,8 @@ public SMTOptionsAction(MainWindow mainWindow) {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-            ProofDependentSettings pdSettings = ProofSettings.DEFAULT_SETTINGS.getSMTSettings();
-            Proof proof = this.getMediator().getProof();
+            ProofDependentSMTSettings pdSettings = ProofSettings.DEFAULT_SETTINGS.getSMTSettings();
+            Proof proof = this.getMediator().getSelectedProof();
             if(proof != null){
                     pdSettings = proof.getSettings().getSMTSettings();
             }
@@ -37,7 +37,7 @@ public SMTOptionsAction(MainWindow mainWindow) {
                 @Override
                 public void settingsChanged(GUIEvent event) {
                         if(event.getSource() instanceof ProofIndependentSMTSettings ||
-                                event.getSource() instanceof ProofDependentSettings)
+                                event.getSource() instanceof ProofDependentSMTSettings)
                         mainWindow.updateSMTSelectMenu();
                 }
                     

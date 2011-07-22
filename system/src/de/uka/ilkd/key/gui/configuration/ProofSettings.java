@@ -17,7 +17,7 @@ import java.util.Properties;
 
 import de.uka.ilkd.key.gui.GUIEvent;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmaGeneratorSettings;
-import de.uka.ilkd.key.gui.smt.ProofDependentSettings;
+import de.uka.ilkd.key.gui.smt.ProofDependentSMTSettings;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.util.Debug;
@@ -83,7 +83,7 @@ public class ProofSettings {
             new StrategySettings(),
             new GeneralSettings(),
 	    new ChoiceSettings(),
-	    ProofDependentSettings.getDefaultSettingsData(),
+	    ProofDependentSMTSettings.getDefaultSettingsData(),
 	    new ViewSettings()
 
 	};
@@ -255,9 +255,9 @@ public class ProofSettings {
     /** returns the DecisionProcedureSettings object
      * @return the DecisionProcedureSettings object
      */
-    public ProofDependentSettings getSMTSettings() {
+    public ProofDependentSMTSettings getSMTSettings() {
             ensureInitialized();
-            return (ProofDependentSettings) settings[SMT_SETTINGS];
+            return (ProofDependentSMTSettings) settings[SMT_SETTINGS];
     }
     
 

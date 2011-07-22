@@ -213,9 +213,9 @@ public class SolverListener implements SolverLauncherListener {
 
                 
                 String names[] = new String[smtproblems.size()];
-                int x = 0;
+                int x = 0,y=0;
                 for (SMTProblem problem : smtproblems) {
-                        int y = 0;
+                        y = 0;
                         for (SMTSolver solver : problem.getSolvers()) {
                                 this.problems.add(new InternSMTProblem(x, y,
                                                 problem, solver));
@@ -224,6 +224,7 @@ public class SolverListener implements SolverLauncherListener {
                         names[x] = problem.getName();
                         x++;
                 }
+       
                 
                 ProgressDialogListener listener = new ProgressDialogListener() {
                         
