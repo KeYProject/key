@@ -56,6 +56,7 @@ import de.uka.ilkd.key.logic.sort.ProgramSVSort;
    Augmented with meta constructs and schema variables for use of a schematic 
    Java in Taclets.
  */
+@SuppressWarnings("all")
 public class SchemaJavaParser {
 
     public static final void initialize(Reader r) {

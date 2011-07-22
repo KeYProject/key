@@ -46,6 +46,12 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationException;
  */
 public final class JMLTransformer extends RecoderModelTransformer {
     
+    /**
+     * JML markers left and right.
+     */
+    private static final String JML = "/*@";
+    private static final String JMR = "@*/";
+
     private static final ImmutableList<String> javaMods
         = ImmutableSLList.<String>nil().prepend(new String[]{"abstract",
                                                          "final", 
@@ -148,7 +154,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
      * in JML markers.
      */
     private String getJMLModString(ImmutableList<String> mods) {
-        StringBuffer sb = new StringBuffer("/*@");
+        StringBuffer sb = new StringBuffer(JML);
         
         for(String mod : mods) {
             if(!javaMods.contains(mod)) {
@@ -156,7 +162,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
             }
         }
         
-        sb.append("@*/");
+        sb.append(JMR);
         return sb.toString();
     }
     

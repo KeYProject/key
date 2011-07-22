@@ -78,8 +78,11 @@ public class JMLSpecFactory {
     //internal methods
     //-------------------------------------------------------------------------
 
-    private String getInvName() {
+    private String getDefaultInvName(String name) {
+        if (name == null)
         return "JML class invariant nr " + invCounter++;
+        else
+            return "JML class invariant \""+name+"\" (nr "+ invCounter++ +")";
     }
 
 
@@ -215,7 +218,7 @@ public class JMLSpecFactory {
                 translateSignalsOnly(pm, progVars.excVar,
                                      originalBehavior,
                                      textualSpecCase.getSignalsOnly());
-        clauses.diverges = translateDeverges(pm, progVars.selfVar,
+        clauses.diverges = translateDiverges(pm, progVars.selfVar,
                                              progVars.paramVars,
                                              textualSpecCase.getDiverges());
         return clauses;
@@ -291,7 +294,7 @@ public class JMLSpecFactory {
     }
 
 
-    private Term translateDeverges(ProgramMethod pm,
+    private Term translateDiverges(ProgramMethod pm,
                                    ProgramVariable selfVar,
                                    ImmutableList<ProgramVariable> paramVars,
                                    ImmutableList<PositionedString> originalDiverges)
@@ -592,7 +595,7 @@ public class JMLSpecFactory {
         Term inv = translator.<Term>parse(originalInv, kjt, selfVar, null, null,
                                           null, null, services);
         //create invariant
-        String name = getInvName();
+        String name = getDefaultInvName(null);
         return new ClassInvariantImpl(name,
                                       name,
                                       kjt,
@@ -606,9 +609,21 @@ public class JMLSpecFactory {
             KeYJavaType kjt,
             TextualJMLClassInv textualInv)
             throws SLTranslationException {
-        return createJMLClassInvariant(kjt,
-                                       getVisibility(textualInv),
-                                       textualInv.getInv());
+        //create variable for self
+        ProgramVariable selfVar = TB.selfVar(services, kjt, false);
+
+        //translateToTerm expression
+        Term inv = translator.<Term>parse(textualInv.getInv(), kjt, selfVar, null, null,
+                                          null, null, services);
+        //create invariant
+        String name = getDefaultInvName(null);
+        String display = getDefaultInvName(textualInv.getName());
+        return new ClassInvariantImpl(name,
+                                      display,
+                                      kjt,
+                                      getVisibility(textualInv),
+                                      inv,
+                                      selfVar);
     }
 
 
@@ -684,10 +699,32 @@ public class JMLSpecFactory {
     public ClassAxiom createJMLRepresents(KeYJavaType kjt,
                                           TextualJMLRepresents textualRep)
             throws SLTranslationException {
-        return createJMLRepresents(kjt,
+        boolean isStatic = textualRep.getMods().contains("static");
+      //create variable for self
+        final ProgramVariable selfVar =
+                isStatic ? null : TB.selfVar(services, kjt, false);
+
+        //translateToTerm expression
+        final Pair<ObserverFunction, Term> rep =
+                translator.<Pair<ObserverFunction, Term>>parse(textualRep.getRepresents(),
+                                                               kjt,
+                                                               selfVar,
+                                                               null,
+                                                               null,
+                                                               null,
+                                                               null,
+                                                               services);
+        //create class axiom
+        String name = "JML represents clause for "
+            + rep.first.name().toString();
+        String displayName = textualRep.getName() == null ?
+                name : "JML represents clause \""+textualRep.getName()+"\" for "+ rep.first.name();
+        return new RepresentsAxiom(name, displayName,
+                                   rep.first,
+                                   kjt,
                                    getVisibility(textualRep),
-                                   textualRep.getRepresents(),
-                                   textualRep.getMods().contains("static"));
+                                   rep.second,
+                                   selfVar);
     }
 
 
@@ -714,7 +751,10 @@ public class JMLSpecFactory {
                                        null, null, services);
         
         //create class axiom
-        return new ClassAxiomImpl("class axiom in " + kjt.getFullName(), kjt,
+        String name = "class axiom in " + kjt.getFullName();
+        String displayName = textual.getName() == null ?
+                name : "class axiom \""+textual.getName()+"\" in "+kjt.getFullName();
+        return new ClassAxiomImpl(name, displayName, kjt,
                                   new Public(), ax, selfVar);
     }
 

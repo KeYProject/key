@@ -69,6 +69,16 @@ public final class ClassAxiomImpl extends ClassAxiom {
 	originalRep.execPostOrder(oc);
 	this.isStatic        = !oc.contains(originalSelfVar);
     }
+    
+
+    public ClassAxiomImpl(String name, String displayName,
+        KeYJavaType kjt,
+        VisibilityModifier visibility,
+        Term rep,
+        ProgramVariable selfVar) {
+        this(name,kjt,visibility,rep,selfVar);
+        this.displayName = displayName;
+    }
 
 
     private Term getAxiom(ParsableVariable heapVar, 
@@ -185,11 +195,6 @@ public final class ClassAxiomImpl extends ClassAxiom {
 	return "axiom "+originalRep.toString();
     }
 
-
-    @Override
-    public String getDisplayName() {
-	return getName();
-    }
 
 
 

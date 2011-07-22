@@ -98,7 +98,7 @@ public class Services{
 	    this.exceptionHandler = exceptionHandler;
 	}
         javainfo = new JavaInfo
-        	(new KeYProgModelInfo(typeconverter, this.exceptionHandler), this);
+        	(new KeYProgModelInfo(this, typeconverter, this.exceptionHandler), this);
         nameRecorder = new NameRecorder();
     }
     
@@ -115,7 +115,7 @@ public class Services{
 	typeconverter = new TypeConverter(this);
 	//	exceptionHandler = new KeYRecoderExcHandler();
 	javainfo = new JavaInfo
-	    (new KeYProgModelInfo(crsc, rec2key, typeconverter), this);
+	    (new KeYProgModelInfo(this, crsc, rec2key, typeconverter), this);
 	nameRecorder = new NameRecorder();
     }
 

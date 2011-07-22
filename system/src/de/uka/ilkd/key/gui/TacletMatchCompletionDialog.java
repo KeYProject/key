@@ -360,7 +360,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                                 ((SVInstantiationExceptionWithPosition) exc).getColumn(),
                                 ((SVInstantiationExceptionWithPosition) exc).inIfSequent());
 		    }
-		    new ExceptionDialog(TacletMatchCompletionDialog.this, 
+		    ExceptionDialog.showDialog(TacletMatchCompletionDialog.this, 
 		            mediator().getExceptionHandler().getExceptions());
 		    mediator().getExceptionHandler().clear();
 		    return ;

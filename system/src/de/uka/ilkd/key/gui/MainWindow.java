@@ -50,6 +50,7 @@ import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
@@ -227,6 +228,9 @@ public final class MainWindow extends JFrame  {
     private LemmaGenerationAction loadKeYTaclets;
     
 
+    
+    private OneStepSimplificationToggleAction oneStepSimplAction = 
+        new OneStepSimplificationToggleAction(this);
     
     public static final String AUTO_MODE_TEXT = "Start/stop automated proof search";
 
@@ -434,11 +438,13 @@ public final class MainWindow extends JFrame  {
         GuiUtilities.paintEmptyViewComponent(proofListView, "Proofs");
         
         JSplitPane leftPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, proofListView, tabbedPane);
+        leftPane.setName("leftPane");
         leftPane.setOneTouchExpandable(true);
         
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPane, goalView);
         splitPane.setResizeWeight(0); // the right pane is more important
         splitPane.setOneTouchExpandable(true);
+        splitPane.setName("splitPane");
         getContentPane().add(splitPane, BorderLayout.CENTER);
         
 //      // work around bug in
@@ -469,7 +475,11 @@ public final class MainWindow extends JFrame  {
             }
         });
         
+        // default size
         setSize(1000, 750);
+        setName("mainWindow");
+        
+        // load preferred sizes from system preferences
         prefSaver.load(this);
     }
 
@@ -495,6 +505,7 @@ public final class MainWindow extends JFrame  {
 	pane.getInputMap(JComponent.WHEN_FOCUSED).getParent().remove(
 	        KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, Toolkit
 	                .getDefaultToolkit().getMenuShortcutKeyMask()));
+	pane.setName("leftTabbed");
 	
 	return pane;
     }
@@ -525,6 +536,10 @@ public final class MainWindow extends JFrame  {
         toolBar.add(comp.getSelectionComponent());
         toolBar.addSeparator();
         toolBar.add(new UndoLastStepAction(this, false));
+        JToggleButton oneStep = new JToggleButton(oneStepSimplAction);
+        oneStep.setHideActionText(true);
+        toolBar.addSeparator();
+        toolBar.add(oneStep);
 	return toolBar;
     }
     
@@ -806,7 +821,7 @@ public final class MainWindow extends JFrame  {
 	options.add(setupSpeclangMenu());
 	options.addSeparator();
         options.add(new JCheckBoxMenuItem(new MinimizeInteraction(this)));
-        options.add(new JCheckBoxMenuItem(new OneStepSimplificationToggleAction(this)));
+        options.add(new JCheckBoxMenuItem(oneStepSimplAction));
         
         return options;
         
@@ -1370,7 +1385,7 @@ public final class MainWindow extends JFrame  {
             if (!"".equals(info.getResult())) {
                 final KeYExceptionHandler exceptionHandler = 
                     ((ProblemLoader)info.getSource()).getExceptionHandler();
-                new ExceptionDialog(MainWindow.this,     
+                ExceptionDialog.showDialog(MainWindow.this,     
                         exceptionHandler.getExceptions());
                 exceptionHandler.clear();
             } else {
@@ -1796,7 +1811,6 @@ public final class MainWindow extends JFrame  {
      * @return the instance of Main
      * @throws Exception 
      */
-    // FIXME Do not change state in a getter method. 
     public static MainWindow getInstance(final boolean visible) throws IllegalStateException {
         
         if(instance == null) {
@@ -1804,13 +1818,14 @@ public final class MainWindow extends JFrame  {
             throw new IllegalStateException("There is no GUI main window. Sorry.");
         }
         
-        if(visible && !instance.isVisible()) {
-            GuiUtilities.invokeOnEventQueue(new Runnable() {
-                public void run() {                            
-                    instance.setVisible(true);
-                }
-            });
-        }
+        // in a getter method the state ought not be changed. -> Lead to trouble.
+//        if(visible && !instance.isVisible()) {
+//            GuiUtilities.invokeOnEventQueue(new Runnable() {
+//                public void run() {                            
+//                    instance.setVisible(true);
+//                }
+//            });
+//        }
         
         return instance;
     }

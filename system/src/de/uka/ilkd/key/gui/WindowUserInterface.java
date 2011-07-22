@@ -75,7 +75,7 @@ public class WindowUserInterface implements UserInterface {
             if (!"".equals(info.getResult())) {
                 final KeYExceptionHandler exceptionHandler = 
                     ((ProblemLoader)info.getSource()).getExceptionHandler();
-                        new ExceptionDialog(mainWindow,     
+                        ExceptionDialog.showDialog(mainWindow,     
                                 exceptionHandler.getExceptions());
                         exceptionHandler.clear();
             } else {

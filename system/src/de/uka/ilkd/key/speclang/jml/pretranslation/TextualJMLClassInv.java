@@ -28,8 +28,15 @@ public final class TextualJMLClassInv extends TextualJMLConstruct {
         assert inv != null;
         this.inv = inv;
     }
-    
-    
+
+    public TextualJMLClassInv(ImmutableList<String> mods, 
+            PositionedString inv, String name) {
+        super(mods);
+        assert inv != null;
+        this.inv = inv;
+        this.name = name;
+    }
+
     public PositionedString getInv() {
         return inv;
     }
@@ -54,5 +61,9 @@ public final class TextualJMLClassInv extends TextualJMLConstruct {
     @Override
     public int hashCode() {
         return mods.hashCode() + inv.hashCode();
+    }
+    
+    public String getName(){
+        return name;
     }
 }

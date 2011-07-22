@@ -43,9 +43,13 @@ public abstract class BinaryOperator extends Operator {
 
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
 	final TypeConverter tc=javaServ.getTypeConverter();
+	try {
 	return tc.getPromotedType
 	    (tc.getKeYJavaType((Expression)getChildAt(0), ec),
 	     tc.getKeYJavaType((Expression)getChildAt(1), ec));
+	} catch (Exception e){
+	    throw new RuntimeException("Type promotion failed (see below). Operator was "+this, e);
+	}
     }
 
 }

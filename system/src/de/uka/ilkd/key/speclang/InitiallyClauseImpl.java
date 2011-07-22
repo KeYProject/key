@@ -219,21 +219,21 @@ public final class InitiallyClauseImpl implements InitiallyClause {
     
     @Override
     public ImmutableSet<Contract> toContract(ProgramMethod pm) { 
-	try {
-	    if (sf==null) throw new SLTranslationException("Contract for initially clause could not be created because no SpecFactory given");
-	    if (! pm.isConstructor()) throw new SLTranslationException("Initially clauses only apply to constructors, not to method "+pm);
+        try {
+            if (sf==null) throw new SLTranslationException("Contract for initially clause could not be created because no SpecFactory given");
+            if (! pm.isConstructor()) throw new SLTranslationException("Initially clauses only apply to constructors, not to method "+pm);
             final TextualJMLSpecCase specCase =
-                    new TextualJMLSpecCase(ImmutableSLList.<String>nil(),
-                                           Behavior.NONE);
+                new TextualJMLSpecCase(ImmutableSLList.<String>nil(),
+                        Behavior.NONE);
             specCase.addName(new PositionedString(getName()));
             specCase.addRequires(createPrecond(pm));
-            specCase.addEnsures(originalSpec.prepend("ensures "));
-            specCase.addSignals(new PositionedString("(Exception)"+ originalSpec.text, originalSpec.fileName, originalSpec.pos));
+            specCase.addEnsures(originalSpec);
+            specCase.addSignals(originalSpec);
             specCase.addDiverges(new PositionedString("true"));
-	    return sf.createJMLOperationContracts(pm, specCase);
-	} catch (SLTranslationException e){ 
-	    services.getExceptionHandler().reportException(e);
-	    return null;
-	}
+            return sf.createJMLOperationContracts(pm, specCase);
+        } catch (SLTranslationException e){ 
+            services.getExceptionHandler().reportException(e);
+            return null;
+        }
     }
 }
