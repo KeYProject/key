@@ -129,7 +129,7 @@ public abstract class TacletLoader {
                                 KeYUserProblemFile keyFile = new KeYUserProblemFile(
                                                 f.getName(), f, monitor);
                                 ImmutableSet<Taclet> taclets = load(keyFile, initConfig);
-                                envForTaclets.registerRules(taclets,
+                                getProofEnvForTaclets().registerRules(taclets,
                                                 AxiomJustification.INSTANCE);
                                 axioms = axioms.union(taclets);
                         }

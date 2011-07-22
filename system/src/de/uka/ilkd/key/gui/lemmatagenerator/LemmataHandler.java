@@ -5,10 +5,10 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Vector;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.ProofSaver;
@@ -19,9 +19,12 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.lemma.AutomaticProver;
+import de.uka.ilkd.key.taclettranslation.lemma.TacletLoader;
+import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.LoaderListener;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletFilter;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletInfo;
+import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
 public class LemmataHandler implements TacletFilter {
         private final LemmataAutoModeOptions options;
@@ -58,6 +61,21 @@ public class LemmataHandler implements TacletFilter {
                 File fileForDefinitions =  options.getPathOfRuleFile() != "" ? new File(options.getPathOfDefinitionFile()) :file;
                 Collection<File> filesForAxioms = createFilesForAxioms(options.getFilesForAxioms());
                 
+                final ProblemInitializer problemInitializer = new ProblemInitializer(null,
+                                profile, new Services(
+                                                new KeYRecoderExcHandler()),
+                                false, new Listener());
+                
+                TacletLoader tacletLoader = new TacletLoader.TacletFromFileLoader(null,
+                                                      new Listener(),
+                                                      problemInitializer,
+                                                      profile,
+                                                      fileForDefinitions ,
+                                                      file,
+                                                      filesForAxioms,
+                                                      null);
+                
+                
                 LoaderListener loaderListener = new LoaderListener() {
 
                         @Override
@@ -89,27 +107,26 @@ public class LemmataHandler implements TacletFilter {
 
                         @Override
                         public void progressStarted(Object sender) {
-                                // TODO Auto-generated method stub
+                
                                 
                         }
 
                         @Override
                         public void reportStatus(Object sender, String string) {
-                                // TODO Auto-generated method stub
+                  
                                 
                         }
 
                         @Override
                         public void resetStatus(Object sender) {
-                                // TODO Auto-generated method stub
+                  
                                 
                         }
                 };
-                /*
-                TacletSoundnessPOLoader loader = new TacletSoundnessPOLoader(
-                                null, file,EnvironmentCreator.create(options.getHomePath(),null,new Listener(),profile),
-                                loaderListener, new Listener(), this,filesForAxioms,fileForDefinitions,true);
-                loader.start();*/
+      
+                TacletSoundnessPOLoader loader = new TacletSoundnessPOLoader(loaderListener,this,true,tacletLoader,true);
+                
+                loader.start();
         }
         
         private Collection<File> createFilesForAxioms(Collection<String> filenames){
