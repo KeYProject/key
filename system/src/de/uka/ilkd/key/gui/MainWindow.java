@@ -866,6 +866,7 @@ public final class MainWindow extends JFrame  {
 
 	Collection<SolverTypeCollection> solverUnions = ProofIndependentSettings.DEFAULT_INSTANCE.
 	                                  getSMTSettings().getUsableSolverUnions();
+
 	if(solverUnions == null || solverUnions.isEmpty()){
 	    updateDPSelectionMenu();
 	}else{

@@ -82,7 +82,7 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.gui.configur
                 for(Entry<SolverType, SolverData> entry : data.dataOfSolvers.entrySet()){
                         dataOfSolvers.put(entry.getKey(), entry.getValue().clone());
                 }
-                
+                solverUnions =  new LinkedList<SolverTypeCollection>(); 
                 for(SolverTypeCollection solverUnion : data.solverUnions){
                         solverUnions.add(solverUnion);
                 }   
