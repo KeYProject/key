@@ -20,6 +20,7 @@ import javax.swing.*;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.smt.SMTMenuItem;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
@@ -157,21 +158,21 @@ class TacletMenu extends JMenu {
 	}
     }
     
-    private void createSMTMenu(MenuControl control){
-	Collection<SolverTypeCollection> solverUnions = 
-	ProofSettings.DEFAULT_SETTINGS.getSMTSettings().getSolverUnions();
-	if(!solverUnions.isEmpty()){
-	    addSeparator();	
-	}
-	for(SolverTypeCollection union : solverUnions){
-	    if(union.isUsable()){
-		 JMenuItem item = new SMTMenuItem(union);                       
-		 item.addActionListener(control);
-		 add(item);
-	    }
-	}
-	
-    }
+        private void createSMTMenu(MenuControl control) {
+                Collection<SolverTypeCollection> solverUnions = ProofIndependentSettings.DEFAULT_INSTANCE
+                                .getSMTSettings().getSolverUnions();
+                if (!solverUnions.isEmpty()) {
+                        addSeparator();
+                }
+                for (SolverTypeCollection union : solverUnions) {
+                        if (union.isUsable()) {
+                                JMenuItem item = new SMTMenuItem(union);
+                                item.addActionListener(control);
+                                add(item);
+                        }
+                }
+
+        }
 				      
     /**
      * adds an item for built in rules (e.g. Run Simplify or Update Simplifier)
@@ -377,7 +378,8 @@ class TacletMenu extends JMenu {
 	        @Override
 	        public void run() {
 	            
-	            SMTSettings settings = ProofSettings.DEFAULT_SETTINGS.getSMTSettings();
+	            SMTSettings settings = new SMTSettings(goal.proof().getSettings().getSMTSettings(),
+	                            ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),goal.proof());
 	            SolverLauncher launcher = new SolverLauncher(settings);
 	            launcher.addListener(new SolverListener(settings));
 	            Collection<SMTProblem> list = new LinkedList<SMTProblem>();

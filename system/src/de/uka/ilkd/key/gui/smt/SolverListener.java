@@ -28,7 +28,7 @@ import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
 
 
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
+
 import de.uka.ilkd.key.gui.smt.InformationWindow.Information;
 import de.uka.ilkd.key.gui.smt.ProgressDialog.Modus;
 import de.uka.ilkd.key.gui.smt.ProgressDialog.ProgressDialogListener;
@@ -148,7 +148,7 @@ public class SolverListener implements SolverLauncherListener {
                 if (!problemsWithException.isEmpty()) {
                       progressDialog.setAdditionalInformation("Exception for...", Color.RED,problemsWithException);
                 } else {
-                        if (settings.getModeOfProgressDialog() == SettingsData.PROGRESS_MODE_CLOSE) {
+                        if (settings.getModeOfProgressDialog() == ProofIndependentSMTSettings.PROGRESS_MODE_CLOSE) {
                                 applyEvent(launcher);
                         }
                 }
@@ -213,9 +213,9 @@ public class SolverListener implements SolverLauncherListener {
 
                 
                 String names[] = new String[smtproblems.size()];
-                int x = 0;
+                int x = 0,y=0;
                 for (SMTProblem problem : smtproblems) {
-                        int y = 0;
+                        y = 0;
                         for (SMTSolver solver : problem.getSolvers()) {
                                 this.problems.add(new InternSMTProblem(x, y,
                                                 problem, solver));
@@ -224,6 +224,7 @@ public class SolverListener implements SolverLauncherListener {
                         names[x] = problem.getName();
                         x++;
                 }
+       
                 
                 ProgressDialogListener listener = new ProgressDialogListener() {
                         
@@ -490,8 +491,7 @@ public class SolverListener implements SolverLauncherListener {
 
         private void storeTacletTranslation(SMTSolver solver, Goal goal,
                         TacletSetTranslation translation) {
-                String path = ProofSettings.DEFAULT_SETTINGS.getSMTSettings()
-                                .getPathForTacletTranslation();
+                String path = settings.getPathForTacletTranslation();
                 path = finalizePath(path, solver, goal);
                 storeToFile(translation.toString(), path);
         }

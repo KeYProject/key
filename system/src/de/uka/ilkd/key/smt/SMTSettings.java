@@ -11,8 +11,6 @@
 package de.uka.ilkd.key.smt;
 
 import java.util.Collection;
-
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.rule.Taclet;
 
 public interface SMTSettings {
@@ -69,7 +67,7 @@ public interface SMTSettings {
      * by the translation. In case that a taclet is not supported, it is
      * ignored.
      */
-    public Collection<Taclet> getTaclets(Services services);
+    public Collection<Taclet> getTaclets();
     
     /**
      * Returns <code>true</code> if the uniqueness property should be translated 

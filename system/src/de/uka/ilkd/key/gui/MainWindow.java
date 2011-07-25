@@ -45,6 +45,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -68,7 +69,8 @@ import de.uka.ilkd.key.gui.actions.EditMostRecentFileAction;
 import de.uka.ilkd.key.gui.actions.ExitMainAction;
 import de.uka.ilkd.key.gui.actions.FontSizeAction;
 import de.uka.ilkd.key.gui.actions.LicenseAction;
-import de.uka.ilkd.key.gui.actions.LoadUserDefinedTacletsAction;
+import de.uka.ilkd.key.gui.actions.LemmaGenerationAction;
+import de.uka.ilkd.key.gui.actions.LemmaGenerationAction.Mode;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.actions.MinimizeInteraction;
 import de.uka.ilkd.key.gui.actions.OneStepSimplificationToggleAction;
@@ -90,6 +92,7 @@ import de.uka.ilkd.key.gui.actions.UndoLastStepAction;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.GeneralSettings;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
+import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.configuration.SettingsListener;
 import de.uka.ilkd.key.gui.configuration.StrategySettings;
@@ -220,7 +223,11 @@ public final class MainWindow extends JFrame  {
     private ProofManagementAction proofManagementAction;
     
     /** action for loading taclets onto a ongoing proof */
-    private LoadUserDefinedTacletsAction loadUserDefinedTacletsAction;
+    private LemmaGenerationAction loadUserDefinedTacletsAction;
+    private LemmaGenerationAction loadUserDefinedTacletsForProvingAction;
+    private LemmaGenerationAction loadKeYTaclets;
+    
+
     
     private OneStepSimplificationToggleAction oneStepSimplAction = 
         new OneStepSimplificationToggleAction(this);
@@ -230,8 +237,7 @@ public final class MainWindow extends JFrame  {
     /** Determines if the KeY prover is started in visible mode*/
     public static boolean visible = true;
     
-    /** external prover GUI elements */
-    private SMTSettingsListener smtSettingsListener;
+
     
     /** for locking of threads waiting for the prover to exit */
     public final Object monitor = new Object();
@@ -391,10 +397,13 @@ public final class MainWindow extends JFrame  {
         proofManagementAction     = new ProofManagementAction(this);
         exitMainAction            = new ExitMainAction(this);
         showActiveSettingsAction  = new ShowActiveSettingsAction(this);
-        loadUserDefinedTacletsAction = new LoadUserDefinedTacletsAction(this);
+        loadUserDefinedTacletsAction = new LemmaGenerationAction.ProveAndAddTaclets(this);
+        loadUserDefinedTacletsForProvingAction = new LemmaGenerationAction.ProveUserDefinedTaclets(this);
+        loadKeYTaclets            = new LemmaGenerationAction.ProveKeYTaclets(this);
         
-	smtSettingsListener = 
-	    new SMTSettingsListener(ProofSettings.DEFAULT_SETTINGS.getSMTSettings());
+       // proveTacletsAction       = new ProveTacletsAction(this);
+        
+	
 	
 	mediator.addKeYSelectionListener(OneStepSimplifier.INSTANCE);
         
@@ -466,8 +475,11 @@ public final class MainWindow extends JFrame  {
             }
         });
         
+        // default size
         setSize(1000, 750);
         setName("mainWindow");
+        
+        // load preferred sizes from system preferences
         prefSaver.load(this);
     }
 
@@ -573,7 +585,7 @@ public final class MainWindow extends JFrame  {
 		ComplexButton but = (ComplexButton) e.getSource();
 		if(but.getSelectedItem() instanceof SMTInvokeAction){
 		    SMTInvokeAction action = (SMTInvokeAction) but.getSelectedItem(); 
-		    SMTSettings.getInstance().setActiveSolverUnion(action.solverUnion);
+		    ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().setActiveSolverUnion(action.solverUnion);
 		}
 	
 	    }
@@ -751,7 +763,14 @@ public final class MainWindow extends JFrame  {
         fileMenu.add(saveFileAction);
         fileMenu.addSeparator();
         fileMenu.add(proofManagementAction);
+        
+        
         fileMenu.add(loadUserDefinedTacletsAction);
+        JMenu submenu = new JMenu("Prove...");
+        fileMenu.add(submenu);
+        
+        submenu.add(loadUserDefinedTacletsForProvingAction);
+        submenu.add(loadKeYTaclets);
         fileMenu.addSeparator();
         fileMenu.add(recentFiles.getMenu());
         fileMenu.addSeparator();
@@ -844,14 +863,10 @@ public final class MainWindow extends JFrame  {
      * Remove those, that are not installed anymore, add those, that got installed.
      */
     public void updateSMTSelectMenu() {
-	
-	//Collection<SMTRule> rules = ProofSettings.DEFAULT_SETTINGS.
-	  //                             getSMTSettings().getInstalledRules();
-	
-	// TODO: Change this: only solver unions should be returned 
-	// that are installed.
-	Collection<SolverTypeCollection> solverUnions = ProofSettings.DEFAULT_SETTINGS.
+
+	Collection<SolverTypeCollection> solverUnions = ProofIndependentSettings.DEFAULT_INSTANCE.
 	                                  getSMTSettings().getUsableSolverUnions();
+
 	if(solverUnions == null || solverUnions.isEmpty()){
 	    updateDPSelectionMenu();
 	}else{
@@ -887,7 +902,7 @@ public final class MainWindow extends JFrame  {
 		
 		smtComponent.setItems(actions);
 	            	
-		SolverTypeCollection active = ProofSettings.DEFAULT_SETTINGS.getSMTSettings().computeActiveSolverUnion();
+		SolverTypeCollection active = ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().computeActiveSolverUnion();
 		 
 		SMTInvokeAction activeAction = findAction(actions, active);
 		
@@ -896,7 +911,7 @@ public final class MainWindow extends JFrame  {
 		    Object item = smtComponent.getTopItem();
 		    if(item instanceof SMTInvokeAction){
 			active = ((SMTInvokeAction)item).solverUnion;
-			ProofSettings.DEFAULT_SETTINGS.getSMTSettings().setActiveSolverUnion(active);
+			ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().setActiveSolverUnion(active);
 		    }else{
 			activeAction = null;
 		    }
@@ -1111,47 +1126,7 @@ public final class MainWindow extends JFrame  {
         return proof;
     }
     
-    private final class SMTSettingsListener implements SettingsListener {	
-	private SMTSettings settings;
 
-	public SMTSettingsListener(SMTSettings dps) {
-	    this.settings = dps;
-	    register();
-	}
-
-	private void register() {
-	    if (settings != null) {
-		settings.addSettingsListener(this);
-	    }
-	}
-
-	private void unregister() {
-	    if (settings != null) {
-		settings.removeSettingsListener(this);
-	    }
-	}
-	
-	public void update() {	   
-	    
-	    if (settings != null) {
-		updateSMTSelectMenu();
-
-	    } else {
-		assert false;
-	    }
-	}
-
-	public void settingsChanged(GUIEvent e) {
-	    if (e.getSource() instanceof SMTSettings) {
-		if (e.getSource() != settings) {
-		    unregister();
-		    settings = (SMTSettings) e.getSource();		    
-		    register();
-		}
-		update();
-	    }
-	}
-    }
     
     /**
      * The progress monitor that displays a progress bar in a corner of the main window.
@@ -1330,8 +1305,7 @@ public final class MainWindow extends JFrame  {
             goalView.setViewportView(null);
             
             setProofNodeDisplay();
-            smtSettingsListener.settingsChanged(new GUIEvent((proof != null ? 
-        	    proof.getSettings() : ProofSettings.DEFAULT_SETTINGS).getSMTSettings()));
+           
             makePrettyView();
         }
         
@@ -1745,7 +1719,9 @@ public final class MainWindow extends JFrame  {
 	        @Override
 	        public void run() {
 	        
-	            SMTSettings settings = ProofSettings.DEFAULT_SETTINGS.getSMTSettings();
+	  
+	            SMTSettings settings = new SMTSettings(proof.getSettings().getSMTSettings(),
+	                            ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),proof);
 	            SolverLauncher launcher = new SolverLauncher(settings);
 	            launcher.addListener(new SolverListener(settings));
 	            launcher.launch(solverUnion.getTypes(),
@@ -1836,7 +1812,6 @@ public final class MainWindow extends JFrame  {
      * @return the instance of Main
      * @throws Exception 
      */
-    // FIXME Do not change state in a getter method. 
     public static MainWindow getInstance(final boolean visible) throws IllegalStateException {
         
         if(instance == null) {
@@ -1844,13 +1819,14 @@ public final class MainWindow extends JFrame  {
             throw new IllegalStateException("There is no GUI main window. Sorry.");
         }
         
-        if(visible && !instance.isVisible()) {
-            GuiUtilities.invokeOnEventQueue(new Runnable() {
-                public void run() {                            
-                    instance.setVisible(true);
-                }
-            });
-        }
+        // in a getter method the state ought not be changed. -> Lead to trouble.
+//        if(visible && !instance.isVisible()) {
+//            GuiUtilities.invokeOnEventQueue(new Runnable() {
+//                public void run() {                            
+//                    instance.setVisible(true);
+//                }
+//            });
+//        }
         
         return instance;
     }

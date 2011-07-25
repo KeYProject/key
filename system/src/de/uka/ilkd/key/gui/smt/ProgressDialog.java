@@ -456,12 +456,12 @@ class ProgressTable extends JTable{
                
         }
         
-        @Override
-        public Dimension getPreferredSize() {
-                Dimension dim = new Dimension(super.getPreferredSize());
-                dim.height = Math.min(NUMBER_OF_VISIBLE_ROWS * (progressPanelRenderer.getPreferredSize().height+5), dim.height);
-                return dim;
-        }
+//        @Override
+//        public Dimension getPreferredSize() {
+//                Dimension dim = new Dimension(super.getPreferredSize());
+//                dim.height = Math.min(NUMBER_OF_VISIBLE_ROWS * (progressPanelRenderer.getPreferredSize().height+5), dim.height);
+//                return dim;
+//        }
         
         @Override
         public Dimension getPreferredScrollableViewportSize() {

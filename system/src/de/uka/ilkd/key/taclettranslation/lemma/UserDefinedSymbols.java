@@ -15,6 +15,7 @@ import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.TermSV;
+import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
@@ -97,9 +98,11 @@ public class UserDefinedSymbols {
         public void addSort(Named symbol) {
                 if (symbol != Sort.FORMULA) {
                         Sort sort = (Sort) symbol;
-                        for(Sort parentSort : sort.extendsSorts()){
-                                addSort(parentSort);
-                        }
+                        if(!(sort instanceof NullSort)){
+                                for(Sort parentSort : sort.extendsSorts()){
+                                        addSort(parentSort);
+                                }
+                       }
                         addUserDefiniedSymbol(symbol, usedExtraSorts,
                                         referenceNamespaces.sorts());
                 }
