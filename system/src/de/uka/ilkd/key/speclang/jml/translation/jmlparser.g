@@ -1181,6 +1181,7 @@ primaryexpr returns [SLExpression result=null] throws SLTranslationException
             result = new SLExpression(TB.var(selfVar), selfVar.getKeYJavaType());
         }
     |   new_expr
+    |   array_initializer
 ;   
 
 primarysuffix[SLExpression receiver, String fullyQualifiedName] 
@@ -1251,11 +1252,40 @@ new_expr throws SLTranslationException
     ImmutableList<SLExpression> params;
 }
 :
-	NEW typ=type LPAREN ( params=expressionlist )? RPAREN 
+	NEW typ=type ( 
+	    LPAREN ( params=expressionlist )? RPAREN
+	   |
+	    array_dimensions (array_initializer)?
+	   )
         {	
         	raiseNotSupported("'new' within specifications"); 
         }
     ;
+    
+array_dimensions throws SLTranslationException
+:
+    array_dimension
+    // TODO handle higher dimensions
+;
+    
+array_dimension throws SLTranslationException
+{
+    SLExpression length;
+}
+:
+    LBRACKET (length=expression)? RBRACKET
+;
+    
+array_initializer throws SLTranslationException
+{
+    ImmutableList<SLExpression> init;
+}
+:
+    LBRACE init=expressionlist RBRACE
+    {
+        raiseNotSupported("array initializer");
+    }
+;
 
 expressionlist returns [ImmutableList<SLExpression> result=ImmutableSLList.<SLExpression>nil()] 
                throws SLTranslationException
