@@ -292,7 +292,7 @@ public final class ProblemLoader implements Runnable {
 	       setStandardStatusLine();
            
 	   } catch (ExceptionHandlerException e) {
-	       e.printStackTrace();
+//	       e.printStackTrace();
 	       throw e;
 	   } catch (Throwable thr) {
 	       exceptionHandler.reportException(thr);
