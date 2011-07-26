@@ -23,8 +23,9 @@ package vacid0.redblacktree;
 public class Node {
 
     final static Node NIL = new Nil();
-    //@ axiom NIL != null; // static invariants not yet supported
+    //@ axiom NIL != null;
     //@ axiom (\forall Nil x; x == NIL);
+    //@ axiom this != NIL ==> \typeof(this) == \type(Node);
 
     boolean isRed;
     int key;
@@ -44,7 +45,7 @@ public class Node {
       @ accessible footprint : \nothing;
       @ protected model \locset treeFootprint;
       @ represents treeFootprint = footprint, left.treeFootprint, right.treeFootprint;
-      @ accessible treeFootprint : \set_union(left.treeFootprint,right.treeFootprint) \measured_by height;
+      @ accessible treeFootprint : \set_union(left.treeFootprint, right.treeFootprint) \measured_by height;
       @*/
 
     // the red-black tree properties (`high-level' invariants)
@@ -62,8 +63,7 @@ public class Node {
     // `low-level' invariants
     /*@ invariant parent == NIL || parent.left == this || parent.right == this;
       @ invariant key >= 0;
-      @ invariant height == left.height > right.height ? left.height : right.height)+1;
-      @ invariant (\forall Node n; n != this; \disjoint(footprint, n.footprint));
+      @ invariant height == (left.height > right.height ? left.height : right.height)+1;
       @ invariant \disjoint(footprint, left.treeFootprint) && \disjoint(footprint, right.treeFootprint);
       @ invariant \invariant_for(left) && \invariant_for(right);
       @ accessible \inv : treeFootprint \measured_by height;

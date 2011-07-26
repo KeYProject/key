@@ -52,6 +52,7 @@ public class RedBlackTree implements AbstractMap {
     /*@ normal_behavior
       @ ensures deefolt == d && root == Node.NIL;
       @ ensures theNodes == \seq_empty;
+      @ ensures \fresh(footprint);
       @ accessible \nothing;
       @*/
     public /*@ pure @*/ RedBlackTree (int d){
@@ -215,8 +216,8 @@ public class RedBlackTree implements AbstractMap {
         else y.right = z;
         z.isRed = true;
         //@ set theNodes = \seq_concat(theNodes,\seq_singleton(z));
-        //@ assert root == z <==> root.isRed;
-        //@ assert z.redBlackInvariant;
+        // assert root == z <==> root.isRed;
+        // assert z.redBlackInvariant;
         insertFix(z);
     }
 
@@ -328,6 +329,7 @@ public class RedBlackTree implements AbstractMap {
 
 
     // specified by interface
+    //@ ensures \new_elems_fresh(footprint);
     public void replace (int key, int value){
         Node x = get(key);
         if (x == Node.NIL) {

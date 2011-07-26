@@ -23,12 +23,12 @@ package vacid0.redblacktree;
  */
 public interface AbstractMap{
 
-    /*@ model instance int defaultValue;
-      @ model instance \seq contents;
-      @ model instance \locset footprint;
+    /*@ protected model instance int defaultValue;
+      @ protected model instance \seq contents;
+      @ protected model instance \locset footprint;
       @*/
     
-    /*@ model instance boolean isEmpty;
+    /*@ protected model instance boolean isEmpty;
       @ protected represents isEmpty = (\forall int i; 0 <= i && i < contents.length; contents[i] == defaultValue);
       @ axiom contents.length == 999; // just to have some bound
       @*/
@@ -39,13 +39,13 @@ public interface AbstractMap{
       @ accessible \inv : footprint;
       @ accessible contents : footprint;
       @ accessible footprint : footprint;
-      @ protected invariant (\forall AbstractMap x; x != this; \disjoint(footprint,x.footprint));
       @*/
 
     /** Set the value of key; add it if it is not in the map yet */
     /*@ public normal_behavior
       @ requires 0 <= key && key < contents.length;
       @ ensures contents == \seq_put(\old(contents),key,value);
+      @ ensures \new_elems_fresh(footprint);
       @ assignable footprint;
       @*/
     public void replace (int key, int value);
@@ -54,6 +54,7 @@ public interface AbstractMap{
     /*@ public normal_behavior
       @ requires 0 <= key && key < contents.length;
       @ ensures contents == \seq_put(\old(contents),key,defaultValue);
+      @ ensures \new_elems_fresh(footprint);
       @ assignable footprint;
       @*/
     public void remove (int key);
