@@ -23,9 +23,12 @@ package vacid0.redblacktree;
 public class Node {
 
     final static Node NIL = new Nil();
-    //@ axiom NIL != null;
-    //@ axiom (\forall Nil x; x == NIL);
-    //@ axiom this != NIL ==> \typeof(this) == \type(Node);
+    /*@ model boolean staticInv;
+      @ represents staticInv = NIL != null &&
+      @            (\forall Nil x; x == NIL) &&
+      @            this != NIL ==> \typeof(this) == \type(Node);
+      @ accessible staticInv : \nothing;
+      @*/
 
     boolean isRed;
     int key;
@@ -41,16 +44,16 @@ public class Node {
       @*/
     
     /*@ protected model \locset footprint;
-      @ represents footprint = isRed, key, value, parent, left, right, height;
+      @ represents footprint = this.*;
       @ accessible footprint : \nothing;
       @ protected model \locset treeFootprint;
       @ represents treeFootprint = footprint, left.treeFootprint, right.treeFootprint;
-      @ accessible treeFootprint : \set_union(left.treeFootprint, right.treeFootprint) \measured_by height;
+      @ accessible treeFootprint : treeFootprint \measured_by height;
       @*/
 
     // the red-black tree properties (`high-level' invariants)
     /*@ model boolean redBlackInvariant;
-      @ represents redBlackInvariant \such_that
+      @ represents redBlackInvariant =
       @        (left == NIL || left.key < key) && (right == NIL || right.key > key)
       @     && (isRed ==> !(left.isRed || right.isRed))
       @     && left.blackLeft() == right.blackRight()
@@ -66,11 +69,13 @@ public class Node {
       @ invariant height == (left.height > right.height ? left.height : right.height)+1;
       @ invariant \disjoint(footprint, left.treeFootprint) && \disjoint(footprint, right.treeFootprint);
       @ invariant \invariant_for(left) && \invariant_for(right);
+      @ invariant staticInv;
       @ accessible \inv : treeFootprint \measured_by height;
       @*/
 
     /*@ normal_behavior
       @ requires key >= 0;
+      @ requires staticInv;
       @ ensures parent == NIL && left == NIL && right == NIL && this.key == key && this.value == value && !isRed;
       @ ensures \fresh(footprint);
       @ accessible \nothing; 

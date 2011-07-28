@@ -30,7 +30,7 @@ public interface AbstractMap{
     
     /*@ protected model instance boolean isEmpty;
       @ protected represents isEmpty = (\forall int i; 0 <= i && i < contents.length; contents[i] == defaultValue);
-      @ axiom contents.length == 999; // just to have some bound
+      @ invariant contents.length == 999; // just to have some bound
       @*/
 
     //@ protected initially isEmpty && \invariant_for(this);

@@ -35,7 +35,7 @@ public class Harness {
     assert(b.lookup(2) == 1 && b.lookup(42) == 1);
   }
   
-  //@ requires a.isEmpty && \invariant_for(a) && a.defaultValue == 0 && k >= 0;
+  //@ requires a.isEmpty && \invariant_for(a) && a.defaultValue == 0 && 0 <= k && k < a.contents.length;
   public static void testEmpty(AbstractMap a, int k) {
     assert a.lookup(k) == 0;
   }
