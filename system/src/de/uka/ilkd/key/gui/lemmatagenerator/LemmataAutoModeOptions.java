@@ -22,7 +22,7 @@ public class LemmataAutoModeOptions {
         private static final String SAVE_RESULTS_TO_FILE = KEY_PREFIX
                         + "saveProofToFile";
         private static final String FILE_FOR_AXIOMS = KEY_PREFIX + "axioms";
-        private static final String FILE_FOR_DEFINITION = KEY_PREFIX +"definitions";
+        private static final String FILE_FOR_DEFINITION = KEY_PREFIX +"signature";
 
         private static final String PROOF_POSTFIX = ".key.proof";
 

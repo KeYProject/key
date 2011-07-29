@@ -68,6 +68,7 @@ import de.uka.ilkd.key.gui.actions.AutoModeAction;
 import de.uka.ilkd.key.gui.actions.EditMostRecentFileAction;
 import de.uka.ilkd.key.gui.actions.ExitMainAction;
 import de.uka.ilkd.key.gui.actions.FontSizeAction;
+import de.uka.ilkd.key.gui.actions.LemmaGenerationBatchModeAction;
 import de.uka.ilkd.key.gui.actions.LicenseAction;
 import de.uka.ilkd.key.gui.actions.LemmaGenerationAction;
 import de.uka.ilkd.key.gui.actions.LemmaGenerationAction.Mode;
@@ -226,6 +227,7 @@ public final class MainWindow extends JFrame  {
     private LemmaGenerationAction loadUserDefinedTacletsAction;
     private LemmaGenerationAction loadUserDefinedTacletsForProvingAction;
     private LemmaGenerationAction loadKeYTaclets;
+    private LemmaGenerationBatchModeAction lemmaGenerationBatchModeAction;
     
 
     
@@ -400,6 +402,7 @@ public final class MainWindow extends JFrame  {
         loadUserDefinedTacletsAction = new LemmaGenerationAction.ProveAndAddTaclets(this);
         loadUserDefinedTacletsForProvingAction = new LemmaGenerationAction.ProveUserDefinedTaclets(this);
         loadKeYTaclets            = new LemmaGenerationAction.ProveKeYTaclets(this);
+        lemmaGenerationBatchModeAction    = new LemmaGenerationBatchModeAction(this);
         
        // proveTacletsAction       = new ProveTacletsAction(this);
         
@@ -771,6 +774,7 @@ public final class MainWindow extends JFrame  {
         
         submenu.add(loadUserDefinedTacletsForProvingAction);
         submenu.add(loadKeYTaclets);
+        submenu.add(lemmaGenerationBatchModeAction);
         fileMenu.addSeparator();
         fileMenu.add(recentFiles.getMenu());
         fileMenu.addSeparator();

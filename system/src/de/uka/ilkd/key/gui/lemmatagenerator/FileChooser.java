@@ -39,7 +39,7 @@ public class FileChooser extends JPanel{
                 "for the current proof. For each taclet an extra proof obligation is built that must be provable, in order" +
                 " to sustain the correctness of the calculus.\n" +
                 "\nDefinitions:\n" +
-                "This file contains the defintions (function symbols, predicate symbols, sorts)" +
+                "This file contains the signature (function symbols, predicate symbols, sorts)" +
                 " that are used for creating the proof obligations mentioned above. In most cases it should be the same file" +
                 " as indicated in 'User-Defined Taclets'.\n" +
                 "\nAxioms:\nIn order to prove the correctness of the created lemmata," +
@@ -342,7 +342,7 @@ public class FileChooser extends JPanel{
         
         private SingleFileChooser getDefinitionFileChooser(){
                 if(definitionFileChooser == null){
-                        definitionFileChooser = new SingleFileChooser("Definitions",null);
+                        definitionFileChooser = new SingleFileChooser("Signature",null);
                 }
                return definitionFileChooser;
         }

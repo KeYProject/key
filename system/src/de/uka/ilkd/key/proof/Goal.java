@@ -555,60 +555,66 @@ public class Goal  {
 	return goalList;
     }
 
-    /**
-     * sets back the proof step that led to this goal. This goal is set to
-     * the parent node of the node corresponding to this goal. Goals given in
-     * the goal list parameter are removed from that list, if their
-     * corresponding nodes are leaves of the parent node of this goal.
-     * @param goalList the IList<Goal> with the goals to be removed 
-     * @return the new list of goals where goals mapped to the leaves of
-     * the parent to this goal are removed from compared to the given list.
-     */
-    public ImmutableList<Goal> setBack(ImmutableList<Goal> goalList) {
-	final Node parent = node.parent();
-	final Iterator<Node> leavesIt = parent.leavesIterator();
-	while (leavesIt.hasNext()) {
-	    Node n = leavesIt.next();
-	 
-	    final Iterator<Goal> goalIt = goalList.iterator();
-	    while (goalIt.hasNext()) {
-		final Goal g = goalIt.next();
-	
-		if (g.node()==n && g!=this) {
-		    goalList=goalList.removeFirst(g);		   
-		}
-	    }
-	}
+        /**
+         * sets back the proof step that led to this goal. This goal is set to
+         * the parent node of the node corresponding to this goal. Goals given
+         * in the goal list parameter are removed from that list, if their
+         * corresponding nodes are leaves of the parent node of this goal.
+         * 
+         * @param goalList
+         *                the IList<Goal> with the goals to be removed
+         * @return the new list of goals where goals mapped to the leaves of the
+         *         parent to this goal are removed from compared to the given
+         *         list.
+         */
+        public ImmutableList<Goal> setBack(ImmutableList<Goal> goalList) {
+                final Node parent = node.parent();
+                final Iterator<Node> leavesIt = parent.leavesIterator();
+                while (leavesIt.hasNext()) {
+                        Node n = leavesIt.next();
 
-	//	ruleAppIndex.tacletIndex().setTaclets(parent.getNoPosTacletApps());
+                        final Iterator<Goal> goalIt = goalList.iterator();
+                        while (goalIt.hasNext()) {
+                                final Goal g = goalIt.next();
 
-        removeTaclets();
-	setGlobalProgVars(parent.getGlobalProgVars());
+                                if (g.node() == n && g != this) {
+                                        goalList = goalList.removeFirst(g);
+                                }
+                        }
+                }
 
-	if (node.proof().env()!=null) { // do not break everything
-	                                // because of ProofMgt
-	    node.proof().mgt().ruleUnApplied(parent.getAppliedRuleApp());
-	}
+                // ruleAppIndex.tacletIndex().setTaclets(parent.getNoPosTacletApps());
 
-	Iterator<Node> siblings=parent.childrenIterator();
-	Node[] sibls=new Node[parent.childrenCount()];
-	int i=0;
-	while (siblings.hasNext()) {
-	    sibls[i]=siblings.next(); 
-	    i++;
-	}
+                removeTaclets();
+                setGlobalProgVars(parent.getGlobalProgVars());
 
-	for (i=0; i<sibls.length; i++) {
-	    sibls[i].remove();
-	}
+                if (node.proof().env() != null) { // do not break everything
+                                                  // because of ProofMgt
+                        node.proof()
+                                        .mgt()
+                                        .ruleUnApplied(parent
+                                                        .getAppliedRuleApp());
+                }
 
-	setNode(parent);
-	removeAppliedRuleApp ();
-        
-    updateRuleAppIndex();
-        
-	return goalList;
-    }
+                Iterator<Node> siblings = parent.childrenIterator();
+                Node[] sibls = new Node[parent.childrenCount()];
+                int i = 0;
+                while (siblings.hasNext()) {
+                        sibls[i] = siblings.next();
+                        i++;
+                }
+
+                for (i = 0; i < sibls.length; i++) {
+                        sibls[i].remove();
+                }
+
+                setNode(parent);
+                removeAppliedRuleApp();
+
+                updateRuleAppIndex();
+
+                return goalList;
+        }
 
     private void resetTagManager() {
         tagManager = new FormulaTagManager ( this );
