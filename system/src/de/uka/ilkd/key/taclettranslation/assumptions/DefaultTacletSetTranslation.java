@@ -13,9 +13,7 @@ package de.uka.ilkd.key.taclettranslation.assumptions;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.HashSet;
-import java.util.LinkedList;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -41,7 +39,7 @@ public final class DefaultTacletSetTranslation implements TacletSetTranslation,
          * <code>getTranslation()</code> will first translate the given taclets
          * before it returns <code>translation</code>.
          */
-        private boolean translate = false;
+        private boolean translate = true;
 
         /**
          * Translation of the taclets stored in <code>taclets</code>.
@@ -63,13 +61,6 @@ public final class DefaultTacletSetTranslation implements TacletSetTranslation,
         private ImmutableList<String> instantiationFailures = ImmutableSLList
                         .nil();
 
-        /**
-         * List of taclets that should be translated. The translation will be
-         * done by calling <code>getTtranslation()</code>.
-         */
-        private Collection<Taclet> taclets = new LinkedList<Taclet>();
-
-        private final AssumptionGenerator assumptionGenerator;
 
         private ImmutableSet<Sort> usedFormulaSorts = DefaultImmutableSet.nil();
 
@@ -94,8 +85,7 @@ public final class DefaultTacletSetTranslation implements TacletSetTranslation,
         private final SMTSettings settings;
 
         public DefaultTacletSetTranslation(Services services, SMTSettings settings) {
-                assumptionGenerator = new AssumptionGenerator(services);
-                assumptionGenerator.addListener(this);
+ 
 
                 // translators = translators.append(tt);
                 this.services = services;
@@ -124,6 +114,8 @@ public final class DefaultTacletSetTranslation implements TacletSetTranslation,
                                         .toString(),false)) {
 
                                 try {
+                                        AssumptionGenerator assumptionGenerator = new AssumptionGenerator(services);
+                                        assumptionGenerator.addListener(this);
                                         TacletFormula result = assumptionGenerator
                                                         .translate(t, sorts,
                                                                         settings.getMaxNumberOfGenerics());
@@ -145,12 +137,7 @@ public final class DefaultTacletSetTranslation implements TacletSetTranslation,
                 return translation;
         }
 
-        public void setTacletSet(Collection<Taclet> set) {
-                translate = true;
-                translation = ImmutableSLList.nil();
-                taclets = set;
 
-        }
 
         public ImmutableList<TacletFormula> getNotTranslated() {
 

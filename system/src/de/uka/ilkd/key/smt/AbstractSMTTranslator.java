@@ -1687,7 +1687,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
                 // added, because meatavariables should not be translated.
                 assert !(term.op() instanceof de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable) : "Metavariables no longer supported";
-
+               
                 Operator op = term.op();
                 if (op == Junctor.NOT) {
                         StringBuffer arg = translateTerm(term.sub(0),
@@ -2511,7 +2511,6 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 tacletSetTranslation = new DefaultTacletSetTranslation(
                                 services, settings);
 
-                tacletSetTranslation.setTacletSet(taclets);
 
                 Vector<QuantifiableVariable> vector = new Vector<QuantifiableVariable>();
                 ImmutableSet<Sort> sorts = DefaultImmutableSet.nil();
