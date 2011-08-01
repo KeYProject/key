@@ -16,6 +16,7 @@ import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
@@ -352,6 +353,68 @@ final class JMLTranslator {
                     }
                 }
                 return res;
+            }
+
+        });
+        
+        translationMethods.put("reach", new JMLFieldAccessExpressionTranslationMethod(){
+            @Override
+            public Object translate(Object... params) throws SLTranslationException {
+                checkParameters(params, Term.class, SLExpression.class, SLExpression.class, SLExpression.class, Services.class);
+                final Term t = (Term)params[0];
+                final SLExpression e1 = (SLExpression)params[1];
+                final SLExpression e2 = (SLExpression)params[2];
+                final SLExpression e3 = (SLExpression)params[3];
+                final Services services = (Services)params[4];
+                final LogicVariable stepsLV = e3 == null ? 
+                        new LogicVariable(new Name("n"), services.getTypeConverter().getIntegerLDT().targetSort()) 
+                        : null;
+                final Term h = TB.heap(services);
+                final Term s = getFields(t, services);
+                final Term o = e1.getTerm();
+                final Term o2 = e2.getTerm();
+                final Term n = e3 == null ? TB.var(stepsLV) : e3.getTerm();
+                Term reach = TB.reach(services, h, s, o, o2, n);
+                if(e3 == null) {
+                    reach = TB.ex(stepsLV, reach);
+                }
+                return new SLExpression(reach);
+            }});
+        
+        translationMethods.put("reachLocs", new JMLFieldAccessExpressionTranslationMethod(){
+            @Override
+            public Object translate(Object... params)
+            throws SLTranslationException {
+                checkParameters(params, Term.class, SLExpression.class, SLExpression.class, Services.class);
+                final Term t = (Term)params[0];
+                final SLExpression e1 = (SLExpression)params[1];
+                final SLExpression e3 = (SLExpression)params[2];
+                final Services services = (Services)params[3];
+                final LogicVariable objLV
+                    = new LogicVariable(new Name("o"), services.getJavaInfo().objectSort());
+                final LogicVariable stepsLV = e3 == null ? 
+                        new LogicVariable(new Name("n"), services.getTypeConverter().getIntegerLDT().targetSort()) 
+                        : null;
+                final Term h = TB.heap(services);
+                final Term s = getFields(t, services);
+                final Term o = e1.getTerm();
+                final Term o2 = TB.var(objLV);
+                final Term n = e3 == null ? TB.var(stepsLV) : e3.getTerm();
+                Term reach = TB.reach(services, h, s, o, o2, n);
+                if(e3 == null) {
+                    reach = TB.ex(stepsLV, reach);
+                }
+
+                final LogicVariable fieldLV
+                = new LogicVariable(new Name("f"), services.getTypeConverter().getHeapLDT().getFieldSort());
+                final Term locSet 
+                = TB.guardedSetComprehension(services, 
+                        new LogicVariable[]{objLV, fieldLV},
+                        reach, 
+                        o2,
+                        TB.var(fieldLV));
+
+                return new SLExpression(locSet, services.getJavaInfo().getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
             }
 
         });
@@ -754,6 +817,36 @@ final class JMLTranslator {
         public abstract Term translateQuantifier(QuantifiableVariable qv,
                                                  Term t)
                 throws SLTranslationException;
+     
+    }
+    
+    /**
+     * Abstract super-class for translation methods which enumerate fields such as <code>\reach</code>.
+     * @author bruns
+     *
+     */
+    private abstract class JMLFieldAccessExpressionTranslationMethod implements JMLTranslationMethod {
+        
+        /**
+         * Creates an "all-objects" term from a store-ref term.
+         * @param t store-ref term, needs to be a union of singletons
+         * @param services
+         * @return allObjects term (see <code>LocSetADT</code>)
+         * @throws SLTranslationException in case <code>t</code> is not a store-ref term cosisting of unions of singletons
+         */
+        protected Term getFields(Term t, Services services) throws SLTranslationException {
+            final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
+            if(t.op().equals(locSetLDT.getUnion())) {
+                final Term sub0 = getFields(t.sub(0),services);
+                final Term sub1 = getFields(t.sub(1),services);
+                return TB.union(services, sub0, sub1);
+            } else if(t.op().equals(locSetLDT.getSingleton())) {
+            return TB.allObjects(services, t.sub(1));
+            } else {
+                raiseError("Inacceptable field expression: " + t);
+                return null;
+            }
+        }
     }
 
     private abstract class JMLBoundedNumericalQuantifierTranslationMethod extends JMLQuantifierTranslationMethod {
