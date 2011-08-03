@@ -1420,8 +1420,11 @@ public final class MainWindow extends JFrame  {
             message += ", " + displayedOpenGoalNumber ();
             message += " remaining"; 
             setStatusLine ( message );
-        }
-                              
+        }                              
+    }
+    
+    void displayResults(String message){
+            setStatusLine(message);
     }
     
 //    /**
