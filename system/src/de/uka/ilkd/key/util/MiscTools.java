@@ -450,6 +450,14 @@ public final class MiscTools {
         }
     }
     
+    public static <T> boolean equalsOrNull(T a, Object... bs){
+        boolean result = true;
+        for (Object b: bs){
+            result = result && equalsOrNull(a, b);
+        }
+        return result;
+    }
+    
     
     
     //-------------------------------------------------------------------------

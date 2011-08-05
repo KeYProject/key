@@ -69,6 +69,8 @@ public final class SpecificationRepository {
     		= new LinkedHashMap<KeYJavaType, ImmutableSet<ClassInvariant>>(); 
     private final Map<KeYJavaType,ImmutableSet<ClassAxiom>> axioms
     		= new LinkedHashMap<KeYJavaType, ImmutableSet<ClassAxiom>>();
+    private final Map<KeYJavaType,ImmutableSet<InitiallyClause>> initiallyClauses
+            = new LinkedHashMap<KeYJavaType, ImmutableSet<InitiallyClause>>();
     private final Map<ProofOblInput,ImmutableSet<Proof>> proofs
                 = new LinkedHashMap<ProofOblInput,ImmutableSet<Proof>>();
     private final Map<LoopStatement,LoopInvariant> loopInvs
@@ -644,26 +646,57 @@ public final class SpecificationRepository {
         }
     }
     
-    /**
-     * Registers the passed initially clause as a new contract to all constructors of the KJT of inv.
-     */
-    public void addInitiallyClause(InitiallyClause inv) {
-        final KeYJavaType kjt = inv.getKJT();
+    private void createContractsFromInitiallyClause(InitiallyClause inv, KeYJavaType kjt) {
+        if (!kjt.equals(inv.getKJT()))
+            inv = inv.setKJT(kjt);
         for (ProgramMethod pm: services.getJavaInfo().getConstructors(kjt)){
             if (!JMLInfoExtractor.isHelper(pm)){
-        	addContracts(inv.toContract(pm));
+                final ImmutableSet<Contract> iniContr = inv.toContract(pm);
+                final ImmutableSet<Contract> oldContracts = getContracts(kjt,pm);
+                if (oldContracts.isEmpty()) {
+                    // add new contract, TODO: check whether defaults a valid
+                    addContracts(iniContr);
+                } else {
+                    // add initially clause as postcondition to all contracts
+                    ImmutableSet<FunctionalOperationContract> funcContracts = DefaultImmutableSet.<FunctionalOperationContract>nil();
+                    for (Contract c: iniContr) {
+                        if (c instanceof FunctionalOperationContract)
+                            funcContracts = funcContracts.add((FunctionalOperationContract)c);
+                    }
+                    assert funcContracts.size() == 1 : "funcContracts more than 1";
+                    final FunctionalOperationContract iniContract = funcContracts.toArray(new FunctionalOperationContract[1])[0];
+                    ImmutableSet<Contract> newContracts = DefaultImmutableSet.<Contract>nil();
+                    for (Contract c: oldContracts){
+                        if (c instanceof FunctionalOperationContract){
+                            ImmutableSet<FunctionalOperationContract> tmp = DefaultImmutableSet.<FunctionalOperationContract>nil().add((FunctionalOperationContract)c).add(iniContract);
+                            newContracts = newContracts.add(combineOperationContracts(tmp));
+                        } else {
+                            newContracts = newContracts.add(c);
+                        }
+                    }
+                    contracts.put(new Pair<KeYJavaType, ObserverFunction>(kjt,pm), newContracts);
+                }
             }
         }
-        if (VisibilityModifier.allowsInheritance(inv.getVisibility())){
-            final ImmutableList<KeYJavaType> subs = services.getJavaInfo().getAllSubtypes(kjt);
-            for (KeYJavaType sub: subs){
-        	InitiallyClause subInc = inv.setKJT(sub);
-        	for (ProgramMethod pm: services.getJavaInfo().getConstructors(sub)){
-        	    if (!JMLInfoExtractor.isHelper(pm)){
-        		addContracts(subInc.toContract(pm));
-        	    }
-        	}
-            }}
+    }
+    public void createContractsFromInitiallyClauses(){
+        for (KeYJavaType kjt: initiallyClauses.keySet()){
+            for (InitiallyClause inv: initiallyClauses.get(kjt)){
+                createContractsFromInitiallyClause(inv,kjt);
+                if (VisibilityModifier.allowsInheritance(inv.getVisibility())){
+                    final ImmutableList<KeYJavaType> subs = services.getJavaInfo().getAllSubtypes(kjt);
+                    for (KeYJavaType sub: subs){
+                    createContractsFromInitiallyClause(inv,sub);
+                    }}
+            }
+        }
+    }
+    
+    public void addInitiallyClause(InitiallyClause ini){
+        ImmutableSet<InitiallyClause> oldClauses = initiallyClauses.get(ini.getKJT());
+        if (oldClauses == null)
+            oldClauses = DefaultImmutableSet.<InitiallyClause>nil();
+        initiallyClauses.put(ini.getKJT(), oldClauses.add(ini));
     }
     
     
