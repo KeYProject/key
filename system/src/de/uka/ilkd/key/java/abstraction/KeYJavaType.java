@@ -91,7 +91,7 @@ public class KeYJavaType implements Type {
     
     public boolean equals (Object o){
         try {
-            return getName().equals(((KeYJavaType)o).getName());
+            return javaType.equals(((KeYJavaType)o).javaType) && sort.equals(((KeYJavaType)o).sort);
         } catch (Exception e) {
         return false;
         }

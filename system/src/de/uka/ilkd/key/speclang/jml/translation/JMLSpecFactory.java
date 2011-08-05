@@ -33,6 +33,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
+import de.uka.ilkd.key.speclang.translation.SLWarningException;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 
@@ -717,21 +718,13 @@ public class JMLSpecFactory {
                 isStatic ? null : TB.selfVar(services, kjt, false);
 
         //translateToTerm expression
+        final PositionedString clause = textualRep.getRepresents();
         final Pair<ObserverFunction, Term> rep =
-                translator.<Pair<ObserverFunction, Term>>parse(textualRep.getRepresents(),
-                                                               kjt,
-                                                               selfVar,
-                                                               null,
-                                                               null,
-                                                               null,
-                                                               null,
-                                                               services);
-        // represents clauses must be unique per type
-        // TODO: if statement does not match (bug report #1104)
-        for (Pair<KeYJavaType,ObserverFunction> p: modelFields){
-            if (p.first.equals(kjt)&& p.second.equals(rep.first)){
-                throw new SLTranslationException("JML represents clauses must occur uniquely per type and target.");
-            }
+                translator.<Pair<ObserverFunction, Term>>parse(clause,kjt,selfVar,null,null,null,null,services);
+        //check whether there already is a represents clause
+        if (!modelFields.add(new Pair<KeYJavaType,ObserverFunction>(kjt,rep.first))){
+            throw new SLWarningException("JML represents clauses must occur uniquely per type and target."+
+                    "\nAll but one are ignored.", clause.fileName , clause.pos);
         }
         //create class axiom
         String name = "JML represents clause for "
