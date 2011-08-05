@@ -52,7 +52,6 @@ public final class PartialInvAxiom extends ClassAxiom {
         this.displayName = displayName;
     }
     
-    
     @Override
     public String getName() {
 	return inv.getName();

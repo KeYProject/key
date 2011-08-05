@@ -22,8 +22,6 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.declaration.modifier.Private;
-import de.uka.ilkd.key.java.declaration.modifier.Protected;
-import de.uka.ilkd.key.java.declaration.modifier.Public;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -230,21 +228,15 @@ public final class SpecificationRepository {
         // DISCUSSION: how should it be treated in the mean time? as public? Our specifications rarely stretch over different packages... 
         final boolean visibleToPackage = true;
         final VisibilityModifier visibility = ax.getVisibility();
-        if(visibility == null) {
-            return visibleToPackage;
-        } else if(visibility instanceof Public) {
+        if (VisibilityModifier.isPublic(visibility))
             return true;
-        } else if(visibility instanceof Private) {
+        if (VisibilityModifier.allowsInheritance(visibility))
+            return visibleTo.getSort().extendsTrans(kjt.getSort()) || visibleToPackage;
+        if (VisibilityModifier.isPackageVisible(visibility))
+            return visibleToPackage;
+        else
             return kjt.equals(visibleTo);
-        } else if(visibility instanceof Protected) {
-            return visibleToPackage
-            || visibleTo.getSort().extendsTrans(kjt.getSort());
-        } else {
-            assert false;
-            return false;
-        }
     }
-
     
     private ImmutableSet<ClassAxiom> getVisibleAxiomsOfOtherClasses(
 	    						KeYJavaType visibleTo) {
@@ -336,7 +328,20 @@ public final class SpecificationRepository {
     }
     
     
-    
+
+
+    private RepresentsAxiom getRepresentsAxiom (KeYJavaType kjt, ClassAxiom ax){
+        if (!(ax instanceof RepresentsAxiom) || axioms.get(kjt)== null)
+            return null;
+        RepresentsAxiom result = null;
+        for (ClassAxiom ca: axioms.get(kjt)){
+            if (ca instanceof RepresentsAxiom && (ca.getTarget().equals(ax.getTarget()))){
+                assert result == null : "More than one represents clause for "+ax.getTarget();
+                result = (RepresentsAxiom)ca;
+            }
+        }
+        return result;
+    }
     
     //-------------------------------------------------------------------------
     //public interface
@@ -611,7 +616,7 @@ public final class SpecificationRepository {
     
     /**
      * Registers the passed class invariant, and inherits it to all
-     * subclasses.
+     * subclasses if it is public or protected.
      */
     public void addClassInvariant(ClassInvariant inv) {
         final KeYJavaType kjt = inv.getKJT();
@@ -619,7 +624,7 @@ public final class SpecificationRepository {
         
         addClassAxiom(new PartialInvAxiom(inv, services));
         
-        if(!inv.isStatic()) {
+        if(!inv.isStatic() && VisibilityModifier.allowsInheritance(inv.getVisibility())) {
             final ImmutableList<KeYJavaType> subs 
             	= services.getJavaInfo().getAllSubtypes(kjt);
             for(KeYJavaType sub : subs) {
@@ -649,7 +654,7 @@ public final class SpecificationRepository {
         	addContracts(inv.toContract(pm));
             }
         }
-        if (!(inv.getVisibility() instanceof Private)){
+        if (VisibilityModifier.allowsInheritance(inv.getVisibility())){
             final ImmutableList<KeYJavaType> subs = services.getJavaInfo().getAllSubtypes(kjt);
             for (KeYJavaType sub: subs){
         	InitiallyClause subInc = inv.setKJT(sub);
@@ -739,7 +744,35 @@ public final class SpecificationRepository {
         if(currentAxioms == null) {
             currentAxioms = DefaultImmutableSet.<ClassAxiom>nil();
         }
-        axioms.put(kjt, currentAxioms.add(ax));
+        if (ax instanceof RepresentsAxiom) {
+            // there may only be one conjoined represents axiom per model field
+            RepresentsAxiom  oldRep = getRepresentsAxiom(kjt, ax);
+            if (oldRep != null) {
+                final RepresentsAxiom newRep = oldRep.conjoin((RepresentsAxiom)ax);
+                axioms.put(kjt, currentAxioms.remove(oldRep).add(newRep));
+            } else {
+                axioms.put(kjt, currentAxioms.add(ax));
+            }
+            // inherit represents clauses to subclasses and conjoin together
+            if (VisibilityModifier.allowsInheritance(ax.getVisibility())){
+                final ImmutableList<KeYJavaType> subs = services.getJavaInfo().getAllSubtypes(kjt);
+                for (KeYJavaType sub: subs){
+                    RepresentsAxiom subAx =  ((RepresentsAxiom)ax).setKJT(sub);
+                    currentAxioms = axioms.get(sub);
+                    if(currentAxioms == null) {
+                        currentAxioms = DefaultImmutableSet.<ClassAxiom>nil();
+                    }
+                    oldRep = getRepresentsAxiom(sub, subAx);
+                    if (oldRep == null)
+                        axioms.put(sub, currentAxioms.add(subAx));
+                    else {
+                        final RepresentsAxiom newSubRep = oldRep.conjoin(subAx);
+                        axioms.put(sub, currentAxioms.remove(oldRep).add(newSubRep));
+                    }
+                }}
+        } else {
+            axioms.put(kjt, currentAxioms.add(ax));
+        }
     }
     
     

@@ -35,4 +35,10 @@ public final class SortImpl extends AbstractSort {
     public SortImpl(Name name) {
         this(name, DefaultImmutableSet.<Sort>nil());        
     }
+    
+    public boolean equals(Object o){
+        if (o instanceof SortImpl){
+            return ((SortImpl)o).name().equals(name());
+        } else return false;
+    }
 }

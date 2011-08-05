@@ -12,7 +12,7 @@
 package vacid0.redblacktree;
 
 /**
- * Harness suggested by Leino and Moska&#0322; for runtime-checking the implementation.
+ * Harness suggested by Leino and Moskal.
  * Not implementation-aware (makes only use of the map interface).
  * @author bruns
  *
@@ -21,6 +21,7 @@ public class Harness {
 
     //@ requires a.isEmpty && a.defaultValue == 0 && \invariant_for(a);
     //@ requires b.isEmpty && b.defaultValue == 1 && \invariant_for(b);
+    //@ requires \disjoint(a.footprint,b.footprint);
   public static void redBlackTestHarness(AbstractMap a, AbstractMap b) {
     a.replace(1, 1); 
     b.replace(1, 10);
@@ -34,7 +35,7 @@ public class Harness {
     assert(b.lookup(2) == 1 && b.lookup(42) == 1);
   }
   
-  //@ requires a.isEmpty && \invariant_for(a) && a.defaultValue == 0 && k >= 0;
+  //@ requires a.isEmpty && \invariant_for(a) && a.defaultValue == 0 && 0 <= k && k < a.contents.length;
   public static void testEmpty(AbstractMap a, int k) {
     assert a.lookup(k) == 0;
   }

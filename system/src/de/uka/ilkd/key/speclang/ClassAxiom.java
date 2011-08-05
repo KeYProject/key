@@ -218,5 +218,4 @@ public abstract class ClassAxiom implements SpecificationElement {
     public String getDisplayName() {
         return displayName == null ? getName() : displayName;
     }
-    
 }

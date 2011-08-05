@@ -71,7 +71,7 @@ public class BuiltInRuleApp implements RuleApp {
 	goal.addAppliedRuleApp(this);	
 	ImmutableList<Goal> result = builtInRule.apply(goal, services, this);
 	if (result == null)
-	    goal.removeAppliedRuleApp();
+	    goal.removeLastAppliedRuleApp();
 	return result;
     }
     

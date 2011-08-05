@@ -9,6 +9,9 @@
 //
 package de.uka.ilkd.key.speclang.jml.translation;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
@@ -30,6 +33,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
+import de.uka.ilkd.key.speclang.translation.SLWarningException;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 
@@ -46,6 +50,7 @@ public class JMLSpecFactory {
     private final Services services;
     private final JMLTranslator translator;
     private int invCounter;
+    private Set<Pair<KeYJavaType,ObserverFunction>> modelFields;
 
 
     //-------------------------------------------------------------------------
@@ -55,6 +60,7 @@ public class JMLSpecFactory {
         assert services != null;
         this.services = services;
         this.translator = JMLTranslator.getInstance();
+        modelFields = new HashSet<Pair<KeYJavaType,ObserverFunction>>();
     }
 
     //-------------------------------------------------------------------------
@@ -78,11 +84,11 @@ public class JMLSpecFactory {
     //internal methods
     //-------------------------------------------------------------------------
 
-    private String getDefaultInvName(String name) {
+    private String getDefaultInvName(String name, KeYJavaType kjt) {
         if (name == null)
-        return "JML class invariant nr " + invCounter++;
+        return "JML class invariant nr " + invCounter++ +" in "+ kjt.getName();
         else
-            return "JML class invariant \""+name+"\" (nr "+ invCounter++ +")";
+            return "JML class invariant \""+name+"\" in "+kjt.getName()+ " (nr "+ invCounter++ +")";
     }
 
 
@@ -595,7 +601,7 @@ public class JMLSpecFactory {
         Term inv = translator.<Term>parse(originalInv, kjt, selfVar, null, null,
                                           null, null, services);
         //create invariant
-        String name = getDefaultInvName(null);
+        String name = getDefaultInvName(null,kjt);
         return new ClassInvariantImpl(name,
                                       name,
                                       kjt,
@@ -616,8 +622,8 @@ public class JMLSpecFactory {
         Term inv = translator.<Term>parse(textualInv.getInv(), kjt, selfVar, null, null,
                                           null, null, services);
         //create invariant
-        String name = getDefaultInvName(null);
-        String display = getDefaultInvName(textualInv.getName());
+        String name = getDefaultInvName(null,kjt);
+        String display = getDefaultInvName(textualInv.getName(),kjt);
         return new ClassInvariantImpl(name,
                                       display,
                                       kjt,
@@ -685,6 +691,13 @@ public class JMLSpecFactory {
                                                                null,
                                                                null,
                                                                services);
+        // represents clauses must be unique per type
+        for (Pair<KeYJavaType,ObserverFunction> p: modelFields){
+            if (p.first.equals(kjt)&& p.second.equals(rep.first)){
+                throw new SLTranslationException("JML represents clauses must occur uniquely per type and target.", originalRep.fileName, originalRep.pos);
+            }
+        }
+        modelFields.add(new Pair<KeYJavaType, ObserverFunction>(kjt,rep.first));
         //create class axiom
         return new RepresentsAxiom("JML represents clause for "
                                    + rep.first.name().toString(),
@@ -705,15 +718,14 @@ public class JMLSpecFactory {
                 isStatic ? null : TB.selfVar(services, kjt, false);
 
         //translateToTerm expression
+        final PositionedString clause = textualRep.getRepresents();
         final Pair<ObserverFunction, Term> rep =
-                translator.<Pair<ObserverFunction, Term>>parse(textualRep.getRepresents(),
-                                                               kjt,
-                                                               selfVar,
-                                                               null,
-                                                               null,
-                                                               null,
-                                                               null,
-                                                               services);
+                translator.<Pair<ObserverFunction, Term>>parse(clause,kjt,selfVar,null,null,null,null,services);
+        //check whether there already is a represents clause
+        if (!modelFields.add(new Pair<KeYJavaType,ObserverFunction>(kjt,rep.first))){
+            throw new SLWarningException("JML represents clauses must occur uniquely per type and target."+
+                    "\nAll but one are ignored.", clause.fileName , clause.pos);
+        }
         //create class axiom
         String name = "JML represents clause for "
             + rep.first.name().toString();

@@ -138,7 +138,7 @@ public class Node {
     }
     
     /** Returns the set of NoPosTacletApps at this node */
-    public ImmutableSet<NoPosTacletApp> getNoPosTacletApps() {
+    public ImmutableSet<NoPosTacletApp> getLocalIntroducedRules() {
 	return localIntroducedRules;
     }
 

@@ -86,6 +86,11 @@ public final class RepresentsAxiom extends ClassAxiom {
 		   || originalRep.sub(0).sub(1).op().equals(originalSelfVar));
     }
     
+    private Term instance(boolean finalClass, SchemaVariable selfSV, Services services){
+        return target.isStatic() || finalClass || VisibilityModifier.allowsInheritance(visibility)
+        ? TB.tt() :TB.exactInstance(services, kjt.getSort(), TB.var(selfSV));
+    }
+
     
     private Term getAxiom(ParsableVariable heapVar, 
 	    		  ParsableVariable selfVar,
@@ -155,10 +160,7 @@ public final class RepresentsAxiom extends ClassAxiom {
 	final boolean finalClass 
 		= kjt.getJavaType() instanceof ClassDeclaration 
 	          && ((ClassDeclaration)kjt.getJavaType()).isFinal();
-	final Term exactInstance 
-		= target.isStatic() || finalClass
-		  ? TB.tt() 
-	          : TB.exactInstance(services, kjt.getSort(), TB.var(selfSV));
+		
 		  
         //prepare satisfiability guard
         final Term targetTerm 
@@ -193,7 +195,7 @@ public final class RepresentsAxiom extends ClassAxiom {
         	
 	//assemble formula
 	final Term guardedAxiom 
-		= TB.imp(TB.and(exactInstance, axiomSatisfiable), schemaAxiom);
+		= TB.imp(TB.and(instance(finalClass, selfSV, services), axiomSatisfiable), schemaAxiom);
 	final SequentFormula guardedAxiomCf 
 		= new SequentFormula(guardedAxiom);
 	
@@ -275,12 +277,14 @@ public final class RepresentsAxiom extends ClassAxiom {
 	if(target.isStatic() || finalClass) {
 	    ifSeq = null;
 	} else {
-	    final Term ifFormula 
-	    	= TB.exactInstance(services, kjt.getSort(), TB.var(selfSV));
-	    final SequentFormula ifCf = new SequentFormula(ifFormula);
-	    final Semisequent ifSemiSeq 
-	    	= Semisequent.EMPTY_SEMISEQUENT.insertFirst(ifCf).semisequent();
-	    ifSeq = Sequent.createAnteSequent(ifSemiSeq);
+	    final Term instanceTerm = instance(false, selfSV, services);
+	    final SequentFormula ifCf = new SequentFormula(instanceTerm);
+	    final Semisequent ifSemiSeq = Semisequent.EMPTY_SEMISEQUENT;
+	    // discard trivial antecedent
+	    if (!instanceTerm.equals(TB.tt())) {
+	        ifSemiSeq.insertFirst(ifCf).semisequent();
+	        ifSeq = Sequent.createAnteSequent(ifSemiSeq);
+	    } else ifSeq = null;
 	}
 	
 	//create taclet
@@ -374,5 +378,25 @@ public final class RepresentsAxiom extends ClassAxiom {
 	return originalRep.toString();
     }
 
+
+    public RepresentsAxiom setKJT(KeYJavaType newKjt) {
+        String newName = "JML represents clause for " + target
+        		+ " (subclass " + newKjt.getName()+ ")";
+        return new RepresentsAxiom(newName, displayName, target, newKjt, visibility, originalRep, originalSelfVar);
+    }
+    
+    /** Conjoins two represents clauses with minimum visibility. 
+     *  An exception is thrown if the targets or types are different.
+     *  <b>Known issue</b>: public clauses in subclasses are hidden by protected clauses in superclasses;
+     *  this only applies to observers outside the package of the subclass (whenever package-privacy is implemented).
+     */
+    public RepresentsAxiom conjoin (RepresentsAxiom ax) {
+        if (!target.equals(ax.target) || !kjt.equals(ax.kjt)){
+            throw new RuntimeException("Tried to conjoin incompatible represents axioms.");
+        }
+        VisibilityModifier minVisibility = visibility == null ? (VisibilityModifier.isPrivate(ax.visibility) ? ax.visibility : null) : (visibility.compareTo(ax.visibility) >= 0 ? visibility : ax.visibility);
+        Term newRep = TB.and(originalRep, ax.originalRep);
+        return new RepresentsAxiom(name, displayName, target, kjt, minVisibility, newRep, originalSelfVar);
+    }
 
 }
