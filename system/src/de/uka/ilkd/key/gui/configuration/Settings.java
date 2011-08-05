@@ -20,13 +20,15 @@ public interface Settings {
     /** gets a Properties object and has to perform the necessary
      * steps in order to change this object in a way that it
      * represents the stored settings
+     * <code>sender</code> is the object calling this method.
      */
-    void readSettings(Properties props);
+    void readSettings(Object sender, Properties props);
 
     /** The settings to store are written to the given Properties object.
      * @param props the Properties object where to write the settings as (key, value) pair
+     * <code>sender</code> is the object calling this method.
      */
-    void writeSettings(Properties props);
+    void writeSettings(Object sender, Properties props);
 
     /** adds a listener to the settings object 
      * @param l the listener

@@ -18,7 +18,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Calendar;
 import java.util.LinkedList;
-import java.util.Random;
 import java.util.concurrent.locks.ReentrantLock;
 
 import de.uka.ilkd.key.java.Services;
@@ -280,7 +279,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable {
                                                         solverOutput[ExternalProcessLauncher.ERROR],
                                                         Integer.parseInt(solverOutput[ExternalProcessLauncher.EXIT_CODE]));
                         // uncomment for testing
-                    //    Thread.sleep(10000);
+                        //Thread.sleep(5000);
                         // uncomment for testing
                        // Random random = new Random();
                         //Thread.sleep(random.nextInt(3000)+1000);

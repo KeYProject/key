@@ -83,6 +83,10 @@ public class IconFactory {
     public static ImageIcon keyHole(int x, int y) {
 	return scaleIcon(keyHole,x,y);
     }
+    
+
+            
+            
 
     public static ImageIcon keyHoleClosed(int x, int y) {
 	return scaleIcon(keyHoleClosed,x,y);

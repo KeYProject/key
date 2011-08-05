@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.taclettranslation.lemma;
 
+import java.util.Collection;
+
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
@@ -11,9 +13,9 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.ProblemInitializer.ProblemInitializerListener;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
+import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.LoaderListener;
 import de.uka.ilkd.key.taclettranslation.TacletVisitor;
 
 
@@ -36,24 +38,30 @@ public class ProofObligationCreator {
          * @param initConfig the initial configuration that should be used for creating the proofs.
          * @param axioms The set of user-defined taclets that should be used as additional rules. This
          * taclets are added to the single proof obligation so that they can be used for the proof.  
-         * @param listener a listener that observes the single steps. Used for status information.
+         * @param listeners a listener that observes the single steps. Used for status information.
          * @return A proof aggregate containing the proofs created by this method.
          */
         public ProofAggregate create(ImmutableSet<Taclet> taclets,
                         InitConfig initConfig, ImmutableSet<Taclet> axioms,
-                        ProblemInitializerListener listener) {
+                        Collection<LoaderListener> listeners) {
                 initConfig.setTaclets(initConfig.getTaclets().union(axioms));
                 ProofAggregate[] singleProofs = new ProofAggregate[taclets
                                 .size()];
                 int i = 0;
-                listener.progressStarted(this);
+                for(LoaderListener listener : listeners){
+                        listener.progressStarted(this);
+          
+                }
                 UserDefinedSymbols symbolsForAxioms = analyzeTaclets(axioms,initConfig.namespaces());
                 
                 symbolsForAxioms.addSymbolsToNamespaces(initConfig.namespaces());
                 
                 for (Taclet taclet : taclets) {
-                        listener.reportStatus(this, "Create Lemma for "
+                        for(LoaderListener listener : listeners){
+                                listener.reportStatus(this, "Create Lemma for "
                                         + taclet.name());
+                                
+                        }
                         singleProofs[i] = create(taclet, initConfig,symbolsForAxioms);
                         i++;
                 }
@@ -62,7 +70,9 @@ public class ProofObligationCreator {
                                                 singleProofs,
                                                 createName(singleProofs));
                 // listener.progressStopped(this);
-                listener.resetStatus(this);
+                  for(LoaderListener listener : listeners){
+                          listener.resetStatus(this);
+                  }
                 return proofAggregate;
         }
         
@@ -128,13 +138,14 @@ public class ProofObligationCreator {
                 collectUserDefinedSymbols(formula.getFormula(), userDefinedSymbols);
    
                 String header = userDefinedSymbols.createHeader(initConfig.getServices());
+          
       
                 Proof proof = new Proof(name, formula.getFormula(), header,
                                 initConfig.createTacletIndex(),
                                 initConfig.createBuiltInRuleIndex(),
                                 initConfig.getServices());
          
-
+                     
                 userDefinedSymbols.addSymbolsToNamespaces(proof.getNamespaces());
    
                 return ProofAggregate.createProofAggregate(proof, name);

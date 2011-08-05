@@ -45,6 +45,7 @@ public class Main {
 
     private static String examplesDir = null;
 
+
     private static String fileNameOnStartUp = null;
 
     public static void main(String[] args) {
@@ -137,6 +138,8 @@ public class Main {
         } else {
             System.out.println("Not using assertions ...");	   
         }
+
+
     }
 
     private static void evaluateLemmataOptions(LinkedList<String> options){
@@ -154,11 +157,10 @@ public class Main {
             return;
         }
         
-        KeYMediator mediator = MainWindow.getInstance().getMediator();
-
+        
         try {
             LemmataHandler handler = new LemmataHandler(opt,
-                    mediator.getProfile());
+                    ProofSettings.DEFAULT_SETTINGS.getProfile());
             handler.start();
         }
         catch(ProofInputException exception){
@@ -205,6 +207,7 @@ public class Main {
     public static String getFileNameOnStartUp() {
         return fileNameOnStartUp;
     }
+
 
     public static UserInterface makeUserInterface() {
         if(batchMode) {

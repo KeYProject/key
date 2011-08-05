@@ -85,6 +85,9 @@ public class WindowUserInterface implements UserInterface {
             }
         } else {
             sl.reset();
+            if(info.toString() != ""){
+                    mainWindow.displayResults(info.toString());
+            }
         }
     }
 

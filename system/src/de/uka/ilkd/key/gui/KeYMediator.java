@@ -229,30 +229,38 @@ public class KeYMediator {
 	}
     }
 
-    public void setBack(Node node) {
-	if (ensureProofLoaded()) {
-	    if (getProof().setBack(node)) {
-                finishSetBack();
-	    }else{
-                popupWarning("Setting back at the chosen node is not possible.",
-                "Oops...");            
-	    }
-	}
-    }    
-    
-    public void setBack(Goal goal) {
-	if (ensureProofLoaded()) {
-	    if (getProof() != null && getProof().setBack(goal.node().parent())){
-                finishSetBack();
-	    }else{
-                popupWarning("Setting back the current goal is not possible.", 
-                "Oops...");
-	    }
-	}
-    }
+        public void setBack(Node node) {
+                if (ensureProofLoaded()) {
+                        getProof().pruneProof(node);
+                        finishSetBack(node.proof());
+
+                }
+        }
+
+        public void setBack(Goal goal) {
+                if (ensureProofLoaded()) {
+                        if (getProof() != null) {
+                                getProof().pruneProof(goal);
+                                finishSetBack(getProof());
+
+                        } 
+                }
+        }
     
     
-    private void finishSetBack(){
+    private void finishSetBack(final Proof proof){
+        this.mainFrame.getUserInterface().taskFinished(
+                        new DefaultTaskFinishedInfo(this, null, 
+                                        proof, 0, 
+                                        0, getNrGoalsClosedByAutoMode()){
+                                @Override
+                                public String toString() {
+                                        
+                                        return "Proof has been pruned: "+(proof.openGoals().size() == 1?
+                                                        "one open goal remains." :
+                                                        (proof.openGoals().size()+" open goals remain."));
+                                }
+                        });
         TermTacletAppIndexCacheSet.clearCache();
         AbstractBetaFeature.clearCache();
         IfThenElseMalusFeature.clearCache();
