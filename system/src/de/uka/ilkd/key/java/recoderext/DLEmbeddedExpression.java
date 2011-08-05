@@ -2,15 +2,19 @@ package de.uka.ilkd.key.java.recoderext;
 
 import java.util.List;
 
-import de.uka.ilkd.key.util.MiscTools;
-
-import recoder.abstraction.Type;
 import recoder.java.Expression;
 import recoder.java.SourceVisitor;
 import recoder.java.expression.Operator;
 import recoder.list.generic.ASTArrayList;
+import de.uka.ilkd.key.util.MiscTools;
 
-// MU DOC
+/**
+ * This class is used to parse function applications with JavaDL escapes within
+ * set statements or similar situations.
+ * 
+ * 
+ * @author Mattias Ulbrich
+ */
 public class DLEmbeddedExpression extends Operator {
 
     private final String functionName;
