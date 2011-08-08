@@ -483,8 +483,8 @@ public class JMLSpecFactory {
     private String generateName(ProgramMethod pm,
                                 TextualJMLSpecCase textualSpecCase,
                                 Behavior originalBehavior) {
-        PositionedString customName = textualSpecCase.getName();
-        String name = (customName.text.length() > 0 ? customName.text
+        String customName = textualSpecCase.getName();
+        String name = ((!(customName == null) && customName.length() > 0) ? customName
                        : getContractName(pm, originalBehavior));
         return name;
     }

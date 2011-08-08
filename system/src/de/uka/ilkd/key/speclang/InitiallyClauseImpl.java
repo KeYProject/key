@@ -235,7 +235,8 @@ public final class InitiallyClauseImpl implements InitiallyClause {
             assert resultList.size() == 1;
             Contract result = resultList.toArray(new Contract[1])[0];
             assert result instanceof FunctionalOperationContract;
-            return (FunctionalOperationContract)result;
+            // hack: set modality and modifies to null in order to override when combining contracts
+            return ((FunctionalOperationContract)result).setModality(null).setModifies(null);
         } catch (SLTranslationException e){ 
             services.getExceptionHandler().reportException(e);
             return null;

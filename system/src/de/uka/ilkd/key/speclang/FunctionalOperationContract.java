@@ -77,4 +77,6 @@ public interface FunctionalOperationContract extends OperationContract {
                                     ImmutableList<ProgramVariable> paramVars,
                                     Services services);    
     
+    public FunctionalOperationContract setModality(Modality modality);
+    public FunctionalOperationContract setModifies(Term modifies);
 }

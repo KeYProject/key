@@ -89,10 +89,8 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 	assert !(name == null && baseName == null);
         assert kjt != null;	
         assert pm != null;
-        assert modality != null;
         assert pre != null;
         assert post != null;
-        assert mod != null;
         assert (selfVar == null) == pm.isStatic();
         assert paramVars != null;
         assert paramVars.size() == pm.getParameterDeclarationCount();
@@ -742,6 +740,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
         			    services), 
         		   originalPost);
         Term mod = originalMod;
+        Modality moda = modality;
         for(FunctionalOperationContract other : others) {
             Term otherPre = other.getPre(originalSelfVar, 
         	    			 originalParamVars, 
@@ -761,6 +760,8 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
                                          originalParamVars, 
                                          services);
 
+            Modality otherModality = other.getModality();
+            moda = moda == null ? otherModality : moda; 
             pre = TB.or(pre, otherPre);
             mby = mby != null && otherMby != null
                   ? TB.ife(otherPre, otherMby, mby)
@@ -769,14 +770,16 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
         	    				originalHeapAtPreVar, 
         	    				services), 
         	    		       otherPost));
-            mod = TB.union(services, mod, otherMod);
+            mod = mod == null ? otherMod
+                    : (otherMod == null ?
+                            mod : TB.union(services, mod, otherMod));
         }
 
-        return new FunctionalOperationContractImpl("invalid_name",
+        return new FunctionalOperationContractImpl("combined contract",
         				 newName,
                                          kjt,        				 
                                          pm,
-                                         modality,
+                                         moda,
                                          pre,
                                          mby,
                                          post,
@@ -865,5 +868,17 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
     public VisibilityModifier getVisibility() {
 	assert false; // this is currently not applicable for contracts
 	return null;
+    }
+
+
+    @Override
+    public FunctionalOperationContract setModality(Modality modality){
+        return new FunctionalOperationContractImpl(baseName, kjt, pm, modality, originalPre, originalMby, originalPost, originalMod, originalSelfVar, originalParamVars, originalResultVar, originalExcVar, originalHeapAtPreVar, toBeSaved);
+    }
+
+
+    @Override
+    public FunctionalOperationContract setModifies(Term modifies) {
+        return new FunctionalOperationContractImpl(baseName, kjt, pm, modality, originalPre, originalMby, originalPost, modifies, originalSelfVar, originalParamVars, originalResultVar, originalExcVar, originalHeapAtPreVar, toBeSaved);
     }
 }

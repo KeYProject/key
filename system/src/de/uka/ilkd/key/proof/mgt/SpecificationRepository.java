@@ -364,36 +364,63 @@ public final class SpecificationRepository {
     }
 
 
+    
+    private void registerContract(Contract contract) {
+        final Pair<KeYJavaType, ObserverFunction> target = new Pair<KeYJavaType,ObserverFunction>(contract.getKJT(), contract.getTarget());
+        registerContract(contract, target);
+    }
+
     private void registerContract(Contract contract,
             final ImmutableSet<Pair<KeYJavaType, ObserverFunction>> targets) {
         for(Pair<KeYJavaType,ObserverFunction> impl : targets) {
-            contract = contract.setTarget(impl.first, impl.second, services);
-            final String name = contract.getName();
-            assert contractsByName.get(name) == null
-                   : "Tried to add a contract with a non-unique name: " + name;
-            assert !name.contains(CONTRACT_COMBINATION_MARKER)
-                   : "Tried to add a contract with a name containing the"
-                     + " reserved character " 
-                     + CONTRACT_COMBINATION_MARKER 
-                     + ": " + name;
-            assert contract.id() != Contract.INVALID_ID
-                   : "Tried to add a contract with an invalid id!";
-            contracts.put(impl, 
-                      getContracts(impl.first, impl.second).add(contract));
-            
-            if(contract instanceof FunctionalOperationContract) {
-            operationContracts.put(new Pair<KeYJavaType,ProgramMethod>(impl.first, (ProgramMethod)impl.second), 
-                               getOperationContracts(impl.first, 
-                                                 (ProgramMethod)impl.second)
-                                          .add((FunctionalOperationContract)contract));
-            }
-            contractsByName.put(contract.getName(), contract);
-            contractTargets.put(impl.first, 
-                                getContractTargets(impl.first).add(impl.second));
+            registerContract(contract, impl);
         }
     }
-    
-    
+
+
+    private Contract registerContract(Contract contract,
+            Pair<KeYJavaType, ObserverFunction> target) {
+        contract = contract.setTarget(target.first, target.second, services);
+        final String name = contract.getName();
+        assert contractsByName.get(name) == null
+               : "Tried to add a contract with a non-unique name: " + name;
+        assert !name.contains(CONTRACT_COMBINATION_MARKER)
+               : "Tried to add a contract with a name containing the"
+                 + " reserved character " 
+                 + CONTRACT_COMBINATION_MARKER 
+                 + ": " + name;
+        assert contract.id() != Contract.INVALID_ID
+               : "Tried to add a contract with an invalid id!";
+        contracts.put(target, 
+                  getContracts(target.first, target.second).add(contract));
+        
+        if(contract instanceof FunctionalOperationContract) {
+        operationContracts.put(new Pair<KeYJavaType,ProgramMethod>(target.first, (ProgramMethod)target.second), 
+                           getOperationContracts(target.first, 
+                                             (ProgramMethod)target.second)
+                                      .add((FunctionalOperationContract)contract));
+        }
+        contractsByName.put(contract.getName(), contract);
+        contractTargets.put(target.first, 
+                            getContractTargets(target.first).add(target.second));
+        return contract;
+    }
+
+
+    private void unregisterContract(Contract contract) {
+        final KeYJavaType kjt = contract.getKJT();
+        final Pair<KeYJavaType,ObserverFunction> tp = new Pair<KeYJavaType, ObserverFunction>(kjt, contract.getTarget());
+        final Pair<KeYJavaType,ProgramMethod> tp2 = new Pair<KeYJavaType, ProgramMethod>(kjt, (ProgramMethod) contract.getTarget());
+        contracts.put(tp, contracts.get(tp).remove(contract));
+        if (contract instanceof FunctionalOperationContract){
+            operationContracts.put(tp2, operationContracts.get(tp2).remove((FunctionalOperationContract)contract));
+        }
+        contractsByName.remove(contract.getName());
+        if (contracts.keySet().contains(tp)); 
+            contractTargets.put(kjt, contractTargets.get(kjt).remove(tp.second));
+    }
+
+
     /** Adds initially clause as post-condition to contracts of constructors.
      * @param inv initially clause
      * @param kjt constructors of this type are added a post-condition
@@ -406,24 +433,23 @@ public final class SpecificationRepository {
                 final FunctionalOperationContract iniContr = inv.toContract(pm);
                 final ImmutableSet<Contract> oldContracts = getContracts(kjt,pm);
                 if (oldContracts.isEmpty()) {
-                    // add new contract, TODO: check whether defaults a valid
-                    addContractNoInheritance(iniContr);
+                    // add new contract, hack: setting default modality and modifies
+                    addContractNoInheritance(iniContr.setModality(Modality.BOX).setModifies(TB.allLocs(services)));
+                    assert getContracts(kjt,pm).size() == 1;
                 } else {
-                    ImmutableSet<Contract> newContracts = DefaultImmutableSet.<Contract>nil();
                     for (Contract c: oldContracts){
                         if (c instanceof FunctionalOperationContract){
+                            unregisterContract(c);
                             ImmutableSet<FunctionalOperationContract> tmp = DefaultImmutableSet.<FunctionalOperationContract>nil().add((FunctionalOperationContract)c).add(iniContr);
-                            newContracts = newContracts.add(combineOperationContracts(tmp));
-                        } else {
-                            newContracts = newContracts.add(c);
+                            addContractNoInheritance(combineOperationContracts(tmp));
                         }
                     }
-                    contracts.put(new Pair<KeYJavaType, ObserverFunction>(kjt,pm), newContracts);
+                    assert getContracts(kjt,pm).size() == oldContracts.size();
                 }
             }
         }
     }
-    
+
     //-------------------------------------------------------------------------
     //public interface
     //------------------------------------------------------------------------- 
@@ -1012,7 +1038,7 @@ public final class SpecificationRepository {
 	    } else if(spec instanceof ClassInvariant) {
 		addClassInvariant((ClassInvariant)spec);
 	    } else if(spec instanceof InitiallyClause){
-		addInitiallyClause((InitiallyClause)spec);
+	        addInitiallyClause((InitiallyClause)spec);
 	    } else if(spec instanceof ClassAxiom) {
 		addClassAxiom((ClassAxiom)spec);
 	    } else if(spec instanceof LoopInvariant) {
