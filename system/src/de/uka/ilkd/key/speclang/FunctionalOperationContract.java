@@ -76,4 +76,5 @@ public interface FunctionalOperationContract extends OperationContract {
 	    			    ProgramVariable selfVar, 
                                     ImmutableList<ProgramVariable> paramVars,
                                     Services services);    
+    
 }

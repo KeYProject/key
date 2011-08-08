@@ -172,6 +172,7 @@ public final class InitiallyClauseImpl implements InitiallyClause {
     
     private ImmutableList<PositionedString> createPrecond(ProgramMethod pm){
 	ImmutableList<PositionedString> res = ImmutableSLList.<PositionedString>nil();
+	// TODO: add static invariant
 	for (ParameterDeclaration p: pm.getMethodDeclaration().getParameters()){
 	    if (!JMLInfoExtractor.parameterIsNullable(pm, p)) {
 		res = res.append(createNonNullPositionedString(p.getVariableSpecification().getName(), p.getVariableSpecification().getProgramVariable().getKeYJavaType(), false, originalSpec.fileName, originalSpec.pos));
@@ -218,19 +219,23 @@ public final class InitiallyClauseImpl implements InitiallyClause {
 
     
     @Override
-    public ImmutableSet<Contract> toContract(ProgramMethod pm) { 
+    public FunctionalOperationContract toContract(ProgramMethod pm) { 
         try {
             if (sf==null) throw new SLTranslationException("Contract for initially clause could not be created because no SpecFactory given");
             if (! pm.isConstructor()) throw new SLTranslationException("Initially clauses only apply to constructors, not to method "+pm);
+            final ImmutableList<String> mods = ImmutableSLList.<String>nil().append("private");
             final TextualJMLSpecCase specCase =
-                new TextualJMLSpecCase(ImmutableSLList.<String>nil(),
-                        Behavior.NONE);
+                new TextualJMLSpecCase(mods,Behavior.NONE);
             specCase.addName(new PositionedString(getName()));
             specCase.addRequires(createPrecond(pm));
-            specCase.addEnsures(originalSpec);
-            specCase.addSignals(originalSpec);
+            specCase.addEnsures(originalSpec.prepend("\\invariant_for(this) &&"));
+            specCase.addSignals(originalSpec.prepend("\\invariant_for(this) &&"));
             specCase.addDiverges(new PositionedString("true"));
-            return sf.createJMLOperationContracts(pm, specCase);
+            ImmutableSet<Contract> resultList = sf.createJMLOperationContracts(pm, specCase);
+            assert resultList.size() == 1;
+            Contract result = resultList.toArray(new Contract[1])[0];
+            assert result instanceof FunctionalOperationContract;
+            return (FunctionalOperationContract)result;
         } catch (SLTranslationException e){ 
             services.getExceptionHandler().reportException(e);
             return null;

@@ -293,8 +293,12 @@ public final class SLEnvInput extends AbstractEnvInput {
         	final ImmutableSet<SpecificationElement> constructorSpecs 
 			= specExtractor.extractMethodSpecs(constructor);
         	specRepos.addSpecs(constructorSpecs);
-            }            
+            }
         }
+        
+
+        //add initially clauses to constructor contracts
+        specRepos.createContractsFromInitiallyClauses();
         
         //show warnings to user
         ImmutableSet<PositionedString> warnings = specExtractor.getWarnings();

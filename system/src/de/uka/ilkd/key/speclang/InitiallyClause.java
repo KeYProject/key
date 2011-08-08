@@ -10,13 +10,11 @@
 
 package de.uka.ilkd.key.speclang;
 
-import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
 
 public interface InitiallyClause extends SpecificationElement {
@@ -38,8 +36,7 @@ public interface InitiallyClause extends SpecificationElement {
      * For an initially clause <tt>inic</tt> the resulting contract looks like:<br>
      * <tt>requires true;<br>ensures inic;<br>signals (Exception) inic;<br>diverges true;</tt>
      * @param pm constructor
-     * @throws SLTranslationException 
      */
-    public ImmutableSet<Contract> toContract(ProgramMethod pm) ;
+    public FunctionalOperationContract toContract(ProgramMethod pm);
   
 }

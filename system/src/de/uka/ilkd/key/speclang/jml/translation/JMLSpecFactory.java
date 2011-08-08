@@ -50,6 +50,8 @@ public class JMLSpecFactory {
     private final Services services;
     private final JMLTranslator translator;
     private int invCounter;
+    
+    /** Used to check that there is only one represents clause per type and field. */
     private Set<Pair<KeYJavaType,ObserverFunction>> modelFields;
 
 
@@ -513,7 +515,6 @@ public class JMLSpecFactory {
      *          exception and the pre-heap
      * @param clauses   pre-translated JML clauses
      * @param post  pre-generated post condition
-     * @param result    immutable set of already generated operation contracts 
      * @return      operation contracts including new functional operation
      *          contracts
      */
@@ -562,7 +563,6 @@ public class JMLSpecFactory {
      *          operation parameters, operation result, thrown exception
      *          and the pre-heap
      * @param clauses   pre-translated JML clauses
-     * @param result    immutable set of already generated operation contracts
      * @return      operation contracts including a new dependency contract
      */
     private ImmutableSet<Contract> createDependencyOperationContract(

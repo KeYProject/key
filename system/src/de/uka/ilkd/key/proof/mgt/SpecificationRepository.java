@@ -345,6 +345,85 @@ public final class SpecificationRepository {
         return result;
     }
     
+
+
+    private Contract prepareContract(Contract contract) {
+        //sanity check
+        assert getCanonicalFormForKJT(contract.getTarget(), 
+                                  contract.getKJT())
+                    .equals(contract.getTarget());
+        
+        //set id
+        if(((TypeDeclaration)contract.getKJT().getJavaType()).isLibraryClass()) {
+            contract = contract.setID(libraryContractCounter--);
+            assert libraryContractCounter > Integer.MIN_VALUE : "too many library contracts";
+        } else {
+            contract = contract.setID(contractCounter++);
+        }
+        return contract;
+    }
+
+
+    private void registerContract(Contract contract,
+            final ImmutableSet<Pair<KeYJavaType, ObserverFunction>> targets) {
+        for(Pair<KeYJavaType,ObserverFunction> impl : targets) {
+            contract = contract.setTarget(impl.first, impl.second, services);
+            final String name = contract.getName();
+            assert contractsByName.get(name) == null
+                   : "Tried to add a contract with a non-unique name: " + name;
+            assert !name.contains(CONTRACT_COMBINATION_MARKER)
+                   : "Tried to add a contract with a name containing the"
+                     + " reserved character " 
+                     + CONTRACT_COMBINATION_MARKER 
+                     + ": " + name;
+            assert contract.id() != Contract.INVALID_ID
+                   : "Tried to add a contract with an invalid id!";
+            contracts.put(impl, 
+                      getContracts(impl.first, impl.second).add(contract));
+            
+            if(contract instanceof FunctionalOperationContract) {
+            operationContracts.put(new Pair<KeYJavaType,ProgramMethod>(impl.first, (ProgramMethod)impl.second), 
+                               getOperationContracts(impl.first, 
+                                                 (ProgramMethod)impl.second)
+                                          .add((FunctionalOperationContract)contract));
+            }
+            contractsByName.put(contract.getName(), contract);
+            contractTargets.put(impl.first, 
+                                getContractTargets(impl.first).add(impl.second));
+        }
+    }
+    
+    
+    /** Adds initially clause as post-condition to contracts of constructors.
+     * @param inv initially clause
+     * @param kjt constructors of this type are added a post-condition
+     */
+    private void createContractsFromInitiallyClause(InitiallyClause inv, KeYJavaType kjt) {
+        if (!kjt.equals(inv.getKJT()))
+            inv = inv.setKJT(kjt);
+        for (ProgramMethod pm: services.getJavaInfo().getConstructors(kjt)){
+            if (!JMLInfoExtractor.isHelper(pm)){
+                final FunctionalOperationContract iniContr = inv.toContract(pm);
+                final ImmutableSet<Contract> oldContracts = getContracts(kjt,pm);
+                if (oldContracts.isEmpty()) {
+                    // add new contract, TODO: check whether defaults a valid
+                    addContractNoInheritance(iniContr);
+                } else {
+                    ImmutableSet<Contract> newContracts = DefaultImmutableSet.<Contract>nil();
+                    for (Contract c: oldContracts){
+                        if (c instanceof FunctionalOperationContract){
+                            ImmutableSet<FunctionalOperationContract> tmp = DefaultImmutableSet.<FunctionalOperationContract>nil().add((FunctionalOperationContract)c).add(iniContr);
+                            newContracts = newContracts.add(combineOperationContracts(tmp));
+                        } else {
+                            newContracts = newContracts.add(c);
+                        }
+                    }
+                    contracts.put(new Pair<KeYJavaType, ObserverFunction>(kjt,pm), newContracts);
+                }
+            }
+        }
+    }
+    
     //-------------------------------------------------------------------------
     //public interface
     //------------------------------------------------------------------------- 
@@ -495,18 +574,7 @@ public final class SpecificationRepository {
      * overriding methods.
      */
     public void addContract(Contract contract) {
-	//sanity check
-	assert getCanonicalFormForKJT(contract.getTarget(), 
-		                      contract.getKJT())
-	            .equals(contract.getTarget());
-	
-	//set id
-	if(((TypeDeclaration)contract.getKJT().getJavaType()).isLibraryClass()) {
-	    contract = contract.setID(libraryContractCounter--);
-	    assert libraryContractCounter > Integer.MIN_VALUE : "too many library contracts";
-	} else {
-	    contract = contract.setID(contractCounter++);
-	}
+	contract = prepareContract(contract);
 	
 	//register and inherit
         final ImmutableSet<Pair<KeYJavaType,ObserverFunction>> impls 
@@ -514,32 +582,16 @@ public final class SpecificationRepository {
         	  .add(new Pair<KeYJavaType,ObserverFunction>(contract.getKJT(),
         		        		              contract.getTarget()));
         
-        for(Pair<KeYJavaType,ObserverFunction> impl : impls) {
-            contract = contract.setTarget(impl.first, impl.second, services);
-            final String name = contract.getName();
-            assert contractsByName.get(name) == null
-                   : "Tried to add a contract with a non-unique name: " + name;
-            assert !name.contains(CONTRACT_COMBINATION_MARKER)
-                   : "Tried to add a contract with a name containing the"
-                     + " reserved character " 
-                     + CONTRACT_COMBINATION_MARKER 
-                     + ": " + name;
-            assert contract.id() != Contract.INVALID_ID
-                   : "Tried to add a contract with an invalid id!";
-            contracts.put(impl, 
-        	          getContracts(impl.first, impl.second).add(contract));
-            
-            if(contract instanceof FunctionalOperationContract) {
-        	operationContracts.put(new Pair<KeYJavaType,ProgramMethod>(impl.first, (ProgramMethod)impl.second), 
-        		               getOperationContracts(impl.first, 
-        		        	                     (ProgramMethod)impl.second)
-        		        	              .add((FunctionalOperationContract)contract));
-            }
-            contractsByName.put(contract.getName(), contract);
-            contractTargets.put(impl.first, 
-                                getContractTargets(impl.first).add(impl.second));
-        }
+        registerContract(contract, impls);
     }
+    
+    /** Registers the passed (atomic) contract without inheriting it. */
+    public void addContractNoInheritance(Contract contract){
+        contract = prepareContract(contract);
+        final ImmutableSet<Pair<KeYJavaType,ObserverFunction>> target = DefaultImmutableSet.<Pair<KeYJavaType,ObserverFunction>>nil().add(new Pair<KeYJavaType,ObserverFunction>(contract.getKJT(),contract.getTarget()));
+        registerContract(contract, target);
+    }
+
     
     
     /**
@@ -645,40 +697,12 @@ public final class SpecificationRepository {
             addClassInvariant(inv);
         }
     }
+ 
     
-    private void createContractsFromInitiallyClause(InitiallyClause inv, KeYJavaType kjt) {
-        if (!kjt.equals(inv.getKJT()))
-            inv = inv.setKJT(kjt);
-        for (ProgramMethod pm: services.getJavaInfo().getConstructors(kjt)){
-            if (!JMLInfoExtractor.isHelper(pm)){
-                final ImmutableSet<Contract> iniContr = inv.toContract(pm);
-                final ImmutableSet<Contract> oldContracts = getContracts(kjt,pm);
-                if (oldContracts.isEmpty()) {
-                    // add new contract, TODO: check whether defaults a valid
-                    addContracts(iniContr);
-                } else {
-                    // add initially clause as postcondition to all contracts
-                    ImmutableSet<FunctionalOperationContract> funcContracts = DefaultImmutableSet.<FunctionalOperationContract>nil();
-                    for (Contract c: iniContr) {
-                        if (c instanceof FunctionalOperationContract)
-                            funcContracts = funcContracts.add((FunctionalOperationContract)c);
-                    }
-                    assert funcContracts.size() == 1 : "funcContracts more than 1";
-                    final FunctionalOperationContract iniContract = funcContracts.toArray(new FunctionalOperationContract[1])[0];
-                    ImmutableSet<Contract> newContracts = DefaultImmutableSet.<Contract>nil();
-                    for (Contract c: oldContracts){
-                        if (c instanceof FunctionalOperationContract){
-                            ImmutableSet<FunctionalOperationContract> tmp = DefaultImmutableSet.<FunctionalOperationContract>nil().add((FunctionalOperationContract)c).add(iniContract);
-                            newContracts = newContracts.add(combineOperationContracts(tmp));
-                        } else {
-                            newContracts = newContracts.add(c);
-                        }
-                    }
-                    contracts.put(new Pair<KeYJavaType, ObserverFunction>(kjt,pm), newContracts);
-                }
-            }
-        }
-    }
+    /**
+     * Adds postconditions raising from initially clauses to all constructors.
+     * <b>Warning</b>: To be called after all contracts have been registered.
+     */
     public void createContractsFromInitiallyClauses(){
         for (KeYJavaType kjt: initiallyClauses.keySet()){
             for (InitiallyClause inv: initiallyClauses.get(kjt)){
@@ -692,6 +716,15 @@ public final class SpecificationRepository {
         }
     }
     
+    /** 
+     * Registers the passed initially clause.
+     * Initially clauses in JML specify the post-state of any constructor of subtypes;
+     * they may particularly be used in interface types.
+     * To create proof obligations from initially clauses,
+     * the method <code>createContractsFromInitiallyClauses</code> adds them to the contracts
+     * of respective constructors (or adds a contract if there is none yet).
+     * @param ini initially clause
+     */
     public void addInitiallyClause(InitiallyClause ini){
         ImmutableSet<InitiallyClause> oldClauses = initiallyClauses.get(ini.getKJT());
         if (oldClauses == null)
@@ -701,7 +734,7 @@ public final class SpecificationRepository {
     
     
     /**
-     * Registers the passed initially clauses as new contracts to all constructors of their KJT.
+     * Registers the passed initially clauses.
      */
     public void addInitiallyClauses(ImmutableSet<InitiallyClause> toAdd) {
         for(InitiallyClause inv : toAdd) {
