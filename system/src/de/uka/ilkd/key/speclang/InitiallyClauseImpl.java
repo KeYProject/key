@@ -220,7 +220,7 @@ public final class InitiallyClauseImpl implements InitiallyClause {
     
     @Override
     public FunctionalOperationContract toContract(ProgramMethod pm) { 
-        try {
+        try { // TODO move to ContractFactory
             if (sf==null) throw new SLTranslationException("Contract for initially clause could not be created because no SpecFactory given");
             if (! pm.isConstructor()) throw new SLTranslationException("Initially clauses only apply to constructors, not to method "+pm);
             final ImmutableList<String> mods = ImmutableSLList.<String>nil().append("private");
@@ -236,7 +236,7 @@ public final class InitiallyClauseImpl implements InitiallyClause {
             Contract result = resultList.toArray(new Contract[1])[0];
             assert result instanceof FunctionalOperationContract;
             // hack: set modality and modifies to null in order to override when combining contracts
-            return ((FunctionalOperationContract)result).setModality(null).setModifies(null);
+            return ((FunctionalOperationContract)result);
         } catch (SLTranslationException e){ 
             services.getExceptionHandler().reportException(e);
             return null;

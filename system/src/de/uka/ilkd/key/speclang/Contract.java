@@ -12,7 +12,6 @@ package de.uka.ilkd.key.speclang;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -76,19 +75,6 @@ public interface Contract extends SpecificationElement {
 	               ImmutableList<Term> paramTerms,
 	               Services services);
     
-    /**
-     * Returns another contract like this one but with the passed id.
-     */
-    public Contract setID(int id);
-    
-    /**
-     * Returns another contract like this one, except that it refers to the 
-     * passed target. 
-     */
-    public Contract setTarget(KeYJavaType newKJT,
-	    	              ObserverFunction newTarget,
-	    		      Services services);        
-            
     /**
      * Returns the contract in pretty HTML format.
      */

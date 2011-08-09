@@ -11,7 +11,6 @@
 package de.uka.ilkd.key.speclang;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -48,29 +47,29 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
     
     protected static final TermBuilder TB = TermBuilder.DF;
 
-    private final String baseName;
-    private final String name;
-    private final KeYJavaType kjt;    
-    private final ProgramMethod pm;
-    private final Modality modality;
-    private final Term originalPre;
-    private final Term originalMby;    
-    private final Term originalPost;
-    private final Term originalMod;
-    private final ProgramVariable originalSelfVar;
-    private final ImmutableList<ProgramVariable> originalParamVars;
-    private final ProgramVariable originalResultVar;
-    private final ProgramVariable originalExcVar;
-    private final LocationVariable originalHeapAtPreVar;
-    private final int id;
-    private final boolean toBeSaved;
+    final String baseName;
+    final String name;
+    final KeYJavaType kjt;    
+    final ProgramMethod pm;
+    final Modality modality;
+    final Term originalPre;
+    final Term originalMby;    
+    final Term originalPost;
+    final Term originalMod;
+    final ProgramVariable originalSelfVar;
+    final ImmutableList<ProgramVariable> originalParamVars;
+    final ProgramVariable originalResultVar;
+    final ProgramVariable originalExcVar;
+    final LocationVariable originalHeapAtPreVar;
+    final int id;
+    final boolean toBeSaved;
     
     
     //-------------------------------------------------------------------------
     //constructors
     //-------------------------------------------------------------------------
     
-    private FunctionalOperationContractImpl(String baseName,
+    FunctionalOperationContractImpl(String baseName,
 	                          String name,
                                   KeYJavaType kjt,	                          
                                   ProgramMethod pm,
@@ -91,6 +90,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
         assert pm != null;
         assert pre != null;
         assert post != null;
+        assert modality != null;
         assert (selfVar == null) == pm.isStatic();
         assert paramVars != null;
         assert paramVars.size() == pm.getParameterDeclarationCount();
@@ -138,7 +138,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
      * @param excVar the variable used for the thrown exception
      * @param heapAtPreVar the variable used for the pre-heap
      */
-    public FunctionalOperationContractImpl(String baseName,
+    FunctionalOperationContractImpl(String baseName,
                                  KeYJavaType kjt,	    
                                  ProgramMethod pm,
             		         Modality modality,
@@ -185,7 +185,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
      * 			operation parameters, operation result, thrown exception
      * 			and the pre-heap
      */
-    public FunctionalOperationContractImpl(String baseName, ProgramMethod pm,
+    FunctionalOperationContractImpl(String baseName, ProgramMethod pm,
 	    Modality modality, Term pre, Term mby, Term post, Term mod,
 	    ProgramVariableCollection progVars, boolean toBeSaved) {
 	this(baseName, null, pm.getContainerType(), pm, modality, pre, mby,
@@ -199,14 +199,6 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
     //-------------------------------------------------------------------------
     //internal methods
     //-------------------------------------------------------------------------
-    
-    private static Term atPreify(Term t, 
-	    			 ProgramVariable heapAtPreVar,
-	    			 Services services) {
-	final Map<Term,Term> map = new HashMap<Term,Term>();
-	map.put(TB.heap(services), TB.var(heapAtPreVar));
-        return new OpReplacer(map).replace(t);
-    }
 
     
     private Map /*Operator, Operator, Term -> Term*/ getReplaceMap(
@@ -433,49 +425,6 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 	return or.replace(originalMby);
     }    
     
-
-    @Override
-    public FunctionalOperationContract setID(int newId) {
-        return new FunctionalOperationContractImpl(baseName,
-        	                         null,
-                			 kjt,        	                         
-                			 pm,
-                			 modality,
-                			 originalPre,
-                			 originalMby,
-                			 originalPost,
-                			 originalMod,
-                			 originalSelfVar,
-                			 originalParamVars,
-                			 originalResultVar,
-                			 originalExcVar,
-                			 originalHeapAtPreVar,
-                			 newId,
-                			 toBeSaved);	
-    }
-    
-    
-    @Override
-    public FunctionalOperationContract setTarget(KeYJavaType newKJT,
-	    			       ObserverFunction newPM, 
-	    			       Services services) {
-        return new FunctionalOperationContractImpl(baseName,
-        				 null,
-                			 newKJT,        				 
-                			 (ProgramMethod)newPM,
-                			 modality,
-                			 originalPre,
-                			 originalMby,
-                			 originalPost,
-                			 originalMod,
-                			 originalSelfVar,
-                			 originalParamVars,
-                			 originalResultVar,
-                			 originalExcVar,
-                			 originalHeapAtPreVar,
-                			 id,
-                			 toBeSaved && newKJT.equals(kjt));	
-    }
     
     
     @Override
@@ -720,120 +669,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
     }
     
     
-    @Override
-    public FunctionalOperationContract union(FunctionalOperationContract[] others, 
-                                   String newName, 
-                                   Services services) {
-        assert others != null;
-        for(FunctionalOperationContract contract : others) {
-            assert contract.getTarget().equals(pm);
-        }
-        if(others.length == 0) {
-            return this;
-        }
-        
-        //collect information
-        Term pre = originalPre;
-        Term mby = originalMby;        
-        Term post = TB.imp(atPreify(originalPre, 
-        			    originalHeapAtPreVar,
-        			    services), 
-        		   originalPost);
-        Term mod = originalMod;
-        Modality moda = modality;
-        for(FunctionalOperationContract other : others) {
-            Term otherPre = other.getPre(originalSelfVar, 
-        	    			 originalParamVars, 
-        	    			 services);
-            Term otherMby = other.hasMby()
-            		    ? other.getMby(originalSelfVar, 
-            			           originalParamVars, 
-            			           services)
-            	            : null;   
-            Term otherPost = other.getPost(originalSelfVar, 
-        	    			   originalParamVars, 
-        	    			   originalResultVar, 
-        	    			   originalExcVar, 
-        	    			   originalHeapAtPreVar, 
-        	    			   services);
-            Term otherMod = other.getMod(originalSelfVar, 
-                                         originalParamVars, 
-                                         services);
-
-            Modality otherModality = other.getModality();
-            moda = moda == null ? otherModality : moda; 
-            pre = TB.or(pre, otherPre);
-            mby = mby != null && otherMby != null
-                  ? TB.ife(otherPre, otherMby, mby)
-                  : null;            
-            post = TB.and(post, TB.imp(atPreify(otherPre, 
-        	    				originalHeapAtPreVar, 
-        	    				services), 
-        	    		       otherPost));
-            mod = mod == null ? otherMod
-                    : (otherMod == null ?
-                            mod : TB.union(services, mod, otherMod));
-        }
-
-        return new FunctionalOperationContractImpl("combined contract",
-        				 newName,
-                                         kjt,        				 
-                                         pm,
-                                         moda,
-                                         pre,
-                                         mby,
-                                         post,
-                                         mod,
-                                         originalSelfVar,
-                                         originalParamVars,
-                                         originalResultVar,
-                                         originalExcVar,
-                                         originalHeapAtPreVar,
-                                         INVALID_ID,
-                                         toBeSaved);
-    }
-    
-    
-    @Override
-    public FunctionalOperationContract addPre(Term addedPre,
-		    		    ProgramVariable selfVar, 
-		    		    ImmutableList<ProgramVariable> paramVars,
-		    		    Services services) {
-	//replace in addedPre the variables used for self and parameters
-	Map <Operator, Operator> map = new LinkedHashMap<Operator,Operator>();
-	if(selfVar != null) {
-	    map.put(selfVar, originalSelfVar);
-	}
-	if(paramVars != null) {
-	    Iterator<ProgramVariable> it1 = paramVars.iterator();
-	    Iterator<ProgramVariable> it2 = originalParamVars.iterator();
-	    while(it1.hasNext()) {
-		assert it2.hasNext();
-		map.put(it1.next(), it2.next());
-	    }
-	}
-	OpReplacer or = new OpReplacer(map);
-	addedPre = or.replace(addedPre);
-	
-	//create new contract
-        return new FunctionalOperationContractImpl(baseName,
-        	                         name,
-		 			 kjt,        	                         
-		 			 pm,
-		 			 modality,
-		 			 TB.and(originalPre, addedPre),
-		 			 originalMby,
-		 			 originalPost,
-		 			 originalMod,
-		 			 originalSelfVar,
-		 			 originalParamVars,
-		 			 originalResultVar,
-		 			 originalExcVar,
-		 			 originalHeapAtPreVar,
-		 			 id,
-		 			 toBeSaved);
-    }
-    
+  
     
     @Override
     public String toString() {
@@ -871,14 +707,4 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
     }
 
 
-    @Override
-    public FunctionalOperationContract setModality(Modality modality){
-        return new FunctionalOperationContractImpl(baseName, kjt, pm, modality, originalPre, originalMby, originalPost, originalMod, originalSelfVar, originalParamVars, originalResultVar, originalExcVar, originalHeapAtPreVar, toBeSaved);
-    }
-
-
-    @Override
-    public FunctionalOperationContract setModifies(Term modifies) {
-        return new FunctionalOperationContractImpl(baseName, kjt, pm, modality, originalPre, originalMby, originalPost, modifies, originalSelfVar, originalParamVars, originalResultVar, originalExcVar, originalHeapAtPreVar, toBeSaved);
-    }
 }

@@ -49,6 +49,7 @@ public class JMLSpecFactory {
     private static final TermBuilder TB = TermBuilder.DF;
     private final Services services;
     private final JMLTranslator translator;
+    private final ContractFactory cf;
     private int invCounter;
     
     /** Used to check that there is only one represents clause per type and field. */
@@ -62,6 +63,7 @@ public class JMLSpecFactory {
         assert services != null;
         this.services = services;
         this.translator = JMLTranslator.getInstance();
+        cf = new ContractFactory(services);
         modelFields = new HashSet<Pair<KeYJavaType,ObserverFunction>>();
     }
 
@@ -526,29 +528,27 @@ public class JMLSpecFactory {
             Term post) {
         ImmutableSet<Contract> result = DefaultImmutableSet.<Contract>nil();
         if (clauses.diverges.equals(TB.ff())) {
-            FunctionalOperationContract contract = new FunctionalOperationContractImpl(
-                    name, pm, Modality.DIA, clauses.requires,
-                    clauses.measuredBy, post, clauses.assignable, progVars,
-                    false);
+            FunctionalOperationContract contract = cf.func(
+                    name, pm, true, clauses.requires,
+                    clauses.measuredBy, post, clauses.assignable, progVars);
             result = result.add(contract);
         } else if (clauses.diverges.equals(TB.tt())) {
-            FunctionalOperationContract contract = new FunctionalOperationContractImpl(
-                    name, pm, Modality.BOX, clauses.requires,
-                    clauses.measuredBy, post, clauses.assignable, progVars,
-                    false);
+            FunctionalOperationContract contract = cf.func(
+                    name, pm, false, clauses.requires,
+                    clauses.measuredBy, post, clauses.assignable, progVars);
             result = result.add(contract);
         } else {
-            FunctionalOperationContract contract1 = new FunctionalOperationContractImpl(
-                    name, pm, Modality.DIA,
+            FunctionalOperationContract contract1 = cf.func(
+                    name, pm, true,
                     TB.and(clauses.requires, TB.not(clauses.diverges)),
                     clauses.measuredBy, post, clauses.assignable,
-                    progVars, false);
+                    progVars);
             FunctionalOperationContract contract2 =
-                    new FunctionalOperationContractImpl(name, pm, Modality.BOX,
+                    cf.func(name, pm, false,
                                                         clauses.requires,
                                                         clauses.measuredBy, post,
                                                         clauses.assignable,
-                                                        progVars, false);
+                                                        progVars);
             result = result.add(contract1).add(contract2);
         }
         return result;
@@ -571,8 +571,8 @@ public class JMLSpecFactory {
             ContractClauses clauses) {
         ImmutableSet<Contract> result = DefaultImmutableSet.<Contract>nil();
         if (clauses.accessible != null) {
-            final Contract depContract = new DependencyContractImpl(
-                    "JML accessible clause", pm.getContainerType(), pm,
+            final Contract depContract = cf.dep(
+                    pm.getContainerType(), pm,
                     clauses.requires, clauses.measuredBy,
                     clauses.accessible, progVars.selfVar,
                     progVars.paramVars);
@@ -786,18 +786,7 @@ public class JMLSpecFactory {
                     originalDep, kjt, selfVar, null, null, null, null,
                     services);
         assert dep.first.arity() <= 2;
-
-        //create dependency contract
-        final ImmutableList<ProgramVariable> paramVars =
-                TB.paramVars(services, dep.first, false);
-        return new DependencyContractImpl("JML depends clause",
-                                          kjt,
-                                          dep.first,
-                                          TB.inv(services, TB.var(selfVar)),
-                                          dep.third,
-                                          dep.second,
-                                          selfVar,
-                                          paramVars);
+        return cf.dep(kjt, dep, selfVar);
     }
 
 

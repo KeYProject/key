@@ -56,6 +56,7 @@ public final class SpecificationRepository {
     
     private static final String CONTRACT_COMBINATION_MARKER = "#";
     private static final TermBuilder TB = TermBuilder.DF;
+    private final ContractFactory cf;
     
     private final Map<Pair<KeYJavaType,ObserverFunction>, ImmutableSet<Contract>> contracts 
     		= new LinkedHashMap<Pair<KeYJavaType,ObserverFunction>,ImmutableSet<Contract>>();
@@ -94,6 +95,7 @@ public final class SpecificationRepository {
 
     public SpecificationRepository(Services services) {
 	this.services = services;
+	cf = new ContractFactory(services);
     }
     
 
@@ -355,10 +357,10 @@ public final class SpecificationRepository {
         
         //set id
         if(((TypeDeclaration)contract.getKJT().getJavaType()).isLibraryClass()) {
-            contract = contract.setID(libraryContractCounter--);
+            contract = cf.setID(contract,libraryContractCounter--);
             assert libraryContractCounter > Integer.MIN_VALUE : "too many library contracts";
         } else {
-            contract = contract.setID(contractCounter++);
+            contract = cf.setID(contract,contractCounter++);
         }
         return contract;
     }
@@ -380,7 +382,7 @@ public final class SpecificationRepository {
 
     private Contract registerContract(Contract contract,
             Pair<KeYJavaType, ObserverFunction> target) {
-        contract = contract.setTarget(target.first, target.second, services);
+        contract = cf.setTarget(contract,target.first, target.second);
         final String name = contract.getName();
         assert contractsByName.get(name) == null
                : "Tried to add a contract with a non-unique name: " + name;
@@ -434,12 +436,14 @@ public final class SpecificationRepository {
                 final ImmutableSet<Contract> oldContracts = getContracts(kjt,pm);
                 if (oldContracts.isEmpty()) {
                     // add new contract, hack: setting default modality and modifies
-                    addContractNoInheritance(iniContr.setModality(Modality.BOX).setModifies(TB.allLocs(services)));
+                    //addContractNoInheritance(iniContr.setModality(Modality.BOX).setModifies(TB.allLocs(services)));
+                    addContractNoInheritance(iniContr);
                     assert getContracts(kjt,pm).size() == 1;
                 } else {
                     for (Contract c: oldContracts){
                         if (c instanceof FunctionalOperationContract){
                             unregisterContract(c);
+                            // XXX
                             ImmutableSet<FunctionalOperationContract> tmp = DefaultImmutableSet.<FunctionalOperationContract>nil().add((FunctionalOperationContract)c).add(iniContr);
                             addContractNoInheritance(combineOperationContracts(tmp));
                         }
@@ -650,27 +654,8 @@ public final class SpecificationRepository {
                 return c1.getName().compareTo(c2.getName());
             }
         });
-        
-        //split
-        FunctionalOperationContract contract = contractsArray[0];
-        FunctionalOperationContract[] others 
-            = new FunctionalOperationContract[contractsArray.length - 1];
-        System.arraycopy(contractsArray, 
-                         1, 
-                         others, 
-                         0, 
-                         contractsArray.length - 1);
-        
-        //determine names
-        StringBuffer nameSB = new StringBuffer(contract.getName());
-        for(FunctionalOperationContract other : others) {
-            nameSB.append(CONTRACT_COMBINATION_MARKER + other.getName());
-        }
-        
-        return contract.union(
-                others, 
-                nameSB.toString(), 
-                services);
+       
+        return cf.union(contractsArray);
     }
     
     

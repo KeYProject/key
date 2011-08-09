@@ -12,9 +12,7 @@ package de.uka.ilkd.key.speclang;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
@@ -22,13 +20,6 @@ public interface OperationContract extends Contract {
     
     @Override
     public ProgramMethod getTarget();
-
-    @Override
-    public OperationContract setID(int id);
-    
-    @Override
-    public OperationContract setTarget(KeYJavaType newKJT,
-	    ObserverFunction newTarget, Services services);
     
     /**
      * Returns the modifies clause of the contract.
