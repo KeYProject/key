@@ -404,7 +404,7 @@ public final class MainWindow extends JFrame  {
         loadKeYTaclets            = new LemmaGenerationAction.ProveKeYTaclets(this);
         lemmaGenerationBatchModeAction    = new LemmaGenerationBatchModeAction(this);
         
-       // proveTacletsAction       = new ProveTacletsAction(this);
+
         
 	
 	
