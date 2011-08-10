@@ -149,8 +149,8 @@ public final class JMLSpecExtractor implements SpecExtractor {
      * @param pos the Position where to place this implicit specification
      * @return set of formulas specifying non-nullity for field/variables
      */  
-    private ImmutableSet<PositionedString> createNonNullPositionedString(String varName, KeYJavaType kjt, 
-	    boolean isImplicitVar, String fileName, Position pos) {
+    public static ImmutableSet<PositionedString> createNonNullPositionedString(String varName, KeYJavaType kjt, 
+	    boolean isImplicitVar, String fileName, Position pos, Services services) {
 	ImmutableSet<PositionedString> result = DefaultImmutableSet.<PositionedString>nil(); 
 	final Type varType  = kjt.getJavaType(); 
 
@@ -213,7 +213,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 	    createNonNullPositionedString(field.getProgramName(),
                 		    field.getProgramVariable().getKeYJavaType(),
                 		    field instanceof ImplicitFieldSpecification,
-                		    fileName, member.getEndPosition());
+                		    fileName, member.getEndPosition(),services);
                 	for(PositionedString classInv : nonNullInvs) {
                 	    result = result.add(jsf.createJMLClassInvariant(kjt,
                 		    					    visibility,
@@ -372,7 +372,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
                         createNonNullPositionedString(paramDecl.getName(),
                                 paramDecl.getProgramVariable().getKeYJavaType(),
                                 false,
-                                fileName, pm.getStartPosition());
+                                fileName, pm.getStartPosition(),services);
                     for (PositionedString nonNull : nonNullParams) {
                         specCase.addRequires(nonNull);
                     }
@@ -391,7 +391,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
                     specCase.getBehavior() != Behavior.EXCEPTIONAL_BEHAVIOR) {
                 final ImmutableSet<PositionedString> resultNonNull = 
                     createNonNullPositionedString("\\result", resultType, false, 
-                            fileName, pm.getStartPosition());
+                            fileName, pm.getStartPosition(),services);
                 for (PositionedString nonNull : resultNonNull) {
                     specCase.addEnsures(nonNull.prepend("ensures "));
                 }               

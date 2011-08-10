@@ -43,6 +43,8 @@ import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
+import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
+import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 
@@ -380,7 +382,7 @@ public final class SpecificationRepository {
     }
 
 
-    private Contract registerContract(Contract contract,
+    private void registerContract(Contract contract,
             Pair<KeYJavaType, ObserverFunction> target) {
         contract = cf.setTarget(contract,target.first, target.second);
         final String name = contract.getName();
@@ -405,7 +407,6 @@ public final class SpecificationRepository {
         contractsByName.put(contract.getName(), contract);
         contractTargets.put(target.first, 
                             getContractTargets(target.first).add(target.second));
-        return contract;
     }
 
 
@@ -418,12 +419,12 @@ public final class SpecificationRepository {
             operationContracts.put(tp2, operationContracts.get(tp2).remove((FunctionalOperationContract)contract));
         }
         contractsByName.remove(contract.getName());
-        if (contracts.keySet().contains(tp)); 
-            contractTargets.put(kjt, contractTargets.get(kjt).remove(tp.second));
+        contractTargets.put(kjt, contractTargets.get(kjt).remove(tp.second));
     }
 
 
     /** Adds initially clause as post-condition to contracts of constructors.
+     * Creates a new contract if there is none yet.
      * @param inv initially clause
      * @param kjt constructors of this type are added a post-condition
      */
@@ -432,21 +433,21 @@ public final class SpecificationRepository {
             inv = inv.setKJT(kjt);
         for (ProgramMethod pm: services.getJavaInfo().getConstructors(kjt)){
             if (!JMLInfoExtractor.isHelper(pm)){
-                final FunctionalOperationContract iniContr = inv.toContract(pm);
                 final ImmutableSet<Contract> oldContracts = getContracts(kjt,pm);
-                if (oldContracts.isEmpty()) {
-                    // add new contract, hack: setting default modality and modifies
-                    //addContractNoInheritance(iniContr.setModality(Modality.BOX).setModifies(TB.allLocs(services)));
+                ImmutableSet<FunctionalOperationContract> oldFuncContracts = DefaultImmutableSet.nil();
+                for (Contract old: oldContracts){
+                    if (old instanceof FunctionalOperationContract)
+                        oldFuncContracts = oldFuncContracts.add((FunctionalOperationContract) old);
+                }
+                if (oldFuncContracts.isEmpty()) {
+                    final FunctionalOperationContract iniContr = cf.func(pm, inv);
                     addContractNoInheritance(iniContr);
-                    assert getContracts(kjt,pm).size() == 1;
+                    assert getContracts(kjt,pm).size() == 1 + oldContracts.size();
                 } else {
-                    for (Contract c: oldContracts){
-                        if (c instanceof FunctionalOperationContract){
-                            unregisterContract(c);
-                            // XXX
-                            ImmutableSet<FunctionalOperationContract> tmp = DefaultImmutableSet.<FunctionalOperationContract>nil().add((FunctionalOperationContract)c).add(iniContr);
-                            addContractNoInheritance(combineOperationContracts(tmp));
-                        }
+                    for (FunctionalOperationContract c: oldFuncContracts){
+                        unregisterContract(c);
+                        addContractNoInheritance(cf.addPost(c, inv));
+                        assert contractTargets.get(kjt).contains(c.getTarget());
                     }
                     assert getContracts(kjt,pm).size() == oldContracts.size();
                 }
@@ -617,9 +618,7 @@ public final class SpecificationRepository {
     
     /** Registers the passed (atomic) contract without inheriting it. */
     public void addContractNoInheritance(Contract contract){
-        contract = prepareContract(contract);
-        final ImmutableSet<Pair<KeYJavaType,ObserverFunction>> target = DefaultImmutableSet.<Pair<KeYJavaType,ObserverFunction>>nil().add(new Pair<KeYJavaType,ObserverFunction>(contract.getKJT(),contract.getTarget()));
-        registerContract(contract, target);
+        registerContract(prepareContract(contract));
     }
 
     

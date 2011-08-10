@@ -31,6 +31,8 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.speclang.*;
+import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
+import de.uka.ilkd.key.speclang.jml.JMLSpecExtractor;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.speclang.translation.SLWarningException;
@@ -639,6 +641,8 @@ public class JMLSpecFactory {
             throws SLTranslationException {
         assert kjt != null;
         assert original != null;
+        
+        
 
         //create variable for self
         ProgramVariable selfVar = TB.selfVar(services, kjt, false);
@@ -651,10 +655,9 @@ public class JMLSpecFactory {
         InitiallyClauseImpl res = new InitiallyClauseImpl(name,
                                                           name,
                                                           kjt,
-                                                          visibility,
+                                                          new Public(),
                                                           inv,
                                                           selfVar, original);
-        res.setSpecFactory(this, services);
         return res;
 
     }
@@ -925,5 +928,44 @@ public class JMLSpecFactory {
                                       textualLoopSpec.getInvariant(),
                                       textualLoopSpec.getAssignable(),
                                       textualLoopSpec.getVariant());
+    }
+    
+
+
+    /**
+     * Translate initially clause to a contract for the given constructor.
+     * Exception is thrown if the methods passed is not a constructor.
+     * For an initially clause <tt>ini</tt> the resulting contract looks like:<br>
+     * <tt>requires true;<br>ensures ini;<br>signals (Exception) ini;<br>diverges true;</tt>
+     * @param pm constructor
+     */
+    public FunctionalOperationContract initiallyClauseToContract(InitiallyClause ini, ProgramMethod pm) throws SLTranslationException { 
+        if (! pm.isConstructor()) throw new SLTranslationException("Initially clauses only apply to constructors, not to method "+pm);
+        final ImmutableList<String> mods = ImmutableSLList.<String>nil().append("private");
+        final TextualJMLSpecCase specCase =
+            new TextualJMLSpecCase(mods,Behavior.NONE);
+        specCase.addName(new PositionedString(ini.getName()));
+        specCase.addRequires(createPrecond(pm, ini.getOriginalSpec()));
+        specCase.addEnsures(ini.getOriginalSpec().prepend("\\invariant_for(this) &&"));
+        specCase.addSignals(ini.getOriginalSpec().prepend("\\invariant_for(this) &&"));
+        specCase.addDiverges(new PositionedString("true"));
+        ImmutableSet<Contract> resultList = createJMLOperationContracts(pm, specCase);
+        assert resultList.size() == 1;
+        Contract result = resultList.toArray(new Contract[1])[0];
+        assert result instanceof FunctionalOperationContract;
+        return ((FunctionalOperationContract)result);
+    }
+
+
+
+    private ImmutableList<PositionedString> createPrecond(ProgramMethod pm, PositionedString originalSpec){
+        ImmutableList<PositionedString> res = ImmutableSLList.<PositionedString>nil();
+        // TODO: add static invariant
+        for (ParameterDeclaration p: pm.getMethodDeclaration().getParameters()){
+            if (!JMLInfoExtractor.parameterIsNullable(pm, p)) {
+                res = res.append(JMLSpecExtractor.createNonNullPositionedString(p.getVariableSpecification().getName(), p.getVariableSpecification().getProgramVariable().getKeYJavaType(), false, originalSpec.fileName, originalSpec.pos, services));
+            }
+        }
+        return res;
     }
 }

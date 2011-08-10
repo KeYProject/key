@@ -62,7 +62,6 @@ public final class ProgramMethod extends ObserverFunction
               container,
               method.isStatic(),
               getParamTypes(method)); 
-                        
 	this.method  = method;;
 	this.kjt     = kjt;
         this.pi      = pi;

@@ -14,7 +14,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
 
 
 public interface InitiallyClause extends SpecificationElement {
@@ -28,15 +27,9 @@ public interface InitiallyClause extends SpecificationElement {
      */
     public Term getClause(ParsableVariable selfVar, Services services);
     
+    public PositionedString getOriginalSpec();
+    
     public InitiallyClause setKJT(KeYJavaType newKjt);
 
-    /**
-     * Translate this initially clause to a contract for the given constructor.
-     * Exception is thrown if the methods passed is not a constructor.
-     * For an initially clause <tt>inic</tt> the resulting contract looks like:<br>
-     * <tt>requires true;<br>ensures inic;<br>signals (Exception) inic;<br>diverges true;</tt>
-     * @param pm constructor
-     */
-    public FunctionalOperationContract toContract(ProgramMethod pm);
   
 }
