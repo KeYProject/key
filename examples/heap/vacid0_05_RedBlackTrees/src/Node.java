@@ -23,8 +23,9 @@ package vacid0.redblacktree;
 public class Node {
 
     final static Node NIL = new Nil();
-    /*@ model boolean staticInv;
-      @ represents staticInv = NIL != null &&
+    /*@ protected model boolean staticInv;
+      @ protected represents staticInv = 
+      @            NIL != null &&
       @            (\forall Nil x; x == NIL) &&
       @            this != NIL ==> \typeof(this) == \type(Node);
       @ accessible staticInv : \nothing;
@@ -43,6 +44,12 @@ public class Node {
       @ accessible subtree : treeFootprint \measured_by height;
       @*/
     
+    /*@ protected model int blackHeight;
+      @ represents blackHeight \such_that
+      @             redBlackInvariant ==> blackHeight == left.blackHeight + (isRed?0:1);
+      @ accessible blackHeight : treeFootprint \measured_by height;
+      @*/
+    
     /*@ protected model \locset footprint;
       @ represents footprint = this.*;
       @ accessible footprint : \nothing;
@@ -52,12 +59,12 @@ public class Node {
       @*/
 
     // the red-black tree properties (`high-level' invariants)
-    /*@ model boolean redBlackInvariant;
+    /*@ protected model boolean redBlackInvariant;
       @ represents redBlackInvariant =
       @        (left == NIL || left.key < key) && (right == NIL || right.key > key)
       @     && (isRed ==> !(left.isRed || right.isRed))
-      @     && left.blackLeft() == right.blackRight()
-      @     && (this == NIL || (left.redBlackInvariant && right.redBlackInvariant))
+      @     && left.blackHeight == right.blackHeight
+      @     && left.redBlackInvariant && right.redBlackInvariant
       @     && \invariant_for(this);
       @ accessible redBlackInvariant : treeFootprint \measured_by height;
       @*/
@@ -75,10 +82,9 @@ public class Node {
 
     /*@ normal_behavior
       @ requires key >= 0;
-      @ requires staticInv;
+      @ requires NIL.staticInv;
       @ ensures parent == NIL && left == NIL && right == NIL && this.key == key && this.value == value && !isRed;
       @ ensures \fresh(footprint);
-      @ accessible \nothing; 
       @ pure
       @*/
     Node (int key, int value){
@@ -91,16 +97,6 @@ public class Node {
     }
 
     private Node (){}
-
-    //@ measured_by height;
-    protected /*@ pure @*/ int blackLeft (){
-        return left.blackLeft()+(left.isRed?0:1);
-    }
-
-    //@ measured_by height;
-    protected /*@ pure @*/ int blackRight(){
-        return right.blackRight()+(right.isRed?0:1);
-    }
     
     
     // Standard method implementations (not relevant for verification)
@@ -156,13 +152,17 @@ public class Node {
      * NIL is always black.
      * @author bruns
      */
-    public final static class Nil extends Node {
+    public final static /*@ pure @*/ class Nil extends Node {
         /*@ represents footprint = \empty;
           @ represents treeFootprint = \empty;
           @ represents subtree = \seq_empty;
+          @ represents blackHeight = 0;
+          @ represents redBlackInvariant = true;
           @ accessible footprint : \nothing;
           @ accessible treeFootprint : \nothing;
           @ accessible subtree : \nothing;
+          @ accessible blackHeight : \nothing;
+          @ accessible redBlackInvariant : \nothing;
           @*/
         
         //@ invariant height == 0;

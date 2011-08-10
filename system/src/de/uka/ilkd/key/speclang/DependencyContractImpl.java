@@ -63,7 +63,7 @@ public final class DependencyContractImpl implements DependencyContract {
 	assert kjt != null;
 	assert target != null;
 	assert pre != null;
-	assert dep != null;
+	assert dep != null : "cannot create contract "+baseName+" for "+target+" when no specification is given";
         assert (selfVar == null) == target.isStatic();
         assert paramVars != null;
         assert paramVars.size() == target.arity() - (target.isStatic() ? 1 : 2);

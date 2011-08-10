@@ -33,7 +33,7 @@ public class RedBlackTree implements AbstractMap {
     //@ private invariant !root.isRed;
     //@ private invariant root.parent == Node.NIL;
     //@ private invariant root.redBlackInvariant;
-    
+    //@ private invariant Node.NIL.staticInv;
 
     //@ private ghost \seq theNodes;
     //@ private invariant theNodes == root.subtree;
@@ -50,10 +50,10 @@ public class RedBlackTree implements AbstractMap {
     /** Constructs RB tree with default value.
      * @param d default value */
     /*@ normal_behavior
+      @ requires Node.NIL.staticInv;
       @ ensures deefolt == d && root == Node.NIL;
       @ ensures theNodes == \seq_empty;
       @ ensures \fresh(footprint);
-      @ accessible \nothing;
       @*/
     public /*@ pure @*/ RedBlackTree (int d){
         deefolt = d;
@@ -329,7 +329,6 @@ public class RedBlackTree implements AbstractMap {
 
 
     // specified by interface
-    //@ ensures \new_elems_fresh(footprint);
     public void replace (int key, int value){
         Node x = get(key);
         if (x == Node.NIL) {

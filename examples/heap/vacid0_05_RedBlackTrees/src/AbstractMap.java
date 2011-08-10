@@ -33,7 +33,7 @@ public interface AbstractMap{
       @ invariant contents.length == 999; // just to have some bound
       @*/
 
-    //@ protected initially isEmpty && \invariant_for(this);
+    //@ initially isEmpty;
     
     /*@ accessible defaultValue: \nothing;
       @ accessible \inv : footprint;
