@@ -225,7 +225,6 @@ QUANTIFIER
         "\\sum"
     ;
 
-    
 protected
 LETTER
 options {

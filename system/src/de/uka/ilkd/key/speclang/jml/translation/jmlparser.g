@@ -1358,6 +1358,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
     SLExpression e3 = null;
     KeYJavaType typ;
     Term t, t2;
+    Token tk = null;
     Pair<KeYJavaType,ImmutableList<LogicVariable>> declVars = null;    
 }
 :
@@ -1634,11 +1635,6 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
             result = new SLExpression(TB.seqSingleton(services, e1.getTerm()));
         }    
     
-    |   SEQCONCAT LPAREN e1=expression COMMA e2=expression RPAREN
-        {
-            result = new SLExpression(TB.seqConcat(services, e1.getTerm(), e2.getTerm()));
-        }    
-    
     |   SEQSUB LPAREN e1=expression COMMA e2=expression COMMA e3=expression RPAREN
         {
             result = new SLExpression(TB.seqSub(services, e1.getTerm(), e2.getTerm(), e3.getTerm()));
@@ -1647,11 +1643,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
     |   SEQREVERSE LPAREN e1=expression RPAREN
         {
             result = new SLExpression(TB.seqReverse(services, e1.getTerm()));
-        }   
-    |   SEQGET LPAREN e1=expression COMMA e2=expression RPAREN
-        {
-        result = new SLExpression(TB.seqGet(services, Sort.ANY, e1.getTerm(), e2.getTerm()));
-        }
+        } 
     |   SEQREPLACE LPAREN e1=expression COMMA e2=expression COMMA e3=expression RPAREN
         {
             // short for "e1[0..e2-1]+e3+e1[e2+1..e1.length-1]"
@@ -1662,14 +1654,10 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
             final Term put = TB.seqConcat(services, ante, TB.seqConcat(services, insert, post));
             result = new SLExpression(put);
         }
-    |   INDEXOF LPAREN e1=expression COMMA e2=expression RPAREN
+    |   (tk1:SEQCONTAINS{tk=tk1;} | tk2: SEQCONCAT{tk=tk2;} | tk3: SEQGET{tk=tk3;} | tk4: INDEXOF{tk=tk4;})
+        LPAREN e1=expression COMMA e2=expression RPAREN
         {
-            result = new SLExpression(TB.indexOf(services,e1.getTerm(),e2.getTerm()));
-        }
-    |
-        SEQCONTAINS LPAREN e1=expression COMMA e2=expression RPAREN
-        {
-            result = translator.<SLExpression>translate("\\contains", services, e1, e2);
+            result = translator.<SLExpression>translate(tk.getText(), services, e1, e2);
         }
     |   LPAREN result=expression RPAREN
 ;

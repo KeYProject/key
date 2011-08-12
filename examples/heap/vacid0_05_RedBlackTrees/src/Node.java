@@ -55,8 +55,7 @@ public class Node {
     // the red-black tree properties (`high-level' invariants)
     /*@ protected model boolean redBlackInvariant;
       @ represents redBlackInvariant =
-      @        (left == NIL || left.key < key) && (right == NIL || right.key > key)
-      @     && (isRed ==> !(left.isRed || right.isRed))
+      @        (isRed ==> !(left.isRed || right.isRed))
       @     && left.blackHeight == right.blackHeight
       @     && left.redBlackInvariant && right.redBlackInvariant
       @     && \invariant_for(this);
@@ -66,8 +65,8 @@ public class Node {
 
     // `low-level' invariants
     /*@ invariant parent == NIL || parent.left == this || parent.right == this;
-      @ invariant key >= 0;
-      @ invariant height == (left.height > right.height ? left.height : right.height)+1;
+      @ invariant key >= 0 && (left == NIL || left.key < key) && (right == NIL || right.key > key);
+      @ invariant height >= 0 && height == (left.height > right.height ? left.height : right.height)+1;
       @ invariant \disjoint(footprint, left.treeFootprint) && \disjoint(footprint, right.treeFootprint);
       @ invariant \invariant_for(left) && \invariant_for(right);
       @ invariant staticInv;

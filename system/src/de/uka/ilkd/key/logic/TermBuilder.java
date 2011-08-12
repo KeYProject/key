@@ -1438,7 +1438,7 @@ public final class TermBuilder {
 	return func(services.getTypeConverter().getSeqLDT().getSeqLen(), s);
     }
     
-    // TODO: doc
+    /** Function representing the least index of an element x in a sequence s (or underspecified) */
     public Term indexOf(Services services, Term s, Term x){
 	return func(services.getTypeConverter().getSeqLDT().getSeqIndexOf(),s,x);
     }

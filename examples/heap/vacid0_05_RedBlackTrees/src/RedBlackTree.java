@@ -24,13 +24,14 @@ public class RedBlackTree implements AbstractMap {
     //@ private represents defaultValue = deefolt;
 
     private Node root;
-    //@ private invariant !root.isRed;
-    //@ private invariant root.parent == Node.NIL;
-    //@ private invariant root.redBlackInvariant;
-    //@ private invariant Node.NIL.staticInv;
+    /*@ private invariant !root.isRed;
+      @ private invariant root.parent == Node.NIL;
+      @ private invariant root.redBlackInvariant;
+      @ private invariant Node.NIL.staticInv;
+      @*/
 
     //@ private ghost \seq theNodes;
-    //@ private invariant theNodes == root.subtree;
+    //@ private invariant (\forall Node x; \contains(theNodes,x) <==> \contains(root.subtree,x));
 
     /*@ private represents contents \such_that (\forall int i; 0 <= i && i < contents.length;
       @            contents[i] == (get(i) == Node.NIL ? deefolt : get(i).value));
@@ -58,8 +59,9 @@ public class RedBlackTree implements AbstractMap {
 
     /*@ normal_behavior
       @ requires \contains(theNodes,z);
-      @ ensures !\contains(theNodes,z);
-      @ assignable footprint, theNodes;
+      @ ensures theNodes == \old(\seq_concat(\seq_sub(theNodes, 0, \indexOf(theNodes,z)-1),\seq_sub(theNodes, \indexOf(theNodes,z)+1, theNodes.length-1)));
+      @ ensures footprint == \old(\set_minus(footprint, z.footprint));
+      @ assignable footprint;
       @*/
     private void delete(Node z) {
         Node y = (z.left == Node.NIL || z.right == Node.NIL) ? z : treeSuccessor(z);
@@ -89,11 +91,15 @@ public class RedBlackTree implements AbstractMap {
       @ requires !x.parent.isRed && x.parent != Node.NIL;
       @ requires \invariant_for(x.parent) && x.redBlackInvariant;
       @ ensures \invariant_for(this);
+      @ ensures footprint == \old(footprint);
+      @ ensures theNodes == \old(theNodes);
       @ assignable footprint;
       @*/
     private /*@ helper @*/ void deleteFix(Node x) {
         Node w;
         /*@ maintaining x.redBlackInvariant;
+          @ maintaining \invariant_for(root);
+          @ maintaining footprint == \old(footprint);
           @ decreasing root.height - x.height;
           @*/
         while (x != root && !x.isRed){
@@ -163,7 +169,8 @@ public class RedBlackTree implements AbstractMap {
         /*@ decreasing x.height;
           @ maintaining 0 <= x.height && x.height <= root.height;
           @ maintaining (\forall int i; 0 <= i && i < visited.length; ((Node)visited[i]).key != key);
-          @ maintaining (\forall Node n; \contains(theNodes,n); \contains(visited,n));
+          @ maintaining (\forall Node n; \contains(visited,n); \contains(theNodes,n));
+          @ maintaining \invariant_for(x);
           @*/
         // XXX still to weak, need to say something about ordering of keys
         while (x != Node.NIL && x.key != key){
@@ -183,9 +190,9 @@ public class RedBlackTree implements AbstractMap {
      * @param z node to be inserted
      */
     /*@ normal_behavior
-      @ requires z != Node.NIL && z != null && z.key >= 0;
+      @ requires z != Node.NIL && z.staticInv && z != null && z.key >= 0;
       @ requires !\contains(theNodes,z);
-      @ ensures \contains(theNodes,z);
+      @ ensures theNodes == \seq_concat(\old(theNodes),\seq_singleton(z));
       @ assignable root, z.parent, z.isRed, theNodes;
       @*/
     private void insert (Node z){
@@ -210,8 +217,6 @@ public class RedBlackTree implements AbstractMap {
         else y.right = z;
         z.isRed = true;
         //@ set theNodes = \seq_concat(theNodes,\seq_singleton(z));
-        // assert root == z <==> root.isRed;
-        // assert z.redBlackInvariant;
         insertFix(z);
     }
 
@@ -223,8 +228,9 @@ public class RedBlackTree implements AbstractMap {
       @   requires z.isRed;
       @   requires root == z <==> root.isRed;
       @   assignable footprint;
+      @   ensures footprint == \old(footprint);
       @   ensures \invariant_for(this);
-      @   ensures contents == \old(contents);
+      @   ensures theNodes == \old(theNodes);
       @ helper
       @*/
     private void insertFix(Node z) {
@@ -232,6 +238,7 @@ public class RedBlackTree implements AbstractMap {
           @ maintaining z.parent == root ==> !z.parent.isRed;
           @ maintaining z.redBlackInvariant;
           @ maintaining z.parent == z.parent.parent.left ? z.parent.parent.right.redBlackInvariant : z.parent.parent.left.redBlackInvariant;
+          @ maintaining footprint == \old(footprint);
           @ decreasing root.height - z.height;
           @*/
         while (z.parent.isRed) {
@@ -282,10 +289,10 @@ public class RedBlackTree implements AbstractMap {
       @   ensures \invariant_for(x.parent);
       @   assignable root, x.parent, x.parent.left, x.parent.right, x.right, x.right.parent, x.right.left, x.height, x.right.height;
       @ also normal_behavior
-      @   requires x != Node.NIL && x.right != Node.NIL;
+      @   requires x != Node.NIL && x.right == Node.NIL;
       @   assignable \nothing;
       @*/
-    private /*@ helper @*/ void leftRotate (Node x){
+    private /*@ spec_public helper @*/ void leftRotate (Node x){
         Node y = x.right;
         Node p = x.parent;
         if (y != Node.NIL) {
@@ -363,37 +370,26 @@ public class RedBlackTree implements AbstractMap {
         }
     }
     
+    /** Returns the left-most node of the right subtree. */
     /*@ normal_behavior
-      @   requires x != Node.NIL && x.parent != Node.NIL && \invariant_for(x.parent) && x == x.parent.right;
+      @   requires z != Node.NIL && \invariant_for(z);
+      @   requires z.left != Node.NIL && z.right != Node.NIL;
       @   ensures \result != Node.NIL && \result.left == Node.NIL;
-      @   ensures x.parent.key < \result.key && \result.key < x.key;
+      @   ensures z.key < \result.key && \result.key <= z.right.key;
+      @   ensures \contains(z.right.subtree, \result);
       @*/
-    private /*@ pure helper @*/ Node treeMinimum(Node x) {
-        /*@ maintaining \old(x.parent.key) < x.key;
-          @ maintaining x == x.parent.left;
-          @ maintaining x != Node.NIL;
-          @ maintaining \invariant_for(x);
-          @ decreasing x.height;
-          @*/
-        while (x.left != Node.NIL){
-            x = x.left;
-        }
-        return x;
-    }
-    
-    /*@ normal_behavior
-      @ requires x != Node.NIL && \invariant_for(x);
-      @ requires x.left != Node.NIL && x.right != Node.NIL;
-      @*/
-    private /*@ pure helper @*/ Node treeSuccessor(Node x) {
-        if (x.right != Node.NIL)
-            return treeMinimum(x.right);
-        Node y = x.parent;
-        while (y != Node.NIL && x == y.right){
-            x = y;
-            y = y.parent;
-        }
-        return y;
+    private /*@ pure helper @*/ Node treeSuccessor(Node z) {
+      Node x = z.right;
+      /*@ maintaining z.key < x.key;
+        @ maintaining x != Node.NIL;
+        @ maintaining z == \old(z);
+        @ maintaining \invariant_for(x);
+        @ decreasing x.height;
+        @*/
+      while (x.left != Node.NIL){
+          x = x.left;
+      }
+      return x;
     }
     
     
