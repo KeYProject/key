@@ -46,7 +46,7 @@ public class KeYRecoderExcHandler extends KeYExceptionHandlerImpl
     @Override    
     public void clear() {
 	super.clear();
-	recoderExceptions = new ExtList();
+	recoderExceptions = new LinkedList<Throwable>();
 	recoderErrorCount = 0;
     }
     

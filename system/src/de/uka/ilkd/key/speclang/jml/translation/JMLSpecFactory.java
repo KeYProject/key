@@ -940,7 +940,7 @@ public class JMLSpecFactory {
      * @param pm constructor
      */
     public FunctionalOperationContract initiallyClauseToContract(InitiallyClause ini, ProgramMethod pm) throws SLTranslationException { 
-        if (! pm.isConstructor()) throw new SLTranslationException("Initially clauses only apply to constructors, not to method "+pm);
+        //if (! pm.isConstructor()) throw new SLTranslationException("Initially clauses only apply to constructors, not to method "+pm);
         final ImmutableList<String> mods = ImmutableSLList.<String>nil().append("private");
         final TextualJMLSpecCase specCase =
             new TextualJMLSpecCase(mods,Behavior.NONE);

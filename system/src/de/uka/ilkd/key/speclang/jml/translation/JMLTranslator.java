@@ -284,6 +284,50 @@ final class JMLTranslator {
             
         });
         
+        translationMethods.put("\\indexOf", new JMLTranslationMethod(){
+
+            @Override
+            public Object translate(Object... params)
+                    throws SLTranslationException {
+                checkParameters(params, Services.class, SLExpression.class, SLExpression.class);
+                final Services services = (Services)params[0];
+                final Term seq = ((SLExpression)params[1]).getTerm();
+                final Term elem = ((SLExpression)params[2]).getTerm();
+                final KeYJavaType inttype = services.getJavaInfo().getPrimitiveKeYJavaType("int");
+                return new SLExpression(TB.indexOf(services,seq,elem),inttype);
+            }
+            
+        });
+        
+        translationMethods.put("\\seq_get", new JMLTranslationMethod(){
+
+            @Override
+            public Object translate(Object... params)
+                    throws SLTranslationException {
+                checkParameters(params, Services.class, SLExpression.class, SLExpression.class);
+                final Services services = (Services)params[0];
+                final Term seq = ((SLExpression)params[1]).getTerm();
+                final Term idx = ((SLExpression)params[2]).getTerm();
+                return new SLExpression(TB.seqGet(services, Sort.ANY, seq, idx));
+            }
+            
+        });
+        
+        translationMethods.put("\\seq_concat", new JMLTranslationMethod(){
+
+            @Override
+            public Object translate(Object... params)
+                    throws SLTranslationException {
+                checkParameters(params, Services.class, SLExpression.class, SLExpression.class);
+                final Services services = (Services)params[0];
+                final Term seq1 = ((SLExpression)params[1]).getTerm();
+                final Term seq2 = ((SLExpression)params[2]).getTerm();
+                final KeYJavaType seqtype = services.getJavaInfo().getPrimitiveKeYJavaType("\\seq");
+                return new SLExpression(TB.seqConcat(services, seq1, seq2),seqtype);
+            }
+            
+        });
+        
         translationMethods.put("\\contains", new JMLTranslationMethod(){
             // this is a quick hack; to be removed eventually; hopefully there will be support for set ADTs soon, so this will be obsolete
 
