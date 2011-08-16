@@ -207,7 +207,13 @@ public final class GenericSortInstantiations {
 	return p_s;
     }
 
-
+    
+    /** exception thrown if no solution exists */
+    private final static GenericSortException 
+    UNSATISFIABLE_SORT_CONSTRAINTS = new GenericSortException
+    ( "Conditions for generic sorts could not be solved: ", 
+                    ImmutableSLList.<GenericSortCondition>nil() );
+    
     /**
      * Really solve the conditions given
      * @param p_sorts generic sorts that must be instantiated
@@ -234,11 +240,11 @@ public final class GenericSortInstantiations {
 			  services);
 
 
-	if ( res == null )
-	    throw new GenericSortException
-		( "Conditions for generic sorts could not be solved: ", 
-		  p_conditions );
-
+	if ( res == null ) {
+	        UNSATISFIABLE_SORT_CONSTRAINTS.setConditions(p_conditions);
+	        throw UNSATISFIABLE_SORT_CONSTRAINTS;
+	}
+	    
 	return res;
     }
 

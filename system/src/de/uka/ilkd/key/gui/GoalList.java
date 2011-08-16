@@ -468,7 +468,10 @@ public class GoalList extends JList {
 
 	class GoalListProofTreeListener implements ProofTreeListener, java.io.Serializable {
 
-	    /*
+	    private boolean pruningInProcess;
+
+
+        /*
 	     * (non-Javadoc)
 	     * 
 	     * @see de.uka.ilkd.key.proof.ProofTreeListener#proofExpanded(de.uka.ilkd.key.proof.ProofTreeEvent)
@@ -486,6 +489,7 @@ public class GoalList extends JList {
 	    }
 
 	    public void proofIsBeingPruned(ProofTreeEvent e) {
+	            pruningInProcess = true;
 	    }
 
 	    /** The proof tree has been pruned under the node mentioned in the
@@ -495,6 +499,7 @@ public class GoalList extends JList {
 	    public void proofPruned(ProofTreeEvent e) {
 		clear();
 		add(e.getSource().openGoals());
+	    pruningInProcess = false;
 	    }
 
 
@@ -502,24 +507,28 @@ public class GoalList extends JList {
 	     * removed etc.
 	     */
 	    public void proofGoalRemoved(ProofTreeEvent e) {
+	    if (pruningInProcess) return;
 		remove(e.getGoal());
 	    }
 	
 	    /** invoked if the current goal of the proof changed */
 	    public void proofGoalsAdded(ProofTreeEvent e) {
+	    if (pruningInProcess) return;
 		add(e.getGoals());
 	    }
 
 	    /** invoked if the current goal of the proof changed */
 	    public void proofGoalsChanged(ProofTreeEvent e) {
-		clear();		
+		if (pruningInProcess) return;
+	    clear();		
 		add(e.getGoals());
 	    }
         
 	    public void proofStructureChanged (ProofTreeEvent e) {
-	        clear ();
-                add ( e.getSource ().openGoals () );
-            }
+        if (pruningInProcess) return;
+	    clear ();
+        add ( e.getSource ().openGoals () );
+        }
 
 	    
 	    public void smtDataUpdate(ProofTreeEvent e) {}

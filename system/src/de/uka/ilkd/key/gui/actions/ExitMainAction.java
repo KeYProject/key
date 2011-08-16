@@ -44,6 +44,7 @@ public class ExitMainAction extends MainWindowAction {
             getMediator().fireShutDown(new GUIEvent(this));
 
             System.out.println("Have a nice day.");
+            mainWindow.savePreferences();
             System.exit(-1);
         }
         

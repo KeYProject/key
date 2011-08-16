@@ -59,7 +59,11 @@ my %erroneous;
 
 
  foreach my $dotkey (@automatic_JAVADL) {
+   next if $dotkey =~ /^\s*#/;
+   next if $dotkey =~ /^\s*$/;
+
    $dotkey = &fileline($dotkey);
+   print "now running $dotkey ...\n";
 
    open (HANDLE, $dotkey) or die  $dotkey. " couldn't be opened.";
    my $cnt=grep /\\settings/, <HANDLE>;
@@ -101,6 +105,9 @@ my %erroneous;
 
 
   foreach my $dotkey (@not_provableJavaDL) {
+   next if $dotkey =~ /^\s*#/;
+   next if $dotkey =~ /^\s*$/;
+
     $dotkey = &fileline($dotkey);
 
    open (HANDLE, $dotkey) or die  $dotkey. " couldn't be opened.";

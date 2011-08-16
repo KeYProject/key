@@ -12,6 +12,7 @@ import junit.framework.TestCase;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
+@SuppressWarnings("unchecked")
 public class TestKey extends TestCase {
 
     static Class[] utilityTests = new Class[] {

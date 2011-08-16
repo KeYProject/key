@@ -247,10 +247,6 @@ public final class QueryAxiom extends ClassAxiom {
     public String toString() {
 	return "query axiom for " + target;
     }
-
-
-    @Override
-    public String getDisplayName() {
-	return getName();
-    }
+    
 }
+ 

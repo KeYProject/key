@@ -55,7 +55,7 @@ class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings{
     }
 
     @Override
-    public Collection<Taclet> getTaclets(Services services) {
+    public Collection<Taclet> getTaclets() {
 	return null;
     }
 

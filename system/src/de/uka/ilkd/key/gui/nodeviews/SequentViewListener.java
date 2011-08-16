@@ -12,7 +12,12 @@ package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.Color;
 import java.awt.Point;
-import java.awt.dnd.*;
+import java.awt.dnd.DragGestureEvent;
+import java.awt.dnd.DragGestureListener;
+import java.awt.dnd.DragSource;
+import java.awt.dnd.DragSourceAdapter;
+import java.awt.dnd.DragSourceDropEvent;
+import java.awt.dnd.InvalidDnDOperationException;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -24,13 +29,12 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.rule.BuiltInRule;
-import javax.swing.KeyStroke;
 
 
 
@@ -97,7 +101,7 @@ class SequentViewListener extends MouseInputAdapter
             if (showTermInfo) { 
                 final String info = getTermInfo();
                
-                final IMain main = ((IMain)mediator.mainFrame());
+                MainWindow main = mediator.mainFrame();
                 if (info == null) {
                     main.setStandardStatusLine();
                 } else {                    
@@ -230,13 +234,16 @@ class SequentViewListener extends MouseInputAdapter
             } else {
                 search.requestFocus();
             }
+        } else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+            IncrementalSearch search = IncrementalSearch.getInstance();
+            search.disableSearch();
         } else if ((e.getModifiersEx() & InputEvent.ALT_DOWN_MASK) != 0) {
             synchronized(this) {
                 showTermInfo = true;	    
             }
             final String info = getTermInfo();
             
-            final IMain main = ((IMain)mediator.mainFrame());
+            final MainWindow main = mediator.mainFrame();
             if (info == null) {
                 main.setStandardStatusLine();
             } else {                    
@@ -254,7 +261,8 @@ class SequentViewListener extends MouseInputAdapter
             synchronized(this) {
                 showTermInfo = false;
             }
-            ((IMain)mediator.mainFrame()).setStandardStatusLine();
+            final MainWindow main = mediator.mainFrame();
+            main.setStandardStatusLine();
         }
     }
 
@@ -276,7 +284,8 @@ class SequentViewListener extends MouseInputAdapter
 	 */	
 	public void dragGestureRecognized(DragGestureEvent dgEvent) {	
 	    final Object oldHighlight = seqView.getCurrentHighlight();	
-	    final Object dndHighlight = seqView.getColorHighlight(Color.green);            
+	    final Object dndHighlight =
+                    seqView.getColorHighlight(SequentView.DND_HIGHLIGHT_COLOR);
 	    seqView.updateUpdateHighlights();
 	
 	    seqView.setCurrentHighlight(dndHighlight);

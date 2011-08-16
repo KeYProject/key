@@ -39,7 +39,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
-import de.uka.ilkd.key.proof.ProofTreeRemovedNodeEvent;
 import de.uka.ilkd.key.proof.TacletFilter;
 import de.uka.ilkd.key.proof.TermTacletAppIndexCacheSet;
 import de.uka.ilkd.key.proof.init.JavaProfile;
@@ -230,30 +229,38 @@ public class KeYMediator {
 	}
     }
 
-    public void setBack(Node node) {
-	if (ensureProofLoaded()) {
-	    if (getProof().setBack(node)) {
-                finishSetBack();
-	    }else{
-                popupWarning("Setting back at the chosen node is not possible.",
-                "Oops...");            
-	    }
-	}
-    }    
-    
-    public void setBack(Goal goal) {
-	if (ensureProofLoaded()) {
-	    if (getProof() != null && getProof().setBack(goal)){
-                finishSetBack();
-	    }else{
-                popupWarning("Setting back the current goal is not possible.", 
-                "Oops...");
-	    }
-	}
-    }
+        public void setBack(Node node) {
+                if (ensureProofLoaded()) {
+                        getProof().pruneProof(node);
+                        finishSetBack(node.proof());
+
+                }
+        }
+
+        public void setBack(Goal goal) {
+                if (ensureProofLoaded()) {
+                        if (getProof() != null) {
+                                getProof().pruneProof(goal);
+                                finishSetBack(getProof());
+
+                        } 
+                }
+        }
     
     
-    private void finishSetBack(){
+    private void finishSetBack(final Proof proof){
+        this.mainFrame.getUserInterface().taskFinished(
+                        new DefaultTaskFinishedInfo(this, null, 
+                                        proof, 0, 
+                                        0, getNrGoalsClosedByAutoMode()){
+                                @Override
+                                public String toString() {
+                                        
+                                        return "Proof has been pruned: "+(proof.openGoals().size() == 1?
+                                                        "one open goal remains." :
+                                                        (proof.openGoals().size()+" open goals remain."));
+                                }
+                        });
         TermTacletAppIndexCacheSet.clearCache();
         AbstractBetaFeature.clearCache();
         IfThenElseMalusFeature.clearCache();
@@ -555,8 +562,8 @@ public class KeYMediator {
     /** returns the main frame
      * @return the main frame 
      */
-    public JFrame mainFrame() {
-	return mainFrame instanceof JFrame ? (JFrame) mainFrame : null;
+    public MainWindow mainFrame() {
+	return mainFrame;
     }
 
     /** notifies that a node that is not a goal has been chosen
@@ -775,20 +782,25 @@ public class KeYMediator {
 
 
     class KeYMediatorProofTreeListener extends ProofTreeAdapter {
-	public void proofClosed(ProofTreeEvent e) {
+	private boolean pruningInProcess;
+
+        public void proofClosed(ProofTreeEvent e) {
 	    KeYMediator.this.notify
 	        (new ProofClosedNotificationEvent(e.getSource()));
 	}
 
-	public void proofPruned(ProofTreeEvent e) {
-	    final ProofTreeRemovedNodeEvent ev = (ProofTreeRemovedNodeEvent) e;
-	    if (ev.getRemovedNode() == getSelectedNode()) {
-		SwingUtilities.invokeLater(new Runnable() {
-		    public void run() {
-			keySelectionModel.setSelectedNode(ev.getNode());
-		    }
-		});
-	    }
+	public void proofPruningInProcess(ProofTreeEvent e) {
+	    pruningInProcess = true;
+	}
+	
+	public void proofPruned(final ProofTreeEvent e) {	    
+	    SwingUtilities.invokeLater(new Runnable() {
+	        public void run () {
+	            if (!e.getSource().find(getSelectedNode())) {	
+                     keySelectionModel.setSelectedNode(e.getNode());                     
+                }
+            }});
+	        pruningInProcess = false;
 	}
     
 	public void proofGoalsAdded(ProofTreeEvent e) {
@@ -801,7 +813,7 @@ public class KeYMediator {
 	}
 
 	public void proofStructureChanged(ProofTreeEvent e) {
-	    if (autoMode()) return;
+	    if (autoMode() || pruningInProcess) return;
 	    Proof p = e.getSource();
 	    if (p == getSelectedProof()) {
 		Node sel_node = getSelectedNode();

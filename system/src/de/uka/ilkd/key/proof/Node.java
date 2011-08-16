@@ -138,7 +138,7 @@ public class Node {
     }
     
     /** Returns the set of NoPosTacletApps at this node */
-    public ImmutableSet<NoPosTacletApp> getNoPosTacletApps() {
+    public ImmutableSet<NoPosTacletApp> getLocalIntroducedRules() {
 	return localIntroducedRules;
     }
 
@@ -239,7 +239,7 @@ public class Node {
     /** removes child/parent relationship between this node and its
      * parent; if this node is root nothing happens.
      */
-    public void remove() {
+    void remove() {
 	if (parent != null) {
 	    parent.remove(this);
 	} 
@@ -251,17 +251,14 @@ public class Node {
      * @return false iff the given node was not child of this node and
      * nothing has been done.
      */
-    public boolean remove(Node child) {
-        proof().fireProofIsBeingPruned(child.parent, child);
+    boolean remove(Node child) {
 	if (children.remove(child)) {
-	    child.parent = null;
-            
+	    child.parent = null;            
             final ListIterator<Node> it = children.listIterator(child.siblingNr);
             while (it.hasNext()) {
                 it.next().siblingNr--;                
             }
             child.siblingNr = -1;
-	    proof().fireProofPruned(this, child);
 	    return true;
 	} else {
 	    return false;

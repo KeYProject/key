@@ -18,6 +18,7 @@ import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.expression.literal.*;
 import de.uka.ilkd.key.java.expression.operator.*;
+import de.uka.ilkd.key.java.expression.operator.adt.Singleton;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.ldt.*;
@@ -88,11 +89,6 @@ public final class TypeConverter {
     
     public ImmutableList<LDT> getModels() {
         return models;
-    }
-
-    
-    public Services getServices() {
-	return services;
     }
     
 
@@ -175,7 +171,6 @@ public final class TypeConverter {
 	    throw new IllegalArgumentException("TypeConverter could not handle"
 					       +" this operator: " + op);
 	}
-	
 	return TB.func(responsibleLDT.getFunctionFor(op, services, ec), subs);
     }
    
@@ -754,8 +749,8 @@ public final class TypeConverter {
 	return
 	    ( to instanceof PrimitiveType &&
 	      isImplicitNarrowing ( expr, (PrimitiveType)to ) ) ||
-	    isIdentical ( expr.getKeYJavaType ( getServices (), ec ), to ) ||
-	    isWidening  ( expr.getKeYJavaType ( getServices (), ec ), to );
+	    isIdentical ( expr.getKeYJavaType ( services, ec ), to ) ||
+	    isWidening  ( expr.getKeYJavaType ( services, ec ), to );
     }
 
     

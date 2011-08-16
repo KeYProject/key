@@ -11,6 +11,7 @@ public class MinimizeInteraction extends MainWindowAction {
 
     public MinimizeInteraction(MainWindow mainWindow) {
 	super(mainWindow);
+	setName("Minimize Interaction");
     }
 
     @Override

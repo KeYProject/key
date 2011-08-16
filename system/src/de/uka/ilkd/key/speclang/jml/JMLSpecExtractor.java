@@ -149,8 +149,8 @@ public final class JMLSpecExtractor implements SpecExtractor {
      * @param pos the Position where to place this implicit specification
      * @return set of formulas specifying non-nullity for field/variables
      */  
-    private ImmutableSet<PositionedString> createNonNullPositionedString(String varName, KeYJavaType kjt, 
-	    boolean isImplicitVar, String fileName, Position pos) {
+    public static ImmutableSet<PositionedString> createNonNullPositionedString(String varName, KeYJavaType kjt, 
+	    boolean isImplicitVar, String fileName, Position pos, Services services) {
 	ImmutableSet<PositionedString> result = DefaultImmutableSet.<PositionedString>nil(); 
 	final Type varType  = kjt.getJavaType(); 
 
@@ -213,7 +213,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 	    createNonNullPositionedString(field.getProgramName(),
                 		    field.getProgramVariable().getKeYJavaType(),
                 		    field instanceof ImplicitFieldSpecification,
-                		    fileName, member.getEndPosition());
+                		    fileName, member.getEndPosition(),services);
                 	for(PositionedString classInv : nonNullInvs) {
                 	    result = result.add(jsf.createJMLClassInvariant(kjt,
                 		    					    visibility,
@@ -297,19 +297,19 @@ public final class JMLSpecExtractor implements SpecExtractor {
     
     @Override    
     public ImmutableSet<SpecificationElement> extractMethodSpecs(ProgramMethod pm)
-            throws SLTranslationException {
+    throws SLTranslationException {
         ImmutableSet<SpecificationElement> result 
-        	= DefaultImmutableSet.<SpecificationElement>nil();
+        = DefaultImmutableSet.<SpecificationElement>nil();
 
         //get type declaration, file name
         TypeDeclaration td 
-            = (TypeDeclaration) pm.getContainerType().getJavaType();
+        = (TypeDeclaration) pm.getContainerType().getJavaType();
         String fileName = td.getPositionInfo().getFileName();
 
         //determine purity
         final boolean isPure = JMLInfoExtractor.isPure(pm);
         final boolean isHelper = JMLInfoExtractor.isHelper(pm);
-        
+
         //get textual JML constructs
         Comment[] comments = pm.getComments();
         ImmutableList<TextualJMLConstruct> constructs;
@@ -317,10 +317,10 @@ public final class JMLSpecExtractor implements SpecExtractor {
             //concatenate comments, determine position
             String concatenatedComment = concatenate(comments);
             Position pos = comments[0].getStartPosition();
-            
+
             //call preparser
             KeYJMLPreParser preParser 
-                = new KeYJMLPreParser(concatenatedComment, fileName, pos);
+            = new KeYJMLPreParser(concatenatedComment, fileName, pos);
             constructs = preParser.parseClasslevelComment();
             warnings = warnings.union(preParser.getWarnings());
         } else {
@@ -329,7 +329,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
         //create JML contracts out of constructs, add them to result
         TextualJMLConstruct[] constructsArray 
-            = constructs.toArray(new TextualJMLConstruct[constructs.size()]);
+        = constructs.toArray(new TextualJMLConstruct[constructs.size()]);
 
         int startPos;
         if(pm.isModel()) {
@@ -339,75 +339,75 @@ public final class JMLSpecExtractor implements SpecExtractor {
             startPos = constructsArray.length - 1;
         }
         for(int i = startPos; 
-            i >= 0 && constructsArray[i] instanceof TextualJMLSpecCase; 
-            i--) {
+        i >= 0 && constructsArray[i] instanceof TextualJMLSpecCase; 
+        i--) {
             TextualJMLSpecCase specCase 
-                = (TextualJMLSpecCase) constructsArray[i];
+            = (TextualJMLSpecCase) constructsArray[i];
 
             //add purity
             if(isPure) {
                 specCase.addAssignable(new PositionedString("assignable \\nothing"));
             }
-            
+
             //add invariants
             if(!pm.isStatic() && !isHelper) {
-        	if(!pm.isConstructor()) {
-        	    specCase.addRequires(new PositionedString("<inv>"));
-        	}
-        	if(specCase.getBehavior() != Behavior.EXCEPTIONAL_BEHAVIOR) {
-        	    specCase.addEnsures(new PositionedString("ensures <inv>"));
-        	}
-        	if(specCase.getBehavior() != Behavior.NORMAL_BEHAVIOR) {
-        	    specCase.addSignals(new PositionedString("signals (Exception e) <inv>"));
-        	}
+                if(!pm.isConstructor()) {
+                    specCase.addRequires(new PositionedString("<inv>"));
+                }
+                if(specCase.getBehavior() != Behavior.EXCEPTIONAL_BEHAVIOR) {
+                    specCase.addEnsures(new PositionedString("ensures <inv>"));
+                }
+                if(specCase.getBehavior() != Behavior.NORMAL_BEHAVIOR) {
+                    specCase.addSignals(new PositionedString("signals (Exception e) <inv>"));
+                }
             }
-                        
+
             //add non-null preconditions
             for(int j = 0, n = pm.getParameterDeclarationCount(); j < n; j++) {
                 //no additional precondition for primitive types!
                 final VariableSpecification paramDecl = pm.getParameterDeclarationAt(j)
-		        .getVariableSpecification();
+                .getVariableSpecification();
                 if (!JMLInfoExtractor.parameterIsNullable(pm, j)) {
                     final ImmutableSet<PositionedString> nonNullParams = 
-                	createNonNullPositionedString(paramDecl.getName(),
-                		paramDecl.getProgramVariable().getKeYJavaType(),
-                		false,
-                		fileName, pm.getStartPosition());
+                        createNonNullPositionedString(paramDecl.getName(),
+                                paramDecl.getProgramVariable().getKeYJavaType(),
+                                false,
+                                fileName, pm.getStartPosition(),services);
                     for (PositionedString nonNull : nonNullParams) {
-                	specCase.addRequires(nonNull);
+                        specCase.addRequires(nonNull);
                     }
-		}
-		String param_name = paramDecl.getName();
+                }
+                String param_name = paramDecl.getName();
                 Type t = pm.getParameterDeclarationAt(j).
-                            getTypeReference().
-                            getKeYJavaType();                 
+                getTypeReference().
+                getKeYJavaType();                 
             }
 
             //add non-null postcondition
             KeYJavaType resultType = pm.getKeYJavaType();
 
             if(resultType != null &&
-        	    !JMLInfoExtractor.resultIsNullable(pm) &&
-        	    specCase.getBehavior() != Behavior.EXCEPTIONAL_BEHAVIOR) {
-        	final ImmutableSet<PositionedString> resultNonNull = 
-        	    createNonNullPositionedString("\\result", resultType, false, 
-        		    fileName, pm.getStartPosition());
-        	for (PositionedString nonNull : resultNonNull) {
-        	    specCase.addEnsures(nonNull.prepend("ensures "));
-        	}               
+                    !JMLInfoExtractor.resultIsNullable(pm) &&
+                    specCase.getBehavior() != Behavior.EXCEPTIONAL_BEHAVIOR) {
+                final ImmutableSet<PositionedString> resultNonNull = 
+                    createNonNullPositionedString("\\result", resultType, false, 
+                            fileName, pm.getStartPosition(),services);
+                for (PositionedString nonNull : resultNonNull) {
+                    specCase.addEnsures(nonNull.prepend("ensures "));
+                }               
             }
 
             //add implicit signals-only if omitted
             if(specCase.getSignalsOnly().isEmpty()
-               && specCase.getBehavior() != Behavior.NORMAL_BEHAVIOR) {
+                    && specCase.getBehavior() != Behavior.NORMAL_BEHAVIOR) {
                 specCase.addSignalsOnly(
-                            new PositionedString(getDefaultSignalsOnly(pm)));
+                        new PositionedString(getDefaultSignalsOnly(pm)));
             }
 
             //translate contract
             try {
                 ImmutableSet<Contract> contracts 
-                    = jsf.createJMLOperationContracts(pm, specCase);
+                = jsf.createJMLOperationContracts(pm, specCase);
                 for(Contract contract : contracts) {
                     result = result.add(contract);
                 }

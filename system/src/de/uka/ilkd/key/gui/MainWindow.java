@@ -17,7 +17,6 @@ import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.FlowLayout;
 import java.awt.Frame;
-import java.awt.GraphicsEnvironment;
 import java.awt.GridBagLayout;
 import java.awt.Point;
 import java.awt.Toolkit;
@@ -32,6 +31,8 @@ import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -45,10 +46,12 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
@@ -68,8 +71,10 @@ import de.uka.ilkd.key.gui.actions.AutoModeAction;
 import de.uka.ilkd.key.gui.actions.EditMostRecentFileAction;
 import de.uka.ilkd.key.gui.actions.ExitMainAction;
 import de.uka.ilkd.key.gui.actions.FontSizeAction;
+import de.uka.ilkd.key.gui.actions.LemmaGenerationBatchModeAction;
 import de.uka.ilkd.key.gui.actions.LicenseAction;
-import de.uka.ilkd.key.gui.actions.LoadUserDefinedTacletsAction;
+import de.uka.ilkd.key.gui.actions.LemmaGenerationAction;
+import de.uka.ilkd.key.gui.actions.LemmaGenerationAction.Mode;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.actions.MinimizeInteraction;
 import de.uka.ilkd.key.gui.actions.OneStepSimplificationToggleAction;
@@ -91,6 +96,7 @@ import de.uka.ilkd.key.gui.actions.UndoLastStepAction;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.GeneralSettings;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
+import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.configuration.SettingsListener;
 import de.uka.ilkd.key.gui.configuration.StrategySettings;
@@ -126,6 +132,7 @@ import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.GuiUtilities;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.key.util.PreferenceSaver;
 
 
 @SuppressWarnings("serial")
@@ -220,15 +227,22 @@ public final class MainWindow extends JFrame  {
     private ProofManagementAction proofManagementAction;
     
     /** action for loading taclets onto a ongoing proof */
-    private LoadUserDefinedTacletsAction loadUserDefinedTacletsAction;
+    private LemmaGenerationAction loadUserDefinedTacletsAction;
+    private LemmaGenerationAction loadUserDefinedTacletsForProvingAction;
+    private LemmaGenerationAction loadKeYTaclets;
+    private LemmaGenerationBatchModeAction lemmaGenerationBatchModeAction;
+    
+
+    
+    private OneStepSimplificationToggleAction oneStepSimplAction = 
+        new OneStepSimplificationToggleAction(this);
     
     public static final String AUTO_MODE_TEXT = "Start/stop automated proof search";
 
     /** Determines if the KeY prover is started in visible mode*/
     public static boolean visible = true;
     
-    /** external prover GUI elements */
-    private SMTSettingsListener smtSettingsListener;
+
     
     /** for locking of threads waiting for the prover to exit */
     public final Object monitor = new Object();
@@ -238,6 +252,9 @@ public final class MainWindow extends JFrame  {
 //    private ProverTaskListener taskListener;
     
     private NotificationManager notificationManager;
+    
+    private PreferenceSaver prefSaver = 
+        new PreferenceSaver(Preferences.userNodeForPackage(MainWindow.class));
 
     private ComplexButton smtComponent;
     
@@ -283,11 +300,6 @@ public final class MainWindow extends JFrame  {
         
         SwingUtilities.updateComponentTreeUI(this);
         ToolTipManager.sharedInstance().setDismissDelay(30000);
-        setSize(1000, 750);
-        
-        GraphicsEnvironment env =
-            GraphicsEnvironment.getLocalGraphicsEnvironment();
-        setBounds(env.getMaximumWindowBounds());
         
         addWindowListener(exitMainAction.windowListener);
         
@@ -413,10 +425,14 @@ public final class MainWindow extends JFrame  {
         proofManagementAction     = new ProofManagementAction(this);
         exitMainAction            = new ExitMainAction(this);
         showActiveSettingsAction  = new ShowActiveSettingsAction(this);
-        loadUserDefinedTacletsAction = new LoadUserDefinedTacletsAction(this);
+        loadUserDefinedTacletsAction = new LemmaGenerationAction.ProveAndAddTaclets(this);
+        loadUserDefinedTacletsForProvingAction = new LemmaGenerationAction.ProveUserDefinedTaclets(this);
+        loadKeYTaclets            = new LemmaGenerationAction.ProveKeYTaclets(this);
+        lemmaGenerationBatchModeAction    = new LemmaGenerationBatchModeAction(this);
         
-	smtSettingsListener = 
-	    new SMTSettingsListener(ProofSettings.DEFAULT_SETTINGS.getSMTSettings());
+       // proveTacletsAction       = new ProveTacletsAction(this);
+        
+	
 	
 	mediator.addKeYSelectionListener(OneStepSimplifier.INSTANCE);
         
@@ -451,11 +467,13 @@ public final class MainWindow extends JFrame  {
         GuiUtilities.paintEmptyViewComponent(proofListView, "Proofs");
         
         JSplitPane leftPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, proofListView, tabbedPane);
+        leftPane.setName("leftPane");
         leftPane.setOneTouchExpandable(true);
         
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPane, goalView);
         splitPane.setResizeWeight(0); // the right pane is more important
         splitPane.setOneTouchExpandable(true);
+        splitPane.setName("splitPane");
         getContentPane().add(splitPane, BorderLayout.CENTER);
         
 //      // work around bug in
@@ -485,6 +503,13 @@ public final class MainWindow extends JFrame  {
                 GuiUtilities.copyHighlightToClipboard(sequentView);
             }
         });
+        
+        // default size
+        setSize(1000, 750);
+        setName("mainWindow");
+        
+        // load preferred sizes from system preferences
+        prefSaver.load(this);
     }
 
     private JTabbedPane createTabbedPane() {
@@ -509,6 +534,7 @@ public final class MainWindow extends JFrame  {
 	pane.getInputMap(JComponent.WHEN_FOCUSED).getParent().remove(
 	        KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, Toolkit
 	                .getDefaultToolkit().getMenuShortcutKeyMask()));
+	pane.setName("leftTabbed");
 	
 	return pane;
     }
@@ -521,7 +547,6 @@ public final class MainWindow extends JFrame  {
         fileOperations.add(saveFileAction);        
         fileOperations.addSeparator();
         fileOperations.add(proofManagementAction);
-        fileOperations.add(loadUserDefinedTacletsAction);
 	
         return fileOperations;
     }
@@ -540,6 +565,10 @@ public final class MainWindow extends JFrame  {
         toolBar.add(comp.getSelectionComponent());
         toolBar.addSeparator();
         toolBar.add(new UndoLastStepAction(this, false));
+        JToggleButton oneStep = new JToggleButton(oneStepSimplAction);
+        oneStep.setHideActionText(true);
+        toolBar.addSeparator();
+        toolBar.add(oneStep);
 	return toolBar;
     }
     
@@ -585,7 +614,7 @@ public final class MainWindow extends JFrame  {
 		ComplexButton but = (ComplexButton) e.getSource();
 		if(but.getSelectedItem() instanceof SMTInvokeAction){
 		    SMTInvokeAction action = (SMTInvokeAction) but.getSelectedItem(); 
-		    SMTSettings.getInstance().setActiveSolverUnion(action.solverUnion);
+		    ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().setActiveSolverUnion(action.solverUnion);
 		}
 	
 	    }
@@ -763,6 +792,15 @@ public final class MainWindow extends JFrame  {
         fileMenu.add(saveFileAction);
         fileMenu.addSeparator();
         fileMenu.add(proofManagementAction);
+        
+        
+        fileMenu.add(loadUserDefinedTacletsAction);
+        JMenu submenu = new JMenu("Prove...");
+        fileMenu.add(submenu);
+        
+        submenu.add(loadUserDefinedTacletsForProvingAction);
+        submenu.add(loadKeYTaclets);
+        submenu.add(lemmaGenerationBatchModeAction);
         fileMenu.addSeparator();
         fileMenu.add(recentFiles.getMenu());
         fileMenu.addSeparator();
@@ -827,7 +865,7 @@ public final class MainWindow extends JFrame  {
 	options.add(setupSpeclangMenu());
 	options.addSeparator();
         options.add(new JCheckBoxMenuItem(new MinimizeInteraction(this)));
-        options.add(new JCheckBoxMenuItem(new OneStepSimplificationToggleAction(this)));
+        options.add(new JCheckBoxMenuItem(oneStepSimplAction));
         
         return options;
         
@@ -869,14 +907,10 @@ public final class MainWindow extends JFrame  {
      * Remove those, that are not installed anymore, add those, that got installed.
      */
     public void updateSMTSelectMenu() {
-	
-	//Collection<SMTRule> rules = ProofSettings.DEFAULT_SETTINGS.
-	  //                             getSMTSettings().getInstalledRules();
-	
-	// TODO: Change this: only solver unions should be returned 
-	// that are installed.
-	Collection<SolverTypeCollection> solverUnions = ProofSettings.DEFAULT_SETTINGS.
+
+	Collection<SolverTypeCollection> solverUnions = ProofIndependentSettings.DEFAULT_INSTANCE.
 	                                  getSMTSettings().getUsableSolverUnions();
+
 	if(solverUnions == null || solverUnions.isEmpty()){
 	    updateDPSelectionMenu();
 	}else{
@@ -912,7 +946,7 @@ public final class MainWindow extends JFrame  {
 		
 		smtComponent.setItems(actions);
 	            	
-		SolverTypeCollection active = ProofSettings.DEFAULT_SETTINGS.getSMTSettings().computeActiveSolverUnion();
+		SolverTypeCollection active = ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().computeActiveSolverUnion();
 		 
 		SMTInvokeAction activeAction = findAction(actions, active);
 		
@@ -921,7 +955,7 @@ public final class MainWindow extends JFrame  {
 		    Object item = smtComponent.getTopItem();
 		    if(item instanceof SMTInvokeAction){
 			active = ((SMTInvokeAction)item).solverUnion;
-			ProofSettings.DEFAULT_SETTINGS.getSMTSettings().setActiveSolverUnion(active);
+			ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().setActiveSolverUnion(active);
 		    }else{
 			activeAction = null;
 		    }
@@ -931,7 +965,7 @@ public final class MainWindow extends JFrame  {
 	   }
     
     JCheckBoxMenuItem saveSMTFile;
-    private JCheckBoxMenuItem waitForAllProvers;
+//    private JCheckBoxMenuItem waitForAllProvers;
     
     private JMenuItem setupSpeclangMenu() {
         JMenu result = new JMenu("Specification Parser");       
@@ -992,6 +1026,7 @@ public final class MainWindow extends JFrame  {
         }
         goalView.setViewportView(goalViewPane);
         goalView.setBorder(new TitledBorder(borderTitle));
+        goalView.setBackground(goalViewPane.getBackground());
         goalView.validate();
         validate();
     }
@@ -1135,47 +1170,7 @@ public final class MainWindow extends JFrame  {
         return proof;
     }
     
-    private final class SMTSettingsListener implements SettingsListener {	
-	private SMTSettings settings;
 
-	public SMTSettingsListener(SMTSettings dps) {
-	    this.settings = dps;
-	    register();
-	}
-
-	private void register() {
-	    if (settings != null) {
-		settings.addSettingsListener(this);
-	    }
-	}
-
-	private void unregister() {
-	    if (settings != null) {
-		settings.removeSettingsListener(this);
-	    }
-	}
-	
-	public void update() {	   
-	    
-	    if (settings != null) {
-		updateSMTSelectMenu();
-
-	    } else {
-		assert false;
-	    }
-	}
-
-	public void settingsChanged(GUIEvent e) {
-	    if (e.getSource() instanceof SMTSettings) {
-		if (e.getSource() != settings) {
-		    unregister();
-		    settings = (SMTSettings) e.getSource();		    
-		    register();
-		}
-		update();
-	    }
-	}
-    }
     
     /**
      * The progress monitor that displays a progress bar in a corner of the main window.
@@ -1354,8 +1349,7 @@ public final class MainWindow extends JFrame  {
             goalView.setViewportView(null);
             
             setProofNodeDisplay();
-            smtSettingsListener.settingsChanged(new GUIEvent((proof != null ? 
-        	    proof.getSettings() : ProofSettings.DEFAULT_SETTINGS).getSMTSettings()));
+           
             makePrettyView();
         }
         
@@ -1436,7 +1430,7 @@ public final class MainWindow extends JFrame  {
             if (!"".equals(info.getResult())) {
                 final KeYExceptionHandler exceptionHandler = 
                     ((ProblemLoader)info.getSource()).getExceptionHandler();
-                new ExceptionDialog(MainWindow.this,     
+                ExceptionDialog.showDialog(MainWindow.this,     
                         exceptionHandler.getExceptions());
                 exceptionHandler.clear();
             } else {
@@ -1466,60 +1460,63 @@ public final class MainWindow extends JFrame  {
             message += ", " + displayedOpenGoalNumber ();
             message += " remaining"; 
             setStatusLine ( message );
-        }
-                              
+        }                              
     }
     
-    /**
-     * called when the batch mode has been finished 
-     * @param result the Object encapsulating informtation about the result, e.g.
-     * String "Error" if an error has occurred. 
-     * @param proof the Proof to which <tt>appliedRules</tt> rules have been 
-     * applied requiring <tt>time</tt> ms
-     * @param time the long giving the needed time in ms 
-     * @param appliedRules the int giving the number of applied rules
-     */
-    private void finishedBatchMode (Object result, 
-            Proof proof, long time, int appliedRules) {
-
-        if ( Main.getStatisticsFile() != null )
-            printStatistics ( Main.getStatisticsFile(), result, time, appliedRules );
-
-        if ("Error".equals ( result ) ) {
-            // Error in batchMode. Terminate with status -1.
-            System.exit ( -1 );
-        }
-
-        // Save the proof before exit.
-
-        String baseName = Main.getFileNameOnStartUp();
-        int idx = baseName.indexOf(".key");        
-        if (idx == -1) {
-            idx = baseName.indexOf(".proof");
-        }        
-        baseName = baseName.substring(0, idx==-1 ? baseName.length() : idx);
-
-        File f; 
-        int counter = 0;
-        do {           
-
-            f = new File(baseName + ".auto."+ counter +".proof");
-            counter++;
-        } while (f.exists());
-
-        MainWindow.getInstance ().saveProof ( f.getAbsolutePath() );
-        if (proof.openGoals ().size () == 0) {
-            // Says that all Proofs have succeeded
-            if (proof.getBasicTask().getStatus().getProofClosedButLemmasLeft()) {
-                // Says that the proof is closed by depends on (unproved) lemmas                
-                System.exit ( 0 ); //XXX, was: 2 
-            }
-            System.exit ( 0 ); 
-        } else {
-            // Says that there is at least one open Proof
-            System.exit ( 1 );
-        }
+    void displayResults(String message){
+            setStatusLine(message);
     }
+    
+//    /**
+//     * called when the batch mode has been finished 
+//     * @param result the Object encapsulating informtation about the result, e.g.
+//     * String "Error" if an error has occurred. 
+//     * @param proof the Proof to which <tt>appliedRules</tt> rules have been 
+//     * applied requiring <tt>time</tt> ms
+//     * @param time the long giving the needed time in ms 
+//     * @param appliedRules the int giving the number of applied rules
+//     */
+//    private void finishedBatchMode (Object result, 
+//            Proof proof, long time, int appliedRules) {
+//
+//        if ( Main.getStatisticsFile() != null )
+//            printStatistics ( Main.getStatisticsFile(), result, time, appliedRules );
+//
+//        if ("Error".equals ( result ) ) {
+//            // Error in batchMode. Terminate with status -1.
+//            System.exit ( -1 );
+//        }
+//
+//        // Save the proof before exit.
+//
+//        String baseName = Main.getFileNameOnStartUp();
+//        int idx = baseName.indexOf(".key");        
+//        if (idx == -1) {
+//            idx = baseName.indexOf(".proof");
+//        }        
+//        baseName = baseName.substring(0, idx==-1 ? baseName.length() : idx);
+//
+//        File f; 
+//        int counter = 0;
+//        do {           
+//
+//            f = new File(baseName + ".auto."+ counter +".proof");
+//            counter++;
+//        } while (f.exists());
+//
+//        MainWindow.getInstance ().saveProof ( f.getAbsolutePath() );
+//        if (proof.openGoals ().size () == 0) {
+//            // Says that all Proofs have succeeded
+//            if (proof.getBasicTask().getStatus().getProofClosedButLemmasLeft()) {
+//                // Says that the proof is closed by depends on (unproved) lemmas                
+//                System.exit ( 0 ); //XXX, was: 2 
+//            }
+//            System.exit ( 0 ); 
+//        } else {
+//            // Says that there is at least one open Proof
+//            System.exit ( 1 );
+//        }
+//    }
 
 //    class MainTaskListenerBatchMode implements ProverTaskListener { // XXX
 //        public void taskStarted(String message, int size) {
@@ -1769,7 +1766,9 @@ public final class MainWindow extends JFrame  {
 	        @Override
 	        public void run() {
 	        
-	            SMTSettings settings = ProofSettings.DEFAULT_SETTINGS.getSMTSettings();
+	  
+	            SMTSettings settings = new SMTSettings(proof.getSettings().getSMTSettings(),
+	                            ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),proof);
 	            SolverLauncher launcher = new SolverLauncher(settings);
 	            launcher.addListener(new SolverListener(settings));
 	            launcher.launch(solverUnion.getTypes(),
@@ -1860,7 +1859,6 @@ public final class MainWindow extends JFrame  {
      * @return the instance of Main
      * @throws Exception 
      */
-    // FIXME Do not change state in a getter method. 
     public static MainWindow getInstance(final boolean visible) throws IllegalStateException {
         
         if(instance == null) {
@@ -1868,13 +1866,14 @@ public final class MainWindow extends JFrame  {
             throw new IllegalStateException("There is no GUI main window. Sorry.");
         }
         
-        if(visible && !instance.isVisible()) {
-            GuiUtilities.invokeOnEventQueue(new Runnable() {
-                public void run() {                            
-                    instance.setVisible(true);
-                }
-            });
-        }
+        // in a getter method the state ought not be changed. -> Lead to trouble.
+//        if(visible && !instance.isVisible()) {
+//            GuiUtilities.invokeOnEventQueue(new Runnable() {
+//                public void run() {                            
+//                    instance.setVisible(true);
+//                }
+//            });
+//        }
         
         return instance;
     }
@@ -1912,6 +1911,15 @@ public final class MainWindow extends JFrame  {
 
     public Action getOpenMostRecentFileAction() {
         return openMostRecentFileAction;
+    }
+
+    public void savePreferences() {
+        try {
+            prefSaver.save(this);
+        } catch (BackingStoreException e) {
+            // it is not tragic if the preferences cannot be stored.
+            e.printStackTrace();
+        }
     }
 
 }

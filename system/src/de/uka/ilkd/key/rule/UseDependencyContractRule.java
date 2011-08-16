@@ -486,7 +486,8 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	    return false;
 	}
 
-	//heap term of observer must be store-term
+	//heap term of observer must be store-term (or anon, create, 
+	//memset, ...)
 	final Services services = goal.proof().getServices();
 	if(!hasRawSteps(focus.sub(0), goal.sequent(), services)) {
 	    return false;

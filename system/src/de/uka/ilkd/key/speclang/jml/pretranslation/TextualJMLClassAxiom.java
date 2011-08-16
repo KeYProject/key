@@ -34,6 +34,11 @@ public final class TextualJMLClassAxiom extends TextualJMLConstruct {
         this.inv = inv;
     }
     
+    public TextualJMLClassAxiom(ImmutableList<String> mods, PositionedString inv, String name){
+        this(mods,inv);
+        this.name = name;
+    }
+    
     
     public PositionedString getAxiom() {
         return inv;
@@ -59,5 +64,9 @@ public final class TextualJMLClassAxiom extends TextualJMLConstruct {
     @Override
     public int hashCode() {
         return mods.hashCode() + inv.hashCode();
+    }
+    
+    public String getName(){
+        return name;
     }
 }

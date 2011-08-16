@@ -22,8 +22,6 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.declaration.modifier.Private;
-import de.uka.ilkd.key.java.declaration.modifier.Protected;
-import de.uka.ilkd.key.java.declaration.modifier.Public;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -58,6 +56,7 @@ public final class SpecificationRepository {
     
     private static final String CONTRACT_COMBINATION_MARKER = "#";
     private static final TermBuilder TB = TermBuilder.DF;
+    private final ContractFactory cf;
     
     private final Map<Pair<KeYJavaType,ObserverFunction>, ImmutableSet<Contract>> contracts 
     		= new LinkedHashMap<Pair<KeYJavaType,ObserverFunction>,ImmutableSet<Contract>>();
@@ -71,6 +70,8 @@ public final class SpecificationRepository {
     		= new LinkedHashMap<KeYJavaType, ImmutableSet<ClassInvariant>>(); 
     private final Map<KeYJavaType,ImmutableSet<ClassAxiom>> axioms
     		= new LinkedHashMap<KeYJavaType, ImmutableSet<ClassAxiom>>();
+    private final Map<KeYJavaType,ImmutableSet<InitiallyClause>> initiallyClauses
+            = new LinkedHashMap<KeYJavaType, ImmutableSet<InitiallyClause>>();
     private final Map<ProofOblInput,ImmutableSet<Proof>> proofs
                 = new LinkedHashMap<ProofOblInput,ImmutableSet<Proof>>();
     private final Map<LoopStatement,LoopInvariant> loopInvs
@@ -94,6 +95,7 @@ public final class SpecificationRepository {
 
     public SpecificationRepository(Services services) {
 	this.services = services;
+	cf = new ContractFactory(services);
     }
     
 
@@ -225,25 +227,20 @@ public final class SpecificationRepository {
     
     
     private boolean axiomIsVisible(ClassAxiom ax, KeYJavaType visibleTo) {
-	final KeYJavaType kjt = ax.getKJT();
-	final String kjtPackage = "x"; //TODO: package information not yet available
-	final String visibleToPackage = "y";
-	final VisibilityModifier visibility = ax.getVisibility();
-	if(visibility == null) {
-	    return kjtPackage.equals(visibleToPackage);
-	} else if(visibility instanceof Public) {
-	    return true;
-	} else if(visibility instanceof Private) {
-	    return kjt.equals(visibleTo);
-	} else if(visibility instanceof Protected) {
-	    return kjtPackage.equals(visibleToPackage)
-	           || visibleTo.getSort().extendsTrans(kjt.getSort());
-	} else {
-	    assert false;
-	    return false;
-	}
+        final KeYJavaType kjt = ax.getKJT();
+        //TODO: package information not yet available
+        // DISCUSSION: how should it be treated in the mean time? as public? Our specifications rarely stretch over different packages... 
+        final boolean visibleToPackage = true;
+        final VisibilityModifier visibility = ax.getVisibility();
+        if (VisibilityModifier.isPublic(visibility))
+            return true;
+        if (VisibilityModifier.allowsInheritance(visibility))
+            return visibleTo.getSort().extendsTrans(kjt.getSort()) || visibleToPackage;
+        if (VisibilityModifier.isPackageVisible(visibility))
+            return visibleToPackage;
+        else
+            return kjt.equals(visibleTo);
     }
-    
     
     private ImmutableSet<ClassAxiom> getVisibleAxiomsOfOtherClasses(
 	    						KeYJavaType visibleTo) {
@@ -335,8 +332,130 @@ public final class SpecificationRepository {
     }
     
     
+
+
+    private RepresentsAxiom getRepresentsAxiom (KeYJavaType kjt, ClassAxiom ax){
+        if (!(ax instanceof RepresentsAxiom) || axioms.get(kjt)== null)
+            return null;
+        RepresentsAxiom result = null;
+        for (ClassAxiom ca: axioms.get(kjt)){
+            if (ca instanceof RepresentsAxiom && (ca.getTarget().equals(ax.getTarget()))){
+                assert result == null : "More than one represents clause for "+ax.getTarget();
+                result = (RepresentsAxiom)ca;
+            }
+        }
+        return result;
+    }
     
+
+
+    private Contract prepareContract(Contract contract) {
+        //sanity check
+        assert getCanonicalFormForKJT(contract.getTarget(), 
+                                  contract.getKJT())
+                    .equals(contract.getTarget());
+        
+        //set id
+        if(((TypeDeclaration)contract.getKJT().getJavaType()).isLibraryClass()) {
+            contract = cf.setID(contract,libraryContractCounter--);
+            assert libraryContractCounter > Integer.MIN_VALUE : "too many library contracts";
+        } else {
+            contract = cf.setID(contract,contractCounter++);
+        }
+        return contract;
+    }
+
+
     
+    private void registerContract(Contract contract) {
+        final Pair<KeYJavaType, ObserverFunction> target = new Pair<KeYJavaType,ObserverFunction>(contract.getKJT(), contract.getTarget());
+        registerContract(contract, target);
+    }
+
+    private void registerContract(Contract contract,
+            final ImmutableSet<Pair<KeYJavaType, ObserverFunction>> targets) {
+        for(Pair<KeYJavaType,ObserverFunction> impl : targets) {
+            registerContract(contract, impl);
+        }
+    }
+
+
+    private void registerContract(Contract contract,
+            Pair<KeYJavaType, ObserverFunction> targetPair) {
+        final KeYJavaType targetKJT = targetPair.first;
+        final ObserverFunction targetMethod = targetPair.second;
+        contract = cf.setTarget(contract,targetKJT, targetMethod);
+        final String name = contract.getName();
+        assert contractsByName.get(name) == null
+               : "Tried to add a contract with a non-unique name: " + name;
+        assert !name.contains(CONTRACT_COMBINATION_MARKER)
+               : "Tried to add a contract with a name containing the"
+                 + " reserved character " 
+                 + CONTRACT_COMBINATION_MARKER 
+                 + ": " + name;
+        assert contract.id() != Contract.INVALID_ID
+               : "Tried to add a contract with an invalid id!";
+        contracts.put(targetPair, 
+                  getContracts(targetKJT, targetMethod).add(contract));
+        
+        if(contract instanceof FunctionalOperationContract) {
+        operationContracts.put(new Pair<KeYJavaType,ProgramMethod>(targetKJT, (ProgramMethod)targetMethod), 
+                           getOperationContracts(targetKJT, 
+                                             (ProgramMethod)targetMethod)
+                                      .add((FunctionalOperationContract)contract));
+        }
+        contractsByName.put(contract.getName(), contract);
+        final ImmutableSet<ObserverFunction> oldTargets = getContractTargets(targetKJT);
+        final ImmutableSet<ObserverFunction> newTargets = oldTargets.add(targetMethod);
+        contractTargets.put(targetKJT, newTargets);
+    }
+
+
+    /** Removes the contract from the repository, but keeps its target. */
+    private void unregisterContract(Contract contract) {
+        final KeYJavaType kjt = contract.getKJT();
+        final Pair<KeYJavaType,ObserverFunction> tp = new Pair<KeYJavaType, ObserverFunction>(kjt, contract.getTarget());
+        final Pair<KeYJavaType,ProgramMethod> tp2 = new Pair<KeYJavaType, ProgramMethod>(kjt, (ProgramMethod) contract.getTarget());
+        contracts.put(tp, contracts.get(tp).remove(contract));
+        if (contract instanceof FunctionalOperationContract){
+            operationContracts.put(tp2, operationContracts.get(tp2).remove((FunctionalOperationContract)contract));
+        }
+        contractsByName.remove(contract.getName());
+    }
+
+
+    /** Adds initially clause as post-condition to contracts of constructors.
+     * Creates a new contract if there is none yet.
+     * @param inv initially clause
+     * @param kjt constructors of this type are added a post-condition
+     */
+    private void createContractsFromInitiallyClause(InitiallyClause inv, KeYJavaType kjt) {
+        if (!kjt.equals(inv.getKJT()))
+            inv = inv.setKJT(kjt);
+        for (ProgramMethod pm: services.getJavaInfo().getConstructors(kjt)){
+            if (!JMLInfoExtractor.isHelper(pm)){
+                final ImmutableSet<Contract> oldContracts = getContracts(kjt,pm);
+                ImmutableSet<FunctionalOperationContract> oldFuncContracts = DefaultImmutableSet.nil();
+                for (Contract old: oldContracts){
+                    if (old instanceof FunctionalOperationContract)
+                        oldFuncContracts = oldFuncContracts.add((FunctionalOperationContract) old);
+                }
+                if (oldFuncContracts.isEmpty()) {
+                    final FunctionalOperationContract iniContr = cf.func(pm, inv);
+                    addContractNoInheritance(iniContr);
+                    assert getContracts(kjt,pm).size() == 1 + oldContracts.size();
+                } else {
+                    for (FunctionalOperationContract c: oldFuncContracts){
+                        unregisterContract(c);
+                        addContractNoInheritance(cf.addPost(c, inv));
+                        assert contractTargets.get(kjt).contains(c.getTarget());
+                    }
+                    assert getContracts(kjt,pm).size() == oldContracts.size();
+                }
+            }
+        }
+    }
+
     //-------------------------------------------------------------------------
     //public interface
     //------------------------------------------------------------------------- 
@@ -487,18 +606,7 @@ public final class SpecificationRepository {
      * overriding methods.
      */
     public void addContract(Contract contract) {
-	//sanity check
-	assert getCanonicalFormForKJT(contract.getTarget(), 
-		                      contract.getKJT())
-	            .equals(contract.getTarget());
-	
-	//set id
-	if(((TypeDeclaration)contract.getKJT().getJavaType()).isLibraryClass()) {
-	    contract = contract.setID(libraryContractCounter--);
-	    assert libraryContractCounter > Integer.MIN_VALUE : "too many library contracts";
-	} else {
-	    contract = contract.setID(contractCounter++);
-	}
+	contract = prepareContract(contract);
 	
 	//register and inherit
         final ImmutableSet<Pair<KeYJavaType,ObserverFunction>> impls 
@@ -506,32 +614,15 @@ public final class SpecificationRepository {
         	  .add(new Pair<KeYJavaType,ObserverFunction>(contract.getKJT(),
         		        		              contract.getTarget()));
         
-        for(Pair<KeYJavaType,ObserverFunction> impl : impls) {
-            contract = contract.setTarget(impl.first, impl.second, services);
-            final String name = contract.getName();
-            assert contractsByName.get(name) == null
-                   : "Tried to add a contract with a non-unique name: " + name;
-            assert !name.contains(CONTRACT_COMBINATION_MARKER)
-                   : "Tried to add a contract with a name containing the"
-                     + " reserved character " 
-                     + CONTRACT_COMBINATION_MARKER 
-                     + ": " + name;
-            assert contract.id() != Contract.INVALID_ID
-                   : "Tried to add a contract with an invalid id!";
-            contracts.put(impl, 
-        	          getContracts(impl.first, impl.second).add(contract));
-            
-            if(contract instanceof FunctionalOperationContract) {
-        	operationContracts.put(new Pair<KeYJavaType,ProgramMethod>(impl.first, (ProgramMethod)impl.second), 
-        		               getOperationContracts(impl.first, 
-        		        	                     (ProgramMethod)impl.second)
-        		        	              .add((FunctionalOperationContract)contract));
-            }
-            contractsByName.put(contract.getName(), contract);
-            contractTargets.put(impl.first, 
-                                getContractTargets(impl.first).add(impl.second));
-        }
+        registerContract(contract, impls);
+        assert contractTargets.get(contract.getKJT()).contains(contract.getTarget()) : "target "+contract.getTarget()+" missing for contract "+contract;
     }
+    
+    /** Registers the passed (atomic) contract without inheriting it. */
+    public void addContractNoInheritance(Contract contract){
+        registerContract(prepareContract(contract));
+    }
+
     
     
     /**
@@ -564,27 +655,8 @@ public final class SpecificationRepository {
                 return c1.getName().compareTo(c2.getName());
             }
         });
-        
-        //split
-        FunctionalOperationContract contract = contractsArray[0];
-        FunctionalOperationContract[] others 
-            = new FunctionalOperationContract[contractsArray.length - 1];
-        System.arraycopy(contractsArray, 
-                         1, 
-                         others, 
-                         0, 
-                         contractsArray.length - 1);
-        
-        //determine names
-        StringBuffer nameSB = new StringBuffer(contract.getName());
-        for(FunctionalOperationContract other : others) {
-            nameSB.append(CONTRACT_COMBINATION_MARKER + other.getName());
-        }
-        
-        return contract.union(
-                others, 
-                nameSB.toString(), 
-                services);
+       
+        return cf.union(contractsArray);
     }
     
     
@@ -610,7 +682,7 @@ public final class SpecificationRepository {
     
     /**
      * Registers the passed class invariant, and inherits it to all
-     * subclasses.
+     * subclasses if it is public or protected.
      */
     public void addClassInvariant(ClassInvariant inv) {
         final KeYJavaType kjt = inv.getKJT();
@@ -618,7 +690,7 @@ public final class SpecificationRepository {
         
         addClassAxiom(new PartialInvAxiom(inv, services));
         
-        if(!inv.isStatic()) {
+        if(!inv.isStatic() && VisibilityModifier.allowsInheritance(inv.getVisibility())) {
             final ImmutableList<KeYJavaType> subs 
             	= services.getJavaInfo().getAllSubtypes(kjt);
             for(KeYJavaType sub : subs) {
@@ -637,32 +709,44 @@ public final class SpecificationRepository {
             addClassInvariant(inv);
         }
     }
+ 
     
     /**
-     * Registers the passed initially clause as a new contract to all constructors of the KJT of inv.
+     * Adds postconditions raising from initially clauses to all constructors.
+     * <b>Warning</b>: To be called after all contracts have been registered.
      */
-    public void addInitiallyClause(InitiallyClause inv) {
-        final KeYJavaType kjt = inv.getKJT();
-        for (ProgramMethod pm: services.getJavaInfo().getConstructors(kjt)){
-            if (!JMLInfoExtractor.isHelper(pm)){
-        	addContracts(inv.toContract(pm));
+    public void createContractsFromInitiallyClauses(){
+        for (KeYJavaType kjt: initiallyClauses.keySet()){
+            for (InitiallyClause inv: initiallyClauses.get(kjt)){
+                createContractsFromInitiallyClause(inv,kjt);
+                if (VisibilityModifier.allowsInheritance(inv.getVisibility())){
+                    final ImmutableList<KeYJavaType> subs = services.getJavaInfo().getAllSubtypes(kjt);
+                    for (KeYJavaType sub: subs){
+                    createContractsFromInitiallyClause(inv,sub);
+                    }}
             }
         }
-        if (!(inv.getVisibility() instanceof Private)){
-            final ImmutableList<KeYJavaType> subs = services.getJavaInfo().getAllSubtypes(kjt);
-            for (KeYJavaType sub: subs){
-        	InitiallyClause subInc = inv.setKJT(sub);
-        	for (ProgramMethod pm: services.getJavaInfo().getConstructors(sub)){
-        	    if (!JMLInfoExtractor.isHelper(pm)){
-        		addContracts(subInc.toContract(pm));
-        	    }
-        	}
-            }}
+    }
+    
+    /** 
+     * Registers the passed initially clause.
+     * Initially clauses in JML specify the post-state of any constructor of subtypes;
+     * they may particularly be used in interface types.
+     * To create proof obligations from initially clauses,
+     * the method <code>createContractsFromInitiallyClauses</code> adds them to the contracts
+     * of respective constructors (or adds a contract if there is none yet).
+     * @param ini initially clause
+     */
+    public void addInitiallyClause(InitiallyClause ini){
+        ImmutableSet<InitiallyClause> oldClauses = initiallyClauses.get(ini.getKJT());
+        if (oldClauses == null)
+            oldClauses = DefaultImmutableSet.<InitiallyClause>nil();
+        initiallyClauses.put(ini.getKJT(), oldClauses.add(ini));
     }
     
     
     /**
-     * Registers the passed initially clauses as new contracts to all constructors of their KJT.
+     * Registers the passed initially clauses.
      */
     public void addInitiallyClauses(ImmutableSet<InitiallyClause> toAdd) {
         for(InitiallyClause inv : toAdd) {
@@ -738,7 +822,35 @@ public final class SpecificationRepository {
         if(currentAxioms == null) {
             currentAxioms = DefaultImmutableSet.<ClassAxiom>nil();
         }
-        axioms.put(kjt, currentAxioms.add(ax));
+        if (ax instanceof RepresentsAxiom) {
+            // there may only be one conjoined represents axiom per model field
+            RepresentsAxiom  oldRep = getRepresentsAxiom(kjt, ax);
+            if (oldRep != null) {
+                final RepresentsAxiom newRep = oldRep.conjoin((RepresentsAxiom)ax);
+                axioms.put(kjt, currentAxioms.remove(oldRep).add(newRep));
+            } else {
+                axioms.put(kjt, currentAxioms.add(ax));
+            }
+            // inherit represents clauses to subclasses and conjoin together
+            if (VisibilityModifier.allowsInheritance(ax.getVisibility())){
+                final ImmutableList<KeYJavaType> subs = services.getJavaInfo().getAllSubtypes(kjt);
+                for (KeYJavaType sub: subs){
+                    RepresentsAxiom subAx =  ((RepresentsAxiom)ax).setKJT(sub);
+                    currentAxioms = axioms.get(sub);
+                    if(currentAxioms == null) {
+                        currentAxioms = DefaultImmutableSet.<ClassAxiom>nil();
+                    }
+                    oldRep = getRepresentsAxiom(sub, subAx);
+                    if (oldRep == null)
+                        axioms.put(sub, currentAxioms.add(subAx));
+                    else {
+                        final RepresentsAxiom newSubRep = oldRep.conjoin(subAx);
+                        axioms.put(sub, currentAxioms.remove(oldRep).add(newSubRep));
+                    }
+                }}
+        } else {
+            axioms.put(kjt, currentAxioms.add(ax));
+        }
     }
     
     
@@ -912,7 +1024,7 @@ public final class SpecificationRepository {
 	    } else if(spec instanceof ClassInvariant) {
 		addClassInvariant((ClassInvariant)spec);
 	    } else if(spec instanceof InitiallyClause){
-		addInitiallyClause((InitiallyClause)spec);
+	        addInitiallyClause((InitiallyClause)spec);
 	    } else if(spec instanceof ClassAxiom) {
 		addClassAxiom((ClassAxiom)spec);
 	    } else if(spec instanceof LoopInvariant) {

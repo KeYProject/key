@@ -96,6 +96,14 @@ public class Function extends AbstractSortedOperator {
 		          : "{" + whereToBind() + "}"));
     }
     
+    public boolean equals (Object o){
+        if (o instanceof Function){
+            return ((Function)o).name().equals(name());
+        } else {
+            return false;
+        }
+    }
+    
 
     /**
      * Returns a parsable string representation of the declaration of this

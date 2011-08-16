@@ -47,6 +47,7 @@ public class Main {
 
     private static String examplesDir = null;
 
+
     private static String fileNameOnStartUp = null;
 
     public static void main(String[] args) {
@@ -65,14 +66,16 @@ public class Main {
 
         GuiUtilities.invokeAndWait(new Runnable() {
             public void run() {
-                MainWindow.createInstance("KeY " + KeYResourceManager.getManager().getVersion());                
+                MainWindow.createInstance("KeY " + KeYResourceManager.getManager().getVersion());  
+                MainWindow key = MainWindow.getInstance();
+                key.setVisible(true);
+                key.loadCommandLineFile();
             }
         });
         
 
         MainWindow key = MainWindow.getInstance();
         
-        key.loadCommandLineFile();
     }
 
     public static void evaluateOptions(String[] opt) {
@@ -158,11 +161,10 @@ public class Main {
             return;
         }
         
-        KeYMediator mediator = MainWindow.getInstance().getMediator();
-
+        
         try {
             LemmataHandler handler = new LemmataHandler(opt,
-                    mediator.getProfile());
+                    ProofSettings.DEFAULT_SETTINGS.getProfile());
             handler.start();
         }
         catch(ProofInputException exception){
@@ -210,6 +212,7 @@ public class Main {
     public static String getFileNameOnStartUp() {
         return fileNameOnStartUp;
     }
+
 
     public static UserInterface makeUserInterface() {
         if(batchMode) {

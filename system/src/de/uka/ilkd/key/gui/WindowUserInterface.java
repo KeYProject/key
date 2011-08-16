@@ -28,12 +28,12 @@ public class WindowUserInterface implements UserInterface {
 
     @Override
     public void progressStarted(Object sender) {
-        mainWindow.getMediator().startInterface(true);
+        mainWindow.getMediator().stopInterface(true);
     }
 
     @Override
     public void progressStopped(Object sender) {
-        mainWindow.getMediator().stopInterface(true);
+        mainWindow.getMediator().startInterface(true);
     }
 
     @Override
@@ -75,7 +75,7 @@ public class WindowUserInterface implements UserInterface {
             if (!"".equals(info.getResult())) {
                 final KeYExceptionHandler exceptionHandler = 
                     ((ProblemLoader)info.getSource()).getExceptionHandler();
-                        new ExceptionDialog(mainWindow,     
+                        ExceptionDialog.showDialog(mainWindow,     
                                 exceptionHandler.getExceptions());
                         exceptionHandler.clear();
             } else {
@@ -85,6 +85,9 @@ public class WindowUserInterface implements UserInterface {
             }
         } else {
             sl.reset();
+            if(info.toString() != ""){
+                    mainWindow.displayResults(info.toString());
+            }
         }
     }
 

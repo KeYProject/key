@@ -212,6 +212,7 @@ public class ComplexButton {
     }
     
     public void setItems(Action[]  it){
+
 	items = it;
 	createMenu();
 	if(it == null){

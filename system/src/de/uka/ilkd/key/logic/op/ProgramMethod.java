@@ -62,7 +62,6 @@ public final class ProgramMethod extends ObserverFunction
               container,
               method.isStatic(),
               getParamTypes(method)); 
-                        
 	this.method  = method;;
 	this.kjt     = kjt;
         this.pi      = pi;
@@ -81,7 +80,8 @@ public final class ProgramMethod extends ObserverFunction
 		= new KeYJavaType[md.getParameterDeclarationCount()];
 	for(int i = 0; i < result.length; i++) {
 	    result[i] = md.getParameterDeclarationAt(i)
-	                  .getTypeReference()
+	    		  .getVariableSpecification()
+	    		  .getProgramVariable()
 	                  .getKeYJavaType();
 	}
 	return new ImmutableArray<KeYJavaType>(result);

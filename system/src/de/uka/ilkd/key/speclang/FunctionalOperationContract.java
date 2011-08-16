@@ -12,7 +12,6 @@ package de.uka.ilkd.key.speclang;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 
@@ -23,14 +22,6 @@ import de.uka.ilkd.key.logic.op.*;
  * and a modality.
  */
 public interface FunctionalOperationContract extends OperationContract {
-    
-    @Override
-    public FunctionalOperationContract setID(int id);
-    
-    @Override
-    public FunctionalOperationContract setTarget(KeYJavaType newKJT,
-	    	                       ObserverFunction newTarget,
-	    	                       Services services);    
     
     /**
      * Returns the modality of the contract.
@@ -58,22 +49,5 @@ public interface FunctionalOperationContract extends OperationContract {
 	    	        Term heapAtPre,
 	    	        Services services);
 
-    /**
-     * Returns the union of this contract and those in the passed array. 
-     * Probably you want to use SpecificationRepository.combineContracts()
-     * instead, which additionally takes care that the combined contract can be 
-     * loaded later. The resulting contract has id "INVALID_ID".
-     */
-    public FunctionalOperationContract union(FunctionalOperationContract[] others, 
-                                   String name, 
-                                   Services services);
-    
-    /**
-     * Returns another contract like this one, except that the passed term
-     * has been added as a precondition.
-     */
-    public FunctionalOperationContract addPre(Term addedPre,
-	    			    ProgramVariable selfVar, 
-                                    ImmutableList<ProgramVariable> paramVars,
-                                    Services services);    
+
 }

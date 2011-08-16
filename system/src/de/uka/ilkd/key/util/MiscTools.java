@@ -439,6 +439,25 @@ public final class MiscTools {
 	return result;
     }
     
+    /**
+     * True if both are <code>null</code> or <code>a.equals(b)</code> with <code>equals</code> from type T.
+     */
+    public static <T> boolean equalsOrNull(T a, Object b){
+        if (a == null) {
+            return b == null;
+        } else {
+            return a.equals(b);
+        }
+    }
+    
+    public static <T> boolean equalsOrNull(T a, Object... bs){
+        boolean result = true;
+        for (Object b: bs){
+            result = result && equalsOrNull(a, b);
+        }
+        return result;
+    }
+    
     
     
     //-------------------------------------------------------------------------

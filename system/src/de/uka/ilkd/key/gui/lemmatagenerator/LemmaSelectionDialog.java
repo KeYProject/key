@@ -1,364 +1,196 @@
 package de.uka.ilkd.key.gui.lemmatagenerator;
 
-
-
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Vector;
+import java.util.List;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JDialog;
-import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.border.TitledBorder;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.gui.lemmatagenerator.ItemChooser.ItemFilter;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.taclettranslation.TacletSoundnessPOLoader.TacletFilter;
-import de.uka.ilkd.key.taclettranslation.TacletSoundnessPOLoader.TacletInfo;
+import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletFilter;
+import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletInfo;
+/**
+ * The core of the Selection-Dialog is the class SelectionPanel which extends JPanel.
+ * It contains a table for presenting the taclets using special filters. 
+ * The dialog owns two SelectionPanels, one for presenting the taclets that can be chosen by the user (),
+ * and one for presenting the taclets that the user has chosen. Both tables work on the 
+ * same model but using different filters: 
+ * A taclet is wrapped by an object of type TableItem which contains the taclet itself and 
+ * a additional information about on which side it should be shown (LEFT or RIGHT). 
+ * The taclet
+ * 
+ */
 
 
-class TacletChooser extends JPanel{
-    
-    private static final long serialVersionUID = 1L;
-    private JList   tacletList;
-    private JList    selectedList;
-    private JPanel  middlePanel;
-    private JPanel   contentPanel;
-    private JButton  leftButton;
-    private JButton  rightButton;
-    private JScrollPane leftPane;
-    private JScrollPane rightPane;
-    
-    private final DefaultListCellRenderer cellRenderer = new DefaultListCellRenderer(){
-	
-	private  String createAdditonalInfo(TacletInfo info){
-	    String s = "";
-	    if(info.isNotSupported()){
-		return " (is not supported)";
-	    }
-	    if(info.isAlreadyInUse()){
-		return " (is already in use)";
-	    }
-	    return s;
-	}
-	
+
+
+public class LemmaSelectionDialog extends JDialog implements TacletFilter {
+
         private static final long serialVersionUID = 1L;
-	    public Component getListCellRendererComponent
-		    (JList list,
-		     Object value,           
-		     int index,              
-		     boolean isSelected,     
-		     boolean cellHasFocus)    
-		                             
-		{
-		    if (value instanceof TacletInfo) {
-			TacletInfo info = ((TacletInfo)value);
-			value = info.getTaclet().name().toString() + 
-			createAdditonalInfo(info);
-		    }
-		    return super.getListCellRendererComponent(list, value, 
-							      index, 
-							      isSelected, 
-							      cellHasFocus);
-		}
-	    };
-    
-    static private final Dimension MAX = new Dimension(Integer.MAX_VALUE,Integer.MAX_VALUE);
-    
-    TacletChooser(){
-	this.setMaximumSize(MAX);
-	setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-	add(Box.createVerticalStrut(10));
-	add(getContentPanel());
-	add(Box.createVerticalStrut(10));	
-    }
-    
-    private JPanel getContentPanel(){
-	if(contentPanel == null){
-	    contentPanel = new JPanel();
-	    contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.X_AXIS));
-	    contentPanel.add(getLeftPane());
-	    contentPanel.add(Box.createHorizontalStrut(5));
-	    contentPanel.add(getMiddlePanel());
-	    contentPanel.add(Box.createHorizontalStrut(5));
-	    contentPanel.add(getRightPane());
-	    contentPanel.add(Box.createHorizontalGlue());
-	}
-	return contentPanel;
-    }
-    
-    private JScrollPane getLeftPane(){
-	if(leftPane == null){
-	  
-	    leftPane = new JScrollPane(getTacletList(),ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
-		    ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED
-		    );
-	    leftPane.setMaximumSize(MAX);
-	    leftPane.setBorder(new TitledBorder("Choice"));
-	}
-	return leftPane;
-    }
-    
-    private JScrollPane getRightPane(){
-	if(rightPane == null){
-	    rightPane = new JScrollPane(getSelectedList(),ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
-		    ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED
-		    );
-	    rightPane.setMaximumSize(MAX);
-	    rightPane.setBorder(new TitledBorder("Selected"));
-	}
-	return rightPane;
-    }
-    
-    private JPanel getMiddlePanel(){
-	if(middlePanel == null){
-	    middlePanel = new JPanel();
-	    middlePanel.setLayout(new BoxLayout(middlePanel, BoxLayout.Y_AXIS));
-	    middlePanel.add(getLeftButton());
-	    middlePanel.add(Box.createVerticalStrut(10));
-	    middlePanel.add(getRightButton());
-	    Dimension dim = getLeftButton().getPreferredSize();
-	    dim.height = dim.height+10 + getRightButton().getPreferredSize().height;
-	    middlePanel.setMaximumSize(dim);
-	    
-	}
-	return middlePanel;
-    }
-    
-    private JButton getLeftButton(){
-	if(leftButton == null){
-	    leftButton = new JButton("<");
-	    leftButton.addActionListener(new ActionListener() {
-	        
-	        @Override
-	        public void actionPerformed(ActionEvent e) {
-	            cut(getSelectedList().getSelectedValues(),getSelectionModel(),getTacletModel(),
-	        	    getTacletList());
-	        }
-	    });
-	}
-	return leftButton;
-	    
-    }
-    
-    private JButton getRightButton(){
-	if(rightButton == null){
-	    rightButton = new JButton(">");
-	    rightButton.addActionListener(new ActionListener() {
-	        
-	        @Override
-	        public void actionPerformed(ActionEvent e) {
-	            
-	            cut(getTacletList().getSelectedValues(),getTacletModel(),getSelectionModel(),
-	        	    getSelectedList());
-	        }
-	    });
-	}
-	return rightButton;
-	    
-    }
 
-    private void cut(Object [] values, DefaultListModel src, DefaultListModel dest, JList destList){
-	if(values.length == 0){
-	    return;
-	}
-	int added =0;
-	for(Object value : values){
-	    TacletInfo info = (TacletInfo) value;
-	    if(!info.isAlreadyInUse() && !info.isNotSupported()){
-		src.removeElement(value);
-		dest.addElement(value);
-		added++;
-	    }
-	    
-	}
-	if(added>0){
-	destList.setSelectionInterval(dest.size()-added, dest.size()-1);
-	}
-    }
-    
-    
-    private JList getTacletList(){
-	if(tacletList == null){
-	    tacletList = new JList();
-	
-	    tacletList.setModel(new DefaultListModel());
-	    tacletList.setCellRenderer(cellRenderer);
-	}
-	return tacletList;
-    }
-    
-    private JList getSelectedList(){
-	if(selectedList == null){
-	    selectedList = new JList();
-	
-	    selectedList.setModel(new DefaultListModel());
-	    selectedList.setCellRenderer(cellRenderer);
-	}
-	return selectedList;
-    }
-    
-    private DefaultListModel getSelectionModel(){
-	return (DefaultListModel)(getSelectedList().getModel());
-    }
-    
-    private DefaultListModel getTacletModel(){
-	return (DefaultListModel)(getTacletList().getModel());
-    }
-    
-    public void setTaclets(Vector<TacletInfo> taclets){
-	
-	DefaultListModel model = getTacletModel();
-	for(TacletInfo info : taclets){
-	    model.addElement(info);
-	}
-	getTacletList().setModel(model);
-	
-	getTacletList().setSelectionInterval(0, taclets.size()-1);
-    }
-    
-    public ImmutableSet<Taclet> getSelectedTaclets(){
-	
-	Object [] selected = getSelectionModel().toArray();
-	ImmutableSet<Taclet> set = DefaultImmutableSet.nil();
-	for(Object obj : selected){
-	    set = set.add(((TacletInfo) obj).getTaclet());
-	}
-	return set;
-    }
-    
-    public void removeSelection(){
-	getSelectedList().setSelectedIndices(new int[0]);
-	getTacletList().setSelectedIndices(new int[0]);
-    }
-}
+        private JButton okayButton;
+        private JCheckBox showSupported;
+        private JButton cancelButton;
+        private JPanel buttonPanel;
+        private JPanel contentPanel;
+        private ItemChooser<TacletInfo> tacletChooser;
+        private ItemFilter<TacletInfo> showOnlySupportedTaclets = new ItemFilter<TacletInfo>(){
 
-public class LemmaSelectionDialog extends JDialog implements TacletFilter{
-    
-    private static final long serialVersionUID = 1L;
+                @Override
+                public boolean include(TacletInfo itemData) {
+                       return !itemData.isNotSupported();
+                }                
+        };
+        
+        private ItemFilter<TacletInfo> filterForMovingTaclets = new ItemFilter<TacletInfo>(){
 
-    private JButton okayButton;
-
-    private JButton cancelButton;
-    private JPanel  buttonPanel;
-    private JPanel  contentPanel;
-    private TacletChooser  tacletChooser;
-
-    
-
-    public LemmaSelectionDialog(){
-	this.setTitle("Taclet Selection");
-	this.setLayout(new BoxLayout(this.getContentPane(), BoxLayout.X_AXIS));
-	this.getContentPane().add(Box.createHorizontalStrut(10));
-	this.getContentPane().add(getContentPanel());
-	this.getContentPane().add(Box.createHorizontalStrut(10));
-	this.setMinimumSize(new Dimension(300,300));
-	this.setLocationByPlatform(true);
-
-	this.pack();
-
-    }
-    
-    public ImmutableSet<Taclet> showModal(Vector<TacletInfo> taclets){
-	this.setModal(true);
-	this.getTacletChooser().setTaclets(taclets);
-	this.setVisible(true);
-	return getTacletChooser().getSelectedTaclets();
-    }
-    
-
-    
-    private JPanel getButtonPanel(){
-	
-	if(buttonPanel == null){
-	    buttonPanel = new JPanel();
-	    buttonPanel.setLayout(new BoxLayout(buttonPanel,BoxLayout.X_AXIS));
-	    buttonPanel.add(Box.createHorizontalGlue());
-	    buttonPanel.add(getOkayButton());
-	    buttonPanel.add(Box.createHorizontalStrut(5));
-	    buttonPanel.add(getCancelButton());
-	}
-	return buttonPanel;
-    }
-    
+                @Override
+                public boolean include(TacletInfo itemData) {
+                       return !itemData.isNotSupported() && !itemData.isAlreadyInUse();
+                }                
+        };    
 
 
-    
-    private JPanel getContentPanel(){
-	if(contentPanel == null){
-	    contentPanel = new JPanel();
-	    contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
-	    contentPanel.add(Box.createVerticalStrut(10));
-	    contentPanel.add(getTacletChooser());
-	    contentPanel.add(getButtonPanel());
-	    contentPanel.add(Box.createVerticalStrut(10));
-	}
-	return contentPanel;
-    }
-    
+        public LemmaSelectionDialog() {
+                this.setTitle("Taclet Selection");
+                this.setLayout(new BoxLayout(this.getContentPane(),
+                                BoxLayout.X_AXIS));
+                this.getContentPane().add(Box.createHorizontalStrut(10));
+                this.getContentPane().add(getContentPanel());
+                this.getContentPane().add(Box.createHorizontalStrut(10));
+                this.setMinimumSize(new Dimension(300, 300));
+                this.setLocationByPlatform(true);
+
+                this.pack();
+
+        }
+
+        public ImmutableSet<Taclet> showModal(List<TacletInfo> taclets) {
+                this.setModal(true);
+                this.getTacletChooser().setItems(taclets, "Taclets");
+                this.setVisible(true);
+                ImmutableSet<Taclet> set = DefaultImmutableSet.nil();
+                for(TacletInfo info : getTacletChooser().getDataOfSelectedItems()){
+                        set = set.add(info.getTaclet());
+                }
+                return set;
+        }
+        
+        private JCheckBox getShowSupported() {
+                if(showSupported == null){
+                        showSupported = new JCheckBox("Show only supported taclets.");
+                        showSupported.setSelected(true);
+                        showSupported.addActionListener(new ActionListener() {
+                                
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                        if(showSupported.isSelected()){
+                                                getTacletChooser().addFilter(showOnlySupportedTaclets);
+                                                 
+                                        }else{
+                                                getTacletChooser().removeFilter(showOnlySupportedTaclets);
+                                                        
+                                        }
+                                        
+                                }
+                        });
+                }
+                return showSupported;
+        }
+
+        private JPanel getButtonPanel() {
+
+                if (buttonPanel == null) {
+                        buttonPanel = new JPanel();
+                        buttonPanel.setLayout(new BoxLayout(buttonPanel,
+                                        BoxLayout.X_AXIS));
+                        buttonPanel.add(getShowSupported());
+                        buttonPanel.add(Box.createHorizontalGlue());
+                        buttonPanel.add(getOkayButton());
+                        buttonPanel.add(Box.createHorizontalStrut(8));
+                        
+                        buttonPanel.add(getCancelButton());
+                }
+                return buttonPanel;
+        }
+
+        private JPanel getContentPanel() {
+                if (contentPanel == null) {
+                        contentPanel = new JPanel();
+                        contentPanel.setLayout(new BoxLayout(contentPanel,
+                                        BoxLayout.Y_AXIS));
+                        contentPanel.add(Box.createVerticalStrut(10));
+                        contentPanel.add(getTacletChooser());
+                        contentPanel.add(getButtonPanel());
+                        contentPanel.add(Box.createVerticalStrut(10));
+                }
+                return contentPanel;
+        }
+
+        private JButton getOkayButton() {
+                if (okayButton == null) {
+                        okayButton = new JButton("Okay");
+                        okayButton.addActionListener(new ActionListener() {
+
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                        tacletsSelected();
+                                }
+                        });
+                        okayButton.setPreferredSize(getCancelButton().getPreferredSize());
+                }
+                return okayButton;
+        }
+        
 
 
-    
-    private JButton getOkayButton(){
-	if(okayButton == null){
-	    okayButton = new JButton("ok");
-	    okayButton.addActionListener(new ActionListener() {
-	        
-	        @Override
-	        public void actionPerformed(ActionEvent e) {
-	        	tacletsSelected();
-	        }
-	    });
-	}
-	return okayButton;
-    }
-    
-   
-    private void tacletsSelected(){
-	
-	dispose();
-    }
-    
-    private void cancel(){
-	getTacletChooser().removeSelection();
-	dispose();
-    }
-    
-    private JButton getCancelButton(){
-	if(cancelButton == null){
-	    cancelButton = new JButton("cancel");
-	    cancelButton.addActionListener(new ActionListener() {
-	        
-	        @Override
-	        public void actionPerformed(ActionEvent e) {
-	        	cancel();
-	        }
-	    });
-	}
-	return cancelButton;
-    }
-    
-    private TacletChooser getTacletChooser(){
-	if(tacletChooser == null){
-	    tacletChooser = new TacletChooser();
-	}
-	return tacletChooser;
-    }
+        private void tacletsSelected() {
 
-    @Override
-    public ImmutableSet<Taclet> filter(Vector<TacletInfo> taclets) {
-	return showModal(taclets);
-    }
-    
-    
+                dispose();
+        }
+
+        private void cancel() {
+                getTacletChooser().removeSelection();
+                getTacletChooser().moveAllToLeft();
+                dispose();
+        }
+
+        private JButton getCancelButton() {
+                if (cancelButton == null) {
+                        cancelButton = new JButton("Cancel");
+                        cancelButton.addActionListener(new ActionListener() {
+
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                        cancel();
+                                }
+                        });
+                }
+                return cancelButton;
+        }
+
+        private ItemChooser<TacletInfo> getTacletChooser() {
+                if (tacletChooser == null) {
+                        tacletChooser = new ItemChooser<TacletInfo>("Search for taclets with names containing");
+                        tacletChooser.addFilterForMovingItems(filterForMovingTaclets);
+                        tacletChooser.addFilter(showOnlySupportedTaclets);
+                }
+                return tacletChooser;
+        }
+
+        @Override
+        public ImmutableSet<Taclet> filter(List<TacletInfo> taclets) {
+
+                return showModal(taclets);
+        }
+
 }
