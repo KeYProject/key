@@ -103,6 +103,7 @@ public class ObserverFunction extends Function {
         if (o instanceof ObserverFunction){
             ObserverFunction p = (ObserverFunction)o;
             boolean b = (p.isStatic == isStatic);
+            b = b && MiscTools.equalsOrNull(p.name(), name());
             b = b && MiscTools.equalsOrNull(p.container, container);
             b = b && MiscTools.equalsOrNull(p.paramTypes, paramTypes);
             b = b && MiscTools.equalsOrNull(p.type, type);

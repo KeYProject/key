@@ -381,8 +381,10 @@ public final class SpecificationRepository {
 
 
     private void registerContract(Contract contract,
-            Pair<KeYJavaType, ObserverFunction> target) {
-        contract = cf.setTarget(contract,target.first, target.second);
+            Pair<KeYJavaType, ObserverFunction> targetPair) {
+        final KeYJavaType targetKJT = targetPair.first;
+        final ObserverFunction targetMethod = targetPair.second;
+        contract = cf.setTarget(contract,targetKJT, targetMethod);
         final String name = contract.getName();
         assert contractsByName.get(name) == null
                : "Tried to add a contract with a non-unique name: " + name;
@@ -393,21 +395,23 @@ public final class SpecificationRepository {
                  + ": " + name;
         assert contract.id() != Contract.INVALID_ID
                : "Tried to add a contract with an invalid id!";
-        contracts.put(target, 
-                  getContracts(target.first, target.second).add(contract));
+        contracts.put(targetPair, 
+                  getContracts(targetKJT, targetMethod).add(contract));
         
         if(contract instanceof FunctionalOperationContract) {
-        operationContracts.put(new Pair<KeYJavaType,ProgramMethod>(target.first, (ProgramMethod)target.second), 
-                           getOperationContracts(target.first, 
-                                             (ProgramMethod)target.second)
+        operationContracts.put(new Pair<KeYJavaType,ProgramMethod>(targetKJT, (ProgramMethod)targetMethod), 
+                           getOperationContracts(targetKJT, 
+                                             (ProgramMethod)targetMethod)
                                       .add((FunctionalOperationContract)contract));
         }
         contractsByName.put(contract.getName(), contract);
-        contractTargets.put(target.first, 
-                            getContractTargets(target.first).add(target.second));
+        final ImmutableSet<ObserverFunction> oldTargets = getContractTargets(targetKJT);
+        final ImmutableSet<ObserverFunction> newTargets = oldTargets.add(targetMethod);
+        contractTargets.put(targetKJT, newTargets);
     }
 
 
+    /** Removes the contract from the repository, but keeps its target. */
     private void unregisterContract(Contract contract) {
         final KeYJavaType kjt = contract.getKJT();
         final Pair<KeYJavaType,ObserverFunction> tp = new Pair<KeYJavaType, ObserverFunction>(kjt, contract.getTarget());
@@ -417,7 +421,6 @@ public final class SpecificationRepository {
             operationContracts.put(tp2, operationContracts.get(tp2).remove((FunctionalOperationContract)contract));
         }
         contractsByName.remove(contract.getName());
-        contractTargets.put(kjt, contractTargets.get(kjt).remove(tp.second));
     }
 
 
@@ -612,6 +615,7 @@ public final class SpecificationRepository {
         		        		              contract.getTarget()));
         
         registerContract(contract, impls);
+        assert contractTargets.get(contract.getKJT()).contains(contract.getTarget()) : "target "+contract.getTarget()+" missing for contract "+contract;
     }
     
     /** Registers the passed (atomic) contract without inheriting it. */
