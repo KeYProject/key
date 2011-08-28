@@ -279,10 +279,19 @@ public class ContractFactory {
                                          services);
 
             pre = tb.or(pre, otherPre);
-            mby = tb.ife(otherPre, otherMby, mby) ;         
+            
+            // bugfix (MU)
+            // if the first or the other contract do not have a
+            // measured-by-clause, assume no clause at all 
+            if(mby == null || otherMby == null) {
+                mby = null;
+            } else {
+                mby = tb.ife(otherPre, otherMby, mby);
+            }
+            
             post = tb.and(post, tb.imp(atPreify(otherPre, 
                                 t.originalHeapAtPreVar), 
-                               otherPost));
+                                otherPost));
             mod = mod == null ? otherMod
                     : (otherMod == null ?
                             mod : tb.union(services, mod, otherMod));
