@@ -243,9 +243,8 @@ public class ProofSaver {
          String branchLabel = child.getNodeInfo().getBranchLabel();
          
          if (branchLabel == null) {
-              // This assertion is related to bug #1099  
+            // This check is related to bug #1099  
             System.err.println("(null) branchlabel for node " + child);
-         } else {
             branchLabel = "THIS_LABEL_WAS_MISSING";
          }
          tree.append("(branch \" " + escapeCharacters(branchLabel) + "\"\n");
