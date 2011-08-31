@@ -23,6 +23,7 @@ import de.uka.ilkd.key.java.recoderext.ProgramVariableSVWrapper;
 import de.uka.ilkd.key.java.recoderext.TypeSVWrapper;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -56,9 +57,13 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
      * 
      * @param rec2key
      *            the object to associate to
+     * @param namespaceSet
+     *            namespaces to resolve entity names
+     * @param services
+     *            services to be used
      */
-    public SchemaRecoder2KeYConverter(SchemaRecoder2KeY rec2key) {
-        super(rec2key);
+    public SchemaRecoder2KeYConverter(SchemaRecoder2KeY rec2key, Services services, NamespaceSet namespaceSet) {
+        super(rec2key, services, namespaceSet);
     }
 
     // ------ conversion methods

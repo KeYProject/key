@@ -20,23 +20,22 @@ header {
     import de.uka.ilkd.key.java.Position;
     import de.uka.ilkd.key.java.Services;
     import de.uka.ilkd.key.java.abstraction.*;
-    import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
-    import de.uka.ilkd.key.java.declaration.ClassDeclaration;
     import de.uka.ilkd.key.java.expression.literal.StringLiteral;
     import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
     import de.uka.ilkd.key.ldt.*;
     import de.uka.ilkd.key.logic.*;
     import de.uka.ilkd.key.logic.op.*;
     import de.uka.ilkd.key.logic.sort.*;
+    import de.uka.ilkd.key.parser.ParserException;
     import de.uka.ilkd.key.proof.OpReplacer;
     import de.uka.ilkd.key.speclang.PositionedString;
     import de.uka.ilkd.key.speclang.translation.*;
     import de.uka.ilkd.key.util.Pair;
     import de.uka.ilkd.key.util.Triple;    
 
-    import java.lang.RuntimeException;
     import java.math.BigInteger;
-    import java.util.*;
+    import java.util.Map;
+    import java.util.LinkedHashMap;
 }
 
 class KeYJMLParser extends Parser;
@@ -147,13 +146,15 @@ options {
 
     private void raiseError(String msg) throws SLTranslationException {
 	throw excManager.createException(msg);
-    }
-    
+    }    
     
     private void raiseError(String msg, Token t) throws SLTranslationException {
 	throw excManager.createException(msg, t);
     }
     
+    private void raiseError(String msg, Token t, Exception cause) throws SLTranslationException {
+        throw excManager.createException(msg, t, cause);
+    }
     
     private void raiseNotSupported(String feature) 
 	    throws SLTranslationException {
@@ -291,9 +292,6 @@ options {
 	
 	return null;
     }
-
-
- 
 }
 
 
@@ -1352,7 +1350,7 @@ decimalnumeral returns [SLExpression result=null] throws SLTranslationException
 
 jmlprimary returns [SLExpression result=null] throws SLTranslationException
 {
-    ImmutableList<SLExpression> list;
+    ImmutableList<SLExpression> list = null;
     SLExpression e1 = null;
     SLExpression e2 = null;
     SLExpression e3 = null;
@@ -1381,8 +1379,13 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 			   "\\old not allowed in this context.");
 	    }
 	    
-	    result = new SLExpression(convertToOld(result.getTerm()), 
-	                              result.getType());
+	    typ = result.getType();
+	    if(typ != null) {
+	      result = new SLExpression(convertToOld(result.getTerm()), 
+	                                result.getType());
+	    } else {
+	      result = new SLExpression(convertToOld(result.getTerm()));
+	    }
 	}
     |   
 	CREATED LPAREN result=expression RPAREN
@@ -1415,10 +1418,18 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 	    }
 	}
 	
-    |   INFORMAL_DESCRIPTION 
+    |   desc:INFORMAL_DESCRIPTION 
 	{
-	    raiseNotSupported("informal predicates");
+	    // was: raiseNotSupported("informal predicates");
+	    result = translator.<SLExpression>translate("(* *)", services, desc, 
+	        selfVar, resultVar, paramVars, heapAtPre, excManager);
 	}
+	
+    |   escape:DL_ESCAPE LPAREN ( list=expressionlist )? RPAREN
+        {
+            result = translator.<SLExpression>translate("\\dl_", escape, list, services, excManager);
+        }
+        
     |   NOT_MODIFIED LPAREN t=storereflist RPAREN
         {
         result = new SLExpression(translator.<Term>translate("\\not_modified",services, heapAtPre, t));

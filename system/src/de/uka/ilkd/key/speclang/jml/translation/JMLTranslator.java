@@ -9,12 +9,21 @@
 //
 package de.uka.ilkd.key.speclang.jml.translation;
 
+import java.util.Iterator;
+import java.util.Map;
+
+import antlr.Token;
+import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Named;
+import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
@@ -24,11 +33,13 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.translation.SLExpression;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.speclang.translation.SLTranslationExceptionManager;
+import de.uka.ilkd.key.util.*;
 import de.uka.ilkd.key.util.LinkedHashMap;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
@@ -79,7 +90,7 @@ final class JMLTranslator {
         });
         translationMethods.put("depends", new JMLTranslationMethod() {
             @Override
-            public Triple translate(Object... params)
+            public Triple<ObserverFunction, Term, Term> translate(Object... params)
                     throws SLTranslationException {
                 checkParameters(params, SLExpression.class, Term.class,
                                 SLExpression.class,
@@ -545,7 +556,120 @@ final class JMLTranslator {
             }
         });
         
-        // others
+        translationMethods.put("(* *)", new JMLTranslationMethod() {
+            public Object translate(Object... params) throws SLTranslationException {
+
+                checkParameters(params, Services.class, Token.class,
+                        LocationVariable.class, LocationVariable.class, 
+                        ImmutableList.class, Term.class, 
+                        SLTranslationExceptionManager.class);
+                
+                Services services = (Services) params[0];
+                Token desc = (Token) params[1]; 
+                LocationVariable selfVar = (LocationVariable) params[2];
+                LocationVariable resultVar = (LocationVariable) params[3];
+                ImmutableList<LocationVariable> paramVars = 
+                    (ImmutableList<LocationVariable>) params[4];
+                Term heapAtPre = (Term) params[5];
+                SLTranslationExceptionManager excMan = 
+                    (SLTranslationExceptionManager) params[6];
+                
+                // strip leading and trailing (* ... *)
+                String text = desc.getText();
+                text = text.substring(2, text.length() - 2);
+                
+                // prepare namespaces
+                NamespaceSet namespaces = services.getNamespaces().copy();
+                Namespace programVariables = namespaces.programVariables();
+
+                if(heapAtPre != null && heapAtPre.op() instanceof ProgramVariable) {
+                    programVariables.add(heapAtPre.op());
+                }
+
+                if(selfVar != null) {
+                    programVariables.add(selfVar);
+                }
+
+                if(resultVar != null) {
+                    programVariables.add(resultVar);
+                }
+
+                for (ProgramVariable param : paramVars) {
+                    programVariables.add(param);
+                }
+
+                SLExpression result;
+                try {
+                    result = new SLExpression(TB.parseTerm(text, services, namespaces));
+                    return result;
+                } catch (ParserException ex) {
+                    throw excMan.createException("Cannot parse embedded JavaDL: " + text, desc, ex);
+                }
+            }
+        });
+        
+        translationMethods.put("\\dl_", new JMLTranslationMethod() {
+            @Override
+            public Object translate(Object... params) throws SLTranslationException {
+                checkParameters(params, Token.class, ImmutableList.class, Services.class,
+                        SLTranslationExceptionManager.class);
+                
+                Token escape = (Token) params[0];
+                ImmutableList<SLExpression> list = (ImmutableList<SLExpression>) params[1];
+                Services services = (Services) params[2];
+                SLTranslationExceptionManager excMan = (SLTranslationExceptionManager) params[3];
+
+                // strip leading "\dl_"
+                String functName = escape.getText().substring(4);
+                Namespace funcs = services.getNamespaces().functions();
+                Named symbol = funcs.lookup(new Name(functName));
+                
+                if(symbol == null) {
+                    throw excMan.createException("Unknown function symbol " + functName, escape);
+                }
+                
+                assert symbol instanceof Function : "Expecting a function symbol in this namespace";
+                Function function = (Function) symbol;
+                                    
+                Term[] args;
+                if(list == null) {
+                    // empty parameter list
+                    args = new Term[0];
+                } else {
+                
+                    Term heap = TB.heap(services);
+                    
+                    // special casing "implicit heap" arguments:
+                    // omitting one argument means first argument is "heap"
+                    int i = 0;
+                    if(function.arity() == list.size() + 1 
+                            && function.argSort(0) == heap.sort()) {
+                        args = new Term[list.size() + 1];
+                        args[i++] = heap;
+                    } else {
+                        args = new Term[list.size()];
+                    }
+                    
+                    for (SLExpression expr : list) {
+                        if(!expr.isTerm()) {
+                            throw new SLTranslationException("Expecting a term here, not: " + expr);
+                        }
+                        args[i++] = expr.getTerm();
+                    }
+                }
+                                    
+                // TODO Catch TermCreationException and throw exception with line number
+                try {
+                    Term resultTerm = TB.func(function, args, null);
+                    SLExpression result = new SLExpression(resultTerm);
+                    return result;
+                } catch (TermCreationException ex) {
+                    throw excMan.createException("Cannot create term " + function.name() + 
+                            "(" + MiscTools.join(args, ", ") + ")", escape, ex);
+                }
+            }});
+
+            // others
         translationMethods.put("array reference", new JMLTranslationMethod(){
 
             @Override
@@ -742,6 +866,7 @@ final class JMLTranslator {
     private <T> void checkReturnType(Object result)
             throws SLTranslationException {
         try {
+            // TODO This is not type-safe. Implement this with a Class-argument.
             result = (T) result;
         } catch (ClassCastException e) {
             throw new SLTranslationException(

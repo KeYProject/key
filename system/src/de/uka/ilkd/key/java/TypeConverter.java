@@ -165,6 +165,11 @@ public final class TypeConverter {
 	} else if(op instanceof Conditional) {
 	    assert subs.length == 3;
 	    return TB.ife(subs[0], subs[1], subs[2]);
+	} else if(op instanceof DLEmbeddedExpression) {
+	    DLEmbeddedExpression emb = (DLEmbeddedExpression) op;
+	    Function f = emb.getFunctionSymbol();
+	    // TODO make a sensible error recovery
+	    return TB.func(f, subs);
 	} else {
 	    Debug.out("typeconverter: no data type model "+
 		      "available to convert:", op, op.getClass());		

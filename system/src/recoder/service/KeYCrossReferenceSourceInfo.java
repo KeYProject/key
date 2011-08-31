@@ -42,18 +42,12 @@ import recoder.service.NameInfo;
 import recoder.service.UnresolvedReferenceException;
 import de.uka.ilkd.key.java.recoderext.ClassFileDeclarationBuilder;
 import de.uka.ilkd.key.java.recoderext.adt.*;
-import de.uka.ilkd.key.java.recoderext.EnumClassDeclaration;
-import de.uka.ilkd.key.java.recoderext.ExecutionContext;
-import de.uka.ilkd.key.java.recoderext.MethodCallStatement;
+import de.uka.ilkd.key.java.recoderext.*;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.util.SpecDataLocation;
 
 
-/**
- * @author mattias
- *
- */
 public class KeYCrossReferenceSourceInfo
     extends DefaultCrossReferenceSourceInfo {
 
@@ -608,7 +602,11 @@ public class KeYCrossReferenceSourceInfo
                   || expr instanceof SeqConcat
                   || expr instanceof SeqSub
                   || expr instanceof SeqReverse) {
-	    return name2primitiveType.get("\\seq");
+        return name2primitiveType.get("\\seq");
+	} else if(expr instanceof DLEmbeddedExpression) {
+	    // w/o further resolution, a type cannot be determined.
+	    // but this does not fail.
+	    return getNameInfo().getUnknownType();
 	} else if (expr instanceof SeqLength
 	        || expr instanceof SeqIndexOf){
 	    return name2primitiveType.get("int");

@@ -47,8 +47,9 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader {
         super(services, nss);
     }
 
-    protected Recoder2KeYConverter makeConverter() {
-        return new SchemaRecoder2KeYConverter(this);
+    @Override
+    protected Recoder2KeYConverter makeConverter(Services services, NamespaceSet nss) {
+        return new SchemaRecoder2KeYConverter(this, services, nss);
     }
 
     /**
