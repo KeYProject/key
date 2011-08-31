@@ -594,8 +594,10 @@ final class JMLTranslator {
                     programVariables.add(resultVar);
                 }
 
-                for (ProgramVariable param : paramVars) {
-                    programVariables.add(param);
+                if(paramVars != null) {
+                    for (ProgramVariable param : paramVars) {
+                        programVariables.add(param);
+                    }
                 }
 
                 SLExpression result;
@@ -624,52 +626,72 @@ final class JMLTranslator {
                 Namespace funcs = services.getNamespaces().functions();
                 Named symbol = funcs.lookup(new Name(functName));
                 
-                if(symbol == null) {
-                    throw excMan.createException("Unknown function symbol " + functName, escape);
-                }
-                
-                assert symbol instanceof Function : "Expecting a function symbol in this namespace";
-                Function function = (Function) symbol;
-                                    
-                Term[] args;
-                if(list == null) {
-                    // empty parameter list
-                    args = new Term[0];
-                } else {
-                
-                    Term heap = TB.heap(services);
+                if(symbol != null) {
+                    // Function symbol found
+
+                    assert symbol instanceof Function : "Expecting a function symbol in this namespace";
+                    Function function = (Function) symbol;
                     
-                    // special casing "implicit heap" arguments:
-                    // omitting one argument means first argument is "heap"
-                    int i = 0;
-                    if(function.arity() == list.size() + 1 
-                            && function.argSort(0) == heap.sort()) {
-                        args = new Term[list.size() + 1];
-                        args[i++] = heap;
+                    Term[] args;
+                    if(list == null) {
+                        // empty parameter list
+                        args = new Term[0];
                     } else {
-                        args = new Term[list.size()];
+
+                        Term heap = TB.heap(services);
+
+                        // special casing "implicit heap" arguments:
+                        // omitting one argument means first argument is "heap"
+                        int i = 0;
+                        if(function.arity() == list.size() + 1 
+                                && function.argSort(0) == heap.sort()) {
+                            args = new Term[list.size() + 1];
+                            args[i++] = heap;
+                        } else {
+                            args = new Term[list.size()];
+                        }
+
+                        for (SLExpression expr : list) {
+                            if(!expr.isTerm()) {
+                                throw new SLTranslationException("Expecting a term here, not: " + expr);
+                            }
+                            args[i++] = expr.getTerm();
+                        }
+                    }
+
+                    try {
+                        Term resultTerm = TB.func(function, args, null);
+                        SLExpression result = new SLExpression(resultTerm);
+                        return result;
+                    } catch (TermCreationException ex) {
+                        throw excMan.createException("Cannot create term " + function.name() + 
+                                "(" + MiscTools.join(args, ", ") + ")", escape, ex);
                     }
                     
-                    for (SLExpression expr : list) {
-                        if(!expr.isTerm()) {
-                            throw new SLTranslationException("Expecting a term here, not: " + expr);
-                        }
-                        args[i++] = expr.getTerm();
-                    }
                 }
-                                    
-                // TODO Catch TermCreationException and throw exception with line number
+
+                assert symbol == null;  // no function symbol found
+                
+                Namespace progVars = services.getNamespaces().programVariables();
+                symbol = progVars.lookup(new Name(functName));
+                
+                if(symbol == null) {
+                    throw excMan.createException("Unknown escaped symbol " + functName, escape);
+                }
+                
+                assert symbol instanceof ProgramVariable : "Expecting a program variable";
+                ProgramVariable pv = (ProgramVariable)symbol;
                 try {
-                    Term resultTerm = TB.func(function, args, null);
+                    Term resultTerm = TB.var(pv);
                     SLExpression result = new SLExpression(resultTerm);
-                    return result;
+                    return result; 
                 } catch (TermCreationException ex) {
-                    throw excMan.createException("Cannot create term " + function.name() + 
-                            "(" + MiscTools.join(args, ", ") + ")", escape, ex);
+                    throw excMan.createException("Cannot create term " + pv.name(), escape, ex);
                 }
+                
             }});
 
-            // others
+        // others
         translationMethods.put("array reference", new JMLTranslationMethod(){
 
             @Override
