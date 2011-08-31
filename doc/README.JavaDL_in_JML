@@ -59,6 +59,21 @@ The term "bar" must, however, for technical reasons be succeeded by
 
 This works for predicate symbols, too.
 
+If the first argument of the symbol is of type Heap and the number of
+actual parameters is smaller than number of formal parameters, the
+program variable "heap" (the current heap) is implicitly added as
+first parameter. Example:
+
+In KeY:
+  \functions {
+     Seq arr2seq(Heap, Object)
+  }
+
+In JML (e.g.):
+  //@ ensures arr2seq(arrayObject) == \emptySeq;
+equivalen to
+  //@ ensures arr2seq(\dl_heap(), arrayObject) == \emptySeq;
+
 
 3) Limitations
 --------------
@@ -75,3 +90,4 @@ This works for predicate symbols, too.
 
 Changelog:
   Mattias Ulbrich 2011-07-12
+                  2011-08-31
