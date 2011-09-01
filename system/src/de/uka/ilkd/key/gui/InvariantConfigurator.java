@@ -206,8 +206,7 @@ public class InvariantConfigurator {
                          */
                         private void initInputPane() {
                                 for (int i = 0; i < invariants.size(); i++) {
-                                        JPanel panel = createInvariantTab(i);
-                                        inputPane.addTab("Inv " + i, panel);
+                                        inputPane.addTab("Inv " + i, createInvariantTab(i));
                                         inputPane.validate();
 
                                 }
@@ -316,8 +315,9 @@ public class InvariantConfigurator {
 
                         }
 
-                        private JPanel createInvariantTab(int i) {
+                        private JScrollPane createInvariantTab(int i) {
                                 JPanel panel = new JPanel();
+                                panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
 
                                 JTextArea invarea = createInputTextArea(
                                                 INVARIANTTITLE, invariants
@@ -331,12 +331,11 @@ public class InvariantConfigurator {
                                 panel.add(invarea);
                                 panel.add(modarea);
                                 panel.add(vararea);
-                                panel.setMinimumSize(panel.getPreferredSize());
-                                panel.setLayout(new BorderLayout());
+
                                 
                                 
                                 
-                                return panel;
+                                return new JScrollPane(panel);
 
                         }
 

@@ -260,17 +260,19 @@ public final class WhileInvariantRule implements BuiltInRule {
 
         @Override
         public boolean isApplicable(Goal goal, PosInOccurrence pio) {
-                //Check if the rule would be applicable
-                checkApplicability(goal, pio);
+                // Check if the rule would be applicable
+                if (checkApplicability(goal, pio)) {
 
-                // instantiation must succeed
-                if (Main.getInstance().mediator().autoMode()) {
-                        Instantiation inst = instantiate(pio.subTerm(), goal
-                                        .proof().getServices());
-                        return inst != null;
-                } else {
-                        return true;
-                }
+
+                        if (Main.getInstance().mediator().autoMode()) {
+                                // instantiation must succeed
+                                Instantiation inst = instantiate(pio.subTerm(),
+                                                goal.proof().getServices());
+                                return inst != null;
+                        } else {
+                                return true;
+                        }
+                } else return false;
         }
 
         protected boolean checkApplicability(Goal goal, PosInOccurrence pio) {
