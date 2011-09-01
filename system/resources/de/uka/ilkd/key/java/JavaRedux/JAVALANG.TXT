@@ -35,6 +35,7 @@ java/lang/Exception.java
 java/lang/ExceptionInInitializerError.java
 java/lang/IllegalArgumentException.java
 java/lang/IndexOutOfBoundsException.java
+java/lang/Integer.java
 java/lang/InterruptedException.java
 java/lang/Iterable.java
 java/lang/LinkageError.java
