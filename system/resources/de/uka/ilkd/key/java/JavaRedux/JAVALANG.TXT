@@ -15,7 +15,7 @@
 # java.lang.Object has been modified manually!
 
 # The following files are takes from the jmlspecs repository and have been modified to fit KeY:
-# java.lang.System, java.util.Arrays
+# java.lang.System, java.util.Arrays, java.io.PrintStream
 
 java/lang/Object.java
 
@@ -59,4 +59,5 @@ java/util/ListIterator.java
 java/util/Map.java
 java/util/Set.java
 java/io/IOException.java
+java/io/PrintStream.java
 java/io/Serializable.java
