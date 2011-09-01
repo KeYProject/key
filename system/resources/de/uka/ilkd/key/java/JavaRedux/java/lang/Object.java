@@ -9,7 +9,7 @@ public class Object {
     public /*@ pure @*/ Object() {}
     
 
-    public /*@ pure @*/ boolean equals(java.lang.Object o);
+    public /*@ pure @*/ boolean equals(/*@ nullable @*/ java.lang.Object o);
     public int hashCode();
 
     public java.lang.String toString();
