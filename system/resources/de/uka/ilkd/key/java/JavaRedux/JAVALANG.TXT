@@ -14,6 +14,9 @@
 
 # java.lang.Object has been modified manually!
 
+# The following files are takes from the jmlspecs repository and have been modified to fit KeY:
+# java.lang.System, java.util.Arrays
+
 java/lang/Object.java
 
 java/lang/annotation/Annotation.java
@@ -45,8 +48,10 @@ java/lang/Runnable.java
 java/lang/RuntimeException.java
 java/lang/String.java
 java/lang/StringBuffer.java
+java/lang/System.java
 java/lang/Thread.java
 java/lang/Throwable.java
+java/util/Arrays.java
 java/util/Collection.java
 java/util/Iterator.java
 java/util/List.java
