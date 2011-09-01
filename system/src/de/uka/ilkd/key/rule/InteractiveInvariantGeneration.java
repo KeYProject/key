@@ -1,11 +1,45 @@
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.swing.JOptionPane;
+
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.java.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.reference.TypeRef;
+import de.uka.ilkd.key.java.statement.MethodFrame;
+import de.uka.ilkd.key.java.statement.While;
+import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.metaconstruct.WhileInvRule;
+import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.speclang.LoopInvariantImpl;
+import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.speclang.LoopInvariant;
 
 public class InteractiveInvariantGeneration implements Rule, BuiltInRule {
 
@@ -47,7 +81,59 @@ public class InteractiveInvariantGeneration implements Rule, BuiltInRule {
                 if (!Main.getInstance().mediator().autoMode()) {
                         return false;
                 } else {
-                        if (true) {
+                        //Check if While Rule is applicable
+                        WhileInvariantRule WIR = WhileInvariantRule.INSTANCE;
+                        if (WIR.checkApplicability(goal, pio)) {
+                                
+                                
+                             // leading update?
+                                Pair<Term, Term> update = WIR.applyUpdates(pio.subTerm());
+                                final Term u = update.first;
+                                final Term progPost = update.second;
+                                
+                                
+                                // active statement must be while loop
+                                SourceElement activeStatement = MiscTools.getActiveStatement(progPost.javaBlock());
+
+                                Services services = goal.proof().getServices();
+                                final While loop = (While) activeStatement;
+                                LoopInvariant inv = services.getSpecificationRepository()
+                                                .getLoopInvariant(loop);
+
+                                //The invariant could be nonexistent
+                                if (inv == null) {
+                                        inv = new LoopInvariantImpl(
+                                                        loop,
+                                                        MiscTools
+                                                                        .getInnermostMethodFrame(
+                                                                                        progPost
+                                                                                                        .javaBlock(),
+                                                                                        services) == null ? null
+                                                                        : MiscTools
+                                                                                        .getSelfTerm(
+                                                                                                        MiscTools
+                                                                                                                        .getInnermostMethodFrame(
+                                                                                                                                        progPost
+                                                                                                                                                        .javaBlock(),
+                                                                                                                                        services),
+                                                                                                        services),
+                                                        (Term) null);
+                                }
+                                
+                                //Check wether termination must be proved
+                                boolean requiresVariant = false;
+                                // Check if a variant is required
+                                if (progPost.op() == Modality.DIA) {
+                                        requiresVariant = true;
+                                }
+                                        
+                                        
+                              //Get the new invariantloopInvariant
+                                inv = Main.getInstance().getLoopInvariant(inv, services, requiresVariant);
+                                
+                                //the new Invariant is put into spec repos
+                                services.getSpecificationRepository().setLoopInvariant(inv);
+                                return true;                               
                                 
                         }
                 }

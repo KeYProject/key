@@ -131,9 +131,8 @@ public final class WhileInvariantRule implements BuiltInRule {
                                                                         requiresVariant);
                                 }
 
-
-                                        if(inv == null) {
-                                                Main.getInstance().mediator().setBack();
+                                if (inv == null) {
+                                        Main.getInstance().mediator().setBack();
 
                                 }
                         }
@@ -179,7 +178,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                 return result;
         }
 
-        private SourceElement getActiveStatement(final Term progPost) {
+        SourceElement getActiveStatement(final Term progPost) {
                 SourceElement activeStatement = MiscTools
                                 .getActiveStatement(progPost.javaBlock());
                 if (!(activeStatement instanceof While)) {
@@ -198,7 +197,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                 }
         }
 
-        private Pair<Term, Term> applyUpdates(Term focusTerm) {
+        protected Pair<Term, Term> applyUpdates(Term focusTerm) {
                 if (focusTerm.op() instanceof UpdateApplication) {
                         return new Pair<Term, Term>(UpdateApplication
                                         .getUpdate(focusTerm),
@@ -261,6 +260,20 @@ public final class WhileInvariantRule implements BuiltInRule {
 
         @Override
         public boolean isApplicable(Goal goal, PosInOccurrence pio) {
+                //Check if the rule would be applicable
+                checkApplicability(goal, pio);
+
+                // instantiation must succeed
+                if (Main.getInstance().mediator().autoMode()) {
+                        Instantiation inst = instantiate(pio.subTerm(), goal
+                                        .proof().getServices());
+                        return inst != null;
+                } else {
+                        return true;
+                }
+        }
+
+        protected boolean checkApplicability(Goal goal, PosInOccurrence pio) {
                 // focus must be top level succedent
                 if (pio == null || !pio.isTopLevel() || pio.isInAntec()) {
                         return false;
@@ -285,14 +298,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                         return false;
                 }
 
-                // instantiation must succeed
-                if (Main.getInstance().mediator().autoMode()) {
-                        Instantiation inst = instantiate(pio.subTerm(), goal
-                                        .proof().getServices());
-                        return inst != null;
-                } else {
-                        return true;
-                }
+                return true;
         }
 
         @Override

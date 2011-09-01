@@ -63,8 +63,8 @@ public class JavaProfile extends AbstractProfile {
                                    .prepend(UseDependencyContractRule.INSTANCE)
                                    .prepend(OneStepSimplifier.INSTANCE)
         			   //.prepend(PullOutConditionalsRule.INSTANCE)  // rule at the moment unsound
-        			   .prepend(QueryExpand.INSTANCE);
-        			   //.prepend(InteractiveInvariantGeneration.INSTANCE);
+        			   .prepend(QueryExpand.INSTANCE)
+        			   .prepend(InteractiveInvariantGeneration.INSTANCE);
   
         //contract insertion rule, ATTENTION: ProofMgt relies on the fact 
         // that Contract insertion rule is the FIRST element of this list!
