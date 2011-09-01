@@ -4280,11 +4280,12 @@ proofBody [ProblemLoader prl] :
     ;
 
 
-pseudosexpr [ProblemLoader prl] { char eid='0'; String str = null; } :
+pseudosexpr [ProblemLoader prl] { char eid='0'; String str = ""; } :
         LPAREN (eid=expreid
-            (str = string_literal { prl.beginExpr(eid,str); } )? 
+            (str = string_literal )? 
+               { prl.beginExpr(eid,str); } 
             ( pseudosexpr[prl] )* ) ?
-        { prl.endExpr(eid, stringLiteralLine); }
+               { prl.endExpr(eid, stringLiteralLine); }
         RPAREN   
     ;
 

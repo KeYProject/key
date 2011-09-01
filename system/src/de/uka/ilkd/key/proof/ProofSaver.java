@@ -242,14 +242,16 @@ public class ProofSaver {
          tree.append(prefix);            
          String branchLabel = child.getNodeInfo().getBranchLabel();
          
+         // The branchLabel is ignored when reading in the proof,
+         // print it if we have it, ignore it otherwise. (MU)
          if (branchLabel == null) {
-            // This check is related to bug #1099  
-            System.err.println("(null) branchlabel for node " + child);
-            branchLabel = "THIS_LABEL_WAS_MISSING";
+             tree.append("(branch\n");
+         } else {
+             tree.append("(branch \"" + escapeCharacters(branchLabel) + "\"\n");
          }
-         tree.append("(branch \" " + escapeCharacters(branchLabel) + "\"\n");
-	 collectProof(child, prefix+"   ", tree);
-         tree.append(prefix+")\n");
+         
+         collectProof(child, prefix + "   ", tree);
+         tree.append(prefix + ")\n");
       }
 
       return tree;
