@@ -11,6 +11,7 @@
 package de.uka.ilkd.key.smt;
 
 import java.util.Collection;
+
 import de.uka.ilkd.key.rule.Taclet;
 
 public interface SMTSettings {
@@ -89,5 +90,6 @@ public interface SMTSettings {
      * are not supported) a constant should be introduced.
      */
     public boolean useAssumptionsForBigSmallIntegers();
+  
 
 }

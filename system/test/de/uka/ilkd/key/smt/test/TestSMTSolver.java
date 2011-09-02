@@ -15,11 +15,8 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 
-
 import junit.framework.Assert;
-
 import de.uka.ilkd.key.gui.configuration.PathConfig;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -27,7 +24,6 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SMTSolverResult;
 import de.uka.ilkd.key.smt.SolverLauncher;
-
 import de.uka.ilkd.key.smt.SolverType;
 
 class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings{
@@ -93,6 +89,7 @@ class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings{
     public boolean useUninterpretedMultiplicationIfNecessary() {
 	return false;
     }
+
     
 }
 

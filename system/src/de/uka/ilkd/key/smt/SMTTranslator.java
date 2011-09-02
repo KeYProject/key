@@ -10,6 +10,8 @@
 
 package de.uka.ilkd.key.smt;
 
+import java.util.Collection;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 
@@ -17,9 +19,6 @@ import de.uka.ilkd.key.logic.Term;
 
 public interface SMTTranslator {
 
-    public static enum TERMPOSITION {ANTECEDENT, SUCCEDENT}
-    
-    
     
     /**
      * Translates a problem into the given syntax. The only difference to
@@ -34,15 +33,9 @@ public interface SMTTranslator {
            throws IllegalFormulaException;
     
 
-    
     /**
-     * Translate a term into the given syntax.
-     * @param t The term to translate.
-     * @param services a service wrapper object.
-     * @return A StringBuffer, representing the term in the given syntax.
-     * @throws IllegalArgumentException if the term is not of type FORMULA or could not be translated.
+     * Returns all exceptions that have occurred while translating the taclets.
      */
-    public StringBuffer translate(Term t, Services services, SMTSettings settings) 
-    		throws IllegalFormulaException;
+    public Collection<Throwable> getExceptionsOfTacletTranslation();
 
 }

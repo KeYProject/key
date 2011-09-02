@@ -108,12 +108,32 @@ public class SolverListener implements SolverLauncherListener {
                                 
 
                         }
-                        addInformation("Translation",solver.getTranslation());
-                        if(solver.getTacletTranslation() != null){
-                                addInformation("Taclets",solver.getTacletTranslation().toString());
+                        addInformation("Translation", solver.getTranslation());
+                        if (solver.getTacletTranslation() != null) {
+                                addInformation("Taclets", solver
+                                                .getTacletTranslation()
+                                                .toString());
                         }
-                        addInformation("Solver Output",solver.getSolverOutput());
-                     
+                        addInformation("Solver Output",
+                                        solver.getSolverOutput());
+
+                        Collection<Throwable> exceptionsOfTacletTranslation = solver
+                                        .getExceptionsOfTacletTranslation();
+                        if (!exceptionsOfTacletTranslation.isEmpty()) {
+                                String exceptionText = "The following exceptions have ocurred while translating the taclets:\n\n";
+                                int i = 1;
+                                for (Throwable e : exceptionsOfTacletTranslation) {
+                                        exceptionText += i + ". "
+                                                        + e.getMessage();
+                                        StringWriter sw = new StringWriter();
+                                        PrintWriter pw = new PrintWriter(sw);
+                                        e.printStackTrace(pw);
+                                        exceptionText += "\n\n" + sw.toString();
+                                        exceptionText += "\n #######################\n\n";
+                                        i++;
+                                }
+                                addInformation("Warning", exceptionText);
+                        }
                         return solver.getException() != null;
                 }
                 

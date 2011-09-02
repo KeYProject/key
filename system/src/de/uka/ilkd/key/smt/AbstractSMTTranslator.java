@@ -171,7 +171,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         /** Formulae made of taclets, used for assumptions. */
         private TacletSetTranslation tacletSetTranslation = null;
 
-        // private Collection<Taclet> taclets= new LinkedList<Taclet>();
+        private Collection<Throwable> exceptionsForTacletTranslation= new LinkedList<Throwable>();
 
         /**
          * Assumptions made of taclets - the translation of
@@ -243,38 +243,10 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 return buildComplText(services, hb, settings);
         }
 
-        /**
-         * Translate a term into the given syntax.
-         * 
-         * @param t
-         *                The term to translate.
-         * @param services
-         *                a service wrapper object.
-         * @return A StringBuffer, representing the term in the given syntax.
-         * @throws IllegalArgumentException
-         *                 if the term is not of type FORMULA or could not be
-         *                 translated.
-         */
-        public final StringBuffer translate(Term t, Services services,
-                        SMTSettings settings) throws IllegalArgumentException {
-                smtSettings = settings;
-                // check, if the term is of type formula. Otherwise a
-                // translation does not make sense
-                if (t.sort() != Sort.FORMULA) {
-                        throw new IllegalArgumentException(
-                                        "The given Term is not Type of Formula");
-                }
-                // translate
-                try {
-                        StringBuffer form;
-                        form = translateTerm(t,
-                                        new Vector<QuantifiableVariable>(),
-                                        services);
-                        return buildComplText(services, form, settings);
-                } catch (IllegalFormulaException e) {
-                        throw new IllegalArgumentException(
-                                        "Illegal formula. Can not be translated");
-                }
+
+        @Override
+        public Collection<Throwable> getExceptionsOfTacletTranslation() {
+                 return exceptionsForTacletTranslation;
         }
 
         protected final SMTSettings getSettings() {
@@ -952,7 +924,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         private StringBuffer getNameForIntegerConstant(Services services,
                         long integer) {
                 String val = Long.toString(integer);
-                val = integer < 0 ? "min" + val.substring(1) : val;
+                val = integer < 0 ? "negative_value" : "positive_value";
                 return new StringBuffer(TermBuilder.DF.newName(services, "i")
                                 + "_" + val);
 
@@ -1630,32 +1602,32 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                         elseterm = this.castIfNeccessary(elseterm,
                                         iteTerm.sub(2).sort(), iteTerm.sort());
                 }
-                try {
+                //try {
                         return this.translateTermIfThenElse(cond, ifterm,
                                         elseterm);
-                } catch (IllegalFormulaException e) {
-                        // the translation of if then else for terms is not
-                        // supported, so use default implementation
-                        // invent a new constant
-                        LogicVariable c = new LogicVariable(
-                                        new Name("iteConst"), iteTerm.sort());
-                        // translate the constant
-                        Term t = TermBuilder.DF.var(c);
-                        StringBuffer cstr = this.translateTerm(t,
-                                        quantifiedVars, services);
-                        // build an assumption used to specify how c can be used
-                        StringBuffer assump = this.translateObjectEqual(cstr,
-                                        ifterm);
-                        assump = this.translateLogicalImply(cond, assump);
-                        StringBuffer temp = this.translateObjectEqual(cstr,
-                                        elseterm);
-                        temp = this.translateLogicalImply(
-                                        this.translateLogicalNot(cond), temp);
-                        assump = this.translateLogicalAnd(assump, temp);
-                        this.assumptions.add(assump);
-
-                        return cstr;
-                }
+//                } catch (IllegalFormulaException e) {
+//                        // the translation of if then else for terms is not
+//                        // supported, so use default implementation
+//                        // invent a new constant
+//                        LogicVariable c = new LogicVariable(
+//                                        new Name("iteConst"), iteTerm.sort());
+//                        // translate the constant
+//                        Term t = TermBuilder.DF.var(c);
+//                        StringBuffer cstr = this.translateTerm(t,
+//                                        quantifiedVars, services);
+//                        // build an assumption used to specify how c can be used
+//                        StringBuffer assump = this.translateObjectEqual(cstr,
+//                                        ifterm);
+//                        assump = this.translateLogicalImply(cond, assump);
+//                        StringBuffer temp = this.translateObjectEqual(cstr,
+//                                        elseterm);
+//                        temp = this.translateLogicalImply(
+//                                        this.translateLogicalNot(cond), temp);
+//                        assump = this.translateLogicalAnd(assump, temp);
+//                        this.assumptions.add(assump);
+//
+//                        return cstr;
+//                }
         }
 
         private void addConstantTypePredicate(Term term, StringBuffer name) {
@@ -2553,13 +2525,11 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                                         services);
                                         result.add(term);
 
-                                } catch (IllegalNumberException e) {
-                                        // don't interrupt the translation,
-                                        // because only one taclet
-                                        // cannot be translated. This exception
-                                        // can occur if the translator
-                                        // tries to translate numbers that are
-                                        // not supported.
+                                } catch (Throwable e) {
+                                
+                                      exceptionsForTacletTranslation.add(
+                                                       new RuntimeException("Could not translate taclet "+tf.getTaclet().name()
+                                                       , e));
                                 }
 
                         }

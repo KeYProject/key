@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -111,6 +112,8 @@ final class SMTSolverImplementation implements SMTSolver, Runnable {
          * this attribute
          */
         private Throwable exception;
+        
+        private Collection<Throwable> exceptionsForTacletTranslation = new LinkedList<Throwable>();
 
         private String solverOutput[] = null;
 
@@ -434,11 +437,13 @@ final class SMTSolverImplementation implements SMTSolver, Runnable {
 
                 SMTTranslator trans = getType().getTranslator(services);
                 // instantiateTaclets(trans);
-
+         
                 problemString = trans.translateProblem(term, services,
                                 smtSettings).toString();
+            
                 tacletTranslation = ((AbstractSMTTranslator) trans)
                                 .getTacletSetTranslation();
+                exceptionsForTacletTranslation.addAll(trans.getExceptionsOfTacletTranslation());
                 return translateToCommand(problemString);
         }
 
@@ -492,6 +497,12 @@ final class SMTSolverImplementation implements SMTSolver, Runnable {
                         i++;
                 }
                 return s;
+        }
+
+        @Override
+        public Collection<Throwable> getExceptionsOfTacletTranslation() {
+                
+                return exceptionsForTacletTranslation;
         }
 
 }
