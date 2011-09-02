@@ -588,6 +588,14 @@ TOKEN :
   >
 }
 
+// Token for JML embedding of JavaDL functions:
+TOKEN :
+{
+ < DL_EMBEDDED_FUNCTION:
+    "\\dl_" <LETTER> (<LETTER>|<DIGIT>)* 
+ >
+}
+
 
 
 /* SEPARATORS */
@@ -2668,6 +2676,8 @@ Expression UnaryExpression() :
   result = UnaryExpressionNotPlusMinus()
 |
   result = ADTGetter()
+|
+  result = EmbeddedDLExpression()
 )
   { 
     checkConstruction(result);
@@ -3207,6 +3217,28 @@ Expression ADTConstructor() :
       setPostfixInfo(result);
       return result;
   }
+}
+
+Expression EmbeddedDLExpression() :
+{
+   List<Expression> arguments = new ArrayList<Expression>();
+   Expression expr;
+   Token t;
+}
+{
+    t=<DL_EMBEDDED_FUNCTION> "(" 
+      (
+        expr = Expression() { arguments.add(expr); }
+        ( "," expr = Expression() { arguments.add(expr); } )*
+      )?  ")"
+      
+    { 
+      // strip leading "\dl_"
+      String functionName = t.image.substring(4);
+      DLEmbeddedExpression result = new DLEmbeddedExpression(functionName, arguments);
+      setPrefixInfo(result);
+      return result;
+    }
 }
 
 PrimarySuffixReturnValue PrimarySuffix() :

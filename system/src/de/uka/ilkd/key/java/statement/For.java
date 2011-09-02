@@ -75,15 +75,6 @@ public class For extends LoopStatement implements VariableScope {
     }
 
     /**
-     *      Is exit condition.
-     *      @return the boolean value.
-     */
-
-    public boolean isExitCondition() {
-        return false;
-    }
-
-    /**
      *      Is checked before iteration.
      *      @return the boolean value.
      */

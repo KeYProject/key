@@ -56,7 +56,7 @@ public class SeqIndexOf extends Operator {
 
     @Override
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
-        return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT);
+        return javaServ.getJavaInfo().getPrimitiveKeYJavaType(PrimitiveType.JAVA_INT);
     }
 
 

@@ -196,6 +196,11 @@ public abstract class JavaASTVisitor extends JavaASTWalker
     @Override
     public void performActionOnSeqReverse(SeqReverse x) {
 	doDefaultAction(x);
+    } 
+    
+    @Override
+    public void performActionOnDLEmbeddedExpression(DLEmbeddedExpression x) {
+        doDefaultAction(x);
     }
     
 

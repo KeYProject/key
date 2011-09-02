@@ -206,7 +206,7 @@ public class Recoder2KeY implements JavaReader {
 
         this.servConf = servConf;
         this.mapping = rec2key;
-        this.converter = makeConverter();
+        this.converter = makeConverter(services, nss);
         this.typeConverter = new Recoder2KeYTypeConverter(services, tc, nss, this);
         
         // set up recoder:
@@ -223,11 +223,14 @@ public class Recoder2KeY implements JavaReader {
     /**
      * create the ast converter. This is overwritten in SchemaRecoder2KeY to use
      * schema-aware converters.
+     * @param services 
+     * 
+     * @param nss the namespaces provided to the constructor 
      * 
      * @return a newley created converter
      */
-    protected Recoder2KeYConverter makeConverter() {
-        return new Recoder2KeYConverter(this);
+    protected Recoder2KeYConverter makeConverter(Services services, NamespaceSet nss) {
+        return new Recoder2KeYConverter(this, services, nss);
     }
 
     /**

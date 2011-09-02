@@ -341,7 +341,8 @@ public final class LogicPrinter {
      *           The Taclet to be pretty-printed.
      */
     public void printTaclet(Taclet taclet) {
-        printTaclet(taclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true, false);
+        // the last argument used to be false. Changed that - M.Ulbrich
+        printTaclet(taclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true, true); 
     }
 
     protected void printAttribs(Taclet taclet) throws IOException{

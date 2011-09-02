@@ -1,12 +1,6 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// Copyright (C) 2011 Daniel Bruns
+// Published under Modified BSD License
+// See LICENSE for details.
 
 
 package vacid0.redblacktree;
@@ -26,51 +20,49 @@ package vacid0.redblacktree;
  */
 public class RedBlackTree implements AbstractMap {
 
-    private int deefolt;
-    //@ represents defaultValue = deefolt;
+    final private int deefolt;
+    //@ private represents defaultValue = deefolt;
 
     private Node root;
-    //@ invariant !root.isRed;
-    //@ invariant root.parent == Node.NIL;
-    
-    //@ invariant root.redBlackInvariant;
+    /*@ private invariant !root.isRed;
+      @ private invariant root.parent == Node.NIL;
+      @ private invariant root.redBlackInvariant;
+      @ private invariant Node.NIL.staticInv;
+      @*/
 
-    /*@ represents contents \such_that (\forall int i; 0 <= i;
+    //@ private ghost \seq theNodes;
+    //@ private invariant (\forall Node x; \contains(theNodes,x) <==> \contains(root.subtree,x));
+
+    /*@ private represents contents \such_that (\forall int i; 0 <= i && i < contents.length;
       @            contents[i] == (get(i) == Node.NIL ? deefolt : get(i).value));
+      @ private represents footprint = theNodes, root, root.treeFootprint;
+      @ accessible contents : \singleton(theNodes);
+      @ accessible \inv : footprint;
+      @ accessible footprint : footprint;
       @*/
     
-    //@ ghost \seq theNodes;
     
     /** Constructs RB tree with default value.
      * @param d default value */
-    public RedBlackTree (int d){
-        //@ set theNodes = \seq_empty;
+    /*@ normal_behavior
+      @ requires Node.NIL.staticInv;
+      @ ensures deefolt == d && root == Node.NIL;
+      @ ensures theNodes == \seq_empty;
+      @ ensures \fresh(footprint);
+      @*/
+    public /*@ pure @*/ RedBlackTree (int d){
         deefolt = d;
+        //@ set theNodes = \seq_empty;
         root = Node.NIL;
     }
     
 
-    // specified by interface
-    public void replace (int key, int value){
-        Node x = get(key);
-        if (x == Node.NIL) {
-            final  Node n = new Node(key,value);
-            //@ set theNodes = \seq_concat(theNodes,\seq_singleton(n));
-            insert(n);
-            insertFix(n);
-        }
-        else x.value = value;  
-    }
-
-    // specified by interface
-    public void remove (int key){
-        final Node n = get(key);
-        if (n != Node.NIL) {
-            //@ set theNodes = \seq_concat(\seq_sub(theNodes,0,\indexOf(theNodes,n) -1),\seq_sub(theNodes,\indexOf(theNodes,n)+1, \seq_length(theNodes)-1));
-            delete(n);
-        }
-    }
-
+    /*@ normal_behavior
+      @ requires \contains(theNodes,z);
+      @ ensures theNodes == \old(\seq_concat(\seq_sub(theNodes, 0, \indexOf(theNodes,z)-1),\seq_sub(theNodes, \indexOf(theNodes,z)+1, theNodes.length-1)));
+      @ ensures footprint == \old(\set_minus(footprint, z.footprint));
+      @ assignable footprint;
+      @*/
     private void delete(Node z) {
         Node y = (z.left == Node.NIL || z.right == Node.NIL) ? z : treeSuccessor(z);
         Node x = (y.left != Node.NIL) ? y.left : y.right;
@@ -85,14 +77,31 @@ public class RedBlackTree implements AbstractMap {
         if (y != z) {
             z.key = y.key;
         }
+        //TODO set height
+        /*@ ghost int idx;
+          @ set idx = \indexOf(theNodes,z);
+          @ set theNodes = \seq_concat(\seq_sub(theNodes, 0, idx-1),\seq_sub(theNodes, idx+1, \seq_length(theNodes)-1));
+          @*/
         if (!y.isRed){
             deleteFix(x);
         }
     }
 
-
+    /*@ normal_behavior
+      @ requires !x.parent.isRed && x.parent != Node.NIL;
+      @ requires \invariant_for(x.parent) && x.redBlackInvariant;
+      @ ensures \invariant_for(this);
+      @ ensures footprint == \old(footprint);
+      @ ensures theNodes == \old(theNodes);
+      @ assignable footprint;
+      @*/
     private /*@ helper @*/ void deleteFix(Node x) {
         Node w;
+        /*@ maintaining x.redBlackInvariant;
+          @ maintaining \invariant_for(root);
+          @ maintaining footprint == \old(footprint);
+          @ decreasing root.height - x.height;
+          @*/
         while (x != root && !x.isRed){
             if (x == x.parent.left) {
                w = x.parent.right;
@@ -148,22 +157,11 @@ public class RedBlackTree implements AbstractMap {
     }
 
 
-    private /*@ helper @*/ Node treeSuccessor(Node z) {
-        // TODO not documented in Cormen et al.
-        return null;
-    }
 
-
-    // specified by interface
-    public int lookup (int key){
-        Node x = get(key);
-        if (x == Node.NIL)
-            return deefolt;
-        else return x.value;
-    }
-    
-    //@ requires true;
-    //@ ensures (\exists int i; 0 <= i && i < theNodes.length; ((Node)theNodes[i]).key == key) ? \result.key == key : \result == Node.NIL;
+    /*@ normal_behavior
+      @ ensures (\exists Node n; \contains(theNodes,n) && n.key == key ==> \result == n);
+      @ ensures !(\exists Node n; \contains(theNodes,n) && n.key == key) ==> \result == Node.NIL; 
+      @*/
     private /*@ pure @*/ Node get(int key){
         Node x = root;
         //@ ghost \seq visited = \seq_empty;
@@ -171,7 +169,10 @@ public class RedBlackTree implements AbstractMap {
         /*@ decreasing x.height;
           @ maintaining 0 <= x.height && x.height <= root.height;
           @ maintaining (\forall int i; 0 <= i && i < visited.length; ((Node)visited[i]).key != key);
+          @ maintaining (\forall Node n; \contains(visited,n); \contains(theNodes,n));
+          @ maintaining \invariant_for(x);
           @*/
+        // XXX still to weak, need to say something about ordering of keys
         while (x != Node.NIL && x.key != key){
             //@ set visited = \seq_concat(visited,\singleton(x));
             if (key < x.key)
@@ -180,7 +181,8 @@ public class RedBlackTree implements AbstractMap {
         }
         return x;
     }
-   
+
+
     /** Inserts a node into the tree.
      * The node is first inserted in an appropriate position (according to its key)
      * and colored red. In a second step, the red-black properties are restored
@@ -188,12 +190,10 @@ public class RedBlackTree implements AbstractMap {
      * @param z node to be inserted
      */
     /*@ normal_behavior
-      @ requires z != Node.NIL;
-      @ requires \invariant_for(this);
-      @ ensures root == z <==> root.isRed;
-      @ ensures z.redBlackInvariant && z.isRed;
-      @ assignable root, z.parent;
-      @ helper
+      @ requires z != Node.NIL && z.staticInv && z != null && z.key >= 0;
+      @ requires !\contains(theNodes,z);
+      @ ensures theNodes == \seq_concat(\old(theNodes),\seq_singleton(z));
+      @ assignable root, z.parent, z.isRed, theNodes;
       @*/
     private void insert (Node z){
         Node x = root;
@@ -202,6 +202,7 @@ public class RedBlackTree implements AbstractMap {
           @ decreasing x.height;
           @*/
         while (x != Node.NIL){
+            //TODO set x.height
             y = x;
             if (z.key < x.key)
                 x = x.left;
@@ -215,16 +216,21 @@ public class RedBlackTree implements AbstractMap {
             y.left = z;
         else y.right = z;
         z.isRed = true;
+        //@ set theNodes = \seq_concat(theNodes,\seq_singleton(z));
+        insertFix(z);
     }
 
 
     /** &quot;Repairs&quot; the tree so red-black properties hold again; */
     /*@ normal_behavior
-      @   requires z != Node.NIL && \invariant_for(z);
+      @   requires z != Node.NIL && z.redBlackInvariant;
       @   requires \invariant_for(z.parent);
       @   requires z.isRed;
       @   requires root == z <==> root.isRed;
+      @   assignable footprint;
+      @   ensures footprint == \old(footprint);
       @   ensures \invariant_for(this);
+      @   ensures theNodes == \old(theNodes);
       @ helper
       @*/
     private void insertFix(Node z) {
@@ -232,6 +238,7 @@ public class RedBlackTree implements AbstractMap {
           @ maintaining z.parent == root ==> !z.parent.isRed;
           @ maintaining z.redBlackInvariant;
           @ maintaining z.parent == z.parent.parent.left ? z.parent.parent.right.redBlackInvariant : z.parent.parent.left.redBlackInvariant;
+          @ maintaining footprint == \old(footprint);
           @ decreasing root.height - z.height;
           @*/
         while (z.parent.isRed) {
@@ -272,6 +279,7 @@ public class RedBlackTree implements AbstractMap {
         root.isRed = false;
     }
 
+
     /*@ normal_behavior
       @   requires x != Node.NIL && x.right != Node.NIL && \invariant_for(x);
       @   ensures x.parent == \old(x.right) && x.right == \old(x.right.left);
@@ -281,10 +289,10 @@ public class RedBlackTree implements AbstractMap {
       @   ensures \invariant_for(x.parent);
       @   assignable root, x.parent, x.parent.left, x.parent.right, x.right, x.right.parent, x.right.left, x.height, x.right.height;
       @ also normal_behavior
-      @   requires x != Node.NIL && x.right != Node.NIL;
+      @   requires x != Node.NIL && x.right == Node.NIL;
       @   assignable \nothing;
       @*/
-    private /*@ helper @*/ void leftRotate (Node x){
+    private /*@ spec_public helper @*/ void leftRotate (Node x){
         Node y = x.right;
         Node p = x.parent;
         if (y != Node.NIL) {
@@ -302,6 +310,33 @@ public class RedBlackTree implements AbstractMap {
                 else p.right = y;
             }
         }
+    }
+    
+    // specified by interface
+    public int lookup (int key){
+        Node x = get(key);
+        if (x == Node.NIL)
+            return deefolt;
+        else return x.value;
+    }
+   
+    // specified by interface
+    public void remove (int key){
+        final Node n = get(key);
+        if (n != Node.NIL) {
+            delete(n);
+        }
+    }
+
+
+    // specified by interface
+    public void replace (int key, int value){
+        Node x = get(key);
+        if (x == Node.NIL) {
+            final  Node n = new Node(key,value);
+            insert(n);
+        }
+        else x.value = value;  
     }
 
     /*@ normal_behavior
@@ -335,8 +370,32 @@ public class RedBlackTree implements AbstractMap {
         }
     }
     
-    // Standard methods (not relevant for verification)
+    /** Returns the left-most node of the right subtree. */
+    /*@ normal_behavior
+      @   requires z != Node.NIL && \invariant_for(z);
+      @   requires z.left != Node.NIL && z.right != Node.NIL;
+      @   ensures \result != Node.NIL && \result.left == Node.NIL;
+      @   ensures z.key < \result.key && \result.key <= z.right.key;
+      @   ensures \contains(z.right.subtree, \result);
+      @*/
+    private /*@ pure helper @*/ Node treeSuccessor(Node z) {
+      Node x = z.right;
+      /*@ maintaining z.key < x.key;
+        @ maintaining x != Node.NIL;
+        @ maintaining z == \old(z);
+        @ maintaining \invariant_for(x);
+        @ decreasing x.height;
+        @*/
+      while (x.left != Node.NIL){
+          x = x.left;
+      }
+      return x;
+    }
+    
+    
 
+    // Standard methods (not relevant for verification)
+    
     public boolean equals (Object o){
         try {
             RedBlackTree t = (RedBlackTree)o;
@@ -346,10 +405,10 @@ public class RedBlackTree implements AbstractMap {
             return false;
         }
     }
-    
+
     public String toString(){
         return new String(root.subtreeToString(0));
     }
-    
+ 
 
 }

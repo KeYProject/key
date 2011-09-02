@@ -146,12 +146,15 @@ SEQSUB : "\\seq_sub";
 SEQREVERSE : "\\seq_reverse";
 SEQREPLACE : "\\seq_put";
 INDEXOF : "\\indexOf";
+SEQCONTAINS : "\\contains"; // temp workaround as long as sets are not yet implemented
 
 MEASURED_BY : "\\measured_by";
 
 FROM : "\\from";
 TO : "\\to";
 IF : "\\if";
+
+DL_ESCAPE : "\\dl_"  LETTER  ( LETTERORDIGIT )*  ;
 
 EQV_ANTIV: "<==>" | "<=!=>";
 EQ_NEQ : "==" | "!=";
@@ -224,7 +227,6 @@ QUANTIFIER
         "\\sum"
     ;
 
-    
 protected
 LETTER
 options {

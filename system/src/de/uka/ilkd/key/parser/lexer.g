@@ -75,6 +75,7 @@ tokens {
 	ENUM_CONST = "\\enumConstant";	
         FREELABELIN = "\\freeLabelIn";
 	HASSORT = "\\hasSort";
+	FIELDTYPE = "\\fieldType";
 	ELEMSORT = "\\elemSort";        
 	ISARRAY="\\isArray";
 	ISARRAYLENGTH="\\isArrayLength";	

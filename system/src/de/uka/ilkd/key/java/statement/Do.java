@@ -60,14 +60,6 @@ public class Do extends LoopStatement {
     }
 
     /**
-     *      Is exit condition.
-     *      @return the boolean value.
-     */
-    public boolean isExitCondition() {
-        return false;
-    }
-
-    /**
      *      Is checked before iteration.
      *      @return the boolean value.
      */

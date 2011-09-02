@@ -29,6 +29,9 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
      */
 
     ImmutableList<T> prepend(ImmutableList<T> list);
+    
+    /** prepends an iterable collection */
+    ImmutableList<T> prepend(Iterable<T> collection);
 
     /** prepends array (O(n))
      * @param array the array of the elements to be prepended
@@ -46,8 +49,10 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
      * @param list the list to be appended
      * @return IList<T> this++list
      */
-
     ImmutableList<T> append(ImmutableList<T> list);
+    
+    /** appends an iterable collection */
+    ImmutableList<T> append(Iterable<T> collection);
 
     /** appends element at end (non-destructive) (O(n))
      * @param array the array to be appended

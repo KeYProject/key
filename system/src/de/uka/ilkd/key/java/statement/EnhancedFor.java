@@ -75,15 +75,6 @@ public class EnhancedFor extends LoopStatement implements VariableScope {
     }
 
     /**
-     * @see de.uka.ilkd.key.java.statement.For#isExitCondition()
-     * @see recoder.java.statement.LoopStatement#isExitCondition()
-     */
-    public boolean isExitCondition() {
-        // TODO (?)
-        return false;
-    }
-
-    /**
      * @see de.uka.ilkd.key.java.statement.For#isCheckedBeforeIteration
      * @see recoder.java.statement.LoopStatement#isCheckedBeforeIteration()
      */

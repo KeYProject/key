@@ -102,6 +102,25 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 	return res;
     }
 
+
+    @Override
+    public ImmutableList<T> append(Iterable<T> collection) {
+        ImmutableList<T> tmp = this;
+        for (T elem: collection){
+            tmp = tmp.append(elem);
+        }
+        return tmp;
+    }
+
+    @Override
+    public ImmutableList<T> prepend(Iterable<T> collection) {
+        ImmutableList<T> tmp = this;
+        for (T elem: collection){
+            tmp = tmp.prepend(elem);
+        }
+        return tmp;
+    }
+    
     /**
      * first <code>n</code> elements of the list are truncated
      * @param n an int specifying the number of elements to be truncated
@@ -430,7 +449,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 
         @Override
 	public boolean equals ( Object o ) {
-	    return o instanceof NIL;
+	    return o instanceof NIL<?>;
 	}
 
         @Override
@@ -447,7 +466,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 	public ImmutableList<S> prepend(ImmutableList<S> list) {
 	    return list;
 	}
-
+        
         @Override
 	public ImmutableList<S> append(S element) {
 	    return new Cons<S>(element);
@@ -536,7 +555,6 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 	    	" is not supported for immutable datastructures.");
 	    }
 	}
-
 
     }
 }

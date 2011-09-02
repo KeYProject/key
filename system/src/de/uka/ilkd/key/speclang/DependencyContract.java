@@ -12,9 +12,7 @@ package de.uka.ilkd.key.speclang;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 /**
@@ -22,14 +20,6 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
  * a precondition, a depends clause, and a measured-by clause.
  */
 public interface DependencyContract extends Contract {
-    
-    @Override
-    public DependencyContract setID(int id);
-        
-    @Override
-    public DependencyContract setTarget(KeYJavaType newKJT,
-	    	                        ObserverFunction newTarget,
-	    	                        Services services);
     
     /**
      * Returns the dependency set of the contract.

@@ -49,7 +49,6 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
             ImmutableSLList.<PositionedString>nil();
     private ImmutableList<PositionedString> declassifyVar =
             ImmutableSLList.<PositionedString>nil();
-    private PositionedString name = new PositionedString("");
 
 
     public TextualJMLSpecCase(ImmutableList<String> mods,
@@ -61,7 +60,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
 
     public void addName(PositionedString n) {
-        this.name = n;
+        this.name = n.text;
     }
 
 
@@ -210,7 +209,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
 
 
-    public PositionedString getName() {
+    public String getName() {
         return name;
     }
 

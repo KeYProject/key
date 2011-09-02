@@ -10,28 +10,20 @@
 
 package de.uka.ilkd.key.util;
 
-import de.uka.ilkd.key.collection.DefaultImmutableSet;
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.collection.ImmutableSet;
+import java.util.*;
+
+import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.Assignment;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.java.statement.CatchAllStatement;
-import de.uka.ilkd.key.java.statement.LabeledStatement;
-import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.java.visitor.CreatingASTVisitor;
-import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
+import de.uka.ilkd.key.java.reference.*;
+import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.visitor.*;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.rule.*;
 
 
@@ -439,6 +431,25 @@ public final class MiscTools {
 	return result;
     }
     
+    /**
+     * True if both are <code>null</code> or <code>a.equals(b)</code> with <code>equals</code> from type T.
+     */
+    public static <T> boolean equalsOrNull(T a, Object b){
+        if (a == null) {
+            return b == null;
+        } else {
+            return a.equals(b);
+        }
+    }
+    
+    public static <T> boolean equalsOrNull(T a, Object... bs){
+        boolean result = true;
+        for (Object b: bs){
+            result = result && equalsOrNull(a, b);
+        }
+        return result;
+    }
+    
     
     
     //-------------------------------------------------------------------------
@@ -530,5 +541,49 @@ public final class MiscTools {
              .replace("[", "(")
              .replace("]", ")");
         return s;
+    }
+
+    /**
+     * Join the string representations of a collection of objects into onw
+     * string. The individual elements are separated by a delimiter.
+     * 
+     * {@link Object#toString()} is used to turn the objects into strings.
+     * 
+     * @param collection
+     *            an arbitrary non-null collection
+     * @param delimiter
+     *            a non-null string which is put between the elements.
+     * 
+     * @return the concatenation of all string representations separated by the
+     *         delimiter
+     */
+    public static String join(Iterable<?> collection, String delimiter) {
+        StringBuilder sb = new StringBuilder();
+        for (Object obj : collection) {
+            if(sb.length() > 0) {
+                sb.append(delimiter);
+            }
+            sb.append(obj);
+        }
+        
+        return sb.toString();
+    }
+    
+    /**
+     * Join the string representations of an array of objects into one
+     * string. The individual elements are separated by a delimiter.
+     * 
+     * {@link Object#toString()} is used to turn the objects into strings.
+     * 
+     * @param collection
+     *            an arbitrary non-null array of objects
+     * @param delimiter
+     *            a non-null string which is put between the elements.
+     * 
+     * @return the concatenation of all string representations separated by the
+     *         delimiter
+     */
+    public static String join(Object[] collection, String delimiter) {
+        return join(Arrays.asList(collection), delimiter);
     }
 }

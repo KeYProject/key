@@ -1,12 +1,6 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// Copyright (C) 2011 Daniel Bruns
+// Published under Modified BSD License
+// See LICENSE for details.
 
 
 package vacid0.redblacktree;
@@ -23,61 +17,79 @@ package vacid0.redblacktree;
 public class Node {
 
     final static Node NIL = new Nil();
-    //@ axiom NIL != null; // static invariants not yet supported
-    //@ axiom (\forall Nil x; x == NIL);
+    /*@ protected model boolean staticInv;
+      @ protected represents staticInv = 
+      @            NIL != null &&
+      @            (\forall Nil x; x == NIL) &&
+      @            this != NIL ==> \typeof(this) == \type(Node);
+      @ accessible staticInv : \nothing;
+      @*/
 
     boolean isRed;
     int key;
     int value;
     
-    //@ ghost int height;
+    //@ protected ghost int height;
 
     Node parent, left, right;
     
-    //@ model \locset footprint;
-    //@ represents footprint = isRed, key, value, parent, left, right, height;
-    //@ accessible footprint : footprint;
+    /*@ protected model \seq subtree;
+      @ represents subtree = \seq_concat(\seq_singleton(this), \seq_concat(left.subtree, right.subtree));
+      @ accessible subtree : treeFootprint \measured_by height;
+      @*/
+    
+    /*@ protected model int blackHeight;
+      @ represents blackHeight \such_that
+      @             redBlackInvariant ==> blackHeight == left.blackHeight + (isRed?0:1);
+      @ accessible blackHeight : treeFootprint \measured_by height;
+      @*/
+    
+    /*@ protected model \locset footprint;
+      @ represents footprint = this.*;
+      @ accessible footprint : \nothing;
+      @ protected model \locset treeFootprint;
+      @ represents treeFootprint = footprint, left.treeFootprint, right.treeFootprint;
+      @ accessible treeFootprint : treeFootprint \measured_by height;
+      @*/
 
     // the red-black tree properties (`high-level' invariants)
-    /*@ model boolean redBlackInvariant;
-      @ represents redBlackInvariant \such_that
-      @        (left == NIL || left.key < key) && (right == NIL || right.key > key)
-      @     && (isRed ==> !(left.isRed || right.isRed))
-      @     && left.blackLeft() == right.blackRight()
-      @     && (this == NIL || (left.redBlackInvariant && right.redBlackInvariant))
+    /*@ protected model boolean redBlackInvariant;
+      @ represents redBlackInvariant =
+      @        (isRed ==> !(left.isRed || right.isRed))
+      @     && left.blackHeight == right.blackHeight
+      @     && left.redBlackInvariant && right.redBlackInvariant
       @     && \invariant_for(this);
-      @ accessible redBlackInvariant : footprint, left.footprint, right.footprint \measured_by height;
+      @ accessible redBlackInvariant : treeFootprint \measured_by height;
       @*/
     
 
     // `low-level' invariants
-    //@ invariant parent == NIL || parent.left == this || parent.right == this;
-    //@ invariant key >= 0;
-    //@ invariant height == (this == NIL ? 0 :(left.height > right.height ? left.height : right.height)+1);
-    //@ invariant \invariant_for(left) && \invariant_for(right);
-    //@ accessible \inv : footprint, left.footprint, right.footprint \measured_by height;
+    /*@ invariant parent == NIL || parent.left == this || parent.right == this;
+      @ invariant key >= 0 && (left == NIL || left.key < key) && (right == NIL || right.key > key);
+      @ invariant height >= 0 && height == (left.height > right.height ? left.height : right.height)+1;
+      @ invariant \disjoint(footprint, left.treeFootprint) && \disjoint(footprint, right.treeFootprint);
+      @ invariant \invariant_for(left) && \invariant_for(right);
+      @ invariant staticInv;
+      @ accessible \inv : treeFootprint \measured_by height;
+      @*/
 
-    //@ requires key >= 0;
+    /*@ normal_behavior
+      @ requires key >= 0;
+      @ requires NIL.staticInv;
+      @ ensures parent == NIL && left == NIL && right == NIL && this.key == key && this.value == value && !isRed;
+      @ ensures \fresh(footprint);
+      @ pure
+      @*/
     Node (int key, int value){
         parent = NIL;
         left = NIL;
         right = NIL;
+        //@ set height = 1;
         this.key = key;
         this.value = value;
     }
 
-    //@ helper
     private Node (){}
-
-    //@ measured_by height;
-    protected /*@ pure @*/ int blackLeft (){
-        return left.blackLeft()+(left.isRed?0:1);
-    }
-
-    //@ measured_by height;
-    protected /*@ pure @*/ int blackRight(){
-        return right.blackRight()+(right.isRed?0:1);
-    }
     
     
     // Standard method implementations (not relevant for verification)
@@ -133,8 +145,21 @@ public class Node {
      * NIL is always black.
      * @author bruns
      */
-    public final static class Nil extends Node {
-        //@ ensures true;
+    public final static /*@ pure @*/ class Nil extends Node {
+        /*@ represents footprint = \empty;
+          @ represents treeFootprint = \empty;
+          @ represents subtree = \seq_empty;
+          @ represents blackHeight = 0;
+          @ represents redBlackInvariant = true;
+          @ accessible footprint : \nothing;
+          @ accessible treeFootprint : \nothing;
+          @ accessible subtree : \nothing;
+          @ accessible blackHeight : \nothing;
+          @ accessible redBlackInvariant : \nothing;
+          @*/
+        
+        //@ invariant height == 0;
+        
         private Nil(){
             //@ set height = 0;
             parent = this;
