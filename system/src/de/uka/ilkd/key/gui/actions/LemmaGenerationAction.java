@@ -5,6 +5,7 @@ import java.io.File;
 import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.gui.ExceptionDialog;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.SimpleExceptionDialog;
 import de.uka.ilkd.key.gui.lemmatagenerator.FileChooser;
@@ -106,7 +107,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                 LoaderListener listener = new AbstractLoaderListener(mainWindow) {
                         @Override
                         public void stopped(Throwable exception) {
-                              handleException(exception);
+                                ExceptionDialog.showDialog(ProveKeYTaclets.this.mainWindow, exception);
                         }
 
                         @Override
@@ -124,7 +125,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                     
                     TacletSoundnessPOLoader loader = new TacletSoundnessPOLoader(
                                  listener,
-                                new LemmaSelectionDialog(),true,tacletLoader,true);
+                                new LemmaSelectionDialog(),true,tacletLoader);
                     loader.start();
 
             }
@@ -190,7 +191,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                 LoaderListener listener = new AbstractLoaderListener(mainWindow) {
                     @Override
                     public void stopped(Throwable exception) {
-                          throw new RuntimeException(exception);
+                            ExceptionDialog.showDialog(ProveUserDefinedTaclets.this.mainWindow, exception);
                     }
 
                     @Override
@@ -207,7 +208,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                 
                 TacletSoundnessPOLoader loader = new TacletSoundnessPOLoader(
                              listener,
-                            new LemmaSelectionDialog(),loadAsLemmata,tacletLoader,true);
+                            new LemmaSelectionDialog(),loadAsLemmata,tacletLoader);
                 loader.start();
 
             }
@@ -269,8 +270,8 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                 LoaderListener listener = new AbstractLoaderListener(mainWindow) {
                     @Override
                     public void stopped(Throwable exception) {
-                          throw new RuntimeException(exception);
-                    }
+                           ExceptionDialog.showDialog(ProveAndAddTaclets.this.mainWindow, exception);
+                     }
 
                     @Override
                     public void stopped(ProofAggregate p,
@@ -304,7 +305,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                 
                 TacletSoundnessPOLoader loader = new TacletSoundnessPOLoader(
                             listener,
-                            new LemmaSelectionDialog(),loadAsLemmata,tacletLoader,false);
+                            new LemmaSelectionDialog(),loadAsLemmata,tacletLoader,proof.env().getInitConfig());
                 loader.start();
 
             }

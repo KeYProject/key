@@ -113,7 +113,7 @@ public class SolverListener implements SolverLauncherListener {
                                 addInformation("Taclets",solver.getTacletTranslation().toString());
                         }
                         addInformation("Solver Output",solver.getSolverOutput());
-                        addInformation("Translation",solver.getTranslation());
+                     
                         return solver.getException() != null;
                 }
                 

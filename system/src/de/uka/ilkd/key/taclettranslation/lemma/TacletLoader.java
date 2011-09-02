@@ -88,10 +88,22 @@ public abstract class TacletLoader {
                         this.envForTaclets = env;
                 }
                
+               public TacletFromFileLoader(TacletFromFileLoader loader,InitConfig initConfig){
+                       this(loader.monitor,loader.listener,loader.problemInitializer,loader.profile,
+                            loader.fileForDefinitions,loader.fileForTaclets,loader.filesForAxioms,loader.envForTaclets,initConfig);
+               }
                
-
-
-
+               public TacletFromFileLoader(ProgressMonitor pm,
+                               ProblemInitializerListener listener,
+                               ProblemInitializer problemInitializer,
+                               Profile profile,
+                               File fileForDefinitions, File fileForTaclets,
+                               Collection<File> filesForAxioms,
+                               ProofEnvironment env, InitConfig config) {
+                       this(pm,listener,problemInitializer,profile,fileForDefinitions,fileForTaclets,filesForAxioms,env);
+                       this.initConfig = config;
+               }
+ 
 
                 public void prepare() {
                         KeYUserProblemFile keyFileDefs = new KeYUserProblemFile(
