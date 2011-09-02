@@ -16,8 +16,11 @@ my $automaticjavadl_txt = "automaticJAVADL.txt";
 my $not_provablejavadl_txt = "notProvableJavaDL.txt";
 # time out set to 20 minutes
 my $time_limit = 20*60; 
+
+# use the time command to print out runtime info
+my $time_command = "/usr/bin/time";
 # output of the time command
-my $time_format = "   user %U sec\n system %S sec\nelapsed %E sec\nMax. size %M kB\nAvg. size %t kB";
+my $time_format = '   user %U sec\n system %S sec\nelapsed %E sec\nMax. size %M kB\nAvg. size %t kB';
 
 
 chdir $bin_path;
@@ -166,7 +169,6 @@ sub prepare_file {
     close IN;
 }
 
-
 sub fileline {
     chop $_[0];
     return $_[0];
@@ -211,6 +213,8 @@ sub system_timeout {
 	# parent process, waiting for child
 	waitpid $child, 0;
 	my $result = ${^CHILD_ERROR_NATIVE};
+	# in case of a time out - wait a little for the process to finish
+	sleep 10 if $result & 0xff;
 	return $result;
     } else {
 	die "Error while forking!";
@@ -219,11 +223,8 @@ sub system_timeout {
  
 sub runAuto {
   my $dk = &getcwd . "/$_[0]";
-  sleep(2);
-
-
-  my $command = "time -f '$time_format' " . $absolute_bin_path . "/runProver $dk auto";
-#  print "Command is: $command\n";
+  my $command = "$time_command -f '$time_format' " . $absolute_bin_path . "/runProver $dk auto";
+  print "Command is: $command\n";
   my $result = &system_timeout($time_limit, $command);
 #  print "\nReturn value: $result\n";
   return $result;
