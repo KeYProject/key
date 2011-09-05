@@ -27,7 +27,7 @@ package java.lang;
  * @author Daniel Bruns
  */
 public  /*@ pure nullable_by_default @*/ final
-    class Integer /*extends Number*/ implements Comparable {
+    class Integer extends Number implements Comparable {
 
     //@ public ghost int theInteger;
     public static final int   MIN_VALUE = -2147483648;
