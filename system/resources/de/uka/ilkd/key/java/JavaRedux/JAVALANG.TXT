@@ -15,7 +15,7 @@
 # java.lang.Object has been modified manually!
 
 # The following files are takes from the jmlspecs repository and have been modified to fit KeY:
-# java.lang.System, java.util.Arrays, java.io.PrintStream
+# java.lang.Integer, java.lang.Number, java.lang.System, java.math.BigInteger, java.util.Arrays, java.io.PrintStream
 
 java/lang/Object.java
 
@@ -42,6 +42,7 @@ java/lang/LinkageError.java
 java/lang/NegativeArraySizeException.java
 java/lang/NoClassDefFoundError.java
 java/lang/NullPointerException.java
+java/lang/Number.java
 java/lang/NumberFormatException.java
 java/lang/VirtualMachineError.java
 java/lang/OutOfMemoryError.java
@@ -52,6 +53,7 @@ java/lang/StringBuffer.java
 java/lang/System.java
 java/lang/Thread.java
 java/lang/Throwable.java
+java/math/BigInteger.java
 java/util/Arrays.java
 java/util/Collection.java
 java/util/Iterator.java
