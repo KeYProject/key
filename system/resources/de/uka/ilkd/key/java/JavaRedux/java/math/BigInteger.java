@@ -41,14 +41,11 @@ public /*@ pure @*/ class BigInteger extends java.lang.Number implements java.la
  
     public BigInteger(String val);
 
-    //@ pure
-    public BigInteger(int numBits, Random rnd);
-
-    //@ pure
-    public BigInteger(int bitLength, int certainty, Random rnd);
-
-    public static /*@ pure @*/ BigInteger probablePrime(int bitLength,
-                                                          Random rnd);
+//    public BigInteger(int numBits, Random rnd);
+//    public BigInteger(int bitLength, int certainty, Random rnd);
+//
+//    public static /*@ pure @*/ BigInteger probablePrime(int bitLength,
+//                                                          Random rnd);
 
 //    boolean primeToCertainty(int certainty, java.util.Random r); // CHANGED in 1.6
 
@@ -60,8 +57,8 @@ public /*@ pure @*/ class BigInteger extends java.lang.Number implements java.la
     public static final BigInteger ZERO;
     public static final BigInteger ONE;
 
-    //@ public invariant ZERO != null && ZERO.equals(valueOf(0L));
-    //@ public invariant ONE != null && ONE.equals(valueOf(1L));
+    //@ public invariant ZERO != null && ZERO.equals(valueOf((long)0));
+    //@ public invariant ONE != null && ONE.equals(valueOf((long)1));
 
     // Arithmetic Operations
 
