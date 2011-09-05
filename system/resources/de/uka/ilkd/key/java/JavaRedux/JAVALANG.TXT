@@ -54,6 +54,7 @@ java/lang/System.java
 java/lang/Thread.java
 java/lang/Throwable.java
 java/math/BigInteger.java
+java/util/ArrayList.java
 java/util/Arrays.java
 java/util/Collection.java
 java/util/Iterator.java
