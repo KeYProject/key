@@ -53,7 +53,10 @@ public class Throwable extends java.lang.Object implements java.io.Serializable
      @*/
    public /*@strictly_pure*/ java.lang.String getMessage();
    
-   public java.lang.String getLocalizedMessage();
+   /*@ public normal_behavior
+     @   ensures true;
+     @*/ // XXX
+   public /*@ pure @*/ java.lang.String getLocalizedMessage();
       
    /*@ public normal_behavior
      @    ensures \result == cause;
