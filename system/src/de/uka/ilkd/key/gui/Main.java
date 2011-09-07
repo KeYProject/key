@@ -125,6 +125,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
+import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.smt.SMTProblem;
@@ -3133,7 +3134,7 @@ public final class Main extends JFrame implements IMain {
     
     public LoopInvariant getLoopInvariant(LoopInvariant loopInvariant,
 	    					Services service,
-	    					boolean requiresVariant) {
+	    					boolean requiresVariant) throws RuleAbortException {
 	return InvariantConfigurator.getInstance().getLoopInvariant(
 							loopInvariant,
 							service,
@@ -3141,7 +3142,7 @@ public final class Main extends JFrame implements IMain {
     }
 	
     public LoopInvariant getLoopInvariant(LoopInvariant loopInvariant,
-	    					Services service) {
+	    					Services service) throws RuleAbortException {
 	return InvariantConfigurator.getInstance().getLoopInvariant(
 							loopInvariant,
 							service,

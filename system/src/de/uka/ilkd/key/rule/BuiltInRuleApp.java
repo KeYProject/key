@@ -68,8 +68,15 @@ public class BuiltInRuleApp implements RuleApp {
      */
     @Override    
     public ImmutableList<Goal> execute(Goal goal, Services services) {
-	goal.addAppliedRuleApp(this);	
-	ImmutableList<Goal> result = builtInRule.apply(goal, services, this);
+	goal.addAppliedRuleApp(this);
+	ImmutableList<Goal> result = null;
+	try {
+	    result = builtInRule.apply(goal, services, this);
+	} catch (RuleAbortException e) {
+	    result = null;
+	} catch (Exception e) {
+	    result = null;
+    }
 	if (result == null)
 	    goal.removeAppliedRuleApp();
 	return result;

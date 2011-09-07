@@ -12,9 +12,6 @@ package de.uka.ilkd.key.rule;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.swing.JOptionPane;
-
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.Main;
@@ -63,7 +60,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         // internal methods
         // -------------------------------------------------------------------------
 
-        private Instantiation instantiate(Term focusTerm, Services services) {
+        private Instantiation instantiate(Term focusTerm, Services services) throws RuleAbortException {
                 // return last Instantiation if it is ok
                 if (checkLastInstantiation(focusTerm, services)) {
                         return lastInstantiation;
@@ -123,18 +120,19 @@ public final class WhileInvariantRule implements BuiltInRule {
                                                 || requiresVariant) {// Invariant
                                         // is
                                         // needed
+
+
                                         inv = Main
                                                         .getInstance()
                                                         .getLoopInvariant(
                                                                         inv,
                                                                         services,
                                                                         requiresVariant);
-                                }
+                                        
 
-                                if (inv == null) {
-                                        Main.getInstance().mediator().setBack();
 
                                 }
+
                         }
                 } else {
                         if (inv == null
@@ -262,12 +260,15 @@ public final class WhileInvariantRule implements BuiltInRule {
         public boolean isApplicable(Goal goal, PosInOccurrence pio) {
                 // Check if the rule would be applicable
                 if (checkApplicability(goal, pio)) {
-
-
                         if (Main.getInstance().mediator().autoMode()) {
                                 // instantiation must succeed
-                                Instantiation inst = instantiate(pio.subTerm(),
+                            Instantiation inst = null;
+                            try {
+                                inst = instantiate(pio.subTerm(),
                                                 goal.proof().getServices());
+                            } catch (Exception e) {
+                                return false;
+                            }
                                 return inst != null;
                         } else {
                                 return true;
@@ -305,7 +306,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
         @Override
         public ImmutableList<Goal> apply(Goal goal, Services services,
-                        RuleApp ruleApp) {
+                        RuleApp ruleApp) throws RuleAbortException {
                 final KeYJavaType booleanKJT = services.getTypeConverter()
                                 .getBooleanType();
                 final KeYJavaType intKJT = services

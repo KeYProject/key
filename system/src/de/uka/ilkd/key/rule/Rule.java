@@ -29,8 +29,9 @@ public interface Rule {
      * @param ruleApp the rule application to be executed
      * @return all open goals below \old(goal.node()), i.e. the goals
      * resulting from the rule application
+     * @throws Exception 
      */
-    ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp);
+    ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) throws Exception;
     
     /** 
      * the name of the rule
