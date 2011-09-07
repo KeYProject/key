@@ -4,6 +4,8 @@ import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
@@ -101,9 +103,9 @@ public class InvariantConfigurator {
             
             
             //Creates a new Printer, pretty Syntax cannot be parsed up to now!
-            private final LogicPrinter printer = new LogicPrinter(
-                    new ProgramPrinter(sw), new NotationInfo(), Main.getInstance().mediator()
-                            .getServices());
+           /* private final LogicPrinter printer = new LogicPrinter(
+                    new ProgramPrinter(sw), null, Main.getInstance().mediator()
+                            .getServices());*/
             private JTabbedPane inputPane;
             private JPanel errorPanel;
 
@@ -275,13 +277,15 @@ public class InvariantConfigurator {
              * @return the String Representation of the Term
              */
             private String printTerm(Term t) {
-                try {
+                /*try {
                     int start = printer.result().length();
                     printer.printTerm(t);
                     return printer.result().substring(start - 1);
                 } catch (Exception e) {
                     return t.toString();
-                }
+                }*/
+                
+                return t.toString();
 
             }
 
@@ -642,10 +646,10 @@ public class InvariantConfigurator {
                 Term result = null;
                 index = inputPane.getSelectedIndex();
                 // might throw parserException
-                result = parser.parse(new StringReader(invariants
-
-                .get(index)[0]), Sort.ANY, services, services.getNamespaces(),
-                        printer.getNotationInfo().getAbbrevMap());
+                
+                
+               result =  parser.parse(new StringReader(invariants.get(index)[0]), Sort.ANY, services, services.getNamespaces(),
+                Main.getInstance().mediator().getNotationInfo().getAbbrevMap());
 
                 return result;
             }
@@ -657,8 +661,7 @@ public class InvariantConfigurator {
                 // antlr
                 result = parser.parse(
                         new StringReader(invariants.get(index)[1]), Sort.ANY,
-                        services, services.getNamespaces(), printer
-                                .getNotationInfo().getAbbrevMap());
+                        services, services.getNamespaces(), Main.getInstance().mediator().getNotationInfo().getAbbrevMap());
                 return result;
             }
 
@@ -669,8 +672,7 @@ public class InvariantConfigurator {
                 // antlr
                 result = parser.parse(
                         new StringReader(invariants.get(index)[2]), Sort.ANY,
-                        services, services.getNamespaces(), printer
-                                .getNotationInfo().getAbbrevMap());
+                        services, services.getNamespaces(), Main.getInstance().mediator().getNotationInfo().getAbbrevMap());
                 return result;
             }
 
