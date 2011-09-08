@@ -34,6 +34,8 @@ public class PrimitiveType
 	new PrimitiveType("char", new CharLiteral('\u0000'));
     public static final PrimitiveType JAVA_LONG  = 
 	new PrimitiveType("long", new LongLiteral(0L));
+    public static final PrimitiveType JAVA_BIGINT =
+            new PrimitiveType("\\bigint", new BigintLiteral(0));
     public static final PrimitiveType JAVA_FLOAT = 
 	new PrimitiveType("float", new FloatLiteral(0.0f));
     public static final PrimitiveType JAVA_DOUBLE  = 
@@ -56,6 +58,7 @@ public class PrimitiveType
 	typeMap.put("int", JAVA_INT);
 	typeMap.put("char", JAVA_CHAR);
 	typeMap.put("long", JAVA_LONG);
+	typeMap.put("\\bigint", JAVA_BIGINT);
 	typeMap.put("float", JAVA_FLOAT);
 	typeMap.put("double", JAVA_DOUBLE);
 	typeMap.put("boolean", JAVA_BOOLEAN);	

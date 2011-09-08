@@ -31,6 +31,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.speclang.translation.JavaIntegerSemanticsHelper;
 import de.uka.ilkd.key.speclang.translation.SLExpression;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.speclang.translation.SLTranslationExceptionManager;
@@ -347,18 +348,20 @@ final class JMLTranslator {
                 ImmutableList<LogicVariable> declVars =
                         (ImmutableList<LogicVariable>) params[4];
                 Services services = (Services) params[5];
+                KeYJavaType promo = services.getTypeConverter().getPromotedType(declsType, t.getType());
 
-                if (!declsType.getJavaType().equals(PrimitiveType.JAVA_INT)) {
-                    throw new SLTranslationException(
-                            "bounded sum variable must be of type int");
+                if (!(declsType.getJavaType().equals(PrimitiveType.JAVA_INT)
+                        || declsType.getJavaType().equals(PrimitiveType.JAVA_BIGINT))) {
+                    throw new SLTranslationException("bounded sum variable must be of type int or \\bigint");
                 } else if (declVars.size() != 1) {
                     throw new SLTranslationException(
                             "bounded sum must declare exactly one variable");
                 }
-                LogicVariable qv = declVars.head();
-                Term resultTerm = TB.bsum(qv, a.getTerm(), b.getTerm(),
-                                          t.getTerm(), services);
-                return new SLExpression(resultTerm, t.getType());
+                LogicVariable qv = (LogicVariable) declVars.head();
+                Term resultTerm = TB.bsum(qv, a.getTerm(), b.getTerm(), t.getTerm(), services);
+                return new SLExpression(resultTerm, 
+                        promo.getJavaType() == PrimitiveType.JAVA_BIGINT ?
+                                promo : t.getType());
             }
         });
         translationMethods.put(JMLKeyWord.SUM,
@@ -390,15 +393,10 @@ final class JMLTranslator {
         // primary expressions
         translationMethods.put(JMLKeyWord.INV_FOR, new JMLTranslationMethod(){
 
-            /**
-             * @param params[0] Services
-             * @param params[1] SLExpression giving the object
-             */
             @Override
             public SLExpression translate(SLTranslationExceptionManager excManager, Object... params)
                     throws SLTranslationException {
                 checkParameters(params, Services.class, SLExpression.class);
-                final Services services = (Services) params[0];
                 Function inv = services.getJavaInfo().getInv();
                 Term obj = ((SLExpression)params[1]).getTerm();
                 return new SLExpression(TB.func(inv, TB.heap(services), obj));
@@ -468,10 +466,9 @@ final class JMLTranslator {
             public Object translate(SLTranslationExceptionManager excManager, Object... params)
                     throws SLTranslationException {
                 checkParameters(params, Services.class, SLExpression.class, SLExpression.class);
-                final Services services = (Services)params[0];
                 final Term seq = ((SLExpression)params[1]).getTerm();
                 final Term elem = ((SLExpression)params[2]).getTerm();
-                final KeYJavaType inttype = services.getJavaInfo().getPrimitiveKeYJavaType("int");
+                final KeYJavaType inttype = services.getJavaInfo().getPrimitiveKeYJavaType(PrimitiveType.JAVA_BIGINT);
                 return new SLExpression(TB.indexOf(services,seq,elem),inttype);
             }
             
@@ -483,7 +480,6 @@ final class JMLTranslator {
             public Object translate(SLTranslationExceptionManager excManager, Object... params)
                     throws SLTranslationException {
                 checkParameters(params, Services.class, SLExpression.class, SLExpression.class);
-                final Services services = (Services)params[0];
                 final Term seq = ((SLExpression)params[1]).getTerm();
                 final Term idx = ((SLExpression)params[2]).getTerm();
                 return new SLExpression(TB.seqGet(services, Sort.ANY, seq, idx));
@@ -497,7 +493,6 @@ final class JMLTranslator {
             public Object translate(SLTranslationExceptionManager excManager, Object... params)
                     throws SLTranslationException {
                 checkParameters(params, Services.class, SLExpression.class, SLExpression.class);
-                final Services services = (Services)params[0];
                 final Term seq1 = ((SLExpression)params[1]).getTerm();
                 final Term seq2 = ((SLExpression)params[2]).getTerm();
                 final KeYJavaType seqtype = services.getJavaInfo().getPrimitiveKeYJavaType("\\seq");
@@ -514,10 +509,9 @@ final class JMLTranslator {
             public Object translate(SLTranslationExceptionManager excManager, Object... params)
                     throws SLTranslationException {
                 checkParameters(params, Services.class, SLExpression.class, SLExpression.class);
-                final Services services = (Services)params[0];
                 final Term seq = ((SLExpression)params[1]).getTerm();
                 final Term elem = ((SLExpression)params[2]).getTerm();
-                final LogicVariable i = new LogicVariable(new Name("i"), services.getJavaInfo().getPrimitiveKeYJavaType("int").getSort());
+                final LogicVariable i = new LogicVariable(new Name("i"), services.getJavaInfo().getPrimitiveKeYJavaType(PrimitiveType.JAVA_BIGINT).getSort());
                 final Term body = TB.and(TB.leq(TB.zero(services), TB.var(i), services),TB.lt(TB.var(i), TB.seqLen(services, seq), services), TB.equals(TB.seqGet(services, Sort.ANY, seq, TB.var(i)), elem));
                 return new SLExpression(TB.ex(i, body));
             }
@@ -668,6 +662,90 @@ final class JMLTranslator {
                 }
             }
         });
+
+        translationMethods.put(">>", new JMLArithmeticOperationTranslationMethod(){
+
+            @Override
+            public SLExpression translate(SLExpression a, SLExpression e)
+            throws SLTranslationException {
+                checkNotBigint(a);
+                checkNotBigint(e);
+
+                return intHelper.buildRightShiftExpression(a, e);
+            }
+
+            @Override
+            public String opName() {
+                return "shift right";
+            }
+
+        });
+
+        translationMethods.put("<<", new JMLArithmeticOperationTranslationMethod(){
+
+            @Override
+            public SLExpression translate(SLExpression result, SLExpression e)
+            throws SLTranslationException {
+                checkNotBigint(result);
+                checkNotBigint(e);
+
+                return intHelper.buildLeftShiftExpression(result, e);
+            }
+
+            @Override
+            public String opName() {
+                return "shift left";
+            }
+
+        });
+
+        translationMethods.put(">>>", new JMLArithmeticOperationTranslationMethod(){
+
+            @Override
+            public SLExpression translate(SLExpression result, SLExpression e)
+            throws SLTranslationException {
+                checkNotBigint(result);
+                checkNotBigint(e);
+
+                return intHelper.buildUnsignedRightShiftExpression(result, e);
+            }
+
+            @Override
+            public String opName() {
+                return "unsigned shift right";
+            }
+        });
+        
+        translationMethods.put("+", new JMLArithmeticOperationTranslationMethod(){
+
+            @Override
+            public String opName() {
+                return "add";
+            }
+
+            @Override
+            protected SLExpression translate(SLExpression left,
+                    SLExpression right) throws SLTranslationException {
+                    return intHelper.buildAddExpression(left, right);
+            }
+            
+        });
+        
+        translationMethods.put("-", new JMLArithmeticOperationTranslationMethod(){
+
+            @Override
+            protected String opName() {
+                return ("subtract");
+            }
+
+            @Override
+            protected SLExpression translate(SLExpression left,
+                    SLExpression right) throws SLTranslationException {
+                return intHelper.buildSubExpression(left, right);
+            }
+            
+        });
+        
         
         translationMethods.put(JMLKeyWord.COMMENTARY, new JMLTranslationMethod() {
             public Object translate(SLTranslationExceptionManager excManager, Object... params) throws SLTranslationException {
@@ -909,10 +987,38 @@ final class JMLTranslator {
     //-------------------------------------------------------------------------
     // public methods
     //-------------------------------------------------------------------------
+
+
+    @Deprecated
     public static JMLTranslator getInstance() {
         return instance;
     }
     
+    public static JMLTranslator getInstance (Services services, SLTranslationExceptionManager sltem){
+        instance.setExceptionManager(sltem);
+        instance.setServices(services);
+        instance.setIntHelper(new JavaIntegerSemanticsHelper(services, sltem));
+        return instance;
+    }
+
+
+    @SuppressWarnings("unchecked")
+    public <T> T translate(String jmlKeyword,
+                          Object... params)
+            throws SLTranslationException {
+        JMLTranslationMethod m = translationMethods.get(jmlKeyword);
+        if (m != null) {
+            Object result = m.translate(params);
+            this.<T>checkReturnType(result);
+            return (T) result;
+        } else {
+            throw new SLTranslationException(
+                    "Unknown translation for JML-keyword \""
+                    + jmlKeyword
+                    + "\". The keyword seems not to be supported yet.");
+        }
+    }
+
 
     /**
      *
@@ -1021,7 +1127,18 @@ final class JMLTranslator {
         String msg = feature + " is not supported and has been silently ignored.";
         // TODO: wasn't there some collection of non-critical warnings ???
     }
-
+    
+    private void setServices (Services services){
+        this.services = services;
+    }
+    
+    private void setIntHelper (JavaIntegerSemanticsHelper intHelper){
+        this.intHelper = intHelper;
+    }
+    
+    private void setExceptionManager (SLTranslationExceptionManager sltem){
+        excManager = sltem;
+    }
 
     //-------------------------------------------------------------------------
     // private classes
@@ -1358,5 +1475,50 @@ final class JMLTranslator {
                                            + b.toString() + ".");
             }
         }
+    }
+    
+    /**
+     * Translation methods for (binary) arithmetic operations.
+     * Contains checks whether \bigint or Java integer semantics should be used.
+     * @author bruns
+     *
+     */
+    private abstract class JMLArithmeticOperationTranslationMethod implements JMLTranslationMethod {
+        
+        
+        protected void checkNotBigint(SLExpression e) throws SLTranslationException {
+            if (isBigint(e))
+                raiseError("Operation "+opName()+" may only be used with primitive Java types, not with \\bigint");
+        }
+
+        protected boolean isBigint(SLExpression e) {
+            return e.getType().equals(bigint());
+        }
+
+        protected KeYJavaType bigint() {
+            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
+        }
+
+        private void checkNotType(SLExpression e)
+                throws SLTranslationException {
+            if (e.isType()) {
+                raiseError("Cannot use operation "+opName()+" on type " +
+                        e.getType().getName() + ".");
+            }
+            assert e.isTerm();
+        }
+        
+        @Override
+        public Object translate (Object ... params ) throws SLTranslationException{
+            checkParameters(params, SLExpression.class, SLExpression.class);
+            SLExpression result = (SLExpression) params[0];
+            SLExpression e = (SLExpression) params[1];
+            checkNotType(result);
+            checkNotType(e);
+            return translate(result,e);
+        }
+        
+        protected abstract String opName();
+        protected abstract SLExpression translate(SLExpression left, SLExpression right) throws SLTranslationException;
     }
 }

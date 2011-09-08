@@ -153,35 +153,43 @@ public class JavaIntegerSemanticsHelper {
 
 
     public SLExpression buildAddExpression(SLExpression a, SLExpression b)
-            throws SLTranslationException {
+    throws SLTranslationException {
         assert a != null;
         assert b != null;
         try {
             KeYJavaType resultType = getPromotedType(a, b);
-            Function add = resultType.getJavaType() == PrimitiveType.JAVA_LONG
-                           ? integerLDT.getJavaAddLong()
-                           : integerLDT.getJavaAddInt();
+            Function add;
+            if (resultType.getJavaType() == PrimitiveType.JAVA_LONG)
+                add = integerLDT.getJavaAddLong();
+            else if (resultType.getJavaType() == PrimitiveType.JAVA_BIGINT)
+                add = integerLDT.getAdd();
+            else
+                add = integerLDT.getJavaAddInt();
             return new SLExpression(TB.func(add, a.getTerm(), b.getTerm()),
-        	                    resultType);
+                    resultType);
         } catch (RuntimeException e) {
             raiseError("Error in additive expression " + a + " + " + b + ":" 
-        	       + e.getMessage());
+                    + e.getMessage());
             return null; //unreachable
         }
     }
 
 
     public SLExpression buildSubExpression(SLExpression a, SLExpression b)
-            throws SLTranslationException {
+    throws SLTranslationException {
         assert a != null;
         assert b != null;
         try {
             KeYJavaType resultType = getPromotedType(a, b);
-            Function sub = resultType.getJavaType() == PrimitiveType.JAVA_LONG
-                           ? integerLDT.getJavaSubLong()
-                           : integerLDT.getJavaSubInt();
+            Function sub;
+            if (resultType.getJavaType() == PrimitiveType.JAVA_LONG) {
+                sub = integerLDT.getJavaSubLong();
+            } else if (resultType.getJavaType() == PrimitiveType.JAVA_BIGINT)
+                sub = integerLDT.getSub();
+            else
+                sub = integerLDT.getJavaSubInt();
             return new SLExpression(TB.func(sub, a.getTerm(), b.getTerm()),
-        	                    resultType);
+                    resultType);
         } catch (RuntimeException e) {
             raiseError("Error in subtract expression " + a + " - " + b + ".");
             return null; //unreachable            
@@ -190,34 +198,42 @@ public class JavaIntegerSemanticsHelper {
 
 
     public SLExpression buildMulExpression(SLExpression a, SLExpression b)
-            throws SLTranslationException {
+    throws SLTranslationException {
         assert a != null;
         assert b != null;
         try {
             KeYJavaType resultType = getPromotedType(a, b);
-	    Function mul = resultType.getJavaType() == PrimitiveType.JAVA_LONG
-	                   ? integerLDT.getJavaMulLong()
-	                   : integerLDT.getJavaMulInt();
+            Function mul;
+            if (resultType.getJavaType() == PrimitiveType.JAVA_LONG)
+                mul = integerLDT.getJavaMulLong();
+            else if (resultType.getJavaType() == PrimitiveType.JAVA_BIGINT)
+                mul = integerLDT.getMul();
+            else
+                mul = integerLDT.getJavaMulInt();
             return new SLExpression(TB.func(mul, a.getTerm(), b.getTerm()),
-        	                    resultType);
+                    resultType);
         } catch (RuntimeException e) {
             raiseError("Error in multiplicative expression " + a + " * "
-                       + b + ".");
+                    + b + ".");
             return null; //unreachable            
         }
     }
 
 
     public SLExpression buildDivExpression(SLExpression a, SLExpression b)
-            throws SLTranslationException {
+    throws SLTranslationException {
         try {
             KeYJavaType resultType = getPromotedType(a, b);
-	    Function div = resultType.getJavaType() == PrimitiveType.JAVA_LONG
-	                   ? integerLDT.getJavaDivLong()
-	                   : integerLDT.getJavaDivInt();
- 
+            Function div;
+            if (resultType.getJavaType() == PrimitiveType.JAVA_LONG)
+                div = integerLDT.getJavaDivLong();
+            else if (resultType.getJavaType() == PrimitiveType.JAVA_BIGINT)
+                div = integerLDT.getDiv();
+            else
+                div = integerLDT.getJavaDivInt();
+
             return new SLExpression(TB.func(div, a.getTerm(), b.getTerm()),
-        	                    resultType);
+                    resultType);
         } catch (RuntimeException e) {
             raiseError("Error in division expression " + a + " / " + b + ".");
             return null; //unreachable            
@@ -226,13 +242,16 @@ public class JavaIntegerSemanticsHelper {
 
 
     public SLExpression buildModExpression(SLExpression a, SLExpression b)
-            throws SLTranslationException {
+    throws SLTranslationException {
         assert a != null;
         assert b != null;
         try {
-	    Function mod = integerLDT.getJavaMod();
-            return new SLExpression(TB.func(mod, a.getTerm(), b.getTerm()),
-        	                    a.getType());
+            KeYJavaType resultType = getPromotedType(a, b);
+            if (resultType.getJavaType() == PrimitiveType.JAVA_BIGINT)
+                return new SLExpression(TB.func(integerLDT.getMod(), a.getTerm(), b.getTerm()), resultType);
+            else
+                return new SLExpression(TB.func(integerLDT.getJavaMod(), a.getTerm(), b.getTerm()),
+                        a.getType());
         } catch (RuntimeException e) {
             raiseError("Error in modulo expression " + a + " % " + b + ".");
             return null; //unreachable            
@@ -241,73 +260,77 @@ public class JavaIntegerSemanticsHelper {
 
 
     public SLExpression buildRightShiftExpression(SLExpression a, SLExpression b)
-            throws SLTranslationException {
+    throws SLTranslationException {
         assert a != null;
         assert b != null;
         try {
             KeYJavaType resultType = getPromotedType(a, b);
-	    Function shift = resultType.getJavaType() == PrimitiveType.JAVA_LONG
-	                     ? integerLDT.getJavaShiftRightLong()
-	                     : integerLDT.getJavaShiftRightInt();
+            Function shift = resultType.getJavaType() == PrimitiveType.JAVA_LONG
+            ? integerLDT.getJavaShiftRightLong()
+                    : integerLDT.getJavaShiftRightInt();
             return new SLExpression(TB.func(shift, a.getTerm(), b.getTerm()),
-        	                    resultType);
+                    resultType);
         } catch (RuntimeException e) {
             raiseError("Error in shift-right expression " + a + " >> " 
-                       + b + ".");
+                    + b + ".");
             return null; //unreachable            
         }
     }
 
 
     public SLExpression buildLeftShiftExpression(SLExpression a, SLExpression b)
-            throws SLTranslationException {
+    throws SLTranslationException {
         assert a != null;
         assert b != null;
         try {
             KeYJavaType resultType = getPromotedType(a, b);
-	    Function shift = resultType.getJavaType() == PrimitiveType.JAVA_LONG
-	                     ? integerLDT.getJavaShiftLeftLong()
-	                     : integerLDT.getJavaShiftLeftInt();
+            Function shift = resultType.getJavaType() == PrimitiveType.JAVA_LONG
+            ? integerLDT.getJavaShiftLeftLong()
+                    : integerLDT.getJavaShiftLeftInt();
             return new SLExpression(TB.func(shift, a.getTerm(), b.getTerm()),
-        	                    resultType);
+                    resultType);
         } catch (RuntimeException e) {
             raiseError("Error in shift-left expression " + a + " << " 
-                       + b + ".");
+                    + b + ".");
             return null; //unreachable            
         }
     }
 
 
     public SLExpression buildUnsignedRightShiftExpression(SLExpression a, 
-	    						  SLExpression b)
-            throws SLTranslationException {
+            SLExpression b)
+    throws SLTranslationException {
         assert a != null;
         assert b != null;
         try {
             KeYJavaType resultType = getPromotedType(a, b);
-	    Function shift = resultType.getJavaType() == PrimitiveType.JAVA_LONG
-	                     ? integerLDT.getJavaUnsignedShiftRightLong()
-	                     : integerLDT.getJavaUnsignedShiftRightInt();
+            Function shift = resultType.getJavaType() == PrimitiveType.JAVA_LONG
+            ? integerLDT.getJavaUnsignedShiftRightLong()
+                    : integerLDT.getJavaUnsignedShiftRightInt();
             return new SLExpression(TB.func(shift, a.getTerm(), b.getTerm()),
-        	                    resultType);
+                    resultType);
         } catch (RuntimeException e) {
             raiseError("Error in unsigned shift-right expression " + a + " >>> "
-                       + b + ".");
+                    + b + ".");
             return null; //unreachable            
         }
     }
 
 
     public SLExpression buildUnaryMinusExpression(SLExpression a) 
-            throws SLTranslationException {
+    throws SLTranslationException {
         assert a != null;
         try {
             KeYJavaType resultType = getPromotedType(a);
-	    Function minus = resultType.getJavaType() == PrimitiveType.JAVA_LONG
-	                     ? integerLDT.getJavaUnaryMinusLong()
-	                     : integerLDT.getJavaUnaryMinusInt();
+            Function minus;
+            if (resultType.getJavaType() == PrimitiveType.JAVA_LONG)
+                minus = integerLDT.getJavaUnaryMinusLong();
+            else if (resultType.getJavaType() == PrimitiveType.JAVA_BIGINT)
+                minus = integerLDT.getNegativeNumberSign();
+            else
+                minus = integerLDT.getJavaUnaryMinusInt();
             return new SLExpression(TB.func(minus, a.getTerm()),
-        	                    resultType);
+                    resultType);
         } catch (RuntimeException e) {
             raiseError("Error in unary minus expression -" + a + ".");
             return null; //unreachable            
@@ -327,7 +350,12 @@ public class JavaIntegerSemanticsHelper {
         assert a != null;
         try {
 	    Function cast = integerLDT.getJavaCast(resultType.getJavaType());
+	    if (cast != null)
             return new SLExpression(TB.func(cast, a.getTerm()), resultType);
+	    else { // there is no cast to \bigint
+	        assert resultType.getJavaType() == PrimitiveType.JAVA_BIGINT;
+	        return new SLExpression(a.getTerm(), resultType);
+	    }
         } catch (RuntimeException e) {
             raiseError("Error in cast expression -" + a + ".");
             return null; //unreachable            

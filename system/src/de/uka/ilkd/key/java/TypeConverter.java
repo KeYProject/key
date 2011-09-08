@@ -458,6 +458,14 @@ public final class TypeConverter {
                         t2 == PrimitiveType.JAVA_CHAR||
                         t2 == PrimitiveType.JAVA_LONG)) { 
             return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LONG);
+    	} else if ((t1 == PrimitiveType.JAVA_BIGINT) &&
+    	        t2 == PrimitiveType.JAVA_BYTE || t2 == PrimitiveType.JAVA_CHAR || t2 == PrimitiveType.JAVA_INT
+    	        || t2 == PrimitiveType.JAVA_LONG || t2 == PrimitiveType.JAVA_SHORT) {
+    	    return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
+        } else if ((t2 == PrimitiveType.JAVA_BIGINT) &&
+                t1 == PrimitiveType.JAVA_BYTE || t1 == PrimitiveType.JAVA_CHAR || t1 == PrimitiveType.JAVA_INT
+                || t1 == PrimitiveType.JAVA_LONG || t1 == PrimitiveType.JAVA_SHORT) {
+            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
     	} else if (t1 == PrimitiveType.JAVA_LOCSET && t2 == PrimitiveType.JAVA_LOCSET) { 
             return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LOCSET);
     	} else if (t1 == PrimitiveType.JAVA_SEQ && t2 == PrimitiveType.JAVA_SEQ) { 
@@ -490,6 +498,8 @@ public final class TypeConverter {
 	    return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LOCSET);
 	if (t1 == PrimitiveType.JAVA_SEQ) 
 	    return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SEQ);	
+	if (t1 == PrimitiveType.JAVA_BIGINT)
+	    return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
 	throw new RuntimeException("Could not determine promoted type "+
 				   "of "+type1);
     }

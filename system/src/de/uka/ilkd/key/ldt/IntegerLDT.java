@@ -15,6 +15,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
+import de.uka.ilkd.key.java.expression.literal.BigintLiteral;
 import de.uka.ilkd.key.java.expression.literal.CharLiteral;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.expression.literal.LongLiteral;
@@ -33,6 +34,7 @@ import de.uka.ilkd.key.util.ExtList;
  * declared in integerHeader.key and offers methods to convert java
  * number types to their logic counterpart.
  */
+@SuppressWarnings("unused")
 public final class IntegerLDT extends LDT {
     
     public static final Name NAME = new Name("int");    
@@ -379,6 +381,7 @@ public final class IntegerLDT extends LDT {
                 ExecutionContext ec) {
         final Type opReturnType = op.getKeYJavaType(serv, ec).getJavaType();
         final boolean isLong = opReturnType == PrimitiveType.JAVA_LONG; 
+        final boolean isBigint = opReturnType == PrimitiveType.JAVA_BIGINT;
 
         if (op instanceof GreaterThan) {
             return getGreaterThan();
@@ -388,16 +391,16 @@ public final class IntegerLDT extends LDT {
             return getLessThan();
         } else if (op instanceof LessOrEquals) {
             return getLessOrEquals();
-        } else if (op instanceof Divide) {                      
-            return isLong ? getJavaDivLong() : getJavaDivInt();
+        } else if (op instanceof Divide) {
+            return isLong ? getJavaDivLong() : (isBigint ? getDiv() : getJavaDivInt());
         } else if (op instanceof Times) {
-            return isLong ? getJavaMulLong() : getJavaMulInt();
+            return isLong ? getJavaMulLong() : (isBigint ? getMul() : getJavaMulInt());
         } else if (op instanceof Plus) {
-            return isLong ? getJavaAddLong() : getJavaAddInt();
+            return isLong ? getJavaAddLong() : (isBigint ? getAdd() : getJavaAddInt());
         } else if (op instanceof Minus) {
-            return isLong ? getJavaSubLong() : getJavaSubInt();
+            return isLong ? getJavaSubLong() : (isBigint ? getSub() : getJavaSubInt());
         } else if (op instanceof Modulo) {
-            return getJavaMod();
+            return isBigint ? getMod() : getJavaMod();
         } else if (op instanceof ShiftLeft) {
             return isLong ? getJavaShiftLeftLong() : getJavaShiftLeftInt();
         } else if (op instanceof ShiftRight) {
@@ -414,7 +417,7 @@ public final class IntegerLDT extends LDT {
         } else if (op instanceof BinaryXOr) {
             return isLong ? getJavaBitwiseOrLong() : getJavaBitwiseXOrInt();
         } else if (op instanceof Negative) {
-            return isLong ? getJavaUnaryMinusLong() : getJavaUnaryMinusInt();
+            return isLong ? getJavaUnaryMinusLong() : (isBigint ? getNegativeNumberSign() : getJavaUnaryMinusInt());
         } else if (op instanceof TypeCast) {
             return getJavaCast(opReturnType);
         } else {
@@ -477,6 +480,7 @@ public final class IntegerLDT extends LDT {
         boolean minusFlag = false;
         Debug.assertTrue(lit instanceof IntLiteral || 
                          lit instanceof LongLiteral ||
+                         lit instanceof BigintLiteral ||
                          lit instanceof CharLiteral,
                          "Literal '"+lit+"' is not an integer literal.");
 
@@ -491,13 +495,15 @@ public final class IntegerLDT extends LDT {
             identifier = charID;
         }
 
-        String literalString = ""; 
-        if (lit instanceof IntLiteral) {
+        String literalString = null;
+        if (lit instanceof IntLiteral)
             literalString = ((IntLiteral)lit).getValue();
-        } else {
-            Debug.assertTrue(lit instanceof LongLiteral);
+        else if (lit instanceof LongLiteral)
             literalString = ((LongLiteral)lit).getValue();
-        }
+        else if (lit instanceof BigintLiteral)
+            literalString = ((BigintLiteral)lit).getValue();
+        else
+            assert false;
 
         if (literalString.charAt(0) == '-') {
             minusFlag = true;       
