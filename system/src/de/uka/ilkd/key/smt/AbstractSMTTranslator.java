@@ -10,6 +10,7 @@
 
 package de.uka.ilkd.key.smt;
 
+
 import java.util.*;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
@@ -50,11 +51,21 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                  * not allowed.). In this case the multiplication is translated
                  * into a uninterpreted function with some assumptions.
                  */
-                private boolean supportsOnlySimpleMultiplication = false;
+                private final boolean supportsOnlySimpleMultiplication;
+                private final boolean hasNumberLimit;
+
 
                 public Configuration(boolean supportsOnlySimpleMultiplication) {
+                        this(supportsOnlySimpleMultiplication,false);                       
+                }
+                
+                public Configuration(boolean supportsOnlySimpleMultiplication,boolean hasNumberLimit) {
                         super();
                         this.supportsOnlySimpleMultiplication = supportsOnlySimpleMultiplication;
+                        this.hasNumberLimit = hasNumberLimit;
+                }
+                public boolean hasNumberLimit(){
+                        return hasNumberLimit;
                 }
 
         }
@@ -2544,8 +2555,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
          * limit is only considered if <code>hasNumberLimit</code> returns
          * <code>true</code>.
          * */
-        protected long getMaxNumber() {
-                return 0;
+        private long getMaxNumber() {
+                  return smtSettings.getMaximumInteger();
         }
 
         /**
@@ -2553,16 +2564,15 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
          * limit is only considered if <code>hasNumberLimit</code> returns
          * <code>true</code>.
          * */
-        protected long getMinNumber() {
-
-                return 0;
+        private long getMinNumber() {
+                return smtSettings.getMinimumInteger();
         }
 
         /**
          * returns <code>true</code> if the format supports only integers within
          * a certain interval.
          */
-        protected boolean hasNumberLimit() {
-                return false;
+        private boolean hasNumberLimit() {
+                return config.hasNumberLimit;
         }
 }

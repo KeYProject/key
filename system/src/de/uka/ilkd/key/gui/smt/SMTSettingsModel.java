@@ -1,14 +1,19 @@
 package de.uka.ilkd.key.gui.smt;
 
+
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.LinkedList;
 
+import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
@@ -102,6 +107,7 @@ class GeneralOptions extends TablePanel{
         public final static String PROGRESS_MODE_USER = "Progress dialog remains open after executing solvers.";
         public final static String PROGRESS_MODE_CLOSE = "Close progress dialog after all solvers have finished.";
         public final static String PROGRESS_MODE_CLOSE_FIRST = "Close progress dialog after the first solver has finished.";
+        public final int minWidthOfTitle;
 
         private final static String infoSaveToFilePanel = "Activate this option to store the translations "
                         + "that are handed over to the externals solvers:\n"
@@ -135,6 +141,7 @@ class GeneralOptions extends TablePanel{
         
         public GeneralOptions(ProofIndependentSMTSettings settings) {
                 super();
+                this.minWidthOfTitle = SwingUtilities.computeStringWidth(this.getFontMetrics(getFont()),"Concurrent ProcessesBLANK");
                 this.settings = settings;
                 createTable();
         }
@@ -150,7 +157,7 @@ class GeneralOptions extends TablePanel{
         
         public JTextField getMaxProcesses() {
                 if(maxProcesses == null){
-                        maxProcesses = addTextField("Concurrent Processes:",Long.toString(settings.maxConcurrentProcesses),infoMaxProcesses,
+                        maxProcesses = addTextField("Concurrent Processes:",minWidthOfTitle,Long.toString(settings.maxConcurrentProcesses),infoMaxProcesses,
                                         new ActionListener(){
 
                                                 @Override
@@ -171,7 +178,7 @@ class GeneralOptions extends TablePanel{
         
         public JTextField getTimeoutField() {
                 if(timeoutField == null){
-                        timeoutField = addTextField("Timeout:",Float.toString((float)settings.timeout/1000),infoTimeoutField,
+                        timeoutField = addTextField("Timeout:",minWidthOfTitle,Float.toString((float)settings.timeout/1000),infoTimeoutField,
                                         new ActionListener(){
 
                                                 @Override
@@ -207,6 +214,7 @@ class GeneralOptions extends TablePanel{
                 return progressModeBox;
         }
 
+        
         
         public FileChooserPanel getSaveToFilePanel() {
                 if(saveToFilePanel == null){
@@ -248,9 +256,11 @@ class SolverOptions extends TablePanel{
         private JTextField solverName;
         private JTextField solverCommand;
         private JTextField solverInstalled;
-       
+        
         private final SolverType solverType; 
         private final ProofIndependentSMTSettings settings;
+        
+        private final int minWidthOfTitle;
         
         private static final String infoSolverName =
         "There are two ways to make supported provers applicable for KeY:\n"
@@ -266,10 +276,11 @@ class SolverOptions extends TablePanel{
         
         public SolverOptions(SolverType solverType,ProofIndependentSMTSettings settings) {
                 super();
+                this.minWidthOfTitle = SwingUtilities.computeStringWidth(this.getFontMetrics(getFont()),"InstalledBLANK");
                 this.setName(solverType.getName());
                 this.solverType = solverType;
                 this.settings = settings;
-             
+    
                 createTable();
               
                 if(solverType.getInfo() != null){
@@ -290,9 +301,12 @@ class SolverOptions extends TablePanel{
                 getSolverCommand();
         }
         
+               
+
+        
         public JTextField getSolverCommand() {
                 if(solverCommand == null){
-                        solverCommand = addTextField("Command",solverType.getExecutionCommand(),infoSolverCommand,new ActionListener() {
+                        solverCommand = addTextField("Command",minWidthOfTitle,solverType.getExecutionCommand(),infoSolverCommand,new ActionListener() {
                                 
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
@@ -305,7 +319,7 @@ class SolverOptions extends TablePanel{
         
         public JTextField getSolverInstalled() {
                 if(solverInstalled == null){
-                        solverInstalled = addTextField("Installed",Boolean.toString(solverType.isInstalled(true)),"",null);
+                        solverInstalled = addTextField("Installed",minWidthOfTitle,Boolean.toString(solverType.isInstalled(true)),"",null);
                         solverInstalled.setBackground(this.getBackground());
                         solverInstalled.setEditable(false);
                 }
@@ -314,7 +328,7 @@ class SolverOptions extends TablePanel{
         
         public JTextField getSolverName() {
                 if(solverName == null){
-                        solverName = addTextField("Name",solverType.getName(),infoSolverName,null);
+                        solverName = addTextField("Name",minWidthOfTitle,solverType.getName(),infoSolverName,null);
                         solverName.setBackground(this.getBackground());
                         solverName.setEditable(false);
                 }
@@ -328,6 +342,7 @@ class TacletTranslationOptions extends TablePanel{
         private FileChooserPanel fileChooserPanel;
         private final SMTSettings settings;
         private JTextField       maxNumberOfGenerics;
+        private final int minWidthOfTitle;
         
         private static final String infoFileChooserPanel = "Activate this option to store the translations of taclets"
                         + " that are handed over to the externals solvers:\n"
@@ -356,6 +371,7 @@ class TacletTranslationOptions extends TablePanel{
         
         public TacletTranslationOptions(SMTSettings settings) {
                 super();
+                this.minWidthOfTitle = SwingUtilities.computeStringWidth(this.getFontMetrics(getFont()),"Maximum number of generic sorts.BLANK");
                 this.settings = settings;
                 createTable();
         }
@@ -370,7 +386,7 @@ class TacletTranslationOptions extends TablePanel{
         
         public JTextField createMaxNumberOfGenerics() {
                 if(maxNumberOfGenerics == null){
-                        maxNumberOfGenerics = addTextField("Maximum number of generic sorts.",
+                        maxNumberOfGenerics = addTextField("Maximum number of generic sorts.",minWidthOfTitle,
                                         Integer.toString(settings.getMaxNumberOfGenerics())
                                         , infoMaxNumberOfGenerics, new ActionListener() {
                                                 
@@ -422,6 +438,9 @@ class TranslationOptions extends TablePanel{
          private JCheckBox useBuiltInUniqueness;
          private JCheckBox useUIMultiplication;
          private JCheckBox useConstantsForIntegers;
+         private JTextField minField;
+         private JTextField maxField;
+         private final int minWidthOfTitle;
          private final ProofDependentSMTSettings settings;
          
          private static final String infoUseExplicitTypeHierarchy = "If this option is selected, the transitive inheritance between classes is modeled by "
@@ -482,6 +501,7 @@ class TranslationOptions extends TablePanel{
          
          public TranslationOptions(ProofDependentSMTSettings settings) {
                 super();
+                this.minWidthOfTitle = SwingUtilities.computeStringWidth(this.getFontMetrics(getFont()),"MaximumBLANK");
                 this.settings = settings;      
                 createTable();
      
@@ -561,15 +581,66 @@ class TranslationOptions extends TablePanel{
         public JCheckBox createConstantsForIntegers() {
                 
                 if(useConstantsForIntegers == null){
-                        useConstantsForIntegers = addCheckBox( "Use uninterpreted constants for too small or too big numbers.", 
-                                        infoUseConstantsForIntegers
+                        Box box = Box.createVerticalBox();
+                        
+                        box.setBorder(BorderFactory.createTitledBorder("Use constants for too big or too small integers."));
+                       
+                        maxField = createTextField(Long.toString(settings.maxInteger), new ActionListener() {
+                                
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                        long result = settings.maxInteger;
+                                        try{
+                                                result = Long.parseLong(maxField.getText());
+                                                maxField.setForeground(Color.BLACK);
+                                        }catch(Throwable ex){
+                                                maxField.setForeground(Color.RED);
+                                        }
+                                        settings.maxInteger = result;
+                                        
+                                }
+                        });
+                        
+                        minField = createTextField(Long.toString(settings.minInteger), new ActionListener() {
+                                
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                        long result = settings.minInteger;
+                                        try{
+                                                result = Long.parseLong(minField.getText());
+                                                minField.setForeground(Color.BLACK);
+                                        }catch(Throwable ex){
+                                                minField.setForeground(Color.RED);
+                                        }
+                                        settings.minInteger = result;
+                                        
+                                }
+                        });
+                        
+                        
+                        
+                        
+                        
+                        useConstantsForIntegers = createCheckBox("activated"
                                        ,settings.useConstantsForIntegers
                                        , new ActionListener() {
                                                @Override
                                                public void actionPerformed(ActionEvent e) {
                                                      settings.useConstantsForIntegers = useConstantsForIntegers.isSelected(); 
+                                                     maxField.setEnabled(useConstantsForIntegers.isSelected());
+                                                     minField.setEnabled(useConstantsForIntegers.isSelected());
                                                }
                                        });
+                        Box box2 = Box.createHorizontalBox();
+                        box2.add(useConstantsForIntegers);
+                        box2.add(Box.createHorizontalGlue());
+                        box.add(  box2);
+                        box.add(createTitledComponent("Maximum:",minWidthOfTitle, maxField));
+                        box.add(Box.createVerticalStrut(3));
+                        box.add(createTitledComponent("Minimum:",minWidthOfTitle, minField));
+                        
+                        
+                        addComponent(box, infoUseConstantsForIntegers);
                 }
                 return useConstantsForIntegers;
        }

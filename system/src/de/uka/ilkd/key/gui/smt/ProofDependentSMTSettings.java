@@ -32,6 +32,9 @@ public class ProofDependentSMTSettings implements de.uka.ilkd.key.gui.configurat
         private static final String USE_UNINTERPRETED_MULTIPLICATION = "[SMTSettings]useUninterpretedMultiplication";
 
         private static final String USE_CONSTANTS_FOR_BIGSMALL_INTEGERS = "[SMTSettings]useConstantsForBigOrSmallIntegers";
+        
+        private static final String INTEGERS_MAXIMUM = "[SMTSettings]integersMaximum";
+        private static final String INTEGERS_MINIMUM = "[SMTSettings]integersMinimum";
 
         private Collection<SettingsListener> listeners = new HashSet<SettingsListener>();
 
@@ -41,6 +44,9 @@ public class ProofDependentSMTSettings implements de.uka.ilkd.key.gui.configurat
         public boolean useUIMultiplication          = true;
         public boolean useConstantsForIntegers     = true;
         public int     maxGenericSorts               = 2;
+        public long    maxInteger                   =2147483645;
+        public long    minInteger                   =-2147483645;
+        
 
 
         public  SupportedTaclets supportedTaclets;
@@ -62,6 +68,8 @@ public class ProofDependentSMTSettings implements de.uka.ilkd.key.gui.configurat
                 this.useBuiltInUniqueness          = data.useBuiltInUniqueness;
                 this.useUIMultiplication           = data.useUIMultiplication;
                 this.useConstantsForIntegers       = data.useConstantsForIntegers; 
+                this.maxInteger                    = data.maxInteger;
+                this.minInteger                    = data.minInteger;
      
              
         }
@@ -94,8 +102,12 @@ public class ProofDependentSMTSettings implements de.uka.ilkd.key.gui.configurat
                 useUIMultiplication      = SettingsConverter.read(props,USE_UNINTERPRETED_MULTIPLICATION,useUIMultiplication);
                 useConstantsForIntegers  = SettingsConverter.read(props,USE_CONSTANTS_FOR_BIGSMALL_INTEGERS,useConstantsForIntegers);
              
+                maxInteger = SettingsConverter.read(props,INTEGERS_MAXIMUM,maxInteger);
+                minInteger = SettingsConverter.read(props,INTEGERS_MINIMUM,minInteger);
+                
                 supportedTaclets.selectTaclets(SettingsConverter.read(props, TACLET_SELECTION,
                                 supportedTaclets.getNamesOfSelectedTaclets()));
+     
         }
 
         public void writeSettings(Object sender, Properties props){
@@ -106,6 +118,8 @@ public class ProofDependentSMTSettings implements de.uka.ilkd.key.gui.configurat
                 SettingsConverter.store(props,USE_BUILT_IN_UNIQUENESS,useBuiltInUniqueness);
                 SettingsConverter.store(props,USE_UNINTERPRETED_MULTIPLICATION,useUIMultiplication);
                 SettingsConverter.store(props,USE_CONSTANTS_FOR_BIGSMALL_INTEGERS,useConstantsForIntegers);
+                SettingsConverter.store(props,INTEGERS_MAXIMUM,maxInteger);
+                SettingsConverter.store(props,INTEGERS_MINIMUM,minInteger);
         }
         
         

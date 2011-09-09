@@ -190,6 +190,16 @@ public class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings{
                 pdSettings.addSettingsListener(listener);
         }
 
+        @Override
+        public long getMaximumInteger() {
+                 return pdSettings.maxInteger;
+        }
+
+        @Override
+        public long getMinimumInteger() {
+                return pdSettings.minInteger;
+        }
+
         
 
         

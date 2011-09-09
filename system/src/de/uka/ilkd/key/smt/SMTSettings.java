@@ -90,6 +90,10 @@ public interface SMTSettings {
      * are not supported) a constant should be introduced.
      */
     public boolean useAssumptionsForBigSmallIntegers();
+    
+    public long getMaximumInteger();
+    
+    public long getMinimumInteger();
   
 
 }

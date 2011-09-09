@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.gui.smt;
 
+
 import java.awt.Dimension;
 
 import java.awt.event.ActionEvent;
@@ -83,14 +84,19 @@ public abstract class TablePanel extends JPanel{
                 return box;
         }
         
-        
-        
-        protected JCheckBox addCheckBox(String title, String info, boolean value, ActionListener changeListener){
+        protected JCheckBox createCheckBox(String title, boolean value, ActionListener changeListener){
                 JCheckBox checkBox = new JCheckBox(title,value);
                 checkBox.addActionListener(changeListener);
+                return checkBox;
+        }
+        
+        protected JCheckBox addCheckBox(String title, String info, boolean value, ActionListener changeListener){
+                JCheckBox checkBox = createCheckBox(title, value, changeListener);
                 addComponent(checkBox, info);
                 return checkBox;
         }
+        
+
         
         protected FileChooserPanel addFileChooserPanel(String title, String file, String info,
                         boolean selected,boolean enabled, ActionListener changeListener){
@@ -116,7 +122,7 @@ public abstract class TablePanel extends JPanel{
                 component.setMaximumSize(dim);
         }
         
-        protected JTextField addTextField(String title, String text, String info,final ActionListener changeListener){
+        protected JTextField createTextField(String text ,final ActionListener changeListener){
                 JTextField field = new JTextField(text);
                 field.getDocument().addDocumentListener(new DocumentListener() {
                         
@@ -129,16 +135,36 @@ public abstract class TablePanel extends JPanel{
                         @Override
                         public void changedUpdate(DocumentEvent e) {if(changeListener != null)changeListener.actionPerformed(null);}
                 });
+                return field;
+        }
+        
+        protected Box createTitledComponent(String title,int minWidthOfTitle, JComponent component){
                 Box box = Box.createHorizontalBox();
-                box.add(new JLabel(title));
+                JLabel label = new JLabel(title);
+                Dimension dim = label.getMinimumSize();
+                dim.width = minWidthOfTitle;
+                label.setMinimumSize(dim);
+                dim = label.getPreferredSize();
+                dim.width = minWidthOfTitle;
+                label.setPreferredSize(dim);
+                box.add(label);
                 box.add(Box.createHorizontalStrut(5));
                 box.add(Box.createHorizontalGlue());
-                box.add(field);
-                setMaximumHeight(box, field.getPreferredSize().height);
+                box.add(component);
+                setMaximumHeight(box, component.getPreferredSize().height);
+                return box;
+        }
+        
+        protected JTextField addTextField(String title,int minWidthOfTitle, String text, String info,final ActionListener changeListener){
+                JTextField field = createTextField( text, changeListener);
+                Box box = createTitledComponent(title,minWidthOfTitle, field);
+        
                 addComponent(box,info);
                 
                 return field;              
         }
+        
+        
         
         public JTextArea getInfoText() {
                  return infoText;
