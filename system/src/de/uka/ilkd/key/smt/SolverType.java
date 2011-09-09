@@ -54,6 +54,8 @@ public interface SolverType {
         public String getDefaultExecutionCommand();
 
         public SMTTranslator getTranslator(Services services);
+        
+        public boolean supportsIfThenElse();
 
         static public final SolverType Z3_SOLVER = new AbstractSolverType() {
 
@@ -75,6 +77,9 @@ public interface SolverType {
                         return "Z3";
                 }
 
+                public boolean supportsIfThenElse() {
+                        return true;
+                };
                 @Override
                 public SMTTranslator getTranslator(Services services) {
                         return new SmtLibTranslator(services,
@@ -155,6 +160,10 @@ public interface SolverType {
                         return new SmtLibTranslator(services,
                                         new Configuration(false));
                 }
+                
+                public boolean supportsIfThenElse() {
+                        return true;
+                };
 
                 @Override
                 public String getInfo() {
@@ -220,6 +229,10 @@ public interface SolverType {
                         return "Use the newest release of version 1.x instead of version 2. Yices 2 does not support the "
                                         + "required logic AUFLIA.";
                 }
+                
+                public boolean supportsIfThenElse() {
+                        return true;
+                };
 
                 @Override
                 public SMTSolverResult interpretAnswer(String text,
@@ -280,6 +293,10 @@ public interface SolverType {
                 public String getInfo() {
                         return "Simplify only supports integers within the interval [-2147483646,2147483646]=[-2^31+2,2^31-2].";
                 }
+                
+                public boolean supportsIfThenElse() {
+                        return false;
+                };
 
                 @Override
                 public SMTSolverResult interpretAnswer(String text,
@@ -445,6 +462,8 @@ abstract class AbstractSolverType implements SolverType {
 
                 executionCommand = s;
         }
+        
+        
 
         public String toString() {
                 return getName();
