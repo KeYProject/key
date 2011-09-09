@@ -509,6 +509,7 @@ TOKEN :
   }
 | < BOOLEAN: "boolean" >
 | < BREAK: "break" >
+| < BIGINT: "\\bigint" >
 | < BYTE: "byte" >
 | < CASE: "case" >
 | < CATCH: "catch" >
@@ -2098,6 +2099,7 @@ TypeReference PrimitiveType() :
      | "long"
      | "float"
      | "double"
+     | "\\bigint"
      )
 	{
 	    Identifier id = factory.createIdentifier(token.image);

@@ -432,6 +432,7 @@ TOKEN :
 	  	  // TODO
 	  }
   }
+| < BIGINT: "\\bigint">
 | < BOOLEAN: "boolean" >
 | < BREAK: "break" >
 | < BYTE: "byte" >
@@ -1962,6 +1963,7 @@ TypeReference PrimitiveType() :
   | "short"
   | "int"
   | "long"
+  | "\\bigint"
   | "float"
   | "double"
   | "\\locset"

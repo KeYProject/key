@@ -183,9 +183,9 @@ public abstract class ProgramSVSort extends AbstractSort {
 			 PrimitiveType.JAVA_LONG});
 
     
-    public static final ProgramSVSort SIMPLEANYNUMBERTYPEEXPRESSION 
+    public static final ProgramSVSort SIMPLEANYJAVANUMBERTYPEEXPRESSION 
 	= new SimpleExpressionSpecialPrimitiveTypeSort
-	("AnyNumberTypeExpression", new
+	("AnyJavaNumberTypeExpression", new
 	 PrimitiveType[]{PrimitiveType.JAVA_BYTE,
 			 PrimitiveType.JAVA_SHORT,
 			 PrimitiveType.JAVA_INT,
@@ -212,6 +212,21 @@ public abstract class ProgramSVSort extends AbstractSort {
 			 PrimitiveType.JAVA_BYTE,
 			 PrimitiveType.JAVA_SHORT,
 			 PrimitiveType.JAVA_INT});
+    
+    public static final ProgramSVSort SIMPLEJAVABIGINTEXPRESSION
+    = new SimpleExpressionSpecialPrimitiveTypeSort
+    ("JavaBigintExpression", new PrimitiveType[]{PrimitiveType.JAVA_BIGINT});
+
+    
+    public static final ProgramSVSort SIMPLEANYNUMBERTYPEEXPRESSION 
+    = new SimpleExpressionSpecialPrimitiveTypeSort
+    ("AnyNumberTypeExpression", new
+     PrimitiveType[]{PrimitiveType.JAVA_BYTE,
+             PrimitiveType.JAVA_SHORT,
+             PrimitiveType.JAVA_INT,
+             PrimitiveType.JAVA_LONG,
+             PrimitiveType.JAVA_CHAR,
+             PrimitiveType.JAVA_BIGINT});
 
     public static final ProgramSVSort SIMPLEJAVABOOLEANEXPRESSION 
 	= new SimpleExpressionSpecialPrimitiveTypeSort

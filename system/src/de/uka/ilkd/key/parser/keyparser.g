@@ -2157,6 +2157,9 @@ any_sortId_check_help [boolean checkSort] returns [Pair<Sort,Type> result = null
             } else if(name.equals(PrimitiveType.JAVA_LONG.getName())) {
                 t = PrimitiveType.JAVA_LONG;
                 name = PrimitiveType.JAVA_INT.getName();
+            } else if(name.equals(PrimitiveType.JAVA_BIGINT.getName())){
+                t = PrimitiveType.JAVA_BIGINT;
+                name = PrimitiveType.JAVA_BIGINT.getName();
             }
             
             Sort s = lookupSort(name);
