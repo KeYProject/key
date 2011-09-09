@@ -671,6 +671,9 @@ public class Recoder2KeY implements JavaReader {
                 }
                 methDecl.setBody(null);
             }
+            /*
+            // This is deactivated to allow compile time constants in declaration stub files.
+            // see bug #1114 
             if (pe instanceof recoder.java.declaration.FieldSpecification) {
                 recoder.java.declaration.FieldSpecification fieldSpec = 
                     (recoder.java.declaration.FieldSpecification) pe;
@@ -680,6 +683,7 @@ public class Recoder2KeY implements JavaReader {
                 }
                 fieldSpec.setInitializer(null);
             }
+            */
             if (pe instanceof ClassInitializer) {
                 ClassInitializer classInit = (ClassInitializer) pe;
                 if(!allowed && classInit.getBody() != null) {
