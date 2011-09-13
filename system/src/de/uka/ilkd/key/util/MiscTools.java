@@ -586,4 +586,29 @@ public final class MiscTools {
     public static String join(Object[] collection, String delimiter) {
         return join(Arrays.asList(collection), delimiter);
     }
+
+    /**
+     * Takes a string and returns a string which is potentially shorter and
+     * contains a sub-collection of the original characters.
+     * 
+     * All alphabetic characters (A-Z and a-z) are copied to the result while
+     * all other characters are removed.
+     * 
+     * @param string
+     *            an arbitrary string
+     * @return a string which is a sub-structure of the original character
+     *         sequence
+     * 
+     * @author mattias ulbrich
+     */
+    public static /*@NonNull*/ String filterAlphabetic(/*@NonNull*/ String string) {
+        StringBuilder res = new StringBuilder();
+        for (int i = 0; i < string.length(); i++) {
+            char c = string.charAt(i);
+            if((c >= 'A' && c <= 'Z') || (c >= 'A' && c <= 'Z')) {
+                res.append(c);
+            }
+        }
+        return res.toString();
+    }
 }
