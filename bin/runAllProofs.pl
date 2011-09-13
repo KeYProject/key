@@ -1,11 +1,11 @@
 #!/usr/bin/perl -w
-use File::Find;
-use File::Copy;
-use File::Basename;
-use Cwd;
 use strict;
-use Net::SMTP;
+use Cwd;
+use File::Find;
+use File::Basename;
 use Getopt::Std;
+# use File::Copy;
+# use Net::SMTP;
 
 #
 # Configuration variables
@@ -31,15 +31,24 @@ chdir $path_to_examples;
 #
 # Command line
 my %option = ();
-getopts("hcm:", \%option);
+getopts("hdl", \%option);
 
 if ($option{h}) {
   print "runs all proofs listed in the files: $automaticjavadl_txt and $not_provablejavadl_txt .\n";
   print "They can be found in " . $bin_path . "/" . $path_to_examples . "/" . $path_to_automated .  "\n\n";
-  print "Use '-m email\@address.com' to send the report as an email to the specified address.\n";
   print "Use '-h' to get this text (very necessary this line).\n";
-  print "Use '-c' to get the debug messages from the smtp part if there are email problems.\n";
+  print "Use '-l' to save proofs and reload them directly afterwards. (Test cases for proof loading)\n";
+  print "Use '-d' to delete all files created automatically by a run of this script.\n";
+#  print "[DEFUNCT] Use '-m email\@address.com' to send the report as an email to the specified address.\n";
+#  print "[DEFUNCT] Use '-c' to get the debug messages from the smtp part if there are email problems.\n";
   exit;
+}
+
+my $reloadTests = $option{l};
+
+if($option{d}) {
+    &cleanDirectories (".");
+    exit 0;
 }
 
 #
@@ -65,6 +74,7 @@ my $counter = 0;
 my $correct = 0;
 my $failures = 0;
 my $errors = 0;
+my @reloadFailed;
 my %successes;
 my %failing;
 my %erroneous;
@@ -84,7 +94,7 @@ foreach my $dotkey (@automatic_JAVADL) {
 
    &prepare_file($dotkey);
 
-   my $success = runAuto ($dotkey . ".auto.key");
+   my $success = &runAuto ($dotkey . ".auto.key");
    if ( $success == 0) {
        &processReturn (0, "indeed provable", $dotkey);
    } elsif ($success == 256) {
@@ -93,11 +103,16 @@ foreach my $dotkey (@automatic_JAVADL) {
        &processReturn (2, "error in proof/timed out (" . 
 		       "Error code $success)", $dotkey);
    }
-    
-   unlink($dotkey.".auto.key");
-   unlink($dotkey."auto.0.proof");
 
-   print "\nStatus: $counter examples tested. $errors errors occurred.\n\n";
+   # replace trailing .key by .auto.proof
+   $dotkey =~ s/\.key$/.auto.proof/;
+
+   &reloadFile($dotkey) if $reloadTests;
+    
+   print "\nStatus: $counter examples tested. $errors errors occurred.\n";
+   print "Reload-Tests: " . 
+       ($reloadTests ? (scalar(@reloadFailed) . " failures") : "disabled") 
+       . "\n\n";
 }
 
 #
@@ -115,7 +130,7 @@ foreach my $dotkey (@not_provableJavaDL) {
 
     &prepare_file($dotkey);
     
-    my $success = runAuto ($dotkey . ".auto.key");
+    my $success = &runAuto ($dotkey . ".auto.key");
     if ( $success == 0) {
         &processReturn (1, "should not be provable", $dotkey);
     } elsif ($success == 256) {
@@ -125,14 +140,20 @@ foreach my $dotkey (@not_provableJavaDL) {
 		       "Error code $success)", $dotkey);
     }
 
-    unlink($dotkey.".auto.key");
-    unlink($dotkey."auto.0.proof");
+    # unlink($dotkey.".auto.key");
+    # unlink($dotkey."auto.0.proof"); 
 
     print "\nStatus: $counter examples tested. $errors errors occurred.\n\n";
 }
 
 print "\n$correct/$counter prover runs according to spec.\n".
-     "$errors errors occurred.\n\n";
+     "$errors errors occurred.\n";
+
+if($reloadTests) {
+    print "Failing reload attempts: " . scalar(@reloadFailed) . "\n\n";
+} else {
+    print "Reload tests were disabled\n\n";
+}
 
 print &produceResultText;
 
@@ -180,7 +201,8 @@ sub fileline {
 }
 
 sub produceResultText {
-    my $result;
+    my $result = "";
+
     if (%failing) {
 	$result .= "++The following files did not behave as expected:\n";
 	foreach my $key (keys %failing) {
@@ -192,6 +214,13 @@ sub produceResultText {
 	$result .= "++The following files produced unexpected errors:\n";
 	foreach my $key (keys %erroneous) {
 	    $result .= "$key \t :  $erroneous{$key}\n"
+	}
+    }
+
+    if (@reloadFailed) {
+	$result .= "++The following files could not have their proof reloaded:\n";
+	foreach (@reloadFailed) {
+	    $result .= "$_\n";
 	}
     }
     
@@ -224,7 +253,7 @@ sub system_timeout {
 sub runAuto {
   my $dk = &getcwd . "/$_[0]";
   my $command = "$time_command -f '$time_format' " . $absolute_bin_path . "/runProver $dk auto";
-  print "Command is: $command\n";
+  # print "Command is: $command\n";
   my $result = &system_timeout($time_limit, $command);
 #  print "\nReturn value: $result\n";
   return $result;
@@ -243,4 +272,40 @@ sub processReturn {
 	$erroneous{"$_[2]"} = $_[1];
 	$errors++;
     }
+}
+
+sub reloadFile {
+    my $file = $_[0];
+    print "Try to reload proof result $file:\n";
+
+    my $dk = &getcwd . "/$file";
+    unless(-r $dk) {
+	print "$dk cannot be read!";
+	push @reloadFailed, $file;
+	return;
+    }
+
+    my $command = "$time_command -f '$time_format' " . $absolute_bin_path . "/runProver $dk auto_loadonly";
+    # print "Command is: $command\n";
+    my $result = &system_timeout($time_limit, $command);
+#    print "\nReturn value: $result\n";
+
+    if($result != 0) {
+	print "\nCould not reload saved file $file\n";
+	push @reloadFailed, $file;
+    }
+}
+
+sub cleanDirectories {
+    print @_;
+    find(\&wanted, @_);
+    sub wanted {
+	# $_ holds filename and $File::Find::name the full path
+	# print $_ . "\n";
+	if(/auto\.key$/ || /auto(\.[0-9]+)?\.proof$/) {
+	    print "Remove file $File::Find::name\n";
+	    unlink($_) or die "Cannot remove $_ in " . `pwd` . ": $!"; 
+	}
+    }
+
 }
