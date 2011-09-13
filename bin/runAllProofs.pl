@@ -175,8 +175,7 @@ sub prepare_file {
     open (OUT, "> " . $dotkey . ".auto.key") or 
 	die $dotkey. ".auto.key couldn't be opened for writing.";
     
-    my $first_line = <IN>;
-    my $has_settings = $first_line =~ /\\settings/;
+    my $has_settings = grep /\\settings/, <IN>;
     
     seek IN, 0, 0;
 
