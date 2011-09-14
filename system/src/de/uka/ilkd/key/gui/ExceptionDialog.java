@@ -152,6 +152,7 @@ public class ExceptionDialog extends JDialog {
         
         JButton closeButton = new JButton("Close");
         closeButton.addActionListener(closeListener);
+        getRootPane().setDefaultButton(closeButton);
         
         JCheckBox detailsBox  = new JCheckBox("Show Details");
         detailsBox.setSelected(false);
@@ -301,7 +302,7 @@ public class ExceptionDialog extends JDialog {
         listScroll = createJListScroll(excList);
         
         if(withList) {
-            cp.add(listScroll, new GridBagConstraints(0, 0, 1, 1, 1., .1,
+            cp.add(listScroll, new GridBagConstraints(0, 0, 1, 1, 1., 1.,
                     GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
                             0, 0, 0, 0), 0, 0));
         } else {
