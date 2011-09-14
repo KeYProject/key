@@ -50,7 +50,7 @@
 
 \javaSource "src";
 
-\chooseContract "JML depends clause [id: 7 / java.lang.Object::<inv> for Transaction]";
+\chooseContract "JML accessible clause [id: 7 / java.lang.Object::<inv> for Transaction]";
 
 \proof {
 (keyLog "0" (keyUser "mattias" ) (keyVersion "87dc0a69f156a44363f4ffda80eda512f68e3bd1"))
