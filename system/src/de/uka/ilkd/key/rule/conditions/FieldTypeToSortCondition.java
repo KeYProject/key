@@ -57,7 +57,7 @@ public final class FieldTypeToSortCondition implements VariableCondition {
                                  SVSubstitute svSubst,
                                  MatchConditions matchCond,
                                  Services services) {
-
+            
         if (var != exprOrTypeSV) {
             return matchCond;
         }
@@ -68,21 +68,39 @@ public final class FieldTypeToSortCondition implements VariableCondition {
             Operator op = ((Term) svSubst).op();
             if (op instanceof Function) {
                 String name = ((Function) op).name().toString();
-                int divider = name.indexOf("::$");
-                if (divider < 0) {
-                    return null;
+                
+                String className;
+                String attributeName;
+                
+                // check for normal attribute
+                int endOfClassName = name.indexOf("::$");                
+                
+                int startAttributeName = endOfClassName + 3;                
+                
+                     
+                if ( endOfClassName < 0) {
+                        // not a normal attribute, maybe an implicit attribute like <created>?
+                        endOfClassName = name.indexOf("::<");
+                        startAttributeName = endOfClassName + 2;
                 }
 
-                String className = name.substring(0, divider);
-                String attributeName = name.substring(divider + 3);
+                if ( endOfClassName < 0 ) {
+                        return null;
+                }
+    
 
+                className     = name.substring(0, endOfClassName);
+                attributeName = name.substring(startAttributeName);
+        
                 ProgramVariable attribute = services.getJavaInfo()
                         .getAttribute(attributeName, className);
+                
                 if (attribute == null) {
                     return null;
                 }
 
                 Sort targetSort = attribute.getKeYJavaType().getSort();
+                
                 return matchCond.setInstantiations(inst.add(
                         GenericSortCondition.createIdentityCondition(sort,
                                 targetSort),
