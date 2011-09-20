@@ -271,6 +271,8 @@ public abstract class ProgramSVSort extends AbstractSort {
     public static final ProgramSVSort ALLOCATE
         = new SpecificMethodNameSort(new ProgramElementName
                 (InstanceAllocationMethodBuilder.IMPLICIT_INSTANCE_ALLOCATE));
+
+    public static final ProgramSVSort SPECIFIC_METHOD_NAME = new SpecificMethodNameSort();
         
 
     //---------------REFERENCE SORTS ------------------------
@@ -302,6 +304,9 @@ public abstract class ProgramSVSort extends AbstractSort {
             Services services);
 
 
+    public ProgramSVSort createInstance(String parameter) {
+      throw new UnsupportedOperationException();
+    }
 
     //-------------Now the inner classes representing the-----------------------
     //-------------different kinds of program SVs-------------------------------
@@ -929,9 +934,14 @@ public abstract class ProgramSVSort extends AbstractSort {
     /**
      * allows to match on a specific method name 
      */
-    private static final class SpecificMethodNameSort extends MethodNameSort{
+    private static final class SpecificMethodNameSort extends MethodNameSort {
 
         private final ProgramElementName methodName;
+        
+        public SpecificMethodNameSort() {
+          super(new Name("SpecificMethodName"));
+          this.methodName = null;
+        }
         
         public SpecificMethodNameSort(ProgramElementName name) {
             super(name);
@@ -939,11 +949,18 @@ public abstract class ProgramSVSort extends AbstractSort {
         }
 
         protected boolean canStandFor(ProgramElement pe,
-                                      Services services) {          
+                                      Services services) {
+            if(methodName == null) {
+              return false;
+            }
             if(pe instanceof MethodName) {                
                 return pe.equals(methodName);
             }
             return false;
+        }
+        
+        public ProgramSVSort createInstance(String parameter) {
+          return new SpecificMethodNameSort(new ProgramElementName(parameter));
         }
 
     }
