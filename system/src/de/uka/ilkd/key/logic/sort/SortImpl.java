@@ -41,4 +41,5 @@ public final class SortImpl extends AbstractSort {
             return ((SortImpl)o).name().equals(name());
         } else return false;
     }
+
 }

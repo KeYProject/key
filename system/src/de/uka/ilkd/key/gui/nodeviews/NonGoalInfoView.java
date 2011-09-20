@@ -112,7 +112,7 @@ public class NonGoalInfoView extends JTextArea {
 	}                       
 	writeSVModifiers(out, schemaVar);
 	if(!(schemaVar instanceof FormulaSV || schemaVar instanceof UpdateSV)) {
-	    out.append(" " + schemaVar.sort());
+	    out.append(" " + schemaVar.sort().declarationString());
 	}
 	out.append(  " " + schemaVar.name() );
     }

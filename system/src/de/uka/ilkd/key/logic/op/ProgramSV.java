@@ -439,6 +439,6 @@ public final class ProgramSV extends AbstractSV
 
     @Override
     public String proofToString() {
-	return "\\schemaVar \\program " + sort().name() + " " + name() + ";\n";
+	return "\\schemaVar \\program " + sort().declarationString() + " " + name() + ";\n";
     }
 }

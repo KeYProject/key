@@ -268,18 +268,8 @@ public abstract class ProgramSVSort extends AbstractSort {
     public static final ProgramSVSort ARRAYLENGTH
 	= new ArrayLengthSort();
    
-    public static final ProgramSVSort ALLOCATE
-        = new SpecificMethodNameSort(new ProgramElementName
-                (InstanceAllocationMethodBuilder.IMPLICIT_INSTANCE_ALLOCATE));
-
-    public static final ProgramSVSort SPECIFIC_METHOD_NAME = new SpecificMethodNameSort();
-        
-
     //---------------REFERENCE SORTS ------------------------
     public static final ProgramSVSort EXECUTIONCONTEXT = new ExecutionContextSort();
-
-    
-
 
 
     //--------------------------------------------------------------------------
@@ -838,7 +828,6 @@ public abstract class ProgramSVSort extends AbstractSort {
 	    if(pe instanceof MethodReference) {
 		MethodReference mr = (MethodReference)pe;
 		Name localname = mr.getProgramElementName();
-		if (excludedMethodName(localname)) return false;
 		if (mr.getReferencePrefix() instanceof SuperReference ||
 		    mr.getReferencePrefix() instanceof TypeReference) {
 		    return false;
@@ -910,62 +899,41 @@ public abstract class ProgramSVSort extends AbstractSort {
     /**
      * This sort represents a type of program schema variables that match
      * on names of method references, i.e. the "m" of o.m(p1,pn).
+     * 
+     * It can also be made to match only specific method names
+     * defined by the parameter "name".
      */
     private static class MethodNameSort extends ProgramSVSort{
+        private final ProgramElementName methodName;
+
 	public MethodNameSort() {
 	    super(new Name("MethodName"));
+            this.methodName = null;
 	}
 
-        protected MethodNameSort(Name n) {
-            super(n);
+        public MethodNameSort(ProgramElementName name) {
+	    super(new Name("MethodName"));
+            this.methodName = name;
         }
         
 	protected boolean canStandFor(ProgramElement pe,
 				      Services services) {	    
-	    if(pe instanceof MethodName) {
-		Name localname = (ProgramElementName) pe;
-		return (!excludedMethodName(localname));
-	    }
-	    return false;
-	}
-
-    }
-
-    /**
-     * allows to match on a specific method name 
-     */
-    private static final class SpecificMethodNameSort extends MethodNameSort {
-
-        private final ProgramElementName methodName;
-        
-        public SpecificMethodNameSort() {
-          super(new Name("SpecificMethodName"));
-          this.methodName = null;
-        }
-        
-        public SpecificMethodNameSort(ProgramElementName name) {
-            super(name);
-            this.methodName = name;
-        }
-
-        protected boolean canStandFor(ProgramElement pe,
-                                      Services services) {
-            if(methodName == null) {
-              return false;
-            }
             if(pe instanceof MethodName) {                
-                return pe.equals(methodName);
+                return methodName == null ? true : pe.equals(methodName);
             }
             return false;
-        }
-        
+	}
+
         public ProgramSVSort createInstance(String parameter) {
-          return new SpecificMethodNameSort(new ProgramElementName(parameter));
+          return new MethodNameSort(new ProgramElementName(parameter));
+        }
+
+        public String declarationString() {
+           return name().toString() + (methodName != null ? "[name="+methodName+"]" : "");
         }
 
     }
 
-    
     /**
      * This sort represents a type of program schema variables that match
      * on labels.
@@ -1468,10 +1436,6 @@ public abstract class ProgramSVSort extends AbstractSort {
 
     static KeYJavaType getKeYJavaType(ProgramElement pe, ExecutionContext ec, Services services) {
 	return services.getTypeConverter().getKeYJavaType((Expression)pe, ec);
-    }
-
-    static boolean excludedMethodName(Name name) {
-	return false;
     }
 
     static boolean implicit(ProgramElement pe) {
