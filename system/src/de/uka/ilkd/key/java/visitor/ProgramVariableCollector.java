@@ -40,6 +40,7 @@ public final class ProgramVariableCollector extends JavaASTVisitor {
 	super(root, services);
         assert services != null;
         result.add(services.getTypeConverter().getHeapLDT().getHeap());
+        result.add(services.getTypeConverter().getHeapLDT().getSavedHeap());
     }
     
     
