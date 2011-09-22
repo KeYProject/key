@@ -71,7 +71,7 @@ public class ArrayReference extends JavaNonTerminalProgramElement
      */ 
     public ArrayReference(ExtList children, ReferencePrefix accessPath, PositionInfo pi) {
 	super(children, pi);
-	Expression[] e = (Expression[])children.collect(Expression.class);
+	Expression[] e = children.collect(Expression.class);
 	if(e.length>1){
 	    Expression[] e1 = new Expression[e.length-1];
         System.arraycopy(e, 0, e1, 0, e1.length);
@@ -97,7 +97,7 @@ public class ArrayReference extends JavaNonTerminalProgramElement
      */ 
     public ArrayReference(ExtList children, ReferencePrefix accessPath) {
 	this(children, accessPath, 
-	     (PositionInfo)children.get(PositionInfo.class));
+	     children.get(PositionInfo.class));
     }
 
     private ArrayReference(Expression[] e, ReferencePrefix accessPath) {

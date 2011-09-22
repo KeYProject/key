@@ -59,13 +59,13 @@ public class MethodCallStatement extends JavaStatement implements
     protected MethodCallStatement(MethodCallStatement proto) {
         super(proto);
         if (proto.resultVar != null) {
-            resultVar = (Expression) proto.resultVar.deepClone();
+            resultVar = proto.resultVar.deepClone();
         }
         if (proto.ec != null) {
             ec = proto.ec.deepClone();
         }	
         if (proto.body != null) {
-            body = (Statement) proto.body.deepClone();
+            body = proto.body.deepClone();
         }
         makeParentRoleValid();
     }

@@ -196,7 +196,7 @@ public class GraphViz
          img_stream = new byte[in.available()];
          in.read(img_stream);
          // Close it if we need to
-         if( in != null ) in.close();
+         in.close();
 
          if (img.delete() == false) 
             System.err.println("Warning: "+img.getAbsolutePath()+" could not be deleted!");

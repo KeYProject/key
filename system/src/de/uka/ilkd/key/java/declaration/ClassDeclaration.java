@@ -129,8 +129,8 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
 			    boolean anonymousClass,
 			    boolean localClass) { 
 	super(children, fullName, isLibrary);
-	extending=(Extends)children.get(Extends.class);
-	implementing=(Implements)children.get(Implements.class);
+	extending=children.get(Extends.class);
+	implementing=children.get(Implements.class);
 	this.isInnerClass = innerClass;
 	this.isAnonymousClass = anonymousClass;
 	this.isLocalClass =localClass;

@@ -36,7 +36,7 @@ public class RKeYMetaConstructType extends TypeReference
     protected RKeYMetaConstructType(RKeYMetaConstructType proto) {
         super(proto);
         if (proto.child != null) {
-            child = (Expression)proto.child.deepClone();
+            child = proto.child.deepClone();
         }
     }
 

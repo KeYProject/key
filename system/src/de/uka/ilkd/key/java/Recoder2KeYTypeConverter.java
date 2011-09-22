@@ -267,12 +267,11 @@ public class Recoder2KeYTypeConverter {
                 Debug.out("recoder2key: unknown type", t);
                 Debug.out("Unknown type: " + t.getClass() + " "
                         + t.getFullName());
-                Debug.fail();
-                result = null;
+                Debug.fail();                
             }
         } else {
             if(namespaces.sorts().lookup(s.name()) == null) {
-        	namespaces.sorts().add(s);
+                namespaces.sorts().add(s);
             }            
             result = new KeYJavaType(s);
         }

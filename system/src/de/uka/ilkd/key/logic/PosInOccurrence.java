@@ -142,7 +142,7 @@ public class PosInOccurrence {
     }
 
     public int hashCode () {
-    	return (int) hashCode;
+    	return hashCode;
     }  
 
     /**

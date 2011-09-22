@@ -61,14 +61,13 @@ public class MethodDeclaration extends JavaDeclaration
 			     boolean parentIsInterfaceDeclaration,
 			     Comment[] voidComments) {
 	super(children);
-	returnType = (TypeReference)children.get(TypeReference.class);
+	returnType = children.get(TypeReference.class);
 	this.voidComments = voidComments;
-	name = (ProgramElementName)children.get(ProgramElementName.class);
+	name = children.get(ProgramElementName.class);
 	this.parameters = new
-	    ImmutableArray<ParameterDeclaration>((ParameterDeclaration[])
-				children.collect(ParameterDeclaration.class));  
-	exceptions = (Throws)children.get(Throws.class);
-	body = (StatementBlock)children.get(StatementBlock.class);
+	    ImmutableArray<ParameterDeclaration>(children.collect(ParameterDeclaration.class));  
+	exceptions = children.get(Throws.class);
+	body = children.get(StatementBlock.class);
 	this.parentIsInterfaceDeclaration = parentIsInterfaceDeclaration;
 	assert returnType == null || voidComments == null;
     }

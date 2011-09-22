@@ -63,7 +63,7 @@ public class IntLiteral extends Literal {
      */
     public IntLiteral(ExtList children) {
 	super(children);
-	this.value=(String)children.get(String.class);
+	this.value=children.get(String.class);
     }
     
     /**

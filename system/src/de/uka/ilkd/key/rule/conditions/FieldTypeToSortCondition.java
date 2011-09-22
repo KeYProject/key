@@ -35,8 +35,6 @@ public final class FieldTypeToSortCondition implements VariableCondition {
                                    final GenericSort sort) {
         this.exprOrTypeSV = exprOrTypeSV;
         this.sort = sort;
-
-        assert sort instanceof GenericSort;
         assert checkSortedSV(exprOrTypeSV);
     }
 

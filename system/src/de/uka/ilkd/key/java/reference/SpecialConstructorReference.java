@@ -62,7 +62,7 @@ public abstract class SpecialConstructorReference
     public SpecialConstructorReference(ExtList children) {
 	super(children);	
 	this.arguments = new ImmutableArray<Expression>
-	    ((Expression[])children.collect(Expression.class)); 
+	    (children.collect(Expression.class)); 
     }
 
     /**
@@ -75,7 +75,7 @@ public abstract class SpecialConstructorReference
     public SpecialConstructorReference(ExtList children, PositionInfo pi) {
 	super(children, pi);	
 	this.arguments = new ImmutableArray<Expression>
-	    ((Expression[])children.collect(Expression.class)); 
+	    (children.collect(Expression.class)); 
     }
 
 

@@ -62,10 +62,8 @@ public class ClassSelectionDialog extends JDialog {
         } else {
             classList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         }
-        Iterator<KeYJavaType> it = kjts.iterator();
         Vector<WrappedKJT> v = new Vector<WrappedKJT>();
-        while(it.hasNext()) {
-            KeYJavaType kjt = (KeYJavaType) it.next();
+        for (final KeYJavaType kjt : kjts) {
             if(kjt.getJavaType() instanceof ClassType) {
         	v.add(new WrappedKJT(kjt));
             }

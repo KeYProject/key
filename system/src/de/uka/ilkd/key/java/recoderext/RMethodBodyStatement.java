@@ -65,11 +65,11 @@ public class RMethodBodyStatement extends JavaStatement
 
     public RMethodBodyStatement deepClone() {
         return new RMethodBodyStatement
-            ((TypeReference)bodySource.deepClone(), 
+            (bodySource.deepClone(), 
              (ProgramVariableSVWrapper)resultVar.deepClone(), 
              (ReferencePrefix)methodReferencePrefix.deepClone(),
-             (Identifier)methodName.deepClone(),
-             (ASTList<Expression>)arguments.deepClone());
+             methodName.deepClone(),
+             arguments.deepClone());
     }
     
     /**

@@ -95,8 +95,7 @@ public class InitialPositionTable extends PositionTable{
     public ImmutableList<Integer> pathForPosition(PosInOccurrence pio,
 					 SequentPrintFilter filter) {
 	ImmutableList<Integer> p = ImmutableSLList.<Integer>nil();
-	
-	p = p;
+
 	p = prependPathInFormula(p,pio);
 	p = p.prepend(Integer.valueOf(indexOfCfma(pio.constrainedFormula(),
 					      filter)));

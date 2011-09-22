@@ -83,13 +83,9 @@ public class NonGoalInfoView extends JTextArea {
     private static void writeTacletSchemaVariable(StringBuffer out, 
 	    					  SchemaVariable schemaVar) {
 	if(schemaVar instanceof ModalOperatorSV) {            
-	    final ModalOperatorSV modalOpSV = (ModalOperatorSV)schemaVar;
-	    final Iterator<Modality> it = modalOpSV.getModalities().iterator();
-	    assert modalOpSV instanceof ModalOperatorSV;
-                out.append ( "\\modalOperator { " );
+	    final ModalOperatorSV modalOpSV = (ModalOperatorSV)schemaVar;	    
 	    String sep = "";
-	    while (it.hasNext()) {
-		final Operator op = (Operator)it.next();
+	    for (final Operator op : modalOpSV.getModalities()) {
 		out.append ( sep );
 		out.append ( op.name() );
 		sep = ", ";

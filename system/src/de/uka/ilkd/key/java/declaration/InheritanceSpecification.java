@@ -71,8 +71,7 @@ public abstract class InheritanceSpecification
     protected InheritanceSpecification(ExtList children) {
         super(children);
 	this.supertypes=new
-	    ImmutableArray<TypeReference>((TypeReference[])
-				 children.collect(TypeReference.class)); 
+	    ImmutableArray<TypeReference>(children.collect(TypeReference.class)); 
     }
 
 

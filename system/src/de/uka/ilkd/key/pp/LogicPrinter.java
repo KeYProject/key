@@ -1293,7 +1293,7 @@ public final class LogicPrinter {
             final QuantifiableVariable v = vars.get (j);
             if(v instanceof LogicVariable) {
                 Term t =
-                    TermFactory.DEFAULT.createTerm((LogicVariable) v);
+                    TermFactory.DEFAULT.createTerm(v);
                 if(notationInfo.getAbbrevMap().containsTerm(t)) {
                     layouter.print (v.sort().name().toString() + " " +
                                     notationInfo.getAbbrevMap().getAbbrev(t));

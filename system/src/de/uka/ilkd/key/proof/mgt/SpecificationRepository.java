@@ -985,7 +985,7 @@ public final class SpecificationRepository {
     public void removeProof(Proof proof) {
         for(Map.Entry<ProofOblInput,ImmutableSet<Proof>> entry 
         	: proofs.entrySet()) {
-            ImmutableSet<Proof> sop = (ImmutableSet<Proof>) entry.getValue();
+            ImmutableSet<Proof> sop = entry.getValue();
             if(sop.contains(proof)) {
                 sop = sop.remove(proof);
                 if(sop.size()==0){

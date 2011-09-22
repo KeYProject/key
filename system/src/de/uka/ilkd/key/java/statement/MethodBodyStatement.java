@@ -90,10 +90,10 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
      }
     
     public MethodBodyStatement(ExtList list) {        
-        this.bodySource = (TypeReference) list.get(TypeReference.class);
-        this.resultVar  = (IProgramVariable) list.get(IProgramVariable.class);
+        this.bodySource = list.get(TypeReference.class);
+        this.resultVar  = list.get(IProgramVariable.class);
         
-        this.methodReference = (MethodReference)list.get(MethodReference.class);
+        this.methodReference = list.get(MethodReference.class);
         
         assert methodReference != null : "Missing methodreference";
         assert methodReference.getReferencePrefix() != null : 

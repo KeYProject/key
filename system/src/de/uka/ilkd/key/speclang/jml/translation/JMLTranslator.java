@@ -254,7 +254,7 @@ final class JMLTranslator {
                 } else if (declVars.size() != 1) {
                     throw new SLTranslationException("bounded sum must declare exactly one variable");
                 }
-                LogicVariable qv = (LogicVariable) declVars.head();
+                LogicVariable qv = declVars.head();
                 Term resultTerm = TB.bsum(qv, a.getTerm(), b.getTerm(), t.getTerm(), services);
                 return new SLExpression(resultTerm, t.getType());
             }

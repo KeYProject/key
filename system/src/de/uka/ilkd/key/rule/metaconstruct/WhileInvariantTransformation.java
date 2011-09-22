@@ -291,7 +291,7 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
             if(breakInnerLabel != breakOuterLabel)
                 Debug.log4jWarn("inner and outer label must be the same in WhileInvariantTransformation.performActionOnEnhancedFor", null);
             
-            Statement body = (Statement)changeList.get(Statement.class);
+            Statement body = changeList.get(Statement.class);
             
             // label statement if there are returns / continue / breaks
             if (breakOuterLabel != null) {

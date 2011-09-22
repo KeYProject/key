@@ -61,8 +61,8 @@ public class EnhancedFor extends LoopStatement implements VariableScope {
      * @param children a list of parameters
      */
     public EnhancedFor(ExtList children) {
-        super((ILoopInit) children.get(ILoopInit.class), (IGuard) children
-                .get(IGuard.class), null, (Statement) children
+        super(children.get(ILoopInit.class), children
+                .get(IGuard.class), null, children
                 .get(Statement.class), children);
     }
 
