@@ -2,7 +2,6 @@ package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
@@ -11,23 +10,8 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.logic.IntIterator;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.PIOPathIterator;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -149,7 +133,7 @@ public class QueryExpand implements BuiltInRule {
 
         final Term[] argUpdates = new Term[args.size()]; 
         for (int i = 0; i<args.size(); i++) {
-            argUpdates[i] = tb.elementary(services, tb.var((ProgramVariable)args.get(i)), query.sub(offset+1+i));
+            argUpdates[i] = tb.elementary(services, tb.var(args.get(i)), query.sub(offset+1+i));
         }
 
         update = tb.parallel(update, tb.parallel(argUpdates));
@@ -168,8 +152,8 @@ public class QueryExpand implements BuiltInRule {
         g.changeFormula(new SequentFormula(newFormula), pio.topLevel());
 
         //register variables in namespace
-        for (final Expression pv : args) { // add new program variables for arguments
-            g.addProgramVariable((ProgramVariable) pv);
+        for (final ProgramVariable pv : args) { // add new program variables for arguments
+            g.addProgramVariable(pv);
         }	
         if (callee != null) { g.addProgramVariable(callee); }
         g.addProgramVariable(result);
@@ -183,12 +167,13 @@ public class QueryExpand implements BuiltInRule {
 
         final ProgramVariable[] args = new ProgramVariable[paramDecls.size()];
         int i = 0;
-        for (ParameterDeclaration pdecl : paramDecls) {
+        for (final ParameterDeclaration pdecl : paramDecls) {
             final ProgramElementName argVarName = 
                     new ProgramElementName(VariableNameProposer.DEFAULT.
                             getNameProposal(pdecl.getVariableSpecification().getName(), services, n));
 
-            args[i] = new LocationVariable(argVarName, pdecl.getVariableSpecification().getProgramVariable().getKeYJavaType());
+            args[i] = new LocationVariable(argVarName, 
+                    pdecl.getVariableSpecification().getProgramVariable().getKeYJavaType());
             i++;
         }
 
