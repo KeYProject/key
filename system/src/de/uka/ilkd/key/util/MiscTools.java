@@ -145,7 +145,7 @@ public final class MiscTools {
                     stack.push(new ExtList());
                     walk(root());
                     ExtList el = stack.peek();
-                    return (ProgramElement) el.get(ProgramElement.class); 
+                    return el.get(ProgramElement.class); 
                 }
                 
                 public void doAction(ProgramElement node) {

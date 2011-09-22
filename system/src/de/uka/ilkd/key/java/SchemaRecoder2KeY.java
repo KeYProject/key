@@ -106,8 +106,7 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader {
         }
         typeDecls.add(classDecl);
 
-        recoder.java.CompilationUnit compUnitContext = (recoder.java.CompilationUnit) cUnit
-        .deepClone();
+        recoder.java.CompilationUnit compUnitContext = cUnit.deepClone();
 
         compUnitContext.setDeclarations(typeDecls);
         compUnitContext.makeParentRoleValid();

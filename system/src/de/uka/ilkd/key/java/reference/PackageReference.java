@@ -46,8 +46,8 @@ public class PackageReference extends JavaNonTerminalProgramElement
      * 	Comments.
      */
     public PackageReference(ExtList children) {
-	prefix=(PackageReference)children.get(PackageReference.class);
-	name=(ProgramElementName)children.get(ProgramElementName.class);
+	prefix=children.get(PackageReference.class);
+	name=children.get(ProgramElementName.class);
 	assert name != null;
     }
 

@@ -48,7 +48,7 @@ public abstract class JavaSourceElement implements SourceElement {
      * 	PositionInfo 
      */
     public JavaSourceElement(ExtList children) {
-	posInfo = getPosInfo((PositionInfo)children.get(PositionInfo.class));
+	posInfo = getPosInfo(children.get(PositionInfo.class));
 
     }
 

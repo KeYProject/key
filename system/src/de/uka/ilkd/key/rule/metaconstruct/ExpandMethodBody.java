@@ -73,7 +73,7 @@ public class ExpandMethodBody extends ProgramTransformer {
 //	result = prettyNewObjectNames(result, methDecl, classContext);
 
 	// at this point all arguments should be program variables
-	ImmutableArray<Expression> argsAsParam = mbs.getArguments();
+	ImmutableArray<? extends Expression> argsAsParam = mbs.getArguments();
 
 	final HashMap<IProgramVariable, Expression> map = 
 	    new HashMap<IProgramVariable, Expression>();	

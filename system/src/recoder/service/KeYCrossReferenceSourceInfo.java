@@ -115,12 +115,10 @@ public class KeYCrossReferenceSourceInfo
 		if (pe instanceof TypeDeclarationContainer) {
 		    TypeDeclarationContainer tdc = (TypeDeclarationContainer) pe;
 		    for (int i = 0; i<tdc.getTypeDeclarationCount(); i++) {
-			if (tdc.getTypeDeclarationAt(i) instanceof ClassType) {
-			    ClassType ct = (ClassType) tdc.getTypeDeclarationAt(i);
-			    for (ClassType superType : ct.getSupertypes()) {
-				registerSubtype(ct, superType);
-			    }
-			}
+		        ClassType ct = tdc.getTypeDeclarationAt(i);
+		        for (ClassType superType : ct.getSupertypes()) {
+		            registerSubtype(ct, superType);
+		        }
 		    }
 		}
 	    }
@@ -330,7 +328,7 @@ public class KeYCrossReferenceSourceInfo
 
         // check primitive types, array types of primitive types,
         // and void --- these happen often
-        Type t = (Type) name2primitiveType.get(name);
+        Type t = name2primitiveType.get(name);
         if (t != null) {
             return t;
         }

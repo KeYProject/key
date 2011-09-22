@@ -116,7 +116,7 @@ public class ExceptionDialog extends JDialog {
 	} 
 	
 	if (location == null && exc.getCause() != null) {
-	    location = getLocation(((Throwable)exc).getCause());
+	    location = getLocation(exc.getCause());
 	}
 	
 	return location;

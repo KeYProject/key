@@ -59,8 +59,8 @@ public abstract class TypeReferenceImp
      */
     public TypeReferenceImp(ExtList children, int dim) {
 	super(children);
-	prefix = (ReferencePrefix)children.get(ReferencePrefix.class);
-	name = (ProgramElementName)children.get(ProgramElementName.class);
+	prefix = children.get(ReferencePrefix.class);
+	name = children.get(ProgramElementName.class);
 	dimensions = dim;
     }
 

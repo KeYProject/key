@@ -67,7 +67,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement
         super(children);
 	this.children =
 	    new ImmutableArray<Expression>
-	    ((Expression[])children.collect(Expression.class)); 
+	    (children.collect(Expression.class)); 
     }
 
     /**

@@ -306,7 +306,7 @@ public class Node {
 
     /** returns i-th child */
     public Node child(int i) {
-	return (Node)(children.get(i));
+	return children.get(i);
     }
 
     /**

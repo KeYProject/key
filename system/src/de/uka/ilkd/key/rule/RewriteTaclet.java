@@ -219,7 +219,7 @@ public final class RewriteTaclet extends FindTaclet {
 				 	MatchConditions    matchCond) {
 	Term term = posOfFind.constrainedFormula().formula();
 	IntIterator it = posOfFind.posInTerm().iterator();
-	Term rwTemplate=((RewriteTacletGoalTemplate)gt).replaceWith();
+	Term rwTemplate=gt.replaceWith();
 
 	Term formula = replace(term, 
 		       	       rwTemplate, 

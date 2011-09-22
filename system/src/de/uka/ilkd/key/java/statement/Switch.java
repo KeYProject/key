@@ -74,9 +74,8 @@ public class Switch extends BranchStatement
 
     public Switch(ExtList children) {
         super(children);
-	this.expression = (Expression)children.get(Expression.class);
-	this.branches=new ImmutableArray<Branch>((Branch[])
-					children.collect(Branch.class)); 
+	this.expression = children.get(Expression.class);
+	this.branches=new ImmutableArray<Branch>(children.collect(Branch.class)); 
     }
 
 

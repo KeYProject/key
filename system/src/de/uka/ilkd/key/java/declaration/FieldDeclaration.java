@@ -62,8 +62,7 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
 			    boolean parentIsInterfaceDeclaration) {
         super(children, parentIsInterfaceDeclaration);
 	fieldSpecs = new
-	    ImmutableArray<FieldSpecification>((FieldSpecification[])
-				      children.collect(FieldSpecification.class));
+	    ImmutableArray<FieldSpecification>(children.collect(FieldSpecification.class));
     }
     
     public ImmutableArray<FieldSpecification> getFieldSpecifications() {

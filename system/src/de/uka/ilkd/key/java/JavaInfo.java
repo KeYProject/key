@@ -716,7 +716,7 @@ public final class JavaInfo {
     }
 
     /** gets an array of expression and returns a list of types */
-    private ImmutableList<KeYJavaType> getKeYJavaTypes(ImmutableArray<Expression> args) {
+    private ImmutableList<KeYJavaType> getKeYJavaTypes(ImmutableArray<? extends Expression> args) {
 	ImmutableList<KeYJavaType> result = ImmutableSLList.<KeYJavaType>nil(); 
 	if (args != null) {
 	    for (int i = args.size()-1; i >= 0 ; i--) {
@@ -735,7 +735,7 @@ public final class JavaInfo {
      * signature 
      * @return the signature 
      */
-    public ImmutableList<KeYJavaType> createSignature(ImmutableArray<Expression> arguments) {
+    public ImmutableList<KeYJavaType> createSignature(ImmutableArray<? extends Expression> arguments) {
 	return getKeYJavaTypes(arguments);    
     }
 

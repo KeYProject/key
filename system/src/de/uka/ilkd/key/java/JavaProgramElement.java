@@ -67,7 +67,7 @@ public abstract class JavaProgramElement extends JavaSourceElement
      * @param list the ExtList with children and comments of this node
      */
     private Comment[] extractComments(ExtList list) {
-        final Comment[] c = (Comment[])list.collect(Comment.class);
+        final Comment[] c = list.collect(Comment.class);
         return c == null ? NO_COMMENTS : c;
     }
 

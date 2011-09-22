@@ -49,7 +49,7 @@ public class Finally extends BranchImp {
      */ 
     public Finally(ExtList children) {
 	super(children);
-	body=(StatementBlock)children.get(StatementBlock.class);
+	body=children.get(StatementBlock.class);
     }
 
     /**

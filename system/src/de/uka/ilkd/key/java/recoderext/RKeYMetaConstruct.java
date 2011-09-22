@@ -50,7 +50,7 @@ public class RKeYMetaConstruct extends JavaStatement
     protected RKeYMetaConstruct(RKeYMetaConstruct proto) {
         super(proto);
         if (proto.child != null) {
-            child = (Statement)proto.child.deepClone();
+            child = proto.child.deepClone();
         }
     }
 

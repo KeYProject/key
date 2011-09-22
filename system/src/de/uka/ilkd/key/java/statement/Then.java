@@ -37,7 +37,7 @@ public class Then extends BranchImp {
      */ 
     public Then(ExtList children) {
 	super(children);
-	body=(Statement)children.get(Statement.class);
+	body=children.get(Statement.class);
     }
 
     /**

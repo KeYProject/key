@@ -23,8 +23,8 @@ public class DefaultConstructor implements Constructor {
 
     //???use ProgramElementName instead of name?????
     public DefaultConstructor(ExtList children) {
-	name=(String)children.get(String.class);
-	parentIsPublic=((Boolean)children.get(Boolean.class)).booleanValue();
+	name=children.get(String.class);
+	parentIsPublic=children.get(Boolean.class).booleanValue();
     }
 
     /**

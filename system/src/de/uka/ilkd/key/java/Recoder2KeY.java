@@ -512,10 +512,8 @@ public class Recoder2KeY implements JavaReader {
     	        ConvertException e2 = new ConvertException("While parsing "+loc+"\n"+ex.getMessage());
                 e2.initCause(ex);
                 throw e2;
-            } finally {
-        	if (f != null) {
+            } finally {        
         	    f.close();
-        	}
             }
             
             

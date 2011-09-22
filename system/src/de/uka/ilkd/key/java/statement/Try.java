@@ -83,9 +83,9 @@ public class Try extends BranchStatement
 
     public Try(ExtList children) {
         super(children);
-	this.body = (StatementBlock)children.get(StatementBlock.class);
+	this.body = children.get(StatementBlock.class);
 	this.branches=new
-	    ImmutableArray<Branch>((Branch[])children.collect(Branch.class));
+	    ImmutableArray<Branch>(children.collect(Branch.class));
         prefixElementArray = computePrefix(body);
     }
 

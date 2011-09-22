@@ -90,7 +90,7 @@ public class KeYRecoderExcHandler extends KeYExceptionHandlerImpl
         String msg = "Recoder: " + recoderErrorCount + " errors have occurred - aborting.";
 	recoderErrorCount = 0;
         ExceptionHandlerException ex = new ExceptionHandlerException(msg);
-        ex.initCause((Throwable)recoderExceptions.get(0));
+        ex.initCause(recoderExceptions.get(0));
         recoderExceptions.clear();
         
         throw ex;

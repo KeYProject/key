@@ -72,13 +72,10 @@ public class CompilationUnit
      */
     public CompilationUnit(ExtList children) {
 	super(children);
-	packageSpec=(PackageSpecification)children.get(
-					    PackageSpecification.class); 
-	this.imports=new ImmutableArray<Import>((Import[])
-				      children.collect(Import.class));
+	packageSpec=children.get(PackageSpecification.class); 
+	this.imports=new ImmutableArray<Import>(children.collect(Import.class));
 	this.typeDeclarations=new
-	    ImmutableArray<TypeDeclaration>((TypeDeclaration[])
-				   children.collect(TypeDeclaration.class)); 
+	    ImmutableArray<TypeDeclaration>(children.collect(TypeDeclaration.class)); 
     }
     
 

@@ -625,8 +625,7 @@ public class Recoder2KeYConverter {
         ExtList children = collectChildren(newArr);
         // now we have to extract the array initializer
         // is stored separately and must not appear in the children list
-        ArrayInitializer arrInit = (ArrayInitializer) children
-        .get(ArrayInitializer.class);
+        ArrayInitializer arrInit = children.get(ArrayInitializer.class);
         children.remove(arrInit);
 
         recoder.abstraction.Type javaType = getServiceConfiguration()
@@ -806,12 +805,12 @@ public class Recoder2KeYConverter {
     /** convert a recoder Identifier to a KeY Identifier */
     public ProgramElementName convert(recoder.java.Identifier id) {
         return VariableNamer.parseName(id.getText(),
-                (Comment[]) collectComments(id).collect(Comment.class));
+                collectComments(id).collect(Comment.class));
     }
 
     public ProgramElementName convert(ImplicitIdentifier id) {
         return new ProgramElementName(id.getText(),
-                (Comment[]) collectComments(id).collect(Comment.class));
+                collectComments(id).collect(Comment.class));
     }
 
     /** convert a recoderext MethodFrameStatement to a KeY MethodFrameStatement */
@@ -1379,22 +1378,14 @@ public class Recoder2KeYConverter {
         }
 
         if (recoderVarSpec == null) {
-            // null means only bytecode available for this
-            // field %%%
-            recoder.abstraction.Field recField = getServiceConfiguration()
-            .getSourceInfo().getField(fr);
-            recoder.abstraction.Type recoderType = getServiceConfiguration()
-            .getByteCodeInfo().getType(recField);
+            // null means only bytecode available for this field %%%
+            recoder.abstraction.Field recField = getServiceConfiguration().getSourceInfo().getField(fr);
+            recoder.abstraction.Type recoderType = getServiceConfiguration().getByteCodeInfo().getType(recField);
             recoder.java.declaration.FieldSpecification fs = new recoder.java.declaration.FieldSpecification(
                     fr.getIdentifier());
-            boolean isModel = false;
-            for(recoder.java.declaration.Modifier mod : recoderVarSpec.getParent().getModifiers()) {
-        	if(mod instanceof de.uka.ilkd.key.java.recoderext.Model) {
-        	    isModel = true;
-        	    break;
-        	}
-            }            
             
+            final boolean isModel = false; // bytecode-only fields are no model fields
+                       
             pv = new LocationVariable(new ProgramElementName(makeAdmissibleName(fs.getName()),
                     makeAdmissibleName(recField.getContainingClassType().getFullName())),
                     getKeYJavaType(recoderType), getKeYJavaType(recField
