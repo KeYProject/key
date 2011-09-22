@@ -139,7 +139,7 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
 
 
 
-    private void checkOnlyProgramVarsAsArguments(ImmutableArray<Expression> arguments) {
+    private void checkOnlyProgramVarsAsArguments(ImmutableArray<? extends Expression> arguments) {
         for (int i = 0, sz = arguments.size(); i<sz; i++) {
             final Expression argument = arguments.get(i);
             if (!((argument instanceof LocationVariable && !((LocationVariable)argument).isMember()) || 
@@ -192,7 +192,7 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
         return methodReference.getReferencePrefix();
     }
     
-    public ImmutableArray<Expression> getArguments() {
+    public ImmutableArray<? extends Expression> getArguments() {
         return methodReference.getArguments();
     }
     

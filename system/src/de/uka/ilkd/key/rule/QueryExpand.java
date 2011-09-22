@@ -103,10 +103,10 @@ public class QueryExpand implements BuiltInRule {
         final ProgramMethod method = (ProgramMethod)query.op();
 
 
-        final ImmutableArray<Expression> args = getArgumentVariables(method.getParameters(), goal.node(), services);
+        final ImmutableArray<ProgramVariable> args = getArgumentVariables(method.getParameters(), goal.node(), services);
 
         final ProgramVariable callee;
-        int offset;
+        final int offset;
         if (method.isStatic()) {
             callee = null;
             offset = 0;
@@ -129,7 +129,8 @@ public class QueryExpand implements BuiltInRule {
         final Function placeHolderResult = new Function(new Name(VariableNameProposer.DEFAULT.
                 getNameProposal("res_"+method.getName(), services, goal.node())), query.sort());
 
-        // construct method call   {heap:=h || p1:arg1 || ... || pn:=argn} \[ res = o.m(p1,..,pn); \] (c = res) 
+        // construct method call   {heap:=h || p1:arg1 || ... || pn:=argn} 
+        //                                  \[ res = o.m(p1,..,pn); \] (c = res) 
 
         final CopyAssignment assignment = new CopyAssignment(result, mr);
         final MethodFrame mf = new MethodFrame(null, 
@@ -167,7 +168,7 @@ public class QueryExpand implements BuiltInRule {
         g.changeFormula(new SequentFormula(newFormula), pio.topLevel());
 
         //register variables in namespace
-        for (Expression pv : args) { // add new program variables for arguments
+        for (final Expression pv : args) { // add new program variables for arguments
             g.addProgramVariable((ProgramVariable) pv);
         }	
         if (callee != null) { g.addProgramVariable(callee); }
@@ -177,10 +178,10 @@ public class QueryExpand implements BuiltInRule {
         return newGoal;
     }
 
-    private ImmutableArray<Expression> getArgumentVariables(
+    private ImmutableArray<ProgramVariable> getArgumentVariables(
             ImmutableArray<ParameterDeclaration> paramDecls, Node n, Services services) {
 
-        final Expression[] args = new Expression[paramDecls.size()];
+        final ProgramVariable[] args = new ProgramVariable[paramDecls.size()];
         int i = 0;
         for (ParameterDeclaration pdecl : paramDecls) {
             final ProgramElementName argVarName = 
@@ -191,7 +192,7 @@ public class QueryExpand implements BuiltInRule {
             i++;
         }
 
-        return new ImmutableArray<Expression>(args);
+        return new ImmutableArray<ProgramVariable>(args);
     }
 
     @Override
@@ -223,7 +224,7 @@ public class QueryExpand implements BuiltInRule {
         if (pio!=null && pio.subTerm().op() instanceof ProgramMethod && pio.subTerm().freeVars().isEmpty()) {
             final Term pmTerm = pio.subTerm();
             ProgramMethod pm = (ProgramMethod) pmTerm.op();
-            final Sort nullSort = goal.proof().getServices().getJavaInfo().getNullType().getSort();
+            final Sort nullSort = goal.proof().getJavaInfo().nullSort();
             if (pm.isStatic() || (pmTerm.sub(1).sort().extendsTrans(goal.proof().getJavaInfo().objectSort()) && 
                     !pmTerm.sub(1).sort().extendsTrans(nullSort))) {
                 PIOPathIterator it = pio.iterator();

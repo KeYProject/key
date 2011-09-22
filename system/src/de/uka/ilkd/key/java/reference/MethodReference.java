@@ -50,7 +50,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
     /**
      *      Arguments.
      */
-    protected final ImmutableArray<Expression> arguments;
+    protected final ImmutableArray<? extends Expression> arguments;
     
     public MethodReference(ExtList args, MethodName n, 
                    ReferencePrefix p, PositionInfo pos) {
@@ -61,7 +61,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
         this.arguments = new ImmutableArray<Expression>((Expression[]) args.collect(Expression.class));       
     }
     
-    public MethodReference(ImmutableArray<Expression> args, MethodName n, 
+    public MethodReference(ImmutableArray<? extends Expression> args, MethodName n, 
             ReferencePrefix p) {
         this.prefix = p;
         name = n;
@@ -93,7 +93,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
     }
 
     protected void checkArguments(){
-	ImmutableArray<Expression> args = getArguments();
+	ImmutableArray<? extends Expression> args = getArguments();
 	for(Expression arg:args){
 	    if(arg==null) 
 		throw new NullPointerException();
@@ -236,7 +236,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
      *      @return the expression array wrapper.
      */
     @Override
-    public ImmutableArray<Expression> getArguments() {
+    public ImmutableArray<? extends Expression> getArguments() {
         return arguments;
     }
 
