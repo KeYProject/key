@@ -1709,7 +1709,7 @@ one_schema_var_decl
     PROGRAM
     { mods = new SchemaVariableModifierSet.ProgramSV (); }
     ( schema_modifiers[mods] ) ?
-    id = simple_ident ( LBRACKET nameString = simple_ident EQUALS parameter = simple_ident RBRACKET )? {
+    id = simple_ident ( LBRACKET nameString = simple_ident EQUALS parameter = simple_ident_dots RBRACKET )? {
        if(nameString != null && !"name".equals(nameString)) {
          semanticError("Unrecognized token '"+nameString+"', expected 'name'");
        }

@@ -880,17 +880,32 @@ public abstract class ProgramSVSort extends AbstractSort {
      * match anything except byte, char, short, int, and long.
      */    
     private static final class TypeReferenceNotPrimitiveSort extends ProgramSVSort {
+        
+        private final String matchName;
 
 	public TypeReferenceNotPrimitiveSort() {
 	    super(new Name("NonPrimitiveType"));
+            this.matchName = null;
+	}
+
+	public TypeReferenceNotPrimitiveSort(String name) {
+	    super(new Name("NonPrimitiveType"));
+            this.matchName = name;
 	}
 
 	protected boolean canStandFor(ProgramElement check, Services services) {	    
 	    if (!(check instanceof TypeReference)) return false;
-	    return !(((TypeReference)(check)).getKeYJavaType().getJavaType() 
-		     instanceof PrimitiveType);
-	
+            if(((TypeReference)(check)).getKeYJavaType().getJavaType() 
+		     instanceof PrimitiveType) return false;
+            if(matchName != null) {
+                return matchName.equals(((TypeReference)(check)).getKeYJavaType().getJavaType().getFullName());
+            }
+            return true;
 	}
+
+        public ProgramSVSort createInstance(String parameter) {
+          return new TypeReferenceNotPrimitiveSort(parameter);
+        }
     }
 
     
