@@ -158,7 +158,8 @@ public final class SpecificationRepository {
         ImmutableSet<Pair<KeYJavaType,ObserverFunction>> result 
         	= DefaultImmutableSet.<Pair<KeYJavaType,ObserverFunction>>nil();
         
-        if(pm.isConstructor()) {
+        // static methods and constructors are not overriden
+        if(pm.isConstructor() || pm.isStatic()) {
             return result;
         }
         
