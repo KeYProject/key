@@ -79,8 +79,6 @@ public class ApplyStrategy {
 	    this.medi = medi;
         medi.addRuleAppListener( new ProofListener() );        
     }
-    
-    
 
     /** applies rules that are chosen by the active strategy 
      * @return true iff a rule has been applied, false otherwise

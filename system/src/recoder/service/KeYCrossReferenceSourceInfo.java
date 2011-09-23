@@ -414,8 +414,8 @@ public class KeYCrossReferenceSourceInfo
         }
         if (result != null) {
             return result;
-        }
-
+        }        
+        
         // now the outer scope is null, so we have arrived at the top
         CompilationUnit cu = (CompilationUnit) scope;
 

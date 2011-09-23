@@ -526,11 +526,14 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	final PosInOccurrence pio = ruleApp.posInOccurrence();	
         final Term focus = pio.subTerm();
         final ObserverFunction target = (ObserverFunction) focus.op();
+ 
         final Term selfTerm = target.isStatic() ? null : focus.sub(1);
+       
         ImmutableList<Term> paramTerms = ImmutableSLList.<Term>nil();
         for(int i = target.isStatic() ? 1 : 2, n = focus.arity(); i < n; i++) {
             paramTerms = paramTerms.append(focus.sub(i));
         }
+        
         final KeYJavaType kjt
         	= target.isStatic() 
 		  ? target.getContainerType()

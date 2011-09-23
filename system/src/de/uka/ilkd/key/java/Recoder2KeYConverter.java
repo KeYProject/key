@@ -1660,32 +1660,41 @@ public class Recoder2KeYConverter {
         final recoder.java.declaration.ClassDeclaration cd = n.getClassDeclaration();
         
         LinkedList<?> outerVars = null;
-        if(locClass2finalVar != null){
+        if (locClass2finalVar != null){
             outerVars = (LinkedList<?>) locClass2finalVar.get(cd);
         }
         
-        int numVars = outerVars!=null? outerVars.size() : 0;
-        Expression[] arguments = new Expression[(args != null ? args.size() : 0)+numVars];
-        for (int i = 0; i < arguments.length-numVars; i++) {
-            arguments[i] = (Expression)callConvert(args.get(i));
+        int numVars = outerVars != null ? outerVars.size() : 0;
+        
+        final Expression[] arguments;
+        
+        if (args != null) {
+           arguments = new Expression[args.size() + numVars];                
+           for (int i = 0; i < arguments.length - numVars; i++) {
+               arguments[i] = (Expression)callConvert(args.get(i));
+           }       
+        } else {
+            arguments = new Expression[numVars];
         }
         
-        for (int i = arguments.length-numVars; i<arguments.length; i++) {
-	    recoder.java.declaration.VariableSpecification v = (recoder.java.declaration.VariableSpecification) 
-		outerVars.get(i-arguments.length + numVars);
-	    if (si.getContainingClassType(v) != si.getContainingClassType(n)){
-		recoder.java.declaration.FieldSpecification fs = 
-		    (recoder.java.declaration.FieldSpecification) si.getVariable(ImplicitFieldAdder.FINAL_VAR_PREFIX+v.getName(), 
-										 (recoder.java.declaration.ClassDeclaration) 
-										 si.getContainingClassType(n));
-		arguments[i] = new FieldReference(getProgramVariableForFieldSpecification(fs), new ThisReference());
-	    }else{
-		arguments[i] = (ProgramVariable) convert(v).getProgramVariable();
-	    }
+        if (outerVars != null) {
+            for (int i = arguments.length-numVars; i<arguments.length; i++) {
+                recoder.java.declaration.VariableSpecification v = (recoder.java.declaration.VariableSpecification) 
+                        outerVars.get(i-arguments.length + numVars);
+                if (si.getContainingClassType(v) != si.getContainingClassType(n)){
+                    recoder.java.declaration.FieldSpecification fs = 
+                            (recoder.java.declaration.FieldSpecification) si.getVariable(ImplicitFieldAdder.FINAL_VAR_PREFIX+v.getName(), 
+                                    (recoder.java.declaration.ClassDeclaration) 
+                                    si.getContainingClassType(n));
+                    arguments[i] = new FieldReference(getProgramVariableForFieldSpecification(fs), new ThisReference());
+                } else {
+                    arguments[i] = (ProgramVariable) convert(v).getProgramVariable();
+                }
+            }
         }
-        
+
         TypeReference maybeAnonClass = (TypeReference) callConvert(tr);
-        if(n.getClassDeclaration() != null){
+        if (n.getClassDeclaration() != null){
             callConvert(n.getClassDeclaration());
             KeYJavaType kjt = getKeYJavaType(n.getClassDeclaration());
             maybeAnonClass = new TypeRef(kjt);
