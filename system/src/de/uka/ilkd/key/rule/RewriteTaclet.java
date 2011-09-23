@@ -148,11 +148,11 @@ public final class RewriteTaclet extends FindTaclet {
 		op = t.op ();
 
 		if ( op instanceof UpdateApplication &&
-		     it.getChild () == ((UpdateApplication)op).targetPos()) {		    
+		     it.getChild () == UpdateApplication.targetPos()) {		    
 		    if ( getStateRestriction() == IN_SEQUENT_STATE || veto(t) ) {
 			return null;
 		    } else {
-			Term update = ((UpdateApplication) op).getUpdate(t);
+			Term update = UpdateApplication.getUpdate(t);
 			svi = svi.addUpdate ( update );
 		    }
 		    

@@ -135,10 +135,9 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
      * PRECONDITION: <code>warysvars != null</code>
      */
     private Term applyOnUpdate ( Term t ) {
-        final UpdateApplication updOp = (UpdateApplication)t.op ();
         
 	// only the last child is below the update
-	final Term target = updOp.getTarget ( t );
+	final Term target = UpdateApplication.getTarget ( t );
 	if ( !target.freeVars ().contains ( getVariable () ) )
 	    return super.apply1 ( t );
 
@@ -147,14 +146,14 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
 	    new ImmutableArray[t.arity()];
 
 	for ( int i = 0; i < t.arity (); i++ ) {
-            if ( i != updOp.targetPos () )
+            if ( i != UpdateApplication.targetPos () )
                 applyOnSubterm ( t, i, newSubterms, newBoundVars );
         }
 
-	newBoundVars[updOp.targetPos()] = t.varsBoundHere ( updOp.targetPos() );
+	newBoundVars[UpdateApplication.targetPos()] = t.varsBoundHere ( UpdateApplication.targetPos() );
         final boolean addSubst =
-            subTermChanges ( t.varsBoundHere ( updOp.targetPos () ), target );
-        newSubterms[updOp.targetPos ()] = addSubst ? substWithNewVar ( target )
+            subTermChanges ( t.varsBoundHere ( UpdateApplication.targetPos () ), target );
+        newSubterms[UpdateApplication.targetPos ()] = addSubst ? substWithNewVar ( target )
                                                    : target;
 
         return TB.tf().createTerm ( t.op (),

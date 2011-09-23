@@ -1181,43 +1181,7 @@ public abstract class ProgramSVSort extends AbstractSort {
 
     //------------------ stuff concerned with explicit and implicit elements----
     
-    private static final class ExplicitProgramVariableSort
-	extends LeftHandSideSort {
-
-	public ExplicitProgramVariableSort() {
-	    super(new Name("ExplicitVariable"));
-	}
-
-	public boolean canStandFor(Term t) {
-	    return (t.op() instanceof ProgramVariable);
-	}
-
-	protected boolean canStandFor(ProgramElement pe,
-				      Services services) {
-	    return (super.canStandFor(pe, services) && !implicit(pe));
-	}
-    }
-
-    private static final class ImplicitProgramVariableSort
-	extends LeftHandSideSort {
-
-	public ImplicitProgramVariableSort() {
-	    super(new Name("ImplicitVariable"));
-	}
-
-	public boolean canStandFor(Term t) {
-	    return (t.op() instanceof ProgramVariable && 
-                    implicit((ProgramVariable)t.op()));
-	}
-
-	protected boolean canStandFor(ProgramElement pe,
-				      Services services) {
-	    return super.canStandFor(pe, services) && implicit(pe);
-	}
-    }
-
-
-
+    
     private static final class ConstantProgramVariableSort 
 	extends ProgramSVSort {
 

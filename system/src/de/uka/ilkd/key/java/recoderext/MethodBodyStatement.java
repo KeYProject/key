@@ -24,6 +24,11 @@ public class MethodBodyStatement extends JavaStatement implements
     TypeReferenceContainer, ExpressionContainer, NamedProgramElement, ReferenceSuffix {
     
     /**
+     * 
+     */
+    private static final long serialVersionUID = 3576016842584950841L;
+
+    /**
      * the ast parent
      */
     private StatementContainer astParent;

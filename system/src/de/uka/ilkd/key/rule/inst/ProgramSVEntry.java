@@ -21,6 +21,10 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
  */
 public class ProgramSVEntry implements Serializable {
     
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -5837249343101979072L;
     /** the SchemaVariable */
     private SchemaVariable key;
     /** the JavaProgramElement */

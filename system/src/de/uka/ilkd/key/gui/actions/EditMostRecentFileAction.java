@@ -13,6 +13,11 @@ import de.uka.ilkd.key.gui.MainWindow;
  */
 public final class EditMostRecentFileAction extends MainWindowAction {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -6214327707255790570L;
+
     public EditMostRecentFileAction(MainWindow mainWindow) {
 	super(mainWindow);
 	

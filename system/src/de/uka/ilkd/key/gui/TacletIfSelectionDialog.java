@@ -33,6 +33,10 @@ import de.uka.ilkd.key.util.Debug;
  */
 public class TacletIfSelectionDialog extends JPanel{
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -7456635942609535650L;
     private JPanel ifPanel = new JPanel();
     private ApplyTacletDialogModel model;
     private TacletMatchCompletionDialog owner;
@@ -75,12 +79,22 @@ public class TacletIfSelectionDialog extends JPanel{
 	    p.setLayout(new BoxLayout(p, BoxLayout.X_AXIS));
 	    JLabel label = new JLabel(ProofSaver.printAnything(
 	        model.ifFma(i), model.proof().getServices())) {
-	        public java.awt.Dimension getPreferredSize() {
+	        /**
+                 * 
+                 */
+                private static final long serialVersionUID = -6925345438533627265L;
+
+            public java.awt.Dimension getPreferredSize() {
 		    return new java.awt.Dimension(100,10);
 		}
 	    };
 	    p.add(label);
 	    JComboBox ifChoice = new JComboBox(model.ifChoiceModel(i)) {
+                /**
+             * 
+             */
+            private static final long serialVersionUID = -6429999070946158788L;
+
                 public java.awt.Dimension getPreferredSize() {
                     return new java.awt.Dimension(800,
                         (int)super.getPreferredSize().getHeight());
@@ -181,6 +195,10 @@ public class TacletIfSelectionDialog extends JPanel{
 
     static class IfComboRenderer extends JLabel implements ListCellRenderer {
 	
+        /**
+         * 
+         */
+        private static final long serialVersionUID = -7145932915948630147L;
         private final Services services;
         private final ListCellRenderer defaultRenderer;
         

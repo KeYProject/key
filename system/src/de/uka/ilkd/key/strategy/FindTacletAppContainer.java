@@ -146,7 +146,7 @@ public class FindTacletAppContainer extends TacletAppContainer {
                 final Operator modOp = changePIO.getSubTerm ().op ();
 
                 return !( modOp instanceof UpdateApplication
-                          && appIndex == ( (UpdateApplication)modOp ).targetPos ()
+                          && appIndex == UpdateApplication.targetPos ()
                           && updateContextIsRecorded () );
             }
         }

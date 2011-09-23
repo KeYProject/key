@@ -49,6 +49,11 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 
 public final class StrategySelectionView extends JPanel {
     
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 4543901758512289107L;
+
     private static final String JAVACARDDL_STRATEGY_NAME 
     	= "JavaCardDLStrategy";
 
@@ -100,6 +105,11 @@ public final class StrategySelectionView extends JPanel {
     
     JPanel javaDLOptionsPanel = new JPanel() {
         
+        /**
+         * 
+         */
+        private static final long serialVersionUID = -6053300204350121172L;
+
         public void setEnabled(boolean enabled) {
              super.setEnabled(enabled);
              setChildrenEnabled(this, enabled);

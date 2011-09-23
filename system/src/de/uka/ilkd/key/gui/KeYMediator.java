@@ -11,7 +11,6 @@
 package de.uka.ilkd.key.gui;
 
 import java.awt.Component;
-import java.util.ArrayList;
 import java.util.Iterator;
 
 import javax.swing.Action;
@@ -84,8 +83,6 @@ public class KeYMediator {
     private boolean stupidMode; // minimize user interaction
 
     private boolean autoMode; // autoModeStarted has been fired
-    
-    private ArrayList<InterruptListener> interruptListener = new ArrayList<InterruptListener>();
     
     /** creates the KeYMediator with a reference to the application's
      * main frame and the current proof settings

@@ -18,6 +18,11 @@ public class PassiveExpression
 
         
     /**
+     * 
+     */
+    private static final long serialVersionUID = 4916068787633267648L;
+
+    /**
      * creates a newly generated passive expression
      */
     public PassiveExpression() {

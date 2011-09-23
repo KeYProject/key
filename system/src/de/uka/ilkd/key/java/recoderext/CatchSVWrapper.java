@@ -20,6 +20,10 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 public class CatchSVWrapper extends Catch 
     implements KeYRecoderExtension, SVWrapper{
    
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 6288254708744002494L;
     protected SchemaVariable sv;
 
     public CatchSVWrapper(SchemaVariable sv) {

@@ -11,11 +11,15 @@
 package de.uka.ilkd.key.java.recoderext.adt;
 
 import recoder.java.Expression;
-import recoder.java.SourceVisitor;
-import recoder.java.expression.Operator;
 
 
 public class SetMinus extends ADTPrefixConstruct {
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -1824229344478712816L;
+
 
     public SetMinus(Expression lhs, Expression rhs) {
 	super(lhs, rhs);

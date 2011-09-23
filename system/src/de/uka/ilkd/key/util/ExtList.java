@@ -26,7 +26,6 @@ public class ExtList extends LinkedList<Object> {
     }
 
     /** copies list to array (array has type of cl) */
-    @SuppressWarnings("unchecked")
     private static <T>T[] toArray(Class<T> cl, LinkedList<T> list) {
         T[] array= (T[]) java.lang.reflect.Array.newInstance(cl,list.size());
         System.arraycopy(list.toArray(),0,array,0,list.size());

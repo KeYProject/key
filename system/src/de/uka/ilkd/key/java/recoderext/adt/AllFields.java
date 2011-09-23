@@ -11,11 +11,15 @@
 package de.uka.ilkd.key.java.recoderext.adt;
 
 import recoder.java.Expression;
-import recoder.java.SourceVisitor;
-import recoder.java.expression.Operator;
 
 
 public class AllFields extends ADTPrefixConstruct {
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 3940415948467563540L;
+
 
     public AllFields(Expression lhs) {
 	super(lhs);

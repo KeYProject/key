@@ -20,6 +20,10 @@ import javax.swing.plaf.metal.MetalIconFactory.FolderIcon16;
 
 class KeYFolderIcon extends FolderIcon16 {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -1761252232258509631L;
     private static final Icon closedIcon   = new KeYFolderIcon(Color.green.darker());
     private static final Icon closableIcon = new KeYFolderIcon(Color.blue.darker());
     private static final Dimension folderIcon16Size = new Dimension( 16, 16 );

@@ -40,6 +40,10 @@ import javax.swing.event.ListSelectionListener;
 
 public final class ExampleChooser extends JDialog {
     
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -4405666868752394532L;
     private static final String KEY_FILE_NAME = "project.key";
     private static final String README_NAME = "README.txt";
     

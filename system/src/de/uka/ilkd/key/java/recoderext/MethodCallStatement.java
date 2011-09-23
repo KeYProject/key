@@ -21,6 +21,11 @@ public class MethodCallStatement extends JavaStatement implements
     StatementContainer, ExpressionContainer {
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = -7934369465947182006L;
+
+    /**
      * resultVar (should be a VariableReference, but the parser can't enforce this)
      */
     protected Expression resultVar;

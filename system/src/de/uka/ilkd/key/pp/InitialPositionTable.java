@@ -129,23 +129,6 @@ public class InitialPositionTable extends PositionTable{
     }
 
     /**
-     * Returns the <code>SequentPrintFilterEntry</code> for the given
-     * constrained formula from the <code>filter</code>.
-     */
-    private SequentPrintFilterEntry entryForCfma (SequentFormula cfma,
-                                                  SequentPrintFilter filter) {
-        ImmutableList<SequentPrintFilterEntry> list =
-            filter.getAntec ().append ( filter.getSucc () );
-        int k;
-        for ( k = 0; !list.isEmpty (); k++, list = list.tail () ) {
-            if ( list.head ().getOriginalFormula () == cfma ) {
-                return list.head ();
-            }
-        }
-        return null;
-    }
-
-    /**
      * Returns the character range of the `lowest' subtable that
      * includes <code>index</code> in its range.
      * @param index the character index to search for.

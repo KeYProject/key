@@ -12,6 +12,11 @@ import de.uka.ilkd.key.proof.Proof;
 
 public class ShowProofStatistics extends MainWindowAction {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -8814798230037775905L;
+
     public ShowProofStatistics(MainWindow mainWindow) {
 	super(mainWindow);
 	setName("Show Proof Statistics...");

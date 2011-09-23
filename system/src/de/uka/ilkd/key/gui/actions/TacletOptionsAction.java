@@ -9,6 +9,11 @@ import de.uka.ilkd.key.gui.configuration.ProofSettings;
 
 public class TacletOptionsAction extends MainWindowAction {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -6813540362001480606L;
+
     public TacletOptionsAction(MainWindow mainWindow) {
 	super(mainWindow);
 	setName("Taclet Options...");

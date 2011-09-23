@@ -15,6 +15,10 @@ import recoder.java.expression.operator.NewArray;
 
 public class NewArrayWrapper extends NewArray {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -3838799869300845065L;
     private Identifier scope;
     
     public NewArrayWrapper(NewArray proto, Identifier scope){

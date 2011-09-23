@@ -11,7 +11,6 @@
 package de.uka.ilkd.key.java.recoderext.adt;
 
 import recoder.java.Expression;
-import recoder.java.SourceVisitor;
 
 /**
  * Sequence getter operation.
@@ -20,6 +19,11 @@ import recoder.java.SourceVisitor;
  */
 public class SeqGet extends ADTPrefixConstruct {
     
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -421447886220796576L;
+
     /**
      * Creates a sequence getter operator.
      * @param seq Sequence to operate on

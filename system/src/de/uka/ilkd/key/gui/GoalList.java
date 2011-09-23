@@ -50,6 +50,10 @@ import de.uka.ilkd.key.util.Debug;
 
 public class GoalList extends JList {
     
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1632264315383703798L;
     private final static ImageIcon keyIcon = IconFactory.keyHole(20,20);
     private final static Icon disabledGoalIcon = IconFactory.keyHoleInteractive(20, 20);
 
@@ -76,6 +80,11 @@ public class GoalList extends JList {
      *
      */
     private final class DisableSingleGoal extends DisableGoal {
+
+        /**
+         * 
+         */
+        private static final long serialVersionUID = -2035187175105625072L;
 
         DisableSingleGoal() {
             if (getSelectedValue() instanceof Goal) {                
@@ -122,6 +131,11 @@ public class GoalList extends JList {
      * @author Richard Bubel
      */
     private final class DisableOtherGoals extends DisableGoal {
+
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 4077876260098617901L;
 
         DisableOtherGoals() {
             if (getSelectedValue() instanceof Goal) {                
@@ -305,7 +319,12 @@ public class GoalList extends JList {
     
     private class GoalListGUIListener implements GUIListener,
                                          java.io.Serializable {
-	/** invoked if a frame that wants modal access is opened */
+	/**
+         * 
+         */
+        private static final long serialVersionUID = -1826501525753975124L;
+
+    /** invoked if a frame that wants modal access is opened */
 	public void modalDialogOpened(GUIEvent e) {
 	    setEnabled(false);
 	}
@@ -372,7 +391,11 @@ public class GoalList extends JList {
 
     private static class GoalListModel extends AbstractListModel {
     
-	/** the proof the model belongs to */	
+	/**
+         * 
+         */
+        private static final long serialVersionUID = 3754243473284250930L;
+    /** the proof the model belongs to */	
 	private Proof proof;
 	/** */
 	private List<Goal> goals;
@@ -468,7 +491,11 @@ public class GoalList extends JList {
 
 	class GoalListProofTreeListener implements ProofTreeListener, java.io.Serializable {
 
-	    private boolean pruningInProcess;
+	    /**
+         * 
+         */
+        private static final long serialVersionUID = 3090011700136463120L;
+        private boolean pruningInProcess;
 
 
         /*
@@ -543,6 +570,10 @@ public class GoalList extends JList {
      */
     private class SelectingGoalListModel extends AbstractListModel {
         
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 7395134147866131926L;
         private final GoalListModel delegate;
         /**
          * The last known size of the delegate model. This is used to recognise
@@ -636,19 +667,17 @@ public class GoalList extends JList {
          */
         private int removeInterval (int delegateBegin, int delegateEnd) {
             final int ind = delegatePosToMappingPos ( delegateBegin );
-
-            int removeCount = 0;
+            
             while ( ind != entries.size ()
                     && getDelegateIndex ( ind ) < delegateEnd ) {
                 entries.remove ( ind );
-                ++removeCount;
             }
             
             return ind;
         }
         
         private int delegatePosToMappingPos (int delegateIndex) {
-            // unefficient, could be implemented using binary search (is there
+            // Inefficient, could be implemented using binary search (is there
             // an usable algorithm for this purpose in the Java library?)
 
             for ( int res = 0; res != entries.size(); ++res ) {
@@ -766,7 +795,12 @@ public class GoalList extends JList {
 
                
         
-	public IconCellRenderer() {
+	/**
+         * 
+         */
+        private static final long serialVersionUID = -8178991338906184819L;
+
+    public IconCellRenderer() {
 	    GoalList.this.setToolTipText("GOAL");
 	}
 	

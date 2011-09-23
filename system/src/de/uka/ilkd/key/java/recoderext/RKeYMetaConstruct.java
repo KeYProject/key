@@ -34,6 +34,10 @@ public class RKeYMetaConstruct extends JavaStatement
 
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = -2616618524631193660L;
+    /**
      Child
      */
     protected Statement child=null;

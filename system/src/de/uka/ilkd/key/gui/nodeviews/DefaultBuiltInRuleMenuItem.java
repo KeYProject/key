@@ -20,6 +20,10 @@ import de.uka.ilkd.key.rule.BuiltInRule;
  */
 class DefaultBuiltInRuleMenuItem extends JMenuItem implements BuiltInRuleMenuItem {
     
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 2104546363767367689L;
     private BuiltInRule connectedTo;
     
     public DefaultBuiltInRuleMenuItem(BuiltInRule connectedTo) {

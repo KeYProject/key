@@ -10,6 +10,11 @@ import de.uka.ilkd.key.pp.NotationInfo;
 
 public class PrettyPrintToggleAction extends MainWindowAction {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 8633254204256247698L;
+
     public PrettyPrintToggleAction(MainWindow mainWindow) {
 	super(mainWindow);
 	setName("Use pretty syntax");

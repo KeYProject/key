@@ -46,6 +46,10 @@ import de.uka.ilkd.key.util.Debug;
 
 class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 7853478051421478043L;
     private Proof proof;
     private ProofTreeListener proofTreeListener;
 

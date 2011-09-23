@@ -2,9 +2,6 @@ package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
 
-import javax.swing.Action;
-import javax.swing.Icon;
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -17,6 +14,11 @@ import de.uka.ilkd.key.gui.configuration.ProofSettings;
  * default settings
  */
 public class ShowActiveSettingsAction extends MainWindowAction {
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -3038735283059371442L;
 
     public ShowActiveSettingsAction(MainWindow mainWindow) {
 	super(mainWindow);

@@ -24,6 +24,11 @@ public class KeYFileChooser {
 
     public KeYFileChooser(String initDir) {
 	fileChooser = new JFileChooser(new File(initDir)) {
+                /**
+         * 
+         */
+        private static final long serialVersionUID = -7598570660247063980L;
+
                 public void approveSelection() {
                     File file = getSelectedFile();
                     if (saveDialog && file.exists() &&

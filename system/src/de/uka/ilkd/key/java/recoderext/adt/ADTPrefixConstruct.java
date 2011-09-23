@@ -8,6 +8,10 @@ import recoder.java.reference.ReferenceSuffix;
 
 public abstract class ADTPrefixConstruct extends Operator implements ReferencePrefix {
     
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 2903025447315816147L;
     private ReferenceSuffix suffix;
     
     public ADTPrefixConstruct(){

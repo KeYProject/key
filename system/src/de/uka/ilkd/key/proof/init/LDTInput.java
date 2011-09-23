@@ -15,7 +15,6 @@ import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.*;
 

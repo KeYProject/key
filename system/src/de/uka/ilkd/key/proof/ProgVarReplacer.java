@@ -30,9 +30,6 @@ import de.uka.ilkd.key.rule.inst.*;
  */
 public final class ProgVarReplacer {
     
-    private static final TermBuilder TB = TermBuilder.DF;
-    
-    
     /**
      * map specifying the replacements to be done
      */

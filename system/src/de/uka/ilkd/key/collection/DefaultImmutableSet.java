@@ -197,7 +197,11 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
     /** represents the empty set for elements of type <T> */
     private static class NILSet<T> extends DefaultImmutableSet<T> {
 
-	static final NILSet<?> NIL = new NILSet();
+	/**
+         * 
+         */
+        private static final long serialVersionUID = -8055357307337694419L;
+    static final NILSet<?> NIL = new NILSet();
 
 	private NILSet() {}
 

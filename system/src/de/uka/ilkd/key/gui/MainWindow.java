@@ -45,7 +45,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -71,7 +70,6 @@ import de.uka.ilkd.key.gui.actions.FontSizeAction;
 import de.uka.ilkd.key.gui.actions.LemmaGenerationBatchModeAction;
 import de.uka.ilkd.key.gui.actions.LicenseAction;
 import de.uka.ilkd.key.gui.actions.LemmaGenerationAction;
-import de.uka.ilkd.key.gui.actions.LemmaGenerationAction.Mode;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.actions.MinimizeInteraction;
 import de.uka.ilkd.key.gui.actions.OneStepSimplificationToggleAction;
@@ -1038,10 +1036,6 @@ public final class MainWindow extends JFrame  {
         }
     }
     
-    private void saveProof(String proofFile) {
-        saveProof(new File(proofFile));
-    }
-    
     public void saveProof(File proofFile) {
         String filename = proofFile.getAbsolutePath();    
         ProofSaver saver = new ProofSaver(getMediator().getSelectedProof(), filename, Main.INTERNAL_VERSION);
@@ -1065,26 +1059,6 @@ public final class MainWindow extends JFrame  {
             new ProblemLoader(file, this);
         pl.addTaskListener(getUserInterface());
         pl.run();
-    }
-    
-    private void closeTask() {
-	final Proof proof = mediator.getProof();
-	if (proof != null) {
-	    final TaskTreeNode rootTask = proof.getBasicTask().getRootTask();
-	    closeTask(rootTask); 
-	}
-    }
-
-    private void closeTask(TaskTreeNode rootTask) {
-       if(proofList.removeTask(rootTask)){
-            for(Proof proof:rootTask.allProofs()){
-                //In a previous revision the following statement was performed only
-                //on one proof object, namely on: mediator.getProof()
-                proof.getServices().getSpecificationRepository().removeProof(proof);
-                proof.mgt().removeProofListener();
-            }
-            proofTreeView.removeProofs(rootTask.allProofs());
-       }
     }
 
     // FIXME DOES NOT DO THE SAME AS THE ONE ONE ABOVE

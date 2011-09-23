@@ -29,6 +29,11 @@ public class InsertHiddenTacletMenuItem extends InsertionTacletBrowserMenuItem {
     
    
     /**
+     * 
+     */
+    private static final long serialVersionUID = -2221016383998349319L;
+
+    /**
      * creates an instance of the insert hidden menu item
      * @param parent the JFrame with the parent frame
      * @param notInfo the NotationInfo to be used for pretty printing 

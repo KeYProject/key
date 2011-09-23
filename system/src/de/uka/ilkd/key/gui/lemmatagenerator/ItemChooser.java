@@ -378,7 +378,6 @@ class SelectionPanel<T> extends JPanel{
        
                 LinkedList<T> infoList = new LinkedList<T>();
                 for(int i : getList().getSelectedRows()){
-                       @SuppressWarnings("unchecked") // cast is okay.
                 TableItem<T> item = ((TableItem<T>)getList().getValueAt(i, 0)); 
                       infoList.add(item.getData());  
                 }
@@ -389,7 +388,6 @@ class SelectionPanel<T> extends JPanel{
                 
                 LinkedList<TableItem<T>> infoList = new LinkedList<TableItem<T>>();
                 for(int i : getList().getSelectedRows()){
-                        @SuppressWarnings("unchecked") // cast is okay
                         TableItem<T> item = ((TableItem<T>)getList().getValueAt(i, 0)); 
                       infoList.add(item);  
                 }
@@ -407,7 +405,6 @@ class SelectionPanel<T> extends JPanel{
                         @Override
                         public boolean include(
                                         javax.swing.RowFilter.Entry<? extends ItemModel, ? extends Integer> entry) {
-                                @SuppressWarnings("unchecked")// cast is okay.
                                 TableItem<T> item = (TableItem<T>) entry.getModel().getValueAt(entry.getIdentifier(),0);
                                 
                                 for(ItemFilter<T> userFilter : userFilters){
@@ -464,7 +461,6 @@ class SelectionPanel<T> extends JPanel{
                 return side;
         }
         
-        @SuppressWarnings("unchecked")
         public void update(){
                 ((TableRowSorter<ItemModel>)getList().getRowSorter()).setRowFilter(filter);
         }

@@ -11,11 +11,15 @@
 package de.uka.ilkd.key.java.recoderext.adt;
 
 import recoder.java.Expression;
-import recoder.java.SourceVisitor;
-import recoder.java.expression.Operator;
 
 
 public class Intersect extends ADTPrefixConstruct {
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 8777658515734186914L;
+
 
     public Intersect(Expression lhs, Expression rhs) {
 	super(lhs, rhs);

@@ -11,12 +11,15 @@
 package de.uka.ilkd.key.speclang.translation;
 
 import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 
 
 public class SLTranslationException extends ProofInputException {
       
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 6600131411834400587L;
     private final String fileName;
     private final Position pos;
     

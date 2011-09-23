@@ -16,6 +16,10 @@ import javax.swing.JPanel;
 
 public abstract class InstallationPane extends JPanel {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -5956711910075180613L;
     private String name;
     private KeYInstaller installer;
 
