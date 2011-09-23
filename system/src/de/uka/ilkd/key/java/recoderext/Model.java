@@ -17,6 +17,12 @@ import recoder.java.declaration.Modifier;
 
 public class Model extends Modifier {
     
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -1997772798461795576L;
+
+
     public Model() {
     }
     

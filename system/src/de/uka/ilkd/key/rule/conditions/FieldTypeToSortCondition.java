@@ -11,13 +11,11 @@
 package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.*;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.*;
-import de.uka.ilkd.key.util.Debug;
 
 /**
  * Variable condition that enforces a given generic sort to be instantiated with

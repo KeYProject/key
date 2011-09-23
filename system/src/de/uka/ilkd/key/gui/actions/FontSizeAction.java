@@ -14,6 +14,11 @@ import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
 
 public class FontSizeAction extends MainWindowAction implements ConfigChangeListener {
     
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -5429097174272693359L;
+
     public static enum Mode { LARGER, SMALLER }
 
     private Mode mode;;

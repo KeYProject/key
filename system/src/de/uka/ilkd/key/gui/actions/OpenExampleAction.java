@@ -3,8 +3,6 @@ package de.uka.ilkd.key.gui.actions;
 import java.awt.event.ActionEvent;
 import java.io.File;
 
-import javax.swing.AbstractAction;
-
 import de.uka.ilkd.key.gui.ExampleChooser;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -14,6 +12,11 @@ import de.uka.ilkd.key.gui.MainWindow;
  */
 public final class OpenExampleAction extends MainWindowAction {
     
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -7703620988220254791L;
+
     public OpenExampleAction(MainWindow mainWindow) {
 	super(mainWindow);
         setName("Load Example...");

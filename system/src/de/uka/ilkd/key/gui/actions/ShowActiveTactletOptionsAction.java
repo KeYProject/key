@@ -12,6 +12,11 @@ import de.uka.ilkd.key.proof.Proof;
 
 public class ShowActiveTactletOptionsAction extends MainWindowAction {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -7012564698194718532L;
+
     public ShowActiveTactletOptionsAction(MainWindow mainWindow) {
 	super(mainWindow);
 	setName("Show Active Taclet Options...");

@@ -11,6 +11,11 @@ import de.uka.ilkd.key.gui.MainWindow;
 
 public class AboutAction extends MainWindowAction {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 8240213594748334802L;
+
     public AboutAction(MainWindow mainWindow) {
 	super(mainWindow);
 	setName("About KeY");

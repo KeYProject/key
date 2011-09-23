@@ -57,6 +57,10 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationException;
  */
 public class ExceptionDialog extends JDialog {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -4532724315711726522L;
     private JScrollPane listScroll, stScroll;    
     private boolean withList = false;
     private JTextArea stTextArea;
@@ -338,6 +342,11 @@ public class ExceptionDialog extends JDialog {
 
     private static class TextAreaRenderer extends JTextArea implements ListCellRenderer
     {
+        /**
+         * 
+         */
+        private static final long serialVersionUID = -1151786934514170956L;
+
         public TextAreaRenderer()
         {	   
             setLineWrap(true);

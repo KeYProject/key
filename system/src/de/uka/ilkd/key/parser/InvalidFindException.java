@@ -12,6 +12,10 @@ package de.uka.ilkd.key.parser;
 class InvalidFindException 
     extends antlr.SemanticException {
     
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1699188390606912785L;
     private String description;
     
     public InvalidFindException(String description,

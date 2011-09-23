@@ -13,6 +13,12 @@ import recoder.java.expression.Operator;
 public class RangeExpression extends Operator implements Expression {
     
     
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 6404478656913511767L;
+
+
     public RangeExpression (Expression fromIdx, Expression toIdx){
         super(fromIdx, toIdx);
         makeParentRoleValid();

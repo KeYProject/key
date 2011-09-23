@@ -13,6 +13,10 @@ package de.uka.ilkd.key.proof;
 public class SVRigidnessException 
     extends SVInstantiationExceptionWithPosition {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -440942650851579438L;
     private String toInstantiate;
          
     public SVRigidnessException( String toInstantiate, 

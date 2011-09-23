@@ -36,7 +36,6 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
-import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -53,6 +52,10 @@ import de.uka.ilkd.key.util.Debug;
 
 public class NonGoalInfoView extends JTextArea {
     	 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -868094158643337989L;
     private LogicPrinter printer;	 
     private SequentPrintFilter filter;
     private InitialPositionTable posTable;

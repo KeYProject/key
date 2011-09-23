@@ -38,6 +38,10 @@ import de.uka.ilkd.key.util.pp.StringBackend;
 public abstract class ApplyTacletDialog extends JDialog {
 
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -411398660828882035L;
     // buttons
     protected JButton cancelButton;
     protected JButton applyButton;

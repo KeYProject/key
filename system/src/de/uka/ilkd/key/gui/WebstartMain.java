@@ -17,8 +17,6 @@ import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import de.uka.ilkd.key.gui.MainWindow;
-
 
 public class WebstartMain {
     

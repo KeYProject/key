@@ -1,20 +1,22 @@
 package de.uka.ilkd.key.gui.actions;
 
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowListener;
 
 import javax.swing.JOptionPane;
-import javax.swing.KeyStroke;
-
 import de.uka.ilkd.key.gui.GUIEvent;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 
 public class ExitMainAction extends MainWindowAction {
     
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 5881706859613947592L;
+
     public ExitMainAction(MainWindow mainWindow) {
 	super(mainWindow);
 	setName("Exit");

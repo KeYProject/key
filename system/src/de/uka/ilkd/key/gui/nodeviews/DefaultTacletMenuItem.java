@@ -30,6 +30,10 @@ import de.uka.ilkd.key.util.pp.WriterBackend;
  */
 class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
     
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -5537139155045230424L;
     private TacletApp connectedTo;
     
     /** creates TacletMenuItem attached to a Taclet 

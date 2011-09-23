@@ -25,9 +25,7 @@ public final class CharListNotation extends Notation {
 	if(sp.getNotationInfo().getAbbrevMap().isEnabled(t)) {
 	    sp.printTerm(t);
 	} else {
-	    String s;
 	    try {
-		s = translateTerm(t);
 		sp.printConstant(translateTerm(t));
 	    } catch (IllegalArgumentException exc) {
 		sp.printFunctionTerm(t.op().name().toString(), t);

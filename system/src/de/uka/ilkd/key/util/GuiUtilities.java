@@ -102,7 +102,12 @@ public class GuiUtilities {
         if (clipBoardTextArea == null) {
             clipBoardTextArea = new java.awt.TextArea(
         	    "",10,10,java.awt.TextArea.SCROLLBARS_NONE) {
-        	public java.awt.Dimension getMaximumSize() {
+        	/**
+                     * 
+                     */
+                    private static final long serialVersionUID = 7729624612190406520L;
+
+            public java.awt.Dimension getMaximumSize() {
         	    return new java.awt.Dimension(0,0);
         	}
             };

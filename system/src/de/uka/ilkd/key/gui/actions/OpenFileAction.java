@@ -11,6 +11,11 @@ import de.uka.ilkd.key.util.GuiUtilities;
 
 public class OpenFileAction extends MainWindowAction {
     
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -8548805965130100236L;
+
     public OpenFileAction(MainWindow mainWindow) {
 	super(mainWindow);
         setName("Load...");

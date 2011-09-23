@@ -17,6 +17,10 @@ import java.util.Set;
 
 public final class StrategyProperties extends Properties {
     
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 8651946636880456925L;
     public final static String STOPMODE_OPTIONS_KEY = "STOPMODE_OPTIONS_KEY";
     public final static String STOPMODE_DEFAULT = "STOPMODE_DEFAULT";
     public final static String STOPMODE_NONCLOSE = "STOPMODE_NONCLOSE";    

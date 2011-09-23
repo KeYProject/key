@@ -117,10 +117,7 @@ public final class QueryAxiom extends ClassAxiom {
 				ProgramSVSort.VARIABLE, 
 				false);
 	final ProgramSV[] paramProgSVs = new ProgramSV[target.getNumParams()];
-	for(int i = 0; i < paramProgSVs.length; i++) {
-	    final String paramName = target.getParameterDeclarationAt(i)
-	                                   .getVariableSpecification()
-	                                   .getName();
+	for(int i = 0; i < paramProgSVs.length; i++) {	    
 	    paramProgSVs[i] = SchemaVariableFactory.createProgramSV(
 		    		new ProgramElementName("#p" + i), 
 		    		ProgramSVSort.VARIABLE, 

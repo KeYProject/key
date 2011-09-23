@@ -18,6 +18,11 @@ import de.uka.ilkd.key.util.KeYResourceManager;
 
 public class LicenseAction extends MainWindowAction {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -5859545563375095225L;
+
     public LicenseAction(MainWindow mainWindow) {
 	super(mainWindow);
 	setName("License");

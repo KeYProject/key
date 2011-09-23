@@ -21,6 +21,10 @@ import de.uka.ilkd.key.rule.BuiltInRule;
  */
 public class BuiltInRuleIndex implements java.io.Serializable {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -4399004272449882750L;
     /** list of available built in rules */
     private ImmutableList<BuiltInRule> rules = ImmutableSLList.<BuiltInRule>nil();
 

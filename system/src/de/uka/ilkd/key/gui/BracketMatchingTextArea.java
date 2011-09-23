@@ -287,7 +287,7 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
     static private class BorderPainter implements HighlightPainter {
 
         /**
-         * The code is copied from {@link DefaultHighlighter#DefaultPainter#paint(Graphics)}
+         * The code is copied from @link DefaultHighlighter#DefaultPainter#paint(Graphics)
          */
         public void paint(Graphics g, int offs0, int offs1, Shape bounds,
                 JTextComponent c) {

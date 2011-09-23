@@ -23,6 +23,11 @@ import de.uka.ilkd.key.collection.ImmutableList;
 public class GenericSortException extends SortException {
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = 1372231759025588273L;
+
+    /**
      * often used singleton
      */
     public static final GenericSortException UNINSTANTIATED_GENERIC_SORT =

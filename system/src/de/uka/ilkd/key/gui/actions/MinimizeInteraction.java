@@ -9,6 +9,11 @@ import de.uka.ilkd.key.gui.configuration.ProofSettings;
 
 public class MinimizeInteraction extends MainWindowAction {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 3453843972242689758L;
+
     public MinimizeInteraction(MainWindow mainWindow) {
 	super(mainWindow);
 	setName("Minimize Interaction");

@@ -366,12 +366,13 @@ public class PrettyPrinter {
 
     protected Position getRelativePosition(SourceElement first) {
         try {
-        if (indentMap.containsKey(first)) {
-            return indentMap.get(first);
-        } else {
-            if (first!=null) return first.getRelativePosition();
-            
-        }} finally {
+            if (indentMap.containsKey(first)) {
+                return indentMap.get(first);
+            } else {
+                if (first!=null) return first.getRelativePosition();
+
+            }
+        } finally {
             return Position.UNDEFINED;
         }
     }

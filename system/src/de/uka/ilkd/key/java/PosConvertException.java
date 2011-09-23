@@ -11,6 +11,10 @@ package de.uka.ilkd.key.java;
 
 public class PosConvertException extends ConvertException {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 758453353495075586L;
     int line;
     int col;
     

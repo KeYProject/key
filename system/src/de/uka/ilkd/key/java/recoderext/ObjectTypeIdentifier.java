@@ -14,6 +14,11 @@ import recoder.java.Identifier;
 
 public class ObjectTypeIdentifier extends Identifier {
     
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -2181868786991278019L;
+
     public ObjectTypeIdentifier(String id) {
         super(id);
     }

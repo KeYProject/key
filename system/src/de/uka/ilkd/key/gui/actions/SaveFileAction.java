@@ -14,6 +14,11 @@ import de.uka.ilkd.key.util.MiscTools;
  */
 public final class SaveFileAction extends MainWindowAction {
     
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -5479654127272775831L;
+
     public SaveFileAction(MainWindow mainWindow) {
 	super(mainWindow);
         setName("Save ...");

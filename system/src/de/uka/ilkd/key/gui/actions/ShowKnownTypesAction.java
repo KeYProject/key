@@ -22,6 +22,11 @@ import de.uka.ilkd.key.proof.Proof;
 
 public class ShowKnownTypesAction extends MainWindowAction {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 4368162229726580799L;
+
     public ShowKnownTypesAction(MainWindow mainWindow) {
 	super(mainWindow);
 	setName("Show Known Types...");

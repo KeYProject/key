@@ -325,7 +325,11 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
 
     /** inner class for the entries */
     private static class MapEntry<S,T> implements ImmutableMapEntry<S,T> {
-	// the key
+	/**
+         * 
+         */
+        private static final long serialVersionUID = -6785625761293313622L;
+    // the key
 	private final S key;
 	// the value
 	private final T value;

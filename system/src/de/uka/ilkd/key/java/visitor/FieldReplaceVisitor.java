@@ -51,7 +51,6 @@ public class FieldReplaceVisitor extends CreatingASTVisitor {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public void performActionOnFieldReference(final FieldReference x) {
 	final ExtList changeList = stack.peek();
 	if (changeList.getFirst() == CHANGED) {

@@ -11,11 +11,14 @@
 package de.uka.ilkd.key.java.recoderext.adt;
 
 import recoder.java.Expression;
-import recoder.java.SourceVisitor;
-import recoder.java.expression.Operator;
 
 
 public class SeqSingleton extends ADTPrefixConstruct {
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 940102046205262465L;
 
     public SeqSingleton(Expression lhs) {
 	super(lhs);

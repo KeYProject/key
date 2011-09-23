@@ -16,6 +16,11 @@ import javax.swing.JFrame;
 
 public class Installer extends JFrame {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -1362348387316872810L;
+
     public static void main ( String[] args ) {
 	String os = System.getProperty ( "os.name" );
 	String currentDir = System.getProperty ( "user.dir" );

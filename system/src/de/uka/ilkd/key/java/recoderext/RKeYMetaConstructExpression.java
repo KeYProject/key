@@ -28,6 +28,10 @@ public class RKeYMetaConstructExpression extends Literal
 
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = -145731902618445018L;
+    /**
      Child
      */
     protected Expression child=null;

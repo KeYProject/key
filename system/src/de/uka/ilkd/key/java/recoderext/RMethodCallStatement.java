@@ -28,6 +28,11 @@ public class RMethodCallStatement extends JavaStatement
     implements StatementContainer, KeYRecoderExtension {
 
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 6613584975256598095L;
+
     /** schemavariable needed by meta construct */
     private ProgramVariableSVWrapper resultVar;
 

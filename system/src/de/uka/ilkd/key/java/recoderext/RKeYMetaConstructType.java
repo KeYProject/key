@@ -28,6 +28,10 @@ public class RKeYMetaConstructType extends TypeReference
 
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = -8028793181207056503L;
+    /**
      Child
      */
     protected Expression child=null;

@@ -17,6 +17,12 @@ import recoder.java.declaration.Modifier;
 
 public class Ghost extends Modifier {
     
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -4883937081008486072L;
+
+
     public Ghost() {
     }
     

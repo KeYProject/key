@@ -9,6 +9,11 @@ import de.uka.ilkd.key.proof.Proof;
 
 public class ShowUsedContractsAction extends MainWindowAction {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 2680058046414747256L;
+
     public ShowUsedContractsAction(MainWindow mainWindow) {
 	super(mainWindow);
 	setName("Show Used Contracts...");

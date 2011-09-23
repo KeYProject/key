@@ -20,6 +20,10 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 public class StatementSVWrapper extends JavaStatement 
     implements KeYRecoderExtension, SVWrapper{
    
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -4062276649575988872L;
     protected SchemaVariable sv;
 
     protected StatementSVWrapper(StatementSVWrapper proto) {

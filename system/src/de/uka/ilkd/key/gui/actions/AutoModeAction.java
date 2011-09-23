@@ -21,6 +21,10 @@ import de.uka.ilkd.key.proof.ProofTreeListener;
 
 public final class AutoModeAction extends MainWindowAction {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -7702898691162947994L;
     final Icon startLogo = IconFactory
 	    .autoModeStartLogo(MainWindow.TOOLBAR_ICON_SIZE);
     final Icon stopLogo = IconFactory.autoModeStopLogo(MainWindow.TOOLBAR_ICON_SIZE);

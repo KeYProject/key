@@ -25,6 +25,10 @@ import javax.swing.text.PlainDocument;
 
 public class ViewSelector extends JDialog {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 5271280688046955444L;
     private JTextField maxTooltipLinesInputField;
     private JCheckBox showWholeTacletCB;
 
@@ -131,7 +135,12 @@ public class ViewSelector extends JDialog {
     // INNER CLASS TO READ ONLY NUMBERS FOR MAX APPs
     static class NumberDocument extends PlainDocument {
 
-	public void insertString(int offs, String str, AttributeSet a) 
+	/**
+         * 
+         */
+        private static final long serialVersionUID = -5423315366275141764L;
+
+    public void insertString(int offs, String str, AttributeSet a) 
 	    throws BadLocationException {
 	    if (str == null) {
 		return;
@@ -148,7 +157,12 @@ public class ViewSelector extends JDialog {
     }
 
     static class NumberInputField extends JTextField {
-	public NumberInputField(int number, int cols) {
+	/**
+         * 
+         */
+        private static final long serialVersionUID = 5578481785681533620L;
+
+    public NumberInputField(int number, int cols) {
 	    super(cols);
 	    setText(""+number);
 	}

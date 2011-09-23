@@ -11,11 +11,15 @@
 package de.uka.ilkd.key.java.recoderext.adt;
 
 import recoder.java.Expression;
-import recoder.java.SourceVisitor;
-import recoder.java.expression.Operator;
 
 
 public class SetUnion extends ADTPrefixConstruct {
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -8425018389934762589L;
+
 
     public SetUnion(Expression lhs, Expression rhs) {
 	super(lhs, rhs);

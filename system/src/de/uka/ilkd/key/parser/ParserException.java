@@ -20,6 +20,12 @@ public final class ParserException extends Exception {
 
     /* --- constructors --- */
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -5701137989453187397L;
+
+
     /** @param message The error message. The message may be shown to
      * the user and should be appropriately formated.
      * @param location The location on which the error occured. The

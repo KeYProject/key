@@ -46,8 +46,7 @@ public class NotInScopeOfModalityFeature extends BinaryFeature {
             
             if ( op instanceof Modality ) return true;
             if ( op instanceof UpdateApplication ) {
-                final UpdateApplication updOp = (UpdateApplication)op;
-                if ( it.getChild () == updOp.targetPos () ) return true;
+                if ( it.getChild () == UpdateApplication.targetPos () ) return true;
             }
         }
         

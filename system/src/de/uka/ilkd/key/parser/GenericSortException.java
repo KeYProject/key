@@ -14,6 +14,10 @@ import antlr.Token;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 public class GenericSortException extends antlr.SemanticException {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 7887443025957191925L;
     String cat;
     String filename;
     Sort   sort;
