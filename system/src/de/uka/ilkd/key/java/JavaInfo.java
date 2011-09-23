@@ -471,14 +471,13 @@ public final class JavaInfo {
 	     sortCachedSize = kpmi.rec2key().size();
 	     sort2KJTCache = new HashMap<Sort, KeYJavaType>();
 	     for (final Object o : kpmi.allElements()) {
-		 if (o instanceof KeYJavaType){
-                     final KeYJavaType oKJT = (KeYJavaType)o;
-                     if(sort2KJTCache.containsKey(oKJT.getSort())) {
-                	 sort2KJTCache.remove(oKJT.getSort()); //XXX
-                     } else {
-                	 sort2KJTCache.put((oKJT).getSort(), oKJT);
-                     }
-		 }
+	         if (o instanceof KeYJavaType){
+	             final KeYJavaType oKJT = (KeYJavaType)o;
+	             if(sort2KJTCache.containsKey(oKJT.getSort())) {
+	                 sort2KJTCache.remove(oKJT.getSort()); //XXX
+	             } 
+	             sort2KJTCache.put((oKJT).getSort(), oKJT);	             
+	         }
 	     }
 	 }	
 	 return sort2KJTCache.get(sort);
