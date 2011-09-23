@@ -633,9 +633,9 @@ public final class UseOperationContractRule implements BuiltInRule {
             preGoal = result.head();
             nullGoal = null;
         }
-        preGoal.setBranchLabel("Pre");
-        postGoal.setBranchLabel("Post");
-        excPostGoal.setBranchLabel("Exceptional Post");
+        preGoal.setBranchLabel("Pre"+ " ("+contract.getTarget().getName()+")");
+        postGoal.setBranchLabel("Post"+ " ("+contract.getTarget().getName()+")");
+        excPostGoal.setBranchLabel("Exceptional Post"+ " ("+contract.getTarget().getName()+")");
         
         //prepare common stuff for the three branches
         final Triple<Term,Term,Term> anonAssumptionAndUpdateAndHeap 
