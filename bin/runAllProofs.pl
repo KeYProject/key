@@ -14,8 +14,8 @@ my $path_to_examples = "../system/proofExamples/";
 my $path_to_automated = "index/";
 my $automaticjavadl_txt = "automaticJAVADL.txt";
 my $not_provablejavadl_txt = "notProvableJavaDL.txt";
-# time out set to 20 minutes
-my $time_limit = 20*60; 
+# time out set to 30 minutes
+my $time_limit = 30*60; 
 
 # use the time command to print out runtime info
 my $time_command = "/usr/bin/time";
