@@ -95,14 +95,18 @@
     </instrument>
   </target>
 
+  <target name="copy" depends="prepare"
+	  description="Copy all resources into the binary directory.">
+    <copy todir="${build.dir}">
+      <fileset dir="${basedir}/resources/"/>
+    </copy>
+  </target>
 
 
   <target name="compile" depends="prepare, keyparser, proofjavaparser, schemajavaparser, 
-  	                                   jmlparser, jmlpreparser"
+  	                                   jmlparser, jmlpreparser, copy"
           description="Compiles all java files into the source directory.">
-  	<copy todir="${build.dir}">
-    	    <fileset dir="${basedir}/resources/"/>
-        </copy>
+  	
      <javac srcdir= "${src.dir}:${gen.dir}:${test.dir}"
            destdir="${dist.dir}"
            source="1.6"

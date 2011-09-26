@@ -28,9 +28,9 @@ public class JRadioButtonHashMap extends JRadioButton {
         hashmap.put(command, this);        
     }
         
-    static HashMap hashmap = new HashMap();
+    static HashMap<String, JRadioButtonHashMap> hashmap = new HashMap<String, JRadioButtonHashMap>();
        
     public static JRadioButton getButton(String command) {
-        return (JRadioButton) hashmap.get(command);       
+        return hashmap.get(command);       
     }
 }
