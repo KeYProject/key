@@ -13,13 +13,18 @@ import de.uka.ilkd.key.proof.ProofSaver;
 public class BatchMode {
     
     private String fileName;
+
+    // flag to indicate that a file should merely be loaded not proved. (for
+    // "reload" testing)
+    private final boolean loadOnly;
     
-    public BatchMode(String fileName) {
+    public BatchMode(String fileName, boolean loadOnly) {
         this.fileName = fileName;
+        this.loadOnly = loadOnly;
     }
 
-    public void autoRun() {
-    }
+//    public void autoRun() {
+//    }
 
     
    public void finishedBatchMode (Object result, 
@@ -51,7 +56,10 @@ public class BatchMode {
         } while (f.exists());
 
         try {
+            // a copy with running number to compare different runs
             saveProof ( f.getAbsolutePath() );
+            // save current proof under common name as well
+            saveProof ( baseName + ".auto.proof" );
         } catch (IOException e) {
             System.exit( 1 );
         }
@@ -101,6 +109,10 @@ public class BatchMode {
     private void saveProof(String filename) throws IOException {
         ProofSaver saver = new ProofSaver(MainWindow.getInstance().getMediator().getProof(), filename, Main.INTERNAL_VERSION);
         saver.save();
+    }
+
+    public boolean isLoadOnly() {
+        return loadOnly;
     }
 
 

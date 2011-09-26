@@ -40,7 +40,10 @@ public class Main {
 
     /** if true then automatically start startAutoMode after the key-file is loaded*/
     static boolean batchMode = false;
-
+    
+    /** if true then only load the file and exit afterwards (for testing load features)*/
+    private static boolean batchLoadOnly = false;
+    
     private static String statisticsFile = null;
 
     private static String examplesDir = null;
@@ -102,6 +105,9 @@ public class Main {
                     break; 
                 } else if (opt[index].equals("AUTO")) {
                     batchMode = true;
+                } else if (opt[index].equals("AUTO_LOADONLY")) {
+                    batchMode = true;
+                    batchLoadOnly = true;
                 } else if (opt[index].equals("TIMEOUT")) {
                     long timeout = -1;
                     try {
@@ -211,7 +217,7 @@ public class Main {
 
     public static UserInterface makeUserInterface() {
         if(batchMode) {
-            BatchMode batch = new BatchMode(fileNameOnStartUp);
+            BatchMode batch = new BatchMode(fileNameOnStartUp, batchLoadOnly);
             return new ConsoleUserInterface(MainWindow.getInstance(), batch, VERBOSE_UI);
         } else {
             return new WindowUserInterface(MainWindow.getInstance());

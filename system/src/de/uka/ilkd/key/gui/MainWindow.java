@@ -14,6 +14,7 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Cursor;
+import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.GridBagLayout;
@@ -1140,6 +1141,7 @@ public final class MainWindow extends JFrame  {
         
 	private void setToolBarDisabled() {
 	    
+	    assert EventQueue.isDispatchThread() : "toolbar disabled from wrong thread";
 	    assert doNotReenable == null : "toolbar disabled w/o prior enable";
 	    
 	    doNotReenable = new HashSet<Component>();
@@ -1161,6 +1163,7 @@ public final class MainWindow extends JFrame  {
         
         private void setToolBarEnabled() {
             
+            assert EventQueue.isDispatchThread() : "toolbar enabled from wrong thread";
             assert doNotReenable != null : "toolbar enabled w/o prior disable";
             
             Component[] cs = controlToolBar.getComponents();
