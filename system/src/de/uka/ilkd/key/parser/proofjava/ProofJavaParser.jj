@@ -481,6 +481,9 @@ TOKEN :
 | < THIS: "this" >
 | < THROW: "throw" >
 | < THROWS: "throws" >
+| < TRANSACTIONBEGIN: "#beginJavaCardTransaction">
+| < TRANSACTIONCOMMIT: "#commitJavaCardTransaction">
+| < TRANSACTIONABORT: "#abortJavaCardTransaction">
 | < TRANSIENT: "transient" >
 | < TRUE: "true" >
 | < TRY: "try" >
@@ -3622,6 +3625,7 @@ Statement Statement() :
 | result = WhileStatement()
 | result = DoStatement()
 | result = ForStatement()
+| result = TransactionStatement()
 | result = BreakStatement()
 | result = ContinueStatement()
 | result = ReturnStatement()
@@ -4274,6 +4278,29 @@ ASTList<Expression> ForUpdate() :
     return result;
   }
 }
+
+TransactionStatement TransactionStatement() :
+{
+  String name;
+}
+{
+  (  ( <TRANSACTIONBEGIN> { name = token.image; } )
+   | ( <TRANSACTIONCOMMIT> { name = token.image; } )
+   | ( <TRANSACTIONABORT> { name = token.image; } ) ) ";" 
+  {
+     int type = 0;
+     if(name.indexOf("#begin") != -1) {
+        type = TransactionStatement.BEGIN;
+     } else if(name.indexOf("#commit") != -1) {
+        type = TransactionStatement.COMMIT;
+     } else if(name.indexOf("#abort") != -1) {
+        type = TransactionStatement.ABORT;
+     }
+     return new TransactionStatement(type);
+  }
+}
+
+
 
 Break BreakStatement() :
 {

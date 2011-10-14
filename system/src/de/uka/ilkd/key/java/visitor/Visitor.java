@@ -346,4 +346,6 @@ public interface Visitor {
     void performActionOnSeqLength(SeqLength seqLength);
 
     void performActionOnSeqGet(SeqGet seqGet);
+    
+    void performActionOnTransactionStatement(TransactionStatement transSt);
 }
