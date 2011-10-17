@@ -40,10 +40,9 @@ public class TransactionStatement extends JavaStatement {
     public Statement deepClone() {
         return new TransactionStatement(this);
     }
-
-
+    
     @Override
-    public void accept(SourceVisitor arg0) {
+    public void accept(SourceVisitor sourceVisitor) {
     }
 
 
@@ -62,6 +61,17 @@ public class TransactionStatement extends JavaStatement {
     public boolean replaceChild(recoder.java.ProgramElement arg0,
             recoder.java.ProgramElement arg1) {
         return false;
+    }
+    
+    public boolean equals(Object o) {
+        if (o != null && o instanceof TransactionStatement) {
+            return ((TransactionStatement)o).type == this.type;
+        }
+        return false;
+    }
+
+    public String toString() {
+        return de.uka.ilkd.key.java.statement.TransactionStatement.names[type - 1];
     }
 
 }

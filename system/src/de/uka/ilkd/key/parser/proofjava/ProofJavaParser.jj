@@ -481,9 +481,9 @@ TOKEN :
 | < THIS: "this" >
 | < THROW: "throw" >
 | < THROWS: "throws" >
-| < TRANSACTIONBEGIN: "#beginJavaCardTransaction">
-| < TRANSACTIONCOMMIT: "#commitJavaCardTransaction">
-| < TRANSACTIONABORT: "#abortJavaCardTransaction">
+| < TRANSACTIONBEGIN: "#beginJavaCardTransaction" >
+| < TRANSACTIONCOMMIT: "#commitJavaCardTransaction" >
+| < TRANSACTIONABORT: "#abortJavaCardTransaction" >
 | < TRANSIENT: "transient" >
 | < TRUE: "true" >
 | < TRY: "try" >
