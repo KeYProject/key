@@ -1371,7 +1371,7 @@ public final class TermBuilder {
     }
     
     
-    public Term frame(Services services,
+    public Term frame(Services services, Term heapTerm,
 	    	      Map<Term,Term> normalToAtPre, 
 	    	      Term mod) {
 	final Sort objectSort = services.getJavaInfo().objectSort();
@@ -1405,12 +1405,12 @@ public final class TermBuilder {
                       not(createdAtPre)),
                       equals(select(services,
                                     Sort.ANY,
-                                    heap(services),
+                                    heapTerm,
                                     objVarTerm,
                                     fieldVarTerm),
                              select(services,
                                     Sort.ANY,
-                                    or.replace(heap(services)),
+                                    or.replace(heapTerm),
                                     objVarTerm,
                                     fieldVarTerm))));
     }

@@ -28,6 +28,7 @@ import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.Branch;
 import de.uka.ilkd.key.java.statement.Catch;
+import de.uka.ilkd.key.java.statement.TransactionStatement;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.logic.*;
@@ -75,12 +76,21 @@ public final class FunctionalOperationContractPO
         //initial value of measured_by clause
         final Term mbyAtPreDef = generateMbyAtPreDef(selfVar, paramVars);
 
-        return TB.and(new Term[]{TB.wellFormedHeap(services),
-                                 selfNotNull,
-                                 selfCreated,
-                                 selfExactType,
-                                 paramsOK,
-                                 mbyAtPreDef});
+        if(getContract().transactionContract()) {
+          return TB.and(new Term[]{TB.wellFormedHeap(services), TB.wellFormed(services, TB.savedHeap(services)),
+                                   selfNotNull,
+                                   selfCreated,
+                                   selfExactType,
+                                   paramsOK,
+                                   mbyAtPreDef});
+        }else{
+          return TB.and(new Term[]{TB.wellFormedHeap(services), 
+                                   selfNotNull,
+                                   selfCreated,
+                                   selfExactType,
+                                   paramsOK,
+                                   mbyAtPreDef});
+        }
     }
 
 
@@ -131,8 +141,14 @@ public final class FunctionalOperationContractPO
         final Catch catchStat = new Catch(excDecl,
                                           new StatementBlock(assignStat));
         final Try tryStat = new Try(sb, new Branch[]{catchStat});
-        final StatementBlock sb2 = new StatementBlock(new Statement[]{nullStat,
-                                                                      tryStat});
+        final StatementBlock sb2 = new StatementBlock(
+           getContract().transactionContract() ? 
+                new Statement[]{
+                        new TransactionStatement(de.uka.ilkd.key.java.recoderext.TransactionStatement.BEGIN),
+                        nullStat, tryStat,
+                        new TransactionStatement(de.uka.ilkd.key.java.recoderext.TransactionStatement.COMMIT)}
+              :
+                new Statement[]{nullStat, tryStat});
 
         //create java block
         JavaBlock result = JavaBlock.createJavaBlock(sb2);
@@ -146,6 +162,7 @@ public final class FunctionalOperationContractPO
                                   ProgramVariable resultVar,
                                   ProgramVariable exceptionVar,
                                   LocationVariable heapAtPreVar,
+                                  LocationVariable savedHeapAtPreVar,
                                   Term postTerm) {
         //create formal parameters
         ImmutableList<LocationVariable> formalParamVars =
@@ -171,6 +188,9 @@ public final class FunctionalOperationContractPO
 
         //create update
         Term update = TB.elementary(services, heapAtPreVar, TB.heap(services));
+        if(savedHeapAtPreVar != null) {
+           update = TB.parallel(update, TB.elementary(services, savedHeapAtPreVar, TB.heap(services)));
+        }
         Iterator<LocationVariable> formalParamIt = formalParamVars.iterator();
         Iterator<ProgramVariable> paramIt = paramVars.iterator();
         while (formalParamIt.hasNext()) {
@@ -204,6 +224,14 @@ public final class FunctionalOperationContractPO
         final Map<Term, Term> normalToAtPre = new HashMap<Term, Term>();
         normalToAtPre.put(TB.heap(services), TB.var(heapAtPreVar));
 
+        final LocationVariable savedHeapAtPreVar = getContract().transactionContract() ? TB.heapAtPreVar(services,
+                                                              "savedHeapAtPre", true) : null;
+
+        final Map<Term, Term> savedToAtPre = new HashMap<Term, Term>();
+        if(savedHeapAtPreVar != null) {
+            savedToAtPre.put(TB.savedHeap(services), TB.var(savedHeapAtPreVar));
+            savedToAtPre.put(TB.heap(services), TB.var(savedHeapAtPreVar));
+        }
         //register the variables so they are declared in proof header 
         //if the proof is saved to a file
         register(paramVars);
@@ -211,30 +239,43 @@ public final class FunctionalOperationContractPO
         register(resultVar);
         register(exceptionVar);
         register(heapAtPreVar);
+        if(savedHeapAtPreVar != null) {
+           register(savedHeapAtPreVar);
+        }
 
         //build precondition
         final Term pre = TB.and(buildFreePre(selfVar,
                                              contract.getKJT(),
                                              paramVars),
-                                contract.getPre(selfVar, paramVars, services));
+                                contract.getPre(selfVar, paramVars, savedHeapAtPreVar, services));
 
         //build program term
-        final Term post = TB.and(getContract().getPost(selfVar,
-                                                       paramVars,
-                                                       resultVar,
-                                                       exceptionVar,
-                                                       heapAtPreVar,
-                                                       services),
-                                 TB.frame(services,
-                                          normalToAtPre,
+        final Term postTerm = getContract().getPost(selfVar,
+                                                    paramVars,
+                                                    resultVar,
+                                                    exceptionVar,
+                                                    heapAtPreVar,
+                                                    savedHeapAtPreVar,
+                                                    services);
+        final Term frameTerm = TB.frame(services, TB.heap(services),
+                                          normalToAtPre, 
                                           getContract().getMod(selfVar,
                                                                paramVars,
-                                                               services)));
+                                                               services));
+        final Term post = TB.and(getContract().transactionContract() ?
+                new Term[] {postTerm, frameTerm, TB.frame(services, TB.savedHeap(services),
+                                          savedToAtPre,
+                                          getContract().getBackupMod(selfVar,
+                                                               paramVars,
+                                                               services))}
+             :
+                new Term[] {postTerm, frameTerm} );
         final Term progPost = buildProgramTerm(paramVars,
                                                selfVar,
                                                resultVar,
                                                exceptionVar,
                                                heapAtPreVar,
+                                               savedHeapAtPreVar,
                                                post);
 
         //save in field

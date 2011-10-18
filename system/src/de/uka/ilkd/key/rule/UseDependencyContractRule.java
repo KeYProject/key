@@ -579,7 +579,8 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	}
         final Term pre = contract.getPre(baseHeapAndChangedLocs.first,
         	                         selfTerm, 
-        	                         paramTerms, 
+        	                         paramTerms,
+                                         null, 
         	                         services);
         final Term dep = contract.getDep(baseHeapAndChangedLocs.first, 
         				 selfTerm, 

@@ -105,8 +105,8 @@ public class JMLSpecFactory {
 
 
     private String getContractName(ProgramMethod programMethod,
-                                   Behavior behavior) {
-        return "JML " + behavior.toString() + "operation contract";
+                                   Behavior behavior, boolean transaction) {
+        return "JML " + behavior.toString() + (transaction ? "transaction " :"") +"operation contract";
     }
 
 
@@ -509,7 +509,7 @@ public class JMLSpecFactory {
                                 Behavior originalBehavior) {
         String customName = textualSpecCase.getName();
         String name = ((!(customName == null) && customName.length() > 0) ? customName
-                       : getContractName(pm, originalBehavior));
+                       : getContractName(pm, originalBehavior, textualSpecCase.getMods().contains("transaction")));
         return name;
     }
 

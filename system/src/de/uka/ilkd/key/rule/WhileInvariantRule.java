@@ -257,7 +257,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 		= createAnonUpdate(inst.loop, mod, localOuts, services);
 	final Term anonUpdate = anonUpdateAndHeap.first;
 	final Term anonHeap   = anonUpdateAndHeap.second;
-	final Term frameCondition = TB.frame(services,
+	final Term frameCondition = TB.frame(services, TB.heap(services),
 		                             normalToBeforeLoop, 
 		                             mod);
 	

@@ -36,6 +36,7 @@ public interface FunctionalOperationContract extends OperationContract {
 	    	        ProgramVariable resultVar, 
 	    	        ProgramVariable excVar,
 	    	        ProgramVariable heapAtPreVar,
+	    	        ProgramVariable savedHeapAtPreVar,
 	    	        Services services);
     
     /**
@@ -47,6 +48,7 @@ public interface FunctionalOperationContract extends OperationContract {
 	    	        Term resultTerm, 
 	    	        Term excTerm,
 	    	        Term heapAtPre,
+                        Term savedHeapAtPre,
 	    	        Services services);
 
 

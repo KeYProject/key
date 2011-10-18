@@ -556,8 +556,13 @@ public final class UseOperationContractRule implements BuiltInRule {
      		= TB.heapAtPreVar(services, 
      				  "heapBefore_" + inst.pm.getName(), 
      				  true);
+        final LocationVariable savedHeapAtPreVar =
+           contract.transactionContract() ? TB.heapAtPreVar(services, 
+     				  "savedHeapBefore_" + inst.pm.getName(), 
+     				  true) : null;
      	goal.addProgramVariable(heapAtPreVar);
         final Term heapAtPre = TB.var(heapAtPreVar);
+        final Term savedHeapAtPre = savedHeapAtPreVar != null ? TB.var(savedHeapAtPreVar) : null;
 
         //create variables for result and exception
         final ProgramVariable resultVar 
@@ -590,7 +595,8 @@ public final class UseOperationContractRule implements BuiltInRule {
                   : TB.var(resultVar);
         final Term pre  = contract.getPre(TB.heap(services), 
         				  contractSelf, 
-        				  contractParams, 
+        				  contractParams,
+                                          savedHeapAtPre,
         				  services);
         final Term post = contract.getPost(TB.heap(services),
         	                           contractSelf, 
@@ -598,6 +604,7 @@ public final class UseOperationContractRule implements BuiltInRule {
                                            contractResult, 
                                            TB.var(excVar), 
                                            heapAtPre,
+                                           savedHeapAtPre,
                                            services);
         final Term mod = contract.getMod(TB.heap(services),
         	                         contractSelf,
