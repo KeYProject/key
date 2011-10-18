@@ -52,6 +52,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
     final KeYJavaType kjt;    
     final ProgramMethod pm;
     final Modality modality;
+    final Modality poModality;
     final Term originalPre;
     final Term originalMby;    
     final Term originalPost;
@@ -126,7 +127,10 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 	this.originalHeapAtPreVar   = heapAtPreVar;
 	this.originalSavedHeapAtPreVar = savedHeapAtPreVar;
 	this.id                     = id;
-        this.transaction            = (modBackup != null);	
+        this.transaction            = (modBackup != null);
+        this.poModality             = (modality == Modality.DIA_TRANSACTION ? 
+                                          Modality.DIA : 
+                                          (modality == Modality.BOX_TRANSACTION ? Modality.BOX : modality));	
 	this.toBeSaved	            = toBeSaved;
     }    
 
@@ -608,6 +612,11 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
         return modality;
     }
     
+    @Override
+    public Modality getPOModality() {
+        return poModality;
+    }
+
   
     @Override
     public Term getPost(ProgramVariable selfVar, 

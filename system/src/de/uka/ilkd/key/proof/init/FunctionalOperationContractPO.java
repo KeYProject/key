@@ -183,7 +183,7 @@ public final class FunctionalOperationContractPO
                                             exceptionVar);
 
         //create program term
-        final Term programTerm = TB.prog(getContract().getModality(), jb,
+        final Term programTerm = TB.prog(getContract().getPOModality(), jb,
                                          postTerm);
 
         //create update

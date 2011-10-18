@@ -27,6 +27,8 @@ public interface FunctionalOperationContract extends OperationContract {
      * Returns the modality of the contract.
      */
     public Modality getModality();
+
+    public Modality getPOModality();
    
     /**
      * Returns the postcondition of the contract.

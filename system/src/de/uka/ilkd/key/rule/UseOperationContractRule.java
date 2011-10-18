@@ -235,6 +235,11 @@ public final class UseOperationContractRule implements BuiltInRule {
                                           .getOperationContracts(kjt, 
                                         	  		 pm,
                                         	  		 Modality.DIA));
+        }else if(modality == Modality.BOX_TRANSACTION) {
+            result = result.union(services.getSpecificationRepository()
+                                          .getOperationContracts(kjt, 
+                                        	  		 pm,
+                                        	  		 Modality.DIA_TRANSACTION));
         }
 
         return result;
@@ -437,7 +442,8 @@ public final class UseOperationContractRule implements BuiltInRule {
 	}
 	
 	//focus (below update) must be modality term
-	if(progPost.op() != Modality.BOX && progPost.op() != Modality.DIA) {
+	if(progPost.op() != Modality.BOX && progPost.op() != Modality.DIA && 
+           progPost.op() != Modality.BOX_TRANSACTION && progPost.op() != Modality.DIA_TRANSACTION) {
 	    return null;
 	}
 	final Modality mod = (Modality) progPost.op();

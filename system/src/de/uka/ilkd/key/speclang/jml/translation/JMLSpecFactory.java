@@ -555,6 +555,7 @@ public class JMLSpecFactory {
                     clauses.measuredBy, post, clauses.assignable, progVars);
             if(clauses.assignable_backup != null) {
                contract = cf.setModifiesBackup(contract, clauses.assignable_backup);
+               contract = cf.setModality(contract, Modality.DIA_TRANSACTION);
             }
             result = result.add(contract);
         } else if (clauses.diverges.equals(TB.tt())) {
@@ -563,6 +564,7 @@ public class JMLSpecFactory {
                     clauses.measuredBy, post, clauses.assignable, progVars);
             if(clauses.assignable_backup != null) {
                contract = cf.setModifiesBackup(contract, clauses.assignable_backup);
+               contract = cf.setModality(contract, Modality.BOX_TRANSACTION);
             }
             result = result.add(contract);
         } else {
@@ -579,7 +581,9 @@ public class JMLSpecFactory {
                                                         progVars);
             if(clauses.assignable_backup != null) {
                contract1 = cf.setModifiesBackup(contract1, clauses.assignable_backup);
+               contract1 = cf.setModality(contract1, Modality.DIA_TRANSACTION);
                contract2 = cf.setModifiesBackup(contract2, clauses.assignable_backup);
+               contract2 = cf.setModality(contract2, Modality.BOX_TRANSACTION);
             }
             result = result.add(contract1).add(contract2);
         }
