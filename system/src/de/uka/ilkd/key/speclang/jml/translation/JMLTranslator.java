@@ -831,12 +831,13 @@ final class JMLTranslator {
                        ProgramVariable resultVar,
                        ProgramVariable excVar,
                        Term heapAtPre,
+                       Term savedHeapAtPre,
                        Services services)
             throws SLTranslationException {
         final KeYJMLParser parser = new KeYJMLParser(expr, services,
                                                      specInClass, selfVar,
                                                      paramVars, resultVar,
-                                                     excVar, heapAtPre);
+                                                     excVar, heapAtPre, savedHeapAtPre);
         Object result = null;
 	try {
 	    result = parser.top();

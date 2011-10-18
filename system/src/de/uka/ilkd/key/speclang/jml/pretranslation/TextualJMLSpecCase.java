@@ -31,6 +31,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
             ImmutableSLList.<PositionedString>nil();
     private ImmutableList<PositionedString> assignable =
             ImmutableSLList.<PositionedString>nil();
+    private ImmutableList<PositionedString> assignable_backup =
+            ImmutableSLList.<PositionedString>nil();
     private ImmutableList<PositionedString> accessible =
             ImmutableSLList.<PositionedString>nil();
     private ImmutableList<PositionedString> ensures =
@@ -91,6 +93,15 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     public void addAssignable(ImmutableList<PositionedString> l) {
         assignable = assignable.append(l);
+    }
+
+    public void addAssignableBackup(PositionedString ps) {
+        assignable_backup = assignable_backup.append(ps);
+    }
+
+
+    public void addAssignableBackup(ImmutableList<PositionedString> l) {
+        assignable_backup = assignable_backup.append(l);
     }
 
 
@@ -198,6 +209,9 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return assignable;
     }
 
+    public ImmutableList<PositionedString> getAssignableBackup() {
+        return assignable_backup;
+    }
 
     public ImmutableList<PositionedString> getAccessible() {
         return accessible;
@@ -268,6 +282,10 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         while (it.hasNext()) {
             sb.append("assignable: ").append(it.next()).append("\n");
         }
+        it = assignable_backup.iterator();
+        while (it.hasNext()) {
+            sb.append("assignable_backup: ").append(it.next()).append("\n");
+        }
         it = accessible.iterator();
         while (it.hasNext()) {
             sb.append("accessible: " + it.next() + "\n");
@@ -319,6 +337,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                && behavior.equals(sc.behavior)
                && requires.equals(sc.requires)
                && assignable.equals(sc.assignable)
+               && assignable_backup.equals(sc.assignable_backup)
                && accessible.equals(sc.accessible)
                && ensures.equals(sc.ensures)
                && signals.equals(sc.signals)

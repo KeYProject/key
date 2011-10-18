@@ -73,6 +73,7 @@ public class ContractFactory {
             foci.originalMby,
             tb.and(foci.originalPost, addedPost),
             foci.originalMod,
+            foci.originalModBackup,
             foci.originalSelfVar,
             foci.originalParamVars,
             foci.originalResultVar,
@@ -109,6 +110,7 @@ public class ContractFactory {
             foci.originalMby,
             foci.originalPost,
             foci.originalMod,
+            foci.originalModBackup,
             foci.originalSelfVar,
             foci.originalParamVars,
             foci.originalResultVar,
@@ -168,7 +170,7 @@ public class ContractFactory {
             ProgramVariable excVar,
             LocationVariable heapAtPreVar,
             boolean toBeSaved) {
-        return new FunctionalOperationContractImpl(baseName, kjt,   pm, modality, pre, mby, post, mod,selfVar, paramVars,resultVar,excVar,heapAtPreVar, toBeSaved);
+        return new FunctionalOperationContractImpl(baseName, kjt,   pm, modality, pre, mby, post, mod, null, selfVar, paramVars,resultVar,excVar,heapAtPreVar, toBeSaved);
     }
        
     
@@ -181,7 +183,7 @@ public class ContractFactory {
             Modality modality, Term pre, Term mby, Term post, Term mod,
             ProgramVariableCollection progVars, boolean toBeSaved) {
         return new FunctionalOperationContractImpl(baseName, null, pm.getContainerType(), pm, modality, pre, mby,
-                post, mod, progVars.selfVar, progVars.paramVars,
+                post, mod, null, progVars.selfVar, progVars.paramVars,
                 progVars.resultVar, progVars.excVar, progVars.heapAtPreVar,
                 Contract.INVALID_ID, toBeSaved);
     }
@@ -203,14 +205,20 @@ public class ContractFactory {
     public FunctionalOperationContract setModality(FunctionalOperationContract old, Modality modality){
         assert old instanceof FunctionalOperationContractImpl : UNKNOWN_CONTRACT_IMPLEMENTATION;
         FunctionalOperationContractImpl foci = (FunctionalOperationContractImpl) old;
-        return new FunctionalOperationContractImpl(foci.baseName, foci.kjt, foci.pm, modality, foci.originalPre, foci.originalMby, foci.originalPost, foci.originalMod, foci.originalSelfVar, foci.originalParamVars, foci.originalResultVar, foci.originalExcVar, foci.originalHeapAtPreVar, foci.toBeSaved);
+        return new FunctionalOperationContractImpl(foci.baseName, foci.kjt, foci.pm, modality, foci.originalPre, foci.originalMby, foci.originalPost, foci.originalMod, foci.originalModBackup, foci.originalSelfVar, foci.originalParamVars, foci.originalResultVar, foci.originalExcVar, foci.originalHeapAtPreVar, foci.toBeSaved);
     }
 
 
     public FunctionalOperationContract setModifies(FunctionalOperationContract old, Term modifies){
         assert old instanceof FunctionalOperationContractImpl : UNKNOWN_CONTRACT_IMPLEMENTATION;
         FunctionalOperationContractImpl foci = (FunctionalOperationContractImpl) old;
-        return new FunctionalOperationContractImpl(foci.baseName, foci.kjt, foci.pm, foci.modality, foci.originalPre, foci.originalMby, foci.originalPost, modifies, foci.originalSelfVar, foci.originalParamVars, foci.originalResultVar, foci.originalExcVar, foci.originalHeapAtPreVar, foci.toBeSaved);
+        return new FunctionalOperationContractImpl(foci.baseName, foci.kjt, foci.pm, foci.modality, foci.originalPre, foci.originalMby, foci.originalPost, modifies, foci.originalModBackup, foci.originalSelfVar, foci.originalParamVars, foci.originalResultVar, foci.originalExcVar, foci.originalHeapAtPreVar, foci.toBeSaved);
+    }
+
+    public FunctionalOperationContract setModifiesBackup(FunctionalOperationContract old, Term modifiesBackup){
+        assert old instanceof FunctionalOperationContractImpl : UNKNOWN_CONTRACT_IMPLEMENTATION;
+        FunctionalOperationContractImpl foci = (FunctionalOperationContractImpl) old;
+        return new FunctionalOperationContractImpl(foci.baseName, foci.kjt, foci.pm, foci.modality, foci.originalPre, foci.originalMby, foci.originalPost, foci.originalMod, modifiesBackup, foci.originalSelfVar, foci.originalParamVars, foci.originalResultVar, foci.originalExcVar, foci.originalHeapAtPreVar, foci.toBeSaved);
     }
    
     @SuppressWarnings("unchecked")
@@ -306,6 +314,7 @@ public class ContractFactory {
                                          mby,
                                          post,
                                          mod,
+                                         null, // TODO !!!!
                                          t.originalSelfVar,
                                          t.originalParamVars,
                                          t.originalResultVar,
@@ -389,6 +398,7 @@ public class ContractFactory {
                              foci.originalMby,
                              foci.originalPost,
                              foci.originalMod,
+                             foci.originalModBackup,
                              foci.originalSelfVar,
                              foci.originalParamVars,
                              foci.originalResultVar,
@@ -424,6 +434,7 @@ public class ContractFactory {
                              foci.originalMby,
                              foci.originalPost,
                              foci.originalMod,
+                             foci.originalModBackup,
                              foci.originalSelfVar,
                              foci.originalParamVars,
                              foci.originalResultVar,

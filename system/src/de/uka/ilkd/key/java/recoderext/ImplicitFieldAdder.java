@@ -48,6 +48,7 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
     public static final String IMPLICIT_INITIALIZED = "<initialized>";
 
     public static final String IMPLICIT_TRANSIENT = "<transient>";
+    public static final String IMPLICIT_TRANSACTION_UPDATED = "<transactionConditionallyUpdated>";
     
     public static final String IMPLICIT_ENCLOSING_THIS = "<enclosingThis>";
     
@@ -133,6 +134,7 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
 	attach(createImplicitRecoderField("boolean", IMPLICIT_INITIALIZED, false, false), td, 0);
         attach(createImplicitRecoderField("boolean", IMPLICIT_CREATED, false, false), td, 0);	  
         attach(createImplicitRecoderField("int", IMPLICIT_TRANSIENT, false, false), td, 0);	  
+        attach(createImplicitRecoderField("boolean", IMPLICIT_TRANSACTION_UPDATED, false, false), td, 0);	  
     }
     
 

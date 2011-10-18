@@ -63,6 +63,7 @@ options {
     private ProgramVariable resultVar;
     private ProgramVariable excVar;
     private Term heapAtPre;
+    private Term savedHeapAtPre;
     
     // Helper objects
     private JMLResolverManager resolverManager;
@@ -78,7 +79,8 @@ options {
 		ImmutableList<ProgramVariable> paramVars,
 		ProgramVariable result,
 		ProgramVariable exc,
-		Term heapAtPre) {
+		Term heapAtPre,
+                Term savedHeapAtPre) {
 	this(lexer);
 
 	// save parameters
@@ -98,6 +100,7 @@ options {
 	this.resultVar      = result;
 	this.excVar	    = exc;
 	this.heapAtPre      = heapAtPre;
+        this.savedHeapAtPre = savedHeapAtPre;
 
 	// initialize helper objects
 	this.resolverManager = new JMLResolverManager(this.javaInfo,
@@ -125,7 +128,8 @@ options {
 		ImmutableList<ProgramVariable> paramVars,
 		ProgramVariable result,
 		ProgramVariable exc,
-		Term heapAtPre) {
+		Term heapAtPre,
+                Term savedHeapAtPre) {
 	this(new KeYJMLLexer(new StringReader(ps.text)), 
 	     ps.fileName, 
 	     ps.pos,
@@ -135,7 +139,8 @@ options {
 	     paramVars,
 	     result,
 	     exc,
-	     heapAtPre);
+	     heapAtPre,
+             savedHeapAtPre);
     }
 
 
@@ -239,10 +244,23 @@ options {
 	assert heapAtPre != null;
 	Map map = new LinkedHashMap();
 	map.put(TB.heap(services), heapAtPre);
+        if(savedHeapAtPre != null) {
+	  map.put(TB.savedHeap(services), savedHeapAtPre);
+        }
 	OpReplacer or = new OpReplacer(map);
 	return or.replace(term);
     }
 
+    private Term convertToBackup(Term term) {
+	assert savedHeapAtPre != null;
+	Map map = new LinkedHashMap();
+	map.put(TB.heap(services), TB.savedHeap(services));
+        if(heapAtPre != null) {
+	  map.put(heapAtPre, savedHeapAtPre);
+        }
+	OpReplacer or = new OpReplacer(map);
+	return or.replace(term);
+    }
 
 
     private String createSignatureString(ImmutableList<SLExpression> signature) {
@@ -1385,6 +1403,21 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 	                                result.getType());
 	    } else {
 	      result = new SLExpression(convertToOld(result.getTerm()));
+	    }
+	}
+    |
+	BACKUP LPAREN result=expression RPAREN
+	{
+	    if (savedHeapAtPre == null) {
+		raiseError("JML construct " +
+			   "\\backup not allowed in this context.");
+	    }	    
+	    typ = result.getType();
+	    if(typ != null) {
+	      result = new SLExpression(convertToBackup(result.getTerm()), 
+	                                result.getType());
+	    } else {
+	      result = new SLExpression(convertToBackup(result.getTerm()));
 	    }
 	}
     |   

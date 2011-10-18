@@ -50,6 +50,7 @@ tokens {
 }
 
 AND : "&";
+BACKUP : "\\backup";
 BIGINT : "\\bigint";
 BITWISENOT : "~";
 BSUM : "\\bsum";  //KeY extension, not official JML

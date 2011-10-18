@@ -56,6 +56,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
     final Term originalMby;    
     final Term originalPost;
     final Term originalMod;
+    final Term originalModBackup;
     final ProgramVariable originalSelfVar;
     final ImmutableList<ProgramVariable> originalParamVars;
     final ProgramVariable originalResultVar;
@@ -78,6 +79,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
             		          Term mby,
             		          Term post,
             		          Term mod,
+                                  Term modBackup,
             		          ProgramVariable selfVar,
             		          ImmutableList<ProgramVariable> paramVars,
             		          ProgramVariable resultVar,
@@ -113,6 +115,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 	this.originalMby            = mby;
 	this.originalPost           = post;
 	this.originalMod            = mod;
+	this.originalModBackup      = modBackup;
 	this.originalSelfVar        = selfVar;
 	this.originalParamVars      = paramVars;
 	this.originalResultVar      = resultVar;
@@ -146,6 +149,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
             		         Term mby,            		         
             		         Term post,
             		         Term mod,
+                                 Term modBackup,
             		         ProgramVariable selfVar,
             		         ImmutableList<ProgramVariable> paramVars,
             		         ProgramVariable resultVar,
@@ -161,6 +165,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
              mby,
              post,
              mod,
+             modBackup,
              selfVar,
              paramVars,
              resultVar,
@@ -186,10 +191,10 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
      * 			and the pre-heap
      */
     FunctionalOperationContractImpl(String baseName, ProgramMethod pm,
-	    Modality modality, Term pre, Term mby, Term post, Term mod,
+	    Modality modality, Term pre, Term mby, Term post, Term mod, Term modBackup,
 	    ProgramVariableCollection progVars, boolean toBeSaved) {
 	this(baseName, null, pm.getContainerType(), pm, modality, pre, mby,
-	        post, mod, progVars.selfVar, progVars.paramVars,
+	        post, mod, modBackup, progVars.selfVar, progVars.paramVars,
 	        progVars.resultVar, progVars.excVar, progVars.heapAtPreVar,
 	        INVALID_ID, toBeSaved);
     }
@@ -460,6 +465,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
         	            : null;        
         final String post = LogicPrinter.quickPrintTerm(originalPost, services);
         final String mod  = LogicPrinter.quickPrintTerm(originalMod, services);
+        final String modBackup = originalModBackup != null ? LogicPrinter.quickPrintTerm(originalModBackup, services) : null;
                       
         return "<html>"
                 + "<i>" + LogicPrinter.escapeHTML(sig.toString(), false) + "</i>"
@@ -469,6 +475,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
                 + LogicPrinter.escapeHTML(post, false)
                 + "<br><b>mod</b> "
                 + LogicPrinter.escapeHTML(mod, false)
+                + (modBackup != null ? "<br><b>mod_backup</b> "+ LogicPrinter.escapeHTML(modBackup, false) : "")
                 + (hasMby() 
                    ? "<br><b>measured-by</b> " + LogicPrinter.escapeHTML(mby, 
                 	   						 false)
@@ -681,6 +688,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 		+ originalPost 
 		+ "; mod: " 
 		+ originalMod
+                + (originalModBackup != null ? "; mod_backup: " + originalModBackup : "")
 		+ "; termination: "
 		+ getModality();
     }

@@ -329,9 +329,6 @@ public final class TermBuilder {
 		            	            		    .targetSort()));
     }
         
-    
-    
-    
     //-------------------------------------------------------------------------
     //constructors for special classes of term operators
     //-------------------------------------------------------------------------
@@ -1137,6 +1134,10 @@ public final class TermBuilder {
     
     public Term heap(Services services) {
         return var(services.getTypeConverter().getHeapLDT().getHeap());
+    }
+
+    public Term savedHeap(Services services) {
+        return var(services.getTypeConverter().getHeapLDT().getSavedHeap());
     }
     
     
