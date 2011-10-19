@@ -1088,7 +1088,9 @@ loop_specification[ImmutableList<String> mods]
     	options { greedy = true; }
     	:
     	    ps=loop_invariant       { ls.addInvariant(ps); }
+        |   ps=loop_invariant_tra   { ls.addTransactionInvariant(ps); }
         |   ps=assignable_clause    { ls.addAssignable(ps); }
+	|   ps=assignable_backup_clause { ls.addAssignableBackup(ps); }
         |   ps=variant_function     { ls.setVariant(ps); } 
     )+
 ;
@@ -1097,6 +1099,11 @@ loop_specification[ImmutableList<String> mods]
 loop_invariant returns [PositionedString result = null]
 :
     maintaining_keyword result=expression
+;
+
+loop_invariant_tra returns [PositionedString result = null]
+:
+    LOOP_INVARIANT_TRA result=expression
 ;
 
 

@@ -356,6 +356,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                + behavior.hashCode()
                + requires.hashCode()
                + assignable.hashCode()
+               + assignable_backup.hashCode()
                + accessible.hashCode()
                + ensures.hashCode()
                + signals.hashCode()

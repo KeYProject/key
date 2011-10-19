@@ -75,6 +75,7 @@ tokens {
     INVARIANT_RED 		= "invariant_redundantly";
     LOOP_INVARIANT  		= "loop_invariant";
     LOOP_INVARIANT_RED  	= "loop_invariant_redundantly";
+    LOOP_INVARIANT_TRA  	= "loop_invariant_transaction";
     MAINTAINING  		= "maintaining";
     MAINTAINING_REDUNDANTLY	= "maintaining_redundantly";
     MAPS			= "maps";

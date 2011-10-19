@@ -24,6 +24,7 @@ import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
+import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.LoopInvariant;
@@ -44,6 +45,9 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
 	    		  SVInstantiations svInst, 
 	    		  Services services) {
         final Term target = term.sub(0);
+        final boolean transaction =
+              (target.op() != null &&
+                  (target.op() == Modality.DIA_TRANSACTION || target.op() == Modality.BOX_TRANSACTION));
         
         //the target term should have a Java block 
         final ProgramElement pe = target.javaBlock().program();
@@ -85,12 +89,17 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
         final String methodName = frame.getProgramMethod().getName();
 	final LocationVariable heapAtPreVar 
 		= TB.heapAtPreVar(services, "heapBefore_" + methodName, true);
+	final LocationVariable savedHeapAtPreVar = transaction ?
+		TB.heapAtPreVar(services, "savedHeapBefore_" + methodName, true) : null;
 	services.getNamespaces().programVariables().addSafely(heapAtPreVar);
 	final Term heapAtPre = TB.var(heapAtPreVar);
-	final Term heapAtPreUpdate = TB.elementary(services, 
-						   heapAtPreVar, 
-						   TB.heap(services));
-        
+	final Term savedHeapAtPre = transaction ? TB.var(savedHeapAtPreVar) : null;
+	final Term heapAtPreUpdate = transaction ? 
+          TB.parallel(
+             TB.elementary(services, heapAtPreVar, TB.heap(services)),
+             TB.elementary(services, savedHeapAtPreVar, TB.savedHeap(services)))
+           :
+           TB.elementary(services, heapAtPreVar, TB.heap(services));
         //update loop invariants
         for(LoopStatement loop : loops) {
             LoopInvariant inv 
@@ -108,7 +117,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                     = inv.getVariant(selfTerm, heapAtPre, services);
                 
                 final LoopInvariant newInv 
-                    = new LoopInvariantImpl(loop, 
+             	       = new LoopInvariantImpl(loop, 
                                             newInvariant, 
                                             newModifies, 
                                             newVariant, 
