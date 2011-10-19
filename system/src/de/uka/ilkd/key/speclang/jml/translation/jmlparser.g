@@ -1189,6 +1189,21 @@ primaryexpr returns [SLExpression result=null] throws SLTranslationException
     |   array_initializer
 ;   
 
+transactionUpdated
+  returns [SLExpression result=null]
+  throws SLTranslationException
+{
+   SLExpression expr;
+   String fieldName = "<transactionConditionallyUpdated>";
+}
+:
+
+   tk:TRANSACTIONUPDATED LPAREN expr=expression RPAREN
+   {
+      result = lookupIdentifier(fieldName, expr, null, tk);
+   }
+;
+
 primarysuffix[SLExpression receiver, String fullyQualifiedName] 
 		returns [SLExpression result=null] 
 		throws SLTranslationException
@@ -1405,6 +1420,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 	      result = new SLExpression(convertToOld(result.getTerm()));
 	    }
 	}
+    |   result = transactionUpdated
     |
 	BACKUP LPAREN result=expression RPAREN
 	{
