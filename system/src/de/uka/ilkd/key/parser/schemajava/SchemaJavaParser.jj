@@ -561,6 +561,7 @@ TOKEN :
 		    | < THROWS: "throws" >
                     | < TRANSACTIONBEGIN: "#beginJavaCardTransaction" >
                     | < TRANSACTIONCOMMIT: "#commitJavaCardTransaction" >
+                    | < TRANSACTIONFINISH: "#finishJavaCardTransaction" >
                     | < TRANSACTIONABORT: "#abortJavaCardTransaction" >
 		    | < TRANSIENT: "transient" >
 		    | < TRUE: "true" >
@@ -4529,6 +4530,7 @@ TransactionStatement TransactionStatement() :
 {
   (  ( <TRANSACTIONBEGIN> { name = token.image; } )
    | ( <TRANSACTIONCOMMIT> { name = token.image; } )
+   | ( <TRANSACTIONFINISH> { name = token.image; } )
    | ( <TRANSACTIONABORT> { name = token.image; } ) ) ";" 
   {
      int type = 0;
@@ -4536,6 +4538,8 @@ TransactionStatement TransactionStatement() :
         type = TransactionStatement.BEGIN;
      } else if(name.indexOf("#commit") != -1) {
         type = TransactionStatement.COMMIT;
+     } else if(name.indexOf("#finish") != -1) {
+        type = TransactionStatement.FINISH;
      } else if(name.indexOf("#abort") != -1) {
         type = TransactionStatement.ABORT;
      }

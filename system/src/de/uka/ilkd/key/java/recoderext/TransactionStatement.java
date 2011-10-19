@@ -10,13 +10,14 @@ public class TransactionStatement extends JavaStatement {
 
     public static final int BEGIN = 1; 
     public static final int COMMIT = 2; 
-    public static final int ABORT = 3;
+    public static final int FINISH = 3; 
+    public static final int ABORT = 4;
     
     private int type;
     
     public TransactionStatement(int type) {
         super();
-        if(type != BEGIN && type != COMMIT && type != ABORT) {
+        if(type != BEGIN && type != COMMIT && type != FINISH && type != ABORT) {
             throw new IllegalArgumentException("Wrong transaction statement type "+type);
         }
         this.type = type;

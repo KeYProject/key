@@ -10,15 +10,15 @@ import de.uka.ilkd.key.rule.MatchConditions;
 public class TransactionStatement extends JavaStatement {
 
     public static final String[] names = { 
-        "#beginJavaCardTransaction", "#commitJavaCardTransaction", "#abortJavaCardTransaction"
+        "#beginJavaCardTransaction", "#commitJavaCardTransaction", "#finishJavaCardTransaction", "#abortJavaCardTransaction"
    };
 
     private int type;
     
     public TransactionStatement(int type) {
         super();
-        if(type != de.uka.ilkd.key.java.recoderext.TransactionStatement.BEGIN &&
-                  type != de.uka.ilkd.key.java.recoderext.TransactionStatement.COMMIT && type != de.uka.ilkd.key.java.recoderext.TransactionStatement.ABORT) {
+        if(type != de.uka.ilkd.key.java.recoderext.TransactionStatement.BEGIN && type != de.uka.ilkd.key.java.recoderext.TransactionStatement.COMMIT 
+             && type != de.uka.ilkd.key.java.recoderext.TransactionStatement.FINISH && type != de.uka.ilkd.key.java.recoderext.TransactionStatement.ABORT) {
             throw new IllegalArgumentException("Wrong transaction statement type "+type);
         }
         this.type = type;

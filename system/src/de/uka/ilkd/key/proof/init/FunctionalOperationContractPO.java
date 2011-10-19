@@ -146,7 +146,7 @@ public final class FunctionalOperationContractPO
                 new Statement[]{
                         new TransactionStatement(de.uka.ilkd.key.java.recoderext.TransactionStatement.BEGIN),
                         nullStat, tryStat,
-                        new TransactionStatement(de.uka.ilkd.key.java.recoderext.TransactionStatement.COMMIT)}
+                        new TransactionStatement(de.uka.ilkd.key.java.recoderext.TransactionStatement.FINISH)}
               :
                 new Statement[]{nullStat, tryStat});
 
