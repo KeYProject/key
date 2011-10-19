@@ -99,7 +99,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 		= services.getSpecificationRepository().getLoopInvariant(loop);
 	if(inv == null 
            || inv.getInvariant(inv.getInternalSelfTerm(), 
-        	   	       inv.getInternalHeapAtPre(), 
+        	   	       inv.getInternalHeapAtPre(), null, 
 			       services) == null
 	   || (progPost.op() == Modality.DIA 
 	       && inv.getVariant(inv.getInternalSelfTerm(), 
@@ -203,10 +203,10 @@ public final class WhileInvariantRule implements BuiltInRule {
 				         services);
 	final Term heapAtMethodPre = inst.inv.getInternalHeapAtPre();
 	final Term invTerm         = inst.inv.getInvariant(inst.selfTerm, 
-		 	                                   heapAtMethodPre, 
+		 	                                   heapAtMethodPre, null,
 		 	                                   services);
 	final Term mod = inst.inv.getModifies(inst.selfTerm, 
-					      heapAtMethodPre, 
+					      heapAtMethodPre, null, 
 					      services);
 	final Term variant = inst.inv.getVariant(inst.selfTerm, 
 						 heapAtMethodPre, 

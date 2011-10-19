@@ -75,19 +75,32 @@ public final class ProgramVariableCollector extends JavaASTVisitor {
             new TermProgramVariableCollector(services);
         Term selfTerm = x.getInternalSelfTerm();
         Term heapAtPre = x.getInternalHeapAtPre();
+        Term savedHeapAtPre = x.getInternalSavedHeapAtPre();
         
         //invariant
-        Term inv = x.getInvariant(selfTerm, heapAtPre, services);
+        Term inv = x.getInvariant(selfTerm, heapAtPre, null, services);
         if(inv != null) {
             inv.execPostOrder(tpvc);
         }
+
+        //transaction invariant
+        Term transInv = x.getInvariant(selfTerm, heapAtPre, savedHeapAtPre, services);
+        if(transInv != null) {
+            transInv.execPostOrder(tpvc);
+        }
                 
         //modifies
-        Term mod = x.getModifies(selfTerm, heapAtPre, services);
+        Term mod = x.getModifies(selfTerm, heapAtPre, null, services);
         if(mod != null) {
             mod.execPostOrder(tpvc);
         }
-        
+
+        //modifies
+        Term modBackup = x.getModifies(selfTerm, heapAtPre, savedHeapAtPre, services);
+        if(modBackup != null) {
+            modBackup.execPostOrder(tpvc);
+        }
+
         //variant
         Term v = x.getVariant(selfTerm, heapAtPre, services);
         if(v != null) {

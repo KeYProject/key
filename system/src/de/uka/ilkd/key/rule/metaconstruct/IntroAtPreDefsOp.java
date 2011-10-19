@@ -89,11 +89,10 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
         final String methodName = frame.getProgramMethod().getName();
 	final LocationVariable heapAtPreVar 
 		= TB.heapAtPreVar(services, "heapBefore_" + methodName, true);
-	final LocationVariable savedHeapAtPreVar = transaction ?
-		TB.heapAtPreVar(services, "savedHeapBefore_" + methodName, true) : null;
+	final LocationVariable savedHeapAtPreVar = TB.heapAtPreVar(services, "savedHeapBefore_" + methodName, true);
 	services.getNamespaces().programVariables().addSafely(heapAtPreVar);
 	final Term heapAtPre = TB.var(heapAtPreVar);
-	final Term savedHeapAtPre = transaction ? TB.var(savedHeapAtPreVar) : null;
+	final Term savedHeapAtPre = TB.var(savedHeapAtPreVar);
 	final Term heapAtPreUpdate = transaction ? 
           TB.parallel(
              TB.elementary(services, heapAtPreVar, TB.heap(services)),
@@ -110,19 +109,28 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                     selfTerm = null;
                 }
                 final Term newInvariant 
-                    = inv.getInvariant(selfTerm, heapAtPre, services);
+                    = inv.getInvariant(selfTerm, heapAtPre, null, services);
                 final Term newModifies
-                    = inv.getModifies(selfTerm, heapAtPre, services);
+                    = inv.getModifies(selfTerm, heapAtPre, null, services);
+                final Term newTransactionInvariant =
+                  transaction ?
+                     inv.getInvariant(selfTerm, heapAtPre, savedHeapAtPre, services)
+                   : null;
+                final Term newBackupModifies =
+                     inv.getModifies(selfTerm, heapAtPre, savedHeapAtPre, services);
                 final Term newVariant
                     = inv.getVariant(selfTerm, heapAtPre, services);
                 
                 final LoopInvariant newInv 
              	       = new LoopInvariantImpl(loop, 
-                                            newInvariant, 
+                                            newInvariant,
+                                            newTransactionInvariant,
                                             newModifies, 
+                                            newBackupModifies,
                                             newVariant, 
                                             selfTerm,
-                                            heapAtPre);
+                                            heapAtPre,
+                                            savedHeapAtPre);
                 services.getSpecificationRepository().setLoopInvariant(newInv);                
             }
         }

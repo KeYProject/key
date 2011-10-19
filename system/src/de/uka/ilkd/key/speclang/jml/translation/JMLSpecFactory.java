@@ -871,7 +871,9 @@ public class JMLSpecFactory {
             ProgramMethod pm,
             LoopStatement loop,
             ImmutableList<PositionedString> originalInvariant,
+            ImmutableList<PositionedString> originalTransactionInvariant,
             ImmutableList<PositionedString> originalAssignable,
+            ImmutableList<PositionedString> originalBackupAssignable,
             PositionedString originalVariant)
             throws SLTranslationException {
         assert pm != null;
@@ -898,7 +900,8 @@ public class JMLSpecFactory {
                 collectLocalVariables(pm.getBody(), loop);
         paramVars = paramVars.append(localVars);
         Term heapAtPre = TB.var(TB.heapAtPreVar(services, "heapAtPre", false));
-
+        Term savedHeapAtPre = TB.var(TB.heapAtPreVar(services, "savedHeapAtPre", false));
+        
         //translateToTerm invariant
         Term invariant;
         if (originalInvariant.isEmpty()) {
@@ -911,6 +914,19 @@ public class JMLSpecFactory {
                                                selfVar, paramVars, null,
                                                null, heapAtPre, null, services);
                 invariant = TB.and(invariant, translated);
+            }
+        }
+        Term transactionInvariant;
+        if (originalTransactionInvariant.isEmpty()) {
+            transactionInvariant = null;
+        } else {
+            transactionInvariant = TB.tt();
+            for (PositionedString expr : originalTransactionInvariant) {
+                Term translated =
+                        translator.<Term>parse(expr, pm.getContainerType(),
+                                               selfVar, paramVars, null,
+                                               null, heapAtPre, savedHeapAtPre, services);
+                transactionInvariant = TB.and(transactionInvariant, translated);
             }
         }
 
@@ -926,6 +942,20 @@ public class JMLSpecFactory {
                                                selfVar, paramVars, null, null,
                                                null, null, services);
                 assignable = TB.union(services, assignable, translated);
+            }
+        }
+
+        Term assignableBackup;
+        if (originalBackupAssignable.isEmpty()) {
+            assignableBackup = TB.allLocs(services);
+        } else {
+            assignableBackup = TB.empty(services);
+            for (PositionedString expr : originalBackupAssignable) {
+                Term translated =
+                        translator.<Term>parse(expr, pm.getContainerType(),
+                                               selfVar, paramVars, null, null,
+                                               null, null, services);
+                assignableBackup = TB.union(services, assignableBackup, translated);
             }
         }
 
@@ -945,11 +975,14 @@ public class JMLSpecFactory {
         //create loop invariant annotation
         Term selfTerm = selfVar == null ? null : TB.var(selfVar);
         return new LoopInvariantImpl(loop,
-                                     invariant,
-                                     assignable,
-                                     variant,
-                                     selfTerm,
-                                     heapAtPre);
+                invariant,
+                transactionInvariant,
+                assignable,
+                assignableBackup,
+                variant,
+                selfTerm,
+                heapAtPre,
+                savedHeapAtPre);
     }
 
 
@@ -961,7 +994,9 @@ public class JMLSpecFactory {
         return createJMLLoopInvariant(pm,
                                       loop,
                                       textualLoopSpec.getInvariant(),
+                                      textualLoopSpec.getTransactionInvariant(),
                                       textualLoopSpec.getAssignable(),
+                                      textualLoopSpec.getAssignableBackup(),
                                       textualLoopSpec.getVariant());
     }
     
