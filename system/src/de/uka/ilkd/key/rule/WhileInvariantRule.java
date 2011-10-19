@@ -82,7 +82,8 @@ public final class WhileInvariantRule implements BuiltInRule {
 	}
 
 	//focus (below update) must be modality term
-	if(progPost.op() != Modality.BOX && progPost.op() != Modality.DIA) {
+	if(progPost.op() != Modality.BOX && progPost.op() != Modality.DIA
+	    && progPost.op() != Modality.BOX_TRANSACTION && progPost.op() != Modality.DIA_TRANSACTION) {
 	    return null;
 	}
 
@@ -144,9 +145,11 @@ public final class WhileInvariantRule implements BuiltInRule {
 	    			ImmutableSet<ProgramVariable> localOuts,
 	    			Services services) {
 	//heap
+    // shortcut - localOuts == null means we create the anon-update for the savedHeap
+    final boolean transaction = (localOuts == null);
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	final Name anonHeapName 
-		= new Name(TB.newName(services, "anonHeap_loop"));
+		= new Name(TB.newName(services, transaction ? "anonSavedHeap" : "anonHeap_loop"));
 	final Function anonHeapFunc = new Function(anonHeapName,
 					     heapLDT.targetSort());
 	services.getNamespaces().functions().addSafely(anonHeapFunc);
@@ -154,18 +157,19 @@ public final class WhileInvariantRule implements BuiltInRule {
 	Term anonUpdate = TB.anonUpd(services, mod, anonHeapTerm);
 	
 	//local output vars
-	for(ProgramVariable pv : localOuts) {
-	    final String anonFuncName 
-	    	= TB.newName(services, pv.name().toString());
-	    final Function anonFunc 
-	    	= new Function(new Name(anonFuncName), pv.sort());
-	    services.getNamespaces().functions().addSafely(anonFunc);
-	    final Term elemUpd = TB.elementary(services, 
-		                               (LocationVariable)pv, 
-		                               TB.func(anonFunc));
-	    anonUpdate = TB.parallel(anonUpdate, elemUpd);
+	if(!transaction) {
+	    for(ProgramVariable pv : localOuts) {
+	        final String anonFuncName 
+	    	    = TB.newName(services, pv.name().toString());
+	        final Function anonFunc 
+	    	    = new Function(new Name(anonFuncName), pv.sort());
+	        services.getNamespaces().functions().addSafely(anonFunc);
+	        final Term elemUpd = TB.elementary(services, 
+	                (LocationVariable)pv, 
+	                TB.func(anonFunc));
+	        anonUpdate = TB.parallel(anonUpdate, elemUpd);
+	    }
 	}
-	
 	return new Pair<Term,Term>(anonUpdate, anonHeapTerm);
     }
     
