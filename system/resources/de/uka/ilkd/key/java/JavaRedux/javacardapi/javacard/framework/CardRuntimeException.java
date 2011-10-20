@@ -13,44 +13,62 @@ package javacard.framework;
 public class CardRuntimeException extends java.lang.RuntimeException {
 
     private static /*@ spec_public nullable @*/ CardRuntimeException _systemInstance = new CardRuntimeException();
-    //@ public invariant CardRuntimeException._systemInstance != null;
+    // @ public static invariant CardRuntimeException._systemInstance != null;
+
+    //@ public model instance \locset state;
+    //@ public model instance \locset reasonRep;
+    //@ public accessible \inv : state, reasonRep;
+    //@ public accessible state : state, reasonRep;
+    //@ public accessible reasonRep : state, reasonRep;
+    //@ protected represents reasonRep = _reason[*];
+    //@ protected represents state = _reason;
+
 
     protected /*@ spec_public non_null @*/ short[] _reason;
     //@ public instance invariant _reason.length == 1;
     //@ public instance invariant JCSystem.isTransient(_reason) == JCSystem.CLEAR_ON_RESET; 
 
-    //@ ensures \fresh(_reason);
-    //@ ensures getReason() == reason;
-    //@ assignable _reason;
+    /*@ public normal_behavior
+      @   ensures \fresh(state);
+      @   ensures getReason() == reason;
+      @   assignable state;
+      @*/
     public CardRuntimeException(short reason) {
        this();
 	// KeYHelper.setJavaOwner(_reason, this);
        setReason(reason);
     }
 
-    //@ ensures \fresh(_reason);
-    //@ assignable _reason;
+    /*@ public normal_behavior
+      @   ensures \fresh(state);
+      @   assignable state;
+      @*/
     CardRuntimeException() {
         _reason = JCSystem.makeTransientShortArray((short) 1,
                 JCSystem.CLEAR_ON_RESET);
 	// KeYHelper.setJavaOwner(_reason, this);
     }
 
-    //@ ensures \result == _reason[0];
-    //@ assignable \nothing;
-    public short getReason() {
+    /*@ public normal_behavior
+      @   accessible state, reasonRep;
+      @   ensures \result == getReason();
+      @*/
+    public /*@ pure @*/ short getReason() {
         return _reason[0];
     }
 
-    //@ ensures getReason() == reason;
-    //@ assignable _reason[0];
+    /*@ public normal_behavior
+      @   assignable reasonRep;
+      @   ensures getReason() == reason;
+      @*/
     public void setReason(short reason) {
         _reason[0] = reason;
     }
 
     /*@ public exceptional_behavior
+      @   requires CardRuntimeException._systemInstance != null;
       @   requires CardRuntimeException._systemInstance.\inv;
-      @   assignable CardRuntimeException._systemInstance._reason[0];
+      @   assignable CardRuntimeException._systemInstance.reasonRep;
       @   signals (CardRuntimeException cre) ((CardRuntimeException)cre).getReason() == reason;
       @   signals_only CardRuntimeException;
       @*/

@@ -13,8 +13,8 @@ public class JCSystem {
     private static native void nativeKeYAbortTransaction();
     private static native void nativeKeYCommitTransaction();
     
-    private static native byte nativeKeYGetTransient(Object o);
-    private static native void nativeKeYSetTransient(Object o, byte transientType);
+    static native byte nativeKeYGetTransient(Object o);
+    static native void nativeKeYSetTransient(Object o, byte transientType);
 
     public static final byte NOT_A_TRANSIENT_OBJECT = (byte) 0;
     //@ public static invariant NOT_A_TRANSIENT_OBJECT == 0;
@@ -40,15 +40,21 @@ public class JCSystem {
     }
 
     private static /*@ spec_public @*/ byte _transactionDepth = (byte)0;
-    //@ public static invariant _transactionDepth == 0 || _transactionDepth == 1;
+    //@ public static invariant getTransactionDepth() == 0 || getTransactionDepth() == 1;
 
     //@ ensures \result == _transactionDepth;
     public /*@ pure @*/ static byte getTransactionDepth() {
       return _transactionDepth;
     }
 
-    private /*@ spec_public @*/ static NegativeArraySizeException nase = new NegativeArraySizeException();
+    /*@ spec_public @*/ static NegativeArraySizeException nase = new NegativeArraySizeException();
     //@ public static invariant nase != null;
+
+    /*@ spec_public @*/ static NullPointerException npe = new NullPointerException();
+    //@ public static invariant npe != null;
+
+    /*@ spec_public @*/ static ArrayIndexOutOfBoundsException aioobe = new ArrayIndexOutOfBoundsException();
+    //@ public static invariant aioobe != null;
 
     //@ requires length >= 0;
     //@ requires event == CLEAR_ON_RESET || event == CLEAR_ON_DESELECT;
