@@ -55,7 +55,7 @@ public abstract class LabelJumpStatement extends JumpStatement implements NameRe
      */
     public LabelJumpStatement(ExtList children) {
 	super(children);
-	name=(Label)children.get(Label.class);
+	name=children.get(Label.class);
     }
 
 

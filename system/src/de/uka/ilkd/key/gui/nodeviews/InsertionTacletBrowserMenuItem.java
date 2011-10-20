@@ -35,6 +35,10 @@ import de.uka.ilkd.key.util.Debug;
 public abstract class InsertionTacletBrowserMenuItem extends JMenu
  implements TacletMenuItem {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1874640339950617746L;
     /** all taclet apps the user can choose from */
     private Collection<TacletAppListItem> insertionTaclets;
     /** the added action listeners */
@@ -47,11 +51,15 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu
     private TacletApp selectedTaclet;
     /** the services */
     protected Services services;
+    
+    /** the base title; used title = basetitle + ( nrOfItems ) */
+    private String baseTitle;
 
     public InsertionTacletBrowserMenuItem(String title, JFrame parent, 
             NotationInfo notInfo, Services services) {
         
         super(title);
+        this.baseTitle = title;
         this.parent = parent;
         this.notInfo = notInfo;
         this.services = services;
@@ -101,6 +109,7 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu
             
         });
         add(appItem);
+        setText(baseTitle + " (" + getAppSize() + (getAppSize() != 1 ? " items" : " item") +")");
     }
 
 
@@ -188,6 +197,11 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu
             
             final JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
                          scrollPane, formulaDisplaySP) {
+                /**
+                             * 
+                             */
+                            private static final long serialVersionUID = -6688343484818325411L;
+
                 public void setUI(javax.swing.plaf.SplitPaneUI ui) {
                     try{ super.setUI(ui); } catch(NullPointerException e) 
                     {Debug.out("Exception thrown by class Main at setUI"); }

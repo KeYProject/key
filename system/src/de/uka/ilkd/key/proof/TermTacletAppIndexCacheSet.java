@@ -217,8 +217,7 @@ public class TermTacletAppIndexCacheSet {
         final Operator op = t.op ();
         if ( !( op instanceof UpdateApplication ) ) return false;
 
-        final UpdateApplication updOp = (UpdateApplication)op;
-        return subtermIndex == updOp.targetPos ();
+        return subtermIndex == UpdateApplication.targetPos ();
     }
 
     /**

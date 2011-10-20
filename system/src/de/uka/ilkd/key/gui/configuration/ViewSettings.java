@@ -150,7 +150,7 @@ public class ViewSettings implements Settings {
      * represents the stored settings
      * @param props the collection of properties  
      */
-    public void readSettings(Properties props) {
+    public void readSettings(Object sender, Properties props) {
 		String val1 = props.getProperty(MAX_TOOLTIP_LINES_KEY);
 		String val2 = props.getProperty(FONT_INDEX);
 		String val3 = props.getProperty(SHOW_WHOLE_TACLET);
@@ -185,7 +185,7 @@ public class ViewSettings implements Settings {
 	 *           the Properties object where to write the settings as (key,
 	 *           value) pair
 	 */
-    public void writeSettings(Properties props) {
+    public void writeSettings(Object sender,Properties props) {
     	props.setProperty(MAX_TOOLTIP_LINES_KEY, "" + maxTooltipLines);
     	props.setProperty(SHOW_WHOLE_TACLET, "" + showWholeTaclet);
     	props.setProperty(FONT_INDEX, "" + sizeIndex);

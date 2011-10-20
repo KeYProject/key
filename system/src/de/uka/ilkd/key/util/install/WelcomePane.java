@@ -20,6 +20,12 @@ import javax.swing.SwingConstants;
  */
 public class WelcomePane extends InstallationPane {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 6205049648488646558L;
+
+
     public WelcomePane ( KeYInstaller installer ) {
 
 	super ( "Welcome", installer );

@@ -58,5 +58,10 @@ public class DefaultTaskFinishedInfo implements TaskFinishedInfo {
 
     public Proof getProof() {            
         return proof;
-    }        
+    }       
+    
+    @Override
+    public String toString() {
+                return "";
+    }
 }

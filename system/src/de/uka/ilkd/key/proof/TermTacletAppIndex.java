@@ -406,7 +406,7 @@ public class TermTacletAppIndex {
         final int child = pathToModification.getChild ();
         
         if ( newTerm.op () instanceof UpdateApplication ) {
-            final int targetPos = ( (UpdateApplication)newTerm.op () ).targetPos ();
+            final int targetPos = UpdateApplication.targetPos ();
             if ( child != targetPos ) {
                 newSubIndices =
                     updateIUpdateTarget ( newSubIndices,
@@ -659,7 +659,7 @@ public class TermTacletAppIndex {
         final int nextSubtermIndex = pathToModification.getChild ();
         
         if ( subTerm.op () instanceof UpdateApplication ) {
-            final int targetPos = ( (UpdateApplication)subTerm.op () ).targetPos ();
+            final int targetPos = UpdateApplication.targetPos ();
             if ( nextSubtermIndex != targetPos )
                 getSubIndex ( targetPos )
                     .reportTacletApps ( pos.down ( targetPos ), listener );

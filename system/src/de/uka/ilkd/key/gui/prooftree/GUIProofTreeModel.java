@@ -46,6 +46,10 @@ import de.uka.ilkd.key.util.Debug;
 
 class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 7853478051421478043L;
     private Proof proof;
     private ProofTreeListener proofTreeListener;
 
@@ -70,8 +74,11 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
 
    class ProofTreeListener extends ProofTreeAdapter {
 
+      private Node pruningInProcess;
+
       public void proofStructureChanged(ProofTreeEvent e) {
-         Node n = e.getNode();
+        if (pruningInProcess != null) return;
+        Node n = e.getNode();
          // we assume that there already is a "node" event for every other
          // type of event
          if (n != null) {
@@ -85,7 +92,11 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
              }
 
       }
-      
+
+      public void proofIsBeingPruned(ProofTreeEvent e){              
+            pruningInProcess = e.getNode();   
+      }
+
       /** The proof tree under the node mentioned in the ProofTreeEvent
        * is in pruning phase. The subtree of node will be removed after this
        * call but at this point the subtree can still be
@@ -93,40 +104,18 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
        * The method proofPruned is called, when the nodes are disconnect from
        * node.
        */
-      public void proofIsBeingPruned(ProofTreeEvent e){
-          //Maybe the following should happen in GUIProofTreeModel.updateTree ?
-          //In the following all nodes of the pruned subtree are removed 
-          //from proofTreenodes and branchTreeNodes.
-          Node n = e.getNode();
-          final Stack<Node> workingList = new Stack<Node> ();
-          int ccount = n.childrenCount();
-          for(int i=0;i<ccount;i++){
-              Node node = n.child(i);
-              if(node!=null){
-                  workingList.add(node);
-              }
-          }
-          while ( !workingList.empty () ) {
-              Node node = workingList.pop ();
-              proofTreeNodes.remove(node);
-              branchNodes.remove(node);
-              ccount = node.childrenCount();
-              for(int i=0;i<ccount;i++){
-                  n = node.child(i);
-                  if(n!=null){
-                      workingList.add(n);
-                  }
-              }
-          }
-          
+      public void proofPruned(ProofTreeEvent e){              
+              updateTree(getProofTreeNode(pruningInProcess));
+              pruningInProcess = null;   
       }
 
-        public void proofGoalRemoved (ProofTreeEvent e) {
-            if ( hideClosedSubtrees () ) {
-                updateTree((TreeNode) null);
-            } else
-                proofStructureChanged ( e );
-        }
+      public void proofGoalRemoved (ProofTreeEvent e) {
+              if (pruningInProcess != null) return;
+              if ( hideClosedSubtrees () ) {
+                      updateTree((TreeNode) null);
+              } else
+                      proofStructureChanged ( e );
+      }
 
    }
 

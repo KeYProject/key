@@ -64,7 +64,7 @@ public class InterfaceDeclaration extends TypeDeclaration {
     public InterfaceDeclaration(ExtList children, ProgramElementName fullName,
 				boolean isLibrary) { 
 	super(children, fullName, isLibrary);
-	extending=(Extends)children.get(Extends.class);
+	extending=children.get(Extends.class);
     } 
 
     public InterfaceDeclaration(ProgramElementName name) { 

@@ -471,14 +471,13 @@ public final class JavaInfo {
 	     sortCachedSize = kpmi.rec2key().size();
 	     sort2KJTCache = new HashMap<Sort, KeYJavaType>();
 	     for (final Object o : kpmi.allElements()) {
-		 if (o instanceof KeYJavaType){
-                     final KeYJavaType oKJT = (KeYJavaType)o;
-                     if(sort2KJTCache.containsKey(oKJT.getSort())) {
-                	 sort2KJTCache.remove(oKJT.getSort()); //XXX
-                     } else {
-                	 sort2KJTCache.put((oKJT).getSort(), oKJT);
-                     }
-		 }
+	         if (o instanceof KeYJavaType){
+	             final KeYJavaType oKJT = (KeYJavaType)o;
+	             if(sort2KJTCache.containsKey(oKJT.getSort())) {
+	                 sort2KJTCache.remove(oKJT.getSort()); //XXX
+	             } 
+	             sort2KJTCache.put((oKJT).getSort(), oKJT);	             
+	         }
 	     }
 	 }	
 	 return sort2KJTCache.get(sort);
@@ -716,7 +715,7 @@ public final class JavaInfo {
     }
 
     /** gets an array of expression and returns a list of types */
-    private ImmutableList<KeYJavaType> getKeYJavaTypes(ImmutableArray<Expression> args) {
+    private ImmutableList<KeYJavaType> getKeYJavaTypes(ImmutableArray<? extends Expression> args) {
 	ImmutableList<KeYJavaType> result = ImmutableSLList.<KeYJavaType>nil(); 
 	if (args != null) {
 	    for (int i = args.size()-1; i >= 0 ; i--) {
@@ -735,7 +734,7 @@ public final class JavaInfo {
      * signature 
      * @return the signature 
      */
-    public ImmutableList<KeYJavaType> createSignature(ImmutableArray<Expression> arguments) {
+    public ImmutableList<KeYJavaType> createSignature(ImmutableArray<? extends Expression> arguments) {
 	return getKeYJavaTypes(arguments);    
     }
 
@@ -1168,7 +1167,7 @@ public final class JavaInfo {
     public ImmutableList<KeYJavaType> getAllSubtypes(KeYJavaType type) {
         return kpmi.getAllSubtypes(type);
     }
-    
+
     /**
      * returns all supertypes of a given type
      * @param type the KeYJavaType whose supertypes are returned
@@ -1176,13 +1175,22 @@ public final class JavaInfo {
      */
     public ImmutableList<KeYJavaType> getAllSupertypes(KeYJavaType type) {
         if (type.getJavaType() instanceof ArrayType) {
-            ImmutableList<KeYJavaType> arraySupertypes = ImmutableSLList.<KeYJavaType>nil();
-            for (Sort sort : type.getSort().extendsSorts()) {
-                type.getSort().extendsSorts().iterator();
-            }
-            return arraySupertypes;
+            ImmutableList<KeYJavaType> res = ImmutableSLList.<KeYJavaType>nil();
+            for (Sort s: getSuperSorts(type.getSort()))
+                res = res.append(getKeYJavaType(s));
+            return res;
         }
         return kpmi.getAllSupertypes(type);
+    }
+
+    private ImmutableList<Sort> getSuperSorts(Sort sort){
+        ImmutableList<Sort> res = ImmutableSLList.<Sort>nil();
+        final Sort object = getJavaLangObject().getSort();
+        if (sort != object)
+            for (Sort exsort: sort.extendsSorts(services)) {
+                res = res.append(getSuperSorts(exsort)).append(exsort);
+            }
+        return res;
     }
 
     /**
@@ -1258,7 +1266,9 @@ public final class JavaInfo {
         return length;
     }
     
-    
+    /**
+     * Returns the special symbol <code>&lt;inv&gt;</code> which stands for the class invariant of an object.
+     */
     public ObserverFunction getInv() {
 	if(inv == null) {
 	    inv = new ObserverFunction("<inv>",

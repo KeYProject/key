@@ -20,24 +20,21 @@ header {
     import de.uka.ilkd.key.java.Position;
     import de.uka.ilkd.key.java.Services;
     import de.uka.ilkd.key.java.abstraction.*;
-    import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
-    import de.uka.ilkd.key.java.declaration.ClassDeclaration;
     import de.uka.ilkd.key.java.expression.literal.StringLiteral;
     import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
     import de.uka.ilkd.key.ldt.*;
     import de.uka.ilkd.key.logic.*;
     import de.uka.ilkd.key.logic.op.*;
     import de.uka.ilkd.key.logic.sort.*;
+    import de.uka.ilkd.key.parser.ParserException;
     import de.uka.ilkd.key.proof.OpReplacer;
     import de.uka.ilkd.key.speclang.PositionedString;
     import de.uka.ilkd.key.speclang.translation.*;
     import de.uka.ilkd.key.util.Pair;
     import de.uka.ilkd.key.util.Triple;    
 
-    import java.lang.RuntimeException;
     import java.math.BigInteger;
     import java.util.Map;
-    import java.util.Iterator;
     import java.util.LinkedHashMap;
 }
 
@@ -94,6 +91,8 @@ options {
 	this.excManager     = new SLTranslationExceptionManager(this,
 				    				fileName, 
 				    				offsetPos);
+	translator.setExceptionManager(excManager);
+	
 	this.selfVar	    = self;
 	this.paramVars      = paramVars;
 	this.resultVar      = result;
@@ -147,17 +146,29 @@ options {
 
     private void raiseError(String msg) throws SLTranslationException {
 	throw excManager.createException(msg);
-    }
-    
+    }    
     
     private void raiseError(String msg, Token t) throws SLTranslationException {
 	throw excManager.createException(msg, t);
     }
     
+    private void raiseError(String msg, Token t, Exception cause) throws SLTranslationException {
+        throw excManager.createException(msg, t, cause);
+    }
     
     private void raiseNotSupported(String feature) 
 	    throws SLTranslationException {
 	throw excManager.createWarningException(feature + " not supported"); 
+    }
+    
+    /**
+     * This is used for features without semantics such as labels or annotations.
+     * @author bruns
+     * @since 1.7.2178
+     */
+    private void addIgnoreWarning(String feature) {
+        String msg = feature + " is not supported and has been silently ignored.";
+        // TODO: wasn't there some collection of non-critical warnings ???
     }
 	
 
@@ -223,6 +234,7 @@ options {
     /**
      * Converts a term so that all of its non-rigid operators refer to the pre-state.
      */
+    // TODO: remove when all clients have been moved to JMLTranslator
     private Term convertToOld(Term term) {
 	assert heapAtPre != null;
 	Map map = new LinkedHashMap();
@@ -231,31 +243,6 @@ options {
 	return or.replace(term);
     }
 
-    private boolean isBoundedSum(Term a, LogicVariable lv){
-        return lowerBound(a,lv)!=null && upperBound(a,lv)!=null;
-    }
-    
-    private Term lowerBound(Term a, LogicVariable lv){
-        if(a.arity()>0 && a.sub(0).op()==Junctor.AND){
-            a=a.sub(0);
-        }
-        if(a.arity()==2 && a.op()==Junctor.AND && a.sub(0).arity()==2 && a.sub(0).sub(1).op()==lv
-                && a.sub(0).op().equals(intLDT.getLessOrEquals())){
-            return a.sub(0).sub(0);
-        }
-        return null;
-    }
-   
-    private Term upperBound(Term a, LogicVariable lv){
-        if(a.arity()>0 && a.sub(0).op()==Junctor.AND){
-            a=a.sub(0);
-        }   
-        if(a.arity()==2 && a.op()==Junctor.AND && a.sub(1).arity()==2 && a.sub(1).sub(0).op()==lv
-                && a.sub(1).op().equals(intLDT.getLessThan())){
-            return a.sub(1).sub(1);
-        }
-        return null;
-    }
 
 
     private String createSignatureString(ImmutableList<SLExpression> signature) {
@@ -304,20 +291,6 @@ options {
 	}
 	
 	return null;
-    }
-
-
-    private Term getFields(Term t) throws SLTranslationException {
-        if(t.op().equals(locSetLDT.getUnion())) {
-            final Term sub0 = getFields(t.sub(0));
-            final Term sub1 = getFields(t.sub(1));
-            return TB.union(services, sub0, sub1);
-        } else if(t.op().equals(locSetLDT.getSingleton())) {
-	    return TB.allObjects(services, t.sub(1));
-        } else {
-            raiseError("Inacceptable field expression: " + t);
-            return null;
-        }
     }
 }
 
@@ -530,61 +503,9 @@ specarrayrefexpr[SLExpression receiver, String fullyQualifiedName, Token lbrack]
 	| MULT
     )
     {
-	if(receiver == null) {
-	    raiseError("Array \"" + fullyQualifiedName + "\" not found.", lbrack);
-	} else if(receiver.isType()) {
-	    raiseError("Error in array expression: \"" + fullyQualifiedName +
-		    "\" is a type.", lbrack);
-	} else if(!(receiver.getType().getJavaType() instanceof ArrayType
-	            || receiver.getType().getJavaType().equals(PrimitiveType.JAVA_SEQ))) {
-	    raiseError("Cannot access " + receiver.getTerm() + " as an array.");
-	}
-    
-    	//arrays
-    	if(receiver.getType().getJavaType() instanceof ArrayType) {
-	    if (rangeFrom == null) {
-	        // We have a star. A star includes all components of an array even
-	        // those out of bounds. This makes proving easier.	    
-	        Term t = TB.allFields(services, receiver.getTerm());
-    	        result = new SLExpression(t);
-	    } else if (rangeTo != null) {
-	        // We have "rangeFrom .. rangeTo"
-	        Term t = TB.arrayRange(services, 
-	    			       receiver.getTerm(), 
-	    			       rangeFrom.getTerm(), 
-	    			       rangeTo.getTerm());
-	        result = new SLExpression(t);
-	    } else {
-	        // We have a regular array access
-	        Term t = TB.dotArr(services, 
-	    		           receiver.getTerm(),
-	    	    	           rangeFrom.getTerm());
-	        ArrayType arrayType = (ArrayType) receiver.getType().getJavaType();
-	        KeYJavaType elementType = arrayType.getBaseType().getKeYJavaType();	    		       
-                result = new SLExpression(t, elementType);
-	    }
-	    
-	//sequences	
-	} else {
-	    if(rangeTo != null) {
-	        Term t = TB.seqSub(services, 
-	                           receiver.getTerm(), 
-	                           rangeFrom.getTerm(), 
-	                           rangeTo.getTerm());
-	        result = new SLExpression(t);
-	    } else {
-	    	Term t = TB.seqGet(services, 
-	    			   Sort.ANY,
-	    		           receiver.getTerm(), 
-	    		           rangeFrom.getTerm());
-	        result = new SLExpression(t);
-	    }	
-	}
+        result = translator.<SLExpression>translate("array reference", services, receiver, fullyQualifiedName, lbrack, rangeFrom, rangeTo);
     }
-    ;exception
-        catch [TermCreationException ex] {
-              raiseError(ex.getMessage());
-        }
+;
 
 
 storerefkeyword returns [Term result = null] throws SLTranslationException
@@ -805,18 +726,50 @@ andexpr returns [SLExpression result=null] throws SLTranslationException
 	)?
 ;
 
-
 equalityexpr returns [SLExpression result=null] throws SLTranslationException
 {
-    SLExpression right = null;
+	SLExpression right = null;
 }
-:
+	 :
 	result=relationalexpr 
 	(   eq:EQ_NEQ right=equalityexpr
-	    { result = translator.<SLExpression>translate(eq.getText(), result, right, excManager, services); }
+	        { result = translator.<SLExpression>translate(eq.getText(), result, right, excManager, services); }
 	)?
 ;
 
+//equalityexpr returns [SLExpression result=null] throws SLTranslationException
+//{
+//    Deque<Pair<Token,SLExpression>> right = null;
+//}
+//:
+//    result = relationalexpr
+//    right = equalityexprright
+//    { 
+//        assert right != null;
+//        for (Pair<Token,SLExpression> pair: right) { 
+//            result = translator.<SLExpression>translate(pair.first.getText(), result, pair.second, excManager, services);
+//        }
+//    }
+//;
+///** Helper method to make equality expressions left associative. */
+//equalityexprright returns [Deque<Pair<Token,SLExpression>> result= null] throws SLTranslationException
+//{
+//    SLExpression tmp = null;
+//}
+//:
+//    (EQ | NEQ) =>
+//        eq:EQ_NEQ
+//        tmp = relationalexpr
+//        result = equalityexprright
+//    {
+//        result.push(new Pair<Token,SLExpression>(eq,tmp));
+//    }
+//    |
+//    EMPTY
+//    {
+//        result = new ArrayDeque<Pair<Token,SLExpression>>();
+//    }
+//;
 
 relationalexpr returns [SLExpression result=null] throws SLTranslationException
 {
@@ -1073,12 +1026,8 @@ multexpr returns [SLExpression result=null] throws SLTranslationException
 
 
 unaryexpr returns [SLExpression result=null] throws SLTranslationException
-{
-    KeYJavaType type = null;
-}
 :
-(
-       PLUS result=unaryexpr
+    PLUS result=unaryexpr
 	{
 	    if (result.isType()) {
 		raiseError("Cannot build  +" + result.getType().getName() + ".");
@@ -1098,30 +1047,36 @@ unaryexpr returns [SLExpression result=null] throws SLTranslationException
 	    result = intHelper.buildUnaryMinusExpression(result);
 	}
     |
-	(LPAREN typespec RPAREN ) => 
-	   LPAREN type=typespec RPAREN result=unaryexpr
-	
+	(LPAREN typespec RPAREN ) => result = castexpr
     |
-	result=unaryexprnotplusminus
-)
-	 {
-	     if (type != null) {
-		 if (result.isType()) {
-		     raiseError("Casting of type variables not (yet) supported.");
-		 }
-		 assert result.isTerm();
-		 
-		 if(intHelper.isIntegerTerm(result)) {
-		     result = intHelper.buildCastExpression(type, result);
-		 } else {
-		     result = new SLExpression(
-		         TB.cast(services, type.getSort(), result.getTerm()), 
-		         type);
-		 }
-	     }
-	}
+	    result=unaryexprnotplusminus
 ;
 
+castexpr returns  [SLExpression result = null] throws SLTranslationException
+{
+    KeYJavaType type = null;
+}
+:
+LPAREN type=typespec RPAREN result=unaryexpr
+{
+    if (type != null) {
+    if (result.isType()) {
+        raiseError("Casting of type variables not (yet) supported.");
+    }
+    assert result.isTerm();
+    
+    if(intHelper.isIntegerTerm(result)) {
+        result = intHelper.buildCastExpression(type, result);
+    } else {
+        result = new SLExpression(
+            TB.cast(services, type.getSort(), result.getTerm()), 
+            type);
+    }
+    } else {
+        raiseError("Please provide a type to cast to.");
+    }
+}
+;
 
 unaryexprnotplusminus returns [SLExpression result=null] throws SLTranslationException
 {
@@ -1213,6 +1168,7 @@ primaryexpr returns [SLExpression result=null] throws SLTranslationException
             result = new SLExpression(TB.var(selfVar), selfVar.getKeYJavaType());
         }
     |   new_expr
+    |   array_initializer
 ;   
 
 primarysuffix[SLExpression receiver, String fullyQualifiedName] 
@@ -1283,11 +1239,40 @@ new_expr throws SLTranslationException
     ImmutableList<SLExpression> params;
 }
 :
-	NEW typ=type LPAREN ( params=expressionlist )? RPAREN 
+	NEW typ=type ( 
+	    LPAREN ( params=expressionlist )? RPAREN
+	   |
+	    array_dimensions (array_initializer)?
+	   )
         {	
         	raiseNotSupported("'new' within specifications"); 
         }
     ;
+    
+array_dimensions throws SLTranslationException
+:
+    array_dimension
+    // TODO handle higher dimensions
+;
+    
+array_dimension throws SLTranslationException
+{
+    SLExpression length;
+}
+:
+    LBRACKET (length=expression)? RBRACKET
+;
+    
+array_initializer throws SLTranslationException
+{
+    ImmutableList<SLExpression> init;
+}
+:
+    LBRACE init=expressionlist RBRACE
+    {
+        raiseNotSupported("array initializer");
+    }
+;
 
 expressionlist returns [ImmutableList<SLExpression> result=ImmutableSLList.<SLExpression>nil()] 
                throws SLTranslationException
@@ -1365,12 +1350,13 @@ decimalnumeral returns [SLExpression result=null] throws SLTranslationException
 
 jmlprimary returns [SLExpression result=null] throws SLTranslationException
 {
-    ImmutableList<SLExpression> list;
+    ImmutableList<SLExpression> list = null;
     SLExpression e1 = null;
     SLExpression e2 = null;
     SLExpression e3 = null;
     KeYJavaType typ;
     Term t, t2;
+    Token tk = null;
     Pair<KeYJavaType,ImmutableList<LogicVariable>> declVars = null;    
 }
 :
@@ -1393,8 +1379,13 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 			   "\\old not allowed in this context.");
 	    }
 	    
-	    result = new SLExpression(convertToOld(result.getTerm()), 
-	                              result.getType());
+	    typ = result.getType();
+	    if(typ != null) {
+	      result = new SLExpression(convertToOld(result.getTerm()), 
+	                                result.getType());
+	    } else {
+	      result = new SLExpression(convertToOld(result.getTerm()));
+	    }
 	}
     |   
 	CREATED LPAREN result=expression RPAREN
@@ -1427,13 +1418,21 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 	    }
 	}
 	
-    |   INFORMAL_DESCRIPTION 
+    |   desc:INFORMAL_DESCRIPTION 
 	{
-	    raiseNotSupported("informal predicates");
+	    // was: raiseNotSupported("informal predicates");
+	    result = translator.<SLExpression>translate("(* *)", services, desc, 
+	        selfVar, resultVar, paramVars, heapAtPre, excManager);
 	}
+	
+    |   escape:DL_ESCAPE LPAREN ( list=expressionlist )? RPAREN
+        {
+            result = translator.<SLExpression>translate("\\dl_", escape, list, services, excManager);
+        }
+        
     |   NOT_MODIFIED LPAREN t=storereflist RPAREN
         {
-            raiseNotSupported("\\not_modified");
+        result = new SLExpression(translator.<Term>translate("\\not_modified",services, heapAtPre, t));
         } 
 	
     |   FRESH LPAREN list=expressionlist RPAREN
@@ -1467,50 +1466,12 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 
     |   REACH LPAREN t=storeref COMMA e1=expression COMMA e2=expression (COMMA e3=expression)? RPAREN
 	{
-	    final LogicVariable stepsLV 
-	    	= e3 == null 
-	          ? new LogicVariable(new Name("n"), intLDT.targetSort()) 
-	          : null;
-	    final Term h = TB.heap(services);
-	    final Term s = getFields(t);
-	    final Term o = e1.getTerm();
-	    final Term o2 = e2.getTerm();
-	    final Term n = e3 == null ? TB.var(stepsLV) : e3.getTerm();
-	    Term reach = TB.reach(services, h, s, o, o2, n);
-	    if(e3 == null) {
-	        reach = TB.ex(stepsLV, reach);
-	    }
-	    result = new SLExpression(reach);
+        result = translator.<SLExpression>translate("reach", t, e1, e2, e3, services);
 	} 
 	
     |   REACHLOCS LPAREN t=storeref COMMA e1=expression (COMMA e3=expression)? RPAREN
 	{
-	    final LogicVariable objLV
-	    	= new LogicVariable(new Name("o"), javaInfo.objectSort());
-	    final LogicVariable stepsLV 
-	    	= e3 == null 
-	          ? new LogicVariable(new Name("n"), intLDT.targetSort()) 
-	          : null;
-	    final Term h = TB.heap(services);
-	    final Term s = getFields(t);
-	    final Term o = e1.getTerm();
-	    final Term o2 = TB.var(objLV);
-	    final Term n = e3 == null ? TB.var(stepsLV) : e3.getTerm();
-	    Term reach = TB.reach(services, h, s, o, o2, n);
-	    if(e3 == null) {
-	        reach = TB.ex(stepsLV, reach);
-	    }
-	    
-	    final LogicVariable fieldLV
-	    	= new LogicVariable(new Name("f"), heapLDT.getFieldSort());
-	    final Term locSet 
-	    	= TB.guardedSetComprehension(services, 
-	    	                             new LogicVariable[]{objLV, fieldLV},
-	    	                             reach, 
-	    	                      	     o2,
-	    	                      	     TB.var(fieldLV));
-	    
-	    result = new SLExpression(locSet, javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
+        result = translator.<SLExpression>translate("reachLocs", t, e1, e3, services);
 	} 	
 	
     |   DURATION LPAREN result=expression RPAREN 
@@ -1562,23 +1523,19 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 	
     |   INVARIANT_FOR LPAREN result=expression RPAREN 
 	{
-	    raiseNotSupported("\\invariant_for");
+	    result = translator.<SLExpression>translate("\\invariant_for",services,result);
+	    
 	} 
 	
     |   ( LPAREN LBLNEG ) => LPAREN LBLNEG IDENT result=expression RPAREN
 	{
-	    raiseNotSupported("\\lblneg");
+	    addIgnoreWarning("\\lblneg");
 	} 
 	
     |   ( LPAREN LBLPOS ) => LPAREN LBLPOS IDENT result=expression RPAREN 
 	{
-	    raiseNotSupported("\\lblpos");
+	    addIgnoreWarning("\\lblpos");
 	} 
-	
-    |   NOWARN 
-	{
-	    raiseNotSupported("\\nowarn");
-	}
 	 
     |   STRING_EQUAL LPAREN e1=expression COMMA e2=expression RPAREN
         {
@@ -1689,11 +1646,6 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
             result = new SLExpression(TB.seqSingleton(services, e1.getTerm()));
         }    
     
-    |   SEQCONCAT LPAREN e1=expression COMMA e2=expression RPAREN
-        {
-            result = new SLExpression(TB.seqConcat(services, e1.getTerm(), e2.getTerm()));
-        }    
-    
     |   SEQSUB LPAREN e1=expression COMMA e2=expression COMMA e3=expression RPAREN
         {
             result = new SLExpression(TB.seqSub(services, e1.getTerm(), e2.getTerm(), e3.getTerm()));
@@ -1702,8 +1654,22 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
     |   SEQREVERSE LPAREN e1=expression RPAREN
         {
             result = new SLExpression(TB.seqReverse(services, e1.getTerm()));
-        }                         
-
+        } 
+    |   SEQREPLACE LPAREN e1=expression COMMA e2=expression COMMA e3=expression RPAREN
+        {
+            // short for "e1[0..e2-1]+e3+e1[e2+1..e1.length-1]"
+            final Term minusOne = TB.zTerm(services, "-1");
+            final Term ante = TB.seqSub(services, e1.getTerm(), TB.zero(services), TB.add(services, e2.getTerm(), minusOne));
+            final Term insert = TB.seqSingleton(services, e3.getTerm());
+            final Term post = TB.seqSub(services, e1.getTerm(), TB.add(services, e2.getTerm(), TB.one(services)), TB.add(services, TB.seqLen(services, e1.getTerm()), minusOne));
+            final Term put = TB.seqConcat(services, ante, TB.seqConcat(services, insert, post));
+            result = new SLExpression(put);
+        }
+    |   (tk1:SEQCONTAINS{tk=tk1;} | tk2: SEQCONCAT{tk=tk2;} | tk3: SEQGET{tk=tk3;} | tk4: INDEXOF{tk=tk4;})
+        LPAREN e1=expression COMMA e2=expression RPAREN
+        {
+            result = translator.<SLExpression>translate(tk.getText(), services, e1, e2);
+        }
     |   LPAREN result=expression RPAREN
 ;
 
@@ -1735,6 +1701,8 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
 	}
 	RPAREN
 ;
+	
+
 
 bsumterm returns [SLExpression result=null] throws SLTranslationException
 {

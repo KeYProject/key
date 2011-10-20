@@ -46,7 +46,7 @@ public class ArrayInitializer extends JavaNonTerminalProgramElement
     public ArrayInitializer(ExtList list) {
 	super(list);
 	this.children = 
-	    new ImmutableArray<Expression>((Expression[])list.collect(Expression.class));
+	    new ImmutableArray<Expression>(list.collect(Expression.class));
     }
     
     

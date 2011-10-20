@@ -19,6 +19,11 @@ public class CatchAllStatement extends JavaStatement
 			       implements StatementContainer,
 			       		  ExpressionContainer {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -7826889550059322778L;
+
     private StatementContainer astParent;
 
     protected StatementBlock body;

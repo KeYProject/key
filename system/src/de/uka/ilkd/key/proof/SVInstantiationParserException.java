@@ -13,6 +13,10 @@ package de.uka.ilkd.key.proof;
 public class SVInstantiationParserException 
     extends SVInstantiationExceptionWithPosition {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 4411508672178909020L;
     private String instantiation;
     private String detail;
          

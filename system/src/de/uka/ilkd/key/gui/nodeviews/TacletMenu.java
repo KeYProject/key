@@ -20,8 +20,7 @@ import javax.swing.*;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.Main;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.smt.SMTMenuItem;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
 import de.uka.ilkd.key.gui.smt.SolverListener;
@@ -38,6 +37,7 @@ import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
+import de.uka.ilkd.key.util.GuiUtilities;
 
 
 /**
@@ -48,6 +48,10 @@ import de.uka.ilkd.key.smt.SolverTypeCollection;
  */ 
 class TacletMenu extends JMenu {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -4659105575090816693L;
     private PosInSequent pos;
     private SequentView sequentView;
     private KeYMediator mediator;
@@ -157,21 +161,21 @@ class TacletMenu extends JMenu {
 	}
     }
     
-    private void createSMTMenu(MenuControl control){
-	Collection<SolverTypeCollection> solverUnions = 
-	ProofSettings.DEFAULT_SETTINGS.getSMTSettings().getSolverUnions();
-	if(!solverUnions.isEmpty()){
-	    addSeparator();	
-	}
-	for(SolverTypeCollection union : solverUnions){
-	    if(union.isUsable()){
-		 JMenuItem item = new SMTMenuItem(union);                       
-		 item.addActionListener(control);
-		 add(item);
-	    }
-	}
-	
-    }
+        private void createSMTMenu(MenuControl control) {
+                Collection<SolverTypeCollection> solverUnions = ProofIndependentSettings.DEFAULT_INSTANCE
+                                .getSMTSettings().getSolverUnions();
+                if (!solverUnions.isEmpty()) {
+                        addSeparator();
+                }
+                for (SolverTypeCollection union : solverUnions) {
+                        if (union.isUsable()) {
+                                JMenuItem item = new SMTMenuItem(union);
+                                item.addActionListener(control);
+                                add(item);
+                        }
+                }
+
+        }
 				      
     /**
      * adds an item for built in rules (e.g. Run Simplify or Update Simplifier)
@@ -299,7 +303,6 @@ class TacletMenu extends JMenu {
     private TacletMenuItem[] createMenuItems(ImmutableList<TacletApp> taclets, 
 					     MenuControl  control) {
 	List<TacletMenuItem> items = new LinkedList<TacletMenuItem>();
-	Iterator<TacletApp> it = taclets.iterator();
 	
         final InsertHiddenTacletMenuItem insHiddenItem = 
             new InsertHiddenTacletMenuItem(mediator.mainFrame(), 
@@ -310,8 +313,7 @@ class TacletMenu extends JMenu {
                     mediator.getNotationInfo(), mediator.getServices());
        
         
-        for (int i = 0; it.hasNext(); i++) {
-            final TacletApp app = it.next();
+        for (final TacletApp app : taclets) {
            
             final Taclet taclet = app.taclet();
             if (insHiddenItem.isResponsible(taclet)) {
@@ -377,7 +379,8 @@ class TacletMenu extends JMenu {
 	        @Override
 	        public void run() {
 	            
-	            SMTSettings settings = ProofSettings.DEFAULT_SETTINGS.getSMTSettings();
+	            SMTSettings settings = new SMTSettings(goal.proof().getSettings().getSMTSettings(),
+	                            ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),goal.proof());
 	            SolverLauncher launcher = new SolverLauncher(settings);
 	            launcher.addListener(new SolverListener(settings));
 	            Collection<SMTProblem> list = new LinkedList<SMTProblem>();
@@ -402,7 +405,7 @@ class TacletMenu extends JMenu {
 	    } else {
 		if (((JMenuItem)e.getSource()).getText()
 		    .startsWith("to clipboard")){
-                    Main.copyHighlightToClipboard(sequentView);
+                    GuiUtilities.copyHighlightToClipboard(sequentView);
 		} else if(((JMenuItem)e.getSource()).getText().
 			  startsWith("Pop method frame")){
 		    //                        mediator.popMethodFrame();
@@ -508,6 +511,11 @@ class TacletMenu extends JMenu {
 
 
     static class FocussedRuleApplicationMenuItem extends JMenuItem {
+        /**
+         * 
+         */
+        private static final long serialVersionUID = -6486650015103963268L;
+
         public FocussedRuleApplicationMenuItem () {
             super("Apply rules automatically here");
             setToolTipText("<html>Initiates and restricts automatic rule applications on the " +

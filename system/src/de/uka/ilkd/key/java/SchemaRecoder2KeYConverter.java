@@ -23,6 +23,7 @@ import de.uka.ilkd.key.java.recoderext.ProgramVariableSVWrapper;
 import de.uka.ilkd.key.java.recoderext.TypeSVWrapper;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -56,9 +57,13 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
      * 
      * @param rec2key
      *            the object to associate to
+     * @param namespaceSet
+     *            namespaces to resolve entity names
+     * @param services
+     *            services to be used
      */
-    public SchemaRecoder2KeYConverter(SchemaRecoder2KeY rec2key) {
-        super(rec2key);
+    public SchemaRecoder2KeYConverter(SchemaRecoder2KeY rec2key, Services services, NamespaceSet namespaceSet) {
+        super(rec2key, services, namespaceSet);
     }
 
     // ------ conversion methods
@@ -77,28 +82,28 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
         String mcName = mc.getName();
         list.add(callConvert(mc.getChild()));
         if ("#switch-to-if".equals(mcName)) {
-            return new SwitchToIf((SchemaVariable) list
+            return new SwitchToIf(list
                     .get(SchemaVariable.class));
         } else if ("#unwind-loop".equals(mcName)) {
             final ProgramSV[] labels = mc.getSV();
-            return new UnwindLoop(labels[0], labels[1], (LoopStatement) list
+            return new UnwindLoop(labels[0], labels[1], list
                     .get(LoopStatement.class));
         } else if ("#unpack".equals(mcName)) {
-            return new Unpack((For) list.get(For.class));
+            return new Unpack(list.get(For.class));
         } else if ("#for-to-while".equals(mcName)) {
             final ProgramSV[] labels = mc.getSV();
             return new ForToWhile(labels[0], labels[1], 
-                    (Statement)list.get(Statement.class));      
+                    list.get(Statement.class));      
         }  else if ("#enhancedfor-elim".equals(mcName)){ 
-            EnhancedFor efor = (EnhancedFor)list.get(EnhancedFor.class);
+            EnhancedFor efor = list.get(EnhancedFor.class);
             if(efor == null)
                 throw new ConvertException("#enhancedfor-elim requires an enhanced for loop as argument");
-            return new EnhancedForElimination((EnhancedFor)list.get(EnhancedFor.class));
+            return new EnhancedForElimination(list.get(EnhancedFor.class));
         } else if ("#do-break".equals(mcName)) {
-            return new DoBreak((LabeledStatement) list
+            return new DoBreak(list
                     .get(LabeledStatement.class));
         } else if ("#expand-method-body".equals(mcName)) {
-            return new ExpandMethodBody((SchemaVariable) list
+            return new ExpandMethodBody(list
                     .get(SchemaVariable.class));
         } else if ("#method-call".equals(mcName)) {
             ProgramSV[] svw = mc.getSV();
@@ -112,30 +117,30 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
                     execSV = svw[i];
                 }
             }
-            return new MethodCall(execSV, returnSV, (Expression) list
+            return new MethodCall(execSV, returnSV, list
         	    .get(Expression.class));
         } else if ("#evaluate-arguments".equals(mcName)) {
-            return new EvaluateArgs((Expression) list.get(Expression.class));
+            return new EvaluateArgs(list.get(Expression.class));
         } else if ("#constructor-call".equals(mcName)) {
             return new ConstructorCall(mc.getFirstSV().getSV(),
-                    (Expression) list.get(Expression.class));
+                    list.get(Expression.class));
         } else if ("#special-constructor-call".equals(mcName)) {
-            return new SpecialConstructorCall((Expression) list
+            return new SpecialConstructorCall(list
                     .get(Expression.class));
         } else if ("#post-work".equals(mcName)) {
-            return new PostWork((SchemaVariable) list.get(SchemaVariable.class));
+            return new PostWork(list.get(SchemaVariable.class));
         } else if ("#static-initialisation".equals(mcName)) {
-            return new StaticInitialisation((Expression) list
+            return new StaticInitialisation(list
                     .get(Expression.class));
         } else if ("#resolve-multiple-var-decl".equals(mcName)) {
-            return new MultipleVarDecl((SchemaVariable) list
+            return new MultipleVarDecl(list
                     .get(SchemaVariable.class));
         } else if ("#array-post-declaration".equals(mcName)) {
-            return new ArrayPostDecl((SchemaVariable) list
+            return new ArrayPostDecl(list
                     .get(SchemaVariable.class));
         } else if ("#init-array-creation".equals(mcName)) {
             return new InitArrayCreation(mc.getFirstSV().getSV(),
-                    (Expression) list.get(Expression.class));
+                    list.get(Expression.class));
         } else {
             throw new ConvertException("Program meta construct "
                     + mc.toString() + " unknown.");
@@ -153,11 +158,11 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
         String mcName = mc.getName();
         list.add(callConvert(mc.getChild()));
         if ("#create-object".equals(mcName)) {
-            return new CreateObject((Expression) list.get(Expression.class));
+            return new CreateObject(list.get(Expression.class));
         } else if ("#isstatic".equals(mc.getName())) {
-            return new IsStatic((Expression) list.get(Expression.class));
+            return new IsStatic(list.get(Expression.class));
         } else if ("#length-reference".equals(mcName)) {
-            return new ArrayLength((Expression) list.get(Expression.class));
+            return new ArrayLength(list.get(Expression.class));
         } else {
             throw new ConvertException("Program meta construct "
                     + mc.toString() + " unknown.");
@@ -174,7 +179,7 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
         ExtList list = new ExtList();
         list.add(callConvert(mc.getChild()));
         if ("#typeof".equals(mc.getName0())) {
-            return new TypeOf((Expression) list.get(Expression.class));
+            return new TypeOf(list.get(Expression.class));
         } else {
             throw new ConvertException("Program meta construct "
                     + mc.toString() + " unknown.");
@@ -312,7 +317,7 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
                     varspecs);
         } else {
             // otherwise use the default case
-            return (LocalVariableDeclaration) super.convert(lvd);
+            return super.convert(lvd);
         }
     }
 

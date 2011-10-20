@@ -19,6 +19,10 @@ import javax.swing.plaf.metal.MetalIconFactory.TreeControlIcon;
 
 class KeYControlIcon extends TreeControlIcon {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -1164410135409712176L;
     private static final Icon collapsedIcon   = new KeYControlIcon(true);
     private static final Icon expandedIcon    = new KeYControlIcon(false);
 

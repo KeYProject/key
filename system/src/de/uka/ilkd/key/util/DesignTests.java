@@ -131,15 +131,6 @@ public class DesignTests {
     }
 
     /**
-     * some operator classes are allowed to have greater visibility 
-     */
-    private boolean exception(Class cl) {
-	return 
-	    (cl == de.uka.ilkd.key.logic.op.Junctor.class); // ASMKEY extends Junctor
-    }
-
-
-    /**
      * subclass of Term must be private or package private
      */
     public LinkedList testTermSubclassVisibility() {

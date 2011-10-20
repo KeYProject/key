@@ -52,12 +52,12 @@ public class ExecutionContext
      * context
      */
     public ExecutionContext(ExtList children) {
-	this.classContext = (TypeReference) children.get(TypeReference.class);	
+	this.classContext = children.get(TypeReference.class);	
 	if (classContext == null)
 	    { System.out.println("||||"+children); Debug.printStackTrace(); }
 
 	children.remove(this.classContext);
-	this.runtimeInstance = (ReferencePrefix) children.get(ReferencePrefix.class);
+	this.runtimeInstance = children.get(ReferencePrefix.class);
     }
 
 

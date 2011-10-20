@@ -14,6 +14,10 @@ import antlr.Token;
 
 public class JavaParserException extends antlr.SemanticException {
     
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 3858933208298220420L;
     String cat;
     String filename;
     String jb;

@@ -26,6 +26,7 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.BasicTask;
 import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -509,64 +510,171 @@ public class Proof implements Named {
     }
     
     
-    /** returns true iff sets back to the step that created the given
-     * goal. If the undo operation was succesful true is returned.
-     * @param goal the Goal desribing the location where to set back
-     * @return true iff undo operation was succesfull.
-     */
-    public boolean setBack(Goal goal) {		
-	if (goal != null) {
-	    Node parent = goal.node().parent();
-	    if (parent != null) {
-                getServices().setBackCounters(goal.node());
-		openGoals = goal.setBack(openGoals);
-		fireProofGoalsChanged();
-		return true;
-	    }
-	}
-	// root reached or proof closed
-	return false;
-    }
 
+   
     
-    /** Prunes away the subtree beneath <code>node</code>.
-     *	<code>node</code> is going to be the last node on its
-     * branch.
-     * @param node the node desribing the location where to set back
-     * @return true iff undo operation was succesfull.
+    /**
+     * This class is responsible for pruning a proof tree at a certain cutting point.
+     * It has been introduced to encapsulate the methods that are needed for pruning. 
+     * Since the class has influence on the internal state of the proof it should not be
+     * moved to a new file, in order to restrict the access to it. 
      */
-    public boolean setBack(final Node node) {
-	Goal goal = getGoal(node);
-	while (goal == null) {	
-	    final ImmutableList<Goal> goalList = getSubtreeGoals(node);
-	    if (!goalList.isEmpty()) {
-		// The subtree goals (goalList) are scanned for common
-		// direct ancestors (parents). Afterwards the remove
-		// list is the greatest subset of the subtree goals such
-		// that the parents of the goals are disjoint.
-		final HashSet<Node> parentSet = new HashSet<Node>();		
-		final Iterator<Goal> goalIt = goalList.iterator();
-                ImmutableList<Goal> removeList = ImmutableSLList.<Goal>nil();
-		while (goalIt.hasNext()) {
-		    final Goal nextGoal = goalIt.next();
-		    if (!parentSet.contains(nextGoal.node().parent())) {
-			removeList = removeList.prepend(nextGoal);
-			parentSet.add(nextGoal.node().parent());
-		    }
-		}
-		//call setBack(Goal) on each element in the remove
-		//list. The former parents become the new goals
-		final Iterator<Goal> removeIt = removeList.iterator();
-		while (removeIt.hasNext()) {
-		    setBack(removeIt.next());
-		}
-		goal = getGoal(node);
-	    } else {
-	        return false;
-	    }
-	}
-	return true;
+    private class ProofPruner{
+            private Node firstLeaf = null;
+            
+            public void prune(final Node cuttingPoint){
+                   
+                  // there is only one leaf containing a open goal that is interesting for pruning the sub-tree of <code>node</code>,
+                  // namely the first leave that is found by a breadth first search. 
+                  // The other leaves containing open goals are only important for removing the open goals from the open goal list.
+                  // To that end those leaves are stored in residualLeaves. For increasing the performance a tree structure has been
+                  // chosen, because it offers the operation <code>contains</code> in O(log n).
+                  final Set<Node> residualLeaves = new TreeSet<Node>(new Comparator<Node>() {
+                        @Override
+                        public int compare(Node o1, Node o2) {
+                                return o1.serialNr()-o2.serialNr();
+                        }
+                  });
+                  
+                                   
+                  // First, make a breadth first search, in order to find the leaf with the shortest distance to the cutting point
+                  // and to remove the rule applications from the proof management system.
+                  // Furthermore store the residual leaves.
+                  breadthFirstSearch(cuttingPoint, new ProofVisitor() {
+                        @Override
+                        public void visit(Proof proof, Node visitedNode) {
+                                if(visitedNode.leaf() && !visitedNode.isClosed()){
+                                        if(firstLeaf == null){
+                                                firstLeaf = visitedNode;
+                                        }else{
+                                                residualLeaves.add(visitedNode);
+                                        }
+                
+                                }
+                                                   
+                                if (Proof.this.env() != null && visitedNode.parent() != null) { 
+                                        Proof.this.mgt().ruleUnApplied(visitedNode.parent().getAppliedRuleApp());
+                                }
+                                
+                        }
+                  });
+                  
+                  final Goal firstGoal = getGoal(firstLeaf);
+                  assert firstGoal != null;
+                  
+                  // Go from the first leaf that has been found to the cutting point. For each node on the path remove
+                  // the local rules from firstGoal that have been added by the considered node.
+                  traverseFromChildToParent(firstLeaf,cuttingPoint,new ProofVisitor() {
+                        
+                        @Override
+                        public void visit(Proof proof, Node visitedNode) {
+                                final Iterator<NoPosTacletApp> it = visitedNode.getLocalIntroducedRules().iterator();
+                                while ( it.hasNext () ){
+                                     firstGoal.ruleAppIndex().removeNoPosTacletApp(it.next ());
+                                }
+                               
+                                firstGoal.pruneToParent();
+                        }
+                  });
+                  
+                  // do some cleaning and refreshing: Clearing indices, caches....
+                  refreshGoal(firstGoal,cuttingPoint);
+                  
+                  // cut the subtree, it is not needed anymore.
+                  cut(cuttingPoint);
+                  
+                  //remove the goals of the residual leaves.
+                  removeOpenGoals(residualLeaves);
+         
+            }
+            
+            private void refreshGoal(Goal goal, Node node){
+                    goal.setGlobalProgVars(node.getGlobalProgVars());
+                    goal.getRuleAppManager().clearCache();
+                    goal.ruleAppIndex().clearIndexes();
+       
+            }
+            
+            private void removeOpenGoals(Collection<Node> toBeRemoved){
+                    ImmutableList<Goal> newGoalList = ImmutableSLList.nil();
+                    for(Goal openGoal : openGoals){
+                          if(!toBeRemoved.contains(openGoal.node())){
+                                  newGoalList = newGoalList.append(openGoal);
+                          }
+                    }
+                    openGoals = newGoalList;     
+            }
+            
+            
+            private void cut(Node node){
+                    Node[] children = new Node[node.childrenCount()];
+                    Iterator<Node> it = node.childrenIterator();
+                                    
+                    int i = 0;
+                    while(it.hasNext()) {
+                            children[i] = it.next();
+                            i++;
+                    }
+                    for(Node child : children){
+                            node.remove(child);
+                    }
+            }
+            
     }
+    
+    public void pruneProof(Goal goal){
+            if(goal.node().parent()!= null){
+                    pruneProof(goal.node().parent());
+            }
+    }
+    
+    /**
+     * Prunes the subtree beneath the node <code>cuttingPoint</code>, i.e. the node
+     * <code>cuttingPoint</code> remains as the last node on the branch. As a result a 
+     * open goal is associated with this node. 
+     * @param cuttingPoint
+     */
+    public void pruneProof(Node cuttingPoint){
+            assert cuttingPoint.proof() == this;
+            if(getGoal(cuttingPoint)!= null || cuttingPoint.isClosed()){
+                    return;
+            }
+            
+            ProofPruner pruner = new ProofPruner();
+            fireProofIsBeingPruned(cuttingPoint);
+            pruner.prune(cuttingPoint);   
+            fireProofGoalsChanged();
+            fireProofPruned(cuttingPoint);
+    }
+    
+    /**
+     * Makes a downwards directed breadth first search on the proof tree, starting with node
+     *  <code>startNode</code>. The visited notes are reported to the object <code>visitor</code>.
+     *  The first reported node is <code>startNode</code>.
+     */
+    public void breadthFirstSearch(Node startNode, ProofVisitor visitor){
+            LinkedList<Node> queue = new LinkedList<Node>();
+            queue.add(startNode);
+            while(!queue.isEmpty()){
+                    Node currentNode = queue.poll();
+                    Iterator<Node> it = currentNode.childrenIterator();
+                    while(it.hasNext()){
+                            queue.add(it.next());
+                    }
+                    visitor.visit(this, currentNode);
+            }
+    }
+    
+    public void traverseFromChildToParent(Node child, Node parent, ProofVisitor visitor){
+            do{
+                visitor.visit(this, child);
+                child = child.parent();     
+            }while(child != parent);
+    }
+    
+    
+ 
+
 
 
     /** fires the event that the proof has been expanded at the given node */
@@ -579,8 +687,8 @@ public class Proof implements Named {
 
     
     /** fires the event that the proof has been pruned at the given node */
-    protected void fireProofIsBeingPruned(Node node, Node removedNode) {
-        ProofTreeEvent e = new ProofTreeRemovedNodeEvent(this, node, removedNode);
+    protected void fireProofIsBeingPruned(Node below) {
+        ProofTreeEvent e = new ProofTreeEvent(this, below);
         for (int i = 0; i<listenerList.size(); i++) {
             listenerList.get(i).proofIsBeingPruned(e);
         }
@@ -588,8 +696,8 @@ public class Proof implements Named {
     
 
     /** fires the event that the proof has been pruned at the given node */
-    protected void fireProofPruned(Node node, Node removedNode) {
-	ProofTreeEvent e = new ProofTreeRemovedNodeEvent(this, node, removedNode);
+    protected void fireProofPruned(Node below) {
+	ProofTreeEvent e = new ProofTreeEvent(this, below);
 	for (int i = 0; i<listenerList.size(); i++) {
 	    listenerList.get(i).proofPruned(e);
 	}

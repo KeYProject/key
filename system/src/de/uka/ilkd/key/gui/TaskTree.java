@@ -22,12 +22,16 @@ import javax.swing.tree.TreePath;
 
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.notification.events.AbandonTaskEvent;
-import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.mgt.*;
 import de.uka.ilkd.key.util.Debug;
 
 public class TaskTree extends JPanel {
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -6084969108377936099L;
 
     private JTree delegateView;
 
@@ -95,7 +99,7 @@ public class TaskTree extends JPanel {
 		tn.allProofs()[i].removeProofTreeListener(proofTreeListener);
                 tn.allProofs()[i].mgt().removeProofListener();
 	    }
-            ((ProofTreeView) Main.getInstance().getProofView().getComponent(0)).
+            MainWindow.getInstance().getProofView().
                 removeProofs(tn.allProofs());
 	    //go to some other node, take the last leaf.
 	    TreePath path 
@@ -204,7 +208,11 @@ public class TaskTree extends JPanel {
     static class TaskTreeIconCellRenderer extends DefaultTreeCellRenderer
 				             implements java.io.Serializable { 
 	
-	static final ImageIcon keyIcon=IconFactory.keyHole(20,20);
+	/**
+         * 
+         */
+        private static final long serialVersionUID = 4580251672266092290L;
+    static final ImageIcon keyIcon=IconFactory.keyHole(20,20);
 	static final ImageIcon keyClosedIcon=IconFactory.keyHoleClosed(20,20);
 	static final ImageIcon keyAlmostClosedIcon
 	    =IconFactory.keyHoleAlmostClosed(20,20);

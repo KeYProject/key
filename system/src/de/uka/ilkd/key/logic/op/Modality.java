@@ -54,6 +54,6 @@ public final class Modality extends AbstractSortedOperator {
      * @param str name of the modality to return
      */
     public static Modality getModality(String str) {
-        return (Modality)nameMap.get(str);
+        return nameMap.get(str);
     }
 }

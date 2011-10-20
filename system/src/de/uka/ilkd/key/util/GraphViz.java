@@ -184,8 +184,7 @@ public class GraphViz
       byte[] img_stream = null;
 
       try {
-         img = File.createTempFile("graph_", ".ps", new File(this.TEMP_DIR));
-         String temp = img.getAbsolutePath();
+         img = File.createTempFile("graph_", ".ps", new File(GraphViz.TEMP_DIR));
 
          Runtime rt = Runtime.getRuntime();
          String cmd = DOT + " -Tps "+dot.getAbsolutePath()+" -o"+img.getAbsolutePath();
@@ -196,13 +195,13 @@ public class GraphViz
          img_stream = new byte[in.available()];
          in.read(img_stream);
          // Close it if we need to
-         if( in != null ) in.close();
+         in.close();
 
          if (img.delete() == false) 
             System.err.println("Warning: "+img.getAbsolutePath()+" could not be deleted!");
       }
       catch (java.io.IOException ioe) {
-         System.err.println("Error:    in I/O processing of tempfile in dir "+this.TEMP_DIR+"\n");
+         System.err.println("Error:    in I/O processing of tempfile in dir "+GraphViz.TEMP_DIR+"\n");
          System.err.println("       or in calling external command");
          ioe.printStackTrace();
       }
@@ -224,7 +223,7 @@ public class GraphViz
    {
       File temp;
       try {
-         temp = File.createTempFile("graph_", ".dot.tmp", new File(this.TEMP_DIR));
+         temp = File.createTempFile("graph_", ".dot.tmp", new File(GraphViz.TEMP_DIR));
          FileWriter fout = new FileWriter(temp);
          fout.write(str);
          fout.close();

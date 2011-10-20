@@ -15,6 +15,11 @@ import java.util.HashMap;
 import javax.swing.JRadioButton;
 
 public class JRadioButtonHashMap extends JRadioButton {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 785796009937827348L;
+
     JRadioButtonHashMap(String text, String command, boolean selected, 
             boolean enabled) {
         super(text, selected);
@@ -23,9 +28,9 @@ public class JRadioButtonHashMap extends JRadioButton {
         hashmap.put(command, this);        
     }
         
-    static HashMap hashmap = new HashMap();
+    static HashMap<String, JRadioButtonHashMap> hashmap = new HashMap<String, JRadioButtonHashMap>();
        
     public static JRadioButton getButton(String command) {
-        return (JRadioButton) hashmap.get(command);       
+        return hashmap.get(command);       
     }
 }

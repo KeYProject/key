@@ -82,7 +82,7 @@ public class StrategySettings implements Settings {
     /* (non-Javadoc)
      * @see de.uka.ilkd.key.gui.Settings#readSettings(java.util.Properties)
      */
-    public void readSettings ( Properties props ) {
+    public void readSettings (Object sender, Properties props ) {
         String numString = props.getProperty(STEPS_KEY);
         String strategyString = props.getProperty(STRATEGY_KEY);
         String timeoutString = props.getProperty(TIMEOUT_KEY);
@@ -129,7 +129,7 @@ public class StrategySettings implements Settings {
     /* (non-Javadoc)
      * @see de.uka.ilkd.key.gui.Settings#writeSettings(java.util.Properties)
      */
-    public void writeSettings ( Properties props ) {
+    public void writeSettings (Object sender, Properties props ) {
 	if (getStrategy()==null) {
 	    setStrategy(SimpleJavaCardDLOptions.LOOPS_METHODS.name());
 	}

@@ -30,6 +30,10 @@ import javax.swing.*;
  */
 public class InstallationPathChooser extends JPanel {
     
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -1310452811820985040L;
     private JButton fileSelectionButton;
     private JTextField pathEntryField;
     private File file;

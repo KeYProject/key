@@ -542,18 +542,4 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
 	return toReturn;
     }
     
-    @Override
-    protected long getMaxNumber() {
-     	return 2147483646;
-    }
-    
-    @Override
-    protected long getMinNumber() {
-	return -2147483646;
-    }
-    
-    @Override
-    protected boolean hasNumberLimit() {
-	return true;
-    }
 }

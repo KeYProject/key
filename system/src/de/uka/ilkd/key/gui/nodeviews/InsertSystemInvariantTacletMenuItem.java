@@ -31,6 +31,11 @@ import de.uka.ilkd.key.rule.TacletGoalTemplate;
 public class InsertSystemInvariantTacletMenuItem extends InsertionTacletBrowserMenuItem {
    
     /**
+     * 
+     */
+    private static final long serialVersionUID = -4303059934911952345L;
+
+    /**
      * creates an instance of the insert hidden menu item
      * @param parent the JFrame with the parent frame
      * @param notInfo the NotationInfo to be used for pretty printing 

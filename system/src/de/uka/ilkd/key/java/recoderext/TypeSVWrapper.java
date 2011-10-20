@@ -16,6 +16,10 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 public class TypeSVWrapper extends TypeReference
     implements KeYRecoderExtension, SVWrapper{
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 2694567717981292433L;
     SchemaVariable sv=null;
 
     public TypeSVWrapper(SchemaVariable sv) {

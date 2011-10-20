@@ -52,8 +52,7 @@ public class Default extends BranchImp {
     */ 
     public Default(ExtList children) {
 	super(children);
-	this.body=new ImmutableArray<Statement>((Statement[])
-				       children.collect(Statement.class)); 
+	this.body=new ImmutableArray<Statement>(children.collect(Statement.class)); 
     }
 
     /**

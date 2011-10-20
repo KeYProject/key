@@ -65,7 +65,7 @@ public class New extends TypeOperator
      */
     public New(ExtList children, ReferencePrefix rp) {
 	super(children);
-	anonymousClass = (ClassDeclaration)children.get(ClassDeclaration.class);
+	anonymousClass = children.get(ClassDeclaration.class);
 	accessPath = rp;
     }
 
@@ -84,7 +84,7 @@ public class New extends TypeOperator
      */
     public New(ExtList children, ReferencePrefix rp, PositionInfo pi) {
 	super(children, pi);
-	anonymousClass = (ClassDeclaration)children.get(ClassDeclaration.class);        
+	anonymousClass = children.get(ClassDeclaration.class);        
 	accessPath = rp;
     }
 

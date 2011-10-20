@@ -10,12 +10,9 @@
 
 package de.uka.ilkd.key.taclettranslation.assumptions;
 
-import java.util.Collection;
-
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
 
 /**
@@ -26,14 +23,7 @@ import de.uka.ilkd.key.taclettranslation.TacletFormula;
  */
 public interface TacletSetTranslation {
 
-    /**
-     * sets the set of taclets that should be translated. The taclets will be
-     * translated not until calling <code>getTranslation</code>.
-     * 
-     * @param set
-     *            the set of taclets that should be translated.
-     */
-    public void setTacletSet(Collection<Taclet> set);
+
 
     /**
      * Builds the translation of the taclets given by calling the method
@@ -42,8 +32,7 @@ public interface TacletSetTranslation {
      * @return returns the resulting formulae of the taclets. Each formula of
      *         the resulting set is associated with one taclet.
      */
-    public ImmutableList<TacletFormula> getTranslation(ImmutableSet<Sort> sorts,
-               int maxGeneric);
+    public ImmutableList<TacletFormula> getTranslation(ImmutableSet<Sort> sorts);
 
     /**
      * Returns all taclet that have not been translated. The reason can be got

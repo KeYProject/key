@@ -17,6 +17,10 @@ import de.uka.ilkd.key.proof.Proof;
 
 public class EnvNode extends DefaultMutableTreeNode implements TaskTreeNode{
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 5739765420005738444L;
     private ProofEnvironment env;
 
     public EnvNode(ProofEnvironment e) {

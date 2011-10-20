@@ -14,6 +14,7 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -23,8 +24,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.WindowConstants;
 
 import de.uka.ilkd.key.gui.KeYFileChooser;
+import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 
 
 
@@ -36,7 +39,7 @@ public class FileChooser extends JPanel{
                 "for the current proof. For each taclet an extra proof obligation is built that must be provable, in order" +
                 " to sustain the correctness of the calculus.\n" +
                 "\nDefinitions:\n" +
-                "This file contains the defintions (function symbols, predicate symbols, sorts)" +
+                "This file contains the signature (function symbols, predicate symbols, sorts)" +
                 " that are used for creating the proof obligations mentioned above. In most cases it should be the same file" +
                 " as indicated in 'User-Defined Taclets'.\n" +
                 "\nAxioms:\nIn order to prove the correctness of the created lemmata," +
@@ -46,18 +49,46 @@ public class FileChooser extends JPanel{
                 "It is the responsibility of the user to guarantee this consistency.\n\n" +
                 "Technical Remarks:\nThe axioms must be stored in another file than the user-defined taclets. Furthermore the axioms " +
                 "are only loaded for the lemmata, but not for the current proof.";
-
+        
+        private static final String INFO_TEXT1 = "Be aware of the fact that you are going to load taclets\n" +
+        		                                    "without creating corresponding proof obligations!\n"+
+        		                                    "In case that the taclets that you want to load are unsound,\n"+
+        		                                    "the calculus will become unsound!";
+        private static final String INFO_TEXT2 = "Be aware of the fact that you are going to load taclets\n" +
+        		                                    "without creating corresponding proof obligations!\n"+
+        		                                    "In case that the taclets that you want to load are unsound,\n"+
+        		                                    "the calculus will become unsound!";
+        
+        
         private class SingleFileChooser extends Box{
                 private static final long serialVersionUID = 1L;
                 private File           chosenFile;
                 private JButton    chooseFileButton;
                 private JTextField fileField;
-                public SingleFileChooser(String title) {
-                        super(BoxLayout.X_AXIS);
+                private String title;
+                
+                
+                
+                public SingleFileChooser(String title, JCheckBox checkbox) {
+           
+                        super(BoxLayout.Y_AXIS);
+                        this.title = title;
+                        Box box = Box.createHorizontalBox();
+                     
                         this.setBorder(BorderFactory.createTitledBorder(title));
-                        this.add(getFileField());
-                        this.add(Box.createHorizontalStrut(5));
-                        this.add(getChooseFileButton());
+                        
+                      
+                        box.add(getFileField());
+                        box.add(Box.createHorizontalStrut(5));
+                        box.add(getChooseFileButton());
+                        this.add(box);
+                        if(checkbox != null){
+                                box = Box.createHorizontalBox();
+                                box.add(getLemmaCheckBox());
+                                box.add(Box.createHorizontalGlue());
+                                this.add(Box.createVerticalStrut(5));
+                                this.add(box);
+                        }
                 }
                 
                 private JTextField getFileField() {
@@ -78,7 +109,7 @@ public class FileChooser extends JPanel{
                                         
                                         @Override
                                         public void actionPerformed(ActionEvent arg0) {
-                                                File file = chooseFiles("File containing the lemmata.");
+                                                File file = chooseFiles(title);
                                                 if(file != null){
                                                         fileHasBeenChosen(file);
                                                         setChosenFile(file);
@@ -121,12 +152,15 @@ public class FileChooser extends JPanel{
         private JButton okayButton;
         private JButton cancelButton;
         
+        private JCheckBox lemmaCheckbox;
+        
         private boolean       closedByOkayButton = false;
         private final DefaultListModel listModel = new DefaultListModel();
         private static final Dimension MAX_DIM = new Dimension(Integer.MAX_VALUE,Integer.MAX_VALUE);
-              
+        private boolean firstTimeAddingAxioms = true;      
         public FileChooser(){
              this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+             
              
              JLabel label = new JLabel("Please choose the files that should be browsed for..."); 
              label.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -136,6 +170,7 @@ public class FileChooser extends JPanel{
              this.add(label);
              this.add(Box.createVerticalStrut(15));
              this.add(getLemmataFileChooser());
+  
              this.add(Box.createVerticalStrut(5));
              this.add(getDefinitionFileChooser());
              this.add(Box.createVerticalStrut(5));
@@ -162,7 +197,56 @@ public class FileChooser extends JPanel{
                 return definitionFileChooser.getChosenFile();
         }
         
+        private JCheckBox getLemmaCheckBox(){
+                if(lemmaCheckbox == null){
+                        lemmaCheckbox = new JCheckBox("Load taclets as lemmata.");
+                        lemmaCheckbox.setSelected(true);
+                        lemmaCheckbox.addActionListener(new ActionListener() {
+                                
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                        
+                                        InfoDialog infoDialog = new InfoDialog();
+                                        if(!lemmaCheckbox.isSelected()){
+                                            lemmaCheckbox.setSelected(true);   
+                                            boolean showDialogUsingAxioms = ProofIndependentSettings.DEFAULT_INSTANCE
+                                            .getLemmaGeneratorSettings()
+                                            .isShowingDialogUsingAxioms();
+                                            if((showDialogUsingAxioms &&
+                                                            infoDialog.showDialog(INFO_TEXT1,FileChooser.this)) || 
+                                                            !showDialogUsingAxioms){
+                                              changedToNotSelected();   
+                                              lemmaCheckbox.setSelected(false);  
+                                               ProofIndependentSettings.DEFAULT_INSTANCE
+                                              .getLemmaGeneratorSettings()
+                                              .showDialogUsingAxioms(showDialogUsingAxioms && infoDialog
+                                                              .showThisDialogNextTime()  );
+                                            }
+                                        }else{
+                                            changedToSelected();
+                                        }
+                                                                
+                                }
+                        });
+                }
+                return lemmaCheckbox;
+        }
+        
+        private void enableAxiomFilePanel(boolean val){
+                getAddAxiomFileButton().setEnabled(val);
+                getRemoveAxiomFileButton().setEnabled(val);
+                getAxiomsList().setEnabled(val);
+        }
+        
+        private void changedToSelected(){
+                enableAxiomFilePanel(true);
+        }
+        
+        private void changedToNotSelected() {
+                enableAxiomFilePanel(false);
+        }
 
+        
         
         private JList getAxiomsList() {
                 if(axiomsList == null){
@@ -238,7 +322,7 @@ public class FileChooser extends JPanel{
 
         private SingleFileChooser getLemmataFileChooser(){
                 if(lemmataFileChooser == null){
-                        lemmataFileChooser = new SingleFileChooser("User-Defined Taclets"){
+                        lemmataFileChooser = new SingleFileChooser("User-Defined Taclets",getLemmaCheckBox()){
                                 private static final long serialVersionUID = 1L;
                                 protected void fileHasBeenChosen(File file) {
                                         if(okayButton != null){
@@ -258,7 +342,7 @@ public class FileChooser extends JPanel{
         
         private SingleFileChooser getDefinitionFileChooser(){
                 if(definitionFileChooser == null){
-                        definitionFileChooser = new SingleFileChooser("Definitions");
+                        definitionFileChooser = new SingleFileChooser("Signature",null);
                 }
                return definitionFileChooser;
         }
@@ -272,6 +356,19 @@ public class FileChooser extends JPanel{
                         
                         @Override
                         public void actionPerformed(ActionEvent e) {
+                               
+                               if(firstTimeAddingAxioms && 
+                                               ProofIndependentSettings.DEFAULT_INSTANCE.
+                                               getLemmaGeneratorSettings().isShowingDialogAddingAxioms()){                                     
+                                      
+                                       InfoDialog infoDialog = new InfoDialog();
+                                       firstTimeAddingAxioms = !infoDialog.showDialog(INFO_TEXT2,FileChooser.this);
+                                       ProofIndependentSettings.DEFAULT_INSTANCE
+                                       .getLemmaGeneratorSettings().showDialogAddingAxioms(infoDialog.showThisDialogNextTime());
+                                       if(firstTimeAddingAxioms){
+                                               return;
+                                       }
+                               }
                                File file = chooseFiles("File containing the axioms.");
                                if(file != null){
                                        listModel.addElement(file);
@@ -346,6 +443,7 @@ public class FileChooser extends JPanel{
                 if(dialog == null){
                         dialog = new JDialog();
                         dialog.setTitle("Files for Loading User-Defined Taclets...");
+                        dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
                         Container pane = dialog.getContentPane();
                 
                         pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
@@ -369,7 +467,7 @@ public class FileChooser extends JPanel{
         
         private JButton getOkayButton(){
                 if(okayButton == null){
-                      okayButton  = new JButton("OK"); 
+                      okayButton  = new JButton("Okay"); 
                       Dimension dim = getCancelButton().getPreferredSize();
                       okayButton.setEnabled(false);
                       okayButton.setPreferredSize(dim);
@@ -383,6 +481,8 @@ public class FileChooser extends JPanel{
                 }
                 return okayButton;
          }
+        
+
         
         
         private JButton getCancelButton(){
@@ -405,6 +505,15 @@ public class FileChooser extends JPanel{
               getDialog().setModal(true);
               getDialog().setVisible(true);
               return closedByOkayButton;
+        }
+        
+        public static void main(String [] args){
+                FileChooser chooser = new FileChooser();
+                chooser.showAsDialog();
+        }
+        
+        public boolean isLoadingAsLemmata(){
+                return this.getLemmaCheckBox().isSelected();
         }
         
         

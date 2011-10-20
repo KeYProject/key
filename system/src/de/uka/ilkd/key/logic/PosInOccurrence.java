@@ -142,7 +142,7 @@ public class PosInOccurrence {
     }
 
     public int hashCode () {
-    	return (int) hashCode;
+    	return hashCode;
     }  
 
     /**
@@ -195,7 +195,6 @@ public class PosInOccurrence {
         final PIOPathIterator it = iterator ();
         Term newTerm = p_newFormula.formula ();
         PosInTerm newPosInTerm = PosInTerm.TOP_LEVEL;
-        int depth = 0;
 
         while ( true ) {
             final int subNr = it.next ();
@@ -204,7 +203,6 @@ public class PosInOccurrence {
 
             newPosInTerm = newPosInTerm.down( subNr );
             newTerm = newTerm.sub ( subNr );
-            ++depth;
         }
 
         return new PosInOccurrence ( p_newFormula,

@@ -13,6 +13,10 @@ package de.uka.ilkd.key.parser;
 import antlr.Token;
 
 public class AmbigiousDeclException extends antlr.SemanticException {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 5836342271644427009L;
     String filename = "unknown";
     String ambigious_symbol;
     Token t;

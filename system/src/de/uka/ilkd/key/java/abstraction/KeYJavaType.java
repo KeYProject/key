@@ -88,6 +88,14 @@ public class KeYJavaType implements Type {
     public String getName() {
 	return getJavaType().getName();
     }
+    
+    public boolean equals (Object o){
+        try {
+            return javaType.equals(((KeYJavaType)o).javaType) && sort.equals(((KeYJavaType)o).sort);
+        } catch (Exception e) {
+        return false;
+        }
+    }
 
     public PackageReference createPackagePrefix() {
 	PackageReference ref = null;

@@ -15,6 +15,10 @@ import recoder.java.expression.operator.New;
 
 public class NewWrapper extends New {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -2814303467813768233L;
     private Identifier scope;
     
     public NewWrapper(New proto, Identifier scope){

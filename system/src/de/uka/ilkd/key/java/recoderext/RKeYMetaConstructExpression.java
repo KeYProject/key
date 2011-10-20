@@ -28,6 +28,10 @@ public class RKeYMetaConstructExpression extends Literal
 
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = -145731902618445018L;
+    /**
      Child
      */
     protected Expression child=null;
@@ -36,7 +40,7 @@ public class RKeYMetaConstructExpression extends Literal
     protected RKeYMetaConstructExpression(RKeYMetaConstructExpression proto) {
         super(proto);
         if (proto.child != null) {
-            child = (Expression)proto.child.deepClone();
+            child = proto.child.deepClone();
         }
     }
 

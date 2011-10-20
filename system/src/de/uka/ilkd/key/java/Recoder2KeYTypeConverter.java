@@ -74,12 +74,15 @@ public class Recoder2KeYTypeConverter {
      * The associated Recoder<->KeY object
      */
     private final Recoder2KeY recoder2key;
+    
+    private JavaInfo javaInfo;
 
-    public Recoder2KeYTypeConverter(TypeConverter typeConverter, NamespaceSet namespaces, Recoder2KeY recoder2key) {
+    public Recoder2KeYTypeConverter(Services services, TypeConverter typeConverter, NamespaceSet namespaces, Recoder2KeY recoder2key) {
         super();
         this.typeConverter = typeConverter;
         this.namespaces = namespaces;
         this.recoder2key = recoder2key;
+        javaInfo = services.getJavaInfo();
     }
 
     private KeYJavaType lookupInCache(recoder.abstraction.Type t) {
@@ -93,10 +96,6 @@ public class Recoder2KeYTypeConverter {
         recoder2key.rec2key().put(t, kjt);
     }
 
-    private JavaInfo getJavaInfo() {
-        return typeConverter != null ? typeConverter.getServices()
-                .getJavaInfo() : null;
-    }
 
     private ServiceConfiguration getServiceConfiguration() {
         return recoder2key.getServiceConfiguration();
@@ -268,12 +267,11 @@ public class Recoder2KeYTypeConverter {
                 Debug.out("recoder2key: unknown type", t);
                 Debug.out("Unknown type: " + t.getClass() + " "
                         + t.getFullName());
-                Debug.fail();
-                result = null;
+                Debug.fail();                
             }
         } else {
             if(namespaces.sorts().lookup(s.name()) == null) {
-        	namespaces.sorts().add(s);
+                namespaces.sorts().add(s);
             }            
             result = new KeYJavaType(s);
         }
@@ -316,7 +314,7 @@ public class Recoder2KeYTypeConverter {
          */
 
         if (ss.isEmpty() && !isObject(classType)) {
-            ss = ss.add(getJavaInfo().objectSort());
+            ss = ss.add(javaInfo.objectSort());
         }
         return ss;
     }
@@ -435,12 +433,7 @@ public class Recoder2KeYTypeConverter {
                 .getDimension() + 1 : 1;
                 TypeRef parentReference = new TypeRef(new ProgramElementName(""
                         + parent.getSort().name()), dimension, null, parent);
-                KeYJavaType integerType = getKeYJavaType(getServiceConfiguration()
-                        .getNameInfo().getIntType());
-
-                final recoder.service.NameInfo nameInfo = getServiceConfiguration()
-                .getNameInfo();
-
+                
                 // add methods
                 // the only situation where base can be null is in case of a
                 // reference type
@@ -453,15 +446,7 @@ public class Recoder2KeYTypeConverter {
 
                 if (arrayMethodBuilder == null) {
                     initArrayMethodBuilder();
-                }
-
-		//disabled PERC Pico extensions from side branch engelcMemoryConsumption
-		/*
-                AnnotationUseSpecification ecs = 
-                    new AnnotationUseSpecification(new TypeRef(getKeYJavaType("ExternallyConstructedScope")));
-                AnnotationUseSpecification nls = 
-                    new AnnotationUseSpecification(new TypeRef(getKeYJavaType("NoLocalScope")));
-		*/
+                }	
 
                 final ProgramMethod prepare = arrayMethodBuilder.getPrepareArrayMethod(
 										       parentReference, length, defaultValue, fields);
@@ -551,9 +536,7 @@ public class Recoder2KeYTypeConverter {
     private void initArrayMethodBuilder() {
         final KeYJavaType integerType = getKeYJavaType(getServiceConfiguration()
                 .getNameInfo().getIntType());
-        final KeYJavaType byteType = getKeYJavaType(getServiceConfiguration()
-                .getNameInfo().getByteType());
-        final KeYJavaType objectType = javaInfo().getJavaLangObject();
+        final KeYJavaType objectType = javaInfo.getJavaLangObject();
         Sort heapSort = typeConverter.getHeapLDT() == null
                         ? Sort.ANY
                         : typeConverter.getHeapLDT().targetSort();
@@ -561,11 +544,6 @@ public class Recoder2KeYTypeConverter {
         	= new CreateArrayMethodBuilder(integerType,
         				       objectType,
         				       heapSort);
-    }
-
-    private JavaInfo javaInfo() {
-        return typeConverter != null ? typeConverter.getServices()
-                .getJavaInfo() : null;
     }
     
     public TypeConverter getTypeConverter() {

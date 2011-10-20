@@ -9,6 +9,9 @@
 //
 package de.uka.ilkd.key.speclang.jml.translation;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
@@ -28,8 +31,11 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.speclang.*;
+import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
+import de.uka.ilkd.key.speclang.jml.JMLSpecExtractor;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
+import de.uka.ilkd.key.speclang.translation.SLWarningException;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 
@@ -45,7 +51,11 @@ public class JMLSpecFactory {
     private static final TermBuilder TB = TermBuilder.DF;
     private final Services services;
     private final JMLTranslator translator;
+    private final ContractFactory cf;
     private int invCounter;
+    
+    /** Used to check that there is only one represents clause per type and field. */
+    private Set<Pair<KeYJavaType,ObserverFunction>> modelFields;
 
 
     //-------------------------------------------------------------------------
@@ -55,6 +65,8 @@ public class JMLSpecFactory {
         assert services != null;
         this.services = services;
         this.translator = JMLTranslator.getInstance();
+        cf = new ContractFactory(services);
+        modelFields = new HashSet<Pair<KeYJavaType,ObserverFunction>>();
     }
 
     //-------------------------------------------------------------------------
@@ -78,8 +90,11 @@ public class JMLSpecFactory {
     //internal methods
     //-------------------------------------------------------------------------
 
-    private String getInvName() {
-        return "JML class invariant nr " + invCounter++;
+    private String getDefaultInvName(String name, KeYJavaType kjt) {
+        if (name == null)
+        return "JML class invariant nr " + invCounter++ +" in "+ kjt.getName();
+        else
+            return "JML class invariant \""+name+"\" in "+kjt.getName()+ " (nr "+ invCounter++ +")";
     }
 
 
@@ -215,7 +230,7 @@ public class JMLSpecFactory {
                 translateSignalsOnly(pm, progVars.excVar,
                                      originalBehavior,
                                      textualSpecCase.getSignalsOnly());
-        clauses.diverges = translateDeverges(pm, progVars.selfVar,
+        clauses.diverges = translateDiverges(pm, progVars.selfVar,
                                              progVars.paramVars,
                                              textualSpecCase.getDiverges());
         return clauses;
@@ -291,7 +306,7 @@ public class JMLSpecFactory {
     }
 
 
-    private Term translateDeverges(ProgramMethod pm,
+    private Term translateDiverges(ProgramMethod pm,
                                    ProgramVariable selfVar,
                                    ImmutableList<ProgramVariable> paramVars,
                                    ImmutableList<PositionedString> originalDiverges)
@@ -472,8 +487,8 @@ public class JMLSpecFactory {
     private String generateName(ProgramMethod pm,
                                 TextualJMLSpecCase textualSpecCase,
                                 Behavior originalBehavior) {
-        PositionedString customName = textualSpecCase.getName();
-        String name = (customName.text.length() > 0 ? customName.text
+        String customName = textualSpecCase.getName();
+        String name = ((!(customName == null) && customName.length() > 0) ? customName
                        : getContractName(pm, originalBehavior));
         return name;
     }
@@ -504,7 +519,6 @@ public class JMLSpecFactory {
      *          exception and the pre-heap
      * @param clauses   pre-translated JML clauses
      * @param post  pre-generated post condition
-     * @param result    immutable set of already generated operation contracts 
      * @return      operation contracts including new functional operation
      *          contracts
      */
@@ -516,29 +530,27 @@ public class JMLSpecFactory {
             Term post) {
         ImmutableSet<Contract> result = DefaultImmutableSet.<Contract>nil();
         if (clauses.diverges.equals(TB.ff())) {
-            FunctionalOperationContract contract = new FunctionalOperationContractImpl(
-                    name, pm, Modality.DIA, clauses.requires,
-                    clauses.measuredBy, post, clauses.assignable, progVars,
-                    false);
+            FunctionalOperationContract contract = cf.func(
+                    name, pm, true, clauses.requires,
+                    clauses.measuredBy, post, clauses.assignable, progVars);
             result = result.add(contract);
         } else if (clauses.diverges.equals(TB.tt())) {
-            FunctionalOperationContract contract = new FunctionalOperationContractImpl(
-                    name, pm, Modality.BOX, clauses.requires,
-                    clauses.measuredBy, post, clauses.assignable, progVars,
-                    false);
+            FunctionalOperationContract contract = cf.func(
+                    name, pm, false, clauses.requires,
+                    clauses.measuredBy, post, clauses.assignable, progVars);
             result = result.add(contract);
         } else {
-            FunctionalOperationContract contract1 = new FunctionalOperationContractImpl(
-                    name, pm, Modality.DIA,
+            FunctionalOperationContract contract1 = cf.func(
+                    name, pm, true,
                     TB.and(clauses.requires, TB.not(clauses.diverges)),
                     clauses.measuredBy, post, clauses.assignable,
-                    progVars, false);
+                    progVars);
             FunctionalOperationContract contract2 =
-                    new FunctionalOperationContractImpl(name, pm, Modality.BOX,
+                    cf.func(name, pm, false,
                                                         clauses.requires,
                                                         clauses.measuredBy, post,
                                                         clauses.assignable,
-                                                        progVars, false);
+                                                        progVars);
             result = result.add(contract1).add(contract2);
         }
         return result;
@@ -553,7 +565,6 @@ public class JMLSpecFactory {
      *          operation parameters, operation result, thrown exception
      *          and the pre-heap
      * @param clauses   pre-translated JML clauses
-     * @param result    immutable set of already generated operation contracts
      * @return      operation contracts including a new dependency contract
      */
     private ImmutableSet<Contract> createDependencyOperationContract(
@@ -562,8 +573,8 @@ public class JMLSpecFactory {
             ContractClauses clauses) {
         ImmutableSet<Contract> result = DefaultImmutableSet.<Contract>nil();
         if (clauses.accessible != null) {
-            final Contract depContract = new DependencyContractImpl(
-                    "JML accessible clause", pm.getContainerType(), pm,
+            final Contract depContract = cf.dep(
+                    pm.getContainerType(), pm,
                     clauses.requires, clauses.measuredBy,
                     clauses.accessible, progVars.selfVar,
                     progVars.paramVars);
@@ -592,7 +603,7 @@ public class JMLSpecFactory {
         Term inv = translator.<Term>parse(originalInv, kjt, selfVar, null, null,
                                           null, null, services);
         //create invariant
-        String name = getInvName();
+        String name = getDefaultInvName(null,kjt);
         return new ClassInvariantImpl(name,
                                       name,
                                       kjt,
@@ -606,9 +617,21 @@ public class JMLSpecFactory {
             KeYJavaType kjt,
             TextualJMLClassInv textualInv)
             throws SLTranslationException {
-        return createJMLClassInvariant(kjt,
-                                       getVisibility(textualInv),
-                                       textualInv.getInv());
+        //create variable for self
+        ProgramVariable selfVar = TB.selfVar(services, kjt, false);
+
+        //translateToTerm expression
+        Term inv = translator.<Term>parse(textualInv.getInv(), kjt, selfVar, null, null,
+                                          null, null, services);
+        //create invariant
+        String name = getDefaultInvName(null,kjt);
+        String display = getDefaultInvName(textualInv.getName(),kjt);
+        return new ClassInvariantImpl(name,
+                                      display,
+                                      kjt,
+                                      getVisibility(textualInv),
+                                      inv,
+                                      selfVar);
     }
 
 
@@ -618,6 +641,8 @@ public class JMLSpecFactory {
             throws SLTranslationException {
         assert kjt != null;
         assert original != null;
+        
+        
 
         //create variable for self
         ProgramVariable selfVar = TB.selfVar(services, kjt, false);
@@ -630,10 +655,9 @@ public class JMLSpecFactory {
         InitiallyClauseImpl res = new InitiallyClauseImpl(name,
                                                           name,
                                                           kjt,
-                                                          visibility,
+                                                          new Public(),
                                                           inv,
                                                           selfVar, original);
-        res.setSpecFactory(this, services);
         return res;
 
     }
@@ -670,6 +694,13 @@ public class JMLSpecFactory {
                                                                null,
                                                                null,
                                                                services);
+        // represents clauses must be unique per type
+        for (Pair<KeYJavaType,ObserverFunction> p: modelFields){
+            if (p.first.equals(kjt)&& p.second.equals(rep.first)){
+                throw new SLTranslationException("JML represents clauses must occur uniquely per type and target.", originalRep.fileName, originalRep.pos);
+            }
+        }
+        modelFields.add(new Pair<KeYJavaType, ObserverFunction>(kjt,rep.first));
         //create class axiom
         return new RepresentsAxiom("JML represents clause for "
                                    + rep.first.name().toString(),
@@ -684,10 +715,31 @@ public class JMLSpecFactory {
     public ClassAxiom createJMLRepresents(KeYJavaType kjt,
                                           TextualJMLRepresents textualRep)
             throws SLTranslationException {
-        return createJMLRepresents(kjt,
+        boolean isStatic = textualRep.getMods().contains("static");
+      //create variable for self
+        final ProgramVariable selfVar =
+                isStatic ? null : TB.selfVar(services, kjt, false);
+
+        //translateToTerm expression
+        final PositionedString clause = textualRep.getRepresents();
+        final Pair<ObserverFunction, Term> rep =
+                translator.<Pair<ObserverFunction, Term>>parse(clause,kjt,selfVar,null,null,null,null,services);
+        //check whether there already is a represents clause
+        if (!modelFields.add(new Pair<KeYJavaType,ObserverFunction>(kjt,rep.first))){
+            throw new SLWarningException("JML represents clauses must occur uniquely per type and target."+
+                    "\nAll but one are ignored.", clause.fileName , clause.pos);
+        }
+        //create class axiom
+        String name = "JML represents clause for "
+            + rep.first.name().toString();
+        String displayName = textualRep.getName() == null ?
+                name : "JML represents clause \""+textualRep.getName()+"\" for "+ rep.first.name();
+        return new RepresentsAxiom(name, displayName,
+                                   rep.first,
+                                   kjt,
                                    getVisibility(textualRep),
-                                   textualRep.getRepresents(),
-                                   textualRep.getMods().contains("static"));
+                                   rep.second,
+                                   selfVar);
     }
 
 
@@ -714,7 +766,10 @@ public class JMLSpecFactory {
                                        null, null, services);
         
         //create class axiom
-        return new ClassAxiomImpl("class axiom in " + kjt.getFullName(), kjt,
+        String name = "class axiom in " + kjt.getFullName();
+        String displayName = textual.getName() == null ?
+                name : "class axiom \""+textual.getName()+"\" in "+kjt.getFullName();
+        return new ClassAxiomImpl(name, displayName, kjt,
                                   new Public(), ax, selfVar);
     }
 
@@ -734,18 +789,7 @@ public class JMLSpecFactory {
                     originalDep, kjt, selfVar, null, null, null, null,
                     services);
         assert dep.first.arity() <= 2;
-
-        //create dependency contract
-        final ImmutableList<ProgramVariable> paramVars =
-                TB.paramVars(services, dep.first, false);
-        return new DependencyContractImpl("JML depends clause",
-                                          kjt,
-                                          dep.first,
-                                          TB.inv(services, TB.var(selfVar)),
-                                          dep.third,
-                                          dep.second,
-                                          selfVar,
-                                          paramVars);
+        return cf.dep(kjt, dep, selfVar);
     }
 
 
@@ -884,5 +928,44 @@ public class JMLSpecFactory {
                                       textualLoopSpec.getInvariant(),
                                       textualLoopSpec.getAssignable(),
                                       textualLoopSpec.getVariant());
+    }
+    
+
+
+    /**
+     * Translate initially clause to a contract for the given constructor.
+     * Exception is thrown if the methods passed is not a constructor.
+     * For an initially clause <tt>ini</tt> the resulting contract looks like:<br>
+     * <tt>requires true;<br>ensures ini;<br>signals (Exception) ini;<br>diverges true;</tt>
+     * @param pm constructor
+     */
+    public FunctionalOperationContract initiallyClauseToContract(InitiallyClause ini, ProgramMethod pm) throws SLTranslationException { 
+        //if (! pm.isConstructor()) throw new SLTranslationException("Initially clauses only apply to constructors, not to method "+pm);
+        final ImmutableList<String> mods = ImmutableSLList.<String>nil().append("private");
+        final TextualJMLSpecCase specCase =
+            new TextualJMLSpecCase(mods,Behavior.NONE);
+        specCase.addName(new PositionedString(ini.getName()));
+        specCase.addRequires(createPrecond(pm, ini.getOriginalSpec()));
+        specCase.addEnsures(ini.getOriginalSpec().prepend("\\invariant_for(this) &&"));
+        specCase.addSignals(ini.getOriginalSpec().prepend("\\invariant_for(this) &&"));
+        specCase.addDiverges(new PositionedString("true"));
+        ImmutableSet<Contract> resultList = createJMLOperationContracts(pm, specCase);
+        assert resultList.size() == 1;
+        Contract result = resultList.toArray(new Contract[1])[0];
+        assert result instanceof FunctionalOperationContract;
+        return ((FunctionalOperationContract)result);
+    }
+
+
+
+    private ImmutableList<PositionedString> createPrecond(ProgramMethod pm, PositionedString originalSpec){
+        ImmutableList<PositionedString> res = ImmutableSLList.<PositionedString>nil();
+        // TODO: add static invariant
+        for (ParameterDeclaration p: pm.getMethodDeclaration().getParameters()){
+            if (!JMLInfoExtractor.parameterIsNullable(pm, p)) {
+                res = res.append(JMLSpecExtractor.createNonNullPositionedString(p.getVariableSpecification().getName(), p.getVariableSpecification().getProgramVariable().getKeYJavaType(), false, originalSpec.fileName, originalSpec.pos, services));
+            }
+        }
+        return res;
     }
 }

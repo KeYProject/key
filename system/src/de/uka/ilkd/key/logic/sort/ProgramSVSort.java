@@ -27,6 +27,7 @@ import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.PassiveExpression;
 import de.uka.ilkd.key.java.expression.literal.StringLiteral;
 import de.uka.ilkd.key.java.expression.operator.*;
+import de.uka.ilkd.key.java.expression.operator.adt.*;
 import de.uka.ilkd.key.java.recoderext.InstanceAllocationMethodBuilder;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
@@ -516,7 +517,9 @@ public abstract class ProgramSVSort extends AbstractSort {
 		|| pe instanceof AllFields
 		|| pe instanceof SeqSingleton
 		|| pe instanceof SeqConcat
-		|| pe instanceof SeqSub) {
+		|| pe instanceof SeqSub
+		|| pe instanceof SeqReverse
+		|| pe instanceof DLEmbeddedExpression) {
 		return true;
 	    }
 	    
@@ -1178,43 +1181,7 @@ public abstract class ProgramSVSort extends AbstractSort {
 
     //------------------ stuff concerned with explicit and implicit elements----
     
-    private static final class ExplicitProgramVariableSort
-	extends LeftHandSideSort {
-
-	public ExplicitProgramVariableSort() {
-	    super(new Name("ExplicitVariable"));
-	}
-
-	public boolean canStandFor(Term t) {
-	    return (t.op() instanceof ProgramVariable);
-	}
-
-	protected boolean canStandFor(ProgramElement pe,
-				      Services services) {
-	    return (super.canStandFor(pe, services) && !implicit(pe));
-	}
-    }
-
-    private static final class ImplicitProgramVariableSort
-	extends LeftHandSideSort {
-
-	public ImplicitProgramVariableSort() {
-	    super(new Name("ImplicitVariable"));
-	}
-
-	public boolean canStandFor(Term t) {
-	    return (t.op() instanceof ProgramVariable && 
-                    implicit((ProgramVariable)t.op()));
-	}
-
-	protected boolean canStandFor(ProgramElement pe,
-				      Services services) {
-	    return super.canStandFor(pe, services) && implicit(pe);
-	}
-    }
-
-
-
+    
     private static final class ConstantProgramVariableSort 
 	extends ProgramSVSort {
 

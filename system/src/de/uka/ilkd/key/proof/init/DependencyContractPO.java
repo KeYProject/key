@@ -116,6 +116,8 @@ public final class DependencyContractPO extends AbstractPO
 	if(target instanceof ProgramMethod) {
 	    target = javaInfo.getToplevelPM(contract.getKJT(), 
 		    			    (ProgramMethod)target);
+	    // FIXME: for some reason the above method call returns null now and then, the following line (hopefully) is a work-around
+	    if (target == null) target = contract.getTarget();
 	}
 	
 	//prepare variables

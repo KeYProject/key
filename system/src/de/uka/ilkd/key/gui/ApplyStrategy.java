@@ -79,8 +79,6 @@ public class ApplyStrategy {
 	    this.medi = medi;
         medi.addRuleAppListener( new ProofListener() );        
     }
-    
-    
 
     /** applies rules that are chosen by the active strategy 
      * @return true iff a rule has been applied, false otherwise
@@ -199,17 +197,16 @@ public class ApplyStrategy {
     }
 
 
-    private void init(Proof proof, ImmutableList<Goal> goals, int maxSteps, long timeout) {
-        this.proof = proof;
+    private void init(Proof newProof, ImmutableList<Goal> goals, int maxSteps, long timeout) {
+        this.proof = newProof;
         maxApplications = maxSteps;
         this.timeout = timeout;
         countApplied = 0; 
-        StrategySettings sSettings =proof.getSettings().getStrategySettings();
        	medi.getProfile().setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);//XXX
 
-	this.goalChooser = medi.getProfile().getSelectedGoalChooserBuilder().create();//Use this independently of StrategyProperties.GOALCHOOSER_OPTIONS_KEY
+       	this.goalChooser = medi.getProfile().getSelectedGoalChooserBuilder().create();//Use this independently of StrategyProperties.GOALCHOOSER_OPTIONS_KEY
 
-        goalChooser.init ( proof, goals );
+        goalChooser.init ( newProof, goals );
         setAutoModeActive(true);
         startedAsInteractive = !mediator().autoMode();
         if ( startedAsInteractive ) {

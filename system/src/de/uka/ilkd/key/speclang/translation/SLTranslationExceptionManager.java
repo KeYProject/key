@@ -120,6 +120,18 @@ public class SLTranslationExceptionManager {
                                                                  t.getColumn()));
     }
     
+    /**
+     * Creates an SLTranslationException with the position information of the
+     * passed token.
+     * 
+     * @param cause the exception which causes the new exception to be created.
+     */
+    public SLTranslationException createException(String message, Token t, Throwable cause) {
+        SLTranslationException result = createException(message, t);
+        result.initCause(cause);
+        return result;
+    }
+    
     
     /**
      * Creates an SLWarningException with current absolute position 

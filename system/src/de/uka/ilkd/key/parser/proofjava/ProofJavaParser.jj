@@ -27,7 +27,6 @@ package de.uka.ilkd.key.parser.proofjava;
 import java.io.*;
 import java.util.*;
 
-import recoder.*;
 import recoder.list.generic.*;
 import recoder.java.*;
 import recoder.java.declaration.*;
@@ -40,6 +39,7 @@ import recoder.java.statement.*;
 import recoder.io.*;
 
 import de.uka.ilkd.key.java.recoderext.*;
+import de.uka.ilkd.key.java.recoderext.adt.*;
 import recoder.abstraction.TypeArgument.WildcardMode;
 
 
@@ -49,10 +49,14 @@ import recoder.abstraction.TypeArgument.WildcardMode;
    to accept the Java 1.2 strictfp modifier.
    Several patches have been added to allow semicola after member declarations.
    Augmented with special constructs used in KeY proofs. These are:
-   - method-call statement
-   - method-body statement
-   - implicit fields
+   <ul>
+   <li> method-call statement
+   <li> method-body statement
+   <li> implicit fields
+   <li> nearly all the JML expression syntax supported by KeY in set statements
+   </ul>
  */
+@SuppressWarnings("all")
 public class ProofJavaParser {
 
     public static final void initialize(Reader r) {
@@ -284,6 +288,7 @@ public class ProofJavaParser {
         
         /** valid iff <tt>type</tt> is <tt>IDENTIFIER</tt> */
         Identifier            id   = null;
+        
     
         /** valid iff <tt>type</tt> is <tt>ARGUMENTS</tt> */
         ASTList<Expression> args = null;
@@ -320,7 +325,13 @@ public class ProofJavaParser {
         /** production was <pre>Name</pre> */
         static final int QUALIFIED_NAME   =  6;
         /** production was <pre>"@(" Expression ")"</pre> */
-        static final int PASSIVE_EXPR =  7;    
+        static final int PASSIVE_EXPR =  7; 
+        
+        /** production was something like <pre>"&93;seq_reverse(" Expression ")"</pre>.
+         * Extension to Java/JML with ADTs.
+         * @since 1.7.2118
+         */
+        static final int ADT_CONSTRUCT = 42;
     
         /** indicates the type of the result */
         int           type    = UNDEFINED;
@@ -575,6 +586,14 @@ TOKEN :
        "\u1040"-"\u1049"
       ]
   >
+}
+
+// Token for JML embedding of JavaDL functions:
+TOKEN :
+{
+ < DL_EMBEDDED_FUNCTION:
+    "\\dl_" <LETTER> (<LETTER>|<DIGIT>)* 
+ >
 }
 
 
@@ -2251,6 +2270,8 @@ ASTList<UncollatedReferenceQualifier> TypedNameList() :
 /*
  * Expression syntax follows.
  */
+
+
 Expression Expression() :
 /*
  * This expansion has been written this way instead of:
@@ -2263,7 +2284,7 @@ Expression Expression() :
  */
 {
     Expression result;
-    Expression expr, expr2;
+    Expression expr;
     Assignment op;
     ASTList<Expression> leftRight = new ASTArrayList<Expression>();
 }
@@ -2279,60 +2300,6 @@ Expression Expression() :
           result = op;
       }
     ]
-    |
-    "\\singleton" "(" expr = Expression() ")"
-    {
-        result = new Singleton(expr);
-        setPrefixInfo(result);
-    }
-    |
-    "\\set_union" "(" expr = Expression() "," result = Expression() ")"
-    {
-        result = new SetUnion(expr, result);
-        setPrefixInfo(result);
-    }
-    |
-    "\\intersect" "(" expr = Expression() "," result = Expression() ")"
-    {
-        result = new Intersect(expr, result);
-        setPrefixInfo(result);
-    }
-    |
-    "\\set_minus" "(" expr = Expression() "," result = Expression() ")"
-    {
-        result = new SetMinus(expr, result);
-        setPrefixInfo(result);
-    }
-    |
-    "\\all_fields" "(" expr = Expression() ")"
-    {
-        result = new AllFields(expr);
-        setPrefixInfo(result);
-    }
-    |
-    "\\seq_singleton" "(" expr = Expression() ")"
-    {
-        result = new SeqSingleton(expr);
-        setPrefixInfo(result);
-    }
-    |
-    "\\seq_concat" "(" expr = Expression() "," result = Expression() ")"
-    {
-        result = new SeqConcat(expr, result);
-        setPrefixInfo(result);
-    }
-    |
-    "\\seq_sub" "(" expr = Expression() "," expr2 = Expression() "," result = Expression() ")"
-    {
-        result = new SeqSub(expr, expr2, result);
-        setPrefixInfo(result);
-    }
-    |
-    "\\seq_reverse" "(" expr = Expression() ")"
-    {
-        result = new SeqReverse(expr);
-        setPrefixInfo(result);
-    }
   )
   {
       checkConstruction(result);
@@ -2340,8 +2307,6 @@ Expression Expression() :
       return result;
   }
 }
-
-
 
 Assignment AssignmentOperator() :
 {
@@ -2709,6 +2674,10 @@ Expression UnaryExpression() :
   result = PreDecrementExpression()
 |
   result = UnaryExpressionNotPlusMinus()
+|
+  result = ADTGetter()
+|
+  result = EmbeddedDLExpression()
 )
   { 
     checkConstruction(result);
@@ -2786,6 +2755,35 @@ Expression UnaryExpressionNotPlusMinus() :
         return result;
     }
 
+}
+
+Expression ADTGetter() :
+{
+    Expression result;
+    Expression expr;
+}
+{
+    (
+    "\\indexOf" "(" expr = Expression() "," result = Expression() ")"
+    {
+        result = new SeqIndexOf(expr,result);
+    }
+    |
+    "\\seq_length" "(" expr = Expression() ")"
+    {
+        result = new SeqLength(expr);
+    }
+    |
+    "\\seq_get" "(" expr = Expression() "," result = Expression() ")"
+    {
+        result = new SeqGet(expr, result);
+    }
+    )
+    {
+        checkConstruction(result);
+        setPrefixInfo(result);
+        return result;
+    }
 }
 
 // This production is to determine lookahead only. The LOOKAHEAD specifications
@@ -2903,6 +2901,9 @@ Expression PrimaryExpression() :
       case PrimaryPrefixReturnValue.PASSIVE_EXPR:
           tmpResult = (PassiveExpression)prefix.expr;
           break;
+      case PrimaryPrefixReturnValue.ADT_CONSTRUCT:
+          tmpResult = (ADTPrefixConstruct) prefix.expr;
+          break;
       default:
           throw new ParseException("Unknown prefix");
       }
@@ -2958,18 +2959,26 @@ Expression PrimaryExpression() :
           }
           break;
       case PrimarySuffixReturnValue.INDEX_EXPR:
+          // suffix is either array / sequence access or subsequence construction
           if (tmpResult instanceof UncollatedReferenceQualifier ||
-              tmpResult instanceof MethodReference ||
-              tmpResult instanceof ParenthesizedExpression ||
-              //tmpResult instanceof ThisReference || // this[i] in array initialization
-              tmpResult instanceof VariableReference) {
+                  tmpResult instanceof MethodReference ||
+                  tmpResult instanceof ParenthesizedExpression ||
+                  //tmpResult instanceof ThisReference || // this[i] in array initialization
+                  tmpResult instanceof ADTPrefixConstruct ||
+                  tmpResult instanceof VariableReference) {
+              if (suffix.expr instanceof RangeExpression) {
+                  System.out.println("sucess! "+suffix.expr+" is a range"); // XXX
+                  // XXX what if prefix ist Uncollated ???
+                  tmpResult = new SeqSub((ADTPrefixConstruct) tmpResult, (RangeExpression) suffix.expr);
+              } else {
                   // Now we know that this is an array reference
-              ASTList<Expression> indicees = new ASTArrayList<Expression>(1);
-              indicees.add(suffix.expr);
-              tmpResult = 
-                  factory.createArrayReference(tmpResult, indicees);
-              setPrefixInfo(tmpResult);
-              setPostfixInfo(tmpResult);
+                  ASTList<Expression> indicees = new ASTArrayList<Expression>(1);
+                  indicees.add(suffix.expr);
+                  tmpResult = 
+                      factory.createArrayReference(tmpResult, indicees);
+                  setPrefixInfo(tmpResult);
+                  setPostfixInfo(tmpResult);
+              }
           } else if (tmpResult instanceof ArrayReference) {
               // we need to add another access dimension
               ((ArrayReference)tmpResult).getDimensionExpressions().add(suffix.expr);
@@ -3115,16 +3124,127 @@ PrimaryPrefixReturnValue PrimaryPrefix() :
         prefix.type = PrimaryPrefixReturnValue.QUALIFIED_NAME;
         prefix.name = qn;
   }
+|
+    expr = ADTConstructor() 
+    {
+        // XXX now primary expression (otherwise could not use expressions like \seq_reverse(x).length
+        prefix.type = PrimaryPrefixReturnValue.ADT_CONSTRUCT;
+        prefix.expr = expr;
+    }
 )
   {
       return prefix;
   }
 }
 
+
+
+Expression ADTConstructor() :
+{
+    Expression result;
+    Expression expr, expr2;
+}
+
+{
+    (
+    "\\singleton" "(" expr = Expression() ")"
+    {
+        result = new Singleton(expr);
+        setPrefixInfo(result);
+    }
+    |
+    "\\set_union" "(" expr = Expression() "," result = Expression() ")"
+    {
+        result = new SetUnion(expr, result);
+        setPrefixInfo(result);
+    }
+    |
+    "\\intersect" "(" expr = Expression() "," result = Expression() ")"
+    {
+        result = new Intersect(expr, result);
+        setPrefixInfo(result);
+    }
+    |
+    "\\set_minus" "(" expr = Expression() "," result = Expression() ")"
+    {
+        result = new SetMinus(expr, result);
+        setPrefixInfo(result);
+    }
+    |
+    "\\all_fields" "(" expr = Expression() ")"
+    {
+        result = new AllFields(expr);
+        setPrefixInfo(result);
+    }
+    |
+    "\\seq_singleton" "(" expr = Expression() ")"
+    {
+        result = new SeqSingleton(expr);
+        setPrefixInfo(result);
+    }
+    |
+    "\\seq_concat" "(" expr = Expression() "," result = Expression() ")"
+    {
+        result = new SeqConcat(expr, result);
+        setPrefixInfo(result);
+    }
+    |
+    "\\seq_sub" "(" expr = Expression() "," expr2 = Expression() "," result = Expression() ")"
+    {
+        result = new SeqSub(expr, expr2, result);
+        setPrefixInfo(result);
+    }
+    |
+    "\\seq_reverse" "(" expr = Expression() ")"
+    {
+        result = new SeqReverse(expr);
+        setPrefixInfo(result);
+    }
+    |
+    "\\seq_put" "(" expr = Expression() "," expr2 = Expression() "," result = Expression() ")"
+    {
+        // desugaring
+        final Expression one = factory.createIntLiteral(1);
+        final Expression first = new SeqSub(expr, factory.createIntLiteral(0), factory.createMinus(expr2, one));
+        final Expression second = new SeqSingleton(result);
+        final Expression third = new SeqSub(expr, factory.createPlus(expr2,one), factory.createMinus(new SeqLength(expr),one));
+        result = new SeqConcat(first, new SeqConcat(second, third));
+        setPrefixInfo(result);
+    }
+    )
+    {
+      checkConstruction(result);
+      setPostfixInfo(result);
+      return result;
+  }
+}
+
+Expression EmbeddedDLExpression() :
+{
+   List<Expression> arguments = new ArrayList<Expression>();
+   Expression expr;
+   Token t;
+}
+{
+    t=<DL_EMBEDDED_FUNCTION> "(" 
+      (
+        expr = Expression() { arguments.add(expr); }
+        ( "," expr = Expression() { arguments.add(expr); } )*
+      )?  ")"
+      
+    { 
+      // strip leading "\dl_"
+      String functionName = t.image.substring(4);
+      DLEmbeddedExpression result = new DLEmbeddedExpression(functionName, arguments);
+      setPrefixInfo(result);
+      return result;
+    }
+}
+
 PrimarySuffixReturnValue PrimarySuffix() :
 {
     // reuses global suffix field
-    Expression               expr;
+    Expression               expr; 
     ASTList<Expression>    args;
     Identifier               id;
     Literal                  lit;
@@ -3132,6 +3252,15 @@ PrimarySuffixReturnValue PrimarySuffix() :
 }
 {
 (
+//        //XXX it causes several warnings about nondeterminism. can those be ignored?
+//  LOOKAHEAD(2)
+//  ".." expr = Expression()
+//  {
+//      // subsequence range expression
+//      suffix.type = PrimarySuffixReturnValue.RANGE;
+//      suffix.expr = expr;
+//  }
+//|
   LOOKAHEAD(2)
   "." "this"
   {
@@ -3158,10 +3287,12 @@ PrimarySuffixReturnValue PrimarySuffix() :
   {
   	  suffix.type = suffix.IDENTIFIER;
   }
-|  "[" expr = Expression() "]"
+| 
+  "[" expr = IndexRange() "]"
   {
-      suffix.type = PrimarySuffixReturnValue.INDEX_EXPR;
-      suffix.expr = expr;
+    // can be simple array access, or subsequence construction
+    suffix.type = PrimarySuffixReturnValue.INDEX_EXPR;
+    suffix.expr = expr;
   }
 |
   "."
@@ -3180,6 +3311,28 @@ PrimarySuffixReturnValue PrimarySuffix() :
   {
       return suffix;
   }
+}
+
+Expression IndexRange() :
+    /*
+     * Introduced to handle postfix style sequence ranges as top-level expressions.
+     * XXX does not yet work since Expression may contain dots
+     */
+{
+    Expression result, end;
+}
+{
+    result = Expression()
+    [ ".." end = Expression()
+      {
+        result = new RangeExpression(result, end);
+      }
+    ]
+    {
+        checkConstruction(result);
+        setPostfixInfo(result);
+        return result;
+    }
 }
 
 Literal Literal() :

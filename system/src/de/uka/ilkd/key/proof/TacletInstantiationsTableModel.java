@@ -35,8 +35,12 @@ import de.uka.ilkd.key.rule.inst.*;
 
 public class TacletInstantiationsTableModel extends AbstractTableModel {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 5285420522875326156L;
     /** the instantiations entries */
-    private Vector entries;
+    private Vector<Object[]> entries;
     /** the related rule application */
     private final TacletApp originalApp;
     /** the integer defines the row until which no editing is possible */
@@ -87,8 +91,8 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
 
     /** creates a Vector with the row entries of the table
     */
-    private Vector createEntryArray(TacletApp tacletApp) {
-        Vector rowVec = new Vector();
+    private Vector<Object[]> createEntryArray(TacletApp tacletApp) {
+        Vector<Object[]> rowVec = new Vector<Object[]>();
         Iterator<SchemaVariable> it = tacletApp.instantiations().svIterator();
         int count = 0;
 
@@ -139,7 +143,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
 
     /** adds an instantiation of a schemavariable */
     public void addInstantiationEntry(int row, Term instantiation) {
-	((Object[])entries.get(row))[1] = instantiation;
+	entries.get(row)[1] = instantiation;
     }
 
     /** return the rule application which is the table models base
@@ -538,14 +542,14 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
     /** sets the Value of the cell */
     public void setValueAt(Object instantiation, int rowIndex,
                            int columnIndex) {
-	((Object[])entries.get(rowIndex))[columnIndex] = instantiation;
+	entries.get(rowIndex)[columnIndex] = instantiation;
     }
 
     /** get value at the specified row and col
      * @return the value
      */
     public Object getValueAt(int row, int col) {
-        return  ((Object[])entries.get(row))[col];
+        return  entries.get(row)[col];
     }
 
     /** returns the index of the row the given Schemavariable stands

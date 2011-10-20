@@ -97,6 +97,11 @@ public class ExpansionState
     extends AbstractSet
     implements Serializable
 {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -8276873816625710215L;
+
     private JTree tree;
 
     private Set paths;

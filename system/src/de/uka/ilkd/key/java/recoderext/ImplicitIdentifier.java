@@ -19,6 +19,11 @@ import recoder.java.Identifier;
  */
 public class ImplicitIdentifier extends Identifier {
     
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -4226362019731704838L;
+
     public ImplicitIdentifier(String id) {
 	super(id);
     }

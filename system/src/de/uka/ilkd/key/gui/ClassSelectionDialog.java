@@ -16,7 +16,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.Vector;
 
 import javax.swing.*;
@@ -33,6 +32,10 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
  */
 public class ClassSelectionDialog extends JDialog {
     
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -7369508044709282573L;
     private boolean successful = false;
     private JList classList;
     
@@ -62,10 +65,8 @@ public class ClassSelectionDialog extends JDialog {
         } else {
             classList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         }
-        Iterator<KeYJavaType> it = kjts.iterator();
         Vector<WrappedKJT> v = new Vector<WrappedKJT>();
-        while(it.hasNext()) {
-            KeYJavaType kjt = (KeYJavaType) it.next();
+        for (final KeYJavaType kjt : kjts) {
             if(kjt.getJavaType() instanceof ClassType) {
         	v.add(new WrappedKJT(kjt));
             }

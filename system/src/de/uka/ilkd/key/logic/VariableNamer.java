@@ -13,8 +13,6 @@ package de.uka.ilkd.key.logic;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
-
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -42,6 +40,7 @@ import de.uka.ilkd.key.proof.ProofSaver;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.util.MiscTools;
 
 
 /**
@@ -364,14 +363,19 @@ public abstract class VariableNamer implements InstantiationProposer {
      */
     private String getBaseNameProposal(Type type) {
 	String result;
-        String name = type.getName().toString();
         if(type instanceof ArrayType) {
 	    result = getBaseNameProposal(((ArrayType)type).getBaseType()
 		    					  .getKeYJavaType()
 		    					  .getJavaType());
-	    result += "_arr";
+            result += "_arr";
         } else {
-            result = name.substring(0, 1).toLowerCase();
+            String name = type.getName().toString();
+            name = MiscTools.filterAlphabetic(name);
+            if (name.length() > 0) {
+                result = name.substring(0, 1).toLowerCase();
+            } else {
+                result = "x"; // use default name otherwise
+            }
         }
         
 	return result;

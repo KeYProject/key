@@ -86,9 +86,8 @@ public abstract class TypeDeclaration extends JavaDeclaration
 	this.name = name;
 	this.fullName = fullName;
 	this.members = new ImmutableArray<MemberDeclaration>
-	    ((MemberDeclaration[])children.collect(MemberDeclaration.class));
-	ParentIsInterfaceDeclaration piid=(ParentIsInterfaceDeclaration)
-	    children.get(ParentIsInterfaceDeclaration.class);
+	    (children.collect(MemberDeclaration.class));
+	ParentIsInterfaceDeclaration piid=children.get(ParentIsInterfaceDeclaration.class);
 	if (piid!=null) {
 	    this.parentIsInterfaceDeclaration =(piid).getValue();
 	} else {
@@ -110,7 +109,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
 	    		   ProgramElementName fullName,
 			   boolean isLibrary) {
 	this(children, 
-	     (ProgramElementName)children.get(ProgramElementName.class), 
+	     children.get(ProgramElementName.class), 
 	     fullName, isLibrary);
     }
 
@@ -345,5 +344,11 @@ public abstract class TypeDeclaration extends JavaDeclaration
      */
     public boolean isAbstract() {
         return super.isAbstract();
+    }
+    
+    public boolean equals(Object o){
+        if (o instanceof TypeDeclaration){
+            return ((TypeDeclaration)o).fullName.equals(fullName);
+        } else return false;
     }
 }

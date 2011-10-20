@@ -58,7 +58,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
      */     
     public JavaDeclaration(ExtList children) {
 	super(children);
-	modArray = new ImmutableArray<Modifier>((Modifier[])children.collect(Modifier.class));
+	modArray = new ImmutableArray<Modifier>(children.collect(Modifier.class));
     }
 
 

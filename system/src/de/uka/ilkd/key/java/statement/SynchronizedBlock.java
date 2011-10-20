@@ -72,8 +72,8 @@ public class SynchronizedBlock extends JavaStatement
 
     public SynchronizedBlock(ExtList children) {
         super(children);
-	expression = (Expression)children.get(Expression.class);
-	body = (StatementBlock)children.get(StatementBlock.class);
+	expression = children.get(Expression.class);
+	body = children.get(StatementBlock.class);
         prefixElementArray = computePrefix(body);        
     }
 

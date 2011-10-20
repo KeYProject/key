@@ -125,8 +125,8 @@ public class ClassInitializeMethodBuilder
 		!isConstantField(fs)) {
 		result.add
 		    (assign(passiveFieldReference
-			    ((Identifier)fs.getIdentifier().deepClone()),
-			    (Expression) fs.getInitializer().deepClone()));
+			    (fs.getIdentifier().deepClone()),
+			    fs.getInitializer().deepClone()));
 	    }
 	}
 	
@@ -150,7 +150,7 @@ public class ClassInitializeMethodBuilder
 		      
 	for (int i = 0; i<typeDeclaration.getChildCount(); i++) {
 	    if (typeDeclaration.getChildAt(i) instanceof ClassInitializer) {
-		result.add((Statement)((ClassInitializer)typeDeclaration.
+		result.add(((ClassInitializer)typeDeclaration.
 			    getChildAt(i)).getBody().deepClone());
 	    } else if (typeDeclaration.getChildAt(i) instanceof FieldDeclaration) {
 		result.addAll(fieldInitializersToAssignments
@@ -251,8 +251,8 @@ public class ClassInitializeMethodBuilder
 	     new Identifier(caughtParam));
 	
 
-	catcher.add((Statement)resetInitInProgress.deepClone());
-	catcher.add((Statement)markErroneous.deepClone());
+	catcher.add(resetInitInProgress.deepClone());
+	catcher.add(markErroneous.deepClone());
 
 	catcher.add(t);
        
@@ -280,8 +280,7 @@ public class ClassInitializeMethodBuilder
 	    initializerExecutionBody.add
 		(0, new PassiveExpression
 		 (new MethodReference
-		  ((TypeReference)
-		   class2super.get(cd).deepClone(),
+		  (class2super.get(cd).deepClone(),
 		   new ImplicitIdentifier
 		   (ClassInitializeMethodBuilder.CLASS_INITIALIZE_IDENTIFIER))));
 	}

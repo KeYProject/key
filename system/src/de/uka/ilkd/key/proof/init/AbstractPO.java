@@ -75,7 +75,7 @@ public abstract class AbstractPO implements ProofOblInput {
             Pair<Sort, ObserverFunction> usedObs,
             ImmutableSet<ClassAxiom> axioms) {
         for (ClassAxiom axiom : axioms) {
-            if (!(axiom.getTarget().equals(usedObs.second)
+            if (axiom.getTarget()==null || !(axiom.getTarget().equals(usedObs.second)
                   && usedObs.first.extendsTrans(axiom.getKJT().getSort()))) {
                 axioms = axioms.remove(axiom);
             }
@@ -158,10 +158,10 @@ public abstract class AbstractPO implements ProofOblInput {
 
 
     protected final void register(ProgramVariable pv) {
-        Namespace progVarNames = services.getNamespaces().programVariables();
-        if (pv != null && progVarNames.lookup(pv.name()) == null) {
-            progVarNames.addSafely(pv);
-        }
+//         Namespace progVarNames = services.getNamespaces().programVariables();
+//         if (pv != null && progVarNames.lookup(pv.name()) == null) {
+//             progVarNames.addSafely(pv);
+//         }
     }
 
 
@@ -173,15 +173,15 @@ public abstract class AbstractPO implements ProofOblInput {
 
 
     protected final void register(Function f) {
-        Namespace functionNames = services.getNamespaces().functions();
-        if (f != null && functionNames.lookup(f.name()) == null) {
-            assert f.sort() != Sort.UPDATE;
-            if (f.sort() == Sort.FORMULA) {
-                functionNames.addSafely(f);
-            } else {
-                functionNames.addSafely(f);
-            }
-        }
+//         Namespace functionNames = services.getNamespaces().functions();
+//         if (f != null && functionNames.lookup(f.name()) == null) {
+//             assert f.sort() != Sort.UPDATE;
+//             if (f.sort() == Sort.FORMULA) {
+//                 functionNames.addSafely(f);
+//             } else {
+//                 functionNames.addSafely(f);
+//             }
+//         }
     }
 
 

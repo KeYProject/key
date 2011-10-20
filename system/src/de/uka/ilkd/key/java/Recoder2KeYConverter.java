@@ -13,6 +13,8 @@
 package de.uka.ilkd.key.java;
 
 import java.lang.reflect.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.util.*;
 
 import recoder.CrossReferenceServiceConfiguration;
@@ -20,26 +22,29 @@ import recoder.abstraction.ClassType;
 import recoder.abstraction.Type;
 import recoder.java.NonTerminalProgramElement;
 import recoder.list.generic.ASTList;
-import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.*;
+import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.abstraction.Field;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.declaration.modifier.*;
+import de.uka.ilkd.key.java.declaration.modifier.Ghost;
+import de.uka.ilkd.key.java.declaration.modifier.Model;
 import de.uka.ilkd.key.java.expression.*;
+import de.uka.ilkd.key.java.expression.PassiveExpression;
 import de.uka.ilkd.key.java.expression.literal.*;
 import de.uka.ilkd.key.java.expression.operator.*;
-import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
-import de.uka.ilkd.key.java.recoderext.ImplicitIdentifier;
+import de.uka.ilkd.key.java.expression.operator.DLEmbeddedExpression;
+import de.uka.ilkd.key.java.expression.operator.adt.*;
+import de.uka.ilkd.key.java.recoderext.*;
 import de.uka.ilkd.key.java.reference.*;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.*;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.VariableNamer;
+import de.uka.ilkd.key.java.statement.CatchAllStatement;
+import de.uka.ilkd.key.java.statement.MethodBodyStatement;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.ExtList;
+import de.uka.ilkd.key.util.*;
 
 
 /**
@@ -67,6 +72,8 @@ public class Recoder2KeYConverter {
 
     // -------- public part
 
+    private final Services services;
+
     public ProgramElement process(recoder.java.ProgramElement pe) {
         Object result = callConvert(pe);
         assert result instanceof ProgramElement : "result must be a ProgramElement";
@@ -89,9 +96,11 @@ public class Recoder2KeYConverter {
         return (CompilationUnit) result;
     }
 
-    public Recoder2KeYConverter(Recoder2KeY rec2key) {
+    public Recoder2KeYConverter(Recoder2KeY rec2key, Services services, NamespaceSet nss) {
         super();
         this.rec2key = rec2key;
+        this.services = services;
+        this.namespaceSet = nss;
     }
 
     // -------- implementation part
@@ -145,6 +154,12 @@ public class Recoder2KeYConverter {
      * the associated Recoder2KeY object
      */
     private Recoder2KeY rec2key;
+    
+    /**
+     * The namespaces are here to provide some conversion functions access to
+     * previously defined logical symbols.
+     */
+    private final NamespaceSet namespaceSet;
 
     /**
      * retrieve a key type using the converter available from Recoder2KeY
@@ -524,8 +539,9 @@ public class Recoder2KeYConverter {
             return Class.forName(className);
         } catch (ClassNotFoundException cnfe) {
             Debug.out("There is an AST class " +className + " missing at KeY.", cnfe);
-            throw new ConvertException("There is an AST class missing at KeY.",
-                    cnfe);
+            throw new ConvertException(this.getClass().toString()+" could not find a conversion from RecodeR class "+recoderClass.getClass()+".\n"
+                    +"Maybe you have added a class to package key.recoderext and did not add the equivalent to key.java.expression or its subpackages."
+                    ,cnfe);
         } catch (ExceptionInInitializerError initErr) {
             Debug.out("recoder2key: Failed initializing class.", initErr);
             throw new ConvertException("Failed initializing class.", initErr);
@@ -609,8 +625,7 @@ public class Recoder2KeYConverter {
         ExtList children = collectChildren(newArr);
         // now we have to extract the array initializer
         // is stored separately and must not appear in the children list
-        ArrayInitializer arrInit = (ArrayInitializer) children
-        .get(ArrayInitializer.class);
+        ArrayInitializer arrInit = children.get(ArrayInitializer.class);
         children.remove(arrInit);
 
         recoder.abstraction.Type javaType = getServiceConfiguration()
@@ -648,59 +663,93 @@ public class Recoder2KeYConverter {
     }
     
     
-    public EmptySetLiteral convert(de.uka.ilkd.key.java.recoderext.EmptySetLiteral e) {
+    public EmptySetLiteral convert(de.uka.ilkd.key.java.recoderext.adt.EmptySetLiteral e) {
 	return EmptySetLiteral.INSTANCE;
     }
     
-    public Singleton convert(de.uka.ilkd.key.java.recoderext.Singleton e) {
+    public Singleton convert(de.uka.ilkd.key.java.recoderext.adt.Singleton e) {
         ExtList children = collectChildren(e);	
 	return new Singleton(children);
     }        
     
-    public SetUnion convert(de.uka.ilkd.key.java.recoderext.SetUnion e) {
+    public SetUnion convert(de.uka.ilkd.key.java.recoderext.adt.SetUnion e) {
         ExtList children = collectChildren(e);	
 	return new SetUnion(children);
     }
     
-    public Intersect convert(de.uka.ilkd.key.java.recoderext.Intersect e) {
+    public Intersect convert(de.uka.ilkd.key.java.recoderext.adt.Intersect e) {
         ExtList children = collectChildren(e);	
 	return new Intersect(children);
     }
     
-    public SetMinus convert(de.uka.ilkd.key.java.recoderext.SetMinus e) {
+    public SetMinus convert(de.uka.ilkd.key.java.recoderext.adt.SetMinus e) {
         ExtList children = collectChildren(e);	
 	return new SetMinus(children);
     }
     
-    public AllFields convert(de.uka.ilkd.key.java.recoderext.AllFields e) {
+    public AllFields convert(de.uka.ilkd.key.java.recoderext.adt.AllFields e) {
         ExtList children = collectChildren(e);	
 	return new AllFields(children);
     }
     
-    
-    public EmptySeqLiteral convert(de.uka.ilkd.key.java.recoderext.EmptySeqLiteral e) {
-	return EmptySeqLiteral.INSTANCE;
+    public EmptySeqLiteral convert(de.uka.ilkd.key.java.recoderext.adt.EmptySeqLiteral e) {
+        return EmptySeqLiteral.INSTANCE;
     }    
     
-    public SeqSingleton convert(de.uka.ilkd.key.java.recoderext.SeqSingleton e) {
+    public SeqSingleton convert(de.uka.ilkd.key.java.recoderext.adt.SeqSingleton e) {
         ExtList children = collectChildren(e);	
 	return new SeqSingleton(children);
     }
     
-    public SeqConcat convert(de.uka.ilkd.key.java.recoderext.SeqConcat e) {
+    public SeqConcat convert(de.uka.ilkd.key.java.recoderext.adt.SeqConcat e) {
         ExtList children = collectChildren(e);	
 	return new SeqConcat(children);
     }
     
-    public SeqSub convert(de.uka.ilkd.key.java.recoderext.SeqSub e) {
+    public SeqSub convert(de.uka.ilkd.key.java.recoderext.adt.SeqSub e) {
         ExtList children = collectChildren(e);	
 	return new SeqSub(children);
-    }    
+    }
     
-    public SeqReverse convert(de.uka.ilkd.key.java.recoderext.SeqReverse e) {
+    public SeqLength convert(de.uka.ilkd.key.java.recoderext.adt.SeqLength e){
+        return new SeqLength(collectChildren(e));
+    }
+    
+    public SeqIndexOf convert(de.uka.ilkd.key.java.recoderext.adt.SeqIndexOf e){
+	return new SeqIndexOf(collectChildren(e));
+    }
+    
+    public SeqReverse convert(de.uka.ilkd.key.java.recoderext.adt.SeqReverse e) {
         ExtList children = collectChildren(e);	
 	return new SeqReverse(children);
-    }    
+    }
+    
+    /**
+     * Resolve the function symbol which is embedded here to its logical
+     * counterpart.
+     */
+    public DLEmbeddedExpression convert(de.uka.ilkd.key.java.recoderext.DLEmbeddedExpression e) {
+        ExtList children = collectChildren(e);
+        String name = e.getFunctionName();
+        Named named = namespaceSet.functions().lookup(new Name(name));
+        
+        if(named == null || !(named instanceof Function)) {
+            // TODO provide position information?!
+            throw new ConvertException("In an embedded DL expression, " + name 
+                    + " is not a known DL function name. Line/Col:" + e.getStartPosition());
+        }
+        
+        Function f = (Function) named;
+        DLEmbeddedExpression expression = new DLEmbeddedExpression(f, children);
+        
+        expression.check(services);
+        
+        return expression;
+    }
+    
+    public SeqGet convert(de.uka.ilkd.key.java.recoderext.adt.SeqGet e){
+        return new SeqGet(collectChildren(e));
+    }
 
     /** convert a recoder StringLiteral to a KeY StringLiteral */
     public StringLiteral convert(
@@ -756,12 +805,12 @@ public class Recoder2KeYConverter {
     /** convert a recoder Identifier to a KeY Identifier */
     public ProgramElementName convert(recoder.java.Identifier id) {
         return VariableNamer.parseName(id.getText(),
-                (Comment[]) collectComments(id).collect(Comment.class));
+                collectComments(id).collect(Comment.class));
     }
 
     public ProgramElementName convert(ImplicitIdentifier id) {
         return new ProgramElementName(id.getText(),
-                (Comment[]) collectComments(id).collect(Comment.class));
+                collectComments(id).collect(Comment.class));
     }
 
     /** convert a recoderext MethodFrameStatement to a KeY MethodFrameStatement */
@@ -1329,22 +1378,14 @@ public class Recoder2KeYConverter {
         }
 
         if (recoderVarSpec == null) {
-            // null means only bytecode available for this
-            // field %%%
-            recoder.abstraction.Field recField = getServiceConfiguration()
-            .getSourceInfo().getField(fr);
-            recoder.abstraction.Type recoderType = getServiceConfiguration()
-            .getByteCodeInfo().getType(recField);
+            // null means only bytecode available for this field %%%
+            recoder.abstraction.Field recField = getServiceConfiguration().getSourceInfo().getField(fr);
+            recoder.abstraction.Type recoderType = getServiceConfiguration().getByteCodeInfo().getType(recField);
             recoder.java.declaration.FieldSpecification fs = new recoder.java.declaration.FieldSpecification(
                     fr.getIdentifier());
-            boolean isModel = false;
-            for(recoder.java.declaration.Modifier mod : recoderVarSpec.getParent().getModifiers()) {
-        	if(mod instanceof de.uka.ilkd.key.java.recoderext.Model) {
-        	    isModel = true;
-        	    break;
-        	}
-            }            
             
+            final boolean isModel = false; // bytecode-only fields are no model fields
+                       
             pv = new LocationVariable(new ProgramElementName(makeAdmissibleName(fs.getName()),
                     makeAdmissibleName(recField.getContainingClassType().getFullName())),
                     getKeYJavaType(recoderType), getKeYJavaType(recField
@@ -1619,32 +1660,41 @@ public class Recoder2KeYConverter {
         final recoder.java.declaration.ClassDeclaration cd = n.getClassDeclaration();
         
         LinkedList<?> outerVars = null;
-        if(locClass2finalVar != null){
+        if (locClass2finalVar != null){
             outerVars = (LinkedList<?>) locClass2finalVar.get(cd);
         }
         
-        int numVars = outerVars!=null? outerVars.size() : 0;
-        Expression[] arguments = new Expression[(args != null ? args.size() : 0)+numVars];
-        for (int i = 0; i < arguments.length-numVars; i++) {
-            arguments[i] = (Expression)callConvert(args.get(i));
+        int numVars = outerVars != null ? outerVars.size() : 0;
+        
+        final Expression[] arguments;
+        
+        if (args != null) {
+           arguments = new Expression[args.size() + numVars];                
+           for (int i = 0; i < arguments.length - numVars; i++) {
+               arguments[i] = (Expression)callConvert(args.get(i));
+           }       
+        } else {
+            arguments = new Expression[numVars];
         }
         
-        for (int i = arguments.length-numVars; i<arguments.length; i++) {
-	    recoder.java.declaration.VariableSpecification v = (recoder.java.declaration.VariableSpecification) 
-		outerVars.get(i-arguments.length + numVars);
-	    if (si.getContainingClassType(v) != si.getContainingClassType(n)){
-		recoder.java.declaration.FieldSpecification fs = 
-		    (recoder.java.declaration.FieldSpecification) si.getVariable(ImplicitFieldAdder.FINAL_VAR_PREFIX+v.getName(), 
-										 (recoder.java.declaration.ClassDeclaration) 
-										 si.getContainingClassType(n));
-		arguments[i] = new FieldReference(getProgramVariableForFieldSpecification(fs), new ThisReference());
-	    }else{
-		arguments[i] = (ProgramVariable) convert(v).getProgramVariable();
-	    }
+        if (outerVars != null) {
+            for (int i = arguments.length-numVars; i<arguments.length; i++) {
+                recoder.java.declaration.VariableSpecification v = (recoder.java.declaration.VariableSpecification) 
+                        outerVars.get(i-arguments.length + numVars);
+                if (si.getContainingClassType(v) != si.getContainingClassType(n)){
+                    recoder.java.declaration.FieldSpecification fs = 
+                            (recoder.java.declaration.FieldSpecification) si.getVariable(ImplicitFieldAdder.FINAL_VAR_PREFIX+v.getName(), 
+                                    (recoder.java.declaration.ClassDeclaration) 
+                                    si.getContainingClassType(n));
+                    arguments[i] = new FieldReference(getProgramVariableForFieldSpecification(fs), new ThisReference());
+                } else {
+                    arguments[i] = (ProgramVariable) convert(v).getProgramVariable();
+                }
+            }
         }
-        
+
         TypeReference maybeAnonClass = (TypeReference) callConvert(tr);
-        if(n.getClassDeclaration() != null){
+        if (n.getClassDeclaration() != null){
             callConvert(n.getClassDeclaration());
             KeYJavaType kjt = getKeYJavaType(n.getClassDeclaration());
             maybeAnonClass = new TypeRef(kjt);

@@ -40,28 +40,14 @@ import recoder.service.ChangeHistory;
 import recoder.service.DefaultCrossReferenceSourceInfo;
 import recoder.service.NameInfo;
 import recoder.service.UnresolvedReferenceException;
-import de.uka.ilkd.key.java.recoderext.AllFields;
 import de.uka.ilkd.key.java.recoderext.ClassFileDeclarationBuilder;
-import de.uka.ilkd.key.java.recoderext.EmptySeqLiteral;
-import de.uka.ilkd.key.java.recoderext.EmptySetLiteral;
-import de.uka.ilkd.key.java.recoderext.EnumClassDeclaration;
-import de.uka.ilkd.key.java.recoderext.ExecutionContext;
-import de.uka.ilkd.key.java.recoderext.MethodCallStatement;
-import de.uka.ilkd.key.java.recoderext.SeqConcat;
-import de.uka.ilkd.key.java.recoderext.SeqReverse;
-import de.uka.ilkd.key.java.recoderext.SeqSingleton;
-import de.uka.ilkd.key.java.recoderext.SeqSub;
-import de.uka.ilkd.key.java.recoderext.SetUnion;
-import de.uka.ilkd.key.java.recoderext.Singleton;
+import de.uka.ilkd.key.java.recoderext.adt.*;
+import de.uka.ilkd.key.java.recoderext.*;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.util.SpecDataLocation;
 
 
-/**
- * @author mattias
- *
- */
 public class KeYCrossReferenceSourceInfo
     extends DefaultCrossReferenceSourceInfo {
 
@@ -129,12 +115,10 @@ public class KeYCrossReferenceSourceInfo
 		if (pe instanceof TypeDeclarationContainer) {
 		    TypeDeclarationContainer tdc = (TypeDeclarationContainer) pe;
 		    for (int i = 0; i<tdc.getTypeDeclarationCount(); i++) {
-			if (tdc.getTypeDeclarationAt(i) instanceof ClassType) {
-			    ClassType ct = (ClassType) tdc.getTypeDeclarationAt(i);
-			    for (ClassType superType : ct.getSupertypes()) {
-				registerSubtype(ct, superType);
-			    }
-			}
+		        ClassType ct = tdc.getTypeDeclarationAt(i);
+		        for (ClassType superType : ct.getSupertypes()) {
+		            registerSubtype(ct, superType);
+		        }
 		    }
 		}
 	    }
@@ -344,7 +328,7 @@ public class KeYCrossReferenceSourceInfo
 
         // check primitive types, array types of primitive types,
         // and void --- these happen often
-        Type t = (Type) name2primitiveType.get(name);
+        Type t = name2primitiveType.get(name);
         if (t != null) {
             return t;
         }
@@ -430,8 +414,8 @@ public class KeYCrossReferenceSourceInfo
         }
         if (result != null) {
             return result;
-        }
-
+        }        
+        
         // now the outer scope is null, so we have arrived at the top
         CompilationUnit cu = (CompilationUnit) scope;
 
@@ -604,23 +588,27 @@ public class KeYCrossReferenceSourceInfo
         shit: reference2element.clear();
     }*/
     
-    
-    private final PrimitiveType setType = new PrimitiveType("\\set", this);
-    private final PrimitiveType seqType = new PrimitiveType("\\seq", this);
-    
     @Override 
     public Type getType(Expression expr) {
 	if(expr instanceof EmptySetLiteral
            || expr instanceof Singleton
            || expr instanceof SetUnion
            || expr instanceof AllFields) {
-	    return setType;
+	    return name2primitiveType.get("\\set");
 	} else if(expr instanceof EmptySeqLiteral
                   || expr instanceof SeqSingleton
                   || expr instanceof SeqConcat
                   || expr instanceof SeqSub
                   || expr instanceof SeqReverse) {
-	    return seqType;
+        return name2primitiveType.get("\\seq");
+	} else if(expr instanceof DLEmbeddedExpression) {
+	    // w/o further resolution, a type cannot be determined.
+	    // but this does not fail.
+	    return getNameInfo().getUnknownType();
+	} else if (expr instanceof SeqLength
+	        || expr instanceof SeqIndexOf){
+	    return name2primitiveType.get("int");
+	    // TODO: handle SeqGet
 	} else {
 	    return super.getType(expr);
 	}

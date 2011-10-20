@@ -82,6 +82,10 @@ import de.uka.ilkd.key.util.Debug;
 
 public class ProofTreeView extends JPanel {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1640354881070567924L;
     private static final Color PASTEL_COLOR = new Color(255,255,204);
     private static final Color BISQUE_COLOR = new Color(240,228,196);
     private static final Color PALE_RED_COLOR = new Color(255,153,153);
@@ -134,7 +138,12 @@ public class ProofTreeView extends JPanel {
         guiListener = new GUIProofTreeGUIListener();
 	delegateView = new JTree(
 		     new DefaultMutableTreeNode("No proof loaded")) {
-		public void updateUI() {
+		/**
+                 * 
+                 */
+                private static final long serialVersionUID = 6555955929759162324L;
+
+        public void updateUI() {
 		    super.updateUI();
 		    /* we want plus/minus signs to expand/collapse tree nodes */
 		    final TreeUI ui = getUI();
@@ -476,7 +485,11 @@ public class ProofTreeView extends JPanel {
     // listens to gui events
     class GUIProofTreeGUIListener implements GUIListener,
                                              java.io.Serializable {
-	/** invoked if a frame that wants modal access is opened */
+	/**
+         * 
+         */
+        private static final long serialVersionUID = -7767170815005302177L;
+    /** invoked if a frame that wants modal access is opened */
 	public void modalDialogOpened(GUIEvent e) {
 	    delegateView.setEnabled(false);
 	}
@@ -502,7 +515,6 @@ public class ProofTreeView extends JPanel {
 
 	/** makes selected node visible of lastGoalNode */
 	public void makeSelectedNodeVisible(Node selectedNode) {
-            
             if (selectedNode != null ) {
                 if ( proof != selectedNode.proof() ) {
                     return;
@@ -516,8 +528,9 @@ public class ProofTreeView extends JPanel {
 	
 	/** focused node has changed */
 	public void selectedNodeChanged(KeYSelectionEvent e) {	    
-	    if (!ignoreNodeSelectionChange)
-	        makeSelectedNodeVisible(mediator.getSelectedNode());	    
+	    if (!ignoreNodeSelectionChange) {
+	        makeSelectedNodeVisible(mediator.getSelectedNode());	        
+	    }
 	}
 
 	/** the selected proof has changed (e.g. a new proof has been
@@ -580,7 +593,11 @@ public class ProofTreeView extends JPanel {
 
     class GUITreeSelectionListener implements TreeSelectionListener,
                                               java.io.Serializable {
-	// hack to reduce duplicated repaints
+	/**
+         * 
+         */
+        private static final long serialVersionUID = 1417544836006726419L;
+    // hack to reduce duplicated repaints
 	public boolean ignoreChange = false;
 
 	public void valueChanged(TreeSelectionEvent e) {
@@ -628,6 +645,12 @@ public class ProofTreeView extends JPanel {
 	                implements TreeCellRenderer,
 			           java.io.Serializable {
 
+    /**
+         * 
+         */
+        private static final long serialVersionUID = -4990023575036168279L;
+    private Icon keyHole20x20 = IconFactory.keyHole(20, 20);       
+            
 	public Component getTreeCellRendererComponent(JTree tree,
 						      Object value,
 						      boolean sel,
@@ -686,7 +709,7 @@ public class ProofTreeView extends JPanel {
 		        tree_cell.setToolTipText("Interactive goal - no automatic rule application");
 		    } else {
 			tree_cell.setForeground(Color.red);
-			tree_cell.setIcon(IconFactory.keyHole(20, 20));
+			tree_cell.setIcon(keyHole20x20);
 			ProofTreeView.this.setToolTipText("Open Goal");
 			tree_cell.setToolTipText("An open goal");
 		    }                                                            
@@ -734,7 +757,11 @@ public class ProofTreeView extends JPanel {
     class ProofTreePopupMenu extends JPopupMenu 
 	implements ActionListener, ItemListener {	
 	
-	private JMenuItem expandAll   = new JMenuItem("Expand All");
+	/**
+         * 
+         */
+        private static final long serialVersionUID = 4071286598496826646L;
+    private JMenuItem expandAll   = new JMenuItem("Expand All");
 	private JMenuItem expandAllBelow   = new JMenuItem("Expand All Below");
 	private JMenuItem expandGoals = new JMenuItem("Expand Goals Only");
 	private JMenuItem expandGoalsBelow = 
@@ -753,8 +780,7 @@ public class ProofTreeView extends JPanel {
 	private JMenuItem prune    = new JMenuItem("Prune Proof");
 	private JMenuItem runStrategy = new JMenuItem("Apply Strategy",
 	    IconFactory.autoModeStartLogo(10));
-        private JMenuItem bugdetection= new JMenuItem("Bug Detection");
-
+        
 	private TreePath path;
 	private TreePath branch;
 	private Node invokedNode;
@@ -984,7 +1010,12 @@ public class ProofTreeView extends JPanel {
          */
 	private final class SetGoalsBelowEnableStatus extends DisableGoal {
 
-	    public SetGoalsBelowEnableStatus(boolean enableGoals) {
+	    /**
+         * 
+         */
+        private static final long serialVersionUID = 7264466584742639608L;
+
+        public SetGoalsBelowEnableStatus(boolean enableGoals) {
 	        this.enableGoals = enableGoals;
 	        
 	        String action = enableGoals ? "Automatic" : "Interactive";
@@ -1085,6 +1116,10 @@ public class ProofTreeView extends JPanel {
     class ProofTreeSearchPanel extends JPanel implements DocumentListener,
             TreeModelListener {
 
+        /**
+         * 
+         */
+        private static final long serialVersionUID = -1945019325314041986L;
         private JTextField searchString = new JTextField(20);
         private JButton prev = new JButton("Prev");
         private JButton next = new JButton("Next");

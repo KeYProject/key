@@ -28,10 +28,10 @@ public class Pair<T1, T2> {
     
     
     public boolean equals(Object o) {
-	if(!(o instanceof Pair)) {
+	if(!(o instanceof Pair<?, ?>)) {
 	    return false;
 	} 
-	Pair p = (Pair) o;
+	Pair<?, ?> p = (Pair<?, ?>) o;
 	return (first == null ? p.first == null : first.equals(p.first))
 	       && (second == null ? p.second == null : second.equals(p.second));
     }

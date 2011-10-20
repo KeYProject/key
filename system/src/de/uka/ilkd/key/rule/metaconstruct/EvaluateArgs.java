@@ -83,7 +83,7 @@ public class EvaluateArgs extends ProgramTransformer{
 	    newCalled = mr.getReferencePrefix();
 	}
 	
-	ImmutableArray<Expression> args = mr.getArguments();
+	ImmutableArray<? extends Expression> args = mr.getArguments();
 	Expression[] newArgs = new Expression[args.size()];
 	for(int i = 0; i < args.size(); i++) { 
 	    newArgs[i] = evaluate(args.get(i), evalstat, services, ec);

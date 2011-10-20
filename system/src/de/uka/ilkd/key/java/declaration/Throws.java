@@ -69,8 +69,7 @@ public class Throws extends JavaNonTerminalProgramElement
     public Throws(ExtList children) {
 	super(children);
 	this.exceptions=new
-	    ImmutableArray<TypeReference>((TypeReference[])
-				 children.collect(TypeReference.class));  
+	    ImmutableArray<TypeReference>(children.collect(TypeReference.class));  
     }
 
     public SourceElement getLastElement() {

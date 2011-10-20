@@ -41,7 +41,7 @@ public class ApplyTacletDialogModel {
     private Sequent seq;
 
     /** listeners of this model */
-    private Vector listeners = new Vector();
+    private Vector<ModelChangeListener> listeners = new Vector<ModelChangeListener>();
     /** the change event that is sent */
     private final ModelEvent changeEvent = new ModelEvent(this);
 

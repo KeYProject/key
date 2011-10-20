@@ -8,7 +8,7 @@ class AddAndMultiply {
 	if(y < 0) {
 	    /*@ loop_invariant y <= i && i <= 0 && res == x + i; 
 	      @ assignable \nothing;
-	      @ decreases y - i;
+	      @ decreases i - y;
 	      @*/
 	    for(int i = 0; i > y; i--) {
 		res--;

@@ -46,9 +46,9 @@ public class If extends BranchStatement implements ExpressionContainer {
      */ 
     public If(ExtList children) {
 	super(children);
-	thenBranch=(Then)children.get(Then.class);
-	elseBranch=(Else)children.get(Else.class);
-	expression=(Expression)children.get(Expression.class);
+	thenBranch=children.get(Then.class);
+	elseBranch=children.get(Else.class);
+	expression=children.get(Expression.class);
     }
 
     /**

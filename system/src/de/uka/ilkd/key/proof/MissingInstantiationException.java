@@ -14,6 +14,10 @@ package de.uka.ilkd.key.proof;
 public class MissingInstantiationException 
     extends SVInstantiationExceptionWithPosition {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 6424217152885699595L;
     private String toInstantiate;
          
     public MissingInstantiationException( String toInstantiate, 

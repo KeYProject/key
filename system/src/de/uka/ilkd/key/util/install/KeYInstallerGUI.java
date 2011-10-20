@@ -265,6 +265,11 @@ public class KeYInstallerGUI extends KeYInstallerUI {
     }
     
     private static class NotCompleteException extends RuntimeException {
+
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 5345835460812915864L;
     }
     
 

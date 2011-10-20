@@ -30,6 +30,10 @@ public class RMethodBodyStatement extends JavaStatement
     implements KeYRecoderExtension, TypeReferenceContainer, 
     ExpressionContainer, NamedProgramElement {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -8427953809480454933L;
     private TypeReference bodySource; 
     private ProgramVariableSVWrapper resultVar;
     
@@ -65,11 +69,11 @@ public class RMethodBodyStatement extends JavaStatement
 
     public RMethodBodyStatement deepClone() {
         return new RMethodBodyStatement
-            ((TypeReference)bodySource.deepClone(), 
+            (bodySource.deepClone(), 
              (ProgramVariableSVWrapper)resultVar.deepClone(), 
              (ReferencePrefix)methodReferencePrefix.deepClone(),
-             (Identifier)methodName.deepClone(),
-             (ASTList<Expression>)arguments.deepClone());
+             methodName.deepClone(),
+             arguments.deepClone());
     }
     
     /**

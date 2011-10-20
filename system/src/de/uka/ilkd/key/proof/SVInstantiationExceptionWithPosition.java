@@ -20,6 +20,10 @@ package de.uka.ilkd.key.proof;
 public abstract class SVInstantiationExceptionWithPosition 
     extends SVInstantiationException {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 2157800633859913303L;
     private int row;
     private int column;
     private boolean inIfSequent;

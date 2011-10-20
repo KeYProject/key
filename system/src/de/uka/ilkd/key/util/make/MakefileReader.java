@@ -28,7 +28,7 @@ public class MakefileReader {
 
     private void gotoNextLine(FileReader fr) {
 	try {
-	    while (fr.read()!=(int)'\n') {	    
+	    while (fr.read()!='\n') {	    
 	    }
 	} catch (Exception e) {
 	    System.out.println("Error reading file.");
@@ -40,13 +40,13 @@ public class MakefileReader {
 	    String readStr = "";
 	    int read = fr.read();
 	    while (read!=-1) {
-		if (read==(int)'\n' || read==(int)'\r') {
+		if (read=='\n' || read=='\r') {
 		    readStr="";
-		} else if (read==(int)'\t') {
+		} else if (read=='\t') {
 		    readStr="";
 		    gotoNextLine(fr);
 		} else {
-		    if (read!=(int)':') {
+		    if (read!=':') {
 			readStr=readStr+(char)read;		
 		    } else {
 			hset.add(readStr);

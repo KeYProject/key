@@ -29,7 +29,7 @@ import javax.swing.JPopupMenu;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -102,7 +102,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
 	        	List files = (List) transferable.getTransferData(DataFlavor.javaFileListFlavor);
 	        	for (Iterator i = files.iterator(); i.hasNext(); ) {
 	        	    File f = (File) i.next();
-	        	    Main.getInstance().loadProblem(f);
+	        	    MainWindow.getInstance().loadProblem(f);
 	        	}
 	        	event.dropComplete(true);
 	        	}

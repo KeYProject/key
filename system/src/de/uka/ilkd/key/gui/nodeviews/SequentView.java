@@ -55,11 +55,18 @@ import de.uka.ilkd.key.util.Debug;
  */
 public class SequentView extends JEditorPane implements Autoscroll {
             
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 8807311012343029195L;
+
     public static final Color DEFAULT_HIGHLIGHT_COLOR = new Color(70, 100, 170, 76);
 
     public static final Color ADDITIONAL_HIGHLIGHT_COLOR = new Color(0, 0, 0, 38);
 
     public static final Color UPDATE_HIGHLIGHT_COLOR = new Color(0, 150, 130, 38);
+
+    public static final Color DND_HIGHLIGHT_COLOR = new Color(0, 150, 130, 104);
 
     public static final Color BACKGROUND_COLOR = new Color(249, 249, 249);
 
@@ -235,12 +242,12 @@ public class SequentView extends JEditorPane implements Autoscroll {
         try{
             Config.DEFAULT.removeConfigChangeListener(configChangeListener);
         } catch (Throwable e) {
-            Main.getInstance().notify(new GeneralFailureEvent(e.getMessage()));
+            MainWindow.getInstance().notify(new GeneralFailureEvent(e.getMessage()));
         }finally{
             try {
                 super.finalize();
             } catch (Throwable e) {
-                Main.getInstance().notify(new GeneralFailureEvent(e.getMessage()));
+                MainWindow.getInstance().notify(new GeneralFailureEvent(e.getMessage()));
             }
         }
     }

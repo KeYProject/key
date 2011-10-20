@@ -34,13 +34,15 @@ import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.mgt.ProofStatus;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.speclang.DependencyContract;
-import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.util.Pair;
 
 
 public final class ProofManagementDialog extends JDialog {
     
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 3543411893273433386L;
     private static final ImageIcon keyIcon 
         = IconFactory.keyHole(20, 20);
     private static final ImageIcon keyAlmostClosedIcon 
@@ -70,7 +72,7 @@ public final class ProofManagementDialog extends JDialog {
     //-------------------------------------------------------------------------
 
     private ProofManagementDialog(InitConfig initConfig, String title) {
-	super(Main.getInstance(), title, true);
+	super(MainWindow.getInstance(), title, true);
 	this.initConfig = initConfig;
 	this.services   = initConfig.getServices();
 	this.specRepos  = initConfig.getServices().getSpecificationRepository();
@@ -87,7 +89,12 @@ public final class ProofManagementDialog extends JDialog {
 	//create proof list
 	proofList = new JList();
 	proofList.setCellRenderer(new DefaultListCellRenderer() {
-	    public Component getListCellRendererComponent(JList list, 
+	    /**
+         * 
+         */
+        private static final long serialVersionUID = -7810888250050777877L;
+
+        public Component getListCellRendererComponent(JList list, 
 	     					   	  Object value, 
 		     					  int index, 
 		     					  boolean isSelected, 
@@ -244,7 +251,7 @@ public final class ProofManagementDialog extends JDialog {
         getContentPane().setLayout(new BoxLayout(getContentPane(), 
                                                  BoxLayout.Y_AXIS));	
 	pack();
-	final Point mainLoc = Main.getInstance().getLocation();
+	final Point mainLoc = MainWindow.getInstance().getLocation();
 	setLocation(mainLoc.x + 20, mainLoc.y + 20);
     }
     
@@ -409,14 +416,14 @@ public final class ProofManagementDialog extends JDialog {
     private void findOrStartProof(ProofOblInput po) {
         Proof proof = findPreferablyClosedProof(po);
         if(proof == null) {
-            ProblemInitializer pi = Main.getInstance().createProblemInitializer();
+            ProblemInitializer pi = MainWindow.getInstance().createProblemInitializer();
             try {
                 pi.startProver(initConfig, po);
             } catch(ProofInputException exc) {
-        	new ExceptionDialog(Main.getInstance(), exc);
+        	ExceptionDialog.showDialog(MainWindow.getInstance(), exc);
             }
         } else {
-            Main.getInstance().mediator().setProof(proof);
+            MainWindow.getInstance().getMediator().setProof(proof);
         }
         startedProof = true;
     }

@@ -299,7 +299,7 @@ class ResolveTypeDeclaration extends GenericResolutionTransformation {
     private List<Method> getOverriddenMethods(Method method) {
         SourceInfo sourceInfo = getSourceInfo();
 
-        ClassType classType = (ClassType) sourceInfo.getContainingClassType(method);
+        ClassType classType = sourceInfo.getContainingClassType(method);
         List<Type> signature = method.getSignature();
         String name = method.getName();
 

@@ -30,8 +30,12 @@ import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.util.Pair;
 
 
-class ClassTree extends JTree {
+public class ClassTree extends JTree {
     
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -3006761219011776834L;
     private final Map<Pair<KeYJavaType,ObserverFunction>,Icon> targetIcons;
     
     
@@ -50,7 +54,12 @@ class ClassTree extends JTree {
 	getSelectionModel().setSelectionMode(
 				TreeSelectionModel.SINGLE_TREE_SELECTION);
 	setCellRenderer(new DefaultTreeCellRenderer() {
-	    public Component getTreeCellRendererComponent(JTree tree,
+	    /**
+         * 
+         */
+        private static final long serialVersionUID = -6609972972532204432L;
+
+        public Component getTreeCellRendererComponent(JTree tree,
 						      	  Object value,
 						      	  boolean sel,
 						      	  boolean expanded,

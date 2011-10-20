@@ -40,6 +40,11 @@ import de.uka.ilkd.key.util.ExceptionHandlerException;
 
 public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 5124050224007103908L;
+
     // the table showing the instantiations
     private DataTable[] dataTable;
 
@@ -167,6 +172,11 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 	
 	JSplitPane splitPaneBot = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
                                    tacletPanel, downPanel) {
+            /**
+                                     * 
+                                     */
+                                    private static final long serialVersionUID = 2482567227427247871L;
+
             public void setUI(javax.swing.plaf.SplitPaneUI ui) {
                 try{ super.setUI(ui); } catch(NullPointerException e)
 		    { Debug.out("Exception thrown by class TacletMatchCompletionDialog at setUI");}
@@ -177,6 +187,11 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 
 	JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
                                    createTacletDisplay(), splitPaneBot) {
+            /**
+                                     * 
+                                     */
+                                    private static final long serialVersionUID = -8853995169898290919L;
+
             public void setUI(javax.swing.plaf.SplitPaneUI ui) {
                 try{ super.setUI(ui); } catch(NullPointerException e) 
 		    {Debug.out("Exception thrown by class TacletMatchCompletionDialog at setUI"); }
@@ -360,7 +375,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                                 ((SVInstantiationExceptionWithPosition) exc).getColumn(),
                                 ((SVInstantiationExceptionWithPosition) exc).inIfSequent());
 		    }
-		    new ExceptionDialog(TacletMatchCompletionDialog.this, 
+		    ExceptionDialog.showDialog(TacletMatchCompletionDialog.this, 
 		            mediator().getExceptionHandler().getExceptions());
 		    mediator().getExceptionHandler().clear();
 		    return ;
@@ -381,7 +396,11 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
     private static class DataTable extends JTable 
 	implements ModelChangeListener {
 
-	//JTextArea inputArea=new JTextArea("Nothing",3,16);
+	/**
+         * 
+         */
+        private static final long serialVersionUID = 5988602390976062610L;
+        //JTextArea inputArea=new JTextArea("Nothing",3,16);
         JTextArea inputArea=new BracketMatchingTextArea("Nothing",3,16);
 	final InputEditor iEditor = new InputEditor(inputArea);
 	final InputCellRenderer iRenderer = new InputCellRenderer();
@@ -541,7 +560,11 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 
 	class InputEditor extends DefaultCellEditor implements PositionSettable{
 
-	    JPanel editPanel;
+	    /**
+         * 
+         */
+        private static final long serialVersionUID = 1547755822847646366L;
+        JPanel editPanel;
 	    JTextArea textarea;
 
 	    public InputEditor(JTextArea ta) {
@@ -674,7 +697,11 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 
 	class InputCellRenderer extends DefaultTableCellRenderer {
 	    
-	    JTextArea ta=new JTextArea("nothing");
+	    /**
+         * 
+         */
+        private static final long serialVersionUID = -7270236368657110379L;
+        JTextArea ta=new JTextArea("nothing");
 
 	    public Component getTableCellRendererComponent
 		(JTable table, Object obj, 

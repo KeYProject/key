@@ -13,6 +13,10 @@ package de.uka.ilkd.key.parser;
 import antlr.Token;
 
 public class NotDeclException extends antlr.SemanticException {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -237567578063439448L;
     String cat;
     String undeclared_symbol;
     String addtl;

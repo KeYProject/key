@@ -39,6 +39,7 @@ public abstract class ClassAxiom implements SpecificationElement {
         
 
     protected static final TermBuilder TB = TermBuilder.DF;
+    protected String displayName;
     
     public static Pair<Term, ImmutableSet<Taclet>> limitTerm(Term t, ImmutableSet<Pair<Sort, ObserverFunction>> toLimit, Services services) {
         ImmutableSet<Taclet> taclets = DefaultImmutableSet.nil();
@@ -163,25 +164,25 @@ public abstract class ClassAxiom implements SpecificationElement {
         	= new HashMap<VariableSV,VariableSV>(); 
         for(VariableSV sv : intermediateRes.second) {
             if(namesOfNewSVs.contains(sv.name())) {
-        	//choose alternative name
-        	final String baseName = sv.name().toString();
-        	int i = 0;
-        	Name newName;
-        	do {
-        	    newName = new Name(baseName + "_" + i++);
-        	} while(usedNames.contains(newName));
-        	
-        	//create new SV, register in replace map
-        	final VariableSV newSV 
-        		= SchemaVariableFactory.createVariableSV(newName, 
-        							 sv.sort());
-        	newSVs = newSVs.add(newSV);
-        	namesOfNewSVs.add(sv.name());
-        	usedNames.add(sv.name());
-        	replaceMap.put(sv, newSV);
+                //choose alternative name
+                final String baseName = sv.name().toString();
+                int i = 0;
+                Name newName;
+                do {
+                    newName = new Name(baseName + "_" + i++);
+                } while(usedNames.contains(newName));
+
+                //create new SV, register in replace map
+                final VariableSV newSV 
+                = SchemaVariableFactory.createVariableSV(newName, 
+                        sv.sort());
+                newSVs = newSVs.add(newSV);
+                namesOfNewSVs.add(newSV.name());
+                usedNames.add(newSV.name());
+                replaceMap.put(sv, newSV);
             } else {
-        	newSVs = newSVs.add(sv);
-        	namesOfNewSVs.add(sv.name());
+                newSVs = newSVs.add(sv);
+                namesOfNewSVs.add(sv.name());
             }
         }
         final OpReplacer or = new OpReplacer(replaceMap);
@@ -212,4 +213,9 @@ public abstract class ClassAxiom implements SpecificationElement {
     public abstract ImmutableSet<Taclet> getTaclets(
 	    		ImmutableSet<Pair<Sort, ObserverFunction>> toLimit,
 	    		Services services);    
+
+    @Override
+    public String getDisplayName() {
+        return displayName == null ? getName() : displayName;
+    }
 }

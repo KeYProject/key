@@ -14,4 +14,5 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationException;
  */
 public interface JMLTranslationMethod {
     public Object translate(Object ... params) throws SLTranslationException;
+
 }

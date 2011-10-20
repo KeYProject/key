@@ -105,9 +105,8 @@ public class DefaultGoalChooser implements IGoalChooser {
          * ProofTreeEvent.  In other words, that node should no longer
          * have any children now.  Any nodes that were not descendants of
          * that node are unaffected.*/
-        public void proofPruned(ProofTreeEvent e) {
-            ProofTreeRemovedNodeEvent removeEvent = (ProofTreeRemovedNodeEvent)e;
-            currentSubtreeRoot = removeEvent.getNode();
+        public void proofPruned(ProofTreeEvent e) {            
+            currentSubtreeRoot = e.getNode();
             setupGoals ( proof.getSubtreeGoals(proof.root()) );
         }
     }

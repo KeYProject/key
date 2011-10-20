@@ -12,7 +12,7 @@ package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.gui.ContractConfigurator;
-import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
@@ -141,39 +141,40 @@ public final class UseOperationContractRule implements BuiltInRule {
     
     
     private static ProgramMethod getProgramMethod(
-	    				   MethodOrConstructorReference mr,
-	    				   KeYJavaType staticType, 
-	    				   ExecutionContext ec,
-	    				   Services services) {
-	ProgramMethod result;	
-	if(mr instanceof MethodReference) { //from MethodCall.java
-	    MethodReference methRef = (MethodReference) mr;
-	    if(ec != null) {
-		result = methRef.method(services, staticType, ec);
-		if(result == null) {
-		    // if a method is declared protected and prefix and
-		    // execContext are in different packages we have to
-		    // simulate visibility rules like being in prefixType
-		    result = methRef.method(services, 
-			    staticType, 
-			    methRef.getMethodSignature(services, ec), 
-			    staticType);
-		}
-	    } else {
-		result = methRef.method(services, 
-			staticType, 
-			methRef.getMethodSignature(services, ec), 
-			staticType);
-	    }
-	} else {
-	    New n = (New) mr;
-	    ImmutableList<KeYJavaType> sig = ImmutableSLList.<KeYJavaType>nil();
-	    for(Expression e : n.getArguments()) {
-		sig = sig.append(e.getKeYJavaType(services, ec));
-	    }
-	    result = services.getJavaInfo().getConstructor(staticType, sig);
-	}
-	return result;
+            MethodOrConstructorReference mr,
+            KeYJavaType staticType, 
+            ExecutionContext ec,
+            Services services) {
+        ProgramMethod result;	
+        if(mr instanceof MethodReference) { //from MethodCall.java
+            MethodReference methRef = (MethodReference) mr;
+            if(ec != null) {
+                result = methRef.method(services, staticType, ec);
+                if(result == null) {
+                    // if a method is declared protected and prefix and
+                    // execContext are in different packages we have to
+                    // simulate visibility rules like being in prefixType
+                    result = methRef.method(services, 
+                            staticType, 
+                            methRef.getMethodSignature(services, ec), 
+                            staticType);
+                }
+            } else {
+                result = methRef.method(services, 
+                        staticType, 
+                        methRef.getMethodSignature(services, ec), 
+                        staticType);
+            }
+        } else {
+            New n = (New) mr;
+            ImmutableList<KeYJavaType> sig = ImmutableSLList.<KeYJavaType>nil();
+            for(Expression e : n.getArguments()) {
+                sig = sig.append(e.getKeYJavaType(services, ec));
+            }
+            result = services.getJavaInfo().getConstructor(staticType, sig);
+            assert result != null;
+        }
+        return result;
     }
     
     
@@ -256,14 +257,14 @@ public final class UseOperationContractRule implements BuiltInRule {
 	    }
 	}
 	assert !contracts.isEmpty();
-        if(Main.getInstance().mediator().autoMode()) {
+        if(MainWindow.getInstance().getMediator().autoMode()) {
             return services.getSpecificationRepository()
                            .combineOperationContracts(contracts);
         } else {
             FunctionalOperationContract[] contractsArr 
             	= contracts.toArray(new FunctionalOperationContract[contracts.size()]);
             ContractConfigurator cc 
-                    = new ContractConfigurator(Main.getInstance(),
+                    = new ContractConfigurator(MainWindow.getInstance(),
                                                services,
                                                contractsArr,
                                                "Contracts for " + pm.getName(),
@@ -440,51 +441,48 @@ public final class UseOperationContractRule implements BuiltInRule {
 	    return null;
 	}
 	final Modality mod = (Modality) progPost.op();
-	
-        //active statement must be method call or new
-        final Pair<Expression,MethodOrConstructorReference> methodCall
-        	= getMethodCall(progPost.javaBlock(), services);
-        if(methodCall == null) {
-            return null;
-        }
-        final Expression actualResult = methodCall.first;        
-        final MethodOrConstructorReference mr = methodCall.second;        
-      
-        //arguments of method call must be simple expressions
+
+	//active statement must be method call or new
+	final Pair<Expression,MethodOrConstructorReference> methodCall
+	= getMethodCall(progPost.javaBlock(), services);
+	if(methodCall == null) {
+	    return null;
+	}
+	final Expression actualResult = methodCall.first;        
+	final MethodOrConstructorReference mr = methodCall.second;        
+    assert mr != null;
+	//arguments of method call must be simple expressions
 	final ExecutionContext ec 
-		= MiscTools.getInnermostExecutionContext(progPost.javaBlock(), 
-						   	 services); 	        
-        for(Expression arg : mr.getArguments()) {
-            if(!ProgramSVSort.SIMPLEEXPRESSION
-        	             .canStandFor(arg, ec, services)) {
-        	return null;
-            }
-        }
- 
-        //collect further information
+	= MiscTools.getInnermostExecutionContext(progPost.javaBlock(), 
+	        services); 	        
+	for(Expression arg : mr.getArguments()) {
+	    if(!ProgramSVSort.SIMPLEEXPRESSION
+	            .canStandFor(arg, ec, services)) {
+	        return null;
+	    }
+	}
+
+	//collect further information
 	final KeYJavaType staticType = getStaticPrefixType(mr, services, ec);
 	assert staticType != null;
 	final ProgramMethod pm = getProgramMethod(mr, 
-		                                  staticType,
-		                                  ec, 
-		                                  services);
-	assert pm != null;
-	final Term actualSelf 
-		= getActualSelf(mr, pm, ec, services);
-	final ImmutableList<Term> actualParams
-		= getActualParams(mr, ec, services);
-	
+	        staticType,
+	        ec, 
+	        services);
+	assert pm != null : "Getting program method failed.\nReference: "+mr+", static type: "+staticType+", execution context: "+ec;
+	final Term actualSelf = getActualSelf(mr, pm, ec, services);
+	final ImmutableList<Term> actualParams  = getActualParams(mr, ec, services);
+
 	//cache and return result
-	final Instantiation result
-		= new Instantiation(u, 
-			     	    progPost, 
-			     	    mod,
-			     	    actualResult,
-			     	    actualSelf,
-			     	    staticType,
-			     	    mr,
-			     	    pm,
-			     	    actualParams);
+	final Instantiation result = new Instantiation(u, 
+	        progPost, 
+	        mod,
+	        actualResult,
+	        actualSelf,
+	        staticType,
+	        mr,
+	        pm,
+	        actualParams);
 	return result;
     }
     
@@ -635,9 +633,9 @@ public final class UseOperationContractRule implements BuiltInRule {
             preGoal = result.head();
             nullGoal = null;
         }
-        preGoal.setBranchLabel("Pre");
-        postGoal.setBranchLabel("Post");
-        excPostGoal.setBranchLabel("Exceptional Post");
+        preGoal.setBranchLabel("Pre"+ " ("+contract.getTarget().getName()+")");
+        postGoal.setBranchLabel("Post"+ " ("+contract.getTarget().getName()+")");
+        excPostGoal.setBranchLabel("Exceptional Post"+ " ("+contract.getTarget().getName()+")");
         
         //prepare common stuff for the three branches
         final Triple<Term,Term,Term> anonAssumptionAndUpdateAndHeap 

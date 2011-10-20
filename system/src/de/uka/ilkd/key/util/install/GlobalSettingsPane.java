@@ -22,6 +22,11 @@ import javax.swing.*;
  */
 public class GlobalSettingsPane extends InstallationPane {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 8493173164648301677L;
+
     private InstallationPathChooser[] installPath=
 	new InstallationPathChooser [ 2 ];
 

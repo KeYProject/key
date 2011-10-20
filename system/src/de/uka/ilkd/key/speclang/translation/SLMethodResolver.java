@@ -59,7 +59,7 @@ public final class SLMethodResolver extends SLExpressionResolver {
         Term recTerm = receiver.getTerm(); 
         
         
-        while(pm == null) {
+        while (true) {
             pm = javaInfo.getToplevelPM(containingType, methodName, signature);
             LocationVariable et = (LocationVariable) javaInfo.getAttribute(
                     ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, containingType);

@@ -55,6 +55,7 @@ header {
   import de.uka.ilkd.key.java.StatementBlock;
   import de.uka.ilkd.key.java.declaration.VariableDeclaration;
   import de.uka.ilkd.key.java.recoderext.*;
+  import de.uka.ilkd.key.java.recoderext.adt.*;
   import de.uka.ilkd.key.pp.AbbrevMap;
   import de.uka.ilkd.key.pp.LogicPrinter;
 }
@@ -239,7 +240,7 @@ options {
 		     Services services,
 		     NamespaceSet nss) {
 	this(mode, lexer, 
-	     new Recoder2KeY(
+	     new Recoder2KeY(services,
 		new KeYCrossReferenceServiceConfiguration(
 		   services.getExceptionHandler()), 
 		services.getJavaInfo().rec2key(), new NamespaceSet(), 
@@ -3451,6 +3452,7 @@ varexp[TacletBuilder b]
     | varcond_enum_const[b] 
     | varcond_free[b]  
     | varcond_hassort[b]
+    | varcond_fieldtype[b]
     | varcond_equalUnique[b]
     | varcond_new[b]
     | varcond_newlabel[b] 
@@ -3674,6 +3676,36 @@ varcond_hassort [TacletBuilder b]
      }
    }
 ;
+
+varcond_fieldtype [TacletBuilder b]
+{
+    ParsableVariable x = null;
+    Sort s = null;
+}
+:
+    FIELDTYPE
+    LPAREN
+    x=varId
+    COMMA 
+    s=any_sortId_check[true] 
+    RPAREN
+    {
+        if(!(s instanceof GenericSort)) {
+            throw new GenericSortException("sort",
+                                        "Generic sort expected", 
+                                        s,
+                                        getFilename(),
+                                        getLine(), 
+                                        getColumn());
+        } else if(!FieldTypeToSortCondition.checkSortedSV((SchemaVariable)x)) {
+            semanticError("Expected schema variable of kind EXPRESSION or TYPE, " 
+                          + "but is " + x);
+        } else {
+            b.addVariableCondition(new FieldTypeToSortCondition((SchemaVariable)x, 
+                                                               (GenericSort)s));
+        }
+    }
+;      
 
 varcond_enumtype [TacletBuilder b, boolean negated]
 {
@@ -4248,11 +4280,12 @@ proofBody [ProblemLoader prl] :
     ;
 
 
-pseudosexpr [ProblemLoader prl] { char eid='0'; String str = null; } :
+pseudosexpr [ProblemLoader prl] { char eid='0'; String str = ""; } :
         LPAREN (eid=expreid
-            (str = string_literal { prl.beginExpr(eid,str); } )? 
+            (str = string_literal )? 
+               { prl.beginExpr(eid,str); } 
             ( pseudosexpr[prl] )* ) ?
-        { prl.endExpr(eid, stringLiteralLine); }
+               { prl.endExpr(eid, stringLiteralLine); }
         RPAREN   
     ;
 

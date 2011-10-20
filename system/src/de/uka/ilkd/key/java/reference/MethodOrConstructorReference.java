@@ -22,5 +22,5 @@ public interface MethodOrConstructorReference extends MemberReference,
     /**
      * @return the array wrapper of the argument expressions .
      */
-    ImmutableArray<Expression> getArguments();
+    ImmutableArray<? extends Expression> getArguments();
 }

@@ -33,23 +33,23 @@ public final class DependencyContractImpl implements DependencyContract {
     
     private static final TermBuilder TB = TermBuilder.DF;
     
-    private final String baseName;    
-    private final String name;
-    private final KeYJavaType kjt;
-    private final ObserverFunction target;
-    private final Term originalPre;
-    private final Term originalMby;    
-    private final Term originalDep;
-    private final ProgramVariable originalSelfVar;
-    private final ImmutableList<ProgramVariable> originalParamVars;
-    private final int id;    
+    final String baseName;    
+    final String name;
+    final KeYJavaType kjt;
+    final ObserverFunction target;
+    final Term originalPre;
+    final Term originalMby;    
+    final Term originalDep;
+    final ProgramVariable originalSelfVar;
+    final ImmutableList<ProgramVariable> originalParamVars;
+    final int id;    
     
 
     //-------------------------------------------------------------------------
     //constructors
     //-------------------------------------------------------------------------
     
-    private DependencyContractImpl(String baseName,
+    DependencyContractImpl(String baseName,
 	                           String name, 
 	                           KeYJavaType kjt,
 	    			   ObserverFunction target,
@@ -63,7 +63,7 @@ public final class DependencyContractImpl implements DependencyContract {
 	assert kjt != null;
 	assert target != null;
 	assert pre != null;
-	assert dep != null;
+	assert dep != null : "cannot create contract "+baseName+" for "+target+" when no specification is given";
         assert (selfVar == null) == target.isStatic();
         assert paramVars != null;
         assert paramVars.size() == target.arity() - (target.isStatic() ? 1 : 2);
@@ -86,7 +86,7 @@ public final class DependencyContractImpl implements DependencyContract {
     }
     
     
-    public DependencyContractImpl(String baseName, 
+    DependencyContractImpl(String baseName, 
 	                          KeYJavaType kjt,
 	    			  ObserverFunction target,
 	    			  Term pre,
@@ -224,39 +224,7 @@ public final class DependencyContractImpl implements DependencyContract {
 	OpReplacer or = new OpReplacer(map);
 	return or.replace(originalMby);
     }    
-    
-    
-    @Override
-    public DependencyContract setID(int newId) {
-        return new DependencyContractImpl(baseName,
-        	                          null,
-                			  kjt,        	                         
-                			  target,
-                			  originalPre,
-                			  originalMby,                			  
-                			  originalDep,
-                			  originalSelfVar,
-                			  originalParamVars,
-                			  newId);	
-    }
-    
-    
-    @Override
-    public DependencyContract setTarget(KeYJavaType newKJT,
-	    		      	        ObserverFunction newTarget, 
-	    		      	        Services services) {
-        return new DependencyContractImpl(baseName,
-        				  null,
-                			  newKJT,        				 
-                			  newTarget,
-                			  originalPre,
-                			  originalMby,                			  
-                			  originalDep,
-                			  originalSelfVar,
-                			  originalParamVars,
-                			  id);	
-    }        
-    
+   
     
     @Override
     public String getHTMLText(Services services) {

@@ -25,6 +25,7 @@ import recoder.java.reference.VariableReference;
 import recoder.kit.TwoPassTransformation;
 import recoder.service.DefaultCrossReferenceSourceInfo;
 import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.java.recoderext.adt.*;
 
 /**
  * The Java DL requires some implicit fields, that are available in each
@@ -163,7 +164,7 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
                 (Identifier)td.getIdentifier().deepClone();*/
         
 	if (td.getIdentifier() != null) {
-	    return (Identifier)td.getIdentifier().deepClone();
+	    return td.getIdentifier().deepClone();
 	}
 	
 	final ClassType firstActualSupertype = getAllSupertypes(td).get(1);

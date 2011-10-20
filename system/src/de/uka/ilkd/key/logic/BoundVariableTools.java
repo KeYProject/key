@@ -46,7 +46,7 @@ public class BoundVariableTools {
                  != newBoundVars.get ( i ) ) {
                 final Term newVarTerm =
                     tf.createTerm
-                    ( (LogicVariable)newBoundVars.get ( i ) );
+                    ( newBoundVars.get ( i ) );
                 final ClashFreeSubst subst =
                     new ClashFreeSubst ( oldBoundVars.get ( i ),
                                          newVarTerm );
@@ -252,11 +252,11 @@ public class BoundVariableTools {
         for ( int i = 0; i != ar0.size (); ++i ) {
             QuantifiableVariable pv0 = ar0.get ( i );            
             if ( variableRenaming.containsKey ( pv0 ) )
-                pv0 = (QuantifiableVariable)variableRenaming.get ( pv0 );
+                pv0 = variableRenaming.get ( pv0 );
                 
             QuantifiableVariable pv1 = ar1.get ( i );
             if ( variableRenaming.containsKey ( pv1 ) )
-                pv1 = (QuantifiableVariable)variableRenaming.get ( pv1 );
+                pv1 = variableRenaming.get ( pv1 );
             
             if ( pv0 != pv1 ) {
                 // introduce a new variable
