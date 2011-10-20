@@ -201,17 +201,25 @@ public final class WhileInvariantRule implements BuiltInRule {
 	final KeYJavaType intKJT 
 		= services.getJavaInfo()
 	                  .getPrimitiveKeYJavaType(PrimitiveType.JAVA_INT);
-	
 	//get instantiation
 	Instantiation inst = instantiate(ruleApp.posInOccurrence().subTerm(), 
 				         services);
-	final Term heapAtMethodPre = inst.inv.getInternalHeapAtPre();
-	final Term invTerm         = inst.inv.getInvariant(inst.selfTerm, 
-		 	                                   heapAtMethodPre, null,
-		 	                                   services);
+    final boolean transaction = (inst.progPost.op() == Modality.DIA_TRANSACTION || inst.progPost.op() == Modality.BOX_TRANSACTION); 
+
+    final Term heapAtMethodPre = inst.inv.getInternalHeapAtPre();
+    final Term savedHeapAtMethodPre = inst.inv.getInternalSavedHeapAtPre();
+    final Term regularInv = inst.inv.getInvariant(inst.selfTerm, heapAtMethodPre, null, services);
+    final Term transactionInv = transaction ? inst.inv.getInvariant(inst.selfTerm, heapAtMethodPre, savedHeapAtMethodPre, services) : null;
+    // NOTE even when a transaction is on, the transactionInv can still be null (no loop_invariant_transaction given)
+	final Term invTerm  = transactionInv != null ?
+	     TB.and(regularInv, transactionInv) : regularInv;
 	final Term mod = inst.inv.getModifies(inst.selfTerm, 
 					      heapAtMethodPre, null, 
 					      services);
+	// This on the other hand should never be null
+    final Term modBackup = inst.inv.getModifies(inst.selfTerm, 
+            heapAtMethodPre, savedHeapAtMethodPre, 
+            services);
 	final Term variant = inst.inv.getVariant(inst.selfTerm, 
 						 heapAtMethodPre, 
 						 services);
@@ -240,6 +248,16 @@ public final class WhileInvariantRule implements BuiltInRule {
 	Term beforeLoopUpdate = TB.elementary(services, 
 					      heapBeforeLoop, 
 				              TB.heap(services));
+    final Map<Term,Term> savedToBeforeLoop = new HashMap<Term,Term>();
+	if(transaction) {
+	    final LocationVariable savedHeapBeforeLoop
+	        = TB.heapAtPreVar(services, "savedHeapBeforeLoop", true);
+	    beforeLoopUpdate = TB.parallel(beforeLoopUpdate, TB.elementary(services, 
+                savedHeapBeforeLoop, 
+                    TB.savedHeap(services)));
+	    savedToBeforeLoop.put(TB.savedHeap(services), TB.var(savedHeapBeforeLoop));
+        savedToBeforeLoop.put(TB.heap(services), TB.var(savedHeapBeforeLoop));
+	}
 	final Map<Term,Term> normalToBeforeLoop = new HashMap<Term,Term>();
 	normalToBeforeLoop.put(TB.heap(services), TB.var(heapBeforeLoop));
 	for(ProgramVariable pv : localOuts) {
@@ -259,11 +277,27 @@ public final class WhileInvariantRule implements BuiltInRule {
 	//prepare anon update, frame condition
 	final Pair<Term,Term> anonUpdateAndHeap 
 		= createAnonUpdate(inst.loop, mod, localOuts, services);
-	final Term anonUpdate = anonUpdateAndHeap.first;
-	final Term anonHeap   = anonUpdateAndHeap.second;
-	final Term frameCondition = TB.frame(services, TB.heap(services),
-		                             normalToBeforeLoop, 
-		                             mod);
+	final Term anonUpdate;
+	final Term anonHeapWellFormed;
+	if(transaction) {
+	    final Pair<Term,Term> anonUpdateAndHeapSaved  
+	      = createAnonUpdate(inst.loop, modBackup, null, services);
+	  anonUpdate = TB.parallel(anonUpdateAndHeap.first, anonUpdateAndHeapSaved.first);
+	  anonHeapWellFormed   = TB.and(TB.wellFormed(services, anonUpdateAndHeap.second), TB.wellFormed(services, anonUpdateAndHeapSaved.second));
+	}else{
+	  anonUpdate = anonUpdateAndHeap.first;
+	  anonHeapWellFormed   = TB.wellFormed(services, anonUpdateAndHeap.second);	    
+	}
+
+	final Term normalFrameCondition = TB.frame(services, TB.heap(services),
+               normalToBeforeLoop, 
+               mod);
+	final Term transactionFrameCondition = transaction ?
+	          TB.frame(services, TB.savedHeap(services), savedToBeforeLoop, modBackup)
+	        : null;
+
+	final Term frameCondition = transactionFrameCondition != null ?
+	        TB.and(normalFrameCondition,transactionFrameCondition) : normalFrameCondition;
 	
 	//prepare variant
 	final ProgramElementName variantName 
@@ -271,7 +305,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 	final LocationVariable variantPV = new LocationVariable(variantName, 
 								intKJT);
 	services.getNamespaces().programVariables().addSafely(variantPV);
-	final boolean dia = inst.progPost.op() == Modality.DIA;
+	final boolean dia = (inst.progPost.op() == Modality.DIA || inst.progPost.op() == Modality.DIA_TRANSACTION);
 	final Term variantUpdate 
 		= dia ? TB.elementary(services, variantPV, variant) : TB.skip();
 	final Term variantNonNeg 
@@ -348,8 +382,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         //                         (\[{ method-frame(#ex):{#typeof(#e) #v1 = #e;} }\]#v1=TRUE ->
         //                          #whileInvRule(\[{.. while (#e) #s ...}\]post, 
         //                               #locDepFunc(anon1, \[{.. while (#e) #s ...}\]post) & inv)),anon1));
-	bodyGoal.addFormula(new SequentFormula(TB.wellFormed(services, 
-		 	    					 anonHeap)), 
+	bodyGoal.addFormula(new SequentFormula(anonHeapWellFormed), 
 		 	    true, 
 		 	    false);		
 
@@ -390,13 +423,12 @@ public final class WhileInvariantRule implements BuiltInRule {
 	// \replacewith (==> #introNewAnonUpdate(#modifies, inv ->
 	// (\[{ method-frame(#ex):{#typeof(#e) #v1 = #e;} }\]
 	// (#v1=FALSE -> \[{.. ...}\]post)),anon2))
-	useGoal.addFormula(new SequentFormula(TB.wellFormed(services, 
-		 						anonHeap)), 
+	useGoal.addFormula(new SequentFormula(anonHeapWellFormed), 
 		 	   true, 
 		 	   false);		
 	useGoal.addFormula(new SequentFormula(uAnonInv), true, false);
 
-	Term restPsi = TB.prog(dia ? Modality.DIA : Modality.BOX,
+	Term restPsi = TB.prog((Modality)inst.progPost.op(),
 			       MiscTools.removeActiveStatement(
 				       	inst.progPost.javaBlock(), 
 					services), 
