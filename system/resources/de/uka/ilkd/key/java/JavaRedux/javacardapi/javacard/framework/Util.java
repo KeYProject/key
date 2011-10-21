@@ -7,11 +7,15 @@ public class Util {
            requires JCSystem.npe != null;
            requires JCSystem.aioobe != null;
            requires JCSystem.isTransient(dest) != JCSystem.NOT_A_TRANSIENT_OBJECT ==> !\transactionUpdated(dest);
+           requires src.length < 32768;
+           requires dest.length < 32768;
            ensures \result == destOffset + length;
            ensures (\forall short i; i>=0 && i<length; dest[destOffset + i] == \old(src[srcOffset + i]));
-           ensures (JCSystem.isTransient(dest) == JCSystem.NOT_A_TRANSIENT_OBJECT && \transactionUpdated(dest)) ?  
-              (\forall short i; i>=0 && i<length; \backup(dest[destOffset + i]) == \old(\backup(dest[destOffset + i])))
-            : (\forall short i; i>=0 && i<length; \backup(dest[destOffset + i]) == \old(src[srcOffset + i]));
+           ensures (\forall short i; i>=0 && i<length; \backup(dest[destOffset + i]) == 
+                 ((JCSystem.isTransient(dest) == JCSystem.NOT_A_TRANSIENT_OBJECT && \transactionUpdated(dest)) ?  
+                    \old(\backup(dest[destOffset + i]))
+                  : \old(src[srcOffset + i]))
+              );
            signals (NullPointerException npe) npe == JCSystem.npe && (src == null || dest == null);
            signals (ArrayIndexOutOfBoundsException aioobe) aioobe == JCSystem.aioobe && (length < 0 ||
                srcOffset < 0 || destOffset < 0 ||
@@ -25,6 +29,8 @@ public class Util {
          public behavior
            requires JCSystem.npe != null;
            requires JCSystem.aioobe != null;
+           requires src.length < 32768;
+           requires dest.length < 32768;
            ensures \result == destOffset + length;
            ensures (\forall short i; i>=0 && i<length; dest[destOffset + i] == \old(src[srcOffset + i]));
            signals (NullPointerException npe) npe == JCSystem.npe && (src == null || dest == null);
@@ -59,14 +65,17 @@ public class Util {
              loop_invariant i >= 0 && i <= length &&
                 srcOffset + i >= 0 && srcOffset + i <= src.length &&
                 destOffset + i >= 0 && destOffset + i <= dest.length &&
-               (\forall short j; j>=0 && j<i; dest[destOffset + j] == \old(src[srcOffset + j])) &&
-               (\forall short j; j>=i && j<length; dest[destOffset + j] == \old(dest[destOffset + j]));
+               (\forall short j; j >= 0 && j< length;
+                   dest[destOffset + j] == (j<i ? \old(src[srcOffset + j]) : \old(dest[destOffset + j]))
+               )
+             ;
              loop_invariant_transaction
-                 (\transactionUpdated(dest) ?
-                   (\forall short j; j>=0 && j<i; \backup(dest[destOffset + j]) == \old(\backup(dest[destOffset + j])))
-                 :
-                   (\forall short j; j>=0 && j<i; \backup(dest[destOffset + j]) == \old(src[srcOffset + j])))
-               && (\forall short j; j>=i && j<length; \backup(dest[destOffset + j]) == \old(\backup(dest[destOffset + j])));
+               (\forall short j; j >= 0 && j < length; 
+                  \backup(dest[destOffset + j]) ==
+                    ((j >= i || \transactionUpdated(dest)) ?
+                        \old(\backup(dest[destOffset + j])) :
+                        \old(src[srcOffset + j]))
+               );
              decreases length - i;
              assignable dest[destOffset..destOffset+length-1];
              assignable_backup dest[destOffset..destOffset+length-1];
@@ -77,19 +86,20 @@ public class Util {
         }else{
           /*@
              loop_invariant i >= 0 && i <= length &&
-                srcOffset + length - i >= 0 && srcOffset + length - i <= src.length &&
-                destOffset + length - i >= 0 && destOffset + length - i <= dest.length &&
-                (\forall short j; j >= 0 && j < length - i; dest[destOffset + j] == \old(dest[destOffset + j])) && 
-                (\forall short j; j >= length - i && j < length; dest[destOffset + j] == \old(src[srcOffset + j]))
+                srcOffset + length - i >= 0 && srcOffset + length - i  <= src.length &&
+                destOffset + length - i >= 0 && destOffset + length - i <= dest.length
+                &&
+                (\forall short j; j >= 0 && j < length; 
+                    dest[destOffset + j] == (j >= length - i ? \old(src[srcOffset + j]) : \old(dest[destOffset + j]))
+                )
              ;
              loop_invariant_transaction
-                 (\transactionUpdated(dest) ?
-                   (\forall short j; j >= 0 && j < length - i;
-                        \backup(dest[destOffset + j]) == \old(\backup(dest[destOffset + j])))
-                 :
-                   (\forall short j; j >= length - i && j < length; \backup(dest[destOffset + j]) == \old(src[srcOffset + j])))
-               && (\forall short j; j >= 0 && j < length - i;
-                                \backup(dest[destOffset + j]) == \old(\backup(dest[destOffset + j])));
+               (\forall short j; j >= 0 && j < length; 
+                  \backup(dest[destOffset + j]) ==
+                    ((j < length - i || \transactionUpdated(dest)) ?
+                        \old(\backup(dest[destOffset + j])) :
+                        \old(src[srcOffset + j]))
+               );
              decreases length - i;
              assignable dest[destOffset..destOffset+length-1];
              assignable_backup dest[destOffset..destOffset+length-1];
