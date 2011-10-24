@@ -52,7 +52,11 @@ public class JavaIntegerSemanticsHelper {
     //-------------------------------------------------------------------------
 
     private void raiseError(String message) throws SLTranslationException {
-	throw excManager.createException(message);
+        throw excManager.createException(message);
+    }
+    
+    private void raiseError(String message, Exception e) throws SLTranslationException {
+        throw excManager.createException(message, e);
     }
     
     
@@ -94,7 +98,7 @@ public class JavaIntegerSemanticsHelper {
 	    return new SLExpression(TB.func(or, a.getTerm(), b.getTerm()), 
 		                    resultType);
 	} catch (RuntimeException e) {
-            raiseError("Error in or-expression " + a + " | " + b + ".");
+            raiseError("Error in or-expression " + a + " | " + b + ".",e);
             return null; //unreachable
         }
     }
@@ -113,7 +117,7 @@ public class JavaIntegerSemanticsHelper {
 	    return new SLExpression(TB.func(and, a.getTerm(), b.getTerm()),
 		                    resultType);
 	} catch (RuntimeException e) {
-            raiseError("Error in and-expression " + a + " & " + b + ".");
+            raiseError("Error in and-expression " + a + " & " + b + ".",e);
             return null; //unreachable
         }
     }
@@ -132,7 +136,7 @@ public class JavaIntegerSemanticsHelper {
 	    return new SLExpression(TB.func(xor, a.getTerm(), b.getTerm()),
 		                    resultType);
 	} catch (RuntimeException e) {
-            raiseError("Error in xor-expression " + a + " ^ " + b + ".");
+            raiseError("Error in xor-expression " + a + " ^ " + b + ".",e);
             return null; //unreachable
         }
     }
@@ -146,7 +150,7 @@ public class JavaIntegerSemanticsHelper {
 	    return new SLExpression(TB.func(neg, a.getTerm()),
 		                    a.getType());
 	} catch (RuntimeException e) {
-            raiseError("Error in neg-expression " + a + ".");
+            raiseError("Error in neg-expression " + a + ".",e);
             return null; //unreachable
         }
     }
@@ -168,8 +172,7 @@ public class JavaIntegerSemanticsHelper {
             return new SLExpression(TB.func(add, a.getTerm(), b.getTerm()),
                     resultType);
         } catch (RuntimeException e) {
-            raiseError("Error in additive expression " + a + " + " + b + ":" 
-                    + e.getMessage());
+            raiseError("Error in additive expression " + a + " + " + b + ":",e);
             return null; //unreachable
         }
     }
@@ -191,7 +194,7 @@ public class JavaIntegerSemanticsHelper {
             return new SLExpression(TB.func(sub, a.getTerm(), b.getTerm()),
                     resultType);
         } catch (RuntimeException e) {
-            raiseError("Error in subtract expression " + a + " - " + b + ".");
+            raiseError("Error in subtract expression " + a + " - " + b + ".",e);
             return null; //unreachable            
         }
     }
@@ -214,7 +217,7 @@ public class JavaIntegerSemanticsHelper {
                     resultType);
         } catch (RuntimeException e) {
             raiseError("Error in multiplicative expression " + a + " * "
-                    + b + ".");
+                    + b + ".",e);
             return null; //unreachable            
         }
     }
@@ -235,7 +238,7 @@ public class JavaIntegerSemanticsHelper {
             return new SLExpression(TB.func(div, a.getTerm(), b.getTerm()),
                     resultType);
         } catch (RuntimeException e) {
-            raiseError("Error in division expression " + a + " / " + b + ".");
+            raiseError("Error in division expression " + a + " / " + b + ".",e);
             return null; //unreachable            
         }
     }
@@ -253,7 +256,7 @@ public class JavaIntegerSemanticsHelper {
                 return new SLExpression(TB.func(integerLDT.getJavaMod(), a.getTerm(), b.getTerm()),
                         a.getType());
         } catch (RuntimeException e) {
-            raiseError("Error in modulo expression " + a + " % " + b + ".");
+            raiseError("Error in modulo expression " + a + " % " + b + ".",e);
             return null; //unreachable            
         }        
     }
@@ -272,7 +275,7 @@ public class JavaIntegerSemanticsHelper {
                     resultType);
         } catch (RuntimeException e) {
             raiseError("Error in shift-right expression " + a + " >> " 
-                    + b + ".");
+                    + b + ".",e);
             return null; //unreachable            
         }
     }
@@ -291,7 +294,7 @@ public class JavaIntegerSemanticsHelper {
                     resultType);
         } catch (RuntimeException e) {
             raiseError("Error in shift-left expression " + a + " << " 
-                    + b + ".");
+                    + b + ".",e);
             return null; //unreachable            
         }
     }
@@ -311,7 +314,7 @@ public class JavaIntegerSemanticsHelper {
                     resultType);
         } catch (RuntimeException e) {
             raiseError("Error in unsigned shift-right expression " + a + " >>> "
-                    + b + ".");
+                    + b + ".",e);
             return null; //unreachable            
         }
     }
@@ -332,7 +335,7 @@ public class JavaIntegerSemanticsHelper {
             return new SLExpression(TB.func(minus, a.getTerm()),
                     resultType);
         } catch (RuntimeException e) {
-            raiseError("Error in unary minus expression -" + a + ".");
+            raiseError("Error in unary minus expression -" + a + ".",e);
             return null; //unreachable            
         }
     }
@@ -357,7 +360,7 @@ public class JavaIntegerSemanticsHelper {
 	        return new SLExpression(a.getTerm(), resultType);
 	    }
         } catch (RuntimeException e) {
-            raiseError("Error in cast expression -" + a + ".");
+            raiseError("Error in cast expression -" + a + ".",e);
             return null; //unreachable            
         }
     }    
