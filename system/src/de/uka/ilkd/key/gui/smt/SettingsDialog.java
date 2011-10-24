@@ -21,6 +21,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
+import de.uka.ilkd.key.gui.IconFactory;
+
 
 
 class OptionContentNode extends DefaultMutableTreeNode{
@@ -103,6 +105,7 @@ public class SettingsDialog extends JDialog{
                 this.getContentPane().setPreferredSize(computePreferredSize(model));
                 this.setLocationByPlatform(true);
                 this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+                setIconImage(IconFactory.keyLogo());
                 this.pack();
         }
         
