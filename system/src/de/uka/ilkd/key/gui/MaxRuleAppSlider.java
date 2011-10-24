@@ -46,7 +46,7 @@ public class MaxRuleAppSlider extends JSlider {
         }
 
         setLabelTable ( labelTable );
-        setPaintLabels ( true );
+        setPaintLabels (true);
 
         // show ticks
         setMajorTickSpacing ( 9 );

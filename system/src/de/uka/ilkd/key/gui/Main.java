@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 
+
 import de.uka.ilkd.key.gui.configuration.GeneralSettings;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
@@ -35,6 +36,7 @@ public class Main {
     public static final String COPYRIGHT="(C) Copyright 2001-2011 "
         +"Universit\u00e4t Karlsruhe, Universit\u00e4t Koblenz-Landau, "
         +"and Chalmers University of Technology";
+
 
     private static final boolean VERBOSE_UI = Boolean.getBoolean("key.verbose-ui");
 
@@ -74,6 +76,8 @@ public class Main {
             }
         });
         
+
+        MainWindow key = MainWindow.getInstance();
         
     }
 
@@ -199,6 +203,7 @@ public class Main {
     public static String getExamplesDir() {
         return examplesDir;
     }
+
 
     /**
      * @return the statisticsFile
