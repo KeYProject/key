@@ -30,7 +30,7 @@ public class LicenseAction extends MainWindowAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-	
+        showLicense();
     }
 
     public void showLicense() {
