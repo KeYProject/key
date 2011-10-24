@@ -39,7 +39,7 @@ public class PackageSpecification
 
     public PackageSpecification(ExtList children) {
 	super(children);
-	reference=(PackageReference)children.get(PackageReference.class);
+	reference=children.get(PackageReference.class);
     }
 
 

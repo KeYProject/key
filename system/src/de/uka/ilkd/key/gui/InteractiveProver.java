@@ -148,8 +148,7 @@ public class InteractiveProver {
      */
     public void applyInteractive ( RuleApp app, Goal goal ) {
         goal.node().getNodeInfo().setInteractiveRuleApplication(true);
-
- 		ImmutableList<Goal> goalList = goal.apply(app);
+ 		goal.apply(app);
     }
 
 

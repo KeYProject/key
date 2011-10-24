@@ -47,8 +47,9 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader {
         super(services, nss);
     }
 
-    protected Recoder2KeYConverter makeConverter() {
-        return new SchemaRecoder2KeYConverter(this);
+    @Override
+    protected Recoder2KeYConverter makeConverter(Services services, NamespaceSet nss) {
+        return new SchemaRecoder2KeYConverter(this, services, nss);
     }
 
     /**
@@ -105,8 +106,7 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader {
         }
         typeDecls.add(classDecl);
 
-        recoder.java.CompilationUnit compUnitContext = (recoder.java.CompilationUnit) cUnit
-        .deepClone();
+        recoder.java.CompilationUnit compUnitContext = cUnit.deepClone();
 
         compUnitContext.setDeclarations(typeDecls);
         compUnitContext.makeParentRoleValid();

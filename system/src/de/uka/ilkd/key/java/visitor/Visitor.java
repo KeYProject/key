@@ -95,6 +95,8 @@ public interface Visitor {
     void performActionOnSeqSub(SeqSub x);
     
     void performActionOnSeqReverse(SeqReverse x);
+    
+    void performActionOnDLEmbeddedExpression(DLEmbeddedExpression x);
 
     void performActionOnStringLiteral(StringLiteral x); 
 

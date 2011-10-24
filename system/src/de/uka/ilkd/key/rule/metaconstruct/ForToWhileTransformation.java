@@ -85,19 +85,24 @@ public class ForToWhileTransformation extends WhileLoopTransformation {
             }
 
             final int updateSize = (updates == null ? 0 : updates.size());
+            
             Statement innerBlockStatements[] = new Statement[updateSize + 1];
             innerBlockStatements[0] = body;
-            for (int copyStatements = 0; copyStatements < updateSize; copyStatements++) {
-                innerBlockStatements[copyStatements + 1] = (ExpressionStatement) updates
-                        .getExpressionAt(copyStatements);
+            if (updates != null) {
+                for (int copyStatements = 0; copyStatements < updateSize; copyStatements++) {
+                    innerBlockStatements[copyStatements + 1] = (ExpressionStatement) updates
+                            .getExpressionAt(copyStatements);
+                }
             }
 
             final int initSize = (inits == null ? 0 : inits.size());
             Statement outerBlockStatements[] = new Statement[initSize + 1];
 
-            for (int copyStatements = 0; copyStatements < initSize; copyStatements++) {
-                outerBlockStatements[copyStatements] = inits.getInits()
-                        .get(copyStatements);
+            if (inits != null) {
+                for (int copyStatements = 0; copyStatements < initSize; copyStatements++) {
+                    outerBlockStatements[copyStatements] = inits.getInits()
+                            .get(copyStatements);
+                }
             }
             
             outerBlockStatements[initSize] = new While(guard.getExpression(),
@@ -115,7 +120,7 @@ public class ForToWhileTransformation extends WhileLoopTransformation {
             // copy loop invariant to the created while loop
             LoopInvariant li 
                 = services.getSpecificationRepository().getLoopInvariant(x);
-            if(li != null) {
+            if (li != null) {
                 li = li.setLoop((While)outerBlockStatements[initSize]);
                 services.getSpecificationRepository().setLoopInvariant(li);
             }

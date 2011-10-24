@@ -276,7 +276,7 @@ public class AddAHead {
     public String[] readLines(String f) {
 	File file=new File(f);
 	BufferedReader b=getBufferedReader(file);		
-	Vector v=new Vector();
+	Vector<String> v=new Vector<String>();
 	String l;
 	try{
 	    while ((l=b.readLine())!=null) {
@@ -288,7 +288,7 @@ public class AddAHead {
 	}
 	String[]  result=new String[v.size()];
 	for (int i=0; i<result.length; i++) {
-	    result[i]=(String)v.elementAt(i);
+	    result[i]=v.elementAt(i);
 	}
 	return result;
     }

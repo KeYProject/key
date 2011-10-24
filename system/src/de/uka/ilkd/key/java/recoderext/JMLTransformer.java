@@ -279,7 +279,12 @@ public final class JMLTransformer extends RecoderModelTransformer {
 
                 if(decl.getMods().contains("instance")) {
                     fieldDecl = new FieldDeclaration((FieldDeclaration)fieldDecl) {
-                	@Override
+                	/**
+                         * 
+                         */
+                        private static final long serialVersionUID = -5013131875224970650L;
+
+                    @Override
                 	public boolean isStatic() {
                 	    return false;
                 	}

@@ -245,7 +245,7 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 	toReturn.append(assump);
 	
 	// add the formula
-	toReturn.append("\n\n:notes \"The formula to proof:\""); 
+	toReturn.append("\n\n:notes \"The formula to be proved:\""); 
 	formula = this.translateLogicalNot(formula);
 	toReturn.append("\n:formula ").append(formula).append("\n");
 

@@ -23,6 +23,10 @@ import de.uka.ilkd.key.proof.ProofAggregate;
  * complex task such as ProofListTask.*/
 public class BasicTask extends DefaultMutableTreeNode implements TaskTreeNode{
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -6490453248054760812L;
     private ProofAggregate proof;
 
     /** creates a task with a single proof. The given proof list must

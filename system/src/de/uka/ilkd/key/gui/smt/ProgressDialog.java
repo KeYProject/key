@@ -473,7 +473,7 @@ class ProgressTable extends JTable{
         
         public static void packColumn(JTable table, int vColIndex, int margin) {
                
-                TableColumnModel colModel = (TableColumnModel)table.getColumnModel();
+                TableColumnModel colModel = table.getColumnModel();
                 TableColumn col = colModel.getColumn(vColIndex);
                 int width = 0;
 

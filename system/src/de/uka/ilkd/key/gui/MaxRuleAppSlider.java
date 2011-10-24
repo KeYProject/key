@@ -21,6 +21,10 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 public class MaxRuleAppSlider extends JSlider {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 5810499328583797609L;
     private static final int MAX_RULE_APPS_LOG10 = 5;
     private final static String TEXT = "Max. Rule Applications: ";
     private KeYMediator mediator;

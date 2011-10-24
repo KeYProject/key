@@ -265,6 +265,10 @@ public class IncrementalSearch {
     
 
     private class SearchDialog extends JDialog {
+        /**
+         * 
+         */
+        private static final long serialVersionUID = -6940680783649580399L;
         public final Color ALLERT_COLOR = new Color(255, 178, 178);
         public final Dimension INIT_SIZE =
                 new JDialog().getContentPane().add(new JTextField("12345678901234567890")).getPreferredSize();

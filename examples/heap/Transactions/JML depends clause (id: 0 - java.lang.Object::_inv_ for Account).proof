@@ -50,7 +50,7 @@
 
 \javaSource "src";
 
-\chooseContract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]";
+\chooseContract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]";
 
 \proof {
 (keyLog "0" (keyUser "mattias" ) (keyVersion "87dc0a69f156a44363f4ffda80eda512f68e3bd1"))
@@ -326,7 +326,7 @@
                            (rule "onlyCreatedObjectsAreInLocSets" (formula "1") (ifseqformula "8"))
                            (rule "replace_known_right" (formula "1") (term "0") (ifseqformula "20"))
                            (builtin "One Step Simplification" (formula "1"))
-                           (builtin "Use Dependency Contract" (formula "4") (ifInst ""  (formula "12")) (contract "JML depends clause [id: 7 / java.lang.Object::<inv> for Transaction]"))
+                           (builtin "Use Dependency Contract" (formula "4") (ifInst ""  (formula "12")) (contract "JML accessible clause [id: 7 / java.lang.Object::<inv> for Transaction]"))
                            (branch " Dependencies unchanged by write to allLocs \\setMinus self.footprint
 "
                               (rule "andLeft" (formula "18"))
@@ -461,7 +461,7 @@
                            (rule "replace_known_right" (formula "11") (term "0") (ifseqformula "16"))
                            (builtin "One Step Simplification" (formula "11") (ifInst ""  (formula "3")))
                            (rule "true_left" (formula "11"))
-                           (builtin "Use Dependency Contract" (formula "17") (ifInst ""  (formula "8")) (contract "JML depends clause [id: 7 / java.lang.Object::<inv> for Transaction]"))
+                           (builtin "Use Dependency Contract" (formula "17") (ifInst ""  (formula "8")) (contract "JML accessible clause [id: 7 / java.lang.Object::<inv> for Transaction]"))
                            (branch " Dependencies unchanged by write to allLocs \\setMinus self.footprint
 "
                               (rule "andLeft" (formula "14"))
@@ -638,7 +638,7 @@
                      (rule "onlyCreatedObjectsAreInLocSets" (formula "1") (ifseqformula "8"))
                      (rule "replace_known_right" (formula "1") (term "0") (ifseqformula "19"))
                      (builtin "One Step Simplification" (formula "1"))
-                     (builtin "Use Dependency Contract" (formula "4") (ifInst ""  (formula "12")) (contract "JML depends clause [id: 7 / java.lang.Object::<inv> for Transaction]"))
+                     (builtin "Use Dependency Contract" (formula "4") (ifInst ""  (formula "12")) (contract "JML accessible clause [id: 7 / java.lang.Object::<inv> for Transaction]"))
                      (branch " Dependencies unchanged by write to allLocs \\setMinus self.footprint
 "
                         (rule "andLeft" (formula "18"))
@@ -709,7 +709,7 @@
                      (rule "replace_known_left" (formula "2") (term "1") (ifseqformula "4"))
                      (builtin "One Step Simplification" (formula "2") (ifInst ""  (formula "15")))
                      (rule "true_left" (formula "2"))
-                     (builtin "Use Dependency Contract" (formula "16") (ifInst ""  (formula "8")) (contract "JML depends clause [id: 7 / java.lang.Object::<inv> for Transaction]"))
+                     (builtin "Use Dependency Contract" (formula "16") (ifInst ""  (formula "8")) (contract "JML accessible clause [id: 7 / java.lang.Object::<inv> for Transaction]"))
                      (branch " Dependencies unchanged by write to allLocs \\setMinus self.footprint
 "
                         (rule "andLeft" (formula "14"))
@@ -822,7 +822,7 @@
                   (rule "replace_known_left" (formula "1") (term "1") (ifseqformula "4"))
                   (builtin "One Step Simplification" (formula "1") (ifInst ""  (formula "14")))
                   (rule "true_left" (formula "1"))
-                  (builtin "Use Dependency Contract" (formula "15") (ifInst ""  (formula "8")) (contract "JML depends clause [id: 7 / java.lang.Object::<inv> for Transaction]"))
+                  (builtin "Use Dependency Contract" (formula "15") (ifInst ""  (formula "8")) (contract "JML accessible clause [id: 7 / java.lang.Object::<inv> for Transaction]"))
                   (branch " Dependencies unchanged by write to allLocs \\setMinus self.footprint
 "
                      (rule "andLeft" (formula "14"))
@@ -888,7 +888,7 @@
                      (rule "replace_known_right" (formula "2") (term "0") (ifseqformula "14"))
                      (builtin "One Step Simplification" (formula "2") (ifInst ""  (formula "4")))
                      (rule "true_left" (formula "2"))
-                     (builtin "Use Dependency Contract" (formula "16") (ifInst ""  (formula "8")) (contract "JML depends clause [id: 7 / java.lang.Object::<inv> for Transaction]"))
+                     (builtin "Use Dependency Contract" (formula "16") (ifInst ""  (formula "8")) (contract "JML accessible clause [id: 7 / java.lang.Object::<inv> for Transaction]"))
                      (branch " Dependencies unchanged by write to allLocs \\setMinus self.footprint
 "
                         (rule "andLeft" (formula "14"))

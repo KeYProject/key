@@ -74,6 +74,7 @@
 ./heap/observer/ExampleSubject_notifyObservers.key
 ./heap/observer/ExampleSubject_value_dep.key
 ./heap/observer/ExampleSubject_value.key
+./heap/saddleback_search/Saddleback_search.key
 ./heap/simple/anonymise_datagroup.key
 ./heap/simple/array_creation.key
 ./heap/simple/arrays_with_disjoint_sorts.key

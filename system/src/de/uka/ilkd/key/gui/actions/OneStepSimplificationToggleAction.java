@@ -14,6 +14,11 @@ import de.uka.ilkd.key.rule.OneStepSimplifier;
 
 public class OneStepSimplificationToggleAction extends MainWindowAction {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -2772730241688097857L;
+
     public OneStepSimplificationToggleAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("One Step Simplification");

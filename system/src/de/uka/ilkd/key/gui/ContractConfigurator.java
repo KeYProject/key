@@ -23,6 +23,10 @@ import de.uka.ilkd.key.speclang.Contract;
 
 public class ContractConfigurator extends JDialog {
     
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 4002043118399402599L;
     private ContractSelectionPanel contractPanel;
     private JButton okButton;
     private JButton cancelButton;

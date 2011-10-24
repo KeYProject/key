@@ -380,10 +380,10 @@ public class EqualityConstraint implements Constraint {
                                        Term t1,
                                        boolean modifyThis,
                                        Services services) {
-        if (services == null) return Constraint.TOP;
+/*        if (services == null) return Constraint.TOP;
         
         final ImmutableSet<Sort> set = 
-            DefaultImmutableSet.<Sort>nil().add(t0.sort()).add(t1.sort());
+            DefaultImmutableSet.<Sort>nil().add(t0.sort()).add(t1.sort());*/
 //        assert false : "metavariables disabled";
         return Constraint.TOP;
 //        final Sort intersectionSort = 

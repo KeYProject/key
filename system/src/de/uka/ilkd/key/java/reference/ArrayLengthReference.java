@@ -48,7 +48,7 @@ public class ArrayLengthReference extends JavaNonTerminalProgramElement
      */ 
     public ArrayLengthReference(ExtList children) {
 	super(children);
-	prefix = (ReferencePrefix)children.get(ReferencePrefix.class);
+	prefix = children.get(ReferencePrefix.class);
     }
 
     /**

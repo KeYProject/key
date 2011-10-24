@@ -18,7 +18,6 @@ import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
-import de.uka.ilkd.key.rule.PullOutConditionalsRule;
 import de.uka.ilkd.key.rule.QueryExpand;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;

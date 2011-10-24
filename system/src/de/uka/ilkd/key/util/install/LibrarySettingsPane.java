@@ -21,6 +21,10 @@ import javax.swing.JTextArea;
  */
 public class LibrarySettingsPane extends InstallationPane {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 961855442417412207L;
     private InstallationPathChooser chooser = null;
 
     public LibrarySettingsPane ( KeYInstaller installer ) {

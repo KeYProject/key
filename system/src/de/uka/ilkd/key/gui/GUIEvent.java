@@ -14,6 +14,11 @@ import java.util.EventObject;
 
 public class GUIEvent extends EventObject {
     
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -7158097246804870506L;
+
     /** creates a new gui event 
      * @param source Object that is the source of the event
      */

@@ -92,7 +92,8 @@ public final class DefaultTacletSetTranslation implements TacletSetTranslation,
                 this.settings = settings;
 
         }
-
+        
+   
         @Override
         public ImmutableList<TacletFormula> getTranslation(
                         ImmutableSet<Sort> sorts) {
@@ -108,12 +109,18 @@ public final class DefaultTacletSetTranslation implements TacletSetTranslation,
                 ImmutableSet<Sort> emptySetSort = DefaultImmutableSet.nil();
 
                 usedFormulaSorts = (sorts == null ? emptySetSort : sorts);
-
+             
+                
+                                
                 for (Taclet t : settings.getTaclets()) {
+                  
+                       
                         if (SupportedTaclets.REFERENCE.contains(t.name()
                                         .toString(),false)) {
 
-                                try {
+                                
+                                try {   
+                           
                                         AssumptionGenerator assumptionGenerator = new AssumptionGenerator(services);
                                         assumptionGenerator.addListener(this);
                                         TacletFormula result = assumptionGenerator

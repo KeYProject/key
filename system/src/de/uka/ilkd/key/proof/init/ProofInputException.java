@@ -15,6 +15,10 @@ package de.uka.ilkd.key.proof.init;
  */
 public class ProofInputException extends Exception {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 2020248619026188315L;
     private final String message;
 
     public ProofInputException(Exception e) {

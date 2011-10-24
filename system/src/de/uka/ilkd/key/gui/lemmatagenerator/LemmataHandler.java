@@ -124,7 +124,7 @@ public class LemmataHandler implements TacletFilter {
                         }
                 };
       
-                TacletSoundnessPOLoader loader = new TacletSoundnessPOLoader(loaderListener,this,true,tacletLoader,true);
+                TacletSoundnessPOLoader loader = new TacletSoundnessPOLoader(loaderListener,this,true,tacletLoader);
                 
                 loader.start();
         }

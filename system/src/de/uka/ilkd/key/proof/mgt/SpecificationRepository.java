@@ -158,7 +158,8 @@ public final class SpecificationRepository {
         ImmutableSet<Pair<KeYJavaType,ObserverFunction>> result 
         	= DefaultImmutableSet.<Pair<KeYJavaType,ObserverFunction>>nil();
         
-        if(pm.isConstructor()) {
+        // static methods and constructors are not overriden
+        if(pm.isConstructor() || pm.isStatic()) {
             return result;
         }
         
@@ -985,7 +986,7 @@ public final class SpecificationRepository {
     public void removeProof(Proof proof) {
         for(Map.Entry<ProofOblInput,ImmutableSet<Proof>> entry 
         	: proofs.entrySet()) {
-            ImmutableSet<Proof> sop = (ImmutableSet<Proof>) entry.getValue();
+            ImmutableSet<Proof> sop = entry.getValue();
             if(sop.contains(proof)) {
                 sop = sop.remove(proof);
                 if(sop.size()==0){

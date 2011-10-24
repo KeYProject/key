@@ -11,10 +11,10 @@
 package de.uka.ilkd.key.gui.smt;
 
 import java.awt.Component;
-import java.awt.ScrollPane;
 import java.util.Collection;
 
 import javax.swing.JDialog;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 
@@ -56,9 +56,8 @@ public class InformationWindow extends JDialog {
    }
    
    private Component newTab(Information information){
-       ScrollPane pane = new ScrollPane();
-       pane.add(new JTextArea(information.content));
-       return pane;
+       JScrollPane pane = new JScrollPane(new JTextArea(information.content));
+        return pane;
    }
    
    

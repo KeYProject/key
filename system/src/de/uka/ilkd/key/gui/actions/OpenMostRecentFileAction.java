@@ -1,11 +1,8 @@
 package de.uka.ilkd.key.gui.actions;
 
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
-
-import javax.swing.KeyStroke;
 
 import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -16,6 +13,11 @@ import de.uka.ilkd.key.gui.MainWindow;
 
 public final class OpenMostRecentFileAction extends MainWindowAction {
     
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 4855372503837208313L;
+
     public OpenMostRecentFileAction(MainWindow mainWindow) {
 	super(mainWindow);
         setName("Reload ");

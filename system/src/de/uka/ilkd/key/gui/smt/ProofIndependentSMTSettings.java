@@ -125,6 +125,7 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.gui.configur
         public void setCommand(SolverType type, String command){
                 dataOfSolvers.get(type).command = command;
         }
+        
 
         public Collection<SolverData> getDataOfSolvers(){
                 return dataOfSolvers.values();
@@ -179,9 +180,12 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.gui.configur
         public static class SolverData{
                 public String command = "";
                 public final SolverType type;
+                
                 public SolverData(SolverType type){
-                        this.type = type;
+                        this(type,type.getDefaultExecutionCommand());
+                        
                         command = type.getDefaultExecutionCommand();
+
                 }
 
                 private SolverData(SolverType type,String command){
@@ -192,6 +196,7 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.gui.configur
                 private void readSettings(Properties props){
 
                         command = SettingsConverter.read(props,EXECUTION_STRING+type.getName(),command);
+                     
                         type.setExecutionCommand(command);
 
                 }

@@ -55,6 +55,11 @@ import de.uka.ilkd.key.util.Debug;
  */
 public class SequentView extends JEditorPane implements Autoscroll {
             
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 8807311012343029195L;
+
     public static final Color DEFAULT_HIGHLIGHT_COLOR = new Color(70, 100, 170, 76);
 
     public static final Color ADDITIONAL_HIGHLIGHT_COLOR = new Color(0, 0, 0, 38);

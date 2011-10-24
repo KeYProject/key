@@ -57,6 +57,10 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationException;
  */
 public class ExceptionDialog extends JDialog {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -4532724315711726522L;
     private JScrollPane listScroll, stScroll;    
     private boolean withList = false;
     private JTextArea stTextArea;
@@ -116,7 +120,7 @@ public class ExceptionDialog extends JDialog {
 	} 
 	
 	if (location == null && exc.getCause() != null) {
-	    location = getLocation(((Throwable)exc).getCause());
+	    location = getLocation(exc.getCause());
 	}
 	
 	return location;
@@ -152,6 +156,7 @@ public class ExceptionDialog extends JDialog {
         
         JButton closeButton = new JButton("Close");
         closeButton.addActionListener(closeListener);
+        getRootPane().setDefaultButton(closeButton);
         
         JCheckBox detailsBox  = new JCheckBox("Show Details");
         detailsBox.setSelected(false);
@@ -301,7 +306,7 @@ public class ExceptionDialog extends JDialog {
         listScroll = createJListScroll(excList);
         
         if(withList) {
-            cp.add(listScroll, new GridBagConstraints(0, 0, 1, 1, 1., .1,
+            cp.add(listScroll, new GridBagConstraints(0, 0, 1, 1, 1., 1.,
                     GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
                             0, 0, 0, 0), 0, 0));
         } else {
@@ -337,6 +342,11 @@ public class ExceptionDialog extends JDialog {
 
     private static class TextAreaRenderer extends JTextArea implements ListCellRenderer
     {
+        /**
+         * 
+         */
+        private static final long serialVersionUID = -1151786934514170956L;
+
         public TextAreaRenderer()
         {	   
             setLineWrap(true);

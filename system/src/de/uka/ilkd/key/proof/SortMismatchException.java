@@ -16,6 +16,10 @@ import de.uka.ilkd.key.logic.sort.Sort;
 public class SortMismatchException 
     extends SVInstantiationExceptionWithPosition {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -5791743260310763761L;
     private String toInstantiate;
     private Sort   givenSort;
          

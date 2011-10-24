@@ -11,12 +11,15 @@
 package de.uka.ilkd.key.java.recoderext.adt;
 
 import recoder.java.Expression;
-import recoder.java.SourceVisitor;
-import recoder.java.expression.Operator;
 import recoder.list.generic.ASTArrayList;
 
 
 public class SeqReverse extends ADTPrefixConstruct {
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -4836079248155746383L;
 
     public SeqReverse(Expression e) {
 	children = new ASTArrayList<Expression>(getArity());

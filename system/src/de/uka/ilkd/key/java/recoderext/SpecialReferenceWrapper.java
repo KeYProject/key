@@ -19,6 +19,10 @@ import recoder.java.reference.TypeReference;
 public class SpecialReferenceWrapper extends ThisReference 
     implements Expression, KeYRecoderExtension, ReferencePrefix {
    
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -8843308796536009121L;
     protected TypeReference typeRef;
     protected ReferencePrefix myprefix;
 

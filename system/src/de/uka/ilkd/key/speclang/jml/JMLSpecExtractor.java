@@ -364,10 +364,10 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
             //add non-null preconditions
             for(int j = 0, n = pm.getParameterDeclarationCount(); j < n; j++) {
-                //no additional precondition for primitive types!
-                final VariableSpecification paramDecl = pm.getParameterDeclarationAt(j)
-                .getVariableSpecification();
+                final VariableSpecification paramDecl = 
+                        pm.getParameterDeclarationAt(j).getVariableSpecification();
                 if (!JMLInfoExtractor.parameterIsNullable(pm, j)) {
+                    //no additional precondition for primitive types! createNonNullPos... takes care of that
                     final ImmutableSet<PositionedString> nonNullParams = 
                         createNonNullPositionedString(paramDecl.getName(),
                                 paramDecl.getProgramVariable().getKeYJavaType(),
@@ -377,10 +377,6 @@ public final class JMLSpecExtractor implements SpecExtractor {
                         specCase.addRequires(nonNull);
                     }
                 }
-                String param_name = paramDecl.getName();
-                Type t = pm.getParameterDeclarationAt(j).
-                getTypeReference().
-                getKeYJavaType();                 
             }
 
             //add non-null postcondition

@@ -122,7 +122,6 @@ public class ConstructorNormalformBuilder
 		     new ImplicitIdentifier(name),
 		     new ASTArrayList<ParameterDeclaration>(0),
 		     null,
-		     (StatementBlock)
 		     ((ClassInitializer)cd.getChildAt(i)).getBody().deepClone());		
 		initializerMethod.makeAllParentRolesValid();
 		mdl.add(initializerMethod);
@@ -142,7 +141,7 @@ public class ConstructorNormalformBuilder
 			    (new FieldReference
 			     (new ThisReference(), 
 			      specs.get(j).getIdentifier()),
-                              (Expression)fieldInit.deepClone());
+                              fieldInit.deepClone());
 			result.add(fieldCopy);
 		    }
 		}
@@ -244,8 +243,7 @@ public class ConstructorNormalformBuilder
                     (CONSTRUCTOR_NORMALFORM_IDENTIFIER)), body, 0);
         final Iterator<Statement> initializers = class2initializers.get(cd).iterator();
         for (int i = 0; initializers.hasNext(); i++) {
-            attach((Statement) 
-                    initializers.next().deepClone(),
+            attach(initializers.next().deepClone(),
                     body, i+1);
         }
         MethodDeclaration def =  new MethodDeclaration(mods,
@@ -283,7 +281,7 @@ public class ConstructorNormalformBuilder
         String etId = "_ENCLOSING_THIS";
 	if(et!=null){
 	    pd = new ParameterDeclaration(
-	            new TypeReference((Identifier) td.getIdentifier().deepClone()), 
+	            new TypeReference(td.getIdentifier().deepClone()), 
 	            new Identifier(etId));
 	    ca = new CopyAssignment(new FieldReference(new ThisReference(), new ImplicitIdentifier(et.getName())),
 	                new VariableReference(new Identifier(etId)));
@@ -296,18 +294,15 @@ public class ConstructorNormalformBuilder
 	    body =  new StatementBlock();    
 	} else {
 	    ConstructorDeclaration consDecl = (ConstructorDeclaration)cons;
-	    mods = (ASTList<DeclarationSpecifier>)
-		(consDecl.getDeclarationSpecifiers()==null ? null : consDecl.getDeclarationSpecifiers().deepClone());	    
-	    parameters = 
-		(ASTList<ParameterDeclaration>)consDecl.getParameters().deepClone();
-	    recThrows = (Throws) (consDecl.getThrown() == null ? null : 
-				  consDecl.getThrown().deepClone());
+	    mods = (consDecl.getDeclarationSpecifiers()==null ? null : consDecl.getDeclarationSpecifiers().deepClone());	    
+	    parameters = consDecl.getParameters().deepClone();
+	    recThrows = consDecl.getThrown() == null ? null :  consDecl.getThrown().deepClone();
             
 	    StatementBlock origBody = consDecl.getBody();
             if(origBody == null) // may happen if a stub is defined with an empty constructor
                 body = null;
             else
-                body = (StatementBlock) origBody.deepClone();
+                body = origBody.deepClone();
 	}
 	
 	if(outerVars!=null && !outerVars.isEmpty()){     
@@ -377,14 +372,12 @@ public class ConstructorNormalformBuilder
 		for(int i = 0; outerVars!=null && i<outerVars.size(); i++){
 		    attach(new CopyAssignment(new FieldReference(new ThisReference(), 
 		            new ImplicitIdentifier(ImplicitFieldAdder.FINAL_VAR_PREFIX+
-		                    ((Variable) outerVars.get(i)).getName())),
-		            new VariableReference(new Identifier(((Variable) outerVars.get(i)).getName()))), body, 
+		                    (outerVars.get(i)).getName())),
+		            new VariableReference(new Identifier(outerVars.get(i).getName()))), body, 
 		            i+(ca!=null?1:0));
 		}      
 		for (int i = 0; i<initializers.size(); i++) {
-		    attach((Statement) 
-			   initializers.get(i).deepClone(),
-			   body, i+1+j);
+		    attach(initializers.get(i).deepClone(), body, i+1+j);
 		}
 
 	    }
@@ -408,7 +401,7 @@ public class ConstructorNormalformBuilder
             if(n.getArguments()==null || n.getArguments().size()==0) return null;
             ConstructorDeclaration constr = services.getCrossReferenceSourceInfo().getConstructorDeclaration(      
                     services.getCrossReferenceSourceInfo().getConstructor(n));
-            constr = (ConstructorDeclaration) constr.deepClone();
+            constr = constr.deepClone();
             SuperConstructorReference sr = new SuperConstructorReference(
                     n.getArguments()!=null ? (ASTList<Expression>) n.getArguments().deepClone() : 
                         new ASTArrayList<Expression>(0));

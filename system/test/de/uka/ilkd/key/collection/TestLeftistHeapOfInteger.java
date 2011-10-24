@@ -88,8 +88,8 @@ public class TestLeftistHeapOfInteger extends junit.framework.TestCase {
 	while ( t1.hasNext () )
 	    l1.add ( t1.next () );
 
-	Object[] a0 = (Object[])l0.collect ( Object.class );
-	Object[] a1 = (Object[])l1.collect ( Object.class );
+	Object[] a0 = l0.collect ( Object.class );
+	Object[] a1 = l1.collect ( Object.class );
 
 	Arrays.sort ( a0 );
 	Arrays.sort ( a1 );

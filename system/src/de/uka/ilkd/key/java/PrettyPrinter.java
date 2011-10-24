@@ -366,12 +366,13 @@ public class PrettyPrinter {
 
     protected Position getRelativePosition(SourceElement first) {
         try {
-        if (indentMap.containsKey(first)) {
-            return indentMap.get(first);
-        } else {
-            if (first!=null) return first.getRelativePosition();
-            
-        }} finally {
+            if (indentMap.containsKey(first)) {
+                return indentMap.get(first);
+            } else {
+                if (first!=null) return first.getRelativePosition();
+
+            }
+        } finally {
             return Position.UNDEFINED;
         }
     }
@@ -1061,6 +1062,22 @@ public class PrettyPrinter {
         write(")");
         printFooter(x);
     }          
+    
+    public void printDLEmbeddedExpression(
+            DLEmbeddedExpression x) throws IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+        writeToken(0, "\\dl_" + x.getFunctionSymbol().name(), x);
+        write("(");
+        for (int i = 0; i < x.getChildCount(); i++) {
+            if(i != 0) {
+                write(",");
+            }
+            writeElement(0, x.getChildAt(i));
+        }
+        write(")");
+        printFooter(x); 
+    } 
 
     public void printStringLiteral(StringLiteral x) throws java.io.IOException {
         printHeader(x);

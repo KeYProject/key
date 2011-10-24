@@ -33,7 +33,7 @@ import de.uka.ilkd.key.rule.Taclet;
 
 public class RuleView extends JPanel implements TreeSelectionListener, java.io.Serializable {
 
-
+    private static final long serialVersionUID = 911181673407907024L;
     protected RuleTreeModel ruleViewModel    = null;
     protected JTree ruleTree;
 
@@ -143,7 +143,11 @@ public class RuleView extends JPanel implements TreeSelectionListener, java.io.S
 	implements TreeCellRenderer,
 		   java.io.Serializable {
 
-	JPanel panel;
+	/**
+         * 
+         */
+        private static final long serialVersionUID = 6129388673386459052L;
+    JPanel panel;
 	JPanel statusPanel;
 	JTextArea text;	
 

@@ -737,7 +737,7 @@
                                     (rule "replace_known_left" (formula "23") (term "0") (ifseqformula "24"))
                                     (builtin "One Step Simplification" (formula "23"))
                                     (rule "true_left" (formula "23"))
-                                    (builtin "Use Dependency Contract" (formula "11") (ifInst ""  (formula "6") (term "0")) (ifInst ""  (formula "6")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                    (builtin "Use Dependency Contract" (formula "11") (ifInst ""  (formula "6") (term "0")) (ifInst ""  (formula "6")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                     (branch " Dependencies unchanged by write to {}
 "
                                        (rule "andLeft" (formula "44"))
@@ -749,7 +749,7 @@
                                        (rule "replace_known_right" (formula "43") (term "1,0") (ifseqformula "49"))
                                        (builtin "One Step Simplification" (formula "43") (ifInst ""  (formula "2")) (ifInst ""  (formula "50")))
                                        (rule "false_right" (formula "43"))
-                                       (builtin "Use Dependency Contract" (formula "17") (ifInst ""  (formula "11")) (ifInst ""  (formula "14")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                       (builtin "Use Dependency Contract" (formula "17") (ifInst ""  (formula "11")) (ifInst ""  (formula "14")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                        (branch " Dependencies unchanged by write to allFields(self_0)
 "
                                           (rule "selectCreatedOfAnonEQ" (formula "44") (term "0,1,0,0") (ifseqformula "6"))
@@ -775,7 +775,7 @@
                                           (rule "instanceof_static_type" (formula "45") (term "0,0,1,0"))
                                           (builtin "One Step Simplification" (formula "45"))
                                           (rule "castDel" (formula "45") (term "0,0,0"))
-                                          (builtin "Use Dependency Contract" (formula "25") (ifInst ""  (formula "19") (term "0")) (ifInst ""  (formula "19")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                          (builtin "Use Dependency Contract" (formula "25") (ifInst ""  (formula "19") (term "0")) (ifInst ""  (formula "19")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                           (branch " Dependencies unchanged by write to {}
 "
                                              (rule "selectCreatedOfAnonEQ" (formula "47") (term "0,1,0") (ifseqformula "14"))
@@ -796,7 +796,7 @@
                                              (rule "replace_known_right" (formula "46") (term "0,1,0,0") (ifseqformula "48"))
                                              (builtin "One Step Simplification" (formula "46") (ifInst ""  (formula "44")) (ifInst ""  (formula "49")) (ifInst ""  (formula "50")) (ifInst ""  (formula "51")))
                                              (rule "false_right" (formula "46"))
-                                             (builtin "Use Dependency Contract" (formula "30") (ifInst ""  (formula "25")) (ifInst ""  (formula "27")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                             (builtin "Use Dependency Contract" (formula "30") (ifInst ""  (formula "25")) (ifInst ""  (formula "27")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                              (branch " Dependencies unchanged by write to allFields(self_1)
 "
                                                 (rule "selectCreatedOfAnonEQ" (formula "47") (term "0,1,0,0") (ifseqformula "19"))
@@ -828,7 +828,7 @@
                                                 (rule "instanceof_static_type" (formula "48") (term "0,0,1,0"))
                                                 (builtin "One Step Simplification" (formula "48"))
                                                 (rule "castDel" (formula "48") (term "0,0,0"))
-                                                (builtin "Use Dependency Contract" (formula "37") (ifInst ""  (formula "17")) (ifInst ""  (formula "32")) (ifInst ""  (formula "27")) (ifInst ""  (formula "19")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                (builtin "Use Dependency Contract" (formula "37") (ifInst ""  (formula "17")) (ifInst ""  (formula "32")) (ifInst ""  (formula "27")) (ifInst ""  (formula "19")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                 (branch " Dependencies unchanged by write to      allFields(self_0) \\cup allFields(self_1)
 \\cup allFields(self_1)
 "
@@ -870,7 +870,7 @@
                                                    (rule "instanceof_static_type" (formula "51") (term "0,0,1,0"))
                                                    (builtin "One Step Simplification" (formula "51"))
                                                    (rule "castDel" (formula "51") (term "0,0,0"))
-                                                   (builtin "Use Dependency Contract" (formula "36") (ifInst ""  (formula "30")) (ifInst ""  (formula "32")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                   (builtin "Use Dependency Contract" (formula "36") (ifInst ""  (formula "30")) (ifInst ""  (formula "32")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                    (branch " Dependencies unchanged by write to allFields(self_0) \\cup allFields(self_1)
 "
                                                       (rule "selectCreatedOfAnonEQ" (formula "53") (term "0,1,0,0") (ifseqformula "27"))
@@ -911,7 +911,7 @@
                                                       (rule "instanceof_static_type" (formula "53") (term "0,0,1,0"))
                                                       (builtin "One Step Simplification" (formula "53"))
                                                       (rule "castDel" (formula "53") (term "0,0,0"))
-                                                      (builtin "Use Dependency Contract" (formula "42") (ifInst ""  (formula "39") (term "0")) (ifInst ""  (formula "39")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                      (builtin "Use Dependency Contract" (formula "42") (ifInst ""  (formula "39") (term "0")) (ifInst ""  (formula "39")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                       (branch " Dependencies unchanged by write to {}
 "
                                                          (rule "selectCreatedOfAnonEQ" (formula "55") (term "0,1,0") (ifseqformula "32"))
@@ -930,7 +930,7 @@
                                                          (rule "replace_known_left" (formula "54") (term "0") (ifseqformula "42"))
                                                          (builtin "One Step Simplification" (formula "54") (ifInst ""  (formula "36")))
                                                          (rule "true_left" (formula "54"))
-                                                         (builtin "Use Dependency Contract" (formula "62") (ifInst ""  (formula "39") (term "0")) (ifInst ""  (formula "39")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                         (builtin "Use Dependency Contract" (formula "62") (ifInst ""  (formula "39") (term "0")) (ifInst ""  (formula "39")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                          (branch " Dependencies unchanged by write to {}
 "
                                                             (rule "selectCreatedOfAnonEQ" (formula "55") (term "0,1,0") (ifseqformula "32"))
@@ -1000,7 +1000,7 @@
                                                          (rule "onlyCreatedObjectsAreInLocSets" (formula "2") (ifseqformula "28"))
                                                          (rule "replace_known_right" (formula "2") (term "0") (ifseqformula "61"))
                                                          (builtin "One Step Simplification" (formula "2"))
-                                                         (builtin "Use Dependency Contract" (formula "45") (ifInst ""  (formula "42") (term "0")) (ifInst ""  (formula "42")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                         (builtin "Use Dependency Contract" (formula "45") (ifInst ""  (formula "42") (term "0")) (ifInst ""  (formula "42")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                          (branch " Dependencies unchanged by write to {}
 "
                                                             (rule "selectCreatedOfAnonEQ" (formula "56") (term "0,1,0") (ifseqformula "35"))
@@ -1019,7 +1019,7 @@
                                                             (rule "replace_known_left" (formula "55") (term "0") (ifseqformula "45"))
                                                             (builtin "One Step Simplification" (formula "55") (ifInst ""  (formula "39")))
                                                             (rule "true_left" (formula "55"))
-                                                            (builtin "Use Dependency Contract" (formula "63") (ifInst ""  (formula "42") (term "0")) (ifInst ""  (formula "42")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                            (builtin "Use Dependency Contract" (formula "63") (ifInst ""  (formula "42") (term "0")) (ifInst ""  (formula "42")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                             (branch " Dependencies unchanged by write to {}
 "
                                                                (rule "selectCreatedOfAnonEQ" (formula "56") (term "0,1,0") (ifseqformula "35"))
@@ -1070,7 +1070,7 @@
                                                          (rule "onlyCreatedObjectsAreInLocSets" (formula "2") (ifseqformula "28"))
                                                          (rule "replace_known_right" (formula "2") (term "0") (ifseqformula "56"))
                                                          (builtin "One Step Simplification" (formula "2"))
-                                                         (builtin "Use Dependency Contract" (formula "45") (ifInst ""  (formula "42") (term "0")) (ifInst ""  (formula "42")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                         (builtin "Use Dependency Contract" (formula "45") (ifInst ""  (formula "42") (term "0")) (ifInst ""  (formula "42")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                          (branch " Dependencies unchanged by write to {}
 "
                                                             (rule "selectCreatedOfAnonEQ" (formula "56") (term "0,1,0") (ifseqformula "35"))
@@ -1089,7 +1089,7 @@
                                                             (rule "replace_known_left" (formula "55") (term "0") (ifseqformula "45"))
                                                             (builtin "One Step Simplification" (formula "55") (ifInst ""  (formula "39")))
                                                             (rule "true_left" (formula "55"))
-                                                            (builtin "Use Dependency Contract" (formula "63") (ifInst ""  (formula "42") (term "0")) (ifInst ""  (formula "42")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                            (builtin "Use Dependency Contract" (formula "63") (ifInst ""  (formula "42") (term "0")) (ifInst ""  (formula "42")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                             (branch " Dependencies unchanged by write to {}
 "
                                                                (rule "selectCreatedOfAnonEQ" (formula "56") (term "0,1,0") (ifseqformula "35"))
@@ -1176,7 +1176,7 @@
                                                          (rule "onlyCreatedObjectsAreInLocSets" (formula "2") (ifseqformula "16"))
                                                          (rule "replace_known_right" (formula "2") (term "0") (ifseqformula "59"))
                                                          (builtin "One Step Simplification" (formula "2"))
-                                                         (builtin "Use Dependency Contract" (formula "40") (ifInst ""  (formula "34")) (ifInst ""  (formula "36")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                         (builtin "Use Dependency Contract" (formula "40") (ifInst ""  (formula "34")) (ifInst ""  (formula "36")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                          (branch " Dependencies unchanged by write to allFields(self_0) \\cup allFields(self_1)
 "
                                                             (rule "selectCreatedOfAnonEQ" (formula "54") (term "0,1,0,0") (ifseqformula "31"))
@@ -1217,7 +1217,7 @@
                                                             (rule "instanceof_static_type" (formula "54") (term "0,0,1,0"))
                                                             (builtin "One Step Simplification" (formula "54"))
                                                             (rule "castDel" (formula "54") (term "0,0,0"))
-                                                            (builtin "Use Dependency Contract" (formula "46") (ifInst ""  (formula "43") (term "0")) (ifInst ""  (formula "43")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                            (builtin "Use Dependency Contract" (formula "46") (ifInst ""  (formula "43") (term "0")) (ifInst ""  (formula "43")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                             (branch " Dependencies unchanged by write to {}
 "
                                                                (rule "selectCreatedOfAnonEQ" (formula "56") (term "0,1,0") (ifseqformula "36"))
@@ -1236,7 +1236,7 @@
                                                                (rule "replace_known_left" (formula "55") (term "0") (ifseqformula "46"))
                                                                (builtin "One Step Simplification" (formula "55") (ifInst ""  (formula "40")))
                                                                (rule "true_left" (formula "55"))
-                                                               (builtin "Use Dependency Contract" (formula "63") (ifInst ""  (formula "43") (term "0")) (ifInst ""  (formula "43")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                               (builtin "Use Dependency Contract" (formula "63") (ifInst ""  (formula "43") (term "0")) (ifInst ""  (formula "43")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                                (branch " Dependencies unchanged by write to {}
 "
                                                                   (rule "selectCreatedOfAnonEQ" (formula "56") (term "0,1,0") (ifseqformula "36"))
@@ -1306,7 +1306,7 @@
                                                                (rule "onlyCreatedObjectsAreInLocSets" (formula "2") (ifseqformula "32"))
                                                                (rule "replace_known_right" (formula "2") (term "0") (ifseqformula "62"))
                                                                (builtin "One Step Simplification" (formula "2"))
-                                                               (builtin "Use Dependency Contract" (formula "49") (ifInst ""  (formula "46") (term "0")) (ifInst ""  (formula "46")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                               (builtin "Use Dependency Contract" (formula "49") (ifInst ""  (formula "46") (term "0")) (ifInst ""  (formula "46")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                                (branch " Dependencies unchanged by write to {}
 "
                                                                   (rule "selectCreatedOfAnonEQ" (formula "57") (term "0,1,0") (ifseqformula "39"))
@@ -1325,7 +1325,7 @@
                                                                   (rule "replace_known_left" (formula "56") (term "0") (ifseqformula "49"))
                                                                   (builtin "One Step Simplification" (formula "56") (ifInst ""  (formula "43")))
                                                                   (rule "true_left" (formula "56"))
-                                                                  (builtin "Use Dependency Contract" (formula "64") (ifInst ""  (formula "46") (term "0")) (ifInst ""  (formula "46")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                                  (builtin "Use Dependency Contract" (formula "64") (ifInst ""  (formula "46") (term "0")) (ifInst ""  (formula "46")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                                   (branch " Dependencies unchanged by write to {}
 "
                                                                      (rule "selectCreatedOfAnonEQ" (formula "57") (term "0,1,0") (ifseqformula "39"))
@@ -1376,7 +1376,7 @@
                                                                (rule "onlyCreatedObjectsAreInLocSets" (formula "2") (ifseqformula "32"))
                                                                (rule "replace_known_right" (formula "2") (term "0") (ifseqformula "57"))
                                                                (builtin "One Step Simplification" (formula "2"))
-                                                               (builtin "Use Dependency Contract" (formula "49") (ifInst ""  (formula "46") (term "0")) (ifInst ""  (formula "46")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                               (builtin "Use Dependency Contract" (formula "49") (ifInst ""  (formula "46") (term "0")) (ifInst ""  (formula "46")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                                (branch " Dependencies unchanged by write to {}
 "
                                                                   (rule "selectCreatedOfAnonEQ" (formula "57") (term "0,1,0") (ifseqformula "39"))
@@ -1395,7 +1395,7 @@
                                                                   (rule "replace_known_left" (formula "56") (term "0") (ifseqformula "49"))
                                                                   (builtin "One Step Simplification" (formula "56") (ifInst ""  (formula "43")))
                                                                   (rule "true_left" (formula "56"))
-                                                                  (builtin "Use Dependency Contract" (formula "64") (ifInst ""  (formula "46") (term "0")) (ifInst ""  (formula "46")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                                  (builtin "Use Dependency Contract" (formula "64") (ifInst ""  (formula "46") (term "0")) (ifInst ""  (formula "46")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                                   (branch " Dependencies unchanged by write to {}
 "
                                                                      (rule "selectCreatedOfAnonEQ" (formula "57") (term "0,1,0") (ifseqformula "39"))
@@ -1484,7 +1484,7 @@
                                                       (rule "replace_known_right" (formula "1") (term "0") (ifseqformula "52"))
                                                       (builtin "One Step Simplification" (formula "1") (ifInst ""  (formula "26")))
                                                       (rule "true_left" (formula "1"))
-                                                      (builtin "Use Dependency Contract" (formula "41") (ifInst ""  (formula "21")) (ifInst ""  (formula "36")) (ifInst ""  (formula "31")) (ifInst ""  (formula "23")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                      (builtin "Use Dependency Contract" (formula "41") (ifInst ""  (formula "21")) (ifInst ""  (formula "36")) (ifInst ""  (formula "31")) (ifInst ""  (formula "23")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                       (branch " Dependencies unchanged by write to      allFields(self_0) \\cup allFields(self_1)
 \\cup allFields(self_1)
 "
@@ -1525,7 +1525,7 @@
                                                          (rule "typeEqDerived2" (formula "52") (term "0,0,1,0") (ifseqformula "2"))
                                                          (builtin "One Step Simplification" (formula "52"))
                                                          (rule "castDel" (formula "52") (term "0,0,0"))
-                                                         (builtin "Use Dependency Contract" (formula "40") (ifInst ""  (formula "34")) (ifInst ""  (formula "36")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                         (builtin "Use Dependency Contract" (formula "40") (ifInst ""  (formula "34")) (ifInst ""  (formula "36")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                          (branch " Dependencies unchanged by write to allFields(self_0) \\cup allFields(self_1)
 "
                                                             (rule "selectCreatedOfAnonEQ" (formula "54") (term "0,1,0,0") (ifseqformula "31"))
@@ -1566,7 +1566,7 @@
                                                             (rule "typeEqDerived2" (formula "54") (term "0,0,1,0") (ifseqformula "2"))
                                                             (builtin "One Step Simplification" (formula "54"))
                                                             (rule "castDel" (formula "54") (term "0,0,0"))
-                                                            (builtin "Use Dependency Contract" (formula "46") (ifInst ""  (formula "43") (term "0")) (ifInst ""  (formula "43")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                            (builtin "Use Dependency Contract" (formula "46") (ifInst ""  (formula "43") (term "0")) (ifInst ""  (formula "43")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                             (branch " Dependencies unchanged by write to {}
 "
                                                                (rule "selectCreatedOfAnonEQ" (formula "56") (term "0,1,0") (ifseqformula "36"))
@@ -1585,7 +1585,7 @@
                                                                (rule "replace_known_left" (formula "55") (term "1") (ifseqformula "40"))
                                                                (builtin "One Step Simplification" (formula "55") (ifInst ""  (formula "46")))
                                                                (rule "true_left" (formula "55"))
-                                                               (builtin "Use Dependency Contract" (formula "63") (ifInst ""  (formula "43") (term "0")) (ifInst ""  (formula "43")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                               (builtin "Use Dependency Contract" (formula "63") (ifInst ""  (formula "43") (term "0")) (ifInst ""  (formula "43")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                                (branch " Dependencies unchanged by write to {}
 "
                                                                   (rule "selectCreatedOfAnonEQ" (formula "56") (term "0,1,0") (ifseqformula "36"))
@@ -1655,7 +1655,7 @@
                                                                (rule "onlyCreatedObjectsAreInLocSets" (formula "2") (ifseqformula "32"))
                                                                (rule "replace_known_right" (formula "2") (term "0") (ifseqformula "57"))
                                                                (builtin "One Step Simplification" (formula "2"))
-                                                               (builtin "Use Dependency Contract" (formula "49") (ifInst ""  (formula "46") (term "0")) (ifInst ""  (formula "46")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                               (builtin "Use Dependency Contract" (formula "49") (ifInst ""  (formula "46") (term "0")) (ifInst ""  (formula "46")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                                (branch " Dependencies unchanged by write to {}
 "
                                                                   (rule "selectCreatedOfAnonEQ" (formula "57") (term "0,1,0") (ifseqformula "39"))
@@ -1674,7 +1674,7 @@
                                                                   (rule "replace_known_left" (formula "56") (term "0") (ifseqformula "49"))
                                                                   (builtin "One Step Simplification" (formula "56") (ifInst ""  (formula "43")))
                                                                   (rule "true_left" (formula "56"))
-                                                                  (builtin "Use Dependency Contract" (formula "64") (ifInst ""  (formula "46") (term "0")) (ifInst ""  (formula "46")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                                  (builtin "Use Dependency Contract" (formula "64") (ifInst ""  (formula "46") (term "0")) (ifInst ""  (formula "46")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                                   (branch " Dependencies unchanged by write to {}
 "
                                                                      (rule "selectCreatedOfAnonEQ" (formula "57") (term "0,1,0") (ifseqformula "39"))
@@ -1726,7 +1726,7 @@
                                                                (rule "onlyCreatedObjectsAreInLocSets" (formula "2") (ifseqformula "32"))
                                                                (rule "replace_known_right" (formula "2") (term "0") (ifseqformula "62"))
                                                                (builtin "One Step Simplification" (formula "2"))
-                                                               (builtin "Use Dependency Contract" (formula "49") (ifInst ""  (formula "46") (term "0")) (ifInst ""  (formula "46")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                               (builtin "Use Dependency Contract" (formula "49") (ifInst ""  (formula "46") (term "0")) (ifInst ""  (formula "46")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                                (branch " Dependencies unchanged by write to {}
 "
                                                                   (rule "selectCreatedOfAnonEQ" (formula "57") (term "0,1,0") (ifseqformula "39"))
@@ -1745,7 +1745,7 @@
                                                                   (rule "replace_known_left" (formula "56") (term "0") (ifseqformula "49"))
                                                                   (builtin "One Step Simplification" (formula "56") (ifInst ""  (formula "43")))
                                                                   (rule "true_left" (formula "56"))
-                                                                  (builtin "Use Dependency Contract" (formula "64") (ifInst ""  (formula "46") (term "0")) (ifInst ""  (formula "46")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                                  (builtin "Use Dependency Contract" (formula "64") (ifInst ""  (formula "46") (term "0")) (ifInst ""  (formula "46")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                                   (branch " Dependencies unchanged by write to {}
 "
                                                                      (rule "selectCreatedOfAnonEQ" (formula "57") (term "0,1,0") (ifseqformula "39"))
@@ -1821,7 +1821,7 @@
                                                                (rule "onlyCreatedObjectsAreInLocSets" (formula "2") (ifseqformula "20"))
                                                                (rule "replace_known_right" (formula "2") (term "0") (ifseqformula "60"))
                                                                (builtin "One Step Simplification" (formula "2"))
-                                                               (builtin "Use Dependency Contract" (formula "44") (ifInst ""  (formula "38")) (ifInst ""  (formula "40")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                               (builtin "Use Dependency Contract" (formula "44") (ifInst ""  (formula "38")) (ifInst ""  (formula "40")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                                (branch " Dependencies unchanged by write to allFields(self_0) \\cup allFields(self_1)
 "
                                                                   (rule "selectCreatedOfAnonEQ" (formula "55") (term "0,1,0,0") (ifseqformula "35"))
@@ -1862,7 +1862,7 @@
                                                                   (rule "typeEqDerived2" (formula "55") (term "0,0,1,0") (ifseqformula "6"))
                                                                   (builtin "One Step Simplification" (formula "55"))
                                                                   (rule "castDel" (formula "55") (term "0,0,0"))
-                                                                  (builtin "Use Dependency Contract" (formula "50") (ifInst ""  (formula "47") (term "0")) (ifInst ""  (formula "47")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                                  (builtin "Use Dependency Contract" (formula "50") (ifInst ""  (formula "47") (term "0")) (ifInst ""  (formula "47")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                                   (branch " Dependencies unchanged by write to {}
 "
                                                                      (rule "selectCreatedOfAnonEQ" (formula "57") (term "0,1,0") (ifseqformula "40"))
@@ -1881,7 +1881,7 @@
                                                                      (rule "replace_known_left" (formula "56") (term "0") (ifseqformula "50"))
                                                                      (builtin "One Step Simplification" (formula "56") (ifInst ""  (formula "44")))
                                                                      (rule "true_left" (formula "56"))
-                                                                     (builtin "Use Dependency Contract" (formula "64") (ifInst ""  (formula "47") (term "0")) (ifInst ""  (formula "47")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                                     (builtin "Use Dependency Contract" (formula "64") (ifInst ""  (formula "47") (term "0")) (ifInst ""  (formula "47")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                                      (branch " Dependencies unchanged by write to {}
 "
                                                                         (rule "selectCreatedOfAnonEQ" (formula "57") (term "0,1,0") (ifseqformula "40"))
@@ -1951,7 +1951,7 @@
                                                                      (rule "onlyCreatedObjectsAreInLocSets" (formula "2") (ifseqformula "36"))
                                                                      (rule "replace_known_right" (formula "2") (term "0") (ifseqformula "63"))
                                                                      (builtin "One Step Simplification" (formula "2"))
-                                                                     (builtin "Use Dependency Contract" (formula "53") (ifInst ""  (formula "50") (term "0")) (ifInst ""  (formula "50")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                                     (builtin "Use Dependency Contract" (formula "53") (ifInst ""  (formula "50") (term "0")) (ifInst ""  (formula "50")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                                      (branch " Dependencies unchanged by write to {}
 "
                                                                         (rule "selectCreatedOfAnonEQ" (formula "58") (term "0,1,0") (ifseqformula "43"))
@@ -1970,7 +1970,7 @@
                                                                         (rule "replace_known_left" (formula "57") (term "0") (ifseqformula "53"))
                                                                         (builtin "One Step Simplification" (formula "57") (ifInst ""  (formula "47")))
                                                                         (rule "true_left" (formula "57"))
-                                                                        (builtin "Use Dependency Contract" (formula "65") (ifInst ""  (formula "50") (term "0")) (ifInst ""  (formula "50")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                                        (builtin "Use Dependency Contract" (formula "65") (ifInst ""  (formula "50") (term "0")) (ifInst ""  (formula "50")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                                         (branch " Dependencies unchanged by write to {}
 "
                                                                            (rule "selectCreatedOfAnonEQ" (formula "58") (term "0,1,0") (ifseqformula "43"))
@@ -2021,7 +2021,7 @@
                                                                      (rule "onlyCreatedObjectsAreInLocSets" (formula "2") (ifseqformula "36"))
                                                                      (rule "replace_known_right" (formula "2") (term "0") (ifseqformula "58"))
                                                                      (builtin "One Step Simplification" (formula "2"))
-                                                                     (builtin "Use Dependency Contract" (formula "53") (ifInst ""  (formula "50") (term "0")) (ifInst ""  (formula "50")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                                     (builtin "Use Dependency Contract" (formula "53") (ifInst ""  (formula "50") (term "0")) (ifInst ""  (formula "50")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                                      (branch " Dependencies unchanged by write to {}
 "
                                                                         (rule "selectCreatedOfAnonEQ" (formula "58") (term "0,1,0") (ifseqformula "43"))
@@ -2040,7 +2040,7 @@
                                                                         (rule "replace_known_left" (formula "57") (term "0") (ifseqformula "53"))
                                                                         (builtin "One Step Simplification" (formula "57") (ifInst ""  (formula "47")))
                                                                         (rule "true_left" (formula "57"))
-                                                                        (builtin "Use Dependency Contract" (formula "65") (ifInst ""  (formula "50") (term "0")) (ifInst ""  (formula "50")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                                        (builtin "Use Dependency Contract" (formula "65") (ifInst ""  (formula "50") (term "0")) (ifInst ""  (formula "50")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                                         (branch " Dependencies unchanged by write to {}
 "
                                                                            (rule "selectCreatedOfAnonEQ" (formula "58") (term "0,1,0") (ifseqformula "43"))
@@ -2156,7 +2156,7 @@
                                                 (rule "replace_known_left" (formula "1") (term "1") (ifseqformula "12"))
                                                 (builtin "One Step Simplification" (formula "1") (ifInst ""  (formula "54")))
                                                 (rule "true_left" (formula "1"))
-                                                (builtin "Use Dependency Contract" (formula "29") (ifInst ""  (formula "23") (term "0")) (ifInst ""  (formula "23")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                (builtin "Use Dependency Contract" (formula "29") (ifInst ""  (formula "23") (term "0")) (ifInst ""  (formula "23")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                 (branch " Dependencies unchanged by write to {}
 "
                                                    (rule "selectCreatedOfAnonEQ" (formula "48") (term "0,1,0") (ifseqformula "18"))
@@ -2177,7 +2177,7 @@
                                                    (rule "replace_known_right" (formula "47") (term "0,1,0,0") (ifseqformula "49"))
                                                    (builtin "One Step Simplification" (formula "47") (ifInst ""  (formula "4")) (ifInst ""  (formula "50")) (ifInst ""  (formula "51")) (ifInst ""  (formula "52")))
                                                    (rule "false_right" (formula "47"))
-                                                   (builtin "Use Dependency Contract" (formula "34") (ifInst ""  (formula "29")) (ifInst ""  (formula "31")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                   (builtin "Use Dependency Contract" (formula "34") (ifInst ""  (formula "29")) (ifInst ""  (formula "31")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                    (branch " Dependencies unchanged by write to allFields(self_1)
 "
                                                       (rule "selectCreatedOfAnonEQ" (formula "48") (term "0,1,0,0") (ifseqformula "23"))
@@ -2209,7 +2209,7 @@
                                                       (rule "instanceof_static_type" (formula "49") (term "0,0,1,0"))
                                                       (builtin "One Step Simplification" (formula "49"))
                                                       (rule "castDel" (formula "49") (term "0,0,0"))
-                                                      (builtin "Use Dependency Contract" (formula "41") (ifInst ""  (formula "21")) (ifInst ""  (formula "36")) (ifInst ""  (formula "31")) (ifInst ""  (formula "23")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                      (builtin "Use Dependency Contract" (formula "41") (ifInst ""  (formula "21")) (ifInst ""  (formula "36")) (ifInst ""  (formula "31")) (ifInst ""  (formula "23")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                       (branch " Dependencies unchanged by write to      allFields(self_0) \\cup allFields(self_1)
 \\cup allFields(self_1)
 "
@@ -2250,7 +2250,7 @@
                                                          (rule "instanceof_static_type" (formula "52") (term "0,0,1,0"))
                                                          (builtin "One Step Simplification" (formula "52"))
                                                          (rule "castDel" (formula "52") (term "0,0,0"))
-                                                         (builtin "Use Dependency Contract" (formula "40") (ifInst ""  (formula "34")) (ifInst ""  (formula "36")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                         (builtin "Use Dependency Contract" (formula "40") (ifInst ""  (formula "34")) (ifInst ""  (formula "36")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                          (branch " Dependencies unchanged by write to allFields(self_0) \\cup allFields(self_1)
 "
                                                             (rule "selectCreatedOfAnonEQ" (formula "54") (term "0,1,0,0") (ifseqformula "31"))
@@ -2291,7 +2291,7 @@
                                                             (rule "instanceof_static_type" (formula "54") (term "0,0,1,0"))
                                                             (builtin "One Step Simplification" (formula "54"))
                                                             (rule "castDel" (formula "54") (term "0,0,0"))
-                                                            (builtin "Use Dependency Contract" (formula "46") (ifInst ""  (formula "43") (term "0")) (ifInst ""  (formula "43")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                            (builtin "Use Dependency Contract" (formula "46") (ifInst ""  (formula "43") (term "0")) (ifInst ""  (formula "43")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                             (branch " Dependencies unchanged by write to {}
 "
                                                                (rule "selectCreatedOfAnonEQ" (formula "56") (term "0,1,0") (ifseqformula "36"))
@@ -2310,7 +2310,7 @@
                                                                (rule "replace_known_left" (formula "55") (term "1") (ifseqformula "40"))
                                                                (builtin "One Step Simplification" (formula "55") (ifInst ""  (formula "46")))
                                                                (rule "true_left" (formula "55"))
-                                                               (builtin "Use Dependency Contract" (formula "63") (ifInst ""  (formula "43") (term "0")) (ifInst ""  (formula "43")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                               (builtin "Use Dependency Contract" (formula "63") (ifInst ""  (formula "43") (term "0")) (ifInst ""  (formula "43")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                                (branch " Dependencies unchanged by write to {}
 "
                                                                   (rule "selectCreatedOfAnonEQ" (formula "56") (term "0,1,0") (ifseqformula "36"))
@@ -2380,7 +2380,7 @@
                                                                (rule "onlyCreatedObjectsAreInLocSets" (formula "2") (ifseqformula "32"))
                                                                (rule "replace_known_right" (formula "2") (term "0") (ifseqformula "57"))
                                                                (builtin "One Step Simplification" (formula "2"))
-                                                               (builtin "Use Dependency Contract" (formula "49") (ifInst ""  (formula "46") (term "0")) (ifInst ""  (formula "46")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                               (builtin "Use Dependency Contract" (formula "49") (ifInst ""  (formula "46") (term "0")) (ifInst ""  (formula "46")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                                (branch " Dependencies unchanged by write to {}
 "
                                                                   (rule "selectCreatedOfAnonEQ" (formula "57") (term "0,1,0") (ifseqformula "39"))
@@ -2399,7 +2399,7 @@
                                                                   (rule "replace_known_left" (formula "56") (term "0") (ifseqformula "49"))
                                                                   (builtin "One Step Simplification" (formula "56") (ifInst ""  (formula "43")))
                                                                   (rule "true_left" (formula "56"))
-                                                                  (builtin "Use Dependency Contract" (formula "64") (ifInst ""  (formula "46") (term "0")) (ifInst ""  (formula "46")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                                  (builtin "Use Dependency Contract" (formula "64") (ifInst ""  (formula "46") (term "0")) (ifInst ""  (formula "46")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                                   (branch " Dependencies unchanged by write to {}
 "
                                                                      (rule "selectCreatedOfAnonEQ" (formula "57") (term "0,1,0") (ifseqformula "39"))
@@ -2451,7 +2451,7 @@
                                                                (rule "onlyCreatedObjectsAreInLocSets" (formula "2") (ifseqformula "32"))
                                                                (rule "replace_known_right" (formula "2") (term "0") (ifseqformula "62"))
                                                                (builtin "One Step Simplification" (formula "2"))
-                                                               (builtin "Use Dependency Contract" (formula "49") (ifInst ""  (formula "46") (term "0")) (ifInst ""  (formula "46")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                               (builtin "Use Dependency Contract" (formula "49") (ifInst ""  (formula "46") (term "0")) (ifInst ""  (formula "46")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                                (branch " Dependencies unchanged by write to {}
 "
                                                                   (rule "selectCreatedOfAnonEQ" (formula "57") (term "0,1,0") (ifseqformula "39"))
@@ -2470,7 +2470,7 @@
                                                                   (rule "replace_known_left" (formula "56") (term "0") (ifseqformula "49"))
                                                                   (builtin "One Step Simplification" (formula "56") (ifInst ""  (formula "43")))
                                                                   (rule "true_left" (formula "56"))
-                                                                  (builtin "Use Dependency Contract" (formula "64") (ifInst ""  (formula "46") (term "0")) (ifInst ""  (formula "46")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                                  (builtin "Use Dependency Contract" (formula "64") (ifInst ""  (formula "46") (term "0")) (ifInst ""  (formula "46")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                                   (branch " Dependencies unchanged by write to {}
 "
                                                                      (rule "selectCreatedOfAnonEQ" (formula "57") (term "0,1,0") (ifseqformula "39"))
@@ -2546,7 +2546,7 @@
                                                                (rule "onlyCreatedObjectsAreInLocSets" (formula "2") (ifseqformula "20"))
                                                                (rule "replace_known_right" (formula "2") (term "0") (ifseqformula "60"))
                                                                (builtin "One Step Simplification" (formula "2"))
-                                                               (builtin "Use Dependency Contract" (formula "44") (ifInst ""  (formula "38")) (ifInst ""  (formula "40")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                               (builtin "Use Dependency Contract" (formula "44") (ifInst ""  (formula "38")) (ifInst ""  (formula "40")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                                (branch " Dependencies unchanged by write to allFields(self_0) \\cup allFields(self_1)
 "
                                                                   (rule "selectCreatedOfAnonEQ" (formula "55") (term "0,1,0,0") (ifseqformula "35"))
@@ -2587,7 +2587,7 @@
                                                                   (rule "instanceof_static_type" (formula "55") (term "0,0,1,0"))
                                                                   (builtin "One Step Simplification" (formula "55"))
                                                                   (rule "castDel" (formula "55") (term "0,0,0"))
-                                                                  (builtin "Use Dependency Contract" (formula "50") (ifInst ""  (formula "47") (term "0")) (ifInst ""  (formula "47")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                                  (builtin "Use Dependency Contract" (formula "50") (ifInst ""  (formula "47") (term "0")) (ifInst ""  (formula "47")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                                   (branch " Dependencies unchanged by write to {}
 "
                                                                      (rule "selectCreatedOfAnonEQ" (formula "57") (term "0,1,0") (ifseqformula "40"))
@@ -2606,7 +2606,7 @@
                                                                      (rule "replace_known_left" (formula "56") (term "0") (ifseqformula "50"))
                                                                      (builtin "One Step Simplification" (formula "56") (ifInst ""  (formula "44")))
                                                                      (rule "true_left" (formula "56"))
-                                                                     (builtin "Use Dependency Contract" (formula "64") (ifInst ""  (formula "47") (term "0")) (ifInst ""  (formula "47")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                                     (builtin "Use Dependency Contract" (formula "64") (ifInst ""  (formula "47") (term "0")) (ifInst ""  (formula "47")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                                      (branch " Dependencies unchanged by write to {}
 "
                                                                         (rule "selectCreatedOfAnonEQ" (formula "57") (term "0,1,0") (ifseqformula "40"))
@@ -2676,7 +2676,7 @@
                                                                      (rule "onlyCreatedObjectsAreInLocSets" (formula "2") (ifseqformula "36"))
                                                                      (rule "replace_known_right" (formula "2") (term "0") (ifseqformula "58"))
                                                                      (builtin "One Step Simplification" (formula "2"))
-                                                                     (builtin "Use Dependency Contract" (formula "53") (ifInst ""  (formula "50") (term "0")) (ifInst ""  (formula "50")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                                     (builtin "Use Dependency Contract" (formula "53") (ifInst ""  (formula "50") (term "0")) (ifInst ""  (formula "50")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                                      (branch " Dependencies unchanged by write to {}
 "
                                                                         (rule "selectCreatedOfAnonEQ" (formula "58") (term "0,1,0") (ifseqformula "43"))
@@ -2695,7 +2695,7 @@
                                                                         (rule "replace_known_left" (formula "57") (term "0") (ifseqformula "53"))
                                                                         (builtin "One Step Simplification" (formula "57") (ifInst ""  (formula "47")))
                                                                         (rule "true_left" (formula "57"))
-                                                                        (builtin "Use Dependency Contract" (formula "65") (ifInst ""  (formula "50") (term "0")) (ifInst ""  (formula "50")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                                        (builtin "Use Dependency Contract" (formula "65") (ifInst ""  (formula "50") (term "0")) (ifInst ""  (formula "50")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                                         (branch " Dependencies unchanged by write to {}
 "
                                                                            (rule "selectCreatedOfAnonEQ" (formula "58") (term "0,1,0") (ifseqformula "43"))
@@ -2747,7 +2747,7 @@
                                                                      (rule "onlyCreatedObjectsAreInLocSets" (formula "2") (ifseqformula "36"))
                                                                      (rule "replace_known_right" (formula "2") (term "0") (ifseqformula "63"))
                                                                      (builtin "One Step Simplification" (formula "2"))
-                                                                     (builtin "Use Dependency Contract" (formula "53") (ifInst ""  (formula "50") (term "0")) (ifInst ""  (formula "50")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                                     (builtin "Use Dependency Contract" (formula "53") (ifInst ""  (formula "50") (term "0")) (ifInst ""  (formula "50")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                                      (branch " Dependencies unchanged by write to {}
 "
                                                                         (rule "selectCreatedOfAnonEQ" (formula "58") (term "0,1,0") (ifseqformula "43"))
@@ -2766,7 +2766,7 @@
                                                                         (rule "replace_known_left" (formula "57") (term "0") (ifseqformula "53"))
                                                                         (builtin "One Step Simplification" (formula "57") (ifInst ""  (formula "47")))
                                                                         (rule "true_left" (formula "57"))
-                                                                        (builtin "Use Dependency Contract" (formula "65") (ifInst ""  (formula "50") (term "0")) (ifInst ""  (formula "50")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                                        (builtin "Use Dependency Contract" (formula "65") (ifInst ""  (formula "50") (term "0")) (ifInst ""  (formula "50")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                                         (branch " Dependencies unchanged by write to {}
 "
                                                                            (rule "selectCreatedOfAnonEQ" (formula "58") (term "0,1,0") (ifseqformula "43"))
@@ -2865,7 +2865,7 @@
                                                             (rule "replace_known_right" (formula "1") (term "0") (ifseqformula "53"))
                                                             (builtin "One Step Simplification" (formula "1") (ifInst ""  (formula "30")))
                                                             (rule "true_left" (formula "1"))
-                                                            (builtin "Use Dependency Contract" (formula "45") (ifInst ""  (formula "25")) (ifInst ""  (formula "40")) (ifInst ""  (formula "35")) (ifInst ""  (formula "27")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                            (builtin "Use Dependency Contract" (formula "45") (ifInst ""  (formula "25")) (ifInst ""  (formula "40")) (ifInst ""  (formula "35")) (ifInst ""  (formula "27")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                             (branch " Dependencies unchanged by write to      allFields(self_0) \\cup allFields(self_1)
 \\cup allFields(self_1)
 "
@@ -2907,7 +2907,7 @@
                                                                (rule "typeEqDerived2" (formula "53") (term "0,0,1,0") (ifseqformula "2"))
                                                                (builtin "One Step Simplification" (formula "53"))
                                                                (rule "castDel" (formula "53") (term "0,0,0"))
-                                                               (builtin "Use Dependency Contract" (formula "44") (ifInst ""  (formula "38")) (ifInst ""  (formula "40")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                               (builtin "Use Dependency Contract" (formula "44") (ifInst ""  (formula "38")) (ifInst ""  (formula "40")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                                (branch " Dependencies unchanged by write to allFields(self_0) \\cup allFields(self_1)
 "
                                                                   (rule "selectCreatedOfAnonEQ" (formula "55") (term "0,1,0,0") (ifseqformula "35"))
@@ -2947,7 +2947,7 @@
                                                                   (rule "typeEqDerived2" (formula "55") (term "0,0,1,0") (ifseqformula "2"))
                                                                   (builtin "One Step Simplification" (formula "55"))
                                                                   (rule "castDel" (formula "55") (term "0,0,0"))
-                                                                  (builtin "Use Dependency Contract" (formula "50") (ifInst ""  (formula "47") (term "0")) (ifInst ""  (formula "47")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                                  (builtin "Use Dependency Contract" (formula "50") (ifInst ""  (formula "47") (term "0")) (ifInst ""  (formula "47")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                                   (branch " Dependencies unchanged by write to {}
 "
                                                                      (rule "selectCreatedOfAnonEQ" (formula "57") (term "0,1,0") (ifseqformula "40"))
@@ -2966,7 +2966,7 @@
                                                                      (rule "replace_known_left" (formula "56") (term "1") (ifseqformula "44"))
                                                                      (builtin "One Step Simplification" (formula "56") (ifInst ""  (formula "50")))
                                                                      (rule "true_left" (formula "56"))
-                                                                     (builtin "Use Dependency Contract" (formula "64") (ifInst ""  (formula "47") (term "0")) (ifInst ""  (formula "47")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                                     (builtin "Use Dependency Contract" (formula "64") (ifInst ""  (formula "47") (term "0")) (ifInst ""  (formula "47")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                                      (branch " Dependencies unchanged by write to {}
 "
                                                                         (rule "selectCreatedOfAnonEQ" (formula "57") (term "0,1,0") (ifseqformula "40"))
@@ -3036,7 +3036,7 @@
                                                                      (rule "onlyCreatedObjectsAreInLocSets" (formula "2") (ifseqformula "36"))
                                                                      (rule "replace_known_right" (formula "2") (term "0") (ifseqformula "58"))
                                                                      (builtin "One Step Simplification" (formula "2"))
-                                                                     (builtin "Use Dependency Contract" (formula "53") (ifInst ""  (formula "50") (term "0")) (ifInst ""  (formula "50")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                                     (builtin "Use Dependency Contract" (formula "53") (ifInst ""  (formula "50") (term "0")) (ifInst ""  (formula "50")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                                      (branch " Dependencies unchanged by write to {}
 "
                                                                         (rule "selectCreatedOfAnonEQ" (formula "58") (term "0,1,0") (ifseqformula "43"))
@@ -3055,7 +3055,7 @@
                                                                         (rule "replace_known_left" (formula "57") (term "0") (ifseqformula "53"))
                                                                         (builtin "One Step Simplification" (formula "57") (ifInst ""  (formula "47")))
                                                                         (rule "true_left" (formula "57"))
-                                                                        (builtin "Use Dependency Contract" (formula "65") (ifInst ""  (formula "50") (term "0")) (ifInst ""  (formula "50")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                                        (builtin "Use Dependency Contract" (formula "65") (ifInst ""  (formula "50") (term "0")) (ifInst ""  (formula "50")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                                         (branch " Dependencies unchanged by write to {}
 "
                                                                            (rule "selectCreatedOfAnonEQ" (formula "58") (term "0,1,0") (ifseqformula "43"))
@@ -3107,7 +3107,7 @@
                                                                      (rule "onlyCreatedObjectsAreInLocSets" (formula "2") (ifseqformula "36"))
                                                                      (rule "replace_known_right" (formula "2") (term "0") (ifseqformula "63"))
                                                                      (builtin "One Step Simplification" (formula "2"))
-                                                                     (builtin "Use Dependency Contract" (formula "53") (ifInst ""  (formula "50") (term "0")) (ifInst ""  (formula "50")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                                     (builtin "Use Dependency Contract" (formula "53") (ifInst ""  (formula "50") (term "0")) (ifInst ""  (formula "50")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                                      (branch " Dependencies unchanged by write to {}
 "
                                                                         (rule "selectCreatedOfAnonEQ" (formula "58") (term "0,1,0") (ifseqformula "43"))
@@ -3126,7 +3126,7 @@
                                                                         (rule "replace_known_left" (formula "57") (term "0") (ifseqformula "53"))
                                                                         (builtin "One Step Simplification" (formula "57") (ifInst ""  (formula "47")))
                                                                         (rule "true_left" (formula "57"))
-                                                                        (builtin "Use Dependency Contract" (formula "65") (ifInst ""  (formula "50") (term "0")) (ifInst ""  (formula "50")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                                        (builtin "Use Dependency Contract" (formula "65") (ifInst ""  (formula "50") (term "0")) (ifInst ""  (formula "50")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                                         (branch " Dependencies unchanged by write to {}
 "
                                                                            (rule "selectCreatedOfAnonEQ" (formula "58") (term "0,1,0") (ifseqformula "43"))
@@ -3213,7 +3213,7 @@
                                                                      (rule "onlyCreatedObjectsAreInLocSets" (formula "2") (ifseqformula "24"))
                                                                      (rule "replace_known_right" (formula "2") (term "0") (ifseqformula "61"))
                                                                      (builtin "One Step Simplification" (formula "2"))
-                                                                     (builtin "Use Dependency Contract" (formula "48") (ifInst ""  (formula "42")) (ifInst ""  (formula "44")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                                     (builtin "Use Dependency Contract" (formula "48") (ifInst ""  (formula "42")) (ifInst ""  (formula "44")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                                      (branch " Dependencies unchanged by write to allFields(self_0) \\cup allFields(self_1)
 "
                                                                         (rule "selectCreatedOfAnonEQ" (formula "56") (term "0,1,0,0") (ifseqformula "39"))
@@ -3253,7 +3253,7 @@
                                                                         (rule "typeEqDerived2" (formula "56") (term "0,0,1,0") (ifseqformula "6"))
                                                                         (builtin "One Step Simplification" (formula "56"))
                                                                         (rule "castDel" (formula "56") (term "0,0,0"))
-                                                                        (builtin "Use Dependency Contract" (formula "54") (ifInst ""  (formula "51") (term "0")) (ifInst ""  (formula "51")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                                        (builtin "Use Dependency Contract" (formula "54") (ifInst ""  (formula "51") (term "0")) (ifInst ""  (formula "51")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                                         (branch " Dependencies unchanged by write to {}
 "
                                                                            (rule "selectCreatedOfAnonEQ" (formula "58") (term "0,1,0") (ifseqformula "44"))
@@ -3272,7 +3272,7 @@
                                                                            (rule "replace_known_left" (formula "57") (term "0") (ifseqformula "54"))
                                                                            (builtin "One Step Simplification" (formula "57") (ifInst ""  (formula "48")))
                                                                            (rule "true_left" (formula "57"))
-                                                                           (builtin "Use Dependency Contract" (formula "65") (ifInst ""  (formula "51") (term "0")) (ifInst ""  (formula "51")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                                           (builtin "Use Dependency Contract" (formula "65") (ifInst ""  (formula "51") (term "0")) (ifInst ""  (formula "51")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                                            (branch " Dependencies unchanged by write to {}
 "
                                                                               (rule "selectCreatedOfAnonEQ" (formula "58") (term "0,1,0") (ifseqformula "44"))
@@ -3342,7 +3342,7 @@
                                                                            (rule "onlyCreatedObjectsAreInLocSets" (formula "2") (ifseqformula "40"))
                                                                            (rule "replace_known_right" (formula "2") (term "0") (ifseqformula "64"))
                                                                            (builtin "One Step Simplification" (formula "2"))
-                                                                           (builtin "Use Dependency Contract" (formula "57") (ifInst ""  (formula "54") (term "0")) (ifInst ""  (formula "54")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                                           (builtin "Use Dependency Contract" (formula "57") (ifInst ""  (formula "54") (term "0")) (ifInst ""  (formula "54")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                                            (branch " Dependencies unchanged by write to {}
 "
                                                                               (rule "selectCreatedOfAnonEQ" (formula "59") (term "0,1,0") (ifseqformula "47"))
@@ -3361,7 +3361,7 @@
                                                                               (rule "replace_known_left" (formula "58") (term "0") (ifseqformula "57"))
                                                                               (builtin "One Step Simplification" (formula "58") (ifInst ""  (formula "51")))
                                                                               (rule "true_left" (formula "58"))
-                                                                              (builtin "Use Dependency Contract" (formula "66") (ifInst ""  (formula "54") (term "0")) (ifInst ""  (formula "54")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                                              (builtin "Use Dependency Contract" (formula "66") (ifInst ""  (formula "54") (term "0")) (ifInst ""  (formula "54")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                                               (branch " Dependencies unchanged by write to {}
 "
                                                                                  (rule "selectCreatedOfAnonEQ" (formula "59") (term "0,1,0") (ifseqformula "47"))
@@ -3412,7 +3412,7 @@
                                                                            (rule "onlyCreatedObjectsAreInLocSets" (formula "2") (ifseqformula "40"))
                                                                            (rule "replace_known_right" (formula "2") (term "0") (ifseqformula "59"))
                                                                            (builtin "One Step Simplification" (formula "2"))
-                                                                           (builtin "Use Dependency Contract" (formula "57") (ifInst ""  (formula "54") (term "0")) (ifInst ""  (formula "54")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                                           (builtin "Use Dependency Contract" (formula "57") (ifInst ""  (formula "54") (term "0")) (ifInst ""  (formula "54")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                                            (branch " Dependencies unchanged by write to {}
 "
                                                                               (rule "selectCreatedOfAnonEQ" (formula "59") (term "0,1,0") (ifseqformula "47"))
@@ -3431,7 +3431,7 @@
                                                                               (rule "replace_known_left" (formula "58") (term "0") (ifseqformula "57"))
                                                                               (builtin "One Step Simplification" (formula "58") (ifInst ""  (formula "51")))
                                                                               (rule "true_left" (formula "58"))
-                                                                              (builtin "Use Dependency Contract" (formula "66") (ifInst ""  (formula "54") (term "0")) (ifInst ""  (formula "54")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                                              (builtin "Use Dependency Contract" (formula "66") (ifInst ""  (formula "54") (term "0")) (ifInst ""  (formula "54")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                                               (branch " Dependencies unchanged by write to {}
 "
                                                                                  (rule "selectCreatedOfAnonEQ" (formula "59") (term "0,1,0") (ifseqformula "47"))
@@ -3700,7 +3700,7 @@
                               (rule "replace_known_left" (formula "23") (term "0") (ifseqformula "24"))
                               (builtin "One Step Simplification" (formula "23"))
                               (rule "true_left" (formula "23"))
-                              (builtin "Use Dependency Contract" (formula "11") (ifInst ""  (formula "6") (term "0")) (ifInst ""  (formula "6")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                              (builtin "Use Dependency Contract" (formula "11") (ifInst ""  (formula "6") (term "0")) (ifInst ""  (formula "6")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                               (branch " Dependencies unchanged by write to {}
 "
                                  (rule "andLeft" (formula "32"))
@@ -3712,7 +3712,7 @@
                                  (rule "replace_known_right" (formula "31") (term "0,1,0,0") (ifseqformula "37"))
                                  (builtin "One Step Simplification" (formula "31") (ifInst ""  (formula "2")) (ifInst ""  (formula "36")))
                                  (rule "false_right" (formula "31"))
-                                 (builtin "Use Dependency Contract" (formula "17") (ifInst ""  (formula "11")) (ifInst ""  (formula "14")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                 (builtin "Use Dependency Contract" (formula "17") (ifInst ""  (formula "11")) (ifInst ""  (formula "14")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                  (branch " Dependencies unchanged by write to allFields(self_0)
 "
                                     (rule "selectCreatedOfAnonEQ" (formula "32") (term "0,1,0,0") (ifseqformula "6"))
@@ -3738,7 +3738,7 @@
                                     (rule "instanceof_static_type" (formula "33") (term "0,0,1,0"))
                                     (builtin "One Step Simplification" (formula "33"))
                                     (rule "castDel" (formula "33") (term "0,0,0"))
-                                    (builtin "Use Dependency Contract" (formula "25") (ifInst ""  (formula "19") (term "0")) (ifInst ""  (formula "19")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                    (builtin "Use Dependency Contract" (formula "25") (ifInst ""  (formula "19") (term "0")) (ifInst ""  (formula "19")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                     (branch " Dependencies unchanged by write to {}
 "
                                        (rule "selectCreatedOfAnonEQ" (formula "35") (term "0,1,0") (ifseqformula "14"))
@@ -3759,7 +3759,7 @@
                                        (rule "replace_known_right" (formula "34") (term "0,1,0,0") (ifseqformula "35"))
                                        (builtin "One Step Simplification" (formula "34") (ifInst ""  (formula "32")) (ifInst ""  (formula "36")) (ifInst ""  (formula "37")) (ifInst ""  (formula "38")))
                                        (rule "false_right" (formula "34"))
-                                       (builtin "Use Dependency Contract" (formula "30") (ifInst ""  (formula "25")) (ifInst ""  (formula "27")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                       (builtin "Use Dependency Contract" (formula "30") (ifInst ""  (formula "25")) (ifInst ""  (formula "27")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                        (branch " Dependencies unchanged by write to allFields(self_1)
 "
                                           (rule "selectCreatedOfAnonEQ" (formula "35") (term "0,1,0,0") (ifseqformula "19"))
@@ -3791,7 +3791,7 @@
                                           (rule "instanceof_static_type" (formula "35") (term "0,0,1,0"))
                                           (builtin "One Step Simplification" (formula "35"))
                                           (rule "castDel" (formula "35") (term "0,0,0"))
-                                          (builtin "Use Dependency Contract" (formula "44") (ifInst ""  (formula "17")) (ifInst ""  (formula "27")) (ifInst ""  (formula "19")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                          (builtin "Use Dependency Contract" (formula "44") (ifInst ""  (formula "17")) (ifInst ""  (formula "27")) (ifInst ""  (formula "19")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                           (branch " Dependencies unchanged by write to allFields(self_1)
 "
                                              (rule "selectCreatedOfAnonEQ" (formula "37") (term "0,1,0,0") (ifseqformula "14"))
@@ -3860,7 +3860,7 @@
                                              (rule "replace_known_left" (formula "1") (term "1") (ifseqformula "25"))
                                              (builtin "One Step Simplification" (formula "1") (ifInst ""  (formula "38")))
                                              (rule "true_left" (formula "1"))
-                                             (builtin "Use Dependency Contract" (formula "45") (ifInst ""  (formula "20")) (ifInst ""  (formula "30")) (ifInst ""  (formula "22")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                             (builtin "Use Dependency Contract" (formula "45") (ifInst ""  (formula "20")) (ifInst ""  (formula "30")) (ifInst ""  (formula "22")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                              (branch " Dependencies unchanged by write to allFields(self_1)
 "
                                                 (rule "selectCreatedOfAnonEQ" (formula "38") (term "0,1,0,0") (ifseqformula "17"))
@@ -3937,7 +3937,7 @@
                                           (rule "replace_known_right" (formula "1") (term "0") (ifseqformula "41"))
                                           (builtin "One Step Simplification" (formula "1") (ifInst ""  (formula "12")))
                                           (rule "true_left" (formula "1"))
-                                          (builtin "Use Dependency Contract" (formula "29") (ifInst ""  (formula "23") (term "0")) (ifInst ""  (formula "23")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                          (builtin "Use Dependency Contract" (formula "29") (ifInst ""  (formula "23") (term "0")) (ifInst ""  (formula "23")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                           (branch " Dependencies unchanged by write to {}
 "
                                              (rule "selectCreatedOfAnonEQ" (formula "36") (term "0,1,0") (ifseqformula "18"))
@@ -3958,7 +3958,7 @@
                                              (rule "replace_known_right" (formula "35") (term "0,1,0,0") (ifseqformula "36"))
                                              (builtin "One Step Simplification" (formula "35") (ifInst ""  (formula "3")) (ifInst ""  (formula "37")) (ifInst ""  (formula "38")) (ifInst ""  (formula "39")))
                                              (rule "false_right" (formula "35"))
-                                             (builtin "Use Dependency Contract" (formula "34") (ifInst ""  (formula "29")) (ifInst ""  (formula "31")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                             (builtin "Use Dependency Contract" (formula "34") (ifInst ""  (formula "29")) (ifInst ""  (formula "31")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                              (branch " Dependencies unchanged by write to allFields(self_1)
 "
                                                 (rule "selectCreatedOfAnonEQ" (formula "36") (term "0,1,0,0") (ifseqformula "23"))
@@ -3990,7 +3990,7 @@
                                                 (rule "instanceof_static_type" (formula "36") (term "0,0,1,0"))
                                                 (builtin "One Step Simplification" (formula "36"))
                                                 (rule "castDel" (formula "36") (term "0,0,0"))
-                                                (builtin "Use Dependency Contract" (formula "45") (ifInst ""  (formula "21")) (ifInst ""  (formula "31")) (ifInst ""  (formula "23")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                (builtin "Use Dependency Contract" (formula "45") (ifInst ""  (formula "21")) (ifInst ""  (formula "31")) (ifInst ""  (formula "23")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                 (branch " Dependencies unchanged by write to allFields(self_1)
 "
                                                    (rule "selectCreatedOfAnonEQ" (formula "38") (term "0,1,0,0") (ifseqformula "18"))
@@ -4059,7 +4059,7 @@
                                                    (rule "replace_known_left" (formula "1") (term "1") (ifseqformula "29"))
                                                    (builtin "One Step Simplification" (formula "1") (ifInst ""  (formula "39")))
                                                    (rule "true_left" (formula "1"))
-                                                   (builtin "Use Dependency Contract" (formula "46") (ifInst ""  (formula "24")) (ifInst ""  (formula "34")) (ifInst ""  (formula "26")) (contract "JML depends clause [id: 0 / java.lang.Object::<inv> for Account]"))
+                                                   (builtin "Use Dependency Contract" (formula "46") (ifInst ""  (formula "24")) (ifInst ""  (formula "34")) (ifInst ""  (formula "26")) (contract "JML accessible clause [id: 0 / java.lang.Object::<inv> for Account]"))
                                                    (branch " Dependencies unchanged by write to allFields(self_1)
 "
                                                       (rule "selectCreatedOfAnonEQ" (formula "39") (term "0,1,0,0") (ifseqformula "21"))

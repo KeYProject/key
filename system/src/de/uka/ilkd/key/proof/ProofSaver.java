@@ -18,10 +18,7 @@ import java.util.Vector;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableMapEntry;
-import de.uka.ilkd.key.gui.IMain;
-import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
@@ -242,15 +239,16 @@ public class ProofSaver {
          tree.append(prefix);            
          String branchLabel = child.getNodeInfo().getBranchLabel();
          
+         // The branchLabel is ignored when reading in the proof,
+         // print it if we have it, ignore it otherwise. (MU)
          if (branchLabel == null) {
-              // This assertion is related to bug #1099  
-            System.err.println("(null) branchlabel for node " + child);
+             tree.append("(branch\n");
          } else {
-            branchLabel = "THIS_LABEL_WAS_MISSING";
+             tree.append("(branch \"" + escapeCharacters(branchLabel) + "\"\n");
          }
-         tree.append("(branch \" " + escapeCharacters(branchLabel) + "\"\n");
-	 collectProof(child, prefix+"   ", tree);
-         tree.append(prefix+")\n");
+         
+         collectProof(child, prefix + "   ", tree);
+         tree.append(prefix + ")\n");
       }
 
       return tree;

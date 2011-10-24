@@ -20,6 +20,10 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 public class ExpressionSVWrapper extends Literal implements Expression, 
     LoopInitializer, KeYRecoderExtension, SVWrapper, ReferencePrefix {
    
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 7659491655661716390L;
     protected SchemaVariable sv;
     protected ReferenceSuffix suff;
 

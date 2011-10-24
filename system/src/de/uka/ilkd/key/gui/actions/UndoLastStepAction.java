@@ -24,6 +24,10 @@ import de.uka.ilkd.key.proof.ProofEvent;
  */
 public final class UndoLastStepAction extends MainWindowAction {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 9133317783386913373L;
     private boolean longName = false;
     
     /**

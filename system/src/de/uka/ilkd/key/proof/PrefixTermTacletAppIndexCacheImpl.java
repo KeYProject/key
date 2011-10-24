@@ -32,16 +32,16 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 abstract class PrefixTermTacletAppIndexCacheImpl extends
                                                  PrefixTermTacletAppIndexCache {
 
-    private final Map cache;
+    private final Map<CacheKey, TermTacletAppIndex> cache;
     
     protected PrefixTermTacletAppIndexCacheImpl(ImmutableList<QuantifiableVariable> prefix,
-                                                Map cache) {
+                                                Map<CacheKey, TermTacletAppIndex> cache) {
         super ( prefix );
         this.cache = cache;
     }
 
     public TermTacletAppIndex getIndexForTerm(Term t) {
-        final TermTacletAppIndex res = (TermTacletAppIndex)cache.get ( getQueryKey ( t ) );
+        final TermTacletAppIndex res = cache.get ( getQueryKey ( t ) );
         
 //       countAccess ( res != null );
 

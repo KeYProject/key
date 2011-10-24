@@ -29,6 +29,10 @@ import de.uka.ilkd.key.gui.IconFactory;
 
 public class ChoiceSelector extends JDialog {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -4470713015801365801L;
     private ChoiceSettings settings;
     private HashMap<String, String> category2DefaultChoice;
     private HashMap<String, Set<String>> category2Choices;

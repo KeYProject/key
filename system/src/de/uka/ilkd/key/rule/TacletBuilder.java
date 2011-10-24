@@ -295,6 +295,10 @@ public abstract class TacletBuilder {
     static class TacletBuilderException extends IllegalArgumentException {
 	
       
+        /**
+         * 
+         */
+        private static final long serialVersionUID = -6710383705714015291L;
         private Name tacletname;
         private String errorMessage;
                 

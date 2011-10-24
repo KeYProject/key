@@ -14,6 +14,11 @@ package de.uka.ilkd.key.util;
 
 public class ExceptionHandlerException extends RuntimeException {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 4804191909840321109L;
+
     public ExceptionHandlerException() {
 	super("An Exception occurred");
     }

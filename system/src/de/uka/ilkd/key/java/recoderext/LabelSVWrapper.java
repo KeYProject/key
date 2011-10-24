@@ -15,6 +15,10 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 public class  LabelSVWrapper extends Identifier 
     implements KeYRecoderExtension, SVWrapper{
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 5338442155201858492L;
     SchemaVariable sv=null;
 
     public LabelSVWrapper(SchemaVariable sv) {

@@ -10,7 +10,6 @@
 
 package de.uka.ilkd.key.gui.nodeviews;
 
-import java.awt.Color;
 import java.awt.Point;
 import java.awt.dnd.DragGestureEvent;
 import java.awt.dnd.DragGestureListener;

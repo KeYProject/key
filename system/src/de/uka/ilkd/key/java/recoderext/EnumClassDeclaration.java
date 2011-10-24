@@ -69,6 +69,11 @@ import recoder.list.generic.ASTList;
 public class EnumClassDeclaration extends ClassDeclaration {
     
     /**
+     * 
+     */
+    private static final long serialVersionUID = -7075041929429297548L;
+
+    /**
      * name of the static variable of the array holding the names of the constants.
      */
     private static final String ENUM_NAMES = "<enumConstantNames>";

@@ -13,6 +13,10 @@ package de.uka.ilkd.key.parser;
 import antlr.Token;
 
 public class KeYSemanticException extends antlr.SemanticException {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -3341865050312925366L;
     String cat;
     String filename;
     Token t;

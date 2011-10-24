@@ -34,13 +34,15 @@ import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.mgt.ProofStatus;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.speclang.DependencyContract;
-import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.util.Pair;
 
 
 public final class ProofManagementDialog extends JDialog {
     
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 3543411893273433386L;
     private static final ImageIcon keyIcon 
         = IconFactory.keyHole(20, 20);
     private static final ImageIcon keyAlmostClosedIcon 
@@ -87,7 +89,12 @@ public final class ProofManagementDialog extends JDialog {
 	//create proof list
 	proofList = new JList();
 	proofList.setCellRenderer(new DefaultListCellRenderer() {
-	    public Component getListCellRendererComponent(JList list, 
+	    /**
+         * 
+         */
+        private static final long serialVersionUID = -7810888250050777877L;
+
+        public Component getListCellRendererComponent(JList list, 
 	     					   	  Object value, 
 		     					  int index, 
 		     					  boolean isSelected, 

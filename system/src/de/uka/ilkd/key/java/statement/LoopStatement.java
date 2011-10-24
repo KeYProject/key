@@ -381,13 +381,6 @@ public abstract class LoopStatement extends JavaStatement
        return inits;
     }
 
-
-    /**
-     *      Is exit condition.
-     *      @return the boolean value.
-     */
-    public abstract boolean isExitCondition();
-
     /**
      *      Is checked before iteration.
      *      @return the boolean value.

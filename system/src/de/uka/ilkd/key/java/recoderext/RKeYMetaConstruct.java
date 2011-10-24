@@ -34,6 +34,10 @@ public class RKeYMetaConstruct extends JavaStatement
 
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = -2616618524631193660L;
+    /**
      Child
      */
     protected Statement child=null;
@@ -50,7 +54,7 @@ public class RKeYMetaConstruct extends JavaStatement
     protected RKeYMetaConstruct(RKeYMetaConstruct proto) {
         super(proto);
         if (proto.child != null) {
-            child = (Statement)proto.child.deepClone();
+            child = proto.child.deepClone();
         }
     }
 

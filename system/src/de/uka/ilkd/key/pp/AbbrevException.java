@@ -11,7 +11,11 @@ package de.uka.ilkd.key.pp;
 
 public class AbbrevException extends Exception{
 	
-	protected boolean termused;
+	/**
+     * 
+     */
+    private static final long serialVersionUID = 7602628448672131434L;
+    protected boolean termused;
 
 	public AbbrevException(String message,boolean termused){
 		super(message);

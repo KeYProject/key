@@ -13,6 +13,11 @@ import de.uka.ilkd.key.gui.MainWindow;
 public abstract class MainWindowAction extends AbstractAction {
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = -957832573562266547L;
+
+    /**
      * This constant holds the typical key to be used for shortcuts
      * (usually {@link java.awt.Event#CTRL_MASK})
      */

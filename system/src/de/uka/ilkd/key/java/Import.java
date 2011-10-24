@@ -40,7 +40,7 @@ public class Import extends JavaNonTerminalProgramElement
      */
     public Import(ExtList children, boolean isMultiImport) {
 	super(children);
-	reference=(TypeReferenceInfix)children.get(TypeReferenceInfix.class);
+	reference=children.get(TypeReferenceInfix.class);
 	this.isMultiImport=isMultiImport;
     }
 

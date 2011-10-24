@@ -19,6 +19,10 @@ import de.uka.ilkd.key.logic.sort.Sort;
 
 public class TermCreationException extends RuntimeException {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -420114434457325045L;
     private final String errorMessage;
 
     public TermCreationException(String errorMessage) {

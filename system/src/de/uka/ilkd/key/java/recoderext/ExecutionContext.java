@@ -21,6 +21,11 @@ public class ExecutionContext
 	       ExpressionContainer {
     
     /**
+     * 
+     */
+    private static final long serialVersionUID = 2460904042433100490L;
+
+    /**
      * the ast parent
      */
     private NonTerminalProgramElement astParent;

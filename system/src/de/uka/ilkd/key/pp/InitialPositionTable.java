@@ -95,8 +95,7 @@ public class InitialPositionTable extends PositionTable{
     public ImmutableList<Integer> pathForPosition(PosInOccurrence pio,
 					 SequentPrintFilter filter) {
 	ImmutableList<Integer> p = ImmutableSLList.<Integer>nil();
-	
-	p = p;
+
 	p = prependPathInFormula(p,pio);
 	p = p.prepend(Integer.valueOf(indexOfCfma(pio.constrainedFormula(),
 					      filter)));
@@ -127,23 +126,6 @@ public class InitialPositionTable extends PositionTable{
 	    }
 	}
 	return -1;
-    }
-
-    /**
-     * Returns the <code>SequentPrintFilterEntry</code> for the given
-     * constrained formula from the <code>filter</code>.
-     */
-    private SequentPrintFilterEntry entryForCfma (SequentFormula cfma,
-                                                  SequentPrintFilter filter) {
-        ImmutableList<SequentPrintFilterEntry> list =
-            filter.getAntec ().append ( filter.getSucc () );
-        int k;
-        for ( k = 0; !list.isEmpty (); k++, list = list.tail () ) {
-            if ( list.head ().getOriginalFormula () == cfma ) {
-                return list.head ();
-            }
-        }
-        return null;
     }
 
     /**

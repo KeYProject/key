@@ -1,10 +1,7 @@
 package de.uka.ilkd.key.gui.actions;
 
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-
-import javax.swing.KeyStroke;
 
 import de.uka.ilkd.key.gui.KeYSelectionEvent;
 import de.uka.ilkd.key.gui.KeYSelectionListener;
@@ -16,6 +13,11 @@ import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
  * Shows the proof management dialog
  */
 public final class ProofManagementAction extends MainWindowAction {
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 7696620742992568551L;
 
     public ProofManagementAction(MainWindow mainWindow) {
 	super(mainWindow);

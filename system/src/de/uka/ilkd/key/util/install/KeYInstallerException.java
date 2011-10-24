@@ -15,6 +15,10 @@ import java.io.StringWriter;
 
 public class KeYInstallerException extends Exception {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 4811766923178331697L;
     private Exception e;
 
     public KeYInstallerException ( String msg ) {

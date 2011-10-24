@@ -196,28 +196,30 @@ class TacletConditions {
     
     private boolean containsComparisionCondition(TypeComparisonCondition tcc,
 	    Sort s1, Sort s2, TypeComparisonCondition.Mode mode){
-	GenericSortResolver first  = null, second = null;
-	if(tcc.getFirstResolver() instanceof GenericSortResolver){
-	    first = (GenericSortResolver)tcc.getFirstResolver();
-	}
 	
-	if(tcc.getSecondResolver() instanceof GenericSortResolver){
-	    second = (GenericSortResolver)tcc.getSecondResolver();
-	}
+        GenericSortResolver first  = null, second = null;
 	
-	 
-	if(tcc != null && first != null && second != null){
-	    if(tcc.getMode() == mode){
-		if(first.getGenericSort().equals(s1) &&
-			second.getGenericSort().equals(s2)){
-		    return true;}
-		if(first.getGenericSort().equals(s2) &&
-			second.getGenericSort().equals(s1)){
-		    return true;}
-	    }
-	}
-	return false;
-	
+        if(tcc.getFirstResolver() instanceof GenericSortResolver){
+            first = (GenericSortResolver)tcc.getFirstResolver();
+        }
+
+        if(tcc.getSecondResolver() instanceof GenericSortResolver){
+            second = (GenericSortResolver)tcc.getSecondResolver();
+        }
+
+
+        if(first != null && second != null){
+            if(tcc.getMode() == mode){
+                if(first.getGenericSort().equals(s1) &&
+                        second.getGenericSort().equals(s2)){
+                    return true;}
+                if(first.getGenericSort().equals(s2) &&
+                        second.getGenericSort().equals(s1)){
+                    return true;}
+            }
+        }
+        return false;
+
     }
     
     public boolean containsIsSubtypeRelation(Sort gen,Sort inst, TypeComparisonCondition.Mode mode){

@@ -18,6 +18,10 @@ import recoder.java.expression.Literal;
 
 public final class EmptySetLiteral extends Literal {
     
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 262935836224837458L;
     public static final EmptySetLiteral INSTANCE = new EmptySetLiteral();
     
     @Override

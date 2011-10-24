@@ -44,7 +44,7 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
      */
     public TypeOperator(ExtList children) {
 	super(children);
-	typeReference=(TypeReference)children.get(TypeReference.class);
+	typeReference=children.get(TypeReference.class);
     }
 
     /**
@@ -58,7 +58,7 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
      */
     public TypeOperator(ExtList children, PositionInfo pi) {
 	super(children);
-	typeReference=(TypeReference)children.get(TypeReference.class);
+	typeReference=children.get(TypeReference.class);
     }
     
     public TypeOperator(Expression unaryChild, TypeReference typeref) {

@@ -341,7 +341,8 @@ public final class LogicPrinter {
      *           The Taclet to be pretty-printed.
      */
     public void printTaclet(Taclet taclet) {
-        printTaclet(taclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true, false);
+        // the last argument used to be false. Changed that - M.Ulbrich
+        printTaclet(taclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true, true); 
     }
 
     protected void printAttribs(Taclet taclet) throws IOException{
@@ -1292,7 +1293,7 @@ public final class LogicPrinter {
             final QuantifiableVariable v = vars.get (j);
             if(v instanceof LogicVariable) {
                 Term t =
-                    TermFactory.DEFAULT.createTerm((LogicVariable) v);
+                    TermFactory.DEFAULT.createTerm(v);
                 if(notationInfo.getAbbrevMap().containsTerm(t)) {
                     layouter.print (v.sort().name().toString() + " " +
                                     notationInfo.getAbbrevMap().getAbbrev(t));

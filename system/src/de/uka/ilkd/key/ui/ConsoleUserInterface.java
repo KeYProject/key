@@ -36,7 +36,7 @@ public class ConsoleUserInterface implements UserInterface {
                 System.out.println(info.getResult());
                     System.exit(-1);
             } 
-            if(info.getProof().openGoals().size()==0) {
+            if(batchMode.isLoadOnly() ||  info.getProof().openGoals().size()==0) {
                 System.out.println("proof.openGoals.size=" + 
                         info.getProof().openGoals().size());              
                 System.exit(0);

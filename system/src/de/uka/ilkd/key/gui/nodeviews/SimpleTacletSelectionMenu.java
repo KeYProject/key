@@ -36,6 +36,11 @@ import de.uka.ilkd.key.rule.PosTacletApp;
 public class SimpleTacletSelectionMenu extends JMenu {
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = 3027934580300468044L;
+
+    /**
      * creates an instance of this menu displaying the applications stored in
      * <tt>apps</tt>
      * @param apps the IList<PosTacletApp> to be displayed

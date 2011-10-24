@@ -28,6 +28,11 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
  */
 public class Namespace implements java.io.Serializable {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 3094844691883883929L;
+
     /** 
      * The fall-back namespace for symbols not present in this
      * Namespace.

@@ -164,7 +164,7 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
                 (Identifier)td.getIdentifier().deepClone();*/
         
 	if (td.getIdentifier() != null) {
-	    return (Identifier)td.getIdentifier().deepClone();
+	    return td.getIdentifier().deepClone();
 	}
 	
 	final ClassType firstActualSupertype = getAllSupertypes(td).get(1);

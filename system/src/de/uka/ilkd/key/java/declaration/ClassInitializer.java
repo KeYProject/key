@@ -44,7 +44,7 @@ public class ClassInitializer extends JavaDeclaration implements MemberDeclarati
      */
     public ClassInitializer(ExtList children) {
         super(children);
-	body=(StatementBlock)children.get(StatementBlock.class);
+	body=children.get(StatementBlock.class);
     }
 
 

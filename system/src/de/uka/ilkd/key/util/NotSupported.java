@@ -13,6 +13,11 @@ package de.uka.ilkd.key.util;
 
 public class NotSupported extends RuntimeException {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -1804357960867777191L;
+
     public NotSupported(String msg) {
 	super(msg);
     }

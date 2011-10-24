@@ -21,6 +21,10 @@ import javax.swing.*;
 import javax.swing.border.BevelBorder;
 
 class MainStatusLine extends JPanel {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -4324361226332870737L;
     private JLabel       text;
     private JPanel       progressPanel;
     private JProgressBar progressBar;

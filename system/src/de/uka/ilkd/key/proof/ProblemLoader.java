@@ -716,22 +716,17 @@ public final class ProblemLoader implements Runnable {
 
     private static class AppConstructionException extends Exception {
 
-        AppConstructionException(String s) {
-            super(s);
-        }
-
-        AppConstructionException(Throwable t) {
-            super(t);
-        }
-
-        AppConstructionException(String s, Throwable t) {
-            super(s, t);
-        }
-
-    }
+        /**
+         * 
+         */
+        private static final long serialVersionUID = -6534063595443883709L; }
 
     private static class BuiltInConstructionException extends Exception {
-	BuiltInConstructionException(String s) {
+	/**
+         * 
+         */
+        private static final long serialVersionUID = -735474220502290816L;
+    BuiltInConstructionException(String s) {
 	    super(s);
 	}
 	BuiltInConstructionException(Throwable cause) {
@@ -741,15 +736,5 @@ public final class ProblemLoader implements Runnable {
 
     public KeYExceptionHandler getExceptionHandler() {
         return exceptionHandler;
-    }
-
-    private static class PairOfString {
-        public String left;
-        public String right;
-
-        public PairOfString ( String p_left, String p_right ) {
-            left  = p_left;
-            right = p_right;
-        }
     }
 }

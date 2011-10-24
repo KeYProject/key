@@ -154,6 +154,8 @@ FROM : "\\from";
 TO : "\\to";
 IF : "\\if";
 
+DL_ESCAPE : "\\dl_"  LETTER  ( LETTERORDIGIT )*  ;
+
 EQV_ANTIV: "<==>" | "<=!=>";
 EQ_NEQ : "==" | "!=";
 

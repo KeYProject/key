@@ -16,8 +16,6 @@ import java.io.StringWriter;
 
 import junit.framework.TestCase;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
-import de.uka.ilkd.key.collection.DefaultImmutableSet;
-import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;

@@ -471,14 +471,13 @@ public final class JavaInfo {
 	     sortCachedSize = kpmi.rec2key().size();
 	     sort2KJTCache = new HashMap<Sort, KeYJavaType>();
 	     for (final Object o : kpmi.allElements()) {
-		 if (o instanceof KeYJavaType){
-                     final KeYJavaType oKJT = (KeYJavaType)o;
-                     if(sort2KJTCache.containsKey(oKJT.getSort())) {
-                	 sort2KJTCache.remove(oKJT.getSort()); //XXX
-                     } else {
-                	 sort2KJTCache.put((oKJT).getSort(), oKJT);
-                     }
-		 }
+	         if (o instanceof KeYJavaType){
+	             final KeYJavaType oKJT = (KeYJavaType)o;
+	             if(sort2KJTCache.containsKey(oKJT.getSort())) {
+	                 sort2KJTCache.remove(oKJT.getSort()); //XXX
+	             } 
+	             sort2KJTCache.put((oKJT).getSort(), oKJT);	             
+	         }
 	     }
 	 }	
 	 return sort2KJTCache.get(sort);
@@ -716,7 +715,7 @@ public final class JavaInfo {
     }
 
     /** gets an array of expression and returns a list of types */
-    private ImmutableList<KeYJavaType> getKeYJavaTypes(ImmutableArray<Expression> args) {
+    private ImmutableList<KeYJavaType> getKeYJavaTypes(ImmutableArray<? extends Expression> args) {
 	ImmutableList<KeYJavaType> result = ImmutableSLList.<KeYJavaType>nil(); 
 	if (args != null) {
 	    for (int i = args.size()-1; i >= 0 ; i--) {
@@ -735,7 +734,7 @@ public final class JavaInfo {
      * signature 
      * @return the signature 
      */
-    public ImmutableList<KeYJavaType> createSignature(ImmutableArray<Expression> arguments) {
+    public ImmutableList<KeYJavaType> createSignature(ImmutableArray<? extends Expression> arguments) {
 	return getKeYJavaTypes(arguments);    
     }
 

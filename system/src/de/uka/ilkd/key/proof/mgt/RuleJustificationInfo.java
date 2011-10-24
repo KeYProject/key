@@ -28,7 +28,7 @@ public class RuleJustificationInfo {
     }
 
     public RuleJustification getJustification(Rule r) {
-	return (RuleJustification) rule2justif.get(r);
+	return rule2justif.get(r);
     }
 
     public RuleJustification getJustification(RuleApp r, Services services) {

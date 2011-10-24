@@ -206,7 +206,7 @@ public class Recoder2KeY implements JavaReader {
 
         this.servConf = servConf;
         this.mapping = rec2key;
-        this.converter = makeConverter();
+        this.converter = makeConverter(services, nss);
         this.typeConverter = new Recoder2KeYTypeConverter(services, tc, nss, this);
         
         // set up recoder:
@@ -223,11 +223,14 @@ public class Recoder2KeY implements JavaReader {
     /**
      * create the ast converter. This is overwritten in SchemaRecoder2KeY to use
      * schema-aware converters.
+     * @param services 
+     * 
+     * @param nss the namespaces provided to the constructor 
      * 
      * @return a newley created converter
      */
-    protected Recoder2KeYConverter makeConverter() {
-        return new Recoder2KeYConverter(this);
+    protected Recoder2KeYConverter makeConverter(Services services, NamespaceSet nss) {
+        return new Recoder2KeYConverter(this, services, nss);
     }
 
     /**
@@ -509,10 +512,8 @@ public class Recoder2KeY implements JavaReader {
     	        ConvertException e2 = new ConvertException("While parsing "+loc+"\n"+ex.getMessage());
                 e2.initCause(ex);
                 throw e2;
-            } finally {
-        	if (f != null) {
+            } finally {        
         	    f.close();
-        	}
             }
             
             
@@ -668,6 +669,9 @@ public class Recoder2KeY implements JavaReader {
                 }
                 methDecl.setBody(null);
             }
+            /*
+            // This is deactivated to allow compile time constants in declaration stub files.
+            // see bug #1114 
             if (pe instanceof recoder.java.declaration.FieldSpecification) {
                 recoder.java.declaration.FieldSpecification fieldSpec = 
                     (recoder.java.declaration.FieldSpecification) pe;
@@ -677,6 +681,7 @@ public class Recoder2KeY implements JavaReader {
                 }
                 fieldSpec.setInitializer(null);
             }
+            */
             if (pe instanceof ClassInitializer) {
                 ClassInitializer classInit = (ClassInitializer) pe;
                 if(!allowed && classInit.getBody() != null) {
