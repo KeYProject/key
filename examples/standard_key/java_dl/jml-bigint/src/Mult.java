@@ -12,8 +12,8 @@ public class Mult {
     // (ignoring-overflow) semantics.
 
     /*@ public normal_behavior
-      @ requires -2147483548 <= (\bigint)x * (\bigint)y;
-      @ requires (\bigint)x * (\bigint)y <= 2147483547;
+      @ requires -2147483648 <= (\bigint)x * (\bigint)y;
+      @ requires (\bigint)x * (\bigint)y <= 2147483647;
       @ ensures \result == x * y;
       @*/
     public int mult (int x, int y){
