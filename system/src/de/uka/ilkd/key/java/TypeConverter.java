@@ -42,7 +42,9 @@ public final class TypeConverter {
     private LocSetLDT locSetLDT;
     private HeapLDT heapLDT;
     private SeqLDT seqLDT;
+    @SuppressWarnings("unused")
     private FloatLDT floatLDT;
+    @SuppressWarnings("unused")
     private DoubleLDT doubleLDT;
     private CharListLDT charListLDT;
     
@@ -458,13 +460,9 @@ public final class TypeConverter {
                         t2 == PrimitiveType.JAVA_CHAR||
                         t2 == PrimitiveType.JAVA_LONG)) { 
             return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LONG);
-    	} else if ((t1 == PrimitiveType.JAVA_BIGINT) &&
-    	        t2 == PrimitiveType.JAVA_BYTE || t2 == PrimitiveType.JAVA_CHAR || t2 == PrimitiveType.JAVA_INT
-    	        || t2 == PrimitiveType.JAVA_LONG || t2 == PrimitiveType.JAVA_SHORT || t2 == PrimitiveType.JAVA_BIGINT) {
+    	} else if ((t1 == PrimitiveType.JAVA_BIGINT) && isIntegerType(t2)) {
     	    return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
-        } else if ((t2 == PrimitiveType.JAVA_BIGINT) &&
-                t1 == PrimitiveType.JAVA_BYTE || t1 == PrimitiveType.JAVA_CHAR || t1 == PrimitiveType.JAVA_INT
-                || t1 == PrimitiveType.JAVA_LONG || t1 == PrimitiveType.JAVA_SHORT || t1 == PrimitiveType.JAVA_BIGINT) {
+        } else if ((t2 == PrimitiveType.JAVA_BIGINT) && isIntegerType(t2)) {
             return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
     	} else if (t1 == PrimitiveType.JAVA_LOCSET && t2 == PrimitiveType.JAVA_LOCSET) { 
             return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LOCSET);
@@ -478,6 +476,11 @@ public final class TypeConverter {
             throw new RuntimeException("Could not determine promoted type "
         	    	               + "of " + t1 + " and " + t2);
         }
+    }
+
+    public boolean isIntegerType(Type t2){
+        return (t2 == PrimitiveType.JAVA_BYTE || t2 == PrimitiveType.JAVA_CHAR || t2 == PrimitiveType.JAVA_INT
+                || t2 == PrimitiveType.JAVA_LONG || t2 == PrimitiveType.JAVA_SHORT || t2 == PrimitiveType.JAVA_BIGINT);
     }
 
 
