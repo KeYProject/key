@@ -12,6 +12,7 @@ public class Mult {
     // (ignoring-overflow) semantics.
 
     /*@ public normal_behavior
+      @ requires -2147483648 < x;
       @ requires -2147483648 <= (\bigint)x * (\bigint)y;
       @ requires (\bigint)x * (\bigint)y <= 2147483647;
       @ ensures \result == x * y;
@@ -20,9 +21,9 @@ public class Mult {
         int z = 0;
         boolean p = x > 0;
         if (p) x = -x;
-        //  maintaining z == y * (p? (x-\old(x)) : (\old(x)-x));
-        //@ maintaining true;
-        while (x++ > 0) z += y;
+        //@ maintaining z == y * (p? (\old(x)+x) : (x-\old(x)));
+        //@ decreasing -x;
+        while (x++ < 0) z += y;
         return p? z: -z;
     }
 }
