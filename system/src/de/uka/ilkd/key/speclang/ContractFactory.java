@@ -94,44 +94,16 @@ public class ContractFactory {
      * Returns another contract like this one, except that the passed term
      * has been added as a precondition.
      */
-<<<<<<< HEAD
-    public FunctionalOperationContract addPre(FunctionalOperationContract old, Term addedPre,
-            ProgramVariable selfVar, 
-            ImmutableList<ProgramVariable> paramVars, LocationVariable savedHeapAtPreVar){
-        assert old instanceof FunctionalOperationContractImpl : UNKNOWN_CONTRACT_IMPLEMENTATION;
-    FunctionalOperationContractImpl foci = (FunctionalOperationContractImpl) old;
-    addedPre = replaceVariables(addedPre, selfVar, paramVars, savedHeapAtPreVar, foci.originalSelfVar, foci.originalParamVars, foci.originalSavedHeapAtPreVar);
-
-    //create new contract
-    return new FunctionalOperationContractImpl(foci.baseName,
-            foci.name,
-            foci.kjt,                                    
-            foci.pm,
-            foci.modality,
-            tb.and(foci.originalPre, addedPre),
-            foci.originalMby,
-            foci.originalPost,
-            foci.originalMod,
-            foci.originalModBackup,
-            foci.originalSelfVar,
-            foci.originalParamVars,
-            foci.originalResultVar,
-            foci.originalExcVar,
-            foci.originalHeapAtPreVar,
-            foci.originalSavedHeapAtPreVar,
-            foci.id,
-            foci.toBeSaved);
-=======
     public FunctionalOperationContract addPre(FunctionalOperationContract old,
                                               Term addedPre,
                                               ProgramVariable selfVar,
-                                              ImmutableList<ProgramVariable> paramVars) {
+                                              ImmutableList<ProgramVariable> paramVars, LocationVariable savedHeapAtPreVar) {
         assert old instanceof FunctionalOperationContractImpl : UNKNOWN_CONTRACT_IMPLEMENTATION;
         FunctionalOperationContractImpl foci =
                 (FunctionalOperationContractImpl) old;
         addedPre =
-                replaceVariables(addedPre, selfVar, paramVars,
-                                 foci.originalSelfVar, foci.originalParamVars);
+                replaceVariables(addedPre, selfVar, paramVars, savedHeapAtPreVar,
+                                 foci.originalSelfVar, foci.originalParamVars, foci.originalSavedHeapAtPreVar);
 
         //create new contract
         return new FunctionalOperationContractImpl(foci.baseName,
@@ -144,14 +116,15 @@ public class ContractFactory {
                                                    foci.originalMby,
                                                    foci.originalPost,
                                                    foci.originalMod,
+                                                   foci.originalModBackup,
                                                    foci.originalSelfVar,
                                                    foci.originalParamVars,
                                                    foci.originalResultVar,
                                                    foci.originalExcVar,
                                                    foci.originalHeapAtPreVar,
+                                                   foci.originalSavedHeapAtPreVar,
                                                    foci.id,
                                                    foci.toBeSaved);
->>>>>>> 3834e3162f7f7caa385edfd225e55de98cf8bc59
     }
 
     public DependencyContract dep(KeYJavaType containerType,

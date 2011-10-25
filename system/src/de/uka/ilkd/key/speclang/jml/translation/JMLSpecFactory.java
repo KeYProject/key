@@ -380,7 +380,7 @@ public class JMLSpecFactory {
                                       Behavior originalBehavior,
                                       ImmutableList<PositionedString> originalClauses)
             throws SLTranslationException {
-        return translateSignals(pm, null, null, null, excVar, null,
+        return translateSignals(pm, null, null, null, excVar, null, null,
                                 originalBehavior, originalClauses);
     }
 
@@ -877,7 +877,7 @@ public class JMLSpecFactory {
             transactionInvariant = TB.tt();
             for (PositionedString expr : originalTransactionInvariant) {
                 Term translated =
-                        translator.<Term>parse(expr, pm.getContainerType(),
+                        translator.<Term>translate(expr, pm.getContainerType(),
                                                selfVar, paramVars, null,
                                                null, heapAtPre, savedHeapAtPre, services);
                 transactionInvariant = TB.and(transactionInvariant, translated);
@@ -906,7 +906,7 @@ public class JMLSpecFactory {
             assignableBackup = TB.empty(services);
             for (PositionedString expr : originalBackupAssignable) {
                 Term translated =
-                        translator.<Term>parse(expr, pm.getContainerType(),
+                        translator.<Term>translate(expr, pm.getContainerType(),
                                                selfVar, paramVars, null, null,
                                                null, null, services);
                 assignableBackup = TB.union(services, assignableBackup, translated);

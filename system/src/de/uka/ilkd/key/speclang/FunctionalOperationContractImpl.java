@@ -794,11 +794,13 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
                                                    originalMby,
                                                    originalPost,
                                                    originalMod,
+                                                   originalModBackup,
                                                    originalSelfVar,
                                                    originalParamVars,
                                                    originalResultVar,
                                                    originalExcVar,
                                                    originalHeapAtPreVar,
+                                                   originalSavedHeapAtPreVar,
                                                    newId,
                                                    toBeSaved);
     }
@@ -817,11 +819,13 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
                                                    originalMby,
                                                    originalPost,
                                                    originalMod,
+                                                   originalModBackup,
                                                    originalSelfVar,
                                                    originalParamVars,
                                                    originalResultVar,
                                                    originalExcVar,
                                                    originalHeapAtPreVar,
+                                                   originalSavedHeapAtPreVar,
                                                    id,
                                                    toBeSaved && newKJT.equals(
                 kjt));
