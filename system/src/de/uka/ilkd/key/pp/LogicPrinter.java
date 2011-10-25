@@ -10,6 +10,9 @@
 
 package de.uka.ilkd.key.pp;
 
+import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
+import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.*;
