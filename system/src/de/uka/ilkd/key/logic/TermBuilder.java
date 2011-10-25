@@ -1416,11 +1416,12 @@ public final class TermBuilder {
     }
     
     
-    public Term anonUpd(Services services, Term mod, Term anonHeap) {
+    public Term anonUpd(Services services, Term mod, Term anonHeap, boolean savedHeap) {
 	return elementary(services,
-		          services.getTypeConverter().getHeapLDT().getHeap(),
+		          savedHeap ? services.getTypeConverter().getHeapLDT().getSavedHeap()
+		                    : services.getTypeConverter().getHeapLDT().getHeap(),
 		          anon(services, 
-		               heap(services), 
+		               savedHeap ? savedHeap(services) : heap(services), 
 		               mod, 
 		               anonHeap));
     }

@@ -149,12 +149,12 @@ public final class WhileInvariantRule implements BuiltInRule {
     final boolean transaction = (localOuts == null);
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	final Name anonHeapName 
-		= new Name(TB.newName(services, transaction ? "anonSavedHeap" : "anonHeap_loop"));
+		= new Name(TB.newName(services, transaction ? "anonSavedHeap_loop" : "anonHeap_loop"));
 	final Function anonHeapFunc = new Function(anonHeapName,
 					     heapLDT.targetSort());
 	services.getNamespaces().functions().addSafely(anonHeapFunc);
 	final Term anonHeapTerm = TB.func(anonHeapFunc);
-	Term anonUpdate = TB.anonUpd(services, mod, anonHeapTerm);
+	Term anonUpdate = TB.anonUpd(services, mod, anonHeapTerm, transaction);
 	
 	//local output vars
 	if(!transaction) {
