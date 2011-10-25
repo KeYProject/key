@@ -356,8 +356,8 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
         //partial inv axiom
         bindRuleSet ( d, "partialInvAxiom",
                       add ( NonDuplicateAppModPositionFeature.INSTANCE,
-                            longConst ( 10000 ) ) );                        
-        
+                            longConst ( 10000 ) ) );
+
         //inReachableState        
         bindRuleSet ( d, "inReachableStateImplication",
                       add ( NonDuplicateAppModPositionFeature.INSTANCE,
