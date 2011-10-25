@@ -42,6 +42,7 @@ tokens {
     ENSURES         = "ensures";
     DEPENDS         = "depends";
     REPRESENTS      = "represents";
+    REQUIRES        = "requires";
     SIGNALS         = "signals";
     SIGNALS_ONLY    = "signals_only";
 }

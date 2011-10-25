@@ -299,6 +299,7 @@ top returns [Object result = null] throws  SLTranslationException
     (   result = accessibleclause
     |   result = assignableclause
     |   result = dependsclause
+    |   result = requiresclause
     |   result = ensuresclause
     |   result = representsclause
     |   result = signalsclause
@@ -334,6 +335,13 @@ dependsclause returns [Triple<ObserverFunction,Term,Term> result=null] throws SL
     (MEASURED_BY mby=expression)? SEMI
         { result = translator.<Triple<ObserverFunction,Term,Term>>translate(
                 dep.getText(), excManager, lhs, rhs, mby, services); }
+    ;
+
+
+requiresclause returns [Term result = null] throws SLTranslationException
+:
+    req:REQUIRES result=termexpression
+            { result = translator.<Term>translate(req.getText(), excManager, result, services); }
     ;
 
 
