@@ -10,6 +10,8 @@
 
 package de.uka.ilkd.key.rule;
 
+import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 import java.util.HashMap;
 import java.util.Iterator;
 
