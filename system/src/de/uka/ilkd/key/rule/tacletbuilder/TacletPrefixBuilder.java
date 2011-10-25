@@ -11,12 +11,6 @@
 
 package de.uka.ilkd.key.rule.tacletbuilder;
 
-import de.uka.ilkd.key.rule.tacletbuilder.FindTacletBuilder;
-import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
-import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
-import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
-import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
-import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.*;
@@ -226,7 +220,7 @@ public class TacletPrefixBuilder {
 	return prefixMap;
     }
     
-    static class InvalidPrefixException extends IllegalStateException {
+    public static class InvalidPrefixException extends IllegalStateException {
         private static final long serialVersionUID = 5855187579027274363L;
         
         InvalidPrefixException(String tacletName, 
