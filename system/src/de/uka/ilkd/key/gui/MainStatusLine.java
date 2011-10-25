@@ -133,7 +133,7 @@ class MainStatusLine extends JPanel {
 			    progressPanel.removeComponentListener ( this );
 			    Dimension s = progressPanel.getSize ();
 			    s           = new Dimension ( 0, (int)s.getHeight () );
-			    add ( Box.createRigidArea ( s ) );
+			    add(Box.createRigidArea(s));
 			}
 		    };
 		progressPanel.addComponentListener ( phantomAdder );
