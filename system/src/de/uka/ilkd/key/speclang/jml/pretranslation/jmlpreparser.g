@@ -495,7 +495,7 @@ requires_clause
 	returns [PositionedString result = null] 
 	throws SLTranslationException
 :
-    requires_keyword result=expression
+    requires_keyword result=expression { result = result.prepend("requires "); }
 ;
 
 
