@@ -9,6 +9,13 @@
 //
 
 package de.uka.ilkd.key.gui;
+import de.uka.ilkd.key.rule.tacletbuilder.NoFindTacletBuilder;
+import de.uka.ilkd.key.rule.tacletbuilder.AntecTacletBuilder;
+import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
+import de.uka.ilkd.key.rule.tacletbuilder.SuccTacletBuilder;
 import java.io.StringReader;
 
 import de.uka.ilkd.key.collection.ImmutableList;
