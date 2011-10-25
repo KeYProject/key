@@ -8,13 +8,19 @@
 //
 //
 
-package de.uka.ilkd.key.rule;
+package de.uka.ilkd.key.rule.tacletbuilder;
 
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.rule.RewriteTaclet;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletApplPart;
 
 /** class builds RewriteTaclet objects.*/
 public class RewriteTacletBuilder extends FindTacletBuilder{
-    
+
+
     /**
      * encodes restrictions on the state where a rewrite taclet is applicable
      * If the value is equal to 
@@ -88,6 +94,7 @@ public class RewriteTacletBuilder extends FindTacletBuilder{
      * the TacletGoalTemplate must not be an AntecSuccTacletGoalTemplate,
      * otherwise an illegal argument exception is thrown.
      */
+    @Override
     public void addTacletGoalTemplate(TacletGoalTemplate goal) {
 	if (goal instanceof AntecSuccTacletGoalTemplate) {
 	    throw new IllegalArgumentException("Tried to add a AntecSucc"+
@@ -97,7 +104,15 @@ public class RewriteTacletBuilder extends FindTacletBuilder{
 	
 	goals = goals.prepend(goal);
     }
-    
+
+
+    public void addGoalTerm(Term goalTerm) {
+        final TacletGoalTemplate axiomTemplate =
+                new RewriteTacletGoalTemplate(goalTerm);
+        addTacletGoalTemplate(axiomTemplate);
+    }
+
+
     /** builds and returns the Taclet that is specified by
      * former set... / add... methods. If no name is specified then
      * an Taclet with an empty string name is build. No specifications
@@ -108,6 +123,7 @@ public class RewriteTacletBuilder extends FindTacletBuilder{
      * recursive flags imply that the flags are not set. 
      * No specified find part causes an IllegalStateException.
      */
+    @Override
     public Taclet getTaclet(){
 	return getRewriteTaclet();
     }

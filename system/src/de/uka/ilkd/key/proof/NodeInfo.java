@@ -196,7 +196,10 @@ public class NodeInfo {
                 m.appendReplacement(sb, res.replace("$", "\\$"));
             }
             m.appendTail(sb);
-            branchLabel = sb.toString();
+            // eliminate annoying whitespaces
+            Pattern whiteSpacePattern = Pattern.compile("\\s+");
+            Matcher whiteSpaceMatcher = whiteSpacePattern.matcher(sb);
+            branchLabel = whiteSpaceMatcher.replaceAll(" ");
         } else {
             branchLabel = s; 
         }

@@ -36,6 +36,7 @@ header {
   import de.uka.ilkd.key.proof.init.*;
 
   import de.uka.ilkd.key.rule.*;
+  import de.uka.ilkd.key.rule.tacletbuilder.*;
   import de.uka.ilkd.key.rule.conditions.*;
  
   import de.uka.ilkd.key.speclang.*;
@@ -307,7 +308,29 @@ options {
         this.taclets = null;
         this.keh = new KeYRecoderExcHandler();
     }
- 
+
+
+    /**
+     * Parses taclet from string.
+     */
+    public static Taclet parseTaclet(String s, Services services) {
+   	try {
+	    KeYParser p =
+                new KeYParser(ParserMode.TACLET,
+                              new KeYLexer(new StringReader(s),null),
+                              "No file. KeYParser.parseTaclet(\n" + s + ")\n",
+                              services,
+                              services.getNamespaces());
+	    return p.taclet(DefaultImmutableSet.<Choice>nil());
+	} catch (Exception e) {
+	    StringWriter sw = new StringWriter();
+	    PrintWriter pw = new PrintWriter(sw);
+	    e.printStackTrace(pw);
+	    throw new RuntimeException("Exc while Parsing:\n" + sw );
+	}
+    }
+
+
     public String getChooseContract() {
       return chooseContract;
     }
@@ -3076,7 +3099,10 @@ one_schema_bound_variable returns[QuantifiableVariable v=null]
    id = simple_ident {
       ts = (Operator) variables().lookup(new Name(id));   
       if ( ! (ts instanceof VariableSV)) {
-        semanticError(ts+" is not allowed in a quantifier.");
+        semanticError(ts+" is not allowed in a quantifier. Note, that you can't "
+        + "use the normal syntax for quantifiers of the form \"\\exists int i;\""
+        + " in taclets. You have to define the variable as a schema variable"
+        + " and use the syntax \"\\exists i;\" instead.");
       }
       v = (QuantifiableVariable) ts;
       bindVar();

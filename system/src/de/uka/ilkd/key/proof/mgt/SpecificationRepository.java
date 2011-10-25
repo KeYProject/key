@@ -37,8 +37,8 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.RewriteTaclet;
-import de.uka.ilkd.key.rule.RewriteTacletBuilder;
-import de.uka.ilkd.key.rule.RewriteTacletGoalTemplate;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.*;
@@ -358,10 +358,10 @@ public final class SpecificationRepository {
         
         //set id
         if(((TypeDeclaration)contract.getKJT().getJavaType()).isLibraryClass()) {
-            contract = cf.setID(contract,libraryContractCounter--);
+            contract = contract.setID(libraryContractCounter--);
             assert libraryContractCounter > Integer.MIN_VALUE : "too many library contracts";
         } else {
-            contract = cf.setID(contract,contractCounter++);
+            contract = contract.setID(contractCounter++);
         }
         return contract;
     }
@@ -385,7 +385,7 @@ public final class SpecificationRepository {
             Pair<KeYJavaType, ObserverFunction> targetPair) {
         final KeYJavaType targetKJT = targetPair.first;
         final ObserverFunction targetMethod = targetPair.second;
-        contract = cf.setTarget(contract,targetKJT, targetMethod);
+        contract = contract.setTarget(targetKJT, targetMethod);
         final String name = contract.getName();
         assert contractsByName.get(name) == null
                : "Tried to add a contract with a non-unique name: " + name;

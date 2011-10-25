@@ -8,10 +8,13 @@
 //
 //
 
-package de.uka.ilkd.key.rule;
+package de.uka.ilkd.key.rule.tacletbuilder;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.rule.SuccTaclet;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletApplPart;
 
 
 /** class builds SuccTaclet objects.*/

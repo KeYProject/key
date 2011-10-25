@@ -100,8 +100,8 @@ tokens {
 	INSTANTIATE_GENERIC = "\\instantiateGeneric";
 
 	// Quantifiers, binding, substitution
-	FORALL = "\\forall";
-	EXISTS = "\\exists";
+        FORALL = "\\forall";
+        EXISTS = "\\exists";
         SUBST  = "\\subst";
 	IF   = "\\if";
 	IFEX   = "\\ifEx";
@@ -573,7 +573,7 @@ options {
 }
 :
   '<' '='
-;
+    ;
 
 protected IMPLICIT_IDENT
 options {

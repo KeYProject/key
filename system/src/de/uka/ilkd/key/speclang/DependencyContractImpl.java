@@ -333,4 +333,35 @@ public final class DependencyContractImpl implements DependencyContract {
 	        (DependencyContract) contract);
     }
 
+
+    @Override
+    public DependencyContract setID(int newId) {
+        return new DependencyContractImpl(baseName,
+                                          null,
+                                          kjt,
+                                          target,
+                                          originalPre,
+                                          originalMby,
+                                          originalDep,
+                                          originalSelfVar,
+                                          originalParamVars,
+                                          newId);
+    }
+
+
+    @Override
+    public Contract setTarget(KeYJavaType newKJT,
+                              ObserverFunction newPM) {
+        return new DependencyContractImpl(baseName,
+                                          null,
+                                          newKJT,
+                                          newPM,
+                                          originalPre,
+                                          originalMby,
+                                          originalDep,
+                                          originalSelfVar,
+                                          originalParamVars,
+                                          id);
+    }
+
 }

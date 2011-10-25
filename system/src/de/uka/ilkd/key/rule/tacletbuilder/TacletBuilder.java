@@ -8,7 +8,7 @@
 //
 //
 
-package de.uka.ilkd.key.rule;
+package de.uka.ilkd.key.rule.tacletbuilder;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -23,6 +23,13 @@ import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.VariableSV;
+import de.uka.ilkd.key.rule.NewDependingOn;
+import de.uka.ilkd.key.rule.NewVarcond;
+import de.uka.ilkd.key.rule.NotFreeIn;
+import de.uka.ilkd.key.rule.RuleSet;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletAttributes;
+import de.uka.ilkd.key.rule.VariableCondition;
 
 /** 
  * abstract taclet builder class to be inherited from taclet builders
@@ -185,6 +192,27 @@ public abstract class TacletBuilder {
     public void addVarsNotFreeIn(SchemaVariable v0, SchemaVariable v1){
 	varsNotFreeIn = varsNotFreeIn.prepend(new NotFreeIn(v0, v1));
     }
+
+    
+    public void addVarsNotFreeIn(Iterable<? extends SchemaVariable> v0,
+                                 Iterable<? extends SchemaVariable> v1) {
+        for (SchemaVariable boundSV : v0) {
+            for (SchemaVariable schemaVar : v1) {
+                addVarsNotFreeIn(boundSV, schemaVar);
+            }
+        }
+    }
+
+
+    public void addVarsNotFreeIn(Iterable<? extends SchemaVariable> v0,
+                                 SchemaVariable... v1) {
+        for (SchemaVariable boundSV : v0) {
+            for (SchemaVariable schemaVar : v1) {
+                addVarsNotFreeIn(boundSV, schemaVar);
+            }
+        }
+    }
+
 
    /** adds a list of <I>NotFreeIn</I> variable pairs to the variable 
     *conditions of

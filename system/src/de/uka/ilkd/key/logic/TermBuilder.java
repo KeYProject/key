@@ -653,11 +653,14 @@ public final class TermBuilder {
      */
     public Term convertToFormula(Term a, Services services) {
         BooleanLDT booleanLDT = services.getTypeConverter().getBooleanLDT();
-	if(a.sort() == booleanLDT.targetSort()) {
-	    return equals(a, TRUE(services));
-	}
-
-	return a;
+        if (a.sort() == Sort.FORMULA) {
+            return a;
+        } else if (a.sort() == booleanLDT.targetSort()) {
+            return equals(a, TRUE(services));
+        } else {
+            throw new TermCreationException("Term " + a + " cannot be converted"
+                                            + " into a formula.");
+        }
     }
     
     
@@ -805,8 +808,26 @@ public final class TermBuilder {
 	                        Term target) {
 	return apply(elementary(services, loc, value), target);
     }
-    
-    
+
+
+    public Term applyElementary(Services services,
+	                        Term heap,
+	                        Term target) {
+	return apply(elementary(services, heap), target);
+    }
+
+
+    public ImmutableList<Term> applyElementary(Services services,
+	                        Term heap,
+	                        Iterable<Term> targets) {
+        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+        for (Term target : targets) {
+            result = result.append(apply(elementary(services, heap), target));
+        }
+	return result;
+    }
+
+
     public Term applyParallel(Term[] updates, Term target) {
 	return apply(parallel(updates), target);
     }
@@ -1510,5 +1531,5 @@ public final class TermBuilder {
     
     public Term seqReverse(Services services, Term s) {
 	return func(services.getTypeConverter().getSeqLDT().getSeqReverse(), s);
-    }    
+    }
 }

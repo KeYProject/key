@@ -10,6 +10,16 @@
 			<arguments>
 			</arguments>
 		</buildCommand>
+		<buildCommand>
+			<name>org.eclipse.ui.externaltools.ExternalToolBuilder</name>
+			<triggers>full,incremental,</triggers>
+			<arguments>
+				<dictionary>
+					<key>LaunchConfigHandle</key>
+					<value>&lt;project&gt;/.externalToolBuilders/New_Builder.launch</value>
+				</dictionary>
+			</arguments>
+		</buildCommand>
 	</buildSpec>
 	<natures>
 		<nature>org.eclipse.jem.workbench.JavaEMFNature</nature>
@@ -17,11 +27,4 @@
 		<nature>org.eclipse.jem.beaninfo.BeanInfoNature</nature>
 		<nature>sf.eclipse.javacc.javaccnature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>key_lib</name>
-			<type>2</type>
-			<locationURI>key_lib</locationURI>
-		</link>
-	</linkedResources>
 </projectDescription>

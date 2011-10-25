@@ -45,7 +45,7 @@ public class TestKey extends TestCase {
 
     static Class[] ruleTests = new Class[] {
 	de.uka.ilkd.key.rule.TestSchemaModalOperators.class,
-	de.uka.ilkd.key.rule.TestTacletBuild.class,
+	de.uka.ilkd.key.rule.tacletbuilder.TestTacletBuild.class,
 	de.uka.ilkd.key.rule.TestCollisionResolving.class,
 	de.uka.ilkd.key.rule.TestMatchTaclet.class,
 	de.uka.ilkd.key.rule.TestApplyTaclet.class,

@@ -783,4 +783,47 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
         return transaction;
     } 
 
+    @Override
+    public FunctionalOperationContract setID(int newId) {
+        return new FunctionalOperationContractImpl(baseName,
+                                                   null,
+                                                   kjt,
+                                                   pm,
+                                                   modality,
+                                                   originalPre,
+                                                   originalMby,
+                                                   originalPost,
+                                                   originalMod,
+                                                   originalSelfVar,
+                                                   originalParamVars,
+                                                   originalResultVar,
+                                                   originalExcVar,
+                                                   originalHeapAtPreVar,
+                                                   newId,
+                                                   toBeSaved);
+    }
+
+
+    @Override
+    public Contract setTarget(KeYJavaType newKJT,
+                              ObserverFunction newPM) {
+        assert newPM instanceof ProgramMethod;
+        return new FunctionalOperationContractImpl(baseName,
+                                                   null,
+                                                   newKJT,
+                                                   (ProgramMethod) newPM,
+                                                   modality,
+                                                   originalPre,
+                                                   originalMby,
+                                                   originalPost,
+                                                   originalMod,
+                                                   originalSelfVar,
+                                                   originalParamVars,
+                                                   originalResultVar,
+                                                   originalExcVar,
+                                                   originalHeapAtPreVar,
+                                                   id,
+                                                   toBeSaved && newKJT.equals(
+                kjt));
+    }
 }

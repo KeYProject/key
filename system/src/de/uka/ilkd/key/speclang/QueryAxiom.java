@@ -10,6 +10,8 @@
 
 package de.uka.ilkd.key.speclang;
 
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;

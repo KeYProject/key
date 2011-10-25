@@ -30,6 +30,7 @@ public class ViewSettings implements Settings {
         "[View]HideIntermediateProofsteps";
     private static final String HIDE_CLOSED_SUBTREES =
         "[View]HideClosedSubtrees";
+    private static final String USE_SYSTEM_LAF = "[View]UseSystemLookAndFeel";
 
 
     /** default max number of displayed tooltip lines is 40 */
@@ -43,6 +44,8 @@ public class ViewSettings implements Settings {
     private boolean hideIntermediateProofsteps = false;
     /** do not hide closed subtrees by default */
     private boolean hideClosedSubtrees = false;
+    /** whether to use system look and feel */
+    private boolean useSystemLaF = false;
 
 
     private LinkedList<SettingsListener> listenerList =
@@ -110,6 +113,23 @@ public class ViewSettings implements Settings {
             fireSettingsChanged();
         }
     }
+    
+    /**
+     * Are system look and feel activated?
+     */
+    public boolean useSystemLaF(){
+        return useSystemLaF;
+    }
+    
+    /**
+     * Sets the system look and feel option.
+     */
+    public void setUseSystemLaF(boolean b){
+        if (b != useSystemLaF){
+            useSystemLaF = b;
+            fireSettingsChanged();
+        }
+    }
 
     /**
      * @return true iff intermediate proofsteps should be hidden
@@ -156,6 +176,7 @@ public class ViewSettings implements Settings {
 		String val3 = props.getProperty(SHOW_WHOLE_TACLET);
 		String val4 = props.getProperty(HIDE_INTERMEDIATE_PROOFSTEPS);
 		String val5 = props.getProperty(HIDE_CLOSED_SUBTREES);
+		String val6 = props.getProperty(USE_SYSTEM_LAF);
 		if (val1 != null) {
 		        maxTooltipLines = Integer.valueOf(val1).intValue();
 		} 
@@ -172,6 +193,9 @@ public class ViewSettings implements Settings {
 		if (val5 != null) {
 			hideClosedSubtrees = Boolean.valueOf(val5)
 				.booleanValue();
+		}
+		if (val6 != null) {
+		    useSystemLaF = Boolean.valueOf(val6).booleanValue();
 		}
 	}
 
@@ -193,6 +217,7 @@ public class ViewSettings implements Settings {
             hideIntermediateProofsteps);
     	props.setProperty(HIDE_CLOSED_SUBTREES, "" +
             hideClosedSubtrees);
+    	props.setProperty(USE_SYSTEM_LAF, ""+useSystemLaF);
     }
 
     /** sends the message that the state of this setting has been

@@ -8,9 +8,10 @@
 //
 //
 
-package de.uka.ilkd.key.rule;
+package de.uka.ilkd.key.rule.tacletbuilder;
 
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.rule.BoundUniquenessChecker;
 /** Superclass of TacletBuilder objects that have a non-empty find clause.
  * This should be all of them except NoFindTacletBuilder.
  */

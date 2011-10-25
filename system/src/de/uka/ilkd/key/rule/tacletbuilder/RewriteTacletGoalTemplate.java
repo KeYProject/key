@@ -8,16 +8,18 @@
 //
 //
 
-package de.uka.ilkd.key.rule;
+package de.uka.ilkd.key.rule.tacletbuilder;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.BoundVarsVisitor;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.rule.Taclet;
 
 /** this class inherits from TacletGoalTemplate. It is used if there is a
  * replacewith in the ruleGoals that replaces a term by another
@@ -52,6 +54,12 @@ public class RewriteTacletGoalTemplate extends TacletGoalTemplate {
     }
 
 
+    public RewriteTacletGoalTemplate(Term replacewith) {
+	this(Sequent.EMPTY_SEQUENT, ImmutableSLList.<Taclet>nil(),
+             replacewith);
+    }
+
+
     /** a Taclet may replace a Term by another. The new Term is returned.     
      * @return Term being paramter in the rule goal replacewith(Seq)
      */
@@ -64,7 +72,8 @@ public class RewriteTacletGoalTemplate extends TacletGoalTemplate {
      * goal template
      * @return all variables that occur bound in this goal template
      */
-    protected ImmutableSet<QuantifiableVariable> getBoundVariables() {
+    @Override
+    public ImmutableSet<QuantifiableVariable> getBoundVariables() {
         final BoundVarsVisitor bvv = new BoundVarsVisitor();
         bvv.visit(replaceWith());
         return bvv.getBoundVariables().union(super.getBoundVariables());
@@ -73,11 +82,13 @@ public class RewriteTacletGoalTemplate extends TacletGoalTemplate {
     /**
      * @return Term being paramter in the rule goal replacewith(term)
      */
-    Object replaceWithExpressionAsObject() {
+    @Override
+    public Object replaceWithExpressionAsObject() {
 	return replacewith;
     }
 
 
+    @Override
     public boolean equals(Object o) {
 	if ( ! ( o instanceof RewriteTacletGoalTemplate ) )
 	    return false;
@@ -87,6 +98,7 @@ public class RewriteTacletGoalTemplate extends TacletGoalTemplate {
 	    && replacewith.equals(other.replacewith);
     }
     
+    @Override
     public int hashCode(){
     	int result = 17;
     	result = 37 * result * super.hashCode();
@@ -96,6 +108,7 @@ public class RewriteTacletGoalTemplate extends TacletGoalTemplate {
 
     
     /** toString */
+    @Override
     public String toString() {
 	String result=super.toString();
 	result+="\\replacewith("+replaceWith()+") ";       

@@ -8,7 +8,18 @@
 //
 //
 
-package de.uka.ilkd.key.rule;
+package de.uka.ilkd.key.rule.tacletbuilder;
+
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.logic.Semisequent;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.rule.BoundUniquenessChecker;
+import de.uka.ilkd.key.rule.NoFindTaclet;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletApplPart;
+
 
 /** 
  * Due to the immutability of {@link Taclet}s, they are created in the parsers 
@@ -53,6 +64,19 @@ public class NoFindTacletBuilder extends TacletBuilder {
     public void addTacletGoalTemplate(TacletGoalTemplate goal) {
 	goals = goals.prepend(goal);
     }
+
+
+    public void addGoalTerm(Term goalTerm) {
+        final SequentFormula axiomSf = new SequentFormula(goalTerm);
+        final Semisequent axiomSemiSeq =
+                Semisequent.EMPTY_SEMISEQUENT.insertFirst(axiomSf).semisequent();
+        final Sequent axiomSeq = Sequent.createAnteSequent(axiomSemiSeq);
+        final TacletGoalTemplate axiomTemplate =
+                new AntecSuccTacletGoalTemplate(
+                axiomSeq, ImmutableSLList.<Taclet>nil(), Sequent.EMPTY_SEQUENT);
+        addTacletGoalTemplate(axiomTemplate);
+    }
+
 
     /**
      * checks that a variableSV occurrs at most once in a quantifier of the

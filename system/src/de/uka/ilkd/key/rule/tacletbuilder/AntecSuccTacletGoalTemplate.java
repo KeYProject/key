@@ -13,7 +13,7 @@
  * sequent. The replacewith for terms/formulae is realized in another
  * class calles RewriteTacletGoalTemplate.
 */
-package de.uka.ilkd.key.rule;
+package de.uka.ilkd.key.rule.tacletbuilder;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
@@ -22,6 +22,7 @@ import de.uka.ilkd.key.logic.BoundVarsVisitor;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.rule.Taclet;
 
 public class AntecSuccTacletGoalTemplate extends TacletGoalTemplate {
     /** sequent that replaces another one */
@@ -63,7 +64,8 @@ public class AntecSuccTacletGoalTemplate extends TacletGoalTemplate {
      * goal template
      * @return all variables that occur bound in this goal template
      */
-    protected ImmutableSet<QuantifiableVariable> getBoundVariables() {
+    @Override
+    public ImmutableSet<QuantifiableVariable> getBoundVariables() {
         final BoundVarsVisitor bvv = new BoundVarsVisitor();
         bvv.visit(replaceWith());
         return bvv.getBoundVariables().union(super.getBoundVariables());
@@ -72,11 +74,13 @@ public class AntecSuccTacletGoalTemplate extends TacletGoalTemplate {
     /**
      * @return Sequent being paramter in the rule goal replacewith(Seq)
      */
-    Object replaceWithExpressionAsObject() {
+    @Override
+    public Object replaceWithExpressionAsObject() {
 	return replacewith;
     }
 
 
+    @Override
     public boolean equals(Object o) {
 	if ( ! ( o instanceof AntecSuccTacletGoalTemplate ) )
 	    return false;
@@ -86,6 +90,7 @@ public class AntecSuccTacletGoalTemplate extends TacletGoalTemplate {
 	    && replacewith.equals(other.replacewith);
     }
     
+    @Override
     public int hashCode(){
     	int result = 17;
     	result = 37 * result + super.hashCode();
@@ -95,6 +100,7 @@ public class AntecSuccTacletGoalTemplate extends TacletGoalTemplate {
 
     
     /** toString */
+    @Override
     public String toString() {
 	String result=super.toString();
 	result+="\\replacewith("+replaceWith()+") ";       

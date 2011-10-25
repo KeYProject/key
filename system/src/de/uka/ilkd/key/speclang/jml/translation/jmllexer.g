@@ -37,16 +37,14 @@ tokens {
     TRUE = "true";    
     VOID = "void";
 
-    ACCESSIBLE                  = "accessible";
-    ASSIGNABLE 			= "assignable";
-    ENSURES 			= "ensures";
-    DECLASSIFY                  = "declassify";
-    DECLASSIFY_VAR              = "declassify_var";
-    DEPENDS                     = "depends";
-    REPRESENTS			= "represents";
-    SECURE_FOR                  = "secure_for";
-    SIGNALS 			= "signals";
-    SIGNALS_ONLY 		= "signals_only";
+    ACCESSIBLE      = "accessible";
+    ASSIGNABLE      = "assignable";
+    ENSURES         = "ensures";
+    DEPENDS         = "depends";
+    REPRESENTS      = "represents";
+    REQUIRES        = "requires";
+    SIGNALS         = "signals";
+    SIGNALS_ONLY    = "signals_only";
 }
 
 AND : "&";

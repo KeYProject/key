@@ -11,6 +11,7 @@
 package de.uka.ilkd.key.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Cursor;
@@ -56,7 +57,9 @@ import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
+import javax.swing.UIManager;
 import javax.swing.WindowConstants;
+import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -276,6 +279,7 @@ public final class MainWindow extends JFrame  {
      */
     private void initialize(String title) {
         setTitle(title);
+        setLaF();
         setIconImage(IconFactory.keyLogo());
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         proofListener = new MainProofListener();
@@ -299,6 +303,28 @@ public final class MainWindow extends JFrame  {
         addWindowListener(exitMainAction.windowListener);
         
     }
+    
+
+    /**
+     * Tries to set the system look and feel if this option is activated.
+     */
+    private void setLaF() {
+        try{
+            if (ProofSettings.DEFAULT_SETTINGS.getViewSettings().useSystemLaF()) {
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+
+                // Workarounds for GTK+
+                // TODO: check whether they apply to other LaFs
+                UIManager.put("Slider.paintValue", Boolean.FALSE);
+                UIManager.put("Menu.background", Color.GRAY); // menu background is still white....
+
+                SwingUtilities.updateComponentTreeUI(this);
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
     
     private void initNotification() {
         if (!Main.batchMode) {
@@ -436,7 +462,7 @@ public final class MainWindow extends JFrame  {
         // create tabbed pane
         tabbedPane = createTabbedPane();
 
-        proofListView.setPreferredSize(new java.awt.Dimension(250, 100));
+        proofListView.setPreferredSize(new java.awt.Dimension(350, 100));
         GuiUtilities.paintEmptyViewComponent(proofListView, "Proofs");
         
         JSplitPane leftPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, proofListView, tabbedPane);
@@ -785,6 +811,20 @@ public final class MainWindow extends JFrame  {
         JMenu view = new JMenu("View");
         view.setMnemonic(KeyEvent.VK_V);
         
+        JMenuItem laf = new JCheckBoxMenuItem("Use system look and feel (experimental)");
+        laf.setToolTipText("If checked KeY tries to appear in the look and feel of your window manager, if not in the default Java LaF (aka Metal).");
+        final de.uka.ilkd.key.gui.configuration.ViewSettings vs = ProofSettings.DEFAULT_SETTINGS.getViewSettings();
+        laf.setSelected(vs.useSystemLaF());
+        laf.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                vs.setUseSystemLaF(((JCheckBoxMenuItem)e.getSource()).
+                isSelected());
+                // TODO: inform that this requires a restart
+                System.out.println("Info: Look and feel changed for next start of KeY.");
+            }});
+        view.add(laf);
+        
+       
         view.add(new JCheckBoxMenuItem(new PrettyPrintToggleAction(this)));
         view.addSeparator();
         {

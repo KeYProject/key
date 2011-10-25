@@ -9,7 +9,7 @@
 //
 
 
-package de.uka.ilkd.key.rule;
+package de.uka.ilkd.key.rule.tacletbuilder;
 
 import java.util.Iterator;
 
@@ -18,6 +18,10 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.rule.NotFreeIn;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletPrefix;
+import de.uka.ilkd.key.rule.TacletSchemaVariableCollector;
 
 public class TacletPrefixBuilder {
 
@@ -216,7 +220,7 @@ public class TacletPrefixBuilder {
 	return prefixMap;
     }
     
-    static class InvalidPrefixException extends IllegalStateException {
+    public static class InvalidPrefixException extends IllegalStateException {
         private static final long serialVersionUID = 5855187579027274363L;
         
         InvalidPrefixException(String tacletName, 

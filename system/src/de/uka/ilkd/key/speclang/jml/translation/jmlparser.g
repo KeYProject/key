@@ -93,7 +93,6 @@ options {
 	this.excManager     = new SLTranslationExceptionManager(this,
 				    				fileName, 
 				    				offsetPos);
-	translator.setExceptionManager(excManager);
 	
 	this.selfVar	    = self;
 	this.paramVars      = paramVars;
@@ -318,6 +317,7 @@ top returns [Object result = null] throws  SLTranslationException
     (   result = accessibleclause
     |   result = assignableclause
     |   result = dependsclause
+    |   result = requiresclause
     |   result = ensuresclause
     |   result = representsclause
     |   result = signalsclause
@@ -331,14 +331,14 @@ top returns [Object result = null] throws  SLTranslationException
 accessibleclause returns [Term result = null] throws SLTranslationException
 :
     acc:ACCESSIBLE result=storereflist
-        { result = translator.<Term>translate(acc.getText(), result, services); }
+        { result = translator.<Term>translate(acc.getText(), excManager, result, services); }
     ;
 
 
 assignableclause returns [Term result = null] throws SLTranslationException
 :
     ass:ASSIGNABLE result=storereflist
-        { result = translator.<Term>translate(ass.getText(), result, services); }
+        { result = translator.<Term>translate(ass.getText(), excManager, result, services); }
     ;
 
 
@@ -352,14 +352,21 @@ dependsclause returns [Triple<ObserverFunction,Term,Term> result=null] throws SL
     COLON rhs=storereflist
     (MEASURED_BY mby=expression)? SEMI
         { result = translator.<Triple<ObserverFunction,Term,Term>>translate(
-                dep.getText(), lhs, rhs, mby, excManager, services); }
+                dep.getText(), excManager, lhs, rhs, mby, services); }
+    ;
+
+
+requiresclause returns [Term result = null] throws SLTranslationException
+:
+    req:REQUIRES result=termexpression
+            { result = translator.<Term>translate(req.getText(), excManager, result, services); }
     ;
 
 
 ensuresclause returns [Term result = null] throws SLTranslationException
 :
     ens:ENSURES result=termexpression
-            { result = translator.<Term>translate(ens.getText(), result, services); }
+            { result = translator.<Term>translate(ens.getText(), excManager, result, services); }
     ;
 
 
@@ -411,7 +418,7 @@ representsclause returns [Pair<ObserverFunction,Term> result=null] throws SLTran
             SUCH_THAT t=predicate
         )
     )
-    { result = translator.<Pair<ObserverFunction,Term>>translate(rep.getText(), lhs, t, services); }
+    { result = translator.<Pair<ObserverFunction,Term>>translate(rep.getText(), excManager, lhs, t, services); }
     ;
 
 
@@ -436,7 +443,7 @@ signalsclause returns [Term result=null] throws SLTranslationException
 	    if (vName != null) {
 		resolverManager.popLocalVariablesNamespace();
 	    }
-            result = translator.<Term>translate(sig.getText(), result, eVar, excVar, excType, services);
+            result = translator.<Term>translate(sig.getText(), excManager, result, eVar, excVar, excType, services);
 	}
     ;
 
@@ -452,7 +459,7 @@ throws SLTranslationException {
       | type = referencetype { typeList = typeList.append(type); }
         (COMMA type = referencetype { typeList = typeList.append(type); })*
     )
-    { result = translator.<Term>translate(sigo.getText(), typeList, this.excVar, services); }
+    { result = translator.<Term>translate(sigo.getText(), excManager, typeList, this.excVar, services); }
     ;
 
 
@@ -460,7 +467,7 @@ termexpression returns [Term result = null] throws SLTranslationException {
     SLExpression exp = null;
 }
 :
-    exp=expression { result = TB.convertToFormula((Term) exp.getTerm(), services); }
+    exp=expression { result = (Term) exp.getTerm(); }
     ;
 
 
@@ -521,7 +528,7 @@ specarrayrefexpr[SLExpression receiver, String fullyQualifiedName, Token lbrack]
 	| MULT
     )
     {
-        result = translator.<SLExpression>translate("array reference", services, receiver, fullyQualifiedName, lbrack, rangeFrom, rangeTo);
+        result = translator.<SLExpression>translate("array reference", excManager, services, receiver, fullyQualifiedName, lbrack, rangeFrom, rangeTo);
     }
 ;
 
@@ -601,7 +608,7 @@ equivalenceexpr returns [SLExpression result=null] throws SLTranslationException
 :
 	result = impliesexpr
         (   eq:EQV_ANTIV right=equivalenceexpr
-            { result = translator.<SLExpression>translate(eq.getText(), result, right, excManager, services); }
+            { result = translator.<SLExpression>translate(eq.getText(), excManager, result, right, services); }
         )?
     ;
 
@@ -751,7 +758,7 @@ equalityexpr returns [SLExpression result=null] throws SLTranslationException
 	 :
 	result=relationalexpr 
 	(   eq:EQ_NEQ right=equalityexpr
-	        { result = translator.<SLExpression>translate(eq.getText(), result, right, excManager, services); }
+	        { result = translator.<SLExpression>translate(eq.getText(), excManager, result, right, services); }
 	)?
 ;
 
@@ -765,7 +772,7 @@ equalityexpr returns [SLExpression result=null] throws SLTranslationException
 //    { 
 //        assert right != null;
 //        for (Pair<Token,SLExpression> pair: right) { 
-//            result = translator.<SLExpression>translate(pair.first.getText(), result, pair.second, excManager, services);
+//            result = translator.<SLExpression>translate(pair.first.getText(), excManager, result, pair.second, excManager, services);
 //        }
 //    }
 //;
@@ -1470,18 +1477,18 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
     |   desc:INFORMAL_DESCRIPTION 
 	{
 	    // was: raiseNotSupported("informal predicates");
-	    result = translator.<SLExpression>translate("(* *)", services, desc, 
-	        selfVar, resultVar, paramVars, heapAtPre, excManager);
+	    result = translator.<SLExpression>translate("(* *)", excManager, services, desc, 
+	        selfVar, resultVar, paramVars, heapAtPre);
 	}
 	
     |   escape:DL_ESCAPE LPAREN ( list=expressionlist )? RPAREN
         {
-            result = translator.<SLExpression>translate("\\dl_", escape, list, services, excManager);
+            result = translator.<SLExpression>translate("\\dl_", excManager, escape, list, services);
         }
         
     |   NOT_MODIFIED LPAREN t=storereflist RPAREN
         {
-        result = new SLExpression(translator.<Term>translate("\\not_modified",services, heapAtPre, t));
+        result = new SLExpression(translator.<Term>translate("\\not_modified", excManager, services, heapAtPre, t));
         } 
 	
     |   FRESH LPAREN list=expressionlist RPAREN
@@ -1515,12 +1522,12 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 
     |   REACH LPAREN t=storeref COMMA e1=expression COMMA e2=expression (COMMA e3=expression)? RPAREN
 	{
-        result = translator.<SLExpression>translate("reach", t, e1, e2, e3, services);
+        result = translator.<SLExpression>translate("reach", excManager, t, e1, e2, e3, services);
 	} 
 	
     |   REACHLOCS LPAREN t=storeref COMMA e1=expression (COMMA e3=expression)? RPAREN
 	{
-        result = translator.<SLExpression>translate("reachLocs", t, e1, e3, services);
+        result = translator.<SLExpression>translate("reachLocs", excManager, t, e1, e3, services);
 	} 	
 	
     |   DURATION LPAREN result=expression RPAREN 
@@ -1572,7 +1579,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 	
     |   INVARIANT_FOR LPAREN result=expression RPAREN 
 	{
-	    result = translator.<SLExpression>translate("\\invariant_for",services,result);
+	    result = translator.<SLExpression>translate("\\invariant_for", excManager, services, result);
 	    
 	} 
 	
@@ -1717,7 +1724,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
     |   (tk1:SEQCONTAINS{tk=tk1;} | tk2: SEQCONCAT{tk=tk2;} | tk3: SEQGET{tk=tk3;} | tk4: INDEXOF{tk=tk4;})
         LPAREN e1=expression COMMA e2=expression RPAREN
         {
-            result = translator.<SLExpression>translate(tk.getText(), services, e1, e2);
+            result = translator.<SLExpression>translate(tk.getText(), excManager, services, e1, e2);
         }
     |   LPAREN result=expression RPAREN
 ;
@@ -1746,7 +1753,7 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
 	    p = TB.convertToFormula(p, services);
 	    Term t = TB.convertToFormula(expr.getTerm(), services);
 	    
-	    result = translator.<Term>translate(q.getText(), p, t, declVars.first, declVars.second, nullable, services);
+	    result = translator.<Term>translate(q.getText(), excManager, p, t, declVars.first, declVars.second, nullable, services);
 	}
 	RPAREN
 ;
@@ -1771,7 +1778,7 @@ bsumterm returns [SLExpression result=null] throws SLTranslationException
             a=expression SEMI  b=expression SEMI t=expression
         )
         {
-            result = translator.<SLExpression>translate(q.getText(), a, b, t, decls.first, decls.second, services);
+            result = translator.<SLExpression>translate(q.getText(), excManager, a, b, t, decls.first, decls.second, services);
             resolverManager.popLocalVariablesNamespace();
         }
         RPAREN

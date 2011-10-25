@@ -8,7 +8,7 @@
 //
 //
 
-package de.uka.ilkd.key.rule;
+package de.uka.ilkd.key.rule.tacletbuilder;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -18,6 +18,7 @@ import de.uka.ilkd.key.logic.BoundVarsVisitor;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.rule.Taclet;
 
 /** 
  * this class contains the goals of the schematic theory specific
@@ -80,7 +81,7 @@ public class TacletGoalTemplate {
      * REMARK: returns 'null' if there is no replace-with part !
      * Overwritten in subclasses !
      */
-    Object replaceWithExpressionAsObject() {
+    public Object replaceWithExpressionAsObject() {
 	return null;
     }
 
@@ -115,7 +116,7 @@ public class TacletGoalTemplate {
      * goal template
      * @return all variables that occur bound in this goal template
      */
-    protected ImmutableSet<QuantifiableVariable> getBoundVariables() {
+    public ImmutableSet<QuantifiableVariable> getBoundVariables() {
 	ImmutableSet<QuantifiableVariable> result
 	    = DefaultImmutableSet.<QuantifiableVariable>nil();
 
