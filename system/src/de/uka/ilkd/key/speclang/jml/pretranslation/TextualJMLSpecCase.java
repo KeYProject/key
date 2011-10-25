@@ -43,12 +43,6 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
             ImmutableSLList.<PositionedString>nil();
     private ImmutableList<PositionedString> depends =
             ImmutableSLList.<PositionedString>nil();
-    private ImmutableList<PositionedString> secureFor =
-            ImmutableSLList.<PositionedString>nil();
-    private ImmutableList<PositionedString> declassify =
-            ImmutableSLList.<PositionedString>nil();
-    private ImmutableList<PositionedString> declassifyVar =
-            ImmutableSLList.<PositionedString>nil();
 
 
     public TextualJMLSpecCase(ImmutableList<String> mods,
@@ -134,36 +128,6 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
 
 
-    public void addSecureFor(PositionedString ps) {
-        secureFor = secureFor.append(ps);
-    }
-
-
-    public void addSecureFor(ImmutableList<PositionedString> l) {
-        secureFor = secureFor.append(l);
-    }
-
-
-    public void addDeclassify(PositionedString ps) {
-        declassify = declassify.append(ps);
-    }
-
-
-    public void addDeclassify(ImmutableList<PositionedString> l) {
-        declassify = declassify.append(l);
-    }
-
-
-    public void addDeclassifyVar(PositionedString ps) {
-        declassifyVar = declassifyVar.append(ps);
-    }
-
-
-    public void addDeclassifyVar(ImmutableList<PositionedString> l) {
-        declassifyVar = declassifyVar.append(l);
-    }
-
-
     public void setWorkingSpace(PositionedString ps) {
         workingSpace = ps;
     }
@@ -239,21 +203,6 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
 
 
-    public ImmutableList<PositionedString> getSecureFor() {
-        return secureFor;
-    }
-
-
-    public ImmutableList<PositionedString> getDeclassify() {
-        return declassify;
-    }
-
-
-    public ImmutableList<PositionedString> getDeclassifyVar() {
-        return declassifyVar;
-    }
-
-
     @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
@@ -292,19 +241,6 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         while (it.hasNext()) {
             sb.append("depends: ").append(it.next()).append("\n");
         }
-        it = secureFor.iterator();
-        while (it.hasNext()) {
-            sb.append("saveFor: ").append(it.next()).append("\n");
-        }
-        it = declassify.iterator();
-        while (it.hasNext()) {
-            sb.append("declassify: ").append(it.next()).append("\n");
-        }
-        it = declassifyVar.iterator();
-        while (it.hasNext()) {
-            sb.append("declassifyVar: ").append(it.next()).append("\n");
-        }
-
         return sb.toString();
     }
 
@@ -324,10 +260,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                && signals.equals(sc.signals)
                && signalsOnly.equals(sc.signalsOnly)
                && diverges.equals(sc.diverges)
-               && depends.equals(sc.depends)
-               && secureFor.equals(sc.secureFor)
-               && declassify.equals(sc.declassify)
-               && declassifyVar.equals(sc.declassifyVar);
+               && depends.equals(sc.depends);
     }
 
 
@@ -342,9 +275,6 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                + signals.hashCode()
                + signalsOnly.hashCode()
                + diverges.hashCode()
-               + depends.hashCode()
-               + secureFor.hashCode()
-               + declassify.hashCode()
-               + declassifyVar.hashCode();
+               + depends.hashCode();
     }
 }
