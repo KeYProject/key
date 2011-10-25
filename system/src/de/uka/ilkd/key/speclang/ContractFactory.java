@@ -92,48 +92,77 @@ public class ContractFactory {
      * Returns another contract like this one, except that the passed term
      * has been added as a precondition.
      */
-    public FunctionalOperationContract addPre(FunctionalOperationContract old, Term addedPre,
-            ProgramVariable selfVar, 
-            ImmutableList<ProgramVariable> paramVars){
+    public FunctionalOperationContract addPre(FunctionalOperationContract old,
+                                              Term addedPre,
+                                              ProgramVariable selfVar,
+                                              ImmutableList<ProgramVariable> paramVars) {
         assert old instanceof FunctionalOperationContractImpl : UNKNOWN_CONTRACT_IMPLEMENTATION;
-    FunctionalOperationContractImpl foci = (FunctionalOperationContractImpl) old;
-    addedPre = replaceVariables(addedPre, selfVar, paramVars, foci.originalSelfVar, foci.originalParamVars);
+        FunctionalOperationContractImpl foci =
+                (FunctionalOperationContractImpl) old;
+        addedPre =
+                replaceVariables(addedPre, selfVar, paramVars,
+                                 foci.originalSelfVar, foci.originalParamVars);
 
-    //create new contract
-    return new FunctionalOperationContractImpl(foci.baseName,
-            foci.name,
-            foci.kjt,                                    
-            foci.pm,
-            foci.modality,
-            tb.and(foci.originalPre, addedPre),
-            foci.originalMby,
-            foci.originalPost,
-            foci.originalMod,
-            foci.originalSelfVar,
-            foci.originalParamVars,
-            foci.originalResultVar,
-            foci.originalExcVar,
-            foci.originalHeapAtPreVar,
-            foci.id,
-            foci.toBeSaved);
+        //create new contract
+        return new FunctionalOperationContractImpl(foci.baseName,
+                                                   foci.name,
+                                                   foci.kjt,
+                                                   foci.pm,
+                                                   foci.modality,
+                                                   tb.and(foci.originalPre,
+                                                          addedPre),
+                                                   foci.originalMby,
+                                                   foci.originalPost,
+                                                   foci.originalMod,
+                                                   foci.originalSelfVar,
+                                                   foci.originalParamVars,
+                                                   foci.originalResultVar,
+                                                   foci.originalExcVar,
+                                                   foci.originalHeapAtPreVar,
+                                                   foci.id,
+                                                   foci.toBeSaved);
     }
 
     public DependencyContract dep(KeYJavaType containerType,
-            ObserverFunction pm, Term requires, Term measuredBy, Term accessible,
-            ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars) {
-        return dep("JML accessible clause", containerType, pm, requires, measuredBy, accessible, selfVar, paramVars);
+                                  ObserverFunction pm,
+                                  Term requires,
+                                  Term measuredBy,
+                                  Term accessible,
+                                  ProgramVariable selfVar,
+                                  ImmutableList<ProgramVariable> paramVars) {
+        assert (selfVar == null) == pm.isStatic();
+        return dep("JML accessible clause", containerType, pm, requires,
+                   measuredBy, accessible, selfVar, paramVars);
     }
     
-    public DependencyContract dep(KeYJavaType kjt, Triple<ObserverFunction, Term, Term> dep, ProgramVariable selfVar){
+    public DependencyContract dep(KeYJavaType kjt,
+                                  Triple<ObserverFunction, Term, Term> dep,
+                                  ProgramVariable selfVar) {
         final ImmutableList<ProgramVariable> paramVars =
                 tb.paramVars(services, dep.first, false);
-        return dep(kjt,dep.first,tb.inv(services, tb.var(selfVar)),dep.third,dep.second,selfVar,paramVars);
+        assert (selfVar == null) == dep.first.isStatic();
+        if (selfVar != null) {
+            return dep(kjt, dep.first, tb.inv(services, tb.var(selfVar)),
+                       dep.third, dep.second, selfVar, paramVars);
+        } else {
+            // TODO: insert static invariant??
+            return dep(kjt, dep.first, tb.TRUE(services), dep.third, dep.second,
+                       selfVar, paramVars);
+        }
     }
 
-    public DependencyContract dep(String string, KeYJavaType containerType,
-            ObserverFunction pm, Term requires, Term measuredBy, Term accessible,
-            ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars) {
-        return new DependencyContractImpl(string, containerType,pm, requires, measuredBy, accessible, selfVar, paramVars);
+    public DependencyContract dep(String string,
+                                  KeYJavaType containerType,
+                                  ObserverFunction pm,
+                                  Term requires,
+                                  Term measuredBy,
+                                  Term accessible,
+                                  ProgramVariable selfVar,
+                                  ImmutableList<ProgramVariable> paramVars) {
+        assert (selfVar == null) == pm.isStatic();
+        return new DependencyContractImpl(string, containerType, pm, requires,
+                                          measuredBy, accessible, selfVar,
+                                          paramVars);
     }
 
     @Override
@@ -187,19 +216,6 @@ public class ContractFactory {
     }
     
  
-    @SuppressWarnings("unchecked")
-    public <T extends Contract> T setID(T old, int newId){
-        if (old instanceof FunctionalOperationContractImpl){
-            return (T) setID((FunctionalOperationContractImpl)old, newId);
-        } else if (old instanceof DependencyContractImpl){
-            return (T) setID((DependencyContractImpl)old, newId);
-        } else {
-            assert false : UNKNOWN_CONTRACT_IMPLEMENTATION;
-            return null;
-        }
-    }
-    
-    
     public FunctionalOperationContract setModality(FunctionalOperationContract old, Modality modality){
         assert old instanceof FunctionalOperationContractImpl : UNKNOWN_CONTRACT_IMPLEMENTATION;
         FunctionalOperationContractImpl foci = (FunctionalOperationContractImpl) old;
@@ -213,17 +229,6 @@ public class ContractFactory {
         return new FunctionalOperationContractImpl(foci.baseName, foci.kjt, foci.pm, foci.modality, foci.originalPre, foci.originalMby, foci.originalPost, modifies, foci.originalSelfVar, foci.originalParamVars, foci.originalResultVar, foci.originalExcVar, foci.originalHeapAtPreVar, foci.toBeSaved);
     }
    
-    @SuppressWarnings("unchecked")
-    public <T extends Contract> T setTarget(T old, KeYJavaType newKJT, ObserverFunction newPM){
-        if (old instanceof FunctionalOperationContractImpl){
-            return (T) setTarget((FunctionalOperationContractImpl)old, newKJT, newPM);
-        } else if (old instanceof DependencyContractImpl){
-            return (T) setTarget((DependencyContractImpl)old, newKJT, newPM);
-        } else {
-            assert false : UNKNOWN_CONTRACT_IMPLEMENTATION;
-            return null;
-        }
-    }
     
     /**
      * Returns the union of the passed contracts. 
@@ -362,75 +367,4 @@ public class ContractFactory {
         original = or.replace(original);
         return original;
     }
-    
- 
-    
-    private DependencyContractImpl setID(DependencyContractImpl dc, int newId) {
-        return new DependencyContractImpl(dc.baseName,
-                                      null,
-                              dc.kjt,                                   
-                              dc.target,
-                              dc.originalPre,
-                              dc.originalMby,                            
-                              dc.originalDep,
-                              dc.originalSelfVar,
-                              dc.originalParamVars,
-                              newId);   
-    }
-    
-    
-    private FunctionalOperationContractImpl setID(FunctionalOperationContractImpl foci, int newId) {
-        return new FunctionalOperationContractImpl(foci.baseName,
-                                     null,
-                             foci.kjt,                                    
-                             foci.pm,
-                             foci.modality,
-                             foci.originalPre,
-                             foci.originalMby,
-                             foci.originalPost,
-                             foci.originalMod,
-                             foci.originalSelfVar,
-                             foci.originalParamVars,
-                             foci.originalResultVar,
-                             foci.originalExcVar,
-                             foci.originalHeapAtPreVar,
-                             newId,
-                             foci.toBeSaved);    
-    }        
-    
-    private DependencyContractImpl setTarget(DependencyContractImpl dc, KeYJavaType newKJT,
-                                ObserverFunction newTarget) {
-        return new DependencyContractImpl(dc.baseName,
-                          null,
-                              newKJT,                        
-                              newTarget,
-                              dc.originalPre,
-                              dc.originalMby,                            
-                              dc.originalDep,
-                              dc.originalSelfVar,
-                              dc.originalParamVars,
-                              dc.id);  
-    }
-
-
-    private FunctionalOperationContractImpl setTarget(FunctionalOperationContractImpl foci, KeYJavaType newKJT,
-                           ObserverFunction newPM) {
-        return new FunctionalOperationContractImpl(foci.baseName,
-                         null,
-                             newKJT,                         
-                             (ProgramMethod)newPM,
-                             foci.modality,
-                             foci.originalPre,
-                             foci.originalMby,
-                             foci.originalPost,
-                             foci.originalMod,
-                             foci.originalSelfVar,
-                             foci.originalParamVars,
-                             foci.originalResultVar,
-                             foci.originalExcVar,
-                             foci.originalHeapAtPreVar,
-                             foci.id,
-                             foci.toBeSaved && newKJT.equals(foci.kjt));  
-    }
-    
 }

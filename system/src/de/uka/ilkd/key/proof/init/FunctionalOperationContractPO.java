@@ -238,7 +238,7 @@ public final class FunctionalOperationContractPO
                                                post);
 
         //save in field
-        poTerms = new Term[]{TB.imp(pre, progPost)};
+        assignPOTerms(TB.imp(pre, progPost));
 
         //add axioms
         collectClassAxioms(contract.getKJT());

@@ -12,6 +12,7 @@ package de.uka.ilkd.key.speclang;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -99,4 +100,17 @@ public interface Contract extends SpecificationElement {
      */
     public ProofOblInput createProofObl(InitConfig initConfig,
 	    Contract contract);
+    
+    /**
+     * Returns a contract which is identical this contract except that
+     * the id is set to the new id.
+     */
+    public Contract setID(int newId);
+    
+    
+    /**
+     * Returns a contract which is identical this contract except that
+     * the KeYJavaType and ObserverFunction are set to the new values.
+     */
+    public Contract setTarget(KeYJavaType newKJT, ObserverFunction newPM);
 }

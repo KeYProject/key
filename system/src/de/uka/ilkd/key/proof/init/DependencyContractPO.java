@@ -181,7 +181,7 @@ public final class DependencyContractPO extends AbstractPO
                         	         TB.apply(update, targetTerm)));
 	
         //save in field
-        poTerms = new Term[]{po};
+        assignPOTerms(po);
         
         //add axioms
         collectClassAxioms(contract.getKJT());
