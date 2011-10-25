@@ -125,7 +125,7 @@ public class Util {
            requires JCSystem.isTransient(dest) != JCSystem.NOT_A_TRANSIENT_OBJECT ==> !\transactionUpdated(dest);
            ensures \result == destOffset + length;
            ensures (\forall short i; i>=0 && i<length; dest[destOffset + i] == \old(src[srcOffset + i]));
-           ensures JCSystem.isTransient(dest) == JCSystem.NOT_A_TRANSIENT_OBJECT
+           ensures (JCSystem.isTransient(dest) == JCSystem.NOT_A_TRANSIENT_OBJECT && length > 0)
                 ==> \backup(\transactionUpdated(dest));
            ensures  JCSystem.isTransient(dest) != JCSystem.NOT_A_TRANSIENT_OBJECT ==>
                 !\backup(\transactionUpdated(dest));
@@ -188,8 +188,11 @@ public class Util {
                    dest[destOffset + j] == (j<i ? \old(src[srcOffset + j]) : \old(dest[destOffset + j]))
                )
              ;
-             loop_invariant_transaction
+             loop_invariant_transaction true 
+                &&
                (JCSystem.isTransient(dest) == JCSystem.NOT_A_TRANSIENT_OBJECT && i != 0  ==> \backup(\transactionUpdated(dest))) 
+                &&
+               (JCSystem.isTransient(dest) != JCSystem.NOT_A_TRANSIENT_OBJECT ==> !\backup(\transactionUpdated(dest))) 
                 &&
                (\forall short j; j >= 0 && j < length; 
                   \backup(dest[destOffset + j]) ==
@@ -216,6 +219,8 @@ public class Util {
              ;
              loop_invariant_transaction
                 (JCSystem.isTransient(dest) == JCSystem.NOT_A_TRANSIENT_OBJECT && i != 0  ==> \backup(\transactionUpdated(dest))) &&
+               (JCSystem.isTransient(dest) != JCSystem.NOT_A_TRANSIENT_OBJECT ==> !\backup(\transactionUpdated(dest))) 
+                &&
                (\forall short j; j >= 0 && j < length; 
                   \backup(dest[destOffset + j]) ==
                     ((j < length - i || JCSystem.isTransient(dest) == JCSystem.NOT_A_TRANSIENT_OBJECT) ?
