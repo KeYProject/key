@@ -333,6 +333,7 @@ public class IncrementalSearch {
         
         @Override
         public void requestFocus() {
+            textField.selectAll();
             textField.requestFocus();
         }
 
