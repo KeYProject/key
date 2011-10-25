@@ -121,6 +121,12 @@ public final class ClassInvariantImpl implements ClassInvariant {
         final OpReplacer or = new OpReplacer(replaceMap);
         return or.replace(originalInv);   
     }
+
+
+    @Override
+    public Term getOriginalInv() {
+        return originalInv;
+    }
     
  
     @Override
