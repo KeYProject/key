@@ -258,15 +258,9 @@ public final class ProblemLoader implements Runnable {
         	   if(contract == null) {
         	       throw new RuntimeException("Contract not found: " 
         		                          + chooseContract);
-        	   } else if(contract instanceof FunctionalOperationContract) {
-        	       po = new FunctionalOperationContractPO(
-        		       		initConfig, 
-        		       		(FunctionalOperationContract)contract);
         	   } else {
-        	       po = new DependencyContractPO(
-        		       		initConfig, 
-        		       		(DependencyContract)contract);
-        	   }
+                       po = contract.createProofObl(initConfig, contract);
+                   }
         	   
                } else { 
         	   ProofManagementDialog.showInstance(initConfig);
