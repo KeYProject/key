@@ -200,7 +200,7 @@ public class Util {
                         \old(\backup(dest[destOffset + j])) :
                         \old(src[srcOffset + j]))
                )
-;
+             ;
              decreases length - i;
              assignable dest[destOffset..destOffset+length-1];
              assignable_backup \transactionUpdated(dest), dest[destOffset..destOffset+length-1];
@@ -241,9 +241,51 @@ public class Util {
         return (short) (destOffset + length);
     }
 
+    /*@
+         public normal_behavior
+           requires src.length < 32768;
+           requires dest.length < 32768;
+           requires src != null && dest != null;
+           requires length >= 0;
+           requires srcOffset >=0 & srcOffset + length <= src.length;
+           requires destOffset >=0 & destOffset + length <= dest.length;
+           ensures \result == -1 || \result == 0 || \result == 1;
+           ensures \result == 0 ==> (\forall short i; i>=0 && i < length; src[srcOffset + i] == dest[destOffset + i]);
+           ensures \result == -1 ==>
+              (\exists short i; i>=0 && i < length; src[srcOffset + i] < dest[destOffset + i] &&
+                 (\forall short j; j>=0 && j<i; src[srcOffset + j] == dest[destOffset + j]));
+           ensures \result == 1 ==>
+              (\exists short i; i>=0 && i < length; src[srcOffset + i] > dest[destOffset + i] &&
+                 (\forall short j; j>=0 && j<i; src[srcOffset + j] == dest[destOffset + j]));
+           assignable \nothing;
+    @*/
     public static final byte arrayCompare(/*@ nullable @*/ byte[] src, short srcOffset,
             /*@ nullable @*/ byte[] dest, short destOffset, short length)
             throws NullPointerException, ArrayIndexOutOfBoundsException {
+         if (src == null || dest == null)
+            throw JCSystem.npe;
+         if (length < 0 || srcOffset < 0 || destOffset < 0
+                || srcOffset  > (short)(src.length - length)
+                || destOffset > (short)(dest.length - length))
+            throw JCSystem.aioobe;
+
+        if(src == dest && srcOffset == destOffset) {
+          return (byte)0;
+        }
+
+        /*@ loop_invariant i>=0 && i <= length &&
+               (\forall short j; j>=0 && j < i; src[srcOffset + j] == dest[destOffset + j]);
+            decreases length - i;
+            assignable \nothing;
+          @*/
+        for(short i=0; i<length; i++) {
+           if(src[srcOffset + i] < dest[destOffset + i]) {
+              return (byte)-1;
+           }
+           if(src[srcOffset + i] > dest[destOffset + i]) {
+              return (byte)1;
+           }
+        }
         return (byte)0;
     }
 }

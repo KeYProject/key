@@ -63,10 +63,28 @@ public class OwnerPIN implements PIN {
         _isValidated[0] = false;
     }
 
+    /*@ public behavior
+          requires JCSystem.npe != null;
+          requires JCSystem.aioobe != null;
+          requires PINException._systemInstance != null;
+          requires PINException._systemInstance.<inv>;
+          ensures getTriesRemaining() == _maxTries;
+          ensures !isValidated();
+          signals (NullPointerException npe) npe == JCSystem.npe && pin == null;
+          signals (ArrayIndexOutOfBoundsException aioobe)
+             aioobe == JCSystem.aioobe && (length < 0 || offset < 0 || offset + length > pin.length);
+          signals (PINException pe)
+             pe == PINException._systemInstance &&
+             ((PINException)pe).getReason() == PINException.ILLEGAL_VALUE &&
+             length > _maxPINSize;
+          signals_only NullPointerException, ArrayIndexOutOfBoundsException, PINException;
+          assignable _pin[*];
+      @*/
     public void update(/*@ nullable @*/ byte[] pin, short offset, byte length)
-            throws PINException {
-        if (length > _maxPINSize)
+            throws PINException, NullPointerException {
+        if (length > _maxPINSize) {
             PINException.throwIt(PINException.ILLEGAL_VALUE);
+        }
         Util.arrayCopy(pin, offset, _pin, (short) 1, length);
         _pin[0] = _maxTries;
         setValidatedFlag(false);
@@ -81,7 +99,8 @@ public class OwnerPIN implements PIN {
         return getValidatedFlag();
     }
 
-    public byte getTriesRemaining() {
+    //@ ensures \result == _pin[0];
+    public /*@pure@*/ byte getTriesRemaining() {
         return _pin[0];
     }
 
