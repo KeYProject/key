@@ -30,6 +30,7 @@ public interface FunctionalOperationContract extends OperationContract {
 
     public Modality getPOModality();
    
+    public boolean isReadOnlyContract();
     /**
      * Returns the postcondition of the contract.
      */

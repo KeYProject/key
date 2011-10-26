@@ -674,6 +674,10 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 	return or.replace(originalPost);
     }    
 
+    public boolean isReadOnlyContract() {
+        return originalMod.toString().equals("empty");
+    }
+    
     public Term getAnyMod(Term mod, ProgramVariable selfVar, 
                        ImmutableList<ProgramVariable> paramVars,
                        Services services) {

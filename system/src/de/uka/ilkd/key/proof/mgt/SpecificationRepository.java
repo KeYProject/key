@@ -517,8 +517,11 @@ public final class SpecificationRepository {
 	    				       ProgramMethod pm,
 	    				       Modality modality) {
 	ImmutableSet<FunctionalOperationContract> result = getOperationContracts(kjt, pm);
+	final boolean transactionModality = (modality == Modality.DIA_TRANSACTION || modality == Modality.BOX_TRANSACTION);
+	final Modality otherMatchModality = transactionModality ? ((modality == Modality.DIA_TRANSACTION) ? Modality.DIA :
+	          Modality.BOX) : null;
 	for(FunctionalOperationContract contract : result) {
-	    if(!contract.getModality().equals(modality)) {
+	    if(!contract.getModality().equals(modality) && !(contract.isReadOnlyContract() && contract.getModality().equals(otherMatchModality))) {
 		result = result.remove(contract);
 	    }
 	}
