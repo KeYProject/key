@@ -48,6 +48,7 @@ tokens {
 }
 
 AND : "&";
+BACKUP : "\\backup";
 BIGINT : "\\bigint";
 BITWISENOT : "~";
 BSUM : "\\bsum";  //KeY extension, not official JML
@@ -114,6 +115,7 @@ SHIFTLEFT : "<<";
 SHIFTRIGHT : ">>";
 SPACE : "\\space";
 STRING_EQUAL : "\\string_equal";
+TRANSACTIONUPDATED: "\\transactionUpdated";
 TYPEOF : "\\typeof";
 TYPE_SMALL : "\\type";
 TYPE : "\\TYPE";

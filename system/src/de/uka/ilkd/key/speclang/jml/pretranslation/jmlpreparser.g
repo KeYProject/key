@@ -224,6 +224,7 @@ modifier returns [String result = null]:
     |   spr:SPEC_PROTECTED      { result = spr.getText(); }
     |   spu:SPEC_PUBLIC         { result = spu.getText(); }
     |   sta:STATIC              { result = sta.getText(); }
+    |   tra:TRANSACTION         { result = tra.getText(); }
 ;
 
 
@@ -565,6 +566,7 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 :
     (
 	    ps=assignable_clause     { sc.addAssignable(ps); }
+	|   ps=assignable_backup_clause { sc.addAssignableBackup(ps); }
 	|   ps=accessible_clause     { sc.addAccessible(ps); }
 	|   ps=ensures_clause        { sc.addEnsures(ps); }
 	|   ps=signals_clause        { sc.addSignals(ps); }
@@ -596,6 +598,21 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 //-----------------------------------------------------------------------------
 //simple specification body clauses
 //-----------------------------------------------------------------------------
+
+assignable_backup_clause 
+	returns [PositionedString result = null] 
+	throws SLTranslationException
+:
+    assignable_backup_keyword result=expression { result = result.prepend("assignable "); }
+;
+
+assignable_backup_keyword
+:
+    	ASSIGNABLE_TRA 
+    |   MODIFIABLE_TRA 
+    |   MODIFIES_TRA
+;
+
 
 assignable_clause 
 	returns [PositionedString result = null] 
@@ -1071,7 +1088,9 @@ loop_specification[ImmutableList<String> mods]
     	options { greedy = true; }
     	:
     	    ps=loop_invariant       { ls.addInvariant(ps); }
+        |   ps=loop_invariant_tra   { ls.addTransactionInvariant(ps); }
         |   ps=assignable_clause    { ls.addAssignable(ps); }
+	|   ps=assignable_backup_clause { ls.addAssignableBackup(ps); }
         |   ps=variant_function     { ls.setVariant(ps); } 
     )+
 ;
@@ -1080,6 +1099,11 @@ loop_specification[ImmutableList<String> mods]
 loop_invariant returns [PositionedString result = null]
 :
     maintaining_keyword result=expression
+;
+
+loop_invariant_tra returns [PositionedString result = null]
+:
+    LOOP_INVARIANT_TRA result=expression
 ;
 
 

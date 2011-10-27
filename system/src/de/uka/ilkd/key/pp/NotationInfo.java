@@ -144,6 +144,10 @@ public final class NotationInfo {
 	tbl.put(Quantifier.EX, new Notation.Quantifier("\\exists", 60, 60));
 	tbl.put(Modality.DIA,new Notation.ModalityNotation("\\<","\\>", 60, 60));
 	tbl.put(Modality.BOX,new Notation.ModalityNotation("\\[","\\]", 60, 60));
+	tbl.put(Modality.TOUT,new Notation.ModalityNotation("\\[[","\\]]", 60, 60));
+	tbl.put(Modality.DIA_TRANSACTION,new Notation.ModalityNotation("\\diamond_transaction","\\endmodality", 60, 60));
+	tbl.put(Modality.BOX_TRANSACTION,new Notation.ModalityNotation("\\box_transaction","\\endmodality", 60, 60));
+	tbl.put(Modality.TOUT_TRANSACTION,new Notation.ModalityNotation("\\throughout_transaction","\\endmodality", 60, 60));
 	tbl.put(IfThenElse.IF_THEN_ELSE, new Notation.IfThenElse(130, "\\if"));
 	tbl.put(WarySubstOp.SUBST,new Notation.Subst());
 	tbl.put(UpdateApplication.UPDATE_APPLICATION, new Notation.UpdateApplicationNotation());

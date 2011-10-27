@@ -216,36 +216,24 @@ tokens {
    static {
       modNames.put("\\<","diamond");
       modNames.put("\\diamond","diamond");
-      modNames.put("\\diamond_tra","diamond_tra");
-      modNames.put("\\diamond_trc","diamond_trc");
-      modNames.put("\\diamond_susp","diamond_susp");
+      modNames.put("\\diamond_transaction","diamond_transaction");
       modNames.put("\\[","box");
       modNames.put("\\box","box");
-      modNames.put("\\box_tra","box_tra");
-      modNames.put("\\box_trc","box_trc");
-      modNames.put("\\box_susp","box_susp");
+      modNames.put("\\box_transaction","box_transaction");
       modNames.put("\\[[","throughout");
       modNames.put("\\throughout","throughout");
-      modNames.put("\\throughout_tra","throughout_tra");
-      modNames.put("\\throughout_trc","throughout_trc");
-      modNames.put("\\throughout_susp","throughout_susp");
+      modNames.put("\\throughout_transaction","throughout_transaction");
 
       modPairs.put("\\<","\\>");
       modPairs.put("\\modality","\\endmodality");
       modPairs.put("\\diamond","\\endmodality");
-      modPairs.put("\\diamond_tra","\\endmodality");
-      modPairs.put("\\diamond_trc","\\endmodality");
-      modPairs.put("\\diamond_susp","\\endmodality");
+      modPairs.put("\\diamond_transaction","\\endmodality");
       modPairs.put("\\[","\\]");
       modPairs.put("\\box","\\endmodality");
-      modPairs.put("\\box_tra","\\endmodality");
-      modPairs.put("\\box_trc","\\endmodality");
-      modPairs.put("\\box_susp","\\endmodality");
+      modPairs.put("\\box_transaction","\\endmodality");
       modPairs.put("\\[[","\\]]");
       modPairs.put("\\throughout","\\endmodality");
-      modPairs.put("\\throughout_tra","\\endmodality");
-      modPairs.put("\\throughout_trc","\\endmodality");
-      modPairs.put("\\throughout_susp","\\endmodality");
+      modPairs.put("\\throughout_transaction","\\endmodality");
    }
 
    private void matchAndTransformModality(int beginIndex) throws antlr.RecognitionException {

@@ -41,6 +41,7 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.java.statement.CatchAllStatement;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
+import de.uka.ilkd.key.java.statement.TransactionStatement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -1744,6 +1745,10 @@ public class Recoder2KeYConverter {
         return new CopyAssignment(collectChildrenAndComments(arg));
     }
 
+    public TransactionStatement convert(de.uka.ilkd.key.java.recoderext.TransactionStatement tr){
+        return new TransactionStatement(tr.getType());
+    }
+    
     public PostIncrement convert(recoder.java.expression.operator.PostIncrement arg) {
         return new PostIncrement(collectChildrenAndComments(arg));
     }

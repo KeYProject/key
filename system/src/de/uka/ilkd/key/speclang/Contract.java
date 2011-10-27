@@ -50,6 +50,7 @@ public interface Contract extends SpecificationElement {
      */
     public Term getPre(ProgramVariable selfVar, 
 	    	       ImmutableList<ProgramVariable> paramVars,
+                       ProgramVariable savedHeapAtPreVar,
 	    	       Services services);
     
     /**
@@ -58,6 +59,7 @@ public interface Contract extends SpecificationElement {
     public Term getPre(Term heapTerm,
 	               Term selfTerm, 
 	    	       ImmutableList<Term> paramTerms,
+                       Term savedHeapAtPre,
 	    	       Services services);    
     
     
@@ -87,6 +89,8 @@ public interface Contract extends SpecificationElement {
      * specified directly in DL, but not for JML contracts)
      */
     public boolean toBeSaved();
+
+    public boolean transactionContract();
     
     /**
      * Returns a parseable String representation of the contract. 

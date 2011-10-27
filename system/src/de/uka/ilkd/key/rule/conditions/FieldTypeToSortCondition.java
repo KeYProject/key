@@ -87,7 +87,7 @@ public final class FieldTypeToSortCondition implements VariableCondition {
 
                 className     = name.substring(0, endOfClassName);
                 attributeName = name.substring(startAttributeName);
-        
+
                 ProgramVariable attribute = services.getJavaInfo()
                         .getAttribute(attributeName, className);
                 

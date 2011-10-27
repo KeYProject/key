@@ -26,7 +26,11 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
 
     private ImmutableList<PositionedString> invariant          
             = ImmutableSLList.<PositionedString>nil();
+    private ImmutableList<PositionedString> transaction_invariant          
+            = ImmutableSLList.<PositionedString>nil();
     private ImmutableList<PositionedString> assignable         
+            = ImmutableSLList.<PositionedString>nil();
+    private ImmutableList<PositionedString> assignable_backup         
             = ImmutableSLList.<PositionedString>nil();
     private PositionedString variant                  
             = null;
@@ -40,12 +44,19 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
     public void addInvariant(PositionedString ps) {
         invariant = invariant.append(ps);
     }
+
+    public void addTransactionInvariant(PositionedString ps) {
+        transaction_invariant = transaction_invariant.append(ps);
+    }
     
     
     public void addAssignable(PositionedString ps) {
         assignable = assignable.append(ps);
     }
     
+    public void addAssignableBackup(PositionedString ps) {
+        assignable_backup = assignable_backup.append(ps);
+    }
     
     public void setVariant(PositionedString ps) {
         assert variant == null;
@@ -57,9 +68,16 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
         return invariant;
     }
     
+    public ImmutableList<PositionedString> getTransactionInvariant() {
+        return transaction_invariant;
+    }
     
     public ImmutableList<PositionedString> getAssignable() {
         return assignable;
+    }
+
+    public ImmutableList<PositionedString> getAssignableBackup() {
+        return assignable_backup;
     }
     
     
@@ -77,9 +95,17 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
         while(it.hasNext()) {
             sb.append("invariant: " + it.next() + "\n");
         }
+        it = transaction_invariant.iterator();
+        while(it.hasNext()) {
+            sb.append("transaction_invariant: " + it.next() + "\n");
+        }
         it = assignable.iterator();
         while(it.hasNext()) {
             sb.append("assignable: " + it.next() + "\n");
+        }
+        it = assignable_backup.iterator();
+        while (it.hasNext()) {
+            sb.append("assignable_backup: ").append(it.next()).append("\n");
         }
         if(variant != null) {
             sb.append("decreases: " + variant);
@@ -97,16 +123,19 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
         TextualJMLLoopSpec ls = (TextualJMLLoopSpec) o;
         return mods.equals(ls.mods)
                && invariant.equals(ls.invariant)
+               && transaction_invariant.equals(ls.transaction_invariant)
                && assignable.equals(ls.assignable)
+               && assignable_backup.equals(ls.assignable_backup)
                && (variant == null && ls.variant == null
                    || variant != null && variant.equals(ls.variant));
     }
-    
-    
+        
     @Override
     public int hashCode() {
         return mods.hashCode()
                 + invariant.hashCode() 
-                + assignable.hashCode();
+                + transaction_invariant.hashCode() 
+                + assignable.hashCode()
+                + assignable_backup.hashCode();
     }
 }

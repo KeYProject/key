@@ -75,4 +75,6 @@ public interface Sort extends Named {
      * returns the exactinstanceof symbol of this Sort
      */
     SortDependingFunction getExactInstanceofSymbol(Services services);
+
+    String declarationString();
 }

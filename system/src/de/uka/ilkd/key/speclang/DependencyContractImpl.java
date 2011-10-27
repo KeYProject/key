@@ -144,6 +144,7 @@ public final class DependencyContractImpl implements DependencyContract {
     @Override
     public Term getPre(ProgramVariable selfVar, 
 	    	       ImmutableList<ProgramVariable> paramVars,
+                       ProgramVariable savedHeapAtPreVar,
 	    	       Services services) {
         assert (selfVar == null) == (originalSelfVar == null);
         assert paramVars != null;
@@ -164,6 +165,7 @@ public final class DependencyContractImpl implements DependencyContract {
     public Term getPre(Term heapTerm,
 	               Term selfTerm, 
 	    	       ImmutableList<Term> paramTerms,
+                       Term savedHeapAtPre,
 	    	       Services services) {
 	assert heapTerm != null;
 	assert (selfTerm == null) == (originalSelfVar == null);
@@ -319,6 +321,10 @@ public final class DependencyContractImpl implements DependencyContract {
 	return null;
     }
 
+    @Override
+    public boolean transactionContract() {
+        return false;
+    }
 
     @Override
     public ProofOblInput createProofObl(InitConfig initConfig,

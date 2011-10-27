@@ -15,11 +15,13 @@ public class ProgramVariableCollection {
     public ProgramVariable excVar;
     public LocationVariable heapAtPreVar ;
     public Term heapAtPre;
+    public LocationVariable savedHeapAtPreVar ;
+    public Term savedHeapAtPre;
     
     public ProgramVariableCollection(ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars,
             ProgramVariable resultVar, ProgramVariable excVar,
-            LocationVariable heapAtPreVar, Term heapAtPre) {
+            LocationVariable heapAtPreVar, Term heapAtPre, LocationVariable savedHeapAtPreVar, Term savedHeapAtPre) {
         super();
         this.selfVar = selfVar;
         this.paramVars = paramVars;
@@ -27,6 +29,8 @@ public class ProgramVariableCollection {
         this.excVar = excVar;
         this.heapAtPreVar = heapAtPreVar;
         this.heapAtPre = heapAtPre;
+        this.savedHeapAtPreVar = savedHeapAtPreVar;
+        this.savedHeapAtPre = savedHeapAtPre;
     }
 
     public ProgramVariableCollection() {

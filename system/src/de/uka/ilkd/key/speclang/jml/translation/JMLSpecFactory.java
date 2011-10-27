@@ -81,6 +81,7 @@ public class JMLSpecFactory {
         public Term requires;
         public Term measuredBy;
         public Term assignable;
+        public Term assignable_backup;
         public Term accessible;
         public Term ensures;
         public Term signals;
@@ -106,8 +107,8 @@ public class JMLSpecFactory {
 
 
     private String getContractName(ProgramMethod programMethod,
-                                   Behavior behavior) {
-        return "JML " + behavior.toString() + "operation contract";
+                                   Behavior behavior, boolean transaction) {
+        return "JML " + behavior.toString() + (transaction ? "transaction " :"") +"operation contract";
     }
 
 
@@ -193,6 +194,8 @@ public class JMLSpecFactory {
         progVar.excVar = TB.excVar(services, pm, false);
         progVar.heapAtPreVar = TB.heapAtPreVar(services, "heapAtPre", false);
         progVar.heapAtPre = TB.var(progVar.heapAtPreVar);
+        progVar.savedHeapAtPreVar = TB.heapAtPreVar(services, "savedHeapAtPre", false);
+        progVar.savedHeapAtPre = TB.var(progVar.savedHeapAtPreVar);
         return progVar;
     }
 
@@ -203,9 +206,10 @@ public class JMLSpecFactory {
                                                 Behavior originalBehavior)
             throws SLTranslationException {
         ContractClauses clauses = new ContractClauses();
+        Term savedHeapAtPre = textualSpecCase.getMods().contains("transaction") ? progVars.savedHeapAtPre : null;
         clauses.requires =
                 translateAndClauses(pm, progVars.selfVar, progVars.paramVars,
-                                    null, null, null,
+                                    null, null, null, savedHeapAtPre,
                                     textualSpecCase.getRequires());
         clauses.measuredBy =
                 translateMeasuredBy(pm, progVars.selfVar,
@@ -215,6 +219,18 @@ public class JMLSpecFactory {
                 translateAssignable(pm, progVars.selfVar,
                                     progVars.paramVars,
                                     textualSpecCase.getAssignable());
+        if(textualSpecCase.getMods().contains("transaction")) {
+          clauses.assignable_backup =
+                  translateAssignable(pm, progVars.selfVar,
+                                      progVars.paramVars,
+                                      textualSpecCase.getAssignableBackup());
+        }else{
+           if(textualSpecCase.getAssignableBackup().size() != 0) {
+             throw new SLTranslationException("assignable_backup not allowed in a non-transaction spec case.",
+                 textualSpecCase.getAssignableBackup().head().fileName, textualSpecCase.getAssignableBackup().head().pos);
+           }
+           clauses.assignable_backup = null;
+        }
         clauses.accessible =
                 translateAccessible(pm, progVars.selfVar,
                                     progVars.paramVars,
@@ -222,12 +238,12 @@ public class JMLSpecFactory {
         clauses.ensures = translateEnsures(pm, progVars.selfVar,
                                            progVars.paramVars,
                                            progVars.resultVar, progVars.excVar,
-                                           progVars.heapAtPre, originalBehavior,
+                                           progVars.heapAtPre, savedHeapAtPre, originalBehavior,
                                            textualSpecCase.getEnsures());
         clauses.signals = translateSignals(pm, progVars.selfVar,
                                            progVars.paramVars,
                                            progVars.resultVar, progVars.excVar,
-                                           progVars.heapAtPre, originalBehavior,
+                                           progVars.heapAtPre, savedHeapAtPre, originalBehavior,
                                            textualSpecCase.getSignals());
         clauses.signalsOnly =
                 translateSignalsOnly(pm, progVars.excVar, originalBehavior,
@@ -254,7 +270,7 @@ public class JMLSpecFactory {
                 ImmutableList<Term> translated =
                         translator.<ImmutableList<Term>>translate(
                         expr, pm.getContainerType(), selfVar, paramVars, null,
-                        null, null, services);
+                        null, null, null, services);
                 result = result.append(translated);
             }
             return result;
@@ -269,6 +285,7 @@ public class JMLSpecFactory {
             ProgramVariable resultVar,
             ProgramVariable excVar,
             Term heapAtPre,
+            Term savedHeapAtPre,
             ImmutableList<PositionedString> originalClauses)
             throws SLTranslationException {
         Term result = TB.tt();
@@ -276,7 +293,7 @@ public class JMLSpecFactory {
             Term translated =
                     translator.<Term>translate(expr, pm.getContainerType(),
                                            selfVar, paramVars, resultVar,
-                                           excVar, heapAtPre, services);
+                                           excVar, heapAtPre, savedHeapAtPre, services);
             result = TB.and(result, translated);
         }
         return result;
@@ -292,7 +309,7 @@ public class JMLSpecFactory {
         for (PositionedString expr : originalClauses) {
             Term translated =
                     translator.<Term>translate(expr, pm.getContainerType(), selfVar,
-                                           paramVars, null, null, null,
+                                           paramVars, null, null, null, null,
                                            services);
             result = TB.or(result, translated);
         }
@@ -310,7 +327,7 @@ public class JMLSpecFactory {
         for (PositionedString expr : originalClauses) {
             Term translated =
                     translator.<Term>translate(expr, pm.getContainerType(), selfVar,
-                                           paramVars, null, null, null, services);
+                                           paramVars, null, null, null, null, services);
             result = TB.union(services, result, translated);
         }
         return result;
@@ -330,7 +347,7 @@ public class JMLSpecFactory {
                                                           pm.getContainerType(),
                                                           selfVar,
                                                           paramVars, null, null,
-                                                          null, services);
+                                                          null, null, services);
             result = result.append(translated);
         }
         return result;
@@ -344,6 +361,7 @@ public class JMLSpecFactory {
             ProgramVariable resultVar,
             ProgramVariable excVar,
             Term heapAtPre,
+            Term savedHeapAtPre,
             Behavior originalBehavior,
             ImmutableList<PositionedString> originalClauses)
             throws SLTranslationException {
@@ -352,7 +370,7 @@ public class JMLSpecFactory {
             return TB.ff();
         } else {
             return translateAndClauses(pm, selfVar, paramVars, resultVar,
-                    excVar, heapAtPre, originalClauses);
+                    excVar, heapAtPre, savedHeapAtPre, originalClauses);
         }
     }
 
@@ -362,7 +380,7 @@ public class JMLSpecFactory {
                                       Behavior originalBehavior,
                                       ImmutableList<PositionedString> originalClauses)
             throws SLTranslationException {
-        return translateSignals(pm, null, null, null, excVar, null,
+        return translateSignals(pm, null, null, null, excVar, null, null,
                                 originalBehavior, originalClauses);
     }
 
@@ -373,6 +391,7 @@ public class JMLSpecFactory {
                                   ProgramVariable resultVar,
                                   ProgramVariable excVar,
                                   Term heapAtPre,
+                                  Term savedHeapAtPre,
                                   Behavior originalBehavior,
                                   ImmutableList<PositionedString> originalClauses)
             throws SLTranslationException {
@@ -381,7 +400,7 @@ public class JMLSpecFactory {
             return TB.ff();
         } else {
             return translateAndClauses(pm, selfVar, paramVars, resultVar,
-                    excVar, heapAtPre, originalClauses);
+                    excVar, heapAtPre, savedHeapAtPre, originalClauses);
         }
     }
 
@@ -429,7 +448,7 @@ public class JMLSpecFactory {
                 Term translated = translator.<Term>translate(expr,
                                                          pm.getContainerType(),
                                                          selfVar, paramVars,
-                                                         null, null, null,
+                                                         null, null, null, null,
                                                          services);
                 measuredBy = TB.add(services, measuredBy, translated);
             }
@@ -443,7 +462,7 @@ public class JMLSpecFactory {
                                 Behavior originalBehavior) {
         String customName = textualSpecCase.getName();
         String name = ((!(customName == null) && customName.length() > 0) ? customName
-                       : getContractName(pm, originalBehavior));
+                       : getContractName(pm, originalBehavior, textualSpecCase.getMods().contains("transaction")));
         return name;
     }
 
@@ -487,11 +506,19 @@ public class JMLSpecFactory {
             FunctionalOperationContract contract = cf.func(
                     name, pm, true, clauses.requires,
                     clauses.measuredBy, post, clauses.assignable, progVars);
+            if(clauses.assignable_backup != null) {
+               contract = cf.setModifiesBackup(contract, clauses.assignable_backup);
+               contract = cf.setModality(contract, Modality.DIA_TRANSACTION);
+            }
             result = result.add(contract);
         } else if (clauses.diverges.equals(TB.tt())) {
             FunctionalOperationContract contract = cf.func(
                     name, pm, false, clauses.requires,
                     clauses.measuredBy, post, clauses.assignable, progVars);
+            if(clauses.assignable_backup != null) {
+               contract = cf.setModifiesBackup(contract, clauses.assignable_backup);
+               contract = cf.setModality(contract, Modality.BOX_TRANSACTION);
+            }
             result = result.add(contract);
         } else {
             FunctionalOperationContract contract1 = cf.func(
@@ -505,6 +532,12 @@ public class JMLSpecFactory {
                                                         clauses.measuredBy, post,
                                                         clauses.assignable,
                                                         progVars);
+            if(clauses.assignable_backup != null) {
+               contract1 = cf.setModifiesBackup(contract1, clauses.assignable_backup);
+               contract1 = cf.setModality(contract1, Modality.DIA_TRANSACTION);
+               contract2 = cf.setModifiesBackup(contract2, clauses.assignable_backup);
+               contract2 = cf.setModality(contract2, Modality.BOX_TRANSACTION);
+            }
             result = result.add(contract1).add(contract2);
         }
         return result;
@@ -556,7 +589,7 @@ public class JMLSpecFactory {
 
         //translateToTerm expression
         Term inv = translator.<Term>translate(originalInv, kjt, selfVar, null, null,
-                                          null, null, services);
+                                          null, null, null, services);
         //create invariant
         String name = getDefaultInvName(null,kjt);
         return new ClassInvariantImpl(name,
@@ -577,7 +610,7 @@ public class JMLSpecFactory {
 
         //translateToTerm expression
         Term inv = translator.<Term>translate(textualInv.getInv(), kjt, selfVar, null, null,
-                                          null, null, services);
+                                          null, null, null, services);
         //create invariant
         String name = getDefaultInvName(null,kjt);
         String display = getDefaultInvName(textualInv.getName(),kjt);
@@ -604,7 +637,7 @@ public class JMLSpecFactory {
 
         //translateToTerm expression
         Term inv = translator.<Term>translate(original, kjt, selfVar, null, null,
-                                          null, null, services);
+                                          null, null, null, services);
         //create invariant
         String name = getInicName();
         InitiallyClauseImpl res = new InitiallyClauseImpl(name,
@@ -648,6 +681,7 @@ public class JMLSpecFactory {
                                                                null,
                                                                null,
                                                                null,
+                                                               null,
                                                                services);
         // represents clauses must be unique per type
         for (Pair<KeYJavaType,ObserverFunction> p: modelFields){
@@ -678,7 +712,7 @@ public class JMLSpecFactory {
         //translateToTerm expression
         final PositionedString clause = textualRep.getRepresents();
         final Pair<ObserverFunction, Term> rep =
-                translator.<Pair<ObserverFunction, Term>>translate(clause,kjt,selfVar,null,null,null,null,services);
+                translator.<Pair<ObserverFunction, Term>>translate(clause,kjt,selfVar,null,null,null,null,null,services);
         //check whether there already is a represents clause
         if (!modelFields.add(new Pair<KeYJavaType,ObserverFunction>(kjt,rep.first))){
             throw new SLWarningException("JML represents clauses must occur uniquely per type and target."+
@@ -718,7 +752,7 @@ public class JMLSpecFactory {
         //translate expression
         final Term ax =
                 translator.<Term>translate(originalRep, kjt, selfVar, null, null,
-                                       null, null, services);
+                                       null, null, null, services);
         
         //create class axiom
         String name = "class axiom in " + kjt.getFullName();
@@ -741,7 +775,7 @@ public class JMLSpecFactory {
         //translateToTerm expression
         Triple<ObserverFunction, Term, Term> dep =
                 translator.<Triple<ObserverFunction, Term, Term>>translate(
-                    originalDep, kjt, selfVar, null, null, null, null,
+                    originalDep, kjt, selfVar, null, null, null, null, null,
                     services);
         assert dep.first.arity() <= 2;
         return cf.dep(kjt, dep, dep.first.isStatic() ? null : selfVar);
@@ -791,7 +825,9 @@ public class JMLSpecFactory {
             ProgramMethod pm,
             LoopStatement loop,
             ImmutableList<PositionedString> originalInvariant,
+            ImmutableList<PositionedString> originalTransactionInvariant,
             ImmutableList<PositionedString> originalAssignable,
+            ImmutableList<PositionedString> originalBackupAssignable,
             PositionedString originalVariant)
             throws SLTranslationException {
         assert pm != null;
@@ -818,7 +854,8 @@ public class JMLSpecFactory {
                 collectLocalVariables(pm.getBody(), loop);
         paramVars = paramVars.append(localVars);
         Term heapAtPre = TB.var(TB.heapAtPreVar(services, "heapAtPre", false));
-
+        Term savedHeapAtPre = TB.var(TB.heapAtPreVar(services, "savedHeapAtPre", false));
+        
         //translateToTerm invariant
         Term invariant;
         if (originalInvariant.isEmpty()) {
@@ -829,8 +866,21 @@ public class JMLSpecFactory {
                 Term translated =
                         translator.<Term>translate(expr, pm.getContainerType(),
                                                selfVar, paramVars, null,
-                                               null, heapAtPre, services);
+                                               null, heapAtPre, null, services);
                 invariant = TB.and(invariant, translated);
+            }
+        }
+        Term transactionInvariant;
+        if (originalTransactionInvariant.isEmpty()) {
+            transactionInvariant = null;
+        } else {
+            transactionInvariant = TB.tt();
+            for (PositionedString expr : originalTransactionInvariant) {
+                Term translated =
+                        translator.<Term>translate(expr, pm.getContainerType(),
+                                               selfVar, paramVars, null,
+                                               null, heapAtPre, savedHeapAtPre, services);
+                transactionInvariant = TB.and(transactionInvariant, translated);
             }
         }
 
@@ -844,8 +894,22 @@ public class JMLSpecFactory {
                 Term translated =
                         translator.<Term>translate(expr, pm.getContainerType(),
                                                selfVar, paramVars, null, null,
-                                               null, services);
+                                               null, null, services);
                 assignable = TB.union(services, assignable, translated);
+            }
+        }
+
+        Term assignableBackup;
+        if (originalBackupAssignable.isEmpty()) {
+            assignableBackup = TB.allLocs(services);
+        } else {
+            assignableBackup = TB.empty(services);
+            for (PositionedString expr : originalBackupAssignable) {
+                Term translated =
+                        translator.<Term>translate(expr, pm.getContainerType(),
+                                               selfVar, paramVars, null, null,
+                                               null, null, services);
+                assignableBackup = TB.union(services, assignableBackup, translated);
             }
         }
 
@@ -857,7 +921,7 @@ public class JMLSpecFactory {
             Term translated =
                     translator.<Term>translate(originalVariant,
                                            pm.getContainerType(), selfVar,
-                                           paramVars, null, null, heapAtPre,
+                                           paramVars, null, null, heapAtPre, null, 
                                            services);
             variant = translated;
         }
@@ -865,11 +929,14 @@ public class JMLSpecFactory {
         //create loop invariant annotation
         Term selfTerm = selfVar == null ? null : TB.var(selfVar);
         return new LoopInvariantImpl(loop,
-                                     invariant,
-                                     assignable,
-                                     variant,
-                                     selfTerm,
-                                     heapAtPre);
+                invariant,
+                transactionInvariant,
+                assignable,
+                assignableBackup,
+                variant,
+                selfTerm,
+                heapAtPre,
+                savedHeapAtPre);
     }
 
 
@@ -881,7 +948,9 @@ public class JMLSpecFactory {
         return createJMLLoopInvariant(pm,
                                       loop,
                                       textualLoopSpec.getInvariant(),
+                                      textualLoopSpec.getTransactionInvariant(),
                                       textualLoopSpec.getAssignable(),
+                                      textualLoopSpec.getAssignableBackup(),
                                       textualLoopSpec.getVariant());
     }
     

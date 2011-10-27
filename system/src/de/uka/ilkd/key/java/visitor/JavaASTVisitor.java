@@ -831,4 +831,10 @@ public abstract class JavaASTVisitor extends JavaASTWalker
     public void performActionOnLoopInvariant(LoopInvariant x) {
         //do nothing
     }
+
+    @Override    
+    public void performActionOnTransactionStatement(TransactionStatement x) {
+    doDefaultAction(x);
+    }
+
 }

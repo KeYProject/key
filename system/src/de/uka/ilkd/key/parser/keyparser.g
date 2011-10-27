@@ -1720,6 +1720,8 @@ one_schema_var_decl
     boolean makeVariableSV  = false;
     boolean makeSkolemTermSV = false;
     String id = null;
+    String parameter = null;
+    String nameString = null;
     ImmutableList<String> ids = null;
     SchemaVariableModifierSet mods = null;
 } :   
@@ -1730,8 +1732,12 @@ one_schema_var_decl
     PROGRAM
     { mods = new SchemaVariableModifierSet.ProgramSV (); }
     ( schema_modifiers[mods] ) ?
-    id = simple_ident  {
-       s = (Sort)ProgramSVSort.name2sort().get(new Name(id));
+    id = simple_ident ( LBRACKET nameString = simple_ident EQUALS parameter = simple_ident_dots RBRACKET )? {
+       if(nameString != null && !"name".equals(nameString)) {
+         semanticError("Unrecognized token '"+nameString+"', expected 'name'");
+       }
+       ProgramSVSort psv = ProgramSVSort.name2sort().get(new Name(id));
+       s = (Sort) (parameter != null ? psv.createInstance(parameter) : psv);
        if (s == null) {
          semanticError
            ("Program SchemaVariable of type "+id+" not found.");

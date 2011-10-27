@@ -425,4 +425,5 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     public ObjectTypeIdentifier createObjectTypeIdentifier(String text) {
         return new ObjectTypeIdentifier(text);
     }
+    
 }

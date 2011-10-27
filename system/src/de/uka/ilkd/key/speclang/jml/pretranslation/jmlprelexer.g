@@ -34,6 +34,7 @@ tokens {
     ASSUME                      = "assume";
     ASSUME_REDUNDANTLY          = "assume_redundantly";
     ASSIGNABLE 			= "assignable";
+    ASSIGNABLE_TRA              = "assignable_backup";
     ASSIGNABLE_RED 		= "assignable_redundantly";
     AXIOM                       = "axiom";
     BEHAVIOR 			= "behavior";
@@ -74,6 +75,7 @@ tokens {
     INVARIANT_RED 		= "invariant_redundantly";
     LOOP_INVARIANT  		= "loop_invariant";
     LOOP_INVARIANT_RED  	= "loop_invariant_redundantly";
+    LOOP_INVARIANT_TRA  	= "loop_invariant_transaction";
     MAINTAINING  		= "maintaining";
     MAINTAINING_REDUNDANTLY	= "maintaining_redundantly";
     MAPS			= "maps";
@@ -82,8 +84,10 @@ tokens {
     MEASURED_BY_REDUNDANTLY     = "measured_by_redundantly";
     MODEL 			= "model";
     MODIFIABLE			= "modifiable";
+    MODIFIABLE_TRA		= "modifiable_backup";
     MODIFIABLE_RED		= "modifiable_redundantly";
     MODIFIES			= "modifies";
+    MODIFIES_TRA		= "modifies_backup";
     MODIFIES_RED		= "modifies_redundantly";
     MONITORED                   = "monitored";
     MONITORS_FOR		= "monitors_for";
@@ -121,6 +125,7 @@ tokens {
     STATIC 			= "static";
     STRICTFP 			= "strictfp";
     SYNCHRONIZED 		= "synchronized";
+    TRANSACTION                 = "transaction";
     TRANSIENT 			= "transient";
     UNINITIALIZED 		= "uninitialized";
     VOLATILE 			= "volatile";

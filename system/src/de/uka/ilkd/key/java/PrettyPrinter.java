@@ -2845,4 +2845,21 @@ public class PrettyPrinter {
 	output();
     }
 
+    public void printTransactionStatement(TransactionStatement x) throws java.io.IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+    
+    // Mark statement start ...
+    markStart(0,x);
+
+        write(x.toString());
+        write(";");
+
+        // Mark statement end ...
+    markEnd(0,x);
+
+        printFooter(x);
+    }
+
+    
 }

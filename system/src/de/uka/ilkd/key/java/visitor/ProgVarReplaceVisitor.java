@@ -223,19 +223,36 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         }
         Term selfTerm = inv.getInternalSelfTerm();
         Term heapAtPre = inv.getInternalHeapAtPre();
+        Term savedHeapAtPre = inv.getInternalSavedHeapAtPre();
         
         //invariant
         Term newInvariant 
             = replaceVariablesInTerm(inv.getInvariant(selfTerm, 
-                                                      heapAtPre, 
+                                                      heapAtPre,
+                                                      null,
                                                       services));
-                
+
+        // transaction invariant
+        Term newTransactionInvariant 
+            = replaceVariablesInTerm(inv.getInvariant(selfTerm, 
+                                                      heapAtPre,
+                                                      savedHeapAtPre,
+                                                      services));
+
         //modifies
         Term newModifies
             = replaceVariablesInTerm(inv.getModifies(selfTerm, 
-                                     heapAtPre, 
+                                     heapAtPre,
+                                     null,
                                      services));
-        
+
+        //backup modifies
+        Term newBackupModifies
+            = replaceVariablesInTerm(inv.getModifies(selfTerm, 
+                                     heapAtPre,
+                                     savedHeapAtPre,
+                                     services));
+
         //variant
         Term newVariant
             = replaceVariablesInTerm(inv.getVariant(selfTerm, 
@@ -245,14 +262,18 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         
         Term newSelfTerm = replaceVariablesInTerm(selfTerm); 
         Term newHeapAtPre = replaceVariablesInTerm(heapAtPre);
+        Term newSavedHeapAtPre = replaceVariablesInTerm(savedHeapAtPre);
 
         LoopInvariant newInv 
             = new LoopInvariantImpl(newLoop, 
-                                    newInvariant, 
+                                    newInvariant,
+                                    newTransactionInvariant,
                                     newModifies, 
+                                    newBackupModifies,
                                     newVariant, 
                                     newSelfTerm,
-                                    newHeapAtPre);
+                                    newHeapAtPre,
+                                    newSavedHeapAtPre);
         services.getSpecificationRepository().setLoopInvariant(newInv);
     }
 }
