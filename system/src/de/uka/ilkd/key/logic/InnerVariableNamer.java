@@ -112,17 +112,18 @@ public class InnerVariableNamer extends VariableNamer {
 	}
         
         ProgramVariable newvar = var;
-        
         if (!newname.equals(name)) {        
-            newvar = new LocationVariable(newname,
-                    			  var.getKeYJavaType());
+            newvar = new LocationVariable(newname, var.getKeYJavaType());
             map.put(var, newvar);
             renamingHistory = map;
             //execute renaming
             ProgVarReplacer pvr = new ProgVarReplacer(map, services);
             pvr.replace(goal);
         }
-        
+
+        assert newvar != null;
+        assert isUniqueInGlobals(newvar.name().toString(), globals);
+        assert services.getNamespaces().lookupLogicSymbol(newvar.name())==null;
         return newvar;
     }
 

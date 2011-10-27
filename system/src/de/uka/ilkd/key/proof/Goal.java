@@ -11,17 +11,19 @@
 
 package de.uka.ilkd.key.proof;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.RuleAppListener;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.proofevent.NodeChangeJournal;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
@@ -218,15 +220,7 @@ public class Goal  {
     }
 
     public void setGlobalProgVars(ImmutableSet<ProgramVariable> s) {
-        ImmutableSet<ProgramVariable> globalProgVars = getGlobalProgVars();
-        Namespace ns = proof().getNamespaces().programVariables();
-        Iterator<ProgramVariable> it = s.iterator();
-        while (it.hasNext()) {
-            ProgramVariable pv = it.next();
-            if (!globalProgVars.contains(pv)) {
-                ns.addSafely(pv);
-            }
-        }
+        assert node.proof().getNamespaces().contains(names(s));
 	node.setGlobalProgVars(s);
     }
 
@@ -464,9 +458,9 @@ public class Goal  {
 	while (it.hasNext()) {
 	    s = s.add((ProgramVariable)it.next());
 	}
-        proof().getNamespaces().programVariables().reset();
         node().setGlobalProgVars(DefaultImmutableSet.<ProgramVariable>nil());
-	setGlobalProgVars(s);
+        proof().getNamespaces().programVariables().set(s);
+        setGlobalProgVars(s);
     }
 
 
@@ -648,5 +642,13 @@ public class Goal  {
 	synchronized(ruleAppListenerList) {	
 	    ruleAppListenerList.remove(p);
 	}
+    }
+    
+    private <T extends Named> ImmutableSet<Name> names(ImmutableSet<T> set) {
+        ImmutableSet<Name> names = DefaultImmutableSet.<Name>nil();
+        for (T elem : set) {
+            names = names.add(elem.name());
+        }
+        return names;
     }
 }

@@ -15,6 +15,7 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 
 
 /**
@@ -241,6 +242,12 @@ public class Namespace implements java.io.Serializable {
         }
     }
 
+    public <T extends Named> void addSafely(ImmutableSet<T> names) {
+        for (Named name : names) {
+            addSafely(name);
+        }
+    }
+    
     public Namespace copy() {
 	Namespace copy;
 	if(protocol != null){
@@ -260,5 +267,10 @@ public class Namespace implements java.io.Serializable {
 	symbols=null;	
 	localSym=null;
 	numLocalSyms=0;
+    }
+    
+    public <T extends Named> void set(ImmutableSet<T> names) {
+        reset();
+        addSafely(names);
     }
 }
