@@ -280,6 +280,9 @@ public class TacletGenerator {
 
 
     public ImmutableSet<Taclet> generatePartialInvTaclet(Name name,
+                                                         SchemaVariable heapSV,
+                                                         SchemaVariable selfSV,
+                                                         SchemaVariable eqSV,
                                                          Term term,
                                                          KeYJavaType kjt,
                                                          ImmutableSet<Pair<Sort, ObserverFunction>> toLimit,
@@ -287,24 +290,7 @@ public class TacletGenerator {
                                                          boolean eqVersion,
                                                          Services services) {
         ImmutableSet<Taclet> result = DefaultImmutableSet.<Taclet>nil();
-        //create schema variables
-        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-        final SchemaVariable heapSV =
-                SchemaVariableFactory.createTermSV(new Name("h"),
-                                                   heapLDT.targetSort(),
-                                                   false,
-                                                   false);
-        final SchemaVariable selfSV =
-                isStatic
-                ? null
-                : SchemaVariableFactory.createTermSV(new Name("self"),
-                                                     kjt.getSort());
-        final SchemaVariable eqSV = isStatic
-                                    ? null
-                                    : SchemaVariableFactory.createTermSV(
-                new Name("EQ"),
-                services.getJavaInfo().objectSort());
-
+        
         //instantiate axiom with schema variables
         final Term rawAxiom = OpReplacer.replace(TB.heap(services),
                                                  TB.var(heapSV),

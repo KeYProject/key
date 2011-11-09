@@ -15,6 +15,7 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -82,9 +83,31 @@ public final class PartialInvAxiom extends ClassAxiom {
             Name name = MiscTools.toValidTacletName("Partial inv axiom for "
                                                     + inv.getName()
                                                     + (i == 0 ? "" : " EQ"));
+            
+            //create schema variables
+            final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+            final SchemaVariable heapSV =
+                    SchemaVariableFactory.createTermSV(new Name("h"),
+                                                       heapLDT.targetSort(),
+                                                       false,
+                                                       false);
+            final SchemaVariable selfSV =
+                    target.isStatic()
+                    ? null
+                    : SchemaVariableFactory.createTermSV(new Name("self"),
+                                                         inv.getKJT().getSort());
+            final SchemaVariable eqSV = target.isStatic()
+                                        ? null
+                                        : SchemaVariableFactory.createTermSV(
+                    new Name("EQ"),
+                    services.getJavaInfo().objectSort());
+            
             ImmutableSet<Taclet> taclets =
                     TG.generatePartialInvTaclet(name,
-                                                inv.getOriginalInv(),
+                                                heapSV,
+                                                selfSV,
+                                                eqSV,
+                                                inv.getInv(selfSV, services),
                                                 inv.getKJT(),
                                                 toLimit,
                                                 target.isStatic(),
