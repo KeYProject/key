@@ -84,6 +84,7 @@ import de.uka.ilkd.key.gui.actions.PrettyPrintToggleAction;
 import de.uka.ilkd.key.gui.actions.ProofManagementAction;
 import de.uka.ilkd.key.gui.actions.SMTOptionsAction;
 import de.uka.ilkd.key.gui.actions.SaveFileAction;
+import de.uka.ilkd.key.gui.actions.SearchInProofTreeAction;
 import de.uka.ilkd.key.gui.actions.ShowActiveSettingsAction;
 import de.uka.ilkd.key.gui.actions.ShowActiveTactletOptionsAction;
 import de.uka.ilkd.key.gui.actions.ShowKnownTypesAction;
@@ -845,6 +846,8 @@ public final class MainWindow extends JFrame  {
         proof.add(autoModeAction);
         proof.add(new UndoLastStepAction(this, true));
         proof.add(new AbandonTaskAction(this));
+        proof.addSeparator();
+        proof.add(new SearchInProofTreeAction(this));
         proof.addSeparator();
 	proof.add(new ShowUsedContractsAction(this));
         proof.add(new ShowActiveTactletOptionsAction(this));
