@@ -20,7 +20,7 @@ import java.io.IOException;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.pp.PosInSequent;
-import de.uka.ilkd.key.proof.ProofSaver;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 
 /**
  * This class in an implementation of the {@link Transferable} interface and

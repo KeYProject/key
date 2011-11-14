@@ -36,7 +36,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.InstantiationProposer;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.ProofSaver;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.NewVarcond;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.TacletApp;

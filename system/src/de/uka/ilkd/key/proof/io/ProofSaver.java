@@ -8,7 +8,7 @@
 //
 //
 
-package de.uka.ilkd.key.proof;
+package de.uka.ilkd.key.proof.io;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -26,6 +26,9 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
+import de.uka.ilkd.key.proof.NameRecorder;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.rule.*;

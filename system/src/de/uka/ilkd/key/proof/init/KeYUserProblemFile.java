@@ -20,6 +20,7 @@ import de.uka.ilkd.key.proof.CountingBufferedReader;
 import de.uka.ilkd.key.proof.ProblemLoader;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.io.KeYFile;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.ProgressMonitor;
 

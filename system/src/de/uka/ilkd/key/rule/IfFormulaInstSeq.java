@@ -16,7 +16,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.proof.ProofSaver;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 
 
 /**

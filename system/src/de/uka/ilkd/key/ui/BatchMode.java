@@ -8,7 +8,7 @@ import java.io.PrintWriter;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofSaver;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 
 public class BatchMode {
     

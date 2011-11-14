@@ -34,6 +34,7 @@ import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.RuleSource;
 import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.proof.init.*;
+import de.uka.ilkd.key.proof.io.KeYFileForTests;
 
 public class TacletForTests {
 

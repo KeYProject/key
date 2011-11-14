@@ -8,7 +8,7 @@
 //
 //
 
-package de.uka.ilkd.key.proof.init;
+package de.uka.ilkd.key.proof.io;
 
 import java.io.File;
 import java.util.List;
@@ -17,6 +17,9 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.*;
+import de.uka.ilkd.key.proof.init.Includes;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 
 
 /** Represents the LDT .key files as a whole. Special treatment of these

@@ -8,10 +8,14 @@
 //
 //
 
-package de.uka.ilkd.key.proof.init;
+package de.uka.ilkd.key.proof.io;
 
 import java.io.File;
 import java.util.List;
+
+import de.uka.ilkd.key.proof.init.Includes;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 
 
 

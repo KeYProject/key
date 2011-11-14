@@ -12,7 +12,7 @@ package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.proof.ProofSaver;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 
 
 /**

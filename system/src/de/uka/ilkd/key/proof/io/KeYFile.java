@@ -8,7 +8,7 @@
 //
 //
 
-package de.uka.ilkd.key.proof.init;
+package de.uka.ilkd.key.proof.io;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -28,6 +28,9 @@ import de.uka.ilkd.key.parser.ParserConfig;
 import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.CountingBufferedReader;
 import de.uka.ilkd.key.proof.RuleSource;
+import de.uka.ilkd.key.proof.init.Includes;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.Debug;

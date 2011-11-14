@@ -28,6 +28,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.parser.*;
 import de.uka.ilkd.key.pp.AbbrevMap;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.NewVarcond;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.*;

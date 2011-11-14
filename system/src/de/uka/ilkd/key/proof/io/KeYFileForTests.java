@@ -8,7 +8,7 @@
 //
 //
 
-package de.uka.ilkd.key.proof.init;
+package de.uka.ilkd.key.proof.io;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -20,6 +20,7 @@ import de.uka.ilkd.key.parser.KeYParser;
 import de.uka.ilkd.key.parser.ParserConfig;
 import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.CountingBufferedReader;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 
 /**
  * Used for TESTS ONLY as we allow there to declare program variables global
