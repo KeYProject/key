@@ -450,6 +450,40 @@ public final class MiscTools {
         return result;
     }
     
+    /**
+     * Separates the single directory entries in a filename.
+     * The first element is an empty String iff the filename is absolute.
+     * Ignores double slashes and slashes at the end.
+     * E.g., "/home//daniel/key/" yields {"","home","daniel","key"}.
+     * Currently only recognizes UNIX filenames.
+     * There is no check whether all other characters are valid for filenames.
+     */
+    public static List<String> disectFilename(String filename){
+        // TODO: is it useful to handle Windows filenames???
+        String sep;
+        List<String> res = new ArrayList<String>();
+        // if filename contains slashes, take it as UNIX filename, otherwise Windows
+        if (filename.indexOf("/") != -1) sep = "/";
+//        else sep = "\\";
+        else {
+            res.add(filename);
+            return res;
+        }
+        int i = 0;
+        while (i < filename.length()){
+            int j = filename.indexOf(sep,i);
+            if (j == -1 || j >= filename.length()-1)
+                break;
+            if (i == j) {
+                if (i == 0)
+                    res.add("");
+                continue;
+            }
+            res.add(filename.substring(i, j-1));
+            i = j+1;
+        }
+        return res;
+    }
     
     
     //-------------------------------------------------------------------------

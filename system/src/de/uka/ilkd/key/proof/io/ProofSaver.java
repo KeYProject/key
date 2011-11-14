@@ -91,8 +91,11 @@ public class ProofSaver {
           //settings
           ps.println(writeSettings(proof.getSettings()));
           
-          //declarations of symbols, sorts, rules
-          ps.print(proof.header());          
+          //declarations of symbols, sorts
+          String header = proof.header();
+          makePathsRelative(header);
+          ps.print(header);
+          System.out.print(header); // XXX
 
           //\problem or \chooseContract
           final ContractPO po = proof.getServices()
@@ -142,6 +145,13 @@ public class ProofSaver {
    }
    
  
+
+    private void makePathsRelative(String header) {
+        // TODO more?
+        final String[] search = new String[]{"\\javaSource","\\bootclasspath","\\classpath"};
+        final String path = filename;
+        System.out.println(path);
+    }
 
     private String newNames2Proof(Node n) {
         String s = "";
