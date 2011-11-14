@@ -21,5 +21,19 @@ public class TestMiscTools extends TestCase {
         assertEquals(4,ls.length);
         assertEquals("key",ls[3]);
     }
+    
+    public void testMakeFilenameRelative(){
+        String s = "/home/daniel/bla";
+        String t = "/home/daniel/blubb";
+        String u = MiscTools.makeFilenameRelative(s,t);
+        assertEquals("../bla",u);
+        // s shorter than t
+        t = "/home/daniel/bla/foo/bar";
+        u = MiscTools.makeFilenameRelative(s, t);
+        assertEquals("../..",u);
+        // s already relative
+        s = s.substring(1);
+        assertEquals(s,MiscTools.makeFilenameRelative(s, t));
+    }
 
 }

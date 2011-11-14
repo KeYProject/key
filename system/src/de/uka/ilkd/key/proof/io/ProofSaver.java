@@ -33,6 +33,7 @@ import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.*;
+import de.uka.ilkd.key.util.MiscTools;
 
 /**
  * Saves a proof and provides useful methods for pretty printing
@@ -93,9 +94,8 @@ public class ProofSaver {
           
           //declarations of symbols, sorts
           String header = proof.header();
-          makePathsRelative(header);
+          header = makePathsRelative(header);
           ps.print(header);
-          System.out.print(header); // XXX
 
           //\problem or \chooseContract
           final ContractPO po = proof.getServices()
@@ -146,11 +146,31 @@ public class ProofSaver {
    
  
 
-    private void makePathsRelative(String header) {
+    private String makePathsRelative(String header) {
         // TODO more?
         final String[] search = new String[]{"\\javaSource","\\bootclasspath","\\classpath"};
-        final String path = filename;
-        System.out.println(path);
+        final String basePath = filename.substring(0, filename.lastIndexOf("/"));
+        String tmp = header;
+        // locate filenames in header
+        for (String s: search){
+            int i = tmp.indexOf(s);
+            if (i == -1) continue; // entry not in file
+            // path is always put in quotation marks
+            int k = tmp.indexOf("\"",i)+1;
+            int j = tmp.indexOf("\"", k);
+            int l = tmp.indexOf(";",k)+1;
+            
+            // put in everything before the keyword
+            String tmp2 = (i == 0) ? "" : tmp.substring(0, i-1);
+            
+            // add new relative path
+            final String relPath = MiscTools.makeFilenameRelative(tmp.substring(k,j), basePath);
+            tmp2 = tmp2 + s + " \"" + relPath +"\";";
+            
+            // put back in the rest
+            tmp = tmp2 + (k < tmp.length()? tmp.substring(l,tmp.length()-1): "");
+        }
+        return tmp;
     }
 
     private String newNames2Proof(Node n) {

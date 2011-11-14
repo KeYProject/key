@@ -472,17 +472,49 @@ public final class MiscTools {
         int i = 0;
         while (i < filename.length()){
             int j = filename.indexOf(sep,i);
-            if (j == -1 || j >= filename.length()-1)
+            if (j == -1){
+                res.add(filename.substring(i, filename.length()));
                 break;
+            }
             if (i == j) {
                 if (i == 0)
                     res.add("");
-                continue;
+            } else {
+            res.add(filename.substring(i, j));
             }
-            res.add(filename.substring(i, j-1));
             i = j+1;
         }
         return res;
+    }
+    
+    /** Returns a filename relative to another one.
+     * The second parameter needs to be absolute and is expected to refer to directory
+     * This method only operates on Strings, not on real files!
+     */
+    public static String makeFilenameRelative(String origFilename, String toFilename){
+        String[] a = disectFilename(origFilename).toArray(new String[0]);
+        String[] b = disectFilename(toFilename).toArray(new String[0]);
+        if (!a[0].equals("")) // already relative
+            return origFilename;
+        assert b[0].equals("") : "please use absolute filenames to make them relative";
+        int i = 1; boolean diff= false;
+        String s = "";
+        String t = "";
+        while (i < b.length){
+            // shared until i
+            if (i >= a.length || !a[i].equals(b[i])) diff = true;
+            // add ".." for each remaining element in b
+            // and collect the remaining elements of a
+            if (diff) {
+                s = s + "../";
+                if (i < a.length) 
+                    t = t +"/"+ a[i];
+            }
+            i++;
+        }
+        while (i < a.length)
+            t = t +"/"+ a[i++];
+        return s.substring(0,s.length()-1) + t;
     }
     
     
