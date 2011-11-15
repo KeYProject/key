@@ -21,7 +21,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.DefaultGoalChooserBuilder;
 import de.uka.ilkd.key.proof.DepthFirstGoalChooserBuilder;
 import de.uka.ilkd.key.proof.GoalChooserBuilder;
-import de.uka.ilkd.key.proof.RuleSource;
+import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.BuiltInRule;

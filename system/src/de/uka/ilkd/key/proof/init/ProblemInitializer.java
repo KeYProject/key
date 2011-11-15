@@ -41,6 +41,7 @@ import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.io.EnvInput;
 import de.uka.ilkd.key.proof.io.KeYFile;
 import de.uka.ilkd.key.proof.io.LDTInput;
+import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.proof.io.LDTInput.LDTInputListener;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.GlobalProofMgt;

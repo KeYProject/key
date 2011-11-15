@@ -31,10 +31,10 @@ import de.uka.ilkd.key.parser.KeYParser;
 import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.RuleSource;
 import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.io.KeYFileForTests;
+import de.uka.ilkd.key.proof.io.RuleSource;
 
 public class TacletForTests {
 

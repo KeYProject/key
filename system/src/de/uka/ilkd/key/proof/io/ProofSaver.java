@@ -146,6 +146,9 @@ public class ProofSaver {
    
  
 
+   /** Searches in the header for absolute paths to Java files and tries to replace them
+    * by paths relative to the proof file to be saved.
+    */
     private String makePathsRelative(String header) {
         // TODO more?
         final String[] search = new String[]{"\\javaSource","\\bootclasspath","\\classpath"};

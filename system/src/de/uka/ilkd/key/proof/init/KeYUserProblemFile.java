@@ -158,7 +158,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
     @Override
     public ProofAggregate getPO() throws ProofInputException {
         assert problemTerm != null;
-	String name = name();
+        String name = name();
         ProofSettings settings = getPreferences();
         return ProofAggregate.createProofAggregate(
                 new Proof(name, 

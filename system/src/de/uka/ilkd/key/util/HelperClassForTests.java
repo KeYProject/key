@@ -18,8 +18,8 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.RuleSource;
 import de.uka.ilkd.key.proof.init.*;
+import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.rule.BuiltInRule;
 
 /**
