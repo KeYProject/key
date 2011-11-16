@@ -34,6 +34,7 @@ header {
 
   import de.uka.ilkd.key.proof.*;
   import de.uka.ilkd.key.proof.init.*;
+  import de.uka.ilkd.key.proof.io.*;
 
   import de.uka.ilkd.key.rule.*;
   import de.uka.ilkd.key.rule.tacletbuilder.*;

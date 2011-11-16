@@ -453,18 +453,18 @@ public final class MiscTools {
     /**
      * Separates the single directory entries in a filename.
      * The first element is an empty String iff the filename is absolute.
+     * (For a Windows filename, it contains a drive letter and a colon).
      * Ignores double slashes and slashes at the end.
      * E.g., "/home//daniel/key/" yields {"","home","daniel","key"}.
-     * Currently only recognizes UNIX filenames.
+     * Tries to automatically detect UNIX or Windows directory delimiters.
      * There is no check whether all other characters are valid for filenames.
      */
-    public static List<String> disectFilename(String filename){
-        // TODO: is it useful to handle Windows filenames???
-        String sep;
+    static List<String> disectFilename(String filename){
+        final String sep;
         List<String> res = new ArrayList<String>();
         // if filename contains slashes, take it as UNIX filename, otherwise Windows
         if (filename.indexOf("/") != -1) sep = "/";
-//        else sep = "\\";
+        else if (filename.indexOf("\\") != -1) sep = "\\";
         else {
             res.add(filename);
             return res;
@@ -490,13 +490,28 @@ public final class MiscTools {
     /** Returns a filename relative to another one.
      * The second parameter needs to be absolute and is expected to refer to directory
      * This method only operates on Strings, not on real files!
+     * Note that it treats Strings case-sensitive.
+     * The resulting filename always uses UNIX directory delimiters.
      */
     public static String makeFilenameRelative(String origFilename, String toFilename){
         String[] a = disectFilename(origFilename).toArray(new String[0]);
         String[] b = disectFilename(toFilename).toArray(new String[0]);
+        
+        // check for Windows paths
+        if (a[0].length() == 2 && a[0].charAt(1) == ':') {
+            // FIXME: UNIX filenames may well contain colons, too
+            char drive = Character.toUpperCase(a[0].charAt(0));
+            if (!(b[0].length() == 2 && Character.toUpperCase(b[0].charAt(0)) == drive && b[0].charAt(1) == ':'))
+                throw new RuntimeException("cannot make paths on different drives relative");
+            // remove drive letter
+            a[0] = ""; b[0] = "";
+        }
+        
         if (!a[0].equals("")) // already relative
             return origFilename;
-        assert b[0].equals("") : "please use absolute filenames to make them relative";
+        if (!b[0].equals("")) 
+            throw new RuntimeException("please use absolute filenames to make them relative");
+        
         int i = 1; boolean diff= false;
         String s = "";
         String t = "";
@@ -508,13 +523,20 @@ public final class MiscTools {
             if (diff) {
                 s = s + "../";
                 if (i < a.length) 
-                    t = t +"/"+ a[i];
+                    t = t + (a[i].equals("")? "" : "/")+ a[i];
             }
             i++;
         }
         while (i < a.length)
-            t = t +"/"+ a[i++];
-        return s.substring(0,s.length()-1) + t;
+            t = t +(a[i].equals("")? "" : "/")+ a[i++];
+        // strip leading slash
+        if (t.length()>0 && t.charAt(0) == '/')
+            t = t.substring(1);
+        // strip ending slash
+        t = s + t;
+        if (t.length() > 0 && t.charAt(t.length()-1) == '/')
+            t = t.substring(0,t.length()-1);
+        return t;
     }
     
     

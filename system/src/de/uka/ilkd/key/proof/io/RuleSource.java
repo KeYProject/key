@@ -21,6 +21,8 @@ import de.uka.ilkd.key.util.KeYResourceManager;
 
 public class RuleSource {
 
+    private static final String PATH_TO_RULES = "../rules/";
+
     private URL url=null;
 
     private File f=null;
@@ -57,7 +59,7 @@ public class RuleSource {
 
     public static RuleSource initRuleFile(String filename) {
         URL u = KeYResourceManager.getManager().
-            getResourceFile(RuleSource.class, "rules/" + filename);
+            getResourceFile(RuleSource.class, PATH_TO_RULES + filename);
         if (u == null) {
             // a more specific exception type would probably be better
             throw new RuntimeException("Could not find rule file "+filename);

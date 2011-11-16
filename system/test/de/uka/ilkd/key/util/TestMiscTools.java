@@ -13,13 +13,14 @@ public class TestMiscTools extends TestCase {
         s = s.substring(1);
         ls = MiscTools.disectFilename(s).toArray();
         assertEquals("home",ls[0]);
-//        s = "C:\\Windows\\Users\\";
-//        ls = MiscTools.disectFilename(s).toArray();
-//        assertEquals("",ls[0]);
         s = s+"/";
         ls = MiscTools.disectFilename(s).toArray();
         assertEquals(4,ls.length);
         assertEquals("key",ls[3]);
+        // test windows delimiters
+        s = "C:\\Windows\\Users\\";
+        ls = MiscTools.disectFilename(s).toArray();
+        assertEquals("C:",ls[0]);
     }
     
     public void testMakeFilenameRelative(){
@@ -34,6 +35,19 @@ public class TestMiscTools extends TestCase {
         // s already relative
         s = s.substring(1);
         assertEquals(s,MiscTools.makeFilenameRelative(s, t));
+        // test windows delimiters
+        s = "C:\\Windows";
+        t = "c:\\";
+        u = MiscTools.makeFilenameRelative(s, t);
+        assertEquals("Windows",u);
+        // do stupid things
+        try {
+            t = "/home/daniel";
+            u = MiscTools.makeFilenameRelative(s, t);
+            fail();
+        } catch (RuntimeException e){
+            assertTrue(true);
+        }
     }
 
 }
