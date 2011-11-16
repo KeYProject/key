@@ -85,6 +85,7 @@ public class ProofSaver {
       PrintWriter ps = null;
       
       try {
+          
           fos = new FileOutputStream(filename);
           ps = new PrintWriter(fos, true);
           printer = createLogicPrinter(proof.getServices(), false);
@@ -171,7 +172,7 @@ public class ProofSaver {
             tmp2 = tmp2 + s + " \"" + relPath +"\";";
             
             // put back in the rest
-            tmp = tmp2 + (k < tmp.length()? tmp.substring(l,tmp.length()-1): "");
+            tmp = tmp2 + (k < tmp.length()? tmp.substring(l,tmp.length()): "");
         }
         return tmp;
     }

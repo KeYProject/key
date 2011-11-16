@@ -624,7 +624,15 @@ public final class MiscTools {
     
     
     public static String toValidFileName(String s) {
-        s = s.replaceAll("\\$|<|>", "_")
+        s = s.replace("\\", "_")
+             .replace("$", "_")
+             .replace("?", "_")
+             .replace("|", "_")
+             .replace("<", "_")
+             .replace(">", "_")
+             .replace(":", "_")
+             .replace("*", "+")
+             .replace("\"", "'")
              .replace("/", "-")
              .replace("[", "(")
              .replace("]", ")");

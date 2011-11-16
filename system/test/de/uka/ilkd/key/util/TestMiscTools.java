@@ -49,5 +49,11 @@ public class TestMiscTools extends TestCase {
             assertTrue(true);
         }
     }
+    
+    public void testToValidFileName(){
+        assertEquals("foo_bar", MiscTools.toValidFileName("foo:bar"));
+        assertEquals("foo_bar", MiscTools.toValidFileName("foo\\bar"));
+        assertEquals("foo(bar)", MiscTools.toValidFileName("foo[bar]"));
+    }
 
 }
