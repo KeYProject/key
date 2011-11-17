@@ -125,6 +125,8 @@ public class TacletGenerator {
                                                      ProgramVariable self,
                                                      Services services) {
         final RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();
+        
+        originalAxiom = TB.convertToFormula(originalAxiom, services);
 
         // create schema terms
         final SchemaVariable heapSV = createSchemaVariable(heap);

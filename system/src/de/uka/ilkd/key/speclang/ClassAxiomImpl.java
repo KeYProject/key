@@ -54,7 +54,6 @@ public final class ClassAxiomImpl extends ClassAxiom {
 	    ProgramVariable selfVar) {
 	assert name != null;
 	assert kjt != null;
-	assert rep.sort() == Sort.FORMULA;
 	this.name = name;
 	this.kjt = kjt;
 	this.visibility = visibility;
@@ -106,13 +105,14 @@ public final class ClassAxiomImpl extends ClassAxiom {
         if (!isStatic) {
             replaceVars = replaceVars.append(originalSelfVar);
         }
+        Term rep = TB.convertToFormula(originalRep, services);
         TacletGenerator TG = TacletGenerator.getInstance();
         DefaultImmutableSet<Taclet> taclets = DefaultImmutableSet.<Taclet>nil();
         final int c = services.getCounter("classAxiom").getCountPlusPlus();
         final String namePP = "Class axiom " + c + " in " + kjt.getFullName();
         final Name tacletName = MiscTools.toValidTacletName(namePP);
         final RuleSet ruleSet = new RuleSet(new Name("classAxiom"));
-        return taclets.add(TG.generateAxiomTaclet(tacletName, originalRep,
+        return taclets.add(TG.generateAxiomTaclet(tacletName, rep,
                                                        replaceVars, kjt, ruleSet,
                                                        services));
     }

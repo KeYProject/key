@@ -19,6 +19,7 @@ import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.OpReplacer;
 
 
@@ -119,7 +120,9 @@ public final class ClassInvariantImpl implements ClassInvariant {
         final Map<Operator, Operator> replaceMap 
         	= getReplaceMap(selfVar, services);
         final OpReplacer or = new OpReplacer(replaceMap);
-        return or.replace(originalInv);   
+        Term res = or.replace(originalInv);
+        res = TermBuilder.DF.convertToFormula(res, services);
+        return res;
     }
 
 
