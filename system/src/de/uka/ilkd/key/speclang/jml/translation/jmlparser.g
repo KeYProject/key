@@ -322,6 +322,9 @@ top returns [Object result = null] throws  SLTranslationException
     |   result = representsclause
     |   result = signalsclause
     |   result = signalsonlyclause
+    |   result = respectsclause
+    |   result = secureforclause
+    |   result = declassifyclause
     |   result = termexpression
     )
     (SEMI)? EOF
@@ -461,6 +464,47 @@ throws SLTranslationException {
     )
     { result = translator.<Term>translate(sigo.getText(), excManager, typeList, this.excVar, services); }
     ;
+
+respectsclause returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException {
+    Term term = null;
+}
+:
+    resp:RESPECTS
+    term = storeref {/* result = result.append(term);*/ }
+    (COMMA term = storeref { /* result = result.append(term);*/ })*
+        { /*result = translator.<ImmutableList<Term>>translate(resp.getText(), excManager, result, services);*/ }
+    ;
+
+
+secureforclause returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException {
+    Term term = null;
+}
+:
+    sec:SECURE_FOR
+    term = storeref { /*result = result.append(term); */}
+    (   (COMMA term = storeref {/* result = result.append(term);*/ })*
+        COLON term = storeref { result = result.append(term); }
+    )?
+        { /*result = translator.<ImmutableList<Term>>translate(sec.getText(), excManager, result, services); */}
+    ;
+    
+declassifyclause returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException
+    {
+        Term declass = null;
+        Term frompart = null;
+        Term topart = null;
+        Term ifpart = null;
+    }
+    :
+        del:DECLASSIFY declass = predicate
+        (FROM frompart = storereflist)?
+        (TO topart = storereflist)?
+        (IF ifpart = predicate)?
+        {/* result = translator.<ImmutableList<Term>>translate(
+                del.getText(), excManager, declass, frompart, topart, ifpart, services); */}
+        ;
+
+
 
 
 termexpression returns [Term result = null] throws SLTranslationException {
