@@ -21,8 +21,8 @@ public final class ProofManagementAction extends MainWindowAction {
 
     public ProofManagementAction(MainWindow mainWindow) {
 	super(mainWindow);
-	setName("Proof Management...");
-	setTooltip("Proof Management.");
+	setName("Proof Management");
+	setTooltip("Proof Management");
 	setAcceleratorLetter(KeyEvent.VK_M);
 
 	setEnabled(enabled());
