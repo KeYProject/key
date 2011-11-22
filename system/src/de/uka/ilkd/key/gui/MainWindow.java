@@ -1183,7 +1183,7 @@ public final class MainWindow extends JFrame  {
         private Set<Component> doNotReenable;
         
 	private void setToolBarDisabled() {
-	    
+	    System.out.println("Disable");
 	    assert EventQueue.isDispatchThread() : "toolbar disabled from wrong thread";
 	    assert doNotReenable == null : "toolbar disabled w/o prior enable";
 	    
@@ -1205,7 +1205,7 @@ public final class MainWindow extends JFrame  {
 	}
         
         private void setToolBarEnabled() {
-            
+            System.out.println("Enable");    
             assert EventQueue.isDispatchThread() : "toolbar enabled from wrong thread";
             assert doNotReenable != null : "toolbar enabled w/o prior disable";
             

@@ -522,7 +522,7 @@ public class Proof implements Named {
     private class ProofPruner{
             private Node firstLeaf = null;
             
-            public void prune(final Node cuttingPoint){
+            public Node [] prune(final Node cuttingPoint){
                    
                   // there is only one leaf containing a open goal that is interesting for pruning the sub-tree of <code>node</code>,
                   // namely the first leave that is found by a breadth first search. 
@@ -581,10 +581,11 @@ public class Proof implements Named {
                   refreshGoal(firstGoal,cuttingPoint);
                   
                   // cut the subtree, it is not needed anymore.
-                  cut(cuttingPoint);
+                  Node [] subtrees =cut(cuttingPoint);
                   
                   //remove the goals of the residual leaves.
                   removeOpenGoals(residualLeaves);
+                  return subtrees;
          
             }
             
@@ -606,7 +607,7 @@ public class Proof implements Named {
             }
             
             
-            private void cut(Node node){
+            private Node [] cut(Node node){
                     Node[] children = new Node[node.childrenCount()];
                     Iterator<Node> it = node.childrenIterator();
                                     
@@ -618,6 +619,7 @@ public class Proof implements Named {
                     for(Node child : children){
                             node.remove(child);
                     }
+                    return children;
             }
             
     }
@@ -633,18 +635,26 @@ public class Proof implements Named {
      * <code>cuttingPoint</code> remains as the last node on the branch. As a result a 
      * open goal is associated with this node. 
      * @param cuttingPoint
+     * @return Returns the sub trees that has been pruned. 
      */
-    public void pruneProof(Node cuttingPoint){
-            assert cuttingPoint.proof() == this;
-            if(getGoal(cuttingPoint)!= null || cuttingPoint.isClosed()){
-                    return;
-            }
-            
-            ProofPruner pruner = new ProofPruner();
-            fireProofIsBeingPruned(cuttingPoint);
-            pruner.prune(cuttingPoint);   
+    public Node [] pruneProof(Node cuttingPoint){
+         return pruneProof(cuttingPoint,true);
+    }
+    
+    public Node [] pruneProof(Node cuttingPoint, boolean fireChanges){
+        assert cuttingPoint.proof() == this;
+        if(getGoal(cuttingPoint)!= null || cuttingPoint.isClosed()){
+                return null;
+        }
+        
+        ProofPruner pruner = new ProofPruner();
+        fireProofIsBeingPruned(cuttingPoint);
+        Node[] result = pruner.prune(cuttingPoint); 
+        if(fireChanges){
             fireProofGoalsChanged();
             fireProofPruned(cuttingPoint);
+        }
+        return result;
     }
     
     /**

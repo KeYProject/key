@@ -30,6 +30,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
@@ -40,6 +41,8 @@ import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.TacletFilter;
 import de.uka.ilkd.key.proof.TermTacletAppIndexCacheSet;
+import de.uka.ilkd.key.proof.delayedcut.DelayedCutCompletion;
+import de.uka.ilkd.key.proof.delayedcut.DelayedCutProcessor;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.BuiltInRule;
@@ -931,5 +934,24 @@ public class KeYMediator {
     // TODO used 1 time, drop it? (MU)
     public ProverTaskListener getProverTaskListener() {
         return mainFrame.getUserInterface();
+    }
+
+    public void processDelayedCut(Node invokedNode) {
+        if (ensureProofLoaded()) {
+            DelayedCutProcessor.INSTANCE.cut(
+                    getProof(),
+                    invokedNode,new DelayedCutCompletion() {
+                        
+                        @Override
+                        public boolean complete(TacletApp app, Goal goal) {
+                            
+                            int serialNr = goal.node().serialNr();
+                            TacletMatchCompletionDialog.completeAndApplyApp(app, goal, KeYMediator.this);
+                            return goal.node().serialNr() != serialNr;
+                            
+                        }
+                    });
+        }
+        
     }
 }
