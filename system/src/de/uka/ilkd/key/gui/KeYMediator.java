@@ -23,6 +23,8 @@ import javax.swing.event.EventListenerList;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.gui.delayedcut.CheckedUserInput;
+import de.uka.ilkd.key.gui.delayedcut.InspectorForFormulas;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.notification.events.ProofClosedNotificationEvent;
 import de.uka.ilkd.key.java.JavaInfo;
@@ -30,6 +32,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.PosInSequent;
@@ -41,6 +44,7 @@ import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.TacletFilter;
 import de.uka.ilkd.key.proof.TermTacletAppIndexCacheSet;
+import de.uka.ilkd.key.proof.delayedcut.DelayedCut;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCutCompletion;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCutProcessor;
 import de.uka.ilkd.key.proof.init.JavaProfile;
@@ -938,19 +942,24 @@ public class KeYMediator {
 
     public void processDelayedCut(Node invokedNode) {
         if (ensureProofLoaded()) {
+            final String result = 
+                    CheckedUserInput.showAsDialog("Cut Formula",
+                            "Please specify a formula:",
+                            "to be written + change default input to empty string",
+                            "true",
+                    new InspectorForFormulas(getProof().getServices())                                   
+                    );    
+            if(result == null){
+                return;
+            }
+            
+            Term formula = InspectorForFormulas.translate(getProof().getServices(),result);
+            
             DelayedCutProcessor.INSTANCE.cut(
                     getProof(),
-                    invokedNode,new DelayedCutCompletion() {
-                        
-                        @Override
-                        public boolean complete(TacletApp app, Goal goal) {
-                            
-                            int serialNr = goal.node().serialNr();
-                            TacletMatchCompletionDialog.completeAndApplyApp(app, goal, KeYMediator.this);
-                            return goal.node().serialNr() != serialNr;
-                            
-                        }
-                    });
+                    invokedNode,formula,DelayedCut.FORMULA_ON_RIGHT_SIDE                          
+                         
+                    );
         }
         
     }
