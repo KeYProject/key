@@ -257,8 +257,12 @@ public final class JMLTransformer extends RecoderModelTransformer {
             }
         }
         if(!(isGhost || isModel)) {
+            String s = decl.getDecl().text;
+            s = s.substring(0, s.indexOf(' '));
             throw new SLTranslationException(
-                            "JML field declaration has to be ghost or model!",
+                            "Could not translate JML specification. "+
+                            "You have either tried to use an unsupported keyword ("+s +") "+
+                            "or a JML field declaration without a ghost or model modifier.",
                             declWithMods.fileName,
                             declWithMods.pos);
         }        
