@@ -454,8 +454,8 @@ public final class MiscTools {
      * Separates the single directory entries in a filename.
      * The first element is an empty String iff the filename is absolute.
      * (For a Windows filename, it contains a drive letter and a colon).
-     * Ignores double slashes and slashes at the end.
-     * E.g., "/home//daniel/key/" yields {"","home","daniel","key"}.
+     * Ignores double slashes and slashes at the end, removes references to the cwd.
+     * E.g., "/home//daniel/./key/" yields {"","home","daniel","key"}.
      * Tries to automatically detect UNIX or Windows directory delimiters.
      * There is no check whether all other characters are valid for filenames.
      */
@@ -472,15 +472,23 @@ public final class MiscTools {
         int i = 0;
         while (i < filename.length()){
             int j = filename.indexOf(sep,i);
-            if (j == -1){
-                res.add(filename.substring(i, filename.length()));
+            if (j == -1){ // no slash anymore
+                final String s = filename.substring(i, filename.length());
+                if (!s.equals("."))
+                    res.add(s);
                 break;
             }
             if (i == j) {
+                // empty string between slashes
                 if (i == 0)
+                    // leading slash
                     res.add("");
             } else {
-            res.add(filename.substring(i, j));
+                // contains "/./"
+                final String s = filename.substring(i, j);
+                if (!s.equals(".")) {
+                    res.add(s);
+                }
             }
             i = j+1;
         }
@@ -512,6 +520,12 @@ public final class MiscTools {
         if (!b[0].equals("")) 
             throw new RuntimeException("please use absolute filenames to make them relative");
         
+        // remove ".." from paths
+        a = removeDotDot(a);
+        b = removeDotDot(b);
+        
+        // FIXME: there may be leading ..'s
+        
         int i = 1; boolean diff= false;
         String s = "";
         String t = "";
@@ -537,6 +551,22 @@ public final class MiscTools {
         if (t.length() > 0 && t.charAt(t.length()-1) == '/')
             t = t.substring(0,t.length()-1);
         return t;
+    }
+
+
+    private static String[] removeDotDot(String[] a) {
+        String[] newa = new String[a.length];
+        int k = 0;
+        for (int j = 0; j < a.length-1; j++){
+            if (a[j].equals("..") || !a[j+1].equals("..")){
+                newa[k++] = a[j];
+            } else
+                j++;
+        }
+        if (!a[a.length-1].equals("..")){
+            newa[k++] = a[a.length-1];
+        }
+        return Arrays.copyOf(newa, k);
     }
     
     
