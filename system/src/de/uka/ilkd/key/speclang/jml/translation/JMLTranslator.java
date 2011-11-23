@@ -381,8 +381,6 @@ final class JMLTranslator {
             @Override
             public Term translateBoundedNumericalQuantifier(
                     QuantifiableVariable qv, Term lo, Term hi, Term body) {
-                System.out.println(TB.one(services).sort());
-                System.out.println(TB.zero(services).sort());
                 final Term cond = TB.ife(TB.convertToFormula(body,services), TB.one(services), TB.zero(services));
                 return TB.bsum(qv, lo, hi, cond, services);
             }
