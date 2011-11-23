@@ -361,19 +361,34 @@ final class JMLTranslator {
                 return new SLExpression(resultTerm, t.getType());
             }
         });
-        translationMethods.put(JMLKeyWord.SUM, new JMLBoundedNumericalQuantifierTranslationMethod(){
-                @Override
-                public Term emptyRangeValue() {
-                        return TB.zero(services);
-                }
-                @Override
-                public Term translateBoundedNumericalQuantifier(
-                                QuantifiableVariable qv, Term lo, Term hi,
-                                Term body) {
-                        return TB.bsum(qv, lo, hi, body, services);               } 
-        }
-        );
+        translationMethods.put(JMLKeyWord.SUM,
+                               new JMLBoundedNumericalQuantifierTranslationMethod() {
+
+
+            @Override
+            public Term translateBoundedNumericalQuantifier(
+                    QuantifiableVariable qv,
+                    Term lo,
+                    Term hi,
+                    Term body) {
+                return TB.bsum(qv, lo, hi, body, services);
+            }
+        });
         
+        translationMethods.put(JMLKeyWord.NUM_OF, new JMLBoundedNumericalQuantifierTranslationMethod(){
+
+
+            @Override
+            public Term translateBoundedNumericalQuantifier(
+                    QuantifiableVariable qv, Term lo, Term hi, Term body) {
+                System.out.println(TB.one(services).sort());
+                System.out.println(TB.zero(services).sort());
+                final Term cond = TB.ife(TB.convertToFormula(body,services), TB.one(services), TB.zero(services));
+                return TB.bsum(qv, lo, hi, cond, services);
+            }
+            
+        });
+
         // primary expressions
         translationMethods.put(JMLKeyWord.INV_FOR, new JMLTranslationMethod(){
 
@@ -1069,6 +1084,7 @@ final class JMLTranslator {
                                          Term t1,
                                          Term t2)
                 throws SLTranslationException {
+            t2 = TB.convertToFormula(t2, services);
             Term result = combineQuantifiedTerms(t1, t2);
             for (LogicVariable qv : qvs) {
                 result = translateQuantifier(qv, result);
@@ -1172,41 +1188,46 @@ final class JMLTranslator {
                     return super.translate(excManager, params);
             }
 
-            @Override
-            public Term translateQuantifiers(Iterable<LogicVariable> qvs, Term t1, Term t2)
-            throws SLTranslationException {
-                    Iterator<LogicVariable> it = qvs.iterator();
-                    LogicVariable lv = it.next();
-                    if (it.hasNext() || !isBoundedNumerical(t1, lv)){
-                            throw new SLTranslationException(notBounded);
-                    } else {
-                            if (t1.arity()>0 && t1.sub(0).op()==Junctor.AND)
-                                    t2 = TB.ife(t1.sub(1), t2, emptyRangeValue());
-                            return translateBoundedNumericalQuantifier(lv, lowerBound(t1, lv), upperBound(t1, lv), t2);
-                    }
+
+        @Override
+        public Term translateQuantifiers(Iterable<LogicVariable> qvs,
+                                         Term t1,
+                                         Term t2)
+                throws SLTranslationException {
+            Iterator<LogicVariable> it = qvs.iterator();
+            LogicVariable lv = it.next();
+            if (it.hasNext() || !isBoundedNumerical(t1, lv)) {
+                throw new SLTranslationException(notBounded);
+            } else {
+                return translateBoundedNumericalQuantifier(lv,
+                                                           lowerBound(t1, lv),
+                                                           upperBound(t1, lv),
+                                                           t2);
             }
+        }
 
             /** Creates a term for a bounded numerical quantifier (e.g., sum).*/
             public abstract Term translateBoundedNumericalQuantifier(QuantifiableVariable qv, Term lo, Term hi, Term body);
 
-            /** Gives the defined term for an empty range to quantify over (e.g., zero for sum). */
-            public abstract Term emptyRangeValue ();
 
-            /** Should not be called. */
-            @Override
-            @Deprecated
-            public Term combineQuantifiedTerms(Term t1, Term t2){
-                    assert false;
-                    return null;
-            }
-            /** Should not be called. */
-            @Override
-            @Deprecated
-            public Term translateQuantifier(QuantifiableVariable qv,
-                            Term t){
-                    assert false;
-                    return null;
-            }
+        /** Should not be called. */
+        @Override
+        @Deprecated
+        public Term combineQuantifiedTerms(Term t1,
+                                           Term t2) {
+            assert false;
+            return null;
+        }
+
+
+        /** Should not be called. */
+        @Override
+        @Deprecated
+        public Term translateQuantifier(QuantifiableVariable qv,
+                                        Term t) {
+            assert false;
+            return null;
+        }
     }
     
     /**

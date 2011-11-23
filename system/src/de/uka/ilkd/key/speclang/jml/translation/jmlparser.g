@@ -1795,9 +1795,7 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
 	    resolverManager.popLocalVariablesNamespace();
 	    
 	    p = TB.convertToFormula(p, services);
-	    Term t = TB.convertToFormula(expr.getTerm(), services);
-	    
-	    result = translator.<Term>translate(q.getText(), excManager, p, t, declVars.first, declVars.second, nullable, services);
+	    result = translator.<Term>translate(q.getText(), excManager, p, expr.getTerm(), declVars.first, declVars.second, nullable, services);
 	}
 	RPAREN
 ;
