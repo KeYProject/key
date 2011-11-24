@@ -174,7 +174,7 @@ public class ProofSaver {
                String tmp2 = (i == 0) ? "" : tmp.substring(0, i-1);
 
                // add new relative path
-               final String absPath = (new File(tmp.substring(k,j))).getCanonicalPath();
+               final String absPath = tmp.substring(k,j);
                final String relPath = MiscTools.makeFilenameRelative(absPath, basePath);
                tmp2 = tmp2 + s + " \"" + relPath +"\";";
 
@@ -182,7 +182,7 @@ public class ProofSaver {
                tmp = tmp2 + (k < tmp.length()? tmp.substring(l,tmp.length()): "");
            }
        } catch (IOException e) {
-           assert false;
+           e.printStackTrace();
        }
        return tmp;
    }
