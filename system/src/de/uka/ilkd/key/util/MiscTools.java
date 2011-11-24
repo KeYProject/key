@@ -515,10 +515,15 @@ public final class MiscTools {
             a[0] = ""; b[0] = "";
         }
         
-        if (!a[0].equals("")) // already relative
-            return origFilename;
+        if (!a[0].equals("")){ // already relative
+            String res = "";
+            for (String s: a){
+                res += s;
+            }
+            return res;
+        }
         if (!b[0].equals("")) 
-            throw new RuntimeException("please use absolute filenames to make them relative");
+            throw new RuntimeException("\""+toFilename+ "\" is a relative path. Please use absolute paths to make others relative to them.");
         
         // remove ".." from paths
         a = removeDotDot(a);

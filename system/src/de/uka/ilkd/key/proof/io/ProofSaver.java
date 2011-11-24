@@ -153,7 +153,12 @@ public class ProofSaver {
     private String makePathsRelative(String header) {
         // TODO more?
         final String[] search = new String[]{"\\javaSource","\\bootclasspath","\\classpath"};
-        final String basePath = filename.substring(0, filename.lastIndexOf("/"));
+        String basePath = null;
+        try {
+            basePath = (new java.io.File(filename)).getCanonicalPath().substring(0, filename.lastIndexOf("/"));
+        } catch (IOException e) {
+            assert false;
+        }
         String tmp = header;
         // locate filenames in header
         for (String s: search){

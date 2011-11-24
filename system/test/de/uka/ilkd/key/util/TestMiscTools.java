@@ -17,7 +17,7 @@ public class TestMiscTools extends TestCase {
         ls = MiscTools.disectFilename(s).toArray();
         assertEquals(4,ls.length);
         assertEquals("key",ls[3]);
-        s = s+".";
+        s = "."+s;
         ls = MiscTools.disectFilename(s).toArray();
         assertEquals(4,ls.length);
         assertEquals("key",ls[3]);
