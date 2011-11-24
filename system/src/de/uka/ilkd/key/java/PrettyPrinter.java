@@ -2690,7 +2690,7 @@ public class PrettyPrinter {
     public void printElse(Else x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
-        write("else");
+        write("else ");
         if (x.getBody() != null) {
 	    if (x.getBody() instanceof StatementBlock) {
 		writeElement(1, 0, x.getBody());
