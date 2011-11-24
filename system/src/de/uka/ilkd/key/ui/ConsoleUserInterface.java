@@ -25,6 +25,8 @@ public class ConsoleUserInterface implements UserInterface {
         System.out.print("[ DONE ");
         if (info.getSource() instanceof ApplyStrategy) {
             System.out.println("  ... rule application ]");
+            System.out.println("number of goals remaining open:" + 
+                    info.getProof().openGoals().size());
             System.out.flush();
             batchMode.finishedBatchMode ( info.getResult(), 
                     info.getProof(), info.getTime(), 
@@ -37,7 +39,7 @@ public class ConsoleUserInterface implements UserInterface {
                     System.exit(-1);
             } 
             if(batchMode.isLoadOnly() ||  info.getProof().openGoals().size()==0) {
-                System.out.println("proof.openGoals.size=" + 
+                System.out.println("number of open goals after loading:" + 
                         info.getProof().openGoals().size());              
                 System.exit(0);
             }
