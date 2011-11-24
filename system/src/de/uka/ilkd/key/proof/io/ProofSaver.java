@@ -10,6 +10,7 @@
 
 package de.uka.ilkd.key.proof.io;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -150,37 +151,41 @@ public class ProofSaver {
    /** Searches in the header for absolute paths to Java files and tries to replace them
     * by paths relative to the proof file to be saved.
     */
-    private String makePathsRelative(String header) {
-        // TODO more?
-        final String[] search = new String[]{"\\javaSource","\\bootclasspath","\\classpath"};
-        String basePath = null;
-        try {
-            basePath = (new java.io.File(filename)).getCanonicalPath().substring(0, filename.lastIndexOf("/"));
-        } catch (IOException e) {
-            assert false;
-        }
-        String tmp = header;
-        // locate filenames in header
-        for (String s: search){
-            int i = tmp.indexOf(s);
-            if (i == -1) continue; // entry not in file
-            // path is always put in quotation marks
-            int k = tmp.indexOf("\"",i)+1;
-            int j = tmp.indexOf("\"", k);
-            int l = tmp.indexOf(";",k)+1;
-            
-            // put in everything before the keyword
-            String tmp2 = (i == 0) ? "" : tmp.substring(0, i-1);
-            
-            // add new relative path
-            final String relPath = MiscTools.makeFilenameRelative(tmp.substring(k,j), basePath);
-            tmp2 = tmp2 + s + " \"" + relPath +"\";";
-            
-            // put back in the rest
-            tmp = tmp2 + (k < tmp.length()? tmp.substring(l,tmp.length()): "");
-        }
-        return tmp;
-    }
+   private String makePathsRelative(String header) {
+       // TODO more?
+       final String[] search = new String[]{"\\javaSource","\\bootclasspath","\\classpath"};
+       String basePath = null;
+       String tmp = header;
+       final char sep = File.separatorChar;
+       try {
+           basePath = (new File(filename)).getCanonicalPath();
+           final int indexOfSep = basePath.lastIndexOf(sep) >= 0 ? basePath.lastIndexOf(sep) : basePath.length();
+           basePath = basePath.substring(0, indexOfSep);
+           // locate filenames in header
+           for (String s: search){
+               int i = tmp.indexOf(s);
+               if (i == -1) continue; // entry not in file
+               // path is always put in quotation marks
+               int k = tmp.indexOf("\"",i)+1;
+               int j = tmp.indexOf("\"", k);
+               int l = tmp.indexOf(";",k)+1;
+
+               // put in everything before the keyword
+               String tmp2 = (i == 0) ? "" : tmp.substring(0, i-1);
+
+               // add new relative path
+               final String absPath = (new File(tmp.substring(k,j))).getCanonicalPath();
+               final String relPath = MiscTools.makeFilenameRelative(absPath, basePath);
+               tmp2 = tmp2 + s + " \"" + relPath +"\";";
+
+               // put back in the rest
+               tmp = tmp2 + (k < tmp.length()? tmp.substring(l,tmp.length()): "");
+           }
+       } catch (IOException e) {
+           assert false;
+       }
+       return tmp;
+   }
 
     private String newNames2Proof(Node n) {
         String s = "";

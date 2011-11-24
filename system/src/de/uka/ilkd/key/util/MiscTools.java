@@ -10,6 +10,7 @@
 
 package de.uka.ilkd.key.util;
 
+import java.io.File;
 import java.util.*;
 
 import de.uka.ilkd.key.collection.*;
@@ -460,11 +461,11 @@ public final class MiscTools {
      * There is no check whether all other characters are valid for filenames.
      */
     static List<String> disectFilename(String filename){
-        final String sep;
+        final char sep = File.separatorChar;
         List<String> res = new ArrayList<String>();
         // if filename contains slashes, take it as UNIX filename, otherwise Windows
-        if (filename.indexOf("/") != -1) sep = "/";
-        else if (filename.indexOf("\\") != -1) sep = "\\";
+        if (filename.indexOf("/") != -1) assert sep == '/';
+        else if (filename.indexOf("\\") != -1) assert sep == '\\';
         else {
             res.add(filename);
             return res;
