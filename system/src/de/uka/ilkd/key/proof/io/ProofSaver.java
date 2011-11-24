@@ -171,7 +171,8 @@ public class ProofSaver {
                int l = tmp.indexOf(";",k)+1;
 
                // put in everything before the keyword
-               String tmp2 = (i == 0) ? "" : tmp.substring(0, i-1);
+               // bugfix #1138: changed i-1 to i
+               String tmp2 = (i == 0) ? "" : tmp.substring(0, i);
 
                // add new relative path
                final String absPath = tmp.substring(k,j);
