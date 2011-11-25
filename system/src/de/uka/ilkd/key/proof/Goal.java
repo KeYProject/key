@@ -503,7 +503,7 @@ public class Goal  {
      */
     public void removeLastAppliedRuleApp () {
 	appliedRuleApps = appliedRuleApps.tail ();
-	node ().setAppliedRuleApp ( null );
+	//node ().setAppliedRuleApp ( null );
     }
 
     
@@ -555,7 +555,8 @@ public class Goal  {
     
 
 
-    private void resetTagManager() {
+    public void resetTagManager() {
+        System.out.println("New Tag Manager");
         tagManager = new FormulaTagManager ( this );
     }
 

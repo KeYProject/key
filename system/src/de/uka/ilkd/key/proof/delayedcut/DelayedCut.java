@@ -4,31 +4,40 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.rule.RuleApp;
 
 public class DelayedCut {
-        public static final int FORMULA_ON_LEFT_SIDE = 0;
-        public static final int FORMULA_ON_RIGHT_SIDE = 1;
+        public static final int DECISION_PREDICATE_IN_ANTECEDENT = 0;
+        public static final int DECISION_PREDICATE_IN_SUCCEDENT = 1;
     
         private final Proof proof;
         private final Node  node;
         private final Node [] subtrees;
         private final int   cutMode;
-        private final Term formula;
+        private final Term decisionPredicate;
+        private final RuleApp firstAppliedRuleApp;
+        
        
         
         public DelayedCut(Proof proof, Node node, Term formula, Node [] subtrees,
-                int sideOfFormula) {
+                int sideOfDecisionPredicate, RuleApp firstAppliedRuleApp) {
             super();
-            assert sideOfFormula == FORMULA_ON_LEFT_SIDE || sideOfFormula == FORMULA_ON_RIGHT_SIDE;
+            assert sideOfDecisionPredicate == DECISION_PREDICATE_IN_ANTECEDENT || sideOfDecisionPredicate == DECISION_PREDICATE_IN_SUCCEDENT;
             this.proof = proof;
             this.node = node;
-            this.formula = formula;
+            this.decisionPredicate = formula;
             this.subtrees = subtrees;
-            this.cutMode = sideOfFormula;
+            this.cutMode = sideOfDecisionPredicate;
+            this.firstAppliedRuleApp = firstAppliedRuleApp;
+
         }
         
         public Term getFormula() {
-            return formula;
+            return decisionPredicate;
+        }
+        
+        public RuleApp getFirstAppliedRuleApp() {
+            return firstAppliedRuleApp;
         }
         
         public Services getServices(){
@@ -49,6 +58,10 @@ public class DelayedCut {
         
         public int getCutMode() {
             return cutMode;
+        }
+        
+        public boolean isDecisionPredicateInAntecendet(){
+            return cutMode == DECISION_PREDICATE_IN_ANTECEDENT;
         }
         
 

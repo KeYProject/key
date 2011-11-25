@@ -583,6 +583,7 @@ public class Proof implements Named {
                   // cut the subtree, it is not needed anymore.
                   Node [] subtrees =cut(cuttingPoint);
                   
+                  
                   //remove the goals of the residual leaves.
                   removeOpenGoals(residualLeaves);
                   return subtrees;
@@ -593,6 +594,8 @@ public class Proof implements Named {
                     goal.setGlobalProgVars(node.getGlobalProgVars());
                     goal.getRuleAppManager().clearCache();
                     goal.ruleAppIndex().clearIndexes();
+                    goal.node().setAppliedRuleApp(null);
+                    goal.resetTagManager();
        
             }
             

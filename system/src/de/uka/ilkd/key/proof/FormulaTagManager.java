@@ -10,11 +10,15 @@
 
 package de.uka.ilkd.key.proof;
 
+import java.io.IOException;
 import java.util.HashMap;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -93,7 +97,7 @@ public class FormulaTagManager {
 	assert source != null;
         removeTags ( sci, true, source  );
 	removeTags ( sci, false, source );
-	
+
         updateTags ( sci, true, source  );
 	updateTags ( sci, false, source );
 
@@ -186,6 +190,8 @@ public class FormulaTagManager {
     private void updateTag ( FormulaChangeInfo p_info,
                              Sequent           p_newSeq,
                              Goal              p_goal ) {
+     
+ 
 	final PosInOccurrence oldPIO  =
 	    p_info.getPositionOfModification().topLevel();
         final FormulaTag      tag     = getTagForPos ( oldPIO );

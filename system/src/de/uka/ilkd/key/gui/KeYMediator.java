@@ -45,7 +45,6 @@ import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.TacletFilter;
 import de.uka.ilkd.key.proof.TermTacletAppIndexCacheSet;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCut;
-import de.uka.ilkd.key.proof.delayedcut.DelayedCutCompletion;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCutProcessor;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
@@ -957,7 +956,7 @@ public class KeYMediator {
             
             DelayedCutProcessor.INSTANCE.cut(
                     getProof(),
-                    invokedNode,formula,DelayedCut.FORMULA_ON_RIGHT_SIDE                          
+                    invokedNode,formula,DelayedCut.DECISION_PREDICATE_IN_SUCCEDENT                          
                          
                     );
         }
