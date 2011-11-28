@@ -595,8 +595,7 @@ public class Proof implements Named {
                     goal.getRuleAppManager().clearCache();
                     goal.ruleAppIndex().clearIndexes();
                     goal.node().setAppliedRuleApp(null);
-                    goal.resetTagManager();
-       
+           
             }
             
             private void removeOpenGoals(Collection<Node> toBeRemoved){

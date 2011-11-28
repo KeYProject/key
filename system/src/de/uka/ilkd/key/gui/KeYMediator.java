@@ -45,6 +45,7 @@ import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.TacletFilter;
 import de.uka.ilkd.key.proof.TermTacletAppIndexCacheSet;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCut;
+import de.uka.ilkd.key.proof.delayedcut.DelayedCutListener;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCutProcessor;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
@@ -54,6 +55,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.feature.AbstractBetaFeature;
 import de.uka.ilkd.key.strategy.feature.IfThenElseMalusFeature;
+import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.GuiUtilities;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
@@ -953,12 +955,67 @@ public class KeYMediator {
             }
             
             Term formula = InspectorForFormulas.translate(getProof().getServices(),result);
-            
-            DelayedCutProcessor.INSTANCE.cut(
-                    getProof(),
-                    invokedNode,formula,DelayedCut.DECISION_PREDICATE_IN_SUCCEDENT                          
-                         
-                    );
+            final UserInterface ui = KeYMediator.this.mainFrame.getUserInterface();
+            DelayedCutProcessor processor = new DelayedCutProcessor(getProof(),
+                    invokedNode,
+                    formula,
+                    DelayedCut.DECISION_PREDICATE_IN_SUCCEDENT);
+            processor.add(new DelayedCutListener() {
+                
+                @Override
+                public void eventRebuildingTree(final int currentTacletNumber,final int totalNumber) {
+             
+          
+                    SwingUtilities.invokeLater(new Runnable() {
+                        
+                        @Override
+                        public void run() {
+                            ui.taskStarted("Rebuilding...", totalNumber);
+                            ui.taskProgress(currentTacletNumber);
+                           // ui.setProgress(currentTacletNumber);
+                         }
+                    });
+                }
+                
+                @Override
+                public void eventEnd(DelayedCut cutInformation) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        
+                        @Override
+                        public void run() {
+                            getProof().fireProofGoalsChanged();
+                            ui.resetStatus(this);
+                            KeYMediator.this.startInterface(true);
+                        }
+                    });
+                   
+                }
+                
+                @Override
+                public void eventCutting() {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        
+                        @Override
+                        public void run() {
+                            ui.taskStarted("Cutting...", 0);
+                         //   ui.taskProgress(0);
+                        }
+                    });
+           
+                }
+
+                @Override
+                public void eventException(Throwable throwable) {
+                    KeYMediator.this.startInterface(true);
+                    ExceptionDialog.showDialog(KeYMediator.this.mainFrame(),throwable);
+                    
+                }
+            });
+            this.stopInterface(true);
+            this.mainFrame().getStatusLine().setVisible(true);
+          
+            Thread thread = new Thread(processor);
+            thread.start();
         }
         
     }

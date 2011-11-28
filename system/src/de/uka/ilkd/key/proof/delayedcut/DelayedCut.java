@@ -4,6 +4,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 
 public class DelayedCut {
@@ -16,6 +17,7 @@ public class DelayedCut {
         private final int   cutMode;
         private final Term decisionPredicate;
         private final RuleApp firstAppliedRuleApp;
+        private NoPosTacletApp hideApp = null;
         
        
         
@@ -51,6 +53,16 @@ public class DelayedCut {
             return proof;
         }
         
+        public void setHideApp(NoPosTacletApp hideApp) {
+            if(this.hideApp != null){
+                throw new IllegalArgumentException("There already exists an app.");
+            }
+            this.hideApp = hideApp;
+        }
+        
+        public NoPosTacletApp getHideApp() {
+            return hideApp;
+        }
         
         public Node[] getSubtrees() {
             return subtrees;

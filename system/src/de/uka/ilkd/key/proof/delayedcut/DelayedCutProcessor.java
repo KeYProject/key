@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -36,14 +37,18 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * is stored in  * <code>DelayCut</code>.
  *
  */
-public class DelayedCutProcessor {
-    public static DelayedCutProcessor INSTANCE = new DelayedCutProcessor();
-    
+public class DelayedCutProcessor implements Runnable {
+     
     private static final String HIDE_RIGHT_TACLET = "hide_right";
     private static final String HIDE_LEFT_TACLET  = "hide_left";
     private static final String CUT_TACLET = "cut";
     private static final int DEC_PRED_INDEX = 0;
 
+    private final LinkedList<DelayedCutListener> listeners = new LinkedList<DelayedCutListener>();
+    private final Proof proof;
+    private final Node  node;
+    private final Term  descisionPredicate;
+    private final int   mode;
     
     private static class TacletCollection{
         FindTaclet hideRightTaclet;
@@ -68,21 +73,27 @@ public class DelayedCutProcessor {
         }
     }
     
-    private HashMap<Proof, TacletCollection> tacletCollection = 
-            new HashMap<Proof,TacletCollection>();
+
     
-    private TacletCollection getTaclets(Proof proof){
-        TacletCollection tc = tacletCollection.get(proof);
-        if(tc == null){
-            tc = new TacletCollection(proof);
-            tacletCollection.put(proof, tc);
-        }
-        return tc;
+    public void add(DelayedCutListener listener){
+        listeners.add(listener);
     }
     
+    public void remove(DelayedCutListener listener){
+        listeners.remove(listener);
+    }
+
     
-    private DelayedCutProcessor() {}
     
+    public DelayedCutProcessor(Proof proof, Node node, Term descisionPredicate,
+            int mode) {
+        super();
+        this.proof = proof;
+        this.node = node;
+        this.descisionPredicate = descisionPredicate;
+        this.mode = mode;
+    }
+
     private Goal find(Proof proof, Node node){
         for(Goal goal : proof.openGoals()){
             if(goal.node() == node){
@@ -92,30 +103,41 @@ public class DelayedCutProcessor {
         return null;
     }
     
-    public boolean cut(Proof proof, Node node, Term formula, int mode){
-        System.out.println("BEGIN CUT");
+    public void cut(){
+        
+        for(DelayedCutListener listener : listeners){
+            listener.eventCutting();
+        }
          // do not change the order of the following two statements!
          RuleApp firstAppliedRuleApp = node.getAppliedRuleApp(); 
          Node subtrees [] = proof.pruneProof(node, false);
          
-         TacletCollection taclets = getTaclets(proof);
+         TacletCollection taclets = new TacletCollection(proof);
          
          DelayedCut delayedCut = new DelayedCut(proof, node,
-                                                formula, subtrees,
+                                                descisionPredicate, subtrees,
                                                 mode,firstAppliedRuleApp);
+         
         
          ImmutableList<Goal> cutResult = cut(delayedCut,taclets);       
          
          ImmutableList<Goal> hideResult = hide(delayedCut,getGoalForHiding(cutResult, delayedCut),taclets);
          
-         rebuildSubTrees(delayedCut, hideResult.head());
+         
+         
+         List<Goal> openLeaves = rebuildSubTrees(delayedCut, hideResult.head());
+ 
+         uncoverDecisionPredicate(delayedCut, openLeaves);
 
-         proof.fireProofGoalsChanged();
-         return true;
+         for(DelayedCutListener listener : listeners){
+             listener.eventEnd(delayedCut);
+         }
+       
+         
     }
     
     
-
+   
     
     
     
@@ -131,7 +153,7 @@ public class DelayedCutProcessor {
         
         app = app.addCheckedInstantiation(app.uninstantiatedVars().iterator().next(),
                                     cut.getFormula(),cut.getServices(), true);
-  
+    
        return goal.apply(app);
     }
     
@@ -151,7 +173,9 @@ public class DelayedCutProcessor {
         TacletApp app = PosTacletApp.createPosTacletApp(hideTaclet,inst,
                 pio,
             cut.getServices());
-        return goal.apply(app);
+        ImmutableList<Goal> result = goal.apply(app);
+        cut.setHideApp(result.head().node().getLocalIntroducedRules().iterator().next());
+        return result;
     }
     
     private Goal getGoalForHiding(ImmutableList<Goal> goals, DelayedCut cut){
@@ -200,23 +224,33 @@ public class DelayedCutProcessor {
         
     }
     
-    private void rebuildSubTrees(DelayedCut cut, Goal goal){
-        System.out.println("###BEGIN###");
+    private List<Goal> rebuildSubTrees(DelayedCut cut, Goal goal){
         LinkedList<NodeGoalPair> pairs = new LinkedList<NodeGoalPair>();
+        LinkedList<Goal>  openLeaves = new LinkedList<Goal>();
  
         add(pairs,cut.getSubtrees(),goal.apply(
                 cut.getFirstAppliedRuleApp()));
+        
+        int totalNumber = 0;
+        for(NodeGoalPair pair : pairs){
+            totalNumber += pair.node.countNodes();
+        }
 
+        int currentNumber =0;
         while(!pairs.isEmpty()){
             
             NodeGoalPair pair = pairs.pollLast();
-            
-            System.out.println("Apply rule of " +pair.node.serialNr());
-            System.out.println("Apply rule on " + pair.goal.node().serialNr()); 
+
             RuleApp app = createNewRuleApp(pair,
                     cut.getServices());
-            add(pairs,pair.node,pair.goal.apply(app));
+            
+  
+            totalNumber -= add(pairs,openLeaves,pair.node,pair.goal.apply(app));
+            for(DelayedCutListener listener : listeners){
+                listener.eventRebuildingTree(++currentNumber, totalNumber);
+            }
         }
+        return openLeaves;
     }
     
     private RuleApp createNewRuleApp(NodeGoalPair pair, Services services){
@@ -243,7 +277,13 @@ public class DelayedCutProcessor {
     
     private PosInOccurrence translate(NodeGoalPair pair){
         RuleApp oldRuleApp = pair.node.getAppliedRuleApp();
-        int formulaNumber = pair.node.sequent().formulaNumberInSequent(oldRuleApp.posInOccurrence().isInAntec(),
+        if(oldRuleApp.posInOccurrence() == null){
+            return null;
+        }
+        int formulaNumber = pair.node.sequent().formulaNumberInSequent(
+                oldRuleApp.
+                posInOccurrence().
+                isInAntec(),
                 oldRuleApp.posInOccurrence().constrainedFormula());
         return PosInOccurrence.findInSequent(pair.goal.sequent(),
                 formulaNumber, oldRuleApp.posInOccurrence().posInTerm());
@@ -259,14 +299,41 @@ public class DelayedCutProcessor {
         }
     }
     
-    private void add(LinkedList<NodeGoalPair> pairs, Node parent, ImmutableList<Goal> goals){
+    private int add(LinkedList<NodeGoalPair> pairs,
+                     LinkedList<Goal> openLeaves, 
+                     Node parent, ImmutableList<Goal> goals){
         assert parent.childrenCount() == goals.size();
-        int i=0; 
+        int leafNumber = 0;
+        int i=0;
         for(Goal goal : goals){
             if(!parent.child(i).leaf()){
                 pairs.add(new NodeGoalPair(parent.child(i),goal));
+            }else{
+                if(!goal.node().isClosed()){
+                    openLeaves.add(goal);
+                }          
+                leafNumber++;
             }
-            i++;
+            i++;            
+        }
+        return leafNumber;
+
+    }
+    
+    private void uncoverDecisionPredicate(DelayedCut cut, List<Goal> openLeaves){
+        for(Goal goal : openLeaves){
+            goal.apply(cut.getHideApp());
+        }
+    }
+
+    @Override
+    public void run() {
+        try{
+            cut();
+        }catch(Throwable throwable){
+            for(DelayedCutListener listener : listeners){
+                listener.eventException(throwable);
+            }
         }
     }
 

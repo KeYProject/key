@@ -555,8 +555,8 @@ public class Goal  {
     
 
 
-    public void resetTagManager() {
-        System.out.println("New Tag Manager");
+    private void resetTagManager() {
+    
         tagManager = new FormulaTagManager ( this );
     }
 
