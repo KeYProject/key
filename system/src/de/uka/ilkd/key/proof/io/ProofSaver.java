@@ -152,7 +152,6 @@ public class ProofSaver {
     * by paths relative to the proof file to be saved.
     */
    private String makePathsRelative(String header) {
-       // TODO more?
        final String[] search = new String[]{"\\javaSource","\\bootclasspath","\\classpath"};
        String basePath = null;
        String tmp = header;
@@ -165,22 +164,30 @@ public class ProofSaver {
            for (String s: search){
                int i = tmp.indexOf(s);
                if (i == -1) continue; // entry not in file
-               // path is always put in quotation marks
-               int k = tmp.indexOf("\"",i)+1;
-               int j = tmp.indexOf("\"", k);
-               int l = tmp.indexOf(";",k)+1;
 
                // put in everything before the keyword
                // bugfix #1138: changed i-1 to i
-               String tmp2 = (i == 0) ? "" : tmp.substring(0, i);
+               String tmp2 = tmp.substring(0, i);
+               String relPathString = "";
+               i += s.length();
+               int l = tmp.indexOf(";",i);
+               
+               // there may be more than one path
+               while (0 <= tmp.indexOf("\"",i) && tmp.indexOf("\"",i) < l) {
+                   // path is always put in quotation marks
+                   int k = tmp.indexOf("\"",i)+1;
+                   int j = tmp.indexOf("\"", k);
 
-               // add new relative path
-               final String absPath = tmp.substring(k,j);
-               final String relPath = MiscTools.makeFilenameRelative(absPath, basePath);
-               tmp2 = tmp2 + s + " \"" + relPath +"\";";
+                   // add new relative path
+                   final String absPath = tmp.substring(k,j);
+                   final String relPath = MiscTools.makeFilenameRelative(absPath, basePath);
+                   relPathString = relPathString+" \"" + relPath +"\"";
+                   i = j+1;
+               }
+               tmp2 = tmp2 + s + relPathString + ";";
 
                // put back in the rest
-               tmp = tmp2 + (k < tmp.length()? tmp.substring(l,tmp.length()): "");
+               tmp = tmp2 + (i < tmp.length()? tmp.substring(l+1,tmp.length()): "");
            }
        } catch (IOException e) {
            e.printStackTrace();

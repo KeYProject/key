@@ -464,8 +464,8 @@ public final class MiscTools {
         final char sep = File.separatorChar;
         List<String> res = new ArrayList<String>();
         // if filename contains slashes, take it as UNIX filename, otherwise Windows
-        if (filename.indexOf("/") != -1) assert sep == '/';
-        else if (filename.indexOf("\\") != -1) assert sep == '\\';
+        if (filename.indexOf("/") != -1) assert sep == '/' : "\""+filename+"\" contains both / and \\";
+        else if (filename.indexOf("\\") != -1) assert sep == '\\': "\""+filename+"\" contains both / and \\";
         else {
             res.add(filename);
             return res;
