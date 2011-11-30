@@ -639,18 +639,21 @@ public class Proof implements Named {
      * @param cuttingPoint
      * @return Returns the sub trees that has been pruned. 
      */
-    public Node [] pruneProof(Node cuttingPoint){
-         return pruneProof(cuttingPoint,true);
+ 
+    public Node[] pruneProof(Node cuttingPoint){
+        return pruneProof(cuttingPoint,true);
     }
     
-    public Node [] pruneProof(Node cuttingPoint, boolean fireChanges){
+    public Node [] pruneProof(Node cuttingPoint,boolean fireChanges){
         assert cuttingPoint.proof() == this;
         if(getGoal(cuttingPoint)!= null || cuttingPoint.isClosed()){
                 return null;
         }
         
         ProofPruner pruner = new ProofPruner();
-        fireProofIsBeingPruned(cuttingPoint);
+        if(fireChanges){
+            fireProofIsBeingPruned(cuttingPoint);
+        }
         Node[] result = pruner.prune(cuttingPoint); 
         if(fireChanges){
             fireProofGoalsChanged();
@@ -690,7 +693,7 @@ public class Proof implements Named {
 
 
     /** fires the event that the proof has been expanded at the given node */
-    protected void fireProofExpanded(Node node) {
+    public void fireProofExpanded(Node node) {
 	ProofTreeEvent e = new ProofTreeEvent(this, node);
 	for (int i = 0; i<listenerList.size(); i++) {
 	    listenerList.get(i).proofExpanded(e);
@@ -717,7 +720,7 @@ public class Proof implements Named {
 
     
     /** fires the event that the proof has been restructured */
-    protected void fireProofStructureChanged() {
+    public void fireProofStructureChanged() {
 	ProofTreeEvent e = new ProofTreeEvent(this);
 	for (int i = 0; i<listenerList.size(); i++) {
 	    listenerList.get(i).proofStructureChanged(e);

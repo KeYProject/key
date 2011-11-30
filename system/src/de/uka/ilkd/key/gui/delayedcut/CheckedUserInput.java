@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.gui.delayedcut;
 
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.LinkedList;
@@ -11,6 +13,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
@@ -22,7 +25,7 @@ public class CheckedUserInput extends JPanel{
 
 
     static public interface CheckedUserInputInspector{
-        public boolean check(String toBeChecked);
+        public String check(String toBeChecked);
     }
     
     static public interface CheckedUserInputListener{
@@ -33,17 +36,29 @@ public class CheckedUserInput extends JPanel{
     
     private TrafficLight trafficLight;
     private JTextPane    inputFieldForFormula;
-    
+    private JLabel       infoLabel;
 
     private final CheckedUserInputInspector inspector; 
     private final List<CheckedUserInputListener> listeners = new LinkedList<CheckedUserInputListener>();
     
     public CheckedUserInput(CheckedUserInputInspector inspector) {
         this.inspector = inspector;
-        this.setLayout(new BoxLayout(this,BoxLayout.X_AXIS));
-        this.add(new JScrollPane(getInputFieldForFormula()));
-        this.add(Box.createHorizontalStrut(5));
-        this.add(getTrafficLight());
+        this.setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
+        Box horzBox = Box.createHorizontalBox();
+        JScrollPane pane = new JScrollPane(getInputFieldForFormula());
+        horzBox.add(pane);
+        horzBox.add(Box.createHorizontalStrut(5));
+        horzBox.add(getTrafficLight());
+        Dimension dim = pane.getPreferredSize();
+        dim.height = getTrafficLight().getPreferredSize().height;
+        pane.setPreferredSize(dim);
+        pane.setMinimumSize(dim);
+        this.add(horzBox);
+        this.add(Box.createVerticalStrut(2));
+        horzBox = Box.createHorizontalBox();
+        horzBox.add(getInfoLabel());
+        horzBox.add(Box.createHorizontalGlue());
+        this.add(horzBox);
     }
 
     
@@ -52,6 +67,17 @@ public class CheckedUserInput extends JPanel{
             trafficLight = new TrafficLight(10);            
         }
         return trafficLight;
+    }
+    
+    private JLabel getInfoLabel(){
+        if(infoLabel == null){
+            infoLabel = new JLabel();
+            infoLabel.setBackground(this.getBackground());
+            infoLabel.setFont(this.getFont());
+            infoLabel.setText(" ");
+            
+        }
+        return infoLabel;
     }
     
     private JTextPane getInputFieldForFormula(){
@@ -81,10 +107,10 @@ public class CheckedUserInput extends JPanel{
     
     private void checkInput(){
         String text = inputFieldForFormula.getText();
-        boolean result = inspector.check(text);
+        String result = inspector.check(text);
         setValid(result);
         for(CheckedUserInputListener listener : listeners){
-            listener.userInputChanged(text,result);
+            listener.userInputChanged(text,result==null);
         }
     }
     
@@ -106,8 +132,13 @@ public class CheckedUserInput extends JPanel{
         checkInput();
     }
 
-private void setValid(boolean b){
-        getTrafficLight().setGreen(b);
+private void setValid(String result){
+        if(result == null){
+            getInfoLabel().setText(" ");
+        }else{
+            getInfoLabel().setText(result);
+        }
+        getTrafficLight().setGreen(result == null);
         SwingUtilities.invokeLater(new Runnable() {
          
          @Override
@@ -170,9 +201,9 @@ private void setValid(boolean b){
                 new CheckedUserInputInspector() {
             
             @Override
-            public boolean check(String toBeChecked) {
+            public String check(String toBeChecked) {
 
-                return toBeChecked.equals("test");
+                return toBeChecked.equals("test") ? null : "Syntax Error";
             }
         });
     }

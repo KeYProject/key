@@ -110,7 +110,7 @@ public class DelayedCutProcessor implements Runnable {
         }
          // do not change the order of the following two statements!
          RuleApp firstAppliedRuleApp = node.getAppliedRuleApp(); 
-         Node subtrees [] = proof.pruneProof(node, false);
+         Node subtrees [] = proof.pruneProof(node,false);
          
          TacletCollection taclets = new TacletCollection(proof);
          
@@ -119,7 +119,8 @@ public class DelayedCutProcessor implements Runnable {
                                                 mode,firstAppliedRuleApp);
          
         
-         ImmutableList<Goal> cutResult = cut(delayedCut,taclets);       
+         ImmutableList<Goal> cutResult = cut(delayedCut,taclets);      
+
          
          ImmutableList<Goal> hideResult = hide(delayedCut,getGoalForHiding(cutResult, delayedCut),taclets);
          
@@ -132,7 +133,8 @@ public class DelayedCutProcessor implements Runnable {
          for(DelayedCutListener listener : listeners){
              listener.eventEnd(delayedCut);
          }
-       
+         
+   
          
     }
     
@@ -153,8 +155,9 @@ public class DelayedCutProcessor implements Runnable {
         
         app = app.addCheckedInstantiation(app.uninstantiatedVars().iterator().next(),
                                     cut.getFormula(),cut.getServices(), true);
-    
-       return goal.apply(app);
+
+       //return app.execute(goal,cut.getServices());
+        return goal.apply(app);
     }
     
     private ImmutableList<Goal> hide(DelayedCut cut, Goal goal, TacletCollection taclets){
@@ -243,9 +246,11 @@ public class DelayedCutProcessor implements Runnable {
 
             RuleApp app = createNewRuleApp(pair,
                     cut.getServices());
-            
-  
-            totalNumber -= add(pairs,openLeaves,pair.node,pair.goal.apply(app));
+         
+            totalNumber -= add(pairs,openLeaves,pair.node,
+                   pair.goal.apply(app));
+ 
+
             for(DelayedCutListener listener : listeners){
                 listener.eventRebuildingTree(++currentNumber, totalNumber);
             }
@@ -277,7 +282,7 @@ public class DelayedCutProcessor implements Runnable {
     
     private PosInOccurrence translate(NodeGoalPair pair){
         RuleApp oldRuleApp = pair.node.getAppliedRuleApp();
-        if(oldRuleApp.posInOccurrence() == null){
+        if(oldRuleApp == null ||oldRuleApp.posInOccurrence() == null){
             return null;
         }
         int formulaNumber = pair.node.sequent().formulaNumberInSequent(
@@ -293,8 +298,10 @@ public class DelayedCutProcessor implements Runnable {
         
         assert subtrees.length == goals.size(); 
         int i=0;
-        for(Goal goal : goals){            
-            pairs.add(new NodeGoalPair(subtrees[i], goal));
+        for(Goal goal : goals){   
+            if(!subtrees[i].leaf()){
+                pairs.add(new NodeGoalPair(subtrees[i], goal));
+            }
             i++;
         }
     }

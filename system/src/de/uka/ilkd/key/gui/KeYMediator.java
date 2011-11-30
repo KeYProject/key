@@ -941,14 +941,14 @@ public class KeYMediator {
         return mainFrame.getUserInterface();
     }
 
-    public void processDelayedCut(Node invokedNode) {
+    public void processDelayedCut(final Node invokedNode) {
         if (ensureProofLoaded()) {
             final String result = 
                     CheckedUserInput.showAsDialog("Cut Formula",
                             "Please specify a formula:",
                             "to be written + change default input to empty string",
                             "true",
-                    new InspectorForFormulas(getProof().getServices())                                   
+                    new InspectorForFormulas(getProof().getServices(),invokedNode)                                   
                     );    
             if(result == null){
                 return;
@@ -959,13 +959,12 @@ public class KeYMediator {
             DelayedCutProcessor processor = new DelayedCutProcessor(getProof(),
                     invokedNode,
                     formula,
-                    DelayedCut.DECISION_PREDICATE_IN_SUCCEDENT);
+                    DelayedCut.DECISION_PREDICATE_IN_ANTECEDENT);
             processor.add(new DelayedCutListener() {
                 
                 @Override
                 public void eventRebuildingTree(final int currentTacletNumber,final int totalNumber) {
-             
-          
+                  
                     SwingUtilities.invokeLater(new Runnable() {
                         
                         @Override
@@ -983,7 +982,8 @@ public class KeYMediator {
                         
                         @Override
                         public void run() {
-                            getProof().fireProofGoalsChanged();
+                           // getProof().fireProofGoalsChanged();
+                            //getProof().fireProofExpanded(invokedNode);
                             ui.resetStatus(this);
                             KeYMediator.this.startInterface(true);
                         }
@@ -1003,16 +1003,25 @@ public class KeYMediator {
                     });
            
                 }
-
+           
                 @Override
                 public void eventException(Throwable throwable) {
                     KeYMediator.this.startInterface(true);
-                    ExceptionDialog.showDialog(KeYMediator.this.mainFrame(),throwable);
-                    
+                    ExceptionDialog.showDialog(
+                            KeYMediator.this.mainFrame(),
+                            new RuntimeException("The cut could not be processed successfully. In order to " +
+                            		"preserve consistency the proof is pruned.", throwable));
+                    SwingUtilities.invokeLater(new Runnable() {
+                        
+                        @Override
+                        public void run() {
+                            getProof().pruneProof(invokedNode);
+                        }
+                    });
                 }
             });
             this.stopInterface(true);
-            this.mainFrame().getStatusLine().setVisible(true);
+
           
             Thread thread = new Thread(processor);
             thread.start();
