@@ -14,6 +14,8 @@
 
 # java.lang.Object has been modified manually!
 
+java/lang/Object.java
+
 java/lang/annotation/Annotation.java
 java/lang/ArithmeticException.java
 java/lang/ArrayIndexOutOfBoundsException.java
