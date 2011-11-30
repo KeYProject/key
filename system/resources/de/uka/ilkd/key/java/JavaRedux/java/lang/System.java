@@ -18,28 +18,87 @@
 
 package java.lang;
 
-//import java.io.*;
-//import java.util.Properties;
+import java.io.*;
+import java.util.Properties;
 
 /** JML's specification of java.lang.System.
- * Taken from jmlspecs repository (Java 1.4) and modified to fit to KeY.
+ *
  * @version $Revision: 2251 $ KeY
  * @author Gary T. Leavens
  * @author David R. Cok
  * @author Joseph R. Kiniry
  * @author Daniel Bruns
  */
-public final class System {     
+public final /*@ nullable_by_default @*/ class System {
+
+    //@ public final ghost static boolean allowNullStreams = false;
+
+    /*  In declaring allowNullStreams to be final, we restrict beyond what
+        the JDK requires.  The JDK allows in, out and err to be set to null
+        streams, in which case a NullPointerException is raised on any
+        attempt to read or write to in, out or err.  By declaring 
+        allowNullStreams final we introduce the invariant that it is always
+        non-null.  If we don't do this, we will need to include in preconditions
+        whereever in, out and err are used that they are non null.  This is
+        a decided nuisance, and I think the programmer would rather be
+        warned that a possibly null stream is being assigned. 
+
+	Since allowNullStreams = false and is declared as final, this means
+	that in, out and err are effectively non-null.  The only way to allow
+	them to be nullable is to modify this specification (or make a copy of
+	it) and change the value of allowNullStreams.  Since changing the
+	nullity requires changing the spec, and since some tools can do more
+	if in, out and err are explicitly declared non-null, we are going one
+	step further and annotating in, out and err as non_null.  If ever you
+	change allowNullStreams to be true, then you will need to change the
+	annotations of in, out and err to be nullable.
+    */
+
+//    public final static /*@non_null*//*see note above*/ InputStream in;
+//    public final static /*@non_null*//*see note above*/ PrintStream out;
+//    public final static /*@non_null*//*see note above*/ PrintStream err;
+
+    /* @ requires allowNullStreams || i != null;
+      @ assignable in;  // strangely enough, in is like a read-only var.
+      @ ensures in == i;
+      @*/
+//    public static void setIn(InputStream i);
+
+    /* @ requires allowNullStreams || o != null;
+      @ assignable out;
+      @ ensures out == o;
+      @*/
+//    public static void setOut(PrintStream o);
+
+    /* @ requires allowNullStreams || e != null;
+      @ assignable err;
+      @ ensures err == e;
+      @*/
+//    public static void setErr(PrintStream e);
 
 
-//    public final static java.io.InputStream in;
-    public final static java.io.PrintStream out;
-    public final static java.io.PrintStream err;
-    
-    
+    // @ public model static nullable SecurityManager systemSecurityManager;
 
+    /* @  public normal_behavior
+      @    requires s == null;
+      @    assignable \nothing;
+      @    ensures \not_modified(systemSecurityManager);
+      @ also
+      @  public behavior
+      @    requires s != null;
+      @    assignable systemSecurityManager;
+      @    ensures  systemSecurityManager == s;
+      @    signals (SecurityException) (* if the change is not permitted *);
+      @*/
+//    public static void setSecurityManager(/*@nullable*/ SecurityManager s) throws SecurityException;
+
+    /* @ public normal_behavior
+      @   ensures \result == systemSecurityManager;
+      @*/
+//    public /*@ pure @*/ static /*@nullable*/ SecurityManager getSecurityManager();
 
     /** The last value of currentTimeMillis() that was returned */
+
     //@ public static ghost long time;
 
     // FIXME - need to show that the value is volatile ?
@@ -92,9 +151,9 @@ public final class System {
       @   signals_only ArrayStoreException, ArrayIndexOutOfBoundsException;
 	   |}
       @*/
-    public static native void arraycopy(/*@ nullable @*/ Object src,
+    public static native void arraycopy(/*@non_null*/ Object src,
                                         int srcPos,
-                                        /*@ nullable @*/ Object dest,
+                                        /*@non_null*/ Object dest,
                                         int destPos,
                                         int length);
 
