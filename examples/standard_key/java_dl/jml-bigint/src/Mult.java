@@ -13,20 +13,25 @@ public class Mult {
 
     /*@ public normal_behavior
       @ requires -2147483648 < x;
-      @ requires -2147483648 <= (\bigint)x * (\bigint)y;
+      @ requires -2147483648 < (\bigint)x * (\bigint)y;
       @ requires (\bigint)x * (\bigint)y <= 2147483647;
       @ ensures \result == x * y;
       @*/
     public int mult (int x, int y){
         int z = 0;
-        boolean p = x > 0;
-        if (p) x = -x;
+        boolean n = x < 0;
+        if (n) x = -x;
 	//@ ghost int oldx = x;
-	/*@ maintaining oldx <= x && x <= 0;
-          @ maintaining z == y * (p? (\old(x)+x) : (x-\old(x)));
-          @ decreasing -x;
+	//@ ghost \bigint p = 0;
+	/*@ maintaining 0 <= x && x <= oldx;
+          @ maintaining z == y * (oldx - x);
+	  @ maintaining (\bigint)z == p;
+          @ decreasing  x;
 	  @*/
-        while (x++ < 0) z += y;
-        return p? z: -z;
+        while (x-- > 0) {
+	    //@ set p = p + (\bigint)y;
+	    z += y;
+        }
+        return n? -z: z;
     }
 }
