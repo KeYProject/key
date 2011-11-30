@@ -677,9 +677,9 @@ final class JMLTranslator {
         });
         
         translationMethods.put(JMLKeyWord.COMMENTARY, new JMLTranslationMethod() {
+            @Override
             public Object translate(SLTranslationExceptionManager excManager, Object... params) throws SLTranslationException {
 
-            @Override
                 checkParameters(params, Services.class, Token.class,
                         LocationVariable.class, LocationVariable.class, 
                         ImmutableList.class, Term.class);

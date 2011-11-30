@@ -85,8 +85,6 @@ public class JMLSpecFactory {
         public Term signals;
         public Term signalsOnly;
         public Term diverges;
-        public ImmutableList<Term> respects;
-        public ImmutableList<ImmutableList<Term>> declassify;
     }
 
     //-------------------------------------------------------------------------
@@ -263,14 +261,6 @@ public class JMLSpecFactory {
         clauses.diverges = translateOrClauses(pm, progVars.selfVar,
                                               progVars.paramVars,
                                               textualSpecCase.getDiverges());
-        clauses.respects =
-                translateListUnionClauses(pm, progVars.selfVar,
-                                          progVars.paramVars,
-                                          textualSpecCase.getRespects());
-        clauses.declassify =
-                translateIndependetClauses(pm, progVars.selfVar,
-                                           progVars.paramVars,
-                                           textualSpecCase.getDeclassify());
         return clauses;
     }
 
@@ -535,81 +525,40 @@ public class JMLSpecFactory {
             Term post) {
         ImmutableSet<Contract> result = DefaultImmutableSet.<Contract>nil();
         if (clauses.diverges.equals(TB.ff())) {
-            FunctionalOperationContract contract =
-                    cf.createFunctionalContract(name,
-                                                pm.getContainerType(), pm,
-                                                Modality.DIA, clauses.requires,
-                                                clauses.measuredBy,
-                                                clauses.assignable, null,
-                                                progVars.selfVar,
-                                                progVars.paramVars, post,
-                                                progVars.resultVar,
-                                                progVars.excVar,
-                                                progVars.heapAtPreVar,
-                                                progVars.savedHeapAtPreVar,
-                                                false);
-            if (clauses.assignable_backup != null) {
-                contract = contract.setModifiesBackup(clauses.assignable_backup);
-                contract = contract.setModality(Modality.DIA_TRANSACTION);
+            FunctionalOperationContract contract = cf.func(
+                    name, pm, true, clauses.requires,
+                    clauses.measuredBy, post, clauses.assignable, progVars);
+            if(clauses.assignable_backup != null) {
+               contract = cf.setModifiesBackup(contract, clauses.assignable_backup);
+               contract = cf.setModality(contract, Modality.DIA_TRANSACTION);
             }
             result = result.add(contract);
         } else if (clauses.diverges.equals(TB.tt())) {
-            FunctionalOperationContract contract =
-                    cf.createFunctionalContract(name, pm.getContainerType(), pm,
-                                                Modality.BOX,
-                                                clauses.requires,
-                                                clauses.measuredBy,
-                                                clauses.assignable,
-                                                null,
-                                                progVars.selfVar,
-                                                progVars.paramVars, post,
-                                                progVars.resultVar,
-                                                progVars.excVar,
-                                                progVars.heapAtPreVar,
-                                                progVars.savedHeapAtPreVar,
-                                                false);
-            if (clauses.assignable_backup != null) {
-                contract = contract.setModifiesBackup(clauses.assignable_backup);
-                contract = contract.setModality(Modality.BOX_TRANSACTION);
+            FunctionalOperationContract contract = cf.func(
+                    name, pm, false, clauses.requires,
+                    clauses.measuredBy, post, clauses.assignable, progVars);
+            if(clauses.assignable_backup != null) {
+               contract = cf.setModifiesBackup(contract, clauses.assignable_backup);
+               contract = cf.setModality(contract, Modality.BOX_TRANSACTION);
             }
             result = result.add(contract);
         } else {
-            FunctionalOperationContract contract1 =
-                    cf.createFunctionalContract(name, pm.getContainerType(), pm,
-                                                Modality.DIA,
-                                                TB.and(clauses.requires,
-                                                       TB.not(clauses.diverges)),
-                                                clauses.measuredBy,
-                                                clauses.assignable,
-                                                null,
-                                                progVars.selfVar,
-                                                progVars.paramVars,
-                                                post,
-                                                progVars.resultVar,
-                                                progVars.excVar,
-                                                progVars.heapAtPreVar,
-                                                progVars.savedHeapAtPreVar,
-                                                false);
+            FunctionalOperationContract contract1 = cf.func(
+                    name, pm, true,
+                    TB.and(clauses.requires, TB.not(clauses.diverges)),
+                    clauses.measuredBy, post, clauses.assignable,
+                    progVars);
             FunctionalOperationContract contract2 =
-                    cf.createFunctionalContract(name, pm.getContainerType(), pm,
-                                                Modality.BOX,
-                                                clauses.requires,
-                                                clauses.measuredBy,
-                                                clauses.assignable, null,
-                                                progVars.selfVar,
-                                                progVars.paramVars, post,
-                                                progVars.resultVar,
-                                                progVars.excVar,
-                                                progVars.heapAtPreVar,
-                                                progVars.savedHeapAtPreVar,
-                                                false);
-            if (clauses.assignable_backup != null) {
-                contract1 = contract1.setModifiesBackup(
-                        clauses.assignable_backup);
-                contract1 = contract1.setModality(Modality.DIA_TRANSACTION);
-                contract2 = contract2.setModifiesBackup(
-                        clauses.assignable_backup);
-                contract2 = contract2.setModality(Modality.BOX_TRANSACTION);
+                    cf.func(name, pm, false,
+                                                        clauses.requires,
+                                                        clauses.measuredBy, post,
+                                                        clauses.assignable,
+                                                        progVars);
+            if(clauses.assignable_backup != null) {
+               contract1 = cf.setModifiesBackup(contract1, clauses.assignable_backup);
+               contract1 = cf.setModality(contract1, Modality.DIA_TRANSACTION);
+               contract2 = cf.setModifiesBackup(contract2, clauses.assignable_backup);
+               contract2 = cf.setModality(contract2, Modality.BOX_TRANSACTION);
             }
             result = result.add(contract1).add(contract2);
         }
@@ -634,14 +583,11 @@ public class JMLSpecFactory {
         ImmutableSet<Contract> result = DefaultImmutableSet.<Contract>nil();
         if (!clauses.accessible.equalsModRenaming(TB.allLocs(services))) {
             assert (progVars.selfVar == null) == pm.isStatic();
-            final Contract depContract =
-                    new DependencyContractImpl("JML accessible clause",
-                                               pm.getContainerType(),
-                                               pm, clauses.requires,
-                                               clauses.measuredBy,
-                                               clauses.accessible,
-                                               progVars.selfVar,
-                                               progVars.paramVars);
+            final Contract depContract = cf.dep(
+                    pm.getContainerType(), pm,
+                    clauses.requires, clauses.measuredBy,
+                    clauses.accessible, progVars.selfVar,
+                    progVars.paramVars);
             result = result.add(depContract);
         }
         return result;
@@ -856,8 +802,7 @@ public class JMLSpecFactory {
                                         null, null, null,
                                         Triple.class, services);
         assert dep.first.arity() <= 2;
-        return cf.createDependencyContract(kjt, dep, dep.first.isStatic() ? null
-                                                     : selfVar);
+        return cf.dep(kjt, dep, dep.first.isStatic() ? null : selfVar);
     }
 
 
@@ -890,33 +835,12 @@ public class JMLSpecFactory {
 
         // create contracts
         ImmutableSet<Contract> result = DefaultImmutableSet.<Contract>nil();
-        //TODO: use symbolic execution contract...
-        result = result.union(
-                createFunctionalOperationContracts(name, pm, progVars, clauses,
-                                                   post));
+        result = result.union(createFunctionalOperationContracts(name, pm,
+                                                                 progVars,
+                                                                 clauses, post));
         result = result.union(createDependencyOperationContract(pm, progVars,
                                                                 clauses));
-        OperationContract symbExecContract =
-                cf.createSymbolicExecContract(pm.getContainerType(), pm,
-                                              Modality.BOX, clauses.requires,
-                                              clauses.measuredBy,
-                                              clauses.assignable, null,
-                                              progVars.selfVar,
-                                              progVars.paramVars);
-        result = result.add(symbExecContract);
-        if (!clauses.respects.isEmpty()) {
-            result = result.add(
-                    cf.createInformationFlowContract(pm.getContainerType(), pm,
-                                                     Modality.BOX,
-                                                     clauses.requires,
-                                                     clauses.measuredBy,
-                                                     clauses.assignable, null,
-                                                     progVars.selfVar,
-                                                     progVars.paramVars,
-                                                     clauses.accessible,
-                                                     clauses.respects,
-                                                     clauses.declassify));
-        }
+
         return result;
     }
 
