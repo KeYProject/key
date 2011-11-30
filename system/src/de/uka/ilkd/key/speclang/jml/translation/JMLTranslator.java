@@ -51,8 +51,9 @@ import de.uka.ilkd.key.ldt.BooleanLDT;
  */
 final class JMLTranslator {
 
-    private final static JMLTranslator instance = new JMLTranslator();
     private final static TermBuilder TB = TermBuilder.DF;
+    private Services services;                          // to be used in future
+    private SLTranslationExceptionManager excManager;
 
     private EnumMap<JMLKeyWord, JMLTranslationMethod> translationMethods;
 
@@ -110,7 +111,11 @@ final class JMLTranslator {
     };
 
 
-    private JMLTranslator() {
+    public JMLTranslator(SLTranslationExceptionManager excManager,
+                         Services services) {
+        this.excManager = excManager;
+        this.services = services;
+        
         translationMethods =
                 new EnumMap<JMLKeyWord, JMLTranslationMethod>(JMLKeyWord.class) {
                     public JMLTranslationMethod get(JMLKeyWord key) {
@@ -364,7 +369,6 @@ final class JMLTranslator {
         translationMethods.put(JMLKeyWord.SUM,
                                new JMLBoundedNumericalQuantifierTranslationMethod() {
 
-
             @Override
             public Term translateBoundedNumericalQuantifier(
                     QuantifiableVariable qv,
@@ -374,17 +378,20 @@ final class JMLTranslator {
                 return TB.bsum(qv, lo, hi, body, services);
             }
         });
-        
-        translationMethods.put(JMLKeyWord.NUM_OF, new JMLBoundedNumericalQuantifierTranslationMethod(){
 
+        translationMethods.put(JMLKeyWord.NUM_OF,
+                               new JMLBoundedNumericalQuantifierTranslationMethod() {
 
             @Override
             public Term translateBoundedNumericalQuantifier(
-                    QuantifiableVariable qv, Term lo, Term hi, Term body) {
-                final Term cond = TB.ife(TB.convertToFormula(body,services), TB.one(services), TB.zero(services));
+                    QuantifiableVariable qv,
+                    Term lo,
+                    Term hi,
+                    Term body) {
+                final Term cond = TB.ife(TB.convertToFormula(body, services),
+                                         TB.one(services), TB.zero(services));
                 return TB.bsum(qv, lo, hi, cond, services);
             }
-            
         });
 
         // primary expressions
@@ -907,27 +914,19 @@ final class JMLTranslator {
     }
 
 
-    //-------------------------------------------------------------------------
-    // public methods
-    //-------------------------------------------------------------------------
-    public static JMLTranslator getInstance() {
-        return instance;
-    }
-    
-
     /**
      *
      */
     public static <T> T translate(PositionedString expr,
-                           KeYJavaType specInClass,
-                           ProgramVariable selfVar,
-                           ImmutableList<ProgramVariable> paramVars,
-                           ProgramVariable resultVar,
-                           ProgramVariable excVar,
-                           Term heapAtPre,
-                           Term savedHeapAtPre,
-                           Class<T> resultClass,
-                           Services services)
+                                  KeYJavaType specInClass,
+                                  ProgramVariable selfVar,
+                                  ImmutableList<ProgramVariable> paramVars,
+                                  ProgramVariable resultVar,
+                                  ProgramVariable excVar,
+                                  Term heapAtPre,
+                                  Term savedHeapAtPre,
+                                  Class<T> resultClass,
+                                  Services services)
             throws SLTranslationException {
         final KeYJMLParser parser = new KeYJMLParser(expr, services,
                                                      specInClass, selfVar,
@@ -947,13 +946,19 @@ final class JMLTranslator {
      *
      */
     public <T> T translate(String jmlKeyWordName,
-                           SLTranslationExceptionManager excManager,
                            Class<T> resultClass,
                            Object... params)
             throws SLTranslationException {
         try {
             JMLKeyWord jmlKeyWord = JMLKeyWord.jmlValueOf(jmlKeyWordName);
             JMLTranslationMethod m = translationMethods.get(jmlKeyWord);
+            if (m == null) {
+                throw excManager.createException(
+                        "Unknown JML-keyword or unknown translation for "
+                        + "JML-keyword \"" + jmlKeyWordName
+                        + "\". The keyword seems "
+                        + "not to be supported yet.");
+            }
             Object result = m.translate(excManager, params);
             resultClass.cast(result);
             return castToReturnType(result, resultClass);
@@ -998,7 +1003,8 @@ final class JMLTranslator {
 
 
 //    @SuppressWarnings("unchecked")
-    private static <T> T castToReturnType(Object result, Class<T> resultClass)
+    private static <T> T castToReturnType(Object result,
+                                          Class<T> resultClass)
             throws SLTranslationException {
         if (!resultClass.isInstance(result)) {
             throw new SLTranslationException(
