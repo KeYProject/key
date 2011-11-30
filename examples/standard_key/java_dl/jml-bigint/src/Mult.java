@@ -21,8 +21,11 @@ public class Mult {
         int z = 0;
         boolean p = x > 0;
         if (p) x = -x;
-        //@ maintaining z == y * (p? (\old(x)+x) : (x-\old(x)));
-        //@ decreasing -x;
+	//@ ghost int oldx = x;
+	/*@ maintaining oldx <= x && x <= 0;
+          @ maintaining z == y * (p? (\old(x)+x) : (x-\old(x)));
+          @ decreasing -x;
+	  @*/
         while (x++ < 0) z += y;
         return p? z: -z;
     }
