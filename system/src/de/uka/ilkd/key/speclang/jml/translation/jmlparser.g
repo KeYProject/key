@@ -100,8 +100,10 @@ options {
 	this.excVar	    = exc;
 	this.heapAtPre      = heapAtPre;
         this.savedHeapAtPre = savedHeapAtPre;
-	
-	this.translator = JMLTranslator.getInstance(services, excManager);
+
+
+        intHelper = new JavaIntegerSemanticsHelper(services, excManager);
+	this.translator = JMLTranslator.getInstance();
 
 	// initialize helper objects
 	this.resolverManager = new JMLResolverManager(this.javaInfo,
@@ -117,8 +119,6 @@ options {
 	if(resultVar != null) {
 	    resolverManager.putIntoTopLocalVariablesNamespace(resultVar);
 	}
-
-	intHelper = new JavaIntegerSemanticsHelper(services, excManager);
     }
     
     
@@ -947,17 +947,17 @@ shiftexpr returns [SLExpression result=null] throws SLTranslationException
     (
 	sr:SHIFTRIGHT e=additiveexpr
 	{
-        result = translator.<SLExpression>translate(sr.getText(), result, e);
+        result = translator.<SLExpression>translate(sr.getText(), excManager, services, result, e);
 	}
     |   
 	sl:SHIFTLEFT e=additiveexpr 
 	{
-        result = translator.<SLExpression>translate(sl.getText(), result, e);
+        result = translator.<SLExpression>translate(sl.getText(), excManager, services, result, e);
 	}
     |   
 	usr:UNSIGNEDSHIFTRIGHT e=additiveexpr 
 	{
-        result = translator.<SLExpression>translate(usr.getText(), result, e);
+        result = translator.<SLExpression>translate(usr.getText(), excManager, services, result, e);
 	}
     )*
 ; 
@@ -972,12 +972,12 @@ additiveexpr returns [SLExpression result=null] throws SLTranslationException
     (
 	plus:PLUS e=multexpr
 	{
-        result = translator.<SLExpression>translate(plus.getText(), result, e);
+        result = translator.<SLExpression>translate(plus.getText(), excManager, services, result, e);
 	}
     |
 	minus:MINUS e=multexpr
 	{
-	    result = translator.<SLExpression>translate(minus.getText(), result, e);
+	    result = translator.<SLExpression>translate(minus.getText(), excManager, services, result, e);
 	}
     )*
 ;

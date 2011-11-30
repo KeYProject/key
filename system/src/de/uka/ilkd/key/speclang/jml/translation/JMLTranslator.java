@@ -36,9 +36,6 @@ import de.uka.ilkd.key.speclang.translation.SLExpression;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.speclang.translation.SLTranslationExceptionManager;
 import de.uka.ilkd.key.util.*;
-import de.uka.ilkd.key.util.LinkedHashMap;
-import de.uka.ilkd.key.util.Pair;
-import de.uka.ilkd.key.util.Triple;
 import java.util.EnumMap;
 import java.util.Arrays;
 
@@ -56,7 +53,7 @@ final class JMLTranslator {
     private final static TermBuilder TB = TermBuilder.DF;
 
     private EnumMap<JMLKeyWord, JMLTranslationMethod> translationMethods;
-
+    
     public static enum JMLKeyWord {
         ARRAY_REF ("array reference"),
         INV_FOR ("\\invariant_for"),
@@ -88,7 +85,12 @@ final class JMLTranslator {
         REACH ("reach"),
         REACH_LOCS ("reachLocs"),
         COMMENTARY ("(* *)"),
-        DL ("\\dl_");
+        DL ("\\dl_"),
+        ADD ("+"),
+        SUBTRACT ("-"),
+        SHIFT_LEFT ("<<"),
+        SHIFT_RIGHT (">>"),
+        UNSIGNED_SHIFT_RIGHT (">>>");
 
         private final String jmlName;
         JMLKeyWord(String name) {
@@ -397,6 +399,7 @@ final class JMLTranslator {
             public SLExpression translate(SLTranslationExceptionManager excManager, Object... params)
                     throws SLTranslationException {
                 checkParameters(params, Services.class, SLExpression.class);
+                final Services services = (Services)params[0];
                 Function inv = services.getJavaInfo().getInv();
                 Term obj = ((SLExpression)params[1]).getTerm();
                 return new SLExpression(TB.func(inv, TB.heap(services), obj));
@@ -466,6 +469,7 @@ final class JMLTranslator {
             public Object translate(SLTranslationExceptionManager excManager, Object... params)
                     throws SLTranslationException {
                 checkParameters(params, Services.class, SLExpression.class, SLExpression.class);
+                final Services services = (Services)params[0];
                 final Term seq = ((SLExpression)params[1]).getTerm();
                 final Term elem = ((SLExpression)params[2]).getTerm();
                 final KeYJavaType inttype = services.getJavaInfo().getPrimitiveKeYJavaType(PrimitiveType.JAVA_BIGINT);
@@ -480,6 +484,7 @@ final class JMLTranslator {
             public Object translate(SLTranslationExceptionManager excManager, Object... params)
                     throws SLTranslationException {
                 checkParameters(params, Services.class, SLExpression.class, SLExpression.class);
+                final Services services = (Services)params[0];
                 final Term seq = ((SLExpression)params[1]).getTerm();
                 final Term idx = ((SLExpression)params[2]).getTerm();
                 return new SLExpression(TB.seqGet(services, Sort.ANY, seq, idx));
@@ -493,6 +498,7 @@ final class JMLTranslator {
             public Object translate(SLTranslationExceptionManager excManager, Object... params)
                     throws SLTranslationException {
                 checkParameters(params, Services.class, SLExpression.class, SLExpression.class);
+                final Services services = (Services)params[0];
                 final Term seq1 = ((SLExpression)params[1]).getTerm();
                 final Term seq2 = ((SLExpression)params[2]).getTerm();
                 final KeYJavaType seqtype = services.getJavaInfo().getPrimitiveKeYJavaType("\\seq");
@@ -509,6 +515,7 @@ final class JMLTranslator {
             public Object translate(SLTranslationExceptionManager excManager, Object... params)
                     throws SLTranslationException {
                 checkParameters(params, Services.class, SLExpression.class, SLExpression.class);
+                final Services services = (Services)params[0];
                 final Term seq = ((SLExpression)params[1]).getTerm();
                 final Term elem = ((SLExpression)params[2]).getTerm();
                 final LogicVariable i = new LogicVariable(new Name("i"), services.getJavaInfo().getPrimitiveKeYJavaType(PrimitiveType.JAVA_BIGINT).getSort());
@@ -663,10 +670,10 @@ final class JMLTranslator {
             }
         });
 
-        translationMethods.put(">>", new JMLArithmeticOperationTranslationMethod(){
+        translationMethods.put(JMLKeyWord.SHIFT_RIGHT, new JMLArithmeticOperationTranslationMethod(){
 
             @Override
-            public SLExpression translate(SLExpression a, SLExpression e)
+            public SLExpression translate(JavaIntegerSemanticsHelper intHelper, SLExpression a, SLExpression e)
             throws SLTranslationException {
                 checkNotBigint(a);
                 checkNotBigint(e);
@@ -681,10 +688,10 @@ final class JMLTranslator {
 
         });
 
-        translationMethods.put("<<", new JMLArithmeticOperationTranslationMethod(){
+        translationMethods.put(JMLKeyWord.SHIFT_LEFT, new JMLArithmeticOperationTranslationMethod(){
 
             @Override
-            public SLExpression translate(SLExpression result, SLExpression e)
+            public SLExpression translate(JavaIntegerSemanticsHelper intHelper, SLExpression result, SLExpression e)
             throws SLTranslationException {
                 checkNotBigint(result);
                 checkNotBigint(e);
@@ -699,10 +706,10 @@ final class JMLTranslator {
 
         });
 
-        translationMethods.put(">>>", new JMLArithmeticOperationTranslationMethod(){
+        translationMethods.put(JMLKeyWord.UNSIGNED_SHIFT_RIGHT, new JMLArithmeticOperationTranslationMethod(){
 
             @Override
-            public SLExpression translate(SLExpression result, SLExpression e)
+            public SLExpression translate(JavaIntegerSemanticsHelper intHelper, SLExpression result, SLExpression e)
             throws SLTranslationException {
                 checkNotBigint(result);
                 checkNotBigint(e);
@@ -716,7 +723,7 @@ final class JMLTranslator {
             }
         });
         
-        translationMethods.put("+", new JMLArithmeticOperationTranslationMethod(){
+        translationMethods.put(JMLKeyWord.ADD, new JMLArithmeticOperationTranslationMethod(){
 
             @Override
             public String opName() {
@@ -724,14 +731,14 @@ final class JMLTranslator {
             }
 
             @Override
-            protected SLExpression translate(SLExpression left,
+            protected SLExpression translate(JavaIntegerSemanticsHelper intHelper, SLExpression left,
                     SLExpression right) throws SLTranslationException {
                     return intHelper.buildAddExpression(left, right);
             }
             
         });
         
-        translationMethods.put("-", new JMLArithmeticOperationTranslationMethod(){
+        translationMethods.put(JMLKeyWord.SUBTRACT, new JMLArithmeticOperationTranslationMethod(){
 
             @Override
             protected String opName() {
@@ -739,7 +746,7 @@ final class JMLTranslator {
             }
 
             @Override
-            protected SLExpression translate(SLExpression left,
+            protected SLExpression translate(JavaIntegerSemanticsHelper intHelper, SLExpression left,
                     SLExpression right) throws SLTranslationException {
                 return intHelper.buildSubExpression(left, right);
             }
@@ -989,34 +996,8 @@ final class JMLTranslator {
     //-------------------------------------------------------------------------
 
 
-    @Deprecated
     public static JMLTranslator getInstance() {
         return instance;
-    }
-    
-    public static JMLTranslator getInstance (Services services, SLTranslationExceptionManager sltem){
-        instance.setExceptionManager(sltem);
-        instance.setServices(services);
-        instance.setIntHelper(new JavaIntegerSemanticsHelper(services, sltem));
-        return instance;
-    }
-
-
-    @SuppressWarnings("unchecked")
-    public <T> T translate(String jmlKeyword,
-                          Object... params)
-            throws SLTranslationException {
-        JMLTranslationMethod m = translationMethods.get(jmlKeyword);
-        if (m != null) {
-            Object result = m.translate(params);
-            this.<T>checkReturnType(result);
-            return (T) result;
-        } else {
-            throw new SLTranslationException(
-                    "Unknown translation for JML-keyword \""
-                    + jmlKeyword
-                    + "\". The keyword seems not to be supported yet.");
-        }
     }
 
 
@@ -1052,6 +1033,7 @@ final class JMLTranslator {
     /**
      *
      */
+    @SuppressWarnings("unchecked")
     public <T> T translate(String jmlKeyWordName,
                            SLTranslationExceptionManager excManager,
                            Object... params)
@@ -1077,7 +1059,7 @@ final class JMLTranslator {
     // private methods
     //-------------------------------------------------------------------------
     private void checkParameters(Object[] params,
-                                 Class... classes)
+                                 Class<?>... classes)
             throws SLTranslationException {
         boolean ok = true;
         int i = 0;
@@ -1102,7 +1084,6 @@ final class JMLTranslator {
     }
 
 
-    @SuppressWarnings("unchecked")
     private <T> void checkReturnType(Object result)
             throws SLTranslationException {
         try {
@@ -1126,18 +1107,6 @@ final class JMLTranslator {
     private void addIgnoreWarning(String feature) {
         String msg = feature + " is not supported and has been silently ignored.";
         // TODO: wasn't there some collection of non-critical warnings ???
-    }
-    
-    private void setServices (Services services){
-        this.services = services;
-    }
-    
-    private void setIntHelper (JavaIntegerSemanticsHelper intHelper){
-        this.intHelper = intHelper;
-    }
-    
-    private void setExceptionManager (SLTranslationExceptionManager sltem){
-        excManager = sltem;
     }
 
     //-------------------------------------------------------------------------
@@ -1485,40 +1454,52 @@ final class JMLTranslator {
      */
     private abstract class JMLArithmeticOperationTranslationMethod implements JMLTranslationMethod {
         
+        @SuppressWarnings("unused")
+        protected KeYJavaType bigint;
+        
+        @SuppressWarnings("unused")
+        protected String BIGINT_NOT_ALLOWED = "Operation "+opName()+" may only be used with primitive Java types, not with \\bigint";
+
+        @SuppressWarnings("unused")
+        protected boolean isBigint(SLExpression e) {
+            assert bigint != null;
+            return e.getType().equals(bigint);
+        }
         
         protected void checkNotBigint(SLExpression e) throws SLTranslationException {
-            if (isBigint(e))
-                raiseError("Operation "+opName()+" may only be used with primitive Java types, not with \\bigint");
+            if (isBigint(e)) {
+                throw new SLTranslationException(BIGINT_NOT_ALLOWED);
+            }
         }
 
-        protected boolean isBigint(SLExpression e) {
-            return e.getType().equals(bigint());
-        }
-
-        protected KeYJavaType bigint() {
-            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
-        }
-
-        private void checkNotType(SLExpression e)
+        private void checkNotType(SLExpression e, SLTranslationExceptionManager man)
                 throws SLTranslationException {
             if (e.isType()) {
-                raiseError("Cannot use operation "+opName()+" on type " +
+                throw man.createException("Cannot use operation "+opName()+" on type " +
                         e.getType().getName() + ".");
             }
             assert e.isTerm();
         }
         
         @Override
-        public Object translate (Object ... params ) throws SLTranslationException{
-            checkParameters(params, SLExpression.class, SLExpression.class);
-            SLExpression result = (SLExpression) params[0];
-            SLExpression e = (SLExpression) params[1];
-            checkNotType(result);
-            checkNotType(e);
-            return translate(result,e);
+        public SLExpression translate (SLTranslationExceptionManager man, Object ... params ) throws SLTranslationException{
+            checkParameters(params, Services.class, SLExpression.class, SLExpression.class);
+            JavaIntegerSemanticsHelper jish = new JavaIntegerSemanticsHelper((Services)params[0],man);
+            bigint = ((Services)params[0]).getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
+            SLExpression e1 = (SLExpression) params[1];
+            SLExpression e2 = (SLExpression) params[2];
+            checkNotType(e1,man);
+            checkNotType(e2,man);
+            SLExpression result = null;
+            try {
+                result = translate(jish,e1,e2);
+            } catch (SLTranslationException cause){
+                throw man.createException("Cannot create JML arithmetic expression", cause);
+            }
+            return result;
         }
         
         protected abstract String opName();
-        protected abstract SLExpression translate(SLExpression left, SLExpression right) throws SLTranslationException;
+        protected abstract SLExpression translate(JavaIntegerSemanticsHelper intHelper, SLExpression left, SLExpression right) throws SLTranslationException;
     }
 }
