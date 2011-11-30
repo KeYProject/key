@@ -672,6 +672,7 @@ final class JMLTranslator {
         translationMethods.put(JMLKeyWord.COMMENTARY, new JMLTranslationMethod() {
             public Object translate(SLTranslationExceptionManager excManager, Object... params) throws SLTranslationException {
 
+            @Override
                 checkParameters(params, Services.class, Token.class,
                         LocationVariable.class, LocationVariable.class, 
                         ImmutableList.class, Term.class);
@@ -917,8 +918,7 @@ final class JMLTranslator {
     /**
      *
      */
-    @SuppressWarnings("unchecked")
-    public <T> T translate(PositionedString expr,
+    public static <T> T translate(PositionedString expr,
                            KeYJavaType specInClass,
                            ProgramVariable selfVar,
                            ImmutableList<ProgramVariable> paramVars,
@@ -926,6 +926,7 @@ final class JMLTranslator {
                            ProgramVariable excVar,
                            Term heapAtPre,
                            Term savedHeapAtPre,
+                           Class<T> resultClass,
                            Services services)
             throws SLTranslationException {
         final KeYJMLParser parser = new KeYJMLParser(expr, services,
@@ -938,8 +939,7 @@ final class JMLTranslator {
         } catch (antlr.ANTLRException e) {
             throw parser.getExceptionManager().convertException(e);
         }
-        this.<T>checkReturnType(result);
-        return (T) result;
+        return castToReturnType(result, resultClass);
     }
     
 
@@ -948,14 +948,15 @@ final class JMLTranslator {
      */
     public <T> T translate(String jmlKeyWordName,
                            SLTranslationExceptionManager excManager,
+                           Class<T> resultClass,
                            Object... params)
             throws SLTranslationException {
         try {
             JMLKeyWord jmlKeyWord = JMLKeyWord.jmlValueOf(jmlKeyWordName);
             JMLTranslationMethod m = translationMethods.get(jmlKeyWord);
             Object result = m.translate(excManager, params);
-            this.<T>checkReturnType(result);
-            return (T) result;
+            resultClass.cast(result);
+            return castToReturnType(result, resultClass);
         } catch (IllegalArgumentException e) {
             throw excManager.createException(
                     "Unknown JML-keyword or unknown translation for "
@@ -996,18 +997,16 @@ final class JMLTranslator {
     }
 
 
-    @SuppressWarnings("unchecked")
-    private <T> void checkReturnType(Object result)
+//    @SuppressWarnings("unchecked")
+    private static <T> T castToReturnType(Object result, Class<T> resultClass)
             throws SLTranslationException {
-        try {
-            // TODO This is not type-safe. Implement this with a Class-argument.
-            result = (T) result;
-        } catch (ClassCastException e) {
+        if (!resultClass.isInstance(result)) {
             throw new SLTranslationException(
                     "Return value does not match the expected return type:\n"
                     + "Return type was: " + result.getClass() + "\n"
-                    + "Tried conversion was: " + e.getMessage());
+                    + "Expected type was: " + resultClass);
         }
+        return (T) result;
     }
 
 

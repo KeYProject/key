@@ -317,14 +317,13 @@ top returns [Object result = null] throws  SLTranslationException
     (   result = accessibleclause
     |   result = assignableclause
     |   result = dependsclause
-    |   result = requiresclause
+    |   result = declassifyclause
     |   result = ensuresclause
     |   result = representsclause
+    |   result = requiresclause
+    |   result = respectsclause
     |   result = signalsclause
     |   result = signalsonlyclause
-    |   result = respectsclause
-    |   result = secureforclause
-    |   result = declassifyclause
     |   result = termexpression
     )
     (SEMI)? EOF
@@ -333,15 +332,31 @@ top returns [Object result = null] throws  SLTranslationException
 
 accessibleclause returns [Term result = null] throws SLTranslationException
 :
-    acc:ACCESSIBLE result=storereflist
-        { result = translator.<Term>translate(acc.getText(), excManager, result, services); }
+    acc:ACCESSIBLE result=storeRefUnion
+        { result = translator.translate(acc.getText(), excManager, Term.class, result, services); }
     ;
 
 
 assignableclause returns [Term result = null] throws SLTranslationException
 :
-    ass:ASSIGNABLE result=storereflist
-        { result = translator.<Term>translate(ass.getText(), excManager, result, services); }
+    ass:ASSIGNABLE result=storeRefUnion
+        { result = translator.translate(ass.getText(), excManager, Term.class, result, services); }
+    ;
+
+
+declassifyclause returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException
+{
+    Term declass = null;
+    Term frompart = null;
+    Term topart = null;
+    Term ifpart = null;
+}
+:
+    del:DECLASSIFY declass = predicate
+    (FROM frompart = storeRefUnion)?
+    (TO topart = storeRefUnion)?
+    (IF ifpart = predicate)?
+    { result = translator.translate(del.getText(), excManager, ImmutableList.class, declass, frompart, topart, ifpart, services); }
     ;
 
 
@@ -352,24 +367,24 @@ dependsclause returns [Triple<ObserverFunction,Term,Term> result=null] throws SL
 }
 :
     dep:DEPENDS lhs=expression
-    COLON rhs=storereflist
+    COLON rhs=storeRefUnion
     (MEASURED_BY mby=expression)? SEMI
-        { result = translator.<Triple<ObserverFunction,Term,Term>>translate(
-                dep.getText(), excManager, lhs, rhs, mby, services); }
+        { result = translator.translate(
+                dep.getText(), excManager, Triple.class, lhs, rhs, mby, services); }
     ;
 
 
 requiresclause returns [Term result = null] throws SLTranslationException
 :
     req:REQUIRES result=termexpression
-            { result = translator.<Term>translate(req.getText(), excManager, result, services); }
+            { result = translator.translate(req.getText(), excManager, Term.class, result, services); }
     ;
 
 
 ensuresclause returns [Term result = null] throws SLTranslationException
 :
     ens:ENSURES result=termexpression
-            { result = translator.<Term>translate(ens.getText(), excManager, result, services); }
+            { result = translator.translate(ens.getText(), excManager, Term.class, result, services); }
     ;
 
 
@@ -411,7 +426,7 @@ representsclause returns [Pair<ObserverFunction,Term> result=null] throws SLTran
         { // TODO: move code out of the parser!
           lhs.getTerm().sort().equals(locSetLDT.targetSort())}?
         (
-            (LARROW | EQUAL_SINGLE) t=storereflist
+            (LARROW | EQUAL_SINGLE) t=storeRefUnion
             {   // TODO: move code out of the parser!
                 t = TB.equals(lhs.getTerm(), t);
             }
@@ -421,7 +436,18 @@ representsclause returns [Pair<ObserverFunction,Term> result=null] throws SLTran
             SUCH_THAT t=predicate
         )
     )
-    { result = translator.<Pair<ObserverFunction,Term>>translate(rep.getText(), excManager, lhs, t, services); }
+    { result = translator.translate(rep.getText(), excManager, Pair.class, lhs, t, services); }
+    ;
+
+
+respectsclause returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException {
+    Term term = null;
+}
+:
+    resp:RESPECTS
+    term = storeref { result = result.append(term); }
+    (COMMA term = storeref { result = result.append(term); })*
+        { result = translator.translate(resp.getText(), excManager, ImmutableList.class, result, services); }
     ;
 
 
@@ -446,7 +472,7 @@ signalsclause returns [Term result=null] throws SLTranslationException
 	    if (vName != null) {
 		resolverManager.popLocalVariablesNamespace();
 	    }
-            result = translator.<Term>translate(sig.getText(), excManager, result, eVar, excVar, excType, services);
+            result = translator.translate(sig.getText(), excManager, Term.class, result, eVar, excVar, excType, services);
 	}
     ;
 
@@ -462,49 +488,8 @@ throws SLTranslationException {
       | type = referencetype { typeList = typeList.append(type); }
         (COMMA type = referencetype { typeList = typeList.append(type); })*
     )
-    { result = translator.<Term>translate(sigo.getText(), excManager, typeList, this.excVar, services); }
+    { result = translator.translate(sigo.getText(), excManager, Term.class, typeList, this.excVar, services); }
     ;
-
-respectsclause returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException {
-    Term term = null;
-}
-:
-    resp:RESPECTS
-    term = storeref {/* result = result.append(term);*/ }
-    (COMMA term = storeref { /* result = result.append(term);*/ })*
-        { /*result = translator.<ImmutableList<Term>>translate(resp.getText(), excManager, result, services);*/ }
-    ;
-
-
-secureforclause returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException {
-    Term term = null;
-}
-:
-    sec:SECURE_FOR
-    term = storeref { /*result = result.append(term); */}
-    (   (COMMA term = storeref {/* result = result.append(term);*/ })*
-        COLON term = storeref { result = result.append(term); }
-    )?
-        { /*result = translator.<ImmutableList<Term>>translate(sec.getText(), excManager, result, services); */}
-    ;
-    
-declassifyclause returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException
-    {
-        Term declass = null;
-        Term frompart = null;
-        Term topart = null;
-        Term ifpart = null;
-    }
-    :
-        del:DECLASSIFY declass = predicate
-        (FROM frompart = storereflist)?
-        (TO topart = storereflist)?
-        (IF ifpart = predicate)?
-        {/* result = translator.<ImmutableList<Term>>translate(
-                del.getText(), excManager, declass, frompart, topart, ifpart, services); */}
-        ;
-
-
 
 
 termexpression returns [Term result = null] throws SLTranslationException {
@@ -515,48 +500,67 @@ termexpression returns [Term result = null] throws SLTranslationException {
     ;
 
 
-storereflist returns [Term result = null] throws SLTranslationException
+storeRefUnion returns [Term result = null] throws SLTranslationException {
+    ImmutableList<Term> list = null;
+}
+:   list = storeRefList
+    { result = TB.union(services, list); };
+
+
+storeRefList returns [ImmutableList<Term> result = ImmutableSLList.<Term>nil()]
+        throws SLTranslationException {
+    Term t = null;
+}
+:   t = storeref { result = result.append(t); }
+	(COMMA t = storeref { result = result.append(t); } )*;
+
+
+
+storeRefIntersect returns [Term result = null] throws SLTranslationException {
+    ImmutableList<Term> list = null;
+}
+:   list = storeRefList { result = TB.intersect(services, list); };
+
+
+storeref returns [Term result = null] throws SLTranslationException {
+    SLExpression expr;
+}
+:       NOTHING { result = TB.empty(services); }
+    |   EVERYTHING { result = TB.createdLocs(services); }
+    |   NOT_SPECIFIED { result = TB.createdLocs(services); }
+    |   result = storeRefExpr;
+
+
+createLocset returns [Term result = null] throws SLTranslationException
 {
-    Term mod = null;
+    ImmutableList<SLExpression> list;
 }
 :
-    result=storeref
-	(COMMA mod=storeref { result = TB.union(services, result, mod); } )*
+    (LOCSET | SINGLETON) LPAREN list=exprList RPAREN
+    {
+        result = translator.translate("create locset", excManager, Term.class, list, services);
+    }
     ;
 
 
-
-storeref returns [Term result = null] throws SLTranslationException
-{
-    Term s1 = null;
-    Term s2 = null;
+exprList returns [ImmutableList<SLExpression> result = ImmutableSLList.<SLExpression>nil()]
+        throws SLTranslationException {
+    SLExpression expr = null;
 }
-:
-	result=storerefexpression
-    |   result=storerefkeyword
-    ;
+:   expr = expression { result = result.append(expr); }
+	(COMMA expr = expression { result = result.append(expr); } )*;
 
-storerefexpression returns [Term result = null] throws SLTranslationException
+
+storeRefExpr returns [Term result = null] throws SLTranslationException
 {
     SLExpression expr;
 }
 :
     expr=expression 
     {
- 	    if(expr.isTerm() && expr.getTerm().sort().equals(locSetLDT.targetSort())) {
-	    	result = expr.getTerm();
-	    } else if(expr.isTerm() && heapLDT.getSortOfSelect(expr.getTerm().op()) != null) {
-	        final Term objTerm = expr.getTerm().sub(1);
-	        final Term fieldTerm = expr.getTerm().sub(2);
-	    	result = TB.singleton(services, objTerm, fieldTerm);
-	    } else {
-	    	raiseError("Not a valid store-ref expression: " + expr.getTerm());
-	    }
+        result = translator.translate("store_ref_expr", excManager, Term.class, expr, services);
     }
-    ; exception
-        catch [TermCreationException ex] {
-	    raiseError(ex.getMessage());
-        }
+    ;
 
 
 specarrayrefexpr[SLExpression receiver, String fullyQualifiedName, Token lbrack] 
@@ -572,22 +576,11 @@ specarrayrefexpr[SLExpression receiver, String fullyQualifiedName, Token lbrack]
 	| MULT
     )
     {
-        result = translator.<SLExpression>translate("array reference", excManager, services, receiver, fullyQualifiedName, lbrack, rangeFrom, rangeTo);
+        result = translator.translate("array reference", excManager, SLExpression.class, services, receiver, fullyQualifiedName, lbrack, rangeFrom, rangeTo);
     }
 ;
 
 
-storerefkeyword returns [Term result = null] throws SLTranslationException
-{
-    KeYJavaType t = null;
-}
-:
-    NOTHING { result = TB.empty(services); }
-    | EVERYTHING { result = TB.createdLocs(services); }
-    | NOT_SPECIFIED { result = TB.createdLocs(services); }
-;
-    
-    
 predornot returns [Term result=null] throws SLTranslationException
 :
 	result=predicate
@@ -652,7 +645,7 @@ equivalenceexpr returns [SLExpression result=null] throws SLTranslationException
 :
 	result = impliesexpr
         (   eq:EQV_ANTIV right=equivalenceexpr
-            { result = translator.<SLExpression>translate(eq.getText(), excManager, result, right, services); }
+            { result = translator.translate(eq.getText(), excManager, SLExpression.class, result, right, services); }
         )?
     ;
 
@@ -802,7 +795,7 @@ equalityexpr returns [SLExpression result=null] throws SLTranslationException
 	 :
 	result=relationalexpr 
 	(   eq:EQ_NEQ right=equalityexpr
-	        { result = translator.<SLExpression>translate(eq.getText(), excManager, result, right, services); }
+	        { result = translator.translate(eq.getText(), excManager, SLExpression.class, result, right, services); }
 	)?
 ;
 
@@ -816,7 +809,7 @@ equalityexpr returns [SLExpression result=null] throws SLTranslationException
 //    { 
 //        assert right != null;
 //        for (Pair<Token,SLExpression> pair: right) { 
-//            result = translator.<SLExpression>translate(pair.first.getText(), excManager, result, pair.second, excManager, services);
+//            result = translator.translate(pair.first.getText(), excManager, SLExpression.class, result, pair.second, excManager, services);
 //        }
 //    }
 //;
@@ -1435,6 +1428,7 @@ decimalnumeral returns [SLExpression result=null] throws SLTranslationException
 jmlprimary returns [SLExpression result=null] throws SLTranslationException
 {
     ImmutableList<SLExpression> list = null;
+    ImmutableList<Term> tlist = null;
     SLExpression e1 = null;
     SLExpression e2 = null;
     SLExpression e3 = null;
@@ -1521,18 +1515,18 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
     |   desc:INFORMAL_DESCRIPTION 
 	{
 	    // was: raiseNotSupported("informal predicates");
-	    result = translator.<SLExpression>translate("(* *)", excManager, services, desc, 
+	    result = translator.translate("(* *)", excManager, SLExpression.class, services, desc, 
 	        selfVar, resultVar, paramVars, heapAtPre);
 	}
 	
     |   escape:DL_ESCAPE LPAREN ( list=expressionlist )? RPAREN
         {
-            result = translator.<SLExpression>translate("\\dl_", excManager, escape, list, services);
+            result = translator.translate("\\dl_", excManager, SLExpression.class, escape, list, services);
         }
         
-    |   NOT_MODIFIED LPAREN t=storereflist RPAREN
+    |   NOT_MODIFIED LPAREN t=storeRefUnion RPAREN
         {
-        result = new SLExpression(translator.<Term>translate("\\not_modified", excManager, services, heapAtPre, t));
+        result = new SLExpression(translator.translate("\\not_modified", excManager, Term.class, services, heapAtPre, t));
         } 
 	
     |   FRESH LPAREN list=expressionlist RPAREN
@@ -1566,12 +1560,12 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 
     |   REACH LPAREN t=storeref COMMA e1=expression COMMA e2=expression (COMMA e3=expression)? RPAREN
 	{
-        result = translator.<SLExpression>translate("reach", excManager, t, e1, e2, e3, services);
+        result = translator.translate("reach", excManager, SLExpression.class, t, e1, e2, e3, services);
 	} 
 	
     |   REACHLOCS LPAREN t=storeref COMMA e1=expression (COMMA e3=expression)? RPAREN
 	{
-        result = translator.<SLExpression>translate("reachLocs", excManager, t, e1, e3, services);
+        result = translator.translate("reachLocs", excManager, SLExpression.class, t, e1, e3, services);
 	} 	
 	
     |   DURATION LPAREN result=expression RPAREN 
@@ -1623,7 +1617,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 	
     |   INVARIANT_FOR LPAREN result=expression RPAREN 
 	{
-	    result = translator.<SLExpression>translate("\\invariant_for", excManager, services, result);
+	    result = translator.translate("\\invariant_for", excManager, SLExpression.class, services, result);
 	    
 	} 
 	
@@ -1656,32 +1650,15 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
             result = new SLExpression(TB.empty(services),
                                       javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
         }
+
+    |   t = createLocset
+        { result = new SLExpression(t, javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET)); }
         
-    |   SINGLETON LPAREN t=storeref RPAREN
-        {
-            if(!t.op().equals(locSetLDT.getSingleton())) {
-            	if(heapLDT.getSortOfSelect(t.op()) != null) {
-	            final Term objTerm = t.sub(1);
-	            final Term fieldTerm = t.sub(2);
-	    	    t = TB.singleton(services, objTerm, fieldTerm);
-            	} else {
-                    raiseError("Not a singleton: " + t);
-                }
-            }
-            result = new SLExpression(t, javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
-        }
+    |   (UNION | UNION_2) LPAREN t=storeRefUnion RPAREN
+        { result = new SLExpression(t, javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET)); }
         
-    |   UNION LPAREN t=storeref COMMA t2 = storeref RPAREN
-        {
-            result = new SLExpression(TB.union(services, t, t2),
-                                      javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
-        }
-        
-    |   INTERSECT LPAREN t=storeref COMMA t2=storeref RPAREN
-        {
-            result = new SLExpression(TB.intersect(services, t, t2),
-                                      javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
-        }         
+    |   INTERSECT LPAREN t=storeRefIntersect RPAREN
+        { result = new SLExpression(t, javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET)); }
 
     |   SETMINUS LPAREN t=storeref COMMA t2=storeref RPAREN
         {
@@ -1718,7 +1695,12 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
     |   DISJOINT LPAREN t=storeref COMMA t2=storeref RPAREN
         {
             result = new SLExpression(TB.disjoint(services, t, t2));
-        } 
+        }
+
+    |   pd:PAIRWISE_DISJOINT LPAREN tlist=storeRefList RPAREN {
+            result = translator.translate(pd.getText(), excManager,
+                                          SLExpression.class, tlist, services);
+        }
 
     |   SUBSET LPAREN t=storeref COMMA t2=storeref RPAREN
         {
@@ -1768,7 +1750,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
     |   (tk1:SEQCONTAINS{tk=tk1;} | tk2: SEQCONCAT{tk=tk2;} | tk3: SEQGET{tk=tk3;} | tk4: INDEXOF{tk=tk4;})
         LPAREN e1=expression COMMA e2=expression RPAREN
         {
-            result = translator.<SLExpression>translate(tk.getText(), excManager, services, e1, e2);
+            result = translator.translate(tk.getText(), excManager, SLExpression.class, services, e1, e2);
         }
     |   LPAREN result=expression RPAREN
 ;
@@ -1795,7 +1777,7 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
 	    resolverManager.popLocalVariablesNamespace();
 	    
 	    p = TB.convertToFormula(p, services);
-	    result = translator.<Term>translate(q.getText(), excManager, p, expr.getTerm(), declVars.first, declVars.second, nullable, services);
+	    result = translator.translate(q.getText(), excManager, Term.class, p, expr.getTerm(), declVars.first, declVars.second, nullable, services);
 	}
 	RPAREN
 ;
@@ -1820,7 +1802,7 @@ bsumterm returns [SLExpression result=null] throws SLTranslationException
             a=expression SEMI  b=expression SEMI t=expression
         )
         {
-            result = translator.<SLExpression>translate(q.getText(), excManager, a, b, t, decls.first, decls.second, services);
+            result = translator.translate(q.getText(), excManager, SLExpression.class, a, b, t, decls.first, decls.second, services);
             resolverManager.popLocalVariablesNamespace();
         }
         RPAREN
