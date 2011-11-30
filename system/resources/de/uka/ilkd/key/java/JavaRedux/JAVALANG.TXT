@@ -14,8 +14,6 @@
 
 # java.lang.Object has been modified manually!
 
-java/lang/Object.java
-
 java/lang/annotation/Annotation.java
 java/lang/ArithmeticException.java
 java/lang/ArrayIndexOutOfBoundsException.java
@@ -38,7 +36,6 @@ java/lang/LinkageError.java
 java/lang/NegativeArraySizeException.java
 java/lang/NoClassDefFoundError.java
 java/lang/NullPointerException.java
-java/lang/Number.java
 java/lang/NumberFormatException.java
 java/lang/VirtualMachineError.java
 java/lang/OutOfMemoryError.java
