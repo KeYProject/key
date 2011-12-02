@@ -1,8 +1,9 @@
-package de.uka.ilkd.key.gui.delayedcut;
+package de.uka.ilkd.key.gui.utilities;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -10,8 +11,21 @@ import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 
 
+/**
+ * A dialog offering three buttons at the lower border: Help (optional), Okay and Cancel.
+ * The content of the dialog is passed to the dialog by the constructor of the class.
+ * You can access the three buttons (in order to add some action listeners) by:
+ * <code>getOkayButton()</code> 
+ * <code>getCancelButton()</code>
+ * <code>getHelpButton()</code>
+ * 
+ * 
+ * If you want to see how the dialog looks like execute the method <code>main</code> at the bottom
+ * of this file.
+ */
 public class StdDialog extends JDialog{
 
     private static final long serialVersionUID = 1L;
@@ -25,9 +39,7 @@ public class StdDialog extends JDialog{
         this.setLocationByPlatform(true);       
         this.setTitle(title);
         this.setModal(true);
-        Dimension dim = content.getMaximumSize();
-        dim.width = Integer.MAX_VALUE;
-        content.setMaximumSize(dim);
+        content.setMaximumSize(new Dimension(Integer.MAX_VALUE,Integer.MAX_VALUE));
         Box vertBox = Box.createVerticalBox();
         Box horzBox = Box.createHorizontalBox();
         
@@ -49,7 +61,9 @@ public class StdDialog extends JDialog{
         horzBox.add(getOkayButton());
         horzBox.add(Box.createHorizontalStrut(strut));
         horzBox.add(getCancelButton());
+        horzBox.add(Box.createHorizontalStrut(strut));
         vertBox.add(horzBox);
+      
         vertBox.add(Box.createVerticalStrut(strut));        
         this.getContentPane().add(vertBox);
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -89,6 +103,7 @@ public class StdDialog extends JDialog{
                     
                 }
             });
+            okayButton.setMnemonic(KeyEvent.VK_O);
         }
         return okayButton;
     }
@@ -104,12 +119,20 @@ public class StdDialog extends JDialog{
                     StdDialog.this.dispose();
                 }
             });
+            cancelButton.setMnemonic(KeyEvent.VK_C);
         }
         return cancelButton;
     }
     
     public static void main(String [] args) {
-        StdDialog dialog = new StdDialog("Test",new JButton("Test"), 5,true);
+        final StdDialog dialog = new StdDialog("Test",new JButton("Test"), 5,true);
+        dialog.getOkayButton().addActionListener(new ActionListener() {
+            
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                JOptionPane.showMessageDialog(dialog, "Okay");
+            }
+        });
         dialog.setModal(true);
         dialog.setVisible(true);
     }

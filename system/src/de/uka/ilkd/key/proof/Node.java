@@ -114,6 +114,7 @@ public class Node {
     }    
 
     public void setAppliedRuleApp(RuleApp ruleApp) {
+        this.nodeInfo.updateNoteInfo();
         this.appliedRuleApp = ruleApp;        
     }
 

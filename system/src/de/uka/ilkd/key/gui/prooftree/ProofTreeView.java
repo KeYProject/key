@@ -771,7 +771,7 @@ public class ProofTreeView extends JPanel {
 		new JCheckBoxMenuItem("Hide Closed Subtrees");
 	private JMenuItem search = new JMenuItem("Search");
 	private JMenuItem prune    = new JMenuItem("Prune Proof");
-	private JMenuItem delayedCut = new JMenuItem("Cut");
+	private JMenuItem delayedCut = new JMenuItem("Delayed Cut");
 	private JMenuItem runStrategy = new JMenuItem("Apply Strategy",
 	    IconFactory.autoModeStartLogo(10));
         
@@ -818,7 +818,7 @@ public class ProofTreeView extends JPanel {
 	        delayedCut.addActionListener(this);
 	        delayedCut.setEnabled(false);
 	        if (proof != null) {
-	            if (proof.isGoal(invokedNode) || 
+	            if (!invokedNode.leaf() && 
 	                proof.getSubtreeGoals(invokedNode).size()>0) {
 	                delayedCut.setEnabled(true);
 	            }
@@ -882,8 +882,9 @@ public class ProofTreeView extends JPanel {
 	public void actionPerformed(ActionEvent e) {
 	       if (e.getSource() == delayedCut) {
 	           delegateModel.setAttentive(false);
-	           mediator().processDelayedCut(invokedNode);
-	           delegateModel.updateTree ( null );
+	           if(mediator().processDelayedCut(invokedNode)){
+	               delegateModel.updateTree ( null );
+	           }
 	           delegateModel.setAttentive(true);
 	           makeNodeVisible(mediator.getSelectedNode());
 	           }else

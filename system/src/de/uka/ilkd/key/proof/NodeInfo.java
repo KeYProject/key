@@ -92,6 +92,15 @@ public class NodeInfo {
         }
     }
     
+    void updateNoteInfo(){
+        determinedFstAndActiveStatement = false;
+        firstStatement = null;
+        firstStatementString = null;
+        activeStatement = null;
+        determineFirstAndActiveStatement();
+    }
+  
+    
     private boolean isSymbolicExecution(Taclet t) {
         ImmutableList<RuleSet> list = t.getRuleSets();
 	RuleSet       rs;

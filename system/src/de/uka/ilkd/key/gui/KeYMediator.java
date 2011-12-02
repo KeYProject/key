@@ -23,10 +23,9 @@ import javax.swing.event.EventListenerList;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.gui.delayedcut.CheckedUserInput;
-import de.uka.ilkd.key.gui.delayedcut.InspectorForFormulas;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.notification.events.ProofClosedNotificationEvent;
+import de.uka.ilkd.key.gui.utilities.CheckedUserInput;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Namespace;
@@ -941,20 +940,21 @@ public class KeYMediator {
         return mainFrame.getUserInterface();
     }
 
-    public void processDelayedCut(final Node invokedNode) {
+    public boolean processDelayedCut(final Node invokedNode) {
         if (ensureProofLoaded()) {
             final String result = 
                     CheckedUserInput.showAsDialog("Cut Formula",
                             "Please specify a formula:",
-                            "to be written + change default input to empty string",
-                            "true",
-                    new InspectorForFormulas(getProof().getServices(),invokedNode)                                   
+                            null,
+                            "",
+                    new InspectorForDecisionPredicates(getProof().getServices(),invokedNode,   DelayedCut.DECISION_PREDICATE_IN_ANTECEDENT) ,
+                    true
                     );    
             if(result == null){
-                return;
+                return false;
             }
             
-            Term formula = InspectorForFormulas.translate(getProof().getServices(),result);
+            Term formula = InspectorForDecisionPredicates.translate(getProof().getServices(),result);
             final UserInterface ui = KeYMediator.this.mainFrame.getUserInterface();
             DelayedCutProcessor processor = new DelayedCutProcessor(getProof(),
                     invokedNode,
@@ -1026,6 +1026,7 @@ public class KeYMediator {
             Thread thread = new Thread(processor);
             thread.start();
         }
+        return true;
         
     }
 }

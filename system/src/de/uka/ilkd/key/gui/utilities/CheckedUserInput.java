@@ -1,6 +1,5 @@
-package de.uka.ilkd.key.gui.delayedcut;
+package de.uka.ilkd.key.gui.utilities;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,21 +12,39 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextField;
 import javax.swing.JTextPane;
-import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+
+/**
+ * This class offers a simple solution for receiving checked user input. 
+ * It describes a panel consisting of a text field for user input and a 
+ * traffic light. By means of the interface <code>CheckedUserInputInspector</code>
+ * one can check the input the user makes instantaneously.  
+ * 
+ * If you want to see how the component looks like, execute the method <code>main</code> 
+ * at the bottom of this file.
+ */
 public class CheckedUserInput extends JPanel{
     private static final long serialVersionUID = 1L;
+   
 
 
 
     static public interface CheckedUserInputInspector{
+        
+        public static final String NO_USER_INPUT = " ";
+        /**
+         * @param toBeChecked the user input to be checked.
+         * @return <code>null</code> if the user input is valid, otherwise a string describing the error. 
+         */
         public String check(String toBeChecked);
     }
     
+    /**
+     * Used for observing the checked user input.
+     */
     static public interface CheckedUserInputListener{
         public void userInputChanged(String input,boolean valid);
       
@@ -41,7 +58,7 @@ public class CheckedUserInput extends JPanel{
     private final CheckedUserInputInspector inspector; 
     private final List<CheckedUserInputListener> listeners = new LinkedList<CheckedUserInputListener>();
     
-    public CheckedUserInput(CheckedUserInputInspector inspector) {
+    public CheckedUserInput(CheckedUserInputInspector inspector, boolean showInformation) {
         this.inspector = inspector;
         this.setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
         Box horzBox = Box.createHorizontalBox();
@@ -56,7 +73,9 @@ public class CheckedUserInput extends JPanel{
         this.add(horzBox);
         this.add(Box.createVerticalStrut(2));
         horzBox = Box.createHorizontalBox();
-        horzBox.add(getInfoLabel());
+        if(showInformation){
+            horzBox.add(getInfoLabel());
+        }
         horzBox.add(Box.createHorizontalGlue());
         this.add(horzBox);
     }
@@ -139,22 +158,17 @@ private void setValid(String result){
             getInfoLabel().setText(result);
         }
         getTrafficLight().setGreen(result == null);
-        SwingUtilities.invokeLater(new Runnable() {
-         
-         @Override
-         public void run() {
-                 getTrafficLight().repaint();
-         }
-        });
+
 }
     
     public static String showAsDialog(String title,String description,
                                         final String helpText,
                                         String defaultInput,
-                                       CheckedUserInputInspector inspector
+                                       CheckedUserInputInspector inspector,
+                                       boolean showInformation
                                        
                                        ) {
-        CheckedUserInput userInput = new CheckedUserInput(inspector);
+        CheckedUserInput userInput = new CheckedUserInput(inspector,showInformation);
         
         Box vertBox = Box.createVerticalBox();
         if(description != null){
@@ -185,7 +199,8 @@ private void setValid(String result){
         });
         
         userInput.setInput(defaultInput);
-        
+        Dimension dim = dialog.getPreferredSize();
+        dialog.setSize(Math.max(dim.width,dialog.getOkayButton().getWidth()*4),dim.height);
         dialog.setVisible(true);
         
         if(dialog.okayButtonHasBeenPressed()){
@@ -197,7 +212,7 @@ private void setValid(String result){
     
     
     public static void main(String [] args){
-        showAsDialog("Test","description","that is only a test","default",
+        showAsDialog("Checked user input embedded in a dialog.","type 'test'","that is only a test","default",
                 new CheckedUserInputInspector() {
             
             @Override
@@ -205,6 +220,6 @@ private void setValid(String result){
 
                 return toBeChecked.equals("test") ? null : "Syntax Error";
             }
-        });
+        },true);
     }
 }

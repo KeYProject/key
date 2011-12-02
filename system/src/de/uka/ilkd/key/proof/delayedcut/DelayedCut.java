@@ -7,6 +7,10 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 
+/**
+ * This class wraps the information about the delayed cut. It only wraps data but not functional 
+ * information. 
+ */
 public class DelayedCut {
         public static final int DECISION_PREDICATE_IN_ANTECEDENT = 0;
         public static final int DECISION_PREDICATE_IN_SUCCEDENT = 1;
@@ -31,6 +35,7 @@ public class DelayedCut {
             this.subtrees = subtrees;
             this.cutMode = sideOfDecisionPredicate;
             this.firstAppliedRuleApp = firstAppliedRuleApp;
+
 
         }
         
@@ -74,11 +79,7 @@ public class DelayedCut {
         
         public boolean isDecisionPredicateInAntecendet(){
             return cutMode == DECISION_PREDICATE_IN_ANTECEDENT;
-        }
-        
-
-    
-        
+        } 
     
 
 }

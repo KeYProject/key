@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.gui.delayedcut;
+package de.uka.ilkd.key.gui.utilities;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -8,8 +8,13 @@ import java.awt.RenderingHints;
 
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EtchedBorder;
 
+
+/**
+ * A traffic light: It can be either green or red.
+ */
 class TrafficLight extends JPanel{
          private static final Color VALID_COLOR = Color.GREEN;
          private static final Color INVALID_COLOR = Color.RED;
@@ -26,13 +31,12 @@ class TrafficLight extends JPanel{
                         this.setPreferredSize(new Dimension(diameter+5,2*diameter+7));
                         this.setMaximumSize(new Dimension(diameter+5,2*diameter+7));
                         this.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
-                        // this.setBorder(BorderFactory.createLineBorder(Color.BLACK));
                }
 
 
 
 
-        @Override
+               @Override
                protected void paintComponent(Graphics g) {
                        super.paintComponent(g);
                        Graphics2D g2D =(Graphics2D) g.create();
@@ -57,8 +61,15 @@ class TrafficLight extends JPanel{
                        
                }
         
-                public void setGreen(boolean b){
+                 public void setGreen(boolean b){
                         isGreen = b;
+                        SwingUtilities.invokeLater(new Runnable() {
+                            
+                            @Override
+                            public void run() {
+                                repaint();
+                            }
+                        });
                 }
                
        }
