@@ -23,6 +23,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
+import de.uka.ilkd.key.gui.join.JoinMenuItem;
 import de.uka.ilkd.key.gui.smt.SMTMenuItem;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
 import de.uka.ilkd.key.gui.smt.SolverListener;
@@ -35,6 +36,8 @@ import de.uka.ilkd.key.pp.AbbrevException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.join.JoinIsApplicable;
+import de.uka.ilkd.key.proof.join.ProspectivePartner;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
@@ -130,6 +133,7 @@ class TacletMenu extends JMenu {
 	    createSMTMenu(control);
 	}
 	createFocussedAutoModeMenu ( control );
+	ceateJoinMenu(control);
     
 	//        addPopFrameItem(control);
 
@@ -178,6 +182,16 @@ class TacletMenu extends JMenu {
                 }
 
         }
+        
+        private void ceateJoinMenu(MenuControl control){
+            
+               List<ProspectivePartner> partner = 
+                       JoinIsApplicable.INSTANCE.isApplicable(mediator.getSelectedGoal(),pos.getPosInOccurrence());
+               if(!partner.isEmpty()){
+                   JMenuItem item = new JoinMenuItem(partner);
+                   add(item);
+               }
+        }   
 				      
     /**
      * adds an item for built in rules (e.g. Run Simplify or Update Simplifier)
@@ -394,7 +408,8 @@ class TacletMenu extends JMenu {
 	      
         	}});
         	thread.start();            
-            }else if (e.getSource() instanceof BuiltInRuleMenuItem) {
+            }           
+            else if (e.getSource() instanceof BuiltInRuleMenuItem) {
         	   
                    mediator.selectedBuiltInRule
                     (((BuiltInRuleMenuItem) e.getSource()).connectedTo(), 
