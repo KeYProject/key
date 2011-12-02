@@ -18,9 +18,9 @@ my $not_provablejavadl_txt = "notProvableJavaDL.txt";
 my $time_limit = 30*60; 
 
 # use the time command to print out runtime info
-my $time_command = "/usr/bin/time";
+#my $time_executable = "/usr/bin/time";
 # output of the time command
-my $time_format = '   user %U sec\n system %S sec\nelapsed %E sec\nMax. size %M kB\nAvg. size %t kB';
+#my $time_format = '   user %U sec\n system %S sec\nelapsed %E sec\nMax. size %M kB\nAvg. size %t kB';
 
 
 chdir $bin_path;
@@ -78,7 +78,6 @@ my @reloadFailed;
 my %successes;
 my %failing;
 my %erroneous;
-
 #
 # go through automatic files
 #
@@ -251,9 +250,11 @@ sub system_timeout {
  
 sub runAuto {
   my $dk = &getcwd . "/$_[0]";
-  my $command = "$time_command -f '$time_format' " . $absolute_bin_path . "/runProver $dk auto";
+  my $command = $absolute_bin_path . "/runProver $dk auto";
   # print "Command is: $command\n";
+  my $starttime = time();
   my $result = &system_timeout($time_limit, $command);
+  print "Time elapsed: " . (time() - $starttime) . " sec\n";
 #  print "\nReturn value: $result\n";
   return $result;
 }
@@ -284,7 +285,7 @@ sub reloadFile {
 	return;
     }
 
-    my $command = "$time_command -f '$time_format' " . $absolute_bin_path . "/runProver $dk auto_loadonly";
+    my $command = $absolute_bin_path . "/runProver $dk auto_loadonly";
     # print "Command is: $command\n";
     my $result = &system_timeout($time_limit, $command);
 #    print "\nReturn value: $result\n";

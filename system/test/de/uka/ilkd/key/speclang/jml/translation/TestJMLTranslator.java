@@ -43,7 +43,6 @@ public class TestJMLTranslator extends TestCase {
     private static final TermBuilder TB = TermBuilder.DF;
     private static JavaInfo javaInfo;
     private static Services services;
-    private static JMLTranslator translator;
     private static KeYJavaType testClassType;
     private static Term heapAtPre;
 
@@ -55,7 +54,6 @@ public class TestJMLTranslator extends TestCase {
         javaInfo = new HelperClassForTests().parse(
                 new File(testFile)).getFirstProof().getJavaInfo();
         services = javaInfo.getServices();
-        translator = JMLTranslator.getInstance();
         testClassType = javaInfo.getKeYJavaType("testPackage.TestClass");
         heapAtPre = TB.var(TB.heapAtPreVar(services, "heapAtPre", false));
     }
@@ -121,10 +119,10 @@ public class TestJMLTranslator extends TestCase {
         Term result = null;
 
         try {
-            result = translator.<Term>translate(new PositionedString("true"),
-                                                    testClassType,
-                                                    null, null, null, null, null, null,
-                                                    services);
+            result = JMLTranslator.translate(new PositionedString("true"),
+                                             testClassType, null, null, null,
+                                             null, null, null, Term.class,
+                                             services);
         } catch (SLTranslationException e) {
             assertTrue(false);
         }
@@ -140,10 +138,10 @@ public class TestJMLTranslator extends TestCase {
         ProgramVariable selfVar = buildSelfVarAsProgVar();
 
         try {
-            result = translator.<Term>translate(new PositionedString("this"),
-                                                    testClassType,
-                                                    selfVar, null, null, null, null,
-                                                    null, services);
+            result = JMLTranslator.translate(new PositionedString("this"),
+                                             testClassType, selfVar, null, null,
+                                             null, null, null, Term.class,
+                                             services);
         } catch (SLTranslationException e) {
             assertTrue(false);
         }
@@ -159,10 +157,10 @@ public class TestJMLTranslator extends TestCase {
         ProgramVariable selfVar = buildSelfVarAsProgVar();
 
         try {
-            result = translator.<Term>translate(new PositionedString(
+            result = JMLTranslator.translate(new PositionedString(
                     "(b <= s &&  i > 5) ==> this != instance"), testClassType,
                                                     selfVar, null, null, null, null,
-                                                    null, services);
+                                                    null, Term.class, services);
         } catch (SLTranslationException e) {
             e.printStackTrace();
             assertTrue(false);
@@ -183,10 +181,10 @@ public class TestJMLTranslator extends TestCase {
         ProgramVariable i = javaInfo.getAttribute("testPackage.TestClass::i");
 
         try {
-            result = translator.<Term>translate(new PositionedString(
+            result = JMLTranslator.translate(new PositionedString(
                     "this.i"), testClassType,
-                                                    selfVar, null, null, null, null,
-                                                    null, services);
+                                             selfVar, null, null, null, null,
+                                             null, Term.class, services);
         } catch (SLTranslationException e) {
             assertTrue(false);
         }
@@ -207,11 +205,10 @@ public class TestJMLTranslator extends TestCase {
                                                          testClassType);
 
         try {
-            result = translator.<Term>translate(new PositionedString(
-                    "this.getOne()"),
-                                                    testClassType, selfVar, null,
-                                                    null, null,
-                                                    null, null, services);
+            result = JMLTranslator.translate(new PositionedString("this.getOne()"),
+                                             testClassType, selfVar, null,
+                                             null, null, null, null, Term.class,
+                                             services);
         } catch (SLTranslationException e) {
             assertTrue(false);
         }
@@ -226,11 +223,11 @@ public class TestJMLTranslator extends TestCase {
         Term result = null;
 
         try {
-            result = translator.<Term>translate(
+            result = JMLTranslator.translate(
                     new PositionedString(
                     "(\\forall int i; (0 <= i && i <= 2147483647) )"),
                     testClassType, null, null, null, null,
-                    null, null, services);
+                    null, null, Term.class, services);
         } catch (SLTranslationException e) {
             assertTrue(e.getMessage(), false);
         }
@@ -261,11 +258,11 @@ public class TestJMLTranslator extends TestCase {
         Term result = null;
 
         try {
-            result = translator.<Term>translate(
+            result = JMLTranslator.translate(
                     new PositionedString(
                     "(\\exists int i; (0 <= i && i <= 2147483647) )"),
                     testClassType, null, null, null, null,
-                    null, null, services);
+                    null, null, Term.class, services);
         } catch (SLTranslationException e) {
             assertTrue(e.getMessage(), false);
         }
@@ -296,11 +293,11 @@ public class TestJMLTranslator extends TestCase {
         Term result = null;
 
         try {
-            result = translator.<Term>translate(
+            result = JMLTranslator.translate(
                     new PositionedString(
                     "(\\bsum int i; 0; 2147483647; i)"),
                     testClassType, null, null, null, null,
-                    null, null, services);
+                    null, null, Term.class, services);
         } catch (SLTranslationException e) {
             assertTrue(e.getMessage(), false);
         }
@@ -326,11 +323,11 @@ public class TestJMLTranslator extends TestCase {
         Term result = null;
 
         try {
-            result = translator.<Term>translate(
+            result = JMLTranslator.translate(
                     new PositionedString(
                     "(\\exists TestClass t; t != null; t.i == 0)"),
                     testClassType, null, null, null, null,
-                    null, null, services);
+                    null, null, Term.class, services);
         } catch (SLTranslationException e) {
             assertTrue("Error Message: " + e, false);
         }
@@ -351,11 +348,11 @@ public class TestJMLTranslator extends TestCase {
 
 
         try {
-            result = translator.<Term>translate(new PositionedString(
+            result = JMLTranslator.translate(new PositionedString(
                     "this.i == \\old(this.i)"),
                                                     testClassType, selfVar, null,
                                                     null, excVar, heapAtPre, null, 
-                                                    services);
+                                                    Term.class, services);
         } catch (SLTranslationException e) {
             e.printStackTrace();
             assertTrue(false);
@@ -385,11 +382,11 @@ public class TestJMLTranslator extends TestCase {
         ProgramVariable resultVar = buildResultVar(pm);
 
         try {
-            result = translator.<Term>translate(new PositionedString(
+            result = JMLTranslator.translate(new PositionedString(
                     "\\result == 1"),
                                                     testClassType, selfVar, null,
                                                     resultVar, excVar, heapAtPre, null, 
-                                                    services);
+                                                    Term.class, services);
         } catch (SLTranslationException e) {
             assertTrue(false);
         }
@@ -409,7 +406,7 @@ public class TestJMLTranslator extends TestCase {
                 "testPackage.TestClass::array");
 
         try {
-            result = translator.<Term>translate(new PositionedString(
+            result = JMLTranslator.translate(new PositionedString(
                     "\\nonnullelements(this.array)"),
                                                     testClassType,
                                                     selfVar,
@@ -417,7 +414,7 @@ public class TestJMLTranslator extends TestCase {
                                                     null,
                                                     null,
                                                     heapAtPre,
-                                                    null,
+                                                    null, Term.class,
                                                     services);
         } catch (SLTranslationException e) {
             assertTrue(false);
@@ -436,7 +433,7 @@ public class TestJMLTranslator extends TestCase {
         ProgramVariable selfVar = buildSelfVarAsProgVar();
 
         try {
-            result = translator.<Term>translate(new PositionedString(
+            result = JMLTranslator.translate(new PositionedString(
                     "\\is_initialized(testPackage.TestClass)"),
                                                     testClassType,
                                                     selfVar,
@@ -444,7 +441,7 @@ public class TestJMLTranslator extends TestCase {
                                                     null,
                                                     null,
                                                     heapAtPre,
-                                                    null,
+                                                    null, Term.class,
                                                     services);
         } catch (SLTranslationException e) {
             assertTrue(false);
@@ -465,9 +462,9 @@ public class TestJMLTranslator extends TestCase {
         ProgramVariable selfVar = buildSelfVarAsProgVar();
 
         try {
-            result = translator.<Term>translate(
+            result = JMLTranslator.translate(
                     new PositionedString(" i == 0x12 "),
-                    testClassType, selfVar, null, null, null, null, null, services);
+                    testClassType, selfVar, null, null, null, null, null, Term.class, services);
         } catch (SLTranslationException e) {
             assertTrue(false);
         }
@@ -492,10 +489,10 @@ public class TestJMLTranslator extends TestCase {
                                                      signature, testClassType);
 
         try {
-            result = translator.<Term>translate(
+            result = JMLTranslator.translate(
                     new PositionedString("this.m((int)4 + 2) == this.m(i)"),
                     testClassType,
-                    selfVar, null, null, null, null, null, services);
+                    selfVar, null, null, null, null, null, Term.class, services);
         } catch (SLTranslationException e) {
             e.printStackTrace();
             assertTrue(false);
@@ -521,10 +518,10 @@ public class TestJMLTranslator extends TestCase {
                                                      signature, testClassType);
 
         try {
-            result = translator.<Term>translate(
+            result = JMLTranslator.translate(
                     new PositionedString("this.m(l) == this.m((long)i + 3)"),
                     testClassType, selfVar,
-                    null, null, null, null, null, services);
+                    null, null, null, null, null, Term.class, services);
         } catch (SLTranslationException e) {
             e.printStackTrace();
             assertTrue(false);
@@ -550,10 +547,10 @@ public class TestJMLTranslator extends TestCase {
                                                      signature, testClassType);
 
         try {
-            result = translator.<Term>translate(
+            result = JMLTranslator.translate(
                     new PositionedString("this.m(s + 4) == this.m(+b)"),
                     testClassType, selfVar,
-                    null, null, null, null, null, services);
+                    null, null, null, null, null, Term.class, services);
         } catch (SLTranslationException e) {
             e.printStackTrace();
             assertTrue(false);
@@ -578,11 +575,11 @@ public class TestJMLTranslator extends TestCase {
                                                      testClassType);
 
         try {
-            result = translator.<Term>translate(
+            result = JMLTranslator.translate(
                     new PositionedString(
                     "testPackage.TestClass.staticMethod() == 4"), testClassType,
                     selfVar,
-                    null, null, null, null, null, services);
+                    null, null, null, null, null, Term.class, services);
         } catch (SLTranslationException e) {
             e.printStackTrace();
             assertTrue(false);
@@ -599,11 +596,11 @@ public class TestJMLTranslator extends TestCase {
         ProgramVariable selfVar = buildSelfVarAsProgVar();
 
         try {
-            result = translator.<Term>translate(
+            result = JMLTranslator.translate(
                     new PositionedString(
                     "( \\exists TestClass t; t != null; \\typeof(t) <: \\type(java.lang.Object) )"),
                     testClassType, selfVar,
-                    null, null, null, null, null, services);
+                    null, null, null, null, null, Term.class, services);
         } catch (SLTranslationException e) {
             e.printStackTrace();
             assertTrue(false);
@@ -625,7 +622,7 @@ public class TestJMLTranslator extends TestCase {
                 "testPackage.TestClass::array");
 
         try {
-            result = translator.<Term>translate(new PositionedString(
+            result = JMLTranslator.translate(new PositionedString(
                     "(\\forall TestClass a;a.array == array; a == this)"),
                                                     testClassType,
                                                     selfVar,
@@ -633,7 +630,7 @@ public class TestJMLTranslator extends TestCase {
                                                     null,
                                                     null,
                                                     null,
-                                                    null,
+                                                    null, Term.class,
                                                     services);
         } catch (SLTranslationException e) {
             assertTrue("Parsing Error: " + e, false);

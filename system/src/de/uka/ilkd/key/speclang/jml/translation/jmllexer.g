@@ -40,9 +40,12 @@ tokens {
     ACCESSIBLE      = "accessible";
     ASSIGNABLE      = "assignable";
     ENSURES         = "ensures";
+    DECLASSIFY      = "declassify";
     DEPENDS         = "depends";
     REPRESENTS      = "represents";
     REQUIRES        = "requires";
+    RESPECTS        = "respects";
+    SECURE_FOR      = "secure_for";
     SIGNALS         = "signals";
     SIGNALS_ONLY    = "signals_only";
 }

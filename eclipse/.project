@@ -17,4 +17,11 @@
 		<nature>org.eclipse.jem.beaninfo.BeanInfoNature</nature>
 		<nature>sf.eclipse.javacc.javaccnature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>key_lib</name>
+			<type>2</type>
+			<locationURI>key_lib</locationURI>
+		</link>
+	</linkedResources>
 </projectDescription>

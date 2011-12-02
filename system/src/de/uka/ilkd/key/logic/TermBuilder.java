@@ -10,9 +10,6 @@
 
 package de.uka.ilkd.key.logic;
 
-import java.io.StringReader;
-import java.util.HashMap;
-import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -24,26 +21,7 @@ import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IfThenElse;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ObserverFunction;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.Quantifier;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SubstOp;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.logic.op.UpdateJunctor;
-import de.uka.ilkd.key.logic.op.UpdateableOperator;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -51,6 +29,10 @@ import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.OpReplacer;
+import java.io.StringReader;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 
 /**
@@ -84,7 +66,7 @@ public final class TermBuilder {
     //-------------------------------------------------------------------------
 
     /**
-     * Parses the given string that represents the term (or formula) using the
+     * Parses the given string that represents the term (or createTerm) using the
      * service's namespaces.
      * 
      * @param s
@@ -99,7 +81,7 @@ public final class TermBuilder {
     }
 
     /**
-     * Parses the given string that represents the term (or formula) using the
+     * Parses the given string that represents the term (or createTerm) using the
      * provided namespaces.
      * 
      * @param s
@@ -543,7 +525,7 @@ public final class TermBuilder {
     }
     
     
-    public Term and(ImmutableList<Term> subTerms) {
+    public Term and(Iterable<Term> subTerms) {
 	Term result = tt();
 	for(Term sub : subTerms) {
 	    result = and(result, sub);
@@ -730,7 +712,7 @@ public final class TermBuilder {
     }
     
     
-    public Term parallel(Term[] updates) {
+    public Term parallel(Term... updates) {
 	Term result = skip();
 	for(int i = 0; i < updates.length; i++) {
 	    result = parallel(result, updates[i]);
@@ -755,6 +737,21 @@ public final class TermBuilder {
 	    updates[i] = elementary(services, lhss[i], values[i]);
 	}
 	return parallel(updates);
+    }
+    
+    
+    public Term parallel(Services services,
+                         Iterable<Term> lhss,
+                         Iterable<Term> values) {
+        ImmutableList<Term> updates = ImmutableSLList.<Term>nil();
+        Iterator<Term> lhssIt = lhss.iterator();
+        Iterator<Term> rhssIt = values.iterator();
+        while (lhssIt.hasNext()) {
+            assert rhssIt.hasNext();
+            updates = updates.append(elementary(services, lhssIt.next(),
+                                                rhssIt.next()));
+        }
+        return parallel(updates);
     }
     
     
@@ -1014,6 +1011,24 @@ public final class TermBuilder {
     }
     
     
+    public Term union(Services services, Term ... subTerms) {
+        Term result = empty(services);
+        for(Term sub : subTerms) {
+	    result = union(services, result, sub);
+	}
+        return result;
+    }
+    
+    
+    public Term union(Services services, Iterable<Term> subTerms) {
+        Term result = empty(services);
+        for(Term sub : subTerms) {
+	    result = union(services, result, sub);
+	}
+        return result;
+    }
+    
+        
     public Term intersect(Services services, Term s1, Term s2) {
 	final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
 	if(s1.op() == ldt.getEmpty() || s2.op() == ldt.getEmpty()) {
@@ -1021,6 +1036,24 @@ public final class TermBuilder {
 	} else {
 	    return func(ldt.getIntersect(), s1, s2);
 	}
+    }
+    
+    
+    public Term intersect(Services services, Term ... subTerms) {
+        Term result = empty(services);
+        for(Term sub : subTerms) {
+	    result = intersect(services, result, sub);
+	}
+        return result;
+    }
+    
+    
+    public Term intersect(Services services, Iterable<Term> subTerms) {
+        Term result = empty(services);
+        for(Term sub : subTerms) {
+	    result = intersect(services, result, sub);
+	}
+        return result;
     }
     
     
@@ -1532,4 +1565,4 @@ public final class TermBuilder {
     public Term seqReverse(Services services, Term s) {
 	return func(services.getTypeConverter().getSeqLDT().getSeqReverse(), s);
     }
-}
+    }

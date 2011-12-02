@@ -17,6 +17,10 @@ public class TestMiscTools extends TestCase {
         ls = MiscTools.disectFilename(s).toArray();
         assertEquals(4,ls.length);
         assertEquals("key",ls[3]);
+        s = "."+s;
+        ls = MiscTools.disectFilename(s).toArray();
+        assertEquals(4,ls.length);
+        assertEquals("key",ls[3]);
         // test windows delimiters
         s = "C:\\Windows\\Users\\";
         ls = MiscTools.disectFilename(s).toArray();
@@ -35,6 +39,10 @@ public class TestMiscTools extends TestCase {
         // s already relative
         s = s.substring(1);
         assertEquals(s,MiscTools.makeFilenameRelative(s, t));
+        s = "/home/../home/daniel/";
+        t = "/home";
+        assertEquals("daniel", MiscTools.makeFilenameRelative(s, t));
+        
         // test windows delimiters
         s = "C:\\Windows";
         t = "c:\\";
@@ -55,5 +63,4 @@ public class TestMiscTools extends TestCase {
         assertEquals("foo_bar", MiscTools.toValidFileName("foo\\bar"));
         assertEquals("foo(bar)", MiscTools.toValidFileName("foo[bar]"));
     }
-
 }

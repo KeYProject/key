@@ -458,8 +458,8 @@ public class TacletGenerator {
                 = SchemaVariableFactory.createVariableSV(newName, 
                         sv.sort());
                 newSVs = newSVs.add(newSV);
-                namesOfNewSVs.add(sv.name());
-                usedNames.add(sv.name());
+                namesOfNewSVs.add(newSV.name());
+                usedNames.add(newSV.name());
                 replaceMap.put(sv, newSV);
             } else {
                 newSVs = newSVs.add(sv);
