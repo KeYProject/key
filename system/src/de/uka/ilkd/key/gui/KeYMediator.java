@@ -944,7 +944,7 @@ public class KeYMediator {
         if (ensureProofLoaded()) {
             final String result = 
                     CheckedUserInput.showAsDialog("Cut Formula",
-                            "Please specify a formula:",
+                            "Please supply a formula:",
                             null,
                             "",
                     new InspectorForDecisionPredicates(getProof().getServices(),invokedNode,   DelayedCut.DECISION_PREDICATE_IN_ANTECEDENT) ,
