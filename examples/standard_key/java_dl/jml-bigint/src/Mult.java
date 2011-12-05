@@ -34,4 +34,16 @@ public class Mult {
         }
         return n? -z: z;
     }
+
+// this example involving a narrowing cast 
+// only works with Java integer semantics in force
+
+    //@ ghost byte b;
+
+    //@ ensures b == 0;
+    public void cast () {
+        //@ ghost \bigint z = 256;
+        //@ set b = (byte) z;
+        {}
+    }
 }
