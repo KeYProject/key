@@ -2104,7 +2104,8 @@ TypeReference PrimitiveType() :
      | "\\bigint"
      )
 	{
-	    Identifier id = factory.createIdentifier(token.image);
+        String type = token.image;
+	    Identifier id = factory.createIdentifier(type);
 	    setPrefixInfo(id);
 	    result = factory.createTypeReference(id);
 	    checkConstruction(result);
