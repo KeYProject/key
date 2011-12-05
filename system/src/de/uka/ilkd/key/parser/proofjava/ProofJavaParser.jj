@@ -464,6 +464,7 @@ TOKEN :
 | < INSTANCEOF: "instanceof" >
 | < INT: "int" >
 | < INTERFACE: "interface" >
+| < LOCSET: "\\locset">
 | < LONG: "long" >
 | < METHODFRAME: "method-frame" >
 | < NATIVE: "native" >
@@ -474,6 +475,7 @@ TOKEN :
 | < PROTECTED: "protected" >
 | < PUBLIC: "public" >
 | < RETURN: "return" >
+| < SEQ: "\\seq" >
 | < SHORT: "short" >
 | < STATIC: "static" >
 | < SUPER: "super" >
