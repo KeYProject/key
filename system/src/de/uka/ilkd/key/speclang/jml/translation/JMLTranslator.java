@@ -89,7 +89,7 @@ final class JMLTranslator {
         COMMENTARY ("(* *)"),
         STORE_REF_EXPR("store_ref_expr"),
         CREATE_LOCSET("create locset"),
-        PAIRWISE_DISJOINT("\\disjoint");
+        PAIRWISE_DISJOINT("\\disjoint"),
         DL ("\\dl_"),
         ADD ("+"),
         SUBTRACT ("-"),
