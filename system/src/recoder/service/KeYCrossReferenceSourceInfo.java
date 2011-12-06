@@ -78,6 +78,10 @@ public class KeYCrossReferenceSourceInfo
 	//HEAP
 	name2primitiveType.put("\\locset", new PrimitiveType("\\locset", this));
 	name2primitiveType.put("\\seq", new PrimitiveType("\\seq", this));
+	
+	// JML's primitive types
+	name2primitiveType.put("\\bigint", new PrimitiveType("\\bigint", this));
+	name2primitiveType.put("\\real", new PrimitiveType("\\real", this));
     }
 
     /**
@@ -607,7 +611,7 @@ public class KeYCrossReferenceSourceInfo
 	    return getNameInfo().getUnknownType();
 	} else if (expr instanceof SeqLength
 	        || expr instanceof SeqIndexOf){
-	    return name2primitiveType.get("int");
+	    return name2primitiveType.get("\\bigint");
 	    // TODO: handle SeqGet
 	} else {
 	    return super.getType(expr);

@@ -157,6 +157,11 @@ tokens {
         CONTAINERTYPE = "\\containerType";
         
         LIMITED = "$lmtd";
+        
+        // types that need to be declared as keywords
+        LOCSET = "\\locset";
+        SEQ = "\\seq";
+        BIGINT = "\\bigint";
 }
 
 {
@@ -760,81 +765,83 @@ options {
     paraphrase = "All possible modalities, including schema.";
 }
 :	'\\' ( (LETTER | '_')+ | "<" | "[" | "[[") {
-	   modalityBegin = text.toString();
-           Debug.out("modalityBegin == ", modalityBegin);
-           int literalTest = testLiteralsTable(MODALITY);
-           Debug.out("testLiteralsTable == ", literalTest);
-		_ttype = testLiteralsTable(_ttype);
-           if(literalTest == MODALITY && modPairs.get(modalityBegin) != null) {
-              /* This while with the following call to mMODALITYEND is 
-	       * and alternative to calling mJAVABLOCK, but it should be faster
-	       */
-              while(true) {
-		if(LA(1) == '/' && LA(2) == '/') {
-		   mSL_COMMENT(false); continue;
-		}
-		if(LA(1) == '/' && LA(2) == '*') {
-		   mML_COMMENT(false); continue;
-		}
-		if(LA(1) == '/' && LA(2) == '*') {
-		   mML_COMMENT(false); continue;
-		}
-		if(LA(1) == '\"') {
-                   mQUOTED_STRING_LITERAL(false); continue;
-		}
-		if(LA(1) == '\'') {
-                   mCHAR_LITERAL(false); continue;
-		}
-		if((LA(1) == '\r' && LA(2) != '\n') ||
-		    LA(1) == '\n') newline();
-	        if(LA(1) == '\\') break;
-		matchNot(EOF_CHAR);
-	      }
-	      mMODALITYEND(false);
-//              mJAVABLOCK(false);
-	      matchAndTransformModality(_begin);
-           }else{
-	        if("\\includeFile".equals(modalityBegin)) {
-		  // File inclusion 
-                  while(LA(1) == ' ' || LA(1) == '\t' || LA(1) == '\n')
-		    match(LA(1));
-		  int startIndex = text.length()+1;
-		  mQUOTED_STRING_LITERAL(false);
-		  int stopIndex = text.length()-1;
-                  while(LA(1) == ' ' || LA(1) == '\t' || LA(1) == '\n')
-		    match(LA(1));
-		  mSEMI(false);
-		  _ttype = Token.SKIP;
-		  String fileName = text.toString().substring(startIndex,stopIndex);
-		  Debug.out("File to be included: ", fileName);
-		  File incf = new File(fileName);
-		  File f = new File(getFilename());
-		  if((f.isAbsolute() || f.getParentFile() != null) && !incf.isAbsolute()) {
-		    f = new File(f.getParentFile(), fileName);
-		    fileName = f.getAbsolutePath();
-		  }
-		  Debug.out("File to be included: ", fileName);
-       		  try {
-                    KeYLexer sublexer =
-		      new KeYLexer(
-		        new DataInputStream(new  
-			FileInputStream(fileName)),
-			keh, selector);
-                    sublexer.setFilename(fileName);
-                    selector.push(sublexer);
-		    Debug.out("Pushed lexer: ", sublexer);
-                    selector.retry();
-                  } catch (FileNotFoundException fnf) {
-                     throw new RecognitionException("File '" + fileName + "' not found.",
-	               getFilename(), getLine(), getColumn());
-                  }
-		} else {
-		_ttype = IDENT; // make it an IDENT starting with '\\'
-		                // (it will not contain digits!)
-		}
-	   }
-	}
-	;
+    modalityBegin = text.toString();
+    Debug.out("modalityBegin == ", modalityBegin);
+    int literalTest = testLiteralsTable(MODALITY);
+    Debug.out("testLiteralsTable == ", literalTest);
+    _ttype = testLiteralsTable(_ttype);
+    if(literalTest == MODALITY && modPairs.get(modalityBegin) != null) {
+        /* This while with the following call to mMODALITYEND is 
+         * and alternative to calling mJAVABLOCK, but it should be faster
+         */
+        while(true) {
+            if(LA(1) == '/' && LA(2) == '/') {
+                mSL_COMMENT(false); continue;
+            }
+            if(LA(1) == '/' && LA(2) == '*') {
+                mML_COMMENT(false); continue;
+            }
+            if(LA(1) == '/' && LA(2) == '*') {
+                mML_COMMENT(false); continue;
+            }
+            if(LA(1) == '\"') {
+                mQUOTED_STRING_LITERAL(false); continue;
+            }
+            if(LA(1) == '\'') {
+                mCHAR_LITERAL(false); continue;
+            }
+            if((LA(1) == '\r' && LA(2) != '\n') ||
+                    LA(1) == '\n') newline();
+            if(LA(1) == '\\' && (LA(2) == 'e' || LA(2) == '>' || LA(2) == ']'))
+                // check whether it follows an ENDMODALITY
+                break;
+            matchNot(EOF_CHAR);
+        }
+        mMODALITYEND(false);
+        //              mJAVABLOCK(false);
+        matchAndTransformModality(_begin);
+    }else{
+        if("\\includeFile".equals(modalityBegin)) {
+            // File inclusion 
+            while(LA(1) == ' ' || LA(1) == '\t' || LA(1) == '\n')
+                match(LA(1));
+            int startIndex = text.length()+1;
+            mQUOTED_STRING_LITERAL(false);
+            int stopIndex = text.length()-1;
+            while(LA(1) == ' ' || LA(1) == '\t' || LA(1) == '\n')
+                match(LA(1));
+            mSEMI(false);
+            _ttype = Token.SKIP;
+            String fileName = text.toString().substring(startIndex,stopIndex);
+            Debug.out("File to be included: ", fileName);
+            File incf = new File(fileName);
+            File f = new File(getFilename());
+            if((f.isAbsolute() || f.getParentFile() != null) && !incf.isAbsolute()) {
+                f = new File(f.getParentFile(), fileName);
+                fileName = f.getAbsolutePath();
+            }
+            Debug.out("File to be included: ", fileName);
+            try {
+                KeYLexer sublexer =
+                    new KeYLexer(
+                            new DataInputStream(new  
+                                    FileInputStream(fileName)),
+                                    keh, selector);
+                sublexer.setFilename(fileName);
+                selector.push(sublexer);
+                Debug.out("Pushed lexer: ", sublexer);
+                selector.retry();
+            } catch (FileNotFoundException fnf) {
+                throw new RecognitionException("File '" + fileName + "' not found.",
+                        getFilename(), getLine(), getColumn());
+            }
+        } else {
+            _ttype = IDENT; // make it an IDENT starting with '\\'
+            // (it will not contain digits!)
+        }
+    }
+}
+;
 
 protected MODALITYEND
 options {

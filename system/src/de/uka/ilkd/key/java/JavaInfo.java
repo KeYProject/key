@@ -92,6 +92,7 @@ public final class JavaInfo {
     // the simple name lookup is errorprone and should be removed soon
     // where it is used, force to specify a context class for unique type 
     // resolution
+    @Deprecated
     private HashMap<String, Object> sName2KJTCache = null;
     
     private LRUCache<CacheKey, ImmutableList<KeYJavaType>> commonSubtypeCache 
@@ -396,7 +397,8 @@ public final class JavaInfo {
 	              || type == PrimitiveType.JAVA_CHAR 
 	              || type == PrimitiveType.JAVA_INT 
                       || type == PrimitiveType.JAVA_LONG 
-		      || type == PrimitiveType.JAVA_SHORT) { 
+		      || type == PrimitiveType.JAVA_SHORT
+		      || type == PrimitiveType.JAVA_BIGINT) { 
 		 sort = (Sort) sorts.lookup(IntegerLDT.NAME);;
 	    } else if(type == PrimitiveType.JAVA_FLOAT) {
 		sort = (Sort) sorts.lookup(FloatLDT.NAME);

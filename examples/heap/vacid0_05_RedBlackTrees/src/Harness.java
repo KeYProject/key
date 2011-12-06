@@ -29,6 +29,9 @@ public class Harness {
     assert(b.lookup(2) == 1 && b.lookup(42) == 1);
   }
   
+  
+  // *** Some simpler tests *** //
+  
   //@ requires a.isEmpty && \invariant_for(a) && a.defaultValue == 0 && 0 <= k && k < a.contents.length;
   public static void testEmpty(AbstractMap a, int k) {
     assert a.lookup(k) == 0;
@@ -43,6 +46,15 @@ public class Harness {
     assert(a.lookup(1) == 0);
 
   }
+  
+  //@ requires \invariant_for(a) && \invariant_for(b);
+  //@ requires \disjoint(a.footprint,b.footprint);
+  //@ ensures \disjoint(a.footprint,b.footprint);
+  public static void testDisjointnessPreservation(AbstractMap a, AbstractMap b){
+      a.replace(3, 27);
+  }
+  
+  
   public static void main(String[] arrrgggh){
       redBlackTestHarness(new RedBlackTree(0), new RedBlackTree(1));
   //    System.out.println("Test harness successfully passed.");

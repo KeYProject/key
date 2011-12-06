@@ -102,6 +102,8 @@ options {
 	this.heapAtPre      = heapAtPre;
         this.savedHeapAtPre = savedHeapAtPre;
 
+
+        intHelper = new JavaIntegerSemanticsHelper(services, excManager);
 	// initialize helper objects
 	this.resolverManager = new JMLResolverManager(this.javaInfo,
 						      specInClass,
@@ -116,8 +118,6 @@ options {
 	if(resultVar != null) {
 	    resolverManager.putIntoTopLocalVariablesNamespace(resultVar);
 	}
-
-	intHelper = new JavaIntegerSemanticsHelper(services, excManager);
     }
     
     
@@ -937,52 +937,19 @@ shiftexpr returns [SLExpression result=null] throws SLTranslationException
 :
     result=additiveexpr
     (
-	SHIFTRIGHT e=additiveexpr
+	sr:SHIFTRIGHT e=additiveexpr
 	{
-	    if (result.isType()) {
-		raiseError("Cannot build shift expression from type " +
-		    result.getType().getName() + ".");
-	    }
-	    if (e.isType()) {
-		raiseError("Cannot shift right by type " +
-		    e.getType().getName() + ".");
-	    }
-	    assert result.isTerm();
-	    assert e.isTerm();
-
-	    result = intHelper.buildRightShiftExpression(result, e);
+        result = translator.<SLExpression>translate(sr.getText(), SLExpression.class, services, result, e);
 	}
     |   
-	SHIFTLEFT e=additiveexpr 
+	sl:SHIFTLEFT e=additiveexpr 
 	{
-	    if (result.isType()) {
-		raiseError("Cannot build shift expression from type " +
-		    result.getType().getName() + ".");
-	    }
-	    if (e.isType()) {
-		raiseError("Cannot shift left by type " +
-		    e.getType().getName() + ".");
-	    }
-	    assert result.isTerm();
-	    assert e.isTerm();
-
-	    result = intHelper.buildLeftShiftExpression(result, e);
+        result = translator.<SLExpression>translate(sl.getText(), SLExpression.class, services, result, e);
 	}
     |   
-	UNSIGNEDSHIFTRIGHT e=additiveexpr 
+	usr:UNSIGNEDSHIFTRIGHT e=additiveexpr 
 	{
-	    if (result.isType()) {
-		raiseError("Cannot build shift expression from type " +
-		    result.getType().getName() + ".");
-	    }
-	    if (e.isType()) {
-		raiseError("Cannot shift right (unsigned) by type " +
-		    e.getType().getName() + ".");
-	    }
-	    assert result.isTerm();
-	    assert e.isTerm();
-
-	    result = intHelper.buildUnsignedRightShiftExpression(result, e);
+        result = translator.<SLExpression>translate(usr.getText(), SLExpression.class, services, result, e);
 	}
     )*
 ; 
@@ -995,36 +962,14 @@ additiveexpr returns [SLExpression result=null] throws SLTranslationException
 :
     result=multexpr
     (
-	PLUS e=multexpr
+	plus:PLUS e=multexpr
 	{
-	    if (result.isType()) {
-		raiseError("Cannot build additive expression from type " +
-		    result.getType().getName() + ".");
-	    }
-	    if (e.isType()) {
-		raiseError("Cannot add type " +
-		    e.getType().getName() + ".");
-	    }
-	    assert result.isTerm();
-	    assert e.isTerm();
-
-	    result = intHelper.buildAddExpression(result, e);
+        result = translator.<SLExpression>translate(plus.getText(), SLExpression.class, services, result, e);
 	}
     |
-	MINUS e=multexpr
+	minus:MINUS e=multexpr
 	{
-	    if (result.isType()) {
-		raiseError("Cannot build additive expression from type " +
-		    result.getType().getName() + ".");
-	    }
-	    if (e.isType()) {
-		raiseError("Cannot subtract type " +
-		    e.getType().getName() + ".");
-	    }
-	    assert result.isTerm();
-	    assert e.isTerm();
-
-	    result = intHelper.buildSubExpression(result, e);
+	    result = translator.<SLExpression>translate(minus.getText(), SLExpression.class, services, result, e);
 	}
     )*
 ;
@@ -1929,7 +1874,7 @@ builtintype returns [KeYJavaType type = null] throws SLTranslationException
 	|
 	    BIGINT
 	    {
-		raiseNotSupported("\\bigint");
+		type = javaInfo.getKeYJavaType(PrimitiveType.JAVA_BIGINT);
 	    } 
 	|
 	    REAL

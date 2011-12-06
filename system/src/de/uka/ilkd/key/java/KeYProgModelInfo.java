@@ -237,7 +237,7 @@ public class KeYProgModelInfo{
     }
 
     /**
-     * checls wheter subType is assignment compatible to type according 
+     * checks whether subType is assignment compatible to type according 
      * to the rules defined in the java language specification
      */
     private boolean isAssignmentCompatible(recoder.abstraction.ArrayType subType,
