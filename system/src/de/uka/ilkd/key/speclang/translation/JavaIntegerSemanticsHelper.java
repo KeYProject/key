@@ -72,7 +72,17 @@ public class JavaIntegerSemanticsHelper {
         assert result != null;
         return result;
     }
-    
+
+    private boolean isBigint(KeYJavaType resultType) {
+        return resultType.getJavaType() == PrimitiveType.JAVA_BIGINT;
+    }
+
+
+
+    private boolean isLong(KeYJavaType resultType) {
+        return resultType.getJavaType() == PrimitiveType.JAVA_LONG;
+    }
+
     
     
     //-------------------------------------------------------------------------
@@ -92,9 +102,13 @@ public class JavaIntegerSemanticsHelper {
         assert b != null;
 	try {
 	    KeYJavaType resultType = getPromotedType(a, b);
-	    Function or = resultType.getJavaType() == PrimitiveType.JAVA_LONG
-	                  ? integerLDT.getJavaBitwiseOrLong()
-	                  : integerLDT.getJavaBitwiseOrInt();
+	    Function or = null;
+	    if (isLong(resultType))
+	        or = integerLDT.getJavaBitwiseOrLong();
+	    else if (isBigint(resultType))
+	        raiseError("Bitwise operations are not allowed for \\bigint.");
+	    else
+	        or = integerLDT.getJavaBitwiseOrInt();
 	    return new SLExpression(TB.func(or, a.getTerm(), b.getTerm()), 
 		                    resultType);
 	} catch (RuntimeException e) {
@@ -111,9 +125,13 @@ public class JavaIntegerSemanticsHelper {
         assert b != null;
 	try {
 	    KeYJavaType resultType = getPromotedType(a, b);
-	    Function and = resultType.getJavaType() == PrimitiveType.JAVA_LONG
-	                  ? integerLDT.getJavaBitwiseAndLong()
-	                  : integerLDT.getJavaBitwiseAndInt();
+	    Function and = null;
+	    if (isLong(resultType))
+	        and = integerLDT.getJavaBitwiseAndLong();
+	    else if (isBigint(resultType))
+            raiseError("Bitwise operations are not allowed for \\bigint.");
+	    else
+	        and = integerLDT.getJavaBitwiseAndInt();
 	    return new SLExpression(TB.func(and, a.getTerm(), b.getTerm()),
 		                    resultType);
 	} catch (RuntimeException e) {
@@ -130,9 +148,13 @@ public class JavaIntegerSemanticsHelper {
         assert b != null;
 	try {
 	    KeYJavaType resultType = getPromotedType(a, b);
-	    Function xor = resultType.getJavaType() == PrimitiveType.JAVA_LONG
-	                   ? integerLDT.getJavaBitwiseXOrLong()
-	                   : integerLDT.getJavaBitwiseXOrInt();
+	    Function xor = null;
+	    if (isLong(resultType))
+	        xor = integerLDT.getJavaBitwiseXOrLong();
+	    else if (isBigint(resultType))
+            raiseError("Bitwise operations are not allowed for \\bigint.");
+	    else
+	        xor = integerLDT.getJavaBitwiseXOrInt();
 	    return new SLExpression(TB.func(xor, a.getTerm(), b.getTerm()),
 		                    resultType);
 	} catch (RuntimeException e) {
@@ -146,6 +168,8 @@ public class JavaIntegerSemanticsHelper {
 	    throws SLTranslationException {
         assert a != null;
 	try {
+	    if (isBigint(a.getType()))
+	        raiseError("Bitwise operations are not allowed for \\bigint.");
 	    Function neg = integerLDT.getJavaBitwiseNegation();
 	    return new SLExpression(TB.func(neg, a.getTerm()),
 		                    a.getType());
@@ -163,9 +187,9 @@ public class JavaIntegerSemanticsHelper {
         try {
             KeYJavaType resultType = getPromotedType(a, b);
             Function add;
-            if (resultType.getJavaType() == PrimitiveType.JAVA_LONG)
+            if (isLong(resultType))
                 add = integerLDT.getJavaAddLong();
-            else if (resultType.getJavaType() == PrimitiveType.JAVA_BIGINT)
+            else if (isBigint(resultType))
                 add = integerLDT.getAdd();
             else
                 add = integerLDT.getJavaAddInt();
@@ -185,9 +209,9 @@ public class JavaIntegerSemanticsHelper {
         try {
             KeYJavaType resultType = getPromotedType(a, b);
             Function sub;
-            if (resultType.getJavaType() == PrimitiveType.JAVA_LONG) {
+            if (isLong(resultType)) {
                 sub = integerLDT.getJavaSubLong();
-            } else if (resultType.getJavaType() == PrimitiveType.JAVA_BIGINT)
+            } else if (isBigint(resultType))
                 sub = integerLDT.getSub();
             else
                 sub = integerLDT.getJavaSubInt();
@@ -207,9 +231,9 @@ public class JavaIntegerSemanticsHelper {
         try {
             KeYJavaType resultType = getPromotedType(a, b);
             Function mul;
-            if (resultType.getJavaType() == PrimitiveType.JAVA_LONG)
+            if (isLong(resultType))
                 mul = integerLDT.getJavaMulLong();
-            else if (resultType.getJavaType() == PrimitiveType.JAVA_BIGINT)
+            else if (isBigint(resultType))
                 mul = integerLDT.getMul();
             else
                 mul = integerLDT.getJavaMulInt();
@@ -228,9 +252,9 @@ public class JavaIntegerSemanticsHelper {
         try {
             KeYJavaType resultType = getPromotedType(a, b);
             Function div;
-            if (resultType.getJavaType() == PrimitiveType.JAVA_LONG)
+            if (isLong(resultType))
                 div = integerLDT.getJavaDivLong();
-            else if (resultType.getJavaType() == PrimitiveType.JAVA_BIGINT)
+            else if (isBigint(resultType))
                 div = integerLDT.getDiv();
             else
                 div = integerLDT.getJavaDivInt();
@@ -250,7 +274,7 @@ public class JavaIntegerSemanticsHelper {
         assert b != null;
         try {
             KeYJavaType resultType = getPromotedType(a, b);
-            if (resultType.getJavaType() == PrimitiveType.JAVA_BIGINT)
+            if (isBigint(resultType))
                 return new SLExpression(TB.func(integerLDT.getMod(), a.getTerm(), b.getTerm()), resultType);
             else
                 return new SLExpression(TB.func(integerLDT.getJavaMod(), a.getTerm(), b.getTerm()),
@@ -268,9 +292,14 @@ public class JavaIntegerSemanticsHelper {
         assert b != null;
         try {
             KeYJavaType resultType = getPromotedType(a, b);
-            Function shift = resultType.getJavaType() == PrimitiveType.JAVA_LONG
-            ? integerLDT.getJavaShiftRightLong()
-                    : integerLDT.getJavaShiftRightInt();
+            Function shift = null;
+            if (isLong(resultType)) {
+                shift = integerLDT.getJavaShiftRightLong();
+            } else if (isBigint(resultType)){
+                raiseError("Shift operation not allowed for \\bigint.");
+            } else {
+                shift = integerLDT.getJavaShiftRightInt();
+            }
             return new SLExpression(TB.func(shift, a.getTerm(), b.getTerm()),
                     resultType);
         } catch (RuntimeException e) {
@@ -280,16 +309,19 @@ public class JavaIntegerSemanticsHelper {
         }
     }
 
-
     public SLExpression buildLeftShiftExpression(SLExpression a, SLExpression b)
     throws SLTranslationException {
         assert a != null;
         assert b != null;
         try {
             KeYJavaType resultType = getPromotedType(a, b);
-            Function shift = resultType.getJavaType() == PrimitiveType.JAVA_LONG
-            ? integerLDT.getJavaShiftLeftLong()
-                    : integerLDT.getJavaShiftLeftInt();
+            Function shift = null;
+            if (isLong(resultType))
+                shift = integerLDT.getJavaShiftLeftLong();
+            else if (isBigint(resultType))
+                raiseError("Shift operation not allowed for \\bigint.");
+            else
+                shift = integerLDT.getJavaShiftLeftInt();
             return new SLExpression(TB.func(shift, a.getTerm(), b.getTerm()),
                     resultType);
         } catch (RuntimeException e) {
@@ -307,9 +339,13 @@ public class JavaIntegerSemanticsHelper {
         assert b != null;
         try {
             KeYJavaType resultType = getPromotedType(a, b);
-            Function shift = resultType.getJavaType() == PrimitiveType.JAVA_LONG
-            ? integerLDT.getJavaUnsignedShiftRightLong()
-                    : integerLDT.getJavaUnsignedShiftRightInt();
+            Function shift = null;
+            if (isLong(resultType))
+                shift = integerLDT.getJavaUnsignedShiftRightLong();
+            else if (isBigint(resultType))
+                raiseError("Shift operation not allowed for \\bigint.");
+            else
+                shift = integerLDT.getJavaUnsignedShiftRightInt();
             return new SLExpression(TB.func(shift, a.getTerm(), b.getTerm()),
                     resultType);
         } catch (RuntimeException e) {
@@ -326,9 +362,9 @@ public class JavaIntegerSemanticsHelper {
         try {
             KeYJavaType resultType = getPromotedType(a);
             Function minus;
-            if (resultType.getJavaType() == PrimitiveType.JAVA_LONG)
+            if (isLong(resultType))
                 minus = integerLDT.getJavaUnaryMinusLong();
-            else if (resultType.getJavaType() == PrimitiveType.JAVA_BIGINT)
+            else if (isBigint(resultType))
                 minus = integerLDT.getNegativeNumberSign();
             else
                 minus = integerLDT.getJavaUnaryMinusInt();
@@ -356,7 +392,7 @@ public class JavaIntegerSemanticsHelper {
 	    if (cast != null)
             return new SLExpression(TB.func(cast, a.getTerm()), resultType);
 	    else { // there is no cast to \bigint
-	        assert resultType.getJavaType() == PrimitiveType.JAVA_BIGINT;
+	        assert isBigint(resultType);
 	        return new SLExpression(a.getTerm(), resultType);
 	    }
         } catch (RuntimeException e) {
