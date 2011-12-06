@@ -1693,12 +1693,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 	                              javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));        
         }        
 
-    |   DISJOINT LPAREN t=storeref COMMA t2=storeref RPAREN
-        {
-            result = new SLExpression(TB.disjoint(services, t, t2));
-        }
-
-    |   pd:PAIRWISE_DISJOINT LPAREN tlist=storeRefList RPAREN {
+    |   pd:DISJOINT LPAREN tlist=storeRefList RPAREN {
             result = translator.translate(pd.getText(), SLExpression.class, tlist, services);
         }
 

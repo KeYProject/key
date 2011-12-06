@@ -92,7 +92,7 @@ final class JMLTranslator {
         DL("\\dl_"),
         STORE_REF_EXPR("store_ref_expr"),
         CREATE_LOCSET("create locset"),
-        PAIRWISE_DISJOINT("\\pairwise_disjoint");
+        PAIRWISE_DISJOINT("\\disjoint");
 
         private final String jmlName;
         JMLKeyWord(String name) {
