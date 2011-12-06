@@ -104,8 +104,6 @@ options {
 
 
         intHelper = new JavaIntegerSemanticsHelper(services, excManager);
-	this.translator = JMLTranslator.getInstance();
-
 	// initialize helper objects
 	this.resolverManager = new JMLResolverManager(this.javaInfo,
 						      specInClass,
@@ -941,17 +939,17 @@ shiftexpr returns [SLExpression result=null] throws SLTranslationException
     (
 	sr:SHIFTRIGHT e=additiveexpr
 	{
-        result = translator.<SLExpression>translate(sr.getText(), excManager, services, result, e);
+        result = translator.<SLExpression>translate(sr.getText(), SLExpression.class, services, result, e);
 	}
     |   
 	sl:SHIFTLEFT e=additiveexpr 
 	{
-        result = translator.<SLExpression>translate(sl.getText(), excManager, services, result, e);
+        result = translator.<SLExpression>translate(sl.getText(), SLExpression.class, services, result, e);
 	}
     |   
 	usr:UNSIGNEDSHIFTRIGHT e=additiveexpr 
 	{
-        result = translator.<SLExpression>translate(usr.getText(), excManager, services, result, e);
+        result = translator.<SLExpression>translate(usr.getText(), SLExpression.class, services, result, e);
 	}
     )*
 ; 
@@ -966,12 +964,12 @@ additiveexpr returns [SLExpression result=null] throws SLTranslationException
     (
 	plus:PLUS e=multexpr
 	{
-        result = translator.<SLExpression>translate(plus.getText(), excManager, services, result, e);
+        result = translator.<SLExpression>translate(plus.getText(), SLExpression.class, services, result, e);
 	}
     |
 	minus:MINUS e=multexpr
 	{
-	    result = translator.<SLExpression>translate(minus.getText(), excManager, services, result, e);
+	    result = translator.<SLExpression>translate(minus.getText(), SLExpression.class, services, result, e);
 	}
     )*
 ;
