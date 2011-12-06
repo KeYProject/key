@@ -128,6 +128,9 @@ final class JMLTranslator {
         translationMethods =
                 new EnumMap<JMLKeyWord, JMLTranslationMethod>(JMLKeyWord.class) {
 
+                    private static final long serialVersionUID = 1L;
+
+                    @SuppressWarnings("unused")
                     public JMLTranslationMethod get(JMLKeyWord key) {
                         JMLTranslationMethod m = super.get(key);
                         if (m != null) {
@@ -1196,10 +1199,6 @@ final class JMLTranslator {
     }
     
 
-    /**
-     *
-     */
-    @SuppressWarnings("unchecked")
     public <T> T translate(String jmlKeyWordName,
                            Class<T> resultClass,
                            Object... params)
@@ -1258,7 +1257,6 @@ final class JMLTranslator {
     }
 
 
-    @SuppressWarnings("unchecked")
     private static <T> T castToReturnType(Object result,
                                           Class<T> resultClass)
             throws SLTranslationException {
@@ -1268,7 +1266,7 @@ final class JMLTranslator {
                     + "Return type was: " + result.getClass() + "\n"
                     + "Expected type was: " + resultClass);
         }
-        return (T) result;
+        return resultClass.cast(result);
     }
 
 
