@@ -25,12 +25,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.gui.configuration.StrategySettings;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.proofevent.NodeReplacement;
@@ -103,15 +100,21 @@ public class ApplyStrategy {
                             .equals(StrategyProperties.STOPMODE_NONCLOSE)) {
                     // iff Stop on non-closeable Goal is selected a little
                     // popup is generated and proof is stopped
-                    JOptionPane pane = new JOptionPane(
+                    AutoDismissDialog dialog = new AutoDismissDialog(
                             "Couldn't close Goal Nr. "
                                     + g.node().serialNr()
-                                    + " automatically",
-                            JOptionPane.INFORMATION_MESSAGE,
-                            JOptionPane.DEFAULT_OPTION);
-                    JDialog dialog = pane.createDialog(medi.mainFrame(),
-                            "The KeY Project");
-                    dialog.setVisible(true);
+                                    + " automatically");
+                    dialog.show();
+                    
+//                    JOptionPane pane = new JOptionPane(
+//                            "Couldn't close Goal Nr. "
+//                                    + g.node().serialNr()
+//                                    + " automatically",
+//                            JOptionPane.INFORMATION_MESSAGE,
+//                            JOptionPane.DEFAULT_OPTION);
+//                    JDialog dialog = pane.createDialog(medi.mainFrame(),
+//                            "The KeY Project");
+//                    dialog.setVisible(true);
                     medi.goalChosen(g);
                     return false;
         	}
