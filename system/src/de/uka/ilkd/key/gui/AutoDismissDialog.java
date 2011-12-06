@@ -21,14 +21,14 @@ import javax.swing.JPanel;
 public class AutoDismissDialog {
 
     public static final int DEFAULT_DELAY = 5000;
-    public static final int DEFAULT_RATE = 100;
+    public static final int DEFAULT_RATE = 25;
     public static final int DEFAULT_DELAY_START_TO_DISPOSE = 2000;
     public static final int DEFAULT_DELAY_DISPOSE_TO_END = 1000;
     private final JDialog dialog;
     private final JPanel messagePanel;
     private final Timer timer;
     private int remainingSteps;
-    private final int delay, rate, delayStartToDispose, delayDisposeToEnd;
+    private final int delay, rate, delayStartToDispose;
     private final int steps;
 
 
@@ -49,7 +49,6 @@ public class AutoDismissDialog {
         this.delay = delay;
         this.rate = rate;
         this.delayStartToDispose = delayStartToDispose;
-        this.delayDisposeToEnd = delayDisposeToEnd;
         dialog.pack();
     }
 
