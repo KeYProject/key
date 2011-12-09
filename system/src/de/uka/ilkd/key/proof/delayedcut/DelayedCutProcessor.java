@@ -329,12 +329,15 @@ public class DelayedCutProcessor implements Runnable {
     private void add(LinkedList<NodeGoalPair> pairs, Node [] subtrees, ImmutableList<Goal> goals){
         
         assert subtrees.length == goals.size(); 
-        int i=0;
+        
         for(Goal goal : goals){   
-            if(!subtrees[i].leaf()){
-                pairs.add(new NodeGoalPair(subtrees[i], goal));
+            for(int i=0; i < subtrees.length; i++){
+                if(!subtrees[i].leaf() && subtrees[i].getNodeInfo().getBranchLabel().equals(goal.node().getNodeInfo().getBranchLabel())){
+                    pairs.add(new NodeGoalPair(subtrees[i], goal));
+                }    
             }
-            i++;
+            
+           
         }
     }
     

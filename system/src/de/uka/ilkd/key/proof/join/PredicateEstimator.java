@@ -21,17 +21,23 @@ public interface PredicateEstimator {
      * returns a decision predicate for the two nodes in partner. The predicate should be true 
      * in the sequent of the first node and false in the sequent of the second node.
      */
-    public Term estimate(ProspectivePartner partner, Proof proof);
+    public Result estimate(ProspectivePartner partner, Proof proof);
+    
+    public interface Result{
+        Term getPredicate();
+        Node getCommonParent();
+    }
 }
 
 
 class StdPredicateEstimator implements PredicateEstimator{
     
     @Override
-    public Term estimate(ProspectivePartner partner, Proof proof){
-           String branchLabel = getFirstDifferentNode(partner).getNodeInfo().getBranchLabel();
+    public Result estimate(ProspectivePartner partner, Proof proof){
+           final Node node = getFirstDifferentNode(partner);
+           String branchLabel = node.getNodeInfo().getBranchLabel();
            if(branchLabel != null && (branchLabel.endsWith("TRUE") || branchLabel.endsWith("FALSE") )){
-               boolean positive = branchLabel.endsWith("TRUE");
+               final boolean positive = branchLabel.endsWith("TRUE");
                String suffix = positive ? "TRUE" : "FALSE";
                int index = branchLabel.lastIndexOf(suffix);
                branchLabel = branchLabel.substring(0, index);      
@@ -42,11 +48,27 @@ class StdPredicateEstimator implements PredicateEstimator{
                }
                
           
-               Term term = translate(branchLabel,proof.getServices());;
-               if(term != null && !positive){
-                   return TermBuilder.DF.not(term);
+               final Term term = translate(branchLabel,proof.getServices());
+               
+               if(term != null){
+                   return new Result() {
+                    
+                    @Override
+                    public Term getPredicate() {
+                        if(!positive){
+                            return TermBuilder.DF.not(term);
+                        }
+                        return term;
+                    }
+                    
+                    @Override
+                    public Node getCommonParent() {
+                        return node.parent();
+                    }
+                };
+                   
                }
-               return term;
+               
          
            }
         

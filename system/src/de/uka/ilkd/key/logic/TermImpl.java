@@ -26,13 +26,15 @@ final class TermImpl implements Term {
     	= new ImmutableArray<Term>();
     private static final ImmutableArray<QuantifiableVariable> EMPTY_VAR_LIST
     	= new ImmutableArray<QuantifiableVariable>();
+    private static int serialNumberCounter =0;
 
     //content
     private final Operator op;
     private final ImmutableArray<Term> subs;
     private final ImmutableArray<QuantifiableVariable> boundVars;
     private final JavaBlock javaBlock;
-    
+
+    private int serialNumber = serialNumberCounter++;
     //caches
     private static enum ThreeValuedTruth { TRUE, FALSE, UNKNOWN }
     private int depth = -1;
@@ -494,6 +496,10 @@ final class TermImpl implements Term {
     }
    
 
+    @Override
+    public int serialNumber() {
+        return serialNumber;
+    }
 
  
 }

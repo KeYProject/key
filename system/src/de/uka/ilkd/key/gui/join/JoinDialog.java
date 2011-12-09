@@ -25,6 +25,7 @@ import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.join.PredicateEstimator;
+import de.uka.ilkd.key.proof.join.PredicateEstimator.Result;
 import de.uka.ilkd.key.proof.join.ProspectivePartner;
 
 public class JoinDialog extends StdDialog{
@@ -138,8 +139,10 @@ public class JoinDialog extends StdDialog{
             DefaultListModel model = new DefaultListModel();
             for(final ProspectivePartner partner : partnerList){
                 model.addElement(new ContentItem(partner));
-                partner.setCommonPredicate(estimator.estimate(partner, proof));
-            }
+                Result result = estimator.estimate(partner, proof);
+                partner.setCommonPredicate(result.getPredicate());
+                partner.setCommonParent(result.getCommonParent());
+             }
             
             getChoiceList().setModel(model);
             getChoiceList().setSelectedIndex(0);

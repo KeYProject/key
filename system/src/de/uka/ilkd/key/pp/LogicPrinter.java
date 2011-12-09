@@ -97,7 +97,7 @@ public final class LogicPrinter {
         if (services != null) {
             ni.refresh(services);
         }
-        LogicPrinter p = new LogicPrinter(null, 
+        LogicPrinter p = new LogicPrinter(new ProgramPrinter(), 
                                           ni, 
                                           services);
         try {
