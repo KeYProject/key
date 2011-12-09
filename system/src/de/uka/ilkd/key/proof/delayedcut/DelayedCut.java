@@ -1,7 +1,9 @@
 package de.uka.ilkd.key.proof.delayedcut;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
@@ -22,6 +24,7 @@ public class DelayedCut {
         private final Term decisionPredicate;
         private final RuleApp firstAppliedRuleApp;
         private NoPosTacletApp hideApp = null;
+        private ImmutableList<Goal> goalsAfterUncovering = null;
         
        
         
@@ -63,6 +66,18 @@ public class DelayedCut {
                 throw new IllegalArgumentException("There already exists an app.");
             }
             this.hideApp = hideApp;
+        }
+        
+        public void setGoalsAfterUncovering(
+                ImmutableList<Goal> goalsAfterUncovering) {
+            if(this.goalsAfterUncovering != null){
+                throw new IllegalArgumentException("There already exists a list of goals.");
+            }
+            this.goalsAfterUncovering = goalsAfterUncovering;
+        }
+        
+        public ImmutableList<Goal> getGoalsAfterUncovering() {
+            return goalsAfterUncovering;
         }
         
         public NoPosTacletApp getHideApp() {

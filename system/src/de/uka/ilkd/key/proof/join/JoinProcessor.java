@@ -5,13 +5,15 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.TreeSet;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCut;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCutProcessor;
@@ -21,8 +23,13 @@ public class JoinProcessor implements Runnable{
     private final Proof proof;
     private final Services services;
     private final ProspectivePartner partner;
+    private final LinkedList<Listener> listeners = new LinkedList<Listener>();
+
     
-    
+    public interface Listener{
+        public void exceptionWhileJoining(Throwable e);
+        public void endOfJoining(ImmutableList<Goal> goals);
+    }
     
     public JoinProcessor(ProspectivePartner partner, Proof proof) {
         super();
@@ -40,6 +47,10 @@ public class JoinProcessor implements Runnable{
         
     }
     
+    public void addListener(Listener listener){
+        listeners.add(listener);
+    }
+    
     private void processJoin(){
 
         Term cutFormula = createCutFormula();
@@ -49,11 +60,14 @@ public class JoinProcessor implements Runnable{
                                                 cutFormula,
                                                 DelayedCut.DECISION_PREDICATE_IN_ANTECEDENT);
         
-        cutProcessor.cut();
+        DelayedCut cut = cutProcessor.cut();
+ 
         
-        
-        System.out.println(LogicPrinter.quickPrintTerm(cutFormula, services));
+        for(Listener listener : listeners){
+            listener.endOfJoining(cut.getGoalsAfterUncovering());
+        }
     }
+    
     
     
     private Term createCutFormula(){
@@ -169,7 +183,13 @@ public class JoinProcessor implements Runnable{
 
     @Override
     public void run() {
+        try{
         join();
+        }catch(Throwable e){
+            for(Listener listener : listeners){
+                listener.exceptionWhileJoining(e);
+            }
+        }
     }
 
 }

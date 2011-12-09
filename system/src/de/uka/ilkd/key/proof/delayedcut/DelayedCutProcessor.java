@@ -1,9 +1,11 @@
 package de.uka.ilkd.key.proof.delayedcut;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
@@ -115,7 +117,7 @@ public class DelayedCutProcessor implements Runnable {
         return null;
     }
     
-    public void cut(){
+    public DelayedCut cut(){
         if(used){
             throw new IllegalStateException("For each cut a new object of this class must be created.");
         }
@@ -150,7 +152,7 @@ public class DelayedCutProcessor implements Runnable {
              listener.eventEnd(delayedCut);
          }     
    
-         
+         return delayedCut;
     }
     
 
@@ -332,13 +334,28 @@ public class DelayedCutProcessor implements Runnable {
         
         for(Goal goal : goals){   
             for(int i=0; i < subtrees.length; i++){
-                if(!subtrees[i].leaf() && subtrees[i].getNodeInfo().getBranchLabel().equals(goal.node().getNodeInfo().getBranchLabel())){
+                if(!subtrees[i].leaf() && nodesAreEqual(subtrees[i], goal.node())){
                     pairs.add(new NodeGoalPair(subtrees[i], goal));
                 }    
             }
             
            
         }
+    }
+    
+    private boolean nodesAreEqual(Node node1, Node node2){
+        if(node1.sequent().size() != node2.sequent().size()){
+            return false;
+        }
+        Iterator<SequentFormula> it1 = node1.sequent().iterator();
+        Iterator<SequentFormula> it2 = node2.sequent().iterator();
+        while(it1.hasNext()){
+            if(it1.next().formula() != it2.next().formula()){
+                return false;
+            }
+        }
+        return true;
+        
     }
     
     /**
@@ -371,9 +388,11 @@ public class DelayedCutProcessor implements Runnable {
      * This function uncovers the decision predicate that is hidden after applying the cut rule. 
      */
     private void uncoverDecisionPredicate(DelayedCut cut, List<Goal> openLeaves){
+        ImmutableList<Goal> list = ImmutableSLList.<Goal>nil();
         for(Goal goal : openLeaves){
-            goal.apply(cut.getHideApp());
+            list = list.append(goal.apply(cut.getHideApp()));
         }
+        cut.setGoalsAfterUncovering(list);
     }
 
     @Override

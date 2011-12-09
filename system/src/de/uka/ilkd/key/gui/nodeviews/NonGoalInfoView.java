@@ -298,7 +298,7 @@ public class NonGoalInfoView extends JTextArea {
 			if(ui == null)
 			    return;
 			final NonGoalInfoView t = NonGoalInfoView.this;	 
-			final Rectangle rect = ui.modelToView ( t, r.start () );	 
+			final Rectangle rect = ui.modelToView ( t, r.start () );
 			rect.add ( ui.modelToView ( t, r.end () ) );	 
  	 
 			for ( int i = 4; i >= 0; --i ) {	 
