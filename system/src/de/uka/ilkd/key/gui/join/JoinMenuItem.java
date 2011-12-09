@@ -6,16 +6,19 @@ import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.JMenuItem;
 
+import de.uka.ilkd.key.gui.utilities.InspectorForFormulas;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.join.PredicateEstimator;
 import de.uka.ilkd.key.proof.join.ProspectivePartner;
 
 
 public class JoinMenuItem extends JMenuItem {
     private static final long serialVersionUID = 1L;
-    private final List<ProspectivePartner> partner;
+  
 
-    public JoinMenuItem(final List<ProspectivePartner> partner) {
+    public JoinMenuItem(final List<ProspectivePartner> partner, final Proof proof) {
     super();    
-        this.partner = partner;
+
         this.setText(toString());
         this.setAction(new AbstractAction(toString()) {
             
@@ -23,18 +26,15 @@ public class JoinMenuItem extends JMenuItem {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                 ProspectivePartner p = partner.get(0);
-                 System.out.println(p.getCommonParent().serialNr());
-
-                 System.out.println(p.getCommonPredicate());
+                 JoinDialog dialog = new JoinDialog(new InspectorForFormulas(proof.getServices()),
+                         partner, proof,PredicateEstimator.STD_ESTIMATOR);
+                 dialog.setVisible(true);
+                 
             }
         });
     }
     
-    public  List<ProspectivePartner>  getPartner() {
-            return partner;
-    }
-    
+ 
     @Override
     public String toString() {
         return "Join goal with...";

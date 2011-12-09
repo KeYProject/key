@@ -2,6 +2,7 @@ package de.uka.ilkd.key.proof.join;
 
 import java.util.LinkedList;
 import java.util.List;
+
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -9,7 +10,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
 
 public class JoinIsApplicable {
     public static final JoinIsApplicable INSTANCE = new JoinIsApplicable();
@@ -17,7 +17,7 @@ public class JoinIsApplicable {
     private JoinIsApplicable() {/*It's a singleton*/}
     
     public List<ProspectivePartner> isApplicable(Goal goal ,PosInOccurrence pio){
-        if(!pio.isTopLevel() || pio.isInAntec()){
+        if(pio == null || !pio.isTopLevel() || pio.isInAntec()){
             return new LinkedList<ProspectivePartner>();
         }
         return computeProspecitvePartner(goal, pio);
