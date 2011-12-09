@@ -281,7 +281,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 	// because they prevented the scrollbar from appearing (esp. in
 	// low screen resolution)
  	tablePane.setPreferredSize(tableDim);
-	validateTree();
+	validate();
     }
 
     private void setColumnName(int model, int col, String name) {
