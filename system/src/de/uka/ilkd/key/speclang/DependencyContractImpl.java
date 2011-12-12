@@ -20,6 +20,7 @@ import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.DependencyContractPO;
@@ -67,6 +68,7 @@ public final class DependencyContractImpl implements DependencyContract {
         assert (selfVar == null) == target.isStatic();
         assert paramVars != null;
         assert paramVars.size() == target.arity() - (target.isStatic() ? 1 : 2);
+        assert pre.sort() == Sort.FORMULA;
 	this.baseName = baseName;
         this.name                   = name != null 
                                       ? name 
@@ -151,7 +153,9 @@ public final class DependencyContractImpl implements DependencyContract {
         assert paramVars.size() == originalParamVars.size();
         assert services != null;
 	Map<SVSubstitute, SVSubstitute> map = new HashMap<SVSubstitute, SVSubstitute>();
-	map.put(originalSelfVar, selfVar);
+	if (originalSelfVar != null) {
+	    map.put(originalSelfVar, selfVar);
+	}
 	for(ProgramVariable originalParamVar : originalParamVars) {
 	    map.put(originalParamVar, paramVars.head());
 	    paramVars = paramVars.tail();
@@ -197,7 +201,9 @@ public final class DependencyContractImpl implements DependencyContract {
         assert paramVars.size() == originalParamVars.size();
         assert services != null;
 	Map<SVSubstitute, SVSubstitute> map = new HashMap<SVSubstitute, SVSubstitute>();
-	map.put(originalSelfVar, selfVar);
+	if (originalSelfVar != null) {
+	    map.put(originalSelfVar, selfVar);
+	}
 	for(ProgramVariable originalParamVar : originalParamVars) {
 	    map.put(originalParamVar, paramVars.head());
 	    paramVars = paramVars.tail();
@@ -220,7 +226,9 @@ public final class DependencyContractImpl implements DependencyContract {
 	assert services != null;
 	Map<SVSubstitute, SVSubstitute> map = new HashMap<SVSubstitute, SVSubstitute>();
 	map.put(TB.heap(services), heapTerm);
-	map.put(TB.var(originalSelfVar), selfTerm);
+	if (originalSelfVar != null) {
+	    map.put(TB.var(originalSelfVar), selfTerm);
+	}
 	for(ProgramVariable originalParamVar : originalParamVars) {
 	    map.put(TB.var(originalParamVar), paramTerms.head());
 	    paramTerms = paramTerms.tail();
@@ -274,7 +282,9 @@ public final class DependencyContractImpl implements DependencyContract {
         assert paramVars.size() == originalParamVars.size();
         assert services != null;
 	Map<SVSubstitute, SVSubstitute> map = new HashMap<SVSubstitute, SVSubstitute>();
-	map.put(originalSelfVar, selfVar);
+	if (originalSelfVar != null) {
+	    map.put(originalSelfVar, selfVar);
+	}
 	for(ProgramVariable originalParamVar : originalParamVars) {
 	    map.put(originalParamVar, paramVars.head());
 	    paramVars = paramVars.tail();
