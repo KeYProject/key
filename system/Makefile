@@ -150,7 +150,7 @@ doc: argfile
 	-sourcepath $(GENERATED_SRC_PATH):$(SRC):$(TEST) -d doc \
 	-link http://recoder.sourceforge.net/doc/api \
 	-link http://download.oracle.com/javase/6/docs/api/ \
-	-link http://www.antlr.org \
+	-link http://www.antlr2.org/javadoc/ \
 	-windowtitle "KeY API Documentation" \
 	-doctitle "KeY API Documentation ($(KEY_VERSION_LONG))" \
 	-header "KeY $(KEY_VERSION_LONG)" \
