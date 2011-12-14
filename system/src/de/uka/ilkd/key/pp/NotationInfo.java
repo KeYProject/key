@@ -19,6 +19,7 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.util.UnicodeHelper;
 
 
 /** 
@@ -119,6 +120,7 @@ public final class NotationInfo {
 
 
     public static boolean PRETTY_SYNTAX = true;
+    public static boolean UNICODE_ENABLED = false;
         
     
     /** This maps operators and classes of operators to {@link
@@ -235,6 +237,31 @@ public final class NotationInfo {
 	tbl.put(charListLDT.getClEmpty(), new Notation.Constant("\"\"",PRIORITY_BOTTOM));
     }
     
+    /**
+     * Add notations with Unicode symbols.
+     * @param services
+     */
+    private void addVeryFancyNotations(Services services){
+        final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();  
+        final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
+        tbl.put(Junctor.TRUE ,new Notation.Constant(""+UnicodeHelper.TOP, PRIORITY_ATOM));
+        tbl.put(Junctor.FALSE,new Notation.Constant(""+UnicodeHelper.BOT, PRIORITY_ATOM));
+        tbl.put(Junctor.NOT,new Notation.Prefix(""+UnicodeHelper.NEG ,PRIORITY_NEGATION,PRIORITY_NEGATION));
+        tbl.put(Junctor.AND,new Notation.Infix(""+UnicodeHelper.AND  ,PRIORITY_AND,PRIORITY_AND,PRIORITY_MODALITY));
+        tbl.put(Junctor.OR, new Notation.Infix(""+UnicodeHelper.OR  ,PRIORITY_OR,PRIORITY_OR,PRIORITY_AND));
+        tbl.put(Junctor.IMP,new Notation.Infix(""+UnicodeHelper.IMP ,PRIORITY_IMP,PRIORITY_OR,PRIORITY_IMP));
+        tbl.put(Equality.EQV,new Notation.Infix(""+UnicodeHelper.EQV,PRIORITY_EQUIVALENCE,PRIORITY_EQUIVALENCE,PRIORITY_IMP));
+        tbl.put(Quantifier.ALL,new Notation.Quantifier(""+UnicodeHelper.FORALL, PRIORITY_QUANTIFIER, PRIORITY_QUANTIFIER));
+        tbl.put(Quantifier.EX, new Notation.Quantifier(""+UnicodeHelper.EXISTS, PRIORITY_QUANTIFIER, PRIORITY_QUANTIFIER));
+        tbl.put(integerLDT.getLessOrEquals(), new Notation.Infix(""+UnicodeHelper.LEQ, PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
+        tbl.put(integerLDT.getGreaterOrEquals(), new Notation.Infix(""+UnicodeHelper.GEQ, PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
+        tbl.put(setLDT.getEmpty(), new Notation.Constant(""+UnicodeHelper.EMPTY, PRIORITY_ATOM));
+        tbl.put(setLDT.getUnion(), new Notation.Infix(""+UnicodeHelper.UNION, PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
+        tbl.put(setLDT.getIntersect(), new Notation.Infix(""+UnicodeHelper.INTERSECT, PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
+        tbl.put(setLDT.getSetMinus(), new Notation.Infix(""+UnicodeHelper.SETMINUS, PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
+        tbl.put(setLDT.getElementOf(), new Notation.ElementOfNotation(""+UnicodeHelper.IN));
+        tbl.put(setLDT.getSubset(), new Notation.Infix(""+UnicodeHelper.SUBSET, PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
+    }
 
 
     //-------------------------------------------------------------------------
@@ -245,6 +272,8 @@ public final class NotationInfo {
 	createDefaultNotationTable();
 	if(PRETTY_SYNTAX && services != null) {
 	    addFancyNotations(services);
+	    if (UNICODE_ENABLED)
+	        addVeryFancyNotations(services);
 	}
     }    
         

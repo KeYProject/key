@@ -87,6 +87,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.pp.SequentPrintFilter;
 import de.uka.ilkd.key.proof.Goal;
@@ -106,6 +107,7 @@ import de.uka.ilkd.key.util.GuiUtilities;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.PreferenceSaver;
+import de.uka.ilkd.key.util.UnicodeHelper;
 
 
 @SuppressWarnings("serial")
@@ -800,6 +802,23 @@ public final class MainWindow extends JFrame  {
         
        
         view.add(new JCheckBoxMenuItem(new PrettyPrintToggleAction(this)));
+        
+
+        final MainWindowAction pp2 = new MainWindowAction(this, 
+                "Use Unicode symbols", 
+                "If checked formulae are displayed with special Unicode characters" +
+                " (such as \""+UnicodeHelper.AND+"\") instead of the traditional ASCII ones. \n"+
+                "Only works in combination with pretty printing (see above).",
+                NotationInfo.UNICODE_ENABLED){
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                NotationInfo.UNICODE_ENABLED = ((JCheckBoxMenuItem) e.getSource()).isSelected();
+                mainWindow.makePrettyView();
+            }
+        };
+        view.add(new JCheckBoxMenuItem(pp2));
+        
         view.addSeparator();
         {
             JMenu fontSize = new JMenu("Font Size");
