@@ -22,8 +22,8 @@ public final class UnicodeHelper {
     public static final char OR = '\u2228'; 
 
     // temporal operators
-    public static final char BOX = '\u25FB';
-    public static final char DIAMOND = '\u22C4';
+    public static final char BOX = '\u25A1';
+    public static final char DIAMOND = '\u25C7';
     public static final char CIRC = '\u2218';
     public static final char BULLET = '\u2219';
     
@@ -37,5 +37,7 @@ public final class UnicodeHelper {
     public static final char BOT = '\u22A5';
     public static final char TURNSTILE = '\u22A6';
     public static final char MODELS = '\u22A7';
+    
+    
     
 }
