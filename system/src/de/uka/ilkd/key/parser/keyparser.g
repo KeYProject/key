@@ -2290,20 +2290,14 @@ formula returns [Term a = null]
         }
     ;
 
-term returns [Term a = null] 
-    :
-        a=term10 
-    ;
-
-
-term10 returns [Term result = null]
+term returns [Term result = null]
 {
     Term a = null;
 }
     :
-        result=term10_2
+        result=elementary_update_term
         (
-           PARALLEL a=term10_2
+           PARALLEL a=elementary_update_term
            {
                result = tf.createTerm(UpdateJunctor.PARALLEL_UPDATE, result, a);
            }
@@ -2317,13 +2311,13 @@ term10 returns [Term result = null]
         }
         
         
-term10_2 returns[Term result=null]
+elementary_update_term returns[Term result=null]
 {
     Term a = null;
 }  :
-        result=term20 
+        result=equivalence_term 
         (
-            ASSIGN a=term20
+            ASSIGN a=equivalence_term
             {
                 result = TermBuilder.DF.elementary(getServices(), result, a);
             }
@@ -2336,12 +2330,12 @@ term10_2 returns[Term result=null]
         }
 
 
-term20 returns [Term a = null] 
+equivalence_term returns [Term a = null] 
 {
     Term a1;
 }
-    :   a=term30 
-        (EQV a1=term30 
+    :   a=implication_term 
+        (EQV a1=implication_term 
             { a = tf.createTerm(Equality.EQV, new Term[]{a, a1});} )*
 ; exception
         catch [TermCreationException ex] {
@@ -2350,12 +2344,12 @@ term20 returns [Term a = null]
 			(ex.getMessage(), getFilename(), getLine(), getColumn()));
         }
 
-term30 returns [Term a = null] 
+implication_term returns [Term a = null] 
 {
     Term a1;
 }
-    :   a=term40 
-        (IMP a1=term30 
+    :   a=disjunction_term 
+        (IMP a1=implication_term 
             { a = tf.createTerm(Junctor.IMP, new Term[]{a, a1});} )?
 ; exception
         catch [TermCreationException ex] {
@@ -2364,12 +2358,12 @@ term30 returns [Term a = null]
 			(ex.getMessage(), getFilename(), getLine(), getColumn()));
         }
 
-term40 returns [Term a = null] 
+disjunction_term returns [Term a = null] 
 {
     Term a1;
 }
-    :   a=term50 
-        (OR a1=term50 
+    :   a=conjunction_term 
+        (OR a1=conjunction_term 
             { a = tf.createTerm(Junctor.OR, new Term[]{a, a1});} )*
 ; exception
         catch [TermCreationException ex] {
@@ -2378,7 +2372,7 @@ term40 returns [Term a = null]
 			(ex.getMessage(), getFilename(), getLine(), getColumn()));
         }
 
-term50 returns [Term a = null] 
+conjunction_term returns [Term a = null] 
 {
     Term a1;
 }
@@ -2396,7 +2390,7 @@ term50 returns [Term a = null]
 term60 returns [Term a = null] 
     :  
         a = unary_formula
-    |   a = term70
+    |   a = equality_term
 ; exception
         catch [TermCreationException ex] {
               keh.reportException
@@ -2417,7 +2411,8 @@ unary_formula returns [Term a = null]
 			(ex.getMessage(), getFilename(), getLine(), getColumn()));
         }
 
-term70 returns [Term a = null] 
+
+equality_term returns [Term a = null] 
 {
     Term a1;
     boolean negated = false;
@@ -2515,7 +2510,7 @@ logicTermReEntry returns [Term a = null]
   Function op = null;
 }
 :
-   a = term90 ((relation_op)=> op = relation_op a1=term90 {
+   a = weak_arith_op_term ((relation_op)=> op = relation_op a1=weak_arith_op_term {
                  a = tf.createTerm(op, a, a1);
               })?
 ; exception
@@ -2526,13 +2521,13 @@ logicTermReEntry returns [Term a = null]
         }
 
 
-term90 returns [Term a = null]
+weak_arith_op_term returns [Term a = null]
 {
   Term a1 = null;
   Function op = null;
 }
 :
-   a = term100 ( op = weak_arith_op a1=term100 {
+   a = strong_arith_op_term ( op = weak_arith_op a1=strong_arith_op_term {
                   a = tf.createTerm(op, a, a1);
                 })*
 ; exception
@@ -2542,7 +2537,7 @@ term90 returns [Term a = null]
 			(ex.getMessage(), getFilename(), getLine(), getColumn()));
         }
 
-term100 returns [Term a = null]
+strong_arith_op_term returns [Term a = null]
 {
   Term a1 = null;
   Function op = null;
@@ -2810,7 +2805,7 @@ accessterm returns [Term result = null]
         {isStaticAttribute()}?            // look for package1.package2.Class.attr
         result = static_attribute_suffix
       | 	
-        result = term130
+        result = atom
       )   
          ( result = array_access_suffix[result] | result = attribute_or_query_suffix[result] )*
  ; exception
@@ -2869,7 +2864,7 @@ accesstermlist returns [HashSet accessTerms = new HashSet()] {Term t = null;}:
      (t=accessterm {accessTerms.add(t);} ( COMMA t=accessterm {accessTerms.add(t);})* )? ;
 
 
-term130 returns [Term a = null]
+atom returns [Term a = null]
     :
         {isTermTransformer()}? a = specialTerm
     |   a = funcpredvarterm

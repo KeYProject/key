@@ -381,13 +381,19 @@ public abstract class Notation {
      * The standard concrete syntax for the element of operator.
      */
     public static final class ElementOfNotation extends Notation {
+        private String symbol;
 
 	public ElementOfNotation() {
 	    super(130);
 	}
+	
+	    public ElementOfNotation(String symbol){
+	        this();
+	        this.symbol = symbol;
+	    }
 
 	public void print(Term t, LogicPrinter sp) throws IOException {
-	    sp.printElementOf(t);
+	    sp.printElementOf(t, symbol);
 	}
     }      
     

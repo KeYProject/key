@@ -1101,7 +1101,36 @@ public final class LogicPrinter {
 	markStartSub();	 
 	printTerm(t.sub(2));
 	markEndSub();	
-    }      
+    }     
+    
+    public void printElementOf(Term t, String symbol) throws IOException {
+        if (symbol == null) {
+            printElementOf(t);
+            return;
+        }
+
+        assert t.arity() == 3;
+        startTerm(3);
+        
+        layouter.print("(").beginC(0);
+        
+        markStartSub();  
+        printTerm(t.sub(0));
+        markEndSub();
+        
+        layouter.print(",").brk(1,0);
+        
+        markStartSub();  
+        printTerm(t.sub(1));
+        markEndSub();
+
+        layouter.print(")").end();
+        layouter.print(symbol);
+        
+        markStartSub();  
+        printTerm(t.sub(2));
+        markEndSub();   
+    }
     
 
     /** Print a unary term in prefix style.  For instance
