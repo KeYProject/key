@@ -259,7 +259,7 @@ public final class NotationInfo {
         tbl.put(setLDT.getUnion(), new Notation.Infix(""+UnicodeHelper.UNION, PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
         tbl.put(setLDT.getIntersect(), new Notation.Infix(""+UnicodeHelper.INTERSECT, PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
         tbl.put(setLDT.getSetMinus(), new Notation.Infix(""+UnicodeHelper.SETMINUS, PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
-        tbl.put(setLDT.getElementOf(), new Notation.ElementOfNotation(""+UnicodeHelper.IN));
+        tbl.put(setLDT.getElementOf(), new Notation.ElementOfNotation(" " + UnicodeHelper.IN + " "));
         tbl.put(setLDT.getSubset(), new Notation.Infix(""+UnicodeHelper.SUBSET, PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
     }
 
