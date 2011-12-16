@@ -4,7 +4,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -41,14 +40,14 @@ public class JoinIsApplicable {
     
     private ProspectivePartner areProspectivePartners(Goal g1, PosInOccurrence pio ,Goal g2){
         Term referenceFormula = pio.subTerm();
+     
         Term update1 = referenceFormula.op() instanceof UpdateApplication ? referenceFormula.sub(0) : TermBuilder.DF.skip();
-        Term formula1 = referenceFormula;
+
         referenceFormula = referenceFormula.op() instanceof UpdateApplication ? referenceFormula.sub(1) : referenceFormula;
         
         
         for(SequentFormula sf : g2.sequent().succedent()){
             Term formula = sf.formula();
-            Term formula2 = formula;
             Term update2 = TermBuilder.DF.skip();
             if(formula.op() instanceof UpdateApplication 
                && !formula.equals(referenceFormula)){
@@ -57,8 +56,9 @@ public class JoinIsApplicable {
                     
             }
             if(formula.equals(referenceFormula)){
-                return new ProspectivePartner(referenceFormula,g1.node(),formula1,update1,pio,g2.node(),formula2,update2,
-                        new PosInOccurrence(sf,PosInTerm.TOP_LEVEL,false));
+                return new ProspectivePartner(referenceFormula,g1.node(),
+                        pio.constrainedFormula(),update1,g2.node(),sf,update2
+                        );
             }
         }
         return null;

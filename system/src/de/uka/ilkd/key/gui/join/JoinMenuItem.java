@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.gui.join;
 
 import java.awt.event.ActionEvent;
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -9,10 +8,10 @@ import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.gui.ExceptionDialog;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.utilities.InspectorForFormulas;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.join.JoinProcessor;
 import de.uka.ilkd.key.proof.join.JoinProcessor.Listener;
@@ -47,7 +46,7 @@ public class JoinMenuItem extends JMenuItem {
                         
                         @Override
                         public void exceptionWhileJoining(Throwable e) {
-                           e.printStackTrace();     
+                           ExceptionDialog.showDialog(mediator.mainFrame(), e);   
                            mediator.startInterface(true);
                         }
                         

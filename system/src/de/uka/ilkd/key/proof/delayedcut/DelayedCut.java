@@ -25,6 +25,7 @@ public class DelayedCut {
         private final RuleApp firstAppliedRuleApp;
         private NoPosTacletApp hideApp = null;
         private ImmutableList<Goal> goalsAfterUncovering = null;
+        private Goal                remainingGoal = null;
         
        
         
@@ -61,19 +62,27 @@ public class DelayedCut {
             return proof;
         }
         
-        public void setHideApp(NoPosTacletApp hideApp) {
+        void setHideApp(NoPosTacletApp hideApp) {
             if(this.hideApp != null){
                 throw new IllegalArgumentException("There already exists an app.");
             }
             this.hideApp = hideApp;
         }
         
-        public void setGoalsAfterUncovering(
+        void setGoalsAfterUncovering(
                 ImmutableList<Goal> goalsAfterUncovering) {
             if(this.goalsAfterUncovering != null){
                 throw new IllegalArgumentException("There already exists a list of goals.");
             }
             this.goalsAfterUncovering = goalsAfterUncovering;
+        }
+        
+        void setRemainingGoal(Goal remainingGoal) {
+            this.remainingGoal = remainingGoal;
+        }
+        
+        public Goal getRemainingGoal() {
+            return remainingGoal;
         }
         
         public ImmutableList<Goal> getGoalsAfterUncovering() {

@@ -72,6 +72,7 @@ tokens {
 	DISJOINTMODULONULL  = "\\disjointModuloNull";
 	DROP_EFFECTLESS_ELEMENTARIES = "\\dropEffectlessElementaries";
 	DROP_EFFECTLESS_STORES = "\\dropEffectlessStores";	
+	SIMPLIFY_IF_THEN_ELSE_UPDATE = "\\simplifyIfThenElseUpdate";
 	ENUM_CONST = "\\enumConstant";	
         FREELABELIN = "\\freeLabelIn";
 	HASSORT = "\\hasSort";

@@ -1,23 +1,24 @@
 package de.uka.ilkd.key.proof.join;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
+
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
 
 public class ProspectivePartner {
         private final Term[] updates = new Term[2];
         private final Term   commonFormula;
-        private final Term[]   formula = new Term[2];
+        private final SequentFormula []   formula = new SequentFormula[2];
         private final Node[] nodes = new Node[2];
-        private final PosInOccurrence [] positions = new PosInOccurrence[2];
         private Term commonPredicate = null; 
         private Node commonParent = null;
+        private SequentFormula formulaForHiding = null;
 
         
         
-        public ProspectivePartner(Term commonFormula,Node node1,Term formula1, Term update1, PosInOccurrence pos1,
-                Node node2,Term formula2, Term update2, PosInOccurrence pos2) {
+        public ProspectivePartner(Term commonFormula,Node node1,SequentFormula formula1, Term update1,
+                Node node2,SequentFormula formula2, Term update2) {
             super();
             this.commonFormula = commonFormula;
             formula[0] = formula1;
@@ -26,8 +27,6 @@ public class ProspectivePartner {
             updates[1] = update2;
             nodes[0]   = node1;
             nodes[1]   = node2;
-            positions[0] = pos1;
-            positions[1] = pos2;
         }
         
         public Term getCommonFormula() {
@@ -42,10 +41,6 @@ public class ProspectivePartner {
             return updates[index];
         }
         
-        public PosInOccurrence getPosition(int index){
-            return positions[index];
-        }
-        
         public void setCommonPredicate(Term commonPredicate) {
             this.commonPredicate = commonPredicate;
         }
@@ -56,6 +51,15 @@ public class ProspectivePartner {
         
         public void setCommonParent(Node commonParent) {
             this.commonParent = commonParent;
+            setFormulaForHiding(commonParent.getAppliedRuleApp().posInOccurrence().constrainedFormula());
+        }
+        
+        private void setFormulaForHiding(SequentFormula formulaForHiding) {
+            this.formulaForHiding = formulaForHiding;
+        }
+        
+        public SequentFormula getFormulaForHiding() {
+            return formulaForHiding;
         }
         
         public Node getCommonParent() {
@@ -66,7 +70,7 @@ public class ProspectivePartner {
             return getNode(index).sequent();
         }
         
-        public Term getFormula(int i){
+        public SequentFormula getFormula(int i){
             return formula[i];
         }
 

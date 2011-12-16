@@ -11,10 +11,10 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.TacletFilter;
 import de.uka.ilkd.key.rule.BuiltInRuleApp;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
@@ -22,8 +22,7 @@ import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.inst.SVInstantiations;
-
+    
 /**
  * This class is responsible for processing the delayed cut. The information about the cut 
  * is stored in  <code>DelayCut</code>. For each cut a new object of this class must be created.
@@ -60,32 +59,6 @@ public class DelayedCutProcessor implements Runnable {
     private final int   mode;
     private boolean     used = false;
     
-    
-    /**
-     * This class wraps the taclets used for the cutting process. 
-     */
-    private static class TacletCollection{
-        FindTaclet hideRightTaclet;
-        Taclet cutTaclet;
-        FindTaclet hideLeftTaclet;
-        TacletCollection(Proof proof){
-            for(Taclet taclet : proof.env().getInitConfig().getTaclets()){
-                if(taclet.name().toString().equals(HIDE_RIGHT_TACLET)){
-                    hideRightTaclet = (FindTaclet)taclet;
-                }else  if(taclet.name().toString().equals(CUT_TACLET)){
-                    cutTaclet = taclet; 
-                }  if(taclet.name().toString().equals(HIDE_LEFT_TACLET)){
-                    hideLeftTaclet = (FindTaclet)taclet; 
-                }                
-            }
-        }
-        public String toString(){
-            String s = "hideRightTaclet: " + (hideRightTaclet != null) + "\n"+
-                        "hideLeftTaclet: " + (hideLeftTaclet != null) + "\n"+
-                        "cutTaclet: " + (cutTaclet != null) + "\n";
-            return s;
-        }
-    }
     
 
     
@@ -129,18 +102,22 @@ public class DelayedCutProcessor implements Runnable {
          RuleApp firstAppliedRuleApp = node.getAppliedRuleApp(); 
          Node subtrees [] = proof.pruneProof(node,false);
          
-         // collect the taclets that are necessary for cutting: cut and hide taclets.
-         TacletCollection taclets = new TacletCollection(proof);
          
          DelayedCut delayedCut = new DelayedCut(proof, node,
                                                 descisionPredicate, subtrees,
                                                 mode,firstAppliedRuleApp);
          
          // apply the cut rule on the node.
-         ImmutableList<Goal> result = cut(delayedCut,taclets);      
+         ImmutableList<Goal> result = cut(delayedCut);      
 
          // hide the decision predicate.
-         result = hide(delayedCut,getGoalForHiding(result, delayedCut),taclets);
+         int indexForHiding = getGoalForHiding(result, delayedCut);
+         Goal hide = indexForHiding == 0 ? result.head() :
+                                result.tail().head();
+         delayedCut.setRemainingGoal(indexForHiding == 1 ? result.head() :
+                                result.tail().head());
+         
+         result = hide(delayedCut,hide);
                   
          // rebuild the tree that has been pruned before.
          List<Goal> openLeaves = rebuildSubTrees(delayedCut, result.head());
@@ -162,38 +139,62 @@ public class DelayedCutProcessor implements Runnable {
     
     
     
-    private ImmutableList<Goal> cut(DelayedCut cut,
-            TacletCollection taclets){
+    private ImmutableList<Goal> cut(DelayedCut cut){
         Goal goal = find(cut.getProof(), cut.getNode());
         
+        TacletFilter filter = new TacletFilter() {
+            
+            @Override
+            protected boolean filter(Taclet taclet) {
+                
+                return taclet.name().toString().equals(CUT_TACLET);
+            }
+            
+            
+        };
+        
+        ImmutableList<NoPosTacletApp> apps =  goal.ruleAppIndex().getNoFindTaclet(filter, cut.getServices());
+        assert apps.size() == 1;
          
-        TacletApp app = NoPosTacletApp.createNoPosTacletApp(taclets.cutTaclet);
+        TacletApp app = apps.head();
         
         app = app.addCheckedInstantiation(app.uninstantiatedVars().iterator().next(),
                                     cut.getFormula(),cut.getServices(), true);
         return goal.apply(app);
     }
     
+    private ImmutableList<Goal> apply(final String tacletName,Goal goal, PosInOccurrence pio){
+        TacletFilter filter = new TacletFilter() {
+            
+            @Override
+            protected boolean filter(Taclet taclet) {
+                
+                return taclet.name().toString().equals(tacletName);
+            }
+            
+            
+        };
+     
+        ImmutableList<NoPosTacletApp> apps =  goal.ruleAppIndex().getFindTaclet(filter,pio,goal.proof().getServices());
+        assert apps.size() == 1;
+        NoPosTacletApp app = apps.head();
+        
+        PosTacletApp app2 = app.setPosInOccurrence(pio, goal.proof().getServices());
+        return goal.apply(app2); 
+    }
+    
     /**
      * Hides the formula that has been added by the hide process.*/
-    private ImmutableList<Goal> hide(DelayedCut cut, Goal goal, TacletCollection taclets){
-        FindTaclet hideTaclet = getHideTaclet(cut, taclets);
-        SVInstantiations inst =
-        SVInstantiations.EMPTY_SVINSTANTIATIONS.add(
-                getSVofHideTaclet(hideTaclet),
-                cut.getFormula(), cut.getServices());
-      
+    private ImmutableList<Goal> hide(DelayedCut cut, Goal goal){
+  
         SequentFormula sf = getSequentFormula(goal, cut.isDecisionPredicateInAntecendet());
         
         
         PosInOccurrence pio = new PosInOccurrence(sf,PosInTerm.TOP_LEVEL,
                 cut.isDecisionPredicateInAntecendet());
         
-        TacletApp app = PosTacletApp.createPosTacletApp(hideTaclet,inst,
-                pio,
-            cut.getServices());
-        ImmutableList<Goal> result = goal.apply(app);
-        cut.setHideApp(result.head().node().getLocalIntroducedRules().iterator().next());
+        ImmutableList<Goal> result= apply(getHideTacletName(cut), goal, pio);
+          cut.setHideApp(result.head().node().getLocalIntroducedRules().iterator().next());
         return result;
     }
     
@@ -201,7 +202,7 @@ public class DelayedCutProcessor implements Runnable {
      * After applying the cut rule two goal result. The pruned subtree is added to one of these goals. 
      * This method finds the the goal.
      *     */
-    private Goal getGoalForHiding(ImmutableList<Goal> goals, DelayedCut cut){
+    private int getGoalForHiding(ImmutableList<Goal> goals, DelayedCut cut){
         assert goals.size() == 2;
         Goal [] goal = {goals.head(),goals.tail().head()};
        
@@ -213,24 +214,20 @@ public class DelayedCutProcessor implements Runnable {
             if(goal[i].node().getNodeInfo().getBranchLabel().endsWith(side)){
                 SequentFormula formula = getSequentFormula(goal[i], cut.isDecisionPredicateInAntecendet());
                 if(formula.formula() == cut.getFormula()){
-                    return goal[i];
+                    return i;
                 }
             }
         }
         throw new IllegalStateException("After a cut a goal belongs to the left or right side of the tree");
     }
     
-    private SchemaVariable getSVofHideTaclet(Taclet taclet){
-        return  taclet.getIfFindVariables().iterator().next();
+
+    
+    private String getHideTacletName(DelayedCut cut){
+        return cut.isDecisionPredicateInAntecendet() ?HIDE_LEFT_TACLET:
+            HIDE_RIGHT_TACLET;        
     }
     
-    /**
-     * Returns the right hide talcet.
-     */
-    private FindTaclet getHideTaclet(DelayedCut cut, TacletCollection taclets){
-        return cut.isDecisionPredicateInAntecendet() ? taclets.hideLeftTaclet :
-            taclets.hideRightTaclet;        
-    }
     
     private SequentFormula getSequentFormula(Goal goal, boolean decPredInAnte){
         return decPredInAnte ?

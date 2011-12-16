@@ -7,16 +7,21 @@ import java.util.TreeSet;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Semisequent;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.TacletFilter;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCut;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCutProcessor;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.PosTacletApp;
+import de.uka.ilkd.key.rule.Taclet;
 
 public class JoinProcessor implements Runnable{
     private boolean used = false;
@@ -24,6 +29,9 @@ public class JoinProcessor implements Runnable{
     private final Services services;
     private final ProspectivePartner partner;
     private final LinkedList<Listener> listeners = new LinkedList<Listener>();
+    private static final String HIDE_RIGHT_TACLET = "hide_right";
+    public static final String SIMPLIFY_UPDATE = "simplifyIfThenElseUpdate";
+
 
     
     public interface Listener{
@@ -62,12 +70,61 @@ public class JoinProcessor implements Runnable{
         
         DelayedCut cut = cutProcessor.cut();
  
+        Goal result = hide(cut.getRemainingGoal());
         
+        simplifyUpdate(result,cut);
+  
         for(Listener listener : listeners){
             listener.endOfJoining(cut.getGoalsAfterUncovering());
         }
     }
     
+
+    
+    private SequentFormula findFormula(Sequent sequent,Term content, boolean antecedent){
+        for(SequentFormula sf : (antecedent ? sequent.antecedent() : sequent.succedent())){
+            if(sf.formula().equals(content)){
+                return sf;
+            }
+        }
+        return null;
+    }
+    
+    private void simplifyUpdate(Goal goal, DelayedCut cut){
+
+        SequentFormula sf = findFormula(goal.sequent(), cut.getFormula(), false);
+        
+        PosInOccurrence pio = new PosInOccurrence(sf,PosInTerm.TOP_LEVEL.down(0),false);
+        apply(SIMPLIFY_UPDATE, goal, pio);
+    }
+    
+    private ImmutableList<Goal> apply(final String tacletName,Goal goal, PosInOccurrence pio){
+        TacletFilter filter = new TacletFilter() {
+            
+            @Override
+            protected boolean filter(Taclet taclet) {
+                
+                return taclet.name().toString().equals(tacletName);
+            }
+            
+            
+        };
+        ImmutableList<NoPosTacletApp> apps =  goal.ruleAppIndex().getFindTaclet(filter,pio, services);
+        assert apps.size() == 1;
+        NoPosTacletApp app = apps.head();
+        
+        PosTacletApp app2 = app.setPosInOccurrence(pio, services);
+        return goal.apply(app2); 
+    }
+
+    
+    private Goal hide(Goal goal){
+        int index = goal.sequent().formulaNumberInSequent(false,partner.getFormulaForHiding());
+        PosInOccurrence pio = PosInOccurrence.findInSequent(goal.sequent(),
+                index, PosInTerm.TOP_LEVEL);
+        return apply(HIDE_RIGHT_TACLET, goal, pio).head();
+        
+    }
     
     
     private Term createCutFormula(){
@@ -91,8 +148,8 @@ public class JoinProcessor implements Runnable{
          Collection<Term> commonGamma = computeCommonFormulas(partner.getSequent(0).antecedent(),
                                                               partner.getSequent(1).antecedent(),
                                                               partner.getCommonFormula());
-         Collection<Term> delta1      = computeDifference(partner.getSequent(0).succedent(),commonDelta,partner.getFormula(0));
-         Collection<Term> delta2      = computeDifference(partner.getSequent(1).succedent(),commonDelta,partner.getFormula(1));
+         Collection<Term> delta1      = computeDifference(partner.getSequent(0).succedent(),commonDelta,partner.getFormula(0).formula());
+         Collection<Term> delta2      = computeDifference(partner.getSequent(1).succedent(),commonDelta,partner.getFormula(1).formula());
          
          Collection<Term> gamma1      = computeDifference(partner.getSequent(0).antecedent(),commonGamma,null);
          Collection<Term> gamma2      = computeDifference(partner.getSequent(1).antecedent(),commonGamma,null);

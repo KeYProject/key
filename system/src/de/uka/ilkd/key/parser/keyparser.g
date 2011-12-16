@@ -3481,7 +3481,7 @@ varexp[TacletBuilder b]
 :
   ( varcond_applyUpdateOnRigid[b]
     | varcond_dropEffectlessElementaries[b]
-    | varcond_dropEffectlessStores[b]  
+    | varcond_dropEffectlessStores[b] 
     | varcond_enum_const[b] 
     | varcond_free[b]  
     | varcond_hassort[b]
@@ -3492,6 +3492,7 @@ varexp[TacletBuilder b]
     | varcond_observer[b]
     | varcond_different[b]
     | varcond_metadisjoint[b]
+    | varcond_simplifyIfThenElseUpdate[b]
   ) 
   | 
   ( (NOT {negated = true;} )? 
@@ -3557,6 +3558,25 @@ varcond_dropEffectlessStores[TacletBuilder b]
       							       (TermSV)f,
       							       (TermSV)x, 
                                                                (TermSV)result));
+   }
+;
+
+varcond_simplifyIfThenElseUpdate[TacletBuilder b]
+{
+  ParsableVariable u1 = null;
+  ParsableVariable u2 = null;
+  ParsableVariable commonFormula  = null;
+  ParsableVariable phi = null;
+  ParsableVariable result = null;
+}
+:
+   SIMPLIFY_IF_THEN_ELSE_UPDATE LPAREN phi=varId COMMA u1=varId COMMA u2=varId COMMA commonFormula=varId COMMA result=varId RPAREN 
+   {
+      b.addVariableCondition(new SimplifyIfThenElseUpdateCondition((FormulaSV) phi,
+      															   (UpdateSV) u1,
+      															   (UpdateSV) u2,
+      															   (FormulaSV) commonFormula,
+                                                                   (SchemaVariable)result));
    }
 ;
 

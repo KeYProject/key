@@ -142,6 +142,7 @@ public class JoinDialog extends StdDialog{
                 Result result = estimator.estimate(partner, proof);
                 partner.setCommonPredicate(result.getPredicate());
                 partner.setCommonParent(result.getCommonParent());
+  
              }
             
             getChoiceList().setModel(model);
