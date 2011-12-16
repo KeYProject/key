@@ -1156,12 +1156,12 @@ final class JMLTranslator {
                 Services services = (Services) params[1];
 
                 ImmutableList<Term> disTerms = ImmutableSLList.<Term>nil();
-                for (Term t1 : list) {
+                while (!list.isEmpty()) {
+                    Term t1 = list.head();
+                    list = list.tail();
                     for (Term t2 : list) {
-                        if (t1 != t2) {
-                            Term dis = TB.disjoint(services, t1, t2);
-                            disTerms = disTerms.append(dis);
-                        }
+                        Term dis = TB.disjoint(services, t1, t2);
+                        disTerms = disTerms.append(dis);
                     }
                 }
                 return new SLExpression(TB.and(disTerms));
