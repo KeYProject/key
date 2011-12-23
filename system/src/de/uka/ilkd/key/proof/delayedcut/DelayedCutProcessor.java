@@ -141,7 +141,7 @@ public class DelayedCutProcessor implements Runnable {
     
     private ImmutableList<Goal> cut(DelayedCut cut){
         Goal goal = find(cut.getProof(), cut.getNode());
-        
+
         TacletFilter filter = new TacletFilter() {
             
             @Override

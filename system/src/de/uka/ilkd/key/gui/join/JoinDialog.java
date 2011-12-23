@@ -35,7 +35,7 @@ public class JoinDialog extends StdDialog{
     private final     ContentPanel content;
     public JoinDialog(CheckedUserInputInspector inspector,List<ProspectivePartner> partnerList, Proof proof,
             PredicateEstimator estimator) {
-        super("Joining",  5, true);
+        super("Joining",  5, false);
         content = new ContentPanel(inspector, partnerList, proof,estimator,new CheckedUserInputListener(){
 
             @Override
