@@ -17,11 +17,12 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
 public class RuleSource {
 
-    private static final String PATH_TO_RULES = "../rules/";
+    private static final String PATH_TO_RULES = "rules/";
 
     private URL url=null;
 
@@ -59,7 +60,7 @@ public class RuleSource {
 
     public static RuleSource initRuleFile(String filename) {
         URL u = KeYResourceManager.getManager().
-            getResourceFile(RuleSource.class, PATH_TO_RULES + filename);
+            getResourceFile(Proof.class, PATH_TO_RULES + filename);
         if (u == null) {
             // a more specific exception type would probably be better
             throw new RuntimeException("Could not find rule file "+filename);

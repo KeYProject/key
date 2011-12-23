@@ -64,6 +64,10 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
     public ImplicitIdentifier createImplicitIdentifier(String text) {
         return new ImplicitIdentifier(text);
     }
+    
+    public Identifier createIdentifier (String text){
+        return new ExtendedIdentifier(text);
+    }
 
     public SpecialReferenceWrapper createThisReference(TypeReference typeRef,
 						       Expression var) {

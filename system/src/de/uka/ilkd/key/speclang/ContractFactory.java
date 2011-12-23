@@ -150,7 +150,7 @@ public class ContractFactory {
                        dep.third, dep.second, selfVar, paramVars);
         } else {
             // TODO: insert static invariant??
-            return dep(kjt, dep.first, tb.TRUE(services), dep.third, dep.second,
+            return dep(kjt, dep.first, tb.tt(), dep.third, dep.second,
                        selfVar, paramVars);
         }
     }

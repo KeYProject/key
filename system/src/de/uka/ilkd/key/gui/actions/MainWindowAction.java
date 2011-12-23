@@ -31,6 +31,19 @@ public abstract class MainWindowAction extends AbstractAction {
 	this.mainWindow = mainWindow;
     }
     
+    protected MainWindowAction(MainWindow mainWindow, String name, String toolTip, Boolean selected){
+        this(mainWindow);
+        if (name != null) setName(name);
+        if (toolTip != null) setTooltip(toolTip);
+        if (selected != null) setSelected(selected);
+    }
+    
+    protected MainWindowAction(MainWindow mainWindow, String name, String toolTip, Boolean selected, KeyStroke acceleratorKey, Icon icon){
+        this(mainWindow, name, toolTip, selected);
+        if (acceleratorKey != null) setAcceleratorKey(acceleratorKey);
+        if (icon != null) setIcon(icon);
+    }
+    
     protected KeYMediator getMediator() {
 	return mainWindow.getMediator();
     }

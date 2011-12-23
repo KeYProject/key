@@ -416,6 +416,7 @@ public class Recoder2KeYConverter {
     private Literal getLiteralFor(
             recoder.service.ConstantEvaluator.EvaluationResult p_er) {
         switch (p_er.getTypeCode()) {
+        // XXX need to add one for \bigint, too?
         case recoder.service.ConstantEvaluator.BOOLEAN_TYPE:
             return BooleanLiteral.getBooleanLiteral(p_er.getBoolean());
         case recoder.service.ConstantEvaluator.CHAR_TYPE:
@@ -540,8 +541,9 @@ public class Recoder2KeYConverter {
             return Class.forName(className);
         } catch (ClassNotFoundException cnfe) {
             Debug.out("There is an AST class " +className + " missing at KeY.", cnfe);
-            throw new ConvertException(this.getClass().toString()+" could not find a conversion from RecodeR class "+recoderClass.getClass()+".\n"
-                    +"Maybe you have added a class to package key.recoderext and did not add the equivalent to key.java.expression or its subpackages."
+            throw new ConvertException("Recoder2KeYConverter could not find a conversion from RecodeR "+recoderClass.getClass()+".\n"
+                    +"Maybe you have added a class to package key.java.recoderext and did not add the equivalent to key.java.expression or its subpackages."
+                    +"\nAt least there is no class named "+className+"."
                     ,cnfe);
         } catch (ExceptionInInitializerError initErr) {
             Debug.out("recoder2key: Failed initializing class.", initErr);
@@ -555,15 +557,23 @@ public class Recoder2KeYConverter {
     private static int RECODER_PREFIX_LENGTH = "recoder.".length();
 
     /**
-     * constructs the name of the corresponding KeYClass
-     * 
+     * constructs the name of the corresponding KeYClass.
+     * Expected prefixes are either recoder or ...key.java.recoderext
      * @param recoderClass
      *            Class that is the original recoder
      * @return String containing the KeY-Classname
      */
     private String getKeYName(Class<? extends recoder.java.JavaProgramElement> recoderClass) {
-        return "de.uka.ilkd.key."
-        + recoderClass.getName().substring(RECODER_PREFIX_LENGTH);
+        final String prefix ="de.uka.ilkd.key.";
+        final String recoderClassName = recoderClass.getName();
+        if (recoderClassName.startsWith("recoder.")) {
+            return prefix+recoderClassName.substring(RECODER_PREFIX_LENGTH);
+        } else if (recoderClassName.startsWith(prefix+"java.recoderext.")) {
+            return recoderClassName.replaceAll("recoderext\\.", "");
+        } else {
+            assert false : "Unexpected class prefix: "+recoderClassName;
+            return "";
+        }
     }
 
     /**

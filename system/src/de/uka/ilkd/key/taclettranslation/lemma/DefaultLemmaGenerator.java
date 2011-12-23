@@ -110,7 +110,6 @@ class DefaultLemmaGenerator implements LemmaGenerator {
         public static String checkForIllegalOps(Term formula, Taclet owner, boolean schemaVarsAreAllowed){
              if((!schemaVarsAreAllowed && formula.op() instanceof SchemaVariable) ||
                 formula.op() instanceof Modality ||
-                formula.op() instanceof ProgramVariable ||
                 formula.op() instanceof ModalOperatorSV ||
                 formula.op() instanceof ProgramSV ||
                 formula.op() instanceof SkolemTermSV ||

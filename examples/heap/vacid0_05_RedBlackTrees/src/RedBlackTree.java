@@ -202,7 +202,6 @@ public class RedBlackTree implements AbstractMap {
           @ decreasing x.height;
           @*/
         while (x != Node.NIL){
-            //TODO set x.height
             y = x;
             if (z.key < x.key)
                 x = x.left;

@@ -158,20 +158,18 @@ public class Node {
           @ accessible redBlackInvariant : \nothing;
           @*/
         
-        //@ invariant height == 0;
+        /*@ invariant height == 0;
+          @ invariant parent == Node.NIL && left == Node.NIL && right == Node.NIL;
+          @ invariant !isRed;
+          @*/
         
+        //@ helper
         private Nil(){
             //@ set height = 0;
             parent = this;
             left = this;
             right = this;
             isRed= false;
-        }
-        protected int blackLeft(){
-            return 0;
-        }
-        protected int blackRight(){
-            return 0;
         }
         public String toString(){
             return "[NIL]";

@@ -17,6 +17,7 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -918,7 +919,6 @@ public final class TermBuilder {
     public Term one(Services services) {
         return services.getTypeConverter().getIntegerLDT().one();
     }
-
     
     /**
      * @param services Services which contains the number-functions
@@ -1407,7 +1407,7 @@ public final class TermBuilder {
 	    return or(created(services, h, t), equals(t, NULL(services)));
 	} else if(s.equals(setLDT.targetSort())) {
 	    return createdInHeap(services, t, h);
-	} else if(s.equals(intLDT.targetSort())) {
+	} else if(s.equals(intLDT.targetSort()) && kjt.getJavaType() != PrimitiveType.JAVA_BIGINT) {
 	    return func(intLDT.getInBounds(kjt.getJavaType()), t);
 	} else {
 	    return tt();

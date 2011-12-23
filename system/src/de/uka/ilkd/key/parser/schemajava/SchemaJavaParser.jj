@@ -509,6 +509,7 @@ TOKEN :
   }
 | < BOOLEAN: "boolean" >
 | < BREAK: "break" >
+| < BIGINT: "\\bigint" >
 | < BYTE: "byte" >
 | < CASE: "case" >
 | < CATCH: "catch" >
@@ -2098,9 +2099,13 @@ TypeReference PrimitiveType() :
      | "long"
      | "float"
      | "double"
+     | "\\seq"
+     | "\\locset"
+     | "\\bigint"
      )
 	{
-	    Identifier id = factory.createIdentifier(token.image);
+        String type = token.image;
+	    Identifier id = factory.createIdentifier(type);
 	    setPrefixInfo(id);
 	    result = factory.createTypeReference(id);
 	    checkConstruction(result);
