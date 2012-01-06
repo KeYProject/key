@@ -19,6 +19,7 @@ import java.util.*;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -105,6 +106,36 @@ public final class LogicPrinter {
         } catch (IOException ioe) {
             return t.toString();
         }
+        return p.result().toString();
+    }
+    
+    public static String quickPrintSemisequent(Semisequent s, Services services) {
+        final NotationInfo ni = new NotationInfo();
+        if (services != null) {
+            ni.refresh(services);
+        }
+        LogicPrinter p = new LogicPrinter(new ProgramPrinter(), 
+                                          ni, 
+                                          services);
+
+        try {
+			p.printSemisequent(s);
+		} catch (IOException e) {
+			return s.toString();
+		}
+        return p.result().toString();
+    }
+    
+    
+    public static String quickPrintSequent(Sequent s, Services services) {
+        final NotationInfo ni = new NotationInfo();
+        if (services != null) {
+            ni.refresh(services);
+        }
+        LogicPrinter p = new LogicPrinter(new ProgramPrinter(), 
+                                          ni, 
+                                          services);
+        p.printSequent(s);
         return p.result().toString();
     }
     

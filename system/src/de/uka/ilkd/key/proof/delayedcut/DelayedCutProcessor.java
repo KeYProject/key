@@ -41,6 +41,8 @@ import de.uka.ilkd.key.rule.TacletApp;
  * 3.3. F is uncovered in G.
  * Remark: F must not exist already in the sequent the process is applied on. Since a antecedent respective succedent is a set of 
  * formulas the hiding mechanism of F does not work. An already existing formula would be hidden.  
+ * 
+ * REMARK: Before you change this class, see the comment at the method <code>apply</code>.
  */
 public class DelayedCutProcessor implements Runnable {
      
@@ -100,7 +102,7 @@ public class DelayedCutProcessor implements Runnable {
         }
          // do not change the order of the following two statements!
          RuleApp firstAppliedRuleApp = node.getAppliedRuleApp(); 
-         Node subtrees [] = proof.pruneProof(node,false);
+         ImmutableList<Node> subtrees = proof.pruneProof(node,false);
          
          
          DelayedCut delayedCut = new DelayedCut(proof, node,
@@ -254,9 +256,9 @@ public class DelayedCutProcessor implements Runnable {
         LinkedList<NodeGoalPair> pairs = new LinkedList<NodeGoalPair>();
         LinkedList<Goal>  openLeaves = new LinkedList<Goal>();
  
-        add(pairs,cut.getSubtrees(),goal.apply(
-                cut.getFirstAppliedRuleApp()));
-        
+        add(pairs,new LinkedList<Goal>(),cut.getSubtrees().iterator(),
+        		  apply(goal,cut.getFirstAppliedRuleApp()));
+
         int totalNumber = 0;
         for(NodeGoalPair pair : pairs){
             totalNumber += pair.node.countNodes();
@@ -270,8 +272,10 @@ public class DelayedCutProcessor implements Runnable {
             RuleApp app = createNewRuleApp(pair,
                     cut.getServices());
          
-            totalNumber -= add(pairs,openLeaves,pair.node,
-                   pair.goal.apply(app));
+     
+            
+            totalNumber -= add(pairs,openLeaves,pair.node.childrenIterator(),
+                   apply(pair.goal,app));
  
 
             for(DelayedCutListener listener : listeners){
@@ -282,6 +286,30 @@ public class DelayedCutProcessor implements Runnable {
     }
     
     /**
+     * CAUTION: The order of the goals is crucial for the success of the delayed cut. Since the method 
+     * Goal::split() prepends goals to the current list. If you have some problems with the delayed cut, 
+     * have a look the Goal::split(), whether this has changed. 
+     * Up to now the order must therefore reversed, otherwise if the proof splits up into several branches
+     * the rules are applied on the wrong nodes which results in exceptions.  
+     * 
+     * @param goal
+     * @param app
+     * @return
+     */
+    private LinkedList<Goal> apply(Goal goal, RuleApp app){
+        LinkedList<Goal> goals = new LinkedList<Goal>();
+        ImmutableList<Goal> childs =  goal.apply(app);
+        // if the rule is a SMT rule, <code>childs</code> can be null.
+        //if(childs == null){
+        //	return goals;
+        //}
+        for(Goal child : childs){
+        	goals.addFirst(child);
+        }
+        return goals;
+    }
+    
+    /**
      * Based on an old rule application a new rule application is built. Mainly 
      * the position is updated.
      */
@@ -289,7 +317,7 @@ public class DelayedCutProcessor implements Runnable {
         RuleApp oldRuleApp = pair.node.getAppliedRuleApp();
         
         
-        PosInOccurrence newPos = translate(pair);
+        PosInOccurrence newPos = translate(pair,services);
 
         if(oldRuleApp instanceof PosTacletApp){
             PosTacletApp app = (PosTacletApp) oldRuleApp; 
@@ -301,17 +329,14 @@ public class DelayedCutProcessor implements Runnable {
 
         if(oldRuleApp instanceof BuiltInRuleApp){
             BuiltInRuleApp app = (BuiltInRuleApp) oldRuleApp;
-            return new BuiltInRuleApp(app.rule(), translate(pair), app.ifInsts());
+            return new BuiltInRuleApp(app.rule(), translate(pair,services), app.ifInsts());
         }
         return oldRuleApp;
         
     }
     
-    /**
-     * Translates the position of an old rule application into the position of 
-     * a new rule application.
-     */
-    private PosInOccurrence translate(NodeGoalPair pair){
+    
+    private PosInOccurrence translate(NodeGoalPair pair,Services services){
         RuleApp oldRuleApp = pair.node.getAppliedRuleApp();
         if(oldRuleApp == null ||oldRuleApp.posInOccurrence() == null){
             return null;
@@ -325,35 +350,7 @@ public class DelayedCutProcessor implements Runnable {
                 formulaNumber, oldRuleApp.posInOccurrence().posInTerm());
     }
     
-    private void add(LinkedList<NodeGoalPair> pairs, Node [] subtrees, ImmutableList<Goal> goals){
-        
-        assert subtrees.length == goals.size(); 
-        
-        for(Goal goal : goals){   
-            for(int i=0; i < subtrees.length; i++){
-                if(!subtrees[i].leaf() && nodesAreEqual(subtrees[i], goal.node())){
-                    pairs.add(new NodeGoalPair(subtrees[i], goal));
-                }    
-            }
-            
-           
-        }
-    }
     
-    private boolean nodesAreEqual(Node node1, Node node2){
-        if(node1.sequent().size() != node2.sequent().size()){
-            return false;
-        }
-        Iterator<SequentFormula> it1 = node1.sequent().iterator();
-        Iterator<SequentFormula> it2 = node2.sequent().iterator();
-        while(it1.hasNext()){
-            if(it1.next().formula() != it2.next().formula()){
-                return false;
-            }
-        }
-        return true;
-        
-    }
     
     /**
      * Used for rebuilding the tree: Joins the node of the old sub trees and the corresponding 
@@ -362,20 +359,22 @@ public class DelayedCutProcessor implements Runnable {
      *     */
     private int add(LinkedList<NodeGoalPair> pairs,
                      LinkedList<Goal> openLeaves, 
-                     Node parent, ImmutableList<Goal> goals){
-        assert parent.childrenCount() == goals.size();
+                     Iterator<Node> iterator, LinkedList<Goal> goals){
+       
         int leafNumber = 0;
-        int i=0;
-        for(Goal goal : goals){
-            if(!parent.child(i).leaf()){
-                pairs.add(new NodeGoalPair(parent.child(i),goal));
+
+        while(iterator.hasNext()){
+        	Goal matchedGoal = goals.pollFirst();
+        	Node child = iterator.next();
+        	
+            if(!child.leaf()){
+                pairs.add(new NodeGoalPair(child,matchedGoal));
             }else{
-                if(!goal.node().isClosed()){
-                    openLeaves.add(goal);
+                if(!matchedGoal.node().isClosed()){
+                    openLeaves.add(matchedGoal);
                 }          
                 leafNumber++;
             }
-            i++;            
         }
         return leafNumber;
 

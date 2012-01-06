@@ -38,42 +38,47 @@ public class JoinMenuItem extends JMenuItem {
                          partner, proof,PredicateEstimator.STD_ESTIMATOR);
                  dialog.setVisible(true);
                  if(dialog.okayButtonHasBeenPressed()){
-                      
-                        
-                     JoinProcessor processor = new JoinProcessor(dialog.getSelectedPartner(), proof);
-                     
-                     processor.addListener(new Listener() {
-                        
-                        @Override
-                        public void exceptionWhileJoining(Throwable e) {
-                           ExceptionDialog.showDialog(mediator.mainFrame(), e);   
-                           mediator.startInterface(true);
-                        }
-                        
-                        @Override
-                        public void endOfJoining(final ImmutableList<Goal> goals) {
-                            SwingUtilities.invokeLater(new Runnable() {
-                                
-                                @Override
-                                public void run() {
-                                    mediator.startInterface(true);
-                                    mediator.startAutoMode(goals);
-                                   
-                                    
-                                }
-                            });
-           
-                       
-                        }
-                    });
-                     
-                     Thread thread = new Thread(processor);
-                     thread.start();
-                   
+                	 start(dialog.getSelectedPartner(),proof,mediator);                   
+                 }else{
+                	 mediator.stopInterface(true);
                  }
                  
             }
         });
+    }
+    
+    private void start(ProspectivePartner partner, Proof proof, final KeYMediator mediator){
+        
+        
+        JoinProcessor processor = new JoinProcessor(partner, proof);
+        
+        processor.addListener(new Listener() {
+           
+           @Override
+           public void exceptionWhileJoining(Throwable e) {
+              ExceptionDialog.showDialog(mediator.mainFrame(), e);   
+              mediator.startInterface(true);
+           }
+           
+           @Override
+           public void endOfJoining(final ImmutableList<Goal> goals) {
+               SwingUtilities.invokeLater(new Runnable() {
+                   
+                   @Override
+                   public void run() {
+                       mediator.startInterface(true);
+                       mediator.startAutoMode(goals);
+                      
+                       
+                   }
+               });
+
+          
+           }
+       });
+        
+        Thread thread = new Thread(processor);
+        thread.start();
     }
     
  

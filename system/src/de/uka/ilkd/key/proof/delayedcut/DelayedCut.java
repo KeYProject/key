@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.proof.delayedcut;
 
+import java.util.LinkedList;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
@@ -19,7 +21,7 @@ public class DelayedCut {
     
         private final Proof proof;
         private final Node  node;
-        private final Node [] subtrees;
+        private final ImmutableList<Node>  subtrees;
         private final int   cutMode;
         private final Term decisionPredicate;
         private final RuleApp firstAppliedRuleApp;
@@ -29,7 +31,7 @@ public class DelayedCut {
         
        
         
-        public DelayedCut(Proof proof, Node node, Term formula, Node [] subtrees,
+        public DelayedCut(Proof proof, Node node, Term formula, ImmutableList<Node>  subtrees,
                 int sideOfDecisionPredicate, RuleApp firstAppliedRuleApp) {
             super();
             assert sideOfDecisionPredicate == DECISION_PREDICATE_IN_ANTECEDENT || sideOfDecisionPredicate == DECISION_PREDICATE_IN_SUCCEDENT;
@@ -93,7 +95,7 @@ public class DelayedCut {
             return hideApp;
         }
         
-        public Node[] getSubtrees() {
+        public ImmutableList<Node> getSubtrees() {
             return subtrees;
         }
         
