@@ -360,9 +360,11 @@ public class DelayedCutProcessor implements Runnable {
     private int add(LinkedList<NodeGoalPair> pairs,
                      LinkedList<Goal> openLeaves, 
                      Iterator<Node> iterator, LinkedList<Goal> goals){
-       
+        
         int leafNumber = 0;
-
+        if(goals.isEmpty()){
+        	return leafNumber;
+        }
         while(iterator.hasNext()){
         	Goal matchedGoal = goals.pollFirst();
         	Node child = iterator.next();

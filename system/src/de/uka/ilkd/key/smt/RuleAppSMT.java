@@ -11,6 +11,7 @@
 package de.uka.ilkd.key.smt;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -46,11 +47,9 @@ public class RuleAppSMT implements RuleApp {
     public ImmutableList<Goal> execute(Goal goal, Services services) {
 	goal.addAppliedRuleApp(this);
 
-	goal.split(1);
-
 	goal.proof().closeGoal(goal);
 	goal.node().getNodeInfo().setBranchLabel(title);
-	return null;
+	return ImmutableSLList.<Goal>nil();
     }
 
     @Override
