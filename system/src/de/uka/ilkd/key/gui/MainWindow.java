@@ -1766,6 +1766,12 @@ public final class MainWindow extends JFrame  {
 	    
 	    return this.solverUnion.equals(((SMTInvokeAction)obj).solverUnion);
 	}
+
+    @Override
+    public int hashCode() {
+        return solverUnion.hashCode() * 7;
+    }
+
     }
     
     public void loadCommandLineFile() {

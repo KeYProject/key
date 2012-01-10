@@ -392,4 +392,9 @@ public class ContractFactory {
         original = or.replace(original);
         return original;
     }
+
+    @Override
+    public int hashCode() {
+        return services == null ? 0 : services.hashCode();
+    }
 }
