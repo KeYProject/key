@@ -52,7 +52,7 @@ public class ProofIndependentSettings implements SettingsListener {
                             settings.readSettings(this,properties);
                     }
                 } catch (IOException e){
-                        new RuntimeException(e);
+                    throw new RuntimeException(e);
                 }
       
         }

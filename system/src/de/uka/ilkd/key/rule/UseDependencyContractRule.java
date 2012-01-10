@@ -527,18 +527,23 @@ public final class UseDependencyContractRule implements BuiltInRule {
         final Term focus = pio.subTerm();
         final ObserverFunction target = (ObserverFunction) focus.op();
  
-        final Term selfTerm = target.isStatic() ? null : focus.sub(1);
+        
+        final Term selfTerm;
+        final KeYJavaType kjt;
+
+        if (target.isStatic()) {
+            selfTerm = null; 
+            kjt = target.getContainerType();
+        } else {
+            selfTerm = focus.sub(1);
+            kjt = services.getJavaInfo().getKeYJavaType(selfTerm.sort());
+        }
        
         ImmutableList<Term> paramTerms = ImmutableSLList.<Term>nil();
         for(int i = target.isStatic() ? 1 : 2, n = focus.arity(); i < n; i++) {
             paramTerms = paramTerms.append(focus.sub(i));
         }
         
-        final KeYJavaType kjt
-        	= target.isStatic() 
-		  ? target.getContainerType()
-	          : services.getJavaInfo().getKeYJavaType(selfTerm.sort());
-		   
         //configure contract
         final DependencyContract contract;
         if(ruleApp instanceof ContractRuleApp) {
