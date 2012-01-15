@@ -31,27 +31,22 @@ public interface SolverType {
                         int val);
 
         public String getInfo();
+        
+        public String getSolverCommand();
 
 
 
-        /**
-         * Get the command for executing the external prover. This is a
-         * hardcoded default value. It might be overridden by user settings
-         * 
-         * @param filename
-         *                the location, where the file is stored.
-         * @param formula
-         *                the formula, that was created by the translator
-         * @return Array of Strings, that can be used for executing an external
-         *         decider.
-         */
-        public String getExecutionCommand(String filename, String formula);
 
-        public String getExecutionCommand();
+        public String getSolverParameters();
+        
 
-        public void setExecutionCommand(String s);
+        public void setSolverParameters(String s);
+        
+        public void setSolverCommand(String s);
 
-        public String getDefaultExecutionCommand();
+        public String getDefaultSolverParameters();
+        
+        public String getDefaultSolverCommand();
 
         public SMTTranslator getTranslator(Services services);
         
@@ -59,11 +54,14 @@ public interface SolverType {
 
         static public final SolverType Z3_SOLVER = new AbstractSolverType() {
 
-                @Override
-                public String getExecutionCommand(String filename,
-                                String formula) {
-                        return "z3 -smt -m " + filename;
-                }
+                      
+                public String getDefaultSolverCommand() {
+                    return "z3";                    
+                };
+                
+                public String getDefaultSolverParameters() {
+                    return "-smt -m %f";
+                };
 
                 @Override
                 public SMTSolver createSolver(SMTProblem problem,
@@ -149,10 +147,14 @@ public interface SolverType {
                                         services, this);
                 }
 
+                public String getDefaultSolverCommand() {
+                    return "cvc3";
+                };
+                
                 @Override
-                public String getExecutionCommand(String filename,
-                                String formula) {
-                        return "cvc3 -lang smt +model " + filename;
+                public String getDefaultSolverParameters() {
+                    // TODO Auto-generated method stub
+                    return " -lang smt +model %f";
                 }
 
                 @Override
@@ -218,10 +220,15 @@ public interface SolverType {
                                         new Configuration(true));
                 }
 
+                         
                 @Override
-                public String getExecutionCommand(String filename,
-                                String formula) {
-                        return "yices -tc -e -smt " + filename;
+                public String getDefaultSolverCommand() {
+                          return "yices";
+                }
+                
+                @Override
+                public String getDefaultSolverParameters() {
+                         return "-tc -e -smt %f";
                 }
 
                 @Override
@@ -282,13 +289,16 @@ public interface SolverType {
                         return new SimplifyTranslator(services,
                                         new Configuration(false,true));
                 }
+                
+                public String getDefaultSolverCommand() {
+                    return "simplify";
+                };
+                
+                public String getDefaultSolverParameters() {
+                    return "%f";
+                };
 
-                @Override
-                public String getExecutionCommand(String filename,
-                                String formula) {
-                        return "simplify " + filename;
-                }
-
+         
                 @Override
                 public String getInfo() {
                         return "Simplify only supports integers within the interval [-2147483646,2147483646]=[-2^31+2,2^31-2].";
@@ -383,16 +393,13 @@ public interface SolverType {
 abstract class AbstractSolverType implements SolverType {
         private boolean installWasChecked = false;
         private boolean isInstalled = false;
-        private String executionCommand = getDefaultExecutionCommand();
+        private String solverParameters = getDefaultSolverParameters();
+        private String solverCommand    = getDefaultSolverCommand();
 
 
         public static boolean isInstalled(String cmd) {
 
-                int first = cmd.indexOf(" ");
-                if (first >= 0) {
-                        cmd = cmd.substring(0, first);
-                }
-
+         
                 if (checkEnvVariable(cmd)) {
                         return true;
                 } else {
@@ -420,7 +427,8 @@ abstract class AbstractSolverType implements SolverType {
         public boolean isInstalled(boolean recheck) {
                 if (recheck || !installWasChecked) {
 
-                        String cmd = getExecutionCommand();
+                        String cmd = getSolverCommand();
+                    
                         isInstalled = isInstalled(cmd);
                         if (isInstalled) {
                                 installWasChecked = true;
@@ -433,6 +441,7 @@ abstract class AbstractSolverType implements SolverType {
         private static boolean checkEnvVariable(String cmd) {
                 String filesep = System.getProperty("file.separator");
                 String path = System.getenv("PATH");
+  
                 String[] res = path.split(System.getProperty("path.separator"));
                 for (String s : res) {
                         File file = new File(s + filesep + cmd);
@@ -444,23 +453,31 @@ abstract class AbstractSolverType implements SolverType {
                 return false;
 
         }
+  
 
-        /**
-         * get the hard coded execution command from this solver. The filename
-         * od a problem is indicated by %f, the problem itsself with %p
-         */
+        public String getSolverParameters() {
+                if(solverParameters == null){
+                    return getDefaultSolverParameters();
+                }
+                return solverParameters;
+        }
+
+        public void setSolverParameters(String s) {
+
+                solverParameters= s;
+        }
+        
         @Override
-        public String getDefaultExecutionCommand() {
-                return this.getExecutionCommand("%f", "%p");
+        public void setSolverCommand(String s) {
+            solverCommand = s;
         }
-
-        public String getExecutionCommand() {
-                return executionCommand;
-        }
-
-        public void setExecutionCommand(String s) {
-
-                executionCommand = s;
+        
+        @Override
+        public final String getSolverCommand() {
+            if(solverCommand == null || solverCommand.isEmpty()){
+                return getDefaultSolverCommand();
+            }
+            return solverCommand;
         }
         
         
