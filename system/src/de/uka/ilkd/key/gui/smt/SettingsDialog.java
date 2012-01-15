@@ -113,7 +113,7 @@ public class SettingsDialog extends JDialog{
         private Dimension computePreferredSize(TreeModel model){
                 DefaultMutableTreeNode node = (DefaultMutableTreeNode)model.getRoot();
                 Dimension dim = computePreferredSize(node);
-                dim.width = dim.width + getOptionTree().getPreferredSize().width+50;
+                dim.width = dim.width + getOptionTree().getPreferredSize().width+80;
                 dim.height = Math.min(dim.height,400);
                 return dim;
         }

@@ -8,6 +8,7 @@ import java.util.LinkedList;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -257,6 +258,7 @@ class SolverOptions extends TablePanel{
         private JTextField solverCommand;
         private JTextField solverParameters;
         private JTextField solverInstalled;
+        private JButton    toDefaultButton;
         
         private final SolverType solverType; 
         private final ProofIndependentSMTSettings settings;
@@ -306,10 +308,30 @@ class SolverOptions extends TablePanel{
                 getSolverInstalled();
                 getSolverCommand();
                 getSolverParameters();
+                getToDefaultButton();
+                
                
         }
         
-               
+
+        public JButton getToDefaultButton() {
+            if(toDefaultButton == null){
+                toDefaultButton = new JButton("Set parameters to default.");
+                Box box= addComponent(toDefaultButton, null);
+                toDefaultButton.addActionListener(new ActionListener() {
+                    
+                    @Override
+                    public void actionPerformed(ActionEvent arg0) {
+                        getSolverParameters().setText(solverType.getDefaultSolverParameters());
+                        settings.setParameters(solverType, solverParameters.getText());  
+                        
+                    }
+                });
+                box.add(Box.createHorizontalGlue());
+            }
+              
+            return toDefaultButton;
+        }
 
         
         public JTextField getSolverParameters() {
