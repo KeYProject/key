@@ -108,8 +108,8 @@ public abstract class TablePanel extends JPanel{
               return fileChooserPanel;
         }
         
-        protected JComboBox addComboBox(String info,int selectionIndex,ActionListener changeListener,Object... items){
-                JComboBox comboBox = new JComboBox(items);
+        protected JComboBox<?> addComboBox(String info,int selectionIndex,ActionListener changeListener,Object... items){
+                JComboBox<?> comboBox = new JComboBox<Object>(items);
                 comboBox.setSelectedIndex(selectionIndex);
                 comboBox.addActionListener(changeListener);
                 addComponent(comboBox, info);

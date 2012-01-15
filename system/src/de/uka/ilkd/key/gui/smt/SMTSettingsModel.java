@@ -99,7 +99,7 @@ public class SMTSettingsModel extends DefaultTreeModel {
 class GeneralOptions extends TablePanel{
         private static final long serialVersionUID = 1L;
         private FileChooserPanel saveToFilePanel;
-        private JComboBox        progressModeBox;
+        private JComboBox<?>        progressModeBox;
         private JTextField       maxProcesses;
         private JTextField       timeoutField;
         private final ProofIndependentSMTSettings settings;
@@ -199,7 +199,7 @@ class GeneralOptions extends TablePanel{
         
   
         
-        public JComboBox getProgressModeBox() {
+        public JComboBox<?> getProgressModeBox() {
                 if(progressModeBox == null){
                         progressModeBox = addComboBox(infoProgressModeBox,settings.modeOfProgressDialog, new ActionListener() {
                                 

@@ -3,6 +3,7 @@ package de.uka.ilkd.key.gui.configuration;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -45,16 +46,32 @@ public class ProofIndependentSettings implements SettingsListener {
         
         public void loadSettings(String file){
                 try {
-                    FileInputStream in = new FileInputStream(PathConfig.PROOF_INDEPENDT_SETTINGS);
-                    Properties properties = new Properties();
-                    properties.load(in);
-                    for(Settings settings : settingsSet){
-                            settings.readSettings(this,properties);
-                    }
+                    load(file);
                 } catch (IOException e){
+                    File testFile = new File(PathConfig.PROOF_INDEPENDT_SETTINGS);
+                    if(!testFile.exists()){
+                        FileWriter writer;
+                        try {
+                            writer = new FileWriter(testFile);
+                            writer.append("a");
+                            writer.close();
+                            load(file);
+                        } catch (IOException e1) {
+                            throw new RuntimeException(e1);
+                        }
+                    }
                     throw new RuntimeException(e);
                 }
       
+        }
+        
+        private void load(String file) throws IOException{
+            FileInputStream in = new FileInputStream(PathConfig.PROOF_INDEPENDT_SETTINGS);
+            Properties properties = new Properties();
+            properties.load(in);
+            for(Settings settings : settingsSet){
+                    settings.readSettings(this,properties);
+            }
         }
         
         public void saveSettings(){
