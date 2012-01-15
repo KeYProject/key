@@ -68,11 +68,7 @@ public class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings{
                 return proof;
         }
 
-        @Override
-        public String getCommand(SolverType type) {
-                
-                return piSettings.getCommand(type);
-        }
+
 
         @Override
         public int getMaxConcurrentProcesses() {
