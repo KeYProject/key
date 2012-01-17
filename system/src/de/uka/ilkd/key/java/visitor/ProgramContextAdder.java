@@ -142,8 +142,6 @@ public class ProgramContextAdder {
 
         putIn.getBody().arraycopy(0, body, 0, putInLength);
 
-        assert lastChild >= putInLength;
-
         for (int i = putInLength; i < childrenToAdd; i++) {
             body[i] = (Statement) wrapper.getChildAt(lastChild + (i - putInLength));
         }
