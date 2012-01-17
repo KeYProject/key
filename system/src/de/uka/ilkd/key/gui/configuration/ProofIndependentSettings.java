@@ -29,7 +29,7 @@ public class ProofIndependentSettings implements SettingsListener {
                 for (Settings settings : settingsSet) {
                         settings.addSettingsListener(this);
                 }
-                loadSettings(filename);
+                loadSettings();
         }
 
         @Override
@@ -44,33 +44,24 @@ public class ProofIndependentSettings implements SettingsListener {
                 return lemmaGeneratorSettings;
         }
         
-        public void loadSettings(String file){
+        public void loadSettings(){
                 try {
-                    load(file);
-                } catch (IOException e){
-                    File testFile = new File(PathConfig.PROOF_INDEPENDT_SETTINGS);
-                    if(!testFile.exists()){
-                        FileWriter writer;
-                        try {
-                            writer = new FileWriter(testFile);
-                            writer.append("a");
-                            writer.close();
-                            load(file);
-                        } catch (IOException e1) {
-                            throw new RuntimeException(e1);
-                        }
+                    File testFile = new File(filename);
+                    if(testFile.exists()){
+                        load(testFile);
                     }
+                } catch (IOException e){
                     throw new RuntimeException(e);
                 }
       
         }
         
-        private void load(String file) throws IOException{
-            FileInputStream in = new FileInputStream(PathConfig.PROOF_INDEPENDT_SETTINGS);
+        private void load(File file) throws IOException{
+            FileInputStream in = new FileInputStream(file);
             Properties properties = new Properties();
             properties.load(in);
             for(Settings settings : settingsSet){
-                    settings.readSettings(this,properties);
+                settings.readSettings(this,properties);
             }
         }
         
