@@ -143,7 +143,7 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader {
             Debug.out(e);
             throw new ConvertException("Parsing: \n **** BEGIN ****\n " + block
                     + "\n **** END ****\n failed. Thrown Exception:"
-                    + e.toString());
+                    + e.toString(), e);
         } catch (IOException ioe) {
             Debug.out("readSchemaJavaBlock(Reader,CompilationUnit)"
                     + " caused the IO exception:\n", ioe);
@@ -151,7 +151,7 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader {
             throw new ConvertException(
                     "IO Error when parsing: \n **** BEGIN ****\n " + block
                     + "\n **** END ****\n failed. Thrown IOException:"
-                    + ioe.toString());
+                    + ioe.toString(), ioe);
         } finally {
 	    if (br != null)
 	        try {
@@ -160,7 +160,7 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader {
                     throw new ConvertException(
                             "IO Error when parsing: \n **** BEGIN ****\n " + block
                             + "\n **** END ****\n failed. Thrown IOException:"
-                            + ioe.toString());
+                            + ioe.toString(), ioe);
                 }
 	}
 
