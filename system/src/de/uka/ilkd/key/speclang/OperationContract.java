@@ -22,6 +22,14 @@ public interface OperationContract extends Contract {
     public ProgramMethod getTarget();
     
     /**
+     * Returns <code>true</code> iff the method (according to the contract) does
+     * not modify the heap at all, i.e., iff it is "strictly pure."
+     * 
+     * @return whether this contract is strictly pure.
+     */
+    public boolean hasModifiesClause();
+    
+    /**
      * Returns the modifies clause of the contract.
      */
     public Term getMod(ProgramVariable selfVar, 

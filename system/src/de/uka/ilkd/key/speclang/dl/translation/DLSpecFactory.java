@@ -295,9 +295,10 @@ public final class DLSpecFactory {
 					 pm, 
 					 modality, 
 					 pre,
-					 null,//measured_by in DL contracts not supported yet					 
+					 null,// TODO measured_by in DL contracts not supported yet
 					 post, 
 					 modifies, 
+					 true, // TODO strictly pure in DL contracts not supported yet
 					 selfVar, 
 					 paramVars, 
 					 resultVar, 

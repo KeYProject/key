@@ -68,6 +68,13 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
     final boolean transaction;
     final boolean toBeSaved;
     
+    /**
+     * If a method is strictly pure, it has no modifies clause which could
+     * anonymised.
+     * @see #hasModifiesClause()
+     */
+    final boolean hasRealModifiesClause;
+    
     
     //-------------------------------------------------------------------------
     //constructors
@@ -82,6 +89,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
             		          Term mby,
             		          Term post,
             		          Term mod,
+            		          boolean hasRealMod,
                                   Term modBackup,
             		          ProgramVariable selfVar,
             		          ImmutableList<ProgramVariable> paramVars,
@@ -119,6 +127,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 	this.originalMby            = mby;
 	this.originalPost           = post;
 	this.originalMod            = mod;
+	this.hasRealModifiesClause  = hasRealMod;
 	this.originalModBackup      = modBackup;
 	this.originalSelfVar        = selfVar;
 	this.originalParamVars      = paramVars;
@@ -158,6 +167,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
             		         Term mby,            		         
             		         Term post,
             		         Term mod,
+            		         boolean hasMod,
                                  Term modBackup,
             		         ProgramVariable selfVar,
             		         ImmutableList<ProgramVariable> paramVars,
@@ -175,6 +185,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
              mby,
              post,
              mod,
+             hasMod,
              modBackup,
              selfVar,
              paramVars,
@@ -201,14 +212,14 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
      * 			operation parameters, operation result, thrown exception
      * 			and the pre-heap
      */
-    FunctionalOperationContractImpl(String baseName, ProgramMethod pm,
-	    Modality modality, Term pre, Term mby, Term post, Term mod, Term modBackup,
-	    ProgramVariableCollection progVars, boolean toBeSaved) {
-	this(baseName, null, pm.getContainerType(), pm, modality, pre, mby,
-	        post, mod, modBackup, progVars.selfVar, progVars.paramVars,
-	        progVars.resultVar, progVars.excVar, progVars.heapAtPreVar, progVars.savedHeapAtPreVar,
-	        INVALID_ID, toBeSaved);
-    }
+//    FunctionalOperationContractImpl(String baseName, ProgramMethod pm,
+//	    Modality modality, Term pre, Term mby, Term post, Term mod, boolean hasMod, Term modBackup,
+//	    ProgramVariableCollection progVars, boolean toBeSaved) {
+//	this(baseName, null, pm.getContainerType(), pm, modality, pre, mby,
+//	        post, mod, hasMod, modBackup, progVars.selfVar, progVars.paramVars,
+//	        progVars.resultVar, progVars.excVar, progVars.heapAtPreVar, progVars.savedHeapAtPreVar,
+//	        INVALID_ID, toBeSaved);
+//    }
     
     
     
@@ -506,6 +517,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
                 + LogicPrinter.escapeHTML(post, false)
                 + "<br><b>mod</b> "
                 + LogicPrinter.escapeHTML(mod, false)
+                + (hasRealModifiesClause ? "" : "<b>, creates no new objects</b>")
                 + (modBackup != null ? "<br><b>mod_backup</b> "+ LogicPrinter.escapeHTML(modBackup, false) : "")
                 + (hasMby() 
                    ? "<br><b>measured-by</b> " + LogicPrinter.escapeHTML(mby, 
@@ -730,6 +742,11 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 	final OpReplacer or = new OpReplacer(replaceMap);
 	return or.replace(mod);
     }
+    
+    @Override
+    public boolean hasModifiesClause() {
+        return this.hasRealModifiesClause;
+    }
   
     @Override    
     public Term getMod(Term heapTerm,
@@ -757,6 +774,8 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 		+ originalPost 
 		+ "; mod: " 
 		+ originalMod
+		+ "; hasMod: "
+		+ hasRealModifiesClause
                 + (originalModBackup != null ? "; mod_backup: " + originalModBackup : "")
 		+ "; termination: "
 		+ getModality();
@@ -798,6 +817,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
                                                    originalMby,
                                                    originalPost,
                                                    originalMod,
+                                                   hasRealModifiesClause,
                                                    originalModBackup,
                                                    originalSelfVar,
                                                    originalParamVars,
@@ -823,6 +843,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
                                                    originalMby,
                                                    originalPost,
                                                    originalMod,
+                                                   hasRealModifiesClause,
                                                    originalModBackup,
                                                    originalSelfVar,
                                                    originalParamVars,

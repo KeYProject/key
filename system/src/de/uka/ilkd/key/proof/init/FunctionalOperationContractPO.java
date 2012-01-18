@@ -257,11 +257,19 @@ public final class FunctionalOperationContractPO
                                                     heapAtPreVar,
                                                     savedHeapAtPreVar,
                                                     services);
-        final Term frameTerm = TB.frame(services, TB.heap(services),
-                                          normalToAtPre, 
-                                          getContract().getMod(selfVar,
-                                                               paramVars,
-                                                               services));
+        final Term frameTerm;
+        
+        // strictly pure have a different contract.
+        if(getContract().hasModifiesClause()) {
+            frameTerm = TB.frame(services, TB.heap(services),
+                    normalToAtPre, 
+                    getContract().getMod(selfVar,
+                            paramVars,
+                            services));
+        } else {
+            frameTerm = TB.frameStrictlyEmpty(services, TB.heap(services), normalToAtPre);
+        }
+        
         final Term post = TB.and(getContract().transactionContract() ?
                 new Term[] {postTerm, frameTerm, TB.frame(services, TB.savedHeap(services),
                                           savedToAtPre,

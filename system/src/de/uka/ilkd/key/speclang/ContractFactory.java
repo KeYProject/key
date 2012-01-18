@@ -73,6 +73,7 @@ public class ContractFactory {
             foci.originalMby,
             tb.and(foci.originalPost, addedPost),
             foci.originalMod,
+            foci.hasRealModifiesClause,
             foci.originalModBackup,
             foci.originalSelfVar,
             foci.originalParamVars,
@@ -116,6 +117,7 @@ public class ContractFactory {
                                                    foci.originalMby,
                                                    foci.originalPost,
                                                    foci.originalMod,
+                                                   foci.hasRealModifiesClause,
                                                    foci.originalModBackup,
                                                    foci.originalSelfVar,
                                                    foci.originalParamVars,
@@ -195,26 +197,27 @@ public class ContractFactory {
             Term mby,                           
             Term post,
             Term mod,
+            boolean hasMod,
             ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars,
             ProgramVariable resultVar,
             ProgramVariable excVar,
             LocationVariable heapAtPreVar,
             boolean toBeSaved) {
-        return new FunctionalOperationContractImpl(baseName, kjt,   pm, modality, pre, mby, post, mod, null, selfVar, paramVars,resultVar,excVar,heapAtPreVar, null, toBeSaved);
+        return new FunctionalOperationContractImpl(baseName, kjt,   pm, modality, pre, mby, post, mod, hasMod, null, selfVar, paramVars,resultVar,excVar,heapAtPreVar, null, toBeSaved);
     }
        
     
-    public FunctionalOperationContract func (String baseName, ProgramMethod pm, boolean terminates, Term pre, Term mby, Term post, Term mod, ProgramVariableCollection pv ){
+    public FunctionalOperationContract func (String baseName, ProgramMethod pm, boolean terminates, Term pre, Term mby, Term post, Term mod, boolean hasMod, ProgramVariableCollection pv ){
         Modality modality = terminates ? Modality.DIA : Modality.BOX;
-        return func(baseName, pm, modality, pre, mby, post, mod,pv, false);
+        return func(baseName, pm, modality, pre, mby, post, mod, hasMod, pv, false);
     }
     
     public FunctionalOperationContract func (String baseName, ProgramMethod pm,
-            Modality modality, Term pre, Term mby, Term post, Term mod,
+            Modality modality, Term pre, Term mby, Term post, Term mod, boolean hasMod,
             ProgramVariableCollection progVars, boolean toBeSaved) {
         return new FunctionalOperationContractImpl(baseName, null, pm.getContainerType(), pm, modality, pre, mby,
-                post, mod, null, progVars.selfVar, progVars.paramVars,
+                post, mod, hasMod, null, progVars.selfVar, progVars.paramVars,
                 progVars.resultVar, progVars.excVar, progVars.heapAtPreVar, progVars.savedHeapAtPreVar,
                 Contract.INVALID_ID, toBeSaved);
     }
@@ -223,26 +226,32 @@ public class ContractFactory {
     public FunctionalOperationContract setModality(FunctionalOperationContract old, Modality modality){
         assert old instanceof FunctionalOperationContractImpl : UNKNOWN_CONTRACT_IMPLEMENTATION;
         FunctionalOperationContractImpl foci = (FunctionalOperationContractImpl) old;
-        return new FunctionalOperationContractImpl(foci.baseName, foci.kjt, foci.pm, modality, foci.originalPre, foci.originalMby, foci.originalPost, foci.originalMod, foci.originalModBackup, foci.originalSelfVar, foci.originalParamVars, foci.originalResultVar, foci.originalExcVar, foci.originalHeapAtPreVar, foci.originalSavedHeapAtPreVar, foci.toBeSaved);
+        return new FunctionalOperationContractImpl(foci.baseName, foci.kjt, foci.pm, modality, foci.originalPre, foci.originalMby, foci.originalPost, foci.originalMod, foci.hasRealModifiesClause, foci.originalModBackup, foci.originalSelfVar, foci.originalParamVars, foci.originalResultVar, foci.originalExcVar, foci.originalHeapAtPreVar, foci.originalSavedHeapAtPreVar, foci.toBeSaved);
     }
 
 
     public FunctionalOperationContract setModifies(FunctionalOperationContract old, Term modifies){
         assert old instanceof FunctionalOperationContractImpl : UNKNOWN_CONTRACT_IMPLEMENTATION;
         FunctionalOperationContractImpl foci = (FunctionalOperationContractImpl) old;
-        return new FunctionalOperationContractImpl(foci.baseName, foci.kjt, foci.pm, foci.modality, foci.originalPre, foci.originalMby, foci.originalPost, modifies, foci.originalModBackup, foci.originalSelfVar, foci.originalParamVars, foci.originalResultVar, foci.originalExcVar, foci.originalHeapAtPreVar, foci.originalSavedHeapAtPreVar, foci.toBeSaved);
+        return new FunctionalOperationContractImpl(foci.baseName, foci.kjt, foci.pm, foci.modality, foci.originalPre, foci.originalMby, foci.originalPost, modifies, foci.hasRealModifiesClause, foci.originalModBackup, foci.originalSelfVar, foci.originalParamVars, foci.originalResultVar, foci.originalExcVar, foci.originalHeapAtPreVar, foci.originalSavedHeapAtPreVar, foci.toBeSaved);
+    }
+    
+    public FunctionalOperationContract setHasModifiesClause(FunctionalOperationContract old, boolean hasModifiesClause){
+        assert old instanceof FunctionalOperationContractImpl : UNKNOWN_CONTRACT_IMPLEMENTATION;
+        FunctionalOperationContractImpl foci = (FunctionalOperationContractImpl) old;
+        return new FunctionalOperationContractImpl(foci.baseName, foci.kjt, foci.pm, foci.modality, foci.originalPre, foci.originalMby, foci.originalPost, foci.originalMod, hasModifiesClause, foci.originalModBackup, foci.originalSelfVar, foci.originalParamVars, foci.originalResultVar, foci.originalExcVar, foci.originalHeapAtPreVar, foci.originalSavedHeapAtPreVar, foci.toBeSaved);
     }
 
     public FunctionalOperationContract setModifiesBackup(FunctionalOperationContract old, Term modifiesBackup){
         assert old instanceof FunctionalOperationContractImpl : UNKNOWN_CONTRACT_IMPLEMENTATION;
         FunctionalOperationContractImpl foci = (FunctionalOperationContractImpl) old;
-        return new FunctionalOperationContractImpl(foci.baseName, foci.kjt, foci.pm, foci.modality, foci.originalPre, foci.originalMby, foci.originalPost, foci.originalMod, modifiesBackup, foci.originalSelfVar, foci.originalParamVars, foci.originalResultVar, foci.originalExcVar, foci.originalHeapAtPreVar, foci.originalSavedHeapAtPreVar, foci.toBeSaved);
+        return new FunctionalOperationContractImpl(foci.baseName, foci.kjt, foci.pm, foci.modality, foci.originalPre, foci.originalMby, foci.originalPost, foci.originalMod, foci.hasRealModifiesClause, modifiesBackup, foci.originalSelfVar, foci.originalParamVars, foci.originalResultVar, foci.originalExcVar, foci.originalHeapAtPreVar, foci.originalSavedHeapAtPreVar, foci.toBeSaved);
     }
 
     public FunctionalOperationContract setSaveHeapAtPreVar(FunctionalOperationContract old, LocationVariable savedHeapAtPreVar){
         assert old instanceof FunctionalOperationContractImpl : UNKNOWN_CONTRACT_IMPLEMENTATION;
         FunctionalOperationContractImpl foci = (FunctionalOperationContractImpl) old;
-        return new FunctionalOperationContractImpl(foci.baseName, foci.kjt, foci.pm, foci.modality, foci.originalPre, foci.originalMby, foci.originalPost, foci.originalMod, foci.originalModBackup, foci.originalSelfVar, foci.originalParamVars, foci.originalResultVar, foci.originalExcVar, foci.originalHeapAtPreVar, savedHeapAtPreVar, foci.toBeSaved);
+        return new FunctionalOperationContractImpl(foci.baseName, foci.kjt, foci.pm, foci.modality, foci.originalPre, foci.originalMby, foci.originalPost, foci.originalMod, foci.hasRealModifiesClause, foci.originalModBackup, foci.originalSelfVar, foci.originalParamVars, foci.originalResultVar, foci.originalExcVar, foci.originalHeapAtPreVar, savedHeapAtPreVar, foci.toBeSaved);
     }
    
     
@@ -279,6 +288,7 @@ public class ContractFactory {
                         t.originalHeapAtPreVar), 
                    t.originalPost);
         Term mod = t.originalMod;
+        boolean hasMod = t.hasModifiesClause();
         Modality moda = t.modality;
         for(FunctionalOperationContract other : others) {
             Term otherPre = other.getPre(t.originalSelfVar, 
@@ -297,6 +307,7 @@ public class ContractFactory {
                                t.originalHeapAtPreVar, 
                                t.originalSavedHeapAtPreVar, 
                                services);
+            boolean otherHasMod = other.hasModifiesClause();
             Term otherMod = other.getMod(t.originalSelfVar, 
                                          t.originalParamVars, 
                                          services);
@@ -315,9 +326,17 @@ public class ContractFactory {
             post = tb.and(post, tb.imp(atPreify(otherPre, 
                                 t.originalHeapAtPreVar), 
                                 otherPost));
-            mod = mod == null ? otherMod
+            
+            if(!hasMod && !otherHasMod) {
+                // both contracts are strictly pure
+                // hasMod remains false ...
+                // no need to update mod.
+            } else {
+                hasMod = true;
+                mod = mod == null ? otherMod
                     : (otherMod == null ?
                             mod : tb.union(services, mod, otherMod));
+            }
         }
 
         return new FunctionalOperationContractImpl(INVALID_ID,
@@ -329,6 +348,7 @@ public class ContractFactory {
                                          mby,
                                          post,
                                          mod,
+                                         hasMod,
                                          null, // TODO !!!!
                                          t.originalSelfVar,
                                          t.originalParamVars,

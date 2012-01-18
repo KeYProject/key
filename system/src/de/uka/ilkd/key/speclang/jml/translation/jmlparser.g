@@ -340,8 +340,12 @@ accessibleclause returns [Term result = null] throws SLTranslationException
 
 assignableclause returns [Term result = null] throws SLTranslationException
 :
-    ass:ASSIGNABLE result=storeRefUnion
+    ass:ASSIGNABLE 
+    ( result=storeRefUnion
         { result = translator.translate(ass.getText(), Term.class, result, services); }
+    | LESS_THAN_NOTHING
+        { result = TB.lessThanNothing(); }
+    )
     ;
 
 
