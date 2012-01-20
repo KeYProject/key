@@ -154,7 +154,14 @@ public final class WhileInvariantRule implements BuiltInRule {
 					     heapLDT.targetSort());
 	services.getNamespaces().functions().addSafely(anonHeapFunc);
 	final Term anonHeapTerm = TB.func(anonHeapFunc);
-	Term anonUpdate = TB.anonUpd(services, mod, anonHeapTerm, transaction);
+	
+	// check for strictly pure loops
+	Term anonUpdate;
+	if(mod == TB.lessThanNothing()) {
+	    anonUpdate = TB.skip();
+	} else {
+	    anonUpdate = TB.anonUpd(services, mod, anonHeapTerm, transaction);
+	}
 	
 	//local output vars
 	if(!transaction) {
@@ -289,9 +296,15 @@ public final class WhileInvariantRule implements BuiltInRule {
 	  anonHeapWellFormed   = TB.wellFormed(services, anonUpdateAndHeap.second);	    
 	}
 
-	final Term normalFrameCondition = TB.frame(services, TB.heap(services),
+	// special case frame condition for strictly pure loops
+	final Term normalFrameCondition;
+	if(mod == TB.lessThanNothing()) {
+	    normalFrameCondition = TB.frameStrictlyEmpty(services, TB.heap(services), normalToBeforeLoop); 
+	} else {
+	    normalFrameCondition = TB.frame(services, TB.heap(services),
                normalToBeforeLoop, 
                mod);
+	}
 	final Term transactionFrameCondition = transaction ?
 	          TB.frame(services, TB.savedHeap(services), savedToBeforeLoop, modBackup)
 	        : null;

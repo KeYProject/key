@@ -17,10 +17,8 @@ import de.uka.ilkd.key.util.MiscTools;
  */
 public class DLEmbeddedExpression extends Operator {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = 8210489918296848261L;
+        
     private final String functionName;
 
     /**
