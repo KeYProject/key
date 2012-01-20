@@ -157,7 +157,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 	
 	// check for strictly pure loops
 	Term anonUpdate;
-	if(mod == TB.lessThanNothing()) {
+	if(TB.lessThanNothing().equals(mod)) {
 	    anonUpdate = TB.skip();
 	} else {
 	    anonUpdate = TB.anonUpd(services, mod, anonHeapTerm, transaction);
@@ -298,7 +298,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
 	// special case frame condition for strictly pure loops
 	final Term normalFrameCondition;
-	if(mod == TB.lessThanNothing()) {
+	if(TB.lessThanNothing().equals(mod)) {
 	    normalFrameCondition = TB.frameStrictlyEmpty(services, TB.heap(services), normalToBeforeLoop); 
 	} else {
 	    normalFrameCondition = TB.frame(services, TB.heap(services),
