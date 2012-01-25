@@ -2,8 +2,6 @@ package org.key_project.key4eclipse.util.test.testcase.swtbot;
 
 import java.lang.reflect.InvocationTargetException;
 
-import javax.swing.SwingUtilities;
-
 import junit.framework.TestCase;
 
 import org.eclipse.core.resources.IFolder;
@@ -13,12 +11,14 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.junit.Test;
 import org.key_project.key4eclipse.util.eclipse.BundleUtil;
-import org.key_project.key4eclipse.util.java.thread.AbstractRunnableWithException;
-import org.key_project.key4eclipse.util.java.thread.IRunnableWithException;
+import org.key_project.key4eclipse.util.java.SwingUtil;
 import org.key_project.key4eclipse.util.jdt.JDTUtil;
 import org.key_project.key4eclipse.util.key.KeYUtil;
 import org.key_project.key4eclipse.util.test.Activator;
 import org.key_project.key4eclipse.util.test.util.TestUtilsUtil;
+import org.key_project.swtbot.swing.bot.SwingBot;
+import org.key_project.swtbot.swing.bot.SwingBotJDialog;
+import org.key_project.swtbot.swing.bot.SwingBotJLabel;
 
 /**
  * SWT Bot tests for {@link KeYUtil}.
@@ -28,7 +28,29 @@ public class SWTBotKeYUtilTest extends TestCase {
     // TODO: Implement tests for the missing methods of class KeYUtil
     
     /**
-     * Tests {@link KeYUtil#load(org.eclipse.core.resources.IResource)}.
+     * Tests {@link KeYUtil#showErrorInKey(Throwable)}.
+     */
+    @Test
+    public void testShowErrorInKey() throws InterruptedException, InvocationTargetException {
+        final Exception exception = new Exception("Test Exception");
+        // Open error dialog
+        SwingUtil.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                KeYUtil.showErrorInKey(exception);
+            }
+        });
+        // Get and close error dialog
+        SwingBotJDialog dialog = new SwingBot().jDialog("Error");
+        assertTrue(dialog.isOpen());
+        SwingBotJLabel label = dialog.bot().jLabel();
+        assertEquals(exception.toString(), label.getText());
+        dialog.close();
+    }
+    
+    /**
+     * Tests {@link KeYUtil#load(org.eclipse.core.resources.IResource)} and
+     * {@link KeYUtil#loadAsync(org.eclipse.core.resources.IResource)}.
      */
     @Test
     public void testLoad() throws Exception {
@@ -59,31 +81,17 @@ public class SWTBotKeYUtilTest extends TestCase {
         }
         javaProject.setRawClasspath(oldEntries, null);
         // Load java project with one source directory
-        KeYUtil.load(javaProject.getProject());
+        KeYUtil.loadAsync(javaProject.getProject());
         TestUtilsUtil.keyStartSelectedProofInProofManagementDiaolog();
         TestUtilsUtil.keyCheckProofs("JML operation contract [id: 0 / banking.LoggingPayCard::charge]", "JML operation contract [id: 0 / banking.LoggingPayCard::charge]");
         // Load second java project
         IJavaProject secondProject = TestUtilsUtil.createJavaProject("SWTBotKeYUtilTest_testLoad_Java2");
         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/MCDemo", secondProject.getProject().getFolder("src"));
-        KeYUtil.load(secondProject.getProject());
+        KeYUtil.loadAsync(secondProject.getProject());
         TestUtilsUtil.keyStartSelectedProofInProofManagementDiaolog();
         TestUtilsUtil.keyCheckProofs("JML normal_behavior operation contract [id: 0 / MCDemo::inc]", "JML operation contract [id: 0 / banking.LoggingPayCard::charge]", "JML normal_behavior operation contract [id: 0 / MCDemo::inc]");
         // Open first project again to make sure that only the proof is selected again and no second proof environment is created
-        IRunnableWithException run = new AbstractRunnableWithException() {
-            @Override
-            public void run() {
-                try {
-                    KeYUtil.load(javaProject.getProject());
-                }
-                catch (Exception e) {
-                    setException(e);
-                }
-            }
-        };
-        SwingUtilities.invokeLater(run);
-        if (run.getException() != null) {
-            throw run.getException();
-        }
+        KeYUtil.loadAsync(javaProject.getProject());
         TestUtilsUtil.keyGoToSelectedProofInProofManagementDiaolog();
         TestUtilsUtil.keyCheckProofs("JML operation contract [id: 0 / banking.LoggingPayCard::charge]", "JML operation contract [id: 0 / banking.LoggingPayCard::charge]", "JML normal_behavior operation contract [id: 0 / MCDemo::inc]");
         // Close main window
@@ -91,12 +99,13 @@ public class SWTBotKeYUtilTest extends TestCase {
     }
     
     /**
-     * Tests {@link KeYUtil#openMainWindow()}.
+     * Tests {@link KeYUtil#openMainWindow()} and
+     * {@link KeYUtil#openMainWindowAsync()}.
      */
     @Test
     public void testOpenMainWindow() throws InterruptedException, InvocationTargetException {
         // Open main window
-        KeYUtil.openMainWindow();
+        KeYUtil.openMainWindowAsync();
         // Close main window
         TestUtilsUtil.keyCloseMainWindow();
     }

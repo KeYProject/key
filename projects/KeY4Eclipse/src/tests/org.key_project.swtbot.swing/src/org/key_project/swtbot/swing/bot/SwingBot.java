@@ -18,6 +18,7 @@ import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -308,6 +309,25 @@ public class SwingBot extends SWTBot {
    public SwingBotJTree jTree(Class<? extends TreeModel> treeModelClass, int index) {
       Matcher matcher = ComponentMatcherFactory.allOf(ComponentMatcherFactory.componentOfType(JTree.class), ComponentMatcherFactory.treeModelOfType(treeModelClass));
       return new SwingBotJTree((JTree)component(matcher, index));
+   }
+   
+   /**
+    * Returns a wrapper for the described element.
+    * @return A wrapper around a {@link JLabel}.
+    */   
+   public SwingBotJLabel jLabel() {
+      return jLabel(0);
+   }
+   
+   /**
+    * Returns a wrapper for the described element.
+    * @param index The index of the {@link JLabel}, in case there are multiple trees in the parent.
+    * @return A wrapper around a {@link JLabel}.
+    */      
+   @SuppressWarnings({ "rawtypes", "unchecked" })
+   public SwingBotJLabel jLabel(int index) {
+      Matcher matcher = ComponentMatcherFactory.allOf(ComponentMatcherFactory.componentOfType(JLabel.class));
+      return new SwingBotJLabel((JLabel)component(matcher, index));
    }
    
    /**

@@ -1,8 +1,11 @@
 package org.key_project.key4eclipse.util.key;
 
+import java.awt.Component;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+
+import javax.swing.JOptionPane;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Assert;
@@ -10,6 +13,8 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
+import org.key_project.key4eclipse.util.Activator;
+import org.key_project.key4eclipse.util.eclipse.Logger;
 import org.key_project.key4eclipse.util.java.SwingUtil;
 import org.key_project.key4eclipse.util.java.thread.AbstractRunnableWithException;
 import org.key_project.key4eclipse.util.java.thread.IRunnableWithException;
@@ -57,6 +62,31 @@ public final class KeYUtil {
     }
     
     /**
+     * <p>
+     * Executes {@link #openMainWindow()} asynchronous.
+     * </p>
+     * <p>
+     * <b>Attention: </b> The asynchronous execution is required on MAC OS!
+     * </p>
+     * @throws InvocationTargetException Occurred Exception.
+     * @throws InterruptedException Occurred Exception. 
+     */
+    public static void openMainWindowAsync() throws InterruptedException, InvocationTargetException {
+        SwingUtil.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    openMainWindow();
+                }
+                catch (Exception e) {
+                    new Logger(Activator.getDefault(), Activator.PLUGIN_ID).logError(e);
+                    showErrorInKey(e);
+                }
+            }
+        });
+    }
+
+    /**
      * Opens the KeY main window via {@link Main#main(String[])}.
      * @throws InvocationTargetException Occurred Exception.
      * @throws InterruptedException Occurred Exception.
@@ -66,6 +96,32 @@ public final class KeYUtil {
             @Override
             public void run() {
                 Main.main(new String[] {});
+            }
+        });
+    }
+ 
+    /**
+     * <p>
+     * Executes {@link #load(IResource)} asynchronous.
+     * </p>
+     * <p>
+     * <b>Attention: </b> The asynchronous execution is required on MAC OS!
+     * </p>
+     * @param locationToLoad The location to load.
+     * @throws InvocationTargetException Occurred Exception.
+     * @throws InterruptedException Occurred Exception.
+     */
+    public static void loadAsync(final IResource locationToLoad) throws InterruptedException, InvocationTargetException {
+        SwingUtil.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    load(locationToLoad);
+                }
+                catch (Exception e) {
+                    new Logger(Activator.getDefault(), Activator.PLUGIN_ID).logError(e);
+                    showErrorInKey(e);
+                }
             }
         });
     }
@@ -144,6 +200,31 @@ public final class KeYUtil {
         else {
             return null;
         }
+    }
+    
+    /**
+     * <p>
+     * Executes {@link #startProof(IMethod)} asynchronous.
+     * </p>
+     * <p>
+     * <b>Attention: </b> The asynchronous execution is required on MAC OS!
+     * </p>
+     * @param method The {@link IMethod} to start proof for.
+     * @throws Exception Occurred Exception.
+     */
+    public static void startProofAsync(final IMethod method) throws Exception {
+        SwingUtil.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    startProof(method);
+                }
+                catch (Exception e) {
+                    new Logger(Activator.getDefault(), Activator.PLUGIN_ID).logError(e);
+                    showErrorInKey(e);
+                }
+            }
+        });
     }
     
     /**
@@ -329,6 +410,23 @@ public final class KeYUtil {
         }
         catch (JavaModelException e) {
             throw new ProofInputException(e);
+        }
+    }
+    
+    /**
+     * Shows the exception to the error dialog to the user via Swing.
+     * @param t The {@link Throwable} to show.
+     */
+    public static void showErrorInKey(Throwable t) {
+        if (t != null) {
+            Component parentComponent = null;
+            if (MainWindow.hasInstance()) {
+                parentComponent = MainWindow.getInstance();
+            }
+            JOptionPane.showMessageDialog(parentComponent, 
+                                          t, 
+                                          "Error", 
+                                          JOptionPane.ERROR_MESSAGE);
         }
     }
 }

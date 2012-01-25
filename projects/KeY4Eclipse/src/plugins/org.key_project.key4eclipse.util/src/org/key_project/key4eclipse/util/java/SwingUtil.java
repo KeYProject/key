@@ -16,7 +16,7 @@ public final class SwingUtil {
     }
     
     /**
-     * Executes the {@link Runnable} in the {@link Thread} of Swing.
+     * Executes the {@link Runnable} in the {@link Thread} of Swing synchron.
      * @param run The {@link Runnable} to execute.
      * @throws InterruptedException Occurred Exception.
      * @throws InvocationTargetException Occurred Exception.
@@ -28,6 +28,23 @@ public final class SwingUtil {
             }
             else {
                 SwingUtilities.invokeAndWait(run);
+            }
+        }
+    }
+    
+    /**
+     * Executes the {@link Runnable} in the {@link Thread} of Swing asynchronous.
+     * @param run The {@link Runnable} to execute.
+     * @throws InterruptedException Occurred Exception.
+     * @throws InvocationTargetException Occurred Exception.
+     */
+    public static void invokeLater(Runnable run) throws InterruptedException, InvocationTargetException {
+        if (run != null) {
+            if (SwingUtilities.isEventDispatchThread()) {
+                run.run();
+            }
+            else {
+                SwingUtilities.invokeLater(run);
             }
         }
     }
