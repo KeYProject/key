@@ -70,13 +70,10 @@ public final class DependencyContractImpl implements DependencyContract {
         assert paramVars.size() == target.arity() - (target.isStatic() ? 1 : 2);
         assert pre.sort() == Sort.FORMULA;
 	this.baseName = baseName;
-        this.name                   = name != null 
-                                      ? name 
-                                      : baseName + " [id: " + id + " / " 
-                                        + target
-                                        + " for " 
-                                        + kjt.getJavaType().getName() 
-                                        + "]";
+        this.name = name != null 
+                  ? name 
+                  : ContractFactory.generateContractName(baseName, kjt, target,
+                                       id);
 	this.kjt = kjt;
 	this.target = target;
 	this.originalPre = pre;
@@ -377,5 +374,10 @@ public final class DependencyContractImpl implements DependencyContract {
                                           originalParamVars,
                                           id);
     }
-
+    
+    
+    @Override
+    public String getTypeName() {
+        return ContractFactory.generateContractTypeName(baseName, kjt, target);
+    }
 }

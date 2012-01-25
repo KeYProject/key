@@ -10,7 +10,6 @@
 
 package de.uka.ilkd.key.proof.mgt;
 
-import java.util.*;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -20,31 +19,25 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
-import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.declaration.modifier.Private;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.RewriteTaclet;
-import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
-import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
+import java.util.*;
 
 
 /**
@@ -84,8 +77,8 @@ public final class SpecificationRepository {
 		= new LinkedHashMap<ObserverFunction,ImmutableSet<Taclet>>();
     private final Services services;
     
-    private int contractCounter = 0;
-    private int libraryContractCounter = -1;
+    private final Map<String, Integer> contractCounters
+                = new de.uka.ilkd.key.util.LinkedHashMap<String, Integer>();
     
     
     
@@ -357,12 +350,12 @@ public final class SpecificationRepository {
                     .equals(contract.getTarget());
         
         //set id
-        if(((TypeDeclaration)contract.getKJT().getJavaType()).isLibraryClass()) {
-            contract = contract.setID(libraryContractCounter--);
-            assert libraryContractCounter > Integer.MIN_VALUE : "too many library contracts";
-        } else {
-            contract = contract.setID(contractCounter++);
+        Integer nextId = contractCounters.get(contract.getTypeName());
+        if (nextId == null) {
+            nextId = 0;
         }
+        contract = contract.setID(nextId);
+        contractCounters.put(contract.getTypeName(), nextId + 1);
         return contract;
     }
 
@@ -374,13 +367,13 @@ public final class SpecificationRepository {
     }
 
     private void registerContract(Contract contract,
-            final ImmutableSet<Pair<KeYJavaType, ObserverFunction>> targets) {
+                                  final ImmutableSet<Pair<KeYJavaType, ObserverFunction>> targets) {
         for(Pair<KeYJavaType,ObserverFunction> impl : targets) {
             registerContract(contract, impl);
         }
     }
 
-
+    
     private void registerContract(Contract contract,
             Pair<KeYJavaType, ObserverFunction> targetPair) {
         final KeYJavaType targetKJT = targetPair.first;

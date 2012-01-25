@@ -417,4 +417,35 @@ public class ContractFactory {
     public int hashCode() {
         return services == null ? 0 : services.hashCode();
     }
+    
+    
+    public static String generateContractName(String myBaseName,
+                                              KeYJavaType myKjt,
+                                              ObserverFunction myTarget,
+                                              int myId) {
+        return myBaseName
+               + " [id: "
+               + myId
+               + " / "
+               + myTarget
+               + (myKjt.equals(myTarget.getContainerType())
+                  ? ""
+                  : " for "
+                    + myKjt.getJavaType().getFullName())
+               + "]";
+    }
+
+
+    public static String generateContractTypeName(String myBaseName,
+                                                  KeYJavaType myKjt,
+                                                  ObserverFunction myTarget) {
+        return myBaseName
+               + " ["
+               + myTarget
+               + (myKjt.equals(myTarget.getContainerType())
+                  ? ""
+                  : " for "
+                    + myKjt.getJavaType().getFullName())
+               + "]";
+    }
 }
