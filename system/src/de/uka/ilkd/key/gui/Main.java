@@ -157,7 +157,7 @@ public class Main {
         try {
 
             opt = new LemmataAutoModeOptions(options, INTERNAL_VERSION, 
-                    PathConfig.KEY_CONFIG_DIR);
+                    PathConfig.getKeyConfigDir());
             
         } catch(Exception e) {
             System.out.println("An error occured while reading the lemma parameters:");

@@ -196,7 +196,7 @@ public final class SpecificationRepository {
     /**
      * Returns all known class invariants for the passed type.
      */
-    private ImmutableSet<ClassInvariant> getClassInvariants(KeYJavaType kjt) {
+    public ImmutableSet<ClassInvariant> getClassInvariants(KeYJavaType kjt) {
 	ImmutableSet<ClassInvariant> result = invs.get(kjt);
 	return result == null 
 	       ? DefaultImmutableSet.<ClassInvariant>nil() 

@@ -51,7 +51,7 @@ public abstract class TacletLoader {
                 if(envForTaclets == null){
                         try{
                                 EnvironmentCreator ec = new EnvironmentCreator();
-                        envForTaclets =  ec.create(PathConfig.KEY_CONFIG_DIR, monitor, listener, profile); 
+                        envForTaclets =  ec.create(PathConfig.getKeyConfigDir(), monitor, listener, profile); 
                           if(tacletFile == null){
                                   tacletFile = ec.getKeyFile();
                                            

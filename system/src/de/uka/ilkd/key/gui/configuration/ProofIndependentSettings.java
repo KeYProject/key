@@ -14,7 +14,7 @@ import de.uka.ilkd.key.gui.smt.ProofIndependentSMTSettings;
 
 
 public class ProofIndependentSettings implements SettingsListener {
-        public static final ProofIndependentSettings DEFAULT_INSTANCE = new ProofIndependentSettings(PathConfig.PROOF_INDEPENDT_SETTINGS);
+        public static final ProofIndependentSettings DEFAULT_INSTANCE = new ProofIndependentSettings(PathConfig.getProofIndependentSettings());
         private final ProofIndependentSMTSettings smtSettings = ProofIndependentSMTSettings.getDefaultSettingsData();
         private final LemmaGeneratorSettings lemmaGeneratorSettings = new LemmaGeneratorSettings();
         private final String filename;
@@ -70,7 +70,7 @@ public class ProofIndependentSettings implements SettingsListener {
                 try {
                     File file = new File(filename);
                     if (!file.exists()) {                        
-                            new File(PathConfig.KEY_CONFIG_DIR+File.separator).mkdirs();
+                            new File(PathConfig.getKeyConfigDir()+File.separator).mkdirs();
                             file.createNewFile();
                     }            
                     FileOutputStream out = new FileOutputStream(file);

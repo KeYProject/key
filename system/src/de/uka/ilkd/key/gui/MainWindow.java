@@ -59,13 +59,39 @@ import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
-import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.MouseInputAdapter;
 
-import de.uka.ilkd.key.gui.actions.*;
+import de.uka.ilkd.key.gui.actions.AbandonTaskAction;
+import de.uka.ilkd.key.gui.actions.AboutAction;
+import de.uka.ilkd.key.gui.actions.AutoModeAction;
+import de.uka.ilkd.key.gui.actions.EditMostRecentFileAction;
+import de.uka.ilkd.key.gui.actions.ExitMainAction;
+import de.uka.ilkd.key.gui.actions.FontSizeAction;
+import de.uka.ilkd.key.gui.actions.LemmaGenerationAction;
+import de.uka.ilkd.key.gui.actions.LemmaGenerationBatchModeAction;
+import de.uka.ilkd.key.gui.actions.LicenseAction;
+import de.uka.ilkd.key.gui.actions.MainWindowAction;
+import de.uka.ilkd.key.gui.actions.MinimizeInteraction;
+import de.uka.ilkd.key.gui.actions.OneStepSimplificationToggleAction;
+import de.uka.ilkd.key.gui.actions.OpenExampleAction;
+import de.uka.ilkd.key.gui.actions.OpenFileAction;
+import de.uka.ilkd.key.gui.actions.OpenMostRecentFileAction;
+import de.uka.ilkd.key.gui.actions.PrettyPrintToggleAction;
+import de.uka.ilkd.key.gui.actions.ProofManagementAction;
+import de.uka.ilkd.key.gui.actions.SMTOptionsAction;
+import de.uka.ilkd.key.gui.actions.SaveFileAction;
+import de.uka.ilkd.key.gui.actions.SearchInProofTreeAction;
+import de.uka.ilkd.key.gui.actions.ShowActiveSettingsAction;
+import de.uka.ilkd.key.gui.actions.ShowActiveTactletOptionsAction;
+import de.uka.ilkd.key.gui.actions.ShowKnownTypesAction;
+import de.uka.ilkd.key.gui.actions.ShowProofStatistics;
+import de.uka.ilkd.key.gui.actions.ShowUsedContractsAction;
+import de.uka.ilkd.key.gui.actions.TacletOptionsAction;
+import de.uka.ilkd.key.gui.actions.ToolTipOptionsAction;
+import de.uka.ilkd.key.gui.actions.UndoLastStepAction;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.GeneralSettings;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
@@ -381,7 +407,7 @@ public final class MainWindow extends JFrame  {
                 loadProblem(new File(recentFiles.getAbsolutePath((JMenuItem) e.getSource())));
             }
         }, MAX_RECENT_FILES, null);
-        recentFiles.load(PathConfig.RECENT_FILES_STORAGE);
+        recentFiles.load(PathConfig.getRecentFileStorage());
         
         
         // FIXME do this NOT in layout of GUI
@@ -1898,4 +1924,17 @@ public final class MainWindow extends JFrame  {
         }
     }
 
+    /**
+     * <p>
+     * Returns the {@link ExitMainAction} that is used to exit the {@link MainWindow}.
+     * </p>
+     * <p>
+     * This functionality is required because for instance other projects
+     * like the Eclipse integration has to close the main window.
+     * </p>
+     * @return The used {@link ExitMainAction}.
+     */
+    public ExitMainAction getExitMainAction() {
+        return exitMainAction;
+    }
 }

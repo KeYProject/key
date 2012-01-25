@@ -195,7 +195,7 @@ public final class ProblemLoader implements Runnable {
      * @throws IllegalArgumentException if the user has selected a file with an unsupported extension
      *                          an exception is thrown to indicate this
      */
-    protected EnvInput createEnvInput(File file) 
+    public EnvInput createEnvInput(File file) 
     throws FileNotFoundException {                
         
         final String filename = file.getName();
