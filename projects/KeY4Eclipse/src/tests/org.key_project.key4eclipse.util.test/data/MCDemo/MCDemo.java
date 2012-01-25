@@ -9,21 +9,28 @@
  *    Martin Hentschel - initial API and implementation
  *******************************************************************************/
 
-package org.key_project.key4eclipse.util.test.suite.swtbot;
-
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.key_project.key4eclipse.util.test.testcase.swtbot.SWTBotKeYUtilTest;
-import org.key_project.key4eclipse.util.test.testcase.swtbot.SWTBotLoggerTest;
-
-/**
- * Run all contained JUnit 4 test cases that requires SWT Bot.
- * @author Martin Hentschel
- */
-@RunWith(Suite.class)
-@Suite.SuiteClasses({
-    SWTBotKeYUtilTest.class,
-    SWTBotLoggerTest.class
-})
-public class SWTBotAllUtilTests {
+public class MCDemo {
+	/*@
+    @ public instance invariant attr >= 0;
+    @*/	
+	
+	/*@ spec_public @*/int attr;
+	
+	/*@
+	  @ public normal_behavior
+	  @ assignable \nothing;
+	  @ ensures \result == x+1;
+	  @*/
+	public int inc(int x) {
+		return ++x;
+	}
+    
+	/*@
+	  @ public normal_behavior
+	  @ ensures \result == u+1 && attr == 100;
+	  @*/
+	public int init(int u) {
+		attr = 100;
+		return inc(u);
+	}
 }

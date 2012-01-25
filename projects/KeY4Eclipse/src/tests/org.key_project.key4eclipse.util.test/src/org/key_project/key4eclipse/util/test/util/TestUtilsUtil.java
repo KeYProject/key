@@ -16,6 +16,8 @@ import static org.junit.Assert.assertNotNull;
 import java.io.ByteArrayInputStream;
 import java.util.List;
 
+import javax.swing.tree.TreeModel;
+
 import junit.framework.TestCase;
 
 import org.eclipse.core.resources.IContainer;
@@ -45,6 +47,18 @@ import org.key_project.key4eclipse.util.eclipse.Logger;
 import org.key_project.key4eclipse.util.java.thread.AbstractRunnableWithResult;
 import org.key_project.key4eclipse.util.java.thread.IRunnableWithResult;
 import org.key_project.key4eclipse.util.test.Activator;
+import org.key_project.swtbot.swing.bot.SwingBot;
+import org.key_project.swtbot.swing.bot.SwingBotJButton;
+import org.key_project.swtbot.swing.bot.SwingBotJDialog;
+import org.key_project.swtbot.swing.bot.SwingBotJFrame;
+import org.key_project.swtbot.swing.bot.SwingBotJTree;
+
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.ProofManagementDialog;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.mgt.TaskTreeModel;
+import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
+import de.uka.ilkd.key.util.KeYResourceManager;
 
 /**
  * Provides static methods that make testing easier.
@@ -303,5 +317,107 @@ public class TestUtilsUtil {
       };
       Display.getDefault().syncExec(run);
       return run.getResult();
+   }
+  
+   /**
+    * Returns the {@link SwingBotJFrame} that handles the {@link MainWindow}
+    * of KeY.
+    * @return The {@link SwingBotJFrame} for KeY's {@link MainWindow}.
+    */
+   public static SwingBotJFrame keyGetMainWindow() {
+       SwingBot bot = new SwingBot();
+       SwingBotJFrame frame = bot.jFrame("KeY " + KeYResourceManager.getManager().getVersion());
+       TestCase.assertNotNull(frame);
+       TestCase.assertTrue(frame.isOpen());
+       return frame;
+   }
+   
+   /**
+    * Closes the opened {@link MainWindow} of KeY.
+    */
+   public static void keyCloseMainWindow() {
+       SwingBotJFrame frame = TestUtilsUtil.keyGetMainWindow();
+       frame.close();
+       TestCase.assertFalse(frame.isOpen());
+   }
+   
+   /**
+    * Returns the {@link SwingBotJDialog} that handles the opened
+    * {@link ProofManagementDialog} of KeY.
+    * @param mainWindow The parent main window.
+    * @return The {@link SwingBotJDialog} for the {@link ProofManagementDialog}.
+    */
+   public static SwingBotJDialog keyGetProofManagementDiaolog(SwingBotJFrame mainWindow) {
+       SwingBotJDialog dialog = mainWindow.bot().jDialog("Proof Management");
+       TestCase.assertNotNull(dialog);
+       TestCase.assertTrue(dialog.isOpen());
+       return dialog;
+   }
+   
+   /**
+    * Starts the selected proof in the opened {@link ProofManagementDialog}.
+    */
+   public static void keyStartSelectedProofInProofManagementDiaolog() {
+       SwingBotJFrame frame = TestUtilsUtil.keyGetMainWindow();
+       SwingBotJDialog dialog = TestUtilsUtil.keyGetProofManagementDiaolog(frame);
+       TestCase.assertTrue(dialog.isOpen());
+       SwingBotJButton startButton = dialog.bot().jButton("Start Proof");
+       startButton.clickAndWait();
+       TestCase.assertFalse(dialog.isOpen());
+   }
+   
+   /**
+    * Goes to the selected proof in the opened {@link ProofManagementDialog}.
+    */
+   public static void keyGoToSelectedProofInProofManagementDiaolog() {
+       SwingBotJFrame frame = TestUtilsUtil.keyGetMainWindow();
+       SwingBotJDialog dialog = TestUtilsUtil.keyGetProofManagementDiaolog(frame);
+       TestCase.assertTrue(dialog.isOpen());
+       SwingBotJButton goToButton = dialog.bot().jButton("Go to Proof");
+       goToButton.clickAndWait();
+       TestCase.assertFalse(dialog.isOpen());
+   }
+   
+   /**
+    * Makes sure that the correct proofs are shown in the proof tree.
+    * @param selectedProof The expected selected proof.
+    * @param availableProofs The expected available proofs.
+    */
+   public static void keyCheckProofs(String selectedProof, String... availableProofs) {
+       SwingBotJFrame frame = TestUtilsUtil.keyGetMainWindow();
+       SwingBotJTree tree = frame.bot().jTree(TaskTreeModel.class);
+       TestUtilsUtil.keyCheckAvailableProofs(tree, availableProofs);
+       TestUtilsUtil.keyCheckSelectedProof(tree, selectedProof);
+   }
+   
+   /**
+    * Makes sure that the correct proof is selected.
+    * @param tree The tree.
+    * @param expectedProofName The name of the expected proof.
+    */
+   public static void keyCheckSelectedProof(SwingBotJTree tree,
+                                            String expectedProofName) {
+      Object[] selectedObjects = tree.getSelectedObjects();
+      TestCase.assertEquals(1, selectedObjects.length);
+      TestCase.assertTrue(selectedObjects[0] instanceof TaskTreeNode);
+      Proof proof = ((TaskTreeNode)selectedObjects[0]).proof();
+      TestCase.assertEquals(expectedProofName, proof.name().toString());
+   }
+
+   /**
+    * Makes sure that the correct proofs are available.
+    * @param tree The tree.
+    * @param expectedProofNames The name of the expected proofs.
+    */
+   public static void keyCheckAvailableProofs(SwingBotJTree tree,
+                                              String... expectedProofNames) {
+      TreeModel model = tree.getModel();
+      TestCase.assertEquals(expectedProofNames.length, model.getChildCount(model.getRoot()));
+      for (int i = 0; i < expectedProofNames.length; i++) {
+          Object child = model.getChild(model.getRoot(), i);
+          TestCase.assertTrue(child instanceof TaskTreeNode);
+          Proof proof = ((TaskTreeNode)child).proof();
+          TestCase.assertEquals(expectedProofNames[i], proof.name().toString());
+      }
    }
 }

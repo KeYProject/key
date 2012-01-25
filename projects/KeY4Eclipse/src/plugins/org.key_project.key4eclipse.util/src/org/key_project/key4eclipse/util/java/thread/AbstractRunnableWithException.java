@@ -13,24 +13,34 @@ package org.key_project.key4eclipse.util.java.thread;
 
 /**
  * <p>
- * A {@link Runnable} that has a result that is accessible via {@link #getResult()}.
+ * Provides a basic implementation of {@link IRunnableWithException}.
  * </p>
  * <p>
- * Concrete implementations should be subclasses of {@link AbstractRunnableWithResult}.
+ * The concrete implementations have to set the exception 
+ * via {@link #setException(Exception)} in {@link #run()}.
  * </p>
  * @author Martin Hentschel
- * @see AbstractRunnableWithResult
+ * @see IRunnableWithResult
  */
-public interface IRunnableWithResult<T> extends IRunnableWithException {
+public abstract class AbstractRunnableWithException implements IRunnableWithException {
    /**
-    * Returns the result.
-    * @return The result.
+    * An occurred exception.
     */
-   public T getResult();
+   private Exception exception;
    
    /**
-    * Returns an occurred exception.
-    * @return An occurred exception.
+    * {@inheritDoc}
     */
-   public Exception getException();
+   @Override   
+   public Exception getException() {
+      return exception;
+   }
+
+   /**
+    * Sets the occurred exception.
+    * @param exception The occurred exception.
+    */
+   protected void setException(Exception exception) {
+      this.exception = exception;
+   }
 }

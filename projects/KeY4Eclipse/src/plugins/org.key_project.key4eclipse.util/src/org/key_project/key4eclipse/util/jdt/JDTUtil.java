@@ -30,6 +30,7 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.key_project.key4eclipse.util.eclipse.ResourceUtil;
+import org.key_project.key4eclipse.util.java.ArrayUtil;
 
 /**
  * Provides static methods to work with JDT.
@@ -40,6 +41,20 @@ public class JDTUtil {
     * Forbid instances by this private constructor.
     */
    private JDTUtil() {
+   }
+   
+   /**
+    * Adds the given {@link IClasspathEntry} to the {@link IJavaProject}.
+    * @param javaProject The {@link IJavaProject} to add to.
+    * @param entryToAdd The {@link IClasspathEntry} to add.
+    * @throws JavaModelException Occurred Exception.
+    */
+   public static void addClasspathEntry(IJavaProject javaProject,
+                                        IClasspathEntry entryToAdd) throws JavaModelException {
+       if (javaProject != null && entryToAdd != null) {
+           IClasspathEntry[] newEntries = ArrayUtil.add(javaProject.getRawClasspath(), entryToAdd);
+           javaProject.setRawClasspath(newEntries, null);
+       }
    }
    
    /**

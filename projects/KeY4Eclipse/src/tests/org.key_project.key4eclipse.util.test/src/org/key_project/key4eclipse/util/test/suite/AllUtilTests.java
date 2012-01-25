@@ -30,16 +30,17 @@ import org.key_project.key4eclipse.util.test.testcase.StringUtilTest;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-   AbstractRunnableWithResultTest.class,
-   ArrayUtilTest.class,
-   BundleUtilTest.class,
-   CollectionUtilTest.class,
-   IOUtilTest.class,
-   JDTUtilTest.class,
-   LoggerTest.class,
-   ObjectUtilTest.class,
-   ResourceUtilTest.class,
-   StringUtilTest.class
+    AbstractRunnableWithResultTest.class,
+    AbstractRunnableWithResultTest.class,
+    ArrayUtilTest.class,
+    BundleUtilTest.class,
+    CollectionUtilTest.class,
+    IOUtilTest.class,
+    JDTUtilTest.class,
+    LoggerTest.class,
+    ObjectUtilTest.class,
+    ResourceUtilTest.class,
+    StringUtilTest.class
 })
 public class AllUtilTests {
 }

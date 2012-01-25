@@ -31,7 +31,6 @@ import org.eclipse.jdt.core.JavaCore;
 import org.junit.Test;
 import org.key_project.key4eclipse.util.eclipse.BundleUtil;
 import org.key_project.key4eclipse.util.eclipse.ResourceUtil;
-import org.key_project.key4eclipse.util.java.ArrayUtil;
 import org.key_project.key4eclipse.util.jdt.JDTUtil;
 import org.key_project.key4eclipse.util.test.Activator;
 import org.key_project.key4eclipse.util.test.util.TestUtilsUtil;
@@ -42,8 +41,39 @@ import org.key_project.key4eclipse.util.test.util.TestUtilsUtil;
  */
 public class JDTUtilTest extends TestCase {
     /**
+     * Tests {@link JDTUtil#addClasspathEntry(IJavaProject, org.eclipse.jdt.core.IClasspathEntry)}
+     */
+    @Test
+    public void testAddClasspathEntry() throws CoreException, InterruptedException {
+        // Create initial java project
+        IJavaProject javaProject = TestUtilsUtil.createJavaProject("JDTUtilTest_testAddClasspathEntry");
+        IFolder src = javaProject.getProject().getFolder("src");
+        IClasspathEntry[] entries = javaProject.getRawClasspath();
+        assertEquals(1, entries.length);
+        assertEquals(src.getFullPath(), entries[0].getPath());
+        // Test null execution which should do nothing
+        IFolder secondSrc = javaProject.getProject().getFolder("secondSrc");
+        if (!secondSrc.exists()) {
+            secondSrc.create(true, true, null);
+        }
+        JDTUtil.addClasspathEntry(null, null);
+        JDTUtil.addClasspathEntry(null, JavaCore.newSourceEntry(secondSrc.getFullPath()));
+        JDTUtil.addClasspathEntry(javaProject, null);
+        entries = javaProject.getRawClasspath();
+        assertEquals(1, entries.length);
+        assertEquals(src.getFullPath(), entries[0].getPath());
+        // Add path entry
+        JDTUtil.addClasspathEntry(javaProject, JavaCore.newSourceEntry(secondSrc.getFullPath()));
+        entries = javaProject.getRawClasspath();
+        assertEquals(2, entries.length);
+        assertEquals(src.getFullPath(), entries[0].getPath());
+        assertEquals(secondSrc.getFullPath(), entries[1].getPath());
+    }
+    
+    /**
      * Tests {@link JDTUtil#getSourceLocations(IProject)}
      */
+    @Test
     public void testGetSourceLocations() throws CoreException, InterruptedException {
         // Test null
         List<File> locations = JDTUtil.getSourceLocations(null);
@@ -69,8 +99,7 @@ public class JDTUtilTest extends TestCase {
         if (!secondSrc.exists()) {
             secondSrc.create(true, true, null);
         }
-        IClasspathEntry[] newEntries = ArrayUtil.add(javaProject.getRawClasspath(), JavaCore.newSourceEntry(secondSrc.getFullPath()));
-        javaProject.setRawClasspath(newEntries, null);
+        JDTUtil.addClasspathEntry(javaProject, JavaCore.newSourceEntry(secondSrc.getFullPath()));
         // Test Java project with two source location in project
         locations = JDTUtil.getSourceLocations(project);
         assertNotNull(locations);
@@ -83,8 +112,7 @@ public class JDTUtilTest extends TestCase {
         IFolder refSrc = refProject.getFolder("src");
         assertNotNull(refSrc);
         assertTrue(refSrc.exists());
-        newEntries = ArrayUtil.add(javaProject.getRawClasspath(), JavaCore.newSourceEntry(refJavaProject.getPath()));
-        javaProject.setRawClasspath(newEntries, null);
+        JDTUtil.addClasspathEntry(javaProject, JavaCore.newSourceEntry(refJavaProject.getPath()));
         // Test Java project with two source location in project and project reference
         locations = JDTUtil.getSourceLocations(project);
         assertNotNull(locations);
@@ -97,8 +125,7 @@ public class JDTUtilTest extends TestCase {
         assertEquals(1, locations.size());
         assertEquals(ResourceUtil.getLocation(refSrc), locations.get(0));
         // Create cycle by also referencing javaProject in refJavaProject
-        newEntries = ArrayUtil.add(refJavaProject.getRawClasspath(), JavaCore.newSourceEntry(javaProject.getPath()));
-        refJavaProject.setRawClasspath(newEntries, null);
+        JDTUtil.addClasspathEntry(refJavaProject, JavaCore.newSourceEntry(javaProject.getPath()));
         // Test Java project with two source location in project and cyclic project reference
         locations = JDTUtil.getSourceLocations(project);
         assertNotNull(locations);

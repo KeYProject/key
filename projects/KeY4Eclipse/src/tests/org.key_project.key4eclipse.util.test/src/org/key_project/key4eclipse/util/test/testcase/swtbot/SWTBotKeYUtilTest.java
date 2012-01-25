@@ -1,32 +1,37 @@
 package org.key_project.key4eclipse.util.test.testcase.swtbot;
 
+import java.lang.reflect.InvocationTargetException;
+
+import javax.swing.SwingUtilities;
+
 import junit.framework.TestCase;
 
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.JavaCore;
 import org.junit.Test;
 import org.key_project.key4eclipse.util.eclipse.BundleUtil;
+import org.key_project.key4eclipse.util.java.thread.AbstractRunnableWithException;
+import org.key_project.key4eclipse.util.java.thread.IRunnableWithException;
+import org.key_project.key4eclipse.util.jdt.JDTUtil;
 import org.key_project.key4eclipse.util.key.KeYUtil;
 import org.key_project.key4eclipse.util.test.Activator;
 import org.key_project.key4eclipse.util.test.util.TestUtilsUtil;
-import org.key_project.swtbot.swing.bot.SwingBot;
-import org.key_project.swtbot.swing.bot.SwingBotJButton;
-import org.key_project.swtbot.swing.bot.SwingBotJDialog;
-import org.key_project.swtbot.swing.bot.SwingBotJFrame;
-
-import de.uka.ilkd.key.util.KeYResourceManager;
 
 /**
  * SWT Bot tests for {@link KeYUtil}.
  * @author Martin Hentschel
  */
 public class SWTBotKeYUtilTest extends TestCase {
+    // TODO: Implement tests for the missing methods of class KeYUtil
+    
     /**
      * Tests {@link KeYUtil#load(org.eclipse.core.resources.IResource)}.
      */
     @Test
-    public void testLoad() throws CoreException, InterruptedException {
+    public void testLoad() throws Exception {
         // Try to load general project in KeY.
         IProject project = TestUtilsUtil.createProject("SWTBotKeYUtilTest_testLoad_general");
         try {
@@ -36,35 +41,63 @@ public class SWTBotKeYUtilTest extends TestCase {
         catch (Exception e) {
             assertTrue(e.getMessage(), e.getMessage().contains("The project \"" + project + "\" is no Java project."));
         }
-        // Load java project with one source directory
-        IJavaProject javaProject = TestUtilsUtil.createJavaProject("SWTBotKeYUtilTest_testLoad_Java");
+        // Load java project with multiple source directories
+        final IJavaProject javaProject = TestUtilsUtil.createJavaProject("SWTBotKeYUtilTest_testLoad_Java");
         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/banking", javaProject.getProject().getFolder("src"));
+        IFolder secondSrc = javaProject.getProject().getFolder("secondSrc");
+        if (!secondSrc.exists()) {
+            secondSrc.create(true, true, null);
+        }
+        IClasspathEntry[] oldEntries = javaProject.getRawClasspath();
+        JDTUtil.addClasspathEntry(null, JavaCore.newSourceEntry(secondSrc.getFullPath()));
+        try {
+            KeYUtil.load(project);
+            fail("Multiple source paths are not supported.");
+        }
+        catch (Exception e) {
+            assertTrue(e.getMessage(), e.getMessage().contains("The project \"" + project + "\" is no Java project."));
+        }
+        javaProject.setRawClasspath(oldEntries, null);
+        // Load java project with one source directory
         KeYUtil.load(javaProject.getProject());
-        SwingBot bot = new SwingBot();
-        SwingBotJFrame frame = bot.jFrame("KeY " + KeYResourceManager.getManager().getVersion());
-        assertTrue(frame.isOpen());
-        SwingBotJDialog dialog = frame.bot().jDialog("Proof Management");
-        assertTrue(dialog.isOpen());
-        SwingBotJButton startButton = dialog.bot().jButton("Start Proof");
-        startButton.clickAndWait();
-        assertFalse(dialog.isOpen());
-        
-//        frame.close();
-//        assertFalse(frame.isOpen());
+        TestUtilsUtil.keyStartSelectedProofInProofManagementDiaolog();
+        TestUtilsUtil.keyCheckProofs("JML operation contract [id: 0 / banking.LoggingPayCard::charge]", "JML operation contract [id: 0 / banking.LoggingPayCard::charge]");
+        // Load second java project
+        IJavaProject secondProject = TestUtilsUtil.createJavaProject("SWTBotKeYUtilTest_testLoad_Java2");
+        BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/MCDemo", secondProject.getProject().getFolder("src"));
+        KeYUtil.load(secondProject.getProject());
+        TestUtilsUtil.keyStartSelectedProofInProofManagementDiaolog();
+        TestUtilsUtil.keyCheckProofs("JML normal_behavior operation contract [id: 0 / MCDemo::inc]", "JML operation contract [id: 0 / banking.LoggingPayCard::charge]", "JML normal_behavior operation contract [id: 0 / MCDemo::inc]");
+        // Open first project again to make sure that only the proof is selected again and no second proof environment is created
+        IRunnableWithException run = new AbstractRunnableWithException() {
+            @Override
+            public void run() {
+                try {
+                    KeYUtil.load(javaProject.getProject());
+                }
+                catch (Exception e) {
+                    setException(e);
+                }
+            }
+        };
+        SwingUtilities.invokeLater(run);
+        if (run.getException() != null) {
+            throw run.getException();
+        }
+        TestUtilsUtil.keyGoToSelectedProofInProofManagementDiaolog();
+        TestUtilsUtil.keyCheckProofs("JML operation contract [id: 0 / banking.LoggingPayCard::charge]", "JML operation contract [id: 0 / banking.LoggingPayCard::charge]", "JML normal_behavior operation contract [id: 0 / MCDemo::inc]");
+        // Close main window
+        TestUtilsUtil.keyCloseMainWindow();
     }
     
     /**
      * Tests {@link KeYUtil#openMainWindow()}.
      */
     @Test
-    public void testOpenMainWindow() {
+    public void testOpenMainWindow() throws InterruptedException, InvocationTargetException {
         // Open main window
         KeYUtil.openMainWindow();
         // Close main window
-        SwingBot bot = new SwingBot();
-        SwingBotJFrame frame = bot.jFrame("KeY " + KeYResourceManager.getManager().getVersion());
-        assertTrue(frame.isOpen());
-        frame.close();
-        assertFalse(frame.isOpen());
+        TestUtilsUtil.keyCloseMainWindow();
     }
 }

@@ -7,14 +7,15 @@ every workspace:
 - Download KeY externals and extract them into any directory.
   (e.g. from http://www.key-project.org/download/releases/KeYExtLib-1.6.zip)
 - Configure development IDE
-  1. Open the properties of plug-in project "org.key_project.sed.external.key"
+  1. Open the properties of plug-in project "org.key_project.key4eclipse"
   2. Select properties page "Resource, Linked Resources"
   3. Set path in variable "KEY_REPOSITORY" to the directory that contains the 
      KeY repository (e.g. it contains the directory "system")
   4. Set path in variable "KEY_EXTERNALS" to the directory that contains the
      KeY externals (antlr.jar, javacc.jar, junit.jar, objenesis.jar and 
      recoderKey.jar)
-  5. Execute "system/build.xml" as "Ant Build...".
+  5. Refresh the project "org.key_project.key4eclipse".
+  6. Execute "system/build.xml" as "Ant Build...".
      a) Switch to tab HRE
      b) Add the following VM arguments: -Xms512m -Xmx512m
      c) Switch to tab "Environment"

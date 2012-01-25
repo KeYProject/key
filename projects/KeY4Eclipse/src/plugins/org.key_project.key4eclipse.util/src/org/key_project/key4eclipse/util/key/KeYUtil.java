@@ -1,7 +1,7 @@
 package org.key_project.key4eclipse.util.key;
 
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import org.eclipse.core.resources.IResource;
@@ -10,6 +10,9 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
+import org.key_project.key4eclipse.util.java.SwingUtil;
+import org.key_project.key4eclipse.util.java.thread.AbstractRunnableWithException;
+import org.key_project.key4eclipse.util.java.thread.IRunnableWithException;
 import org.key_project.key4eclipse.util.jdt.JDTUtil;
 
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -55,17 +58,26 @@ public final class KeYUtil {
     
     /**
      * Opens the KeY main window via {@link Main#main(String[])}.
+     * @throws InvocationTargetException Occurred Exception.
+     * @throws InterruptedException Occurred Exception.
      */
-    public static void openMainWindow() {
-        Main.main(new String[] {});
+    public static void openMainWindow() throws InterruptedException, InvocationTargetException {
+        SwingUtil.invokeAndWait(new Runnable() {
+            @Override
+            public void run() {
+                Main.main(new String[] {});
+            }
+        });
     }
  
     /**
      * Opens the KeY main window and loads the given location.
+     * If the location is already loaded the {@link ProofManagementDialog}
+     * is shown again for this location.
      * @param locationToLoad The location to load.
-     * @throws JavaModelException Occurred Exception.
+     * @throws Exception Occurred Exception.
      */
-    public static void load(IResource locationToLoad) throws JavaModelException {
+    public static void load(IResource locationToLoad) throws Exception {
         if (locationToLoad != null) {
             // Make sure that the location is contained in a Java project
             Assert.isTrue(JDTUtil.isJavaProject(locationToLoad.getProject()), "The project \"" + locationToLoad.getProject() + "\" is no Java project.");
@@ -73,21 +85,35 @@ public final class KeYUtil {
             List<File> sourcePaths = JDTUtil.getSourceLocations(locationToLoad.getProject());
             Assert.isTrue(1 == sourcePaths.size(), "Multiple source paths are not supported.");
             // Get local file for the eclipse resource
-            File location = sourcePaths.get(0);
+            final File location = sourcePaths.get(0);
             Assert.isNotNull(location, "The resource \"" + locationToLoad + "\" is not local.");
-            // Open main window
-            openMainWindow();
-            // Make sure that main window is available.
-            Assert.isTrue(MainWindow.hasInstance(), "KeY main window is not available.");
-            // Check if environment is already loaded
-            InitConfig alreadyLoadedConfig = getInitConfig(location); 
-            if (alreadyLoadedConfig != null) {
-                // Open proof management dialog
-                ProofManagementDialog.showInstance(alreadyLoadedConfig);
-            }
-            else {
-                // Load local file
-                MainWindow.getInstance().loadProblem(location);
+            IRunnableWithException run = new AbstractRunnableWithException() {
+                @Override
+                public void run() {
+                    try {
+                        // Open main window
+                        openMainWindow();
+                        // Make sure that main window is available.
+                        Assert.isTrue(MainWindow.hasInstance(), "KeY main window is not available.");
+                        // Check if environment is already loaded
+                        InitConfig alreadyLoadedConfig = getInitConfig(location); 
+                        if (alreadyLoadedConfig != null) {
+                            // Open proof management dialog
+                            ProofManagementDialog.showInstance(alreadyLoadedConfig);
+                        }
+                        else {
+                            // Load local file
+                            MainWindow.getInstance().loadProblem(location);
+                        }
+                    }
+                    catch (Exception e) {
+                        setException(e);
+                    }
+                }
+            };
+            SwingUtil.invokeAndWait(run);
+            if (run.getException() != null) {
+                throw run.getException();
             }
         }
     }
@@ -123,10 +149,9 @@ public final class KeYUtil {
     /**
      * Starts a proof for the given {@link IMethod}.
      * @param method The {@link IMethod} to start proof for.
-     * @throws FileNotFoundException Occurred Exception.
-     * @throws ProofInputException Occurred Exception.
+     * @throws Exception Occurred Exception.
      */
-    public static void startProof(IMethod method) throws FileNotFoundException, ProofInputException, JavaModelException {
+    public static void startProof(final IMethod method) throws Exception {
         if (method != null) {
             // make sure that the method has a resource
             Assert.isNotNull(method.getResource(), "Method \"" + method + "\" is not part of a workspace resource.");
@@ -136,28 +161,42 @@ public final class KeYUtil {
             List<File> sourcePaths = JDTUtil.getSourceLocations(method.getResource().getProject());
             Assert.isTrue(1 == sourcePaths.size(), "Multiple source paths are not supported.");
             // Get local file for the eclipse resource
-            File location = sourcePaths.get(0);
+            final File location = sourcePaths.get(0);
             Assert.isNotNull(location, "The resource \"" + method.getResource() + "\" is not local.");
-            // Open main window
-            openMainWindow();
-            // Make sure that main window is available.
-            Assert.isTrue(MainWindow.hasInstance(), "KeY main window is not available.");
-            // Check if location is already loaded
-            InitConfig initConfig = getInitConfig(location);
-            if (initConfig == null) {
-                // Load local file
-                MainWindow main = MainWindow.getInstance();
-                ProblemLoader loader = new ProblemLoader(location, main);
-                main.getRecentFiles().addRecentFile(location.getAbsolutePath());
-                EnvInput envInput = loader.createEnvInput(location);
-                ProblemInitializer init = main.createProblemInitializer();
-                initConfig = init.prepare(envInput);
+            IRunnableWithException run = new AbstractRunnableWithException() {
+                @Override
+                public void run() {
+                    try {
+                        // Open main window
+                        openMainWindow();
+                        // Make sure that main window is available.
+                        Assert.isTrue(MainWindow.hasInstance(), "KeY main window is not available.");
+                        // Check if location is already loaded
+                        InitConfig initConfig = getInitConfig(location);
+                        if (initConfig == null) {
+                            // Load local file
+                            MainWindow main = MainWindow.getInstance();
+                            ProblemLoader loader = new ProblemLoader(location, main);
+                            main.getRecentFiles().addRecentFile(location.getAbsolutePath());
+                            EnvInput envInput = loader.createEnvInput(location);
+                            ProblemInitializer init = main.createProblemInitializer();
+                            initConfig = init.prepare(envInput);
+                        }
+                        // Get method to proof in KeY
+                        ProgramMethod pm = getProgramMethod(method, initConfig.getServices().getJavaInfo());
+                        Assert.isNotNull(pm, "Can't find method \"" + method + "\" in KeY.");
+                        // Start proof by showing the proof management dialog
+                        ProofManagementDialog.showInstance(initConfig, pm.getContainerType(), pm);
+                    }
+                    catch (Exception e) {
+                        setException(e);
+                    }
+                }
+            };
+            SwingUtil.invokeAndWait(run);
+            if (run.getException() != null) {
+                throw run.getException();
             }
-            // Get method to proof in KeY
-            ProgramMethod pm = getProgramMethod(method, initConfig.getServices().getJavaInfo());
-            Assert.isNotNull(pm, "Can't find method \"" + method + "\" in KeY.");
-            // Start proof by showing the proof management dialog
-            ProofManagementDialog.showInstance(initConfig, pm.getContainerType(), pm);
         }
     }
     

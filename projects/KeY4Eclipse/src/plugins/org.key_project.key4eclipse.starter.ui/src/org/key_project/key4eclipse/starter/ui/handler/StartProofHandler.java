@@ -1,11 +1,8 @@
 package org.key_project.key4eclipse.starter.ui.handler;
 
-import java.io.FileNotFoundException;
-
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.ui.actions.SelectionConverter;
 import org.eclipse.jdt.internal.ui.javaeditor.JavaEditor;
 import org.eclipse.jface.text.ITextSelection;
@@ -14,8 +11,6 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.key_project.key4eclipse.util.key.KeYUtil;
-
-import de.uka.ilkd.key.proof.init.ProofInputException;
 
 /**
  * Handler that starts the KeY UI via {@link KeYUtil#openMainWindow()}.
@@ -26,7 +21,7 @@ public class StartProofHandler extends AbstractSaveExecutionHandler {
      * {@inheritDoc}
      */
     @Override
-    protected Object doExecute(ExecutionEvent event) throws FileNotFoundException, JavaModelException, ProofInputException {
+    protected Object doExecute(ExecutionEvent event) throws Exception {
         ISelection selection = HandlerUtil.getCurrentSelection(event);
         if (selection instanceof IStructuredSelection) {
             Object[] elements = ((IStructuredSelection)selection).toArray();

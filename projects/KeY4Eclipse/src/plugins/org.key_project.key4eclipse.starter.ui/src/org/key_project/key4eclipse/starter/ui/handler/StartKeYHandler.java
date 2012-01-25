@@ -11,7 +11,7 @@ public class StartKeYHandler extends AbstractSaveExecutionHandler {
      * {@inheritDoc}
      */
     @Override
-    protected Object doExecute(ExecutionEvent event) {
+    protected Object doExecute(ExecutionEvent event) throws Exception {
         KeYUtil.openMainWindow();
         return null;
     }

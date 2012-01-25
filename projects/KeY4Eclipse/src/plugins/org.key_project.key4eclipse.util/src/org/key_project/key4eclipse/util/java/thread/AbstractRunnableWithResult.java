@@ -22,17 +22,12 @@ package org.key_project.key4eclipse.util.java.thread;
  * @author Martin Hentschel
  * @see IRunnableWithResult
  */
-public abstract class AbstractRunnableWithResult<T> implements IRunnableWithResult<T> {
+public abstract class AbstractRunnableWithResult<T> extends AbstractRunnableWithException implements IRunnableWithResult<T> {
    /**
     * The result.
     */
    private T result;
    
-   /**
-    * An occurred exception.
-    */
-   private Exception exception;
-
    /**
     * {@inheritDoc}
     */
@@ -47,21 +42,5 @@ public abstract class AbstractRunnableWithResult<T> implements IRunnableWithResu
     */
    protected void setResult(T result) {
       this.result = result;
-   }
-   
-   /**
-    * {@inheritDoc}
-    */
-   @Override   
-   public Exception getException() {
-      return exception;
-   }
-
-   /**
-    * Sets the occurred exception.
-    * @param exception The occurred exception.
-    */
-   protected void setException(Exception exception) {
-      this.exception = exception;
    }
 }
