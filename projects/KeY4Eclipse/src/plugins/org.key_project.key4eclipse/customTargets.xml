@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- see: http://help.eclipse.org/indigo/topic/org.eclipse.pde.doc.user/reference/pde_feature_generating_build.htm -->
+<!-- see: http://help.eclipse.org/indigo/topic/org.eclipse.pde.doc.user/tasks/pde_custom_callbacks.htm -->
+<project name="org.key_project.sed.external.key" basedir=".">
+	<!-- 
+	   The path to the KeY checkout that contains the directory "system".
+	   IT IS REQUIRED TO CUSTOMIZE THIS PATH ON EVERY PC!!! 
+	-->
+        <property name="keyRepository" value="D:\Forschung\GIT\KeY"/>
+	
+        <!-- 
+           The path to the directory that contains the externa libraries of KeY.
+           IT IS REQUIRED TO CUSTOMIZE THIS PATH ON EVERY PC!!! 
+        -->
+        <property name="ext.dir" value="D:\Forschung\Tools\KeY-External Libs"/>
+	
+	<!-- Before PDE compilation -->
+	<target name="pre.@dot">
+                <!-- Do KeY specific compilation via its ant file -->
+                <ant antfile="build.xml" dir="${keyRepository}/system" target="compile" />
+                <!-- Create temporary directories required for compilation -->
+                <mkdir dir="${basedir}/lib"/>
+		<mkdir dir="${basedir}/system/binary"/>
+                <mkdir dir="${basedir}/system/genSrc"/>
+                <mkdir dir="${basedir}/system/src"/>
+                <mkdir dir="${basedir}/system/test"/>
+		<!-- Copy source code to temporary directory required for compilation of pluginSrc -->
+                <copy todir="${basedir}/system/genSrc" failonerror="true" overwrite="true">
+                        <fileset dir="${keyRepository}/system/genSrc">
+                                <include name="*"/>
+                        </fileset>
+                </copy>
+                <copy todir="${basedir}/system/src" failonerror="true" overwrite="true">
+                        <fileset dir="${keyRepository}/system/src">
+                                <include name="*/"/>
+                        </fileset>
+                </copy>
+                <!-- Copy external libraries into target directory -->
+                <copy todir="${basedir}/lib" failonerror="true" overwrite="true">
+                        <fileset dir="${ext.dir}">
+                                <include name="*"/>
+                        </fileset>
+                </copy>
+                <!-- Copy external libraries into target directory -->
+                <copy todir="${target.folder}" failonerror="true" overwrite="true">
+                        <fileset dir="${keyRepository}/system/binary">
+                                <include name="*/"/>
+                        </fileset>
+                </copy>
+	</target>
+
+	<!-- After PDE compilation -->
+        <target name="post.@dot">
+        	<!-- Delete temporary created directories -->
+                <delete includeemptydirs="true">
+                	<fileset dir="${basedir}/system"/>
+                </delete>
+                <delete includeemptydirs="true">
+                        <fileset dir="${basedir}/lib"/>
+                </delete>
+        </target>
+
+	<!-- Before compiles files are copied to target directory -->
+   	<target name="pre.gather.bin.parts">
+   	        <!-- Copy external libraries into target directory -->
+                <copy todir="${target.folder}/lib" failonerror="true" overwrite="true">
+                        <fileset dir="${ext.dir}">
+                                <include name="*"/>
+                        </fileset>
+                </copy>
+                <!-- Copy all already complied resources into target directory -->
+                <copy todir="${target.folder}" failonerror="true" overwrite="true">
+                        <fileset dir="${keyRepository}/system/binary">
+                                <include name="de/"/>
+                                <include name="recoder/"/>
+                        </fileset>
+                </copy>
+                <!-- Copy resources into target directory -->
+                <copy todir="${target.folder}" failonerror="true" overwrite="true">
+                        <fileset dir="${keyRepository}/system/resources">
+                                <include name="de/"/>
+                                <include name="key.properties"/>
+                        </fileset>
+                </copy> 
+	</target>
+</project>

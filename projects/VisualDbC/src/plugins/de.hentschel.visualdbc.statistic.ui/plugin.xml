@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.core.runtime.adapters">
+      <factory
+            adaptableType="de.hentschel.visualdbc.dbcmodel.diagram.part.DbCDiagramEditor"
+            class="de.hentschel.visualdbc.statistic.ui.adapter.DbCDiagramEditorStatisticAdapterFactory">
+         <adapter
+               type="de.hentschel.visualdbc.statistic.ui.view.IStatisticViewPart">
+         </adapter>
+      </factory>
+      <factory
+            adaptableType="de.hentschel.visualdbc.dbcmodel.presentation.DbcmodelEditor"
+            class="de.hentschel.visualdbc.statistic.ui.adapter.DbcmodelEditorStatisticAdapterFactory">
+         <adapter
+               type="de.hentschel.visualdbc.statistic.ui.view.IStatisticViewPart">
+         </adapter>
+      </factory>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            id="de.hentschel.visualdbc.category"
+            name="Visual DbC">
+      </category>
+      <view
+            allowMultiple="true"
+            category="de.hentschel.visualdbc.category"
+            class="de.hentschel.visualdbc.statistic.ui.view.StatisticViewPart"
+            icon="icon/stastic.gif"
+            id="de.hentschel.visualdbc.statistic.ui.view.StatisticViewPart"
+            name="Statistic"
+            restorable="true">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.viewActions">
+      <viewContribution
+            id="de.hentschel.visualdbc.statistic.ui.view.StatisticViewPart.viewContribution"
+            targetID="de.hentschel.visualdbc.statistic.ui.view.StatisticViewPart">
+         <action
+               class="de.hentschel.visualdbc.statistic.ui.command.SelectProofObligationsViewActionDelegate"
+               icon="icon/obligationFilter.gif"
+               id="de.hentschel.visualdbc.statistic.ui.command.SelectProofObligationsViewActionDelegate"
+               label="Select Proof Obligations"
+               style="push"
+               toolbarPath="additions">
+         </action>
+      </viewContribution>
+   </extension>
+</plugin>

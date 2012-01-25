@@ -1,0 +1,20 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Visual DbC Execution of all Tests
+Bundle-SymbolicName: de.hentschel.visualdbc.all.test
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: de.hentschel.visualdbc.all.test.Activator
+Require-Bundle: org.eclipse.core.runtime,
+ org.junit4;bundle-version="4.8.1",
+ org.key_project.key4eclipse.util.test;bundle-version="1.0.0",
+ de.hentschel.visualdbc.dataSource.test;bundle-version="1.0.0",
+ de.hentschel.visualdbc.dataSource.ui.test;bundle-version="1.0.0",
+ de.hentschel.visualdbc.dataSource.key.test;bundle-version="1.0.0",
+ de.hentschel.visualdbc.generation.test;bundle-version="1.0.0",
+ de.hentschel.visualdbc.generation.ui.test;bundle-version="1.0.0",
+ de.hentschel.visualdbc.dbcmodel.diagram.custom.test;bundle-version="1.0.0",
+ de.hentschel.visualdbc.interactive.proving.ui.test;bundle-version="1.0.0",
+ de.hentschel.visualdbc.example.test;bundle-version="1.0.0"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-Vendor: Martin Hentschel

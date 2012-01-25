@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension-point id="de.hentschel.visualdbc.interactive.proving.ui.dsFinder" name="Visual DbC Data Source Finder" schema="schema/de.hentschel.visualdbc.interactive.proving.ui.dsFinder.exsd"/>
+   <extension-point id="de.hentschel.visualdbc.interactive.proving.ui.dbcFinder" name="Visual DbC DbC Finder" schema="schema/de.hentschel.visualdbc.interactive.proving.ui.dbcFinder.exsd"/>
+   <extension point="org.eclipse.ui.bindings">
+      <key
+            commandId="de.hentschel.visualdbc.dbcmodel.diagram.openProof"
+            contextId="de.hentschel.visualdbc.dbcmodel.diagram.ui.diagramContext"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+O"/>
+   </extension>
+   <extension point="org.eclipse.ui.commands">
+      <category name="Visual DbC" description="Commands related to Visual DbC." id="de.hentschel.visualdbc.category"/>
+      <command
+            categoryId="de.hentschel.visualdbc.category"
+            defaultHandler="de.hentschel.visualdbc.interactive.proving.ui.command.OpenProofCommand"
+            description="Open the data source user interface to finish the proof."
+            id="de.hentschel.visualdbc.dbcmodel.diagram.openProof"
+            name="Open Proof">
+      </command>
+   </extension>
+   <extension point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            adaptable="true"
+            id="de.hentschel.visualdbc.interactive.proving.objectContribution.DbcProofEditPartbcProofEditPart"
+            objectClass="de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcProofEditPart">
+         <action
+               class="de.hentschel.visualdbc.interactive.proving.ui.command.OpenProofCommand"
+               definitionId="de.hentschel.visualdbc.dbcmodel.diagram.openProof"
+               enablesFor="+"
+               icon="icons/OpenProof.gif"
+               id="de.hentschel.visualdbc.interactive.proving.command.OpenProofCommand"
+               label="&amp;Open Proof"
+               menubarPath="additions">
+         </action>
+      </objectContribution>
+      <objectContribution
+            adaptable="true"
+            id="de.hentschel.visualdbc.interactive.proving.objectContribution.DbcProof2EditPart"
+            objectClass="de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcProof2EditPart">
+         <action
+               class="de.hentschel.visualdbc.interactive.proving.ui.command.OpenProofCommand"
+               definitionId="de.hentschel.visualdbc.dbcmodel.diagram.openProof"
+               enablesFor="+"
+               icon="icons/OpenProof.gif"
+               id="de.hentschel.visualdbc.interactive.proving.command.OpenProofCommand"
+               label="&amp;Open Proof"
+               menubarPath="additions">
+         </action>
+      </objectContribution>
+      <objectContribution
+            adaptable="true"
+            id="de.hentschel.visualdbc.interactive.proving.objectContribution.DbcProof"
+            objectClass="de.hentschel.visualdbc.dbcmodel.DbcProof">
+         <action
+               class="de.hentschel.visualdbc.interactive.proving.ui.command.OpenProofCommand"
+               definitionId="de.hentschel.visualdbc.dbcmodel.diagram.openProof"
+               enablesFor="+"
+               icon="icons/OpenProof.gif"
+               id="de.hentschel.visualdbc.interactive.proving.command.OpenProofCommand"
+               label="&amp;Open Proof"
+               menubarPath="additions">
+         </action>
+      </objectContribution>                    
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="de.hentschel.visualdbc.dbcmodel.diagram.general"
+            class="de.hentschel.visualdbc.interactive.proving.ui.preference.InteractiveProofingPreferencePage"
+            id="de.hentschel.visualdbc.interactive.proving.preference.InteractiveProofingPreferencePage"
+            name="Interactive proofing">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="de.hentschel.visualdbc.interactive.proving.ui.util.InteractiveProvingPreferencesInitializer">
+      </initializer>
+   </extension>
+   <extension
+         point="de.hentschel.visualdbc.interactive.proving.ui.dbcFinder">
+      <finder
+            class="de.hentschel.visualdbc.interactive.proving.ui.finder.DefaultDbcFinderFactory">
+      </finder>
+   </extension>
+   <extension
+         point="de.hentschel.visualdbc.interactive.proving.ui.dsFinder">
+      <finder
+            class="de.hentschel.visualdbc.interactive.proving.ui.finder.DefaultDSFinderFactory">
+      </finder>
+   </extension>
+</plugin>

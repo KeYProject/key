@@ -1,0 +1,105 @@
+Dynamic Icons explained on class DbcMethod
+==========================================
+1. Open ItemProvider: DbcMethodItemProvider
+2. Modify method: getImage
+   /**
+    * This returns DbcMethod.gif.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated NOT
+    */
+   @Override
+   public Object getImage(Object object) {
+      // Begin Changes MHE
+      String imagePath = "full/obj16/DbcMethod";
+      if (object instanceof DbcMethod) {
+         DbcMethod method = (DbcMethod)object;
+         switch (method.getVisibility()) {
+            case PRIVATE : imagePath = "full/obj16/methpri_obj";
+                           break;
+            case PROTECTED : imagePath = "full/obj16/methpro_obj";
+                             break;
+            case PUBLIC : imagePath = "full/obj16/methpub_obj";
+                          break;
+            default : imagePath = "full/obj16/methdef_obj";
+                      break;
+         }
+      }
+      return overlayImage(object, getResourceLocator().getImage(imagePath));
+      // End Changes MHE
+   }
+   
+3. Open EditPart: DbcMethodNameEditPart
+4. Modify method: getLabelIcon
+   /**
+    * @generated NOT
+    */
+   protected Image getLabelIcon() {
+      EObject parserElement = getParserElement();
+      if (parserElement == null) {
+         return null;
+      }
+      // Begin Changes MHE
+      else {
+         // Copied code from DbcModelDiagramEditorPlugin#getItemImageDescriptor()
+         AdapterFactory adapterFactory = DbCDiagramEditorPlugin.getInstance().getItemProvidersAdapterFactory();
+         IItemLabelProvider labelProvider = (IItemLabelProvider)adapterFactory.adapt(parserElement, IItemLabelProvider.class);
+         if (labelProvider != null) {
+            return ExtendedImageRegistry.getInstance().getImage(labelProvider.getImage(parserElement));
+         }
+         else {
+            return DbCElementTypes.getImage(parserElement.eClass());
+         }
+      }
+      // End Changes MHE
+   }
+5. Modify method: handleNotificationEvent
+   /**
+    * @generated NOT
+    */
+   protected void handleNotificationEvent(Notification event) {
+      Object feature = event.getFeature();
+      if (NotationPackage.eINSTANCE.getFontStyle_FontColor().equals(feature)) {
+         Integer c = (Integer) event.getNewValue();
+         setFontColor(DiagramColorRegistry.getInstance().getColor(c));
+      }
+      else if (NotationPackage.eINSTANCE.getFontStyle_Underline().equals(
+            feature)) {
+         refreshUnderline();
+      }
+      else if (NotationPackage.eINSTANCE.getFontStyle_StrikeThrough().equals(
+            feature)) {
+         refreshStrikeThrough();
+      }
+      else if (NotationPackage.eINSTANCE.getFontStyle_FontHeight().equals(
+            feature)
+            || NotationPackage.eINSTANCE.getFontStyle_FontName()
+                  .equals(feature)
+            || NotationPackage.eINSTANCE.getFontStyle_Bold().equals(feature)
+            || NotationPackage.eINSTANCE.getFontStyle_Italic().equals(feature)) {
+         refreshFont();
+      }
+      else {
+         if (getParser() != null
+               && getParser().isAffectingEvent(event,
+                     getParserOptions().intValue())) {
+            refreshLabel();
+         }
+         if (getParser() instanceof ISemanticParser) {
+            ISemanticParser modelParser = (ISemanticParser) getParser();
+            if (modelParser.areSemanticElementsAffected(null, event)) {
+               removeSemanticListeners();
+               if (resolveSemanticElement() != null) {
+                  addSemanticListeners();
+               }
+               refreshLabel();
+            }
+         }
+         // Begin Changes MHE
+         if (DbcmodelPackage.Literals.DBC_METHOD__VISIBILITY.equals(event.getFeature())) {
+            refreshLabel();
+         }
+         // End Changes MHE
+      }
+      super.handleNotificationEvent(event);
+   }

@@ -1,0 +1,75 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Martin Hentschel.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Martin Hentschel - initial API and implementation
+ *******************************************************************************/
+
+package org.key_project.key4eclipse.util.test.testcase;
+
+import java.io.File;
+
+import junit.framework.TestCase;
+
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
+import org.junit.Test;
+import org.key_project.key4eclipse.util.eclipse.ResourceUtil;
+import org.key_project.key4eclipse.util.java.ArrayUtil;
+import org.key_project.key4eclipse.util.test.util.TestUtilsUtil;
+
+/**
+ * Contains tests for {@link ResourceUtil}
+ * @author Martin Hentschel
+ */
+public class ResourceUtilTest extends TestCase {
+   /**
+    * Tests {@link ResourceUtil#getLocation(org.eclipse.core.resources.IResource)}
+    */
+   @Test
+   public void testGetLocation() {
+      // Create project
+      IProject project = TestUtilsUtil.createProject("ResourceUtilTest_testGetLocation");
+      IFolder folder = TestUtilsUtil.createFolder(project, "emptyFolder");
+      IFile file = TestUtilsUtil.createFile(project, "file.txt", "Hello World!");
+      IFolder subfolder = TestUtilsUtil.createFolder(project, "subFolder");
+      IFolder subFolderFolder = TestUtilsUtil.createFolder(subfolder, "emptyFolderInSubfolder");
+      IFile subFolderFile = TestUtilsUtil.createFile(subfolder, "fileInSubfolder.txt", "Hello World!");
+      // test null
+      assertNull(ResourceUtil.getLocation(null));
+      // test project
+      File projectLocation = ResourceUtil.getLocation(project);
+      assertNotNull(projectLocation);
+      assertTrue(projectLocation.exists() && projectLocation.isDirectory());
+      // test folder
+      File folderLocation = ResourceUtil.getLocation(folder);
+      assertNotNull(folderLocation);
+      assertTrue(folderLocation.exists() && folderLocation.isDirectory());
+      assertTrue(ArrayUtil.contains(projectLocation.listFiles(), folderLocation));
+      // test file
+      File fileLocation = ResourceUtil.getLocation(file);
+      assertNotNull(fileLocation);
+      assertTrue(fileLocation.exists() && fileLocation.isFile());
+      assertTrue(ArrayUtil.contains(projectLocation.listFiles(), fileLocation));
+      // test subfolder
+      File subfolderLocation = ResourceUtil.getLocation(subfolder);
+      assertNotNull(subfolderLocation);
+      assertTrue(subfolderLocation.exists() && subfolderLocation.isDirectory());
+      assertTrue(ArrayUtil.contains(projectLocation.listFiles(), subfolderLocation));
+      // test subFolderFolder
+      File subFolderFolderLocation = ResourceUtil.getLocation(subFolderFolder);
+      assertNotNull(subFolderFolderLocation);
+      assertTrue(subFolderFolderLocation.exists() && subFolderFolderLocation.isDirectory());
+      assertTrue(ArrayUtil.contains(subfolderLocation.listFiles(), subFolderFolderLocation));
+      // test subFolderFile
+      File subFolderFileLocation = ResourceUtil.getLocation(subFolderFile);
+      assertNotNull(subFolderFileLocation);
+      assertTrue(subFolderFileLocation.exists() && subFolderFileLocation.isFile());
+      assertTrue(ArrayUtil.contains(subfolderLocation.listFiles(), subFolderFileLocation));
+   }
+}

@@ -1,0 +1,30 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Visual DbC Interactive Proving UI Test
+Bundle-SymbolicName: de.hentschel.visualdbc.interactive.proving.ui.test;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: de.hentschel.visualdbc.interactive.proving.ui.test.Activator
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.ui,
+ org.eclipse.core.resources;bundle-version="3.6.1",
+ org.junit4;bundle-version="4.8.1",
+ org.eclipse.swtbot.go;bundle-version="2.0.4",
+ org.eclipse.gef;bundle-version="3.6.2",
+ org.eclipse.swtbot.eclipse.gef.finder;bundle-version="2.0.4",
+ org.eclipse.gmf.runtime.diagram.ui.properties;bundle-version="1.4.2",
+ org.eclipse.gmf.runtime.diagram.ui.resources.editor.ide,
+ org.key_project.key4eclipse.util;bundle-version="1.0.0",
+ org.key_project.key4eclipse.util.test;bundle-version="1.0.0",
+ de.hentschel.visualdbc.dataSource;bundle-version="1.0.0",
+ de.hentschel.visualdbc.dataSource.test;bundle-version="1.0.0",
+ de.hentschel.visualdbc.generation;bundle-version="1.0.0",
+ de.hentschel.visualdbc.generation.test;bundle-version="1.0.0",
+ de.hentschel.visualdbc.dbcmodel.editor;bundle-version="1.0.0",
+ de.hentschel.visualdbc.dbcmodel.diagram;bundle-version="1.0.0",
+ de.hentschel.visualdbc.interactive.proving.ui;bundle-version="1.0.0"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-Vendor: Martin Hentschel
+Export-Package: de.hentschel.visualdbc.interactive.proving.ui.test.suite,
+ de.hentschel.visualdbc.interactive.proving.ui.test.suite.swtbot,
+ de.hentschel.visualdbc.interactive.proving.ui.test.util

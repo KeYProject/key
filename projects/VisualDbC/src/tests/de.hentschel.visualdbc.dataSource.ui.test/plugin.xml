@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="de.hentschel.visualdbc.dataSource.dataSources">
+      <dataSource
+            class="de.hentschel.visualdbc.datasource.ui.test.dataSource.UIDummyDriver1">
+      </dataSource>
+      <dataSource
+            class="de.hentschel.visualdbc.datasource.ui.test.dataSource.UIDummyDriverB">
+      </dataSource>
+      <dataSource
+            class="de.hentschel.visualdbc.datasource.ui.test.dataSource.UIDummyDriverA">
+      </dataSource>
+   </extension>
+
+</plugin>

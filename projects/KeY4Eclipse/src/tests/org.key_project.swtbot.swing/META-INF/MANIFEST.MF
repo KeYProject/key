@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Swing
+Bundle-SymbolicName: org.key_project.swtbot.swing
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.key_project.swtbot.swing.Activator
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.ui,
+ org.eclipse.swtbot.go;bundle-version="2.0.4"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: org.key_project.swtbot.swing.bot,
+ org.key_project.swtbot.swing.bot.finder.waits,
+ org.key_project.swtbot.swing.finder.matchers
