@@ -17,6 +17,8 @@ import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.Vector;
 
+import javax.swing.JOptionPane;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableMapEntry;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
@@ -31,6 +33,7 @@ import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ContractPO;
+import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.*;
@@ -257,14 +260,26 @@ public class ProofSaver {
 
         if (appliedRuleApp.rule() instanceof UseOperationContractRule 
             || appliedRuleApp.rule() instanceof UseDependencyContractRule) {
-            RuleJustificationBySpec ruleJusti = (RuleJustificationBySpec) 
+            RuleJustification ruleJusti = 
                             proof.env().getJustifInfo()
                                        .getJustification(appliedRuleApp, 
                                                          proof.getServices());
-
-            tree.append(" (contract \"");
-            tree.append(ruleJusti.getSpec().getName());
-            tree.append("\")");
+            
+            if(ruleJusti instanceof RuleJustificationBySpec) {
+                RuleJustificationBySpec ruleJustiBySpec = (RuleJustificationBySpec) ruleJusti;
+                tree.append(" (contract \"");
+                tree.append(ruleJustiBySpec.getSpec().getName());
+                tree.append("\")");
+            } else {
+                // FIXME This is debug code to identify new occurrences of bug #1111. (Remove if that is closed)
+                // In rare cases this branch is taken. We need to be able to
+                // identify them. 
+                tree.append(" (contract \"ERROR-please report to bug #1111; " + 
+                        appliedRuleApp.rule().getClass() + ";"+ ruleJusti +"\")");
+                JOptionPane.showMessageDialog(null, "A known unfixed internal error has occurred. " +
+                		"Your save file will be invalid! Please " +
+                		"submit your save file to bug #1111. Thanks!");
+            }
         }
 
         tree.append(")\n");
