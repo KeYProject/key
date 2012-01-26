@@ -20,6 +20,8 @@ import org.key_project.swtbot.swing.bot.SwingBot;
 import org.key_project.swtbot.swing.bot.SwingBotJDialog;
 import org.key_project.swtbot.swing.bot.SwingBotJLabel;
 
+import de.uka.ilkd.key.gui.MainWindow;
+
 /**
  * SWT Bot tests for {@link KeYUtil}.
  * @author Martin Hentschel
@@ -94,6 +96,9 @@ public class SWTBotKeYUtilTest extends TestCase {
         KeYUtil.loadAsync(javaProject.getProject());
         TestUtilsUtil.keyGoToSelectedProofInProofManagementDiaolog();
         TestUtilsUtil.keyCheckProofs("JML operation contract [id: 0 / banking.LoggingPayCard::charge]", "JML operation contract [id: 0 / banking.LoggingPayCard::charge]", "JML normal_behavior operation contract [id: 0 / MCDemo::inc]");
+        // Clear proof list
+        KeYUtil.clearProofList(MainWindow.getInstance());
+        TestCase.assertTrue(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
         // Close main window
         TestUtilsUtil.keyCloseMainWindow();
     }

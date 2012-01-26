@@ -32,12 +32,17 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.key_project.key4eclipse.util.eclipse.BundleUtil;
 import org.key_project.key4eclipse.util.eclipse.ResourceUtil;
+import org.key_project.key4eclipse.util.eclipse.job.AbstractKeYMainWindowJob;
 import org.key_project.key4eclipse.util.test.util.TestUtilsUtil;
 import org.key_project.swtbot.swing.bot.AbstractSwingBotComponent;
 import org.key_project.swtbot.swing.bot.SwingBot;
@@ -83,6 +88,7 @@ import de.hentschel.visualdbc.dbcmodel.DbcModel;
 import de.hentschel.visualdbc.generation.operation.CreateOperation;
 import de.hentschel.visualdbc.generation.test.util.TestGenerationUtil;
 import de.hentschel.visualdbc.interactive.proving.ui.test.util.TestInteractiveProvingUtil;
+import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.mgt.TaskTreeModel;
@@ -210,7 +216,12 @@ public final class TestKeyUtil {
          TestCase.assertEquals(1, connection.getConnectionListeners().length);
          TestDataSourceUtil.compareConnectionEvents(connection, logger, false, false, false);
       }
-      connection.connect(settings, interactive, new NullProgressMonitor());
+      KeYConnectJob job = new KeYConnectJob(interactive, settings, connection);
+      job.schedule();
+      TestUtilsUtil.waitForJob(job);
+      if (job.getException() != null) {
+         throw job.getException();
+      }
       TestCase.assertTrue(connection.isConnected());
       TestCase.assertEquals(interactive, connection.isInteractive());
       if (logger != null) {
@@ -232,6 +243,73 @@ public final class TestKeyUtil {
       TestCase.assertFalse(expectedIter.hasNext());
       TestCase.assertFalse(currentIter.hasNext());
       return connection;
+   }
+   
+   /**
+    * This {@link Job} is used to connect to a KeY data source. It is required
+    * because of the SWT and Swing integration which requires asynchronous
+    * calls between both UI threads. A required synchronous call is possible
+    * via a separate {@link Thread} which is provided by this {@link Job}.
+    * @author Martin Hentschel
+    */
+   private static class KeYConnectJob extends AbstractKeYMainWindowJob {
+      /**
+       * Use interactive mode?
+       */
+      private boolean interactive;
+      
+      /**
+       * The connection settings to use.
+       */
+      private Map<String, Object> settings;
+      
+      /**
+       * The {@link IDSConnection} to connect to.
+       */
+      private IDSConnection connection;
+      
+      /**
+       * Occurred Exception.
+       */
+      private DSException exception;
+      
+      /**
+       * Constructor.
+       * @param interactive  Use interactive mode?
+       * @param settings The connection settings to use.
+       * @param connection The {@link IDSConnection} to connect to.
+       */
+      public KeYConnectJob(boolean interactive,
+                           Map<String, Object> settings,
+                           IDSConnection connection) {
+         super("Connecting to KeY");
+         this.interactive = interactive;
+         this.settings = settings;
+         this.connection = connection;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      protected IStatus run(IProgressMonitor monitor) {
+         try {
+            connection.connect(settings, interactive, new NullProgressMonitor());
+            return Status.OK_STATUS;
+         }
+         catch (DSException e) {
+            this.exception = e;
+            return new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e);
+         }
+      }
+
+      /**
+       * Returns the occurred exception.
+       * @return The occurred exception or {@code null} if no one occurred.
+       */
+      public DSException getException() {
+         return exception;
+      }
    }
 
    /**
@@ -1278,7 +1356,7 @@ public final class TestKeyUtil {
     */
    public static SwingBotJFrame getInteractiveKeyMain(IResource resource) {
       SwingBot bot = new SwingBot();
-      SwingBotJFrame frame = bot.jFrame(KeyConnection.KEY_MAIN_WINDOW_TITLE);
+      SwingBotJFrame frame = bot.jFrame(Main.getMainWindowTitle());
       TestCase.assertTrue(frame.isOpen());
       return frame;
    }

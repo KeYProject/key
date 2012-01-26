@@ -27,6 +27,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
@@ -418,6 +419,32 @@ public class TestUtilsUtil {
           TestCase.assertTrue(child instanceof TaskTreeNode);
           Proof proof = ((TaskTreeNode)child).proof();
           TestCase.assertEquals(expectedProofNames[i], proof.name().toString());
+      }
+   }
+
+   /**
+    * Blocks the current {@link Thread} until the given {@link Job} has finished.
+    * @param job The {@link Job} to wait for.
+    */
+   public static void waitForJob(Job job) {
+      if (job != null) {
+         while (job.getState() != Job.NONE) {
+            sleep(100);
+         }
+         TestCase.assertEquals(Job.NONE, job.getState());
+      }
+   }
+   
+   /**
+    * Sleeps the current {@link Thread} for the given time.
+    * @param time The time to sleep.
+    */
+   public static void sleep(int time) {
+      try {
+         Thread.sleep(100);
+      }
+      catch (InterruptedException e) {
+         // Nothing to do.
       }
    }
 }

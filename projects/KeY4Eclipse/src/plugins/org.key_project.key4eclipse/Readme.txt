@@ -29,3 +29,11 @@ every workspace:
   3. Set value of property "ext.dir" to the directory that contains the
      KeY externals (antlr.jar, javacc.jar, junit.jar, objenesis.jar and 
      recoderKey.jar)
+
+Important notice:
+SWT and Swing runs both in his own UI thread. For synchronization it is
+required to use Display#syncExec(Runnable) and SwingUtil#invokeAndWait(Runnable)
+or Display#asyncExec(Runnable) and SwingUtil#invokeLater(Runnable). Keep
+always in mind that a synchronous call is not possible from SWT or Swing thread.
+In this case only an asynchronous method call is possible. If you don't
+respect this knowledge Mac OS will cause deadlocks!

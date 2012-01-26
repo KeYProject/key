@@ -28,6 +28,15 @@ public final class SwingUtil {
     }
 
     /**
+     * Checks if the currently active {@link Thread} is responsible
+     * for the Swing UI.
+     * @return {@code true} is Swing {@link Thread}, {@code false} is not Swing {@link Thread}.
+     */
+    public static boolean isSwingThread() {
+       return SwingUtilities.isEventDispatchThread();
+    }
+
+    /**
      * <p>
      * Executes the {@link Runnable} in the {@link Thread} of Swing synchronous.
      * </p>
@@ -49,7 +58,7 @@ public final class SwingUtil {
      */
     public static void invokeAndWait(Runnable run) throws InterruptedException, InvocationTargetException {
         if (run != null) {
-            if (SwingUtilities.isEventDispatchThread()) {
+            if (isSwingThread()) {
                 run.run();
             }
             else {
@@ -76,43 +85,43 @@ public final class SwingUtil {
         }
     }
     
-    /**
-     * Helper class that is used to determine when the wrapped
-     * {@link Runnable} is completely executed.
-     * @author Martin Hentschel
-     */
-    private static class RunnableLock implements Runnable {
-        /**
-         * The child {@link Runnable} to execute.
-         */
-        private Runnable run;
-        
-        /**
-         * Constructor.
-         * @param run The child {@link Runnable} to execute.
-         */
-        public RunnableLock(Runnable run) {
-            super();
-            this.run = run;
-        }
-
-        /**
-         * Checks if the execution is completed.
-         * @return {@code true} execution completed, {@code false} still in execution or execution was not started.
-         */
-        public boolean done() {
-            return run == null;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void run() {
-            if (run != null) {
-                run.run();
-            }
-            run = null;
-        }
-    }
+//    /**
+//     * Helper class that is used to determine when the wrapped
+//     * {@link Runnable} is completely executed.
+//     * @author Martin Hentschel
+//     */
+//    private static class RunnableLock implements Runnable {
+//        /**
+//         * The child {@link Runnable} to execute.
+//         */
+//        private Runnable run;
+//        
+//        /**
+//         * Constructor.
+//         * @param run The child {@link Runnable} to execute.
+//         */
+//        public RunnableLock(Runnable run) {
+//            super();
+//            this.run = run;
+//        }
+//
+//        /**
+//         * Checks if the execution is completed.
+//         * @return {@code true} execution completed, {@code false} still in execution or execution was not started.
+//         */
+//        public boolean done() {
+//            return run == null;
+//        }
+//
+//        /**
+//         * {@inheritDoc}
+//         */
+//        @Override
+//        public void run() {
+//            if (run != null) {
+//                run.run();
+//            }
+//            run = null;
+//        }
+//    }
 }

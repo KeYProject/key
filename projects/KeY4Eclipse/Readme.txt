@@ -76,14 +76,24 @@ To add the required Eclipse projects follow these steps:
    fix the compiler failures and to make that the product is deployable.
    
    
-(6) Start the product from development IDE
+(6) Important notice
+--------------------
+SWT and Swing runs both in his own UI thread. For synchronization it is
+required to use Display#syncExec(Runnable) and SwingUtil#invokeAndWait(Runnable)
+or Display#asyncExec(Runnable) and SwingUtil#invokeLater(Runnable). Keep
+always in mind that a synchronous call is not possible from SWT or Swing thread.
+In this case only an asynchronous method call is possible. If you don't
+respect this knowledge Mac OS will cause deadlocks!   
+   
+   
+(7) Start the product from development IDE
 ------------------------------------------
 1. Open file org.key_project.key4eclipse.starter.product.ui/KeY4Eclipse.product
 2. Click on "Launch an Eclipse application" in tab "Overview" of the
    opened "Product Configuration Editor"
 
 
-(7) Start automated tests
+(8) Start automated tests
 -------------------------
 - Start JUnit tests:
   Run class org.key_project.key4eclipse.all.test.suite.AllTests as 
@@ -95,7 +105,7 @@ To add the required Eclipse projects follow these steps:
   this class.
 
 
-(8) Deploy the product
+(9) Deploy the product
 ----------------------
 1. Open file org.key_project.key4eclipse.starter.product.ui/KeY4Eclipse.product
 2. Click on "Eclipse Product export wizard" in tab "Overview" of the

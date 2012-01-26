@@ -69,7 +69,7 @@ public class Main {
 
         GuiUtilities.invokeAndWait(new Runnable() {
             public void run() {
-                MainWindow.createInstance("KeY " + KeYResourceManager.getManager().getVersion());  
+                MainWindow.createInstance(getMainWindowTitle());  
                 MainWindow key = MainWindow.getInstance();
                 key.setVisible(true);
                 key.loadCommandLineFile();
@@ -79,6 +79,15 @@ public class Main {
 
         MainWindow key = MainWindow.getInstance();
         
+    }
+    
+    /**
+     * Returns the used title. This information is required in other
+     * projects which intantiates the {@link MainWindow} manually.
+     * @return The title of {@link MainWindow} to use.
+     */
+    public static String getMainWindowTitle() {
+       return "KeY " + KeYResourceManager.getManager().getVersion();
     }
 
     public static void evaluateOptions(String[] opt) {

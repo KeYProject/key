@@ -9,12 +9,16 @@ import javax.swing.JOptionPane;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.key_project.key4eclipse.util.Activator;
 import org.key_project.key4eclipse.util.eclipse.Logger;
+import org.key_project.key4eclipse.util.eclipse.job.AbstractKeYMainWindowJob;
 import org.key_project.key4eclipse.util.java.SwingUtil;
 import org.key_project.key4eclipse.util.java.thread.AbstractRunnableWithException;
 import org.key_project.key4eclipse.util.java.thread.IRunnableWithException;
@@ -34,7 +38,9 @@ import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.EnvInput;
 import de.uka.ilkd.key.proof.mgt.EnvNode;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.TaskTreeModel;
+import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
 
 /**
  * <p>
@@ -72,18 +78,18 @@ public final class KeYUtil {
      * @throws InterruptedException Occurred Exception. 
      */
     public static void openMainWindowAsync() throws InterruptedException, InvocationTargetException {
-        SwingUtil.invokeLater(new Runnable() {
+        new AbstractKeYMainWindowJob("Starting KeY") {
             @Override
-            public void run() {
+            protected IStatus run(IProgressMonitor monitor) {
                 try {
                     openMainWindow();
-                }
+                    return Status.OK_STATUS;
+                } 
                 catch (Exception e) {
-                    new Logger(Activator.getDefault(), Activator.PLUGIN_ID).logError(e);
-                    showErrorInKey(e);
+                    return new Logger(Activator.getDefault(), Activator.PLUGIN_ID).createErrorStatus(e);
                 }
             }
-        });
+        }.schedule();
     }
 
     /**
@@ -112,18 +118,18 @@ public final class KeYUtil {
      * @throws InterruptedException Occurred Exception.
      */
     public static void loadAsync(final IResource locationToLoad) throws InterruptedException, InvocationTargetException {
-        SwingUtil.invokeLater(new Runnable() {
+        new AbstractKeYMainWindowJob("Loading Project in KeY") {
             @Override
-            public void run() {
+            protected IStatus run(IProgressMonitor monitor) {
                 try {
                     load(locationToLoad);
-                }
+                    return Status.OK_STATUS;
+                } 
                 catch (Exception e) {
-                    new Logger(Activator.getDefault(), Activator.PLUGIN_ID).logError(e);
-                    showErrorInKey(e);
+                    return new Logger(Activator.getDefault(), Activator.PLUGIN_ID).createErrorStatus(e);
                 }
             }
-        });
+        }.schedule();
     }
  
     /**
@@ -213,18 +219,18 @@ public final class KeYUtil {
      * @throws Exception Occurred Exception.
      */
     public static void startProofAsync(final IMethod method) throws Exception {
-        SwingUtil.invokeLater(new Runnable() {
+        new AbstractKeYMainWindowJob("Starting Proof in KeY") {
             @Override
-            public void run() {
+            protected IStatus run(IProgressMonitor monitor) {
                 try {
                     startProof(method);
-                }
+                    return Status.OK_STATUS;
+                } 
                 catch (Exception e) {
-                    new Logger(Activator.getDefault(), Activator.PLUGIN_ID).logError(e);
-                    showErrorInKey(e);
+                    return new Logger(Activator.getDefault(), Activator.PLUGIN_ID).createErrorStatus(e);
                 }
             }
-        });
+        }.schedule();
     }
     
     /**
@@ -428,5 +434,63 @@ public final class KeYUtil {
                                           "Error", 
                                           JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    /**
+     * Removes all proofs from the proof list of the given {@link MainWindow}.
+     * @param main The {@link MainWindow} to remove all proofs from.
+     */
+    public static void clearProofList(MainWindow main) {
+       TaskTreeModel model = main.getProofList().getModel();
+       while (model.getChildCount(model.getRoot()) >= 1) {
+          Object child = model.getChild(model.getRoot(), 0);
+          if (child instanceof EnvNode) {
+             EnvNode envChild = (EnvNode)child;
+             for (int j = 0; j < envChild.getChildCount(); j++) {
+                Object envTaskChild = envChild.getChildAt(j);
+                if (envTaskChild instanceof TaskTreeNode) {
+                   main.getProofList().removeTaskWithoutInteraction((TaskTreeNode)envTaskChild);
+                }
+             }
+          }
+       }
+    }
+    
+    /**
+     * Removes the whole {@link ProofEnvironment} with all contained proofs
+     * from the proof list.
+     * @param main The {@link MainWindow} to handle.
+     * @param env The {@link ProofEnvironment} to remove.
+     */
+    public static void removeFromProofList(MainWindow main, ProofEnvironment env) {
+       TaskTreeModel model = main.getProofList().getModel();
+       EnvNode envNode = null;
+       for (int i = 0; i < model.getChildCount(model.getRoot()); i++) {
+          Object child = model.getChild(model.getRoot(), i);
+          if (child instanceof EnvNode) {
+             EnvNode envChild = (EnvNode)child;
+             if (env != null ? env.equals(envChild.getProofEnv()) : envChild.getProofEnv() == null) {
+                envNode = envChild;
+             }
+          }
+       }
+       if (envNode != null) {
+          for (int i = 0; i < envNode.getChildCount(); i++) {
+             Object child = envNode.getChildAt(i);
+             if (child instanceof TaskTreeNode) {
+                main.getProofList().removeTaskWithoutInteraction((TaskTreeNode)child);
+             }
+          }
+       }
+    }
+    
+    /**
+     * Checks if the proof list contains some entries.
+     * @param main The {@link MainWindow} to check.
+     * @return {@code true} proof list is empty, {@code false} proof list contains at least on entry.
+     */
+    public static boolean isProofListEmpty(MainWindow main) {
+       TaskTreeModel model = main.getProofList().getModel();
+       return model.getChildCount(model.getRoot()) == 0;
     }
 }

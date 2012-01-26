@@ -18,6 +18,8 @@ import javax.swing.JFrame;
 import junit.framework.TestCase;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.junit.Test;
 import org.key_project.key4eclipse.util.eclipse.BundleUtil;
 import org.key_project.key4eclipse.util.eclipse.ResourceUtil;
@@ -47,7 +49,7 @@ public class SWTBotKeyInteractiveMainTest extends TestCase {
     * disconnected.
     */
    @Test
-   public void testDisconnectingConnection() {
+   public void testDisconnectingConnection() throws CoreException, DSException {
       IDSConnection connection = null;
       ConnectionLogger logger = new ConnectionLogger();
       try {
@@ -73,10 +75,6 @@ public class SWTBotKeyInteractiveMainTest extends TestCase {
          frame.bot().waitUntil(Conditions.componentCloses(frame));
          assertFalse(frame.isOpen());
       }
-      catch (Exception e) {
-         e.printStackTrace();
-         TestCase.fail(e.getMessage());
-      }
       finally {
          try {
             if (connection != null && connection.isConnected()) {
@@ -98,7 +96,7 @@ public class SWTBotKeyInteractiveMainTest extends TestCase {
     * and throws the correct event when the {@link MainWindow} is closed.
     */
    @Test
-   public void testClosingFrameByUser() {
+   public void testClosingFrameByUser() throws CoreException, DSException {
       IDSConnection connection = null;
       ConnectionLogger logger = new ConnectionLogger();
       try {
@@ -120,10 +118,6 @@ public class SWTBotKeyInteractiveMainTest extends TestCase {
          connection.removeConnectionListener(logger);
          TestCase.assertEquals(0, connection.getConnectionListeners().length);
          connection = null;
-      }
-      catch (Exception e) {
-         e.printStackTrace();
-         TestCase.fail(e.getMessage());
       }
       finally {
          try {

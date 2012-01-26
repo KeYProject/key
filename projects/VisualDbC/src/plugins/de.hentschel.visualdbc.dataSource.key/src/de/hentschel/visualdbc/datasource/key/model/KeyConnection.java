@@ -35,6 +35,7 @@ import org.key_project.key4eclipse.util.java.ObjectUtil;
 import org.key_project.key4eclipse.util.java.SwingUtil;
 import org.key_project.key4eclipse.util.java.thread.AbstractRunnableWithException;
 import org.key_project.key4eclipse.util.java.thread.IRunnableWithException;
+import org.key_project.key4eclipse.util.key.KeYUtil;
 
 import de.hentschel.visualdbc.datasource.key.intern.helper.KeyHacks;
 import de.hentschel.visualdbc.datasource.key.intern.helper.OpenedProof;
@@ -74,7 +75,6 @@ import de.uka.ilkd.key.gui.GUIListener;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.actions.ExitMainAction;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.ClassType;
@@ -99,10 +99,6 @@ import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.EnvInput;
-import de.uka.ilkd.key.proof.mgt.EnvNode;
-import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.proof.mgt.TaskTreeModel;
-import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
@@ -157,11 +153,6 @@ public class KeyConnection extends MemoryConnection {
     * The name of the proof obligation used for operation contracts.
     */
    public static final String PROOF_OBLIGATION_OPERATION_CONTRACT = "ContractPO";
-
-   /**
-    * The title that is used in the {@link MainWindow}.
-    */
-   public static final String KEY_MAIN_WINDOW_TITLE = "KeY for Visual DbC";
    
    /**
     * The opened KeY model represented as {@link InitConfig}.
@@ -246,22 +237,27 @@ public class KeyConnection extends MemoryConnection {
          final boolean skipLibraryClasses = isSkipLibraryClasses(connectionSettings);
          final DSPackageManagement packageManagement = getPackageManagent(connectionSettings);
          // Instantiate KeY main window
+         SwingUtil.invokeAndWait(new Runnable() {
+            @Override
+            public void run() {
+               if (!MainWindow.hasInstance()) {
+                  MainWindow.createInstance(Main.getMainWindowTitle());
+               }
+               // Open connection in key
+               if (interactive) {
+                  main = MainWindow.getInstance();
+                  main.setVisible(true);
+               }
+               else {
+                  main = MainWindow.getInstance(false);
+               }
+            }
+         });
+         // Open environment and analyse types
          IRunnableWithException run = new AbstractRunnableWithException() {
             @Override
             public void run() {
                try {
-                  if (!MainWindow.hasInstance()) {
-                     ExitMainAction.exitSystem = false;
-                     MainWindow.createInstance(KEY_MAIN_WINDOW_TITLE);
-                  }
-                  // Open connection in key
-                  if (interactive) {
-                     main = MainWindow.getInstance();
-                     main.setVisible(true);
-                  }
-                  else {
-                     main = MainWindow.getInstance(false);
-                  }
                   KeYMediator mediator = main.getMediator();
                   mediator.addGUIListener(mainGuiListener);
                   ProblemLoader loader = new ProblemLoader(location, main);
@@ -296,7 +292,7 @@ public class KeyConnection extends MemoryConnection {
     */
    protected void handleMainClosed(GUIEvent e) {
       try {
-         disconnect();
+         disconnect(false);
       }
       catch (DSException exception) {
          LogUtil.getLogger().logError(exception);
@@ -1217,18 +1213,46 @@ public class KeyConnection extends MemoryConnection {
       return super.isConnected() && initConfig != null;
    }
 
+
    /**
     * {@inheritDoc}
     */
    @Override
    public void disconnect() throws DSException {
+      disconnect(true);
+   }
+   
+   /**
+    * 
+    * @param closeKeYMain
+    * @throws DSException
+    */
+   protected void disconnect(final boolean closeKeYMain) throws DSException {
       if (main != null) {
          main.getMediator().removeGUIListener(mainGuiListener);
-         if (initConfig != null) {
-            removeFromProofList(initConfig.getProofEnv());
+         try {
+            final MainWindow oldMain = main;
+            final InitConfig oldInitConfig = initConfig;
+            Runnable run = new Runnable() {
+               @Override
+               public void run() {
+                  if (oldInitConfig != null) {
+                     KeYUtil.removeFromProofList(oldMain, oldInitConfig.getProofEnv());
+                  }
+                  if (closeKeYMain && KeYUtil.isProofListEmpty(oldMain) && oldMain.getExitMainAction() != null) {
+                     oldMain.getExitMainAction().exitMainWithoutInteraction();
+                  }
+               }
+            };
+            if (SwingUtil.isSwingThread()) {
+               run.run();
+            }
+            else {
+               SwingUtil.invokeLater(run);
+            }
          }
-         if (isProofListEmpty() && main.getExitMainAction() != null) {
-            main.getExitMainAction().exitMainWithoutInteraction();
+         catch (Exception e) {
+            LogUtil.getLogger().logError(e);
          }
       }
       main = null;
@@ -1389,41 +1413,5 @@ public class KeyConnection extends MemoryConnection {
 
    public void closeTaskWithoutInteraction() {
       main.closeTaskWithoutInteraction();
-   }
-   
-   /**
-    * Removes the whole {@link ProofEnvironment} with all contained proofs
-    * from the proof list.
-    * @param env The {@link ProofEnvironment} to remove.
-    */
-   public void removeFromProofList(ProofEnvironment env) {
-      TaskTreeModel model = main.getProofList().getModel();
-      EnvNode envNode = null;
-      for (int i = 0; i < model.getChildCount(model.getRoot()); i++) {
-         Object child = model.getChild(model.getRoot(), i);
-         if (child instanceof EnvNode) {
-            EnvNode envChild = (EnvNode)child;
-            if (env != null ? env.equals(envChild.getProofEnv()) : envChild.getProofEnv() == null) {
-               envNode = envChild;
-            }
-         }
-      }
-      if (envNode != null) {
-         for (int i = 0; i < envNode.getChildCount(); i++) {
-            Object child = envNode.getChildAt(i);
-            if (child instanceof TaskTreeNode) {
-               main.getProofList().removeTaskWithoutInteraction((TaskTreeNode)child);
-            }
-         }
-      }
-   }
-   
-   /**
-    * Checks if the proof list contains some entries.
-    * @return {@code true} proof list is empty, {@code false} proof list contains at least on entry.
-    */
-   public boolean isProofListEmpty() {
-      TaskTreeModel model = main.getProofList().getModel();
-      return model.getChildCount(model.getRoot()) == 0;
    }
 }

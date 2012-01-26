@@ -35,6 +35,8 @@ import org.eclipse.swtbot.eclipse.gef.finder.widgets.SWTBotGefEditor;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.key_project.key4eclipse.util.eclipse.BundleUtil;
 import org.key_project.key4eclipse.util.test.util.TestUtilsUtil;
@@ -59,6 +61,9 @@ import de.hentschel.visualdbc.dbcmodel.presentation.DbcmodelEditor;
 import de.hentschel.visualdbc.interactive.proving.ui.command.OpenProofCommand;
 import de.hentschel.visualdbc.interactive.proving.ui.finder.IDSFinder;
 import de.hentschel.visualdbc.interactive.proving.ui.finder.IDbcFinder;
+import de.hentschel.visualdbc.interactive.proving.ui.job.StartProofJob;
+import de.hentschel.visualdbc.interactive.proving.ui.job.event.IStartProofJobListener;
+import de.hentschel.visualdbc.interactive.proving.ui.job.event.StartProofJobEvent;
 import de.hentschel.visualdbc.interactive.proving.ui.test.Activator;
 import de.hentschel.visualdbc.interactive.proving.ui.test.model.ExecutableProof;
 import de.hentschel.visualdbc.interactive.proving.ui.test.model.LoggingMethod;
@@ -76,6 +81,20 @@ import de.hentschel.visualdbc.interactive.proving.ui.util.ProofUtil;
  * @author Martin Hentschel
  */
 public class SWTBotOpenProofCommandTest extends TestCase {
+   LogStartProofJobListener l = new LogStartProofJobListener();
+   
+   @Before
+   @Override
+   public void setUp() throws Exception {
+      StartProofJob.addStartProofJobListener(l);
+   }
+
+   @After
+   @Override
+   public void tearDown() throws Exception {
+      StartProofJob.removeStartProofJobListener(l);
+   }
+
    /**
     * Tests opening proofs in the following scenarios:
     * <ul>
@@ -178,45 +197,38 @@ public class SWTBotOpenProofCommandTest extends TestCase {
          assertEquals(c1, c1RespectsModifies.getTarget());
          assertEquals("RespectsModifies", c1RespectsModifies.getObligation());
          // Open proof: EnsuresPost on c1
-         TestUtilsUtil.selectInTree(tree, c1EnsuresPostPath);
-         tree.contextMenu("Open Proof").click();
+         openProof(tree, c1EnsuresPostPath);
          compareOpenProofCalls(model, "EnsuresPost", null, null);
          assertEquals(DbcProofStatus.OPEN, c1EnsuresPost.getStatus());
          // Open proof again: EnsuresPost on c1
-         TestUtilsUtil.selectInTree(tree, c1EnsuresPostPath);
-         tree.contextMenu("Open Proof").click();
+         openProof(tree, c1EnsuresPostPath);
          compareOpenProofCalls(model, "EnsuresPost", null, null);
          // Open proof: RespectsModifies on c1
-         TestUtilsUtil.selectInTree(tree, c1RespectsModifiesPath);
-         tree.contextMenu("Open Proof").click();
+         openProof(tree, c1RespectsModifiesPath);
          compareOpenProofCalls(model, "RespectsModifies", null, null);
          // Open proof: EnsuresPost on c0
-         TestUtilsUtil.selectInTree(tree, c0EnsuresPostPath);
-         tree.contextMenu("Open Proof").click();
+         openProof(tree, c0EnsuresPostPath);
          compareOpenProofCalls(model, null, "EnsuresPost", null);
          // Open proof: EnsuresPost on c1 and c0
          SWTBotTreeItem firstItem = TestUtilsUtil.selectInTree(tree, c0EnsuresPostPath);
          SWTBotTreeItem secondItem = TestUtilsUtil.selectInTree(tree, c1EnsuresPostPath);
          tree.select(firstItem, secondItem);
-         tree.contextMenu("Open Proof").click();
+         openProof(tree);
          compareOpenProofCalls(model, "EnsuresPost", "EnsuresPost", null);
          // Open proof: PreservesInv on inc
-         TestUtilsUtil.selectInTree(tree, incPreservesInvPath);
-         tree.contextMenu("Open Proof").click();
+         openProof(tree, incPreservesInvPath);
          compareOpenProofCalls(model, null, null, "PreservesInv");
          // Open proof: invalid on inc
-         TestUtilsUtil.selectInTree(tree, incInvalidPath);
-         tree.contextMenu("Open Proof").click();
+         openProof(tree, incInvalidPath);
          compareOpenProofCalls(model, null, null, null);
-         SWTBotShell errorShell = bot.shell("Error");
-         assertEquals("The obligation \"InvalidObligation\" is invalid.\nValid obligations are:\n -PreservesInv", errorShell.bot().label(1).getText());
+         SWTBotShell errorShell = bot.shell("Problem Occurred");
+         assertEquals("The obligation \"InvalidObligation\" is invalid.\nValid obligations are:\n -PreservesInv", errorShell.bot().label(2).getText());
          errorShell.bot().button("OK").click();
          // Open proof: noTarget
-         TestUtilsUtil.selectInTree(tree, noTargetPath);
-         tree.contextMenu("Open Proof").click();
+         openProof(tree, noTargetPath);
          compareOpenProofCalls(model, null, null, null);
-         errorShell = bot.shell("Error");
-         assertEquals("Proof target not defined.", errorShell.bot().label(1).getText());
+         errorShell = bot.shell("Problem Occurred");
+         assertEquals("Proof target not defined.", errorShell.bot().label(2).getText());
          errorShell.bot().button("OK").click();
          // Get data source model instances
          IDSConnection connection = InteractiveConnectionUtil.openConnection(model, null);
@@ -329,8 +341,7 @@ public class SWTBotOpenProofCommandTest extends TestCase {
             ((LoggingOperationContract)dsProvable).setInitialReferenceToAdd(new MemoryProvableReference(dsProvable, "Initial Reference"));
          }
          assertFalse(dsProvable.hasInteractiveProof(proof.getObligation()));
-         TestUtilsUtil.selectInTree(tree, c0EnsuresPostPath);
-         tree.contextMenu("Open Proof").click();
+         openProof(tree, c0EnsuresPostPath);
          compareOpenProofCalls(model, null, "EnsuresPost", null);
          assertEquals(1, proof.getProofReferences().size());
          assertEquals(proof.getTarget(), proof.getProofReferences().get(0).getTarget());
@@ -350,6 +361,26 @@ public class SWTBotOpenProofCommandTest extends TestCase {
          // Close editor
          new SWTWorkbenchBot().closeAllEditors();
       }
+   }
+   
+   /**
+    * Opens a proof.
+    * @param tree The tree that provides the context menu to open a proof.
+    * @param pathToProofElement The element to select in the tree.
+    */
+   protected void openProof(SWTBotTree tree, String[] pathToProofElement) {
+      TestUtilsUtil.selectInTree(tree, pathToProofElement);
+      openProof(tree);
+   }
+
+   /**
+    * Opens a proof.
+    * @param tree The tree that provides the context menu to open a proof.
+    */
+   protected void openProof(SWTBotTree tree) {
+      int oldCount = l.getFinishCount();
+      tree.contextMenu("Open Proof").click();
+      waitForProofOpening(oldCount);
    }
    
    /**
@@ -385,8 +416,7 @@ public class SWTBotOpenProofCommandTest extends TestCase {
       ProofUtil.createReference(domain, proof, target, "TestReferenceToDelete");
       assertFalse(proof.getProofReferences().isEmpty());
       // Open proof
-      TestUtilsUtil.selectInTree(tree, proofPath);
-      tree.contextMenu("Open Proof").click();
+      openProof(tree, proofPath);
       compareOpenProofCalls(model, "EnsuresPost", null, null);
       if (allowProofResets) {
          assertTrue(proof.getProofReferences().isEmpty());
@@ -397,8 +427,7 @@ public class SWTBotOpenProofCommandTest extends TestCase {
       assertTrue(dsProvable.hasInteractiveProof(proof.getObligation()));
       // Open proof again (proof now opened, no reset required)
       ProofUtil.createReference(domain, proof, target, "TestReferenceToDelete");
-      TestUtilsUtil.selectInTree(tree, proofPath);
-      tree.contextMenu("Open Proof").click();
+      openProof(tree, proofPath);
       compareOpenProofCalls(model, "EnsuresPost", null, null);
       assertFalse(proof.getProofReferences().isEmpty());
       // Remove prove
@@ -410,8 +439,7 @@ public class SWTBotOpenProofCommandTest extends TestCase {
       }
       assertFalse(dsProvable.hasInteractiveProof(proof.getObligation()));
       // Open proof again
-      TestUtilsUtil.selectInTree(tree, proofPath);
-      tree.contextMenu("Open Proof").click();
+      openProof(tree, proofPath);
       compareOpenProofCalls(model, "EnsuresPost", null, null);
       if (allowProofResets) {
          assertTrue(proof.getProofReferences().isEmpty());
@@ -456,8 +484,7 @@ public class SWTBotOpenProofCommandTest extends TestCase {
       domain.getCommandStack().execute(setStatusCmd);
       assertEquals(statusToSet, proof.getStatus());
       // Open proof
-      TestUtilsUtil.selectInTree(tree, proofPath);
-      tree.contextMenu("Open Proof").click();
+      openProof(tree, proofPath);
       compareOpenProofCalls(model, "EnsuresPost", null, null);
       if (allowProofResets) {
          assertEquals(DbcProofStatus.OPEN, proof.getStatus());
@@ -469,8 +496,7 @@ public class SWTBotOpenProofCommandTest extends TestCase {
       // Open proof again (proof now opened, no reset required)
       setStatusCmd = SetCommand.create(domain, proof, DbcmodelPackage.Literals.DBC_PROOF__STATUS, statusToSet);
       domain.getCommandStack().execute(setStatusCmd);
-      TestUtilsUtil.selectInTree(tree, proofPath);
-      tree.contextMenu("Open Proof").click();
+      openProof(tree, proofPath);
       compareOpenProofCalls(model, "EnsuresPost", null, null);
       assertEquals(statusToSet, proof.getStatus());
       // Remove prove
@@ -482,8 +508,7 @@ public class SWTBotOpenProofCommandTest extends TestCase {
       }
       assertFalse(dsProvable.hasInteractiveProof(proof.getObligation()));
       // Open proof again
-      TestUtilsUtil.selectInTree(tree, proofPath);
-      tree.contextMenu("Open Proof").click();
+      openProof(tree, proofPath);
       compareOpenProofCalls(model, "EnsuresPost", null, null);
       if (allowProofResets) {
          assertEquals(DbcProofStatus.OPEN, proof.getStatus());
@@ -586,42 +611,35 @@ public class SWTBotOpenProofCommandTest extends TestCase {
          assertEquals(c1, ((DbcProof)TestInteractiveProvingUtil.getEditModel(c1RespectsModifies)).getTarget());
          assertEquals("RespectsModifies", ((DbcProof)TestInteractiveProvingUtil.getEditModel(c1RespectsModifies)).getObligation());
          // Open proof: EnsuresPost on c1
-         editor.select(c1EnsuresPost);
-         editor.clickContextMenu("Open Proof");
+         openProof(editor, c1EnsuresPost);
          compareOpenProofCalls(model, "EnsuresPost", null, null);
          // Open proof again: EnsuresPost on c1
-         editor.select(c1EnsuresPost);
-         editor.clickContextMenu("Open Proof");
+         openProof(editor, c1EnsuresPost);
          compareOpenProofCalls(model, "EnsuresPost", null, null);
          // Open proof: RespectsModifies on c1
-         editor.select(c1RespectsModifies);
-         editor.clickContextMenu("Open Proof");
+         openProof(editor, c1RespectsModifies);
          compareOpenProofCalls(model, "RespectsModifies", null, null);
          // Open proof: EnsuresPost on c0
-         editor.select(c0EnsuresPost);
-         editor.clickContextMenu("Open Proof");
+         openProof(editor, c0EnsuresPost);
          compareOpenProofCalls(model, null, "EnsuresPost", null);
          // Open proof: EnsuresPost on c1 and c0
          editor.select(c0EnsuresPost, c1EnsuresPost);
-         editor.clickContextMenu("Open Proof");
+         openProof(editor);
          compareOpenProofCalls(model, "EnsuresPost", "EnsuresPost", null);
          // Open proof: PreservesInv on inc
-         editor.select(incPreservesInv);
-         editor.clickContextMenu("Open Proof");
+         openProof(editor, incPreservesInv);
          compareOpenProofCalls(model, null, null, "PreservesInv");
          // Open proof: invalid on inc
-         editor.select(incInvalid);
-         editor.clickContextMenu("Open Proof");
+         openProof(editor, incInvalid);
          compareOpenProofCalls(model, null, null, null);
-         SWTBotShell errorShell = bot.shell("Error");
-         assertEquals("The obligation \"InvalidObligation\" is invalid.\nValid obligations are:\n -PreservesInv", errorShell.bot().label(1).getText());
+         SWTBotShell errorShell = bot.shell("Problem Occurred");
+         assertEquals("The obligation \"InvalidObligation\" is invalid.\nValid obligations are:\n -PreservesInv", errorShell.bot().label(2).getText());
          errorShell.bot().button("OK").click();
          // Open proof: noTarget
-         editor.select(noTarget);
-         editor.clickContextMenu("Open Proof");
+         openProof(editor, noTarget);
          compareOpenProofCalls(model, null, null, null);
-         errorShell = bot.shell("Error");
-         assertEquals("Proof target not defined.", errorShell.bot().label(1).getText());
+         errorShell = bot.shell("Problem Occurred");
+         assertEquals("Proof target not defined.", errorShell.bot().label(2).getText());
          errorShell.bot().button("OK").click();
          // Get data source model instances
          IDSConnection connection = InteractiveConnectionUtil.openConnection(model, null);
@@ -734,8 +752,7 @@ public class SWTBotOpenProofCommandTest extends TestCase {
             ((LoggingOperationContract)dsProvable).setInitialReferenceToAdd(new MemoryProvableReference(dsProvable, "Initial Reference"));
          }
          assertFalse(dsProvable.hasInteractiveProof(proof.getObligation()));
-         editor.select(c0EnsuresPost);
-         editor.clickContextMenu("Open Proof");
+         openProof(editor, c0EnsuresPost);
          compareOpenProofCalls(model, null, "EnsuresPost", null);
          assertEquals(1, proof.getProofReferences().size());
          assertEquals(proof.getTarget(), proof.getProofReferences().get(0).getTarget());
@@ -756,7 +773,68 @@ public class SWTBotOpenProofCommandTest extends TestCase {
          new SWTWorkbenchBot().closeAllEditors();
       }
    }
+
+   /**
+    * Opens the proof.
+    * @param editor The editor to open the proof in.
+    * @param proofEditPart The element to select in the editor for that a proof should be opened. 
+    */
+   protected void openProof(SWTBotGefEditor editor, SWTBotGefEditPart proofEditPart) {
+      editor.select(proofEditPart);
+      openProof(editor);
+   }
    
+   /**
+    * Opens the proof.
+    * @param editor The editor to open the proof in.
+    */
+   protected void openProof(SWTBotGefEditor editor) {
+      int oldCount = l.getFinishCount();
+      editor.clickContextMenu("Open Proof");
+      waitForProofOpening(oldCount);
+   }
+   
+   /**
+    * Waits until at least one more proof is opened.
+    * @param oldCount The old number of opened proofs.
+    */
+   protected void waitForProofOpening(int oldCount) {
+      while (l.getFinishCount() <= oldCount) {
+         TestUtilsUtil.sleep(100);
+      }
+   }
+   
+   /**
+    * Counts the number of loaded proofs via {@link StartProofJob}.
+    * @author Martin Hentschel
+    */
+   private static class LogStartProofJobListener implements IStartProofJobListener {
+      /**
+       * The number of events.
+       */
+      private int finishCount = 0;
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void jobFinished(StartProofJobEvent e) {
+         synchronized (this) {
+            finishCount++;
+         }
+      }
+
+      /**
+       * Returns the number of events.
+       * @return The number of events.
+       */
+      public int getFinishCount() {
+         synchronized (this) {
+            return finishCount;
+         }
+      }
+   }
+
    /**
     * Tests reference based resets.
     * @param model The {@link DbcModel} to use.
@@ -787,8 +865,7 @@ public class SWTBotOpenProofCommandTest extends TestCase {
       ProofUtil.createReference((ShapeNodeEditPart)proofEditPart.part(), target, "TestReferenceToDelete");
       assertFalse(proof.getProofReferences().isEmpty());
       // Open proof
-      editor.select(proofEditPart);
-      editor.clickContextMenu("Open Proof");
+      openProof(editor, proofEditPart);
       compareOpenProofCalls(model, "EnsuresPost", null, null);
       if (allowProofResets) {
          assertTrue(proof.getProofReferences().isEmpty());
@@ -799,8 +876,7 @@ public class SWTBotOpenProofCommandTest extends TestCase {
       assertTrue(dsProvable.hasInteractiveProof(proof.getObligation()));
       // Open proof again (proof now opened, no reset required)
       ProofUtil.createReference((ShapeNodeEditPart)proofEditPart.part(), target, "TestReferenceToDelete");
-      editor.select(proofEditPart);
-      editor.clickContextMenu("Open Proof");
+      openProof(editor, proofEditPart);
       compareOpenProofCalls(model, "EnsuresPost", null, null);
       assertFalse(proof.getProofReferences().isEmpty());
       // Remove prove
@@ -812,8 +888,7 @@ public class SWTBotOpenProofCommandTest extends TestCase {
       }
       assertFalse(dsProvable.hasInteractiveProof(proof.getObligation()));
       // Open proof again
-      editor.select(proofEditPart);
-      editor.clickContextMenu("Open Proof");
+      openProof(editor, proofEditPart);
       compareOpenProofCalls(model, "EnsuresPost", null, null);
       if (allowProofResets) {
          assertTrue(proof.getProofReferences().isEmpty());
@@ -857,8 +932,7 @@ public class SWTBotOpenProofCommandTest extends TestCase {
       domain.getCommandStack().execute(setStatusCmd);
       assertEquals(statusToSet, proof.getStatus());
       // Open proof
-      editor.select(proofEditPart);
-      editor.clickContextMenu("Open Proof");
+      openProof(editor, proofEditPart);
       compareOpenProofCalls(model, "EnsuresPost", null, null);
       if (allowProofResets) {
          assertEquals(DbcProofStatus.OPEN, proof.getStatus());
@@ -870,8 +944,7 @@ public class SWTBotOpenProofCommandTest extends TestCase {
       // Open proof again (proof now opened, no reset required)
       setStatusCmd = SetCommand.create(domain, proof, DbcmodelPackage.Literals.DBC_PROOF__STATUS, statusToSet);
       domain.getCommandStack().execute(setStatusCmd);
-      editor.select(proofEditPart);
-      editor.clickContextMenu("Open Proof");
+      openProof(editor, proofEditPart);
       compareOpenProofCalls(model, "EnsuresPost", null, null);
       assertEquals(statusToSet, proof.getStatus());
       // Remove prove
@@ -883,8 +956,7 @@ public class SWTBotOpenProofCommandTest extends TestCase {
       }
       assertFalse(dsProvable.hasInteractiveProof(proof.getObligation()));
       // Open proof again
-      editor.select(proofEditPart);
-      editor.clickContextMenu("Open Proof");
+      openProof(editor, proofEditPart);
       compareOpenProofCalls(model, "EnsuresPost", null, null);
       if (allowProofResets) {
          assertEquals(DbcProofStatus.OPEN, proof.getStatus());
