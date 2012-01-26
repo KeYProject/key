@@ -18,6 +18,9 @@ import java.util.List;
 import org.eclipse.swtbot.swt.finder.waits.ICondition;
 import org.eclipse.swtbot.swt.finder.waits.WaitForObjectCondition;
 import org.hamcrest.Matcher;
+import org.key_project.swtbot.swing.util.AbstractRunnableWithResult;
+import org.key_project.swtbot.swing.util.IRunnableWithResult;
+import org.key_project.swtbot.swing.util.SaveSwingUtil;
 
 /**
  * <p>
@@ -52,7 +55,14 @@ public class WaitForWindow<T extends Window> extends WaitForObjectCondition<T> {
    @Override
    @SuppressWarnings("unchecked")
    protected List<T> findMatches() {
-      Window[] windows = Window.getWindows();
+      IRunnableWithResult<Window[]> run = new AbstractRunnableWithResult<Window[]>() {
+         @Override
+         public void run() {
+            setResult(Window.getWindows());
+         }
+      };
+      SaveSwingUtil.invokeAndWait(run);
+      Window[] windows = run.getResult();
       ArrayList<T> matchingFrames = new ArrayList<T>();
       for (Window window : windows) {
          if (matcher.matches(window)) {

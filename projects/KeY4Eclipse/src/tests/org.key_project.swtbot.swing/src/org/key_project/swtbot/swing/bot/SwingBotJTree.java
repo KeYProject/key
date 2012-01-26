@@ -19,6 +19,9 @@ import javax.swing.tree.TreePath;
 
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
+import org.key_project.swtbot.swing.util.AbstractRunnableWithResult;
+import org.key_project.swtbot.swing.util.IRunnableWithResult;
+import org.key_project.swtbot.swing.util.SaveSwingUtil;
 
 /**
  * <p>
@@ -45,7 +48,14 @@ public class SwingBotJTree extends AbstractSwingBotComponent<JTree> {
     * @return The tree model.
     */
    public TreeModel getModel() {
-      return component.getModel();
+      IRunnableWithResult<TreeModel> run = new AbstractRunnableWithResult<TreeModel>() {
+         @Override
+         public void run() {
+            setResult(component.getModel());
+         }
+      };
+      SaveSwingUtil.invokeAndWait(run);
+      return run.getResult();
    }
    
    /**
@@ -53,23 +63,35 @@ public class SwingBotJTree extends AbstractSwingBotComponent<JTree> {
     * @return The selected {@link Object}s.
     */
    public Object[] getSelectedObjects() {
-      TreePath[] selection = component.getSelectionPaths();
-      if (selection != null) {
-         Object[] result = new Object[selection.length];
-         for (int i = 0; i < selection.length; i++) {
-            result[i] = selection[i].getLastPathComponent();
+      IRunnableWithResult<Object[]> run = new AbstractRunnableWithResult<Object[]>() {
+         @Override
+         public void run() {
+            TreePath[] selection = component.getSelectionPaths();
+            if (selection != null) {
+               Object[] result = new Object[selection.length];
+               for (int i = 0; i < selection.length; i++) {
+                  result[i] = selection[i].getLastPathComponent();
+               }
+               setResult(result);
+            }
+            else {
+               setResult(new Object[0]);
+            }
          }
-         return result;
-      }
-      else {
-         return new Object[0];
-      }
+      };
+      SaveSwingUtil.invokeAndWait(run);
+      return run.getResult();
    }
    
    /**
     * Deselects all elements in the tree.
     */
    public void unselectAll() {
-      component.setSelectionRows(new int[0]);
+      SaveSwingUtil.invokeAndWait(new Runnable() {
+         @Override
+         public void run() {
+            component.setSelectionRows(new int[0]);
+         }
+      });
    }
 }

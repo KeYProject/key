@@ -1223,9 +1223,9 @@ public class KeyConnection extends MemoryConnection {
    }
    
    /**
-    * 
-    * @param closeKeYMain
-    * @throws DSException
+    * Executes the disconnect and may closes the opened {@link MainWindow}.
+    * @param closeKeYMain Close main window?
+    * @throws DSException Occurred Exception.
     */
    protected void disconnect(final boolean closeKeYMain) throws DSException {
       if (main != null) {
@@ -1252,7 +1252,7 @@ public class KeyConnection extends MemoryConnection {
             }
          }
          catch (Exception e) {
-            LogUtil.getLogger().logError(e);
+            throw new DSException(e);
          }
       }
       main = null;

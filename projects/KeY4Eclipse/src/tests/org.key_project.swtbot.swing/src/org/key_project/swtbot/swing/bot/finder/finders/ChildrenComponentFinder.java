@@ -20,6 +20,9 @@ import javax.swing.JMenuBar;
 
 import org.eclipse.swtbot.swt.finder.finders.ChildrenControlFinder;
 import org.hamcrest.Matcher;
+import org.key_project.swtbot.swing.util.AbstractRunnableWithResult;
+import org.key_project.swtbot.swing.util.IRunnableWithResult;
+import org.key_project.swtbot.swing.util.SaveSwingUtil;
 
 /**
  * <p>
@@ -59,14 +62,21 @@ public class ChildrenComponentFinder extends ComponentFinder {
     */
    @Override
    public JMenuBar findJMenuBar() {
-      if (parentComponent instanceof JFrame) {
-         return ((JFrame)parentComponent).getJMenuBar();
-      }
-      else if (parentComponent instanceof JDialog) {
-         return ((JDialog)parentComponent).getJMenuBar();
-      }
-      else {
-         throw null;
-      }
+      IRunnableWithResult<JMenuBar> run = new AbstractRunnableWithResult<JMenuBar>() {
+         @Override
+         public void run() {
+            if (parentComponent instanceof JFrame) {
+               setResult(((JFrame)parentComponent).getJMenuBar());
+            }
+            else if (parentComponent instanceof JDialog) {
+               setResult(((JDialog)parentComponent).getJMenuBar());
+            }
+            else {
+               setResult(null);
+            }
+         }
+      };
+      SaveSwingUtil.invokeAndWait(run);
+      return run.getResult();
    }
 }

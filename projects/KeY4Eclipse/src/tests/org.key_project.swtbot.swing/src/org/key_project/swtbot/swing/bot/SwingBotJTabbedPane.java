@@ -17,6 +17,9 @@ import javax.swing.JTabbedPane;
 
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTabItem;
+import org.key_project.swtbot.swing.util.AbstractRunnableWithResult;
+import org.key_project.swtbot.swing.util.IRunnableWithResult;
+import org.key_project.swtbot.swing.util.SaveSwingUtil;
 
 /**
  * <p>
@@ -43,9 +46,17 @@ public class SwingBotJTabbedPane extends AbstractSwingBotComponent<JTabbedPane> 
     * @param index The index to select.
     * @return A created {@link AbstractSwingBotComponent} to handle the selected tab {@link Component}.
     */
-   public AbstractSwingBotComponent<? extends Component> select(int index) {
-      component.setSelectedIndex(index);
-      Component selectedComponent = component.getComponentAt(index);
+   public AbstractSwingBotComponent<? extends Component> select(final int index) {
+      IRunnableWithResult<Component> run = new AbstractRunnableWithResult<Component>() {
+        @Override
+        public void run() {
+           component.setSelectedIndex(index);
+           Component selectedComponent = component.getComponentAt(index);
+           setResult(selectedComponent);
+        }
+      };
+      SaveSwingUtil.invokeAndWait(run);
+      Component selectedComponent = run.getResult();
       return SwingBot.createBotComponent(bot().getFinder(), selectedComponent);
    }
 
@@ -54,8 +65,15 @@ public class SwingBotJTabbedPane extends AbstractSwingBotComponent<JTabbedPane> 
     * @param index The index.
     * @return The title at that index.
     */
-   public String getTitleAt(int index) {
-      return component.getTitleAt(index);
+   public String getTitleAt(final int index) {
+      IRunnableWithResult<String> run = new AbstractRunnableWithResult<String>() {
+         @Override
+         public void run() {
+            setResult(component.getTitleAt(index));
+         }
+      };
+      SaveSwingUtil.invokeAndWait(run);
+      return run.getResult();
    }
 
    /**
@@ -63,7 +81,14 @@ public class SwingBotJTabbedPane extends AbstractSwingBotComponent<JTabbedPane> 
     * @param title The title.
     * @return The index of the first tab with the title or {@code -1} if no tab has the title.
     */
-   public int indexOfTitle(String title) {
-      return component.indexOfTab(title);
+   public int indexOfTitle(final String title) {
+      IRunnableWithResult<Integer> run = new AbstractRunnableWithResult<Integer>() {
+         @Override
+         public void run() {
+            setResult(component.indexOfTab(title));
+         }
+      };
+      SaveSwingUtil.invokeAndWait(run);
+      return run.getResult();
    }
 }

@@ -17,6 +17,9 @@ import javax.swing.JLabel;
 
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotLabel;
+import org.key_project.swtbot.swing.util.AbstractRunnableWithResult;
+import org.key_project.swtbot.swing.util.IRunnableWithResult;
+import org.key_project.swtbot.swing.util.SaveSwingUtil;
 
 /**
  * <p>
@@ -43,6 +46,13 @@ public class SwingBotJLabel extends AbstractSwingBotComponent<JLabel> {
     * @return The shown text.
     */
    public String getText() {
-       return component.getText();
+       IRunnableWithResult<String> run = new AbstractRunnableWithResult<String>() {
+           @Override
+           public void run() {
+               setResult(component.getText());
+           }
+       };
+       SaveSwingUtil.invokeAndWait(run);
+       return run.getResult();
    }
 }

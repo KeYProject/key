@@ -19,7 +19,6 @@ import junit.framework.TestCase;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.junit.Test;
 import org.key_project.key4eclipse.util.eclipse.BundleUtil;
 import org.key_project.key4eclipse.util.eclipse.ResourceUtil;

@@ -416,6 +416,9 @@ public class SwingBot extends SWTBot {
       else if (c instanceof JTree) {
          return new SwingBotJTree((JTree)c);
       }
+      else if (c instanceof JLabel) {
+          return new SwingBotJLabel((JLabel)c);
+       }
       else {
          return null;
       }

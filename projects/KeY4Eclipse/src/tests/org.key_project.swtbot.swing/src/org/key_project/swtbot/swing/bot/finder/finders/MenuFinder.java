@@ -20,6 +20,9 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
 import org.hamcrest.Matcher;
+import org.key_project.swtbot.swing.util.AbstractRunnableWithResult;
+import org.key_project.swtbot.swing.util.IRunnableWithResult;
+import org.key_project.swtbot.swing.util.SaveSwingUtil;
 
 /**
  * <p>
@@ -52,18 +55,27 @@ public class MenuFinder {
     * @param recursive If set to true, will find sub-menus as well.
     * @return All menus in the specified menu bar that match the matcher.
     */
-   private List<JMenu> findMenusInternal(JMenuBar bar, Matcher<JMenu> matcher, boolean recursive) {
-      LinkedHashSet<JMenu> result = new LinkedHashSet<JMenu>();
-      if (bar != null) {
-         for (int i = 0; i < bar.getMenuCount(); i++) {
-            JMenu menu = bar.getMenu(i);
-            if (matcher.matches(menu))
-               result.add(menu);
-            if (recursive)
-               result.addAll(findMenusInternal(menu, matcher, recursive));
+   private List<JMenu> findMenusInternal(final JMenuBar bar, 
+                                         final Matcher<JMenu> matcher, 
+                                         final boolean recursive) {
+      IRunnableWithResult<List<JMenu>> run = new AbstractRunnableWithResult<List<JMenu>>() {
+         @Override
+         public void run() {
+            LinkedHashSet<JMenu> result = new LinkedHashSet<JMenu>();
+            if (bar != null) {
+               for (int i = 0; i < bar.getMenuCount(); i++) {
+                  JMenu menu = bar.getMenu(i);
+                  if (matcher.matches(menu))
+                     result.add(menu);
+                  if (recursive)
+                     result.addAll(findMenusInternal(menu, matcher, recursive));
+               }
+            }
+            setResult(new ArrayList<JMenu>(result));
          }
-      }
-      return new ArrayList<JMenu>(result);
+      };
+      SaveSwingUtil.invokeAndWait(run);
+      return run.getResult();
    }
 
    /**
@@ -74,21 +86,30 @@ public class MenuFinder {
     * @param recursive If set to true, will find sub-menus as well.
     * @return All menus in the specified menu that match the matcher.
     */
-   private List<JMenu> findMenusInternal(JMenu menu, Matcher<JMenu> matcher, boolean recursive) {
-      LinkedHashSet<JMenu> result = new LinkedHashSet<JMenu>();
-      if (menu != null) {
-         for (int i = 0; i < menu.getItemCount(); i++) {
-            JMenuItem item = menu.getItem(i);
-            if (item instanceof JMenu) {
-               JMenu childMenu = (JMenu)item;
-               if (matcher.matches(childMenu))
-                  result.add(childMenu);
-               if (recursive)
-                  result.addAll(findMenusInternal(childMenu, matcher, recursive));
+   private List<JMenu> findMenusInternal(final JMenu menu, 
+                                         final Matcher<JMenu> matcher, 
+                                         final boolean recursive) {
+      IRunnableWithResult<List<JMenu>> run = new AbstractRunnableWithResult<List<JMenu>>() {
+         @Override
+         public void run() {
+            LinkedHashSet<JMenu> result = new LinkedHashSet<JMenu>();
+            if (menu != null) {
+               for (int i = 0; i < menu.getItemCount(); i++) {
+                  JMenuItem item = menu.getItem(i);
+                  if (item instanceof JMenu) {
+                     JMenu childMenu = (JMenu)item;
+                     if (matcher.matches(childMenu))
+                        result.add(childMenu);
+                     if (recursive)
+                        result.addAll(findMenusInternal(childMenu, matcher, recursive));
+                  }
+               }
             }
+            setResult(new ArrayList<JMenu>(result));
          }
-      }
-      return new ArrayList<JMenu>(result);
+      };
+      SaveSwingUtil.invokeAndWait(run);
+      return run.getResult();
    }
    
    /**
@@ -107,15 +128,23 @@ public class MenuFinder {
     * @param matcher The matcher that can match menus and menu items.
     * @return All menu items in the specified menu that match the matcher.
     */
-   private List<JMenuItem> findItemsInternal(JMenu menu, Matcher<JMenuItem> matcher) {
-      LinkedHashSet<JMenuItem> result = new LinkedHashSet<JMenuItem>();
-      if (menu != null) {
-         for (int i = 0; i < menu.getItemCount(); i++) {
-            JMenuItem item = menu.getItem(i);
-            if (matcher.matches(item))
-               result.add(item);
+   private List<JMenuItem> findItemsInternal(final JMenu menu, 
+                                             final Matcher<JMenuItem> matcher) {
+      IRunnableWithResult<List<JMenuItem>> run = new AbstractRunnableWithResult<List<JMenuItem>>() {
+         @Override
+         public void run() {
+            LinkedHashSet<JMenuItem> result = new LinkedHashSet<JMenuItem>();
+            if (menu != null) {
+               for (int i = 0; i < menu.getItemCount(); i++) {
+                  JMenuItem item = menu.getItem(i);
+                  if (matcher.matches(item))
+                     result.add(item);
+               }
+            }
+            setResult(new ArrayList<JMenuItem>(result));
          }
-      }
-      return new ArrayList<JMenuItem>(result);
+      };
+      SaveSwingUtil.invokeAndWait(run);
+      return run.getResult();
    }
 }

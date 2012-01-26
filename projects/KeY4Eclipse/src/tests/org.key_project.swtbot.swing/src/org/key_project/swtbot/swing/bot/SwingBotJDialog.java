@@ -17,6 +17,9 @@ import javax.swing.JDialog;
 
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
+import org.key_project.swtbot.swing.util.AbstractRunnableWithResult;
+import org.key_project.swtbot.swing.util.IRunnableWithResult;
+import org.key_project.swtbot.swing.util.SaveSwingUtil;
 
 /**
  * <p>
@@ -42,7 +45,12 @@ public class SwingBotJDialog extends AbstractSwingBotComponent<JDialog> {
     * Closes the {@link JDialog}.
     */
    public void close() {
-      component.setVisible(false);
+      SaveSwingUtil.invokeAndWait(new Runnable() {
+         @Override
+         public void run() {
+            component.setVisible(false);
+         }
+      });
    }
    
    /**
@@ -51,7 +59,14 @@ public class SwingBotJDialog extends AbstractSwingBotComponent<JDialog> {
     * @see JDialog#isVisible()
     */
    public boolean isOpen() {
-      return component.isVisible();
+      IRunnableWithResult<Boolean> run = new AbstractRunnableWithResult<Boolean>() {
+         @Override
+         public void run() {
+            setResult(component.isVisible());
+         }
+      };
+      SaveSwingUtil.invokeAndWait(run);
+      return run.getResult() != null && run.getResult().booleanValue();
    }
    
    /**
@@ -60,6 +75,13 @@ public class SwingBotJDialog extends AbstractSwingBotComponent<JDialog> {
     * @see JDialog#isActive()
     */
    public boolean isActive() {
-      return component.isActive();
+      IRunnableWithResult<Boolean> run = new AbstractRunnableWithResult<Boolean>() {
+         @Override
+         public void run() {
+            setResult(component.isActive());
+         }
+      };
+      SaveSwingUtil.invokeAndWait(run);
+      return run.getResult() != null && run.getResult().booleanValue();
    }
 }

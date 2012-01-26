@@ -12,7 +12,6 @@
 package org.key_project.swtbot.swing.finder.matchers;
 
 import java.awt.Component;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.eclipse.swt.widgets.Text;
@@ -21,6 +20,9 @@ import org.eclipse.swtbot.swt.finder.utils.SWTUtils;
 import org.hamcrest.Description;
 import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
+import org.key_project.swtbot.swing.util.AbstractRunnableWithResultAndException;
+import org.key_project.swtbot.swing.util.IRunnableWithResultAndException;
+import org.key_project.swtbot.swing.util.SaveSwingUtil;
 
 /**
  * <p>
@@ -94,13 +96,25 @@ public class WithToolTipText<T> extends AbstractMatcher<T> {
     * exception is thrown.
     * @param obj any object to get the tool tip from.
     * @return the return value of obj#getTooltip()
-    * @throws NoSuchMethodException if the method "getTooltip" does not exist on the object.
-    * @throws IllegalAccessException if the java access control does not allow invocation.
-    * @throws InvocationTargetException if the method "getTooltip" throws an exception.
     * @see Method#invoke(Object, Object[])
     */   
-   static String getTooltip(Object obj) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-      return ((String) SWTUtils.invokeMethod(obj, "getToolTipText")).replaceAll(Text.DELIMITER, "\n");
+   static String getTooltip(final Object obj) throws Exception {
+      IRunnableWithResultAndException<String> run = new AbstractRunnableWithResultAndException<String>() {
+         @Override
+         public void run() {
+            try {
+               setResult(((String) SWTUtils.invokeMethod(obj, "getToolTipText")).replaceAll(Text.DELIMITER, "\n"));
+            }
+            catch (Exception e) {
+               setException(e);
+            }
+         }
+      };
+      SaveSwingUtil.invokeAndWait(run);
+      if (run.getException() != null) {
+         throw run.getException();
+      }
+      return run.getResult();
    }
    
    /**

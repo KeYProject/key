@@ -12,7 +12,6 @@
 package org.key_project.swtbot.swing.finder.matchers;
 
 import java.awt.Component;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.eclipse.swt.widgets.Text;
@@ -21,6 +20,9 @@ import org.eclipse.swtbot.swt.finder.utils.SWTUtils;
 import org.hamcrest.Description;
 import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
+import org.key_project.swtbot.swing.util.AbstractRunnableWithResultAndException;
+import org.key_project.swtbot.swing.util.IRunnableWithResultAndException;
+import org.key_project.swtbot.swing.util.SaveSwingUtil;
 
 /**
  * <p>
@@ -94,13 +96,25 @@ public class WithText<T> extends AbstractMatcher<T> {
     * exception is thrown.
     * @param obj any object to get the text from.
     * @return the return value of obj#getText()
-    * @throws NoSuchMethodException if the method "getText" does not exist on the object.
-    * @throws IllegalAccessException if the java access control does not allow invocation.
-    * @throws InvocationTargetException if the method "getText" throws an exception.
     * @see Method#invoke(Object, Object[])
     */   
-   static String getText(Object obj) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-      return ((String) SWTUtils.invokeMethod(obj, "getText")).replaceAll(Text.DELIMITER, "\n");
+   static String getText(final Object obj) throws Exception {
+      IRunnableWithResultAndException<String> run = new AbstractRunnableWithResultAndException<String>() {
+         @Override
+         public void run() {
+            try {
+                setResult(((String) SWTUtils.invokeMethod(obj, "getText")).replaceAll(Text.DELIMITER, "\n"));
+            }
+            catch (Exception e) {
+               setException(e);
+            }
+         }
+      };
+      SaveSwingUtil.invokeAndWait(run);
+      if (run.getException() != null) {
+          throw run.getException();
+      }
+      return run.getResult();
    }
    
    /**

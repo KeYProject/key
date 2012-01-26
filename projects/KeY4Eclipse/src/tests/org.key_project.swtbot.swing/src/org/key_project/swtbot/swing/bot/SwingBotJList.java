@@ -18,6 +18,9 @@ import javax.swing.ListModel;
 
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotList;
+import org.key_project.swtbot.swing.util.AbstractRunnableWithResult;
+import org.key_project.swtbot.swing.util.IRunnableWithResult;
+import org.key_project.swtbot.swing.util.SaveSwingUtil;
 
 /**
  * <p>
@@ -43,8 +46,13 @@ public class SwingBotJList extends AbstractSwingBotComponent<JList> {
     * Selects the index in the {@link JList}.
     * @param index The index to select.
     */
-   public void select(int index) {
-      component.setSelectedIndex(index);
+   public void select(final int index) {
+      SaveSwingUtil.invokeAndWait(new Runnable() {
+         @Override
+         public void run() {
+            component.setSelectedIndex(index);
+         }
+      });
    }
 
    /**
@@ -52,13 +60,20 @@ public class SwingBotJList extends AbstractSwingBotComponent<JList> {
     * @return The selected {@link Object}s.
     */   
    public Object[] getSelectedObjects() {
-      Object[] result = component.getSelectedValues();
-      if (result != null) {
-         return result;
-      }
-      else {
-         return new Object[0];
-      }
+      IRunnableWithResult<Object[]> run = new AbstractRunnableWithResult<Object[]>() {
+         @Override
+         public void run() {
+            Object[] result = component.getSelectedValues();
+            if (result != null) {
+               setResult(result);
+            }
+            else {
+               setResult(new Object[0]);
+            }
+         }
+      };
+      SaveSwingUtil.invokeAndWait(run);
+      return run.getResult();
    }
 
    /**
@@ -66,22 +81,27 @@ public class SwingBotJList extends AbstractSwingBotComponent<JList> {
     * all items are deselected.
     * @param itemText The text of the item to select.
     */
-   public void selectByText(String itemText) {
-      Object toSelect = null;
-      ListModel model = component.getModel();
-      int i = 0;
-      while (toSelect == null && i < model.getSize()) {
-         Object current = model.getElementAt(i);
-         if (current != null && current.toString().equals(itemText)) {
-            toSelect = current;
+   public void selectByText(final String itemText) {
+      SaveSwingUtil.invokeAndWait(new Runnable() {
+         @Override
+         public void run() {
+            Object toSelect = null;
+            ListModel model = component.getModel();
+            int i = 0;
+            while (toSelect == null && i < model.getSize()) {
+               Object current = model.getElementAt(i);
+               if (current != null && current.toString().equals(itemText)) {
+                  toSelect = current;
+               }
+               i++;
+            }
+            if (toSelect != null) {
+               component.setSelectedValue(toSelect, true);
+            }
+            else {
+               component.setSelectedIndices(new int[0]);
+            }
          }
-         i++;
-      }
-      if (toSelect != null) {
-         component.setSelectedValue(toSelect, true);
-      }
-      else {
-         component.setSelectedIndices(new int[0]);
-      }
+      });
    }
 }

@@ -22,6 +22,9 @@ import javax.swing.JMenuBar;
 
 import org.eclipse.swtbot.swt.finder.finders.ControlFinder;
 import org.hamcrest.Matcher;
+import org.key_project.swtbot.swing.util.AbstractRunnableWithResult;
+import org.key_project.swtbot.swing.util.IRunnableWithResult;
+import org.key_project.swtbot.swing.util.SaveSwingUtil;
 
 /**
  * <p>
@@ -67,7 +70,9 @@ public class ComponentFinder {
     * @return All visible {@link Component}s in the parent {@link Component} that the matcher matches. If recursive is {@code true} then find the {@link Component} within each of the parent {@link Component}s.
     */
    @SuppressWarnings("unchecked")
-   private <T extends Component> List<T> findComponentsInternal(Component parentComponent, Matcher<T> matcher, boolean recursive) {
+   private <T extends Component> List<T> findComponentsInternal(final Component parentComponent, 
+                                                                Matcher<T> matcher, 
+                                                                boolean recursive) {
       if ((parentComponent == null))
          return new ArrayList<T>();
       if (!parentComponent.isVisible()) {
@@ -81,7 +86,14 @@ public class ComponentFinder {
             throw new IllegalArgumentException("The specified matcher should only match against is declared type.", exception);
          }
       if (recursive) {
-         Component[] children = parentComponent instanceof Container ? ((Container)parentComponent).getComponents() : new Component[0];
+         IRunnableWithResult<Component[]> run = new AbstractRunnableWithResult<Component[]>() {
+            @Override
+            public void run() {
+               setResult(parentComponent instanceof Container ? ((Container)parentComponent).getComponents() : new Component[0]);
+            }
+         };
+         SaveSwingUtil.invokeAndWait(run);
+         Component[] children = run.getResult();
          components.addAll(findComponentsInternal(children, matcher, recursive));
       }
       return new ArrayList<T>(components);

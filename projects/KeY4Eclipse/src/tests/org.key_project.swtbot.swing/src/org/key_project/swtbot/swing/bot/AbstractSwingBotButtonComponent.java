@@ -18,6 +18,7 @@ import javax.swing.AbstractButton;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.utils.MessageFormat;
 import org.eclipse.swtbot.swt.finder.widgets.AbstractSWTBot;
+import org.key_project.swtbot.swing.util.SaveSwingUtil;
 
 /**
  * <p>
@@ -66,7 +67,12 @@ public class AbstractSwingBotButtonComponent<T extends AbstractButton> extends A
     */
    public AbstractSwingBotButtonComponent<T> clickAndWait() {
       log.debug(MessageFormat.format("Clicking on {0}", this));
-      component.doClick();
+      SaveSwingUtil.invokeAndWait(new Runnable() {
+         @Override
+         public void run() {
+            component.doClick();
+         }
+      });
       log.debug(MessageFormat.format("Clicked on {0}", this));
       return this;
    }

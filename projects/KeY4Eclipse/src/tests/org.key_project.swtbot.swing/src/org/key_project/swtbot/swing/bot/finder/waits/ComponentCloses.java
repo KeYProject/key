@@ -58,6 +58,6 @@ class ComponentCloses extends DefaultCondition {
     */
    @Override
    public boolean test() throws Exception {
-      return !component.component.isVisible();
+      return !component.isVisible();
    }
 }

@@ -19,6 +19,9 @@ import org.apache.log4j.Logger;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.widgets.AbstractSWTBot;
 import org.key_project.swtbot.swing.bot.finder.waits.Conditions;
+import org.key_project.swtbot.swing.util.AbstractRunnableWithResult;
+import org.key_project.swtbot.swing.util.IRunnableWithResult;
+import org.key_project.swtbot.swing.util.SaveSwingUtil;
 
 
 /**
@@ -57,12 +60,35 @@ public class AbstractSwingBotComponent<T extends Component> {
    }
    
    /**
+    * Gets if the object's {@link Component} is visible.
+    * @return {@code true} if the widget is visible.
+    * @see Component#isVisible()
+    */
+   public boolean isVisible() {
+      IRunnableWithResult<Boolean> run = new AbstractRunnableWithResult<Boolean>() {
+         @Override
+         public void run() {
+            setResult(component.isVisible());
+         }
+      };
+      SaveSwingUtil.invokeAndWait(run);
+      return run.getResult() != null && run.getResult().booleanValue();
+   }
+   
+   /**
     * Gets if the object's {@link Component} is enabled.
     * @return {@code true} if the widget is enabled.
     * @see Component#isEnabled()
     */
    public boolean isEnabled() {
-      return component.isEnabled();
+      IRunnableWithResult<Boolean> run = new AbstractRunnableWithResult<Boolean>() {
+         @Override
+         public void run() {
+            setResult(component.isEnabled());
+         }
+      };
+      SaveSwingUtil.invokeAndWait(run);
+      return run.getResult() != null && run.getResult().booleanValue();
    }
    
    /**
