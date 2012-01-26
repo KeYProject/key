@@ -27,7 +27,36 @@ public final class SwingUtil {
                 run.run();
             }
             else {
-                SwingUtilities.invokeAndWait(run);
+                RunnableLock lock = new RunnableLock(run);
+                SwingUtilities.invokeLater(lock);
+                synchronized (lock) {
+                    while (!lock.done()) {
+                        lock.wait();
+                    }
+                }
+            }
+        }
+    }
+    
+    private static class RunnableLock implements Runnable {
+        private Runnable runnable;
+        
+        private RunnableLock(Runnable runnable) {
+            super();
+            this.runnable = runnable;
+        }
+        
+        public boolean done() {
+            return runnable == null;
+        }
+        
+        public void run() {
+            synchronized (this) {
+                if (runnable != null) {
+                    runnable.run();
+                }
+                runnable = null;
+                notify();
             }
         }
     }

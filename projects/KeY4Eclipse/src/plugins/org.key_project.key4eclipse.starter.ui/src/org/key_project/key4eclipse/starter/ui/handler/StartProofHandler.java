@@ -27,7 +27,7 @@ public class StartProofHandler extends AbstractSaveExecutionHandler {
             Object[] elements = ((IStructuredSelection)selection).toArray();
             for (Object element : elements) {
                 if (element instanceof IMethod) {
-                    KeYUtil.startProofAsync((IMethod)element);
+                    KeYUtil.startProof((IMethod)element);
                 }
             }
         }
@@ -38,7 +38,7 @@ public class StartProofHandler extends AbstractSaveExecutionHandler {
                 JavaEditor javaEditor = (JavaEditor)editor;
                 IJavaElement element = SelectionConverter.resolveEnclosingElement(javaEditor, textSelection);
                 if (element instanceof IMethod) {
-                    KeYUtil.startProofAsync((IMethod)element);
+                    KeYUtil.startProof((IMethod)element);
                 }
             }
         }

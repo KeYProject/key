@@ -12,7 +12,7 @@ public class StartKeYHandler extends AbstractSaveExecutionHandler {
      */
     @Override
     protected Object doExecute(ExecutionEvent event) throws Exception {
-        KeYUtil.openMainWindowAsync();
+        KeYUtil.openMainWindow();
         return null;
     }
 }
