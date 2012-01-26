@@ -787,7 +787,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 	        	        
     @Override
     public String getDisplayName() {
-        return ContractFactory.generateDisplayName(baseName, id);
+        return ContractFactory.generateDisplayName(baseName, kjt, target, id);
     }
 
 

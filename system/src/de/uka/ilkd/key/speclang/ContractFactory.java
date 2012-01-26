@@ -421,8 +421,14 @@ public class ContractFactory {
     
     
     public static String generateDisplayName(String myBaseName,
+                                             KeYJavaType myKjt,
+                                             ObserverFunction myTarget,
                                              int myId) {
-        return myBaseName + " " + myId;
+        return myBaseName + " " + myId +
+                (myKjt.equals(myTarget.getContainerType())
+                  ? ""
+                  : " for "
+                    + myKjt.getJavaType().getFullName());
     }
     
     
