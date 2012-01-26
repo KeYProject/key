@@ -30,7 +30,10 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.ui.wizards.JavaCapabilityConfigurationPage;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
@@ -57,6 +60,8 @@ import org.key_project.swtbot.swing.bot.SwingBotJTree;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofManagementDialog;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.mgt.EnvNode;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.TaskTreeModel;
 import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
 import de.uka.ilkd.key.util.KeYResourceManager;
@@ -423,6 +428,37 @@ public class TestUtilsUtil {
    }
 
    /**
+    * Returns the {@link ProofEnvironment} in the proof list at
+    * the given index.
+    * @param index The index.
+    * @return The found {@link ProofEnvironment}.
+    */
+   public static ProofEnvironment keyGetProofEnv(int index) {
+       SwingBotJFrame frame = TestUtilsUtil.keyGetMainWindow();
+       SwingBotJTree tree = frame.bot().jTree(TaskTreeModel.class);
+       return keyGetProofEnv(tree, index);
+   }
+   
+   /**
+    * Returns the {@link ProofEnvironment} in the proof list at
+    * the given index.
+    * @param tree The {@link SwingBotJTree} to search in.
+    * @param index The index.
+    * @return The found {@link ProofEnvironment}.
+    */
+   public static ProofEnvironment keyGetProofEnv(SwingBotJTree tree, int index) {
+       TestCase.assertNotNull(tree);
+       TestCase.assertTrue(index >= 0);
+       TreeModel model = tree.getModel();
+       TestCase.assertNotNull(model);
+       TestCase.assertTrue(index < model.getChildCount(model.getRoot()));
+       Object child = model.getChild(model.getRoot(), index);
+       TestCase.assertTrue(child instanceof EnvNode);
+       ProofEnvironment result = ((EnvNode)child).getProofEnv();
+       return result;
+   }
+   
+   /**
     * Blocks the current {@link Thread} until the given {@link Job} has finished.
     * @param job The {@link Job} to wait for.
     */
@@ -446,5 +482,29 @@ public class TestUtilsUtil {
       catch (InterruptedException e) {
          // Nothing to do.
       }
+   }
+
+   /**
+    * Returns the specified {@link IMethod}.
+    * @param javaProject The {@link IJavaProject} that contains the source code.
+    * @param typeName The type name.
+    * @param methodName The method name.
+    * @param parameters The method parameters.
+    * @return The found {@link IMethod}.
+    * @throws JavaModelException Occurred Exception.
+    */
+   public static IMethod getJdtMethod(IJavaProject javaProject,
+                                      String typeName, 
+                                      String methodName, 
+                                      String... parameters) throws JavaModelException {
+       IType type = javaProject.findType(typeName);
+       assertNotNull(type);
+       for (IMethod method : type.getMethods()) {
+           System.out.println(method);
+       }
+       IMethod method = type.getMethod(methodName, parameters);
+       assertNotNull(method);
+       System.out.println("FOUND: " + method);
+       return method;
    }
 }

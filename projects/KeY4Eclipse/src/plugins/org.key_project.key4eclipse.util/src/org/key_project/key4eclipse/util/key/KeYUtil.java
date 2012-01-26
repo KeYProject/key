@@ -21,7 +21,9 @@ import org.key_project.key4eclipse.util.eclipse.Logger;
 import org.key_project.key4eclipse.util.eclipse.job.AbstractKeYMainWindowJob;
 import org.key_project.key4eclipse.util.java.SwingUtil;
 import org.key_project.key4eclipse.util.java.thread.AbstractRunnableWithException;
+import org.key_project.key4eclipse.util.java.thread.AbstractRunnableWithResult;
 import org.key_project.key4eclipse.util.java.thread.IRunnableWithException;
+import org.key_project.key4eclipse.util.java.thread.IRunnableWithResult;
 import org.key_project.key4eclipse.util.jdt.JDTUtil;
 
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -184,28 +186,37 @@ public final class KeYUtil {
      * Returns an already loaded {@link InitConfig} for the given location.
      * @param location The given location.
      * @return The already loaded {@link InitConfig} or {@code null} if no one is loaded.
+     * @throws InvocationTargetException Occurred Exception.
+     * @throws InterruptedException Occurred Exception.
      */
-    public static InitConfig getInitConfig(File location) {
-        if (location != null) {
-            TaskTreeModel model = MainWindow.getInstance().getProofList().getModel();
-            InitConfig result = null;
-            int i = 0;
-            while (result == null && i < model.getChildCount(model.getRoot())) {
-                Object child = model.getChild(model.getRoot(), i);
-                if (child instanceof EnvNode) {
-                    EnvNode envChild = (EnvNode)child;
-                    String srcPath = envChild.getProofEnv().getJavaModel().getModelDir();
-                    if (srcPath != null && location.equals(new File(srcPath))) {
-                        result = envChild.getProofEnv().getInitConfig();
+    public static InitConfig getInitConfig(final File location) throws InterruptedException, InvocationTargetException {
+        IRunnableWithResult<InitConfig> run = new AbstractRunnableWithResult<InitConfig>() {
+            @Override
+            public void run() {
+                if (location != null) {
+                    TaskTreeModel model = MainWindow.getInstance().getProofList().getModel();
+                    InitConfig result = null;
+                    int i = 0;
+                    while (result == null && i < model.getChildCount(model.getRoot())) {
+                        Object child = model.getChild(model.getRoot(), i);
+                        if (child instanceof EnvNode) {
+                            EnvNode envChild = (EnvNode)child;
+                            String srcPath = envChild.getProofEnv().getJavaModel().getModelDir();
+                            if (srcPath != null && location.equals(new File(srcPath))) {
+                                result = envChild.getProofEnv().getInitConfig();
+                            }
+                        }
+                        i++;
                     }
+                    setResult(result);
                 }
-                i++;
+                else {
+                    setResult(null);
+                }
             }
-            return result;
-        }
-        else {
-            return null;
-        }
+        };
+        SwingUtil.invokeAndWait(run);
+        return run.getResult();
     }
     
     /**
