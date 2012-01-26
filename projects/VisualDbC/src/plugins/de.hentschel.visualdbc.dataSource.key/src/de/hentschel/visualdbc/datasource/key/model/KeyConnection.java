@@ -268,6 +268,8 @@ public class KeyConnection extends MemoryConnection {
                   EnvInput envInput = loader.createEnvInput(location);
                   init = main.createProblemInitializer();
                   initConfig = init.prepare(envInput);
+                  // Analyze classes, interfaces, enums and packages
+                  analyzeTypes(initConfig.getServices(), skipLibraryClasses, packageManagement, monitor);
                }
                catch (Exception e) {
                   setException(e);
@@ -278,8 +280,6 @@ public class KeyConnection extends MemoryConnection {
          if (run.getException() != null) {
             throw run.getException();
          }
-         // Analyze classes, interfaces, enums and packages
-         analyzeTypes(initConfig.getServices(), skipLibraryClasses, packageManagement, monitor);
          super.connect(connectionSettings, interactive, monitor);
       }
       catch (DSException e) {

@@ -12,20 +12,18 @@
 package de.hentschel.visualdbc.interactive.proving.ui.command;
 
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.gmf.runtime.diagram.ui.editparts.ShapeNodeEditPart;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 
-import de.hentschel.visualdbc.datasource.model.exception.DSCanceledException;
 import de.hentschel.visualdbc.datasource.model.exception.DSException;
 import de.hentschel.visualdbc.dbcmodel.DbcProof;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcProof2EditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcProofEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.part.DbCDiagramEditor;
 import de.hentschel.visualdbc.dbcmodel.presentation.DbcmodelEditor;
-import de.hentschel.visualdbc.interactive.proving.ui.util.ProofUtil;
+import de.hentschel.visualdbc.interactive.proving.ui.job.StartProofJob;
 
 /**
  * Opens the data source user interface to finish the selected {@link DbcProof}.
@@ -107,12 +105,8 @@ public class OpenProofCommand extends AbstractCommand {
     * @throws DSException Occurred Exception
     */
    protected void openProof(DbcProof proof, ShapeNodeEditPart proofEditPart) throws DSException {
-      try {
-         EditingDomain domain = getEditingDomain();
-         ProofUtil.openProof(domain, proof, proofEditPart, new NullProgressMonitor());
-      }
-      catch (DSCanceledException e) {
-         // Progress was canceled, nothing to do.
-      }
+      EditingDomain domain = getEditingDomain();
+      StartProofJob job = new StartProofJob(domain, proof, proofEditPart);
+      job.schedule();
    }
 }

@@ -32,6 +32,11 @@ public final class SwingUtil {
      * Executes the {@link Runnable} in the {@link Thread} of Swing synchronous.
      * </p>
      * <p>
+     * <b>Attention: </b> It is not possible to use this method from
+     * Thread of the {@link Display}. In this case an {@link InterruptedException}
+     * is thrown.
+     * </p>
+     * <p>
      * For informations about SWT and Swing integration have a look at:
      * <ul>
      *    <li><a href="http://www.eclipsezone.com/eclipse/forums/t45697.html">http://www.eclipsezone.com/eclipse/forums/t45697.html</li>
