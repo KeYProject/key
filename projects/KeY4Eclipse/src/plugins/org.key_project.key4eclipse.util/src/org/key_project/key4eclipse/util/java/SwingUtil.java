@@ -4,6 +4,8 @@ import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.SwingUtilities;
 
+import org.eclipse.swt.widgets.Display;
+
 /**
  * Provides static methods to work with Swing.
  * @author Martin Hentschel
@@ -16,7 +18,14 @@ public final class SwingUtil {
     }
     
     /**
-     * Executes the {@link Runnable} in the {@link Thread} of Swing synchron.
+     * <p>
+     * Executes the {@link Runnable} in the {@link Thread} of Swing synchronous.
+     * </p>
+     * <p>
+     * <b>Attention:</b> This method does not work correctly from
+     * {@link Display}s Thread on Mac OS. Also {@link Object#wait()}
+     * and {@link Object#notify()} don't work in this scenario.
+     * </p>
      * @param run The {@link Runnable} to execute.
      * @throws InterruptedException Occurred Exception.
      * @throws InvocationTargetException Occurred Exception.
@@ -27,36 +36,7 @@ public final class SwingUtil {
                 run.run();
             }
             else {
-                RunnableLock lock = new RunnableLock(run);
-                SwingUtilities.invokeLater(lock);
-                synchronized (lock) {
-                    while (!lock.done()) {
-                        lock.wait();
-                    }
-                }
-            }
-        }
-    }
-    
-    private static class RunnableLock implements Runnable {
-        private Runnable runnable;
-        
-        private RunnableLock(Runnable runnable) {
-            super();
-            this.runnable = runnable;
-        }
-        
-        public boolean done() {
-            return runnable == null;
-        }
-        
-        public void run() {
-            synchronized (this) {
-                if (runnable != null) {
-                    runnable.run();
-                }
-                runnable = null;
-                notify();
+                SwingUtilities.invokeAndWait(run);
             }
         }
     }

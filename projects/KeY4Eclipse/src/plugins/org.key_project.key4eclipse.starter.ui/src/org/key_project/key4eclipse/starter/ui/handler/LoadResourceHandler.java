@@ -22,10 +22,10 @@ public class LoadResourceHandler extends AbstractSaveExecutionHandler {
             Object[] elements = ((IStructuredSelection)selection).toArray();
             for (Object element : elements) {
                 if (element instanceof IResource) {
-                    KeYUtil.load((IResource)element);
+                    KeYUtil.loadAsync((IResource)element);
                 }
                 else if (element instanceof IJavaElement) {
-                    KeYUtil.load(((IJavaElement)element).getResource());
+                    KeYUtil.loadAsync(((IJavaElement)element).getResource());
                 }
             }
         }
