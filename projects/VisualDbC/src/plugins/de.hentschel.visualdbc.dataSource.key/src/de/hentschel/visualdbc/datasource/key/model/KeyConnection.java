@@ -32,6 +32,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.key_project.key4eclipse.util.eclipse.ResourceUtil;
 import org.key_project.key4eclipse.util.java.ArrayUtil;
 import org.key_project.key4eclipse.util.java.ObjectUtil;
+import org.key_project.key4eclipse.util.java.SwingUtil;
+import org.key_project.key4eclipse.util.java.thread.AbstractRunnableWithException;
+import org.key_project.key4eclipse.util.java.thread.IRunnableWithException;
 
 import de.hentschel.visualdbc.datasource.key.intern.helper.KeyHacks;
 import de.hentschel.visualdbc.datasource.key.intern.helper.OpenedProof;
@@ -226,8 +229,8 @@ public class KeyConnection extends MemoryConnection {
     */
    @Override
    public void connect(Map<String, Object> connectionSettings, 
-                       boolean interactive,
-                       IProgressMonitor monitor) throws DSException {
+                       final boolean interactive,
+                       final IProgressMonitor monitor) throws DSException {
       try {
          Assert.isNotNull(connectionSettings);
          // Initialize instance variables
@@ -236,31 +239,45 @@ public class KeyConnection extends MemoryConnection {
          invariantsMapping = new HashMap<ClassInvariant, IDSInvariant>();
          typesMapping = new HashMap<KeYJavaType, IDSType>();
          // Get settings
-         File location = getLocation(connectionSettings);
+         final File location = getLocation(connectionSettings);
          if (location == null || !location.exists()) {
             throw new DSException("The location \"" + location + "\" doesn't exist.");
          }
-         boolean skipLibraryClasses = isSkipLibraryClasses(connectionSettings);
-         DSPackageManagement packageManagement = getPackageManagent(connectionSettings);
+         final boolean skipLibraryClasses = isSkipLibraryClasses(connectionSettings);
+         final DSPackageManagement packageManagement = getPackageManagent(connectionSettings);
          // Instantiate KeY main window
-         if (!MainWindow.hasInstance()) {
-            ExitMainAction.exitSystem = false;
-            MainWindow.createInstance(KEY_MAIN_WINDOW_TITLE);
+         IRunnableWithException run = new AbstractRunnableWithException() {
+            @Override
+            public void run() {
+               try {
+                  if (!MainWindow.hasInstance()) {
+                     ExitMainAction.exitSystem = false;
+                     MainWindow.createInstance(KEY_MAIN_WINDOW_TITLE);
+                  }
+                  // Open connection in key
+                  if (interactive) {
+                     main = MainWindow.getInstance();
+                     main.setVisible(true);
+                  }
+                  else {
+                     main = MainWindow.getInstance(false);
+                  }
+                  KeYMediator mediator = main.getMediator();
+                  mediator.addGUIListener(mainGuiListener);
+                  ProblemLoader loader = new ProblemLoader(location, main);
+                  EnvInput envInput = loader.createEnvInput(location);
+                  init = main.createProblemInitializer();
+                  initConfig = init.prepare(envInput);
+               }
+               catch (Exception e) {
+                  setException(e);
+               }
+            }
+         };
+         SwingUtil.invokeAndWait(run);
+         if (run.getException() != null) {
+            throw run.getException();
          }
-         // Open connection in key
-         if (interactive) {
-            main = MainWindow.getInstance();
-            main.setVisible(true);
-         }
-         else {
-            main = MainWindow.getInstance(false);
-         }
-         KeYMediator mediator = main.getMediator();
-         mediator.addGUIListener(mainGuiListener);
-         ProblemLoader loader = new ProblemLoader(location, main);
-         EnvInput envInput = loader.createEnvInput(location);
-         init = main.createProblemInitializer();
-         initConfig = init.prepare(envInput);
          // Analyze classes, interfaces, enums and packages
          analyzeTypes(initConfig.getServices(), skipLibraryClasses, packageManagement, monitor);
          super.connect(connectionSettings, interactive, monitor);

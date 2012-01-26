@@ -32,12 +32,7 @@ public final class SwingUtil {
      * Executes the {@link Runnable} in the {@link Thread} of Swing synchronous.
      * </p>
      * <p>
-     * <b>Attention:</b> This method does not work correctly from
-     * {@link Display}s Thread on Mac OS. Also {@link Object#wait()}
-     * and {@link Object#notify()} don't work in this scenario.
-     * </p>
-     * <p>
-     * More informations about SWT and Swing integration have a look at:
+     * For informations about SWT and Swing integration have a look at:
      * <ul>
      *    <li><a href="http://www.eclipsezone.com/eclipse/forums/t45697.html">http://www.eclipsezone.com/eclipse/forums/t45697.html</li>
      *    <li><a href="http://www.eclipse.org/articles/article.php?file=Article-Swing-SWT-Integration/index.html">http://www.eclipse.org/articles/article.php?file=Article-Swing-SWT-Integration/index.html</li>
@@ -53,29 +48,60 @@ public final class SwingUtil {
                 run.run();
             }
             else {
-                RunnableLock lock = new RunnableLock(run);
-                SwingUtilities.invokeLater(lock);
-                while (!lock.done()) {
-                    if (!Display.getDefault().readAndDispatch()) {
-                        Display.getDefault().sleep();
-                    }
-                }
+               if (Display.getCurrent() == null) {
+                  SwingUtilities.invokeAndWait(run);
+               }
+               else {
+                  throw new InterruptedException("Synchronous invokation is not possible from display's thread.");
+//                  RunnableLock lock = new RunnableLock(run);
+//                  SwingUtilities.invokeLater(lock);
+//                  while (!lock.done()) {
+//                      // Attention: By default is it not possible to execute
+//                      // synchronous messages between SWT and Swing Thread.
+//                      // Also a manual lock with Object#wait() and
+//                      // Object#notify() causes a deadlock on Mac OS.
+//                      // The only solution is to keep the event handling alive
+//                      // in the SWT thread while it waits for the Swing thread.
+//                      if (!Display.getDefault().readAndDispatch()) {
+//                          Display.getDefault().sleep();
+//                      }
+//                  }
+               }
             }
         }
     }
     
+    /**
+     * Helper class that is used to determine when the wrapped
+     * {@link Runnable} is completely executed.
+     * @author Martin Hentschel
+     */
     private static class RunnableLock implements Runnable {
+        /**
+         * The child {@link Runnable} to execute.
+         */
         private Runnable run;
         
-        private RunnableLock(Runnable run) {
+        /**
+         * Constructor.
+         * @param run The child {@link Runnable} to execute.
+         */
+        public RunnableLock(Runnable run) {
             super();
             this.run = run;
         }
 
+        /**
+         * Checks if the execution is completed.
+         * @return {@code true} execution completed, {@code false} still in execution or execution was not started.
+         */
         public boolean done() {
             return run == null;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void run() {
             if (run != null) {

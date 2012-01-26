@@ -12,9 +12,7 @@ public class StartKeYHandler extends AbstractSaveExecutionHandler {
      */
     @Override
     protected Object doExecute(ExecutionEvent event) throws Exception {
-        System.out.println("### START KEY ###");
-        KeYUtil.openMainWindow();
-        System.out.println("### END KEY ###");
+        KeYUtil.openMainWindowAsync();
         return null;
     }
 }
