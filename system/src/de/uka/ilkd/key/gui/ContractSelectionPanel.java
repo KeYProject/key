@@ -116,7 +116,7 @@ class ContractSelectionPanel extends JPanel {
 		//set border
 		TitledBorder border = new TitledBorder(
 				BorderFactory.createEtchedBorder(),
-                                contract.getName());
+                                contract.getDisplayName());
 
                 Font borderFont = border.getTitleFont();
                 if (borderFont == null) { // MS Windows issues

@@ -323,7 +323,7 @@ public final class DependencyContractImpl implements DependencyContract {
 
     @Override
     public String getDisplayName() {
-	return getName();
+        return ContractFactory.generateDisplayName(baseName, id);
     }
 
 

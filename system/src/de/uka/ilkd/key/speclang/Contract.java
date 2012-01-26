@@ -120,8 +120,7 @@ public interface Contract extends SpecificationElement {
     
     
     /**
-     * Returns the name of the contract type, for instance
-     * "" for an JML normal_behavior contract.
+     * Returns technical name for the contract type.
      */
     public String getTypeName();
 }
