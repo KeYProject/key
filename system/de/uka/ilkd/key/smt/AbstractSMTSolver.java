@@ -13,6 +13,7 @@ import java.io.*;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.regex.Matcher;
 
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
@@ -67,8 +68,10 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
     public SolverSession getSession(){return session;}
     
     private boolean useForMultipleRule = true;
-    
-    private String   executionCommand = getDefaultExecutionCommand();
+
+    private String command;
+
+    private String parameters;
     
     
     
@@ -80,12 +83,10 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
     /**
      * Get the command for executing the external prover.
      * This is a hardcoded default value. It might be overridden by user settings
-     * @param filename the location, where the file is stored.
-     * @param formula the formula, that was created by the translator
-     * @return Array of Strings, that can be used for executing an external decider.
      */
-    protected abstract String getExecutionCommand(String filename,
-	    				            String formula);
+ 
+    public abstract String getDefaultCommand();
+    public abstract String getDefaultParameters();
   
     public SMTTranslator getTranslator(Services services) {
 	try{
@@ -103,17 +104,15 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
     }
 
     
-    private String getFinalExecutionCommand(String filename, String formula) {
-	//get the Command from user settings
-	String toReturn = ProofSettings.DEFAULT_SETTINGS.getSMTSettings().getExecutionCommand(this);
-	if (toReturn == null || toReturn.length() == 0) {
-	    toReturn = this.getExecutionCommand(filename, formula);
-	} else {
-	    //replace the placeholder with filename and fomula
-	    toReturn = toReturn.replaceAll("%f", filename);
-	    toReturn = toReturn.replaceAll("%p", formula);
-	}
-	return toReturn;
+    private String[] getFinalSolverParameters(String filename, String formula) {
+
+	String toReturn = getParameters();
+	 // replace the placeholder with filename and fomula
+	
+	 toReturn = toReturn.replaceAll("%f",Matcher.quoteReplacement(filename));
+	 toReturn = toReturn.replaceAll("%p", formula);	
+	 return toReturn.split(" ");
+	
     }
     
    
@@ -217,7 +216,7 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
 
 
     
-    private String translateToCommand(String formula, Services services) throws IOException{
+    private String[] translateToCommand(String formula, Services services) throws IOException{
 	final File loc;
 	try {
 	    //store the translation to a file                                
@@ -229,13 +228,21 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
 	    io.initCause(e);
 	    throw io;
 	} 
+	
+	String pars [] = this.getFinalSolverParameters(loc.getAbsolutePath(), formula);
+	String result [] = new String[pars.length+1];
+	for(int i=0; i < result.length; i++){
+	result[i] = i==0? getCommand() : pars[i-1];
+	}
+
 
 	//get the commands for execution
-	return this.getFinalExecutionCommand(loc.getAbsolutePath(), formula);
+	return result;
+	
     }
     
 
-    private String translateToCommand(Term term, Services services) throws IllegalFormulaException, IOException {
+    private String[] translateToCommand(Term term, Services services) throws IllegalFormulaException, IOException {
 	
 	SMTTranslator trans = this.getTranslator(services);
 	instantiateTaclets(trans);
@@ -270,11 +277,7 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
     
     public static boolean isInstalled(String cmd){
 	    
-	    int first = cmd.indexOf(" ");
-	    if(first >= 0){
-		cmd = cmd.substring(0, first);
-	    }
-	    
+    
 	    if(checkEnvVariable(cmd)){
 		return true;
 	    } else{
@@ -291,7 +294,7 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
      */
     public boolean isInstalled(boolean recheck) {
 	if (recheck | !installwaschecked) {
-	    String cmd = getExecutionCommand();
+	    String cmd = getCommand();
 	    isinstalled = isInstalled(cmd); 
 	    if(isinstalled){
 		 installwaschecked = true;		      
@@ -309,13 +312,7 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
 	    + File.separator + "ornot.key";
     }
     
-    /**
-     * get the hard coded execution command from this solver.
-     * The filename od a problem is indicated by %f, the problem itsself with %p
-     */
-    public String getDefaultExecutionCommand() {
-	return this.getExecutionCommand("%f", "%p");
-    }
+
     
     
     
@@ -376,31 +373,24 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
     
     @Override
     public String[] atStart() throws Exception{
-
-	LinkedList<String> list = new LinkedList<String>();
+	String  result []= new String[0];
 	InternResult term = session.nextTerm();
 	//session.addResult(SMTSolverResult.createUnknownResult("",name()),session.currentTerm());
 	if(term != null){
-	    String s;
+	    
 	    if(term.getFormula() != null){
-		s = translateToCommand(term.getFormula(), session.getServices());
+		result = translateToCommand(term.getFormula(), session.getServices());
 	    }else{
-		s = translateToCommand(term.getRealTerm(), session.getServices()); 
+		result = translateToCommand(term.getRealTerm(), session.getServices()); 
 	    }
 	     
 	    
-	    while(s.indexOf(' ')!=-1){
-		int index = s.indexOf(' ');
 
-		list.add(s.substring(0,s.indexOf(' ')));
-		s = s.substring(index+1,s.length());
-	    }
-	    list.add(s);
 
 	    
 	}
 
-	return list.toArray(new String[list.size()]);
+	return result;
     }
     
     @Override
@@ -462,15 +452,28 @@ public abstract class AbstractSMTSolver extends AbstractProcess implements SMTSo
         
     }
 
-
-    public void setExecutionCommand(String s) {
-        
-        executionCommand = s;
+    public void setCommand(String command){
+	this.command = command;
     }
     
-    public String getExecutionCommand(){
-	return executionCommand;
+    public void setParameters(String parameters){
+	this.parameters = parameters;
     }
+
+    public String getCommand() {
+	if(command == null){
+	    return getDefaultCommand();
+	}
+	return command;
+    }
+    
+    public String getParameters() {
+	if(parameters == null){
+	    return getDefaultParameters();
+	}
+	return parameters;
+    }
+
     
 
 

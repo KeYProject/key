@@ -23,14 +23,16 @@ public final class Z3Solver extends AbstractSMTSolver {
     
     
     
-    @Override
-    protected String getExecutionCommand(String filename, String formula) {
 
-	//String toReturn = "z3 -smt " + filename;
-	//The following is create a model if possible
-	String toReturn = "z3 -smt -m " + filename;
-	
-	return toReturn;
+    
+    @Override
+    public String getDefaultCommand() {
+        return "z3";
+    }
+    
+    @Override
+    public String getDefaultParameters() {
+        return "-smt -m %f";
     }
     
     

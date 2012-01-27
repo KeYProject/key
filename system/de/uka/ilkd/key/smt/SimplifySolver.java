@@ -24,13 +24,18 @@ public final class SimplifySolver extends AbstractSMTSolver {
     public SMTTranslator getTranslator(Services services) {
 	return new SimplifyTranslator(services);
     }
+
     
     @Override
-    protected String getExecutionCommand(String filename, String formula) {
+    public String getDefaultParameters() {
 
-	String toReturn = "simplify " + filename;
-
-	return toReturn;
+        return "%f";
+    }
+    
+    @Override
+    public String getDefaultCommand() {
+        
+        return "simplify";
     }
 
     

@@ -20,15 +20,19 @@ public class CVC3Solver extends AbstractSMTSolver {
     
 
 
+
+    
     @Override
-    protected String getExecutionCommand(String filename, String formula) {
-	//String toReturn = new String[4];
-
-//	String toReturn = "cvc3 -lang smt " + filename;
-	String toReturn = "cvc3 -lang smt +model " + filename;
-
-	return toReturn;
+    public String getDefaultCommand() {
+        
+        return "cvc3";
     }
+    
+    @Override
+    public String getDefaultParameters() {
+        return " -lang smt +model %f";
+    }
+    
 
     
 

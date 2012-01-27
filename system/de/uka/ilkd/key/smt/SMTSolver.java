@@ -57,9 +57,14 @@ public interface SMTSolver extends de.uka.ilkd.key.smt.launcher.Process {
     /**
      * @return the command used for execution of the programm on default
      */
-    public String getDefaultExecutionCommand();
+    public String getDefaultCommand();
     
-    public String getExecutionCommand();
+    public String getDefaultParameters();
+    
+    public String getParameters();
+    
+    public String getCommand();
+
     
     public boolean useForMultipleRule();
     

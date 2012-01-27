@@ -19,14 +19,16 @@ public final class YicesSolver extends AbstractSMTSolver {
     }
     
 
+
+    
     @Override
-    protected String getExecutionCommand(String filename, String formula) {
-
-	//String toReturn = "yices -tc -smt " + filename;
-	//The following command tells yices to return a model if possible 
-	String toReturn = "yices -tc -e -smt " + filename;
-
-	return toReturn;
+    public String getDefaultParameters() {
+        return  "-tc -e -smt %f";
+    }
+    
+    @Override
+    public String getDefaultCommand() {
+        return "yices";
     }
 
     

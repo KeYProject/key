@@ -47,8 +47,7 @@ public class SMTSettings implements Settings {
     
     private static final String PROGRESS_DIALOG_MODE = "[DecisionProcedure]pd_mode";
 
-    
-    /**@see {@link de.uka.ilkd.key.smt.SmtLibTranslatorWeaker} */
+
     private static final String WEAKENSMTTRANSLATION = "[DecisionProcedure]WeakenSMTTranslation";
 
     /** the list of registered SettingListener */
@@ -74,13 +73,11 @@ public class SMTSettings implements Settings {
     private int timeout = 60;
     
     private static SMTSettings instance;
-    
-    private static String EXECSTR = "[DecisionProcedure]Exec";
-    
-    /** the string separating different solver-command values. */
-    private static final String execSeperator1 = ":"; 
-    /** The String separating solvernames from commands in the settingsfile */
-    private static final String execSeperator2 = "="; 
+
+    private static String PARAMETERS = "[DecisionProcedure]Parameters";
+    private static String COMMAND = "[DecisionProcedure]Command";
+
+
     
     /** the string separating different solvers
       */
@@ -141,7 +138,7 @@ public class SMTSettings implements Settings {
     /**
      * retrieves the rule of the specified name or returns <code>null</code> if
      * no such rule exists
-     * @param ruleName the String unambiguously specifying a rule 
+     * @param name the String unambiguously specifying a rule 
      * @return the found SMTRule or <code>null</code> 
      */
     public SMTRule findRuleByName(String name){
@@ -248,6 +245,9 @@ public class SMTSettings implements Settings {
     private final static String HASH      = "#hash";
     
     private String decode(String s){
+	if(s == null || s.isEmpty()){
+	    return null;
+	}
 	s = s.replaceAll(EQUALITY, "=");
 	s = s.replaceAll(BACKSLASH, "\\\\");
 	s = s.replaceAll(COLON, ":");
@@ -257,6 +257,9 @@ public class SMTSettings implements Settings {
     }
     
     private String encode(String s){
+	if(s == null || s.isEmpty()){
+	    return "";
+	}
 	// # must be replaced first
 	s = s.replaceAll("#",HASH);
 	s = s.replaceAll("\\\\",BACKSLASH);
@@ -329,21 +332,13 @@ public class SMTSettings implements Settings {
      * @param props
      */
     private void readExecutionString(Properties props) {
-	String allCommands = props.getProperty(EXECSTR);
-	//all value pairs are stored separated by a |
-	if (allCommands != null) {
-	    String[] valuepairs = allCommands.split(execSeperator1);
-	    for (String s : valuepairs) {
-		String[] vals = s.split(execSeperator2);
-		if (vals.length == 2) {
-		    AbstractSMTSolver solver = findSolverByName(vals[0]);
-		    if(solver != null){
-			setExecutionCommand(solver,decode(vals[1]));
-			solver.isInstalled(true);
-		    }
-		}
-	    }
-	}
+	for (AbstractSMTSolver solver : getSolvers()) {
+	     
+	     String command = decode(props.getProperty(COMMAND+"_"+solver.name()));
+	     String parameters = decode(props.getProperty(PARAMETERS+"_"+solver.name()));
+	     solver.setCommand(command);
+	     solver.setParameters(parameters);
+        }	
     }
     
     
@@ -371,22 +366,13 @@ public class SMTSettings implements Settings {
      * @param prop
      */
     private void writeExecutionString(Properties prop) {
-	String toStore = "";
 	for (AbstractSMTSolver solver : getSolvers()) {
 	     
-	     String comm = encode(solver.getExecutionCommand());
-	    	if (comm == null) {
-			comm = "";
-	    	}
-	    	toStore = toStore + solver.name() + execSeperator2 + comm + execSeperator1;
-	    }
-	
-	//remove the las two || again
-	if (toStore.length() >= execSeperator1.length()){
-	    //if the program comes here, a the end ad extra || was added.
-	    toStore = toStore.substring(0, toStore.length()-execSeperator1.length());
-	}
-	prop.setProperty(EXECSTR, toStore);
+	     String command = encode(solver.getCommand());
+	     String parameters = encode(solver.getParameters());
+	     prop.setProperty(COMMAND+"_"+solver.name(),command);
+	     prop.setProperty(PARAMETERS+"_"+solver.name(),parameters);
+       }	
     }
     
     /**
@@ -409,23 +395,9 @@ public class SMTSettings implements Settings {
     
 
     
-    /**
-     * Set a execution command for a certain solver.
-     * @param s the solver, which uses this command.
-     * @param command the command to use
-     */
-    public void setExecutionCommand(AbstractSMTSolver s, String command) {
-	s.setExecutionCommand(command);
-    }
+
     
-    /**
-     * get the execution command for a certain rule.
-     * @param r the rule
-     * @return the execution command
-     */
-    public String getExecutionCommand(AbstractSMTSolver solver) {
-	return solver.getExecutionCommand();
-    }
+
     
 
     public boolean getMultipleUse(AbstractSMTSolver solver){
@@ -500,15 +472,13 @@ public class SMTSettings implements Settings {
     
     /**
      * returns true, if a created problem file should be saved.
-     * @return
      */
     public boolean getSaveFile() {
 	return this.saveFile;
     }
     
     private boolean showSMTResDialog = false;
-    
-    /**@see {@link de.uka.ilkd.key.smt.SmtLibTranslatorWeaker} */
+
     public boolean weakenSMTTranslation = false;
     
     public void setSMTResDialog(boolean b){
