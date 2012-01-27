@@ -36,9 +36,9 @@
       </command>
       <command
             categoryId="org.key_project.sed.external.key.starter.ui.commands.category"
-            description="Loads the selected Java projects in KeY."
+            description="Loads the selected resource in KeY."
             id="org.key_project.sed.external.key.starter.ui.commands.loadResourceCommand"
-            name="Load Project in KeY">
+            name="Load in KeY">
       </command>
       <command
             categoryId="org.key_project.sed.external.key.starter.ui.commands.category"
@@ -88,6 +88,15 @@
                   <instanceof
                         value="org.eclipse.jdt.core.IJavaProject">
                   </instanceof>
+                  <and>
+                     <instanceof
+                           value="org.eclipse.core.resources.IFile">
+                     </instanceof>
+                     <test
+                           property="org.eclipse.core.resources.extension"
+                           value="key">
+                     </test>
+                  </and>
                </or>
             </iterate>
          </enabledWhen>
@@ -187,7 +196,7 @@
                   commandId="org.key_project.sed.external.key.starter.ui.commands.loadResourceCommand"
                   icon="icons/logo16.gif"
                   id="org.key_project.sed.external.key.starter.ui.commands.loadResourceCommand"
-                  label="Load Project in KeY"
+                  label="Load in KeY"
                   mnemonic="L"
                   style="push">
             </command>
@@ -303,6 +312,29 @@
                      </with>
                   </and>
                </or>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="org.key_project.sed.external.key.starter.ui.commands.loadResourceCommand"
+               icon="icons/logo16.gif"
+               id="org.key_project.sed.external.key.starter.ui.commands.loadResourceCommand.file"
+               label="Load File in KeY"
+               mnemonic="L"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <iterate
+                     operator="and">
+                  <and>
+                     <instanceof
+                           value="org.eclipse.core.resources.IFile">
+                     </instanceof>
+                     <test
+                           property="org.eclipse.core.resources.extension"
+                           value="key">
+                     </test>
+                  </and>
+               </iterate>
             </visibleWhen>
          </command>
       </menuContribution>

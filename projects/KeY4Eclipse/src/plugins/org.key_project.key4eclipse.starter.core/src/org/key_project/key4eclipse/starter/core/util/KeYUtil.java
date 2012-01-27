@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.swing.JOptionPane;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Assert;
@@ -19,6 +20,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.key_project.key4eclipse.starter.core.job.AbstractKeYMainWindowJob;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
+import org.key_project.key4eclipse.util.eclipse.ResourceUtil;
 import org.key_project.key4eclipse.util.java.SwingUtil;
 import org.key_project.key4eclipse.util.java.thread.AbstractRunnableWithException;
 import org.key_project.key4eclipse.util.java.thread.AbstractRunnableWithResult;
@@ -142,17 +144,27 @@ public final class KeYUtil {
      */
     public static void load(IResource locationToLoad) throws Exception {
         if (locationToLoad != null) {
-            // Make sure that the location is contained in a Java project
-            IProject project = locationToLoad.getProject();
-            Assert.isTrue(JDTUtil.isJavaProject(locationToLoad.getProject()), "The project \"" + project + "\" is no Java project.");
-            // Get source paths from class path
-            List<File> sourcePaths = JDTUtil.getSourceLocations(project);
-            Assert.isTrue(1 == sourcePaths.size(), "Multiple source paths are not supported.");
-            // Get KeY project settings
-            final File bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
-            final List<File> classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
-            // Get local file for the eclipse resource
-            final File location = sourcePaths.get(0);
+            final File location;
+            final File bootClassPath;
+            final List<File> classPaths;
+            if (locationToLoad instanceof IFile) {
+                location = ResourceUtil.getLocation(locationToLoad);
+                bootClassPath = null;
+                classPaths = null;
+            }
+            else {
+                // Make sure that the location is contained in a Java project
+                IProject project = locationToLoad.getProject();
+                Assert.isTrue(JDTUtil.isJavaProject(locationToLoad.getProject()), "The project \"" + project + "\" is no Java project.");
+                // Get source paths from class path
+                List<File> sourcePaths = JDTUtil.getSourceLocations(project);
+                Assert.isTrue(1 == sourcePaths.size(), "Multiple source paths are not supported.");
+                // Get KeY project settings
+                bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
+                classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
+                // Get local file for the eclipse resource
+                location = sourcePaths.get(0);
+            }
             Assert.isNotNull(location, "The resource \"" + locationToLoad + "\" is not local.");
             IRunnableWithException run = new AbstractRunnableWithException() {
                 @Override
