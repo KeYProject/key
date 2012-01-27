@@ -109,6 +109,15 @@ public class Namespace implements java.io.Serializable {
         }
     }
     
+    public void remove(Name name){
+    	if(symbols != null && symbols.containsKey(name)){
+    		symbols.remove(name);
+    	}
+       	if(protocol != null && protocol.containsKey(name)){
+    		protocol.remove(name);
+    	}
+    }
+    
     /** Adds the object <code>sym</code> to this namespace. 
      * Throws a runtime exception if an object with the same name is 
      * already there. */

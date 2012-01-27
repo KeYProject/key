@@ -119,6 +119,9 @@ public class JoinProcessor implements Runnable{
 
     
     private Goal hide(Goal goal){
+    	if(partner.getFormulaForHiding() == null){
+    		return goal;
+    	}
         int index = goal.sequent().formulaNumberInSequent(false,partner.getFormulaForHiding());
         PosInOccurrence pio = PosInOccurrence.findInSequent(goal.sequent(),
                 index, PosInTerm.TOP_LEVEL);

@@ -722,6 +722,7 @@ public abstract class TacletApp implements RuleApp {
 	    final SchemaVariable sv = svIt.next();
 	    if(sv instanceof SkolemTermSV) {
 		final Term inst = (Term) insts.getInstantiation(sv);
+		
 		services.getNamespaces().functions().addSafely(inst.op());
 	    }
 	}

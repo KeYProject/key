@@ -51,7 +51,9 @@ public class ProspectivePartner {
         
         public void setCommonParent(Node commonParent) {
             this.commonParent = commonParent;
+            if(commonParent.getAppliedRuleApp() != null &&  commonParent.getAppliedRuleApp().posInOccurrence() != null){
             setFormulaForHiding(commonParent.getAppliedRuleApp().posInOccurrence().constrainedFormula());
+            }
         }
         
         private void setFormulaForHiding(SequentFormula formulaForHiding) {
