@@ -261,7 +261,8 @@ public class TemporarySettings extends Settings {
 				"Specify the start command for an external procedure in such a way that it can be executed " +
 				"to solve a problem file. Feel free to use any parameter to finetune the program.\n\n" +
 				"Use %f as placeholder for the filename containing the problemdescription.\n\n" +
-				"Use %p as placeholder for the problem directly. This should be needed in special cases only.";
+				"Use %p as placeholder for the problem directly. This should be needed in special cases only.\n\n"+
+                                "Please do not forget to specify the file extension, e.g. solverName.exe";
 		        }
 	        },
 	        
