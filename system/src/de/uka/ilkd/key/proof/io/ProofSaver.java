@@ -265,21 +265,13 @@ public class ProofSaver {
                                        .getJustification(appliedRuleApp, 
                                                          proof.getServices());
             
-            if(ruleJusti instanceof RuleJustificationBySpec) {
-                RuleJustificationBySpec ruleJustiBySpec = (RuleJustificationBySpec) ruleJusti;
-                tree.append(" (contract \"");
-                tree.append(ruleJustiBySpec.getSpec().getName());
-                tree.append("\")");
-            } else {
-                // FIXME This is debug code to identify new occurrences of bug #1111. (Remove if that is closed)
-                // In rare cases this branch is taken. We need to be able to
-                // identify them. 
-                tree.append(" (contract \"ERROR-please report to bug #1111; " + 
-                        appliedRuleApp.rule().getClass() + ";"+ ruleJusti +"\")");
-                JOptionPane.showMessageDialog(null, "A known unfixed internal error has occurred. " +
-                		"Your save file will be invalid! Please " +
-                		"submit your save file to bug #1111. Thanks!");
-            }
+            assert ruleJusti instanceof RuleJustificationBySpec : 
+                "Please consult bug #1111 if this fails.";
+            
+            RuleJustificationBySpec ruleJustiBySpec = (RuleJustificationBySpec) ruleJusti;
+            tree.append(" (contract \"");
+            tree.append(ruleJustiBySpec.getSpec().getName());
+            tree.append("\")");
         }
 
         tree.append(")\n");
