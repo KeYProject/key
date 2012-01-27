@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -1116,9 +1117,13 @@ public final class MainWindow extends JFrame  {
     }
     
     public void loadProblem(File file) {
+        loadProblem(file, null, null);
+    }
+            
+    public void loadProblem(File file, List<File> classPath, File bootClassPath) {
         recentFiles.addRecentFile(file.getAbsolutePath());
         final ProblemLoader pl = 
-            new ProblemLoader(file, this);
+            new ProblemLoader(file, classPath, bootClassPath, this);
         pl.addTaskListener(getUserInterface());
         pl.run();
     }

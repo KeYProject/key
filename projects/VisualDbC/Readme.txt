@@ -112,9 +112,13 @@ http://i12www.ira.uka.de/~klebanov/keywiki/index.cgi?KeYDevelopmentInEclipse
 
 To add the required Eclipse projects follow these steps:
 1. Import the following projects from ../KeY4Eclipse/src/plugins:
-   - org.key_project.key4eclipse.feature
    - org.key_project.key4eclipse
+   - org.key_project.key4eclipse.bugfix_mac_os
+   - org.key_project.key4eclipse.feature
+   - org.key_project.key4eclipse.starter.core
+   - org.key_project.key4eclipse.starter.core.test
    - org.key_project.key4eclipse.util
+   - org.key_project.key4eclipse.util.test
    - org.key_project.swtbot.swing
    Use the import wizard "Existing Projects into Workspace" for the import.
 2. Follow the steps in project file org.key_project.key4eclipse/Readme.txt

@@ -15,6 +15,7 @@ import java.io.FileNotFoundException;
 import java.io.StringReader;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Stack;
 import java.util.Vector;
 
@@ -76,6 +77,8 @@ import de.uka.ilkd.key.util.ProgressMonitor;
 public final class ProblemLoader implements Runnable {
 
     private File file;
+    private List<File> classPath;
+    private File bootClassPath;
     private MainWindow main;    
     private KeYMediator mediator;
 
@@ -104,11 +107,17 @@ public final class ProblemLoader implements Runnable {
     private SwingWorker worker;
     private ProgressMonitor pm;
     private ProverTaskListener ptl;
-    
+
     public ProblemLoader(File file, MainWindow main) {
+        this(file, null, null, main);
+    }
+    
+    public ProblemLoader(File file, List<File> classPath, File bootClassPath, MainWindow main) {
         this.main = main;
         this.mediator  = main.getMediator();        
         this.file = file;
+        this.classPath = classPath;
+        this.bootClassPath = bootClassPath;
         this.exceptionHandler = mediator.getExceptionHandler();
 
         addProgressMonitor(main.getUserInterface());
@@ -197,15 +206,20 @@ public final class ProblemLoader implements Runnable {
      */
     public EnvInput createEnvInput(File file) 
     throws FileNotFoundException {                
+        return createEnvInput(file, null, null);
+    }
+    
+    public EnvInput createEnvInput(File file, List<File> classPath, File bootClassPath) 
+    throws FileNotFoundException {                
         
         final String filename = file.getName();
         
         if (filename.endsWith(".java")){ 
             // java file, probably enriched by specifications
             if(file.getParentFile() == null) {
-                return new SLEnvInput(".");
+                return new SLEnvInput(".", classPath, bootClassPath);
             } else {
-                return new SLEnvInput(file.getParentFile().getAbsolutePath());
+                return new SLEnvInput(file.getParentFile().getAbsolutePath(), classPath, bootClassPath);
             }            
         } else if (filename.endsWith(".key") || 
                 filename.endsWith(".proof")) {
@@ -215,7 +229,7 @@ public final class ProblemLoader implements Runnable {
         } else if (file.isDirectory()){ 
             // directory containing java sources, probably enriched 
             // by specifications
-            return new SLEnvInput(file.getPath());
+            return new SLEnvInput(file.getPath(), classPath, bootClassPath);
         } else {
             if (filename.lastIndexOf('.') != -1) {
                 throw new IllegalArgumentException
@@ -237,7 +251,7 @@ public final class ProblemLoader implements Runnable {
        ProofOblInput po = null;
        try{
            try{
-               envInput = createEnvInput(file);
+               envInput = createEnvInput(file, classPath, bootClassPath);
                init = main.createProblemInitializer(); 
                InitConfig initConfig = init.prepare(envInput);
 

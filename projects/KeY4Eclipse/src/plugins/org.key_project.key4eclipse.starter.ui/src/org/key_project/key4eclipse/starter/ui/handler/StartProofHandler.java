@@ -10,7 +10,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.handlers.HandlerUtil;
-import org.key_project.key4eclipse.util.key.KeYUtil;
+import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 
 /**
  * Handler that starts the KeY UI via {@link KeYUtil#openMainWindow()}.

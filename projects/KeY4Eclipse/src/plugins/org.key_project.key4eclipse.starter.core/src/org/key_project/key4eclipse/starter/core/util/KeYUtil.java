@@ -1,4 +1,4 @@
-package org.key_project.key4eclipse.util.key;
+package org.key_project.key4eclipse.starter.core.util;
 
 import java.awt.Component;
 import java.io.File;
@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.swing.JOptionPane;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -16,9 +17,8 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
-import org.key_project.key4eclipse.util.Activator;
-import org.key_project.key4eclipse.util.eclipse.Logger;
-import org.key_project.key4eclipse.util.eclipse.job.AbstractKeYMainWindowJob;
+import org.key_project.key4eclipse.starter.core.job.AbstractKeYMainWindowJob;
+import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.util.java.SwingUtil;
 import org.key_project.key4eclipse.util.java.thread.AbstractRunnableWithException;
 import org.key_project.key4eclipse.util.java.thread.AbstractRunnableWithResult;
@@ -61,7 +61,6 @@ import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
  * </p>
  * @author Martin Hentschel
  */
-// TODO: Change path to config files via PathConfig
 public final class KeYUtil {
     /**
      * Forbid instances.
@@ -88,7 +87,7 @@ public final class KeYUtil {
                     return Status.OK_STATUS;
                 } 
                 catch (Exception e) {
-                    return new Logger(Activator.getDefault(), Activator.PLUGIN_ID).createErrorStatus(e);
+                    return LogUtil.getLogger().createErrorStatus(e);
                 }
             }
         }.schedule();
@@ -128,7 +127,7 @@ public final class KeYUtil {
                     return Status.OK_STATUS;
                 } 
                 catch (Exception e) {
-                    return new Logger(Activator.getDefault(), Activator.PLUGIN_ID).createErrorStatus(e);
+                    return LogUtil.getLogger().createErrorStatus(e);
                 }
             }
         }.schedule();
@@ -144,10 +143,14 @@ public final class KeYUtil {
     public static void load(IResource locationToLoad) throws Exception {
         if (locationToLoad != null) {
             // Make sure that the location is contained in a Java project
-            Assert.isTrue(JDTUtil.isJavaProject(locationToLoad.getProject()), "The project \"" + locationToLoad.getProject() + "\" is no Java project.");
+            IProject project = locationToLoad.getProject();
+            Assert.isTrue(JDTUtil.isJavaProject(locationToLoad.getProject()), "The project \"" + project + "\" is no Java project.");
             // Get source paths from class path
-            List<File> sourcePaths = JDTUtil.getSourceLocations(locationToLoad.getProject());
+            List<File> sourcePaths = JDTUtil.getSourceLocations(project);
             Assert.isTrue(1 == sourcePaths.size(), "Multiple source paths are not supported.");
+            // Get KeY project settings
+            final File bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
+            final List<File> classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
             // Get local file for the eclipse resource
             final File location = sourcePaths.get(0);
             Assert.isNotNull(location, "The resource \"" + locationToLoad + "\" is not local.");
@@ -167,7 +170,7 @@ public final class KeYUtil {
                         }
                         else {
                             // Load local file
-                            MainWindow.getInstance().loadProblem(location);
+                            MainWindow.getInstance().loadProblem(location, classPaths, bootClassPath);
                         }
                     }
                     catch (Exception e) {
@@ -238,7 +241,7 @@ public final class KeYUtil {
                     return Status.OK_STATUS;
                 } 
                 catch (Exception e) {
-                    return new Logger(Activator.getDefault(), Activator.PLUGIN_ID).createErrorStatus(e);
+                    return LogUtil.getLogger().createErrorStatus(e);
                 }
             }
         }.schedule();
@@ -254,10 +257,14 @@ public final class KeYUtil {
             // make sure that the method has a resource
             Assert.isNotNull(method.getResource(), "Method \"" + method + "\" is not part of a workspace resource.");
             // Make sure that the location is contained in a Java project
-            Assert.isTrue(JDTUtil.isJavaProject(method.getResource().getProject()), " The project \"" + method.getResource().getProject() + "\" is no Java project.");
+            IProject project = method.getResource().getProject();
+            Assert.isTrue(JDTUtil.isJavaProject(project), " The project \"" + project + "\" is no Java project.");
             // Get source paths from class path
-            List<File> sourcePaths = JDTUtil.getSourceLocations(method.getResource().getProject());
+            List<File> sourcePaths = JDTUtil.getSourceLocations(project);
             Assert.isTrue(1 == sourcePaths.size(), "Multiple source paths are not supported.");
+            // Get KeY project settings
+            final File bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
+            final List<File> classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
             // Get local file for the eclipse resource
             final File location = sourcePaths.get(0);
             Assert.isNotNull(location, "The resource \"" + method.getResource() + "\" is not local.");
@@ -276,7 +283,7 @@ public final class KeYUtil {
                             MainWindow main = MainWindow.getInstance();
                             ProblemLoader loader = new ProblemLoader(location, main);
                             main.getRecentFiles().addRecentFile(location.getAbsolutePath());
-                            EnvInput envInput = loader.createEnvInput(location);
+                            EnvInput envInput = loader.createEnvInput(location, classPaths, bootClassPath);
                             ProblemInitializer init = main.createProblemInitializer();
                             initConfig = init.prepare(envInput);
                         }

@@ -17,6 +17,11 @@ package org.key_project.key4eclipse.util.java;
  */
 public final class StringUtil {
    /**
+    * Constant for an empty string.
+    */
+   public static final String EMPTY_STRING = "";
+
+   /**
     * Forbid instances by this private constructor.
     */
    private StringUtil() {

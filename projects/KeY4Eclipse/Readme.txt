@@ -27,14 +27,23 @@ It provides the following file structure:
 - org.key_project.key4eclipse.feature 
   // Provides the KeY code and utilities without any Eclipse UI integrations.
   - org.key_project.key4eclipse // KeY code
+  - org.key_project.key4eclipse.starter.core 
+    // KeY specific settings and utilities for Eclipse based plug-ins.
   - org.key_project.key4eclipse.util // Utility code reused in other projects
 - org.key_project.key4eclipse.starter.feature
   // Provides a simple UI integration of KeY into Eclipse
   - org.key_project.key4eclipse.starter.ui // UI integration of KeY
   - org.key_project.key4eclipse.starter.product.ui // Product and branding
+- org.key_project.key4eclipse.bugfix_mac_os
+  // Contains all required plug-ins for this product because some of them are 
+  // missing in the Mac OS features provided by Eclipse.
 - <tests>
   - org.key_project.swtbot.swing // Extends SWTBot for Swing
   - org.key_project.key4eclipse.all.test // Allows to execute all tests at once
+  - org.key_project.key4eclipse.starter.core.test 
+    // Tests for org.key_project.key4eclipse.starter.core
+  - org.key_project.key4eclipse.starter.ui.test
+    // Tests for org.key_project.key4eclipse.starter.ui
   - org.key_project.key4eclipse.test // Tests for org.key_project.key4eclipse
   - org.key_project.key4eclipse.util.test 
     // Tests for org.key_project.key4eclipse.util

@@ -1,6 +1,7 @@
-package org.key_project.key4eclipse.util.eclipse.job;
+package org.key_project.key4eclipse.starter.core.job;
 
 import org.eclipse.core.runtime.jobs.Job;
+import org.key_project.key4eclipse.util.eclipse.job.ObjectchedulingRule;
 
 import de.uka.ilkd.key.gui.MainWindow;
 

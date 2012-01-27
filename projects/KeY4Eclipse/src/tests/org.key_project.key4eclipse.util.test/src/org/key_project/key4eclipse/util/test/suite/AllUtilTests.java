@@ -22,6 +22,7 @@ import org.key_project.key4eclipse.util.test.testcase.JDTUtilTest;
 import org.key_project.key4eclipse.util.test.testcase.LoggerTest;
 import org.key_project.key4eclipse.util.test.testcase.ObjectUtilTest;
 import org.key_project.key4eclipse.util.test.testcase.ResourceUtilTest;
+import org.key_project.key4eclipse.util.test.testcase.SWTUtilTest;
 import org.key_project.key4eclipse.util.test.testcase.StringUtilTest;
 
 /**
@@ -40,7 +41,8 @@ import org.key_project.key4eclipse.util.test.testcase.StringUtilTest;
     LoggerTest.class,
     ObjectUtilTest.class,
     ResourceUtilTest.class,
-    StringUtilTest.class
+    StringUtilTest.class,
+    SWTUtilTest.class
 })
 public class AllUtilTests {
 }

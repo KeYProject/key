@@ -5,16 +5,17 @@ Bundle-SymbolicName: org.key_project.key4eclipse.util
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.key_project.key4eclipse.util.Activator
 Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.ui,
  org.eclipse.core.resources;bundle-version="3.6.1",
+ org.eclipse.ui,
+ org.eclipse.ui.ide;bundle-version="3.7.0",
  org.eclipse.jdt.core;bundle-version="3.6.2",
- org.key_project.key4eclipse;bundle-version="1.0.0"
+ org.eclipse.jdt.ui;bundle-version="3.7.1"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: KeY Project
 Export-Package: org.key_project.key4eclipse.util.eclipse,
  org.key_project.key4eclipse.util.eclipse.job,
+ org.key_project.key4eclipse.util.eclipse.swt,
  org.key_project.key4eclipse.util.java,
  org.key_project.key4eclipse.util.java.thread,
- org.key_project.key4eclipse.util.jdt,
- org.key_project.key4eclipse.util.key
+ org.key_project.key4eclipse.util.jdt

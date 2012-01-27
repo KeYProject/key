@@ -29,13 +29,13 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.key4eclipse.util.eclipse.ResourceUtil;
 import org.key_project.key4eclipse.util.java.ArrayUtil;
 import org.key_project.key4eclipse.util.java.ObjectUtil;
 import org.key_project.key4eclipse.util.java.SwingUtil;
 import org.key_project.key4eclipse.util.java.thread.AbstractRunnableWithException;
 import org.key_project.key4eclipse.util.java.thread.IRunnableWithException;
-import org.key_project.key4eclipse.util.key.KeYUtil;
 
 import de.hentschel.visualdbc.datasource.key.intern.helper.KeyHacks;
 import de.hentschel.visualdbc.datasource.key.intern.helper.OpenedProof;

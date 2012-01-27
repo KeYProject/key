@@ -15,7 +15,7 @@
    </copyright>
 
    <license url="http://www.key-project.org/download/LICENSE">
-       KeY - INTEGRATED DEDUCTIVE SOFTWARE DESIGN 
+      KeY - INTEGRATED DEDUCTIVE SOFTWARE DESIGN 
             
        Copyright (C) 2001-2010 Universitaet Karlsruhe (TH), Germany 
                                and Chalmers University of Technology, Sweden
@@ -359,6 +359,13 @@
 
    <plugin
          id="org.key_project.key4eclipse.util"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.key_project.key4eclipse.starter.core"
          download-size="0"
          install-size="0"
          version="0.0.0"

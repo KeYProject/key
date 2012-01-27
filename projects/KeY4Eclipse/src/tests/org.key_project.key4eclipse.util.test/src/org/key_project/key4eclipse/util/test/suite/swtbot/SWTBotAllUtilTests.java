@@ -13,7 +13,6 @@ package org.key_project.key4eclipse.util.test.suite.swtbot;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
-import org.key_project.key4eclipse.util.test.testcase.swtbot.SWTBotKeYUtilTest;
 import org.key_project.key4eclipse.util.test.testcase.swtbot.SWTBotLoggerTest;
 
 /**
@@ -22,7 +21,6 @@ import org.key_project.key4eclipse.util.test.testcase.swtbot.SWTBotLoggerTest;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    SWTBotKeYUtilTest.class,
     SWTBotLoggerTest.class
 })
 public class SWTBotAllUtilTests {

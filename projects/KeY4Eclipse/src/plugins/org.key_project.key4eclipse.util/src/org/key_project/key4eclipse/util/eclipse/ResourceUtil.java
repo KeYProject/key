@@ -14,6 +14,9 @@ package org.key_project.key4eclipse.util.eclipse;
 import java.io.File;
 
 import org.eclipse.core.resources.IResource;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.model.IWorkbenchAdapter;
 
 /**
  * Provides static methods to work with workspace resources.
@@ -37,5 +40,26 @@ public class ResourceUtil {
          location = new File(resource.getLocationURI());
       }
       return location;
+   }
+
+   /**
+    * <p>
+    * Returns the {@link Image} for the given {@link IResource}.
+    * </p>
+    * <p>
+    * <b>Attention: </b> The caller is responsible to dispose the created {@link Image}!
+    * </p>
+    * @param resource The {@link IResource} for that an {@link Image} is needed.
+    * @return The found {@link Image} or {@code null} if no one can be found.
+    */
+   public static Image getImage(IResource resource) {
+      if (resource != null) {
+          IWorkbenchAdapter adapter = (IWorkbenchAdapter)resource.getAdapter(IWorkbenchAdapter.class);
+          ImageDescriptor id = adapter.getImageDescriptor(resource);
+          return id.createImage();
+      }
+      else {
+         return null;
+      }
    }
 }

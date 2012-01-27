@@ -1,7 +1,7 @@
 package org.key_project.key4eclipse.starter.ui.handler;
 
 import org.eclipse.core.commands.ExecutionEvent;
-import org.key_project.key4eclipse.util.key.KeYUtil;
+import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 
 /**
  * Handler that starts the KeY UI via {@link KeYUtil#openMainWindow()}.

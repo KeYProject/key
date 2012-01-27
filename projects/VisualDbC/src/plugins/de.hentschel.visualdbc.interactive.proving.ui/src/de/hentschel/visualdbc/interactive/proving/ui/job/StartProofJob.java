@@ -9,7 +9,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.gmf.runtime.diagram.ui.editparts.ShapeNodeEditPart;
-import org.key_project.key4eclipse.util.eclipse.job.AbstractKeYMainWindowJob;
+import org.key_project.key4eclipse.starter.core.job.AbstractKeYMainWindowJob;
 
 import de.hentschel.visualdbc.dbcmodel.DbcProof;
 import de.hentschel.visualdbc.interactive.proving.ui.job.event.IStartProofJobListener;

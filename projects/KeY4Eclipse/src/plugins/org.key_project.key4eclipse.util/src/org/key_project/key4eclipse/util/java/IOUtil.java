@@ -11,9 +11,19 @@
 
 package org.key_project.key4eclipse.util.java;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+
+import javax.swing.Icon;
+import javax.swing.filechooser.FileSystemView;
+
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.widgets.Display;
+import org.key_project.key4eclipse.util.eclipse.swt.ImageUtil;
 
 /**
  * Provides static methods to work with java IO.
@@ -62,5 +72,31 @@ public final class IOUtil {
             in.close();
          }
       }
+   }
+
+   /**
+    * <p>
+    * Returns the file system icon for the given existing file.
+    * </p>
+    * <p>
+    * <b>Attention: </b> The caller is responsible to dispose the created {@link Image}!
+    * </p>
+    * @param file The file for that the system icon is needed.
+    * @return The file system icon or {@code null} if no existing file is given.
+    */
+   public static Image getFileSystemIcon(File file) {
+       Image image = null;
+       if (file != null && file.exists()) {
+           FileSystemView view = FileSystemView.getFileSystemView();
+           if (view != null) {
+               Icon icon = view.getSystemIcon(file);
+               if (icon != null) {
+                   BufferedImage bufferedImage = ImageUtil.toBufferedImage(icon);
+                   ImageData imageData = ImageUtil.convertToImageData(bufferedImage);
+                   image = new Image(Display.getDefault(), imageData);
+               }
+           }
+       }
+       return image;
    }
 }

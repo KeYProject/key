@@ -1,4 +1,4 @@
-package org.key_project.key4eclipse.util.test.testcase.swtbot;
+package org.key_project.key4eclipse.starter.core.test.testcase.swtbot;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
@@ -14,12 +14,12 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.Signature;
 import org.junit.Test;
+import org.key_project.key4eclipse.starter.core.test.Activator;
+import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.key4eclipse.util.eclipse.BundleUtil;
 import org.key_project.key4eclipse.util.eclipse.ResourceUtil;
 import org.key_project.key4eclipse.util.java.SwingUtil;
 import org.key_project.key4eclipse.util.jdt.JDTUtil;
-import org.key_project.key4eclipse.util.key.KeYUtil;
-import org.key_project.key4eclipse.util.test.Activator;
 import org.key_project.key4eclipse.util.test.util.TestUtilsUtil;
 import org.key_project.swtbot.swing.bot.SwingBot;
 import org.key_project.swtbot.swing.bot.SwingBotJDialog;
