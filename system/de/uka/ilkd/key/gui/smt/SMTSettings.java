@@ -242,14 +242,27 @@ public class SMTSettings implements Settings {
 	return this.timeout;
     }
 
-    private final static String EQUALITY = "#####";
+    private final static String EQUALITY = "#equality";
+    private final static String BACKSLASH = "#backslash";
+    private final static String COLON     = "#colon";
+    private final static String HASH      = "#hash";
     
     private String decode(String s){
-	return s.replaceAll(EQUALITY, "=");
+	s = s.replaceAll(EQUALITY, "=");
+	s = s.replaceAll(BACKSLASH, "\\\\");
+	s = s.replaceAll(COLON, ":");
+	// HASH must be replaced at last
+	s = s.replaceAll(HASH, "#");
+	return s;
     }
     
     private String encode(String s){
-	return s.replaceAll("=", EQUALITY);
+	// # must be replaced first
+	s = s.replaceAll("#",HASH);
+	s = s.replaceAll("\\\\",BACKSLASH);
+	s = s.replaceAll(":",COLON);
+	s = s.replaceAll("=", EQUALITY);
+	return s;
     }
     
 
