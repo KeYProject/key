@@ -81,18 +81,27 @@ import de.hentschel.visualdbc.interactive.proving.ui.util.ProofUtil;
  * @author Martin Hentschel
  */
 public class SWTBotOpenProofCommandTest extends TestCase {
-   LogStartProofJobListener l = new LogStartProofJobListener();
+   /**
+    * Listens for opened interactive proofs and logs the starts internally.
+    */
+   private LogStartProofJobListener startProofListener = new LogStartProofJobListener();
    
+   /**
+    * {@inheritDoc}
+    */
    @Before
    @Override
    public void setUp() throws Exception {
-      StartProofJob.addStartProofJobListener(l);
+      StartProofJob.addStartProofJobListener(startProofListener);
    }
 
+   /**
+    * {@inheritDoc}
+    */
    @After
    @Override
    public void tearDown() throws Exception {
-      StartProofJob.removeStartProofJobListener(l);
+      StartProofJob.removeStartProofJobListener(startProofListener);
    }
 
    /**
@@ -213,7 +222,7 @@ public class SWTBotOpenProofCommandTest extends TestCase {
          SWTBotTreeItem firstItem = TestUtilsUtil.selectInTree(tree, c0EnsuresPostPath);
          SWTBotTreeItem secondItem = TestUtilsUtil.selectInTree(tree, c1EnsuresPostPath);
          tree.select(firstItem, secondItem);
-         openProof(tree);
+         openProof(tree, 2);
          compareOpenProofCalls(model, "EnsuresPost", "EnsuresPost", null);
          // Open proof: PreservesInv on inc
          openProof(tree, incPreservesInvPath);
@@ -370,17 +379,18 @@ public class SWTBotOpenProofCommandTest extends TestCase {
     */
    protected void openProof(SWTBotTree tree, String[] pathToProofElement) {
       TestUtilsUtil.selectInTree(tree, pathToProofElement);
-      openProof(tree);
+      openProof(tree, 1);
    }
 
    /**
     * Opens a proof.
     * @param tree The tree that provides the context menu to open a proof.
+    * @param waitCount The number of started proofs to wait for.
     */
-   protected void openProof(SWTBotTree tree) {
-      int oldCount = l.getFinishCount();
+   protected void openProof(SWTBotTree tree, int waitCount) {
+      int oldCount = startProofListener.getFinishCount();
       tree.contextMenu("Open Proof").click();
-      waitForProofOpening(oldCount);
+      waitForProofOpening(oldCount, waitCount);
    }
    
    /**
@@ -624,7 +634,7 @@ public class SWTBotOpenProofCommandTest extends TestCase {
          compareOpenProofCalls(model, null, "EnsuresPost", null);
          // Open proof: EnsuresPost on c1 and c0
          editor.select(c0EnsuresPost, c1EnsuresPost);
-         openProof(editor);
+         openProof(editor, 2);
          compareOpenProofCalls(model, "EnsuresPost", "EnsuresPost", null);
          // Open proof: PreservesInv on inc
          openProof(editor, incPreservesInv);
@@ -781,25 +791,27 @@ public class SWTBotOpenProofCommandTest extends TestCase {
     */
    protected void openProof(SWTBotGefEditor editor, SWTBotGefEditPart proofEditPart) {
       editor.select(proofEditPart);
-      openProof(editor);
+      openProof(editor, 1);
    }
    
    /**
     * Opens the proof.
     * @param editor The editor to open the proof in.
+    * @param waitCount The number of started proofs to wait for.
     */
-   protected void openProof(SWTBotGefEditor editor) {
-      int oldCount = l.getFinishCount();
+   protected void openProof(SWTBotGefEditor editor, int waitCount) {
+      int oldCount = startProofListener.getFinishCount();
       editor.clickContextMenu("Open Proof");
-      waitForProofOpening(oldCount);
+      waitForProofOpening(oldCount, waitCount);
    }
    
    /**
     * Waits until at least one more proof is opened.
     * @param oldCount The old number of opened proofs.
+    * @param waitCount The number of started proofs to wait for.
     */
-   protected void waitForProofOpening(int oldCount) {
-      while (l.getFinishCount() <= oldCount) {
+   protected void waitForProofOpening(int oldCount, int waitCount) {
+      while (startProofListener.getFinishCount() < oldCount + waitCount) {
          TestUtilsUtil.sleep(100);
       }
    }
