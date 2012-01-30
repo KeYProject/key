@@ -1,5 +1,6 @@
 package org.key_project.key4eclipse.starter.ui.property;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -29,6 +30,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
@@ -80,14 +82,24 @@ public class KeYProjectPropertyPage extends PropertyPage implements IWorkbenchPr
     private TableViewer classPathTableViewer; 
     
     /**
-     * Adds a class path entry from the workspace.
+     * Adds a directory class path entry from the workspace.
      */
     private Button addWorkspaceButton;
     
     /**
-     * Adds an external class path entry.
+     * Adds an external directory class path entry.
      */
     private Button addExternalButton;
+    
+    /**
+     * Adds a file class path entry from the workspace.
+     */
+    private Button addWorkspaceFileButton;
+    
+    /**
+     * Adds an external file class path entry.
+     */
+    private Button addExternalFileButton;
     
     /**
      * Removes all selected class path entries.
@@ -208,11 +220,20 @@ public class KeYProjectPropertyPage extends PropertyPage implements IWorkbenchPr
         classPathButtonComposite.setLayout(createGridLayout(1, true));
         addWorkspaceButton = new Button(classPathButtonComposite, SWT.PUSH);
         addWorkspaceButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        addWorkspaceButton.setText("&Add Workspace");
+        addWorkspaceButton.setText("Add Works&pace");
         addWorkspaceButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 addWorkspaceClassPathEntry();
+            }
+        });
+        addWorkspaceFileButton = new Button(classPathButtonComposite, SWT.PUSH);
+        addWorkspaceFileButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        addWorkspaceFileButton.setText("Add Workspace F&ile");
+        addWorkspaceFileButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                addWorkspaceFileClassPathEntry();
             }
         });
         addExternalButton = new Button(classPathButtonComposite, SWT.PUSH);
@@ -222,6 +243,15 @@ public class KeYProjectPropertyPage extends PropertyPage implements IWorkbenchPr
             @Override
             public void widgetSelected(SelectionEvent e) {
                 addExternalClassPathEntry();
+            }
+        });
+        addExternalFileButton = new Button(classPathButtonComposite, SWT.PUSH);
+        addExternalFileButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        addExternalFileButton.setText("Add Exter&nal File");
+        addExternalFileButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                addExternalFileClassPathEntry();
             }
         });
         removeButton = new Button(classPathButtonComposite, SWT.PUSH);
@@ -381,6 +411,36 @@ public class KeYProjectPropertyPage extends PropertyPage implements IWorkbenchPr
             }
             selectClassPathEntry(newEntry);
         }
+        updateValidState();
+    }
+
+    /**
+     * Opens the dialog to add external file class path entries.
+     */    
+    public void addExternalFileClassPathEntry() {
+        FileDialog dialog = new FileDialog(getShell(), SWT.MULTI);
+        dialog.setText("Select class path file to add");
+        dialog.setFilterExtensions(new String[] {"*.*", "*.jar"});
+        dialog.setFilterIndex(1);
+        dialog.open();
+        String[] files = dialog.getFileNames();
+        String path = dialog.getFilterPath();
+        if (files != null && path != null) {
+            for (String file : files) {
+                KeYClassPathEntry newEntry = new KeYClassPathEntry(KeYClassPathEntryKind.EXTERNAL_IN_FILE_SYSTEM, path + File.separator + file);
+                if (!classPathEntries.contains(newEntry)) {
+                    classPathEntries.add(newEntry);
+                    updateClassPathViewer();
+                }
+                selectClassPathEntry(newEntry);
+            }
+        }
+        updateValidState();
+    }
+
+    public void addWorkspaceFileClassPathEntry() {
+        // TODO Auto-generated method stub
+        
     }
 
     /**
@@ -405,6 +465,7 @@ public class KeYProjectPropertyPage extends PropertyPage implements IWorkbenchPr
             }
             selectClassPathEntries(toSelect);
         }
+        updateValidState();
     }
 
     /**
@@ -580,6 +641,9 @@ public class KeYProjectPropertyPage extends PropertyPage implements IWorkbenchPr
      */
     public void setEnabled(boolean enabled) {
         addWorkspaceButton.setEnabled(enabled);
+        addWorkspaceFileButton.setEnabled(enabled);
+        addExternalButton.setEnabled(enabled);
+        addExternalFileButton.setEnabled(enabled);
         bootClassPathText.setEditable(enabled && !useDefaultBootClassPathButton.getSelection());
         classPathTableViewer.getTable().setEnabled(enabled);
         useDefaultBootClassPathButton.setEnabled(enabled);

@@ -23,6 +23,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.swing.JFrame;
+import javax.swing.UIManager;
 import javax.swing.tree.TreeModel;
 
 import junit.framework.TestCase;
@@ -1341,7 +1342,9 @@ public final class TestKeyUtil {
       SwingBotJMenuBar bar = frame.bot().jMenuBar();
       bar.menu("File").item("Exit").click();
       SwingBotJDialog dialog = frame.bot().jDialog("Exit");
-      dialog.bot().jButton("Ja").clickAndWait();
+      
+      
+      dialog.bot().jButton(UIManager.get("OptionPane.yesButtonText").toString()).clickAndWait();
       frame.bot().waitUntil(Conditions.componentCloses(dialog));
       TestCase.assertFalse(dialog.isOpen());
       frame.bot().waitUntil(Conditions.componentCloses(frame));

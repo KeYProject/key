@@ -332,6 +332,27 @@ public class SwingBot extends SWTBot {
    
    /**
     * Returns a wrapper for the described element.
+    * @param text The text on the {@link JLabel}.
+    * @return A wrapper around a {@link JLabel} with the specified text.
+    */   
+   public SwingBotJLabel jLabel(String text) {
+      return jLabel(text, 0);
+   }
+   
+   /**
+    * Returns a wrapper for the described element.
+    * @param text The text on the {@link JLabel}.
+    * @param index The index of the {@link JLabel}, in case there are multiple buttons with the same text.
+    * @return A wrapper around a {@link JLabel} with the specified index.
+    */      
+   @SuppressWarnings({ "rawtypes", "unchecked" })
+   public SwingBotJLabel jLabel(String text, int index) {
+      Matcher matcher = ComponentMatcherFactory.allOf(ComponentMatcherFactory.componentOfType(JLabel.class), ComponentMatcherFactory.withText(text));
+      return new SwingBotJLabel((JLabel)component(matcher, index));
+   }
+   
+   /**
+    * Returns a wrapper for the described element.
     * @return A wrapper around a {@link JList} with the specified text.
     */   
    public SwingBotJList jList() {

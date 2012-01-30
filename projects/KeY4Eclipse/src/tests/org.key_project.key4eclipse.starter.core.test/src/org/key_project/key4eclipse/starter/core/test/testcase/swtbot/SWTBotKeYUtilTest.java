@@ -49,7 +49,7 @@ public class SWTBotKeYUtilTest extends TestCase {
         // Get and close error dialog
         SwingBotJDialog dialog = new SwingBot().jDialog("Error");
         assertTrue(dialog.isOpen());
-        SwingBotJLabel label = dialog.bot().jLabel();
+        SwingBotJLabel label = dialog.bot().jLabel(exception.toString()); // On Mac OS it is not the first label.
         assertEquals(exception.toString(), label.getText());
         dialog.close();
     }

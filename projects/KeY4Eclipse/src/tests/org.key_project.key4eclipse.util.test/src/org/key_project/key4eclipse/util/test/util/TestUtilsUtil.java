@@ -35,7 +35,9 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.ui.wizards.JavaCapabilityConfigurationPage;
+import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
@@ -46,6 +48,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.ide.IDE;
 import org.key_project.key4eclipse.util.eclipse.Logger;
 import org.key_project.key4eclipse.util.java.thread.AbstractRunnableWithResult;
@@ -278,8 +281,15 @@ public class TestUtilsUtil {
     * @return The opened preference dialog shell.
     */
    public static SWTBotShell openPreferencePage(SWTWorkbenchBot bot, String... preferencePagePath) {
-      // Open preference dialog
-      TestUtilsUtil.menuClick(bot, "Window", "Preferences");
+      // Open preference dialog (Usage of TestUtilsUtil.menuClick(bot, "Window", "Preferences") is not possible because Mac OS has entry in special menu)
+      Display.getDefault().asyncExec(new Runnable() {
+         @Override
+         public void run() {
+            Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+            PreferenceDialog dialog = PreferencesUtil.createPreferenceDialogOn(shell, null, null, null);
+            dialog.open();
+         }
+      });
       // Open preference page
       SWTBotShell shell = bot.shell("Preferences");
       TestUtilsUtil.selectInTree(shell.bot().tree(), preferencePagePath);
