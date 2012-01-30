@@ -2,11 +2,13 @@ package org.key_project.key4eclipse.starter.ui.property;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -43,6 +45,7 @@ import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties.U
 import org.key_project.key4eclipse.starter.ui.provider.KeYClassPathEntryLabelProvider;
 import org.key_project.key4eclipse.starter.ui.util.LogUtil;
 import org.key_project.key4eclipse.util.eclipse.swt.SWTUtil;
+import org.key_project.key4eclipse.util.eclipse.swt.viewer.FileExtensionViewerFilter;
 import org.key_project.key4eclipse.util.java.StringUtil;
 
 /**
@@ -438,11 +441,6 @@ public class KeYProjectPropertyPage extends PropertyPage implements IWorkbenchPr
         updateValidState();
     }
 
-    public void addWorkspaceFileClassPathEntry() {
-        // TODO Auto-generated method stub
-        
-    }
-
     /**
      * Opens the dialog to add workspace class path entries.
      */
@@ -457,6 +455,32 @@ public class KeYProjectPropertyPage extends PropertyPage implements IWorkbenchPr
             List<KeYClassPathEntry> toSelect = new ArrayList<KeYClassPathEntry>(result.length);
             for (IContainer container : result) {
                 KeYClassPathEntry newEntry = new KeYClassPathEntry(KeYClassPathEntryKind.WORKSPACE, container.getFullPath().toString());
+                toSelect.add(newEntry);
+                if (!classPathEntries.contains(newEntry)) {
+                    classPathEntries.add(newEntry);
+                    updateClassPathViewer();
+                }
+            }
+            selectClassPathEntries(toSelect);
+        }
+        updateValidState();
+    }
+
+    /**
+     * Opens the dialog to add workspace file class path entries.
+     */    
+    public void addWorkspaceFileClassPathEntry() {
+        
+        IFile[] result = SWTUtil.openFileSelection(getShell(),
+                                                   "Select class path file to add",
+                                                   "Select a file.", 
+                                                   true, 
+                                                   null,
+                                                   Collections.singleton(new FileExtensionViewerFilter(new String[] {"jar", "zip"})));
+        if (result != null) {
+            List<KeYClassPathEntry> toSelect = new ArrayList<KeYClassPathEntry>(result.length);
+            for (IFile file : result) {
+                KeYClassPathEntry newEntry = new KeYClassPathEntry(KeYClassPathEntryKind.WORKSPACE, file.getFullPath().toString());
                 toSelect.add(newEntry);
                 if (!classPathEntries.contains(newEntry)) {
                     classPathEntries.add(newEntry);
