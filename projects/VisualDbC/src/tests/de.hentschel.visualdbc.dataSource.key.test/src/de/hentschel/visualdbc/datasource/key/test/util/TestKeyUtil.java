@@ -1419,7 +1419,7 @@ public final class TestKeyUtil {
       ConnectionLogger logger = new ConnectionLogger();
       long originalTimeout = SWTBotPreferences.TIMEOUT;
       try {
-         SWTBotPreferences.TIMEOUT = 10000;
+         SWTBotPreferences.TIMEOUT = SWTBotPreferences.TIMEOUT * 2;
          // Create project and fill it with test data
          IProject project = TestUtilsUtil.createProject(projectName);
          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, pathInPlugin, project);

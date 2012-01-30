@@ -31,6 +31,10 @@ import de.hentschel.visualdbc.interactive.proving.ui.test.suite.AllInteractivePr
  * <p>
  * Requires the following JVM settings: -Xms128m -Xmx1024m -XX:MaxPermSize=256m
  * </p>
+ * <p>
+ * If you got timeout exceptions increase the waiting time with the following
+ * additional JVM parameter: -Dorg.eclipse.swtbot.search.timeout=10000
+ * </p> 
  * @author Martin Hentschel
  */
 @RunWith(Suite.class)
