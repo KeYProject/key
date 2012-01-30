@@ -24,11 +24,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.key4eclipse.util.eclipse.ResourceUtil;
 import org.key_project.key4eclipse.util.java.ArrayUtil;
@@ -231,6 +234,8 @@ public class KeyConnection extends MemoryConnection {
          typesMapping = new HashMap<KeYJavaType, IDSType>();
          // Get settings
          final File location = getLocation(connectionSettings);
+         final List<File> classPathEntries = getClassPathEntries(connectionSettings);
+         final File bootClassPath = getBootClassPath(connectionSettings);
          if (location == null || !location.exists()) {
             throw new DSException("The location \"" + location + "\" doesn't exist.");
          }
@@ -260,8 +265,8 @@ public class KeyConnection extends MemoryConnection {
                try {
                   KeYMediator mediator = main.getMediator();
                   mediator.addGUIListener(mainGuiListener);
-                  ProblemLoader loader = new ProblemLoader(location, main);
-                  EnvInput envInput = loader.createEnvInput(location);
+                  ProblemLoader loader = new ProblemLoader(location, classPathEntries, bootClassPath, main);
+                  EnvInput envInput = loader.createEnvInput(location, classPathEntries, bootClassPath);
                   init = main.createProblemInitializer();
                   initConfig = init.prepare(envInput);
                   // Analyze classes, interfaces, enums and packages
@@ -1185,6 +1190,54 @@ public class KeyConnection extends MemoryConnection {
       }
       else {
          throw new DSException("Not supported location: " + object);
+      }
+   }
+
+   /**
+    * Returns the boot class path configured in the {@link IProject}
+    * that contains the target location.
+    * @param settings The connection settings.
+    * @return The found boot class path or {@code null} if no one is available.
+    * @throws CoreException Occurred Exception.
+    */
+   protected File getBootClassPath(Map<String, Object> settings) throws CoreException {
+      Assert.isNotNull(settings);
+      Object object = settings.get(KeyDriver.SETTING_LOCATION);
+      if (object instanceof IPath) {
+         IResource resource = ResourcesPlugin.getWorkspace().getRoot().findMember((IPath)object);
+         if (resource != null) {
+            return KeYResourceProperties.getKeYBootClassPathLocation(resource.getProject());
+         }
+         else {
+            return null;
+         }
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * Returns the class path entries configured in the {@link IProject}
+    * that contains the target location.
+    * @param settings The connection settings.
+    * @return The found class path entries or {@code null} if no one are available.
+    * @throws CoreException Occurred Exception.
+    */
+   protected List<File> getClassPathEntries(Map<String, Object> settings) throws CoreException {
+      Assert.isNotNull(settings);
+      Object object = settings.get(KeyDriver.SETTING_LOCATION);
+      if (object instanceof IPath) {
+         IResource resource = ResourcesPlugin.getWorkspace().getRoot().findMember((IPath)object);
+         if (resource != null) {
+            return KeYResourceProperties.getKeYClassPathEntries(resource.getProject());
+         }
+         else {
+            return null;
+         }
+      }
+      else {
+         return null;
       }
    }
    
