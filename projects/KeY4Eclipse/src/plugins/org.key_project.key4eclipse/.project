@@ -29,22 +29,12 @@
 		<link>
 			<name>lib</name>
 			<type>2</type>
-			<locationURI>KEY_EXTERNALS</locationURI>
+			<locationURI>key_lib</locationURI>
 		</link>
 		<link>
 			<name>system</name>
 			<type>2</type>
-			<locationURI>KEY_REPOSITORY/system</locationURI>
+			<locationURI>key_rep/system</locationURI>
 		</link>
 	</linkedResources>
-	<variableList>
-		<variable>
-			<name>KEY_EXTERNALS</name>
-			<value>file:/D:/Forschung/Tools/KeY-External%20Libs</value>
-		</variable>
-		<variable>
-			<name>KEY_REPOSITORY</name>
-			<value>file:/D:/Forschung/GIT/KeY</value>
-		</variable>
-	</variableList>
 </projectDescription>
