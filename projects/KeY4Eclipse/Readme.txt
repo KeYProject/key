@@ -9,7 +9,16 @@ For more details about this project feel free to contact the following persons:
 (1) Project Description
 -----------------------
 The aim of this project is to provide the KeY code for other Eclipse plug-ins.
-Also an integration of KeY into the Eclipse UI is provided. 
+
+Also an integration of KeY into the Eclipse UI is provided. The UI integration
+has the following user relevant features:
+- Opening KeY via toolbar entry or main menu
+- Load Java project in KeY via context menu or main menu
+- Load *.key or *.proof file in KeY via context menu or main menu
+- Start proof for a Java method/constructor in KeY via context menu or main menu
+- Configure KeY specfic boot class path and class path entries in properties
+  dialog of a Java project
+- Editing of *.key and *.proof files with a text editor directly in Eclipse
 
 
 (2) File Structure

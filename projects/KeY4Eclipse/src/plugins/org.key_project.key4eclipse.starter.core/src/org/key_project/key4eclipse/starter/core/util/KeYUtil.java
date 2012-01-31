@@ -65,9 +65,35 @@ import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
  */
 public final class KeYUtil {
     /**
+     * The file extension for *.key files.
+     */
+    public static final String KEY_FILE_EXTENSION = "key";
+
+    /**
+     * The file extension for *.proof files.
+     */
+    public static final String PROOF_FILE_EXTENSION = "proof";
+    
+    /**
      * Forbid instances.
      */
     private KeYUtil() {
+    }
+    
+    /**
+     * Checks if the given extension is supported by KeY.
+     * @param extension The file extension to check.
+     * @return {@code true} supported by KeY, {@code false} not supported by KeY.
+     */
+    public static boolean isFileExtensionSupported(String extension) {
+        if (extension != null) {
+            String lowerExtension = extension.toLowerCase();
+            return KEY_FILE_EXTENSION.equals(lowerExtension) ||
+                   PROOF_FILE_EXTENSION.equals(lowerExtension);
+        }
+        else {
+            return false;
+        }
     }
     
     /**

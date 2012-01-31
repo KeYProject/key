@@ -10,7 +10,6 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
-import org.key_project.key4eclipse.util.java.StringUtil;
 
 /**
  * Handler that starts the KeY UI via {@link KeYUtil#openMainWindow()}.
@@ -42,7 +41,7 @@ public class LoadResourceHandler extends AbstractSaveExecutionHandler {
                 if (input != null) {
                     IFile file = (IFile)input.getAdapter(IFile.class);
                     if (file != null && 
-                        "key".equals(StringUtil.toLowerCase(file.getFileExtension()))) {
+                        KeYUtil.isFileExtensionSupported(file.getFileExtension())) {
                         KeYUtil.loadAsync(file);
                     }
                 }

@@ -101,10 +101,16 @@
                         variable="activeEditorInput">
                      <adapt
                            type="org.eclipse.core.resources.IFile">
-                        <test
-                              property="org.eclipse.core.resources.extension"
-                              value="key">
-                        </test>
+                        <or>
+                           <test
+                                 property="org.eclipse.core.resources.extension"
+                                 value="key">
+                           </test>
+                           <test
+                                 property="org.eclipse.core.resources.extension"
+                                 value="proof">
+                           </test>
+                        </or>
                      </adapt>
                   </with>
                </or>
@@ -339,10 +345,16 @@
                      <instanceof
                            value="org.eclipse.core.resources.IFile">
                      </instanceof>
-                     <test
-                           property="org.eclipse.core.resources.extension"
-                           value="key">
-                     </test>
+                     <or>
+                        <test
+                              property="org.eclipse.core.resources.extension"
+                              value="key">
+                        </test>
+                        <test
+                              property="org.eclipse.core.resources.extension"
+                              value="proof">
+                        </test>
+                     </or>
                   </and>
                </iterate>
             </visibleWhen>
@@ -381,8 +393,17 @@
             default="true"
             extensions="key"
             icon="icons/logo16.gif"
-            id="org.key_project.key4eclipse.starter.ui.editor.KeYFileEditor"
+            id="org.key_project.key4eclipse.starter.ui.editor.keyEditor"
             name="KeY Editor">
+      </editor>
+      <editor
+            class="org.eclipse.ui.editors.text.TextEditor"
+            contributorClass="org.eclipse.ui.editors.text.TextEditorActionContributor"
+            default="true"
+            extensions="proof"
+            icon="icons/logo16.gif"
+            id="org.key_project.key4eclipse.starter.ui.editor.proofEditor"
+            name="Proof Editor">
       </editor>
    </extension>
 </plugin>

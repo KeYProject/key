@@ -24,6 +24,7 @@ import org.key_project.key4eclipse.util.test.testcase.ObjectUtilTest;
 import org.key_project.key4eclipse.util.test.testcase.ResourceUtilTest;
 import org.key_project.key4eclipse.util.test.testcase.SWTUtilTest;
 import org.key_project.key4eclipse.util.test.testcase.StringUtilTest;
+import org.key_project.key4eclipse.util.test.testcase.WorkbenchUtilTest;
 
 /**
  * Run all contained JUnit 4 test cases.
@@ -42,7 +43,8 @@ import org.key_project.key4eclipse.util.test.testcase.StringUtilTest;
     ObjectUtilTest.class,
     ResourceUtilTest.class,
     StringUtilTest.class,
-    SWTUtilTest.class
+    SWTUtilTest.class,
+    WorkbenchUtilTest.class
 })
 public class AllUtilTests {
 }

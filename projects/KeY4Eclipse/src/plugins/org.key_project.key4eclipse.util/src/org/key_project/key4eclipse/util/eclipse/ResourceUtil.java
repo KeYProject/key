@@ -12,8 +12,11 @@
 package org.key_project.key4eclipse.util.eclipse;
 
 import java.io.File;
+import java.net.URI;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.model.IWorkbenchAdapter;
@@ -27,6 +30,27 @@ public class ResourceUtil {
     * Forbid instances by this private constructor.
     */
    private ResourceUtil() {
+   }
+   
+   /**
+    * Returns all workspace {@link IResource}s that represents the given
+    * {@link File} in the local file system.
+    * @param location The file or folder in the local file system.
+    * @return The found workspace {@link IResource}s.
+    */
+   public static IResource[] findResourceForLocation(File location) {
+      if (location != null) {
+         URI uri = location.toURI();
+         if (location.isFile()) {
+            return ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(uri);
+         }
+         else {
+            return ResourcesPlugin.getWorkspace().getRoot().findContainersForLocationURI(uri);
+         }
+      }
+      else {
+         return new IContainer[0];
+      }
    }
    
    /**

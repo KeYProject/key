@@ -42,6 +42,8 @@ import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
+import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
+import org.eclipse.swtbot.swt.finder.waits.ICondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
@@ -516,5 +518,32 @@ public class TestUtilsUtil {
        assertNotNull(method);
        System.out.println("FOUND: " + method);
        return method;
+   }
+
+   /**
+    * Creates an {@link ICondition} that makes sure that the given 
+    * {@link SWTBotTree} has a selection.
+    * @param tree The {@link SWTBotTree} to check.
+    * @return The created {@link ICondition}.
+    */
+   public static ICondition hasSelection(final SWTBotTree tree) {
+      return new DefaultCondition() {
+         @Override
+         public boolean test() throws Exception {
+            IRunnableWithResult<Boolean> run = new AbstractRunnableWithResult<Boolean>() {
+               @Override
+               public void run() {
+                  setResult(tree.widget.getSelectionCount() >= 1);
+               }
+            };
+            Display.getDefault().syncExec(run);
+            return run.getResult() != null && run.getResult().booleanValue();
+         }
+        
+         @Override
+         public String getFailureMessage() {
+            return "The component " + tree + " has no selection.";
+         }
+      };
    }
 }
