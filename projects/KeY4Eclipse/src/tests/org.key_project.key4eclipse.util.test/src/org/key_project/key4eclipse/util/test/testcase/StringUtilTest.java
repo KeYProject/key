@@ -11,16 +11,28 @@
 
 package org.key_project.key4eclipse.util.test.testcase;
 
+import junit.framework.TestCase;
+
 import org.junit.Test;
 import org.key_project.key4eclipse.util.java.StringUtil;
-
-import junit.framework.TestCase;
 
 /**
  * Tests for {@link StringUtil}
  * @author Martin Hentschel
  */
 public class StringUtilTest extends TestCase {
+   /**
+    * Tests {@link StringUtil#toLowerCase(String)}
+    */
+   @Test
+   public void testToLowerCase() {
+       assertNull(StringUtil.toLowerCase(null));
+       assertEquals("aa", StringUtil.toLowerCase("AA"));
+       assertEquals("aa", StringUtil.toLowerCase("aa"));
+       assertEquals("aa", StringUtil.toLowerCase("Aa"));
+       assertEquals("aa", StringUtil.toLowerCase("aA"));
+   }
+
    /**
     * Tests {@link StringUtil#trim(String)}
     */

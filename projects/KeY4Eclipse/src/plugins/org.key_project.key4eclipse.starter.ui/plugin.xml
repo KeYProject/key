@@ -97,6 +97,16 @@
                            value="key">
                      </test>
                   </and>
+                  <with
+                        variable="activeEditorInput">
+                     <adapt
+                           type="org.eclipse.core.resources.IFile">
+                        <test
+                              property="org.eclipse.core.resources.extension"
+                              value="key">
+                        </test>
+                     </adapt>
+                  </with>
                </or>
             </iterate>
          </enabledWhen>
@@ -362,5 +372,17 @@
             </or>
          </enabledWhen>
       </page>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="org.eclipse.ui.editors.text.TextEditor"
+            contributorClass="org.eclipse.ui.editors.text.TextEditorActionContributor"
+            default="true"
+            extensions="key"
+            icon="icons/logo16.gif"
+            id="org.key_project.key4eclipse.starter.ui.editor.KeYFileEditor"
+            name="KeY Editor">
+      </editor>
    </extension>
 </plugin>

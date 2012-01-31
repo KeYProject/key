@@ -53,4 +53,13 @@ public final class StringUtil {
    public static String trim(String text) {
       return text != null ? text.trim() : null;
    }
+
+   /**
+    * Nullpointer save execution of {@link String#toLowerCase()}.
+    * @param text The text to convert.
+    * @return The text in lower case or {@code null} if the given text is {@code null}.
+    */
+   public static String toLowerCase(String text) {
+       return text != null ? text.toLowerCase() : null;
+   }
 }
