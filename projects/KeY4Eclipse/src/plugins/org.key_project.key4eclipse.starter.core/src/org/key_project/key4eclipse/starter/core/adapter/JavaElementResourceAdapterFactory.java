@@ -1,4 +1,4 @@
-package org.key_project.key4eclipse.starter.ui.adapter;
+package org.key_project.key4eclipse.starter.core.adapter;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdapterFactory;

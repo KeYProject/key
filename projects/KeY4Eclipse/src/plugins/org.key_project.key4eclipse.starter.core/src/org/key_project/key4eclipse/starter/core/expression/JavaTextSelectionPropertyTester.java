@@ -1,15 +1,14 @@
-package org.key_project.key4eclipse.starter.ui.property;
+package org.key_project.key4eclipse.starter.core.expression;
 
 import org.eclipse.core.expressions.PropertyTester;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.internal.ui.actions.SelectionConverter;
 import org.eclipse.jdt.internal.ui.javaeditor.JavaEditor;
 import org.eclipse.jface.text.ITextSelection;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.PlatformUI;
-import org.key_project.key4eclipse.starter.ui.Activator;
+import org.key_project.key4eclipse.starter.core.util.LogUtil;
+import org.key_project.key4eclipse.util.eclipse.WorkbenchUtil;
 
 /**
  * <p>
@@ -70,7 +69,7 @@ public class JavaTextSelectionPropertyTester extends PropertyTester {
                 if (receiver instanceof ITextSelection) {
                     ITextSelection textSelection = (ITextSelection)receiver;
                     if ("selectedElementInstanceOf".equals(property)) {
-                        IEditorPart editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
+                        IEditorPart editor = WorkbenchUtil.getActiveEditor();
                         if (editor instanceof JavaEditor) {
                             JavaEditor javaEditor = (JavaEditor)editor;
                             IJavaElement element = SelectionConverter.resolveEnclosingElement(javaEditor, textSelection);
@@ -78,12 +77,19 @@ public class JavaTextSelectionPropertyTester extends PropertyTester {
                         }
                     }
                 }
+                else if (receiver instanceof JavaEditor) {
+                    JavaEditor javaEditor = (JavaEditor)receiver;
+                    ISelection selection = javaEditor.getSelectionProvider().getSelection();
+                    if (selection instanceof ITextSelection) {
+                        IJavaElement element = SelectionConverter.resolveEnclosingElement(javaEditor, (ITextSelection)selection);
+                        result = Class.forName(expectedValue.toString()).isInstance(element);
+                    }
+                }
             }
             return result;
         } 
         catch (Exception e) {
-            e.printStackTrace();
-            Activator.getDefault().getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e));
+            LogUtil.getLogger().logError(e);
             return false;
         }
     }

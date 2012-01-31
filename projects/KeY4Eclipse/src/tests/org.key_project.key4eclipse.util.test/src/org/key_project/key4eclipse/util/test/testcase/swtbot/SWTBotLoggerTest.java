@@ -19,9 +19,9 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
-import org.eclipse.ui.PlatformUI;
 import org.junit.Test;
 import org.key_project.key4eclipse.util.eclipse.Logger;
+import org.key_project.key4eclipse.util.eclipse.WorkbenchUtil;
 import org.key_project.key4eclipse.util.test.util.TestUtilsUtil;
 
 /**
@@ -74,7 +74,7 @@ public class SWTBotLoggerTest extends TestCase {
       public void run() {
          boolean oldAutomatedMode = ErrorDialog.AUTOMATED_MODE;
          try {
-            Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+            Shell shell = WorkbenchUtil.getActiveShell();
             ErrorDialog.AUTOMATED_MODE = false;
             result = TestUtilsUtil.createLogger().openErrorDialog(shell, new Exception("My message."));
          }

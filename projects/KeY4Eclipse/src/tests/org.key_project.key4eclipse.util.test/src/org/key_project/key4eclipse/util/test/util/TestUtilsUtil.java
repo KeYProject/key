@@ -49,10 +49,9 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.PreferencesUtil;
-import org.eclipse.ui.ide.IDE;
 import org.key_project.key4eclipse.util.eclipse.Logger;
+import org.key_project.key4eclipse.util.eclipse.WorkbenchUtil;
 import org.key_project.key4eclipse.util.java.thread.AbstractRunnableWithResult;
 import org.key_project.key4eclipse.util.java.thread.IRunnableWithResult;
 import org.key_project.key4eclipse.util.test.Activator;
@@ -287,7 +286,7 @@ public class TestUtilsUtil {
       Display.getDefault().asyncExec(new Runnable() {
          @Override
          public void run() {
-            Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+            Shell shell = WorkbenchUtil.getActiveShell();
             PreferenceDialog dialog = PreferencesUtil.createPreferenceDialogOn(shell, null, null, null);
             dialog.open();
          }
@@ -308,7 +307,7 @@ public class TestUtilsUtil {
          @Override
          public void run() {
             try {
-               IEditorPart result = IDE.openEditor(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage(), file);
+               IEditorPart result = WorkbenchUtil.openEditor(file);
                setResult(result);
             }
             catch (Exception e) {
@@ -511,12 +510,8 @@ public class TestUtilsUtil {
                                       String... parameters) throws JavaModelException {
        IType type = javaProject.findType(typeName);
        assertNotNull(type);
-       for (IMethod method : type.getMethods()) {
-           System.out.println(method);
-       }
        IMethod method = type.getMethod(methodName, parameters);
        assertNotNull(method);
-       System.out.println("FOUND: " + method);
        return method;
    }
 

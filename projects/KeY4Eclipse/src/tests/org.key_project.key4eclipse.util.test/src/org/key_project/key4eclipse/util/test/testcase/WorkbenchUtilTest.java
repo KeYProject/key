@@ -16,6 +16,58 @@ import org.key_project.key4eclipse.util.test.util.TestUtilsUtil;
  */
 public class WorkbenchUtilTest extends TestCase {
     /**
+     * Tests {@link WorkbenchUtil#getActiveShell()}
+     */
+    @Test
+    public void testGetActiveShell() {
+        assertNotNull(WorkbenchUtil.getActiveShell());
+    }
+
+    /**
+     * Tests {@link WorkbenchUtil#getActiveEditor()}
+     */
+    @Test
+    public void testGetActiveEditor() throws PartInitException {
+        IEditorPart editor = null;
+        try {
+            // Make sure that no editor is opened
+            assertNull(WorkbenchUtil.getActiveEditor());
+            // Create project and file
+            IProject project = TestUtilsUtil.createProject("WorkbenchUtilTest_testGetActiveEditor");
+            IFile file = TestUtilsUtil.createFile(project, "Test.txt", "Hello World");
+            // Open editor
+            editor = WorkbenchUtil.openEditor(file);
+            // Make sure that editor si opened
+            IEditorPart active = WorkbenchUtil.getActiveEditor();
+            assertNotNull(active);
+            assertEquals(editor, active);
+            // Close editor
+            WorkbenchUtil.closeEditor(editor, true);
+            // Make sure that no editor is opened
+            assertNull(WorkbenchUtil.getActiveEditor());
+        }
+        finally {
+            WorkbenchUtil.closeEditor(editor, true);
+        }
+    }
+
+    /**
+     * Tests {@link WorkbenchUtil#getActivePage()}
+     */
+    @Test
+    public void testGetActivePage() {
+        assertNotNull(WorkbenchUtil.getActivePage());
+    }
+
+    /**
+     * Tests {@link WorkbenchUtil#getActiveWorkbenchWindow()}
+     */
+    @Test
+    public void testGetActiveWorkbenchWindow() {
+        assertNotNull(WorkbenchUtil.getActiveWorkbenchWindow());
+    }
+    
+    /**
      * Tests {@link WorkbenchUtil#openEditor(org.eclipse.core.resources.IFile)}
      * and {@link WorkbenchUtil#closeEditor(IEditorPart, boolean)}
      */
@@ -30,6 +82,10 @@ public class WorkbenchUtilTest extends TestCase {
         assertEquals(file, editor.getEditorInput().getAdapter(IFile.class));
         assertTrue(editor.getEditorSite().getPage().isPartVisible(editor));
         boolean closed = WorkbenchUtil.closeEditor(editor, true);
+        assertTrue(closed);
+        assertFalse(editor.getEditorSite().getPage().isPartVisible(editor));
+        // Try to close already closed editor again
+        closed = WorkbenchUtil.closeEditor(editor, true);
         assertTrue(closed);
         assertFalse(editor.getEditorSite().getPage().isPartVisible(editor));
         // Test opening null parameter

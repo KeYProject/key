@@ -13,6 +13,8 @@ package org.key_project.key4eclipse.starter.core.test.suite;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
+import org.key_project.key4eclipse.starter.core.test.testcase.JavaElementResourceAdapterFactoryTest;
+import org.key_project.key4eclipse.starter.core.test.testcase.JavaTextSelectionPropertyTesterTest;
 import org.key_project.key4eclipse.starter.core.test.testcase.KeYUtilTest;
 import org.key_project.key4eclipse.starter.core.test.testcase.LogUtilTest;
 
@@ -22,6 +24,8 @@ import org.key_project.key4eclipse.starter.core.test.testcase.LogUtilTest;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
+    JavaElementResourceAdapterFactoryTest.class,
+    JavaTextSelectionPropertyTesterTest.class,
     KeYUtilTest.class,
     LogUtilTest.class
 })

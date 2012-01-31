@@ -16,8 +16,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.key_project.key4eclipse.util.java.thread.AbstractRunnableWithResult;
 import org.key_project.key4eclipse.util.java.thread.IRunnableWithResult;
@@ -134,11 +132,8 @@ public class Logger {
    public int openErrorDialog(Shell parentShell,
                               final Throwable t) {
       if (t != null) {
-         if (parentShell == null && PlatformUI.getWorkbench() != null) {
-            IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-            if (window != null) {
-               parentShell = window.getShell();
-            }
+         if (parentShell == null) {
+             parentShell = WorkbenchUtil.getActiveShell();
          }
          final Shell parentToUse = parentShell;
          IRunnableWithResult<Integer> run = new AbstractRunnableWithResult<Integer>() {

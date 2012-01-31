@@ -2,6 +2,7 @@ package org.key_project.key4eclipse.util.eclipse;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IWorkbench;
@@ -18,9 +19,70 @@ import org.eclipse.ui.wizards.newresource.BasicNewFolderResourceWizard;
  */
 public final class WorkbenchUtil {
     /**
+     * The ID of the default text editor.
+     */
+    public static final String DEFAULT_TEXT_EDITOR_ID = "org.eclipse.ui.DefaultTextEditor";
+    
+    /**
      * Forbid instances.
      */
     private WorkbenchUtil() {
+    }
+    
+    /**
+     * Returns the active {@link IWorkbenchWindow} if available.
+     * @return The active {@link IWorkbenchWindow} or {@code null} if no one is available.
+     */
+    public static IWorkbenchWindow getActiveWorkbenchWindow() {
+        IWorkbench workbench = PlatformUI.getWorkbench();
+        if (workbench != null) {
+            return workbench.getActiveWorkbenchWindow();
+        }
+        else {
+            return null;
+        }
+    }
+    
+    /**
+     * Returns the active {@link IWorkbenchPage} if available.
+     * @return The active {@link IWorkbenchPage} or {@code null} if no one is available.
+     */
+    public static IWorkbenchPage getActivePage() {
+        IWorkbenchWindow window = getActiveWorkbenchWindow();
+        if (window != null) {
+            return window.getActivePage();
+        }
+        else {
+            return null;
+        }
+    }
+    
+    /**
+     * Returns the active {@link IEditorPart} if available.
+     * @return The active {@link IEditorPart} or {@code null} if no one is available.
+     */
+    public static IEditorPart getActiveEditor() {
+        IWorkbenchPage page = getActivePage();
+        if (page != null) {
+            return page.getActiveEditor();
+        }
+        else {
+            return null;
+        }
+    }
+    
+    /**
+     * Returns the active {@link Shell} if available.
+     * @return The active {@link Shell} or {@code null} if no one is available.
+     */
+    public static Shell getActiveShell() {
+        IWorkbenchWindow window = getActiveWorkbenchWindow();
+        if (window != null) {
+            return window.getShell();
+        }
+        else {
+            return null;
+        }
     }
     
     /**

@@ -2,26 +2,6 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension
-         point="org.eclipse.core.runtime.adapters">
-      <factory
-            adaptableType="org.eclipse.jdt.core.IMethod"
-            class="org.key_project.key4eclipse.starter.ui.adapter.JavaElementResourceAdapterFactory">
-         <adapter
-               type="org.eclipse.core.resources.IResource">
-         </adapter>
-      </factory>
-   </extension>
-   <extension
-         point="org.eclipse.core.expressions.propertyTesters">
-      <propertyTester
-            class="org.key_project.key4eclipse.starter.ui.property.JavaTextSelectionPropertyTester"
-            id="org.key_project.key4eclipse.starter.ui.JavaTextSelectionPropertyTester"
-            namespace="org.key_project.key4eclipse.starter.ui.javaTextSelection"
-            properties="selectedElementInstanceOf"
-            type="org.eclipse.jface.text.ITextSelection">
-      </propertyTester>
-   </extension>   
-   <extension
          point="org.eclipse.ui.commands">
       <category
             description="Contains all commands which are provided by the KeY Eclipse integration."
@@ -161,7 +141,7 @@
                         </instanceof>
                         <test
                               forcePluginActivation="true"
-                              property="org.key_project.key4eclipse.starter.ui.javaTextSelection.selectedElementInstanceOf"
+                              property="org.key_project.key4eclipse.starter.core.javaTextSelection.selectedElementInstanceOf"
                               value="org.eclipse.jdt.core.IMethod">
                         </test>
                      </and>
@@ -321,7 +301,7 @@
                            </instanceof>
                            <test
                                  forcePluginActivation="true"
-                                 property="org.key_project.key4eclipse.starter.ui.javaTextSelection.selectedElementInstanceOf"
+                                 property="org.key_project.key4eclipse.starter.core.javaTextSelection.selectedElementInstanceOf"
                                  value="org.eclipse.jdt.core.IMethod">
                            </test>
                         </and>
