@@ -37,6 +37,7 @@ class KeYLexer extends Lexer;
 options {
     k=2;
     defaultErrorHandler = true;
+    charVocabulary='\u0000'..'\uFFFE';
 }
 
 tokens {
