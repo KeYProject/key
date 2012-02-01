@@ -12,6 +12,7 @@
 package org.key_project.key4eclipse.util.test.testcase;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 import junit.framework.TestCase;
 
@@ -31,6 +32,57 @@ import org.key_project.key4eclipse.util.test.util.TestUtilsUtil;
  * @author Martin Hentschel
  */
 public class BundleUtilTest extends TestCase {
+   /**
+    * Tests {@link BundleUtil#openInputStream(String, String)}
+    */
+   @Test
+   public void testOpenInputStream() throws IOException {
+       InputStream in = null;
+       try {
+          // Test valid resource
+          in = BundleUtil.openInputStream(Activator.PLUGIN_ID, "data/extractTest/File.txt");
+          assertEquals("File", IOUtil.readFrom(in));
+          in.close();
+          // Test invalid resource in valid plug-in
+          try {
+              BundleUtil.openInputStream(Activator.PLUGIN_ID, "INVALID");
+              fail("Opening an invalid resource should not be possible.");
+          }
+          catch (IOException e) {
+              assertEquals("Can't find resource \"INVALID\" in plug-in \"" + Activator.PLUGIN_ID + "\".", e.getMessage());
+          }
+          // Test null path
+          try {
+              BundleUtil.openInputStream(Activator.PLUGIN_ID, null);
+              fail("Opening an invalid resource should not be possible.");
+          }
+          catch (IOException e) {
+              assertEquals("No path in plug-in \"" + Activator.PLUGIN_ID + "\" defined.", e.getMessage());
+          }
+          // Test invalid plug-in
+          try {
+              BundleUtil.openInputStream("INVALID", "data/extractTest/File.txt");
+              fail("Opening a resource in an invalid plug-in should not be possible.");
+          }
+          catch (IOException e) {
+              assertEquals("Can't find plug-in \"INVALID\".", e.getMessage());
+          }
+          // Test null plug-in
+          try {
+              BundleUtil.openInputStream(null, "data/extractTest/File.txt");
+              fail("Opening a resource in an invalid plug-in should not be possible.");
+          }
+          catch (IOException e) {
+              assertEquals("No plug-in defined.", e.getMessage());
+          }
+       }
+       finally {
+           if (in != null) {
+               in.close();
+           }
+       }
+   }
+   
    /**
     * Tests {@link BundleUtil#extractFromBundleToWorkspace(String, String, org.eclipse.core.resources.IContainer)}
     */

@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.junit.Test;
 import org.key_project.key4eclipse.util.eclipse.ResourceUtil;
 import org.key_project.key4eclipse.util.java.ArrayUtil;
+import org.key_project.key4eclipse.util.java.StringUtil;
 import org.key_project.key4eclipse.util.test.util.TestUtilsUtil;
 
 /**
@@ -31,6 +32,28 @@ import org.key_project.key4eclipse.util.test.util.TestUtilsUtil;
  * @author Martin Hentschel
  */
 public class ResourceUtilTest extends TestCase {
+   /**
+    * Tests {@link ResourceUtil#getProject(String)}.
+    */
+   @Test
+   public void testGetProject() {
+      // Create example projects
+      IProject project1 = TestUtilsUtil.createProject("ResourceUtilTest_testGetProject1");
+      IProject project2 = TestUtilsUtil.createProject("ResourceUtilTest_testGetProject2");
+      // Test null
+      assertNull(ResourceUtil.getProject(null));
+      // Test empty
+      assertNull(ResourceUtil.getProject(StringUtil.EMPTY_STRING));
+      // Test invalid
+      IProject invalid = ResourceUtil.getProject("INVALID"); 
+      assertNotNull(invalid);
+      assertFalse(invalid.exists());
+      assertFalse(invalid.isOpen());
+      // Test valid
+      assertEquals(project1, ResourceUtil.getProject(project1.getName()));
+      assertEquals(project2, ResourceUtil.getProject(project2.getName()));
+   }
+    
    /**
     * Tests {@link ResourceUtil#findResourceForLocation(File)}
     */

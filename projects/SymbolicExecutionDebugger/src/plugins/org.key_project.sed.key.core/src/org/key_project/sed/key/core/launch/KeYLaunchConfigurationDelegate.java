@@ -5,6 +5,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
+import org.eclipse.jdt.core.IMethod;
+import org.key_project.sed.key.core.util.KeySEDUtil;
 
 /**
  * This {@link LaunchConfigurationDelegate} is responsible to start
@@ -20,6 +22,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
                        String mode, 
                        ILaunch launch, 
                        IProgressMonitor monitor) throws CoreException {
-        System.out.println("Start Launch");
+        IMethod method = KeySEDUtil.findMethod(launch);
+        System.out.println("Debugging: " + method);
     }
 }

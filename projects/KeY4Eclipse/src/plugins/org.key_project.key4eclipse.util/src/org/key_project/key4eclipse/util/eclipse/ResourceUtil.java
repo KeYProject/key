@@ -15,11 +15,13 @@ import java.io.File;
 import java.net.URI;
 
 import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.model.IWorkbenchAdapter;
+import org.key_project.key4eclipse.util.java.StringUtil;
 
 /**
  * Provides static methods to work with workspace resources.
@@ -81,6 +83,22 @@ public class ResourceUtil {
           IWorkbenchAdapter adapter = (IWorkbenchAdapter)resource.getAdapter(IWorkbenchAdapter.class);
           ImageDescriptor id = adapter.getImageDescriptor(resource);
           return id.createImage();
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * Returns the {@link IProject} for the given name. If no project with
+    * the name an {@link IProject} reference is returned, 
+    * but {@link IProject#exists()} is still {@code false}.
+    * @param projectName The name of the project.
+    * @return The found {@link IProject} or {@code null} if the project name is {@code null}/empty.
+    */
+   public static IProject getProject(String projectName) {
+      if (!StringUtil.isTrimmedEmpty(projectName)) {
+         return ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
       }
       else {
          return null;

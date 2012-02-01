@@ -29,8 +29,10 @@ import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.ui.JavaElementLabels;
 import org.key_project.key4eclipse.util.eclipse.ResourceUtil;
 import org.key_project.key4eclipse.util.java.ArrayUtil;
+import org.key_project.key4eclipse.util.java.ObjectUtil;
 
 /**
  * Provides static methods to work with JDT.
@@ -41,6 +43,36 @@ public class JDTUtil {
     * Forbid instances by this private constructor.
     */
    private JDTUtil() {
+   }
+   
+   /**
+    * Returns a human readable text label for the given {@link IJavaElement}.
+    * @param element The {@link IJavaElement} to convert,
+    * @return The human readable text label. An empty {@link String} is returned if the given {@link IJavaElement} is {@code null}.
+    */
+   public static String getTextLabel(IJavaElement element) {
+       return JavaElementLabels.getTextLabel(element, JavaElementLabels.ALL_DEFAULT);
+   }
+   
+   /**
+    * Returns the first {@link IJavaElement} from the given once that
+    * has the given text label.
+    * @param elements The {@link IJavaElement}s to search in.
+    * @param textLabel The text label for that the {@link IJavaElement} is needed.
+    * @return The first found {@link IJavaElement} or {@code null} if no one was found.
+    */
+   public static IJavaElement getElementForTextLabel(IJavaElement[] elements, String textLabel) {
+       IJavaElement result = null;
+       if (elements != null) {
+           int i = 0;
+           while (result == null && i < elements.length) {
+               if (ObjectUtil.equals(textLabel, getTextLabel(elements[i]))) {
+                   result = elements[i];
+               }
+               i++;
+           }
+       }
+       return result;
    }
    
    /**
@@ -128,6 +160,24 @@ public class JDTUtil {
     */
    public static IJavaProject getJavaProject(IProject project) {
        return JavaCore.create(project);
+   }
+
+   /**
+    * <p>
+    * Returns the {@link IJavaProject} for the given {@link IProject}.
+    * </p>
+    * <p>
+    * <b>Attention:</b> It is also an {@link IJavaProject} returned even
+    * if the {@link IProject} is no Java project (has no JDT nature).
+    * To verify if an {@link IProject} is a real Java project use
+    * {@link JDTUtil#isJavaProject(IProject)}.
+    * </p>
+    * @param projectName The name of the {@link IProject} for that an {@link IJavaProject} is needed.
+    * @return The {@link IJavaProject} representation of the {@link IProject} with the given name or {@code null} if the given project name is {@code null}/empty.
+    */
+   public static IJavaProject getJavaProject(String projectName) {
+       IProject project = ResourceUtil.getProject(projectName);
+       return getJavaProject(project);
    }
    
    /**

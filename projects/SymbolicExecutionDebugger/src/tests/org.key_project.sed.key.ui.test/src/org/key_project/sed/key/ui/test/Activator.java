@@ -1,8 +1,6 @@
-package org.key_project.sed.key.ui;
+package org.key_project.sed.key.ui.test;
 
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.key_project.sed.key.ui.util.KeYSEDImages;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -11,7 +9,7 @@ import org.osgi.framework.BundleContext;
 public class Activator extends AbstractUIPlugin {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "org.key_project.sed.key.ui"; //$NON-NLS-1$
+	public static final String PLUGIN_ID = "org.key_project.sed.key.ui.test"; //$NON-NLS-1$
 
 	// The shared instance
 	private static Activator plugin;
@@ -36,14 +34,8 @@ public class Activator extends AbstractUIPlugin {
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext context) throws Exception {
-	    Display.getDefault().syncExec(new Runnable() {
-	            @Override
-	            public void run() {
-	                KeYSEDImages.disposeImages();
-	            }
-	    });
-            plugin = null;
-            super.stop(context);
+		plugin = null;
+		super.stop(context);
 	}
 
 	/**

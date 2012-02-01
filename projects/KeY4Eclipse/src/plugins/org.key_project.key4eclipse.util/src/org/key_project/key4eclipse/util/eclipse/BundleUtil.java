@@ -80,4 +80,38 @@ public final class BundleUtil {
          }
       }
    }
+
+   /**
+    * Opens an {@link InputStream} to the resource in the plug-in with the given ID.
+    * The caller of this method is responsible to close it.
+    * @param bundleId The ID of the plug-in that contains the resource.
+    * @param pathInBundle The path to the resource.
+    * @return The opened {@link InputStream}.
+    * @throws IOException Occurred Exception.
+    */
+   public static InputStream openInputStream(String bundleId, String pathInBundle) throws IOException {
+       if (bundleId != null) {
+           if (pathInBundle != null) {
+               Bundle bundle = Platform.getBundle(bundleId);
+               if (bundle != null) {
+                   URL url = bundle.getEntry(pathInBundle);
+                   if (url != null) {
+                       return url.openStream();
+                   }
+                   else {
+                       throw new IOException("Can't find resource \"" + pathInBundle + "\" in plug-in \"" + bundleId + "\".");
+                   }
+               }
+               else {
+                   throw new IOException("Can't find plug-in \"" + bundleId + "\".");
+               }
+           }
+           else {
+               throw new IOException("No path in plug-in \"" + bundleId + "\" defined.");
+           }
+       }
+       else {
+           throw new IOException("No plug-in defined.");
+       }
+   }
 }

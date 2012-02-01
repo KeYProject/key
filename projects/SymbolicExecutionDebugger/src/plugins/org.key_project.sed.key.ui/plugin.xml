@@ -104,5 +104,5 @@
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+M2+D">
       </key>
-   </extension>       
+   </extension>
 </plugin>

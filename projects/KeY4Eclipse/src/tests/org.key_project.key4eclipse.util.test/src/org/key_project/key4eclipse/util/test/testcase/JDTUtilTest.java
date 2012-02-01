@@ -25,12 +25,15 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.Signature;
 import org.junit.Test;
 import org.key_project.key4eclipse.util.eclipse.BundleUtil;
 import org.key_project.key4eclipse.util.eclipse.ResourceUtil;
+import org.key_project.key4eclipse.util.java.StringUtil;
 import org.key_project.key4eclipse.util.jdt.JDTUtil;
 import org.key_project.key4eclipse.util.test.Activator;
 import org.key_project.key4eclipse.util.test.util.TestUtilsUtil;
@@ -40,6 +43,52 @@ import org.key_project.key4eclipse.util.test.util.TestUtilsUtil;
  * @author Martin Hentschel
  */
 public class JDTUtilTest extends TestCase {
+    /**
+     * Tests {@link JDTUtil#getElementForTextLabel(IJavaElement[], String)}
+     * @throws InterruptedException 
+     * @throws CoreException 
+     */
+    @Test
+    public void testGetElementForTextLabel() throws CoreException, InterruptedException {
+        // Create projects with test content
+        IJavaProject javaProject = TestUtilsUtil.createJavaProject("JDTUtilTest_testGetElementForTextLabel");
+        IFolder srcFolder = javaProject.getProject().getFolder("src");
+        BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/MethodTest", srcFolder);
+        // Get type
+        IType type = javaProject.findType("MethodTest");
+        assertNotNull(type);
+        IMethod[] methods = type.getMethods();
+        assertTrue(methods != null && methods.length >= 1);
+        // Test null text label
+        assertEquals(null, JDTUtil.getElementForTextLabel(methods, null));
+        // Test null elements
+        assertEquals(null, JDTUtil.getElementForTextLabel(null, JDTUtil.getTextLabel(methods[0])));
+        // Test invalid label
+        assertEquals(null, JDTUtil.getElementForTextLabel(methods, "invalid()"));
+        // Test valid methods
+        for (IMethod method : methods) {
+            assertSame(method, JDTUtil.getElementForTextLabel(methods, JDTUtil.getTextLabel(method)));
+        }
+    }
+    
+    /**
+     * Tests {@link JDTUtil#getTextLabel(IJavaElement)}
+     */
+    @Test
+    public void testGetTextLabel() throws CoreException, InterruptedException {
+        // Create projects with test content
+        IJavaProject javaProject = TestUtilsUtil.createJavaProject("JDTUtilTest_testGetTextLabel");
+        IFolder srcFolder = javaProject.getProject().getFolder("src");
+        IFolder banking = TestUtilsUtil.createFolder(srcFolder, "banking");
+        BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/banking", banking);
+        // Get method
+        IMethod method = TestUtilsUtil.getJdtMethod(javaProject, "banking.PayCard", "charge", Signature.C_INT + "");
+        // Test null
+        assertEquals(StringUtil.EMPTY_STRING, JDTUtil.getTextLabel(null));
+        // Test method
+        assertEquals("charge(int)", JDTUtil.getTextLabel(method));
+    }
+    
     /**
      * Tests {@link JDTUtil#addClasspathEntry(IJavaProject, org.eclipse.jdt.core.IClasspathEntry)}
      */
@@ -157,22 +206,43 @@ public class JDTUtilTest extends TestCase {
     }
 
     /**
+     * Tests {@link JDTUtil#getJavaProject(String)}
+     */
+    @Test
+    public void testGetJavaProject_String() throws CoreException, InterruptedException {
+        // Test null
+        assertNull(JDTUtil.getJavaProject((String)null));
+        // Test general project
+        IProject project = TestUtilsUtil.createProject("JDTUtilTest_testGetJavaProject_String_general");
+        IJavaProject javaProject = JDTUtil.getJavaProject(project.getName());
+        assertNull(JDTUtil.getJavaProject((String)null));
+        assertEquals(project, javaProject.getProject());
+        // Test Java project
+        IJavaProject createdProject = TestUtilsUtil.createJavaProject("JDTUtilTest_testGetJavaProject_String_Java"); 
+        project = createdProject.getProject();
+        javaProject = JDTUtil.getJavaProject(project.getName());
+        assertNull(JDTUtil.getJavaProject((String)null));
+        assertEquals(project, javaProject.getProject());
+        assertEquals(createdProject, javaProject);
+    }
+
+    /**
      * Tests {@link JDTUtil#getJavaProject(IProject)}
      */
     @Test
-    public void testGetJavaProject() throws CoreException, InterruptedException {
+    public void testGetJavaProject_IProject() throws CoreException, InterruptedException {
         // Test null
-        assertNull(JDTUtil.getJavaProject(null));
+        assertNull(JDTUtil.getJavaProject((IProject)null));
         // Test general project
-        IProject project = TestUtilsUtil.createProject("JDTUtilTest_testGetJavaProject_general");
+        IProject project = TestUtilsUtil.createProject("JDTUtilTest_testGetJavaProject_IProject_general");
         IJavaProject javaProject = JDTUtil.getJavaProject(project);
-        assertNull(JDTUtil.getJavaProject(null));
+        assertNull(JDTUtil.getJavaProject((IProject)null));
         assertEquals(project, javaProject.getProject());
         // Test Java project
-        IJavaProject createdProject = TestUtilsUtil.createJavaProject("JDTUtilTest_testGetJavaProject_Java"); 
+        IJavaProject createdProject = TestUtilsUtil.createJavaProject("JDTUtilTest_testGetJavaProject_IProject_Java"); 
         project = createdProject.getProject();
         javaProject = JDTUtil.getJavaProject(project);
-        assertNull(JDTUtil.getJavaProject(null));
+        assertNull(JDTUtil.getJavaProject((IProject)null));
         assertEquals(project, javaProject.getProject());
         assertEquals(createdProject, javaProject);
     }

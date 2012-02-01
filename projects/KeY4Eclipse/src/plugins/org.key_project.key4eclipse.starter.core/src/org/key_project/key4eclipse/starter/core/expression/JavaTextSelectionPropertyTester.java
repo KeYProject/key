@@ -6,9 +6,12 @@ import org.eclipse.jdt.internal.ui.actions.SelectionConverter;
 import org.eclipse.jdt.internal.ui.javaeditor.JavaEditor;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorPart;
 import org.key_project.key4eclipse.starter.core.util.LogUtil;
 import org.key_project.key4eclipse.util.eclipse.WorkbenchUtil;
+import org.key_project.key4eclipse.util.java.thread.AbstractRunnableWithResult;
+import org.key_project.key4eclipse.util.java.thread.IRunnableWithResult;
 
 /**
  * <p>
@@ -62,31 +65,49 @@ public class JavaTextSelectionPropertyTester extends PropertyTester {
      * {@inheritDoc}
      */
     @Override
-    public boolean test(Object receiver, String property, Object[] args, Object expectedValue) {
+    public boolean test(final Object receiver, 
+                        final String property, 
+                        final Object[] args, 
+                        final Object expectedValue) {
         try {
-            boolean result = false;
-            if (expectedValue != null) {
-                if (receiver instanceof ITextSelection) {
-                    ITextSelection textSelection = (ITextSelection)receiver;
-                    if ("selectedElementInstanceOf".equals(property)) {
-                        IEditorPart editor = WorkbenchUtil.getActiveEditor();
-                        if (editor instanceof JavaEditor) {
-                            JavaEditor javaEditor = (JavaEditor)editor;
-                            IJavaElement element = SelectionConverter.resolveEnclosingElement(javaEditor, textSelection);
-                            result = Class.forName(expectedValue.toString()).isInstance(element);
+            IRunnableWithResult<Boolean> run = new AbstractRunnableWithResult<Boolean>() {
+                @Override
+                public void run() {
+                    try {
+                        boolean result = false;
+                        if (expectedValue != null) {
+                            if (receiver instanceof ITextSelection) {
+                                ITextSelection textSelection = (ITextSelection)receiver;
+                                if ("selectedElementInstanceOf".equals(property)) {
+                                    IEditorPart editor = WorkbenchUtil.getActiveEditor();
+                                    if (editor instanceof JavaEditor) {
+                                        JavaEditor javaEditor = (JavaEditor)editor;
+                                        IJavaElement element = SelectionConverter.resolveEnclosingElement(javaEditor, textSelection);
+                                        result = Class.forName(expectedValue.toString()).isInstance(element);
+                                    }
+                                }
+                            }
+                            else if (receiver instanceof JavaEditor) {
+                                JavaEditor javaEditor = (JavaEditor)receiver;
+                                ISelection selection = javaEditor.getSelectionProvider().getSelection();
+                                if (selection instanceof ITextSelection) {
+                                    IJavaElement element = SelectionConverter.resolveEnclosingElement(javaEditor, (ITextSelection)selection);
+                                    result = Class.forName(expectedValue.toString()).isInstance(element);
+                                }
+                            }
                         }
+                        setResult(result);
+                    }
+                    catch (Exception e) {
+                        setException(e);
                     }
                 }
-                else if (receiver instanceof JavaEditor) {
-                    JavaEditor javaEditor = (JavaEditor)receiver;
-                    ISelection selection = javaEditor.getSelectionProvider().getSelection();
-                    if (selection instanceof ITextSelection) {
-                        IJavaElement element = SelectionConverter.resolveEnclosingElement(javaEditor, (ITextSelection)selection);
-                        result = Class.forName(expectedValue.toString()).isInstance(element);
-                    }
-                }
+            };
+            Display.getDefault().syncExec(run);
+            if (run.getException() != null) {
+                throw run.getException();
             }
-            return result;
+            return run.getResult() != null && run.getResult().booleanValue();
         } 
         catch (Exception e) {
             LogUtil.getLogger().logError(e);
