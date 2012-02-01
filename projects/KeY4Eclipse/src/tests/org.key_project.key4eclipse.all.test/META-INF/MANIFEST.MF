@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Test
+Bundle-Name: Contains all KeY4Eclipse Tests
 Bundle-SymbolicName: org.key_project.key4eclipse.all.test
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.key_project.key4eclipse.all.test.Activator

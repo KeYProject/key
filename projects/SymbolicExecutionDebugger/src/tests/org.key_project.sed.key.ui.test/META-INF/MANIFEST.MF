@@ -11,3 +11,4 @@ Require-Bundle: org.eclipse.core.runtime,
  org.key_project.sed.key.ui;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: org.key_project.sed.key.ui.test.suite
