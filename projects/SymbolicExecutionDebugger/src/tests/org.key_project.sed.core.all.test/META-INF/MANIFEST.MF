@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Contains all SED Test
-Bundle-SymbolicName: org.key_project.sed.core.all.test
+Bundle-SymbolicName: org.key_project.sed.all.test
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.key_project.sed.core.all.test.Activator
 Require-Bundle: org.eclipse.ui,
