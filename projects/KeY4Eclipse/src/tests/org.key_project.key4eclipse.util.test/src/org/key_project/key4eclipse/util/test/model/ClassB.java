@@ -11,6 +11,7 @@
 
 package org.key_project.key4eclipse.util.test.model;
 
+@SuppressWarnings("unused")
 public class ClassB extends ClassA {
    private int privateField = 42;
    

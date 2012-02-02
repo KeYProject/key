@@ -11,7 +11,6 @@
 
 package org.key_project.key4eclipse.util.java;
 
-
 /**
  * Provides static methods to work with arrays.
  * @author Martin Hentschel
@@ -21,6 +20,48 @@ public final class ArrayUtil {
     * Forbid instances by this private constructor.
     */
    private ArrayUtil() {
+   }
+   
+   /**
+    * <p>
+    * Adds the given elements to the existing array. The result is a new
+    * array that contains the other elements in the end.
+    * </p>
+    * <p>
+    * <b>Attention: </b> It is not possible to use this method with
+    * two {@code null} parameters. In this case is an {@link IllegalArgumentException}
+    * thrown.
+    * </p>
+    * @param array The array to add to.
+    * @param toAdd The elements to add.
+    * @return The new created array.
+    * @throws IllegalArgumentException Both parameters are {@code null}.
+    */
+   @SuppressWarnings("unchecked")
+   public static <T> T[] addAll(T[] array, T[] toAdd) {
+       if (array != null) {
+           if (toAdd != null) {
+               T[] result = (T[])java.lang.reflect.Array.newInstance(array.getClass().getComponentType(), array.length + toAdd.length);
+               System.arraycopy(array, 0, result, 0, array.length);
+               System.arraycopy(toAdd, 0, result, array.length, toAdd.length);
+               return result;
+           }
+           else {
+               T[] result = (T[])java.lang.reflect.Array.newInstance(array.getClass().getComponentType(), array.length);
+               System.arraycopy(array, 0, result, 0, array.length);
+               return result;
+           }
+       }
+       else {
+           if (toAdd != null) {
+               T[] result = (T[])java.lang.reflect.Array.newInstance(toAdd.getClass().getComponentType(), toAdd.length);
+               System.arraycopy(toAdd, 0, result, 0, toAdd.length);
+               return result;
+           }
+           else {
+               throw new IllegalArgumentException("Can not create an array if both paramters are null.");
+           }
+       }
    }
    
    /**
@@ -42,9 +83,7 @@ public final class ArrayUtil {
    public static <T> T[] add(T[] array, T toAdd) {
        if (array != null) {
            T[] result = (T[])java.lang.reflect.Array.newInstance(array.getClass().getComponentType(), array.length + 1);
-           for (int i = 0; i < array.length; i++) {
-               result[i] = array[i];
-           }
+           System.arraycopy(array, 0, result, 0, array.length);
            result[array.length] = toAdd;
            return result;
        }

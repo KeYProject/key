@@ -34,6 +34,7 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.ui.PreferenceConstants;
 import org.eclipse.jdt.ui.wizards.JavaCapabilityConfigurationPage;
 import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.swt.widgets.Display;
@@ -52,6 +53,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.key_project.key4eclipse.util.eclipse.Logger;
 import org.key_project.key4eclipse.util.eclipse.WorkbenchUtil;
+import org.key_project.key4eclipse.util.java.ArrayUtil;
 import org.key_project.key4eclipse.util.java.thread.AbstractRunnableWithResult;
 import org.key_project.key4eclipse.util.java.thread.IRunnableWithResult;
 import org.key_project.key4eclipse.util.test.Activator;
@@ -137,9 +139,19 @@ public class TestUtilsUtil {
       }
       IJavaProject javaProject = JavaCore.create(project); 
       JavaCapabilityConfigurationPage page = new JavaCapabilityConfigurationPage();
-      page.init(javaProject, bin.getFullPath(), new IClasspathEntry[] {JavaCore.newSourceEntry(src.getFullPath())}, false);
+      IClasspathEntry[] entries = new IClasspathEntry[] {JavaCore.newSourceEntry(src.getFullPath())};
+      entries = ArrayUtil.addAll(entries, getDefaultJRELibrary());
+      page.init(javaProject, bin.getFullPath(), entries, false);
       page.configureJavaProject(null);
       return javaProject;
+   }
+   
+   /**
+    * Returns the default JRE library entries.
+    * @return The default JRE library entries.
+    */
+   public static IClasspathEntry[] getDefaultJRELibrary() {
+       return PreferenceConstants.getDefaultJRELibrary();
    }
 
    /**

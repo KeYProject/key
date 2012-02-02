@@ -25,11 +25,21 @@ import org.key_project.sed.key.ui.util.LogUtil;
  * Searches all available Java types ({@link IType}).
  * </p>
  * <p>
+ * Usage example:
+ * <pre><code>
+ * IJavaProject javaProject = ...;
+ * IJavaSearchScope searchScope = SearchEngine.createJavaSearchScope(new IJavaElement[] {javaProject}, IJavaSearchScope.SOURCES);
+ * AllTypesSearchEngine engine = new AllTypesSearchEngine();
+ * engine.setIncludeAnnotations(true);
+ * engine.setIncludeInnerAndAnonymousTypes(true);
+ * IType[] types = engine.searchTypes(new NullProgressMonitor(), searchScope);
+ * </code></pre>
+ * </p>
+ * <p>
  * The implementation is oriented at {@link MainMethodSearchEngine}.
  * </p>
  * @author Martin Hentschel
  */
-// TODO: Implement test
 @SuppressWarnings("restriction")
 public class AllTypesSearchEngine {
     /**
@@ -37,6 +47,11 @@ public class AllTypesSearchEngine {
      */
     private boolean includeInnerAndAnonymousTypes = false;
     
+    /**
+     * Include annotations in the search result?
+     */
+    private boolean includeAnnotations = false;
+
     /**
      * Implementation of {@link SearchRequestor} to collect found
      * {@link IType}s in a search.
@@ -65,7 +80,8 @@ public class AllTypesSearchEngine {
             Object enclosingElement = match.getElement();
             if (enclosingElement instanceof IType) {
                 IType type = (IType)enclosingElement;
-                if (includeInnerAndAnonymousTypes || !type.isMember() && !type.isAnonymous()) {
+                if ((isIncludeInnerAndAnonymousTypes() || (!type.isMember() && !type.isAnonymous())) &&
+                    (isIncludeAnnotations() || !type.isAnnotation())) {
                     result.add(type);
                 }
             }
@@ -81,7 +97,10 @@ public class AllTypesSearchEngine {
     public IType[] searchTypes(IProgressMonitor pm, IJavaSearchScope scope) {
         pm.beginTask("Searching for types...", 100);
         int searchTicks = 100;
-        SearchPattern pattern = SearchPattern.createPattern("*", IJavaSearchConstants.TYPE, IJavaSearchConstants.DECLARATIONS, SearchPattern.R_EXACT_MATCH | SearchPattern.R_CASE_SENSITIVE);
+        SearchPattern pattern = SearchPattern.createPattern("*",
+                                                            IJavaSearchConstants.TYPE,
+                                                            IJavaSearchConstants.ALL_OCCURRENCES, 
+                                                            SearchPattern.R_EXACT_MATCH | SearchPattern.R_CASE_SENSITIVE);
         SearchParticipant[] participants = new SearchParticipant[] {SearchEngine.getDefaultSearchParticipant()};
         TypeCollector collector = new TypeCollector();
         IProgressMonitor searchMonitor = new SubProgressMonitor(pm, searchTicks);
@@ -129,5 +148,21 @@ public class AllTypesSearchEngine {
      */
     public void setIncludeInnerAndAnonymousTypes(boolean includeInnerAndAnonymousTypes) {
         this.includeInnerAndAnonymousTypes = includeInnerAndAnonymousTypes;
+    }
+    
+    /**
+     * Checks if annotations are included in the search result.
+     * @return {@code true} included, {@code false} not included.
+     */
+    public boolean isIncludeAnnotations() {
+        return includeAnnotations;
+    }
+
+    /**
+     * Defines if annotations are included in the search result.
+     * @param includeAnnotations {@code true} included, {@code false} not included.
+     */
+    public void setIncludeAnnotations(boolean includeAnnotations) {
+        this.includeAnnotations = includeAnnotations;
     }
 }

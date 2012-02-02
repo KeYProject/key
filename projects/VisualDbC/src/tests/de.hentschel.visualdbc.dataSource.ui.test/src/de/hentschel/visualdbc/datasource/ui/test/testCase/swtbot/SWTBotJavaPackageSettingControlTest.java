@@ -70,7 +70,7 @@ public class SWTBotJavaPackageSettingControlTest extends TestCase {
          IFolder packageAFolder = srcFolder.getFolder("sWTBotJavaPackageSettingControlTestA");
          assertTrue(packageAFolder.exists());
          IPackageFragmentRoot[] roots = javaProject.getPackageFragmentRoots();
-         assertEquals(1, roots.length);
+         assertTrue(roots.length >= 1);
          IPackageFragmentRoot defaultPackage = roots[0];
          assertNotNull(defaultPackage);
          IPackageFragment packageA = defaultPackage.getPackageFragment("sWTBotJavaPackageSettingControlTestA");
@@ -160,7 +160,7 @@ public class SWTBotJavaPackageSettingControlTest extends TestCase {
          IFolder packageAFolder = srcFolder.getFolder("sWTBotJavaPackageSettingControlTestA");
          assertTrue(packageAFolder.exists());
          IPackageFragmentRoot[] roots = javaProject.getPackageFragmentRoots();
-         assertEquals(1, roots.length);
+         assertTrue(roots.length >= 1);
          IPackageFragmentRoot defaultPackage = roots[0];
          assertNotNull(defaultPackage);
          IPackageFragment packageA = defaultPackage.getPackageFragment("sWTBotJavaPackageSettingControlTestA");
@@ -274,7 +274,7 @@ public class SWTBotJavaPackageSettingControlTest extends TestCase {
          IFolder packageAFolder = srcFolder.getFolder("sWTBotJavaPackageSettingControlTestA");
          assertTrue(packageAFolder.exists());
          IPackageFragmentRoot[] roots = javaProject.getPackageFragmentRoots();
-         assertEquals(1, roots.length);
+         assertTrue(roots.length >= 1);
          IPackageFragmentRoot defaultPackage = roots[0];
          assertNotNull(defaultPackage);
          IPackageFragment packageA = defaultPackage.getPackageFragment("sWTBotJavaPackageSettingControlTestA");
@@ -376,7 +376,7 @@ public class SWTBotJavaPackageSettingControlTest extends TestCase {
          IFolder packageAFolder = srcFolder.getFolder("sWTBotJavaPackageSettingControlTestA");
          assertTrue(packageAFolder.exists());
          IPackageFragmentRoot[] roots = javaProject.getPackageFragmentRoots();
-         assertEquals(1, roots.length);
+         assertTrue(roots.length >= 1);
          IPackageFragmentRoot defaultPackage = roots[0];
          assertNotNull(defaultPackage);
          IPackageFragment packageA = defaultPackage.getPackageFragment("sWTBotJavaPackageSettingControlTestA");
@@ -461,7 +461,7 @@ public class SWTBotJavaPackageSettingControlTest extends TestCase {
          IFolder packageAFolder = srcFolder.getFolder("sWTBotJavaPackageSettingControlTestA");
          assertTrue(packageAFolder.exists());
          IPackageFragmentRoot[] roots = javaProject.getPackageFragmentRoots();
-         assertEquals(1, roots.length);
+         assertTrue(roots.length >= 1);
          IPackageFragmentRoot defaultPackage = roots[0];
          assertNotNull(defaultPackage);
          IPackageFragment packageA = defaultPackage.getPackageFragment("sWTBotJavaPackageSettingControlTestA");
@@ -547,7 +547,7 @@ public class SWTBotJavaPackageSettingControlTest extends TestCase {
          IFolder packageAFolder = srcFolder.getFolder("sWTBotJavaPackageSettingControlTestA");
          assertTrue(packageAFolder.exists());
          IPackageFragmentRoot[] roots = javaProject.getPackageFragmentRoots();
-         assertEquals(1, roots.length);
+         assertTrue(roots.length >= 1);
          IPackageFragmentRoot defaultPackage = roots[0];
          assertNotNull(defaultPackage);
          IPackageFragment packageA = defaultPackage.getPackageFragment("sWTBotJavaPackageSettingControlTestA");

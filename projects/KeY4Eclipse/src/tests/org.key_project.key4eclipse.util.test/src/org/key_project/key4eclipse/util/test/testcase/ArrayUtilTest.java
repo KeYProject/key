@@ -16,15 +16,51 @@ import junit.framework.TestCase;
 import org.junit.Test;
 import org.key_project.key4eclipse.util.java.ArrayUtil;
 
-
 /**
  * Tests for {@link ArrayUtil}
  * @author Martin Hentschel
  */
 public class ArrayUtilTest extends TestCase {
     /**
+     * Tests {@link ArrayUtil#addAll(Object[], Object[])}
+     */
+    @Test
+    public void testAddAll() {
+        String[] first = new String[] {"A", "B", "C"};
+        String[] second = new String[] {"D", "E"};
+        // Test first parameter null
+        String[] combined = ArrayUtil.addAll(null, second);
+        assertEquals(2, combined.length);
+        assertEquals("D", combined[0]);
+        assertEquals("E", combined[1]);
+        // Test second parameter null
+        combined = ArrayUtil.addAll(first, null);
+        assertEquals(3, combined.length);
+        assertEquals("A", combined[0]);
+        assertEquals("B", combined[1]);
+        assertEquals("C", combined[2]);
+        // Test both parameter valid
+        combined = ArrayUtil.addAll(first, second);
+        assertEquals(5, combined.length);
+        assertEquals("A", combined[0]);
+        assertEquals("B", combined[1]);
+        assertEquals("C", combined[2]);
+        assertEquals("D", combined[3]);
+        assertEquals("E", combined[4]);
+        // Test both parameter null
+        try {
+            ArrayUtil.addAll(null, null);
+            fail("Exception expected if both parameters are null.");
+        }
+        catch (IllegalArgumentException e) {
+            assertEquals("Can not create an array if both paramters are null.", e.getMessage());
+        }
+    }
+    
+    /**
      * Tests {@link ArrayUtil#add(Object[], Object)}
      */
+    @Test
     public void testAdd() {
         // Test null array
         String[] result = ArrayUtil.add(null, "A");

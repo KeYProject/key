@@ -14,10 +14,10 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jdt.core.ILocalVariable;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.Signature;
 import org.key_project.key4eclipse.starter.core.job.AbstractKeYMainWindowJob;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.util.eclipse.ResourceUtil;
@@ -384,18 +384,18 @@ public final class KeYUtil {
      * @param javaInfo The {@link JavaInfo} of KeY to use.
      * @return The found {@link KeYJavaType}.
      * @throws ProofInputException Occurred Exception.
+     * @throws JavaModelException Occurred Exception.
      */
-    public static ImmutableList<KeYJavaType> getParameterKJTs(IMethod method, JavaInfo javaInfo) throws ProofInputException {
+    public static ImmutableList<KeYJavaType> getParameterKJTs(IMethod method, JavaInfo javaInfo) throws ProofInputException, JavaModelException {
         ImmutableList<KeYJavaType> result = ImmutableSLList.<KeYJavaType>nil();
         IType declaringType         = method.getDeclaringType();
-        String[] parameterTypeNames = method.getParameterTypes();
-        for(int i = 0; i < parameterTypeNames.length; i++) {
-            String javaTypeName = determineJavaType(parameterTypeNames[i], declaringType);
-
+        ILocalVariable[] parameters = method.getParameters();
+        for (ILocalVariable parameter : parameters) {
+            String javaTypeName = JDTUtil.getQualifiedParameterType(declaringType, parameter);
             if(javaTypeName == null) {
                 throw new ProofInputException("Error determining signature types: " + 
                                               "Could not resolve type " + 
-                                              parameterTypeNames[i] + 
+                                              parameter + 
                                               "! This is probably a syntax problem, " + 
                                               " check your import statements.");
             }
@@ -403,76 +403,6 @@ public final class KeYUtil {
             result = result.append(kjt);
         }
         return result;
-    }
-    
-    /**
-     * Computes the name of the java type.
-     * @param eclipseSignature The signature in eclipse.
-     * @param surroundingType The parent type.
-     * @return The name of the java type.
-     * @throws ProofInputException Occurred Exception.
-     */
-    public static String determineJavaType(String eclipseSignature, IType surroundingType) throws ProofInputException {
-        try {
-            switch(eclipseSignature.charAt(0)) {
-
-            case Signature.C_ARRAY: // this parameter is an array
-                int depth = Signature.getArrayCount(eclipseSignature);
-                StringBuffer type = new StringBuffer(determineJavaType(Signature.getElementType(eclipseSignature), surroundingType));
-                // array type is <element type> ([])+, now create the []s
-                for (int i = 0; i < depth; i++) {
-                    type.append('['); type.append(']');
-                    // this is probably much faster, than handling String-objects ?!                
-                }
-                return type.toString();
-            // primitive types:
-            case Signature.C_BOOLEAN:
-                return "boolean";
-
-            case Signature.C_BYTE:
-                return "byte";
-
-            case Signature.C_CHAR:
-                return "char";
-
-            case Signature.C_DOUBLE:
-                return "double";
-
-            case Signature.C_FLOAT:
-                return "float";
-
-            case Signature.C_INT:
-                return "int";
-
-            case Signature.C_LONG:
-                return "long";
-
-            case Signature.C_SHORT:
-                return "short";
-
-            // arbitrary types with fully-qualified name
-            case Signature.C_RESOLVED:
-                return eclipseSignature.substring(1, eclipseSignature.length() - 1);
-                // eclipse input is "Lpackage.Type;", so
-                // cut off the first and last character
-
-            // arbitrary types with unresolved names
-            case Signature.C_UNRESOLVED:
-                String unqualifiedTypeName = eclipseSignature.substring(1, eclipseSignature.length() - 1);
-                String[][] resolvedTypes = surroundingType.resolveType(unqualifiedTypeName);                                    
-                if (resolvedTypes != null && resolvedTypes.length > 0) {
-                    return (resolvedTypes[0][0].equals("") ? "" : resolvedTypes[0][0] + ".") + resolvedTypes[0][1];
-                } 
-                else {
-                    return null;
-                }
-            default:
-                throw new ProofInputException("Not supported Eclipse Signature type " + eclipseSignature + ".");
-            }
-        }
-        catch (JavaModelException e) {
-            throw new ProofInputException(e);
-        }
     }
     
     /**

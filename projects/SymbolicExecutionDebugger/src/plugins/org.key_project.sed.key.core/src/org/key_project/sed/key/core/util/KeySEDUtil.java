@@ -13,6 +13,7 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaModelException;
 import org.key_project.key4eclipse.util.java.ObjectUtil;
 import org.key_project.key4eclipse.util.java.StringUtil;
 import org.key_project.key4eclipse.util.jdt.JDTUtil;
@@ -90,10 +91,11 @@ public final class KeySEDUtil {
      * for the given {@link IMethod}.
      * @param method The given {@link IMethod}.
      * @return The value to store.
+     * @throws JavaModelException Occurred Exception
      */
-    public static String getMethodValue(IMethod method) {
+    public static String getMethodValue(IMethod method) throws JavaModelException {
         if (method != null) {
-            return JDTUtil.getTextLabel(method);
+            return JDTUtil.getQualifiedMethodLabel(method);
         }
         else {
             return null;
@@ -161,7 +163,7 @@ public final class KeySEDUtil {
                 IType type = project.findType(typeName);
                 if (type != null) {
                     String methodSignature = getMethodValue(configuration);
-                    result = (IMethod)JDTUtil.getElementForTextLabel(type.getMethods(), methodSignature);
+                    result = JDTUtil.getElementForQualifiedMethodLabel(type.getMethods(), methodSignature);
                 }
             }
         }

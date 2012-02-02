@@ -25,6 +25,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.ILocalVariable;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
@@ -43,6 +44,114 @@ import org.key_project.key4eclipse.util.test.util.TestUtilsUtil;
  * @author Martin Hentschel
  */
 public class JDTUtilTest extends TestCase {
+    /**
+     * Tests {@link JDTUtil#getQualifiedParameterType(IType, org.eclipse.jdt.core.ILocalVariable)}.
+     */
+    @Test
+    public void testGetQualifiedParameterType() throws CoreException, InterruptedException {
+        // Create projects with test content
+        IJavaProject javaProject = TestUtilsUtil.createJavaProject("JDTUtilTest_testGetQualifiedParameterType");
+        IFolder srcFolder = javaProject.getProject().getFolder("src");
+        BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/SignatureLabelTest", srcFolder);
+        // Get type
+        IType type = javaProject.findType("SignatureLabelTest");
+        assertNotNull(type);
+        IMethod[] methods = type.getMethods();
+        IMethod method = JDTUtil.getElementForQualifiedMethodLabel(methods, "ADateBDate(a.Date, b.Date)");
+        assertNotNull(method);
+        ILocalVariable[] parameters = method.getParameters();
+        assertEquals(2, parameters.length);
+        // Test null type
+        assertNull(JDTUtil.getQualifiedParameterType(null, parameters[0]));
+        // Test null parameter
+        assertNull(JDTUtil.getQualifiedParameterType(type, null));
+        // Test both null
+        assertNull(JDTUtil.getQualifiedParameterType(null, null));
+        // Test methods parameter
+        assertEquals("a.Date", JDTUtil.getQualifiedParameterType(type, parameters[0]));
+        assertEquals("b.Date", JDTUtil.getQualifiedParameterType(type, parameters[1]));
+    }
+    
+    /**
+     * Tests {@link JDTUtil#getElementForQualifiedMethodLabel(IMethod[], String)}
+     * @throws InterruptedException 
+     * @throws CoreException 
+     */
+    @Test
+    public void testGetElementForQualifiedMethodLabel() throws CoreException, InterruptedException {
+        // Create projects with test content
+        IJavaProject javaProject = TestUtilsUtil.createJavaProject("JDTUtilTest_testGetElementForQualifiedMethodLabel");
+        IFolder srcFolder = javaProject.getProject().getFolder("src");
+        BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/MethodTest", srcFolder);
+        // Get type
+        IType type = javaProject.findType("MethodTest");
+        assertNotNull(type);
+        IMethod[] methods = type.getMethods();
+        assertTrue(methods != null && methods.length >= 1);
+        // Test null text label
+        assertEquals(null, JDTUtil.getElementForQualifiedMethodLabel(methods, null));
+        // Test null elements
+        assertEquals(null, JDTUtil.getElementForQualifiedMethodLabel(null, JDTUtil.getQualifiedMethodLabel(methods[0])));
+        // Test invalid label
+        assertEquals(null, JDTUtil.getElementForQualifiedMethodLabel(methods, "invalid()"));
+        // Test valid methods
+        for (IMethod method : methods) {
+            assertSame(method, JDTUtil.getElementForQualifiedMethodLabel(methods, JDTUtil.getQualifiedMethodLabel(method)));
+        }
+    }
+    
+    /**
+     * Tests {@link JDTUtil#getQualifiedMethodLabel(IMethod)}.
+     */
+    @Test
+    public void testGetQualifiedMethodLabel() throws CoreException, InterruptedException {
+        // Create projects with test content
+        IJavaProject javaProject = TestUtilsUtil.createJavaProject("JDTUtilTest_testGetQualifiedMethodLabel");
+        IFolder srcFolder = javaProject.getProject().getFolder("src");
+        BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/SignatureLabelTest", srcFolder);
+        // Get type
+        IType type = javaProject.findType("SignatureLabelTest");
+        IMethod[] methods = type.getMethods();
+        String[] expectedLabels = new String[] { "booleanParam(boolean)",
+                                                 "byteParam(byte)",
+                                                 "shortParam(short)",
+                                                 "intParam(int)",
+                                                 "longParam(long)",
+                                                 "doubleParam(double)",
+                                                 "floatParam(float)",
+                                                 "charParam(char)",
+                                                 "objectParam(java.lang.Object)",
+                                                 "stringParam(java.lang.String)",
+                                                 "booleanArrayParam(boolean[])",
+                                                 "byteArrayParam(byte[])",
+                                                 "shortArrayParam(short[])",
+                                                 "intArrayParam(int[])",
+                                                 "longArrayParam(long[])",
+                                                 "doubleArrayParam(double[])",
+                                                 "floatArrayParam(float[])",
+                                                 "charArrayParam(char[])",
+                                                 "objectArrayParam(java.lang.Object[])",
+                                                 "stringArrayParam(java.lang.String[])",
+                                                 "booleanArrayArrayParam(boolean[][])",
+                                                 "byteArrayArrayParam(byte[][])",
+                                                 "shortArrayArrayParam(short[][])",
+                                                 "intArrayArrayParam(int[][])",
+                                                 "longArrayArrayParam(long[][])",
+                                                 "doubleArrayArrayParam(double[][])",
+                                                 "floatArrayArrayParam(float[][])",
+                                                 "charArrayArrayParam(char[][])",
+                                                 "objectArrayArrayParam(java.lang.Object[][])",
+                                                 "stringArrayArrayParam(java.lang.String[][])",
+                                                 "ADateADate(a.Date, a.Date)",
+                                                 "ADateBDate(a.Date, b.Date)",
+                                                 "BDateBDate(b.Date, b.Date)"
+        };
+        for (int i = 0; i < methods.length; i++) {
+            String label = JDTUtil.getQualifiedMethodLabel(methods[i]);
+            assertEquals(expectedLabels[i], label);
+        }
+    }
+    
     /**
      * Tests {@link JDTUtil#getElementForTextLabel(IJavaElement[], String)}
      * @throws InterruptedException 
@@ -97,9 +206,13 @@ public class JDTUtilTest extends TestCase {
         // Create initial java project
         IJavaProject javaProject = TestUtilsUtil.createJavaProject("JDTUtilTest_testAddClasspathEntry");
         IFolder src = javaProject.getProject().getFolder("src");
+        IClasspathEntry[] defaultEntries = TestUtilsUtil.getDefaultJRELibrary();
         IClasspathEntry[] entries = javaProject.getRawClasspath();
-        assertEquals(1, entries.length);
+        assertEquals(1 + defaultEntries.length, entries.length);
         assertEquals(src.getFullPath(), entries[0].getPath());
+        for (int i = 1; i < entries.length; i++) {
+            assertEquals(entries[i], defaultEntries[i - 1]);
+        }
         // Test null execution which should do nothing
         IFolder secondSrc = javaProject.getProject().getFolder("secondSrc");
         if (!secondSrc.exists()) {
@@ -109,14 +222,20 @@ public class JDTUtilTest extends TestCase {
         JDTUtil.addClasspathEntry(null, JavaCore.newSourceEntry(secondSrc.getFullPath()));
         JDTUtil.addClasspathEntry(javaProject, null);
         entries = javaProject.getRawClasspath();
-        assertEquals(1, entries.length);
+        assertEquals(1 + defaultEntries.length, entries.length);
         assertEquals(src.getFullPath(), entries[0].getPath());
+        for (int i = 1; i < entries.length; i++) {
+            assertEquals(entries[i], defaultEntries[i - 1]);
+        }
         // Add path entry
         JDTUtil.addClasspathEntry(javaProject, JavaCore.newSourceEntry(secondSrc.getFullPath()));
         entries = javaProject.getRawClasspath();
-        assertEquals(2, entries.length);
+        assertEquals(2 + defaultEntries.length, entries.length);
         assertEquals(src.getFullPath(), entries[0].getPath());
-        assertEquals(secondSrc.getFullPath(), entries[1].getPath());
+        for (int i = 1; i < defaultEntries.length; i++) {
+            assertEquals(entries[i], defaultEntries[i - 1]);
+        }
+        assertEquals(secondSrc.getFullPath(), entries[entries.length - 1].getPath());
     }
     
     /**

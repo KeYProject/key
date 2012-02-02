@@ -24,11 +24,16 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.ILocalVariable;
+import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IPackageDeclaration;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
+import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.Signature;
+import org.eclipse.jdt.internal.ui.viewsupport.JavaElementLabelComposer;
 import org.eclipse.jdt.ui.JavaElementLabels;
 import org.key_project.key4eclipse.util.eclipse.ResourceUtil;
 import org.key_project.key4eclipse.util.java.ArrayUtil;
@@ -38,11 +43,183 @@ import org.key_project.key4eclipse.util.java.ObjectUtil;
  * Provides static methods to work with JDT.
  * @author Martin Hentschel
  */
+@SuppressWarnings("restriction")
 public class JDTUtil {
    /**
     * Forbid instances by this private constructor.
     */
    private JDTUtil() {
+   }
+   
+   /**
+    * Returns the first {@link IJavaElement} from the given once that
+    * has the given text label.
+    * @param elements The {@link IJavaElement}s to search in.
+    * @param textLabel The text label for that the {@link IJavaElement} is needed.
+    * @return The first found {@link IJavaElement} or {@code null} if no one was found.
+    * @throws JavaModelException Occurred Exception 
+    */
+   public static IMethod getElementForQualifiedMethodLabel(IMethod[] elements, String textLabel) throws JavaModelException {
+       IMethod result = null;
+       if (elements != null) {
+           int i = 0;
+           while (result == null && i < elements.length) {
+               if (ObjectUtil.equals(textLabel, getQualifiedMethodLabel(elements[i]))) {
+                   result = elements[i];
+               }
+               i++;
+           }
+       }
+       return result;
+   }
+   
+   /**
+    * <p>
+    * Returns the unique method signature for the given {@link IMethod}.
+    * Parameter types are replaced with the full qualified type names.
+    * </p>
+    * <p>
+    * Example method declaration: {@code public int foo(Date ud, java.sql.Date sd)}<br>
+    * Created signature: {@code foo(java.util.Date, java.sql.Date)}
+    * </p>
+    * @param method The {@link IMethod} for that the signature label is needed.
+    * @return The created label.
+    * @throws JavaModelException Occurred Exception.
+    */
+   public static String getQualifiedMethodLabel(IMethod method) throws JavaModelException {
+      try {
+         if (method != null) {
+            StringBuffer sb = new StringBuffer();
+            sb.append(method.getElementName());
+            sb.append("(");
+            ILocalVariable[] parameters = method.getParameters();
+            boolean afterFirst = false;
+            JavaElementLabelComposerHelper c = new JavaElementLabelComposerHelper(sb, method.getDeclaringType());
+            for (ILocalVariable parameter : parameters) {
+               if (afterFirst) {
+                  sb.append(", ");
+               }
+               else {
+                  afterFirst = true;
+               }
+               c.appendTypeSignatureLabel(parameter, parameter.getTypeSignature(), JavaElementLabels.F_PRE_TYPE_SIGNATURE);
+            }
+            sb.append(")");
+            return sb.toString();
+         }
+         else {
+            return null;
+         }
+      }
+      catch (JavaModelRuntimeException e) {
+         throw e.getCause();
+      }
+   }
+   
+   /**
+    * Returns the full qualified type name of the given method parameter.
+    * @param declaringType The {@link IType} that contains the {@link IMethod} which has the given parameter as {@link ILocalVariable} instance.
+    * @param parameter The parameter.
+    * @return The full qualified name.
+    * @throws JavaModelException Occurred Exception.
+    */
+   public static String getQualifiedParameterType(IType declaringType, ILocalVariable parameter) throws JavaModelException {
+      try {
+         if (declaringType != null && parameter != null) {
+            StringBuffer sb = new StringBuffer();
+            JavaElementLabelComposerHelper c = new JavaElementLabelComposerHelper(sb, declaringType);
+            c.appendTypeSignatureLabel(parameter, parameter.getTypeSignature(), JavaElementLabels.F_PRE_TYPE_SIGNATURE);
+            return sb.toString();
+         }
+         else {
+            return null;
+         }
+      }
+      catch (JavaModelRuntimeException e) {
+         throw e.getCause();
+      }
+   }
+   
+   /**
+    * Utility class to compute the full qualified type of a method parameter.
+    * @author Martin Hentschel
+    */
+   private static class JavaElementLabelComposerHelper extends JavaElementLabelComposer {
+      /**
+       * The Type that contains the method.
+       */
+      private IType declaringType;
+
+      /**
+       * Constructor.
+       * @param buffer The {@link StringBuffer} to fill.
+       * @param declaringType The Type that contains the method.
+       */
+      private JavaElementLabelComposerHelper(StringBuffer buffer, IType declaringType) {
+         super(buffer);
+         this.declaringType = declaringType;
+      }
+
+      /**
+       * <p>
+       * {@inheritDoc}
+       * </p>
+       * <p>
+       * Changed visibility to public.
+       * </p>
+       */
+      @Override
+      public void appendTypeSignatureLabel(IJavaElement enclosingElement, String typeSig, long flags) {
+         super.appendTypeSignatureLabel(enclosingElement, typeSig, flags);
+      }
+
+      /**
+       * Overwritten to return the fulil qualified type name instead of the simple type name.
+       */
+      @Override
+      protected String getSimpleTypeName(IJavaElement enclosingElement, String typeSig) {
+         try {
+            String simpleName = Signature.toString(Signature.getTypeErasure(typeSig));
+            String[][] resolvedTypes = declaringType.resolveType(simpleName);
+            if (resolvedTypes != null && resolvedTypes.length > 0) {
+               return (resolvedTypes[0][0].equals("") ? "" : resolvedTypes[0][0] + ".") + resolvedTypes[0][1];
+            } 
+            else {
+               return simpleName;
+            }
+         }
+         catch (JavaModelException e) {
+            throw new JavaModelRuntimeException(e);
+         }
+      }
+   }
+   
+   /**
+    * A utility {@link RuntimeException} that is used to transfer
+    * a {@link JavaModelException} back in the call hierarchy.
+    * @author Martin Hentschel
+    */
+   private static class JavaModelRuntimeException extends RuntimeException {
+      /**
+       * Generated UID.
+       */
+      private static final long serialVersionUID = 9027197807876279139L;
+
+      /**
+       * Constructor.
+       * @param cause The {@link JavaModelException} to wrap.
+       */
+      private JavaModelRuntimeException(JavaModelException cause) {
+         super(cause);
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public JavaModelException getCause() {
+         return (JavaModelException)super.getCause();
+      }
    }
    
    /**

@@ -34,7 +34,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.key_project.key4eclipse.util.jdt.JDTUtil;
 import org.key_project.sed.key.core.util.KeySEDUtil;
-import org.key_project.sed.key.ui.jdt.AllMethodsSearchEngine;
+import org.key_project.sed.key.ui.jdt.AllOperationsSearchEngine;
 import org.key_project.sed.key.ui.jdt.AllTypesSearchEngine;
 import org.key_project.sed.key.ui.util.KeYSEDImages;
 import org.key_project.sed.key.ui.util.LogUtil;
@@ -280,8 +280,8 @@ public class KeYLaunchConfigurationTab extends AbstractLaunchConfigurationTab {
                 elements = new IJavaElement[] {};
             }
             IJavaSearchScope searchScope = SearchEngine.createJavaSearchScope(elements, IJavaSearchScope.SOURCES);
-            AllMethodsSearchEngine engine = new AllMethodsSearchEngine();
-            IMethod[] methods = engine.searchMethods(getLaunchConfigurationDialog(), searchScope);
+            AllOperationsSearchEngine engine = new AllOperationsSearchEngine();
+            IMethod[] methods = engine.searchOperations(getLaunchConfigurationDialog(), searchScope);
             // Open selection dialog
             ILabelProvider labelProvider = new JavaElementLabelProvider(JavaElementLabelProvider.SHOW_DEFAULT);
             ElementListSelectionDialog dialog = new ElementListSelectionDialog(getShell(), labelProvider);
@@ -316,7 +316,7 @@ public class KeYLaunchConfigurationTab extends AbstractLaunchConfigurationTab {
             if (!text.isEmpty()) {
                 IType type = getType();
                 if (type != null) {
-                    return (IMethod)JDTUtil.getElementForTextLabel(type.getMethods(), text);
+                    return JDTUtil.getElementForQualifiedMethodLabel(type.getMethods(), text);
                 }
                 else {
                     return null;
