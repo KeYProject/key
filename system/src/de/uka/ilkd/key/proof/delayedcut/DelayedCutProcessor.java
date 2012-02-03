@@ -13,12 +13,10 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
-import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.TacletFilter;
-import de.uka.ilkd.key.proof.join.ProspectivePartner;
 import de.uka.ilkd.key.rule.BuiltInRuleApp;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
@@ -128,7 +126,7 @@ public class DelayedCutProcessor implements Runnable {
                   
          // rebuild the tree that has been pruned before.
          List<Goal> openLeaves = rebuildSubTrees(delayedCut, result.head());
-    
+     
          // uncover the decision predicate.
          uncoverDecisionPredicate(delayedCut, openLeaves);
      
@@ -261,7 +259,7 @@ public class DelayedCutProcessor implements Runnable {
         LinkedList<NodeGoalPair> pairs = new LinkedList<NodeGoalPair>();
         LinkedList<Goal>  openLeaves = new LinkedList<Goal>();
  
-        add(pairs,new LinkedList<Goal>(),cut.getSubtrees().iterator(),
+        add(pairs,openLeaves,cut.getSubtrees().iterator(),
         		  apply(cut.getNode(),goal,cut.getFirstAppliedRuleApp(),cut.getServices()));
 
         int totalNumber = 0;
@@ -370,7 +368,9 @@ public class DelayedCutProcessor implements Runnable {
     }
     
     private void check(Goal goal,final RuleApp app, PosInOccurrence newPos, Services services){
-
+        if(newPos == null){
+            return;
+        }
     	if(app instanceof BuiltInRuleApp){
     		for(RuleApp newApp: goal.ruleAppIndex().getBuiltInRules(goal, newPos)){
     			if(app.rule().name().compareTo(newApp.rule().name()) == 0){

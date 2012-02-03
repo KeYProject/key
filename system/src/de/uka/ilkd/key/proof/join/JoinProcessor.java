@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.TreeSet;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
@@ -110,7 +111,12 @@ public class JoinProcessor implements Runnable{
             
         };
         ImmutableList<NoPosTacletApp> apps =  goal.ruleAppIndex().getFindTaclet(filter,pio, services);
-        assert apps.size() == 1;
+        if(apps.size() != 1){
+            if(tacletName.equals(SIMPLIFY_UPDATE)){
+                return ImmutableSLList.<Goal>nil().append(goal);
+            }
+            throw new RuntimeException("Cannot apply taclet " +tacletName  + " on node "+ goal.node().serialNr());
+        }
         NoPosTacletApp app = apps.head();
         
         PosTacletApp app2 = app.setPosInOccurrence(pio, services);
