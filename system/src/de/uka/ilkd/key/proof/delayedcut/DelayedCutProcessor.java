@@ -17,6 +17,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.TacletFilter;
+import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.BuiltInRuleApp;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
@@ -361,8 +362,9 @@ public class DelayedCutProcessor implements Runnable {
 
         if(oldRuleApp instanceof BuiltInRuleApp){
             BuiltInRuleApp app = (BuiltInRuleApp) oldRuleApp;
-            return new BuiltInRuleApp(app.rule(), translate(pair,services), app.ifInsts());
+            return new BuiltInRuleApp(app.rule(),newPos, app.ifInsts());
         }
+        
         return oldRuleApp;
         
     }
@@ -372,29 +374,40 @@ public class DelayedCutProcessor implements Runnable {
             return;
         }
     	if(app instanceof BuiltInRuleApp){
-    		for(RuleApp newApp: goal.ruleAppIndex().getBuiltInRules(goal, newPos)){
-    			if(app.rule().name().compareTo(newApp.rule().name()) == 0){
-    				return;
-    			}    			
+    		BuiltInRule rule = (BuiltInRule) app.rule();
+    		if(rule.isApplicable(goal, newPos)){
+    			return;
     		}
+//    		for(RuleApp newApp: goal.ruleAppIndex().getBuiltInRules(goal, newPos)){
+//    			if(app.rule().name().compareTo(newApp.rule().name()) == 0){
+//    				return;
+//    			}    			
+//    		}
+//  
     		throw new RuntimeException("Cannot apply built-in rule-app");
     		
     	}
     	
     	if(app instanceof TacletApp){
-    		ImmutableList<TacletApp> list = goal.ruleAppIndex().getTacletAppAt(new TacletFilter() {
-			
-			@Override
-			protected boolean filter(Taclet taclet) {			
-				return taclet.name().compareTo(app.rule().name()) == 0;
-			}
-    		}, newPos, services);
-    
-    	    if(!list.isEmpty()){
-    	    	return;
-    	    }
+    		NoPosTacletApp noPosApp = NoPosTacletApp.createNoPosTacletApp((Taclet)app.rule());
+    		if(noPosApp.matchFind(newPos, services) == null){
 
-    		throw new RuntimeException("Cannot apply taclet-app");
+        		throw new RuntimeException("Cannot apply taclet-app");
+    		}
+    		return;
+//    		ImmutableList<TacletApp> list = goal.ruleAppIndex().getTacletAppAt(new TacletFilter() {
+//			
+//			@Override
+//			protected boolean filter(Taclet taclet) {			
+//				return taclet.name().compareTo(app.rule().name()) == 0;
+//			}
+//    		}, newPos, services);
+//    
+//    	    if(!list.isEmpty()){
+//    	    	return;
+//    	    }
+//
+//    		throw new RuntimeException("Cannot apply taclet-app");
     	}
     	
     	throw new RuntimeException("App is neither a BuiltInApp nor a TacletApp, it's  of type"+app.getClass().getName());

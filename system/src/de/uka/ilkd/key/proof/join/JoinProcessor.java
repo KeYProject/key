@@ -6,7 +6,6 @@ import java.util.LinkedList;
 import java.util.TreeSet;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
@@ -21,7 +20,9 @@ import de.uka.ilkd.key.proof.TacletFilter;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCut;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCutProcessor;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.PosTacletApp;
+import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 
 public class JoinProcessor implements Runnable{
@@ -32,6 +33,7 @@ public class JoinProcessor implements Runnable{
     private final LinkedList<Listener> listeners = new LinkedList<Listener>();
     private static final String HIDE_RIGHT_TACLET = "hide_right";
     public static final String SIMPLIFY_UPDATE = "simplifyIfThenElseUpdate";
+    public static final String SIMPLIFY_IF_ELSE = "ifthenelse_same_branches";
 
 
     
@@ -96,26 +98,42 @@ public class JoinProcessor implements Runnable{
         SequentFormula sf = findFormula(goal.sequent(), cut.getFormula(), false);
         
         PosInOccurrence pio = new PosInOccurrence(sf,PosInTerm.TOP_LEVEL.down(0),false);
-        apply(SIMPLIFY_UPDATE, goal, pio);
+        
+        if(apply(new String [] {SIMPLIFY_IF_ELSE,SIMPLIFY_UPDATE,
+        }, goal, pio)== null){
+        	pio = new PosInOccurrence(sf,PosInTerm.TOP_LEVEL,false);
+        	ImmutableList<RuleApp> builtInApps =goal.ruleAppIndex().getBuiltInRules(goal, pio);
+        	for(RuleApp app : builtInApps){
+        		if(app.rule() == OneStepSimplifier.INSTANCE){
+        			goal.apply(app);
+        		}
+        	}
+        }
     }
     
-    private ImmutableList<Goal> apply(final String tacletName,Goal goal, PosInOccurrence pio){
+    /**Applies one of the given taclets if this possible otherwise an exception is thrown.*/
+    private ImmutableList<Goal> apply(final String [] tacletNames,Goal goal, PosInOccurrence pio){
+    	
+
         TacletFilter filter = new TacletFilter() {
             
             @Override
             protected boolean filter(Taclet taclet) {
-                
-                return taclet.name().toString().equals(tacletName);
+                for(String tacletName : tacletNames){
+                	if( taclet.name().toString().equals(tacletName)){
+                		return true;
+                	}
+                }
+                return false;
             }
             
             
         };
         ImmutableList<NoPosTacletApp> apps =  goal.ruleAppIndex().getFindTaclet(filter,pio, services);
-        if(apps.size() != 1){
-            if(tacletName.equals(SIMPLIFY_UPDATE)){
-                return ImmutableSLList.<Goal>nil().append(goal);
-            }
-            throw new RuntimeException("Cannot apply taclet " +tacletName  + " on node "+ goal.node().serialNr());
+        
+        if(apps.isEmpty()){
+        	return null;
+
         }
         NoPosTacletApp app = apps.head();
         
@@ -131,7 +149,7 @@ public class JoinProcessor implements Runnable{
         int index = goal.sequent().formulaNumberInSequent(false,partner.getFormulaForHiding());
         PosInOccurrence pio = PosInOccurrence.findInSequent(goal.sequent(),
                 index, PosInTerm.TOP_LEVEL);
-        return apply(HIDE_RIGHT_TACLET, goal, pio).head();
+        return apply(new String [] {HIDE_RIGHT_TACLET}, goal, pio).head();
         
     }
     
