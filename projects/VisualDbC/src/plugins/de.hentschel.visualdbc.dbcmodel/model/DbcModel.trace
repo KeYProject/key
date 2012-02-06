@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<trace:TraceModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:trace="http://www.eclipse.org/gmf/2006/Trace">
+  <nodeTraces
+      visualID="2007"
+      queryText="(let _eClass_:ecore::EClass = modelFacet.metaClass.ecoreClass in _eClass_.ePackage.nsURI = 'http://www.hentschel.de/dbcmodel' and _eClass_.name = 'DbcPackage') and (let _containmentMF_:ecore::EStructuralFeature = modelFacet.containmentMetaFeature.ecoreFeature in (let _eClass_:ecore::EClass = _containmentMF_.eContainingClass in _eClass_.ePackage.nsURI = 'http://www.hentschel.de/dbcmodel' and _eClass_.name = 'AbstractDbCContainer') and _containmentMF_.name = 'packages')">
+    <nodeLabelTraces
+        visualID="5042"
+        queryText="true"/>
+    <compartmentTraces
+        visualID="7034"
+        queryText="true"/>
+  </nodeTraces>
+  <nodeTraces
+      visualID="2011"
+      queryText="(let _eClass_:ecore::EClass = modelFacet.metaClass.ecoreClass in _eClass_.ePackage.nsURI = 'http://www.hentschel.de/dbcmodel' and _eClass_.name = 'DbcInterface') and (let _containmentMF_:ecore::EStructuralFeature = modelFacet.containmentMetaFeature.ecoreFeature in (let _eClass_:ecore::EClass = _containmentMF_.eContainingClass in _eClass_.ePackage.nsURI = 'http://www.hentschel.de/dbcmodel' and _eClass_.name = 'AbstractDbcTypeContainer') and _containmentMF_.name = 'types')">
+    <nodeLabelTraces
+        visualID="5049"
+        queryText="true"/>
+    <compartmentTraces
+        visualID="7057"
+        queryText="true"/>
+    <compartmentTraces
+        visualID="7058"
+        queryText="true"/>
+  </nodeTraces>
+  <nodeTraces
+      visualID="2012"
+      queryText="(let _eClass_:ecore::EClass = modelFacet.metaClass.ecoreClass in _eClass_.ePackage.nsURI = 'http://www.hentschel.de/dbcmodel' and _eClass_.name = 'DbcClass') and (let _containmentMF_:ecore::EStructuralFeature = modelFacet.containmentMetaFeature.ecoreFeature in (let _eClass_:ecore::EClass = _containmentMF_.eContainingClass in _eClass_.ePackage.nsURI = 'http://www.hentschel.de/dbcmodel' and _eClass_.name = 'AbstractDbcTypeContainer') and _containmentMF_.name = 'types')">
+    <nodeLabelTraces
+        visualID="5050"
+        queryText="true"/>
+    <compartmentTraces
+        visualID="7059"
+        queryText="true"/>
+    <compartmentTraces
+        visualID="7060"
+        queryText="true"/>
+  </nodeTraces>
+  <nodeTraces
+      visualID="2013"
+      queryText="(let _eClass_:ecore::EClass = modelFacet.metaClass.ecoreClass in _eClass_.ePackage.nsURI = 'http://www.hentschel.de/dbcmodel' and _eClass_.name = 'DbcEnum') and (let _containmentMF_:ecore::EStructuralFeature = modelFacet.containmentMetaFeature.ecoreFeature in (let _eClass_:ecore::EClass = _containmentMF_.eContainingClass in _eClass_.ePackage.nsURI = 'http://www.hentschel.de/dbcmodel' and _eClass_.name = 'AbstractDbcTypeContainer') and _containmentMF_.name = 'types')">
+    <nodeLabelTraces
+        visualID="5051"
+        queryText="true"/>
+    <compartmentTraces
+        visualID="7061"
+        queryText="true"/>
+    <compartmentTraces
+        visualID="7062"
+        queryText="true"/>
+    <compartmentTraces
+        visualID="7063"
+        queryText="true"/>
+  </nodeTraces>
+  <nodeTraces
+      visualID="2014"
+      queryText="(let _eClass_:ecore::EClass = modelFacet.metaClass.ecoreClass in _eClass_.ePackage.nsURI = 'http://www.hentschel.de/dbcmodel' and _eClass_.name = 'DbcProof') and (let _containmentMF_:ecore::EStructuralFeature = modelFacet.containmentMetaFeature.ecoreFeature in (let _eClass_:ecore::EClass = _containmentMF_.eContainingClass in _eClass_.ePackage.nsURI = 'http://www.hentschel.de/dbcmodel' and _eClass_.name = 'AbstractDbcProofContainer') and _containmentMF_.name = 'proofs')">
+    <nodeLabelTraces
+        visualID="5053"
+        queryText="true"/>
+  </nodeTraces>
+  <childNodeTraces
+      visualID="3009"
+      queryText="(let _eClass_:ecore::EClass = modelFacet.metaClass.ecoreClass in _eClass_.ePackage.nsURI = 'http://www.hentschel.de/dbcmodel' and _eClass_.name = 'DbcMethod') and (let _containmentMF_:ecore::EStructuralFeature = modelFacet.containmentMetaFeature.ecoreFeature in (let _eClass_:ecore::EClass = _containmentMF_.eContainingClass in _eClass_.ePackage.nsURI = 'http://www.hentschel.de/dbcmodel' and _eClass_.name = 'AbstractDbcInterface') and _containmentMF_.name = 'methods')">
+    <nodeLabelTraces
+        visualID="5011"
+        queryText="true"/>
+    <compartmentTraces
+        visualID="7011"
+        queryText="true"/>
+  </childNodeTraces>
+  <childNodeTraces
+      visualID="3010"
+      queryText="(let _eClass_:ecore::EClass = modelFacet.metaClass.ecoreClass in _eClass_.ePackage.nsURI = 'http://www.hentschel.de/dbcmodel' and _eClass_.name = 'DbcConstructor') and (let _containmentMF_:ecore::EStructuralFeature = modelFacet.containmentMetaFeature.ecoreFeature in (let _eClass_:ecore::EClass = _containmentMF_.eContainingClass in _eClass_.ePackage.nsURI = 'http://www.hentschel.de/dbcmodel' and _eClass_.name = 'AbstractDbcClass') and _containmentMF_.name = 'constructors')">
+    <nodeLabelTraces
+        visualID="5012"
+        queryText="true"/>
+    <compartmentTraces
+        visualID="7012"
+        queryText="true"/>
+  </childNodeTraces>
+  <childNodeTraces
+      visualID="3011"
+      queryText="(let _eClass_:ecore::EClass = modelFacet.metaClass.ecoreClass in _eClass_.ePackage.nsURI = 'http://www.hentschel.de/dbcmodel' and _eClass_.name = 'DbcAttribute') and (let _containmentMF_:ecore::EStructuralFeature = modelFacet.containmentMetaFeature.ecoreFeature in (let _eClass_:ecore::EClass = _containmentMF_.eContainingClass in _eClass_.ePackage.nsURI = 'http://www.hentschel.de/dbcmodel' and _eClass_.name = 'AbstractDbcInterface') and _containmentMF_.name = 'attributes')"/>
+  <childNodeTraces
+      visualID="3020"
+      queryText="(let _eClass_:ecore::EClass = modelFacet.metaClass.ecoreClass in _eClass_.ePackage.nsURI = 'http://www.hentschel.de/dbcmodel' and _eClass_.name = 'DbcEnumLiteral') and (let _containmentMF_:ecore::EStructuralFeature = modelFacet.containmentMetaFeature.ecoreFeature in (let _eClass_:ecore::EClass = _containmentMF_.eContainingClass in _eClass_.ePackage.nsURI = 'http://www.hentschel.de/dbcmodel' and _eClass_.name = 'AbstractDbcEnum') and _containmentMF_.name = 'literals')"/>
+  <childNodeTraces
+      visualID="3026"
+      queryText="(let _eClass_:ecore::EClass = modelFacet.metaClass.ecoreClass in _eClass_.ePackage.nsURI = 'http://www.hentschel.de/dbcmodel' and _eClass_.name = 'DbcOperationContract') and (let _containmentMF_:ecore::EStructuralFeature = modelFacet.containmentMetaFeature.ecoreFeature in (let _eClass_:ecore::EClass = _containmentMF_.eContainingClass in _eClass_.ePackage.nsURI = 'http://www.hentschel.de/dbcmodel' and _eClass_.name = 'AbstractDbcOperation') and _containmentMF_.name = 'operationContracts')">
+    <nodeLabelTraces
+        visualID="5035"
+        queryText="true"/>
+    <nodeLabelTraces
+        visualID="5036"
+        queryText="true"/>
+    <nodeLabelTraces
+        visualID="5037"
+        queryText="true"/>
+  </childNodeTraces>
+  <childNodeTraces
+      visualID="3027"
+      queryText="(let _eClass_:ecore::EClass = modelFacet.metaClass.ecoreClass in _eClass_.ePackage.nsURI = 'http://www.hentschel.de/dbcmodel' and _eClass_.name = 'DbcPackage') and (let _containmentMF_:ecore::EStructuralFeature = modelFacet.containmentMetaFeature.ecoreFeature in (let _eClass_:ecore::EClass = _containmentMF_.eContainingClass in _eClass_.ePackage.nsURI = 'http://www.hentschel.de/dbcmodel' and _eClass_.name = 'AbstractDbCContainer') and _containmentMF_.name = 'packages')">
+    <nodeLabelTraces
+        visualID="5041"
+        queryText="true"/>
+    <compartmentTraces
+        visualID="7035"
+        queryText="true"/>
+  </childNodeTraces>
+  <childNodeTraces
+      visualID="3031"
+      queryText="(let _eClass_:ecore::EClass = modelFacet.metaClass.ecoreClass in _eClass_.ePackage.nsURI = 'http://www.hentschel.de/dbcmodel' and _eClass_.name = 'DbcClass') and (let _containmentMF_:ecore::EStructuralFeature = modelFacet.containmentMetaFeature.ecoreFeature in (let _eClass_:ecore::EClass = _containmentMF_.eContainingClass in _eClass_.ePackage.nsURI = 'http://www.hentschel.de/dbcmodel' and _eClass_.name = 'AbstractDbcTypeContainer') and _containmentMF_.name = 'types')">
+    <nodeLabelTraces
+        visualID="5048"
+        queryText="true"/>
+    <compartmentTraces
+        visualID="7050"
+        queryText="true"/>
+    <compartmentTraces
+        visualID="7051"
+        queryText="true"/>
+  </childNodeTraces>
+  <childNodeTraces
+      visualID="3032"
+      queryText="(let _eClass_:ecore::EClass = modelFacet.metaClass.ecoreClass in _eClass_.ePackage.nsURI = 'http://www.hentschel.de/dbcmodel' and _eClass_.name = 'DbcInterface') and (let _containmentMF_:ecore::EStructuralFeature = modelFacet.containmentMetaFeature.ecoreFeature in (let _eClass_:ecore::EClass = _containmentMF_.eContainingClass in _eClass_.ePackage.nsURI = 'http://www.hentschel.de/dbcmodel' and _eClass_.name = 'AbstractDbcTypeContainer') and _containmentMF_.name = 'types')">
+    <nodeLabelTraces
+        visualID="5047"
+        queryText="true"/>
+    <compartmentTraces
+        visualID="7052"
+        queryText="true"/>
+    <compartmentTraces
+        visualID="7053"
+        queryText="true"/>
+  </childNodeTraces>
+  <childNodeTraces
+      visualID="3033"
+      queryText="(let _eClass_:ecore::EClass = modelFacet.metaClass.ecoreClass in _eClass_.ePackage.nsURI = 'http://www.hentschel.de/dbcmodel' and _eClass_.name = 'DbcEnum') and (let _containmentMF_:ecore::EStructuralFeature = modelFacet.containmentMetaFeature.ecoreFeature in (let _eClass_:ecore::EClass = _containmentMF_.eContainingClass in _eClass_.ePackage.nsURI = 'http://www.hentschel.de/dbcmodel' and _eClass_.name = 'AbstractDbcTypeContainer') and _containmentMF_.name = 'types')">
+    <nodeLabelTraces
+        visualID="5046"
+        queryText="true"/>
+    <compartmentTraces
+        visualID="7054"
+        queryText="true"/>
+    <compartmentTraces
+        visualID="7055"
+        queryText="true"/>
+    <compartmentTraces
+        visualID="7056"
+        queryText="true"/>
+  </childNodeTraces>
+  <childNodeTraces
+      visualID="3034"
+      queryText="(let _eClass_:ecore::EClass = modelFacet.metaClass.ecoreClass in _eClass_.ePackage.nsURI = 'http://www.hentschel.de/dbcmodel' and _eClass_.name = 'DbcProof') and (let _containmentMF_:ecore::EStructuralFeature = modelFacet.containmentMetaFeature.ecoreFeature in (let _eClass_:ecore::EClass = _containmentMF_.eContainingClass in _eClass_.ePackage.nsURI = 'http://www.hentschel.de/dbcmodel' and _eClass_.name = 'AbstractDbcProofContainer') and _containmentMF_.name = 'proofs')">
+    <nodeLabelTraces
+        visualID="5052"
+        queryText="true"/>
+  </childNodeTraces>
+  <childNodeTraces
+      visualID="3035"
+      queryText="(let _eClass_:ecore::EClass = modelFacet.metaClass.ecoreClass in _eClass_.ePackage.nsURI = 'http://www.hentschel.de/dbcmodel' and _eClass_.name = 'DbcInvariant') and (let _containmentMF_:ecore::EStructuralFeature = modelFacet.containmentMetaFeature.ecoreFeature in (let _eClass_:ecore::EClass = _containmentMF_.eContainingClass in _eClass_.ePackage.nsURI = 'http://www.hentschel.de/dbcmodel' and _eClass_.name = 'AbstractDbcType') and _containmentMF_.name = 'invariants')">
+    <nodeLabelTraces
+        visualID="5054"
+        queryText="true"/>
+    <nodeLabelTraces
+        visualID="5055"
+        queryText="true"/>
+  </childNodeTraces>
+  <linkTraces
+      visualID="4001"
+      queryText="modelFacet.oclIsKindOf(gmfgen::FeatureLinkModelFacet) and (let _feature_:ecore::EStructuralFeature = modelFacet.oclAsType(gmfgen::FeatureLinkModelFacet).metaFeature.ecoreFeature in (let _eClass_:ecore::EClass = _feature_.eContainingClass in _eClass_.ePackage.nsURI = 'http://www.hentschel.de/dbcmodel' and _eClass_.name = 'DbcProof') and _feature_.name = 'target')"/>
+  <linkTraces
+      visualID="4002"
+      queryText="modelFacet.oclIsKindOf(gmfgen::TypeLinkModelFacet) and (let _eClass_:ecore::EClass = modelFacet.oclAsType(gmfgen::TypeLinkModelFacet).metaClass.ecoreClass in _eClass_.ePackage.nsURI = 'http://www.hentschel.de/dbcmodel' and _eClass_.name = 'DbcProofReference')">
+    <linkLabelTraces
+        visualID="6001"
+        queryText="true"/>
+  </linkTraces>
+  <linkTraces
+      visualID="4003"
+      queryText="modelFacet.oclIsKindOf(gmfgen::FeatureLinkModelFacet) and (let _feature_:ecore::EStructuralFeature = modelFacet.oclAsType(gmfgen::FeatureLinkModelFacet).metaFeature.ecoreFeature in (let _eClass_:ecore::EClass = _feature_.eContainingClass in _eClass_.ePackage.nsURI = 'http://www.hentschel.de/dbcmodel' and _eClass_.name = 'DbcClass') and _feature_.name = 'extends')"/>
+  <linkTraces
+      visualID="4004"
+      queryText="modelFacet.oclIsKindOf(gmfgen::FeatureLinkModelFacet) and (let _feature_:ecore::EStructuralFeature = modelFacet.oclAsType(gmfgen::FeatureLinkModelFacet).metaFeature.ecoreFeature in (let _eClass_:ecore::EClass = _feature_.eContainingClass in _eClass_.ePackage.nsURI = 'http://www.hentschel.de/dbcmodel' and _eClass_.name = 'DbcInterface') and _feature_.name = 'extends')"/>
+  <linkTraces
+      visualID="4005"
+      queryText="modelFacet.oclIsKindOf(gmfgen::FeatureLinkModelFacet) and (let _feature_:ecore::EStructuralFeature = modelFacet.oclAsType(gmfgen::FeatureLinkModelFacet).metaFeature.ecoreFeature in (let _eClass_:ecore::EClass = _feature_.eContainingClass in _eClass_.ePackage.nsURI = 'http://www.hentschel.de/dbcmodel' and _eClass_.name = 'AbstractDbcClass') and _feature_.name = 'implements')"/>
+</trace:TraceModel>

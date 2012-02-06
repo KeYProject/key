@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<introContent>
+   <extensionContent style="css/userGuide.css" name="Visual DbC User Guide" path="overview/@">
+      <group style-id="content-group">
+            <link label="Visual DbC User Guide" url="http://org.eclipse.ui.intro/showHelpTopic?id=/de.hentschel.visualdbc.help/help/tasks/CreateExampleProject.htm" id="openUserGuide" style-id="content-link">
+               <text>Read the Visual DbC User Guide</text>
+            </link>
+      </group>
+   </extensionContent>
+</introContent>

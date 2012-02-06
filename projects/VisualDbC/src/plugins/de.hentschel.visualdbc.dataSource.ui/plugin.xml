@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension-point id="de.hentschel.visualdbc.dataSource.ui.settingControls" name="Visual DBC Setting Controls" schema="schema/de.hentschel.visualdbc.dataSource.ui.settingControls.exsd"/>
+   <extension
+         point="de.hentschel.visualdbc.dataSource.ui.settingControls">
+      <control
+            class="de.hentschel.visualdbc.datasource.ui.setting.BooleanSettingControl"
+            id="de.hentschel.visualdbc.datasource.ui.setting.BooleanSettingControl">
+      </control>
+      <control
+            class="de.hentschel.visualdbc.datasource.ui.setting.PackageManagementControl"
+            id="de.hentschel.visualdbc.datasource.ui.setting.PackageManagementControl">
+      </control>
+      <control
+            class="de.hentschel.visualdbc.datasource.ui.setting.YesNoSettingControl"
+            id="de.hentschel.visualdbc.datasource.ui.setting.YesNoSettingControl">
+      </control>
+      <control
+            class="de.hentschel.visualdbc.datasource.ui.setting.FileOrResourceJavaPackageSettingControl"
+            id="de.hentschel.visualdbc.datasource.ui.setting.FileOrResourceJavaPackageSettingControl">
+      </control>
+      <control
+            class="de.hentschel.visualdbc.datasource.ui.setting.JavaPackageSettingControl"
+            id="de.hentschel.visualdbc.datasource.ui.setting.JavaPackageSettingControl">
+      </control>
+   </extension>
+
+</plugin>

@@ -561,6 +561,14 @@ public final class UseDependencyContractRule implements BuiltInRule {
         				    goal.sequent(), 
         				    services, 
         				    (BuiltInRuleApp)ruleApp);
+        //create justification
+        final RuleJustificationBySpec just 
+                = new RuleJustificationBySpec(contract);
+        final ComplexRuleJustificationBySpec cjust
+                = (ComplexRuleJustificationBySpec)
+                    goal.proof().env().getJustifInfo().getJustification(this);
+        cjust.add(ruleApp, just);
+        
         if(baseHeapAndChangedLocs == null) {
             return goal.split(1);
         }
@@ -613,14 +621,6 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	}        
         final Term cutFormula 
         	= TB.and(new Term[]{freePre, pre, disjoint, mbyOk});
-        
-        //create justification
-        final RuleJustificationBySpec just 
-        	= new RuleJustificationBySpec(contract);
-        final ComplexRuleJustificationBySpec cjust 
-            	= (ComplexRuleJustificationBySpec)
-            	    goal.proof().env().getJustifInfo().getJustification(this);
-        cjust.add(ruleApp, just);        
         
         //bail out if obviously not helpful
         if(!baseHeapAndChangedLocs.second.op().equals(locSetLDT.getEmpty())) {

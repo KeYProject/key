@@ -17,6 +17,8 @@ import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.Vector;
 
+import javax.swing.JOptionPane;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableMapEntry;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
@@ -31,6 +33,7 @@ import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ContractPO;
+import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.*;
@@ -257,13 +260,17 @@ public class ProofSaver {
 
         if (appliedRuleApp.rule() instanceof UseOperationContractRule 
             || appliedRuleApp.rule() instanceof UseDependencyContractRule) {
-            RuleJustificationBySpec ruleJusti = (RuleJustificationBySpec) 
+            RuleJustification ruleJusti = 
                             proof.env().getJustifInfo()
                                        .getJustification(appliedRuleApp, 
                                                          proof.getServices());
-
+            
+            assert ruleJusti instanceof RuleJustificationBySpec : 
+                "Please consult bug #1111 if this fails.";
+            
+            RuleJustificationBySpec ruleJustiBySpec = (RuleJustificationBySpec) ruleJusti;
             tree.append(" (contract \"");
-            tree.append(ruleJusti.getSpec().getName());
+            tree.append(ruleJustiBySpec.getSpec().getName());
             tree.append("\")");
         }
 

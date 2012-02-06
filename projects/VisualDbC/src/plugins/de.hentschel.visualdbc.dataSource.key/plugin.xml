@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension-point id="de.hentschel.visualdbc.dataSource.key.ruleAnalysts" name="Visual DbC KeY Data Source Rule Analysts" schema="schema/de.hentschel.visualdbc.dataSource.key.ruleAnalysts.exsd"/>
+   <extension
+         point="de.hentschel.visualdbc.dataSource.dataSources">
+      <dataSource
+            class="de.hentschel.visualdbc.datasource.key.model.KeyDriver">
+      </dataSource>
+   </extension>
+   <extension
+         point="de.hentschel.visualdbc.dataSource.key.ruleAnalysts">
+      <ruleAnalyst
+            class="de.hentschel.visualdbc.datasource.key.rule.MethodBodyExpandRuleAnalyst"
+            priority="VERY_LOW">
+      </ruleAnalyst>
+      <ruleAnalyst
+            class="de.hentschel.visualdbc.datasource.key.rule.UseOperationContractRuleAnalyst"
+            priority="VERY_LOW">
+      </ruleAnalyst>
+   </extension>
+</plugin>

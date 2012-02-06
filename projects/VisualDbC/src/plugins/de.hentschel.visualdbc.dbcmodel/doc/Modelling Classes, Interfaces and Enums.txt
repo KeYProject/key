@@ -1,0 +1,42 @@
+Modelling Classes, Interfaces and Enums
+=======================================
+
+Solution 1: One Class with an type enum
+***************************************
+
+Advantages: 
+- Easy diagram model
+
+Disadvantages:
+- Every type contains everything, e.g. a class contains enum literals in the graphical definition
+
+Solution 2: Multiple classes for each type
+***************************************
+
+Advantages: 
+- The graphical definition of a type contains only the relevant information
+
+Disadvantages:
+- Very complex diagram model
+
+Solution 3: Generalization Enum => Class => Interface
+***************************************
+
+Advantages: 
+- Minimal enlarged diagram model
+
+Disadvantages:
+- The enum contains properties that it does not have
+- Suspect generalization
+- Extends relations between enums and interfaces/classes and other combinations are possible
+
+Solution 4: Generalization of abstract Classes: AbEnum => AbClass => AbInterface
+***************************************
+
+Advantages: 
+- Minimal enlarged diagram model
+- The graphical definition of a type contains only the relevant information
+- No not allowed extends relations
+
+Disadvantages:
+ 
