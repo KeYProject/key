@@ -154,20 +154,22 @@ public final class ProofUtil {
                }
             });
             // Add the initial references to the graph
-            for (IDSProvableReference provableReference : openedDsProof.getProofReferences()) {
-               // Find target
-               IDbcFinder dbcFinder = FinderUtil.getDbcFinder(connection, model);
-               IDbCProofReferencable target = dbcFinder.findProofReferencable(provableReference.getTargetProvable());
-               String label = provableReference.getLabel();
-               // Make sure that the reference not already exist
-               DbcProofReference existingReference = proof.getProofReference(target, label);
-               if (existingReference == null) {
-                  // Create reference
-                  if (proofEditPart != null) {
-                     createReference(proofEditPart, target, label);
-                  }
-                  else {
-                     createReference(domain, proof, target, label);
+            synchronized (openedDsProof.getProofReferences()) {
+               for (IDSProvableReference provableReference : openedDsProof.getProofReferences()) {
+                  // Find target
+                  IDbcFinder dbcFinder = FinderUtil.getDbcFinder(connection, model);
+                  IDbCProofReferencable target = dbcFinder.findProofReferencable(provableReference.getTargetProvable());
+                  String label = provableReference.getLabel();
+                  // Make sure that the reference not already exist
+                  DbcProofReference existingReference = proof.getProofReference(target, label);
+                  if (existingReference == null) {
+                     // Create reference
+                     if (proofEditPart != null) {
+                        createReference(proofEditPart, target, label);
+                     }
+                     else {
+                        createReference(domain, proof, target, label);
+                     }
                   }
                }
             }

@@ -155,16 +155,18 @@ public class KeyProof extends MemoryProof {
     * @param references The new references to set.
     */
    protected void setReferences(List<IDSProvableReference> references) {
-      // Check if the references have changed
-      if (!getProofReferences().equals(references)) {
-         // Get the old references
-         List<IDSProvableReference> oldReferences = new LinkedList<IDSProvableReference>(getProofReferences());
-         // Remove all old references
-         getProofReferences().clear();
-         // Add new references
-         getProofReferences().addAll(references);
-         // Inform listeners about the new references
-         fireReferencesChanged(new DSProofEvent(this, oldReferences, references));
+      synchronized (getProofReferences()) {
+         // Check if the references have changed
+         if (!getProofReferences().equals(references)) {
+            // Get the old references
+            List<IDSProvableReference> oldReferences = new LinkedList<IDSProvableReference>(getProofReferences());
+            // Remove all old references
+            getProofReferences().clear();
+            // Add new references
+            getProofReferences().addAll(references);
+            // Inform listeners about the new references
+            fireReferencesChanged(new DSProofEvent(this, oldReferences, references));
+         }
       }
    }
 

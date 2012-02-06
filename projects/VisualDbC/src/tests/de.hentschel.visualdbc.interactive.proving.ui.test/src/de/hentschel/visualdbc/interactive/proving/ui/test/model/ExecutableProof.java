@@ -39,9 +39,11 @@ public class ExecutableProof extends MemoryProof {
     * @param referencesToAdd The references to add.
     */
    public void addReferences(IDSProvableReference... referencesToAdd) {
-      List<IDSProvableReference> oldReferences = new LinkedList<IDSProvableReference>(getProofReferences());
-      CollectionUtil.addAll(getProofReferences(), referencesToAdd);
-      fireReferencesChanged(new DSProofEvent(this, oldReferences, getProofReferences()));
+      synchronized (getProofReferences()) {
+         List<IDSProvableReference> oldReferences = new LinkedList<IDSProvableReference>(getProofReferences());
+         CollectionUtil.addAll(getProofReferences(), referencesToAdd);
+         fireReferencesChanged(new DSProofEvent(this, oldReferences, getProofReferences()));
+      }
    }
 
    /**
@@ -49,8 +51,10 @@ public class ExecutableProof extends MemoryProof {
     * @param referencesToRemove The references to add.
     */
    public void removeReferences(IDSProvableReference... referencesToRemove) {
-      List<IDSProvableReference> oldReferences = new LinkedList<IDSProvableReference>(getProofReferences());
-      CollectionUtil.removeAll(getProofReferences(), referencesToRemove);
-      fireReferencesChanged(new DSProofEvent(this, oldReferences, getProofReferences()));
+      synchronized (getProofReferences()) {
+         List<IDSProvableReference> oldReferences = new LinkedList<IDSProvableReference>(getProofReferences());
+         CollectionUtil.removeAll(getProofReferences(), referencesToRemove);
+         fireReferencesChanged(new DSProofEvent(this, oldReferences, getProofReferences()));
+      }
    }
 }
