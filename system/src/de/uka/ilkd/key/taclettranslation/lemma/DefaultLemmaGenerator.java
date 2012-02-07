@@ -18,7 +18,6 @@ import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
@@ -110,7 +109,6 @@ class DefaultLemmaGenerator implements LemmaGenerator {
         public static String checkForIllegalOps(Term formula, Taclet owner, boolean schemaVarsAreAllowed){
              if((!schemaVarsAreAllowed && formula.op() instanceof SchemaVariable) ||
                 formula.op() instanceof Modality ||
-                formula.op() instanceof ProgramVariable ||
                 formula.op() instanceof ModalOperatorSV ||
                 formula.op() instanceof ProgramSV ||
                 formula.op() instanceof SkolemTermSV ||

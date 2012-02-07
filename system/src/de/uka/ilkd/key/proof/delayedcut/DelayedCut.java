@@ -1,7 +1,11 @@
 package de.uka.ilkd.key.proof.delayedcut;
 
+import java.util.LinkedList;
+
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
@@ -17,15 +21,17 @@ public class DelayedCut {
     
         private final Proof proof;
         private final Node  node;
-        private final Node [] subtrees;
+        private final ImmutableList<Node>  subtrees;
         private final int   cutMode;
         private final Term decisionPredicate;
         private final RuleApp firstAppliedRuleApp;
         private NoPosTacletApp hideApp = null;
+        private ImmutableList<Goal> goalsAfterUncovering = null;
+        private Goal                remainingGoal = null;
         
        
         
-        public DelayedCut(Proof proof, Node node, Term formula, Node [] subtrees,
+        public DelayedCut(Proof proof, Node node, Term formula, ImmutableList<Node>  subtrees,
                 int sideOfDecisionPredicate, RuleApp firstAppliedRuleApp) {
             super();
             assert sideOfDecisionPredicate == DECISION_PREDICATE_IN_ANTECEDENT || sideOfDecisionPredicate == DECISION_PREDICATE_IN_SUCCEDENT;
@@ -58,18 +64,38 @@ public class DelayedCut {
             return proof;
         }
         
-        public void setHideApp(NoPosTacletApp hideApp) {
+        void setHideApp(NoPosTacletApp hideApp) {
             if(this.hideApp != null){
                 throw new IllegalArgumentException("There already exists an app.");
             }
             this.hideApp = hideApp;
         }
         
+        void setGoalsAfterUncovering(
+                ImmutableList<Goal> goalsAfterUncovering) {
+            if(this.goalsAfterUncovering != null){
+                throw new IllegalArgumentException("There already exists a list of goals.");
+            }
+            this.goalsAfterUncovering = goalsAfterUncovering;
+        }
+        
+        void setRemainingGoal(Goal remainingGoal) {
+            this.remainingGoal = remainingGoal;
+        }
+        
+        public Goal getRemainingGoal() {
+            return remainingGoal;
+        }
+        
+        public ImmutableList<Goal> getGoalsAfterUncovering() {
+            return goalsAfterUncovering;
+        }
+        
         public NoPosTacletApp getHideApp() {
             return hideApp;
         }
         
-        public Node[] getSubtrees() {
+        public ImmutableList<Node> getSubtrees() {
             return subtrees;
         }
         

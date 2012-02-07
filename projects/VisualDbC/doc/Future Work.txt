@@ -1,0 +1,9 @@
+Feature requests
+================
+1. Support missing rules, e.g.: MethodCall
+   Requester: Martin Hentschel (hentschel@cs.tu-darmstadt.de)
+   
+2. Improve visible elements in the statistics view.
+   The ida is to expand automatically elements that are not completly verified,
+   simlar to View Test-Coverate of Eclipse extension Eclemma.
+   Requester: Thomas Thüm (thomas.thuem@ovgu.de)

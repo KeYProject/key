@@ -29,11 +29,7 @@ import de.uka.ilkd.key.smt.SolverType;
 
 class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings{
 
-    
-    @Override
-    public String getCommand(SolverType type) {
-	return type.getDefaultExecutionCommand();
-    }
+
 
     @Override
     public int getMaxConcurrentProcesses() {
@@ -47,7 +43,7 @@ class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings{
 
     @Override
     public String getSMTTemporaryFolder() {
-	return   PathConfig.KEY_CONFIG_DIR
+	return   PathConfig.getKeyConfigDir()
 	    + File.separator + "smt_formula";
     }
 

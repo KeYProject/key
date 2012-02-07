@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="dbcmodel"
+    nsURI="http://www.hentschel.de/dbcmodel" nsPrefix="dbcmodel">
+  <eClassifiers xsi:type="ecore:EClass" name="DbcModel" eSuperTypes="#//AbstractDbCContainer">
+    <eOperations name="toConnectionProperties" eType="#//Properties"/>
+    <eOperations name="getProofObligation" eType="#//DbcProofObligation">
+      <eParameters name="proofObligation" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eOperations>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="driverId" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="connectionSettings" upperBound="-1"
+        eType="#//DbcProperty" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="proofObligations" upperBound="-1"
+        eType="#//DbcProofObligation" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="DbcPackage" eSuperTypes="#//AbstractDbCContainer">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="DbcClass" eSuperTypes="#//AbstractDbcClass">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="abstract" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="final" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="extends" upperBound="-1"
+        eType="#//DbcClass"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="anonymous" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="AbstractDbcProofContainer" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="proofs" upperBound="-1"
+        eType="#//DbcProof" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="DbcMethod" eSuperTypes="#//AbstractDbcOperation">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="returnType" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="abstract" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="final" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="DbcInvariant" eSuperTypes="#//AbstractDbcSpecification #//IDbCProofReferencable">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="condition" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="DbcProof">
+    <eOperations name="getProofReference" eType="#//DbcProofReference">
+      <eParameters name="target" eType="#//IDbCProofReferencable"/>
+      <eParameters name="kind" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eOperations>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="target" eType="#//IDbCProvable"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="proofReferences" upperBound="-1"
+        eType="#//DbcProofReference" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="obligation" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="status" eType="#//DbcProofStatus"
+        defaultValueLiteral="open"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="DbcConstructor" eSuperTypes="#//AbstractDbcOperation"/>
+  <eClassifiers xsi:type="ecore:EClass" name="DbcProofReference">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="target" eType="#//IDbCProofReferencable"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="kind" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="DbcAttribute">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="type" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="visibility" eType="#//DbcVisibility"
+        defaultValueLiteral="private"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="static" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="final" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="DbcVisibility">
+    <eLiterals name="DEFAULT" literal="default"/>
+    <eLiterals name="PRIVATE" value="1" literal="private"/>
+    <eLiterals name="PROTECTED" value="2" literal="protected"/>
+    <eLiterals name="PUBLIC" value="3" literal="public"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="AbstractDbcClass" abstract="true" eSuperTypes="#//AbstractDbcInterface">
+    <eOperations name="getConstructor" eType="#//DbcConstructor">
+      <eParameters name="signature" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eOperations>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="constructors" upperBound="-1"
+        eType="#//DbcConstructor" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="implements" upperBound="-1"
+        eType="#//DbcInterface"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="AbstractDbcInterface" abstract="true"
+      eSuperTypes="#//AbstractDbcType">
+    <eOperations name="getMethod" eType="#//DbcMethod">
+      <eParameters name="signature" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eOperations>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="methods" upperBound="-1"
+        eType="#//DbcMethod" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="attributes" upperBound="-1"
+        eType="#//DbcAttribute" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="DbcInterface" eSuperTypes="#//AbstractDbcInterface">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="extends" upperBound="-1"
+        eType="#//DbcInterface"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="AbstractDbcType" abstract="true" eSuperTypes="#//AbstractDbcTypeContainer #//IDbCProvable">
+    <eOperations name="getInvariant" eType="#//DbcInvariant">
+      <eParameters name="condition" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eOperations>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="visibility" eType="#//DbcVisibility"
+        defaultValueLiteral="public"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="static" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="invariants" upperBound="-1"
+        eType="#//DbcInvariant" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="AbstractDbcEnum" abstract="true" eSuperTypes="#//AbstractDbcClass">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="literals" upperBound="-1"
+        eType="#//DbcEnumLiteral" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="DbcEnum" eSuperTypes="#//AbstractDbcEnum"/>
+  <eClassifiers xsi:type="ecore:EClass" name="DbcEnumLiteral">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="DbcProofStatus">
+    <eLiterals name="FAILED" literal="failed"/>
+    <eLiterals name="OPEN" value="1" literal="open"/>
+    <eLiterals name="FULFILLED" value="2" literal="fulfilled"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="DbcOperationContract" eSuperTypes="#//AbstractDbcSpecification #//IDbCProvable">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="pre" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="post" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="modifies" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="termination" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="AbstractDbcSpecification" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="DbcProperty">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="key" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EDataType" name="Properties" instanceClassName="java.util.Properties"/>
+  <eClassifiers xsi:type="ecore:EClass" name="AbstractDbcOperation" abstract="true"
+      eSuperTypes="#//AbstractDbcProofContainer #//IDbCProvable">
+    <eOperations name="getOperationContract" eType="#//DbcOperationContract">
+      <eParameters name="pre" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      <eParameters name="post" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eOperations>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="operationContracts" upperBound="-1"
+        eType="#//DbcOperationContract" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="signature" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="visibility" eType="#//DbcVisibility"
+        defaultValueLiteral="public"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="static" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="AbstractDbCContainer" abstract="true"
+      eSuperTypes="#//AbstractDbcTypeContainer">
+    <eOperations name="getPackage" eType="#//DbcPackage">
+      <eParameters name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eOperations>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="packages" upperBound="-1"
+        eType="#//DbcPackage" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="AbstractDbcTypeContainer" abstract="true"
+      eSuperTypes="#//AbstractDbcProofContainer">
+    <eOperations name="getType" eType="#//AbstractDbcType">
+      <eParameters name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eOperations>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="types" upperBound="-1"
+        eType="#//AbstractDbcType" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="IDbCProvable" abstract="true" interface="true"
+      eSuperTypes="#//IDbCProofReferencable">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="proofObligations" upperBound="-1"
+        eType="#//DbcProofObligation"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="allProofs" upperBound="-1"
+        eType="#//DbcProof" changeable="false" transient="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="IDbCProofReferencable" abstract="true"
+      interface="true"/>
+  <eClassifiers xsi:type="ecore:EClass" name="DbcProofObligation">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="obligation" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+</ecore:EPackage>

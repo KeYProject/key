@@ -278,6 +278,14 @@ public class TaskTree extends JPanel {
 	}
 	
     }
+    
+    /**
+     * Returns the shown {@link TaskTreeModel}.
+     * @return The shown {@link TaskTreeModel}.
+     */
+    public TaskTreeModel getModel() {
+       return model;
+    }
 
 
 

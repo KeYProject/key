@@ -522,7 +522,7 @@ public class Proof implements Named {
     private class ProofPruner{
             private Node firstLeaf = null;
             
-            public Node [] prune(final Node cuttingPoint){
+            public ImmutableList<Node> prune(final Node cuttingPoint){
                    
                   // there is only one leaf containing a open goal that is interesting for pruning the sub-tree of <code>node</code>,
                   // namely the first leave that is found by a breadth first search. 
@@ -553,7 +553,7 @@ public class Proof implements Named {
                                 }
                                                    
                                 if (Proof.this.env() != null && visitedNode.parent() != null) { 
-                                        Proof.this.mgt().ruleUnApplied(visitedNode.parent().getAppliedRuleApp());
+                                        	Proof.this.mgt().ruleUnApplied(visitedNode.parent().getAppliedRuleApp());
                                 }
                                 
                         }
@@ -570,6 +570,7 @@ public class Proof implements Named {
                         public void visit(Proof proof, Node visitedNode) {
                                 final Iterator<NoPosTacletApp> it = visitedNode.getLocalIntroducedRules().iterator();
                                 while ( it.hasNext () ){
+                                	
                                      firstGoal.ruleAppIndex().removeNoPosTacletApp(it.next ());
                                 }
                                
@@ -581,7 +582,7 @@ public class Proof implements Named {
                   refreshGoal(firstGoal,cuttingPoint);
                   
                   // cut the subtree, it is not needed anymore.
-                  Node [] subtrees =cut(cuttingPoint);
+                  ImmutableList<Node> subtrees =cut(cuttingPoint);
                   
                   
                   //remove the goals of the residual leaves.
@@ -609,14 +610,13 @@ public class Proof implements Named {
             }
             
             
-            private Node [] cut(Node node){
-                    Node[] children = new Node[node.childrenCount()];
+            private ImmutableList<Node> cut(Node node){
+                    ImmutableList<Node> children = ImmutableSLList.nil();
                     Iterator<Node> it = node.childrenIterator();
-                                    
-                    int i = 0;
+                              
                     while(it.hasNext()) {
-                            children[i] = it.next();
-                            i++;
+                            children = children.append(it.next());
+                            
                     }
                     for(Node child : children){
                             node.remove(child);
@@ -640,11 +640,11 @@ public class Proof implements Named {
      * @return Returns the sub trees that has been pruned. 
      */
  
-    public Node[] pruneProof(Node cuttingPoint){
+    public ImmutableList<Node> pruneProof(Node cuttingPoint){
         return pruneProof(cuttingPoint,true);
     }
     
-    public Node [] pruneProof(Node cuttingPoint,boolean fireChanges){
+    public ImmutableList<Node> pruneProof(Node cuttingPoint,boolean fireChanges){
         assert cuttingPoint.proof() == this;
         if(getGoal(cuttingPoint)!= null || cuttingPoint.isClosed()){
                 return null;
@@ -654,7 +654,7 @@ public class Proof implements Named {
         if(fireChanges){
             fireProofIsBeingPruned(cuttingPoint);
         }
-        Node[] result = pruner.prune(cuttingPoint); 
+        ImmutableList<Node> result = pruner.prune(cuttingPoint); 
         if(fireChanges){
             fireProofGoalsChanged();
             fireProofPruned(cuttingPoint);

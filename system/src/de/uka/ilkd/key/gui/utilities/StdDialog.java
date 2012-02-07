@@ -34,19 +34,24 @@ public class StdDialog extends JDialog{
     private JButton cancelButton;
     private boolean okayButtonHasBeenPressed = false;
     private boolean cancelButtonHasBeenPressed = false;
+    private Box     contentBox; 
+    
+    public StdDialog(String title, int strut, boolean helpButton){
+        this(title,null,strut,helpButton);
+    }
     
     public StdDialog(String title, JComponent content, int strut, boolean helpButton) {
         this.setLocationByPlatform(true);       
         this.setTitle(title);
         this.setModal(true);
-        content.setMaximumSize(new Dimension(Integer.MAX_VALUE,Integer.MAX_VALUE));
+        //content.setMaximumSize(new Dimension(Integer.MAX_VALUE,Integer.MAX_VALUE));
         Box vertBox = Box.createVerticalBox();
         Box horzBox = Box.createHorizontalBox();
         
         vertBox.add(Box.createVerticalStrut(strut));
         
         horzBox.add(Box.createHorizontalStrut(strut));
-        horzBox.add(content);
+        horzBox.add(getContentBox());
         horzBox.add(Box.createHorizontalGlue());
         horzBox.add(Box.createHorizontalStrut(strut));
         vertBox.add(horzBox);
@@ -73,8 +78,23 @@ public class StdDialog extends JDialog{
                 getCancelButton().doClick();                
             }
         });
+        if(content != null){
+            setContent(content);
+        }else{
+            this.pack();
+        }
+    }
+    public void setContent(JComponent content){
+        getContentBox().removeAll();
+        getContentBox().add(content);
+        content.setMaximumSize(new Dimension(Integer.MAX_VALUE,Integer.MAX_VALUE));
         this.pack();
     }
+    
+    
+
+    
+
     
     public boolean okayButtonHasBeenPressed() {
         return okayButtonHasBeenPressed;
@@ -124,6 +144,14 @@ public class StdDialog extends JDialog{
         return cancelButton;
     }
     
+    private Box getContentBox(){
+        if(contentBox == null){
+            contentBox = Box.createVerticalBox();
+            contentBox.setMaximumSize(new Dimension(Integer.MAX_VALUE,Integer.MAX_VALUE));
+        }
+        return contentBox;
+    }
+    
     public static void main(String [] args) {
         final StdDialog dialog = new StdDialog("Test",new JButton("Test"), 5,true);
         dialog.getOkayButton().addActionListener(new ActionListener() {
@@ -136,4 +164,6 @@ public class StdDialog extends JDialog{
         dialog.setModal(true);
         dialog.setVisible(true);
     }
+    
+
 }

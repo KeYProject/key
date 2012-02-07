@@ -8,6 +8,7 @@ import java.util.LinkedList;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -255,7 +256,9 @@ class SolverOptions extends TablePanel{
         private static final long serialVersionUID = 1L;
         private JTextField solverName;
         private JTextField solverCommand;
+        private JTextField solverParameters;
         private JTextField solverInstalled;
+        private JButton    toDefaultButton;
         
         private final SolverType solverType; 
         private final ProofIndependentSMTSettings settings;
@@ -264,16 +267,21 @@ class SolverOptions extends TablePanel{
         
         private static final String infoSolverName =
         "There are two ways to make supported provers applicable for KeY:\n"
-        + "1. Specify the absolute path of the prover in the field below.\n"
+        + "1. Specify the absolute path of the prover in the field 'Command'.\n"
         + "2. Change the enviroment variable $PATH of your system, so that it "
-        + "refers to the installed prover.";
+        + "refers to the installed prover. In that case you must specify the name of the solver in 'Command'";
         
-        private static final String infoSolverCommand ="Editing the start command:\n"
+        private static final String infoSolverParameters ="Editing the start command:\n"
                         + "Specify the start command for an external procedure in such a way that it can be executed "
                         + "to solve a problem file. Feel free to use any parameter to finetune the program.\n\n"
                         + "Use %f as placeholder for the filename containing the problemdescription.\n\n"
                         + "Use %p as placeholder for the problem directly. This should be needed in special cases only.";
-        
+        private static final String infoSolverCommand ="The command for the solver.\n\n" +
+        		"Either you specify the absolute path of your solver or just the command for starting it.\n" +
+        		"In the latter case you have to modify the PATH-variable of your system.\n" +
+        		"Please note that you also have to specify the filename extension\n" +
+        		"For example: z3.exe";
+
         public SolverOptions(SolverType solverType,ProofIndependentSMTSettings settings) {
                 super();
                 this.minWidthOfTitle = SwingUtilities.computeStringWidth(this.getFontMetrics(getFont()),"InstalledBLANK");
@@ -299,23 +307,60 @@ class SolverOptions extends TablePanel{
                 getSolverName();
                 getSolverInstalled();
                 getSolverCommand();
+                getSolverParameters();
+                getToDefaultButton();
+                
+               
         }
         
-               
+
+        public JButton getToDefaultButton() {
+            if(toDefaultButton == null){
+                toDefaultButton = new JButton("Set parameters to default.");
+                Box box= addComponent(toDefaultButton, null);
+                toDefaultButton.addActionListener(new ActionListener() {
+                    
+                    @Override
+                    public void actionPerformed(ActionEvent arg0) {
+                        getSolverParameters().setText(solverType.getDefaultSolverParameters());
+                        settings.setParameters(solverType, solverParameters.getText());  
+                        
+                    }
+                });
+                box.add(Box.createHorizontalGlue());
+            }
+              
+            return toDefaultButton;
+        }
 
         
-        public JTextField getSolverCommand() {
-                if(solverCommand == null){
-                        solverCommand = addTextField("Command",minWidthOfTitle,solverType.getExecutionCommand(),infoSolverCommand,new ActionListener() {
+        public JTextField getSolverParameters() {
+                if(solverParameters == null){
+                        solverParameters = addTextField("Parameters",minWidthOfTitle,solverType.getSolverParameters(),infoSolverParameters,new ActionListener() {
                                 
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
-                                      settings.setCommand(solverType, solverCommand.getText());                                      
+                                      settings.setParameters(solverType, solverParameters.getText());                                      
                                 }
                         });
                 }
-                return solverCommand;
+                return solverParameters;
         }
+        
+        public JTextField getSolverCommand() {
+             if(solverCommand == null){
+                    solverCommand = addTextField("Command",minWidthOfTitle,solverType.getSolverCommand()
+                            ,infoSolverCommand,new ActionListener() {
+                            
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                  settings.setCommand(solverType, solverCommand.getText());                                      
+                            }
+                    });
+            }
+            return solverCommand;
+    }
+    
         
         public JTextField getSolverInstalled() {
                 if(solverInstalled == null){

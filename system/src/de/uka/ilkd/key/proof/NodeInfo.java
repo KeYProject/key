@@ -180,6 +180,7 @@ public class NodeInfo {
         determineFirstAndActiveStatement();
         if (s == null)
             return;
+        if(node.parent() == null){ return;}
         RuleApp ruleApp = node.parent().getAppliedRuleApp();
         if (ruleApp instanceof TacletApp) { 
             TacletApp tacletApp = (TacletApp) ruleApp; // XXX

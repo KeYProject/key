@@ -971,7 +971,7 @@ public class KeYMediator {
                         public void run() {
                             ui.taskStarted("Rebuilding...", totalNumber);
                             ui.taskProgress(currentTacletNumber);
-                           // ui.setProgress(currentTacletNumber);
+            
                          }
                     });
                 }
@@ -982,8 +982,6 @@ public class KeYMediator {
                         
                         @Override
                         public void run() {
-                           // getProof().fireProofGoalsChanged();
-                            //getProof().fireProofExpanded(invokedNode);
                             ui.resetStatus(this);
                             KeYMediator.this.startInterface(true);
                         }
@@ -998,7 +996,6 @@ public class KeYMediator {
                         @Override
                         public void run() {
                             ui.taskStarted("Cutting...", 0);
-                         //   ui.taskProgress(0);
                         }
                     });
            
@@ -1007,10 +1004,12 @@ public class KeYMediator {
                 @Override
                 public void eventException(Throwable throwable) {
                     KeYMediator.this.startInterface(true);
+                    throwable.printStackTrace();
                     ExceptionDialog.showDialog(
                             KeYMediator.this.mainFrame(),
                             new RuntimeException("The cut could not be processed successfully. In order to " +
-                            		"preserve consistency the proof is pruned.", throwable));
+                            		"preserve consistency the proof is pruned. For more information see details or output of your console.", throwable));
+                    
                     SwingUtilities.invokeLater(new Runnable() {
                         
                         @Override

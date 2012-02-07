@@ -982,6 +982,17 @@ public final class TermBuilder {
     //location set operators    
     //-------------------------------------------------------------------------
     
+    /**
+     * This value is only used as a marker for "\less_than_nothing" in JML. It
+     * may return any term. Preferably of type LocSet, but this is not
+     * necessary.
+     * 
+     * @return an arbitrary but fixed term.
+     */
+    public Term lessThanNothing() {
+        return ff();
+    }
+    
     public Term empty(Services services) {
 	return func(services.getTypeConverter().getLocSetLDT().getEmpty());
     }
@@ -1467,6 +1478,46 @@ public final class TermBuilder {
                                     or.replace(heapTerm),
                                     objVarTerm,
                                     fieldVarTerm))));
+    }
+    
+    /**
+     * Returns the framing condition that the resulting heap is identical (i.e.
+     * has the same value in all locations) to the before-heap.
+     * 
+     * @see #frame(Services, Term, Map, Term)
+     */
+    public Term frameStrictlyEmpty(Services services, Term heapTerm,
+            Map<Term,Term> normalToAtPre) {
+        final Sort objectSort = services.getJavaInfo().objectSort();
+        final Sort fieldSort = services.getTypeConverter()
+                .getHeapLDT()
+                .getFieldSort();
+
+        final Name objVarName   = new Name(newName(services, "o"));
+        final Name fieldVarName = new Name(newName(services, "f"));
+        final LogicVariable objVar = new LogicVariable(objVarName, objectSort);
+        final LogicVariable fieldVar = new LogicVariable(fieldVarName, fieldSort);
+        final Term objVarTerm = var(objVar);
+        final Term fieldVarTerm = var(fieldVar);
+
+        final OpReplacer or = new OpReplacer(normalToAtPre);
+
+        ImmutableList<QuantifiableVariable> quantVars =
+                ImmutableSLList.<QuantifiableVariable>nil();
+        quantVars = quantVars.append(objVar);
+        quantVars = quantVars.append(fieldVar);
+        
+        return all(quantVars,
+                equals(select(services,
+                        Sort.ANY,
+                        heapTerm,
+                        objVarTerm,
+                        fieldVarTerm),
+                        select(services,
+                                Sort.ANY,
+                                or.replace(heapTerm),
+                                objVarTerm,
+                                fieldVarTerm)));
     }
     
     

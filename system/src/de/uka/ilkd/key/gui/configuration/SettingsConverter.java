@@ -19,8 +19,8 @@ public class SettingsConverter {
         public static String convert(String str, boolean encode){
                 String result = str;
                 for(int i = 0; i < encoding.length; i++){
-                     result = result.replaceAll(encoding[i][encode ? 0 : 1],
-                                     encoding[i][encode ? 1 : 0]);
+                     result = result.replaceAll(encoding[i][encode ? 1 : 0],
+                                     encoding[i][encode ? 0 : 1]);
                      
                 }
                 return result;
@@ -132,10 +132,11 @@ public class SettingsConverter {
         }
         
         public static void main(String [] args){
-                String test1 = "\ntest\"test\\test,=#test";
-                String result = decode(test1);
-                assert result == encode(result);
-                System.out.println(test1 +"$$"+ result + "$$"+encode(result));
+                String test = "\\test";
+                String result = decode(test);
+                System.out.println(result);
+                System.out.println(encode(result));
+               
         }
 
 }

@@ -40,6 +40,8 @@ public class CheckedUserInput extends JPanel{
          * @return <code>null</code> if the user input is valid, otherwise a string describing the error. 
          */
         public String check(String toBeChecked);
+        
+        
     }
     
     /**
@@ -78,6 +80,7 @@ public class CheckedUserInput extends JPanel{
         }
         horzBox.add(Box.createHorizontalGlue());
         this.add(horzBox);
+        setInput("");
     }
 
     

@@ -1,0 +1,8 @@
+#Mon May 02 15:02:08 CEST 2011
+eclipse.preferences.version=1
+gmf_dashboard/domainGenerationModel=platform\:/resource/de.hentschel.visualdbc.dbcmodel/model/DbcModel.genmodel
+gmf_dashboard/domainModel=platform\:/resource/de.hentschel.visualdbc.dbcmodel/model/DbcModel.ecore
+gmf_dashboard/generationModel=platform\:/resource/de.hentschel.visualdbc.dbcmodel/model/DbcModel.gmfgen
+gmf_dashboard/graphicalDefinitionModel=platform\:/resource/de.hentschel.visualdbc.dbcmodel/model/DbcModel.gmfgraph
+gmf_dashboard/mappingModel=platform\:/resource/de.hentschel.visualdbc.dbcmodel/model/DbcModel.gmfmap
+gmf_dashboard/toolingDefinitionModel=platform\:/resource/de.hentschel.visualdbc.dbcmodel/model/DbcModel.gmftool

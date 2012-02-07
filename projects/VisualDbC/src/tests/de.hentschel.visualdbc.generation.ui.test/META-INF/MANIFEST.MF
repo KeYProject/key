@@ -1,0 +1,29 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Visual DbC Diagram Generation UI Tests
+Bundle-SymbolicName: de.hentschel.visualdbc.generation.ui.test;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: de.hentschel.visualdbc.generation.ui.test.Activator
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.jdt.core;bundle-version="3.6.2",
+ org.junit4;bundle-version="4.8.1",
+ org.eclipse.swtbot.go;bundle-version="2.0.4",
+ org.eclipse.core.resources;bundle-version="3.6.1",
+ org.key_project.key4eclipse.util;bundle-version="1.0.0",
+ org.key_project.key4eclipse.util.test;bundle-version="1.0.0",
+ de.hentschel.visualdbc.dataSource;bundle-version="1.0.0",
+ de.hentschel.visualdbc.dataSource.ui.test;bundle-version="1.0.0",
+ de.hentschel.visualdbc.dataSource.key;bundle-version="1.0.0",
+ de.hentschel.visualdbc.generation.test;bundle-version="1.0.0",
+ de.hentschel.visualdbc.generation.ui;bundle-version="1.0.0",
+ de.hentschel.visualdbc.generation;bundle-version="1.0.0",
+ de.hentschel.visualdbc.dbcmodel;bundle-version="1.0.0"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-Vendor: Martin Hentschel
+Export-Package: de.hentschel.visualdbc.generation.ui.test.suite,
+ de.hentschel.visualdbc.generation.ui.test.suite.swtbot,
+ de.hentschel.visualdbc.generation.ui.test.testCase,
+ de.hentschel.visualdbc.generation.ui.test.testCase.swtbot,
+ de.hentschel.visualdbc.generation.ui.test.util

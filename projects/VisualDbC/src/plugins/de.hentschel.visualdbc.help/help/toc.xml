@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<toc label="Visual DbC User Guide">
+   <topic label="Tasks">
+      <topic label="Create an Example Project" href="help/tasks/CreateExampleProject.htm" />
+      <topic label="Create a DbC diagram from data source" href="help/tasks/CreateDiagramFromDataSource.htm" />
+      <topic label="Optimize diagram layout" href="help/tasks/OptimizeDiagramLayout.htm" />
+      <topic label="Interactive Proving" href="help/tasks/InteractiveProving.htm" />
+   </topic>
+</toc>

@@ -98,6 +98,7 @@ NOT : "!";
 NOT_MODIFIED : "\\not_modified";
 NOT_SPECIFIED : "\\not_specified";
 NOTHING : "\\nothing";
+LESS_THAN_NOTHING : "\\less_than_nothing";   //KeY extension for strict purity, not official JML (MU)
 OLD : "\\old";
 OTHER : "\\other";
 OUTER_SCOPE : "\\outerScope"; //KeY extension, not official JML

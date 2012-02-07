@@ -1,18 +1,20 @@
 package de.uka.ilkd.key.proof.delayedcut;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.TacletFilter;
 import de.uka.ilkd.key.rule.BuiltInRuleApp;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
@@ -20,8 +22,7 @@ import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.inst.SVInstantiations;
-
+    
 /**
  * This class is responsible for processing the delayed cut. The information about the cut 
  * is stored in  <code>DelayCut</code>. For each cut a new object of this class must be created.
@@ -40,6 +41,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * 3.3. F is uncovered in G.
  * Remark: F must not exist already in the sequent the process is applied on. Since a antecedent respective succedent is a set of 
  * formulas the hiding mechanism of F does not work. An already existing formula would be hidden.  
+ * 
+ * REMARK: Before you change this class, see the comment at the method <code>apply</code>.
  */
 public class DelayedCutProcessor implements Runnable {
      
@@ -58,32 +61,6 @@ public class DelayedCutProcessor implements Runnable {
     private final int   mode;
     private boolean     used = false;
     
-    
-    /**
-     * This class wraps the taclets used for the cutting process. 
-     */
-    private static class TacletCollection{
-        FindTaclet hideRightTaclet;
-        Taclet cutTaclet;
-        FindTaclet hideLeftTaclet;
-        TacletCollection(Proof proof){
-            for(Taclet taclet : proof.env().getInitConfig().getTaclets()){
-                if(taclet.name().toString().equals(HIDE_RIGHT_TACLET)){
-                    hideRightTaclet = (FindTaclet)taclet;
-                }else  if(taclet.name().toString().equals(CUT_TACLET)){
-                    cutTaclet = taclet; 
-                }  if(taclet.name().toString().equals(HIDE_LEFT_TACLET)){
-                    hideLeftTaclet = (FindTaclet)taclet; 
-                }                
-            }
-        }
-        public String toString(){
-            String s = "hideRightTaclet: " + (hideRightTaclet != null) + "\n"+
-                        "hideLeftTaclet: " + (hideLeftTaclet != null) + "\n"+
-                        "cutTaclet: " + (cutTaclet != null) + "\n";
-            return s;
-        }
-    }
     
 
     
@@ -115,7 +92,7 @@ public class DelayedCutProcessor implements Runnable {
         return null;
     }
     
-    public void cut(){
+    public DelayedCut cut(){
         if(used){
             throw new IllegalStateException("For each cut a new object of this class must be created.");
         }
@@ -125,20 +102,24 @@ public class DelayedCutProcessor implements Runnable {
         }
          // do not change the order of the following two statements!
          RuleApp firstAppliedRuleApp = node.getAppliedRuleApp(); 
-         Node subtrees [] = proof.pruneProof(node,false);
+         ImmutableList<Node> subtrees = proof.pruneProof(node,false);
          
-         // collect the taclets that are necessary for cutting: cut and hide taclets.
-         TacletCollection taclets = new TacletCollection(proof);
          
          DelayedCut delayedCut = new DelayedCut(proof, node,
                                                 descisionPredicate, subtrees,
                                                 mode,firstAppliedRuleApp);
          
          // apply the cut rule on the node.
-         ImmutableList<Goal> result = cut(delayedCut,taclets);      
+         ImmutableList<Goal> result = cut(delayedCut);      
 
          // hide the decision predicate.
-         result = hide(delayedCut,getGoalForHiding(result, delayedCut),taclets);
+         int indexForHiding = getGoalForHiding(result, delayedCut);
+         Goal hide = indexForHiding == 0 ? result.head() :
+                                result.tail().head();
+         delayedCut.setRemainingGoal(indexForHiding == 1 ? result.head() :
+                                result.tail().head());
+         
+         result = hide(delayedCut,hide);
                   
          // rebuild the tree that has been pruned before.
          List<Goal> openLeaves = rebuildSubTrees(delayedCut, result.head());
@@ -150,7 +131,7 @@ public class DelayedCutProcessor implements Runnable {
              listener.eventEnd(delayedCut);
          }     
    
-         
+         return delayedCut;
     }
     
 
@@ -160,38 +141,62 @@ public class DelayedCutProcessor implements Runnable {
     
     
     
-    private ImmutableList<Goal> cut(DelayedCut cut,
-            TacletCollection taclets){
+    private ImmutableList<Goal> cut(DelayedCut cut){
         Goal goal = find(cut.getProof(), cut.getNode());
+
+        TacletFilter filter = new TacletFilter() {
+            
+            @Override
+            protected boolean filter(Taclet taclet) {
+                
+                return taclet.name().toString().equals(CUT_TACLET);
+            }
+            
+            
+        };
         
+        ImmutableList<NoPosTacletApp> apps =  goal.ruleAppIndex().getNoFindTaclet(filter, cut.getServices());
+        assert apps.size() == 1;
          
-        TacletApp app = NoPosTacletApp.createNoPosTacletApp(taclets.cutTaclet);
+        TacletApp app = apps.head();
         
         app = app.addCheckedInstantiation(app.uninstantiatedVars().iterator().next(),
                                     cut.getFormula(),cut.getServices(), true);
         return goal.apply(app);
     }
     
+    private ImmutableList<Goal> apply(final String tacletName,Goal goal, PosInOccurrence pio){
+        TacletFilter filter = new TacletFilter() {
+            
+            @Override
+            protected boolean filter(Taclet taclet) {
+                
+                return taclet.name().toString().equals(tacletName);
+            }
+            
+            
+        };
+     
+        ImmutableList<NoPosTacletApp> apps =  goal.ruleAppIndex().getFindTaclet(filter,pio,goal.proof().getServices());
+        assert apps.size() == 1;
+        NoPosTacletApp app = apps.head();
+        
+        PosTacletApp app2 = app.setPosInOccurrence(pio, goal.proof().getServices());
+        return goal.apply(app2); 
+    }
+    
     /**
      * Hides the formula that has been added by the hide process.*/
-    private ImmutableList<Goal> hide(DelayedCut cut, Goal goal, TacletCollection taclets){
-        FindTaclet hideTaclet = getHideTaclet(cut, taclets);
-        SVInstantiations inst =
-        SVInstantiations.EMPTY_SVINSTANTIATIONS.add(
-                getSVofHideTaclet(hideTaclet),
-                cut.getFormula(), cut.getServices());
-      
+    private ImmutableList<Goal> hide(DelayedCut cut, Goal goal){
+  
         SequentFormula sf = getSequentFormula(goal, cut.isDecisionPredicateInAntecendet());
         
         
         PosInOccurrence pio = new PosInOccurrence(sf,PosInTerm.TOP_LEVEL,
                 cut.isDecisionPredicateInAntecendet());
         
-        TacletApp app = PosTacletApp.createPosTacletApp(hideTaclet,inst,
-                pio,
-            cut.getServices());
-        ImmutableList<Goal> result = goal.apply(app);
-        cut.setHideApp(result.head().node().getLocalIntroducedRules().iterator().next());
+        ImmutableList<Goal> result= apply(getHideTacletName(cut), goal, pio);
+          cut.setHideApp(result.head().node().getLocalIntroducedRules().iterator().next());
         return result;
     }
     
@@ -199,7 +204,7 @@ public class DelayedCutProcessor implements Runnable {
      * After applying the cut rule two goal result. The pruned subtree is added to one of these goals. 
      * This method finds the the goal.
      *     */
-    private Goal getGoalForHiding(ImmutableList<Goal> goals, DelayedCut cut){
+    private int getGoalForHiding(ImmutableList<Goal> goals, DelayedCut cut){
         assert goals.size() == 2;
         Goal [] goal = {goals.head(),goals.tail().head()};
        
@@ -211,24 +216,20 @@ public class DelayedCutProcessor implements Runnable {
             if(goal[i].node().getNodeInfo().getBranchLabel().endsWith(side)){
                 SequentFormula formula = getSequentFormula(goal[i], cut.isDecisionPredicateInAntecendet());
                 if(formula.formula() == cut.getFormula()){
-                    return goal[i];
+                    return i;
                 }
             }
         }
         throw new IllegalStateException("After a cut a goal belongs to the left or right side of the tree");
     }
     
-    private SchemaVariable getSVofHideTaclet(Taclet taclet){
-        return  taclet.getIfFindVariables().iterator().next();
+
+    
+    private String getHideTacletName(DelayedCut cut){
+        return cut.isDecisionPredicateInAntecendet() ?HIDE_LEFT_TACLET:
+            HIDE_RIGHT_TACLET;        
     }
     
-    /**
-     * Returns the right hide talcet.
-     */
-    private FindTaclet getHideTaclet(DelayedCut cut, TacletCollection taclets){
-        return cut.isDecisionPredicateInAntecendet() ? taclets.hideLeftTaclet :
-            taclets.hideRightTaclet;        
-    }
     
     private SequentFormula getSequentFormula(Goal goal, boolean decPredInAnte){
         return decPredInAnte ?
@@ -255,9 +256,9 @@ public class DelayedCutProcessor implements Runnable {
         LinkedList<NodeGoalPair> pairs = new LinkedList<NodeGoalPair>();
         LinkedList<Goal>  openLeaves = new LinkedList<Goal>();
  
-        add(pairs,cut.getSubtrees(),goal.apply(
-                cut.getFirstAppliedRuleApp()));
-        
+        add(pairs,new LinkedList<Goal>(),cut.getSubtrees().iterator(),
+        		  apply(goal,cut.getFirstAppliedRuleApp()));
+
         int totalNumber = 0;
         for(NodeGoalPair pair : pairs){
             totalNumber += pair.node.countNodes();
@@ -271,8 +272,10 @@ public class DelayedCutProcessor implements Runnable {
             RuleApp app = createNewRuleApp(pair,
                     cut.getServices());
          
-            totalNumber -= add(pairs,openLeaves,pair.node,
-                   pair.goal.apply(app));
+     
+            
+            totalNumber -= add(pairs,openLeaves,pair.node.childrenIterator(),
+                   apply(pair.goal,app));
  
 
             for(DelayedCutListener listener : listeners){
@@ -283,6 +286,30 @@ public class DelayedCutProcessor implements Runnable {
     }
     
     /**
+     * CAUTION: The order of the goals is crucial for the success of the delayed cut. Since the method 
+     * Goal::split() prepends goals to the current list. If you have some problems with the delayed cut, 
+     * have a look the Goal::split(), whether this has changed. 
+     * Up to now the order must therefore reversed, otherwise if the proof splits up into several branches
+     * the rules are applied on the wrong nodes which results in exceptions.  
+     * 
+     * @param goal
+     * @param app
+     * @return
+     */
+    private LinkedList<Goal> apply(Goal goal, RuleApp app){
+        LinkedList<Goal> goals = new LinkedList<Goal>();
+        ImmutableList<Goal> childs =  goal.apply(app);
+        // if the rule is a SMT rule, <code>childs</code> can be null.
+        //if(childs == null){
+        //	return goals;
+        //}
+        for(Goal child : childs){
+        	goals.addFirst(child);
+        }
+        return goals;
+    }
+    
+    /**
      * Based on an old rule application a new rule application is built. Mainly 
      * the position is updated.
      */
@@ -290,7 +317,7 @@ public class DelayedCutProcessor implements Runnable {
         RuleApp oldRuleApp = pair.node.getAppliedRuleApp();
         
         
-        PosInOccurrence newPos = translate(pair);
+        PosInOccurrence newPos = translate(pair,services);
 
         if(oldRuleApp instanceof PosTacletApp){
             PosTacletApp app = (PosTacletApp) oldRuleApp; 
@@ -302,17 +329,14 @@ public class DelayedCutProcessor implements Runnable {
 
         if(oldRuleApp instanceof BuiltInRuleApp){
             BuiltInRuleApp app = (BuiltInRuleApp) oldRuleApp;
-            return new BuiltInRuleApp(app.rule(), translate(pair), app.ifInsts());
+            return new BuiltInRuleApp(app.rule(), translate(pair,services), app.ifInsts());
         }
         return oldRuleApp;
         
     }
     
-    /**
-     * Translates the position of an old rule application into the position of 
-     * a new rule application.
-     */
-    private PosInOccurrence translate(NodeGoalPair pair){
+    
+    private PosInOccurrence translate(NodeGoalPair pair,Services services){
         RuleApp oldRuleApp = pair.node.getAppliedRuleApp();
         if(oldRuleApp == null ||oldRuleApp.posInOccurrence() == null){
             return null;
@@ -326,17 +350,7 @@ public class DelayedCutProcessor implements Runnable {
                 formulaNumber, oldRuleApp.posInOccurrence().posInTerm());
     }
     
-    private void add(LinkedList<NodeGoalPair> pairs, Node [] subtrees, ImmutableList<Goal> goals){
-        
-        assert subtrees.length == goals.size(); 
-        int i=0;
-        for(Goal goal : goals){   
-            if(!subtrees[i].leaf()){
-                pairs.add(new NodeGoalPair(subtrees[i], goal));
-            }
-            i++;
-        }
-    }
+    
     
     /**
      * Used for rebuilding the tree: Joins the node of the old sub trees and the corresponding 
@@ -345,20 +359,24 @@ public class DelayedCutProcessor implements Runnable {
      *     */
     private int add(LinkedList<NodeGoalPair> pairs,
                      LinkedList<Goal> openLeaves, 
-                     Node parent, ImmutableList<Goal> goals){
-        assert parent.childrenCount() == goals.size();
+                     Iterator<Node> iterator, LinkedList<Goal> goals){
+        
         int leafNumber = 0;
-        int i=0;
-        for(Goal goal : goals){
-            if(!parent.child(i).leaf()){
-                pairs.add(new NodeGoalPair(parent.child(i),goal));
+        if(goals.isEmpty()){
+        	return leafNumber;
+        }
+        while(iterator.hasNext()){
+        	Goal matchedGoal = goals.pollFirst();
+        	Node child = iterator.next();
+        	
+            if(!child.leaf()){
+                pairs.add(new NodeGoalPair(child,matchedGoal));
             }else{
-                if(!goal.node().isClosed()){
-                    openLeaves.add(goal);
+                if(!matchedGoal.node().isClosed()){
+                    openLeaves.add(matchedGoal);
                 }          
                 leafNumber++;
             }
-            i++;            
         }
         return leafNumber;
 
@@ -368,9 +386,11 @@ public class DelayedCutProcessor implements Runnable {
      * This function uncovers the decision predicate that is hidden after applying the cut rule. 
      */
     private void uncoverDecisionPredicate(DelayedCut cut, List<Goal> openLeaves){
+        ImmutableList<Goal> list = ImmutableSLList.<Goal>nil();
         for(Goal goal : openLeaves){
-            goal.apply(cut.getHideApp());
+            list = list.append(goal.apply(cut.getHideApp()));
         }
+        cut.setGoalsAfterUncovering(list);
     }
 
     @Override
