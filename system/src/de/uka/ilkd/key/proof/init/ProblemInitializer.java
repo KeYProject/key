@@ -515,7 +515,7 @@ public final class ProblemInitializer {
                 }
                 for(ProgramMethod pm
                         : javaInfo.getAllProgramMethodsLocallyDeclared(kjt)) {
-                    if(pm.getKeYJavaType() != null) {
+                    if(pm.getReturnType() != null) {
                         functions.add(pm);
                     }
                 }

@@ -268,7 +268,7 @@ public final class DLSpecFactory {
 	}
 
 	//result variable may be omitted
-	if(resultVar == null && pm.getKeYJavaType() != null) {
+	if(resultVar == null && pm.getReturnType() != null) {
 	    resultVar = TB.resultVar(services, pm, false);
 	}
 

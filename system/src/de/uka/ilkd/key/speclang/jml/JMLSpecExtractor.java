@@ -380,7 +380,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
             }
 
             //add non-null postcondition
-            KeYJavaType resultType = pm.getKeYJavaType();
+            KeYJavaType resultType = pm.getReturnType();
 
             if(resultType != null &&
                     !JMLInfoExtractor.resultIsNullable(pm) &&

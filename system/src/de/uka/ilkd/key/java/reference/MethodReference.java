@@ -353,7 +353,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
 	if(meth == null){
 	    return ec.getTypeReference().getKeYJavaType();
 	}
-	return meth.getKeYJavaType();
+	return meth.getReturnType();
 		      
     }
 

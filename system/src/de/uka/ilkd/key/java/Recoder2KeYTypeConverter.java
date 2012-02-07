@@ -145,9 +145,9 @@ public class Recoder2KeYTypeConverter {
      * 
      */
     public KeYJavaType getKeYJavaType(recoder.abstraction.Type t) {
-        if (t == null) {
-            return null; // this can originate from 'void'
-        }
+        
+        // change from 2012-02-07: there must be a definite KJT
+        assert t != null : "null cannot be converted into a KJT";
 
         // lookup in the cache
         KeYJavaType kjt = lookupInCache(t);

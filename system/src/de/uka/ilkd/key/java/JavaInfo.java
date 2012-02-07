@@ -614,7 +614,7 @@ public final class JavaInfo {
 	    System.arraycopy(subs, 2, newSubs, 1, newSubs.length - 1);
 	    subs=newSubs;
 	}
-	if(pm.getKeYJavaType() == null) {
+	if(pm.getReturnType() == null) {
 	    throw new IllegalArgumentException("Program method "+methodName
 					       +" in "+className+" must have"
 					       +" a non-void type.");

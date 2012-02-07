@@ -105,14 +105,14 @@ public final class SLMethodResolver extends SLExpressionResolver {
             subs[i++] = slExpression.getTerm();
         }
         
-        if (pm.getKeYJavaType() == null) {
+        if (pm.getReturnType() == null) {
             // return type is void
             throw manager.excManager.createException("can not use void " +
             		"method \"" + methodName + "\" in specification expression.");
         }
         
         return new SLExpression(TB.tf().createTerm(pm, subs), 
-        	                pm.getKeYJavaType());
+        	                pm.getReturnType());
     }
 
 }
