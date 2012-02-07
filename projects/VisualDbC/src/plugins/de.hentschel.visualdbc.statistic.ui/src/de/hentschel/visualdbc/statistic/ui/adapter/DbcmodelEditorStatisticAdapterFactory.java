@@ -17,6 +17,8 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.edit.domain.EditingDomain;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.Viewer;
 
 import de.hentschel.visualdbc.dbcmodel.DbcModel;
 import de.hentschel.visualdbc.dbcmodel.presentation.DbcmodelEditor;
@@ -34,14 +36,26 @@ public class DbcmodelEditorStatisticAdapterFactory extends AbstractStatisticAdap
    @Override
    public Object getAdapter(final Object adaptableObject, @SuppressWarnings("rawtypes") Class adapterType) {
       final IStatisticProvider provider = new IStatisticProvider() {
+         private DbcmodelEditor editor;
+         
          @Override
          public DbcModel getModel() {
             if (adaptableObject instanceof DbcmodelEditor) {
-               DbcmodelEditor editor = (DbcmodelEditor)adaptableObject;
+               editor = (DbcmodelEditor)adaptableObject;
                return searchDbcModel(editor.getEditingDomain());
             }
             else {
                return null;
+            }
+         }
+
+         @Override
+         public void select(ISelection selection) {
+            if (editor != null) {
+               Viewer viewer = editor.getViewer();
+               if (viewer != null) {
+                  viewer.setSelection(selection);
+               }
             }
          }};
       return new DbcStatisticViewPart(provider);    

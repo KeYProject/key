@@ -11,6 +11,8 @@
 
 package de.hentschel.visualdbc.statistic.ui.control;
 
+import org.eclipse.jface.viewers.ISelection;
+
 import de.hentschel.visualdbc.dbcmodel.DbcModel;
 
 /**
@@ -24,4 +26,10 @@ public interface IStatisticProvider {
     * @return The {@link DbcModel}.
     */
    public DbcModel getModel();
+   
+   /**
+    * Selects the given elements in the provider.
+    * @param selection The elements to select.
+    */
+   public void select(ISelection selection);
 }
