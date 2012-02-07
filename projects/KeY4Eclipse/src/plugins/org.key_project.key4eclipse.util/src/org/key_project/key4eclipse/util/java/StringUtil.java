@@ -22,6 +22,11 @@ public final class StringUtil {
    public static final String EMPTY_STRING = "";
 
    /**
+    * Constant for a line break.
+    */
+   public static final Object NEW_LINE = System.getProperty("line.separator");
+   
+   /**
     * Forbid instances by this private constructor.
     */
    private StringUtil() {

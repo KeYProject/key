@@ -306,25 +306,17 @@ public final class KeYUtil {
             // Get local file for the eclipse resource
             final File location = sourcePaths.get(0);
             Assert.isNotNull(location, "The resource \"" + method.getResource() + "\" is not local.");
+            // Open main window to avoid repaint bugs
+            openMainWindow();
+            // Load location and open proof management dialog
             IRunnableWithException run = new AbstractRunnableWithException() {
                 @Override
                 public void run() {
                     try {
-                        // Open main window
-                        openMainWindow();
                         // Make sure that main window is available.
                         Assert.isTrue(MainWindow.hasInstance(), "KeY main window is not available.");
-                        // Check if location is already loaded
-                        InitConfig initConfig = getInitConfig(location);
-                        if (initConfig == null) {
-                            // Load local file
-                            MainWindow main = MainWindow.getInstance();
-                            ProblemLoader loader = new ProblemLoader(location, main);
-                            main.getRecentFiles().addRecentFile(location.getAbsolutePath());
-                            EnvInput envInput = loader.createEnvInput(location, classPaths, bootClassPath);
-                            ProblemInitializer init = main.createProblemInitializer();
-                            initConfig = init.prepare(envInput);
-                        }
+                        // Load location
+                        InitConfig initConfig = internalLoad(location, classPaths, bootClassPath, true);
                         // Get method to proof in KeY
                         ProgramMethod pm = getProgramMethod(method, initConfig.getServices().getJavaInfo());
                         Assert.isNotNull(pm, "Can't find method \"" + method + "\" in KeY.");
@@ -341,6 +333,54 @@ public final class KeYUtil {
                 throw run.getException();
             }
         }
+    }
+    
+    /**
+     * Loads the given location in KeY and returns the opened {@link InitConfig}.
+     * @param location The location to load.
+     * @param classPaths The class path entries to use.
+     * @param bootClassPath The boot class path to use.
+     * @param showKeYMainWindow Show KeY {@link MainWindow}? <b>Attention: </b> The {@link InitConfig} is not available in the proof tree, because no proof is started.
+     * @return The opened {@link InitConfig}.
+     * @throws Exception Occurred Exception.
+     */
+    public static InitConfig internalLoad(final File location,
+                                          final List<File> classPaths,
+                                          final File bootClassPath,
+                                          final boolean showKeYMainWindow) throws Exception {
+        IRunnableWithResult<InitConfig> run = new AbstractRunnableWithResult<InitConfig>() {
+            @Override
+            public void run() {
+                try {
+                    if (!MainWindow.hasInstance()) {
+                        MainWindow.createInstance(Main.getMainWindowTitle());
+                    }
+                    MainWindow main = MainWindow.getInstance(showKeYMainWindow);
+                    if (showKeYMainWindow && !main.isVisible()) {
+                        main.setVisible(true);
+                    }
+                    // Check if location is already loaded
+                    InitConfig initConfig = getInitConfig(location);
+                    if (initConfig == null) {
+                        // Load local file
+                        ProblemLoader loader = new ProblemLoader(location, main);
+                        main.getRecentFiles().addRecentFile(location.getAbsolutePath());
+                        EnvInput envInput = loader.createEnvInput(location, classPaths, bootClassPath);
+                        ProblemInitializer init = main.createProblemInitializer();
+                        initConfig = init.prepare(envInput);
+                    }
+                    setResult(initConfig);
+                }
+                catch (Exception e) {
+                    setException(e);
+                }
+            }
+        };
+        SwingUtil.invokeAndWait(run);
+        if (run.getException() != null) {
+            throw run.getException();
+        }
+        return run.getResult();
     }
     
     /**
