@@ -284,7 +284,10 @@ public final class JMLSpecExtractor implements SpecExtractor {
         	    } else if (c instanceof TextualJMLClassAxiom){
         		ClassAxiom ax = jsf.createJMLClassAxiom(kjt, (TextualJMLClassAxiom)c);
         		result = result.add(ax);
-        	    } // else might be some other specification
+        	    } else {
+        	        // DO NOTHING
+        	        // There may be ohter kinds of JML constructs which are not specifications.
+        	    }
         	} catch (SLWarningException e) {
         	    warnings = warnings.add(e.getWarning());
         	}
@@ -382,7 +385,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
             //add non-null postcondition
             KeYJavaType resultType = pm.getReturnType();
 
-            if(resultType != null &&
+            if(!pm.isVoid() && !pm.isConstructor() &&
                     !JMLInfoExtractor.resultIsNullable(pm) &&
                     specCase.getBehavior() != Behavior.EXCEPTIONAL_BEHAVIOR) {
                 final ImmutableSet<PositionedString> resultNonNull = 
