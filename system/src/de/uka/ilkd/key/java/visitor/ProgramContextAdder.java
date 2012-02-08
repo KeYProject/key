@@ -102,7 +102,7 @@ public class ProgramContextAdder {
 
     /**
      * inserts the content of the statement block <code>putIn</code> and
-     * adds succedding children of the innermost non terminal element
+     * adds succeeding children of the innermost non terminal element
      * (usually statement block) in the context.
      * @param wrapper the JavaNonTerminalProgramElement with the context
      *   that has to be wrapped around the content of <code>putIn</code>
@@ -112,7 +112,7 @@ public class ProgramContextAdder {
      * first element before the suffix of the context 
      * @return the StatementBlock which encloses the content of
      * <code>putIn</code> together with the succeeding context elements
-     * of the innermost context statemebt block (attention:
+     * of the innermost context statement block (attention:
      * in a case like 
      *   <code>{{{oldStmnt; list of further stmnt;}} moreStmnts; }</code> 
      * only the underscored part is returned
@@ -121,31 +121,30 @@ public class ProgramContextAdder {
      * part has to be done elsewhere.
      */
     private final StatementBlock createWrapperBody
-	(JavaNonTerminalProgramElement wrapper,
-	 StatementBlock putIn, PosInProgram suffix) {
-        
-	final int putInLength   = putIn.getChildCount();
-        
-	final int lastChild = suffix.last();
-        	
-	final int childLeft =  wrapper.getChildCount() - lastChild;
+    (JavaNonTerminalProgramElement wrapper,
+            StatementBlock putIn, PosInProgram suffix) {
+
+        final int putInLength   = putIn.getChildCount();
+
+        // ATTENTION: may be -1
+        final int lastChild = suffix.last();
+
+        final int childLeft =  wrapper.getChildCount() - lastChild;
 
 
-	final int childrenToAdd = putInLength + childLeft;
+        final int childrenToAdd = putInLength + childLeft;
 
-	if (childLeft == 0) { 
-	    return putIn;
-	}
-	
-	final Statement[] body = new Statement[childrenToAdd]; 
-	
-	putIn.getBody().arraycopy(0, body, 0, putInLength);
+        if (childLeft == 0 || lastChild == -1) { 
+            return putIn;
+        }
 
+        final Statement[] body = new Statement[childrenToAdd]; 
 
-	for (int i = putInLength; i < childrenToAdd; i++) {
-	    body[i] = (Statement) wrapper.getChildAt
-		(lastChild + (i - putInLength));
-	}
+        putIn.getBody().arraycopy(0, body, 0, putInLength);
+
+        for (int i = putInLength; i < childrenToAdd; i++) {
+            body[i] = (Statement) wrapper.getChildAt(lastChild + (i - putInLength));
+        }
 
 	/*
 	  Example: 
