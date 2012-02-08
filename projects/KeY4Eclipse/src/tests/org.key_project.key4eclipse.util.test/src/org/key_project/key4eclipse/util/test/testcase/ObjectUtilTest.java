@@ -14,6 +14,7 @@ package org.key_project.key4eclipse.util.test.testcase;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Comparator;
 
 import junit.framework.TestCase;
 
@@ -27,6 +28,21 @@ import org.key_project.key4eclipse.util.test.model.ClassB;
  * @author Martin Hentschel
  */
 public class ObjectUtilTest extends TestCase {
+   /**
+    * Tests {@link ObjectUtil#createEqualsComparator()}.
+    */
+   @Test
+   public void testCreateEqualsComparator() {
+       Comparator<String> c = ObjectUtil.createEqualsComparator();
+       assertNotNull(c);
+       assertSame(0, c.compare("A", "A"));
+       assertNotSame(0, c.compare("A", "a"));
+       assertNotSame(0, c.compare("a", "b"));
+       assertNotSame(0, c.compare("a", null));
+       assertNotSame(0, c.compare(null, "b"));
+       assertSame(0, c.compare(null, null));
+   }
+    
    /**
     * Tests for {@link ObjectUtil#hashCode()}
     */

@@ -11,6 +11,8 @@
 
 package org.key_project.key4eclipse.util.java;
 
+import java.util.Comparator;
+
 /**
  * Provides static methods to work with strings.
  * @author Martin Hentschel
@@ -66,5 +68,29 @@ public final class StringUtil {
     */
    public static String toLowerCase(String text) {
        return text != null ? text.toLowerCase() : null;
+   }
+   
+   /**
+    * Creates a {@link Comparator} that can be used to compute the
+    * equality of two given {@link String}s ignoring the case
+    * via {@link String#compareToIgnoreCase(String)}. If both values
+    * are {@code null} also {@code 0} is returned in 
+    * {@link Comparator#compare(Object, Object)}. If only one value
+    * is {@code null} {@link Comparator#compare(Object, Object)} will
+    * return a value different to {@code 0}.
+    * @return The created {@link Comparator}.
+    */
+   public static Comparator<String> createIgnoreCaseComparator() {
+      return new Comparator<String>() {
+         @Override
+         public int compare(String o1, String o2) {
+            if (o1 != null && o2 != null) {
+               return o1.compareToIgnoreCase(o2);
+            }
+            else {
+               return o1 == null && o2 == null ? 0 : 1;
+            }
+         }
+      };
    }
 }

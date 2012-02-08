@@ -11,6 +11,8 @@
 
 package org.key_project.key4eclipse.util.test.testcase;
 
+import java.util.Comparator;
+
 import junit.framework.TestCase;
 
 import org.junit.Test;
@@ -21,6 +23,24 @@ import org.key_project.key4eclipse.util.java.StringUtil;
  * @author Martin Hentschel
  */
 public class StringUtilTest extends TestCase {
+   /**
+    * Tests {@link StringUtil#createIgnoreCaseComparator()}.
+    */
+   @Test
+   public void testCreateIgnoreCaseComparator() {
+      Comparator<String> c = StringUtil.createIgnoreCaseComparator();
+      assertNotNull(c);
+      assertSame("A".compareToIgnoreCase("A"), c.compare("A", "A"));
+      assertSame("A".compareToIgnoreCase("a"), c.compare("A", "a"));
+      assertSame("A".compareToIgnoreCase("B"), c.compare("A", "B"));
+      assertSame("A".compareToIgnoreCase("b"), c.compare("A", "b"));
+      assertSame("a".compareToIgnoreCase("B"), c.compare("a", "B"));
+      assertSame("A".compareToIgnoreCase("B"), c.compare("A", "B"));
+      assertNotSame(0, c.compare("A", null));
+      assertNotSame(0, c.compare(null, "A"));
+      assertSame(0, c.compare(null, null));
+   }
+    
    /**
     * Tests {@link StringUtil#toLowerCase(String)}
     */

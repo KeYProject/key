@@ -14,6 +14,7 @@ package org.key_project.key4eclipse.util.java;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -237,5 +238,23 @@ public final class ObjectUtil {
     */
    public static int hashCode(Object obj) {
       return obj != null ? obj.hashCode() : 0;
+   }
+   
+   /**
+    * Creates a {@link Comparator} that can be used to compute the
+    * equality of two given {@link Object}s. They are seen as equal
+    * if {@link ObjectUtil#equals(Object, Object)} tells it. In this case
+    * {@code 0} is returned in {@link Comparator#compare(Object, Object)}.
+    * If they are not equal {@link Comparator#compare(Object, Object)} returns
+    * a value different to {@code 0}.
+    * @return The created {@link Comparator}.
+    */
+   public static <T> Comparator<T> createEqualsComparator() {
+       return new Comparator<T>() {
+           @Override
+           public int compare(T arg0, T arg1) {
+               return ObjectUtil.equals(arg0, arg1) ? 0 : 1;
+           }
+       };
    }
 }

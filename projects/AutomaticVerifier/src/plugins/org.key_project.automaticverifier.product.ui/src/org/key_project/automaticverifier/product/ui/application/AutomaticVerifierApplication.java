@@ -1,10 +1,19 @@
 package org.key_project.automaticverifier.product.ui.application;
 
+import java.util.Comparator;
+import java.util.Map;
+
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
+import org.key_project.key4eclipse.util.java.ArrayUtil;
+import org.key_project.key4eclipse.util.java.StringUtil;
+import org.key_project.key4eclipse.util.java.SwingUtil;
+
+import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.gui.MainWindow;
 
 /**
  * <p>
@@ -23,6 +32,50 @@ public class AutomaticVerifierApplication implements IApplication {
      */
     @Override
     public Object start(IApplicationContext context) throws Exception {
+        String[] arguments = getStartArguments(context);
+        Comparator<String> comparator = StringUtil.createIgnoreCaseComparator();
+        if (ArrayUtil.contains(arguments, "keyonly", comparator)) {
+            String[] cleaned = ArrayUtil.remove(arguments, "keyonly", comparator);
+            return startKeYApplication(cleaned, context);
+        }
+        else {
+            return startEclipseApplication(context);
+        }
+    }
+    
+    /**
+     * Starts the KeY application.
+     * @param cleanedArguments The cleaned arguments for KeY.
+     * @param context The {@link IApplicationContext} to use.
+     * @return The exit result.
+     * @throws Exception Occurred Exception.
+     */
+    protected Object startKeYApplication(final String[] cleanedArguments,
+                                         final IApplicationContext context) throws Exception {
+        // Start KeY
+        SwingUtil.invokeAndWait(new Runnable() {
+            @Override
+            public void run() {
+                Main.main(cleanedArguments);
+            }
+        });
+        // Close splash screen
+        context.applicationRunning();
+        // Wait until KeY is closed.
+        MainWindow mainWindow = MainWindow.getInstance();
+        while (mainWindow.isVisible()) {
+            Thread.sleep(500);
+        }
+        return IApplication.EXIT_OK;
+    }
+
+    /**
+     * Starts the eclipse application.
+     * @param context The {@link IApplicationContext} to use.
+     * @return The exit result.
+     * @throws Exception Occurred Exception.
+     */
+    protected Object startEclipseApplication(IApplicationContext context) throws Exception {
         Display display = PlatformUI.createDisplay();
         try {
             int returnCode = PlatformUI.createAndRunWorkbench(display, new AutomaticVerifierWorkbenchAdvisor());
@@ -33,6 +86,27 @@ public class AutomaticVerifierApplication implements IApplication {
         }
         finally {
             display.dispose();
+        }
+    }
+    
+    /**
+     * Returns the start parameters if possible.
+     * @param context The {@link IApplicationContext} to use.
+     * @return The found start parameters or {@code null} if no one was found.
+     */
+    protected String[] getStartArguments(IApplicationContext context) {
+        if (context != null) {
+            Map<?, ?> arguments = context.getArguments();
+            if (arguments != null) {
+                Object value = arguments.get(IApplicationContext.APPLICATION_ARGS);
+                return value instanceof String[] ? (String[])value : null;
+            }
+            else {
+                return null;
+            }
+        }
+        else {
+            return null;
         }
     }
 
