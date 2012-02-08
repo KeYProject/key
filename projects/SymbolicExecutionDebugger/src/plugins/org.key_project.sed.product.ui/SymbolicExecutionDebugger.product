@@ -32,6 +32,8 @@ Developed as part of the KeY project.
       startupMessageRect="30,252,445,20"
       startupForegroundColor="3F3F3F" />
    <launcher name="SED">
+      <linux icon="/org.key_project.sed.product.ui/icons/logo48.xpm"/>
+      <macosx icon="/org.key_project.sed.product.ui/icons/logo.icns"/>
       <solaris/>
       <win useIco="true">
          <ico path="/org.key_project.sed.product.ui/icons/logo.ico"/>

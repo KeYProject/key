@@ -32,6 +32,7 @@ Developed as part of the KeY project.
       startupMessageRect="30,252,445,20"
       startupForegroundColor="3F3F3F" />
    <launcher name="AutomaticVerifier">
+      <linux icon="/org.key_project.automaticverifier.product.ui/icons/logo48.xpm"/>
       <macosx icon="/org.key_project.automaticverifier.product.ui/icons/logo.icns"/>
       <solaris/>
       <win useIco="true">
