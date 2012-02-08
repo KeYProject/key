@@ -191,12 +191,12 @@ public class AutomaticVerifierComposite extends Composite {
     public void startProofs() {
         if (proofViewer.getInput() instanceof List<?>) {
             final List<?> input = (List<?>)proofViewer.getInput();
-            new Job("Proveing") {
+            new Job("Proving") {
                 @Override
                 protected IStatus run(IProgressMonitor monitor) {
                     try {
                         SWTUtil.checkCanceled(monitor);
-                        monitor.beginTask("Proveing", input.size());
+                        monitor.beginTask("Proving", input.size());
                         for (Object obj : input) {
                             SWTUtil.checkCanceled(monitor);
                             if (obj instanceof AutomaticProof) {
