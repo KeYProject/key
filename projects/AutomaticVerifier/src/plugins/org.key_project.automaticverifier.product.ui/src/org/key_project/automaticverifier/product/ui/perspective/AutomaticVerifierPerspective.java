@@ -27,7 +27,7 @@ public class AutomaticVerifierPerspective implements IPerspectiveFactory {
     public void createInitialLayout(IPageLayout layout) {
         String editorArea = layout.getEditorArea();
         layout.setEditorAreaVisible(false);
-        layout.addView(AutomaticVerifierView.ID, IPageLayout.TOP, 0.75f, editorArea);
+        layout.addStandaloneView(AutomaticVerifierView.ID, false, IPageLayout.TOP, 0.75f, editorArea);
         layout.addPlaceholder(IPageLayout.ID_PROGRESS_VIEW, IPageLayout.BOTTOM, 0.25f, editorArea);
     }
 }
