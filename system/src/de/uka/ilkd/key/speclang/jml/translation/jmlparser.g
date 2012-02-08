@@ -1400,21 +1400,8 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
     |
         (LPAREN BSUM) => result=bsumterm
     |
-	(OLD | PRE) LPAREN result=expression RPAREN
-	{
-	    if (heapAtPre == null) {
-		raiseError("JML construct " +
-			   "\\old not allowed in this context.");
-	    }
-	    
-	    typ = result.getType();
-	    if(typ != null) {
-	      result = new SLExpression(convertToOld(result.getTerm()), 
-	                                result.getType());
-	    } else {
-	      result = new SLExpression(convertToOld(result.getTerm()));
-	    }
-	}
+	(OLD | PRE) => result=oldexpression
+	
     |   result = transactionUpdated
     |
 	BACKUP LPAREN result=expression RPAREN
@@ -1726,7 +1713,31 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
 	RPAREN
 ;
 	
-
+oldexpression returns [SLExpression result=null] throws SLTranslationException
+{ KeYJavaType typ; }
+:
+    (
+    PRE LPAREN result=expression RPAREN
+    |
+    OLD LPAREN result=expression (COMMA id:IDENT)? RPAREN
+    )
+    {
+        if (heapAtPre == null) {
+        raiseError("JML construct " +
+               "\\old not allowed in this context.");
+        }
+        
+        if (id != null) addIgnoreWarning("\\old with label");
+        
+        typ = result.getType();
+        if(typ != null) {
+          result = new SLExpression(convertToOld(result.getTerm()), 
+                                    result.getType());
+        } else {
+          result = new SLExpression(convertToOld(result.getTerm()));
+        }
+    }
+;
 
 bsumterm returns [SLExpression result=null] throws SLTranslationException
 {
