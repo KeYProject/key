@@ -110,7 +110,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
         if (resultVar == null){
             assert (pm.isVoid() || pm.isConstructor()) : "resultVar == null for method "+pm;
         } else {
-            assert (!pm.isVoid() && !pm.isConstructor()) : "non-null result variable for void method or constructor "+pm;
+            assert (!pm.isVoid() && !pm.isConstructor()) : "non-null result variable for void method or constructor "+pm+" with return type "+pm.getReturnType();
         }
         assert excVar != null;
         assert heapAtPreVar != null;
@@ -237,7 +237,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
     //-------------------------------------------------------------------------
 
     
-    private Map /*Operator, Operator, Term -> Term*/ getReplaceMap(
+    private Map<ProgramVariable, ProgramVariable> getReplaceMap(
 	    		      ProgramVariable selfVar, 
 	    		      ImmutableList<ProgramVariable> paramVars, 
 	    		      ProgramVariable resultVar, 
@@ -245,7 +245,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 	    		      ProgramVariable heapAtPreVar,
 	    		      ProgramVariable savedHeapAtPreVar,
 	    		      Services services) {
-	final Map result = new LinkedHashMap();
+	final Map<ProgramVariable, ProgramVariable> result = new LinkedHashMap<ProgramVariable, ProgramVariable>();
 	
         //self
 	if(selfVar != null) {
@@ -294,7 +294,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
     }
     
     
-    private Map /*Operator, Operator, Term -> Term*/ getReplaceMap(
+    private Map<Term, Term> getReplaceMap(
 	    		      Term heapTerm,
 	    		      Term selfTerm, 
 	    		      ImmutableList<Term> paramTerms, 
@@ -403,7 +403,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
         assert services != null;
-	final Map replaceMap = getReplaceMap(selfVar, 
+	final Map<ProgramVariable, ProgramVariable> replaceMap = getReplaceMap(selfVar, 
                                              paramVars, 
                                              null, 
                                              null,
@@ -426,7 +426,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
         assert paramTerms != null;
         assert paramTerms.size() == originalParamVars.size();
         assert services != null;
-	final Map replaceMap = getReplaceMap(heapTerm, 
+	final Map<Term, Term> replaceMap = getReplaceMap(heapTerm, 
 					     selfTerm, 
 					     paramTerms, 
 					     null, 
@@ -447,7 +447,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
         assert services != null;
-	final Map replaceMap = getReplaceMap(selfVar, 
+	final Map<ProgramVariable, ProgramVariable> replaceMap = getReplaceMap(selfVar, 
                                              paramVars, 
                                              null, 
                                              null,
@@ -469,7 +469,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
         assert paramTerms != null;
         assert paramTerms.size() == originalParamVars.size();
         assert services != null;
-	final Map replaceMap = getReplaceMap(heapTerm, 
+	final Map<Term, Term> replaceMap = getReplaceMap(heapTerm, 
 					     selfTerm, 
 					     paramTerms, 
 					     null, 
@@ -654,7 +654,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
         assert excVar != null;
         assert heapAtPreVar != null;
         assert services != null;
-	final Map replaceMap = getReplaceMap(selfVar, 
+	final Map<ProgramVariable, ProgramVariable> replaceMap = getReplaceMap(selfVar, 
                                        	     paramVars, 
                                        	     resultVar, 
                                        	     excVar, 
@@ -683,7 +683,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
         assert excTerm != null;
         assert heapAtPre != null;
         assert services != null;
-	final Map replaceMap = getReplaceMap(heapTerm,
+	final Map<Term, Term> replaceMap = getReplaceMap(heapTerm,
 		                             selfTerm, 
                                              paramTerms, 
                                              resultTerm, 
@@ -706,7 +706,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
         assert services != null;
-	final Map replaceMap = getReplaceMap(selfVar, 
+	final Map<ProgramVariable, ProgramVariable> replaceMap = getReplaceMap(selfVar, 
                                              paramVars, 
                                              null, 
                                              null, 
@@ -740,7 +740,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
         assert paramTerms != null;
         assert paramTerms.size() == originalParamVars.size();
         assert services != null;
-	final Map replaceMap = getReplaceMap(heapTerm,
+	final Map<Term, Term> replaceMap = getReplaceMap(heapTerm,
 		                             selfTerm, 
                                              paramTerms, 
                                              null, 
