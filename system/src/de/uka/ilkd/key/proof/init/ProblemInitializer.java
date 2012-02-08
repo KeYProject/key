@@ -515,7 +515,8 @@ public final class ProblemInitializer {
                 }
                 for(ProgramMethod pm
                         : javaInfo.getAllProgramMethodsLocallyDeclared(kjt)) {
-                    if(pm.getReturnType() != null) {
+                    if(pm.isVoid() || pm.isConstructor()) {
+                        // XXX what does this do?
                         functions.add(pm);
                     }
                 }

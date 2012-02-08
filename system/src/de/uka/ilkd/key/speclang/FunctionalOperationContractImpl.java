@@ -207,7 +207,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
     }
     
     
-    /**
+    /* *
      * Creates an operation contract.
      * 
      * @param baseName base name of the contract (does not have to be unique)

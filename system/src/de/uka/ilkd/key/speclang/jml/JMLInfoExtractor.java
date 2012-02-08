@@ -89,7 +89,7 @@ public final class JMLInfoExtractor {
         }
         
         // ... or to the return type ...
-        if(pm.isVoid()) {
+        if(!pm.isVoid() && !pm.isConstructor()) {
             coms = coms.prepend(method.getTypeReference().getComments());
         }
         
@@ -263,7 +263,7 @@ public final class JMLInfoExtractor {
         for(Modifier mod : md.getModifiers()) {
             comments = comments.prepend(mod.getComments());
         }
-        if(pm.isVoid()) {
+        if(!pm.isVoid() && !pm.isConstructor()) {
             comments = comments.prepend(md.getTypeReference().getComments());
         }
         Comment[] methodComments = md.getComments();

@@ -256,7 +256,7 @@ public final class TermBuilder {
      */
     public LocationVariable resultVar(Services services, String name,
 	    ProgramMethod pm, boolean makeNameUnique) {
-	if(pm.getReturnType() == null || pm.isConstructor()) {
+	if(pm.isVoid() || pm.isConstructor()) {
 	    return null;
 	} else {
 	    if(makeNameUnique) {

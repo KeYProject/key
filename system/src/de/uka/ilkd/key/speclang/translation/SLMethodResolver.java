@@ -105,8 +105,7 @@ public final class SLMethodResolver extends SLExpressionResolver {
             subs[i++] = slExpression.getTerm();
         }
         
-        if (pm.getReturnType() == null) {
-            // return type is void
+        if (pm.isVoid()) {
             throw manager.excManager.createException("can not use void " +
             		"method \"" + methodName + "\" in specification expression.");
         }
