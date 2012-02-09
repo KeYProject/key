@@ -989,7 +989,7 @@ public class Recoder2KeYConverter {
         ProgramMethod result 
         	= new ProgramMethod(consDecl,
         			    containerKJT, 
-        			    containerKJT,
+        			    KeYJavaType.VOID_TYPE,
         			    positionInfo(cd),
         			    heapSort);
         insertToMap(cd, result);
@@ -1011,7 +1011,7 @@ public class Recoder2KeYConverter {
                             : rec2key.getTypeConverter().getTypeConverter().getHeapLDT().targetSort();        
         final KeYJavaType containerKJT = getKeYJavaType(cont);
         ProgramMethod result = new ProgramMethod(consDecl,
-                containerKJT, containerKJT,
+                containerKJT, KeYJavaType.VOID_TYPE,
                 PositionInfo.UNDEFINED,
                 heapSort);
         insertToMap(dc, result);

@@ -232,7 +232,7 @@ public final class ProgramMethod extends ObserverFunction
     }
     
     public boolean isVoid(){
-        return returnType == KeYJavaType.VOID_TYPE;
+        return returnType == KeYJavaType.VOID_TYPE && !isConstructor();
     }
     
     @Override
