@@ -19,7 +19,7 @@ options {
  	charVocabulary='\3'..'\ufffe';
  	codeGenMakeSwitchThreshold = 2;  // Some optimizations
 	codeGenBitsetTestThreshold = 3;
-	k=7;
+	k=8;
 }
 
 tokens {
@@ -92,8 +92,6 @@ MINUS : "-";
 MOD : "%";
 MULT : "*";
 NONNULLELEMENTS : "\\nonnullelements";
-NON_NULL : "\\non_null";
-NULLABLE : "\\nullable";
 NOT : "!";
 NOT_MODIFIED : "\\not_modified";
 NOT_SPECIFIED : "\\not_specified";
@@ -276,9 +274,28 @@ options {
     testLiterals = true;
     paraphrase = "an identifier";
 }:
-        LETTER (LETTERORDIGIT)*
+ // used in special cases where both an identifier or a keyword would be acceptable
+   (
+   ('n' 'o' 'n' '_' 'n' 'u' 'l' 'l') => NON_NULL {$setType(NON_NULL);}
+   |
+   ('n' 'u' 'l' 'l' 'a' 'b' 'l' 'e') => NULLABLE {$setType(NULLABLE);}
+   |
+   (LETTER (LETTERORDIGIT)*)
+   ) 
 ;
-
+    
+protected
+NON_NULL
+:
+    'n' 'o' 'n' '_' 'n' 'u' 'l' 'l'
+;
+    
+protected
+NULLABLE
+:
+    'n' 'u' 'l' 'l' 'a' 'b' 'l' 'e'
+;
+    
 HEXNUMERAL
     :
         '0'! ('x'!|'X'!) (HEXDIGIT)+
