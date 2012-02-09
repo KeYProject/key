@@ -14,7 +14,9 @@ import de.uka.ilkd.key.util.ExtList;
 
 /**
    Default constructor of class types.
+   @deprecated is actually never used
  */
+@Deprecated
 public class DefaultConstructor implements Constructor {
 
     protected final String name;
@@ -33,6 +35,7 @@ public class DefaultConstructor implements Constructor {
        @param name of the Constructor
        @param parentIsPublic is set true iff the parent is declared public.
      */
+    @Deprecated
     public DefaultConstructor(String name, boolean parentIsPublic) {
 	this.parentIsPublic = parentIsPublic;
 	this.name=name;

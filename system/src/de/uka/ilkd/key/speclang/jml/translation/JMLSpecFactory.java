@@ -830,6 +830,7 @@ public class JMLSpecFactory {
     }
 
 
+    @SuppressWarnings("unchecked")
     public Contract createJMLDependencyContract(KeYJavaType kjt,
                                                 PositionedString originalDep)
             throws SLTranslationException {

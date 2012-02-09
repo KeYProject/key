@@ -1542,7 +1542,8 @@ final class JMLTranslator {
             if (expr1.isType() != expr2.isType()) {
                 throw excManager.createException(
                         "Cannot build equality expression (" + eqSymb
-                        + ") between term and type.");
+                        + ") between term and type.\n" +
+                        		"The expression was: "+expr1+eqSymb+expr2);
             }
 
         }
