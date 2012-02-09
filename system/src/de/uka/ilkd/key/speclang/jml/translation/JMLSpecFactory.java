@@ -353,7 +353,8 @@ public class JMLSpecFactory {
             if(translated == TB.lessThanNothing()) {
                 if(originalClauses.size() > 1) {
                     throw new SLTranslationException(
-                            "\"assignable \\less_than_nothing\" does not go with other assignable clauses",
+                            "\"assignable \\less_than_nothing\" does not go with other " +
+                            "assignable clauses (even if they declare the same).",
                             expr.fileName, expr.pos);
                 }
                 return TB.empty(services);

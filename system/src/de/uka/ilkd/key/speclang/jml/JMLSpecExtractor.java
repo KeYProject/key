@@ -310,6 +310,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
         String fileName = td.getPositionInfo().getFileName();
 
         //determine purity
+        final boolean isStrictlyPure = JMLInfoExtractor.isStrictlyPure(pm);
         final boolean isPure = JMLInfoExtractor.isPure(pm);
         final boolean isHelper = JMLInfoExtractor.isHelper(pm);
 
@@ -347,8 +348,10 @@ public final class JMLSpecExtractor implements SpecExtractor {
             TextualJMLSpecCase specCase 
             = (TextualJMLSpecCase) constructsArray[i];
 
-            //add purity
-            if(isPure) {
+            //add purity. Strict purity overrides purity.
+            if(isStrictlyPure) {
+                specCase.addAssignable(new PositionedString("assignable \\less_than_nothing"));
+            } else if(isPure) {
                 specCase.addAssignable(new PositionedString("assignable \\nothing"));
             }
 
