@@ -1808,7 +1808,7 @@ public final class MainWindow extends JFrame  {
     public void loadCommandLineFile() {
         if (Main.getFileNameOnStartUp() != null) {
             loadProblem(new File(Main.getFileNameOnStartUp()));
-        } else if(Main.getExamplesDir() != null) {
+        } else if(Main.getExamplesDir() != null && Main.showExampleChooserIfExamplesDirIsDefined) {
             openExampleAction.actionPerformed(null);
         }
     }

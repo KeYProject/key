@@ -4,7 +4,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.key_project.key4eclipse.starter.core.test.suite.AllStarterCoreTests;
 import org.key_project.key4eclipse.starter.ui.test.suite.AllStarterUITests;
-import org.key_project.key4eclipse.suite.AllKeY4EclipseTests;
+import org.key_project.key4eclipse.test.suite.AllKeY4EclipseTests;
 import org.key_project.key4eclipse.util.test.suite.AllUtilTests;
 
 /**

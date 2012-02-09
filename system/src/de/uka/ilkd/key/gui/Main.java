@@ -52,7 +52,20 @@ public class Main {
 
 
     private static String fileNameOnStartUp = null;
-
+    /**
+     * <p>
+     * This flag indicates if the example chooser should be shown
+     * if {@link #examplesDir} is defined (not {@code null}). It is set
+     * in the Eclipse integration to {@code false}, because it is required
+     * to define the path to a different one without showing the chooser.
+     * </p>
+     * <p>
+     * Conclusion: It must be possible to use KeY with a custom examples
+     * directory without showin the chooser on startup.
+     * </p>
+     */
+    public static boolean showExampleChooserIfExamplesDirIsDefined = true;
+    
     public static void main(String[] args) {
         System.out.println("\nKeY Version " + VERSION);
         System.out.println(COPYRIGHT + "\nKeY is protected by the " +

@@ -1,8 +1,9 @@
-package org.key_project.key4eclipse.suite;
+package org.key_project.key4eclipse.test.suite;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
-import org.key_project.key4eclipse.testcase.MainTest;
+import org.key_project.key4eclipse.test.testcase.KeYExampleUtilTest;
+import org.key_project.key4eclipse.test.testcase.MainTest;
 
 /**
  * Run all contained JUnit 4 test cases.
@@ -10,6 +11,7 @@ import org.key_project.key4eclipse.testcase.MainTest;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
+   KeYExampleUtilTest.class,
    MainTest.class
 })
 public class AllKeY4EclipseTests {

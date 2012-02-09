@@ -42,6 +42,22 @@ public final class IOUtil {
    }
 
    /**
+    * Deletes the given file/folder with all contained sub files/folders.
+    * @param file The file/folder to delete.
+    */
+   public static void delete(File file) {
+       if (file != null && file.exists()) {
+           if (file.isDirectory()) {
+               File[] children = file.listFiles();
+               for (File child : children) {
+                   delete(child);
+               }
+           }
+           file.delete();
+       }
+   }
+
+   /**
     * Reads the compelte content from the {@link InputStream} and closes it.
     * @param in The {@link InputStream} to read from and to close.
     * @return The read content or {@code null} if the {@link InputStream} is {@code null}.

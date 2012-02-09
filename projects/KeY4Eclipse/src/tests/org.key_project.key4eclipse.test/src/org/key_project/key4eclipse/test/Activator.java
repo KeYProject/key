@@ -1,4 +1,4 @@
-package org.key_project.key4eclipse;
+package org.key_project.key4eclipse.test;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;

@@ -1,4 +1,4 @@
-package org.key_project.key4eclipse.testcase;
+package org.key_project.key4eclipse.test.testcase;
 
 import junit.framework.TestCase;
 

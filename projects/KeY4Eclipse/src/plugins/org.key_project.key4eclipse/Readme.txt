@@ -26,7 +26,7 @@ every workspace:
      d) Add variable "KEY_LIB" with the path to the KeY externals as value.
         E.g.: D:\Forschung\Tools\KeY-External Libs
      e) Execute it to generate KeY code and to make rules available at runtime.
-- Configure build process
+- Configure build process and make the KeY examples running in development IDE:
   1. Create file "org.key_project.sed.external.key/customTargets.properties"
      with the following key value pairs:
      - Name: key.rep
