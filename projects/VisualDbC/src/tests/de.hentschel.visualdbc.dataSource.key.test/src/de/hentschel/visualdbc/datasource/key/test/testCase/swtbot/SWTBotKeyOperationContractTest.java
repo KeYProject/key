@@ -18,6 +18,7 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 import org.key_project.key4eclipse.util.java.CollectionUtil;
+import org.key_project.key4eclipse.util.test.util.TestUtilsUtil.MethodTreatment;
 
 import de.hentschel.visualdbc.datasource.key.model.KeyConnection;
 import de.hentschel.visualdbc.datasource.key.model.KeyOperationContract;
@@ -25,7 +26,6 @@ import de.hentschel.visualdbc.datasource.key.rule.KeyProofReferenceUtil;
 import de.hentschel.visualdbc.datasource.key.test.util.TestKeyUtil;
 import de.hentschel.visualdbc.datasource.key.test.util.TestKeyUtil.IDSProvableReferenceSelector;
 import de.hentschel.visualdbc.datasource.key.test.util.TestKeyUtil.IDSProvableSelector;
-import de.hentschel.visualdbc.datasource.key.test.util.TestKeyUtil.MethodTreatment;
 import de.hentschel.visualdbc.datasource.model.IDSClass;
 import de.hentschel.visualdbc.datasource.model.IDSConnection;
 import de.hentschel.visualdbc.datasource.model.IDSMethod;

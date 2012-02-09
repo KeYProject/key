@@ -45,6 +45,7 @@ import org.key_project.key4eclipse.starter.core.job.AbstractKeYMainWindowJob;
 import org.key_project.key4eclipse.util.eclipse.BundleUtil;
 import org.key_project.key4eclipse.util.eclipse.ResourceUtil;
 import org.key_project.key4eclipse.util.test.util.TestUtilsUtil;
+import org.key_project.key4eclipse.util.test.util.TestUtilsUtil.MethodTreatment;
 import org.key_project.swtbot.swing.bot.AbstractSwingBotComponent;
 import org.key_project.swtbot.swing.bot.SwingBot;
 import org.key_project.swtbot.swing.bot.SwingBotJButton;
@@ -52,7 +53,6 @@ import org.key_project.swtbot.swing.bot.SwingBotJDialog;
 import org.key_project.swtbot.swing.bot.SwingBotJFrame;
 import org.key_project.swtbot.swing.bot.SwingBotJList;
 import org.key_project.swtbot.swing.bot.SwingBotJMenuBar;
-import org.key_project.swtbot.swing.bot.SwingBotJRadioButton;
 import org.key_project.swtbot.swing.bot.SwingBotJTabbedPane;
 import org.key_project.swtbot.swing.bot.SwingBotJTree;
 import org.key_project.swtbot.swing.bot.finder.waits.Conditions;
@@ -1492,7 +1492,7 @@ public final class TestKeyUtil {
             TestCase.assertEquals(1, proof.getProofListeners().length);
             TestCase.assertEquals(0, proofLogger.getClosedEvents().size());
             TestCase.assertEquals(0, proofLogger.getReferenceChangedEvents().size());
-            finishSelectedProofAutomatically(frame, methodTreatment);
+            TestUtilsUtil.keyFinishSelectedProofAutomatically(frame, methodTreatment);
             TestCase.assertTrue(proof.isClosed());
             TestCase.assertEquals(1, proofLogger.getClosedEvents().size());
             TestCase.assertEquals(proof, proofLogger.getClosedEvents().get(0).getSource());
@@ -1606,56 +1606,6 @@ public final class TestKeyUtil {
             }
          }
       }
-   }
-   
-   /**
-    * Possible method treatments that are configurable inside the 
-    * "Proof Search Strategy" tab.
-    * @author Martin Hentschel
-    */
-   public enum MethodTreatment {
-      /**
-       * Expand.
-       */
-      EXPAND,
-      
-      /**
-       * Contracts
-       */
-      CONTRACTS
-   }
-
-   /**
-    * Executes the "Start/stop automated proof search" on the given KeY frame.
-    * @param frame The given KeY frame.
-    * @param methodTreatment The method treatment to use.
-    */
-   public static void finishSelectedProofAutomatically(SwingBotJFrame frame, MethodTreatment methodTreatment) {
-      // Set proof search strategy settings
-      SwingBotJTabbedPane pane = frame.bot().jTabbedPane();
-      TestCase.assertEquals("Proof Search Strategy", pane.getTitleAt(2));
-      AbstractSwingBotComponent<?> tabComponent = pane.select(2);
-      if (MethodTreatment.CONTRACTS.equals(methodTreatment)) {
-         SwingBotJRadioButton contractsButton = tabComponent.bot().jRadioButton("Contract", 0);
-         contractsButton.click();
-      }
-      else {
-         SwingBotJRadioButton expandButton = tabComponent.bot().jRadioButton("Expand", 1);
-         expandButton.click();
-      }
-      TestCase.assertEquals("Proof", pane.getTitleAt(0));
-      pane.select(0);
-      // Run proof completion
-      frame.bot().jTree().unselectAll();
-      frame.bot().waitWhile(Conditions.hasSelection(frame.bot().jTree()));
-      SwingBotJButton button = frame.bot().jButtonWithTooltip("Start/stop automated proof search");
-      button.click();
-      frame.bot().waitUntil(Conditions.hasSelection(frame.bot().jTree()));
-      // Close result dialog
-      SwingBotJDialog proofClosedDialog = frame.bot().jDialog("Proof closed");
-      proofClosedDialog.bot().jButton("OK").click();
-      proofClosedDialog.bot().waitUntil(Conditions.componentCloses(proofClosedDialog));
-      TestCase.assertFalse(proofClosedDialog.isOpen());   
    }
    
    /**

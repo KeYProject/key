@@ -34,9 +34,6 @@ public class AllTypesSearchEngineTest extends TestCase {
         IJavaSearchScope searchScope = SearchEngine.createJavaSearchScope(new IJavaElement[] {javaProject}, IJavaSearchScope.SOURCES);
         AllTypesSearchEngine engine = new AllTypesSearchEngine();
         IType[] types = engine.searchTypes(new NullProgressMonitor(), searchScope);
-        for (IType type : types) {
-            System.out.println(type.getFullyQualifiedName());
-        }
         doCompareTestResult(types, 
                             "InMainPackage", 
                             "a.InAPackage", 

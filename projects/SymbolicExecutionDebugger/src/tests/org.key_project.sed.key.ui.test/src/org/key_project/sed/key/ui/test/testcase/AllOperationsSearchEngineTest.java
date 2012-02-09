@@ -36,10 +36,6 @@ public class AllOperationsSearchEngineTest extends TestCase {
         IJavaSearchScope searchScope = SearchEngine.createJavaSearchScope(new IJavaElement[] {javaProject}, IJavaSearchScope.SOURCES);
         AllOperationsSearchEngine engine = new AllOperationsSearchEngine();
         IMethod[] methods = engine.searchOperations(new NullProgressMonitor(), searchScope);
-        for (int i = 0; i < methods.length; i++) {
-            System.out.println(JDTUtil.getTextLabel(methods[i].getParent())+ "." + JDTUtil.getQualifiedMethodLabel(methods[i]));
-        }
-        
         doCompareTestResult(methods, 
                             "InMainPackage.methodInMainPackage()",
                             "InAPackage.methodInAPackage()",
@@ -127,10 +123,6 @@ public class AllOperationsSearchEngineTest extends TestCase {
         AllOperationsSearchEngine engine = new AllOperationsSearchEngine();
         engine.setIncludeOperationsOfInnerAndAnonymousTypes(true);
         IMethod[] methods = engine.searchOperations(new NullProgressMonitor(), searchScope);
-        for (int i = 0; i < methods.length; i++) {
-            System.out.println(JDTUtil.getTextLabel(methods[i].getParent())+ "." + JDTUtil.getQualifiedMethodLabel(methods[i]));
-        }
-        
         doCompareTestResult(methods, 
                             "InMainPackage.methodInMainPackage()",
                             "InAPackage.methodInAPackage()",
