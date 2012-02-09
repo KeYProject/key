@@ -31,9 +31,12 @@ public final class JMLInfoExtractor {
     
     /**
      * Checks whether "comment" is a JML comment containing "key".
+     * see bugreport #1166
      */
     private static boolean checkFor(String key, String comment) {
-	return comment.startsWith("/*@") && comment.contains(key);
+        int index = comment.indexOf(key);
+	boolean result = comment.startsWith("/*@") && index >= 0;
+	return result;
     }    
     
     
@@ -138,6 +141,20 @@ public final class JMLInfoExtractor {
             return false;
         } else {
             return hasJMLModifier((TypeDeclaration)t.getJavaType(), "pure");
+        }
+    }
+    
+    /**
+     * Returns true iff the given type is specified as pure, i.e. all
+     * methods and constructors are by default specified "strictly_pure"
+     * 
+     * If t is not a reference type, false is returned.
+     */
+    public static boolean isStrictlyPureByDefault(KeYJavaType t) {
+        if(!(t.getJavaType() instanceof TypeDeclaration)) {
+            return false;
+        } else {
+            return hasJMLModifier((TypeDeclaration)t.getJavaType(), "strictly_pure");
         }
     }
 
@@ -297,5 +314,14 @@ public final class JMLInfoExtractor {
      */
     public static boolean isHelper(ProgramMethod pm) {
 	return hasJMLModifier(pm, "helper");
+    }
+
+    /**
+     * Returns true iff the given method is specified "strictly_pure"
+     * or the containing type is specified so.
+     */
+    public static boolean isStrictlyPure(ProgramMethod pm) {
+        return hasJMLModifier(pm, "strictly_pure") 
+                || isStrictlyPureByDefault(pm.getContainerType());
     }
 }

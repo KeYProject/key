@@ -20,12 +20,22 @@ class StrictlyPure {
     }
 
 
+    // new modifier: strictly_pure
+
+    /*@ ensures \result == field; */
+    /*@ strictly_pure*/ int strictlyPureModifierMethod() {
+       return field;
+    }
+
     /*@ requires field == 42;
+      @ requires \invariant_for(o);
       @ ensures field == 42;
       @ ensures \dl_heap() == \old(\dl_heap());
+      @ ensures \result == 0;
       @*/
-    void useStrictlyPureMethod() {
-	return strictlyPureMethod();
+    int useStrictlyPureMethod(StrictlyPureClass o) {
+        o.thisMethodIsStrictlyPureByDefault();
+	return strictlyPureMethod() - strictlyPureModifierMethod();
     }
 
     /* WARNING: If you use the line
@@ -33,7 +43,9 @@ class StrictlyPure {
      *
      * in a specification of a contract, you are likely
      * to encounter an infinite loop when using the contract.
-     * Rather use the equivalent and more powerfull
+     * Rather use the equivalent and more powerful
      *  assignable \less_than_nothing;
+     * or the modifier
+     *  strictly_pure
      */
 }
