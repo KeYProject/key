@@ -73,4 +73,15 @@ public class TestMiscTools extends TestCase {
         assertFalse(containsWholeWord("foobar","foo"));
         assertFalse(containsWholeWord("bar","foo"));
     }
+    
+    public void testIsJMLComment(){
+        assertTrue(isJMLComment("/*@iarijagjs"));
+        assertTrue(isJMLComment("//@ sasahgue"));
+        assertTrue(isJMLComment("//+KeY@"));
+        assertTrue(isJMLComment("//-ESC@"));
+        assertFalse(isJMLComment("//-KeY@"));
+        assertFalse(isJMLComment("// @"));
+        assertFalse(isJMLComment("/*"));
+        assertFalse(isJMLComment("/**"));
+    }
 }

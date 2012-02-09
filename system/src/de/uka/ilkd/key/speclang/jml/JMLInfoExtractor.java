@@ -17,6 +17,7 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.util.MiscTools;
 
 /**
  * Helper class used by the JML translation. Provides methods that look for
@@ -35,7 +36,7 @@ public final class JMLInfoExtractor {
      */
     private static boolean checkFor(String key, String comment) {
         int index = comment.indexOf(key);
-	boolean result = comment.startsWith("/*@") && index >= 0;
+	boolean result = MiscTools.isJMLComment(comment) && index >= 0;
 	return result;
     }    
     

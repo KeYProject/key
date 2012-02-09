@@ -764,4 +764,21 @@ public final class MiscTools {
         }
         return false;
     }
+    
+
+    /** There are different kinds of JML markers.
+     * See Section 4.4 "Annotation markers" of the JML reference manual.
+     * @param comment
+     * @return
+     */
+    public static boolean isJMLComment(String comment) {
+        try {
+        return (comment.startsWith("/*@") || comment.startsWith("//@")
+                || comment.startsWith("/*+KeY@") || comment.startsWith("//+KeY@")
+                || (comment.startsWith("/*-")&& !comment.substring(3,6).equals("KeY") && comment.contains("@"))
+                || (comment.startsWith("//-") && !comment.substring(3,6).equals("KeY") && comment.contains("@")));
+        } catch (IndexOutOfBoundsException e){
+            return false;
+        }
+    }   
 }
