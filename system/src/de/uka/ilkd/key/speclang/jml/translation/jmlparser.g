@@ -1891,7 +1891,7 @@ builtintype returns [KeYJavaType type = null] throws SLTranslationException
 	|
 	    VOID 
 	    {
-		type = null;
+		type = KeYJavaType.VOID_TYPE;
 	    }
 	|
 	    BIGINT
