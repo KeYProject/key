@@ -2,6 +2,7 @@ package de.uka.ilkd.key.util;
 
 
 import junit.framework.TestCase;
+import static de.uka.ilkd.key.util.MiscTools.*;
 
 public class TestMiscTools extends TestCase {
 
@@ -62,5 +63,14 @@ public class TestMiscTools extends TestCase {
         assertEquals("foo_bar", MiscTools.toValidFileName("foo:bar"));
         assertEquals("foo_bar", MiscTools.toValidFileName("foo\\bar"));
         assertEquals("foo(bar)", MiscTools.toValidFileName("foo[bar]"));
+    }
+    
+    public void testContainsWholeWord(){
+        assertTrue(containsWholeWord("foo bar","foo"));
+        assertTrue(containsWholeWord("foo;","foo"));
+        assertTrue(containsWholeWord("\rfoo\t","foo"));
+        assertTrue(containsWholeWord(" foo foo","foo"));
+        assertFalse(containsWholeWord("foobar","foo"));
+        assertFalse(containsWholeWord("bar","foo"));
     }
 }
