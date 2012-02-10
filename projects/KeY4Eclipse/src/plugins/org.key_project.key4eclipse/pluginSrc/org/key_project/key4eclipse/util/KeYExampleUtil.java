@@ -41,7 +41,7 @@ public class KeYExampleUtil {
     public static String getLocalExampleDirectory() {
         try {
             Bundle bundle = Activator.getDefault().getBundle();
-            URL customTargetsURL = bundle.getEntry("customTargets.xml");
+            URL customTargetsURL = bundle.getEntry("customTargets.properties");
             if (customTargetsURL != null) {
                 InputStream in = null;
                 try {
