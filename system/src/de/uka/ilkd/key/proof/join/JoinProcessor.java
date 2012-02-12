@@ -14,6 +14,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.TacletFilter;
@@ -32,6 +33,7 @@ public class JoinProcessor implements Runnable{
     private final ProspectivePartner partner;
     private final LinkedList<Listener> listeners = new LinkedList<Listener>();
     private static final String HIDE_RIGHT_TACLET = "hide_right";
+    private static final String OR_RIGHT_TACLET = "orRight";
     public static final String SIMPLIFY_UPDATE [] =    {"simplifyIfThenElseUpdate1",
     													"simplifyIfThenElseUpdate2",
     													"simplifyIfThenElseUpdate3"};
@@ -77,7 +79,9 @@ public class JoinProcessor implements Runnable{
  
         Goal result = hide(cut.getRemainingGoal());
         
-        simplifyUpdate(result,cut);
+        result = simplifyUpdate(result,cut);
+        
+        orRight(result);
   
         for(Listener listener : listeners){
             listener.endOfJoining(cut.getGoalsAfterUncovering());
@@ -85,6 +89,13 @@ public class JoinProcessor implements Runnable{
     }
     
 
+    private void orRight(Goal goal){
+        SequentFormula sf =goal.sequent().succedent().get(0);
+        PosInOccurrence pio =new PosInOccurrence(sf,PosInTerm.TOP_LEVEL,false);
+        apply(new String[]{OR_RIGHT_TACLET}, goal, pio);
+  
+    }
+    
     
     private SequentFormula findFormula(Sequent sequent,Term content, boolean antecedent){
         for(SequentFormula sf : (antecedent ? sequent.antecedent() : sequent.succedent())){
@@ -95,21 +106,14 @@ public class JoinProcessor implements Runnable{
         return null;
     }
     
-    private void simplifyUpdate(Goal goal, DelayedCut cut){
+    private Goal simplifyUpdate(Goal goal, DelayedCut cut){
 
         SequentFormula sf = findFormula(goal.sequent(), cut.getFormula(), false);
         
         PosInOccurrence pio = new PosInOccurrence(sf,PosInTerm.TOP_LEVEL.down(0),false);
-        
-        if(apply(SIMPLIFY_UPDATE, goal, pio)== null){
-        	pio = new PosInOccurrence(sf,PosInTerm.TOP_LEVEL,false);
-        	ImmutableList<RuleApp> builtInApps =goal.ruleAppIndex().getBuiltInRules(goal, pio);
-        	for(RuleApp app : builtInApps){
-        		if(app.rule() == OneStepSimplifier.INSTANCE){
-        			goal.apply(app);
-        		}
-        	}
-        }
+        Goal result = apply(SIMPLIFY_UPDATE, goal, pio).head();
+
+        return result == null ? goal : result;
     }
     
     /**Applies one of the given taclets if this possible otherwise an exception is thrown.*/
