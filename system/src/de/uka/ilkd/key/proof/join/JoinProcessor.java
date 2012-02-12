@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.TreeSet;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
@@ -20,6 +21,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.TacletFilter;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCut;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCutProcessor;
+import de.uka.ilkd.key.proof.delayedcut.NodeGoalPair;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.PosTacletApp;
@@ -82,9 +84,17 @@ public class JoinProcessor implements Runnable{
         result = simplifyUpdate(result,cut);
         
         orRight(result);
+        
+        ImmutableList<Goal> list = ImmutableSLList.<Goal>nil();
+        
+        for(NodeGoalPair pair : cut.getGoalsAfterUncovering()){
+        	if(pair.node == partner.getNode(0) || pair.node == partner.getNode(1)){
+        		list = list.append(pair.goal);
+        	}
+        }
   
         for(Listener listener : listeners){
-            listener.endOfJoining(cut.getGoalsAfterUncovering());
+            listener.endOfJoining(list);
         }
     }
     
