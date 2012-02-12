@@ -32,8 +32,10 @@ public class JoinProcessor implements Runnable{
     private final ProspectivePartner partner;
     private final LinkedList<Listener> listeners = new LinkedList<Listener>();
     private static final String HIDE_RIGHT_TACLET = "hide_right";
-    public static final String SIMPLIFY_UPDATE = "simplifyIfThenElseUpdate";
-    public static final String SIMPLIFY_IF_ELSE = "ifthenelse_same_branches";
+    public static final String SIMPLIFY_UPDATE [] =    {"simplifyIfThenElseUpdate1",
+    													"simplifyIfThenElseUpdate2",
+    													"simplifyIfThenElseUpdate3"};
+
 
 
     
@@ -99,8 +101,7 @@ public class JoinProcessor implements Runnable{
         
         PosInOccurrence pio = new PosInOccurrence(sf,PosInTerm.TOP_LEVEL.down(0),false);
         
-        if(apply(new String [] {SIMPLIFY_IF_ELSE,SIMPLIFY_UPDATE,
-        }, goal, pio)== null){
+        if(apply(SIMPLIFY_UPDATE, goal, pio)== null){
         	pio = new PosInOccurrence(sf,PosInTerm.TOP_LEVEL,false);
         	ImmutableList<RuleApp> builtInApps =goal.ruleAppIndex().getBuiltInRules(goal, pio);
         	for(RuleApp app : builtInApps){

@@ -36,6 +36,7 @@ import de.uka.ilkd.key.pp.AbbrevException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.TacletFilter;
 import de.uka.ilkd.key.proof.join.JoinIsApplicable;
 import de.uka.ilkd.key.proof.join.JoinProcessor;
 import de.uka.ilkd.key.proof.join.ProspectivePartner;
@@ -61,6 +62,7 @@ class TacletMenu extends JMenu {
     private PosInSequent pos;
     private SequentView sequentView;
     private KeYMediator mediator;
+
 
     private TacletAppComparator comp = new TacletAppComparator();
         
@@ -92,7 +94,6 @@ class TacletMenu extends JMenu {
 	createTacletMenu(removeRewrites(findList).prepend(rewriteList),
 			 noFindList, builtInList, new MenuControl());
     }
-
     
     /** removes RewriteTaclet from list
      * @param list the IList<Taclet> from where the RewriteTaclet are
@@ -331,8 +332,12 @@ class TacletMenu extends JMenu {
        
         
         for (final TacletApp app : taclets) {
-           
+            
             final Taclet taclet = app.taclet();
+            if(!mediator.getFilterForInteractiveProving().filter(taclet)){
+            	continue;
+            }
+            
             if (insHiddenItem.isResponsible(taclet)) {
                 insHiddenItem.add(app);
             } else if (insSystemInvItem.isResponsible(taclet)) { 
