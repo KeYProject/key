@@ -1,0 +1,6 @@
+a#openUserGuide img {
+   background-image : url(graphics/visualDbC.gif);
+}
+a#openUserGuide:hover img {
+   background-image : url(graphics/visualDbC_hov.gif);
+}

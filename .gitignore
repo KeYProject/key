@@ -35,3 +35,4 @@ tags
 /netbeans/eclipse/build/
 /netbeans/eclipse/nbproject/private/
 /netbeans/eclipse/dist/
+*.class

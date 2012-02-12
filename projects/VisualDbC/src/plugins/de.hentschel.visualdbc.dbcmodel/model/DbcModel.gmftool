@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gmftool:ToolRegistry xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:gmftool="http://www.eclipse.org/gmf/2005/ToolDefinition">
+  <palette
+      title="dbcmodelPalette">
+    <tools
+        xsi:type="gmftool:ToolGroup"
+        title="Code"
+        collapsible="true">
+      <tools
+          xsi:type="gmftool:CreationTool"
+          title="Package"
+          description="Create new package">
+        <smallIcon
+            xsi:type="gmftool:DefaultImage"/>
+        <largeIcon
+            xsi:type="gmftool:DefaultImage"/>
+      </tools>
+      <tools
+          xsi:type="gmftool:CreationTool"
+          title="Class"
+          description="Create new class">
+        <smallIcon
+            xsi:type="gmftool:DefaultImage"/>
+        <largeIcon
+            xsi:type="gmftool:DefaultImage"/>
+      </tools>
+      <tools
+          xsi:type="gmftool:CreationTool"
+          title="Interface"
+          description="Create new interface">
+        <smallIcon
+            xsi:type="gmftool:DefaultImage"/>
+        <largeIcon
+            xsi:type="gmftool:DefaultImage"/>
+      </tools>
+      <tools
+          xsi:type="gmftool:CreationTool"
+          title="Enum"
+          description="Create new enumeration">
+        <smallIcon
+            xsi:type="gmftool:DefaultImage"/>
+        <largeIcon
+            xsi:type="gmftool:DefaultImage"/>
+      </tools>
+      <tools
+          xsi:type="gmftool:CreationTool"
+          title="Enum Literal"
+          description="Create new enumeration literal">
+        <smallIcon
+            xsi:type="gmftool:DefaultImage"/>
+        <largeIcon
+            xsi:type="gmftool:DefaultImage"/>
+      </tools>
+      <tools
+          xsi:type="gmftool:CreationTool"
+          title="Attribute"
+          description="Create new attribute">
+        <smallIcon
+            xsi:type="gmftool:DefaultImage"/>
+        <largeIcon
+            xsi:type="gmftool:DefaultImage"/>
+      </tools>
+      <tools
+          xsi:type="gmftool:CreationTool"
+          title="Method"
+          description="Create new method">
+        <smallIcon
+            xsi:type="gmftool:DefaultImage"/>
+        <largeIcon
+            xsi:type="gmftool:DefaultImage"/>
+      </tools>
+      <tools
+          xsi:type="gmftool:CreationTool"
+          title="Constructor"
+          description="Create new constructor">
+        <smallIcon
+            xsi:type="gmftool:DefaultImage"/>
+        <largeIcon
+            xsi:type="gmftool:DefaultImage"/>
+      </tools>
+      <tools
+          xsi:type="gmftool:CreationTool"
+          title="Extends"
+          description="Create new extends generalization">
+        <smallIcon
+            xsi:type="gmftool:BundleImage"
+            path="icons/extends.gif"
+            bundle="de.hentschel.visualdbc.dbcmodel"/>
+        <largeIcon
+            xsi:type="gmftool:BundleImage"
+            path="icons/extends.gif"
+            bundle="de.hentschel.visualdbc.dbcmodel"/>
+      </tools>
+      <tools
+          xsi:type="gmftool:CreationTool"
+          title="Implements"
+          description="Create new implements generalization">
+        <smallIcon
+            xsi:type="gmftool:BundleImage"
+            path="icons/implements.gif"
+            bundle="de.hentschel.visualdbc.dbcmodel"/>
+        <largeIcon
+            xsi:type="gmftool:BundleImage"
+            path="icons/implements.gif"
+            bundle="de.hentschel.visualdbc.dbcmodel"/>
+      </tools>
+    </tools>
+    <tools
+        xsi:type="gmftool:ToolGroup"
+        title="Specification"
+        collapsible="true">
+      <tools
+          xsi:type="gmftool:CreationTool"
+          title="Invariant"
+          description="Create new invariant">
+        <smallIcon
+            xsi:type="gmftool:DefaultImage"/>
+        <largeIcon
+            xsi:type="gmftool:DefaultImage"/>
+      </tools>
+      <tools
+          xsi:type="gmftool:CreationTool"
+          title="Operation Contract"
+          description="Create new operation contract">
+        <smallIcon
+            xsi:type="gmftool:DefaultImage"/>
+        <largeIcon
+            xsi:type="gmftool:DefaultImage"/>
+      </tools>
+    </tools>
+    <tools
+        xsi:type="gmftool:ToolGroup"
+        title="Proof"
+        collapsible="true">
+      <tools
+          xsi:type="gmftool:CreationTool"
+          title="Proof"
+          description="Create new proof">
+        <smallIcon
+            xsi:type="gmftool:DefaultImage"/>
+        <largeIcon
+            xsi:type="gmftool:DefaultImage"/>
+      </tools>
+      <tools
+          xsi:type="gmftool:CreationTool"
+          title="Proof Target"
+          description="Create new proof  target">
+        <smallIcon
+            xsi:type="gmftool:BundleImage"
+            path="icons/proofTarget.gif"
+            bundle="de.hentschel.visualdbc.dbcmodel"/>
+        <largeIcon
+            xsi:type="gmftool:BundleImage"
+            path="icons/proofTarget.gif"
+            bundle="de.hentschel.visualdbc.dbcmodel"/>
+      </tools>
+      <tools
+          xsi:type="gmftool:CreationTool"
+          title="Proof Reference"
+          description="Create new proof  reference">
+        <smallIcon
+            xsi:type="gmftool:BundleImage"
+            path="icons/proofReference.gif"
+            bundle="de.hentschel.visualdbc.dbcmodel"/>
+        <largeIcon
+            xsi:type="gmftool:BundleImage"
+            path="icons/proofReference.gif"
+            bundle="de.hentschel.visualdbc.dbcmodel"/>
+      </tools>
+    </tools>
+  </palette>
+</gmftool:ToolRegistry>

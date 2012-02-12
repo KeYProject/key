@@ -338,7 +338,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         } else if(resultTerm != null) {
             result = TB.reachableValue(services, 
         	                       resultTerm, 
-        	                       pm.getKeYJavaType());
+        	                       pm.getReturnType());
         } else {
             result = TB.tt();
         }
@@ -657,8 +657,14 @@ public final class UseOperationContractRule implements BuiltInRule {
         excPostGoal.setBranchLabel("Exceptional Post"+ " ("+contract.getTarget().getName()+")");
         
         //prepare common stuff for the three branches
-        final Triple<Term,Term,Term> anonAssumptionAndUpdateAndHeap 
-        	= createAnonUpdate(inst.pm, mod, services, false);
+        final Triple<Term,Term,Term> anonAssumptionAndUpdateAndHeap;
+        if(contract.hasModifiesClause()) {
+            anonAssumptionAndUpdateAndHeap = createAnonUpdate(inst.pm, mod, services, false);
+        } else {
+            // a method w/o modification (i.e. strictly pure) does not modify the heap:
+            anonAssumptionAndUpdateAndHeap = 
+                    new Triple<Term,Term,Term>(TB.tt(), TB.skip(), TB.heap(services));
+        }
         
         final Triple<Term,Term,Term> anonAssumptionAndUpdateAndHeapSaved 
             = transaction ?

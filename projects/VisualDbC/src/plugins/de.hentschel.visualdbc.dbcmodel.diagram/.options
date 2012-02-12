@@ -1,0 +1,7 @@
+# Tracing options for the de.hentschel.visualdbc.dbcmodel.diagram plug-in
+
+# Common issues
+de.hentschel.visualdbc.dbcmodel.diagram/debug=false
+
+# Visual IDs
+de.hentschel.visualdbc.dbcmodel.diagram/debug/visualID=false

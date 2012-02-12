@@ -152,7 +152,10 @@ public class SLTranslationExceptionManager {
                                       fileName, 
                                       getPosition());
     }
-
+    
+    public SLTranslationException createWarningException(String message, Token t) {
+        return new SLWarningException(new PositionedString(message, t));
+    }
     
     /**
      * Converts an ANTLRException into an SLTranslationException with the same

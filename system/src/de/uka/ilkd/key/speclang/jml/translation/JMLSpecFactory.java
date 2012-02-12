@@ -85,6 +85,7 @@ public class JMLSpecFactory {
         public Term signals;
         public Term signalsOnly;
         public Term diverges;
+        public boolean strictlyPure;
     }
 
     //-------------------------------------------------------------------------
@@ -225,6 +226,10 @@ public class JMLSpecFactory {
                 translateAssignable(pm, progVars.selfVar,
                                     progVars.paramVars,
                                     textualSpecCase.getAssignable());
+        clauses.strictlyPure =
+                translateStrictlyPure(pm, progVars.selfVar,
+                        progVars.paramVars,
+                        textualSpecCase.getAssignable());
         if (textualSpecCase.getMods().contains("transaction")) {
             clauses.assignable_backup =
                     translateAssignable(pm, progVars.selfVar,
@@ -343,12 +348,24 @@ public class JMLSpecFactory {
                                             paramVars, null, null, null, null,
                                             Term.class,
                                             services);
+            
+            // less than nothing is marked by some special term;
+            if(translated == TB.lessThanNothing()) {
+                if(originalClauses.size() > 1) {
+                    throw new SLTranslationException(
+                            "\"assignable \\less_than_nothing\" does not go with other " +
+                            "assignable clauses (even if they declare the same).",
+                            expr.fileName, expr.pos);
+                }
+                return TB.empty(services);
+            }
+            
             result = TB.union(services, result, translated);
         }
+        
         return result;
     }
-
-
+    
     private ImmutableList<Term> translateListUnionClauses(
             ProgramMethod pm,
             ProgramVariable selfVar,
@@ -447,6 +464,30 @@ public class JMLSpecFactory {
                                          originalClauses);
         }
     }
+    
+    private boolean translateStrictlyPure(ProgramMethod pm,
+            ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars,
+            ImmutableList<PositionedString> assignableClauses)
+                    throws SLTranslationException {
+        
+        for (PositionedString expr : assignableClauses) {
+            Term translated =
+                    JMLTranslator.translate(expr, pm.getContainerType(),
+                                            selfVar,
+                                            paramVars, null, null, null, null,
+                                            Term.class,
+                                            services);
+            
+            // less than nothing is marked by some special term;
+            if(translated == TB.lessThanNothing()) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+
 
 
     private Term translateMeasuredBy(ProgramMethod pm,
@@ -527,7 +568,8 @@ public class JMLSpecFactory {
         if (clauses.diverges.equals(TB.ff())) {
             FunctionalOperationContract contract = cf.func(
                     name, pm, true, clauses.requires,
-                    clauses.measuredBy, post, clauses.assignable, progVars);
+                    clauses.measuredBy, post, clauses.assignable, 
+                    !clauses.strictlyPure, progVars);
             if(clauses.assignable_backup != null) {
                contract = cf.setModifiesBackup(contract, clauses.assignable_backup);
                contract = cf.setModality(contract, Modality.DIA_TRANSACTION);
@@ -536,7 +578,7 @@ public class JMLSpecFactory {
         } else if (clauses.diverges.equals(TB.tt())) {
             FunctionalOperationContract contract = cf.func(
                     name, pm, false, clauses.requires,
-                    clauses.measuredBy, post, clauses.assignable, progVars);
+                    clauses.measuredBy, post, clauses.assignable, !clauses.strictlyPure, progVars);
             if(clauses.assignable_backup != null) {
                contract = cf.setModifiesBackup(contract, clauses.assignable_backup);
                contract = cf.setModality(contract, Modality.BOX_TRANSACTION);
@@ -547,12 +589,13 @@ public class JMLSpecFactory {
                     name, pm, true,
                     TB.and(clauses.requires, TB.not(clauses.diverges)),
                     clauses.measuredBy, post, clauses.assignable,
-                    progVars);
+                    !clauses.strictlyPure, progVars);
             FunctionalOperationContract contract2 =
                     cf.func(name, pm, false,
                                                         clauses.requires,
                                                         clauses.measuredBy, post,
                                                         clauses.assignable,
+                                                        !clauses.strictlyPure,
                                                         progVars);
             if(clauses.assignable_backup != null) {
                contract1 = cf.setModifiesBackup(contract1, clauses.assignable_backup);
@@ -787,6 +830,7 @@ public class JMLSpecFactory {
     }
 
 
+    @SuppressWarnings("unchecked")
     public Contract createJMLDependencyContract(KeYJavaType kjt,
                                                 PositionedString originalDep)
             throws SLTranslationException {

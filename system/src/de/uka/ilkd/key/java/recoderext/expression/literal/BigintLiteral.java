@@ -59,6 +59,17 @@ public final class BigintLiteral extends Literal implements KeYRecoderExtension 
         else
             return false;
     }
+
+    @Override
+    public int hashCode() {
+        int hash = -1;
+        try { 
+            hash = (int) Long.parseLong(value);
+        } finally {
+            System.err.println("Strange value for BigIntLiteral: " + this);
+        }
+        return hash;
+    }
   
 
 }

@@ -34,8 +34,9 @@ header {
     import de.uka.ilkd.key.util.Triple;    
 
     import java.math.BigInteger;
+import java.util.List;
     import java.util.Map;
-    import java.util.LinkedHashMap;
+import java.util.LinkedHashMap;
 }
 
 class KeYJMLParser extends Parser;
@@ -55,6 +56,7 @@ options {
     private LocSetLDT locSetLDT;
     private BooleanLDT booleanLDT;
     private SLTranslationExceptionManager excManager;
+    private List<PositionedString> warnings = new java.util.ArrayList<PositionedString>();
 
     private JMLTranslator translator;
 
@@ -171,9 +173,14 @@ options {
      * @author bruns
      * @since 1.7.2178
      */
-    private void addIgnoreWarning(String feature) {
+    private void addIgnoreWarning(String feature, Token t) {
         String msg = feature + " is not supported and has been silently ignored.";
-        // TODO: wasn't there some collection of non-critical warnings ???
+        warnings.add(new PositionedString(msg,t));
+    }
+    
+    public List<PositionedString> getWarnings(){
+        // mutable -- but who cares?
+        return warnings;
     }
 	
 
@@ -340,8 +347,12 @@ accessibleclause returns [Term result = null] throws SLTranslationException
 
 assignableclause returns [Term result = null] throws SLTranslationException
 :
-    ass:ASSIGNABLE result=storeRefUnion
+    ass:ASSIGNABLE 
+    ( result=storeRefUnion
         { result = translator.translate(ass.getText(), Term.class, result, services); }
+    | LESS_THAN_NOTHING
+        { result = TB.lessThanNothing(); }
+    )
     ;
 
 
@@ -1388,7 +1399,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 	{
 	    if(resultVar==null) {
 		raiseError("\\result used in wrong context");
-	    }
+	    } else
 	    result = new SLExpression(TB.var(resultVar), resultVar.getKeYJavaType());
 	}
     |
@@ -1396,21 +1407,8 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
     |
         (LPAREN BSUM) => result=bsumterm
     |
-	(OLD | PRE) LPAREN result=expression RPAREN
-	{
-	    if (heapAtPre == null) {
-		raiseError("JML construct " +
-			   "\\old not allowed in this context.");
-	    }
-	    
-	    typ = result.getType();
-	    if(typ != null) {
-	      result = new SLExpression(convertToOld(result.getTerm()), 
-	                                result.getType());
-	    } else {
-	      result = new SLExpression(convertToOld(result.getTerm()));
-	    }
-	}
+	(OLD | PRE) => result=oldexpression
+	
     |   result = transactionUpdated
     |
 	BACKUP LPAREN result=expression RPAREN
@@ -1567,14 +1565,14 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 	    
 	} 
 	
-    |   ( LPAREN LBLNEG ) => LPAREN LBLNEG IDENT result=expression RPAREN
+    |   ( LPAREN LBLNEG ) => LPAREN lblneg:LBLNEG IDENT result=expression RPAREN
 	{
-	    addIgnoreWarning("\\lblneg");
+	    addIgnoreWarning("\\lblneg",lblneg);
 	} 
 	
-    |   ( LPAREN LBLPOS ) => LPAREN LBLPOS IDENT result=expression RPAREN 
+    |   ( LPAREN LBLPOS ) => LPAREN lblpos:LBLPOS IDENT result=expression RPAREN 
 	{
-	    addIgnoreWarning("\\lblpos");
+	    addIgnoreWarning("\\lblpos",lblpos);
 	} 
 	 
     |   STRING_EQUAL LPAREN e1=expression COMMA e2=expression RPAREN
@@ -1722,7 +1720,31 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
 	RPAREN
 ;
 	
-
+oldexpression returns [SLExpression result=null] throws SLTranslationException
+{ KeYJavaType typ; }
+:
+    (
+    PRE LPAREN result=expression RPAREN
+    |
+    OLD LPAREN result=expression (COMMA id:IDENT)? RPAREN
+    )
+    {
+        if (heapAtPre == null) {
+        raiseError("JML construct " +
+               "\\old not allowed in this context.");
+        }
+        
+        if (id != null) addIgnoreWarning("\\old with label",id);
+        
+        typ = result.getType();
+        if(typ != null) {
+          result = new SLExpression(convertToOld(result.getTerm()), 
+                                    result.getType());
+        } else {
+          result = new SLExpression(convertToOld(result.getTerm()));
+        }
+    }
+;
 
 bsumterm returns [SLExpression result=null] throws SLTranslationException
 {
@@ -1869,7 +1891,7 @@ builtintype returns [KeYJavaType type = null] throws SLTranslationException
 	|
 	    VOID 
 	    {
-		type = null;
+		type = KeYJavaType.VOID_TYPE;
 	    }
 	|
 	    BIGINT

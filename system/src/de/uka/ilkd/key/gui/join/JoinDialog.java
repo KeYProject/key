@@ -92,10 +92,9 @@ public class JoinDialog extends StdDialog{
                 }
                 LogicPrinter printer = new LogicPrinter(new ProgramPrinter(), new NotationInfo(), proof.getServices());
                 try{
-                    
                     printer.printTerm(partner.getCommonPredicate());
                 }catch (Throwable e){
-                    new RuntimeException(e);
+                    throw new RuntimeException(e);
                 }
                 String result = printer.toString();
                 if(result.endsWith("\n")){

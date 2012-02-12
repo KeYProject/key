@@ -20,6 +20,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.regex.Matcher;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
@@ -230,18 +231,16 @@ final class SMTSolverImplementation implements SMTSolver, Runnable {
                 return getState() == SolverState.Running;
         }
 
-        private String getFinalExecutionCommand(String filename, String formula) {
+        private String []getFinalExecutionCommand(String filename, String formula) {
                 // get the Command from user settings
-                String toReturn = this.type.getExecutionCommand();
-                if (toReturn == null || toReturn.length() == 0) {
-                        toReturn = this.type.getExecutionCommand(filename,
-                                        formula);
-                } else {
-                        // replace the placeholder with filename and fomula
-                        toReturn = toReturn.replaceAll("%f", filename);
-                        toReturn = toReturn.replaceAll("%p", formula);
-                }
-                return toReturn;
+                String toReturn = this.type.getSolverParameters();
+                  // replace the placeholder with filename and fomula
+         
+                toReturn = toReturn.replaceAll("%f",Matcher.quoteReplacement(filename));
+                toReturn = toReturn.replaceAll("%p", formula);
+                
+                
+                return toReturn.split(" ");
         }
 
         @Override
@@ -251,9 +250,9 @@ final class SMTSolverImplementation implements SMTSolver, Runnable {
                 listener.processStarted(this, problem);
 
                 // Secondly: Translate the given problem
-                String s;
+                String commands[];
                 try {
-                        s = translateToCommand(problem.getTerm());
+                        commands = translateToCommand(problem.getTerm());
                 } catch (Throwable e) {
                         interruptionOccurred(e);
                         listener.processInterrupted(this, problem, e);
@@ -261,21 +260,11 @@ final class SMTSolverImplementation implements SMTSolver, Runnable {
                         solverTimeout.cancel();
                         return;
                 }
-
-                // thirdly: Split the command in several strings.
-                LinkedList<String> list = new LinkedList<String>();
-                while (s.indexOf(' ') != -1) {
-                        int index = s.indexOf(' ');
-                        list.add(s.substring(0, s.indexOf(' ')));
-                        s = s.substring(index + 1, s.length());
-                }
-                list.add(s);
-                String[] array = new String[list.size()];
+     
 
                 // start the external process.
                 try {
-                        solverOutput = processLauncher.launch(list
-                                        .toArray(array));
+                        solverOutput = processLauncher.launch(commands);
                         this.finalResult = type
                                         .interpretAnswer(
                                                         solverOutput[ExternalProcessLauncher.RESULT],
@@ -409,7 +398,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable {
                 return sb.toString();
         }
 
-        private String translateToCommand(String formula) throws IOException {
+        private String [] translateToCommand(String formula) throws IOException {
                 final File loc;
                 try {
                         // store the translation to a file
@@ -426,13 +415,13 @@ final class SMTSolverImplementation implements SMTSolver, Runnable {
                         io.initCause(e);
                         throw io;
                 }
-
+         
                 // get the commands for execution
                 return this.getFinalExecutionCommand(loc.getAbsolutePath(),
                                 formula);
         }
 
-        private String translateToCommand(Term term)
+        private String[] translateToCommand(Term term)
                         throws IllegalFormulaException, IOException {
 
                 SMTTranslator trans = getType().getTranslator(services);
@@ -444,7 +433,12 @@ final class SMTSolverImplementation implements SMTSolver, Runnable {
                 tacletTranslation = ((AbstractSMTTranslator) trans)
                                 .getTacletSetTranslation();
                 exceptionsForTacletTranslation.addAll(trans.getExceptionsOfTacletTranslation());
-                return translateToCommand(problemString);
+                String parameters [] = translateToCommand(problemString);
+                String result [] = new String[parameters.length+1];
+                for(int i=0; i < result.length; i++){
+                    result[i] = i==0? type.getSolverCommand() : parameters[i-1];
+                }
+                return result;
         }
 
         @Override

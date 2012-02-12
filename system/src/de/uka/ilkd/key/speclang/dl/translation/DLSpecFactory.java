@@ -268,7 +268,7 @@ public final class DLSpecFactory {
 	}
 
 	//result variable may be omitted
-	if(resultVar == null && pm.getKeYJavaType() != null) {
+	if(resultVar == null && !pm.isVoid()) {
 	    resultVar = TB.resultVar(services, pm, false);
 	}
 
@@ -295,9 +295,10 @@ public final class DLSpecFactory {
 					 pm, 
 					 modality, 
 					 pre,
-					 null,//measured_by in DL contracts not supported yet					 
+					 null,// TODO measured_by in DL contracts not supported yet
 					 post, 
 					 modifies, 
+					 true, // TODO strictly pure in DL contracts not supported yet
 					 selfVar, 
 					 paramVars, 
 					 resultVar, 

@@ -196,7 +196,7 @@ public final class SpecificationRepository {
     /**
      * Returns all known class invariants for the passed type.
      */
-    private ImmutableSet<ClassInvariant> getClassInvariants(KeYJavaType kjt) {
+    public ImmutableSet<ClassInvariant> getClassInvariants(KeYJavaType kjt) {
 	ImmutableSet<ClassInvariant> result = invs.get(kjt);
 	return result == null 
 	       ? DefaultImmutableSet.<ClassInvariant>nil() 
@@ -798,7 +798,7 @@ public final class SpecificationRepository {
 	//add query axioms for own class
 	for(ProgramMethod pm : services.getJavaInfo()
 		                       .getAllProgramMethods(kjt)) {
-	    if(pm.getKeYJavaType() != null && !pm.isImplicit()) {
+	    if(!pm.isVoid() && !pm.isConstructor() && !pm.isImplicit()) {
 		pm = services.getJavaInfo().getToplevelPM(kjt, pm);		
 		final ClassAxiom queryAxiom 
 		    = new QueryAxiom("Query axiom for " + pm.getName() 

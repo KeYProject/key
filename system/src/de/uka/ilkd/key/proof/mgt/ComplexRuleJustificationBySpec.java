@@ -19,8 +19,8 @@ import de.uka.ilkd.key.rule.RuleApp;
 
 public class ComplexRuleJustificationBySpec implements ComplexRuleJustification {
 
-    private Map /*RuleApp -> RuleJustificationBySpec*/ app2Just 
-        = new LinkedHashMap();
+    private Map<RuleApp, RuleJustificationBySpec> app2Just 
+        = new LinkedHashMap<RuleApp, RuleJustificationBySpec>();
    
         
     public boolean isAxiomJustification() {
@@ -30,13 +30,18 @@ public class ComplexRuleJustificationBySpec implements ComplexRuleJustification 
     
     public RuleJustification getSpecificJustification(RuleApp app, 
                                                       Services services) {
-        RuleJustification result = (RuleJustification) app2Just.get(app);
+        RuleJustification result = app2Just.get(app);
         return result == null ? this : result;
     }
     
     
     public void add(RuleApp ruleApp, RuleJustificationBySpec just) {
-	assert !(just instanceof ComplexRuleJustification);
+	// assert !(just instanceof ComplexRuleJustification);
         app2Just.put(ruleApp, just);
+    }
+    
+    @Override
+    public String toString() {
+        return "ComplexRuleJustificationBySpec[" + app2Just + "]";
     }
 }

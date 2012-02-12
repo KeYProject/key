@@ -1,0 +1,119 @@
+package org.key_project.sed.key.ui.jdt;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.LinkedList;
+import java.util.List;
+
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.search.IJavaSearchConstants;
+import org.eclipse.jdt.core.search.IJavaSearchScope;
+import org.eclipse.jdt.core.search.SearchEngine;
+import org.eclipse.jdt.core.search.SearchMatch;
+import org.eclipse.jdt.core.search.SearchParticipant;
+import org.eclipse.jdt.core.search.SearchPattern;
+import org.eclipse.jdt.core.search.SearchRequestor;
+import org.eclipse.jdt.internal.debug.ui.launcher.MainMethodSearchEngine;
+import org.eclipse.jface.operation.IRunnableContext;
+import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.key_project.sed.key.ui.util.LogUtil;
+
+/**
+ * <p>
+ * Searches all available Java methods ({@link IMethod}).
+ * </p>
+ * <p>
+ * The implementation is oriented at {@link MainMethodSearchEngine}.
+ * </p>
+ * @author Martin Hentschel
+ */
+//TODO: Implement test
+@SuppressWarnings("restriction")
+public class AllMethodsSearchEngine {
+    /**
+     * Include methods of inner and anonymous types in the search result?
+     */
+    private boolean includeMethodsOfInnerAndAnonymousTypes = false;
+    
+    /**
+     * Implementation of {@link SearchRequestor} to collect found
+     * {@link IMethod}s in a search.
+     * @author Martin Hentschel
+     */
+    private class MethodCollector extends SearchRequestor {
+        /**
+         * Contains all found {@link IMethod}s.
+         */
+        private List<IMethod> result = new LinkedList<IMethod>();
+
+        /**
+         * Returns the found {@link IMethod}s.
+         * @return The found {@link IMethod}s.
+         */
+        public List<IMethod> getResult() {
+            return result;
+        }
+
+        /**
+         * Checks if the found element is a valid result and adds it 
+         * to {@link #getResult()}.
+         */
+        @Override
+        public void acceptSearchMatch(SearchMatch match) throws CoreException {
+            Object enclosingElement = match.getElement();
+            if (enclosingElement instanceof IMethod) {
+                IMethod method = (IMethod)enclosingElement;
+                IType type = (IType)method.getParent();
+                if (includeMethodsOfInnerAndAnonymousTypes || !type.isMember() && !type.isAnonymous()) {
+                    result.add(method);
+                }
+            }
+        }
+    }
+
+    /**
+     * Searches all methods.
+     * @param pm The {@link IProgressMonitor} to use.
+     * @param scope The {@link IJavaSearchScope} to search in.
+     * @return The found {@link IMethod}s.
+     */
+    public IMethod[] searchMethods(IProgressMonitor pm, IJavaSearchScope scope) {
+        pm.beginTask("Searching for methods...", 100);
+        int searchTicks = 100;
+        SearchPattern pattern = SearchPattern.createPattern("*", IJavaSearchConstants.METHOD, IJavaSearchConstants.DECLARATIONS, SearchPattern.R_EXACT_MATCH | SearchPattern.R_CASE_SENSITIVE);
+        SearchParticipant[] participants = new SearchParticipant[] {SearchEngine.getDefaultSearchParticipant()};
+        MethodCollector collector = new MethodCollector();
+        IProgressMonitor searchMonitor = new SubProgressMonitor(pm, searchTicks);
+        try {
+            new SearchEngine().search(pattern, participants, scope, collector, searchMonitor);
+        }
+        catch (CoreException ce) {
+            LogUtil.getLogger().logError(ce);
+        }
+        List<IMethod> result = collector.getResult();
+        return result.toArray(new IMethod[result.size()]);
+    }
+    
+    /**
+     * Searches all methods.
+     * @param context The {@link IRunnableContext} to search in.
+     * @param scope The {@link IJavaSearchScope} to search in.
+     * @return The found {@link IMethod}s.
+     * @throws InvocationTargetException Occurred Exception.
+     * @throws InterruptedException Occurred Exception.
+     */
+    public IMethod[] searchMethods(IRunnableContext context, 
+                                   final IJavaSearchScope scope) throws InvocationTargetException, InterruptedException {
+        final IMethod[][] res = new IMethod[1][];
+        IRunnableWithProgress runnable = new IRunnableWithProgress() {
+            public void run(IProgressMonitor pm) throws InvocationTargetException {
+                res[0] = searchMethods(pm, scope);
+            }
+        };
+        context.run(true, true, runnable);
+        return res[0];
+    }
+}

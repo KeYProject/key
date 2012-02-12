@@ -22,13 +22,6 @@ public interface SMTSettings {
      */
     public long getTimeout();
 
-    /**
-     * Returns the generic command that should be used for starting a solver of
-     * type <code>type</code>.<br>
-     * Allowed place holders:<br>
-     * %f Filename %p Problem formula.
-     */
-    public String getCommand(SolverType type);
 
     /**
      * The path of the folder, where the smt files are stored temporarily.

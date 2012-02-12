@@ -3,8 +3,6 @@ package de.uka.ilkd.key.gui.smt;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
 
 
@@ -17,6 +15,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTree;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
@@ -107,12 +107,13 @@ public class SettingsDialog extends JDialog{
                 this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
                 setIconImage(IconFactory.keyLogo());
                 this.pack();
+                
         }
         
         private Dimension computePreferredSize(TreeModel model){
                 DefaultMutableTreeNode node = (DefaultMutableTreeNode)model.getRoot();
                 Dimension dim = computePreferredSize(node);
-                dim.width = dim.width + getOptionTree().getPreferredSize().width+50;
+                dim.width = dim.width + getOptionTree().getPreferredSize().width+80;
                 dim.height = Math.min(dim.height,400);
                 return dim;
         }
@@ -133,12 +134,13 @@ public class SettingsDialog extends JDialog{
         
         private JTree getOptionTree(){
                 if(optionTree == null){
-                        optionTree = new JTree();        
-                        optionTree.addMouseListener(new MouseAdapter() {
-                                @Override
-                                public void mouseClicked(MouseEvent e) {
-                                        TreePath path = optionTree.getPathForLocation(
-                                                        e.getX(), e.getY());
+                        optionTree = new JTree();  
+                        optionTree.addTreeSelectionListener(new TreeSelectionListener() {
+                            
+                            @Override
+                            public void valueChanged(TreeSelectionEvent e) {
+                                TreePath path = e.getNewLeadSelectionPath();
+                                        
                                         if (path != null) {
                                                 Object node = path.getLastPathComponent();
                                                 if (node != null && node instanceof OptionContentNode) {
@@ -146,7 +148,7 @@ public class SettingsDialog extends JDialog{
                                           
                                                 }
                                         }
-                                }
+                            }
                         });
                 }
                 return optionTree;

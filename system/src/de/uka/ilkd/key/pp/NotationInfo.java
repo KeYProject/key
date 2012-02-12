@@ -17,7 +17,25 @@ import de.uka.ilkd.key.ldt.CharListLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.ElementaryUpdate;
+import de.uka.ilkd.key.logic.op.Equality;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IfThenElse;
+import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.ModalOperatorSV;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.ObserverFunction;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ProgramConstant;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.Quantifier;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SortDependingFunction;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.op.UpdateJunctor;
+import de.uka.ilkd.key.logic.op.WarySubstOp;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.UnicodeHelper;
 
@@ -99,6 +117,7 @@ public final class NotationInfo {
     
 
 
+    // Priorities of operators (roughly corresponding to the grammatical structure in the parser.
     static final int PRIORITY_TOP = 0;
     static final int PRIORITY_EQUIVALENCE = 20;
     static final int PRIORITY_IMP = 30;
@@ -120,16 +139,30 @@ public final class NotationInfo {
 
 
     public static boolean PRETTY_SYNTAX = true;
+    /**
+     * Whether the very fancy notation is enabled
+     * in which Unicode characters for logical operators
+     * are printed.
+     */
     public static boolean UNICODE_ENABLED = false;
         
     
     /** This maps operators and classes of operators to {@link
-     * Notation}s.  The idea is that we first look wether the operator has
+     * Notation}s.  The idea is that we first look whether the operator has
      * a Notation registered.  Otherwise, we see if there is one for the
      * <em>class</em> of the operator.
      */
     private HashMap<Object, Notation> tbl;
 
+    /**
+     * Caches for the different kinds of notations.
+     * If a cache is yet unused, a shallow clone
+     * of the current notation table is produced and assigned to it.
+     */
+    private HashMap<Object, Notation> defaultNotationCache = null;
+    private HashMap<Object, Notation> fancyNotationCache = null;
+    private HashMap<Object, Notation> veryFancyNotationCache = null;
+    
     /**
      * Maps terms to abbreviations and reverse.
      */
@@ -150,11 +183,17 @@ public final class NotationInfo {
     //-------------------------------------------------------------------------
     //internal methods
     //-------------------------------------------------------------------------     
+    
         
     /** Register the standard set of notations (that can be defined without
      * a services object).
      */
+    @SuppressWarnings("unchecked")
     private void createDefaultNotationTable() {
+        if (defaultNotationCache != null){
+            tbl = defaultNotationCache;
+            return;
+        }
 	tbl = new HashMap<Object,Notation>();
 	
 	tbl.put(Junctor.TRUE ,new Notation.Constant("true", PRIORITY_ATOM));
@@ -187,6 +226,7 @@ public final class NotationInfo {
 	tbl.put(SchemaVariable.class, new Notation.SchemaVariableNotation());
 	
 	tbl.put(Sort.CAST_NAME, new Notation.CastFunction("(",")",PRIORITY_CAST, PRIORITY_BOTTOM));
+	defaultNotationCache = (HashMap<Object, Notation>) tbl.clone();
     }
         
     
@@ -194,7 +234,12 @@ public final class NotationInfo {
      * Adds notations that can only be defined when a services object is 
      * available.
      */
+    @SuppressWarnings("unchecked")
     private void addFancyNotations(Services services) {
+        if (fancyNotationCache != null){
+            tbl = fancyNotationCache;
+            return;
+        }
 	//arithmetic operators
 	final IntegerLDT integerLDT 
 		= services.getTypeConverter().getIntegerLDT();	
@@ -235,13 +280,20 @@ public final class NotationInfo {
 	tbl.put(charListLDT.getClConcat(), new Notation.Infix("+",PRIORITY_CAST,PRIORITY_ATOM,PRIORITY_ATOM));
 	tbl.put(charListLDT.getClCons(), new CharListNotation());
 	tbl.put(charListLDT.getClEmpty(), new Notation.Constant("\"\"",PRIORITY_BOTTOM));
+	
+	    fancyNotationCache = (HashMap<Object, Notation>) tbl.clone();
     }
     
     /**
      * Add notations with Unicode symbols.
      * @param services
      */
+    @SuppressWarnings("unchecked")
     private void addVeryFancyNotations(Services services){
+        if (veryFancyNotationCache != null){
+            tbl = veryFancyNotationCache;
+            return;
+        }
         final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();  
         final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
         tbl.put(Junctor.TRUE ,new Notation.Constant(""+UnicodeHelper.TOP, PRIORITY_ATOM));
@@ -261,6 +313,7 @@ public final class NotationInfo {
         tbl.put(setLDT.getSetMinus(), new Notation.Infix(""+UnicodeHelper.SETMINUS, PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
         tbl.put(setLDT.getElementOf(), new Notation.ElementOfNotation(" " + UnicodeHelper.IN + " "));
         tbl.put(setLDT.getSubset(), new Notation.Infix(""+UnicodeHelper.SUBSET, PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
+        veryFancyNotationCache = (HashMap<Object, Notation>) tbl.clone();
     }
 
 
@@ -292,30 +345,30 @@ public final class NotationInfo {
      * If no notation is registered, a Function notation is returned.
      */
     public Notation getNotation(Operator op, @SuppressWarnings("unused") Services services) {
-	Notation result = tbl.get(op);
-	if(result != null) {
-	    return result;
-	}
-	
-	result = tbl.get(op.getClass());
-	if(result != null) {
-	    return result;
-	}
-	
-	if(op instanceof SchemaVariable) {
-	    result = tbl.get(SchemaVariable.class);
-	    if(result != null) {
-		return result;
-	    }
-	}
-	
-	if(op instanceof SortDependingFunction) {
-	    result = tbl.get(((SortDependingFunction)op).getKind());
-	    if(result != null) {
-		return result;
-	    }
-	}
-	
-	return new Notation.FunctionNotation();
+        Notation result = tbl.get(op);
+        if(result != null) {
+            return result;
+        }
+
+        result = tbl.get(op.getClass());
+        if(result != null) {
+            return result;
+        }
+
+        if(op instanceof SchemaVariable) {
+            result = tbl.get(SchemaVariable.class);
+            if(result != null) {
+                return result;
+            }
+        }
+
+        if(op instanceof SortDependingFunction) {
+            result = tbl.get(((SortDependingFunction)op).getKind());
+            if(result != null) {
+                return result;
+            }
+        }
+
+        return new Notation.FunctionNotation();
     }
 }

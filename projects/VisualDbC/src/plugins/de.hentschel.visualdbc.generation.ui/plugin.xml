@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="de.hentschel.visualdbc.generation.ui.perspective.VisualDbcPerspectiveFactory"
+            icon="icon/VisualDbCPerspective.gif"
+            id="de.hentschel.visualdbc.perspective"
+            name="Visual DbC">
+      </perspective>
+   </extension>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <category
+            id="de.hentschel.visualdbc.generation.ui.category"
+            name="Visual DbC">
+      </category>
+      <wizard
+            category="de.hentschel.visualdbc.generation.ui.category"
+            class="de.hentschel.visualdbc.generation.ui.wizard.GenerateDiagramWizard"
+            finalPerspective="de.hentschel.visualdbc.perspective"
+            icon="icon/obj16/DbcmodelDiagramFile.gif"
+            id="de.hentschel.visualdbc.generation.ui.wizard.GenerateDiagramWizard"
+            name="DbC Diagram from Data Source"
+            preferredPerspectives="de.hentschel.visualdbc.perspective"
+            project="false">
+         <description>
+            Create a new DbC Diagram filled with content from a data source
+         </description>
+      </wizard>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="*">
+         <perspectiveShortcut
+               id="de.hentschel.visualdbc.perspective">
+         </perspectiveShortcut>
+      </perspectiveExtension>
+   </extension>
+</plugin>

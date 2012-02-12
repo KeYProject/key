@@ -70,6 +70,10 @@ public class TransactionStatement extends JavaStatement {
         }
         return false;
     }
+    
+    public int hashCode() {
+        return type;
+    }
 
     public String toString() {
         return de.uka.ilkd.key.java.statement.TransactionStatement.names[type - 1];

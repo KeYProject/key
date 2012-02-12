@@ -58,6 +58,7 @@ public class ConstructorDeclaration extends MethodDeclaration implements Constru
      * @param parentIsInterfaceDeclaration a boolean set true iff
      * parent is an InterfaceDeclaration 
      */
+    @Deprecated
     public ConstructorDeclaration(Modifier[] modifiers, 
 	    			  ProgramElementName name,
 				  ParameterDeclaration[] parameters, 

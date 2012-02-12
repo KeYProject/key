@@ -20,6 +20,8 @@ public class SolverTypeCollection implements Iterable<SolverType> {
     private String name = "";
     private int minUsableSolver = 1;
 
+    private int hashCode = -1;
+
     /**
      * 
      * @param type
@@ -47,6 +49,27 @@ public class SolverTypeCollection implements Iterable<SolverType> {
 
     }
 
+    public boolean equals(Object o) {
+        if (!(o instanceof SolverTypeCollection)) {
+            return false;
+        }
+        SolverTypeCollection stc = (SolverTypeCollection) o;
+        return name.equals(stc.name) && minUsableSolver == stc.minUsableSolver && types.equals(stc.types);
+    }
+
+    public int hashCode() {
+        if (hashCode == -1) {
+            hashCode = (minUsableSolver + 1) * name.hashCode();
+            for (SolverType type:types) {
+                hashCode = hashCode + 7*type.hashCode();
+            }
+            if (hashCode == -1) {
+                hashCode = 0;
+            }
+        }
+        return hashCode;
+    }
+    
     public LinkedList<SolverType> getTypes() {
 	return types;
     }

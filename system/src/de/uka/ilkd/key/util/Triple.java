@@ -18,9 +18,9 @@ public class Triple<T1, T2, T3> {
 
     
     public Triple(T1 first, T2 second, T3 third) { 
-	this.first  = first;
-	this.second = second;   
-	this.third  = third;
+        this.first  = first;
+        this.second = second;   
+        this.third  = third;
     }
 
 
@@ -28,19 +28,19 @@ public class Triple<T1, T2, T3> {
 	return "(" + first + ", " + second + ", " + third + ")"; 
     }
     
-    
+
     public boolean equals(Object o) {
-	if(!(o instanceof Triple)) {
-	    return false;
-	} 
-	Triple p = (Triple) o;
-	return (first == null ? p.first == null : first.equals(p.first))
-	       && (second == null ? p.second == null : second.equals(p.second))
-	       && (third == null ? p.third == null : third.equals(p.third));
+        if(!(o instanceof Triple<?, ?, ?>)) {
+            return false;
+        } 
+        Triple<?, ?, ?> p = (Triple<?, ?, ?>) o;
+        return (first == null ? p.first == null : first.equals(p.first))
+        && (second == null ? p.second == null : second.equals(p.second))
+        && (third == null ? p.third == null : third.equals(p.third));
     }
     
     
     public int hashCode() {
-	return first.hashCode() + second.hashCode();
+        return 666*first.hashCode() + 42*second.hashCode() + 23*third.hashCode();
     }
 }

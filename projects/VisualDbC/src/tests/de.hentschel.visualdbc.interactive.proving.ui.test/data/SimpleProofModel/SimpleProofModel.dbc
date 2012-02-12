@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dbcmodel:DbcModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dbcmodel="http://www.hentschel.de/dbcmodel" driverId="de.hentschel.visualdbc.dbcmodel.diagram.custom.test.simpleProofModel">
+  <types xsi:type="dbcmodel:DbcClass" name="MCDemo">
+    <proofs obligation="EnsuresPost" target="//@types.0/@methods.1/@operationContracts.0"/>
+    <proofs obligation="EnsuresPost" target="//@types.0/@methods.0/@operationContracts.0" status="fulfilled"/>
+    <proofs obligation="PreservesInv" target="//@types.0/@methods.0" status="failed"/>
+    <proofs obligation="InvalidObligation" target="//@types.0/@methods.0"/>
+    <proofs obligation="NoProofTarget" status="fulfilled"/>
+    <proofs obligation="RespectsModifies" target="//@types.0/@methods.1/@operationContracts.0"/>
+    <methods signature="inc(x : int)" returnType="int">
+      <operationContracts name="JML normal_behavior operation contract (id: 0)" pre="true" post="exc = null" modifies="{}" termination="diamond"/>
+    </methods>
+    <methods signature="init(u : int)" returnType="int">
+      <operationContracts name="JML normal_behavior operation contract (id: 1)" pre="true" post="result = (jint)(javaAddInt(u, (jint)(1)))&#xA;&amp; self.attr = (jint)(100)&#xA;&amp; exc = null" modifies="{}" termination="diamond"/>
+    </methods>
+    <attributes name="attr" type="int"/>
+  </types>
+</dbcmodel:DbcModel>

@@ -598,7 +598,7 @@ public class KeYCrossReferenceSourceInfo
            || expr instanceof Singleton
            || expr instanceof SetUnion
            || expr instanceof AllFields) {
-	    return name2primitiveType.get("\\set");
+	    return name2primitiveType.get("\\locset");
 	} else if(expr instanceof EmptySeqLiteral
                   || expr instanceof SeqSingleton
                   || expr instanceof SeqConcat

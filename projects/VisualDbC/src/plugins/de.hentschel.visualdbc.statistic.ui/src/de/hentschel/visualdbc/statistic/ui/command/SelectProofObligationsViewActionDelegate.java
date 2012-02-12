@@ -1,0 +1,44 @@
+package de.hentschel.visualdbc.statistic.ui.command;
+
+import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.ui.IViewActionDelegate;
+import org.eclipse.ui.IViewPart;
+
+import de.hentschel.visualdbc.statistic.ui.view.StatisticViewPart;
+
+/**
+ * Opens the dialog to select the proof obligations to show.
+ * @author Martin Hentschel
+ */
+public class SelectProofObligationsViewActionDelegate implements IViewActionDelegate {
+   /**
+    * The {@link IViewPart} that contains the action.
+    */
+   private IViewPart viewPart;
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void run(IAction action) {
+      if (viewPart instanceof StatisticViewPart) {
+         ((StatisticViewPart)viewPart).openSelectProofObligationsDialog();
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void selectionChanged(IAction action, ISelection selection) {
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void init(IViewPart view) {
+      this.viewPart = view;
+   }
+}
