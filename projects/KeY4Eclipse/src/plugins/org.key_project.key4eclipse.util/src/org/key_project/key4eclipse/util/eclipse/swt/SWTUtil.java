@@ -99,7 +99,7 @@ public final class SWTUtil {
             table.addListener(SWT.PaintItem, new Listener() {
                 public void handleEvent(Event event) {
                     TableItem item = (TableItem)event.item;
-                    event.gc.drawImage(item.getImage(), event.x, event.y);
+                    event.gc.drawImage(item.getImage(), event.x >= 0 ? event.x : 0, event.y); // On Linux event.x is negativ what is wrong
                 }
             });
         }
