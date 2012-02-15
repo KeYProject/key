@@ -7,13 +7,58 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 import org.key_project.key4eclipse.util.java.CollectionUtil;
-
+import org.key_project.key4eclipse.util.java.IFilter;
 
 /**
  * Tests for {@link CollectionUtil}.
  * @author Martin Hentschel
  */
 public class CollectionUtilTest extends TestCase {
+   /**
+    * Tests for {@link CollectionUtil#search(Iterable, org.key_project.key4eclipse.util.java.IFilter)}.
+    */
+   @Test
+   public void testSearch() {
+       List<String> collection = CollectionUtil.toList("A", "B", "C", "D");
+       assertEquals("A", CollectionUtil.search(collection, new IFilter<String>() {
+          @Override
+          public boolean select(String element) {
+             return "A".equals(element);
+          }
+       }));
+       assertEquals("B", CollectionUtil.search(collection, new IFilter<String>() {
+          @Override
+          public boolean select(String element) {
+             return "B".equals(element);
+          }
+       }));
+       assertEquals("C", CollectionUtil.search(collection, new IFilter<String>() {
+          @Override
+          public boolean select(String element) {
+             return "C".equals(element);
+          }
+       }));
+       assertEquals("D", CollectionUtil.search(collection, new IFilter<String>() {
+          @Override
+          public boolean select(String element) {
+             return "D".equals(element);
+          }
+       }));
+       assertNull(CollectionUtil.search(collection, new IFilter<String>() {
+          @Override
+          public boolean select(String element) {
+             return "E".equals(element);
+          }
+       }));
+       assertNull(CollectionUtil.search(collection, null));
+       assertNull(CollectionUtil.search(null, new IFilter<String>() {
+          @Override
+          public boolean select(String element) {
+             return "E".equals(element);
+          }
+       }));
+   }
+    
    /**
     * Test for {@link CollectionUtil#removeComplete(java.util.Collection, Object)}
     */

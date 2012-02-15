@@ -210,7 +210,7 @@ public class KeYProjectPropertyPage extends PropertyPage implements IWorkbenchPr
         classPathComposite.setLayout(createGridLayout(2, false));
         classPathTableViewer = new TableViewer(classPathComposite, SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION);
         classPathTableViewer.getTable().setLayoutData(new GridData(GridData.FILL_BOTH));
-        classPathTableViewer.setContentProvider(new ArrayContentProvider());
+        classPathTableViewer.setContentProvider(ArrayContentProvider.getInstance());
         classPathTableViewer.setLabelProvider(new KeYClassPathEntryLabelProvider());
         classPathTableViewer.addSelectionChangedListener(new ISelectionChangedListener() {
             @Override

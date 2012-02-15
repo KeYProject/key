@@ -52,7 +52,7 @@ public class SWTUtilTest extends TestCase {
         Shell shell = new Shell();
         shell.setLayout(new FillLayout());
         TableViewer viewer = new TableViewer(shell);
-        viewer.setContentProvider(new ArrayContentProvider());
+        viewer.setContentProvider(ArrayContentProvider.getInstance());
         final ArrayObjectLabelProvider labelProvider = new ArrayObjectLabelProvider();
         viewer.setLabelProvider(labelProvider);
         viewer.setInput(input);
@@ -115,7 +115,7 @@ public class SWTUtilTest extends TestCase {
         TableViewerColumn thirdColumn = new TableViewerColumn(viewer, SWT.NONE);
         thirdColumn.getColumn().setText("Third");
         thirdColumn.getColumn().setWidth(200);
-        viewer.setContentProvider(new ArrayContentProvider());
+        viewer.setContentProvider(ArrayContentProvider.getInstance());
         final ArrayObjectLabelProvider labelProvider = new ArrayObjectLabelProvider();
         viewer.setLabelProvider(labelProvider);
         viewer.setInput(input);

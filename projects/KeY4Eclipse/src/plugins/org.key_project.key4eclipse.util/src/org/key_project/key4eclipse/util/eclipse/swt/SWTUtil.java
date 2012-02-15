@@ -22,11 +22,13 @@ import org.eclipse.jdt.internal.ui.wizards.buildpaths.FolderSelectionDialog;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
@@ -64,6 +66,42 @@ public final class SWTUtil {
     public static void checkCanceled(IProgressMonitor monitor) throws OperationCanceledException {
         if (monitor != null && monitor.isCanceled()) {
             throw new OperationCanceledException();
+        }
+    }
+    
+    /**
+     * <p>
+     * Configures the given {@link Table} to show only the column {@link Image}s
+     * with their real size.
+     * </p>
+     * <p>
+     * It is recommend that not text is set on the {@link TableItem} 
+     * (e.g. used {@link LabelProvider} returns no texts) because otherwise
+     * it is possible that the cells are to big.
+     * </p>
+     * @param table The {@link Table} to configure.
+     */
+    public static void makeTableShowingFullTableItemImages(final Table table) {
+        if (table != null) {
+            table.addListener(SWT.MeasureItem, new Listener() {
+                @Override
+                public void handleEvent(Event event) {
+                    TableItem item = (TableItem)event.item;
+                    event.width = item.getImage().getImageData().width;
+                    event.height = item.getImage().getImageData().height;
+                }
+            });
+            table.addListener(SWT.EraseItem, new Listener() {
+                public void handleEvent(Event event) {
+                    event.detail &= ~SWT.FOREGROUND;
+                }
+            });
+            table.addListener(SWT.PaintItem, new Listener() {
+                public void handleEvent(Event event) {
+                    TableItem item = (TableItem)event.item;
+                    event.gc.drawImage(item.getImage(), event.x, event.y);
+                }
+            });
         }
     }
     
@@ -109,7 +147,7 @@ public final class SWTUtil {
                     TableItem item = (TableItem)event.item;
                     String text = item.getText(event.index);
                     Point size = event.gc.textExtent(text);
-                    event.width = size.x + 2 * textMargin;
+                    event.width = size.x + (2 * textMargin);
                     event.height = Math.max(event.height, size.y + textMargin);
                 }
             });

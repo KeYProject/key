@@ -140,7 +140,7 @@ public class AutomaticVerifierComposite extends Composite {
         proofResultColumn.getColumn().setMoveable(true);
         proofViewerLayout.setColumnData(proofResultColumn.getColumn(), new ColumnWeightData(15));
         SWTUtil.makeTableColumnsSortable(proofViewer);
-        proofViewer.setContentProvider(new ArrayContentProvider());
+        proofViewer.setContentProvider(ArrayContentProvider.getInstance());
         proofViewer.setLabelProvider(new AutomaticProofLabelProvider());
         Composite buttonComposite = new Composite(proofGroup, SWT.NONE);
         buttonComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));

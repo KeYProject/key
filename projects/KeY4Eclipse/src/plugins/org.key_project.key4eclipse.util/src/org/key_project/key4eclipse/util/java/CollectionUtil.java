@@ -118,6 +118,12 @@ public class CollectionUtil {
       }
    }
    
+   /**
+    * Removes all occurrences of the element in the given {@link Collection}.
+    * @param collection The {@link Collection} to remove from.
+    * @param toRemove The element to remove.
+    * @return {@code true} if at least one element was removed, {@code false} if the {@link Collection} was not modified.
+    */
    public static <T> boolean removeComplete(Collection<T> collection, T toRemove) {
       if (collection != null) {
          Iterator<T> iter = collection.iterator();
@@ -133,5 +139,25 @@ public class CollectionUtil {
       else {
          return false;
       }
+   }
+
+   /**
+    * Searches an element in the given {@link Iterable} instance.
+    * @param iterable The instance to search in.
+    * @param filter The filter to select an element.
+    * @return The found element or {@code null} if no element was found.
+    */
+   public static <T> T search(Iterable<T> iterable, IFilter<T> filter) {
+      T result = null;
+      if (iterable != null && filter != null) {
+         Iterator<T> iter = iterable.iterator();
+         while (result == null && iter.hasNext()) {
+            T next = iter.next();
+            if (filter.select(next)) {
+               result = next;
+            }
+         }
+      }
+      return result;
    }
 }

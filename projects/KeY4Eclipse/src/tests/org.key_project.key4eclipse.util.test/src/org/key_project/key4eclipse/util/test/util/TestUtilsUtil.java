@@ -39,6 +39,8 @@ import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.waits.ICondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.ui.IEditorPart;
@@ -633,5 +635,19 @@ public class TestUtilsUtil {
       proofClosedDialog.bot().jButton("OK").click();
       proofClosedDialog.bot().waitUntil(Conditions.componentCloses(proofClosedDialog));
       TestCase.assertFalse(proofClosedDialog.isOpen());   
+   }
+
+   /**
+    * Makes sure that the given {@link SWTBotTable} without columns
+    * contains the correct rows.
+    * @param table The {@link SWTBotTable} to test.
+    * @param rowValues The expected row values.
+    */
+   public static void assertTableRows(SWTBotTable table, String... rowValues) {
+       TestCase.assertEquals(rowValues.length, table.rowCount());
+       for (int i = 0; i < table.rowCount(); i++) {
+           SWTBotTableItem item = table.getTableItem(i);
+           TestCase.assertEquals(rowValues[i], item.getText());
+       }
    }
 }

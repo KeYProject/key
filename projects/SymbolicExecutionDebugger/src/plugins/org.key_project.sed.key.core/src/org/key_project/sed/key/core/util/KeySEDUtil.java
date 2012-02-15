@@ -46,6 +46,16 @@ public final class KeySEDUtil {
     public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_METHOD = "org.key_project.sed.key.core.launch.sed.key.attribute.method";
 
     /**
+     * The key of the attribute "useExistingContract" in an {@link ILaunchConfiguration} of type {@value KeySEDUtil#LAUNCH_CONFIGURATION_TYPE_ID}.
+     */
+    public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_EXISTING_CONTRACT = "org.key_project.sed.key.core.launch.sed.key.attribute.useExistingContract";
+
+    /**
+     * The key of the attribute "existingContract" in an {@link ILaunchConfiguration} of type {@value KeySEDUtil#LAUNCH_CONFIGURATION_TYPE_ID}.
+     */
+    public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_EXISTING_CONTRACT = "org.key_project.sed.key.core.launch.sed.key.attribute.existingContract";
+
+    /**
      * The launch mode supported by the Symbolic Execution Debugger based on KeY.
      */
     public static final String MODE = "debug";
@@ -131,7 +141,27 @@ public final class KeySEDUtil {
     public static String getMethodValue(ILaunchConfiguration configuration) throws CoreException {
         return configuration != null ? configuration.getAttribute(LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_METHOD, StringUtil.EMPTY_STRING) : StringUtil.EMPTY_STRING;
     }
-
+    
+    /**
+     * Returns the use existing contract attribute value from the given {@link ILaunchConfiguration}.
+     * @param configuration The {@link ILaunchConfiguration} to read from.
+     * @return The use existing contract attribute value.
+     * @throws CoreException Occurred Exception.
+     */
+    public static boolean isUseExistingContractValue(ILaunchConfiguration configuration) throws CoreException {
+        return configuration != null ? configuration.getAttribute(LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_EXISTING_CONTRACT, false) : false;
+    }
+    
+    /**
+     * Returns the existing contract attribute value from the given {@link ILaunchConfiguration}.
+     * @param configuration The {@link ILaunchConfiguration} to read from.
+     * @return The existing contract attribute value.
+     * @throws CoreException Occurred Exception.
+     */
+    public static String getExistingContractValue(ILaunchConfiguration configuration) throws CoreException {
+        return configuration != null ? configuration.getAttribute(LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_EXISTING_CONTRACT, StringUtil.EMPTY_STRING) : StringUtil.EMPTY_STRING;
+    }
+    
     /**
      * Searches the {@link IMethod} that is defined by the given {@link ILaunch}.
      * @param launch The {@link ILaunch} that defines an {@link IMethod}.

@@ -1,17 +1,35 @@
 package org.key_project.key4eclipse.util.eclipse.swt;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 import java.awt.image.DirectColorModel;
+import java.awt.image.FilteredImageSource;
+import java.awt.image.ImageFilter;
+import java.awt.image.ImageProducer;
 import java.awt.image.IndexColorModel;
+import java.awt.image.RGBImageFilter;
 import java.awt.image.WritableRaster;
 
 import javax.swing.Icon;
+import javax.swing.JEditorPane;
+import javax.swing.JFrame;
+import javax.swing.text.Document;
+import javax.swing.text.html.HTMLDocument;
+import javax.swing.text.html.HTMLEditorKit;
+import javax.swing.text.html.StyleSheet;
 
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.widgets.Display;
 
 /**
  * Provides static methods to work with images.
@@ -22,6 +40,113 @@ public final class ImageUtil {
      * Forbid instances.
      */
     private ImageUtil() {
+    }
+    
+    /**
+     * <p>
+     * Renders the given HTML text as image.
+     * </p>
+     * <p>
+     * Fore more details about changing the default font ofa JEditorPane have a look at
+     * <a href="http://explodingpixels.wordpress.com/2008/10/28/make-jeditorpane-use-the-system-font/">http://explodingpixels.wordpress.com/2008/10/28/make-jeditorpane-use-the-system-font/</a>.
+     * </p>
+     * @param html The HTML text to render.
+     * @param useDefaultSystemFont Use SWT system font as default?
+     * @param transparentBackground Use transparent background color?
+     * @return The created image that shows the HTML content.
+     */
+    public static BufferedImage renderHTML(String html, boolean useDefaultSystemFont, boolean transparentBackground) {
+        // Use a JEditorPane to render the HTML text.
+        JEditorPane pane = new JEditorPane();
+        // Modify pane to use default system font
+        try {
+            pane.setContentType(new HTMLEditorKit().getContentType());
+            if (useDefaultSystemFont) {
+                Font font = Display.getDefault().getSystemFont();
+                if (font != null && font.getFontData().length >= 1) {
+                    FontData data = font.getFontData()[0];
+                    String bodyRule = "body { font-family: " + data.getName() + "; }";
+                    Document document = pane.getDocument();
+                    if (document instanceof HTMLDocument) {
+                        StyleSheet sheet = ((HTMLDocument)document).getStyleSheet();
+                        sheet.addRule(bodyRule);
+                    }
+                }
+            }
+            pane.setText(html);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        // Put the JEditorPane into a JFrame to optimize the width and height.
+        JFrame frame = new JFrame();
+        frame.setLayout(new BorderLayout());
+        frame.add(pane, BorderLayout.CENTER);
+        frame.pack();
+        // Create screenshot of JEditorPane.
+        BufferedImage image = new BufferedImage(pane.getWidth(), pane.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        Graphics g = image.getGraphics();
+        try {
+            pane.paint(g);
+        }
+        finally {
+            g.dispose();
+        }
+        if (transparentBackground) {
+            // Make background transparent if required.
+            final Color transparentColor = pane.getBackground();
+            java.awt.Image transparentImage = ImageUtil.makeColorTransparent(image, transparentColor);
+            return ImageUtil.toBufferedImage(transparentImage);
+        }
+        else {
+            return image;
+        }
+    }
+    
+    /**
+     * <p>
+     * Makes the given color in the given {@link Image} transparent.
+     * </p>
+     * <p>
+     * Fore more details have a look at
+     * <a href="http://stackoverflow.com/questions/665406/how-to-make-a-color-transparent-in-a-bufferedimage-and-save-as-png">http://stackoverflow.com/questions/665406/how-to-make-a-color-transparent-in-a-bufferedimage-and-save-as-png</a>.
+     * </p>
+     * @param image The {@link Image} to modify.
+     * @param transparentColor The color to make transparent.
+     * @return A new created {@link Image} where the color is transparent.
+     */
+    public static Image makeColorTransparent(Image image,
+                                             final Color transparentColor) {
+        ImageFilter filter = new RGBImageFilter() {
+            @Override
+            public final int filterRGB(int x, int y, int rgb) {
+                if (rgb == transparentColor.getRGB()) {
+                    return rgb & 0xFFFFFF; // Set fully transparent but keep color
+                }
+                return rgb;
+            }
+        };
+        ImageProducer ip = new FilteredImageSource(image.getSource(), filter);
+        return Toolkit.getDefaultToolkit().createImage(ip);
+    }
+    
+    /**
+     * Converts the given {@link Image} into a {@link BufferedImage}.
+     * @param image The {@link Image} to convert.
+     * @return The created {@link BufferedImage} with the content from the given {@link Image}.
+     */
+    public static BufferedImage toBufferedImage(Image image) {
+        BufferedImage result = new BufferedImage(image.getWidth(null), 
+                                                 image.getHeight(null), 
+                                                 BufferedImage.TYPE_INT_ARGB);
+        Graphics g = result.getGraphics();
+        try {
+            g.drawImage(image, 0, 0, null);
+            return result;
+        }
+        finally {
+            g.dispose();
+        }
     }
     
     /**
