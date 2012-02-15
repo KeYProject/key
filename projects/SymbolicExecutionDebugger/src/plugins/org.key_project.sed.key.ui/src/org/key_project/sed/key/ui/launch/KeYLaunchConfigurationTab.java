@@ -342,8 +342,8 @@ public class KeYLaunchConfigurationTab extends AbstractLaunchConfigurationTab {
                         // Open selection dialog
                         Services services = initConfig.getServices();
                         ContractSelectionDialog dialog = new ContractSelectionDialog(getShell(), ImmutableCollectionContentProvider.getInstance(), services);
-                        dialog.setMessage("Contract selection");
-                        dialog.setTitle("Select a contract to debug.");
+                        dialog.setTitle("Contract selection");
+                        dialog.setMessage("Select a contract to debug.");
                         dialog.setInput(operationContracts);
                         FunctionalOperationContract selectedContract = CollectionUtil.search(operationContracts, new IFilter<FunctionalOperationContract>() {
                             @Override
@@ -358,7 +358,7 @@ public class KeYLaunchConfigurationTab extends AbstractLaunchConfigurationTab {
                             Object result = dialog.getFirstResult();
                             if (result instanceof FunctionalOperationContract) {
                                 FunctionalOperationContract foc = (FunctionalOperationContract)result;
-                                existingContractText.setText(foc.getDisplayName());
+                                existingContractText.setText(foc.getName());
                             }
                         }
                     }

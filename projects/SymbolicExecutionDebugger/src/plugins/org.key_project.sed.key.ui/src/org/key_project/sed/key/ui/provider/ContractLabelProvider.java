@@ -47,7 +47,18 @@ public class ContractLabelProvider extends LabelProvider {
         if (element instanceof Contract) {
             Image image = cache.get(element);
             if (image == null) {
-                String html = ((Contract)element).getHTMLText(services);
+                // Convert contract to HTML 
+                Contract contract = (Contract)element;
+                String html = contract.getHTMLText(services);
+                // Insert contract name into HTML
+                int index = html.indexOf("<html>");
+                if (index >= 0) {
+                    // A real border with tile via <fieldset><legend>Title</legend>Content</fieldset> is not supported by Swing 
+                    html = html.substring(0, index) + 
+                           "<html><h2>" + contract.getName() + "</h2>" + 
+                           html.substring(index + "<html>".length());
+                }
+                // Create image
                 BufferedImage javaImage = ImageUtil.renderHTML(html, true, true);
                 ImageData data = ImageUtil.convertToImageData(javaImage);
                 image = new Image(Display.getDefault(), data);
