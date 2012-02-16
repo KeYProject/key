@@ -1,6 +1,7 @@
 package org.key_project.automaticverifier.product.ui.model;
 
 import org.eclipse.core.runtime.Assert;
+import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.key4eclipse.util.bean.Bean;
 import org.key_project.key4eclipse.util.java.SwingUtil;
 import org.key_project.key4eclipse.util.java.thread.AbstractRunnableWithResult;
@@ -174,14 +175,7 @@ public class AutomaticProof extends Bean {
                 // Start interactive proof automatically
                 main.getMediator().startAutoMode(proof.openEnabledGoals());
                 // Wait for interactive prover
-                while (main.frozen) {
-                    try {
-                        Thread.sleep(250);
-                    }
-                    catch (InterruptedException e) {
-                        // Nothing to do
-                    }
-                }
+                KeYUtil.waitWhileMainWindowIsFrozen(main);
             }
             finally {
                 if (main != null && task != null) {

@@ -1,6 +1,9 @@
 This plug-in "org.key_project.key4eclipse" provides the KeY code
 to all other plug-ins.
 
+
+Workspace preparation
+---------------------
 To use and deploy this plug-in the following modifications must be done in
 every workspace:
 - Checkout KeY repository
@@ -38,7 +41,16 @@ every workspace:
         key.rep=D:/Forschung/GIT/KeY
         ext.dir=D:/Forschung/Tools/KeY-External Libs
 
-Important notice:
+
+Test Execution
+--------------
+1. Run TestKey as "Junit Test" with additional VM argument:
+   -Dkey.home=<Location>
+   e.g. -Dkey.home=D:\Forschung\GIT\KeY
+
+
+Important notice
+----------------
 SWT and Swing runs both in his own UI thread. For synchronization it is
 required to use Display#syncExec(Runnable) and SwingUtil#invokeAndWait(Runnable)
 or Display#asyncExec(Runnable) and SwingUtil#invokeLater(Runnable). Keep

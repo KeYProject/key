@@ -42,8 +42,6 @@ import org.key_project.key4eclipse.starter.core.provider.ImmutableCollectionCont
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.key4eclipse.util.eclipse.ResourceUtil;
 import org.key_project.key4eclipse.util.eclipse.swt.SWTUtil;
-import org.key_project.key4eclipse.util.java.CollectionUtil;
-import org.key_project.key4eclipse.util.java.IFilter;
 import org.key_project.key4eclipse.util.java.ObjectUtil;
 import org.key_project.key4eclipse.util.java.StringUtil;
 import org.key_project.key4eclipse.util.java.SwingUtil;
@@ -345,12 +343,7 @@ public class KeYLaunchConfigurationTab extends AbstractLaunchConfigurationTab {
                         dialog.setTitle("Contract selection");
                         dialog.setMessage("Select a contract to debug.");
                         dialog.setInput(operationContracts);
-                        FunctionalOperationContract selectedContract = CollectionUtil.search(operationContracts, new IFilter<FunctionalOperationContract>() {
-                            @Override
-                            public boolean select(FunctionalOperationContract element) {
-                                return element != null && ObjectUtil.equals(element.getDisplayName(), getContractId());
-                            }
-                        });
+                        FunctionalOperationContract selectedContract = KeySEDUtil.findContract(operationContracts, getContractId());
                         if (selectedContract != null) {
                             dialog.setInitialSelections(new Object[] {selectedContract});
                         }

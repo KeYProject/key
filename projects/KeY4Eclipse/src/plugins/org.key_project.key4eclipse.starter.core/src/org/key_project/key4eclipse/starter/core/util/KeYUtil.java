@@ -519,4 +519,16 @@ public final class KeYUtil {
        TaskTreeModel model = main.getProofList().getModel();
        return model.getChildCount(model.getRoot()) == 0;
     }
+    
+    public static void waitWhileMainWindowIsFrozen(MainWindow main) {
+        // Wait for interactive prover
+        while (main.frozen) {
+            try {
+                Thread.sleep(250);
+            }
+            catch (InterruptedException e) {
+                // Nothing to do
+            }
+        }
+    }
 }

@@ -14,10 +14,15 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
+import org.key_project.key4eclipse.util.java.CollectionUtil;
+import org.key_project.key4eclipse.util.java.IFilter;
 import org.key_project.key4eclipse.util.java.ObjectUtil;
 import org.key_project.key4eclipse.util.java.StringUtil;
 import org.key_project.key4eclipse.util.jdt.JDTUtil;
 import org.key_project.sed.core.util.LaunchUtil;
+
+import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
 /**
  * Provides static utility methods for the Symbolic Execution Debugger
@@ -252,5 +257,15 @@ public final class KeySEDUtil {
             }
         }
         return result;
+    }
+
+    public static FunctionalOperationContract findContract(ImmutableSet<FunctionalOperationContract> operationContracts, 
+                                                           final String contractName) {
+        return CollectionUtil.search(operationContracts, new IFilter<FunctionalOperationContract>() {
+            @Override
+            public boolean select(FunctionalOperationContract element) {
+                return element != null && ObjectUtil.equals(element.getName(), contractName);
+            }
+        });
     }
 }
