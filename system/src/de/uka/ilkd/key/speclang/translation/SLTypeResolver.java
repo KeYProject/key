@@ -42,7 +42,7 @@ public final class SLTypeResolver extends SLExpressionResolver {
         try {
             KeYJavaType type = javaInfo.getTypeByClassName(name);
             if(type == null) {
-        	throw new RuntimeException();
+        	throw new SLTranslationException("Type "+type+" not found.");
             }
             return new SLExpression(type);
         } catch (RuntimeException e) {
