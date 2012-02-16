@@ -13,6 +13,7 @@ import org.key_project.key4eclipse.test.testcase.MainTest;
 @Suite.SuiteClasses({
    KeYExampleUtilTest.class,
    MainTest.class
+   //RunAllProofsTest.class // This class is not listed because it takes to much time.
 })
 public class AllKeY4EclipseTests {
 }

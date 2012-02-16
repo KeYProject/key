@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.PrintStream;
 
 import javax.swing.Icon;
 import javax.swing.filechooser.FileSystemView;
@@ -47,7 +49,7 @@ public final class IOUtil {
    }
 
    /**
-    * Reads the compelte content from the {@link InputStream} and closes it.
+    * Reads the complete content from the {@link InputStream} and closes it.
     * @param in The {@link InputStream} to read from and to close.
     * @return The read content or {@code null} if the {@link InputStream} is {@code null}.
     * @throws IOException Occurred Exception.
@@ -75,6 +77,31 @@ public final class IOUtil {
          }
          if (in != null) {
             in.close();
+         }
+      }
+   }
+
+   /**
+    * Writes the given content into the given {@link OutputStream} and closes it.
+    * Nothing will be written if the content is {@code null}, but the stream will be closed.
+    * @param out The {@link OutputStream} to write to.
+    * @param content The content to write.
+    * @throws IOException Occurred Exception.
+    */
+   public static void writeTo(OutputStream out, String content) throws IOException {
+      PrintStream printStream = null;
+      try {
+         if (out != null && content != null) {
+            printStream = new PrintStream(out);
+            printStream.print(content);
+         }
+      }
+      finally {
+         if (out != null) {
+            out.close();
+         }
+         if (printStream != null) {
+            printStream.close();
          }
       }
    }

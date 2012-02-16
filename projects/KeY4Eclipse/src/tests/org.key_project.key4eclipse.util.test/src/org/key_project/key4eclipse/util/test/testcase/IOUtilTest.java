@@ -1,7 +1,10 @@
 package org.key_project.key4eclipse.util.test.testcase;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 import junit.framework.TestCase;
@@ -15,6 +18,36 @@ import org.key_project.key4eclipse.util.test.util.TestUtilsUtil;
  * @author Martin Hentschel
  */
 public class IOUtilTest extends TestCase {
+   /**
+    * Tests {@link IOUtil#writeTo(java.io.OutputStream, String)}
+    */
+   @Test
+   public void testWriteTo() throws IOException {
+      File tempFile = null;
+      try {
+         // Test null stream, nothing should happen
+         String content = "Hello World!";
+         IOUtil.writeTo(null, content);
+         // Test null content
+         ByteArrayOutputStream out = new ByteArrayOutputStream();
+         IOUtil.writeTo(out, null);
+         assertEquals(0, out.toByteArray().length);
+         // Test writing to memory stream
+         out = new ByteArrayOutputStream();
+         IOUtil.writeTo(out, content);
+         assertEquals(content, out.toString());
+         // Test writing to temporary file
+         tempFile = File.createTempFile("IOUtilTest", "testWriteTo.txt");
+         IOUtil.writeTo(new FileOutputStream(tempFile), content);
+         assertEquals(content, IOUtil.readFrom(new FileInputStream(tempFile)));
+      }
+      finally {
+         if (tempFile != null) {
+             tempFile.delete();
+         }
+      }
+   }
+   
    /**
     * Tests {@link IOUtil#readFrom(java.io.InputStream)}
     */

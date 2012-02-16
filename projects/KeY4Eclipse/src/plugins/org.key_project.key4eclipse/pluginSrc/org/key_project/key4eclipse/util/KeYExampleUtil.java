@@ -39,31 +39,93 @@ public class KeYExampleUtil {
      * @return The local example directory or {@code null} if it is not available.
      */
     public static String getLocalExampleDirectory() {
-        try {
-            Bundle bundle = Activator.getDefault().getBundle();
-            URL customTargetsURL = bundle.getEntry("customTargets.properties");
-            if (customTargetsURL != null) {
-                InputStream in = null;
-                try {
-                    in = customTargetsURL.openStream();
-                    Properties props = new Properties();
-                    props.load(in);
-                    String dir = props.getProperty("key.rep");
-                    if (dir != null && dir.trim().length() >= 1) {
-                        return dir.trim() + File.separator + "examples" + File.separator + "heap";
-                    }
-                    else {
-                        return null;
-                    }
+        String localKeyHome = getLocalKeYHomeDirectory();
+        return localKeyHome != null ? localKeyHome + File.separator + "examples" + File.separator + "heap" : null;
+    }
+
+    /**
+     * Returns a specified KeY external library directory in bundle file "customTargets.xml".
+     * This file is only available if the plug-in was loaded in a started
+     * Eclipse product via the Eclipse development IDE. In a real deployed
+     * product it will return {@code null}.
+     * @return The local library directory or {@code null} if it is not available.
+     */
+    public static String getLocalKeYExtraLibsDirectory() {
+        return getLocalPropertyValue("ext.dir");
+    }
+
+    /**
+     * Returns a specified KeY repository home directory in bundle file "customTargets.xml".
+     * This file is only available if the plug-in was loaded in a started
+     * Eclipse product via the Eclipse development IDE. In a real deployed
+     * product it will return {@code null}.
+     * @return The local KeY repository directory or {@code null} if it is not available.
+     */
+    public static String getLocalKeYHomeDirectory() {
+        return getLocalPropertyValue("key.rep");
+    }
+
+    /**
+     * Returns a specified value in bundle file "customTargets.xml".
+     * This file is only available if the plug-in was loaded in a started
+     * Eclipse product via the Eclipse development IDE. In a real deployed
+     * product it will return {@code null}.
+     * @param key The key for that the value should be returned if possible.
+     * @return The value or {@code null} if it is not available.
+     */
+    public static String getLocalPropertyValue(String key) {
+        if (key != null) {
+            Properties props = getLocalProperties();
+            if (props != null) {
+                String dir = props.getProperty(key);
+                if (dir != null && dir.trim().length() >= 1) {
+                    return dir.trim();
                 }
-                finally {
-                    if (in != null) {
-                        in.close();
-                    }
+                else {
+                    return null;
                 }
             }
             else {
                 return null;
+            }
+        }
+        else {
+            return null;
+        }
+    }
+
+    /**
+     * Returns the properties in bundle file "customTargets.xml".
+     * This file is only available if the plug-in was loaded in a started
+     * Eclipse product via the Eclipse development IDE. In a real deployed
+     * product it will return {@code null}.
+     * @return The properties or {@code null} if it is not available.
+     */
+    public static Properties getLocalProperties() {
+        try {
+            if (Activator.getDefault() != null) {
+                Bundle bundle = Activator.getDefault().getBundle();
+                URL customTargetsURL = bundle.getEntry("customTargets.properties");
+                if (customTargetsURL != null) {
+                    InputStream in = null;
+                    try {
+                        in = customTargetsURL.openStream();
+                        Properties props = new Properties();
+                        props.load(in);
+                        return props;
+                    }
+                    finally {
+                        if (in != null) {
+                            in.close();
+                        }
+                    }
+                }
+                else {
+                    return null;
+                }
+            }
+            else {
+                return null; // Plug-in is not loaded, may used in normal Java application
             }
         }
         catch (IOException e) {

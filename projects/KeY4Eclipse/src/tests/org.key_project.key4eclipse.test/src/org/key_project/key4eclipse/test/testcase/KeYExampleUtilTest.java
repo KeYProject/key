@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.Properties;
 
 import junit.framework.TestCase;
@@ -26,6 +27,113 @@ import org.osgi.framework.Bundle;
  * @author Martin Hentschel
  */
 public class KeYExampleUtilTest extends TestCase {
+    /**
+     * Tests {@link KeYExampleUtil#getLocalKeYHomeDirectory()}.
+     */
+    @Test
+    public void testGetLocalKeYHomeDirectory() throws IOException {
+        // Get value
+        String localExampleDir = KeYExampleUtil.getLocalKeYHomeDirectory();
+        // Compare value
+        assertEquals(getLocalPropertyValue("key.rep"), localExampleDir);
+    }
+
+    /**
+     * Tests {@link KeYExampleUtil#getLocalKeYExtraLibsDirectory()}.
+     */
+    @Test
+    public void testGetLocalKeYExtraLibsDirectory() throws IOException {
+        // Get value
+        String localExampleDir = KeYExampleUtil.getLocalKeYExtraLibsDirectory();
+        // Compare value
+        assertEquals(getLocalPropertyValue("ext.dir"), localExampleDir);
+    }
+
+    /**
+     * Tests {@link KeYExampleUtil#getLocalExampleDirectory()}.
+     */
+    @Test
+    public void testGetLocalExampleDirectory() throws IOException {
+        // Get value
+        String localExampleDir = KeYExampleUtil.getLocalExampleDirectory();
+        // Compare value
+        assertEquals(getLocalPropertyValue("key.rep") + File.separator + "examples" + File.separator + "heap", localExampleDir);
+    }
+    
+    /**
+     * Tests {@link KeYExampleUtil#getLocalPropertyValue(String)}.
+     */
+    @Test
+    public void testGetLocalPropertyValue() throws IOException {
+        // Test null
+        assertNull(KeYExampleUtil.getLocalPropertyValue(null));
+        // Test valid keys
+        assertEquals(getLocalPropertyValue("key.rep"), KeYExampleUtil.getLocalPropertyValue("key.rep"));
+        assertEquals(getLocalPropertyValue("ext.dir"), KeYExampleUtil.getLocalPropertyValue("ext.dir"));
+        // Test invalid key
+        assertEquals(getLocalPropertyValue("INVALID"), KeYExampleUtil.getLocalPropertyValue("INVALID"));
+    }
+    
+    /**
+     * Tests {@link KeYExampleUtil#getLocalProperties()}.
+     */
+    @Test
+    public void testGetLocalProperties() throws IOException {
+        Properties expected = getLocalProperties();
+        Properties actual = KeYExampleUtil.getLocalProperties();
+        assertEquals(expected.size(), actual.size());
+        Enumeration<?> keys = expected.propertyNames();
+        while (keys.hasMoreElements()) {
+            Object key = keys.nextElement();
+            assertTrue(key instanceof String);
+            assertTrue(actual.containsKey(key));
+            assertEquals(expected.getProperty((String)key), actual.getProperty((String)key));
+        }
+    }
+    
+    /**
+     * Returns the local property value.
+     * @param key The key.
+     * @return The value.
+     * @throws IOException Occurred exception.
+     */
+    protected String getLocalPropertyValue(String key) throws IOException {
+        Properties props = getLocalProperties();
+        return props != null ? props.getProperty(key) : null;
+    }
+    
+    /**
+     * Returns all local properties.
+     * @return The local properties.
+     * @throws IOException Occurred exception.
+     */
+    protected Properties getLocalProperties() throws IOException {
+        Bundle bundle = Platform.getBundle("org.key_project.key4eclipse");
+        if (bundle != null) {
+            URL entry = bundle.getEntry("customTargets.properties");
+            if (entry != null) {
+                InputStream in = null;
+                try {
+                    in = entry.openStream();
+                    Properties properties = new Properties();
+                    properties.load(in);
+                    return properties;
+                }
+                finally {
+                    if (in != null) {
+                        in.close();
+                    }
+                }
+            }
+            else {
+                return null;
+            }
+        }
+        else {
+            return null;
+        }
+    }
+    
     /**
      * Tests {@link KeYExampleUtil#updateExampleDirectory(String, String, String, String, String)}.
      */
@@ -82,35 +190,5 @@ public class KeYExampleUtilTest extends TestCase {
         Properties properties = new Properties();
         properties.load(new FileInputStream(exampleFile));
         assertEquals(expectedVersion, properties.get(KeYExampleUtil.VERSION_KEY));
-    }
-
-    /**
-     * Tests {@link KeYExampleUtil#getLocalExampleDirectory()}.
-     */
-    @Test
-    public void testGetLocalExampleDirectory() throws IOException {
-        // Get directory
-        String localExampleDir = KeYExampleUtil.getLocalExampleDirectory();
-        // Get bundle
-        Bundle bundle = Platform.getBundle("org.key_project.key4eclipse");
-        assertNotNull(bundle);
-        URL entry = bundle.getEntry("customTargets.properties");
-        if (entry != null) {
-            InputStream in = null;
-            try {
-                in = entry.openStream();
-                Properties properties = new Properties();
-                properties.load(in);
-                assertEquals(properties.get("key.rep") + File.separator + "examples" + File.separator + "heap", localExampleDir);
-            }
-            finally {
-                if (in != null) {
-                    in.close();
-                }
-            }
-        }
-        else {
-            assertNull(localExampleDir);
-        }
     }
 }
