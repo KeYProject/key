@@ -58,6 +58,7 @@ public class NodeInfo {
 
     private static List<Name> symbolicExecNames = new ArrayList<Name>(5);
     static {
+        symbolicExecNames.add(new Name("method_expand"));
         symbolicExecNames.add(new Name("simplify_prog"));
         symbolicExecNames.add(new Name("simplify_autoname"));
         symbolicExecNames.add(new Name("executeIntegerAssignment"));
