@@ -18,6 +18,7 @@ import org.key_project.key4eclipse.util.java.SwingUtil;
 import org.key_project.key4eclipse.util.java.thread.AbstractRunnableWithResult;
 import org.key_project.key4eclipse.util.java.thread.IRunnableWithResult;
 import org.key_project.key4eclipse.util.jdt.JDTUtil;
+import org.key_project.sed.key.core.launch.key.po.SEDFunctionalOperationContractPO;
 import org.key_project.sed.key.core.util.KeySEDUtil;
 import org.key_project.sed.key.core.util.LogUtil;
 
@@ -27,9 +28,15 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.notification.NotificationEventID;
 import de.uka.ilkd.key.gui.notification.NotificationTask;
+import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Node.NodeIterator;
+import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
@@ -73,6 +80,8 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
             }
             // Run proof
             runProof(proof);
+            // Analyze proof
+            analyzeProof(proof);
         }
         catch (CoreException e) {
             throw e;
@@ -141,14 +150,27 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
                         ImmutableList<String> mods = ImmutableSLList.nil();
                         mods = mods.append("public");
                         TextualJMLSpecCase textualSpecCase = new TextualJMLSpecCase(mods, Behavior.NORMAL_BEHAVIOR);
-                        textualSpecCase.addRequires(new PositionedString("self.<inv>")); // Assume own invariants
+                        if (!pm.isStatic()) {
+                           textualSpecCase.addRequires(new PositionedString("self.<inv>")); // Assume own invariants
+                        }
                         // Create contract
                         JMLSpecFactory factory = new JMLSpecFactory(services);
                         ImmutableSet<Contract> contracts = factory.createJMLOperationContracts(pm, textualSpecCase);
                         contract = contracts.iterator().next();
                     }
+                    // Make sure that a contract is defined
+                    if (contract == null) {
+                        throw new CoreException(LogUtil.getLogger().createErrorStatus("Unable to find a contract to prove."));
+                    }
                     // Instantiate proof
-                    ProofOblInput input = contract.createProofObl(initConfig, contract);
+                    ProofOblInput input;
+                    if (contract instanceof FunctionalOperationContract) {
+                        input = new SEDFunctionalOperationContractPO(initConfig, (FunctionalOperationContract)contract);
+                    }
+                    else {
+                        throw new CoreException(LogUtil.getLogger().createErrorStatus("Contract of class \"" + contract.getClass().getCanonicalName() + "\" are not supported."));
+//                        input = contract.createProofObl(initConfig, contract);                        
+                    }
                     ProblemInitializer init = main.createProblemInitializer();
                     Proof proof = init.startProver(initConfig, input);
                     setResult(proof);
@@ -191,6 +213,46 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
         finally {
             if (task != null) {
                 main.getNotificationManager().addNotificationTask(task);
+            }
+        }
+    }
+
+    /**
+     * Analyzes the given Proof by printing the executed code in the console.
+     * @param proof The Proof to analyze.
+     */
+    protected void analyzeProof(Proof proof) {
+        analyzeNode(proof.root(), 0);
+    }
+
+    /**
+     * <p>
+     * Analyzes the given Proof by printing the executed code in the console.
+     * </p>
+     * <p>
+     * <b>Attention :</b> A correct pruning requires at the moment that
+     * the Taclet Option "runtimeExceptions" is set to "runtimeExceptions:allow".
+     * Alternatively it is required to modify rule {@code assignment_to_reference_array_component}
+     * in file {@code javaRules.key} by uncommenting {@code \add (!(#v=null) & lt(#se, length(#v)) & geq(#se,0) & arrayStoreValid(#v, #se0)==>)}. 
+     * </p>
+     * @param proof The Proof to analyze.
+     */
+    protected void analyzeNode(Node node, int level) {
+        // Analyze node
+        if (!node.isClosed()) { // Prune closed branches
+            NodeInfo info = node.getNodeInfo();
+            SourceElement statement = info.getActiveStatement();
+            if (statement != null && statement.getPositionInfo() != null) {
+                PositionInfo posInfo = statement.getPositionInfo();
+                if (posInfo.getStartPosition() != Position.UNDEFINED) {
+                    System.out.println(statement);
+                }
+            }
+            // Iterate over children
+            NodeIterator children = node.childrenIterator();
+            while (children.hasNext()) {
+               Node child = children.next();
+               analyzeNode(child, level + 1);
             }
         }
     }
