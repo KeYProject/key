@@ -44,7 +44,7 @@ public final class QueryAxiom extends ClassAxiom {
     public QueryAxiom(String name, ProgramMethod target, KeYJavaType kjt) {
 	assert name != null;
 	assert target != null;
-	assert target.getKeYJavaType() != null;	
+	assert target.getReturnType() != null;	
 	assert kjt != null;
 	this.name = name;
 	this.target = target;	
@@ -149,7 +149,7 @@ public final class QueryAxiom extends ClassAxiom {
 	}
 	final Term post = TB.imp(TB.reachableValue(services, 
 						   TB.var(resultProgSV), 
-						   target.getKeYJavaType()),
+						   target.getReturnType()),
 	                  	 TB.equals(TB.var(skolemSV), TB.var(resultProgSV)));
 	
 	//create java block
@@ -222,7 +222,7 @@ public final class QueryAxiom extends ClassAxiom {
 		    		     target.getParamType(i).getJavaType());
 	}
 	tacletBuilder.addVarsNew(resultProgSV, 
-				 target.getKeYJavaType().getJavaType());
+				 target.getReturnType().getJavaType());
 	tacletBuilder.setStateRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);
 	tacletBuilder.addTacletGoalTemplate
 	    (new RewriteTacletGoalTemplate(addedSeq,

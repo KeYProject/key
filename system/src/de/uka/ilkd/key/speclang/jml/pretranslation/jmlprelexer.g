@@ -103,6 +103,7 @@ tokens {
     PROTECTED 			= "protected";
     PUBLIC			= "public";
     PURE 			= "pure";
+    STRICTLY_PURE               = "strictly_pure";
     READABLE			= "readable";
     REPRESENTS			= "represents";
     REPRESENTS_RED		= "represents_redundantly";

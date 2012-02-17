@@ -40,7 +40,7 @@ public class JoinMenuItem extends JMenuItem {
                  if(dialog.okayButtonHasBeenPressed()){
                 	 start(dialog.getSelectedPartner(),proof,mediator);                   
                  }else{
-                	 mediator.stopInterface(true);
+                	 mediator.startInterface(true);
                  }
                  
             }

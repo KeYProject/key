@@ -14,13 +14,16 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.TacletFilter;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCut;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCutProcessor;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.PosTacletApp;
+import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 
 public class JoinProcessor implements Runnable{
@@ -30,7 +33,11 @@ public class JoinProcessor implements Runnable{
     private final ProspectivePartner partner;
     private final LinkedList<Listener> listeners = new LinkedList<Listener>();
     private static final String HIDE_RIGHT_TACLET = "hide_right";
-    public static final String SIMPLIFY_UPDATE = "simplifyIfThenElseUpdate";
+    private static final String OR_RIGHT_TACLET = "orRight";
+    public static final String SIMPLIFY_UPDATE [] =    {"simplifyIfThenElseUpdate1",
+    													"simplifyIfThenElseUpdate2",
+    													"simplifyIfThenElseUpdate3"};
+
 
 
     
@@ -72,7 +79,9 @@ public class JoinProcessor implements Runnable{
  
         Goal result = hide(cut.getRemainingGoal());
         
-        simplifyUpdate(result,cut);
+        result = simplifyUpdate(result,cut);
+        
+        orRight(result);
   
         for(Listener listener : listeners){
             listener.endOfJoining(cut.getGoalsAfterUncovering());
@@ -80,6 +89,13 @@ public class JoinProcessor implements Runnable{
     }
     
 
+    private void orRight(Goal goal){
+        SequentFormula sf =goal.sequent().succedent().get(0);
+        PosInOccurrence pio =new PosInOccurrence(sf,PosInTerm.TOP_LEVEL,false);
+        apply(new String[]{OR_RIGHT_TACLET}, goal, pio);
+  
+    }
+    
     
     private SequentFormula findFormula(Sequent sequent,Term content, boolean antecedent){
         for(SequentFormula sf : (antecedent ? sequent.antecedent() : sequent.succedent())){
@@ -90,27 +106,40 @@ public class JoinProcessor implements Runnable{
         return null;
     }
     
-    private void simplifyUpdate(Goal goal, DelayedCut cut){
+    private Goal simplifyUpdate(Goal goal, DelayedCut cut){
 
         SequentFormula sf = findFormula(goal.sequent(), cut.getFormula(), false);
         
         PosInOccurrence pio = new PosInOccurrence(sf,PosInTerm.TOP_LEVEL.down(0),false);
-        apply(SIMPLIFY_UPDATE, goal, pio);
+        Goal result = apply(SIMPLIFY_UPDATE, goal, pio).head();
+
+        return result == null ? goal : result;
     }
     
-    private ImmutableList<Goal> apply(final String tacletName,Goal goal, PosInOccurrence pio){
+    /**Applies one of the given taclets if this possible otherwise an exception is thrown.*/
+    private ImmutableList<Goal> apply(final String [] tacletNames,Goal goal, PosInOccurrence pio){
+    	
+
         TacletFilter filter = new TacletFilter() {
             
             @Override
             protected boolean filter(Taclet taclet) {
-                
-                return taclet.name().toString().equals(tacletName);
+                for(String tacletName : tacletNames){
+                	if( taclet.name().toString().equals(tacletName)){
+                		return true;
+                	}
+                }
+                return false;
             }
             
             
         };
         ImmutableList<NoPosTacletApp> apps =  goal.ruleAppIndex().getFindTaclet(filter,pio, services);
-        assert apps.size() == 1;
+        
+        if(apps.isEmpty()){
+        	return null;
+
+        }
         NoPosTacletApp app = apps.head();
         
         PosTacletApp app2 = app.setPosInOccurrence(pio, services);
@@ -119,10 +148,13 @@ public class JoinProcessor implements Runnable{
 
     
     private Goal hide(Goal goal){
+    	if(partner.getFormulaForHiding() == null){
+    		return goal;
+    	}
         int index = goal.sequent().formulaNumberInSequent(false,partner.getFormulaForHiding());
         PosInOccurrence pio = PosInOccurrence.findInSequent(goal.sequent(),
                 index, PosInTerm.TOP_LEVEL);
-        return apply(HIDE_RIGHT_TACLET, goal, pio).head();
+        return apply(new String [] {HIDE_RIGHT_TACLET}, goal, pio).head();
         
     }
     

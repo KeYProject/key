@@ -239,7 +239,7 @@ public class Recoder2KeYConverter {
 
         // if not in cache, search it - and fill the cache
         if (m == null) {
-            Class[] context = new Class[] { contextClass };
+            Class<?>[] context = new Class<?>[] { contextClass };
 
             // remember all superclasses for the cache
             LinkedList<Class<?>> l = new LinkedList<Class<?>>();
@@ -984,11 +984,12 @@ public class Recoder2KeYConverter {
 
         Sort heapSort = rec2key.getTypeConverter().getTypeConverter().getHeapLDT() == null
                             ? Sort.ANY
-                            : rec2key.getTypeConverter().getTypeConverter().getHeapLDT().targetSort();        
+                            : rec2key.getTypeConverter().getTypeConverter().getHeapLDT().targetSort();    
+        final KeYJavaType containerKJT = getKeYJavaType(cont);
         ProgramMethod result 
         	= new ProgramMethod(consDecl,
-        			    getKeYJavaType(cont), 
-        			    getKeYJavaType(cd.getReturnType()),
+        			    containerKJT, 
+        			    KeYJavaType.VOID_TYPE,
         			    positionInfo(cd),
         			    heapSort);
         insertToMap(cd, result);
@@ -1008,8 +1009,9 @@ public class Recoder2KeYConverter {
         Sort heapSort = rec2key.getTypeConverter().getTypeConverter().getHeapLDT() == null
                             ? Sort.ANY
                             : rec2key.getTypeConverter().getTypeConverter().getHeapLDT().targetSort();        
+        final KeYJavaType containerKJT = getKeYJavaType(cont);
         ProgramMethod result = new ProgramMethod(consDecl,
-                getKeYJavaType(cont), getKeYJavaType(dc.getReturnType()),
+                containerKJT, KeYJavaType.VOID_TYPE,
                 PositionInfo.UNDEFINED,
                 heapSort);
         insertToMap(dc, result);
@@ -1149,9 +1151,14 @@ public class Recoder2KeYConverter {
             Sort heapSort = rec2key.getTypeConverter().getTypeConverter().getHeapLDT() == null
                             ? Sort.ANY
                             : rec2key.getTypeConverter().getTypeConverter().getHeapLDT().targetSort();
+            final KeYJavaType containerType = getKeYJavaType(cont);
+            assert containerType != null;
+            final Type returnType = md.getReturnType();
+            // may be null for a void method
+            final KeYJavaType returnKJT = returnType==null? KeYJavaType.VOID_TYPE : getKeYJavaType(returnType);
             result = new ProgramMethod(methDecl, 
-        	    		       getKeYJavaType(cont),
-                    		       getKeYJavaType(md.getReturnType()), positionInfo(md),
+        	    		       containerType,
+                    		       returnKJT, positionInfo(md),
                     		       heapSort);
 
             insertToMap(md, result);

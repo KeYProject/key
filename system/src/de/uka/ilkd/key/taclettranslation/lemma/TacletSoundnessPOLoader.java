@@ -211,7 +211,7 @@ public class TacletSoundnessPOLoader {
                         collectionOfTacletInfo
                                         .add(new TacletInfo(taclet, treeSet
                                                         .contains(taclet),
-                                                        check(taclet)));
+                                                        loadAsLemmata ? check(taclet) : false));
                 }
                 return collectionOfTacletInfo;
         }

@@ -284,7 +284,10 @@ public final class JMLSpecExtractor implements SpecExtractor {
         	    } else if (c instanceof TextualJMLClassAxiom){
         		ClassAxiom ax = jsf.createJMLClassAxiom(kjt, (TextualJMLClassAxiom)c);
         		result = result.add(ax);
-        	    } // else might be some other specification
+        	    } else {
+        	        // DO NOTHING
+        	        // There may be ohter kinds of JML constructs which are not specifications.
+        	    }
         	} catch (SLWarningException e) {
         	    warnings = warnings.add(e.getWarning());
         	}
@@ -307,6 +310,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
         String fileName = td.getPositionInfo().getFileName();
 
         //determine purity
+        final boolean isStrictlyPure = JMLInfoExtractor.isStrictlyPure(pm);
         final boolean isPure = JMLInfoExtractor.isPure(pm);
         final boolean isHelper = JMLInfoExtractor.isHelper(pm);
 
@@ -344,8 +348,10 @@ public final class JMLSpecExtractor implements SpecExtractor {
             TextualJMLSpecCase specCase 
             = (TextualJMLSpecCase) constructsArray[i];
 
-            //add purity
-            if(isPure) {
+            //add purity. Strict purity overrides purity.
+            if(isStrictlyPure) {
+                specCase.addAssignable(new PositionedString("assignable \\less_than_nothing"));
+            } else if(isPure) {
                 specCase.addAssignable(new PositionedString("assignable \\nothing"));
             }
 
@@ -380,9 +386,9 @@ public final class JMLSpecExtractor implements SpecExtractor {
             }
 
             //add non-null postcondition
-            KeYJavaType resultType = pm.getKeYJavaType();
+            KeYJavaType resultType = pm.getReturnType();
 
-            if(resultType != null &&
+            if(!pm.isVoid() && !pm.isConstructor() &&
                     !JMLInfoExtractor.resultIsNullable(pm) &&
                     specCase.getBehavior() != Behavior.EXCEPTIONAL_BEHAVIOR) {
                 final ImmutableSet<PositionedString> resultNonNull = 

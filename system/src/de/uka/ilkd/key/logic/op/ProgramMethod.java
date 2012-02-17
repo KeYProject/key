@@ -21,7 +21,6 @@ import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeRef;
-import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.ProgramInLogic;
@@ -40,8 +39,9 @@ public final class ProgramMethod extends ObserverFunction
     			  	 implements SourceElement, ProgramElement, 
     			  	            MemberDeclaration, ProgramInLogic {
 
-    private final MethodDeclaration method; 
-    private final KeYJavaType kjt;
+    private final MethodDeclaration method;
+    /** Return type of the method. Must not be null. Use KeYJavaType.VOID_TYPE for void methods. */
+    private final KeYJavaType returnType;
     private final PositionInfo pi;
     
     
@@ -56,14 +56,14 @@ public final class ProgramMethod extends ObserverFunction
                          PositionInfo pi,
                          Sort heapSort) {
         super(method.getProgramElementName().toString(), 
-              kjt == null ? Sort.ANY : kjt.getSort(),
+              kjt.getSort(),
               kjt,
               heapSort,
               container,
               method.isStatic(),
-              getParamTypes(method)); 
-	this.method  = method;;
-	this.kjt     = kjt;
+              getParamTypes(method));
+        this.method  = method;
+        this.returnType     = kjt;
         this.pi      = pi;
     }
     
@@ -231,6 +231,10 @@ public final class ProgramMethod extends ObserverFunction
 	return method.isStrictFp();
     }
     
+    public boolean isVoid(){
+        return returnType == KeYJavaType.VOID_TYPE && !isConstructor();
+    }
+    
     @Override
     public ImmutableArray<Modifier> getModifiers(){
 	return method.getModifiers();
@@ -258,9 +262,17 @@ public final class ProgramMethod extends ObserverFunction
 
 	return method==((ProgramMethod)se).getMethodDeclaration();
     }
+    
+    @Deprecated
+    public KeYJavaType getKJT(){
+        return returnType;
+    }
 
-    public KeYJavaType getKeYJavaType() {
-	return kjt;
+    /**
+     * @return the return type
+     */
+    public KeYJavaType getReturnType() {
+        return returnType;
     }
 
     @Override
@@ -306,10 +318,6 @@ public final class ProgramMethod extends ObserverFunction
 
     public boolean isSynchronized() {
     	return getMethodDeclaration().isSynchronized();
-    }
-    
-    public TypeReference getTypeReference() {
-    	return getMethodDeclaration().getTypeReference();
     }
     
     public Throws getThrown() {

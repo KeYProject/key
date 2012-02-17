@@ -221,6 +221,7 @@ modifier returns [String result = null]:
     |   pro:PROTECTED           { result = pro.getText(); }
     |   pub:PUBLIC              { result = pub.getText(); }
     |   pur:PURE                { result = pur.getText(); }
+    |   stp:STRICTLY_PURE       { result = stp.getText(); }
     |   spr:SPEC_PROTECTED      { result = spr.getText(); }
     |   spu:SPEC_PUBLIC         { result = spu.getText(); }
     |   sta:STATIC              { result = sta.getText(); }

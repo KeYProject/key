@@ -11,10 +11,13 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.TacletFilter;
+import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.BuiltInRuleApp;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
@@ -22,6 +25,7 @@ import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
     
 /**
  * This class is responsible for processing the delayed cut. The information about the cut 
@@ -123,7 +127,7 @@ public class DelayedCutProcessor implements Runnable {
                   
          // rebuild the tree that has been pruned before.
          List<Goal> openLeaves = rebuildSubTrees(delayedCut, result.head());
- 
+     
          // uncover the decision predicate.
          uncoverDecisionPredicate(delayedCut, openLeaves);
      
@@ -256,8 +260,8 @@ public class DelayedCutProcessor implements Runnable {
         LinkedList<NodeGoalPair> pairs = new LinkedList<NodeGoalPair>();
         LinkedList<Goal>  openLeaves = new LinkedList<Goal>();
  
-        add(pairs,new LinkedList<Goal>(),cut.getSubtrees().iterator(),
-        		  apply(goal,cut.getFirstAppliedRuleApp()));
+        add(pairs,openLeaves,cut.getSubtrees().iterator(),
+        		  apply(cut.getNode(),goal,cut.getFirstAppliedRuleApp(),cut.getServices()));
 
         int totalNumber = 0;
         for(NodeGoalPair pair : pairs){
@@ -273,10 +277,10 @@ public class DelayedCutProcessor implements Runnable {
                     cut.getServices());
          
      
-            
+           
             totalNumber -= add(pairs,openLeaves,pair.node.childrenIterator(),
-                   apply(pair.goal,app));
- 
+                   apply(pair.node,pair.goal,app,cut.getServices()));
+          
 
             for(DelayedCutListener listener : listeners){
                 listener.eventRebuildingTree(++currentNumber, totalNumber);
@@ -296,9 +300,25 @@ public class DelayedCutProcessor implements Runnable {
      * @param app
      * @return
      */
-    private LinkedList<Goal> apply(Goal goal, RuleApp app){
+    private LinkedList<Goal> apply(Goal goal, RuleApp app, Services services){
+        if(app instanceof TacletApp){
+        	TacletApp tapp = (TacletApp) app;
+        	final SVInstantiations insts = tapp.instantiations();
+        	final Iterator<SchemaVariable> svIt = insts.svIterator();
+        	while(svIt.hasNext()) {
+        	    final SchemaVariable sv = svIt.next();
+        	    if(sv instanceof SkolemTermSV) {
+        		final Term inst = (Term) insts.getInstantiation(sv);
+        		   		 services.getNamespaces().functions().remove(inst.op().name());
+        	    }
+        	}
+        }
+
+    	
         LinkedList<Goal> goals = new LinkedList<Goal>();
         ImmutableList<Goal> childs =  goal.apply(app);
+        
+
         // if the rule is a SMT rule, <code>childs</code> can be null.
         //if(childs == null){
         //	return goals;
@@ -307,6 +327,14 @@ public class DelayedCutProcessor implements Runnable {
         	goals.addFirst(child);
         }
         return goals;
+    }
+    
+    private LinkedList<Goal> apply(Node oldNode, Goal goal, RuleApp app, Services services){
+    	 try{
+    		return apply(goal, app, services);
+    	}catch(Throwable e){
+    		throw new RuntimeException("Problem with replaying node "+oldNode.serialNr(), e);
+    	}
     }
     
     /**
@@ -318,6 +346,11 @@ public class DelayedCutProcessor implements Runnable {
         
         
         PosInOccurrence newPos = translate(pair,services);
+        try{
+        check(pair.goal,oldRuleApp,newPos,services);
+        }catch(Throwable e){
+        	throw new RuntimeException("Problem with replaying node " + pair.node.serialNr(),e);
+        }
 
         if(oldRuleApp instanceof PosTacletApp){
             PosTacletApp app = (PosTacletApp) oldRuleApp; 
@@ -329,10 +362,56 @@ public class DelayedCutProcessor implements Runnable {
 
         if(oldRuleApp instanceof BuiltInRuleApp){
             BuiltInRuleApp app = (BuiltInRuleApp) oldRuleApp;
-            return new BuiltInRuleApp(app.rule(), translate(pair,services), app.ifInsts());
+            return new BuiltInRuleApp(app.rule(),newPos, app.ifInsts());
         }
+        
         return oldRuleApp;
         
+    }
+    
+    private void check(Goal goal,final RuleApp app, PosInOccurrence newPos, Services services){
+        if(newPos == null){
+            return;
+        }
+    	if(app instanceof BuiltInRuleApp){
+    		BuiltInRule rule = (BuiltInRule) app.rule();
+    		if(rule.isApplicable(goal, newPos)){
+    			return;
+    		}
+//    		for(RuleApp newApp: goal.ruleAppIndex().getBuiltInRules(goal, newPos)){
+//    			if(app.rule().name().compareTo(newApp.rule().name()) == 0){
+//    				return;
+//    			}    			
+//    		}
+//  
+    		throw new RuntimeException("Cannot apply built-in rule-app");
+    		
+    	}
+    	
+    	if(app instanceof TacletApp){
+    		NoPosTacletApp noPosApp = NoPosTacletApp.createNoPosTacletApp((Taclet)app.rule());
+    		if(noPosApp.matchFind(newPos, services) == null){
+
+        		throw new RuntimeException("Cannot apply taclet-app");
+    		}
+    		return;
+//    		ImmutableList<TacletApp> list = goal.ruleAppIndex().getTacletAppAt(new TacletFilter() {
+//			
+//			@Override
+//			protected boolean filter(Taclet taclet) {			
+//				return taclet.name().compareTo(app.rule().name()) == 0;
+//			}
+//    		}, newPos, services);
+//    
+//    	    if(!list.isEmpty()){
+//    	    	return;
+//    	    }
+//
+//    		throw new RuntimeException("Cannot apply taclet-app");
+    	}
+    	
+    	throw new RuntimeException("App is neither a BuiltInApp nor a TacletApp, it's  of type"+app.getClass().getName());
+    	
     }
     
     

@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.proof.delayedcut;
 
-import java.util.LinkedList;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;

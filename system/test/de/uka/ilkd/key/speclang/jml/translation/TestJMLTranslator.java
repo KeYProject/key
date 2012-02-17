@@ -80,7 +80,7 @@ public class TestJMLTranslator extends TestCase {
     protected ProgramVariable buildResultVar(ProgramMethod pm) {
         ProgramElementName resPEN = new ProgramElementName("result");
         ProgramVariable result = new LocationVariable(resPEN,
-                                                      pm.getKeYJavaType());
+                                                      pm.getReturnType());
         return result;
     }
 

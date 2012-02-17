@@ -223,7 +223,7 @@ public class MethodDeclaration extends JavaDeclaration
         if (returnType != null && index == 0) {
             return returnType;
         }
-        throw new ArrayIndexOutOfBoundsException();
+        throw new IndexOutOfBoundsException();
     }
 
     
@@ -238,7 +238,7 @@ public class MethodDeclaration extends JavaDeclaration
         if (parameters != null) {
             return parameters.get(index);
         }
-        throw new ArrayIndexOutOfBoundsException();
+        throw new IndexOutOfBoundsException();
     }
 
     
