@@ -58,7 +58,7 @@ public class Activator extends AbstractUIPlugin {
                                                    keyExampleFile, 
                                                    exampleDir);
         }
-        Main.evaluateOptions(new String[] { "EXAMPLES", exampleDir });
+        Main.evaluateOptions(new String[] { "EXAMPLES\" \"" + exampleDir}); // " " is a workaround for the buggy evaluation of start parameters
     }
 
     /*
