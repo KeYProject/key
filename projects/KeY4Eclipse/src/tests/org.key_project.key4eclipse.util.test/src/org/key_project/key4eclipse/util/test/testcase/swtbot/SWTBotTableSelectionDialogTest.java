@@ -53,18 +53,21 @@ public class SWTBotTableSelectionDialogTest extends TestCase {
         IContentProvider contentProvider = ArrayContentProvider.getInstance();
         ILabelProvider labelProvider = new ArrayObjectLabelProvider();
         ElementTableSelectionDialog dialog = new ElementTableSelectionDialog(parent, contentProvider, labelProvider);
-        dialog.setTitle("SWTBotTableSelectionDialogTest");
-        dialog.setMessage("testSignleSelectionResult");
+        dialog.setTitle("SWTBotTableSelectionDialogTest_testMultiSelectionResult");
         dialog.setInput(input);
         dialog.setAllowMultiple(true);
         // Open dialog again and approve it
-        openDialog(dialog, new int[] {1}, ElementTableSelectionDialog.OK, o2);
+        dialog.setMessage("testSignleSelectionResult 1");
+        openDialog(dialog, "SWTBotTableSelectionDialogTest_testMultiSelectionResult", "testSignleSelectionResult 1", new int[] {1}, ElementTableSelectionDialog.OK, o2);
         // Open dialog and cancel it
-        openDialog(dialog, new int[] {1}, ElementTableSelectionDialog.CANCEL);
+        dialog.setMessage("testSignleSelectionResult 2");
+        openDialog(dialog, "SWTBotTableSelectionDialogTest_testMultiSelectionResult", "testSignleSelectionResult 2", new int[] {1}, ElementTableSelectionDialog.CANCEL);
         // Open dialog with multiple selections and approve it
-        openDialog(dialog, new int[] {1, 3}, ElementTableSelectionDialog.OK, o2, o4);
+        dialog.setMessage("testSignleSelectionResult 3");
+        openDialog(dialog, "SWTBotTableSelectionDialogTest_testMultiSelectionResult", "testSignleSelectionResult 3", new int[] {1, 3}, ElementTableSelectionDialog.OK, o2, o4);
         // Open dialog with multiple selections and cancel it
-        openDialog(dialog, new int[] {1, 3}, ElementTableSelectionDialog.CANCEL);
+        dialog.setMessage("testSignleSelectionResult 4");
+        openDialog(dialog, "SWTBotTableSelectionDialogTest_testMultiSelectionResult", "testSignleSelectionResult 4", new int[] {1, 3}, ElementTableSelectionDialog.CANCEL);
     }
     
     /**
@@ -91,16 +94,18 @@ public class SWTBotTableSelectionDialogTest extends TestCase {
         IContentProvider contentProvider = ArrayContentProvider.getInstance();
         ILabelProvider labelProvider = new ArrayObjectLabelProvider();
         ElementTableSelectionDialog dialog = new ElementTableSelectionDialog(parent, contentProvider, labelProvider);
-        dialog.setTitle("SWTBotTableSelectionDialogTest");
-        dialog.setMessage("testSignleSelectionResult");
+        dialog.setTitle("SWTBotTableSelectionDialogTest_testSignleSelectionResult");
         dialog.setInput(input);
         // Open dialog again and approve it
-        openDialog(dialog, new int[] {1}, ElementTableSelectionDialog.OK, o2);
+        dialog.setMessage("testSignleSelectionResult 1");
+        openDialog(dialog, "SWTBotTableSelectionDialogTest_testSignleSelectionResult", "testSignleSelectionResult 1", new int[] {1}, ElementTableSelectionDialog.OK, o2);
         // Open dialog and cancel it
-        openDialog(dialog, new int[] {1}, ElementTableSelectionDialog.CANCEL);
+        dialog.setMessage("testSignleSelectionResult 2");
+        openDialog(dialog, "SWTBotTableSelectionDialogTest_testSignleSelectionResult", "testSignleSelectionResult 2", new int[] {1}, ElementTableSelectionDialog.CANCEL);
         // Make sure that multiple selections are not possible
         try {
-            openDialog(dialog, new int[] {1, 2}, ElementTableSelectionDialog.OK);
+            dialog.setMessage("testSignleSelectionResult 3");
+            openDialog(dialog, "SWTBotTableSelectionDialogTest_testSignleSelectionResult", "testSignleSelectionResult 3", new int[] {1, 2}, ElementTableSelectionDialog.OK);
         }
         catch (IllegalArgumentException e) {
             assertEquals("Table does not support multi selection.", e.getMessage());
@@ -111,50 +116,62 @@ public class SWTBotTableSelectionDialogTest extends TestCase {
      * Opens the given {@link ElementTableSelectionDialog} and makes sure
      * that the correct result is returned.
      * @param dialog The {@link ElementTableSelectionDialog} to open.
+     * @param dialogTitle The dialog title to use.
+     * @param dialogMessage The expected dialog message.
      * @param indicesToSelect The rows to select.
      * @param expectedDialogResult The expected dialog result.
      * @param expectedSelection The expected selection.
      */
     protected void openDialog(final ElementTableSelectionDialog dialog,
+                              String dialogTitle,
+                              String dialogMessage,
                               int[] indicesToSelect,
                               int expectedDialogResult,
                               Object... expectedSelection) {
-        // Open dialog
-        IRunnableWithResult<Integer> run = new AbstractRunnableWithResult<Integer>() {
-            @Override
-            public void run() {
-                setResult(dialog.open());
+        SWTBotShell shell = null;
+        try {
+            // Open dialog
+            IRunnableWithResult<Integer> run = new AbstractRunnableWithResult<Integer>() {
+                @Override
+                public void run() {
+                    setResult(dialog.open());
+                }
+            };
+            Display.getDefault().asyncExec(run);
+            // Get dialog
+            SWTBot bot = new SWTBot();
+            shell = bot.shell(dialogTitle);
+            // Test label
+            SWTBotLabel label = shell.bot().label(dialogMessage);
+            assertEquals(dialogMessage, label.getText());
+            // Make sure that the correct values are shown
+            SWTBotTable table = shell.bot().table();
+            TestUtilsUtil.assertTableRows(table, "o1", "o2", "o3", "o4");
+            // Select second item
+            table.select(indicesToSelect);
+            // Approve dialog
+            SWTBotButton button = shell.bot().button(ElementTableSelectionDialog.OK == expectedDialogResult ? "OK" : "Cancel");
+            button.click();
+            assertFalse(shell.isOpen());
+            Integer dialogResult = run.getResult();
+            assertNotNull(dialogResult);
+            assertEquals(expectedDialogResult, dialogResult.intValue());
+            if (expectedSelection.length >= 1) {
+                assertEquals(expectedSelection[0], dialog.getFirstResult());
             }
-        };
-        Display.getDefault().asyncExec(run);
-        // Get dialog
-        SWTBot bot = new SWTBot();
-        SWTBotShell shell = bot.shell("SWTBotTableSelectionDialogTest");
-        // Test label
-        SWTBotLabel label = shell.bot().label("testSignleSelectionResult");
-        assertEquals("testSignleSelectionResult", label.getText());
-        // Make sure that the correct values are shown
-        SWTBotTable table = shell.bot().table();
-        TestUtilsUtil.assertTableRows(table, "o1", "o2", "o3", "o4");
-        // Select second item
-        table.select(indicesToSelect);
-        // Approve dialog
-        SWTBotButton okButton = shell.bot().button(ElementTableSelectionDialog.OK == expectedDialogResult ? "OK" : "Cancel");
-        okButton.click();
-        assertFalse(shell.isOpen());
-        Integer dialogResult = run.getResult();
-        assertNotNull(dialogResult);
-        assertEquals(expectedDialogResult, dialogResult.intValue());
-        if (expectedSelection.length >= 1) {
-            assertEquals(expectedSelection[0], dialog.getFirstResult());
+            else {
+                assertNull(dialog.getFirstResult());
+            }
+            assertNotNull(dialog.getResult());
+            assertEquals(expectedSelection.length, dialog.getResult().length);
+            for (int i = 0; i < expectedSelection.length; i++) {
+                assertEquals(expectedSelection[i], dialog.getResult()[i]);
+            }
         }
-        else {
-            assertNull(dialog.getFirstResult());
-        }
-        assertNotNull(dialog.getResult());
-        assertEquals(expectedSelection.length, dialog.getResult().length);
-        for (int i = 0; i < expectedSelection.length; i++) {
-            assertEquals(expectedSelection[i], dialog.getResult()[i]);
+        finally {
+            if (shell != null && shell.isOpen()) {
+                shell.close();
+            }
         }
     }
 }
