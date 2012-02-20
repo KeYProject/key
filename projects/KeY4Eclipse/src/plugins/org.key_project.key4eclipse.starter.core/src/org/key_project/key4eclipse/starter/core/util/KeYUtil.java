@@ -21,7 +21,6 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.key_project.key4eclipse.starter.core.job.AbstractKeYMainWindowJob;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.util.eclipse.ResourceUtil;
-import org.key_project.key4eclipse.util.java.StringUtil;
 import org.key_project.key4eclipse.util.java.SwingUtil;
 import org.key_project.key4eclipse.util.java.thread.AbstractRunnableWithException;
 import org.key_project.key4eclipse.util.java.thread.AbstractRunnableWithResult;
@@ -131,7 +130,7 @@ public final class KeYUtil {
         SwingUtil.invokeAndWait(new Runnable() {
             @Override
             public void run() {
-                Main.main(new String[] {StringUtil.EMPTY_STRING}); // Empty String is a workaround for the buggy evaluation of start parameters
+                Main.main(new String[] {});
             }
         });
     }
