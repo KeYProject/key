@@ -1050,8 +1050,8 @@ public class KeyConnection extends MemoryConnection {
       else {
          result.setVisibility(DSVisibility.DEFAULT);
       }
-      if (method.getTypeReference() != null) {
-         String returnType = getTypeName(method.getTypeReference(), DSPackageManagement.NO_PACKAGES);
+      if (method.getMethodDeclaration() != null && method.getMethodDeclaration().getTypeReference() != null) {
+         String returnType = getTypeName(method.getMethodDeclaration().getTypeReference(), DSPackageManagement.NO_PACKAGES);
          result.setReturnType(returnType);
       }
       else {
