@@ -104,18 +104,9 @@ public class Main {
     }
 
     public static void evaluateOptions(String[] opt) {
- 	    //All arguments are passed as one single string in opt[0] that has to be splitted. 
-    	//String may be empty if no arguments are passed 
-    	if(opt[0].equals("") && opt.length==1){
-    		opt = new String[0]; 
-    	}else{
-    		opt = opt[0].split("\" \"");
-    	}
         int index = 0;
         ProofSettings.DEFAULT_SETTINGS.setProfile(new JavaProfile());
         while (opt.length > index) {
-        	opt[index]=opt[index].replaceAll("\"", "");
-        	opt[index]=opt[index].trim();
             if ((new File(opt[index])).exists()) {
                 fileNameOnStartUp=opt[index];
             } else {
