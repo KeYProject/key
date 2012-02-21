@@ -220,6 +220,7 @@ public class SWTBotJavaPackageSettingControlTest extends TestCase {
            assertNull(TestDataSourceUIUtil.getValueThreadSave(settingControl, control));
            botShell.bot().button().click();
            SWTBotShell selectShell = botShell.bot().shell("Select package");
+           selectShell.bot().text().setText(packageB.getElementName()); // Filter the table entries, required in tests if scroll bars are used.
            selectShell.bot().table().select(packageB.getElementName());
            selectShell.bot().button("OK").click();
            assertNull(TestDataSourceUIUtil.getValidationMessageThreadSave(settingControl, control));
@@ -402,16 +403,15 @@ public class SWTBotJavaPackageSettingControlTest extends TestCase {
            // Select package a
            clickButton.click();
            SWTBotShell selectShell = botShell.bot().shell("Select package");
+           selectShell.bot().text().setText(packageA.getElementName()); // Filter the table entries, required in tests if scroll bars are used.
            selectShell.bot().table().select(packageA.getElementName());
            selectShell.bot().button("OK").click();
            assertEquals(getExpectedPackage(packageA), TestDataSourceUIUtil.getValueThreadSave(settingControl, control));
            assertEquals(packageA.getElementName(), pathText.getText());
-           // Select package b, package a must be preselected
+           // Select package b, package a must be preselected (not testable)
            clickButton.click();
            selectShell = botShell.bot().shell("Select package");
-           TableCollection selection = selectShell.bot().table().selection();
-           assertEquals(1, selection.rowCount());
-//           assertEquals(packageA.getElementName(), selection.get(0).get(0)); // Checking the selected element doesn't work.
+           selectShell.bot().text().setText(packageB.getElementName()); // Filter the table entries, required in tests if scroll bars are used.
            selectShell.bot().table().select(packageB.getElementName());
            selectShell.bot().button("OK").click();
            assertEquals(getExpectedPackage(packageB), TestDataSourceUIUtil.getValueThreadSave(settingControl, control));
@@ -758,6 +758,7 @@ public class SWTBotJavaPackageSettingControlTest extends TestCase {
                 }
                 clickButton.click();
                 SWTBotShell selectShell = botShell.bot().shell("Select package");
+                selectShell.bot().text().setText(((IJavaElement)toSet).getElementName()); // Filter the table entries, required in tests if scroll bars are used.
                 selectShell.bot().table().select(((IJavaElement)toSet).getElementName());
                 selectShell.bot().button("OK").click();
              }
