@@ -221,7 +221,7 @@ public class JavaPackageSettingControl extends AbstractSettingControl {
          openSelectDirectoryDialog();
       }
       else if (lastButton.equals(packageButton)) {
-         openSelectPackageDialog();
+         openSelectPackageButton();
       }
       else {
          openSelectResourceDialog();
@@ -231,10 +231,10 @@ public class JavaPackageSettingControl extends AbstractSettingControl {
    /**
     * Opens the select package dialog.
     */
-   protected void openSelectPackageDialog() {
+   protected void openSelectPackageButton() {
       try {
          IJavaElement[] packages = JDTUtil.getAllPackageFragmentRoot();
-         ElementListSelectionDialog dialog = new ElementListSelectionDialog(text.getShell(), new JavaElementLabelProvider(JavaElementLabelProvider.SHOW_DEFAULT));
+         ElementListSelectionDialog dialog= new ElementListSelectionDialog(text.getShell(), new JavaElementLabelProvider(JavaElementLabelProvider.SHOW_DEFAULT));
          dialog.setIgnoreCase(false);
          dialog.setTitle("Select package");
          dialog.setMessage("&Choose a package:");

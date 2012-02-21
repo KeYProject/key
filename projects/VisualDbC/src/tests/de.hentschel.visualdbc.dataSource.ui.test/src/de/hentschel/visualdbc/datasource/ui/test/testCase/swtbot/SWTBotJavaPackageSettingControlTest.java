@@ -35,12 +35,10 @@ import org.eclipse.swtbot.swt.finder.utils.TableCollection;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotRadio;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.junit.Test;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.eclipse.ResourceUtil;
-import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithResult;
 import org.key_project.util.java.thread.IRunnableWithResult;
 import org.key_project.util.jdt.JDTUtil;
@@ -164,10 +162,6 @@ public class SWTBotJavaPackageSettingControlTest extends TestCase {
        assertNotNull(packageA);
        IPackageFragment packageB = defaultPackage.getPackageFragment("sWTBotJavaPackageSettingControlTestB");
        assertNotNull(packageB);
-       // Test listed packages
-       IJavaElement[] packages = JDTUtil.getAllPackageFragmentRoot();
-       assertTrue(ArrayUtil.toString(packages), ArrayUtil.contains(packages, packageA));
-       assertTrue(ArrayUtil.toString(packages), ArrayUtil.contains(packages, packageB));
        // Create control
        final ISettingControl settingControl = SettingControlUtil.createSettingControl(getControlId());
        assertNotNull(settingControl);
