@@ -2,10 +2,10 @@ package org.key_project.automaticverifier.product.ui.model;
 
 import org.eclipse.core.runtime.Assert;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
-import org.key_project.key4eclipse.util.bean.Bean;
-import org.key_project.key4eclipse.util.java.SwingUtil;
-import org.key_project.key4eclipse.util.java.thread.AbstractRunnableWithResult;
-import org.key_project.key4eclipse.util.java.thread.IRunnableWithResult;
+import org.key_project.util.bean.Bean;
+import org.key_project.util.java.SwingUtil;
+import org.key_project.util.java.thread.AbstractRunnableWithResult;
+import org.key_project.util.java.thread.IRunnableWithResult;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.notification.NotificationEventID;

@@ -17,8 +17,8 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.junit.Test;
-import org.key_project.key4eclipse.util.java.CollectionUtil;
-import org.key_project.key4eclipse.util.test.util.TestUtilsUtil.MethodTreatment;
+import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.test.util.TestUtilsUtil.MethodTreatment;
 
 import de.hentschel.visualdbc.datasource.key.model.KeyConnection;
 import de.hentschel.visualdbc.datasource.key.model.KeyOperationContract;

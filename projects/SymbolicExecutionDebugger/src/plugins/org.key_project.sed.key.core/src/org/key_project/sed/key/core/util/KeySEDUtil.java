@@ -14,12 +14,12 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.key_project.key4eclipse.util.java.CollectionUtil;
-import org.key_project.key4eclipse.util.java.IFilter;
-import org.key_project.key4eclipse.util.java.ObjectUtil;
-import org.key_project.key4eclipse.util.java.StringUtil;
-import org.key_project.key4eclipse.util.jdt.JDTUtil;
 import org.key_project.sed.core.util.LaunchUtil;
+import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.IFilter;
+import org.key_project.util.java.ObjectUtil;
+import org.key_project.util.java.StringUtil;
+import org.key_project.util.jdt.JDTUtil;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;

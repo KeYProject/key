@@ -1,6 +1,6 @@
 package org.key_project.automaticverifier.product.ui.model;
 
-import org.key_project.key4eclipse.util.java.StringUtil;
+import org.key_project.util.java.StringUtil;
 
 /**
  * Represents an automatic proof result.

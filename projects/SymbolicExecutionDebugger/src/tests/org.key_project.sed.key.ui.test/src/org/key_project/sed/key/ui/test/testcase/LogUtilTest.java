@@ -3,8 +3,8 @@ package org.key_project.sed.key.ui.test.testcase;
 import junit.framework.TestCase;
 
 import org.junit.Test;
-import org.key_project.key4eclipse.util.eclipse.Logger;
 import org.key_project.sed.key.ui.util.LogUtil;
+import org.key_project.util.eclipse.Logger;
 
 /**
  * Contains tests for {@link LogUtil}

@@ -16,7 +16,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.jdt.debug.ui;bundle-version="3.6.1",
  org.eclipse.jface.text;bundle-version="3.7.1",
  org.key_project.key4eclipse;bundle-version="1.0.0",
- org.key_project.key4eclipse.util;bundle-version="1.0.0",
+ org.key_project.util;bundle-version="1.0.0",
  org.key_project.key4eclipse.starter.core;bundle-version="1.0.0",
  org.key_project.sed.core;bundle-version="1.0.0",
  org.key_project.sed.ui;bundle-version="1.0.0"

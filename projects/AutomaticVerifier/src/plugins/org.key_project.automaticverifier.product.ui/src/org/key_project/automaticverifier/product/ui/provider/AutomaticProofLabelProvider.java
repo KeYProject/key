@@ -11,7 +11,7 @@ import org.eclipse.jface.viewers.LabelProviderChangedEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.key_project.automaticverifier.product.ui.model.AutomaticProof;
-import org.key_project.key4eclipse.util.java.StringUtil;
+import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.proof.Proof;
 

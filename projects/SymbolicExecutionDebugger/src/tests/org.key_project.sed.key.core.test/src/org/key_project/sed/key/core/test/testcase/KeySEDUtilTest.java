@@ -14,11 +14,11 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.Signature;
 import org.junit.Test;
-import org.key_project.key4eclipse.util.eclipse.BundleUtil;
-import org.key_project.key4eclipse.util.java.StringUtil;
-import org.key_project.key4eclipse.util.test.util.TestUtilsUtil;
 import org.key_project.sed.key.core.test.Activator;
 import org.key_project.sed.key.core.util.KeySEDUtil;
+import org.key_project.util.eclipse.BundleUtil;
+import org.key_project.util.java.StringUtil;
+import org.key_project.util.test.util.TestUtilsUtil;
 
 /**
  * Tests for {@link KeySEDUtil}.

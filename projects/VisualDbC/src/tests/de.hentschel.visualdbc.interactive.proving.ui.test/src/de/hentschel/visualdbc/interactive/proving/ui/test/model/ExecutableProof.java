@@ -14,7 +14,7 @@ package de.hentschel.visualdbc.interactive.proving.ui.test.model;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.key_project.key4eclipse.util.java.CollectionUtil;
+import org.key_project.util.java.CollectionUtil;
 
 import de.hentschel.visualdbc.datasource.model.IDSProof;
 import de.hentschel.visualdbc.datasource.model.IDSProvableReference;

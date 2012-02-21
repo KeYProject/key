@@ -10,10 +10,10 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.jdt.core.search.SearchEngine;
-import org.key_project.key4eclipse.util.eclipse.BundleUtil;
-import org.key_project.key4eclipse.util.test.util.TestUtilsUtil;
 import org.key_project.sed.key.ui.jdt.AllTypesSearchEngine;
 import org.key_project.sed.key.ui.test.Activator;
+import org.key_project.util.eclipse.BundleUtil;
+import org.key_project.util.test.util.TestUtilsUtil;
 
 /**
  * Tests for {@link AllTypesSearchEngine}

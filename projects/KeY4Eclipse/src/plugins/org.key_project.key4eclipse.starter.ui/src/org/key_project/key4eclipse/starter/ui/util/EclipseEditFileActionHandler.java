@@ -6,8 +6,8 @@ import java.io.IOException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.swt.widgets.Display;
-import org.key_project.key4eclipse.util.eclipse.ResourceUtil;
-import org.key_project.key4eclipse.util.eclipse.WorkbenchUtil;
+import org.key_project.util.eclipse.ResourceUtil;
+import org.key_project.util.eclipse.WorkbenchUtil;
 
 import de.uka.ilkd.key.gui.actions.EditMostRecentFileAction.EditFileActionHandler;
 

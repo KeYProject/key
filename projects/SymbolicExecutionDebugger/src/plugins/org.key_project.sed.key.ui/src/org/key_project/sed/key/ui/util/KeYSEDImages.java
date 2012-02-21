@@ -5,8 +5,8 @@ import java.io.InputStream;
 
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
-import org.key_project.key4eclipse.util.eclipse.BundleUtil;
 import org.key_project.sed.key.ui.Activator;
+import org.key_project.util.eclipse.BundleUtil;
 
 /**
  * <p>

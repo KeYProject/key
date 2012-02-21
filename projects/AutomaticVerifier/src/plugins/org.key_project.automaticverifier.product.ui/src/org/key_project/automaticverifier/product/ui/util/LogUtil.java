@@ -1,7 +1,7 @@
 package org.key_project.automaticverifier.product.ui.util;
 
 import org.key_project.automaticverifier.product.ui.Activator;
-import org.key_project.key4eclipse.util.eclipse.Logger;
+import org.key_project.util.eclipse.Logger;
 
 /**
  * Provides static methods for logging.

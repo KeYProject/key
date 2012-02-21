@@ -11,11 +11,11 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.jdt.core.search.SearchEngine;
-import org.key_project.key4eclipse.util.eclipse.BundleUtil;
-import org.key_project.key4eclipse.util.jdt.JDTUtil;
-import org.key_project.key4eclipse.util.test.util.TestUtilsUtil;
 import org.key_project.sed.key.ui.jdt.AllOperationsSearchEngine;
 import org.key_project.sed.key.ui.test.Activator;
+import org.key_project.util.eclipse.BundleUtil;
+import org.key_project.util.jdt.JDTUtil;
+import org.key_project.util.test.util.TestUtilsUtil;
 
 /**
  * Tests for {@link AllOperationsSearchEngine}.

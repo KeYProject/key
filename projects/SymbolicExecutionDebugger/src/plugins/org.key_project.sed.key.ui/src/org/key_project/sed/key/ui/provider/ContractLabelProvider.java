@@ -10,7 +10,7 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.widgets.Display;
-import org.key_project.key4eclipse.util.eclipse.swt.ImageUtil;
+import org.key_project.util.eclipse.swt.ImageUtil;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.speclang.Contract;

@@ -17,14 +17,37 @@
  */
 package de.hentschel.visualdbc.dbcmodel.util;
 
-import de.hentschel.visualdbc.dbcmodel.*;
-
-import java.util.List;
-
-import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.util.Switch;
+
+import de.hentschel.visualdbc.dbcmodel.AbstractDbCContainer;
+import de.hentschel.visualdbc.dbcmodel.AbstractDbcClass;
+import de.hentschel.visualdbc.dbcmodel.AbstractDbcEnum;
+import de.hentschel.visualdbc.dbcmodel.AbstractDbcInterface;
+import de.hentschel.visualdbc.dbcmodel.AbstractDbcOperation;
+import de.hentschel.visualdbc.dbcmodel.AbstractDbcProofContainer;
+import de.hentschel.visualdbc.dbcmodel.AbstractDbcSpecification;
+import de.hentschel.visualdbc.dbcmodel.AbstractDbcType;
+import de.hentschel.visualdbc.dbcmodel.AbstractDbcTypeContainer;
+import de.hentschel.visualdbc.dbcmodel.DbcAttribute;
+import de.hentschel.visualdbc.dbcmodel.DbcClass;
+import de.hentschel.visualdbc.dbcmodel.DbcConstructor;
+import de.hentschel.visualdbc.dbcmodel.DbcEnum;
+import de.hentschel.visualdbc.dbcmodel.DbcEnumLiteral;
+import de.hentschel.visualdbc.dbcmodel.DbcInterface;
+import de.hentschel.visualdbc.dbcmodel.DbcInvariant;
+import de.hentschel.visualdbc.dbcmodel.DbcMethod;
+import de.hentschel.visualdbc.dbcmodel.DbcModel;
+import de.hentschel.visualdbc.dbcmodel.DbcOperationContract;
+import de.hentschel.visualdbc.dbcmodel.DbcPackage;
+import de.hentschel.visualdbc.dbcmodel.DbcProof;
+import de.hentschel.visualdbc.dbcmodel.DbcProofObligation;
+import de.hentschel.visualdbc.dbcmodel.DbcProofReference;
+import de.hentschel.visualdbc.dbcmodel.DbcProperty;
+import de.hentschel.visualdbc.dbcmodel.DbcmodelPackage;
+import de.hentschel.visualdbc.dbcmodel.IDbCProofReferencable;
+import de.hentschel.visualdbc.dbcmodel.IDbCProvable;
 
 /**
  * <!-- begin-user-doc -->

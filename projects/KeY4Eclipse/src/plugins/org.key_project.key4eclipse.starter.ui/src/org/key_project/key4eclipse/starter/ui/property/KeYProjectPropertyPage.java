@@ -44,9 +44,9 @@ import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties.UseBootClassPathKind;
 import org.key_project.key4eclipse.starter.ui.provider.KeYClassPathEntryLabelProvider;
 import org.key_project.key4eclipse.starter.ui.util.LogUtil;
-import org.key_project.key4eclipse.util.eclipse.swt.SWTUtil;
-import org.key_project.key4eclipse.util.eclipse.swt.viewer.FileExtensionViewerFilter;
-import org.key_project.key4eclipse.util.java.StringUtil;
+import org.key_project.util.eclipse.swt.SWTUtil;
+import org.key_project.util.eclipse.swt.viewer.FileExtensionViewerFilter;
+import org.key_project.util.java.StringUtil;
 
 /**
  * Provides the {@link PropertyPage} that is used to configure KeY specific

@@ -8,9 +8,9 @@ import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
-import org.key_project.key4eclipse.util.java.ArrayUtil;
-import org.key_project.key4eclipse.util.java.StringUtil;
-import org.key_project.key4eclipse.util.java.SwingUtil;
+import org.key_project.util.java.ArrayUtil;
+import org.key_project.util.java.StringUtil;
+import org.key_project.util.java.SwingUtil;
 
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.MainWindow;

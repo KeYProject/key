@@ -4,9 +4,9 @@ import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
-import org.key_project.key4eclipse.util.eclipse.swt.SWTUtil;
-import org.key_project.key4eclipse.util.eclipse.swt.dialog.ElementTableSelectionDialog;
 import org.key_project.sed.key.ui.provider.ContractLabelProvider;
+import org.key_project.util.eclipse.swt.SWTUtil;
+import org.key_project.util.eclipse.swt.dialog.ElementTableSelectionDialog;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.speclang.Contract;

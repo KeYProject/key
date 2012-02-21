@@ -36,7 +36,7 @@ import org.key_project.automaticverifier.product.ui.provider.AutomaticProofLabel
 import org.key_project.automaticverifier.product.ui.util.LogUtil;
 import org.key_project.automaticverifier.product.ui.view.AutomaticVerifierView;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
-import org.key_project.key4eclipse.util.eclipse.swt.SWTUtil;
+import org.key_project.util.eclipse.swt.SWTUtil;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
