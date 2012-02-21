@@ -56,6 +56,9 @@ public class AutomaticProofLabelProvider extends LabelProvider implements ITable
                 case 1 : return proof.getOperationName();
                 case 2 : return proof.getContractName();
                 case 3 : return proof.getResult() != null ? proof.getResult().getDisplayText() : StringUtil.EMPTY_STRING;
+                case 4 : return proof.hasResult() ? proof.getNodes() + StringUtil.EMPTY_STRING : StringUtil.EMPTY_STRING;
+                case 5 : return proof.hasResult() ? proof.getBranches() + StringUtil.EMPTY_STRING : StringUtil.EMPTY_STRING;
+                case 6 : return proof.hasResult() ? proof.getTime() + StringUtil.EMPTY_STRING : StringUtil.EMPTY_STRING;
                 default : return getText(element);
             }
         }
@@ -69,8 +72,8 @@ public class AutomaticProofLabelProvider extends LabelProvider implements ITable
      * @param proof The {@link Proof} to observe.
      */
     protected void addListenerTo(AutomaticProof proof) {
-        if (proof != null && !proof.hasListener(AutomaticProof.PROP_RESULT, listener)) {
-            proof.addPropertyChangeListener(AutomaticProof.PROP_RESULT, listener);
+        if (proof != null && !proof.hasListener(listener)) {
+            proof.addPropertyChangeListener(listener);
         }
     }
 
@@ -107,7 +110,7 @@ public class AutomaticProofLabelProvider extends LabelProvider implements ITable
      */
     protected void removeListenerFrom(AutomaticProof proof) {
         if (proof != null) {
-            proof.removePropertyChangeListener(AutomaticProof.PROP_RESULT, listener);
+            proof.removePropertyChangeListener(listener);
         }
     }
 }

@@ -27,7 +27,22 @@ public class AutomaticProof extends Bean {
      * Bean property {@link #getResult()}.
      */
     public static final String PROP_RESULT = "result";
-    
+
+    /**
+     * Bean property {@link #getNodes()}.
+     */
+    private static final String PROP_NODES = "nodes";
+
+    /**
+     * Bean property {@link #getBranches()}.
+     */
+    private static final String PROP_BRANCHES = "branches";
+
+    /**
+     * Bean property {@link #getTime()}.
+     */
+    private static final String PROP_TIME = "time";
+
     /**
      * The {@link InitConfig} that contains the {@link OperationContract} to proof.
      */
@@ -62,6 +77,26 @@ public class AutomaticProof extends Bean {
      * The {@link Proof} instance in KeY.
      */
     private Proof proof;
+    
+    /**
+     * The number of proof nodes.
+     */
+    private int nodes;
+    
+    /**
+     * The number of proof branches.
+     */
+    private int branches;
+    
+    /**
+     * The elapsed time in the proof.
+     */
+    private long time;
+    
+    /**
+     * The time when the proof was started.
+     */
+    private long proofStartTime;
     
     /**
      * Constructor.
@@ -173,9 +208,12 @@ public class AutomaticProof extends Bean {
                     main.getNotificationManager().removeNotificationTask(task);
                 }
                 // Start interactive proof automatically
+                proofStartTime = System.currentTimeMillis();
                 main.getMediator().startAutoMode(proof.openEnabledGoals());
                 // Wait for interactive prover
                 KeYUtil.waitWhileMainWindowIsFrozen(main);
+                // Update statistics
+                updateStatistics();
             }
             finally {
                 if (main != null && task != null) {
@@ -192,6 +230,16 @@ public class AutomaticProof extends Bean {
     protected void handleProofClosed(ProofTreeEvent e) {
         setResult(AutomaticProofResult.CLOSED);
     }
+    
+    /**
+     * Updates the statistics
+     * {@link #getNodes()}, {@link #getBranches()} and {@link #getTime()}.
+     */
+    protected void updateStatistics() {
+        setTime(System.currentTimeMillis() - proofStartTime);
+        setNodes(proof.countNodes());
+        setBranches(proof.countBranches());
+    }
 
     /**
      * Sets the proof result.
@@ -201,5 +249,67 @@ public class AutomaticProof extends Bean {
         AutomaticProofResult oldValue = getResult();
         this.result = result;
         firePropertyChange(PROP_RESULT, oldValue, getResult());
+    }
+    
+    /**
+     * Returns the number of proof nodes.
+     * @return The number of proof nodes.
+     */
+    public int getNodes() {
+        return nodes;
+    }
+
+    /**
+     * Sets the number of proof nodes.
+     * @param nodes The number of proof nodes to set.
+     */
+    public void setNodes(int nodes) {
+        int oldValue = getNodes();
+        this.nodes = nodes;
+        firePropertyChange(PROP_NODES, oldValue, getNodes());
+    }
+
+    /**
+     * Returns the number of branches.
+     * @return The number of branches.
+     */
+    public int getBranches() {
+        return branches;
+    }
+
+    /**
+     * Sets the number of branches.
+     * @param branches The number of branches to set.
+     */
+    public void setBranches(int branches) {
+        int oldValue = getBranches();
+        this.branches = branches;
+        firePropertyChange(PROP_BRANCHES, oldValue, getBranches());
+    }
+
+    /**
+     * Returns the elapsed time.
+     * @return The elapsed time.
+     */
+    public long getTime() {
+        return time;
+    }
+
+    /**
+     * Sets the elapsed time.
+     * @param time The elapsed time to set.
+     */
+    public void setTime(long time) {
+        long oldValue = getTime();
+        this.time = time;
+        firePropertyChange(PROP_TIME, oldValue, getTime());
+    }
+
+    /**
+     * Checks if a proof result is available.
+     * @return {@code true} proof result is available, {@code false} no proof result available.
+     */
+    public boolean hasResult() {
+        return getResult() != null && !AutomaticProofResult.UNKNOWN.equals(getResult());
     }
 }

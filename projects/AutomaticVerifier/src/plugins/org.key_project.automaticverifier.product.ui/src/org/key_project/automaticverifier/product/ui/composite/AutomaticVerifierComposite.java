@@ -139,6 +139,19 @@ public class AutomaticVerifierComposite extends Composite {
         proofResultColumn.getColumn().setText("Proof Result");
         proofResultColumn.getColumn().setMoveable(true);
         proofViewerLayout.setColumnData(proofResultColumn.getColumn(), new ColumnWeightData(15));
+        TableViewerColumn proofNodesColumn = new TableViewerColumn(proofViewer, style);
+        proofNodesColumn.getColumn().setText("Nodes");
+        proofNodesColumn.getColumn().setMoveable(true);
+        proofViewerLayout.setColumnData(proofNodesColumn.getColumn(), new ColumnWeightData(5));
+        TableViewerColumn proofBranchesColumn = new TableViewerColumn(proofViewer, style);
+        proofBranchesColumn.getColumn().setText("Branches");
+        proofBranchesColumn.getColumn().setMoveable(true);
+        proofViewerLayout.setColumnData(proofBranchesColumn.getColumn(), new ColumnWeightData(5));
+        TableViewerColumn proofTimeColumn = new TableViewerColumn(proofViewer, style);
+        proofTimeColumn.getColumn().setText("Time (milliseconds)");
+        proofTimeColumn.getColumn().setMoveable(true);
+        proofViewerLayout.setColumnData(proofTimeColumn.getColumn(), new ColumnWeightData(5));
+        
         SWTUtil.makeTableColumnsSortable(proofViewer);
         proofViewer.setContentProvider(ArrayContentProvider.getInstance());
         proofViewer.setLabelProvider(new AutomaticProofLabelProvider());
