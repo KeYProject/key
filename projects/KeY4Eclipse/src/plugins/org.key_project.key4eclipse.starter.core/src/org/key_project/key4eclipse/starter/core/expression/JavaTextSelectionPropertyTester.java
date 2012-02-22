@@ -9,9 +9,9 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorPart;
 import org.key_project.key4eclipse.starter.core.util.LogUtil;
-import org.key_project.key4eclipse.util.eclipse.WorkbenchUtil;
-import org.key_project.key4eclipse.util.java.thread.AbstractRunnableWithResult;
-import org.key_project.key4eclipse.util.java.thread.IRunnableWithResult;
+import org.key_project.util.eclipse.WorkbenchUtil;
+import org.key_project.util.java.thread.AbstractRunnableWithResult;
+import org.key_project.util.java.thread.IRunnableWithResult;
 
 /**
  * <p>

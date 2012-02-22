@@ -30,7 +30,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.junit.Before;
 import org.junit.Test;
-import org.key_project.key4eclipse.util.test.util.TestUtilsUtil;
+import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.hentschel.visualdbc.datasource.key.model.KeyDriver;
 import de.hentschel.visualdbc.dbcmodel.DbcModel;

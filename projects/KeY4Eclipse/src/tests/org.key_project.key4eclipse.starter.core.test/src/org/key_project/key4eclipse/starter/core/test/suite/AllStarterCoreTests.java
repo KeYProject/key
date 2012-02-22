@@ -1,18 +1,8 @@
-/*******************************************************************************
- * Copyright (c) 2011 Martin Hentschel.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *    Martin Hentschel - initial API and implementation
- *******************************************************************************/
-
 package org.key_project.key4eclipse.starter.core.test.suite;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
+import org.key_project.key4eclipse.starter.core.test.testcase.ImmutableCollectionContentProviderTest;
 import org.key_project.key4eclipse.starter.core.test.testcase.JavaElementResourceAdapterFactoryTest;
 import org.key_project.key4eclipse.starter.core.test.testcase.JavaTextSelectionPropertyTesterTest;
 import org.key_project.key4eclipse.starter.core.test.testcase.KeYUtilTest;
@@ -24,6 +14,7 @@ import org.key_project.key4eclipse.starter.core.test.testcase.LogUtilTest;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
+    ImmutableCollectionContentProviderTest.class,
     JavaElementResourceAdapterFactoryTest.class,
     JavaTextSelectionPropertyTesterTest.class,
     KeYUtilTest.class,

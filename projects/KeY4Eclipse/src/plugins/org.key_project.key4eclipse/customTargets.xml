@@ -93,5 +93,11 @@
                                 <include name="key.properties"/>
                         </fileset>
                 </copy> 
+                <!-- Copy examples into target directory -->
+                <copy todir="${target.folder}/examples" failonerror="true" overwrite="true">
+                        <fileset dir="${key.rep}/examples/">
+                                <include name="heap/"/>
+                        </fileset>
+                </copy> 
 	</target>
 </project>

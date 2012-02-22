@@ -12,25 +12,15 @@
 package de.hentschel.visualdbc.datasource.key.intern.helper;
 
 import org.eclipse.core.runtime.Assert;
-import org.key_project.key4eclipse.util.java.ObjectUtil;
-import org.key_project.key4eclipse.util.java.StringUtil;
+import org.key_project.util.java.ObjectUtil;
+import org.key_project.util.java.StringUtil;
 
-import de.hentschel.visualdbc.datasource.model.exception.DSCanceledException;
 import de.hentschel.visualdbc.datasource.model.exception.DSException;
-import de.uka.ilkd.key.gui.ExceptionDialog;
-import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
-import de.uka.ilkd.key.speclang.OperationContract;
 
 /**
  * Provides static methods that uses java reflections to access not public

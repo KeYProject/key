@@ -6,7 +6,7 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.debug.ui.IDebugModelPresentation;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
-import org.key_project.key4eclipse.util.eclipse.WorkbenchUtil;
+import org.key_project.util.eclipse.WorkbenchUtil;
 
 /**
  * Provides static methods for the UI functionality of the Eclipse Debugger API.

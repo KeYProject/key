@@ -40,7 +40,8 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 /**
  * The proof obligation for operation contracts. 
  */
-public final class FunctionalOperationContractPO
+// The class can not be final, it is required in the symbolic execution debugger to modify the behavior in it 
+public class FunctionalOperationContractPO
         extends AbstOpContractPO {
 
     public FunctionalOperationContractPO(InitConfig initConfig,
@@ -156,14 +157,14 @@ public final class FunctionalOperationContractPO
         return result;
     }
 
-
-    private Term buildProgramTerm(ImmutableList<ProgramVariable> paramVars,
-                                  ProgramVariable selfVar,
-                                  ProgramVariable resultVar,
-                                  ProgramVariable exceptionVar,
-                                  LocationVariable heapAtPreVar,
-                                  LocationVariable savedHeapAtPreVar,
-                                  Term postTerm) {
+    // Must be protected because it is overwritten in sub classes.
+    protected Term buildProgramTerm(ImmutableList<ProgramVariable> paramVars,
+                                    ProgramVariable selfVar,
+                                    ProgramVariable resultVar,
+                                    ProgramVariable exceptionVar,
+                                    LocationVariable heapAtPreVar,
+                                    LocationVariable savedHeapAtPreVar,
+                                    Term postTerm) {
         //create formal parameters
         ImmutableList<LocationVariable> formalParamVars =
                 ImmutableSLList.<LocationVariable>nil();

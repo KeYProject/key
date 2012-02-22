@@ -72,10 +72,16 @@
                      <instanceof
                            value="org.eclipse.core.resources.IFile">
                      </instanceof>
-                     <test
-                           property="org.eclipse.core.resources.extension"
-                           value="key">
-                     </test>
+                     <or>
+                        <test
+                              property="org.eclipse.core.resources.extension"
+                              value="key">
+                        </test>
+                        <test
+                              property="org.eclipse.core.resources.extension"
+                              value="proof">
+                        </test>
+                     </or>
                   </and>
                   <with
                         variable="activeEditorInput">

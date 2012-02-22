@@ -13,7 +13,7 @@ package de.hentschel.visualdbc.datasource.model.implementation;
 
 import java.util.Iterator;
 
-import org.key_project.key4eclipse.util.java.ObjectUtil;
+import org.key_project.util.java.ObjectUtil;
 
 import de.hentschel.visualdbc.datasource.model.IDSClass;
 import de.hentschel.visualdbc.datasource.model.IDSEnum;

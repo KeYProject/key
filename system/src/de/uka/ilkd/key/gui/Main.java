@@ -52,7 +52,20 @@ public class Main {
 
 
     private static String fileNameOnStartUp = null;
-
+    /**
+     * <p>
+     * This flag indicates if the example chooser should be shown
+     * if {@link #examplesDir} is defined (not {@code null}). It is set
+     * in the Eclipse integration to {@code false}, because it is required
+     * to define the path to a different one without showing the chooser.
+     * </p>
+     * <p>
+     * Conclusion: It must be possible to use KeY with a custom examples
+     * directory without showin the chooser on startup.
+     * </p>
+     */
+    public static boolean showExampleChooserIfExamplesDirIsDefined = true;
+    
     public static void main(String[] args) {
         System.out.println("\nKeY Version " + VERSION);
         System.out.println(COPYRIGHT + "\nKeY is protected by the " +
@@ -83,7 +96,7 @@ public class Main {
     
     /**
      * Returns the used title. This information is required in other
-     * projects which intantiates the {@link MainWindow} manually.
+     * projects which instantiates the {@link MainWindow} manually.
      * @return The title of {@link MainWindow} to use.
      */
     public static String getMainWindowTitle() {
@@ -93,11 +106,11 @@ public class Main {
     public static void evaluateOptions(String[] opt) {
         int index = 0;
         ProofSettings.DEFAULT_SETTINGS.setProfile(new JavaProfile());
-        while (opt.length > index) {	    
+        while (opt.length > index) {
             if ((new File(opt[index])).exists()) {
                 fileNameOnStartUp=opt[index];
             } else {
-                opt[index] = opt[index].toUpperCase();		
+                opt[index] = opt[index].toUpperCase();
                 if (opt[index].equals("NO_DEBUG")) {
                     de.uka.ilkd.key.util.Debug.ENABLE_DEBUG = false;
                 } else if (opt[index].equals("DEBUG")) {

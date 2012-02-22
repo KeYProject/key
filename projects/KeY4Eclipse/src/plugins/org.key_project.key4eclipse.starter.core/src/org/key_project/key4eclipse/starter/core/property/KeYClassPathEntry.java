@@ -5,9 +5,9 @@ import java.io.File;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Path;
-import org.key_project.key4eclipse.util.eclipse.ResourceUtil;
-import org.key_project.key4eclipse.util.java.ObjectUtil;
-import org.key_project.key4eclipse.util.java.StringUtil;
+import org.key_project.util.eclipse.ResourceUtil;
+import org.key_project.util.java.ObjectUtil;
+import org.key_project.util.java.StringUtil;
 
 /**
  * Represents a class path entry for KeY.

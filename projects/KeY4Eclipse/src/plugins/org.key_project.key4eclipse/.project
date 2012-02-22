@@ -27,6 +27,11 @@
 	</natures>
 	<linkedResources>
 		<link>
+			<name>examples</name>
+			<type>2</type>
+			<locationURI>key_rep/examples</locationURI>
+		</link>
+		<link>
 			<name>lib</name>
 			<type>2</type>
 			<locationURI>key_lib</locationURI>

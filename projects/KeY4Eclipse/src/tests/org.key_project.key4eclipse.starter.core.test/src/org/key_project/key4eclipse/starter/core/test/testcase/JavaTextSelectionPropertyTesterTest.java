@@ -13,9 +13,9 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.ide.IDE;
 import org.key_project.key4eclipse.starter.core.expression.JavaTextSelectionPropertyTester;
 import org.key_project.key4eclipse.starter.core.test.Activator;
-import org.key_project.key4eclipse.util.eclipse.BundleUtil;
-import org.key_project.key4eclipse.util.eclipse.WorkbenchUtil;
-import org.key_project.key4eclipse.util.test.util.TestUtilsUtil;
+import org.key_project.util.eclipse.BundleUtil;
+import org.key_project.util.eclipse.WorkbenchUtil;
+import org.key_project.util.test.util.TestUtilsUtil;
 
 /**
  * Tests for {@link JavaTextSelectionPropertyTester}.

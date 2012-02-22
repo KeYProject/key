@@ -14,19 +14,19 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jdt.core.ILocalVariable;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.Signature;
 import org.key_project.key4eclipse.starter.core.job.AbstractKeYMainWindowJob;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
-import org.key_project.key4eclipse.util.eclipse.ResourceUtil;
-import org.key_project.key4eclipse.util.java.SwingUtil;
-import org.key_project.key4eclipse.util.java.thread.AbstractRunnableWithException;
-import org.key_project.key4eclipse.util.java.thread.AbstractRunnableWithResult;
-import org.key_project.key4eclipse.util.java.thread.IRunnableWithException;
-import org.key_project.key4eclipse.util.java.thread.IRunnableWithResult;
-import org.key_project.key4eclipse.util.jdt.JDTUtil;
+import org.key_project.util.eclipse.ResourceUtil;
+import org.key_project.util.java.SwingUtil;
+import org.key_project.util.java.thread.AbstractRunnableWithException;
+import org.key_project.util.java.thread.AbstractRunnableWithResult;
+import org.key_project.util.java.thread.IRunnableWithException;
+import org.key_project.util.java.thread.IRunnableWithResult;
+import org.key_project.util.jdt.JDTUtil;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -306,25 +306,17 @@ public final class KeYUtil {
             // Get local file for the eclipse resource
             final File location = sourcePaths.get(0);
             Assert.isNotNull(location, "The resource \"" + method.getResource() + "\" is not local.");
+            // Open main window to avoid repaint bugs
+            openMainWindow();
+            // Load location and open proof management dialog
             IRunnableWithException run = new AbstractRunnableWithException() {
                 @Override
                 public void run() {
                     try {
-                        // Open main window
-                        openMainWindow();
                         // Make sure that main window is available.
                         Assert.isTrue(MainWindow.hasInstance(), "KeY main window is not available.");
-                        // Check if location is already loaded
-                        InitConfig initConfig = getInitConfig(location);
-                        if (initConfig == null) {
-                            // Load local file
-                            MainWindow main = MainWindow.getInstance();
-                            ProblemLoader loader = new ProblemLoader(location, main);
-                            main.getRecentFiles().addRecentFile(location.getAbsolutePath());
-                            EnvInput envInput = loader.createEnvInput(location, classPaths, bootClassPath);
-                            ProblemInitializer init = main.createProblemInitializer();
-                            initConfig = init.prepare(envInput);
-                        }
+                        // Load location
+                        InitConfig initConfig = internalLoad(location, classPaths, bootClassPath, true);
                         // Get method to proof in KeY
                         ProgramMethod pm = getProgramMethod(method, initConfig.getServices().getJavaInfo());
                         Assert.isNotNull(pm, "Can't find method \"" + method + "\" in KeY.");
@@ -341,6 +333,54 @@ public final class KeYUtil {
                 throw run.getException();
             }
         }
+    }
+    
+    /**
+     * Loads the given location in KeY and returns the opened {@link InitConfig}.
+     * @param location The location to load.
+     * @param classPaths The class path entries to use.
+     * @param bootClassPath The boot class path to use.
+     * @param showKeYMainWindow Show KeY {@link MainWindow}? <b>Attention: </b> The {@link InitConfig} is not available in the proof tree, because no proof is started.
+     * @return The opened {@link InitConfig}.
+     * @throws Exception Occurred Exception.
+     */
+    public static InitConfig internalLoad(final File location,
+                                          final List<File> classPaths,
+                                          final File bootClassPath,
+                                          final boolean showKeYMainWindow) throws Exception {
+        IRunnableWithResult<InitConfig> run = new AbstractRunnableWithResult<InitConfig>() {
+            @Override
+            public void run() {
+                try {
+                    if (!MainWindow.hasInstance()) {
+                        MainWindow.createInstance(Main.getMainWindowTitle());
+                    }
+                    MainWindow main = MainWindow.getInstance(showKeYMainWindow);
+                    if (showKeYMainWindow && !main.isVisible()) {
+                        main.setVisible(true);
+                    }
+                    // Check if location is already loaded
+                    InitConfig initConfig = getInitConfig(location);
+                    if (initConfig == null) {
+                        // Load local file
+                        ProblemLoader loader = new ProblemLoader(location, main);
+                        main.getRecentFiles().addRecentFile(location.getAbsolutePath());
+                        EnvInput envInput = loader.createEnvInput(location, classPaths, bootClassPath);
+                        ProblemInitializer init = main.createProblemInitializer();
+                        initConfig = init.prepare(envInput);
+                    }
+                    setResult(initConfig);
+                }
+                catch (Exception e) {
+                    setException(e);
+                }
+            }
+        };
+        SwingUtil.invokeAndWait(run);
+        if (run.getException() != null) {
+            throw run.getException();
+        }
+        return run.getResult();
     }
     
     /**
@@ -384,18 +424,18 @@ public final class KeYUtil {
      * @param javaInfo The {@link JavaInfo} of KeY to use.
      * @return The found {@link KeYJavaType}.
      * @throws ProofInputException Occurred Exception.
+     * @throws JavaModelException Occurred Exception.
      */
-    public static ImmutableList<KeYJavaType> getParameterKJTs(IMethod method, JavaInfo javaInfo) throws ProofInputException {
+    public static ImmutableList<KeYJavaType> getParameterKJTs(IMethod method, JavaInfo javaInfo) throws ProofInputException, JavaModelException {
         ImmutableList<KeYJavaType> result = ImmutableSLList.<KeYJavaType>nil();
         IType declaringType         = method.getDeclaringType();
-        String[] parameterTypeNames = method.getParameterTypes();
-        for(int i = 0; i < parameterTypeNames.length; i++) {
-            String javaTypeName = determineJavaType(parameterTypeNames[i], declaringType);
-
+        ILocalVariable[] parameters = method.getParameters();
+        for (ILocalVariable parameter : parameters) {
+            String javaTypeName = JDTUtil.getQualifiedParameterType(declaringType, parameter);
             if(javaTypeName == null) {
                 throw new ProofInputException("Error determining signature types: " + 
                                               "Could not resolve type " + 
-                                              parameterTypeNames[i] + 
+                                              parameter + 
                                               "! This is probably a syntax problem, " + 
                                               " check your import statements.");
             }
@@ -403,76 +443,6 @@ public final class KeYUtil {
             result = result.append(kjt);
         }
         return result;
-    }
-    
-    /**
-     * Computes the name of the java type.
-     * @param eclipseSignature The signature in eclipse.
-     * @param surroundingType The parent type.
-     * @return The name of the java type.
-     * @throws ProofInputException Occurred Exception.
-     */
-    public static String determineJavaType(String eclipseSignature, IType surroundingType) throws ProofInputException {
-        try {
-            switch(eclipseSignature.charAt(0)) {
-
-            case Signature.C_ARRAY: // this parameter is an array
-                int depth = Signature.getArrayCount(eclipseSignature);
-                StringBuffer type = new StringBuffer(determineJavaType(Signature.getElementType(eclipseSignature), surroundingType));
-                // array type is <element type> ([])+, now create the []s
-                for (int i = 0; i < depth; i++) {
-                    type.append('['); type.append(']');
-                    // this is probably much faster, than handling String-objects ?!                
-                }
-                return type.toString();
-            // primitive types:
-            case Signature.C_BOOLEAN:
-                return "boolean";
-
-            case Signature.C_BYTE:
-                return "byte";
-
-            case Signature.C_CHAR:
-                return "char";
-
-            case Signature.C_DOUBLE:
-                return "double";
-
-            case Signature.C_FLOAT:
-                return "float";
-
-            case Signature.C_INT:
-                return "int";
-
-            case Signature.C_LONG:
-                return "long";
-
-            case Signature.C_SHORT:
-                return "short";
-
-            // arbitrary types with fully-qualified name
-            case Signature.C_RESOLVED:
-                return eclipseSignature.substring(1, eclipseSignature.length() - 1);
-                // eclipse input is "Lpackage.Type;", so
-                // cut off the first and last character
-
-            // arbitrary types with unresolved names
-            case Signature.C_UNRESOLVED:
-                String unqualifiedTypeName = eclipseSignature.substring(1, eclipseSignature.length() - 1);
-                String[][] resolvedTypes = surroundingType.resolveType(unqualifiedTypeName);                                    
-                if (resolvedTypes != null && resolvedTypes.length > 0) {
-                    return (resolvedTypes[0][0].equals("") ? "" : resolvedTypes[0][0] + ".") + resolvedTypes[0][1];
-                } 
-                else {
-                    return null;
-                }
-            default:
-                throw new ProofInputException("Not supported Eclipse Signature type " + eclipseSignature + ".");
-            }
-        }
-        catch (JavaModelException e) {
-            throw new ProofInputException(e);
-        }
     }
     
     /**
@@ -548,5 +518,17 @@ public final class KeYUtil {
     public static boolean isProofListEmpty(MainWindow main) {
        TaskTreeModel model = main.getProofList().getModel();
        return model.getChildCount(model.getRoot()) == 0;
+    }
+    
+    public static void waitWhileMainWindowIsFrozen(MainWindow main) {
+        // Wait for interactive prover
+        while (main.frozen) {
+            try {
+                Thread.sleep(250);
+            }
+            catch (InterruptedException e) {
+                // Nothing to do
+            }
+        }
     }
 }
