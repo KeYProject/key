@@ -16,6 +16,7 @@ import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
 
 /**
@@ -49,9 +50,9 @@ public class AutomaticProof extends Bean {
     private InitConfig initConfig;
 
     /**
-     * The {@link OperationContract} to proof.
+     * The {@link Contract} to proof.
      */
-    private OperationContract oc;
+    private Contract contract;
         
     /**
      * The type.
@@ -59,9 +60,9 @@ public class AutomaticProof extends Bean {
     private String typeName;
     
     /**
-     * The operation.
+     * The target.
      */
-    private String operationName;
+    private String targetName;
     
     /**
      * The contract.
@@ -101,24 +102,24 @@ public class AutomaticProof extends Bean {
     /**
      * Constructor.
      * @param typeName The type.
-     * @param operationName The operation. 
+     * @param targetName The target. 
      * @param contractName The contract.
      * @param initConfig The {@link InitConfig} that contains the {@link OperationContract} to proof.
-     * @param oc The {@link OperationContract} to proof.
+     * @param contract The {@link Contract} to proof.
      */
     public AutomaticProof(String typeName, 
-                          String operationName, 
+                          String targetName, 
                           String contractName,
                           InitConfig initConfig,
-                          OperationContract oc) {
+                          Contract contract) {
         super();
         Assert.isNotNull(initConfig);
-        Assert.isNotNull(oc);
+        Assert.isNotNull(contract);
         this.typeName = typeName;
-        this.operationName = operationName;
+        this.targetName = targetName;
         this.contractName = contractName;
         this.initConfig = initConfig;
-        this.oc = oc;
+        this.contract = contract;
     }
 
     /**
@@ -130,11 +131,11 @@ public class AutomaticProof extends Bean {
     }
 
     /**
-     * Returns the operation.
-     * @return The operation.
+     * Returns the target.
+     * @return The target.
      */
-    public String getOperationName() {
-        return operationName;
+    public String getTargetName() {
+        return targetName;
     }
 
     /**
@@ -169,7 +170,7 @@ public class AutomaticProof extends Bean {
                         @Override
                         public void run() {
                             try {
-                                ProofOblInput input = oc.createProofObl(initConfig, oc);
+                                ProofOblInput input = contract.createProofObl(initConfig, contract);
                                 Assert.isNotNull(input);
                                 Assert.isTrue(MainWindow.hasInstance());
                                 MainWindow main = MainWindow.getInstance();

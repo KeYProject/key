@@ -53,7 +53,7 @@ public class AutomaticProofLabelProvider extends LabelProvider implements ITable
             addListenerTo(proof);
             switch (columnIndex) {
                 case 0 : return proof.getTypeName();
-                case 1 : return proof.getOperationName();
+                case 1 : return proof.getTargetName();
                 case 2 : return proof.getContractName();
                 case 3 : return proof.getResult() != null ? proof.getResult().getDisplayText() : StringUtil.EMPTY_STRING;
                 case 4 : return proof.hasResult() ? proof.getNodes() + StringUtil.EMPTY_STRING : StringUtil.EMPTY_STRING;

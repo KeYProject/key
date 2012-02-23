@@ -38,16 +38,16 @@ import org.key_project.automaticverifier.product.ui.view.AutomaticVerifierView;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
 
-import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.gui.ClassTree;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.speclang.FunctionalOperationContract;
+import de.uka.ilkd.key.speclang.Contract;
 
 /**
  * Content in the {@link AutomaticVerifierView} that contains the whole
@@ -127,10 +127,10 @@ public class AutomaticVerifierComposite extends Composite {
         typeColumn.getColumn().setText("Type");
         typeColumn.getColumn().setMoveable(true);
         proofViewerLayout.setColumnData(typeColumn.getColumn(), new ColumnWeightData(15));
-        TableViewerColumn operationColumn = new TableViewerColumn(proofViewer, style);
-        operationColumn.getColumn().setText("Operation");
-        operationColumn.getColumn().setMoveable(true);
-        proofViewerLayout.setColumnData(operationColumn.getColumn(), new ColumnWeightData(15));
+        TableViewerColumn targetColumn = new TableViewerColumn(proofViewer, style);
+        targetColumn.getColumn().setText("Target");
+        targetColumn.getColumn().setMoveable(true);
+        proofViewerLayout.setColumnData(targetColumn.getColumn(), new ColumnWeightData(15));
         TableViewerColumn contractColumn = new TableViewerColumn(proofViewer, style);
         contractColumn.getColumn().setText("Contract");
         contractColumn.getColumn().setMoveable(true);
@@ -310,11 +310,13 @@ public class AutomaticVerifierComposite extends Composite {
                             monitor.beginTask("Analysing types", kjtsarr.length);
                             for (KeYJavaType type : kjtsarr) {
                                 SWTUtil.checkCanceled(monitor);
-                                // Get methods
-                                ImmutableList<ProgramMethod> methods = services.getJavaInfo().getAllProgramMethodsLocallyDeclared(type);
-                                listContracts(init, services, type, methods, proofs);
-                                ImmutableList<ProgramMethod> constructors = services.getJavaInfo().getConstructors(type);
-                                listContracts(init, services, type, constructors, proofs);
+                                ImmutableSet<ObserverFunction> targets = services.getSpecificationRepository().getContractTargets(type);
+                                for (ObserverFunction target : targets) {
+                                    ImmutableSet<Contract> contracts = services.getSpecificationRepository().getContracts(type, target);
+                                    for (Contract contract : contracts) {
+                                        proofs.add(new AutomaticProof(type.getFullName(), ClassTree.getDisplayName(services, contract.getTarget()), contract.getDisplayName(), init, contract));
+                                    }
+                                }
                                 monitor.worked(1);
                             }
                             SWTUtil.checkCanceled(monitor);
@@ -338,17 +340,6 @@ public class AutomaticVerifierComposite extends Composite {
                         }
                         finally {
                             monitor.done();
-                        }
-                    }
-                    
-                    protected void listContracts(InitConfig initConfig, Services services, KeYJavaType type, ImmutableList<ProgramMethod> methods, List<AutomaticProof> proofs) {
-                        for (ProgramMethod pm : methods) {
-                            if (!pm.isImplicit()) {
-                                ImmutableSet<FunctionalOperationContract> operationContracts = services.getSpecificationRepository().getOperationContracts(type, pm);
-                                for (FunctionalOperationContract oc : operationContracts) {
-                                    proofs.add(new AutomaticProof(type.getFullName(), pm.getFullName(), oc.getName(), initConfig, oc));
-                                }
-                            }
                         }
                     }
                 }.schedule();
