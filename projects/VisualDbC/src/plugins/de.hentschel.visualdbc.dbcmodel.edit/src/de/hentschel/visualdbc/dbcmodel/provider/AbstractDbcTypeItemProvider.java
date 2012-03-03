@@ -182,6 +182,7 @@ public class AbstractDbcTypeItemProvider
       if (childrenFeatures == null) {
          super.getChildrenFeatures(object);
          childrenFeatures.add(DbcmodelPackage.Literals.ABSTRACT_DBC_TYPE__INVARIANTS);
+         childrenFeatures.add(DbcmodelPackage.Literals.ABSTRACT_DBC_TYPE__AXIOMS);
       }
       return childrenFeatures;
    }
@@ -231,6 +232,7 @@ public class AbstractDbcTypeItemProvider
             fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
             return;
          case DbcmodelPackage.ABSTRACT_DBC_TYPE__INVARIANTS:
+         case DbcmodelPackage.ABSTRACT_DBC_TYPE__AXIOMS:
             fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), true, false));
             return;
       }
@@ -252,6 +254,11 @@ public class AbstractDbcTypeItemProvider
          (createChildParameter
             (DbcmodelPackage.Literals.ABSTRACT_DBC_TYPE__INVARIANTS,
              DbcmodelFactory.eINSTANCE.createDbcInvariant()));
+
+      newChildDescriptors.add
+         (createChildParameter
+            (DbcmodelPackage.Literals.ABSTRACT_DBC_TYPE__AXIOMS,
+             DbcmodelFactory.eINSTANCE.createDbcAxiom()));
    }
 
 }

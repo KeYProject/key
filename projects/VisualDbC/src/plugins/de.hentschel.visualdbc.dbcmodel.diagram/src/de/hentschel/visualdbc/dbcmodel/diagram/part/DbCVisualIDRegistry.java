@@ -19,7 +19,15 @@ import org.eclipse.gmf.runtime.notation.View;
 
 import de.hentschel.visualdbc.dbcmodel.DbcModel;
 import de.hentschel.visualdbc.dbcmodel.DbcmodelPackage;
+import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbCAxiomContractDepEditPart;
+import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbCAxiomContractEditPart;
+import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbCAxiomContractNameEditPart;
+import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbCAxiomContractPreEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcAttributeEditPart;
+import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcAxiomDbcAxiomCompartmentEditPart;
+import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcAxiomDefinitionEditPart;
+import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcAxiomEditPart;
+import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcAxiomNameEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcClass2EditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcClassDbcClassAttributeCompartment2EditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcClassDbcClassAttributeCompartmentEditPart;
@@ -279,6 +287,10 @@ public class DbCVisualIDRegistry {
                domainElement.eClass())) {
             return DbcProof2EditPart.VISUAL_ID;
          }
+         if (DbcmodelPackage.eINSTANCE.getDbcAxiom().isSuperTypeOf(
+               domainElement.eClass())) {
+            return DbcAxiomEditPart.VISUAL_ID;
+         }
          break;
       case DbcClassDbcClassAttributeCompartmentEditPart.VISUAL_ID:
          if (DbcmodelPackage.eINSTANCE.getDbcAttribute().isSuperTypeOf(
@@ -310,6 +322,10 @@ public class DbCVisualIDRegistry {
          if (DbcmodelPackage.eINSTANCE.getDbcMethod().isSuperTypeOf(
                domainElement.eClass())) {
             return DbcMethodEditPart.VISUAL_ID;
+         }
+         if (DbcmodelPackage.eINSTANCE.getDbcAxiom().isSuperTypeOf(
+               domainElement.eClass())) {
+            return DbcAxiomEditPart.VISUAL_ID;
          }
          break;
       case DbcInterfaceDbcInterfaceAttributeCompartmentEditPart.VISUAL_ID:
@@ -347,6 +363,10 @@ public class DbCVisualIDRegistry {
                domainElement.eClass())) {
             return DbcConstructorEditPart.VISUAL_ID;
          }
+         if (DbcmodelPackage.eINSTANCE.getDbcAxiom().isSuperTypeOf(
+               domainElement.eClass())) {
+            return DbcAxiomEditPart.VISUAL_ID;
+         }
          break;
       case DbcEnumDbcEnumAttributeCompartmentEditPart.VISUAL_ID:
          if (DbcmodelPackage.eINSTANCE.getDbcAttribute().isSuperTypeOf(
@@ -380,6 +400,12 @@ public class DbCVisualIDRegistry {
             return DbcOperationContractEditPart.VISUAL_ID;
          }
          break;
+      case DbcAxiomDbcAxiomCompartmentEditPart.VISUAL_ID:
+         if (DbcmodelPackage.eINSTANCE.getDbCAxiomContract().isSuperTypeOf(
+               domainElement.eClass())) {
+            return DbCAxiomContractEditPart.VISUAL_ID;
+         }
+         break;
       case DbcInterfaceDbcInterfaceMainCompartment2EditPart.VISUAL_ID:
          if (DbcmodelPackage.eINSTANCE.getDbcClass().isSuperTypeOf(
                domainElement.eClass())) {
@@ -404,6 +430,10 @@ public class DbCVisualIDRegistry {
          if (DbcmodelPackage.eINSTANCE.getDbcMethod().isSuperTypeOf(
                domainElement.eClass())) {
             return DbcMethodEditPart.VISUAL_ID;
+         }
+         if (DbcmodelPackage.eINSTANCE.getDbcAxiom().isSuperTypeOf(
+               domainElement.eClass())) {
+            return DbcAxiomEditPart.VISUAL_ID;
          }
          break;
       case DbcInterfaceDbcInterfaceAttributeCompartment2EditPart.VISUAL_ID:
@@ -441,6 +471,10 @@ public class DbCVisualIDRegistry {
                domainElement.eClass())) {
             return DbcProof2EditPart.VISUAL_ID;
          }
+         if (DbcmodelPackage.eINSTANCE.getDbcAxiom().isSuperTypeOf(
+               domainElement.eClass())) {
+            return DbcAxiomEditPart.VISUAL_ID;
+         }
          break;
       case DbcClassDbcClassAttributeCompartment2EditPart.VISUAL_ID:
          if (DbcmodelPackage.eINSTANCE.getDbcAttribute().isSuperTypeOf(
@@ -476,6 +510,10 @@ public class DbCVisualIDRegistry {
          if (DbcmodelPackage.eINSTANCE.getDbcConstructor().isSuperTypeOf(
                domainElement.eClass())) {
             return DbcConstructorEditPart.VISUAL_ID;
+         }
+         if (DbcmodelPackage.eINSTANCE.getDbcAxiom().isSuperTypeOf(
+               domainElement.eClass())) {
+            return DbcAxiomEditPart.VISUAL_ID;
          }
          break;
       case DbcEnumDbcEnumAttributeCompartment2EditPart.VISUAL_ID:
@@ -667,6 +705,28 @@ public class DbCVisualIDRegistry {
             return true;
          }
          break;
+      case DbcAxiomEditPart.VISUAL_ID:
+         if (DbcAxiomNameEditPart.VISUAL_ID == nodeVisualID) {
+            return true;
+         }
+         if (DbcAxiomDefinitionEditPart.VISUAL_ID == nodeVisualID) {
+            return true;
+         }
+         if (DbcAxiomDbcAxiomCompartmentEditPart.VISUAL_ID == nodeVisualID) {
+            return true;
+         }
+         break;
+      case DbCAxiomContractEditPart.VISUAL_ID:
+         if (DbCAxiomContractNameEditPart.VISUAL_ID == nodeVisualID) {
+            return true;
+         }
+         if (DbCAxiomContractPreEditPart.VISUAL_ID == nodeVisualID) {
+            return true;
+         }
+         if (DbCAxiomContractDepEditPart.VISUAL_ID == nodeVisualID) {
+            return true;
+         }
+         break;
       case DbcPackageDbcPackageCompartmentEditPart.VISUAL_ID:
          if (DbcPackage2EditPart.VISUAL_ID == nodeVisualID) {
             return true;
@@ -723,6 +783,9 @@ public class DbCVisualIDRegistry {
          if (DbcProof2EditPart.VISUAL_ID == nodeVisualID) {
             return true;
          }
+         if (DbcAxiomEditPart.VISUAL_ID == nodeVisualID) {
+            return true;
+         }
          break;
       case DbcClassDbcClassAttributeCompartmentEditPart.VISUAL_ID:
          if (DbcAttributeEditPart.VISUAL_ID == nodeVisualID) {
@@ -746,6 +809,9 @@ public class DbCVisualIDRegistry {
             return true;
          }
          if (DbcMethodEditPart.VISUAL_ID == nodeVisualID) {
+            return true;
+         }
+         if (DbcAxiomEditPart.VISUAL_ID == nodeVisualID) {
             return true;
          }
          break;
@@ -776,6 +842,9 @@ public class DbCVisualIDRegistry {
          if (DbcConstructorEditPart.VISUAL_ID == nodeVisualID) {
             return true;
          }
+         if (DbcAxiomEditPart.VISUAL_ID == nodeVisualID) {
+            return true;
+         }
          break;
       case DbcEnumDbcEnumAttributeCompartmentEditPart.VISUAL_ID:
          if (DbcAttributeEditPart.VISUAL_ID == nodeVisualID) {
@@ -803,6 +872,11 @@ public class DbCVisualIDRegistry {
             return true;
          }
          break;
+      case DbcAxiomDbcAxiomCompartmentEditPart.VISUAL_ID:
+         if (DbCAxiomContractEditPart.VISUAL_ID == nodeVisualID) {
+            return true;
+         }
+         break;
       case DbcInterfaceDbcInterfaceMainCompartment2EditPart.VISUAL_ID:
          if (DbcClass2EditPart.VISUAL_ID == nodeVisualID) {
             return true;
@@ -820,6 +894,9 @@ public class DbCVisualIDRegistry {
             return true;
          }
          if (DbcMethodEditPart.VISUAL_ID == nodeVisualID) {
+            return true;
+         }
+         if (DbcAxiomEditPart.VISUAL_ID == nodeVisualID) {
             return true;
          }
          break;
@@ -850,6 +927,9 @@ public class DbCVisualIDRegistry {
          if (DbcProof2EditPart.VISUAL_ID == nodeVisualID) {
             return true;
          }
+         if (DbcAxiomEditPart.VISUAL_ID == nodeVisualID) {
+            return true;
+         }
          break;
       case DbcClassDbcClassAttributeCompartment2EditPart.VISUAL_ID:
          if (DbcAttributeEditPart.VISUAL_ID == nodeVisualID) {
@@ -876,6 +956,9 @@ public class DbCVisualIDRegistry {
             return true;
          }
          if (DbcConstructorEditPart.VISUAL_ID == nodeVisualID) {
+            return true;
+         }
+         if (DbcAxiomEditPart.VISUAL_ID == nodeVisualID) {
             return true;
          }
          break;

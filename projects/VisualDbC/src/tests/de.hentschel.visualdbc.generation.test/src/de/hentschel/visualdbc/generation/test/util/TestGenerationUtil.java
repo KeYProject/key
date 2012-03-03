@@ -32,9 +32,12 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.jface.viewers.ISelection;
+import org.key_project.util.java.CollectionUtil;
 
 import de.hentschel.visualdbc.datasource.model.DSVisibility;
 import de.hentschel.visualdbc.datasource.model.IDSAttribute;
+import de.hentschel.visualdbc.datasource.model.IDSAxiom;
+import de.hentschel.visualdbc.datasource.model.IDSAxiomContract;
 import de.hentschel.visualdbc.datasource.model.IDSClass;
 import de.hentschel.visualdbc.datasource.model.IDSConnection;
 import de.hentschel.visualdbc.datasource.model.IDSConnectionSetting;
@@ -55,7 +58,9 @@ import de.hentschel.visualdbc.datasource.test.util.TestDataSourceUtil;
 import de.hentschel.visualdbc.datasource.util.DataSourceIterator;
 import de.hentschel.visualdbc.dbcmodel.AbstractDbcOperation;
 import de.hentschel.visualdbc.dbcmodel.AbstractDbcType;
+import de.hentschel.visualdbc.dbcmodel.DbCAxiomContract;
 import de.hentschel.visualdbc.dbcmodel.DbcAttribute;
+import de.hentschel.visualdbc.dbcmodel.DbcAxiom;
 import de.hentschel.visualdbc.dbcmodel.DbcClass;
 import de.hentschel.visualdbc.dbcmodel.DbcConstructor;
 import de.hentschel.visualdbc.dbcmodel.DbcEnum;
@@ -164,8 +169,6 @@ public final class TestGenerationUtil {
             TestCase.assertEquals(0, dbcModel.getConnectionSettings().size());
          }
       }
-      // Compare proof obligations
-      compareProofObligations(dsConnection, dbcModel);
       // Compare packages
       TestCase.assertEquals(dsConnection.getPackages().size(), dbcModel.getPackages().size());
       Iterator<IDSPackage> dsPackages = dsConnection.getPackages().iterator();
@@ -175,6 +178,8 @@ public final class TestGenerationUtil {
       }
       // Compare types
       compareTypes(dsConnection.getClasses(), dsConnection.getEnums(), dsConnection.getInterfaces(), dbcModel.getTypes());
+      // Compare proof obligations
+      compareProofObligations(dsConnection, dbcModel);
    }
 
    /**
@@ -221,6 +226,11 @@ public final class TestGenerationUtil {
 
          @Override
          protected void workOnOperationContract(IDSOperationContract instance) throws DSException {
+            ALL_DS_OBLIGATIONS.addAll(instance.getObligations());
+         }
+
+         @Override
+         protected void workOnAxiomContract(IDSAxiomContract instance) throws DSException {
             ALL_DS_OBLIGATIONS.addAll(instance.getObligations());
          }
       };
@@ -346,6 +356,163 @@ public final class TestGenerationUtil {
          fail("Data source type \"" + dsTypeInvariant + "\" has no parent.");
       }
    }
+
+   /**
+    * Compares the given constructor {@link List}s.
+    * @param expected The expected values.
+    * @param current The current values.
+    * @param compareReferences Compare references?
+    * @throws DSException Occurred Exception
+    */      
+   public static void compareAxioms(List<IDSAxiom> expected, List<DbcAxiom> current, boolean compareReferences) throws DSException {
+      TestCase.assertNotNull(expected);
+      TestCase.assertNotNull(current);
+      TestCase.assertEquals(expected.size(), current.size());
+      Iterator<IDSAxiom> exClassIter = expected.iterator();
+      Iterator<DbcAxiom> curClassIter = current.iterator();
+      while (exClassIter.hasNext() && curClassIter.hasNext()) {
+         compareAxiom(exClassIter.next(), curClassIter.next(), compareReferences);
+      }
+      TestCase.assertFalse(exClassIter.hasNext());
+      TestCase.assertFalse(curClassIter.hasNext());
+   }
+   
+   /**
+    * Compares the given invariants {@link List}s.
+    * @param expected The expected values.
+    * @param current The current values.
+    * @throws DSException Occurred Exception
+    */ 
+   public static void compareAxioms(List<IDSAxiom> expected, List<IDSAxiom> current) throws DSException {
+      TestCase.assertNotNull(expected);
+      TestCase.assertNotNull(current);
+      TestCase.assertEquals(expected.size(), current.size());
+      Iterator<IDSAxiom> exClassIter = expected.iterator();
+      Iterator<IDSAxiom> curClassIter = current.iterator();
+      while (exClassIter.hasNext() && curClassIter.hasNext()) {
+         compareAxiom(true, exClassIter.next(), curClassIter.next());
+      }
+      TestCase.assertFalse(exClassIter.hasNext());
+      TestCase.assertFalse(curClassIter.hasNext());
+   }
+
+   /**
+    * Compares the data source type invariant with the model specification.
+    * @param dsTypeAxiom The expected data source type invariant.
+    * @param dbcAxiom The current model specification.
+    * @param compareReferences compare also references?
+    * @throws DSException Occurred Exception
+    */
+   public static void compareAxiom(IDSAxiom dsTypeAxiom, DbcAxiom dbcAxiom, boolean compareReferences) throws DSException {
+      TestCase.assertNotNull(dsTypeAxiom);
+      TestCase.assertNotNull(dbcAxiom);
+      TestCase.assertEquals(dsTypeAxiom.getName(), dbcAxiom.getName());
+      TestCase.assertEquals(dsTypeAxiom.getDefinition(), dbcAxiom.getDefinition());
+      if (compareReferences) {
+         // Compare parent
+         if (dsTypeAxiom.getParent() instanceof IDSClass) {
+            TestCase.assertTrue(dbcAxiom.eContainer() instanceof DbcClass);
+            compareClass((IDSClass)dsTypeAxiom.getParent(), (DbcClass)dbcAxiom.eContainer(), false);
+         }
+         else if (dsTypeAxiom.getParent() instanceof IDSInterface) {
+            TestCase.assertTrue(dbcAxiom.eContainer() instanceof DbcInterface);
+            compareInterface((IDSInterface)dsTypeAxiom.getParent(), (DbcInterface)dbcAxiom.eContainer(), false);
+         }
+         else if (dsTypeAxiom.getParent() instanceof IDSEnum) {
+            TestCase.assertTrue(dbcAxiom.eContainer() instanceof DbcEnum);
+            compareEnum((IDSEnum)dsTypeAxiom.getParent(), (DbcEnum)dbcAxiom.eContainer(), false);
+         }
+         else {
+            fail("Data source type \"" + dsTypeAxiom + "\" has no parent.");
+         }
+         // Compare contained axiom contracts
+         TestCase.assertEquals(dsTypeAxiom.getAxiomContracts().size(), dbcAxiom.getAxiomContracts().size());
+         Iterator<IDSAxiomContract> dsOperationContracts = dsTypeAxiom.getAxiomContracts().iterator();
+         Iterator<DbCAxiomContract> dbcOperationContracts = dbcAxiom.getAxiomContracts().iterator();
+         while (dsOperationContracts.hasNext() && dbcOperationContracts.hasNext()) {
+            compareAxiomContract(dsOperationContracts.next(), dbcOperationContracts.next());
+         }
+      }
+   }
+
+   /**
+    * Compares the given {@link IDSInvariant}s.
+    * @param expected The expected values.
+    * @param current The current values.
+    * @throws DSException Occurred Exception
+    */   
+   public static void compareAxiom(boolean compareReferences, IDSAxiom expected, IDSAxiom current) throws DSException {
+      TestCase.assertNotNull(expected);
+      TestCase.assertNotNull(current);
+      TestCase.assertEquals(expected.getName(), current.getName());
+      TestCase.assertEquals(expected.getDefinition(), current.getDefinition());
+      compareProofObligations(expected.getName(), expected.getObligations(), current.getObligations());
+      // Compare parent
+      if (expected.getParent() instanceof IDSClass) {
+         TestCase.assertTrue(current.getParent() instanceof IDSClass);
+         compareClass((IDSClass)expected.getParent(), (IDSClass)current.getParent(), false);
+      }
+      else if (expected.getParent() instanceof IDSInterface) {
+         TestCase.assertTrue(current.getParent() instanceof IDSInterface);
+         compareInterface((IDSInterface)expected.getParent(), (IDSInterface)current.getParent(), false);
+      }
+      else if (expected.getParent() instanceof IDSEnum) {
+         TestCase.assertTrue(current.getParent() instanceof IDSEnum);
+         compareEnum((IDSEnum)expected.getParent(), (IDSEnum)current.getParent(), false);
+      }
+      else {
+         TestCase.fail("Unsupported parent \"" + expected.getParent() + "\".");
+      }
+      // Compare axiom contracts
+      if (compareReferences) {
+         TestCase.assertNotNull(expected);
+         TestCase.assertNotNull(current);
+         TestCase.assertEquals(expected.getAxiomContracts().size(), current.getAxiomContracts().size());
+         Iterator<IDSAxiomContract> exClassIter = expected.getAxiomContracts().iterator();
+         Iterator<IDSAxiomContract> curClassIter = current.getAxiomContracts().iterator();
+         while (exClassIter.hasNext() && curClassIter.hasNext()) {
+            compareAxiomContract(exClassIter.next(), curClassIter.next());
+         }
+         TestCase.assertFalse(exClassIter.hasNext());
+         TestCase.assertFalse(curClassIter.hasNext());
+      }
+   }
+   
+   /**
+    * Compares the data source operation contract with the model specification.
+    * @param dsAxiomContract The expected data source operation contract.
+    * @param dbcAxiomContract The current model operation contract.
+    * @throws DSException Occurred Exception
+    */
+   public static void compareAxiomContract(IDSAxiomContract dsAxiomContract, IDSAxiomContract dbcAxiomContract) throws DSException {
+      TestCase.assertNotNull(dsAxiomContract);
+      TestCase.assertNotNull(dbcAxiomContract);
+      compareProofObligations(dsAxiomContract.getName(), dsAxiomContract.getObligations(), dbcAxiomContract.getObligations());
+      TestCase.assertEquals(dsAxiomContract.getName(), dbcAxiomContract.getName());
+      TestCase.assertEquals(dsAxiomContract.getDep(), dbcAxiomContract.getDep());
+      TestCase.assertEquals(dsAxiomContract.getPre(), dbcAxiomContract.getPre());
+      // Compare parent
+      TestCase.assertNotNull(dbcAxiomContract.getParent());
+      compareAxiom(false, dsAxiomContract.getParent(), dbcAxiomContract.getParent());
+   }
+   
+   /**
+    * Compares the data source operation contract with the model specification.
+    * @param dsAxiomContract The expected data source operation contract.
+    * @param dbcAxiomContract The current model operation contract.
+    * @throws DSException Occurred Exception
+    */
+   public static void compareAxiomContract(IDSAxiomContract dsAxiomContract, DbCAxiomContract dbcAxiomContract) throws DSException {
+      TestCase.assertNotNull(dsAxiomContract);
+      TestCase.assertNotNull(dbcAxiomContract);
+      compareProvable(dsAxiomContract, dbcAxiomContract);
+      TestCase.assertEquals(dsAxiomContract.getName(), dbcAxiomContract.getName());
+      TestCase.assertEquals(dsAxiomContract.getDep(), dbcAxiomContract.getDep());
+      TestCase.assertEquals(dsAxiomContract.getPre(), dbcAxiomContract.getPre());
+      // Compare parent
+      TestCase.assertTrue(dbcAxiomContract.eContainer() instanceof DbcAxiom);
+      compareAxiom(dsAxiomContract.getParent(), (DbcAxiom)dbcAxiomContract.eContainer(), false);
+   }
    
    /**
     * Compares the data source operation contract with the model specification.
@@ -358,7 +525,7 @@ public final class TestGenerationUtil {
       TestCase.assertNotNull(dbcOperationContract);
       TestCase.assertEquals(dsOperationContract.getModifies(), dbcOperationContract.getModifies());
       compareProvable(dsOperationContract, dbcOperationContract);
-//      TestCase.assertEquals(dsOperationContract.getName(), dbcOperationContract.getName()); // Names might be different
+      TestCase.assertEquals(dsOperationContract.getName(), dbcOperationContract.getName());
       TestCase.assertEquals(dsOperationContract.getPost(), dbcOperationContract.getPost());
       TestCase.assertEquals(dsOperationContract.getPre(), dbcOperationContract.getPre());
       TestCase.assertEquals(dsOperationContract.getTermination(), dbcOperationContract.getTermination());
@@ -426,6 +593,8 @@ public final class TestGenerationUtil {
       TestCase.assertEquals(dsEnum.getName(), dbcEnum.getName());
       compareProvable(dsEnum, dbcEnum);
       compareVisibility(dsEnum.getVisibility(), dbcEnum.getVisibility());
+      // Compare axioms
+      compareAxioms(dsEnum.getAxioms(), dbcEnum.getAxioms(), compareReferences);
       // Compare inner types
       if (compareReferences) {
          compareTypes(dsEnum.getInnerClasses(), dsEnum.getInnerEnums(), dsEnum.getInnerInterfaces(), dbcEnum.getTypes());
@@ -495,6 +664,8 @@ public final class TestGenerationUtil {
       TestCase.assertEquals(dsInterface.getName(), dbcInterface.getName());
       compareProvable(dsInterface, dbcInterface);
       compareVisibility(dsInterface.getVisibility(), dbcInterface.getVisibility());
+      // Compare axioms
+      compareAxioms(dsInterface.getAxioms(), dbcInterface.getAxioms(), compareReferences);
       // Compare inner types
       if (compareReferences) {
          compareTypes(dsInterface.getInnerClasses(), dsInterface.getInnerEnums(), dsInterface.getInnerInterfaces(), dbcInterface.getTypes());
@@ -552,6 +723,8 @@ public final class TestGenerationUtil {
       compareProvable(dsClass, dbcClass);
       compareClassName(dsClass, dbcClass);
       compareVisibility(dsClass.getVisibility(), dbcClass.getVisibility());
+      // Compare axioms
+      compareAxioms(dsClass.getAxioms(), dbcClass.getAxioms(), compareReferences);
       // Compare inner types
       if (compareReferences) {
          compareTypes(dsClass.getInnerClasses(), dsClass.getInnerEnums(), dsClass.getInnerInterfaces(), dbcClass.getTypes());
@@ -850,7 +1023,7 @@ public final class TestGenerationUtil {
    public static void compareStrings(String message, List<String> expected, List<String> current) {
       TestCase.assertNotNull(message, expected);
       TestCase.assertNotNull(message, current);
-      TestCase.assertEquals(message, expected.size(), current.size());
+      TestCase.assertEquals(message + "expected: " + CollectionUtil.toString(expected) + " but is currently: " + CollectionUtil.toString(current), expected.size(), current.size());
       Iterator<String> exClassIter = expected.iterator();
       Iterator<String> curClassIter = current.iterator();
       while (exClassIter.hasNext() && curClassIter.hasNext()) {
@@ -941,6 +1114,7 @@ public final class TestGenerationUtil {
          compareClasses(expected.getName(), expected.getExtends(), current.getExtends());
          compareInterfaces(expected.getImplements(), current.getImplements());
          compareInvariants(expected.getInvariants(), current.getInvariants());
+         compareAxioms(expected.getAxioms(), current.getAxioms());
       }
       compareProofObligations(expected.getName(), expected.getObligations(), current.getObligations());
       compareTypeParent(expected, current);
@@ -1223,7 +1397,7 @@ public final class TestGenerationUtil {
    public static void compareOperationContract(String message, IDSOperationContract expected, IDSOperationContract current) throws DSException {
       TestCase.assertNotNull(message, expected);
       TestCase.assertNotNull(message, current);
-//      TestCase.assertEquals(message, expected.getName(), current.getName()); // The IDs may change from test execution to test execution.
+      TestCase.assertEquals(message, expected.getName(), current.getName());
       TestCase.assertEquals(message, expected.getPre(), current.getPre());
       TestCase.assertEquals(message, expected.getPost(), current.getPost());
       TestCase.assertEquals(message, expected.getModifies(), current.getModifies());

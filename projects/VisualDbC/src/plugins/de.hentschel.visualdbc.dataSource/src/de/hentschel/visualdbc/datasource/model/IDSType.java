@@ -109,4 +109,19 @@ public interface IDSType extends IDSProvable {
     * @throws DSException Occurred Exception
     */
    public List<IDSInvariant> getInvariants() throws DSException;
+
+   /**
+    * Returns the axiom with the given definition.
+    * @param definition The definition.
+    * @return The found {@link IDSAxiom} or {@code null} if no one was found.
+    * @throws DSException Occurred Exception.
+    */
+   public IDSAxiom getAxiom(String definition) throws DSException;
+   
+   /**
+    * Returns all contained axioms.
+    * @return The contained axioms.
+    * @throws DSException Occurred Exception
+    */
+   public List<IDSAxiom> getAxioms() throws DSException;
 }

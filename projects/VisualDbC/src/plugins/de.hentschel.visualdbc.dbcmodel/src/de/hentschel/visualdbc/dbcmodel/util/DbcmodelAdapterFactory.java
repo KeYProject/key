@@ -187,6 +187,14 @@ public class DbcmodelAdapterFactory extends AdapterFactoryImpl {
             return createDbcProofObligationAdapter();
          }
          @Override
+         public Adapter caseDbcAxiom(DbcAxiom object) {
+            return createDbcAxiomAdapter();
+         }
+         @Override
+         public Adapter caseDbCAxiomContract(DbCAxiomContract object) {
+            return createDbCAxiomContractAdapter();
+         }
+         @Override
          public Adapter defaultCase(EObject object) {
             return createEObjectAdapter();
          }
@@ -571,6 +579,34 @@ public class DbcmodelAdapterFactory extends AdapterFactoryImpl {
    }
 
    /**
+    * Creates a new adapter for an object of class '{@link de.hentschel.visualdbc.dbcmodel.DbcAxiom <em>Dbc Axiom</em>}'.
+    * <!-- begin-user-doc -->
+     * This default implementation returns null so that we can easily ignore cases;
+     * it's useful to ignore a case when inheritance will catch all the cases anyway.
+     * <!-- end-user-doc -->
+    * @return the new adapter.
+    * @see de.hentschel.visualdbc.dbcmodel.DbcAxiom
+    * @generated
+    */
+    public Adapter createDbcAxiomAdapter() {
+      return null;
+   }
+
+/**
+    * Creates a new adapter for an object of class '{@link de.hentschel.visualdbc.dbcmodel.DbCAxiomContract <em>Db CAxiom Contract</em>}'.
+    * <!-- begin-user-doc -->
+    * This default implementation returns null so that we can easily ignore cases;
+    * it's useful to ignore a case when inheritance will catch all the cases anyway.
+    * <!-- end-user-doc -->
+    * @return the new adapter.
+    * @see de.hentschel.visualdbc.dbcmodel.DbCAxiomContract
+    * @generated
+    */
+   public Adapter createDbCAxiomContractAdapter() {
+      return null;
+   }
+
+/**
     * Creates a new adapter for the default case.
     * <!-- begin-user-doc -->
     * This default implementation returns null.

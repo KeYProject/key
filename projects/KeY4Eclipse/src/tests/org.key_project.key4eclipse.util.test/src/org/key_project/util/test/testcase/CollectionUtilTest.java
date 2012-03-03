@@ -15,6 +15,32 @@ import org.key_project.util.java.IFilter;
  */
 public class CollectionUtilTest extends TestCase {
    /**
+    * Tests {@link CollectionUtil#contains(Iterable, Object)}
+    */
+   @Test
+   public void testContains() {
+      // Create model
+      List<String> list = new LinkedList<String>();
+      list.add("A");
+      list.add("B");
+      list.add("C");
+      list.add("D");
+      // Test null parameter
+      assertFalse(CollectionUtil.contains(null, "A"));
+      assertFalse(CollectionUtil.contains(list, null));
+      assertFalse(CollectionUtil.contains(null, null));
+      // Test values
+      assertTrue(CollectionUtil.contains(list, "A"));
+      assertTrue(CollectionUtil.contains(list, "B"));
+      assertTrue(CollectionUtil.contains(list, "C"));
+      assertTrue(CollectionUtil.contains(list, "D"));
+      assertFalse(CollectionUtil.contains(list, "E"));
+      // Test valid null value
+      list.add(null);
+      assertTrue(CollectionUtil.contains(list, null));
+   }
+   
+   /**
     * Tests for {@link CollectionUtil#search(Iterable, org.key_project.util.java.IFilter)}.
     */
    @Test

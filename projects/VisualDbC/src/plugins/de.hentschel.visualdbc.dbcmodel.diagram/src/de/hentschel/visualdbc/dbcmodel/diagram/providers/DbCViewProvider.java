@@ -55,7 +55,15 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.FontData;
 
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.AbstractDbcClassImplementsEditPart;
+import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbCAxiomContractDepEditPart;
+import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbCAxiomContractEditPart;
+import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbCAxiomContractNameEditPart;
+import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbCAxiomContractPreEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcAttributeEditPart;
+import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcAxiomDbcAxiomCompartmentEditPart;
+import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcAxiomDefinitionEditPart;
+import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcAxiomEditPart;
+import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcAxiomNameEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcClass2EditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcClassDbcClassAttributeCompartment2EditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcClassDbcClassAttributeCompartmentEditPart;
@@ -216,6 +224,8 @@ public class DbCViewProvider extends AbstractProvider implements IViewProvider {
             case DbcOperationContractEditPart.VISUAL_ID:
             case DbcConstructorEditPart.VISUAL_ID:
             case DbcEnumLiteralEditPart.VISUAL_ID:
+            case DbcAxiomEditPart.VISUAL_ID:
+            case DbCAxiomContractEditPart.VISUAL_ID:
             case DbcInterfaceEditPart.VISUAL_ID:
             case DbcClassEditPart.VISUAL_ID:
             case DbcEnumEditPart.VISUAL_ID:
@@ -247,7 +257,9 @@ public class DbCViewProvider extends AbstractProvider implements IViewProvider {
             || DbcMethodEditPart.VISUAL_ID == visualID
             || DbcOperationContractEditPart.VISUAL_ID == visualID
             || DbcConstructorEditPart.VISUAL_ID == visualID
-            || DbcEnumLiteralEditPart.VISUAL_ID == visualID;
+            || DbcEnumLiteralEditPart.VISUAL_ID == visualID
+            || DbcAxiomEditPart.VISUAL_ID == visualID
+            || DbCAxiomContractEditPart.VISUAL_ID == visualID;
    }
 
    /**
@@ -352,6 +364,12 @@ public class DbCViewProvider extends AbstractProvider implements IViewProvider {
       case DbcEnumLiteralEditPart.VISUAL_ID:
          return createDbcEnumLiteral_3020(domainElement, containerView, index,
                persisted, preferencesHint);
+      case DbcAxiomEditPart.VISUAL_ID:
+         return createDbcAxiom_3036(domainElement, containerView, index,
+               persisted, preferencesHint);
+      case DbCAxiomContractEditPart.VISUAL_ID:
+         return createDbCAxiomContract_3037(domainElement, containerView,
+               index, persisted, preferencesHint);
       }
       // can't happen, provided #provides(CreateNodeViewOperation) is correct
       return null;
@@ -1102,6 +1120,102 @@ public class DbCViewProvider extends AbstractProvider implements IViewProvider {
             .getType(DbcEnumLiteralEditPart.VISUAL_ID));
       ViewUtil.insertChildView(containerView, node, index, persisted);
       node.setElement(domainElement);
+      return node;
+   }
+
+   /**
+    * @generated
+    */
+   public Node createDbcAxiom_3036(EObject domainElement, View containerView,
+         int index, boolean persisted, PreferencesHint preferencesHint) {
+      Shape node = NotationFactory.eINSTANCE.createShape();
+      node.setLayoutConstraint(NotationFactory.eINSTANCE.createBounds());
+      node.setType(DbCVisualIDRegistry.getType(DbcAxiomEditPart.VISUAL_ID));
+      ViewUtil.insertChildView(containerView, node, index, persisted);
+      node.setElement(domainElement);
+      // initializeFromPreferences 
+      final IPreferenceStore prefStore = (IPreferenceStore) preferencesHint
+            .getPreferenceStore();
+
+      org.eclipse.swt.graphics.RGB lineRGB = PreferenceConverter.getColor(
+            prefStore, IPreferenceConstants.PREF_LINE_COLOR);
+      ViewUtil.setStructuralFeatureValue(node,
+            NotationPackage.eINSTANCE.getLineStyle_LineColor(),
+            FigureUtilities.RGBToInteger(lineRGB));
+      FontStyle nodeFontStyle = (FontStyle) node
+            .getStyle(NotationPackage.Literals.FONT_STYLE);
+      if (nodeFontStyle != null) {
+         FontData fontData = PreferenceConverter.getFontData(prefStore,
+               IPreferenceConstants.PREF_DEFAULT_FONT);
+         nodeFontStyle.setFontName(fontData.getName());
+         nodeFontStyle.setFontHeight(fontData.getHeight());
+         nodeFontStyle.setBold((fontData.getStyle() & SWT.BOLD) != 0);
+         nodeFontStyle.setItalic((fontData.getStyle() & SWT.ITALIC) != 0);
+         org.eclipse.swt.graphics.RGB fontRGB = PreferenceConverter.getColor(
+               prefStore, IPreferenceConstants.PREF_FONT_COLOR);
+         nodeFontStyle.setFontColor(FigureUtilities.RGBToInteger(fontRGB)
+               .intValue());
+      }
+      org.eclipse.swt.graphics.RGB fillRGB = PreferenceConverter.getColor(
+            prefStore, IPreferenceConstants.PREF_FILL_COLOR);
+      ViewUtil.setStructuralFeatureValue(node,
+            NotationPackage.eINSTANCE.getFillStyle_FillColor(),
+            FigureUtilities.RGBToInteger(fillRGB));
+      Node label5056 = createLabel(node,
+            DbCVisualIDRegistry.getType(DbcAxiomNameEditPart.VISUAL_ID));
+      Node label5060 = createLabel(node,
+            DbCVisualIDRegistry.getType(DbcAxiomDefinitionEditPart.VISUAL_ID));
+      createCompartment(node,
+            DbCVisualIDRegistry
+                  .getType(DbcAxiomDbcAxiomCompartmentEditPart.VISUAL_ID),
+            true, false, false, false);
+      return node;
+   }
+
+   /**
+    * @generated
+    */
+   public Node createDbCAxiomContract_3037(EObject domainElement,
+         View containerView, int index, boolean persisted,
+         PreferencesHint preferencesHint) {
+      Node node = NotationFactory.eINSTANCE.createNode();
+      node.getStyles().add(NotationFactory.eINSTANCE.createDescriptionStyle());
+      node.getStyles().add(NotationFactory.eINSTANCE.createFontStyle());
+      node.getStyles().add(NotationFactory.eINSTANCE.createLineStyle());
+      node.setLayoutConstraint(NotationFactory.eINSTANCE.createBounds());
+      node.setType(DbCVisualIDRegistry
+            .getType(DbCAxiomContractEditPart.VISUAL_ID));
+      ViewUtil.insertChildView(containerView, node, index, persisted);
+      node.setElement(domainElement);
+      // initializeFromPreferences 
+      final IPreferenceStore prefStore = (IPreferenceStore) preferencesHint
+            .getPreferenceStore();
+
+      org.eclipse.swt.graphics.RGB lineRGB = PreferenceConverter.getColor(
+            prefStore, IPreferenceConstants.PREF_LINE_COLOR);
+      ViewUtil.setStructuralFeatureValue(node,
+            NotationPackage.eINSTANCE.getLineStyle_LineColor(),
+            FigureUtilities.RGBToInteger(lineRGB));
+      FontStyle nodeFontStyle = (FontStyle) node
+            .getStyle(NotationPackage.Literals.FONT_STYLE);
+      if (nodeFontStyle != null) {
+         FontData fontData = PreferenceConverter.getFontData(prefStore,
+               IPreferenceConstants.PREF_DEFAULT_FONT);
+         nodeFontStyle.setFontName(fontData.getName());
+         nodeFontStyle.setFontHeight(fontData.getHeight());
+         nodeFontStyle.setBold((fontData.getStyle() & SWT.BOLD) != 0);
+         nodeFontStyle.setItalic((fontData.getStyle() & SWT.ITALIC) != 0);
+         org.eclipse.swt.graphics.RGB fontRGB = PreferenceConverter.getColor(
+               prefStore, IPreferenceConstants.PREF_FONT_COLOR);
+         nodeFontStyle.setFontColor(FigureUtilities.RGBToInteger(fontRGB)
+               .intValue());
+      }
+      Node label5057 = createLabel(node,
+            DbCVisualIDRegistry.getType(DbCAxiomContractNameEditPart.VISUAL_ID));
+      Node label5058 = createLabel(node,
+            DbCVisualIDRegistry.getType(DbCAxiomContractPreEditPart.VISUAL_ID));
+      Node label5059 = createLabel(node,
+            DbCVisualIDRegistry.getType(DbCAxiomContractDepEditPart.VISUAL_ID));
       return node;
    }
 

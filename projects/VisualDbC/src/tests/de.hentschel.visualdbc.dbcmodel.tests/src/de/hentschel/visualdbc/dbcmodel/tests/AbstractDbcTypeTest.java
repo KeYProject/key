@@ -18,6 +18,7 @@
 package de.hentschel.visualdbc.dbcmodel.tests;
 
 import de.hentschel.visualdbc.dbcmodel.AbstractDbcType;
+import de.hentschel.visualdbc.dbcmodel.DbcAxiom;
 import de.hentschel.visualdbc.dbcmodel.DbcClass;
 import de.hentschel.visualdbc.dbcmodel.DbcInvariant;
 import de.hentschel.visualdbc.dbcmodel.DbcmodelFactory;
@@ -30,6 +31,7 @@ import de.hentschel.visualdbc.dbcmodel.DbcmodelFactory;
  * The following operations are tested:
  * <ul>
  *   <li>{@link de.hentschel.visualdbc.dbcmodel.AbstractDbcType#getInvariant(java.lang.String) <em>Get Invariant</em>}</li>
+ *   <li>{@link de.hentschel.visualdbc.dbcmodel.AbstractDbcType#getAxiom(java.lang.String) <em>Get Axiom</em>}</li>
  * </ul>
  * </p>
  * @generated
@@ -83,6 +85,34 @@ public abstract class AbstractDbcTypeTest extends AbstractDbcTypeContainerTest {
       assertEquals(invariantB, container.getInvariant(invariantB.getCondition()));
       assertEquals(invariantC, container.getInvariant(invariantC.getCondition()));
       assertNull(container.getInvariant(invariantD.getCondition()));
+   }
+
+   /**
+    * Tests the '{@link de.hentschel.visualdbc.dbcmodel.AbstractDbcType#getAxiom(java.lang.String) <em>Get Axiom</em>}' operation.
+    * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+    * @see de.hentschel.visualdbc.dbcmodel.AbstractDbcType#getAxiom(java.lang.String)
+    * @generated NOT
+    */
+    public void testGetAxiom__String() {
+       // Create model
+       DbcClass container = DbcmodelFactory.eINSTANCE.createDbcClass();
+       DbcAxiom axiomA = DbcmodelFactory.eINSTANCE.createDbcAxiom();
+       axiomA.setDefinition("axiomA");
+       container.getAxioms().add(axiomA);
+       DbcAxiom axiomB = DbcmodelFactory.eINSTANCE.createDbcAxiom();
+       axiomB.setDefinition("axiomB");
+       container.getAxioms().add(axiomB);
+       DbcAxiom axiomC = DbcmodelFactory.eINSTANCE.createDbcAxiom();
+       axiomC.setDefinition("axiomC");
+       container.getAxioms().add(axiomC);
+       DbcAxiom axiomD = DbcmodelFactory.eINSTANCE.createDbcAxiom();
+       axiomD.setDefinition("axiomD");
+       // Execute test
+       assertEquals(axiomA, container.getAxiom(axiomA.getDefinition()));
+       assertEquals(axiomB, container.getAxiom(axiomB.getDefinition()));
+       assertEquals(axiomC, container.getAxiom(axiomC.getDefinition()));
+       assertNull(container.getAxiom(axiomD.getDefinition()));
    }
 
 } //AbstractDbcTypeTest

@@ -11,16 +11,21 @@
 
 package de.hentschel.visualdbc.datasource.model.memory;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.key_project.util.java.ObjectUtil;
+
 import de.hentschel.visualdbc.datasource.model.DSVisibility;
+import de.hentschel.visualdbc.datasource.model.IDSAxiom;
 import de.hentschel.visualdbc.datasource.model.IDSClass;
 import de.hentschel.visualdbc.datasource.model.IDSContainer;
 import de.hentschel.visualdbc.datasource.model.IDSEnum;
 import de.hentschel.visualdbc.datasource.model.IDSInterface;
 import de.hentschel.visualdbc.datasource.model.IDSInvariant;
 import de.hentschel.visualdbc.datasource.model.IDSType;
+import de.hentschel.visualdbc.datasource.model.exception.DSException;
 import de.hentschel.visualdbc.datasource.model.implementation.AbstractDSType;
 
 /**
@@ -78,6 +83,11 @@ public abstract class AbstractMemoryType extends AbstractDSType {
     * Contains all invariants.
     */
    private List<IDSInvariant> invariants = new LinkedList<IDSInvariant>();
+   
+   /**
+    * Contains all axioms.
+    */
+   private List<IDSAxiom> axioms = new LinkedList<IDSAxiom>();
 
    /**
     * Sets the parent package.
@@ -233,5 +243,38 @@ public abstract class AbstractMemoryType extends AbstractDSType {
    public void addInvariant(MemoryInvariant invariant) {
       invariants.add(invariant);
       invariant.setParent(this);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public List<IDSAxiom> getAxioms() {
+      return axioms;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IDSAxiom getAxiom(String definition) throws DSException {
+      Iterator<IDSAxiom> iter = getAxioms().iterator();
+      IDSAxiom result = null;
+      while(result == null && iter.hasNext()) {
+         IDSAxiom next = iter.next();
+         if (next != null && ObjectUtil.equals(next.getDefinition(), definition)) {
+            result = next;
+         }
+      }
+      return result;
+   }
+   
+   /**
+    * Adds the axiom and updates his parent reference.
+    * @param axiom The axiom to add.
+    */
+   public void addAxiom(MemoryAxiom axiom) {
+      axioms.add(axiom);
+      axiom.setParent(this);
    }
 }

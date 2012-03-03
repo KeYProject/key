@@ -32,6 +32,9 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 
+import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbCAxiomContractEditPart;
+import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcAxiomDbcAxiomCompartmentEditPart;
+import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcAxiomEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcClass2EditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcClassDbcClassMainCompartment2EditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcClassDbcClassMainCompartmentEditPart;
@@ -129,7 +132,7 @@ public class DbCModelingAssistantProvider extends ModelingAssistantProvider {
          return types;
       }
       if (editPart instanceof DbcClassDbcClassMainCompartmentEditPart) {
-         ArrayList<IElementType> types = new ArrayList<IElementType>(7);
+         ArrayList<IElementType> types = new ArrayList<IElementType>(8);
          types.add(DbCElementTypes.DbcClass_3031);
          types.add(DbCElementTypes.DbcInterface_3032);
          types.add(DbCElementTypes.DbcEnum_3033);
@@ -137,19 +140,10 @@ public class DbCModelingAssistantProvider extends ModelingAssistantProvider {
          types.add(DbCElementTypes.DbcConstructor_3010);
          types.add(DbCElementTypes.DbcInvariant_3035);
          types.add(DbCElementTypes.DbcProof_3034);
+         types.add(DbCElementTypes.DbcAxiom_3036);
          return types;
       }
       if (editPart instanceof DbcInterfaceDbcInterfaceMainCompartmentEditPart) {
-         ArrayList<IElementType> types = new ArrayList<IElementType>(6);
-         types.add(DbCElementTypes.DbcClass_3031);
-         types.add(DbCElementTypes.DbcInterface_3032);
-         types.add(DbCElementTypes.DbcEnum_3033);
-         types.add(DbCElementTypes.DbcProof_3034);
-         types.add(DbCElementTypes.DbcInvariant_3035);
-         types.add(DbCElementTypes.DbcMethod_3009);
-         return types;
-      }
-      if (editPart instanceof DbcEnumDbcEnumMainCompartmentEditPart) {
          ArrayList<IElementType> types = new ArrayList<IElementType>(7);
          types.add(DbCElementTypes.DbcClass_3031);
          types.add(DbCElementTypes.DbcInterface_3032);
@@ -157,7 +151,19 @@ public class DbCModelingAssistantProvider extends ModelingAssistantProvider {
          types.add(DbCElementTypes.DbcProof_3034);
          types.add(DbCElementTypes.DbcInvariant_3035);
          types.add(DbCElementTypes.DbcMethod_3009);
+         types.add(DbCElementTypes.DbcAxiom_3036);
+         return types;
+      }
+      if (editPart instanceof DbcEnumDbcEnumMainCompartmentEditPart) {
+         ArrayList<IElementType> types = new ArrayList<IElementType>(8);
+         types.add(DbCElementTypes.DbcClass_3031);
+         types.add(DbCElementTypes.DbcInterface_3032);
+         types.add(DbCElementTypes.DbcEnum_3033);
+         types.add(DbCElementTypes.DbcProof_3034);
+         types.add(DbCElementTypes.DbcInvariant_3035);
+         types.add(DbCElementTypes.DbcMethod_3009);
          types.add(DbCElementTypes.DbcConstructor_3010);
+         types.add(DbCElementTypes.DbcAxiom_3036);
          return types;
       }
       if (editPart instanceof DbcMethodDbcMethodCompartmentEditPart) {
@@ -172,18 +178,24 @@ public class DbCModelingAssistantProvider extends ModelingAssistantProvider {
          types.add(DbCElementTypes.DbcOperationContract_3026);
          return types;
       }
+      if (editPart instanceof DbcAxiomDbcAxiomCompartmentEditPart) {
+         ArrayList<IElementType> types = new ArrayList<IElementType>(1);
+         types.add(DbCElementTypes.DbCAxiomContract_3037);
+         return types;
+      }
       if (editPart instanceof DbcInterfaceDbcInterfaceMainCompartment2EditPart) {
-         ArrayList<IElementType> types = new ArrayList<IElementType>(6);
+         ArrayList<IElementType> types = new ArrayList<IElementType>(7);
          types.add(DbCElementTypes.DbcClass_3031);
          types.add(DbCElementTypes.DbcInterface_3032);
          types.add(DbCElementTypes.DbcEnum_3033);
          types.add(DbCElementTypes.DbcProof_3034);
          types.add(DbCElementTypes.DbcInvariant_3035);
          types.add(DbCElementTypes.DbcMethod_3009);
+         types.add(DbCElementTypes.DbcAxiom_3036);
          return types;
       }
       if (editPart instanceof DbcClassDbcClassMainCompartment2EditPart) {
-         ArrayList<IElementType> types = new ArrayList<IElementType>(7);
+         ArrayList<IElementType> types = new ArrayList<IElementType>(8);
          types.add(DbCElementTypes.DbcClass_3031);
          types.add(DbCElementTypes.DbcInterface_3032);
          types.add(DbCElementTypes.DbcEnum_3033);
@@ -191,10 +203,11 @@ public class DbCModelingAssistantProvider extends ModelingAssistantProvider {
          types.add(DbCElementTypes.DbcConstructor_3010);
          types.add(DbCElementTypes.DbcInvariant_3035);
          types.add(DbCElementTypes.DbcProof_3034);
+         types.add(DbCElementTypes.DbcAxiom_3036);
          return types;
       }
       if (editPart instanceof DbcEnumDbcEnumMainCompartment2EditPart) {
-         ArrayList<IElementType> types = new ArrayList<IElementType>(7);
+         ArrayList<IElementType> types = new ArrayList<IElementType>(8);
          types.add(DbCElementTypes.DbcClass_3031);
          types.add(DbCElementTypes.DbcInterface_3032);
          types.add(DbCElementTypes.DbcEnum_3033);
@@ -202,6 +215,7 @@ public class DbCModelingAssistantProvider extends ModelingAssistantProvider {
          types.add(DbCElementTypes.DbcInvariant_3035);
          types.add(DbCElementTypes.DbcMethod_3009);
          types.add(DbCElementTypes.DbcConstructor_3010);
+         types.add(DbCElementTypes.DbcAxiom_3036);
          return types;
       }
       return Collections.EMPTY_LIST;
@@ -278,6 +292,13 @@ public class DbCModelingAssistantProvider extends ModelingAssistantProvider {
       }
       if (targetEditPart instanceof DbcConstructorEditPart) {
          return ((DbcConstructorEditPart) targetEditPart)
+               .getMARelTypesOnTarget();
+      }
+      if (targetEditPart instanceof DbcAxiomEditPart) {
+         return ((DbcAxiomEditPart) targetEditPart).getMARelTypesOnTarget();
+      }
+      if (targetEditPart instanceof DbCAxiomContractEditPart) {
+         return ((DbCAxiomContractEditPart) targetEditPart)
                .getMARelTypesOnTarget();
       }
       return Collections.EMPTY_LIST;
@@ -371,6 +392,14 @@ public class DbCModelingAssistantProvider extends ModelingAssistantProvider {
       }
       if (targetEditPart instanceof DbcConstructorEditPart) {
          return ((DbcConstructorEditPart) targetEditPart)
+               .getMATypesForSource(relationshipType);
+      }
+      if (targetEditPart instanceof DbcAxiomEditPart) {
+         return ((DbcAxiomEditPart) targetEditPart)
+               .getMATypesForSource(relationshipType);
+      }
+      if (targetEditPart instanceof DbCAxiomContractEditPart) {
+         return ((DbCAxiomContractEditPart) targetEditPart)
                .getMATypesForSource(relationshipType);
       }
       return Collections.EMPTY_LIST;

@@ -700,6 +700,171 @@
       <accessors
           figure="//@figures.0/@descriptors.15/@actualFigure/@children.2/@children.0"/>
     </descriptors>
+    <descriptors
+        name="DbcAxiomFigure">
+      <actualFigure
+          xsi:type="gmfgraph:RoundedRectangle"
+          name="DbcAxiomFigure"
+          cornerWidth="45"
+          cornerHeight="45">
+        <layout
+            xsi:type="gmfgraph:GridLayout">
+          <margins/>
+          <spacing
+              dy="-1"/>
+        </layout>
+        <children
+            xsi:type="gmfgraph:Label"
+            name="DbcAxiomNameFigure"
+            text="&lt;...>">
+          <layoutData
+              xsi:type="gmfgraph:GridLayoutData"
+              grabExcessHorizontalSpace="true"/>
+          <border
+              xsi:type="gmfgraph:MarginBorder">
+            <insets
+                top="5"
+                left="15"
+                bottom="3"
+                right="15"/>
+          </border>
+        </children>
+        <children
+            xsi:type="gmfgraph:Rectangle"
+            name="DbcAxiomDefinitionBorder">
+          <layoutData
+              xsi:type="gmfgraph:GridLayoutData"
+              grabExcessHorizontalSpace="true"
+              grabExcessVerticalSpace="true"
+              verticalAlignment="FILL"
+              horizontalAlignment="FILL"/>
+          <layout
+              xsi:type="gmfgraph:GridLayout"/>
+          <children
+              xsi:type="gmfgraph:Label"
+              name="DbcAxiomDefinitionFigure"
+              text="&lt;...>">
+            <layoutData
+                xsi:type="gmfgraph:GridLayoutData"
+                grabExcessHorizontalSpace="true"
+                grabExcessVerticalSpace="true"
+                verticalAlignment="FILL"
+                horizontalAlignment="FILL"/>
+          </children>
+        </children>
+        <children
+            xsi:type="gmfgraph:Rectangle"
+            name="DbcAxiomCompartmentRectangle">
+          <layoutData
+              xsi:type="gmfgraph:GridLayoutData"
+              grabExcessHorizontalSpace="true"
+              grabExcessVerticalSpace="true"
+              verticalAlignment="FILL"
+              horizontalAlignment="FILL"/>
+          <border
+              xsi:type="gmfgraph:MarginBorder">
+            <insets
+                left="5"
+                bottom="5"
+                right="5"/>
+          </border>
+        </children>
+      </actualFigure>
+      <accessors
+          figure="//@figures.0/@descriptors.16/@actualFigure/@children.0"/>
+      <accessors
+          figure="//@figures.0/@descriptors.16/@actualFigure/@children.2"/>
+      <accessors
+          figure="//@figures.0/@descriptors.16/@actualFigure/@children.1/@children.0"/>
+    </descriptors>
+    <descriptors
+        name="DbcAxiomContractFigure">
+      <actualFigure
+          xsi:type="gmfgraph:RoundedRectangle"
+          name="DbcAxiomContractFigure"
+          cornerWidth="45"
+          cornerHeight="45">
+        <layout
+            xsi:type="gmfgraph:GridLayout">
+          <margins/>
+          <spacing
+              dy="-1"/>
+        </layout>
+        <backgroundColor
+            xsi:type="gmfgraph:RGBColor"
+            red="240"
+            green="240"
+            blue="250"/>
+        <children
+            xsi:type="gmfgraph:Label"
+            name="DbcAxiomContractNameFigure"
+            text="&lt;...>">
+          <layoutData
+              xsi:type="gmfgraph:GridLayoutData"
+              grabExcessHorizontalSpace="true"/>
+          <border
+              xsi:type="gmfgraph:MarginBorder">
+            <insets
+                top="5"
+                left="15"
+                bottom="3"
+                right="15"/>
+          </border>
+        </children>
+        <children
+            xsi:type="gmfgraph:Rectangle"
+            name="DbcAxiomContractPreBorder">
+          <layoutData
+              xsi:type="gmfgraph:GridLayoutData"
+              grabExcessHorizontalSpace="true"
+              grabExcessVerticalSpace="true"
+              verticalAlignment="FILL"
+              horizontalAlignment="FILL"/>
+          <layout
+              xsi:type="gmfgraph:GridLayout"/>
+          <children
+              xsi:type="gmfgraph:Label"
+              name="DbcAxiomContractPreFigure"
+              text="&lt;...>">
+            <layoutData
+                xsi:type="gmfgraph:GridLayoutData"
+                grabExcessHorizontalSpace="true"
+                grabExcessVerticalSpace="true"
+                verticalAlignment="FILL"
+                horizontalAlignment="FILL"/>
+          </children>
+        </children>
+        <children
+            xsi:type="gmfgraph:Rectangle"
+            name="DbcAxiomContractDepBorder">
+          <layoutData
+              xsi:type="gmfgraph:GridLayoutData"
+              grabExcessHorizontalSpace="true"
+              grabExcessVerticalSpace="true"
+              verticalAlignment="FILL"
+              horizontalAlignment="FILL"/>
+          <layout
+              xsi:type="gmfgraph:GridLayout"/>
+          <children
+              xsi:type="gmfgraph:Label"
+              name="DbcAxiomContractDepFigure"
+              text="&lt;...>">
+            <layoutData
+                xsi:type="gmfgraph:GridLayoutData"
+                grabExcessHorizontalSpace="true"
+                grabExcessVerticalSpace="true"
+                verticalAlignment="FILL"
+                horizontalAlignment="FILL"/>
+          </children>
+        </children>
+      </actualFigure>
+      <accessors
+          figure="//@figures.0/@descriptors.17/@actualFigure/@children.0"/>
+      <accessors
+          figure="//@figures.0/@descriptors.17/@actualFigure/@children.1/@children.0"/>
+      <accessors
+          figure="//@figures.0/@descriptors.17/@actualFigure/@children.2/@children.0"/>
+    </descriptors>
   </figures>
   <nodes
       name="DbcPackage"
@@ -728,6 +893,12 @@
   <nodes
       name="DbcOperationContract"
       figure="DbcOperationContractFigure"/>
+  <nodes
+      name="DbcAxiom"
+      figure="DbcAxiomFigure"/>
+  <nodes
+      name="DbcAxiomContract"
+      figure="DbcAxiomContractFigure"/>
   <connections
       name="DbcProofTargetConnection"
       figure="DbcProofTargetFigure"/>
@@ -790,6 +961,11 @@
       figure="DbcEnumFigure"
       collapsible="true"
       accessor="//@figures.0/@descriptors.11/@accessors.3"/>
+  <compartments
+      name="DbcAxiomCompartment"
+      figure="DbcAxiomFigure"
+      collapsible="true"
+      accessor="//@figures.0/@descriptors.16/@accessors.1"/>
   <labels
       name="DbcPackageName"
       figure="DbcPackageFigure"
@@ -851,4 +1027,27 @@
       figure="DbcOperationContractFigure"
       elementIcon="false"
       accessor="//@figures.0/@descriptors.15/@accessors.2"/>
+  <labels
+      name="DbcAxiomName"
+      figure="DbcAxiomFigure"
+      accessor="//@figures.0/@descriptors.16/@accessors.0"/>
+  <labels
+      name="DbcAxiomContractName"
+      figure="DbcAxiomContractFigure"
+      accessor="//@figures.0/@descriptors.17/@accessors.0"/>
+  <labels
+      name="DbcAxiomContractPre"
+      figure="DbcAxiomContractFigure"
+      elementIcon="false"
+      accessor="//@figures.0/@descriptors.17/@accessors.1"/>
+  <labels
+      name="DbcAxiomContractDep"
+      figure="DbcAxiomContractFigure"
+      elementIcon="false"
+      accessor="//@figures.0/@descriptors.17/@accessors.2"/>
+  <labels
+      name="DbcAxiomDefinition"
+      figure="DbcAxiomFigure"
+      elementIcon="false"
+      accessor="//@figures.0/@descriptors.16/@accessors.2"/>
 </gmfgraph:Canvas>

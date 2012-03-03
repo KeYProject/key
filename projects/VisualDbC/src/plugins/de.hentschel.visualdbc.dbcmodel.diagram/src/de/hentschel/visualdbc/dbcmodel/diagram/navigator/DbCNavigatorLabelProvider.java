@@ -29,7 +29,11 @@ import org.eclipse.ui.navigator.ICommonLabelProvider;
 
 import de.hentschel.visualdbc.dbcmodel.DbcModel;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.AbstractDbcClassImplementsEditPart;
+import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbCAxiomContractEditPart;
+import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbCAxiomContractNameEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcAttributeEditPart;
+import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcAxiomEditPart;
+import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcAxiomNameEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcClass2EditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcClassEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcClassExtendsEditPart;
@@ -129,72 +133,78 @@ public class DbCNavigatorLabelProvider extends LabelProvider implements
     */
    public Image getImage(View view) {
       switch (DbCVisualIDRegistry.getVisualID(view)) {
-      case DbcConstructorEditPart.VISUAL_ID:
-         return getImage(
-               "Navigator?Node?http://www.hentschel.de/dbcmodel?DbcConstructor", DbCElementTypes.DbcConstructor_3010); //$NON-NLS-1$
-      case DbcClassEditPart.VISUAL_ID:
-         return getImage(
-               "Navigator?TopLevelNode?http://www.hentschel.de/dbcmodel?DbcClass", DbCElementTypes.DbcClass_2012); //$NON-NLS-1$
-      case DbcInvariantEditPart.VISUAL_ID:
-         return getImage(
-               "Navigator?Node?http://www.hentschel.de/dbcmodel?DbcInvariant", DbCElementTypes.DbcInvariant_3035); //$NON-NLS-1$
-      case DbcAttributeEditPart.VISUAL_ID:
-         return getImage(
-               "Navigator?Node?http://www.hentschel.de/dbcmodel?DbcAttribute", DbCElementTypes.DbcAttribute_3011); //$NON-NLS-1$
-      case DbcEnumLiteralEditPart.VISUAL_ID:
-         return getImage(
-               "Navigator?Node?http://www.hentschel.de/dbcmodel?DbcEnumLiteral", DbCElementTypes.DbcEnumLiteral_3020); //$NON-NLS-1$
-      case DbcProofReferenceEditPart.VISUAL_ID:
-         return getImage(
-               "Navigator?Link?http://www.hentschel.de/dbcmodel?DbcProofReference", DbCElementTypes.DbcProofReference_4002); //$NON-NLS-1$
-      case DbcClassExtendsEditPart.VISUAL_ID:
-         return getImage(
-               "Navigator?Link?http://www.hentschel.de/dbcmodel?DbcClass?extends", DbCElementTypes.DbcClassExtends_4003); //$NON-NLS-1$
-      case DbcOperationContractEditPart.VISUAL_ID:
-         return getImage(
-               "Navigator?Node?http://www.hentschel.de/dbcmodel?DbcOperationContract", DbCElementTypes.DbcOperationContract_3026); //$NON-NLS-1$
-      case DbcProofEditPart.VISUAL_ID:
-         return getImage(
-               "Navigator?TopLevelNode?http://www.hentschel.de/dbcmodel?DbcProof", DbCElementTypes.DbcProof_2014); //$NON-NLS-1$
       case DbcProofTargetEditPart.VISUAL_ID:
          return getImage(
                "Navigator?Link?http://www.hentschel.de/dbcmodel?DbcProof?target", DbCElementTypes.DbcProofTarget_4001); //$NON-NLS-1$
-      case DbcProof2EditPart.VISUAL_ID:
+      case DbcAttributeEditPart.VISUAL_ID:
          return getImage(
-               "Navigator?Node?http://www.hentschel.de/dbcmodel?DbcProof", DbCElementTypes.DbcProof_3034); //$NON-NLS-1$
+               "Navigator?Node?http://www.hentschel.de/dbcmodel?DbcAttribute", DbCElementTypes.DbcAttribute_3011); //$NON-NLS-1$
       case DbcInterfaceExtendsEditPart.VISUAL_ID:
          return getImage(
                "Navigator?Link?http://www.hentschel.de/dbcmodel?DbcInterface?extends", DbCElementTypes.DbcInterfaceExtends_4004); //$NON-NLS-1$
-      case DbcInterface2EditPart.VISUAL_ID:
-         return getImage(
-               "Navigator?Node?http://www.hentschel.de/dbcmodel?DbcInterface", DbCElementTypes.DbcInterface_3032); //$NON-NLS-1$
-      case DbcEnumEditPart.VISUAL_ID:
-         return getImage(
-               "Navigator?TopLevelNode?http://www.hentschel.de/dbcmodel?DbcEnum", DbCElementTypes.DbcEnum_2013); //$NON-NLS-1$
-      case DbcPackage2EditPart.VISUAL_ID:
-         return getImage(
-               "Navigator?Node?http://www.hentschel.de/dbcmodel?DbcPackage", DbCElementTypes.DbcPackage_3027); //$NON-NLS-1$
-      case DbcPackageEditPart.VISUAL_ID:
-         return getImage(
-               "Navigator?TopLevelNode?http://www.hentschel.de/dbcmodel?DbcPackage", DbCElementTypes.DbcPackage_2007); //$NON-NLS-1$
       case DbcMethodEditPart.VISUAL_ID:
          return getImage(
                "Navigator?Node?http://www.hentschel.de/dbcmodel?DbcMethod", DbCElementTypes.DbcMethod_3009); //$NON-NLS-1$
-      case DbcModelEditPart.VISUAL_ID:
+      case DbcEnumLiteralEditPart.VISUAL_ID:
          return getImage(
-               "Navigator?Diagram?http://www.hentschel.de/dbcmodel?DbcModel", DbCElementTypes.DbcModel_1000); //$NON-NLS-1$
+               "Navigator?Node?http://www.hentschel.de/dbcmodel?DbcEnumLiteral", DbCElementTypes.DbcEnumLiteral_3020); //$NON-NLS-1$
       case AbstractDbcClassImplementsEditPart.VISUAL_ID:
          return getImage(
                "Navigator?Link?http://www.hentschel.de/dbcmodel?AbstractDbcClass?implements", DbCElementTypes.AbstractDbcClassImplements_4005); //$NON-NLS-1$
-      case DbcClass2EditPart.VISUAL_ID:
+      case DbcClassEditPart.VISUAL_ID:
          return getImage(
-               "Navigator?Node?http://www.hentschel.de/dbcmodel?DbcClass", DbCElementTypes.DbcClass_3031); //$NON-NLS-1$
+               "Navigator?TopLevelNode?http://www.hentschel.de/dbcmodel?DbcClass", DbCElementTypes.DbcClass_2012); //$NON-NLS-1$
+      case DbcModelEditPart.VISUAL_ID:
+         return getImage(
+               "Navigator?Diagram?http://www.hentschel.de/dbcmodel?DbcModel", DbCElementTypes.DbcModel_1000); //$NON-NLS-1$
       case DbcInterfaceEditPart.VISUAL_ID:
          return getImage(
                "Navigator?TopLevelNode?http://www.hentschel.de/dbcmodel?DbcInterface", DbCElementTypes.DbcInterface_2011); //$NON-NLS-1$
+      case DbcClass2EditPart.VISUAL_ID:
+         return getImage(
+               "Navigator?Node?http://www.hentschel.de/dbcmodel?DbcClass", DbCElementTypes.DbcClass_3031); //$NON-NLS-1$
+      case DbcProofReferenceEditPart.VISUAL_ID:
+         return getImage(
+               "Navigator?Link?http://www.hentschel.de/dbcmodel?DbcProofReference", DbCElementTypes.DbcProofReference_4002); //$NON-NLS-1$
+      case DbCAxiomContractEditPart.VISUAL_ID:
+         return getImage(
+               "Navigator?Node?http://www.hentschel.de/dbcmodel?DbCAxiomContract", DbCElementTypes.DbCAxiomContract_3037); //$NON-NLS-1$
+      case DbcConstructorEditPart.VISUAL_ID:
+         return getImage(
+               "Navigator?Node?http://www.hentschel.de/dbcmodel?DbcConstructor", DbCElementTypes.DbcConstructor_3010); //$NON-NLS-1$
+      case DbcPackageEditPart.VISUAL_ID:
+         return getImage(
+               "Navigator?TopLevelNode?http://www.hentschel.de/dbcmodel?DbcPackage", DbCElementTypes.DbcPackage_2007); //$NON-NLS-1$
+      case DbcAxiomEditPart.VISUAL_ID:
+         return getImage(
+               "Navigator?Node?http://www.hentschel.de/dbcmodel?DbcAxiom", DbCElementTypes.DbcAxiom_3036); //$NON-NLS-1$
       case DbcEnum2EditPart.VISUAL_ID:
          return getImage(
                "Navigator?Node?http://www.hentschel.de/dbcmodel?DbcEnum", DbCElementTypes.DbcEnum_3033); //$NON-NLS-1$
+      case DbcInterface2EditPart.VISUAL_ID:
+         return getImage(
+               "Navigator?Node?http://www.hentschel.de/dbcmodel?DbcInterface", DbCElementTypes.DbcInterface_3032); //$NON-NLS-1$
+      case DbcOperationContractEditPart.VISUAL_ID:
+         return getImage(
+               "Navigator?Node?http://www.hentschel.de/dbcmodel?DbcOperationContract", DbCElementTypes.DbcOperationContract_3026); //$NON-NLS-1$
+      case DbcEnumEditPart.VISUAL_ID:
+         return getImage(
+               "Navigator?TopLevelNode?http://www.hentschel.de/dbcmodel?DbcEnum", DbCElementTypes.DbcEnum_2013); //$NON-NLS-1$
+      case DbcProofEditPart.VISUAL_ID:
+         return getImage(
+               "Navigator?TopLevelNode?http://www.hentschel.de/dbcmodel?DbcProof", DbCElementTypes.DbcProof_2014); //$NON-NLS-1$
+      case DbcPackage2EditPart.VISUAL_ID:
+         return getImage(
+               "Navigator?Node?http://www.hentschel.de/dbcmodel?DbcPackage", DbCElementTypes.DbcPackage_3027); //$NON-NLS-1$
+      case DbcClassExtendsEditPart.VISUAL_ID:
+         return getImage(
+               "Navigator?Link?http://www.hentschel.de/dbcmodel?DbcClass?extends", DbCElementTypes.DbcClassExtends_4003); //$NON-NLS-1$
+      case DbcInvariantEditPart.VISUAL_ID:
+         return getImage(
+               "Navigator?Node?http://www.hentschel.de/dbcmodel?DbcInvariant", DbCElementTypes.DbcInvariant_3035); //$NON-NLS-1$
+      case DbcProof2EditPart.VISUAL_ID:
+         return getImage(
+               "Navigator?Node?http://www.hentschel.de/dbcmodel?DbcProof", DbCElementTypes.DbcProof_3034); //$NON-NLS-1$
       }
       return getImage("Navigator?UnknownElement", null); //$NON-NLS-1$
    }
@@ -247,50 +257,54 @@ public class DbCNavigatorLabelProvider extends LabelProvider implements
          return getUnresolvedDomainElementProxyText(view);
       }
       switch (DbCVisualIDRegistry.getVisualID(view)) {
-      case DbcConstructorEditPart.VISUAL_ID:
-         return getDbcConstructor_3010Text(view);
-      case DbcClassEditPart.VISUAL_ID:
-         return getDbcClass_2012Text(view);
-      case DbcInvariantEditPart.VISUAL_ID:
-         return getDbcInvariant_3035Text(view);
-      case DbcAttributeEditPart.VISUAL_ID:
-         return getDbcAttribute_3011Text(view);
-      case DbcEnumLiteralEditPart.VISUAL_ID:
-         return getDbcEnumLiteral_3020Text(view);
-      case DbcProofReferenceEditPart.VISUAL_ID:
-         return getDbcProofReference_4002Text(view);
-      case DbcClassExtendsEditPart.VISUAL_ID:
-         return getDbcClassExtends_4003Text(view);
-      case DbcOperationContractEditPart.VISUAL_ID:
-         return getDbcOperationContract_3026Text(view);
-      case DbcProofEditPart.VISUAL_ID:
-         return getDbcProof_2014Text(view);
       case DbcProofTargetEditPart.VISUAL_ID:
          return getDbcProofTarget_4001Text(view);
-      case DbcProof2EditPart.VISUAL_ID:
-         return getDbcProof_3034Text(view);
+      case DbcAttributeEditPart.VISUAL_ID:
+         return getDbcAttribute_3011Text(view);
       case DbcInterfaceExtendsEditPart.VISUAL_ID:
          return getDbcInterfaceExtends_4004Text(view);
-      case DbcInterface2EditPart.VISUAL_ID:
-         return getDbcInterface_3032Text(view);
-      case DbcEnumEditPart.VISUAL_ID:
-         return getDbcEnum_2013Text(view);
-      case DbcPackage2EditPart.VISUAL_ID:
-         return getDbcPackage_3027Text(view);
-      case DbcPackageEditPart.VISUAL_ID:
-         return getDbcPackage_2007Text(view);
       case DbcMethodEditPart.VISUAL_ID:
          return getDbcMethod_3009Text(view);
-      case DbcModelEditPart.VISUAL_ID:
-         return getDbcModel_1000Text(view);
+      case DbcEnumLiteralEditPart.VISUAL_ID:
+         return getDbcEnumLiteral_3020Text(view);
       case AbstractDbcClassImplementsEditPart.VISUAL_ID:
          return getAbstractDbcClassImplements_4005Text(view);
-      case DbcClass2EditPart.VISUAL_ID:
-         return getDbcClass_3031Text(view);
+      case DbcClassEditPart.VISUAL_ID:
+         return getDbcClass_2012Text(view);
+      case DbcModelEditPart.VISUAL_ID:
+         return getDbcModel_1000Text(view);
       case DbcInterfaceEditPart.VISUAL_ID:
          return getDbcInterface_2011Text(view);
+      case DbcClass2EditPart.VISUAL_ID:
+         return getDbcClass_3031Text(view);
+      case DbcProofReferenceEditPart.VISUAL_ID:
+         return getDbcProofReference_4002Text(view);
+      case DbCAxiomContractEditPart.VISUAL_ID:
+         return getDbCAxiomContract_3037Text(view);
+      case DbcConstructorEditPart.VISUAL_ID:
+         return getDbcConstructor_3010Text(view);
+      case DbcPackageEditPart.VISUAL_ID:
+         return getDbcPackage_2007Text(view);
+      case DbcAxiomEditPart.VISUAL_ID:
+         return getDbcAxiom_3036Text(view);
       case DbcEnum2EditPart.VISUAL_ID:
          return getDbcEnum_3033Text(view);
+      case DbcInterface2EditPart.VISUAL_ID:
+         return getDbcInterface_3032Text(view);
+      case DbcOperationContractEditPart.VISUAL_ID:
+         return getDbcOperationContract_3026Text(view);
+      case DbcEnumEditPart.VISUAL_ID:
+         return getDbcEnum_2013Text(view);
+      case DbcProofEditPart.VISUAL_ID:
+         return getDbcProof_2014Text(view);
+      case DbcPackage2EditPart.VISUAL_ID:
+         return getDbcPackage_3027Text(view);
+      case DbcClassExtendsEditPart.VISUAL_ID:
+         return getDbcClassExtends_4003Text(view);
+      case DbcInvariantEditPart.VISUAL_ID:
+         return getDbcInvariant_3035Text(view);
+      case DbcProof2EditPart.VISUAL_ID:
+         return getDbcProof_3034Text(view);
       }
       return getUnknownElementText(view);
    }
@@ -358,6 +372,27 @@ public class DbCNavigatorLabelProvider extends LabelProvider implements
       else {
          DbCDiagramEditorPlugin.getInstance().logError(
                "Parser was not found for label " + 5053); //$NON-NLS-1$
+         return ""; //$NON-NLS-1$
+      }
+   }
+
+   /**
+    * @generated
+    */
+   private String getDbCAxiomContract_3037Text(View view) {
+      IParser parser = DbCParserProvider
+            .getParser(DbCElementTypes.DbCAxiomContract_3037,
+                  view.getElement() != null ? view.getElement() : view,
+                  DbCVisualIDRegistry
+                        .getType(DbCAxiomContractNameEditPart.VISUAL_ID));
+      if (parser != null) {
+         return parser.getPrintString(new EObjectAdapter(
+               view.getElement() != null ? view.getElement() : view),
+               ParserOptions.NONE.intValue());
+      }
+      else {
+         DbCDiagramEditorPlugin.getInstance().logError(
+               "Parser was not found for label " + 5057); //$NON-NLS-1$
          return ""; //$NON-NLS-1$
       }
    }
@@ -481,6 +516,26 @@ public class DbCNavigatorLabelProvider extends LabelProvider implements
       else {
          DbCDiagramEditorPlugin.getInstance().logError(
                "Parser was not found for label " + 6001); //$NON-NLS-1$
+         return ""; //$NON-NLS-1$
+      }
+   }
+
+   /**
+    * @generated
+    */
+   private String getDbcAxiom_3036Text(View view) {
+      IParser parser = DbCParserProvider.getParser(
+            DbCElementTypes.DbcAxiom_3036,
+            view.getElement() != null ? view.getElement() : view,
+            DbCVisualIDRegistry.getType(DbcAxiomNameEditPart.VISUAL_ID));
+      if (parser != null) {
+         return parser.getPrintString(new EObjectAdapter(
+               view.getElement() != null ? view.getElement() : view),
+               ParserOptions.NONE.intValue());
+      }
+      else {
+         DbCDiagramEditorPlugin.getInstance().logError(
+               "Parser was not found for label " + 5056); //$NON-NLS-1$
          return ""; //$NON-NLS-1$
       }
    }

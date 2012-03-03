@@ -92,8 +92,12 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DbcModel.ecore#//AbstractDbcType/visibility"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DbcModel.ecore#//AbstractDbcType/static"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DbcModel.ecore#//AbstractDbcType/invariants"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DbcModel.ecore#//AbstractDbcType/axioms"/>
       <genOperations ecoreOperation="DbcModel.ecore#//AbstractDbcType/getInvariant">
         <genParameters ecoreParameter="DbcModel.ecore#//AbstractDbcType/getInvariant/condition"/>
+      </genOperations>
+      <genOperations ecoreOperation="DbcModel.ecore#//AbstractDbcType/getAxiom">
+        <genParameters ecoreParameter="DbcModel.ecore#//AbstractDbcType/getAxiom/definition"/>
       </genOperations>
     </genClasses>
     <genClasses image="false" ecoreClass="DbcModel.ecore#//AbstractDbcEnum">
@@ -146,6 +150,18 @@
     <genClasses image="false" ecoreClass="DbcModel.ecore#//IDbCProofReferencable"/>
     <genClasses ecoreClass="DbcModel.ecore#//DbcProofObligation">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DbcModel.ecore#//DbcProofObligation/obligation"/>
+    </genClasses>
+    <genClasses ecoreClass="DbcModel.ecore#//DbcAxiom">
+      <genFeatures createChild="false" propertyMultiLine="true" ecoreFeature="ecore:EAttribute DbcModel.ecore#//DbcAxiom/definition"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DbcModel.ecore#//DbcAxiom/axiomContracts"/>
+      <genOperations ecoreOperation="DbcModel.ecore#//DbcAxiom/getAxiomContract">
+        <genParameters ecoreParameter="DbcModel.ecore#//DbcAxiom/getAxiomContract/pre"/>
+        <genParameters ecoreParameter="DbcModel.ecore#//DbcAxiom/getAxiomContract/dep"/>
+      </genOperations>
+    </genClasses>
+    <genClasses ecoreClass="DbcModel.ecore#//DbCAxiomContract">
+      <genFeatures createChild="false" propertyMultiLine="true" ecoreFeature="ecore:EAttribute DbcModel.ecore#//DbCAxiomContract/pre"/>
+      <genFeatures createChild="false" propertyMultiLine="true" ecoreFeature="ecore:EAttribute DbcModel.ecore#//DbCAxiomContract/dep"/>
     </genClasses>
   </genPackages>
 </genmodel:GenModel>

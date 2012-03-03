@@ -37,7 +37,9 @@ import de.hentschel.visualdbc.dbcmodel.AbstractDbcProofContainer;
 import de.hentschel.visualdbc.dbcmodel.AbstractDbcSpecification;
 import de.hentschel.visualdbc.dbcmodel.AbstractDbcType;
 import de.hentschel.visualdbc.dbcmodel.AbstractDbcTypeContainer;
+import de.hentschel.visualdbc.dbcmodel.DbCAxiomContract;
 import de.hentschel.visualdbc.dbcmodel.DbcAttribute;
+import de.hentschel.visualdbc.dbcmodel.DbcAxiom;
 import de.hentschel.visualdbc.dbcmodel.DbcClass;
 import de.hentschel.visualdbc.dbcmodel.DbcConstructor;
 import de.hentschel.visualdbc.dbcmodel.DbcEnum;
@@ -249,6 +251,20 @@ public class DbcmodelPackageImpl extends EPackageImpl implements DbcmodelPackage
    private EClass dbcProofObligationEClass = null;
 
    /**
+    * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+    * @generated
+    */
+    private EClass dbcAxiomEClass = null;
+
+/**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
+   private EClass dbCAxiomContractEClass = null;
+
+/**
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
     * @generated
@@ -755,6 +771,15 @@ public class DbcmodelPackageImpl extends EPackageImpl implements DbcmodelPackage
 
    /**
     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+    * @generated
+    */
+    public EReference getAbstractDbcType_Axioms() {
+      return (EReference)abstractDbcTypeEClass.getEStructuralFeatures().get(4);
+   }
+
+/**
+    * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
     * @generated
     */
@@ -1025,6 +1050,60 @@ public class DbcmodelPackageImpl extends EPackageImpl implements DbcmodelPackage
 
    /**
     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+    * @generated
+    */
+    public EClass getDbcAxiom() {
+      return dbcAxiomEClass;
+   }
+
+/**
+    * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+    * @generated
+    */
+    public EAttribute getDbcAxiom_Definition() {
+      return (EAttribute)dbcAxiomEClass.getEStructuralFeatures().get(0);
+   }
+
+/**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
+   public EReference getDbcAxiom_AxiomContracts() {
+      return (EReference)dbcAxiomEClass.getEStructuralFeatures().get(1);
+   }
+
+/**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
+   public EClass getDbCAxiomContract() {
+      return dbCAxiomContractEClass;
+   }
+
+/**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
+   public EAttribute getDbCAxiomContract_Pre() {
+      return (EAttribute)dbCAxiomContractEClass.getEStructuralFeatures().get(0);
+   }
+
+/**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
+   public EAttribute getDbCAxiomContract_Dep() {
+      return (EAttribute)dbCAxiomContractEClass.getEStructuralFeatures().get(1);
+   }
+
+/**
+    * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
     * @generated
     */
@@ -1138,6 +1217,7 @@ public class DbcmodelPackageImpl extends EPackageImpl implements DbcmodelPackage
       createEAttribute(abstractDbcTypeEClass, ABSTRACT_DBC_TYPE__VISIBILITY);
       createEAttribute(abstractDbcTypeEClass, ABSTRACT_DBC_TYPE__STATIC);
       createEReference(abstractDbcTypeEClass, ABSTRACT_DBC_TYPE__INVARIANTS);
+      createEReference(abstractDbcTypeEClass, ABSTRACT_DBC_TYPE__AXIOMS);
 
       abstractDbcEnumEClass = createEClass(ABSTRACT_DBC_ENUM);
       createEReference(abstractDbcEnumEClass, ABSTRACT_DBC_ENUM__LITERALS);
@@ -1180,6 +1260,14 @@ public class DbcmodelPackageImpl extends EPackageImpl implements DbcmodelPackage
 
       dbcProofObligationEClass = createEClass(DBC_PROOF_OBLIGATION);
       createEAttribute(dbcProofObligationEClass, DBC_PROOF_OBLIGATION__OBLIGATION);
+
+      dbcAxiomEClass = createEClass(DBC_AXIOM);
+      createEAttribute(dbcAxiomEClass, DBC_AXIOM__DEFINITION);
+      createEReference(dbcAxiomEClass, DBC_AXIOM__AXIOM_CONTRACTS);
+
+      dbCAxiomContractEClass = createEClass(DB_CAXIOM_CONTRACT);
+      createEAttribute(dbCAxiomContractEClass, DB_CAXIOM_CONTRACT__PRE);
+      createEAttribute(dbCAxiomContractEClass, DB_CAXIOM_CONTRACT__DEP);
 
       // Create enums
       dbcVisibilityEEnum = createEEnum(DBC_VISIBILITY);
@@ -1238,6 +1326,10 @@ public class DbcmodelPackageImpl extends EPackageImpl implements DbcmodelPackage
       abstractDbCContainerEClass.getESuperTypes().add(this.getAbstractDbcTypeContainer());
       abstractDbcTypeContainerEClass.getESuperTypes().add(this.getAbstractDbcProofContainer());
       iDbCProvableEClass.getESuperTypes().add(this.getIDbCProofReferencable());
+      dbcAxiomEClass.getESuperTypes().add(this.getIDbCProofReferencable());
+      dbcAxiomEClass.getESuperTypes().add(this.getAbstractDbcSpecification());
+      dbCAxiomContractEClass.getESuperTypes().add(this.getAbstractDbcSpecification());
+      dbCAxiomContractEClass.getESuperTypes().add(this.getIDbCProvable());
 
       // Initialize classes and features; add operations and parameters
       initEClass(dbcModelEClass, DbcModel.class, "DbcModel", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -1315,9 +1407,13 @@ public class DbcmodelPackageImpl extends EPackageImpl implements DbcmodelPackage
       initEAttribute(getAbstractDbcType_Visibility(), this.getDbcVisibility(), "visibility", "public", 0, 1, AbstractDbcType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
       initEAttribute(getAbstractDbcType_Static(), ecorePackage.getEBoolean(), "static", null, 0, 1, AbstractDbcType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
       initEReference(getAbstractDbcType_Invariants(), this.getDbcInvariant(), null, "invariants", null, 0, -1, AbstractDbcType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+      initEReference(getAbstractDbcType_Axioms(), this.getDbcAxiom(), null, "axioms", null, 0, -1, AbstractDbcType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
       op = addEOperation(abstractDbcTypeEClass, this.getDbcInvariant(), "getInvariant", 0, 1, IS_UNIQUE, IS_ORDERED);
       addEParameter(op, ecorePackage.getEString(), "condition", 0, 1, IS_UNIQUE, IS_ORDERED);
+
+      op = addEOperation(abstractDbcTypeEClass, this.getDbcAxiom(), "getAxiom", 0, 1, IS_UNIQUE, IS_ORDERED);
+      addEParameter(op, ecorePackage.getEString(), "definition", 0, 1, IS_UNIQUE, IS_ORDERED);
 
       initEClass(abstractDbcEnumEClass, AbstractDbcEnum.class, "AbstractDbcEnum", IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
       initEReference(getAbstractDbcEnum_Literals(), this.getDbcEnumLiteral(), null, "literals", null, 0, -1, AbstractDbcEnum.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -1370,6 +1466,18 @@ public class DbcmodelPackageImpl extends EPackageImpl implements DbcmodelPackage
 
       initEClass(dbcProofObligationEClass, DbcProofObligation.class, "DbcProofObligation", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
       initEAttribute(getDbcProofObligation_Obligation(), ecorePackage.getEString(), "obligation", null, 0, 1, DbcProofObligation.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+      initEClass(dbcAxiomEClass, DbcAxiom.class, "DbcAxiom", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+      initEAttribute(getDbcAxiom_Definition(), ecorePackage.getEString(), "definition", null, 0, 1, DbcAxiom.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+      initEReference(getDbcAxiom_AxiomContracts(), this.getDbCAxiomContract(), null, "axiomContracts", null, 0, -1, DbcAxiom.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+      op = addEOperation(dbcAxiomEClass, this.getDbCAxiomContract(), "getAxiomContract", 0, 1, IS_UNIQUE, IS_ORDERED);
+      addEParameter(op, ecorePackage.getEString(), "pre", 0, 1, IS_UNIQUE, IS_ORDERED);
+      addEParameter(op, ecorePackage.getEString(), "dep", 0, 1, IS_UNIQUE, IS_ORDERED);
+
+      initEClass(dbCAxiomContractEClass, DbCAxiomContract.class, "DbCAxiomContract", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+      initEAttribute(getDbCAxiomContract_Pre(), ecorePackage.getEString(), "pre", null, 0, 1, DbCAxiomContract.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+      initEAttribute(getDbCAxiomContract_Dep(), ecorePackage.getEString(), "dep", null, 0, 1, DbCAxiomContract.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
       // Initialize enums and add enum literals
       initEEnum(dbcVisibilityEEnum, DbcVisibility.class, "DbcVisibility");

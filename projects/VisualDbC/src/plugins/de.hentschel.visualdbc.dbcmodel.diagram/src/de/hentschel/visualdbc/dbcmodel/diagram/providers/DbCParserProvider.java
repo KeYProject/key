@@ -25,7 +25,12 @@ import org.eclipse.gmf.runtime.emf.ui.services.parser.ParserHintAdapter;
 import org.eclipse.gmf.runtime.notation.View;
 
 import de.hentschel.visualdbc.dbcmodel.DbcmodelPackage;
+import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbCAxiomContractDepEditPart;
+import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbCAxiomContractNameEditPart;
+import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbCAxiomContractPreEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcAttributeEditPart;
+import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcAxiomDefinitionEditPart;
+import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcAxiomNameEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcClassName2EditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcClassNameEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcConstructorSignatureEditPart;
@@ -407,6 +412,96 @@ public class DbCParserProvider extends AbstractProvider implements
    /**
     * @generated
     */
+   private IParser dbcAxiomName_5056Parser;
+
+   /**
+    * @generated
+    */
+   private IParser getDbcAxiomName_5056Parser() {
+      if (dbcAxiomName_5056Parser == null) {
+         EAttribute[] features = new EAttribute[] { DbcmodelPackage.eINSTANCE
+               .getAbstractDbcSpecification_Name() };
+         MessageFormatParser parser = new MessageFormatParser(features);
+         dbcAxiomName_5056Parser = parser;
+      }
+      return dbcAxiomName_5056Parser;
+   }
+
+   /**
+    * @generated
+    */
+   private IParser dbcAxiomDefinition_5060Parser;
+
+   /**
+    * @generated
+    */
+   private IParser getDbcAxiomDefinition_5060Parser() {
+      if (dbcAxiomDefinition_5060Parser == null) {
+         EAttribute[] features = new EAttribute[] { DbcmodelPackage.eINSTANCE
+               .getDbcAxiom_Definition() };
+         MessageFormatParser parser = new MessageFormatParser(features);
+         dbcAxiomDefinition_5060Parser = parser;
+      }
+      return dbcAxiomDefinition_5060Parser;
+   }
+
+   /**
+    * @generated
+    */
+   private IParser dbCAxiomContractName_5057Parser;
+
+   /**
+    * @generated
+    */
+   private IParser getDbCAxiomContractName_5057Parser() {
+      if (dbCAxiomContractName_5057Parser == null) {
+         EAttribute[] features = new EAttribute[] { DbcmodelPackage.eINSTANCE
+               .getAbstractDbcSpecification_Name() };
+         MessageFormatParser parser = new MessageFormatParser(features);
+         dbCAxiomContractName_5057Parser = parser;
+      }
+      return dbCAxiomContractName_5057Parser;
+   }
+
+   /**
+    * @generated
+    */
+   private IParser dbCAxiomContractPre_5058Parser;
+
+   /**
+    * @generated
+    */
+   private IParser getDbCAxiomContractPre_5058Parser() {
+      if (dbCAxiomContractPre_5058Parser == null) {
+         EAttribute[] features = new EAttribute[] { DbcmodelPackage.eINSTANCE
+               .getDbCAxiomContract_Pre() };
+         MessageFormatParser parser = new MessageFormatParser(features);
+         dbCAxiomContractPre_5058Parser = parser;
+      }
+      return dbCAxiomContractPre_5058Parser;
+   }
+
+   /**
+    * @generated
+    */
+   private IParser dbCAxiomContractDep_5059Parser;
+
+   /**
+    * @generated
+    */
+   private IParser getDbCAxiomContractDep_5059Parser() {
+      if (dbCAxiomContractDep_5059Parser == null) {
+         EAttribute[] features = new EAttribute[] { DbcmodelPackage.eINSTANCE
+               .getDbCAxiomContract_Dep() };
+         MessageFormatParser parser = new MessageFormatParser(features);
+         dbCAxiomContractDep_5059Parser = parser;
+      }
+      return dbCAxiomContractDep_5059Parser;
+   }
+
+   /**
+    * @generated
+    */
    private IParser dbcProofReferenceKind_6001Parser;
 
    /**
@@ -468,6 +563,16 @@ public class DbCParserProvider extends AbstractProvider implements
          return getDbcConstructorSignature_5012Parser();
       case DbcEnumLiteralEditPart.VISUAL_ID:
          return getDbcEnumLiteral_3020Parser();
+      case DbcAxiomNameEditPart.VISUAL_ID:
+         return getDbcAxiomName_5056Parser();
+      case DbcAxiomDefinitionEditPart.VISUAL_ID:
+         return getDbcAxiomDefinition_5060Parser();
+      case DbCAxiomContractNameEditPart.VISUAL_ID:
+         return getDbCAxiomContractName_5057Parser();
+      case DbCAxiomContractPreEditPart.VISUAL_ID:
+         return getDbCAxiomContractPre_5058Parser();
+      case DbCAxiomContractDepEditPart.VISUAL_ID:
+         return getDbCAxiomContractDep_5059Parser();
       case DbcProofReferenceKindEditPart.VISUAL_ID:
          return getDbcProofReferenceKind_6001Parser();
       }

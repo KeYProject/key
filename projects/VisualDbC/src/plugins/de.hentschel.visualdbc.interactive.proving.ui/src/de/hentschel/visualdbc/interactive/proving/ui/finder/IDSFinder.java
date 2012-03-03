@@ -11,6 +11,8 @@
 
 package de.hentschel.visualdbc.interactive.proving.ui.finder;
 
+import de.hentschel.visualdbc.datasource.model.IDSAxiom;
+import de.hentschel.visualdbc.datasource.model.IDSAxiomContract;
 import de.hentschel.visualdbc.datasource.model.IDSClass;
 import de.hentschel.visualdbc.datasource.model.IDSConnection;
 import de.hentschel.visualdbc.datasource.model.IDSConstructor;
@@ -21,6 +23,8 @@ import de.hentschel.visualdbc.datasource.model.IDSOperationContract;
 import de.hentschel.visualdbc.datasource.model.IDSPackage;
 import de.hentschel.visualdbc.datasource.model.IDSProvable;
 import de.hentschel.visualdbc.datasource.model.exception.DSException;
+import de.hentschel.visualdbc.dbcmodel.DbCAxiomContract;
+import de.hentschel.visualdbc.dbcmodel.DbcAxiom;
 import de.hentschel.visualdbc.dbcmodel.DbcClass;
 import de.hentschel.visualdbc.dbcmodel.DbcConstructor;
 import de.hentschel.visualdbc.dbcmodel.DbcEnum;
@@ -92,6 +96,22 @@ public interface IDSFinder {
     * @throws DSException Occurred Exception.
     */
    public IDSMethod findMethod(DbcMethod toSearch) throws DSException;
+
+   /**
+    * Finds an {@link IDSAxiom}.
+    * @param toSearch The {@link DbcAxiom} to search for.
+    * @return The found {@link IDSAxiom} or a thrown {@link DSException} if no one was found.
+    * @throws DSException Occurred Exception.
+    */
+   public IDSAxiom findAxiom(DbcAxiom toSearch) throws DSException;
+
+   /**
+    * Finds an {@link IDSAxiomContract}.
+    * @param toSearch The {@link DbCAxiomContract} to search for.
+    * @return The found {@link IDSAxiomContract} or a thrown {@link DSException} if no one was found.
+    * @throws DSException Occurred Exception.
+    */
+   public IDSAxiomContract findAxiomContract(DbCAxiomContract toSearch) throws DSException;
 
    /**
     * Finds an {@link IDSConstructor}.

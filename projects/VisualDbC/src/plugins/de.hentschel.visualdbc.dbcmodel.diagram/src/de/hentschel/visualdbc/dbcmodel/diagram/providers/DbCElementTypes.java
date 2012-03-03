@@ -29,7 +29,9 @@ import org.eclipse.swt.graphics.Image;
 
 import de.hentschel.visualdbc.dbcmodel.DbcmodelPackage;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.AbstractDbcClassImplementsEditPart;
+import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbCAxiomContractEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcAttributeEditPart;
+import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcAxiomEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcClass2EditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcClassEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcClassExtendsEditPart;
@@ -146,6 +148,16 @@ public class DbCElementTypes {
     * @generated
     */
    public static final IElementType DbcEnumLiteral_3020 = getElementType("de.hentschel.visualdbc.dbcmodel.diagram.DbcEnumLiteral_3020"); //$NON-NLS-1$
+   /**
+    * @generated
+    */
+   public static final IElementType DbcAxiom_3036 = getElementType("de.hentschel.visualdbc.dbcmodel.diagram.DbcAxiom_3036"); //$NON-NLS-1$
+
+   /**
+    * @generated
+    */
+   public static final IElementType DbCAxiomContract_3037 = getElementType("de.hentschel.visualdbc.dbcmodel.diagram.DbCAxiomContract_3037"); //$NON-NLS-1$
+
    /**
     * @generated
     */
@@ -319,6 +331,11 @@ public class DbCElementTypes {
          elements.put(DbcEnumLiteral_3020,
                DbcmodelPackage.eINSTANCE.getDbcEnumLiteral());
 
+         elements.put(DbcAxiom_3036, DbcmodelPackage.eINSTANCE.getDbcAxiom());
+
+         elements.put(DbCAxiomContract_3037,
+               DbcmodelPackage.eINSTANCE.getDbCAxiomContract());
+
          elements.put(DbcProofTarget_4001,
                DbcmodelPackage.eINSTANCE.getDbcProof_Target());
 
@@ -367,6 +384,8 @@ public class DbCElementTypes {
          KNOWN_ELEMENT_TYPES.add(DbcOperationContract_3026);
          KNOWN_ELEMENT_TYPES.add(DbcConstructor_3010);
          KNOWN_ELEMENT_TYPES.add(DbcEnumLiteral_3020);
+         KNOWN_ELEMENT_TYPES.add(DbcAxiom_3036);
+         KNOWN_ELEMENT_TYPES.add(DbCAxiomContract_3037);
          KNOWN_ELEMENT_TYPES.add(DbcProofTarget_4001);
          KNOWN_ELEMENT_TYPES.add(DbcProofReference_4002);
          KNOWN_ELEMENT_TYPES.add(DbcClassExtends_4003);
@@ -415,6 +434,10 @@ public class DbCElementTypes {
          return DbcConstructor_3010;
       case DbcEnumLiteralEditPart.VISUAL_ID:
          return DbcEnumLiteral_3020;
+      case DbcAxiomEditPart.VISUAL_ID:
+         return DbcAxiom_3036;
+      case DbCAxiomContractEditPart.VISUAL_ID:
+         return DbCAxiomContract_3037;
       case DbcProofTargetEditPart.VISUAL_ID:
          return DbcProofTarget_4001;
       case DbcProofReferenceEditPart.VISUAL_ID:

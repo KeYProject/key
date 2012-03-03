@@ -46,7 +46,7 @@ public class DbcProofReferenceCreateCommand extends EditElementCommand {
     * @generated
     */
    private final EObject target;
-   
+
    // Begin Changes MHE
    /**
     * @generated NOT

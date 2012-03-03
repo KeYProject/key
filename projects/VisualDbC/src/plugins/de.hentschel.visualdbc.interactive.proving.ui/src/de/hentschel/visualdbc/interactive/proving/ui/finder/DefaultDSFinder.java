@@ -13,6 +13,8 @@ package de.hentschel.visualdbc.interactive.proving.ui.finder;
 
 import org.eclipse.emf.ecore.EObject;
 
+import de.hentschel.visualdbc.datasource.model.IDSAxiom;
+import de.hentschel.visualdbc.datasource.model.IDSAxiomContract;
 import de.hentschel.visualdbc.datasource.model.IDSClass;
 import de.hentschel.visualdbc.datasource.model.IDSConnection;
 import de.hentschel.visualdbc.datasource.model.IDSConstructor;
@@ -23,6 +25,8 @@ import de.hentschel.visualdbc.datasource.model.IDSOperationContract;
 import de.hentschel.visualdbc.datasource.model.IDSPackage;
 import de.hentschel.visualdbc.datasource.model.IDSProvable;
 import de.hentschel.visualdbc.datasource.model.exception.DSException;
+import de.hentschel.visualdbc.dbcmodel.DbCAxiomContract;
+import de.hentschel.visualdbc.dbcmodel.DbcAxiom;
 import de.hentschel.visualdbc.dbcmodel.DbcClass;
 import de.hentschel.visualdbc.dbcmodel.DbcConstructor;
 import de.hentschel.visualdbc.dbcmodel.DbcEnum;
@@ -225,6 +229,60 @@ public class DefaultDSFinder extends AbstractDSFinder {
     * {@inheritDoc}
     */
    @Override
+   public IDSAxiom findAxiom(DbcAxiom toSearch) throws DSException {
+      IDSAxiom result = null;
+      if (toSearch != null) {
+         // Get parent
+         EObject parent = toSearch.eContainer();
+         if (parent instanceof DbcClass) {
+            IDSClass dsParent = findClass((DbcClass)parent);
+            result = dsParent.getAxiom(toSearch.getDefinition());
+         }
+         else if (parent instanceof DbcInterface) {
+            IDSInterface dsParent = findInterface((DbcInterface)parent);
+            result = dsParent.getAxiom(toSearch.getDefinition());
+         }
+         else if (parent instanceof DbcEnum) {
+            IDSEnum dsParent = findEnum((DbcEnum)parent);
+            result = dsParent.getAxiom(toSearch.getDefinition());
+         }
+         else {
+            throw new DSException("Not supported parent: " + parent);
+         }
+      }
+      if (result == null) {
+         throw new DSException("Can't find method for: " + toSearch);
+      }
+      return result;
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IDSAxiomContract findAxiomContract(DbCAxiomContract toSearch) throws DSException {
+      IDSAxiomContract result = null;
+      if (toSearch != null) {
+         // Get parent
+         EObject parent = toSearch.eContainer();
+         if (parent instanceof DbcAxiom) {
+            IDSAxiom dsParent = findAxiom((DbcAxiom)parent);
+            result = dsParent.getAxiomContract(toSearch.getPre(), toSearch.getDep());
+         }
+         else {
+            throw new DSException("Not supported parent: " + parent);
+         }
+         if (result == null) {
+            throw new DSException("Can't find axiom contract for: " + toSearch);
+         }
+      }
+      return result;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
    public IDSConstructor findConstructor(DbcConstructor toSearch) throws DSException {
       IDSConstructor result = null;
       if (toSearch != null) {
@@ -300,6 +358,12 @@ public class DefaultDSFinder extends AbstractDSFinder {
          }
          else if (toSearch instanceof DbcOperationContract) {
             result = findOperationContract((DbcOperationContract)toSearch);
+         }
+         else if (toSearch instanceof DbcAxiom) {
+            result = findAxiom((DbcAxiom)toSearch);
+         }
+         else if (toSearch instanceof DbCAxiomContract) {
+            result = findAxiomContract((DbCAxiomContract)toSearch);
          }
          else {
             throw new DSException("Not supported provable: " + toSearch);

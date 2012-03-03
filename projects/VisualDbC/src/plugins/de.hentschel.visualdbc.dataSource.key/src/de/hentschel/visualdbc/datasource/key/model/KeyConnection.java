@@ -35,6 +35,7 @@ import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.ArrayUtil;
+import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.SwingUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithException;
@@ -46,6 +47,8 @@ import de.hentschel.visualdbc.datasource.key.util.LogUtil;
 import de.hentschel.visualdbc.datasource.model.DSPackageManagement;
 import de.hentschel.visualdbc.datasource.model.DSVisibility;
 import de.hentschel.visualdbc.datasource.model.IDSAttribute;
+import de.hentschel.visualdbc.datasource.model.IDSAxiom;
+import de.hentschel.visualdbc.datasource.model.IDSAxiomContract;
 import de.hentschel.visualdbc.datasource.model.IDSClass;
 import de.hentschel.visualdbc.datasource.model.IDSConnection;
 import de.hentschel.visualdbc.datasource.model.IDSConstructor;
@@ -62,6 +65,8 @@ import de.hentschel.visualdbc.datasource.model.IDSType;
 import de.hentschel.visualdbc.datasource.model.exception.DSCanceledException;
 import de.hentschel.visualdbc.datasource.model.exception.DSException;
 import de.hentschel.visualdbc.datasource.model.memory.MemoryAttribute;
+import de.hentschel.visualdbc.datasource.model.memory.MemoryAxiom;
+import de.hentschel.visualdbc.datasource.model.memory.MemoryAxiomContract;
 import de.hentschel.visualdbc.datasource.model.memory.MemoryClass;
 import de.hentschel.visualdbc.datasource.model.memory.MemoryConnection;
 import de.hentschel.visualdbc.datasource.model.memory.MemoryConstructor;
@@ -92,6 +97,7 @@ import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
 import de.uka.ilkd.key.java.reference.PackageReference;
 import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.ProblemLoader;
@@ -102,10 +108,13 @@ import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.EnvInput;
+import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.DependencyContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.OperationContract;
+import de.uka.ilkd.key.speclang.RepresentsAxiom;
 
 /**
  * Implementation for {@link IDSConnection} to analyze code files with KeY.
@@ -181,11 +190,21 @@ public class KeyConnection extends MemoryConnection {
     * Maps all {@link OperationContract}s to their data source instance.
     */
    private Map<OperationContract, IDSOperationContract> operationContractsMapping;
+
+   /**
+    * Maps all {@link OperationContract}s to their data source instance.
+    */
+   private Map<Contract, IDSAxiomContract> axiomContractsMapping;
    
    /**
     * Maps all {@link ClassInvariant}s to their data source instance.
     */
    private Map<ClassInvariant, IDSInvariant> invariantsMapping;
+   
+   /**
+    * Maps all {@link ClassAxiom}s to their data source instance.
+    */
+   private Map<ClassAxiom, IDSAxiom> axiomsMapping;
    
    /**
     * Maps all {@link KeYJavaType}s to their data source instance.
@@ -230,8 +249,10 @@ public class KeyConnection extends MemoryConnection {
          // Initialize instance variables
          operationsMapping = new HashMap<ProgramMethod, IDSOperation>();
          operationContractsMapping = new HashMap<OperationContract, IDSOperationContract>();
+         axiomContractsMapping = new HashMap<Contract, IDSAxiomContract>();
          invariantsMapping = new HashMap<ClassInvariant, IDSInvariant>();
          typesMapping = new HashMap<KeYJavaType, IDSType>();
+         axiomsMapping = new HashMap<ClassAxiom, IDSAxiom>();
          // Get settings
          final File location = getLocation(connectionSettings);
          final List<File> classPathEntries = getClassPathEntries(connectionSettings);
@@ -782,10 +803,32 @@ public class KeyConnection extends MemoryConnection {
          MemoryInvariant invariant = createInvariant(services, classInvariant);
          result.addInvariant(invariant);
       }
+      // Add type axioms
+      ImmutableSet<ClassAxiom> axioms = services.getSpecificationRepository().getClassAxioms(type);
+      for (ClassAxiom classAxiom : axioms) {
+         if (shouldIncludeClassAxiom(services, type, classAxiom)) {
+            MemoryAxiom axiom = createAxiom(services, type, classAxiom);
+            result.addAxiom(axiom);
+         }
+      }
       typesMapping.put(type, result);
       return result;
    }
-   
+
+   /**
+    * Checks if the given {@link ClassAxiom} should be included.
+    * @param services The {@link Services} to use.
+    * @param type The current {@link KeYJavaType}
+    * @param classAxiom The {@link ClassAxiom} to check.
+    * @return {@code true} include, {@code false} do not include
+    */
+   protected boolean shouldIncludeClassAxiom(Services services, KeYJavaType type, ClassAxiom classAxiom) {
+      ImmutableSet<ObserverFunction> targets = services.getSpecificationRepository().getContractTargets(type);
+      return classAxiom instanceof RepresentsAxiom && // Filter other axiom types out
+             ((classAxiom.getTarget() != null && classAxiom.getTarget().getType() != null) || // Allow also represents axioms without accessible clause.
+             CollectionUtil.contains(targets, classAxiom.getTarget())); // Make sure that everything that has an accessible clause is available.
+   }
+
    /**
     * Creates a new {@link IDSClass} instance for the given KeY instance.
     * @param services The {@link Services} that is used to read containments.
@@ -852,10 +895,19 @@ public class KeyConnection extends MemoryConnection {
             throw new DSException("Not supported super type: " + superType);
          }
       }
+      // Add type invariants
       ImmutableSet<ClassInvariant> classInvariants = services.getSpecificationRepository().getClassInvariants(type);
       for (ClassInvariant classInvariant : classInvariants) {
          MemoryInvariant invariant = createInvariant(services, classInvariant);
          result.addInvariant(invariant);
+      }
+      // Add type axioms
+      ImmutableSet<ClassAxiom> axioms = services.getSpecificationRepository().getClassAxioms(type);
+      for (ClassAxiom classAxiom : axioms) {
+         if (shouldIncludeClassAxiom(services, type, classAxiom)) {
+            MemoryAxiom axiom = createAxiom(services, type, classAxiom);
+            result.addAxiom(axiom);
+         }
       }
       // Add allowed proof obligations
       List<String> classObligations = Collections.emptyList();
@@ -928,6 +980,78 @@ public class KeyConnection extends MemoryConnection {
       result.setName(classInvariant.getName());
       result.setText(KeyHacks.getClassInvariantText(services, classInvariant));
       invariantsMapping.put(classInvariant, result);
+      return result;
+   }
+
+   /**
+    * Creates a new {@link IDSAxiom} instance for the given KeY instance.
+    * @param services The services to use.
+    * @param classAxiom The KeY instance.
+    * @return The created {@link IDSAxiom}.
+    * @throws DSException Occurred exception
+    */
+   protected MemoryAxiom createAxiom(Services services, 
+                                     KeYJavaType type,
+                                     ClassAxiom classAxiom) throws DSException {
+      MemoryAxiom result = new MemoryAxiom();
+      result.setName(classAxiom.getName());
+      result.setDefinition(ObjectUtil.toString(classAxiom));
+      fillAxiomContracts(result, services, type, classAxiom);
+      axiomsMapping.put(classAxiom, result);
+      return result;
+   }
+   
+   /**
+    * Fills the {@link IDSOperation} with operation contracts and possible obligations.
+    * @param toFill The {@link IDSOperation} to fill.
+    * @param services The {@link Services} to use.
+    * @param type The java type.
+    * @param pm The method/constructor
+    * @throws DSException Occurred Exception
+    */
+   protected void fillAxiomContracts(IDSAxiom toFill, 
+                                     Services services, 
+                                     KeYJavaType type, 
+                                     ClassAxiom classAxiom) throws DSException {
+      // Get all possible contracts
+      ImmutableSet<Contract> contracts = services.getSpecificationRepository().getAllContracts();
+      // Separate between proofs for contracts and for operation itself
+      List<String> contractObligations = new LinkedList<String>();
+      contractObligations.add(PROOF_OBLIGATION_OPERATION_CONTRACT);
+      List<String> methodObligations = new LinkedList<String>();
+      fillProovableWithAllowedOperationContracts(toFill, methodObligations);
+      // Add operation contracts
+      for (Contract contract : contracts) {
+         if (contract instanceof DependencyContract &&
+             ObjectUtil.equals(classAxiom.getTarget(), contract.getTarget())) {
+            MemoryAxiomContract axiomContract = createAxiomContract(services, (DependencyContract)contract, contractObligations, type, toFill);
+            toFill.getAxiomContracts().add(axiomContract);
+         }
+      }
+   }
+   
+   /**
+    * Creates a new {@link IDSAxiomContract} instance for the given KeY instance.
+    * @param services The services to use.
+    * @param contract The KeY instance.
+    * @param obligations The possible proof obligations
+    * @param kjt The {@link KeYJavaType}
+    * @param parent The parent.
+    * @return The created {@link IDSAxiomContract}.
+    * @throws DSException Occurred exception
+    */   
+   protected MemoryAxiomContract createAxiomContract(Services services, 
+                                                     DependencyContract contract,
+                                                     List<String> obligations,
+                                                     KeYJavaType kjt,
+                                                     IDSAxiom parent) throws DSException {
+      MemoryAxiomContract result = new KeyAxiomContract(this, kjt, contract);
+      result.setParent(parent);
+      result.setName(contract.getName());
+      result.setPre(KeyHacks.getOperationContractPre(services, contract));
+      result.setDep(KeyHacks.getDependencyContractDep(services, (DependencyContract)contract));
+      fillProovableWithAllowedOperationContracts(result, obligations);
+      axiomContractsMapping.put(contract, result);
       return result;
    }
 
@@ -1313,7 +1437,9 @@ public class KeyConnection extends MemoryConnection {
       initConfig = null;
       operationsMapping = null;
       operationContractsMapping = null;
+      axiomContractsMapping = null;
       invariantsMapping = null;
+      axiomsMapping = null;
       typesMapping = null;
       super.disconnect();
    }
@@ -1337,12 +1463,30 @@ public class KeyConnection extends MemoryConnection {
    }
 
    /**
+    * Returns the {@link IDSAxiomContract} for the give {@link Contract} from KeY.
+    * @param oc The given {@link Contract}.
+    * @return The mapped {@link IDSAxiomContract} or {@code null} if no data source instance exists.
+    */
+   public IDSAxiomContract getAxiomContract(Contract oc) {
+      return axiomContractsMapping.get(oc);
+   }
+
+   /**
     * Returns the {@link IDSInvariant} for the give {@link ClassInvariant} from KeY.
     * @param invariant The given {@link ClassInvariant}.
     * @return The mapped {@link IDSInvariant} or {@code null} if no data source instance exists.
     */   
    public IDSInvariant getInvariant(ClassInvariant invariant) {
       return invariantsMapping.get(invariant);
+   }
+
+   /**
+    * Returns the {@link IDSAxiom} for the give {@link ClassAxiom} from KeY.
+    * @param axiom The given {@link ClassAxiom}.
+    * @return The mapped {@link IDSAxiom} or {@code null} if no data source instance exists.
+    */   
+   public IDSAxiom getAxiom(ClassAxiom axiom) {
+      return axiomsMapping.get(axiom);
    }
    
    /**
@@ -1364,7 +1508,7 @@ public class KeyConnection extends MemoryConnection {
     * Opens the proof.
     * @param type The {@link KeYJavaType} to use or {@code null} if not required.
     * @param pm The {@link ProgramMethod} to use or {@code null} if not required.
-    * @param oc The {@link OperationContract} to use or {@code null} if not required.
+    * @param oc The {@link Contract} to use or {@code null} if not required.
     * @param obligation The obligation to proof.
     * @return The opened {@link OpenedProof} or {@code null} if no one was opened.
     * @throws DSException Occurred Exception
@@ -1372,7 +1516,7 @@ public class KeyConnection extends MemoryConnection {
     */
    public OpenedProof openProof(KeYJavaType type,
                                 ProgramMethod pm,
-                                OperationContract oc,
+                                Contract oc,
                                 String obligation) throws DSException, DSCanceledException {
       OpenedProof proofResult = createProofInput(type, pm, oc, obligation);
       if (proofResult == null || proofResult.getInput() == null) {
@@ -1393,14 +1537,14 @@ public class KeyConnection extends MemoryConnection {
     * </p>
     * @param type The {@link KeYJavaType} to use or {@code null} if not required.
     * @param pm The {@link ProgramMethod} to use or {@code null} if not required.
-    * @param oc The {@link OperationContract} to use or {@code null} if not required.
+    * @param oc The {@link Contract} to use or {@code null} if not required.
     * @param poString The obligation to proof.
     * @return The created {@link OpenedProof} that contains for example the {@link ProofOblInput}.
     * @throws DSException Occurred Exception
     */
    public OpenedProof createProofInput(KeYJavaType type,
                                        ProgramMethod pm,
-                                       OperationContract oc,
+                                       Contract oc,
                                        String poString) throws DSException {
       ProofOblInput input = oc.createProofObl(initConfig, oc);
       return new OpenedProof(input);

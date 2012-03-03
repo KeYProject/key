@@ -120,8 +120,14 @@
         <containmentFeature
             href="DbcModel.ecore#//AbstractDbcInterface/methods"/>
       </children>
+      <children
+          compartment="//@nodes.1/@ownedChild/@compartments.0"
+          referencedChild="//@nodes.2/@ownedChild/@children.8/@ownedChild">
+        <containmentFeature
+            href="DbcModel.ecore#//AbstractDbcType/axioms"/>
+      </children>
       <compartments
-          children="//@nodes.1/@ownedChild/@children.2 //@nodes.1/@ownedChild/@children.1 //@nodes.1/@ownedChild/@children.0 //@nodes.1/@ownedChild/@children.3 //@nodes.1/@ownedChild/@children.4 //@nodes.1/@ownedChild/@children.6">
+          children="//@nodes.1/@ownedChild/@children.2 //@nodes.1/@ownedChild/@children.1 //@nodes.1/@ownedChild/@children.0 //@nodes.1/@ownedChild/@children.3 //@nodes.1/@ownedChild/@children.4 //@nodes.1/@ownedChild/@children.6 //@nodes.1/@ownedChild/@children.7">
         <compartment
             href="DbcModel.gmfgraph#DbcInterfaceMainCompartment"/>
       </compartments>
@@ -228,7 +234,7 @@
               </labelMappings>
               <tool
                   xsi:type="gmftool:CreationTool"
-                  href="DbcModel.gmftool#//@palette/@tools.1/@tools.1"/>
+                  href="DbcModel.gmftool#//@palette/@tools.1/@tools.3"/>
               <diagramNode
                   href="DbcModel.gmfgraph#DbcOperationContract"/>
             </ownedChild>
@@ -301,7 +307,7 @@
           </labelMappings>
           <tool
               xsi:type="gmftool:CreationTool"
-              href="DbcModel.gmftool#//@palette/@tools.1/@tools.0"/>
+              href="DbcModel.gmftool#//@palette/@tools.1/@tools.2"/>
           <diagramNode
               href="DbcModel.gmfgraph#DbcInvariant"/>
         </ownedChild>
@@ -338,8 +344,76 @@
               href="DbcModel.gmfgraph#DbcAttributeName"/>
         </ownedChild>
       </children>
+      <children
+          compartment="//@nodes.2/@ownedChild/@compartments.0">
+        <containmentFeature
+            href="DbcModel.ecore#//AbstractDbcType/axioms"/>
+        <ownedChild>
+          <domainMetaElement
+              href="DbcModel.ecore#//DbcAxiom"/>
+          <labelMappings
+              xsi:type="gmfmap:FeatureLabelMapping">
+            <diagramLabel
+                href="DbcModel.gmfgraph#DbcAxiomName"/>
+            <features
+                href="DbcModel.ecore#//AbstractDbcSpecification/name"/>
+          </labelMappings>
+          <labelMappings
+              xsi:type="gmfmap:FeatureLabelMapping">
+            <diagramLabel
+                href="DbcModel.gmfgraph#DbcAxiomDefinition"/>
+            <features
+                href="DbcModel.ecore#//DbcAxiom/definition"/>
+          </labelMappings>
+          <tool
+              xsi:type="gmftool:CreationTool"
+              href="DbcModel.gmftool#//@palette/@tools.1/@tools.0"/>
+          <diagramNode
+              href="DbcModel.gmfgraph#DbcAxiom"/>
+          <children
+              compartment="//@nodes.2/@ownedChild/@children.8/@ownedChild/@compartments.0">
+            <containmentFeature
+                href="DbcModel.ecore#//DbcAxiom/axiomContracts"/>
+            <ownedChild>
+              <domainMetaElement
+                  href="DbcModel.ecore#//DbCAxiomContract"/>
+              <labelMappings
+                  xsi:type="gmfmap:FeatureLabelMapping">
+                <diagramLabel
+                    href="DbcModel.gmfgraph#DbcAxiomContractName"/>
+                <features
+                    href="DbcModel.ecore#//AbstractDbcSpecification/name"/>
+              </labelMappings>
+              <labelMappings
+                  xsi:type="gmfmap:FeatureLabelMapping">
+                <diagramLabel
+                    href="DbcModel.gmfgraph#DbcAxiomContractPre"/>
+                <features
+                    href="DbcModel.ecore#//DbCAxiomContract/pre"/>
+              </labelMappings>
+              <labelMappings
+                  xsi:type="gmfmap:FeatureLabelMapping">
+                <diagramLabel
+                    href="DbcModel.gmfgraph#DbcAxiomContractDep"/>
+                <features
+                    href="DbcModel.ecore#//DbCAxiomContract/dep"/>
+              </labelMappings>
+              <tool
+                  xsi:type="gmftool:CreationTool"
+                  href="DbcModel.gmftool#//@palette/@tools.1/@tools.1"/>
+              <diagramNode
+                  href="DbcModel.gmfgraph#DbcAxiomContract"/>
+            </ownedChild>
+          </children>
+          <compartments
+              children="//@nodes.2/@ownedChild/@children.8/@ownedChild/@children.0">
+            <compartment
+                href="DbcModel.gmfgraph#DbcAxiomCompartment"/>
+          </compartments>
+        </ownedChild>
+      </children>
       <compartments
-          children="//@nodes.2/@ownedChild/@children.3 //@nodes.2/@ownedChild/@children.0 //@nodes.2/@ownedChild/@children.4 //@nodes.2/@ownedChild/@children.5 //@nodes.2/@ownedChild/@children.6 //@nodes.2/@ownedChild/@children.1 //@nodes.2/@ownedChild/@children.2">
+          children="//@nodes.2/@ownedChild/@children.3 //@nodes.2/@ownedChild/@children.0 //@nodes.2/@ownedChild/@children.4 //@nodes.2/@ownedChild/@children.5 //@nodes.2/@ownedChild/@children.6 //@nodes.2/@ownedChild/@children.1 //@nodes.2/@ownedChild/@children.2 //@nodes.2/@ownedChild/@children.8">
         <compartment
             href="DbcModel.gmfgraph#DbcClassMainCompartment"/>
       </compartments>
@@ -440,8 +514,14 @@
               href="DbcModel.gmfgraph#DbcEnumLiteralName"/>
         </ownedChild>
       </children>
+      <children
+          compartment="//@nodes.3/@ownedChild/@compartments.0"
+          referencedChild="//@nodes.2/@ownedChild/@children.8/@ownedChild">
+        <containmentFeature
+            href="DbcModel.ecore#//AbstractDbcType/axioms"/>
+      </children>
       <compartments
-          children="//@nodes.3/@ownedChild/@children.2 //@nodes.3/@ownedChild/@children.1 //@nodes.3/@ownedChild/@children.0 //@nodes.3/@ownedChild/@children.3 //@nodes.3/@ownedChild/@children.4 //@nodes.3/@ownedChild/@children.6 //@nodes.3/@ownedChild/@children.7">
+          children="//@nodes.3/@ownedChild/@children.2 //@nodes.3/@ownedChild/@children.1 //@nodes.3/@ownedChild/@children.0 //@nodes.3/@ownedChild/@children.3 //@nodes.3/@ownedChild/@children.4 //@nodes.3/@ownedChild/@children.6 //@nodes.3/@ownedChild/@children.7 //@nodes.3/@ownedChild/@children.9">
         <compartment
             href="DbcModel.gmfgraph#DbcEnumMainCompartment"/>
       </compartments>

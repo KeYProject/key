@@ -86,6 +86,8 @@ public class DbcmodelFactoryImpl extends EFactoryImpl implements DbcmodelFactory
          case DbcmodelPackage.DBC_OPERATION_CONTRACT: return createDbcOperationContract();
          case DbcmodelPackage.DBC_PROPERTY: return createDbcProperty();
          case DbcmodelPackage.DBC_PROOF_OBLIGATION: return createDbcProofObligation();
+         case DbcmodelPackage.DBC_AXIOM: return createDbcAxiom();
+         case DbcmodelPackage.DB_CAXIOM_CONTRACT: return createDbCAxiomContract();
          default:
             throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
       }
@@ -280,6 +282,26 @@ public class DbcmodelFactoryImpl extends EFactoryImpl implements DbcmodelFactory
    }
 
    /**
+    * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+    * @generated
+    */
+    public DbcAxiom createDbcAxiom() {
+      DbcAxiomImpl dbcAxiom = new DbcAxiomImpl();
+      return dbcAxiom;
+   }
+
+/**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
+   public DbCAxiomContract createDbCAxiomContract() {
+      DbCAxiomContractImpl dbCAxiomContract = new DbCAxiomContractImpl();
+      return dbCAxiomContract;
+   }
+
+/**
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
     * @generated

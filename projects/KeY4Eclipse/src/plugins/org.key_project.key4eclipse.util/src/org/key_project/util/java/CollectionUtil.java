@@ -160,4 +160,21 @@ public class CollectionUtil {
       }
       return result;
    }
+
+   /**
+    * Checks if the given element is contained in the given {@link Iterable}.
+    * @param iterable The given {@link Iterable} to search in.
+    * @param element The element to search.
+    * @return {@code true} = contained, {@code false} = not contained
+    */
+   public static <T> boolean contains(Iterable<T> iterable, T element) {
+      boolean found = false;
+      if (iterable != null) {
+         Iterator<T> iter = iterable.iterator();
+         while (!found && iter.hasNext()) {
+            found = ObjectUtil.equals(iter.next(), element);
+         }
+      }
+      return found;
+   }
 }

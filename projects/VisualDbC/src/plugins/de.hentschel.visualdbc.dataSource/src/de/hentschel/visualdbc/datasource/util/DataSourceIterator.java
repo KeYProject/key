@@ -12,6 +12,8 @@
 package de.hentschel.visualdbc.datasource.util;
 
 import de.hentschel.visualdbc.datasource.model.IDSAttribute;
+import de.hentschel.visualdbc.datasource.model.IDSAxiom;
+import de.hentschel.visualdbc.datasource.model.IDSAxiomContract;
 import de.hentschel.visualdbc.datasource.model.IDSClass;
 import de.hentschel.visualdbc.datasource.model.IDSConnection;
 import de.hentschel.visualdbc.datasource.model.IDSConstructor;
@@ -151,6 +153,9 @@ public class DataSourceIterator {
       for (IDSInvariant invariant : instance.getInvariants()) {
          iterateOverInvariant(invariant);
       }
+      for (IDSAxiom axiom : instance.getAxioms()) {
+         iterateOverAxiom(axiom);
+      }
    }
    
    /**
@@ -178,6 +183,9 @@ public class DataSourceIterator {
       }
       for (IDSInvariant invariant : instance.getInvariants()) {
          iterateOverInvariant(invariant);
+      }
+      for (IDSAxiom axiom : instance.getAxioms()) {
+         iterateOverAxiom(axiom);
       }
    }
    
@@ -209,6 +217,9 @@ public class DataSourceIterator {
       }
       for (IDSInvariant invariant : instance.getInvariants()) {
          iterateOverInvariant(invariant);
+      }
+      for (IDSAxiom axiom : instance.getAxioms()) {
+         iterateOverAxiom(axiom);
       }
       for (IDSEnumLiteral literal : instance.getLiterals()) {
          iterateOverEnumLiteral(literal);
@@ -323,12 +334,53 @@ public class DataSourceIterator {
    }
    
    /**
+    * Iterates over the current element.
+    * @param instance The current element.
+    * @throws DSException Occurred Exception.
+    */
+   public void iterateOverAxiom(IDSAxiom instance) throws DSException {
+      workOnAxiom(instance);
+      for (IDSAxiomContract axiomContract : instance.getAxiomContracts()) {
+         iterateOverAxiomContract(axiomContract);
+      }
+      iterateOverProvable(instance);
+   }
+   
+   /**
+    * Iterates over the current element.
+    * @param instance The current element.
+    * @throws DSException Occurred Exception.
+    */
+   public void iterateOverAxiomContract(IDSAxiomContract instance) throws DSException {
+      workOnAxiomContract(instance);
+      iterateOverProvable(instance);
+   }
+   
+   /**
     * Subclasses can do something with the current element.
     * This default implementation does nothing.
     * @param instance The current element.
     * @throws DSException Occurred Exception.
     */
    protected void workOnInvariant(IDSInvariant instance) throws DSException {
+   }
+   
+   /**
+    * Subclasses can do something with the current element.
+    * This default implementation does nothing.
+    * @param instance The current element.
+    * @throws DSException Occurred Exception.
+    */
+   protected void workOnAxiom(IDSAxiom instance) throws DSException {
+   }
+   
+   /**
+    * Subclasses can do something with the current element.
+    * This default implementation does nothing.
+    * @param instance The current element.
+    * @throws DSException Occurred Exception.
+    */
+   protected void workOnAxiomContract(IDSAxiomContract instance) throws DSException {
    }
    
    /**

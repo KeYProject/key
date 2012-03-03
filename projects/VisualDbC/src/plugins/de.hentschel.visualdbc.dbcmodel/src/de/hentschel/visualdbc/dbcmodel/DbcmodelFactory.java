@@ -172,6 +172,24 @@ public interface DbcmodelFactory extends EFactory {
    DbcProofObligation createDbcProofObligation();
 
    /**
+    * Returns a new object of class '<em>Dbc Axiom</em>'.
+    * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+    * @return a new object of class '<em>Dbc Axiom</em>'.
+    * @generated
+    */
+    DbcAxiom createDbcAxiom();
+
+/**
+    * Returns a new object of class '<em>Db CAxiom Contract</em>'.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @return a new object of class '<em>Db CAxiom Contract</em>'.
+    * @generated
+    */
+   DbCAxiomContract createDbCAxiomContract();
+
+/**
     * Returns the package supported by this factory.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->

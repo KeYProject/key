@@ -17,6 +17,7 @@
  */
 package de.hentschel.visualdbc.dbcmodel.util;
 
+import de.hentschel.visualdbc.dbcmodel.*;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.util.Switch;
@@ -328,6 +329,23 @@ public class DbcmodelSwitch<T> extends Switch<T> {
          case DbcmodelPackage.DBC_PROOF_OBLIGATION: {
             DbcProofObligation dbcProofObligation = (DbcProofObligation)theEObject;
             T result = caseDbcProofObligation(dbcProofObligation);
+            if (result == null) result = defaultCase(theEObject);
+            return result;
+         }
+         case DbcmodelPackage.DBC_AXIOM: {
+            DbcAxiom dbcAxiom = (DbcAxiom)theEObject;
+            T result = caseDbcAxiom(dbcAxiom);
+            if (result == null) result = caseIDbCProofReferencable(dbcAxiom);
+            if (result == null) result = caseAbstractDbcSpecification(dbcAxiom);
+            if (result == null) result = defaultCase(theEObject);
+            return result;
+         }
+         case DbcmodelPackage.DB_CAXIOM_CONTRACT: {
+            DbCAxiomContract dbCAxiomContract = (DbCAxiomContract)theEObject;
+            T result = caseDbCAxiomContract(dbCAxiomContract);
+            if (result == null) result = caseAbstractDbcSpecification(dbCAxiomContract);
+            if (result == null) result = caseIDbCProvable(dbCAxiomContract);
+            if (result == null) result = caseIDbCProofReferencable(dbCAxiomContract);
             if (result == null) result = defaultCase(theEObject);
             return result;
          }
@@ -726,6 +744,36 @@ public class DbcmodelSwitch<T> extends Switch<T> {
    }
 
    /**
+    * Returns the result of interpreting the object as an instance of '<em>Dbc Axiom</em>'.
+    * <!-- begin-user-doc -->
+     * This implementation returns null;
+     * returning a non-null result will terminate the switch.
+     * <!-- end-user-doc -->
+    * @param object the target of the switch.
+    * @return the result of interpreting the object as an instance of '<em>Dbc Axiom</em>'.
+    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+    * @generated
+    */
+    public T caseDbcAxiom(DbcAxiom object) {
+      return null;
+   }
+
+/**
+    * Returns the result of interpreting the object as an instance of '<em>Db CAxiom Contract</em>'.
+    * <!-- begin-user-doc -->
+    * This implementation returns null;
+    * returning a non-null result will terminate the switch.
+    * <!-- end-user-doc -->
+    * @param object the target of the switch.
+    * @return the result of interpreting the object as an instance of '<em>Db CAxiom Contract</em>'.
+    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+    * @generated
+    */
+   public T caseDbCAxiomContract(DbCAxiomContract object) {
+      return null;
+   }
+
+/**
     * Returns the result of interpreting the object as an instance of '<em>EObject</em>'.
     * <!-- begin-user-doc -->
     * This implementation returns null;

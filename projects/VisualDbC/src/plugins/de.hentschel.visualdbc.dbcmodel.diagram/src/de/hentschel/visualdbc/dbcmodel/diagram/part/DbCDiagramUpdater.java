@@ -1,14 +1,3 @@
-/*******************************************************************************
- * Copyright (c) 2011 Martin Hentschel.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *    Martin Hentschel - initial API and implementation
- *******************************************************************************/
-
 package de.hentschel.visualdbc.dbcmodel.diagram.part;
 
 import java.util.Collection;
@@ -25,7 +14,9 @@ import org.eclipse.gmf.runtime.notation.View;
 
 import de.hentschel.visualdbc.dbcmodel.AbstractDbcClass;
 import de.hentschel.visualdbc.dbcmodel.AbstractDbcType;
+import de.hentschel.visualdbc.dbcmodel.DbCAxiomContract;
 import de.hentschel.visualdbc.dbcmodel.DbcAttribute;
+import de.hentschel.visualdbc.dbcmodel.DbcAxiom;
 import de.hentschel.visualdbc.dbcmodel.DbcClass;
 import de.hentschel.visualdbc.dbcmodel.DbcConstructor;
 import de.hentschel.visualdbc.dbcmodel.DbcEnum;
@@ -42,7 +33,10 @@ import de.hentschel.visualdbc.dbcmodel.DbcmodelPackage;
 import de.hentschel.visualdbc.dbcmodel.IDbCProofReferencable;
 import de.hentschel.visualdbc.dbcmodel.IDbCProvable;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.AbstractDbcClassImplementsEditPart;
+import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbCAxiomContractEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcAttributeEditPart;
+import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcAxiomDbcAxiomCompartmentEditPart;
+import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcAxiomEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcClass2EditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcClassDbcClassAttributeCompartment2EditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcClassDbcClassAttributeCompartmentEditPart;
@@ -117,6 +111,8 @@ public class DbCDiagramUpdater {
          return getDbcMethodDbcMethodCompartment_7011SemanticChildren(view);
       case DbcConstructorDbcConstructorCompartmentEditPart.VISUAL_ID:
          return getDbcConstructorDbcConstructorCompartment_7012SemanticChildren(view);
+      case DbcAxiomDbcAxiomCompartmentEditPart.VISUAL_ID:
+         return getDbcAxiomDbcAxiomCompartment_7064SemanticChildren(view);
       case DbcInterfaceDbcInterfaceMainCompartment2EditPart.VISUAL_ID:
          return getDbcInterfaceDbcInterfaceMainCompartment_7057SemanticChildren(view);
       case DbcInterfaceDbcInterfaceAttributeCompartment2EditPart.VISUAL_ID:
@@ -342,6 +338,14 @@ public class DbCDiagramUpdater {
             continue;
          }
       }
+      for (Iterator<?> it = modelElement.getAxioms().iterator(); it.hasNext();) {
+         DbcAxiom childElement = (DbcAxiom) it.next();
+         int visualID = DbCVisualIDRegistry.getNodeVisualID(view, childElement);
+         if (visualID == DbcAxiomEditPart.VISUAL_ID) {
+            result.add(new DbCNodeDescriptor(childElement, visualID));
+            continue;
+         }
+      }
       return result;
    }
 
@@ -422,6 +426,14 @@ public class DbCDiagramUpdater {
          DbcMethod childElement = (DbcMethod) it.next();
          int visualID = DbCVisualIDRegistry.getNodeVisualID(view, childElement);
          if (visualID == DbcMethodEditPart.VISUAL_ID) {
+            result.add(new DbCNodeDescriptor(childElement, visualID));
+            continue;
+         }
+      }
+      for (Iterator<?> it = modelElement.getAxioms().iterator(); it.hasNext();) {
+         DbcAxiom childElement = (DbcAxiom) it.next();
+         int visualID = DbCVisualIDRegistry.getNodeVisualID(view, childElement);
+         if (visualID == DbcAxiomEditPart.VISUAL_ID) {
             result.add(new DbCNodeDescriptor(childElement, visualID));
             continue;
          }
@@ -515,6 +527,14 @@ public class DbCDiagramUpdater {
          DbcConstructor childElement = (DbcConstructor) it.next();
          int visualID = DbCVisualIDRegistry.getNodeVisualID(view, childElement);
          if (visualID == DbcConstructorEditPart.VISUAL_ID) {
+            result.add(new DbCNodeDescriptor(childElement, visualID));
+            continue;
+         }
+      }
+      for (Iterator<?> it = modelElement.getAxioms().iterator(); it.hasNext();) {
+         DbcAxiom childElement = (DbcAxiom) it.next();
+         int visualID = DbCVisualIDRegistry.getNodeVisualID(view, childElement);
+         if (visualID == DbcAxiomEditPart.VISUAL_ID) {
             result.add(new DbCNodeDescriptor(childElement, visualID));
             continue;
          }
@@ -644,6 +664,32 @@ public class DbCDiagramUpdater {
    /**
     * @generated
     */
+   public static List<DbCNodeDescriptor> getDbcAxiomDbcAxiomCompartment_7064SemanticChildren(
+         View view) {
+      if (false == view.eContainer() instanceof View) {
+         return Collections.emptyList();
+      }
+      View containerView = (View) view.eContainer();
+      if (!containerView.isSetElement()) {
+         return Collections.emptyList();
+      }
+      DbcAxiom modelElement = (DbcAxiom) containerView.getElement();
+      LinkedList<DbCNodeDescriptor> result = new LinkedList<DbCNodeDescriptor>();
+      for (Iterator<?> it = modelElement.getAxiomContracts().iterator(); it
+            .hasNext();) {
+         DbCAxiomContract childElement = (DbCAxiomContract) it.next();
+         int visualID = DbCVisualIDRegistry.getNodeVisualID(view, childElement);
+         if (visualID == DbCAxiomContractEditPart.VISUAL_ID) {
+            result.add(new DbCNodeDescriptor(childElement, visualID));
+            continue;
+         }
+      }
+      return result;
+   }
+
+   /**
+    * @generated
+    */
    public static List<DbCNodeDescriptor> getDbcInterfaceDbcInterfaceMainCompartment_7057SemanticChildren(
          View view) {
       if (false == view.eContainer() instanceof View) {
@@ -692,6 +738,14 @@ public class DbCDiagramUpdater {
          DbcMethod childElement = (DbcMethod) it.next();
          int visualID = DbCVisualIDRegistry.getNodeVisualID(view, childElement);
          if (visualID == DbcMethodEditPart.VISUAL_ID) {
+            result.add(new DbCNodeDescriptor(childElement, visualID));
+            continue;
+         }
+      }
+      for (Iterator<?> it = modelElement.getAxioms().iterator(); it.hasNext();) {
+         DbcAxiom childElement = (DbcAxiom) it.next();
+         int visualID = DbCVisualIDRegistry.getNodeVisualID(view, childElement);
+         if (visualID == DbcAxiomEditPart.VISUAL_ID) {
             result.add(new DbCNodeDescriptor(childElement, visualID));
             continue;
          }
@@ -789,6 +843,14 @@ public class DbCDiagramUpdater {
             continue;
          }
       }
+      for (Iterator<?> it = modelElement.getAxioms().iterator(); it.hasNext();) {
+         DbcAxiom childElement = (DbcAxiom) it.next();
+         int visualID = DbCVisualIDRegistry.getNodeVisualID(view, childElement);
+         if (visualID == DbcAxiomEditPart.VISUAL_ID) {
+            result.add(new DbCNodeDescriptor(childElement, visualID));
+            continue;
+         }
+      }
       return result;
    }
 
@@ -878,6 +940,14 @@ public class DbCDiagramUpdater {
          DbcConstructor childElement = (DbcConstructor) it.next();
          int visualID = DbCVisualIDRegistry.getNodeVisualID(view, childElement);
          if (visualID == DbcConstructorEditPart.VISUAL_ID) {
+            result.add(new DbCNodeDescriptor(childElement, visualID));
+            continue;
+         }
+      }
+      for (Iterator<?> it = modelElement.getAxioms().iterator(); it.hasNext();) {
+         DbcAxiom childElement = (DbcAxiom) it.next();
+         int visualID = DbCVisualIDRegistry.getNodeVisualID(view, childElement);
+         if (visualID == DbcAxiomEditPart.VISUAL_ID) {
             result.add(new DbCNodeDescriptor(childElement, visualID));
             continue;
          }
@@ -975,6 +1045,10 @@ public class DbCDiagramUpdater {
          return getDbcConstructor_3010ContainedLinks(view);
       case DbcEnumLiteralEditPart.VISUAL_ID:
          return getDbcEnumLiteral_3020ContainedLinks(view);
+      case DbcAxiomEditPart.VISUAL_ID:
+         return getDbcAxiom_3036ContainedLinks(view);
+      case DbCAxiomContractEditPart.VISUAL_ID:
+         return getDbCAxiomContract_3037ContainedLinks(view);
       case DbcProofReferenceEditPart.VISUAL_ID:
          return getDbcProofReference_4002ContainedLinks(view);
       }
@@ -1018,6 +1092,10 @@ public class DbCDiagramUpdater {
          return getDbcConstructor_3010IncomingLinks(view);
       case DbcEnumLiteralEditPart.VISUAL_ID:
          return getDbcEnumLiteral_3020IncomingLinks(view);
+      case DbcAxiomEditPart.VISUAL_ID:
+         return getDbcAxiom_3036IncomingLinks(view);
+      case DbCAxiomContractEditPart.VISUAL_ID:
+         return getDbCAxiomContract_3037IncomingLinks(view);
       case DbcProofReferenceEditPart.VISUAL_ID:
          return getDbcProofReference_4002IncomingLinks(view);
       }
@@ -1061,6 +1139,10 @@ public class DbCDiagramUpdater {
          return getDbcConstructor_3010OutgoingLinks(view);
       case DbcEnumLiteralEditPart.VISUAL_ID:
          return getDbcEnumLiteral_3020OutgoingLinks(view);
+      case DbcAxiomEditPart.VISUAL_ID:
+         return getDbcAxiom_3036OutgoingLinks(view);
+      case DbCAxiomContractEditPart.VISUAL_ID:
+         return getDbCAxiomContract_3037OutgoingLinks(view);
       case DbcProofReferenceEditPart.VISUAL_ID:
          return getDbcProofReference_4002OutgoingLinks(view);
       }
@@ -1225,6 +1307,22 @@ public class DbCDiagramUpdater {
     * @generated
     */
    public static List<DbCLinkDescriptor> getDbcEnumLiteral_3020ContainedLinks(
+         View view) {
+      return Collections.emptyList();
+   }
+
+   /**
+    * @generated
+    */
+   public static List<DbCLinkDescriptor> getDbcAxiom_3036ContainedLinks(
+         View view) {
+      return Collections.emptyList();
+   }
+
+   /**
+    * @generated
+    */
+   public static List<DbCLinkDescriptor> getDbCAxiomContract_3037ContainedLinks(
          View view) {
       return Collections.emptyList();
    }
@@ -1453,6 +1551,35 @@ public class DbCDiagramUpdater {
    /**
     * @generated
     */
+   public static List<DbCLinkDescriptor> getDbcAxiom_3036IncomingLinks(View view) {
+      DbcAxiom modelElement = (DbcAxiom) view.getElement();
+      Map<EObject, Collection<EStructuralFeature.Setting>> crossReferences = EcoreUtil.CrossReferencer
+            .find(view.eResource().getResourceSet().getResources());
+      LinkedList<DbCLinkDescriptor> result = new LinkedList<DbCLinkDescriptor>();
+      result.addAll(getIncomingTypeModelFacetLinks_DbcProofReference_4002(
+            modelElement, crossReferences));
+      return result;
+   }
+
+   /**
+    * @generated
+    */
+   public static List<DbCLinkDescriptor> getDbCAxiomContract_3037IncomingLinks(
+         View view) {
+      DbCAxiomContract modelElement = (DbCAxiomContract) view.getElement();
+      Map<EObject, Collection<EStructuralFeature.Setting>> crossReferences = EcoreUtil.CrossReferencer
+            .find(view.eResource().getResourceSet().getResources());
+      LinkedList<DbCLinkDescriptor> result = new LinkedList<DbCLinkDescriptor>();
+      result.addAll(getIncomingFeatureModelFacetLinks_DbcProof_Target_4001(
+            modelElement, crossReferences));
+      result.addAll(getIncomingTypeModelFacetLinks_DbcProofReference_4002(
+            modelElement, crossReferences));
+      return result;
+   }
+
+   /**
+    * @generated
+    */
    public static List<DbCLinkDescriptor> getDbcProofReference_4002IncomingLinks(
          View view) {
       return Collections.emptyList();
@@ -1604,6 +1731,21 @@ public class DbCDiagramUpdater {
     * @generated
     */
    public static List<DbCLinkDescriptor> getDbcEnumLiteral_3020OutgoingLinks(
+         View view) {
+      return Collections.emptyList();
+   }
+
+   /**
+    * @generated
+    */
+   public static List<DbCLinkDescriptor> getDbcAxiom_3036OutgoingLinks(View view) {
+      return Collections.emptyList();
+   }
+
+   /**
+    * @generated
+    */
+   public static List<DbCLinkDescriptor> getDbCAxiomContract_3037OutgoingLinks(
          View view) {
       return Collections.emptyList();
    }
