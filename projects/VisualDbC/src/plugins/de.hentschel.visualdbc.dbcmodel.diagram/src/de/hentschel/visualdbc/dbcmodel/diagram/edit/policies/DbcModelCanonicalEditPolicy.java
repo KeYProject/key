@@ -44,12 +44,14 @@ import org.eclipse.gmf.runtime.notation.View;
 
 import de.hentschel.visualdbc.dbcmodel.DbcmodelPackage;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbCAxiomContractEditPart;
+import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcAttributeEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcAxiomEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcClass2EditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcClassEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcConstructorEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcEnum2EditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcEnumEditPart;
+import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcEnumLiteralEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcInterface2EditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcInterfaceEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcInvariantEditPart;
@@ -417,6 +419,17 @@ public class DbcModelCanonicalEditPolicy extends CanonicalEditPolicy {
          }
          break;
       }
+      case DbcAttributeEditPart.VISUAL_ID: {
+         if (!domain2NotationMap.containsKey(view.getElement())) {
+            result.addAll(DbCDiagramUpdater
+                  .getDbcAttribute_3011ContainedLinks(view));
+         }
+         if (!domain2NotationMap.containsKey(view.getElement())
+               || view.getEAnnotation("Shortcut") == null) { //$NON-NLS-1$
+            domain2NotationMap.put(view.getElement(), view);
+         }
+         break;
+      }
       case DbcMethodEditPart.VISUAL_ID: {
          if (!domain2NotationMap.containsKey(view.getElement())) {
             result.addAll(DbCDiagramUpdater
@@ -443,6 +456,17 @@ public class DbcModelCanonicalEditPolicy extends CanonicalEditPolicy {
          if (!domain2NotationMap.containsKey(view.getElement())) {
             result.addAll(DbCDiagramUpdater
                   .getDbcConstructor_3010ContainedLinks(view));
+         }
+         if (!domain2NotationMap.containsKey(view.getElement())
+               || view.getEAnnotation("Shortcut") == null) { //$NON-NLS-1$
+            domain2NotationMap.put(view.getElement(), view);
+         }
+         break;
+      }
+      case DbcEnumLiteralEditPart.VISUAL_ID: {
+         if (!domain2NotationMap.containsKey(view.getElement())) {
+            result.addAll(DbCDiagramUpdater
+                  .getDbcEnumLiteral_3020ContainedLinks(view));
          }
          if (!domain2NotationMap.containsKey(view.getElement())
                || view.getEAnnotation("Shortcut") == null) { //$NON-NLS-1$

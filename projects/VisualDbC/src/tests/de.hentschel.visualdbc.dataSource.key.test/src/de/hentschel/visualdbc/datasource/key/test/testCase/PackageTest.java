@@ -28,7 +28,7 @@ public class PackageTest extends TestCase {
     * Tests packages with management {@link DSPackageManagement#NO_PACKAGES}
     */
    @Test
-   public void testPackageManagement_noPackages() {
+   public void testPackageManagement_noPackages() throws Exception {
       TestKeyUtil.testKeyConnection("testPackageManagement_noPackages",
                                     "data/packageTest",
                                     null,
@@ -40,7 +40,7 @@ public class PackageTest extends TestCase {
     * Tests packages with management {@link DSPackageManagement#FLAT_LIST}
     */
    @Test
-   public void testPackageManagement_flatList() {
+   public void testPackageManagement_flatList() throws Exception {
       TestKeyUtil.testKeyConnection("testPackageManagement_flatList",
                                     "data/packageTest",
                                     null,
@@ -52,7 +52,7 @@ public class PackageTest extends TestCase {
     * Tests packages with management {@link DSPackageManagement#HIERARCHY}
     */
    @Test
-   public void testPackageManagement_hierarchy() {
+   public void testPackageManagement_hierarchy() throws Exception {
       TestKeyUtil.testKeyConnection("testPackageManagement_hierarchy",
                                     "data/packageTest",
                                     null,

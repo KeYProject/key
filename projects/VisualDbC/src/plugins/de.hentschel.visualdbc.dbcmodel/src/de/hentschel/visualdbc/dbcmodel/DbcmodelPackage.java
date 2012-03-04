@@ -1338,13 +1338,32 @@ public interface DbcmodelPackage extends EPackage {
    int DBC_PROOF_REFERENCE_FEATURE_COUNT = 2;
 
    /**
+    * The meta object id for the '{@link de.hentschel.visualdbc.dbcmodel.IDbCProofReferencable <em>IDb CProof Referencable</em>}' class.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @see de.hentschel.visualdbc.dbcmodel.IDbCProofReferencable
+    * @see de.hentschel.visualdbc.dbcmodel.impl.DbcmodelPackageImpl#getIDbCProofReferencable()
+    * @generated
+    */
+   int IDB_CPROOF_REFERENCABLE = 24;
+
+   /**
+    * The number of structural features of the '<em>IDb CProof Referencable</em>' class.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int IDB_CPROOF_REFERENCABLE_FEATURE_COUNT = 0;
+
+   /**
     * The feature id for the '<em><b>Name</b></em>' attribute.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
     * @generated
     * @ordered
     */
-   int DBC_ATTRIBUTE__NAME = 0;
+   int DBC_ATTRIBUTE__NAME = IDB_CPROOF_REFERENCABLE_FEATURE_COUNT + 0;
 
    /**
     * The feature id for the '<em><b>Type</b></em>' attribute.
@@ -1353,7 +1372,7 @@ public interface DbcmodelPackage extends EPackage {
     * @generated
     * @ordered
     */
-   int DBC_ATTRIBUTE__TYPE = 1;
+   int DBC_ATTRIBUTE__TYPE = IDB_CPROOF_REFERENCABLE_FEATURE_COUNT + 1;
 
    /**
     * The feature id for the '<em><b>Visibility</b></em>' attribute.
@@ -1362,7 +1381,7 @@ public interface DbcmodelPackage extends EPackage {
     * @generated
     * @ordered
     */
-   int DBC_ATTRIBUTE__VISIBILITY = 2;
+   int DBC_ATTRIBUTE__VISIBILITY = IDB_CPROOF_REFERENCABLE_FEATURE_COUNT + 2;
 
    /**
     * The feature id for the '<em><b>Static</b></em>' attribute.
@@ -1371,7 +1390,7 @@ public interface DbcmodelPackage extends EPackage {
     * @generated
     * @ordered
     */
-   int DBC_ATTRIBUTE__STATIC = 3;
+   int DBC_ATTRIBUTE__STATIC = IDB_CPROOF_REFERENCABLE_FEATURE_COUNT + 3;
 
    /**
     * The feature id for the '<em><b>Final</b></em>' attribute.
@@ -1380,7 +1399,7 @@ public interface DbcmodelPackage extends EPackage {
     * @generated
     * @ordered
     */
-   int DBC_ATTRIBUTE__FINAL = 4;
+   int DBC_ATTRIBUTE__FINAL = IDB_CPROOF_REFERENCABLE_FEATURE_COUNT + 4;
 
    /**
     * The number of structural features of the '<em>Dbc Attribute</em>' class.
@@ -1389,7 +1408,7 @@ public interface DbcmodelPackage extends EPackage {
     * @generated
     * @ordered
     */
-   int DBC_ATTRIBUTE_FEATURE_COUNT = 5;
+   int DBC_ATTRIBUTE_FEATURE_COUNT = IDB_CPROOF_REFERENCABLE_FEATURE_COUNT + 5;
 
    /**
     * The feature id for the '<em><b>Proofs</b></em>' containment reference list.
@@ -1472,14 +1491,14 @@ public interface DbcmodelPackage extends EPackage {
     */
     int DBC_INTERFACE__AXIOMS = ABSTRACT_DBC_INTERFACE__AXIOMS;
 
-/**
+   /**
     * The feature id for the '<em><b>Methods</b></em>' containment reference list.
     * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
+       * <!-- end-user-doc -->
     * @generated
     * @ordered
     */
-   int DBC_INTERFACE__METHODS = ABSTRACT_DBC_INTERFACE__METHODS;
+      int DBC_INTERFACE__METHODS = ABSTRACT_DBC_INTERFACE__METHODS;
 
    /**
     * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
@@ -1589,14 +1608,14 @@ public interface DbcmodelPackage extends EPackage {
     */
     int ABSTRACT_DBC_ENUM__AXIOMS = ABSTRACT_DBC_CLASS__AXIOMS;
 
-/**
+   /**
     * The feature id for the '<em><b>Methods</b></em>' containment reference list.
     * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
+       * <!-- end-user-doc -->
     * @generated
     * @ordered
     */
-   int ABSTRACT_DBC_ENUM__METHODS = ABSTRACT_DBC_CLASS__METHODS;
+      int ABSTRACT_DBC_ENUM__METHODS = ABSTRACT_DBC_CLASS__METHODS;
 
    /**
     * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
@@ -1724,14 +1743,14 @@ public interface DbcmodelPackage extends EPackage {
     */
     int DBC_ENUM__AXIOMS = ABSTRACT_DBC_ENUM__AXIOMS;
 
-/**
+   /**
     * The feature id for the '<em><b>Methods</b></em>' containment reference list.
     * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
+       * <!-- end-user-doc -->
     * @generated
     * @ordered
     */
-   int DBC_ENUM__METHODS = ABSTRACT_DBC_ENUM__METHODS;
+      int DBC_ENUM__METHODS = ABSTRACT_DBC_ENUM__METHODS;
 
    /**
     * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
@@ -1785,7 +1804,7 @@ public interface DbcmodelPackage extends EPackage {
     * @generated
     * @ordered
     */
-   int DBC_ENUM_LITERAL__NAME = 0;
+   int DBC_ENUM_LITERAL__NAME = IDB_CPROOF_REFERENCABLE_FEATURE_COUNT + 0;
 
    /**
     * The number of structural features of the '<em>Dbc Enum Literal</em>' class.
@@ -1794,7 +1813,7 @@ public interface DbcmodelPackage extends EPackage {
     * @generated
     * @ordered
     */
-   int DBC_ENUM_LITERAL_FEATURE_COUNT = 1;
+   int DBC_ENUM_LITERAL_FEATURE_COUNT = IDB_CPROOF_REFERENCABLE_FEATURE_COUNT + 1;
 
    /**
     * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -1894,25 +1913,6 @@ public interface DbcmodelPackage extends EPackage {
     * @ordered
     */
    int DBC_PROPERTY_FEATURE_COUNT = 2;
-
-   /**
-    * The meta object id for the '{@link de.hentschel.visualdbc.dbcmodel.IDbCProofReferencable <em>IDb CProof Referencable</em>}' class.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @see de.hentschel.visualdbc.dbcmodel.IDbCProofReferencable
-    * @see de.hentschel.visualdbc.dbcmodel.impl.DbcmodelPackageImpl#getIDbCProofReferencable()
-    * @generated
-    */
-   int IDB_CPROOF_REFERENCABLE = 24;
-
-   /**
-    * The number of structural features of the '<em>IDb CProof Referencable</em>' class.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    * @ordered
-    */
-   int IDB_CPROOF_REFERENCABLE_FEATURE_COUNT = 0;
 
    /**
     * The meta object id for the '{@link de.hentschel.visualdbc.dbcmodel.IDbCProvable <em>IDb CProvable</em>}' class.

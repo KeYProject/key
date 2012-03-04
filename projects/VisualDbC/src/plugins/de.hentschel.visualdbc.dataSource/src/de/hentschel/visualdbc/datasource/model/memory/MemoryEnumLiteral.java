@@ -11,18 +11,34 @@
 
 package de.hentschel.visualdbc.datasource.model.memory;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import de.hentschel.visualdbc.datasource.model.IDSEnum;
 import de.hentschel.visualdbc.datasource.model.IDSEnumLiteral;
+import de.hentschel.visualdbc.datasource.model.exception.DSException;
+import de.hentschel.visualdbc.datasource.model.implementation.AbstractDSProvable;
 
 /**
  * Default implementation for an {@link IDSEnumLiteral} for objects in the
  * memory.
  * @author Martin Hentschel
  */
-public class MemoryEnumLiteral implements IDSEnumLiteral {
+public class MemoryEnumLiteral extends AbstractDSProvable implements IDSEnumLiteral {
    /**
     * The name.
     */
    private String name;
+   
+   /**
+    * All available obligations.
+    */
+   private List<String> obligations = new LinkedList<String>();
+   
+   /**
+    * The parent {@link IDSEnum}.
+    */
+   private IDSEnum parent;
    
    /**
     * Sets the name.
@@ -38,5 +54,29 @@ public class MemoryEnumLiteral implements IDSEnumLiteral {
    @Override
    public String getName() {
       return name;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public List<String> getObligations() throws DSException {
+      return obligations;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IDSEnum getParent() {
+      return parent;
+   }
+
+   /**
+    * Sets the parent {@link IDSEnum}.
+    * @param parent The parent {@link IDSEnum} to set.
+    */
+   public void setParent(IDSEnum parent) {
+      this.parent = parent;
    }
 }

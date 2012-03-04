@@ -1488,7 +1488,13 @@ public class DbCDiagramUpdater {
     */
    public static List<DbCLinkDescriptor> getDbcAttribute_3011IncomingLinks(
          View view) {
-      return Collections.emptyList();
+      DbcAttribute modelElement = (DbcAttribute) view.getElement();
+      Map<EObject, Collection<EStructuralFeature.Setting>> crossReferences = EcoreUtil.CrossReferencer
+            .find(view.eResource().getResourceSet().getResources());
+      LinkedList<DbCLinkDescriptor> result = new LinkedList<DbCLinkDescriptor>();
+      result.addAll(getIncomingTypeModelFacetLinks_DbcProofReference_4002(
+            modelElement, crossReferences));
+      return result;
    }
 
    /**
@@ -1545,7 +1551,13 @@ public class DbCDiagramUpdater {
     */
    public static List<DbCLinkDescriptor> getDbcEnumLiteral_3020IncomingLinks(
          View view) {
-      return Collections.emptyList();
+      DbcEnumLiteral modelElement = (DbcEnumLiteral) view.getElement();
+      Map<EObject, Collection<EStructuralFeature.Setting>> crossReferences = EcoreUtil.CrossReferencer
+            .find(view.eResource().getResourceSet().getResources());
+      LinkedList<DbCLinkDescriptor> result = new LinkedList<DbCLinkDescriptor>();
+      result.addAll(getIncomingTypeModelFacetLinks_DbcProofReference_4002(
+            modelElement, crossReferences));
+      return result;
    }
 
    /**

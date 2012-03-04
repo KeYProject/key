@@ -18,7 +18,6 @@ import java.util.List;
 import org.key_project.util.java.ObjectUtil;
 
 import de.hentschel.visualdbc.datasource.model.DSVisibility;
-import de.hentschel.visualdbc.datasource.model.IDSAttribute;
 import de.hentschel.visualdbc.datasource.model.IDSInterface;
 import de.hentschel.visualdbc.datasource.model.IDSMethod;
 import de.hentschel.visualdbc.datasource.model.exception.DSException;
@@ -29,11 +28,6 @@ import de.hentschel.visualdbc.datasource.model.exception.DSException;
  * @author Martin Hentschel
  */
 public class MemoryInterface extends AbstractMemoryType implements IDSInterface {
-   /**
-    * The contained attributes.
-    */
-   private List<IDSAttribute> attributes = new LinkedList<IDSAttribute>();
-   
    /**
     * The contained methods.
     */
@@ -71,14 +65,6 @@ public class MemoryInterface extends AbstractMemoryType implements IDSInterface 
    public MemoryInterface(String name, DSVisibility visibility) {
       setName(name);
       setVisibility(visibility);
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public List<IDSAttribute> getAttributes() {
-      return attributes;
    }
 
    /**

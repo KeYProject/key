@@ -266,180 +266,22 @@ public class DbCNavigatorContentProvider implements ICommonContentProvider {
    private Object[] getViewChildren(View view, Object parentElement) {
       switch (DbCVisualIDRegistry.getVisualID(view)) {
 
-      case DbcProofTargetEditPart.VISUAL_ID: {
-         LinkedList<DbCAbstractNavigatorItem> result = new LinkedList<DbCAbstractNavigatorItem>();
-         Edge sv = (Edge) view;
-         DbCNavigatorGroup target = new DbCNavigatorGroup(
-               Messages.NavigatorGroupName_DbcProofTarget_4001_target,
-               "icons/linkTargetNavigatorGroup.gif", parentElement); //$NON-NLS-1$
-         DbCNavigatorGroup source = new DbCNavigatorGroup(
-               Messages.NavigatorGroupName_DbcProofTarget_4001_source,
-               "icons/linkSourceNavigatorGroup.gif", parentElement); //$NON-NLS-1$
-         Collection<View> connectedViews;
-         connectedViews = getLinksTargetByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcInterfaceEditPart.VISUAL_ID));
-         target.addChildren(createNavigatorItems(connectedViews, target, true));
-         connectedViews = getLinksTargetByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcClassEditPart.VISUAL_ID));
-         target.addChildren(createNavigatorItems(connectedViews, target, true));
-         connectedViews = getLinksTargetByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcEnumEditPart.VISUAL_ID));
-         target.addChildren(createNavigatorItems(connectedViews, target, true));
-         connectedViews = getLinksTargetByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcClass2EditPart.VISUAL_ID));
-         target.addChildren(createNavigatorItems(connectedViews, target, true));
-         connectedViews = getLinksTargetByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcInterface2EditPart.VISUAL_ID));
-         target.addChildren(createNavigatorItems(connectedViews, target, true));
-         connectedViews = getLinksTargetByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcEnum2EditPart.VISUAL_ID));
-         target.addChildren(createNavigatorItems(connectedViews, target, true));
-         connectedViews = getLinksTargetByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcMethodEditPart.VISUAL_ID));
-         target.addChildren(createNavigatorItems(connectedViews, target, true));
-         connectedViews = getLinksTargetByType(Collections.singleton(sv),
-               DbCVisualIDRegistry
-                     .getType(DbcOperationContractEditPart.VISUAL_ID));
-         target.addChildren(createNavigatorItems(connectedViews, target, true));
-         connectedViews = getLinksTargetByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcConstructorEditPart.VISUAL_ID));
-         target.addChildren(createNavigatorItems(connectedViews, target, true));
-         connectedViews = getLinksTargetByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbCAxiomContractEditPart.VISUAL_ID));
-         target.addChildren(createNavigatorItems(connectedViews, target, true));
-         connectedViews = getLinksSourceByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcProofEditPart.VISUAL_ID));
-         source.addChildren(createNavigatorItems(connectedViews, source, true));
-         connectedViews = getLinksSourceByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcProof2EditPart.VISUAL_ID));
-         source.addChildren(createNavigatorItems(connectedViews, source, true));
-         if (!target.isEmpty()) {
-            result.add(target);
-         }
-         if (!source.isEmpty()) {
-            result.add(source);
-         }
-         return result.toArray();
-      }
-
-      case DbcInterfaceExtendsEditPart.VISUAL_ID: {
-         LinkedList<DbCAbstractNavigatorItem> result = new LinkedList<DbCAbstractNavigatorItem>();
-         Edge sv = (Edge) view;
-         DbCNavigatorGroup target = new DbCNavigatorGroup(
-               Messages.NavigatorGroupName_DbcInterfaceExtends_4004_target,
-               "icons/linkTargetNavigatorGroup.gif", parentElement); //$NON-NLS-1$
-         DbCNavigatorGroup source = new DbCNavigatorGroup(
-               Messages.NavigatorGroupName_DbcInterfaceExtends_4004_source,
-               "icons/linkSourceNavigatorGroup.gif", parentElement); //$NON-NLS-1$
-         Collection<View> connectedViews;
-         connectedViews = getLinksTargetByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcInterfaceEditPart.VISUAL_ID));
-         target.addChildren(createNavigatorItems(connectedViews, target, true));
-         connectedViews = getLinksTargetByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcInterface2EditPart.VISUAL_ID));
-         target.addChildren(createNavigatorItems(connectedViews, target, true));
-         connectedViews = getLinksSourceByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcInterfaceEditPart.VISUAL_ID));
-         source.addChildren(createNavigatorItems(connectedViews, source, true));
-         connectedViews = getLinksSourceByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcInterface2EditPart.VISUAL_ID));
-         source.addChildren(createNavigatorItems(connectedViews, source, true));
-         if (!target.isEmpty()) {
-            result.add(target);
-         }
-         if (!source.isEmpty()) {
-            result.add(source);
-         }
-         return result.toArray();
-      }
-
-      case DbcMethodEditPart.VISUAL_ID: {
+      case DbcPackage2EditPart.VISUAL_ID: {
          LinkedList<DbCAbstractNavigatorItem> result = new LinkedList<DbCAbstractNavigatorItem>();
          Node sv = (Node) view;
-         DbCNavigatorGroup incominglinks = new DbCNavigatorGroup(
-               Messages.NavigatorGroupName_DbcMethod_3009_incominglinks,
-               "icons/incomingLinksNavigatorGroup.gif", parentElement); //$NON-NLS-1$
-         Collection<View> connectedViews;
-         connectedViews = getChildrenByType(Collections.singleton(sv),
-               DbCVisualIDRegistry
-                     .getType(DbcMethodDbcMethodCompartmentEditPart.VISUAL_ID));
-         connectedViews = getChildrenByType(connectedViews,
-               DbCVisualIDRegistry.getType(DbcProof2EditPart.VISUAL_ID));
-         result.addAll(createNavigatorItems(connectedViews, parentElement,
-               false));
-         connectedViews = getChildrenByType(Collections.singleton(sv),
-               DbCVisualIDRegistry
-                     .getType(DbcMethodDbcMethodCompartmentEditPart.VISUAL_ID));
-         connectedViews = getChildrenByType(connectedViews,
-               DbCVisualIDRegistry
-                     .getType(DbcOperationContractEditPart.VISUAL_ID));
-         result.addAll(createNavigatorItems(connectedViews, parentElement,
-               false));
-         connectedViews = getIncomingLinksByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcProofTargetEditPart.VISUAL_ID));
-         incominglinks.addChildren(createNavigatorItems(connectedViews,
-               incominglinks, true));
-         connectedViews = getIncomingLinksByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcProofReferenceEditPart.VISUAL_ID));
-         incominglinks.addChildren(createNavigatorItems(connectedViews,
-               incominglinks, true));
-         if (!incominglinks.isEmpty()) {
-            result.add(incominglinks);
-         }
-         return result.toArray();
-      }
-
-      case AbstractDbcClassImplementsEditPart.VISUAL_ID: {
-         LinkedList<DbCAbstractNavigatorItem> result = new LinkedList<DbCAbstractNavigatorItem>();
-         Edge sv = (Edge) view;
-         DbCNavigatorGroup target = new DbCNavigatorGroup(
-               Messages.NavigatorGroupName_AbstractDbcClassImplements_4005_target,
-               "icons/linkTargetNavigatorGroup.gif", parentElement); //$NON-NLS-1$
-         DbCNavigatorGroup source = new DbCNavigatorGroup(
-               Messages.NavigatorGroupName_AbstractDbcClassImplements_4005_source,
-               "icons/linkSourceNavigatorGroup.gif", parentElement); //$NON-NLS-1$
-         Collection<View> connectedViews;
-         connectedViews = getLinksTargetByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcInterfaceEditPart.VISUAL_ID));
-         target.addChildren(createNavigatorItems(connectedViews, target, true));
-         connectedViews = getLinksTargetByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcInterface2EditPart.VISUAL_ID));
-         target.addChildren(createNavigatorItems(connectedViews, target, true));
-         connectedViews = getLinksSourceByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcClassEditPart.VISUAL_ID));
-         source.addChildren(createNavigatorItems(connectedViews, source, true));
-         connectedViews = getLinksSourceByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcEnumEditPart.VISUAL_ID));
-         source.addChildren(createNavigatorItems(connectedViews, source, true));
-         connectedViews = getLinksSourceByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcClass2EditPart.VISUAL_ID));
-         source.addChildren(createNavigatorItems(connectedViews, source, true));
-         connectedViews = getLinksSourceByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcEnum2EditPart.VISUAL_ID));
-         source.addChildren(createNavigatorItems(connectedViews, source, true));
-         if (!target.isEmpty()) {
-            result.add(target);
-         }
-         if (!source.isEmpty()) {
-            result.add(source);
-         }
-         return result.toArray();
-      }
-
-      case DbcClassEditPart.VISUAL_ID: {
-         LinkedList<DbCAbstractNavigatorItem> result = new LinkedList<DbCAbstractNavigatorItem>();
-         Node sv = (Node) view;
-         DbCNavigatorGroup incominglinks = new DbCNavigatorGroup(
-               Messages.NavigatorGroupName_DbcClass_2012_incominglinks,
-               "icons/incomingLinksNavigatorGroup.gif", parentElement); //$NON-NLS-1$
-         DbCNavigatorGroup outgoinglinks = new DbCNavigatorGroup(
-               Messages.NavigatorGroupName_DbcClass_2012_outgoinglinks,
-               "icons/outgoingLinksNavigatorGroup.gif", parentElement); //$NON-NLS-1$
          Collection<View> connectedViews;
          connectedViews = getChildrenByType(
                Collections.singleton(sv),
                DbCVisualIDRegistry
-                     .getType(DbcClassDbcClassMainCompartment2EditPart.VISUAL_ID));
+                     .getType(DbcPackageDbcPackageCompartment2EditPart.VISUAL_ID));
+         connectedViews = getChildrenByType(connectedViews,
+               DbCVisualIDRegistry.getType(DbcPackage2EditPart.VISUAL_ID));
+         result.addAll(createNavigatorItems(connectedViews, parentElement,
+               false));
+         connectedViews = getChildrenByType(
+               Collections.singleton(sv),
+               DbCVisualIDRegistry
+                     .getType(DbcPackageDbcPackageCompartment2EditPart.VISUAL_ID));
          connectedViews = getChildrenByType(connectedViews,
                DbCVisualIDRegistry.getType(DbcClass2EditPart.VISUAL_ID));
          result.addAll(createNavigatorItems(connectedViews, parentElement,
@@ -447,7 +289,7 @@ public class DbCNavigatorContentProvider implements ICommonContentProvider {
          connectedViews = getChildrenByType(
                Collections.singleton(sv),
                DbCVisualIDRegistry
-                     .getType(DbcClassDbcClassMainCompartment2EditPart.VISUAL_ID));
+                     .getType(DbcPackageDbcPackageCompartment2EditPart.VISUAL_ID));
          connectedViews = getChildrenByType(connectedViews,
                DbCVisualIDRegistry.getType(DbcInterface2EditPart.VISUAL_ID));
          result.addAll(createNavigatorItems(connectedViews, parentElement,
@@ -455,7 +297,7 @@ public class DbCNavigatorContentProvider implements ICommonContentProvider {
          connectedViews = getChildrenByType(
                Collections.singleton(sv),
                DbCVisualIDRegistry
-                     .getType(DbcClassDbcClassMainCompartment2EditPart.VISUAL_ID));
+                     .getType(DbcPackageDbcPackageCompartment2EditPart.VISUAL_ID));
          connectedViews = getChildrenByType(connectedViews,
                DbCVisualIDRegistry.getType(DbcEnum2EditPart.VISUAL_ID));
          result.addAll(createNavigatorItems(connectedViews, parentElement,
@@ -463,128 +305,11 @@ public class DbCNavigatorContentProvider implements ICommonContentProvider {
          connectedViews = getChildrenByType(
                Collections.singleton(sv),
                DbCVisualIDRegistry
-                     .getType(DbcClassDbcClassMainCompartment2EditPart.VISUAL_ID));
-         connectedViews = getChildrenByType(connectedViews,
-               DbCVisualIDRegistry.getType(DbcMethodEditPart.VISUAL_ID));
-         result.addAll(createNavigatorItems(connectedViews, parentElement,
-               false));
-         connectedViews = getChildrenByType(
-               Collections.singleton(sv),
-               DbCVisualIDRegistry
-                     .getType(DbcClassDbcClassMainCompartment2EditPart.VISUAL_ID));
-         connectedViews = getChildrenByType(connectedViews,
-               DbCVisualIDRegistry.getType(DbcConstructorEditPart.VISUAL_ID));
-         result.addAll(createNavigatorItems(connectedViews, parentElement,
-               false));
-         connectedViews = getChildrenByType(
-               Collections.singleton(sv),
-               DbCVisualIDRegistry
-                     .getType(DbcClassDbcClassMainCompartment2EditPart.VISUAL_ID));
-         connectedViews = getChildrenByType(connectedViews,
-               DbCVisualIDRegistry.getType(DbcInvariantEditPart.VISUAL_ID));
-         result.addAll(createNavigatorItems(connectedViews, parentElement,
-               false));
-         connectedViews = getChildrenByType(
-               Collections.singleton(sv),
-               DbCVisualIDRegistry
-                     .getType(DbcClassDbcClassMainCompartment2EditPart.VISUAL_ID));
+                     .getType(DbcPackageDbcPackageCompartment2EditPart.VISUAL_ID));
          connectedViews = getChildrenByType(connectedViews,
                DbCVisualIDRegistry.getType(DbcProof2EditPart.VISUAL_ID));
          result.addAll(createNavigatorItems(connectedViews, parentElement,
                false));
-         connectedViews = getChildrenByType(
-               Collections.singleton(sv),
-               DbCVisualIDRegistry
-                     .getType(DbcClassDbcClassAttributeCompartment2EditPart.VISUAL_ID));
-         connectedViews = getChildrenByType(connectedViews,
-               DbCVisualIDRegistry.getType(DbcAttributeEditPart.VISUAL_ID));
-         result.addAll(createNavigatorItems(connectedViews, parentElement,
-               false));
-         connectedViews = getChildrenByType(
-               Collections.singleton(sv),
-               DbCVisualIDRegistry
-                     .getType(DbcClassDbcClassMainCompartment2EditPart.VISUAL_ID));
-         connectedViews = getChildrenByType(connectedViews,
-               DbCVisualIDRegistry.getType(DbcAxiomEditPart.VISUAL_ID));
-         result.addAll(createNavigatorItems(connectedViews, parentElement,
-               false));
-         connectedViews = getIncomingLinksByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcProofTargetEditPart.VISUAL_ID));
-         incominglinks.addChildren(createNavigatorItems(connectedViews,
-               incominglinks, true));
-         connectedViews = getIncomingLinksByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcProofReferenceEditPart.VISUAL_ID));
-         incominglinks.addChildren(createNavigatorItems(connectedViews,
-               incominglinks, true));
-         connectedViews = getIncomingLinksByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcClassExtendsEditPart.VISUAL_ID));
-         incominglinks.addChildren(createNavigatorItems(connectedViews,
-               incominglinks, true));
-         connectedViews = getOutgoingLinksByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcClassExtendsEditPart.VISUAL_ID));
-         outgoinglinks.addChildren(createNavigatorItems(connectedViews,
-               outgoinglinks, true));
-         connectedViews = getOutgoingLinksByType(Collections.singleton(sv),
-               DbCVisualIDRegistry
-                     .getType(AbstractDbcClassImplementsEditPart.VISUAL_ID));
-         outgoinglinks.addChildren(createNavigatorItems(connectedViews,
-               outgoinglinks, true));
-         if (!incominglinks.isEmpty()) {
-            result.add(incominglinks);
-         }
-         if (!outgoinglinks.isEmpty()) {
-            result.add(outgoinglinks);
-         }
-         return result.toArray();
-      }
-
-      case DbcModelEditPart.VISUAL_ID: {
-         LinkedList<DbCAbstractNavigatorItem> result = new LinkedList<DbCAbstractNavigatorItem>();
-         Diagram sv = (Diagram) view;
-         DbCNavigatorGroup links = new DbCNavigatorGroup(
-               Messages.NavigatorGroupName_DbcModel_1000_links,
-               "icons/linksNavigatorGroup.gif", parentElement); //$NON-NLS-1$
-         Collection<View> connectedViews;
-         connectedViews = getChildrenByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcPackageEditPart.VISUAL_ID));
-         result.addAll(createNavigatorItems(connectedViews, parentElement,
-               false));
-         connectedViews = getChildrenByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcInterfaceEditPart.VISUAL_ID));
-         result.addAll(createNavigatorItems(connectedViews, parentElement,
-               false));
-         connectedViews = getChildrenByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcClassEditPart.VISUAL_ID));
-         result.addAll(createNavigatorItems(connectedViews, parentElement,
-               false));
-         connectedViews = getChildrenByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcEnumEditPart.VISUAL_ID));
-         result.addAll(createNavigatorItems(connectedViews, parentElement,
-               false));
-         connectedViews = getChildrenByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcProofEditPart.VISUAL_ID));
-         result.addAll(createNavigatorItems(connectedViews, parentElement,
-               false));
-         connectedViews = getDiagramLinksByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcProofTargetEditPart.VISUAL_ID));
-         links.addChildren(createNavigatorItems(connectedViews, links, false));
-         connectedViews = getDiagramLinksByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcProofReferenceEditPart.VISUAL_ID));
-         links.addChildren(createNavigatorItems(connectedViews, links, false));
-         connectedViews = getDiagramLinksByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcClassExtendsEditPart.VISUAL_ID));
-         links.addChildren(createNavigatorItems(connectedViews, links, false));
-         connectedViews = getDiagramLinksByType(Collections.singleton(sv),
-               DbCVisualIDRegistry
-                     .getType(DbcInterfaceExtendsEditPart.VISUAL_ID));
-         links.addChildren(createNavigatorItems(connectedViews, links, false));
-         connectedViews = getDiagramLinksByType(Collections.singleton(sv),
-               DbCVisualIDRegistry
-                     .getType(AbstractDbcClassImplementsEditPart.VISUAL_ID));
-         links.addChildren(createNavigatorItems(connectedViews, links, false));
-         if (!links.isEmpty()) {
-            result.add(links);
-         }
          return result.toArray();
       }
 
@@ -694,6 +419,314 @@ public class DbCNavigatorContentProvider implements ICommonContentProvider {
          return result.toArray();
       }
 
+      case DbcProofTargetEditPart.VISUAL_ID: {
+         LinkedList<DbCAbstractNavigatorItem> result = new LinkedList<DbCAbstractNavigatorItem>();
+         Edge sv = (Edge) view;
+         DbCNavigatorGroup target = new DbCNavigatorGroup(
+               Messages.NavigatorGroupName_DbcProofTarget_4001_target,
+               "icons/linkTargetNavigatorGroup.gif", parentElement); //$NON-NLS-1$
+         DbCNavigatorGroup source = new DbCNavigatorGroup(
+               Messages.NavigatorGroupName_DbcProofTarget_4001_source,
+               "icons/linkSourceNavigatorGroup.gif", parentElement); //$NON-NLS-1$
+         Collection<View> connectedViews;
+         connectedViews = getLinksTargetByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcInterfaceEditPart.VISUAL_ID));
+         target.addChildren(createNavigatorItems(connectedViews, target, true));
+         connectedViews = getLinksTargetByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcClassEditPart.VISUAL_ID));
+         target.addChildren(createNavigatorItems(connectedViews, target, true));
+         connectedViews = getLinksTargetByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcEnumEditPart.VISUAL_ID));
+         target.addChildren(createNavigatorItems(connectedViews, target, true));
+         connectedViews = getLinksTargetByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcClass2EditPart.VISUAL_ID));
+         target.addChildren(createNavigatorItems(connectedViews, target, true));
+         connectedViews = getLinksTargetByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcInterface2EditPart.VISUAL_ID));
+         target.addChildren(createNavigatorItems(connectedViews, target, true));
+         connectedViews = getLinksTargetByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcEnum2EditPart.VISUAL_ID));
+         target.addChildren(createNavigatorItems(connectedViews, target, true));
+         connectedViews = getLinksTargetByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcMethodEditPart.VISUAL_ID));
+         target.addChildren(createNavigatorItems(connectedViews, target, true));
+         connectedViews = getLinksTargetByType(Collections.singleton(sv),
+               DbCVisualIDRegistry
+                     .getType(DbcOperationContractEditPart.VISUAL_ID));
+         target.addChildren(createNavigatorItems(connectedViews, target, true));
+         connectedViews = getLinksTargetByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcConstructorEditPart.VISUAL_ID));
+         target.addChildren(createNavigatorItems(connectedViews, target, true));
+         connectedViews = getLinksTargetByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbCAxiomContractEditPart.VISUAL_ID));
+         target.addChildren(createNavigatorItems(connectedViews, target, true));
+         connectedViews = getLinksSourceByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcProofEditPart.VISUAL_ID));
+         source.addChildren(createNavigatorItems(connectedViews, source, true));
+         connectedViews = getLinksSourceByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcProof2EditPart.VISUAL_ID));
+         source.addChildren(createNavigatorItems(connectedViews, source, true));
+         if (!target.isEmpty()) {
+            result.add(target);
+         }
+         if (!source.isEmpty()) {
+            result.add(source);
+         }
+         return result.toArray();
+      }
+
+      case DbcEnumEditPart.VISUAL_ID: {
+         LinkedList<DbCAbstractNavigatorItem> result = new LinkedList<DbCAbstractNavigatorItem>();
+         Node sv = (Node) view;
+         DbCNavigatorGroup incominglinks = new DbCNavigatorGroup(
+               Messages.NavigatorGroupName_DbcEnum_2013_incominglinks,
+               "icons/incomingLinksNavigatorGroup.gif", parentElement); //$NON-NLS-1$
+         DbCNavigatorGroup outgoinglinks = new DbCNavigatorGroup(
+               Messages.NavigatorGroupName_DbcEnum_2013_outgoinglinks,
+               "icons/outgoingLinksNavigatorGroup.gif", parentElement); //$NON-NLS-1$
+         Collection<View> connectedViews;
+         connectedViews = getChildrenByType(Collections.singleton(sv),
+               DbCVisualIDRegistry
+                     .getType(DbcEnumDbcEnumMainCompartment2EditPart.VISUAL_ID));
+         connectedViews = getChildrenByType(connectedViews,
+               DbCVisualIDRegistry.getType(DbcClass2EditPart.VISUAL_ID));
+         result.addAll(createNavigatorItems(connectedViews, parentElement,
+               false));
+         connectedViews = getChildrenByType(Collections.singleton(sv),
+               DbCVisualIDRegistry
+                     .getType(DbcEnumDbcEnumMainCompartment2EditPart.VISUAL_ID));
+         connectedViews = getChildrenByType(connectedViews,
+               DbCVisualIDRegistry.getType(DbcInterface2EditPart.VISUAL_ID));
+         result.addAll(createNavigatorItems(connectedViews, parentElement,
+               false));
+         connectedViews = getChildrenByType(Collections.singleton(sv),
+               DbCVisualIDRegistry
+                     .getType(DbcEnumDbcEnumMainCompartment2EditPart.VISUAL_ID));
+         connectedViews = getChildrenByType(connectedViews,
+               DbCVisualIDRegistry.getType(DbcEnum2EditPart.VISUAL_ID));
+         result.addAll(createNavigatorItems(connectedViews, parentElement,
+               false));
+         connectedViews = getChildrenByType(Collections.singleton(sv),
+               DbCVisualIDRegistry
+                     .getType(DbcEnumDbcEnumMainCompartment2EditPart.VISUAL_ID));
+         connectedViews = getChildrenByType(connectedViews,
+               DbCVisualIDRegistry.getType(DbcProof2EditPart.VISUAL_ID));
+         result.addAll(createNavigatorItems(connectedViews, parentElement,
+               false));
+         connectedViews = getChildrenByType(Collections.singleton(sv),
+               DbCVisualIDRegistry
+                     .getType(DbcEnumDbcEnumMainCompartment2EditPart.VISUAL_ID));
+         connectedViews = getChildrenByType(connectedViews,
+               DbCVisualIDRegistry.getType(DbcInvariantEditPart.VISUAL_ID));
+         result.addAll(createNavigatorItems(connectedViews, parentElement,
+               false));
+         connectedViews = getChildrenByType(
+               Collections.singleton(sv),
+               DbCVisualIDRegistry
+                     .getType(DbcEnumDbcEnumAttributeCompartment2EditPart.VISUAL_ID));
+         connectedViews = getChildrenByType(connectedViews,
+               DbCVisualIDRegistry.getType(DbcAttributeEditPart.VISUAL_ID));
+         result.addAll(createNavigatorItems(connectedViews, parentElement,
+               false));
+         connectedViews = getChildrenByType(Collections.singleton(sv),
+               DbCVisualIDRegistry
+                     .getType(DbcEnumDbcEnumMainCompartment2EditPart.VISUAL_ID));
+         connectedViews = getChildrenByType(connectedViews,
+               DbCVisualIDRegistry.getType(DbcMethodEditPart.VISUAL_ID));
+         result.addAll(createNavigatorItems(connectedViews, parentElement,
+               false));
+         connectedViews = getChildrenByType(Collections.singleton(sv),
+               DbCVisualIDRegistry
+                     .getType(DbcEnumDbcEnumMainCompartment2EditPart.VISUAL_ID));
+         connectedViews = getChildrenByType(connectedViews,
+               DbCVisualIDRegistry.getType(DbcConstructorEditPart.VISUAL_ID));
+         result.addAll(createNavigatorItems(connectedViews, parentElement,
+               false));
+         connectedViews = getChildrenByType(
+               Collections.singleton(sv),
+               DbCVisualIDRegistry
+                     .getType(DbcEnumDbcEnumLiteralCompartment2EditPart.VISUAL_ID));
+         connectedViews = getChildrenByType(connectedViews,
+               DbCVisualIDRegistry.getType(DbcEnumLiteralEditPart.VISUAL_ID));
+         result.addAll(createNavigatorItems(connectedViews, parentElement,
+               false));
+         connectedViews = getChildrenByType(Collections.singleton(sv),
+               DbCVisualIDRegistry
+                     .getType(DbcEnumDbcEnumMainCompartment2EditPart.VISUAL_ID));
+         connectedViews = getChildrenByType(connectedViews,
+               DbCVisualIDRegistry.getType(DbcAxiomEditPart.VISUAL_ID));
+         result.addAll(createNavigatorItems(connectedViews, parentElement,
+               false));
+         connectedViews = getIncomingLinksByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcProofTargetEditPart.VISUAL_ID));
+         incominglinks.addChildren(createNavigatorItems(connectedViews,
+               incominglinks, true));
+         connectedViews = getIncomingLinksByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcProofReferenceEditPart.VISUAL_ID));
+         incominglinks.addChildren(createNavigatorItems(connectedViews,
+               incominglinks, true));
+         connectedViews = getOutgoingLinksByType(Collections.singleton(sv),
+               DbCVisualIDRegistry
+                     .getType(AbstractDbcClassImplementsEditPart.VISUAL_ID));
+         outgoinglinks.addChildren(createNavigatorItems(connectedViews,
+               outgoinglinks, true));
+         if (!incominglinks.isEmpty()) {
+            result.add(incominglinks);
+         }
+         if (!outgoinglinks.isEmpty()) {
+            result.add(outgoinglinks);
+         }
+         return result.toArray();
+      }
+
+      case DbcEnumLiteralEditPart.VISUAL_ID: {
+         LinkedList<DbCAbstractNavigatorItem> result = new LinkedList<DbCAbstractNavigatorItem>();
+         Node sv = (Node) view;
+         DbCNavigatorGroup incominglinks = new DbCNavigatorGroup(
+               Messages.NavigatorGroupName_DbcEnumLiteral_3020_incominglinks,
+               "icons/incomingLinksNavigatorGroup.gif", parentElement); //$NON-NLS-1$
+         Collection<View> connectedViews;
+         connectedViews = getIncomingLinksByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcProofReferenceEditPart.VISUAL_ID));
+         incominglinks.addChildren(createNavigatorItems(connectedViews,
+               incominglinks, true));
+         if (!incominglinks.isEmpty()) {
+            result.add(incominglinks);
+         }
+         return result.toArray();
+      }
+
+      case DbcClassExtendsEditPart.VISUAL_ID: {
+         LinkedList<DbCAbstractNavigatorItem> result = new LinkedList<DbCAbstractNavigatorItem>();
+         Edge sv = (Edge) view;
+         DbCNavigatorGroup target = new DbCNavigatorGroup(
+               Messages.NavigatorGroupName_DbcClassExtends_4003_target,
+               "icons/linkTargetNavigatorGroup.gif", parentElement); //$NON-NLS-1$
+         DbCNavigatorGroup source = new DbCNavigatorGroup(
+               Messages.NavigatorGroupName_DbcClassExtends_4003_source,
+               "icons/linkSourceNavigatorGroup.gif", parentElement); //$NON-NLS-1$
+         Collection<View> connectedViews;
+         connectedViews = getLinksTargetByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcClassEditPart.VISUAL_ID));
+         target.addChildren(createNavigatorItems(connectedViews, target, true));
+         connectedViews = getLinksTargetByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcClass2EditPart.VISUAL_ID));
+         target.addChildren(createNavigatorItems(connectedViews, target, true));
+         connectedViews = getLinksSourceByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcClassEditPart.VISUAL_ID));
+         source.addChildren(createNavigatorItems(connectedViews, source, true));
+         connectedViews = getLinksSourceByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcClass2EditPart.VISUAL_ID));
+         source.addChildren(createNavigatorItems(connectedViews, source, true));
+         if (!target.isEmpty()) {
+            result.add(target);
+         }
+         if (!source.isEmpty()) {
+            result.add(source);
+         }
+         return result.toArray();
+      }
+
+      case DbcOperationContractEditPart.VISUAL_ID: {
+         LinkedList<DbCAbstractNavigatorItem> result = new LinkedList<DbCAbstractNavigatorItem>();
+         Node sv = (Node) view;
+         DbCNavigatorGroup incominglinks = new DbCNavigatorGroup(
+               Messages.NavigatorGroupName_DbcOperationContract_3026_incominglinks,
+               "icons/incomingLinksNavigatorGroup.gif", parentElement); //$NON-NLS-1$
+         Collection<View> connectedViews;
+         connectedViews = getIncomingLinksByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcProofTargetEditPart.VISUAL_ID));
+         incominglinks.addChildren(createNavigatorItems(connectedViews,
+               incominglinks, true));
+         connectedViews = getIncomingLinksByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcProofReferenceEditPart.VISUAL_ID));
+         incominglinks.addChildren(createNavigatorItems(connectedViews,
+               incominglinks, true));
+         if (!incominglinks.isEmpty()) {
+            result.add(incominglinks);
+         }
+         return result.toArray();
+      }
+
+      case DbcAttributeEditPart.VISUAL_ID: {
+         LinkedList<DbCAbstractNavigatorItem> result = new LinkedList<DbCAbstractNavigatorItem>();
+         Node sv = (Node) view;
+         DbCNavigatorGroup incominglinks = new DbCNavigatorGroup(
+               Messages.NavigatorGroupName_DbcAttribute_3011_incominglinks,
+               "icons/incomingLinksNavigatorGroup.gif", parentElement); //$NON-NLS-1$
+         Collection<View> connectedViews;
+         connectedViews = getIncomingLinksByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcProofReferenceEditPart.VISUAL_ID));
+         incominglinks.addChildren(createNavigatorItems(connectedViews,
+               incominglinks, true));
+         if (!incominglinks.isEmpty()) {
+            result.add(incominglinks);
+         }
+         return result.toArray();
+      }
+
+      case DbcInvariantEditPart.VISUAL_ID: {
+         LinkedList<DbCAbstractNavigatorItem> result = new LinkedList<DbCAbstractNavigatorItem>();
+         Node sv = (Node) view;
+         DbCNavigatorGroup incominglinks = new DbCNavigatorGroup(
+               Messages.NavigatorGroupName_DbcInvariant_3035_incominglinks,
+               "icons/incomingLinksNavigatorGroup.gif", parentElement); //$NON-NLS-1$
+         Collection<View> connectedViews;
+         connectedViews = getIncomingLinksByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcProofReferenceEditPart.VISUAL_ID));
+         incominglinks.addChildren(createNavigatorItems(connectedViews,
+               incominglinks, true));
+         if (!incominglinks.isEmpty()) {
+            result.add(incominglinks);
+         }
+         return result.toArray();
+      }
+
+      case DbcProofEditPart.VISUAL_ID: {
+         LinkedList<DbCAbstractNavigatorItem> result = new LinkedList<DbCAbstractNavigatorItem>();
+         Node sv = (Node) view;
+         DbCNavigatorGroup outgoinglinks = new DbCNavigatorGroup(
+               Messages.NavigatorGroupName_DbcProof_2014_outgoinglinks,
+               "icons/outgoingLinksNavigatorGroup.gif", parentElement); //$NON-NLS-1$
+         Collection<View> connectedViews;
+         connectedViews = getOutgoingLinksByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcProofTargetEditPart.VISUAL_ID));
+         outgoinglinks.addChildren(createNavigatorItems(connectedViews,
+               outgoinglinks, true));
+         connectedViews = getOutgoingLinksByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcProofReferenceEditPart.VISUAL_ID));
+         outgoinglinks.addChildren(createNavigatorItems(connectedViews,
+               outgoinglinks, true));
+         if (!outgoinglinks.isEmpty()) {
+            result.add(outgoinglinks);
+         }
+         return result.toArray();
+      }
+
+      case DbcAxiomEditPart.VISUAL_ID: {
+         LinkedList<DbCAbstractNavigatorItem> result = new LinkedList<DbCAbstractNavigatorItem>();
+         Node sv = (Node) view;
+         DbCNavigatorGroup incominglinks = new DbCNavigatorGroup(
+               Messages.NavigatorGroupName_DbcAxiom_3036_incominglinks,
+               "icons/incomingLinksNavigatorGroup.gif", parentElement); //$NON-NLS-1$
+         Collection<View> connectedViews;
+         connectedViews = getChildrenByType(Collections.singleton(sv),
+               DbCVisualIDRegistry
+                     .getType(DbcAxiomDbcAxiomCompartmentEditPart.VISUAL_ID));
+         connectedViews = getChildrenByType(connectedViews,
+               DbCVisualIDRegistry.getType(DbCAxiomContractEditPart.VISUAL_ID));
+         result.addAll(createNavigatorItems(connectedViews, parentElement,
+               false));
+         connectedViews = getIncomingLinksByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcProofReferenceEditPart.VISUAL_ID));
+         incominglinks.addChildren(createNavigatorItems(connectedViews,
+               incominglinks, true));
+         if (!incominglinks.isEmpty()) {
+            result.add(incominglinks);
+         }
+         return result.toArray();
+      }
+
       case DbcClass2EditPart.VISUAL_ID: {
          LinkedList<DbCAbstractNavigatorItem> result = new LinkedList<DbCAbstractNavigatorItem>();
          Node sv = (Node) view;
@@ -792,302 +825,6 @@ public class DbCNavigatorContentProvider implements ICommonContentProvider {
                DbCVisualIDRegistry.getType(DbcClassExtendsEditPart.VISUAL_ID));
          outgoinglinks.addChildren(createNavigatorItems(connectedViews,
                outgoinglinks, true));
-         connectedViews = getOutgoingLinksByType(Collections.singleton(sv),
-               DbCVisualIDRegistry
-                     .getType(AbstractDbcClassImplementsEditPart.VISUAL_ID));
-         outgoinglinks.addChildren(createNavigatorItems(connectedViews,
-               outgoinglinks, true));
-         if (!incominglinks.isEmpty()) {
-            result.add(incominglinks);
-         }
-         if (!outgoinglinks.isEmpty()) {
-            result.add(outgoinglinks);
-         }
-         return result.toArray();
-      }
-
-      case DbcProofReferenceEditPart.VISUAL_ID: {
-         LinkedList<DbCAbstractNavigatorItem> result = new LinkedList<DbCAbstractNavigatorItem>();
-         Edge sv = (Edge) view;
-         DbCNavigatorGroup target = new DbCNavigatorGroup(
-               Messages.NavigatorGroupName_DbcProofReference_4002_target,
-               "icons/linkTargetNavigatorGroup.gif", parentElement); //$NON-NLS-1$
-         DbCNavigatorGroup source = new DbCNavigatorGroup(
-               Messages.NavigatorGroupName_DbcProofReference_4002_source,
-               "icons/linkSourceNavigatorGroup.gif", parentElement); //$NON-NLS-1$
-         Collection<View> connectedViews;
-         connectedViews = getLinksTargetByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcInterfaceEditPart.VISUAL_ID));
-         target.addChildren(createNavigatorItems(connectedViews, target, true));
-         connectedViews = getLinksTargetByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcClassEditPart.VISUAL_ID));
-         target.addChildren(createNavigatorItems(connectedViews, target, true));
-         connectedViews = getLinksTargetByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcEnumEditPart.VISUAL_ID));
-         target.addChildren(createNavigatorItems(connectedViews, target, true));
-         connectedViews = getLinksTargetByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcClass2EditPart.VISUAL_ID));
-         target.addChildren(createNavigatorItems(connectedViews, target, true));
-         connectedViews = getLinksTargetByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcInterface2EditPart.VISUAL_ID));
-         target.addChildren(createNavigatorItems(connectedViews, target, true));
-         connectedViews = getLinksTargetByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcEnum2EditPart.VISUAL_ID));
-         target.addChildren(createNavigatorItems(connectedViews, target, true));
-         connectedViews = getLinksTargetByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcInvariantEditPart.VISUAL_ID));
-         target.addChildren(createNavigatorItems(connectedViews, target, true));
-         connectedViews = getLinksTargetByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcMethodEditPart.VISUAL_ID));
-         target.addChildren(createNavigatorItems(connectedViews, target, true));
-         connectedViews = getLinksTargetByType(Collections.singleton(sv),
-               DbCVisualIDRegistry
-                     .getType(DbcOperationContractEditPart.VISUAL_ID));
-         target.addChildren(createNavigatorItems(connectedViews, target, true));
-         connectedViews = getLinksTargetByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcConstructorEditPart.VISUAL_ID));
-         target.addChildren(createNavigatorItems(connectedViews, target, true));
-         connectedViews = getLinksTargetByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcAxiomEditPart.VISUAL_ID));
-         target.addChildren(createNavigatorItems(connectedViews, target, true));
-         connectedViews = getLinksTargetByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbCAxiomContractEditPart.VISUAL_ID));
-         target.addChildren(createNavigatorItems(connectedViews, target, true));
-         connectedViews = getLinksSourceByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcProofEditPart.VISUAL_ID));
-         source.addChildren(createNavigatorItems(connectedViews, source, true));
-         connectedViews = getLinksSourceByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcProof2EditPart.VISUAL_ID));
-         source.addChildren(createNavigatorItems(connectedViews, source, true));
-         if (!target.isEmpty()) {
-            result.add(target);
-         }
-         if (!source.isEmpty()) {
-            result.add(source);
-         }
-         return result.toArray();
-      }
-
-      case DbCAxiomContractEditPart.VISUAL_ID: {
-         LinkedList<DbCAbstractNavigatorItem> result = new LinkedList<DbCAbstractNavigatorItem>();
-         Node sv = (Node) view;
-         DbCNavigatorGroup incominglinks = new DbCNavigatorGroup(
-               Messages.NavigatorGroupName_DbCAxiomContract_3037_incominglinks,
-               "icons/incomingLinksNavigatorGroup.gif", parentElement); //$NON-NLS-1$
-         Collection<View> connectedViews;
-         connectedViews = getIncomingLinksByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcProofTargetEditPart.VISUAL_ID));
-         incominglinks.addChildren(createNavigatorItems(connectedViews,
-               incominglinks, true));
-         connectedViews = getIncomingLinksByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcProofReferenceEditPart.VISUAL_ID));
-         incominglinks.addChildren(createNavigatorItems(connectedViews,
-               incominglinks, true));
-         if (!incominglinks.isEmpty()) {
-            result.add(incominglinks);
-         }
-         return result.toArray();
-      }
-
-      case DbcConstructorEditPart.VISUAL_ID: {
-         LinkedList<DbCAbstractNavigatorItem> result = new LinkedList<DbCAbstractNavigatorItem>();
-         Node sv = (Node) view;
-         DbCNavigatorGroup incominglinks = new DbCNavigatorGroup(
-               Messages.NavigatorGroupName_DbcConstructor_3010_incominglinks,
-               "icons/incomingLinksNavigatorGroup.gif", parentElement); //$NON-NLS-1$
-         Collection<View> connectedViews;
-         connectedViews = getChildrenByType(
-               Collections.singleton(sv),
-               DbCVisualIDRegistry
-                     .getType(DbcConstructorDbcConstructorCompartmentEditPart.VISUAL_ID));
-         connectedViews = getChildrenByType(connectedViews,
-               DbCVisualIDRegistry.getType(DbcProof2EditPart.VISUAL_ID));
-         result.addAll(createNavigatorItems(connectedViews, parentElement,
-               false));
-         connectedViews = getChildrenByType(
-               Collections.singleton(sv),
-               DbCVisualIDRegistry
-                     .getType(DbcConstructorDbcConstructorCompartmentEditPart.VISUAL_ID));
-         connectedViews = getChildrenByType(connectedViews,
-               DbCVisualIDRegistry
-                     .getType(DbcOperationContractEditPart.VISUAL_ID));
-         result.addAll(createNavigatorItems(connectedViews, parentElement,
-               false));
-         connectedViews = getIncomingLinksByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcProofTargetEditPart.VISUAL_ID));
-         incominglinks.addChildren(createNavigatorItems(connectedViews,
-               incominglinks, true));
-         connectedViews = getIncomingLinksByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcProofReferenceEditPart.VISUAL_ID));
-         incominglinks.addChildren(createNavigatorItems(connectedViews,
-               incominglinks, true));
-         if (!incominglinks.isEmpty()) {
-            result.add(incominglinks);
-         }
-         return result.toArray();
-      }
-
-      case DbcPackageEditPart.VISUAL_ID: {
-         LinkedList<DbCAbstractNavigatorItem> result = new LinkedList<DbCAbstractNavigatorItem>();
-         Node sv = (Node) view;
-         Collection<View> connectedViews;
-         connectedViews = getChildrenByType(
-               Collections.singleton(sv),
-               DbCVisualIDRegistry
-                     .getType(DbcPackageDbcPackageCompartmentEditPart.VISUAL_ID));
-         connectedViews = getChildrenByType(connectedViews,
-               DbCVisualIDRegistry.getType(DbcPackage2EditPart.VISUAL_ID));
-         result.addAll(createNavigatorItems(connectedViews, parentElement,
-               false));
-         connectedViews = getChildrenByType(
-               Collections.singleton(sv),
-               DbCVisualIDRegistry
-                     .getType(DbcPackageDbcPackageCompartmentEditPart.VISUAL_ID));
-         connectedViews = getChildrenByType(connectedViews,
-               DbCVisualIDRegistry.getType(DbcClass2EditPart.VISUAL_ID));
-         result.addAll(createNavigatorItems(connectedViews, parentElement,
-               false));
-         connectedViews = getChildrenByType(
-               Collections.singleton(sv),
-               DbCVisualIDRegistry
-                     .getType(DbcPackageDbcPackageCompartmentEditPart.VISUAL_ID));
-         connectedViews = getChildrenByType(connectedViews,
-               DbCVisualIDRegistry.getType(DbcInterface2EditPart.VISUAL_ID));
-         result.addAll(createNavigatorItems(connectedViews, parentElement,
-               false));
-         connectedViews = getChildrenByType(
-               Collections.singleton(sv),
-               DbCVisualIDRegistry
-                     .getType(DbcPackageDbcPackageCompartmentEditPart.VISUAL_ID));
-         connectedViews = getChildrenByType(connectedViews,
-               DbCVisualIDRegistry.getType(DbcEnum2EditPart.VISUAL_ID));
-         result.addAll(createNavigatorItems(connectedViews, parentElement,
-               false));
-         connectedViews = getChildrenByType(
-               Collections.singleton(sv),
-               DbCVisualIDRegistry
-                     .getType(DbcPackageDbcPackageCompartmentEditPart.VISUAL_ID));
-         connectedViews = getChildrenByType(connectedViews,
-               DbCVisualIDRegistry.getType(DbcProof2EditPart.VISUAL_ID));
-         result.addAll(createNavigatorItems(connectedViews, parentElement,
-               false));
-         return result.toArray();
-      }
-
-      case DbcAxiomEditPart.VISUAL_ID: {
-         LinkedList<DbCAbstractNavigatorItem> result = new LinkedList<DbCAbstractNavigatorItem>();
-         Node sv = (Node) view;
-         DbCNavigatorGroup incominglinks = new DbCNavigatorGroup(
-               Messages.NavigatorGroupName_DbcAxiom_3036_incominglinks,
-               "icons/incomingLinksNavigatorGroup.gif", parentElement); //$NON-NLS-1$
-         Collection<View> connectedViews;
-         connectedViews = getChildrenByType(Collections.singleton(sv),
-               DbCVisualIDRegistry
-                     .getType(DbcAxiomDbcAxiomCompartmentEditPart.VISUAL_ID));
-         connectedViews = getChildrenByType(connectedViews,
-               DbCVisualIDRegistry.getType(DbCAxiomContractEditPart.VISUAL_ID));
-         result.addAll(createNavigatorItems(connectedViews, parentElement,
-               false));
-         connectedViews = getIncomingLinksByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcProofReferenceEditPart.VISUAL_ID));
-         incominglinks.addChildren(createNavigatorItems(connectedViews,
-               incominglinks, true));
-         if (!incominglinks.isEmpty()) {
-            result.add(incominglinks);
-         }
-         return result.toArray();
-      }
-
-      case DbcEnum2EditPart.VISUAL_ID: {
-         LinkedList<DbCAbstractNavigatorItem> result = new LinkedList<DbCAbstractNavigatorItem>();
-         Node sv = (Node) view;
-         DbCNavigatorGroup incominglinks = new DbCNavigatorGroup(
-               Messages.NavigatorGroupName_DbcEnum_3033_incominglinks,
-               "icons/incomingLinksNavigatorGroup.gif", parentElement); //$NON-NLS-1$
-         DbCNavigatorGroup outgoinglinks = new DbCNavigatorGroup(
-               Messages.NavigatorGroupName_DbcEnum_3033_outgoinglinks,
-               "icons/outgoingLinksNavigatorGroup.gif", parentElement); //$NON-NLS-1$
-         Collection<View> connectedViews;
-         connectedViews = getChildrenByType(Collections.singleton(sv),
-               DbCVisualIDRegistry
-                     .getType(DbcEnumDbcEnumMainCompartmentEditPart.VISUAL_ID));
-         connectedViews = getChildrenByType(connectedViews,
-               DbCVisualIDRegistry.getType(DbcClass2EditPart.VISUAL_ID));
-         result.addAll(createNavigatorItems(connectedViews, parentElement,
-               false));
-         connectedViews = getChildrenByType(Collections.singleton(sv),
-               DbCVisualIDRegistry
-                     .getType(DbcEnumDbcEnumMainCompartmentEditPart.VISUAL_ID));
-         connectedViews = getChildrenByType(connectedViews,
-               DbCVisualIDRegistry.getType(DbcInterface2EditPart.VISUAL_ID));
-         result.addAll(createNavigatorItems(connectedViews, parentElement,
-               false));
-         connectedViews = getChildrenByType(Collections.singleton(sv),
-               DbCVisualIDRegistry
-                     .getType(DbcEnumDbcEnumMainCompartmentEditPart.VISUAL_ID));
-         connectedViews = getChildrenByType(connectedViews,
-               DbCVisualIDRegistry.getType(DbcEnum2EditPart.VISUAL_ID));
-         result.addAll(createNavigatorItems(connectedViews, parentElement,
-               false));
-         connectedViews = getChildrenByType(Collections.singleton(sv),
-               DbCVisualIDRegistry
-                     .getType(DbcEnumDbcEnumMainCompartmentEditPart.VISUAL_ID));
-         connectedViews = getChildrenByType(connectedViews,
-               DbCVisualIDRegistry.getType(DbcProof2EditPart.VISUAL_ID));
-         result.addAll(createNavigatorItems(connectedViews, parentElement,
-               false));
-         connectedViews = getChildrenByType(Collections.singleton(sv),
-               DbCVisualIDRegistry
-                     .getType(DbcEnumDbcEnumMainCompartmentEditPart.VISUAL_ID));
-         connectedViews = getChildrenByType(connectedViews,
-               DbCVisualIDRegistry.getType(DbcInvariantEditPart.VISUAL_ID));
-         result.addAll(createNavigatorItems(connectedViews, parentElement,
-               false));
-         connectedViews = getChildrenByType(
-               Collections.singleton(sv),
-               DbCVisualIDRegistry
-                     .getType(DbcEnumDbcEnumAttributeCompartmentEditPart.VISUAL_ID));
-         connectedViews = getChildrenByType(connectedViews,
-               DbCVisualIDRegistry.getType(DbcAttributeEditPart.VISUAL_ID));
-         result.addAll(createNavigatorItems(connectedViews, parentElement,
-               false));
-         connectedViews = getChildrenByType(Collections.singleton(sv),
-               DbCVisualIDRegistry
-                     .getType(DbcEnumDbcEnumMainCompartmentEditPart.VISUAL_ID));
-         connectedViews = getChildrenByType(connectedViews,
-               DbCVisualIDRegistry.getType(DbcMethodEditPart.VISUAL_ID));
-         result.addAll(createNavigatorItems(connectedViews, parentElement,
-               false));
-         connectedViews = getChildrenByType(Collections.singleton(sv),
-               DbCVisualIDRegistry
-                     .getType(DbcEnumDbcEnumMainCompartmentEditPart.VISUAL_ID));
-         connectedViews = getChildrenByType(connectedViews,
-               DbCVisualIDRegistry.getType(DbcConstructorEditPart.VISUAL_ID));
-         result.addAll(createNavigatorItems(connectedViews, parentElement,
-               false));
-         connectedViews = getChildrenByType(
-               Collections.singleton(sv),
-               DbCVisualIDRegistry
-                     .getType(DbcEnumDbcEnumLiteralCompartmentEditPart.VISUAL_ID));
-         connectedViews = getChildrenByType(connectedViews,
-               DbCVisualIDRegistry.getType(DbcEnumLiteralEditPart.VISUAL_ID));
-         result.addAll(createNavigatorItems(connectedViews, parentElement,
-               false));
-         connectedViews = getChildrenByType(Collections.singleton(sv),
-               DbCVisualIDRegistry
-                     .getType(DbcEnumDbcEnumMainCompartmentEditPart.VISUAL_ID));
-         connectedViews = getChildrenByType(connectedViews,
-               DbCVisualIDRegistry.getType(DbcAxiomEditPart.VISUAL_ID));
-         result.addAll(createNavigatorItems(connectedViews, parentElement,
-               false));
-         connectedViews = getIncomingLinksByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcProofTargetEditPart.VISUAL_ID));
-         incominglinks.addChildren(createNavigatorItems(connectedViews,
-               incominglinks, true));
-         connectedViews = getIncomingLinksByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcProofReferenceEditPart.VISUAL_ID));
-         incominglinks.addChildren(createNavigatorItems(connectedViews,
-               incominglinks, true));
          connectedViews = getOutgoingLinksByType(Collections.singleton(sv),
                DbCVisualIDRegistry
                      .getType(AbstractDbcClassImplementsEditPart.VISUAL_ID));
@@ -1208,13 +945,30 @@ public class DbCNavigatorContentProvider implements ICommonContentProvider {
          return result.toArray();
       }
 
-      case DbcOperationContractEditPart.VISUAL_ID: {
+      case DbcConstructorEditPart.VISUAL_ID: {
          LinkedList<DbCAbstractNavigatorItem> result = new LinkedList<DbCAbstractNavigatorItem>();
          Node sv = (Node) view;
          DbCNavigatorGroup incominglinks = new DbCNavigatorGroup(
-               Messages.NavigatorGroupName_DbcOperationContract_3026_incominglinks,
+               Messages.NavigatorGroupName_DbcConstructor_3010_incominglinks,
                "icons/incomingLinksNavigatorGroup.gif", parentElement); //$NON-NLS-1$
          Collection<View> connectedViews;
+         connectedViews = getChildrenByType(
+               Collections.singleton(sv),
+               DbCVisualIDRegistry
+                     .getType(DbcConstructorDbcConstructorCompartmentEditPart.VISUAL_ID));
+         connectedViews = getChildrenByType(connectedViews,
+               DbCVisualIDRegistry.getType(DbcProof2EditPart.VISUAL_ID));
+         result.addAll(createNavigatorItems(connectedViews, parentElement,
+               false));
+         connectedViews = getChildrenByType(
+               Collections.singleton(sv),
+               DbCVisualIDRegistry
+                     .getType(DbcConstructorDbcConstructorCompartmentEditPart.VISUAL_ID));
+         connectedViews = getChildrenByType(connectedViews,
+               DbCVisualIDRegistry
+                     .getType(DbcOperationContractEditPart.VISUAL_ID));
+         result.addAll(createNavigatorItems(connectedViews, parentElement,
+               false));
          connectedViews = getIncomingLinksByType(Collections.singleton(sv),
                DbCVisualIDRegistry.getType(DbcProofTargetEditPart.VISUAL_ID));
          incominglinks.addChildren(createNavigatorItems(connectedViews,
@@ -1229,69 +983,52 @@ public class DbCNavigatorContentProvider implements ICommonContentProvider {
          return result.toArray();
       }
 
-      case DbcEnumEditPart.VISUAL_ID: {
+      case DbcClassEditPart.VISUAL_ID: {
          LinkedList<DbCAbstractNavigatorItem> result = new LinkedList<DbCAbstractNavigatorItem>();
          Node sv = (Node) view;
          DbCNavigatorGroup incominglinks = new DbCNavigatorGroup(
-               Messages.NavigatorGroupName_DbcEnum_2013_incominglinks,
+               Messages.NavigatorGroupName_DbcClass_2012_incominglinks,
                "icons/incomingLinksNavigatorGroup.gif", parentElement); //$NON-NLS-1$
          DbCNavigatorGroup outgoinglinks = new DbCNavigatorGroup(
-               Messages.NavigatorGroupName_DbcEnum_2013_outgoinglinks,
+               Messages.NavigatorGroupName_DbcClass_2012_outgoinglinks,
                "icons/outgoingLinksNavigatorGroup.gif", parentElement); //$NON-NLS-1$
          Collection<View> connectedViews;
-         connectedViews = getChildrenByType(Collections.singleton(sv),
+         connectedViews = getChildrenByType(
+               Collections.singleton(sv),
                DbCVisualIDRegistry
-                     .getType(DbcEnumDbcEnumMainCompartment2EditPart.VISUAL_ID));
+                     .getType(DbcClassDbcClassMainCompartment2EditPart.VISUAL_ID));
          connectedViews = getChildrenByType(connectedViews,
                DbCVisualIDRegistry.getType(DbcClass2EditPart.VISUAL_ID));
-         result.addAll(createNavigatorItems(connectedViews, parentElement,
-               false));
-         connectedViews = getChildrenByType(Collections.singleton(sv),
-               DbCVisualIDRegistry
-                     .getType(DbcEnumDbcEnumMainCompartment2EditPart.VISUAL_ID));
-         connectedViews = getChildrenByType(connectedViews,
-               DbCVisualIDRegistry.getType(DbcInterface2EditPart.VISUAL_ID));
-         result.addAll(createNavigatorItems(connectedViews, parentElement,
-               false));
-         connectedViews = getChildrenByType(Collections.singleton(sv),
-               DbCVisualIDRegistry
-                     .getType(DbcEnumDbcEnumMainCompartment2EditPart.VISUAL_ID));
-         connectedViews = getChildrenByType(connectedViews,
-               DbCVisualIDRegistry.getType(DbcEnum2EditPart.VISUAL_ID));
-         result.addAll(createNavigatorItems(connectedViews, parentElement,
-               false));
-         connectedViews = getChildrenByType(Collections.singleton(sv),
-               DbCVisualIDRegistry
-                     .getType(DbcEnumDbcEnumMainCompartment2EditPart.VISUAL_ID));
-         connectedViews = getChildrenByType(connectedViews,
-               DbCVisualIDRegistry.getType(DbcProof2EditPart.VISUAL_ID));
-         result.addAll(createNavigatorItems(connectedViews, parentElement,
-               false));
-         connectedViews = getChildrenByType(Collections.singleton(sv),
-               DbCVisualIDRegistry
-                     .getType(DbcEnumDbcEnumMainCompartment2EditPart.VISUAL_ID));
-         connectedViews = getChildrenByType(connectedViews,
-               DbCVisualIDRegistry.getType(DbcInvariantEditPart.VISUAL_ID));
          result.addAll(createNavigatorItems(connectedViews, parentElement,
                false));
          connectedViews = getChildrenByType(
                Collections.singleton(sv),
                DbCVisualIDRegistry
-                     .getType(DbcEnumDbcEnumAttributeCompartment2EditPart.VISUAL_ID));
+                     .getType(DbcClassDbcClassMainCompartment2EditPart.VISUAL_ID));
          connectedViews = getChildrenByType(connectedViews,
-               DbCVisualIDRegistry.getType(DbcAttributeEditPart.VISUAL_ID));
+               DbCVisualIDRegistry.getType(DbcInterface2EditPart.VISUAL_ID));
          result.addAll(createNavigatorItems(connectedViews, parentElement,
                false));
-         connectedViews = getChildrenByType(Collections.singleton(sv),
+         connectedViews = getChildrenByType(
+               Collections.singleton(sv),
                DbCVisualIDRegistry
-                     .getType(DbcEnumDbcEnumMainCompartment2EditPart.VISUAL_ID));
+                     .getType(DbcClassDbcClassMainCompartment2EditPart.VISUAL_ID));
+         connectedViews = getChildrenByType(connectedViews,
+               DbCVisualIDRegistry.getType(DbcEnum2EditPart.VISUAL_ID));
+         result.addAll(createNavigatorItems(connectedViews, parentElement,
+               false));
+         connectedViews = getChildrenByType(
+               Collections.singleton(sv),
+               DbCVisualIDRegistry
+                     .getType(DbcClassDbcClassMainCompartment2EditPart.VISUAL_ID));
          connectedViews = getChildrenByType(connectedViews,
                DbCVisualIDRegistry.getType(DbcMethodEditPart.VISUAL_ID));
          result.addAll(createNavigatorItems(connectedViews, parentElement,
                false));
-         connectedViews = getChildrenByType(Collections.singleton(sv),
+         connectedViews = getChildrenByType(
+               Collections.singleton(sv),
                DbCVisualIDRegistry
-                     .getType(DbcEnumDbcEnumMainCompartment2EditPart.VISUAL_ID));
+                     .getType(DbcClassDbcClassMainCompartment2EditPart.VISUAL_ID));
          connectedViews = getChildrenByType(connectedViews,
                DbCVisualIDRegistry.getType(DbcConstructorEditPart.VISUAL_ID));
          result.addAll(createNavigatorItems(connectedViews, parentElement,
@@ -1299,14 +1036,164 @@ public class DbCNavigatorContentProvider implements ICommonContentProvider {
          connectedViews = getChildrenByType(
                Collections.singleton(sv),
                DbCVisualIDRegistry
-                     .getType(DbcEnumDbcEnumLiteralCompartment2EditPart.VISUAL_ID));
+                     .getType(DbcClassDbcClassMainCompartment2EditPart.VISUAL_ID));
+         connectedViews = getChildrenByType(connectedViews,
+               DbCVisualIDRegistry.getType(DbcInvariantEditPart.VISUAL_ID));
+         result.addAll(createNavigatorItems(connectedViews, parentElement,
+               false));
+         connectedViews = getChildrenByType(
+               Collections.singleton(sv),
+               DbCVisualIDRegistry
+                     .getType(DbcClassDbcClassMainCompartment2EditPart.VISUAL_ID));
+         connectedViews = getChildrenByType(connectedViews,
+               DbCVisualIDRegistry.getType(DbcProof2EditPart.VISUAL_ID));
+         result.addAll(createNavigatorItems(connectedViews, parentElement,
+               false));
+         connectedViews = getChildrenByType(
+               Collections.singleton(sv),
+               DbCVisualIDRegistry
+                     .getType(DbcClassDbcClassAttributeCompartment2EditPart.VISUAL_ID));
+         connectedViews = getChildrenByType(connectedViews,
+               DbCVisualIDRegistry.getType(DbcAttributeEditPart.VISUAL_ID));
+         result.addAll(createNavigatorItems(connectedViews, parentElement,
+               false));
+         connectedViews = getChildrenByType(
+               Collections.singleton(sv),
+               DbCVisualIDRegistry
+                     .getType(DbcClassDbcClassMainCompartment2EditPart.VISUAL_ID));
+         connectedViews = getChildrenByType(connectedViews,
+               DbCVisualIDRegistry.getType(DbcAxiomEditPart.VISUAL_ID));
+         result.addAll(createNavigatorItems(connectedViews, parentElement,
+               false));
+         connectedViews = getIncomingLinksByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcProofTargetEditPart.VISUAL_ID));
+         incominglinks.addChildren(createNavigatorItems(connectedViews,
+               incominglinks, true));
+         connectedViews = getIncomingLinksByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcProofReferenceEditPart.VISUAL_ID));
+         incominglinks.addChildren(createNavigatorItems(connectedViews,
+               incominglinks, true));
+         connectedViews = getIncomingLinksByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcClassExtendsEditPart.VISUAL_ID));
+         incominglinks.addChildren(createNavigatorItems(connectedViews,
+               incominglinks, true));
+         connectedViews = getOutgoingLinksByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcClassExtendsEditPart.VISUAL_ID));
+         outgoinglinks.addChildren(createNavigatorItems(connectedViews,
+               outgoinglinks, true));
+         connectedViews = getOutgoingLinksByType(Collections.singleton(sv),
+               DbCVisualIDRegistry
+                     .getType(AbstractDbcClassImplementsEditPart.VISUAL_ID));
+         outgoinglinks.addChildren(createNavigatorItems(connectedViews,
+               outgoinglinks, true));
+         if (!incominglinks.isEmpty()) {
+            result.add(incominglinks);
+         }
+         if (!outgoinglinks.isEmpty()) {
+            result.add(outgoinglinks);
+         }
+         return result.toArray();
+      }
+
+      case DbcProof2EditPart.VISUAL_ID: {
+         LinkedList<DbCAbstractNavigatorItem> result = new LinkedList<DbCAbstractNavigatorItem>();
+         Node sv = (Node) view;
+         DbCNavigatorGroup outgoinglinks = new DbCNavigatorGroup(
+               Messages.NavigatorGroupName_DbcProof_3034_outgoinglinks,
+               "icons/outgoingLinksNavigatorGroup.gif", parentElement); //$NON-NLS-1$
+         Collection<View> connectedViews;
+         connectedViews = getOutgoingLinksByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcProofTargetEditPart.VISUAL_ID));
+         outgoinglinks.addChildren(createNavigatorItems(connectedViews,
+               outgoinglinks, true));
+         connectedViews = getOutgoingLinksByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcProofReferenceEditPart.VISUAL_ID));
+         outgoinglinks.addChildren(createNavigatorItems(connectedViews,
+               outgoinglinks, true));
+         if (!outgoinglinks.isEmpty()) {
+            result.add(outgoinglinks);
+         }
+         return result.toArray();
+      }
+
+      case DbcEnum2EditPart.VISUAL_ID: {
+         LinkedList<DbCAbstractNavigatorItem> result = new LinkedList<DbCAbstractNavigatorItem>();
+         Node sv = (Node) view;
+         DbCNavigatorGroup incominglinks = new DbCNavigatorGroup(
+               Messages.NavigatorGroupName_DbcEnum_3033_incominglinks,
+               "icons/incomingLinksNavigatorGroup.gif", parentElement); //$NON-NLS-1$
+         DbCNavigatorGroup outgoinglinks = new DbCNavigatorGroup(
+               Messages.NavigatorGroupName_DbcEnum_3033_outgoinglinks,
+               "icons/outgoingLinksNavigatorGroup.gif", parentElement); //$NON-NLS-1$
+         Collection<View> connectedViews;
+         connectedViews = getChildrenByType(Collections.singleton(sv),
+               DbCVisualIDRegistry
+                     .getType(DbcEnumDbcEnumMainCompartmentEditPart.VISUAL_ID));
+         connectedViews = getChildrenByType(connectedViews,
+               DbCVisualIDRegistry.getType(DbcClass2EditPart.VISUAL_ID));
+         result.addAll(createNavigatorItems(connectedViews, parentElement,
+               false));
+         connectedViews = getChildrenByType(Collections.singleton(sv),
+               DbCVisualIDRegistry
+                     .getType(DbcEnumDbcEnumMainCompartmentEditPart.VISUAL_ID));
+         connectedViews = getChildrenByType(connectedViews,
+               DbCVisualIDRegistry.getType(DbcInterface2EditPart.VISUAL_ID));
+         result.addAll(createNavigatorItems(connectedViews, parentElement,
+               false));
+         connectedViews = getChildrenByType(Collections.singleton(sv),
+               DbCVisualIDRegistry
+                     .getType(DbcEnumDbcEnumMainCompartmentEditPart.VISUAL_ID));
+         connectedViews = getChildrenByType(connectedViews,
+               DbCVisualIDRegistry.getType(DbcEnum2EditPart.VISUAL_ID));
+         result.addAll(createNavigatorItems(connectedViews, parentElement,
+               false));
+         connectedViews = getChildrenByType(Collections.singleton(sv),
+               DbCVisualIDRegistry
+                     .getType(DbcEnumDbcEnumMainCompartmentEditPart.VISUAL_ID));
+         connectedViews = getChildrenByType(connectedViews,
+               DbCVisualIDRegistry.getType(DbcProof2EditPart.VISUAL_ID));
+         result.addAll(createNavigatorItems(connectedViews, parentElement,
+               false));
+         connectedViews = getChildrenByType(Collections.singleton(sv),
+               DbCVisualIDRegistry
+                     .getType(DbcEnumDbcEnumMainCompartmentEditPart.VISUAL_ID));
+         connectedViews = getChildrenByType(connectedViews,
+               DbCVisualIDRegistry.getType(DbcInvariantEditPart.VISUAL_ID));
+         result.addAll(createNavigatorItems(connectedViews, parentElement,
+               false));
+         connectedViews = getChildrenByType(
+               Collections.singleton(sv),
+               DbCVisualIDRegistry
+                     .getType(DbcEnumDbcEnumAttributeCompartmentEditPart.VISUAL_ID));
+         connectedViews = getChildrenByType(connectedViews,
+               DbCVisualIDRegistry.getType(DbcAttributeEditPart.VISUAL_ID));
+         result.addAll(createNavigatorItems(connectedViews, parentElement,
+               false));
+         connectedViews = getChildrenByType(Collections.singleton(sv),
+               DbCVisualIDRegistry
+                     .getType(DbcEnumDbcEnumMainCompartmentEditPart.VISUAL_ID));
+         connectedViews = getChildrenByType(connectedViews,
+               DbCVisualIDRegistry.getType(DbcMethodEditPart.VISUAL_ID));
+         result.addAll(createNavigatorItems(connectedViews, parentElement,
+               false));
+         connectedViews = getChildrenByType(Collections.singleton(sv),
+               DbCVisualIDRegistry
+                     .getType(DbcEnumDbcEnumMainCompartmentEditPart.VISUAL_ID));
+         connectedViews = getChildrenByType(connectedViews,
+               DbCVisualIDRegistry.getType(DbcConstructorEditPart.VISUAL_ID));
+         result.addAll(createNavigatorItems(connectedViews, parentElement,
+               false));
+         connectedViews = getChildrenByType(
+               Collections.singleton(sv),
+               DbCVisualIDRegistry
+                     .getType(DbcEnumDbcEnumLiteralCompartmentEditPart.VISUAL_ID));
          connectedViews = getChildrenByType(connectedViews,
                DbCVisualIDRegistry.getType(DbcEnumLiteralEditPart.VISUAL_ID));
          result.addAll(createNavigatorItems(connectedViews, parentElement,
                false));
          connectedViews = getChildrenByType(Collections.singleton(sv),
                DbCVisualIDRegistry
-                     .getType(DbcEnumDbcEnumMainCompartment2EditPart.VISUAL_ID));
+                     .getType(DbcEnumDbcEnumMainCompartmentEditPart.VISUAL_ID));
          connectedViews = getChildrenByType(connectedViews,
                DbCVisualIDRegistry.getType(DbcAxiomEditPart.VISUAL_ID));
          result.addAll(createNavigatorItems(connectedViews, parentElement,
@@ -1333,112 +1220,17 @@ public class DbCNavigatorContentProvider implements ICommonContentProvider {
          return result.toArray();
       }
 
-      case DbcProofEditPart.VISUAL_ID: {
-         LinkedList<DbCAbstractNavigatorItem> result = new LinkedList<DbCAbstractNavigatorItem>();
-         Node sv = (Node) view;
-         DbCNavigatorGroup outgoinglinks = new DbCNavigatorGroup(
-               Messages.NavigatorGroupName_DbcProof_2014_outgoinglinks,
-               "icons/outgoingLinksNavigatorGroup.gif", parentElement); //$NON-NLS-1$
-         Collection<View> connectedViews;
-         connectedViews = getOutgoingLinksByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcProofTargetEditPart.VISUAL_ID));
-         outgoinglinks.addChildren(createNavigatorItems(connectedViews,
-               outgoinglinks, true));
-         connectedViews = getOutgoingLinksByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcProofReferenceEditPart.VISUAL_ID));
-         outgoinglinks.addChildren(createNavigatorItems(connectedViews,
-               outgoinglinks, true));
-         if (!outgoinglinks.isEmpty()) {
-            result.add(outgoinglinks);
-         }
-         return result.toArray();
-      }
-
-      case DbcPackage2EditPart.VISUAL_ID: {
-         LinkedList<DbCAbstractNavigatorItem> result = new LinkedList<DbCAbstractNavigatorItem>();
-         Node sv = (Node) view;
-         Collection<View> connectedViews;
-         connectedViews = getChildrenByType(
-               Collections.singleton(sv),
-               DbCVisualIDRegistry
-                     .getType(DbcPackageDbcPackageCompartment2EditPart.VISUAL_ID));
-         connectedViews = getChildrenByType(connectedViews,
-               DbCVisualIDRegistry.getType(DbcPackage2EditPart.VISUAL_ID));
-         result.addAll(createNavigatorItems(connectedViews, parentElement,
-               false));
-         connectedViews = getChildrenByType(
-               Collections.singleton(sv),
-               DbCVisualIDRegistry
-                     .getType(DbcPackageDbcPackageCompartment2EditPart.VISUAL_ID));
-         connectedViews = getChildrenByType(connectedViews,
-               DbCVisualIDRegistry.getType(DbcClass2EditPart.VISUAL_ID));
-         result.addAll(createNavigatorItems(connectedViews, parentElement,
-               false));
-         connectedViews = getChildrenByType(
-               Collections.singleton(sv),
-               DbCVisualIDRegistry
-                     .getType(DbcPackageDbcPackageCompartment2EditPart.VISUAL_ID));
-         connectedViews = getChildrenByType(connectedViews,
-               DbCVisualIDRegistry.getType(DbcInterface2EditPart.VISUAL_ID));
-         result.addAll(createNavigatorItems(connectedViews, parentElement,
-               false));
-         connectedViews = getChildrenByType(
-               Collections.singleton(sv),
-               DbCVisualIDRegistry
-                     .getType(DbcPackageDbcPackageCompartment2EditPart.VISUAL_ID));
-         connectedViews = getChildrenByType(connectedViews,
-               DbCVisualIDRegistry.getType(DbcEnum2EditPart.VISUAL_ID));
-         result.addAll(createNavigatorItems(connectedViews, parentElement,
-               false));
-         connectedViews = getChildrenByType(
-               Collections.singleton(sv),
-               DbCVisualIDRegistry
-                     .getType(DbcPackageDbcPackageCompartment2EditPart.VISUAL_ID));
-         connectedViews = getChildrenByType(connectedViews,
-               DbCVisualIDRegistry.getType(DbcProof2EditPart.VISUAL_ID));
-         result.addAll(createNavigatorItems(connectedViews, parentElement,
-               false));
-         return result.toArray();
-      }
-
-      case DbcClassExtendsEditPart.VISUAL_ID: {
-         LinkedList<DbCAbstractNavigatorItem> result = new LinkedList<DbCAbstractNavigatorItem>();
-         Edge sv = (Edge) view;
-         DbCNavigatorGroup target = new DbCNavigatorGroup(
-               Messages.NavigatorGroupName_DbcClassExtends_4003_target,
-               "icons/linkTargetNavigatorGroup.gif", parentElement); //$NON-NLS-1$
-         DbCNavigatorGroup source = new DbCNavigatorGroup(
-               Messages.NavigatorGroupName_DbcClassExtends_4003_source,
-               "icons/linkSourceNavigatorGroup.gif", parentElement); //$NON-NLS-1$
-         Collection<View> connectedViews;
-         connectedViews = getLinksTargetByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcClassEditPart.VISUAL_ID));
-         target.addChildren(createNavigatorItems(connectedViews, target, true));
-         connectedViews = getLinksTargetByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcClass2EditPart.VISUAL_ID));
-         target.addChildren(createNavigatorItems(connectedViews, target, true));
-         connectedViews = getLinksSourceByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcClassEditPart.VISUAL_ID));
-         source.addChildren(createNavigatorItems(connectedViews, source, true));
-         connectedViews = getLinksSourceByType(Collections.singleton(sv),
-               DbCVisualIDRegistry.getType(DbcClass2EditPart.VISUAL_ID));
-         source.addChildren(createNavigatorItems(connectedViews, source, true));
-         if (!target.isEmpty()) {
-            result.add(target);
-         }
-         if (!source.isEmpty()) {
-            result.add(source);
-         }
-         return result.toArray();
-      }
-
-      case DbcInvariantEditPart.VISUAL_ID: {
+      case DbCAxiomContractEditPart.VISUAL_ID: {
          LinkedList<DbCAbstractNavigatorItem> result = new LinkedList<DbCAbstractNavigatorItem>();
          Node sv = (Node) view;
          DbCNavigatorGroup incominglinks = new DbCNavigatorGroup(
-               Messages.NavigatorGroupName_DbcInvariant_3035_incominglinks,
+               Messages.NavigatorGroupName_DbCAxiomContract_3037_incominglinks,
                "icons/incomingLinksNavigatorGroup.gif", parentElement); //$NON-NLS-1$
          Collection<View> connectedViews;
+         connectedViews = getIncomingLinksByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcProofTargetEditPart.VISUAL_ID));
+         incominglinks.addChildren(createNavigatorItems(connectedViews,
+               incominglinks, true));
          connectedViews = getIncomingLinksByType(Collections.singleton(sv),
                DbCVisualIDRegistry.getType(DbcProofReferenceEditPart.VISUAL_ID));
          incominglinks.addChildren(createNavigatorItems(connectedViews,
@@ -1449,23 +1241,271 @@ public class DbCNavigatorContentProvider implements ICommonContentProvider {
          return result.toArray();
       }
 
-      case DbcProof2EditPart.VISUAL_ID: {
+      case DbcInterfaceExtendsEditPart.VISUAL_ID: {
+         LinkedList<DbCAbstractNavigatorItem> result = new LinkedList<DbCAbstractNavigatorItem>();
+         Edge sv = (Edge) view;
+         DbCNavigatorGroup target = new DbCNavigatorGroup(
+               Messages.NavigatorGroupName_DbcInterfaceExtends_4004_target,
+               "icons/linkTargetNavigatorGroup.gif", parentElement); //$NON-NLS-1$
+         DbCNavigatorGroup source = new DbCNavigatorGroup(
+               Messages.NavigatorGroupName_DbcInterfaceExtends_4004_source,
+               "icons/linkSourceNavigatorGroup.gif", parentElement); //$NON-NLS-1$
+         Collection<View> connectedViews;
+         connectedViews = getLinksTargetByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcInterfaceEditPart.VISUAL_ID));
+         target.addChildren(createNavigatorItems(connectedViews, target, true));
+         connectedViews = getLinksTargetByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcInterface2EditPart.VISUAL_ID));
+         target.addChildren(createNavigatorItems(connectedViews, target, true));
+         connectedViews = getLinksSourceByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcInterfaceEditPart.VISUAL_ID));
+         source.addChildren(createNavigatorItems(connectedViews, source, true));
+         connectedViews = getLinksSourceByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcInterface2EditPart.VISUAL_ID));
+         source.addChildren(createNavigatorItems(connectedViews, source, true));
+         if (!target.isEmpty()) {
+            result.add(target);
+         }
+         if (!source.isEmpty()) {
+            result.add(source);
+         }
+         return result.toArray();
+      }
+
+      case DbcModelEditPart.VISUAL_ID: {
+         LinkedList<DbCAbstractNavigatorItem> result = new LinkedList<DbCAbstractNavigatorItem>();
+         Diagram sv = (Diagram) view;
+         DbCNavigatorGroup links = new DbCNavigatorGroup(
+               Messages.NavigatorGroupName_DbcModel_1000_links,
+               "icons/linksNavigatorGroup.gif", parentElement); //$NON-NLS-1$
+         Collection<View> connectedViews;
+         connectedViews = getChildrenByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcPackageEditPart.VISUAL_ID));
+         result.addAll(createNavigatorItems(connectedViews, parentElement,
+               false));
+         connectedViews = getChildrenByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcInterfaceEditPart.VISUAL_ID));
+         result.addAll(createNavigatorItems(connectedViews, parentElement,
+               false));
+         connectedViews = getChildrenByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcClassEditPart.VISUAL_ID));
+         result.addAll(createNavigatorItems(connectedViews, parentElement,
+               false));
+         connectedViews = getChildrenByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcEnumEditPart.VISUAL_ID));
+         result.addAll(createNavigatorItems(connectedViews, parentElement,
+               false));
+         connectedViews = getChildrenByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcProofEditPart.VISUAL_ID));
+         result.addAll(createNavigatorItems(connectedViews, parentElement,
+               false));
+         connectedViews = getDiagramLinksByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcProofTargetEditPart.VISUAL_ID));
+         links.addChildren(createNavigatorItems(connectedViews, links, false));
+         connectedViews = getDiagramLinksByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcProofReferenceEditPart.VISUAL_ID));
+         links.addChildren(createNavigatorItems(connectedViews, links, false));
+         connectedViews = getDiagramLinksByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcClassExtendsEditPart.VISUAL_ID));
+         links.addChildren(createNavigatorItems(connectedViews, links, false));
+         connectedViews = getDiagramLinksByType(Collections.singleton(sv),
+               DbCVisualIDRegistry
+                     .getType(DbcInterfaceExtendsEditPart.VISUAL_ID));
+         links.addChildren(createNavigatorItems(connectedViews, links, false));
+         connectedViews = getDiagramLinksByType(Collections.singleton(sv),
+               DbCVisualIDRegistry
+                     .getType(AbstractDbcClassImplementsEditPart.VISUAL_ID));
+         links.addChildren(createNavigatorItems(connectedViews, links, false));
+         if (!links.isEmpty()) {
+            result.add(links);
+         }
+         return result.toArray();
+      }
+
+      case DbcProofReferenceEditPart.VISUAL_ID: {
+         LinkedList<DbCAbstractNavigatorItem> result = new LinkedList<DbCAbstractNavigatorItem>();
+         Edge sv = (Edge) view;
+         DbCNavigatorGroup target = new DbCNavigatorGroup(
+               Messages.NavigatorGroupName_DbcProofReference_4002_target,
+               "icons/linkTargetNavigatorGroup.gif", parentElement); //$NON-NLS-1$
+         DbCNavigatorGroup source = new DbCNavigatorGroup(
+               Messages.NavigatorGroupName_DbcProofReference_4002_source,
+               "icons/linkSourceNavigatorGroup.gif", parentElement); //$NON-NLS-1$
+         Collection<View> connectedViews;
+         connectedViews = getLinksTargetByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcInterfaceEditPart.VISUAL_ID));
+         target.addChildren(createNavigatorItems(connectedViews, target, true));
+         connectedViews = getLinksTargetByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcClassEditPart.VISUAL_ID));
+         target.addChildren(createNavigatorItems(connectedViews, target, true));
+         connectedViews = getLinksTargetByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcEnumEditPart.VISUAL_ID));
+         target.addChildren(createNavigatorItems(connectedViews, target, true));
+         connectedViews = getLinksTargetByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcClass2EditPart.VISUAL_ID));
+         target.addChildren(createNavigatorItems(connectedViews, target, true));
+         connectedViews = getLinksTargetByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcInterface2EditPart.VISUAL_ID));
+         target.addChildren(createNavigatorItems(connectedViews, target, true));
+         connectedViews = getLinksTargetByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcEnum2EditPart.VISUAL_ID));
+         target.addChildren(createNavigatorItems(connectedViews, target, true));
+         connectedViews = getLinksTargetByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcInvariantEditPart.VISUAL_ID));
+         target.addChildren(createNavigatorItems(connectedViews, target, true));
+         connectedViews = getLinksTargetByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcAttributeEditPart.VISUAL_ID));
+         target.addChildren(createNavigatorItems(connectedViews, target, true));
+         connectedViews = getLinksTargetByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcMethodEditPart.VISUAL_ID));
+         target.addChildren(createNavigatorItems(connectedViews, target, true));
+         connectedViews = getLinksTargetByType(Collections.singleton(sv),
+               DbCVisualIDRegistry
+                     .getType(DbcOperationContractEditPart.VISUAL_ID));
+         target.addChildren(createNavigatorItems(connectedViews, target, true));
+         connectedViews = getLinksTargetByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcConstructorEditPart.VISUAL_ID));
+         target.addChildren(createNavigatorItems(connectedViews, target, true));
+         connectedViews = getLinksTargetByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcEnumLiteralEditPart.VISUAL_ID));
+         target.addChildren(createNavigatorItems(connectedViews, target, true));
+         connectedViews = getLinksTargetByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcAxiomEditPart.VISUAL_ID));
+         target.addChildren(createNavigatorItems(connectedViews, target, true));
+         connectedViews = getLinksTargetByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbCAxiomContractEditPart.VISUAL_ID));
+         target.addChildren(createNavigatorItems(connectedViews, target, true));
+         connectedViews = getLinksSourceByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcProofEditPart.VISUAL_ID));
+         source.addChildren(createNavigatorItems(connectedViews, source, true));
+         connectedViews = getLinksSourceByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcProof2EditPart.VISUAL_ID));
+         source.addChildren(createNavigatorItems(connectedViews, source, true));
+         if (!target.isEmpty()) {
+            result.add(target);
+         }
+         if (!source.isEmpty()) {
+            result.add(source);
+         }
+         return result.toArray();
+      }
+
+      case AbstractDbcClassImplementsEditPart.VISUAL_ID: {
+         LinkedList<DbCAbstractNavigatorItem> result = new LinkedList<DbCAbstractNavigatorItem>();
+         Edge sv = (Edge) view;
+         DbCNavigatorGroup target = new DbCNavigatorGroup(
+               Messages.NavigatorGroupName_AbstractDbcClassImplements_4005_target,
+               "icons/linkTargetNavigatorGroup.gif", parentElement); //$NON-NLS-1$
+         DbCNavigatorGroup source = new DbCNavigatorGroup(
+               Messages.NavigatorGroupName_AbstractDbcClassImplements_4005_source,
+               "icons/linkSourceNavigatorGroup.gif", parentElement); //$NON-NLS-1$
+         Collection<View> connectedViews;
+         connectedViews = getLinksTargetByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcInterfaceEditPart.VISUAL_ID));
+         target.addChildren(createNavigatorItems(connectedViews, target, true));
+         connectedViews = getLinksTargetByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcInterface2EditPart.VISUAL_ID));
+         target.addChildren(createNavigatorItems(connectedViews, target, true));
+         connectedViews = getLinksSourceByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcClassEditPart.VISUAL_ID));
+         source.addChildren(createNavigatorItems(connectedViews, source, true));
+         connectedViews = getLinksSourceByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcEnumEditPart.VISUAL_ID));
+         source.addChildren(createNavigatorItems(connectedViews, source, true));
+         connectedViews = getLinksSourceByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcClass2EditPart.VISUAL_ID));
+         source.addChildren(createNavigatorItems(connectedViews, source, true));
+         connectedViews = getLinksSourceByType(Collections.singleton(sv),
+               DbCVisualIDRegistry.getType(DbcEnum2EditPart.VISUAL_ID));
+         source.addChildren(createNavigatorItems(connectedViews, source, true));
+         if (!target.isEmpty()) {
+            result.add(target);
+         }
+         if (!source.isEmpty()) {
+            result.add(source);
+         }
+         return result.toArray();
+      }
+
+      case DbcPackageEditPart.VISUAL_ID: {
          LinkedList<DbCAbstractNavigatorItem> result = new LinkedList<DbCAbstractNavigatorItem>();
          Node sv = (Node) view;
-         DbCNavigatorGroup outgoinglinks = new DbCNavigatorGroup(
-               Messages.NavigatorGroupName_DbcProof_3034_outgoinglinks,
-               "icons/outgoingLinksNavigatorGroup.gif", parentElement); //$NON-NLS-1$
          Collection<View> connectedViews;
-         connectedViews = getOutgoingLinksByType(Collections.singleton(sv),
+         connectedViews = getChildrenByType(
+               Collections.singleton(sv),
+               DbCVisualIDRegistry
+                     .getType(DbcPackageDbcPackageCompartmentEditPart.VISUAL_ID));
+         connectedViews = getChildrenByType(connectedViews,
+               DbCVisualIDRegistry.getType(DbcPackage2EditPart.VISUAL_ID));
+         result.addAll(createNavigatorItems(connectedViews, parentElement,
+               false));
+         connectedViews = getChildrenByType(
+               Collections.singleton(sv),
+               DbCVisualIDRegistry
+                     .getType(DbcPackageDbcPackageCompartmentEditPart.VISUAL_ID));
+         connectedViews = getChildrenByType(connectedViews,
+               DbCVisualIDRegistry.getType(DbcClass2EditPart.VISUAL_ID));
+         result.addAll(createNavigatorItems(connectedViews, parentElement,
+               false));
+         connectedViews = getChildrenByType(
+               Collections.singleton(sv),
+               DbCVisualIDRegistry
+                     .getType(DbcPackageDbcPackageCompartmentEditPart.VISUAL_ID));
+         connectedViews = getChildrenByType(connectedViews,
+               DbCVisualIDRegistry.getType(DbcInterface2EditPart.VISUAL_ID));
+         result.addAll(createNavigatorItems(connectedViews, parentElement,
+               false));
+         connectedViews = getChildrenByType(
+               Collections.singleton(sv),
+               DbCVisualIDRegistry
+                     .getType(DbcPackageDbcPackageCompartmentEditPart.VISUAL_ID));
+         connectedViews = getChildrenByType(connectedViews,
+               DbCVisualIDRegistry.getType(DbcEnum2EditPart.VISUAL_ID));
+         result.addAll(createNavigatorItems(connectedViews, parentElement,
+               false));
+         connectedViews = getChildrenByType(
+               Collections.singleton(sv),
+               DbCVisualIDRegistry
+                     .getType(DbcPackageDbcPackageCompartmentEditPart.VISUAL_ID));
+         connectedViews = getChildrenByType(connectedViews,
+               DbCVisualIDRegistry.getType(DbcProof2EditPart.VISUAL_ID));
+         result.addAll(createNavigatorItems(connectedViews, parentElement,
+               false));
+         return result.toArray();
+      }
+
+      case DbcMethodEditPart.VISUAL_ID: {
+         LinkedList<DbCAbstractNavigatorItem> result = new LinkedList<DbCAbstractNavigatorItem>();
+         Node sv = (Node) view;
+         DbCNavigatorGroup incominglinks = new DbCNavigatorGroup(
+               Messages.NavigatorGroupName_DbcMethod_3009_incominglinks,
+               "icons/incomingLinksNavigatorGroup.gif", parentElement); //$NON-NLS-1$
+         Collection<View> connectedViews;
+         connectedViews = getChildrenByType(Collections.singleton(sv),
+               DbCVisualIDRegistry
+                     .getType(DbcMethodDbcMethodCompartmentEditPart.VISUAL_ID));
+         connectedViews = getChildrenByType(connectedViews,
+               DbCVisualIDRegistry.getType(DbcProof2EditPart.VISUAL_ID));
+         result.addAll(createNavigatorItems(connectedViews, parentElement,
+               false));
+         connectedViews = getChildrenByType(Collections.singleton(sv),
+               DbCVisualIDRegistry
+                     .getType(DbcMethodDbcMethodCompartmentEditPart.VISUAL_ID));
+         connectedViews = getChildrenByType(connectedViews,
+               DbCVisualIDRegistry
+                     .getType(DbcOperationContractEditPart.VISUAL_ID));
+         result.addAll(createNavigatorItems(connectedViews, parentElement,
+               false));
+         connectedViews = getIncomingLinksByType(Collections.singleton(sv),
                DbCVisualIDRegistry.getType(DbcProofTargetEditPart.VISUAL_ID));
-         outgoinglinks.addChildren(createNavigatorItems(connectedViews,
-               outgoinglinks, true));
-         connectedViews = getOutgoingLinksByType(Collections.singleton(sv),
+         incominglinks.addChildren(createNavigatorItems(connectedViews,
+               incominglinks, true));
+         connectedViews = getIncomingLinksByType(Collections.singleton(sv),
                DbCVisualIDRegistry.getType(DbcProofReferenceEditPart.VISUAL_ID));
-         outgoinglinks.addChildren(createNavigatorItems(connectedViews,
-               outgoinglinks, true));
-         if (!outgoinglinks.isEmpty()) {
-            result.add(outgoinglinks);
+         incominglinks.addChildren(createNavigatorItems(connectedViews,
+               incominglinks, true));
+         if (!incominglinks.isEmpty()) {
+            result.add(incominglinks);
          }
          return result.toArray();
       }

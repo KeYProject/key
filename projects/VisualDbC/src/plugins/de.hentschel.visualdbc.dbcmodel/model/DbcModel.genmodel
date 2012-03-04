@@ -83,6 +83,9 @@
       <genOperations ecoreOperation="DbcModel.ecore#//AbstractDbcInterface/getMethod">
         <genParameters ecoreParameter="DbcModel.ecore#//AbstractDbcInterface/getMethod/signature"/>
       </genOperations>
+      <genOperations ecoreOperation="DbcModel.ecore#//AbstractDbcInterface/getAttribute">
+        <genParameters ecoreParameter="DbcModel.ecore#//AbstractDbcInterface/getAttribute/name"/>
+      </genOperations>
     </genClasses>
     <genClasses ecoreClass="DbcModel.ecore#//DbcInterface">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference DbcModel.ecore#//DbcInterface/extends"/>
@@ -102,6 +105,9 @@
     </genClasses>
     <genClasses image="false" ecoreClass="DbcModel.ecore#//AbstractDbcEnum">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DbcModel.ecore#//AbstractDbcEnum/literals"/>
+      <genOperations ecoreOperation="DbcModel.ecore#//AbstractDbcEnum/getLiteral">
+        <genParameters ecoreParameter="DbcModel.ecore#//AbstractDbcEnum/getLiteral/name"/>
+      </genOperations>
     </genClasses>
     <genClasses ecoreClass="DbcModel.ecore#//DbcEnum"/>
     <genClasses ecoreClass="DbcModel.ecore#//DbcEnumLiteral">

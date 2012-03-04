@@ -13,24 +13,30 @@ package de.hentschel.visualdbc.interactive.proving.ui.finder;
 
 import org.eclipse.emf.ecore.EObject;
 
+import de.hentschel.visualdbc.datasource.model.IDSAttribute;
 import de.hentschel.visualdbc.datasource.model.IDSAxiom;
 import de.hentschel.visualdbc.datasource.model.IDSAxiomContract;
 import de.hentschel.visualdbc.datasource.model.IDSClass;
 import de.hentschel.visualdbc.datasource.model.IDSConnection;
 import de.hentschel.visualdbc.datasource.model.IDSConstructor;
 import de.hentschel.visualdbc.datasource.model.IDSEnum;
+import de.hentschel.visualdbc.datasource.model.IDSEnumLiteral;
 import de.hentschel.visualdbc.datasource.model.IDSInterface;
+import de.hentschel.visualdbc.datasource.model.IDSInvariant;
 import de.hentschel.visualdbc.datasource.model.IDSMethod;
 import de.hentschel.visualdbc.datasource.model.IDSOperationContract;
 import de.hentschel.visualdbc.datasource.model.IDSPackage;
 import de.hentschel.visualdbc.datasource.model.IDSProvable;
 import de.hentschel.visualdbc.datasource.model.exception.DSException;
 import de.hentschel.visualdbc.dbcmodel.DbCAxiomContract;
+import de.hentschel.visualdbc.dbcmodel.DbcAttribute;
 import de.hentschel.visualdbc.dbcmodel.DbcAxiom;
 import de.hentschel.visualdbc.dbcmodel.DbcClass;
 import de.hentschel.visualdbc.dbcmodel.DbcConstructor;
 import de.hentschel.visualdbc.dbcmodel.DbcEnum;
+import de.hentschel.visualdbc.dbcmodel.DbcEnumLiteral;
 import de.hentschel.visualdbc.dbcmodel.DbcInterface;
+import de.hentschel.visualdbc.dbcmodel.DbcInvariant;
 import de.hentschel.visualdbc.dbcmodel.DbcMethod;
 import de.hentschel.visualdbc.dbcmodel.DbcModel;
 import de.hentschel.visualdbc.dbcmodel.DbcOperationContract;
@@ -251,7 +257,92 @@ public class DefaultDSFinder extends AbstractDSFinder {
          }
       }
       if (result == null) {
-         throw new DSException("Can't find method for: " + toSearch);
+         throw new DSException("Can't find axiom for: " + toSearch);
+      }
+      return result;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IDSInvariant findInvariant(DbcInvariant toSearch) throws DSException {
+      IDSInvariant result = null;
+      if (toSearch != null) {
+         // Get parent
+         EObject parent = toSearch.eContainer();
+         if (parent instanceof DbcClass) {
+            IDSClass dsParent = findClass((DbcClass)parent);
+            result = dsParent.getInvariant(toSearch.getCondition());
+         }
+         else if (parent instanceof DbcInterface) {
+            IDSInterface dsParent = findInterface((DbcInterface)parent);
+            result = dsParent.getInvariant(toSearch.getCondition());
+         }
+         else if (parent instanceof DbcEnum) {
+            IDSEnum dsParent = findEnum((DbcEnum)parent);
+            result = dsParent.getInvariant(toSearch.getCondition());
+         }
+         else {
+            throw new DSException("Not supported parent: " + parent);
+         }
+      }
+      if (result == null) {
+         throw new DSException("Can't find invariant for: " + toSearch);
+      }
+      return result;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IDSAttribute findAttribute(DbcAttribute toSearch) throws DSException {
+      IDSAttribute result = null;
+      if (toSearch != null) {
+         // Get parent
+         EObject parent = toSearch.eContainer();
+         if (parent instanceof DbcClass) {
+            IDSClass dsParent = findClass((DbcClass)parent);
+            result = dsParent.getAttribute(toSearch.getName());
+         }
+         else if (parent instanceof DbcInterface) {
+            IDSInterface dsParent = findInterface((DbcInterface)parent);
+            result = dsParent.getAttribute(toSearch.getName());
+         }
+         else if (parent instanceof DbcEnum) {
+            IDSEnum dsParent = findEnum((DbcEnum)parent);
+            result = dsParent.getAttribute(toSearch.getName());
+         }
+         else {
+            throw new DSException("Not supported parent: " + parent);
+         }
+      }
+      if (result == null) {
+         throw new DSException("Can't find attribute for: " + toSearch);
+      }
+      return result;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IDSEnumLiteral findEnumLiteral(DbcEnumLiteral toSearch) throws DSException {
+      IDSEnumLiteral result = null;
+      if (toSearch != null) {
+         // Get parent
+         EObject parent = toSearch.eContainer();
+         if (parent instanceof DbcEnum) {
+            IDSEnum dsParent = findEnum((DbcEnum)parent);
+            result = dsParent.getLiteral(toSearch.getName());
+         }
+         else {
+            throw new DSException("Not supported parent: " + parent);
+         }
+      }
+      if (result == null) {
+         throw new DSException("Can't find enum literal for: " + toSearch);
       }
       return result;
    }

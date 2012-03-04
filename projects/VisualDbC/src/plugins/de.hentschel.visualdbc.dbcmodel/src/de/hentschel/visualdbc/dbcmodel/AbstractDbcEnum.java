@@ -52,4 +52,12 @@ public interface AbstractDbcEnum extends AbstractDbcClass {
     */
    EList<DbcEnumLiteral> getLiterals();
 
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @model
+    * @generated
+    */
+   DbcEnumLiteral getLiteral(String name);
+
 } // AbstractDbcEnum

@@ -17,7 +17,6 @@ import java.util.List;
 
 import org.key_project.util.java.ObjectUtil;
 
-import de.hentschel.visualdbc.datasource.model.IDSAttribute;
 import de.hentschel.visualdbc.datasource.model.IDSConstructor;
 import de.hentschel.visualdbc.datasource.model.IDSEnum;
 import de.hentschel.visualdbc.datasource.model.IDSEnumLiteral;
@@ -31,11 +30,6 @@ import de.hentschel.visualdbc.datasource.model.exception.DSException;
  * @author Martin Hentschel
  */
 public class MemoryEnum extends AbstractMemoryType implements IDSEnum {
-   /**
-    * The contained attributes.
-    */
-   private List<IDSAttribute> attributes = new LinkedList<IDSAttribute>();
-   
    /**
     * The contained methods.
     */
@@ -73,14 +67,6 @@ public class MemoryEnum extends AbstractMemoryType implements IDSEnum {
     */
    public MemoryEnum(String name) {
       setName(name);
-   }   
-   
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public List<IDSAttribute> getAttributes() {
-      return attributes;
    }
 
    /**
@@ -165,11 +151,36 @@ public class MemoryEnum extends AbstractMemoryType implements IDSEnum {
    }
    
    /**
+    * Adds the literal and updates his parent reference.
+    * @param literal The literal to add.
+    */
+   public void addLiteral(MemoryEnumLiteral literal) {
+      literals.add(literal);
+      literal.setParent(this);
+   }
+   
+   /**
     * Adds the constructor and updates his parent reference.
     * @param constructor The constructor to add.
     */
    public void addConstructor(MemoryConstructor constructor) {
       constructors.add(constructor);
       constructor.setParent(this);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IDSEnumLiteral getLiteral(String name) throws DSException {
+      Iterator<IDSEnumLiteral> iter = getLiterals().iterator();
+      IDSEnumLiteral result = null;
+      while(result == null && iter.hasNext()) {
+         IDSEnumLiteral next = iter.next();
+         if (next != null && ObjectUtil.equals(next.getName(), name)) {
+            result = next;
+         }
+      }
+      return result;
    }
 }

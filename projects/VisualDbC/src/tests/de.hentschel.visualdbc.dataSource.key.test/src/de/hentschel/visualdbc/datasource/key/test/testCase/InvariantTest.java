@@ -28,7 +28,7 @@ public class InvariantTest extends TestCase {
     * Tests attributes.
     */
    @Test
-   public void testClassAndInterfaceInvariants() {
+   public void testClassAndInterfaceInvariants() throws Exception {
       TestKeyUtil.testKeyConnection("InvariantTest_testClassAndInterfaceInvariants",
                                     "data/typeInvariantTest",
                                     null,

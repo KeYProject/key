@@ -60,6 +60,7 @@ import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbCAxiomContractEditPa
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbCAxiomContractNameEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbCAxiomContractPreEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcAttributeEditPart;
+import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcAttributeNameTypeEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcAxiomDbcAxiomCompartmentEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcAxiomDefinitionEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcAxiomEditPart;
@@ -85,6 +86,7 @@ import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcEnumDbcEnumMainComp
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcEnumDbcEnumMainCompartmentEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcEnumEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcEnumLiteralEditPart;
+import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcEnumLiteralNameEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcEnumName2EditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcEnumNameEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcInterface2EditPart;
@@ -952,10 +954,31 @@ public class DbCViewProvider extends AbstractProvider implements IViewProvider {
          View containerView, int index, boolean persisted,
          PreferencesHint preferencesHint) {
       Node node = NotationFactory.eINSTANCE.createNode();
-      node.setLayoutConstraint(NotationFactory.eINSTANCE.createLocation());
+      node.getStyles().add(NotationFactory.eINSTANCE.createDescriptionStyle());
+      node.getStyles().add(NotationFactory.eINSTANCE.createFontStyle());
+      node.setLayoutConstraint(NotationFactory.eINSTANCE.createBounds());
       node.setType(DbCVisualIDRegistry.getType(DbcAttributeEditPart.VISUAL_ID));
       ViewUtil.insertChildView(containerView, node, index, persisted);
       node.setElement(domainElement);
+      // initializeFromPreferences 
+      final IPreferenceStore prefStore = (IPreferenceStore) preferencesHint
+            .getPreferenceStore();
+      FontStyle nodeFontStyle = (FontStyle) node
+            .getStyle(NotationPackage.Literals.FONT_STYLE);
+      if (nodeFontStyle != null) {
+         FontData fontData = PreferenceConverter.getFontData(prefStore,
+               IPreferenceConstants.PREF_DEFAULT_FONT);
+         nodeFontStyle.setFontName(fontData.getName());
+         nodeFontStyle.setFontHeight(fontData.getHeight());
+         nodeFontStyle.setBold((fontData.getStyle() & SWT.BOLD) != 0);
+         nodeFontStyle.setItalic((fontData.getStyle() & SWT.ITALIC) != 0);
+         org.eclipse.swt.graphics.RGB fontRGB = PreferenceConverter.getColor(
+               prefStore, IPreferenceConstants.PREF_FONT_COLOR);
+         nodeFontStyle.setFontColor(FigureUtilities.RGBToInteger(fontRGB)
+               .intValue());
+      }
+      Node label5061 = createLabel(node,
+            DbCVisualIDRegistry.getType(DbcAttributeNameTypeEditPart.VISUAL_ID));
       return node;
    }
 
@@ -1115,11 +1138,32 @@ public class DbCViewProvider extends AbstractProvider implements IViewProvider {
          View containerView, int index, boolean persisted,
          PreferencesHint preferencesHint) {
       Node node = NotationFactory.eINSTANCE.createNode();
-      node.setLayoutConstraint(NotationFactory.eINSTANCE.createLocation());
+      node.getStyles().add(NotationFactory.eINSTANCE.createDescriptionStyle());
+      node.getStyles().add(NotationFactory.eINSTANCE.createFontStyle());
+      node.setLayoutConstraint(NotationFactory.eINSTANCE.createBounds());
       node.setType(DbCVisualIDRegistry
             .getType(DbcEnumLiteralEditPart.VISUAL_ID));
       ViewUtil.insertChildView(containerView, node, index, persisted);
       node.setElement(domainElement);
+      // initializeFromPreferences 
+      final IPreferenceStore prefStore = (IPreferenceStore) preferencesHint
+            .getPreferenceStore();
+      FontStyle nodeFontStyle = (FontStyle) node
+            .getStyle(NotationPackage.Literals.FONT_STYLE);
+      if (nodeFontStyle != null) {
+         FontData fontData = PreferenceConverter.getFontData(prefStore,
+               IPreferenceConstants.PREF_DEFAULT_FONT);
+         nodeFontStyle.setFontName(fontData.getName());
+         nodeFontStyle.setFontHeight(fontData.getHeight());
+         nodeFontStyle.setBold((fontData.getStyle() & SWT.BOLD) != 0);
+         nodeFontStyle.setItalic((fontData.getStyle() & SWT.ITALIC) != 0);
+         org.eclipse.swt.graphics.RGB fontRGB = PreferenceConverter.getColor(
+               prefStore, IPreferenceConstants.PREF_FONT_COLOR);
+         nodeFontStyle.setFontColor(FigureUtilities.RGBToInteger(fontRGB)
+               .intValue());
+      }
+      Node label5062 = createLabel(node,
+            DbCVisualIDRegistry.getType(DbcEnumLiteralNameEditPart.VISUAL_ID));
       return node;
    }
 

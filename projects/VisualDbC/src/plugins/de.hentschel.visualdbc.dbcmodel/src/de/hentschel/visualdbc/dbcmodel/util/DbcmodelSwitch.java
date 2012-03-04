@@ -187,6 +187,7 @@ public class DbcmodelSwitch<T> extends Switch<T> {
          case DbcmodelPackage.DBC_ATTRIBUTE: {
             DbcAttribute dbcAttribute = (DbcAttribute)theEObject;
             T result = caseDbcAttribute(dbcAttribute);
+            if (result == null) result = caseIDbCProofReferencable(dbcAttribute);
             if (result == null) result = defaultCase(theEObject);
             return result;
          }
@@ -265,6 +266,7 @@ public class DbcmodelSwitch<T> extends Switch<T> {
          case DbcmodelPackage.DBC_ENUM_LITERAL: {
             DbcEnumLiteral dbcEnumLiteral = (DbcEnumLiteral)theEObject;
             T result = caseDbcEnumLiteral(dbcEnumLiteral);
+            if (result == null) result = caseIDbCProofReferencable(dbcEnumLiteral);
             if (result == null) result = defaultCase(theEObject);
             return result;
          }

@@ -27,7 +27,7 @@ public class AccessibleTest extends TestCase {
     * Tests accessible clause.
     */
    @Test
-   public void testAccessible() {
+   public void testAccessible() throws Exception {
       TestKeyUtil.testKeyConnection("AccessibleTest_testAccessible",
                                     "data/accessibleTest",
                                     null,

@@ -130,6 +130,23 @@ public abstract class AbstractDbcInterfaceImpl extends AbstractDbcTypeImpl imple
    /**
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
+    * @generated NOT
+    */
+   public DbcAttribute getAttribute(String name) {
+      DbcAttribute result = null;
+      Iterator<DbcAttribute> iter = getAttributes().iterator();
+      while (result == null && iter.hasNext()) {
+         DbcAttribute next = iter.next();
+         if (next.getName().equals(name)) {
+            result = next;
+         }
+      }
+      return result;
+   }
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
     * @generated
     */
    @Override

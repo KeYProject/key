@@ -304,21 +304,41 @@ public final class TestGenerationUtil {
     * Compares the data source enumeration literal with the model enumeration literal.
     * @param dsEnumLiteral The expected data source enumeration literal.
     * @param dbcEnumLiteral The current model enumeration literal.
+    * @param compareReferences Compare references?
     * @throws DSException Occurred Exception
     */   
-   public static void compareEnumLiteral(IDSEnumLiteral dsEnumLiteral, DbcEnumLiteral dbcEnumLiteral) throws DSException {
+   public static void compareEnumLiteral(IDSEnumLiteral dsEnumLiteral, DbcEnumLiteral dbcEnumLiteral, boolean compareReferences) throws DSException {
       TestCase.assertNotNull(dsEnumLiteral);
       TestCase.assertNotNull(dbcEnumLiteral);
       TestCase.assertEquals(dsEnumLiteral.getName(), dbcEnumLiteral.getName());
+      // Compare parent
+      if (compareReferences) {
+         if (dsEnumLiteral.getParent() instanceof IDSClass) {
+            TestCase.assertTrue(dbcEnumLiteral.eContainer() instanceof DbcClass);
+            compareClass((IDSClass)dsEnumLiteral.getParent(), (DbcClass)dbcEnumLiteral.eContainer(), false);
+         }
+         else if (dsEnumLiteral.getParent() instanceof IDSInterface) {
+            TestCase.assertTrue(dbcEnumLiteral.eContainer() instanceof DbcInterface);
+            compareInterface((IDSInterface)dsEnumLiteral.getParent(), (DbcInterface)dbcEnumLiteral.eContainer(), false);
+         }
+         else if (dsEnumLiteral.getParent() instanceof IDSEnum) {
+            TestCase.assertTrue(dbcEnumLiteral.eContainer() instanceof DbcEnum);
+            compareEnum((IDSEnum)dsEnumLiteral.getParent(), (DbcEnum)dbcEnumLiteral.eContainer(), false);
+         }
+         else {
+            fail("Data source type \"" + dsEnumLiteral + "\" has no parent.");
+         }
+      }
    }
    
    /**
     * Compares the data source attribute with the model attribute.
     * @param dsAttribute The expected data source attribute.
     * @param dbcAttribute The current model attribute.
+    * @param compareReferences Compare references?
     * @throws DSException Occurred Exception
     */   
-   public static void compareAttribute(IDSAttribute dsAttribute, DbcAttribute dbcAttribute) throws DSException {
+   public static void compareAttribute(IDSAttribute dsAttribute, DbcAttribute dbcAttribute, boolean compareReferences) throws DSException {
       TestCase.assertNotNull(dsAttribute);
       TestCase.assertNotNull(dbcAttribute);
       TestCase.assertEquals(dsAttribute.isFinal(), dbcAttribute.isFinal());
@@ -326,6 +346,24 @@ public final class TestGenerationUtil {
       TestCase.assertEquals(dsAttribute.getName(), dbcAttribute.getName());
       TestCase.assertEquals(dsAttribute.getType(), dbcAttribute.getType());
       compareVisibility(dsAttribute.getVisibility(), dbcAttribute.getVisibility());
+      // Compare parent
+      if (compareReferences) {
+         if (dsAttribute.getParent() instanceof IDSClass) {
+            TestCase.assertTrue(dbcAttribute.eContainer() instanceof DbcClass);
+            compareClass((IDSClass)dsAttribute.getParent(), (DbcClass)dbcAttribute.eContainer(), false);
+         }
+         else if (dsAttribute.getParent() instanceof IDSInterface) {
+            TestCase.assertTrue(dbcAttribute.eContainer() instanceof DbcInterface);
+            compareInterface((IDSInterface)dsAttribute.getParent(), (DbcInterface)dbcAttribute.eContainer(), false);
+         }
+         else if (dsAttribute.getParent() instanceof IDSEnum) {
+            TestCase.assertTrue(dbcAttribute.eContainer() instanceof DbcEnum);
+            compareEnum((IDSEnum)dsAttribute.getParent(), (DbcEnum)dbcAttribute.eContainer(), false);
+         }
+         else {
+            fail("Data source type \"" + dsAttribute + "\" has no parent.");
+         }
+      }
    }
 
    /**
@@ -604,7 +642,7 @@ public final class TestGenerationUtil {
       Iterator<IDSAttribute> dsAttributes = dsEnum.getAttributes().iterator();
       Iterator<DbcAttribute> dbcAttributes = dbcEnum.getAttributes().iterator();
       while (dsAttributes.hasNext() && dbcAttributes.hasNext()) {
-         compareAttribute(dsAttributes.next(), dbcAttributes.next());
+         compareAttribute(dsAttributes.next(), dbcAttributes.next(), compareReferences);
       }
       if (compareReferences) {
          // Compare contained methods
@@ -627,7 +665,7 @@ public final class TestGenerationUtil {
       Iterator<IDSEnumLiteral> dsEnumLiterals = dsEnum.getLiterals().iterator();
       Iterator<DbcEnumLiteral> dbcEnumLiterals = dbcEnum.getLiterals().iterator();
       while (dsEnumLiterals.hasNext() && dbcEnumLiterals.hasNext()) {
-         compareEnumLiteral(dsEnumLiterals.next(), dbcEnumLiterals.next());
+         compareEnumLiteral(dsEnumLiterals.next(), dbcEnumLiterals.next(), compareReferences);
       }
       if (compareReferences) {
          // Compare implements
@@ -675,7 +713,7 @@ public final class TestGenerationUtil {
       Iterator<IDSAttribute> dsAttributes = dsInterface.getAttributes().iterator();
       Iterator<DbcAttribute> dbcAttributes = dbcInterface.getAttributes().iterator();
       while (dsAttributes.hasNext() && dbcAttributes.hasNext()) {
-         compareAttribute(dsAttributes.next(), dbcAttributes.next());
+         compareAttribute(dsAttributes.next(), dbcAttributes.next(), compareReferences);
       }
       if (compareReferences) {
          // Compare contained methods
@@ -734,7 +772,7 @@ public final class TestGenerationUtil {
       Iterator<IDSAttribute> dsAttributes = dsClass.getAttributes().iterator();
       Iterator<DbcAttribute> dbcAttributes = dbcClass.getAttributes().iterator();
       while (dsAttributes.hasNext() && dbcAttributes.hasNext()) {
-         compareAttribute(dsAttributes.next(), dbcAttributes.next());
+         compareAttribute(dsAttributes.next(), dbcAttributes.next(), compareReferences);
       }
       if (compareReferences) {
          // Compare contained methods
@@ -1069,7 +1107,7 @@ public final class TestGenerationUtil {
       if (compareReferences) {
          compareMethods(expected.getMethods(), current.getMethods());
       }
-      compareAttributes(expected.getAttributes(), current.getAttributes());
+      compareAttributes(expected.getAttributes(), current.getAttributes(), compareReferences);
       if (compareReferences) {
          compareClasses(current.getName(), expected.getInnerClasses(), current.getInnerClasses());
          compareInterfaces(expected.getInnerInterfaces(), current.getInnerInterfaces());
@@ -1102,7 +1140,7 @@ public final class TestGenerationUtil {
          compareConstructors(expected.getConstructors(), current.getConstructors());
          compareMethods(expected.getMethods(), current.getMethods());
       }
-      compareAttributes(expected.getAttributes(), current.getAttributes());
+      compareAttributes(expected.getAttributes(), current.getAttributes(), compareReferences);
       if (compareReferences) {
          compareClasses(current.getName(), expected.getInnerClasses(), current.getInnerClasses());
          compareInterfaces(expected.getInnerInterfaces(), current.getInnerInterfaces());
@@ -1217,14 +1255,14 @@ public final class TestGenerationUtil {
          compareConstructors(expected.getConstructors(), current.getConstructors());
          compareMethods(expected.getMethods(), current.getMethods());
       }
-      compareAttributes(expected.getAttributes(), current.getAttributes());
+      compareAttributes(expected.getAttributes(), current.getAttributes(), compareReferences);
       if (compareReferences) {
          compareClasses(current.getName(), expected.getInnerClasses(), current.getInnerClasses());
          compareInterfaces(expected.getInnerInterfaces(), current.getInnerInterfaces());
          compareEnums(expected.getInnerEnums(), current.getInnerEnums());
          compareInvariants(expected.getInvariants(), current.getInvariants());
       }
-      compareEnumLiterals(expected.getLiterals(), current.getLiterals());
+      compareEnumLiterals(expected.getLiterals(), current.getLiterals(), compareReferences);
       compareStrings(expected.getName(), expected.getImplementsFullnames(), current.getImplementsFullnames());
       if (compareReferences) {
          compareInterfaces(expected.getImplements(), current.getImplements());
@@ -1237,16 +1275,17 @@ public final class TestGenerationUtil {
     * Compares the given enumeration literal {@link List}s.
     * @param expected The expected values.
     * @param current The current values.
+    * @param compareReferences Compare references?
     * @throws DSException Occurred Exception
     */ 
-   public static void compareEnumLiterals(List<IDSEnumLiteral> expected, List<IDSEnumLiteral> current) throws DSException {
+   public static void compareEnumLiterals(List<IDSEnumLiteral> expected, List<IDSEnumLiteral> current, boolean compareReferences) throws DSException {
       TestCase.assertNotNull(expected);
       TestCase.assertNotNull(current);
       TestCase.assertEquals(expected.size(), current.size());
       Iterator<IDSEnumLiteral> exClassIter = expected.iterator();
       Iterator<IDSEnumLiteral> curClassIter = current.iterator();
       while (exClassIter.hasNext() && curClassIter.hasNext()) {
-         compareEnumLiteral(exClassIter.next(), curClassIter.next());
+         compareEnumLiteral(exClassIter.next(), curClassIter.next(), compareReferences);
       }
       TestCase.assertFalse(exClassIter.hasNext());
       TestCase.assertFalse(curClassIter.hasNext());
@@ -1256,12 +1295,31 @@ public final class TestGenerationUtil {
     * Compares the given {@link IDSEnumLiteral}s.
     * @param expected The expected values.
     * @param current The current values.
+    * @param compareReferences Compare references?
     * @throws DSException Occurred Exception
     */
-   public static void compareEnumLiteral(IDSEnumLiteral expected, IDSEnumLiteral current) throws DSException {
+   public static void compareEnumLiteral(IDSEnumLiteral expected, IDSEnumLiteral current, boolean compareReferences) throws DSException {
       TestCase.assertNotNull(expected);
       TestCase.assertNotNull(current);
       TestCase.assertEquals(expected.getName(), current.getName());
+      if (compareReferences) {
+         // Compare parent
+         if (expected.getParent() instanceof IDSClass) {
+            TestCase.assertTrue(current.getParent() instanceof IDSClass);
+            compareClass((IDSClass)expected.getParent(), (IDSClass)current.getParent(), false);
+         }
+         else if (expected.getParent() instanceof IDSInterface) {
+            TestCase.assertTrue(current.getParent() instanceof IDSInterface);
+            compareInterface((IDSInterface)expected.getParent(), (IDSInterface)current.getParent(), false);
+         }
+         else if (expected.getParent() instanceof IDSEnum) {
+            TestCase.assertTrue(current.getParent() instanceof IDSEnum);
+            compareEnum((IDSEnum)expected.getParent(), (IDSEnum)current.getParent(), false);
+         }
+         else {
+            TestCase.fail("Unsupported parent \"" + expected.getParent() + "\".");
+         }
+      }
    }
 
    /**
@@ -1336,16 +1394,17 @@ public final class TestGenerationUtil {
     * Compares the given attributes {@link List}s.
     * @param expected The expected values.
     * @param current The current values.
+    * @param compareReferences Compare references?
     * @throws DSException Occurred Exception
     */ 
-   public static void compareAttributes(List<IDSAttribute> expected, List<IDSAttribute> current) throws DSException {
+   public static void compareAttributes(List<IDSAttribute> expected, List<IDSAttribute> current, boolean compareReferences) throws DSException {
       TestCase.assertNotNull(expected);
       TestCase.assertNotNull(current);
       TestCase.assertEquals(expected.size(), current.size());
       Iterator<IDSAttribute> exClassIter = expected.iterator();
       Iterator<IDSAttribute> curClassIter = current.iterator();
       while (exClassIter.hasNext() && curClassIter.hasNext()) {
-         compareAttribute(exClassIter.next(), curClassIter.next());
+         compareAttribute(exClassIter.next(), curClassIter.next(), compareReferences);
       }
       TestCase.assertFalse(exClassIter.hasNext());
       TestCase.assertFalse(curClassIter.hasNext());
@@ -1375,9 +1434,10 @@ public final class TestGenerationUtil {
     * Compares the given {@link IDSAttribute}s.
     * @param expected The expected values.
     * @param current The current values.
+    * @param compareReferences Compare references?
     * @throws DSException Occurred Exception
     */
-   public static void compareAttribute(IDSAttribute expected, IDSAttribute current) throws DSException {
+   public static void compareAttribute(IDSAttribute expected, IDSAttribute current, boolean compareReferences) throws DSException {
       TestCase.assertNotNull(expected);
       TestCase.assertNotNull(current);
       TestCase.assertEquals(expected.getName(), expected.isFinal(), current.isFinal());
@@ -1385,6 +1445,24 @@ public final class TestGenerationUtil {
       TestCase.assertEquals(expected.getName(), current.getName());
       TestCase.assertEquals(expected.getName(), expected.getType(), current.getType());
       TestCase.assertEquals(expected.getName(), expected.getVisibility(), current.getVisibility());
+      if (compareReferences) {
+         // Compare parent
+         if (expected.getParent() instanceof IDSClass) {
+            TestCase.assertTrue(current.getParent() instanceof IDSClass);
+            compareClass((IDSClass)expected.getParent(), (IDSClass)current.getParent(), false);
+         }
+         else if (expected.getParent() instanceof IDSInterface) {
+            TestCase.assertTrue(current.getParent() instanceof IDSInterface);
+            compareInterface((IDSInterface)expected.getParent(), (IDSInterface)current.getParent(), false);
+         }
+         else if (expected.getParent() instanceof IDSEnum) {
+            TestCase.assertTrue(current.getParent() instanceof IDSEnum);
+            compareEnum((IDSEnum)expected.getParent(), (IDSEnum)current.getParent(), false);
+         }
+         else {
+            TestCase.fail("Unsupported parent \"" + expected.getParent() + "\".");
+         }
+      }
    }
 
    /**

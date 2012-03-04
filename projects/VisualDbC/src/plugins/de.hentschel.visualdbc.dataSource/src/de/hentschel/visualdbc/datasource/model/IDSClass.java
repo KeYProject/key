@@ -42,13 +42,6 @@ public interface IDSClass extends IDSType {
    public boolean isAbstract() throws DSException;
    
    /**
-    * Returns all contained attributes.
-    * @return The contained attributes.
-    * @throws DSException Occurred Exception
-    */
-   public List<IDSAttribute> getAttributes() throws DSException;
-   
-   /**
     * Returns all contained methods.
     * @return The contained methods.
     * @throws DSException Occurred Exception

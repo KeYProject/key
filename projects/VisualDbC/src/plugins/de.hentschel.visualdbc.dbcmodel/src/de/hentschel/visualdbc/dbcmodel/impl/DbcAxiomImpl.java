@@ -6,30 +6,23 @@
  */
 package de.hentschel.visualdbc.dbcmodel.impl;
 
-import de.hentschel.visualdbc.dbcmodel.AbstractDbcSpecification;
-import de.hentschel.visualdbc.dbcmodel.DbCAxiomContract;
-import de.hentschel.visualdbc.dbcmodel.DbcAxiom;
-import de.hentschel.visualdbc.dbcmodel.DbcOperationContract;
-import de.hentschel.visualdbc.dbcmodel.DbcProof;
-import de.hentschel.visualdbc.dbcmodel.DbcProofObligation;
-import de.hentschel.visualdbc.dbcmodel.DbcmodelPackage;
-
-import de.hentschel.visualdbc.dbcmodel.IDbCProvable;
 import java.util.Collection;
 import java.util.Iterator;
 
 import org.eclipse.emf.common.notify.Notification;
-
 import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
-
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.impl.EObjectImpl;
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.InternalEList;
-import org.eclipse.emf.ecore.util.EObjectResolvingEList;
+
+import de.hentschel.visualdbc.dbcmodel.AbstractDbcSpecification;
+import de.hentschel.visualdbc.dbcmodel.DbCAxiomContract;
+import de.hentschel.visualdbc.dbcmodel.DbcAxiom;
+import de.hentschel.visualdbc.dbcmodel.DbcmodelPackage;
 
 /**
  * <!-- begin-user-doc -->

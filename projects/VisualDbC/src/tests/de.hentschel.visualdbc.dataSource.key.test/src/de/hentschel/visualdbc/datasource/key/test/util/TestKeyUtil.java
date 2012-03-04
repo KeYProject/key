@@ -488,10 +488,10 @@ public final class TestKeyUtil {
       addAllOperationContractObligations(gti2);
       getTransactionId.addOperationContract(gti2);
       result.addMethod(getTransactionId);
-      result.getAttributes().add(new MemoryAttribute("transactionCounter", "int", bugAttributeVisibility(DSVisibility.PRIVATE), true));
-      result.getAttributes().add(new MemoryAttribute("balance", "int", bugAttributeVisibility(DSVisibility.PRIVATE)));
-      result.getAttributes().add(new MemoryAttribute("transactionId", "int", bugAttributeVisibility(DSVisibility.PRIVATE)));
-      result.getAttributes().add(new MemoryAttribute("empty", "boolean", bugAttributeVisibility(DSVisibility.PRIVATE)));
+      result.addAttribute(new MemoryAttribute("transactionCounter", "int", bugAttributeVisibility(DSVisibility.PRIVATE), true));
+      result.addAttribute(new MemoryAttribute("balance", "int", bugAttributeVisibility(DSVisibility.PRIVATE)));
+      result.addAttribute(new MemoryAttribute("transactionId", "int", bugAttributeVisibility(DSVisibility.PRIVATE)));
+      result.addAttribute(new MemoryAttribute("empty", "boolean", bugAttributeVisibility(DSVisibility.PRIVATE)));
       result.getExtendsFullnames().add("java.lang.Object");
       result.addInvariant(new MemoryInvariant("JML class invariant nr " + invariantIds[0] + " in LogRecord", "!self.empty = TRUE\n" +
       		                                                                                                 "-> self.balance >= 0 & self.transactionId >= 0"));
@@ -604,11 +604,11 @@ public final class TestKeyUtil {
       MemoryMethod infoCardMsg = new MemoryMethod("infoCardMsg()", "java.lang.String", DSVisibility.PUBLIC);
       addOperationObligations(infoCardMsg, true, true, true);
       result.addMethod(infoCardMsg);
-      result.getAttributes().add(new MemoryAttribute("limit", "int", bugAttributeVisibility(DSVisibility.DEFAULT)));
-      result.getAttributes().add(new MemoryAttribute("unsuccessfulOperations", "int", bugAttributeVisibility(DSVisibility.DEFAULT)));
-      result.getAttributes().add(new MemoryAttribute("id", "int", bugAttributeVisibility(DSVisibility.DEFAULT)));
-      result.getAttributes().add(new MemoryAttribute("balance", "int", bugAttributeVisibility(DSVisibility.DEFAULT)));
-      result.getAttributes().add(new MemoryAttribute("log", qualifiedLogFileName, bugAttributeVisibility(DSVisibility.PROTECTED)));
+      result.addAttribute(new MemoryAttribute("limit", "int", bugAttributeVisibility(DSVisibility.DEFAULT)));
+      result.addAttribute(new MemoryAttribute("unsuccessfulOperations", "int", bugAttributeVisibility(DSVisibility.DEFAULT)));
+      result.addAttribute(new MemoryAttribute("id", "int", bugAttributeVisibility(DSVisibility.DEFAULT)));
+      result.addAttribute(new MemoryAttribute("balance", "int", bugAttributeVisibility(DSVisibility.DEFAULT)));
+      result.addAttribute(new MemoryAttribute("log", qualifiedLogFileName, bugAttributeVisibility(DSVisibility.PROTECTED)));
       result.getExtendsFullnames().add("java.lang.Object");
       result.addInvariant(new MemoryInvariant("JML class invariant nr " + invariantIDs[0] + " in PayCard", "!self.log = null"));
       result.addInvariant(new MemoryInvariant("JML class invariant nr " + invariantIDs[1] + " in PayCard", "self.balance >= 0"));
@@ -673,9 +673,9 @@ public final class TestKeyUtil {
       addAllOperationContractObligations(mr2);
       getMaximumRecord.addOperationContract(mr2);
       result.addMethod(getMaximumRecord);
-      result.getAttributes().add(new MemoryAttribute("logFileSize", "int", bugAttributeVisibility(DSVisibility.PRIVATE), true));
-      result.getAttributes().add(new MemoryAttribute("currentRecord", "int", bugAttributeVisibility(DSVisibility.PRIVATE)));
-      result.getAttributes().add(new MemoryAttribute("logArray", qualifiedLogRecordClass + KeyConnection.ARRAY_DECLARATION, bugAttributeVisibility(DSVisibility.PRIVATE)));
+      result.addAttribute(new MemoryAttribute("logFileSize", "int", bugAttributeVisibility(DSVisibility.PRIVATE), true));
+      result.addAttribute(new MemoryAttribute("currentRecord", "int", bugAttributeVisibility(DSVisibility.PRIVATE)));
+      result.addAttribute(new MemoryAttribute("logArray", qualifiedLogRecordClass + KeyConnection.ARRAY_DECLARATION, bugAttributeVisibility(DSVisibility.PRIVATE)));
       result.getExtendsFullnames().add("java.lang.Object");
       result.addInvariant(new MemoryInvariant("JML class invariant nr " + invariantIds[0] + " in LogFile", "\\forall int i;\n" +
       		                                                                                               "  (   0 <= i & i < self.logArray.length & inInt(i)\n" +
@@ -778,7 +778,7 @@ public final class TestKeyUtil {
       // Create class B
       MemoryClass b = new MemoryClass("B", DSVisibility.DEFAULT);
       b.getExtendsFullnames().add("java.lang.Object");
-      b.getAttributes().add(new MemoryAttribute("c", "test.Test", bugAttributeVisibility(DSVisibility.PRIVATE), false, bugAttributeFinal(true)));
+      b.addAttribute(new MemoryAttribute("c", "test.Test", bugAttributeVisibility(DSVisibility.PRIVATE), false, bugAttributeFinal(true)));
       b.addConstructor(new MemoryConstructor("B(x : int)", DSVisibility.DEFAULT));
       b.addInvariant(new MemoryInvariant("JML class invariant nr 0 in B", "self.c.<inv>"));
       MemoryAxiom axiom = new MemoryAxiom("Class invariant axiom for test.B", "equiv(java.lang.Object::<inv>(heap,self),java.lang.Object::<inv>(heap,test.Test::select(heap,self,test.B::$c)))");
@@ -790,7 +790,7 @@ public final class TestKeyUtil {
       // Create class test
       MemoryClass test = new MemoryClass("Test", DSVisibility.PUBLIC);
       test.getExtendsFullnames().add("java.lang.Object");
-      test.getAttributes().add(new MemoryAttribute("x", "int", bugAttributeVisibility(DSVisibility.PRIVATE)));
+      test.addAttribute(new MemoryAttribute("x", "int", bugAttributeVisibility(DSVisibility.PRIVATE)));
       test.addConstructor(new MemoryConstructor("Test(x : int)", DSVisibility.PUBLIC));
       testPackage.addClass(test);
       return con;
@@ -806,8 +806,8 @@ public final class TestKeyUtil {
       MemoryConnection con = new MemoryConnection();
       MemoryClass b = new MemoryClass("ModelFieldTest", DSVisibility.PUBLIC);
       b.getExtendsFullnames().add("java.lang.Object");
-      b.getAttributes().add(new MemoryAttribute("f", "int", bugAttributeVisibility(DSVisibility.PRIVATE)));
-      b.getAttributes().add(new MemoryAttribute("x", "int", bugAttributeVisibility(DSVisibility.PRIVATE)));
+      b.addAttribute(new MemoryAttribute("f", "int", bugAttributeVisibility(DSVisibility.PRIVATE)));
+      b.addAttribute(new MemoryAttribute("x", "int", bugAttributeVisibility(DSVisibility.PRIVATE)));
       b.addConstructor(createDefaultConstructor("ModelFieldTest()", null, false));
       MemoryMethod doubleX = new MemoryMethod("doubleX()", "int", DSVisibility.PUBLIC);
       MemoryOperationContract doubleXcontract = new MemoryOperationContract("JML operation contract [id: " + (includeAxiomContract ? 1 : 0) + " / ModelFieldTest::doubleX]", "self.<inv>", "(exc = null -> result = self.f & self.<inv>)\n& exc = null", "allLocs", "diamond");
@@ -834,11 +834,11 @@ public final class TestKeyUtil {
       MemoryConnection con = new MemoryConnection();
       MemoryClass attributeTestParent = new MemoryClass("AttributeTestParent", DSVisibility.PUBLIC);
       attributeTestParent.addConstructor(createDefaultConstructor("AttributeTestParent()", "X"));
-      attributeTestParent.getAttributes().add(new MemoryAttribute("onParentMyClass", "MyClass", bugAttributeVisibility(DSVisibility.DEFAULT)));
-      attributeTestParent.getAttributes().add(new MemoryAttribute("onParentBool", "boolean[][]", bugAttributeVisibility(DSVisibility.PRIVATE)));
-      attributeTestParent.getAttributes().add(new MemoryAttribute("onParentInt", "int", bugAttributeVisibility(DSVisibility.PROTECTED)));
-      attributeTestParent.getAttributes().add(new MemoryAttribute("onParentStringArray", "java.lang.String[]", bugAttributeVisibility(DSVisibility.PUBLIC)));
-      attributeTestParent.getAttributes().add(new MemoryAttribute("PARENT_CONSTANT", "int", bugAttributeVisibility(DSVisibility.PUBLIC), true, bugAttributeFinal(true)));
+      attributeTestParent.addAttribute(new MemoryAttribute("onParentMyClass", "MyClass", bugAttributeVisibility(DSVisibility.DEFAULT)));
+      attributeTestParent.addAttribute(new MemoryAttribute("onParentBool", "boolean[][]", bugAttributeVisibility(DSVisibility.PRIVATE)));
+      attributeTestParent.addAttribute(new MemoryAttribute("onParentInt", "int", bugAttributeVisibility(DSVisibility.PROTECTED)));
+      attributeTestParent.addAttribute(new MemoryAttribute("onParentStringArray", "java.lang.String[]", bugAttributeVisibility(DSVisibility.PUBLIC)));
+      attributeTestParent.addAttribute(new MemoryAttribute("PARENT_CONSTANT", "int", bugAttributeVisibility(DSVisibility.PUBLIC), true, bugAttributeFinal(true)));
       attributeTestParent.getExtendsFullnames().add("java.lang.Object");
       attributeTestParent.addInvariant(new MemoryInvariant("JML class invariant nr 0 in AttributeTestParent", "!self.onParentMyClass = null"));
       attributeTestParent.addInvariant(new MemoryInvariant("JML class invariant nr 1 in AttributeTestParent", "\\forall int i;\n" +
@@ -854,12 +854,12 @@ public final class TestKeyUtil {
       con.addClass(attributeTestParent);
       MemoryClass attributeTest = new MemoryClass("AttributesTest", DSVisibility.PUBLIC);
       attributeTest.addConstructor(createDefaultConstructor("AttributesTest()", "X"));
-      attributeTest.getAttributes().add(new MemoryAttribute("x", "int", bugAttributeVisibility(DSVisibility.PRIVATE)));
-      attributeTest.getAttributes().add(new MemoryAttribute("y", "java.lang.String", bugAttributeVisibility(DSVisibility.DEFAULT)));
-      attributeTest.getAttributes().add(new MemoryAttribute("boolArray", "boolean[]", bugAttributeVisibility(DSVisibility.PUBLIC)));
-      attributeTest.getAttributes().add(new MemoryAttribute("classInstance", "MyClass", bugAttributeVisibility(DSVisibility.PROTECTED)));
-      attributeTest.getAttributes().add(new MemoryAttribute("CONST", "java.lang.String", bugAttributeVisibility(DSVisibility.PRIVATE), false, bugAttributeFinal(true)));
-      attributeTest.getAttributes().add(new MemoryAttribute("counter", "int", bugAttributeVisibility(DSVisibility.PRIVATE), true));
+      attributeTest.addAttribute(new MemoryAttribute("x", "int", bugAttributeVisibility(DSVisibility.PRIVATE)));
+      attributeTest.addAttribute(new MemoryAttribute("y", "java.lang.String", bugAttributeVisibility(DSVisibility.DEFAULT)));
+      attributeTest.addAttribute(new MemoryAttribute("boolArray", "boolean[]", bugAttributeVisibility(DSVisibility.PUBLIC)));
+      attributeTest.addAttribute(new MemoryAttribute("classInstance", "MyClass", bugAttributeVisibility(DSVisibility.PROTECTED)));
+      attributeTest.addAttribute(new MemoryAttribute("CONST", "java.lang.String", bugAttributeVisibility(DSVisibility.PRIVATE), false, bugAttributeFinal(true)));
+      attributeTest.addAttribute(new MemoryAttribute("counter", "int", bugAttributeVisibility(DSVisibility.PRIVATE), true));
       attributeTest.getExtendsFullnames().add("AttributeTestParent");
       attributeTest.getExtends().add(attributeTestParent);
       attributeTest.addInvariant(new MemoryInvariant("JML class invariant nr 5 in AttributesTest", "!self.y = null"));
@@ -935,7 +935,7 @@ public final class TestKeyUtil {
       MemoryConnection con = new MemoryConnection();
       MemoryClass classA = new MemoryClass("ClassA", DSVisibility.PUBLIC);
       classA.addConstructor(createDefaultConstructor("ClassA()", "X"));
-      classA.getAttributes().add(new MemoryAttribute("limit", "int", bugAttributeVisibility(DSVisibility.PRIVATE)));
+      classA.addAttribute(new MemoryAttribute("limit", "int", bugAttributeVisibility(DSVisibility.PRIVATE)));
       classA.getExtendsFullnames().add("java.lang.Object");
       classA.addInvariant(new MemoryInvariant("JML class invariant nr 0 in ClassA", "self.limit >  0"));
       con.addClass(classA);
@@ -977,7 +977,7 @@ public final class TestKeyUtil {
       classAConstructorInt.addOperationContract(oc5);
       classAConstructorInt.addOperationContract(oc1);
       classA.addConstructor(classAConstructorInt);
-      classA.getAttributes().add(new MemoryAttribute("x", "int", bugAttributeVisibility(DSVisibility.PRIVATE)));
+      classA.addAttribute(new MemoryAttribute("x", "int", bugAttributeVisibility(DSVisibility.PRIVATE)));
       classA.getExtendsFullnames().add("java.lang.Object");
       MemoryMethod classAGetX = new MemoryMethod("getX()", "int", DSVisibility.PUBLIC);
       addOperationObligations(classAGetX, true, false, true);
@@ -1218,7 +1218,7 @@ public final class TestKeyUtil {
       anonymousClass.setAnonymous(true);
       anonymousClass.getExtendsFullnames().add("java.lang.Object");
       result.addInnerClass(anonymousClass);
-      result.getAttributes().add(new MemoryAttribute("x", "int", bugAttributeVisibility(DSVisibility.PRIVATE)));
+      result.addAttribute(new MemoryAttribute("x", "int", bugAttributeVisibility(DSVisibility.PRIVATE)));
       MemoryConstructor constructor = new MemoryConstructor("DefaultChildClass(x : int)", DSVisibility.PUBLIC);
       addOperationObligations(constructor, true, false, true);
       result.addConstructor(constructor);
@@ -1318,12 +1318,13 @@ public final class TestKeyUtil {
     * @param startContainerPath The path to the container to connect to.
     * @param packageManagement The package management to use in the KeY connection
     * @param expectedConnection The expected information to compare to.
+    * @throws Exception Occurred Exception.
     */
    public static void testKeyConnection(String projectName,
                                         String testDataInBundle,
                                         String startContainerPath,
                                         DSPackageManagement packageManagement,
-                                        IDSConnection expectedConnection) {
+                                        IDSConnection expectedConnection) throws Exception {
       IDSConnection connection = null;
       ConnectionLogger logger = new ConnectionLogger();
       try {
@@ -1351,10 +1352,6 @@ public final class TestKeyUtil {
          IFile diagramFile = paycardFolder.getFile(new Path("default.proof_diagram"));
          // Compare connection with expected one and created diagram
          compareModels(expectedConnection, connection, modelFile, diagramFile);
-      }
-      catch (Exception e) {
-         e.printStackTrace();
-         TestCase.fail(e.getMessage());
       }
       finally {
          try {

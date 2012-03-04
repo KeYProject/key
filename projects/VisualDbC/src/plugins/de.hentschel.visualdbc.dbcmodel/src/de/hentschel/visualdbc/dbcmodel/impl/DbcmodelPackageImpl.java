@@ -1312,6 +1312,7 @@ public class DbcmodelPackageImpl extends EPackageImpl implements DbcmodelPackage
       dbcInvariantEClass.getESuperTypes().add(this.getAbstractDbcSpecification());
       dbcInvariantEClass.getESuperTypes().add(this.getIDbCProofReferencable());
       dbcConstructorEClass.getESuperTypes().add(this.getAbstractDbcOperation());
+      dbcAttributeEClass.getESuperTypes().add(this.getIDbCProofReferencable());
       abstractDbcClassEClass.getESuperTypes().add(this.getAbstractDbcInterface());
       abstractDbcInterfaceEClass.getESuperTypes().add(this.getAbstractDbcType());
       dbcInterfaceEClass.getESuperTypes().add(this.getAbstractDbcInterface());
@@ -1319,6 +1320,7 @@ public class DbcmodelPackageImpl extends EPackageImpl implements DbcmodelPackage
       abstractDbcTypeEClass.getESuperTypes().add(this.getIDbCProvable());
       abstractDbcEnumEClass.getESuperTypes().add(this.getAbstractDbcClass());
       dbcEnumEClass.getESuperTypes().add(this.getAbstractDbcEnum());
+      dbcEnumLiteralEClass.getESuperTypes().add(this.getIDbCProofReferencable());
       dbcOperationContractEClass.getESuperTypes().add(this.getAbstractDbcSpecification());
       dbcOperationContractEClass.getESuperTypes().add(this.getIDbCProvable());
       abstractDbcOperationEClass.getESuperTypes().add(this.getAbstractDbcProofContainer());
@@ -1399,6 +1401,9 @@ public class DbcmodelPackageImpl extends EPackageImpl implements DbcmodelPackage
       op = addEOperation(abstractDbcInterfaceEClass, this.getDbcMethod(), "getMethod", 0, 1, IS_UNIQUE, IS_ORDERED);
       addEParameter(op, ecorePackage.getEString(), "signature", 0, 1, IS_UNIQUE, IS_ORDERED);
 
+      op = addEOperation(abstractDbcInterfaceEClass, this.getDbcAttribute(), "getAttribute", 0, 1, IS_UNIQUE, IS_ORDERED);
+      addEParameter(op, ecorePackage.getEString(), "name", 0, 1, IS_UNIQUE, IS_ORDERED);
+
       initEClass(dbcInterfaceEClass, DbcInterface.class, "DbcInterface", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
       initEReference(getDbcInterface_Extends(), this.getDbcInterface(), null, "extends", null, 0, -1, DbcInterface.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
@@ -1417,6 +1422,9 @@ public class DbcmodelPackageImpl extends EPackageImpl implements DbcmodelPackage
 
       initEClass(abstractDbcEnumEClass, AbstractDbcEnum.class, "AbstractDbcEnum", IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
       initEReference(getAbstractDbcEnum_Literals(), this.getDbcEnumLiteral(), null, "literals", null, 0, -1, AbstractDbcEnum.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+      op = addEOperation(abstractDbcEnumEClass, this.getDbcEnumLiteral(), "getLiteral", 0, 1, IS_UNIQUE, IS_ORDERED);
+      addEParameter(op, ecorePackage.getEString(), "name", 0, 1, IS_UNIQUE, IS_ORDERED);
 
       initEClass(dbcEnumEClass, DbcEnum.class, "DbcEnum", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 

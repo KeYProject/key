@@ -422,9 +422,46 @@
     <descriptors
         name="DbcAttributeFigure">
       <actualFigure
-          xsi:type="gmfgraph:Label"
-          name="DbcAttributeFigure"
-          text="&lt;...>"/>
+          xsi:type="gmfgraph:Rectangle"
+          name="DbcAttributeFigure">
+        <layout
+            xsi:type="gmfgraph:GridLayout">
+          <margins/>
+          <spacing
+              dy="-1"/>
+        </layout>
+        <foregroundColor
+            xsi:type="gmfgraph:RGBColor"
+            red="240"
+            green="240"
+            blue="250"/>
+        <backgroundColor
+            xsi:type="gmfgraph:RGBColor"
+            red="240"
+            green="240"
+            blue="250"/>
+        <preferredSize
+            dy="18"/>
+        <insets/>
+        <children
+            xsi:type="gmfgraph:Label"
+            name="DbcAttributeNameFigure"
+            text="&lt;...>">
+          <layoutData
+              xsi:type="gmfgraph:GridLayoutData"
+              grabExcessVerticalSpace="true"
+              horizontalAlignment="BEGINNING"
+              verticalSpan="0"
+              horizontalSpan="0"/>
+          <border
+              xsi:type="gmfgraph:MarginBorder">
+            <insets
+                right="5"/>
+          </border>
+        </children>
+      </actualFigure>
+      <accessors
+          figure="//@figures.0/@descriptors.9/@actualFigure/@children.0"/>
     </descriptors>
     <descriptors
         name="DbcInterfaceFigure">
@@ -593,9 +630,46 @@
     <descriptors
         name="DbcEnumLiteralFigure">
       <actualFigure
-          xsi:type="gmfgraph:Label"
-          name="DbcEnumLiteralFigure"
-          text="&lt;...>"/>
+          xsi:type="gmfgraph:Rectangle"
+          name="DbcEnumLiteralFigure">
+        <layout
+            xsi:type="gmfgraph:GridLayout">
+          <margins/>
+          <spacing
+              dy="-1"/>
+        </layout>
+        <foregroundColor
+            xsi:type="gmfgraph:RGBColor"
+            red="240"
+            green="240"
+            blue="250"/>
+        <backgroundColor
+            xsi:type="gmfgraph:RGBColor"
+            red="240"
+            green="240"
+            blue="250"/>
+        <preferredSize
+            dy="18"/>
+        <insets/>
+        <children
+            xsi:type="gmfgraph:Label"
+            name="DbcEnumLiteralNameFigure"
+            text="&lt;...>">
+          <layoutData
+              xsi:type="gmfgraph:GridLayoutData"
+              grabExcessVerticalSpace="true"
+              horizontalAlignment="BEGINNING"
+              verticalSpan="0"
+              horizontalSpan="0"/>
+          <border
+              xsi:type="gmfgraph:MarginBorder">
+            <insets
+                right="5"/>
+          </border>
+        </children>
+      </actualFigure>
+      <accessors
+          figure="//@figures.0/@descriptors.12/@actualFigure/@children.0"/>
     </descriptors>
     <descriptors
         name="ExtendsFigure">
@@ -899,6 +973,12 @@
   <nodes
       name="DbcAxiomContract"
       figure="DbcAxiomContractFigure"/>
+  <nodes
+      name="DbcAttribute"
+      figure="DbcAttributeFigure"/>
+  <nodes
+      name="DbcEnumLiteral"
+      figure="DbcEnumLiteralFigure"/>
   <connections
       name="DbcProofTargetConnection"
       figure="DbcProofTargetFigure"/>
@@ -996,7 +1076,8 @@
       elementIcon="false"/>
   <labels
       name="DbcAttributeName"
-      figure="DbcAttributeFigure"/>
+      figure="DbcAttributeFigure"
+      accessor="//@figures.0/@descriptors.9/@accessors.0"/>
   <labels
       name="DbcInterfaceName"
       figure="DbcInterfaceFigure"
@@ -1007,7 +1088,8 @@
       accessor="//@figures.0/@descriptors.11/@accessors.0"/>
   <labels
       name="DbcEnumLiteralName"
-      figure="DbcEnumLiteralFigure"/>
+      figure="DbcEnumLiteralFigure"
+      accessor="//@figures.0/@descriptors.12/@accessors.0"/>
   <labels
       name="DbcOperationContractName"
       figure="DbcOperationContractFigure"

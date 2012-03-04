@@ -40,7 +40,7 @@ public class KeyConnectionTest extends TestCase {
     * {@link KeyConnection#disconnect()} by connecting to a valid location.
     */
    @Test
-   public void testConnectionToValidLocation() {
+   public void testConnectionToValidLocation() throws Exception {
       TestKeyUtil.testKeyConnection("KeyConnectionTest_testConnectionToValidLocation",
                                     "data/quicktour",
                                     "paycard",

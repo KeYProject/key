@@ -33,6 +33,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbCAxiomContractEditPart;
+import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcAttributeEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcAxiomDbcAxiomCompartmentEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcAxiomEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcClass2EditPart;
@@ -45,6 +46,7 @@ import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcEnum2EditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcEnumDbcEnumMainCompartment2EditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcEnumDbcEnumMainCompartmentEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcEnumEditPart;
+import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcEnumLiteralEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcInterface2EditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcInterfaceDbcInterfaceMainCompartment2EditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcInterfaceDbcInterfaceMainCompartmentEditPart;
@@ -283,6 +285,9 @@ public class DbCModelingAssistantProvider extends ModelingAssistantProvider {
       if (targetEditPart instanceof DbcInvariantEditPart) {
          return ((DbcInvariantEditPart) targetEditPart).getMARelTypesOnTarget();
       }
+      if (targetEditPart instanceof DbcAttributeEditPart) {
+         return ((DbcAttributeEditPart) targetEditPart).getMARelTypesOnTarget();
+      }
       if (targetEditPart instanceof DbcMethodEditPart) {
          return ((DbcMethodEditPart) targetEditPart).getMARelTypesOnTarget();
       }
@@ -292,6 +297,10 @@ public class DbCModelingAssistantProvider extends ModelingAssistantProvider {
       }
       if (targetEditPart instanceof DbcConstructorEditPart) {
          return ((DbcConstructorEditPart) targetEditPart)
+               .getMARelTypesOnTarget();
+      }
+      if (targetEditPart instanceof DbcEnumLiteralEditPart) {
+         return ((DbcEnumLiteralEditPart) targetEditPart)
                .getMARelTypesOnTarget();
       }
       if (targetEditPart instanceof DbcAxiomEditPart) {
@@ -382,6 +391,10 @@ public class DbCModelingAssistantProvider extends ModelingAssistantProvider {
          return ((DbcInvariantEditPart) targetEditPart)
                .getMATypesForSource(relationshipType);
       }
+      if (targetEditPart instanceof DbcAttributeEditPart) {
+         return ((DbcAttributeEditPart) targetEditPart)
+               .getMATypesForSource(relationshipType);
+      }
       if (targetEditPart instanceof DbcMethodEditPart) {
          return ((DbcMethodEditPart) targetEditPart)
                .getMATypesForSource(relationshipType);
@@ -392,6 +405,10 @@ public class DbCModelingAssistantProvider extends ModelingAssistantProvider {
       }
       if (targetEditPart instanceof DbcConstructorEditPart) {
          return ((DbcConstructorEditPart) targetEditPart)
+               .getMATypesForSource(relationshipType);
+      }
+      if (targetEditPart instanceof DbcEnumLiteralEditPart) {
+         return ((DbcEnumLiteralEditPart) targetEditPart)
                .getMATypesForSource(relationshipType);
       }
       if (targetEditPart instanceof DbcAxiomEditPart) {

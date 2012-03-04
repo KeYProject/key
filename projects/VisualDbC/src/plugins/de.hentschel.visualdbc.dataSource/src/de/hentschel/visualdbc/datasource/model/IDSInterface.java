@@ -19,14 +19,7 @@ import de.hentschel.visualdbc.datasource.model.exception.DSException;
  * Represents an interface on the data source.
  * @author Martin Hentschel
  */
-public interface IDSInterface extends IDSType {
-   /**
-    * Returns all contained attributes.
-    * @return The contained attributes.
-    * @throws DSException Occurred Exception
-    */
-   public List<IDSAttribute> getAttributes() throws DSException;
-   
+public interface IDSInterface extends IDSType {   
    /**
     * Returns all contained methods.
     * @return The contained methods.

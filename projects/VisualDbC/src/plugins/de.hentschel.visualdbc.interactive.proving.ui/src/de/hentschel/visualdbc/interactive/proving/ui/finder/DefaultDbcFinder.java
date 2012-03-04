@@ -11,6 +11,7 @@
 
 package de.hentschel.visualdbc.interactive.proving.ui.finder;
 
+import de.hentschel.visualdbc.datasource.model.IDSAttribute;
 import de.hentschel.visualdbc.datasource.model.IDSAxiom;
 import de.hentschel.visualdbc.datasource.model.IDSAxiomContract;
 import de.hentschel.visualdbc.datasource.model.IDSClass;
@@ -18,6 +19,7 @@ import de.hentschel.visualdbc.datasource.model.IDSConnection;
 import de.hentschel.visualdbc.datasource.model.IDSConstructor;
 import de.hentschel.visualdbc.datasource.model.IDSContainer;
 import de.hentschel.visualdbc.datasource.model.IDSEnum;
+import de.hentschel.visualdbc.datasource.model.IDSEnumLiteral;
 import de.hentschel.visualdbc.datasource.model.IDSInterface;
 import de.hentschel.visualdbc.datasource.model.IDSInvariant;
 import de.hentschel.visualdbc.datasource.model.IDSMethod;
@@ -29,10 +31,12 @@ import de.hentschel.visualdbc.datasource.model.IDSType;
 import de.hentschel.visualdbc.datasource.model.exception.DSException;
 import de.hentschel.visualdbc.dbcmodel.AbstractDbcType;
 import de.hentschel.visualdbc.dbcmodel.DbCAxiomContract;
+import de.hentschel.visualdbc.dbcmodel.DbcAttribute;
 import de.hentschel.visualdbc.dbcmodel.DbcAxiom;
 import de.hentschel.visualdbc.dbcmodel.DbcClass;
 import de.hentschel.visualdbc.dbcmodel.DbcConstructor;
 import de.hentschel.visualdbc.dbcmodel.DbcEnum;
+import de.hentschel.visualdbc.dbcmodel.DbcEnumLiteral;
 import de.hentschel.visualdbc.dbcmodel.DbcInterface;
 import de.hentschel.visualdbc.dbcmodel.DbcInvariant;
 import de.hentschel.visualdbc.dbcmodel.DbcMethod;
@@ -253,7 +257,7 @@ public class DefaultDbcFinder extends AbstractDbcFinder {
     */
    @Override
    public DbcAxiom findAxiom(IDSAxiom toSearch) throws DSException {
-       DbcAxiom result = null;
+      DbcAxiom result = null;
       if (toSearch != null) {
          // Get parent
          IDSType parent = toSearch.getParent();
@@ -275,6 +279,55 @@ public class DefaultDbcFinder extends AbstractDbcFinder {
       }
       if (result == null) {
          throw new DSException("Can't find axiom for: " + toSearch);
+      }
+      return result;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public DbcAttribute findAttribute(IDSAttribute toSearch) throws DSException {
+      DbcAttribute result = null;
+      if (toSearch != null) {
+         // Get parent
+         IDSType parent = toSearch.getParent();
+         if (parent instanceof IDSClass) {
+            DbcClass dbcParent = findClass((IDSClass)parent);
+            result = dbcParent.getAttribute(toSearch.getName());
+         }
+         else if (parent instanceof IDSInterface) {
+            DbcInterface dbcParent = findInterface((IDSInterface)parent);
+            result = dbcParent.getAttribute(toSearch.getName());
+         }
+         else if (parent instanceof IDSEnum) {
+            DbcEnum dbcParent = findEnum((IDSEnum)parent);
+            result = dbcParent.getAttribute(toSearch.getName());
+         }
+         else {
+            throw new DSException("Not supported parent: " + parent);
+         }         
+      }
+      if (result == null) {
+         throw new DSException("Can't find attribute for: " + toSearch);
+      }
+      return result;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public DbcEnumLiteral findEnumLiteral(IDSEnumLiteral toSearch) throws DSException {
+      DbcEnumLiteral result = null;
+      if (toSearch != null) {
+         // Get parent
+         IDSEnum parent = toSearch.getParent();
+         DbcEnum dbcParent = findEnum((IDSEnum)parent);
+         result = dbcParent.getLiteral(toSearch.getName());
+      }
+      if (result == null) {
+         throw new DSException("Can't find enum literal for: " + toSearch);
       }
       return result;
    }
@@ -379,6 +432,12 @@ public class DefaultDbcFinder extends AbstractDbcFinder {
          }
          else if (toSearch instanceof IDSAxiom) {
             result = findAxiom((IDSAxiom)toSearch);
+         }
+         else if (toSearch instanceof IDSAttribute) {
+            result = findAttribute((IDSAttribute)toSearch);
+         }
+         else if (toSearch instanceof IDSEnumLiteral) {
+            result = findEnumLiteral((IDSEnumLiteral)toSearch);
          }
          else {
             result = findProvable(toSearch);

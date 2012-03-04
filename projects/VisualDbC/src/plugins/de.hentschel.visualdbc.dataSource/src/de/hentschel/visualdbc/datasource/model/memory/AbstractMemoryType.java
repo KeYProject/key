@@ -18,6 +18,7 @@ import java.util.List;
 import org.key_project.util.java.ObjectUtil;
 
 import de.hentschel.visualdbc.datasource.model.DSVisibility;
+import de.hentschel.visualdbc.datasource.model.IDSAttribute;
 import de.hentschel.visualdbc.datasource.model.IDSAxiom;
 import de.hentschel.visualdbc.datasource.model.IDSClass;
 import de.hentschel.visualdbc.datasource.model.IDSContainer;
@@ -90,6 +91,11 @@ public abstract class AbstractMemoryType extends AbstractDSType {
    private List<IDSAxiom> axioms = new LinkedList<IDSAxiom>();
 
    /**
+    * The contained attributes.
+    */
+   private List<IDSAttribute> attributes = new LinkedList<IDSAttribute>();
+      
+   /**
     * Sets the parent package.
     * @param parentContainer The parent package to set.
     */
@@ -127,6 +133,14 @@ public abstract class AbstractMemoryType extends AbstractDSType {
     */
    public void setStatic(boolean isStatic) {
       this.isStatic = isStatic;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public List<IDSAttribute> getAttributes() {
+      return attributes;
    }
 
    /**
@@ -268,6 +282,38 @@ public abstract class AbstractMemoryType extends AbstractDSType {
       }
       return result;
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IDSInvariant getInvariant(String condition) throws DSException {
+      Iterator<IDSInvariant> iter = getInvariants().iterator();
+      IDSInvariant result = null;
+      while(result == null && iter.hasNext()) {
+         IDSInvariant next = iter.next();
+         if (next != null && ObjectUtil.equals(next.getCondition(), condition)) {
+            result = next;
+         }
+      }
+      return result;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IDSAttribute getAttribute(String name) throws DSException {
+      Iterator<IDSAttribute> iter = getAttributes().iterator();
+      IDSAttribute result = null;
+      while(result == null && iter.hasNext()) {
+         IDSAttribute next = iter.next();
+         if (next != null && ObjectUtil.equals(next.getName(), name)) {
+            result = next;
+         }
+      }
+      return result;
+   }
    
    /**
     * Adds the axiom and updates his parent reference.
@@ -276,5 +322,14 @@ public abstract class AbstractMemoryType extends AbstractDSType {
    public void addAxiom(MemoryAxiom axiom) {
       axioms.add(axiom);
       axiom.setParent(this);
+   }
+   
+   /**
+    * Adds the attribute and updates his parent reference.
+    * @param attribute The attribute to add.
+    */
+   public void addAttribute(MemoryAttribute attribute) {
+      attributes.add(attribute);
+      attribute.setParent(this);
    }
 }

@@ -539,6 +539,11 @@ public class Messages extends NLS {
    /**
     * @generated
     */
+   public static String NavigatorGroupName_DbcAttribute_3011_incominglinks;
+
+   /**
+    * @generated
+    */
    public static String NavigatorGroupName_DbcClassExtends_4003_target;
 
    /**
@@ -610,6 +615,11 @@ public class Messages extends NLS {
     * @generated
     */
    public static String NavigatorGroupName_DbcEnum_2013_outgoinglinks;
+
+   /**
+    * @generated
+    */
+   public static String NavigatorGroupName_DbcEnumLiteral_3020_incominglinks;
 
    /**
     * @generated

@@ -333,6 +333,9 @@ public class DbcProofEditPart extends ShapeNodeEditPart {
       if (targetEditPart instanceof DbcInvariantEditPart) {
          types.add(DbCElementTypes.DbcProofReference_4002);
       }
+      if (targetEditPart instanceof DbcAttributeEditPart) {
+         types.add(DbCElementTypes.DbcProofReference_4002);
+      }
       if (targetEditPart instanceof DbcMethodEditPart) {
          types.add(DbCElementTypes.DbcProofReference_4002);
       }
@@ -340,6 +343,9 @@ public class DbcProofEditPart extends ShapeNodeEditPart {
          types.add(DbCElementTypes.DbcProofReference_4002);
       }
       if (targetEditPart instanceof DbcConstructorEditPart) {
+         types.add(DbCElementTypes.DbcProofReference_4002);
+      }
+      if (targetEditPart instanceof DbcEnumLiteralEditPart) {
          types.add(DbCElementTypes.DbcProofReference_4002);
       }
       if (targetEditPart instanceof DbcAxiomEditPart) {
@@ -376,9 +382,11 @@ public class DbcProofEditPart extends ShapeNodeEditPart {
          types.add(DbCElementTypes.DbcInterface_3032);
          types.add(DbCElementTypes.DbcEnum_3033);
          types.add(DbCElementTypes.DbcInvariant_3035);
+         types.add(DbCElementTypes.DbcAttribute_3011);
          types.add(DbCElementTypes.DbcMethod_3009);
          types.add(DbCElementTypes.DbcOperationContract_3026);
          types.add(DbCElementTypes.DbcConstructor_3010);
+         types.add(DbCElementTypes.DbcEnumLiteral_3020);
          types.add(DbCElementTypes.DbcAxiom_3036);
          types.add(DbCElementTypes.DbCAxiomContract_3037);
       }

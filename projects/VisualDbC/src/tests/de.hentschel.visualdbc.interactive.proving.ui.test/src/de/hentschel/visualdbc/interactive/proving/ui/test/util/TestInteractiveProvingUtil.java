@@ -23,12 +23,14 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.swtbot.eclipse.gef.finder.widgets.SWTBotGefEditPart;
 import org.eclipse.swtbot.eclipse.gef.finder.widgets.SWTBotGefEditor;
 
+import de.hentschel.visualdbc.datasource.model.IDSAttribute;
 import de.hentschel.visualdbc.datasource.model.IDSAxiom;
 import de.hentschel.visualdbc.datasource.model.IDSAxiomContract;
 import de.hentschel.visualdbc.datasource.model.IDSClass;
 import de.hentschel.visualdbc.datasource.model.IDSConnection;
 import de.hentschel.visualdbc.datasource.model.IDSConstructor;
 import de.hentschel.visualdbc.datasource.model.IDSEnum;
+import de.hentschel.visualdbc.datasource.model.IDSEnumLiteral;
 import de.hentschel.visualdbc.datasource.model.IDSInterface;
 import de.hentschel.visualdbc.datasource.model.IDSInvariant;
 import de.hentschel.visualdbc.datasource.model.IDSMethod;
@@ -126,6 +128,16 @@ public final class TestInteractiveProvingUtil {
          @Override
          protected void workOnAxiomContract(IDSAxiomContract instance) throws DSException {
             findAxiomContract(finder, instance);
+         }
+
+         @Override
+         protected void workOnAttribute(IDSAttribute instance) throws DSException {
+            findAttribute(finder, instance);
+         }
+
+         @Override
+         protected void workOnEnumLiteral(IDSEnumLiteral instance) throws DSException {
+            findEnumLiteral(finder, instance);
          }
       };
       iter.iterateOverConnection(connection);
@@ -262,6 +274,32 @@ public final class TestInteractiveProvingUtil {
     * @param toSearch The data source element to search and to compare.
     * @throws DSException Occurred Exception.
     */   
+   public static void findAttribute(IDbcFinder finder, IDSAttribute toSearch) throws DSException {
+      DbcAttribute found = finder.findAttribute(toSearch);
+      TestGenerationUtil.compareAttribute(toSearch, found, true);
+      IDbCProofReferencable proofReferencable = finder.findProofReferencable(toSearch);
+      assertSame(found, proofReferencable);      
+   }
+
+   /**
+    * Uses the {@link IDbcFinder} to find the equal element for the given data source instance.
+    * @param finder The {@link IDbcFinder} to use.
+    * @param toSearch The data source element to search and to compare.
+    * @throws DSException Occurred Exception.
+    */   
+   public static void findEnumLiteral(IDbcFinder finder, IDSEnumLiteral toSearch) throws DSException {
+      DbcEnumLiteral found = finder.findEnumLiteral(toSearch);
+      TestGenerationUtil.compareEnumLiteral(toSearch, found, true);
+      IDbCProofReferencable proofReferencable = finder.findProofReferencable(toSearch);
+      assertSame(found, proofReferencable);      
+   }
+
+   /**
+    * Uses the {@link IDbcFinder} to find the equal element for the given data source instance.
+    * @param finder The {@link IDbcFinder} to use.
+    * @param toSearch The data source element to search and to compare.
+    * @throws DSException Occurred Exception.
+    */   
    public static void findAxiom(IDbcFinder finder, IDSAxiom toSearch) throws DSException {
       DbcAxiom found = finder.findAxiom(toSearch);
       TestGenerationUtil.compareAxiom(toSearch, found, true);
@@ -363,10 +401,12 @@ public final class TestInteractiveProvingUtil {
          assertSame(foundElement, provable);            
       }
       else if (element instanceof DbcEnumLiteral) {
-         // Not supported in finder directly
+         IDSEnumLiteral foundElement = finder.findEnumLiteral((DbcEnumLiteral)element);
+         TestGenerationUtil.compareEnumLiteral(foundElement, (DbcEnumLiteral)element, true);
       }
       else if (element instanceof DbcAttribute) {
-         // Not supported in finder directly
+         IDSAttribute foundElement = finder.findAttribute((DbcAttribute)element);
+         TestGenerationUtil.compareAttribute(foundElement, (DbcAttribute)element, true);
       }
       else if (element instanceof DbcAxiom) {
          IDSAxiom foundElement = finder.findAxiom((DbcAxiom)element);
@@ -391,7 +431,8 @@ public final class TestInteractiveProvingUtil {
          assertSame(foundElement, provable);            
       }
       else if (element instanceof DbcInvariant) {
-         // Not supported in finder directly
+         IDSInvariant foundElement = finder.findInvariant((DbcInvariant)element);
+         TestGenerationUtil.compareInvariant(foundElement, (DbcInvariant)element);
       }
       else if (element instanceof DbcOperationContract) {
          IDSOperationContract foundElement = finder.findOperationContract((DbcOperationContract)element);

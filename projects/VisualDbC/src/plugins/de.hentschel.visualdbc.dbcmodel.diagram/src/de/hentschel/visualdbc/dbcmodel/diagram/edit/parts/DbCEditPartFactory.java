@@ -115,6 +115,9 @@ public class DbCEditPartFactory implements EditPartFactory {
          case DbcAttributeEditPart.VISUAL_ID:
             return new DbcAttributeEditPart(view);
 
+         case DbcAttributeNameTypeEditPart.VISUAL_ID:
+            return new DbcAttributeNameTypeEditPart(view);
+
          case DbcMethodEditPart.VISUAL_ID:
             return new DbcMethodEditPart(view);
 
@@ -141,6 +144,9 @@ public class DbCEditPartFactory implements EditPartFactory {
 
          case DbcEnumLiteralEditPart.VISUAL_ID:
             return new DbcEnumLiteralEditPart(view);
+
+         case DbcEnumLiteralNameEditPart.VISUAL_ID:
+            return new DbcEnumLiteralNameEditPart(view);
 
          case DbcAxiomEditPart.VISUAL_ID:
             return new DbcAxiomEditPart(view);

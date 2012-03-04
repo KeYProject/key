@@ -6,15 +6,11 @@
  */
 package de.hentschel.visualdbc.dbcmodel.tests;
 
-import de.hentschel.visualdbc.dbcmodel.AbstractDbcOperation;
+import junit.framework.TestCase;
+import junit.textui.TestRunner;
 import de.hentschel.visualdbc.dbcmodel.DbCAxiomContract;
 import de.hentschel.visualdbc.dbcmodel.DbcAxiom;
-import de.hentschel.visualdbc.dbcmodel.DbcOperationContract;
 import de.hentschel.visualdbc.dbcmodel.DbcmodelFactory;
-
-import junit.framework.TestCase;
-
-import junit.textui.TestRunner;
 
 /**
  * <!-- begin-user-doc -->

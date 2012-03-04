@@ -24,6 +24,7 @@ import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbCAxiomContractEditPa
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbCAxiomContractNameEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbCAxiomContractPreEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcAttributeEditPart;
+import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcAttributeNameTypeEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcAxiomDbcAxiomCompartmentEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcAxiomDefinitionEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcAxiomEditPart;
@@ -48,6 +49,7 @@ import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcEnumDbcEnumMainComp
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcEnumDbcEnumMainCompartmentEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcEnumEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcEnumLiteralEditPart;
+import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcEnumLiteralNameEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcEnumName2EditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcEnumNameEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcInterface2EditPart;
@@ -678,6 +680,11 @@ public class DbCVisualIDRegistry {
             return true;
          }
          break;
+      case DbcAttributeEditPart.VISUAL_ID:
+         if (DbcAttributeNameTypeEditPart.VISUAL_ID == nodeVisualID) {
+            return true;
+         }
+         break;
       case DbcMethodEditPart.VISUAL_ID:
          if (DbcMethodSignatureReturnTypeEditPart.VISUAL_ID == nodeVisualID) {
             return true;
@@ -702,6 +709,11 @@ public class DbCVisualIDRegistry {
             return true;
          }
          if (DbcConstructorDbcConstructorCompartmentEditPart.VISUAL_ID == nodeVisualID) {
+            return true;
+         }
+         break;
+      case DbcEnumLiteralEditPart.VISUAL_ID:
+         if (DbcEnumLiteralNameEditPart.VISUAL_ID == nodeVisualID) {
             return true;
          }
          break;

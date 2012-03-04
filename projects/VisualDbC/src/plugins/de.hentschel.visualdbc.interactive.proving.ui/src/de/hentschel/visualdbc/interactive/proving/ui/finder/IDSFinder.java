@@ -11,24 +11,30 @@
 
 package de.hentschel.visualdbc.interactive.proving.ui.finder;
 
+import de.hentschel.visualdbc.datasource.model.IDSAttribute;
 import de.hentschel.visualdbc.datasource.model.IDSAxiom;
 import de.hentschel.visualdbc.datasource.model.IDSAxiomContract;
 import de.hentschel.visualdbc.datasource.model.IDSClass;
 import de.hentschel.visualdbc.datasource.model.IDSConnection;
 import de.hentschel.visualdbc.datasource.model.IDSConstructor;
 import de.hentschel.visualdbc.datasource.model.IDSEnum;
+import de.hentschel.visualdbc.datasource.model.IDSEnumLiteral;
 import de.hentschel.visualdbc.datasource.model.IDSInterface;
+import de.hentschel.visualdbc.datasource.model.IDSInvariant;
 import de.hentschel.visualdbc.datasource.model.IDSMethod;
 import de.hentschel.visualdbc.datasource.model.IDSOperationContract;
 import de.hentschel.visualdbc.datasource.model.IDSPackage;
 import de.hentschel.visualdbc.datasource.model.IDSProvable;
 import de.hentschel.visualdbc.datasource.model.exception.DSException;
 import de.hentschel.visualdbc.dbcmodel.DbCAxiomContract;
+import de.hentschel.visualdbc.dbcmodel.DbcAttribute;
 import de.hentschel.visualdbc.dbcmodel.DbcAxiom;
 import de.hentschel.visualdbc.dbcmodel.DbcClass;
 import de.hentschel.visualdbc.dbcmodel.DbcConstructor;
 import de.hentschel.visualdbc.dbcmodel.DbcEnum;
+import de.hentschel.visualdbc.dbcmodel.DbcEnumLiteral;
 import de.hentschel.visualdbc.dbcmodel.DbcInterface;
+import de.hentschel.visualdbc.dbcmodel.DbcInvariant;
 import de.hentschel.visualdbc.dbcmodel.DbcMethod;
 import de.hentschel.visualdbc.dbcmodel.DbcOperationContract;
 import de.hentschel.visualdbc.dbcmodel.DbcPackage;
@@ -96,6 +102,30 @@ public interface IDSFinder {
     * @throws DSException Occurred Exception.
     */
    public IDSMethod findMethod(DbcMethod toSearch) throws DSException;
+
+   /**
+    * Finds an {@link IDSAttribute}.
+    * @param toSearch The {@link DbcAttribute} to search for.
+    * @return The found {@link IDSAttribute} or a thrown {@link DSException} if no one was found.
+    * @throws DSException Occurred Exception.
+    */
+   public IDSAttribute findAttribute(DbcAttribute toSearch) throws DSException;
+
+   /**
+    * Finds an {@link IDSEnumLiteral}.
+    * @param toSearch The {@link DbcEnumLiteral} to search for.
+    * @return The found {@link IDSEnumLiteral} or a thrown {@link DSException} if no one was found.
+    * @throws DSException Occurred Exception.
+    */
+   public IDSEnumLiteral findEnumLiteral(DbcEnumLiteral toSearch) throws DSException;
+
+   /**
+    * Finds an {@link IDSInvariant}.
+    * @param toSearch The {@link DbcInvariant} to search for.
+    * @return The found {@link IDSInvariant} or a thrown {@link DSException} if no one was found.
+    * @throws DSException Occurred Exception.
+    */
+   public IDSInvariant findInvariant(DbcInvariant toSearch) throws DSException;
 
    /**
     * Finds an {@link IDSAxiom}.

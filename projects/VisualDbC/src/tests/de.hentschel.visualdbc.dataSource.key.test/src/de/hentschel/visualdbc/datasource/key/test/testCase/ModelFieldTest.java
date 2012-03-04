@@ -27,7 +27,7 @@ public class ModelFieldTest extends TestCase {
     * Tests model field.
     */
    @Test
-   public void testModelField_withoutAccessible() {
+   public void testModelField_withoutAccessible() throws Exception {
       TestKeyUtil.testKeyConnection("ModelFieldTest_testModelField_withoutAccessible",
                                     "data/modelFieldTestWithoutAccessible",
                                     null,
@@ -39,7 +39,7 @@ public class ModelFieldTest extends TestCase {
     * Tests model field.
     */
    @Test
-   public void testModelField() {
+   public void testModelField() throws Exception {
       TestKeyUtil.testKeyConnection("ModelFieldTest_testModelField",
                                     "data/modelFieldTest",
                                     null,

@@ -782,7 +782,8 @@ public class KeyConnection extends MemoryConnection {
          ImmutableList<ProgramVariable> vars = services.getJavaInfo().getAllAttributes(field.getFullName(), type);
          for (ProgramVariable var : vars) {
             if (!var.isImplicit()) {
-               IDSAttribute attribute = createAttribute(field);
+               MemoryAttribute attribute = createAttribute(field);
+               attribute.setParent(result);
                result.getAttributes().add(attribute);
             }
          }
@@ -801,6 +802,7 @@ public class KeyConnection extends MemoryConnection {
       ImmutableSet<ClassInvariant> classInvariants = services.getSpecificationRepository().getClassInvariants(type);
       for (ClassInvariant classInvariant : classInvariants) {
          MemoryInvariant invariant = createInvariant(services, classInvariant);
+         invariant.setParent(result);
          result.addInvariant(invariant);
       }
       // Add type axioms
@@ -808,6 +810,7 @@ public class KeyConnection extends MemoryConnection {
       for (ClassAxiom classAxiom : axioms) {
          if (shouldIncludeClassAxiom(services, type, classAxiom)) {
             MemoryAxiom axiom = createAxiom(services, type, classAxiom);
+            axiom.setParent(result);
             result.addAxiom(axiom);
          }
       }
@@ -871,7 +874,8 @@ public class KeyConnection extends MemoryConnection {
          ImmutableList<ProgramVariable> vars = services.getJavaInfo().getAllAttributes(field.getFullName(), type);
          for (ProgramVariable var : vars) {
             if (!var.isImplicit()) {
-               IDSAttribute attribute = createAttribute(field);
+               MemoryAttribute attribute = createAttribute(field);
+               attribute.setParent(result);
                result.getAttributes().add(attribute);
             }
          }
@@ -899,6 +903,7 @@ public class KeyConnection extends MemoryConnection {
       ImmutableSet<ClassInvariant> classInvariants = services.getSpecificationRepository().getClassInvariants(type);
       for (ClassInvariant classInvariant : classInvariants) {
          MemoryInvariant invariant = createInvariant(services, classInvariant);
+         invariant.setParent(result);
          result.addInvariant(invariant);
       }
       // Add type axioms
@@ -906,6 +911,7 @@ public class KeyConnection extends MemoryConnection {
       for (ClassAxiom classAxiom : axioms) {
          if (shouldIncludeClassAxiom(services, type, classAxiom)) {
             MemoryAxiom axiom = createAxiom(services, type, classAxiom);
+            axiom.setParent(result);
             result.addAxiom(axiom);
          }
       }
@@ -1060,7 +1066,7 @@ public class KeyConnection extends MemoryConnection {
     * @param variable The KeY instance.
     * @return The created {@link IDSAttribute}.
     */
-   protected IDSAttribute createAttribute(Field variable) {
+   protected MemoryAttribute createAttribute(Field variable) {
       MemoryAttribute result = new MemoryAttribute();
       result.setFinal(variable.isFinal());
       result.setName(variable.getProgramName());

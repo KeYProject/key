@@ -17,21 +17,19 @@
  */
 package de.hentschel.visualdbc.dbcmodel.impl;
 
+import java.util.Collection;
+import java.util.Iterator;
+
+import org.eclipse.emf.common.notify.NotificationChain;
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.InternalEObject;
+import org.eclipse.emf.ecore.util.EObjectContainmentEList;
+import org.eclipse.emf.ecore.util.InternalEList;
+
 import de.hentschel.visualdbc.dbcmodel.AbstractDbcEnum;
 import de.hentschel.visualdbc.dbcmodel.DbcEnumLiteral;
 import de.hentschel.visualdbc.dbcmodel.DbcmodelPackage;
-
-import java.util.Collection;
-
-import org.eclipse.emf.common.notify.NotificationChain;
-
-import org.eclipse.emf.common.util.EList;
-
-import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.InternalEObject;
-
-import org.eclipse.emf.ecore.util.EObjectContainmentEList;
-import org.eclipse.emf.ecore.util.InternalEList;
 
 /**
  * <!-- begin-user-doc -->
@@ -86,6 +84,23 @@ public abstract class AbstractDbcEnumImpl extends AbstractDbcClassImpl implement
          literals = new EObjectContainmentEList<DbcEnumLiteral>(DbcEnumLiteral.class, this, DbcmodelPackage.ABSTRACT_DBC_ENUM__LITERALS);
       }
       return literals;
+   }
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated NOT
+    */
+   public DbcEnumLiteral getLiteral(String name) {
+      DbcEnumLiteral result = null;
+      Iterator<DbcEnumLiteral> iter = getLiterals().iterator();
+      while (result == null && iter.hasNext()) {
+         DbcEnumLiteral next = iter.next();
+         if (next.getName().equals(name)) {
+            result = next;
+         }
+      }
+      return result;
    }
 
    /**

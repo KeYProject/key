@@ -415,6 +415,18 @@ public class DbcEnumItemSemanticEditPolicy extends
                Node cnode = (Node) cit.next();
                switch (DbCVisualIDRegistry.getVisualID(cnode)) {
                case DbcAttributeEditPart.VISUAL_ID:
+                  for (Iterator<?> it = cnode.getTargetEdges().iterator(); it
+                        .hasNext();) {
+                     Edge incomingLink = (Edge) it.next();
+                     if (DbCVisualIDRegistry.getVisualID(incomingLink) == DbcProofReferenceEditPart.VISUAL_ID) {
+                        DestroyElementRequest r = new DestroyElementRequest(
+                              incomingLink.getElement(), false);
+                        cmd.add(new DestroyElementCommand(r));
+                        cmd.add(new DeleteCommand(getEditingDomain(),
+                              incomingLink));
+                        continue;
+                     }
+                  }
                   cmd.add(new DestroyElementCommand(new DestroyElementRequest(
                         getEditingDomain(), cnode.getElement(), false))); // directlyOwned: true
                   // don't need explicit deletion of cnode as parent's view deletion would clean child views as well 
@@ -428,6 +440,18 @@ public class DbcEnumItemSemanticEditPolicy extends
                Node cnode = (Node) cit.next();
                switch (DbCVisualIDRegistry.getVisualID(cnode)) {
                case DbcEnumLiteralEditPart.VISUAL_ID:
+                  for (Iterator<?> it = cnode.getTargetEdges().iterator(); it
+                        .hasNext();) {
+                     Edge incomingLink = (Edge) it.next();
+                     if (DbCVisualIDRegistry.getVisualID(incomingLink) == DbcProofReferenceEditPart.VISUAL_ID) {
+                        DestroyElementRequest r = new DestroyElementRequest(
+                              incomingLink.getElement(), false);
+                        cmd.add(new DestroyElementCommand(r));
+                        cmd.add(new DeleteCommand(getEditingDomain(),
+                              incomingLink));
+                        continue;
+                     }
+                  }
                   cmd.add(new DestroyElementCommand(new DestroyElementRequest(
                         getEditingDomain(), cnode.getElement(), false))); // directlyOwned: true
                   // don't need explicit deletion of cnode as parent's view deletion would clean child views as well 

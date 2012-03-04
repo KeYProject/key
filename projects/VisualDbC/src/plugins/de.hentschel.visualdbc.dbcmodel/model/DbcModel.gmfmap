@@ -341,7 +341,7 @@
               xsi:type="gmftool:CreationTool"
               href="DbcModel.gmftool#//@palette/@tools.0/@tools.5"/>
           <diagramNode
-              href="DbcModel.gmfgraph#DbcAttributeName"/>
+              href="DbcModel.gmfgraph#DbcAttribute"/>
         </ownedChild>
       </children>
       <children
@@ -511,7 +511,7 @@
               xsi:type="gmftool:CreationTool"
               href="DbcModel.gmftool#//@palette/@tools.0/@tools.4"/>
           <diagramNode
-              href="DbcModel.gmfgraph#DbcEnumLiteralName"/>
+              href="DbcModel.gmfgraph#DbcEnumLiteral"/>
         </ownedChild>
       </children>
       <children

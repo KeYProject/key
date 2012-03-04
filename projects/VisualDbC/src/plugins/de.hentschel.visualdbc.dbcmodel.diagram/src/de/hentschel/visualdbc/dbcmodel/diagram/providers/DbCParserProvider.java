@@ -29,12 +29,14 @@ import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbCAxiomContractDepEdi
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbCAxiomContractNameEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbCAxiomContractPreEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcAttributeEditPart;
+import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcAttributeNameTypeEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcAxiomDefinitionEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcAxiomNameEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcClassName2EditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcClassNameEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcConstructorSignatureEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcEnumLiteralEditPart;
+import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcEnumLiteralNameEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcEnumName2EditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcEnumNameEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcInterfaceName2EditPart;
@@ -278,13 +280,13 @@ public class DbCParserProvider extends AbstractProvider implements
    /**
     * @generated
     */
-   private IParser dbcAttribute_3011Parser;
+   private IParser dbcAttributeNameType_5061Parser;
 
    /**
     * @generated
     */
-   private IParser getDbcAttribute_3011Parser() {
-      if (dbcAttribute_3011Parser == null) {
+   private IParser getDbcAttributeNameType_5061Parser() {
+      if (dbcAttributeNameType_5061Parser == null) {
          EAttribute[] features = new EAttribute[] {
                DbcmodelPackage.eINSTANCE.getDbcAttribute_Name(),
                DbcmodelPackage.eINSTANCE.getDbcAttribute_Type() };
@@ -292,9 +294,9 @@ public class DbCParserProvider extends AbstractProvider implements
          parser.setViewPattern("{0} : {1}"); //$NON-NLS-1$
          parser.setEditorPattern("{0} : {1}"); //$NON-NLS-1$
          parser.setEditPattern("{0} : {1}"); //$NON-NLS-1$
-         dbcAttribute_3011Parser = parser;
+         dbcAttributeNameType_5061Parser = parser;
       }
-      return dbcAttribute_3011Parser;
+      return dbcAttributeNameType_5061Parser;
    }
 
    /**
@@ -394,19 +396,19 @@ public class DbCParserProvider extends AbstractProvider implements
    /**
     * @generated
     */
-   private IParser dbcEnumLiteral_3020Parser;
+   private IParser dbcEnumLiteralName_5062Parser;
 
    /**
     * @generated
     */
-   private IParser getDbcEnumLiteral_3020Parser() {
-      if (dbcEnumLiteral_3020Parser == null) {
+   private IParser getDbcEnumLiteralName_5062Parser() {
+      if (dbcEnumLiteralName_5062Parser == null) {
          EAttribute[] features = new EAttribute[] { DbcmodelPackage.eINSTANCE
                .getDbcEnumLiteral_Name() };
          MessageFormatParser parser = new MessageFormatParser(features);
-         dbcEnumLiteral_3020Parser = parser;
+         dbcEnumLiteralName_5062Parser = parser;
       }
-      return dbcEnumLiteral_3020Parser;
+      return dbcEnumLiteralName_5062Parser;
    }
 
    /**
@@ -549,8 +551,8 @@ public class DbCParserProvider extends AbstractProvider implements
          return getDbcInvariantName_5054Parser();
       case DbcInvariantTextEditPart.VISUAL_ID:
          return getDbcInvariantCondition_5055Parser();
-      case DbcAttributeEditPart.VISUAL_ID:
-         return getDbcAttribute_3011Parser();
+      case DbcAttributeNameTypeEditPart.VISUAL_ID:
+         return getDbcAttributeNameType_5061Parser();
       case DbcMethodSignatureReturnTypeEditPart.VISUAL_ID:
          return getDbcMethodSignatureReturnType_5011Parser();
       case DbcOperationContractNameEditPart.VISUAL_ID:
@@ -561,8 +563,8 @@ public class DbCParserProvider extends AbstractProvider implements
          return getDbcOperationContractPost_5037Parser();
       case DbcConstructorSignatureEditPart.VISUAL_ID:
          return getDbcConstructorSignature_5012Parser();
-      case DbcEnumLiteralEditPart.VISUAL_ID:
-         return getDbcEnumLiteral_3020Parser();
+      case DbcEnumLiteralNameEditPart.VISUAL_ID:
+         return getDbcEnumLiteralName_5062Parser();
       case DbcAxiomNameEditPart.VISUAL_ID:
          return getDbcAxiomName_5056Parser();
       case DbcAxiomDefinitionEditPart.VISUAL_ID:

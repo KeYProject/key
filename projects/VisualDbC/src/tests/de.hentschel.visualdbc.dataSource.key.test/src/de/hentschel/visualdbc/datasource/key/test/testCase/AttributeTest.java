@@ -28,7 +28,7 @@ public class AttributeTest extends TestCase {
     * Tests attributes.
     */
    @Test
-   public void testAttributes() {
+   public void testAttributes() throws Exception {
       TestKeyUtil.testKeyConnection("AttributeTest_testAttributes",
                                     "data/attributeTest",
                                     null,
