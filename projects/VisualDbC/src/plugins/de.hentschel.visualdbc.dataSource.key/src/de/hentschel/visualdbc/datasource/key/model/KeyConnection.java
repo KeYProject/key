@@ -212,6 +212,16 @@ public class KeyConnection extends MemoryConnection {
    private Map<ClassAxiom, IDSAxiom> axiomsMapping;
    
    /**
+    * Maps all {@link Field}s to their data source instance.
+    */
+   private Map<Field, IDSAttribute> attributesMapping;
+   
+   /**
+    * Maps all {@link Field}s to their data source instance.
+    */
+   private Map<Field, IDSEnumLiteral> enumLiteralsMapping;
+   
+   /**
     * Maps all {@link KeYJavaType}s to their data source instance.
     */
    private Map<KeYJavaType, IDSType> typesMapping;
@@ -258,6 +268,8 @@ public class KeyConnection extends MemoryConnection {
          invariantsMapping = new HashMap<ClassInvariant, IDSInvariant>();
          typesMapping = new HashMap<KeYJavaType, IDSType>();
          axiomsMapping = new HashMap<ClassAxiom, IDSAxiom>();
+         attributesMapping = new HashMap<Field, IDSAttribute>();
+         enumLiteralsMapping = new HashMap<Field, IDSEnumLiteral>();
          // Get settings
          final File location = getLocation(connectionSettings);
          final List<File> classPathEntries = getClassPathEntries(connectionSettings);
@@ -987,6 +999,7 @@ public class KeyConnection extends MemoryConnection {
    protected MemoryEnumLiteral createEnumLiteral(Services services, Field variable) {
       MemoryEnumLiteral result = new MemoryEnumLiteral();
       result.setName(variable.getProgramName());
+      enumLiteralsMapping.put(variable, result);
       return result;
    }
    
@@ -1277,6 +1290,7 @@ public class KeyConnection extends MemoryConnection {
       else {
          result.setVisibility(DSVisibility.DEFAULT);
       }
+      attributesMapping.put(variable, result);
       return result;
    }
 
@@ -1640,6 +1654,8 @@ public class KeyConnection extends MemoryConnection {
       invariantsMapping = null;
       axiomsMapping = null;
       typesMapping = null;
+      attributesMapping = null;
+      enumLiteralsMapping = null;
       super.disconnect();
    }
    
@@ -1663,11 +1679,11 @@ public class KeyConnection extends MemoryConnection {
 
    /**
     * Returns the {@link IDSAxiomContract} for the give {@link Contract} from KeY.
-    * @param oc The given {@link Contract}.
+    * @param ac The given {@link Contract}.
     * @return The mapped {@link IDSAxiomContract} or {@code null} if no data source instance exists.
     */
-   public IDSAxiomContract getAxiomContract(Contract oc) {
-      return axiomContractsMapping.get(oc);
+   public IDSAxiomContract getAxiomContract(Contract ac) {
+      return axiomContractsMapping.get(ac);
    }
 
    /**
@@ -1695,6 +1711,24 @@ public class KeyConnection extends MemoryConnection {
     */
    public IDSType getType(KeYJavaType type) {
       return typesMapping.get(type);
+   }
+   
+   /**
+    * Returns the {@link IDSAttribute} instance for the given {@link Field} from KeY.
+    * @param field The given {@link Field}.
+    * @return The mapped {@link IDSAttribute} or {@code null} if no data source instance exists.
+    */
+   public IDSAttribute getAttribute(Field field) {
+      return attributesMapping.get(field);
+   }
+   
+   /**
+    * Returns the {@link IDSEnumLiteral} instance for the given {@link Field} from KeY.
+    * @param field The given {@link Field}.
+    * @return The mapped {@link IDSEnumLiteral} or {@code null} if no data source instance exists.
+    */
+   public IDSEnumLiteral getEnumLiteral(Field field) {
+      return enumLiteralsMapping.get(field);
    }
 
 
@@ -1803,10 +1837,17 @@ public class KeyConnection extends MemoryConnection {
       return inUI;
    }
 
+   /**
+    * Returns the used {@link Services}.
+    * @return The used {@link Services}.
+    */
    public Services getServices() {
       return main != null ? main.getMediator().getServices() : null;
    }
 
+   /**
+    * Closes the active task without user interaction.
+    */
    @SuppressWarnings("deprecation")
    public void closeTaskWithoutInteraction() {
       main.closeTaskWithoutInteraction();
