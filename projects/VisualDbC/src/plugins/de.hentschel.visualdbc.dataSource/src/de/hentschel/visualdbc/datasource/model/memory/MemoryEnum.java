@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.key_project.util.java.ObjectUtil;
 
+import de.hentschel.visualdbc.datasource.model.DSVisibility;
 import de.hentschel.visualdbc.datasource.model.IDSConstructor;
 import de.hentschel.visualdbc.datasource.model.IDSEnum;
 import de.hentschel.visualdbc.datasource.model.IDSEnumLiteral;
@@ -67,6 +68,16 @@ public class MemoryEnum extends AbstractMemoryType implements IDSEnum {
     */
    public MemoryEnum(String name) {
       setName(name);
+   }
+
+   /**
+    * Constructor.
+    * @param name The name.
+    * @param visibility The visibility.
+    */
+   public MemoryEnum(String name, DSVisibility visibility) {
+      setName(name);
+      setVisibility(visibility);
    }
 
    /**

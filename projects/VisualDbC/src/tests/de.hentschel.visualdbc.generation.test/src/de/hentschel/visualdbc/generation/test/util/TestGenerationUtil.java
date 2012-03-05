@@ -1543,12 +1543,12 @@ public final class TestGenerationUtil {
    public static void compareMethod(IDSMethod expected, IDSMethod current, boolean compareReferences) throws DSException {
       TestCase.assertNotNull(expected);
       TestCase.assertNotNull(current);
-      TestCase.assertEquals(expected.isAbstract(), current.isAbstract());
-      TestCase.assertEquals(expected.isFinal(), current.isFinal());
-      TestCase.assertEquals(expected.isStatic(), current.isStatic());
-      TestCase.assertEquals(expected.getReturnType(), current.getReturnType());
+      TestCase.assertEquals(expected.getSignature(), expected.isAbstract(), current.isAbstract());
+      TestCase.assertEquals(expected.getSignature(), expected.isFinal(), current.isFinal());
+      TestCase.assertEquals(expected.getSignature(), expected.isStatic(), current.isStatic());
+      TestCase.assertEquals(expected.getSignature(), expected.getReturnType(), current.getReturnType());
       TestCase.assertEquals(expected.getSignature(), current.getSignature());
-      TestCase.assertEquals(expected.getVisibility(), current.getVisibility());
+      TestCase.assertEquals(expected.getSignature(), expected.getVisibility(), current.getVisibility());
       if (compareReferences) {
          compareOperationContracts(expected.getSignature(), expected.getOperationContracts(), current.getOperationContracts());
       }

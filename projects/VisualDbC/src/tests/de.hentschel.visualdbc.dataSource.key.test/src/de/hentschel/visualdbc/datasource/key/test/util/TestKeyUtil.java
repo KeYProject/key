@@ -54,6 +54,7 @@ import org.key_project.swtbot.swing.bot.SwingBotJTree;
 import org.key_project.swtbot.swing.bot.finder.waits.Conditions;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.eclipse.ResourceUtil;
+import org.key_project.util.java.StringUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 import org.key_project.util.test.util.TestUtilsUtil.MethodTreatment;
 
@@ -65,6 +66,7 @@ import de.hentschel.visualdbc.datasource.model.DSVisibility;
 import de.hentschel.visualdbc.datasource.model.IDSClass;
 import de.hentschel.visualdbc.datasource.model.IDSConnection;
 import de.hentschel.visualdbc.datasource.model.IDSDriver;
+import de.hentschel.visualdbc.datasource.model.IDSEnum;
 import de.hentschel.visualdbc.datasource.model.IDSInterface;
 import de.hentschel.visualdbc.datasource.model.IDSProof;
 import de.hentschel.visualdbc.datasource.model.IDSProvable;
@@ -78,6 +80,8 @@ import de.hentschel.visualdbc.datasource.model.memory.MemoryAxiomContract;
 import de.hentschel.visualdbc.datasource.model.memory.MemoryClass;
 import de.hentschel.visualdbc.datasource.model.memory.MemoryConnection;
 import de.hentschel.visualdbc.datasource.model.memory.MemoryConstructor;
+import de.hentschel.visualdbc.datasource.model.memory.MemoryEnum;
+import de.hentschel.visualdbc.datasource.model.memory.MemoryEnumLiteral;
 import de.hentschel.visualdbc.datasource.model.memory.MemoryInterface;
 import de.hentschel.visualdbc.datasource.model.memory.MemoryInvariant;
 import de.hentschel.visualdbc.datasource.model.memory.MemoryMethod;
@@ -123,6 +127,15 @@ public final class TestKeyUtil {
     * @return The visibility to use instead.
     */
    private static DSVisibility bugAttributeVisibility(DSVisibility visibility) {
+      return DSVisibility.DEFAULT;
+   }
+
+   /**
+    * Bug handling that the visibility doesn't work on enumerations.
+    * @param visibility The original visibility to use.
+    * @return The visibility to use instead.
+    */
+   private static DSVisibility bugEnumVisibility(DSVisibility visibility) {
       return DSVisibility.DEFAULT;
    }
    
@@ -797,6 +810,63 @@ public final class TestKeyUtil {
    }
 
    /**
+    * Creates the expected model for the enumeration example with
+    * {@link DSPackageManagement#FLAT_LIST}
+    * @return The expected model.
+    */     
+   public static IDSConnection createExpectedEnumTestModel() {
+      MemoryConnection con = new MemoryConnection();
+      // Create package test
+      MemoryPackage enumPackage = new MemoryPackage("enumPackage");
+      con.addPackage(enumPackage);
+      // Create interface IPackageEnum
+      MemoryInterface iPackageEnum = new MemoryInterface("IPackageEnum", DSVisibility.PUBLIC);
+      iPackageEnum.addMethod(new MemoryMethod("getValue()", "int", DSVisibility.PUBLIC, false, false, true));
+      enumPackage.addInterface(iPackageEnum);
+      // Create enumeration PackageEnum
+      MemoryEnum packageEnum = new MemoryEnum("PackageEnum", bugEnumVisibility(DSVisibility.PUBLIC));
+      packageEnum.getImplements().add(iPackageEnum);
+      packageEnum.getImplementsFullnames().add("enumPackage.IPackageEnum");
+      packageEnum.addLiteral(new MemoryEnumLiteral("RED"));
+      packageEnum.addLiteral(new MemoryEnumLiteral("GREEN"));
+      packageEnum.addLiteral(new MemoryEnumLiteral("BLUE"));
+      packageEnum.addConstructor(createDefaultConstructor("PackageEnum()", null, false));
+      packageEnum.addMethod(new MemoryMethod("getValue()", "int", DSVisibility.PUBLIC));
+      packageEnum.addInvariant(new MemoryInvariant("JML class invariant nr 4 in PackageEnum", "!enumPackage.PackageEnum.RED = null"));
+      packageEnum.addInvariant(new MemoryInvariant("JML class invariant nr 5 in PackageEnum", "!enumPackage.PackageEnum.GREEN = null"));
+      packageEnum.addInvariant(new MemoryInvariant("JML class invariant nr 6 in PackageEnum", "!enumPackage.PackageEnum.BLUE = null"));
+      enumPackage.addEnum(packageEnum);
+      addDefaultEnumMethods(packageEnum, "enumPackage.PackageEnum");
+      // Create enumeration MyEnum
+      MemoryEnum myEnum = new MemoryEnum("MyEnum", bugEnumVisibility(DSVisibility.PUBLIC));
+      myEnum.addLiteral(new MemoryEnumLiteral("A"));
+      myEnum.addLiteral(new MemoryEnumLiteral("B"));
+      myEnum.addLiteral(new MemoryEnumLiteral("C"));
+      myEnum.addAttribute(new MemoryAttribute("previous", "MyEnum", bugAttributeVisibility(DSVisibility.PRIVATE)));
+      myEnum.addConstructor(new MemoryConstructor("MyEnum(previous : MyEnum)", DSVisibility.PRIVATE));
+      myEnum.addMethod(new MemoryMethod("getValue()", "int", DSVisibility.PUBLIC));
+      myEnum.addMethod(new MemoryMethod("getPrevious()", "MyEnum", DSVisibility.PUBLIC));
+      myEnum.addInvariant(new MemoryInvariant("JML class invariant nr 0 in MyEnum", "!MyEnum.A = null"));
+      myEnum.addInvariant(new MemoryInvariant("JML class invariant nr 1 in MyEnum", "!MyEnum.B = null"));
+      myEnum.addInvariant(new MemoryInvariant("JML class invariant nr 2 in MyEnum", "!MyEnum.C = null"));
+      myEnum.addInvariant(new MemoryInvariant("JML class invariant nr 3 in MyEnum", "!self.previous = null"));
+      addDefaultEnumMethods(myEnum, "MyEnum");
+      con.addEnum(myEnum);
+      return con;
+   }
+
+   /**
+    * Adds the default methods that every enumeration has to the given {@link MemoryEnum}.
+    * @param enumeration The {@link MemoryEnum} to fill.
+    * @param fullName The full name of the enumeration.
+    */
+   protected static void addDefaultEnumMethods(MemoryEnum enumeration, String fullName) {
+      enumeration.addMethod(new MemoryMethod("valueOf(string : java.lang.String)", fullName, DSVisibility.PUBLIC, true));
+      enumeration.addMethod(new MemoryMethod("values()", fullName + "[]", DSVisibility.PUBLIC, true));
+      enumeration.addMethod(new MemoryMethod("name()", "java.lang.String", DSVisibility.PUBLIC));
+   }
+
+   /**
     * Creates the expected model for the model field example with
     * {@link DSPackageManagement#FLAT_LIST}
     * @param includeAxiomContract {@code true} include, {@code false} do not include axiom contract
@@ -1128,30 +1198,37 @@ public final class TestKeyUtil {
 
       MemoryPackage packageC = new MemoryPackage("packageA.B.C");
       con.addPackage(packageC);
-      packageC.addClass(createClassContainer("ClassContainer"));
-      packageC.addInterface(createInterfaceContainer("InterfaceContainer"));
+      packageC.addClass(createClassContainer("ClassContainer", packageC.getName(), new String[] {"6", "7", "8"}, true));
+      packageC.addEnum(createEnumContainer("EnumContainer", packageC.getName(), new String[] {"9"}, true));
+      packageC.addInterface(createInterfaceContainer("InterfaceContainer", packageC.getName(), new String[] {"10", "11"}, true));
 
       MemoryPackage packageB = new MemoryPackage("packageA.B");
       con.addPackage(packageB);
-      packageB.addClass(createClassContainer("ClassContainer"));
-      packageB.addInterface(createInterfaceContainer("InterfaceContainer"));
+      packageB.addClass(createClassContainer("ClassContainer", packageB.getName(), new String[] {"12", "13", "14"}, true));
+      packageB.addEnum(createEnumContainer("EnumContainer", packageB.getName(), new String[] {"15"}, true));
+      packageB.addInterface(createInterfaceContainer("InterfaceContainer", packageB.getName(), new String[] {"16", "17"}, true));
       
       MemoryPackage packageA = new MemoryPackage("packageA");
       con.addPackage(packageA);
-      packageA.addClass(createClassContainer("ClassContainer"));
-      packageA.addInterface(createInterfaceContainer("InterfaceContainer"));
+      packageA.addClass(createClassContainer("ClassContainer", packageA.getName(), new String[] {"18", "19", "20"}, true));
+      packageA.addEnum(createEnumContainer("EnumContainer", packageA.getName(), new String[] {"21"}, true));
+      packageA.addInterface(createInterfaceContainer("InterfaceContainer", packageA.getName(), new String[] {"22", "23"}, true));
       
-      con.addClass(createClassContainer("ClassContainer"));
-      con.addInterface(createInterfaceContainer("InterfaceContainer"));
+      con.addClass(createClassContainer("ClassContainer", null, new String[] {"0", "1", "2"}, false));
+      con.addEnum(createEnumContainer("EnumContainer", null, new String[] {"3"}, false));
+      con.addInterface(createInterfaceContainer("InterfaceContainer", null, new String[] {"4", "5"}, false));
       return con;
    }
    
    /**
     * Creates the class "ClassContainer".
     * @param className The name to use.
+    * @param packageName The package name to use.
+    * @param enumInvariantIds The invariant IDs to use.
+    * @param multilineInvariant Are invariants multilined?
     * @return The created {@link IDSClass}.
     */
-   protected static MemoryClass createClassContainer(String className) {
+   protected static MemoryClass createClassContainer(String className, String packageName, String[] enumInvariantIds, boolean multilineInvariant) {
       MemoryClass result = new MemoryClass(className, DSVisibility.PUBLIC);
       result.addConstructor(createDefaultConstructor(className + "()", "X", false, false));
       MemoryClass anonymousClass = new MemoryClass("ClassContainer.30390029.20920809", DSVisibility.DEFAULT);
@@ -1170,20 +1247,160 @@ public final class TestKeyUtil {
       addOperationObligations(doContainer, true, false, true);
       result.addMethod(doContainer);
       result.getExtendsFullnames().add("java.lang.Object");
+      result.addInnerEnum(createDefaultChildEnum("DefaultChildEnum", (!StringUtil.isEmpty(packageName) ? packageName + "." : StringUtil.EMPTY_STRING) + "ClassContainer", enumInvariantIds[0], multilineInvariant));
+      result.addInnerEnum(createPrivateChildEnum("PrivateChildEnum", (!StringUtil.isEmpty(packageName) ? packageName + "." : StringUtil.EMPTY_STRING) + "ClassContainer", enumInvariantIds[1], multilineInvariant));
+      result.addInnerEnum(createProtectedChildEnum("ProtectedChildEnum", (!StringUtil.isEmpty(packageName) ? packageName + "." : StringUtil.EMPTY_STRING) + "ClassContainer"));
+      result.addInnerEnum(createPublicChildEnum("PublicChildEnum", (!StringUtil.isEmpty(packageName) ? packageName + "." : StringUtil.EMPTY_STRING) + "ClassContainer", enumInvariantIds[2], multilineInvariant));
       return result;
    }
    
    /**
+    * Creates the class "ClassContainer".
+    * @param className The name to use.
+    * @param packageName The package name to use.
+    * @param enumInvariantIds The invariant IDs to use.
+    * @param multilineInvariant Are invariants multilined?
+    * @return The created {@link IDSClass}.
+    */
+   protected static MemoryEnum createEnumContainer(String className, String packageName, String[] enumInvariantIds, boolean multilineInvariant) {
+      String fullName = (packageName != null ? packageName + "." : "") + className;
+      MemoryEnum result = new MemoryEnum(className, bugEnumVisibility(DSVisibility.PUBLIC));
+      result.addConstructor(createDefaultConstructor(className + "()", null, false));
+      result.addLiteral(new MemoryEnumLiteral("INSTANCE"));
+//      if (multilineInvariant) {
+//         result.addInvariant(new MemoryInvariant("JML class invariant nr " + enumInvariantIds[0] + " in " + className, "!  " + fullName + ".INSTANCE\n = null"));
+//      }
+//      else {
+         result.addInvariant(new MemoryInvariant("JML class invariant nr " + enumInvariantIds[0] + " in " + className, "!" + fullName + ".INSTANCE = null"));
+//      }
+      MemoryClass anonymousClass = new MemoryClass("ClassContainer.30390029.20920809", DSVisibility.DEFAULT);
+      anonymousClass.setAnonymous(true);
+      anonymousClass.getExtendsFullnames().add("java.lang.Object");
+      result.addInnerClass(anonymousClass);
+      result.addInnerClass(createDefaultChildClass());
+      result.addInnerClass(createPrivateChildClass());
+      result.addInnerClass(createProtectedChildClass());
+      result.addInnerClass(createPublicChildClass());
+      result.addInnerInterface(createDefaultChildInterface());
+      result.addInnerInterface(createPrivateChildInterface());
+      result.addInnerInterface(createProtectedChildInterface());
+      result.addInnerInterface(createPublicChildInterface());
+      MemoryMethod doContainer = new MemoryMethod("doContainer()", "void", DSVisibility.PUBLIC);
+      addOperationObligations(doContainer, true, false, true);
+      result.addMethod(doContainer);
+      addDefaultEnumMethods(result, fullName);
+      return result;
+   }
+   
+   /**
+    * Creates the enumeration "PublicChildEnum".
+    * @param className The class name to use.
+    * @param packageName The package in that the class is contained.
+    * @param invariantId The invariant ID to use.
+    * @param multilineInvariant Is invariant multilined?
+    * @return The created {@link IDSEnum}.
+    */
+   protected static MemoryEnum createPublicChildEnum(String className, String packageName, String invariantId, boolean multilineInvariant) {
+      String fullName = (packageName != null ? packageName + "." : "") + className;
+      MemoryEnum result = new MemoryEnum(className, bugEnumVisibility(DSVisibility.DEFAULT));
+      result.addConstructor(createDefaultConstructor(className + "()", null, false));
+      result.addLiteral(new MemoryEnumLiteral("INSTANCE"));
+      if (multilineInvariant) {
+         result.addInvariant(new MemoryInvariant("JML class invariant nr " + invariantId + " in " + className, "!  " + fullName + ".INSTANCE\n = null"));
+      }
+      else {
+         result.addInvariant(new MemoryInvariant("JML class invariant nr " + invariantId + " in " + className, "!" + fullName + ".INSTANCE = null"));
+      }
+      addDefaultEnumMethods(result, fullName);
+      return result;
+   }
+
+   /**
+    * Creates the enumeration "ProtectedChildEnum".
+    * @param className The class name to use.
+    * @param packageName The package in that the class is contained.
+    * @param invariantId The invariant ID to use.
+    * @param multilineInvariant Is invariant multilined?
+    * @return The created {@link IDSEnum}.
+    */
+   protected static MemoryEnum createProtectedChildEnum(String className, String packageName) {
+      String fullName = (packageName != null ? packageName + "." : "") + className;
+      MemoryEnum result = new MemoryEnum(className, bugEnumVisibility(DSVisibility.DEFAULT));
+      result.addConstructor(createDefaultConstructor(className + "()", null, false));
+      addDefaultEnumMethods(result, fullName);
+      return result;
+   }
+
+   /**
+    * Creates the enumeration "PrivateChildEnum".
+    * @param className The class name to use.
+    * @param packageName The package in that the class is contained.
+    * @param invariantId The invariant ID to use.
+    * @param multilineInvariant Is invariant multilined?
+    * @return The created {@link IDSEnum}.
+    */
+   protected static MemoryEnum createPrivateChildEnum(String className, String packageName, String invariantId, boolean multilineInvariant) {
+      String fullName = (packageName != null ? packageName + "." : "") + className;
+      MemoryEnum result = new MemoryEnum(className, bugEnumVisibility(DSVisibility.DEFAULT));
+      result.addConstructor(createDefaultConstructor(className + "()", null, false));
+      result.addLiteral(new MemoryEnumLiteral("INSTANCE"));
+      if (multilineInvariant) {
+         result.addInvariant(new MemoryInvariant("JML class invariant nr " + invariantId + " in " + className, "!  " + fullName + ".INSTANCE\n = null"));
+      }
+      else {
+         result.addInvariant(new MemoryInvariant("JML class invariant nr " + invariantId + " in " + className, "!" + fullName + ".INSTANCE = null"));
+      }
+      addDefaultEnumMethods(result, fullName);
+      return result;
+   }
+
+   /**
+    * Creates the enumeration "DefaultChildEnum".
+    * @param className The class name to use.
+    * @param packageName The package in that the class is contained.
+    * @param invariantId The invariant ID to use.
+    * @param multilineInvariant Is invariant multilined?
+    * @return The created {@link IDSEnum}.
+    */
+   protected static MemoryEnum createDefaultChildEnum(String className, String packageName, String invariantId, boolean multilineInvariant) {
+      String fullName = (!StringUtil.isEmpty(packageName) ? packageName + "." : StringUtil.EMPTY_STRING) + className;
+      MemoryEnum result = new MemoryEnum(className, bugEnumVisibility(DSVisibility.DEFAULT));
+      MemoryClass anonymousClass = new MemoryClass("ClassContainer.30390029.20920809", DSVisibility.DEFAULT);
+      anonymousClass.setAnonymous(true);
+      anonymousClass.getExtendsFullnames().add("java.lang.Object");
+      result.addInnerClass(anonymousClass);
+      result.addLiteral(new MemoryEnumLiteral("INSTANCE"));
+      if (multilineInvariant) {
+         result.addInvariant(new MemoryInvariant("JML class invariant nr " + invariantId + " in " + className, "!  " + fullName + ".INSTANCE\n = null"));
+      }
+      else {
+         result.addInvariant(new MemoryInvariant("JML class invariant nr " + invariantId + " in " + className, "!" + fullName + ".INSTANCE = null"));
+      }
+      result.addAttribute(new MemoryAttribute("x", "int", bugAttributeVisibility(DSVisibility.PRIVATE)));
+      result.addConstructor(new MemoryConstructor(className + "(x : int)", DSVisibility.PRIVATE));
+      MemoryMethod run = new MemoryMethod("run()", "void", DSVisibility.PUBLIC);
+      addOperationObligations(run, true, false, true);
+      result.addMethod(run);
+      addDefaultEnumMethods(result, fullName);
+      return result;
+   }
+
+   /**
     * Creates the interface "InterfaceContainer".
     * @param interfaceName The name to use.
+    * @param packageName The package name to use.
+    * @param enumInvariantIds The invariant IDs to use.
+    * @param multilineInvariant Are invariants multilined?
     * @return The created {@link IDSInterface}.
     */
-   protected static MemoryInterface createInterfaceContainer(String interfaceName) {
+   protected static MemoryInterface createInterfaceContainer(String interfaceName, String packageName, String[] enumInvariantIds, boolean multilineInvariant) {
       MemoryInterface interfaceContainer = new MemoryInterface(interfaceName, DSVisibility.PUBLIC);
       interfaceContainer.addInnerClass(createDefaultChildClass());
       interfaceContainer.addInnerClass(createPublicChildClass());
       interfaceContainer.addInnerInterface(createDefaultChildInterface());
       interfaceContainer.addInnerInterface(createPublicChildInterface());
+      interfaceContainer.addInnerEnum(createDefaultChildEnum("DefaultChildEnum", (!StringUtil.isEmpty(packageName) ? packageName + "." : StringUtil.EMPTY_STRING) + "InterfaceContainer", enumInvariantIds[0], multilineInvariant));
+      interfaceContainer.addInnerEnum(createPublicChildEnum("PublicChildEnum", (!StringUtil.isEmpty(packageName) ? packageName + "." : StringUtil.EMPTY_STRING) + "InterfaceContainer", enumInvariantIds[1], multilineInvariant));
       return interfaceContainer;
    }
    

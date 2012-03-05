@@ -39,6 +39,20 @@ public class MemoryEnumLiteral extends AbstractDSProvable implements IDSEnumLite
     * The parent {@link IDSEnum}.
     */
    private IDSEnum parent;
+
+   /**
+    * Default constructor.
+    */
+   public MemoryEnumLiteral() {
+   }
+
+   /**
+    * Constructor.
+    * @param name The name to set.
+    */
+   public MemoryEnumLiteral(String name) {
+      setName(name);
+   }
    
    /**
     * Sets the name.

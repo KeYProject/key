@@ -54,6 +54,8 @@ import de.hentschel.visualdbc.datasource.model.IDSConnection;
 import de.hentschel.visualdbc.datasource.model.IDSConstructor;
 import de.hentschel.visualdbc.datasource.model.IDSContainer;
 import de.hentschel.visualdbc.datasource.model.IDSDriver;
+import de.hentschel.visualdbc.datasource.model.IDSEnum;
+import de.hentschel.visualdbc.datasource.model.IDSEnumLiteral;
 import de.hentschel.visualdbc.datasource.model.IDSInterface;
 import de.hentschel.visualdbc.datasource.model.IDSInvariant;
 import de.hentschel.visualdbc.datasource.model.IDSMethod;
@@ -70,6 +72,8 @@ import de.hentschel.visualdbc.datasource.model.memory.MemoryAxiomContract;
 import de.hentschel.visualdbc.datasource.model.memory.MemoryClass;
 import de.hentschel.visualdbc.datasource.model.memory.MemoryConnection;
 import de.hentschel.visualdbc.datasource.model.memory.MemoryConstructor;
+import de.hentschel.visualdbc.datasource.model.memory.MemoryEnum;
+import de.hentschel.visualdbc.datasource.model.memory.MemoryEnumLiteral;
 import de.hentschel.visualdbc.datasource.model.memory.MemoryInterface;
 import de.hentschel.visualdbc.datasource.model.memory.MemoryInvariant;
 import de.hentschel.visualdbc.datasource.model.memory.MemoryMethod;
@@ -91,6 +95,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
+import de.uka.ilkd.key.java.declaration.EnumClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
@@ -363,6 +368,7 @@ public class KeyConnection extends MemoryConnection {
       // Fill data connection model
       Map<String, List<MemoryClass>> innerClasses = new HashMap<String, List<MemoryClass>>(); // Contains all inner classes that are added to their parents after analyzing all types to make sure that the parent type already exists as IDSType.
       Map<String, List<MemoryInterface>> innerInterfaces = new HashMap<String, List<MemoryInterface>>(); // Contains all inner classes that are added to their parents after analyzing all types to make sure that the parent type already exists as IDSType.
+      Map<String, List<MemoryEnum>> innerEnums = new HashMap<String, List<MemoryEnum>>(); // Contains all inner classes that are added to their parents after analyzing all types to make sure that the parent type already exists as IDSType.
       Map<String, IDSType> types = new HashMap<String, IDSType>(); // Maps the full name to the created IDSType.
       monitor.beginTask("Analyzing types", kjtsarr.length);
       for (KeYJavaType type : kjtsarr) {
@@ -381,6 +387,16 @@ public class KeyConnection extends MemoryConnection {
                }
                parentInnerInterfaces.add(interfaceInstance);
                types.put(type.getFullName(), interfaceInstance);
+            }
+            else if (ct instanceof EnumClassDeclaration) {
+               MemoryEnum enumInstance = createEnum(services, (EnumClassDeclaration)ct, type, typeName);
+               List<MemoryEnum> parentInnerEnums = innerEnums.get(parentName);
+               if (parentInnerEnums == null) {
+                  parentInnerEnums = new LinkedList<MemoryEnum>();
+                  innerEnums.put(parentName, parentInnerEnums);
+               }
+               parentInnerEnums.add(enumInstance);
+               types.put(type.getFullName(), enumInstance);
             }
             else {
                MemoryClass classInstance = createClass(services, ct, type, typeName);
@@ -405,6 +421,12 @@ public class KeyConnection extends MemoryConnection {
                   dsPackage.getInterfaces().add(interfaceInstance);
                   types.put(type.getFullName(), interfaceInstance);
                }
+               else if (ct instanceof EnumClassDeclaration) {
+                  MemoryEnum enumInstance = createEnum(services, (EnumClassDeclaration)ct, type, typeName);
+                  enumInstance.setParentContainer(dsPackage);
+                  dsPackage.getEnums().add(enumInstance);
+                  types.put(type.getFullName(), enumInstance);
+               }
                else {
                   MemoryClass classInstance = createClass(services, ct, type, typeName);
                   classInstance.setParentContainer(dsPackage);
@@ -418,6 +440,12 @@ public class KeyConnection extends MemoryConnection {
                   interfaceInstance.setParentContainer(this);
                   getInterfaces().add(interfaceInstance);
                   types.put(type.getFullName(), interfaceInstance);
+               }
+               else if (ct instanceof EnumClassDeclaration) {
+                  MemoryEnum enumInstance = createEnum(services, (EnumClassDeclaration)ct, type, typeName);
+                  enumInstance.setParentContainer(this);
+                  getEnums().add(enumInstance);
+                  types.put(type.getFullName(), enumInstance);
                }
                else {
                   MemoryClass classInstance = createClass(services, ct, type, typeName);
@@ -459,6 +487,20 @@ public class KeyConnection extends MemoryConnection {
          }
          monitor.worked(1);
       }
+      // Add inner enumeration to their parents
+      monitor.beginTask("Adding inner enums", innerInterfaces.size());
+      Set<Entry<String, List<MemoryEnum>>> innerEnumEntries = innerEnums.entrySet();
+      for (Entry<String, List<MemoryEnum>> innerEntry : innerEnumEntries) {
+         IDSType parent = types.get(innerEntry.getKey());
+         Assert.isNotNull(parent);
+         List<MemoryEnum> innerEnumList = innerEntry.getValue();
+         Assert.isNotNull(innerEnumList);
+         for (MemoryEnum innerEnum : innerEnumList) {
+            parent.getInnerEnums().add(innerEnum);
+            innerEnum.setParentType(parent);
+         }
+         monitor.worked(1);
+      }
       // Set parent dependencies
       Collection<IDSType> modelTypes = types.values();
       monitor.beginTask("Adding parent references", modelTypes.size());
@@ -487,6 +529,16 @@ public class KeyConnection extends MemoryConnection {
                if (parentInstance != null) {
                   Assert.isTrue(parentInstance instanceof IDSInterface); 
                   interfaceInstance.getExtends().add((IDSInterface)parentInstance);
+               }
+            }
+         }
+         else if (type instanceof IDSEnum) {
+            IDSEnum enumInstance = (IDSEnum)type;
+            for (String parent : enumInstance.getImplementsFullnames()) {
+               IDSType parentInstance = types.get(parent);
+               if (parentInstance != null) {
+                  Assert.isTrue(parentInstance instanceof IDSInterface); 
+                  enumInstance.getImplements().add((IDSInterface)parentInstance);
                }
             }
          }
@@ -758,6 +810,7 @@ public class KeyConnection extends MemoryConnection {
     */
    protected MemoryInterface createInterface(Services services, ClassType ct, KeYJavaType type, String interfaceName) throws DSException {
       Assert.isTrue(ct.isInterface());
+      Assert.isTrue(!(ct instanceof EnumClassDeclaration));
       MemoryInterface result = new KeyInterface(this, type);
       result.setName(interfaceName);
       // Add methods
@@ -782,7 +835,7 @@ public class KeyConnection extends MemoryConnection {
          ImmutableList<ProgramVariable> vars = services.getJavaInfo().getAllAttributes(field.getFullName(), type);
          for (ProgramVariable var : vars) {
             if (!var.isImplicit()) {
-               MemoryAttribute attribute = createAttribute(field);
+               MemoryAttribute attribute = createAttribute(services, field);
                attribute.setParent(result);
                result.getAttributes().add(attribute);
             }
@@ -833,6 +886,145 @@ public class KeyConnection extends MemoryConnection {
    }
 
    /**
+    * Creates a new {@link IDSEnum} instance for the given KeY instance.
+    * @param services The {@link Services} that is used to read containments.
+    * @param ct The KeY class type.
+    * @param type The KeY instance.
+    * @param className The class name to use.
+    * @return The created {@link IDSClass}.
+    * @throws DSException Occurred Exception
+    */   
+   protected MemoryEnum createEnum(Services services, EnumClassDeclaration ct, KeYJavaType type, String className) throws DSException {
+      Assert.isTrue(!ct.isInterface());
+      Assert.isTrue(ct instanceof EnumClassDeclaration);
+      MemoryEnum result = new KeyEnum(this, type);
+      result.setName(className);
+      // Add methods (must be done before constructor adding to collect implicit defined constructors)
+      ImmutableList<ProgramMethod> methods = services.getJavaInfo().getAllProgramMethodsLocallyDeclared(type);
+      List<ProgramMethod> implicitConstructors = new LinkedList<ProgramMethod>(); 
+      fillEnumWithMethodsAndConstructors(services, result, methods, implicitConstructors, type);
+      // Add constructors with use of implicit constructor definitions to get the specifications
+      ImmutableList<ProgramMethod> constructors = services.getJavaInfo().getConstructors(type);
+      fillEnumWithMethodsAndConstructors(services, result, constructors, implicitConstructors, type);
+      // Add attributes
+      result.setStatic(ct.isStatic());
+      if (ct.isPrivate()) {
+         result.setVisibility(DSVisibility.PRIVATE);
+      }
+      else if (ct.isProtected()) {
+         result.setVisibility(DSVisibility.PROTECTED);
+      }
+      else if (ct.isPublic()) {
+         result.setVisibility(DSVisibility.PUBLIC);
+      }
+      else {
+         result.setVisibility(DSVisibility.DEFAULT);
+      }      
+      ImmutableList<Field> fields = ct.getAllFields(services);
+      for (Field field : fields) {
+         ImmutableList<ProgramVariable> vars = services.getJavaInfo().getAllAttributes(field.getFullName(), type);
+         for (ProgramVariable var : vars) {
+            if (!var.isImplicit()) {
+               if (EnumClassDeclaration.isEnumConstant(field.getProgramVariable())) {
+                  // Enumeration literal
+                  MemoryEnumLiteral literal = createEnumLiteral(services, field);
+                  literal.setParent(result);
+                  result.getLiterals().add(literal);
+               }
+               else {
+                  // Attribute
+                  MemoryAttribute attribute = createAttribute(services, field);
+                  attribute.setParent(result);
+                  result.getAttributes().add(attribute);
+               }
+            }
+         }
+      }
+      // Analyze parents
+      ImmutableList<KeYJavaType> superTypes = services.getJavaInfo().getDirectSuperTypes(type);
+      for (KeYJavaType superType : superTypes) {
+         if (superType.getJavaType() instanceof ClassType) {
+            ClassType superCt = (ClassType)superType.getJavaType();
+            if (superCt.isInterface()) {
+               result.getImplementsFullnames().add(superType.getFullName());
+            }
+         }
+         else if (superType.getJavaType() instanceof InterfaceDeclaration) {
+            result.getImplementsFullnames().add(superType.getFullName());
+         }
+         else {
+            throw new DSException("Not supported super type: " + superType);
+         }
+      }
+      // Add type invariants
+      ImmutableSet<ClassInvariant> classInvariants = services.getSpecificationRepository().getClassInvariants(type);
+      for (ClassInvariant classInvariant : classInvariants) {
+         MemoryInvariant invariant = createInvariant(services, classInvariant);
+         invariant.setParent(result);
+         result.addInvariant(invariant);
+      }
+      // Add type axioms
+      ImmutableSet<ClassAxiom> axioms = services.getSpecificationRepository().getClassAxioms(type);
+      for (ClassAxiom classAxiom : axioms) {
+         if (shouldIncludeClassAxiom(services, type, classAxiom)) {
+            MemoryAxiom axiom = createAxiom(services, type, classAxiom);
+            axiom.setParent(result);
+            result.addAxiom(axiom);
+         }
+      }
+      // Add allowed proof obligations
+      List<String> classObligations = Collections.emptyList();
+      fillProovableWithAllowedOperationContracts(result, classObligations);
+      typesMapping.put(type, result);
+      return result;
+   }
+
+   /**
+    * Creates a new {@link IDSEnumLiteral} instance for the given KeY instance.
+    * @param variable The KeY instance.
+    * @return The created {@link IDSEnumLiteral}.
+    */
+   protected MemoryEnumLiteral createEnumLiteral(Services services, Field variable) {
+      MemoryEnumLiteral result = new MemoryEnumLiteral();
+      result.setName(variable.getProgramName());
+      return result;
+   }
+   
+   /**
+    * Fills the enumeration with constructors and methods from the given KeY instances.
+    * @param services The services to use.
+    * @param toFill The class to fill.
+    * @param methodsAndConstructors The available KeY instances.
+    * @param implicitConstructors The implicit constructor definitions to fill and to read from.
+    * @throws DSException Occurred Exception
+    */
+   protected void fillEnumWithMethodsAndConstructors(Services services,
+                                                     IDSEnum toFill, 
+                                                     ImmutableList<ProgramMethod> methodsAndConstructors,
+                                                     List<ProgramMethod> implicitConstructors,
+                                                     KeYJavaType type) throws DSException {
+      for (ProgramMethod methodOrConstructor : methodsAndConstructors) {
+         if (!methodOrConstructor.isImplicit()) {
+            if (methodOrConstructor.isConstructor()) {
+               ProgramMethod implicitConstructor = getImplicitConstructor(implicitConstructors, methodOrConstructor);
+               Assert.isNotNull(implicitConstructor, "Can't find implicit constructor for: " + methodOrConstructor.getFullName());
+               IDSConstructor constructor = createConstructor(services, methodOrConstructor, implicitConstructor, type, toFill);
+               toFill.getConstructors().add(constructor);
+            }
+            else {
+               IDSMethod dsMethod = createMethod(services, methodOrConstructor, type, toFill);
+               toFill.getMethods().add(dsMethod);
+            }
+         }
+         else {
+            if (INIT_NAME.equals(methodOrConstructor.getName())) {
+               implicitConstructors.add(methodOrConstructor);
+            }
+         }
+      }
+   }
+
+   /**
     * Creates a new {@link IDSClass} instance for the given KeY instance.
     * @param services The {@link Services} that is used to read containments.
     * @param ct The KeY class type.
@@ -843,6 +1035,7 @@ public class KeyConnection extends MemoryConnection {
     */
    protected MemoryClass createClass(Services services, ClassType ct, KeYJavaType type, String className) throws DSException {
       Assert.isTrue(!ct.isInterface());
+      Assert.isTrue(!(ct instanceof EnumClassDeclaration));
       MemoryClass result = new KeyClass(this, type);
       result.setName(className);
       // Add methods (must be done before constructor adding to collect implicit defined constructors)
@@ -874,7 +1067,7 @@ public class KeyConnection extends MemoryConnection {
          ImmutableList<ProgramVariable> vars = services.getJavaInfo().getAllAttributes(field.getFullName(), type);
          for (ProgramVariable var : vars) {
             if (!var.isImplicit()) {
-               MemoryAttribute attribute = createAttribute(field);
+               MemoryAttribute attribute = createAttribute(services, field);
                attribute.setParent(result);
                result.getAttributes().add(attribute);
             }
@@ -1066,7 +1259,7 @@ public class KeyConnection extends MemoryConnection {
     * @param variable The KeY instance.
     * @return The created {@link IDSAttribute}.
     */
-   protected MemoryAttribute createAttribute(Field variable) {
+   protected MemoryAttribute createAttribute(Services services, Field variable) {
       MemoryAttribute result = new MemoryAttribute();
       result.setFinal(variable.isFinal());
       result.setName(variable.getProgramName());

@@ -13,7 +13,9 @@ package packageA.B.C;
 
 import interfaces.MyInterface;
 
-public class ClassContainer {
+public enum EnumContainer {
+	INSTANCE;
+	
 	class DefaultChildClass {
 		private int x;
 		
@@ -74,35 +76,35 @@ public class ClassContainer {
 	
 	
 	
-	enum DefaultChildEnum {
-		INSTANCE(42);
-		
-		private int x;
-		
-		private DefaultChildEnum(int x) {
-			this.x = x;
-		}
-		
-		public void run() {
-			new MyInterface() {
-			};
-		}
-	}
+//	enum DefaultChildEnum {
+//		INSTANCE(42);
+//		
+//		private int x;
+//		
+//		private DefaultChildEnum(int x) {
+//			this.x = x;
+//		}
+//		
+//		public void run() {
+//			new MyInterface() {
+//			};
+//		}
+//	}
 
-	private static enum PrivateChildEnum {
-		INSTANCE;
-		
+//	private static enum PrivateChildEnum {
+//		INSTANCE;
+//		
 //		public enum InnerInnerEnum {
 //			INSTANCE;
 //		}
-	}
+//	}
 
-	protected enum ProtectedChildEnum {
-	}
-	
-	public enum PublicChildEnum {
-		INSTANCE;
-		
+//	protected enum ProtectedChildEnum {
+//	}
+//	
+//	public enum PublicChildEnum {
+//		INSTANCE;
+//		
 //		public enum InnerInnerEnum {
 //			INSTANCE;
 //			
@@ -111,5 +113,5 @@ public class ClassContainer {
 //				};
 //			}
 //		}
-	}
+//	}
 }
