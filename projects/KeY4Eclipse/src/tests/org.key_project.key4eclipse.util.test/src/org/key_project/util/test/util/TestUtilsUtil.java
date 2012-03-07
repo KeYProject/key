@@ -32,6 +32,7 @@ import org.eclipse.jdt.ui.wizards.JavaCapabilityConfigurationPage;
 import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
@@ -674,5 +675,44 @@ public class TestUtilsUtil {
        while ((job = manager.currentJob()) != null) {
            waitForJob(job);
        }
+   }
+
+   /**
+    * Expands all elements in the given {@link SWTBotTree}
+    * @param tree The {@link SWTBotTree} to expand.
+    */
+   public static void expandAll(SWTBotTree tree) {
+      SWTBotTreeItem[] items = tree.getAllItems();
+      for (SWTBotTreeItem item : items) {
+         expandAll(item);
+      }
+   }
+
+   /**
+    * Expands the given {@link SWTBotTreeItem} and all of his children.
+    * @param tree The {@link SWTBotTreeItem} to expand.
+    */
+   public static void expandAll(SWTBotTreeItem item) {
+      item.expand();
+      SWTBotTreeItem[] children = item.getItems();
+      for (SWTBotTreeItem child : children) {
+         expandAll(child);
+      }
+   }
+
+   /**
+    * Returns {@link TreeItem#getData()}.
+    * @param item The {@link SWTBotTreeItem} to return from.
+    * @return The data {@link Object}.
+    */
+   public static Object getTreeItemData(final SWTBotTreeItem item) {
+      IRunnableWithResult<Object> run = new AbstractRunnableWithResult<Object>() {
+         @Override
+         public void run() {
+            setResult(item.widget.getData());
+         }
+      };
+      item.widget.getDisplay().syncExec(run);
+      return run.getResult();
    }
 }

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.debug.core.sourceLocators">
+      <sourceLocator
+            class="org.key_project.sed.core.test.example.fixed_launch_content.FixedExampleSourceLookupDirector"
+            id="org.key_project.sed.core.test.example.fixed_launch_content.sourceLocator"
+            name="Fixed Example Source Locator">
+      </sourceLocator>
+   </extension>
+   <extension
+         point="org.eclipse.debug.core.sourcePathComputers">
+      <sourcePathComputer
+            class="org.key_project.sed.core.test.example.fixed_launch_content.FixedExampleSourcePathComputerDelegate"
+            id="org.key_project.sed.core.test.example.fixed_launch_content.sourcePathComputer">
+      </sourcePathComputer>
+   </extension>
+   <extension
+         point="org.eclipse.debug.core.launchConfigurationTypes">
+      <launchConfigurationType
+            delegate="org.key_project.sed.core.test.example.fixed_launch_content.FixedExampleLaunchConfigurationDelegate"
+            id="org.key_project.sed.core.test.example.fixed_launch_content"
+            modes="debug"
+            name="Fixed Example"
+            sourceLocatorId="org.key_project.sed.core.test.example.fixed_launch_content.sourceLocator"
+            sourcePathComputerId="org.key_project.sed.core.test.example.fixed_launch_content.sourcePathComputer">
+      </launchConfigurationType>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.launchConfigurationTypeImages">
+      <launchConfigurationTypeImage
+            configTypeID="org.key_project.sed.core.test.example.fixed_launch_content"
+            icon="icons/symbolic_debug.gif"
+            id="org.key_project.sed.core.test.example.fixed_launch_content.icon">
+      </launchConfigurationTypeImage>
+   </extension>
+</plugin>

@@ -4,6 +4,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.key_project.key4eclipse.starter.core.test.suite.swtbot.SWTBotAllStarterCoreTests;
 import org.key_project.key4eclipse.test.suite.swtbot.SWTBotAllKeY4EclipseTests;
+import org.key_project.sed.core.test.suite.swtbot.SWTBotAllSEDCoreTests;
 import org.key_project.util.test.suite.swtbot.SWTBotAllUtilTests;
 
 /**
@@ -23,7 +24,8 @@ import org.key_project.util.test.suite.swtbot.SWTBotAllUtilTests;
 @Suite.SuiteClasses({
    SWTBotAllKeY4EclipseTests.class,
    SWTBotAllUtilTests.class,
-   SWTBotAllStarterCoreTests.class
+   SWTBotAllStarterCoreTests.class,
+   SWTBotAllSEDCoreTests.class
 })
 public class SWTBotAllSEDTests {
 }

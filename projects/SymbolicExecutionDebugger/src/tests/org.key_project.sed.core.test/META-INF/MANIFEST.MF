@@ -1,0 +1,21 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Symbolic Execution Debugger (SED) Core Test
+Bundle-SymbolicName: org.key_project.sed.core.test;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.key_project.sed.core.test.Activator
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.ui,
+ org.eclipse.debug.ui;bundle-version="3.7.101",
+ org.junit4;bundle-version="4.8.1",
+ org.eclipse.swtbot.go;bundle-version="2.0.4",
+ org.key_project.sed.core;bundle-version="1.0.0",
+ org.key_project.sed.ui;bundle-version="1.0.0",
+ org.key_project.util.test;bundle-version="1.0.0"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-Vendor: KeY Project
+Export-Package: org.key_project.sed.core.test.example.fixed_launch_content,
+ org.key_project.sed.core.test.suite,
+ org.key_project.sed.core.test.suite.swtbot,
+ org.key_project.sed.core.test.util

@@ -1,0 +1,44 @@
+package org.key_project.sed.core.model;
+
+import org.eclipse.debug.core.DebugException;
+import org.eclipse.debug.core.model.IStackFrame;
+import org.key_project.sed.core.model.impl.AbstractSEDDebugNode;
+import org.key_project.sed.core.model.impl.AbstractSEDStackFrameCompatibleDebugNode;
+
+/**
+ * A node and his sub interfaces forms the symbolic execution tree for
+ * each thread. A node contains the available children.
+ * <p>
+ * The following concrete nodes are available
+ * <ul>
+ * <li>{@link ISEDThread} (root node)</li>
+ * <li>{@link ISEDStatement} (single statement, e.g. {@code int x =  1 + 2;})</li>
+ * <li>{@link ISEDBranchNode} (branch node, e.g. {@code if(x >= 0)})</li>
+ * <li>{@link ISEDBranchCondition} (branch condition, e.g. {@code x < 0})</li>
+ * <li>{@link ISEDMethodCall} (method call, e.g. {@code foo()})</li>
+ * <li>{@link ISEDMethodReturn} (method return, e.g. {@code return 42})</li>
+ * <li>{@link ISEDTermination} (termination, e.g. {@code <end>})</li>
+ * <li>{@link ISEDExceptionalTermination} (exceptional termination, e.g. {@code throws Exception})</li>
+ * </ul>
+ * </p>
+ * <p>
+ * Clients may implement this interface. It should not be directly instantiated.
+ * It is recommended to instantiate always one of the provided sub interfaces
+ * and to subclass from {@link AbstractSEDDebugNode} or from
+ * {@link AbstractSEDStackFrameCompatibleDebugNode} if the sub interface
+ * also extends {@link IStackFrame} for compatibility reasons with the
+ * Eclipse debug API.
+ * </p>
+ * @author Martin Hentschel
+ */
+public interface ISEDDebugNode extends ISEDDebugElement {
+   /**
+    * Returns the contained children.
+    * @return
+    * @exception DebugException if this method fails.  Reasons include:
+    * <ul><li>Failure communicating with the VM.  The DebugException's
+    * status code contains the underlying exception responsible for
+    * the failure.</li>
+    */
+   public ISEDDebugNode[] getChildren() throws DebugException;
+}
