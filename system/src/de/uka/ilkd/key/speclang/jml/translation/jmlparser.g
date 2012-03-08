@@ -300,9 +300,15 @@ options {
             raiseError("internal Error: no further Token in Stream");
 	}
 
-	SLExpression result = resolverManager.resolve(receiver,
-						      lookupName,
-						      params);
+	SLExpression result = null;
+	try {
+	 result = resolverManager.resolve(receiver,
+	   			      lookupName,
+				      params);
+	} catch(SLTranslationException exc) {
+	   // no type name found maybe package?
+	}
+	
 	if(result != null) {
 	    return result;
 	}
@@ -1246,7 +1252,11 @@ primarysuffix[SLExpression receiver, String fullyQualifiedName]
     {
         result = new SLExpression(TB.inv(services, receiver.getTerm()));
     }
-    |
+    |	{
+    	    if(receiver != null) {
+		lookupName = LT(0).getText();
+	    }
+	}
 	l:LPAREN (params=expressionlist)? RPAREN
 	{
 	    result = lookupIdentifier(lookupName, receiver, new SLParameters(params), l);
