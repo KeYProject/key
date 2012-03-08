@@ -41,4 +41,14 @@ public interface ISEDDebugNode extends ISEDDebugElement {
     * the failure.</li>
     */
    public ISEDDebugNode[] getChildren() throws DebugException;
+   
+   /**
+    * Returns the parent in that this node is contained as child.
+    * @return The parent {@link ISEDDebugNode} or {@code null} if it is the root of the symbolic execution tree.
+    * @throws DebugException DebugException if this method fails.  Reasons include:
+    * <ul><li>Failure communicating with the VM.  The DebugException's
+    * status code contains the underlying exception responsible for
+    * the failure.</li>
+    */
+   public ISEDDebugNode getParent() throws DebugException;
 }

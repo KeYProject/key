@@ -23,11 +23,14 @@ public class SEDMemoryBranchCondition extends AbstractSEDBranchCondition {
    
    /**
     * Constructor.
-    * @param target The {@link ISEDDebugTarget} in that this statement is contained.
-    * @param thread The {@link ISEDThread} in that this statement is contained.
+    * @param target The {@link ISEDDebugTarget} in that this branch condition is contained.
+    * @param parent The parent in that this node is contained as child.
+    * @param thread The {@link ISEDThread} in that this branch condition is contained.
     */
-   public SEDMemoryBranchCondition(ISEDDebugTarget target, ISEDThread thread) {
-      super(target, thread);
+   public SEDMemoryBranchCondition(ISEDDebugTarget target, 
+                                   ISEDDebugNode parent, 
+                                   ISEDThread thread) {
+      super(target, parent, thread);
    }
 
    /**

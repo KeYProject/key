@@ -5,7 +5,9 @@ import junit.framework.TestCase;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.junit.Test;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
@@ -37,18 +39,29 @@ public class WorkbenchUtilTest extends TestCase {
             IFile file = TestUtilsUtil.createFile(project, "Test.txt", "Hello World");
             // Open editor
             editor = WorkbenchUtil.openEditor(file);
-            // Make sure that editor si opened
+            // Make sure that editor is opened
             IEditorPart active = WorkbenchUtil.getActiveEditor();
             assertNotNull(active);
             assertEquals(editor, active);
+            assertSame(active, WorkbenchUtil.getActivePart());
             // Close editor
             WorkbenchUtil.closeEditor(editor, true);
             // Make sure that no editor is opened
             assertNull(WorkbenchUtil.getActiveEditor());
+            assertNotSame(active, WorkbenchUtil.getActivePart());
         }
         finally {
             WorkbenchUtil.closeEditor(editor, true);
         }
+    }
+
+    /**
+     * Tests {@link WorkbenchUtil#getActivePart()}
+     */
+    @Test
+    public void testGetActivePart() throws PartInitException {
+       IWorkbenchPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActivePart();
+       assertEquals(part, WorkbenchUtil.getActivePart());
     }
 
     /**

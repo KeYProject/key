@@ -11,4 +11,10 @@
          </adapter>
       </factory>
    </extension>
+      <extension
+            point="org.eclipse.core.runtime.preferences">
+         <initializer
+               class="org.key_project.sed.core.util.SEDPreferenceUtilInitializer">
+         </initializer>
+      </extension>
 </plugin>

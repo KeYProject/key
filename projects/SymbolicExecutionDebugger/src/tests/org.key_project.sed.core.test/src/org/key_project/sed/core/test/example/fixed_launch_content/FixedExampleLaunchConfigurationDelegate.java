@@ -71,59 +71,59 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        thread.setName("Fixed Example Thread");
        target.addSymbolicThread(thread);
        
-       SEDMemoryStatement s1 = new SEDMemoryStatement(target, thread);
+       SEDMemoryStatement s1 = new SEDMemoryStatement(target, thread, thread);
        s1.setName("int x = 1;");
        thread.addChild(s1);
        
-       SEDMemoryStatement s2 = new SEDMemoryStatement(target, thread);
+       SEDMemoryStatement s2 = new SEDMemoryStatement(target, s1, thread);
        s2.setName("int y = 2;");
        s1.addChild(s2);
        
-       SEDMemoryStatement s3 = new SEDMemoryStatement(target, thread);
+       SEDMemoryStatement s3 = new SEDMemoryStatement(target, s2, thread);
        s3.setName("int result = (x + y) / z;");
        s2.addChild(s3);
        
-       SEDMemoryBranchCondition bzero = new SEDMemoryBranchCondition(target, thread);
+       SEDMemoryBranchCondition bzero = new SEDMemoryBranchCondition(target, s3, thread);
        bzero.setName("z == 0");
        s3.addChild(bzero);
        
-       SEDMemoryExceptionalTermination et = new SEDMemoryExceptionalTermination(target, thread);
+       SEDMemoryExceptionalTermination et = new SEDMemoryExceptionalTermination(target, bzero, thread);
        et.setName("throws DivisionByZeroException()");
        bzero.addChild(et);
        
-       SEDMemoryBranchCondition bnotzero = new SEDMemoryBranchCondition(target, thread);
+       SEDMemoryBranchCondition bnotzero = new SEDMemoryBranchCondition(target, s3, thread);
        bnotzero.setName("z != 0");
        s3.addChild(bnotzero);
 
-       SEDMemoryMethodCall call = new SEDMemoryMethodCall(target, thread);
+       SEDMemoryMethodCall call = new SEDMemoryMethodCall(target, bnotzero, thread);
        call.setName("foo(result)");
        bnotzero.addChild(call);       
 
-       SEDMemoryBranchNode branch = new SEDMemoryBranchNode(target, thread);
+       SEDMemoryBranchNode branch = new SEDMemoryBranchNode(target, call, thread);
        branch.setName("if (result >= 0)");
        call.addChild(branch);
        
-       SEDMemoryBranchCondition bnegative = new SEDMemoryBranchCondition(target, thread);
+       SEDMemoryBranchCondition bnegative = new SEDMemoryBranchCondition(target, branch, thread);
        bnegative.setName("result < 0");
        branch.addChild(bnegative);
        
-       SEDMemoryMethodReturn returnNegative = new SEDMemoryMethodReturn(target, thread);
+       SEDMemoryMethodReturn returnNegative = new SEDMemoryMethodReturn(target, bnegative, thread);
        returnNegative.setName("return -1");
        bnegative.addChild(returnNegative);
        
-       SEDMemoryTermination terminationNegative = new SEDMemoryTermination(target, thread);
+       SEDMemoryTermination terminationNegative = new SEDMemoryTermination(target, returnNegative, thread);
        terminationNegative.setName("<end>");
        returnNegative.addChild(terminationNegative);
        
-       SEDMemoryBranchCondition bpositive = new SEDMemoryBranchCondition(target, thread);
+       SEDMemoryBranchCondition bpositive = new SEDMemoryBranchCondition(target, branch, thread);
        bpositive.setName("result >= 0");
        branch.addChild(bpositive);
        
-       SEDMemoryMethodReturn returnPositive = new SEDMemoryMethodReturn(target, thread);
+       SEDMemoryMethodReturn returnPositive = new SEDMemoryMethodReturn(target, bpositive, thread);
        returnPositive.setName("return 1");
        bpositive.addChild(returnPositive);
        
-       SEDMemoryTermination terminationPositive = new SEDMemoryTermination(target, thread);
+       SEDMemoryTermination terminationPositive = new SEDMemoryTermination(target, returnPositive, thread);
        terminationPositive.setName("<end>");
        returnPositive.addChild(terminationPositive);
     }

@@ -23,10 +23,13 @@ public class SEDMemoryStatement extends AbstractSEDStatement {
    /**
     * Constructor.
     * @param target The {@link ISEDDebugTarget} in that this statement is contained.
+    * @param parent The parent in that this node is contained as child.
     * @param thread The {@link ISEDThread} in that this statement is contained.
     */
-   public SEDMemoryStatement(ISEDDebugTarget target, ISEDThread thread) {
-      super(target, thread);
+   public SEDMemoryStatement(ISEDDebugTarget target, 
+                             ISEDDebugNode parent, 
+                             ISEDThread thread) {
+      super(target, parent, thread);
    }
 
    /**

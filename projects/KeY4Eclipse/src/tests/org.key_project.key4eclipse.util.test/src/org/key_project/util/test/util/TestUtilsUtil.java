@@ -693,10 +693,12 @@ public class TestUtilsUtil {
     * @param tree The {@link SWTBotTreeItem} to expand.
     */
    public static void expandAll(SWTBotTreeItem item) {
-      item.expand();
-      SWTBotTreeItem[] children = item.getItems();
-      for (SWTBotTreeItem child : children) {
-         expandAll(child);
+      if (!item.widget.isDisposed()) {
+         item.expand();
+         SWTBotTreeItem[] children = item.getItems();
+         for (SWTBotTreeItem child : children) {
+            expandAll(child);
+         }
       }
    }
 

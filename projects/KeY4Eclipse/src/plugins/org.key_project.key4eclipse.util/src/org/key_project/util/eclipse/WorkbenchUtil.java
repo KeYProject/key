@@ -7,6 +7,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
@@ -51,6 +52,20 @@ public final class WorkbenchUtil {
         IWorkbenchWindow window = getActiveWorkbenchWindow();
         if (window != null) {
             return window.getActivePage();
+        }
+        else {
+            return null;
+        }
+    }
+    
+    /**
+     * Returns the active {@link IWorkbenchPart} if available.
+     * @return The active {@link IWorkbenchPart} or {@code null} if no one is available.
+     */
+    public static IWorkbenchPart getActivePart() {
+        IWorkbenchPage page = getActivePage();
+        if (page != null) {
+            return page.getActivePart();
         }
         else {
             return null;

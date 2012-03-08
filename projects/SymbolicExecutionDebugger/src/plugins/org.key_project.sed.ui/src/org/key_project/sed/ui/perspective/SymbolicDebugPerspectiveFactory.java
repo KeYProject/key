@@ -30,5 +30,7 @@ public class SymbolicDebugPerspectiveFactory implements IPerspectiveFactory {
       layout.addPerspectiveShortcut("org.eclipse.jdt.ui.JavaHierarchyPerspective");
       layout.addPerspectiveShortcut("org.eclipse.jdt.ui.JavaBrowsingPerspective");
       layout.addPerspectiveShortcut("org.eclipse.debug.ui.DebugPerspective");
+      // View Shortcuts
+      layout.addShowViewShortcut(IDebugUIConstants.ID_DEBUG_VIEW);
    }
 }

@@ -23,11 +23,14 @@ public class SEDMemoryTermination extends AbstractSEDTermination {
    
    /**
     * Constructor.
-    * @param target The {@link ISEDDebugTarget} in that this statement is contained.
-    * @param thread The {@link ISEDThread} in that this statement is contained.
+    * @param target The {@link ISEDDebugTarget} in that this termination is contained.
+    * @param parent The parent in that this node is contained as child.
+    * @param thread The {@link ISEDThread} in that this termination is contained.
     */
-   public SEDMemoryTermination(ISEDDebugTarget target, ISEDThread thread) {
-      super(target, thread);
+   public SEDMemoryTermination(ISEDDebugTarget target, 
+                               ISEDDebugNode parent, 
+                               ISEDThread thread) {
+      super(target, parent, thread);
    }
 
    /**

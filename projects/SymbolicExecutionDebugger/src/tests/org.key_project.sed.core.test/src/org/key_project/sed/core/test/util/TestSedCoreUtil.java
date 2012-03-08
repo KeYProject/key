@@ -3,6 +3,7 @@ package org.key_project.sed.core.test.util;
 import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
@@ -11,7 +12,9 @@ import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
+import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
+import org.eclipse.swtbot.swt.finder.waits.ICondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
@@ -26,6 +29,7 @@ import org.key_project.sed.core.model.ISEDStatement;
 import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.util.LaunchUtil;
+import org.key_project.sed.core.util.SEDPreferenceUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 /**
@@ -72,11 +76,35 @@ public final class TestSedCoreUtil {
    }
    
    /**
+    * Returns all existing {@link ILaunchConfiguration} of the fixed example.
+    * @return All existing {@link ILaunchConfiguration}s.
+    * @throws CoreException Occurred Exception.
+    */
+   public static ILaunchConfiguration[] searchFixedExampleLaunchConfigurations() throws CoreException {
+       return DebugPlugin.getDefault().getLaunchManager().getLaunchConfigurations(getFixedExampleConfigurationType());
+   }
+   
+   /**
+    * Returns an {@link ILaunchConfiguration} of the fixed example to execute.
+    * @return The {@link ILaunchConfiguration} to execute.
+    * @throws CoreException Occurred Exception.
+    */
+   public static ILaunchConfiguration getFixedExampleLaunchConfiguration() throws CoreException {
+      ILaunchConfiguration[] existingConfigs = searchFixedExampleLaunchConfigurations();
+      if (existingConfigs != null && existingConfigs.length >= 1) {
+         return existingConfigs[0];
+      }
+      else {
+         return createFixedExampleLaunchConfiguration();
+      }
+   }
+   
+   /**
     * Launches the fixed example.
     * @throws CoreException Occurred Exception.
     */
    public static void launchFixedExample() throws CoreException {
-      ILaunchConfiguration config = createFixedExampleLaunchConfiguration();
+      ILaunchConfiguration config = getFixedExampleLaunchConfiguration();
       DebugUITools.launch(config, FIXED_EXAMPLE_MODE);
    }
 
@@ -198,23 +226,126 @@ public final class TestSedCoreUtil {
    }
 
    /**
+    * Makes sure that only the fixed example is shown in compact view
+    * in the given {@link SWTBotTree}.
+    * @param debugTree The {@link SWTBotTree} to check.
+    */
+   public static void assertCompactFixedExample(SWTBotTree debugTree) {
+      // Assert launch
+      SWTBotTreeItem[] launchItems = debugTree.getAllItems();
+      TestCase.assertEquals(1, launchItems.length);
+      TestCase.assertEquals("Fixed Example Test [Fixed Example]", launchItems[0].getText());
+      // Assert target
+      SWTBotTreeItem[] targetItems = launchItems[0].getItems();
+      TestCase.assertEquals(1, targetItems.length);
+      TestCase.assertEquals("Fixed Example Target", targetItems[0].getText());
+      TestCase.assertTrue(TestUtilsUtil.getTreeItemData(targetItems[0]) instanceof ISEDDebugTarget);
+      // Assert thread
+      SWTBotTreeItem[] threadItems = targetItems[0].getItems();
+      TestCase.assertEquals(1, threadItems.length);
+      TestCase.assertEquals("Fixed Example Thread", threadItems[0].getText());
+      TestCase.assertTrue(TestUtilsUtil.getTreeItemData(threadItems[0]) instanceof ISEDThread);
+      // Assert statement1, 2 and 3
+      SWTBotTreeItem[] statementItems = threadItems[0].getItems();
+      TestCase.assertEquals(3, statementItems.length);
+      TestCase.assertEquals("int x = 1;", statementItems[0].getText());
+      TestCase.assertTrue(TestUtilsUtil.getTreeItemData(statementItems[0]) instanceof ISEDStatement);
+      TestCase.assertEquals(0, statementItems[0].getItems().length);
+      TestCase.assertEquals("int y = 2;", statementItems[1].getText());
+      TestCase.assertTrue(TestUtilsUtil.getTreeItemData(statementItems[1]) instanceof ISEDStatement);
+      TestCase.assertEquals(0, statementItems[1].getItems().length);
+      TestCase.assertEquals("int result = (x + y) / z;", statementItems[2].getText());
+      TestCase.assertTrue(TestUtilsUtil.getTreeItemData(statementItems[2]) instanceof ISEDStatement);
+      // Assert branch conditions
+      SWTBotTreeItem[] conditions1Items = statementItems[2].getItems();
+      TestCase.assertEquals(2, conditions1Items.length);
+      TestCase.assertEquals("z == 0", conditions1Items[0].getText());
+      TestCase.assertTrue(TestUtilsUtil.getTreeItemData(conditions1Items[0]) instanceof ISEDBranchCondition);
+      TestCase.assertEquals("z != 0", conditions1Items[1].getText());
+      TestCase.assertTrue(TestUtilsUtil.getTreeItemData(conditions1Items[1]) instanceof ISEDBranchCondition);
+      // Assert branch zero
+      SWTBotTreeItem[] branchZeroItems = conditions1Items[0].getItems();
+      TestCase.assertEquals(1, branchZeroItems.length);
+      TestCase.assertEquals("throws DivisionByZeroException()", branchZeroItems[0].getText());
+      TestCase.assertTrue(TestUtilsUtil.getTreeItemData(branchZeroItems[0]) instanceof ISEDExceptionalTermination);
+      // Assert branch not zero
+      SWTBotTreeItem[] branchNotZeroItems = conditions1Items[1].getItems();
+      TestCase.assertEquals(2, branchNotZeroItems.length);
+      TestCase.assertEquals("foo(result)", branchNotZeroItems[0].getText());
+      TestCase.assertTrue(TestUtilsUtil.getTreeItemData(branchNotZeroItems[0]) instanceof ISEDMethodCall);
+      TestCase.assertEquals(0, branchNotZeroItems[0].getItems().length);
+      TestCase.assertEquals("if (result >= 0)", branchNotZeroItems[1].getText());
+      TestCase.assertTrue(TestUtilsUtil.getTreeItemData(branchNotZeroItems[1]) instanceof ISEDBranchNode);
+      // Assert branch conditions
+      SWTBotTreeItem[] conditions2Items = branchNotZeroItems[1].getItems();
+      TestCase.assertEquals(2, conditions2Items.length);
+      TestCase.assertEquals("result < 0", conditions2Items[0].getText());
+      TestCase.assertTrue(TestUtilsUtil.getTreeItemData(conditions2Items[0]) instanceof ISEDBranchCondition);
+      TestCase.assertEquals("result >= 0", conditions2Items[1].getText());
+      TestCase.assertTrue(TestUtilsUtil.getTreeItemData(conditions2Items[1]) instanceof ISEDBranchCondition);
+      // Assert branch negative
+      SWTBotTreeItem[] negativeItems = conditions2Items[0].getItems();
+      TestCase.assertEquals(2, negativeItems.length);
+      TestCase.assertEquals("return -1", negativeItems[0].getText());
+      TestCase.assertTrue(TestUtilsUtil.getTreeItemData(negativeItems[0]) instanceof ISEDMethodReturn);
+      TestCase.assertEquals(0, negativeItems[0].getItems().length);
+      TestCase.assertEquals("<end>", negativeItems[1].getText());
+      TestCase.assertTrue(TestUtilsUtil.getTreeItemData(negativeItems[1]) instanceof ISEDTermination);
+      TestCase.assertEquals(0, negativeItems[1].getItems().length);
+      // Assert branch positive
+      SWTBotTreeItem[] positiveItems = conditions2Items[1].getItems();
+      TestCase.assertEquals(2, positiveItems.length);
+      TestCase.assertEquals("return 1", positiveItems[0].getText());
+      TestCase.assertTrue(TestUtilsUtil.getTreeItemData(positiveItems[0]) instanceof ISEDMethodReturn);
+      TestCase.assertEquals(0, positiveItems[0].getItems().length);
+      TestCase.assertEquals("<end>", positiveItems[1].getText());
+      TestCase.assertTrue(TestUtilsUtil.getTreeItemData(positiveItems[1]) instanceof ISEDTermination);
+      TestCase.assertEquals(0, positiveItems[1].getItems().length);
+   }
+
+   /**
     * Terminates and removes all {@link ILaunch}s in the given tree.
     * @param debugTree The given tree.
     */
    public static void terminateAndRemoveAll(SWTBotTree debugTree) {
-      SWTWorkbenchBot bot = new SWTWorkbenchBot();
-      // Terminate all items
-      SWTBotTreeItem[] launchItems = debugTree.getAllItems();
-      for (SWTBotTreeItem item : launchItems) {
-         item.select();
-         item.contextMenu("Terminate and Remove").click();
-         SWTBotShell dialog = bot.shell("Terminate and Remove");
-         dialog.bot().button("Yes").click();
+      if (debugTree!= null) {
+         SWTWorkbenchBot bot = new SWTWorkbenchBot();
+         // Terminate all items
+         SWTBotTreeItem[] launchItems = debugTree.getAllItems();
+         for (SWTBotTreeItem item : launchItems) {
+            item.select();
+            item.contextMenu("Terminate and Remove").click();
+            SWTBotShell dialog = bot.shell("Terminate and Remove");
+            dialog.bot().button("Yes").click();
+         }
+         // Wait until all items are removed
+         bot.waitWhile(Conditions.treeHasRows(debugTree, 1));
+         // Make sure that the tree has no items
+         launchItems = debugTree.getAllItems();
+         TestCase.assertEquals(0, launchItems.length);
       }
-      // Wait until all items are removed
-      bot.waitWhile(Conditions.treeHasRows(debugTree, 1));
-      // Make sure that the tree has no items
-      launchItems = debugTree.getAllItems();
-      TestCase.assertEquals(0, launchItems.length);
+   }
+
+   /**
+    * Waits until the given value is defined for {@link SEDPreferenceUtil#isShowCompactExecutionTree()}.
+    * @param bot The {@link SWTBot} to use.
+    * @param value The value to wait for.
+    */
+   public static void waitUntilShowCompactExecutionTreeValue(SWTBot bot, final boolean value) {
+      bot.waitUntil(new ICondition() {
+         @Override
+         public boolean test() throws Exception {
+            return value == SEDPreferenceUtil.isShowCompactExecutionTree();
+         }
+         
+         @Override
+         public void init(SWTBot bot) {
+         }
+         
+         @Override
+         public String getFailureMessage() {
+            return "The show symbolic compact execution tree value is not " + value + ".";
+         }
+      });
    }
 }

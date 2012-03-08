@@ -37,4 +37,20 @@
          </perspectiveShortcut>
       </perspectiveExtension>
    </extension>
+      <extension
+            point="org.eclipse.ui.menus">
+         <menuContribution
+               allPopups="false"
+               locationURI="menu:org.eclipse.debug.ui.DebugView">
+            <menu
+                  id="org.key_project.sed.ui.symbolicDebugSubmenu"
+                  label="Symbolic Execution Debugger (SED)"
+                  mnemonic="S">
+               <dynamic
+                     class="org.key_project.sed.ui.menu.contribution.ToggleShowCompactSymbolicExecutionTreeContributionItem"
+                     id="org.key_project.sed.ui.symbolicDebugSubmenu.ToggleShowCompactSymbolicExecutionTreeContributionItem">
+               </dynamic>
+            </menu>
+         </menuContribution>
+      </extension>
 </plugin>

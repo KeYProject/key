@@ -13,10 +13,18 @@ import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 import org.eclipse.jdt.core.IMethod;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
+import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
+import org.key_project.sed.core.model.memory.SEDMemoryBranchNode;
+import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
+import org.key_project.sed.core.model.memory.SEDMemoryExceptionalTermination;
+import org.key_project.sed.core.model.memory.SEDMemoryMethodCall;
+import org.key_project.sed.core.model.memory.SEDMemoryMethodReturn;
+import org.key_project.sed.core.model.memory.SEDMemoryStatement;
+import org.key_project.sed.core.model.memory.SEDMemoryTermination;
+import org.key_project.sed.core.model.memory.SEDMemoryThread;
 import org.key_project.sed.key.core.launch.key.po.SEDFunctionalOperationContractPO;
 import org.key_project.sed.key.core.util.KeySEDUtil;
 import org.key_project.sed.key.core.util.LogUtil;
-import org.key_project.util.java.StringUtil;
 import org.key_project.util.java.SwingUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithResult;
 import org.key_project.util.java.thread.IRunnableWithResult;
@@ -63,29 +71,93 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
                        ILaunch launch, 
                        IProgressMonitor monitor) throws CoreException {
         try {
-            // Get method and debug settings
-            final IMethod method = KeySEDUtil.findMethod(launch);
-            if (method == null) {
-                throw new CoreException(LogUtil.getLogger().createErrorStatus("Defined method does not exist. Please update the launch configuration \"" + configuration.getName() + "\"."));
-            }
-            final boolean useExistingContract = KeySEDUtil.isUseExistingContractValue(configuration);
-            final String existingContract = KeySEDUtil.getExistingContractValue(configuration);
-            if (useExistingContract && StringUtil.isTrimmedEmpty(existingContract)) {
-                throw new CoreException(LogUtil.getLogger().createErrorStatus("No existing contract defined. Please update the launch configuration \"" + configuration.getName() + "\"."));
-            }
-            // Instantiate proof
-            Proof proof = instantiateProof(configuration, method, useExistingContract, existingContract);
-            if (proof == null) {
-                throw new CoreException(LogUtil.getLogger().createErrorStatus("Proof was not instantiated."));
-            }
-            // Run proof
-            runProof(proof);
-            // Analyze proof
-            analyzeProof(proof);
+           SEDMemoryDebugTarget target = new SEDMemoryDebugTarget(launch);
+           target.setName("Fixed Example Target");
+           launch.addDebugTarget(target);
+           
+           SEDMemoryThread thread = new SEDMemoryThread(target);
+           thread.setName("Fixed Example Thread");
+           target.addSymbolicThread(thread);
+           
+           SEDMemoryStatement s1 = new SEDMemoryStatement(target, thread, thread);
+           s1.setName("int x = 1;");
+           thread.addChild(s1);
+           
+           SEDMemoryStatement s2 = new SEDMemoryStatement(target, s1, thread);
+           s2.setName("int y = 2;");
+           s1.addChild(s2);
+           
+           SEDMemoryStatement s3 = new SEDMemoryStatement(target, s2, thread);
+           s3.setName("int result = (x + y) / z;");
+           s2.addChild(s3);
+           
+           SEDMemoryBranchCondition bzero = new SEDMemoryBranchCondition(target, s3, thread);
+           bzero.setName("z == 0");
+           s3.addChild(bzero);
+           
+           SEDMemoryExceptionalTermination et = new SEDMemoryExceptionalTermination(target, bzero, thread);
+           et.setName("throws DivisionByZeroException()");
+           bzero.addChild(et);
+           
+           SEDMemoryBranchCondition bnotzero = new SEDMemoryBranchCondition(target, s3, thread);
+           bnotzero.setName("z != 0");
+           s3.addChild(bnotzero);
+
+           SEDMemoryMethodCall call = new SEDMemoryMethodCall(target, bnotzero, thread);
+           call.setName("foo(result)");
+           bnotzero.addChild(call);       
+
+           SEDMemoryBranchNode branch = new SEDMemoryBranchNode(target, call, thread);
+           branch.setName("if (result >= 0)");
+           call.addChild(branch);
+           
+           SEDMemoryBranchCondition bnegative = new SEDMemoryBranchCondition(target, branch, thread);
+           bnegative.setName("result < 0");
+           branch.addChild(bnegative);
+           
+           SEDMemoryMethodReturn returnNegative = new SEDMemoryMethodReturn(target, bnegative, thread);
+           returnNegative.setName("return -1");
+           bnegative.addChild(returnNegative);
+           
+           SEDMemoryTermination terminationNegative = new SEDMemoryTermination(target, returnNegative, thread);
+           terminationNegative.setName("<end>");
+           returnNegative.addChild(terminationNegative);
+           
+           SEDMemoryBranchCondition bpositive = new SEDMemoryBranchCondition(target, branch, thread);
+           bpositive.setName("result >= 0");
+           branch.addChild(bpositive);
+           
+           SEDMemoryMethodReturn returnPositive = new SEDMemoryMethodReturn(target, bpositive, thread);
+           returnPositive.setName("return 1");
+           bpositive.addChild(returnPositive);
+           
+           SEDMemoryTermination terminationPositive = new SEDMemoryTermination(target, returnPositive, thread);
+           terminationPositive.setName("<end>");
+           returnPositive.addChild(terminationPositive);
+           
+//            // Get method and debug settings
+//            final IMethod method = KeySEDUtil.findMethod(launch);
+//            if (method == null) {
+//                throw new CoreException(LogUtil.getLogger().createErrorStatus("Defined method does not exist. Please update the launch configuration \"" + configuration.getName() + "\"."));
+//            }
+//            final boolean useExistingContract = KeySEDUtil.isUseExistingContractValue(configuration);
+//            final String existingContract = KeySEDUtil.getExistingContractValue(configuration);
+//            if (useExistingContract && StringUtil.isTrimmedEmpty(existingContract)) {
+//                throw new CoreException(LogUtil.getLogger().createErrorStatus("No existing contract defined. Please update the launch configuration \"" + configuration.getName() + "\"."));
+//            }
+//            // Instantiate proof
+//            Proof proof = instantiateProof(configuration, method, useExistingContract, existingContract);
+//            if (proof == null) {
+//                throw new CoreException(LogUtil.getLogger().createErrorStatus("Proof was not instantiated."));
+//            }
+//            // Run proof
+//            runProof(proof);
+//            // Analyze proof
+//            analyzeProof(proof);
         }
-        catch (CoreException e) {
-            throw e;
-        }
+//        catch (CoreException e) {
+//            throw e;
+//        }
         catch (Exception e) {
             throw new CoreException(LogUtil.getLogger().createErrorStatus(e));
         }

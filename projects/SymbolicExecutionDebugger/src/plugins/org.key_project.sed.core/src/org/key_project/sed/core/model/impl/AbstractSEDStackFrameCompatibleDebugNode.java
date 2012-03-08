@@ -43,10 +43,13 @@ public abstract class AbstractSEDStackFrameCompatibleDebugNode extends AbstractS
    /**
     * Constructor.
     * @param target The {@link ISEDDebugTarget} in that this node is contained.
+    * @param parent The parent in that this node is contained as child.
     * @param thread The {@link ISEDThread} in that this node is contained.
     */
-   public AbstractSEDStackFrameCompatibleDebugNode(ISEDDebugTarget target, ISEDThread thread) {
-      super(target);
+   public AbstractSEDStackFrameCompatibleDebugNode(ISEDDebugTarget target,
+                                                   ISEDDebugNode parent, 
+                                                   ISEDThread thread) {
+      super(target, parent);
       this.thread = thread;
    }
 
