@@ -25,6 +25,7 @@ import org.key_project.sed.core.model.memory.SEDMemoryThread;
 import org.key_project.sed.key.core.launch.key.po.SEDFunctionalOperationContractPO;
 import org.key_project.sed.key.core.util.KeySEDUtil;
 import org.key_project.sed.key.core.util.LogUtil;
+import org.key_project.util.java.StringUtil;
 import org.key_project.util.java.SwingUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithResult;
 import org.key_project.util.java.thread.IRunnableWithResult;
@@ -135,29 +136,29 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
            terminationPositive.setName("<end>");
            returnPositive.addChild(terminationPositive);
            
-//            // Get method and debug settings
-//            final IMethod method = KeySEDUtil.findMethod(launch);
-//            if (method == null) {
-//                throw new CoreException(LogUtil.getLogger().createErrorStatus("Defined method does not exist. Please update the launch configuration \"" + configuration.getName() + "\"."));
-//            }
-//            final boolean useExistingContract = KeySEDUtil.isUseExistingContractValue(configuration);
-//            final String existingContract = KeySEDUtil.getExistingContractValue(configuration);
-//            if (useExistingContract && StringUtil.isTrimmedEmpty(existingContract)) {
-//                throw new CoreException(LogUtil.getLogger().createErrorStatus("No existing contract defined. Please update the launch configuration \"" + configuration.getName() + "\"."));
-//            }
-//            // Instantiate proof
-//            Proof proof = instantiateProof(configuration, method, useExistingContract, existingContract);
-//            if (proof == null) {
-//                throw new CoreException(LogUtil.getLogger().createErrorStatus("Proof was not instantiated."));
-//            }
-//            // Run proof
-//            runProof(proof);
-//            // Analyze proof
-//            analyzeProof(proof);
+            // Get method and debug settings
+            final IMethod method = KeySEDUtil.findMethod(launch);
+            if (method == null) {
+                throw new CoreException(LogUtil.getLogger().createErrorStatus("Defined method does not exist. Please update the launch configuration \"" + configuration.getName() + "\"."));
+            }
+            final boolean useExistingContract = KeySEDUtil.isUseExistingContractValue(configuration);
+            final String existingContract = KeySEDUtil.getExistingContractValue(configuration);
+            if (useExistingContract && StringUtil.isTrimmedEmpty(existingContract)) {
+                throw new CoreException(LogUtil.getLogger().createErrorStatus("No existing contract defined. Please update the launch configuration \"" + configuration.getName() + "\"."));
+            }
+            // Instantiate proof
+            Proof proof = instantiateProof(configuration, method, useExistingContract, existingContract);
+            if (proof == null) {
+                throw new CoreException(LogUtil.getLogger().createErrorStatus("Proof was not instantiated."));
+            }
+            // Run proof
+            runProof(proof);
+            // Analyze proof
+            analyzeProof(proof);
         }
-//        catch (CoreException e) {
-//            throw e;
-//        }
+        catch (CoreException e) {
+            throw e;
+        }
         catch (Exception e) {
             throw new CoreException(LogUtil.getLogger().createErrorStatus(e));
         }
@@ -223,7 +224,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
                         mods = mods.append("public");
                         TextualJMLSpecCase textualSpecCase = new TextualJMLSpecCase(mods, Behavior.NORMAL_BEHAVIOR);
                         if (!pm.isStatic()) {
-                           textualSpecCase.addRequires(new PositionedString("self.<inv>")); // Assume own invariants
+                           textualSpecCase.addRequires(new PositionedString("this.<inv>")); // Assume own invariants
                         }
                         // Create contract
                         JMLSpecFactory factory = new JMLSpecFactory(services);
