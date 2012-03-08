@@ -2,6 +2,7 @@ package org.key_project.sed.core.model.impl;
 
 import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.DebugElement;
@@ -34,7 +35,7 @@ public abstract class AbstractSEDDebugTarget extends DebugElement implements ISE
    /**
     * Indicates that the process is currently suspended or not.
     */
-   private boolean suspended = false;
+   private boolean suspended = true;
 
    /**
     * Indicates that the process is termianted or not.
@@ -162,6 +163,7 @@ public abstract class AbstractSEDDebugTarget extends DebugElement implements ISE
    @Override
    public void terminate() throws DebugException {
       terminated = true;
+      fireTerminateEvent();
    }
 
    /**
@@ -169,7 +171,7 @@ public abstract class AbstractSEDDebugTarget extends DebugElement implements ISE
     */
    @Override
    public boolean canResume() {
-      return isSuspended();
+      return isSuspended() && !isTerminated() && !isDisconnected();
    }
 
    /**
@@ -177,7 +179,7 @@ public abstract class AbstractSEDDebugTarget extends DebugElement implements ISE
     */
    @Override
    public boolean canSuspend() {
-      return !isSuspended();
+      return !isSuspended() && !isTerminated() && !isDisconnected();
    }
 
    /**
@@ -194,6 +196,7 @@ public abstract class AbstractSEDDebugTarget extends DebugElement implements ISE
    @Override
    public void resume() throws DebugException {
       suspended = false;
+      fireSuspendEvent(DebugEvent.RESUME);
    }
 
    /**
@@ -202,6 +205,7 @@ public abstract class AbstractSEDDebugTarget extends DebugElement implements ISE
    @Override
    public void suspend() throws DebugException {
       suspended = true;
+      fireSuspendEvent(DebugEvent.SUSPEND);
    }
 
    /**
@@ -230,7 +234,7 @@ public abstract class AbstractSEDDebugTarget extends DebugElement implements ISE
     */
    @Override
    public boolean canDisconnect() {
-      return false;
+      return !isDisconnected() && !isTerminated();
    }
 
    /**
@@ -239,6 +243,7 @@ public abstract class AbstractSEDDebugTarget extends DebugElement implements ISE
    @Override
    public void disconnect() throws DebugException {
       this.disconnected = true;
+      fireTerminateEvent();
    }
 
    /**
