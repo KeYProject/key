@@ -8,11 +8,13 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
+import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
+import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.waits.ICondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
@@ -345,6 +347,186 @@ public final class TestSedCoreUtil {
          @Override
          public String getFailureMessage() {
             return "The show symbolic compact execution tree value is not " + value + ".";
+         }
+      });
+   }
+
+   /**
+    * Returns the first available {@link ILaunch} in the given debug tree.
+    * @param debugTree The given debug tree.
+    * @return The first available {@link ILaunch}.
+    */
+   public static ILaunch getFirstLaunch(SWTBotTree debugTree) {
+      SWTBotTreeItem[] items = debugTree.getAllItems();
+      if (items.length >= 1) {
+         Object object = TestUtilsUtil.getTreeItemData(items[0]);
+         TestCase.assertTrue(object instanceof ILaunch);
+         return (ILaunch)object;
+      }
+      else {
+         TestCase.fail("Debug tree is empty.");
+         return null;
+      }
+   }
+
+   /**
+    * Waits until the given {@link SWTBotTree} contains at least one {@link ISEDDebugTarget}.
+    * @param bot The {@link SWTBot} to use.
+    * @param debugTree The {@link SWTBotTree} to search in.
+    * @return The first found {@link ISEDDebugTarget}.
+    */
+   public static ISEDDebugTarget waitUntilDebugTreeHasDebugTarget(SWTBot bot, final SWTBotTree debugTree) {
+      WaitForDebugTargetCondition condition = new WaitForDebugTargetCondition(debugTree);
+      bot.waitUntil(condition);
+      return condition.getTarget();
+   }
+   
+   /**
+    * {@link ICondition} to receive the first {@link IDebugTarget} in a given {@link SWTBotTree}.
+    * @author Martin Hentschel
+    */
+   private static class WaitForDebugTargetCondition implements ICondition {
+      /**
+       * The {@link SWTBotTree} to search in.
+       */
+      private SWTBotTree debugTree;
+      
+      /**
+       * The found {@link ISEDDebugTarget}.
+       */
+      private ISEDDebugTarget target; 
+      
+      /**
+       * Constructor.
+       * @param debugTree The {@link SWTBotTree} to search in.
+       */
+      public WaitForDebugTargetCondition(SWTBotTree debugTree) {
+         TestCase.assertNotNull(debugTree);
+         this.debugTree = debugTree;
+      }
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean test() throws Exception {
+         SWTBotTreeItem[] rootItems = debugTree.getAllItems();
+         if (rootItems != null && rootItems.length >= 1) {
+            SWTBotTreeItem[] level1Items = rootItems[0].getItems();
+            if (level1Items != null && level1Items.length >= 1) {
+               Object data = TestUtilsUtil.getTreeItemData(level1Items[0]);
+               if (data instanceof ISEDDebugTarget) {
+                  target = (ISEDDebugTarget)data;
+                  return true;
+               }
+               else {
+                  return false;
+               }
+            }
+            else {
+               return false;
+            }
+         }
+         else {
+            return false;
+         }
+      }
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void init(SWTBot bot) {
+      }
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getFailureMessage() {
+         return "Debug tree has no IDebugTarget.";
+      }
+
+      /**
+       * Returns the found {@link ISEDDebugTarget}.
+       * @return The found {@link ISEDDebugTarget}.
+       */
+      public ISEDDebugTarget getTarget() {
+         return target;
+      }
+   }
+
+   /**
+    * Waits until the given {@link ILaunch} is terminated.
+    * @param bot The {@link SWTBot} to use.
+    * @param launch The {@link ILaunch} to wait for.
+    */
+   public static void waitUntilLaunchIsTerminated(SWTBot bot, final ILaunch launch) {
+      TestCase.assertNotNull(bot);
+      TestCase.assertNotNull(launch);
+      bot.waitUntil(new ICondition() {
+         @Override
+         public boolean test() throws Exception {
+            return launch.isTerminated();
+         }
+         
+         @Override
+         public void init(SWTBot bot) {
+         }
+         
+         @Override
+         public String getFailureMessage() {
+            return "ILaunch \"" + launch + "\" is not terminated.";
+         }
+      });
+   }
+
+   /**
+    * Waits until the {@link IDebugTarget} can suspend.
+    * @param bot The {@link SWTBot} to use.
+    * @param target The {@link ISEDDebugTarget} to wait for.
+    */
+   public static void waitUntilDebugTargetCanSuspend(SWTBot bot, final ISEDDebugTarget target) {
+      TestCase.assertNotNull(bot);
+      TestCase.assertNotNull(target);
+      bot.waitUntil(new ICondition() {
+         @Override
+         public boolean test() throws Exception {
+            return target.canSuspend();
+         }
+         
+         @Override
+         public void init(SWTBot bot) {
+         }
+         
+         @Override
+         public String getFailureMessage() {
+            return "ISEDDebugTarget \"" + target + "\" can not suspend.";
+         }
+      }, SWTBotPreferences.TIMEOUT, 1); // Delay must be very short because otherwise it is possible that the auto mode has finished between checks which results in a timeout exception.
+   }
+
+   /**
+    * Waits until the {@link IDebugTarget} can resume.
+    * @param bot The {@link SWTBot} to use.
+    * @param target The {@link ISEDDebugTarget} to wait for.
+    */
+   public static void waitUntilDebugTargetCanResume(SWTBot bot, final ISEDDebugTarget target) {
+      TestCase.assertNotNull(bot);
+      TestCase.assertNotNull(target);
+      bot.waitUntil(new ICondition() {
+         @Override
+         public boolean test() throws Exception {
+            return target.canResume();
+         }
+         
+         @Override
+         public void init(SWTBot bot) {
+         }
+         
+         @Override
+         public String getFailureMessage() {
+            return "ISEDDebugTarget \"" + target + "\" can not resume.";
          }
       });
    }

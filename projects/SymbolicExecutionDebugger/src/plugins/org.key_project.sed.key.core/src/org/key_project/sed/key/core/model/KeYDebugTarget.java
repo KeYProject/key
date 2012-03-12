@@ -4,15 +4,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.ILaunch;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
 import org.key_project.sed.core.model.memory.SEDMemoryStatement;
 import org.key_project.sed.core.model.memory.SEDMemoryThread;
+import org.key_project.sed.key.core.util.LogUtil;
 
 import de.uka.ilkd.key.gui.AutoModeListener;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -33,6 +34,11 @@ import de.uka.ilkd.key.proof.ProofEvent;
  * @author Martin Hentschel
  */
 public class KeYDebugTarget extends SEDMemoryDebugTarget {
+   /**
+    * The default name of the only contained {@link ISEDThread}.
+    */
+   public static final String DEFAULT_THREAD_NAME = "KeY Default Thread";
+   
    /**
     * The proof in KeY to tread.
     */
@@ -77,7 +83,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       setModelIdentifier("org.key_project.sed.key.core");
       setName(proof.name() != null ? proof.name().toString() : "Unnamed");
       thread = new SEDMemoryThread(getDebugTarget());
-      thread.setName("KeY Default Thread");
+      thread.setName(DEFAULT_THREAD_NAME);
       addSymbolicThread(thread);
       keyNodeMapping = new HashMap<SourceElement, ISEDDebugNode>();
       // Observe frozen state of KeY Main Frame
@@ -98,7 +104,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
     */
    @Override
    public void resume() throws DebugException {
-      if (!isDisconnected()) {
+      if (canResume()) {
          // Inform UI that the process is resumed
          super.resume();
          // Run proof
@@ -129,8 +135,6 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
            main.getMediator().startAutoMode(proof.openEnabledGoals());
            // Wait for interactive prover
            KeYUtil.waitWhileMainWindowIsFrozen(main);
-           // Inform UI that the process is suspended
-           suspend();
        }
        finally {
            if (task != null) {
@@ -145,7 +149,8 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
    @Override
    public boolean canSuspend() {
       return super.canSuspend() && 
-             MainWindow.getInstance().frozen; // Only if the auto mode is in progress
+             MainWindow.getInstance().frozen && // Only if the auto mode is in progress
+             MainWindow.getInstance().getMediator().getProof() == proof; // And the auto mode handles this proof
    }
 
    /**
@@ -153,14 +158,8 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
     */
    @Override
    public void suspend() throws DebugException {
-      if (!isDisconnected()) {
-         if (isSuspended()) {
-            MainWindow.getInstance().getMediator().stopAutoMode();
-         }
-         // Analyze proof
-         analyzeProof(proof);
-         // Inform UI that the process is suspended
-         super.suspend();
+      if (canSuspend()) {
+         MainWindow.getInstance().getMediator().stopAutoMode();
       }
    }
 
@@ -261,11 +260,30 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
    }
 
    /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void disconnect() throws DebugException {
+      // Remove auto mode listener
+      MainWindow.getInstance().getMediator().removeAutoModeListener(autoModeListener);
+      // Inform UI that the process is disconnected
+      super.disconnect();
+   }
+
+   /**
     * When the auto mode is started.
     * @param e The event.
     */
    protected void handleAutoModeStarted(ProofEvent e) {
-      fireResumeEvent(DebugEvent.RESUME); // Maybe disable resume button
+      try {
+         if (e.getSource() == proof) {
+            // Inform UI that the process is resumed
+            super.resume();
+         }
+      }
+      catch (DebugException exception) {
+         LogUtil.getLogger().logError(exception);
+      }
    }
 
    /**
@@ -273,6 +291,16 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
     * @param e The event.
     */
    protected void handleAutoModeStopped(ProofEvent e) {
-      fireResumeEvent(DebugEvent.RESUME); // Maybe enable resume button again
+      try {
+         if (e.getSource() == proof) {
+            // Analyze proof
+            analyzeProof(proof);
+            // Inform UI that the process is suspended
+            super.suspend();
+         }
+      }
+      catch (DebugException exception) {
+         LogUtil.getLogger().logError(exception);
+      }
    }
 }

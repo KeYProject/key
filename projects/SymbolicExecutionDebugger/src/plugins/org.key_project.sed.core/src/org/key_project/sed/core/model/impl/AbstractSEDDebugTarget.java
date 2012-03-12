@@ -243,7 +243,7 @@ public abstract class AbstractSEDDebugTarget extends DebugElement implements ISE
    @Override
    public void disconnect() throws DebugException {
       this.disconnected = true;
-      fireTerminateEvent();
+      fireTerminateEvent(); // Disconnected threads are treated as terminated by the Eclipse Debug API.
    }
 
    /**

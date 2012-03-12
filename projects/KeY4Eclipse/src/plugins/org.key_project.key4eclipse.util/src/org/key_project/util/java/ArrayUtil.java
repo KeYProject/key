@@ -210,4 +210,13 @@ public final class ArrayUtil {
        }
        return sb.toString();
    }
+
+   /**
+    * Checks if the given array is empty.
+    * @param array The array to check.
+    * @return {@code true} array is empty or {@code null}, {@code false} array is not empty.
+    */
+   public static <T> boolean isEmpty(T[] array) {
+      return array == null || array.length == 0;
+   }
 }

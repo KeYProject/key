@@ -17,4 +17,5 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: KeY Project
 Export-Package: org.key_project.sed.key.core.launch,
+ org.key_project.sed.key.core.model,
  org.key_project.sed.key.core.util

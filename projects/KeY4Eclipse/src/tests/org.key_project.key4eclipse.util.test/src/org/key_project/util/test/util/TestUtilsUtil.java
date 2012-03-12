@@ -717,4 +717,30 @@ public class TestUtilsUtil {
       item.widget.getDisplay().syncExec(run);
       return run.getResult();
    }
+
+   /**
+    * Selects the item in the tree that is defined by the path indices.
+    * @param debugTree The {@link SWTBotTree} to select a {@link SWTBotTreeItem} in.
+    * @param indexPathToItem The path to the item to select which consists of the path indices.
+    * @return The selected {@link SWTBotTreeItem}.
+    */
+   public static SWTBotTreeItem selectInTree(SWTBotTree debugTree, int... indexPathToItem) {
+      TestCase.assertNotNull(debugTree);
+      SWTBotTreeItem parent = null;
+      for (int index : indexPathToItem) {
+         SWTBotTreeItem[] items; 
+         if (parent == null) {
+            items = debugTree.getAllItems();
+         }
+         else {
+            items = parent.getItems();
+         }
+         TestCase.assertTrue(index >= 0);
+         TestCase.assertTrue(index < items.length);
+         parent = items[index];
+      }
+      TestCase.assertNotNull(parent);
+      parent.select();
+      return parent;
+   }
 }

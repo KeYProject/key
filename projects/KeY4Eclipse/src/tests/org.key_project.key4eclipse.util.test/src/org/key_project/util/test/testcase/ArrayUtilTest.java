@@ -14,6 +14,18 @@ import org.key_project.util.java.StringUtil;
  * @author Martin Hentschel
  */
 public class ArrayUtilTest extends TestCase {
+   /**
+    * Tests {@link ArrayUtil#isEmpty(Object[])}
+    */
+   @Test
+   public void testIsEmpty() {
+      assertTrue(ArrayUtil.isEmpty(null));
+      assertTrue(ArrayUtil.isEmpty(new String[] {}));
+      assertFalse(ArrayUtil.isEmpty(new String[] {"A"}));
+      assertFalse(ArrayUtil.isEmpty(new String[] {null}));
+      assertFalse(ArrayUtil.isEmpty(new String[] {"A", "B"}));
+   }
+   
     /**
      * Tests {@link ArrayUtil#toString(Object[], String)}
      */

@@ -9,9 +9,10 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.debug.ui;bundle-version="3.7.101",
  org.junit4;bundle-version="4.8.1",
  org.eclipse.swtbot.go;bundle-version="2.0.4",
+ org.key_project.util;bundle-version="1.0.0",
+ org.key_project.util.test;bundle-version="1.0.0",
  org.key_project.sed.core;bundle-version="1.0.0",
- org.key_project.sed.ui;bundle-version="1.0.0",
- org.key_project.util.test;bundle-version="1.0.0"
+ org.key_project.sed.ui;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: KeY Project
