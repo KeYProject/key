@@ -7,6 +7,7 @@ import org.eclipse.debug.core.model.IVariable;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDThread;
+import org.key_project.sed.core.model.ISourceNameProvider;
 
 /**
  * Provides a basic implementation of {@link ISEDDebugNode}s which
@@ -14,7 +15,7 @@ import org.key_project.sed.core.model.ISEDThread;
  * with the Eclipse debug API.
  * @author Martin Hentschel
  */
-public abstract class AbstractSEDStackFrameCompatibleDebugNode extends AbstractSEDDebugNode implements IStackFrame {
+public abstract class AbstractSEDStackFrameCompatibleDebugNode extends AbstractSEDDebugNode implements IStackFrame, ISourceNameProvider {
    /**
     * The {@link ISEDThread} in that this node is contained.
     */
@@ -25,6 +26,11 @@ public abstract class AbstractSEDStackFrameCompatibleDebugNode extends AbstractS
     */
    private String name;
    
+   /**
+    * The source name.
+    */
+   private String sourceName;
+
    /**
     * The line number.
     */
@@ -274,5 +280,35 @@ public abstract class AbstractSEDStackFrameCompatibleDebugNode extends AbstractS
     */
    protected void setCharEnd(int charEnd) {
       this.charEnd = charEnd;
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getSourceName() {
+      return sourceName;
+   }
+
+   /**
+    * Sets the source name.
+    * @param sourceName The source name to set.
+    */
+   public void setSourceName(String sourceName) {
+      this.sourceName = sourceName;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @SuppressWarnings("rawtypes")
+   @Override
+   public Object getAdapter(Class adapter) {
+      if (ISourceNameProvider.class.equals(adapter)) {
+         return this;
+      }
+      else {
+         return super.getAdapter(adapter);
+      }
    }
 }

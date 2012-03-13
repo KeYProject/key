@@ -2,6 +2,7 @@ package org.key_project.sed.key.core.test.suite;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
+import org.key_project.sed.key.core.test.testcase.KeYSourcePathComputerDelegateTest;
 import org.key_project.sed.key.core.test.testcase.KeySEDUtilTest;
 import org.key_project.sed.key.core.test.testcase.LogUtilTest;
 
@@ -12,6 +13,7 @@ import org.key_project.sed.key.core.test.testcase.LogUtilTest;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
     KeySEDUtilTest.class,
+    KeYSourcePathComputerDelegateTest.class,
     LogUtilTest.class
 })
 public class AllSEDKeYTests {

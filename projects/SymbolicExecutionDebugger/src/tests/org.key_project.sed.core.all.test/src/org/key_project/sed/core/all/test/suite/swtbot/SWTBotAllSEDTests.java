@@ -6,6 +6,7 @@ import org.key_project.key4eclipse.starter.core.test.suite.swtbot.SWTBotAllStart
 import org.key_project.key4eclipse.test.suite.swtbot.SWTBotAllKeY4EclipseTests;
 import org.key_project.sed.core.test.suite.swtbot.SWTBotAllSEDCoreTests;
 import org.key_project.sed.key.core.test.suite.swtbot.SWTBotAllSEDKeYTests;
+import org.key_project.sed.key.ui.test.suite.swtbot.SWTBotAllSEDKeYUITests;
 import org.key_project.util.test.suite.swtbot.SWTBotAllUtilTests;
 
 /**
@@ -27,7 +28,8 @@ import org.key_project.util.test.suite.swtbot.SWTBotAllUtilTests;
    SWTBotAllUtilTests.class,
    SWTBotAllStarterCoreTests.class,
    SWTBotAllSEDCoreTests.class,
-   SWTBotAllSEDKeYTests.class
+   SWTBotAllSEDKeYTests.class,
+   SWTBotAllSEDKeYUITests.class
 })
 public class SWTBotAllSEDTests {
 }

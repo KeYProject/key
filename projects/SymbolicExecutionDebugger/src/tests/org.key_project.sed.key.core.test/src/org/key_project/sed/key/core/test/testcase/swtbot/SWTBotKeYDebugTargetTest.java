@@ -194,17 +194,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
          assertFalse(target.isSuspended());
          assertFalse(target.isTerminated());
          // Suspend launch
-         item.contextMenu("Suspend").click();
-         TestSedCoreUtil.waitUntilDebugTargetCanResume(bot, target); // wait until the target is suspended.
-         assertTrue(launch.canTerminate());
-         assertFalse(launch.isTerminated());
-         assertTrue(target.canDisconnect());
-         assertTrue(target.canResume());
-         assertFalse(target.canSuspend());
-         assertTrue(target.canTerminate());
-         assertFalse(target.isDisconnected());
-         assertTrue(target.isSuspended());
-         assertFalse(target.isTerminated());
+         TestSedCoreUtil.suspend(bot, target);
          // Make sure that the execution tree is not completed
          AssertionFailedError caughtError = null;
          try {

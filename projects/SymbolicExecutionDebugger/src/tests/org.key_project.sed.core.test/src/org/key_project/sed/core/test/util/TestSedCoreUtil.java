@@ -2,6 +2,7 @@ package org.key_project.sed.core.test.util;
 
 import junit.framework.TestCase;
 
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
@@ -9,8 +10,18 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.model.IDebugTarget;
+import org.eclipse.debug.core.model.IStackFrame;
+import org.eclipse.debug.internal.ui.DebugUIPlugin;
+import org.eclipse.debug.internal.ui.DelegatingModelPresentation;
+import org.eclipse.debug.internal.ui.InstructionPointerManager;
 import org.eclipse.debug.ui.DebugUITools;
+import org.eclipse.debug.ui.IDebugModelPresentation;
 import org.eclipse.debug.ui.IDebugUIConstants;
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.Position;
+import org.eclipse.jface.text.source.Annotation;
+import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
@@ -21,6 +32,11 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.texteditor.IDocumentProvider;
+import org.eclipse.ui.texteditor.ITextEditor;
 import org.key_project.sed.core.model.ISEDBranchCondition;
 import org.key_project.sed.core.model.ISEDBranchNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
@@ -38,6 +54,7 @@ import org.key_project.util.test.util.TestUtilsUtil;
  * Provides static methods that makes testing easier
  * @author Martin Hentschel
  */
+@SuppressWarnings("restriction")
 public final class TestSedCoreUtil {
    /**
     * The ID of the fixed example launch configuration type.
@@ -503,7 +520,7 @@ public final class TestSedCoreUtil {
          public String getFailureMessage() {
             return "ISEDDebugTarget \"" + target + "\" can not suspend.";
          }
-      }, SWTBotPreferences.TIMEOUT, 1); // Delay must be very short because otherwise it is possible that the auto mode has finished between checks which results in a timeout exception.
+      }, SWTBotPreferences.TIMEOUT, 0); // Delay must be very short because otherwise it is possible that the auto mode has finished between checks which results in a timeout exception.
    }
 
    /**
@@ -529,5 +546,94 @@ public final class TestSedCoreUtil {
             return "ISEDDebugTarget \"" + target + "\" can not resume.";
          }
       });
+   }
+
+   /**
+    * Makes sure that the correct {@link IEditorPart} was opened by the 
+    * Eclipse Debug API.
+    * @param currentEditorPart The current {@link IEditorPart} to test.
+    * @param expectedResource The expected {@link IResource}.
+    * @param target The {@link IDebugTarget} to use.
+    * @param frame The {@link IStackFrame} to test.
+    * @throws PartInitException Occurred Exception.
+    */
+   public static void assertDebugEditor(IEditorPart currentEditorPart, 
+                                        IResource expectedResource,
+                                        IDebugTarget target, 
+                                        IStackFrame frame) throws PartInitException {
+      IDebugModelPresentation presentation = ((DelegatingModelPresentation)DebugUIPlugin.getModelPresentation()).getPresentation(target.getModelIdentifier());
+      Object sourceElement = target.getLaunch().getSourceLocator().getSourceElement(frame);
+      TestCase.assertEquals(expectedResource, sourceElement);
+      IEditorInput expectedInput = presentation.getEditorInput(sourceElement);
+      TestCase.assertEquals(expectedInput, currentEditorPart.getEditorInput());
+      String expectedId = presentation.getEditorId(expectedInput, frame);
+      TestCase.assertEquals(expectedId, currentEditorPart.getEditorSite().getId());
+      TestCase.assertEquals(expectedResource, currentEditorPart.getEditorInput().getAdapter(IResource.class));
+   }
+   
+   /**
+    * Makes sure that the given {@link IEditorPart} is an {@link ITextEditor}
+    * which has a {@link Annotation} for the given {@link IStackFrame}.
+    * For more details have a look at class {@link InstructionPointerManager}.
+    * @param editorPart The {@link IEditorPart} to test.
+    * @param frame The {@link IStackFrame} that should have an annotation.
+    * @throws CoreException Occurred Exception.
+    * @throws BadLocationException Occurred Exception.
+    */
+   public static void assertDebugCodeAnnotation(IEditorPart editorPart, IStackFrame frame) throws CoreException, BadLocationException {
+      TestCase.assertTrue(editorPart instanceof ITextEditor);
+      IEditorInput input = editorPart.getEditorInput();
+      ITextEditor textEditor = (ITextEditor)editorPart;
+      IDocumentProvider provider = textEditor.getDocumentProvider();
+      try {
+         provider.connect(input);
+         IDocument document = provider.getDocument(editorPart.getEditorInput());
+         IAnnotationModel annotationModel = provider.getAnnotationModel(editorPart.getEditorInput());
+         Annotation annotation = ((DelegatingModelPresentation)DebugUIPlugin.getModelPresentation()).getInstructionPointerAnnotation(editorPart, frame);
+         TestCase.assertNotNull(annotation);
+         Position position = annotationModel.getPosition(annotation);
+         TestCase.assertNotNull(position);
+         if (frame.getCharStart() >= 0) {
+            TestCase.assertEquals(frame.getCharStart(), position.getOffset());
+            TestCase.assertEquals(frame.getCharEnd() - frame.getCharStart(), position.getLength());
+         }
+         else {
+            TestCase.assertEquals(frame.getLineNumber() - 1, document.getLineOfOffset(position.getOffset()));
+         }
+      }
+      finally {
+         provider.disconnect(input);
+      }
+   }
+
+   /**
+    * Suspends the given {@link ISEDDebugTarget} as soon as possible.
+    * @param bot The {@link SWTWorkbenchBot} to use.
+    * @param target The {@link ISEDDebugTarget} to suspend.
+    */
+   public static void suspend(SWTWorkbenchBot bot, final ISEDDebugTarget target) {
+      TestCase.assertNotNull(bot);
+      TestCase.assertNotNull(target);
+      bot.waitUntil(new ICondition() {
+         @Override
+         public synchronized boolean test() throws Exception {
+            if (target.canSuspend()) {
+               target.suspend();
+               return true;
+            }
+            else {
+               return false;
+            }
+         }
+         
+         @Override
+         public void init(SWTBot bot) {
+         }
+         
+         @Override
+         public String getFailureMessage() {
+            return "ISEDDebugTarget \"" + target + "\" can not suspend.";
+         }
+      }, SWTBotPreferences.TIMEOUT, 0); // Delay must be very short because otherwise it is possible that the auto mode has finished between checks which results in a timeout exception.
    }
 }

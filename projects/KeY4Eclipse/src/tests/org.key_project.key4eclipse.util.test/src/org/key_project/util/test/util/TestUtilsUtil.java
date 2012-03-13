@@ -34,6 +34,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
@@ -736,11 +737,73 @@ public class TestUtilsUtil {
             items = parent.getItems();
          }
          TestCase.assertTrue(index >= 0);
-         TestCase.assertTrue(index < items.length);
+         TestCase.assertTrue("Index " + index + " is not smaler as max index " + items.length, index < items.length);
          parent = items[index];
       }
       TestCase.assertNotNull(parent);
       parent.select();
       return parent;
+   }
+
+   /**
+    * Waits until an active editor is available.
+    * @param bot The {@link SWTWorkbenchBot} to use.
+    * @return The active {@link SWTBotEditor}.
+    */
+   public static SWTBotEditor waitForEditor(SWTWorkbenchBot bot) {
+      WaitForEditorCondition wait = new WaitForEditorCondition();
+      bot.waitUntil(wait);
+      return wait.getEditor();
+   }
+   
+   /**
+    * Waits until an active editor is available.
+    * @author Martin Hentschel
+    */
+   private static class WaitForEditorCondition implements ICondition {
+      /**
+       * The used {@link SWTBot}.
+       */
+      private SWTBot bot;
+
+      /**
+       * The found active editor.
+       */
+      private SWTBotEditor editor;
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean test() throws Exception {
+         if (bot instanceof SWTWorkbenchBot) {
+            editor = ((SWTWorkbenchBot)bot).activeEditor();
+         }
+         return editor != null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void init(SWTBot bot) {
+         this.bot = bot;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getFailureMessage() {
+         return "No editor available.";
+      }
+
+      /**
+       * The found active editor.
+       * @return The found editor.
+       */
+      public SWTBotEditor getEditor() {
+         return editor;
+      }
    }
 }

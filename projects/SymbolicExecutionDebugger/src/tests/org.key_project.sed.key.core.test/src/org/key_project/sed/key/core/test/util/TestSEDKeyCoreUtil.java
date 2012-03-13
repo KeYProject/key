@@ -145,23 +145,17 @@ public final class TestSEDKeyCoreUtil {
       // Create statement 1
       SEDMemoryStatement s1 = new SEDMemoryStatement(target, thread, thread);
       s1.setName("int x = 1;");
-      s1.setCharEnd(26);
-      s1.setCharStart(64);
-      s1.setLineNumber(15);
+      s1.setLineNumber(16);
       thread.addChild(s1);
       // Create statement 2
       SEDMemoryStatement s2 = new SEDMemoryStatement(target, s1, thread);
       s2.setName("int y = 2;");
-      s2.setCharEnd(26);
-      s2.setCharStart(26);
-      s2.setLineNumber(16);
+      s2.setLineNumber(17);
       s1.addChild(s2);
       // Create statement 3
       SEDMemoryStatement s3 = new SEDMemoryStatement(target, s2, thread);
       s3.setName("int z = 3;");
-      s3.setCharEnd(26);
-      s3.setCharStart(26);
-      s3.setLineNumber(17);
+      s3.setLineNumber(18);
       s2.addChild(s3);
       return target;
    }

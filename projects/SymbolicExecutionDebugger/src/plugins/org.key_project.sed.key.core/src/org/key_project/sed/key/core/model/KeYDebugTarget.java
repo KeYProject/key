@@ -1,5 +1,6 @@
 package org.key_project.sed.key.core.model;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -224,10 +225,11 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
    protected ISEDDebugNode createNode(SourceElement statement, PositionInfo posInfo) {
       SEDMemoryStatement newNode = new SEDMemoryStatement(getDebugTarget(), thread, thread);
       newNode.setName(statement.toString());
-      newNode.setLineNumber(posInfo.getStartPosition().getLine());
-      newNode.setCharStart(posInfo.getStartPosition().getColumn());
-      if (posInfo.getEndPosition() != Position.UNDEFINED) {
-         newNode.setCharEnd(posInfo.getEndPosition().getColumn());
+      if (posInfo.getEndPosition() != null) {
+         newNode.setLineNumber(posInfo.getEndPosition().getLine());
+      }
+      if (posInfo.getFileName() != null) {
+         newNode.setSourceName(new File(posInfo.getFileName()).getName());
       }
       return newNode;
    }
