@@ -107,7 +107,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
          assertTrue(target.isSuspended());
          assertFalse(target.isTerminated());
          // Make sure that the debug target is in the initial state.
-         TestSEDKeyCoreUtil.assertInitialTarget(target);
+         TestSEDKeyCoreUtil.assertInitialTarget(target, TestSEDKeyCoreUtil.STATEMENT_TARGET_NAME);
          // Disconnect
          SWTBotTreeItem item = TestUtilsUtil.selectInTree(debugTree, pathToElementInDebugTreeWhichProvidesDisconnectMenuItem); // Select first debug target
          item.contextMenu("Disconnect").click();
@@ -125,7 +125,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
          MainWindow.getInstance().getMediator().startAutoMode();
          KeYUtil.waitWhileMainWindowIsFrozen(MainWindow.getInstance());
          // Test the unmodified execution tree
-         TestSEDKeyCoreUtil.assertInitialTarget(target);
+         TestSEDKeyCoreUtil.assertInitialTarget(target, TestSEDKeyCoreUtil.STATEMENT_TARGET_NAME);
       }
       finally {
          // Restore timeout
@@ -179,7 +179,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
          assertTrue(target.isSuspended());
          assertFalse(target.isTerminated());
          // Make sure that the debug target is in the initial state.
-         TestSEDKeyCoreUtil.assertInitialTarget(target);
+         TestSEDKeyCoreUtil.assertInitialTarget(target, TestSEDKeyCoreUtil.STATEMENT_TARGET_NAME);
          // Resume launch
          SWTBotTreeItem item = TestUtilsUtil.selectInTree(debugTree, 0, 0); // Select first debug target
          item.contextMenu("Resume").click();
@@ -291,7 +291,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
          assertTrue(target.isSuspended());
          assertFalse(target.isTerminated());
          // Make sure that the debug target is in the initial state.
-         TestSEDKeyCoreUtil.assertInitialTarget(target);
+         TestSEDKeyCoreUtil.assertInitialTarget(target, TestSEDKeyCoreUtil.STATEMENT_TARGET_NAME);
          // Resume launch
          SWTBotTreeItem item = TestUtilsUtil.selectInTree(debugTree, 0, 0); // Select first debug target
          item.contextMenu("Resume").click();

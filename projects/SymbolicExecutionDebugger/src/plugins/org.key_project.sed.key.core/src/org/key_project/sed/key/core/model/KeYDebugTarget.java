@@ -40,6 +40,11 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
    public static final String DEFAULT_THREAD_NAME = "KeY Default Thread";
    
    /**
+    * The used model identifier.
+    */
+   public static final String MODEL_IDENTIFIER = "org.key_project.sed.key.core";
+   
+   /**
     * The proof in KeY to tread.
     */
    private Proof proof;
@@ -80,7 +85,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       Assert.isNotNull(proof);
       this.proof = proof;
       // Update initial model
-      setModelIdentifier("org.key_project.sed.key.core");
+      setModelIdentifier(MODEL_IDENTIFIER);
       setName(proof.name() != null ? proof.name().toString() : "Unnamed");
       thread = new SEDMemoryThread(getDebugTarget());
       thread.setName(DEFAULT_THREAD_NAME);
