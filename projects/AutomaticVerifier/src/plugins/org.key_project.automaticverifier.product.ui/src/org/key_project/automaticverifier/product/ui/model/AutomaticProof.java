@@ -8,8 +8,6 @@ import org.key_project.util.java.thread.AbstractRunnableWithResult;
 import org.key_project.util.java.thread.IRunnableWithResult;
 
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.notification.NotificationEventID;
-import de.uka.ilkd.key.gui.notification.NotificationTask;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
@@ -159,69 +157,46 @@ public class AutomaticProof extends Bean {
      * @throws Exception Occurred Exception.
      */
     public void startProof() throws Exception {
-        // Check if it is required to start a task
-        if (proof == null) {
-            NotificationTask task = null;
-            MainWindow main = null;
-            try {
-                // Create proof if required
-                if (proof == null) {
-                    IRunnableWithResult<Proof> run = new AbstractRunnableWithResult<Proof>() {
-                        @Override
-                        public void run() {
-                            try {
-                                ProofOblInput input = contract.createProofObl(initConfig, contract);
-                                Assert.isNotNull(input);
-                                Assert.isTrue(MainWindow.hasInstance());
-                                MainWindow main = MainWindow.getInstance();
-                                Assert.isNotNull(main);
-                                ProblemInitializer init = main.createProblemInitializer();
-                                Assert.isNotNull(init);
-                                Proof proof = init.startProver(initConfig, input);
-                                Assert.isNotNull(proof);
-                                setResult(proof);
-                            }
-                            catch (Exception e) {
-                                setException(e);
-                            }
-                        }
-                    };
-                    SwingUtil.invokeAndWait(run);
-                    if (run.getException() != null) {
-                        throw run.getException();
-                    }
-                    proof = run.getResult();
-                    proof.addProofTreeListener(new ProofTreeAdapter() {
-                        @Override
-                        public void proofClosed(ProofTreeEvent e) {
-                            handleProofClosed(e);
-                        }
-                    });
-                    setResult(AutomaticProofResult.OPEN);
-                }
-                // Get main window
-                Assert.isTrue(MainWindow.hasInstance());
-                main = MainWindow.getInstance();
-                Assert.isNotNull(main);
-                // Deactivate proof closed dialog
-                task = main.getNotificationManager().getNotificationTask(NotificationEventID.PROOF_CLOSED);
-                if (task != null) {
-                    main.getNotificationManager().removeNotificationTask(task);
-                }
-                // Start interactive proof automatically
-                proofStartTime = System.currentTimeMillis();
-                main.getMediator().startAutoMode(proof.openEnabledGoals());
-                // Wait for interactive prover
-                KeYUtil.waitWhileMainWindowIsFrozen(main);
-                // Update statistics
-                updateStatistics();
-            }
-            finally {
-                if (main != null && task != null) {
-                    main.getNotificationManager().addNotificationTask(task);
-                }            
-            }
-        }
+       // Make sure that the proof was not executed before.
+       if (proof == null) {
+           IRunnableWithResult<Proof> run = new AbstractRunnableWithResult<Proof>() {
+               @Override
+               public void run() {
+                   try {
+                       ProofOblInput input = contract.createProofObl(initConfig, contract);
+                       Assert.isNotNull(input);
+                       Assert.isTrue(MainWindow.hasInstance());
+                       MainWindow main = MainWindow.getInstance();
+                       Assert.isNotNull(main);
+                       ProblemInitializer init = main.createProblemInitializer();
+                       Assert.isNotNull(init);
+                       Proof proof = init.startProver(initConfig, input);
+                       Assert.isNotNull(proof);
+                       setResult(proof);
+                   }
+                   catch (Exception e) {
+                       setException(e);
+                   }
+               }
+           };
+           SwingUtil.invokeAndWait(run);
+           if (run.getException() != null) {
+               throw run.getException();
+           }
+           proof = run.getResult();
+           proof.addProofTreeListener(new ProofTreeAdapter() {
+               @Override
+               public void proofClosed(ProofTreeEvent e) {
+                   handleProofClosed(e);
+               }
+           });
+           setResult(AutomaticProofResult.OPEN);
+           // Start interactive proof automatically
+           proofStartTime = System.currentTimeMillis();
+           KeYUtil.runProofInAutomaticModeWithoutResultDialog(proof);
+           // Update statistics
+           updateStatistics();
+       }
     }
 
     /**

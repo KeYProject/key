@@ -33,10 +33,14 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofManagementDialog;
+import de.uka.ilkd.key.gui.notification.NotificationEventID;
+import de.uka.ilkd.key.gui.notification.NotificationTask;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.ProblemLoader;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -45,6 +49,8 @@ import de.uka.ilkd.key.proof.mgt.EnvNode;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.TaskTreeModel;
 import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
+import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.rule.RuleApp;
 
 /**
  * <p>
@@ -520,6 +526,10 @@ public final class KeYUtil {
        return model.getChildCount(model.getRoot()) == 0;
     }
     
+    /**
+     * Blocks the current {@link Thread} while the {@link MainWindow} is frozen.
+     * @param main The {@link MainWindow} to wait for.
+     */
     public static void waitWhileMainWindowIsFrozen(MainWindow main) {
         // Wait for interactive prover
         while (main.frozen) {
@@ -530,5 +540,56 @@ public final class KeYUtil {
                 // Nothing to do
             }
         }
+    }
+    
+    /**
+     * Returns the name of the applied rule in the given {@link Node} of
+     * the proof tree in KeY.
+     * @param node The given {@link Node}.
+     * @return The display name of the applied rule in the given {@link Node} or {@code null} if no one exists.
+     */
+    public static String getRuleDisplayName(Node node) {
+       String name = null;
+       if (node != null) {
+          RuleApp ruleApp = node.getAppliedRuleApp();
+          if (ruleApp != null) {
+             Rule rule = ruleApp.rule();
+             if (rule != null) {
+                name = rule.displayName();
+             }
+          }
+       }
+       return name;
+    }
+
+    /**
+     * Tries to close the given {@link Proof} in KeY with the automatic mode.
+     * The current {@link Thread} is blocked until the automatic mode has finished.
+     * The result dialog with the statistics is not shown to the user.
+     * @param proof The {@link Proof} to close.
+     */
+    public static void runProofInAutomaticModeWithoutResultDialog(Proof proof) {
+       // Make sure that main window is available.
+       Assert.isTrue(MainWindow.hasInstance(), "KeY main window is not available.");
+       MainWindow main = MainWindow.getInstance();
+       Assert.isNotNull(main, "KeY main window is not available.");
+       // Run proof
+       NotificationTask task = null;
+       try {
+          // Deactivate proof closed dialog
+          task = main.getNotificationManager().getNotificationTask(NotificationEventID.PROOF_CLOSED);
+          if (task != null) {
+              main.getNotificationManager().removeNotificationTask(task);
+          }
+          // Start interactive proof automatically
+          main.getMediator().startAutoMode(proof.openEnabledGoals());
+          // Wait for interactive prover
+          KeYUtil.waitWhileMainWindowIsFrozen(main);
+      }
+      finally {
+          if (task != null) {
+              main.getNotificationManager().addNotificationTask(task);
+          }
+      }
     }
 }

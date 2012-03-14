@@ -2,6 +2,8 @@ package org.key_project.key4eclipse.starter.core.test.testcase.swtbot;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.util.LinkedList;
+import java.util.List;
 
 import junit.framework.TestCase;
 
@@ -15,6 +17,7 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.Signature;
 import org.junit.Test;
 import org.key_project.key4eclipse.starter.core.test.Activator;
+import org.key_project.key4eclipse.starter.core.test.util.TestStarterCoreUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.swtbot.swing.bot.SwingBot;
 import org.key_project.swtbot.swing.bot.SwingBotJDialog;
@@ -26,14 +29,103 @@ import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Node.NodeIterator;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 
 /**
  * SWT Bot tests for {@link KeYUtil}.
  * @author Martin Hentschel
  */
-public class SWTBotKeYUtilTest extends TestCase {
-    /**
+public class SWTBotKeYUtilTest extends TestCase {   
+   /**
+    * Tests {@link KeYUtil#getRuleDisplayName(de.uka.ilkd.key.proof.Node)}.
+    */
+   @Test
+   public void testGetRuleDisplayName() throws Exception {
+      try {
+         // Test null
+         assertNull(KeYUtil.getRuleDisplayName(null));
+         // Create test project
+         IJavaProject project = TestUtilsUtil.createJavaProject("KeYUtilTest_testGetRuleDisplayName");
+         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/statements", project.getProject().getFolder("src"));
+         // Get method
+         IMethod method = TestUtilsUtil.getJdtMethod(project, "FlatSteps", "doSomething", "I", "QString;", "Z");
+         // Instantiate proof and try to close it in automatic mode
+         Proof proof = TestStarterCoreUtil.instantiateProofWithGeneratedContract(method);
+         KeYUtil.runProofInAutomaticModeWithoutResultDialog(proof);
+         // Collect applied rule names
+         List<String> ruleNames = collectRuleNames(proof);
+         assertTrue(ruleNames.contains("methodCallEmpty"));
+      }
+      finally {
+         // Remove proof
+         KeYUtil.clearProofList(MainWindow.getInstance());
+         TestCase.assertTrue(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
+         // Close main window
+         TestUtilsUtil.keyCloseMainWindow();
+      }
+   }
+   
+   /**
+    * Collects all display names of the applied rules in the given {@link Proof}.
+    * @param proof The {@link Proof}.
+    * @return The found rule display names.
+    */
+   protected List<String> collectRuleNames(Proof proof) {
+      return collectRuleNames(proof.root());
+   }
+   
+   /**
+    * Tests {@link KeYUtil#runProofInAutomaticModeWithoutResultDialog(Proof)}.
+    */
+   @Test
+   public void testRunProofInAutomaticModeWithoutResultDialog() throws Exception {
+      try {
+         // Test null
+         assertNull(KeYUtil.getRuleDisplayName(null));
+         // Create test project
+         IJavaProject project = TestUtilsUtil.createJavaProject("KeYUtilTest_testRunProofInAutomaticModeWithoutResultDialog");
+         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/statements", project.getProject().getFolder("src"));
+         // Get method
+         IMethod method = TestUtilsUtil.getJdtMethod(project, "FlatSteps", "doSomething", "I", "QString;", "Z");
+         // Instantiate proof and try to close it in automatic mode
+         Proof proof = TestStarterCoreUtil.instantiateProofWithGeneratedContract(method);
+         assertFalse(proof.closed());
+         // Close proof in automatic mode
+         KeYUtil.runProofInAutomaticModeWithoutResultDialog(proof);
+         // Make sure that the proof is closed
+         assertTrue(proof.closed());
+      }
+      finally {
+         // Remove proof
+         KeYUtil.clearProofList(MainWindow.getInstance());
+         TestCase.assertTrue(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
+         // Close main window
+         TestUtilsUtil.keyCloseMainWindow();
+      }
+   }
+
+   /**
+    * Collects all display names of the applied rules in the given {@link Node}.
+    * @param proof The {@link Node}.
+    * @return The found rule display names.
+    */
+   protected List<String> collectRuleNames(Node node) {
+      List<String> result = new LinkedList<String>();
+      String nodeName = KeYUtil.getRuleDisplayName(node);
+      if (nodeName != null) {
+         result.add(nodeName);
+      }
+      NodeIterator iter = node.childrenIterator();
+      while (iter.hasNext()) {
+         result.addAll(collectRuleNames(iter.next()));
+      }
+      return result;
+   }
+
+   /**
      * Tests {@link KeYUtil#showErrorInKey(Throwable)}.
      */
     @Test
