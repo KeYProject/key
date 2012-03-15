@@ -15,7 +15,7 @@ import org.key_project.sed.core.model.impl.AbstractSEDMethodCall;
  * information in the memory.
  * @author Martin Hentschel
  */
-public class SEDMemoryMethodCall extends AbstractSEDMethodCall implements ISEDMemoryStackFrameCompatibleDebugNode {
+public class SEDMemoryMethodCall extends AbstractSEDMethodCall implements ISEDMemoryStackFrameCompatibleDebugNode, ISEDMemoryDebugNode {
    /**
     * The contained child nodes.
     */
@@ -42,9 +42,9 @@ public class SEDMemoryMethodCall extends AbstractSEDMethodCall implements ISEDMe
    }
    
    /**
-    * Adds a new {@link ISEDDebugNode} child node.
-    * @param child The {@link ISEDDebugNode} to add.
+    * {@inheritDoc}
     */
+   @Override
    public void addChild(ISEDDebugNode child) {
       if (child != null) {
          children.add(child);

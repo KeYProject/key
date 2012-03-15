@@ -25,7 +25,7 @@ public abstract class AbstractSEDStackFrameCompatibleDebugNode extends AbstractS
     * The name of this debug node.
     */
    private String name;
-   
+
    /**
     * The source name.
     */
@@ -309,6 +309,19 @@ public abstract class AbstractSEDStackFrameCompatibleDebugNode extends AbstractS
       }
       else {
          return super.getAdapter(adapter);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String toString() {
+      try {
+         return getName();
+      }
+      catch (DebugException e) {
+         return e.getMessage();
       }
    }
 }

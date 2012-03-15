@@ -6,6 +6,7 @@ import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.IDebugElement;
 import org.eclipse.debug.core.model.IDebugTarget;
@@ -24,6 +25,8 @@ import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.ISEDStatement;
 import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.core.model.ISEDThread;
+import org.key_project.sed.core.model.memory.ISEDMemoryDebugNode;
+import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
 import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
 import org.key_project.sed.core.model.memory.SEDMemoryMethodCall;
 import org.key_project.sed.core.model.memory.SEDMemoryMethodReturn;
@@ -32,6 +35,7 @@ import org.key_project.sed.core.model.memory.SEDMemoryTermination;
 import org.key_project.sed.core.model.memory.SEDMemoryThread;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
 import org.key_project.sed.key.core.util.KeySEDUtil;
+import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithException;
 import org.key_project.util.java.thread.IRunnableWithException;
 
@@ -44,6 +48,31 @@ public final class TestSEDKeyCoreUtil {
     * The name of the {@link ISEDDebugTarget} used in the flat list example.
     */
    public static final String STATEMENT_TARGET_NAME = "JML normal_behavior operation contract [id: -2147483648 / FlatSteps::doSomething]";
+   
+   /**
+    * The name of the {@link ISEDDebugTarget} used in the method call hierarchy example.
+    */
+   public static final String METHOD_CALL_HIERARCHY_TARGET_NAME = "JML normal_behavior operation contract [id: -2147483648 / MethodHierarchyCallTest::main]";
+   
+   /**
+    * The name of the {@link ISEDDebugTarget} used in the method call hierarchy with exception example.
+    */
+   public static final String METHOD_CALL_HIERARCHY_WITH_EXCEPTION_TARGET_NAME = "JML normal_behavior operation contract [id: -2147483648 / MethodHierarchyCallWithExceptionTest::main]";
+
+   /**
+    * The name of the {@link ISEDDebugTarget} used in the method call parallel example.
+    */
+   public static final String METHOD_CALL_PARALLEL_TARGET_NAME = "JML normal_behavior operation contract [id: -2147483648 / MethodCallParallelTest::main]";
+
+   /**
+    * The name of the {@link ISEDDebugTarget} used in the method call on object example.
+    */
+   public static final String METHOD_CALL_ON_OBJECT_TARGET_NAME = "JML normal_behavior operation contract [id: -2147483648 / MethodCallOnObject::main]";
+
+   /**
+    * The name of the {@link ISEDDebugTarget} used in the method call with exception on object example.
+    */
+   public static final String METHOD_CALL_ON_OBJECT_WITH_EXCEPTION_TARGET_NAME = "JML normal_behavior operation contract [id: -2147483648 / MethodCallOnObjectWithException::main]";
    
    /**
     * Forbid instances.
@@ -111,14 +140,8 @@ public final class TestSEDKeyCoreUtil {
     * @return The created expected model.
     */
    public static ISEDDebugTarget createExpectedInitialModel(String targetName) {
-      // Create target
-      SEDMemoryDebugTarget target = new SEDMemoryDebugTarget(null);
-      target.setModelIdentifier(KeYDebugTarget.MODEL_IDENTIFIER);
-      target.setName(targetName);
-      // Create thread
-      SEDMemoryThread thread = new SEDMemoryThread(target);
-      thread.setName(KeYDebugTarget.DEFAULT_THREAD_NAME);
-      target.addSymbolicThread(thread);
+      SEDMemoryDebugTarget target = appendDebugTarget(targetName);
+      appendThread(target);
       return target;
    }
    
@@ -138,41 +161,340 @@ public final class TestSEDKeyCoreUtil {
     */
    public static ISEDDebugTarget createExpectedStatementModel() {
       // Create target
+      SEDMemoryDebugTarget target = appendDebugTarget(STATEMENT_TARGET_NAME);
+      // Create thread
+      SEDMemoryThread thread = appendThread(target);
+      // Create method call
+      SEDMemoryMethodCall call = appendMethodCall(target, thread, thread, "self.doSomething(_asdf,_a,_b);");
+      // Create statement 1
+      SEDMemoryStatement s1 = appendStatement(target, call, thread, "int x = 1;", 16);
+      // Create statement 2
+      SEDMemoryStatement s2 = appendStatement(target, s1, thread, "int y = 2;", 17);
+      // Create statement 3
+      SEDMemoryStatement s3 = appendStatement(target, s2, thread, "int z = 3;", 18);
+      // Create method return
+      SEDMemoryMethodReturn ret = appendMethodReturn(target, s3, thread, "self.doSomething(_asdf,_a,_b);");
+      // Create termination
+      appendTermination(target, ret, thread);
+      return target;
+   }
+
+   /**
+    * Creates the expected {@link ISEDDebugTarget} for the method call on object example.
+    * @return The expected {@link ISEDDebugTarget}.
+    */
+   public static ISEDDebugTarget createExpectedMethodCallOnObjectModel() {
+      SEDMemoryDebugTarget target = appendDebugTarget(METHOD_CALL_ON_OBJECT_TARGET_NAME);
+      SEDMemoryThread thread = appendThread(target);
+      SEDMemoryMethodCall callMain = appendMethodCall(target, thread, thread, "MethodCallOnObject.main();");
+      SEDMemoryStatement mainS1 = appendStatement(target, callMain, thread, "MethodCallOnObject x = new MethodCallOnObject ();", 4);
+      SEDMemoryBranchCondition b1 = appendBranchCondition(target, mainS1, thread, "Normal Execution (m != null)");
+      SEDMemoryStatement mainS2 = appendStatement(target, b1, thread, "return x.doSomething();", 5);
+      SEDMemoryBranchCondition b2 = appendBranchCondition(target, mainS2, thread, "Normal Execution (x != null)");
+      SEDMemoryMethodCall callDo = appendMethodCall(target, b2, thread, "x.doSomething();");
+      SEDMemoryStatement doS = appendStatement(target, callDo, thread, "return 42;", 9);
+      SEDMemoryMethodReturn doReturn = appendMethodReturn(target, doS, thread, "x.doSomething();");
+      SEDMemoryMethodReturn mainReturn = appendMethodReturn(target, doReturn, thread, "MethodCallOnObject.main();");
+      appendTermination(target, mainReturn, thread);
+      return target;
+   }
+
+   /**
+    * Creates the expected {@link ISEDDebugTarget} for the method call on object with exception example.
+    * @return The expected {@link ISEDDebugTarget}.
+    */   
+   public static ISEDDebugTarget createExpectedMethodCallOnObjectWithExceptionModel() {
+      SEDMemoryDebugTarget target = appendDebugTarget(METHOD_CALL_ON_OBJECT_WITH_EXCEPTION_TARGET_NAME);
+      SEDMemoryThread thread = appendThread(target);
+      SEDMemoryMethodCall callMain = appendMethodCall(target, thread, thread, "MethodCallOnObjectWithException.main();");
+      SEDMemoryStatement mainS1 = appendStatement(target, callMain, thread, "MethodCallOnObjectWithException x = new MethodCallOnObjectWithException ();", 5);
+      SEDMemoryBranchCondition b1 = appendBranchCondition(target, mainS1, thread, "Normal Execution (m != null)");
+      SEDMemoryStatement mainS2 = appendStatement(target, b1, thread, "return x.doSomething();", 6);
+      SEDMemoryBranchCondition b2 = appendBranchCondition(target, mainS2, thread, "Normal Execution (x != null)");
+      SEDMemoryMethodCall callDo = appendMethodCall(target, b2, thread, "x.doSomething();");
+      SEDMemoryStatement doS1 = appendStatement(target, callDo, thread, "MethodCallOnObjectWithException x = null;", 15);
+      SEDMemoryStatement doS2 = appendStatement(target, doS1, thread, "return x_3.return42();", 16);
+      SEDMemoryBranchCondition b3 = appendBranchCondition(target, doS2, thread, "Null Reference (x_3 = null)");
+      SEDMemoryBranchCondition b4 = appendBranchCondition(target, b3, thread, "Post (NullPointerException)");
+      SEDMemoryBranchCondition b5 = appendBranchCondition(target, b4, thread, "if x_5 false");
+      SEDMemoryBranchCondition b6 = appendBranchCondition(target, b5, thread, "Normal Execution (n instanceof NullPointerException)");
+      SEDMemoryStatement mainS3 = appendStatement(target, b6, thread, "MethodCallOnObjectWithException y = new MethodCallOnObjectWithException ();", 9);
+      SEDMemoryBranchCondition b7 = appendBranchCondition(target, mainS3, thread, "Normal Execution (m_3 != null)");
+      SEDMemoryStatement mainS4 = appendStatement(target, b7, thread, "return y.return42();", 10);
+      SEDMemoryBranchCondition b8 = appendBranchCondition(target, mainS4, thread, "Normal Execution (y != null)");
+      SEDMemoryMethodCall call42 = appendMethodCall(target, b8, thread, "y.return42();");
+      SEDMemoryStatement return42S = appendStatement(target, call42, thread, "return 42;", 20);
+      SEDMemoryMethodReturn call42Return = appendMethodReturn(target, return42S, thread, "y.return42();");
+      SEDMemoryMethodReturn mainReturn = appendMethodReturn(target, call42Return, thread, "MethodCallOnObjectWithException.main();");
+      appendTermination(target, mainReturn, thread);
+      return target;
+   }
+
+   /**
+    * Creates the expected {@link ISEDDebugTarget} for the method call parallel example.
+    * @return The expected {@link ISEDDebugTarget}.
+    */
+   public static ISEDDebugTarget createExpectedMethodCallParallelModel() {
+      // Create target
+      SEDMemoryDebugTarget target = appendDebugTarget(METHOD_CALL_PARALLEL_TARGET_NAME);
+      // Create thread
+      SEDMemoryThread thread = appendThread(target);
+      // Create method call main
+      SEDMemoryMethodCall callMain = appendMethodCall(target, thread, thread, "self.main();");
+      // Create statement a()
+      SEDMemoryStatement mainStatement1 = appendStatement(target, callMain, thread, "int a = a();", 4); 
+      // Create method call a
+      SEDMemoryMethodCall callA = appendMethodCall(target, mainStatement1, thread, "self.a();");
+      // Create statement b()
+      SEDMemoryStatement aStatement1 = appendStatement(target, callA, thread, "int b1 = b();", 10); 
+      // Create method call b
+      SEDMemoryMethodCall callB = appendMethodCall(target, aStatement1, thread, "self.b();");
+      // Create statement c()
+      SEDMemoryStatement bStatement = appendStatement(target, callB, thread, "return c();", 17); 
+      // Create method call c
+      SEDMemoryMethodCall callC = appendMethodCall(target, bStatement, thread, "self.c();");
+      // Create statement 42
+      SEDMemoryStatement fourtyTwoStatement = appendStatement(target, callC, thread, "return 42;", 21); 
+      // Create method return of c
+      SEDMemoryMethodReturn cReturn = appendMethodReturn(target, fourtyTwoStatement, thread, "self.c();");
+      // Create method return of b
+      SEDMemoryMethodReturn bReturn = appendMethodReturn(target, cReturn, thread, "self.b();"); 
+      // Create statement b()
+      SEDMemoryStatement aStatement2 = appendStatement(target, bReturn, thread, "int b2 = b();", 11); 
+      // Create method call b
+      SEDMemoryMethodCall callB2 = appendMethodCall(target, aStatement2, thread, "self.b();"); ;
+      // Create statement c()
+      SEDMemoryStatement bStatement2 = appendStatement(target, callB2, thread, "return c();", 17);
+      // Create method call c
+      SEDMemoryMethodCall callC2 = appendMethodCall(target, bStatement2, thread, "self.c();"); 
+      // Create statement 42
+      SEDMemoryStatement fourtyTwoStatement2 = appendStatement(target, callC2, thread, "return 42;", 21); 
+      // Create method return of c
+      SEDMemoryMethodReturn cReturn2 = appendMethodReturn(target, fourtyTwoStatement2, thread, "self.c();"); 
+      // Create method return of b
+      SEDMemoryMethodReturn bReturn2 = appendMethodReturn(target, cReturn2, thread, "self.b();"); 
+      // Create statement c()
+      SEDMemoryStatement aStatement3 = appendStatement(target, bReturn2, thread, "int c = c();", 12); 
+      // Create method call c
+      SEDMemoryMethodCall callC3 = appendMethodCall(target, aStatement3, thread, "self.c();"); ;
+      // Create statement 42
+      SEDMemoryStatement fourtyTwoStatement3 = appendStatement(target, callC3, thread, "return 42;", 21); 
+      // Create method return of c
+      SEDMemoryMethodReturn cReturn3 = appendMethodReturn(target, fourtyTwoStatement3, thread, "self.c();"); 
+      // Create statement return
+      SEDMemoryStatement aStatement4 = appendStatement(target, cReturn3, thread, "return b1+b2+c;", 13); 
+      // Create method return of a
+      SEDMemoryMethodReturn aReturn = appendMethodReturn(target, aStatement4, thread, "self.a();"); 
+      // Create statement x()
+      SEDMemoryStatement mainStatement2 = appendStatement(target, aReturn, thread, "int x = x();", 5); 
+      // Create method call x
+      SEDMemoryMethodCall callX = appendMethodCall(target, mainStatement2, thread, "self.x();");
+      // Create statement 42
+      SEDMemoryStatement twoStatement = appendStatement(target, callX, thread, "return 2;", 25);
+      // Create method return of c
+      SEDMemoryMethodReturn xReturn = appendMethodReturn(target, twoStatement, thread, "self.x();"); 
+      // Create statement return
+      SEDMemoryStatement mainStatement3 = appendStatement(target, xReturn, thread, "return a*x;", 6);
+      // Create method return
+      SEDMemoryMethodReturn mainReturn = appendMethodReturn(target, mainStatement3, thread, "self.main();");
+      // Create termination
+      appendTermination(target, mainReturn, thread);
+      return target;
+   }
+
+   /**
+    * Creates the expected {@link ISEDDebugTarget} for the method call hierarchy example.
+    * @return The expected {@link ISEDDebugTarget}.
+    */
+   public static ISEDDebugTarget createExpectedMethodCallHierarchyModel() {
+      // Create target
+      SEDMemoryDebugTarget target = appendDebugTarget(METHOD_CALL_HIERARCHY_TARGET_NAME);
+      // Create thread
+      SEDMemoryThread thread = appendThread(target);
+      // Create method call main
+      SEDMemoryMethodCall callMain = appendMethodCall(target, thread, thread, "self.main();");
+      // Create statement a()
+      SEDMemoryStatement mainStatement = appendStatement(target, callMain, thread, "return a();", 4);
+      // Create method call a
+      SEDMemoryMethodCall callA = appendMethodCall(target, mainStatement, thread, "self.a();");
+      // Create statement b()
+      SEDMemoryStatement aStatement = appendStatement(target, callA, thread, "return b();", 8);
+      // Create method call b
+      SEDMemoryMethodCall callB = appendMethodCall(target, aStatement, thread, "self.b();");
+      // Create statement c()
+      SEDMemoryStatement bStatement = appendStatement(target, callB, thread, "return c();", 12);
+      // Create method call c
+      SEDMemoryMethodCall callC = appendMethodCall(target, bStatement, thread, "self.c();");
+      // Create statement 42
+      SEDMemoryStatement fourtyTwoStatement = appendStatement(target, callC, thread, "return 42;", 16);
+      // Create method return of c
+      SEDMemoryMethodReturn cReturn = appendMethodReturn(target, fourtyTwoStatement, thread, "self.c();");
+      // Create method return of b
+      SEDMemoryMethodReturn bReturn = appendMethodReturn(target, cReturn, thread, "self.b();");
+      // Create method return of a
+      SEDMemoryMethodReturn aReturn = appendMethodReturn(target, bReturn, thread, "self.a();");
+      // Create method return
+      SEDMemoryMethodReturn mainReturn = appendMethodReturn(target, aReturn, thread, "self.main();");
+      // Create termination
+      appendTermination(target, mainReturn, thread);
+      return target;
+   }
+
+   /**
+    * Creates the expected {@link ISEDDebugTarget} for the method call hierarchy with exception example.
+    * @return The expected {@link ISEDDebugTarget}.
+    */   
+   public static ISEDDebugTarget createExpectedMethodCallHierarchyWithExceptionModel() {
+      // Create target
+      SEDMemoryDebugTarget target = appendDebugTarget(METHOD_CALL_HIERARCHY_WITH_EXCEPTION_TARGET_NAME);
+      // Create thread
+      SEDMemoryThread thread = appendThread(target);
+      // Create method call main
+      SEDMemoryMethodCall callMain = appendMethodCall(target, thread, thread, "self.main();");
+      // Create statement a()
+      SEDMemoryStatement mainStatement = appendStatement(target, callMain, thread, "a();", 7);
+      // Create method call a
+      SEDMemoryMethodCall callA = appendMethodCall(target, mainStatement, thread, "self.a();");
+      // Create statement b()
+      SEDMemoryStatement aStatement = appendStatement(target, callA, thread, "b();", 12);
+      // Create method call b
+      SEDMemoryMethodCall callB = appendMethodCall(target, aStatement, thread, "self.b();");
+      // Create statement c()
+      SEDMemoryStatement bStatement = appendStatement(target, callB, thread, "c();", 21);
+      // Create method call c
+      SEDMemoryMethodCall callC = appendMethodCall(target, bStatement, thread, "self.c();");
+      // Create statement 42
+      SEDMemoryStatement throwStatement = appendStatement(target, callC, thread, "throw new RuntimeException ();", 25);
+      // Create branch condition 1
+      SEDMemoryBranchCondition bc1 = appendBranchCondition(target, throwStatement, thread, "Normal Execution (r_1 != null)");
+      // Create branch condition 2
+      SEDMemoryBranchCondition bc2 = appendBranchCondition(target, bc1, thread, "Normal Execution (r instanceof RuntimeException)");
+      // Create statement ae assignment
+      SEDMemoryStatement aeAssignmentStatement = appendStatement(target, bc2, thread, "int ae = -1;", 15);
+      // Create statement a assignment
+      SEDMemoryStatement aAssignmentStatement = appendStatement(target, aeAssignmentStatement, thread, "int a1 = 1;", 17);
+      // Create method return of a
+      SEDMemoryMethodReturn aReturn = appendMethodReturn(target, aAssignmentStatement, thread, "self.a();");
+      // Create method return
+      SEDMemoryMethodReturn mainReturn = appendMethodReturn(target, aReturn, thread, "self.main();");
+      // Create termination
+      appendTermination(target, mainReturn, thread);
+      return target;
+   }
+   
+   /**
+    * Appends a new debug target to a not existing {@link ILaunch}.
+    * @param name The name to use.
+    * @return The created {@link SEDMemoryDebugTarget}.
+    */
+   public static SEDMemoryDebugTarget appendDebugTarget(String name) {
       SEDMemoryDebugTarget target = new SEDMemoryDebugTarget(null);
       target.setModelIdentifier(KeYDebugTarget.MODEL_IDENTIFIER);
-      target.setName(STATEMENT_TARGET_NAME);
-      // Create thread
+      target.setName(name);
+      return target;
+   }
+   
+   /**
+    * Appends a new thread to the given {@link SEDMemoryDebugTarget}.
+    * @param target The {@link SEDMemoryDebugTarget} to append to.
+    * @return The created {@link SEDMemoryThread}.
+    */
+   public static SEDMemoryThread appendThread(SEDMemoryDebugTarget target) {
       SEDMemoryThread thread = new SEDMemoryThread(target);
       thread.setName(KeYDebugTarget.DEFAULT_THREAD_NAME);
       target.addSymbolicThread(thread);
-      // Create method call
-      SEDMemoryMethodCall call = new SEDMemoryMethodCall(target, thread, thread);
-      call.setName("self.doSomething(_asdf,_a,_b);");
-      thread.addChild(call);
-      // Create statement 1
-      SEDMemoryStatement s1 = new SEDMemoryStatement(target, call, thread);
-      s1.setName("int x = 1;");
-      s1.setLineNumber(16);
-      call.addChild(s1);
-      // Create statement 2
-      SEDMemoryStatement s2 = new SEDMemoryStatement(target, s1, thread);
-      s2.setName("int y = 2;");
-      s2.setLineNumber(17);
-      s1.addChild(s2);
-      // Create statement 3
-      SEDMemoryStatement s3 = new SEDMemoryStatement(target, s2, thread);
-      s3.setName("int z = 3;");
-      s3.setLineNumber(18);
-      s2.addChild(s3);
-      // Create method return
-      SEDMemoryMethodReturn ret = new SEDMemoryMethodReturn(target, s3, thread);
-      ret.setName(KeYDebugTarget.createMethodReturnName(null, "self.doSomething(_asdf,_a,_b);"));
-      s3.addChild(ret);
-      // Create termination
-      SEDMemoryTermination termination = new SEDMemoryTermination(target, ret, thread);
+      return thread;
+   }
+   
+   /**
+    * Appends a new method call to the given parent {@link ISEDMemoryDebugNode}.
+    * @param target The {@link ISEDDebugTarget} to use.
+    * @param parent The parent {@link ISEDMemoryDebugNode} to append to.
+    * @param thread The {@link ISEDThread} to use.
+    * @param name The name to set on the created {@link SEDMemoryMethodCall}.
+    * @return The created {@link SEDMemoryMethodCall}.
+    */
+   public static SEDMemoryMethodCall appendMethodCall(ISEDDebugTarget target, 
+                                                      ISEDMemoryDebugNode parent, 
+                                                      ISEDThread thread,
+                                                      String name) {
+      SEDMemoryMethodCall methodCall = new SEDMemoryMethodCall(target, parent, thread);
+      methodCall.setName(name);
+      parent.addChild(methodCall);
+      return methodCall;
+   }
+   
+   /**
+    * Appends a new statement to the given parent {@link ISEDMemoryDebugNode}.
+    * @param target The {@link ISEDDebugTarget} to use.
+    * @param parent The parent {@link ISEDMemoryDebugNode} to append to.
+    * @param thread The {@link ISEDThread} to use.
+    * @param name The name to set on the created {@link SEDMemoryStatement}.
+    * @param lineNumber The line number to set on the created {@link SEDMemoryStatement}
+    * @return The created {@link SEDMemoryStatement}.
+    */
+   public static SEDMemoryStatement appendStatement(ISEDDebugTarget target, 
+                                                    ISEDMemoryDebugNode parent, 
+                                                    ISEDThread thread,
+                                                    String name,
+                                                    int lineNumber) {
+      SEDMemoryStatement statement = new SEDMemoryStatement(target, parent, thread);
+      statement.setName(name);
+      statement.setLineNumber(lineNumber);
+      parent.addChild(statement);
+      return statement;
+   }
+   
+   /**
+    * Appends a new method return to the given parent {@link ISEDMemoryDebugNode}.
+    * @param target The {@link ISEDDebugTarget} to use.
+    * @param parent The parent {@link ISEDMemoryDebugNode} to append to.
+    * @param thread The {@link ISEDThread} to use.
+    * @param name The name to set on the created {@link SEDMemoryMethodReturn}.
+    * @return The created {@link SEDMemoryMethodReturn}.
+    */
+   public static SEDMemoryMethodReturn appendMethodReturn(ISEDDebugTarget target, 
+                                                          ISEDMemoryDebugNode parent, 
+                                                          ISEDThread thread,
+                                                          String name) {
+      SEDMemoryMethodReturn methodReturn = new SEDMemoryMethodReturn(target, parent, thread);
+      methodReturn.setName(KeYDebugTarget.createMethodReturnName(null, name));
+      parent.addChild(methodReturn);
+      return methodReturn;
+   }
+   
+   /**
+    * Appends a new termination to the given parent {@link ISEDMemoryDebugNode}.
+    * @param target The {@link ISEDDebugTarget} to use.
+    * @param parent The parent {@link ISEDMemoryDebugNode} to append to.
+    * @param thread The {@link ISEDThread} to use.
+    * @return The created {@link SEDMemoryTermination}.
+    */
+   public static SEDMemoryTermination appendTermination(ISEDDebugTarget target, 
+                                                        ISEDMemoryDebugNode parent, 
+                                                        ISEDThread thread) {
+      SEDMemoryTermination termination = new SEDMemoryTermination(target, parent, thread);
       termination.setName(KeYDebugTarget.DEFAULT_TERMINATION_NODE_NAME);
-      ret.addChild(termination);
-      return target;
+      parent.addChild(termination);
+      return termination;
+   }
+   
+   /**
+    * Appends a new branch condition to the given parent {@link ISEDMemoryDebugNode}.
+    * @param target The {@link ISEDDebugTarget} to use.
+    * @param parent The parent {@link ISEDMemoryDebugNode} to append to.
+    * @param thread The {@link ISEDThread} to use.
+    * @param name The name to set on the created {@link SEDMemoryBranchCondition}.
+    * @return The created {@link SEDMemoryBranchCondition}.
+    */
+   public static SEDMemoryBranchCondition appendBranchCondition(ISEDDebugTarget target, 
+                                                                ISEDMemoryDebugNode parent, 
+                                                                ISEDThread thread,
+                                                                String name) {
+      SEDMemoryBranchCondition bc1 = new SEDMemoryBranchCondition(target, parent, thread);
+      bc1.setName(name);
+      parent.addChild(bc1);
+      return bc1;
    }
 
    /**
@@ -252,38 +574,38 @@ public final class TestSEDKeyCoreUtil {
             // Compare children
             ISEDDebugNode[] expectedChildren = expected.getChildren();
             ISEDDebugNode[] currentChildren = current.getChildren();
-            TestCase.assertEquals(expectedChildren.length, currentChildren.length);
+            TestCase.assertEquals("Number of children of " + expected + " is not equal to number of children of " + current + ".", expectedChildren.length, currentChildren.length);
             for (int i = 0; i < expectedChildren.length; i++) {
                if (expectedChildren[i] instanceof ISEDBranchCondition) {
-                  TestCase.assertTrue(currentChildren[i] instanceof ISEDBranchCondition);
+                  TestCase.assertTrue("Expected ISEDBranchCondition on " + ((ISEDBranchCondition)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEDBranchCondition);
                   compareBranchCondition((ISEDBranchCondition)expectedChildren[i], (ISEDBranchCondition)currentChildren[i]);
                }
                else if (expectedChildren[i] instanceof ISEDBranchNode) {
-                  TestCase.assertTrue(currentChildren[i] instanceof ISEDBranchNode);
+                  TestCase.assertTrue("Expected ISEDBranchNode on " + ((ISEDBranchNode)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEDBranchNode);
                   compareBranchNode((ISEDBranchNode)expectedChildren[i], (ISEDBranchNode)currentChildren[i]);
                }
                else if (expectedChildren[i] instanceof ISEDExceptionalTermination) {
-                  TestCase.assertTrue(currentChildren[i] instanceof ISEDExceptionalTermination);
+                  TestCase.assertTrue("Expected ISEDExceptionalTermination on " + ((ISEDExceptionalTermination)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEDExceptionalTermination);
                   compareExceptionalTermination((ISEDExceptionalTermination)expectedChildren[i], (ISEDExceptionalTermination)currentChildren[i]);
                }
                else if (expectedChildren[i] instanceof ISEDMethodCall) {
-                  TestCase.assertTrue(currentChildren[i] instanceof ISEDMethodCall);
+                  TestCase.assertTrue("Expected ISEDMethodCall on " + ((ISEDMethodCall)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEDMethodCall);
                   compareMethodCall((ISEDMethodCall)expectedChildren[i], (ISEDMethodCall)currentChildren[i]);
                }
                else if (expectedChildren[i] instanceof ISEDMethodReturn) {
-                  TestCase.assertTrue(currentChildren[i] instanceof ISEDMethodReturn);
+                  TestCase.assertTrue("Expected ISEDMethodReturn on " + ((ISEDMethodReturn)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEDMethodReturn);
                   compareMethodReturn((ISEDMethodReturn)expectedChildren[i], (ISEDMethodReturn)currentChildren[i]);
                }
                else if (expectedChildren[i] instanceof ISEDStatement) {
-                  TestCase.assertTrue(currentChildren[i] instanceof ISEDStatement);
+                  TestCase.assertTrue("Expected ISEDStatement on " + ((ISEDStatement)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEDStatement);
                   compareStatement((ISEDStatement)expectedChildren[i], (ISEDStatement)currentChildren[i]);
                }
                else if (expectedChildren[i] instanceof ISEDTermination) {
-                  TestCase.assertTrue(currentChildren[i] instanceof ISEDTermination);
+                  TestCase.assertTrue("Expected ISEDTermination on " + ((ISEDTermination)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEDTermination);
                   compareTermination((ISEDTermination)expectedChildren[i], (ISEDTermination)currentChildren[i]);
                }
                else if (expectedChildren[i] instanceof ISEDThread) {
-                  TestCase.assertTrue(currentChildren[i] instanceof ISEDThread);
+                  TestCase.assertTrue("Expected ISEDThread on " + ((ISEDThread)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEDThread);
                   compareThread((ISEDThread)expectedChildren[i], (ISEDThread)currentChildren[i], true);
                }
                else {

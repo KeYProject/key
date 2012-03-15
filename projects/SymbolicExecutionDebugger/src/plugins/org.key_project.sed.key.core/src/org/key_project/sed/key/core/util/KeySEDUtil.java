@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -14,6 +15,9 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
+import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.util.LaunchUtil;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
@@ -259,6 +263,12 @@ public final class KeySEDUtil {
         return result;
     }
 
+    /**
+     * Searches a {@link FunctionalOperationContract} with the given name.
+     * @param operationContracts The available {@link FunctionalOperationContract} to search in.
+     * @param contractName The name of the {@link FunctionalOperationContract} to search.
+     * @return The found {@link FunctionalOperationContract} or {@code null} if no one was found.
+     */
     public static FunctionalOperationContract findContract(ImmutableSet<FunctionalOperationContract> operationContracts, 
                                                            final String contractName) {
         return CollectionUtil.search(operationContracts, new IFilter<FunctionalOperationContract>() {
@@ -268,4 +278,44 @@ public final class KeySEDUtil {
             }
         });
     }
+
+   /**
+    * Prints the {@link ISEDDebugTarget} into the console via {@link System#out}.
+    * @param target The {@link ISEDDebugTarget} to print.
+    * @throws DebugException Occurred Exception.
+    */
+   public static void printDebugTarget(ISEDDebugTarget target) throws DebugException {
+      if (target != null) {
+         System.out.println(target);
+         for (ISEDThread thread : target.getSymbolicThreads()) {
+            printDebugNode(thread, 1);
+         }
+      }
+      else {
+         System.out.println("Target is null.");
+      }
+   }
+
+   /**
+    * Prints the given {@link ISEDDebugNode} into the console via {@link System#out}.
+    * @param node The {@link ISEDDebugNode} to print.
+    * @param level The level.
+    * @throws DebugException Occurred Exception.
+    */
+   public static void printDebugNode(ISEDDebugNode node, int level) throws DebugException {
+      // Print level
+      for (int i = 0; i < level; i++) {
+         System.out.print("\t");
+      }
+      // Print node and children
+      if (node != null) {
+         System.out.println(node);
+         for (ISEDDebugNode child : node.getChildren()) {
+            printDebugNode(child, level + 1);
+         }
+      }
+      else {
+         System.out.println("Node is null");
+      }
+   }
 }

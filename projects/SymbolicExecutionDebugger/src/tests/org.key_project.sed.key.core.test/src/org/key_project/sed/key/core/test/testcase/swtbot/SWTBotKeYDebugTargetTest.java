@@ -15,6 +15,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.Before;
 import org.junit.Test;
+import org.key_project.key4eclipse.starter.core.test.util.TestStarterCoreUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
@@ -41,6 +42,91 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
       // Close welcome view
       SWTWorkbenchBot bot = new SWTWorkbenchBot();
       TestUtilsUtil.closeWelcomeView(bot);
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
+   public void testMethodCallOnObjectWithException() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallOnObjectWithException",
+                     "data/methodCallOnObjectWithException",
+                     new IMethodSelector() {
+                        @Override
+                        public IMethod getMethod(IJavaProject project) throws Exception {
+                           return TestUtilsUtil.getJdtMethod(project, "MethodCallOnObjectWithException", "main");
+                        }
+                     },
+                     TestSEDKeyCoreUtil.METHOD_CALL_ON_OBJECT_WITH_EXCEPTION_TARGET_NAME,
+                     TestSEDKeyCoreUtil.createExpectedMethodCallOnObjectWithExceptionModel());
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
+   public void testMethodCallOnObject() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallOnObject",
+                     "data/methodCallOnObject",
+                     new IMethodSelector() {
+                        @Override
+                        public IMethod getMethod(IJavaProject project) throws Exception {
+                           return TestUtilsUtil.getJdtMethod(project, "MethodCallOnObject", "main");
+                        }
+                     },
+                     TestSEDKeyCoreUtil.METHOD_CALL_ON_OBJECT_TARGET_NAME,
+                     TestSEDKeyCoreUtil.createExpectedMethodCallOnObjectModel());
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
+   public void testMethodCallParallel() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallParallel",
+                     "data/methodCallParallelTest",
+                     new IMethodSelector() {
+                        @Override
+                        public IMethod getMethod(IJavaProject project) throws Exception {
+                           return TestUtilsUtil.getJdtMethod(project, "MethodCallParallelTest", "main");
+                        }
+                     },
+                     TestSEDKeyCoreUtil.METHOD_CALL_PARALLEL_TARGET_NAME,
+                     TestSEDKeyCoreUtil.createExpectedMethodCallParallelModel());
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
+   public void testMethodCallHierarchyWithException() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallHierarchyWithException",
+                     "data/methodHierarchyCallWithExceptionTest",
+                     new IMethodSelector() {
+                        @Override
+                        public IMethod getMethod(IJavaProject project) throws Exception {
+                           return TestUtilsUtil.getJdtMethod(project, "MethodHierarchyCallWithExceptionTest", "main");
+                        }
+                     },
+                     TestSEDKeyCoreUtil.METHOD_CALL_HIERARCHY_WITH_EXCEPTION_TARGET_NAME,
+                     TestSEDKeyCoreUtil.createExpectedMethodCallHierarchyWithExceptionModel());
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
+   public void testMethodCallHierarchy() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallHierarchy",
+                     "data/methodHierarchyCallTest",
+                     new IMethodSelector() {
+                        @Override
+                        public IMethod getMethod(IJavaProject project) throws Exception {
+                           return TestUtilsUtil.getJdtMethod(project, "MethodHierarchyCallTest", "main");
+                        }
+                     },
+                     TestSEDKeyCoreUtil.METHOD_CALL_HIERARCHY_TARGET_NAME,
+                     TestSEDKeyCoreUtil.createExpectedMethodCallHierarchyModel());
    }
    
    /**
@@ -151,23 +237,83 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     * Tests the suspend/resume functionality on the {@link IDebugTarget}.
     */
    @Test
-   public void testSuspendResumeDebugTarget_Resume() throws Exception {
+   public void testFlatStatements() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testFlatStatements",
+                     "data/statements",
+                     new IMethodSelector() {
+                        @Override
+                        public IMethod getMethod(IJavaProject project) throws Exception {
+                           return TestUtilsUtil.getJdtMethod(project, "FlatSteps", "doSomething", "I", "QString;", "Z");
+                        }
+                     },
+                     TestSEDKeyCoreUtil.STATEMENT_TARGET_NAME,
+                     TestSEDKeyCoreUtil.createExpectedStatementModel());
+   }
+   
+   /**
+    * Utility class to select an {@link IMethod} in a given {@link IJavaProject}.
+    * @author Martin Hentschel
+    */
+   public static interface IMethodSelector {
+      /**
+       * Selects an {@link IMethod} in the given {@link IJavaProject}.
+       * @param project The {@link IJavaProject}.
+       * @return The selected {@link IMethod}.
+       * @throws Exception Occurred Exceptions.
+       */
+      public IMethod getMethod(IJavaProject project) throws Exception;
+   }
+   
+   /**
+    * Executes the following test steps:
+    * <ol>
+    *    <li>Extract code from bundle to a Java project with the defined name in the workspace.</li>
+    *    <li>Select an {@link IMethod} to debug with the given {@link IMethodSelector}.</li>
+    *    <li>Launch selected {@link IMethod} with the Symbolic Execution Debugger based on KeY.</li>
+    *    <li>Make sure that the initial SED model ({@link ISEDDebugTarget}) is opened.</li>
+    *    <li>Resume the execution.</li>
+    *    <li>Make sure that the final SED model ({@link ISEDDebugTarget}) specified by the given {@link ISEDDebugTarget} is reached.</li>
+    * </ol>
+    * @param projectName The project name in the workspace.
+    * @param pathInBundle The path to the source code in the bundle to extract to the workspace project.
+    * @param selector {@link IMethodSelector} to select an {@link IMethod} to launch.
+    * @param targetName The name of the {@link IDebugTarget}.
+    * @param expectedDebugTarget The expected {@link ISEDDebugTarget}.
+    * @throws Exception Occurred Exception.
+    */
+   protected void assertSEDModel(String projectName,
+                                 String pathInBundle,
+                                 IMethodSelector selector,
+                                 String targetName,
+                                 ISEDDebugTarget expectedDebugTarget) throws Exception {
       // Create bot
       SWTWorkbenchBot bot = new SWTWorkbenchBot();
       // Get current settings to restore them in finally block
       SWTBotPerspective defaultPerspective = bot.activePerspective();
       SWTBotTree debugTree = null;
       long originalTimeout = SWTBotPreferences.TIMEOUT;
+      String originalRuntimeExceptions = null;
       try {
          // Open symbolic debug perspective
          TestSedCoreUtil.openSymbolicDebugPerspective(bot);
          // Create test project
-         IJavaProject project = TestUtilsUtil.createJavaProject("SWTBotKeYDebugTargetSuspendResumeTest_testSuspendResumeDebugTarget_Resume");
-         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/statements", project.getProject().getFolder("src"));
+         IJavaProject project = TestUtilsUtil.createJavaProject(projectName);
+         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, pathInBundle, project.getProject().getFolder("src"));
          // Get method
-         IMethod method = TestUtilsUtil.getJdtMethod(project, "FlatSteps", "doSomething", "I", "QString;", "Z");
+         assertNotNull(selector);
+         IMethod method = selector.getMethod(project);
          // Increase timeout
-         SWTBotPreferences.TIMEOUT = SWTBotPreferences.TIMEOUT * 4;
+         SWTBotPreferences.TIMEOUT = SWTBotPreferences.TIMEOUT * 8;
+         // Store original settings of KeY which requires that at least one proof was intantiated.
+         if (!KeYUtil.isChoiceSettingInitialised()) {
+            TestStarterCoreUtil.instantiateProofWithGeneratedContract(method);
+            KeYUtil.clearProofList(MainWindow.getInstance());
+         }
+         originalRuntimeExceptions = KeYUtil.getChoiceSetting(KeYUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS);
+         assertNotNull(originalRuntimeExceptions);
+         // Set choice settings in KeY.
+         KeYUtil.setChoiceSetting(KeYUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, KeYUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW);
+         assertEquals(KeYUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW, KeYUtil.getChoiceSetting(KeYUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS));
          // Launch method
          TestSEDKeyCoreUtil.launchKeY(method);
          // Find the launched ILaunch in the debug view
@@ -187,7 +333,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
          assertTrue(target.isSuspended());
          assertFalse(target.isTerminated());
          // Make sure that the debug target is in the initial state.
-         TestSEDKeyCoreUtil.assertInitialTarget(target, TestSEDKeyCoreUtil.STATEMENT_TARGET_NAME);
+         TestSEDKeyCoreUtil.assertInitialTarget(target, targetName);
          // Resume launch
          SWTBotTreeItem item = TestUtilsUtil.selectInTree(debugTree, 0, 0); // Select first debug target
          item.contextMenu("Resume").click();
@@ -212,11 +358,15 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
          assertTrue(target.isSuspended());
          assertFalse(target.isTerminated());
          // Test the execution tree
-         TestSEDKeyCoreUtil.assertStatementsExample(target);
+         TestSEDKeyCoreUtil.compareDebugTarget(expectedDebugTarget, target);
       }
       finally {
          // Restore timeout
          SWTBotPreferences.TIMEOUT = originalTimeout;
+         // Restore runtime option
+         if (originalRuntimeExceptions != null) {
+            KeYUtil.setChoiceSetting(KeYUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, originalRuntimeExceptions);
+         }
          // Restore perspective
          defaultPerspective.activate();
          // Terminate and remove all launches

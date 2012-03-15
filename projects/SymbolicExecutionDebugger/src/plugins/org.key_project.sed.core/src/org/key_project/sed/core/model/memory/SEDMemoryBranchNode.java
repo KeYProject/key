@@ -15,7 +15,7 @@ import org.key_project.sed.core.model.impl.AbstractSEDBranchNode;
  * information in the memory.
  * @author Martin Hentschel
  */
-public class SEDMemoryBranchNode extends AbstractSEDBranchNode implements ISEDMemoryStackFrameCompatibleDebugNode {
+public class SEDMemoryBranchNode extends AbstractSEDBranchNode implements ISEDMemoryStackFrameCompatibleDebugNode, ISEDMemoryDebugNode {
    /**
     * The contained child nodes.
     */
@@ -42,9 +42,9 @@ public class SEDMemoryBranchNode extends AbstractSEDBranchNode implements ISEDMe
    }
    
    /**
-    * Adds a new {@link ISEDDebugNode} child node.
-    * @param child The {@link ISEDDebugNode} to add.
+    * {@inheritDoc}
     */
+   @Override
    public void addChild(ISEDDebugNode child) {
       if (child != null) {
          children.add(child);

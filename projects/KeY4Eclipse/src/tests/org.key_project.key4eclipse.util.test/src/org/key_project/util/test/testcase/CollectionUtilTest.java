@@ -15,6 +15,54 @@ import org.key_project.util.java.IFilter;
  */
 public class CollectionUtilTest extends TestCase {
    /**
+    * Tests {@link CollectionUtil#count(Iterable, IFilter)}.
+    */
+   @Test
+   public void testCount() {
+      // Create model
+      List<String> list = new LinkedList<String>();
+      list.add("A");
+      list.add("B");
+      list.add("A");
+      list.add("C");
+      list.add("B");
+      list.add("A");
+      // Test counts
+      assertEquals(0, CollectionUtil.count(null, null));
+      assertEquals(0, CollectionUtil.count(list, null));
+      assertEquals(0, CollectionUtil.count(null, new IFilter<String>() {
+         @Override
+         public boolean select(String element) {
+            return false;
+         }
+      }));
+      assertEquals(3, CollectionUtil.count(list, new IFilter<String>() {
+         @Override
+         public boolean select(String element) {
+            return "A".equals(element);
+         }
+      }));
+      assertEquals(2, CollectionUtil.count(list, new IFilter<String>() {
+         @Override
+         public boolean select(String element) {
+            return "B".equals(element);
+         }
+      }));
+      assertEquals(1, CollectionUtil.count(list, new IFilter<String>() {
+         @Override
+         public boolean select(String element) {
+            return "C".equals(element);
+         }
+      }));
+      assertEquals(0, CollectionUtil.count(list, new IFilter<String>() {
+         @Override
+         public boolean select(String element) {
+            return "D".equals(element);
+         }
+      }));
+   }
+   
+   /**
     * Tests {@link CollectionUtil#contains(Iterable, Object)}
     */
    @Test

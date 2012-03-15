@@ -15,7 +15,7 @@ import org.key_project.sed.core.model.impl.AbstractSEDExceptionalTermination;
  * information in the memory.
  * @author Martin Hentschel
  */
-public class SEDMemoryExceptionalTermination extends AbstractSEDExceptionalTermination {
+public class SEDMemoryExceptionalTermination extends AbstractSEDExceptionalTermination implements ISEDMemoryStackFrameCompatibleDebugNode, ISEDMemoryDebugNode {
    /**
     * The contained child nodes.
     */
@@ -42,9 +42,9 @@ public class SEDMemoryExceptionalTermination extends AbstractSEDExceptionalTermi
    }
    
    /**
-    * Adds a new {@link ISEDDebugNode} child node.
-    * @param child The {@link ISEDDebugNode} to add.
+    * {@inheritDoc}
     */
+   @Override
    public void addChild(ISEDDebugNode child) {
       if (child != null) {
          children.add(child);
@@ -101,5 +101,18 @@ public class SEDMemoryExceptionalTermination extends AbstractSEDExceptionalTermi
    @Override
    public void setCharEnd(int charEnd) {
       super.setCharEnd(charEnd);
+   }
+   
+   /**
+    * <p>
+    * {@inheritDoc}
+    * </p>
+    * <p>
+    * Changed visibility to public.
+    * </p>
+    */
+   @Override
+   public void setSourceName(String sourceName) {
+      super.setSourceName(sourceName);
    }
 }

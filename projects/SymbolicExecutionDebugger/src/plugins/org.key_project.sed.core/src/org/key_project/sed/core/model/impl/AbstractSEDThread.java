@@ -211,4 +211,17 @@ public abstract class AbstractSEDThread extends AbstractSEDDebugNode implements 
    public void terminate() throws DebugException {
       getDebugTarget().terminate();
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String toString() {
+      try {
+         return getName();
+      }
+      catch (DebugException e) {
+         return e.getMessage();
+      }
+   }
 }

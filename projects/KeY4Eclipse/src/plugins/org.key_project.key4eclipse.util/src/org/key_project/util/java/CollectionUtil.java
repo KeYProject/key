@@ -151,10 +151,12 @@ public class CollectionUtil {
       T result = null;
       if (iterable != null && filter != null) {
          Iterator<T> iter = iterable.iterator();
-         while (result == null && iter.hasNext()) {
-            T next = iter.next();
-            if (filter.select(next)) {
-               result = next;
+         if (iter != null) {
+            while (result == null && iter.hasNext()) {
+               T next = iter.next();
+               if (filter.select(next)) {
+                  result = next;
+               }
             }
          }
       }
@@ -171,10 +173,31 @@ public class CollectionUtil {
       boolean found = false;
       if (iterable != null) {
          Iterator<T> iter = iterable.iterator();
-         while (!found && iter.hasNext()) {
-            found = ObjectUtil.equals(iter.next(), element);
+         if (iter != null) {
+            while (!found && iter.hasNext()) {
+               found = ObjectUtil.equals(iter.next(), element);
+            }
          }
       }
       return found;
+   }
+   
+   /**
+    * Counts the number of elements in the given {@link Iterable} which
+    * are selected by the given {@link IFilter}.
+    * @param iterable The elements to count in.
+    * @param filter The {@link IFilter} to select elements.
+    * @return The number of elements selected by the {@link IFilter} in the given {@link Iterable}.
+    */
+   public static <T> int count(Iterable<T> iterable, IFilter<T> filter) {
+      int count = 0;
+      if (iterable != null && filter != null) {
+         for (T element : iterable) {
+            if (filter.select(element)) {
+               count ++;
+            }
+         }
+      }
+      return count;
    }
 }

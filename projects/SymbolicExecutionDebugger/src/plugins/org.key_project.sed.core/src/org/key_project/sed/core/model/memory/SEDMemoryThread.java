@@ -14,7 +14,7 @@ import org.key_project.sed.core.model.impl.AbstractSEDThread;
  * information in the memory.
  * @author Martin Hentschel
  */
-public class SEDMemoryThread extends AbstractSEDThread {
+public class SEDMemoryThread extends AbstractSEDThread implements ISEDMemoryDebugNode {
    /**
     * The contained child nodes.
     */
@@ -37,9 +37,9 @@ public class SEDMemoryThread extends AbstractSEDThread {
    }
    
    /**
-    * Adds a new {@link ISEDDebugNode} child node.
-    * @param child The {@link ISEDDebugNode} to add.
+    * {@inheritDoc}
     */
+   @Override
    public void addChild(ISEDDebugNode child) {
       if (child != null) {
          children.add(child);

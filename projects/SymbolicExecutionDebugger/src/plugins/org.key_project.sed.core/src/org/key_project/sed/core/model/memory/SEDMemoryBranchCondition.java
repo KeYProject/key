@@ -15,7 +15,7 @@ import org.key_project.sed.core.model.impl.AbstractSEDBranchCondition;
  * information in the memory.
  * @author Martin Hentschel
  */
-public class SEDMemoryBranchCondition extends AbstractSEDBranchCondition implements ISEDMemoryStackFrameCompatibleDebugNode {
+public class SEDMemoryBranchCondition extends AbstractSEDBranchCondition implements ISEDMemoryStackFrameCompatibleDebugNode, ISEDMemoryDebugNode {
    /**
     * The contained child nodes.
     */
@@ -42,9 +42,9 @@ public class SEDMemoryBranchCondition extends AbstractSEDBranchCondition impleme
    }
    
    /**
-    * Adds a new {@link ISEDDebugNode} child node.
-    * @param child The {@link ISEDDebugNode} to add.
+    * {@inheritDoc}
     */
+   @Override
    public void addChild(ISEDDebugNode child) {
       if (child != null) {
          children.add(child);

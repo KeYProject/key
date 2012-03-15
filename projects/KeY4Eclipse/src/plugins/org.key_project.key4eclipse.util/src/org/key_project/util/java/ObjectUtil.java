@@ -246,4 +246,13 @@ public final class ObjectUtil {
            }
        };
    }
+
+   /**
+    * Nullpointer save execution of {@link Object#getClass()}.
+    * @param obj The object to execute get class on.
+    * @return The {@link Class} or {@code null} if the object is {@code null}.
+    */
+   public static Class<?> getClass(Object obj) {
+      return obj != null ? obj.getClass() : null;
+   }
 }

@@ -285,4 +285,17 @@ public abstract class AbstractSEDDebugTarget extends DebugElement implements ISE
    protected void setName(String name) {
       this.name = name;
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String toString() {
+      try {
+         return getName();
+      }
+      catch (DebugException e) {
+         return e.getMessage();
+      }
+   }
 }

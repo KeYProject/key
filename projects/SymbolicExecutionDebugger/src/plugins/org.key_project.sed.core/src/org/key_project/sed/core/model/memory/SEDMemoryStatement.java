@@ -14,7 +14,7 @@ import org.key_project.sed.core.model.impl.AbstractSEDStatement;
  * information in the memory.
  * @author Martin Hentschel
  */
-public class SEDMemoryStatement extends AbstractSEDStatement implements ISEDMemoryStackFrameCompatibleDebugNode {
+public class SEDMemoryStatement extends AbstractSEDStatement implements ISEDMemoryStackFrameCompatibleDebugNode, ISEDMemoryDebugNode {
    /**
     * The contained child nodes.
     */
@@ -41,9 +41,9 @@ public class SEDMemoryStatement extends AbstractSEDStatement implements ISEDMemo
    }
    
    /**
-    * Adds a new {@link ISEDDebugNode} child node.
-    * @param child The {@link ISEDDebugNode} to add.
+    * {@inheritDoc}
     */
+   @Override
    public void addChild(ISEDDebugNode child) {
       if (child != null) {
          children.add(child);

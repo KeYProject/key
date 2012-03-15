@@ -15,7 +15,7 @@ import org.key_project.sed.core.model.impl.AbstractSEDMethodReturn;
  * information in the memory.
  * @author Martin Hentschel
  */
-public class SEDMemoryMethodReturn extends AbstractSEDMethodReturn implements ISEDMemoryStackFrameCompatibleDebugNode {
+public class SEDMemoryMethodReturn extends AbstractSEDMethodReturn implements ISEDMemoryStackFrameCompatibleDebugNode, ISEDMemoryDebugNode {
    /**
     * The contained child nodes.
     */
@@ -42,9 +42,9 @@ public class SEDMemoryMethodReturn extends AbstractSEDMethodReturn implements IS
    }
    
    /**
-    * Adds a new {@link ISEDDebugNode} child node.
-    * @param child The {@link ISEDDebugNode} to add.
+    * {@inheritDoc}
     */
+   @Override
    public void addChild(ISEDDebugNode child) {
       if (child != null) {
          children.add(child);
