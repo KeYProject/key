@@ -36,6 +36,21 @@ public final class SEDImages {
     public static final String TERMINATION = "org.key_project.sed.ui.images.termination";
     
     /**
+     * The key for the image that is used for branch node.
+     */
+    public static final String BRANCH_NODE = "org.key_project.sed.ui.images.branchNode";
+    
+    /**
+     * The key for the image that is used for branch condition.
+     */
+    public static final String BRANCH_CONDITION = "org.key_project.sed.ui.images.branchCondition";
+    
+    /**
+     * The key for the image that is used for exceptional termination.
+     */
+    public static final String EXCEPTIONAL_TERMINATION = "org.key_project.sed.ui.images.exceptionalTermination";
+    
+    /**
      * Forbid instances.
      */
     private SEDImages() {
@@ -76,6 +91,15 @@ public final class SEDImages {
         }
         else if (TERMINATION.equals(key)) {
            path = "icons/termination.gif";
+        }
+        else if (BRANCH_NODE.equals(key)) {
+           path = "icons/branch_node.gif";
+        }
+        else if (BRANCH_CONDITION.equals(key)) {
+           path = "icons/branch_condition.gif";
+        }
+        else if (EXCEPTIONAL_TERMINATION.equals(key)) {
+           path = "icons/exceptional_termination.gif";
         }
         // Load image if possible
         if (path != null) {
@@ -119,6 +143,9 @@ public final class SEDImages {
                registry.remove(METHOD_CALL);
                registry.remove(METHOD_RETURN);
                registry.remove(TERMINATION);
+               registry.remove(BRANCH_NODE);
+               registry.remove(BRANCH_CONDITION);
+               registry.remove(EXCEPTIONAL_TERMINATION);
             }
          });
        }

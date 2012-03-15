@@ -5,6 +5,9 @@ import org.eclipse.debug.ui.IDebugModelPresentation;
 import org.eclipse.debug.ui.IValueDetailListener;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
+import org.key_project.sed.core.model.ISEDBranchCondition;
+import org.key_project.sed.core.model.ISEDBranchNode;
+import org.key_project.sed.core.model.ISEDExceptionalTermination;
 import org.key_project.sed.core.model.ISEDMethodCall;
 import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.ISEDTermination;
@@ -49,8 +52,17 @@ public abstract class AbstractSEDDebugModelPresentation extends LabelProvider im
       else if (element instanceof ISEDMethodReturn) {
          return SEDImages.getImage(SEDImages.METHOD_RETURN);
       }
+      else if (element instanceof ISEDExceptionalTermination) {
+         return SEDImages.getImage(SEDImages.EXCEPTIONAL_TERMINATION);
+      }
       else if (element instanceof ISEDTermination) {
          return SEDImages.getImage(SEDImages.TERMINATION);
+      }
+      else if (element instanceof ISEDBranchCondition) {
+         return SEDImages.getImage(SEDImages.BRANCH_CONDITION);
+      }
+      else if (element instanceof ISEDBranchNode) {
+         return SEDImages.getImage(SEDImages.BRANCH_NODE);
       }
       else {
          return super.getImage(element);
