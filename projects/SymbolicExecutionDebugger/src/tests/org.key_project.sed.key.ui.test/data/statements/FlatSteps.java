@@ -1,7 +1,7 @@
 
 public class FlatSteps {
 	/* Start
-	 * self.doSomething()
+	 * self.doSomething(_asdf_i, _a_i, _b_i)
 	 * int x = 1;
 	 * int y = 2;
 	 * int z = 3;

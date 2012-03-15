@@ -15,7 +15,7 @@ import org.key_project.sed.core.model.impl.AbstractSEDBranchCondition;
  * information in the memory.
  * @author Martin Hentschel
  */
-public class SEDMemoryBranchCondition extends AbstractSEDBranchCondition {
+public class SEDMemoryBranchCondition extends AbstractSEDBranchCondition implements ISEDMemoryStackFrameCompatibleDebugNode {
    /**
     * The contained child nodes.
     */
@@ -101,5 +101,18 @@ public class SEDMemoryBranchCondition extends AbstractSEDBranchCondition {
    @Override
    public void setCharEnd(int charEnd) {
       super.setCharEnd(charEnd);
+   }
+   
+   /**
+    * <p>
+    * {@inheritDoc}
+    * </p>
+    * <p>
+    * Changed visibility to public.
+    * </p>
+    */
+   @Override
+   public void setSourceName(String sourceName) {
+      super.setSourceName(sourceName);
    }
 }

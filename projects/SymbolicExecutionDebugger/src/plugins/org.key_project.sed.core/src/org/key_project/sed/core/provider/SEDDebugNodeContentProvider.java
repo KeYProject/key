@@ -33,6 +33,22 @@ import org.key_project.util.java.ArrayUtil;
 @SuppressWarnings("restriction")
 public class SEDDebugNodeContentProvider extends ElementContentProvider {
    /**
+    * The default instance.
+    */
+   private static SEDDebugNodeContentProvider defaultInsance;
+   
+   /**
+    * Returns the default instance.
+    * @return The default instance.
+    */
+   public static SEDDebugNodeContentProvider getDefaultInstance() {
+      if (defaultInsance == null) {
+         defaultInsance = new SEDDebugNodeContentProvider();
+      }
+      return defaultInsance;
+   }
+   
+   /**
     * Returns the available children.
     * @param parent The parent element for that the children are needed.
     * @return The children. 

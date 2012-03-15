@@ -7,6 +7,7 @@ import org.key_project.key4eclipse.test.suite.AllKeY4EclipseTests;
 import org.key_project.sed.core.test.suite.AllSEDCoreTests;
 import org.key_project.sed.key.core.test.suite.AllSEDKeYTests;
 import org.key_project.sed.key.ui.test.suite.AllSEDKeYUITests;
+import org.key_project.sed.ui.test.suite.AllSEDUITests;
 import org.key_project.util.test.suite.AllUtilTests;
 
 /**
@@ -19,6 +20,7 @@ import org.key_project.util.test.suite.AllUtilTests;
     AllUtilTests.class,
     AllSEDCoreTests.class,
     AllStarterCoreTests.class,
+    AllSEDUITests.class,
     AllSEDKeYTests.class,
     AllSEDKeYUITests.class
 })

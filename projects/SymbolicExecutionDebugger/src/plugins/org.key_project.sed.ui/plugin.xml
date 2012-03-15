@@ -5,7 +5,7 @@
          point="org.eclipse.ui.perspectives">
       <perspective
             class="org.key_project.sed.ui.perspective.SymbolicDebugPerspectiveFactory"
-            icon="icon/symbolic_debug.gif"
+            icon="icons/symbolic_debug.gif"
             id="org.key_project.sed.ui.perspective"
             name="Symbolic Debug">
       </perspective>

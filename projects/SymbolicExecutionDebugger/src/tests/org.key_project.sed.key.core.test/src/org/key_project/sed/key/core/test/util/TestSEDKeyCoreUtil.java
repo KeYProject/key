@@ -25,7 +25,10 @@ import org.key_project.sed.core.model.ISEDStatement;
 import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
+import org.key_project.sed.core.model.memory.SEDMemoryMethodCall;
+import org.key_project.sed.core.model.memory.SEDMemoryMethodReturn;
 import org.key_project.sed.core.model.memory.SEDMemoryStatement;
+import org.key_project.sed.core.model.memory.SEDMemoryTermination;
 import org.key_project.sed.core.model.memory.SEDMemoryThread;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
 import org.key_project.sed.key.core.util.KeySEDUtil;
@@ -142,11 +145,15 @@ public final class TestSEDKeyCoreUtil {
       SEDMemoryThread thread = new SEDMemoryThread(target);
       thread.setName(KeYDebugTarget.DEFAULT_THREAD_NAME);
       target.addSymbolicThread(thread);
+      // Create method call
+      SEDMemoryMethodCall call = new SEDMemoryMethodCall(target, thread, thread);
+      call.setName("self.doSomething(_asdf,_a,_b);");
+      thread.addChild(call);
       // Create statement 1
-      SEDMemoryStatement s1 = new SEDMemoryStatement(target, thread, thread);
+      SEDMemoryStatement s1 = new SEDMemoryStatement(target, call, thread);
       s1.setName("int x = 1;");
       s1.setLineNumber(16);
-      thread.addChild(s1);
+      call.addChild(s1);
       // Create statement 2
       SEDMemoryStatement s2 = new SEDMemoryStatement(target, s1, thread);
       s2.setName("int y = 2;");
@@ -157,6 +164,14 @@ public final class TestSEDKeyCoreUtil {
       s3.setName("int z = 3;");
       s3.setLineNumber(18);
       s2.addChild(s3);
+      // Create method return
+      SEDMemoryMethodReturn ret = new SEDMemoryMethodReturn(target, s3, thread);
+      ret.setName(KeYDebugTarget.createMethodReturnName(null, "self.doSomething(_asdf,_a,_b);"));
+      s3.addChild(ret);
+      // Create termination
+      SEDMemoryTermination termination = new SEDMemoryTermination(target, ret, thread);
+      termination.setName(KeYDebugTarget.DEFAULT_TERMINATION_NODE_NAME);
+      ret.addChild(termination);
       return target;
    }
 

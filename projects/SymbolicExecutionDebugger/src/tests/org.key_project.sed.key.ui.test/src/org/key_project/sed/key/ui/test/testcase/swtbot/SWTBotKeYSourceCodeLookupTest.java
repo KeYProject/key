@@ -21,6 +21,7 @@ import org.eclipse.ui.IEditorPart;
 import org.junit.Before;
 import org.junit.Test;
 import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDMethodCall;
 import org.key_project.sed.core.model.ISEDStatement;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
@@ -91,9 +92,10 @@ public class SWTBotKeYSourceCodeLookupTest extends TestCase {
          assertEquals(0, bot.editors().size());
          // Test statements
          TestUtilsUtil.expandAll(debugTree);
-         testSelectedStatement(bot, debugTree, new int[] {0, 0, 0, 0}, method, target, true);
-         testSelectedStatement(bot, debugTree, new int[] {0, 0, 0, 1}, method, target, false);
-         testSelectedStatement(bot, debugTree, new int[] {0, 0, 0, 2}, method, target, true);
+         TestUtilsUtil.sleep(TestSedCoreUtil.USER_INTERFACE_DEBUG_TREE_WAIT_TIME); // Give the user interface the chance to update the tree
+         assertSelectedStatement(bot, debugTree, new int[] {0, 0, 0, 1}, method, target, true);
+         assertSelectedStatement(bot, debugTree, new int[] {0, 0, 0, 2}, method, target, false);
+         assertSelectedStatement(bot, debugTree, new int[] {0, 0, 0, 3}, method, target, true);
       }
       finally {
          // Restore timeout
@@ -118,7 +120,7 @@ public class SWTBotKeYSourceCodeLookupTest extends TestCase {
     * @throws CoreException Occurred Exception
     * @throws BadLocationException Occurred Exception
     */
-   protected void testSelectedStatement(SWTWorkbenchBot bot, 
+   protected void assertSelectedStatement(SWTWorkbenchBot bot, 
                                         SWTBotTree debugTree, 
                                         int[] pathToStatementInTree,
                                         IMethod method,
@@ -185,8 +187,11 @@ public class SWTBotKeYSourceCodeLookupTest extends TestCase {
          assertEquals(1, target.getSymbolicThreads().length);
          ISEDThread thread = target.getSymbolicThreads()[0];
          assertTrue(thread.getChildren().length >= 1);
-         assertTrue(thread.getChildren()[0] instanceof ISEDStatement);
-         ISEDStatement s1 = (ISEDStatement)thread.getChildren()[0];
+         assertTrue(thread.getChildren()[0] instanceof ISEDMethodCall);
+         ISEDMethodCall call = (ISEDMethodCall)thread.getChildren()[0];
+         assertTrue(call.getChildren().length >= 1);
+         assertTrue(call.getChildren()[0] instanceof ISEDStatement);
+         ISEDStatement s1 = (ISEDStatement)call.getChildren()[0];
          // Test KeYSourceLookupParticipant directly
          KeYSourceLookupParticipant participant = new KeYSourceLookupParticipant();
          assertEquals(method.getResource().getName(), participant.getSourceName(s1));

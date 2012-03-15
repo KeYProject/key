@@ -14,7 +14,7 @@ import org.key_project.sed.core.model.impl.AbstractSEDStatement;
  * information in the memory.
  * @author Martin Hentschel
  */
-public class SEDMemoryStatement extends AbstractSEDStatement {
+public class SEDMemoryStatement extends AbstractSEDStatement implements ISEDMemoryStackFrameCompatibleDebugNode {
    /**
     * The contained child nodes.
     */
@@ -100,5 +100,18 @@ public class SEDMemoryStatement extends AbstractSEDStatement {
    @Override
    public void setCharEnd(int charEnd) {
       super.setCharEnd(charEnd);
+   }
+   
+   /**
+    * <p>
+    * {@inheritDoc}
+    * </p>
+    * <p>
+    * Changed visibility to public.
+    * </p>
+    */
+   @Override
+   public void setSourceName(String sourceName) {
+      super.setSourceName(sourceName);
    }
 }

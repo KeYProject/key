@@ -1,4 +1,4 @@
-package org.key_project.sed.key.ui.util;
+package org.key_project.sed.ui.util;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -6,7 +6,7 @@ import java.io.InputStream;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
-import org.key_project.sed.key.ui.Activator;
+import org.key_project.sed.ui.Activator;
 import org.key_project.util.eclipse.BundleUtil;
 
 /**
@@ -19,16 +19,26 @@ import org.key_project.util.eclipse.BundleUtil;
  * </p>
  * @author Martin Hentschel
  */
-public final class KeYSEDImages {
+public final class SEDImages {
     /**
-     * The key for the image that is used in the main tab group of the launch configuration.
+     * The key for the image that is used for method calls.
      */
-    public static final String LAUNCH_MAIN_TAB_GROUP = "org.key_project.sed.key.ui.images.launchMainTabGroup";
+    public static final String METHOD_CALL = "org.key_project.sed.ui.images.methodCall";
+    
+    /**
+     * The key for the image that is used for method return.
+     */
+    public static final String METHOD_RETURN = "org.key_project.sed.ui.images.methodReturn";
+    
+    /**
+     * The key for the image that is used for termination.
+     */
+    public static final String TERMINATION = "org.key_project.sed.ui.images.termination";
     
     /**
      * Forbid instances.
      */
-    private KeYSEDImages() {
+    private SEDImages() {
     }
     
     /**
@@ -56,35 +66,41 @@ public final class KeYSEDImages {
      * @return The created {@link Image} or {@code null} if it was not possible.
      */
     protected static Image createImage(String key) {
-       // Compute path to image in bundle.
-       String path = null;
-       if (LAUNCH_MAIN_TAB_GROUP.equals(key)) {
-           path = "icons/logo16.gif";
-       }
-       // Load image if possible
-       if (path != null) {
-            InputStream in = null;
-            try {
-                in = BundleUtil.openInputStream(Activator.PLUGIN_ID, path);
-                return new Image(Display.getDefault(), in);
-            }
-            catch (IOException e) {
+        // Compute path to image in bundle.
+        String path = null;
+        if (METHOD_CALL.equals(key)) {
+           path = "icons/method_call.gif";
+        }
+        else if (METHOD_RETURN.equals(key)) {
+           path = "icons/method_return.gif";
+        }
+        else if (TERMINATION.equals(key)) {
+           path = "icons/termination.gif";
+        }
+        // Load image if possible
+        if (path != null) {
+           InputStream in = null;
+           try {
+              in = BundleUtil.openInputStream(Activator.PLUGIN_ID, path);
+              return new Image(Display.getDefault(), in);
+           }
+           catch (IOException e) {
+              LogUtil.getLogger().logError(e);
+              return null;
+           }
+           finally {
+              try {
+                 if (in != null) {
+                    in.close();
+                }
+             }
+             catch (IOException e) {
                 LogUtil.getLogger().logError(e);
-                return null;
-            }
-            finally {
-                try {
-                    if (in != null) {
-                        in.close();
-                    }
-                }
-                catch (IOException e) {
-                    LogUtil.getLogger().logError(e);
-                }
-            }
+             }
+           }
         }
         else {
-            return null;
+           return null;
         }
     }
     
@@ -100,7 +116,9 @@ public final class KeYSEDImages {
             @Override
             public void run() {
                ImageRegistry registry = Activator.getDefault().getImageRegistry();
-               registry.remove(LAUNCH_MAIN_TAB_GROUP);
+               registry.remove(METHOD_CALL);
+               registry.remove(METHOD_RETURN);
+               registry.remove(TERMINATION);
             }
          });
        }

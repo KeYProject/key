@@ -57,6 +57,11 @@ import org.key_project.util.test.util.TestUtilsUtil;
 @SuppressWarnings("restriction")
 public final class TestSedCoreUtil {
    /**
+    * Waiting time of the user interface.
+    */
+   public static final int USER_INTERFACE_DEBUG_TREE_WAIT_TIME = 1000;
+   
+   /**
     * The ID of the fixed example launch configuration type.
     */
    public static final String FIXED_EXAMPLE_LAUNCH_CONFIGURATION_TYPE_ID = "org.key_project.sed.core.test.example.fixed_launch_content";

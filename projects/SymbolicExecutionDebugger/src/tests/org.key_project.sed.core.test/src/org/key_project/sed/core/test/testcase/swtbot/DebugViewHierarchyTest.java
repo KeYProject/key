@@ -21,11 +21,6 @@ import org.key_project.util.test.util.TestUtilsUtil;
  */
 public class DebugViewHierarchyTest extends TestCase {
    /**
-    * Waiting time of the user interface.
-    */
-   public static final int WAIT_TIME = 1000;
-   
-   /**
     * Makes sure that the tree is updated when the user switches between
     * normal and compact view.
     */
@@ -50,23 +45,23 @@ public class DebugViewHierarchyTest extends TestCase {
          bot.waitUntil(Conditions.treeHasRows(debugTree, 1));
          // Expand all tree items
          TestUtilsUtil.expandAll(debugTree);
-         TestUtilsUtil.sleep(WAIT_TIME); // Give the user interface the chance to update the tree
+         TestUtilsUtil.sleep(TestSedCoreUtil.USER_INTERFACE_DEBUG_TREE_WAIT_TIME); // Give the user interface the chance to update the tree
          // Make sure that the correct items are shown
          TestSedCoreUtil.assertCompactFixedExample(debugTree);
          // Change to normal view
          SEDPreferenceUtil.toggleShowCompactExecutionTreePreference();
-         TestUtilsUtil.sleep(WAIT_TIME); // Give the user interface the chance to update the tree
+         TestUtilsUtil.sleep(TestSedCoreUtil.USER_INTERFACE_DEBUG_TREE_WAIT_TIME); // Give the user interface the chance to update the tree
          // Expand all tree items
          TestUtilsUtil.expandAll(debugTree);
-         TestUtilsUtil.sleep(WAIT_TIME); // Give the user interface the chance to update the tree
+         TestUtilsUtil.sleep(TestSedCoreUtil.USER_INTERFACE_DEBUG_TREE_WAIT_TIME); // Give the user interface the chance to update the tree
          // Make sure that the correct items are shown
          TestSedCoreUtil.assertFixedExample(debugTree);
          // Change to compact view
          SEDPreferenceUtil.toggleShowCompactExecutionTreePreference();
-         TestUtilsUtil.sleep(WAIT_TIME); // Give the user interface the chance to update the tree
+         TestUtilsUtil.sleep(TestSedCoreUtil.USER_INTERFACE_DEBUG_TREE_WAIT_TIME); // Give the user interface the chance to update the tree
          // Expand all tree items
          TestUtilsUtil.expandAll(debugTree);
-         TestUtilsUtil.sleep(WAIT_TIME); // Give the user interface the chance to update the tree
+         TestUtilsUtil.sleep(TestSedCoreUtil.USER_INTERFACE_DEBUG_TREE_WAIT_TIME); // Give the user interface the chance to update the tree
          // Make sure that the correct items are shown
          TestSedCoreUtil.assertCompactFixedExample(debugTree);
       }
@@ -105,7 +100,7 @@ public class DebugViewHierarchyTest extends TestCase {
          bot.waitUntil(Conditions.treeHasRows(debugTree, 1));
          // Expand all tree items
          TestUtilsUtil.expandAll(debugTree);
-         TestUtilsUtil.sleep(WAIT_TIME); // Give the user interface the chance to update the tree
+         TestUtilsUtil.sleep(TestSedCoreUtil.USER_INTERFACE_DEBUG_TREE_WAIT_TIME); // Give the user interface the chance to update the tree
          // Make sure that the correct items are shown
          TestSedCoreUtil.assertCompactFixedExample(debugTree);
       }
@@ -143,7 +138,7 @@ public class DebugViewHierarchyTest extends TestCase {
          bot.waitUntil(Conditions.treeHasRows(debugTree, 1));
          // Expand all tree items
          TestUtilsUtil.expandAll(debugTree);
-         TestUtilsUtil.sleep(WAIT_TIME); // Give the user interface the chance to update the tree
+         TestUtilsUtil.sleep(TestSedCoreUtil.USER_INTERFACE_DEBUG_TREE_WAIT_TIME); // Give the user interface the chance to update the tree
          // Make sure that the correct items are shown
          TestSedCoreUtil.assertFixedExample(debugTree);
       }

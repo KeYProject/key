@@ -294,7 +294,7 @@ public abstract class AbstractSEDStackFrameCompatibleDebugNode extends AbstractS
     * Sets the source name.
     * @param sourceName The source name to set.
     */
-   public void setSourceName(String sourceName) {
+   protected void setSourceName(String sourceName) {
       this.sourceName = sourceName;
    }
 

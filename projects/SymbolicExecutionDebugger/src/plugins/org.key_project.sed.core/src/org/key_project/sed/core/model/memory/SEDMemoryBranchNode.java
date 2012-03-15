@@ -15,7 +15,7 @@ import org.key_project.sed.core.model.impl.AbstractSEDBranchNode;
  * information in the memory.
  * @author Martin Hentschel
  */
-public class SEDMemoryBranchNode extends AbstractSEDBranchNode {
+public class SEDMemoryBranchNode extends AbstractSEDBranchNode implements ISEDMemoryStackFrameCompatibleDebugNode {
    /**
     * The contained child nodes.
     */
@@ -101,5 +101,18 @@ public class SEDMemoryBranchNode extends AbstractSEDBranchNode {
    @Override
    public void setCharEnd(int charEnd) {
       super.setCharEnd(charEnd);
+   }
+   
+   /**
+    * <p>
+    * {@inheritDoc}
+    * </p>
+    * <p>
+    * Changed visibility to public.
+    * </p>
+    */
+   @Override
+   public void setSourceName(String sourceName) {
+      super.setSourceName(sourceName);
    }
 }

@@ -13,7 +13,8 @@ Require-Bundle: org.eclipse.ui,
  org.key_project.util.test;bundle-version="1.0.0",
  org.key_project.sed.core.test;bundle-version="1.0.0",
  org.key_project.sed.key.core.test;bundle-version="1.0.0",
- org.key_project.sed.key.ui.test;bundle-version="1.0.0"
+ org.key_project.sed.key.ui.test;bundle-version="1.0.0",
+ org.key_project.sed.ui.test;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: KeY Project
