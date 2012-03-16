@@ -28,11 +28,6 @@ import de.hentschel.visualdbc.datasource.ui.setting.event.SettingControlEvent;
  */
 public class PackageManagementControl extends AbstractSettingControl {
    /**
-    * Generated UID.
-    */
-   private static final long serialVersionUID = 1906721062115407277L;
-   
-   /**
     * The control to select a {@link DSPackageManagement}.
     */
    private Combo control;

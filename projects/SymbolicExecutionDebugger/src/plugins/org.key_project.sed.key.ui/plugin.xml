@@ -105,4 +105,11 @@
             sequence="M1+M2+D">
       </key>
    </extension>
+      <extension
+            point="org.eclipse.debug.ui.debugModelPresentations">
+         <debugModelPresentation
+               class="org.key_project.sed.key.ui.presentation.KeYDebugModelPresentation"
+               id="org.key_project.sed.key.core">
+         </debugModelPresentation>
+      </extension>
 </plugin>

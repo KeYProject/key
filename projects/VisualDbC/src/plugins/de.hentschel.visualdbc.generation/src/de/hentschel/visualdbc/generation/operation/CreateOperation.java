@@ -44,6 +44,8 @@ import org.eclipse.ui.PartInitException;
 
 import de.hentschel.visualdbc.datasource.model.DSVisibility;
 import de.hentschel.visualdbc.datasource.model.IDSAttribute;
+import de.hentschel.visualdbc.datasource.model.IDSAxiom;
+import de.hentschel.visualdbc.datasource.model.IDSAxiomContract;
 import de.hentschel.visualdbc.datasource.model.IDSClass;
 import de.hentschel.visualdbc.datasource.model.IDSConnection;
 import de.hentschel.visualdbc.datasource.model.IDSConstructor;
@@ -59,7 +61,9 @@ import de.hentschel.visualdbc.datasource.model.IDSProvable;
 import de.hentschel.visualdbc.datasource.model.IDSType;
 import de.hentschel.visualdbc.datasource.model.exception.DSException;
 import de.hentschel.visualdbc.dbcmodel.AbstractDbcType;
+import de.hentschel.visualdbc.dbcmodel.DbCAxiomContract;
 import de.hentschel.visualdbc.dbcmodel.DbcAttribute;
+import de.hentschel.visualdbc.dbcmodel.DbcAxiom;
 import de.hentschel.visualdbc.dbcmodel.DbcClass;
 import de.hentschel.visualdbc.dbcmodel.DbcConstructor;
 import de.hentschel.visualdbc.dbcmodel.DbcEnum;
@@ -312,14 +316,40 @@ public class CreateOperation {
    
    /**
     * Fills the given {@link DbcInvariant} list with the attributes provided by the {@link IDSInvariant} list.
-    * @param DbcInvariants The list to fill.
+    * @param dbcInvariants The list to fill.
     * @param dsTypeInvariants The content to convert.
     * @throws DSException Occurred Exception
     */
-   protected void fillDbcInvariants(EList<DbcInvariant> DbcInvariants, List<IDSInvariant> dsTypeInvariants) throws DSException {
+   protected void fillDbcInvariants(EList<DbcInvariant> dbcInvariants, List<IDSInvariant> dsTypeInvariants) throws DSException {
       for (IDSInvariant dsTypeInvariant : dsTypeInvariants) {
          DbcInvariant modelSpecificationInstance = createDbcInvariant(dsTypeInvariant);
-         DbcInvariants.add(modelSpecificationInstance);
+         dbcInvariants.add(modelSpecificationInstance);
+      }
+   }
+   
+   /**
+    * Fills the given {@link DbcAxiom} list with the attributes provided by the {@link IDSAxiom} list.
+    * @param dbcAxioms The list to fill.
+    * @param dsAxioms The content to convert.
+    * @throws DSException Occurred Exception
+    */
+   protected void fillDbcAxioms(DbcModel dbcModel, EList<DbcAxiom> dbcAxioms, List<IDSAxiom> dsAxioms) throws DSException {
+      for (IDSAxiom dsAxiom : dsAxioms) {
+         DbcAxiom modelSpecificationInstance = createDbcAxiom(dbcModel, dsAxiom);
+         dbcAxioms.add(modelSpecificationInstance);
+      }
+   }
+
+   /**
+    * Fills the given {@link DbCAxiomContract} list with the attributes provided by the {@link IDSAxiomContract} list.
+    * @param dbcAxiomContracts The list to fill.
+    * @param dsAxiomContracts The content to convert.
+    * @throws DSException Occurred Exception
+    */
+   protected void fillDbcAxiomContracts(DbcModel dbcModel, EList<DbCAxiomContract> dbcAxiomContracts, List<IDSAxiomContract> dsAxiomContracts) throws DSException {
+      for (IDSAxiomContract dsAxiomContract : dsAxiomContracts) {
+         DbCAxiomContract modelSpecificationInstance = createDbcAxiomContract(dbcModel, dsAxiomContract);
+         dbcAxiomContracts.add(modelSpecificationInstance);
       }
    }
 
@@ -430,6 +460,7 @@ public class CreateOperation {
       fillDbcConstructors(dbcModel, modelInstance.getConstructors(), dsInstance.getConstructors());
       fillDbcEnumLiterals(modelInstance.getLiterals(), dsInstance.getLiterals());
       fillDbcInvariants(modelInstance.getInvariants(), dsInstance.getInvariants());
+      fillDbcAxioms(dbcModel, modelInstance.getAxioms(), dsInstance.getAxioms());
       return modelInstance;
    }
    
@@ -452,6 +483,7 @@ public class CreateOperation {
       fillDbcAttributes(modelInstance.getAttributes(), dsInstance.getAttributes());
       fillDbcMethods(dbcModel, modelInstance.getMethods(), dsInstance.getMethods());
       fillDbcInvariants(modelInstance.getInvariants(), dsInstance.getInvariants());
+      fillDbcAxioms(dbcModel, modelInstance.getAxioms(), dsInstance.getAxioms());
       return modelInstance;
    }
    
@@ -477,6 +509,7 @@ public class CreateOperation {
       fillDbcMethods(dbcModel, modelInstance.getMethods(), dsInstance.getMethods());
       fillDbcConstructors(dbcModel, modelInstance.getConstructors(), dsInstance.getConstructors());
       fillDbcInvariants(modelInstance.getInvariants(), dsInstance.getInvariants());
+      fillDbcAxioms(dbcModel, modelInstance.getAxioms(), dsInstance.getAxioms());
       return modelInstance;
    }
 
@@ -596,6 +629,37 @@ public class CreateOperation {
       DbcInvariant modelInstance = DbcmodelFactory.eINSTANCE.createDbcInvariant();
       modelInstance.setName(dsTypeInvariant.getName());
       modelInstance.setCondition(dsTypeInvariant.getCondition());
+      return modelInstance;
+   }
+   
+   /**
+    * Creates a {@link DbcAxiom} and sets the values provided by the {@link IDSAxiom}.
+    * @param dsAxiom The {@link IDSAxiom} that provides the values.
+    * @return The created {@link DbcAxiom}.
+    * @throws DSException Occurred Exception
+    */
+   protected DbcAxiom createDbcAxiom(DbcModel dbcModel, IDSAxiom dsAxiom) throws DSException {
+      Assert.isNotNull(dsAxiom);
+      DbcAxiom modelInstance = DbcmodelFactory.eINSTANCE.createDbcAxiom();
+      modelInstance.setName(dsAxiom.getName());
+      modelInstance.setDefinition(dsAxiom.getDefinition());
+      fillDbcAxiomContracts(dbcModel, modelInstance.getAxiomContracts(), dsAxiom.getAxiomContracts());
+      return modelInstance;
+   }
+
+   /**
+    * Creates a {@link DbCAxiomContract} and sets the values provided by the {@link IDSAxiomContract}.
+    * @param dsAxiomContract The {@link IDSAxiomContract} that provides the values.
+    * @return The created {@link DbCAxiomContract}.
+    * @throws DSException Occurred Exception
+    */
+   protected DbCAxiomContract createDbcAxiomContract(DbcModel dbcModel, IDSAxiomContract dsAxiomContract) throws DSException {
+      Assert.isNotNull(dsAxiomContract);
+      DbCAxiomContract modelInstance = DbcmodelFactory.eINSTANCE.createDbCAxiomContract();
+      fillDbcProvable(dbcModel, dsAxiomContract, modelInstance);
+      modelInstance.setName(dsAxiomContract.getName());
+      modelInstance.setDep(dsAxiomContract.getDep());
+      modelInstance.setPre(dsAxiomContract.getPre());
       return modelInstance;
    }
 

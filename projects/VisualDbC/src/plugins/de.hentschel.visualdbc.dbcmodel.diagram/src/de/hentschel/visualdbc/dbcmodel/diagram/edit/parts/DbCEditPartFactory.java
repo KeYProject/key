@@ -115,6 +115,9 @@ public class DbCEditPartFactory implements EditPartFactory {
          case DbcAttributeEditPart.VISUAL_ID:
             return new DbcAttributeEditPart(view);
 
+         case DbcAttributeNameTypeEditPart.VISUAL_ID:
+            return new DbcAttributeNameTypeEditPart(view);
+
          case DbcMethodEditPart.VISUAL_ID:
             return new DbcMethodEditPart(view);
 
@@ -141,6 +144,30 @@ public class DbCEditPartFactory implements EditPartFactory {
 
          case DbcEnumLiteralEditPart.VISUAL_ID:
             return new DbcEnumLiteralEditPart(view);
+
+         case DbcEnumLiteralNameEditPart.VISUAL_ID:
+            return new DbcEnumLiteralNameEditPart(view);
+
+         case DbcAxiomEditPart.VISUAL_ID:
+            return new DbcAxiomEditPart(view);
+
+         case DbcAxiomNameEditPart.VISUAL_ID:
+            return new DbcAxiomNameEditPart(view);
+
+         case DbcAxiomDefinitionEditPart.VISUAL_ID:
+            return new DbcAxiomDefinitionEditPart(view);
+
+         case DbCAxiomContractEditPart.VISUAL_ID:
+            return new DbCAxiomContractEditPart(view);
+
+         case DbCAxiomContractNameEditPart.VISUAL_ID:
+            return new DbCAxiomContractNameEditPart(view);
+
+         case DbCAxiomContractPreEditPart.VISUAL_ID:
+            return new DbCAxiomContractPreEditPart(view);
+
+         case DbCAxiomContractDepEditPart.VISUAL_ID:
+            return new DbCAxiomContractDepEditPart(view);
 
          case DbcPackageDbcPackageCompartmentEditPart.VISUAL_ID:
             return new DbcPackageDbcPackageCompartmentEditPart(view);
@@ -175,6 +202,9 @@ public class DbCEditPartFactory implements EditPartFactory {
 
          case DbcConstructorDbcConstructorCompartmentEditPart.VISUAL_ID:
             return new DbcConstructorDbcConstructorCompartmentEditPart(view);
+
+         case DbcAxiomDbcAxiomCompartmentEditPart.VISUAL_ID:
+            return new DbcAxiomDbcAxiomCompartmentEditPart(view);
 
          case DbcInterfaceDbcInterfaceMainCompartment2EditPart.VISUAL_ID:
             return new DbcInterfaceDbcInterfaceMainCompartment2EditPart(view);

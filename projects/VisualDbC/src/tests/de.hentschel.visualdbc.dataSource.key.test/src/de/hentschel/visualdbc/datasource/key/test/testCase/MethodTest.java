@@ -28,7 +28,7 @@ public class MethodTest extends TestCase {
     * Tests methods and constructors.
     */
    @Test
-   public void testMethods() {
+   public void testMethods() throws Exception {
       TestKeyUtil.testKeyConnection("MethodTest_testMethods",
                                     "data/methodAndConstructorTest",
                                     null,

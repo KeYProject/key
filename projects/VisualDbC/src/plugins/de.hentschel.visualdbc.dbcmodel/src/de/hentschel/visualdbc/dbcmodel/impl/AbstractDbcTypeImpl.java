@@ -31,6 +31,7 @@ import org.eclipse.emf.ecore.util.EObjectResolvingEList;
 import org.eclipse.emf.ecore.util.InternalEList;
 
 import de.hentschel.visualdbc.dbcmodel.AbstractDbcType;
+import de.hentschel.visualdbc.dbcmodel.DbcAxiom;
 import de.hentschel.visualdbc.dbcmodel.DbcInvariant;
 import de.hentschel.visualdbc.dbcmodel.DbcProof;
 import de.hentschel.visualdbc.dbcmodel.DbcProofObligation;
@@ -52,6 +53,7 @@ import de.hentschel.visualdbc.dbcmodel.IDbCProvable;
  *   <li>{@link de.hentschel.visualdbc.dbcmodel.impl.AbstractDbcTypeImpl#getVisibility <em>Visibility</em>}</li>
  *   <li>{@link de.hentschel.visualdbc.dbcmodel.impl.AbstractDbcTypeImpl#isStatic <em>Static</em>}</li>
  *   <li>{@link de.hentschel.visualdbc.dbcmodel.impl.AbstractDbcTypeImpl#getInvariants <em>Invariants</em>}</li>
+ *   <li>{@link de.hentschel.visualdbc.dbcmodel.impl.AbstractDbcTypeImpl#getAxioms <em>Axioms</em>}</li>
  * </ul>
  * </p>
  *
@@ -149,6 +151,16 @@ public abstract class AbstractDbcTypeImpl extends AbstractDbcTypeContainerImpl i
    protected EList<DbcInvariant> invariants;
 
    /**
+    * The cached value of the '{@link #getAxioms() <em>Axioms</em>}' containment reference list.
+    * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+    * @see #getAxioms()
+    * @generated
+    * @ordered
+    */
+    protected EList<DbcAxiom> axioms;
+
+/**
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
     * @generated
@@ -268,6 +280,18 @@ public abstract class AbstractDbcTypeImpl extends AbstractDbcTypeContainerImpl i
 
    /**
     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+    * @generated
+    */
+    public EList<DbcAxiom> getAxioms() {
+      if (axioms == null) {
+         axioms = new EObjectContainmentEList<DbcAxiom>(DbcAxiom.class, this, DbcmodelPackage.ABSTRACT_DBC_TYPE__AXIOMS);
+      }
+      return axioms;
+   }
+
+   /**
+    * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
     * @generated NOT
     */
@@ -284,6 +308,23 @@ public abstract class AbstractDbcTypeImpl extends AbstractDbcTypeContainerImpl i
    }
 
    /**
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated NOT
+     */
+    public DbcAxiom getAxiom(String definition) {
+       DbcAxiom result = null;
+        Iterator<DbcAxiom> iter = getAxioms().iterator();
+        while (result == null && iter.hasNext()) {
+           DbcAxiom next = iter.next();
+           if (next.getDefinition().equals(definition)) {
+              result = next;
+           }
+        }
+        return result;
+     }
+
+/**
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
     * @generated
@@ -293,6 +334,8 @@ public abstract class AbstractDbcTypeImpl extends AbstractDbcTypeContainerImpl i
       switch (featureID) {
          case DbcmodelPackage.ABSTRACT_DBC_TYPE__INVARIANTS:
             return ((InternalEList<?>)getInvariants()).basicRemove(otherEnd, msgs);
+         case DbcmodelPackage.ABSTRACT_DBC_TYPE__AXIOMS:
+            return ((InternalEList<?>)getAxioms()).basicRemove(otherEnd, msgs);
       }
       return super.eInverseRemove(otherEnd, featureID, msgs);
    }
@@ -317,6 +360,8 @@ public abstract class AbstractDbcTypeImpl extends AbstractDbcTypeContainerImpl i
             return isStatic();
          case DbcmodelPackage.ABSTRACT_DBC_TYPE__INVARIANTS:
             return getInvariants();
+         case DbcmodelPackage.ABSTRACT_DBC_TYPE__AXIOMS:
+            return getAxioms();
       }
       return super.eGet(featureID, resolve, coreType);
    }
@@ -347,6 +392,10 @@ public abstract class AbstractDbcTypeImpl extends AbstractDbcTypeContainerImpl i
             getInvariants().clear();
             getInvariants().addAll((Collection<? extends DbcInvariant>)newValue);
             return;
+         case DbcmodelPackage.ABSTRACT_DBC_TYPE__AXIOMS:
+            getAxioms().clear();
+            getAxioms().addAll((Collection<? extends DbcAxiom>)newValue);
+            return;
       }
       super.eSet(featureID, newValue);
    }
@@ -374,6 +423,9 @@ public abstract class AbstractDbcTypeImpl extends AbstractDbcTypeContainerImpl i
          case DbcmodelPackage.ABSTRACT_DBC_TYPE__INVARIANTS:
             getInvariants().clear();
             return;
+         case DbcmodelPackage.ABSTRACT_DBC_TYPE__AXIOMS:
+            getAxioms().clear();
+            return;
       }
       super.eUnset(featureID);
    }
@@ -398,6 +450,8 @@ public abstract class AbstractDbcTypeImpl extends AbstractDbcTypeContainerImpl i
             return static_ != STATIC_EDEFAULT;
          case DbcmodelPackage.ABSTRACT_DBC_TYPE__INVARIANTS:
             return invariants != null && !invariants.isEmpty();
+         case DbcmodelPackage.ABSTRACT_DBC_TYPE__AXIOMS:
+            return axioms != null && !axioms.isEmpty();
       }
       return super.eIsSet(featureID);
    }

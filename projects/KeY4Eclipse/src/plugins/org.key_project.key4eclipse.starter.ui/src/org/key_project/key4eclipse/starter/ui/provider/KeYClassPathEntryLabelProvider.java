@@ -9,8 +9,8 @@ import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 import org.key_project.key4eclipse.starter.core.property.KeYClassPathEntry;
-import org.key_project.key4eclipse.util.eclipse.ResourceUtil;
-import org.key_project.key4eclipse.util.java.IOUtil;
+import org.key_project.util.eclipse.ResourceUtil;
+import org.key_project.util.java.IOUtil;
 
 /**
  * Provides a special {@link ILabelProvider} for {@link KeYClassPathEntry} instances.

@@ -358,14 +358,14 @@
          unpack="false"/>
 
    <plugin
-         id="org.key_project.key4eclipse.util"
+         id="org.key_project.key4eclipse.starter.core"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.key_project.key4eclipse.starter.core"
+         id="org.key_project.util"
          download-size="0"
          install-size="0"
          version="0.0.0"

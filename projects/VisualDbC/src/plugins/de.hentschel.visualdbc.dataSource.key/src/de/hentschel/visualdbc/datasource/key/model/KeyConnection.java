@@ -33,12 +33,13 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
-import org.key_project.key4eclipse.util.eclipse.ResourceUtil;
-import org.key_project.key4eclipse.util.java.ArrayUtil;
-import org.key_project.key4eclipse.util.java.ObjectUtil;
-import org.key_project.key4eclipse.util.java.SwingUtil;
-import org.key_project.key4eclipse.util.java.thread.AbstractRunnableWithException;
-import org.key_project.key4eclipse.util.java.thread.IRunnableWithException;
+import org.key_project.util.eclipse.ResourceUtil;
+import org.key_project.util.java.ArrayUtil;
+import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.ObjectUtil;
+import org.key_project.util.java.SwingUtil;
+import org.key_project.util.java.thread.AbstractRunnableWithException;
+import org.key_project.util.java.thread.IRunnableWithException;
 
 import de.hentschel.visualdbc.datasource.key.intern.helper.KeyHacks;
 import de.hentschel.visualdbc.datasource.key.intern.helper.OpenedProof;
@@ -46,11 +47,15 @@ import de.hentschel.visualdbc.datasource.key.util.LogUtil;
 import de.hentschel.visualdbc.datasource.model.DSPackageManagement;
 import de.hentschel.visualdbc.datasource.model.DSVisibility;
 import de.hentschel.visualdbc.datasource.model.IDSAttribute;
+import de.hentschel.visualdbc.datasource.model.IDSAxiom;
+import de.hentschel.visualdbc.datasource.model.IDSAxiomContract;
 import de.hentschel.visualdbc.datasource.model.IDSClass;
 import de.hentschel.visualdbc.datasource.model.IDSConnection;
 import de.hentschel.visualdbc.datasource.model.IDSConstructor;
 import de.hentschel.visualdbc.datasource.model.IDSContainer;
 import de.hentschel.visualdbc.datasource.model.IDSDriver;
+import de.hentschel.visualdbc.datasource.model.IDSEnum;
+import de.hentschel.visualdbc.datasource.model.IDSEnumLiteral;
 import de.hentschel.visualdbc.datasource.model.IDSInterface;
 import de.hentschel.visualdbc.datasource.model.IDSInvariant;
 import de.hentschel.visualdbc.datasource.model.IDSMethod;
@@ -62,9 +67,13 @@ import de.hentschel.visualdbc.datasource.model.IDSType;
 import de.hentschel.visualdbc.datasource.model.exception.DSCanceledException;
 import de.hentschel.visualdbc.datasource.model.exception.DSException;
 import de.hentschel.visualdbc.datasource.model.memory.MemoryAttribute;
+import de.hentschel.visualdbc.datasource.model.memory.MemoryAxiom;
+import de.hentschel.visualdbc.datasource.model.memory.MemoryAxiomContract;
 import de.hentschel.visualdbc.datasource.model.memory.MemoryClass;
 import de.hentschel.visualdbc.datasource.model.memory.MemoryConnection;
 import de.hentschel.visualdbc.datasource.model.memory.MemoryConstructor;
+import de.hentschel.visualdbc.datasource.model.memory.MemoryEnum;
+import de.hentschel.visualdbc.datasource.model.memory.MemoryEnumLiteral;
 import de.hentschel.visualdbc.datasource.model.memory.MemoryInterface;
 import de.hentschel.visualdbc.datasource.model.memory.MemoryInvariant;
 import de.hentschel.visualdbc.datasource.model.memory.MemoryMethod;
@@ -86,12 +95,14 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
+import de.uka.ilkd.key.java.declaration.EnumClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
 import de.uka.ilkd.key.java.reference.PackageReference;
 import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.ProblemLoader;
@@ -102,10 +113,13 @@ import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.EnvInput;
+import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.DependencyContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.OperationContract;
+import de.uka.ilkd.key.speclang.RepresentsAxiom;
 
 /**
  * Implementation for {@link IDSConnection} to analyze code files with KeY.
@@ -181,11 +195,31 @@ public class KeyConnection extends MemoryConnection {
     * Maps all {@link OperationContract}s to their data source instance.
     */
    private Map<OperationContract, IDSOperationContract> operationContractsMapping;
+
+   /**
+    * Maps all {@link OperationContract}s to their data source instance.
+    */
+   private Map<Contract, IDSAxiomContract> axiomContractsMapping;
    
    /**
     * Maps all {@link ClassInvariant}s to their data source instance.
     */
    private Map<ClassInvariant, IDSInvariant> invariantsMapping;
+   
+   /**
+    * Maps all {@link ClassAxiom}s to their data source instance.
+    */
+   private Map<ClassAxiom, IDSAxiom> axiomsMapping;
+   
+   /**
+    * Maps all {@link Field}s to their data source instance.
+    */
+   private Map<Field, IDSAttribute> attributesMapping;
+   
+   /**
+    * Maps all {@link Field}s to their data source instance.
+    */
+   private Map<Field, IDSEnumLiteral> enumLiteralsMapping;
    
    /**
     * Maps all {@link KeYJavaType}s to their data source instance.
@@ -230,8 +264,12 @@ public class KeyConnection extends MemoryConnection {
          // Initialize instance variables
          operationsMapping = new HashMap<ProgramMethod, IDSOperation>();
          operationContractsMapping = new HashMap<OperationContract, IDSOperationContract>();
+         axiomContractsMapping = new HashMap<Contract, IDSAxiomContract>();
          invariantsMapping = new HashMap<ClassInvariant, IDSInvariant>();
          typesMapping = new HashMap<KeYJavaType, IDSType>();
+         axiomsMapping = new HashMap<ClassAxiom, IDSAxiom>();
+         attributesMapping = new HashMap<Field, IDSAttribute>();
+         enumLiteralsMapping = new HashMap<Field, IDSEnumLiteral>();
          // Get settings
          final File location = getLocation(connectionSettings);
          final List<File> classPathEntries = getClassPathEntries(connectionSettings);
@@ -342,6 +380,7 @@ public class KeyConnection extends MemoryConnection {
       // Fill data connection model
       Map<String, List<MemoryClass>> innerClasses = new HashMap<String, List<MemoryClass>>(); // Contains all inner classes that are added to their parents after analyzing all types to make sure that the parent type already exists as IDSType.
       Map<String, List<MemoryInterface>> innerInterfaces = new HashMap<String, List<MemoryInterface>>(); // Contains all inner classes that are added to their parents after analyzing all types to make sure that the parent type already exists as IDSType.
+      Map<String, List<MemoryEnum>> innerEnums = new HashMap<String, List<MemoryEnum>>(); // Contains all inner classes that are added to their parents after analyzing all types to make sure that the parent type already exists as IDSType.
       Map<String, IDSType> types = new HashMap<String, IDSType>(); // Maps the full name to the created IDSType.
       monitor.beginTask("Analyzing types", kjtsarr.length);
       for (KeYJavaType type : kjtsarr) {
@@ -360,6 +399,16 @@ public class KeyConnection extends MemoryConnection {
                }
                parentInnerInterfaces.add(interfaceInstance);
                types.put(type.getFullName(), interfaceInstance);
+            }
+            else if (ct instanceof EnumClassDeclaration) {
+               MemoryEnum enumInstance = createEnum(services, (EnumClassDeclaration)ct, type, typeName);
+               List<MemoryEnum> parentInnerEnums = innerEnums.get(parentName);
+               if (parentInnerEnums == null) {
+                  parentInnerEnums = new LinkedList<MemoryEnum>();
+                  innerEnums.put(parentName, parentInnerEnums);
+               }
+               parentInnerEnums.add(enumInstance);
+               types.put(type.getFullName(), enumInstance);
             }
             else {
                MemoryClass classInstance = createClass(services, ct, type, typeName);
@@ -384,6 +433,12 @@ public class KeyConnection extends MemoryConnection {
                   dsPackage.getInterfaces().add(interfaceInstance);
                   types.put(type.getFullName(), interfaceInstance);
                }
+               else if (ct instanceof EnumClassDeclaration) {
+                  MemoryEnum enumInstance = createEnum(services, (EnumClassDeclaration)ct, type, typeName);
+                  enumInstance.setParentContainer(dsPackage);
+                  dsPackage.getEnums().add(enumInstance);
+                  types.put(type.getFullName(), enumInstance);
+               }
                else {
                   MemoryClass classInstance = createClass(services, ct, type, typeName);
                   classInstance.setParentContainer(dsPackage);
@@ -397,6 +452,12 @@ public class KeyConnection extends MemoryConnection {
                   interfaceInstance.setParentContainer(this);
                   getInterfaces().add(interfaceInstance);
                   types.put(type.getFullName(), interfaceInstance);
+               }
+               else if (ct instanceof EnumClassDeclaration) {
+                  MemoryEnum enumInstance = createEnum(services, (EnumClassDeclaration)ct, type, typeName);
+                  enumInstance.setParentContainer(this);
+                  getEnums().add(enumInstance);
+                  types.put(type.getFullName(), enumInstance);
                }
                else {
                   MemoryClass classInstance = createClass(services, ct, type, typeName);
@@ -438,6 +499,20 @@ public class KeyConnection extends MemoryConnection {
          }
          monitor.worked(1);
       }
+      // Add inner enumeration to their parents
+      monitor.beginTask("Adding inner enums", innerInterfaces.size());
+      Set<Entry<String, List<MemoryEnum>>> innerEnumEntries = innerEnums.entrySet();
+      for (Entry<String, List<MemoryEnum>> innerEntry : innerEnumEntries) {
+         IDSType parent = types.get(innerEntry.getKey());
+         Assert.isNotNull(parent);
+         List<MemoryEnum> innerEnumList = innerEntry.getValue();
+         Assert.isNotNull(innerEnumList);
+         for (MemoryEnum innerEnum : innerEnumList) {
+            parent.getInnerEnums().add(innerEnum);
+            innerEnum.setParentType(parent);
+         }
+         monitor.worked(1);
+      }
       // Set parent dependencies
       Collection<IDSType> modelTypes = types.values();
       monitor.beginTask("Adding parent references", modelTypes.size());
@@ -466,6 +541,16 @@ public class KeyConnection extends MemoryConnection {
                if (parentInstance != null) {
                   Assert.isTrue(parentInstance instanceof IDSInterface); 
                   interfaceInstance.getExtends().add((IDSInterface)parentInstance);
+               }
+            }
+         }
+         else if (type instanceof IDSEnum) {
+            IDSEnum enumInstance = (IDSEnum)type;
+            for (String parent : enumInstance.getImplementsFullnames()) {
+               IDSType parentInstance = types.get(parent);
+               if (parentInstance != null) {
+                  Assert.isTrue(parentInstance instanceof IDSInterface); 
+                  enumInstance.getImplements().add((IDSInterface)parentInstance);
                }
             }
          }
@@ -737,6 +822,7 @@ public class KeyConnection extends MemoryConnection {
     */
    protected MemoryInterface createInterface(Services services, ClassType ct, KeYJavaType type, String interfaceName) throws DSException {
       Assert.isTrue(ct.isInterface());
+      Assert.isTrue(!(ct instanceof EnumClassDeclaration));
       MemoryInterface result = new KeyInterface(this, type);
       result.setName(interfaceName);
       // Add methods
@@ -761,7 +847,8 @@ public class KeyConnection extends MemoryConnection {
          ImmutableList<ProgramVariable> vars = services.getJavaInfo().getAllAttributes(field.getFullName(), type);
          for (ProgramVariable var : vars) {
             if (!var.isImplicit()) {
-               IDSAttribute attribute = createAttribute(field);
+               MemoryAttribute attribute = createAttribute(services, field);
+               attribute.setParent(result);
                result.getAttributes().add(attribute);
             }
          }
@@ -780,12 +867,176 @@ public class KeyConnection extends MemoryConnection {
       ImmutableSet<ClassInvariant> classInvariants = services.getSpecificationRepository().getClassInvariants(type);
       for (ClassInvariant classInvariant : classInvariants) {
          MemoryInvariant invariant = createInvariant(services, classInvariant);
+         invariant.setParent(result);
          result.addInvariant(invariant);
+      }
+      // Add type axioms
+      ImmutableSet<ClassAxiom> axioms = services.getSpecificationRepository().getClassAxioms(type);
+      for (ClassAxiom classAxiom : axioms) {
+         if (shouldIncludeClassAxiom(services, type, classAxiom)) {
+            MemoryAxiom axiom = createAxiom(services, type, classAxiom);
+            axiom.setParent(result);
+            result.addAxiom(axiom);
+         }
       }
       typesMapping.put(type, result);
       return result;
    }
+
+   /**
+    * Checks if the given {@link ClassAxiom} should be included.
+    * @param services The {@link Services} to use.
+    * @param type The current {@link KeYJavaType}
+    * @param classAxiom The {@link ClassAxiom} to check.
+    * @return {@code true} include, {@code false} do not include
+    */
+   protected boolean shouldIncludeClassAxiom(Services services, KeYJavaType type, ClassAxiom classAxiom) {
+      ImmutableSet<ObserverFunction> targets = services.getSpecificationRepository().getContractTargets(type);
+      return classAxiom instanceof RepresentsAxiom && // Filter other axiom types out
+             ((classAxiom.getTarget() != null && classAxiom.getTarget().getType() != null) || // Allow also represents axioms without accessible clause.
+             CollectionUtil.contains(targets, classAxiom.getTarget())); // Make sure that everything that has an accessible clause is available.
+   }
+
+   /**
+    * Creates a new {@link IDSEnum} instance for the given KeY instance.
+    * @param services The {@link Services} that is used to read containments.
+    * @param ct The KeY class type.
+    * @param type The KeY instance.
+    * @param className The class name to use.
+    * @return The created {@link IDSClass}.
+    * @throws DSException Occurred Exception
+    */   
+   protected MemoryEnum createEnum(Services services, EnumClassDeclaration ct, KeYJavaType type, String className) throws DSException {
+      Assert.isTrue(!ct.isInterface());
+      Assert.isTrue(ct instanceof EnumClassDeclaration);
+      MemoryEnum result = new KeyEnum(this, type);
+      result.setName(className);
+      // Add methods (must be done before constructor adding to collect implicit defined constructors)
+      ImmutableList<ProgramMethod> methods = services.getJavaInfo().getAllProgramMethodsLocallyDeclared(type);
+      List<ProgramMethod> implicitConstructors = new LinkedList<ProgramMethod>(); 
+      fillEnumWithMethodsAndConstructors(services, result, methods, implicitConstructors, type);
+      // Add constructors with use of implicit constructor definitions to get the specifications
+      ImmutableList<ProgramMethod> constructors = services.getJavaInfo().getConstructors(type);
+      fillEnumWithMethodsAndConstructors(services, result, constructors, implicitConstructors, type);
+      // Add attributes
+      result.setStatic(ct.isStatic());
+      if (ct.isPrivate()) {
+         result.setVisibility(DSVisibility.PRIVATE);
+      }
+      else if (ct.isProtected()) {
+         result.setVisibility(DSVisibility.PROTECTED);
+      }
+      else if (ct.isPublic()) {
+         result.setVisibility(DSVisibility.PUBLIC);
+      }
+      else {
+         result.setVisibility(DSVisibility.DEFAULT);
+      }      
+      ImmutableList<Field> fields = ct.getAllFields(services);
+      for (Field field : fields) {
+         ImmutableList<ProgramVariable> vars = services.getJavaInfo().getAllAttributes(field.getFullName(), type);
+         for (ProgramVariable var : vars) {
+            if (!var.isImplicit()) {
+               if (EnumClassDeclaration.isEnumConstant(field.getProgramVariable())) {
+                  // Enumeration literal
+                  MemoryEnumLiteral literal = createEnumLiteral(services, field);
+                  literal.setParent(result);
+                  result.getLiterals().add(literal);
+               }
+               else {
+                  // Attribute
+                  MemoryAttribute attribute = createAttribute(services, field);
+                  attribute.setParent(result);
+                  result.getAttributes().add(attribute);
+               }
+            }
+         }
+      }
+      // Analyze parents
+      ImmutableList<KeYJavaType> superTypes = services.getJavaInfo().getDirectSuperTypes(type);
+      for (KeYJavaType superType : superTypes) {
+         if (superType.getJavaType() instanceof ClassType) {
+            ClassType superCt = (ClassType)superType.getJavaType();
+            if (superCt.isInterface()) {
+               result.getImplementsFullnames().add(superType.getFullName());
+            }
+         }
+         else if (superType.getJavaType() instanceof InterfaceDeclaration) {
+            result.getImplementsFullnames().add(superType.getFullName());
+         }
+         else {
+            throw new DSException("Not supported super type: " + superType);
+         }
+      }
+      // Add type invariants
+      ImmutableSet<ClassInvariant> classInvariants = services.getSpecificationRepository().getClassInvariants(type);
+      for (ClassInvariant classInvariant : classInvariants) {
+         MemoryInvariant invariant = createInvariant(services, classInvariant);
+         invariant.setParent(result);
+         result.addInvariant(invariant);
+      }
+      // Add type axioms
+      ImmutableSet<ClassAxiom> axioms = services.getSpecificationRepository().getClassAxioms(type);
+      for (ClassAxiom classAxiom : axioms) {
+         if (shouldIncludeClassAxiom(services, type, classAxiom)) {
+            MemoryAxiom axiom = createAxiom(services, type, classAxiom);
+            axiom.setParent(result);
+            result.addAxiom(axiom);
+         }
+      }
+      // Add allowed proof obligations
+      List<String> classObligations = Collections.emptyList();
+      fillProovableWithAllowedOperationContracts(result, classObligations);
+      typesMapping.put(type, result);
+      return result;
+   }
+
+   /**
+    * Creates a new {@link IDSEnumLiteral} instance for the given KeY instance.
+    * @param variable The KeY instance.
+    * @return The created {@link IDSEnumLiteral}.
+    */
+   protected MemoryEnumLiteral createEnumLiteral(Services services, Field variable) {
+      MemoryEnumLiteral result = new MemoryEnumLiteral();
+      result.setName(variable.getProgramName());
+      enumLiteralsMapping.put(variable, result);
+      return result;
+   }
    
+   /**
+    * Fills the enumeration with constructors and methods from the given KeY instances.
+    * @param services The services to use.
+    * @param toFill The class to fill.
+    * @param methodsAndConstructors The available KeY instances.
+    * @param implicitConstructors The implicit constructor definitions to fill and to read from.
+    * @throws DSException Occurred Exception
+    */
+   protected void fillEnumWithMethodsAndConstructors(Services services,
+                                                     IDSEnum toFill, 
+                                                     ImmutableList<ProgramMethod> methodsAndConstructors,
+                                                     List<ProgramMethod> implicitConstructors,
+                                                     KeYJavaType type) throws DSException {
+      for (ProgramMethod methodOrConstructor : methodsAndConstructors) {
+         if (!methodOrConstructor.isImplicit()) {
+            if (methodOrConstructor.isConstructor()) {
+               ProgramMethod implicitConstructor = getImplicitConstructor(implicitConstructors, methodOrConstructor);
+               Assert.isNotNull(implicitConstructor, "Can't find implicit constructor for: " + methodOrConstructor.getFullName());
+               IDSConstructor constructor = createConstructor(services, methodOrConstructor, implicitConstructor, type, toFill);
+               toFill.getConstructors().add(constructor);
+            }
+            else {
+               IDSMethod dsMethod = createMethod(services, methodOrConstructor, type, toFill);
+               toFill.getMethods().add(dsMethod);
+            }
+         }
+         else {
+            if (INIT_NAME.equals(methodOrConstructor.getName())) {
+               implicitConstructors.add(methodOrConstructor);
+            }
+         }
+      }
+   }
+
    /**
     * Creates a new {@link IDSClass} instance for the given KeY instance.
     * @param services The {@link Services} that is used to read containments.
@@ -797,6 +1048,7 @@ public class KeyConnection extends MemoryConnection {
     */
    protected MemoryClass createClass(Services services, ClassType ct, KeYJavaType type, String className) throws DSException {
       Assert.isTrue(!ct.isInterface());
+      Assert.isTrue(!(ct instanceof EnumClassDeclaration));
       MemoryClass result = new KeyClass(this, type);
       result.setName(className);
       // Add methods (must be done before constructor adding to collect implicit defined constructors)
@@ -828,7 +1080,8 @@ public class KeyConnection extends MemoryConnection {
          ImmutableList<ProgramVariable> vars = services.getJavaInfo().getAllAttributes(field.getFullName(), type);
          for (ProgramVariable var : vars) {
             if (!var.isImplicit()) {
-               IDSAttribute attribute = createAttribute(field);
+               MemoryAttribute attribute = createAttribute(services, field);
+               attribute.setParent(result);
                result.getAttributes().add(attribute);
             }
          }
@@ -852,10 +1105,21 @@ public class KeyConnection extends MemoryConnection {
             throw new DSException("Not supported super type: " + superType);
          }
       }
+      // Add type invariants
       ImmutableSet<ClassInvariant> classInvariants = services.getSpecificationRepository().getClassInvariants(type);
       for (ClassInvariant classInvariant : classInvariants) {
          MemoryInvariant invariant = createInvariant(services, classInvariant);
+         invariant.setParent(result);
          result.addInvariant(invariant);
+      }
+      // Add type axioms
+      ImmutableSet<ClassAxiom> axioms = services.getSpecificationRepository().getClassAxioms(type);
+      for (ClassAxiom classAxiom : axioms) {
+         if (shouldIncludeClassAxiom(services, type, classAxiom)) {
+            MemoryAxiom axiom = createAxiom(services, type, classAxiom);
+            axiom.setParent(result);
+            result.addAxiom(axiom);
+         }
       }
       // Add allowed proof obligations
       List<String> classObligations = Collections.emptyList();
@@ -932,11 +1196,83 @@ public class KeyConnection extends MemoryConnection {
    }
 
    /**
+    * Creates a new {@link IDSAxiom} instance for the given KeY instance.
+    * @param services The services to use.
+    * @param classAxiom The KeY instance.
+    * @return The created {@link IDSAxiom}.
+    * @throws DSException Occurred exception
+    */
+   protected MemoryAxiom createAxiom(Services services, 
+                                     KeYJavaType type,
+                                     ClassAxiom classAxiom) throws DSException {
+      MemoryAxiom result = new MemoryAxiom();
+      result.setName(classAxiom.getName());
+      result.setDefinition(ObjectUtil.toString(classAxiom));
+      fillAxiomContracts(result, services, type, classAxiom);
+      axiomsMapping.put(classAxiom, result);
+      return result;
+   }
+   
+   /**
+    * Fills the {@link IDSOperation} with operation contracts and possible obligations.
+    * @param toFill The {@link IDSOperation} to fill.
+    * @param services The {@link Services} to use.
+    * @param type The java type.
+    * @param pm The method/constructor
+    * @throws DSException Occurred Exception
+    */
+   protected void fillAxiomContracts(IDSAxiom toFill, 
+                                     Services services, 
+                                     KeYJavaType type, 
+                                     ClassAxiom classAxiom) throws DSException {
+      // Get all possible contracts
+      ImmutableSet<Contract> contracts = services.getSpecificationRepository().getAllContracts();
+      // Separate between proofs for contracts and for operation itself
+      List<String> contractObligations = new LinkedList<String>();
+      contractObligations.add(PROOF_OBLIGATION_OPERATION_CONTRACT);
+      List<String> methodObligations = new LinkedList<String>();
+      fillProovableWithAllowedOperationContracts(toFill, methodObligations);
+      // Add operation contracts
+      for (Contract contract : contracts) {
+         if (contract instanceof DependencyContract &&
+             ObjectUtil.equals(classAxiom.getTarget(), contract.getTarget())) {
+            MemoryAxiomContract axiomContract = createAxiomContract(services, (DependencyContract)contract, contractObligations, type, toFill);
+            toFill.getAxiomContracts().add(axiomContract);
+         }
+      }
+   }
+   
+   /**
+    * Creates a new {@link IDSAxiomContract} instance for the given KeY instance.
+    * @param services The services to use.
+    * @param contract The KeY instance.
+    * @param obligations The possible proof obligations
+    * @param kjt The {@link KeYJavaType}
+    * @param parent The parent.
+    * @return The created {@link IDSAxiomContract}.
+    * @throws DSException Occurred exception
+    */   
+   protected MemoryAxiomContract createAxiomContract(Services services, 
+                                                     DependencyContract contract,
+                                                     List<String> obligations,
+                                                     KeYJavaType kjt,
+                                                     IDSAxiom parent) throws DSException {
+      MemoryAxiomContract result = new KeyAxiomContract(this, kjt, contract);
+      result.setParent(parent);
+      result.setName(contract.getName());
+      result.setPre(KeyHacks.getOperationContractPre(services, contract));
+      result.setDep(KeyHacks.getDependencyContractDep(services, (DependencyContract)contract));
+      fillProovableWithAllowedOperationContracts(result, obligations);
+      axiomContractsMapping.put(contract, result);
+      return result;
+   }
+
+   /**
     * Creates a new {@link IDSAttribute} instance for the given KeY instance.
     * @param variable The KeY instance.
     * @return The created {@link IDSAttribute}.
     */
-   protected IDSAttribute createAttribute(Field variable) {
+   protected MemoryAttribute createAttribute(Services services, Field variable) {
       MemoryAttribute result = new MemoryAttribute();
       result.setFinal(variable.isFinal());
       result.setName(variable.getProgramName());
@@ -954,6 +1290,7 @@ public class KeyConnection extends MemoryConnection {
       else {
          result.setVisibility(DSVisibility.DEFAULT);
       }
+      attributesMapping.put(variable, result);
       return result;
    }
 
@@ -1050,8 +1387,8 @@ public class KeyConnection extends MemoryConnection {
       else {
          result.setVisibility(DSVisibility.DEFAULT);
       }
-      if (method.getTypeReference() != null) {
-         String returnType = getTypeName(method.getTypeReference(), DSPackageManagement.NO_PACKAGES);
+      if (method.getMethodDeclaration() != null && method.getMethodDeclaration().getTypeReference() != null) {
+         String returnType = getTypeName(method.getMethodDeclaration().getTypeReference(), DSPackageManagement.NO_PACKAGES);
          result.setReturnType(returnType);
       }
       else {
@@ -1313,8 +1650,12 @@ public class KeyConnection extends MemoryConnection {
       initConfig = null;
       operationsMapping = null;
       operationContractsMapping = null;
+      axiomContractsMapping = null;
       invariantsMapping = null;
+      axiomsMapping = null;
       typesMapping = null;
+      attributesMapping = null;
+      enumLiteralsMapping = null;
       super.disconnect();
    }
    
@@ -1337,12 +1678,30 @@ public class KeyConnection extends MemoryConnection {
    }
 
    /**
+    * Returns the {@link IDSAxiomContract} for the give {@link Contract} from KeY.
+    * @param ac The given {@link Contract}.
+    * @return The mapped {@link IDSAxiomContract} or {@code null} if no data source instance exists.
+    */
+   public IDSAxiomContract getAxiomContract(Contract ac) {
+      return axiomContractsMapping.get(ac);
+   }
+
+   /**
     * Returns the {@link IDSInvariant} for the give {@link ClassInvariant} from KeY.
     * @param invariant The given {@link ClassInvariant}.
     * @return The mapped {@link IDSInvariant} or {@code null} if no data source instance exists.
     */   
    public IDSInvariant getInvariant(ClassInvariant invariant) {
       return invariantsMapping.get(invariant);
+   }
+
+   /**
+    * Returns the {@link IDSAxiom} for the give {@link ClassAxiom} from KeY.
+    * @param axiom The given {@link ClassAxiom}.
+    * @return The mapped {@link IDSAxiom} or {@code null} if no data source instance exists.
+    */   
+   public IDSAxiom getAxiom(ClassAxiom axiom) {
+      return axiomsMapping.get(axiom);
    }
    
    /**
@@ -1352,6 +1711,24 @@ public class KeyConnection extends MemoryConnection {
     */
    public IDSType getType(KeYJavaType type) {
       return typesMapping.get(type);
+   }
+   
+   /**
+    * Returns the {@link IDSAttribute} instance for the given {@link Field} from KeY.
+    * @param field The given {@link Field}.
+    * @return The mapped {@link IDSAttribute} or {@code null} if no data source instance exists.
+    */
+   public IDSAttribute getAttribute(Field field) {
+      return attributesMapping.get(field);
+   }
+   
+   /**
+    * Returns the {@link IDSEnumLiteral} instance for the given {@link Field} from KeY.
+    * @param field The given {@link Field}.
+    * @return The mapped {@link IDSEnumLiteral} or {@code null} if no data source instance exists.
+    */
+   public IDSEnumLiteral getEnumLiteral(Field field) {
+      return enumLiteralsMapping.get(field);
    }
 
 
@@ -1364,7 +1741,7 @@ public class KeyConnection extends MemoryConnection {
     * Opens the proof.
     * @param type The {@link KeYJavaType} to use or {@code null} if not required.
     * @param pm The {@link ProgramMethod} to use or {@code null} if not required.
-    * @param oc The {@link OperationContract} to use or {@code null} if not required.
+    * @param oc The {@link Contract} to use or {@code null} if not required.
     * @param obligation The obligation to proof.
     * @return The opened {@link OpenedProof} or {@code null} if no one was opened.
     * @throws DSException Occurred Exception
@@ -1372,7 +1749,7 @@ public class KeyConnection extends MemoryConnection {
     */
    public OpenedProof openProof(KeYJavaType type,
                                 ProgramMethod pm,
-                                OperationContract oc,
+                                Contract oc,
                                 String obligation) throws DSException, DSCanceledException {
       OpenedProof proofResult = createProofInput(type, pm, oc, obligation);
       if (proofResult == null || proofResult.getInput() == null) {
@@ -1393,14 +1770,14 @@ public class KeyConnection extends MemoryConnection {
     * </p>
     * @param type The {@link KeYJavaType} to use or {@code null} if not required.
     * @param pm The {@link ProgramMethod} to use or {@code null} if not required.
-    * @param oc The {@link OperationContract} to use or {@code null} if not required.
+    * @param oc The {@link Contract} to use or {@code null} if not required.
     * @param poString The obligation to proof.
     * @return The created {@link OpenedProof} that contains for example the {@link ProofOblInput}.
     * @throws DSException Occurred Exception
     */
    public OpenedProof createProofInput(KeYJavaType type,
                                        ProgramMethod pm,
-                                       OperationContract oc,
+                                       Contract oc,
                                        String poString) throws DSException {
       ProofOblInput input = oc.createProofObl(initConfig, oc);
       return new OpenedProof(input);
@@ -1460,10 +1837,18 @@ public class KeyConnection extends MemoryConnection {
       return inUI;
    }
 
+   /**
+    * Returns the used {@link Services}.
+    * @return The used {@link Services}.
+    */
    public Services getServices() {
       return main != null ? main.getMediator().getServices() : null;
    }
 
+   /**
+    * Closes the active task without user interaction.
+    */
+   @SuppressWarnings("deprecation")
    public void closeTaskWithoutInteraction() {
       main.closeTaskWithoutInteraction();
    }

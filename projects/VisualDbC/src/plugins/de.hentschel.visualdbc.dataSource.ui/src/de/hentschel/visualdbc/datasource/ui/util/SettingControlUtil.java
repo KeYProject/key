@@ -16,7 +16,7 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
-import org.key_project.key4eclipse.util.java.ObjectUtil;
+import org.key_project.util.java.ObjectUtil;
 
 import de.hentschel.visualdbc.datasource.ui.setting.ISettingControl;
 

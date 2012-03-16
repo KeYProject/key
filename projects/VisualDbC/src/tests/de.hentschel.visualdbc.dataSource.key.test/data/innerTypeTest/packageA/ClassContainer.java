@@ -70,4 +70,46 @@ public class ClassContainer {
 		new MyInterface() {
 		};
 	}
+	
+	
+	
+	
+	enum DefaultChildEnum {
+		INSTANCE(42);
+		
+		private int x;
+		
+		private DefaultChildEnum(int x) {
+			this.x = x;
+		}
+		
+		public void run() {
+			new MyInterface() {
+			};
+		}
+	}
+
+	private static enum PrivateChildEnum {
+		INSTANCE;
+		
+//		public enum InnerInnerEnum {
+//			INSTANCE;
+//		}
+	}
+
+	protected enum ProtectedChildEnum {
+	}
+	
+	public enum PublicChildEnum {
+		INSTANCE;
+		
+//		public enum InnerInnerEnum {
+//			INSTANCE;
+//			
+//			public void innerInnerRun() {
+//				new MyInterface() {
+//				};
+//			}
+//		}
+	}
 }

@@ -14,7 +14,7 @@ package de.hentschel.visualdbc.interactive.proving.ui.test.model;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.key_project.key4eclipse.util.java.CollectionUtil;
+import org.key_project.util.java.CollectionUtil;
 
 import de.hentschel.visualdbc.datasource.model.IDSProof;
 import de.hentschel.visualdbc.datasource.model.IDSProvableReference;
@@ -39,9 +39,11 @@ public class ExecutableProof extends MemoryProof {
     * @param referencesToAdd The references to add.
     */
    public void addReferences(IDSProvableReference... referencesToAdd) {
-      List<IDSProvableReference> oldReferences = new LinkedList<IDSProvableReference>(getProofReferences());
-      CollectionUtil.addAll(getProofReferences(), referencesToAdd);
-      fireReferencesChanged(new DSProofEvent(this, oldReferences, getProofReferences()));
+      synchronized (getProofReferences()) {
+         List<IDSProvableReference> oldReferences = new LinkedList<IDSProvableReference>(getProofReferences());
+         CollectionUtil.addAll(getProofReferences(), referencesToAdd);
+         fireReferencesChanged(new DSProofEvent(this, oldReferences, getProofReferences()));
+      }
    }
 
    /**
@@ -49,8 +51,10 @@ public class ExecutableProof extends MemoryProof {
     * @param referencesToRemove The references to add.
     */
    public void removeReferences(IDSProvableReference... referencesToRemove) {
-      List<IDSProvableReference> oldReferences = new LinkedList<IDSProvableReference>(getProofReferences());
-      CollectionUtil.removeAll(getProofReferences(), referencesToRemove);
-      fireReferencesChanged(new DSProofEvent(this, oldReferences, getProofReferences()));
+      synchronized (getProofReferences()) {
+         List<IDSProvableReference> oldReferences = new LinkedList<IDSProvableReference>(getProofReferences());
+         CollectionUtil.removeAll(getProofReferences(), referencesToRemove);
+         fireReferencesChanged(new DSProofEvent(this, oldReferences, getProofReferences()));
+      }
    }
 }

@@ -32,7 +32,6 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
@@ -579,7 +578,7 @@ public class KeYMediator {
     }
 
     public void removeAutoModeListener(AutoModeListener listener) {  
-	interactiveProver.addAutoModeListener(listener);
+	interactiveProver.removeAutoModeListener(listener);
     }
 
     /** sets the current goal 

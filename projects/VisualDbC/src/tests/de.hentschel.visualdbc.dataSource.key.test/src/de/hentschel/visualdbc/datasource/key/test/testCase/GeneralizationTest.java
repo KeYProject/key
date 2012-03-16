@@ -28,7 +28,7 @@ public class GeneralizationTest extends TestCase {
     * Tests attributes.
     */
    @Test
-   public void testExtendsAndImplements() {
+   public void testExtendsAndImplements() throws Exception {
       TestKeyUtil.testKeyConnection("GeneralizationTest_testExtendsAndImplements",
                                     "data/generalizationTest",
                                     null,

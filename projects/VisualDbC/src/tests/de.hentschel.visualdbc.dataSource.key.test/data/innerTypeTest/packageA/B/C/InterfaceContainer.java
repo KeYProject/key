@@ -50,4 +50,35 @@ public interface InterfaceContainer {
 	
    public abstract interface PublicChildInterface {
    }
+   
+   
+   
+   
+   enum DefaultChildEnum {
+      INSTANCE(42);
+      
+      private int x;
+      
+      private DefaultChildEnum(int x) {
+         this.x = x;
+      }
+      
+      public void run() {
+         new MyInterface() {
+         };
+      }
+   }
+   
+   public enum PublicChildEnum {
+      INSTANCE;
+      
+//    public enum InnerInnerEnum {
+//       INSTANCE;
+//       
+//       public void innerInnerRun() {
+//          new MyInterface() {
+//          };
+//       }
+//    }
+   }
 }

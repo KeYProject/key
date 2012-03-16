@@ -1,13 +1,28 @@
 package org.key_project.sed.key.core.util;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.debug.core.ILaunchConfigurationType;
+import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.key_project.key4eclipse.util.java.StringUtil;
-import org.key_project.key4eclipse.util.jdt.JDTUtil;
+import org.eclipse.jdt.core.JavaModelException;
+import org.key_project.sed.core.util.LaunchUtil;
+import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.IFilter;
+import org.key_project.util.java.ObjectUtil;
+import org.key_project.util.java.StringUtil;
+import org.key_project.util.jdt.JDTUtil;
+
+import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
 /**
  * Provides static utility methods for the Symbolic Execution Debugger
@@ -34,6 +49,21 @@ public final class KeySEDUtil {
      * The key of the attribute "method" in an {@link ILaunchConfiguration} of type {@value KeySEDUtil#LAUNCH_CONFIGURATION_TYPE_ID}.
      */
     public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_METHOD = "org.key_project.sed.key.core.launch.sed.key.attribute.method";
+
+    /**
+     * The key of the attribute "useExistingContract" in an {@link ILaunchConfiguration} of type {@value KeySEDUtil#LAUNCH_CONFIGURATION_TYPE_ID}.
+     */
+    public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_EXISTING_CONTRACT = "org.key_project.sed.key.core.launch.sed.key.attribute.useExistingContract";
+
+    /**
+     * The key of the attribute "existingContract" in an {@link ILaunchConfiguration} of type {@value KeySEDUtil#LAUNCH_CONFIGURATION_TYPE_ID}.
+     */
+    public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_EXISTING_CONTRACT = "org.key_project.sed.key.core.launch.sed.key.attribute.existingContract";
+
+    /**
+     * The launch mode supported by the Symbolic Execution Debugger based on KeY.
+     */
+    public static final String MODE = "debug";
     
     /**
      * Forbid instances.
@@ -47,9 +77,13 @@ public final class KeySEDUtil {
      * @param method The given {@link IMethod}.
      * @return The value to store.
      */
-    // TODO: Implement test    
     public static String getProjectValue(IMethod method) {
-        return method.getJavaProject().getElementName();
+        if (method != null && method.getJavaProject() != null) {
+            return method.getJavaProject().getElementName();
+        }
+        else {
+            return null;
+        }
     }
     
     /**
@@ -58,9 +92,13 @@ public final class KeySEDUtil {
      * @param method The given {@link IMethod}.
      * @return The value to store.
      */
-    // TODO: Implement test
     public static String getTypeValue(IMethod method) {
-        return ((IType)method.getParent()).getFullyQualifiedName();
+        if (method != null && method.getParent() instanceof IType) {
+            return ((IType)method.getParent()).getFullyQualifiedName();
+        }
+        else {
+            return null;
+        }
     }
     
     /**
@@ -68,10 +106,15 @@ public final class KeySEDUtil {
      * for the given {@link IMethod}.
      * @param method The given {@link IMethod}.
      * @return The value to store.
+     * @throws JavaModelException Occurred Exception
      */
-    // TODO: Implement test
-    public static String getMethodValue(IMethod method) {
-        return JDTUtil.getTextLabel(method);
+    public static String getMethodValue(IMethod method) throws JavaModelException {
+        if (method != null) {
+            return JDTUtil.getQualifiedMethodLabel(method);
+        }
+        else {
+            return null;
+        }
     }
     
     /**
@@ -80,7 +123,6 @@ public final class KeySEDUtil {
      * @return The project attribute value.
      * @throws CoreException Occurred Exception.
      */
-    // TODO: Implement test
     public static String getProjectValue(ILaunchConfiguration configuration) throws CoreException {
         return configuration != null ? configuration.getAttribute(LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_PROJECT, StringUtil.EMPTY_STRING) : StringUtil.EMPTY_STRING;
     }
@@ -91,7 +133,6 @@ public final class KeySEDUtil {
      * @return The type attribute value.
      * @throws CoreException Occurred Exception.
      */
-    // TODO: Implement test
     public static String getTypeValue(ILaunchConfiguration configuration) throws CoreException {
         return configuration != null ? configuration.getAttribute(LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_TYPE, StringUtil.EMPTY_STRING) : StringUtil.EMPTY_STRING;
     }
@@ -102,18 +143,36 @@ public final class KeySEDUtil {
      * @return The method attribute value.
      * @throws CoreException Occurred Exception.
      */
-    // TODO: Implement test
     public static String getMethodValue(ILaunchConfiguration configuration) throws CoreException {
         return configuration != null ? configuration.getAttribute(LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_METHOD, StringUtil.EMPTY_STRING) : StringUtil.EMPTY_STRING;
     }
-
+    
+    /**
+     * Returns the use existing contract attribute value from the given {@link ILaunchConfiguration}.
+     * @param configuration The {@link ILaunchConfiguration} to read from.
+     * @return The use existing contract attribute value.
+     * @throws CoreException Occurred Exception.
+     */
+    public static boolean isUseExistingContractValue(ILaunchConfiguration configuration) throws CoreException {
+        return configuration != null ? configuration.getAttribute(LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_EXISTING_CONTRACT, false) : false;
+    }
+    
+    /**
+     * Returns the existing contract attribute value from the given {@link ILaunchConfiguration}.
+     * @param configuration The {@link ILaunchConfiguration} to read from.
+     * @return The existing contract attribute value.
+     * @throws CoreException Occurred Exception.
+     */
+    public static String getExistingContractValue(ILaunchConfiguration configuration) throws CoreException {
+        return configuration != null ? configuration.getAttribute(LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_EXISTING_CONTRACT, StringUtil.EMPTY_STRING) : StringUtil.EMPTY_STRING;
+    }
+    
     /**
      * Searches the {@link IMethod} that is defined by the given {@link ILaunch}.
      * @param launch The {@link ILaunch} that defines an {@link IMethod}.
      * @return The found {@link IMethod} or {@code null} if no one was found.
      * @throws CoreException Occurred Exception.
      */
-    // TODO: Implement test
     public static IMethod findMethod(ILaunch launch) throws CoreException {
         if (launch != null) {
             return findMethod(launch.getLaunchConfiguration());
@@ -129,7 +188,6 @@ public final class KeySEDUtil {
      * @return The found {@link IMethod} or {@code null} if no one was found.
      * @throws CoreException Occurred Exception.
      */
-    // TODO: Implement test
     public static IMethod findMethod(ILaunchConfiguration configuration) throws CoreException {
         IMethod result = null;
         if (configuration != null) {
@@ -140,10 +198,74 @@ public final class KeySEDUtil {
                 IType type = project.findType(typeName);
                 if (type != null) {
                     String methodSignature = getMethodValue(configuration);
-                    result = (IMethod)JDTUtil.getElementForTextLabel(type.getMethods(), methodSignature);
+                    result = JDTUtil.getElementForQualifiedMethodLabel(type.getMethods(), methodSignature);
                 }
             }
         }
         return result;
+    }
+    
+    /**
+     * Returns the used {@link ILaunchConfigurationType}.
+     * @return The used {@link ILaunchConfigurationType}.
+     */
+    public static ILaunchConfigurationType getConfigurationType() {
+        return LaunchUtil.getConfigurationType(LAUNCH_CONFIGURATION_TYPE_ID);            
+    }
+    
+    /**
+     * Creates a new {@link ILaunchConfiguration}.
+     * @param method The {@link IMethod} to launch.
+     * @return The new created {@link ILaunchConfiguration}.
+     * @throws CoreException Occurred Exception.
+     */
+    public static ILaunchConfiguration createConfiguration(IMethod method) throws CoreException {
+        ILaunchConfiguration config = null;
+        ILaunchConfigurationWorkingCopy wc = null;
+        ILaunchConfigurationType configType = getConfigurationType();
+        String typeLabel = KeySEDUtil.getTypeValue(method);
+        String methodLabel = KeySEDUtil.getMethodValue(method);
+        wc = configType.newInstance(null, LaunchUtil.getLaunchManager().generateLaunchConfigurationName(typeLabel + "#" + methodLabel));
+        wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_PROJECT, KeySEDUtil.getProjectValue(method));
+        wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_TYPE, typeLabel);
+        wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_METHOD, methodLabel);
+        wc.setMappedResources(new IResource[] {method.getUnderlyingResource()});
+        config = wc.doSave();
+        return config;
+    }
+    
+    /**
+     * Searches all {@link ILaunchConfiguration} that handles
+     * the given {@link IMethod}.
+     * @param method The {@link IMethod} for that {@link ILaunchConfiguration}s are required.
+     * @return The found {@link ILaunchConfiguration}s.
+     * @throws CoreException Occurred Exception.
+     */
+    public static List<ILaunchConfiguration> searchLaunchConfigurations(IMethod method) throws CoreException {
+        // Get parameters
+        String projectLabel = KeySEDUtil.getProjectValue(method);
+        String typeLabel = KeySEDUtil.getTypeValue(method);
+        String methodLabel = KeySEDUtil.getMethodValue(method);
+        // Compare existing configurations to with the parameters.
+        ILaunchConfiguration[] configs = DebugPlugin.getDefault().getLaunchManager().getLaunchConfigurations(KeySEDUtil.getConfigurationType());
+        List<ILaunchConfiguration> result = new ArrayList<ILaunchConfiguration>(configs.length);
+        for (ILaunchConfiguration config : configs) {
+            if (ObjectUtil.equals(projectLabel, KeySEDUtil.getProjectValue(config)) &&
+                ObjectUtil.equals(typeLabel, KeySEDUtil.getTypeValue(config)) &&
+                ObjectUtil.equals(methodLabel, KeySEDUtil.getMethodValue(config))) {
+                result.add(config);
+            }
+        }
+        return result;
+    }
+
+    public static FunctionalOperationContract findContract(ImmutableSet<FunctionalOperationContract> operationContracts, 
+                                                           final String contractName) {
+        return CollectionUtil.search(operationContracts, new IFilter<FunctionalOperationContract>() {
+            @Override
+            public boolean select(FunctionalOperationContract element) {
+                return element != null && ObjectUtil.equals(element.getName(), contractName);
+            }
+        });
     }
 }

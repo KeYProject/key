@@ -20,6 +20,7 @@ import org.eclipse.gmf.runtime.diagram.core.commands.DeleteCommand;
 import org.eclipse.gmf.runtime.emf.commands.core.command.CompositeTransactionalCommand;
 import org.eclipse.gmf.runtime.emf.type.core.commands.DestroyElementCommand;
 import org.eclipse.gmf.runtime.emf.type.core.commands.DestroyReferenceCommand;
+import org.eclipse.gmf.runtime.emf.type.core.requests.CreateElementRequest;
 import org.eclipse.gmf.runtime.emf.type.core.requests.CreateRelationshipRequest;
 import org.eclipse.gmf.runtime.emf.type.core.requests.DestroyElementRequest;
 import org.eclipse.gmf.runtime.emf.type.core.requests.DestroyReferenceRequest;
@@ -31,6 +32,7 @@ import org.eclipse.gmf.runtime.notation.View;
 
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.commands.AbstractDbcClassImplementsCreateCommand;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.commands.AbstractDbcClassImplementsReorientCommand;
+import de.hentschel.visualdbc.dbcmodel.diagram.edit.commands.DbcAxiomCreateCommand;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.commands.DbcClassExtendsCreateCommand;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.commands.DbcClassExtendsReorientCommand;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.commands.DbcProofReferenceCreateCommand;
@@ -39,6 +41,7 @@ import de.hentschel.visualdbc.dbcmodel.diagram.edit.commands.DbcProofTargetCreat
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.commands.DbcProofTargetReorientCommand;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.AbstractDbcClassImplementsEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcAttributeEditPart;
+import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcAxiomEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcClass2EditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcClassDbcClassAttributeCompartmentEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcClassDbcClassMainCompartmentEditPart;
@@ -402,6 +405,24 @@ public class DbcClass2ItemSemanticEditPolicy extends
                   // don't need explicit deletion of cnode as parent's view deletion would clean child views as well 
                   // cmd.add(new org.eclipse.gmf.runtime.diagram.core.commands.DeleteCommand(getEditingDomain(), cnode));
                   break;
+               case DbcAxiomEditPart.VISUAL_ID:
+                  for (Iterator<?> it = cnode.getTargetEdges().iterator(); it
+                        .hasNext();) {
+                     Edge incomingLink = (Edge) it.next();
+                     if (DbCVisualIDRegistry.getVisualID(incomingLink) == DbcProofReferenceEditPart.VISUAL_ID) {
+                        DestroyElementRequest r = new DestroyElementRequest(
+                              incomingLink.getElement(), false);
+                        cmd.add(new DestroyElementCommand(r));
+                        cmd.add(new DeleteCommand(getEditingDomain(),
+                              incomingLink));
+                        continue;
+                     }
+                  }
+                  cmd.add(new DestroyElementCommand(new DestroyElementRequest(
+                        getEditingDomain(), cnode.getElement(), false))); // directlyOwned: true
+                  // don't need explicit deletion of cnode as parent's view deletion would clean child views as well 
+                  // cmd.add(new org.eclipse.gmf.runtime.diagram.core.commands.DeleteCommand(getEditingDomain(), cnode));
+                  break;
                }
             }
             break;
@@ -410,6 +431,18 @@ public class DbcClass2ItemSemanticEditPolicy extends
                Node cnode = (Node) cit.next();
                switch (DbCVisualIDRegistry.getVisualID(cnode)) {
                case DbcAttributeEditPart.VISUAL_ID:
+                  for (Iterator<?> it = cnode.getTargetEdges().iterator(); it
+                        .hasNext();) {
+                     Edge incomingLink = (Edge) it.next();
+                     if (DbCVisualIDRegistry.getVisualID(incomingLink) == DbcProofReferenceEditPart.VISUAL_ID) {
+                        DestroyElementRequest r = new DestroyElementRequest(
+                              incomingLink.getElement(), false);
+                        cmd.add(new DestroyElementCommand(r));
+                        cmd.add(new DeleteCommand(getEditingDomain(),
+                              incomingLink));
+                        continue;
+                     }
+                  }
                   cmd.add(new DestroyElementCommand(new DestroyElementRequest(
                         getEditingDomain(), cnode.getElement(), false))); // directlyOwned: true
                   // don't need explicit deletion of cnode as parent's view deletion would clean child views as well 

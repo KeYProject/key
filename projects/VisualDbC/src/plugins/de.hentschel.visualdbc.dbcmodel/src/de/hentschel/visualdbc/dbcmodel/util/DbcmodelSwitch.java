@@ -18,13 +18,37 @@
 package de.hentschel.visualdbc.dbcmodel.util;
 
 import de.hentschel.visualdbc.dbcmodel.*;
-
-import java.util.List;
-
-import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.util.Switch;
+
+import de.hentschel.visualdbc.dbcmodel.AbstractDbCContainer;
+import de.hentschel.visualdbc.dbcmodel.AbstractDbcClass;
+import de.hentschel.visualdbc.dbcmodel.AbstractDbcEnum;
+import de.hentschel.visualdbc.dbcmodel.AbstractDbcInterface;
+import de.hentschel.visualdbc.dbcmodel.AbstractDbcOperation;
+import de.hentschel.visualdbc.dbcmodel.AbstractDbcProofContainer;
+import de.hentschel.visualdbc.dbcmodel.AbstractDbcSpecification;
+import de.hentschel.visualdbc.dbcmodel.AbstractDbcType;
+import de.hentschel.visualdbc.dbcmodel.AbstractDbcTypeContainer;
+import de.hentschel.visualdbc.dbcmodel.DbcAttribute;
+import de.hentschel.visualdbc.dbcmodel.DbcClass;
+import de.hentschel.visualdbc.dbcmodel.DbcConstructor;
+import de.hentschel.visualdbc.dbcmodel.DbcEnum;
+import de.hentschel.visualdbc.dbcmodel.DbcEnumLiteral;
+import de.hentschel.visualdbc.dbcmodel.DbcInterface;
+import de.hentschel.visualdbc.dbcmodel.DbcInvariant;
+import de.hentschel.visualdbc.dbcmodel.DbcMethod;
+import de.hentschel.visualdbc.dbcmodel.DbcModel;
+import de.hentschel.visualdbc.dbcmodel.DbcOperationContract;
+import de.hentschel.visualdbc.dbcmodel.DbcPackage;
+import de.hentschel.visualdbc.dbcmodel.DbcProof;
+import de.hentschel.visualdbc.dbcmodel.DbcProofObligation;
+import de.hentschel.visualdbc.dbcmodel.DbcProofReference;
+import de.hentschel.visualdbc.dbcmodel.DbcProperty;
+import de.hentschel.visualdbc.dbcmodel.DbcmodelPackage;
+import de.hentschel.visualdbc.dbcmodel.IDbCProofReferencable;
+import de.hentschel.visualdbc.dbcmodel.IDbCProvable;
 
 /**
  * <!-- begin-user-doc -->
@@ -163,6 +187,7 @@ public class DbcmodelSwitch<T> extends Switch<T> {
          case DbcmodelPackage.DBC_ATTRIBUTE: {
             DbcAttribute dbcAttribute = (DbcAttribute)theEObject;
             T result = caseDbcAttribute(dbcAttribute);
+            if (result == null) result = caseIDbCProofReferencable(dbcAttribute);
             if (result == null) result = defaultCase(theEObject);
             return result;
          }
@@ -241,6 +266,7 @@ public class DbcmodelSwitch<T> extends Switch<T> {
          case DbcmodelPackage.DBC_ENUM_LITERAL: {
             DbcEnumLiteral dbcEnumLiteral = (DbcEnumLiteral)theEObject;
             T result = caseDbcEnumLiteral(dbcEnumLiteral);
+            if (result == null) result = caseIDbCProofReferencable(dbcEnumLiteral);
             if (result == null) result = defaultCase(theEObject);
             return result;
          }
@@ -305,6 +331,23 @@ public class DbcmodelSwitch<T> extends Switch<T> {
          case DbcmodelPackage.DBC_PROOF_OBLIGATION: {
             DbcProofObligation dbcProofObligation = (DbcProofObligation)theEObject;
             T result = caseDbcProofObligation(dbcProofObligation);
+            if (result == null) result = defaultCase(theEObject);
+            return result;
+         }
+         case DbcmodelPackage.DBC_AXIOM: {
+            DbcAxiom dbcAxiom = (DbcAxiom)theEObject;
+            T result = caseDbcAxiom(dbcAxiom);
+            if (result == null) result = caseIDbCProofReferencable(dbcAxiom);
+            if (result == null) result = caseAbstractDbcSpecification(dbcAxiom);
+            if (result == null) result = defaultCase(theEObject);
+            return result;
+         }
+         case DbcmodelPackage.DB_CAXIOM_CONTRACT: {
+            DbCAxiomContract dbCAxiomContract = (DbCAxiomContract)theEObject;
+            T result = caseDbCAxiomContract(dbCAxiomContract);
+            if (result == null) result = caseAbstractDbcSpecification(dbCAxiomContract);
+            if (result == null) result = caseIDbCProvable(dbCAxiomContract);
+            if (result == null) result = caseIDbCProofReferencable(dbCAxiomContract);
             if (result == null) result = defaultCase(theEObject);
             return result;
          }
@@ -703,6 +746,36 @@ public class DbcmodelSwitch<T> extends Switch<T> {
    }
 
    /**
+    * Returns the result of interpreting the object as an instance of '<em>Dbc Axiom</em>'.
+    * <!-- begin-user-doc -->
+     * This implementation returns null;
+     * returning a non-null result will terminate the switch.
+     * <!-- end-user-doc -->
+    * @param object the target of the switch.
+    * @return the result of interpreting the object as an instance of '<em>Dbc Axiom</em>'.
+    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+    * @generated
+    */
+    public T caseDbcAxiom(DbcAxiom object) {
+      return null;
+   }
+
+/**
+    * Returns the result of interpreting the object as an instance of '<em>Db CAxiom Contract</em>'.
+    * <!-- begin-user-doc -->
+    * This implementation returns null;
+    * returning a non-null result will terminate the switch.
+    * <!-- end-user-doc -->
+    * @param object the target of the switch.
+    * @return the result of interpreting the object as an instance of '<em>Db CAxiom Contract</em>'.
+    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+    * @generated
+    */
+   public T caseDbCAxiomContract(DbCAxiomContract object) {
+      return null;
+   }
+
+/**
     * Returns the result of interpreting the object as an instance of '<em>EObject</em>'.
     * <!-- begin-user-doc -->
     * This implementation returns null;

@@ -42,9 +42,6 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.key_project.key4eclipse.starter.core.job.AbstractKeYMainWindowJob;
-import org.key_project.key4eclipse.util.eclipse.BundleUtil;
-import org.key_project.key4eclipse.util.eclipse.ResourceUtil;
-import org.key_project.key4eclipse.util.test.util.TestUtilsUtil;
 import org.key_project.swtbot.swing.bot.AbstractSwingBotComponent;
 import org.key_project.swtbot.swing.bot.SwingBot;
 import org.key_project.swtbot.swing.bot.SwingBotJButton;
@@ -52,10 +49,14 @@ import org.key_project.swtbot.swing.bot.SwingBotJDialog;
 import org.key_project.swtbot.swing.bot.SwingBotJFrame;
 import org.key_project.swtbot.swing.bot.SwingBotJList;
 import org.key_project.swtbot.swing.bot.SwingBotJMenuBar;
-import org.key_project.swtbot.swing.bot.SwingBotJRadioButton;
 import org.key_project.swtbot.swing.bot.SwingBotJTabbedPane;
 import org.key_project.swtbot.swing.bot.SwingBotJTree;
 import org.key_project.swtbot.swing.bot.finder.waits.Conditions;
+import org.key_project.util.eclipse.BundleUtil;
+import org.key_project.util.eclipse.ResourceUtil;
+import org.key_project.util.java.StringUtil;
+import org.key_project.util.test.util.TestUtilsUtil;
+import org.key_project.util.test.util.TestUtilsUtil.MethodTreatment;
 
 import de.hentschel.visualdbc.datasource.key.model.KeyConnection;
 import de.hentschel.visualdbc.datasource.key.model.KeyDriver;
@@ -65,6 +66,7 @@ import de.hentschel.visualdbc.datasource.model.DSVisibility;
 import de.hentschel.visualdbc.datasource.model.IDSClass;
 import de.hentschel.visualdbc.datasource.model.IDSConnection;
 import de.hentschel.visualdbc.datasource.model.IDSDriver;
+import de.hentschel.visualdbc.datasource.model.IDSEnum;
 import de.hentschel.visualdbc.datasource.model.IDSInterface;
 import de.hentschel.visualdbc.datasource.model.IDSProof;
 import de.hentschel.visualdbc.datasource.model.IDSProvable;
@@ -73,9 +75,13 @@ import de.hentschel.visualdbc.datasource.model.event.DSProofEvent;
 import de.hentschel.visualdbc.datasource.model.exception.DSCanceledException;
 import de.hentschel.visualdbc.datasource.model.exception.DSException;
 import de.hentschel.visualdbc.datasource.model.memory.MemoryAttribute;
+import de.hentschel.visualdbc.datasource.model.memory.MemoryAxiom;
+import de.hentschel.visualdbc.datasource.model.memory.MemoryAxiomContract;
 import de.hentschel.visualdbc.datasource.model.memory.MemoryClass;
 import de.hentschel.visualdbc.datasource.model.memory.MemoryConnection;
 import de.hentschel.visualdbc.datasource.model.memory.MemoryConstructor;
+import de.hentschel.visualdbc.datasource.model.memory.MemoryEnum;
+import de.hentschel.visualdbc.datasource.model.memory.MemoryEnumLiteral;
 import de.hentschel.visualdbc.datasource.model.memory.MemoryInterface;
 import de.hentschel.visualdbc.datasource.model.memory.MemoryInvariant;
 import de.hentschel.visualdbc.datasource.model.memory.MemoryMethod;
@@ -121,6 +127,15 @@ public final class TestKeyUtil {
     * @return The visibility to use instead.
     */
    private static DSVisibility bugAttributeVisibility(DSVisibility visibility) {
+      return DSVisibility.DEFAULT;
+   }
+
+   /**
+    * Bug handling that the visibility doesn't work on enumerations.
+    * @param visibility The original visibility to use.
+    * @return The visibility to use instead.
+    */
+   private static DSVisibility bugEnumVisibility(DSVisibility visibility) {
       return DSVisibility.DEFAULT;
    }
    
@@ -323,11 +338,11 @@ public final class TestKeyUtil {
       con.addPackage(paycard);
       MemoryClass cardException = createCardException("CardException");
       paycard.addClass(cardException);
-      MemoryClass logFile = createLogFile("LogFile", "paycard.LogFile", "paycard.LogRecord", new String[] {"0", "1", "2"}, new String[] {"100", "101", "102"});
+      MemoryClass logFile = createLogFile("LogFile", "paycard.LogFile", "paycard.LogRecord", new String[] {"0", "1", "2"}, new String[] {"0", "2", "1"});
       paycard.addClass(logFile);
-      MemoryClass logRecord = createLogRecord("LogRecord", "paycard.LogRecord", new String[] {"4", "6"}, new String[] {"108", "104", "105", "106", "107"});
+      MemoryClass logRecord = createLogRecord("LogRecord", "paycard.LogRecord", new String[] {"4", "6"}, new String[] {"2", "4", "3", "4", "7"});
       paycard.addClass(logRecord);
-      MemoryClass payCard = createPayCard("PayCard", "paycard.PayCard", "paycard.LogFile", new String[] {"8", "9", "11", "13"}, new String[] {"114", "110", "111", "112", "113", "115", "116"});
+      MemoryClass payCard = createPayCard("PayCard", "paycard.PayCard", "paycard.LogFile", new String[] {"8", "9", "11", "13"}, new String[] {"5", "8", "7", "6", "9", "10", "10"});
       paycard.addClass(payCard);
       return con;
    }
@@ -339,11 +354,11 @@ public final class TestKeyUtil {
     */   
    public static IDSConnection createExpectedPackageTestModel_NoPackages() {
       MemoryConnection con = new MemoryConnection();
-      MemoryClass payCard = createPayCard("PayCard", "PayCard", "packageA.LogFile", new String[] {"0", "1", "3", "5"}, new String[] {"4", "0", "1", "2", "3", "5", "6"});
+      MemoryClass payCard = createPayCard("PayCard", "PayCard", "packageA.LogFile", new String[] {"0", "1", "3", "5"}, new String[] {"0", "3", "2", "1", "4", "5", "5"});
       con.addClass(payCard);
-      MemoryClass logFile = createLogFile("packageA.LogFile", "packageA.LogFile", "packageB.p1.LogRecord", new String[] {"7", "8", "9"}, new String[] {"107", "108", "109"});
+      MemoryClass logFile = createLogFile("packageA.LogFile", "packageA.LogFile", "packageB.p1.LogRecord", new String[] {"7", "8", "9"}, new String[] {"6", "8", "7"});
       con.addClass(logFile);
-      MemoryClass logRecord = createLogRecord("packageB.p1.LogRecord", "packageB.p1.LogRecord", new String[] {"11", "13"}, new String[] {"115", "111", "112", "113", "114"});
+      MemoryClass logRecord = createLogRecord("packageB.p1.LogRecord", "packageB.p1.LogRecord", new String[] {"11", "13"}, new String[] {"8", "9", "9", "10", "13"});
       con.addClass(logRecord);
       MemoryClass cardException = createCardException("packageB.p2.p2a.CardException");
       con.addClass(cardException);
@@ -357,15 +372,15 @@ public final class TestKeyUtil {
     */   
    public static IDSConnection createExpectedPackageTestModel_FlatList() {
       MemoryConnection con = new MemoryConnection();
-      MemoryClass payCard = createPayCard("PayCard", "PayCard", "packageA.LogFile", new String[] {"0", "1", "3", "5"}, new String[] {"4", "0", "1", "2", "3", "5", "6"});
+      MemoryClass payCard = createPayCard("PayCard", "PayCard", "packageA.LogFile", new String[] {"0", "1", "3", "5"}, new String[] {"0", "3", "2", "1", "4", "5", "5"});
       con.addClass(payCard);
       MemoryPackage packageA = new MemoryPackage("packageA");
       con.addPackage(packageA);
-      MemoryClass logFile = createLogFile("LogFile", "packageA.LogFile", "packageB.p1.LogRecord", new String[] {"7", "8", "9"}, new String[] {"107", "108", "109"});
+      MemoryClass logFile = createLogFile("LogFile", "packageA.LogFile", "packageB.p1.LogRecord", new String[] {"7", "8", "9"}, new String[] {"6", "8", "7"});
       packageA.addClass(logFile);
       MemoryPackage packageB_p1 = new MemoryPackage("packageB.p1");
       con.addPackage(packageB_p1);
-      MemoryClass logRecord = createLogRecord("LogRecord", "packageB.p1.LogRecord", new String[] {"11", "13"}, new String[] {"115", "111", "112", "113", "114"});
+      MemoryClass logRecord = createLogRecord("LogRecord", "packageB.p1.LogRecord", new String[] {"11", "13"}, new String[] {"8", "9", "9", "10", "13"});
       packageB_p1.addClass(logRecord);
       MemoryPackage packageB_p2_p2a = new MemoryPackage("packageB.p2.p2a");
       con.addPackage(packageB_p2_p2a);
@@ -381,17 +396,17 @@ public final class TestKeyUtil {
     */   
    public static IDSConnection createExpectedPackageTestModel_Hierarchy() {
       MemoryConnection con = new MemoryConnection();
-      MemoryClass payCard = createPayCard("PayCard", "PayCard", "packageA.LogFile", new String[] {"0", "1", "3", "5"}, new String[] {"4", "0", "1", "2", "3", "5", "6"});
+      MemoryClass payCard = createPayCard("PayCard", "PayCard", "packageA.LogFile", new String[] {"0", "1", "3", "5"}, new String[] {"0", "3", "2", "1", "4", "5", "5"});
       con.addClass(payCard);
       MemoryPackage packageA = new MemoryPackage("packageA");
       con.addPackage(packageA);
-      MemoryClass logFile = createLogFile("LogFile", "packageA.LogFile", "packageB.p1.LogRecord", new String[] {"7", "8", "9"}, new String[] {"107", "108", "109"});
+      MemoryClass logFile = createLogFile("LogFile", "packageA.LogFile", "packageB.p1.LogRecord", new String[] {"7", "8", "9"}, new String[] {"6", "8", "7"});
       packageA.addClass(logFile);
       MemoryPackage packageB = new MemoryPackage("packageB");
       con.addPackage(packageB);
       MemoryPackage packageB_p1 = new MemoryPackage("p1");
       packageB.addPackage(packageB_p1);
-      MemoryClass logRecord = createLogRecord("LogRecord", "packageB.p1.LogRecord", new String[] {"11", "13"}, new String[] {"115", "111", "112", "113", "114"});
+      MemoryClass logRecord = createLogRecord("LogRecord", "packageB.p1.LogRecord", new String[] {"11", "13"}, new String[] {"8", "9", "9", "10", "13"});
       packageB_p1.addClass(logRecord);
       MemoryPackage packageB_p2 = new MemoryPackage("p2");
       packageB.addPackage(packageB_p2);
@@ -433,6 +448,14 @@ public final class TestKeyUtil {
    protected static void addAllOperationContractObligations(MemoryOperationContract oc) {
       oc.getObligations().add(KeyConnection.PROOF_OBLIGATION_OPERATION_CONTRACT);
    }
+  
+   /**
+    * Adds all operation contract obligations to the {@link MemoryAxiomContract}.
+    * @param oc The {@link MemoryAxiomContract} to fill.
+    */
+   protected static void addAllOperationContractObligations(MemoryAxiomContract ac) {
+      ac.getObligations().add(KeyConnection.PROOF_OBLIGATION_OPERATION_CONTRACT);
+   }
 
    /**
     * Creates the class "LogRecord".
@@ -452,7 +475,7 @@ public final class TestKeyUtil {
       result.addConstructor(constructor);
       MemoryMethod setRecord = new MemoryMethod("setRecord(balance : int)", "void", DSVisibility.PUBLIC);
       addOperationObligations(setRecord, true, true, true);
-      MemoryOperationContract sr = new MemoryOperationContract("JML normal_behavior operation contract (id: " + operationContractIds[0] + ")", 
+      MemoryOperationContract sr = new MemoryOperationContract("JML normal_behavior operation contract [id: " + operationContractIds[0] + " / " + logRecordFullqualifiedName + "::setRecord]", 
                                                                "balance >= 0 & self.<inv>", 
                                                                "self.balance = balance\n" +
                                                                "&   self.transactionId\n" +
@@ -468,20 +491,20 @@ public final class TestKeyUtil {
       result.addMethod(setRecord);
       MemoryMethod getBalance = new MemoryMethod("getBalance()", "int", DSVisibility.PUBLIC);
       addOperationObligations(getBalance, true, true, true);
-      MemoryOperationContract gb2 = new MemoryOperationContract("JML normal_behavior operation contract (id: " + operationContractIds[2] + ")", "self.<inv>", "result = self.balance & self.<inv> & exc = null", "{}", "diamond");
+      MemoryOperationContract gb2 = new MemoryOperationContract("JML normal_behavior operation contract [id: " + operationContractIds[2] + " / " + logRecordFullqualifiedName + "::getBalance]", "self.<inv>", "result = self.balance & self.<inv> & exc = null", "{}", "diamond");
       addAllOperationContractObligations(gb2);
       getBalance.addOperationContract(gb2);
       result.addMethod(getBalance);
       MemoryMethod getTransactionId = new MemoryMethod("getTransactionId()", "int", DSVisibility.PUBLIC);
       addOperationObligations(getTransactionId, true, true, true);
-      MemoryOperationContract gti2 = new MemoryOperationContract("JML normal_behavior operation contract (id: " + operationContractIds[4] + ")", "self.<inv>", "result = self.transactionId & self.<inv> & exc = null", "{}", "diamond");
+      MemoryOperationContract gti2 = new MemoryOperationContract("JML normal_behavior operation contract [id: " + operationContractIds[3] + " / " + logRecordFullqualifiedName + "::getTransactionId]", "self.<inv>", "result = self.transactionId & self.<inv> & exc = null", "{}", "diamond");
       addAllOperationContractObligations(gti2);
       getTransactionId.addOperationContract(gti2);
       result.addMethod(getTransactionId);
-      result.getAttributes().add(new MemoryAttribute("transactionCounter", "int", bugAttributeVisibility(DSVisibility.PRIVATE), true));
-      result.getAttributes().add(new MemoryAttribute("balance", "int", bugAttributeVisibility(DSVisibility.PRIVATE)));
-      result.getAttributes().add(new MemoryAttribute("transactionId", "int", bugAttributeVisibility(DSVisibility.PRIVATE)));
-      result.getAttributes().add(new MemoryAttribute("empty", "boolean", bugAttributeVisibility(DSVisibility.PRIVATE)));
+      result.addAttribute(new MemoryAttribute("transactionCounter", "int", bugAttributeVisibility(DSVisibility.PRIVATE), true));
+      result.addAttribute(new MemoryAttribute("balance", "int", bugAttributeVisibility(DSVisibility.PRIVATE)));
+      result.addAttribute(new MemoryAttribute("transactionId", "int", bugAttributeVisibility(DSVisibility.PRIVATE)));
+      result.addAttribute(new MemoryAttribute("empty", "boolean", bugAttributeVisibility(DSVisibility.PRIVATE)));
       result.getExtendsFullnames().add("java.lang.Object");
       result.addInvariant(new MemoryInvariant("JML class invariant nr " + invariantIds[0] + " in LogRecord", "!self.empty = TRUE\n" +
       		                                                                                                 "-> self.balance >= 0 & self.transactionId >= 0"));
@@ -512,7 +535,7 @@ public final class TestKeyUtil {
       result.addConstructor(constructor);
       MemoryMethod createJuniorCard = new MemoryMethod("createJuniorCard()", qualifiedPaycardName, DSVisibility.PUBLIC, true);
       addOperationObligations(createJuniorCard, true, true, true);
-      MemoryOperationContract cjc = new MemoryOperationContract("JML operation contract (id: " + operationContractIDs[0] + ")", 
+      MemoryOperationContract cjc = new MemoryOperationContract("JML operation contract [id: " + operationContractIDs[0] + " / " + qualifiedPaycardName + "::createJuniorCard]", 
                                                                 "true", 
                                                                 "(exc = null -> result.limit = 100 & !result = null)\n" +
                                                                 "& exc = null", 
@@ -523,7 +546,7 @@ public final class TestKeyUtil {
       result.addMethod(createJuniorCard);
       MemoryMethod charge = new MemoryMethod("charge(amount : int)", "boolean", DSVisibility.PUBLIC);
       addOperationObligations(charge, true, true, true);
-      MemoryOperationContract c1 = new MemoryOperationContract("JML exceptional_behavior operation contract (id: " + operationContractIDs[1] + ")", 
+      MemoryOperationContract c1 = new MemoryOperationContract("JML exceptional_behavior operation contract [id: " + operationContractIDs[1] + " / " + qualifiedPaycardName + "::charge]", 
                                                                "amount <= 0 & self.<inv>", 
                                                                "!exc = null\n" +
                                                                "& (  (   java.lang.Exception::instance(exc) = TRUE\n" +
@@ -533,7 +556,7 @@ public final class TestKeyUtil {
                                                                "allLocs", 
                                                                "diamond");
       addAllOperationContractObligations(c1);
-      MemoryOperationContract c2 = new MemoryOperationContract("JML normal_behavior operation contract (id: " + operationContractIDs[2] + ")", 
+      MemoryOperationContract c2 = new MemoryOperationContract("JML normal_behavior operation contract [id: " + operationContractIDs[2] + " / " + qualifiedPaycardName + "::charge]", 
                                                                "(  javaAddInt(amount, self.balance) >= self.limit\n" +
                                                                "   | !self.isValid() = TRUE)\n" +
                                                                "& amount >  0\n" +
@@ -549,7 +572,7 @@ public final class TestKeyUtil {
                                                                "{(self, unsuccessfulOperations)}", 
                                                                "diamond");
       addAllOperationContractObligations(c2);
-      MemoryOperationContract c3 = new MemoryOperationContract("JML normal_behavior operation contract (id: " + operationContractIDs[3] + ")", 
+      MemoryOperationContract c3 = new MemoryOperationContract("JML normal_behavior operation contract [id: " + operationContractIDs[3] + " / " + qualifiedPaycardName + "::charge]", 
                                                                "javaAddInt(amount, self.balance) < self.limit\n" +
                                                                "& self.isValid() = TRUE\n" +
                                                                "& amount >  0\n" +
@@ -569,7 +592,7 @@ public final class TestKeyUtil {
       result.addMethod(charge);
       MemoryMethod chargeAndRecord = new MemoryMethod("chargeAndRecord(amount : int)", "void", DSVisibility.PUBLIC);
       addOperationObligations(chargeAndRecord, true, true, true);
-      MemoryOperationContract car = new MemoryOperationContract("JML normal_behavior operation contract (id: " + operationContractIDs[4] + ")", 
+      MemoryOperationContract car = new MemoryOperationContract("JML normal_behavior operation contract [id: " + operationContractIDs[4] + " / " + qualifiedPaycardName + "::chargeAndRecord]", 
                                                                 "amount >  0 & self.<inv>", 
                                                                 "self.balance >= int::select(heapAtPre, self, balance)\n" +
                                                                 "& self.<inv>\n" +
@@ -581,7 +604,7 @@ public final class TestKeyUtil {
       result.addMethod(chargeAndRecord);
       MemoryMethod isValid = new MemoryMethod("isValid()", "boolean", DSVisibility.PUBLIC);
       addOperationObligations(isValid, true, true, true);
-      MemoryOperationContract iv2 = new MemoryOperationContract("JML normal_behavior operation contract (id: " + operationContractIDs[6] + ")", 
+      MemoryOperationContract iv2 = new MemoryOperationContract("JML normal_behavior operation contract [id: " + operationContractIDs[6] + " / " + qualifiedPaycardName + "::isValid]", 
                                                                 "self.<inv>", 
                                                                 "(result = TRUE <-> self.unsuccessfulOperations <= 3)\n" +
                                                                 "& self.<inv>\n" +
@@ -594,11 +617,11 @@ public final class TestKeyUtil {
       MemoryMethod infoCardMsg = new MemoryMethod("infoCardMsg()", "java.lang.String", DSVisibility.PUBLIC);
       addOperationObligations(infoCardMsg, true, true, true);
       result.addMethod(infoCardMsg);
-      result.getAttributes().add(new MemoryAttribute("limit", "int", bugAttributeVisibility(DSVisibility.DEFAULT)));
-      result.getAttributes().add(new MemoryAttribute("unsuccessfulOperations", "int", bugAttributeVisibility(DSVisibility.DEFAULT)));
-      result.getAttributes().add(new MemoryAttribute("id", "int", bugAttributeVisibility(DSVisibility.DEFAULT)));
-      result.getAttributes().add(new MemoryAttribute("balance", "int", bugAttributeVisibility(DSVisibility.DEFAULT)));
-      result.getAttributes().add(new MemoryAttribute("log", qualifiedLogFileName, bugAttributeVisibility(DSVisibility.PROTECTED)));
+      result.addAttribute(new MemoryAttribute("limit", "int", bugAttributeVisibility(DSVisibility.DEFAULT)));
+      result.addAttribute(new MemoryAttribute("unsuccessfulOperations", "int", bugAttributeVisibility(DSVisibility.DEFAULT)));
+      result.addAttribute(new MemoryAttribute("id", "int", bugAttributeVisibility(DSVisibility.DEFAULT)));
+      result.addAttribute(new MemoryAttribute("balance", "int", bugAttributeVisibility(DSVisibility.DEFAULT)));
+      result.addAttribute(new MemoryAttribute("log", qualifiedLogFileName, bugAttributeVisibility(DSVisibility.PROTECTED)));
       result.getExtendsFullnames().add("java.lang.Object");
       result.addInvariant(new MemoryInvariant("JML class invariant nr " + invariantIDs[0] + " in PayCard", "!self.log = null"));
       result.addInvariant(new MemoryInvariant("JML class invariant nr " + invariantIDs[1] + " in PayCard", "self.balance >= 0"));
@@ -627,7 +650,7 @@ public final class TestKeyUtil {
       result.addConstructor(constructor);
       MemoryMethod addRecord = new MemoryMethod("addRecord(balance : int)", "void", DSVisibility.PUBLIC);
       addOperationObligations(addRecord, true, true, true);
-      MemoryOperationContract ar1 = new MemoryOperationContract("JML normal_behavior operation contract (id: " + operationContractIds[0] + ")", 
+      MemoryOperationContract ar1 = new MemoryOperationContract("JML normal_behavior operation contract [id: " + operationContractIds[0] + " / " + qualifiedLogFileClass + "::addRecord]", 
                                                                 "balance >= 0 & self.<inv>", 
                                                                 "\\if (!  javaAddInt(int::select(heapAtPre,\n" +
                                                                 "                                 self,\n" +
@@ -650,7 +673,7 @@ public final class TestKeyUtil {
       result.addMethod(addRecord);
       MemoryMethod getMaximumRecord = new MemoryMethod("getMaximumRecord()", qualifiedLogRecordClass, DSVisibility.PUBLIC);
       addOperationObligations(getMaximumRecord, true, true, true);
-      MemoryOperationContract mr2 = new MemoryOperationContract("JML normal_behavior operation contract (id: " + operationContractIds[2] + ")", 
+      MemoryOperationContract mr2 = new MemoryOperationContract("JML normal_behavior operation contract [id: " + operationContractIds[2] + " / " + qualifiedLogFileClass + "::getMaximumRecord]", 
                                                                 "self.<inv>", 
                                                                 "\\forall int i;\n" +
                                                                 "    (   0 <= i & i < self.logArray.length & inInt(i)\n" +
@@ -663,9 +686,9 @@ public final class TestKeyUtil {
       addAllOperationContractObligations(mr2);
       getMaximumRecord.addOperationContract(mr2);
       result.addMethod(getMaximumRecord);
-      result.getAttributes().add(new MemoryAttribute("logFileSize", "int", bugAttributeVisibility(DSVisibility.PRIVATE), true));
-      result.getAttributes().add(new MemoryAttribute("currentRecord", "int", bugAttributeVisibility(DSVisibility.PRIVATE)));
-      result.getAttributes().add(new MemoryAttribute("logArray", qualifiedLogRecordClass + KeyConnection.ARRAY_DECLARATION, bugAttributeVisibility(DSVisibility.PRIVATE)));
+      result.addAttribute(new MemoryAttribute("logFileSize", "int", bugAttributeVisibility(DSVisibility.PRIVATE), true));
+      result.addAttribute(new MemoryAttribute("currentRecord", "int", bugAttributeVisibility(DSVisibility.PRIVATE)));
+      result.addAttribute(new MemoryAttribute("logArray", qualifiedLogRecordClass + KeyConnection.ARRAY_DECLARATION, bugAttributeVisibility(DSVisibility.PRIVATE)));
       result.getExtendsFullnames().add("java.lang.Object");
       result.addInvariant(new MemoryInvariant("JML class invariant nr " + invariantIds[0] + " in LogFile", "\\forall int i;\n" +
       		                                                                                               "  (   0 <= i & i < self.logArray.length & inInt(i)\n" +
@@ -754,7 +777,124 @@ public final class TestKeyUtil {
       myClass.addConstructor(createDefaultConstructor("MyClass()", "X", false, false));
       return con;
    }
-  
+
+   /**
+    * Creates the expected model for the accessible clause example with
+    * {@link DSPackageManagement#FLAT_LIST}
+    * @return The expected model.
+    */   
+   public static IDSConnection createExpectedAccessibleTestModel() {
+      MemoryConnection con = new MemoryConnection();
+      // Create package test
+      MemoryPackage testPackage = new MemoryPackage("test");
+      con.addPackage(testPackage);
+      // Create class B
+      MemoryClass b = new MemoryClass("B", DSVisibility.DEFAULT);
+      b.getExtendsFullnames().add("java.lang.Object");
+      b.addAttribute(new MemoryAttribute("c", "test.Test", bugAttributeVisibility(DSVisibility.PRIVATE), false, bugAttributeFinal(true)));
+      b.addConstructor(new MemoryConstructor("B(x : int)", DSVisibility.DEFAULT));
+      b.addInvariant(new MemoryInvariant("JML class invariant nr 0 in B", "self.c.<inv>"));
+      MemoryAxiom axiom = new MemoryAxiom("Class invariant axiom for test.B", "equiv(java.lang.Object::<inv>(heap,self),java.lang.Object::<inv>(heap,test.Test::select(heap,self,test.B::$c)))");
+      MemoryAxiomContract axiomContract = new MemoryAxiomContract("JML accessible clause [id: 0 / java.lang.Object::<inv> for B]", "self.<inv>", "allFields(self) \\cup allFields(self.c)");
+      addAllOperationContractObligations(axiomContract);
+      axiom.addAxiomContract(axiomContract);
+      b.addAxiom(axiom);
+      testPackage.addClass(b);
+      // Create class test
+      MemoryClass test = new MemoryClass("Test", DSVisibility.PUBLIC);
+      test.getExtendsFullnames().add("java.lang.Object");
+      test.addAttribute(new MemoryAttribute("x", "int", bugAttributeVisibility(DSVisibility.PRIVATE)));
+      test.addConstructor(new MemoryConstructor("Test(x : int)", DSVisibility.PUBLIC));
+      testPackage.addClass(test);
+      return con;
+   }
+
+   /**
+    * Creates the expected model for the enumeration example with
+    * {@link DSPackageManagement#FLAT_LIST}
+    * @return The expected model.
+    */     
+   public static IDSConnection createExpectedEnumTestModel() {
+      MemoryConnection con = new MemoryConnection();
+      // Create package test
+      MemoryPackage enumPackage = new MemoryPackage("enumPackage");
+      con.addPackage(enumPackage);
+      // Create interface IPackageEnum
+      MemoryInterface iPackageEnum = new MemoryInterface("IPackageEnum", DSVisibility.PUBLIC);
+      iPackageEnum.addMethod(new MemoryMethod("getValue()", "int", DSVisibility.PUBLIC, false, false, true));
+      enumPackage.addInterface(iPackageEnum);
+      // Create enumeration PackageEnum
+      MemoryEnum packageEnum = new MemoryEnum("PackageEnum", bugEnumVisibility(DSVisibility.PUBLIC));
+      packageEnum.getImplements().add(iPackageEnum);
+      packageEnum.getImplementsFullnames().add("enumPackage.IPackageEnum");
+      packageEnum.addLiteral(new MemoryEnumLiteral("RED"));
+      packageEnum.addLiteral(new MemoryEnumLiteral("GREEN"));
+      packageEnum.addLiteral(new MemoryEnumLiteral("BLUE"));
+      packageEnum.addConstructor(createDefaultConstructor("PackageEnum()", null, false));
+      packageEnum.addMethod(new MemoryMethod("getValue()", "int", DSVisibility.PUBLIC));
+      packageEnum.addInvariant(new MemoryInvariant("JML class invariant nr 4 in PackageEnum", "!enumPackage.PackageEnum.RED = null"));
+      packageEnum.addInvariant(new MemoryInvariant("JML class invariant nr 5 in PackageEnum", "!enumPackage.PackageEnum.GREEN = null"));
+      packageEnum.addInvariant(new MemoryInvariant("JML class invariant nr 6 in PackageEnum", "!enumPackage.PackageEnum.BLUE = null"));
+      enumPackage.addEnum(packageEnum);
+      addDefaultEnumMethods(packageEnum, "enumPackage.PackageEnum");
+      // Create enumeration MyEnum
+      MemoryEnum myEnum = new MemoryEnum("MyEnum", bugEnumVisibility(DSVisibility.PUBLIC));
+      myEnum.addLiteral(new MemoryEnumLiteral("A"));
+      myEnum.addLiteral(new MemoryEnumLiteral("B"));
+      myEnum.addLiteral(new MemoryEnumLiteral("C"));
+      myEnum.addAttribute(new MemoryAttribute("previous", "MyEnum", bugAttributeVisibility(DSVisibility.PRIVATE)));
+      myEnum.addConstructor(new MemoryConstructor("MyEnum(previous : MyEnum)", DSVisibility.PRIVATE));
+      myEnum.addMethod(new MemoryMethod("getValue()", "int", DSVisibility.PUBLIC));
+      myEnum.addMethod(new MemoryMethod("getPrevious()", "MyEnum", DSVisibility.PUBLIC));
+      myEnum.addInvariant(new MemoryInvariant("JML class invariant nr 0 in MyEnum", "!MyEnum.A = null"));
+      myEnum.addInvariant(new MemoryInvariant("JML class invariant nr 1 in MyEnum", "!MyEnum.B = null"));
+      myEnum.addInvariant(new MemoryInvariant("JML class invariant nr 2 in MyEnum", "!MyEnum.C = null"));
+      myEnum.addInvariant(new MemoryInvariant("JML class invariant nr 3 in MyEnum", "!self.previous = null"));
+      addDefaultEnumMethods(myEnum, "MyEnum");
+      con.addEnum(myEnum);
+      return con;
+   }
+
+   /**
+    * Adds the default methods that every enumeration has to the given {@link MemoryEnum}.
+    * @param enumeration The {@link MemoryEnum} to fill.
+    * @param fullName The full name of the enumeration.
+    */
+   protected static void addDefaultEnumMethods(MemoryEnum enumeration, String fullName) {
+      enumeration.addMethod(new MemoryMethod("valueOf(string : java.lang.String)", fullName, DSVisibility.PUBLIC, true));
+      enumeration.addMethod(new MemoryMethod("values()", fullName + "[]", DSVisibility.PUBLIC, true));
+      enumeration.addMethod(new MemoryMethod("name()", "java.lang.String", DSVisibility.PUBLIC));
+   }
+
+   /**
+    * Creates the expected model for the model field example with
+    * {@link DSPackageManagement#FLAT_LIST}
+    * @param includeAxiomContract {@code true} include, {@code false} do not include axiom contract
+    * @return The expected model.
+    */      
+   public static IDSConnection createExpectedModelFieldTestModel(boolean includeAxiomContract) {
+      MemoryConnection con = new MemoryConnection();
+      MemoryClass b = new MemoryClass("ModelFieldTest", DSVisibility.PUBLIC);
+      b.getExtendsFullnames().add("java.lang.Object");
+      b.addAttribute(new MemoryAttribute("f", "int", bugAttributeVisibility(DSVisibility.PRIVATE)));
+      b.addAttribute(new MemoryAttribute("x", "int", bugAttributeVisibility(DSVisibility.PRIVATE)));
+      b.addConstructor(createDefaultConstructor("ModelFieldTest()", null, false));
+      MemoryMethod doubleX = new MemoryMethod("doubleX()", "int", DSVisibility.PUBLIC);
+      MemoryOperationContract doubleXcontract = new MemoryOperationContract("JML operation contract [id: " + (includeAxiomContract ? 1 : 0) + " / ModelFieldTest::doubleX]", "self.<inv>", "(exc = null -> result = self.f & self.<inv>)\n& exc = null", "allLocs", "diamond");
+      addAllOperationContractObligations(doubleXcontract);
+      doubleX.addOperationContract(doubleXcontract);
+      b.addMethod(doubleX);
+      MemoryAxiom axiom1 = new MemoryAxiom("JML represents clause for ModelFieldTest::$f", "equals(ModelFieldTest::$f(heap,self),javaMulInt(Z(2(#)),int::select(heap,self,ModelFieldTest::$x)))");
+      if (includeAxiomContract) {
+         MemoryAxiomContract axiom1contract = new MemoryAxiomContract("JML accessible clause [id: 0 / ModelFieldTest::$f for ModelFieldTest]", "self.<inv>", "{(self, x)}");
+         addAllOperationContractObligations(axiom1contract);
+         axiom1.addAxiomContract(axiom1contract);
+      }
+      b.addAxiom(axiom1);
+      con.addClass(b);
+      return con;
+   }
+
    /**
     * Creates the expected model for the attributes example with
     * {@link DSPackageManagement#FLAT_LIST}
@@ -764,11 +904,11 @@ public final class TestKeyUtil {
       MemoryConnection con = new MemoryConnection();
       MemoryClass attributeTestParent = new MemoryClass("AttributeTestParent", DSVisibility.PUBLIC);
       attributeTestParent.addConstructor(createDefaultConstructor("AttributeTestParent()", "X"));
-      attributeTestParent.getAttributes().add(new MemoryAttribute("onParentMyClass", "MyClass", bugAttributeVisibility(DSVisibility.DEFAULT)));
-      attributeTestParent.getAttributes().add(new MemoryAttribute("onParentBool", "boolean[][]", bugAttributeVisibility(DSVisibility.PRIVATE)));
-      attributeTestParent.getAttributes().add(new MemoryAttribute("onParentInt", "int", bugAttributeVisibility(DSVisibility.PROTECTED)));
-      attributeTestParent.getAttributes().add(new MemoryAttribute("onParentStringArray", "java.lang.String[]", bugAttributeVisibility(DSVisibility.PUBLIC)));
-      attributeTestParent.getAttributes().add(new MemoryAttribute("PARENT_CONSTANT", "int", bugAttributeVisibility(DSVisibility.PUBLIC), true, bugAttributeFinal(true)));
+      attributeTestParent.addAttribute(new MemoryAttribute("onParentMyClass", "MyClass", bugAttributeVisibility(DSVisibility.DEFAULT)));
+      attributeTestParent.addAttribute(new MemoryAttribute("onParentBool", "boolean[][]", bugAttributeVisibility(DSVisibility.PRIVATE)));
+      attributeTestParent.addAttribute(new MemoryAttribute("onParentInt", "int", bugAttributeVisibility(DSVisibility.PROTECTED)));
+      attributeTestParent.addAttribute(new MemoryAttribute("onParentStringArray", "java.lang.String[]", bugAttributeVisibility(DSVisibility.PUBLIC)));
+      attributeTestParent.addAttribute(new MemoryAttribute("PARENT_CONSTANT", "int", bugAttributeVisibility(DSVisibility.PUBLIC), true, bugAttributeFinal(true)));
       attributeTestParent.getExtendsFullnames().add("java.lang.Object");
       attributeTestParent.addInvariant(new MemoryInvariant("JML class invariant nr 0 in AttributeTestParent", "!self.onParentMyClass = null"));
       attributeTestParent.addInvariant(new MemoryInvariant("JML class invariant nr 1 in AttributeTestParent", "\\forall int i;\n" +
@@ -784,12 +924,12 @@ public final class TestKeyUtil {
       con.addClass(attributeTestParent);
       MemoryClass attributeTest = new MemoryClass("AttributesTest", DSVisibility.PUBLIC);
       attributeTest.addConstructor(createDefaultConstructor("AttributesTest()", "X"));
-      attributeTest.getAttributes().add(new MemoryAttribute("x", "int", bugAttributeVisibility(DSVisibility.PRIVATE)));
-      attributeTest.getAttributes().add(new MemoryAttribute("y", "java.lang.String", bugAttributeVisibility(DSVisibility.DEFAULT)));
-      attributeTest.getAttributes().add(new MemoryAttribute("boolArray", "boolean[]", bugAttributeVisibility(DSVisibility.PUBLIC)));
-      attributeTest.getAttributes().add(new MemoryAttribute("classInstance", "MyClass", bugAttributeVisibility(DSVisibility.PROTECTED)));
-      attributeTest.getAttributes().add(new MemoryAttribute("CONST", "java.lang.String", bugAttributeVisibility(DSVisibility.PRIVATE), false, bugAttributeFinal(true)));
-      attributeTest.getAttributes().add(new MemoryAttribute("counter", "int", bugAttributeVisibility(DSVisibility.PRIVATE), true));
+      attributeTest.addAttribute(new MemoryAttribute("x", "int", bugAttributeVisibility(DSVisibility.PRIVATE)));
+      attributeTest.addAttribute(new MemoryAttribute("y", "java.lang.String", bugAttributeVisibility(DSVisibility.DEFAULT)));
+      attributeTest.addAttribute(new MemoryAttribute("boolArray", "boolean[]", bugAttributeVisibility(DSVisibility.PUBLIC)));
+      attributeTest.addAttribute(new MemoryAttribute("classInstance", "MyClass", bugAttributeVisibility(DSVisibility.PROTECTED)));
+      attributeTest.addAttribute(new MemoryAttribute("CONST", "java.lang.String", bugAttributeVisibility(DSVisibility.PRIVATE), false, bugAttributeFinal(true)));
+      attributeTest.addAttribute(new MemoryAttribute("counter", "int", bugAttributeVisibility(DSVisibility.PRIVATE), true));
       attributeTest.getExtendsFullnames().add("AttributeTestParent");
       attributeTest.getExtends().add(attributeTestParent);
       attributeTest.addInvariant(new MemoryInvariant("JML class invariant nr 5 in AttributesTest", "!self.y = null"));
@@ -865,7 +1005,7 @@ public final class TestKeyUtil {
       MemoryConnection con = new MemoryConnection();
       MemoryClass classA = new MemoryClass("ClassA", DSVisibility.PUBLIC);
       classA.addConstructor(createDefaultConstructor("ClassA()", "X"));
-      classA.getAttributes().add(new MemoryAttribute("limit", "int", bugAttributeVisibility(DSVisibility.PRIVATE)));
+      classA.addAttribute(new MemoryAttribute("limit", "int", bugAttributeVisibility(DSVisibility.PRIVATE)));
       classA.getExtendsFullnames().add("java.lang.Object");
       classA.addInvariant(new MemoryInvariant("JML class invariant nr 0 in ClassA", "self.limit >  0"));
       con.addClass(classA);
@@ -907,7 +1047,7 @@ public final class TestKeyUtil {
       classAConstructorInt.addOperationContract(oc5);
       classAConstructorInt.addOperationContract(oc1);
       classA.addConstructor(classAConstructorInt);
-      classA.getAttributes().add(new MemoryAttribute("x", "int", bugAttributeVisibility(DSVisibility.PRIVATE)));
+      classA.addAttribute(new MemoryAttribute("x", "int", bugAttributeVisibility(DSVisibility.PRIVATE)));
       classA.getExtendsFullnames().add("java.lang.Object");
       MemoryMethod classAGetX = new MemoryMethod("getX()", "int", DSVisibility.PUBLIC);
       addOperationObligations(classAGetX, true, false, true);
@@ -1058,30 +1198,37 @@ public final class TestKeyUtil {
 
       MemoryPackage packageC = new MemoryPackage("packageA.B.C");
       con.addPackage(packageC);
-      packageC.addClass(createClassContainer("ClassContainer"));
-      packageC.addInterface(createInterfaceContainer("InterfaceContainer"));
+      packageC.addClass(createClassContainer("ClassContainer", packageC.getName(), new String[] {"6", "7", "8"}, true));
+      packageC.addEnum(createEnumContainer("EnumContainer", packageC.getName(), new String[] {"9"}, true));
+      packageC.addInterface(createInterfaceContainer("InterfaceContainer", packageC.getName(), new String[] {"10", "11"}, true));
 
       MemoryPackage packageB = new MemoryPackage("packageA.B");
       con.addPackage(packageB);
-      packageB.addClass(createClassContainer("ClassContainer"));
-      packageB.addInterface(createInterfaceContainer("InterfaceContainer"));
+      packageB.addClass(createClassContainer("ClassContainer", packageB.getName(), new String[] {"12", "13", "14"}, true));
+      packageB.addEnum(createEnumContainer("EnumContainer", packageB.getName(), new String[] {"15"}, true));
+      packageB.addInterface(createInterfaceContainer("InterfaceContainer", packageB.getName(), new String[] {"16", "17"}, true));
       
       MemoryPackage packageA = new MemoryPackage("packageA");
       con.addPackage(packageA);
-      packageA.addClass(createClassContainer("ClassContainer"));
-      packageA.addInterface(createInterfaceContainer("InterfaceContainer"));
+      packageA.addClass(createClassContainer("ClassContainer", packageA.getName(), new String[] {"18", "19", "20"}, true));
+      packageA.addEnum(createEnumContainer("EnumContainer", packageA.getName(), new String[] {"21"}, true));
+      packageA.addInterface(createInterfaceContainer("InterfaceContainer", packageA.getName(), new String[] {"22", "23"}, true));
       
-      con.addClass(createClassContainer("ClassContainer"));
-      con.addInterface(createInterfaceContainer("InterfaceContainer"));
+      con.addClass(createClassContainer("ClassContainer", null, new String[] {"0", "1", "2"}, false));
+      con.addEnum(createEnumContainer("EnumContainer", null, new String[] {"3"}, false));
+      con.addInterface(createInterfaceContainer("InterfaceContainer", null, new String[] {"4", "5"}, false));
       return con;
    }
    
    /**
     * Creates the class "ClassContainer".
     * @param className The name to use.
+    * @param packageName The package name to use.
+    * @param enumInvariantIds The invariant IDs to use.
+    * @param multilineInvariant Are invariants multilined?
     * @return The created {@link IDSClass}.
     */
-   protected static MemoryClass createClassContainer(String className) {
+   protected static MemoryClass createClassContainer(String className, String packageName, String[] enumInvariantIds, boolean multilineInvariant) {
       MemoryClass result = new MemoryClass(className, DSVisibility.PUBLIC);
       result.addConstructor(createDefaultConstructor(className + "()", "X", false, false));
       MemoryClass anonymousClass = new MemoryClass("ClassContainer.30390029.20920809", DSVisibility.DEFAULT);
@@ -1100,20 +1247,160 @@ public final class TestKeyUtil {
       addOperationObligations(doContainer, true, false, true);
       result.addMethod(doContainer);
       result.getExtendsFullnames().add("java.lang.Object");
+      result.addInnerEnum(createDefaultChildEnum("DefaultChildEnum", (!StringUtil.isEmpty(packageName) ? packageName + "." : StringUtil.EMPTY_STRING) + "ClassContainer", enumInvariantIds[0], multilineInvariant));
+      result.addInnerEnum(createPrivateChildEnum("PrivateChildEnum", (!StringUtil.isEmpty(packageName) ? packageName + "." : StringUtil.EMPTY_STRING) + "ClassContainer", enumInvariantIds[1], multilineInvariant));
+      result.addInnerEnum(createProtectedChildEnum("ProtectedChildEnum", (!StringUtil.isEmpty(packageName) ? packageName + "." : StringUtil.EMPTY_STRING) + "ClassContainer"));
+      result.addInnerEnum(createPublicChildEnum("PublicChildEnum", (!StringUtil.isEmpty(packageName) ? packageName + "." : StringUtil.EMPTY_STRING) + "ClassContainer", enumInvariantIds[2], multilineInvariant));
       return result;
    }
    
    /**
+    * Creates the class "ClassContainer".
+    * @param className The name to use.
+    * @param packageName The package name to use.
+    * @param enumInvariantIds The invariant IDs to use.
+    * @param multilineInvariant Are invariants multilined?
+    * @return The created {@link IDSClass}.
+    */
+   protected static MemoryEnum createEnumContainer(String className, String packageName, String[] enumInvariantIds, boolean multilineInvariant) {
+      String fullName = (packageName != null ? packageName + "." : "") + className;
+      MemoryEnum result = new MemoryEnum(className, bugEnumVisibility(DSVisibility.PUBLIC));
+      result.addConstructor(createDefaultConstructor(className + "()", null, false));
+      result.addLiteral(new MemoryEnumLiteral("INSTANCE"));
+//      if (multilineInvariant) {
+//         result.addInvariant(new MemoryInvariant("JML class invariant nr " + enumInvariantIds[0] + " in " + className, "!  " + fullName + ".INSTANCE\n = null"));
+//      }
+//      else {
+         result.addInvariant(new MemoryInvariant("JML class invariant nr " + enumInvariantIds[0] + " in " + className, "!" + fullName + ".INSTANCE = null"));
+//      }
+      MemoryClass anonymousClass = new MemoryClass("ClassContainer.30390029.20920809", DSVisibility.DEFAULT);
+      anonymousClass.setAnonymous(true);
+      anonymousClass.getExtendsFullnames().add("java.lang.Object");
+      result.addInnerClass(anonymousClass);
+      result.addInnerClass(createDefaultChildClass());
+      result.addInnerClass(createPrivateChildClass());
+      result.addInnerClass(createProtectedChildClass());
+      result.addInnerClass(createPublicChildClass());
+      result.addInnerInterface(createDefaultChildInterface());
+      result.addInnerInterface(createPrivateChildInterface());
+      result.addInnerInterface(createProtectedChildInterface());
+      result.addInnerInterface(createPublicChildInterface());
+      MemoryMethod doContainer = new MemoryMethod("doContainer()", "void", DSVisibility.PUBLIC);
+      addOperationObligations(doContainer, true, false, true);
+      result.addMethod(doContainer);
+      addDefaultEnumMethods(result, fullName);
+      return result;
+   }
+   
+   /**
+    * Creates the enumeration "PublicChildEnum".
+    * @param className The class name to use.
+    * @param packageName The package in that the class is contained.
+    * @param invariantId The invariant ID to use.
+    * @param multilineInvariant Is invariant multilined?
+    * @return The created {@link IDSEnum}.
+    */
+   protected static MemoryEnum createPublicChildEnum(String className, String packageName, String invariantId, boolean multilineInvariant) {
+      String fullName = (packageName != null ? packageName + "." : "") + className;
+      MemoryEnum result = new MemoryEnum(className, bugEnumVisibility(DSVisibility.DEFAULT));
+      result.addConstructor(createDefaultConstructor(className + "()", null, false));
+      result.addLiteral(new MemoryEnumLiteral("INSTANCE"));
+      if (multilineInvariant) {
+         result.addInvariant(new MemoryInvariant("JML class invariant nr " + invariantId + " in " + className, "!  " + fullName + ".INSTANCE\n = null"));
+      }
+      else {
+         result.addInvariant(new MemoryInvariant("JML class invariant nr " + invariantId + " in " + className, "!" + fullName + ".INSTANCE = null"));
+      }
+      addDefaultEnumMethods(result, fullName);
+      return result;
+   }
+
+   /**
+    * Creates the enumeration "ProtectedChildEnum".
+    * @param className The class name to use.
+    * @param packageName The package in that the class is contained.
+    * @param invariantId The invariant ID to use.
+    * @param multilineInvariant Is invariant multilined?
+    * @return The created {@link IDSEnum}.
+    */
+   protected static MemoryEnum createProtectedChildEnum(String className, String packageName) {
+      String fullName = (packageName != null ? packageName + "." : "") + className;
+      MemoryEnum result = new MemoryEnum(className, bugEnumVisibility(DSVisibility.DEFAULT));
+      result.addConstructor(createDefaultConstructor(className + "()", null, false));
+      addDefaultEnumMethods(result, fullName);
+      return result;
+   }
+
+   /**
+    * Creates the enumeration "PrivateChildEnum".
+    * @param className The class name to use.
+    * @param packageName The package in that the class is contained.
+    * @param invariantId The invariant ID to use.
+    * @param multilineInvariant Is invariant multilined?
+    * @return The created {@link IDSEnum}.
+    */
+   protected static MemoryEnum createPrivateChildEnum(String className, String packageName, String invariantId, boolean multilineInvariant) {
+      String fullName = (packageName != null ? packageName + "." : "") + className;
+      MemoryEnum result = new MemoryEnum(className, bugEnumVisibility(DSVisibility.DEFAULT));
+      result.addConstructor(createDefaultConstructor(className + "()", null, false));
+      result.addLiteral(new MemoryEnumLiteral("INSTANCE"));
+      if (multilineInvariant) {
+         result.addInvariant(new MemoryInvariant("JML class invariant nr " + invariantId + " in " + className, "!  " + fullName + ".INSTANCE\n = null"));
+      }
+      else {
+         result.addInvariant(new MemoryInvariant("JML class invariant nr " + invariantId + " in " + className, "!" + fullName + ".INSTANCE = null"));
+      }
+      addDefaultEnumMethods(result, fullName);
+      return result;
+   }
+
+   /**
+    * Creates the enumeration "DefaultChildEnum".
+    * @param className The class name to use.
+    * @param packageName The package in that the class is contained.
+    * @param invariantId The invariant ID to use.
+    * @param multilineInvariant Is invariant multilined?
+    * @return The created {@link IDSEnum}.
+    */
+   protected static MemoryEnum createDefaultChildEnum(String className, String packageName, String invariantId, boolean multilineInvariant) {
+      String fullName = (!StringUtil.isEmpty(packageName) ? packageName + "." : StringUtil.EMPTY_STRING) + className;
+      MemoryEnum result = new MemoryEnum(className, bugEnumVisibility(DSVisibility.DEFAULT));
+      MemoryClass anonymousClass = new MemoryClass("ClassContainer.30390029.20920809", DSVisibility.DEFAULT);
+      anonymousClass.setAnonymous(true);
+      anonymousClass.getExtendsFullnames().add("java.lang.Object");
+      result.addInnerClass(anonymousClass);
+      result.addLiteral(new MemoryEnumLiteral("INSTANCE"));
+      if (multilineInvariant) {
+         result.addInvariant(new MemoryInvariant("JML class invariant nr " + invariantId + " in " + className, "!  " + fullName + ".INSTANCE\n = null"));
+      }
+      else {
+         result.addInvariant(new MemoryInvariant("JML class invariant nr " + invariantId + " in " + className, "!" + fullName + ".INSTANCE = null"));
+      }
+      result.addAttribute(new MemoryAttribute("x", "int", bugAttributeVisibility(DSVisibility.PRIVATE)));
+      result.addConstructor(new MemoryConstructor(className + "(x : int)", DSVisibility.PRIVATE));
+      MemoryMethod run = new MemoryMethod("run()", "void", DSVisibility.PUBLIC);
+      addOperationObligations(run, true, false, true);
+      result.addMethod(run);
+      addDefaultEnumMethods(result, fullName);
+      return result;
+   }
+
+   /**
     * Creates the interface "InterfaceContainer".
     * @param interfaceName The name to use.
+    * @param packageName The package name to use.
+    * @param enumInvariantIds The invariant IDs to use.
+    * @param multilineInvariant Are invariants multilined?
     * @return The created {@link IDSInterface}.
     */
-   protected static MemoryInterface createInterfaceContainer(String interfaceName) {
+   protected static MemoryInterface createInterfaceContainer(String interfaceName, String packageName, String[] enumInvariantIds, boolean multilineInvariant) {
       MemoryInterface interfaceContainer = new MemoryInterface(interfaceName, DSVisibility.PUBLIC);
       interfaceContainer.addInnerClass(createDefaultChildClass());
       interfaceContainer.addInnerClass(createPublicChildClass());
       interfaceContainer.addInnerInterface(createDefaultChildInterface());
       interfaceContainer.addInnerInterface(createPublicChildInterface());
+      interfaceContainer.addInnerEnum(createDefaultChildEnum("DefaultChildEnum", (!StringUtil.isEmpty(packageName) ? packageName + "." : StringUtil.EMPTY_STRING) + "InterfaceContainer", enumInvariantIds[0], multilineInvariant));
+      interfaceContainer.addInnerEnum(createPublicChildEnum("PublicChildEnum", (!StringUtil.isEmpty(packageName) ? packageName + "." : StringUtil.EMPTY_STRING) + "InterfaceContainer", enumInvariantIds[1], multilineInvariant));
       return interfaceContainer;
    }
    
@@ -1148,7 +1435,7 @@ public final class TestKeyUtil {
       anonymousClass.setAnonymous(true);
       anonymousClass.getExtendsFullnames().add("java.lang.Object");
       result.addInnerClass(anonymousClass);
-      result.getAttributes().add(new MemoryAttribute("x", "int", bugAttributeVisibility(DSVisibility.PRIVATE)));
+      result.addAttribute(new MemoryAttribute("x", "int", bugAttributeVisibility(DSVisibility.PRIVATE)));
       MemoryConstructor constructor = new MemoryConstructor("DefaultChildClass(x : int)", DSVisibility.PUBLIC);
       addOperationObligations(constructor, true, false, true);
       result.addConstructor(constructor);
@@ -1248,12 +1535,13 @@ public final class TestKeyUtil {
     * @param startContainerPath The path to the container to connect to.
     * @param packageManagement The package management to use in the KeY connection
     * @param expectedConnection The expected information to compare to.
+    * @throws Exception Occurred Exception.
     */
    public static void testKeyConnection(String projectName,
                                         String testDataInBundle,
                                         String startContainerPath,
                                         DSPackageManagement packageManagement,
-                                        IDSConnection expectedConnection) {
+                                        IDSConnection expectedConnection) throws Exception {
       IDSConnection connection = null;
       ConnectionLogger logger = new ConnectionLogger();
       try {
@@ -1282,19 +1570,17 @@ public final class TestKeyUtil {
          // Compare connection with expected one and created diagram
          compareModels(expectedConnection, connection, modelFile, diagramFile);
       }
-      catch (Exception e) {
-         e.printStackTrace();
-         TestCase.fail(e.getMessage());
-      }
       finally {
          try {
-            TestGenerationUtil.closeConnection(connection);
-            TestDataSourceUtil.compareConnectionEvents(connection, logger, false, false, true);
             if (connection != null) {
-               connection.removeConnectionListener(logger);
-               TestCase.assertEquals(0, connection.getConnectionListeners().length);
+               TestGenerationUtil.closeConnection(connection);
+               TestDataSourceUtil.compareConnectionEvents(connection, logger, false, false, true);
+               if (connection != null) {
+                  connection.removeConnectionListener(logger);
+                  TestCase.assertEquals(0, connection.getConnectionListeners().length);
+               }
+               TestGenerationUtil.closeConnection(expectedConnection);
             }
-            TestGenerationUtil.closeConnection(expectedConnection);
          }
          catch (DSException e) {
             e.printStackTrace();
@@ -1492,7 +1778,7 @@ public final class TestKeyUtil {
             TestCase.assertEquals(1, proof.getProofListeners().length);
             TestCase.assertEquals(0, proofLogger.getClosedEvents().size());
             TestCase.assertEquals(0, proofLogger.getReferenceChangedEvents().size());
-            finishSelectedProofAutomatically(frame, methodTreatment);
+            TestUtilsUtil.keyFinishSelectedProofAutomatically(frame, methodTreatment);
             TestCase.assertTrue(proof.isClosed());
             TestCase.assertEquals(1, proofLogger.getClosedEvents().size());
             TestCase.assertEquals(proof, proofLogger.getClosedEvents().get(0).getSource());
@@ -1606,56 +1892,6 @@ public final class TestKeyUtil {
             }
          }
       }
-   }
-   
-   /**
-    * Possible method treatments that are configurable inside the 
-    * "Proof Search Strategy" tab.
-    * @author Martin Hentschel
-    */
-   public enum MethodTreatment {
-      /**
-       * Expand.
-       */
-      EXPAND,
-      
-      /**
-       * Contracts
-       */
-      CONTRACTS
-   }
-
-   /**
-    * Executes the "Start/stop automated proof search" on the given KeY frame.
-    * @param frame The given KeY frame.
-    * @param methodTreatment The method treatment to use.
-    */
-   public static void finishSelectedProofAutomatically(SwingBotJFrame frame, MethodTreatment methodTreatment) {
-      // Set proof search strategy settings
-      SwingBotJTabbedPane pane = frame.bot().jTabbedPane();
-      TestCase.assertEquals("Proof Search Strategy", pane.getTitleAt(2));
-      AbstractSwingBotComponent<?> tabComponent = pane.select(2);
-      if (MethodTreatment.CONTRACTS.equals(methodTreatment)) {
-         SwingBotJRadioButton contractsButton = tabComponent.bot().jRadioButton("Contract", 0);
-         contractsButton.click();
-      }
-      else {
-         SwingBotJRadioButton expandButton = tabComponent.bot().jRadioButton("Expand", 1);
-         expandButton.click();
-      }
-      TestCase.assertEquals("Proof", pane.getTitleAt(0));
-      pane.select(0);
-      // Run proof completion
-      frame.bot().jTree().unselectAll();
-      frame.bot().waitWhile(Conditions.hasSelection(frame.bot().jTree()));
-      SwingBotJButton button = frame.bot().jButtonWithTooltip("Start/stop automated proof search");
-      button.click();
-      frame.bot().waitUntil(Conditions.hasSelection(frame.bot().jTree()));
-      // Close result dialog
-      SwingBotJDialog proofClosedDialog = frame.bot().jDialog("Proof closed");
-      proofClosedDialog.bot().jButton("OK").click();
-      proofClosedDialog.bot().waitUntil(Conditions.componentCloses(proofClosedDialog));
-      TestCase.assertFalse(proofClosedDialog.isOpen());   
    }
    
    /**

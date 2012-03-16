@@ -25,6 +25,8 @@ import org.eclipse.emf.edit.ui.provider.AdapterFactoryContentProvider;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
 import org.eclipse.jface.layout.TreeColumnLayout;
 import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.ocl.util.ObjectUtil;
@@ -75,6 +77,11 @@ public class StatisticComposite extends Composite {
    private List<DbcProofObligation> selectedObligations = new LinkedList<DbcProofObligation>();
    
    /**
+    * The {@link IStatisticProvider} that is used.
+    */
+   private IStatisticProvider statisticProvider;
+   
+   /**
     * Listens for changes on {@link #model} and {@link #observedObligations}.
     */
    private Adapter modelListener = new AdapterImpl() {
@@ -100,6 +107,7 @@ public class StatisticComposite extends Composite {
                              IStatisticProvider statisticProvider) {
       super(parent, style);
       Assert.isNotNull(statisticProvider);
+      this.statisticProvider = statisticProvider;
       // Set layout
       viewerLayout = new TreeColumnLayout();
       setLayout(viewerLayout);
@@ -141,10 +149,26 @@ public class StatisticComposite extends Composite {
       labelProvider.setFireLabelUpdateNotifications(true);
       viewer.setLabelProvider(labelProvider);
       viewer.setInput(model);
+      viewer.addDoubleClickListener(new IDoubleClickListener() {
+         @Override
+         public void doubleClick(DoubleClickEvent event) {
+            handleDoubleClick(event);
+         }
+      });
       colorDecorator = new StatisticColorDecorator(viewer, 1, selectedObligations, adapterFactory);
       colorDecorator.initTreeItems();
       // Update UI
       layout();
+   }
+
+   /**
+    * Handles a double click in the viewer.
+    * @param event The event.
+    */
+   protected void handleDoubleClick(DoubleClickEvent event) {
+      if (statisticProvider != null) {
+         statisticProvider.select(viewer.getSelection());
+      }
    }
 
    /**

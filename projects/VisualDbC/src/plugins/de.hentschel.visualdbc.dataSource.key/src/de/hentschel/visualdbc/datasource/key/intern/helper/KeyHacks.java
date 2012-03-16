@@ -12,25 +12,17 @@
 package de.hentschel.visualdbc.datasource.key.intern.helper;
 
 import org.eclipse.core.runtime.Assert;
-import org.key_project.key4eclipse.util.java.ObjectUtil;
-import org.key_project.key4eclipse.util.java.StringUtil;
+import org.key_project.util.java.ObjectUtil;
+import org.key_project.util.java.StringUtil;
 
-import de.hentschel.visualdbc.datasource.model.exception.DSCanceledException;
 import de.hentschel.visualdbc.datasource.model.exception.DSException;
-import de.uka.ilkd.key.gui.ExceptionDialog;
-import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.speclang.ClassInvariant;
+import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.DependencyContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
-import de.uka.ilkd.key.speclang.OperationContract;
 
 /**
  * Provides static methods that uses java reflections to access not public
@@ -70,23 +62,23 @@ public final class KeyHacks {
    /**
     * Reads the pre condition from the operation contract.
     * @param services The services to use.
-    * @param operationContract The operation contract to read from.
+    * @param contract The operation contract to read from.
     * @return The pre condition.
     * @throws DSException Occurred Exception
     */
    public static String getOperationContractPre(Services services,
-                                                FunctionalOperationContract operationContract) throws DSException {
+                                                Contract contract) throws DSException {
       try {
          // This implementation uses the code copied from de.uka.ilkd.key.speclang.OperationContractImpl#getHTMLText(de.uka.ilkd.key.java.Services); without the transformation to HTML.
          // An alternative possible solution will be to convert the HTML text back to plain text.
          // This realization is implemented, because it is easier and more performant. 
-         Assert.isNotNull(operationContract);
-         Term originalPre = ObjectUtil.get(operationContract, "originalPre");
+         Assert.isNotNull(contract);
+         Term originalPre = ObjectUtil.get(contract, "originalPre");
          String inv = LogicPrinter.quickPrintTerm(originalPre, services);
          return StringUtil.trim(inv); // Trim the text to remove line breaks in the end
       }
       catch (Exception e) {
-         throw new DSException("Can't read pre condition from operation contract: " + operationContract, e);
+         throw new DSException("Can't read pre condition from contract: " + contract, e);
       }
    }
    
@@ -112,27 +104,49 @@ public final class KeyHacks {
          throw new DSException("Can't read post condition from operation contract: " + operationContract, e);
       }
    }
-   
+
    /**
-    * Reads the modifies from the operation contract.
+    * Reads the dep condition from the dependency contract.
     * @param services The services to use.
-    * @param operationContract The operation contract to read from.
-    * @return The modifies.
+    * @param dependencyContract The dependency contract to read from.
+    * @return The post condition.
     * @throws DSException Occurred Exception
-    */
-   public static String getOperationContractModifies(Services services,
-                                                     FunctionalOperationContract operationContract) throws DSException {
+    */   
+   public static String getDependencyContractDep(Services services, DependencyContract dependencyContract) throws DSException {
       try {
          // This implementation uses the code copied from de.uka.ilkd.key.speclang.OperationContractImpl#getHTMLText(de.uka.ilkd.key.java.Services); without the transformation to HTML.
          // An alternative possible solution will be to convert the HTML text back to plain text.
          // This realization is implemented, because it is easier and more performant. 
-         Assert.isNotNull(operationContract);
-         Term originalModifies = ObjectUtil.get(operationContract, "originalMod");
+         Assert.isNotNull(dependencyContract);
+         Term originalDep = ObjectUtil.get(dependencyContract, "originalDep");
+         String inv = LogicPrinter.quickPrintTerm(originalDep, services);
+         return StringUtil.trim(inv); // Trim the text to remove line breaks in the end
+      }
+      catch (Exception e) {
+         throw new DSException("Can't read dep condition from axiom contract: " + dependencyContract, e);
+      }
+   }
+   
+   /**
+    * Reads the modifies from the operation contract.
+    * @param services The services to use.
+    * @param contract The operation contract to read from.
+    * @return The modifies.
+    * @throws DSException Occurred Exception
+    */
+   public static String getOperationContractModifies(Services services,
+                                                     FunctionalOperationContract contract) throws DSException {
+      try {
+         // This implementation uses the code copied from de.uka.ilkd.key.speclang.OperationContractImpl#getHTMLText(de.uka.ilkd.key.java.Services); without the transformation to HTML.
+         // An alternative possible solution will be to convert the HTML text back to plain text.
+         // This realization is implemented, because it is easier and more performant. 
+         Assert.isNotNull(contract);
+         Term originalModifies = ObjectUtil.get(contract, "originalMod");
          String inv = LogicPrinter.quickPrintTerm(originalModifies, services);
          return StringUtil.trim(inv); // Trim the text to remove line breaks in the end
       }
       catch (Exception e) {
-         throw new DSException("Can't read post condition from operation contract: " + operationContract, e);
+         throw new DSException("Can't read post condition from operation contract: " + contract, e);
       }
    }
 }

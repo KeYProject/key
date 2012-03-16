@@ -1,13 +1,18 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Symbolic Execution Debugger (SED) Core
-Bundle-SymbolicName: org.key_project.sed.core
+Bundle-SymbolicName: org.key_project.sed.core;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.key_project.sed.core.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- org.eclipse.debug.core;bundle-version="3.7.0"
+ org.eclipse.debug.core;bundle-version="3.7.0";visibility:=reexport,
+ org.eclipse.debug.ui;bundle-version="3.7.101",
+ org.key_project.util;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: KeY Project
-Export-Package: org.key_project.sed.core.util
+Export-Package: org.key_project.sed.core.model,
+ org.key_project.sed.core.model.impl,
+ org.key_project.sed.core.model.memory,
+ org.key_project.sed.core.util

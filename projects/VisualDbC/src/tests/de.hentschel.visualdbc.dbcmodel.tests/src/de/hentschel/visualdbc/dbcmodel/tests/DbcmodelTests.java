@@ -54,6 +54,7 @@ public class DbcmodelTests extends TestSuite {
       suite.addTestSuite(DbcConstructorTest.class);
       suite.addTestSuite(DbcInterfaceTest.class);
       suite.addTestSuite(DbcEnumTest.class);
+      suite.addTestSuite(DbcAxiomTest.class);
       return suite;
    }
 

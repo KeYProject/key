@@ -36,9 +36,9 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
-import org.key_project.key4eclipse.util.eclipse.ResourceUtil;
-import org.key_project.key4eclipse.util.java.ObjectUtil;
-import org.key_project.key4eclipse.util.jdt.JDTUtil;
+import org.key_project.util.eclipse.ResourceUtil;
+import org.key_project.util.java.ObjectUtil;
+import org.key_project.util.jdt.JDTUtil;
 
 import de.hentschel.visualdbc.datasource.ui.setting.event.SettingControlEvent;
 import de.hentschel.visualdbc.datasource.ui.util.LogUtil;

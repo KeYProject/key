@@ -80,6 +80,10 @@
             <ElementType class="org.eclipse.gmf.runtime.diagram.ui.editparts.DiagramEditPart">
                <GlobalActionId actionId="save"/>
             </ElementType>
+            <ElementType class="org.eclipse.gmf.runtime.diagram.ui.editparts.IGraphicalEditPart">
+               <GlobalActionId actionId="save">
+               </GlobalActionId>
+            </ElementType>        
          </ViewId>
       </GlobalActionHandlerProvider>
       <GlobalActionHandlerProvider
@@ -213,7 +217,7 @@
       <viewProvider class="de.hentschel.visualdbc.dbcmodel.diagram.providers.DbCViewProvider">
          <Priority name="Lowest"/>
          <context viewClass="org.eclipse.gmf.runtime.notation.Diagram" semanticHints="DbC"/>
-         <context viewClass="org.eclipse.gmf.runtime.notation.Node" semanticHints="2007,2011,2012,2013,2014,3027,3031,3032,3033,3034,3035,3011,3009,3026,3010,3020"/>
+         <context viewClass="org.eclipse.gmf.runtime.notation.Node" semanticHints="2007,2011,2012,2013,2014,3027,3031,3032,3033,3034,3035,3011,3009,3026,3010,3020,3036,3037"/>
          <context viewClass="org.eclipse.gmf.runtime.notation.Edge" semanticHints="4001,4002,4003,4004,4005"/>
       </viewProvider>
    </extension>
@@ -226,16 +230,16 @@
             <method name="getType()" value="DbC"/>
          </object>
          <object class="org.eclipse.gmf.runtime.notation.Node" id="generated-nodes">
-            <method name="getType()" value="2007,2011,2012,2013,2014,3027,3031,3032,3033,3034,3035,3011,3009,3026,3010,3020"/>
+            <method name="getType()" value="2007,2011,2012,2013,2014,3027,3031,3032,3033,3034,3035,3011,3009,3026,3010,3020,3036,3037"/>
          </object>
          <object class="org.eclipse.gmf.runtime.notation.Edge" id="generated-links">
             <method name="getType()" value="4001,4002,4003,4004,4005"/>
          </object>
          <object class="org.eclipse.gmf.runtime.notation.Node" id="generated-labels">
-            <method name="getType()" value="5042,5049,5050,5051,5053,5041,5048,5047,5046,5052,5054,5055,5011,5035,5036,5037,5012"/>
+            <method name="getType()" value="5042,5049,5050,5051,5053,5041,5048,5047,5046,5052,5054,5055,5061,5011,5035,5036,5037,5012,5062,5056,5060,5057,5058,5059"/>
          </object>
          <object class="org.eclipse.gmf.runtime.notation.Node" id="generated-compartments">
-            <method name="getType()" value="7034,7035,7050,7051,7052,7053,7054,7055,7056,7011,7012,7057,7058,7059,7060,7061,7062,7063"/>
+            <method name="getType()" value="7034,7035,7050,7051,7052,7053,7054,7055,7056,7011,7012,7064,7057,7058,7059,7060,7061,7062,7063"/>
          </object>
          <context views="generated-diagram,generated-nodes,generated-links,generated-labels,generated-compartments"/>
       </editpartProvider>
@@ -437,6 +441,26 @@
          </metamodelType>
       </metamodel>
       <metamodel nsURI="http://www.hentschel.de/dbcmodel">
+         <metamodelType
+               id="de.hentschel.visualdbc.dbcmodel.diagram.DbcAxiom_3036"
+               name="%metatype.name.DbcAxiom_3036"
+               kind="org.eclipse.gmf.runtime.emf.type.core.IHintedType"
+               eclass="DbcAxiom"
+               edithelper="de.hentschel.visualdbc.dbcmodel.diagram.edit.helpers.DbcAxiomEditHelper">
+            <param name="semanticHint" value="3036"/>
+         </metamodelType>
+      </metamodel>
+      <metamodel nsURI="http://www.hentschel.de/dbcmodel">
+         <metamodelType
+               id="de.hentschel.visualdbc.dbcmodel.diagram.DbCAxiomContract_3037"
+               name="%metatype.name.DbCAxiomContract_3037"
+               kind="org.eclipse.gmf.runtime.emf.type.core.IHintedType"
+               eclass="DbCAxiomContract"
+               edithelper="de.hentschel.visualdbc.dbcmodel.diagram.edit.helpers.DbCAxiomContractEditHelper">
+            <param name="semanticHint" value="3037"/>
+         </metamodelType>
+      </metamodel>
+      <metamodel nsURI="http://www.hentschel.de/dbcmodel">
          <specializationType
                id="de.hentschel.visualdbc.dbcmodel.diagram.DbcProofTarget_4001"
                name="%metatype.name.DbcProofTarget_4001"
@@ -511,6 +535,8 @@
          <elementType ref="de.hentschel.visualdbc.dbcmodel.diagram.DbcOperationContract_3026"/>
          <elementType ref="de.hentschel.visualdbc.dbcmodel.diagram.DbcConstructor_3010"/>
          <elementType ref="de.hentschel.visualdbc.dbcmodel.diagram.DbcEnumLiteral_3020"/>
+         <elementType ref="de.hentschel.visualdbc.dbcmodel.diagram.DbcAxiom_3036"/>
+         <elementType ref="de.hentschel.visualdbc.dbcmodel.diagram.DbCAxiomContract_3037"/>
          <elementType ref="de.hentschel.visualdbc.dbcmodel.diagram.DbcProofTarget_4001"/>
          <elementType ref="de.hentschel.visualdbc.dbcmodel.diagram.DbcProofReference_4002"/>
          <elementType ref="de.hentschel.visualdbc.dbcmodel.diagram.DbcClassExtends_4003"/>

@@ -83,10 +83,18 @@
   </childNodeTraces>
   <childNodeTraces
       visualID="3011"
-      queryText="(let _eClass_:ecore::EClass = modelFacet.metaClass.ecoreClass in _eClass_.ePackage.nsURI = 'http://www.hentschel.de/dbcmodel' and _eClass_.name = 'DbcAttribute') and (let _containmentMF_:ecore::EStructuralFeature = modelFacet.containmentMetaFeature.ecoreFeature in (let _eClass_:ecore::EClass = _containmentMF_.eContainingClass in _eClass_.ePackage.nsURI = 'http://www.hentschel.de/dbcmodel' and _eClass_.name = 'AbstractDbcInterface') and _containmentMF_.name = 'attributes')"/>
+      queryText="(let _eClass_:ecore::EClass = modelFacet.metaClass.ecoreClass in _eClass_.ePackage.nsURI = 'http://www.hentschel.de/dbcmodel' and _eClass_.name = 'DbcAttribute') and (let _containmentMF_:ecore::EStructuralFeature = modelFacet.containmentMetaFeature.ecoreFeature in (let _eClass_:ecore::EClass = _containmentMF_.eContainingClass in _eClass_.ePackage.nsURI = 'http://www.hentschel.de/dbcmodel' and _eClass_.name = 'AbstractDbcInterface') and _containmentMF_.name = 'attributes')">
+    <nodeLabelTraces
+        visualID="5061"
+        queryText="true"/>
+  </childNodeTraces>
   <childNodeTraces
       visualID="3020"
-      queryText="(let _eClass_:ecore::EClass = modelFacet.metaClass.ecoreClass in _eClass_.ePackage.nsURI = 'http://www.hentschel.de/dbcmodel' and _eClass_.name = 'DbcEnumLiteral') and (let _containmentMF_:ecore::EStructuralFeature = modelFacet.containmentMetaFeature.ecoreFeature in (let _eClass_:ecore::EClass = _containmentMF_.eContainingClass in _eClass_.ePackage.nsURI = 'http://www.hentschel.de/dbcmodel' and _eClass_.name = 'AbstractDbcEnum') and _containmentMF_.name = 'literals')"/>
+      queryText="(let _eClass_:ecore::EClass = modelFacet.metaClass.ecoreClass in _eClass_.ePackage.nsURI = 'http://www.hentschel.de/dbcmodel' and _eClass_.name = 'DbcEnumLiteral') and (let _containmentMF_:ecore::EStructuralFeature = modelFacet.containmentMetaFeature.ecoreFeature in (let _eClass_:ecore::EClass = _containmentMF_.eContainingClass in _eClass_.ePackage.nsURI = 'http://www.hentschel.de/dbcmodel' and _eClass_.name = 'AbstractDbcEnum') and _containmentMF_.name = 'literals')">
+    <nodeLabelTraces
+        visualID="5062"
+        queryText="true"/>
+  </childNodeTraces>
   <childNodeTraces
       visualID="3026"
       queryText="(let _eClass_:ecore::EClass = modelFacet.metaClass.ecoreClass in _eClass_.ePackage.nsURI = 'http://www.hentschel.de/dbcmodel' and _eClass_.name = 'DbcOperationContract') and (let _containmentMF_:ecore::EStructuralFeature = modelFacet.containmentMetaFeature.ecoreFeature in (let _eClass_:ecore::EClass = _containmentMF_.eContainingClass in _eClass_.ePackage.nsURI = 'http://www.hentschel.de/dbcmodel' and _eClass_.name = 'AbstractDbcOperation') and _containmentMF_.name = 'operationContracts')">
@@ -167,6 +175,32 @@
         queryText="true"/>
     <nodeLabelTraces
         visualID="5055"
+        queryText="true"/>
+  </childNodeTraces>
+  <childNodeTraces
+      visualID="3036"
+      queryText="(let _eClass_:ecore::EClass = modelFacet.metaClass.ecoreClass in _eClass_.ePackage.nsURI = 'http://www.hentschel.de/dbcmodel' and _eClass_.name = 'DbcAxiom') and (let _containmentMF_:ecore::EStructuralFeature = modelFacet.containmentMetaFeature.ecoreFeature in (let _eClass_:ecore::EClass = _containmentMF_.eContainingClass in _eClass_.ePackage.nsURI = 'http://www.hentschel.de/dbcmodel' and _eClass_.name = 'AbstractDbcType') and _containmentMF_.name = 'axioms')">
+    <nodeLabelTraces
+        visualID="5056"
+        queryText="true"/>
+    <nodeLabelTraces
+        visualID="5060"
+        queryText="true"/>
+    <compartmentTraces
+        visualID="7064"
+        queryText="true"/>
+  </childNodeTraces>
+  <childNodeTraces
+      visualID="3037"
+      queryText="(let _eClass_:ecore::EClass = modelFacet.metaClass.ecoreClass in _eClass_.ePackage.nsURI = 'http://www.hentschel.de/dbcmodel' and _eClass_.name = 'DbCAxiomContract') and (let _containmentMF_:ecore::EStructuralFeature = modelFacet.containmentMetaFeature.ecoreFeature in (let _eClass_:ecore::EClass = _containmentMF_.eContainingClass in _eClass_.ePackage.nsURI = 'http://www.hentschel.de/dbcmodel' and _eClass_.name = 'DbcAxiom') and _containmentMF_.name = 'axiomContracts')">
+    <nodeLabelTraces
+        visualID="5057"
+        queryText="true"/>
+    <nodeLabelTraces
+        visualID="5058"
+        queryText="true"/>
+    <nodeLabelTraces
+        visualID="5059"
         queryText="true"/>
   </childNodeTraces>
   <linkTraces

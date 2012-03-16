@@ -15,10 +15,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.key_project.key4eclipse.util.java.ObjectUtil;
+import org.key_project.util.java.ObjectUtil;
 
 import de.hentschel.visualdbc.datasource.model.DSVisibility;
-import de.hentschel.visualdbc.datasource.model.IDSAttribute;
 import de.hentschel.visualdbc.datasource.model.IDSClass;
 import de.hentschel.visualdbc.datasource.model.IDSConnection;
 import de.hentschel.visualdbc.datasource.model.IDSConstructor;
@@ -46,11 +45,6 @@ public class MemoryClass extends AbstractMemoryType implements IDSClass {
     * Anonymous?
     */
    private boolean anonymous;
-   
-   /**
-    * The contained attributes.
-    */
-   private List<IDSAttribute> attributes = new LinkedList<IDSAttribute>();
    
    /**
     * The contained methods.
@@ -175,14 +169,6 @@ public class MemoryClass extends AbstractMemoryType implements IDSClass {
    @Override
    public boolean isAbstract() {
       return isAbstract;
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public List<IDSAttribute> getAttributes() {
-      return attributes ;
    }
 
    /**

@@ -28,7 +28,7 @@ public class OperationContractTest extends TestCase {
     * Tests attributes.
     */
    @Test
-   public void testOperationContractsOnMethodsAndConstructors() {
+   public void testOperationContractsOnMethodsAndConstructors() throws Exception {
       TestKeyUtil.testKeyConnection("OperationContractTest_testOperationContractsOnMethodsAndConstructors",
                                     "data/operationContractTest",
                                     null,

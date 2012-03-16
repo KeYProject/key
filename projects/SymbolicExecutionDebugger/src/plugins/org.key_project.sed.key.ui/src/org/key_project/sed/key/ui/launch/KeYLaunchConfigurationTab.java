@@ -1,8 +1,13 @@
 package org.key_project.sed.key.ui.launch;
 
+import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
+import java.util.List;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
@@ -32,12 +37,32 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
-import org.key_project.key4eclipse.util.jdt.JDTUtil;
+import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
+import org.key_project.key4eclipse.starter.core.provider.ImmutableCollectionContentProvider;
+import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.sed.key.core.util.KeySEDUtil;
-import org.key_project.sed.key.ui.jdt.AllMethodsSearchEngine;
+import org.key_project.sed.key.ui.dialog.ContractSelectionDialog;
+import org.key_project.sed.key.ui.jdt.AllOperationsSearchEngine;
 import org.key_project.sed.key.ui.jdt.AllTypesSearchEngine;
 import org.key_project.sed.key.ui.util.KeYSEDImages;
 import org.key_project.sed.key.ui.util.LogUtil;
+import org.key_project.util.eclipse.ResourceUtil;
+import org.key_project.util.eclipse.swt.SWTUtil;
+import org.key_project.util.java.ObjectUtil;
+import org.key_project.util.java.StringUtil;
+import org.key_project.util.java.SwingUtil;
+import org.key_project.util.java.thread.AbstractRunnableWithProgressAndResult;
+import org.key_project.util.java.thread.AbstractRunnableWithResult;
+import org.key_project.util.java.thread.IRunnableWithProgressAndResult;
+import org.key_project.util.java.thread.IRunnableWithResult;
+import org.key_project.util.jdt.JDTUtil;
+
+import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
 /**
  * {@link AbstractLaunchConfigurationTab} implementation for the
@@ -60,7 +85,42 @@ public class KeYLaunchConfigurationTab extends AbstractLaunchConfigurationTab {
      * Defines the method to debug.
      */
     private Text methodText;
+    
+    /**
+     * Defines that a default contract will be generated.
+     */
+    private Button useGeneratedContractButton;
+    
+    /**
+     * Defines that one existing contract will be used.
+     */
+    private Button useExistingContractButton;
 
+    /**
+     * Defines the existing contract to use.
+     */
+    private Text existingContractText;
+    
+    /**
+     * Last loaded {@link InitConfig}.
+     */
+    private InitConfig initConfig;
+    
+    /**
+     * The name of the project that is loaded in {@link #initConfig}.
+     */
+    private String initConfigProject;
+    
+    /**
+     * {@link Button} to browse a contract.
+     */
+    private Button browseContractButton;
+    
+    /**
+     * The last defined existing contract.
+     */
+    private String lastDefinedExistingContract;
+    
     /**
      * {@inheritDoc}
      */
@@ -98,6 +158,7 @@ public class KeYLaunchConfigurationTab extends AbstractLaunchConfigurationTab {
         projectText.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent e) {
+                unsetInitConfig();
                 updateLaunchConfigurationDialog();
             }
         });
@@ -150,6 +211,160 @@ public class KeYLaunchConfigurationTab extends AbstractLaunchConfigurationTab {
                 browseMethod();
             }
         });
+        // Verification
+        Group verificationGroup = new Group(rootComposite, SWT.NONE);
+        verificationGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        verificationGroup.setText("Verification");
+        verificationGroup.setLayout(new GridLayout(1, false));
+        Composite usedContractComposite = new Composite(verificationGroup, SWT.NONE);
+        usedContractComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        usedContractComposite.setLayout(new GridLayout(2, false));
+        useGeneratedContractButton = new Button(usedContractComposite, SWT.RADIO);
+        useGeneratedContractButton.setText("Use &generated contract");
+        useGeneratedContractButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                if (useGeneratedContractButton.getSelection()) {
+                    updateLaunchConfigurationDialog();
+                    updateExistingContractState();
+                }
+            }
+        });
+        useExistingContractButton = new Button(usedContractComposite, SWT.RADIO);
+        useExistingContractButton.setText("Use &existing contract");
+        useExistingContractButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                if (useExistingContractButton.getSelection()) {
+                    updateLaunchConfigurationDialog();
+                    updateExistingContractState();
+                }
+            }
+        });
+        Composite existingContractComposite = new Composite(verificationGroup, SWT.NONE);
+        existingContractComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        existingContractComposite.setLayout(new GridLayout(3, false));
+        Label contractLabel = new Label(existingContractComposite, SWT.NONE);
+        contractLabel.setText("Contr&act");
+        existingContractText = new Text(existingContractComposite, SWT.BORDER);
+        existingContractText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        existingContractText.addModifyListener(new ModifyListener() {
+            @Override
+            public void modifyText(ModifyEvent e) {
+                updateLaunchConfigurationDialog();
+            }
+        });
+        browseContractButton = new Button(existingContractComposite, SWT.PUSH);
+        browseContractButton.setText("Brow&se");
+        browseContractButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                browseContract();
+            }
+        });        
+    }
+
+    protected void updateExistingContractState() {
+        boolean useExistingContract = useExistingContractButton.getSelection();
+        existingContractText.setEditable(useExistingContract);
+        browseContractButton.setEnabled(useExistingContract);
+        if (useExistingContract) {
+            SWTUtil.setText(existingContractText, lastDefinedExistingContract);
+        }
+        else {
+            lastDefinedExistingContract = existingContractText.getText();
+            existingContractText.setText(StringUtil.EMPTY_STRING);
+        }
+    }
+
+    /**
+     * Unsets the loaded {@link InitConfig}.
+     */
+    protected void unsetInitConfig() {
+        if (!ObjectUtil.equals(initConfigProject, projectText.getText())) {
+            initConfig = null;
+            initConfigProject = null;
+        }
+    }
+
+    /**
+     * Opens a dialog to select a contract for the specified method.
+     */
+    public void browseContract() {
+        try {
+            final IMethod method = getMethod();
+            if (method != null && method.exists()) {
+                IProject project = method.getResource().getProject();
+                final File location = ResourceUtil.getLocation(project);
+                final File bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
+                final List<File> classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
+                // Load location
+                if (initConfig == null) {
+                    IRunnableWithProgressAndResult<InitConfig> run = new AbstractRunnableWithProgressAndResult<InitConfig>() {
+                        @Override
+                        public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+                            SWTUtil.checkCanceled(monitor);
+                            monitor.beginTask("Receiving contracts.", IProgressMonitor.UNKNOWN);
+                            IRunnableWithResult<InitConfig> run = new AbstractRunnableWithResult<InitConfig>() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        InitConfig initConfig = KeYUtil.internalLoad(location, classPaths, bootClassPath, false);
+                                        setResult(initConfig);
+                                    }
+                                    catch (Exception e) {
+                                        setException(e);
+                                    }
+                                }
+                            };
+                            SWTUtil.checkCanceled(monitor);
+                            SwingUtil.invokeAndWait(run);
+                            if (run.getException() != null) {
+                                throw new InvocationTargetException(run.getException());
+                            }
+                            SWTUtil.checkCanceled(monitor);
+                            setResult(run.getResult());
+                            monitor.done();
+                        }
+                    };
+                    getLaunchConfigurationDialog().run(true, false, run);
+                    initConfig = run.getResult();
+                    initConfigProject = project.getName();
+                }
+                if (initConfig != null) {
+                    // Get method to proof in KeY
+                    ProgramMethod pm = KeYUtil.getProgramMethod(method, initConfig.getServices().getJavaInfo());
+                    if (pm != null) {
+                        KeYJavaType type = pm.getContainerType();
+                        ImmutableSet<FunctionalOperationContract> operationContracts = initConfig.getServices().getSpecificationRepository().getOperationContracts(type, pm);
+                        // Open selection dialog
+                        Services services = initConfig.getServices();
+                        ContractSelectionDialog dialog = new ContractSelectionDialog(getShell(), ImmutableCollectionContentProvider.getInstance(), services);
+                        dialog.setTitle("Contract selection");
+                        dialog.setMessage("Select a contract to debug.");
+                        dialog.setInput(operationContracts);
+                        FunctionalOperationContract selectedContract = KeySEDUtil.findContract(operationContracts, getContractId());
+                        if (selectedContract != null) {
+                            dialog.setInitialSelections(new Object[] {selectedContract});
+                        }
+                        if (dialog.open() == ContractSelectionDialog.OK) {
+                            Object result = dialog.getFirstResult();
+                            if (result instanceof FunctionalOperationContract) {
+                                FunctionalOperationContract foc = (FunctionalOperationContract)result;
+                                existingContractText.setText(foc.getName());
+                            }
+                        }
+                    }
+                    else {
+                        throw new IllegalStateException("Can't find method \"" + JDTUtil.getQualifiedMethodLabel(method) + "\" in KeY.");
+                    }
+                }
+            }
+        }
+        catch (Exception e) {
+            LogUtil.getLogger().logError(e);
+            LogUtil.getLogger().openErrorDialog(getShell(), e);
+        }
     }
 
     /**
@@ -261,6 +476,14 @@ public class KeYLaunchConfigurationTab extends AbstractLaunchConfigurationTab {
             return null;
         }
     }
+    
+    /**
+     * Returns the ID of the existing contract.
+     * @return The ID of the existing contract.
+     */
+    protected String getContractId() {
+        return existingContractText.getText();
+    }
 
     /**
      * Opens a dialog to select a Java method ({@link IMethod}).
@@ -280,8 +503,8 @@ public class KeYLaunchConfigurationTab extends AbstractLaunchConfigurationTab {
                 elements = new IJavaElement[] {};
             }
             IJavaSearchScope searchScope = SearchEngine.createJavaSearchScope(elements, IJavaSearchScope.SOURCES);
-            AllMethodsSearchEngine engine = new AllMethodsSearchEngine();
-            IMethod[] methods = engine.searchMethods(getLaunchConfigurationDialog(), searchScope);
+            AllOperationsSearchEngine engine = new AllOperationsSearchEngine();
+            IMethod[] methods = engine.searchOperations(getLaunchConfigurationDialog(), searchScope);
             // Open selection dialog
             ILabelProvider labelProvider = new JavaElementLabelProvider(JavaElementLabelProvider.SHOW_DEFAULT);
             ElementListSelectionDialog dialog = new ElementListSelectionDialog(getShell(), labelProvider);
@@ -316,7 +539,7 @@ public class KeYLaunchConfigurationTab extends AbstractLaunchConfigurationTab {
             if (!text.isEmpty()) {
                 IType type = getType();
                 if (type != null) {
-                    return (IMethod)JDTUtil.getElementForTextLabel(type.getMethods(), text);
+                    return JDTUtil.getElementForQualifiedMethodLabel(type.getMethods(), text);
                 }
                 else {
                     return null;
@@ -361,6 +584,15 @@ public class KeYLaunchConfigurationTab extends AbstractLaunchConfigurationTab {
                 setErrorMessage("No existing method selected.");
             }
         }
+        // Validate contract
+        if (valid) {
+            if (useExistingContractButton.getSelection()) {
+                if (StringUtil.isTrimmedEmpty(getContractId())) {
+                    valid = false;
+                    setErrorMessage("No existing contract defined.");
+                }
+            }
+        }
         if (valid) {
             setErrorMessage(null);
         }
@@ -383,6 +615,12 @@ public class KeYLaunchConfigurationTab extends AbstractLaunchConfigurationTab {
             projectText.setText(KeySEDUtil.getProjectValue(configuration));
             typeText.setText(KeySEDUtil.getTypeValue(configuration));
             methodText.setText(KeySEDUtil.getMethodValue(configuration));
+            boolean useExistingContract = KeySEDUtil.isUseExistingContractValue(configuration);
+            useGeneratedContractButton.setSelection(!useExistingContract);
+            useExistingContractButton.setSelection(useExistingContract);
+            existingContractText.setText(KeySEDUtil.getExistingContractValue(configuration));
+            lastDefinedExistingContract = existingContractText.getText();
+            updateExistingContractState();
         } 
         catch (CoreException e) {
             e.printStackTrace();
@@ -397,5 +635,7 @@ public class KeYLaunchConfigurationTab extends AbstractLaunchConfigurationTab {
         configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_PROJECT, projectText.getText());
         configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_TYPE, typeText.getText());
         configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_METHOD, methodText.getText());
+        configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_EXISTING_CONTRACT, useExistingContractButton.getSelection());
+        configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_EXISTING_CONTRACT, existingContractText.getText());
     }
 }

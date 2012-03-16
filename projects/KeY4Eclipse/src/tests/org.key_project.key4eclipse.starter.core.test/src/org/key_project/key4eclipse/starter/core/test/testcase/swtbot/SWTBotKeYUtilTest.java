@@ -2,6 +2,8 @@ package org.key_project.key4eclipse.starter.core.test.testcase.swtbot;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.util.LinkedList;
+import java.util.List;
 
 import junit.framework.TestCase;
 
@@ -15,17 +17,22 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.Signature;
 import org.junit.Test;
 import org.key_project.key4eclipse.starter.core.test.Activator;
+import org.key_project.key4eclipse.starter.core.test.util.TestStarterCoreUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
-import org.key_project.key4eclipse.util.eclipse.BundleUtil;
-import org.key_project.key4eclipse.util.eclipse.ResourceUtil;
-import org.key_project.key4eclipse.util.java.SwingUtil;
-import org.key_project.key4eclipse.util.jdt.JDTUtil;
-import org.key_project.key4eclipse.util.test.util.TestUtilsUtil;
 import org.key_project.swtbot.swing.bot.SwingBot;
 import org.key_project.swtbot.swing.bot.SwingBotJDialog;
 import org.key_project.swtbot.swing.bot.SwingBotJLabel;
+import org.key_project.util.eclipse.BundleUtil;
+import org.key_project.util.eclipse.ResourceUtil;
+import org.key_project.util.java.IFilter;
+import org.key_project.util.java.SwingUtil;
+import org.key_project.util.jdt.JDTUtil;
+import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Node.NodeIterator;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 
 /**
@@ -33,7 +40,237 @@ import de.uka.ilkd.key.proof.init.InitConfig;
  * @author Martin Hentschel
  */
 public class SWTBotKeYUtilTest extends TestCase {
-    /**
+   /**
+    * Tests {@link KeYUtil#findChild(Node, IFilter)}.
+    */
+   @Test
+   public void testFindChild() throws Exception {
+      try {
+         // Create test project
+         IJavaProject project = TestUtilsUtil.createJavaProject("KeYUtilTest_testFindChild");
+         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/statements", project.getProject().getFolder("src"));
+         // Get method
+         IMethod method = TestUtilsUtil.getJdtMethod(project, "FlatSteps", "doSomething", "I", "QString;", "Z");
+         // Instantiate proof and try to close it in automatic mode
+         Proof proof = TestStarterCoreUtil.instantiateProofWithGeneratedContract(method);
+         KeYUtil.runProofInAutomaticModeWithoutResultDialog(proof);
+         // Find nodes for the test
+         Node callNode = KeYUtil.findChild(proof.root(), new IFilter<Node>() {
+            @Override
+            public boolean select(Node element) {
+               return "methodBodyExpand".equals(KeYUtil.getRuleDisplayName(element));
+            }
+         });
+         assertNotNull(callNode);
+         IFilter<Node> returnFilter = new IFilter<Node>() {
+            @Override
+            public boolean select(Node element) {
+               return "methodCallEmpty".equals(KeYUtil.getRuleDisplayName(element));
+            }
+         };
+         Node returnNode = KeYUtil.findChild(proof.root(), returnFilter);
+         assertNotNull(returnNode);
+         // Test method
+         assertNull(KeYUtil.findChild(null, null));
+         assertNull(KeYUtil.findChild(null, returnFilter));
+         assertNull(KeYUtil.findChild(returnNode, null));
+         assertEquals(returnNode, KeYUtil.findChild(callNode, returnFilter));
+         assertSame(returnNode, KeYUtil.findChild(returnNode, returnFilter));
+         assertNull(KeYUtil.findChild(returnNode, new IFilter<Node>() {
+            @Override
+            public boolean select(Node element) {
+               return false;
+            }
+         }));
+      }
+      finally {
+         // Remove proof
+         KeYUtil.clearProofList(MainWindow.getInstance());
+         TestCase.assertTrue(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
+         // Close main window
+         TestUtilsUtil.keyCloseMainWindow();
+      }
+   }
+   
+   /**
+    * Tests {@link KeYUtil#findParent(Node, IFilter)}.
+    */
+   @Test
+   public void testFindParent() throws Exception {
+      try {
+         // Create test project
+         IJavaProject project = TestUtilsUtil.createJavaProject("KeYUtilTest_testFindParent");
+         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/statements", project.getProject().getFolder("src"));
+         // Get method
+         IMethod method = TestUtilsUtil.getJdtMethod(project, "FlatSteps", "doSomething", "I", "QString;", "Z");
+         // Instantiate proof and try to close it in automatic mode
+         Proof proof = TestStarterCoreUtil.instantiateProofWithGeneratedContract(method);
+         KeYUtil.runProofInAutomaticModeWithoutResultDialog(proof);
+         // Find nodes for the test
+         IFilter<Node> callFilter = new IFilter<Node>() {
+            @Override
+            public boolean select(Node element) {
+               return "methodBodyExpand".equals(KeYUtil.getRuleDisplayName(element));
+            }
+         };
+         Node callNode = KeYUtil.findChild(proof.root(), callFilter);
+         assertNotNull(callNode);
+         Node returnNode = KeYUtil.findChild(proof.root(), new IFilter<Node>() {
+            @Override
+            public boolean select(Node element) {
+               return "methodCallEmpty".equals(KeYUtil.getRuleDisplayName(element));
+            }
+         });
+         assertNotNull(returnNode);
+         // Test method
+         assertNull(KeYUtil.findParent(null, null));
+         assertNull(KeYUtil.findParent(null, callFilter));
+         assertNull(KeYUtil.findParent(returnNode, null));
+         assertEquals(callNode, KeYUtil.findParent(returnNode, callFilter));
+         assertNull(KeYUtil.findParent(callNode, callFilter));
+      }
+      finally {
+         // Remove proof
+         KeYUtil.clearProofList(MainWindow.getInstance());
+         TestCase.assertTrue(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
+         // Close main window
+         TestUtilsUtil.keyCloseMainWindow();
+      }
+   }
+   
+   /**
+    * Tests {@link KeYUtil#hasParent(Node, Node)}.
+    */
+   @Test
+   public void testHasParent() throws Exception {
+      try {
+         // Create test project
+         IJavaProject project = TestUtilsUtil.createJavaProject("KeYUtilTest_testHasParent");
+         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/statements", project.getProject().getFolder("src"));
+         // Get method
+         IMethod method = TestUtilsUtil.getJdtMethod(project, "FlatSteps", "doSomething", "I", "QString;", "Z");
+         // Instantiate proof and try to close it in automatic mode
+         Proof proof = TestStarterCoreUtil.instantiateProofWithGeneratedContract(method);
+         KeYUtil.runProofInAutomaticModeWithoutResultDialog(proof);
+         // Find nodes for the test
+         Node callNode = KeYUtil.findChild(proof.root(), new IFilter<Node>() {
+            @Override
+            public boolean select(Node element) {
+               return "methodBodyExpand".equals(KeYUtil.getRuleDisplayName(element));
+            }
+         });
+         assertNotNull(callNode);
+         Node returnNode = KeYUtil.findChild(proof.root(), new IFilter<Node>() {
+            @Override
+            public boolean select(Node element) {
+               return "methodCallEmpty".equals(KeYUtil.getRuleDisplayName(element));
+            }
+         });
+         assertNotNull(returnNode);
+         // Test method
+         assertFalse(KeYUtil.hasParent(null, null));
+         assertFalse(KeYUtil.hasParent(null, callNode));
+         assertTrue(KeYUtil.hasParent(returnNode, null));
+         assertTrue(KeYUtil.hasParent(returnNode, callNode));
+         assertFalse(KeYUtil.hasParent(callNode, returnNode));
+         assertFalse(KeYUtil.hasParent(callNode, callNode));
+      }
+      finally {
+         // Remove proof
+         KeYUtil.clearProofList(MainWindow.getInstance());
+         TestCase.assertTrue(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
+         // Close main window
+         TestUtilsUtil.keyCloseMainWindow();
+      }
+   }
+   
+   /**
+    * Tests {@link KeYUtil#getRuleDisplayName(de.uka.ilkd.key.proof.Node)}.
+    */
+   @Test
+   public void testGetRuleDisplayName() throws Exception {
+      try {
+         // Test null
+         assertNull(KeYUtil.getRuleDisplayName(null));
+         // Create test project
+         IJavaProject project = TestUtilsUtil.createJavaProject("KeYUtilTest_testGetRuleDisplayName");
+         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/statements", project.getProject().getFolder("src"));
+         // Get method
+         IMethod method = TestUtilsUtil.getJdtMethod(project, "FlatSteps", "doSomething", "I", "QString;", "Z");
+         // Instantiate proof and try to close it in automatic mode
+         Proof proof = TestStarterCoreUtil.instantiateProofWithGeneratedContract(method);
+         KeYUtil.runProofInAutomaticModeWithoutResultDialog(proof);
+         // Collect applied rule names
+         List<String> ruleNames = collectRuleNames(proof);
+         assertTrue(ruleNames.contains("methodCallEmpty"));
+      }
+      finally {
+         // Remove proof
+         KeYUtil.clearProofList(MainWindow.getInstance());
+         TestCase.assertTrue(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
+         // Close main window
+         TestUtilsUtil.keyCloseMainWindow();
+      }
+   }
+   
+   /**
+    * Collects all display names of the applied rules in the given {@link Proof}.
+    * @param proof The {@link Proof}.
+    * @return The found rule display names.
+    */
+   protected List<String> collectRuleNames(Proof proof) {
+      return collectRuleNames(proof.root());
+   }
+   
+   /**
+    * Tests {@link KeYUtil#runProofInAutomaticModeWithoutResultDialog(Proof)}.
+    */
+   @Test
+   public void testRunProofInAutomaticModeWithoutResultDialog() throws Exception {
+      try {
+         // Test null
+         assertNull(KeYUtil.getRuleDisplayName(null));
+         // Create test project
+         IJavaProject project = TestUtilsUtil.createJavaProject("KeYUtilTest_testRunProofInAutomaticModeWithoutResultDialog");
+         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/statements", project.getProject().getFolder("src"));
+         // Get method
+         IMethod method = TestUtilsUtil.getJdtMethod(project, "FlatSteps", "doSomething", "I", "QString;", "Z");
+         // Instantiate proof and try to close it in automatic mode
+         Proof proof = TestStarterCoreUtil.instantiateProofWithGeneratedContract(method);
+         assertFalse(proof.closed());
+         // Close proof in automatic mode
+         KeYUtil.runProofInAutomaticModeWithoutResultDialog(proof);
+         // Make sure that the proof is closed
+         assertTrue(proof.closed());
+      }
+      finally {
+         // Remove proof
+         KeYUtil.clearProofList(MainWindow.getInstance());
+         TestCase.assertTrue(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
+         // Close main window
+         TestUtilsUtil.keyCloseMainWindow();
+      }
+   }
+
+   /**
+    * Collects all display names of the applied rules in the given {@link Node}.
+    * @param proof The {@link Node}.
+    * @return The found rule display names.
+    */
+   protected List<String> collectRuleNames(Node node) {
+      List<String> result = new LinkedList<String>();
+      String nodeName = KeYUtil.getRuleDisplayName(node);
+      if (nodeName != null) {
+         result.add(nodeName);
+      }
+      NodeIterator iter = node.childrenIterator();
+      while (iter.hasNext()) {
+         result.addAll(collectRuleNames(iter.next()));
+      }
+      return result;
+   }
+
+   /**
      * Tests {@link KeYUtil#showErrorInKey(Throwable)}.
      */
     @Test

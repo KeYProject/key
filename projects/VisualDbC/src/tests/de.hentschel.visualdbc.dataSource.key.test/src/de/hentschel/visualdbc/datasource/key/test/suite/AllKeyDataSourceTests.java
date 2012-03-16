@@ -14,11 +14,14 @@ package de.hentschel.visualdbc.datasource.key.test.suite;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
+import de.hentschel.visualdbc.datasource.key.test.testCase.AccessibleTest;
 import de.hentschel.visualdbc.datasource.key.test.testCase.AttributeTest;
+import de.hentschel.visualdbc.datasource.key.test.testCase.EnumTest;
 import de.hentschel.visualdbc.datasource.key.test.testCase.GeneralizationTest;
 import de.hentschel.visualdbc.datasource.key.test.testCase.InnerTypeTest;
 import de.hentschel.visualdbc.datasource.key.test.testCase.InvariantTest;
 import de.hentschel.visualdbc.datasource.key.test.testCase.LogUtilTest;
+import de.hentschel.visualdbc.datasource.key.test.testCase.ModelFieldTest;
 import de.hentschel.visualdbc.datasource.key.test.testCase.TypeTest;
 import de.hentschel.visualdbc.datasource.key.test.testCase.KeyConnectionTest;
 import de.hentschel.visualdbc.datasource.key.test.testCase.MethodTest;
@@ -30,12 +33,15 @@ import de.hentschel.visualdbc.datasource.key.test.testCase.PackageTest;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
+   AccessibleTest.class,
    AttributeTest.class,
+   EnumTest.class,
    GeneralizationTest.class,
    InnerTypeTest.class,
    KeyConnectionTest.class,
    LogUtilTest.class,
    MethodTest.class,
+   ModelFieldTest.class,
    PackageTest.class,
    InvariantTest.class,
    TypeTest.class

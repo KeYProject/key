@@ -35,6 +35,7 @@ import org.eclipse.gmf.runtime.notation.Node;
 import org.eclipse.gmf.runtime.notation.View;
 
 import de.hentschel.visualdbc.dbcmodel.DbcmodelPackage;
+import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcAxiomEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcClass2EditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcConstructorEditPart;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.parts.DbcEnum2EditPart;
@@ -85,6 +86,8 @@ public class DbcEnumDbcEnumMainCompartment2CanonicalEditPolicy extends
                .getAbstractDbcInterface_Methods());
          myFeaturesToSynchronize.add(DbcmodelPackage.eINSTANCE
                .getAbstractDbcClass_Constructors());
+         myFeaturesToSynchronize.add(DbcmodelPackage.eINSTANCE
+               .getAbstractDbcType_Axioms());
       }
       return myFeaturesToSynchronize;
    }
@@ -126,6 +129,7 @@ public class DbcEnumDbcEnumMainCompartment2CanonicalEditPolicy extends
       case DbcInvariantEditPart.VISUAL_ID:
       case DbcMethodEditPart.VISUAL_ID:
       case DbcConstructorEditPart.VISUAL_ID:
+      case DbcAxiomEditPart.VISUAL_ID:
          return true;
       }
       return false;

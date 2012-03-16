@@ -155,6 +155,6 @@ To add the required Eclipse projects follow these steps:
 1. Open file de.hentschel.visualdbc.product.ui/Visual DbC.product
 2. Click on "Eclipse Product export wizard" in tab "Overview" of the
    opened "Product Configuration Editor"
-3. Define "Root directory" e.g. "SymbolicExecutionDebugger" and 
+3. Define "Root directory" e.g. "VisualDbC" and 
    "Destination Directory" e.g. "C:\Temp".
 4. Finish the wizard.

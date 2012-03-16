@@ -25,8 +25,8 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.key_project.key4eclipse.util.java.ObjectUtil;
-import org.key_project.key4eclipse.util.test.util.TestUtilsUtil;
+import org.key_project.util.java.ObjectUtil;
+import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.hentschel.visualdbc.datasource.model.IDSConnection;
 import de.hentschel.visualdbc.datasource.model.IDSDriver;

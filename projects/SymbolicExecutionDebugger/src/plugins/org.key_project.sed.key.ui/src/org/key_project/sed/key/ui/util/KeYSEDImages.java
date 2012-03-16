@@ -3,10 +3,11 @@ package org.key_project.sed.key.ui.util;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
-import org.key_project.key4eclipse.util.eclipse.BundleUtil;
 import org.key_project.sed.key.ui.Activator;
+import org.key_project.util.eclipse.BundleUtil;
 
 /**
  * <p>
@@ -55,10 +56,16 @@ public final class KeYSEDImages {
      * @return The created {@link Image} or {@code null} if it was not possible.
      */
     protected static Image createImage(String key) {
-        if (LAUNCH_MAIN_TAB_GROUP.equals(key)) {
+       // Compute path to image in bundle.
+       String path = null;
+       if (LAUNCH_MAIN_TAB_GROUP.equals(key)) {
+           path = "icons/logo16.gif";
+       }
+       // Load image if possible
+       if (path != null) {
             InputStream in = null;
             try {
-                in = BundleUtil.openInputStream(Activator.PLUGIN_ID, "icons/logo16.gif");
+                in = BundleUtil.openInputStream(Activator.PLUGIN_ID, path);
                 return new Image(Display.getDefault(), in);
             }
             catch (IOException e) {
@@ -87,6 +94,15 @@ public final class KeYSEDImages {
      * There is no need to call it from any other place!
      */
     public static void disposeImages() {
-        Activator.getDefault().getImageRegistry().remove(LAUNCH_MAIN_TAB_GROUP);
+       Display display = Display.getDefault();
+       if (!display.isDisposed()) {
+          display.syncExec(new Runnable() {
+            @Override
+            public void run() {
+               ImageRegistry registry = Activator.getDefault().getImageRegistry();
+               registry.remove(LAUNCH_MAIN_TAB_GROUP);
+            }
+         });
+       }
     }
 }

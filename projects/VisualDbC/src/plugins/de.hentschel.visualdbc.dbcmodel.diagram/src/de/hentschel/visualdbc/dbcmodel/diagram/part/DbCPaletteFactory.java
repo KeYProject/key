@@ -69,8 +69,10 @@ public class DbCPaletteFactory {
       PaletteDrawer paletteContainer = new PaletteDrawer(
             Messages.Specification2Group_title);
       paletteContainer.setId("createSpecification2Group"); //$NON-NLS-1$
-      paletteContainer.add(createInvariant1CreationTool());
-      paletteContainer.add(createOperationContract2CreationTool());
+      paletteContainer.add(createAxiom1CreationTool());
+      paletteContainer.add(createAxiomContract2CreationTool());
+      paletteContainer.add(createInvariant3CreationTool());
+      paletteContainer.add(createOperationContract4CreationTool());
       return paletteContainer;
    }
 
@@ -253,12 +255,42 @@ public class DbCPaletteFactory {
    /**
     * @generated
     */
-   private ToolEntry createInvariant1CreationTool() {
+   private ToolEntry createAxiom1CreationTool() {
       NodeToolEntry entry = new NodeToolEntry(
-            Messages.Invariant1CreationTool_title,
-            Messages.Invariant1CreationTool_desc,
+            Messages.Axiom1CreationTool_title,
+            Messages.Axiom1CreationTool_desc,
+            Collections.singletonList(DbCElementTypes.DbcAxiom_3036));
+      entry.setId("createAxiom1CreationTool"); //$NON-NLS-1$
+      entry.setSmallIcon(DbCElementTypes
+            .getImageDescriptor(DbCElementTypes.DbcAxiom_3036));
+      entry.setLargeIcon(entry.getSmallIcon());
+      return entry;
+   }
+
+   /**
+    * @generated
+    */
+   private ToolEntry createAxiomContract2CreationTool() {
+      NodeToolEntry entry = new NodeToolEntry(
+            Messages.AxiomContract2CreationTool_title,
+            Messages.AxiomContract2CreationTool_desc,
+            Collections.singletonList(DbCElementTypes.DbCAxiomContract_3037));
+      entry.setId("createAxiomContract2CreationTool"); //$NON-NLS-1$
+      entry.setSmallIcon(DbCElementTypes
+            .getImageDescriptor(DbCElementTypes.DbCAxiomContract_3037));
+      entry.setLargeIcon(entry.getSmallIcon());
+      return entry;
+   }
+
+   /**
+    * @generated
+    */
+   private ToolEntry createInvariant3CreationTool() {
+      NodeToolEntry entry = new NodeToolEntry(
+            Messages.Invariant3CreationTool_title,
+            Messages.Invariant3CreationTool_desc,
             Collections.singletonList(DbCElementTypes.DbcInvariant_3035));
-      entry.setId("createInvariant1CreationTool"); //$NON-NLS-1$
+      entry.setId("createInvariant3CreationTool"); //$NON-NLS-1$
       entry.setSmallIcon(DbCElementTypes
             .getImageDescriptor(DbCElementTypes.DbcInvariant_3035));
       entry.setLargeIcon(entry.getSmallIcon());
@@ -268,13 +300,13 @@ public class DbCPaletteFactory {
    /**
     * @generated
     */
-   private ToolEntry createOperationContract2CreationTool() {
+   private ToolEntry createOperationContract4CreationTool() {
       NodeToolEntry entry = new NodeToolEntry(
-            Messages.OperationContract2CreationTool_title,
-            Messages.OperationContract2CreationTool_desc,
+            Messages.OperationContract4CreationTool_title,
+            Messages.OperationContract4CreationTool_desc,
             Collections
                   .singletonList(DbCElementTypes.DbcOperationContract_3026));
-      entry.setId("createOperationContract2CreationTool"); //$NON-NLS-1$
+      entry.setId("createOperationContract4CreationTool"); //$NON-NLS-1$
       entry.setSmallIcon(DbCElementTypes
             .getImageDescriptor(DbCElementTypes.DbcOperationContract_3026));
       entry.setLargeIcon(entry.getSmallIcon());
