@@ -80,7 +80,7 @@ public interface SolverType {
                 };
                 @Override
                 public SMTTranslator getTranslator(Services services) {
-                        return new SmtLibTranslator(services,
+                        return new SmtLib2Translator(services,
                                         new Configuration(false));
                 }
 

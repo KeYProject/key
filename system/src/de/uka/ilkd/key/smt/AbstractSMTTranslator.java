@@ -338,6 +338,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
                 // add the assumptions that that are made of taclets
                 start = toReturn.size();
+                System.out.println(this.tacletAssumptions.size());
                 toReturn.addAll(this.tacletAssumptions);
                 // for(int i=0; i < tacletAssumptions.size(); i++){
                 assumptionTypes.add(new ContextualBlock(start,
@@ -2525,15 +2526,17 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                 sorts = sorts.add(sort);
                         }
                 }
-
                 for (TacletFormula tf : tacletSetTranslation
                                 .getTranslation(sorts)) {
 
                         for (Term subterm : tf.getInstantiations()) {
                                 try {
-                                        StringBuffer term = translateTerm(
+                                		StringBuffer term = translateComment(1,tf.getTaclet().displayName()+":\n");		
+                                				
+                                        term.append(translateTerm(
                                                         subterm, vector,
-                                                        services);
+                                                        services));
+                                    
                                         result.add(term);
 
                                 } catch (Throwable e) {
@@ -2548,6 +2551,10 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 }
 
                 return result;
+        }
+        
+        protected StringBuffer translateComment(int newLines, String comment){
+        	return new StringBuffer();
         }
 
         /**
