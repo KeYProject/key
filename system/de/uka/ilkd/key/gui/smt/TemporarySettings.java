@@ -23,6 +23,7 @@ import de.uka.ilkd.key.smt.AbstractSMTSolver;
 class TemporarySolverSettings {
     public SMTSolver solver;
     public String command = "";
+    public String parameters = "";
     public boolean isInstalled = false;
     public boolean useForMulitpleProvers = false;
     
@@ -37,13 +38,16 @@ class TemporarySolverSettings {
     
     void newSession(){
 
-	this.command = solver.getExecutionCommand();
+	this.command = solver.getCommand();
+	this.parameters = solver.getParameters();
 	isInstalled = solver.isInstalled(true);
 	useForMulitpleProvers = solver.useForMultipleRule();
     }
 
     void apply() {
-	((AbstractSMTSolver) solver).setExecutionCommand(command);
+	((AbstractSMTSolver) solver).setCommand(command);
+	((AbstractSMTSolver) solver).setParameters(parameters);
+	
 	((AbstractSMTSolver) solver).useForMultipleRule(useForMulitpleProvers);
 	solver.isInstalled(true);
 
@@ -257,9 +261,31 @@ public class TemporarySettings extends Settings {
 				"Specify the start command for an external procedure in such a way that it can be executed " +
 				"to solve a problem file. Feel free to use any parameter to finetune the program.\n\n" +
 				"Use %f as placeholder for the filename containing the problemdescription.\n\n" +
-				"Use %p as placeholder for the problem directly. This should be needed in special cases only.";
+				"Use %p as placeholder for the problem directly. This should be needed in special cases only.\n\n"+
+                                "Please do not forget to specify the file extension, e.g. solverName.exe";
 		        }
 	        },
+	        
+	        new TableProperty(tss) {
+			
+	                   public boolean prepareValues() {
+				 this.setTitle("Parameters:");
+				 this.setValue(((TemporarySolverSettings)this.getUserObject())
+					 .parameters);
+				 this.setEditable(true);
+		                return true;
+	                    }
+
+			    public void eventChange() {
+			        ((TemporarySolverSettings) getUserObject()).parameters = getValue();
+			    }	
+			    
+		
+			        @Override
+			        public String getInfo() {
+			           return null;
+			        }
+		        },
 
 	        new TableCheckBox(tss) {
 		    @Override
