@@ -188,7 +188,7 @@ public class ProofSaver {
 	     createLogicPrinter(proof.getServices(), false);
 
          logicPrinter.printSequent(node.sequent());
-         tree.append(escapeCharacters(printer.result().toString().replace('\n',' ')));
+         tree.append(escapeCharacters(logicPrinter.result().toString().replace('\n',' ')));
          tree.append("\")\n");
          return;
       }
