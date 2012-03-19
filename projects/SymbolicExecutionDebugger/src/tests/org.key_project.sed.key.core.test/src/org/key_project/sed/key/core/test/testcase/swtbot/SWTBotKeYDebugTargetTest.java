@@ -24,6 +24,7 @@ import org.key_project.sed.key.core.test.Activator;
 import org.key_project.sed.key.core.test.util.TestSEDKeyCoreUtil;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
+import org.key_project.util.test.util.TestUtilsUtil.MethodTreatment;
 
 import de.uka.ilkd.key.gui.MainWindow;
 
@@ -144,7 +145,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
       long originalTimeout = SWTBotPreferences.TIMEOUT;
       try {
          // Open symbolic debug perspective
-         TestSedCoreUtil.openSymbolicDebugPerspective(bot);
+         TestSedCoreUtil.openSymbolicDebugPerspective();
          // Create test project
          IJavaProject project = TestUtilsUtil.createJavaProject("SWTBotKeYDebugTargetSuspendResumeTest_testSuspendResumeDebugTarget_Resume_Suspend_Resume");
          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/statements", project.getProject().getFolder("src"));
@@ -295,7 +296,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
       String originalRuntimeExceptions = null;
       try {
          // Open symbolic debug perspective
-         TestSedCoreUtil.openSymbolicDebugPerspective(bot);
+         TestSedCoreUtil.openSymbolicDebugPerspective();
          // Create test project
          IJavaProject project = TestUtilsUtil.createJavaProject(projectName);
          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, pathInBundle, project.getProject().getFolder("src"));
@@ -304,7 +305,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
          IMethod method = selector.getMethod(project);
          // Increase timeout
          SWTBotPreferences.TIMEOUT = SWTBotPreferences.TIMEOUT * 8;
-         // Store original settings of KeY which requires that at least one proof was intantiated.
+         // Store original settings of KeY which requires that at least one proof was instantiated.
          if (!KeYUtil.isChoiceSettingInitialised()) {
             TestStarterCoreUtil.instantiateProofWithGeneratedContract(method);
             KeYUtil.clearProofList(MainWindow.getInstance());
@@ -334,6 +335,8 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
          assertFalse(target.isTerminated());
          // Make sure that the debug target is in the initial state.
          TestSEDKeyCoreUtil.assertInitialTarget(target, targetName);
+         // Set method treatment
+         TestUtilsUtil.keySetMethodTreatment(MethodTreatment.EXPAND);
          // Resume launch
          SWTBotTreeItem item = TestUtilsUtil.selectInTree(debugTree, 0, 0); // Select first debug target
          item.contextMenu("Resume").click();
@@ -411,7 +414,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
       long originalTimeout = SWTBotPreferences.TIMEOUT;
       try {
          // Open symbolic debug perspective
-         TestSedCoreUtil.openSymbolicDebugPerspective(bot);
+         TestSedCoreUtil.openSymbolicDebugPerspective();
          // Create test project
          IJavaProject project = TestUtilsUtil.createJavaProject(projectName);
          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/statements", project.getProject().getFolder("src"));
@@ -501,7 +504,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
       long originalTimeout = SWTBotPreferences.TIMEOUT;
       try {
          // Open symbolic debug perspective
-         TestSedCoreUtil.openSymbolicDebugPerspective(bot);
+         TestSedCoreUtil.openSymbolicDebugPerspective();
          // Create test project
          IJavaProject project = TestUtilsUtil.createJavaProject(projectName);
          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/statements", project.getProject().getFolder("src"));

@@ -606,13 +606,21 @@ public class TestUtilsUtil {
        */
       CONTRACTS
    }
-
+   
    /**
-    * Executes the "Start/stop automated proof search" on the given KeY frame.
+    * Sets the method treatment in KeY's main window.
+    * @param methodTreatment The method treatment to use.
+    */
+   public static void keySetMethodTreatment(MethodTreatment methodTreatment) {
+      keySetMethodTreatment(keyGetMainWindow(), methodTreatment);
+   }
+   
+   /**
+    * Sets the method treatment in KeY.
     * @param frame The given KeY frame.
     * @param methodTreatment The method treatment to use.
     */
-   public static void keyFinishSelectedProofAutomatically(SwingBotJFrame frame, MethodTreatment methodTreatment) {
+   public static void keySetMethodTreatment(SwingBotJFrame frame, MethodTreatment methodTreatment) {
       // Set proof search strategy settings
       SwingBotJTabbedPane pane = frame.bot().jTabbedPane();
       TestCase.assertEquals("Proof Search Strategy", pane.getTitleAt(2));
@@ -627,6 +635,15 @@ public class TestUtilsUtil {
       }
       TestCase.assertEquals("Proof", pane.getTitleAt(0));
       pane.select(0);
+   }
+
+   /**
+    * Executes the "Start/stop automated proof search" on the given KeY frame.
+    * @param frame The given KeY frame.
+    * @param methodTreatment The method treatment to use.
+    */
+   public static void keyFinishSelectedProofAutomatically(SwingBotJFrame frame, MethodTreatment methodTreatment) {
+      keySetMethodTreatment(frame, methodTreatment);
       // Run proof completion
       frame.bot().jTree().unselectAll();
       frame.bot().waitWhile(Conditions.hasSelection(frame.bot().jTree()));

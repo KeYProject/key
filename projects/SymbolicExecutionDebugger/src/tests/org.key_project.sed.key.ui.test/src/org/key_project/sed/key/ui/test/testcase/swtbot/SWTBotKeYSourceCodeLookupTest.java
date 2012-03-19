@@ -67,7 +67,7 @@ public class SWTBotKeYSourceCodeLookupTest extends TestCase {
       long originalTimeout = SWTBotPreferences.TIMEOUT;
       try {
          // Open symbolic debug perspective
-         TestSedCoreUtil.openSymbolicDebugPerspective(bot);
+         TestSedCoreUtil.openSymbolicDebugPerspective();
          // Create test project
          IJavaProject project = TestUtilsUtil.createJavaProject("SWTBotKeYSourceLookupParticipantTest_testLookupMarkerInUI");
          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/statements", project.getProject().getFolder("src"));
@@ -161,7 +161,7 @@ public class SWTBotKeYSourceCodeLookupTest extends TestCase {
       long originalTimeout = SWTBotPreferences.TIMEOUT;
       try {
          // Open symbolic debug perspective
-         TestSedCoreUtil.openSymbolicDebugPerspective(bot);
+         TestSedCoreUtil.openSymbolicDebugPerspective();
          // Create test project
          IJavaProject project = TestUtilsUtil.createJavaProject("SWTBotKeYSourceLookupParticipantTest_testLookupRequests");
          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/statements", project.getProject().getFolder("src"));

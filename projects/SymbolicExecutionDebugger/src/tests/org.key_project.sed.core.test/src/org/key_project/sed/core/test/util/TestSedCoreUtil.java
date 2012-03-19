@@ -22,6 +22,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
@@ -29,12 +30,14 @@ import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.waits.ICondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IPerspectiveDescriptor;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.key_project.sed.core.model.ISEDBranchCondition;
@@ -48,6 +51,10 @@ import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.util.LaunchUtil;
 import org.key_project.sed.core.util.SEDPreferenceUtil;
+import org.key_project.sed.ui.perspective.SymbolicDebugPerspectiveFactory;
+import org.key_project.util.eclipse.WorkbenchUtil;
+import org.key_project.util.java.thread.AbstractRunnableWithException;
+import org.key_project.util.java.thread.IRunnableWithException;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 /**
@@ -134,19 +141,33 @@ public final class TestSedCoreUtil {
 
    /**
     * Opens the "Symbolic Debug" perspective.
-    * @param bot The {@link SWTWorkbenchBot} to use.
+    * @throws Exception Occurred Exception.
     */
-   public static void openSymbolicDebugPerspective(SWTWorkbenchBot bot) {
-      // Open perspective selection dialog
-      bot.menu("Window").menu("Open Perspective").menu("Other...").click();
-      // Get dialog, select perspective and close it
-      SWTBotShell shell = bot.shell("Open Perspective");
-      SWTBotTable table = shell.bot().table();
-      table.select("Symbolic Debug");
-      shell.bot().button("OK").click();
-      // Make sure that the perspective is opened
-      TestCase.assertFalse(shell.isOpen());
-      TestCase.assertTrue(bot.perspectiveByLabel("Symbolic Debug").isActive());
+   public static void openSymbolicDebugPerspective() throws Exception {
+      IRunnableWithException run = new AbstractRunnableWithException() {
+         @Override
+         public void run() {
+            try {
+               String perspectiveId = SymbolicDebugPerspectiveFactory.PERSPECTIVE_ID;
+               IPerspectiveDescriptor perspective = PlatformUI.getWorkbench().getPerspectiveRegistry().findPerspectiveWithId(perspectiveId);
+               TestCase.assertNotNull(perspective);
+               IWorkbenchPage activePage = WorkbenchUtil.getActivePage();
+               TestCase.assertNotNull(activePage);
+               activePage.setPerspective(perspective);
+               TestCase.assertEquals(perspective, activePage.getPerspective());
+            }
+            catch (Exception e) {
+               setException(e);
+            }
+            catch (Throwable t) {
+               setException(new Exception(t));
+            }
+         }
+      };
+      Display.getDefault().syncExec(run);
+      if (run.getException() != null) {
+         throw run.getException();
+      }
    }
 
    /**

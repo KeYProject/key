@@ -2,7 +2,6 @@ package org.key_project.sed.core.test.testcase.swtbot;
 
 import junit.framework.TestCase;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotPerspective;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
@@ -25,7 +24,7 @@ public class DebugViewHierarchyTest extends TestCase {
     * normal and compact view.
     */
    @Test
-   public void testSwitchingBetweenCompactAndNormalHierarchy() throws CoreException {
+   public void testSwitchingBetweenCompactAndNormalHierarchy() throws Exception {
       // Close welcome view
       SWTWorkbenchBot bot = new SWTWorkbenchBot();
       SWTBotPerspective defaultPerspective = bot.activePerspective();
@@ -36,7 +35,7 @@ public class DebugViewHierarchyTest extends TestCase {
       try {
          TestUtilsUtil.closeWelcomeView(bot);
          // Open symbolic debug perspective
-         TestSedCoreUtil.openSymbolicDebugPerspective(bot);
+         TestSedCoreUtil.openSymbolicDebugPerspective();
          // Launch fixed example
          TestSedCoreUtil.launchFixedExample();
          // Find the launched ILaunch in the debug view
@@ -80,7 +79,7 @@ public class DebugViewHierarchyTest extends TestCase {
     * compact symbolic execution tree option.
     */
    @Test
-   public void testCompactHierarchy() throws CoreException {
+   public void testCompactHierarchy() throws Exception {
       // Close welcome view
       SWTWorkbenchBot bot = new SWTWorkbenchBot();
       SWTBotPerspective defaultPerspective = bot.activePerspective();
@@ -91,7 +90,7 @@ public class DebugViewHierarchyTest extends TestCase {
       try {
          TestUtilsUtil.closeWelcomeView(bot);
          // Open symbolic debug perspective
-         TestSedCoreUtil.openSymbolicDebugPerspective(bot);
+         TestSedCoreUtil.openSymbolicDebugPerspective();
          // Launch fixed example
          TestSedCoreUtil.launchFixedExample();
          // Find the launched ILaunch in the debug view
@@ -118,7 +117,7 @@ public class DebugViewHierarchyTest extends TestCase {
     * in the debug view of the Eclipse debug API.
     */
    @Test
-   public void testHierarchy() throws CoreException {
+   public void testHierarchy() throws Exception {
       // Close welcome view
       SWTWorkbenchBot bot = new SWTWorkbenchBot();
       SWTBotPerspective defaultPerspective = bot.activePerspective();
@@ -129,7 +128,7 @@ public class DebugViewHierarchyTest extends TestCase {
       try {
          TestUtilsUtil.closeWelcomeView(bot);
          // Open symbolic debug perspective
-         TestSedCoreUtil.openSymbolicDebugPerspective(bot);
+         TestSedCoreUtil.openSymbolicDebugPerspective();
          // Launch fixed example
          TestSedCoreUtil.launchFixedExample();
          // Find the launched ILaunch in the debug view

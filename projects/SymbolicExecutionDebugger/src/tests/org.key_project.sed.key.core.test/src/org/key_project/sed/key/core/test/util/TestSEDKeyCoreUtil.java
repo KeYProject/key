@@ -215,8 +215,8 @@ public final class TestSEDKeyCoreUtil {
       SEDMemoryStatement doS1 = appendStatement(target, callDo, thread, "MethodCallOnObjectWithException x = null;", 15);
       SEDMemoryStatement doS2 = appendStatement(target, doS1, thread, "return x_3.return42();", 16);
       SEDMemoryBranchCondition b3 = appendBranchCondition(target, doS2, thread, "Null Reference (x_3 = null)");
-      SEDMemoryBranchCondition b4 = appendBranchCondition(target, b3, thread, "Post (NullPointerException)");
-      SEDMemoryBranchCondition b5 = appendBranchCondition(target, b4, thread, "if x_5 false");
+      SEDMemoryBranchCondition b4 = appendBranchCondition(target, b3, thread, "Normal Execution (n_1 != null)");
+      SEDMemoryBranchCondition b5 = appendBranchCondition(target, b4, thread, "if n instanceof NullPointerException true");
       SEDMemoryBranchCondition b6 = appendBranchCondition(target, b5, thread, "Normal Execution (n instanceof NullPointerException)");
       SEDMemoryStatement mainS3 = appendStatement(target, b6, thread, "MethodCallOnObjectWithException y = new MethodCallOnObjectWithException ();", 9);
       SEDMemoryBranchCondition b7 = appendBranchCondition(target, mainS3, thread, "Normal Execution (m_3 != null)");
