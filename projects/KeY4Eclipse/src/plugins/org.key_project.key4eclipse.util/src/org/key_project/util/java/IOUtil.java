@@ -2,11 +2,14 @@ package org.key_project.util.java;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.swing.Icon;
 import javax.swing.filechooser.FileSystemView;
@@ -62,7 +65,7 @@ public final class IOUtil {
             StringBuffer sb = new StringBuffer();
             char[] buffer = new char[BUFFER_SIZE];
             int read;
-            while ((read = reader.read(buffer)) > 1) {
+            while ((read = reader.read(buffer)) >= 1) {
                sb.append(buffer, 0, read);
             }
             return sb.toString();
@@ -130,5 +133,135 @@ public final class IOUtil {
            }
        }
        return image;
+   }
+
+   /**
+    * <p>
+    * Computes the start indices for each line in the given {@link File}.
+    * </p>
+    * <p>
+    * Example content, line break is '\n':
+    * <pre>
+    * Line 1
+    * Line 2: With some text
+    * 
+    * Line 4
+    * </pre>
+    * Computed line start indices:
+    * <pre><code>
+    * result[0] = 0
+    * result[1] = 7
+    * result[2] = 30
+    * result[3] = 31
+    * </code></pre>
+    * </p>
+    * @param file The given {@link File}.
+    * @return The computed start indices.
+    * @throws IOException Occurred Exception.
+    */
+   public static Integer[] computeLineStartIndices(File file) throws IOException {
+      if (file != null) {
+         return computeLineStartIndices(new FileInputStream(file));
+      }
+      else {
+         return computeLineStartIndices((InputStream)null);
+      }
+   }
+
+   /**
+    * <p>
+    * Computes the start indices for each line in the given {@link InputStream}.
+    * </p>
+    * <p>
+    * Example content, line break is '\n':
+    * <pre>
+    * Line 1
+    * Line 2: With some text
+    * 
+    * Line 4
+    * </pre>
+    * Computed line start indices:
+    * <pre><code>
+    * result[0] = 0
+    * result[1] = 7
+    * result[2] = 30
+    * result[3] = 31
+    * </code></pre>
+    * </p>
+    * @param file The given {@link File}.
+    * @return The computed start indices.
+    * @throws IOException Occurred Exception.
+    */
+   public static Integer[] computeLineStartIndices(InputStream in) throws IOException {
+      
+      
+      InputStreamReader reader = null;
+      try {
+         List<Integer> result = new LinkedList<Integer>();
+         if (in != null) {
+            reader = new InputStreamReader(in);
+            char[] buffer = new char[BUFFER_SIZE]; // Buffer with the read signs
+            int read; // The number of read signs
+            int startIndex = 0; // The accumulated start index over all read buffers
+            int lastSignWasRBreakIndex = -1; // If this is a positive index it indicates that the last buffer ends with '\r' which must now be handled. The absolute result index is stored in this variable
+            int lastIndex = 0; // The index to add to the result when the next line break sing '\r' or '\n' is read
+            // Iterate over the whole content of the given stream
+            while ((read = reader.read(buffer)) >= 1) {
+               for (int i = 0; i < read; i++) {
+                  if ('\n' == buffer[i]) {
+                     // Check for possible line breaks with "\r\n"
+                     if (lastSignWasRBreakIndex >= 0) {
+                        // Handle line break with "\r\n"
+                        result.add(Integer.valueOf(lastSignWasRBreakIndex));
+                        lastSignWasRBreakIndex = -1;
+                     }
+                     else {
+                        // Handle normal line breaks with '\n'
+                        result.add(Integer.valueOf(lastIndex));
+                     }
+                     lastIndex = startIndex + i + 1;
+                  }
+                  else if ('\r' == buffer[i]) {
+                     // Handle double line break with "\r\r" normally if required
+                     if (lastSignWasRBreakIndex >= 0) {
+                        result.add(Integer.valueOf(lastSignWasRBreakIndex));
+                        lastSignWasRBreakIndex = -1;
+                     }
+                     // Check for possible line breaks with "\r\n"
+                     if (i < buffer.length - 1) {
+                        if ('\n' != buffer[i + 1]) {
+                        // Handle normal line breaks with '\r'
+                           result.add(Integer.valueOf(lastIndex));
+                           lastIndex = startIndex + i + 1;
+                        }
+                     }
+                     else {
+                        // Can't check for line break with "\r\n", do check after reading next content
+                        lastSignWasRBreakIndex = lastIndex;
+                        lastIndex = startIndex + i + 1;
+                     }
+                  }
+               }
+               startIndex += read;
+            }
+            // Handle last read '\r' sign if no more content was read
+            if (lastSignWasRBreakIndex >= 0) {
+               result.add(Integer.valueOf(lastSignWasRBreakIndex));
+            }
+            // Handle last read '\r' or '\n' sign if no more content was read
+            if (lastIndex >= 0) {
+               result.add(Integer.valueOf(lastIndex));
+            }
+         }
+         return result.toArray(new Integer[result.size()]);
+      }
+      finally {
+         if (reader != null) {
+            reader.close();
+         }
+         if (in != null) {
+            in.close();
+         }
+      }
    }
 }
