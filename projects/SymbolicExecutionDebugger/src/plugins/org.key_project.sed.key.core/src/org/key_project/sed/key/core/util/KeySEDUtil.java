@@ -286,7 +286,7 @@ public final class KeySEDUtil {
     */
    public static void printDebugTarget(ISEDDebugTarget target) throws DebugException {
       if (target != null) {
-         System.out.println(target);
+         System.out.println(target + "    (" + target.getClass() + ")");
          for (ISEDThread thread : target.getSymbolicThreads()) {
             printDebugNode(thread, 1);
          }
@@ -309,7 +309,7 @@ public final class KeySEDUtil {
       }
       // Print node and children
       if (node != null) {
-         System.out.println(node);
+         System.out.println(node + "     (" + node.getClass() + ")");
          for (ISEDDebugNode child : node.getChildren()) {
             printDebugNode(child, level + 1);
          }

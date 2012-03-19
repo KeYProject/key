@@ -27,6 +27,7 @@ import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.memory.ISEDMemoryDebugNode;
 import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
+import org.key_project.sed.core.model.memory.SEDMemoryBranchNode;
 import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
 import org.key_project.sed.core.model.memory.SEDMemoryMethodCall;
 import org.key_project.sed.core.model.memory.SEDMemoryMethodReturn;
@@ -73,6 +74,36 @@ public final class TestSEDKeyCoreUtil {
     * The name of the {@link ISEDDebugTarget} used in the method call with exception on object example.
     */
    public static final String METHOD_CALL_ON_OBJECT_WITH_EXCEPTION_TARGET_NAME = "JML normal_behavior operation contract [id: -2147483648 / MethodCallOnObjectWithException::main]";
+
+   /**
+    * The name of the {@link ISEDDebugTarget} used in the simple if example.
+    */
+   public static final String SIMPLE_IF_TARGET_NAME = "JML normal_behavior operation contract [id: -2147483648 / SimpleIf::min]";
+
+   /**
+    * The name of the {@link ISEDDebugTarget} used in the functional if example.
+    */
+   public static final String FUNCTIONAL_IF_TARGET_NAME = "JML normal_behavior operation contract [id: -2147483648 / FunctionalIf::min]";
+
+   /**
+    * The name of the {@link ISEDDebugTarget} used in the complex flat steps example.
+    */
+   public static final String COMPLEX_FLAT_STEPS_TARGET_NAME = "JML normal_behavior operation contract [id: -2147483648 / ComplexFlatSteps::doSomething]";
+
+   /**
+    * The name of the {@link ISEDDebugTarget} used in the complex if example.
+    */
+   public static final String COMPLEX_IF_TARGET_NAME = "JML normal_behavior operation contract [id: -2147483648 / ComplexIf::min]";
+
+   /**
+    * The name of the {@link ISEDDebugTarget} used in the static method call example.
+    */
+   public static final String STATIC_METHOD_CALL_TARGET_NAME = "JML normal_behavior operation contract [id: -2147483648 / StaticMethodCall::main]";
+
+   /**
+    * The name of the {@link ISEDDebugTarget} used in the try catch finally example.
+    */
+   public static final String TRY_CATCH_FINALLY_TARGET_NAME = "JML normal_behavior operation contract [id: -2147483648 / TryCatchFinally::tryCatchFinally]";
    
    /**
     * Forbid instances.
@@ -174,6 +205,92 @@ public final class TestSEDKeyCoreUtil {
       SEDMemoryStatement s3 = appendStatement(target, s2, thread, "int z = 3;", 18);
       // Create method return
       SEDMemoryMethodReturn ret = appendMethodReturn(target, s3, thread, "self.doSomething(_asdf,_a,_b);");
+      // Create termination
+      appendTermination(target, ret, thread);
+      return target;
+   }
+
+   /**
+    * Creates the expected {@link ISEDDebugTarget} for the try catch finally example.
+    * @return The expected {@link ISEDDebugTarget}.
+    */
+   public static ISEDDebugTarget createExpectedTryCatchFinallyModel() {
+      SEDMemoryDebugTarget target = appendDebugTarget(TRY_CATCH_FINALLY_TARGET_NAME);
+      SEDMemoryThread thread = appendThread(target);
+      SEDMemoryMethodCall call = appendMethodCall(target, thread, thread, "self.tryCatchFinally(_input);");
+      SEDMemoryStatement s1 = appendStatement(target, call, thread, "int result = 0;", 7);
+      SEDMemoryStatement s2 = appendStatement(target, s1, thread, "result_1=1/_input;", 9);
+      
+      SEDMemoryBranchCondition bc1 = appendBranchCondition(target, s2, thread, "input = 0 TRUE");
+      SEDMemoryBranchCondition bc1a = appendBranchCondition(target, bc1, thread, "Normal Execution (a_1 != null)");
+      SEDMemoryBranchCondition bc1b = appendBranchCondition(target, bc1a, thread, "if a instanceof ArithmeticException true");
+      SEDMemoryBranchCondition bc1c = appendBranchCondition(target, bc1b, thread, "Normal Execution (a instanceof ArithmeticException)");
+      SEDMemoryStatement bc1S1 = appendStatement(target, bc1c, thread, "result_1=2;", 12);
+      SEDMemoryStatement bc1S2 = appendStatement(target, bc1S1, thread, "result_1=result_1*2;", 15);
+      SEDMemoryStatement bc1S3 = appendStatement(target, bc1S2, thread, "return result_1;", 17);
+      SEDMemoryMethodReturn bc1ret = appendMethodReturn(target, bc1S3, thread, "self.tryCatchFinally(_input);");
+      appendTermination(target, bc1ret, thread);
+      
+      SEDMemoryBranchCondition bc2 = appendBranchCondition(target, s2, thread, "input = 0 FALSE");
+      SEDMemoryStatement bc2S1 = appendStatement(target, bc2, thread, "result_1=result_1*2;", 15);
+      SEDMemoryStatement bc2S2 = appendStatement(target, bc2S1, thread, "return result_1;", 17);
+      SEDMemoryMethodReturn bc2ret = appendMethodReturn(target, bc2S2, thread, "self.tryCatchFinally(_input);");
+      appendTermination(target, bc2ret, thread);
+      return target;
+   }
+
+   /**
+    * Creates the expected {@link ISEDDebugTarget} for the static method call example.
+    * @return The expected {@link ISEDDebugTarget}.
+    */
+   public static ISEDDebugTarget createExpectedStaticMethodCallModel() {
+      SEDMemoryDebugTarget target = appendDebugTarget(STATIC_METHOD_CALL_TARGET_NAME);
+      SEDMemoryThread thread = appendThread(target);
+      SEDMemoryMethodCall mainCall = appendMethodCall(target, thread, thread, "StaticMethodCall.main();");
+      SEDMemoryStatement mainS1 = appendStatement(target, mainCall, thread, "doSomething();", 30);
+      SEDMemoryMethodCall doSomethingCall = appendMethodCall(target, mainS1, thread, "StaticMethodCall.doSomething();");
+      SEDMemoryMethodReturn doSomethingReturn = appendMethodReturn(target, doSomethingCall, thread, "StaticMethodCall.doSomething();", 36);
+      SEDMemoryStatement mainS2 = appendStatement(target, doSomethingReturn, thread, "int x = sub()+sub();", 31);
+      
+      SEDMemoryMethodCall subCall1 = appendMethodCall(target, mainS2, thread, "StaticMethodCall.sub();");
+      SEDMemoryStatement subCall1S = appendStatement(target, subCall1, thread, "return subSub()+2;", 39);
+      SEDMemoryMethodCall subSubCall1 = appendMethodCall(target, subCall1S, thread, "StaticMethodCall.subSub();");
+      SEDMemoryStatement subSubCall1S = appendStatement(target, subSubCall1, thread, "return 2;", 43);
+      SEDMemoryMethodReturn subSubReturn1 = appendMethodReturn(target, subSubCall1S, thread, "StaticMethodCall.subSub();");
+      SEDMemoryMethodReturn subReturn1 = appendMethodReturn(target, subSubReturn1, thread, "StaticMethodCall.sub();");
+
+      SEDMemoryMethodCall subCall2 = appendMethodCall(target, subReturn1, thread, "StaticMethodCall.sub();");
+      SEDMemoryStatement subCall2S = appendStatement(target, subCall2, thread, "return subSub()+2;", 39);
+      SEDMemoryMethodCall subSubCall2 = appendMethodCall(target, subCall2S, thread, "StaticMethodCall.subSub();");
+      SEDMemoryStatement subSubCall2S = appendStatement(target, subSubCall2, thread, "return 2;", 43);
+      SEDMemoryMethodReturn subSubReturn2 = appendMethodReturn(target, subSubCall2S, thread, "StaticMethodCall.subSub();");
+      SEDMemoryMethodReturn subReturn2 = appendMethodReturn(target, subSubReturn2, thread, "StaticMethodCall.sub();");
+      
+      SEDMemoryStatement mainS3 = appendStatement(target, subReturn2, thread, "return x;", 32);
+      SEDMemoryMethodReturn mainReturn = appendMethodReturn(target, mainS3, thread, "StaticMethodCall.main();");
+      appendTermination(target, mainReturn, thread);
+      return target;
+   }
+
+   /**
+    * Creates the expected {@link ISEDDebugTarget} for the complex flat steps example.
+    * @return The expected {@link ISEDDebugTarget}.
+    */   
+   public static ISEDDebugTarget createExpectedComplexFlatStepsModel() {
+      // Create target
+      SEDMemoryDebugTarget target = appendDebugTarget(COMPLEX_FLAT_STEPS_TARGET_NAME);
+      // Create thread
+      SEDMemoryThread thread = appendThread(target);
+      // Create method call
+      SEDMemoryMethodCall call = appendMethodCall(target, thread, thread, "self.doSomething();");
+      // Create statement 1
+      SEDMemoryStatement s1 = appendStatement(target, call, thread, "int x = 1+2;", 16);
+      // Create statement 2
+      SEDMemoryStatement s2 = appendStatement(target, s1, thread, "int y = 2*4*9;", 17);
+      // Create statement 3
+      SEDMemoryStatement s3 = appendStatement(target, s2, thread, "int z = 3*(4/(2-3));", 18);
+      // Create method return
+      SEDMemoryMethodReturn ret = appendMethodReturn(target, s3, thread, "self.doSomething();");
       // Create termination
       appendTermination(target, ret, thread);
       return target;
@@ -299,6 +416,92 @@ public final class TestSEDKeyCoreUtil {
       SEDMemoryMethodReturn mainReturn = appendMethodReturn(target, mainStatement3, thread, "self.main();");
       // Create termination
       appendTermination(target, mainReturn, thread);
+      return target;
+   }
+   
+   /**
+    * Creates the expected {@link ISEDDebugTarget} for the simple if example.
+    * @return The expected {@link ISEDDebugTarget}.
+    */
+   public static ISEDDebugTarget createExpectedSimpleIfModel() {
+      // Create target
+      SEDMemoryDebugTarget target = appendDebugTarget(SIMPLE_IF_TARGET_NAME);
+      SEDMemoryThread thread = appendThread(target);
+      SEDMemoryMethodCall callMin = appendMethodCall(target, thread, thread, "self.min(_i,_j);");
+      SEDMemoryStatement s1 = appendStatement(target, callMin, thread, "int result;", 23);
+      SEDMemoryBranchNode branchNode = appendBranchNode(target, s1, thread, "if (_i<_j) {   result_1=_i; }else  {   result_1=_j; }", 29);
+      // Branch 1
+      SEDMemoryBranchCondition bc1 = appendBranchCondition(target, branchNode, thread, "j >= 1 + i TRUE");
+      SEDMemoryStatement s2 = appendStatement(target, bc1, thread, "result_1=_i;", 25);
+      SEDMemoryStatement s3 = appendStatement(target, s2, thread, "return result_1;", 30);
+      SEDMemoryMethodReturn minReturn1 = appendMethodReturn(target, s3, thread, "self.min(_i,_j);");
+      appendTermination(target, minReturn1, thread);
+      // Branch 2
+      SEDMemoryBranchCondition bc2 = appendBranchCondition(target, branchNode, thread, "j >= 1 + i FALSE");
+      SEDMemoryStatement s4 = appendStatement(target, bc2, thread, "result_1=_j;", 28);
+      SEDMemoryStatement s5 = appendStatement(target, s4, thread, "return result_1;", 30);
+      SEDMemoryMethodReturn minReturn2 = appendMethodReturn(target, s5, thread, "self.min(_i,_j);");
+      appendTermination(target, minReturn2, thread);
+      return target;
+   }
+
+   /**
+    * Creates the expected {@link ISEDDebugTarget} for the functional if example.
+    * @return The expected {@link ISEDDebugTarget}.
+    */
+   public static ISEDDebugTarget createExpectedFunctionalIfModel() {
+      // Create target
+      SEDMemoryDebugTarget target = appendDebugTarget(FUNCTIONAL_IF_TARGET_NAME);
+      SEDMemoryThread thread = appendThread(target);
+      SEDMemoryMethodCall callMin = appendMethodCall(target, thread, thread, "self.min(_i,_j);");
+      SEDMemoryStatement s1 = appendStatement(target, callMin, thread, "int result;", 29);
+      SEDMemoryBranchNode branchNode = appendBranchNode(target, s1, thread, "if (invert(_i)<invert(_j)) {   result_1=_i; }else  {   result_1=_j; }", 35);
+      SEDMemoryMethodCall callInvert1 = appendMethodCall(target, branchNode, thread, "self.invert(a);");
+      SEDMemoryStatement callS1 = appendStatement(target, callInvert1, thread, "return a*-1;", 40);
+      SEDMemoryMethodReturn returnInvert1 = appendMethodReturn(target, callS1, thread, "self.invert(a);");
+      SEDMemoryMethodCall callInvert2 = appendMethodCall(target, returnInvert1, thread, "self.invert(a_1);");
+      SEDMemoryStatement callS2 = appendStatement(target, callInvert2, thread, "return a_1*-1;", 40);
+      SEDMemoryMethodReturn returnInvert2 = appendMethodReturn(target, callS2, thread, "self.invert(a_1);");
+      // Branch 1
+      SEDMemoryBranchCondition bc1 = appendBranchCondition(target, returnInvert2, thread, "j <= -1 + i TRUE");
+      SEDMemoryStatement s2 = appendStatement(target, bc1, thread, "result_1=_i;", 31);
+      SEDMemoryStatement s3 = appendStatement(target, s2, thread, "return result_1;", 36);
+      SEDMemoryMethodReturn minReturn1 = appendMethodReturn(target, s3, thread, "self.min(_i,_j);");
+      appendTermination(target, minReturn1, thread);
+      // Branch 2
+      SEDMemoryBranchCondition bc2 = appendBranchCondition(target, returnInvert2, thread, "j <= -1 + i FALSE");
+      SEDMemoryBranchCondition bc2x = appendBranchCondition(target, bc2, thread, "if x false");
+      SEDMemoryStatement s4 = appendStatement(target, bc2x, thread, "result_1=_j;", 34);
+      SEDMemoryStatement s5 = appendStatement(target, s4, thread, "return result_1;", 36);
+      SEDMemoryMethodReturn minReturn2 = appendMethodReturn(target, s5, thread, "self.min(_i,_j);");
+      appendTermination(target, minReturn2, thread);
+      return target;
+   }
+
+   /**
+    * Creates the expected {@link ISEDDebugTarget} for the complex if example.
+    * @return The expected {@link ISEDDebugTarget}.
+    */   
+   public static ISEDDebugTarget createExpectedComplexIfModel() {
+      // Create target
+      SEDMemoryDebugTarget target = appendDebugTarget(COMPLEX_IF_TARGET_NAME);
+      SEDMemoryThread thread = appendThread(target);
+      SEDMemoryMethodCall callMin = appendMethodCall(target, thread, thread, "self.min(_i,_j);");
+      SEDMemoryStatement s1 = appendStatement(target, callMin, thread, "int result;", 23);
+      SEDMemoryBranchNode branchNode = appendBranchNode(target, s1, thread, "if (_i<_j&&_i!=_j) {   result_1=_i; }else  {   result_1=_j; }", 29);
+      // Branch 1
+      SEDMemoryBranchCondition bc1 = appendBranchCondition(target, branchNode, thread, "j >= 1 + i TRUE");
+      SEDMemoryStatement s2 = appendStatement(target, bc1, thread, "result_1=_i;", 25);
+      SEDMemoryStatement s3 = appendStatement(target, s2, thread, "return result_1;", 30);
+      SEDMemoryMethodReturn minReturn1 = appendMethodReturn(target, s3, thread, "self.min(_i,_j);");
+      appendTermination(target, minReturn1, thread);
+      // Branch 2
+      SEDMemoryBranchCondition bc2 = appendBranchCondition(target, branchNode, thread, "j >= 1 + i FALSE");
+      SEDMemoryBranchCondition bc2a = appendBranchCondition(target, bc2, thread, "if x_2 false");
+      SEDMemoryStatement s4 = appendStatement(target, bc2a, thread, "result_1=_j;", 28);
+      SEDMemoryStatement s5 = appendStatement(target, s4, thread, "return result_1;", 30);
+      SEDMemoryMethodReturn minReturn2 = appendMethodReturn(target, s5, thread, "self.min(_i,_j);");
+      appendTermination(target, minReturn2, thread);
       return target;
    }
 
@@ -457,8 +660,26 @@ public final class TestSEDKeyCoreUtil {
                                                           ISEDMemoryDebugNode parent, 
                                                           ISEDThread thread,
                                                           String name) {
+      return appendMethodReturn(target, parent, thread, name, -1);
+   }
+   
+   /**
+    * Appends a new method return to the given parent {@link ISEDMemoryDebugNode}.
+    * @param target The {@link ISEDDebugTarget} to use.
+    * @param parent The parent {@link ISEDMemoryDebugNode} to append to.
+    * @param thread The {@link ISEDThread} to use.
+    * @param name The name to set on the created {@link SEDMemoryMethodReturn}.
+    * @param lineNumber The line number to set on the created {@link SEDMemoryMethodReturn}.
+    * @return The created {@link SEDMemoryMethodReturn}.
+    */
+   public static SEDMemoryMethodReturn appendMethodReturn(ISEDDebugTarget target, 
+                                                          ISEDMemoryDebugNode parent, 
+                                                          ISEDThread thread,
+                                                          String name,
+                                                          int lineNumber) {
       SEDMemoryMethodReturn methodReturn = new SEDMemoryMethodReturn(target, parent, thread);
       methodReturn.setName(KeYDebugTarget.createMethodReturnName(null, name));
+      methodReturn.setLineNumber(lineNumber);
       parent.addChild(methodReturn);
       return methodReturn;
    }
@@ -480,6 +701,27 @@ public final class TestSEDKeyCoreUtil {
    }
    
    /**
+    * Appends a new branch node to the given parent {@link ISEDMemoryDebugNode}.
+    * @param target The {@link ISEDDebugTarget} to use.
+    * @param parent The parent {@link ISEDMemoryDebugNode} to append to.
+    * @param thread The {@link ISEDThread} to use.
+    * @param name The name to set on the created {@link SEDMemoryBranchNode}.
+    * @param lineNumber The line number to set on the created {@link SEDMemoryBranchNode}.
+    * @return The created {@link SEDMemoryBranchNode}.
+    */
+   public static SEDMemoryBranchNode appendBranchNode(ISEDDebugTarget target, 
+                                                      ISEDMemoryDebugNode parent, 
+                                                      ISEDThread thread,
+                                                      String name,
+                                                      int lineNumber) {
+      SEDMemoryBranchNode bn = new SEDMemoryBranchNode(target, parent, thread);
+      bn.setName(name);
+      bn.setLineNumber(lineNumber);
+      parent.addChild(bn);
+      return bn;
+   }
+   
+   /**
     * Appends a new branch condition to the given parent {@link ISEDMemoryDebugNode}.
     * @param target The {@link ISEDDebugTarget} to use.
     * @param parent The parent {@link ISEDMemoryDebugNode} to append to.
@@ -491,10 +733,10 @@ public final class TestSEDKeyCoreUtil {
                                                                 ISEDMemoryDebugNode parent, 
                                                                 ISEDThread thread,
                                                                 String name) {
-      SEDMemoryBranchCondition bc1 = new SEDMemoryBranchCondition(target, parent, thread);
-      bc1.setName(name);
-      parent.addChild(bc1);
-      return bc1;
+      SEDMemoryBranchCondition bc = new SEDMemoryBranchCondition(target, parent, thread);
+      bc.setName(name);
+      parent.addChild(bc);
+      return bc;
    }
 
    /**

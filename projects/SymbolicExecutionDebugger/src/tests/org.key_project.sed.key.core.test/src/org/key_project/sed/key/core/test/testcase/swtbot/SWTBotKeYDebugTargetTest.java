@@ -49,6 +49,108 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     * Tests the suspend/resume functionality on the {@link IDebugTarget}.
     */
    @Test
+   public void testTryCatchFinally() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testTryCatchFinally",
+                     "data/tryCatchFinally",
+                     new IMethodSelector() {
+                        @Override
+                        public IMethod getMethod(IJavaProject project) throws Exception {
+                           return TestUtilsUtil.getJdtMethod(project, "TryCatchFinally", "tryCatchFinally", "I");
+                        }
+                     },
+                     TestSEDKeyCoreUtil.TRY_CATCH_FINALLY_TARGET_NAME,
+                     TestSEDKeyCoreUtil.createExpectedTryCatchFinallyModel());
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
+   public void testStaticMethodCall() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testStaticMethodCall",
+                     "data/staticMethodCall",
+                     new IMethodSelector() {
+                        @Override
+                        public IMethod getMethod(IJavaProject project) throws Exception {
+                           return TestUtilsUtil.getJdtMethod(project, "StaticMethodCall", "main");
+                        }
+                     },
+                     TestSEDKeyCoreUtil.STATIC_METHOD_CALL_TARGET_NAME,
+                     TestSEDKeyCoreUtil.createExpectedStaticMethodCallModel());
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
+   public void testComplexIfSteps() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testComplexIfSteps",
+                     "data/complexIf",
+                     new IMethodSelector() {
+                        @Override
+                        public IMethod getMethod(IJavaProject project) throws Exception {
+                           return TestUtilsUtil.getJdtMethod(project, "ComplexIf", "min", "I", "I");
+                        }
+                     },
+                     TestSEDKeyCoreUtil.COMPLEX_IF_TARGET_NAME,
+                     TestSEDKeyCoreUtil.createExpectedComplexIfModel());
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
+   public void testComplexFlatSteps() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testComplexFlatSteps",
+                     "data/complexFlatSteps",
+                     new IMethodSelector() {
+                        @Override
+                        public IMethod getMethod(IJavaProject project) throws Exception {
+                           return TestUtilsUtil.getJdtMethod(project, "ComplexFlatSteps", "doSomething");
+                        }
+                     },
+                     TestSEDKeyCoreUtil.COMPLEX_FLAT_STEPS_TARGET_NAME,
+                     TestSEDKeyCoreUtil.createExpectedComplexFlatStepsModel());
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
+   public void testFunctionalIf() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testFunctionalIf",
+                     "data/functionalIf",
+                     new IMethodSelector() {
+                        @Override
+                        public IMethod getMethod(IJavaProject project) throws Exception {
+                           return TestUtilsUtil.getJdtMethod(project, "FunctionalIf", "min", "I", "I");
+                        }
+                     },
+                     TestSEDKeyCoreUtil.FUNCTIONAL_IF_TARGET_NAME,
+                     TestSEDKeyCoreUtil.createExpectedFunctionalIfModel());
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
+   public void testSimpleIf() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testSimpleIf",
+                     "data/simpleIf",
+                     new IMethodSelector() {
+                        @Override
+                        public IMethod getMethod(IJavaProject project) throws Exception {
+                           return TestUtilsUtil.getJdtMethod(project, "SimpleIf", "min", "I", "I");
+                        }
+                     },
+                     TestSEDKeyCoreUtil.SIMPLE_IF_TARGET_NAME,
+                     TestSEDKeyCoreUtil.createExpectedSimpleIfModel());
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
    public void testMethodCallOnObjectWithException() throws Exception {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallOnObjectWithException",
                      "data/methodCallOnObjectWithException",
