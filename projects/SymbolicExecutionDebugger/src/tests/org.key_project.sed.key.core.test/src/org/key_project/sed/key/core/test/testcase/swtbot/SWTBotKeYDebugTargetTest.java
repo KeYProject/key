@@ -24,7 +24,6 @@ import org.key_project.sed.key.core.test.Activator;
 import org.key_project.sed.key.core.test.util.TestSEDKeyCoreUtil;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
-import org.key_project.util.test.util.TestUtilsUtil.MethodTreatment;
 
 import de.uka.ilkd.key.gui.MainWindow;
 
@@ -43,6 +42,24 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
       // Close welcome view
       SWTWorkbenchBot bot = new SWTWorkbenchBot();
       TestUtilsUtil.closeWelcomeView(bot);
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
+   public void testElseIfDifferentVariables() throws Exception {
+      // TODO: Bug: ifElseSplit is not treated as BranchNode because it has no active statement, why?
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testElseIfDifferentVariables",
+                     "data/elseIfDifferentVariables",
+                     new IMethodSelector() {
+                        @Override
+                        public IMethod getMethod(IJavaProject project) throws Exception {
+                           return TestUtilsUtil.getJdtMethod(project, "ElseIfDifferentVariables", "main", "Z", "Z");
+                        }
+                     },
+                     TestSEDKeyCoreUtil.ELSE_IF_DIFFERENT_VARIABLES_TARGET_NAME,
+                     TestSEDKeyCoreUtil.createExpectedElseIfDifferentVariablesModel());
    }
    
    /**
@@ -437,8 +454,6 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
          assertFalse(target.isTerminated());
          // Make sure that the debug target is in the initial state.
          TestSEDKeyCoreUtil.assertInitialTarget(target, targetName);
-         // Set method treatment
-         TestUtilsUtil.keySetMethodTreatment(MethodTreatment.EXPAND);
          // Resume launch
          SWTBotTreeItem item = TestUtilsUtil.selectInTree(debugTree, 0, 0); // Select first debug target
          item.contextMenu("Resume").click();

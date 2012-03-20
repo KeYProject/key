@@ -820,7 +820,9 @@ public final class StrategySelectionView extends JPanel {
             
             String activeS = proof.getActiveStrategy().name().toString();
             JRadioButton bactive = JRadioButtonHashMap.getButton(activeS);
-            bactive.setSelected(true);
+            if (bactive != null) { // That bactive is null is a valid scenario for instance in the symbolic execution debugger
+               bactive.setSelected(true);
+            }
             
             StrategyProperties p = proof.
                 getSettings().getStrategySettings().

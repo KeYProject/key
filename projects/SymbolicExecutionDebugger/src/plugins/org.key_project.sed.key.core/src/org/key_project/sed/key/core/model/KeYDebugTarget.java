@@ -27,6 +27,7 @@ import org.key_project.sed.core.model.memory.SEDMemoryMethodReturn;
 import org.key_project.sed.core.model.memory.SEDMemoryStatement;
 import org.key_project.sed.core.model.memory.SEDMemoryTermination;
 import org.key_project.sed.core.model.memory.SEDMemoryThread;
+import org.key_project.sed.key.core.strategy.DebuggerStrategy;
 import org.key_project.sed.key.core.util.LogUtil;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.CollectionUtil;
@@ -56,6 +57,7 @@ import de.uka.ilkd.key.proof.Node.NodeIterator;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 
 /**
  * Implementation if {@link ISEDDebugTarget} which uses KeY to symbolically
@@ -161,6 +163,9 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       if (canResume()) {
          // Inform UI that the process is resumed
          super.resume();
+         // Set strategy to use
+         StrategyProperties strategyProperties = DebuggerStrategy.getDebuggerStrategyProperties(true, false, false, true);
+         proof.setActiveStrategy(new DebuggerStrategy.Factory().create(proof, strategyProperties));
          // Run proof
          KeYUtil.runProofInAutomaticModeWithoutResultDialog(proof);
       }
