@@ -17,7 +17,6 @@
  */
 package de.hentschel.visualdbc.dbcmodel;
 
-import org.eclipse.emf.ecore.EObject;
 
 /**
  * <!-- begin-user-doc -->
@@ -39,7 +38,7 @@ import org.eclipse.emf.ecore.EObject;
  * @model
  * @generated
  */
-public interface DbcAttribute extends EObject {
+public interface DbcAttribute extends IDbCProofReferencable {
    /**
     * Returns the value of the '<em><b>Name</b></em>' attribute.
     * <!-- begin-user-doc -->

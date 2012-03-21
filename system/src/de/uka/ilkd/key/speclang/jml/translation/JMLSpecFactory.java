@@ -48,8 +48,8 @@ import de.uka.ilkd.key.util.Triple;
  */
 public class JMLSpecFactory {
 
-    private static final TermBuilder TB = TermBuilder.DF;
-    private final Services services;
+    private static final de.uka.ilkd.key.logic.TermBuilder TB = TermBuilder.DF;
+    private final de.uka.ilkd.key.java.Services services;
     private final ContractFactory cf;
     private int invCounter;
     /**
@@ -310,7 +310,7 @@ public class JMLSpecFactory {
                                             selfVar, paramVars, resultVar,
                                             excVar, heapAtPre, savedHeapAtPre,
                                             Term.class, services);
-            result = TB.and(result, translated);
+            result = TB.and(result, TB.convertToFormula(translated,services));
         }
         return result;
     }
@@ -328,7 +328,7 @@ public class JMLSpecFactory {
                                             selfVar,
                                             paramVars, null, null, null, null,
                                             Term.class, services);
-            result = TB.or(result, translated);
+            result = TB.or(result, TB.convertToFormula(translated,services));
         }
         return result;
     }
@@ -353,7 +353,8 @@ public class JMLSpecFactory {
             if(translated == TB.lessThanNothing()) {
                 if(originalClauses.size() > 1) {
                     throw new SLTranslationException(
-                            "\"assignable \\less_than_nothing\" does not go with other assignable clauses",
+                            "\"assignable \\less_than_nothing\" does not go with other " +
+                            "assignable clauses (even if they declare the same).",
                             expr.fileName, expr.pos);
                 }
                 return TB.empty(services);
@@ -532,13 +533,11 @@ public class JMLSpecFactory {
                                        Behavior originalBehavior) {
         Term excNull = TB.equals(TB.var(progVars.excVar), TB.NULL(services));
         Term post1 = (originalBehavior == Behavior.NORMAL_BEHAVIOR
-                      ? clauses.ensures
-                      : TB.imp(excNull, clauses.ensures));
+                      ? TB.convertToFormula(clauses.ensures,services)
+                      : TB.imp(excNull, TB.convertToFormula(clauses.ensures,services)));
         Term post2 = (originalBehavior == Behavior.EXCEPTIONAL_BEHAVIOR
-                      ? TB.and(
-                clauses.signals, clauses.signalsOnly) : TB.imp(TB.not(excNull),
-                                                               TB.and(
-                clauses.signals, clauses.signalsOnly)));
+                      ? TB.and(TB.convertToFormula(clauses.signals,services), TB.convertToFormula(clauses.signalsOnly,services)) 
+                      : TB.imp(TB.not(excNull),TB.and(TB.convertToFormula(clauses.signals,services), TB.convertToFormula(clauses.signalsOnly,services))));
         Term post = TB.and(post1, post2);
         return post;
     }
@@ -566,7 +565,7 @@ public class JMLSpecFactory {
         ImmutableSet<Contract> result = DefaultImmutableSet.<Contract>nil();
         if (clauses.diverges.equals(TB.ff())) {
             FunctionalOperationContract contract = cf.func(
-                    name, pm, true, clauses.requires,
+                    name, pm, true, TB.convertToFormula(clauses.requires,services),
                     clauses.measuredBy, post, clauses.assignable, 
                     !clauses.strictlyPure, progVars);
             if(clauses.assignable_backup != null) {
@@ -576,7 +575,7 @@ public class JMLSpecFactory {
             result = result.add(contract);
         } else if (clauses.diverges.equals(TB.tt())) {
             FunctionalOperationContract contract = cf.func(
-                    name, pm, false, clauses.requires,
+                    name, pm, false, TB.convertToFormula(clauses.requires,services),
                     clauses.measuredBy, post, clauses.assignable, !clauses.strictlyPure, progVars);
             if(clauses.assignable_backup != null) {
                contract = cf.setModifiesBackup(contract, clauses.assignable_backup);
@@ -586,7 +585,7 @@ public class JMLSpecFactory {
         } else {
             FunctionalOperationContract contract1 = cf.func(
                     name, pm, true,
-                    TB.and(clauses.requires, TB.not(clauses.diverges)),
+                    TB.and(TB.convertToFormula(clauses.requires,services), TB.not(TB.convertToFormula(clauses.diverges,services))),
                     clauses.measuredBy, post, clauses.assignable,
                     !clauses.strictlyPure, progVars);
             FunctionalOperationContract contract2 =
@@ -627,7 +626,7 @@ public class JMLSpecFactory {
             assert (progVars.selfVar == null) == pm.isStatic();
             final Contract depContract = cf.dep(
                     pm.getContainerType(), pm,
-                    clauses.requires, clauses.measuredBy,
+                    TB.convertToFormula(clauses.requires,services), clauses.measuredBy,
                     clauses.accessible, progVars.selfVar,
                     progVars.paramVars);
             result = result.add(depContract);
@@ -650,9 +649,9 @@ public class JMLSpecFactory {
         ProgramVariable selfVar = TB.selfVar(services, kjt, false);
 
         //translateToTerm expression
-        Term inv = JMLTranslator.translate(originalInv, kjt, selfVar, null, null,
+        Term inv = TB.convertToFormula(JMLTranslator.translate(originalInv, kjt, selfVar, null, null,
                                            null, null, null, Term.class,
-                                           services);
+                                           services),services);
         //create invariant
         String name = getDefaultInvName(null, kjt);
         return new ClassInvariantImpl(name,
@@ -672,9 +671,9 @@ public class JMLSpecFactory {
         ProgramVariable selfVar = TB.selfVar(services, kjt, false);
 
         //translateToTerm expression
-        Term inv = JMLTranslator.translate(textualInv.getInv(), kjt, selfVar,
+        Term inv = TB.convertToFormula(JMLTranslator.translate(textualInv.getInv(), kjt, selfVar,
                                            null, null, null, null, null,
-                                           Term.class, services);
+                                           Term.class, services),services);
         //create invariant
         String name = getDefaultInvName(null, kjt);
         String display = getDefaultInvName(textualInv.getName(), kjt);
@@ -700,9 +699,9 @@ public class JMLSpecFactory {
         ProgramVariable selfVar = TB.selfVar(services, kjt, false);
 
         //translateToTerm expression
-        Term inv = JMLTranslator.translate(original, kjt, selfVar, null, null,
+        Term inv = TB.convertToFormula(JMLTranslator.translate(original, kjt, selfVar, null, null,
                                            null, null, null, Term.class,
-                                           services);
+                                           services),services);
         //create invariant
         String name = getInicName();
         InitiallyClauseImpl res = new InitiallyClauseImpl(name,
@@ -725,6 +724,7 @@ public class JMLSpecFactory {
     }
 
 
+    @SuppressWarnings("unchecked")
     public ClassAxiom createJMLRepresents(KeYJavaType kjt,
                                           VisibilityModifier visibility,
                                           PositionedString originalRep,
@@ -751,13 +751,14 @@ public class JMLSpecFactory {
             }
         }
         modelFields.add(new Pair<KeYJavaType, ObserverFunction>(kjt, rep.first));
+        Term repFormula = TB.convertToFormula(rep.second, services);
         //create class axiom
         return new RepresentsAxiom("JML represents clause for "
                                    + rep.first.name().toString(),
                                    rep.first,
                                    kjt,
                                    visibility,
-                                   rep.second,
+                                   repFormula,
                                    selfVar);
     }
 
@@ -788,11 +789,12 @@ public class JMLSpecFactory {
         String displayName = textualRep.getName() == null ? name
                              : "JML represents clause \"" + textualRep.getName()
                                + "\" for " + rep.first.name();
+        Term repFormula = TB.convertToFormula(rep.second, services);
         return new RepresentsAxiom(name, displayName,
                                    rep.first,
                                    kjt,
                                    getVisibility(textualRep),
-                                   rep.second,
+                                   repFormula,
                                    selfVar);
     }
 
@@ -815,9 +817,9 @@ public class JMLSpecFactory {
         final ProgramVariable selfVar = TB.selfVar(services, kjt, false);
 
         //translate expression
-        final Term ax =
+        final Term ax = TB.convertToFormula(
                 JMLTranslator.translate(originalRep, kjt, selfVar, null, null,
-                                        null, null, null, Term.class, services);
+                                        null, null, null, Term.class, services),services);
 
         //create class axiom
         String name = "class axiom in " + kjt.getFullName();
@@ -829,6 +831,7 @@ public class JMLSpecFactory {
     }
 
 
+    @SuppressWarnings("unchecked")
     public Contract createJMLDependencyContract(KeYJavaType kjt,
                                                 PositionedString originalDep)
             throws SLTranslationException {
@@ -935,7 +938,7 @@ public class JMLSpecFactory {
                                                 selfVar, paramVars, null,
                                                 null, heapAtPre, null,
                                                 Term.class, services);
-                invariant = TB.and(invariant, translated);
+                invariant = TB.and(invariant, TB.convertToFormula(translated,services));
             }
         }
         Term transactionInvariant;
@@ -950,7 +953,7 @@ public class JMLSpecFactory {
                                                 null, heapAtPre,
                                                 savedHeapAtPre, Term.class,
                                                 services);
-                transactionInvariant = TB.and(transactionInvariant, translated);
+                transactionInvariant = TB.and(transactionInvariant, TB.convertToFormula(translated,services));
             }
         }
 

@@ -132,11 +132,11 @@ public class SettingsConverter {
         }
         
         public static void main(String [] args){
+
                 String test = "\\test";
                 String result = decode(test);
                 System.out.println(result);
                 System.out.println(encode(result));
-               
         }
 
 }

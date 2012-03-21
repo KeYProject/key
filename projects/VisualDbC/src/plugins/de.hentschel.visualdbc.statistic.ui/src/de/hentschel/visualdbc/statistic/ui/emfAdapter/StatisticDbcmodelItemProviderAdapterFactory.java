@@ -25,6 +25,8 @@ import de.hentschel.visualdbc.dbcmodel.DbcMethod;
 import de.hentschel.visualdbc.dbcmodel.DbcOperationContract;
 import de.hentschel.visualdbc.dbcmodel.DbcProof;
 import de.hentschel.visualdbc.dbcmodel.DbcProofObligation;
+import de.hentschel.visualdbc.dbcmodel.provider.DbCAxiomContractItemProvider;
+import de.hentschel.visualdbc.dbcmodel.provider.DbcAxiomItemProvider;
 import de.hentschel.visualdbc.dbcmodel.provider.DbcClassItemProvider;
 import de.hentschel.visualdbc.dbcmodel.provider.DbcConstructorItemProvider;
 import de.hentschel.visualdbc.dbcmodel.provider.DbcEnumItemProvider;
@@ -80,6 +82,16 @@ public class StatisticDbcmodelItemProviderAdapterFactory extends DbcmodelItemPro
     * The sued {@link StatisticDbcOperationContractItemProvider} instead of the {@link DbcOperationContractItemProvider}.
     */
    private StatisticDbcOperationContractItemProvider statisticDbcOperationContractItemProvider;
+
+   /**
+    * The sued {@link StatisticDbcAxiomItemProvider} instead of the {@link DbcAxiomItemProvider}.
+    */
+   private StatisticDbcAxiomItemProvider statisticDbcAxiomItemProvider;
+
+   /**
+    * The sued {@link StatisticDbcAxiomContractItemProvider} instead of the {@link DbCAxiomContractItemProvider}.
+    */
+   private StatisticDbcAxiomContractItemProvider statisticDbcAxiomContractItemProvider;
    
    /**
     * The shown {@link DbCProofObligation}s in the columns after the main column.
@@ -156,6 +168,28 @@ public class StatisticDbcmodelItemProviderAdapterFactory extends DbcmodelItemPro
     * {@inheritDoc}
     */
    @Override
+   public Adapter createDbcAxiomAdapter() {
+      if (statisticDbcAxiomItemProvider == null) {
+         statisticDbcAxiomItemProvider = new StatisticDbcAxiomItemProvider(this);
+      }
+      return statisticDbcAxiomItemProvider;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public Adapter createDbCAxiomContractAdapter() {
+      if (statisticDbcAxiomContractItemProvider == null) {
+         statisticDbcAxiomContractItemProvider = new StatisticDbcAxiomContractItemProvider(this);
+      }
+      return statisticDbcAxiomContractItemProvider;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
    public Adapter createDbcMethodAdapter() {
       if (statisticDbcMethodItemProvider == null) {
          statisticDbcMethodItemProvider = new StatisticDbcMethodItemProvider(this);
@@ -213,6 +247,12 @@ public class StatisticDbcmodelItemProviderAdapterFactory extends DbcmodelItemPro
       }
       if (statisticDbcPackageItemProvider != null) {
          statisticDbcPackageItemProvider.dispose();
+      }
+      if (statisticDbcAxiomItemProvider != null) {
+         statisticDbcAxiomItemProvider.dispose();
+      }
+      if (statisticDbcAxiomContractItemProvider != null) {
+         statisticDbcAxiomContractItemProvider.dispose();
       }
       super.dispose();
    }

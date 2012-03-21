@@ -606,10 +606,7 @@ public class Goal  {
         
         proof.getServices().saveNameRecorder(n);
         
-        if ( goalList == null ) {
-            // this happens for the simplify decision procedure
-            // we do nothing in this case
-        } else if ( goalList.isEmpty() ) {
+        if ( goalList.isEmpty() ) {
             proof.closeGoal ( this );           
         } else {
             proof.replace ( this, goalList );

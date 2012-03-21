@@ -32,7 +32,6 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
@@ -48,6 +47,7 @@ import de.uka.ilkd.key.proof.delayedcut.DelayedCutListener;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCutProcessor;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.proof.join.JoinProcessor;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
@@ -90,6 +90,8 @@ public class KeYMediator {
     private boolean stupidMode; // minimize user interaction
 
     private boolean autoMode; // autoModeStarted has been fired
+    
+    private TacletFilter filterForInteractiveProving;
     
     /** creates the KeYMediator with a reference to the application's
      * main frame and the current proof settings
@@ -223,6 +225,29 @@ public class KeYMediator {
 	}
 	return loaded;
     }
+    
+    /**
+     * Returns a filter that is used for filtering taclets that should not be showed while
+     * interactive proving. 
+     */
+    public TacletFilter getFilterForInteractiveProving() {
+    	if(filterForInteractiveProving == null){
+    		filterForInteractiveProving = new TacletFilter(){
+
+				@Override
+				protected boolean filter(Taclet taclet) {
+					for(String name : JoinProcessor.SIMPLIFY_UPDATE){
+						if(name.equals(taclet.name().toString())){
+							return false;
+						}
+					}
+					return true;
+				}
+    			
+    		};
+    	}
+    	return filterForInteractiveProving;
+	}
     
     /** Undo.
      * @author VK
@@ -553,7 +578,7 @@ public class KeYMediator {
     }
 
     public void removeAutoModeListener(AutoModeListener listener) {  
-	interactiveProver.addAutoModeListener(listener);
+	interactiveProver.removeAutoModeListener(listener);
     }
 
     /** sets the current goal 

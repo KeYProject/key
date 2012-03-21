@@ -1,0 +1,1 @@
+AutomaticVerifier KeYonly

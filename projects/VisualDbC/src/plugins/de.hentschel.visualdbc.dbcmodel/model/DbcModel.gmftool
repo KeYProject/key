@@ -114,6 +114,24 @@
         collapsible="true">
       <tools
           xsi:type="gmftool:CreationTool"
+          title="Axiom"
+          description="Create new axiom">
+        <smallIcon
+            xsi:type="gmftool:DefaultImage"/>
+        <largeIcon
+            xsi:type="gmftool:DefaultImage"/>
+      </tools>
+      <tools
+          xsi:type="gmftool:CreationTool"
+          title="Axiom Contract"
+          description="Create new axiom contract">
+        <smallIcon
+            xsi:type="gmftool:DefaultImage"/>
+        <largeIcon
+            xsi:type="gmftool:DefaultImage"/>
+      </tools>
+      <tools
+          xsi:type="gmftool:CreationTool"
           title="Invariant"
           description="Create new invariant">
         <smallIcon

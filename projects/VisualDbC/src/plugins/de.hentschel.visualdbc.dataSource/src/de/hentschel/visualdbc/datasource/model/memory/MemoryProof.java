@@ -11,6 +11,7 @@
 
 package de.hentschel.visualdbc.datasource.model.memory;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -27,7 +28,7 @@ public class MemoryProof extends AbstractDSProof {
    /**
     * Contains the available proof references.
     */
-   private List<IDSProvableReference> proofReferences = new LinkedList<IDSProvableReference>();
+   private List<IDSProvableReference> proofReferences = Collections.synchronizedList(new LinkedList<IDSProvableReference>());
 
    /**
     * Indicates that the proof is closed.

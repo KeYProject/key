@@ -129,6 +129,8 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
             if(next.op() == UpdateJunctor.PARALLEL_UPDATE){
                  updates.add(next.sub(0));
                  updates.add(next.sub(1));
+            }else if(next.op() == UpdateJunctor.SKIP){
+            	return true;            	
             }else if(next.op() instanceof ElementaryUpdate){
                 ElementaryUpdate eu = (ElementaryUpdate) next.op();
                  if(collected.contains(eu.lhs())){
@@ -176,10 +178,14 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
         Term tInst      = (Term) svInst.getInstantiation(commonFormula);
         Term phiInst    = (Term) svInst.getInstantiation(phi);
         Term resultInst = (Term) svInst.getInstantiation(result);
-        if(u1Inst == null || u2Inst == null || tInst==null || phiInst==null) {
+        
+        if(tInst==null || phiInst==null) {
             return mc;
         }
         
+        u1Inst = u1Inst == null ? TermBuilder.DF.skip() : u1Inst;
+        u2Inst = u2Inst == null ? TermBuilder.DF.skip() : u2Inst;
+
         Term properResultInst = simplify(phiInst, u1Inst, u2Inst, tInst, services);
         if(properResultInst == null) {
             return null;

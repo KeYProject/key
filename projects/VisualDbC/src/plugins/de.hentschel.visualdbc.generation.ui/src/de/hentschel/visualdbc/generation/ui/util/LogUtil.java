@@ -11,7 +11,7 @@
 
 package de.hentschel.visualdbc.generation.ui.util;
 
-import org.key_project.key4eclipse.util.eclipse.Logger;
+import org.key_project.util.eclipse.Logger;
 
 import de.hentschel.visualdbc.generation.ui.Activator;
 

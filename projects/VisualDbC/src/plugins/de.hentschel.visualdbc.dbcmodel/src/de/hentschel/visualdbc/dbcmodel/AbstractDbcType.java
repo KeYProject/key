@@ -31,6 +31,7 @@ import org.eclipse.emf.common.util.EList;
  *   <li>{@link de.hentschel.visualdbc.dbcmodel.AbstractDbcType#getVisibility <em>Visibility</em>}</li>
  *   <li>{@link de.hentschel.visualdbc.dbcmodel.AbstractDbcType#isStatic <em>Static</em>}</li>
  *   <li>{@link de.hentschel.visualdbc.dbcmodel.AbstractDbcType#getInvariants <em>Invariants</em>}</li>
+ *   <li>{@link de.hentschel.visualdbc.dbcmodel.AbstractDbcType#getAxioms <em>Axioms</em>}</li>
  * </ul>
  * </p>
  *
@@ -138,11 +139,35 @@ public interface AbstractDbcType extends AbstractDbcTypeContainer, IDbCProvable 
    EList<DbcInvariant> getInvariants();
 
    /**
+    * Returns the value of the '<em><b>Axioms</b></em>' containment reference list.
+    * The list contents are of type {@link de.hentschel.visualdbc.dbcmodel.DbcAxiom}.
+    * <!-- begin-user-doc -->
+     * <p>
+     * If the meaning of the '<em>Axioms</em>' containment reference list isn't clear,
+     * there really should be more of a description here...
+     * </p>
+     * <!-- end-user-doc -->
+    * @return the value of the '<em>Axioms</em>' containment reference list.
+    * @see de.hentschel.visualdbc.dbcmodel.DbcmodelPackage#getAbstractDbcType_Axioms()
+    * @model containment="true"
+    * @generated
+    */
+    EList<DbcAxiom> getAxioms();
+
+/**
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
     * @model
     * @generated
     */
    DbcInvariant getInvariant(String condition);
+
+/**
+    * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+    * @model
+    * @generated
+    */
+    DbcAxiom getAxiom(String definition);
 
 } // AbstractDbcType

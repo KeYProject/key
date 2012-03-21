@@ -668,7 +668,9 @@ public final class SpecificationRepository {
         for(String atomicName : atomicNames) {
             Contract atomicContract = contractsByName.get(atomicName);
             if(atomicContract == null) {
-                return null;
+                // This case happens in the symbolic execution debugger when 
+                // a temporary contract is used which is not part of the SpecificationRepository
+                return DefaultImmutableSet.<Contract>nil(); // Null can not returned, because it causes many NullPointerExceptions 
             }
             assert atomicContract.getTarget().equals(contract.getTarget());
             result = result.add(atomicContract);
@@ -791,7 +793,7 @@ public final class SpecificationRepository {
 	//add query axioms for own class
 	for(ProgramMethod pm : services.getJavaInfo()
 		                       .getAllProgramMethods(kjt)) {
-	    if(pm.getKeYJavaType() != null && !pm.isImplicit()) {
+	    if(!pm.isVoid() && !pm.isConstructor() && !pm.isImplicit()) {
 		pm = services.getJavaInfo().getToplevelPM(kjt, pm);		
 		final ClassAxiom queryAxiom 
 		    = new QueryAxiom("Query axiom for " + pm.getName() 

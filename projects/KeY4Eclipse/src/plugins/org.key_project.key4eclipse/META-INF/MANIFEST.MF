@@ -4,7 +4,9 @@ Bundle-Name: KeY 4 Eclipse
 Bundle-SymbolicName: org.key_project.key4eclipse
 Bundle-Version: 1.0.0.qualifier
 Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime
+ org.eclipse.core.runtime,
+ org.eclipse.core.resources;bundle-version="3.7.100",
+ org.key_project.util;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: lib/antlr.jar,
  lib/javacc.jar,
@@ -105,6 +107,7 @@ Export-Package: .,
  org.javacc.jjdoc,
  org.javacc.jjtree,
  org.javacc.parser,
+ org.key_project.key4eclipse.util,
  org.objenesis,
  org.objenesis.instantiator,
  org.objenesis.instantiator.basic,

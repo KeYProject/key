@@ -28,7 +28,7 @@ public class TypeTest extends TestCase {
     * Tests the flags of classes.
     */
    @Test
-   public void testClassFlags() {
+   public void testClassFlags() throws Exception {
       TestKeyUtil.testKeyConnection("ClassTest_testClassFlags",
                                     "data/typeTest",
                                     null,

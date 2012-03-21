@@ -14,6 +14,7 @@ package de.hentschel.visualdbc.dbcmodel.diagram.edit.policies;
 import org.eclipse.gef.commands.Command;
 import org.eclipse.gmf.runtime.emf.type.core.requests.CreateElementRequest;
 
+import de.hentschel.visualdbc.dbcmodel.diagram.edit.commands.DbcAxiomCreateCommand;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.commands.DbcClass2CreateCommand;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.commands.DbcConstructorCreateCommand;
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.commands.DbcEnum2CreateCommand;
@@ -60,6 +61,9 @@ public class DbcClassDbcClassMainCompartmentItemSemanticEditPolicy extends
       }
       if (DbCElementTypes.DbcProof_3034 == req.getElementType()) {
          return getGEFWrapper(new DbcProof2CreateCommand(req));
+      }
+      if (DbCElementTypes.DbcAxiom_3036 == req.getElementType()) {
+         return getGEFWrapper(new DbcAxiomCreateCommand(req));
       }
       return super.getCreateCommand(req);
    }

@@ -17,7 +17,13 @@ import de.hentschel.visualdbc.datasource.model.exception.DSException;
  * Represents an enumeration literal on the data source.
  * @author Martin Hentschel
  */
-public interface IDSEnumLiteral {
+public interface IDSEnumLiteral extends IDSProvable {
+   /**
+    * Returns the parent.
+    * @return The parent.
+    */
+   public IDSEnum getParent();
+   
    /**
     * Returns the enumeration literal name.
     * @return The enumeration literal name.

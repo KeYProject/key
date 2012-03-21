@@ -38,8 +38,8 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.key_project.key4eclipse.util.eclipse.BundleUtil;
-import org.key_project.key4eclipse.util.test.util.TestUtilsUtil;
+import org.key_project.util.eclipse.BundleUtil;
+import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.hentschel.visualdbc.datasource.model.IDSClass;
 import de.hentschel.visualdbc.datasource.model.IDSConnection;

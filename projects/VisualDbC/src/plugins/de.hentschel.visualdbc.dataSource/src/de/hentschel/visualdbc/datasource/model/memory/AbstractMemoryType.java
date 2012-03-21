@@ -11,16 +11,22 @@
 
 package de.hentschel.visualdbc.datasource.model.memory;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.key_project.util.java.ObjectUtil;
+
 import de.hentschel.visualdbc.datasource.model.DSVisibility;
+import de.hentschel.visualdbc.datasource.model.IDSAttribute;
+import de.hentschel.visualdbc.datasource.model.IDSAxiom;
 import de.hentschel.visualdbc.datasource.model.IDSClass;
 import de.hentschel.visualdbc.datasource.model.IDSContainer;
 import de.hentschel.visualdbc.datasource.model.IDSEnum;
 import de.hentschel.visualdbc.datasource.model.IDSInterface;
 import de.hentschel.visualdbc.datasource.model.IDSInvariant;
 import de.hentschel.visualdbc.datasource.model.IDSType;
+import de.hentschel.visualdbc.datasource.model.exception.DSException;
 import de.hentschel.visualdbc.datasource.model.implementation.AbstractDSType;
 
 /**
@@ -78,7 +84,17 @@ public abstract class AbstractMemoryType extends AbstractDSType {
     * Contains all invariants.
     */
    private List<IDSInvariant> invariants = new LinkedList<IDSInvariant>();
+   
+   /**
+    * Contains all axioms.
+    */
+   private List<IDSAxiom> axioms = new LinkedList<IDSAxiom>();
 
+   /**
+    * The contained attributes.
+    */
+   private List<IDSAttribute> attributes = new LinkedList<IDSAttribute>();
+      
    /**
     * Sets the parent package.
     * @param parentContainer The parent package to set.
@@ -117,6 +133,14 @@ public abstract class AbstractMemoryType extends AbstractDSType {
     */
    public void setStatic(boolean isStatic) {
       this.isStatic = isStatic;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public List<IDSAttribute> getAttributes() {
+      return attributes;
    }
 
    /**
@@ -233,5 +257,79 @@ public abstract class AbstractMemoryType extends AbstractDSType {
    public void addInvariant(MemoryInvariant invariant) {
       invariants.add(invariant);
       invariant.setParent(this);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public List<IDSAxiom> getAxioms() {
+      return axioms;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IDSAxiom getAxiom(String definition) throws DSException {
+      Iterator<IDSAxiom> iter = getAxioms().iterator();
+      IDSAxiom result = null;
+      while(result == null && iter.hasNext()) {
+         IDSAxiom next = iter.next();
+         if (next != null && ObjectUtil.equals(next.getDefinition(), definition)) {
+            result = next;
+         }
+      }
+      return result;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IDSInvariant getInvariant(String condition) throws DSException {
+      Iterator<IDSInvariant> iter = getInvariants().iterator();
+      IDSInvariant result = null;
+      while(result == null && iter.hasNext()) {
+         IDSInvariant next = iter.next();
+         if (next != null && ObjectUtil.equals(next.getCondition(), condition)) {
+            result = next;
+         }
+      }
+      return result;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IDSAttribute getAttribute(String name) throws DSException {
+      Iterator<IDSAttribute> iter = getAttributes().iterator();
+      IDSAttribute result = null;
+      while(result == null && iter.hasNext()) {
+         IDSAttribute next = iter.next();
+         if (next != null && ObjectUtil.equals(next.getName(), name)) {
+            result = next;
+         }
+      }
+      return result;
+   }
+   
+   /**
+    * Adds the axiom and updates his parent reference.
+    * @param axiom The axiom to add.
+    */
+   public void addAxiom(MemoryAxiom axiom) {
+      axioms.add(axiom);
+      axiom.setParent(this);
+   }
+   
+   /**
+    * Adds the attribute and updates his parent reference.
+    * @param attribute The attribute to add.
+    */
+   public void addAttribute(MemoryAttribute attribute) {
+      attributes.add(attribute);
+      attribute.setParent(this);
    }
 }

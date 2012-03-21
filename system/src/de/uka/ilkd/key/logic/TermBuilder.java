@@ -256,14 +256,14 @@ public final class TermBuilder {
      */
     public LocationVariable resultVar(Services services, String name,
 	    ProgramMethod pm, boolean makeNameUnique) {
-	if(pm.getKeYJavaType() == null || pm.isConstructor()) {
+	if(pm.isVoid() || pm.isConstructor()) {
 	    return null;
 	} else {
 	    if(makeNameUnique) {
 		name = newName(services, name);
 	    }
 	    return new LocationVariable(new ProgramElementName(name),
-				    	pm.getKeYJavaType());
+				    	pm.getReturnType());
 	}
     }
     

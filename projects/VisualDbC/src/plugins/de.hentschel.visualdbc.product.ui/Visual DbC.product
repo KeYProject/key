@@ -33,6 +33,8 @@ Visualization of program specification with design by contract
       startupMessageRect="30,252,445,20"
       startupForegroundColor="3F3F3F" />
    <launcher name="Visual DbC">
+      <linux icon="/de.hentschel.visualdbc.product.ui/icons/logo48.xpm"/>
+      <macosx icon="/de.hentschel.visualdbc.product.ui/icons/logo128.icns"/>
       <solaris/>
       <win useIco="true">
          <ico path="/de.hentschel.visualdbc.product.ui/icons/logo.ico"/>

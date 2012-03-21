@@ -432,6 +432,52 @@ public class DbcmodelItemProviderAdapterFactory extends DbcmodelAdapterFactory i
    }
 
    /**
+    * This keeps track of the one adapter used for all {@link de.hentschel.visualdbc.dbcmodel.DbcAxiom} instances.
+    * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+    * @generated
+    */
+    protected DbcAxiomItemProvider dbcAxiomItemProvider;
+
+/**
+    * This creates an adapter for a {@link de.hentschel.visualdbc.dbcmodel.DbcAxiom}.
+    * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+    * @generated
+    */
+    @Override
+    public Adapter createDbcAxiomAdapter() {
+      if (dbcAxiomItemProvider == null) {
+         dbcAxiomItemProvider = new DbcAxiomItemProvider(this);
+      }
+
+      return dbcAxiomItemProvider;
+   }
+
+/**
+    * This keeps track of the one adapter used for all {@link de.hentschel.visualdbc.dbcmodel.DbCAxiomContract} instances.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
+   protected DbCAxiomContractItemProvider dbCAxiomContractItemProvider;
+
+/**
+    * This creates an adapter for a {@link de.hentschel.visualdbc.dbcmodel.DbCAxiomContract}.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
+   @Override
+   public Adapter createDbCAxiomContractAdapter() {
+      if (dbCAxiomContractItemProvider == null) {
+         dbCAxiomContractItemProvider = new DbCAxiomContractItemProvider(this);
+      }
+
+      return dbCAxiomContractItemProvider;
+   }
+
+/**
     * This returns the root adapter factory that contains this factory.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
@@ -545,6 +591,8 @@ public class DbcmodelItemProviderAdapterFactory extends DbcmodelAdapterFactory i
       if (dbcOperationContractItemProvider != null) dbcOperationContractItemProvider.dispose();
       if (dbcPropertyItemProvider != null) dbcPropertyItemProvider.dispose();
       if (dbcProofObligationItemProvider != null) dbcProofObligationItemProvider.dispose();
+      if (dbcAxiomItemProvider != null) dbcAxiomItemProvider.dispose();
+      if (dbCAxiomContractItemProvider != null) dbCAxiomContractItemProvider.dispose();
    }
 
 }

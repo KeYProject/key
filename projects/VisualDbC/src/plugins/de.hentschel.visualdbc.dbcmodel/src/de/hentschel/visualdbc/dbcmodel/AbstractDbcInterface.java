@@ -77,4 +77,12 @@ public interface AbstractDbcInterface extends AbstractDbcType {
     */
    DbcMethod getMethod(String signature);
 
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @model
+    * @generated
+    */
+   DbcAttribute getAttribute(String name);
+
 } // AbstractDbcInterface

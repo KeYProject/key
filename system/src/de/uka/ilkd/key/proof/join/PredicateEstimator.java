@@ -72,7 +72,19 @@ class StdPredicateEstimator implements PredicateEstimator{
          
            }
         
-        return null;
+        return new Result(){
+
+            @Override
+            public Term getPredicate() {
+                return null;
+            }
+
+            @Override
+            public Node getCommonParent() {
+                return node.parent();
+            }
+            
+        };
     }
     
     /**

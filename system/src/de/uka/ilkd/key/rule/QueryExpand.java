@@ -106,7 +106,7 @@ public class QueryExpand implements BuiltInRule {
                 new LocationVariable(
                         new ProgramElementName(VariableNameProposer.DEFAULT.
                                 getNameProposal("result", services, goal.node())), 
-                                method.getKeYJavaType());
+                                method.getReturnType());
 
 
         final MethodReference mr = new MethodReference(args, method.getProgramElementName(), callee);

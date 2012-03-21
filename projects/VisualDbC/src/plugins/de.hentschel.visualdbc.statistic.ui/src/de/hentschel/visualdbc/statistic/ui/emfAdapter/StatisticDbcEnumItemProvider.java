@@ -56,6 +56,7 @@ public class StatisticDbcEnumItemProvider extends DbcEnumItemProvider implements
       result.add(DbcmodelPackage.Literals.ABSTRACT_DBC_INTERFACE__METHODS);
       result.add(DbcmodelPackage.Literals.ABSTRACT_DBC_CLASS__CONSTRUCTORS);
       result.add(DbcmodelPackage.Literals.ABSTRACT_DBC_TYPE_CONTAINER__TYPES);
+      result.add(DbcmodelPackage.Literals.ABSTRACT_DBC_TYPE__AXIOMS);
       return result;
    }
    

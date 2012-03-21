@@ -20,7 +20,7 @@ import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.ui.internal.intro.impl.IntroPlugin;
 import org.junit.Test;
-import org.key_project.key4eclipse.util.test.util.TestUtilsUtil;
+import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.hentschel.visualdbc.example.action.KeyQuicktourWizardIntroAction;
 

@@ -23,7 +23,7 @@ public class DbCNavigatorSorter extends ViewerSorter {
    /**
     * @generated
     */
-   private static final int GROUP_CATEGORY = 7065;
+   private static final int GROUP_CATEGORY = 7066;
 
    /**
     * @generated

@@ -212,30 +212,7 @@ public class ClassTree extends JTree {
             });
             
             for(ObserverFunction target : targetsArr) {
-        	StringBuffer sb = new StringBuffer();
-        	String prettyName = services.getTypeConverter()
-        	                            .getHeapLDT()
-        	                            .getPrettyFieldName(target);
-        	if(prettyName != null) {
-        	    sb.append(prettyName);
-        	} else if(target.name() instanceof ProgramElementName) {
-        	    sb.append(((ProgramElementName)target.name()).getProgramName());
-        	} else {
-        	    sb.append(target.name());
-        	}
-        	if(target.getNumParams() > 0 || target instanceof ProgramMethod) {
-        	    sb.append("(");
-        	}
-        	for(KeYJavaType paramType : target.getParamTypes()) {
-        	    sb.append(paramType.getSort().name() + ", ");
-        	}
-        	if(target.getNumParams() > 0) {
-        	    sb.setLength(sb.length() - 2);
-        	}
-        	if(target.getNumParams() > 0 || target instanceof ProgramMethod) {
-        	    sb.append(")");
-        	}
-        	Entry te = new Entry(sb.toString());
+        	Entry te = new Entry(getDisplayName(services, target));
         	DefaultMutableTreeNode childNode 
         		= new DefaultMutableTreeNode(te);
         	te.kjt = kjt;
@@ -243,6 +220,46 @@ public class ClassTree extends JTree {
         	node.add(childNode);
             }
         }
+    }
+    
+    /**
+     * <p>
+     * Returns a human readable display name for the given {@link ObserverFunction}
+     * with use of the given {@link Services}.
+     * </p>
+     * <p>
+     * This functionality is also required by other products and is for that
+     * reason available as static utility method.
+     * </p>
+     * @param services The {@link Services} to use.
+     * @param ov The {@link ObserverFunction} for that a display name is needed.
+     * @return The display name for the given {@link ObserverFunction}.
+     */
+    public static final String getDisplayName(Services services, ObserverFunction ov) {
+        StringBuffer sb = new StringBuffer();
+        String prettyName = services.getTypeConverter()
+                                    .getHeapLDT()
+                                    .getPrettyFieldName(ov);
+        if(prettyName != null) {
+            sb.append(prettyName);
+        } else if(ov.name() instanceof ProgramElementName) {
+            sb.append(((ProgramElementName)ov.name()).getProgramName());
+        } else {
+            sb.append(ov.name());
+        }
+        if(ov.getNumParams() > 0 || ov instanceof ProgramMethod) {
+            sb.append("(");
+        }
+        for(KeYJavaType paramType : ov.getParamTypes()) {
+            sb.append(paramType.getSort().name() + ", ");
+        }
+        if(ov.getNumParams() > 0) {
+            sb.setLength(sb.length() - 2);
+        }
+        if(ov.getNumParams() > 0 || ov instanceof ProgramMethod) {
+            sb.append(")");
+        }
+        return sb.toString();
     }
 
     

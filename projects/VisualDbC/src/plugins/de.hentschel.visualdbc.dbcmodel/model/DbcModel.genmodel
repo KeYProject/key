@@ -83,6 +83,9 @@
       <genOperations ecoreOperation="DbcModel.ecore#//AbstractDbcInterface/getMethod">
         <genParameters ecoreParameter="DbcModel.ecore#//AbstractDbcInterface/getMethod/signature"/>
       </genOperations>
+      <genOperations ecoreOperation="DbcModel.ecore#//AbstractDbcInterface/getAttribute">
+        <genParameters ecoreParameter="DbcModel.ecore#//AbstractDbcInterface/getAttribute/name"/>
+      </genOperations>
     </genClasses>
     <genClasses ecoreClass="DbcModel.ecore#//DbcInterface">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference DbcModel.ecore#//DbcInterface/extends"/>
@@ -92,12 +95,19 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DbcModel.ecore#//AbstractDbcType/visibility"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DbcModel.ecore#//AbstractDbcType/static"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DbcModel.ecore#//AbstractDbcType/invariants"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DbcModel.ecore#//AbstractDbcType/axioms"/>
       <genOperations ecoreOperation="DbcModel.ecore#//AbstractDbcType/getInvariant">
         <genParameters ecoreParameter="DbcModel.ecore#//AbstractDbcType/getInvariant/condition"/>
+      </genOperations>
+      <genOperations ecoreOperation="DbcModel.ecore#//AbstractDbcType/getAxiom">
+        <genParameters ecoreParameter="DbcModel.ecore#//AbstractDbcType/getAxiom/definition"/>
       </genOperations>
     </genClasses>
     <genClasses image="false" ecoreClass="DbcModel.ecore#//AbstractDbcEnum">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DbcModel.ecore#//AbstractDbcEnum/literals"/>
+      <genOperations ecoreOperation="DbcModel.ecore#//AbstractDbcEnum/getLiteral">
+        <genParameters ecoreParameter="DbcModel.ecore#//AbstractDbcEnum/getLiteral/name"/>
+      </genOperations>
     </genClasses>
     <genClasses ecoreClass="DbcModel.ecore#//DbcEnum"/>
     <genClasses ecoreClass="DbcModel.ecore#//DbcEnumLiteral">
@@ -146,6 +156,18 @@
     <genClasses image="false" ecoreClass="DbcModel.ecore#//IDbCProofReferencable"/>
     <genClasses ecoreClass="DbcModel.ecore#//DbcProofObligation">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DbcModel.ecore#//DbcProofObligation/obligation"/>
+    </genClasses>
+    <genClasses ecoreClass="DbcModel.ecore#//DbcAxiom">
+      <genFeatures createChild="false" propertyMultiLine="true" ecoreFeature="ecore:EAttribute DbcModel.ecore#//DbcAxiom/definition"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DbcModel.ecore#//DbcAxiom/axiomContracts"/>
+      <genOperations ecoreOperation="DbcModel.ecore#//DbcAxiom/getAxiomContract">
+        <genParameters ecoreParameter="DbcModel.ecore#//DbcAxiom/getAxiomContract/pre"/>
+        <genParameters ecoreParameter="DbcModel.ecore#//DbcAxiom/getAxiomContract/dep"/>
+      </genOperations>
+    </genClasses>
+    <genClasses ecoreClass="DbcModel.ecore#//DbCAxiomContract">
+      <genFeatures createChild="false" propertyMultiLine="true" ecoreFeature="ecore:EAttribute DbcModel.ecore#//DbCAxiomContract/pre"/>
+      <genFeatures createChild="false" propertyMultiLine="true" ecoreFeature="ecore:EAttribute DbcModel.ecore#//DbCAxiomContract/dep"/>
     </genClasses>
   </genPackages>
 </genmodel:GenModel>

@@ -1,21 +1,10 @@
-/*******************************************************************************
- * Copyright (c) 2011 Martin Hentschel.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *    Martin Hentschel - initial API and implementation
- *******************************************************************************/
-
 package org.key_project.key4eclipse.starter.core.test.testcase;
 
 import junit.framework.TestCase;
 
 import org.junit.Test;
 import org.key_project.key4eclipse.starter.core.util.LogUtil;
-import org.key_project.key4eclipse.util.eclipse.Logger;
+import org.key_project.util.eclipse.Logger;
 
 /**
  * Contains tests for {@link LogUtil}

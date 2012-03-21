@@ -21,6 +21,21 @@ import de.hentschel.visualdbc.datasource.model.exception.DSException;
  */
 public interface IDSType extends IDSProvable {
    /**
+    * Returns all contained attributes.
+    * @return The contained attributes.
+    * @throws DSException Occurred Exception
+    */
+   public List<IDSAttribute> getAttributes() throws DSException;
+
+   /**
+    * Returns the attribute with the given name.
+    * @param definition The name.
+    * @return The found {@link IDSAttribute} or {@code null} if no one was found.
+    * @throws DSException Occurred Exception.
+    */
+   public IDSAttribute getAttribute(String name) throws DSException;
+   
+   /**
     * Returns the parent {@link IDSPackage} or {@link IDSContainer} or
     * {@code null} if it has no one. 
     * @return The parent {@link IDSContainer} or {@code null} if it has no one.
@@ -109,4 +124,27 @@ public interface IDSType extends IDSProvable {
     * @throws DSException Occurred Exception
     */
    public List<IDSInvariant> getInvariants() throws DSException;
+
+   /**
+    * Returns the invariant with the given condition.
+    * @param definition The condition.
+    * @return The found {@link IDSInvariant} or {@code null} if no one was found.
+    * @throws DSException Occurred Exception.
+    */
+   public IDSInvariant getInvariant(String condition) throws DSException;
+
+   /**
+    * Returns the axiom with the given definition.
+    * @param definition The definition.
+    * @return The found {@link IDSAxiom} or {@code null} if no one was found.
+    * @throws DSException Occurred Exception.
+    */
+   public IDSAxiom getAxiom(String definition) throws DSException;
+   
+   /**
+    * Returns all contained axioms.
+    * @return The contained axioms.
+    * @throws DSException Occurred Exception
+    */
+   public List<IDSAxiom> getAxioms() throws DSException;
 }

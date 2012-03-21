@@ -53,7 +53,7 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="target" eType="#//IDbCProofReferencable"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="kind" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="DbcAttribute">
+  <eClassifiers xsi:type="ecore:EClass" name="DbcAttribute" eSuperTypes="#//IDbCProofReferencable">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="type" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="visibility" eType="#//DbcVisibility"
@@ -81,6 +81,9 @@
     <eOperations name="getMethod" eType="#//DbcMethod">
       <eParameters name="signature" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     </eOperations>
+    <eOperations name="getAttribute" eType="#//DbcAttribute">
+      <eParameters name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eOperations>
     <eStructuralFeatures xsi:type="ecore:EReference" name="methods" upperBound="-1"
         eType="#//DbcMethod" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="attributes" upperBound="-1"
@@ -94,19 +97,27 @@
     <eOperations name="getInvariant" eType="#//DbcInvariant">
       <eParameters name="condition" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     </eOperations>
+    <eOperations name="getAxiom" eType="#//DbcAxiom">
+      <eParameters name="definition" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eOperations>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="visibility" eType="#//DbcVisibility"
         defaultValueLiteral="public"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="static" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="invariants" upperBound="-1"
         eType="#//DbcInvariant" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="axioms" upperBound="-1"
+        eType="#//DbcAxiom" containment="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="AbstractDbcEnum" abstract="true" eSuperTypes="#//AbstractDbcClass">
+    <eOperations name="getLiteral" eType="#//DbcEnumLiteral">
+      <eParameters name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eOperations>
     <eStructuralFeatures xsi:type="ecore:EReference" name="literals" upperBound="-1"
         eType="#//DbcEnumLiteral" containment="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="DbcEnum" eSuperTypes="#//AbstractDbcEnum"/>
-  <eClassifiers xsi:type="ecore:EClass" name="DbcEnumLiteral">
+  <eClassifiers xsi:type="ecore:EClass" name="DbcEnumLiteral" eSuperTypes="#//IDbCProofReferencable">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EEnum" name="DbcProofStatus">
@@ -168,5 +179,18 @@
       interface="true"/>
   <eClassifiers xsi:type="ecore:EClass" name="DbcProofObligation">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="obligation" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="DbcAxiom" eSuperTypes="#//IDbCProofReferencable #//AbstractDbcSpecification">
+    <eOperations name="getAxiomContract" eType="#//DbCAxiomContract">
+      <eParameters name="pre" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      <eParameters name="dep" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eOperations>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="definition" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="axiomContracts" upperBound="-1"
+        eType="#//DbCAxiomContract" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="DbCAxiomContract" eSuperTypes="#//AbstractDbcSpecification #//IDbCProvable">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="pre" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="dep" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
 </ecore:EPackage>

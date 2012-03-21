@@ -14,6 +14,7 @@ package de.hentschel.visualdbc.statistic.ui.util;
 import java.util.List;
 
 import org.eclipse.emf.common.notify.Notification;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.edit.provider.ComposedAdapterFactory;
 import org.eclipse.emf.edit.provider.INotifyChangedListener;
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -22,6 +23,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.TreeItem;
 
+import de.hentschel.visualdbc.dbcmodel.DbcProof;
 import de.hentschel.visualdbc.dbcmodel.DbcProofObligation;
 import de.hentschel.visualdbc.statistic.ui.util.StatisticUtil.ProofStatus;
 
@@ -176,10 +178,35 @@ public class StatisticColorDecorator extends AbstractTreeItemDecorator {
     * @param notification The notification event.
     */
    protected void handleNotifyChanged(Notification notification) {
-      TreeItem item = searchTreeItem(notification.getNotifier());
+      TreeItem item = findVisibleItem(notification.getNotifier());
       if (item != null) {
          updateTreeItem(item);
       }
+   }
+
+   /**
+    * Finds the visible {@link TreeItem} for the given element.
+    * @param element The element for that the {@link TreeItem} is required.
+    * @return The found {@link TreeItem} or {@code null} if no one could be found.
+    */
+   protected TreeItem findVisibleItem(Object element) {
+      // Map proofs to target (proofs are not visible in the hierarchy)
+      if (element instanceof DbcProof) {
+         element = ((DbcProof)element).getTarget();
+      }
+      // Search item
+      TreeItem item = searchTreeItem(element);
+      if (item == null) {
+         // Search parent
+         EObject parent = null;
+         if (element instanceof EObject) {
+            parent = ((EObject)element).eContainer();
+         }
+         if (parent != null) {
+            item = findVisibleItem(parent);
+         }
+      }
+      return item;
    }
 
    /**

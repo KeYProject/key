@@ -14,7 +14,7 @@ package de.hentschel.visualdbc.datasource.key.test.testCase;
 import junit.framework.TestCase;
 
 import org.junit.Test;
-import org.key_project.key4eclipse.util.eclipse.Logger;
+import org.key_project.util.eclipse.Logger;
 
 import de.hentschel.visualdbc.datasource.key.util.LogUtil;
 

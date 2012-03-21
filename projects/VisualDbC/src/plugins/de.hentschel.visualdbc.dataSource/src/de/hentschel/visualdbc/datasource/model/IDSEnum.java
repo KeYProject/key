@@ -19,14 +19,7 @@ import de.hentschel.visualdbc.datasource.model.exception.DSException;
  * Represents an interface on the data source.
  * @author Martin Hentschel
  */
-public interface IDSEnum extends IDSType {
-   /**
-    * Returns all contained attributes.
-    * @return The contained attributes.
-    * @throws DSException Occurred Exception
-    */
-   public List<IDSAttribute> getAttributes() throws DSException;
-   
+public interface IDSEnum extends IDSType {   
    /**
     * Returns all contained methods.
     * @return The contained methods.
@@ -40,7 +33,7 @@ public interface IDSEnum extends IDSType {
     * @return The found {@link IDSMethod} or {@code null} if no one was found.
     * @throws DSException Occurred Exception.
     */
-   public IDSMethod getMethod(String signature) throws DSException;   
+   public IDSMethod getMethod(String signature) throws DSException;
    
    /**
     * Returns all contained constructors.
@@ -63,6 +56,14 @@ public interface IDSEnum extends IDSType {
     * @throws DSException Occurred Exception
     */
    public List<IDSEnumLiteral> getLiterals() throws DSException;
+   
+   /**
+    * Returns the enumeration literal with the given name.
+    * @param name The name.
+    * @return The found {@link IDSEnumLiteral} or {@code null} if no one was found.
+    * @throws DSException Occurred Exception.
+    */
+   public IDSEnumLiteral getLiteral(String name) throws DSException;
    
    /**
     * Returns all implements references that have a target that is contained in the model.

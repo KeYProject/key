@@ -338,7 +338,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         } else if(resultTerm != null) {
             result = TB.reachableValue(services, 
         	                       resultTerm, 
-        	                       pm.getKeYJavaType());
+        	                       pm.getReturnType());
         } else {
             result = TB.tt();
         }

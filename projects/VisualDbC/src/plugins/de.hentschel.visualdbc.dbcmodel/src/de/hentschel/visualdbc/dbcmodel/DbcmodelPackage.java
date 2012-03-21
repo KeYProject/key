@@ -424,13 +424,22 @@ public interface DbcmodelPackage extends EPackage {
    int ABSTRACT_DBC_TYPE__INVARIANTS = ABSTRACT_DBC_TYPE_CONTAINER_FEATURE_COUNT + 5;
 
    /**
+    * The feature id for the '<em><b>Axioms</b></em>' containment reference list.
+    * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+    int ABSTRACT_DBC_TYPE__AXIOMS = ABSTRACT_DBC_TYPE_CONTAINER_FEATURE_COUNT + 6;
+
+/**
     * The number of structural features of the '<em>Abstract Dbc Type</em>' class.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
     * @generated
     * @ordered
     */
-   int ABSTRACT_DBC_TYPE_FEATURE_COUNT = ABSTRACT_DBC_TYPE_CONTAINER_FEATURE_COUNT + 6;
+   int ABSTRACT_DBC_TYPE_FEATURE_COUNT = ABSTRACT_DBC_TYPE_CONTAINER_FEATURE_COUNT + 7;
 
    /**
     * The feature id for the '<em><b>Proofs</b></em>' containment reference list.
@@ -505,6 +514,15 @@ public interface DbcmodelPackage extends EPackage {
    int ABSTRACT_DBC_INTERFACE__INVARIANTS = ABSTRACT_DBC_TYPE__INVARIANTS;
 
    /**
+    * The feature id for the '<em><b>Axioms</b></em>' containment reference list.
+    * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+    int ABSTRACT_DBC_INTERFACE__AXIOMS = ABSTRACT_DBC_TYPE__AXIOMS;
+
+/**
     * The feature id for the '<em><b>Methods</b></em>' containment reference list.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
@@ -604,6 +622,15 @@ public interface DbcmodelPackage extends EPackage {
    int ABSTRACT_DBC_CLASS__INVARIANTS = ABSTRACT_DBC_INTERFACE__INVARIANTS;
 
    /**
+    * The feature id for the '<em><b>Axioms</b></em>' containment reference list.
+    * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+    int ABSTRACT_DBC_CLASS__AXIOMS = ABSTRACT_DBC_INTERFACE__AXIOMS;
+
+/**
     * The feature id for the '<em><b>Methods</b></em>' containment reference list.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
@@ -721,6 +748,15 @@ public interface DbcmodelPackage extends EPackage {
    int DBC_CLASS__INVARIANTS = ABSTRACT_DBC_CLASS__INVARIANTS;
 
    /**
+    * The feature id for the '<em><b>Axioms</b></em>' containment reference list.
+    * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+    int DBC_CLASS__AXIOMS = ABSTRACT_DBC_CLASS__AXIOMS;
+
+/**
     * The feature id for the '<em><b>Methods</b></em>' containment reference list.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
@@ -1302,13 +1338,32 @@ public interface DbcmodelPackage extends EPackage {
    int DBC_PROOF_REFERENCE_FEATURE_COUNT = 2;
 
    /**
+    * The meta object id for the '{@link de.hentschel.visualdbc.dbcmodel.IDbCProofReferencable <em>IDb CProof Referencable</em>}' class.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @see de.hentschel.visualdbc.dbcmodel.IDbCProofReferencable
+    * @see de.hentschel.visualdbc.dbcmodel.impl.DbcmodelPackageImpl#getIDbCProofReferencable()
+    * @generated
+    */
+   int IDB_CPROOF_REFERENCABLE = 24;
+
+   /**
+    * The number of structural features of the '<em>IDb CProof Referencable</em>' class.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int IDB_CPROOF_REFERENCABLE_FEATURE_COUNT = 0;
+
+   /**
     * The feature id for the '<em><b>Name</b></em>' attribute.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
     * @generated
     * @ordered
     */
-   int DBC_ATTRIBUTE__NAME = 0;
+   int DBC_ATTRIBUTE__NAME = IDB_CPROOF_REFERENCABLE_FEATURE_COUNT + 0;
 
    /**
     * The feature id for the '<em><b>Type</b></em>' attribute.
@@ -1317,7 +1372,7 @@ public interface DbcmodelPackage extends EPackage {
     * @generated
     * @ordered
     */
-   int DBC_ATTRIBUTE__TYPE = 1;
+   int DBC_ATTRIBUTE__TYPE = IDB_CPROOF_REFERENCABLE_FEATURE_COUNT + 1;
 
    /**
     * The feature id for the '<em><b>Visibility</b></em>' attribute.
@@ -1326,7 +1381,7 @@ public interface DbcmodelPackage extends EPackage {
     * @generated
     * @ordered
     */
-   int DBC_ATTRIBUTE__VISIBILITY = 2;
+   int DBC_ATTRIBUTE__VISIBILITY = IDB_CPROOF_REFERENCABLE_FEATURE_COUNT + 2;
 
    /**
     * The feature id for the '<em><b>Static</b></em>' attribute.
@@ -1335,7 +1390,7 @@ public interface DbcmodelPackage extends EPackage {
     * @generated
     * @ordered
     */
-   int DBC_ATTRIBUTE__STATIC = 3;
+   int DBC_ATTRIBUTE__STATIC = IDB_CPROOF_REFERENCABLE_FEATURE_COUNT + 3;
 
    /**
     * The feature id for the '<em><b>Final</b></em>' attribute.
@@ -1344,7 +1399,7 @@ public interface DbcmodelPackage extends EPackage {
     * @generated
     * @ordered
     */
-   int DBC_ATTRIBUTE__FINAL = 4;
+   int DBC_ATTRIBUTE__FINAL = IDB_CPROOF_REFERENCABLE_FEATURE_COUNT + 4;
 
    /**
     * The number of structural features of the '<em>Dbc Attribute</em>' class.
@@ -1353,7 +1408,7 @@ public interface DbcmodelPackage extends EPackage {
     * @generated
     * @ordered
     */
-   int DBC_ATTRIBUTE_FEATURE_COUNT = 5;
+   int DBC_ATTRIBUTE_FEATURE_COUNT = IDB_CPROOF_REFERENCABLE_FEATURE_COUNT + 5;
 
    /**
     * The feature id for the '<em><b>Proofs</b></em>' containment reference list.
@@ -1428,13 +1483,22 @@ public interface DbcmodelPackage extends EPackage {
    int DBC_INTERFACE__INVARIANTS = ABSTRACT_DBC_INTERFACE__INVARIANTS;
 
    /**
-    * The feature id for the '<em><b>Methods</b></em>' containment reference list.
+    * The feature id for the '<em><b>Axioms</b></em>' containment reference list.
     * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
+     * <!-- end-user-doc -->
     * @generated
     * @ordered
     */
-   int DBC_INTERFACE__METHODS = ABSTRACT_DBC_INTERFACE__METHODS;
+    int DBC_INTERFACE__AXIOMS = ABSTRACT_DBC_INTERFACE__AXIOMS;
+
+   /**
+    * The feature id for the '<em><b>Methods</b></em>' containment reference list.
+    * <!-- begin-user-doc -->
+       * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+      int DBC_INTERFACE__METHODS = ABSTRACT_DBC_INTERFACE__METHODS;
 
    /**
     * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
@@ -1536,13 +1600,22 @@ public interface DbcmodelPackage extends EPackage {
    int ABSTRACT_DBC_ENUM__INVARIANTS = ABSTRACT_DBC_CLASS__INVARIANTS;
 
    /**
-    * The feature id for the '<em><b>Methods</b></em>' containment reference list.
+    * The feature id for the '<em><b>Axioms</b></em>' containment reference list.
     * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
+     * <!-- end-user-doc -->
     * @generated
     * @ordered
     */
-   int ABSTRACT_DBC_ENUM__METHODS = ABSTRACT_DBC_CLASS__METHODS;
+    int ABSTRACT_DBC_ENUM__AXIOMS = ABSTRACT_DBC_CLASS__AXIOMS;
+
+   /**
+    * The feature id for the '<em><b>Methods</b></em>' containment reference list.
+    * <!-- begin-user-doc -->
+       * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+      int ABSTRACT_DBC_ENUM__METHODS = ABSTRACT_DBC_CLASS__METHODS;
 
    /**
     * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
@@ -1662,13 +1735,22 @@ public interface DbcmodelPackage extends EPackage {
    int DBC_ENUM__INVARIANTS = ABSTRACT_DBC_ENUM__INVARIANTS;
 
    /**
-    * The feature id for the '<em><b>Methods</b></em>' containment reference list.
+    * The feature id for the '<em><b>Axioms</b></em>' containment reference list.
     * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
+     * <!-- end-user-doc -->
     * @generated
     * @ordered
     */
-   int DBC_ENUM__METHODS = ABSTRACT_DBC_ENUM__METHODS;
+    int DBC_ENUM__AXIOMS = ABSTRACT_DBC_ENUM__AXIOMS;
+
+   /**
+    * The feature id for the '<em><b>Methods</b></em>' containment reference list.
+    * <!-- begin-user-doc -->
+       * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+      int DBC_ENUM__METHODS = ABSTRACT_DBC_ENUM__METHODS;
 
    /**
     * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
@@ -1722,7 +1804,7 @@ public interface DbcmodelPackage extends EPackage {
     * @generated
     * @ordered
     */
-   int DBC_ENUM_LITERAL__NAME = 0;
+   int DBC_ENUM_LITERAL__NAME = IDB_CPROOF_REFERENCABLE_FEATURE_COUNT + 0;
 
    /**
     * The number of structural features of the '<em>Dbc Enum Literal</em>' class.
@@ -1731,7 +1813,7 @@ public interface DbcmodelPackage extends EPackage {
     * @generated
     * @ordered
     */
-   int DBC_ENUM_LITERAL_FEATURE_COUNT = 1;
+   int DBC_ENUM_LITERAL_FEATURE_COUNT = IDB_CPROOF_REFERENCABLE_FEATURE_COUNT + 1;
 
    /**
     * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -1833,25 +1915,6 @@ public interface DbcmodelPackage extends EPackage {
    int DBC_PROPERTY_FEATURE_COUNT = 2;
 
    /**
-    * The meta object id for the '{@link de.hentschel.visualdbc.dbcmodel.IDbCProofReferencable <em>IDb CProof Referencable</em>}' class.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @see de.hentschel.visualdbc.dbcmodel.IDbCProofReferencable
-    * @see de.hentschel.visualdbc.dbcmodel.impl.DbcmodelPackageImpl#getIDbCProofReferencable()
-    * @generated
-    */
-   int IDB_CPROOF_REFERENCABLE = 24;
-
-   /**
-    * The number of structural features of the '<em>IDb CProof Referencable</em>' class.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    * @ordered
-    */
-   int IDB_CPROOF_REFERENCABLE_FEATURE_COUNT = 0;
-
-   /**
     * The meta object id for the '{@link de.hentschel.visualdbc.dbcmodel.IDbCProvable <em>IDb CProvable</em>}' class.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
@@ -1917,6 +1980,116 @@ public interface DbcmodelPackage extends EPackage {
    int DBC_PROOF_OBLIGATION_FEATURE_COUNT = 1;
 
    /**
+    * The meta object id for the '{@link de.hentschel.visualdbc.dbcmodel.impl.DbcAxiomImpl <em>Dbc Axiom</em>}' class.
+    * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+    * @see de.hentschel.visualdbc.dbcmodel.impl.DbcAxiomImpl
+    * @see de.hentschel.visualdbc.dbcmodel.impl.DbcmodelPackageImpl#getDbcAxiom()
+    * @generated
+    */
+    int DBC_AXIOM = 26;
+
+/**
+    * The feature id for the '<em><b>Name</b></em>' attribute.
+    * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+    int DBC_AXIOM__NAME = IDB_CPROOF_REFERENCABLE_FEATURE_COUNT + 0;
+
+/**
+    * The feature id for the '<em><b>Definition</b></em>' attribute.
+    * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+    int DBC_AXIOM__DEFINITION = IDB_CPROOF_REFERENCABLE_FEATURE_COUNT + 1;
+
+/**
+    * The feature id for the '<em><b>Axiom Contracts</b></em>' containment reference list.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int DBC_AXIOM__AXIOM_CONTRACTS = IDB_CPROOF_REFERENCABLE_FEATURE_COUNT + 2;
+
+/**
+    * The number of structural features of the '<em>Dbc Axiom</em>' class.
+    * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+    int DBC_AXIOM_FEATURE_COUNT = IDB_CPROOF_REFERENCABLE_FEATURE_COUNT + 3;
+
+/**
+    * The meta object id for the '{@link de.hentschel.visualdbc.dbcmodel.impl.DbCAxiomContractImpl <em>Db CAxiom Contract</em>}' class.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @see de.hentschel.visualdbc.dbcmodel.impl.DbCAxiomContractImpl
+    * @see de.hentschel.visualdbc.dbcmodel.impl.DbcmodelPackageImpl#getDbCAxiomContract()
+    * @generated
+    */
+   int DB_CAXIOM_CONTRACT = 27;
+
+/**
+    * The feature id for the '<em><b>Name</b></em>' attribute.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int DB_CAXIOM_CONTRACT__NAME = ABSTRACT_DBC_SPECIFICATION__NAME;
+
+/**
+    * The feature id for the '<em><b>Proof Obligations</b></em>' reference list.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int DB_CAXIOM_CONTRACT__PROOF_OBLIGATIONS = ABSTRACT_DBC_SPECIFICATION_FEATURE_COUNT + 0;
+
+/**
+    * The feature id for the '<em><b>All Proofs</b></em>' reference list.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int DB_CAXIOM_CONTRACT__ALL_PROOFS = ABSTRACT_DBC_SPECIFICATION_FEATURE_COUNT + 1;
+
+/**
+    * The feature id for the '<em><b>Pre</b></em>' attribute.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int DB_CAXIOM_CONTRACT__PRE = ABSTRACT_DBC_SPECIFICATION_FEATURE_COUNT + 2;
+
+/**
+    * The feature id for the '<em><b>Dep</b></em>' attribute.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int DB_CAXIOM_CONTRACT__DEP = ABSTRACT_DBC_SPECIFICATION_FEATURE_COUNT + 3;
+
+/**
+    * The number of structural features of the '<em>Db CAxiom Contract</em>' class.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int DB_CAXIOM_CONTRACT_FEATURE_COUNT = ABSTRACT_DBC_SPECIFICATION_FEATURE_COUNT + 4;
+
+/**
     * The meta object id for the '{@link de.hentschel.visualdbc.dbcmodel.DbcVisibility <em>Dbc Visibility</em>}' enum.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
@@ -1924,7 +2097,7 @@ public interface DbcmodelPackage extends EPackage {
     * @see de.hentschel.visualdbc.dbcmodel.impl.DbcmodelPackageImpl#getDbcVisibility()
     * @generated
     */
-   int DBC_VISIBILITY = 26;
+   int DBC_VISIBILITY = 28;
 
 
    /**
@@ -1935,7 +2108,7 @@ public interface DbcmodelPackage extends EPackage {
     * @see de.hentschel.visualdbc.dbcmodel.impl.DbcmodelPackageImpl#getDbcProofStatus()
     * @generated
     */
-   int DBC_PROOF_STATUS = 27;
+   int DBC_PROOF_STATUS = 29;
 
 
    /**
@@ -1946,7 +2119,7 @@ public interface DbcmodelPackage extends EPackage {
     * @see de.hentschel.visualdbc.dbcmodel.impl.DbcmodelPackageImpl#getProperties()
     * @generated
     */
-   int PROPERTIES = 28;
+   int PROPERTIES = 30;
 
    /**
     * Returns the meta object for class '{@link de.hentschel.visualdbc.dbcmodel.DbcModel <em>Dbc Model</em>}'.
@@ -2452,6 +2625,17 @@ public interface DbcmodelPackage extends EPackage {
    EReference getAbstractDbcType_Invariants();
 
    /**
+    * Returns the meta object for the containment reference list '{@link de.hentschel.visualdbc.dbcmodel.AbstractDbcType#getAxioms <em>Axioms</em>}'.
+    * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+    * @return the meta object for the containment reference list '<em>Axioms</em>'.
+    * @see de.hentschel.visualdbc.dbcmodel.AbstractDbcType#getAxioms()
+    * @see #getAbstractDbcType()
+    * @generated
+    */
+    EReference getAbstractDbcType_Axioms();
+
+/**
     * Returns the meta object for class '{@link de.hentschel.visualdbc.dbcmodel.AbstractDbcEnum <em>Abstract Dbc Enum</em>}'.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
@@ -2770,6 +2954,70 @@ public interface DbcmodelPackage extends EPackage {
    EAttribute getDbcProofObligation_Obligation();
 
    /**
+    * Returns the meta object for class '{@link de.hentschel.visualdbc.dbcmodel.DbcAxiom <em>Dbc Axiom</em>}'.
+    * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+    * @return the meta object for class '<em>Dbc Axiom</em>'.
+    * @see de.hentschel.visualdbc.dbcmodel.DbcAxiom
+    * @generated
+    */
+    EClass getDbcAxiom();
+
+/**
+    * Returns the meta object for the attribute '{@link de.hentschel.visualdbc.dbcmodel.DbcAxiom#getDefinition <em>Definition</em>}'.
+    * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+    * @return the meta object for the attribute '<em>Definition</em>'.
+    * @see de.hentschel.visualdbc.dbcmodel.DbcAxiom#getDefinition()
+    * @see #getDbcAxiom()
+    * @generated
+    */
+    EAttribute getDbcAxiom_Definition();
+
+/**
+    * Returns the meta object for the containment reference list '{@link de.hentschel.visualdbc.dbcmodel.DbcAxiom#getAxiomContracts <em>Axiom Contracts</em>}'.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @return the meta object for the containment reference list '<em>Axiom Contracts</em>'.
+    * @see de.hentschel.visualdbc.dbcmodel.DbcAxiom#getAxiomContracts()
+    * @see #getDbcAxiom()
+    * @generated
+    */
+   EReference getDbcAxiom_AxiomContracts();
+
+/**
+    * Returns the meta object for class '{@link de.hentschel.visualdbc.dbcmodel.DbCAxiomContract <em>Db CAxiom Contract</em>}'.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @return the meta object for class '<em>Db CAxiom Contract</em>'.
+    * @see de.hentschel.visualdbc.dbcmodel.DbCAxiomContract
+    * @generated
+    */
+   EClass getDbCAxiomContract();
+
+/**
+    * Returns the meta object for the attribute '{@link de.hentschel.visualdbc.dbcmodel.DbCAxiomContract#getPre <em>Pre</em>}'.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @return the meta object for the attribute '<em>Pre</em>'.
+    * @see de.hentschel.visualdbc.dbcmodel.DbCAxiomContract#getPre()
+    * @see #getDbCAxiomContract()
+    * @generated
+    */
+   EAttribute getDbCAxiomContract_Pre();
+
+/**
+    * Returns the meta object for the attribute '{@link de.hentschel.visualdbc.dbcmodel.DbCAxiomContract#getDep <em>Dep</em>}'.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @return the meta object for the attribute '<em>Dep</em>'.
+    * @see de.hentschel.visualdbc.dbcmodel.DbCAxiomContract#getDep()
+    * @see #getDbCAxiomContract()
+    * @generated
+    */
+   EAttribute getDbCAxiomContract_Dep();
+
+/**
     * Returns the meta object for enum '{@link de.hentschel.visualdbc.dbcmodel.DbcVisibility <em>Dbc Visibility</em>}'.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
@@ -3227,6 +3475,14 @@ public interface DbcmodelPackage extends EPackage {
       EReference ABSTRACT_DBC_TYPE__INVARIANTS = eINSTANCE.getAbstractDbcType_Invariants();
 
       /**
+       * The meta object literal for the '<em><b>Axioms</b></em>' containment reference list feature.
+       * <!-- begin-user-doc -->
+         * <!-- end-user-doc -->
+       * @generated
+       */
+        EReference ABSTRACT_DBC_TYPE__AXIOMS = eINSTANCE.getAbstractDbcType_Axioms();
+
+    /**
        * The meta object literal for the '{@link de.hentschel.visualdbc.dbcmodel.impl.AbstractDbcEnumImpl <em>Abstract Dbc Enum</em>}' class.
        * <!-- begin-user-doc -->
        * <!-- end-user-doc -->
@@ -3491,6 +3747,58 @@ public interface DbcmodelPackage extends EPackage {
       EAttribute DBC_PROOF_OBLIGATION__OBLIGATION = eINSTANCE.getDbcProofObligation_Obligation();
 
       /**
+       * The meta object literal for the '{@link de.hentschel.visualdbc.dbcmodel.impl.DbcAxiomImpl <em>Dbc Axiom</em>}' class.
+       * <!-- begin-user-doc -->
+         * <!-- end-user-doc -->
+       * @see de.hentschel.visualdbc.dbcmodel.impl.DbcAxiomImpl
+       * @see de.hentschel.visualdbc.dbcmodel.impl.DbcmodelPackageImpl#getDbcAxiom()
+       * @generated
+       */
+        EClass DBC_AXIOM = eINSTANCE.getDbcAxiom();
+
+    /**
+       * The meta object literal for the '<em><b>Definition</b></em>' attribute feature.
+       * <!-- begin-user-doc -->
+         * <!-- end-user-doc -->
+       * @generated
+       */
+        EAttribute DBC_AXIOM__DEFINITION = eINSTANCE.getDbcAxiom_Definition();
+
+    /**
+       * The meta object literal for the '<em><b>Axiom Contracts</b></em>' containment reference list feature.
+       * <!-- begin-user-doc -->
+       * <!-- end-user-doc -->
+       * @generated
+       */
+      EReference DBC_AXIOM__AXIOM_CONTRACTS = eINSTANCE.getDbcAxiom_AxiomContracts();
+
+   /**
+       * The meta object literal for the '{@link de.hentschel.visualdbc.dbcmodel.impl.DbCAxiomContractImpl <em>Db CAxiom Contract</em>}' class.
+       * <!-- begin-user-doc -->
+       * <!-- end-user-doc -->
+       * @see de.hentschel.visualdbc.dbcmodel.impl.DbCAxiomContractImpl
+       * @see de.hentschel.visualdbc.dbcmodel.impl.DbcmodelPackageImpl#getDbCAxiomContract()
+       * @generated
+       */
+      EClass DB_CAXIOM_CONTRACT = eINSTANCE.getDbCAxiomContract();
+
+   /**
+       * The meta object literal for the '<em><b>Pre</b></em>' attribute feature.
+       * <!-- begin-user-doc -->
+       * <!-- end-user-doc -->
+       * @generated
+       */
+      EAttribute DB_CAXIOM_CONTRACT__PRE = eINSTANCE.getDbCAxiomContract_Pre();
+
+   /**
+       * The meta object literal for the '<em><b>Dep</b></em>' attribute feature.
+       * <!-- begin-user-doc -->
+       * <!-- end-user-doc -->
+       * @generated
+       */
+      EAttribute DB_CAXIOM_CONTRACT__DEP = eINSTANCE.getDbCAxiomContract_Dep();
+
+   /**
        * The meta object literal for the '{@link de.hentschel.visualdbc.dbcmodel.DbcVisibility <em>Dbc Visibility</em>}' enum.
        * <!-- begin-user-doc -->
        * <!-- end-user-doc -->

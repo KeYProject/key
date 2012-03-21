@@ -28,7 +28,7 @@ public class InnerTypeTest extends TestCase {
     * Tests methods and constructors.
     */
    @Test
-   public void testInnerTypes() {
+   public void testInnerTypes() throws Exception {
       TestKeyUtil.testKeyConnection("InnerTypeTest_testInnerTypes",
                                     "data/innerTypeTest",
                                     null,

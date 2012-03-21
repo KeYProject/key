@@ -18,7 +18,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
-import org.key_project.key4eclipse.util.eclipse.BundleUtil;
+import org.key_project.util.eclipse.BundleUtil;
 
 import de.hentschel.visualdbc.example.Activator;
 

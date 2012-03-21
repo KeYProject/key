@@ -11,15 +11,21 @@
 
 package de.hentschel.visualdbc.datasource.model.memory;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import de.hentschel.visualdbc.datasource.model.DSVisibility;
 import de.hentschel.visualdbc.datasource.model.IDSAttribute;
+import de.hentschel.visualdbc.datasource.model.IDSType;
+import de.hentschel.visualdbc.datasource.model.exception.DSException;
+import de.hentschel.visualdbc.datasource.model.implementation.AbstractDSProvable;
 
 /**
  * Default implementation for an {@link IDSAttribute} for objects in the
  * memory.
  * @author Martin Hentschel
  */
-public class MemoryAttribute implements IDSAttribute {
+public class MemoryAttribute extends AbstractDSProvable implements IDSAttribute {
    /**
     * The name.
     */
@@ -44,6 +50,16 @@ public class MemoryAttribute implements IDSAttribute {
     * Is final?
     */
    private boolean isFinal;
+   
+   /**
+    * All available obligations.
+    */
+   private List<String> obligations = new LinkedList<String>();
+   
+   /**
+    * The parent.
+    */
+   private IDSType parent;
    
    /**
     * Default constructor.
@@ -178,5 +194,29 @@ public class MemoryAttribute implements IDSAttribute {
    @Override
    public boolean isFinal() {
       return isFinal;
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public List<String> getObligations() throws DSException {
+      return obligations;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IDSType getParent() throws DSException {
+      return parent;
+   }
+
+   /**
+    * Sets the parent.
+    * @param parent The parent to set.
+    */
+   public void setParent(IDSType parent) {
+      this.parent = parent;
    }
 }

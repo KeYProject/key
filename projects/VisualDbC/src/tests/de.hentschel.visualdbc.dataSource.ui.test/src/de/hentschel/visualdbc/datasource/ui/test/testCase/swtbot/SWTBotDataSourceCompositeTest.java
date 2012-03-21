@@ -28,10 +28,10 @@ import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.junit.Test;
-import org.key_project.key4eclipse.util.eclipse.ResourceUtil;
-import org.key_project.key4eclipse.util.java.thread.AbstractRunnableWithResult;
-import org.key_project.key4eclipse.util.java.thread.IRunnableWithResult;
-import org.key_project.key4eclipse.util.test.util.TestUtilsUtil;
+import org.key_project.util.eclipse.ResourceUtil;
+import org.key_project.util.java.thread.AbstractRunnableWithResult;
+import org.key_project.util.java.thread.IRunnableWithResult;
+import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.hentschel.visualdbc.datasource.model.IDSDriver;
 import de.hentschel.visualdbc.datasource.ui.composite.DataSourceComposite;

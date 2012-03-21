@@ -560,7 +560,7 @@ public class KeYCrossReferenceSourceInfo
                 cu = ClassFileDeclarationBuilder.makeEmptyClassDeclaration(serviceConfiguration.getProgramFactory(), typeString);
                 cu.setDataLocation(new SpecDataLocation("stub", typeString));
             } catch (ParserException e) {
-                throw new RuntimeException(e);
+                throw new de.uka.ilkd.key.java.ConvertException(e);
             }
 
             ChangeHistory changeHistory = serviceConfiguration.getChangeHistory();
@@ -598,7 +598,7 @@ public class KeYCrossReferenceSourceInfo
            || expr instanceof Singleton
            || expr instanceof SetUnion
            || expr instanceof AllFields) {
-	    return name2primitiveType.get("\\set");
+	    return name2primitiveType.get("\\locset");
 	} else if(expr instanceof EmptySeqLiteral
                   || expr instanceof SeqSingleton
                   || expr instanceof SeqConcat

@@ -369,22 +369,42 @@ public class Messages extends NLS {
    /**
     * @generated
     */
-   public static String Invariant1CreationTool_title;
+   public static String Axiom1CreationTool_title;
 
    /**
     * @generated
     */
-   public static String Invariant1CreationTool_desc;
+   public static String Axiom1CreationTool_desc;
 
    /**
     * @generated
     */
-   public static String OperationContract2CreationTool_title;
+   public static String AxiomContract2CreationTool_title;
 
    /**
     * @generated
     */
-   public static String OperationContract2CreationTool_desc;
+   public static String AxiomContract2CreationTool_desc;
+
+   /**
+    * @generated
+    */
+   public static String Invariant3CreationTool_title;
+
+   /**
+    * @generated
+    */
+   public static String Invariant3CreationTool_desc;
+
+   /**
+    * @generated
+    */
+   public static String OperationContract4CreationTool_title;
+
+   /**
+    * @generated
+    */
+   public static String OperationContract4CreationTool_desc;
 
    /**
     * @generated
@@ -474,6 +494,11 @@ public class Messages extends NLS {
    /**
     * @generated
     */
+   public static String DbcAxiomDbcAxiomCompartmentEditPart_title;
+
+   /**
+    * @generated
+    */
    public static String DbcInterfaceDbcInterfaceMainCompartment2EditPart_title;
 
    /**
@@ -514,6 +539,11 @@ public class Messages extends NLS {
    /**
     * @generated
     */
+   public static String NavigatorGroupName_DbcAttribute_3011_incominglinks;
+
+   /**
+    * @generated
+    */
    public static String NavigatorGroupName_DbcClassExtends_4003_target;
 
    /**
@@ -530,6 +560,11 @@ public class Messages extends NLS {
     * @generated
     */
    public static String NavigatorGroupName_DbcProof_2014_outgoinglinks;
+
+   /**
+    * @generated
+    */
+   public static String NavigatorGroupName_DbCAxiomContract_3037_incominglinks;
 
    /**
     * @generated
@@ -569,12 +604,22 @@ public class Messages extends NLS {
    /**
     * @generated
     */
+   public static String NavigatorGroupName_DbcAxiom_3036_incominglinks;
+
+   /**
+    * @generated
+    */
    public static String NavigatorGroupName_DbcEnum_2013_incominglinks;
 
    /**
     * @generated
     */
    public static String NavigatorGroupName_DbcEnum_2013_outgoinglinks;
+
+   /**
+    * @generated
+    */
+   public static String NavigatorGroupName_DbcEnumLiteral_3020_incominglinks;
 
    /**
     * @generated

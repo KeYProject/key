@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: KeY 4 Eclipse Utilities Tests
-Bundle-SymbolicName: org.key_project.key4eclipse.util.test
+Bundle-Name: KeY Project Utilities Tests
+Bundle-SymbolicName: org.key_project.util.test
 Bundle-Version: 1.0.0.qualifier
-Bundle-Activator: org.key_project.key4eclipse.util.test.Activator
+Bundle-Activator: org.key_project.util.test.Activator
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui,
  org.eclipse.ui.navigator.resources;bundle-version="3.4.300",
@@ -15,10 +15,10 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.swtbot.go;bundle-version="2.0.4",
  org.key_project.swtbot.swing;bundle-version="1.0.0",
  org.key_project.key4eclipse;bundle-version="1.0.0",
- org.key_project.key4eclipse.util;bundle-version="1.0.0"
+ org.key_project.util;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: KeY Project
-Export-Package: org.key_project.key4eclipse.util.test.suite,
- org.key_project.key4eclipse.util.test.suite.swtbot,
- org.key_project.key4eclipse.util.test.util
+Export-Package: org.key_project.util.test.suite,
+ org.key_project.util.test.suite.swtbot,
+ org.key_project.util.test.util

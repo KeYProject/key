@@ -28,24 +28,27 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
 
     /** creates an empty new <S>Array
      */
+    @SuppressWarnings("unchecked")
     public ImmutableArray() {
-	content = (S[]) new Object[0];
+        content = (S[]) new Object[0];
     }
 
     /** creates a new <S>Array
      * @param arr the ProgrammElement array to wrap
      */
+    @SuppressWarnings("unchecked")
     public ImmutableArray(S... arr) {
-	content = (S[]) Array.newInstance(arr.getClass().getComponentType(), arr.length);
-	System.arraycopy(arr, 0, content, 0, arr.length);
+        content = (S[]) Array.newInstance(arr.getClass().getComponentType(), arr.length);
+        System.arraycopy(arr, 0, content, 0, arr.length);
     }
 
 
     /** creates a new <S>Array
      * @param list a LinkedList (order is preserved)
      */
+    @SuppressWarnings("unchecked")
     public ImmutableArray(List<S> list) {
-	content = (S[]) list.toArray();
+        content = (S[]) list.toArray();
     }
     
     /** gets the element at the specified position
@@ -85,11 +88,13 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
     
     /**
      * Convert the array to a Java array (O(n))
+     * @throws ClassCastException if T is not a supertype of S
      */
-    public <S> S[] toArray(S[] array) {
-	S[] result;
+    @SuppressWarnings("unchecked")
+    public <T> T[] toArray(T[] array) {
+	T[] result;
 	if (array.length < size()) {
-	    result = (S[]) Array.newInstance(array.getClass().getComponentType(), size());
+	    result = (T[]) Array.newInstance(array.getClass().getComponentType(), size());
 	} else {
 	    result = array;
 	}
@@ -109,16 +114,18 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
 	return hashCode;
     }
 
+    @SuppressWarnings("unchecked")
     public boolean equals (Object o) {
 	if (o == this) {
 	    return true;
 	}
-
-	if (!(o instanceof ImmutableArray)) {
+	    S[] cmp = null;
+	
+	try {
+	    cmp = ((ImmutableArray<S>) o).content;
+	} catch (ClassCastException e){
 	    return false;
 	}
-
-	final S[] cmp = ((ImmutableArray<S>) o).content;
 
 	if (cmp.length != content.length) {
 	    return false;

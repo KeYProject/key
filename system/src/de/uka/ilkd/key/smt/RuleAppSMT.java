@@ -18,15 +18,20 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.BuiltInRuleApp;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 
-public class RuleAppSMT implements RuleApp {
+public class RuleAppSMT extends BuiltInRuleApp{ //implements RuleApp {
 
     private final static SMTRule rule = new SMTRule();
     private String title;
 
+
+   
+    
     public RuleAppSMT(Goal goal, String title) {
+    	super(rule,null);
 	this.title = title;
 	goal.proof().env().getJustifInfo().addJustification(rule,
 	        new RuleJustification() {
@@ -43,14 +48,9 @@ public class RuleAppSMT implements RuleApp {
 	return true;
     }
 
-    @Override
-    public ImmutableList<Goal> execute(Goal goal, Services services) {
-	goal.addAppliedRuleApp(this);
-
-	goal.proof().closeGoal(goal);
-	goal.node().getNodeInfo().setBranchLabel(title);
-	return ImmutableSLList.<Goal>nil();
-    }
+    public String getTitle() {
+		return title;
+	}
 
     @Override
     public PosInOccurrence posInOccurrence() {
@@ -58,7 +58,7 @@ public class RuleAppSMT implements RuleApp {
     }
 
     @Override
-    public Rule rule() {
+    public BuiltInRule rule() {
 
 	return rule;
     }
@@ -74,7 +74,10 @@ public class RuleAppSMT implements RuleApp {
 	@Override
 	public ImmutableList<Goal> apply(Goal goal, Services services,
 	        RuleApp ruleApp) {
-	    return null;
+		goal.split(1);	
+		RuleAppSMT app = (RuleAppSMT) ruleApp;
+		goal.setBranchLabel(app.getTitle());
+	    return ImmutableSLList.<Goal>nil();
 	}
 
 	@Override

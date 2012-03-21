@@ -77,7 +77,7 @@
         compartments="//@diagram/@compartments.2 //@diagram/@compartments.3"
         graphicalNodeEditPolicyClassName="DbcClass2GraphicalNodeEditPolicy"
         createCommandClassName="DbcClass2CreateCommand"
-        containers="//@diagram/@compartments.2 //@diagram/@compartments.4 //@diagram/@compartments.6 //@diagram/@compartments.1 //@diagram/@compartments.0 //@diagram/@compartments.11 //@diagram/@compartments.13 //@diagram/@compartments.15">
+        containers="//@diagram/@compartments.2 //@diagram/@compartments.4 //@diagram/@compartments.6 //@diagram/@compartments.1 //@diagram/@compartments.0 //@diagram/@compartments.12 //@diagram/@compartments.14 //@diagram/@compartments.16">
       <diagramRunTimeClass
           href="../../../plugin/org.eclipse.gmf.runtime.notation/model/notation.genmodel#//notation/Node"/>
       <elementType
@@ -128,7 +128,7 @@
         compartments="//@diagram/@compartments.4 //@diagram/@compartments.5"
         graphicalNodeEditPolicyClassName="DbcInterface2GraphicalNodeEditPolicy"
         createCommandClassName="DbcInterface2CreateCommand"
-        containers="//@diagram/@compartments.4 //@diagram/@compartments.6 //@diagram/@compartments.2 //@diagram/@compartments.1 //@diagram/@compartments.0 //@diagram/@compartments.11 //@diagram/@compartments.13 //@diagram/@compartments.15">
+        containers="//@diagram/@compartments.4 //@diagram/@compartments.6 //@diagram/@compartments.2 //@diagram/@compartments.1 //@diagram/@compartments.0 //@diagram/@compartments.12 //@diagram/@compartments.14 //@diagram/@compartments.16">
       <diagramRunTimeClass
           href="../../../plugin/org.eclipse.gmf.runtime.notation/model/notation.genmodel#//notation/Node"/>
       <elementType
@@ -179,7 +179,7 @@
         compartments="//@diagram/@compartments.6 //@diagram/@compartments.7 //@diagram/@compartments.8"
         graphicalNodeEditPolicyClassName="DbcEnum2GraphicalNodeEditPolicy"
         createCommandClassName="DbcEnum2CreateCommand"
-        containers="//@diagram/@compartments.6 //@diagram/@compartments.4 //@diagram/@compartments.2 //@diagram/@compartments.1 //@diagram/@compartments.0 //@diagram/@compartments.11 //@diagram/@compartments.13 //@diagram/@compartments.15">
+        containers="//@diagram/@compartments.6 //@diagram/@compartments.4 //@diagram/@compartments.2 //@diagram/@compartments.1 //@diagram/@compartments.0 //@diagram/@compartments.12 //@diagram/@compartments.14 //@diagram/@compartments.16">
       <diagramRunTimeClass
           href="../../../plugin/org.eclipse.gmf.runtime.notation/model/notation.genmodel#//notation/Node"/>
       <elementType
@@ -229,7 +229,7 @@
         canonicalEditPolicyClassName="DbcProof2CanonicalEditPolicy"
         graphicalNodeEditPolicyClassName="DbcProof2GraphicalNodeEditPolicy"
         createCommandClassName="DbcProof2CreateCommand"
-        containers="//@diagram/@compartments.6 //@diagram/@compartments.9 //@diagram/@compartments.10 //@diagram/@compartments.4 //@diagram/@compartments.2 //@diagram/@compartments.1 //@diagram/@compartments.0 //@diagram/@compartments.11 //@diagram/@compartments.13 //@diagram/@compartments.15">
+        containers="//@diagram/@compartments.6 //@diagram/@compartments.9 //@diagram/@compartments.10 //@diagram/@compartments.4 //@diagram/@compartments.2 //@diagram/@compartments.1 //@diagram/@compartments.0 //@diagram/@compartments.12 //@diagram/@compartments.14 //@diagram/@compartments.16">
       <diagramRunTimeClass
           href="../../../plugin/org.eclipse.gmf.runtime.notation/model/notation.genmodel#//notation/Node"/>
       <elementType
@@ -279,7 +279,7 @@
         canonicalEditPolicyClassName="DbcInvariantCanonicalEditPolicy"
         graphicalNodeEditPolicyClassName="DbcInvariantGraphicalNodeEditPolicy"
         createCommandClassName="DbcInvariantCreateCommand"
-        containers="//@diagram/@compartments.6 //@diagram/@compartments.4 //@diagram/@compartments.2 //@diagram/@compartments.11 //@diagram/@compartments.13 //@diagram/@compartments.15">
+        containers="//@diagram/@compartments.6 //@diagram/@compartments.4 //@diagram/@compartments.2 //@diagram/@compartments.12 //@diagram/@compartments.14 //@diagram/@compartments.16">
       <diagramRunTimeClass
           href="../../../plugin/org.eclipse.gmf.runtime.notation/model/notation.genmodel#//notation/Node"/>
       <elementType
@@ -336,7 +336,6 @@
       </labels>
     </childNodes>
     <childNodes
-        xsi:type="gmfgen:GenChildLabelNode"
         visualID="3011"
         editPartClassName="DbcAttributeEditPart"
         itemSemanticEditPolicyClassName="DbcAttributeItemSemanticEditPolicy"
@@ -344,8 +343,7 @@
         canonicalEditPolicyClassName="DbcAttributeCanonicalEditPolicy"
         graphicalNodeEditPolicyClassName="DbcAttributeGraphicalNodeEditPolicy"
         createCommandClassName="DbcAttributeCreateCommand"
-        containers="//@diagram/@compartments.7 //@diagram/@compartments.5 //@diagram/@compartments.3 //@diagram/@compartments.12 //@diagram/@compartments.14 //@diagram/@compartments.16"
-        labelElementIcon="true">
+        containers="//@diagram/@compartments.7 //@diagram/@compartments.5 //@diagram/@compartments.3 //@diagram/@compartments.13 //@diagram/@compartments.15 //@diagram/@compartments.17">
       <diagramRunTimeClass
           href="../../../plugin/org.eclipse.gmf.runtime.notation/model/notation.genmodel#//notation/Node"/>
       <elementType
@@ -354,7 +352,16 @@
       <viewmap
           xsi:type="gmfgen:InnerClassViewmap"
           className="DbcAttributeFigure"
-          classBody="&#xA;/**&#xA; * @generated&#xA; */&#xA;public class DbcAttributeFigure extends org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel {&#xA;&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public DbcAttributeFigure() {&#xA;&#x9;&#x9;&#x9;&#x9;this.setText(&quot;&lt;...>&quot;);&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;}&#xA;&#xA;"/>
+          classBody="&#xA;/**&#xA; * @generated&#xA; */&#xA;public class DbcAttributeFigure extends org.eclipse.draw2d.RectangleFigure {&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel fFigureDbcAttributeNameFigure; &#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public DbcAttributeFigure() {&#xA;&#x9;&#x9;&#xA;&#x9;org.eclipse.draw2d.GridLayout layoutThis = new org.eclipse.draw2d.GridLayout();&#xA;&#x9;layoutThis.numColumns = 1;&#xA;&#x9;layoutThis.makeColumnsEqualWidth = true;&#xA;&#x9;layoutThis.horizontalSpacing = 0;&#xA;&#x9;layoutThis.verticalSpacing = -1;&#xA;&#x9;layoutThis.marginWidth = 0;&#xA;&#x9;layoutThis.marginHeight = 0;&#xA;&#x9;this.setLayoutManager(layoutThis);&#xA;&#xA;&#x9;&#x9;&#x9;this.setForegroundColor(THIS_FORE&#xA;);&#xA;&#x9;this.setBackgroundColor(THIS_BACK&#xA;);&#xA;this.setPreferredSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(0)&#xA;, getMapMode().DPtoLP(18)&#xA;));&#xA;&#xA;this.setBorder(new org.eclipse.draw2d.MarginBorder(getMapMode().DPtoLP(0)&#xA;, getMapMode().DPtoLP(0)&#xA;, getMapMode().DPtoLP(0)&#xA;, getMapMode().DPtoLP(0)&#xA;));&#xA;&#x9;&#x9;createContents();&#xA;&#x9;}&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private void createContents(){&#xA;&#xA;&#xA;fFigureDbcAttributeNameFigure = new org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel();&#xA;fFigureDbcAttributeNameFigure.setText(&quot;&lt;...>&quot;);&#xA;fFigureDbcAttributeNameFigure.setBorder(new org.eclipse.draw2d.MarginBorder(getMapMode().DPtoLP(0)&#xA;, getMapMode().DPtoLP(0)&#xA;, getMapMode().DPtoLP(0)&#xA;, getMapMode().DPtoLP(5)&#xA;));&#xA;&#xA;&#xA;org.eclipse.draw2d.GridData constraintFFigureDbcAttributeNameFigure = new org.eclipse.draw2d.GridData();&#xA;constraintFFigureDbcAttributeNameFigure.verticalAlignment = org.eclipse.draw2d.GridData.CENTER;&#xA;constraintFFigureDbcAttributeNameFigure.horizontalAlignment = org.eclipse.draw2d.GridData.BEGINNING;&#xA;constraintFFigureDbcAttributeNameFigure.horizontalIndent = 0;&#xA;constraintFFigureDbcAttributeNameFigure.horizontalSpan = 0;&#xA;constraintFFigureDbcAttributeNameFigure.verticalSpan = 0;&#xA;constraintFFigureDbcAttributeNameFigure.grabExcessHorizontalSpace = false;&#xA;constraintFFigureDbcAttributeNameFigure.grabExcessVerticalSpace = true;&#xA;this.add(fFigureDbcAttributeNameFigure, constraintFFigureDbcAttributeNameFigure);&#xA;&#xA;&#xA;&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel getFigureDbcAttributeNameFigure() {&#xA;&#x9;&#x9;return fFigureDbcAttributeNameFigure;&#xA;&#x9;}&#xA;&#xA;&#xA;}&#xA;&#xA;/**&#xA; * @generated&#xA; */&#xA;static final org.eclipse.swt.graphics.Color THIS_FORE = new org.eclipse.swt.graphics.Color(null, 240, 240, 250);&#xA;&#xA;/**&#xA; * @generated&#xA; */&#xA;static final org.eclipse.swt.graphics.Color THIS_BACK = new org.eclipse.swt.graphics.Color(null, 240, 240, 250);&#xA;&#xA;">
+        <attributes
+            xsi:type="gmfgen:StyleAttributes"
+            fixedForeground="true"
+            fixedBackground="true"/>
+        <attributes
+            xsi:type="gmfgen:DefaultSizeAttributes"
+            width="0"
+            height="18"/>
+      </viewmap>
       <modelFacet>
         <metaClass
             href="DbcModel.genmodel#//dbcmodel/DbcAttribute"/>
@@ -363,17 +370,30 @@
         <childMetaFeature
             href="DbcModel.genmodel#//dbcmodel/AbstractDbcInterface/attributes"/>
       </modelFacet>
-      <labelModelFacet
-          xsi:type="gmfgen:FeatureLabelModelFacet"
-          parser="//@labelParsers/@implementations.0"
-          viewPattern="{0} : {1}"
-          editorPattern="{0} : {1}"
-          editPattern="{0} : {1}">
-        <metaFeatures
-            href="DbcModel.genmodel#//dbcmodel/DbcAttribute/name"/>
-        <metaFeatures
-            href="DbcModel.genmodel#//dbcmodel/DbcAttribute/type"/>
-      </labelModelFacet>
+      <labels
+          visualID="5061"
+          editPartClassName="DbcAttributeNameTypeEditPart"
+          itemSemanticEditPolicyClassName="DbcAttributeNameTypeItemSemanticEditPolicy"
+          notationViewFactoryClassName="DbcAttributeNameTypeViewFactory"
+          elementIcon="true">
+        <diagramRunTimeClass
+            href="../../../plugin/org.eclipse.gmf.runtime.notation/model/notation.genmodel#//notation/Node"/>
+        <viewmap
+            xsi:type="gmfgen:ParentAssignedViewmap"
+            getterName="getFigureDbcAttributeNameFigure"
+            figureQualifiedClassName="org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel"/>
+        <modelFacet
+            xsi:type="gmfgen:FeatureLabelModelFacet"
+            parser="//@labelParsers/@implementations.0"
+            viewPattern="{0} : {1}"
+            editorPattern="{0} : {1}"
+            editPattern="{0} : {1}">
+          <metaFeatures
+              href="DbcModel.genmodel#//dbcmodel/DbcAttribute/name"/>
+          <metaFeatures
+              href="DbcModel.genmodel#//dbcmodel/DbcAttribute/type"/>
+        </modelFacet>
+      </labels>
     </childNodes>
     <childNodes
         visualID="3009"
@@ -384,7 +404,7 @@
         compartments="//@diagram/@compartments.9"
         graphicalNodeEditPolicyClassName="DbcMethodGraphicalNodeEditPolicy"
         createCommandClassName="DbcMethodCreateCommand"
-        containers="//@diagram/@compartments.6 //@diagram/@compartments.4 //@diagram/@compartments.2 //@diagram/@compartments.11 //@diagram/@compartments.13 //@diagram/@compartments.15">
+        containers="//@diagram/@compartments.6 //@diagram/@compartments.4 //@diagram/@compartments.2 //@diagram/@compartments.12 //@diagram/@compartments.14 //@diagram/@compartments.16">
       <diagramRunTimeClass
           href="../../../plugin/org.eclipse.gmf.runtime.notation/model/notation.genmodel#//notation/Node"/>
       <elementType
@@ -522,7 +542,7 @@
         compartments="//@diagram/@compartments.10"
         graphicalNodeEditPolicyClassName="DbcConstructorGraphicalNodeEditPolicy"
         createCommandClassName="DbcConstructorCreateCommand"
-        containers="//@diagram/@compartments.6 //@diagram/@compartments.2 //@diagram/@compartments.13 //@diagram/@compartments.15">
+        containers="//@diagram/@compartments.6 //@diagram/@compartments.2 //@diagram/@compartments.14 //@diagram/@compartments.16">
       <diagramRunTimeClass
           href="../../../plugin/org.eclipse.gmf.runtime.notation/model/notation.genmodel#//notation/Node"/>
       <elementType
@@ -561,7 +581,6 @@
       </labels>
     </childNodes>
     <childNodes
-        xsi:type="gmfgen:GenChildLabelNode"
         visualID="3020"
         editPartClassName="DbcEnumLiteralEditPart"
         itemSemanticEditPolicyClassName="DbcEnumLiteralItemSemanticEditPolicy"
@@ -569,8 +588,7 @@
         canonicalEditPolicyClassName="DbcEnumLiteralCanonicalEditPolicy"
         graphicalNodeEditPolicyClassName="DbcEnumLiteralGraphicalNodeEditPolicy"
         createCommandClassName="DbcEnumLiteralCreateCommand"
-        containers="//@diagram/@compartments.8 //@diagram/@compartments.17"
-        labelElementIcon="true">
+        containers="//@diagram/@compartments.8 //@diagram/@compartments.18">
       <diagramRunTimeClass
           href="../../../plugin/org.eclipse.gmf.runtime.notation/model/notation.genmodel#//notation/Node"/>
       <elementType
@@ -579,7 +597,16 @@
       <viewmap
           xsi:type="gmfgen:InnerClassViewmap"
           className="DbcEnumLiteralFigure"
-          classBody="&#xA;/**&#xA; * @generated&#xA; */&#xA;public class DbcEnumLiteralFigure extends org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel {&#xA;&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public DbcEnumLiteralFigure() {&#xA;&#x9;&#x9;&#x9;&#x9;this.setText(&quot;&lt;...>&quot;);&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;}&#xA;&#xA;"/>
+          classBody="&#xA;/**&#xA; * @generated&#xA; */&#xA;public class DbcEnumLiteralFigure extends org.eclipse.draw2d.RectangleFigure {&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel fFigureDbcEnumLiteralNameFigure; &#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public DbcEnumLiteralFigure() {&#xA;&#x9;&#x9;&#xA;&#x9;org.eclipse.draw2d.GridLayout layoutThis = new org.eclipse.draw2d.GridLayout();&#xA;&#x9;layoutThis.numColumns = 1;&#xA;&#x9;layoutThis.makeColumnsEqualWidth = true;&#xA;&#x9;layoutThis.horizontalSpacing = 0;&#xA;&#x9;layoutThis.verticalSpacing = -1;&#xA;&#x9;layoutThis.marginWidth = 0;&#xA;&#x9;layoutThis.marginHeight = 0;&#xA;&#x9;this.setLayoutManager(layoutThis);&#xA;&#xA;&#x9;&#x9;&#x9;this.setForegroundColor(THIS_FORE&#xA;);&#xA;&#x9;this.setBackgroundColor(THIS_BACK&#xA;);&#xA;this.setPreferredSize(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(0)&#xA;, getMapMode().DPtoLP(18)&#xA;));&#xA;&#xA;this.setBorder(new org.eclipse.draw2d.MarginBorder(getMapMode().DPtoLP(0)&#xA;, getMapMode().DPtoLP(0)&#xA;, getMapMode().DPtoLP(0)&#xA;, getMapMode().DPtoLP(0)&#xA;));&#xA;&#x9;&#x9;createContents();&#xA;&#x9;}&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private void createContents(){&#xA;&#xA;&#xA;fFigureDbcEnumLiteralNameFigure = new org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel();&#xA;fFigureDbcEnumLiteralNameFigure.setText(&quot;&lt;...>&quot;);&#xA;fFigureDbcEnumLiteralNameFigure.setBorder(new org.eclipse.draw2d.MarginBorder(getMapMode().DPtoLP(0)&#xA;, getMapMode().DPtoLP(0)&#xA;, getMapMode().DPtoLP(0)&#xA;, getMapMode().DPtoLP(5)&#xA;));&#xA;&#xA;&#xA;org.eclipse.draw2d.GridData constraintFFigureDbcEnumLiteralNameFigure = new org.eclipse.draw2d.GridData();&#xA;constraintFFigureDbcEnumLiteralNameFigure.verticalAlignment = org.eclipse.draw2d.GridData.CENTER;&#xA;constraintFFigureDbcEnumLiteralNameFigure.horizontalAlignment = org.eclipse.draw2d.GridData.BEGINNING;&#xA;constraintFFigureDbcEnumLiteralNameFigure.horizontalIndent = 0;&#xA;constraintFFigureDbcEnumLiteralNameFigure.horizontalSpan = 0;&#xA;constraintFFigureDbcEnumLiteralNameFigure.verticalSpan = 0;&#xA;constraintFFigureDbcEnumLiteralNameFigure.grabExcessHorizontalSpace = false;&#xA;constraintFFigureDbcEnumLiteralNameFigure.grabExcessVerticalSpace = true;&#xA;this.add(fFigureDbcEnumLiteralNameFigure, constraintFFigureDbcEnumLiteralNameFigure);&#xA;&#xA;&#xA;&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel getFigureDbcEnumLiteralNameFigure() {&#xA;&#x9;&#x9;return fFigureDbcEnumLiteralNameFigure;&#xA;&#x9;}&#xA;&#xA;&#xA;}&#xA;&#xA;/**&#xA; * @generated&#xA; */&#xA;static final org.eclipse.swt.graphics.Color THIS_FORE = new org.eclipse.swt.graphics.Color(null, 240, 240, 250);&#xA;&#xA;/**&#xA; * @generated&#xA; */&#xA;static final org.eclipse.swt.graphics.Color THIS_BACK = new org.eclipse.swt.graphics.Color(null, 240, 240, 250);&#xA;&#xA;">
+        <attributes
+            xsi:type="gmfgen:StyleAttributes"
+            fixedForeground="true"
+            fixedBackground="true"/>
+        <attributes
+            xsi:type="gmfgen:DefaultSizeAttributes"
+            width="0"
+            height="18"/>
+      </viewmap>
       <modelFacet>
         <metaClass
             href="DbcModel.genmodel#//dbcmodel/DbcEnumLiteral"/>
@@ -588,15 +615,179 @@
         <childMetaFeature
             href="DbcModel.genmodel#//dbcmodel/AbstractDbcEnum/literals"/>
       </modelFacet>
-      <labelModelFacet
-          xsi:type="gmfgen:FeatureLabelModelFacet"
-          parser="//@labelParsers/@implementations.0"
-          viewPattern=""
-          editorPattern=""
-          editPattern="">
-        <metaFeatures
-            href="DbcModel.genmodel#//dbcmodel/DbcEnumLiteral/name"/>
-      </labelModelFacet>
+      <labels
+          visualID="5062"
+          editPartClassName="DbcEnumLiteralNameEditPart"
+          itemSemanticEditPolicyClassName="DbcEnumLiteralNameItemSemanticEditPolicy"
+          notationViewFactoryClassName="DbcEnumLiteralNameViewFactory"
+          elementIcon="true">
+        <diagramRunTimeClass
+            href="../../../plugin/org.eclipse.gmf.runtime.notation/model/notation.genmodel#//notation/Node"/>
+        <viewmap
+            xsi:type="gmfgen:ParentAssignedViewmap"
+            getterName="getFigureDbcEnumLiteralNameFigure"
+            figureQualifiedClassName="org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel"/>
+        <modelFacet
+            xsi:type="gmfgen:FeatureLabelModelFacet"
+            parser="//@labelParsers/@implementations.0"
+            viewPattern=""
+            editorPattern=""
+            editPattern="">
+          <metaFeatures
+              href="DbcModel.genmodel#//dbcmodel/DbcEnumLiteral/name"/>
+        </modelFacet>
+      </labels>
+    </childNodes>
+    <childNodes
+        visualID="3036"
+        editPartClassName="DbcAxiomEditPart"
+        itemSemanticEditPolicyClassName="DbcAxiomItemSemanticEditPolicy"
+        notationViewFactoryClassName="DbcAxiomViewFactory"
+        canonicalEditPolicyClassName="DbcAxiomCanonicalEditPolicy"
+        compartments="//@diagram/@compartments.11"
+        graphicalNodeEditPolicyClassName="DbcAxiomGraphicalNodeEditPolicy"
+        createCommandClassName="DbcAxiomCreateCommand"
+        containers="//@diagram/@compartments.6 //@diagram/@compartments.4 //@diagram/@compartments.2 //@diagram/@compartments.12 //@diagram/@compartments.14 //@diagram/@compartments.16">
+      <diagramRunTimeClass
+          href="../../../plugin/org.eclipse.gmf.runtime.notation/model/notation.genmodel#//notation/Node"/>
+      <elementType
+          xsi:type="gmfgen:MetamodelType"
+          editHelperClassName="DbcAxiomEditHelper"/>
+      <viewmap
+          xsi:type="gmfgen:InnerClassViewmap"
+          className="DbcAxiomFigure"
+          classBody="&#xA;/**&#xA; * @generated&#xA; */&#xA;public class DbcAxiomFigure extends org.eclipse.draw2d.RoundedRectangle {&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel fFigureDbcAxiomNameFigure; &#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private org.eclipse.draw2d.RectangleFigure fFigureDbcAxiomCompartmentRectangle; &#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel fFigureDbcAxiomDefinitionFigure; &#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public DbcAxiomFigure() {&#xA;&#x9;&#x9;&#xA;&#x9;org.eclipse.draw2d.GridLayout layoutThis = new org.eclipse.draw2d.GridLayout();&#xA;&#x9;layoutThis.numColumns = 1;&#xA;&#x9;layoutThis.makeColumnsEqualWidth = true;&#xA;&#x9;layoutThis.horizontalSpacing = 0;&#xA;&#x9;layoutThis.verticalSpacing = -1;&#xA;&#x9;layoutThis.marginWidth = 0;&#xA;&#x9;layoutThis.marginHeight = 0;&#xA;&#x9;this.setLayoutManager(layoutThis);&#xA;&#xA;&#x9;&#x9;this.setCornerDimensions(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(45)&#xA;, getMapMode().DPtoLP(45)&#xA;));&#xA;&#x9;&#x9;createContents();&#xA;&#x9;}&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private void createContents(){&#xA;&#xA;&#xA;fFigureDbcAxiomNameFigure = new org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel();&#xA;fFigureDbcAxiomNameFigure.setText(&quot;&lt;...>&quot;);&#xA;fFigureDbcAxiomNameFigure.setBorder(new org.eclipse.draw2d.MarginBorder(getMapMode().DPtoLP(5)&#xA;, getMapMode().DPtoLP(15)&#xA;, getMapMode().DPtoLP(3)&#xA;, getMapMode().DPtoLP(15)&#xA;));&#xA;&#xA;&#xA;org.eclipse.draw2d.GridData constraintFFigureDbcAxiomNameFigure = new org.eclipse.draw2d.GridData();&#xA;constraintFFigureDbcAxiomNameFigure.verticalAlignment = org.eclipse.draw2d.GridData.CENTER;&#xA;constraintFFigureDbcAxiomNameFigure.horizontalAlignment = org.eclipse.draw2d.GridData.CENTER;&#xA;constraintFFigureDbcAxiomNameFigure.horizontalIndent = 0;&#xA;constraintFFigureDbcAxiomNameFigure.horizontalSpan = 1;&#xA;constraintFFigureDbcAxiomNameFigure.verticalSpan = 1;&#xA;constraintFFigureDbcAxiomNameFigure.grabExcessHorizontalSpace = true;&#xA;constraintFFigureDbcAxiomNameFigure.grabExcessVerticalSpace = false;&#xA;this.add(fFigureDbcAxiomNameFigure, constraintFFigureDbcAxiomNameFigure);&#xA;&#xA;&#xA;&#xA;&#xA;org.eclipse.draw2d.RectangleFigure dbcAxiomDefinitionBorder0 = new org.eclipse.draw2d.RectangleFigure();&#xA;&#xA;&#xA;org.eclipse.draw2d.GridData constraintDbcAxiomDefinitionBorder0 = new org.eclipse.draw2d.GridData();&#xA;constraintDbcAxiomDefinitionBorder0.verticalAlignment = org.eclipse.draw2d.GridData.FILL;&#xA;constraintDbcAxiomDefinitionBorder0.horizontalAlignment = org.eclipse.draw2d.GridData.FILL;&#xA;constraintDbcAxiomDefinitionBorder0.horizontalIndent = 0;&#xA;constraintDbcAxiomDefinitionBorder0.horizontalSpan = 1;&#xA;constraintDbcAxiomDefinitionBorder0.verticalSpan = 1;&#xA;constraintDbcAxiomDefinitionBorder0.grabExcessHorizontalSpace = true;&#xA;constraintDbcAxiomDefinitionBorder0.grabExcessVerticalSpace = true;&#xA;this.add(dbcAxiomDefinitionBorder0, constraintDbcAxiomDefinitionBorder0);&#xA;&#xA;&#xA;&#x9;org.eclipse.draw2d.GridLayout layoutDbcAxiomDefinitionBorder0 = new org.eclipse.draw2d.GridLayout();&#xA;&#x9;layoutDbcAxiomDefinitionBorder0.numColumns = 1;&#xA;&#x9;layoutDbcAxiomDefinitionBorder0.makeColumnsEqualWidth = true;&#xA;&#x9;dbcAxiomDefinitionBorder0.setLayoutManager(layoutDbcAxiomDefinitionBorder0);&#xA;&#xA;&#xA;&#xA;fFigureDbcAxiomDefinitionFigure = new org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel();&#xA;fFigureDbcAxiomDefinitionFigure.setText(&quot;&lt;...>&quot;);&#xA;&#xA;&#xA;org.eclipse.draw2d.GridData constraintFFigureDbcAxiomDefinitionFigure = new org.eclipse.draw2d.GridData();&#xA;constraintFFigureDbcAxiomDefinitionFigure.verticalAlignment = org.eclipse.draw2d.GridData.FILL;&#xA;constraintFFigureDbcAxiomDefinitionFigure.horizontalAlignment = org.eclipse.draw2d.GridData.FILL;&#xA;constraintFFigureDbcAxiomDefinitionFigure.horizontalIndent = 0;&#xA;constraintFFigureDbcAxiomDefinitionFigure.horizontalSpan = 1;&#xA;constraintFFigureDbcAxiomDefinitionFigure.verticalSpan = 1;&#xA;constraintFFigureDbcAxiomDefinitionFigure.grabExcessHorizontalSpace = true;&#xA;constraintFFigureDbcAxiomDefinitionFigure.grabExcessVerticalSpace = true;&#xA;dbcAxiomDefinitionBorder0.add(fFigureDbcAxiomDefinitionFigure, constraintFFigureDbcAxiomDefinitionFigure);&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;fFigureDbcAxiomCompartmentRectangle = new org.eclipse.draw2d.RectangleFigure();&#xA;fFigureDbcAxiomCompartmentRectangle.setBorder(new org.eclipse.draw2d.MarginBorder(getMapMode().DPtoLP(0)&#xA;, getMapMode().DPtoLP(5)&#xA;, getMapMode().DPtoLP(5)&#xA;, getMapMode().DPtoLP(5)&#xA;));&#xA;&#xA;&#xA;org.eclipse.draw2d.GridData constraintFFigureDbcAxiomCompartmentRectangle = new org.eclipse.draw2d.GridData();&#xA;constraintFFigureDbcAxiomCompartmentRectangle.verticalAlignment = org.eclipse.draw2d.GridData.FILL;&#xA;constraintFFigureDbcAxiomCompartmentRectangle.horizontalAlignment = org.eclipse.draw2d.GridData.FILL;&#xA;constraintFFigureDbcAxiomCompartmentRectangle.horizontalIndent = 0;&#xA;constraintFFigureDbcAxiomCompartmentRectangle.horizontalSpan = 1;&#xA;constraintFFigureDbcAxiomCompartmentRectangle.verticalSpan = 1;&#xA;constraintFFigureDbcAxiomCompartmentRectangle.grabExcessHorizontalSpace = true;&#xA;constraintFFigureDbcAxiomCompartmentRectangle.grabExcessVerticalSpace = true;&#xA;this.add(fFigureDbcAxiomCompartmentRectangle, constraintFFigureDbcAxiomCompartmentRectangle);&#xA;&#xA;&#xA;&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel getFigureDbcAxiomNameFigure() {&#xA;&#x9;&#x9;return fFigureDbcAxiomNameFigure;&#xA;&#x9;}&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public org.eclipse.draw2d.RectangleFigure getFigureDbcAxiomCompartmentRectangle() {&#xA;&#x9;&#x9;return fFigureDbcAxiomCompartmentRectangle;&#xA;&#x9;}&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel getFigureDbcAxiomDefinitionFigure() {&#xA;&#x9;&#x9;return fFigureDbcAxiomDefinitionFigure;&#xA;&#x9;}&#xA;&#xA;&#xA;}&#xA;&#xA;"/>
+      <modelFacet>
+        <metaClass
+            href="DbcModel.genmodel#//dbcmodel/DbcAxiom"/>
+        <containmentMetaFeature
+            href="DbcModel.genmodel#//dbcmodel/AbstractDbcType/axioms"/>
+        <childMetaFeature
+            href="DbcModel.genmodel#//dbcmodel/AbstractDbcType/axioms"/>
+      </modelFacet>
+      <labels
+          visualID="5056"
+          editPartClassName="DbcAxiomNameEditPart"
+          itemSemanticEditPolicyClassName="DbcAxiomNameItemSemanticEditPolicy"
+          notationViewFactoryClassName="DbcAxiomNameViewFactory"
+          elementIcon="true">
+        <diagramRunTimeClass
+            href="../../../plugin/org.eclipse.gmf.runtime.notation/model/notation.genmodel#//notation/Node"/>
+        <viewmap
+            xsi:type="gmfgen:ParentAssignedViewmap"
+            getterName="getFigureDbcAxiomNameFigure"
+            figureQualifiedClassName="org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel"/>
+        <modelFacet
+            xsi:type="gmfgen:FeatureLabelModelFacet"
+            parser="//@labelParsers/@implementations.0">
+          <metaFeatures
+              href="DbcModel.genmodel#//dbcmodel/AbstractDbcSpecification/name"/>
+        </modelFacet>
+      </labels>
+      <labels
+          visualID="5060"
+          editPartClassName="DbcAxiomDefinitionEditPart"
+          itemSemanticEditPolicyClassName="DbcAxiomDefinitionItemSemanticEditPolicy"
+          notationViewFactoryClassName="DbcAxiomDefinitionViewFactory">
+        <diagramRunTimeClass
+            href="../../../plugin/org.eclipse.gmf.runtime.notation/model/notation.genmodel#//notation/Node"/>
+        <viewmap
+            xsi:type="gmfgen:ParentAssignedViewmap"
+            getterName="getFigureDbcAxiomDefinitionFigure"
+            figureQualifiedClassName="org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel"/>
+        <modelFacet
+            xsi:type="gmfgen:FeatureLabelModelFacet"
+            parser="//@labelParsers/@implementations.0">
+          <metaFeatures
+              href="DbcModel.genmodel#//dbcmodel/DbcAxiom/definition"/>
+        </modelFacet>
+      </labels>
+    </childNodes>
+    <childNodes
+        visualID="3037"
+        editPartClassName="DbCAxiomContractEditPart"
+        itemSemanticEditPolicyClassName="DbCAxiomContractItemSemanticEditPolicy"
+        notationViewFactoryClassName="DbCAxiomContractViewFactory"
+        canonicalEditPolicyClassName="DbCAxiomContractCanonicalEditPolicy"
+        graphicalNodeEditPolicyClassName="DbCAxiomContractGraphicalNodeEditPolicy"
+        createCommandClassName="DbCAxiomContractCreateCommand"
+        containers="//@diagram/@compartments.11">
+      <diagramRunTimeClass
+          href="../../../plugin/org.eclipse.gmf.runtime.notation/model/notation.genmodel#//notation/Node"/>
+      <elementType
+          xsi:type="gmfgen:MetamodelType"
+          editHelperClassName="DbCAxiomContractEditHelper"/>
+      <viewmap
+          xsi:type="gmfgen:InnerClassViewmap"
+          className="DbcAxiomContractFigure"
+          classBody="&#xA;/**&#xA; * @generated&#xA; */&#xA;public class DbcAxiomContractFigure extends org.eclipse.draw2d.RoundedRectangle {&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel fFigureDbcAxiomContractNameFigure; &#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel fFigureDbcAxiomContractPreFigure; &#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel fFigureDbcAxiomContractDepFigure; &#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public DbcAxiomContractFigure() {&#xA;&#x9;&#x9;&#xA;&#x9;org.eclipse.draw2d.GridLayout layoutThis = new org.eclipse.draw2d.GridLayout();&#xA;&#x9;layoutThis.numColumns = 1;&#xA;&#x9;layoutThis.makeColumnsEqualWidth = true;&#xA;&#x9;layoutThis.horizontalSpacing = 0;&#xA;&#x9;layoutThis.verticalSpacing = -1;&#xA;&#x9;layoutThis.marginWidth = 0;&#xA;&#x9;layoutThis.marginHeight = 0;&#xA;&#x9;this.setLayoutManager(layoutThis);&#xA;&#xA;&#x9;&#x9;this.setCornerDimensions(new org.eclipse.draw2d.geometry.Dimension(getMapMode().DPtoLP(45)&#xA;, getMapMode().DPtoLP(45)&#xA;));&#xA;&#x9;this.setBackgroundColor(THIS_BACK&#xA;);&#xA;&#x9;&#x9;createContents();&#xA;&#x9;}&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;private void createContents(){&#xA;&#xA;&#xA;fFigureDbcAxiomContractNameFigure = new org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel();&#xA;fFigureDbcAxiomContractNameFigure.setText(&quot;&lt;...>&quot;);&#xA;fFigureDbcAxiomContractNameFigure.setBorder(new org.eclipse.draw2d.MarginBorder(getMapMode().DPtoLP(5)&#xA;, getMapMode().DPtoLP(15)&#xA;, getMapMode().DPtoLP(3)&#xA;, getMapMode().DPtoLP(15)&#xA;));&#xA;&#xA;&#xA;org.eclipse.draw2d.GridData constraintFFigureDbcAxiomContractNameFigure = new org.eclipse.draw2d.GridData();&#xA;constraintFFigureDbcAxiomContractNameFigure.verticalAlignment = org.eclipse.draw2d.GridData.CENTER;&#xA;constraintFFigureDbcAxiomContractNameFigure.horizontalAlignment = org.eclipse.draw2d.GridData.CENTER;&#xA;constraintFFigureDbcAxiomContractNameFigure.horizontalIndent = 0;&#xA;constraintFFigureDbcAxiomContractNameFigure.horizontalSpan = 1;&#xA;constraintFFigureDbcAxiomContractNameFigure.verticalSpan = 1;&#xA;constraintFFigureDbcAxiomContractNameFigure.grabExcessHorizontalSpace = true;&#xA;constraintFFigureDbcAxiomContractNameFigure.grabExcessVerticalSpace = false;&#xA;this.add(fFigureDbcAxiomContractNameFigure, constraintFFigureDbcAxiomContractNameFigure);&#xA;&#xA;&#xA;&#xA;&#xA;org.eclipse.draw2d.RectangleFigure dbcAxiomContractPreBorder0 = new org.eclipse.draw2d.RectangleFigure();&#xA;&#xA;&#xA;org.eclipse.draw2d.GridData constraintDbcAxiomContractPreBorder0 = new org.eclipse.draw2d.GridData();&#xA;constraintDbcAxiomContractPreBorder0.verticalAlignment = org.eclipse.draw2d.GridData.FILL;&#xA;constraintDbcAxiomContractPreBorder0.horizontalAlignment = org.eclipse.draw2d.GridData.FILL;&#xA;constraintDbcAxiomContractPreBorder0.horizontalIndent = 0;&#xA;constraintDbcAxiomContractPreBorder0.horizontalSpan = 1;&#xA;constraintDbcAxiomContractPreBorder0.verticalSpan = 1;&#xA;constraintDbcAxiomContractPreBorder0.grabExcessHorizontalSpace = true;&#xA;constraintDbcAxiomContractPreBorder0.grabExcessVerticalSpace = true;&#xA;this.add(dbcAxiomContractPreBorder0, constraintDbcAxiomContractPreBorder0);&#xA;&#xA;&#xA;&#x9;org.eclipse.draw2d.GridLayout layoutDbcAxiomContractPreBorder0 = new org.eclipse.draw2d.GridLayout();&#xA;&#x9;layoutDbcAxiomContractPreBorder0.numColumns = 1;&#xA;&#x9;layoutDbcAxiomContractPreBorder0.makeColumnsEqualWidth = true;&#xA;&#x9;dbcAxiomContractPreBorder0.setLayoutManager(layoutDbcAxiomContractPreBorder0);&#xA;&#xA;&#xA;&#xA;fFigureDbcAxiomContractPreFigure = new org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel();&#xA;fFigureDbcAxiomContractPreFigure.setText(&quot;&lt;...>&quot;);&#xA;&#xA;&#xA;org.eclipse.draw2d.GridData constraintFFigureDbcAxiomContractPreFigure = new org.eclipse.draw2d.GridData();&#xA;constraintFFigureDbcAxiomContractPreFigure.verticalAlignment = org.eclipse.draw2d.GridData.FILL;&#xA;constraintFFigureDbcAxiomContractPreFigure.horizontalAlignment = org.eclipse.draw2d.GridData.FILL;&#xA;constraintFFigureDbcAxiomContractPreFigure.horizontalIndent = 0;&#xA;constraintFFigureDbcAxiomContractPreFigure.horizontalSpan = 1;&#xA;constraintFFigureDbcAxiomContractPreFigure.verticalSpan = 1;&#xA;constraintFFigureDbcAxiomContractPreFigure.grabExcessHorizontalSpace = true;&#xA;constraintFFigureDbcAxiomContractPreFigure.grabExcessVerticalSpace = true;&#xA;dbcAxiomContractPreBorder0.add(fFigureDbcAxiomContractPreFigure, constraintFFigureDbcAxiomContractPreFigure);&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;org.eclipse.draw2d.RectangleFigure dbcAxiomContractDepBorder0 = new org.eclipse.draw2d.RectangleFigure();&#xA;&#xA;&#xA;org.eclipse.draw2d.GridData constraintDbcAxiomContractDepBorder0 = new org.eclipse.draw2d.GridData();&#xA;constraintDbcAxiomContractDepBorder0.verticalAlignment = org.eclipse.draw2d.GridData.FILL;&#xA;constraintDbcAxiomContractDepBorder0.horizontalAlignment = org.eclipse.draw2d.GridData.FILL;&#xA;constraintDbcAxiomContractDepBorder0.horizontalIndent = 0;&#xA;constraintDbcAxiomContractDepBorder0.horizontalSpan = 1;&#xA;constraintDbcAxiomContractDepBorder0.verticalSpan = 1;&#xA;constraintDbcAxiomContractDepBorder0.grabExcessHorizontalSpace = true;&#xA;constraintDbcAxiomContractDepBorder0.grabExcessVerticalSpace = true;&#xA;this.add(dbcAxiomContractDepBorder0, constraintDbcAxiomContractDepBorder0);&#xA;&#xA;&#xA;&#x9;org.eclipse.draw2d.GridLayout layoutDbcAxiomContractDepBorder0 = new org.eclipse.draw2d.GridLayout();&#xA;&#x9;layoutDbcAxiomContractDepBorder0.numColumns = 1;&#xA;&#x9;layoutDbcAxiomContractDepBorder0.makeColumnsEqualWidth = true;&#xA;&#x9;dbcAxiomContractDepBorder0.setLayoutManager(layoutDbcAxiomContractDepBorder0);&#xA;&#xA;&#xA;&#xA;fFigureDbcAxiomContractDepFigure = new org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel();&#xA;fFigureDbcAxiomContractDepFigure.setText(&quot;&lt;...>&quot;);&#xA;&#xA;&#xA;org.eclipse.draw2d.GridData constraintFFigureDbcAxiomContractDepFigure = new org.eclipse.draw2d.GridData();&#xA;constraintFFigureDbcAxiomContractDepFigure.verticalAlignment = org.eclipse.draw2d.GridData.FILL;&#xA;constraintFFigureDbcAxiomContractDepFigure.horizontalAlignment = org.eclipse.draw2d.GridData.FILL;&#xA;constraintFFigureDbcAxiomContractDepFigure.horizontalIndent = 0;&#xA;constraintFFigureDbcAxiomContractDepFigure.horizontalSpan = 1;&#xA;constraintFFigureDbcAxiomContractDepFigure.verticalSpan = 1;&#xA;constraintFFigureDbcAxiomContractDepFigure.grabExcessHorizontalSpace = true;&#xA;constraintFFigureDbcAxiomContractDepFigure.grabExcessVerticalSpace = true;&#xA;dbcAxiomContractDepBorder0.add(fFigureDbcAxiomContractDepFigure, constraintFFigureDbcAxiomContractDepFigure);&#xA;&#xA;&#xA;&#xA;&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel getFigureDbcAxiomContractNameFigure() {&#xA;&#x9;&#x9;return fFigureDbcAxiomContractNameFigure;&#xA;&#x9;}&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel getFigureDbcAxiomContractPreFigure() {&#xA;&#x9;&#x9;return fFigureDbcAxiomContractPreFigure;&#xA;&#x9;}&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel getFigureDbcAxiomContractDepFigure() {&#xA;&#x9;&#x9;return fFigureDbcAxiomContractDepFigure;&#xA;&#x9;}&#xA;&#xA;&#xA;}&#xA;&#xA;/**&#xA; * @generated&#xA; */&#xA;static final org.eclipse.swt.graphics.Color THIS_BACK = new org.eclipse.swt.graphics.Color(null, 240, 240, 250);&#xA;&#xA;">
+        <attributes
+            xsi:type="gmfgen:StyleAttributes"
+            fixedBackground="true"/>
+      </viewmap>
+      <modelFacet>
+        <metaClass
+            href="DbcModel.genmodel#//dbcmodel/DbCAxiomContract"/>
+        <containmentMetaFeature
+            href="DbcModel.genmodel#//dbcmodel/DbcAxiom/axiomContracts"/>
+        <childMetaFeature
+            href="DbcModel.genmodel#//dbcmodel/DbcAxiom/axiomContracts"/>
+      </modelFacet>
+      <labels
+          visualID="5057"
+          editPartClassName="DbCAxiomContractNameEditPart"
+          itemSemanticEditPolicyClassName="DbCAxiomContractNameItemSemanticEditPolicy"
+          notationViewFactoryClassName="DbCAxiomContractNameViewFactory"
+          elementIcon="true">
+        <diagramRunTimeClass
+            href="../../../plugin/org.eclipse.gmf.runtime.notation/model/notation.genmodel#//notation/Node"/>
+        <viewmap
+            xsi:type="gmfgen:ParentAssignedViewmap"
+            getterName="getFigureDbcAxiomContractNameFigure"
+            figureQualifiedClassName="org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel"/>
+        <modelFacet
+            xsi:type="gmfgen:FeatureLabelModelFacet"
+            parser="//@labelParsers/@implementations.0">
+          <metaFeatures
+              href="DbcModel.genmodel#//dbcmodel/AbstractDbcSpecification/name"/>
+        </modelFacet>
+      </labels>
+      <labels
+          visualID="5058"
+          editPartClassName="DbCAxiomContractPreEditPart"
+          itemSemanticEditPolicyClassName="DbCAxiomContractPreItemSemanticEditPolicy"
+          notationViewFactoryClassName="DbCAxiomContractPreViewFactory">
+        <diagramRunTimeClass
+            href="../../../plugin/org.eclipse.gmf.runtime.notation/model/notation.genmodel#//notation/Node"/>
+        <viewmap
+            xsi:type="gmfgen:ParentAssignedViewmap"
+            getterName="getFigureDbcAxiomContractPreFigure"
+            figureQualifiedClassName="org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel"/>
+        <modelFacet
+            xsi:type="gmfgen:FeatureLabelModelFacet"
+            parser="//@labelParsers/@implementations.0">
+          <metaFeatures
+              href="DbcModel.genmodel#//dbcmodel/DbCAxiomContract/pre"/>
+        </modelFacet>
+      </labels>
+      <labels
+          visualID="5059"
+          editPartClassName="DbCAxiomContractDepEditPart"
+          itemSemanticEditPolicyClassName="DbCAxiomContractDepItemSemanticEditPolicy"
+          notationViewFactoryClassName="DbCAxiomContractDepViewFactory">
+        <diagramRunTimeClass
+            href="../../../plugin/org.eclipse.gmf.runtime.notation/model/notation.genmodel#//notation/Node"/>
+        <viewmap
+            xsi:type="gmfgen:ParentAssignedViewmap"
+            getterName="getFigureDbcAxiomContractDepFigure"
+            figureQualifiedClassName="org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel"/>
+        <modelFacet
+            xsi:type="gmfgen:FeatureLabelModelFacet"
+            parser="//@labelParsers/@implementations.0">
+          <metaFeatures
+              href="DbcModel.genmodel#//dbcmodel/DbCAxiomContract/dep"/>
+        </modelFacet>
+      </labels>
     </childNodes>
     <topLevelNodes
         visualID="2007"
@@ -650,7 +841,7 @@
         itemSemanticEditPolicyClassName="DbcInterfaceItemSemanticEditPolicy"
         notationViewFactoryClassName="DbcInterfaceViewFactory"
         canonicalEditPolicyClassName="DbcInterfaceCanonicalEditPolicy"
-        compartments="//@diagram/@compartments.11 //@diagram/@compartments.12"
+        compartments="//@diagram/@compartments.12 //@diagram/@compartments.13"
         graphicalNodeEditPolicyClassName="DbcInterfaceGraphicalNodeEditPolicy"
         createCommandClassName="DbcInterfaceCreateCommand">
       <diagramRunTimeClass
@@ -700,7 +891,7 @@
         itemSemanticEditPolicyClassName="DbcClassItemSemanticEditPolicy"
         notationViewFactoryClassName="DbcClassViewFactory"
         canonicalEditPolicyClassName="DbcClassCanonicalEditPolicy"
-        compartments="//@diagram/@compartments.13 //@diagram/@compartments.14"
+        compartments="//@diagram/@compartments.14 //@diagram/@compartments.15"
         graphicalNodeEditPolicyClassName="DbcClassGraphicalNodeEditPolicy"
         createCommandClassName="DbcClassCreateCommand">
       <diagramRunTimeClass
@@ -750,7 +941,7 @@
         itemSemanticEditPolicyClassName="DbcEnumItemSemanticEditPolicy"
         notationViewFactoryClassName="DbcEnumViewFactory"
         canonicalEditPolicyClassName="DbcEnumCanonicalEditPolicy"
-        compartments="//@diagram/@compartments.15 //@diagram/@compartments.16 //@diagram/@compartments.17"
+        compartments="//@diagram/@compartments.16 //@diagram/@compartments.17 //@diagram/@compartments.18"
         graphicalNodeEditPolicyClassName="DbcEnumGraphicalNodeEditPolicy"
         createCommandClassName="DbcEnumCreateCommand">
       <diagramRunTimeClass
@@ -1026,7 +1217,7 @@
         itemSemanticEditPolicyClassName="DbcClassDbcClassMainCompartmentItemSemanticEditPolicy"
         notationViewFactoryClassName="DbcClassDbcClassMainCompartmentViewFactory"
         canonicalEditPolicyClassName="DbcClassDbcClassMainCompartmentCanonicalEditPolicy"
-        childNodes="//@diagram/@childNodes.1 //@diagram/@childNodes.2 //@diagram/@childNodes.3 //@diagram/@childNodes.7 //@diagram/@childNodes.9 //@diagram/@childNodes.5 //@diagram/@childNodes.4"
+        childNodes="//@diagram/@childNodes.1 //@diagram/@childNodes.2 //@diagram/@childNodes.3 //@diagram/@childNodes.7 //@diagram/@childNodes.9 //@diagram/@childNodes.5 //@diagram/@childNodes.4 //@diagram/@childNodes.11"
         title="DbcClassMainCompartment"
         needsTitle="false"
         node="//@diagram/@childNodes.1"
@@ -1061,7 +1252,7 @@
         itemSemanticEditPolicyClassName="DbcInterfaceDbcInterfaceMainCompartmentItemSemanticEditPolicy"
         notationViewFactoryClassName="DbcInterfaceDbcInterfaceMainCompartmentViewFactory"
         canonicalEditPolicyClassName="DbcInterfaceDbcInterfaceMainCompartmentCanonicalEditPolicy"
-        childNodes="//@diagram/@childNodes.1 //@diagram/@childNodes.2 //@diagram/@childNodes.3 //@diagram/@childNodes.4 //@diagram/@childNodes.5 //@diagram/@childNodes.7"
+        childNodes="//@diagram/@childNodes.1 //@diagram/@childNodes.2 //@diagram/@childNodes.3 //@diagram/@childNodes.4 //@diagram/@childNodes.5 //@diagram/@childNodes.7 //@diagram/@childNodes.11"
         title="DbcInterfaceMainCompartment"
         needsTitle="false"
         node="//@diagram/@childNodes.2"
@@ -1096,7 +1287,7 @@
         itemSemanticEditPolicyClassName="DbcEnumDbcEnumMainCompartmentItemSemanticEditPolicy"
         notationViewFactoryClassName="DbcEnumDbcEnumMainCompartmentViewFactory"
         canonicalEditPolicyClassName="DbcEnumDbcEnumMainCompartmentCanonicalEditPolicy"
-        childNodes="//@diagram/@childNodes.1 //@diagram/@childNodes.2 //@diagram/@childNodes.3 //@diagram/@childNodes.4 //@diagram/@childNodes.5 //@diagram/@childNodes.7 //@diagram/@childNodes.9"
+        childNodes="//@diagram/@childNodes.1 //@diagram/@childNodes.2 //@diagram/@childNodes.3 //@diagram/@childNodes.4 //@diagram/@childNodes.5 //@diagram/@childNodes.7 //@diagram/@childNodes.9 //@diagram/@childNodes.11"
         title="DbcEnumMainCompartment"
         needsTitle="false"
         node="//@diagram/@childNodes.3"
@@ -1179,12 +1370,30 @@
           figureQualifiedClassName="org.eclipse.draw2d.RectangleFigure"/>
     </compartments>
     <compartments
+        visualID="7064"
+        editPartClassName="DbcAxiomDbcAxiomCompartmentEditPart"
+        itemSemanticEditPolicyClassName="DbcAxiomDbcAxiomCompartmentItemSemanticEditPolicy"
+        notationViewFactoryClassName="DbcAxiomDbcAxiomCompartmentViewFactory"
+        canonicalEditPolicyClassName="DbcAxiomDbcAxiomCompartmentCanonicalEditPolicy"
+        childNodes="//@diagram/@childNodes.12"
+        title="DbcAxiomCompartment"
+        needsTitle="false"
+        node="//@diagram/@childNodes.11"
+        listLayout="false">
+      <diagramRunTimeClass
+          href="../../../plugin/org.eclipse.gmf.runtime.notation/model/notation.genmodel#//notation/Node"/>
+      <viewmap
+          xsi:type="gmfgen:ParentAssignedViewmap"
+          getterName="getFigureDbcAxiomCompartmentRectangle"
+          figureQualifiedClassName="org.eclipse.draw2d.RectangleFigure"/>
+    </compartments>
+    <compartments
         visualID="7057"
         editPartClassName="DbcInterfaceDbcInterfaceMainCompartment2EditPart"
         itemSemanticEditPolicyClassName="DbcInterfaceDbcInterfaceMainCompartment2ItemSemanticEditPolicy"
         notationViewFactoryClassName="DbcInterfaceDbcInterfaceMainCompartmentViewFactory"
         canonicalEditPolicyClassName="DbcInterfaceDbcInterfaceMainCompartment2CanonicalEditPolicy"
-        childNodes="//@diagram/@childNodes.1 //@diagram/@childNodes.2 //@diagram/@childNodes.3 //@diagram/@childNodes.4 //@diagram/@childNodes.5 //@diagram/@childNodes.7"
+        childNodes="//@diagram/@childNodes.1 //@diagram/@childNodes.2 //@diagram/@childNodes.3 //@diagram/@childNodes.4 //@diagram/@childNodes.5 //@diagram/@childNodes.7 //@diagram/@childNodes.11"
         title="DbcInterfaceMainCompartment"
         needsTitle="false"
         node="//@diagram/@topLevelNodes.1"
@@ -1219,7 +1428,7 @@
         itemSemanticEditPolicyClassName="DbcClassDbcClassMainCompartment2ItemSemanticEditPolicy"
         notationViewFactoryClassName="DbcClassDbcClassMainCompartmentViewFactory"
         canonicalEditPolicyClassName="DbcClassDbcClassMainCompartment2CanonicalEditPolicy"
-        childNodes="//@diagram/@childNodes.1 //@diagram/@childNodes.2 //@diagram/@childNodes.3 //@diagram/@childNodes.7 //@diagram/@childNodes.9 //@diagram/@childNodes.5 //@diagram/@childNodes.4"
+        childNodes="//@diagram/@childNodes.1 //@diagram/@childNodes.2 //@diagram/@childNodes.3 //@diagram/@childNodes.7 //@diagram/@childNodes.9 //@diagram/@childNodes.5 //@diagram/@childNodes.4 //@diagram/@childNodes.11"
         title="DbcClassMainCompartment"
         needsTitle="false"
         node="//@diagram/@topLevelNodes.2"
@@ -1254,7 +1463,7 @@
         itemSemanticEditPolicyClassName="DbcEnumDbcEnumMainCompartment2ItemSemanticEditPolicy"
         notationViewFactoryClassName="DbcEnumDbcEnumMainCompartmentViewFactory"
         canonicalEditPolicyClassName="DbcEnumDbcEnumMainCompartment2CanonicalEditPolicy"
-        childNodes="//@diagram/@childNodes.1 //@diagram/@childNodes.2 //@diagram/@childNodes.3 //@diagram/@childNodes.4 //@diagram/@childNodes.5 //@diagram/@childNodes.7 //@diagram/@childNodes.9"
+        childNodes="//@diagram/@childNodes.1 //@diagram/@childNodes.2 //@diagram/@childNodes.3 //@diagram/@childNodes.4 //@diagram/@childNodes.5 //@diagram/@childNodes.7 //@diagram/@childNodes.9 //@diagram/@childNodes.11"
         title="DbcEnumMainCompartment"
         needsTitle="false"
         node="//@diagram/@topLevelNodes.3"
@@ -1362,6 +1571,16 @@
       <groups
           title="Specification"
           collapse="true">
+        <entries
+            xsi:type="gmfgen:ToolEntry"
+            title="Axiom"
+            description="Create new axiom"
+            genNodes="//@diagram/@childNodes.11"/>
+        <entries
+            xsi:type="gmfgen:ToolEntry"
+            title="Axiom Contract"
+            description="Create new axiom contract"
+            genNodes="//@diagram/@childNodes.12"/>
         <entries
             xsi:type="gmfgen:ToolEntry"
             title="Invariant"
@@ -1483,6 +1702,12 @@
         parent="//@diagram/@childNodes.3"
         child="//@diagram/@childNodes.10"/>
     <childReferences
+        parent="//@diagram/@childNodes.11"
+        child="//@diagram/@childNodes.12"/>
+    <childReferences
+        parent="//@diagram/@childNodes.3"
+        child="//@diagram/@childNodes.11"/>
+    <childReferences
         parent="//@diagram/@childNodes.2"
         child="//@diagram/@childNodes.3"/>
     <childReferences
@@ -1497,6 +1722,9 @@
     <childReferences
         parent="//@diagram/@childNodes.2"
         child="//@diagram/@childNodes.7"/>
+    <childReferences
+        parent="//@diagram/@childNodes.2"
+        child="//@diagram/@childNodes.11"/>
     <childReferences
         parent="//@diagram/@childNodes.1"
         child="//@diagram/@childNodes.2"/>
@@ -1518,6 +1746,9 @@
     <childReferences
         parent="//@diagram/@childNodes.1"
         child="//@diagram/@childNodes.6"/>
+    <childReferences
+        parent="//@diagram/@childNodes.1"
+        child="//@diagram/@childNodes.11"/>
     <childReferences
         parent="//@diagram/@childNodes.0"
         child="//@diagram/@childNodes.1"/>
@@ -1570,6 +1801,9 @@
         parent="//@diagram/@topLevelNodes.1"
         child="//@diagram/@childNodes.7"/>
     <childReferences
+        parent="//@diagram/@topLevelNodes.1"
+        child="//@diagram/@childNodes.11"/>
+    <childReferences
         parent="//@diagram"
         child="//@diagram/@topLevelNodes.1"/>
     <childReferences
@@ -1596,6 +1830,9 @@
     <childReferences
         parent="//@diagram/@topLevelNodes.2"
         child="//@diagram/@childNodes.6"/>
+    <childReferences
+        parent="//@diagram/@topLevelNodes.2"
+        child="//@diagram/@childNodes.11"/>
     <childReferences
         parent="//@diagram"
         child="//@diagram/@topLevelNodes.2"/>
@@ -1626,6 +1863,9 @@
     <childReferences
         parent="//@diagram/@topLevelNodes.3"
         child="//@diagram/@childNodes.10"/>
+    <childReferences
+        parent="//@diagram/@topLevelNodes.3"
+        child="//@diagram/@childNodes.11"/>
     <childReferences
         parent="//@diagram"
         child="//@diagram/@topLevelNodes.3"/>
@@ -1747,6 +1987,18 @@
         groupIcon="icons/incomingLinksNavigatorGroup.gif"/>
     <childReferences
         parent="//@diagram/@links.0"
+        child="//@diagram/@childNodes.12"
+        referenceType="out_target"
+        groupName="target"
+        groupIcon="icons/linkTargetNavigatorGroup.gif"/>
+    <childReferences
+        parent="//@diagram/@childNodes.12"
+        child="//@diagram/@links.0"
+        referenceType="in_source"
+        groupName="incoming links"
+        groupIcon="icons/incomingLinksNavigatorGroup.gif"/>
+    <childReferences
+        parent="//@diagram/@links.0"
         child="//@diagram/@topLevelNodes.4"
         referenceType="in_source"
         groupName="source"
@@ -1860,6 +2112,18 @@
         groupIcon="icons/incomingLinksNavigatorGroup.gif"/>
     <childReferences
         parent="//@diagram/@links.1"
+        child="//@diagram/@childNodes.6"
+        referenceType="out_target"
+        groupName="target"
+        groupIcon="icons/linkTargetNavigatorGroup.gif"/>
+    <childReferences
+        parent="//@diagram/@childNodes.6"
+        child="//@diagram/@links.1"
+        referenceType="in_source"
+        groupName="incoming links"
+        groupIcon="icons/incomingLinksNavigatorGroup.gif"/>
+    <childReferences
+        parent="//@diagram/@links.1"
         child="//@diagram/@childNodes.7"
         referenceType="out_target"
         groupName="target"
@@ -1890,6 +2154,42 @@
         groupIcon="icons/linkTargetNavigatorGroup.gif"/>
     <childReferences
         parent="//@diagram/@childNodes.9"
+        child="//@diagram/@links.1"
+        referenceType="in_source"
+        groupName="incoming links"
+        groupIcon="icons/incomingLinksNavigatorGroup.gif"/>
+    <childReferences
+        parent="//@diagram/@links.1"
+        child="//@diagram/@childNodes.10"
+        referenceType="out_target"
+        groupName="target"
+        groupIcon="icons/linkTargetNavigatorGroup.gif"/>
+    <childReferences
+        parent="//@diagram/@childNodes.10"
+        child="//@diagram/@links.1"
+        referenceType="in_source"
+        groupName="incoming links"
+        groupIcon="icons/incomingLinksNavigatorGroup.gif"/>
+    <childReferences
+        parent="//@diagram/@links.1"
+        child="//@diagram/@childNodes.11"
+        referenceType="out_target"
+        groupName="target"
+        groupIcon="icons/linkTargetNavigatorGroup.gif"/>
+    <childReferences
+        parent="//@diagram/@childNodes.11"
+        child="//@diagram/@links.1"
+        referenceType="in_source"
+        groupName="incoming links"
+        groupIcon="icons/incomingLinksNavigatorGroup.gif"/>
+    <childReferences
+        parent="//@diagram/@links.1"
+        child="//@diagram/@childNodes.12"
+        referenceType="out_target"
+        groupName="target"
+        groupIcon="icons/linkTargetNavigatorGroup.gif"/>
+    <childReferences
+        parent="//@diagram/@childNodes.12"
         child="//@diagram/@links.1"
         referenceType="in_source"
         groupName="incoming links"
@@ -2142,7 +2442,7 @@
       extensibleViaService="true">
     <implementations
         xsi:type="gmfgen:PredefinedParser"
-        uses="//@diagram/@childNodes.4/@labels.0/@modelFacet //@diagram/@childNodes.5/@labels.0/@modelFacet //@diagram/@childNodes.5/@labels.1/@modelFacet //@diagram/@childNodes.6/@labelModelFacet //@diagram/@childNodes.8/@labels.0/@modelFacet //@diagram/@childNodes.8/@labels.1/@modelFacet //@diagram/@childNodes.8/@labels.2/@modelFacet //@diagram/@childNodes.7/@labels.0/@modelFacet //@diagram/@childNodes.9/@labels.0/@modelFacet //@diagram/@childNodes.10/@labelModelFacet //@diagram/@childNodes.3/@labels.0/@modelFacet //@diagram/@childNodes.2/@labels.0/@modelFacet //@diagram/@childNodes.1/@labels.0/@modelFacet //@diagram/@childNodes.0/@labels.0/@modelFacet //@diagram/@topLevelNodes.0/@labels.0/@modelFacet //@diagram/@topLevelNodes.1/@labels.0/@modelFacet //@diagram/@topLevelNodes.2/@labels.0/@modelFacet //@diagram/@topLevelNodes.3/@labels.0/@modelFacet //@diagram/@topLevelNodes.4/@labels.0/@modelFacet //@diagram/@links.1/@labels.0/@modelFacet"/>
+        uses="//@diagram/@childNodes.4/@labels.0/@modelFacet //@diagram/@childNodes.5/@labels.0/@modelFacet //@diagram/@childNodes.5/@labels.1/@modelFacet //@diagram/@childNodes.6/@labels.0/@modelFacet //@diagram/@childNodes.8/@labels.0/@modelFacet //@diagram/@childNodes.8/@labels.1/@modelFacet //@diagram/@childNodes.8/@labels.2/@modelFacet //@diagram/@childNodes.7/@labels.0/@modelFacet //@diagram/@childNodes.9/@labels.0/@modelFacet //@diagram/@childNodes.10/@labels.0/@modelFacet //@diagram/@childNodes.12/@labels.0/@modelFacet //@diagram/@childNodes.12/@labels.1/@modelFacet //@diagram/@childNodes.12/@labels.2/@modelFacet //@diagram/@childNodes.11/@labels.0/@modelFacet //@diagram/@childNodes.11/@labels.1/@modelFacet //@diagram/@childNodes.3/@labels.0/@modelFacet //@diagram/@childNodes.2/@labels.0/@modelFacet //@diagram/@childNodes.1/@labels.0/@modelFacet //@diagram/@childNodes.0/@labels.0/@modelFacet //@diagram/@topLevelNodes.0/@labels.0/@modelFacet //@diagram/@topLevelNodes.1/@labels.0/@modelFacet //@diagram/@topLevelNodes.2/@labels.0/@modelFacet //@diagram/@topLevelNodes.3/@labels.0/@modelFacet //@diagram/@topLevelNodes.4/@labels.0/@modelFacet //@diagram/@links.1/@labels.0/@modelFacet"/>
   </labelParsers>
   <contextMenus
       context="//@diagram">

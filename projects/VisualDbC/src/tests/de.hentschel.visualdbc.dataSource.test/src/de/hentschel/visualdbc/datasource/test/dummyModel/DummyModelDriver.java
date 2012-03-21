@@ -460,8 +460,8 @@ public class DummyModelDriver extends AbstractDSDriver {
          else if (child instanceof MemoryEnum) {
             instance.addInnerEnum((MemoryEnum)child);
          }
-         else if (child instanceof IDSAttribute) {
-            instance.getAttributes().add((IDSAttribute)child);
+         else if (child instanceof MemoryAttribute) {
+            instance.addAttribute((MemoryAttribute)child);
          }
          else if (child instanceof MemoryMethod) {
             instance.addMethod((MemoryMethod)child);
@@ -502,8 +502,8 @@ public class DummyModelDriver extends AbstractDSDriver {
          else if (child instanceof MemoryEnum) {
             instance.addInnerEnum((MemoryEnum)child);
          }
-         else if (child instanceof IDSAttribute) {
-            instance.getAttributes().add((IDSAttribute)child);
+         else if (child instanceof MemoryAttribute) {
+            instance.addAttribute((MemoryAttribute)child);
          }
          else if (child instanceof MemoryMethod) {
             instance.addMethod((MemoryMethod)child);
@@ -541,8 +541,8 @@ public class DummyModelDriver extends AbstractDSDriver {
          else if (child instanceof MemoryEnum) {
             instance.addInnerEnum((MemoryEnum)child);
          }
-         else if (child instanceof IDSAttribute) {
-            instance.getAttributes().add((IDSAttribute)child);
+         else if (child instanceof MemoryAttribute) {
+            instance.addAttribute((MemoryAttribute)child);
          }
          else if (child instanceof MemoryMethod) {
             instance.addMethod((MemoryMethod)child);
@@ -550,8 +550,8 @@ public class DummyModelDriver extends AbstractDSDriver {
          else if (child instanceof MemoryConstructor) {
             instance.addConstructor((MemoryConstructor)child);
          }
-         else if (child instanceof IDSEnumLiteral) {
-            instance.getLiterals().add((IDSEnumLiteral)child);
+         else if (child instanceof MemoryEnumLiteral) {
+            instance.addLiteral((MemoryEnumLiteral)child);
          }
          else {
             throw new IllegalArgumentException("Unsupported child \"" + child + "\".");

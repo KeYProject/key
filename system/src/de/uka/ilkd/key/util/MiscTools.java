@@ -11,21 +11,55 @@
 package de.uka.ilkd.key.util;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
-import de.uka.ilkd.key.collection.*;
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.NameAbstractionTable;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.Assignment;
-import de.uka.ilkd.key.java.reference.*;
-import de.uka.ilkd.key.java.statement.*;
-import de.uka.ilkd.key.java.visitor.*;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.statement.CatchAllStatement;
+import de.uka.ilkd.key.java.statement.LabeledStatement;
+import de.uka.ilkd.key.java.statement.LoopStatement;
+import de.uka.ilkd.key.java.statement.MethodFrame;
+import de.uka.ilkd.key.java.visitor.CreatingASTVisitor;
+import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.ProgramPrefix;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.ObserverFunction;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.Quantifier;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.RuleSet;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.WhileInvariantRule;
 
 
 /**
@@ -217,6 +251,23 @@ public final class MiscTools {
 	}
     }
     
+    /**
+     * <p>
+     * Returns the {@link Sort}s of the given {@link Term}s.
+     * </p>
+     * <p>
+     * This method is used for instance by the Symbolic Execution Debugger.
+     * </p>
+     * @param terms The given {@link Term}s.
+     * @return The {@link Term} {@link Sort}s.
+     */
+    public static ImmutableList<Sort> getSorts(Iterable<Term> terms) {
+        ImmutableList<Sort> result = ImmutableSLList.<Sort>nil();
+        for (Term t : terms) {
+            result = result.append(t.sort());
+        }
+        return result;
+    }
     
     /**
      * Removes all formulas from the passed goal.
@@ -743,4 +794,42 @@ public final class MiscTools {
         }
         return res.toString();
     }
+    
+    /** Checks whether a string contains another one as a whole word
+     * (i.e., separated by whitespaces or a semicolon at the end).
+     * @param s string to search in
+     * @param word string to be searched for
+     */
+    public static boolean containsWholeWord(String s, String word){
+        if (s == null || word == null) return false;
+        int i = -1;
+        final int wl = word.length();
+        while (true) {
+            i = s.indexOf(word, i+1);
+            if (i < 0 || i >= s.length()) break;
+            if (i == 0 || Character.isWhitespace(s.charAt(i-1))) {
+                if (i+wl == s.length() || Character.isWhitespace(s.charAt(i+wl)) || s.charAt(i+wl) == ';') {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
+
+    /** There are different kinds of JML markers.
+     * See Section 4.4 "Annotation markers" of the JML reference manual.
+     * @param comment
+     * @return
+     */
+    public static boolean isJMLComment(String comment) {
+        try {
+        return (comment.startsWith("/*@") || comment.startsWith("//@")
+                || comment.startsWith("/*+KeY@") || comment.startsWith("//+KeY@")
+                || (comment.startsWith("/*-")&& !comment.substring(3,6).equals("KeY") && comment.contains("@"))
+                || (comment.startsWith("//-") && !comment.substring(3,6).equals("KeY") && comment.contains("@")));
+        } catch (IndexOutOfBoundsException e){
+            return false;
+        }
+    }   
 }

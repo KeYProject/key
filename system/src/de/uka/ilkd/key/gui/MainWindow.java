@@ -1808,7 +1808,7 @@ public final class MainWindow extends JFrame  {
     public void loadCommandLineFile() {
         if (Main.getFileNameOnStartUp() != null) {
             loadProblem(new File(Main.getFileNameOnStartUp()));
-        } else if(Main.getExamplesDir() != null) {
+        } else if(Main.getExamplesDir() != null && Main.showExampleChooserIfExamplesDirIsDefined) {
             openExampleAction.actionPerformed(null);
         }
     }
@@ -1941,5 +1941,20 @@ public final class MainWindow extends JFrame  {
      */
     public ExitMainAction getExitMainAction() {
         return exitMainAction;
+    }
+
+    /**
+     * <p>
+     * Returns the {@link NotificationManager}.
+     * </p>
+     * <p>
+     * This functionality is required because in other project is it
+     * required to execute the automatic mode without opening the result dialog
+     * which can be disabled in the {@link NotificationManager}.
+     * </p>
+     * @return
+     */
+    public NotificationManager getNotificationManager() {
+        return notificationManager;
     }
 }

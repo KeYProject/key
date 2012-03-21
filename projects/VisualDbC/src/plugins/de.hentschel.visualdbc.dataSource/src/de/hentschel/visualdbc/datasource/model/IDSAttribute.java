@@ -17,7 +17,14 @@ import de.hentschel.visualdbc.datasource.model.exception.DSException;
  * Represents an attribute on the data source.
  * @author Martin Hentschel
  */
-public interface IDSAttribute {
+public interface IDSAttribute extends IDSProvable {
+   /**
+    * Returns the parent.
+    * @return The parent.
+    * @throws DSException Occurred Exception
+    */
+   public IDSType getParent() throws DSException;
+   
    /**
     * Returns the attribute name.
     * @return The attribute name.

@@ -14,6 +14,7 @@ package de.hentschel.visualdbc.datasource.key.test.suite.swtbot;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
+import de.hentschel.visualdbc.datasource.key.test.testCase.swtbot.SWTBotKeyAxiomContractTest;
 import de.hentschel.visualdbc.datasource.key.test.testCase.swtbot.SWTBotKeyInteractiveMainTest;
 import de.hentschel.visualdbc.datasource.key.test.testCase.swtbot.SWTBotKeyOperationContractTest;
 
@@ -23,6 +24,7 @@ import de.hentschel.visualdbc.datasource.key.test.testCase.swtbot.SWTBotKeyOpera
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
+   SWTBotKeyAxiomContractTest.class,
    SWTBotKeyInteractiveMainTest.class,
    SWTBotKeyOperationContractTest.class
 })
