@@ -196,6 +196,11 @@ public class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings{
                 return pdSettings.minInteger;
         }
 
+		@Override
+		public String getLogic() {
+			return "AUFLIA";
+		}
+
         
 
         

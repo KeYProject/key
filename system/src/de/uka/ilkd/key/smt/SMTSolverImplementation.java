@@ -40,7 +40,7 @@ interface SolverListener {
         void processUser(SMTSolver solver, SMTProblem problem);
 }
 
-final class SMTSolverImplementation implements SMTSolver, Runnable {
+final class SMTSolverImplementation implements SMTSolver, Runnable, PipeListener {
 
         private static int fileCounter = 0;
 
@@ -264,7 +264,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable {
 
                 // start the external process.
                 try {
-                        solverOutput = processLauncher.launch(commands);
+                        solverOutput = processLauncher.launch(commands,problemString);
                         this.finalResult = type
                                         .interpretAnswer(
                                                         solverOutput[ExternalProcessLauncher.RESULT],
@@ -498,5 +498,13 @@ final class SMTSolverImplementation implements SMTSolver, Runnable {
                 
                 return exceptionsForTacletTranslation;
         }
+
+		@Override
+		public void messageIncoming(Pipe pipe, String message, int type) {
+			if(message.indexOf("unsat")>-1){
+				pipe.sendMessgage(Character.toString((char)3));
+			}
+			System.out.println("Type "+type+": "+ message);			
+		}
 
 }

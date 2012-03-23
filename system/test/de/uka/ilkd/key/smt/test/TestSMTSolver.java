@@ -99,6 +99,11 @@ public long getMinimumInteger() {
         return ProofDependentSMTSettings.getDefaultSettingsData().minInteger;
 }
 
+@Override
+public String getLogic() {
+	return "AUFLIA";
+}
+
     
 }
 
