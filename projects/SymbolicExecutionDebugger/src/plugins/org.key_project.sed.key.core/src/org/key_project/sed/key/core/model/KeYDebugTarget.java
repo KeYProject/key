@@ -708,10 +708,16 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
     */
    @Override
    public void terminate() throws DebugException {
-      // Remove proof from user interface
-      KeYUtil.removeFromProofList(MainWindow.getInstance(), proof.env());
       // Remove auto mode listener
-      MainWindow.getInstance().getMediator().removeAutoModeListener(autoModeListener);
+      MainWindow main = MainWindow.getInstance(); 
+      main.getMediator().removeAutoModeListener(autoModeListener);
+      // Suspend first to stop the automatic mode
+      if (!isSuspended()) {
+         suspend();
+         KeYUtil.waitWhileMainWindowIsFrozen(main);
+      }
+      // Remove proof from user interface
+      KeYUtil.removeFromProofList(main, proof.env());
       // Clear cache
       keyNodeMapping.clear();
       // Inform UI that the process is terminated
