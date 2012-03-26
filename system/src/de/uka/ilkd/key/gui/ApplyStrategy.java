@@ -293,7 +293,9 @@ public class ApplyStrategy {
 			mediator().startInterface(true);
 			Goal g = goalChooser.getNextGoal();
 			if(g == null) {
-			    g = proof.openGoals().head();
+				if (proof != null) { // Maybe the proof was removed from the proof list and #clear() has set the proof reference to null. It is possible because this statement is executed after MainWindow#frozen is set to false.
+					g = proof.openGoals().head();
+				}
 			}
 			if(g != null) {
 			    mediator().goalChosen(g);
@@ -301,7 +303,9 @@ public class ApplyStrategy {
 		    }
 		}
             }
-            proof.addAutoModeTime(time);
+            if (proof != null) { // Maybe the proof was removed from the proof list and #clear() has set the proof reference to null. It is possible because this statement is executed after MainWindow#frozen is set to false.
+                proof.addAutoModeTime(time);
+            }
             fireTaskFinished (new DefaultTaskFinishedInfo(ApplyStrategy.this, result, 
                     proof, time, 
                     countApplied, mediator().getNrGoalsClosedByAutoMode()));	  
