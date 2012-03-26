@@ -14,6 +14,7 @@ import java.util.List;
 import javax.swing.Icon;
 import javax.swing.filechooser.FileSystemView;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.widgets.Display;
@@ -137,7 +138,9 @@ public final class IOUtil {
 
    /**
     * <p>
-    * Computes the start indices for each line in the given {@link File}.
+    * Computes line information for each text line in the given {@link File}.
+    * A {@link LineInformation} consists of the offset from the beginning of the
+    * file for each line and the indices of tabs {@code '\t'} in each line.
     * </p>
     * <p>
     * Example content, line break is '\n':
@@ -149,55 +152,55 @@ public final class IOUtil {
     * </pre>
     * Computed line start indices:
     * <pre><code>
-    * result[0] = 0
-    * result[1] = 7
-    * result[2] = 30
-    * result[3] = 31
+    * result[0] = new LineInformation(0, new int[0]);
+    * result[1] = new LineInformation(7, new int[] {7});
+    * result[2] = new LineInformation(30, new int[0]);
+    * result[3] = new LineInformation(31, new int[0]);
     * </code></pre>
     * </p>
     * @param file The given {@link File}.
     * @return The computed start indices.
     * @throws IOException Occurred Exception.
     */
-   public static Integer[] computeLineStartIndices(File file) throws IOException {
+   public static LineInformation[] computeLineInformation(File file) throws IOException {
       if (file != null) {
-         return computeLineStartIndices(new FileInputStream(file));
+         return computeLineInformation(new FileInputStream(file));
       }
       else {
-         return computeLineStartIndices((InputStream)null);
+         return computeLineInformation((InputStream)null);
       }
    }
 
    /**
     * <p>
-    * Computes the start indices for each line in the given {@link InputStream}.
+    * Computes line information for each text line in the given {@link InputStream}.
+    * A {@link LineInformation} consists of the offset from the beginning of the
+    * file for each line and the indices of tabs {@code '\t'} in each line.
     * </p>
     * <p>
     * Example content, line break is '\n':
     * <pre>
     * Line 1
-    * Line 2: With some text
+    * Line 2:\tWith some text
     * 
     * Line 4
     * </pre>
     * Computed line start indices:
     * <pre><code>
-    * result[0] = 0
-    * result[1] = 7
-    * result[2] = 30
-    * result[3] = 31
+    * result[0] = new LineInformation(0, new int[0]);
+    * result[1] = new LineInformation(7, new int[] {7});
+    * result[2] = new LineInformation(30, new int[0]);
+    * result[3] = new LineInformation(31, new int[0]);
     * </code></pre>
     * </p>
     * @param file The given {@link File}.
     * @return The computed start indices.
     * @throws IOException Occurred Exception.
     */
-   public static Integer[] computeLineStartIndices(InputStream in) throws IOException {
-      
-      
+   public static LineInformation[] computeLineInformation(InputStream in) throws IOException {
       InputStreamReader reader = null;
       try {
-         List<Integer> result = new LinkedList<Integer>();
+         List<LineInformation> result = new LinkedList<LineInformation>();
          if (in != null) {
             reader = new InputStreamReader(in);
             char[] buffer = new char[BUFFER_SIZE]; // Buffer with the read signs
@@ -205,6 +208,7 @@ public final class IOUtil {
             int startIndex = 0; // The accumulated start index over all read buffers
             int lastSignWasRBreakIndex = -1; // If this is a positive index it indicates that the last buffer ends with '\r' which must now be handled. The absolute result index is stored in this variable
             int lastIndex = 0; // The index to add to the result when the next line break sing '\r' or '\n' is read
+            List<Integer> tabIndices = new LinkedList<Integer>();
             // Iterate over the whole content of the given stream
             while ((read = reader.read(buffer)) >= 1) {
                for (int i = 0; i < read; i++) {
@@ -212,27 +216,31 @@ public final class IOUtil {
                      // Check for possible line breaks with "\r\n"
                      if (lastSignWasRBreakIndex >= 0) {
                         // Handle line break with "\r\n"
-                        result.add(Integer.valueOf(lastSignWasRBreakIndex));
+                        result.add(new LineInformation(lastSignWasRBreakIndex, tabIndices));
                         lastSignWasRBreakIndex = -1;
+                        tabIndices.clear();
                      }
                      else {
                         // Handle normal line breaks with '\n'
-                        result.add(Integer.valueOf(lastIndex));
+                        result.add(new LineInformation(lastIndex, tabIndices));
+                        tabIndices.clear();
                      }
                      lastIndex = startIndex + i + 1;
                   }
                   else if ('\r' == buffer[i]) {
                      // Handle double line break with "\r\r" normally if required
                      if (lastSignWasRBreakIndex >= 0) {
-                        result.add(Integer.valueOf(lastSignWasRBreakIndex));
+                        result.add(new LineInformation(lastSignWasRBreakIndex, tabIndices));
                         lastSignWasRBreakIndex = -1;
+                        tabIndices.clear();
                      }
                      // Check for possible line breaks with "\r\n"
                      if (i < buffer.length - 1) {
                         if ('\n' != buffer[i + 1]) {
-                        // Handle normal line breaks with '\r'
-                           result.add(Integer.valueOf(lastIndex));
+                           // Handle normal line breaks with '\r'
+                           result.add(new LineInformation(lastIndex, tabIndices));
                            lastIndex = startIndex + i + 1;
+                           tabIndices.clear();
                         }
                      }
                      else {
@@ -241,19 +249,24 @@ public final class IOUtil {
                         lastIndex = startIndex + i + 1;
                      }
                   }
+                  else if ('\t' == buffer[i]) {
+                     tabIndices.add(Integer.valueOf(i - lastIndex));
+                  }
                }
                startIndex += read;
             }
             // Handle last read '\r' sign if no more content was read
             if (lastSignWasRBreakIndex >= 0) {
-               result.add(Integer.valueOf(lastSignWasRBreakIndex));
+               result.add(new LineInformation(lastSignWasRBreakIndex, tabIndices));
+               tabIndices.clear();
             }
             // Handle last read '\r' or '\n' sign if no more content was read
             if (lastIndex >= 0) {
-               result.add(Integer.valueOf(lastIndex));
+               result.add(new LineInformation(lastIndex, tabIndices));
+               tabIndices.clear();
             }
          }
-         return result.toArray(new Integer[result.size()]);
+         return result.toArray(new LineInformation[result.size()]);
       }
       finally {
          if (reader != null) {
@@ -261,6 +274,127 @@ public final class IOUtil {
          }
          if (in != null) {
             in.close();
+         }
+      }
+   }
+   
+   /**
+    * A line information returned from {@link IOUtil#computeLineInformation(File)} and
+    * {@link IOUtil#computeLineInformation(InputStream)}.
+    * @author Martin Hentschel
+    */
+   public static class LineInformation {
+      /**
+       * The offset of the line from beginning of the file.
+       */
+      private int offset;
+      
+      /**
+       * The indices of all tabs in the line.
+       */
+      private int[] tabIndices;
+      
+      /**
+       * Constructor.
+       * @param offset The offset of the line from beginning of the file.
+       * @param tabIndices The indices of all tabs in the line.
+       */
+      public LineInformation(int offset, List<Integer> tabIndices) {
+         this.offset = offset;
+         if (tabIndices != null) {
+            this.tabIndices = new int[tabIndices.size()];
+            int i = 0;
+            for (Integer index : tabIndices) {
+               Assert.isNotNull(index);
+               this.tabIndices[i] = index.intValue();
+               i++;
+            }
+         }
+         else {
+            this.tabIndices = new int[0];
+         }
+      }
+
+      /**
+       * Returns the indices of all tabs in the line.
+       * @return The indices of all tabs in the line.
+       */
+      public int getOffset() {
+         return offset;
+      }
+
+      /**
+       * Returns the indices of all tabs in the line.
+       * @return The indices of all tabs in the line.
+       */
+      public int[] getTabIndices() {
+         return tabIndices;
+      }
+      
+      /**
+       * <p>
+       * Computes for the given column index (a tab represents multiple columns) 
+       * in this line information the normalized column index in that each tab character
+       * represents only one sign.
+       * </p>
+       * <p>
+       * Example line: {@code AB\tCD EF GH\t\tIJ\t.}<br>
+       * Example normalizations:
+       * <pre>
+       * normalizeColumn(0, 3) = 0 which is character 'A'
+       * normalizeColumn(1, 3) = 1 which is character 'B'
+       * normalizeColumn(2, 3) = 2 which is character '  '
+       * normalizeColumn(3, 3) = 2 which is character '  '
+       * normalizeColumn(4, 3) = 2 which is character '  '
+       * normalizeColumn(5, 3) = 3 which is character 'C'
+       * normalizeColumn(6, 3) = 4 which is character 'D'
+       * normalizeColumn(7, 3) = 5 which is character ' '
+       * normalizeColumn(8, 3) = 6 which is character 'E'
+       * normalizeColumn(9, 3) = 7 which is character 'F'
+       * normalizeColumn(10, 3) = 8 which is character ' '
+       * normalizeColumn(11, 3) = 9 which is character 'G'
+       * normalizeColumn(12, 3) = 10 which is character 'H'
+       * normalizeColumn(13, 3) = 11 which is character '   '
+       * normalizeColumn(14, 3) = 11 which is character '   '
+       * normalizeColumn(15, 3) = 11 which is character '   '
+       * normalizeColumn(16, 3) = 12 which is character '   '
+       * normalizeColumn(17, 3) = 12 which is character '   '
+       * normalizeColumn(18, 3) = 12 which is character '   '
+       * normalizeColumn(19, 3) = 13 which is character 'I'
+       * normalizeColumn(20, 3) = 14 which is character 'J'
+       * normalizeColumn(21, 3) = 15 which is character '   '
+       * normalizeColumn(22, 3) = 15 which is character '   '
+       * normalizeColumn(23, 3) = 15 which is character '   '
+       * normalizeColumn(24, 3) = 16 which is character '.'
+       * normalizeColumn(25, 3) = 17
+       * normalizeColumn(26, 3) = 18
+       * </pre>
+       * </p>
+       * @param column The column where tabs represents multiple characters. If the column is negative this value is returned. 
+       * @param tabWidth The tab width which must be greater as {@code 1}, otherwise the column index is returned.
+       * @return The normalized column where tabs represents only one character.
+       */
+      public int normalizeColumn(int column, int tabWidth) {
+         if (column >= 0 && tabWidth >= 2) {
+            int result = column;
+            boolean goOn = true;
+            int i = 0;
+            while (goOn) {
+               goOn = i < tabIndices.length && tabIndices[i] < column - (i * (tabWidth - 1));
+               if (goOn) {
+                  result -= (tabWidth - 1);
+                  i++;
+               }
+            }
+            if (i - 1 >= 0 && i - 1 < tabIndices.length) {
+               if (column - (i - 1) * (tabWidth - 1) >= tabIndices[i - 1] && column - (i - 1) * (tabWidth - 1) < tabIndices[i - 1] + tabWidth - 1) {
+                  result += column - (i - 1) * (tabWidth - 1) - tabIndices[i - 1];
+               }
+            }
+            return result;
+         }
+         else {
+            return column;
          }
       }
    }
