@@ -1,8 +1,11 @@
 TODOs for the execution tree
 ============================
-1. Handle loops
-2. Handle recursive methods (StackOverflowException is thrown at the moment)
-3. Handle exceptional termination (Requires to read variables)
-4. Show return values (Requires to read variables)
-5. Handle switch case (Requires to simplify the proof tree)
-6. Show in all nodes source locations (Requires bedder source locations, e.g. with JDT)
+1. If-Else problematic
+   - ifElseUnfold has source location
+   - ifElseSplit not
+2. Handle switch case (Requires to simplify the proof tree)
+3. Handle recursive methods (StackOverflowException is thrown at the moment)
+4. Handle loops
+5. Handle exceptional termination (Requires to read variables)
+6. Show return values (Requires to read variables)
+7. Show in all nodes source locations (Requires bedder source locations, e.g. with JDT)
