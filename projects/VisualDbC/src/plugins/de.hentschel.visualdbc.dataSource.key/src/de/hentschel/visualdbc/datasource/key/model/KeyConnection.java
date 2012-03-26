@@ -34,7 +34,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.util.eclipse.ResourceUtil;
-import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.SwingUtil;
@@ -107,7 +106,6 @@ import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.ProblemLoader;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -1817,24 +1815,6 @@ public class KeyConnection extends MemoryConnection {
    public void selectProof(Proof proof) {
       Assert.isNotNull(proof);
       main.getMediator().setProof(proof);
-   }   
-   
-   /**
-    * Checks if the {@link Proof} exists in the user interface.
-    * @param proof The {@link Proof} to check.
-    * @return {@code true} = in UI, {@code false} = not in UI.
-    */
-   public boolean isProofInUI(Proof proof) {
-      boolean inUI = false;
-      if (proof != null) {
-         Set<ProofAggregate> proofAggregates = initConfig.getProofEnv().getProofs();
-         Iterator<ProofAggregate> iter = proofAggregates.iterator();
-         while (!inUI && iter.hasNext()) {
-            ProofAggregate next = iter.next();
-            inUI = ArrayUtil.contains(next.getProofs(), proof);
-         }
-      }
-      return inUI;
    }
 
    /**

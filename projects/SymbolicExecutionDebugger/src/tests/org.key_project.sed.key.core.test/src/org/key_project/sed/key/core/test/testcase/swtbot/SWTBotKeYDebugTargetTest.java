@@ -11,6 +11,7 @@ import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotPerspective;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.Before;
@@ -26,6 +27,7 @@ import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.proof.Proof;
 
 /**
  * Tests for the functionality of a {@link KeYDebugTarget}.
@@ -51,6 +53,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
    public void testFixedRecursiveMethodCall() throws Exception {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testFixedRecursiveMethodCall",
                      "data/fixedRecursiveMethodCallTest",
+                     false,
                      new IMethodSelector() {
                         @Override
                         public IMethod getMethod(IJavaProject project) throws Exception {
@@ -69,6 +72,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
       // TODO: Bug: ifElseSplit is not treated as BranchNode because it has no active statement, why?
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testElseIfDifferentVariables",
                      "data/elseIfDifferentVariables",
+                     false,
                      new IMethodSelector() {
                         @Override
                         public IMethod getMethod(IJavaProject project) throws Exception {
@@ -86,6 +90,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
    public void testTryCatchFinally() throws Exception {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testTryCatchFinally",
                      "data/tryCatchFinally",
+                     false,
                      new IMethodSelector() {
                         @Override
                         public IMethod getMethod(IJavaProject project) throws Exception {
@@ -103,6 +108,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
    public void testStaticMethodCall() throws Exception {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testStaticMethodCall",
                      "data/staticMethodCall",
+                     false,
                      new IMethodSelector() {
                         @Override
                         public IMethod getMethod(IJavaProject project) throws Exception {
@@ -120,6 +126,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
    public void testComplexIfSteps() throws Exception {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testComplexIfSteps",
                      "data/complexIf",
+                     false,
                      new IMethodSelector() {
                         @Override
                         public IMethod getMethod(IJavaProject project) throws Exception {
@@ -137,6 +144,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
    public void testComplexFlatSteps() throws Exception {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testComplexFlatSteps",
                      "data/complexFlatSteps",
+                     false,
                      new IMethodSelector() {
                         @Override
                         public IMethod getMethod(IJavaProject project) throws Exception {
@@ -154,6 +162,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
    public void testFunctionalIf() throws Exception {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testFunctionalIf",
                      "data/functionalIf",
+                     false,
                      new IMethodSelector() {
                         @Override
                         public IMethod getMethod(IJavaProject project) throws Exception {
@@ -171,6 +180,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
    public void testSimpleIf() throws Exception {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testSimpleIf",
                      "data/simpleIf",
+                     false,
                      new IMethodSelector() {
                         @Override
                         public IMethod getMethod(IJavaProject project) throws Exception {
@@ -188,6 +198,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
    public void testMethodCallOnObjectWithException() throws Exception {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallOnObjectWithException",
                      "data/methodCallOnObjectWithException",
+                     false,
                      new IMethodSelector() {
                         @Override
                         public IMethod getMethod(IJavaProject project) throws Exception {
@@ -205,6 +216,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
    public void testMethodCallOnObject() throws Exception {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallOnObject",
                      "data/methodCallOnObject",
+                     false,
                      new IMethodSelector() {
                         @Override
                         public IMethod getMethod(IJavaProject project) throws Exception {
@@ -222,6 +234,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
    public void testMethodCallParallel() throws Exception {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallParallel",
                      "data/methodCallParallelTest",
+                     false,
                      new IMethodSelector() {
                         @Override
                         public IMethod getMethod(IJavaProject project) throws Exception {
@@ -239,6 +252,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
    public void testMethodCallHierarchyWithException() throws Exception {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallHierarchyWithException",
                      "data/methodHierarchyCallWithExceptionTest",
+                     false,
                      new IMethodSelector() {
                         @Override
                         public IMethod getMethod(IJavaProject project) throws Exception {
@@ -256,6 +270,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
    public void testMethodCallHierarchy() throws Exception {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallHierarchy",
                      "data/methodHierarchyCallTest",
+                     false,
                      new IMethodSelector() {
                         @Override
                         public IMethod getMethod(IJavaProject project) throws Exception {
@@ -377,6 +392,26 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
    public void testFlatStatements() throws Exception {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testFlatStatements",
                      "data/statements",
+                     false,
+                     new IMethodSelector() {
+                        @Override
+                        public IMethod getMethod(IJavaProject project) throws Exception {
+                           return TestUtilsUtil.getJdtMethod(project, "FlatSteps", "doSomething", "I", "QString;", "Z");
+                        }
+                     },
+                     TestSEDKeyCoreUtil.STATEMENT_TARGET_NAME,
+                     TestSEDKeyCoreUtil.createExpectedStatementModel());
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget},
+    * but the {@link Proof} is already removed in KeY.
+    */
+   @Test
+   public void testFlatStatements_ProofIsNoLongerAvailableInKeY() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testFlatStatements_ProofIsNoLongerAvailableInKeY",
+                     "data/statements",
+                     true,
                      new IMethodSelector() {
                         @Override
                         public IMethod getMethod(IJavaProject project) throws Exception {
@@ -413,6 +448,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     * </ol>
     * @param projectName The project name in the workspace.
     * @param pathInBundle The path to the source code in the bundle to extract to the workspace project.
+    * @param clearProofListInKeYBeforeResume Clear proof list in KeY before resume?
     * @param selector {@link IMethodSelector} to select an {@link IMethod} to launch.
     * @param targetName The name of the {@link IDebugTarget}.
     * @param expectedDebugTarget The expected {@link ISEDDebugTarget}.
@@ -420,6 +456,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     */
    protected void assertSEDModel(String projectName,
                                  String pathInBundle,
+                                 boolean clearProofListInKeYBeforeResume,
                                  IMethodSelector selector,
                                  String targetName,
                                  ISEDDebugTarget expectedDebugTarget) throws Exception {
@@ -471,31 +508,54 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
          assertFalse(target.isTerminated());
          // Make sure that the debug target is in the initial state.
          TestSEDKeyCoreUtil.assertInitialTarget(target, targetName);
-         // Resume launch
+         // Get debug target TreeItem
          SWTBotTreeItem item = TestUtilsUtil.selectInTree(debugTree, 0, 0); // Select first debug target
-         item.contextMenu("Resume").click();
-         TestSedCoreUtil.waitUntilDebugTargetCanSuspend(bot, target); // Wait until the target is resumed.
-         assertTrue(launch.canTerminate());
-         assertFalse(launch.isTerminated());
-         assertTrue(target.canDisconnect());
-         assertFalse(target.canResume());
-         assertTrue(target.canSuspend());
-         assertTrue(target.canTerminate());
-         assertFalse(target.isDisconnected());
-         assertFalse(target.isSuspended());
-         assertFalse(target.isTerminated());
-         TestSedCoreUtil.waitUntilDebugTargetCanResume(bot, target); // wait until the target is suspended.
-         assertTrue(launch.canTerminate());
-         assertFalse(launch.isTerminated());
-         assertTrue(target.canDisconnect());
-         assertTrue(target.canResume());
-         assertFalse(target.canSuspend());
-         assertTrue(target.canTerminate());
-         assertFalse(target.isDisconnected());
-         assertTrue(target.isSuspended());
-         assertFalse(target.isTerminated());
-         // Test the execution tree
-         TestSEDKeyCoreUtil.compareDebugTarget(expectedDebugTarget, target);
+         SWTBotMenu menuItem = item.contextMenu("Resume"); 
+         // Remove proof in KeY if required
+         if (clearProofListInKeYBeforeResume) {
+            assertFalse(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
+            KeYUtil.clearProofList(MainWindow.getInstance());
+            assertTrue(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
+         }
+         // Resume launch
+         menuItem.click();
+         if (clearProofListInKeYBeforeResume) {
+            assertTrue(launch.canTerminate());
+            assertFalse(launch.isTerminated());
+            assertTrue(target.canDisconnect());
+            assertFalse(target.canSuspend());
+            assertTrue(target.canTerminate());
+            assertFalse(target.isDisconnected());
+            assertTrue(target.isSuspended());
+            assertFalse(target.isTerminated());
+            assertFalse(target.canResume());
+            // Test the execution tree
+            TestSEDKeyCoreUtil.assertInitialTarget(target, targetName);
+         }
+         else {
+            TestSedCoreUtil.waitUntilDebugTargetCanSuspend(bot, target); // Wait until the target is resumed.
+            assertTrue(launch.canTerminate());
+            assertFalse(launch.isTerminated());
+            assertTrue(target.canDisconnect());
+            assertFalse(target.canResume());
+            assertTrue(target.canSuspend());
+            assertTrue(target.canTerminate());
+            assertFalse(target.isDisconnected());
+            assertFalse(target.isSuspended());
+            assertFalse(target.isTerminated());
+            TestSedCoreUtil.waitUntilDebugTargetCanResume(bot, target); // wait until the target is suspended.
+            assertTrue(launch.canTerminate());
+            assertFalse(launch.isTerminated());
+            assertTrue(target.canDisconnect());
+            assertFalse(target.canSuspend());
+            assertTrue(target.canTerminate());
+            assertFalse(target.isDisconnected());
+            assertTrue(target.isSuspended());
+            assertFalse(target.isTerminated());
+            assertTrue(target.canResume());
+            // Test the execution tree
+            TestSEDKeyCoreUtil.compareDebugTarget(expectedDebugTarget, target);
+         }
       }
       finally {
          // Restore timeout
@@ -517,7 +577,8 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     */
    @Test
    public void testSuspendResumeWhileDisconnected_Launch() throws Exception {
-      doTestSuspendResumeWhileDisconnected("SWTBotKeYDebugTargetSuspendResumeTest_testSuspendResumeWhileDisconnected_Launch", 
+      doTestSuspendResumeWhileDisconnected("SWTBotKeYDebugTargetSuspendResumeTest_testSuspendResumeWhileDisconnected_Launch",
+                                           false,
                                            0);
    }
    
@@ -527,7 +588,32 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     */
    @Test
    public void testSuspendResumeWhileDisconnected_DebugTarget() throws Exception {
-      doTestSuspendResumeWhileDisconnected("SWTBotKeYDebugTargetSuspendResumeTest_testSuspendResumeWhileDisconnected_DebugTarget", 
+      doTestSuspendResumeWhileDisconnected("SWTBotKeYDebugTargetSuspendResumeTest_testSuspendResumeWhileDisconnected_DebugTarget",
+                                           false,
+                                           0, 0);
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link ILaunch}
+    * that is disconnected,
+    * but the {@link Proof} is already removed in KeY.
+    */
+   @Test
+   public void testSuspendResumeWhileDisconnected_Launch_ProofIsNoLongerAvailableInKeY() throws Exception {
+      doTestSuspendResumeWhileDisconnected("SWTBotKeYDebugTargetSuspendResumeTest_testSuspendResumeWhileDisconnected_Launch_ProofIsNoLongerAvailableInKeY",
+                                           true,
+                                           0);
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}
+    * that is disconnected,
+    * but the {@link Proof} is already removed in KeY.
+    */
+   @Test
+   public void testSuspendResumeWhileDisconnected_DebugTarget_ProofIsNoLongerAvailableInKeY() throws Exception {
+      doTestSuspendResumeWhileDisconnected("SWTBotKeYDebugTargetSuspendResumeTest_testSuspendResumeWhileDisconnected_DebugTarget_ProofIsNoLongerAvailableInKeY",
+                                           true,
                                            0, 0);
    }
    
@@ -535,10 +621,12 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     * Executes the tests for {@link #testSuspendResumeWhileDisconnected_Launch()}
     * and {@link #testSuspendResumeWhileDisconnected_DebugTarget()}.
     * @param projectName The project name to use.
+    * @param clearProofListInKeYBeforeDisconnect Clear proof list in KeY before disconnecting the {@link ILaunch}?
     * @param pathToElementInDebugTreeWhichProvidesDisconnectMenuItem The path to the element which provides the "Disconnect" menu item in the debug tree.
     * @throws Exception Occurred Exception.
     */
    protected void doTestSuspendResumeWhileDisconnected(String projectName,
+                                                       boolean clearProofListInKeYBeforeDisconnect,
                                                        int... pathToElementInDebugTreeWhichProvidesDisconnectMenuItem) throws Exception {
       // Create bot
       SWTWorkbenchBot bot = new SWTWorkbenchBot();
@@ -555,7 +643,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
          // Get method
          IMethod method = TestUtilsUtil.getJdtMethod(project, "FlatSteps", "doSomething", "I", "QString;", "Z");
          // Increase timeout
-         SWTBotPreferences.TIMEOUT = SWTBotPreferences.TIMEOUT * 4;
+         SWTBotPreferences.TIMEOUT = SWTBotPreferences.TIMEOUT * 8;
          // Launch method
          TestSEDKeyCoreUtil.launchKeY(method);
          // Find the launched ILaunch in the debug view
@@ -576,6 +664,12 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
          assertFalse(target.isTerminated());
          // Make sure that the debug target is in the initial state.
          TestSEDKeyCoreUtil.assertInitialTarget(target, TestSEDKeyCoreUtil.STATEMENT_TARGET_NAME);
+         // Clear proof list in KeY if required
+         if (clearProofListInKeYBeforeDisconnect) {
+            assertFalse(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
+            KeYUtil.clearProofList(MainWindow.getInstance());
+            assertTrue(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
+         }
          // Disconnect
          SWTBotTreeItem item = TestUtilsUtil.selectInTree(debugTree, pathToElementInDebugTreeWhichProvidesDisconnectMenuItem); // Select first debug target
          item.contextMenu("Disconnect").click();
@@ -590,8 +684,10 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
          assertTrue(target.isSuspended());
          assertFalse(target.isTerminated());
          // Resume launch directly in KeY
-         MainWindow.getInstance().getMediator().startAutoMode();
-         KeYUtil.waitWhileMainWindowIsFrozen(MainWindow.getInstance());
+         if (!clearProofListInKeYBeforeDisconnect) {
+            MainWindow.getInstance().getMediator().startAutoMode();
+            KeYUtil.waitWhileMainWindowIsFrozen(MainWindow.getInstance());
+         }
          // Test the unmodified execution tree
          TestSEDKeyCoreUtil.assertInitialTarget(target, TestSEDKeyCoreUtil.STATEMENT_TARGET_NAME);
       }
@@ -610,7 +706,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     */
    @Test
    public void testTerminationDebugTarget() throws Exception {
-      doTerminationTest("SWTBotKeYDebugTargetTerminationTest_testTerminationDebugTarget", 0, 0);
+      doTerminationTest("SWTBotKeYDebugTargetTerminationTest_testTerminationDebugTarget", false, 0, 0);
    }
 
    /**
@@ -618,17 +714,37 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     */
    @Test
    public void testTerminationLaunch() throws Exception {
-      doTerminationTest("SWTBotKeYDebugTargetTerminationTest_testTerminationLaunch", 0);
+      doTerminationTest("SWTBotKeYDebugTargetTerminationTest_testTerminationLaunch", false, 0);
+   }
+
+   /**
+    * Tests the termination functionality on the {@link IDebugTarget},
+    * but the {@link Proof} is already removed in KeY.
+    */
+   @Test
+   public void testTerminationDebugTarget_ProofIsNoLongerAvailableInKeY() throws Exception {
+      doTerminationTest("SWTBotKeYDebugTargetTerminationTest_testTerminationDebugTarget_ProofIsNoLongerAvailableInKeY", true, 0, 0);
+   }
+
+   /**
+    * Tests the termination functionality on the {@link ILaunch},
+    * but the {@link Proof} is already removed in KeY.
+    */
+   @Test
+   public void testTerminationLaunch_ProofIsNoLongerAvailableInKeY() throws Exception {
+      doTerminationTest("SWTBotKeYDebugTargetTerminationTest_testTerminationLaunch_ProofIsNoLongerAvailableInKeY", true, 0);
    }
    
    /**
     * Executes the test for {@link #testTerminationDebugTarget()} and
     * {@link #testTerminationLaunch()}.
     * @param projectName The project name to use.
+    * @param clearProofListInKeYBeforeTermination Clear proof list before terminating the {@link ILaunch}?
     * @param pathToElementInDebugTreeWhichProvidesTerminateMenuItem The path to the element which provides the "Terminate" menu item in the debug tree.
     * @throws Exception Occurred Exception.
     */
    protected void doTerminationTest(String projectName,
+                                    boolean clearProofListInKeYBeforeTermination,
                                     int... pathToElementInDebugTreeWhichProvidesTerminateMenuItem) throws Exception {
       // Create bot
       SWTWorkbenchBot bot = new SWTWorkbenchBot();
@@ -664,6 +780,12 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
          assertFalse(target.isDisconnected());
          assertTrue(target.isSuspended());
          assertFalse(target.isTerminated());
+         // Remove proof in KeY if required
+         if (clearProofListInKeYBeforeTermination) {
+            assertFalse(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
+            KeYUtil.clearProofList(MainWindow.getInstance());
+            assertTrue(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
+         }
          // Terminate launch
          SWTBotTreeItem item = TestUtilsUtil.selectInTree(debugTree, pathToElementInDebugTreeWhichProvidesTerminateMenuItem); // Select first launch
          item.contextMenu("Terminate").click();

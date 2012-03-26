@@ -42,6 +42,56 @@ import de.uka.ilkd.key.proof.init.InitConfig;
  * @author Martin Hentschel
  */
 public class SWTBotKeYUtilTest extends TestCase {
+
+   /**
+    * Tests {@link KeYUtil#isProofInUI(Proof)}
+    */
+   @Test
+   public void testIsProofInUI() throws CoreException, InterruptedException, InvocationTargetException {
+       // Open main window
+       KeYUtil.openMainWindow();
+       assertNotNull(MainWindow.getInstance());
+       assertTrue(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
+       // Load a resource
+       IJavaProject javaProject = TestUtilsUtil.createJavaProject("SWTBotKeYUtilTest_testIsProofInUI_1");
+       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/banking", javaProject.getProject().getFolder("src"));
+       KeYUtil.loadAsync(javaProject.getProject());
+       TestUtilsUtil.keyStartSelectedProofInProofManagementDiaolog();
+       TestUtilsUtil.keyCheckProofs("JML operation contract [id: 0 / banking.LoggingPayCard::charge]", "JML operation contract [id: 0 / banking.LoggingPayCard::charge]");
+       assertNotNull(MainWindow.getInstance());
+       assertFalse(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
+       Proof firstProof = TestUtilsUtil.keyGetProofEnv(0).getProofs().iterator().next().getFirstProof();
+       assertNotNull(firstProof);
+       assertTrue(KeYUtil.isProofInUI(firstProof));
+       // Load second java project
+       IJavaProject secondProject = TestUtilsUtil.createJavaProject("SWTBotKeYUtilTest_testIsProofInUI_2");
+       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/MCDemo", secondProject.getProject().getFolder("src"));
+       KeYUtil.loadAsync(secondProject.getProject());
+       TestUtilsUtil.keyStartSelectedProofInProofManagementDiaolog();
+       TestUtilsUtil.keyCheckProofs("JML normal_behavior operation contract [id: 0 / MCDemo::inc]", "JML operation contract [id: 0 / banking.LoggingPayCard::charge]", "JML normal_behavior operation contract [id: 0 / MCDemo::inc]");
+       assertNotNull(MainWindow.getInstance());
+       assertFalse(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
+       Proof secondProof = TestUtilsUtil.keyGetProofEnv(1).getProofs().iterator().next().getFirstProof();
+       assertNotNull(secondProof);
+       assertTrue(KeYUtil.isProofInUI(firstProof));
+       assertTrue(KeYUtil.isProofInUI(secondProof));
+       // Remove first proof
+       KeYUtil.removeFromProofList(MainWindow.getInstance(), firstProof.env());
+       TestCase.assertFalse(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
+       TestUtilsUtil.keyCheckProofs("JML normal_behavior operation contract [id: 0 / MCDemo::inc]", "JML normal_behavior operation contract [id: 0 / MCDemo::inc]");
+       assertFalse(KeYUtil.isProofInUI(firstProof));
+       assertTrue(KeYUtil.isProofInUI(secondProof));
+       // Remove first proof again
+       KeYUtil.removeFromProofList(MainWindow.getInstance(), secondProof.env());
+       TestCase.assertTrue(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
+       assertFalse(KeYUtil.isProofInUI(firstProof));
+       assertFalse(KeYUtil.isProofInUI(secondProof));
+       // Test null
+       assertFalse(KeYUtil.isProofInUI(null));
+       // Close main window
+       TestUtilsUtil.keyCloseMainWindow();
+   }
+   
    /**
     * Tests {@link KeYUtil#getChoiceSetting(String)} and
     * {@link KeYUtil#setChoiceSetting(String, String)} and

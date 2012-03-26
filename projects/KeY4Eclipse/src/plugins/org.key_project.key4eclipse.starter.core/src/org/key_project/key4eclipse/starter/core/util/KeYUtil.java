@@ -4,8 +4,10 @@ import java.awt.Component;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.JOptionPane;
 
@@ -23,6 +25,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.key_project.key4eclipse.starter.core.job.AbstractKeYMainWindowJob;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.util.eclipse.ResourceUtil;
+import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.IFilter;
 import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.SwingUtil;
@@ -47,6 +50,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Node.NodeIterator;
 import de.uka.ilkd.key.proof.ProblemLoader;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -722,5 +726,23 @@ public final class KeYUtil {
     */
    public static boolean isChoiceSettingInitialised() {
       return !ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices().isEmpty();
+   }   
+   
+   /**
+    * Checks if the {@link Proof} exists in the user interface.
+    * @param proof The {@link Proof} to check.
+    * @return {@code true} = in UI, {@code false} = not in UI.
+    */
+   public static boolean isProofInUI(Proof proof) {
+      boolean inUI = false;
+      if (proof != null) {
+         Set<ProofAggregate> proofAggregates = proof.env().getProofs();
+         Iterator<ProofAggregate> iter = proofAggregates.iterator();
+         while (!inUI && iter.hasNext()) {
+            ProofAggregate next = iter.next();
+            inUI = ArrayUtil.contains(next.getProofs(), proof);
+         }
+      }
+      return inUI;
    }
 }

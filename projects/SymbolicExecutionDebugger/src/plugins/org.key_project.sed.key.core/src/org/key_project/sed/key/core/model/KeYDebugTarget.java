@@ -152,7 +152,8 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
    @Override
    public boolean canResume() {
       return super.canResume() && 
-             !MainWindow.getInstance().frozen; // Only one proof completion per time is possible
+             !MainWindow.getInstance().frozen && // Only one proof completion per time is possible
+             KeYUtil.isProofInUI(proof); // Otherwise Auto Mode is not available.
    }
 
    /**

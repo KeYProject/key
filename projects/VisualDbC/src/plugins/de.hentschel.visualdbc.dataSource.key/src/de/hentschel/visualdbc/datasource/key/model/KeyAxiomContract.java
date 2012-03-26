@@ -12,6 +12,7 @@
 package de.hentschel.visualdbc.datasource.key.model;
 
 import org.eclipse.core.runtime.Assert;
+import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 
 import de.hentschel.visualdbc.datasource.key.intern.helper.OpenedProof;
 import de.hentschel.visualdbc.datasource.model.IDSAxiomContract;
@@ -116,6 +117,6 @@ public class KeyAxiomContract extends MemoryAxiomContract {
     * @return {@code true} = is valid, {@code false} = is not valid
     */
    protected boolean isProofValid(KeyProof proof) {
-      return proof != null && connection.isProofInUI(proof.getProof());
+      return proof != null && KeYUtil.isProofInUI(proof.getProof());
    }
 }
