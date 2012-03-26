@@ -48,6 +48,23 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     * Tests the suspend/resume functionality on the {@link IDebugTarget}.
     */
    @Test
+   public void testFixedRecursiveMethodCall() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testFixedRecursiveMethodCall",
+                     "data/fixedRecursiveMethodCallTest",
+                     new IMethodSelector() {
+                        @Override
+                        public IMethod getMethod(IJavaProject project) throws Exception {
+                           return TestUtilsUtil.getJdtMethod(project, "FixedRecursiveMethodCallTest", "decreaseValue");
+                        }
+                     },
+                     TestSEDKeyCoreUtil.FIXED_RECURSIVE_METHOD_CALL_TARGET_NAME,
+                     TestSEDKeyCoreUtil.createExpectedFixedRecursiveMethodCallModel());
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
    public void testElseIfDifferentVariables() throws Exception {
       // TODO: Bug: ifElseSplit is not treated as BranchNode because it has no active statement, why?
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testElseIfDifferentVariables",

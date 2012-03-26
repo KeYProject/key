@@ -109,6 +109,11 @@ public final class TestSEDKeyCoreUtil {
     * The name of the {@link ISEDDebugTarget} used in the else if different variables example.
     */
    public static final String ELSE_IF_DIFFERENT_VARIABLES_TARGET_NAME = "JML normal_behavior operation contract [id: -2147483648 / ElseIfDifferentVariables::main]";
+
+   /**
+    * The name of the {@link ISEDDebugTarget} used in the fixed recursive method call example.
+    */
+   public static final String FIXED_RECURSIVE_METHOD_CALL_TARGET_NAME = "JML normal_behavior operation contract [id: -2147483648 / FixedRecursiveMethodCallTest::decreaseValue]";
    
    /**
     * Forbid instances.
@@ -211,6 +216,41 @@ public final class TestSEDKeyCoreUtil {
       // Create method return
       SEDMemoryMethodReturn ret = appendMethodReturn(target, s3, thread, "self.doSomething(_asdf,_a,_b);");
       // Create termination
+      appendTermination(target, ret, thread);
+      return target;
+   }
+
+   /**
+    * Creates the expected {@link ISEDDebugTarget} for the fixed recursive method call example.
+    * @return The expected {@link ISEDDebugTarget}.
+    */   
+   public static ISEDDebugTarget createExpectedFixedRecursiveMethodCallModel() {
+      SEDMemoryDebugTarget target = appendDebugTarget(FIXED_RECURSIVE_METHOD_CALL_TARGET_NAME);
+      SEDMemoryThread thread = appendThread(target);
+      SEDMemoryMethodCall callMain = appendMethodCall(target, thread, thread, "FixedRecursiveMethodCallTest.decreaseValue();");
+      SEDMemoryStatement sMain = appendStatement(target, callMain, thread, "return decrease(3);", 4);
+      
+      SEDMemoryMethodCall call1 = appendMethodCall(target, sMain, thread, "FixedRecursiveMethodCallTest.decrease(n);");
+      SEDMemoryBranchNode branch1 = appendBranchNode(target, call1, thread, "if (n>=1) {return decrease(n-1); }", 10);
+      SEDMemoryStatement s1 = appendStatement(target, branch1, thread, "return decrease(n-1);", 9);
+      
+      SEDMemoryMethodCall call2 = appendMethodCall(target, s1, thread, "FixedRecursiveMethodCallTest.decrease(n_1);");
+      SEDMemoryBranchNode branch2 = appendBranchNode(target, call2, thread, "if (n_1>=1) {return decrease(n_1-1); }", 10);
+      SEDMemoryStatement s2 = appendStatement(target, branch2, thread, "return decrease(n_1-1);", 9);
+
+      SEDMemoryMethodCall call3 = appendMethodCall(target, s2, thread, "FixedRecursiveMethodCallTest.decrease(n_2);");
+      SEDMemoryBranchNode branch3 = appendBranchNode(target, call3, thread, "if (n_2>=1) {return decrease(n_2-1); }", 10);
+      SEDMemoryStatement s3 = appendStatement(target, branch3, thread, "return decrease(n_2-1);", 9);
+
+      SEDMemoryMethodCall call4 = appendMethodCall(target, s3, thread, "FixedRecursiveMethodCallTest.decrease(n_3);");
+      SEDMemoryBranchNode branch4 = appendBranchNode(target, call4, thread, "if (n_3>=1) {return decrease(n_3-1); }", 10);
+      SEDMemoryStatement s4 = appendStatement(target, branch4, thread, "return n_3;", 11);
+      
+      SEDMemoryMethodReturn ret4 = appendMethodReturn(target, s4, thread, "FixedRecursiveMethodCallTest.decrease(n_3);");
+      SEDMemoryMethodReturn ret3 = appendMethodReturn(target, ret4, thread, "FixedRecursiveMethodCallTest.decrease(n_2);");
+      SEDMemoryMethodReturn ret2 = appendMethodReturn(target, ret3, thread, "FixedRecursiveMethodCallTest.decrease(n_1);");
+      SEDMemoryMethodReturn ret1 = appendMethodReturn(target, ret2, thread, "FixedRecursiveMethodCallTest.decrease(n);");
+      SEDMemoryMethodReturn ret = appendMethodReturn(target, ret1, thread, "FixedRecursiveMethodCallTest.decreaseValue();");
       appendTermination(target, ret, thread);
       return target;
    }
