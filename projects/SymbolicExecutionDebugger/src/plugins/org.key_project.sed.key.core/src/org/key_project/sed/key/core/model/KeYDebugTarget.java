@@ -1,6 +1,5 @@
 package org.key_project.sed.key.core.model;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -10,6 +9,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.ILaunch;
+import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
@@ -17,6 +17,9 @@ import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.ASTParser;
+import org.eclipse.jdt.internal.ui.javaeditor.ASTProvider;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.sed.core.model.ISEDBranchCondition;
 import org.key_project.sed.core.model.ISEDBranchNode;
@@ -27,6 +30,7 @@ import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.ISEDStatement;
 import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.core.model.ISEDThread;
+import org.key_project.sed.core.model.ISourceNameProvider;
 import org.key_project.sed.core.model.memory.ISEDMemoryDebugNode;
 import org.key_project.sed.core.model.memory.ISEDMemoryStackFrameCompatibleDebugNode;
 import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
@@ -38,6 +42,7 @@ import org.key_project.sed.core.model.memory.SEDMemoryStatement;
 import org.key_project.sed.core.model.memory.SEDMemoryTermination;
 import org.key_project.sed.core.model.memory.SEDMemoryThread;
 import org.key_project.sed.key.core.strategy.DebuggerStrategy;
+import org.key_project.sed.key.core.util.ASTNodeByEndIndexSearcher;
 import org.key_project.sed.key.core.util.LogUtil;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.CollectionUtil;
@@ -76,6 +81,7 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
  * debug a program.
  * @author Martin Hentschel
  */
+@SuppressWarnings("restriction")
 public class KeYDebugTarget extends SEDMemoryDebugTarget {
    /**
     * Prefix that is used in {@link ISEDDebugNode}s which represents an internal state in KeY which is not part of the source code.
@@ -303,9 +309,10 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
     * @param parent The parent {@link ISEDDebugNode}.
     * @param info The given {@link NodeInfo} to represent as {@link ISEDBranchCondition}.
     * @return The created {@link ISEDBranchCondition}.
+    * @throws DebugException Occurred Exception.
     */
    protected ISEDBranchCondition createBranchConditionNode(ISEDDebugNode parent,
-                                                           NodeInfo info) {
+                                                           NodeInfo info) throws DebugException {
       // Compute method name
       String name = info.getBranchLabel();
       // Create new node and fill it
@@ -346,7 +353,8 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
                // Find the call Node representation in SED, if not available ignore it.
                ISEDDebugNode callSEDNode = keyNodeMapping.get(callNode);
                if (callSEDNode != null) {
-                  result = createMethodReturnNode(parent, node, statement, posInfo, callNode, callSEDNode);
+                  Assert.isTrue(callSEDNode instanceof ISEDMethodCall);
+                  result = createMethodReturnNode(parent, node, statement, posInfo, callNode, (ISEDMethodCall)callSEDNode);
                }
             }
          }
@@ -381,10 +389,11 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
     * @param statement The given {@link SourceElement} to represent as {@link ISEDTermination}.
     * @param posInfo The {@link PositionInfo} to use.
     * @return The created {@link ISEDTermination}.
+    * @throws DebugException Occurred Exception.
     */
    protected ISEDTermination createTerminationNode(ISEDDebugNode parent, 
                                                    SourceElement statement, 
-                                                   PositionInfo posInfo) {
+                                                   PositionInfo posInfo) throws DebugException {
       // Compute method name
       String name = DEFAULT_TERMINATION_NODE_NAME;
       // Create new node and fill it
@@ -484,7 +493,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
                                                      SourceElement statement, 
                                                      PositionInfo posInfo,
                                                      Node callNode,
-                                                     ISEDDebugNode callSEDNode) throws DebugException {
+                                                     ISEDMethodCall callSEDNode) throws DebugException {
 //      // Find last return node
 //      Node returnNode = KeYUtil.findParent(node, new IFilter<Node>() {
 //         @Override
@@ -508,10 +517,16 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
 //         }
 //      }
       // Compute method name
-      String name = createMethodReturnName(returnValue, ((ISEDMethodCall)callSEDNode).getName());
+      String name = createMethodReturnName(returnValue, callSEDNode.getName());
       // Create new node and fill it
       SEDMemoryMethodReturn newNode = new SEDMemoryMethodReturn(getDebugTarget(), parent, thread);
       fillNode(newNode, name, posInfo);
+      // Update location with the location provided by the call node
+      Assert.isTrue(callSEDNode instanceof ISourceNameProvider);
+      newNode.setSourceName(((ISourceNameProvider)callSEDNode).getSourceName());
+      newNode.setLineNumber(callSEDNode.getLineNumber());
+      newNode.setCharStart(callSEDNode.getCharStart());
+      newNode.setCharEnd(callSEDNode.getCharEnd());
       return newNode;
    }
 
@@ -620,11 +635,10 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       fillNode(newNode, name, pm.getPositionInfo());
       // Try to update the position info with the position of the method name provided by JDT.
       try {
-         Object source = getLaunch().getSourceLocator().getSourceElement(newNode);
-         if (source instanceof IFile) {
-            IJavaElement element = JavaCore.create((IFile)source);
-            if (element instanceof ICompilationUnit) {
-               IMethod method = findJDTMethod((ICompilationUnit)element, pm);
+         if (newNode.getCharEnd() >= 0) {
+            ICompilationUnit compilationUnit = findCompilationUnit(newNode);
+            if (compilationUnit != null) {
+               IMethod method = findJDTMethod(compilationUnit, newNode.getCharEnd());
                if (method != null) {
                   ISourceRange range = method.getNameRange();
                   newNode.setLineNumber(-1);
@@ -633,10 +647,6 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
                }
             }
          }
-//         ASTParser parser = ASTParser.newParser(AST.JLS4);
-//         parser.setSource(unit);
-//         parser.setSourceRange(method.getSourceRange().getOffset(), method.getSourceRange().getLength());
-//         ASTNode node = parser.createAST(null);
       }
       catch (Exception e) {
          throw new DebugException(LogUtil.getLogger().createErrorStatus(e));
@@ -645,37 +655,49 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
    }
    
    /**
-    * Searches the {@link IMethod} as JDT representation for the given
-    * {@link ProgramMethod} in KeY in the given {@link ICompilationUnit}.
+    * Tries to find an {@link ICompilationUnit} for the given {@link IStackFrame}.
+    * @param frame The given {@link IStackFrame} for that is an {@link ICompilationUnit} required.
+    * @return The found {@link ICompilationUnit}.
+    */
+   protected ICompilationUnit findCompilationUnit(IStackFrame frame) {
+      ICompilationUnit result = null;
+      if (frame != null) {
+         Object source = getLaunch().getSourceLocator().getSourceElement(frame);
+         if (source instanceof IFile) {
+            IJavaElement element = JavaCore.create((IFile)source);
+            if (element instanceof ICompilationUnit) {
+               result = (ICompilationUnit)element;
+            }
+         }
+      }
+      return result;
+   }
+   
+   /**
+    * Searches the {@link IMethod} as JDT representation which ends
+    * at the given index.
     * @param cu The {@link ICompilationUnit} to search in.
-    * @param keyMethod The {@link ProgramMethod} of KeY for that the JDT representation is needed.
+    * @param endIndex The index in the file at that the required method ends.
     * @return The found {@link IMethod} or {@code null} if the JDT representation is not available.
     * @throws JavaModelException Occurred Exception.
     * @throws IOException Occurred Exception.
     */
-   public IMethod findJDTMethod(ICompilationUnit cu, ProgramMethod keyMethod) throws JavaModelException, IOException {
+   public IMethod findJDTMethod(ICompilationUnit cu, int endIndex) throws JavaModelException, IOException {
       IMethod result = null;
-      if (cu != null && keyMethod != null) {
-         PositionInfo posInfo = keyMethod.getPositionInfo();
-         if (posInfo != null && posInfo != PositionInfo.UNDEFINED) {
-            int line = posInfo.getEndPosition().getLine() - 1;
-            int column = posInfo.getEndPosition().getColumn();
-            LineInformation[] infos = IOUtil.computeLineInformation(new ByteArrayInputStream(cu.getSource().getBytes()));
-            int offset = infos[line].getOffset() + KeYUtil.normalizeRecorderColumn(column, infos[line].getTabIndices());
-            IType[] types = cu.getAllTypes();
-            int i = 0;
-            while (result == null && i < types.length) {
-               IMethod[] methods = types[i].getMethods();
-               int j = 0;
-               while (result == null && j < methods.length) {
-                  ISourceRange methodRange = methods[j].getSourceRange();
-                  if (offset == methodRange.getOffset() + methodRange.getLength()) {
-                     result = methods[j];
-                  }
-                  j++;
+      if (cu != null) {
+         IType[] types = cu.getAllTypes();
+         int i = 0;
+         while (result == null && i < types.length) {
+            IMethod[] methods = types[i].getMethods();
+            int j = 0;
+            while (result == null && j < methods.length) {
+               ISourceRange methodRange = methods[j].getSourceRange();
+               if (endIndex == methodRange.getOffset() + methodRange.getLength()) {
+                  result = methods[j];
                }
-               i++;
+               j++;
             }
+            i++;
          }
       }
       return result;
@@ -700,15 +722,18 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
     * @param statement The given {@link SourceElement} to represent as {@link ISEDBranchNode}.
     * @param posInfo The {@link PositionInfo} to use.
     * @return The created {@link ISEDBranchNode}.
+    * @throws DebugException Occurred Exception.
     */
    protected ISEDBranchNode createBranchNode(ISEDDebugNode parent, 
                                              SourceElement statement, 
-                                             PositionInfo posInfo) {
+                                             PositionInfo posInfo) throws DebugException {
       // Compute statement name
       String name = statement.toString();
       // Create new node and fill it
       SEDMemoryBranchNode newNode = new SEDMemoryBranchNode(getDebugTarget(), parent, thread);
       fillNode(newNode, name, posInfo);
+      // Try to update the position info with the position of the statement in JDT.
+      updateLocationFromAST(newNode);
       return newNode;
    }
    
@@ -732,16 +757,59 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
     * @param statement The given {@link SourceElement} to represent as {@link ISEDStatement}.
     * @param posInfo The {@link PositionInfo} to use.
     * @return The created {@link ISEDStatement}.
+    * @throws DebugException Occurred Exception.
     */
    protected ISEDStatement createStatementNode(ISEDDebugNode parent, 
                                                SourceElement statement, 
-                                               PositionInfo posInfo) {
+                                               PositionInfo posInfo) throws DebugException {
       // Compute statement name
       String name = statement.toString();
       // Create new node and fill it
       SEDMemoryStatement newNode = new SEDMemoryStatement(getDebugTarget(), parent, thread);
       fillNode(newNode, name, posInfo);
+      // Try to update the position info with the position of the statement in JDT.
+      updateLocationFromAST(newNode);
       return newNode;
+   }
+   
+   /**
+    * Replaces the location in the given {@link ISEDMemoryStackFrameCompatibleDebugNode}
+    * if possible with the location provided via JDT AST model which is more precise.
+    * @param newNode The {@link ISEDMemoryStackFrameCompatibleDebugNode} to update.
+    * @throws DebugException Occurred Exception.
+    */
+   protected void updateLocationFromAST(ISEDMemoryStackFrameCompatibleDebugNode newNode) throws DebugException {
+      try {
+         if (newNode.getCharEnd() >= 0) {
+            ICompilationUnit compilationUnit = findCompilationUnit(newNode);
+            if (compilationUnit != null) {
+               ASTNode root = parse(compilationUnit, newNode.getCharStart(), newNode.getCharEnd() - newNode.getCharStart());
+               ASTNode statementNode = ASTNodeByEndIndexSearcher.search(root, newNode.getCharEnd());
+               if (statementNode != null) {
+                  newNode.setLineNumber(-1);
+                  newNode.setCharStart(statementNode.getStartPosition());
+                  newNode.setCharEnd(statementNode.getStartPosition() + statementNode.getLength());
+               }
+            }
+         }
+      }
+      catch (Exception e) {
+         throw new DebugException(LogUtil.getLogger().createErrorStatus(e));
+      }
+   }
+   
+   /**
+    * Parses the given {@link ICompilationUnit} in the specified range into an AST. 
+    * @param compilationUnit The {@link ICompilationUnit} to parse.
+    * @param offset The start index in the text to parse.
+    * @param length The length of the text to parse.
+    * @return The {@link ASTNode} which is the root of the AST.
+    */
+   protected ASTNode parse(ICompilationUnit compilationUnit, int offset, int length) {
+      ASTParser parser = ASTParser.newParser(ASTProvider.SHARED_AST_LEVEL); // Hopefully always the newest AST level (e.g. AST.JLS4)
+      parser.setSource(compilationUnit);
+      parser.setSourceRange(offset, length);
+      return parser.createAST(null);
    }
    
    /**
@@ -749,17 +817,51 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
     * @param toFill The {@link ISEDMemoryStackFrameCompatibleDebugNode} to fill.
     * @param name The name to set.
     * @param posInfo The {@link PositionInfo} to set.
+    * @throws DebugException Occurred Exception.
     */
-   protected void fillNode(ISEDMemoryStackFrameCompatibleDebugNode toFill, String name, PositionInfo posInfo) {
-      Assert.isNotNull(toFill);
-      toFill.setName(name);
-      if (posInfo != null && posInfo != PositionInfo.UNDEFINED) {
-         if (posInfo.getEndPosition() != null) {
-            toFill.setLineNumber(posInfo.getEndPosition().getLine());
+   protected void fillNode(ISEDMemoryStackFrameCompatibleDebugNode toFill, String name, PositionInfo posInfo) throws DebugException {
+      try {
+         Assert.isNotNull(toFill);
+         toFill.setName(name);
+         if (posInfo != null && posInfo != PositionInfo.UNDEFINED) {
+            // Set source start and end.
+            if (posInfo.getFileName() != null) {
+               File file = new File(posInfo.getFileName());
+               toFill.setSourceName(file.getName());
+               LineInformation[] infos = IOUtil.computeLineInformation(file);
+               if (posInfo.getStartPosition() != null) {
+                  int line = posInfo.getStartPosition().getLine() - 1;
+                  int column = posInfo.getStartPosition().getColumn();
+                  if (line >= 0 && line < infos.length) {
+                     LineInformation info = infos[line];
+                     int offset = info.getOffset() + KeYUtil.normalizeRecorderColumn(column, info.getTabIndices());
+                     toFill.setCharStart(offset);
+                  }
+               }
+               if (posInfo.getEndPosition() != null) {
+                  int line = posInfo.getEndPosition().getLine() - 1;
+                  int column = posInfo.getEndPosition().getColumn();
+                  if (line >= 0 && line < infos.length) {
+                     LineInformation info = infos[line];
+                     int offset = info.getOffset() + KeYUtil.normalizeRecorderColumn(column, info.getTabIndices());
+                     toFill.setCharEnd(offset);
+                  }
+               }
+            }
+            // Check if source start and end is defined.
+            if (toFill.getCharStart() < 0 || toFill.getCharEnd() < 0) {
+               // Unset start and end indices
+               toFill.setCharStart(-1);
+               toFill.setCharEnd(-1);
+               // Try to set a line number as backup
+               if (posInfo.getEndPosition() != null) {
+                  toFill.setLineNumber(posInfo.getEndPosition().getLine());
+               }
+            }
          }
-         if (posInfo.getFileName() != null) {
-            toFill.setSourceName(new File(posInfo.getFileName()).getName());
-         }
+      }
+      catch (IOException e) {
+         throw new DebugException(LogUtil.getLogger().createErrorStatus(e));
       }
    }
    

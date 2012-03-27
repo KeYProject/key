@@ -50,8 +50,8 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     * Tests the suspend/resume functionality on the {@link IDebugTarget}.
     */
    @Test
-   public void testMethodCallForamtTest() throws Exception {
-      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallForamtTest",
+   public void testMethodCallFormatTest() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallFormatTest",
                      "data/methodFormatTest",
                      false,
                      new IMethodSelector() {
@@ -588,7 +588,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
          TestSedCoreUtil.terminateAndRemoveAll(debugTree);
       }
    }
-   
+
    /**
     * Tests the suspend/resume functionality on the {@link ILaunch}
     * that is disconnected.

@@ -8,4 +8,3 @@ TODOs for the execution tree
 4. Handle loops
 5. Handle exceptional termination (Requires to read variables)
 6. Show return values (Requires to read variables)
-7. Show in all nodes source locations (Requires bedder source locations, e.g. with JDT)
