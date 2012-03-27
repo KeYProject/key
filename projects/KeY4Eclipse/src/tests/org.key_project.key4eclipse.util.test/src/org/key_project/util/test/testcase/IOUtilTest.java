@@ -36,30 +36,30 @@ public class IOUtilTest extends TestCase {
       doTestLineInformationNormalizeColumn("AB\tCD EF GH\t\tIJ\t.", 
                                            3, 
                                            new int[] {0, 1, 2, 2, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 11, 11, 12, 12, 12, 13, 14, 15, 15, 15, 16, 17, 18});
-//      doTestLineInformationNormalizeColumn("AB\tCD EF GH\t\tIJ\t.", 
-//                                           2, 
-//                                           new int[] {0, 1, 2, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 11, 12, 12, 13, 14, 15, 15, 16, 17, 18});
-//      doTestLineInformationNormalizeColumn("AB\tCD EF GH\t\tIJ\t.", 
-//                                           1, 
-//                                           new int[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18});
-//      doTestLineInformationNormalizeColumn("AB\tCD EF GH\t\tIJ\t.", 
-//                                           0, // Invalid, column index is expected as result.
-//                                           new int[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18});
-//      doTestLineInformationNormalizeColumn("AB\tCD EF GH\t\tIJ\t.", 
-//                                           -1, // Invalid, column index is expected as result.
-//                                           new int[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18});
-//      // Test invalid column index
-//      LineInformation[] infos = IOUtil.computeLineInformation(new ByteArrayInputStream("AB\tCD EF GH\t\tIJ\t.".getBytes()));
-//      assertNotNull(infos);
-//      assertEquals(1, infos.length);
-//      LineInformation info = infos[0];
-//      assertNotNull(info);
-//      assertEquals(-1, info.normalizeColumn(-1, 3));
-//      assertEquals(-2, info.normalizeColumn(-2, 3));
-//      // Test tabs only
-//      doTestLineInformationNormalizeColumn("\t\t\t\t\t", 
-//                                           3, 
-//                                           new int[] {0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 6, 7});
+      doTestLineInformationNormalizeColumn("AB\tCD EF GH\t\tIJ\t.", 
+                                           2, 
+                                           new int[] {0, 1, 2, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 11, 12, 12, 13, 14, 15, 15, 16, 17, 18});
+      doTestLineInformationNormalizeColumn("AB\tCD EF GH\t\tIJ\t.", 
+                                           1, 
+                                           new int[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18});
+      doTestLineInformationNormalizeColumn("AB\tCD EF GH\t\tIJ\t.", 
+                                           0, // Invalid, column index is expected as result.
+                                           new int[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18});
+      doTestLineInformationNormalizeColumn("AB\tCD EF GH\t\tIJ\t.", 
+                                           -1, // Invalid, column index is expected as result.
+                                           new int[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18});
+      // Test invalid column index
+      LineInformation[] infos = IOUtil.computeLineInformation(new ByteArrayInputStream("AB\tCD EF GH\t\tIJ\t.".getBytes()));
+      assertNotNull(infos);
+      assertEquals(1, infos.length);
+      LineInformation info = infos[0];
+      assertNotNull(info);
+      assertEquals(-1, info.normalizeColumn(-1, 3));
+      assertEquals(-2, info.normalizeColumn(-2, 3));
+      // Test tabs only
+      doTestLineInformationNormalizeColumn("\t\t\t\t\t", 
+                                           3, 
+                                           new int[] {0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 6, 7});
    }
    
    /**
@@ -79,7 +79,7 @@ public class IOUtilTest extends TestCase {
       // Test column normalization
       for (int i = 0; i < expectedIndices.length; i++) {
          int normalColumn = info.normalizeColumn(i, tabWidth);
-         System.out.println("normalizeColumn(" + i + ", " + tabWidth + ") = " + normalColumn + (normalColumn < text.toCharArray().length ? (" which is character '" + text.toCharArray()[normalColumn] + "'") : ""));
+         //System.out.println("normalizeColumn(" + i + ", " + tabWidth + ") = " + normalColumn + (normalColumn < text.toCharArray().length ? (" which is character '" + text.toCharArray()[normalColumn] + "'") : ""));
          assertEquals(expectedIndices[i], normalColumn); 
       }
    }

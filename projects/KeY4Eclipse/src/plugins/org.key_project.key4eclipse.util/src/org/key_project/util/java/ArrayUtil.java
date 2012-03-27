@@ -68,7 +68,7 @@ public final class ArrayUtil {
     * thrown.
     * </p>
     * @param array The array to extend.
-    * @param toAddT The element to add.
+    * @param toAdd The element to add.
     * @return The new created array with one more element.
     * @throws IllegalArgumentException Both parameters are {@code null}.
     */
@@ -89,6 +89,27 @@ public final class ArrayUtil {
            else {
                throw new IllegalArgumentException("Can not create an array if both paramters are null.");
            }
+       }
+   }
+   
+   /**
+    * <p>
+    * Adds the given element to the existing array. The result is a new
+    * array that contains one more element.
+    * </p>
+    * @param array The array to extend.
+    * @param toAdd The element to add.
+    * @return The new created array with one more element.
+    */
+   public static int[] add(int[] array, int toAdd) {
+       if (array != null) {
+           int[] result = new int[array.length + 1];
+           System.arraycopy(array, 0, result, 0, array.length);
+           result[array.length] = toAdd;
+           return result;
+       }
+       else {
+           return new int[] {toAdd};
        }
    }
 
@@ -199,6 +220,38 @@ public final class ArrayUtil {
        if (array != null) {
            boolean afterFirst = false;
            for (T element : array) {
+               if (afterFirst) {
+                   sb.append(separator);
+               }
+               else {
+                   afterFirst = true;
+               }
+               sb.append(ObjectUtil.toString(element));
+           }
+       }
+       return sb.toString();
+   }
+
+   /**
+    * Converts the given array into a {@link String}.
+    * @param array The array to convert.
+    * @return The array as {@link String}.
+    */
+   public static String toString(int[] array) {
+       return toString(array, ", ");
+   }
+   
+   /**
+    * Converts the given array into a {@link String}.
+    * @param array The array to convert.
+    * @param separator The separator between to array elements.
+    * @return The array as {@link String}.
+    */
+   public static String toString(int[] array, String separator) {
+       StringBuffer sb = new StringBuffer();
+       if (array != null) {
+           boolean afterFirst = false;
+           for (int element : array) {
                if (afterFirst) {
                    sb.append(separator);
                }

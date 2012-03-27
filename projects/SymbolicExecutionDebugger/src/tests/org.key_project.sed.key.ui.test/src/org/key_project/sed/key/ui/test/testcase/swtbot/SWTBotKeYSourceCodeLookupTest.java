@@ -87,7 +87,7 @@ public class SWTBotKeYSourceCodeLookupTest extends TestCase {
          TestSedCoreUtil.waitUntilDebugTargetCanSuspend(bot, target); // Wait until the target is resumed.
          TestSedCoreUtil.waitUntilDebugTargetCanResume(bot, target); // wait until the target is suspended.
          // Test the execution tree
-         TestSEDKeyCoreUtil.assertStatementsExample(target);
+         TestSEDKeyCoreUtil.assertFlatStepsExample(target);
          // Make sure that no editor is opened
          assertEquals(0, bot.editors().size());
          // Test statements
@@ -182,7 +182,7 @@ public class SWTBotKeYSourceCodeLookupTest extends TestCase {
          TestSedCoreUtil.waitUntilDebugTargetCanSuspend(bot, target); // Wait until the target is resumed.
          TestSedCoreUtil.waitUntilDebugTargetCanResume(bot, target); // wait until the target is suspended.
          // Test the execution tree
-         TestSEDKeyCoreUtil.assertStatementsExample(target);
+         TestSEDKeyCoreUtil.assertFlatStepsExample(target);
          // Get stack frame for lookup
          assertEquals(1, target.getSymbolicThreads().length);
          ISEDThread thread = target.getSymbolicThreads()[0];

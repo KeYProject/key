@@ -27,6 +27,7 @@ import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.IFilter;
+import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.SwingUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithException;
@@ -34,6 +35,8 @@ import org.key_project.util.java.thread.AbstractRunnableWithResult;
 import org.key_project.util.java.thread.IRunnableWithException;
 import org.key_project.util.java.thread.IRunnableWithResult;
 import org.key_project.util.jdt.JDTUtil;
+
+import recoder.parser.JavaCharStream;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -104,6 +107,11 @@ public final class KeYUtil {
      * The file extension for *.proof files.
      */
     public static final String PROOF_FILE_EXTENSION = "proof";
+    
+    /**
+     * The used tab size in KeY's recorder component.
+     */
+    public static final int RECORDER_TAB_SIZE = 8;
     
     /**
      * Forbid instances.
@@ -744,5 +752,89 @@ public final class KeYUtil {
          }
       }
       return inUI;
+   }
+
+   /**
+    * <p>
+    * Normalizes the given column index computed by KeY's recorder component into
+    * a normal column index in that each tab ({@code '\t'}) character has a fixed tab size 
+    * of one which means that a tab is treated as a normal character.
+    * </p>
+    * <p>
+    * KeY's recorder component has a default tab size of {@link #RECORDER_TAB_SIZE}.
+    * But instead of using this fixed tab size the recorder component uses the following
+    * simplified code to compute the column index:
+    * <pre><code>
+    * int column = 0;
+    * for (char sign : signs) {
+    *    switch (sign) {
+    *        case '\t' : column += (tabSize - (column % tabSize));
+    *                    break;
+    *        default : column ++;
+    *     }
+    * }
+    * </code></pre>
+    * The class of recorder which does the mentioned computation is {@link JavaCharStream}.
+    * </p>
+    * @param column The column computed by KeY's recorder component.
+    * @param tabIndices The indices of tab ({@code '\t'}) characters in the current line. They can be computed for instance via {@link IOUtil#computeLineInformation(File)}. 
+    * @return The normalized column index in that each tab ({@code '\t'}) character has a fixed tab size of one which means that a tab is treated as a normal character.
+    */   
+   public static int normalizeRecorderColumn(int column, int[] tabIndices) {
+      return normalizeRecorderColumn(column, RECORDER_TAB_SIZE, tabIndices);
+   }
+   
+   /**
+    * <p>
+    * Normalizes the given column index computed by KeY's recorder component into
+    * a normal column index in that each tab ({@code '\t'}) character has a fixed tab size 
+    * of one which means that a tab is treated as a normal character.
+    * </p>
+    * <p>
+    * KeY's recorder component has a default tab size of {@link #RECORDER_TAB_SIZE}.
+    * But instead of using this fixed tab size the recorder component uses the following
+    * simplified code to compute the column index:
+    * <pre><code>
+    * int column = 0;
+    * for (char sign : signs) {
+    *    switch (sign) {
+    *        case '\t' : column += (tabSize - (column % tabSize));
+    *                    break;
+    *        default : column ++;
+    *     }
+    * }
+    * </code></pre>
+    * The class of recorder which does the mentioned computation is {@link JavaCharStream}.
+    * </p>
+    * @param column The column computed by KeY's recorder component.
+    * @param tabSize The tab size to use.
+    * @param tabIndices The indices of tab ({@code '\t'}) characters in the current line. They can be computed for instance via {@link IOUtil#computeLineInformation(File)}. 
+    * @return The normalized column index in that each tab ({@code '\t'}) character has a fixed tab size of one which means that a tab is treated as a normal character.
+    */
+   public static int normalizeRecorderColumn(int column, int tabSize, int[] tabIndices) {
+      if (column >= 0 && tabSize >= 2 && tabIndices != null) {
+         int result = 0;
+         int i = 0;
+         int lastTab = -1;
+         int tabOverhead = 0;
+         while (i < tabIndices.length) {
+            if (lastTab >= 0) {
+               result += tabIndices[i] - lastTab;
+            }
+            else {
+               result = tabIndices[i];
+            }
+            if (result < column) {
+               tabOverhead += (tabSize - (result % tabSize) - 1);
+               result += (tabSize - (result % tabSize) - 1);
+            }
+            lastTab = tabIndices[i];
+            i++;
+         }
+         return column - tabOverhead;
+      }
+      else {
+         return column;
+      }
    }
 }

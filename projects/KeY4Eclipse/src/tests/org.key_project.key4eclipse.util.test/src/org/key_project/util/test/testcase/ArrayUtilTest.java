@@ -26,12 +26,37 @@ public class ArrayUtilTest extends TestCase {
       assertFalse(ArrayUtil.isEmpty(new String[] {"A", "B"}));
    }
    
+   /**
+    * Tests {@link ArrayUtil#toString(int[], String)}
+    */
+   @Test
+   public void testToString_int_String() {
+      assertEquals(StringUtil.EMPTY_STRING, ArrayUtil.toString((int[])null, ";"));
+      assertEquals(StringUtil.EMPTY_STRING, ArrayUtil.toString(new int[] {}, ";"));
+      assertEquals("1", ArrayUtil.toString(new int[] {1}, ";"));
+      assertEquals("1;2", ArrayUtil.toString(new int[] {1, 2}, ";"));
+      assertEquals("1;2;3", ArrayUtil.toString(new int[] {1, 2, 3}, ";"));
+      assertEquals("1null2null3", ArrayUtil.toString(new int[] {1, 2, 3}, null));
+   }
+   
+   /**
+    * Tests {@link ArrayUtil#toString(int[])}
+    */
+   @Test
+   public void testToString_int() {
+      assertEquals(StringUtil.EMPTY_STRING, ArrayUtil.toString((int[])null));
+      assertEquals(StringUtil.EMPTY_STRING, ArrayUtil.toString(new int[] {}));
+      assertEquals("1", ArrayUtil.toString(new int[] {1}));
+      assertEquals("1, 2", ArrayUtil.toString(new int[] {1, 2}));
+      assertEquals("1, 2, 3", ArrayUtil.toString(new int[] {1, 2, 3}));
+   }
+   
     /**
      * Tests {@link ArrayUtil#toString(Object[], String)}
      */
     @Test
-    public void testToString_String() {
-        assertEquals(StringUtil.EMPTY_STRING, ArrayUtil.toString(null, ";"));
+    public void testToString_Object_String() {
+        assertEquals(StringUtil.EMPTY_STRING, ArrayUtil.toString((String[])null, ";"));
         assertEquals(StringUtil.EMPTY_STRING, ArrayUtil.toString(new String[] {}, ";"));
         assertEquals("A", ArrayUtil.toString(new String[] {"A"}, ";"));
         assertEquals("A;B", ArrayUtil.toString(new String[] {"A", "B"}, ";"));
@@ -44,8 +69,8 @@ public class ArrayUtilTest extends TestCase {
      * Tests {@link ArrayUtil#toString(Object[])}
      */
     @Test
-    public void testToString() {
-        assertEquals(StringUtil.EMPTY_STRING, ArrayUtil.toString(null));
+    public void testToString_Object() {
+        assertEquals(StringUtil.EMPTY_STRING, ArrayUtil.toString((String[])null));
         assertEquals(StringUtil.EMPTY_STRING, ArrayUtil.toString(new String[] {}));
         assertEquals("A", ArrayUtil.toString(new String[] {"A"}));
         assertEquals("A, B", ArrayUtil.toString(new String[] {"A", "B"}));
@@ -181,10 +206,52 @@ public class ArrayUtilTest extends TestCase {
     }
     
     /**
+     * Tests {@link ArrayUtil#add(int[], int)}
+     */
+    @Test
+    public void testAdd_int() {
+        // Test null array
+        int[] result = ArrayUtil.add(null, 1);
+        assertNotNull(result);
+        assertEquals(1, result.length);
+        assertEquals(1, result[0]);
+        // Test empty array
+        int[] array = new int[] {};
+        result = ArrayUtil.add(array, 1);
+        assertNotNull(result);
+        assertEquals(1, result.length);
+        assertEquals(1, result[0]);
+        // Test array with one element
+        array = new int[] {1};
+        result = ArrayUtil.add(array, 2);
+        assertNotNull(result);
+        assertEquals(2, result.length);
+        assertEquals(1, result[0]);
+        assertEquals(2, result[1]);
+        // Test array with two elements
+        array = new int[] {1, 2};
+        result = ArrayUtil.add(array, 3);
+        assertNotNull(result);
+        assertEquals(3, result.length);
+        assertEquals(1, result[0]);
+        assertEquals(2, result[1]);
+        assertEquals(3, result[2]);
+        // Test array with three elements
+        array = new int[] {1, 2, 3};
+        result = ArrayUtil.add(array, 4);
+        assertNotNull(result);
+        assertEquals(4, result.length);
+        assertEquals(1, result[0]);
+        assertEquals(2, result[1]);
+        assertEquals(3, result[2]);
+        assertEquals(4, result[3]);
+    }
+    
+    /**
      * Tests {@link ArrayUtil#add(Object[], Object)}
      */
     @Test
-    public void testAdd() {
+    public void testAdd_Object() {
         // Test null array
         String[] result = ArrayUtil.add(null, "A");
         assertNotNull(result);

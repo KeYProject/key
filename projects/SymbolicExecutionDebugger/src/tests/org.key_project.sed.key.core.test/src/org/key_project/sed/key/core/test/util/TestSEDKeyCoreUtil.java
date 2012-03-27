@@ -48,7 +48,7 @@ public final class TestSEDKeyCoreUtil {
    /**
     * The name of the {@link ISEDDebugTarget} used in the flat list example.
     */
-   public static final String STATEMENT_TARGET_NAME = "JML normal_behavior operation contract [id: -2147483648 / FlatSteps::doSomething]";
+   public static final String FLAT_STEPS_TARGET_NAME = "JML normal_behavior operation contract [id: -2147483648 / FlatSteps::doSomething]";
    
    /**
     * The name of the {@link ISEDDebugTarget} used in the method call hierarchy example.
@@ -114,6 +114,11 @@ public final class TestSEDKeyCoreUtil {
     * The name of the {@link ISEDDebugTarget} used in the fixed recursive method call example.
     */
    public static final String FIXED_RECURSIVE_METHOD_CALL_TARGET_NAME = "JML normal_behavior operation contract [id: -2147483648 / FixedRecursiveMethodCallTest::decreaseValue]";
+
+   /**
+    * The name of the {@link ISEDDebugTarget} used in the fixed method call format test example.
+    */
+   public static final String METHOD_CALL_FORMAT_TEST_TARGET_NAME = "JML normal_behavior operation contract [id: -2147483648 / MethodFormatTest::main]";
    
    /**
     * Forbid instances.
@@ -192,21 +197,21 @@ public final class TestSEDKeyCoreUtil {
     * @param target The give {@link ISEDDebugTarget} to check.
     * @throws DebugException Occurred Exception.
     */
-   public static void assertStatementsExample(ISEDDebugTarget target) throws DebugException {
-      compareDebugTarget(createExpectedStatementModel(), target);
+   public static void assertFlatStepsExample(ISEDDebugTarget target) throws DebugException {
+      compareDebugTarget(createExpectedFlatStepsModel(), target);
    }
 
    /**
     * Creates the expected {@link ISEDDebugTarget} for the statement example.
     * @return The expected {@link ISEDDebugTarget}.
     */
-   public static ISEDDebugTarget createExpectedStatementModel() {
+   public static ISEDDebugTarget createExpectedFlatStepsModel() {
       // Create target
-      SEDMemoryDebugTarget target = appendDebugTarget(STATEMENT_TARGET_NAME);
+      SEDMemoryDebugTarget target = appendDebugTarget(FLAT_STEPS_TARGET_NAME);
       // Create thread
       SEDMemoryThread thread = appendThread(target);
       // Create method call
-      SEDMemoryMethodCall call = appendMethodCall(target, thread, thread, "self.doSomething(_asdf,_a,_b);");
+      SEDMemoryMethodCall call = appendMethodCall(target, thread, thread, "self.doSomething(_asdf,_a,_b);", 228, 239);
       // Create statement 1
       SEDMemoryStatement s1 = appendStatement(target, call, thread, "int x = 1;", 16);
       // Create statement 2
@@ -221,28 +226,72 @@ public final class TestSEDKeyCoreUtil {
    }
 
    /**
+    * Creates the expected {@link ISEDDebugTarget} for the method call format test example.
+    * @return The expected {@link ISEDDebugTarget}.
+    */   
+   public static ISEDDebugTarget createExpectedMethodCallFormatTestModel() {
+      SEDMemoryDebugTarget target = appendDebugTarget(METHOD_CALL_FORMAT_TEST_TARGET_NAME);
+      SEDMemoryThread thread = appendThread(target);
+      
+      SEDMemoryMethodCall callMain = appendMethodCall(target, thread, thread, "MethodFormatTest.main();", 54, 58);
+      SEDMemoryStatement sMain = appendStatement(target, callMain, thread, "return a();", 3);
+      
+      SEDMemoryMethodCall callA = appendMethodCall(target, sMain, thread, "MethodFormatTest.a();", 100, 101);
+      SEDMemoryStatement sA = appendStatement(target, callA, thread, "return b();", 5);
+      
+      SEDMemoryMethodCall callB = appendMethodCall(target, sA, thread, "MethodFormatTest.b();", 136, 137);
+      SEDMemoryStatement sB = appendStatement(target, callB, thread, "return c();", 5);
+      
+      SEDMemoryMethodCall callC = appendMethodCall(target, sB, thread, "MethodFormatTest.c();", 173, 174);
+      SEDMemoryStatement sC = appendStatement(target, callC, thread, "return d();", 5);
+      
+      SEDMemoryMethodCall callD = appendMethodCall(target, sC, thread, "MethodFormatTest.d();", 214, 215);
+      SEDMemoryStatement sD = appendStatement(target, callD, thread, "return e();", 7);
+      
+      SEDMemoryMethodCall callE = appendMethodCall(target, sD, thread, "MethodFormatTest.e();", 252, 253);
+      SEDMemoryStatement sE = appendStatement(target, callE, thread, "return f();", 8);
+      
+      SEDMemoryMethodCall callF = appendMethodCall(target, sE, thread, "MethodFormatTest.f();", 294, 295);
+      SEDMemoryStatement sF = appendStatement(target, callF, thread, "return g();", 10);
+      
+      SEDMemoryMethodCall callG = appendMethodCall(target, sF, thread, "MethodFormatTest.g();", 332, 333);
+      SEDMemoryStatement sG = appendStatement(target, callG, thread, "return 42;", 12);
+      
+      SEDMemoryMethodReturn retG = appendMethodReturn(target, sG, thread, "MethodFormatTest.g();");
+      SEDMemoryMethodReturn retF = appendMethodReturn(target, retG, thread, "MethodFormatTest.f();");
+      SEDMemoryMethodReturn retE = appendMethodReturn(target, retF, thread, "MethodFormatTest.e();");
+      SEDMemoryMethodReturn retD = appendMethodReturn(target, retE, thread, "MethodFormatTest.d();");
+      SEDMemoryMethodReturn retC = appendMethodReturn(target, retD, thread, "MethodFormatTest.c();");
+      SEDMemoryMethodReturn retB = appendMethodReturn(target, retC, thread, "MethodFormatTest.b();");
+      SEDMemoryMethodReturn retA = appendMethodReturn(target, retB, thread, "MethodFormatTest.a();");
+      SEDMemoryMethodReturn retMain = appendMethodReturn(target, retA, thread, "MethodFormatTest.main();");
+      appendTermination(target, retMain, thread);
+      return target;
+   }
+
+   /**
     * Creates the expected {@link ISEDDebugTarget} for the fixed recursive method call example.
     * @return The expected {@link ISEDDebugTarget}.
     */   
    public static ISEDDebugTarget createExpectedFixedRecursiveMethodCallModel() {
       SEDMemoryDebugTarget target = appendDebugTarget(FIXED_RECURSIVE_METHOD_CALL_TARGET_NAME);
       SEDMemoryThread thread = appendThread(target);
-      SEDMemoryMethodCall callMain = appendMethodCall(target, thread, thread, "FixedRecursiveMethodCallTest.decreaseValue();");
+      SEDMemoryMethodCall callMain = appendMethodCall(target, thread, thread, "FixedRecursiveMethodCallTest.decreaseValue();", 66, 79);
       SEDMemoryStatement sMain = appendStatement(target, callMain, thread, "return decrease(3);", 4);
       
-      SEDMemoryMethodCall call1 = appendMethodCall(target, sMain, thread, "FixedRecursiveMethodCallTest.decrease(n);");
+      SEDMemoryMethodCall call1 = appendMethodCall(target, sMain, thread, "FixedRecursiveMethodCallTest.decrease(n);", 134, 142);
       SEDMemoryBranchNode branch1 = appendBranchNode(target, call1, thread, "if (n>=1) {return decrease(n-1); }", 10);
       SEDMemoryStatement s1 = appendStatement(target, branch1, thread, "return decrease(n-1);", 9);
       
-      SEDMemoryMethodCall call2 = appendMethodCall(target, s1, thread, "FixedRecursiveMethodCallTest.decrease(n_1);");
+      SEDMemoryMethodCall call2 = appendMethodCall(target, s1, thread, "FixedRecursiveMethodCallTest.decrease(n_1);", 134, 142);
       SEDMemoryBranchNode branch2 = appendBranchNode(target, call2, thread, "if (n_1>=1) {return decrease(n_1-1); }", 10);
       SEDMemoryStatement s2 = appendStatement(target, branch2, thread, "return decrease(n_1-1);", 9);
 
-      SEDMemoryMethodCall call3 = appendMethodCall(target, s2, thread, "FixedRecursiveMethodCallTest.decrease(n_2);");
+      SEDMemoryMethodCall call3 = appendMethodCall(target, s2, thread, "FixedRecursiveMethodCallTest.decrease(n_2);", 134, 142);
       SEDMemoryBranchNode branch3 = appendBranchNode(target, call3, thread, "if (n_2>=1) {return decrease(n_2-1); }", 10);
       SEDMemoryStatement s3 = appendStatement(target, branch3, thread, "return decrease(n_2-1);", 9);
 
-      SEDMemoryMethodCall call4 = appendMethodCall(target, s3, thread, "FixedRecursiveMethodCallTest.decrease(n_3);");
+      SEDMemoryMethodCall call4 = appendMethodCall(target, s3, thread, "FixedRecursiveMethodCallTest.decrease(n_3);", 134, 142);
       SEDMemoryBranchNode branch4 = appendBranchNode(target, call4, thread, "if (n_3>=1) {return decrease(n_3-1); }", 10);
       SEDMemoryStatement s4 = appendStatement(target, branch4, thread, "return n_3;", 11);
       
@@ -262,7 +311,7 @@ public final class TestSEDKeyCoreUtil {
    public static ISEDDebugTarget createExpectedElseIfDifferentVariablesModel() {
       SEDMemoryDebugTarget target = appendDebugTarget(ELSE_IF_DIFFERENT_VARIABLES_TARGET_NAME);
       SEDMemoryThread thread = appendThread(target);
-      SEDMemoryMethodCall call = appendMethodCall(target, thread, thread, "self.main(_a,_b);");
+      SEDMemoryMethodCall call = appendMethodCall(target, thread, thread, "self.main(_a,_b);", 55, 59);
       
       SEDMemoryBranchCondition bc1 = appendBranchCondition(target, call, thread, "if _a true");
       SEDMemoryStatement s1 = appendStatement(target, bc1, thread, "return 1;", 5);
@@ -289,7 +338,7 @@ public final class TestSEDKeyCoreUtil {
    public static ISEDDebugTarget createExpectedTryCatchFinallyModel() {
       SEDMemoryDebugTarget target = appendDebugTarget(TRY_CATCH_FINALLY_TARGET_NAME);
       SEDMemoryThread thread = appendThread(target);
-      SEDMemoryMethodCall call = appendMethodCall(target, thread, thread, "self.tryCatchFinally(_input);");
+      SEDMemoryMethodCall call = appendMethodCall(target, thread, thread, "self.tryCatchFinally(_input);", 97, 112);
       SEDMemoryStatement s1 = appendStatement(target, call, thread, "int result = 0;", 7);
       SEDMemoryStatement s2 = appendStatement(target, s1, thread, "result_1=1/_input;", 9);
       
@@ -318,22 +367,22 @@ public final class TestSEDKeyCoreUtil {
    public static ISEDDebugTarget createExpectedStaticMethodCallModel() {
       SEDMemoryDebugTarget target = appendDebugTarget(STATIC_METHOD_CALL_TARGET_NAME);
       SEDMemoryThread thread = appendThread(target);
-      SEDMemoryMethodCall mainCall = appendMethodCall(target, thread, thread, "StaticMethodCall.main();");
+      SEDMemoryMethodCall mainCall = appendMethodCall(target, thread, thread, "StaticMethodCall.main();", 662, 666);
       SEDMemoryStatement mainS1 = appendStatement(target, mainCall, thread, "doSomething();", 30);
-      SEDMemoryMethodCall doSomethingCall = appendMethodCall(target, mainS1, thread, "StaticMethodCall.doSomething();");
+      SEDMemoryMethodCall doSomethingCall = appendMethodCall(target, mainS1, thread, "StaticMethodCall.doSomething();", 756, 767);
       SEDMemoryMethodReturn doSomethingReturn = appendMethodReturn(target, doSomethingCall, thread, "StaticMethodCall.doSomething();", 36);
       SEDMemoryStatement mainS2 = appendStatement(target, doSomethingReturn, thread, "int x = sub()+sub();", 31);
       
-      SEDMemoryMethodCall subCall1 = appendMethodCall(target, mainS2, thread, "StaticMethodCall.sub();");
+      SEDMemoryMethodCall subCall1 = appendMethodCall(target, mainS2, thread, "StaticMethodCall.sub();", 799, 802);
       SEDMemoryStatement subCall1S = appendStatement(target, subCall1, thread, "return subSub()+2;", 39);
-      SEDMemoryMethodCall subSubCall1 = appendMethodCall(target, subCall1S, thread, "StaticMethodCall.subSub();");
+      SEDMemoryMethodCall subSubCall1 = appendMethodCall(target, subCall1S, thread, "StaticMethodCall.subSub();", 858, 864);
       SEDMemoryStatement subSubCall1S = appendStatement(target, subSubCall1, thread, "return 2;", 43);
       SEDMemoryMethodReturn subSubReturn1 = appendMethodReturn(target, subSubCall1S, thread, "StaticMethodCall.subSub();");
       SEDMemoryMethodReturn subReturn1 = appendMethodReturn(target, subSubReturn1, thread, "StaticMethodCall.sub();");
 
-      SEDMemoryMethodCall subCall2 = appendMethodCall(target, subReturn1, thread, "StaticMethodCall.sub();");
+      SEDMemoryMethodCall subCall2 = appendMethodCall(target, subReturn1, thread, "StaticMethodCall.sub();", 799, 802);
       SEDMemoryStatement subCall2S = appendStatement(target, subCall2, thread, "return subSub()+2;", 39);
-      SEDMemoryMethodCall subSubCall2 = appendMethodCall(target, subCall2S, thread, "StaticMethodCall.subSub();");
+      SEDMemoryMethodCall subSubCall2 = appendMethodCall(target, subCall2S, thread, "StaticMethodCall.subSub();", 858, 864);
       SEDMemoryStatement subSubCall2S = appendStatement(target, subSubCall2, thread, "return 2;", 43);
       SEDMemoryMethodReturn subSubReturn2 = appendMethodReturn(target, subSubCall2S, thread, "StaticMethodCall.subSub();");
       SEDMemoryMethodReturn subReturn2 = appendMethodReturn(target, subSubReturn2, thread, "StaticMethodCall.sub();");
@@ -354,7 +403,7 @@ public final class TestSEDKeyCoreUtil {
       // Create thread
       SEDMemoryThread thread = appendThread(target);
       // Create method call
-      SEDMemoryMethodCall call = appendMethodCall(target, thread, thread, "self.doSomething();");
+      SEDMemoryMethodCall call = appendMethodCall(target, thread, thread, "self.doSomething();", 244, 255);
       // Create statement 1
       SEDMemoryStatement s1 = appendStatement(target, call, thread, "int x = 1+2;", 16);
       // Create statement 2
@@ -375,12 +424,12 @@ public final class TestSEDKeyCoreUtil {
    public static ISEDDebugTarget createExpectedMethodCallOnObjectModel() {
       SEDMemoryDebugTarget target = appendDebugTarget(METHOD_CALL_ON_OBJECT_TARGET_NAME);
       SEDMemoryThread thread = appendThread(target);
-      SEDMemoryMethodCall callMain = appendMethodCall(target, thread, thread, "MethodCallOnObject.main();");
+      SEDMemoryMethodCall callMain = appendMethodCall(target, thread, thread, "MethodCallOnObject.main();", 56, 60);
       SEDMemoryStatement mainS1 = appendStatement(target, callMain, thread, "MethodCallOnObject x = new MethodCallOnObject ();", 4);
       SEDMemoryBranchCondition b1 = appendBranchCondition(target, mainS1, thread, "Normal Execution (m != null)");
       SEDMemoryStatement mainS2 = appendStatement(target, b1, thread, "return x.doSomething();", 5);
       SEDMemoryBranchCondition b2 = appendBranchCondition(target, mainS2, thread, "Normal Execution (x != null)");
-      SEDMemoryMethodCall callDo = appendMethodCall(target, b2, thread, "x.doSomething();");
+      SEDMemoryMethodCall callDo = appendMethodCall(target, b2, thread, "x.doSomething();", 164, 175);
       SEDMemoryStatement doS = appendStatement(target, callDo, thread, "return 42;", 9);
       SEDMemoryMethodReturn doReturn = appendMethodReturn(target, doS, thread, "x.doSomething();");
       SEDMemoryMethodReturn mainReturn = appendMethodReturn(target, doReturn, thread, "MethodCallOnObject.main();");
@@ -395,12 +444,12 @@ public final class TestSEDKeyCoreUtil {
    public static ISEDDebugTarget createExpectedMethodCallOnObjectWithExceptionModel() {
       SEDMemoryDebugTarget target = appendDebugTarget(METHOD_CALL_ON_OBJECT_WITH_EXCEPTION_TARGET_NAME);
       SEDMemoryThread thread = appendThread(target);
-      SEDMemoryMethodCall callMain = appendMethodCall(target, thread, thread, "MethodCallOnObjectWithException.main();");
+      SEDMemoryMethodCall callMain = appendMethodCall(target, thread, thread, "MethodCallOnObjectWithException.main();", 69, 73);
       SEDMemoryStatement mainS1 = appendStatement(target, callMain, thread, "MethodCallOnObjectWithException x = new MethodCallOnObjectWithException ();", 5);
       SEDMemoryBranchCondition b1 = appendBranchCondition(target, mainS1, thread, "Normal Execution (m != null)");
       SEDMemoryStatement mainS2 = appendStatement(target, b1, thread, "return x.doSomething();", 6);
       SEDMemoryBranchCondition b2 = appendBranchCondition(target, mainS2, thread, "Normal Execution (x != null)");
-      SEDMemoryMethodCall callDo = appendMethodCall(target, b2, thread, "x.doSomething();");
+      SEDMemoryMethodCall callDo = appendMethodCall(target, b2, thread, "x.doSomething();", 364, 375);
       SEDMemoryStatement doS1 = appendStatement(target, callDo, thread, "MethodCallOnObjectWithException x = null;", 15);
       SEDMemoryStatement doS2 = appendStatement(target, doS1, thread, "return x_3.return42();", 16);
       SEDMemoryBranchCondition b3 = appendBranchCondition(target, doS2, thread, "Null Reference (x_3 = null)");
@@ -411,7 +460,7 @@ public final class TestSEDKeyCoreUtil {
       SEDMemoryBranchCondition b7 = appendBranchCondition(target, mainS3, thread, "Normal Execution (m_3 != null)");
       SEDMemoryStatement mainS4 = appendStatement(target, b7, thread, "return y.return42();", 10);
       SEDMemoryBranchCondition b8 = appendBranchCondition(target, mainS4, thread, "Normal Execution (y != null)");
-      SEDMemoryMethodCall call42 = appendMethodCall(target, b8, thread, "y.return42();");
+      SEDMemoryMethodCall call42 = appendMethodCall(target, b8, thread, "y.return42();", 469, 477);
       SEDMemoryStatement return42S = appendStatement(target, call42, thread, "return 42;", 20);
       SEDMemoryMethodReturn call42Return = appendMethodReturn(target, return42S, thread, "y.return42();");
       SEDMemoryMethodReturn mainReturn = appendMethodReturn(target, call42Return, thread, "MethodCallOnObjectWithException.main();");
@@ -429,19 +478,19 @@ public final class TestSEDKeyCoreUtil {
       // Create thread
       SEDMemoryThread thread = appendThread(target);
       // Create method call main
-      SEDMemoryMethodCall callMain = appendMethodCall(target, thread, thread, "self.main();");
+      SEDMemoryMethodCall callMain = appendMethodCall(target, thread, thread, "self.main();", 53, 57);
       // Create statement a()
       SEDMemoryStatement mainStatement1 = appendStatement(target, callMain, thread, "int a = a();", 4); 
       // Create method call a
-      SEDMemoryMethodCall callA = appendMethodCall(target, mainStatement1, thread, "self.a();");
+      SEDMemoryMethodCall callA = appendMethodCall(target, mainStatement1, thread, "self.a();", 131, 132);
       // Create statement b()
       SEDMemoryStatement aStatement1 = appendStatement(target, callA, thread, "int b1 = b();", 10); 
       // Create method call b
-      SEDMemoryMethodCall callB = appendMethodCall(target, aStatement1, thread, "self.b();");
+      SEDMemoryMethodCall callB = appendMethodCall(target, aStatement1, thread, "self.b();", 230, 231);
       // Create statement c()
       SEDMemoryStatement bStatement = appendStatement(target, callB, thread, "return c();", 17); 
       // Create method call c
-      SEDMemoryMethodCall callC = appendMethodCall(target, bStatement, thread, "self.c();");
+      SEDMemoryMethodCall callC = appendMethodCall(target, bStatement, thread, "self.c();", 271, 272);
       // Create statement 42
       SEDMemoryStatement fourtyTwoStatement = appendStatement(target, callC, thread, "return 42;", 21); 
       // Create method return of c
@@ -451,11 +500,11 @@ public final class TestSEDKeyCoreUtil {
       // Create statement b()
       SEDMemoryStatement aStatement2 = appendStatement(target, bReturn, thread, "int b2 = b();", 11); 
       // Create method call b
-      SEDMemoryMethodCall callB2 = appendMethodCall(target, aStatement2, thread, "self.b();"); ;
+      SEDMemoryMethodCall callB2 = appendMethodCall(target, aStatement2, thread, "self.b();", 230, 231); ;
       // Create statement c()
       SEDMemoryStatement bStatement2 = appendStatement(target, callB2, thread, "return c();", 17);
       // Create method call c
-      SEDMemoryMethodCall callC2 = appendMethodCall(target, bStatement2, thread, "self.c();"); 
+      SEDMemoryMethodCall callC2 = appendMethodCall(target, bStatement2, thread, "self.c();", 271, 272); 
       // Create statement 42
       SEDMemoryStatement fourtyTwoStatement2 = appendStatement(target, callC2, thread, "return 42;", 21); 
       // Create method return of c
@@ -465,7 +514,7 @@ public final class TestSEDKeyCoreUtil {
       // Create statement c()
       SEDMemoryStatement aStatement3 = appendStatement(target, bReturn2, thread, "int c = c();", 12); 
       // Create method call c
-      SEDMemoryMethodCall callC3 = appendMethodCall(target, aStatement3, thread, "self.c();"); ;
+      SEDMemoryMethodCall callC3 = appendMethodCall(target, aStatement3, thread, "self.c();", 271, 272);
       // Create statement 42
       SEDMemoryStatement fourtyTwoStatement3 = appendStatement(target, callC3, thread, "return 42;", 21); 
       // Create method return of c
@@ -477,7 +526,7 @@ public final class TestSEDKeyCoreUtil {
       // Create statement x()
       SEDMemoryStatement mainStatement2 = appendStatement(target, aReturn, thread, "int x = x();", 5); 
       // Create method call x
-      SEDMemoryMethodCall callX = appendMethodCall(target, mainStatement2, thread, "self.x();");
+      SEDMemoryMethodCall callX = appendMethodCall(target, mainStatement2, thread, "self.x();", 311, 312);
       // Create statement 42
       SEDMemoryStatement twoStatement = appendStatement(target, callX, thread, "return 2;", 25);
       // Create method return of c
@@ -499,7 +548,7 @@ public final class TestSEDKeyCoreUtil {
       // Create target
       SEDMemoryDebugTarget target = appendDebugTarget(SIMPLE_IF_TARGET_NAME);
       SEDMemoryThread thread = appendThread(target);
-      SEDMemoryMethodCall callMin = appendMethodCall(target, thread, thread, "self.min(_i,_j);");
+      SEDMemoryMethodCall callMin = appendMethodCall(target, thread, thread, "self.min(_i,_j);", 413, 416);
       SEDMemoryStatement s1 = appendStatement(target, callMin, thread, "int result;", 23);
       SEDMemoryBranchNode branchNode = appendBranchNode(target, s1, thread, "if (_i<_j) {   result_1=_i; }else  {   result_1=_j; }", 29);
       // Branch 1
@@ -525,13 +574,13 @@ public final class TestSEDKeyCoreUtil {
       // Create target
       SEDMemoryDebugTarget target = appendDebugTarget(FUNCTIONAL_IF_TARGET_NAME);
       SEDMemoryThread thread = appendThread(target);
-      SEDMemoryMethodCall callMin = appendMethodCall(target, thread, thread, "self.min(_i,_j);");
+      SEDMemoryMethodCall callMin = appendMethodCall(target, thread, thread, "self.min(_i,_j);", 661, 664);
       SEDMemoryStatement s1 = appendStatement(target, callMin, thread, "int result;", 29);
       SEDMemoryBranchNode branchNode = appendBranchNode(target, s1, thread, "if (invert(_i)<invert(_j)) {   result_1=_i; }else  {   result_1=_j; }", 35);
-      SEDMemoryMethodCall callInvert1 = appendMethodCall(target, branchNode, thread, "self.invert(a);");
+      SEDMemoryMethodCall callInvert1 = appendMethodCall(target, branchNode, thread, "self.invert(a);", 818, 824);
       SEDMemoryStatement callS1 = appendStatement(target, callInvert1, thread, "return a*-1;", 40);
       SEDMemoryMethodReturn returnInvert1 = appendMethodReturn(target, callS1, thread, "self.invert(a);");
-      SEDMemoryMethodCall callInvert2 = appendMethodCall(target, returnInvert1, thread, "self.invert(a_1);");
+      SEDMemoryMethodCall callInvert2 = appendMethodCall(target, returnInvert1, thread, "self.invert(a_1);", 818, 824);
       SEDMemoryStatement callS2 = appendStatement(target, callInvert2, thread, "return a_1*-1;", 40);
       SEDMemoryMethodReturn returnInvert2 = appendMethodReturn(target, callS2, thread, "self.invert(a_1);");
       // Branch 1
@@ -557,7 +606,7 @@ public final class TestSEDKeyCoreUtil {
       // Create target
       SEDMemoryDebugTarget target = appendDebugTarget(COMPLEX_IF_TARGET_NAME);
       SEDMemoryThread thread = appendThread(target);
-      SEDMemoryMethodCall callMin = appendMethodCall(target, thread, thread, "self.min(_i,_j);");
+      SEDMemoryMethodCall callMin = appendMethodCall(target, thread, thread, "self.min(_i,_j);", 424, 427);
       SEDMemoryStatement s1 = appendStatement(target, callMin, thread, "int result;", 23);
       SEDMemoryBranchNode branchNode = appendBranchNode(target, s1, thread, "if (_i<_j&&_i!=_j) {   result_1=_i; }else  {   result_1=_j; }", 29);
       // Branch 1
@@ -586,19 +635,19 @@ public final class TestSEDKeyCoreUtil {
       // Create thread
       SEDMemoryThread thread = appendThread(target);
       // Create method call main
-      SEDMemoryMethodCall callMain = appendMethodCall(target, thread, thread, "self.main();");
+      SEDMemoryMethodCall callMain = appendMethodCall(target, thread, thread, "self.main();", 54, 58);
       // Create statement a()
       SEDMemoryStatement mainStatement = appendStatement(target, callMain, thread, "return a();", 4);
       // Create method call a
-      SEDMemoryMethodCall callA = appendMethodCall(target, mainStatement, thread, "self.a();");
+      SEDMemoryMethodCall callA = appendMethodCall(target, mainStatement, thread, "self.a();", 98, 99);
       // Create statement b()
       SEDMemoryStatement aStatement = appendStatement(target, callA, thread, "return b();", 8);
       // Create method call b
-      SEDMemoryMethodCall callB = appendMethodCall(target, aStatement, thread, "self.b();");
+      SEDMemoryMethodCall callB = appendMethodCall(target, aStatement, thread, "self.b();", 139, 140);
       // Create statement c()
       SEDMemoryStatement bStatement = appendStatement(target, callB, thread, "return c();", 12);
       // Create method call c
-      SEDMemoryMethodCall callC = appendMethodCall(target, bStatement, thread, "self.c();");
+      SEDMemoryMethodCall callC = appendMethodCall(target, bStatement, thread, "self.c();", 180, 181);
       // Create statement 42
       SEDMemoryStatement fourtyTwoStatement = appendStatement(target, callC, thread, "return 42;", 16);
       // Create method return of c
@@ -624,19 +673,19 @@ public final class TestSEDKeyCoreUtil {
       // Create thread
       SEDMemoryThread thread = appendThread(target);
       // Create method call main
-      SEDMemoryMethodCall callMain = appendMethodCall(target, thread, thread, "self.main();");
+      SEDMemoryMethodCall callMain = appendMethodCall(target, thread, thread, "self.main();", 125, 129);
       // Create statement a()
       SEDMemoryStatement mainStatement = appendStatement(target, callMain, thread, "a();", 7);
       // Create method call a
-      SEDMemoryMethodCall callA = appendMethodCall(target, mainStatement, thread, "self.a();");
+      SEDMemoryMethodCall callA = appendMethodCall(target, mainStatement, thread, "self.a();", 173, 174);
       // Create statement b()
       SEDMemoryStatement aStatement = appendStatement(target, callA, thread, "b();", 12);
       // Create method call b
-      SEDMemoryMethodCall callB = appendMethodCall(target, aStatement, thread, "self.b();");
+      SEDMemoryMethodCall callB = appendMethodCall(target, aStatement, thread, "self.b();", 330, 331);
       // Create statement c()
       SEDMemoryStatement bStatement = appendStatement(target, callB, thread, "c();", 21);
       // Create method call c
-      SEDMemoryMethodCall callC = appendMethodCall(target, bStatement, thread, "self.c();");
+      SEDMemoryMethodCall callC = appendMethodCall(target, bStatement, thread, "self.c();", 375, 376);
       // Create statement 42
       SEDMemoryStatement throwStatement = appendStatement(target, callC, thread, "throw new RuntimeException ();", 25);
       // Create branch condition 1
@@ -686,14 +735,20 @@ public final class TestSEDKeyCoreUtil {
     * @param parent The parent {@link ISEDMemoryDebugNode} to append to.
     * @param thread The {@link ISEDThread} to use.
     * @param name The name to set on the created {@link SEDMemoryMethodCall}.
+    * @param charStart The index of the start character to set on the created {@link SEDMemoryStatement}
+    * @param charEnd The index of the end character to set on the created {@link SEDMemoryStatement}
     * @return The created {@link SEDMemoryMethodCall}.
     */
    public static SEDMemoryMethodCall appendMethodCall(ISEDDebugTarget target, 
                                                       ISEDMemoryDebugNode parent, 
                                                       ISEDThread thread,
-                                                      String name) {
+                                                      String name,
+                                                      int charStart,
+                                                      int charEnd) {
       SEDMemoryMethodCall methodCall = new SEDMemoryMethodCall(target, parent, thread);
       methodCall.setName(name);
+      methodCall.setCharStart(charStart);
+      methodCall.setCharEnd(charEnd);
       parent.addChild(methodCall);
       return methodCall;
    }
@@ -977,6 +1032,7 @@ public final class TestSEDKeyCoreUtil {
     */
    protected static void compareStackFrame(IStackFrame expected, IStackFrame current) throws DebugException {
       if (expected != null) {
+//System.out.println(current.getName() + " " + current.getLineNumber() + ", " + current.getCharStart() + ", " + current.getCharEnd());         
          TestCase.assertNotNull(current);
          TestCase.assertEquals(expected.getName(), current.getName());
          TestCase.assertEquals(expected.getName(), expected.getCharEnd(), current.getCharEnd());

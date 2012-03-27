@@ -1,12 +1,22 @@
 package org.key_project.sed.key.core.model;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.ILaunch;
+import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.ISourceRange;
+import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.JavaModelException;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.sed.core.model.ISEDBranchCondition;
 import org.key_project.sed.core.model.ISEDBranchNode;
@@ -32,6 +42,8 @@ import org.key_project.sed.key.core.util.LogUtil;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
+import org.key_project.util.java.IOUtil;
+import org.key_project.util.java.IOUtil.LineInformation;
 import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
@@ -594,18 +606,79 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
     * @param statement The given {@link MethodBodyStatement} to represent as {@link ISEDMethodCall}.
     * @param posInfo The {@link PositionInfo} to use.
     * @return The created {@link ISEDMethodCall}.
+    * @throws DebugException Occurred Exception.
     */
    protected ISEDMethodCall createMethodCallNode(ISEDDebugNode parent, 
                                                  MethodBodyStatement mbs, 
-                                                 PositionInfo posInfo) {
+                                                 PositionInfo posInfo) throws DebugException {
       // Compute method name
       MethodReference mr = mbs.getMethodReference();
-//      ProgramMethod pm = mbs.getProgramMethod(proof.getServices()); // TODO: Use whole method implementation location as position to select.
+      ProgramMethod pm = mbs.getProgramMethod(proof.getServices());
       String name = mr != null ? mr.toString() : UNKNOWN_METHOD_NAME;
       // Create new node and fill it
       SEDMemoryMethodCall newNode = new SEDMemoryMethodCall(getDebugTarget(), parent, thread);
-      fillNode(newNode, name, posInfo);
+      fillNode(newNode, name, pm.getPositionInfo());
+      // Try to update the position info with the position of the method name provided by JDT.
+      try {
+         Object source = getLaunch().getSourceLocator().getSourceElement(newNode);
+         if (source instanceof IFile) {
+            IJavaElement element = JavaCore.create((IFile)source);
+            if (element instanceof ICompilationUnit) {
+               IMethod method = findJDTMethod((ICompilationUnit)element, pm);
+               if (method != null) {
+                  ISourceRange range = method.getNameRange();
+                  newNode.setLineNumber(-1);
+                  newNode.setCharStart(range.getOffset());
+                  newNode.setCharEnd(range.getOffset() + range.getLength());
+               }
+            }
+         }
+//         ASTParser parser = ASTParser.newParser(AST.JLS4);
+//         parser.setSource(unit);
+//         parser.setSourceRange(method.getSourceRange().getOffset(), method.getSourceRange().getLength());
+//         ASTNode node = parser.createAST(null);
+      }
+      catch (Exception e) {
+         throw new DebugException(LogUtil.getLogger().createErrorStatus(e));
+      }
       return newNode;
+   }
+   
+   /**
+    * Searches the {@link IMethod} as JDT representation for the given
+    * {@link ProgramMethod} in KeY in the given {@link ICompilationUnit}.
+    * @param cu The {@link ICompilationUnit} to search in.
+    * @param keyMethod The {@link ProgramMethod} of KeY for that the JDT representation is needed.
+    * @return The found {@link IMethod} or {@code null} if the JDT representation is not available.
+    * @throws JavaModelException Occurred Exception.
+    * @throws IOException Occurred Exception.
+    */
+   public IMethod findJDTMethod(ICompilationUnit cu, ProgramMethod keyMethod) throws JavaModelException, IOException {
+      IMethod result = null;
+      if (cu != null && keyMethod != null) {
+         PositionInfo posInfo = keyMethod.getPositionInfo();
+         if (posInfo != null && posInfo != PositionInfo.UNDEFINED) {
+            int line = posInfo.getEndPosition().getLine() - 1;
+            int column = posInfo.getEndPosition().getColumn();
+            LineInformation[] infos = IOUtil.computeLineInformation(new ByteArrayInputStream(cu.getSource().getBytes()));
+            int offset = infos[line].getOffset() + KeYUtil.normalizeRecorderColumn(column, infos[line].getTabIndices());
+            IType[] types = cu.getAllTypes();
+            int i = 0;
+            while (result == null && i < types.length) {
+               IMethod[] methods = types[i].getMethods();
+               int j = 0;
+               while (result == null && j < methods.length) {
+                  ISourceRange methodRange = methods[j].getSourceRange();
+                  if (offset == methodRange.getOffset() + methodRange.getLength()) {
+                     result = methods[j];
+                  }
+                  j++;
+               }
+               i++;
+            }
+         }
+      }
+      return result;
    }
    
    /**

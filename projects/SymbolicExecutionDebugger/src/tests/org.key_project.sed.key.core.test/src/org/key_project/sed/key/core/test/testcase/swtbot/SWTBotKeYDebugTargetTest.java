@@ -50,6 +50,24 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     * Tests the suspend/resume functionality on the {@link IDebugTarget}.
     */
    @Test
+   public void testMethodCallForamtTest() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallForamtTest",
+                     "data/methodFormatTest",
+                     false,
+                     new IMethodSelector() {
+                        @Override
+                        public IMethod getMethod(IJavaProject project) throws Exception {
+                           return TestUtilsUtil.getJdtMethod(project, "MethodFormatTest", "main");
+                        }
+                     },
+                     TestSEDKeyCoreUtil.METHOD_CALL_FORMAT_TEST_TARGET_NAME,
+                     TestSEDKeyCoreUtil.createExpectedMethodCallFormatTestModel());
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
    public void testFixedRecursiveMethodCall() throws Exception {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testFixedRecursiveMethodCall",
                      "data/fixedRecursiveMethodCallTest",
@@ -323,7 +341,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
          assertTrue(target.isSuspended());
          assertFalse(target.isTerminated());
          // Make sure that the debug target is in the initial state.
-         TestSEDKeyCoreUtil.assertInitialTarget(target, TestSEDKeyCoreUtil.STATEMENT_TARGET_NAME);
+         TestSEDKeyCoreUtil.assertInitialTarget(target, TestSEDKeyCoreUtil.FLAT_STEPS_TARGET_NAME);
          // Resume launch
          SWTBotTreeItem item = TestUtilsUtil.selectInTree(debugTree, 0, 0); // Select first debug target
          item.contextMenu("Resume").click();
@@ -342,7 +360,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
          // Make sure that the execution tree is not completed
          AssertionFailedError caughtError = null;
          try {
-            TestSEDKeyCoreUtil.assertStatementsExample(target);
+            TestSEDKeyCoreUtil.assertFlatStepsExample(target);
          }
          catch (AssertionFailedError e) {
             caughtError = e;
@@ -373,7 +391,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
          assertTrue(target.isSuspended());
          assertFalse(target.isTerminated());
          // Test the execution tree
-         TestSEDKeyCoreUtil.assertStatementsExample(target);
+         TestSEDKeyCoreUtil.assertFlatStepsExample(target);
       }
       finally {
          // Restore timeout
@@ -399,8 +417,8 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
                            return TestUtilsUtil.getJdtMethod(project, "FlatSteps", "doSomething", "I", "QString;", "Z");
                         }
                      },
-                     TestSEDKeyCoreUtil.STATEMENT_TARGET_NAME,
-                     TestSEDKeyCoreUtil.createExpectedStatementModel());
+                     TestSEDKeyCoreUtil.FLAT_STEPS_TARGET_NAME,
+                     TestSEDKeyCoreUtil.createExpectedFlatStepsModel());
    }
    
    /**
@@ -418,8 +436,8 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
                            return TestUtilsUtil.getJdtMethod(project, "FlatSteps", "doSomething", "I", "QString;", "Z");
                         }
                      },
-                     TestSEDKeyCoreUtil.STATEMENT_TARGET_NAME,
-                     TestSEDKeyCoreUtil.createExpectedStatementModel());
+                     TestSEDKeyCoreUtil.FLAT_STEPS_TARGET_NAME,
+                     TestSEDKeyCoreUtil.createExpectedFlatStepsModel());
    }
    
    /**
@@ -663,7 +681,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
          assertTrue(target.isSuspended());
          assertFalse(target.isTerminated());
          // Make sure that the debug target is in the initial state.
-         TestSEDKeyCoreUtil.assertInitialTarget(target, TestSEDKeyCoreUtil.STATEMENT_TARGET_NAME);
+         TestSEDKeyCoreUtil.assertInitialTarget(target, TestSEDKeyCoreUtil.FLAT_STEPS_TARGET_NAME);
          // Clear proof list in KeY if required
          if (clearProofListInKeYBeforeDisconnect) {
             assertFalse(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
@@ -689,7 +707,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
             KeYUtil.waitWhileMainWindowIsFrozen(MainWindow.getInstance());
          }
          // Test the unmodified execution tree
-         TestSEDKeyCoreUtil.assertInitialTarget(target, TestSEDKeyCoreUtil.STATEMENT_TARGET_NAME);
+         TestSEDKeyCoreUtil.assertInitialTarget(target, TestSEDKeyCoreUtil.FLAT_STEPS_TARGET_NAME);
       }
       finally {
          // Restore timeout
