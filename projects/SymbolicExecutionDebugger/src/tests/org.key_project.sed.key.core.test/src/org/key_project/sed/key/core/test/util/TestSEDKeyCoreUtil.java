@@ -110,6 +110,11 @@ public final class TestSEDKeyCoreUtil {
     * The name of the {@link ISEDDebugTarget} used in the else if test example.
     */
    public static final String ELSE_IF_TARGET_NAME = "JML normal_behavior operation contract [id: -2147483648 / ElseIfTest::elseIf]";
+
+   /**
+    * The name of the {@link ISEDDebugTarget} used in the switch case example.
+    */
+   public static final String SWITCH_CASE_TARGET_NAME = "JML normal_behavior operation contract [id: -2147483648 / SwitchCaseTest::switchCase]";
    
    /**
     * Forbid instances.

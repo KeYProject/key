@@ -95,6 +95,24 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     * Tests the suspend/resume functionality on the {@link IDebugTarget}.
     */
    @Test
+   public void testSwitchCase() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testSwitchCase",
+                     "data/switchCaseTest/test",
+                     false,
+                     new IMethodSelector() {
+                        @Override
+                        public IMethod getMethod(IJavaProject project) throws Exception {
+                           return TestUtilsUtil.getJdtMethod(project, "SwitchCaseTest", "switchCase", "I");
+                        }
+                     },
+                     TestSEDKeyCoreUtil.SWITCH_CASE_TARGET_NAME,
+                     "data/switchCaseTest/oracle/SwitchCaseTest.xml");
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
    public void testElseIf() throws Exception {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testElseIf",
                      "data/elseIfTest/test",

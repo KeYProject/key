@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget name="JML normal_behavior operation contract [id: -2147483648 / SwitchCaseTest::switchCase]" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread name="KeY Default Thread">
+         <sedMethodCall name="self.switchCase(_x);" lineNumber="-1" charStart="45" charEnd="55">
+            <sedStatement name="int a;" lineNumber="-1" charStart="68" charEnd="74">
+               <sedBranchNode name="switch (_x) {case 0:a=1;break ;case 1:case 2:   a=-1;case 3:   a=_x*_x;break ;case 4:return 42;default:   a=_x; }" lineNumber="-1" charStart="78" charEnd="280">
+                  <sedBranchCondition name="x = 0 TRUE">
+                     <sedStatement name="a=1;" lineNumber="-1" charStart="106" charEnd="112">
+                        <sedStatement name="return a;" lineNumber="-1" charStart="284" charEnd="293">
+                           <sedMethodReturn name="&lt;return of self.switchCase(_x);&gt;" lineNumber="-1" charStart="45" charEnd="55">
+                              <sedTermination name="&lt;end&gt;">
+                              </sedTermination>
+                           </sedMethodReturn>
+                        </sedStatement>
+                     </sedStatement>
+                  </sedBranchCondition>
+                  <sedBranchCondition name="x = 0 FALSE">
+                     <sedBranchCondition name="x = 1 TRUE">
+                        <sedStatement name="a=-1;" lineNumber="-1" charStart="165" charEnd="172">
+                           <sedStatement name="a=_x*_x;" lineNumber="-1" charStart="188" charEnd="198">
+                              <sedStatement name="return a;" lineNumber="-1" charStart="284" charEnd="293">
+                                 <sedMethodReturn name="&lt;return of self.switchCase(_x);&gt;" lineNumber="-1" charStart="45" charEnd="55">
+                                    <sedTermination name="&lt;end&gt;">
+                                    </sedTermination>
+                                 </sedMethodReturn>
+                              </sedStatement>
+                           </sedStatement>
+                        </sedStatement>
+                     </sedBranchCondition>
+                     <sedBranchCondition name="x = 1 FALSE">
+                        <sedBranchCondition name="x = 2 TRUE">
+                           <sedStatement name="a=-1;" lineNumber="-1" charStart="165" charEnd="172">
+                              <sedStatement name="a=_x*_x;" lineNumber="-1" charStart="188" charEnd="198">
+                                 <sedStatement name="return a;" lineNumber="-1" charStart="284" charEnd="293">
+                                    <sedMethodReturn name="&lt;return of self.switchCase(_x);&gt;" lineNumber="-1" charStart="45" charEnd="55">
+                                       <sedTermination name="&lt;end&gt;">
+                                       </sedTermination>
+                                    </sedMethodReturn>
+                                 </sedStatement>
+                              </sedStatement>
+                           </sedStatement>
+                        </sedBranchCondition>
+                        <sedBranchCondition name="x = 2 FALSE">
+                           <sedBranchCondition name="x = 3 TRUE">
+                              <sedStatement name="a=_x*_x;" lineNumber="-1" charStart="188" charEnd="198">
+                                 <sedStatement name="return a;" lineNumber="-1" charStart="284" charEnd="293">
+                                    <sedMethodReturn name="&lt;return of self.switchCase(_x);&gt;" lineNumber="-1" charStart="45" charEnd="55">
+                                       <sedTermination name="&lt;end&gt;">
+                                       </sedTermination>
+                                    </sedMethodReturn>
+                                 </sedStatement>
+                              </sedStatement>
+                           </sedBranchCondition>
+                           <sedBranchCondition name="x = 3 FALSE">
+                              <sedBranchCondition name="x = 4 TRUE">
+                                 <sedStatement name="return 42;" lineNumber="-1" charStart="242" charEnd="252">
+                                    <sedMethodReturn name="&lt;return of self.switchCase(_x);&gt;" lineNumber="-1" charStart="45" charEnd="55">
+                                       <sedTermination name="&lt;end&gt;">
+                                       </sedTermination>
+                                    </sedMethodReturn>
+                                 </sedStatement>
+                              </sedBranchCondition>
+                              <sedBranchCondition name="x = 4 FALSE">
+                                 <sedBranchCondition name="if x_14 true">
+                                    <sedBranchCondition name="if x_12 true">
+                                       <sedBranchCondition name="if x_10 true">
+                                          <sedBranchCondition name="if x_8 true">
+                                             <sedStatement name="a=_x;" lineNumber="-1" charStart="269" charEnd="275">
+                                                <sedStatement name="return a;" lineNumber="-1" charStart="284" charEnd="293">
+                                                   <sedMethodReturn name="&lt;return of self.switchCase(_x);&gt;" lineNumber="-1" charStart="45" charEnd="55">
+                                                      <sedTermination name="&lt;end&gt;">
+                                                      </sedTermination>
+                                                   </sedMethodReturn>
+                                                </sedStatement>
+                                             </sedStatement>
+                                          </sedBranchCondition>
+                                       </sedBranchCondition>
+                                    </sedBranchCondition>
+                                 </sedBranchCondition>
+                              </sedBranchCondition>
+                           </sedBranchCondition>
+                        </sedBranchCondition>
+                     </sedBranchCondition>
+                  </sedBranchCondition>
+               </sedBranchNode>
+            </sedStatement>
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>
