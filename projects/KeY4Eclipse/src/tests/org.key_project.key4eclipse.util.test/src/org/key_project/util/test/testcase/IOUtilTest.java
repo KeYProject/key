@@ -28,6 +28,25 @@ import org.key_project.util.test.util.TestUtilsUtil;
  */
 public class IOUtilTest extends TestCase {
    /**
+    * Tests {@link IOUtil#createTempDirectory(String, String)}.
+    */
+   @Test
+   public void testCreateTempDirectory() throws IOException {
+      File tempDir = null;
+      try {
+         tempDir = IOUtil.createTempDirectory("IOUtilTest", "testCreateTempDirectory");
+         assertNotNull(tempDir);
+         assertTrue(tempDir.exists());
+         assertTrue(tempDir.isDirectory());
+         assertTrue(tempDir.getName().startsWith("IOUtilTest"));
+         assertTrue(tempDir.getName().endsWith("testCreateTempDirectory"));
+      }
+      finally {
+         IOUtil.delete(tempDir);
+      }
+   }
+   
+   /**
     * Tests {@link LineInformation#normalizeColumn(int, int)}.
     */
    @Test

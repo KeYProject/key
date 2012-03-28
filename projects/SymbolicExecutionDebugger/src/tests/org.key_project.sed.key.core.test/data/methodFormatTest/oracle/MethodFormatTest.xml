@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget name="JML normal_behavior operation contract [id: -2147483648 / MethodFormatTest::main]" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread name="KeY Default Thread">
+         <sedMethodCall name="MethodFormatTest.main();" lineNumber="-1" charStart="54" charEnd="58">
+            <sedStatement name="return a();" lineNumber="-1" charStart="62" charEnd="73">
+               <sedMethodCall name="MethodFormatTest.a();" lineNumber="-1" charStart="100" charEnd="101">
+                  <sedStatement name="return b();" lineNumber="-1" charStart="105" charEnd="116">
+                     <sedMethodCall name="MethodFormatTest.b();" lineNumber="-1" charStart="136" charEnd="137">
+                        <sedStatement name="return c();" lineNumber="-1" charStart="142" charEnd="153">
+                           <sedMethodCall name="MethodFormatTest.c();" lineNumber="-1" charStart="173" charEnd="174">
+                              <sedStatement name="return d();" lineNumber="-1" charStart="178" charEnd="189">
+                                 <sedMethodCall name="MethodFormatTest.d();" lineNumber="-1" charStart="214" charEnd="215">
+                                    <sedStatement name="return e();" lineNumber="-1" charStart="219" charEnd="230">
+                                       <sedMethodCall name="MethodFormatTest.e();" lineNumber="-1" charStart="252" charEnd="253">
+                                          <sedStatement name="return f();" lineNumber="-1" charStart="257" charEnd="268">
+                                             <sedMethodCall name="MethodFormatTest.f();" lineNumber="-1" charStart="294" charEnd="295">
+                                                <sedStatement name="return g();" lineNumber="-1" charStart="299" charEnd="310">
+                                                   <sedMethodCall name="MethodFormatTest.g();" lineNumber="-1" charStart="332" charEnd="333">
+                                                      <sedStatement name="return 42;" lineNumber="-1" charStart="341" charEnd="351">
+                                                         <sedMethodReturn name="&lt;return of MethodFormatTest.g();&gt;" lineNumber="-1" charStart="332" charEnd="333">
+                                                            <sedMethodReturn name="&lt;return of MethodFormatTest.f();&gt;" lineNumber="-1" charStart="294" charEnd="295">
+                                                               <sedMethodReturn name="&lt;return of MethodFormatTest.e();&gt;" lineNumber="-1" charStart="252" charEnd="253">
+                                                                  <sedMethodReturn name="&lt;return of MethodFormatTest.d();&gt;" lineNumber="-1" charStart="214" charEnd="215">
+                                                                     <sedMethodReturn name="&lt;return of MethodFormatTest.c();&gt;" lineNumber="-1" charStart="173" charEnd="174">
+                                                                        <sedMethodReturn name="&lt;return of MethodFormatTest.b();&gt;" lineNumber="-1" charStart="136" charEnd="137">
+                                                                           <sedMethodReturn name="&lt;return of MethodFormatTest.a();&gt;" lineNumber="-1" charStart="100" charEnd="101">
+                                                                              <sedMethodReturn name="&lt;return of MethodFormatTest.main();&gt;" lineNumber="-1" charStart="54" charEnd="58">
+                                                                                 <sedTermination name="&lt;end&gt;">
+                                                                                 </sedTermination>
+                                                                              </sedMethodReturn>
+                                                                           </sedMethodReturn>
+                                                                        </sedMethodReturn>
+                                                                     </sedMethodReturn>
+                                                                  </sedMethodReturn>
+                                                               </sedMethodReturn>
+                                                            </sedMethodReturn>
+                                                         </sedMethodReturn>
+                                                      </sedStatement>
+                                                   </sedMethodCall>
+                                                </sedStatement>
+                                             </sedMethodCall>
+                                          </sedStatement>
+                                       </sedMethodCall>
+                                    </sedStatement>
+                                 </sedMethodCall>
+                              </sedStatement>
+                           </sedMethodCall>
+                        </sedStatement>
+                     </sedMethodCall>
+                  </sedStatement>
+               </sedMethodCall>
+            </sedStatement>
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>

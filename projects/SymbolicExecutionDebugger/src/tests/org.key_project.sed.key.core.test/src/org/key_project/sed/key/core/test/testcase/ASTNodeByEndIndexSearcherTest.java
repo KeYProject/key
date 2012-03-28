@@ -31,7 +31,7 @@ public class ASTNodeByEndIndexSearcherTest extends TestCase {
    public void testSearch() throws CoreException, InterruptedException {
       // Create test project
       IJavaProject project = TestUtilsUtil.createJavaProject("ASTNodeByEndIndexSearcherTest_testSearchResult");
-      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/simpleIf", project.getProject().getFolder("src"));
+      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/simpleIf/test", project.getProject().getFolder("src"));
       // Get method
       IMethod method = TestUtilsUtil.getJdtMethod(project, "SimpleIf", "min", "I", "I");
       assertNotNull(method);

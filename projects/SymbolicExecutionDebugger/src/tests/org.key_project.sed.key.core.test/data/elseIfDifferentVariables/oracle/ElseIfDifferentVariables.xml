@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget name="JML normal_behavior operation contract [id: -2147483648 / ElseIfDifferentVariables::main]" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread name="KeY Default Thread">
+         <sedMethodCall name="self.main(_a,_b);" lineNumber="-1" charStart="55" charEnd="59">
+            <sedBranchNode name="if (_a) {return 1; }else if (_b) {return 2;   }else  {return 3;   }" lineNumber="-1" charStart="87" charEnd="179">
+               <sedBranchCondition name="if _a true">
+                  <sedStatement name="return 1;" lineNumber="-1" charStart="100" charEnd="109">
+                     <sedMethodReturn name="&lt;return of self.main(_a,_b);&gt;" lineNumber="-1" charStart="55" charEnd="59">
+                        <sedTermination name="&lt;end&gt;">
+                        </sedTermination>
+                     </sedMethodReturn>
+                  </sedStatement>
+               </sedBranchCondition>
+               <sedBranchCondition name="if _a false">
+                  <sedBranchNode name="if (_b) {return 2; }else  {return 3; }" lineNumber="-1" charStart="87" charEnd="179">
+                     <sedBranchCondition name="b = TRUE TRUE">
+                        <sedStatement name="return 2;" lineNumber="-1" charStart="136" charEnd="145">
+                           <sedMethodReturn name="&lt;return of self.main(_a,_b);&gt;" lineNumber="-1" charStart="55" charEnd="59">
+                              <sedTermination name="&lt;end&gt;">
+                              </sedTermination>
+                           </sedMethodReturn>
+                        </sedStatement>
+                     </sedBranchCondition>
+                     <sedBranchCondition name="b = TRUE FALSE">
+                        <sedStatement name="return 3;" lineNumber="-1" charStart="165" charEnd="174">
+                           <sedMethodReturn name="&lt;return of self.main(_a,_b);&gt;" lineNumber="-1" charStart="55" charEnd="59">
+                              <sedTermination name="&lt;end&gt;">
+                              </sedTermination>
+                           </sedMethodReturn>
+                        </sedStatement>
+                     </sedBranchCondition>
+                  </sedBranchNode>
+               </sedBranchCondition>
+            </sedBranchNode>
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>

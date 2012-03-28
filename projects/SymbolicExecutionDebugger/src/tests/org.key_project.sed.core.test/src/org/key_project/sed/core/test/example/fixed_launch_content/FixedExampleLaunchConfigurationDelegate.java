@@ -93,7 +93,7 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        bzero.setName("z == 0");
        s3.addChild(bzero);
        
-       SEDMemoryExceptionalTermination et = new SEDMemoryExceptionalTermination(target, bzero, thread);
+       SEDMemoryExceptionalTermination et = new SEDMemoryExceptionalTermination(target, bzero);
        et.setName("throws DivisionByZeroException()");
        bzero.addChild(et);
        

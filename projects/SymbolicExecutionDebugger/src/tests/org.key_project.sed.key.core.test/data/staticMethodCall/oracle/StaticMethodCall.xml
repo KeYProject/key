@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget name="JML normal_behavior operation contract [id: -2147483648 / StaticMethodCall::main]" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread name="KeY Default Thread">
+         <sedMethodCall name="StaticMethodCall.main();" lineNumber="-1" charStart="662" charEnd="666">
+            <sedStatement name="doSomething();" lineNumber="-1" charStart="674" charEnd="688">
+               <sedMethodCall name="StaticMethodCall.doSomething();" lineNumber="-1" charStart="756" charEnd="767">
+                  <sedMethodReturn name="&lt;return of StaticMethodCall.doSomething();&gt;" lineNumber="-1" charStart="756" charEnd="767">
+                     <sedStatement name="int x = sub()+sub();" lineNumber="-1" charStart="692" charEnd="714">
+                        <sedMethodCall name="StaticMethodCall.sub();" lineNumber="-1" charStart="799" charEnd="802">
+                           <sedStatement name="return subSub()+2;" lineNumber="-1" charStart="810" charEnd="830">
+                              <sedMethodCall name="StaticMethodCall.subSub();" lineNumber="-1" charStart="858" charEnd="864">
+                                 <sedStatement name="return 2;" lineNumber="-1" charStart="872" charEnd="881">
+                                    <sedMethodReturn name="&lt;return of StaticMethodCall.subSub();&gt;" lineNumber="-1" charStart="858" charEnd="864">
+                                       <sedMethodReturn name="&lt;return of StaticMethodCall.sub();&gt;" lineNumber="-1" charStart="799" charEnd="802">
+                                          <sedMethodCall name="StaticMethodCall.sub();" lineNumber="-1" charStart="799" charEnd="802">
+                                             <sedStatement name="return subSub()+2;" lineNumber="-1" charStart="810" charEnd="830">
+                                                <sedMethodCall name="StaticMethodCall.subSub();" lineNumber="-1" charStart="858" charEnd="864">
+                                                   <sedStatement name="return 2;" lineNumber="-1" charStart="872" charEnd="881">
+                                                      <sedMethodReturn name="&lt;return of StaticMethodCall.subSub();&gt;" lineNumber="-1" charStart="858" charEnd="864">
+                                                         <sedMethodReturn name="&lt;return of StaticMethodCall.sub();&gt;" lineNumber="-1" charStart="799" charEnd="802">
+                                                            <sedStatement name="return x;" lineNumber="-1" charStart="718" charEnd="727">
+                                                               <sedMethodReturn name="&lt;return of StaticMethodCall.main();&gt;" lineNumber="-1" charStart="662" charEnd="666">
+                                                                  <sedTermination name="&lt;end&gt;">
+                                                                  </sedTermination>
+                                                               </sedMethodReturn>
+                                                            </sedStatement>
+                                                         </sedMethodReturn>
+                                                      </sedMethodReturn>
+                                                   </sedStatement>
+                                                </sedMethodCall>
+                                             </sedStatement>
+                                          </sedMethodCall>
+                                       </sedMethodReturn>
+                                    </sedMethodReturn>
+                                 </sedStatement>
+                              </sedMethodCall>
+                           </sedStatement>
+                        </sedMethodCall>
+                     </sedStatement>
+                  </sedMethodReturn>
+               </sedMethodCall>
+            </sedStatement>
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>

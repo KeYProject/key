@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget name="JML normal_behavior operation contract [id: -2147483648 / SimpleIf::min]" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread name="KeY Default Thread">
+         <sedMethodCall name="self.min(_i,_j);" lineNumber="-1" charStart="413" charEnd="416">
+            <sedStatement name="int result;" lineNumber="-1" charStart="436" charEnd="447">
+               <sedBranchNode name="if (_i&lt;_j) {   result_1=_i; }else  {   result_1=_j; }" lineNumber="-1" charStart="451" charEnd="515">
+                  <sedBranchCondition name="j &gt;= 1 + i TRUE">
+                     <sedStatement name="result_1=_i;" lineNumber="-1" charStart="468" charEnd="479">
+                        <sedStatement name="return result_1;" lineNumber="-1" charStart="519" charEnd="533">
+                           <sedMethodReturn name="&lt;return of self.min(_i,_j);&gt;" lineNumber="-1" charStart="413" charEnd="416">
+                              <sedTermination name="&lt;end&gt;">
+                              </sedTermination>
+                           </sedMethodReturn>
+                        </sedStatement>
+                     </sedStatement>
+                  </sedBranchCondition>
+                  <sedBranchCondition name="j &gt;= 1 + i FALSE">
+                     <sedStatement name="result_1=_j;" lineNumber="-1" charStart="499" charEnd="510">
+                        <sedStatement name="return result_1;" lineNumber="-1" charStart="519" charEnd="533">
+                           <sedMethodReturn name="&lt;return of self.min(_i,_j);&gt;" lineNumber="-1" charStart="413" charEnd="416">
+                              <sedTermination name="&lt;end&gt;">
+                              </sedTermination>
+                           </sedMethodReturn>
+                        </sedStatement>
+                     </sedStatement>
+                  </sedBranchCondition>
+               </sedBranchNode>
+            </sedStatement>
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>

@@ -16,6 +16,7 @@ import org.key_project.util.test.testcase.ResourceUtilTest;
 import org.key_project.util.test.testcase.SWTUtilTest;
 import org.key_project.util.test.testcase.StringUtilTest;
 import org.key_project.util.test.testcase.WorkbenchUtilTest;
+import org.key_project.util.test.testcase.XMLUtilTest;
 
 /**
  * Run all contained JUnit 4 test cases.
@@ -37,7 +38,8 @@ import org.key_project.util.test.testcase.WorkbenchUtilTest;
     ResourceUtilTest.class,
     StringUtilTest.class,
     SWTUtilTest.class,
-    WorkbenchUtilTest.class
+    WorkbenchUtilTest.class,
+    XMLUtilTest.class
 })
 public class AllUtilTests {
 }

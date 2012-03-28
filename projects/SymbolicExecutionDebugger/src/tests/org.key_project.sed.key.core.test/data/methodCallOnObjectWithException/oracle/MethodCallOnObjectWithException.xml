@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget name="JML normal_behavior operation contract [id: -2147483648 / MethodCallOnObjectWithException::main]" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread name="KeY Default Thread">
+         <sedMethodCall name="MethodCallOnObjectWithException.main();" lineNumber="-1" charStart="69" charEnd="73">
+            <sedStatement name="MethodCallOnObjectWithException x = new MethodCallOnObjectWithException ();" lineNumber="-1" charStart="91" charEnd="165">
+               <sedBranchCondition name="Normal Execution (m != null)">
+                  <sedStatement name="return x.doSomething();" lineNumber="-1" charStart="170" charEnd="193">
+                     <sedBranchCondition name="Normal Execution (x != null)">
+                        <sedMethodCall name="x.doSomething();" lineNumber="-1" charStart="364" charEnd="375">
+                           <sedStatement name="MethodCallOnObjectWithException x = null;" lineNumber="-1" charStart="383" charEnd="424">
+                              <sedStatement name="return x_3.return42();" lineNumber="-1" charStart="428" charEnd="448">
+                                 <sedBranchCondition name="Null Reference (x_3 = null)">
+                                    <sedBranchCondition name="Normal Execution (n_1 != null)">
+                                       <sedBranchCondition name="Normal Execution (n instanceof NullPointerException)">
+                                          <sedStatement name="MethodCallOnObjectWithException y = new MethodCallOnObjectWithException ();" lineNumber="-1" charStart="239" charEnd="313">
+                                             <sedBranchCondition name="Normal Execution (m_3 != null)">
+                                                <sedStatement name="return y.return42();" lineNumber="-1" charStart="318" charEnd="338">
+                                                   <sedBranchCondition name="Normal Execution (y != null)">
+                                                      <sedMethodCall name="y.return42();" lineNumber="-1" charStart="469" charEnd="477">
+                                                         <sedStatement name="return 42;" lineNumber="-1" charStart="485" charEnd="495">
+                                                            <sedMethodReturn name="&lt;return of y.return42();&gt;" lineNumber="-1" charStart="469" charEnd="477">
+                                                               <sedMethodReturn name="&lt;return of MethodCallOnObjectWithException.main();&gt;" lineNumber="-1" charStart="69" charEnd="73">
+                                                                  <sedTermination name="&lt;end&gt;">
+                                                                  </sedTermination>
+                                                               </sedMethodReturn>
+                                                            </sedMethodReturn>
+                                                         </sedStatement>
+                                                      </sedMethodCall>
+                                                   </sedBranchCondition>
+                                                </sedStatement>
+                                             </sedBranchCondition>
+                                          </sedStatement>
+                                       </sedBranchCondition>
+                                    </sedBranchCondition>
+                                 </sedBranchCondition>
+                              </sedStatement>
+                           </sedStatement>
+                        </sedMethodCall>
+                     </sedBranchCondition>
+                  </sedStatement>
+               </sedBranchCondition>
+            </sedStatement>
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>

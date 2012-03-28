@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget name="JML normal_behavior operation contract [id: -2147483648 / MethodCallOnObject::main]" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread name="KeY Default Thread">
+         <sedMethodCall name="MethodCallOnObject.main();" lineNumber="-1" charStart="56" charEnd="60">
+            <sedStatement name="MethodCallOnObject x = new MethodCallOnObject ();" lineNumber="-1" charStart="68" charEnd="116">
+               <sedBranchCondition name="Normal Execution (m != null)">
+                  <sedStatement name="return x.doSomething();" lineNumber="-1" charStart="120" charEnd="143">
+                     <sedBranchCondition name="Normal Execution (x != null)">
+                        <sedMethodCall name="x.doSomething();" lineNumber="-1" charStart="164" charEnd="175">
+                           <sedStatement name="return 42;" lineNumber="-1" charStart="183" charEnd="193">
+                              <sedMethodReturn name="&lt;return of x.doSomething();&gt;" lineNumber="-1" charStart="164" charEnd="175">
+                                 <sedMethodReturn name="&lt;return of MethodCallOnObject.main();&gt;" lineNumber="-1" charStart="56" charEnd="60">
+                                    <sedTermination name="&lt;end&gt;">
+                                    </sedTermination>
+                                 </sedMethodReturn>
+                              </sedMethodReturn>
+                           </sedStatement>
+                        </sedMethodCall>
+                     </sedBranchCondition>
+                  </sedStatement>
+               </sedBranchCondition>
+            </sedStatement>
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>

@@ -4,7 +4,7 @@ import junit.framework.TestCase;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.junit.Test;
-import org.key_project.sed.core.test.testcase.swtbot.DebugViewHierarchyTest;
+import org.key_project.sed.core.test.testcase.swtbot.SWTBotDebugViewHierarchyTest;
 import org.key_project.sed.core.util.SEDPreferenceUtil;
 
 /**
@@ -16,7 +16,7 @@ public class SEDPreferenceUtilTest extends TestCase {
     * Tests the preference toggle functionality of
     * {@link SEDPreferenceUtil#toggleShowCompactExecutionTreePreference()}.
     * That all trees in the user interface are updated is tested in
-    * {@link DebugViewHierarchyTest#testSwitchingBetweenCompactAndNormalHierarchy()}.
+    * {@link SWTBotDebugViewHierarchyTest#testSwitchingBetweenCompactAndNormalHierarchy()}.
     */
    @Test
    public void testToggleShowCompactExecutionTreePreference() {

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget name="JML normal_behavior operation contract [id: -2147483648 / MethodHierarchyCallTest::main]" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread name="KeY Default Thread">
+         <sedMethodCall name="self.main();" lineNumber="-1" charStart="54" charEnd="58">
+            <sedStatement name="return a();" lineNumber="-1" charStart="66" charEnd="77">
+               <sedMethodCall name="self.a();" lineNumber="-1" charStart="98" charEnd="99">
+                  <sedStatement name="return b();" lineNumber="-1" charStart="107" charEnd="118">
+                     <sedMethodCall name="self.b();" lineNumber="-1" charStart="139" charEnd="140">
+                        <sedStatement name="return c();" lineNumber="-1" charStart="148" charEnd="159">
+                           <sedMethodCall name="self.c();" lineNumber="-1" charStart="180" charEnd="181">
+                              <sedStatement name="return 42;" lineNumber="-1" charStart="189" charEnd="199">
+                                 <sedMethodReturn name="&lt;return of self.c();&gt;" lineNumber="-1" charStart="180" charEnd="181">
+                                    <sedMethodReturn name="&lt;return of self.b();&gt;" lineNumber="-1" charStart="139" charEnd="140">
+                                       <sedMethodReturn name="&lt;return of self.a();&gt;" lineNumber="-1" charStart="98" charEnd="99">
+                                          <sedMethodReturn name="&lt;return of self.main();&gt;" lineNumber="-1" charStart="54" charEnd="58">
+                                             <sedTermination name="&lt;end&gt;">
+                                             </sedTermination>
+                                          </sedMethodReturn>
+                                       </sedMethodReturn>
+                                    </sedMethodReturn>
+                                 </sedMethodReturn>
+                              </sedStatement>
+                           </sedMethodCall>
+                        </sedStatement>
+                     </sedMethodCall>
+                  </sedStatement>
+               </sedMethodCall>
+            </sedStatement>
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>

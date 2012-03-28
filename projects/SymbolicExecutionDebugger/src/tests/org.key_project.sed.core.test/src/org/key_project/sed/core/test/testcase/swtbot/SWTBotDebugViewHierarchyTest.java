@@ -18,7 +18,7 @@ import org.key_project.util.test.util.TestUtilsUtil;
  * shown in the debug view of the Eclipse debug API.
  * @author Martin Hentschel
  */
-public class DebugViewHierarchyTest extends TestCase {
+public class SWTBotDebugViewHierarchyTest extends TestCase {
    /**
     * Makes sure that the tree is updated when the user switches between
     * normal and compact view.

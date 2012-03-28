@@ -398,4 +398,22 @@ public final class IOUtil {
          }
       }
    }
+
+   /**
+    * Creates a temporary directory with help of {@link File#createTempFile(String, String)}.
+    * @param prefix The prefix string to be used in generating the file's name; must be at least three characters long.
+    * @param suffix The suffix string to be used in generating the file's name; may be null, in which case the suffix ".tmp" will be used.
+    * @return Created temporary directory.
+    * @throws IOException Occurred Exception.
+    */
+   public static File createTempDirectory(String prefix, String suffix) throws IOException {
+      File tempFile = File.createTempFile(prefix, suffix);
+      if (!tempFile.delete()) {
+         throw new IOException("Can't delete temp file, reason is unknown.");
+      }
+      if (!tempFile.mkdir()) {
+         throw new IOException("Can't create temp directory, reason is unknown.");
+      }
+      return tempFile;
+   }
 }

@@ -15,7 +15,7 @@ import org.key_project.sed.core.model.impl.AbstractSEDExceptionalTermination;
  * information in the memory.
  * @author Martin Hentschel
  */
-public class SEDMemoryExceptionalTermination extends AbstractSEDExceptionalTermination implements ISEDMemoryStackFrameCompatibleDebugNode, ISEDMemoryDebugNode {
+public class SEDMemoryExceptionalTermination extends AbstractSEDExceptionalTermination implements ISEDMemoryDebugNode {
    /**
     * The contained child nodes.
     */
@@ -28,9 +28,8 @@ public class SEDMemoryExceptionalTermination extends AbstractSEDExceptionalTermi
     * @param thread The {@link ISEDThread} in that this exceptional termination is contained.
     */
    public SEDMemoryExceptionalTermination(ISEDDebugTarget target, 
-                                          ISEDDebugNode parent, 
-                                          ISEDThread thread) {
-      super(target, parent, thread);
+                                          ISEDDebugNode parent) {
+      super(target, parent);
    }
 
    /**
@@ -62,57 +61,5 @@ public class SEDMemoryExceptionalTermination extends AbstractSEDExceptionalTermi
    @Override
    public void setName(String name) {
       super.setName(name);
-   }
-
-   /**
-    * <p>
-    * {@inheritDoc}
-    * </p>
-    * <p>
-    * Changed visibility to public.
-    * </p>
-    */
-   @Override
-   public void setLineNumber(int lineNumber) {
-      super.setLineNumber(lineNumber);
-   }
-
-   /**
-    * <p>
-    * {@inheritDoc}
-    * </p>
-    * <p>
-    * Changed visibility to public.
-    * </p>
-    */
-   @Override
-   public void setCharStart(int charStart) {
-      super.setCharStart(charStart);
-   }
-
-   /**
-    * <p>
-    * {@inheritDoc}
-    * </p>
-    * <p>
-    * Changed visibility to public.
-    * </p>
-    */
-   @Override
-   public void setCharEnd(int charEnd) {
-      super.setCharEnd(charEnd);
-   }
-   
-   /**
-    * <p>
-    * {@inheritDoc}
-    * </p>
-    * <p>
-    * Changed visibility to public.
-    * </p>
-    */
-   @Override
-   public void setSourceName(String sourceName) {
-      super.setSourceName(sourceName);
    }
 }

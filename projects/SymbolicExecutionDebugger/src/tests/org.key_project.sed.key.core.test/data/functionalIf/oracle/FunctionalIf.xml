@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget name="JML normal_behavior operation contract [id: -2147483648 / FunctionalIf::min]" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread name="KeY Default Thread">
+         <sedMethodCall name="self.min(_i,_j);" lineNumber="-1" charStart="661" charEnd="664">
+            <sedStatement name="int result;" lineNumber="-1" charStart="684" charEnd="695">
+               <sedBranchNode name="if (invert(_i)&lt;invert(_j)) {   result_1=_i; }else  {   result_1=_j; }" lineNumber="-1" charStart="699" charEnd="779">
+                  <sedMethodCall name="self.invert(a);" lineNumber="-1" charStart="818" charEnd="824">
+                     <sedStatement name="return a*-1;" lineNumber="-1" charStart="837" charEnd="851">
+                        <sedMethodReturn name="&lt;return of self.invert(a);&gt;" lineNumber="-1" charStart="818" charEnd="824">
+                           <sedMethodCall name="self.invert(a_1);" lineNumber="-1" charStart="818" charEnd="824">
+                              <sedStatement name="return a_1*-1;" lineNumber="-1" charStart="837" charEnd="851">
+                                 <sedMethodReturn name="&lt;return of self.invert(a_1);&gt;" lineNumber="-1" charStart="818" charEnd="824">
+                                    <sedBranchCondition name="j &lt;= -1 + i TRUE">
+                                       <sedStatement name="result_1=_i;" lineNumber="-1" charStart="732" charEnd="743">
+                                          <sedStatement name="return result_1;" lineNumber="-1" charStart="783" charEnd="797">
+                                             <sedMethodReturn name="&lt;return of self.min(_i,_j);&gt;" lineNumber="-1" charStart="661" charEnd="664">
+                                                <sedTermination name="&lt;end&gt;">
+                                                </sedTermination>
+                                             </sedMethodReturn>
+                                          </sedStatement>
+                                       </sedStatement>
+                                    </sedBranchCondition>
+                                    <sedBranchCondition name="j &lt;= -1 + i FALSE">
+                                       <sedStatement name="result_1=_j;" lineNumber="-1" charStart="763" charEnd="774">
+                                          <sedStatement name="return result_1;" lineNumber="-1" charStart="783" charEnd="797">
+                                             <sedMethodReturn name="&lt;return of self.min(_i,_j);&gt;" lineNumber="-1" charStart="661" charEnd="664">
+                                                <sedTermination name="&lt;end&gt;">
+                                                </sedTermination>
+                                             </sedMethodReturn>
+                                          </sedStatement>
+                                       </sedStatement>
+                                    </sedBranchCondition>
+                                 </sedMethodReturn>
+                              </sedStatement>
+                           </sedMethodCall>
+                        </sedMethodReturn>
+                     </sedStatement>
+                  </sedMethodCall>
+               </sedBranchNode>
+            </sedStatement>
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>

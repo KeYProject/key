@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget name="JML normal_behavior operation contract [id: -2147483648 / ComplexIf::min]" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread name="KeY Default Thread">
+         <sedMethodCall name="self.min(_i,_j);" lineNumber="-1" charStart="424" charEnd="427">
+            <sedStatement name="int result;" lineNumber="-1" charStart="447" charEnd="458">
+               <sedBranchNode name="if (_i&lt;_j&amp;&amp;_i!=_j) {   result_1=_i; }else  {   result_1=_j; }" lineNumber="-1" charStart="462" charEnd="536">
+                  <sedBranchCondition name="j &gt;= 1 + i TRUE">
+                     <sedBranchCondition name="if x_2 true">
+                        <sedStatement name="result_1=_i;" lineNumber="-1" charStart="489" charEnd="500">
+                           <sedStatement name="return result_1;" lineNumber="-1" charStart="540" charEnd="554">
+                              <sedMethodReturn name="&lt;return of self.min(_i,_j);&gt;" lineNumber="-1" charStart="424" charEnd="427">
+                                 <sedTermination name="&lt;end&gt;">
+                                 </sedTermination>
+                              </sedMethodReturn>
+                           </sedStatement>
+                        </sedStatement>
+                     </sedBranchCondition>
+                  </sedBranchCondition>
+                  <sedBranchCondition name="j &gt;= 1 + i FALSE">
+                     <sedStatement name="result_1=_j;" lineNumber="-1" charStart="520" charEnd="531">
+                        <sedStatement name="return result_1;" lineNumber="-1" charStart="540" charEnd="554">
+                           <sedMethodReturn name="&lt;return of self.min(_i,_j);&gt;" lineNumber="-1" charStart="424" charEnd="427">
+                              <sedTermination name="&lt;end&gt;">
+                              </sedTermination>
+                           </sedMethodReturn>
+                        </sedStatement>
+                     </sedStatement>
+                  </sedBranchCondition>
+               </sedBranchNode>
+            </sedStatement>
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>

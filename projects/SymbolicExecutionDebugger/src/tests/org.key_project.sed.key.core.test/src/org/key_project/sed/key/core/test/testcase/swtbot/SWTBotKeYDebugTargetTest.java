@@ -1,8 +1,13 @@
 package org.key_project.sed.key.core.test.testcase.swtbot;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 
+import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.jdt.core.IJavaProject;
@@ -19,11 +24,14 @@ import org.junit.Test;
 import org.key_project.key4eclipse.starter.core.test.util.TestStarterCoreUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.serialization.SEDXMLWriter;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
 import org.key_project.sed.key.core.test.Activator;
 import org.key_project.sed.key.core.test.util.TestSEDKeyCoreUtil;
 import org.key_project.util.eclipse.BundleUtil;
+import org.key_project.util.java.IOUtil;
+import org.key_project.util.java.StringUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -34,6 +42,43 @@ import de.uka.ilkd.key.proof.Proof;
  * @author Martin Hentschel
  */
 public class SWTBotKeYDebugTargetTest extends TestCase {
+   /**
+    * <p>
+    * If this constant is {@code true} a temporary directory is created with
+    * new oracle files. The developer has than to copy the new required files
+    * into the plug-in so that they are used during next test execution.
+    * </p>
+    * <p>
+    * <b>Attention: </b> It is strongly required that new test scenarios
+    * are verified with the SED application. If everything is fine a new test
+    * method can be added to this class and the first test execution can be
+    * used to generate the required oracle file. Existing oracle files should
+    * only be replaced if the functionality of the Symbolic Execution Debugger
+    * has changed so that they are outdated.
+    * </p>
+    */
+   public static final boolean CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY = false;
+   
+   /**
+    * The used temporary oracle directory.
+    */
+   private static final File oracleDirectory;
+
+   /**
+    * Creates the temporary oracle directory if required.
+    */
+   static {
+      File directory = null;
+      try {
+         if (CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY) {
+            directory = IOUtil.createTempDirectory("ORACLE_DIRECTORY", StringUtil.EMPTY_STRING);
+         }
+      }
+      catch (IOException e) {
+      }
+      oracleDirectory = directory;
+   }
+   
    /**
     * {@inheritDoc}
     */
@@ -50,9 +95,27 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     * Tests the suspend/resume functionality on the {@link IDebugTarget}.
     */
    @Test
+   public void testElseIf() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testElseIf",
+                     "data/elseIfTest/test",
+                     false,
+                     new IMethodSelector() {
+                        @Override
+                        public IMethod getMethod(IJavaProject project) throws Exception {
+                           return TestUtilsUtil.getJdtMethod(project, "ElseIfTest", "elseIf", "I");
+                        }
+                     },
+                     TestSEDKeyCoreUtil.ELSE_IF_TARGET_NAME,
+                     "data/elseIfTest/oracle/ElseIfTest.xml");
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
    public void testMethodCallFormatTest() throws Exception {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallFormatTest",
-                     "data/methodFormatTest",
+                     "data/methodFormatTest/test",
                      false,
                      new IMethodSelector() {
                         @Override
@@ -61,7 +124,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
                         }
                      },
                      TestSEDKeyCoreUtil.METHOD_CALL_FORMAT_TEST_TARGET_NAME,
-                     TestSEDKeyCoreUtil.createExpectedMethodCallFormatTestModel());
+                     "data/methodFormatTest/oracle/MethodFormatTest.xml");
    }
    
    /**
@@ -70,7 +133,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
    @Test
    public void testFixedRecursiveMethodCall() throws Exception {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testFixedRecursiveMethodCall",
-                     "data/fixedRecursiveMethodCallTest",
+                     "data/fixedRecursiveMethodCallTest/test",
                      false,
                      new IMethodSelector() {
                         @Override
@@ -79,7 +142,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
                         }
                      },
                      TestSEDKeyCoreUtil.FIXED_RECURSIVE_METHOD_CALL_TARGET_NAME,
-                     TestSEDKeyCoreUtil.createExpectedFixedRecursiveMethodCallModel());
+                     "data/fixedRecursiveMethodCallTest/oracle/FixedRecursiveMethodCallTest.xml");
    }
    
    /**
@@ -88,7 +151,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
    @Test
    public void testElseIfDifferentVariables() throws Exception {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testElseIfDifferentVariables",
-                     "data/elseIfDifferentVariables",
+                     "data/elseIfDifferentVariables/test",
                      false,
                      new IMethodSelector() {
                         @Override
@@ -97,7 +160,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
                         }
                      },
                      TestSEDKeyCoreUtil.ELSE_IF_DIFFERENT_VARIABLES_TARGET_NAME,
-                     TestSEDKeyCoreUtil.createExpectedElseIfDifferentVariablesModel());
+                     "data/elseIfDifferentVariables/oracle/ElseIfDifferentVariables.xml");
    }
    
    /**
@@ -106,7 +169,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
    @Test
    public void testTryCatchFinally() throws Exception {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testTryCatchFinally",
-                     "data/tryCatchFinally",
+                     "data/tryCatchFinally/test",
                      false,
                      new IMethodSelector() {
                         @Override
@@ -115,7 +178,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
                         }
                      },
                      TestSEDKeyCoreUtil.TRY_CATCH_FINALLY_TARGET_NAME,
-                     TestSEDKeyCoreUtil.createExpectedTryCatchFinallyModel());
+                     "data/tryCatchFinally/oracle/TryCatchFinally.xml");
    }
    
    /**
@@ -124,7 +187,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
    @Test
    public void testStaticMethodCall() throws Exception {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testStaticMethodCall",
-                     "data/staticMethodCall",
+                     "data/staticMethodCall/test",
                      false,
                      new IMethodSelector() {
                         @Override
@@ -133,7 +196,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
                         }
                      },
                      TestSEDKeyCoreUtil.STATIC_METHOD_CALL_TARGET_NAME,
-                     TestSEDKeyCoreUtil.createExpectedStaticMethodCallModel());
+                     "data/staticMethodCall/oracle/StaticMethodCall.xml");
    }
    
    /**
@@ -142,7 +205,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
    @Test
    public void testComplexIfSteps() throws Exception {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testComplexIfSteps",
-                     "data/complexIf",
+                     "data/complexIf/test",
                      false,
                      new IMethodSelector() {
                         @Override
@@ -151,7 +214,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
                         }
                      },
                      TestSEDKeyCoreUtil.COMPLEX_IF_TARGET_NAME,
-                     TestSEDKeyCoreUtil.createExpectedComplexIfModel());
+                     "data/complexIf/oracle/ComplexIf.xml");
    }
    
    /**
@@ -160,7 +223,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
    @Test
    public void testComplexFlatSteps() throws Exception {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testComplexFlatSteps",
-                     "data/complexFlatSteps",
+                     "data/complexFlatSteps/test",
                      false,
                      new IMethodSelector() {
                         @Override
@@ -169,7 +232,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
                         }
                      },
                      TestSEDKeyCoreUtil.COMPLEX_FLAT_STEPS_TARGET_NAME,
-                     TestSEDKeyCoreUtil.createExpectedComplexFlatStepsModel());
+                     "data/complexFlatSteps/oracle/ComplexFlatSteps.xml");
    }
    
    /**
@@ -178,7 +241,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
    @Test
    public void testFunctionalIf() throws Exception {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testFunctionalIf",
-                     "data/functionalIf",
+                     "data/functionalIf/test",
                      false,
                      new IMethodSelector() {
                         @Override
@@ -187,7 +250,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
                         }
                      },
                      TestSEDKeyCoreUtil.FUNCTIONAL_IF_TARGET_NAME,
-                     TestSEDKeyCoreUtil.createExpectedFunctionalIfModel());
+                     "data/functionalIf/oracle/FunctionalIf.xml");
    }
    
    /**
@@ -196,7 +259,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
    @Test
    public void testSimpleIf() throws Exception {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testSimpleIf",
-                     "data/simpleIf",
+                     "data/simpleIf/test",
                      false,
                      new IMethodSelector() {
                         @Override
@@ -205,7 +268,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
                         }
                      },
                      TestSEDKeyCoreUtil.SIMPLE_IF_TARGET_NAME,
-                     TestSEDKeyCoreUtil.createExpectedSimpleIfModel());
+                     "data/simpleIf/oracle/SimpleIf.xml");
    }
    
    /**
@@ -214,7 +277,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
    @Test
    public void testMethodCallOnObjectWithException() throws Exception {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallOnObjectWithException",
-                     "data/methodCallOnObjectWithException",
+                     "data/methodCallOnObjectWithException/test",
                      false,
                      new IMethodSelector() {
                         @Override
@@ -223,7 +286,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
                         }
                      },
                      TestSEDKeyCoreUtil.METHOD_CALL_ON_OBJECT_WITH_EXCEPTION_TARGET_NAME,
-                     TestSEDKeyCoreUtil.createExpectedMethodCallOnObjectWithExceptionModel());
+                     "data/methodCallOnObjectWithException/oracle/MethodCallOnObjectWithException.xml");
    }
    
    /**
@@ -232,7 +295,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
    @Test
    public void testMethodCallOnObject() throws Exception {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallOnObject",
-                     "data/methodCallOnObject",
+                     "data/methodCallOnObject/test",
                      false,
                      new IMethodSelector() {
                         @Override
@@ -241,7 +304,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
                         }
                      },
                      TestSEDKeyCoreUtil.METHOD_CALL_ON_OBJECT_TARGET_NAME,
-                     TestSEDKeyCoreUtil.createExpectedMethodCallOnObjectModel());
+                     "data/methodCallOnObject/oracle/MethodCallOnObject.xml");
    }
    
    /**
@@ -250,7 +313,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
    @Test
    public void testMethodCallParallel() throws Exception {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallParallel",
-                     "data/methodCallParallelTest",
+                     "data/methodCallParallelTest/test",
                      false,
                      new IMethodSelector() {
                         @Override
@@ -259,7 +322,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
                         }
                      },
                      TestSEDKeyCoreUtil.METHOD_CALL_PARALLEL_TARGET_NAME,
-                     TestSEDKeyCoreUtil.createExpectedMethodCallParallelModel());
+                     "data/methodCallParallelTest/oracle/MethodCallParallelTest.xml");
    }
    
    /**
@@ -268,7 +331,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
    @Test
    public void testMethodCallHierarchyWithException() throws Exception {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallHierarchyWithException",
-                     "data/methodHierarchyCallWithExceptionTest",
+                     "data/methodHierarchyCallWithExceptionTest/test",
                      false,
                      new IMethodSelector() {
                         @Override
@@ -277,7 +340,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
                         }
                      },
                      TestSEDKeyCoreUtil.METHOD_CALL_HIERARCHY_WITH_EXCEPTION_TARGET_NAME,
-                     TestSEDKeyCoreUtil.createExpectedMethodCallHierarchyWithExceptionModel());
+                     "data/methodHierarchyCallWithExceptionTest/oracle/MethodHierarchyCallWithExceptionTest.xml");
    }
    
    /**
@@ -286,7 +349,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
    @Test
    public void testMethodCallHierarchy() throws Exception {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallHierarchy",
-                     "data/methodHierarchyCallTest",
+                     "data/methodHierarchyCallTest/test",
                      false,
                      new IMethodSelector() {
                         @Override
@@ -295,7 +358,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
                         }
                      },
                      TestSEDKeyCoreUtil.METHOD_CALL_HIERARCHY_TARGET_NAME,
-                     TestSEDKeyCoreUtil.createExpectedMethodCallHierarchyModel());
+                     "data/methodHierarchyCallTest/oracle/MethodHierarchyCallTest.xml");
    }
    
    /**
@@ -316,7 +379,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
          TestSedCoreUtil.openSymbolicDebugPerspective();
          // Create test project
          IJavaProject project = TestUtilsUtil.createJavaProject("SWTBotKeYDebugTargetSuspendResumeTest_testSuspendResumeDebugTarget_Resume_Suspend_Resume");
-         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/statements", project.getProject().getFolder("src"));
+         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/statements/test", project.getProject().getFolder("src"));
          // Get method
          IMethod method = TestUtilsUtil.getJdtMethod(project, "FlatSteps", "doSomething", "I", "QString;", "Z");
          // Increase timeout
@@ -408,7 +471,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
    @Test
    public void testFlatStatements() throws Exception {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testFlatStatements",
-                     "data/statements",
+                     "data/statements/test",
                      false,
                      new IMethodSelector() {
                         @Override
@@ -417,7 +480,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
                         }
                      },
                      TestSEDKeyCoreUtil.FLAT_STEPS_TARGET_NAME,
-                     TestSEDKeyCoreUtil.createExpectedFlatStepsModel());
+                     "data/statements/oracle/FlatSteps.xml");
    }
    
    /**
@@ -427,7 +490,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
    @Test
    public void testFlatStatements_ProofIsNoLongerAvailableInKeY() throws Exception {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testFlatStatements_ProofIsNoLongerAvailableInKeY",
-                     "data/statements",
+                     "data/statements/test",
                      true,
                      new IMethodSelector() {
                         @Override
@@ -436,7 +499,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
                         }
                      },
                      TestSEDKeyCoreUtil.FLAT_STEPS_TARGET_NAME,
-                     TestSEDKeyCoreUtil.createExpectedFlatStepsModel());
+                     "data/statements/oracle/FlatSteps.xml");
    }
    
    /**
@@ -461,14 +524,14 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     *    <li>Launch selected {@link IMethod} with the Symbolic Execution Debugger based on KeY.</li>
     *    <li>Make sure that the initial SED model ({@link ISEDDebugTarget}) is opened.</li>
     *    <li>Resume the execution.</li>
-    *    <li>Make sure that the final SED model ({@link ISEDDebugTarget}) specified by the given {@link ISEDDebugTarget} is reached.</li>
+    *    <li>Make sure that the final SED model ({@link ISEDDebugTarget}) specified by the oracle file expectedModelPathInBundle is reached.</li>
     * </ol>
     * @param projectName The project name in the workspace.
     * @param pathInBundle The path to the source code in the bundle to extract to the workspace project.
     * @param clearProofListInKeYBeforeResume Clear proof list in KeY before resume?
     * @param selector {@link IMethodSelector} to select an {@link IMethod} to launch.
     * @param targetName The name of the {@link IDebugTarget}.
-    * @param expectedDebugTarget The expected {@link ISEDDebugTarget}.
+    * @param expectedModelPathInBundle Path to the oracle file in the bundle which defines the expected {@link ISEDDebugTarget} model.
     * @throws Exception Occurred Exception.
     */
    protected void assertSEDModel(String projectName,
@@ -476,7 +539,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
                                  boolean clearProofListInKeYBeforeResume,
                                  IMethodSelector selector,
                                  String targetName,
-                                 ISEDDebugTarget expectedDebugTarget) throws Exception {
+                                 String expectedModelPathInBundle) throws Exception {
       // Create bot
       SWTWorkbenchBot bot = new SWTWorkbenchBot();
       // Get current settings to restore them in finally block
@@ -571,7 +634,11 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
             assertFalse(target.isTerminated());
             assertTrue(target.canResume());
             // Test the execution tree
-            TestSEDKeyCoreUtil.compareDebugTarget(expectedDebugTarget, target);
+            if (oracleDirectory != null) {
+               createOracleFile(target, expectedModelPathInBundle);
+            }
+            ISEDDebugTarget expectedDebugTarget = TestSEDKeyCoreUtil.createExpectedModel(expectedModelPathInBundle);
+            TestSedCoreUtil.compareDebugTarget(expectedDebugTarget, target);
          }
       }
       finally {
@@ -585,6 +652,44 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
          defaultPerspective.activate();
          // Terminate and remove all launches
          TestSedCoreUtil.terminateAndRemoveAll(debugTree);
+      }
+   }
+
+   /**
+    * Creates a new oracle file for the given {@link ISEDDebugTarget}.
+    * @param target The given {@link ISEDDebugTarget} which provides the oracle data.
+    * @param expectedModelPathInBundle The path in the bundle under that the created oracle file will be later available. It is used to create sub directories in temp directory.
+    * @throws IOException Occurred Exception.
+    * @throws DebugException Occurred Exception.
+    */
+   protected void createOracleFile(ISEDDebugTarget target, String expectedModelPathInBundle) throws IOException, DebugException {
+      if (oracleDirectory != null && oracleDirectory.isDirectory()) {
+         // Create sub folder structure
+         File oracleFile = new File(oracleDirectory, expectedModelPathInBundle);
+         oracleFile.getParentFile().mkdirs();
+         // Create oracle file
+         SEDXMLWriter writer = new SEDXMLWriter();
+         writer.write(target.getLaunch(), SEDXMLWriter.DEFAULT_ENCODING, new FileOutputStream(oracleFile));
+         // Print message to the user.
+         printOracleDirectory();
+      }
+   }
+   
+   /**
+    * Prints {@link #oracleDirectory} to the user via {@link System#out}.
+    */
+   protected void printOracleDirectory() {
+      if (oracleDirectory != null) {
+         final String HEADER_LINE = "Oracle Directory is:";
+         final String PREFIX = "### ";
+         final String SUFFIX = " ###";
+         String path = oracleDirectory.toString();
+         int length = Math.max(path.length(), HEADER_LINE.length());
+         String borderLines = StringUtil.createLine("#", PREFIX.length() + length + SUFFIX.length());
+         System.out.println(borderLines);
+         System.out.println(PREFIX + HEADER_LINE + StringUtil.createLine(" ", length - HEADER_LINE.length()) + SUFFIX);
+         System.out.println(PREFIX + path + StringUtil.createLine(" ", length - path.length()) + SUFFIX);
+         System.out.println(borderLines);
       }
    }
 
@@ -656,7 +761,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
          TestSedCoreUtil.openSymbolicDebugPerspective();
          // Create test project
          IJavaProject project = TestUtilsUtil.createJavaProject(projectName);
-         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/statements", project.getProject().getFolder("src"));
+         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/statements/test", project.getProject().getFolder("src"));
          // Get method
          IMethod method = TestUtilsUtil.getJdtMethod(project, "FlatSteps", "doSomething", "I", "QString;", "Z");
          // Increase timeout
@@ -774,7 +879,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
          TestSedCoreUtil.openSymbolicDebugPerspective();
          // Create test project
          IJavaProject project = TestUtilsUtil.createJavaProject(projectName);
-         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/statements", project.getProject().getFolder("src"));
+         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/statements/test", project.getProject().getFolder("src"));
          // Get method
          IMethod method = TestUtilsUtil.getJdtMethod(project, "FlatSteps", "doSomething", "I", "QString;", "Z");
          // Increase timeout

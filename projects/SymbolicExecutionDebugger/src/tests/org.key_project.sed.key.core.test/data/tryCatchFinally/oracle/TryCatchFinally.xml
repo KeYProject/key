@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget name="JML normal_behavior operation contract [id: -2147483648 / TryCatchFinally::tryCatchFinally]" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread name="KeY Default Thread">
+         <sedMethodCall name="self.tryCatchFinally(_input);" lineNumber="-1" charStart="97" charEnd="112">
+            <sedStatement name="int result = 0;" lineNumber="-1" charStart="129" charEnd="144">
+               <sedStatement name="result_1=1/_input;" lineNumber="-1" charStart="158" charEnd="177">
+                  <sedBranchCondition name="input = 0 TRUE">
+                     <sedBranchCondition name="Normal Execution (a_1 != null)">
+                        <sedBranchCondition name="if a instanceof ArithmeticException true">
+                           <sedBranchCondition name="Normal Execution (a instanceof ArithmeticException)">
+                              <sedStatement name="result_1=2;" lineNumber="-1" charStart="222" charEnd="233">
+                                 <sedStatement name="result_1=result_1*2;" lineNumber="-1" charStart="256" charEnd="276">
+                                    <sedStatement name="return result_1;" lineNumber="-1" charStart="285" charEnd="299">
+                                       <sedMethodReturn name="&lt;return of self.tryCatchFinally(_input);&gt;" lineNumber="-1" charStart="97" charEnd="112">
+                                          <sedTermination name="&lt;end&gt;">
+                                          </sedTermination>
+                                       </sedMethodReturn>
+                                    </sedStatement>
+                                 </sedStatement>
+                              </sedStatement>
+                           </sedBranchCondition>
+                        </sedBranchCondition>
+                     </sedBranchCondition>
+                  </sedBranchCondition>
+                  <sedBranchCondition name="input = 0 FALSE">
+                     <sedStatement name="result_1=result_1*2;" lineNumber="-1" charStart="256" charEnd="276">
+                        <sedStatement name="return result_1;" lineNumber="-1" charStart="285" charEnd="299">
+                           <sedMethodReturn name="&lt;return of self.tryCatchFinally(_input);&gt;" lineNumber="-1" charStart="97" charEnd="112">
+                              <sedTermination name="&lt;end&gt;">
+                              </sedTermination>
+                           </sedMethodReturn>
+                        </sedStatement>
+                     </sedStatement>
+                  </sedBranchCondition>
+               </sedStatement>
+            </sedStatement>
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>

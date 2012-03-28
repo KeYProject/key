@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget name="JML normal_behavior operation contract [id: -2147483648 / ComplexFlatSteps::doSomething]" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread name="KeY Default Thread">
+         <sedMethodCall name="self.doSomething();" lineNumber="-1" charStart="244" charEnd="255">
+            <sedStatement name="int x = 1+2;" lineNumber="-1" charStart="263" charEnd="277">
+               <sedStatement name="int y = 2*4*9;" lineNumber="-1" charStart="281" charEnd="299">
+                  <sedStatement name="int z = 3*(4/(2-3));" lineNumber="-1" charStart="303" charEnd="329">
+                     <sedMethodReturn name="&lt;return of self.doSomething();&gt;" lineNumber="-1" charStart="244" charEnd="255">
+                        <sedTermination name="&lt;end&gt;">
+                        </sedTermination>
+                     </sedMethodReturn>
+                  </sedStatement>
+               </sedStatement>
+            </sedStatement>
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>
