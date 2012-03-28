@@ -55,7 +55,12 @@ import org.key_project.sed.core.model.memory.SEDMemoryThread;
  * @author Martin Hentschel
  */
 public class FixedExampleLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
-    /**
+   /**
+    * The used model identifier.
+    */
+   public static final String MODEL_IDENTIFIER = "org.key_project.sed.core.test.example.fixed_launch_content";
+
+   /**
      * {@inheritDoc}
      */
     @Override
@@ -65,6 +70,7 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
                        IProgressMonitor monitor) throws CoreException {
        SEDMemoryDebugTarget target = new SEDMemoryDebugTarget(launch);
        target.setName("Fixed Example Target");
+       target.setModelIdentifier(MODEL_IDENTIFIER);
        launch.addDebugTarget(target);
        
        SEDMemoryThread thread = new SEDMemoryThread(target);
@@ -83,7 +89,7 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        s3.setName("int result = (x + y) / z;");
        s2.addChild(s3);
        
-       SEDMemoryBranchCondition bzero = new SEDMemoryBranchCondition(target, s3, thread);
+       SEDMemoryBranchCondition bzero = new SEDMemoryBranchCondition(target, s3);
        bzero.setName("z == 0");
        s3.addChild(bzero);
        
@@ -91,7 +97,7 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        et.setName("throws DivisionByZeroException()");
        bzero.addChild(et);
        
-       SEDMemoryBranchCondition bnotzero = new SEDMemoryBranchCondition(target, s3, thread);
+       SEDMemoryBranchCondition bnotzero = new SEDMemoryBranchCondition(target, s3);
        bnotzero.setName("z != 0");
        s3.addChild(bnotzero);
 
@@ -103,7 +109,7 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        branch.setName("if (result >= 0)");
        call.addChild(branch);
        
-       SEDMemoryBranchCondition bnegative = new SEDMemoryBranchCondition(target, branch, thread);
+       SEDMemoryBranchCondition bnegative = new SEDMemoryBranchCondition(target, branch);
        bnegative.setName("result < 0");
        branch.addChild(bnegative);
        
@@ -111,11 +117,11 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        returnNegative.setName("return -1");
        bnegative.addChild(returnNegative);
        
-       SEDMemoryTermination terminationNegative = new SEDMemoryTermination(target, returnNegative, thread);
+       SEDMemoryTermination terminationNegative = new SEDMemoryTermination(target, returnNegative);
        terminationNegative.setName("<end>");
        returnNegative.addChild(terminationNegative);
        
-       SEDMemoryBranchCondition bpositive = new SEDMemoryBranchCondition(target, branch, thread);
+       SEDMemoryBranchCondition bpositive = new SEDMemoryBranchCondition(target, branch);
        bpositive.setName("result >= 0");
        branch.addChild(bpositive);
        
@@ -123,7 +129,7 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        returnPositive.setName("return 1");
        bpositive.addChild(returnPositive);
        
-       SEDMemoryTermination terminationPositive = new SEDMemoryTermination(target, returnPositive, thread);
+       SEDMemoryTermination terminationPositive = new SEDMemoryTermination(target, returnPositive);
        terminationPositive.setName("<end>");
        returnPositive.addChild(terminationPositive);
     }

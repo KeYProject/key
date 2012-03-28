@@ -15,16 +15,11 @@ import org.key_project.sed.core.model.ISourceNameProvider;
  * with the Eclipse debug API.
  * @author Martin Hentschel
  */
-public abstract class AbstractSEDStackFrameCompatibleDebugNode extends AbstractSEDDebugNode implements IStackFrame, ISourceNameProvider {
+public abstract class AbstractSEDStackFrameCompatibleDebugNode extends AbstractSEDTerminateCompatibleDebugNode implements IStackFrame, ISourceNameProvider {
    /**
     * The {@link ISEDThread} in that this node is contained.
     */
    private ISEDThread thread;
-   
-   /**
-    * The name of this debug node.
-    */
-   private String name;
 
    /**
     * The source name.
@@ -194,46 +189,6 @@ public abstract class AbstractSEDStackFrameCompatibleDebugNode extends AbstractS
    public void stepReturn() throws DebugException {
    }
 
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public boolean canTerminate() {
-      return getDebugTarget().canTerminate();
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public boolean isTerminated() {
-      return getDebugTarget().isTerminated();
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public void terminate() throws DebugException {
-      getDebugTarget().terminate();
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public String getName() throws DebugException {
-      return name;
-   }
-
-   /**
-    * Sets the name of this node.
-    * @param name the name to set.
-    */
-   protected void setName(String name) {
-      this.name = name;
-   }
-   
    /**
     * {@inheritDoc}
     */

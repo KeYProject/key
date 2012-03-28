@@ -20,6 +20,11 @@ public abstract class AbstractSEDDebugNode extends AbstractSEDDebugElement imple
    private ISEDDebugNode parent;
    
    /**
+    * The name of this debug node.
+    */
+   private String name;
+   
+   /**
     * Constructor.
     * @param target The {@link ISEDDebugTarget} in that this node is contained.
     * @param parent The parent in that this node is contained as child.
@@ -50,5 +55,21 @@ public abstract class AbstractSEDDebugNode extends AbstractSEDDebugElement imple
       else {
          return Platform.getAdapterManager().getAdapter(this, adapter);
       }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getName() throws DebugException {
+      return name;
+   }
+
+   /**
+    * Sets the name of this node.
+    * @param name the name to set.
+    */
+   protected void setName(String name) {
+      this.name = name;
    }
 }

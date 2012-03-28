@@ -35,4 +35,11 @@
             id="org.key_project.sed.core.test.example.fixed_launch_content.icon">
       </launchConfigurationTypeImage>
    </extension>
+   <extension
+         point="org.eclipse.debug.ui.debugModelPresentations">
+      <debugModelPresentation
+            class="org.key_project.sed.core.test.example.presentation.FixedExampleDebugModelPresentation"
+            id="org.key_project.sed.core.test.example.fixed_launch_content">
+      </debugModelPresentation>
+   </extension>
 </plugin>

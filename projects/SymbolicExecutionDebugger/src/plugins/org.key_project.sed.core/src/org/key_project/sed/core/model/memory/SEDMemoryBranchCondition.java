@@ -7,7 +7,6 @@ import org.eclipse.debug.core.DebugException;
 import org.key_project.sed.core.model.ISEDBranchCondition;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.impl.AbstractSEDBranchCondition;
 
 /**
@@ -15,7 +14,7 @@ import org.key_project.sed.core.model.impl.AbstractSEDBranchCondition;
  * information in the memory.
  * @author Martin Hentschel
  */
-public class SEDMemoryBranchCondition extends AbstractSEDBranchCondition implements ISEDMemoryStackFrameCompatibleDebugNode, ISEDMemoryDebugNode {
+public class SEDMemoryBranchCondition extends AbstractSEDBranchCondition implements ISEDMemoryDebugNode {
    /**
     * The contained child nodes.
     */
@@ -25,12 +24,10 @@ public class SEDMemoryBranchCondition extends AbstractSEDBranchCondition impleme
     * Constructor.
     * @param target The {@link ISEDDebugTarget} in that this branch condition is contained.
     * @param parent The parent in that this node is contained as child.
-    * @param thread The {@link ISEDThread} in that this branch condition is contained.
     */
    public SEDMemoryBranchCondition(ISEDDebugTarget target, 
-                                   ISEDDebugNode parent, 
-                                   ISEDThread thread) {
-      super(target, parent, thread);
+                                   ISEDDebugNode parent) {
+      super(target, parent);
    }
 
    /**
@@ -62,57 +59,5 @@ public class SEDMemoryBranchCondition extends AbstractSEDBranchCondition impleme
    @Override
    public void setName(String name) {
       super.setName(name);
-   }
-
-   /**
-    * <p>
-    * {@inheritDoc}
-    * </p>
-    * <p>
-    * Changed visibility to public.
-    * </p>
-    */
-   @Override
-   public void setLineNumber(int lineNumber) {
-      super.setLineNumber(lineNumber);
-   }
-
-   /**
-    * <p>
-    * {@inheritDoc}
-    * </p>
-    * <p>
-    * Changed visibility to public.
-    * </p>
-    */
-   @Override
-   public void setCharStart(int charStart) {
-      super.setCharStart(charStart);
-   }
-
-   /**
-    * <p>
-    * {@inheritDoc}
-    * </p>
-    * <p>
-    * Changed visibility to public.
-    * </p>
-    */
-   @Override
-   public void setCharEnd(int charEnd) {
-      super.setCharEnd(charEnd);
-   }
-   
-   /**
-    * <p>
-    * {@inheritDoc}
-    * </p>
-    * <p>
-    * Changed visibility to public.
-    * </p>
-    */
-   @Override
-   public void setSourceName(String sourceName) {
-      super.setSourceName(sourceName);
    }
 }
