@@ -222,7 +222,7 @@ public final class TestSEDKeyCoreUtil {
       // Create method return
       SEDMemoryMethodReturn ret = appendMethodReturn(target, s3, thread, "self.doSomething(_asdf,_a,_b);", call);
       // Create termination
-      appendTermination(target, ret, thread);
+      appendTermination(target, ret);
       return target;
    }
 
@@ -267,7 +267,7 @@ public final class TestSEDKeyCoreUtil {
       SEDMemoryMethodReturn retB = appendMethodReturn(target, retC, thread, "MethodFormatTest.b();", callB);
       SEDMemoryMethodReturn retA = appendMethodReturn(target, retB, thread, "MethodFormatTest.a();", callA);
       SEDMemoryMethodReturn retMain = appendMethodReturn(target, retA, thread, "MethodFormatTest.main();", callMain);
-      appendTermination(target, retMain, thread);
+      appendTermination(target, retMain);
       return target;
    }
 
@@ -303,7 +303,7 @@ public final class TestSEDKeyCoreUtil {
       SEDMemoryMethodReturn ret2 = appendMethodReturn(target, ret3, thread, "FixedRecursiveMethodCallTest.decrease(n_1);", call2);
       SEDMemoryMethodReturn ret1 = appendMethodReturn(target, ret2, thread, "FixedRecursiveMethodCallTest.decrease(n);", call1);
       SEDMemoryMethodReturn ret = appendMethodReturn(target, ret1, thread, "FixedRecursiveMethodCallTest.decreaseValue();", callMain);
-      appendTermination(target, ret, thread);
+      appendTermination(target, ret);
       return target;
    }
 
@@ -317,21 +317,24 @@ public final class TestSEDKeyCoreUtil {
       SEDMemoryThread thread = appendThread(target);
       SEDMemoryMethodCall call = appendMethodCall(target, thread, thread, "self.main(_a,_b);", 55, 59);
       
-      SEDMemoryBranchCondition bc1 = appendBranchCondition(target, call, thread, "if _a true");
+      SEDMemoryBranchNode bn1 = appendBranchNode(target, call, thread, "if (_a) {return 1; }else if (_b) {return 2;   }else  {return 3;   }", 87, 179);
+      
+      SEDMemoryBranchCondition bc1 = appendBranchCondition(target, bn1, "if _a true");
       SEDMemoryStatement s1 = appendStatement(target, bc1, thread, "return 1;", 100, 109);
       SEDMemoryMethodReturn ret1 = appendMethodReturn(target, s1, thread, "self.main(_a,_b);", call);
-      appendTermination(target, ret1, thread);
+      appendTermination(target, ret1);
 
-      SEDMemoryBranchCondition bc2 = appendBranchCondition(target, call, thread, "if _a false");
-      SEDMemoryBranchCondition bc2a = appendBranchCondition(target, bc2, thread, "b = TRUE TRUE");
+      SEDMemoryBranchCondition bc2 = appendBranchCondition(target, bn1, "if _a false");
+      SEDMemoryBranchNode bn2 = appendBranchNode(target, bc2, thread, "if (_b) {return 2; }else  {return 3; }", 87, 179);
+      SEDMemoryBranchCondition bc2a = appendBranchCondition(target, bn2, "b = TRUE TRUE");
       SEDMemoryStatement s2 = appendStatement(target, bc2a, thread, "return 2;", 136, 145);
       SEDMemoryMethodReturn ret2 = appendMethodReturn(target, s2, thread, "self.main(_a,_b);", call);
-      appendTermination(target, ret2, thread);
+      appendTermination(target, ret2);
 
-      SEDMemoryBranchCondition bc2b = appendBranchCondition(target, bc2, thread, "b = TRUE FALSE");
+      SEDMemoryBranchCondition bc2b = appendBranchCondition(target, bn2, "b = TRUE FALSE");
       SEDMemoryStatement s3 = appendStatement(target, bc2b, thread, "return 3;", 165, 174);
       SEDMemoryMethodReturn ret3 = appendMethodReturn(target, s3, thread, "self.main(_a,_b);", call);
-      appendTermination(target, ret3, thread);
+      appendTermination(target, ret3);
       return target;
    }
 
@@ -347,21 +350,21 @@ public final class TestSEDKeyCoreUtil {
       SEDMemoryStatement s1 = appendStatement(target, call, thread, "int result = 0;", 129, 144);
       SEDMemoryStatement s2 = appendStatement(target, s1, thread, "result_1=1/_input;", 158, 177);
       
-      SEDMemoryBranchCondition bc1 = appendBranchCondition(target, s2, thread, "input = 0 TRUE");
-      SEDMemoryBranchCondition bc1a = appendBranchCondition(target, bc1, thread, "Normal Execution (a_1 != null)");
-      SEDMemoryBranchCondition bc1b = appendBranchCondition(target, bc1a, thread, "if a instanceof ArithmeticException true");
-      SEDMemoryBranchCondition bc1c = appendBranchCondition(target, bc1b, thread, "Normal Execution (a instanceof ArithmeticException)");
+      SEDMemoryBranchCondition bc1 = appendBranchCondition(target, s2, "input = 0 TRUE");
+      SEDMemoryBranchCondition bc1a = appendBranchCondition(target, bc1, "Normal Execution (a_1 != null)");
+      SEDMemoryBranchCondition bc1b = appendBranchCondition(target, bc1a, "if a instanceof ArithmeticException true");
+      SEDMemoryBranchCondition bc1c = appendBranchCondition(target, bc1b, "Normal Execution (a instanceof ArithmeticException)");
       SEDMemoryStatement bc1S1 = appendStatement(target, bc1c, thread, "result_1=2;", 222, 233);
       SEDMemoryStatement bc1S2 = appendStatement(target, bc1S1, thread, "result_1=result_1*2;", 256, 276);
       SEDMemoryStatement bc1S3 = appendStatement(target, bc1S2, thread, "return result_1;", 285, 299);
       SEDMemoryMethodReturn bc1ret = appendMethodReturn(target, bc1S3, thread, "self.tryCatchFinally(_input);", call);
-      appendTermination(target, bc1ret, thread);
+      appendTermination(target, bc1ret);
       
-      SEDMemoryBranchCondition bc2 = appendBranchCondition(target, s2, thread, "input = 0 FALSE");
+      SEDMemoryBranchCondition bc2 = appendBranchCondition(target, s2, "input = 0 FALSE");
       SEDMemoryStatement bc2S1 = appendStatement(target, bc2, thread, "result_1=result_1*2;", 256, 276);
       SEDMemoryStatement bc2S2 = appendStatement(target, bc2S1, thread, "return result_1;", 285, 299);
       SEDMemoryMethodReturn bc2ret = appendMethodReturn(target, bc2S2, thread, "self.tryCatchFinally(_input);", call);
-      appendTermination(target, bc2ret, thread);
+      appendTermination(target, bc2ret);
       return target;
    }
 
@@ -395,7 +398,7 @@ public final class TestSEDKeyCoreUtil {
       
       SEDMemoryStatement mainS3 = appendStatement(target, subReturn2, thread, "return x;", 718, 727);
       SEDMemoryMethodReturn mainReturn = appendMethodReturn(target, mainS3, thread, "StaticMethodCall.main();", mainCall);
-      appendTermination(target, mainReturn, thread);
+      appendTermination(target, mainReturn);
       return target;
    }
 
@@ -420,7 +423,7 @@ public final class TestSEDKeyCoreUtil {
       // Create method return
       SEDMemoryMethodReturn ret = appendMethodReturn(target, s3, thread, "self.doSomething();", call);
       // Create termination
-      appendTermination(target, ret, thread);
+      appendTermination(target, ret);
       return target;
    }
 
@@ -434,14 +437,14 @@ public final class TestSEDKeyCoreUtil {
       SEDMemoryThread thread = appendThread(target);
       SEDMemoryMethodCall callMain = appendMethodCall(target, thread, thread, "MethodCallOnObject.main();", 56, 60);
       SEDMemoryStatement mainS1 = appendStatement(target, callMain, thread, "MethodCallOnObject x = new MethodCallOnObject ();", 68, 116);
-      SEDMemoryBranchCondition b1 = appendBranchCondition(target, mainS1, thread, "Normal Execution (m != null)");
+      SEDMemoryBranchCondition b1 = appendBranchCondition(target, mainS1, "Normal Execution (m != null)");
       SEDMemoryStatement mainS2 = appendStatement(target, b1, thread, "return x.doSomething();", 120, 143);
-      SEDMemoryBranchCondition b2 = appendBranchCondition(target, mainS2, thread, "Normal Execution (x != null)");
+      SEDMemoryBranchCondition b2 = appendBranchCondition(target, mainS2, "Normal Execution (x != null)");
       SEDMemoryMethodCall callDo = appendMethodCall(target, b2, thread, "x.doSomething();", 164, 175);
       SEDMemoryStatement doS = appendStatement(target, callDo, thread, "return 42;", 183, 193);
       SEDMemoryMethodReturn doReturn = appendMethodReturn(target, doS, thread, "x.doSomething();", callDo);
       SEDMemoryMethodReturn mainReturn = appendMethodReturn(target, doReturn, thread, "MethodCallOnObject.main();", callMain);
-      appendTermination(target, mainReturn, thread);
+      appendTermination(target, mainReturn);
       return target;
    }
 
@@ -455,25 +458,25 @@ public final class TestSEDKeyCoreUtil {
       SEDMemoryThread thread = appendThread(target);
       SEDMemoryMethodCall callMain = appendMethodCall(target, thread, thread, "MethodCallOnObjectWithException.main();", 69, 73);
       SEDMemoryStatement mainS1 = appendStatement(target, callMain, thread, "MethodCallOnObjectWithException x = new MethodCallOnObjectWithException ();", 91, 165);
-      SEDMemoryBranchCondition b1 = appendBranchCondition(target, mainS1, thread, "Normal Execution (m != null)");
+      SEDMemoryBranchCondition b1 = appendBranchCondition(target, mainS1, "Normal Execution (m != null)");
       SEDMemoryStatement mainS2 = appendStatement(target, b1, thread, "return x.doSomething();", 170, 193);
-      SEDMemoryBranchCondition b2 = appendBranchCondition(target, mainS2, thread, "Normal Execution (x != null)");
+      SEDMemoryBranchCondition b2 = appendBranchCondition(target, mainS2, "Normal Execution (x != null)");
       SEDMemoryMethodCall callDo = appendMethodCall(target, b2, thread, "x.doSomething();", 364, 375);
       SEDMemoryStatement doS1 = appendStatement(target, callDo, thread, "MethodCallOnObjectWithException x = null;", 383, 424);
       SEDMemoryStatement doS2 = appendStatement(target, doS1, thread, "return x_3.return42();", 428, 448);
-      SEDMemoryBranchCondition b3 = appendBranchCondition(target, doS2, thread, "Null Reference (x_3 = null)");
-      SEDMemoryBranchCondition b4 = appendBranchCondition(target, b3, thread, "Normal Execution (n_1 != null)");
+      SEDMemoryBranchCondition b3 = appendBranchCondition(target, doS2, "Null Reference (x_3 = null)");
+      SEDMemoryBranchCondition b4 = appendBranchCondition(target, b3, "Normal Execution (n_1 != null)");
 //      SEDMemoryBranchCondition b5 = appendBranchCondition(target, b4, thread, "if n instanceof NullPointerException true");
-      SEDMemoryBranchCondition b6 = appendBranchCondition(target, b4, thread, "Normal Execution (n instanceof NullPointerException)");
+      SEDMemoryBranchCondition b6 = appendBranchCondition(target, b4, "Normal Execution (n instanceof NullPointerException)");
       SEDMemoryStatement mainS3 = appendStatement(target, b6, thread, "MethodCallOnObjectWithException y = new MethodCallOnObjectWithException ();", 239, 313);
-      SEDMemoryBranchCondition b7 = appendBranchCondition(target, mainS3, thread, "Normal Execution (m_3 != null)");
+      SEDMemoryBranchCondition b7 = appendBranchCondition(target, mainS3, "Normal Execution (m_3 != null)");
       SEDMemoryStatement mainS4 = appendStatement(target, b7, thread, "return y.return42();", 318, 338);
-      SEDMemoryBranchCondition b8 = appendBranchCondition(target, mainS4, thread, "Normal Execution (y != null)");
+      SEDMemoryBranchCondition b8 = appendBranchCondition(target, mainS4, "Normal Execution (y != null)");
       SEDMemoryMethodCall call42 = appendMethodCall(target, b8, thread, "y.return42();", 469, 477);
       SEDMemoryStatement return42S = appendStatement(target, call42, thread, "return 42;", 485, 495);
       SEDMemoryMethodReturn call42Return = appendMethodReturn(target, return42S, thread, "y.return42();", call42);
       SEDMemoryMethodReturn mainReturn = appendMethodReturn(target, call42Return, thread, "MethodCallOnObjectWithException.main();", callMain);
-      appendTermination(target, mainReturn, thread);
+      appendTermination(target, mainReturn);
       return target;
    }
 
@@ -546,7 +549,7 @@ public final class TestSEDKeyCoreUtil {
       // Create method return
       SEDMemoryMethodReturn mainReturn = appendMethodReturn(target, mainStatement3, thread, "self.main();", callMain);
       // Create termination
-      appendTermination(target, mainReturn, thread);
+      appendTermination(target, mainReturn);
       return target;
    }
    
@@ -563,17 +566,17 @@ public final class TestSEDKeyCoreUtil {
       SEDMemoryStatement s1 = appendStatement(target, callMin, thread, "int result;", 436, 447);
       SEDMemoryBranchNode branchNode = appendBranchNode(target, s1, thread, "if (_i<_j) {   result_1=_i; }else  {   result_1=_j; }", 451, 515);
       // Branch 1
-      SEDMemoryBranchCondition bc1 = appendBranchCondition(target, branchNode, thread, "j >= 1 + i TRUE");
+      SEDMemoryBranchCondition bc1 = appendBranchCondition(target, branchNode, "j >= 1 + i TRUE");
       SEDMemoryStatement s2 = appendStatement(target, bc1, thread, "result_1=_i;", 468, 479);
       SEDMemoryStatement s3 = appendStatement(target, s2, thread, "return result_1;", 519, 533);
       SEDMemoryMethodReturn minReturn1 = appendMethodReturn(target, s3, thread, "self.min(_i,_j);", callMin);
-      appendTermination(target, minReturn1, thread);
+      appendTermination(target, minReturn1);
       // Branch 2
-      SEDMemoryBranchCondition bc2 = appendBranchCondition(target, branchNode, thread, "j >= 1 + i FALSE");
+      SEDMemoryBranchCondition bc2 = appendBranchCondition(target, branchNode, "j >= 1 + i FALSE");
       SEDMemoryStatement s4 = appendStatement(target, bc2, thread, "result_1=_j;", 499, 510);
       SEDMemoryStatement s5 = appendStatement(target, s4, thread, "return result_1;", 519, 533);
       SEDMemoryMethodReturn minReturn2 = appendMethodReturn(target, s5, thread, "self.min(_i,_j);", callMin);
-      appendTermination(target, minReturn2, thread);
+      appendTermination(target, minReturn2);
       return target;
    }
 
@@ -596,17 +599,17 @@ public final class TestSEDKeyCoreUtil {
       SEDMemoryStatement callS2 = appendStatement(target, callInvert2, thread, "return a_1*-1;", 837, 851);
       SEDMemoryMethodReturn returnInvert2 = appendMethodReturn(target, callS2, thread, "self.invert(a_1);", callInvert2);
       // Branch 1
-      SEDMemoryBranchCondition bc1 = appendBranchCondition(target, returnInvert2, thread, "j <= -1 + i TRUE");
+      SEDMemoryBranchCondition bc1 = appendBranchCondition(target, returnInvert2, "j <= -1 + i TRUE");
       SEDMemoryStatement s2 = appendStatement(target, bc1, thread, "result_1=_i;", 732, 743);
       SEDMemoryStatement s3 = appendStatement(target, s2, thread, "return result_1;", 783, 797);
       SEDMemoryMethodReturn minReturn1 = appendMethodReturn(target, s3, thread, "self.min(_i,_j);", callMin);
-      appendTermination(target, minReturn1, thread);
+      appendTermination(target, minReturn1);
       // Branch 2
-      SEDMemoryBranchCondition bc2 = appendBranchCondition(target, returnInvert2, thread, "j <= -1 + i FALSE");
+      SEDMemoryBranchCondition bc2 = appendBranchCondition(target, returnInvert2, "j <= -1 + i FALSE");
       SEDMemoryStatement s4 = appendStatement(target, bc2, thread, "result_1=_j;", 763, 774);
       SEDMemoryStatement s5 = appendStatement(target, s4, thread, "return result_1;", 783, 797);
       SEDMemoryMethodReturn minReturn2 = appendMethodReturn(target, s5, thread, "self.min(_i,_j);", callMin);
-      appendTermination(target, minReturn2, thread);
+      appendTermination(target, minReturn2);
       return target;
    }
 
@@ -623,18 +626,18 @@ public final class TestSEDKeyCoreUtil {
       SEDMemoryStatement s1 = appendStatement(target, callMin, thread, "int result;", 447, 458);
       SEDMemoryBranchNode branchNode = appendBranchNode(target, s1, thread, "if (_i<_j&&_i!=_j) {   result_1=_i; }else  {   result_1=_j; }", 462, 536);
       // Branch 1
-      SEDMemoryBranchCondition bc1 = appendBranchCondition(target, branchNode, thread, "j >= 1 + i TRUE");
-      SEDMemoryBranchCondition bc1a = appendBranchCondition(target, bc1, thread, "if x_2 true");
+      SEDMemoryBranchCondition bc1 = appendBranchCondition(target, branchNode, "j >= 1 + i TRUE");
+      SEDMemoryBranchCondition bc1a = appendBranchCondition(target, bc1, "if x_2 true");
       SEDMemoryStatement s2 = appendStatement(target, bc1a, thread, "result_1=_i;", 489, 500);
       SEDMemoryStatement s3 = appendStatement(target, s2, thread, "return result_1;", 540, 554);
       SEDMemoryMethodReturn minReturn1 = appendMethodReturn(target, s3, thread, "self.min(_i,_j);", callMin);
-      appendTermination(target, minReturn1, thread);
+      appendTermination(target, minReturn1);
       // Branch 2
-      SEDMemoryBranchCondition bc2 = appendBranchCondition(target, branchNode, thread, "j >= 1 + i FALSE");
+      SEDMemoryBranchCondition bc2 = appendBranchCondition(target, branchNode, "j >= 1 + i FALSE");
       SEDMemoryStatement s4 = appendStatement(target, bc2, thread, "result_1=_j;", 520, 531);
       SEDMemoryStatement s5 = appendStatement(target, s4, thread, "return result_1;", 540, 554);
       SEDMemoryMethodReturn minReturn2 = appendMethodReturn(target, s5, thread, "self.min(_i,_j);", callMin);
-      appendTermination(target, minReturn2, thread);
+      appendTermination(target, minReturn2);
       return target;
    }
 
@@ -673,7 +676,7 @@ public final class TestSEDKeyCoreUtil {
       // Create method return
       SEDMemoryMethodReturn mainReturn = appendMethodReturn(target, aReturn, thread, "self.main();", callMain);
       // Create termination
-      appendTermination(target, mainReturn, thread);
+      appendTermination(target, mainReturn);
       return target;
    }
 
@@ -704,9 +707,9 @@ public final class TestSEDKeyCoreUtil {
       // Create statement 42
       SEDMemoryStatement throwStatement = appendStatement(target, callC, thread, "throw new RuntimeException ();", 388, 417);
       // Create branch condition 1
-      SEDMemoryBranchCondition bc1 = appendBranchCondition(target, throwStatement, thread, "Normal Execution (r_1 != null)");
+      SEDMemoryBranchCondition bc1 = appendBranchCondition(target, throwStatement, "Normal Execution (r_1 != null)");
       // Create branch condition 2
-      SEDMemoryBranchCondition bc2 = appendBranchCondition(target, bc1, thread, "Normal Execution (r instanceof RuntimeException)");
+      SEDMemoryBranchCondition bc2 = appendBranchCondition(target, bc1, "Normal Execution (r instanceof RuntimeException)");
       // Create statement ae assignment
       SEDMemoryStatement aeAssignmentStatement = appendStatement(target, bc2, thread, "int ae = -1;", 262, 274);
       // Create statement a assignment
@@ -716,7 +719,7 @@ public final class TestSEDKeyCoreUtil {
       // Create method return
       SEDMemoryMethodReturn mainReturn = appendMethodReturn(target, aReturn, thread, "self.main();", callMain);
       // Create termination
-      appendTermination(target, mainReturn, thread);
+      appendTermination(target, mainReturn);
       return target;
    }
    
@@ -820,13 +823,11 @@ public final class TestSEDKeyCoreUtil {
     * Appends a new termination to the given parent {@link ISEDMemoryDebugNode}.
     * @param target The {@link ISEDDebugTarget} to use.
     * @param parent The parent {@link ISEDMemoryDebugNode} to append to.
-    * @param thread The {@link ISEDThread} to use.
     * @return The created {@link SEDMemoryTermination}.
     */
    public static SEDMemoryTermination appendTermination(ISEDDebugTarget target, 
-                                                        ISEDMemoryDebugNode parent, 
-                                                        ISEDThread thread) {
-      SEDMemoryTermination termination = new SEDMemoryTermination(target, parent, thread);
+                                                        ISEDMemoryDebugNode parent) {
+      SEDMemoryTermination termination = new SEDMemoryTermination(target, parent);
       termination.setName(KeYDebugTarget.DEFAULT_TERMINATION_NODE_NAME);
       parent.addChild(termination);
       return termination;
@@ -860,15 +861,13 @@ public final class TestSEDKeyCoreUtil {
     * Appends a new branch condition to the given parent {@link ISEDMemoryDebugNode}.
     * @param target The {@link ISEDDebugTarget} to use.
     * @param parent The parent {@link ISEDMemoryDebugNode} to append to.
-    * @param thread The {@link ISEDThread} to use.
     * @param name The name to set on the created {@link SEDMemoryBranchCondition}.
     * @return The created {@link SEDMemoryBranchCondition}.
     */
    public static SEDMemoryBranchCondition appendBranchCondition(ISEDDebugTarget target, 
                                                                 ISEDMemoryDebugNode parent, 
-                                                                ISEDThread thread,
                                                                 String name) {
-      SEDMemoryBranchCondition bc = new SEDMemoryBranchCondition(target, parent, thread);
+      SEDMemoryBranchCondition bc = new SEDMemoryBranchCondition(target, parent);
       bc.setName(name);
       parent.addChild(bc);
       return bc;
@@ -1029,8 +1028,8 @@ public final class TestSEDKeyCoreUtil {
 //System.out.println(current.getName() + " " + current.getLineNumber() + ", " + current.getCharStart() + ", " + current.getCharEnd());         
          TestCase.assertNotNull(current);
          TestCase.assertEquals(expected.getName(), current.getName());
-         TestCase.assertEquals(expected.getName(), expected.getCharEnd(), current.getCharEnd());
          TestCase.assertEquals(expected.getName(), expected.getCharStart(), current.getCharStart());
+         TestCase.assertEquals(expected.getName(), expected.getCharEnd(), current.getCharEnd());
          TestCase.assertEquals(expected.getName(), expected.getLineNumber(), current.getLineNumber());
          comparDebugElement(expected, current, true);
          if (expected.getThread() instanceof ISEDThread) {
@@ -1092,7 +1091,6 @@ public final class TestSEDKeyCoreUtil {
     * @throws DebugException Occurred Exception.
     */
    public static void compareBranchCondition(ISEDBranchCondition expected, ISEDBranchCondition current) throws DebugException {
-      compareStackFrame(expected, current);
       compareNode(expected, current, true);
    }
 
@@ -1157,7 +1155,6 @@ public final class TestSEDKeyCoreUtil {
     * @throws DebugException Occurred Exception.
     */
    public static void compareTermination(ISEDTermination expected, ISEDTermination current) throws DebugException {
-      compareStackFrame(expected, current);
       compareNode(expected, current, true);
    }
 }

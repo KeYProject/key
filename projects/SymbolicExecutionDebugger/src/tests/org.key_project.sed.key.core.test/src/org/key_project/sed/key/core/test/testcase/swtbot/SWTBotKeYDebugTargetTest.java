@@ -87,7 +87,6 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     */
    @Test
    public void testElseIfDifferentVariables() throws Exception {
-      // TODO: Bug: ifElseSplit is not treated as BranchNode because it has no active statement, why?
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testElseIfDifferentVariables",
                      "data/elseIfDifferentVariables",
                      false,

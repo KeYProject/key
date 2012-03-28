@@ -22,6 +22,7 @@ import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.util.MiscTools;
 
 
 /**
@@ -63,6 +64,7 @@ public class NodeInfo {
         symbolicExecNames.add(new Name("simplify_autoname"));
         symbolicExecNames.add(new Name("executeIntegerAssignment"));
         symbolicExecNames.add(new Name("simplify_object_creation"));
+        symbolicExecNames.add(new Name("split_if"));
     }
 
 
@@ -74,10 +76,11 @@ public class NodeInfo {
         if (determinedFstAndActiveStatement)
             return;
         final RuleApp ruleApp = node.getAppliedRuleApp();
+        // TODO: unify with MiscTools getActiveStatement
         if (ruleApp instanceof PosTacletApp) {
             PosTacletApp pta = (PosTacletApp) ruleApp;
             if (!isSymbolicExecution(pta.taclet())) return;
-            Term t = pta.posInOccurrence().subTerm();
+            Term t = MiscTools.goBelowUpdates(pta.posInOccurrence().subTerm());
             final ProgramElement pe = t.javaBlock().program();
             if (pe != null) {
                 firstStatement = pe.getFirstElement();
