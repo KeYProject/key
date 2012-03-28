@@ -99,13 +99,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testSwitchCase",
                      "data/switchCaseTest/test",
                      false,
-                     new IMethodSelector() {
-                        @Override
-                        public IMethod getMethod(IJavaProject project) throws Exception {
-                           return TestUtilsUtil.getJdtMethod(project, "SwitchCaseTest", "switchCase", "I");
-                        }
-                     },
-                     TestSEDKeyCoreUtil.SWITCH_CASE_TARGET_NAME,
+                     createMethodSelector("SwitchCaseTest", "switchCase", "I"),
                      "data/switchCaseTest/oracle/SwitchCaseTest.xml");
    }
    
@@ -117,13 +111,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testElseIf",
                      "data/elseIfTest/test",
                      false,
-                     new IMethodSelector() {
-                        @Override
-                        public IMethod getMethod(IJavaProject project) throws Exception {
-                           return TestUtilsUtil.getJdtMethod(project, "ElseIfTest", "elseIf", "I");
-                        }
-                     },
-                     TestSEDKeyCoreUtil.ELSE_IF_TARGET_NAME,
+                     createMethodSelector("ElseIfTest", "elseIf", "I"),
                      "data/elseIfTest/oracle/ElseIfTest.xml");
    }
    
@@ -135,13 +123,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallFormatTest",
                      "data/methodFormatTest/test",
                      false,
-                     new IMethodSelector() {
-                        @Override
-                        public IMethod getMethod(IJavaProject project) throws Exception {
-                           return TestUtilsUtil.getJdtMethod(project, "MethodFormatTest", "main");
-                        }
-                     },
-                     TestSEDKeyCoreUtil.METHOD_CALL_FORMAT_TEST_TARGET_NAME,
+                     createMethodSelector("MethodFormatTest", "main"),
                      "data/methodFormatTest/oracle/MethodFormatTest.xml");
    }
    
@@ -153,13 +135,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testFixedRecursiveMethodCall",
                      "data/fixedRecursiveMethodCallTest/test",
                      false,
-                     new IMethodSelector() {
-                        @Override
-                        public IMethod getMethod(IJavaProject project) throws Exception {
-                           return TestUtilsUtil.getJdtMethod(project, "FixedRecursiveMethodCallTest", "decreaseValue");
-                        }
-                     },
-                     TestSEDKeyCoreUtil.FIXED_RECURSIVE_METHOD_CALL_TARGET_NAME,
+                     createMethodSelector("FixedRecursiveMethodCallTest", "decreaseValue"),
                      "data/fixedRecursiveMethodCallTest/oracle/FixedRecursiveMethodCallTest.xml");
    }
    
@@ -171,13 +147,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testElseIfDifferentVariables",
                      "data/elseIfDifferentVariables/test",
                      false,
-                     new IMethodSelector() {
-                        @Override
-                        public IMethod getMethod(IJavaProject project) throws Exception {
-                           return TestUtilsUtil.getJdtMethod(project, "ElseIfDifferentVariables", "main", "Z", "Z");
-                        }
-                     },
-                     TestSEDKeyCoreUtil.ELSE_IF_DIFFERENT_VARIABLES_TARGET_NAME,
+                     createMethodSelector("ElseIfDifferentVariables", "main", "Z", "Z"),
                      "data/elseIfDifferentVariables/oracle/ElseIfDifferentVariables.xml");
    }
    
@@ -189,13 +159,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testTryCatchFinally",
                      "data/tryCatchFinally/test",
                      false,
-                     new IMethodSelector() {
-                        @Override
-                        public IMethod getMethod(IJavaProject project) throws Exception {
-                           return TestUtilsUtil.getJdtMethod(project, "TryCatchFinally", "tryCatchFinally", "I");
-                        }
-                     },
-                     TestSEDKeyCoreUtil.TRY_CATCH_FINALLY_TARGET_NAME,
+                     createMethodSelector("TryCatchFinally", "tryCatchFinally", "I"),
                      "data/tryCatchFinally/oracle/TryCatchFinally.xml");
    }
    
@@ -207,13 +171,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testStaticMethodCall",
                      "data/staticMethodCall/test",
                      false,
-                     new IMethodSelector() {
-                        @Override
-                        public IMethod getMethod(IJavaProject project) throws Exception {
-                           return TestUtilsUtil.getJdtMethod(project, "StaticMethodCall", "main");
-                        }
-                     },
-                     TestSEDKeyCoreUtil.STATIC_METHOD_CALL_TARGET_NAME,
+                     createMethodSelector("StaticMethodCall", "main"),
                      "data/staticMethodCall/oracle/StaticMethodCall.xml");
    }
    
@@ -225,13 +183,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testComplexIfSteps",
                      "data/complexIf/test",
                      false,
-                     new IMethodSelector() {
-                        @Override
-                        public IMethod getMethod(IJavaProject project) throws Exception {
-                           return TestUtilsUtil.getJdtMethod(project, "ComplexIf", "min", "I", "I");
-                        }
-                     },
-                     TestSEDKeyCoreUtil.COMPLEX_IF_TARGET_NAME,
+                     createMethodSelector("ComplexIf", "min", "I", "I"),
                      "data/complexIf/oracle/ComplexIf.xml");
    }
    
@@ -243,13 +195,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testComplexFlatSteps",
                      "data/complexFlatSteps/test",
                      false,
-                     new IMethodSelector() {
-                        @Override
-                        public IMethod getMethod(IJavaProject project) throws Exception {
-                           return TestUtilsUtil.getJdtMethod(project, "ComplexFlatSteps", "doSomething");
-                        }
-                     },
-                     TestSEDKeyCoreUtil.COMPLEX_FLAT_STEPS_TARGET_NAME,
+                     createMethodSelector("ComplexFlatSteps", "doSomething"),
                      "data/complexFlatSteps/oracle/ComplexFlatSteps.xml");
    }
    
@@ -261,13 +207,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testFunctionalIf",
                      "data/functionalIf/test",
                      false,
-                     new IMethodSelector() {
-                        @Override
-                        public IMethod getMethod(IJavaProject project) throws Exception {
-                           return TestUtilsUtil.getJdtMethod(project, "FunctionalIf", "min", "I", "I");
-                        }
-                     },
-                     TestSEDKeyCoreUtil.FUNCTIONAL_IF_TARGET_NAME,
+                     createMethodSelector("FunctionalIf", "min", "I", "I"),
                      "data/functionalIf/oracle/FunctionalIf.xml");
    }
    
@@ -279,13 +219,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testSimpleIf",
                      "data/simpleIf/test",
                      false,
-                     new IMethodSelector() {
-                        @Override
-                        public IMethod getMethod(IJavaProject project) throws Exception {
-                           return TestUtilsUtil.getJdtMethod(project, "SimpleIf", "min", "I", "I");
-                        }
-                     },
-                     TestSEDKeyCoreUtil.SIMPLE_IF_TARGET_NAME,
+                     createMethodSelector("SimpleIf", "min", "I", "I"),
                      "data/simpleIf/oracle/SimpleIf.xml");
    }
    
@@ -297,13 +231,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallOnObjectWithException",
                      "data/methodCallOnObjectWithException/test",
                      false,
-                     new IMethodSelector() {
-                        @Override
-                        public IMethod getMethod(IJavaProject project) throws Exception {
-                           return TestUtilsUtil.getJdtMethod(project, "MethodCallOnObjectWithException", "main");
-                        }
-                     },
-                     TestSEDKeyCoreUtil.METHOD_CALL_ON_OBJECT_WITH_EXCEPTION_TARGET_NAME,
+                     createMethodSelector("MethodCallOnObjectWithException", "main"),
                      "data/methodCallOnObjectWithException/oracle/MethodCallOnObjectWithException.xml");
    }
    
@@ -315,13 +243,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallOnObject",
                      "data/methodCallOnObject/test",
                      false,
-                     new IMethodSelector() {
-                        @Override
-                        public IMethod getMethod(IJavaProject project) throws Exception {
-                           return TestUtilsUtil.getJdtMethod(project, "MethodCallOnObject", "main");
-                        }
-                     },
-                     TestSEDKeyCoreUtil.METHOD_CALL_ON_OBJECT_TARGET_NAME,
+                     createMethodSelector("MethodCallOnObject", "main"),
                      "data/methodCallOnObject/oracle/MethodCallOnObject.xml");
    }
    
@@ -333,13 +255,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallParallel",
                      "data/methodCallParallelTest/test",
                      false,
-                     new IMethodSelector() {
-                        @Override
-                        public IMethod getMethod(IJavaProject project) throws Exception {
-                           return TestUtilsUtil.getJdtMethod(project, "MethodCallParallelTest", "main");
-                        }
-                     },
-                     TestSEDKeyCoreUtil.METHOD_CALL_PARALLEL_TARGET_NAME,
+                     createMethodSelector("MethodCallParallelTest", "main"),
                      "data/methodCallParallelTest/oracle/MethodCallParallelTest.xml");
    }
    
@@ -351,13 +267,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallHierarchyWithException",
                      "data/methodHierarchyCallWithExceptionTest/test",
                      false,
-                     new IMethodSelector() {
-                        @Override
-                        public IMethod getMethod(IJavaProject project) throws Exception {
-                           return TestUtilsUtil.getJdtMethod(project, "MethodHierarchyCallWithExceptionTest", "main");
-                        }
-                     },
-                     TestSEDKeyCoreUtil.METHOD_CALL_HIERARCHY_WITH_EXCEPTION_TARGET_NAME,
+                     createMethodSelector("MethodHierarchyCallWithExceptionTest", "main"),
                      "data/methodHierarchyCallWithExceptionTest/oracle/MethodHierarchyCallWithExceptionTest.xml");
    }
    
@@ -369,13 +279,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallHierarchy",
                      "data/methodHierarchyCallTest/test",
                      false,
-                     new IMethodSelector() {
-                        @Override
-                        public IMethod getMethod(IJavaProject project) throws Exception {
-                           return TestUtilsUtil.getJdtMethod(project, "MethodHierarchyCallTest", "main");
-                        }
-                     },
-                     TestSEDKeyCoreUtil.METHOD_CALL_HIERARCHY_TARGET_NAME,
+                     createMethodSelector("MethodHierarchyCallTest", "main"),
                      "data/methodHierarchyCallTest/oracle/MethodHierarchyCallTest.xml");
    }
    
@@ -421,7 +325,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
          assertTrue(target.isSuspended());
          assertFalse(target.isTerminated());
          // Make sure that the debug target is in the initial state.
-         TestSEDKeyCoreUtil.assertInitialTarget(target, TestSEDKeyCoreUtil.FLAT_STEPS_TARGET_NAME);
+         TestSEDKeyCoreUtil.assertInitialTarget(target, TestSEDKeyCoreUtil.computeTargetName(method));
          // Resume launch
          SWTBotTreeItem item = TestUtilsUtil.selectInTree(debugTree, 0, 0); // Select first debug target
          item.contextMenu("Resume").click();
@@ -491,13 +395,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testFlatStatements",
                      "data/statements/test",
                      false,
-                     new IMethodSelector() {
-                        @Override
-                        public IMethod getMethod(IJavaProject project) throws Exception {
-                           return TestUtilsUtil.getJdtMethod(project, "FlatSteps", "doSomething", "I", "QString;", "Z");
-                        }
-                     },
-                     TestSEDKeyCoreUtil.FLAT_STEPS_TARGET_NAME,
+                     createMethodSelector("FlatSteps", "doSomething", "I", "QString;", "Z"),
                      "data/statements/oracle/FlatSteps.xml");
    }
    
@@ -510,13 +408,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testFlatStatements_ProofIsNoLongerAvailableInKeY",
                      "data/statements/test",
                      true,
-                     new IMethodSelector() {
-                        @Override
-                        public IMethod getMethod(IJavaProject project) throws Exception {
-                           return TestUtilsUtil.getJdtMethod(project, "FlatSteps", "doSomething", "I", "QString;", "Z");
-                        }
-                     },
-                     TestSEDKeyCoreUtil.FLAT_STEPS_TARGET_NAME,
+                     createMethodSelector("FlatSteps", "doSomething", "I", "QString;", "Z"),
                      "data/statements/oracle/FlatSteps.xml");
    }
    
@@ -535,6 +427,26 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
    }
    
    /**
+    * Creates a default {@link IMethodSelector} which uses
+    * {@link TestUtilsUtil#getJdtMethod(IJavaProject, String, String, String...)}
+    * to select an {@link IMethod}.
+    * @param typeName The type name.
+    * @param methodName The method name.
+    * @param parameters The method parameters.
+    * @return The created {@link IMethodSelector}.
+    */
+   public static IMethodSelector createMethodSelector(final String typeName, 
+                                                      final String methodName, 
+                                                      final String... parameters) {
+      return new IMethodSelector() {
+         @Override
+         public IMethod getMethod(IJavaProject project) throws Exception {
+            return TestUtilsUtil.getJdtMethod(project, typeName, methodName, parameters);
+         }
+      };
+   }
+   
+   /**
     * Executes the following test steps:
     * <ol>
     *    <li>Extract code from bundle to a Java project with the defined name in the workspace.</li>
@@ -548,7 +460,6 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     * @param pathInBundle The path to the source code in the bundle to extract to the workspace project.
     * @param clearProofListInKeYBeforeResume Clear proof list in KeY before resume?
     * @param selector {@link IMethodSelector} to select an {@link IMethod} to launch.
-    * @param targetName The name of the {@link IDebugTarget}.
     * @param expectedModelPathInBundle Path to the oracle file in the bundle which defines the expected {@link ISEDDebugTarget} model.
     * @throws Exception Occurred Exception.
     */
@@ -556,7 +467,6 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
                                  String pathInBundle,
                                  boolean clearProofListInKeYBeforeResume,
                                  IMethodSelector selector,
-                                 String targetName,
                                  String expectedModelPathInBundle) throws Exception {
       // Create bot
       SWTWorkbenchBot bot = new SWTWorkbenchBot();
@@ -574,6 +484,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
          // Get method
          assertNotNull(selector);
          IMethod method = selector.getMethod(project);
+         String targetName = TestSEDKeyCoreUtil.computeTargetName(method);
          // Increase timeout
          SWTBotPreferences.TIMEOUT = SWTBotPreferences.TIMEOUT * 8;
          // Store original settings of KeY which requires that at least one proof was instantiated.
@@ -803,7 +714,8 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
          assertTrue(target.isSuspended());
          assertFalse(target.isTerminated());
          // Make sure that the debug target is in the initial state.
-         TestSEDKeyCoreUtil.assertInitialTarget(target, TestSEDKeyCoreUtil.FLAT_STEPS_TARGET_NAME);
+         String targetName = TestSEDKeyCoreUtil.computeTargetName(method);
+         TestSEDKeyCoreUtil.assertInitialTarget(target, targetName);
          // Clear proof list in KeY if required
          if (clearProofListInKeYBeforeDisconnect) {
             assertFalse(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
@@ -829,7 +741,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
             KeYUtil.waitWhileMainWindowIsFrozen(MainWindow.getInstance());
          }
          // Test the unmodified execution tree
-         TestSEDKeyCoreUtil.assertInitialTarget(target, TestSEDKeyCoreUtil.FLAT_STEPS_TARGET_NAME);
+         TestSEDKeyCoreUtil.assertInitialTarget(target, targetName);
       }
       finally {
          // Restore timeout

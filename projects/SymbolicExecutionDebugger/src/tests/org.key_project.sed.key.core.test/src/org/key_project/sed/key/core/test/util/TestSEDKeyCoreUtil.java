@@ -32,91 +32,6 @@ import org.xml.sax.SAXException;
  */
 public final class TestSEDKeyCoreUtil {
    /**
-    * The name of the {@link ISEDDebugTarget} used in the flat list example.
-    */
-   public static final String FLAT_STEPS_TARGET_NAME = "JML normal_behavior operation contract [id: -2147483648 / FlatSteps::doSomething]";
-   
-   /**
-    * The name of the {@link ISEDDebugTarget} used in the method call hierarchy example.
-    */
-   public static final String METHOD_CALL_HIERARCHY_TARGET_NAME = "JML normal_behavior operation contract [id: -2147483648 / MethodHierarchyCallTest::main]";
-   
-   /**
-    * The name of the {@link ISEDDebugTarget} used in the method call hierarchy with exception example.
-    */
-   public static final String METHOD_CALL_HIERARCHY_WITH_EXCEPTION_TARGET_NAME = "JML normal_behavior operation contract [id: -2147483648 / MethodHierarchyCallWithExceptionTest::main]";
-
-   /**
-    * The name of the {@link ISEDDebugTarget} used in the method call parallel example.
-    */
-   public static final String METHOD_CALL_PARALLEL_TARGET_NAME = "JML normal_behavior operation contract [id: -2147483648 / MethodCallParallelTest::main]";
-
-   /**
-    * The name of the {@link ISEDDebugTarget} used in the method call on object example.
-    */
-   public static final String METHOD_CALL_ON_OBJECT_TARGET_NAME = "JML normal_behavior operation contract [id: -2147483648 / MethodCallOnObject::main]";
-
-   /**
-    * The name of the {@link ISEDDebugTarget} used in the method call with exception on object example.
-    */
-   public static final String METHOD_CALL_ON_OBJECT_WITH_EXCEPTION_TARGET_NAME = "JML normal_behavior operation contract [id: -2147483648 / MethodCallOnObjectWithException::main]";
-
-   /**
-    * The name of the {@link ISEDDebugTarget} used in the simple if example.
-    */
-   public static final String SIMPLE_IF_TARGET_NAME = "JML normal_behavior operation contract [id: -2147483648 / SimpleIf::min]";
-
-   /**
-    * The name of the {@link ISEDDebugTarget} used in the functional if example.
-    */
-   public static final String FUNCTIONAL_IF_TARGET_NAME = "JML normal_behavior operation contract [id: -2147483648 / FunctionalIf::min]";
-
-   /**
-    * The name of the {@link ISEDDebugTarget} used in the complex flat steps example.
-    */
-   public static final String COMPLEX_FLAT_STEPS_TARGET_NAME = "JML normal_behavior operation contract [id: -2147483648 / ComplexFlatSteps::doSomething]";
-
-   /**
-    * The name of the {@link ISEDDebugTarget} used in the complex if example.
-    */
-   public static final String COMPLEX_IF_TARGET_NAME = "JML normal_behavior operation contract [id: -2147483648 / ComplexIf::min]";
-
-   /**
-    * The name of the {@link ISEDDebugTarget} used in the static method call example.
-    */
-   public static final String STATIC_METHOD_CALL_TARGET_NAME = "JML normal_behavior operation contract [id: -2147483648 / StaticMethodCall::main]";
-
-   /**
-    * The name of the {@link ISEDDebugTarget} used in the try catch finally example.
-    */
-   public static final String TRY_CATCH_FINALLY_TARGET_NAME = "JML normal_behavior operation contract [id: -2147483648 / TryCatchFinally::tryCatchFinally]";
-
-   /**
-    * The name of the {@link ISEDDebugTarget} used in the else if different variables example.
-    */
-   public static final String ELSE_IF_DIFFERENT_VARIABLES_TARGET_NAME = "JML normal_behavior operation contract [id: -2147483648 / ElseIfDifferentVariables::main]";
-
-   /**
-    * The name of the {@link ISEDDebugTarget} used in the fixed recursive method call example.
-    */
-   public static final String FIXED_RECURSIVE_METHOD_CALL_TARGET_NAME = "JML normal_behavior operation contract [id: -2147483648 / FixedRecursiveMethodCallTest::decreaseValue]";
-
-   /**
-    * The name of the {@link ISEDDebugTarget} used in the fixed method call format test example.
-    */
-   public static final String METHOD_CALL_FORMAT_TEST_TARGET_NAME = "JML normal_behavior operation contract [id: -2147483648 / MethodFormatTest::main]";
-
-   /**
-    * The name of the {@link ISEDDebugTarget} used in the else if test example.
-    */
-   public static final String ELSE_IF_TARGET_NAME = "JML normal_behavior operation contract [id: -2147483648 / ElseIfTest::elseIf]";
-
-   /**
-    * The name of the {@link ISEDDebugTarget} used in the switch case example.
-    */
-   public static final String SWITCH_CASE_TARGET_NAME = "JML normal_behavior operation contract [id: -2147483648 / SwitchCaseTest::switchCase]";
-   
-   /**
     * Forbid instances.
     */
    private TestSEDKeyCoreUtil() {
@@ -220,5 +135,16 @@ public final class TestSEDKeyCoreUtil {
     */
    public static void assertFlatStepsExample(ISEDDebugTarget target) throws DebugException, ParserConfigurationException, SAXException, IOException {
       TestSedCoreUtil.compareDebugTarget(createExpectedModel("data/statements/oracle/FlatSteps.xml"), target);
+   }
+   
+   /**
+    * Computes the name of a {@link KeYDebugTarget} which debugs
+    * the given {@link IMethod} with generated operation contract.
+    * @param method The debuged {@link IMethod}.
+    * @return The used target name in a {@link KeYDebugTarget} with generated operation contract.
+    */
+   public static String computeTargetName(IMethod method) {
+      TestCase.assertNotNull(method);
+      return "JML normal_behavior operation contract [id: -2147483648 / " + method.getDeclaringType().getElementName() + "::" + method.getElementName() + "]";
    }
 }
