@@ -61,4 +61,14 @@ public interface ISEDDebugNode extends ISEDDebugElement {
     * the failure.</li>
     */
    public String getName() throws DebugException;
+   
+   /**
+    * Returns a human readable node type name.
+    * @return The human readable node type.
+    * @throws DebugException DebugException if this method fails.  Reasons include:
+    * <ul><li>Failure communicating with the VM.  The DebugException's
+    * status code contains the underlying exception responsible for
+    * the failure.</li>
+    */
+   public String getNodeType() throws DebugException; 
 }

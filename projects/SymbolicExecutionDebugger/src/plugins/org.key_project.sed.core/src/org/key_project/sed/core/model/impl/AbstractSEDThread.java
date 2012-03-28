@@ -224,4 +224,12 @@ public abstract class AbstractSEDThread extends AbstractSEDDebugNode implements 
          return e.getMessage();
       }
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getNodeType() {
+      return "Thread";
+   }
 }

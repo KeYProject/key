@@ -273,7 +273,12 @@ public abstract class AbstractSEDStackFrameCompatibleDebugNode extends AbstractS
    @Override
    public String toString() {
       try {
-         return getName();
+         if (getCharStart() >= 0 && getCharEnd() >= 0) {
+            return super.toString() + " at source location " + getCharStart() + ", " + getCharEnd();
+         }
+         else {
+            return super.toString() + " at line " + getLineNumber();
+         }
       }
       catch (DebugException e) {
          return e.getMessage();

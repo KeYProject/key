@@ -309,7 +309,7 @@ public final class KeySEDUtil {
       }
       // Print node and children
       if (node != null) {
-         System.out.println(node + "     (" + node.getClass() + ")");
+         System.out.println(node);
          for (ISEDDebugNode child : node.getChildren()) {
             printDebugNode(child, level + 1);
          }

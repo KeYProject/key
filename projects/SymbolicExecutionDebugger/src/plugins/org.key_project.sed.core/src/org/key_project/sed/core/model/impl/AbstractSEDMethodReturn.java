@@ -23,4 +23,12 @@ public abstract class AbstractSEDMethodReturn extends AbstractSEDStackFrameCompa
                                   ISEDThread thread) {
       super(target, parent, thread);
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getNodeType() {
+      return "Method Return";
+   }
 }

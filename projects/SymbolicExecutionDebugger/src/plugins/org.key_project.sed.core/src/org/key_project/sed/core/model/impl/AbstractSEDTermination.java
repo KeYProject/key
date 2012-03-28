@@ -20,4 +20,12 @@ public abstract class AbstractSEDTermination extends AbstractSEDTerminateCompati
                                  ISEDDebugNode parent) {
       super(target, parent);
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getNodeType() {
+      return "Termination";
+   }
 }

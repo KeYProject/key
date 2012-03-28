@@ -72,4 +72,17 @@ public abstract class AbstractSEDDebugNode extends AbstractSEDDebugElement imple
    protected void setName(String name) {
       this.name = name;
    }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String toString() {
+      try {
+         return getNodeType() + ": " + getName();
+      }
+      catch (DebugException e) {
+         return e.getMessage();
+      }
+   }
 }

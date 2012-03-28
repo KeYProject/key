@@ -20,4 +20,12 @@ public abstract class AbstractSEDBranchCondition extends AbstractSEDTerminateCom
                                      ISEDDebugNode parent) {
       super(target, parent);
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getNodeType() {
+      return "Branch Condition";
+   }
 }

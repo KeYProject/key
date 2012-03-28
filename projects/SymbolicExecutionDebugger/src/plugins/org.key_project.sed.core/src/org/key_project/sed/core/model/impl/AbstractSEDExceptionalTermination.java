@@ -23,4 +23,12 @@ public abstract class AbstractSEDExceptionalTermination extends AbstractSEDStack
                                             ISEDThread thread) {
       super(target, parent, thread);
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getNodeType() {
+      return "Exceptional Termination";
+   }
 }

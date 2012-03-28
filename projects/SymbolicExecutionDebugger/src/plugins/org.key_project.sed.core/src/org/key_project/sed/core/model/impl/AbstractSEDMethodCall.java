@@ -23,4 +23,12 @@ public abstract class AbstractSEDMethodCall extends AbstractSEDStackFrameCompati
                                 ISEDThread thread) {
       super(target, parent, thread);
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getNodeType() {
+      return "Method Call";
+   }
 }
