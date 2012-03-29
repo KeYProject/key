@@ -11,6 +11,8 @@ import org.key_project.sed.core.model.ISEDBranchCondition;
 import org.key_project.sed.core.model.ISEDBranchNode;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDExceptionalTermination;
+import org.key_project.sed.core.model.ISEDLoopCondition;
+import org.key_project.sed.core.model.ISEDLoopNode;
 import org.key_project.sed.core.model.ISEDMethodCall;
 import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.ISEDTermination;
@@ -78,6 +80,12 @@ public abstract class AbstractSEDDebugModelPresentation extends LabelProvider im
       }
       else if (element instanceof ISEDBranchNode) {
          return SEDImages.getImage(SEDImages.BRANCH_NODE);
+      }
+      else if (element instanceof ISEDLoopNode) {
+         return SEDImages.getImage(SEDImages.LOOP_NODE);
+      }
+      else if (element instanceof ISEDLoopCondition) {
+         return SEDImages.getImage(SEDImages.LOOP_CONDITION);
       }
       else {
          return super.getImage(element);

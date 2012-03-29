@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget name="JML normal_behavior operation contract [id: -2147483648 / ForEachTest::main]" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread name="KeY Default Thread">
+         <sedMethodCall name="self.main();" lineNumber="-1" charStart="91" charEnd="95">
+            <sedStatement name="int[] array = new int[3];" lineNumber="-1" charStart="103" charEnd="128">
+               <sedBranchCondition name="Normal Execution (newObject != null )">
+                  <sedStatement name="int result = 0;" lineNumber="-1" charStart="132" charEnd="147">
+                     <sedLoopNode name="for (int element : array) {   result_1++; }" lineNumber="-1" charStart="151" charEnd="198">
+                        <sedBranchCondition name="Normal Execution (x_arr_3 != null)">
+                           <sedBranchCondition name="Normal Execution (x_arr_3 != null)">
+                              <sedStatement name="result_1++;" lineNumber="-1" charStart="183" charEnd="193">
+                                 <sedBranchCondition name="Normal Execution (x_arr_3 != null)">
+                                    <sedBranchCondition name="Normal Execution (x_arr_3 != null)">
+                                       <sedStatement name="result_1++;" lineNumber="-1" charStart="183" charEnd="193">
+                                          <sedBranchCondition name="Normal Execution (x_arr_3 != null)">
+                                             <sedBranchCondition name="Normal Execution (x_arr_3 != null)">
+                                                <sedStatement name="result_1++;" lineNumber="-1" charStart="183" charEnd="193">
+                                                   <sedBranchCondition name="Normal Execution (x_arr_3 != null)">
+                                                      <sedStatement name="return result_1;" lineNumber="-1" charStart="202" charEnd="216">
+                                                         <sedMethodReturn name="&lt;return of self.main();&gt;" lineNumber="-1" charStart="91" charEnd="95">
+                                                            <sedTermination name="&lt;end&gt;">
+                                                            </sedTermination>
+                                                         </sedMethodReturn>
+                                                      </sedStatement>
+                                                   </sedBranchCondition>
+                                                </sedStatement>
+                                             </sedBranchCondition>
+                                          </sedBranchCondition>
+                                       </sedStatement>
+                                    </sedBranchCondition>
+                                 </sedBranchCondition>
+                              </sedStatement>
+                           </sedBranchCondition>
+                        </sedBranchCondition>
+                     </sedLoopNode>
+                  </sedStatement>
+               </sedBranchCondition>
+            </sedStatement>
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>

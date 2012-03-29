@@ -5,7 +5,6 @@ import junit.framework.TestCase;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotPerspective;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
-import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.junit.Test;
 import org.key_project.sed.core.model.ISEDDebugElement;
@@ -41,7 +40,7 @@ public class SWTBotDebugViewHierarchyTest extends TestCase {
          // Find the launched ILaunch in the debug view
          SWTBotView debugView = TestSedCoreUtil.getDebugView(bot);
          debugTree = debugView.bot().tree();
-         bot.waitUntil(Conditions.treeHasRows(debugTree, 1));
+         TestSedCoreUtil.waitUntilDebugTreeHasDebugTarget(bot, debugTree);
          // Expand all tree items
          TestUtilsUtil.expandAll(debugTree);
          TestUtilsUtil.sleep(TestSedCoreUtil.USER_INTERFACE_DEBUG_TREE_WAIT_TIME); // Give the user interface the chance to update the tree
@@ -96,7 +95,7 @@ public class SWTBotDebugViewHierarchyTest extends TestCase {
          // Find the launched ILaunch in the debug view
          SWTBotView debugView = TestSedCoreUtil.getDebugView(bot);
          debugTree = debugView.bot().tree();
-         bot.waitUntil(Conditions.treeHasRows(debugTree, 1));
+         TestSedCoreUtil.waitUntilDebugTreeHasDebugTarget(bot, debugTree);
          // Expand all tree items
          TestUtilsUtil.expandAll(debugTree);
          TestUtilsUtil.sleep(TestSedCoreUtil.USER_INTERFACE_DEBUG_TREE_WAIT_TIME); // Give the user interface the chance to update the tree
@@ -134,7 +133,7 @@ public class SWTBotDebugViewHierarchyTest extends TestCase {
          // Find the launched ILaunch in the debug view
          SWTBotView debugView = TestSedCoreUtil.getDebugView(bot);
          debugTree = debugView.bot().tree();
-         bot.waitUntil(Conditions.treeHasRows(debugTree, 1));
+         TestSedCoreUtil.waitUntilDebugTreeHasDebugTarget(bot, debugTree);
          // Expand all tree items
          TestUtilsUtil.expandAll(debugTree);
          TestUtilsUtil.sleep(TestSedCoreUtil.USER_INTERFACE_DEBUG_TREE_WAIT_TIME); // Give the user interface the chance to update the tree

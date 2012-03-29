@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget name="JML normal_behavior operation contract [id: -2147483648 / DoWhileTest::main]" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread name="KeY Default Thread">
+         <sedMethodCall name="self.main();" lineNumber="-1" charStart="91" charEnd="95">
+            <sedStatement name="int result = 0;" lineNumber="-1" charStart="103" charEnd="118">
+               <sedStatement name="int i = 0;" lineNumber="-1" charStart="122" charEnd="132">
+                  <sedLoopNode name="do {result_1++;i++;}while ( i&lt;3 );" lineNumber="-1" charStart="136" charEnd="187">
+                     <sedStatement name="result_1++;" lineNumber="-1" charStart="145" charEnd="155">
+                        <sedStatement name="i++;" lineNumber="-1" charStart="160" charEnd="164">
+                           <sedLoopCondition name="i&lt;3" lineNumber="-1" charStart="180" charEnd="185">
+                              <sedStatement name="result_1++;" lineNumber="-1" charStart="145" charEnd="155">
+                                 <sedStatement name="i++;" lineNumber="-1" charStart="160" charEnd="164">
+                                    <sedLoopCondition name="i&lt;3" lineNumber="-1" charStart="180" charEnd="185">
+                                       <sedStatement name="result_1++;" lineNumber="-1" charStart="145" charEnd="155">
+                                          <sedStatement name="i++;" lineNumber="-1" charStart="160" charEnd="164">
+                                             <sedLoopCondition name="i&lt;3" lineNumber="-1" charStart="180" charEnd="185">
+                                                <sedStatement name="return result_1;" lineNumber="-1" charStart="191" charEnd="205">
+                                                   <sedMethodReturn name="&lt;return of self.main();&gt;" lineNumber="-1" charStart="91" charEnd="95">
+                                                      <sedTermination name="&lt;end&gt;">
+                                                      </sedTermination>
+                                                   </sedMethodReturn>
+                                                </sedStatement>
+                                             </sedLoopCondition>
+                                          </sedStatement>
+                                       </sedStatement>
+                                    </sedLoopCondition>
+                                 </sedStatement>
+                              </sedStatement>
+                           </sedLoopCondition>
+                        </sedStatement>
+                     </sedStatement>
+                  </sedLoopNode>
+               </sedStatement>
+            </sedStatement>
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>

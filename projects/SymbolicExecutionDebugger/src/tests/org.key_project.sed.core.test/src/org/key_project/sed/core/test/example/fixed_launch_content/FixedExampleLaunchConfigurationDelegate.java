@@ -9,6 +9,8 @@ import org.key_project.sed.core.model.ISEDBranchCondition;
 import org.key_project.sed.core.model.ISEDBranchNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDExceptionalTermination;
+import org.key_project.sed.core.model.ISEDLoopCondition;
+import org.key_project.sed.core.model.ISEDLoopNode;
 import org.key_project.sed.core.model.ISEDMethodCall;
 import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.ISEDStatement;
@@ -18,6 +20,8 @@ import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
 import org.key_project.sed.core.model.memory.SEDMemoryBranchNode;
 import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
 import org.key_project.sed.core.model.memory.SEDMemoryExceptionalTermination;
+import org.key_project.sed.core.model.memory.SEDMemoryLoopCondition;
+import org.key_project.sed.core.model.memory.SEDMemoryLoopNode;
 import org.key_project.sed.core.model.memory.SEDMemoryMethodCall;
 import org.key_project.sed.core.model.memory.SEDMemoryMethodReturn;
 import org.key_project.sed.core.model.memory.SEDMemoryStatement;
@@ -36,19 +40,22 @@ import org.key_project.sed.core.model.memory.SEDMemoryThread;
  *    Fixed Example Target ({@link ISEDDebugTarget})
  *         Fixed Example Thread ({@link ISEDThread})
  *            int x = 1; ({@link ISEDStatement})
- *               int y = 2; ({@link ISEDStatement})
- *                  int result = (x + y) / z; ({@link ISEDStatement})
- *                     z == 0 ({@link ISEDBranchCondition})
- *                        throws DivisionByZeroException() ({@link ISEDExceptionalTermination}) 
- *                     z != 0 ({@link ISEDBranchCondition})
- *                        foo(result) ({@link ISEDMethodCall})
- *                           if (result >= 0) ({@link ISEDBranchNode})
- *                              result < 0 ({@link ISEDBranchCondition})
- *                                 return -1 ({@link ISEDMethodReturn})
- *                                    <end> ({@link ISEDTermination})
- *                              result >= 0 ({@link ISEDBranchCondition})
- *                                 return 1 ({@link ISEDMethodReturn})
- *                                    <end> ({@link ISEDTermination})
+ *               while (x == 1) ({@link ISEDLoopNode})
+ *                  x == 1 ({@link ISEDLoopCondition})
+ *                     x++; ({@link ISEDStatement})
+ *                        int y = 2; ({@link ISEDStatement})
+ *                           int result = (x + y) / z; ({@link ISEDStatement})
+ *                              z == 0 ({@link ISEDBranchCondition})
+ *                                 throws DivisionByZeroException() ({@link ISEDExceptionalTermination}) 
+ *                              z != 0 ({@link ISEDBranchCondition})
+ *                                 foo(result) ({@link ISEDMethodCall})
+ *                                    if (result >= 0) ({@link ISEDBranchNode})
+ *                                       result < 0 ({@link ISEDBranchCondition})
+ *                                          return -1 ({@link ISEDMethodReturn})
+ *                                             <end> ({@link ISEDTermination})
+ *                                       result >= 0 ({@link ISEDBranchCondition})
+ *                                          return 1 ({@link ISEDMethodReturn})
+ *                                             <end> ({@link ISEDTermination})
  *   
  * </pre>
  * </p>
@@ -81,9 +88,21 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        s1.setName("int x = 1;");
        thread.addChild(s1);
        
-       SEDMemoryStatement s2 = new SEDMemoryStatement(target, s1, thread);
+       SEDMemoryLoopNode ln = new SEDMemoryLoopNode(target, s1, thread);
+       ln.setName("while (x == 1)");
+       s1.addChild(ln);
+       
+       SEDMemoryLoopCondition lc = new SEDMemoryLoopCondition(target, ln, thread);
+       lc.setName("x == 1");
+       ln.addChild(lc);
+       
+       SEDMemoryStatement ls = new SEDMemoryStatement(target, lc, thread);
+       ls.setName("x++;");
+       lc.addChild(ls);
+       
+       SEDMemoryStatement s2 = new SEDMemoryStatement(target, ls, thread);
        s2.setName("int y = 2;");
-       s1.addChild(s2);
+       ls.addChild(s2);
        
        SEDMemoryStatement s3 = new SEDMemoryStatement(target, s2, thread);
        s3.setName("int result = (x + y) / z;");

@@ -51,6 +51,16 @@ public final class SEDImages {
     public static final String EXCEPTIONAL_TERMINATION = "org.key_project.sed.ui.images.exceptionalTermination";
     
     /**
+     * The key for the image that is used for loop node.
+     */
+    public static final String LOOP_NODE = "org.key_project.sed.ui.images.loopNode";
+    
+    /**
+     * The key for the image that is used for loop condition.
+     */
+    public static final String LOOP_CONDITION = "org.key_project.sed.ui.images.loopCondition";
+    
+    /**
      * Forbid instances.
      */
     private SEDImages() {
@@ -101,6 +111,12 @@ public final class SEDImages {
         else if (EXCEPTIONAL_TERMINATION.equals(key)) {
            path = "icons/exceptional_termination.gif";
         }
+        else if (LOOP_NODE.equals(key)) {
+           path = "icons/loop_node.gif";
+        }
+        else if (LOOP_CONDITION.equals(key)) {
+           path = "icons/loop_condition.gif";
+        }
         // Load image if possible
         if (path != null) {
            InputStream in = null;
@@ -146,6 +162,8 @@ public final class SEDImages {
                registry.remove(BRANCH_NODE);
                registry.remove(BRANCH_CONDITION);
                registry.remove(EXCEPTIONAL_TERMINATION);
+               registry.remove(LOOP_NODE);
+               registry.remove(LOOP_CONDITION);
             }
          });
        }

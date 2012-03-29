@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget name="JML normal_behavior operation contract [id: -2147483648 / NestedDoWhileTest::main]" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread name="KeY Default Thread">
+         <sedMethodCall name="self.main();" lineNumber="-1" charStart="97" charEnd="101">
+            <sedStatement name="int result = 0;" lineNumber="-1" charStart="109" charEnd="124">
+               <sedStatement name="int i = 0;" lineNumber="-1" charStart="128" charEnd="138">
+                  <sedLoopNode name="do {do {do {result_1++;i++;}while ( i&lt;2 );     result_1++;     i++;   }  while ( i&lt;3 );   result_1++;   i++; }while ( i&lt;3 );" lineNumber="-1" charStart="142" charEnd="318">
+                     <sedLoopNode name="do {do {result_1++;i++;}while ( i&lt;2 );   result_1++;   i++; }while ( i&lt;3 );" lineNumber="-1" charStart="151" charEnd="271">
+                        <sedLoopNode name="do {result_1++;i++;}while ( i&lt;2 );" lineNumber="-1" charStart="161" charEnd="220">
+                           <sedStatement name="result_1++;" lineNumber="-1" charStart="172" charEnd="182">
+                              <sedStatement name="i++;" lineNumber="-1" charStart="189" charEnd="193">
+                                 <sedLoopCondition name="i&lt;2" lineNumber="-1" charStart="213" charEnd="218">
+                                    <sedStatement name="result_1++;" lineNumber="-1" charStart="172" charEnd="182">
+                                       <sedStatement name="i++;" lineNumber="-1" charStart="189" charEnd="193">
+                                          <sedLoopCondition name="i&lt;2" lineNumber="-1" charStart="213" charEnd="218">
+                                             <sedStatement name="result_1++;" lineNumber="-1" charStart="226" charEnd="236">
+                                                <sedStatement name="i++;" lineNumber="-1" charStart="242" charEnd="246">
+                                                   <sedLoopCondition name="i&lt;3" lineNumber="-1" charStart="264" charEnd="269">
+                                                      <sedStatement name="result_1++;" lineNumber="-1" charStart="276" charEnd="286">
+                                                         <sedStatement name="i++;" lineNumber="-1" charStart="291" charEnd="295">
+                                                            <sedLoopCondition name="i&lt;3" lineNumber="-1" charStart="311" charEnd="316">
+                                                               <sedStatement name="return result_1;" lineNumber="-1" charStart="322" charEnd="336">
+                                                                  <sedMethodReturn name="&lt;return of self.main();&gt;" lineNumber="-1" charStart="97" charEnd="101">
+                                                                     <sedTermination name="&lt;end&gt;">
+                                                                     </sedTermination>
+                                                                  </sedMethodReturn>
+                                                               </sedStatement>
+                                                            </sedLoopCondition>
+                                                         </sedStatement>
+                                                      </sedStatement>
+                                                   </sedLoopCondition>
+                                                </sedStatement>
+                                             </sedStatement>
+                                          </sedLoopCondition>
+                                       </sedStatement>
+                                    </sedStatement>
+                                 </sedLoopCondition>
+                              </sedStatement>
+                           </sedStatement>
+                        </sedLoopNode>
+                     </sedLoopNode>
+                  </sedLoopNode>
+               </sedStatement>
+            </sedStatement>
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>

@@ -66,6 +66,7 @@ public class NodeInfo {
         symbolicExecNames.add(new Name("simplify_object_creation"));
         symbolicExecNames.add(new Name("split_if"));
         symbolicExecNames.add(new Name("simplify_expression"));
+        symbolicExecNames.add(new Name("loop_expand"));
     }
 
 

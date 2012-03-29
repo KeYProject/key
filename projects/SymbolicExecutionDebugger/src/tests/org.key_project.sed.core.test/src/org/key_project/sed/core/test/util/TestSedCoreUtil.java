@@ -48,6 +48,8 @@ import org.key_project.sed.core.model.ISEDBranchNode;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDExceptionalTermination;
+import org.key_project.sed.core.model.ISEDLoopCondition;
+import org.key_project.sed.core.model.ISEDLoopNode;
 import org.key_project.sed.core.model.ISEDMethodCall;
 import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.ISEDStatement;
@@ -222,8 +224,23 @@ public final class TestSedCoreUtil {
       TestCase.assertEquals(1, statement1Items.length);
       TestCase.assertEquals("int x = 1;", statement1Items[0].getText());
       TestCase.assertTrue(TestUtilsUtil.getTreeItemData(statement1Items[0]) instanceof ISEDStatement);
+      // Assert loop node
+      SWTBotTreeItem[] loopNodeItems = statement1Items[0].getItems();
+      TestCase.assertEquals(1, loopNodeItems.length);
+      TestCase.assertEquals("while (x == 1)", loopNodeItems[0].getText());
+      TestCase.assertTrue(TestUtilsUtil.getTreeItemData(loopNodeItems[0]) instanceof ISEDLoopNode);
+      // Assert loop condition
+      SWTBotTreeItem[] loopConditionItems = loopNodeItems[0].getItems();
+      TestCase.assertEquals(1, loopConditionItems.length);
+      TestCase.assertEquals("x == 1", loopConditionItems[0].getText());
+      TestCase.assertTrue(TestUtilsUtil.getTreeItemData(loopConditionItems[0]) instanceof ISEDLoopCondition);
+      // Assert loop statement
+      SWTBotTreeItem[] loopStatementItems = loopConditionItems[0].getItems();
+      TestCase.assertEquals(1, loopStatementItems.length);
+      TestCase.assertEquals("x++;", loopStatementItems[0].getText());
+      TestCase.assertTrue(TestUtilsUtil.getTreeItemData(loopStatementItems[0]) instanceof ISEDStatement);
       // Assert statement2
-      SWTBotTreeItem[] statement2Items = statement1Items[0].getItems();
+      SWTBotTreeItem[] statement2Items = loopStatementItems[0].getItems();
       TestCase.assertEquals(1, statement2Items.length);
       TestCase.assertEquals("int y = 2;", statement2Items[0].getText());
       TestCase.assertTrue(TestUtilsUtil.getTreeItemData(statement2Items[0]) instanceof ISEDStatement);
@@ -309,19 +326,30 @@ public final class TestSedCoreUtil {
       TestCase.assertEquals(1, threadItems.length);
       TestCase.assertEquals("Fixed Example Thread", threadItems[0].getText());
       TestCase.assertTrue(TestUtilsUtil.getTreeItemData(threadItems[0]) instanceof ISEDThread);
-      // Assert statement1, 2 and 3
+      // Assert statement1, loop node, loop condition, loop statement, statement 2 and 3
       SWTBotTreeItem[] statementItems = threadItems[0].getItems();
-      TestCase.assertEquals(3, statementItems.length);
+      TestCase.assertEquals(6, statementItems.length);
       TestCase.assertEquals("int x = 1;", statementItems[0].getText());
       TestCase.assertTrue(TestUtilsUtil.getTreeItemData(statementItems[0]) instanceof ISEDStatement);
       TestCase.assertEquals(0, statementItems[0].getItems().length);
-      TestCase.assertEquals("int y = 2;", statementItems[1].getText());
-      TestCase.assertTrue(TestUtilsUtil.getTreeItemData(statementItems[1]) instanceof ISEDStatement);
+
+      TestCase.assertEquals("while (x == 1)", statementItems[1].getText());
+      TestCase.assertTrue(TestUtilsUtil.getTreeItemData(statementItems[1]) instanceof ISEDLoopNode);
       TestCase.assertEquals(0, statementItems[1].getItems().length);
-      TestCase.assertEquals("int result = (x + y) / z;", statementItems[2].getText());
-      TestCase.assertTrue(TestUtilsUtil.getTreeItemData(statementItems[2]) instanceof ISEDStatement);
+      TestCase.assertEquals("x == 1", statementItems[2].getText());
+      TestCase.assertTrue(TestUtilsUtil.getTreeItemData(statementItems[2]) instanceof ISEDLoopCondition);
+      TestCase.assertEquals(0, statementItems[2].getItems().length);
+      TestCase.assertEquals("x++;", statementItems[3].getText());
+      TestCase.assertTrue(TestUtilsUtil.getTreeItemData(statementItems[3]) instanceof ISEDStatement);
+      TestCase.assertEquals(0, statementItems[3].getItems().length);
+      
+      TestCase.assertEquals("int y = 2;", statementItems[4].getText());
+      TestCase.assertTrue(TestUtilsUtil.getTreeItemData(statementItems[4]) instanceof ISEDStatement);
+      TestCase.assertEquals(0, statementItems[4].getItems().length);
+      TestCase.assertEquals("int result = (x + y) / z;", statementItems[5].getText());
+      TestCase.assertTrue(TestUtilsUtil.getTreeItemData(statementItems[5]) instanceof ISEDStatement);
       // Assert branch conditions
-      SWTBotTreeItem[] conditions1Items = statementItems[2].getItems();
+      SWTBotTreeItem[] conditions1Items = statementItems[5].getItems();
       TestCase.assertEquals(2, conditions1Items.length);
       TestCase.assertEquals("z == 0", conditions1Items[0].getText());
       TestCase.assertTrue(TestUtilsUtil.getTreeItemData(conditions1Items[0]) instanceof ISEDBranchCondition);
@@ -775,6 +803,14 @@ public final class TestSedCoreUtil {
                   TestCase.assertTrue("Expected ISEDExceptionalTermination on " + ((ISEDExceptionalTermination)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEDExceptionalTermination);
                   compareExceptionalTermination((ISEDExceptionalTermination)expectedChildren[i], (ISEDExceptionalTermination)currentChildren[i]);
                }
+               else if (expectedChildren[i] instanceof ISEDLoopCondition) {
+                  TestCase.assertTrue("Expected ISEDLoopCondition on " + ((ISEDLoopCondition)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEDLoopCondition);
+                  compareLoopCondition((ISEDLoopCondition)expectedChildren[i], (ISEDLoopCondition)currentChildren[i]);
+               }
+               else if (expectedChildren[i] instanceof ISEDLoopNode) {
+                  TestCase.assertTrue("Expected ISEDLoopNode on " + ((ISEDLoopNode)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEDLoopNode);
+                  compareLoopNode((ISEDLoopNode)expectedChildren[i], (ISEDLoopNode)currentChildren[i]);
+               }
                else if (expectedChildren[i] instanceof ISEDMethodCall) {
                   TestCase.assertTrue("Expected ISEDMethodCall on " + ((ISEDMethodCall)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEDMethodCall);
                   compareMethodCall((ISEDMethodCall)expectedChildren[i], (ISEDMethodCall)currentChildren[i]);
@@ -935,6 +971,28 @@ public final class TestSedCoreUtil {
     */
    public static void compareExceptionalTermination(ISEDExceptionalTermination expected, ISEDExceptionalTermination current) throws DebugException {
       compareTermination(expected, current);
+   }
+
+   /**
+    * Compares the given {@link ISEDLoopCondition}s with each other.
+    * @param expected The expected {@link ISEDLoopCondition}.
+    * @param current The current {@link ISEDLoopCondition}.
+    * @throws DebugException Occurred Exception.
+    */
+   public static void compareLoopCondition(ISEDLoopCondition expected, ISEDLoopCondition current) throws DebugException {
+      compareStackFrame(expected, current);
+      compareNode(expected, current, true);
+   }
+
+   /**
+    * Compares the given {@link ISEDLoopNode}s with each other.
+    * @param expected The expected {@link ISEDLoopNode}.
+    * @param current The current {@link ISEDLoopNode}.
+    * @throws DebugException Occurred Exception.
+    */
+   public static void compareLoopNode(ISEDLoopNode expected, ISEDLoopNode current) throws DebugException {
+      compareStackFrame(expected, current);
+      compareNode(expected, current, true);
    }
 
    /**

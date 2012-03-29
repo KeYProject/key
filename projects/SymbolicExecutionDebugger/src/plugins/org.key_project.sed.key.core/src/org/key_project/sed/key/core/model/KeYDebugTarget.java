@@ -25,6 +25,8 @@ import org.key_project.sed.core.model.ISEDBranchCondition;
 import org.key_project.sed.core.model.ISEDBranchNode;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDLoopCondition;
+import org.key_project.sed.core.model.ISEDLoopNode;
 import org.key_project.sed.core.model.ISEDMethodCall;
 import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.ISEDStatement;
@@ -36,6 +38,8 @@ import org.key_project.sed.core.model.memory.ISEDMemoryStackFrameCompatibleDebug
 import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
 import org.key_project.sed.core.model.memory.SEDMemoryBranchNode;
 import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
+import org.key_project.sed.core.model.memory.SEDMemoryLoopCondition;
+import org.key_project.sed.core.model.memory.SEDMemoryLoopNode;
 import org.key_project.sed.core.model.memory.SEDMemoryMethodCall;
 import org.key_project.sed.core.model.memory.SEDMemoryMethodReturn;
 import org.key_project.sed.core.model.memory.SEDMemoryStatement;
@@ -46,14 +50,17 @@ import org.key_project.sed.key.core.util.ASTNodeByEndIndexSearcher;
 import org.key_project.sed.key.core.util.LogUtil;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.EqualsHashCodeResetter;
 import org.key_project.util.java.IFilter;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.IOUtil.LineInformation;
+import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.gui.AutoModeListener;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.PositionInfo;
@@ -61,6 +68,9 @@ import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.statement.BranchStatement;
+import de.uka.ilkd.key.java.statement.Do;
+import de.uka.ilkd.key.java.statement.EnhancedFor;
+import de.uka.ilkd.key.java.statement.For;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
@@ -144,6 +154,22 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
    private Map<Node, ISEDDebugNode> keyNodeMapping;
    
    /**
+    * <p>
+    * Maps the loop expression to the initial loop statement which contains
+    * the source code location. The repeated loop statements in KeY's proof
+    * tree have no source locations.
+    * </p>
+    * <p>
+    * The trick is that the repeated loop have exactly the same object
+    * as loop expression. This means reference equality. But {@link Object#equals(Object)}
+    * and {@link Object#hashCode()} is overwritten in {@link Expression}s. Which
+    * leads to wrongly found loops if the expression is equal. For this reason as
+    * key is an {@link EqualsHashCodeResetter} used.
+    * </p>
+    */
+   private Map<EqualsHashCodeResetter<Expression>, LoopStatement> loopExpressionToLoopStatementMapping;
+   
+   /**
     * Constructor.
     * @param launch The parent {@link ILaunch}.
     * @param proof The {@link Proof} in KeY to treat.
@@ -160,6 +186,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       thread.setName(DEFAULT_THREAD_NAME);
       addSymbolicThread(thread);
       keyNodeMapping = new HashMap<Node, ISEDDebugNode>();
+      loopExpressionToLoopStatementMapping = new HashMap<EqualsHashCodeResetter<Expression>, LoopStatement>();
       // Observe frozen state of KeY Main Frame
       MainWindow.getInstance().getMediator().addAutoModeListener(autoModeListener);
    }
@@ -252,6 +279,27 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
                parentToAddTo = debugNode;
             }
          }
+         // Check if loop condition is available
+         if (hasLoopCondition(node, statement)) {
+            // Get the original loop statement
+            LoopStatement loop = (LoopStatement)statement;
+            Expression expression = loop.getGuardExpression();
+            EqualsHashCodeResetter<Expression> resetter = new EqualsHashCodeResetter<Expression>(expression);
+            LoopStatement originalStatement = loopExpressionToLoopStatementMapping.get(resetter);
+            if (originalStatement == null) {
+               loopExpressionToLoopStatementMapping.put(resetter, loop);
+            }
+            else {
+               loop = originalStatement;
+            }
+            if (loop.getPositionInfo() != PositionInfo.UNDEFINED &&
+                !isDoWhileLoopCondition(node, statement) && 
+                !isForLoopCondition(node, statement)) { // do while and for loops exists only in the first iteration where the loop condition is not evaluated. They are transfered into while loops in later proof nodes. 
+               ISEDLoopCondition condition = createLoopCondition(parentToAddTo, loop, expression);
+               addChild(parentToAddTo, condition);
+               parentToAddTo = condition;
+            }
+         }
          // Iterate over children
          boolean hasMultipleBranches = node.childrenCount() >= 2;
          NodeIterator children = node.childrenIterator();
@@ -302,6 +350,37 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       else {
          return false;
       }
+   }
+
+   /**
+    * Checks if the given {@link Node} has a loop condition.
+    * @param node The {@link Node} to check.
+    * @param statement The actual statement ({@link SourceElement}).
+    * @return {@code true} has loop condition, {@code false} has no loop condition.
+    */
+   protected boolean hasLoopCondition(Node node, SourceElement statement) {
+      return statement instanceof LoopStatement && 
+             !(statement instanceof EnhancedFor); // For each loops have no loop condition
+   }
+   
+   /**
+    * Checks if the given {@link SourceElement} is a do while loop.
+    * @param node The {@link Node} to check.
+    * @param statement The actual statement ({@link SourceElement}).
+    * @return {@code true} is do while loop, {@code false} is something else.
+    */
+   protected boolean isDoWhileLoopCondition(Node node, SourceElement statement) {
+      return statement instanceof Do;
+   }
+   
+   /**
+    * Checks if the given {@link SourceElement} is a for loop.
+    * @param node The {@link Node} to check.
+    * @param statement The actual statement ({@link SourceElement}).
+    * @return {@code true} is for loop, {@code false} is something else.
+    */
+   protected boolean isForLoopCondition(Node node, SourceElement statement) {
+      return statement instanceof For;
    }
    
    /**
@@ -363,6 +442,9 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
          }
          else if (isBranchNode(node, info, statement, posInfo)) {
             result = createBranchNode(parent, statement, posInfo);
+         }
+         else if (isLoopNode(node, info, statement, posInfo)) {
+            result = createLoopNode(parent, statement, posInfo);
          }
          else if (isStatementNode(node, info, statement, posInfo)) {
             result = createStatementNode(parent, statement, posInfo);
@@ -713,7 +795,71 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
     */
    protected boolean isBranchNode(Node node, NodeInfo info, SourceElement statement, PositionInfo posInfo) {
       return isStatementNode(node, info, statement, posInfo) &&
-             (statement instanceof BranchStatement || statement instanceof LoopStatement); 
+             (statement instanceof BranchStatement); 
+   }
+   
+   /**
+    * Checks if the given node should be represented as loop node.
+    * @param node The current {@link Node} in the proof tree of KeY.
+    * @param info The {@link NodeInfo}.
+    * @param statement The statement ({@link SourceElement}).
+    * @param posInfo The {@link PositionInfo}.
+    * @return {@code true} represent node as loop node, {@code false} represent node as something else. 
+    */
+   protected boolean isLoopNode(Node node, NodeInfo info, SourceElement statement, PositionInfo posInfo) {
+      return isStatementNode(node, info, statement, posInfo) &&
+             (statement instanceof LoopStatement); 
+   }
+   
+   /**
+    * Creates a new {@link ISEDLoopNode} for the given {@link SourceElement}.
+    * @param parent The parent {@link ISEDDebugNode}.
+    * @param statement The given {@link SourceElement} to represent as {@link ISEDLoopNode}.
+    * @param posInfo The {@link PositionInfo} to use.
+    * @return The created {@link ISEDLoopNode}.
+    * @throws DebugException Occurred Exception.
+    */
+   protected ISEDLoopNode createLoopNode(ISEDDebugNode parent, 
+                                         SourceElement statement, 
+                                         PositionInfo posInfo) throws DebugException {
+      // Compute statement name
+      String name = statement.toString();
+      // Create new node and fill it
+      SEDMemoryLoopNode newNode = new SEDMemoryLoopNode(getDebugTarget(), parent, thread);
+      fillNode(newNode, name, posInfo);
+      // Try to update the position info with the position of the statement in JDT.
+      updateLocationFromAST(newNode);
+      return newNode;
+   }
+   
+   /**
+    * Creates a new {@link ISEDLoopCondition} for the given {@link SourceElement}.
+    * @param parent The parent {@link ISEDDebugNode}.
+    * @param statement The given {@link LoopStatement} to represent as {@link ISEDLoopCondition}.
+    * @param expression The {@link Expression} of the {@link LoopStatement}.
+    * @return The created {@link ISEDLoopCondition}.
+    * @throws DebugException Occurred Exception.
+    */
+   protected ISEDLoopCondition createLoopCondition(ISEDDebugNode parent, 
+                                                   LoopStatement statement,
+                                                   Expression expression) throws DebugException {
+      // Get the position
+      PositionInfo posInfo = expression.getPositionInfo();
+      // Compute statement name
+      String name = ObjectUtil.toString(expression);
+      // Create new node and fill it
+      SEDMemoryLoopCondition newNode = new SEDMemoryLoopCondition(getDebugTarget(), parent, thread);
+      fillNode(newNode, name, posInfo);
+      // Try to update the position info with the position of the statement in JDT.
+      updateLocationFromAST(newNode);
+      // Boolean literals have no position info, set the file of the statement without location in this case
+      if (newNode.getSourceName() == null) {
+         if (statement.getPositionInfo().getFileName() != null) {
+            File file = new File(statement.getPositionInfo().getFileName());
+            newNode.setSourceName(file.getName());
+         }
+      }
+      return newNode;
    }
    
    /**
@@ -905,6 +1051,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       KeYUtil.removeFromProofList(main, proof.env());
       // Clear cache
       keyNodeMapping.clear();
+      loopExpressionToLoopStatementMapping.clear();
       // Inform UI that the process is terminated
       super.terminate();
    }

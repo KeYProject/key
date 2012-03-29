@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget name="JML normal_behavior operation contract [id: -2147483648 / WhileFalseTest::main]" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread name="KeY Default Thread">
+         <sedMethodCall name="self.main();" lineNumber="-1" charStart="94" charEnd="98">
+            <sedStatement name="int result = 0;" lineNumber="-1" charStart="106" charEnd="121">
+               <sedLoopNode name="while ( false ) {   result_1++; }" lineNumber="-1" charStart="125" charEnd="160">
+                  <sedLoopCondition name="false" lineNumber="-1" charStart="-1" charEnd="-1">
+                     <sedBranchCondition name="if false false">
+                        <sedStatement name="return result_1;" lineNumber="-1" charStart="164" charEnd="178">
+                           <sedMethodReturn name="&lt;return of self.main();&gt;" lineNumber="-1" charStart="94" charEnd="98">
+                              <sedTermination name="&lt;end&gt;">
+                              </sedTermination>
+                           </sedMethodReturn>
+                        </sedStatement>
+                     </sedBranchCondition>
+                  </sedLoopCondition>
+               </sedLoopNode>
+            </sedStatement>
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>
