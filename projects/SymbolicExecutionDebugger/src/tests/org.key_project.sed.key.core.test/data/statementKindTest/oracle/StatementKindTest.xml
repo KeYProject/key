@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget name="JML normal_behavior operation contract [id: -2147483648 / StatementKindTest::main]" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread name="KeY Default Thread">
+         <sedMethodCall name="self.main();" lineNumber="-1" charStart="49" charEnd="53">
+            <sedStatement name="foo();" lineNumber="-1" charStart="79" charEnd="85">
+               <sedMethodCall name="self.foo();" lineNumber="-1" charStart="308" charEnd="311">
+                  <sedMethodReturn name="&lt;return of self.foo();&gt;" lineNumber="-1" charStart="308" charEnd="311">
+                     <sedStatement name="int i;" lineNumber="-1" charStart="108" charEnd="114">
+                        <sedStatement name="boolean b = true;" lineNumber="-1" charStart="118" charEnd="135">
+                           <sedStatement name="i=0;" lineNumber="-1" charStart="157" charEnd="163">
+                              <sedStatement name="i=i+1;" lineNumber="-1" charStart="167" charEnd="177">
+                                 <sedStatement name="i+=2;" lineNumber="-1" charStart="181" charEnd="188">
+                                    <sedStatement name="i++;" lineNumber="-1" charStart="192" charEnd="197">
+                                       <sedStatement name="i--;" lineNumber="-1" charStart="201" charEnd="206">
+                                          <sedStatement name="i-=2;" lineNumber="-1" charStart="210" charEnd="217">
+                                             <sedStatement name="i*=2;" lineNumber="-1" charStart="221" charEnd="228">
+                                                <sedStatement name="i/=2;" lineNumber="-1" charStart="232" charEnd="239">
+                                                   <sedStatement name="i%=4;" lineNumber="-1" charStart="243" charEnd="250">
+                                                      <sedStatement name="i=get42();" lineNumber="-1" charStart="254" charEnd="266">
+                                                         <sedMethodCall name="self.get42();" lineNumber="-1" charStart="336" charEnd="341">
+                                                            <sedStatement name="return 42;" lineNumber="-1" charStart="349" charEnd="359">
+                                                               <sedMethodReturn name="&lt;return of self.get42();&gt;" lineNumber="-1" charStart="336" charEnd="341">
+                                                                  <sedStatement name="i=(2+4)*2;" lineNumber="-1" charStart="270" charEnd="286">
+                                                                     <sedMethodReturn name="&lt;return of self.main();&gt;" lineNumber="-1" charStart="49" charEnd="53">
+                                                                        <sedTermination name="&lt;end&gt;">
+                                                                        </sedTermination>
+                                                                     </sedMethodReturn>
+                                                                  </sedStatement>
+                                                               </sedMethodReturn>
+                                                            </sedStatement>
+                                                         </sedMethodCall>
+                                                      </sedStatement>
+                                                   </sedStatement>
+                                                </sedStatement>
+                                             </sedStatement>
+                                          </sedStatement>
+                                       </sedStatement>
+                                    </sedStatement>
+                                 </sedStatement>
+                              </sedStatement>
+                           </sedStatement>
+                        </sedStatement>
+                     </sedStatement>
+                  </sedMethodReturn>
+               </sedMethodCall>
+            </sedStatement>
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>

@@ -824,10 +824,19 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
          Assert.isNotNull(toFill);
          toFill.setName(name);
          if (posInfo != null && posInfo != PositionInfo.UNDEFINED) {
-            // Set source start and end.
+            // Try to find the source file.
+            File file = null;
             if (posInfo.getFileName() != null) {
-               File file = new File(posInfo.getFileName());
+               file = new File(posInfo.getFileName());
+            }
+            else if (posInfo.getParentClass() != null) {
+               file = new File(posInfo.getParentClass());
+            }
+            // Check if a source file is available
+            if (file != null) {
+               // Store reference to source file
                toFill.setSourceName(file.getName());
+               // Set source location
                LineInformation[] infos = IOUtil.computeLineInformation(file);
                if (posInfo.getStartPosition() != null) {
                   int line = posInfo.getStartPosition().getLine() - 1;

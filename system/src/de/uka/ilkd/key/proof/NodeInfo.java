@@ -65,6 +65,7 @@ public class NodeInfo {
         symbolicExecNames.add(new Name("executeIntegerAssignment"));
         symbolicExecNames.add(new Name("simplify_object_creation"));
         symbolicExecNames.add(new Name("split_if"));
+        symbolicExecNames.add(new Name("simplify_expression"));
     }
 
 

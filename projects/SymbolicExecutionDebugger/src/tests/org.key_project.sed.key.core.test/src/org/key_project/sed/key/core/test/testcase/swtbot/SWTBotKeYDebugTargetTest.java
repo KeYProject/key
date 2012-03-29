@@ -95,6 +95,18 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     * Tests the suspend/resume functionality on the {@link IDebugTarget}.
     */
    @Test
+   public void testStatementKinds() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testStatementKinds",
+                     "data/statementKindTest/test",
+                     false,
+                     createMethodSelector("StatementKindTest", "main"),
+                     "data/statementKindTest/oracle/StatementKindTest.xml");
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
    public void testSwitchCase() throws Exception {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testSwitchCase",
                      "data/switchCaseTest/test",
