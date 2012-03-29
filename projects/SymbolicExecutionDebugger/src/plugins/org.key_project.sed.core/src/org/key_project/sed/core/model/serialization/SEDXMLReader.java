@@ -20,6 +20,8 @@ import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
 import org.key_project.sed.core.model.memory.SEDMemoryBranchNode;
 import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
 import org.key_project.sed.core.model.memory.SEDMemoryExceptionalTermination;
+import org.key_project.sed.core.model.memory.SEDMemoryLoopCondition;
+import org.key_project.sed.core.model.memory.SEDMemoryLoopNode;
 import org.key_project.sed.core.model.memory.SEDMemoryMethodCall;
 import org.key_project.sed.core.model.memory.SEDMemoryMethodReturn;
 import org.key_project.sed.core.model.memory.SEDMemoryStatement;
@@ -207,6 +209,12 @@ public class SEDXMLReader {
       else if (SEDXMLWriter.TAG_EXCEPTIONAL_TERMINATION.equals(qName)) {
          return createExceptionalTermination(target, parent, uri, localName, qName, attributes);
       }
+      else if (SEDXMLWriter.TAG_LOOP_CONDITION.equals(qName)) {
+         return createLoopCondition(target, parent, thread, uri, localName, qName, attributes);
+      }
+      else if (SEDXMLWriter.TAG_LOOP_NODE.equals(qName)) {
+         return createLoopNode(target, parent, thread, uri, localName, qName, attributes);
+      }
       else if (SEDXMLWriter.TAG_METHOD_CALL.equals(qName)) {
          return createMethodCall(target, parent, thread, uri, localName, qName, attributes);
       }
@@ -291,6 +299,44 @@ public class SEDXMLReader {
       SEDMemoryExceptionalTermination termination = new SEDMemoryExceptionalTermination(target, parent);
       fillDebugNode(termination, attributes);
       return termination;
+   }
+   
+   /**
+    * Creates a {@link SEDMemoryLoopCondition} instance for the content in the given tag.
+    * @param target The parent {@link ISEDDebugTarget} or {@code null} if not available.
+    * @param parent The parent {@link ISEDDebugNode} or {@code null} if not available.
+    * @param thread The parent {@link ISEDThread} or {@code null} if not available.
+    * @param uri The Namespace URI, or the empty string if the element has no Namespace URI or if Namespace processing is not being performed.
+    * @param localName  The local name (without prefix), or the empty string if Namespace processing is not being performed.
+    * @param qName The qualified name (with prefix), or the empty string if qualified names are not available.
+    * @param attributes The attributes attached to the element. If there are no attributes, it shall be an empty Attributes object.
+    * @return The created {@link SEDMemoryLoopCondition}.
+    * @throws SAXException Occurred Exception.
+    */   
+   protected SEDMemoryLoopCondition createLoopCondition(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) throws SAXException {
+      SEDMemoryLoopCondition methodReturn = new SEDMemoryLoopCondition(target, parent, thread);
+      fillDebugNode(methodReturn, attributes);
+      fillStackFrame(methodReturn, attributes);
+      return methodReturn;
+   }
+   
+   /**
+    * Creates a {@link SEDMemoryLoopNode} instance for the content in the given tag.
+    * @param target The parent {@link ISEDDebugTarget} or {@code null} if not available.
+    * @param parent The parent {@link ISEDDebugNode} or {@code null} if not available.
+    * @param thread The parent {@link ISEDThread} or {@code null} if not available.
+    * @param uri The Namespace URI, or the empty string if the element has no Namespace URI or if Namespace processing is not being performed.
+    * @param localName  The local name (without prefix), or the empty string if Namespace processing is not being performed.
+    * @param qName The qualified name (with prefix), or the empty string if qualified names are not available.
+    * @param attributes The attributes attached to the element. If there are no attributes, it shall be an empty Attributes object.
+    * @return The created {@link SEDMemoryLoopNode}.
+    * @throws SAXException Occurred Exception.
+    */   
+   protected SEDMemoryLoopNode createLoopNode(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) throws SAXException {
+      SEDMemoryLoopNode methodReturn = new SEDMemoryLoopNode(target, parent, thread);
+      fillDebugNode(methodReturn, attributes);
+      fillStackFrame(methodReturn, attributes);
+      return methodReturn;
    }
    
    /**

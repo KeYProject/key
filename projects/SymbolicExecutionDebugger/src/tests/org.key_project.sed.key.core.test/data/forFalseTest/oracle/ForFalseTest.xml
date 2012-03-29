@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget name="JML normal_behavior operation contract [id: -2147483648 / ForFalseTest::main]" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread name="KeY Default Thread">
+         <sedMethodCall name="self.main();" lineNumber="-1" charStart="92" charEnd="96">
+            <sedStatement name="int result = 0;" lineNumber="-1" charStart="104" charEnd="119">
+               <sedLoopNode name="for ( int i = 0; false; i++ ) {   result_1++; }" lineNumber="-1" charStart="123" charEnd="172">
+                  <sedStatement name="int i = 0;" lineNumber="-1" charStart="128" charEnd="137">
+                     <sedLoopCondition name="false" lineNumber="-1" charStart="-1" charEnd="-1">
+                        <sedBranchCondition name="if false false">
+                           <sedStatement name="return result_1;" lineNumber="-1" charStart="176" charEnd="190">
+                              <sedMethodReturn name="&lt;return of self.main();&gt;" lineNumber="-1" charStart="92" charEnd="96">
+                                 <sedTermination name="&lt;end&gt;">
+                                 </sedTermination>
+                              </sedMethodReturn>
+                           </sedStatement>
+                        </sedBranchCondition>
+                     </sedLoopCondition>
+                  </sedStatement>
+               </sedLoopNode>
+            </sedStatement>
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>

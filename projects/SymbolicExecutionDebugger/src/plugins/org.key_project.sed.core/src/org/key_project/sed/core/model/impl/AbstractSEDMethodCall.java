@@ -3,13 +3,12 @@ package org.key_project.sed.core.model.impl;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDMethodCall;
-import org.key_project.sed.core.model.ISEDStatement;
 import org.key_project.sed.core.model.ISEDThread;
 
 /**
  * Provides a basic implementation of {@link ISEDMethodCall}.
  * @author Martin Hentschel
- * @see ISEDStatement
+ * @see ISEDMethodCall
  */
 public abstract class AbstractSEDMethodCall extends AbstractSEDStackFrameCompatibleDebugNode implements ISEDMethodCall {
    /**

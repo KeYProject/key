@@ -13,6 +13,8 @@ import org.key_project.sed.core.model.ISEDBranchNode;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDExceptionalTermination;
+import org.key_project.sed.core.model.ISEDLoopCondition;
+import org.key_project.sed.core.model.ISEDLoopNode;
 import org.key_project.sed.core.model.ISEDMethodCall;
 import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.ISEDStatement;
@@ -77,6 +79,16 @@ public class SEDXMLWriter {
     * Tag name to store {@link ISEDExceptionalTermination}s.
     */
    public static final String TAG_EXCEPTIONAL_TERMINATION = "sedExceptionalTermination";
+
+   /**
+    * Tag name to store {@link ISEDLoopCondition}s.
+    */
+   public static final String TAG_LOOP_CONDITION = "sedLoopCondition";
+
+   /**
+    * Tag name to store {@link ISEDLoopNode}s.
+    */
+   public static final String TAG_LOOP_NODE = "sedLoopNode";
 
    /**
     * Tag name to store {@link ISEDMethodCall}s.
@@ -239,6 +251,12 @@ public class SEDXMLWriter {
       else if (node instanceof ISEDExceptionalTermination) {
          return toXML(level, (ISEDExceptionalTermination)node);
       }
+      else if (node instanceof ISEDLoopCondition) {
+         return toXML(level, (ISEDLoopCondition)node);
+      }
+      else if (node instanceof ISEDLoopNode) {
+         return toXML(level, (ISEDLoopNode)node);
+      }
       else if (node instanceof ISEDMethodCall) {
          return toXML(level, (ISEDMethodCall)node);
       }
@@ -295,6 +313,32 @@ public class SEDXMLWriter {
    protected String toXML(int level, ISEDExceptionalTermination exceptionalTermination) throws DebugException {
       StringBuffer sb = new StringBuffer();
       appendNode(level, TAG_EXCEPTIONAL_TERMINATION, exceptionalTermination, sb);
+      return sb.toString();
+   }
+   
+   /**
+    * Serializes the given {@link ISEDLoopCondition} into a {@link String}.
+    * @param level The level in the tree used for leading white space (formating).
+    * @param target The {@link ISEDLoopCondition} to serialize.
+    * @return The serialized {@link String}.
+    * @throws DebugException Occurred Exception.
+    */
+   protected String toXML(int level, ISEDLoopCondition loopCondition) throws DebugException {
+      StringBuffer sb = new StringBuffer();
+      appendNode(level, TAG_LOOP_CONDITION, loopCondition, sb);
+      return sb.toString();
+   }
+   
+   /**
+    * Serializes the given {@link ISEDLoopNode} into a {@link String}.
+    * @param level The level in the tree used for leading white space (formating).
+    * @param target The {@link ISEDLoopNode} to serialize.
+    * @return The serialized {@link String}.
+    * @throws DebugException Occurred Exception.
+    */
+   protected String toXML(int level, ISEDLoopNode loopNode) throws DebugException {
+      StringBuffer sb = new StringBuffer();
+      appendNode(level, TAG_LOOP_NODE, loopNode, sb);
       return sb.toString();
    }
    

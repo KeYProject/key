@@ -95,6 +95,163 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     * Tests the suspend/resume functionality on the {@link IDebugTarget}.
     */
    @Test
+   public void testForEach() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testForEach",
+                     "data/forEachTest/test",
+                     false,
+                     createMethodSelector("ForEachTest", "main"),
+                     "data/forEachTest/oracle/ForEachTest.xml");
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
+   public void testForFalse() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testForFalse",
+                     "data/forFalseTest/test",
+                     false,
+                     createMethodSelector("ForFalseTest", "main"),
+                     "data/forFalseTest/oracle/ForFalseTest.xml");
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
+   public void testFunctionalFor() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testFunctionalFor",
+                     "data/functionalForTest/test",
+                     false,
+                     createMethodSelector("FunctionalForTest", "main"),
+                     "data/functionalForTest/oracle/FunctionalForTest.xml");
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
+   public void testNestedFor() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testNestedFor",
+                     "data/nestedForTest/test",
+                     false,
+                     createMethodSelector("NestedForTest", "main"),
+                     "data/nestedForTest/oracle/NestedForTest.xml");
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
+   public void testFor() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testFor",
+                     "data/forTest/test",
+                     false,
+                     createMethodSelector("ForTest", "main"),
+                     "data/forTest/oracle/ForTest.xml");
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
+   public void testDoWhileFalse() throws Exception {
+      // TODO: Remove constants in BooleanLiteral and instantiate always a new true, false instance to have source code locations.
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testDoWhileFalse",
+                     "data/doWhileFalseTest/test",
+                     false,
+                     createMethodSelector("DoWhileFalseTest", "main"),
+                     "data/doWhileFalseTest/oracle/DoWhileFalseTest.xml");
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
+   public void testFunctionalDoWhile() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testFunctionalDoWhile",
+                     "data/functionalDoWhileTest/test",
+                     false,
+                     createMethodSelector("FunctionalDoWhileTest", "main"),
+                     "data/functionalDoWhileTest/oracle/FunctionalDoWhileTest.xml");
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
+   public void testNestedDoWhile() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testNestedDoWhile",
+                     "data/nestedDoWhileTest/test",
+                     false,
+                     createMethodSelector("NestedDoWhileTest", "main"),
+                     "data/nestedDoWhileTest/oracle/NestedDoWhileTest.xml");
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
+   public void testDoWhile() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testDoWhile",
+                     "data/doWhileTest/test",
+                     false,
+                     createMethodSelector("DoWhileTest", "main"),
+                     "data/doWhileTest/oracle/DoWhileTest.xml");
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
+   public void testWhileFalse() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testWhileFalse",
+                     "data/whileFalseTest/test",
+                     false,
+                     createMethodSelector("WhileFalseTest", "main"),
+                     "data/whileFalseTest/oracle/WhileFalseTest.xml");
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
+   public void testFunctionalWhile() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testFunctionalWhile",
+                     "data/functionalWhileTest/test",
+                     false,
+                     createMethodSelector("FunctionalWhileTest", "main"),
+                     "data/functionalWhileTest/oracle/FunctionalWhileTest.xml");
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
+   public void testNestedWhile() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testNestedWhile",
+                     "data/nestedWhileTest/test",
+                     false,
+                     createMethodSelector("NestedWhileTest", "mainNested"),
+                     "data/nestedWhileTest/oracle/NestedWhileTest.xml");
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
+   public void testWhile() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testWhile",
+                     "data/whileTest/test",
+                     false,
+                     createMethodSelector("WhileTest", "main"),
+                     "data/whileTest/oracle/WhileTest.xml");
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
    public void testStatementKinds() throws Exception {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testStatementKinds",
                      "data/statementKindTest/test",

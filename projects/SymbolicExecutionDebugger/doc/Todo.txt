@@ -2,6 +2,5 @@ TODOs for the execution tree
 ============================
 1. Handle switch case (Requires to simplify the proof tree)
 2. Handle recursive methods (StackOverflowException is thrown at the moment)
-3. Handle loops
-4. Handle exceptional termination (Requires to read variables)
-5. Show return values (Requires to read variables)
+3. Handle exceptional termination (Requires to read variables)
+4. Show return values (Requires to read variables)

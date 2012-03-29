@@ -3,12 +3,11 @@ package org.key_project.sed.core.model.impl;
 import org.key_project.sed.core.model.ISEDBranchCondition;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.ISEDStatement;
 
 /**
  * Provides a basic implementation of {@link ISEDBranchCondition}.
  * @author Martin Hentschel
- * @see ISEDStatement
+ * @see ISEDBranchCondition
  */
 public abstract class AbstractSEDBranchCondition extends AbstractSEDTerminateCompatibleDebugNode implements ISEDBranchCondition {
    /**
