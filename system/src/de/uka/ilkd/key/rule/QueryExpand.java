@@ -151,6 +151,7 @@ public class QueryExpand implements BuiltInRule {
                 tb.func(placeHolderResult), pio.posInTerm().iterator());
         g.changeFormula(new SequentFormula(newFormula), pio.topLevel());
 
+
         //register variables in namespace
         for (final ProgramVariable pv : args) { // add new program variables for arguments
             g.addProgramVariable(pv);
@@ -158,6 +159,9 @@ public class QueryExpand implements BuiltInRule {
         if (callee != null) { g.addProgramVariable(callee); }
         g.addProgramVariable(result);
         services.getNamespaces().functions().add(placeHolderResult);
+
+        // chrisg: keep the old query
+        g.addFormula(pio.constrainedFormula(), pio.isInAntec(),true);
 
         return newGoal;
     }
