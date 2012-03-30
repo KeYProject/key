@@ -16,7 +16,7 @@ import java.io.File;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.smt.AbstractSMTTranslator.Configuration;
 
-public interface SolverType {
+public interface SolverType extends PipeListener<SolverCommunication> {
 
         public SMTSolver createSolver(SMTProblem problem,
                         SolverListener listener, Services services);
@@ -60,7 +60,7 @@ public interface SolverType {
                 };
                 
                 public String getDefaultSolverParameters() {
-                    return "-smt -m %f";
+                    return "-in -smt2";
                 };
 
                 @Override
@@ -91,24 +91,23 @@ public interface SolverType {
                                 if (text.contains("unsat")) {
                                         return SMTSolverResult
                                                         .createValidResult(
-                                                                        text,
                                                                         getName());
                                 } else if (text.contains("sat")) {
                                         return SMTSolverResult
                                                         .createInvalidResult(
-                                                                        text,
+                                                                        
                                                                         getName());
                                 } else {
                                         return SMTSolverResult
                                                         .createUnknownResult(
-                                                                        text,
+                                                                        
                                                                         getName());
                                 }
                         } else if ((val == 112 && text.contains("unknown"))
                                         || val == 139) {
                                 // the result was unknown
                                 return SMTSolverResult.createUnknownResult(
-                                                text, getName());
+                                                 getName());
                         } else {
                                 // something went wrong
                                 throw new IllegalResultException("Code " + val
@@ -131,6 +130,46 @@ public interface SolverType {
                                         + "You can activate quantifier elimination by appending QUANT_FM=true to"
                                         + " the execution command.";
                 }
+
+                private static final int WAIT_FOR_RESULT = 0;
+                private static final int WAIT_FOR_DETAILS =1;
+                
+                
+				@Override
+				public void messageIncoming(Pipe<SolverCommunication> pipe, String message, int type) {
+					SolverCommunication sc = pipe.getSession();
+				switch (sc.getState()) {
+					case WAIT_FOR_RESULT:
+						 if(type == Pipe.ERROR_MESSAGE || message.startsWith("(error")){
+							 throw new RuntimeException("Error while executing Z3:\n" +message);
+						 }
+						 if(message.equals("unsat")){
+							 sc.setFinalResult(SMTSolverResult.createValidResult(getName()));
+							 pipe.sendMessage("(get-proof)\n");
+							 pipe.sendMessage("(exit)\n");
+							 sc.setState(WAIT_FOR_DETAILS);
+						 }
+						 if(message.equals("sat")){
+							 sc.setFinalResult(SMTSolverResult.createInvalidResult(getName()));
+							 pipe.sendMessage("(get-model)");
+							 pipe.sendMessage("(exit)\n");
+							 sc.setState(WAIT_FOR_DETAILS);
+						 }
+						 if(message.equals("unkown")){
+							 sc.setFinalResult(SMTSolverResult.createInvalidResult(getName()));
+						 }
+						break;
+						
+					case WAIT_FOR_DETAILS:
+						if(message.equals("success")){
+							pipe.stop();	
+						}else{
+							sc.addMessage(message);
+						}						
+						break;						
+					}
+					
+				}
 
         };
         static public final SolverType CVC3_SOLVER = new AbstractSolverType() {
@@ -180,17 +219,17 @@ public interface SolverType {
                                 if (text.startsWith("unsat\n")) {
                                         return SMTSolverResult
                                                         .createValidResult(
-                                                                        text,
+                                                                        
                                                                         getName());
                                 } else if (text.startsWith("sat\n")) {
                                         return SMTSolverResult
                                                         .createInvalidResult(
-                                                                        text,
+                                                                        
                                                                         getName());
                                 } else {
                                         return SMTSolverResult
                                                         .createUnknownResult(
-                                                                        text,
+                                                                        
                                                                         getName());
                                 }
                         } else {
@@ -198,6 +237,12 @@ public interface SolverType {
                                 throw new IllegalResultException(error);
                         }
                 }
+
+				@Override
+				public void messageIncoming(Pipe<SolverCommunication> pipe, String message, int type) {
+					// TODO Auto-generated method stub
+					
+				}
 
         };
         static public final SolverType YICES_SOLVER = new AbstractSolverType() {
@@ -248,17 +293,17 @@ public interface SolverType {
                                 if (text.startsWith("unsat\n")) {
                                         return SMTSolverResult
                                                         .createValidResult(
-                                                                        text,
+                                                                    
                                                                         getName());
                                 } else if (text.startsWith("sat\n")) {
                                         return SMTSolverResult
                                                         .createInvalidResult(
-                                                                        text,
+                                                                        
                                                                         getName());
                                 } else {
                                         return SMTSolverResult
                                                         .createUnknownResult(
-                                                                        text,
+                                                                       
                                                                         getName());
                                 }
 
@@ -267,6 +312,12 @@ public interface SolverType {
                         }
 
                 }
+
+				@Override
+				public void messageIncoming(Pipe<SolverCommunication> pipe, String message, int type) {
+					// TODO Auto-generated method stub
+					
+				}
 
         };
         static public final SolverType SIMPLIFY_SOLVER = new AbstractSolverType() {
@@ -295,7 +346,7 @@ public interface SolverType {
                 };
                 
                 public String getDefaultSolverParameters() {
-                    return "%f";
+                    return "-print";
                 };
 
          
@@ -316,12 +367,12 @@ public interface SolverType {
                                 if (meansValid(text)) {
                                         return SMTSolverResult
                                                         .createValidResult(
-                                                                        text,
+                                                                      
                                                                         getName());
                                 } else if (meansInvalid(text)) {
                                         return SMTSolverResult
                                                         .createInvalidResult(
-                                                                        text,
+                                                                       
                                                                         getName());
                                 } else if (meansBadInput(text)) {
                                         throw new IllegalResultException(text);
@@ -329,7 +380,7 @@ public interface SolverType {
                                 } else {
                                         return SMTSolverResult
                                                         .createUnknownResult(
-                                                                        text,
+                                                                       
                                                                         getName());
                                 }
                         } else {
@@ -386,6 +437,27 @@ public interface SolverType {
                         }
                         return toReturn;
                 }
+
+				@Override
+				public void messageIncoming(Pipe<SolverCommunication> pipe,String message, int type) {
+					SolverCommunication sc = pipe.getSession();
+				    if(message.indexOf("Bad input")>-1){
+						 sc.setFinalResult(SMTSolverResult.createInvalidResult(getName()));
+					}
+					
+					if(message.indexOf("Valid.")>-1){
+						 sc.setFinalResult(SMTSolverResult.createValidResult(getName()));						
+						 pipe.stop();
+					}
+					
+					if(message.indexOf("Invalid.")>-1){
+						 sc.setFinalResult(SMTSolverResult.createInvalidResult(getName()));
+						 
+						 pipe.stop();
+					}				
+					sc.addMessage(message);		
+					
+				}
         };
 
 }
@@ -480,6 +552,13 @@ abstract class AbstractSolverType implements SolverType {
             return solverCommand;
         }
         
+        
+        @Override
+        public void exceptionOccurred(Pipe<SolverCommunication> pipe,
+        	Throwable exception) {
+        	pipe.getSession().addException(exception);
+        
+        }
         
 
         public String toString() {

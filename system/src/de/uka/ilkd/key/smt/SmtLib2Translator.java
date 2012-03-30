@@ -117,7 +117,11 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
     	    SMTSettings settings){
     	StringBuffer result = new StringBuffer("(set-logic");
     	result.append(" "+settings.getLogic() +" )\n");
-    	result.append("(set-option :print-success true) ");
+    	result.append("(set-option :print-success true) \n");
+    	result.append("(set-option :produce-unsat-cores true)\n");
+    	result.append("(set-option :produce-models true)\n");
+    	result.append("(set-option :produce-proofs true)\n");
+    	
     
     	createSortDeclaration(types, result);
     	createFunctionDeclarations(result, predicates, predicateBlocks,functions);

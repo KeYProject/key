@@ -99,7 +99,7 @@ public class SMTProblem {
                 for (SMTSolver solver : solvers) {
                 	    if(solver.getFinalResult() == null){
                 	    	// do nothing
-                	    }else if (solver.getFinalResult().isValid() == ThreeValuedTruth.TRUE) {
+                	    }else if (solver.getFinalResult().isValid() == ThreeValuedTruth.VALID) {
                                 valid = solver.getFinalResult();
                         } else if (solver.getFinalResult().isValid() == ThreeValuedTruth.FALSIFIABLE) {
                                 invalid = solver.getFinalResult();

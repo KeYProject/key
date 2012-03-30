@@ -218,7 +218,8 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
 	/* End of adding part */
 	
 	toReturn.append(formula);
-	
+	//toReturn.append("\n\n\"");
+	//toReturn.append("\n\04");
 	return toReturn;
     }
 

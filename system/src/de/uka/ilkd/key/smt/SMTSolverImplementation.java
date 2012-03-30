@@ -40,7 +40,7 @@ interface SolverListener {
         void processUser(SMTSolver solver, SMTProblem problem);
 }
 
-final class SMTSolverImplementation implements SMTSolver, Runnable, PipeListener {
+final class SMTSolverImplementation implements SMTSolver, Runnable{
 
         private static int fileCounter = 0;
 
@@ -63,17 +63,19 @@ final class SMTSolverImplementation implements SMTSolver, Runnable, PipeListener
         private SolverListener listener;
 
         /** starts a external process and returns the result */
-        private ExternalProcessLauncher processLauncher = new ExternalProcessLauncher();
+        private ExternalProcessLauncher<SolverCommunication> processLauncher 
+        	= new ExternalProcessLauncher<SolverCommunication>(new SolverCommunication());
         /**
          * The services object is stored in order to have the possibility to
          * access it in every method
          */
         private Services services;
         /**
-         * The final result of the solver when applying it on the related
-         * problem
+         * The record of the communication between KeY and the given solver. If everything works fine,
+         * it also contains the final result.
          */
-        private SMTSolverResult finalResult = SMTSolverResult.NO_IDEA;
+        private SolverCommunication solverCommunication = SolverCommunication.EMPTY;
+      
 
         /**
          * This lock variable is responsible for the state variable
@@ -116,10 +118,8 @@ final class SMTSolverImplementation implements SMTSolver, Runnable, PipeListener
         
         private Collection<Throwable> exceptionsForTacletTranslation = new LinkedList<Throwable>();
 
-        private String solverOutput[] = null;
+ 
 
-        private static final String[] HEAD_LINES = { "Normal Output:\n\n",
-                        "\n\nError Output:\n\n", "\n\nExit Code: " };
 
         SMTSolverImplementation(SMTProblem problem, SolverListener listener,
                         Services services, SolverType myType) {
@@ -264,12 +264,15 @@ final class SMTSolverImplementation implements SMTSolver, Runnable, PipeListener
 
                 // start the external process.
                 try {
-                        solverOutput = processLauncher.launch(commands,problemString);
-                        this.finalResult = type
-                                        .interpretAnswer(
-                                                        solverOutput[ExternalProcessLauncher.RESULT],
-                                                        solverOutput[ExternalProcessLauncher.ERROR],
-                                                        Integer.parseInt(solverOutput[ExternalProcessLauncher.EXIT_CODE]));
+                        processLauncher.launch(commands,problemString,type);
+                        solverCommunication = processLauncher.getCommunication();
+                        if(solverCommunication.exceptionHasOccurred() && 
+                          !solverCommunication.resultHasBeenSet()){ 
+                        	// if the result has already been set, the exceptions 
+                        	// must have occurred while doing the remaining communication, which is not that important.
+                        	throw new AccumulatedException(solverCommunication.getExceptions());
+                        }
+                                      
                         // uncomment for testing
                         //Thread.sleep(5000);
                         // uncomment for testing
@@ -451,6 +454,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable, PipeListener
                         solverTimeout.cancel();
                 }
                 if (thread != null) {
+                		processLauncher.stop();
                         thread.interrupt();
                 }
 
@@ -459,7 +463,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable, PipeListener
         @Override
         public SMTSolverResult getFinalResult() {
 
-                return isRunning() ? null : finalResult;
+                return isRunning() ? null : solverCommunication.getFinalResult();
         }
 
         @Override
@@ -479,18 +483,14 @@ final class SMTSolverImplementation implements SMTSolver, Runnable, PipeListener
 
         @Override
         public String getSolverOutput() {
-                if (solverOutput == null) {
-                        return null;
-                }
-                String s = "";
-                int i = 0;
-
-                for (String temp : solverOutput) {
-                        s += i < HEAD_LINES.length ? HEAD_LINES[i] : "";
-                        s += temp;
-                        i++;
-                }
-                return s;
+         		String output = "";
+        		output+= "Result: "+ solverCommunication.getFinalResult().toString()+"\n\n";
+      	
+      
+        		for(String s : solverCommunication.getMessages()){
+        			output += s+"\n";
+        		}
+                return output;
         }
 
         @Override
@@ -499,12 +499,5 @@ final class SMTSolverImplementation implements SMTSolver, Runnable, PipeListener
                 return exceptionsForTacletTranslation;
         }
 
-		@Override
-		public void messageIncoming(Pipe pipe, String message, int type) {
-			if(message.indexOf("unsat")>-1){
-				pipe.sendMessgage(Character.toString((char)3));
-			}
-			System.out.println("Type "+type+": "+ message);			
-		}
 
 }

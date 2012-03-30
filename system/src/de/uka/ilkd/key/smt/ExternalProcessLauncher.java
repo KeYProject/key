@@ -10,96 +10,114 @@
 
 package de.uka.ilkd.key.smt;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
-public class ExternalProcessLauncher {
+public class ExternalProcessLauncher<T> {
     	public final static int RESULT = 0;
     	public final static int ERROR  = 1;
     	public final static int EXIT_CODE = 2;
         private Process process;
-        private Pipe pipe = new Pipe();
-    public ExternalProcessLauncher() {
-    	pipe.addListener(new PipeListener() {
-			
-			@Override
-			public void messageIncoming(Pipe pipe, String message, int type) {
-				System.out.println("Type "+type +": "+message);				
-			}
-		});
-    }
+        private ReentrantLock lockProcess = new ReentrantLock(true);
+        private final Pipe<T> pipe;
+        ExternalProcessLauncher(T session){
+        	pipe = new Pipe<T>(session);
+        }
 
-	public String[] launch(String [] command,String initialMessage) throws Throwable {
-	        int exitCode =0;
-	        String [] result= new String[3];
+
+	public void launch(final String [] command,String initialMessage, PipeListener<T> listener) throws Throwable {
 	     	try{
-	        ProcessBuilder builder = new ProcessBuilder();
-	        for(String cmd : command)
-	        System.out.print(cmd+" ");
-            	builder.command(command);
-               	process = builder.start();
-            pipe.start(process.getInputStream(),
-            		   process.getOutputStream(),
-            		   process.getErrorStream());
-      
-            pipe.sendMessgage(initialMessage+"\n");
-            exitCode = process.waitFor();
-            
-            result[ERROR] = read(process.getErrorStream());
-        
-            process.getErrorStream().close();   	
-               	
-	     	result[RESULT] = read(process.getInputStream());
-	     	process.getInputStream().close();
+	   
+	     		final ReentrantLock lock = new ReentrantLock(true);
+                final Condition cond = lock.newCondition();
+	     		lock.lock();
+                Thread thread = new Thread(new Runnable() {
+            		// This thread starts the process and waits until it has stopped.
+                	@Override
+                	public void run() {
 
-		
-	
-	    
-		result[EXIT_CODE] = Integer.toString(exitCode);	
+                		try {   
+                			lock.lock();
+                			ProcessBuilder builder = new ProcessBuilder();
+                			
+                			//builder.command("/home/benjamin/programs/simplify/test","-nosc");
+                			builder.command(command);
+                			
+                			process = builder.start();
+
+                		} catch(IOException e){
+                			throw new RuntimeException(e);
+                		}
+                		finally{
+                			cond.signalAll();
+                			lock.unlock();
+                		}
+                		try{
+                			process.waitFor();
+         
+                		}catch (InterruptedException e) {/*do nothing*/}
+                		System.out.println("Process finish");
+                		pipe.stop();
+                	
+                	}
+                });
+            // start the thread and wait until the thread has started the process. Then start the pipe.
+            thread.setDaemon(true);
+            thread.start();
+            cond.await();
+            
+            pipe.start(process.getInputStream(),
+            	       process.getOutputStream(),
+            		   process.getErrorStream(),
+            		   listener);
+    
+            
+            // send initial message: basically the smt problem.
+            pipe.sendMessage(initialMessage+"\n");
+  
+            // wait until the pipe 
+            pipe.waitForPipe();
 	     	}finally{
-	     	    if(process != null){
-	     	       process.destroy();
-	     	    }
-	     	}	     	
-		return result;			
+	     	  cleanUp();
+	     	}	     			
 	}
 	
-	private void startPipe(OutputStream output, InputStream input){
-		 InputStreamReader reader = new InputStreamReader(input);
-		
-		 try {
-	            char[] b = new char[1024];
-	            int read = 1;
-	            // As long as data is read; -1 means EOF
-	            while (read > -1) {
-	                // Read bytes into buffer
-	                read = reader.read(b);
-	                //System.out.println("read: " + new String(b));
-	                if (read > -1) {
-	                	System.out.print(b);
-	                }
-	            }
-	        } catch (Exception e) {
-	            // Something happened while reading or writing streams; pipe is broken
-	            throw new RuntimeException("Broken pipe", e);
-	        } finally {
-	            try {
-	                input.close();
-	            } catch (Exception e) {
-	            }
-	            try {
-	                output.close();
-	            } catch (Exception e) {
-	            }
-	        }
-	}
-	
+
+	/**
+	 * Call this method only after the pipe has been stopped. It is not thread safe!
+	 * @return
+	 */
+    T getCommunication(){
+    	return pipe.getSession();
+    }
 	
 	public void stop(){
-	    process.destroy();
+	    pipe.stop();
+	}
+	
+	public void cleanUp(){
+		try{
+			lockProcess.lock();
+			System.out.println("CLEAN UP");
+			if(process != null) {
+	 	       process.destroy();
+	 	       try {
+				process.getErrorStream().close();
+		 	    process.getInputStream().close();
+		 	    process.getOutputStream().close();
+	 	       } catch (IOException e) {
+	 	    	   throw new RuntimeException(e);
+	 	       }
+	 	       process = null;
+	     }
+	   }finally{
+		   lockProcess.unlock();
+	   }
 	}
 	
 	    /** Read the input until end of file and return contents in a
