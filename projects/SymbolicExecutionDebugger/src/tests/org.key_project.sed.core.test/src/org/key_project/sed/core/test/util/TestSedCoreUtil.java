@@ -847,6 +847,14 @@ public final class TestSedCoreUtil {
                   TestCase.assertTrue("Expected ISEDLoopNode on " + ((ISEDLoopNode)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEDLoopNode);
                   compareLoopNode((ISEDLoopNode)expectedChildren[i], (ISEDLoopNode)currentChildren[i], false);
                }
+               else if (expectedChildren[i] instanceof ISEDLoopCondition) {
+                  TestCase.assertTrue("Expected ISEDLoopCondition on " + ((ISEDLoopCondition)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEDLoopCondition);
+                  compareLoopCondition((ISEDLoopCondition)expectedChildren[i], (ISEDLoopCondition)currentChildren[i], false);
+               }
+               else if (expectedChildren[i] instanceof ISEDLoopNode) {
+                  TestCase.assertTrue("Expected ISEDLoopNode on " + ((ISEDLoopNode)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEDLoopNode);
+                  compareLoopNode((ISEDLoopNode)expectedChildren[i], (ISEDLoopNode)currentChildren[i], false);
+               }
                else if (expectedChildren[i] instanceof ISEDMethodCall) {
                   TestCase.assertTrue("Expected ISEDMethodCall on " + ((ISEDMethodCall)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEDMethodCall);
                   compareMethodCall((ISEDMethodCall)expectedChildren[i], (ISEDMethodCall)currentChildren[i], false);
