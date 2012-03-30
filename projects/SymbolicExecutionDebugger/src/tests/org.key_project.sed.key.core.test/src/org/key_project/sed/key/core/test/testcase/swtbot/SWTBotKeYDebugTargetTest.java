@@ -453,6 +453,44 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
    }
    
    /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
+   public void testFlatStatements() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testFlatStatements",
+                     "data/statements/test",
+                     false,
+                     createMethodSelector("FlatSteps", "doSomething", "I", "QString;", "Z"),
+                     "data/statements/oracle/FlatSteps.xml");
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget},
+    * but the {@link Proof} is already removed in KeY.
+    */
+   @Test
+   public void testFlatStatements_ProofIsNoLongerAvailableInKeY() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testFlatStatements_ProofIsNoLongerAvailableInKeY",
+                     "data/statements/test",
+                     true,
+                     createMethodSelector("FlatSteps", "doSomething", "I", "QString;", "Z"),
+                     "data/statements/oracle/FlatSteps.xml");
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
+   public void testRecursiveFibonacci10() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testRecursiveFibonacci10",
+                     "data/recursiveFibonacci/test",
+                     false,
+                     createMethodSelector("RecursiveFibonacci", "fibonacci10"),
+                     "data/recursiveFibonacci/oracle/RecursiveFibonacci.xml",
+                     20);
+   }
+   
+   /**
     * Tests the suspend/resume functionality on the {@link IDebugTarget} by
     * resuming the initial state, suspend the progress and finish it
     * with a second resume.
@@ -557,31 +595,6 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
    }
    
    /**
-    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
-    */
-   @Test
-   public void testFlatStatements() throws Exception {
-      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testFlatStatements",
-                     "data/statements/test",
-                     false,
-                     createMethodSelector("FlatSteps", "doSomething", "I", "QString;", "Z"),
-                     "data/statements/oracle/FlatSteps.xml");
-   }
-   
-   /**
-    * Tests the suspend/resume functionality on the {@link IDebugTarget},
-    * but the {@link Proof} is already removed in KeY.
-    */
-   @Test
-   public void testFlatStatements_ProofIsNoLongerAvailableInKeY() throws Exception {
-      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testFlatStatements_ProofIsNoLongerAvailableInKeY",
-                     "data/statements/test",
-                     true,
-                     createMethodSelector("FlatSteps", "doSomething", "I", "QString;", "Z"),
-                     "data/statements/oracle/FlatSteps.xml");
-   }
-   
-   /**
     * Utility class to select an {@link IMethod} in a given {@link IJavaProject}.
     * @author Martin Hentschel
     */
@@ -637,6 +650,33 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
                                  boolean clearProofListInKeYBeforeResume,
                                  IMethodSelector selector,
                                  String expectedModelPathInBundle) throws Exception {
+      assertSEDModel(projectName, pathInBundle, clearProofListInKeYBeforeResume, selector, expectedModelPathInBundle, 8);
+   }
+   
+   /**
+    * Executes the following test steps:
+    * <ol>
+    *    <li>Extract code from bundle to a Java project with the defined name in the workspace.</li>
+    *    <li>Select an {@link IMethod} to debug with the given {@link IMethodSelector}.</li>
+    *    <li>Launch selected {@link IMethod} with the Symbolic Execution Debugger based on KeY.</li>
+    *    <li>Make sure that the initial SED model ({@link ISEDDebugTarget}) is opened.</li>
+    *    <li>Resume the execution.</li>
+    *    <li>Make sure that the final SED model ({@link ISEDDebugTarget}) specified by the oracle file expectedModelPathInBundle is reached.</li>
+    * </ol>
+    * @param projectName The project name in the workspace.
+    * @param pathInBundle The path to the source code in the bundle to extract to the workspace project.
+    * @param clearProofListInKeYBeforeResume Clear proof list in KeY before resume?
+    * @param selector {@link IMethodSelector} to select an {@link IMethod} to launch.
+    * @param expectedModelPathInBundle Path to the oracle file in the bundle which defines the expected {@link ISEDDebugTarget} model.
+    * @param timeoutFactor The timeout factor used to increase {@link SWTBotPreferences#TIMEOUT}.
+    * @throws Exception Occurred Exception.
+    */
+   protected void assertSEDModel(String projectName,
+                                 String pathInBundle,
+                                 boolean clearProofListInKeYBeforeResume,
+                                 IMethodSelector selector,
+                                 String expectedModelPathInBundle,
+                                 int timeoutFactor) throws Exception {
       // Create bot
       SWTWorkbenchBot bot = new SWTWorkbenchBot();
       // Get current settings to restore them in finally block
@@ -655,7 +695,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
          IMethod method = selector.getMethod(project);
          String targetName = TestSEDKeyCoreUtil.computeTargetName(method);
          // Increase timeout
-         SWTBotPreferences.TIMEOUT = SWTBotPreferences.TIMEOUT * 8;
+         SWTBotPreferences.TIMEOUT = SWTBotPreferences.TIMEOUT * timeoutFactor;
          // Store original settings of KeY which requires that at least one proof was instantiated.
          if (!KeYUtil.isChoiceSettingInitialised()) {
             TestStarterCoreUtil.instantiateProofWithGeneratedContract(method);

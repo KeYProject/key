@@ -20,5 +20,6 @@ Export-Package: org.key_project.util.bean,
  org.key_project.util.eclipse.swt.dialog,
  org.key_project.util.eclipse.swt.viewer,
  org.key_project.util.java,
+ org.key_project.util.java.collection,
  org.key_project.util.java.thread,
  org.key_project.util.jdt

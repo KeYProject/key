@@ -26,9 +26,7 @@ import org.key_project.key4eclipse.starter.core.job.AbstractKeYMainWindowJob;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.ArrayUtil;
-import org.key_project.util.java.IFilter;
 import org.key_project.util.java.IOUtil;
-import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.SwingUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithException;
 import org.key_project.util.java.thread.AbstractRunnableWithResult;
@@ -37,7 +35,6 @@ import org.key_project.util.java.thread.IRunnableWithResult;
 import org.key_project.util.jdt.JDTUtil;
 
 import recoder.parser.JavaCharStream;
-
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.Main;
@@ -50,7 +47,6 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Node.NodeIterator;
 import de.uka.ilkd.key.proof.ProblemLoader;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -623,79 +619,6 @@ public final class KeYUtil {
           if (task != null) {
              main.getNotificationManager().addNotificationTask(task);
           }
-       }
-    }
-    
-    /**
-     * Finds a child node {@link Node} of the given {@link Node} which is 
-     * accepted by the given {@link IFilter}. The node itself is also included
-     * in the search.
-     * @param node The {@link Node} to start search from.
-     * @param filter The {@link IFilter} to select a node.
-     * @return The found {@link Node} or {@code null} if no {@link Node} was found.
-     */
-    public static Node findChild(Node node, IFilter<Node> filter) {
-       Node result = null;
-       if (node != null && filter != null) {
-          if (filter.select(node)) {
-             result =  node;
-          }
-          else {
-             NodeIterator iter = node.childrenIterator();
-             while (result == null && iter.hasNext()) {
-                result = findChild(iter.next(), filter);
-             }
-          }
-       }
-       return result;
-    }
-    
-    /**
-     * Finds a parent {@link Node} of the given {@link Node} which is 
-     * accepted by the given {@link IFilter}.
-     * @param node The {@link Node} to start search from.
-     * @param filter The {@link IFilter} to select a node.
-     * @return The found {@link Node} or {@code null} if no {@link Node} was found.
-     */
-    public static Node findParent(Node node, IFilter<Node> filter) {
-       if (node != null && filter != null) {
-          Node parent = node.parent();
-          if (parent != null) {
-             if (filter.select(parent)) {
-                return parent;
-             }
-             else {
-                return findParent(parent, filter);
-             }
-          }
-          else {
-             return null;
-          }
-       }
-       else {
-          return null;
-       }
-    }
-    
-    /**
-     * Makes sure that the given {@link Node} to check is a child of
-     * the possible parent {@link Node}.
-     * @param toCheck The child {@link Node}.
-     * @param possibleParent The expected parent {@link Node}.
-     * @return {@code true} parent relationship is correct, {@code false} parent relationship is not available.
-     */
-    public static boolean hasParent(Node toCheck, Node possibleParent) {
-       if (toCheck != null) {
-          Node parent = toCheck.parent();
-          if (ObjectUtil.equals(parent, possibleParent)) {
-             return true;
-          }
-          else {
-             return hasParent(parent, possibleParent);
-          }
-       }
-       else {
-          return false;
        }
     }
 

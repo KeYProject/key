@@ -2,8 +2,12 @@ package org.key_project.sed.key.core.model;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Deque;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.Assert;
@@ -56,6 +60,7 @@ import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.IOUtil.LineInformation;
 import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.StringUtil;
+import org.key_project.util.java.collection.DefaultEntry;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.gui.AutoModeListener;
@@ -80,10 +85,10 @@ import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Node.NodeIterator;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
+import de.uka.ilkd.key.proof.ProofVisitor;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
 /**
@@ -149,9 +154,16 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
    };
    
    /**
-    * Maps the KeY instances to the debug API instances.
+    * Maps a {@link Node} of KeY's proof tree to his debug model representation
+    * if it is available.
     */
    private Map<Node, ISEDDebugNode> keyNodeMapping;
+   
+   /**
+    * Maps a loop condition of a {@link Node} of KeY's proof tree to his 
+    * debug model representation ({@link ISEDLoopCondition}) if it is available.
+    */
+   private Map<Node, ISEDLoopCondition> keyNodeLoopConditionMapping;
    
    /**
     * <p>
@@ -170,6 +182,11 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
    private Map<EqualsHashCodeResetter<Expression>, LoopStatement> loopExpressionToLoopStatementMapping;
    
    /**
+    * Represents the method call stack of the current branch in KeY's proof tree.
+    */
+   private LinkedList<Node> methodCallStack;
+   
+   /**
     * Constructor.
     * @param launch The parent {@link ILaunch}.
     * @param proof The {@link Proof} in KeY to treat.
@@ -186,7 +203,9 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       thread.setName(DEFAULT_THREAD_NAME);
       addSymbolicThread(thread);
       keyNodeMapping = new HashMap<Node, ISEDDebugNode>();
+      keyNodeLoopConditionMapping = new HashMap<Node, ISEDLoopCondition>();
       loopExpressionToLoopStatementMapping = new HashMap<EqualsHashCodeResetter<Expression>, LoopStatement>();
+      methodCallStack = new LinkedList<Node>();
       // Observe frozen state of KeY Main Frame
       MainWindow.getInstance().getMediator().addAutoModeListener(autoModeListener);
    }
@@ -238,17 +257,125 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
    }
 
    /**
-    * Analyzes the given Proof by printing the executed code in the console.
+    * Analyzes the given {@link Proof} and his contained proof tree by
+    * filling the contained default {@link ISEDThread} of this {@link ISEDDebugTarget}
+    * with {@link ISEDDebugNode}s which are instantiated if a {@link Node}
+    * in KeY's proof tree applies a rule of symbolic execution.
     * @param proof The {@link Proof} to analyze.
     * @throws DebugException Occurred Exception.
     */
    protected void analyzeProof(Proof proof) throws DebugException {
-      analyzeNode(proof.root(), thread);
+      AnalyzerProofVisitor visitor = new AnalyzerProofVisitor();
+      proof.breadthFirstSearch(proof.root(), visitor); // This visitor pattern must be used because a recursive iteration causes StackOverflowErrors if the proof tree in KeY is to deep (e.g. simple list with 2000 elements during computation of fibonacci(7)
+      visitor.completeTree();
+   }
+   
+   /**
+    * This {@link ProofVisitor} is used to transfer the proof tree in KeY
+    * into {@link ISEDDebugNode}s which are used in the symbolic debugger.
+    * @author Martin Hentschel
+    */
+   private class AnalyzerProofVisitor implements ProofVisitor {
+      /**
+       * Maps the {@link Node} in KeY's proof tree to the {@link ISEDDebugNode} of the debugger where the {@link Node}s children should be added to.
+       */
+      private Map<Node, ISEDDebugNode> addToMapping = new HashMap<Node, ISEDDebugNode>();
+
+      /**
+       * Branch conditions ({@link ISEDBranchCondition}) are only applied to the 
+       * debug model if they have at least one child. For this reason they are
+       * added to the model in {@link #completeTree()} after the whole proof
+       * tree of KeY was analyzed via {@link #visit(Proof, Node)}. The adding
+       * of {@link ISEDBranchCondition} to the model must be done from leaf nodes
+       * to the root, but in correct child order. This {@link Deque} forms
+       * the order in that the {@link ISEDBranchCondition} must be applied.
+       * The contained {@link List} makes sure that the children are applied
+       * in the same order as they occur in KeY's proof tree.
+       */
+      private Deque<Entry<ISEDDebugNode, List<ISEDBranchCondition>>> branchConditionsStack = new LinkedList<Entry<ISEDDebugNode,List<ISEDBranchCondition>>>();
+
+      /**
+       * This utility {@link Map} helps to find a {@link List} in {@link #branchConditionsStack}
+       * for the given parent node to that elements in the {@link List} should be added.
+       */
+      private Map<ISEDDebugNode, List<ISEDBranchCondition>> parentToBranchConditionMapping = new HashMap<ISEDDebugNode, List<ISEDBranchCondition>>();
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void visit(Proof proof, Node visitedNode) {
+         try {
+            // Find the parent node (ISEDDebugNode) to that the debug model representation of the given KeY's proof tree node should be added.
+            ISEDDebugNode parentToAddTo;
+            Node parent = visitedNode.parent(); 
+            if (parent != null) {
+               parentToAddTo = addToMapping.get(parent);
+            }
+            else {
+               parentToAddTo = thread;
+            }
+            // Check if the current node has a branch condition which should be added to the debug model
+            boolean hasMultipleBranches = parent != null && parent.childrenCount() >= 2;
+            if (hasMultipleBranches && // Filter out branch conditions which don't split the tree. E.g. The number of applied rules during one step simplification
+                !(parentToAddTo instanceof ISEDThread) && // Ignore branch conditions before starting with code execution
+                hasBranchCondition(visitedNode) &&
+                !isInImplicitMethod(visitedNode)) { // Check if the child has a branch condition
+               if (!visitedNode.isClosed()) { // Filter out branches that are closed
+                  // Create branch condition
+                  ISEDBranchCondition condition = createBranchConditionNode(parentToAddTo, visitedNode.getNodeInfo());
+                  // Add branch condition to the branch condition attributes for later adding to the proof tree. This is required for instance to filter out branches after the symbolic execution has finished.
+                  List<ISEDBranchCondition> list = parentToBranchConditionMapping.get(parentToAddTo);
+                  if (list == null) {
+                     list = new LinkedList<ISEDBranchCondition>();
+                     branchConditionsStack.addFirst(new DefaultEntry<ISEDDebugNode, List<ISEDBranchCondition>>(parentToAddTo, list));
+                     parentToBranchConditionMapping.put(parentToAddTo, list);
+                  }
+                  list.add(condition);
+                  // Transform the current node into a debug node if possible
+                  parentToAddTo = analyzeNode(visitedNode, condition);
+                  addToMapping.put(visitedNode, parentToAddTo);
+               }
+            }
+            else {
+               // No branch condition, transform the current node into a debug node if possible
+               parentToAddTo = analyzeNode(visitedNode, parentToAddTo);
+               addToMapping.put(visitedNode, parentToAddTo);
+            }
+         }
+         catch (Exception e) {
+            LogUtil.getLogger().logError(e);
+         }
+      }
+      
+      /**
+       * <p>
+       * Completes the debug model after all {@link Node}s were visited
+       * in {@link #visit(Proof, Node)}. The task of this method is to add
+       * {@link ISEDBranchCondition} to the model if they have at least one child.
+       * </p>
+       * <p>
+       * Fore more details have a look at the documentation of {@link #branchConditionsStack}.
+       * </p>
+       * @throws DebugException Occurred Exception
+       */
+      public void completeTree() throws DebugException {
+          for (Entry<ISEDDebugNode, List<ISEDBranchCondition>> entry : branchConditionsStack) {
+             for (ISEDBranchCondition condition : entry.getValue()) {
+                if (!ArrayUtil.isEmpty(condition.getChildren())) {
+                   addChild(entry.getKey(), condition);
+                }
+             }
+         }
+      }
    }
 
    /**
     * <p>
-    * Analyzes the given Proof by printing the executed code in the console.
+    * Analyzes the given {@link Proof} and his contained proof tree by
+    * filling the contained default {@link ISEDThread} of this {@link ISEDDebugTarget}
+    * with {@link ISEDDebugNode}s which are instantiated if a {@link Node}
+    * in KeY's proof tree applies a rule of symbolic execution.
     * </p>
     * <p>
     * <b>Attention :</b> A correct pruning requires at the moment that
@@ -257,20 +384,23 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
     * in file {@code javaRules.key} by uncommenting {@code \add (!(#v=null) & lt(#se, length(#v)) & geq(#se,0) & arrayStoreValid(#v, #se0)==>)}. 
     * </p>
     * @param node The {@link Node} to analyze.
-    * @param parentToAddTo The parent {@link ISEDDebugNode} to add new children to.
+    * @param parentToAddTo The parent {@link ISEDDebugNode} to add the created debug model representation ({@link ISEDDebugNode}) of the given {@link Node} to.
+    * @return The {@link ISEDDebugNode} to which children of the current {@link Node} should be added. If no debug model representation was created the return value is identical to the given one (parentToAddTo).
     * @throws DebugException Occurred Exception.
     */
-   protected void analyzeNode(Node node, ISEDDebugNode parentToAddTo) throws DebugException {
+   protected ISEDDebugNode analyzeNode(Node node, ISEDDebugNode parentToAddTo) throws DebugException {
       // Analyze node
       if (!node.isClosed()) { // Prune closed branches because they are invalid
-         // Get required informations
+         // Get required information
          NodeInfo info = node.getNodeInfo();
          SourceElement statement = info.getActiveStatement();
+         // Update call stack
+         updateCallStack(node, info, statement);
          // Check if the node is already contained in the symbolic execution tree
          ISEDDebugNode debugNode = keyNodeMapping.get(node);
          if (debugNode == null) {
             // Try to create a new node
-            debugNode = createNodeForStatement(parentToAddTo, node, info, statement);
+            debugNode = createDebugModelRepresentation(parentToAddTo, node, info, statement);
             // Check if a new node was created
             if (debugNode != null) {
                // Add new node to symbolic execution tree
@@ -278,6 +408,9 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
                keyNodeMapping.put(node, debugNode);
                parentToAddTo = debugNode;
             }
+         }
+         else {
+            parentToAddTo = debugNode;
          }
          // Check if loop condition is available
          if (hasLoopCondition(node, statement)) {
@@ -295,37 +428,89 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
             if (loop.getPositionInfo() != PositionInfo.UNDEFINED &&
                 !isDoWhileLoopCondition(node, statement) && 
                 !isForLoopCondition(node, statement)) { // do while and for loops exists only in the first iteration where the loop condition is not evaluated. They are transfered into while loops in later proof nodes. 
-               ISEDLoopCondition condition = createLoopCondition(parentToAddTo, loop, expression);
-               addChild(parentToAddTo, condition);
+               ISEDLoopCondition condition = keyNodeLoopConditionMapping.get(node);
+               if (condition == null) {
+                  condition = createLoopCondition(parentToAddTo, loop, expression);
+                  addChild(parentToAddTo, condition);
+                  keyNodeLoopConditionMapping.put(node, condition);
+               }
                parentToAddTo = condition;
             }
          }
-         // Iterate over children
-         boolean hasMultipleBranches = node.childrenCount() >= 2;
-         NodeIterator children = node.childrenIterator();
-         while (children.hasNext()) {
-            Node child = children.next();
-            // Check if branch condition is available
-            if (hasMultipleBranches && // Filter out branch conditions which don't split the tree. E.g. The number of applied rules during one step simplification
-                !(parentToAddTo instanceof ISEDThread) && // Ignore branch conditions before starting with code execution
-                hasBranchCondition(child) &&
-                !isInImplicitMethod(child)) { // Check if the child has a branch condition
-               if (!child.isClosed()) { // Filter out branches that are closed
-                  // Create branch condition
-                  ISEDBranchCondition condition = createBranchConditionNode(parentToAddTo, child.getNodeInfo());
-                  analyzeNode(child, condition);
-                  // Add branch condition and his sub tree only to parent if it contains other elements => Ignore empty branch conditions without children
-                  if (!ArrayUtil.isEmpty(condition.getChildren())) {
-                     addChild(parentToAddTo, condition);
-                  }
+      }
+      return parentToAddTo;
+   }
+
+   /**
+    * Updates the call stack ({@link #methodCallStack}) if the given {@link Node}
+    * in KeY's proof tree is a method call.
+    * @param node The current {@link Node} in the proof tree of KeY.
+    * @param info The {@link NodeInfo}.
+    * @param statement The statement ({@link SourceElement}).
+    */
+   protected void updateCallStack(Node node, NodeInfo info, SourceElement statement) {
+      if (isMethodCallNode(node, info, statement, true)) {
+         // Remove outdated methods from call stack
+         int currentLevel = computeStackSize(node);
+         while (methodCallStack.size() > currentLevel) {
+            methodCallStack.removeLast();
+         }
+         // Add new node to call stack.
+         methodCallStack.addLast(node);
+      }
+   }
+
+   /**
+    * Creates a new debug model representation ({@link ISEDDebugNode}) 
+    * if possible for the given {@link Node} in KeY's proof tree.
+    * @param parent The parent {@link ISEDDebugNode}.
+    * @param node The {@link Node} in the proof tree of KeY.
+    * @param info The {@link NodeInfo}.
+    * @param statement The actual statement ({@link SourceElement}).
+    * @return The created {@link ISEDDebugNode} or {@code null} if the {@link Node} should be ignored in the symbolic execution debugger (SED).
+    * @throws DebugException Occurred Exception.
+    */
+   protected ISEDDebugNode createDebugModelRepresentation(ISEDDebugNode parent,
+                                                          Node node, 
+                                                          NodeInfo info, 
+                                                          SourceElement statement) throws DebugException {
+      ISEDDebugNode result = null;
+      // Make sure that a statement (SourceElement) is available.
+      if (statement != null) {
+         // Get position information
+         PositionInfo posInfo = statement.getPositionInfo();
+         // Determine the node representation and create it if one is available
+         if (isMethodCallNode(node, info, statement)) {
+            Assert.isTrue(statement instanceof MethodBodyStatement, "isMethodCallNode has to verify that the statement is an instance of MethodBodyStatement");
+            MethodBodyStatement mbs = (MethodBodyStatement)statement;
+            result = createMethodCallNode(node, parent, mbs, posInfo);
+         }
+         else if (isMethodReturnNode(node, info, statement, posInfo)) {
+            // Find the Node in the proof tree of KeY for that this Node is the return
+            Node callNode = findMethodCallNode(node);
+            if (callNode != null) {
+               // Find the call Node representation in SED, if not available ignore it.
+               ISEDDebugNode callSEDNode = keyNodeMapping.get(callNode);
+               if (callSEDNode != null) {
+                  Assert.isTrue(callSEDNode instanceof ISEDMethodCall);
+                  result = createMethodReturnNode(parent, node, statement, posInfo, callNode, (ISEDMethodCall)callSEDNode);
                }
             }
-            else {
-               // Add node directly
-               analyzeNode(child, parentToAddTo);
-            }
+         }
+         else if (isTerminationNode(node, info, statement, posInfo)) {
+            result = createTerminationNode(parent, statement, posInfo);
+         }
+         else if (isBranchNode(node, info, statement, posInfo)) {
+            result = createBranchNode(parent, statement, posInfo);
+         }
+         else if (isLoopNode(node, info, statement, posInfo)) {
+            result = createLoopNode(parent, statement, posInfo);
+         }
+         else if (isStatementNode(node, info, statement, posInfo)) {
+            result = createStatementNode(parent, statement, posInfo);
          }
       }
+      return result;
    }
 
    /**
@@ -399,59 +584,6 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       newNode.setName(name);
       return newNode;
    }
-
-   /**
-    * Creates a new {@link ISEDDebugNode} if possible for the given {@link Node}
-    * in the proof tree.
-    * @param parent The parent {@link ISEDDebugNode}.
-    * @param node The {@link Node} in the proof tree of KeY.
-    * @param info The {@link NodeInfo}.
-    * @param statement The actual statement ({@link SourceElement}).
-    * @return The created {@link ISEDDebugNode} or {@code null} if the {@link Node} should be ignored in the symbolic execution debugger (SED).
-    * @throws DebugException Occurred Exception.
-    */
-   protected ISEDDebugNode createNodeForStatement(ISEDDebugNode parent,
-                                                  Node node, 
-                                                  NodeInfo info, 
-                                                  SourceElement statement) throws DebugException {
-      ISEDDebugNode result = null;
-      // Make sure that a statement (SourceElement) is available.
-      if (statement != null) {
-         // Get position information
-         PositionInfo posInfo = statement.getPositionInfo();
-         // Determine the node representation and create it if one is available
-         if (isMethodCallNode(node, info, statement, posInfo)) {
-            Assert.isTrue(statement instanceof MethodBodyStatement, "isMethodCallNode has to verify that the statement is an instance of MethodBodyStatement");
-            MethodBodyStatement mbs = (MethodBodyStatement)statement;
-            result = createMethodCallNode(parent, mbs, posInfo);
-         }
-         else if (isMethodReturnNode(node, info, statement, posInfo)) {
-            // Find the Node in the proof tree of KeY for that this Node is the return
-            Node callNode = findMethodCallNode(node);
-            if (callNode != null) {
-               // Find the call Node representation in SED, if not available ignore it.
-               ISEDDebugNode callSEDNode = keyNodeMapping.get(callNode);
-               if (callSEDNode != null) {
-                  Assert.isTrue(callSEDNode instanceof ISEDMethodCall);
-                  result = createMethodReturnNode(parent, node, statement, posInfo, callNode, (ISEDMethodCall)callSEDNode);
-               }
-            }
-         }
-         else if (isTerminationNode(node, info, statement, posInfo)) {
-            result = createTerminationNode(parent, statement, posInfo);
-         }
-         else if (isBranchNode(node, info, statement, posInfo)) {
-            result = createBranchNode(parent, statement, posInfo);
-         }
-         else if (isLoopNode(node, info, statement, posInfo)) {
-            result = createLoopNode(parent, statement, posInfo);
-         }
-         else if (isStatementNode(node, info, statement, posInfo)) {
-            result = createStatementNode(parent, statement, posInfo);
-         }
-      }
-      return result;
-   }
    
    /**
     * Checks if the given node should be represented as termination.
@@ -505,23 +637,8 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
    protected Node findMethodCallNode(Node currentNode) {
       // Compute the stack frame size before the method is called
       final int returnStackSize = computeStackSize(currentNode) - 1;
-      // Search method body expand node with the same stack frame size
-      Node callNode = KeYUtil.findParent(currentNode, new IFilter<Node>() {
-         @Override
-         public boolean select(Node element) {
-            if (element != null) {
-               NodeInfo info = element.getNodeInfo();
-               SourceElement statement = info != null ? info.getActiveStatement() : null;
-               PositionInfo posInfo = statement != null ? statement.getPositionInfo() : null;
-               return isMethodCallNode(element, info, statement, posInfo, true) && // Implicit methods must be included because otherwise they are scipped and a wrong explicit method is returned.
-                      computeStackSize(element) == returnStackSize;
-            }
-            else {
-               return false;
-            }
-         }
-      });
-      return callNode;
+      // Return the method from the call stack
+      return methodCallStack.get(returnStackSize);
    }
 
    /**
@@ -665,11 +782,10 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
     * @param node The current {@link Node} in the proof tree of KeY.
     * @param info The {@link NodeInfo}.
     * @param statement The statement ({@link SourceElement}).
-    * @param posInfo The {@link PositionInfo}.
     * @return {@code true} represent node as method call, {@code false} represent node as something else. 
     */
-   protected boolean isMethodCallNode(Node node, NodeInfo info, SourceElement statement, PositionInfo posInfo) {
-      return isMethodCallNode(node, info, statement, posInfo, false);
+   protected boolean isMethodCallNode(Node node, NodeInfo info, SourceElement statement) {
+      return isMethodCallNode(node, info, statement, false);
    }
    
    /**
@@ -677,11 +793,10 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
     * @param node The current {@link Node} in the proof tree of KeY.
     * @param info The {@link NodeInfo}.
     * @param statement The statement ({@link SourceElement}).
-    * @param posInfo The {@link PositionInfo}.
     * @param allowImpliciteMethods {@code true} implicit methods are included, {@code false} implicit methods are outfiltered.
     * @return {@code true} represent node as method call, {@code false} represent node as something else. 
     */
-   protected boolean isMethodCallNode(Node node, NodeInfo info, SourceElement statement, PositionInfo posInfo, boolean allowImpliciteMethods) {
+   protected boolean isMethodCallNode(Node node, NodeInfo info, SourceElement statement, boolean allowImpliciteMethods) {
       if (statement instanceof MethodBodyStatement) {
          if (allowImpliciteMethods) {
             return true;
@@ -699,13 +814,15 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
    
    /**
     * Creates a new {@link ISEDMethodCall} for the given {@link MethodBodyStatement}.
+    * @param node The current {@link Node} in KeY's proof tree.
     * @param parent The parent {@link ISEDDebugNode}.
     * @param statement The given {@link MethodBodyStatement} to represent as {@link ISEDMethodCall}.
     * @param posInfo The {@link PositionInfo} to use.
     * @return The created {@link ISEDMethodCall}.
     * @throws DebugException Occurred Exception.
     */
-   protected ISEDMethodCall createMethodCallNode(ISEDDebugNode parent, 
+   protected ISEDMethodCall createMethodCallNode(Node node,
+                                                 ISEDDebugNode parent, 
                                                  MethodBodyStatement mbs, 
                                                  PositionInfo posInfo) throws DebugException {
       // Compute method name
@@ -1051,7 +1168,9 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       KeYUtil.removeFromProofList(main, proof.env());
       // Clear cache
       keyNodeMapping.clear();
+      keyNodeLoopConditionMapping.clear();
       loopExpressionToLoopStatementMapping.clear();
+      methodCallStack.clear();
       // Inform UI that the process is terminated
       super.terminate();
    }
@@ -1090,14 +1209,13 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
    protected void handleAutoModeStopped(ProofEvent e) {
       try {
          if (e.getSource() == proof) {
-            // Analyze proof
             analyzeProof(proof);
-            // Inform UI that the process is suspended
             super.suspend();
          }
       }
-      catch (DebugException exception) {
+      catch (Exception exception) {
          LogUtil.getLogger().logError(exception);
+         LogUtil.getLogger().openErrorDialog(null, exception);
       }
    }
 }

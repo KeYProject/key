@@ -387,4 +387,86 @@ public class ArrayUtilTest extends TestCase {
            assertEquals("Comparator is null.", e.getMessage());
        }
     }
+    
+    /**
+     * Tests {@link ArrayUtil#indexOf(Object[], Object)}
+     */
+    @Test
+    public void testIndexOf() {
+       String[] array = {"A", "B", "C"};
+       assertEquals(-1, ArrayUtil.indexOf(array, null));
+       assertEquals(-1, ArrayUtil.indexOf(null, "A"));
+       assertEquals(0, ArrayUtil.indexOf(array, "A"));
+       assertEquals(1, ArrayUtil.indexOf(array, "B"));
+       assertEquals(2, ArrayUtil.indexOf(array, "C"));
+       assertEquals(-1, ArrayUtil.indexOf(array, "D"));
+       String[] arrayWithNull = {"A", "B", null, "D"};
+       assertEquals(2, ArrayUtil.indexOf(arrayWithNull, null));
+       assertEquals(-1, ArrayUtil.indexOf(null, "A"));
+       assertEquals(0, ArrayUtil.indexOf(arrayWithNull, "A"));
+       assertEquals(1, ArrayUtil.indexOf(arrayWithNull, "B"));
+       assertEquals(-1, ArrayUtil.indexOf(arrayWithNull, "C"));
+       assertEquals(3, ArrayUtil.indexOf(arrayWithNull, "D"));
+       assertEquals(-1, ArrayUtil.indexOf(arrayWithNull, "E"));
+       String[] arrayWithDoubleElements = {"B", "A", "C", "B", "C"};
+       assertEquals(-1, ArrayUtil.indexOf(arrayWithDoubleElements, null));
+       assertEquals(-1, ArrayUtil.indexOf(null, "A"));
+       assertEquals(1, ArrayUtil.indexOf(arrayWithDoubleElements, "A"));
+       assertEquals(0, ArrayUtil.indexOf(arrayWithDoubleElements, "B"));
+       assertEquals(2, ArrayUtil.indexOf(arrayWithDoubleElements, "C"));
+       assertEquals(-1, ArrayUtil.indexOf(arrayWithDoubleElements, "D"));
+    }
+    
+    /**
+     * Tests {@link ArrayUtil#indexOf(Object[], Object, Comparator)}
+     */
+    @Test
+    public void testIndexOf_Comparator() {
+       Comparator<String> comparator = new Comparator<String>() {
+          @Override
+          public int compare(String o1, String o2) {
+             if ("X".equals(o1) || "X".equals(o2)) {
+                 return 0; // D is always true
+             }
+             else if ("B".equals(o1) && "B".equals(o2)) {
+                 return Integer.MAX_VALUE; // B is false
+             }
+             else {
+                 return ObjectUtil.equals(o1, o2) ? 0 : 1;
+             }
+          }
+       };
+       String[] array = {"A", "B", "C"};
+       assertEquals(-1, ArrayUtil.indexOf(array, null, comparator));
+       assertEquals(-1, ArrayUtil.indexOf(null, "A", comparator));
+       assertEquals(0, ArrayUtil.indexOf(array, "A", comparator));
+       assertEquals(-1, ArrayUtil.indexOf(array, "B", comparator));
+       assertEquals(2, ArrayUtil.indexOf(array, "C", comparator));
+       assertEquals(-1, ArrayUtil.indexOf(array, "D", comparator));
+       assertEquals(0, ArrayUtil.indexOf(array, "X", comparator));
+       String[] arrayWithNull = {"A", "B", null, "D"};
+       assertEquals(2, ArrayUtil.indexOf(arrayWithNull, null, comparator));
+       assertEquals(-1, ArrayUtil.indexOf(null, "A", comparator));
+       assertEquals(0, ArrayUtil.indexOf(arrayWithNull, "A", comparator));
+       assertEquals(-1, ArrayUtil.indexOf(arrayWithNull, "B", comparator));
+       assertEquals(-1, ArrayUtil.indexOf(arrayWithNull, "C", comparator));
+       assertEquals(3, ArrayUtil.indexOf(arrayWithNull, "D", comparator));
+       assertEquals(-1, ArrayUtil.indexOf(arrayWithNull, "E", comparator));
+       assertEquals(0, ArrayUtil.indexOf(arrayWithNull, "X", comparator));
+       String[] arrayWithDoubleElements = {"B", "A", "C", "B", "C"};
+       assertEquals(-1, ArrayUtil.indexOf(arrayWithDoubleElements, null, comparator));
+       assertEquals(-1, ArrayUtil.indexOf(null, "A", comparator));
+       assertEquals(1, ArrayUtil.indexOf(arrayWithDoubleElements, "A", comparator));
+       assertEquals(-1, ArrayUtil.indexOf(arrayWithDoubleElements, "B", comparator));
+       assertEquals(2, ArrayUtil.indexOf(arrayWithDoubleElements, "C", comparator));
+       assertEquals(-1, ArrayUtil.indexOf(arrayWithDoubleElements, "D", comparator));
+       assertEquals(0, ArrayUtil.indexOf(arrayWithDoubleElements, "X", comparator));
+       try {
+           ArrayUtil.indexOf(array, "A", null);
+           fail("Comparison without a Comparator should not be possible");
+       }
+       catch (IllegalArgumentException e) {
+           assertEquals("Comparator is null.", e.getMessage());
+       }
+    }
 }

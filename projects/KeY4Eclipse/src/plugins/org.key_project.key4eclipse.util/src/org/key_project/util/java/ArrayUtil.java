@@ -135,22 +135,47 @@ public final class ArrayUtil {
     * @throws IllegalArgumentException If the comparator is {@code null}.
     */
    public static <T> boolean contains(T[] array, T toSearch, Comparator<T> comparator) {
-      boolean contains = false;
+      return indexOf(array, toSearch, comparator) >= 0;
+   }
+
+   /**
+    * Returns the first index in the given array that contains the
+    * element to search.
+    * @param array The array to search in.
+    * @param toSearch The element to search.
+    * @return The first index in the array that contains the element to search or {@code -1} if the elment is not containd in the array.
+    */
+   public static <T> int indexOf(T[] array, T toSearch) {
+      return indexOf(array, toSearch, ObjectUtil.createEqualsComparator());
+   }
+   
+   /**
+    * Returns the first index in the given array that contains the
+    * element to search. The equality is
+    * computed via the comparator. Objects are equal if the comparison result is {@code 0}.
+    * @param array The array to search in.
+    * @param toSearch The element to search.
+    * @param comparator the {@link Comparator} to use.
+    * @return The first index in the array that contains the element to search or {@code -1} if the elment is not containd in the array.
+    * @throws IllegalArgumentException If the comparator is {@code null}.
+    */
+   public static <T> int indexOf(T[] array, T toSearch, Comparator<T> comparator) {
+      int index = -1;
       if (array != null) {
          if (comparator == null) {
             throw new IllegalArgumentException("Comparator is null.");
          }
          else {
             int i = 0;
-            while (i < array.length && !contains) {
+            while (i < array.length && index < 0) {
                if (comparator.compare(array[i], toSearch) == 0) {
-                  contains = true;
+                  index = i;
                }
                i++;
             }
          }
       }
-      return contains;
+      return index;
    }
 
    /**
