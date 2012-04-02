@@ -638,7 +638,12 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       // Compute the stack frame size before the method is called
       final int returnStackSize = computeStackSize(currentNode) - 1;
       // Return the method from the call stack
-      return methodCallStack.get(returnStackSize);
+      if (returnStackSize >= 0) {
+         return methodCallStack.get(returnStackSize);
+      }
+      else {
+         return null;
+      }
    }
 
    /**
