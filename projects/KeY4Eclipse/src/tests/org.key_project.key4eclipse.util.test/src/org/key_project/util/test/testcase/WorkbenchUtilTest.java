@@ -5,18 +5,66 @@ import junit.framework.TestCase;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.navigator.resources.ProjectExplorer;
 import org.junit.Test;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
+import org.key_project.util.test.view.GraphitiEditorInViewView;
 
 /**
  * Contains tests for {@link WorkbenchUtil}.
  * @author Martin Hentschel
  */
 public class WorkbenchUtilTest extends TestCase {
+    /**
+     * Tests {@link WorkbenchUtil#openView(String)},
+     * {@link WorkbenchUtil#findView(String)},
+     * {@link WorkbenchUtil#isActive(IWorkbenchPart)},
+     * {@link WorkbenchUtil#activate(IWorkbenchPart)} and
+     * {@link WorkbenchUtil#closeView(IViewPart)}.
+     */
+    @Test
+    public void testViewManagement() throws PartInitException {
+       // Make sure that view is not open
+       String viewId = GraphitiEditorInViewView.VIEW_ID;
+       IViewPart view = WorkbenchUtil.findView(viewId);
+       assertNull(view);
+       IViewPart explorer = WorkbenchUtil.findView(ProjectExplorer.VIEW_ID);
+       assertNotNull(explorer);
+       // Open view
+       view = WorkbenchUtil.openView(viewId);
+       assertNotNull(view);
+       assertEquals(viewId, view.getViewSite().getId());
+       assertTrue(WorkbenchUtil.isActive(view));
+       assertFalse(WorkbenchUtil.isActive(explorer));
+       // Select project explorer view
+       WorkbenchUtil.activate(explorer);
+       assertFalse(WorkbenchUtil.isActive(view));
+       assertTrue(WorkbenchUtil.isActive(explorer));
+       // Open view again
+       IViewPart reopenedView = WorkbenchUtil.openView(viewId);
+       assertNotNull(reopenedView);
+       assertSame(view, reopenedView);
+       assertTrue(WorkbenchUtil.isActive(view));
+       assertTrue(WorkbenchUtil.isActive(reopenedView));
+       assertFalse(WorkbenchUtil.isActive(explorer));
+       // Close view
+       WorkbenchUtil.closeView(view);
+       assertFalse(WorkbenchUtil.isActive(view));
+       assertFalse(WorkbenchUtil.isActive(reopenedView));
+       // Search view again
+       IViewPart closedView = WorkbenchUtil.findView(viewId);
+       assertNull(closedView);
+       // Search explorer again
+       IViewPart explorerAgain = WorkbenchUtil.findView(ProjectExplorer.VIEW_ID);
+       assertNotNull(explorerAgain);
+       assertSame(explorer, explorerAgain);
+    }
+
     /**
      * Tests {@link WorkbenchUtil#getActiveShell()}
      */

@@ -2,6 +2,7 @@ package org.key_project.util.test.suite.swtbot;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
+import org.key_project.util.test.testcase.swtbot.SWTBotAbstractEditorInViewViewTest;
 import org.key_project.util.test.testcase.swtbot.SWTBotLoggerTest;
 import org.key_project.util.test.testcase.swtbot.SWTBotTableSelectionDialogTest;
 import org.key_project.util.test.testcase.swtbot.SWTBotWorkbenchUtilTest;
@@ -12,6 +13,7 @@ import org.key_project.util.test.testcase.swtbot.SWTBotWorkbenchUtilTest;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
+    SWTBotAbstractEditorInViewViewTest.class,
     SWTBotLoggerTest.class,
     SWTBotTableSelectionDialogTest.class,
     SWTBotWorkbenchUtilTest.class

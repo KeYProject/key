@@ -47,6 +47,8 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.key_project.swtbot.swing.bot.AbstractSwingBotComponent;
 import org.key_project.swtbot.swing.bot.SwingBot;
@@ -63,6 +65,7 @@ import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithResult;
 import org.key_project.util.java.thread.IRunnableWithResult;
 import org.key_project.util.test.Activator;
+import org.key_project.util.test.view.GraphitiEditorInViewView;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofManagementDialog;
@@ -822,5 +825,46 @@ public class TestUtilsUtil {
       public SWTBotEditor getEditor() {
          return editor;
       }
+   }
+
+   /**
+    * Activates the given {@link SWTBotView}.
+    * @param view The {@link SWTBotView} to activate.
+    */
+   public static void activateView(final SWTBotView view) {
+      TestCase.assertNotNull(view);
+      Display.getDefault().syncExec(new Runnable() {
+         @Override
+         public void run() {
+            view.getReference().getPage().activate(view.getReference().getPart(true));
+         }
+      });
+      TestCase.assertTrue(view.isActive());
+   }
+
+   /**
+    * Opens a view with the given ID in the active {@link IWorkbenchPage}.
+    * @param viewId The view ID to open.
+    * @return The opened {@link IViewPart}.
+    * @throws Exception Occurred Exception.
+    */
+   public static IViewPart openView(final String viewId) throws Exception {
+      IRunnableWithResult<IViewPart> run = new AbstractRunnableWithResult<IViewPart>() {
+         @Override
+         public void run() {
+            try {
+               setResult(WorkbenchUtil.openView(GraphitiEditorInViewView.VIEW_ID));
+            }
+            catch (Exception e) {
+               setException(e);
+            }
+         }
+      };
+      Display.getDefault().syncExec(run);
+      if (run.getException() != null) {
+         throw run.getException();
+      }
+      TestCase.assertNotNull(run.getResult());
+      return run.getResult();
    }
 }
