@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Symbolic Execution Debugger (SED) UI Visualization Test
+Bundle-SymbolicName: org.key_project.sed.ui.visualization.test
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.key_project.sed.ui.visualization.test.Activator
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.ui,
+ org.eclipse.graphiti;bundle-version="0.8.1",
+ org.eclipse.graphiti.ui;bundle-version="0.8.1",
+ org.junit4;bundle-version="4.8.1",
+ org.key_project.util;bundle-version="1.0.0",
+ org.key_project.sed.ui.visualization;bundle-version="1.0.0"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-Vendor: KeY Project
+Export-Package: org.key_project.sed.ui.visualization.test.suite

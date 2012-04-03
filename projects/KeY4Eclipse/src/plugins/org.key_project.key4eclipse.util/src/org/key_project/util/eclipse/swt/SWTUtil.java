@@ -30,6 +30,7 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
@@ -424,5 +425,16 @@ public final class SWTUtil {
             }
         }
         return sb.toString();
+    }
+
+    /**
+     * Adds the given text as item to the given {@link Combo}.
+     * @param control The {@link Combo} to add the item to.
+     * @param text The item to add.
+     */
+    public static void add(Combo control, String text) {
+        if (control != null) {
+            control.add(text != null ? text : StringUtil.EMPTY_STRING);
+        }
     }
 }

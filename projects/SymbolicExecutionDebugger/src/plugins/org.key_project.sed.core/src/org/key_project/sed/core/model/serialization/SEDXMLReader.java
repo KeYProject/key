@@ -201,13 +201,13 @@ public class SEDXMLReader {
          return createDebugTarget(uri, localName, qName, attributes);
       }
       else if (SEDXMLWriter.TAG_BRANCH_CONDITION.equals(qName)) {
-         return createBranchCondition(target, parent, uri, localName, qName, attributes);
+         return createBranchCondition(target, parent, thread, uri, localName, qName, attributes);
       }
       else if (SEDXMLWriter.TAG_BRANCH_NODE.equals(qName)) {
          return createBranchNode(target, parent, thread, uri, localName, qName, attributes);
       }
       else if (SEDXMLWriter.TAG_EXCEPTIONAL_TERMINATION.equals(qName)) {
-         return createExceptionalTermination(target, parent, uri, localName, qName, attributes);
+         return createExceptionalTermination(target, parent, thread, uri, localName, qName, attributes);
       }
       else if (SEDXMLWriter.TAG_LOOP_CONDITION.equals(qName)) {
          return createLoopCondition(target, parent, thread, uri, localName, qName, attributes);
@@ -225,7 +225,7 @@ public class SEDXMLReader {
          return createStatement(target, parent, thread, uri, localName, qName, attributes);
       }
       else if (SEDXMLWriter.TAG_TERMINATION.equals(qName)) {
-         return createTermination(target, parent, uri, localName, qName, attributes);
+         return createTermination(target, parent, thread, uri, localName, qName, attributes);
       }
       else if (SEDXMLWriter.TAG_THREAD.equals(qName)) {
          return createThread(target, uri, localName, qName, attributes);
@@ -239,14 +239,15 @@ public class SEDXMLReader {
     * Creates a {@link SEDMemoryBranchCondition} instance for the content in the given tag.
     * @param target The parent {@link ISEDDebugTarget} or {@code null} if not available.
     * @param parent The parent {@link ISEDDebugNode} or {@code null} if not available.
+    * @param thread The parent {@link ISEDThread} or {@code null} if not available.
     * @param uri The Namespace URI, or the empty string if the element has no Namespace URI or if Namespace processing is not being performed.
     * @param localName  The local name (without prefix), or the empty string if Namespace processing is not being performed.
     * @param qName The qualified name (with prefix), or the empty string if qualified names are not available.
     * @param attributes The attributes attached to the element. If there are no attributes, it shall be an empty Attributes object.
     * @return The created {@link SEDMemoryBranchCondition}.
     */
-   protected SEDMemoryBranchCondition createBranchCondition(ISEDDebugTarget target, ISEDDebugNode parent, String uri, String localName, String qName, Attributes attributes) {
-      SEDMemoryBranchCondition termination = new SEDMemoryBranchCondition(target, parent);
+   protected SEDMemoryBranchCondition createBranchCondition(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) {
+      SEDMemoryBranchCondition termination = new SEDMemoryBranchCondition(target, parent, thread);
       fillDebugNode(termination, attributes);
       return termination;
    }
@@ -289,14 +290,15 @@ public class SEDXMLReader {
     * Creates a {@link SEDMemoryExceptionalTermination} instance for the content in the given tag.
     * @param target The parent {@link ISEDDebugTarget} or {@code null} if not available.
     * @param parent The parent {@link ISEDDebugNode} or {@code null} if not available.
+    * @param thread The parent {@link ISEDThread} or {@code null} if not available.
     * @param uri The Namespace URI, or the empty string if the element has no Namespace URI or if Namespace processing is not being performed.
     * @param localName  The local name (without prefix), or the empty string if Namespace processing is not being performed.
     * @param qName The qualified name (with prefix), or the empty string if qualified names are not available.
     * @param attributes The attributes attached to the element. If there are no attributes, it shall be an empty Attributes object.
     * @return The created {@link SEDMemoryExceptionalTermination}.
     */   
-   protected SEDMemoryExceptionalTermination createExceptionalTermination(ISEDDebugTarget target, ISEDDebugNode parent, String uri, String localName, String qName, Attributes attributes) {
-      SEDMemoryExceptionalTermination termination = new SEDMemoryExceptionalTermination(target, parent);
+   protected SEDMemoryExceptionalTermination createExceptionalTermination(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) {
+      SEDMemoryExceptionalTermination termination = new SEDMemoryExceptionalTermination(target, parent, thread);
       fillDebugNode(termination, attributes);
       return termination;
    }
@@ -400,14 +402,15 @@ public class SEDXMLReader {
     * Creates a {@link SEDMemoryTermination} instance for the content in the given tag.
     * @param target The parent {@link ISEDDebugTarget} or {@code null} if not available.
     * @param parent The parent {@link ISEDDebugNode} or {@code null} if not available.
+    * @param thread The parent {@link ISEDThread} or {@code null} if not available.
     * @param uri The Namespace URI, or the empty string if the element has no Namespace URI or if Namespace processing is not being performed.
     * @param localName  The local name (without prefix), or the empty string if Namespace processing is not being performed.
     * @param qName The qualified name (with prefix), or the empty string if qualified names are not available.
     * @param attributes The attributes attached to the element. If there are no attributes, it shall be an empty Attributes object.
     * @return The created {@link SEDMemoryTermination}.
     */   
-   protected SEDMemoryTermination createTermination(ISEDDebugTarget target, ISEDDebugNode parent, String uri, String localName, String qName, Attributes attributes) {
-      SEDMemoryTermination termination = new SEDMemoryTermination(target, parent);
+   protected SEDMemoryTermination createTermination(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) {
+      SEDMemoryTermination termination = new SEDMemoryTermination(target, parent, thread);
       fillDebugNode(termination, attributes);
       return termination;
    }

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+  <extension
+      point="org.eclipse.graphiti.ui.diagramTypes">
+    <diagramType
+      description="This is the diagram type for Symbolic Execution Trees"
+      id="org.key_project.sed.ui.graphiti.ExecutionTreeDiagramType"
+      name="Symbolic Execution Tree"
+      type="executionTree">
+    </diagramType>
+  </extension>
+ 
+  <extension
+      point="org.eclipse.graphiti.ui.diagramTypeProviders">
+    <diagramTypeProvider
+      class="org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeDiagramTypeProvider"
+      description="This is my editor for the Graphiti tutorial"
+      id="org.key_project.sed.ui.graphiti.ExecutionTreeDiagramTypeProvider"
+      name="Symbolic Execution Tree Editor">
+      <diagramType
+        id="org.key_project.sed.ui.graphiti.ExecutionTreeDiagramType">
+      </diagramType>
+      <imageProvider
+            id="org.key_project.sed.ui.visualization.execution_tree.provider.MyTutorialImageProvider">
+      </imageProvider>
+    </diagramTypeProvider>
+  </extension>
+  <extension
+        point="org.eclipse.ui.views">
+     <category
+           id="org.key_project.sed.ui.graphiti.category"
+           name="Symbolic Execution Debugger (SED)">
+     </category>
+     <view
+           category="org.key_project.sed.ui.graphiti.category"
+           class="org.key_project.sed.ui.visualization.view.ExecutionTreeView"
+           icon="icons/symbolic_debug.gif"
+           id="org.key_project.sed.ui.graphiti.view.ExecutionTreeView"
+           name="Symbolic Execution Tree"
+           restorable="true">
+     </view>
+  </extension>
+  
+    <extension
+         point="org.eclipse.graphiti.ui.imageProviders">
+      <imageProvider
+            class="org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeImageProvider"
+            id="org.key_project.sed.ui.visualization.execution_tree.provider.MyTutorialImageProvider">
+      </imageProvider>
+   </extension>
+</plugin>

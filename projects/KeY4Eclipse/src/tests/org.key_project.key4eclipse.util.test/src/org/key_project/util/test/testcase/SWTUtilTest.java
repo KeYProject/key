@@ -20,6 +20,7 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.junit.Test;
@@ -34,6 +35,31 @@ import org.key_project.util.test.util.ArrayObjectLabelProvider;
  * @author Martin Hentschel
  */
 public class SWTUtilTest extends TestCase {
+    /**
+     * Tests {@link SWTUtil#add(Combo, String))}
+     */
+    @Test
+    public void testAdd() {
+        // Create UI
+        Shell shell = new Shell();
+        Combo combo = new Combo(shell, SWT.READ_ONLY);
+        // Set "A"
+        SWTUtil.add(combo, "A");
+        assertEquals("A", combo.getItem(combo.getItemCount() - 1));
+        // Set "B"
+        SWTUtil.add(combo, "B");
+        assertEquals("B", combo.getItem(combo.getItemCount() - 1));
+        // Set ""
+        SWTUtil.add(combo, "");
+        assertEquals("", combo.getItem(combo.getItemCount() - 1));
+        // Set "C"
+        SWTUtil.add(combo, "C");
+        assertEquals("C", combo.getItem(combo.getItemCount() - 1));
+        // Set null
+        SWTUtil.add(combo, null);
+        assertEquals("", combo.getItem(combo.getItemCount() - 1));
+    }
+   
     /**
      * Tests {@link SWTUtil#csvExport(org.eclipse.swt.widgets.Table)},
      * {@link SWTUtil#csvExport(org.eclipse.swt.widgets.Table, java.io.File)} and

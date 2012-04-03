@@ -27,7 +27,15 @@ public abstract class AbstractSEDThread extends AbstractSEDDebugNode implements 
     * @param target The {@link ISEDDebugTarget} in that this thread is contained.
     */
    public AbstractSEDThread(ISEDDebugTarget target) {
-      super(target, null);
+      super(target, null, null);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDThread getThread() {
+      return this;
    }
 
    /**

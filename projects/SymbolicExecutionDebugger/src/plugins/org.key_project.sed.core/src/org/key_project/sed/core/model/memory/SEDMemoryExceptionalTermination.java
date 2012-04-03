@@ -28,8 +28,9 @@ public class SEDMemoryExceptionalTermination extends AbstractSEDExceptionalTermi
     * @param thread The {@link ISEDThread} in that this exceptional termination is contained.
     */
    public SEDMemoryExceptionalTermination(ISEDDebugTarget target, 
-                                          ISEDDebugNode parent) {
-      super(target, parent);
+                                          ISEDDebugNode parent,
+                                          ISEDThread thread) {
+      super(target, parent, thread);
    }
 
    /**

@@ -17,11 +17,6 @@ import org.key_project.sed.core.model.ISourceNameProvider;
  */
 public abstract class AbstractSEDStackFrameCompatibleDebugNode extends AbstractSEDTerminateCompatibleDebugNode implements IStackFrame, ISourceNameProvider {
    /**
-    * The {@link ISEDThread} in that this node is contained.
-    */
-   private ISEDThread thread;
-
-   /**
     * The source name.
     */
    private String sourceName;
@@ -50,16 +45,7 @@ public abstract class AbstractSEDStackFrameCompatibleDebugNode extends AbstractS
    public AbstractSEDStackFrameCompatibleDebugNode(ISEDDebugTarget target,
                                                    ISEDDebugNode parent, 
                                                    ISEDThread thread) {
-      super(target, parent);
-      this.thread = thread;
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public ISEDThread getThread() {
-      return thread;
+      super(target, parent, thread);
    }
 
    /**

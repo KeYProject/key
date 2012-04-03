@@ -8,6 +8,7 @@ import org.key_project.sed.core.test.suite.AllSEDCoreTests;
 import org.key_project.sed.key.core.test.suite.AllSEDKeYTests;
 import org.key_project.sed.key.ui.test.suite.AllSEDKeYUITests;
 import org.key_project.sed.ui.test.suite.AllSEDUITests;
+import org.key_project.sed.ui.visualization.test.suite.AllSEDUIVisualizationTests;
 import org.key_project.util.test.suite.AllUtilTests;
 
 /**
@@ -21,6 +22,7 @@ import org.key_project.util.test.suite.AllUtilTests;
     AllSEDCoreTests.class,
     AllStarterCoreTests.class,
     AllSEDUITests.class,
+    AllSEDUIVisualizationTests.class,
     AllSEDKeYTests.class,
     AllSEDKeYUITests.class
 })

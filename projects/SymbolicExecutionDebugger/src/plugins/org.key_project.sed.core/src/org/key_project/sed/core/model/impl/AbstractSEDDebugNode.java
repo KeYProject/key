@@ -5,6 +5,7 @@ import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IElementContentProvider;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.provider.SEDDebugNodeContentProvider;
 
 /**
@@ -25,13 +26,22 @@ public abstract class AbstractSEDDebugNode extends AbstractSEDDebugElement imple
    private String name;
    
    /**
+    * The thread.
+    */
+   private ISEDThread thread;
+   
+   /**
     * Constructor.
     * @param target The {@link ISEDDebugTarget} in that this node is contained.
     * @param parent The parent in that this node is contained as child.
+    * @param thread The {@link ISEDThread} in that this node is contained.
     */
-   public AbstractSEDDebugNode(ISEDDebugTarget target, ISEDDebugNode parent) {
+   public AbstractSEDDebugNode(ISEDDebugTarget target, 
+                               ISEDDebugNode parent, 
+                               ISEDThread thread) {
       super(target);
       this.parent = parent;
+      this.thread = thread;
    }
 
    /**
@@ -40,6 +50,14 @@ public abstract class AbstractSEDDebugNode extends AbstractSEDDebugElement imple
    @Override
    public ISEDDebugNode getParent() throws DebugException {
       return parent;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDThread getThread() {
+      return thread;
    }
 
    /**

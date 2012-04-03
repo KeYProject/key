@@ -580,7 +580,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       // Compute method name
       String name = info.getBranchLabel();
       // Create new node and fill it
-      SEDMemoryBranchCondition newNode = new SEDMemoryBranchCondition(getDebugTarget(), parent);
+      SEDMemoryBranchCondition newNode = new SEDMemoryBranchCondition(getDebugTarget(), parent, thread);
       newNode.setName(name);
       return newNode;
    }
@@ -611,7 +611,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       // Compute method name
       String name = DEFAULT_TERMINATION_NODE_NAME;
       // Create new node and fill it
-      SEDMemoryTermination newNode = new SEDMemoryTermination(getDebugTarget(), parent);
+      SEDMemoryTermination newNode = new SEDMemoryTermination(getDebugTarget(), parent, thread);
       newNode.setName(name);
       return newNode;
    }
