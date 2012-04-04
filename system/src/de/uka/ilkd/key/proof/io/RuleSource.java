@@ -63,7 +63,7 @@ public class RuleSource {
             getResourceFile(Proof.class, PATH_TO_RULES + filename);
         if (u == null) {
             // a more specific exception type would probably be better
-            throw new RuntimeException("Could not find rule file "+filename);
+            throw new RuntimeException("Could not find rule file "+PATH_TO_RULES+filename);
         }
 	return new RuleSource(u);
     }
