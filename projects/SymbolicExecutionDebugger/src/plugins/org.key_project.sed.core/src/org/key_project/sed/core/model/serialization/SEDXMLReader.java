@@ -11,6 +11,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.CoreException;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDThread;
@@ -58,7 +60,19 @@ public class SEDXMLReader {
     * @throws IOException Occurred Exception.
     */
    public List<ISEDDebugTarget> read(String xml) throws ParserConfigurationException, SAXException, IOException {
-      return read(new ByteArrayInputStream(xml.getBytes()));
+      return xml != null ? read(new ByteArrayInputStream(xml.getBytes())) : null;
+   }
+   /**
+    * Parses the given XML content.
+    * @param xml The XML content to parse.
+    * @return The contained {@link ISEDDebugTarget}s in the given XML content.
+    * @throws ParserConfigurationException Occurred Exception.
+    * @throws SAXException Occurred Exception.
+    * @throws IOException Occurred Exception.
+    * @throws CoreException Occurred Exception.
+    */
+   public List<ISEDDebugTarget> read(IFile file) throws ParserConfigurationException, SAXException, IOException, CoreException {
+      return file != null ? read(file.getContents()) : null;
    }
    
    /**
@@ -262,6 +276,7 @@ public class SEDXMLReader {
     */
    protected SEDMemoryDebugTarget createDebugTarget(String uri, String localName, String qName, Attributes attributes) {
       SEDMemoryDebugTarget target = new SEDMemoryDebugTarget(null);
+      target.setId(getId(attributes));
       target.setName(getName(attributes));
       target.setModelIdentifier(getModelIdentifier(attributes));
       return target;
@@ -436,6 +451,7 @@ public class SEDXMLReader {
     * @param attributes The {@link Attributes} which provides the content.
     */
    protected void fillDebugNode(ISEDMemoryDebugNode node, Attributes attributes) {
+      node.setId(getId(attributes));
       node.setName(getName(attributes));
    }
 
@@ -449,6 +465,15 @@ public class SEDXMLReader {
       node.setLineNumber(getLineNumber(attributes));
       node.setCharStart(getCharStart(attributes));
       node.setCharEnd(getCharEnd(attributes));
+   }
+
+   /**
+    * Returns the ID value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */   
+   protected String getId(Attributes attributes) {
+      return attributes.getValue(SEDXMLWriter.ATTRIBUTE_ID);
    }
    
    /**

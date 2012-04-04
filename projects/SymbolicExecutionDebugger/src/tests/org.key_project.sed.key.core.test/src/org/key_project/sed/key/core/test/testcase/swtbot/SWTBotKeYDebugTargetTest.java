@@ -776,7 +776,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
                createOracleFile(target, expectedModelPathInBundle);
             }
             ISEDDebugTarget expectedDebugTarget = TestSEDKeyCoreUtil.createExpectedModel(expectedModelPathInBundle);
-            TestSedCoreUtil.compareDebugTarget(expectedDebugTarget, target);
+            TestSedCoreUtil.compareDebugTarget(expectedDebugTarget, target, false);
          }
       }
       finally {

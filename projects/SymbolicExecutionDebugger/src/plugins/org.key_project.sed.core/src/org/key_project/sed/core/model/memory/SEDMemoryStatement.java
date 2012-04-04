@@ -114,4 +114,17 @@ public class SEDMemoryStatement extends AbstractSEDStatement implements ISEDMemo
    public void setSourceName(String sourceName) {
       super.setSourceName(sourceName);
    }
+
+   /**
+    * <p>
+    * {@inheritDoc}
+    * </p>
+    * <p>
+    * Changed visibility to public.
+    * </p>
+    */
+   @Override
+   public void setId(String id) {
+      super.setId(id);
+   }
 }

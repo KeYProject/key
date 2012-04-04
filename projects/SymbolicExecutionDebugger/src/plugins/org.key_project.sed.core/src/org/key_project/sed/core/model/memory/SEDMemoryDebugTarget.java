@@ -72,4 +72,17 @@ public class SEDMemoryDebugTarget extends AbstractSEDDebugTarget {
    public void setName(String name) {
       super.setName(name);
    }
+
+   /**
+    * <p>
+    * {@inheritDoc}
+    * </p>
+    * <p>
+    * Changed visibility to public.
+    * </p>
+    */
+   @Override
+   public void setId(String id) {
+      super.setId(id);
+   }
 }

@@ -49,7 +49,7 @@ import org.key_project.sed.ui.visualization.execution_tree.feature.TerminationLa
 import org.key_project.sed.ui.visualization.execution_tree.feature.ThreadAddFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.ThreadCreateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.ThreadLayoutFeature;
-import org.key_project.sed.ui.visualization.execution_tree.service.HashCodeIndependenceSolver;
+import org.key_project.sed.ui.visualization.execution_tree.service.SEDIndependenceSolver;
 
 /**
  * {@link IFeatureProvider} specific implementation for execution tree diagrams.
@@ -62,7 +62,7 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
     */
    public ExecutionTreeFeatureProvider(IDiagramTypeProvider dtp) {
       super(dtp);
-      setIndependenceSolver(new HashCodeIndependenceSolver());
+      setIndependenceSolver(new SEDIndependenceSolver());
    }
    
    /**
@@ -165,10 +165,10 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
    }
    
    /**
-    * Returns the used {@link HashCodeIndependenceSolver}.
-    * @return The used {@link HashCodeIndependenceSolver}.
+    * Returns the used {@link SEDIndependenceSolver}.
+    * @return The used {@link SEDIndependenceSolver}.
     */
-   public HashCodeIndependenceSolver getHashCodeIndependenceSolver() {
-      return (HashCodeIndependenceSolver)getIndependenceSolver();
+   public SEDIndependenceSolver getSEDIndependenceSolver() {
+      return (SEDIndependenceSolver)getIndependenceSolver();
    }
 }

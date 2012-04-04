@@ -59,6 +59,7 @@ public class ThreadCreateFeature extends AbstractDebugNodeCreateFeature {
       // Create thread
       SEDMemoryThread result = new SEDMemoryThread(target);
       result.setName(initialValues.getName());
+      target.addSymbolicThread(result);
       return result;
    }
 }

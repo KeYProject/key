@@ -48,4 +48,11 @@ public interface ISEDDebugElement extends IDebugElement {
     * @return the launch this element is contained in
     */
    public ILaunch getLaunch();
+   
+   /**
+    * Returns a unique ID which identifies this element uniquely in
+    * the whole debug model. The ID must be a valid XML name.
+    * @return The unique ID of this element which is a valid XML name.
+    */
+   public String getId();
 }

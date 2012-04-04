@@ -1,6 +1,13 @@
 package org.key_project.sed.ui.visualization.util;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
+import org.eclipse.graphiti.ui.editor.DiagramEditorInput;
 
 /**
  * Provides static utility methods for Graphiti.
@@ -60,5 +67,42 @@ public final class GraphitiUtil {
       else {
          return size;
       }
+   }
+   
+   /**
+    * Returns the {@link IFile} which is specified by the given {@link DiagramEditorInput}
+    * if available.
+    * @param input The {@link DiagramEditorInput}.
+    * @return The specified {@link IFile} or {@code null} if no {@link IFile} is specified.
+    */
+   public static IFile getFile(DiagramEditorInput input) {
+      IFile result = null;
+      if (input != null) {
+         EObject obj = input.getEObject();
+         if (obj != null) {
+            result = getFile(obj);
+         }
+      }
+      return result;
+   }
+   
+   /**
+    * Returns the {@link IFile} which is specified by the given {@link DiagramEditorInput}
+    * if available.
+    * @param input The {@link DiagramEditorInput}.
+    * @return The specified {@link IFile} or {@code null} if no {@link IFile} is specified.
+    */
+   public static IFile getFile(EObject obj) {
+      IFile result = null;
+      if (obj != null) {
+         Resource resource = obj.eResource();
+         if (resource != null) {
+            URI uri = resource.getURI();
+            if (uri.isPlatformResource()) {
+               result = ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(uri.toPlatformString(true)));
+            }
+         }
+      }
+      return result;
    }
 }

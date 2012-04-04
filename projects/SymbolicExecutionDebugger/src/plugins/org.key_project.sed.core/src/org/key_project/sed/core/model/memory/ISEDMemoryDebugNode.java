@@ -9,6 +9,12 @@ import org.key_project.sed.core.model.ISEDDebugNode;
  */
 public interface ISEDMemoryDebugNode extends ISEDDebugNode {
    /**
+    * Sets the unique ID.
+    * @param id The new unique ID to use.
+    */
+   public void setId(String id);
+   
+   /**
     * Sets the name of this node.
     * @param name the name to set.
     */

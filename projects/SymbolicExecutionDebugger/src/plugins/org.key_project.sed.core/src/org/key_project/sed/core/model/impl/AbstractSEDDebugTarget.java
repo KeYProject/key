@@ -5,7 +5,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.ILaunch;
-import org.eclipse.debug.core.model.DebugElement;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.IMemoryBlock;
@@ -21,7 +20,7 @@ import org.key_project.sed.core.provider.SEDDebugTargetContentProvider;
  * @see ISEDDebugTarget
  */
 @SuppressWarnings("restriction")
-public abstract class AbstractSEDDebugTarget extends DebugElement implements ISEDDebugTarget {
+public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement implements ISEDDebugTarget {
    /**
     * The {@link ILaunch} in that this {@link IDebugTarget} is used.
     */

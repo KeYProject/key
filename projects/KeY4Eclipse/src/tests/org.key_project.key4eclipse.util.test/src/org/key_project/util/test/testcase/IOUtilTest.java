@@ -28,6 +28,19 @@ import org.key_project.util.test.util.TestUtilsUtil;
  */
 public class IOUtilTest extends TestCase {
    /**
+    * Tests {@link IOUtil#getFileNameWithoutExtension(String)}.
+    */
+   @Test
+   public void testGetFileNameWithoutExtension() {
+      assertNull(IOUtil.getFileNameWithoutExtension(null));
+      assertEquals("test", IOUtil.getFileNameWithoutExtension("test.txt"));
+      assertEquals("hello.world", IOUtil.getFileNameWithoutExtension("hello.world.diagram"));
+      assertEquals("", IOUtil.getFileNameWithoutExtension(".project"));
+      assertEquals("", IOUtil.getFileNameWithoutExtension(""));
+      assertEquals("file", IOUtil.getFileNameWithoutExtension("file"));
+   }
+
+   /**
     * Tests {@link IOUtil#createTempDirectory(String, String)}.
     */
    @Test

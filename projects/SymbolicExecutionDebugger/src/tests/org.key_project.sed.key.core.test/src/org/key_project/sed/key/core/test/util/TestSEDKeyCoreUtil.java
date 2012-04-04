@@ -121,7 +121,7 @@ public final class TestSEDKeyCoreUtil {
     * @throws DebugException Occurred Exception.
     */
    public static void assertInitialTarget(ISEDDebugTarget target, String targetName) throws DebugException {
-      TestSedCoreUtil.compareDebugTarget(createExpectedInitialModel(targetName), target);
+      TestSedCoreUtil.compareDebugTarget(createExpectedInitialModel(targetName), target, false);
    }
    
    /**
@@ -134,7 +134,7 @@ public final class TestSEDKeyCoreUtil {
     * @throws ParserConfigurationException Occurred Exception.
     */
    public static void assertFlatStepsExample(ISEDDebugTarget target) throws DebugException, ParserConfigurationException, SAXException, IOException {
-      TestSedCoreUtil.compareDebugTarget(createExpectedModel("data/statements/oracle/FlatSteps.xml"), target);
+      TestSedCoreUtil.compareDebugTarget(createExpectedModel("data/statements/oracle/FlatSteps.xml"), target, false);
    }
    
    /**

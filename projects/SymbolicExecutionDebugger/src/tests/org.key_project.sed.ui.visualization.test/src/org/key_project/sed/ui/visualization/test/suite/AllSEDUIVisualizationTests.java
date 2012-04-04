@@ -2,6 +2,7 @@ package org.key_project.sed.ui.visualization.test.suite;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
+import org.key_project.sed.ui.visualization.test.testcase.ExecutionTreeUtilTest;
 import org.key_project.sed.ui.visualization.test.testcase.GraphitiUtilTest;
 import org.key_project.sed.ui.visualization.test.testcase.LogUtilTest;
 
@@ -11,6 +12,7 @@ import org.key_project.sed.ui.visualization.test.testcase.LogUtilTest;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
+   ExecutionTreeUtilTest.class,
    GraphitiUtilTest.class,
    LogUtilTest.class
 })

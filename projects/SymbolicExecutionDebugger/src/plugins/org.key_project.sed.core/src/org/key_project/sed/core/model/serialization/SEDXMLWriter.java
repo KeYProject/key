@@ -1,9 +1,13 @@
 package org.key_project.sed.core.model.serialization;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IDebugTarget;
@@ -126,6 +130,11 @@ public class SEDXMLWriter {
    public static final String ATTRIBUTE_NAMESPACE = "xmlns";
 
    /**
+    * Attribute name to store IDs.
+    */
+   public static final String ATTRIBUTE_ID = "xml:id";
+
+   /**
     * Attribute name to store names.
     */
    public static final String ATTRIBUTE_NAME = "name";
@@ -151,6 +160,27 @@ public class SEDXMLWriter {
    public static final String ATTRIBUTE_CHAR_END = "charEnd";
    
    /**
+    * Writes the given {@link ISEDDebugTarget}s into the {@link OutputStream} with the defined encoding.
+    * @param targets The {@link ISEDDebugTarget}s to write.
+    * @param encoding The encoding to use.
+    * @param out The {@link OutputStream} to use.
+    * @throws DebugException Occurred Exception.
+    * @throws IOException Occurred Exception.
+    */
+   public void write(IDebugTarget[] targets, String encoding, OutputStream out) throws DebugException, IOException {
+      if (out != null) {
+         try {
+            Charset charset = encoding != null ? Charset.forName(encoding) : Charset.defaultCharset();
+            String xml = toXML(targets, charset.displayName());
+            out.write(xml.getBytes(charset));
+         }
+         finally {
+            out.close();
+         }
+      }
+   }
+   
+   /**
     * Writes the given {@link ILaunch} into the {@link OutputStream} with the defined encoding.
     * @param launch The {@link ILaunch} to write.
     * @param encoding The encoding to use.
@@ -172,6 +202,73 @@ public class SEDXMLWriter {
    }
    
    /**
+    * Writes the given {@link ILaunch} into the {@link IFile} with the defined encoding.
+    * @param launch The {@link ILaunch} to write.
+    * @param encoding The encoding to use.
+    * @param out The {@link OutputStream} to use.
+    * @throws IOException Occurred Exception.
+    * @throws CoreException Occurred Exception.
+    */
+   public void write(ILaunch launch, String encoding, IFile file) throws IOException, CoreException {
+      if (file != null) {
+         InputStream in = null;
+         try {
+            Charset charset = encoding != null ? Charset.forName(encoding) : Charset.defaultCharset();
+            String xml = toXML(launch, charset.displayName());
+            in = new ByteArrayInputStream(xml.getBytes(charset));
+            if (file.exists()) {
+               file.setContents(in, true, true, null);
+            }
+            else {
+               file.create(in, true, null);
+            }
+            file.setCharset(charset.displayName(), null);
+         }
+         finally {
+            if (in != null) {
+               in.close();
+            }
+         }
+      }
+   }
+   
+   /**
+    * Writes the given {@link IDebugTarget}s into the {@link IFile} with the defined encoding.
+    * @param targets The {@link IDebugTarget}s to write.
+    * @param encoding The encoding to use.
+    * @param out The {@link OutputStream} to use.
+    * @throws IOException Occurred Exception.
+    * @throws CoreException Occurred Exception.
+    */
+   public void write(IDebugTarget[] targets, String encoding, IFile file) throws IOException, CoreException {
+      if (file != null) {
+         InputStream in = null;
+         try {
+            Charset charset = encoding != null ? Charset.forName(encoding) : Charset.defaultCharset();
+            String xml = toXML(targets, charset.displayName());
+            in = new ByteArrayInputStream(xml.getBytes(charset));
+            if (file.exists()) {
+               file.setContents(in, true, true, null);
+            }
+            else {
+               file.create(in, true, null);
+            }
+            try {
+               file.setCharset(charset.displayName(), null);
+            }
+            catch (Exception e) {
+               LogUtil.getLogger().logError(e); // Goes sometimes wrong, but is not important
+            }
+         }
+         finally {
+            if (in != null) {
+               in.close();
+            }
+         }
+      }
+   }
+   
+   /**
     * Serializes the given {@link ILaunch} into a {@link String} with the given encoding.
     * @param launch The {@link ILaunch} to serialize.
     * @param encoding The encoding to use.
@@ -181,13 +278,27 @@ public class SEDXMLWriter {
    public String toXML(ILaunch launch, String encoding) throws DebugException {
       StringBuffer sb = new StringBuffer();
       if (launch != null) {
+         sb.append(toXML(launch.getDebugTargets(), encoding));
+      }
+      return sb.toString();
+   }
+   
+   /**
+    * Serializes the given {@link IDebugTarget}s into a {@link String} with the given encoding.
+    * @param launch The {@link ILaunch} to serialize.
+    * @param encoding The encoding to use.
+    * @return The serialized {@link String}.
+    * @throws DebugException Occurred Exception.
+    */
+   public String toXML(IDebugTarget[] targets, String encoding) throws DebugException {
+      StringBuffer sb = new StringBuffer();
+      if (targets != null) {
          appendXmlHeader(encoding, sb);
          sb.append("<");
          sb.append(TAG_LAUNCH);
          appendAttribute(ATTRIBUTE_NAMESPACE, NAMESPACE, sb);
          sb.append(">");
          appendNewLine(sb);
-         IDebugTarget[] targets = launch.getDebugTargets();
          for (IDebugTarget target : targets) {
             if (target instanceof ISEDDebugTarget) {
                sb.append(toXML(1, (ISEDDebugTarget)target));
@@ -217,6 +328,7 @@ public class SEDXMLWriter {
          appendWhiteSpace(level, sb);
          sb.append("<");
          sb.append(TAG_DEBUG_TARGET);
+         appendAttribute(ATTRIBUTE_ID, target.getId(), sb);
          appendAttribute(ATTRIBUTE_NAME, target.getName(), sb);
          appendAttribute(ATTRIBUTE_MODEL_IDENTIFIER, target.getModelIdentifier(), sb);
          sb.append(">");
@@ -420,6 +532,7 @@ public class SEDXMLWriter {
          appendWhiteSpace(level, sb);
          sb.append("<");
          sb.append(tagName);
+         appendAttribute(ATTRIBUTE_ID, node.getId(), sb);
          appendAttribute(ATTRIBUTE_NAME, node.getName(), sb);
          if (node instanceof IStackFrame) {
             IStackFrame frame = (IStackFrame)node;

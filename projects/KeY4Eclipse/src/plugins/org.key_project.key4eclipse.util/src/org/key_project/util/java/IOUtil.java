@@ -35,6 +35,26 @@ public final class IOUtil {
     */
    private IOUtil() {
    }
+   
+   /**
+    * Returns the file name without file extension for the given file name with extension.
+    * @param file The file name with extension for that the file name without extension is needed.
+    * @return The file name without extension or {@code null} if it was not possible to compute it.
+    */
+   public static String getFileNameWithoutExtension(String fileName) {
+      if (fileName != null) {
+         int dotIndex = fileName.lastIndexOf('.');
+         if (dotIndex >= 0) {
+            return fileName.substring(0, dotIndex);
+         }
+         else {
+            return fileName;
+         }
+      }
+      else {
+         return null;
+      }
+   }
 
    /**
     * Deletes the given file/folder with all contained sub files/folders.

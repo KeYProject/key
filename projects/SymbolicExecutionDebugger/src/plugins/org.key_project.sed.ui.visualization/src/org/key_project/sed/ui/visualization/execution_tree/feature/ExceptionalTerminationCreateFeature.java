@@ -7,9 +7,11 @@ import org.eclipse.graphiti.features.ICreateFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDExceptionalTermination;
+import org.key_project.sed.core.model.memory.ISEDMemoryDebugNode;
 import org.key_project.sed.core.model.memory.SEDMemoryExceptionalTermination;
 import org.key_project.sed.ui.visualization.execution_tree.provider.IExecutionTreeImageConstants;
 import org.key_project.sed.ui.visualization.execution_tree.wizard.CreateDebugNodeWizard.CreateDebugNodeWizardResult;
+import org.key_project.sed.ui.visualization.util.LogUtil;
 
 /**
  * Implementation of {@link ICreateFeature} for {@link ISEDExceptionalTermination}s.
@@ -49,6 +51,10 @@ public class ExceptionalTerminationCreateFeature extends AbstractDebugNodeCreate
       Assert.isNotNull(parent);
       SEDMemoryExceptionalTermination result = new SEDMemoryExceptionalTermination(parent.getDebugTarget(), parent, parent.getThread());
       result.setName(initialValues.getName());
+      if (!(parent instanceof ISEDMemoryDebugNode)) {
+         throw new DebugException(LogUtil.getLogger().createErrorStatus("Unsupported parent \"" + parent + "\"."));
+      }
+      ((ISEDMemoryDebugNode)parent).addChild(result);      
       return result;
    }
 

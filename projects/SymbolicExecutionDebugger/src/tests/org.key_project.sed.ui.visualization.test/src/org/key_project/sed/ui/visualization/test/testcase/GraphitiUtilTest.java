@@ -1,18 +1,95 @@
 package org.key_project.sed.ui.visualization.test.testcase;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Collections;
+
 import junit.framework.TestCase;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
+import org.eclipse.emf.edit.command.AddCommand;
+import org.eclipse.emf.transaction.TransactionalEditingDomain;
+import org.eclipse.emf.workspace.WorkspaceEditingDomainFactory;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
+import org.eclipse.graphiti.services.Graphiti;
+import org.eclipse.graphiti.ui.editor.DiagramEditorInput;
 import org.eclipse.graphiti.ui.services.GraphitiUi;
 import org.junit.Test;
 import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeDiagramTypeProvider;
+import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
+import org.key_project.util.test.util.TestUtilsUtil;
 
 /**
  * Tests for {@link GraphitiUtil}.
  * @author Martin Hentschel
  */
 public class GraphitiUtilTest extends TestCase {
+   /**
+    * Tests {@link GraphitiUtil#getFile(org.eclipse.graphiti.ui.editor.DiagramEditorInput)}
+    */
+   @Test
+   public void testGetFile_DiagramEditorInput() throws IOException {
+      File tempFile = File.createTempFile("Diagram", ExecutionTreeUtil.DIAGRAM_FILE_EXTENSION_WITH_DOT);
+      try {
+         // Create workspace model
+         IProject project = TestUtilsUtil.createProject("GraphitiUtilTest_testGetFile_DiagramEditorInput");
+         IFile diagramFile = project.getFile("Diagram" + ExecutionTreeUtil.DIAGRAM_FILE_EXTENSION_WITH_DOT);
+         Diagram diagramInResource = Graphiti.getPeCreateService().createDiagram(ExecutionTreeDiagramTypeProvider.TYPE, "Test", true);
+         TransactionalEditingDomain domainResource = WorkspaceEditingDomainFactory.INSTANCE.createEditingDomain();
+         Resource resource = domainResource.getResourceSet().createResource(URI.createPlatformResourceURI(diagramFile.getFullPath().toString(), true));
+         domainResource.getCommandStack().execute(new AddCommand(domainResource, resource.getContents(), diagramInResource));
+         resource.save(Collections.EMPTY_MAP);
+         // Create file system model
+         Diagram diagramInFileSystem = Graphiti.getPeCreateService().createDiagram(ExecutionTreeDiagramTypeProvider.TYPE, "Test", true);
+         TransactionalEditingDomain domainFileSystem = WorkspaceEditingDomainFactory.INSTANCE.createEditingDomain();
+         Resource resourceOS = domainFileSystem.getResourceSet().createResource(URI.createFileURI(tempFile.getAbsolutePath()));
+         domainFileSystem.getCommandStack().execute(new AddCommand(domainFileSystem, resourceOS.getContents(), diagramInFileSystem));
+         resourceOS.getContents().add(diagramInFileSystem);
+         resourceOS.save(Collections.EMPTY_MAP);
+         // Test results
+         assertNull(GraphitiUtil.getFile((DiagramEditorInput)null));
+         assertEquals(diagramFile, GraphitiUtil.getFile(DiagramEditorInput.createEditorInput(diagramInResource, domainResource, ExecutionTreeDiagramTypeProvider.PROVIDER_ID, true)));
+         assertNull(GraphitiUtil.getFile(DiagramEditorInput.createEditorInput(diagramInFileSystem, domainFileSystem, ExecutionTreeDiagramTypeProvider.PROVIDER_ID, true)));
+      }
+      finally {
+         tempFile.delete();
+      }
+   }
+   
+   /**
+    * Tests {@link GraphitiUtil#getFile(org.eclipse.emf.ecore.EObject)}
+    */
+   @Test
+   public void testGetFile_EObject() throws IOException {
+      File tempFile = File.createTempFile("Diagram", ExecutionTreeUtil.DIAGRAM_FILE_EXTENSION_WITH_DOT);
+      try {
+         // Create model
+         IProject project = TestUtilsUtil.createProject("GraphitiUtilTest_testGetFile_EObject");
+         IFile diagramFile = project.getFile("Diagram" + ExecutionTreeUtil.DIAGRAM_FILE_EXTENSION_WITH_DOT);
+         Diagram diagram = Graphiti.getPeCreateService().createDiagram(ExecutionTreeDiagramTypeProvider.TYPE, "Test", true);
+         Diagram diagramInResource = Graphiti.getPeCreateService().createDiagram(ExecutionTreeDiagramTypeProvider.TYPE, "Test", true);
+         Resource resource = new ResourceSetImpl().createResource(URI.createPlatformResourceURI(diagramFile.getFullPath().toString(), true));
+         resource.getContents().add(diagramInResource);
+         Diagram diagramInFileSystem = Graphiti.getPeCreateService().createDiagram(ExecutionTreeDiagramTypeProvider.TYPE, "Test", true);
+         Resource resourceOS = new ResourceSetImpl().createResource(URI.createFileURI(tempFile.getAbsolutePath()));
+         resourceOS.getContents().add(diagramInFileSystem);
+         // Test results
+         assertNull(GraphitiUtil.getFile((EObject)null));
+         assertNull(GraphitiUtil.getFile(diagram));
+         assertEquals(diagramFile, GraphitiUtil.getFile(diagramInResource));
+         assertNull(GraphitiUtil.getFile(diagramInFileSystem));
+      }
+      finally {
+         tempFile.delete();
+      }
+   }
+   
    /**
     * Tests {@link GraphitiUtil#nextGrid(org.eclipse.graphiti.mm.pictograms.Diagram, int)}
     */

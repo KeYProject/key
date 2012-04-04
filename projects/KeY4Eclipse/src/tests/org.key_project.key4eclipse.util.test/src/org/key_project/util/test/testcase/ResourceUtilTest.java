@@ -22,6 +22,19 @@ import org.key_project.util.test.util.TestUtilsUtil;
  */
 public class ResourceUtilTest extends TestCase {
    /**
+    * Tests {@link ResourceUtil#getFileNameWithoutExtension(IFile)}.
+    */
+   @Test
+   public void testGetFileNameWithoutExtension() {
+      IProject project = TestUtilsUtil.createProject("ResourceUtilTest_testGetFileNameWithoutExtension");
+      assertNull(ResourceUtil.getFileNameWithoutExtension(null));
+      assertEquals("test", ResourceUtil.getFileNameWithoutExtension(project.getFile("test.txt")));
+      assertEquals("hello.world", ResourceUtil.getFileNameWithoutExtension(project.getFile("hello.world.diagram")));
+      assertEquals("", ResourceUtil.getFileNameWithoutExtension(project.getFile(".project")));
+      assertEquals("file", ResourceUtil.getFileNameWithoutExtension(project.getFile("file")));
+   }
+   
+   /**
     * Tests {@link ResourceUtil#getProject(String)}.
     */
    @Test

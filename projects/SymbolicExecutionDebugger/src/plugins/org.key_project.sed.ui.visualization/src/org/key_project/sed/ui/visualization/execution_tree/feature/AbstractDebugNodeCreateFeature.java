@@ -13,7 +13,7 @@ import org.eclipse.graphiti.features.impl.AbstractCreateFeature;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeFeatureProvider;
-import org.key_project.sed.ui.visualization.execution_tree.service.HashCodeIndependenceSolver;
+import org.key_project.sed.ui.visualization.execution_tree.service.SEDIndependenceSolver;
 import org.key_project.sed.ui.visualization.execution_tree.wizard.CreateDebugNodeWizard;
 import org.key_project.sed.ui.visualization.execution_tree.wizard.CreateDebugNodeWizard.CreateDebugNodeWizardResult;
 import org.key_project.sed.ui.visualization.util.LogUtil;
@@ -76,7 +76,7 @@ public abstract class AbstractDebugNodeCreateFeature extends AbstractCreateFeatu
     */
    protected List<ISEDDebugNode> collectExistingNodes() {
       Assert.isTrue(getFeatureProvider() instanceof ExecutionTreeFeatureProvider);
-      HashCodeIndependenceSolver solver = ((ExecutionTreeFeatureProvider)getFeatureProvider()).getHashCodeIndependenceSolver();
+      SEDIndependenceSolver solver = ((ExecutionTreeFeatureProvider)getFeatureProvider()).getSEDIndependenceSolver();
       Collection<Object> businessObjects = solver.getAllBusinessObjects();
       List<ISEDDebugNode> result = new LinkedList<ISEDDebugNode>();
       for (Object obj : businessObjects) {
