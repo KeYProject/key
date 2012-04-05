@@ -104,4 +104,31 @@
              file-extensions="set">
        </file-association>
     </extension>
+      <extension
+          point="org.eclipse.ui.views.properties.tabbed.propertyContributor">
+          <propertyContributor contributorId="symbolicExecutionTreeDiagram.PropertyContributor">
+              <propertyCategory category="Graphiti">
+              </propertyCategory>
+          </propertyContributor>
+      </extension>
+       
+      <extension
+          point="org.eclipse.ui.views.properties.tabbed.propertyTabs">
+          <propertyTabs contributorId="symbolicExecutionTreeDiagram.PropertyContributor">
+              <propertyTab label="Debug" category="Graphiti"
+                  id="org.key_project.sed.ui.visualization.debug.tab">
+              </propertyTab>
+          </propertyTabs>
+      </extension>
+       
+      <extension
+          point="org.eclipse.ui.views.properties.tabbed.propertySections">
+          <propertySections contributorId="symbolicExecutionTreeDiagram.PropertyContributor">
+              <propertySection tab="org.key_project.sed.ui.visualization.debug.tab"           
+               class="org.key_project.sed.ui.visualization.execution_tree.property.SEDDebugNodePropertySection"
+               filter="org.key_project.sed.ui.visualization.execution_tree.property.SEDDebugNodeTreeFilter"
+               id="org.key_project.sed.ui.visualization.debug.tab.SEDDebugNodePropertySection">
+              </propertySection>
+          </propertySections>
+      </extension>    
 </plugin>
