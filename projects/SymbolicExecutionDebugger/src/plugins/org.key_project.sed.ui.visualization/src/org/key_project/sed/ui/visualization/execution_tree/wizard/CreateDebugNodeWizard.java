@@ -1,5 +1,6 @@
 package org.key_project.sed.ui.visualization.execution_tree.wizard;
 
+import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Shell;
@@ -35,6 +36,11 @@ public class CreateDebugNodeWizard extends Wizard {
    private boolean threadCreation;
    
    /**
+    * The used {@link IFeatureProvider}.
+    */
+   private IFeatureProvider featureProvider;
+
+   /**
     * The result of this {@link Wizard}.
     */
    private CreateDebugNodeWizardResult result;
@@ -44,14 +50,17 @@ public class CreateDebugNodeWizard extends Wizard {
     * @param nodeType The name of the node type which should be created.
     * @param debugTargets The existing {@link ISEDDebugTarget}s.
     * @param threadCreation Indicates that threads should be created.
+    * @param featureProvider The {@link IFeatureProvider} to use.
     */
    public CreateDebugNodeWizard(String nodeType, 
                                 ISEDDebugTarget[] debugTargets,
-                                boolean threadCreation) {
+                                boolean threadCreation,
+                                IFeatureProvider featureProvider) {
       super();
       this.nodeType = nodeType;
       this.debugTargets = debugTargets;
       this.threadCreation = threadCreation;
+      this.featureProvider = featureProvider;
    }
 
    /**
@@ -60,7 +69,11 @@ public class CreateDebugNodeWizard extends Wizard {
    @Override
    public void addPages() {
       setWindowTitle("Create " + nodeType);
-      propertyPage = new CreateDebugNodeWizardPage("propertyPage", nodeType, debugTargets, threadCreation);
+      propertyPage = new CreateDebugNodeWizardPage("propertyPage", 
+                                                   nodeType, 
+                                                   debugTargets, 
+                                                   threadCreation, 
+                                                   featureProvider);
       addPage(propertyPage);
    }
 
@@ -90,13 +103,18 @@ public class CreateDebugNodeWizard extends Wizard {
     * @param nodeType The name of the node type which should be created.
     * @param debugTargets The existing {@link ISEDDebugTarget}s.
     * @param threadCreation Indicates that threads should be created.
+    * @param featureProvider The {@link IFeatureProvider} to use.
     * @return The wizard result or {@code null} if the wizard was canceled.
     */
    public static CreateDebugNodeWizardResult openWizard(Shell parentShell, 
                                                         String nodeType, 
                                                         ISEDDebugTarget[] debugTargets,
-                                                        boolean threadCreation) {
-      CreateDebugNodeWizard wizard = new CreateDebugNodeWizard(nodeType, debugTargets, threadCreation);
+                                                        boolean threadCreation,
+                                                        IFeatureProvider featureProvider) {
+      CreateDebugNodeWizard wizard = new CreateDebugNodeWizard(nodeType, 
+                                                               debugTargets, 
+                                                               threadCreation, 
+                                                               featureProvider);
       WizardDialog dialog = new WizardDialog(parentShell, wizard);
       dialog.setHelpAvailable(false);
       if (dialog.open() == WizardDialog.OK) {

@@ -56,7 +56,8 @@ public abstract class AbstractDebugNodeCreateFeature extends AbstractCreateFeatu
          CreateDebugNodeWizardResult result = CreateDebugNodeWizard.openWizard(WorkbenchUtil.getActiveShell(), 
                                                                                getNodeType(),
                                                                                getAvailableDebugTargets(),
-                                                                               isThreadCreation()); 
+                                                                               isThreadCreation(),
+                                                                               getFeatureProvider()); 
          if (result != null) {
             // Create new business object
             ISEDDebugTarget target = result.getTarget();

@@ -3,10 +3,14 @@ package org.key_project.sed.ui.visualization.execution_tree.provider;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.ICreateFeature;
+import org.eclipse.graphiti.features.IDeleteFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.ILayoutFeature;
+import org.eclipse.graphiti.features.IRemoveFeature;
 import org.eclipse.graphiti.features.context.IAddContext;
+import org.eclipse.graphiti.features.context.IDeleteContext;
 import org.eclipse.graphiti.features.context.ILayoutContext;
+import org.eclipse.graphiti.features.context.IRemoveContext;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.ui.features.DefaultFeatureProvider;
 import org.key_project.sed.core.model.ISEDBranchCondition;
@@ -40,6 +44,8 @@ import org.key_project.sed.ui.visualization.execution_tree.feature.MethodCallLay
 import org.key_project.sed.ui.visualization.execution_tree.feature.MethodReturnAddFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.MethodReturnCreateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.MethodReturnLayoutFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.ExecutionTreeDeleteFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.ExecutionTreeRemoveFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.StatementAddFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.StatementCreateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.StatementLayoutFeature;
@@ -64,7 +70,7 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
       super(dtp);
       setIndependenceSolver(new SEDIndependenceSolver());
    }
-   
+
    /**
     * {@inheritDoc}
     */
@@ -162,6 +168,16 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
       else {
          return super.getLayoutFeature(context);
       }
+   }
+   
+   @Override
+   public IDeleteFeature getDeleteFeature(IDeleteContext context) {
+      return new ExecutionTreeDeleteFeature(this);
+   }
+
+   @Override
+   public IRemoveFeature getRemoveFeature(IRemoveContext context) {
+      return new ExecutionTreeRemoveFeature(this);
    }
    
    /**

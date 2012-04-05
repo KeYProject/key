@@ -1,6 +1,5 @@
 package org.key_project.sed.ui.visualization.execution_tree.service;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -80,13 +79,5 @@ public class SEDIndependenceSolver implements IIndependenceSolver {
    @Override
    public Object getBusinessObjectForKey(String key) {
       return key != null ? objectHashmap.get(key) : null;
-   }
-   
-   /**
-    * Returns all known business objects.
-    * @return The known business objects.
-    */
-   public Collection<Object> getAllBusinessObjects() {
-      return objectHashmap.values();
    }
 }

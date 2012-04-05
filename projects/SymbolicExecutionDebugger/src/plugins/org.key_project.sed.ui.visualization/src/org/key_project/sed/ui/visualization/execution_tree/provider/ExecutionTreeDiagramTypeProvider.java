@@ -23,7 +23,6 @@ import org.key_project.sed.ui.visualization.util.LogUtil;
  * {@link IDiagramTypeProvider} specific implementation for execution tree diagrams.
  * @author Martin Hentschel
  */
-// TODO: Implement customized delete/remove feature to remove/delete the whole sub tree and the business objects
 // TODO: Implement properties view
 // TODO: Refactor branch conditions as connection text
 public class ExecutionTreeDiagramTypeProvider extends AbstractDiagramTypeProvider {

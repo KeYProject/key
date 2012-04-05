@@ -3,7 +3,10 @@ package org.key_project.sed.ui.visualization.execution_tree.wizard.page;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.graphiti.features.IFeatureProvider;
+import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -44,6 +47,11 @@ public class CreateDebugNodeWizardPage extends WizardPage {
    private boolean threadCreation;
    
    /**
+    * The used {@link IFeatureProvider}.
+    */
+   private IFeatureProvider featureProvider;
+   
+   /**
     * Input field for the name.
     */
    private Text nameText;
@@ -79,14 +87,19 @@ public class CreateDebugNodeWizardPage extends WizardPage {
     * @param nodeType The name of the node type which should be created.
     * @param debugTargets The existing {@link ISEDDebugTarget}s.
     * @param threadCreation Indicates that threads should be created.
+    * @param featureProvider The {@link IFeatureProvider} to use.
     */
    public CreateDebugNodeWizardPage(String pageName, 
                                     String nodeType, 
                                     ISEDDebugTarget[] debugTargets,
-                                    boolean threadCreation) {
+                                    boolean threadCreation,
+                                    IFeatureProvider featureProvider) {
       super(pageName);
+      Assert.isNotNull(debugTargets);
+      Assert.isNotNull(featureProvider);
       this.debugTargets = debugTargets;
       this.threadCreation = threadCreation;
+      this.featureProvider = featureProvider;
       setTitle("Create " + nodeType);
       setDescription("Define the properties for the new " + nodeType + ".");
    }
@@ -112,19 +125,21 @@ public class CreateDebugNodeWizardPage extends WizardPage {
          }
       });
       // Debug target
-      Label targetLabel = new Label(root, SWT.NONE);
-      targetLabel.setText("&Debug Target");
-      targetCombo = new Combo(root, SWT.READ_ONLY);
-      targetCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-      targetCombo.addSelectionListener(new SelectionAdapter() {
-         @Override
-         public void widgetSelected(SelectionEvent e) {
-            updateThreads();
-            updatePageCompleted();
+      if (isTargetComboShown()) {
+         Label targetLabel = new Label(root, SWT.NONE);
+         targetLabel.setText("&Debug Target");
+         targetCombo = new Combo(root, SWT.READ_ONLY);
+         targetCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+         targetCombo.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+               updateThreads();
+               updatePageCompleted();
+            }
+         });
+         for (ISEDDebugTarget target : debugTargets) {
+            SWTUtil.add(targetCombo, ObjectUtil.toString(target));
          }
-      });
-      for (ISEDDebugTarget target : debugTargets) {
-         SWTUtil.add(targetCombo, ObjectUtil.toString(target));
       }
       if (!isThreadCreation()) {
          // Thread combo
@@ -152,7 +167,9 @@ public class CreateDebugNodeWizardPage extends WizardPage {
          });
       }
       // Select default values
-      selectFirstItem(targetCombo);
+      if (isTargetComboShown()) {
+         selectFirstItem(targetCombo);
+      }
       updateThreads();
       // Update page completed
       updatePageCompleted();
@@ -224,7 +241,10 @@ public class CreateDebugNodeWizardPage extends WizardPage {
       while (iter.hasNext()) {
          ISEDDebugElement next = iter.next();
          if (next instanceof ISEDDebugNode) {
-            children.addFirst((ISEDDebugNode)next);
+            PictogramElement pe = featureProvider.getPictogramElementForBusinessObject(next);
+            if (pe != null) { // Do not include hidden (removed) elements
+               children.addFirst((ISEDDebugNode)next);
+            }
          }
       }
       return children;
@@ -295,12 +315,17 @@ public class CreateDebugNodeWizardPage extends WizardPage {
     * @return The selected {@link ISEDDebugTarget}.
     */
    public ISEDDebugTarget getTarget() {
-      int index = targetCombo.getSelectionIndex();
-      if (index >= 0 && index < debugTargets.length) {
-         return debugTargets[index];
+      if (isTargetComboShown()) {
+         int index = targetCombo.getSelectionIndex();
+         if (index >= 0 && index < debugTargets.length) {
+            return debugTargets[index];
+         }
+         else {
+            return null;
+         }
       }
       else {
-         return null;
+         return debugTargets[0];
       }
    }
    
@@ -340,5 +365,13 @@ public class CreateDebugNodeWizardPage extends WizardPage {
       else {
          return null;
       }
+   }
+   
+   /**
+    * Checks if the debug target combo {@link #targetCombo} is shown or not.
+    * @return {@code true} is shown, {@code false} is not shown.
+    */
+   public boolean isTargetComboShown() {
+      return debugTargets.length != 1;
    }
 }
