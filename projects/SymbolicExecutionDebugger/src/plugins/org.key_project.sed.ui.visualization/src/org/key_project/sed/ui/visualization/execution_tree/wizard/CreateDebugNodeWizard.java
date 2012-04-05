@@ -1,11 +1,11 @@
 package org.key_project.sed.ui.visualization.execution_tree.wizard;
 
-import java.util.List;
-
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.ui.visualization.execution_tree.wizard.page.CreateDebugNodeWizardPage;
 
 /**
@@ -25,9 +25,14 @@ public class CreateDebugNodeWizard extends Wizard {
    private String nodeType;
 
    /**
-    * The existing business objects.
+    * The existing {@link ISEDDebugTarget}s.
     */
-   private List<ISEDDebugNode> businessObjects;
+   private ISEDDebugTarget[] debugTargets;
+   
+   /**
+    * Indicates that threads should be created.
+    */
+   private boolean threadCreation;
    
    /**
     * The result of this {@link Wizard}.
@@ -37,12 +42,16 @@ public class CreateDebugNodeWizard extends Wizard {
    /**
     * Constructor.
     * @param nodeType The name of the node type which should be created.
-    * @param businessObjects The existing business objects.
+    * @param debugTargets The existing {@link ISEDDebugTarget}s.
+    * @param threadCreation Indicates that threads should be created.
     */
-   public CreateDebugNodeWizard(String nodeType, List<ISEDDebugNode> businessObjects) {
+   public CreateDebugNodeWizard(String nodeType, 
+                                ISEDDebugTarget[] debugTargets,
+                                boolean threadCreation) {
       super();
       this.nodeType = nodeType;
-      this.businessObjects = businessObjects;
+      this.debugTargets = debugTargets;
+      this.threadCreation = threadCreation;
    }
 
    /**
@@ -51,7 +60,7 @@ public class CreateDebugNodeWizard extends Wizard {
    @Override
    public void addPages() {
       setWindowTitle("Create " + nodeType);
-      propertyPage = new CreateDebugNodeWizardPage("propertyPage", nodeType, businessObjects);
+      propertyPage = new CreateDebugNodeWizardPage("propertyPage", nodeType, debugTargets, threadCreation);
       addPage(propertyPage);
    }
 
@@ -61,7 +70,9 @@ public class CreateDebugNodeWizard extends Wizard {
    @Override
    public boolean performFinish() {
       result = new CreateDebugNodeWizardResult(propertyPage.getNameValue(),
-                                               propertyPage.isParentRequired() ? propertyPage.getParent() : null);
+                                               propertyPage.getTarget(),
+                                               propertyPage.getParent(),
+                                               propertyPage.getThread());
       return true;
    }
    
@@ -77,13 +88,15 @@ public class CreateDebugNodeWizard extends Wizard {
     * Opens the this {@link Wizard} in an {@link WizardDialog}.
     * @param parentShell The parent {@link Shell} to use.
     * @param nodeType The name of the node type which should be created.
-    * @param businessObjects The existing business objects.
+    * @param debugTargets The existing {@link ISEDDebugTarget}s.
+    * @param threadCreation Indicates that threads should be created.
     * @return The wizard result or {@code null} if the wizard was canceled.
     */
    public static CreateDebugNodeWizardResult openWizard(Shell parentShell, 
-                                                        String nodeType,
-                                                        List<ISEDDebugNode> businessObjects) {
-      CreateDebugNodeWizard wizard = new CreateDebugNodeWizard(nodeType, businessObjects);
+                                                        String nodeType, 
+                                                        ISEDDebugTarget[] debugTargets,
+                                                        boolean threadCreation) {
+      CreateDebugNodeWizard wizard = new CreateDebugNodeWizard(nodeType, debugTargets, threadCreation);
       WizardDialog dialog = new WizardDialog(parentShell, wizard);
       dialog.setHelpAvailable(false);
       if (dialog.open() == WizardDialog.OK) {
@@ -103,21 +116,38 @@ public class CreateDebugNodeWizard extends Wizard {
        * The name of the {@link ISEDDebugNode} to create.
        */
       private String name;
+      
+      /**
+       * The selected {@link ISEDDebugTarget}.
+       */
+      private ISEDDebugTarget target;
 
       /**
-       * The selected parent {@link ISEDDebugNode} or {@code null} if no parent is required.
+       * The selected parent {@link ISEDDebugNode} or {@code null} if an {@link ISEDThread} should be created.
        */
       private ISEDDebugNode parent;
       
       /**
+       * The selected {@link ISEDThread} or {@code null} if an {@link ISEDThread} should be created.
+       */
+      private ISEDThread thread;
+      
+      /**
        * Constructor.
        * @param name The name of the {@link ISEDDebugNode} to create.
-       * @param parent The selected parent {@link ISEDDebugNode} or {@code null} if no parent is required.
+       * @param target The selected {@link ISEDDebugTarget}.
+       * @param parent The selected parent {@link ISEDDebugNode} or {@code null} if an {@link ISEDThread} should be created.
+       * @param thread The selected {@link ISEDThread} or {@code null} if an {@link ISEDThread} should be created.
        */
-      public CreateDebugNodeWizardResult(String name, ISEDDebugNode parent) {
+      public CreateDebugNodeWizardResult(String name, 
+                                         ISEDDebugTarget target, 
+                                         ISEDDebugNode parent, 
+                                         ISEDThread thread) {
          super();
          this.name = name;
+         this.target = target;
          this.parent = parent;
+         this.thread = thread;
       }
 
       /**
@@ -129,11 +159,27 @@ public class CreateDebugNodeWizard extends Wizard {
       }
 
       /**
-       * Returns the selected parent {@link ISEDDebugNode} or {@code null} if no parent is required.
-       * @return The selected parent {@link ISEDDebugNode} or {@code null} if no parent is required.
+       * Returns the selected {@link ISEDDebugTarget}.
+       * @return The selected {@link ISEDDebugTarget}.
+       */
+      public ISEDDebugTarget getTarget() {
+         return target;
+      }
+
+      /**
+       * Returns the selected parent {@link ISEDDebugNode} or {@code null} if an {@link ISEDThread} should be created.
+       * @return The selected parent {@link ISEDDebugNode} or {@code null} if an {@link ISEDThread} should be created.
        */
       public ISEDDebugNode getParent() {
          return parent;
+      }
+
+      /**
+       * Returns the selected {@link ISEDThread} or {@code null} if an {@link ISEDThread} should be created.
+       * @return The selected {@link ISEDThread} or {@code null} if an {@link ISEDThread} should be created.
+       */
+      public ISEDThread getThread() {
+         return thread;
       }
    }
 }

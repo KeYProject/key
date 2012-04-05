@@ -1,7 +1,9 @@
 package org.key_project.sed.ui.visualization.execution_tree.wizard.page;
 
+import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.debug.core.DebugException;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -14,8 +16,13 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.key_project.sed.core.model.ISEDDebugElement;
 import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDThread;
+import org.key_project.sed.core.util.SEDIterator;
 import org.key_project.sed.ui.visualization.execution_tree.wizard.CreateDebugNodeWizard;
+import org.key_project.sed.ui.visualization.util.LogUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.StringUtil;
@@ -27,9 +34,14 @@ import org.key_project.util.java.StringUtil;
  */
 public class CreateDebugNodeWizardPage extends WizardPage {
    /**
-    * The existing business objects.
+    * The existing {@link ISEDDebugTarget}s shown in {@link #targetCombo}.
     */
-   private List<ISEDDebugNode> businessObjects;
+   private ISEDDebugTarget[] debugTargets;
+   
+   /**
+    * Indicates that threads should be created.
+    */
+   private boolean threadCreation;
    
    /**
     * Input field for the name.
@@ -37,19 +49,44 @@ public class CreateDebugNodeWizardPage extends WizardPage {
    private Text nameText;
    
    /**
-    * Input field to define the parent.
+    * {@link Combo} to select {@link ISEDDebugTarget}s.
+    */
+   private Combo targetCombo;
+   
+   /**
+    * {@link Combo} to select {@link ISEDThread}s.
+    */
+   private Combo threadCombo;
+   
+   /**
+    * Input field to define the parent in the {@link ISEDThread}.
     */
    private Combo parentCombo;
+   
+   /**
+    * The shown {@link ISEDThread}s in {@link #threadCombo}.
+    */
+   private ISEDThread[] threads;
+   
+   /**
+    * The shown {@link ISEDDebugNode}s in {@link #parentCombo}.
+    */
+   private List<ISEDDebugNode> parents;
    
    /**
     * Constructor.
     * @param pageName The page name.
     * @param nodeType The name of the node type which should be created.
-    * @param businessObjects The existing business objects.
+    * @param debugTargets The existing {@link ISEDDebugTarget}s.
+    * @param threadCreation Indicates that threads should be created.
     */
-   public CreateDebugNodeWizardPage(String pageName, String nodeType, List<ISEDDebugNode> businessObjects) {
+   public CreateDebugNodeWizardPage(String pageName, 
+                                    String nodeType, 
+                                    ISEDDebugTarget[] debugTargets,
+                                    boolean threadCreation) {
       super(pageName);
-      this.businessObjects = businessObjects;
+      this.debugTargets = debugTargets;
+      this.threadCreation = threadCreation;
       setTitle("Create " + nodeType);
       setDescription("Define the properties for the new " + nodeType + ".");
    }
@@ -74,8 +111,35 @@ public class CreateDebugNodeWizardPage extends WizardPage {
             updatePageCompleted();
          }
       });
-      // Parent combo
-      if (isParentRequired()) {
+      // Debug target
+      Label targetLabel = new Label(root, SWT.NONE);
+      targetLabel.setText("&Debug Target");
+      targetCombo = new Combo(root, SWT.READ_ONLY);
+      targetCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+      targetCombo.addSelectionListener(new SelectionAdapter() {
+         @Override
+         public void widgetSelected(SelectionEvent e) {
+            updateThreads();
+            updatePageCompleted();
+         }
+      });
+      for (ISEDDebugTarget target : debugTargets) {
+         SWTUtil.add(targetCombo, ObjectUtil.toString(target));
+      }
+      if (!isThreadCreation()) {
+         // Thread combo
+         Label threadLabel = new Label(root, SWT.NONE);
+         threadLabel.setText("&Thread");
+         threadCombo = new Combo(root, SWT.READ_ONLY);
+         threadCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+         threadCombo.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+               updateParents();
+               updatePageCompleted();
+            }
+         });
+         // Parent combo
          Label parentLabel = new Label(root, SWT.NONE);
          parentLabel.setText("&Parent");
          parentCombo = new Combo(root, SWT.READ_ONLY);
@@ -86,14 +150,96 @@ public class CreateDebugNodeWizardPage extends WizardPage {
                updatePageCompleted();
             }
          });
-         for (ISEDDebugNode node : businessObjects) {
-            SWTUtil.add(parentCombo, ObjectUtil.toString(node));
-         }
       }
+      // Select default values
+      selectFirstItem(targetCombo);
+      updateThreads();
       // Update page completed
       updatePageCompleted();
    }
+
+   /**
+    * Updates the available {@link ISEDThread}s in {@link #threadCombo}.
+    */
+   protected void updateThreads() {
+      try {
+         if (!isThreadCreation()) {
+            // Remove old items
+            threadCombo.removeAll();
+            // Add new items if possible
+            ISEDDebugTarget target = getTarget();
+            if (target != null) {
+               threads = target.getSymbolicThreads();
+               for (ISEDThread thread : threads) {
+                  SWTUtil.add(threadCombo, ObjectUtil.toString(thread));
+               }
+               // Select first item
+               selectFirstItem(threadCombo);
+            }
+            // Update parents
+            updateParents();
+         }
+      }
+      catch (DebugException e) {
+         LogUtil.getLogger().logError(e);
+         LogUtil.getLogger().openErrorDialog(getShell(), e);
+      }
+   }
    
+   /**
+    * Updates the available {@link ISEDDebugNode}s in {@link #parentCombo}.
+    */   
+   protected void updateParents() {
+      try {
+         if (!isThreadCreation()) {
+            // Remove old items
+            parentCombo.removeAll();
+            // Add new items if possible
+            ISEDThread thread = getThread();
+            if (thread != null) {
+               parents = listParents(thread);
+               for (ISEDDebugNode parent : parents) {
+                  SWTUtil.add(parentCombo, ObjectUtil.toString(parent));
+               }
+               // Select first item
+               selectFirstItem(parentCombo);
+            }
+         }
+      }
+      catch (DebugException e) {
+         LogUtil.getLogger().logError(e);
+         LogUtil.getLogger().openErrorDialog(getShell(), e);
+      }
+   }
+   
+   /**
+    * Collects the contained {@link ISEDDebugNode}s in the given {@link ISEDThread}.
+    * @param thread The given {@link ISEDThread}.
+    * @return The contained {@link ISEDDebugNode}s.
+    * @throws DebugException Occurred Exception.
+    */
+   protected List<ISEDDebugNode> listParents(ISEDThread thread) throws DebugException {
+      LinkedList<ISEDDebugNode> children = new LinkedList<ISEDDebugNode>();
+      SEDIterator iter = new SEDIterator(thread);
+      while (iter.hasNext()) {
+         ISEDDebugElement next = iter.next();
+         if (next instanceof ISEDDebugNode) {
+            children.addFirst((ISEDDebugNode)next);
+         }
+      }
+      return children;
+   }
+
+   /**
+    * Selects the first item if possible in the given {@link Combo}.
+    * @param combo The {@link Combo} to select the first item in.
+    */
+   protected void selectFirstItem(Combo combo) {
+      if (combo.getItemCount() >= 1) {
+         combo.setText(combo.getItem(0));
+      }
+   }
+
    /**
     * Updates the page completed status.
     */
@@ -103,9 +249,20 @@ public class CreateDebugNodeWizardPage extends WizardPage {
       if (!valid) {
          setErrorMessage("No name defined.");
       }
-      if (valid && isParentRequired()) {
-         ISEDDebugNode parent = getParent();
-         valid = parent != null;
+      if (valid) {
+         valid = getTarget() != null;
+         if (!valid) {
+            setErrorMessage("No debug target selected.");
+         }
+      }
+      if (valid && !isThreadCreation()) {
+         valid = getThread() != null;
+         if (!valid) {
+            setErrorMessage("No thread selected.");
+         }
+      }
+      if (valid && !isThreadCreation()) {
+         valid = getParent() != null;
          if (!valid) {
             setErrorMessage("No parent selected.");
          }
@@ -126,11 +283,25 @@ public class CreateDebugNodeWizardPage extends WizardPage {
    }
    
    /**
-    * Checks if a parent is required.
-    * @return {@code true} parent is required, {@code false} parent is not required.
+    * Checks if {@link ISEDThread}s should be created.
+    * @return {@code true} create threads, {@code false} create other {@link ISEDDebugNode}s.
     */
-   public boolean isParentRequired() {
-      return businessObjects != null;
+   public boolean isThreadCreation() {
+      return threadCreation;
+   }
+   
+   /**
+    * Returns the selected {@link ISEDDebugTarget}.
+    * @return The selected {@link ISEDDebugTarget}.
+    */
+   public ISEDDebugTarget getTarget() {
+      int index = targetCombo.getSelectionIndex();
+      if (index >= 0 && index < debugTargets.length) {
+         return debugTargets[index];
+      }
+      else {
+         return null;
+      }
    }
    
    /**
@@ -138,9 +309,33 @@ public class CreateDebugNodeWizardPage extends WizardPage {
     * @return The parent {@link ISEDDebugNode}.
     */
    public ISEDDebugNode getParent() {
-      int index = parentCombo.getSelectionIndex();
-      if (index >= 0 && index < businessObjects.size()) {
-         return businessObjects.get(index);
+      if (!isThreadCreation()) {
+         int index = parentCombo.getSelectionIndex();
+         if (index >= 0 && index < parents.size()) {
+            return parents.get(index);
+         }
+         else {
+            return null;
+         }
+      }
+      else {
+         return null;
+      }
+   }
+   
+   /**
+    * Returns the selected {@link ISEDThread}.
+    * @return The selected {@link ISEDThread}.
+    */
+   public ISEDThread getThread() {
+      if (!isThreadCreation()) {
+         int index = threadCombo.getSelectionIndex();
+         if (index >= 0 && index < threads.length) {
+            return threads[index];
+         }
+         else {
+            return null;
+         }
       }
       else {
          return null;

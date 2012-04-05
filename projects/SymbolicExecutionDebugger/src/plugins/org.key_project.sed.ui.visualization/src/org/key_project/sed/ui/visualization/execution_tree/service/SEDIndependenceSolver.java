@@ -2,15 +2,11 @@ package org.key_project.sed.ui.visualization.execution_tree.service;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
-import org.eclipse.debug.core.model.IDebugElement;
-import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.graphiti.features.impl.IIndependenceSolver;
 import org.eclipse.graphiti.ui.features.DefaultFeatureProvider;
 import org.key_project.sed.core.model.ISEDDebugElement;
@@ -37,11 +33,6 @@ public class SEDIndependenceSolver implements IIndependenceSolver {
     * Maps the hash code ({@link Object#hashCode()}) to his instance.
     */
    private Map<String, Object> objectHashmap = new HashMap<String, Object>();
-   
-   /**
-    * Contains all available {@link IDebugTarget}s.
-    */
-   private Set<IDebugTarget> targets = new HashSet<IDebugTarget>();
 
    /**
     * <p>
@@ -56,7 +47,6 @@ public class SEDIndependenceSolver implements IIndependenceSolver {
     */
    public void init(List<ISEDDebugTarget> targets) throws DebugException {
       Assert.isTrue(this.objectHashmap.isEmpty());
-      Assert.isTrue(this.targets.isEmpty());
       if (targets != null) {
          for (ISEDDebugTarget target : targets) {
             SEDIterator iter = new SEDIterator(target);
@@ -81,10 +71,6 @@ public class SEDIndependenceSolver implements IIndependenceSolver {
          key = Integer.toString(ObjectUtil.hashCode(bo));
       }
       objectHashmap.put(key, bo);
-      if (bo instanceof IDebugElement) {
-         IDebugElement element = (IDebugElement)bo;
-         targets.add(element.getDebugTarget());
-      }
       return key;
    }
 
@@ -102,13 +88,5 @@ public class SEDIndependenceSolver implements IIndependenceSolver {
     */
    public Collection<Object> getAllBusinessObjects() {
       return objectHashmap.values();
-   }
-
-   /**
-    * Returns all available {@link IDebugTarget}s.
-    * @return The available {@link IDebugTarget}s.
-    */
-   public IDebugTarget[] getDebugTargets() {
-      return targets.toArray(new IDebugTarget[targets.size()]);
    }
 }

@@ -1,17 +1,15 @@
 package org.key_project.sed.ui.visualization.execution_tree.feature;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.ICreateFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDMethodCall;
-import org.key_project.sed.core.model.memory.ISEDMemoryDebugNode;
+import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.memory.SEDMemoryMethodCall;
 import org.key_project.sed.ui.visualization.execution_tree.provider.IExecutionTreeImageConstants;
-import org.key_project.sed.ui.visualization.execution_tree.wizard.CreateDebugNodeWizard.CreateDebugNodeWizardResult;
-import org.key_project.sed.ui.visualization.util.LogUtil;
 
 /**
  * Implementation of {@link ICreateFeature} for {@link ISEDMethodCall}s.
@@ -46,15 +44,12 @@ public class MethodCallCreateFeature extends AbstractDebugNodeCreateFeature {
     * {@inheritDoc}
     */
    @Override
-   protected ISEDDebugNode createNewDebugNode(CreateDebugNodeWizardResult initialValues) throws DebugException {
-      ISEDDebugNode parent = initialValues.getParent();
-      Assert.isNotNull(parent);
-      SEDMemoryMethodCall result = new SEDMemoryMethodCall(parent.getDebugTarget(), parent, parent.getThread());
-      result.setName(initialValues.getName());
-      if (!(parent instanceof ISEDMemoryDebugNode)) {
-         throw new DebugException(LogUtil.getLogger().createErrorStatus("Unsupported parent \"" + parent + "\"."));
-      }
-      ((ISEDMemoryDebugNode)parent).addChild(result);      
+   protected ISEDDebugNode createNewDebugNode(ISEDDebugTarget target,
+                                              ISEDDebugNode parent,
+                                              ISEDThread thread,
+                                              String name) throws DebugException {
+      SEDMemoryMethodCall result = new SEDMemoryMethodCall(target, parent, thread);
+      result.setName(name);
       return result;
    }
 }

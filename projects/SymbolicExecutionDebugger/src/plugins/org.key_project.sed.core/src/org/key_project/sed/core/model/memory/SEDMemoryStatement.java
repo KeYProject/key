@@ -49,6 +49,39 @@ public class SEDMemoryStatement extends AbstractSEDStatement implements ISEDMemo
          children.add(child);
       }
    }
+
+   /**
+    * {@inheritDoc}
+    */   
+   @Override
+   public void removeChild(ISEDDebugNode child) {
+      if (child != null) {
+         children.remove(child);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */   
+   @Override
+   public void addChild(int index, ISEDDebugNode child) {
+      if (child != null) {
+         children.add(index, child);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public int indexOfChild(ISEDDebugNode child) {
+      if (child != null) {
+         return children.indexOf(child);
+      }
+      else {
+         return -1;
+      }
+   }
    
    /**
     * <p>

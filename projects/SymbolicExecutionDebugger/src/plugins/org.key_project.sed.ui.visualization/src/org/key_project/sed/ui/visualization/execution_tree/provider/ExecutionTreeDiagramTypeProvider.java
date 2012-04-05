@@ -1,6 +1,8 @@
 package org.key_project.sed.ui.visualization.execution_tree.provider;
 
 import java.io.InputStream;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.graphiti.dt.AbstractDiagramTypeProvider;
@@ -9,6 +11,8 @@ import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.platform.IDiagramEditor;
 import org.eclipse.graphiti.tb.IToolBehaviorProvider;
+import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
 import org.key_project.sed.core.model.serialization.SEDXMLReader;
 import org.key_project.sed.ui.visualization.execution_tree.editor.ExecutionTreeDiagramEditor;
 import org.key_project.sed.ui.visualization.execution_tree.service.SEDIndependenceSolver;
@@ -19,8 +23,7 @@ import org.key_project.sed.ui.visualization.util.LogUtil;
  * {@link IDiagramTypeProvider} specific implementation for execution tree diagrams.
  * @author Martin Hentschel
  */
-// TODO: Implement customized delete/remove feature to remove/delete the whole sub tree
-// TODO: Don't save no longer needed business objects. (and do not show them in creation wizard)
+// TODO: Implement customized delete/remove feature to remove/delete the whole sub tree and the business objects
 // TODO: Implement properties view
 // TODO: Refactor branch conditions as connection text
 public class ExecutionTreeDiagramTypeProvider extends AbstractDiagramTypeProvider {
@@ -44,6 +47,11 @@ public class ExecutionTreeDiagramTypeProvider extends AbstractDiagramTypeProvide
     * lazily via {@link #getAvailableToolBehaviorProviders()}.
     */
    private IToolBehaviorProvider[] toolBehaviorProviders;
+   
+   /**
+    * Contains the available {@link ISEDDebugTarget}s.
+    */
+   private List<ISEDDebugTarget> debugTargets = new LinkedList<ISEDDebugTarget>();
    
    /**
     * Constructor.
@@ -82,7 +90,8 @@ public class ExecutionTreeDiagramTypeProvider extends AbstractDiagramTypeProvide
             InputStream in = ExecutionTreeUtil.readDomainFile(diagram);
             // Load domain file
             SEDXMLReader reader = new SEDXMLReader();
-            solver.init(reader.read(in));
+            debugTargets = reader.read(in);
+            solver.init(debugTargets);
          }
       }
       catch (Exception e) {
@@ -90,5 +99,25 @@ public class ExecutionTreeDiagramTypeProvider extends AbstractDiagramTypeProvide
          LogUtil.getLogger().openErrorDialog(null, e);
          throw new RuntimeException(e);
       }
+   }
+   
+   /**
+    * Makes sure that at least one {@link ISEDDebugTarget} is available
+    * via {@link #getDebugTargets()}.
+    */
+   public void makeSureThatDebugTargetIsAvailable() {
+      if (debugTargets.isEmpty()) {
+         SEDMemoryDebugTarget target = new SEDMemoryDebugTarget(null);
+         target.setName("Default Symbolic Debug Target");
+         debugTargets.add(target);
+      }
+   }
+   
+   /**
+    * Returns the available {@link ISEDDebugTarget}s.
+    * @return The available {@link ISEDDebugTarget}s.
+    */
+   public ISEDDebugTarget[] getDebugTargets() {
+      return debugTargets.toArray(new ISEDDebugTarget[debugTargets.size()]);
    }
 }

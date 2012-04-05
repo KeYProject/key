@@ -9,7 +9,7 @@ import org.key_project.util.java.ArrayUtil;
 
 /**
  * <p>
- * Iterates preorder over the whole containment hierarchy of a given {@link ISEDDebugTarget}.
+ * Iterates preorder over the whole sub tree of a given {@link ISEDDebugElement}.
  * </p>
  * <p>
  * Instances of this class should always be used instead of recursive method
@@ -25,17 +25,23 @@ import org.key_project.util.java.ArrayUtil;
  */
 public class SEDIterator {
    /**
+    * The element at that the iteration has started used as end condition
+    * to make sure that only over the subtree of the element is iterated.
+    */
+   private ISEDDebugElement start;
+
+   /**
     * The next element or {@code null} if no more elements exists.
     */
    private ISEDDebugElement next;
    
    /**
     * Constructor.
-    * @param target The {@link ISEDDebugTarget} to iterate over.
+    * @param start The {@link ISEDDebugElement} to iterate over its sub tree.
     */
-   public SEDIterator(ISEDDebugTarget target) {
-      super();
-      this.next = target;
+   public SEDIterator(ISEDDebugElement start) {      
+      this.start = start;
+      this.next = start;
    }
    
    /**
@@ -100,7 +106,12 @@ public class SEDIterator {
             throw new DebugException(LogUtil.getLogger().createErrorStatus("Debug target \"" + parent + "\" does not contain thread \"" + node + "."));
          }
          if (nodeIndex + 1 < parentChildren.length) {
-            return parentChildren[nodeIndex + 1];
+            if (parentChildren[nodeIndex] != start) {
+               return parentChildren[nodeIndex + 1];
+            }
+            else {
+               return null;
+            }
          }
          else {
             return null; // End of model reached.
@@ -117,10 +128,20 @@ public class SEDIterator {
             throw new DebugException(LogUtil.getLogger().createErrorStatus("Parent node \"" + parent + "\" does not contain child \"" + node + "."));
          }
          if (nodeIndex + 1 < parentChildren.length) {
-            return parentChildren[nodeIndex + 1];
+            if (parentChildren[nodeIndex] != start) {
+               return parentChildren[nodeIndex + 1];
+            }
+            else {
+               return null;
+            }
          }
          else {
-            return getNextOnParent(parent);
+            if (parentChildren[parentChildren.length - 1] != start) {
+               return getNextOnParent(parent);
+            }
+            else {
+               return null;
+            }
          }
       }
    }

@@ -1,19 +1,21 @@
 package org.key_project.sed.ui.visualization.execution_tree.feature;
 
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.features.ICreateFeature;
+import org.eclipse.graphiti.features.ICustomUndoableFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
+import org.eclipse.graphiti.features.context.IContext;
 import org.eclipse.graphiti.features.context.ICreateContext;
 import org.eclipse.graphiti.features.impl.AbstractCreateFeature;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeFeatureProvider;
-import org.key_project.sed.ui.visualization.execution_tree.service.SEDIndependenceSolver;
+import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDThread;
+import org.key_project.sed.core.model.memory.ISEDMemoryDebugNode;
+import org.key_project.sed.core.model.memory.ISEDMemoryDebugTarget;
+import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeDiagramTypeProvider;
 import org.key_project.sed.ui.visualization.execution_tree.wizard.CreateDebugNodeWizard;
 import org.key_project.sed.ui.visualization.execution_tree.wizard.CreateDebugNodeWizard.CreateDebugNodeWizardResult;
 import org.key_project.sed.ui.visualization.util.LogUtil;
@@ -23,7 +25,11 @@ import org.key_project.util.eclipse.WorkbenchUtil;
  * Provides a basic implementation of {@link ICreateFeature} for {@link ISEDDebugNode}s.
  * @author Martin Hentschel
  */
-public abstract class AbstractDebugNodeCreateFeature extends AbstractCreateFeature {
+public abstract class AbstractDebugNodeCreateFeature extends AbstractCreateFeature implements ICustomUndoableFeature {
+   private ISEDDebugNode createdNode;
+   
+   private int indexOnParent;
+   
    /**
     * Constructor.
     * @param fp The {@link IFeatureProvider} which provides this {@link ICreateFeature}.
@@ -49,16 +55,26 @@ public abstract class AbstractDebugNodeCreateFeature extends AbstractCreateFeatu
          // Ask user for initial values
          CreateDebugNodeWizardResult result = CreateDebugNodeWizard.openWizard(WorkbenchUtil.getActiveShell(), 
                                                                                getNodeType(),
-                                                                               collectExistingNodes()); 
+                                                                               getAvailableDebugTargets(),
+                                                                               isThreadCreation()); 
          if (result != null) {
             // Create new business object
-            ISEDDebugNode newDebugNode = createNewDebugNode(result);
-
+            ISEDDebugTarget target = result.getTarget();
+            ISEDDebugNode parent = result.getParent();
+            createdNode = createNewDebugNode(target, parent, result.getThread(), result.getName());
+            if (isThreadCreation()) {
+               Assert.isTrue(target instanceof ISEDMemoryDebugTarget);
+               Assert.isTrue(createdNode instanceof ISEDThread);
+               ((ISEDMemoryDebugTarget)target).addSymbolicThread((ISEDThread)createdNode);
+            }
+            else {
+               Assert.isTrue(parent instanceof ISEDMemoryDebugNode);
+               ((ISEDMemoryDebugNode)parent).addChild(createdNode);
+            }
             // Do the add
-            addGraphicalRepresentation(context, newDebugNode);
-
+            addGraphicalRepresentation(context, createdNode);
             // Return newly created business object(s)
-            return new Object[] {newDebugNode};
+            return new Object[] {createdNode};
          }
          else {
             return EMPTY;
@@ -71,20 +87,23 @@ public abstract class AbstractDebugNodeCreateFeature extends AbstractCreateFeatu
    }
    
    /**
-    * Returns all existing {@link ISEDDebugNode}s in the {@link Diagram}.
-    * @return All existing {@link ISEDDebugNode}s.
+    * Returns the available {@link ISEDDebugTarget}s.
+    * @return The available {@link ISEDDebugTarget}s.
     */
-   protected List<ISEDDebugNode> collectExistingNodes() {
-      Assert.isTrue(getFeatureProvider() instanceof ExecutionTreeFeatureProvider);
-      SEDIndependenceSolver solver = ((ExecutionTreeFeatureProvider)getFeatureProvider()).getSEDIndependenceSolver();
-      Collection<Object> businessObjects = solver.getAllBusinessObjects();
-      List<ISEDDebugNode> result = new LinkedList<ISEDDebugNode>();
-      for (Object obj : businessObjects) {
-         if (obj instanceof ISEDDebugNode) {
-            result.add((ISEDDebugNode)obj);
-         }
-      }
-      return result;
+   protected ISEDDebugTarget[] getAvailableDebugTargets()  {
+      IDiagramTypeProvider dtp = getFeatureProvider().getDiagramTypeProvider();
+      Assert.isTrue(dtp instanceof ExecutionTreeDiagramTypeProvider);
+      ExecutionTreeDiagramTypeProvider provider = (ExecutionTreeDiagramTypeProvider)dtp;
+      provider.makeSureThatDebugTargetIsAvailable();
+      return provider.getDebugTargets();
+   }
+   
+   /**
+    * Defines if {@link ISEDThread}s or other {@link ISEDDebugNode}s should be created.
+    * @return {@code true} create {@link ISEDThread}s, {@code false} create other {@link ISEDDebugNode}s.
+    */
+   protected boolean isThreadCreation() {
+      return false;
    }
    
    /**
@@ -99,5 +118,68 @@ public abstract class AbstractDebugNodeCreateFeature extends AbstractCreateFeatu
     * @return The created {@link ISEDDebugNode}.
     * @throws DebugException Occurred Exception.
     */
-   protected abstract ISEDDebugNode createNewDebugNode(CreateDebugNodeWizardResult initialValues) throws DebugException;
+   protected abstract ISEDDebugNode createNewDebugNode(ISEDDebugTarget target,
+                                                       ISEDDebugNode parent,
+                                                       ISEDThread thread,
+                                                       String name) throws DebugException;
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void undo(IContext context) {
+      try {
+         if (isThreadCreation()) {
+            if (createdNode.getDebugTarget() instanceof ISEDMemoryDebugTarget) {
+               ISEDMemoryDebugTarget target = (ISEDMemoryDebugTarget)createdNode.getDebugTarget();
+               indexOnParent = target.indexOfSymbolicThread((ISEDThread)createdNode);
+               target.removeSymbolicThread((ISEDThread)createdNode);
+            }
+         }
+         else {
+            if (createdNode.getParent() instanceof ISEDMemoryDebugNode) {
+               ISEDMemoryDebugNode parent = (ISEDMemoryDebugNode)createdNode.getParent();
+               indexOnParent = parent.indexOfChild(createdNode);
+               parent.removeChild(createdNode);
+            }
+         }
+      }
+      catch (DebugException e) {
+         LogUtil.getLogger().logError(e);
+         throw new RuntimeException(e);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean canRedo(IContext context) {
+      return true;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void redo(IContext context) {
+      try {
+         if (isThreadCreation()) {
+            if (createdNode.getDebugTarget() instanceof ISEDMemoryDebugTarget) {
+               ISEDMemoryDebugTarget target = (ISEDMemoryDebugTarget)createdNode.getDebugTarget();
+               target.addSymbolicThread(indexOnParent, (ISEDThread)createdNode);
+            }
+         }
+         else {
+            if (createdNode.getParent() instanceof ISEDMemoryDebugNode) {
+               ISEDMemoryDebugNode parent = (ISEDMemoryDebugNode)createdNode.getParent();
+               parent.addChild(indexOnParent, createdNode);
+            }
+         }
+      }
+      catch (DebugException e) {
+         LogUtil.getLogger().logError(e);
+         throw new RuntimeException(e);
+      }
+   }
 }

@@ -15,7 +15,7 @@ import org.key_project.sed.core.model.impl.AbstractSEDDebugTarget;
  * information in the memory.
  * @author Martin Hentschel
  */
-public class SEDMemoryDebugTarget extends AbstractSEDDebugTarget {
+public class SEDMemoryDebugTarget extends AbstractSEDDebugTarget implements ISEDMemoryDebugTarget {
    /**
     * The contained {@link ISEDThread}s.
     */
@@ -38,12 +38,45 @@ public class SEDMemoryDebugTarget extends AbstractSEDDebugTarget {
    }
    
    /**
-    * Adds a new {@link ISEDThread}.
-    * @param thread The {@link ISEDThread} to add.
+    * {@inheritDoc}
     */
+   @Override
    public void addSymbolicThread(ISEDThread thread) {
       if (thread != null) {
          threads.add(thread);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addSymbolicThread(int index, ISEDThread thread) {
+      if (thread != null) {
+         threads.add(index, thread);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void removeSymbolicThread(ISEDThread thread) {
+      if (thread != null) {
+         threads.remove(thread);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public int indexOfSymbolicThread(ISEDThread thread) {
+      if (thread != null) {
+         return threads.indexOf(thread);
+      }
+      else {
+         return -1;
       }
    }
 

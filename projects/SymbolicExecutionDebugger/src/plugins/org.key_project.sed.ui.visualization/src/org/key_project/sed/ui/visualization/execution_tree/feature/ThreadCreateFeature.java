@@ -1,16 +1,14 @@
 package org.key_project.sed.ui.visualization.execution_tree.feature;
 
-import java.util.List;
-
+import org.eclipse.debug.core.DebugException;
 import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.ICreateFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDThread;
-import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
 import org.key_project.sed.core.model.memory.SEDMemoryThread;
 import org.key_project.sed.ui.visualization.execution_tree.provider.IExecutionTreeImageConstants;
-import org.key_project.sed.ui.visualization.execution_tree.wizard.CreateDebugNodeWizard.CreateDebugNodeWizardResult;
 
 /**
  * Implementation of {@link ICreateFeature} for {@link ISEDThread}s.
@@ -45,21 +43,20 @@ public class ThreadCreateFeature extends AbstractDebugNodeCreateFeature {
     * {@inheritDoc}
     */
    @Override
-   protected List<ISEDDebugNode> collectExistingNodes() {
-      return null; // Return null to indicate that no parent is required.
+   protected boolean isThreadCreation() {
+      return true;
    }
 
    /**
     * {@inheritDoc}
     */
    @Override
-   protected ISEDDebugNode createNewDebugNode(CreateDebugNodeWizardResult initialValues) {
-      // Create debug target
-      SEDMemoryDebugTarget target = new SEDMemoryDebugTarget(null);
-      // Create thread
+   protected ISEDDebugNode createNewDebugNode(ISEDDebugTarget target,
+                                              ISEDDebugNode parent,
+                                              ISEDThread thread,
+                                              String name) throws DebugException {
       SEDMemoryThread result = new SEDMemoryThread(target);
-      result.setName(initialValues.getName());
-      target.addSymbolicThread(result);
+      result.setName(name);
       return result;
    }
 }
