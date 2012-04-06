@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.util.Debug;
+
 
 public class SmtLib2Translator extends AbstractSMTTranslator {
 
@@ -30,7 +30,6 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
 
 	private static final String GAP = "          ";
 
-	private static final String MIN_GAP = "  ";
     private static StringBuffer FALSESTRING = new StringBuffer("false");
 
     private static StringBuffer TRUESTRING = new StringBuffer("true");

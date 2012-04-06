@@ -1,14 +1,13 @@
 package de.uka.ilkd.key.smt;
 
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
@@ -30,35 +29,74 @@ interface PipeListener<T>{
  * 
  */
 class Pipe<T>{
-
+	private final ReentrantLock listenerLock = new ReentrantLock(true);
 	private final LinkedList<PipeListener<T>> listeners = new LinkedList<PipeListener<T>>();
-	private final Semaphore     stopWaiting = new Semaphore(0);
+	
+	/** there are three worker threads, thus three permits are acquired in advance. After a worker thread
+	 * has done its work it releases one permit. Thus, the semaphore has exactly one permit when all worker
+	 * have finished their work.*/
+	private final Semaphore     stopWaiting = new Semaphore(-2);
 
-	private Thread [] threads = new Thread[0];
+	/**
+	 * The workers of the pipe. One worker is responsible for sending messages, while the other two workers
+	 * handle messages which are received. 
+	 */
+	private List<Worker>  workers = new LinkedList<Worker>();
+	private final ReentrantLock workerLock   = new ReentrantLock(true);
+	/**
+	 * Stores messages that are to be sent in the next cycle of the worker responsible for sending messages.
+	 */
 	private LinkedList<String> queue = new LinkedList<String>();
 	private final ReentrantLock queueLock = new ReentrantLock(true);
-	private final ReentrantLock listenerLock = new ReentrantLock(true);
+	
+	/**The sender goes to sleep when there are no messages to be sent. If you want to wake him up, use this
+	 * condition. */
 	private final Condition     postMessages = queueLock.newCondition();
+	
+	/**
+	 * External threads can wait until the pipe is closed. The condition <code>await</code> is used for that purpose,
+	 * see <code>waitForPipe</code>.
+	 */
 	private final ReentrantLock awaitLock    = new ReentrantLock(true);
 	private final Condition     awaitCond    = awaitLock.newCondition();
-	private final ReentrantLock threadLock   = new ReentrantLock(true);
+	
+	/**
+	 * The delimiters of the messages, i.e. strings that indicate the end of a message. If you specify several
+	 * delimiters a single message is chosen as small as possible, i.e., it does not contain any delimiter. 
+	 */
+	private final String []     messageDelimiters;
 	
 	public  static final int NORMAL_MESSAGE = 0;
 	public  static final int ERROR_MESSAGE =1;
+	
+	/**
+	 * User specific data.
+	 */
 	private final T session;
 	
     
 	
-	public Pipe(T session) {
+	public Pipe(T session, String [] messageDelimiters) {
 		super();
 		this.session = session;
+		this.messageDelimiters = messageDelimiters;
 	}
 	
 	/**
 	 * Worker class for both the receiver and sender of the pipe. Is mainly responsible for starting both types of
 	 * workers.
 	 */
-	private abstract class Worker implements Runnable{
+	private abstract class Worker extends Thread{
+		@SuppressWarnings("unused")
+		private final String name; // for testing
+		
+		
+		public Worker(String name) {
+			super();
+			this.name = name;
+			this.setDaemon(true);
+		}
+
 		@Override
 		public void run() {
 			try{
@@ -67,18 +105,27 @@ class Pipe<T>{
 				try{
 					listenerLock.lock();
 					e.printStackTrace();
-					System.out.println("Stop called by listener");
-					stop();
+					close();
 					for(PipeListener<T> listener : listeners){
 						listener.exceptionOccurred(Pipe.this,e);
 					}
 				}finally{
 					listenerLock.unlock();
 				}
+			}finally{
+				// the work is done, unregister from the system. 
+				stopWaiting.release();
+				try{
+					awaitLock.lock();
+					awaitCond.signalAll();
+				}finally{
+					awaitLock.unlock();
+				}
 			}
 		}
 		
 		abstract protected void doWork();
+		abstract protected void stopWorking() throws IOException;
 	}
 
 	/**
@@ -86,8 +133,8 @@ class Pipe<T>{
 	 * the message from the queue and sends it to the other side of the pipe. 
 	 */
 	private class Sender extends Worker{
-		public Sender(OutputStream output) {
-			super();
+		public Sender(OutputStream output, String name) {
+			super(name);
 			this.output = output;
 		}
 		private final OutputStream output;
@@ -100,7 +147,6 @@ class Pipe<T>{
 				try {					
 					while(!queue.isEmpty()){
 						String message = queue.pop();
-						System.out.println("Send message: "+ message);
 						writer.write(message+"\n");
 						writer.flush();
 					}
@@ -111,11 +157,18 @@ class Pipe<T>{
 
 				  }
 				  catch (IOException e) {
-					  stop();
+					  close();
 					  throw new RuntimeException(e);
 				}
 			}
-			System.out.println("FINISH: Sender");
+		}
+
+
+		@Override
+		protected void stopWorking() throws IOException {
+			this.interrupt();
+			output.close();
+			
 		}		
 	}
 	
@@ -128,8 +181,8 @@ class Pipe<T>{
 		private final InputStream input;
 		private final int type;
 		
-		public Receiver(InputStream input, int type) {
-			super();
+		public Receiver(InputStream input, int type, String name) {
+			super(name);
 			this.input = input;
 			this.type = type;
 		}
@@ -137,85 +190,101 @@ class Pipe<T>{
 
 		
 		protected void doWork(){
-			 BufferedReader reader = new BufferedReader(new InputStreamReader(input));
-			 String message = null;
+			// do not use BufferedReader directly, but this wrapper in order to support different
+			// message delimiters.
+			BufferedMessageReader reader = new BufferedMessageReader(
+													new InputStreamReader(input),
+													messageDelimiters); 
+			String message = null;
 			 do{
 				message = null;
-				 try {
-					 System.out.println("Wait for incoming message");
-					char buf[] = new char[256];
-					reader.read(buf);
-				//	System.out.println(buf);
-					//message = new String(buf);
-			
- 					message = reader.readLine();
- 					System.out.println("Message has been read");
-				} catch (IOException e) {
-					stop();
-					throw new RuntimeException(e);
-				}
-				if(message != null){
-					try{
-						listenerLock.lock();
-
-						for(PipeListener<T> listener : listeners){
-							listener.messageIncoming(Pipe.this, message, type);
-						}
-					}finally{
-						listenerLock.unlock();
+				try {
+					//the next call blocks the thread and waits until there is a message. 
+ 					message = reader.readMessage();
+				} catch (Throwable e) {
+					close();
+					// only throw an exception if the thread has not been interrupted. It can be that
+					// the exception comes from the interruption.
+					if(!Thread.currentThread().isInterrupted()){
+						throw new RuntimeException(e);
 					}
+				}					 
+				if(message != null){
+					deliverMessage(message);
 				}
-			 }while(message != null && !Thread.interrupted());	
+			 }while(message != null && !Thread.currentThread().isInterrupted());
+			  // process last remaining input:
+			  StringBuffer buf = reader.getMessageBuffer();
+			  if(buf.length()>0){
+				  deliverMessage(buf.toString());
+			  }
+			
+		}
+		
+		
+		private void deliverMessage(String message){
+			try{
+				listenerLock.lock();
+				for(PipeListener<T> listener : listeners){
+					listener.messageIncoming(Pipe.this,message, type);
+				}
+			}finally{
+				listenerLock.unlock();
+			}
+		}
+
+
+
+		@Override
+		protected void stopWorking() throws IOException {
+			this.interrupt();
+		    input.close();
+			
 		}
 	}
 
 	public void start(InputStream input, OutputStream output,InputStream error, PipeListener<T> listener){
 		addListener(listener);
 		try{
-			threadLock.lock();
-
-			threads = new Thread[] {
-					new Thread(new Receiver(input,NORMAL_MESSAGE)),
-					new Thread(new Sender(output)),
-					new Thread(new Receiver(error,ERROR_MESSAGE))
-			};
-			for(Thread thread : threads){
+			workerLock.lock();
+			workers.add(new Receiver(input,NORMAL_MESSAGE,"receiver for normal messages"));
+			workers.add(new Sender(output,"sender"));
+			workers.add(new Receiver(error,ERROR_MESSAGE,"receiver for error messages"));
+			
+	
+			for(Thread thread : workers){
 				thread.setDaemon(true);
 				thread.start();
 			}
 		}finally{
-			threadLock.unlock();
+			workerLock.unlock();
 		}
 		
 	}
 	
 	
-	public void stop(){
-		System.out.println("STOP");
+	public void close(){
 		try{
-			threadLock.lock();
-			for(Thread thread : threads){
-				thread.interrupt();
+			workerLock.lock();
+			for(Worker worker : workers){
+				try{
+				worker.stopWorking();
+				}catch(Throwable e){
+					throw new RuntimeException(e);
+				}
 			}
+			
 		}finally{
-			threadLock.unlock();
+			workerLock.unlock();
 		}
-		
-		// release lock for thread waiting by waitForPipe():
-		stopWaiting.release(1);
-		// signal the receivers to wake up:
-		try{
-			awaitLock.lock();
-			awaitCond.signalAll();
-		}finally{
-			awaitLock.unlock();
-		}
-		System.out.println("STOPPED");
 	}
 	
 
 	
-	
+	/**
+	 * sends a message to the external process. Mainly it adds a new message to
+	 * the message queue and wakes up the sender.
+	 */
 	void sendMessage(String message){
 		try{
 			queueLock.lock();
@@ -248,7 +317,7 @@ class Pipe<T>{
 			try {
 			  awaitCond.await();
 			} catch (InterruptedException e) {
-				break; // stop waiting.
+				close(); // stop pipe and wait until all worker have stopped.				
 			}
 		}
 	}

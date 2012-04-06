@@ -10,26 +10,45 @@
 
 package de.uka.ilkd.key.smt;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
+
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
+
+/**
+ * This class is responsible for starting external processes:
+ * 1. It creates the process
+ * 2. Creates a pipe, that is used for communication.
+ * 3. Starts the process and waits until the pipe has been closed or the process has been stopped.
+ * Remark: It blocks the invoking thread.
+ * The parameter T of the class can be used to define user-specific parameters.
+ */
 public class ExternalProcessLauncher<T> {
-    	public final static int RESULT = 0;
-    	public final static int ERROR  = 1;
-    	public final static int EXIT_CODE = 2;
-        private Process process;
-        private ReentrantLock lockProcess = new ReentrantLock(true);
-        private final Pipe<T> pipe;
-        ExternalProcessLauncher(T session){
-        	pipe = new Pipe<T>(session);
-        }
+	private Process process;
+	/**lock for the process-object in order to guarantee synchronous access: If you want to access on <code>process</code>
+	 * then acquire first the lock!*/        
+	private ReentrantLock lockProcess = new ReentrantLock(true);
+	private final Pipe<T> pipe;
+	ExternalProcessLauncher(T session, String [] messageDelimiters){
+		pipe = new Pipe<T>(session,messageDelimiters);
+	}
 
 
+    /**
+     * Main procedure of the class. Starts the external process using a new thread, then it goes sleeping until 
+     * the new threads has finished its work, namely waiting for the process. Consequently, both threads mainly sleep
+     * while executing the external process.
+     * 
+     * More in detail:
+     * Let T1 be the invoking thread of this method and let T2 be the created thread:
+     * T1 creates the new thread T2, starts T2 and then T1 waits until T2 confirms that the process has been started.
+     * After receiving the confirmation by means of <code>cond</code> T1 starts the pipe and waits until the pipe is closed.
+     * 
+     * From T2's point of view: When T2 becomes alive it creates the external process and starts it. Then it informs T1 
+     * that the process is running now. Afterwards it goes sleeping until it either gets interrupted or the external 
+     * process has terminated. The final operation is closing the pipe.
+     */
 	public void launch(final String [] command,String initialMessage, PipeListener<T> listener) throws Throwable {
 	     	try{
 	   
@@ -44,10 +63,8 @@ public class ExternalProcessLauncher<T> {
                 		try {   
                 			lock.lock();
                 			ProcessBuilder builder = new ProcessBuilder();
-                			
-                			//builder.command("/home/benjamin/programs/simplify/test","-nosc");
                 			builder.command(command);
-                			
+    			
                 			process = builder.start();
 
                 		} catch(IOException e){
@@ -61,8 +78,7 @@ public class ExternalProcessLauncher<T> {
                 			process.waitFor();
          
                 		}catch (InterruptedException e) {/*do nothing*/}
-                		System.out.println("Process finish");
-                		pipe.stop();
+                   		pipe.close();
                 	
                 	}
                 });
@@ -97,13 +113,13 @@ public class ExternalProcessLauncher<T> {
     }
 	
 	public void stop(){
-	    pipe.stop();
+	    pipe.close();
 	}
 	
 	public void cleanUp(){
 		try{
 			lockProcess.lock();
-			System.out.println("CLEAN UP");
+
 			if(process != null) {
 	 	       process.destroy();
 	 	       try {
@@ -118,21 +134,5 @@ public class ExternalProcessLauncher<T> {
 	   }finally{
 		   lockProcess.unlock();
 	   }
-	}
-	
-	    /** Read the input until end of file and return contents in a
-	     * single string containing all line breaks. */
-	    static String read(InputStream in) throws IOException {
-		BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-		StringBuffer sb = new StringBuffer();
-
-		int x = reader.read();
-		while (x > -1) {
-		    sb.append((char) x);
-		    x = reader.read();
-		}
-		return sb.toString();
-	    }
-
-	
+	}	
 }

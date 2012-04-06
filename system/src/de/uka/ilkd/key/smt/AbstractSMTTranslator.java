@@ -338,7 +338,6 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
                 // add the assumptions that that are made of taclets
                 start = toReturn.size();
-                System.out.println(this.tacletAssumptions.size());
                 toReturn.addAll(this.tacletAssumptions);
                 // for(int i=0; i < tacletAssumptions.size(); i++){
                 assumptionTypes.add(new ContextualBlock(start,
@@ -1669,9 +1668,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                         Vector<QuantifiableVariable> quantifiedVars,
                         Services services) throws IllegalFormulaException {
 
-                // added, because meatavariables should not be translated.
-                assert !(term.op() instanceof de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable) : "Metavariables no longer supported";
-               
+       
                 Operator op = term.op();
                 if (op == Junctor.NOT) {
                         StringBuffer arg = translateTerm(term.sub(0),

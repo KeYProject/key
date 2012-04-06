@@ -10,22 +10,14 @@
 
 package de.uka.ilkd.key.smt;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.regex.Matcher;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
-import de.uka.ilkd.key.util.Debug;
 
 interface SolverListener {
         void processStarted(SMTSolver solver, SMTProblem problem);
@@ -41,21 +33,10 @@ interface SolverListener {
 }
 
 final class SMTSolverImplementation implements SMTSolver, Runnable{
-
-        private static int fileCounter = 0;
-
-        private static synchronized int getNextFileID() {
-                fileCounter++;
-                return fileCounter;
-        }
-
+ 
         private static int IDCounter = 0;
         private final int ID = IDCounter++;
 
-        /**
-         * the file base name to be used to store the SMT translation
-         */
-        private static final String FILE_BASE_NAME = "smt_formula";
 
         /** The SMT problem that is related to this solver */
         private SMTProblem problem;
@@ -63,8 +44,8 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
         private SolverListener listener;
 
         /** starts a external process and returns the result */
-        private ExternalProcessLauncher<SolverCommunication> processLauncher 
-        	= new ExternalProcessLauncher<SolverCommunication>(new SolverCommunication());
+        private ExternalProcessLauncher<SolverCommunication> processLauncher;
+   
         /**
          * The services object is stored in order to have the possibility to
          * access it in every method
@@ -127,6 +108,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
                 this.listener = listener;
                 this.services = services;
                 this.type = myType;
+                processLauncher = new ExternalProcessLauncher<SolverCommunication>(new SolverCommunication(),type.getDelimiters());
 
         }
 
@@ -231,17 +213,6 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
                 return getState() == SolverState.Running;
         }
 
-        private String []getFinalExecutionCommand(String filename, String formula) {
-                // get the Command from user settings
-                String toReturn = this.type.getSolverParameters();
-                  // replace the placeholder with filename and fomula
-         
-                toReturn = toReturn.replaceAll("%f",Matcher.quoteReplacement(filename));
-                toReturn = toReturn.replaceAll("%p", formula);
-                
-                
-                return toReturn.split(" ");
-        }
 
         @Override
         public void run() {
@@ -264,7 +235,8 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
 
                 // start the external process.
                 try {
-                        processLauncher.launch(commands,problemString,type);
+                        processLauncher.launch(commands,type.modifyProblem(problemString),type);
+                 
                         solverCommunication = processLauncher.getCommunication();
                         if(solverCommunication.exceptionHasOccurred() && 
                           !solverCommunication.resultHasBeenSet()){ 
@@ -313,118 +285,11 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
                 return type.getName();
         }
 
-        private static String toStringLeadingZeros(int n, int width) {
-                String rv = "" + n;
-                while (rv.length() < width) {
-                        rv = "0" + rv;
-                }
-                return rv;
-        }
 
-        /**
-         * Constructs a date for use in log filenames.
-         */
-        private static String getCurrentDateString() {
-                Calendar c = Calendar.getInstance();
-                StringBuffer sb = new StringBuffer();
-                String dateSeparator = "-";
-                String dateTimeSeparator = "_";
-                sb.append(toStringLeadingZeros(c.get(Calendar.YEAR), 4))
-                                .append(dateSeparator)
-                                .append(toStringLeadingZeros(
-                                                c.get(Calendar.MONTH) + 1, 2))
-                                .append(dateSeparator)
-                                .append(toStringLeadingZeros(
-                                                c.get(Calendar.DATE), 2))
-                                .append(dateTimeSeparator)
-                                .append(toStringLeadingZeros(
-                                                c.get(Calendar.HOUR_OF_DAY), 2))
-                                .append("h")
-                                .append(toStringLeadingZeros(
-                                                c.get(Calendar.MINUTE), 2))
-                                .append("m")
-                                .append(toStringLeadingZeros(
-                                                c.get(Calendar.SECOND), 2))
-                                .append("s")
-                                .append('.')
-                                .append(toStringLeadingZeros(
-                                                c.get(Calendar.MILLISECOND), 2));
-                return sb.toString();
-        }
 
-        /**
-         * store the text to a file.
-         * 
-         * @param text
-         *                the text to be stored.
-         * @return the path where the file was stored to.
-         */
-        private final File storeToFile(String text) throws IOException {
-                // create directory where to put the files marked as delete on
-                // exit
-                final File smtFileDir = new File(
-                                smtSettings.getSMTTemporaryFolder());
-                smtFileDir.mkdirs();
-                smtFileDir.deleteOnExit();
 
-                // create the actual file marked as delete on exit
-                final File smtFile = new File(smtFileDir, FILE_BASE_NAME + "_"
-                                + name() + "_" + "_" + getNextFileID() + "_"
-                                + getCurrentDateString());
 
-                smtFile.deleteOnExit();
-
-                // write the content out to the created file
-                // final BufferedWriter out = new BufferedWriter(new
-                // FileWriter(smtFile));
-                final FileWriter out = new FileWriter(smtFile);
-                out.write(text);
-                out.close();
-
-                return smtFile;
-        }
-
-        /**
-         * Read the input until end of file and return contents in a single
-         * string containing all line breaks.
-         */
-        static String read(InputStream in) throws IOException {
-                BufferedReader reader = new BufferedReader(
-                                new InputStreamReader(in));
-                StringBuffer sb = new StringBuffer();
-
-                int x = reader.read();
-                while (x > -1) {
-                        sb.append((char) x);
-                        x = reader.read();
-                }
-                return sb.toString();
-        }
-
-        private String [] translateToCommand(String formula) throws IOException {
-                final File loc;
-                try {
-                        // store the translation to a file
-                        loc = this.storeToFile(formula);
-                } catch (IOException e) {
-                        Debug.log4jError(
-                                        "The file with the formula could not be written."
-                                                        + e,
-                                        SMTSolverImplementation.class.getName());
-                        final IOException io = new IOException(
-                                        "Could not create or write the input file "
-                                                        + "for the external prover. Received error message:\n"
-                                                        + e.getMessage());
-                        io.initCause(e);
-                        throw io;
-                }
-         
-                // get the commands for execution
-                return this.getFinalExecutionCommand(loc.getAbsolutePath(),
-                                formula);
-        }
-
-        private String[] translateToCommand(Term term)
+       private String[] translateToCommand(Term term)
                         throws IllegalFormulaException, IOException {
 
                 SMTTranslator trans = getType().getTranslator(services);
@@ -436,7 +301,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
                 tacletTranslation = ((AbstractSMTTranslator) trans)
                                 .getTacletSetTranslation();
                 exceptionsForTacletTranslation.addAll(trans.getExceptionsOfTacletTranslation());
-                String parameters [] = translateToCommand(problemString);
+                String parameters [] = this.type.getSolverParameters().split(" ");
                 String result [] = new String[parameters.length+1];
                 for(int i=0; i < result.length; i++){
                     result[i] = i==0? type.getSolverCommand() : parameters[i-1];
