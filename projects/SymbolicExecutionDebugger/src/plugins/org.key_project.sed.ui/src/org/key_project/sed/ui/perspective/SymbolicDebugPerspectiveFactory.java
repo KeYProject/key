@@ -23,7 +23,7 @@ public class SymbolicDebugPerspectiveFactory implements IPerspectiveFactory {
       // Get the editor area.
       String editorArea = layout.getEditorArea();
       // Put the Resource Explorer on the left.
-      IFolderLayout leftFolder = layout.createFolder("left", IPageLayout.LEFT, 0.3f, editorArea);
+      IFolderLayout leftFolder = layout.createFolder("left", IPageLayout.LEFT, 0.5f, editorArea);
       leftFolder.addView(IDebugUIConstants.ID_DEBUG_VIEW);
       // Perspective Shortcuts
       layout.addPerspectiveShortcut("org.eclipse.jdt.ui.JavaPerspective");

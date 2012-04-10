@@ -15,6 +15,24 @@
             name="Graphiti Editor In View"
             restorable="true">
       </view>
+      <view
+            category="org.key_project.util.test.category"
+            class="org.key_project.util.test.view.TextControlEditorInViewView"
+            icon="icons/symbolic_debug.gif"
+            id="org.key_project.util.test.view.TextControlEditorInViewView"
+            name="Text Control Editor In View"
+            restorable="true">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="org.key_project.util.test.editor.TextControlEditor"
+            default="false"
+            icon="icons/symbolic_debug.gif"
+            id="org.key_project.util.test.editor.TextControlEditor"
+            name="Text Control Editor">
+      </editor>
    </extension>
 
 </plugin>

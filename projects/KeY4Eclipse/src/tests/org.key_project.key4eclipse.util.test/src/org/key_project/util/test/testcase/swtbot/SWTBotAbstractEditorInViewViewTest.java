@@ -10,6 +10,8 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotLabel;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.navigator.resources.ProjectExplorer;
 import org.junit.Test;
@@ -20,6 +22,7 @@ import org.key_project.util.java.thread.AbstractRunnableWithResult;
 import org.key_project.util.java.thread.IRunnableWithResult;
 import org.key_project.util.test.util.TestUtilsUtil;
 import org.key_project.util.test.view.GraphitiEditorInViewView;
+import org.key_project.util.test.view.TextControlEditorInViewView;
 
 /**
  * Tests {@link AbstractEditorInViewView}, {@link EditorInViewEditorSite} and
@@ -27,6 +30,62 @@ import org.key_project.util.test.view.GraphitiEditorInViewView;
  * @author Martin Hentschel
  */
 public class SWTBotAbstractEditorInViewViewTest extends TestCase {
+   /**
+    * Tests {@link AbstractEditorInViewView#getMessage()} and
+    * {@link AbstractEditorInViewView#setMessage(String)}.
+    */
+   @Test
+   public void testMessage() throws Exception {
+      SWTBotView view = null;
+      try {
+         // Close welcome view
+         SWTWorkbenchBot bot = new SWTWorkbenchBot();
+         TestUtilsUtil.closeWelcomeView(bot);
+         // Open view
+         final IViewPart part = TestUtilsUtil.openView(TextControlEditorInViewView.VIEW_ID);
+         view = bot.viewById(TextControlEditorInViewView.VIEW_ID);
+         assertTrue(view.isActive());
+         assertTrue(part instanceof TextControlEditorInViewView);
+         TextControlEditorInViewView textView = (TextControlEditorInViewView)part;
+         // Make sure that no editor is opened
+         assertEquals(0, bot.editors().size());
+         // Make sure that message is shown
+         SWTBotLabel label = view.bot().label();
+         assertEquals("Initial message from TextControlEditorInViewView.", label.getText());
+         assertTrue(label.isVisible());
+         // Show new text
+         textView.setMessage("Hello World!");
+         assertEquals("Hello World!", label.getText());
+         assertTrue(label.isVisible());
+         // Show editor
+         textView.setMessage(null);
+         assertFalse(label.isVisible());
+         SWTBotText text = view.bot().text();
+         assertEquals("This is an Editor.", text.getText());
+         assertTrue(text.isVisible());
+         // Show editor again
+         textView.setMessage(null);
+         assertFalse(label.isVisible());
+         assertEquals("This is an Editor.", text.getText());
+         assertTrue(text.isVisible());
+         // Show new text
+         textView.setMessage("Hello World Again!");
+         assertEquals("Hello World Again!", label.getText());
+         assertTrue(label.isVisible());
+         assertFalse(text.isVisible());
+         // Show editor again
+         textView.setMessage(null);
+         assertFalse(label.isVisible());
+         assertEquals("This is an Editor.", text.getText());
+         assertTrue(text.isVisible());
+      }
+      finally {
+         if (view != null) {
+            view.close();
+         }
+      }
+   }
+   
    /**
     * Makes sure that the Graphiti editor {@link DiagramEditor} is correctly
     * shown in an {@link IViewPart} via {@link AbstractEditorInViewView}

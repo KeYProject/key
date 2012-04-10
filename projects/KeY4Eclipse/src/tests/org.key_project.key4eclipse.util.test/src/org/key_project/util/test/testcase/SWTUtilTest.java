@@ -21,6 +21,7 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Combo;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.junit.Test;
@@ -270,7 +271,7 @@ public class SWTUtilTest extends TestCase {
      * Tests {@link SWTUtil#setText(org.eclipse.swt.widgets.Text, String)}
      */
     @Test
-    public void testSetText() {
+    public void testSetText_Text() {
         // Create UI
         Shell shell = new Shell();
         Text text = new Text(shell, SWT.BORDER);
@@ -289,5 +290,30 @@ public class SWTUtilTest extends TestCase {
         // Set null
         SWTUtil.setText(text, null);
         assertEquals("", text.getText());
+    }
+    
+    /**
+     * Tests {@link SWTUtil#setText(org.eclipse.swt.widgets.Label, String)}
+     */
+    @Test
+    public void testSetText_Label() {
+        // Create UI
+        Shell shell = new Shell();
+        Label label = new Label(shell, SWT.BORDER);
+        // Set "A"
+        SWTUtil.setText(label, "A");
+        assertEquals("A", label.getText());
+        // Set "B"
+        SWTUtil.setText(label, "B");
+        assertEquals("B", label.getText());
+        // Set ""
+        SWTUtil.setText(label, "");
+        assertEquals("", label.getText());
+        // Set "C"
+        SWTUtil.setText(label, "C");
+        assertEquals("C", label.getText());
+        // Set null
+        SWTUtil.setText(label, null);
+        assertEquals("", label.getText());
     }
 }

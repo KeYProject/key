@@ -6,6 +6,7 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 import org.key_project.util.java.ArrayUtil;
+import org.key_project.util.java.IFilter;
 import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.StringUtil;
 
@@ -14,6 +15,51 @@ import org.key_project.util.java.StringUtil;
  * @author Martin Hentschel
  */
 public class ArrayUtilTest extends TestCase {
+   /**
+    * Tests for {@link ArrayUtil#search(Object[], IFilter)}.
+    */
+   @Test
+   public void testSearch() {
+      String[] array = {"A", "B", "C", "D"};
+       assertEquals("A", ArrayUtil.search(array, new IFilter<String>() {
+          @Override
+          public boolean select(String element) {
+             return "A".equals(element);
+          }
+       }));
+       assertEquals("B", ArrayUtil.search(array, new IFilter<String>() {
+          @Override
+          public boolean select(String element) {
+             return "B".equals(element);
+          }
+       }));
+       assertEquals("C", ArrayUtil.search(array, new IFilter<String>() {
+          @Override
+          public boolean select(String element) {
+             return "C".equals(element);
+          }
+       }));
+       assertEquals("D", ArrayUtil.search(array, new IFilter<String>() {
+          @Override
+          public boolean select(String element) {
+             return "D".equals(element);
+          }
+       }));
+       assertNull(ArrayUtil.search(array, new IFilter<String>() {
+          @Override
+          public boolean select(String element) {
+             return "E".equals(element);
+          }
+       }));
+       assertNull(ArrayUtil.search(array, null));
+       assertNull(ArrayUtil.search(null, new IFilter<String>() {
+          @Override
+          public boolean select(String element) {
+             return "E".equals(element);
+          }
+       }));
+   }
+   
    /**
     * Tests {@link ArrayUtil#isEmpty(Object[])}
     */

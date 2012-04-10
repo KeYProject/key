@@ -1,5 +1,6 @@
 package org.key_project.sed.ui.visualization.execution_tree.provider;
 
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
@@ -108,6 +109,9 @@ public class ExecutionTreeDiagramTypeProvider extends AbstractDiagramTypeProvide
             debugTargets = reader.read(in);
             solver.init(debugTargets);
          }
+      }
+      catch (FileNotFoundException e) {
+         // Nothing to do
       }
       catch (Exception e) {
          LogUtil.getLogger().logError(e);

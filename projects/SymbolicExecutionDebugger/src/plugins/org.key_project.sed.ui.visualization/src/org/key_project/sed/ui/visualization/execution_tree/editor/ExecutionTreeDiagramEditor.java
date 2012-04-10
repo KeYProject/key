@@ -9,13 +9,14 @@ import org.key_project.sed.core.model.serialization.SEDXMLWriter;
 import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeDiagramTypeProvider;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
 import org.key_project.sed.ui.visualization.util.LogUtil;
+import org.key_project.sed.ui.visualization.util.PaletteHideableDiagramEditor;
 
 /**
  * {@link DiagramEditor} for Symbolic Execution Tree Diagrams.
  * @author Martin Hentschel
  */
 // TODO: Reload diagram when the domain model file has changed.
-public class ExecutionTreeDiagramEditor extends DiagramEditor {
+public class ExecutionTreeDiagramEditor extends PaletteHideableDiagramEditor {
    /**
     * {@inheritDoc}
     */

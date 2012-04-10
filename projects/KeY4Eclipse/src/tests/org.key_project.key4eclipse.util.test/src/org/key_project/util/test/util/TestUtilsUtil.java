@@ -65,7 +65,6 @@ import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithResult;
 import org.key_project.util.java.thread.IRunnableWithResult;
 import org.key_project.util.test.Activator;
-import org.key_project.util.test.view.GraphitiEditorInViewView;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofManagementDialog;
@@ -853,7 +852,7 @@ public class TestUtilsUtil {
          @Override
          public void run() {
             try {
-               setResult(WorkbenchUtil.openView(GraphitiEditorInViewView.VIEW_ID));
+               setResult(WorkbenchUtil.openView(viewId));
             }
             catch (Exception e) {
                setException(e);
