@@ -15,6 +15,7 @@ import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 
 public class ProofIndependentSMTSettings implements de.uka.ilkd.key.gui.configuration.Settings{
+	
         private static final String ACTIVE_SOLVER  = "[SMTSettings]ActiveSolver";
 
         private static final String TIMEOUT="[SMTSettings]SolverTimeout";
@@ -34,7 +35,7 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.gui.configur
         private static final String MAX_CONCURRENT_PROCESSES = "[SMTSettings]maxConcurrentProcesses";
 
    
-        private static final String SOLVER_PARAMETERS  = "[SMTSettings]solverParameters";
+        private static final String SOLVER_PARAMETERS  = "[SMTSettings]solverParametersV1";
         private static final String SOLVER_COMMAND       = "[SMTSettings]solverCommand";
 
   

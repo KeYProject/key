@@ -16,6 +16,8 @@ import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets;
 
 
 public class ProofDependentSMTSettings implements de.uka.ilkd.key.gui.configuration.Settings {
+	
+
 
         private static final String EXPLICIT_TYPE_HIERARCHY = "[SMTSettings]explicitTypeHierarchy";
 
@@ -35,6 +37,7 @@ public class ProofDependentSMTSettings implements de.uka.ilkd.key.gui.configurat
         
         private static final String INTEGERS_MAXIMUM = "[SMTSettings]integersMaximum";
         private static final String INTEGERS_MINIMUM = "[SMTSettings]integersMinimum";
+  
 
         private Collection<SettingsListener> listeners = new HashSet<SettingsListener>();
 

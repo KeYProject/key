@@ -66,7 +66,7 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
 
     private static StringBuffer NULLSORTSTRING = new StringBuffer("NULLSORT");
     
-    private static StringBuffer LOGICALIFTHENELSE = new StringBuffer("if_then_else");
+    private static StringBuffer LOGICALIFTHENELSE = new StringBuffer("ite");
 
     private static StringBuffer TERMIFTHENELSE = new StringBuffer("ite");
     

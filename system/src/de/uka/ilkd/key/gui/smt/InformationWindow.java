@@ -50,7 +50,7 @@ public class InformationWindow extends JDialog {
        for(Information el : information){
 	  getTabbedPane().addTab(el.title, newTab(el)); 
        }
-       setSize(400, 300);
+       setSize(600, 500);
        this.getContentPane().add(getTabbedPane());
        this.setModalExclusionType(ModalExclusionType.APPLICATION_EXCLUDE);
        this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
