@@ -21,6 +21,19 @@ import org.key_project.sed.core.model.ISEDDebugNode;
  */
 public abstract class AbstractDebugNodeLayoutFeature extends AbstractLayoutFeature {
    /**
+    * Property for an {@link Integer} value which defines a new width
+    * which is set on the {@link PictogramElement} during the layout process.
+    * {@link ILayoutContext#getProperty(Object)}.
+    */
+   public static final String WIDTH_TO_SET = "newWidth";
+   /**
+    * Property for an {@link Integer} value which defines a new height
+    * which is set on the {@link PictogramElement} during the layout process.
+    * {@link ILayoutContext#getProperty(Object)}.
+    */
+   public static final String HEIGHT_TO_SET = "newHeight";
+   
+   /**
     * Constructor.
     * @param fp The {@link IFeatureProvider} which provides this {@link ILayoutFeature}.
     */
@@ -57,27 +70,31 @@ public abstract class AbstractDebugNodeLayoutFeature extends AbstractLayoutFeatu
       boolean anythingChanged = false;
       ContainerShape containerShape = (ContainerShape) context.getPictogramElement();
       GraphicsAlgorithm containerGa = containerShape.getGraphicsAlgorithm();
-
-      // Compute minimal width and height
+      // Update width and height to the defined one
+      int widthToSet = getWidthToSet(context);
+      if (widthToSet >= 0) {
+         containerGa.setWidth(widthToSet);
+      }
+      int heightToSet = getHeightToSet(context);
+      if (heightToSet >= 0) {
+         containerGa.setHeight(heightToSet);
+      }
+      // Make sure that minimal width and height holds
       final int MIN_WIDTH = AbstractDebugNodeAddFeature.computeMinWidth(getDiagram());
       final int MIN_HEIGHT = AbstractDebugNodeAddFeature.computeMinHeight(getDiagram());
-      
       // height
       if (containerGa.getHeight() < MIN_HEIGHT) {
          containerGa.setHeight(MIN_HEIGHT);
          anythingChanged = true;
       }
-
       // width
       if (containerGa.getWidth() < MIN_WIDTH) {
          containerGa.setWidth(MIN_WIDTH);
          anythingChanged = true;
       }
-
+      // Update PictogramElement
       int containerWidth = containerGa.getWidth();
       int containerHeight = containerGa.getHeight();
-     
-      
       List<Shape> shapes = containerShape.getChildren();
       if (layoutImageShape(shapes.get(0), containerWidth, containerHeight)) {
          anythingChanged = true;
@@ -88,6 +105,26 @@ public abstract class AbstractDebugNodeLayoutFeature extends AbstractLayoutFeatu
       return anythingChanged;
    }
    
+   /**
+    * Returns the width to set or {@code -1} if it should not be changed.
+    * @param context The {@link ILayoutContext} to extract value from.
+    * @return The width to set or {@code -1} if it should not be changed.
+    */
+   protected int getWidthToSet(ILayoutContext context) {
+      Object value = context.getProperty(WIDTH_TO_SET);
+      return value instanceof Integer ? ((Integer)value).intValue() : -1;
+   }
+   
+   /**
+    * Returns the height to set or {@code -1} if it should not be changed.
+    * @param context The {@link ILayoutContext} to extract value from.
+    * @return The height to set or {@code -1} if it should not be changed.
+    */
+   protected int getHeightToSet(ILayoutContext context) {
+      Object value = context.getProperty(HEIGHT_TO_SET);
+      return value instanceof Integer ? ((Integer)value).intValue() : -1;
+   }
+
    /**
     * Layouts the {@link Shape} which contains the image.
     * @param shape The {@link Shape} to layout.

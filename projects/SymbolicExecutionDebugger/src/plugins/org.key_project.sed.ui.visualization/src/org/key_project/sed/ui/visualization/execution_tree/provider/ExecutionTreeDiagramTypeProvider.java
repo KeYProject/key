@@ -59,7 +59,23 @@ public class ExecutionTreeDiagramTypeProvider extends AbstractDiagramTypeProvide
       super();
       setFeatureProvider(new ExecutionTreeFeatureProvider(this));
    }
-   
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isAutoUpdateAtRuntime() {
+      return true;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isAutoUpdateAtStartup() {
+      return true;
+   }
+
    /**
     * {@inheritDoc}
     */
@@ -108,6 +124,7 @@ public class ExecutionTreeDiagramTypeProvider extends AbstractDiagramTypeProvide
       if (debugTargets.isEmpty()) {
          SEDMemoryDebugTarget target = new SEDMemoryDebugTarget(null);
          target.setName("Default Symbolic Debug Target");
+         getFeatureProvider().link(getDiagram(), target);
          debugTargets.add(target);
       }
    }
