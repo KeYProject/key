@@ -34,5 +34,14 @@
             name="Text Control Editor">
       </editor>
    </extension>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="org.key_project.util.test.perspective.EmptyTestPerspectiveFactory"
+            icon="icons/symbolic_debug.gif"
+            id="org.key_project.util.test.perspective.EmptyTestPerspectiveFactory"
+            name="Empty Test Perspective">
+      </perspective>
+   </extension>
 
 </plugin>

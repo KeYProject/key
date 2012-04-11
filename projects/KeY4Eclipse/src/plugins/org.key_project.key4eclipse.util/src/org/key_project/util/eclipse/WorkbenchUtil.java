@@ -5,6 +5,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
@@ -29,6 +30,38 @@ public final class WorkbenchUtil {
      * Forbid instances.
      */
     private WorkbenchUtil() {
+    }
+    
+    /**
+     * Opens the perspective with the given ID in the active {@link IWorkbenchPage}.
+     * @param perspectiveId The ID of the perspective to open.
+     * @return The opened {@link IPerspectiveDescriptor} or {@code null} if no {@link IWorkbenchPage} is active.
+     */
+    public static IPerspectiveDescriptor openPerspective(String perspectiveId) {
+       IWorkbenchPage page = getActivePage();
+       if (page != null) {
+          IPerspectiveDescriptor perspective = PlatformUI.getWorkbench().getPerspectiveRegistry().findPerspectiveWithId(perspectiveId);
+          page.setPerspective(perspective);
+          return perspective;
+       }
+       else {
+          return null;
+       }
+    }
+
+    /**
+     * Closes the given {@link IPerspectiveDescriptor} in the active {@link IWorkbenchPage}.
+     * @param perspectiveToClose The {@link IPerspectiveDescriptor} to close.
+     * @param saveParts Whether the page's parts should be saved if closed
+     * @param closePage Close the {@link IWorkbenchPage}? 
+     */
+    public static void closePerspective(IPerspectiveDescriptor perspectiveToClose, boolean saveParts, boolean closePage) {
+       if (perspectiveToClose != null) {
+          IWorkbenchPage page = getActivePage();
+          if (page != null) {
+             page.closePerspective(perspectiveToClose, saveParts, closePage);
+          }
+       }
     }
     
     /**

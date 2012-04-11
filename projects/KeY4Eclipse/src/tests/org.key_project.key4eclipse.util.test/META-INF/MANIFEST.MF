@@ -26,6 +26,9 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: KeY Project
-Export-Package: org.key_project.util.test.suite,
+Export-Package: org.key_project.util.test.editor,
+ org.key_project.util.test.perspective,
+ org.key_project.util.test.suite,
  org.key_project.util.test.suite.swtbot,
- org.key_project.util.test.util
+ org.key_project.util.test.util,
+ org.key_project.util.test.view

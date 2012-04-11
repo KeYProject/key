@@ -5,13 +5,16 @@ import junit.framework.TestCase;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.navigator.resources.ProjectExplorer;
 import org.junit.Test;
 import org.key_project.util.eclipse.WorkbenchUtil;
+import org.key_project.util.test.perspective.EmptyTestPerspectiveFactory;
 import org.key_project.util.test.util.TestUtilsUtil;
 import org.key_project.util.test.view.GraphitiEditorInViewView;
 
@@ -20,6 +23,24 @@ import org.key_project.util.test.view.GraphitiEditorInViewView;
  * @author Martin Hentschel
  */
 public class WorkbenchUtilTest extends TestCase {
+   /**
+    * Tests {@link WorkbenchUtil#openPerspective(String)} and
+    * {@link WorkbenchUtil#closePerspective(IPerspectiveDescriptor, boolean, boolean)}.
+    */
+   @Test
+   public void testOpenAndClosePerspective() {
+      IWorkbenchPage activePage = WorkbenchUtil.getActivePage();
+      IPerspectiveDescriptor oldPerspective = activePage.getPerspective();
+      IPerspectiveDescriptor newPerspective = WorkbenchUtil.openPerspective(EmptyTestPerspectiveFactory.PERSPECTIVE_ID);
+      assertNotNull(newPerspective);
+      assertEquals(EmptyTestPerspectiveFactory.PERSPECTIVE_ID, newPerspective.getId());
+      assertEquals(newPerspective, activePage.getPerspective());
+      WorkbenchUtil.closePerspective(newPerspective, false, false);
+      assertEquals(oldPerspective, activePage.getPerspective());
+      WorkbenchUtil.closePerspective(null, false, false);
+      assertEquals(oldPerspective, activePage.getPerspective());
+   }
+   
     /**
      * Tests {@link WorkbenchUtil#openView(String)},
      * {@link WorkbenchUtil#findView(String)},

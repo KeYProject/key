@@ -49,7 +49,9 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.PreferencesUtil;
+import org.eclipse.ui.intro.IIntroManager;
 import org.key_project.swtbot.swing.bot.AbstractSwingBotComponent;
 import org.key_project.swtbot.swing.bot.SwingBot;
 import org.key_project.swtbot.swing.bot.SwingBotJButton;
@@ -84,6 +86,14 @@ public class TestUtilsUtil {
     * Forbid instances.
     */
    private TestUtilsUtil() {
+   }
+
+   /**
+    * Closes the welcome view if it is opened. Otherwise nothing is done.
+    */
+   public static void closeWelcomeView() {
+      IIntroManager introManager = PlatformUI.getWorkbench().getIntroManager(); 
+      introManager.closeIntro(introManager.getIntro());
    }
    
    /**

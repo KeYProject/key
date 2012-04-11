@@ -24,7 +24,6 @@ import org.key_project.util.java.ObjectUtil;
  * </p>
  * @author Martin Hentschel
  */
-// TODO: Implement tests
 public abstract class AbstractDebugViewBasedEditorInViewView extends AbstractEditorInViewView {
    /**
     * Listens for changes on the {@link IWorkbenchPage} of this {@link IViewSite}.
