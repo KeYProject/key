@@ -17,6 +17,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.junit.Test;
+import org.key_project.key4eclipse.test.util.TestKeY4EclipseUtil;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.test.util.TestUtilsUtil.MethodTreatment;
 
@@ -60,7 +61,7 @@ public class SWTBotKeyOperationContractTest extends TestCase {
                                    }
                                 },
                                 KeyConnection.PROOF_OBLIGATION_OPERATION_CONTRACT,
-                                TestKeyUtil.createOperationContractId("MCDemo", "init(int)", "0", "normal_behavior"),
+                                TestKeY4EclipseUtil.createOperationContractId("MCDemo", "init(int)", "0", "normal_behavior"),
                                 true,
                                 MethodTreatment.CONTRACTS,
                                 new IDSProvableReferenceSelector() {
@@ -105,7 +106,7 @@ public class SWTBotKeyOperationContractTest extends TestCase {
                                    }
                                 },
                                 KeyConnection.PROOF_OBLIGATION_OPERATION_CONTRACT,
-                                TestKeyUtil.createOperationContractId("MCDemo", "init(int)", "0", "normal_behavior"),
+                                TestKeY4EclipseUtil.createOperationContractId("MCDemo", "init(int)", "0", "normal_behavior"),
                                 true,
                                 MethodTreatment.EXPAND,
                                 new IDSProvableReferenceSelector() {
@@ -149,7 +150,7 @@ public class SWTBotKeyOperationContractTest extends TestCase {
                                    }
                                 },
                                 KeyConnection.PROOF_OBLIGATION_OPERATION_CONTRACT,
-                                TestKeyUtil.createOperationContractId("paycard.PayCard", "isValid()", "0", "normal_behavior"),
+                                TestKeY4EclipseUtil.createOperationContractId("paycard.PayCard", "isValid()", "0", "normal_behavior"),
                                 true,
                                 MethodTreatment.EXPAND,
                                 null,
@@ -176,7 +177,7 @@ public class SWTBotKeyOperationContractTest extends TestCase {
                                    }
                                 },
                                 KeyConnection.PROOF_OBLIGATION_OPERATION_CONTRACT,
-                                TestKeyUtil.createOperationContractId("paycard.PayCard", "isValid()", "0", "normal_behavior"),
+                                TestKeY4EclipseUtil.createOperationContractId("paycard.PayCard", "isValid()", "0", "normal_behavior"),
                                 true,
                                 MethodTreatment.EXPAND,
                                 null,

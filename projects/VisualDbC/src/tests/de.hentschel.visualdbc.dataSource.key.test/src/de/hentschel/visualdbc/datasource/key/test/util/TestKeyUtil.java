@@ -42,6 +42,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.key_project.key4eclipse.starter.core.job.AbstractKeYMainWindowJob;
+import org.key_project.key4eclipse.test.util.TestKeY4EclipseUtil;
 import org.key_project.swtbot.swing.bot.AbstractSwingBotComponent;
 import org.key_project.swtbot.swing.bot.SwingBot;
 import org.key_project.swtbot.swing.bot.SwingBotJButton;
@@ -475,7 +476,7 @@ public final class TestKeyUtil {
       result.addConstructor(constructor);
       MemoryMethod setRecord = new MemoryMethod("setRecord(balance : int)", "void", DSVisibility.PUBLIC);
       addOperationObligations(setRecord, true, true, true);
-      MemoryOperationContract sr = new MemoryOperationContract(createOperationContractId(logRecordFullqualifiedName, "setRecord(int)", operationContractIds[0], "normal_behavior"),
+      MemoryOperationContract sr = new MemoryOperationContract(TestKeY4EclipseUtil.createOperationContractId(logRecordFullqualifiedName, "setRecord(int)", operationContractIds[0], "normal_behavior"),
                                                                "balance >= 0 & self.<inv>", 
                                                                "self.balance = balance\n" +
                                                                "&   self.transactionId\n" +
@@ -491,7 +492,7 @@ public final class TestKeyUtil {
       result.addMethod(setRecord);
       MemoryMethod getBalance = new MemoryMethod("getBalance()", "int", DSVisibility.PUBLIC);
       addOperationObligations(getBalance, true, true, true);
-      MemoryOperationContract gb2 = new MemoryOperationContract(createOperationContractId(logRecordFullqualifiedName, "getBalance()", operationContractIds[2], "normal_behavior"),
+      MemoryOperationContract gb2 = new MemoryOperationContract(TestKeY4EclipseUtil.createOperationContractId(logRecordFullqualifiedName, "getBalance()", operationContractIds[2], "normal_behavior"),
                                                                 "self.<inv>", 
                                                                 "result = self.balance & self.<inv> & exc = null", "{}", "diamond");
       addAllOperationContractObligations(gb2);
@@ -499,7 +500,7 @@ public final class TestKeyUtil {
       result.addMethod(getBalance);
       MemoryMethod getTransactionId = new MemoryMethod("getTransactionId()", "int", DSVisibility.PUBLIC);
       addOperationObligations(getTransactionId, true, true, true);
-      MemoryOperationContract gti2 = new MemoryOperationContract(createOperationContractId(logRecordFullqualifiedName, "getTransactionId()", operationContractIds[3], "normal_behavior"),
+      MemoryOperationContract gti2 = new MemoryOperationContract(TestKeY4EclipseUtil.createOperationContractId(logRecordFullqualifiedName, "getTransactionId()", operationContractIds[3], "normal_behavior"),
                                                                  "self.<inv>", 
                                                                  "result = self.transactionId & self.<inv> & exc = null", "{}", "diamond");
       addAllOperationContractObligations(gti2);
@@ -539,7 +540,7 @@ public final class TestKeyUtil {
       result.addConstructor(constructor);
       MemoryMethod createJuniorCard = new MemoryMethod("createJuniorCard()", qualifiedPaycardName, DSVisibility.PUBLIC, true);
       addOperationObligations(createJuniorCard, true, true, true);
-      MemoryOperationContract cjc = new MemoryOperationContract(createOperationContractId(qualifiedPaycardName, "createJuniorCard()", operationContractIDs[0], ""), 
+      MemoryOperationContract cjc = new MemoryOperationContract(TestKeY4EclipseUtil.createOperationContractId(qualifiedPaycardName, "createJuniorCard()", operationContractIDs[0], ""), 
                                                                 "true", 
                                                                 "(exc = null -> result.limit = 100 & !result = null)\n" +
                                                                 "& exc = null", 
@@ -550,7 +551,7 @@ public final class TestKeyUtil {
       result.addMethod(createJuniorCard);
       MemoryMethod charge = new MemoryMethod("charge(amount : int)", "boolean", DSVisibility.PUBLIC);
       addOperationObligations(charge, true, true, true);
-      MemoryOperationContract c1 = new MemoryOperationContract(createOperationContractId(qualifiedPaycardName, "charge(int)", operationContractIDs[1], "exceptional_behavior"), 
+      MemoryOperationContract c1 = new MemoryOperationContract(TestKeY4EclipseUtil.createOperationContractId(qualifiedPaycardName, "charge(int)", operationContractIDs[1], "exceptional_behavior"), 
                                                                "amount <= 0 & self.<inv>", 
                                                                "!exc = null\n" +
                                                                "& (  (   java.lang.Exception::instance(exc) = TRUE\n" +
@@ -560,7 +561,7 @@ public final class TestKeyUtil {
                                                                "allLocs", 
                                                                "diamond");
       addAllOperationContractObligations(c1);
-      MemoryOperationContract c2 = new MemoryOperationContract(createOperationContractId(qualifiedPaycardName, "charge(int)", operationContractIDs[2], "normal_behavior"),
+      MemoryOperationContract c2 = new MemoryOperationContract(TestKeY4EclipseUtil.createOperationContractId(qualifiedPaycardName, "charge(int)", operationContractIDs[2], "normal_behavior"),
                                                                "(  javaAddInt(amount, self.balance) >= self.limit\n" +
                                                                "   | !self.isValid() = TRUE)\n" +
                                                                "& amount >  0\n" +
@@ -576,7 +577,7 @@ public final class TestKeyUtil {
                                                                "{(self, unsuccessfulOperations)}", 
                                                                "diamond");
       addAllOperationContractObligations(c2);
-      MemoryOperationContract c3 = new MemoryOperationContract(createOperationContractId(qualifiedPaycardName, "charge(int)", operationContractIDs[3], "normal_behavior"),
+      MemoryOperationContract c3 = new MemoryOperationContract(TestKeY4EclipseUtil.createOperationContractId(qualifiedPaycardName, "charge(int)", operationContractIDs[3], "normal_behavior"),
                                                                "javaAddInt(amount, self.balance) < self.limit\n" +
                                                                "& self.isValid() = TRUE\n" +
                                                                "& amount >  0\n" +
@@ -596,7 +597,7 @@ public final class TestKeyUtil {
       result.addMethod(charge);
       MemoryMethod chargeAndRecord = new MemoryMethod("chargeAndRecord(amount : int)", "void", DSVisibility.PUBLIC);
       addOperationObligations(chargeAndRecord, true, true, true);
-      MemoryOperationContract car = new MemoryOperationContract(createOperationContractId(qualifiedPaycardName, "chargeAndRecord(int)", operationContractIDs[4], "normal_behavior"), 
+      MemoryOperationContract car = new MemoryOperationContract(TestKeY4EclipseUtil.createOperationContractId(qualifiedPaycardName, "chargeAndRecord(int)", operationContractIDs[4], "normal_behavior"), 
                                                                 "amount >  0 & self.<inv>", 
                                                                 "self.balance >= int::select(heapAtPre, self, balance)\n" +
                                                                 "& self.<inv>\n" +
@@ -608,7 +609,7 @@ public final class TestKeyUtil {
       result.addMethod(chargeAndRecord);
       MemoryMethod isValid = new MemoryMethod("isValid()", "boolean", DSVisibility.PUBLIC);
       addOperationObligations(isValid, true, true, true);
-      MemoryOperationContract iv2 = new MemoryOperationContract(createOperationContractId(qualifiedPaycardName, "isValid()", operationContractIDs[6], "normal_behavior"), 
+      MemoryOperationContract iv2 = new MemoryOperationContract(TestKeY4EclipseUtil.createOperationContractId(qualifiedPaycardName, "isValid()", operationContractIDs[6], "normal_behavior"), 
                                                                 "self.<inv>", 
                                                                 "(result = TRUE <-> self.unsuccessfulOperations <= 3)\n" +
                                                                 "& self.<inv>\n" +
@@ -635,21 +636,6 @@ public final class TestKeyUtil {
    }
    
    /**
-    * Creates an operation contract ID.
-    * @param qualifiedName The qualified class name.
-    * @param method The method signature.
-    * @param id The unique ID.
-    * @param behavior The behavior.
-    * @return The created operation contract ID:
-    */
-   public static String createOperationContractId(String qualifiedName,
-                                                  String method,
-                                                  String id,
-                                                  String behavior) {
-      return qualifiedName + "[" + qualifiedName + "::" + method + "].JML " + (StringUtil.isEmpty(behavior) ? "" : behavior + " ") + "operation contract." + id + "";
-   }
-   
-   /**
     * Creates the class "LogFile".
     * @param className The name to use.
     * @param qualifiedLogFileClass The full qualified class name.
@@ -669,7 +655,7 @@ public final class TestKeyUtil {
       result.addConstructor(constructor);
       MemoryMethod addRecord = new MemoryMethod("addRecord(balance : int)", "void", DSVisibility.PUBLIC);
       addOperationObligations(addRecord, true, true, true);
-      MemoryOperationContract ar1 = new MemoryOperationContract(createOperationContractId(qualifiedLogFileClass, "addRecord(int)", operationContractIds[0], "normal_behavior"),
+      MemoryOperationContract ar1 = new MemoryOperationContract(TestKeY4EclipseUtil.createOperationContractId(qualifiedLogFileClass, "addRecord(int)", operationContractIds[0], "normal_behavior"),
                                                                 "balance >= 0 & self.<inv>", 
                                                                 "\\if (!  javaAddInt(int::select(heapAtPre,\n" +
                                                                 "                                 self,\n" +
@@ -692,7 +678,7 @@ public final class TestKeyUtil {
       result.addMethod(addRecord);
       MemoryMethod getMaximumRecord = new MemoryMethod("getMaximumRecord()", qualifiedLogRecordClass, DSVisibility.PUBLIC);
       addOperationObligations(getMaximumRecord, true, true, true);
-      MemoryOperationContract mr2 = new MemoryOperationContract(createOperationContractId(qualifiedLogFileClass, "getMaximumRecord()", operationContractIds[2], "normal_behavior"), 
+      MemoryOperationContract mr2 = new MemoryOperationContract(TestKeY4EclipseUtil.createOperationContractId(qualifiedLogFileClass, "getMaximumRecord()", operationContractIds[2], "normal_behavior"), 
                                                                 "self.<inv>", 
                                                                 "\\forall int i;\n" +
                                                                 "    (   0 <= i & i < self.logArray.length & inInt(i)\n" +
@@ -899,7 +885,7 @@ public final class TestKeyUtil {
       b.addAttribute(new MemoryAttribute("x", "int", bugAttributeVisibility(DSVisibility.PRIVATE)));
       b.addConstructor(createDefaultConstructor("ModelFieldTest()", null, false));
       MemoryMethod doubleX = new MemoryMethod("doubleX()", "int", DSVisibility.PUBLIC);
-      MemoryOperationContract doubleXcontract = new MemoryOperationContract(createOperationContractId("ModelFieldTest", "doubleX()", "0", null),
+      MemoryOperationContract doubleXcontract = new MemoryOperationContract(TestKeY4EclipseUtil.createOperationContractId("ModelFieldTest", "doubleX()", "0", null),
                                                                             "self.<inv>", 
                                                                             "(exc = null -> result = self.f & self.<inv>)\n& exc = null", 
                                                                             "allLocs", 
@@ -909,7 +895,7 @@ public final class TestKeyUtil {
       b.addMethod(doubleX);
       MemoryAxiom axiom1 = new MemoryAxiom("JML represents clause for ModelFieldTest::$f", "equals(ModelFieldTest::$f(heap,self),javaMulInt(Z(2(#)),int::select(heap,self,ModelFieldTest::$x)))");
       if (includeAxiomContract) {
-         MemoryAxiomContract axiom1contract = new MemoryAxiomContract(createAxiomContractId("ModelFieldTest", "$f()", "0"),
+         MemoryAxiomContract axiom1contract = new MemoryAxiomContract(TestKeY4EclipseUtil.createAxiomContractId("ModelFieldTest", "$f()", "0"),
                                                                       "self.<inv>", 
                                                                       "{(self, x)}");
          addAllOperationContractObligations(axiom1contract);
@@ -918,17 +904,6 @@ public final class TestKeyUtil {
       b.addAxiom(axiom1);
       con.addClass(b);
       return con;
-   }
-
-   /**
-    * Creates the ID for an axiom contract.
-    * @param qualifiedName The full qualified class name.
-    * @param field The field.
-    * @param id The unique ID.
-    * @return the create axiom contract ID.
-    */
-   public static String createAxiomContractId(String qualifiedName, String field, String id) {
-      return qualifiedName + "[" + qualifiedName + "::" + field+ "].JML accessible clause." + id;
    }
 
    /**

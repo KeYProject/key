@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget name="JML normal_behavior operation contract [id: -2147483648 / FixedRecursiveMethodCallTest::decreaseValue]" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread name="KeY Default Thread">
-         <sedMethodCall name="FixedRecursiveMethodCallTest.decreaseValue();" lineNumber="-1" charStart="66" charEnd="79">
-            <sedStatement name="return decrease(3);" lineNumber="-1" charStart="87" charEnd="106">
-               <sedMethodCall name="FixedRecursiveMethodCallTest.decrease(n);" lineNumber="-1" charStart="134" charEnd="142">
-                  <sedBranchNode name="if (n&gt;=1) {return decrease(n-1); }" lineNumber="-1" charStart="155" charEnd="201">
-                     <sedStatement name="return decrease(n-1);" lineNumber="-1" charStart="173" charEnd="196">
-                        <sedMethodCall name="FixedRecursiveMethodCallTest.decrease(n_1);" lineNumber="-1" charStart="134" charEnd="142">
-                           <sedBranchNode name="if (n_1&gt;=1) {return decrease(n_1-1); }" lineNumber="-1" charStart="155" charEnd="201">
-                              <sedStatement name="return decrease(n_1-1);" lineNumber="-1" charStart="173" charEnd="196">
-                                 <sedMethodCall name="FixedRecursiveMethodCallTest.decrease(n_2);" lineNumber="-1" charStart="134" charEnd="142">
-                                    <sedBranchNode name="if (n_2&gt;=1) {return decrease(n_2-1); }" lineNumber="-1" charStart="155" charEnd="201">
-                                       <sedStatement name="return decrease(n_2-1);" lineNumber="-1" charStart="173" charEnd="196">
-                                          <sedMethodCall name="FixedRecursiveMethodCallTest.decrease(n_3);" lineNumber="-1" charStart="134" charEnd="142">
-                                             <sedBranchNode name="if (n_3&gt;=1) {return decrease(n_3-1); }" lineNumber="-1" charStart="155" charEnd="201">
-                                                <sedStatement name="return n_3;" lineNumber="-1" charStart="205" charEnd="214">
-                                                   <sedMethodReturn name="&lt;return of FixedRecursiveMethodCallTest.decrease(n_3);&gt;" lineNumber="-1" charStart="134" charEnd="142">
-                                                      <sedMethodReturn name="&lt;return of FixedRecursiveMethodCallTest.decrease(n_2);&gt;" lineNumber="-1" charStart="134" charEnd="142">
-                                                         <sedMethodReturn name="&lt;return of FixedRecursiveMethodCallTest.decrease(n_1);&gt;" lineNumber="-1" charStart="134" charEnd="142">
-                                                            <sedMethodReturn name="&lt;return of FixedRecursiveMethodCallTest.decrease(n);&gt;" lineNumber="-1" charStart="134" charEnd="142">
-                                                               <sedMethodReturn name="&lt;return of FixedRecursiveMethodCallTest.decreaseValue();&gt;" lineNumber="-1" charStart="66" charEnd="79">
-                                                                  <sedTermination name="&lt;end&gt;">
+   <sedTarget xml:id="_aba9e742-4e0a-4bb2-8d10-61d5d20b70b7" name="FixedRecursiveMethodCallTest[FixedRecursiveMethodCallTest::decreaseValue()].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_ea9a8426-ac3a-466b-be42-3e87c365c665" name="KeY Default Thread">
+         <sedMethodCall xml:id="_719b4c4f-8510-407c-a030-9120755be069" name="FixedRecursiveMethodCallTest.decreaseValue();" lineNumber="-1" charStart="66" charEnd="79">
+            <sedStatement xml:id="_f67f50ad-da27-4475-afb7-fb0efad2d597" name="return decrease(3);" lineNumber="-1" charStart="87" charEnd="106">
+               <sedMethodCall xml:id="_05acc0f3-fcb1-471d-becc-d0474062420f" name="FixedRecursiveMethodCallTest.decrease(n);" lineNumber="-1" charStart="134" charEnd="142">
+                  <sedBranchNode xml:id="_a755ae5a-e1bb-4c6b-bc32-910fc77edba8" name="if (n&gt;=1) {return decrease(n-1); }" lineNumber="-1" charStart="155" charEnd="201">
+                     <sedStatement xml:id="_7a46ef67-0b09-43d3-b930-37b1d3faa256" name="return decrease(n-1);" lineNumber="-1" charStart="173" charEnd="196">
+                        <sedMethodCall xml:id="_1fc4a417-f52e-4023-8d71-9b322b3a07c2" name="FixedRecursiveMethodCallTest.decrease(n_1);" lineNumber="-1" charStart="134" charEnd="142">
+                           <sedBranchNode xml:id="_ff681a68-5bce-49a7-b606-1eac3a6e3a9a" name="if (n_1&gt;=1) {return decrease(n_1-1); }" lineNumber="-1" charStart="155" charEnd="201">
+                              <sedStatement xml:id="_ff0bf4d1-97cd-4f04-855e-0ee85476fd58" name="return decrease(n_1-1);" lineNumber="-1" charStart="173" charEnd="196">
+                                 <sedMethodCall xml:id="_830593aa-1c5d-4dd8-a220-ed8bb457969a" name="FixedRecursiveMethodCallTest.decrease(n_2);" lineNumber="-1" charStart="134" charEnd="142">
+                                    <sedBranchNode xml:id="_1d35a3e2-c599-4b3a-a284-d069f16e6412" name="if (n_2&gt;=1) {return decrease(n_2-1); }" lineNumber="-1" charStart="155" charEnd="201">
+                                       <sedStatement xml:id="_80c4d8a7-a275-4319-ad4e-7dd2559f7840" name="return decrease(n_2-1);" lineNumber="-1" charStart="173" charEnd="196">
+                                          <sedMethodCall xml:id="_5797a1d4-cdf9-46f0-baf4-a412012180a7" name="FixedRecursiveMethodCallTest.decrease(n_3);" lineNumber="-1" charStart="134" charEnd="142">
+                                             <sedBranchNode xml:id="_6fad3155-bcf8-4391-ae5e-cf6c7eef1277" name="if (n_3&gt;=1) {return decrease(n_3-1); }" lineNumber="-1" charStart="155" charEnd="201">
+                                                <sedStatement xml:id="_1b46dda3-2f95-4770-8e3a-38bc0d379d95" name="return n_3;" lineNumber="-1" charStart="205" charEnd="214">
+                                                   <sedMethodReturn xml:id="_8612df9d-89cc-4ad0-affa-9cdc056d414a" name="&lt;return of FixedRecursiveMethodCallTest.decrease(n_3);&gt;" lineNumber="-1" charStart="134" charEnd="142">
+                                                      <sedMethodReturn xml:id="_3977e46b-2e80-482d-b416-6b6284f32965" name="&lt;return of FixedRecursiveMethodCallTest.decrease(n_2);&gt;" lineNumber="-1" charStart="134" charEnd="142">
+                                                         <sedMethodReturn xml:id="_b4074ddd-a550-4533-a0cb-5ce7ad1b3ba6" name="&lt;return of FixedRecursiveMethodCallTest.decrease(n_1);&gt;" lineNumber="-1" charStart="134" charEnd="142">
+                                                            <sedMethodReturn xml:id="_8f0f0a25-a66c-4bd0-b9d2-95bf6a4a26f2" name="&lt;return of FixedRecursiveMethodCallTest.decrease(n);&gt;" lineNumber="-1" charStart="134" charEnd="142">
+                                                               <sedMethodReturn xml:id="_f99f339d-ec90-494e-9037-887ede4cb1b8" name="&lt;return of FixedRecursiveMethodCallTest.decreaseValue();&gt;" lineNumber="-1" charStart="66" charEnd="79">
+                                                                  <sedTermination xml:id="_1588cdc9-d08f-4e6c-bd76-a546422ecd3c" name="&lt;end&gt;">
                                                                   </sedTermination>
                                                                </sedMethodReturn>
                                                             </sedMethodReturn>

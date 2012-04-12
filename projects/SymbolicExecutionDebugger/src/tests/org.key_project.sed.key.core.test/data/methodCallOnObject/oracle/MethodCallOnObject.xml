@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget name="JML normal_behavior operation contract [id: -2147483648 / MethodCallOnObject::main]" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread name="KeY Default Thread">
-         <sedMethodCall name="MethodCallOnObject.main();" lineNumber="-1" charStart="56" charEnd="60">
-            <sedStatement name="MethodCallOnObject x = new MethodCallOnObject ();" lineNumber="-1" charStart="68" charEnd="116">
-               <sedBranchCondition name="Normal Execution (m != null)">
-                  <sedStatement name="return x.doSomething();" lineNumber="-1" charStart="120" charEnd="143">
-                     <sedBranchCondition name="Normal Execution (x != null)">
-                        <sedMethodCall name="x.doSomething();" lineNumber="-1" charStart="164" charEnd="175">
-                           <sedStatement name="return 42;" lineNumber="-1" charStart="183" charEnd="193">
-                              <sedMethodReturn name="&lt;return of x.doSomething();&gt;" lineNumber="-1" charStart="164" charEnd="175">
-                                 <sedMethodReturn name="&lt;return of MethodCallOnObject.main();&gt;" lineNumber="-1" charStart="56" charEnd="60">
-                                    <sedTermination name="&lt;end&gt;">
+   <sedTarget xml:id="_de87d555-aa3b-4597-865f-41bb1c461297" name="MethodCallOnObject[MethodCallOnObject::main()].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_405424a6-95ad-458a-a684-204af85f7f49" name="KeY Default Thread">
+         <sedMethodCall xml:id="_0d051d32-076b-40a7-87fa-ea183a5178a4" name="MethodCallOnObject.main();" lineNumber="-1" charStart="56" charEnd="60">
+            <sedStatement xml:id="_1b30db77-e9f2-4cbd-a088-a4096349277b" name="MethodCallOnObject x = new MethodCallOnObject ();" lineNumber="-1" charStart="68" charEnd="116">
+               <sedBranchCondition xml:id="_33b0185e-8226-4fce-927b-4f0ac2d85104" name="Normal Execution (m != null)">
+                  <sedStatement xml:id="_867f0d4b-c460-45b6-96d2-ac4e35d14c41" name="return x.doSomething();" lineNumber="-1" charStart="120" charEnd="143">
+                     <sedBranchCondition xml:id="_a60ded6e-d7bb-4461-97bc-d04c3138c36d" name="Normal Execution (x != null)">
+                        <sedMethodCall xml:id="_60bac632-81b9-44c8-992b-15cfac9eb5ab" name="x.doSomething();" lineNumber="-1" charStart="164" charEnd="175">
+                           <sedStatement xml:id="_e6a6a2d0-0006-45d1-8b21-6386079446c6" name="return 42;" lineNumber="-1" charStart="183" charEnd="193">
+                              <sedMethodReturn xml:id="_9213226a-ade5-4559-9600-e6c5ded411f9" name="&lt;return of x.doSomething();&gt;" lineNumber="-1" charStart="164" charEnd="175">
+                                 <sedMethodReturn xml:id="_ce389721-ba5e-489b-87e4-c41ead408313" name="&lt;return of MethodCallOnObject.main();&gt;" lineNumber="-1" charStart="56" charEnd="60">
+                                    <sedTermination xml:id="_1728e800-2cf2-4b79-8471-897e0426eeb8" name="&lt;end&gt;">
                                     </sedTermination>
                                  </sedMethodReturn>
                               </sedMethodReturn>

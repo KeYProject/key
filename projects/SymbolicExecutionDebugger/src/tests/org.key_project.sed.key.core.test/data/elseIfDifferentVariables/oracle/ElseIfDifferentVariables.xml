@@ -1,31 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget name="JML normal_behavior operation contract [id: -2147483648 / ElseIfDifferentVariables::main]" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread name="KeY Default Thread">
-         <sedMethodCall name="self.main(_a,_b);" lineNumber="-1" charStart="55" charEnd="59">
-            <sedBranchNode name="if (_a) {return 1; }else if (_b) {return 2;   }else  {return 3;   }" lineNumber="-1" charStart="87" charEnd="179">
-               <sedBranchCondition name="if _a true">
-                  <sedStatement name="return 1;" lineNumber="-1" charStart="100" charEnd="109">
-                     <sedMethodReturn name="&lt;return of self.main(_a,_b);&gt;" lineNumber="-1" charStart="55" charEnd="59">
-                        <sedTermination name="&lt;end&gt;">
+   <sedTarget xml:id="_2db98c4e-f0ae-43fb-9346-b0e7f6471ee3" name="ElseIfDifferentVariables[ElseIfDifferentVariables::main(boolean,boolean)].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_58dea4e4-affb-45d9-aa42-c4b616fce167" name="KeY Default Thread">
+         <sedMethodCall xml:id="_645b5b49-ecef-48a5-87f1-eca6fdef638e" name="self.main(_a,_b);" lineNumber="-1" charStart="55" charEnd="59">
+            <sedBranchNode xml:id="_a038ffa9-1691-47cf-ab3a-cfc582a949e9" name="if (_a) {return 1; }else if (_b) {return 2;   }else  {return 3;   }" lineNumber="-1" charStart="87" charEnd="179">
+               <sedBranchCondition xml:id="_ccdae862-81b2-4258-a5d5-8bd1f1ec091b" name="if _a true">
+                  <sedStatement xml:id="_0bd9a36a-8db0-4238-9c22-d48d0ec83a91" name="return 1;" lineNumber="-1" charStart="100" charEnd="109">
+                     <sedMethodReturn xml:id="_05dd6d6a-086c-4058-bb19-2087dc600078" name="&lt;return of self.main(_a,_b);&gt;" lineNumber="-1" charStart="55" charEnd="59">
+                        <sedTermination xml:id="_f6b07b05-c1bf-4ffa-8a9b-95dfb8564322" name="&lt;end&gt;">
                         </sedTermination>
                      </sedMethodReturn>
                   </sedStatement>
                </sedBranchCondition>
-               <sedBranchCondition name="if _a false">
-                  <sedBranchNode name="if (_b) {return 2; }else  {return 3; }" lineNumber="-1" charStart="87" charEnd="179">
-                     <sedBranchCondition name="b = TRUE TRUE">
-                        <sedStatement name="return 2;" lineNumber="-1" charStart="136" charEnd="145">
-                           <sedMethodReturn name="&lt;return of self.main(_a,_b);&gt;" lineNumber="-1" charStart="55" charEnd="59">
-                              <sedTermination name="&lt;end&gt;">
+               <sedBranchCondition xml:id="_369eb59c-7263-4206-9664-5f67b5f89c89" name="if _a false">
+                  <sedBranchNode xml:id="_8f197c0c-1e44-4391-ade1-f748c285881b" name="if (_b) {return 2; }else  {return 3; }" lineNumber="-1" charStart="87" charEnd="179">
+                     <sedBranchCondition xml:id="_238ee852-61ab-4ea1-8348-faf9c9e2ffa5" name="b = TRUE TRUE">
+                        <sedStatement xml:id="_6f8a71c7-6378-4728-9b83-9b2218cc1de6" name="return 2;" lineNumber="-1" charStart="136" charEnd="145">
+                           <sedMethodReturn xml:id="_2660c109-fe0b-4cbc-b178-32a7c2086821" name="&lt;return of self.main(_a,_b);&gt;" lineNumber="-1" charStart="55" charEnd="59">
+                              <sedTermination xml:id="_aaf325fc-d9f0-4718-b891-fbca4ad21995" name="&lt;end&gt;">
                               </sedTermination>
                            </sedMethodReturn>
                         </sedStatement>
                      </sedBranchCondition>
-                     <sedBranchCondition name="b = TRUE FALSE">
-                        <sedStatement name="return 3;" lineNumber="-1" charStart="165" charEnd="174">
-                           <sedMethodReturn name="&lt;return of self.main(_a,_b);&gt;" lineNumber="-1" charStart="55" charEnd="59">
-                              <sedTermination name="&lt;end&gt;">
+                     <sedBranchCondition xml:id="_b3c83742-53f0-422c-9020-4e40da9ec927" name="b = TRUE FALSE">
+                        <sedStatement xml:id="_8eab5c57-81d0-4444-ad91-62bf5ccdb60d" name="return 3;" lineNumber="-1" charStart="165" charEnd="174">
+                           <sedMethodReturn xml:id="_841e88d1-1720-435e-8cf5-1a1527735c32" name="&lt;return of self.main(_a,_b);&gt;" lineNumber="-1" charStart="55" charEnd="59">
+                              <sedTermination xml:id="_87d399b5-fd94-4d4f-8b17-8ae63b203794" name="&lt;end&gt;">
                               </sedTermination>
                            </sedMethodReturn>
                         </sedStatement>

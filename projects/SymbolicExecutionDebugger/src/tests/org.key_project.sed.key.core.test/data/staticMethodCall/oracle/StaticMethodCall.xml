@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget name="JML normal_behavior operation contract [id: -2147483648 / StaticMethodCall::main]" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread name="KeY Default Thread">
-         <sedMethodCall name="StaticMethodCall.main();" lineNumber="-1" charStart="662" charEnd="666">
-            <sedStatement name="doSomething();" lineNumber="-1" charStart="674" charEnd="688">
-               <sedMethodCall name="StaticMethodCall.doSomething();" lineNumber="-1" charStart="756" charEnd="767">
-                  <sedMethodReturn name="&lt;return of StaticMethodCall.doSomething();&gt;" lineNumber="-1" charStart="756" charEnd="767">
-                     <sedStatement name="int x = sub()+sub();" lineNumber="-1" charStart="692" charEnd="714">
-                        <sedMethodCall name="StaticMethodCall.sub();" lineNumber="-1" charStart="799" charEnd="802">
-                           <sedStatement name="return subSub()+2;" lineNumber="-1" charStart="810" charEnd="830">
-                              <sedMethodCall name="StaticMethodCall.subSub();" lineNumber="-1" charStart="858" charEnd="864">
-                                 <sedStatement name="return 2;" lineNumber="-1" charStart="872" charEnd="881">
-                                    <sedMethodReturn name="&lt;return of StaticMethodCall.subSub();&gt;" lineNumber="-1" charStart="858" charEnd="864">
-                                       <sedMethodReturn name="&lt;return of StaticMethodCall.sub();&gt;" lineNumber="-1" charStart="799" charEnd="802">
-                                          <sedMethodCall name="StaticMethodCall.sub();" lineNumber="-1" charStart="799" charEnd="802">
-                                             <sedStatement name="return subSub()+2;" lineNumber="-1" charStart="810" charEnd="830">
-                                                <sedMethodCall name="StaticMethodCall.subSub();" lineNumber="-1" charStart="858" charEnd="864">
-                                                   <sedStatement name="return 2;" lineNumber="-1" charStart="872" charEnd="881">
-                                                      <sedMethodReturn name="&lt;return of StaticMethodCall.subSub();&gt;" lineNumber="-1" charStart="858" charEnd="864">
-                                                         <sedMethodReturn name="&lt;return of StaticMethodCall.sub();&gt;" lineNumber="-1" charStart="799" charEnd="802">
-                                                            <sedStatement name="return x;" lineNumber="-1" charStart="718" charEnd="727">
-                                                               <sedMethodReturn name="&lt;return of StaticMethodCall.main();&gt;" lineNumber="-1" charStart="662" charEnd="666">
-                                                                  <sedTermination name="&lt;end&gt;">
+   <sedTarget xml:id="_d9a2d767-37d0-42a5-b9ea-1f6a5a154064" name="StaticMethodCall[StaticMethodCall::main()].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_33b44079-ab2d-4853-baed-038854c46755" name="KeY Default Thread">
+         <sedMethodCall xml:id="_94533d7f-6670-4812-b5fe-181ca5f65723" name="StaticMethodCall.main();" lineNumber="-1" charStart="662" charEnd="666">
+            <sedStatement xml:id="_2abddd1d-0fec-4dd3-b798-e3552ca7b62f" name="doSomething();" lineNumber="-1" charStart="674" charEnd="688">
+               <sedMethodCall xml:id="_70e9feb3-7813-47ec-b81a-b1132b74f31f" name="StaticMethodCall.doSomething();" lineNumber="-1" charStart="756" charEnd="767">
+                  <sedMethodReturn xml:id="_0465cb50-9a54-4fca-af72-f2a62ccc1e3d" name="&lt;return of StaticMethodCall.doSomething();&gt;" lineNumber="-1" charStart="756" charEnd="767">
+                     <sedStatement xml:id="_35b7df96-532a-45db-a949-910a23530acc" name="int x = sub()+sub();" lineNumber="-1" charStart="692" charEnd="714">
+                        <sedMethodCall xml:id="_25065471-7746-4af2-921f-e5ac15c510bc" name="StaticMethodCall.sub();" lineNumber="-1" charStart="799" charEnd="802">
+                           <sedStatement xml:id="_2b0cd639-0d50-4c40-9479-5e1c8cb9d502" name="return subSub()+2;" lineNumber="-1" charStart="810" charEnd="830">
+                              <sedMethodCall xml:id="_b8fbba26-21eb-4bd2-94c1-ef4b3af738dd" name="StaticMethodCall.subSub();" lineNumber="-1" charStart="858" charEnd="864">
+                                 <sedStatement xml:id="_93fd6f95-250c-4708-aeac-92fceb08a2ba" name="return 2;" lineNumber="-1" charStart="872" charEnd="881">
+                                    <sedMethodReturn xml:id="_e4d12e49-0eeb-4d01-85e8-3c420de53ecc" name="&lt;return of StaticMethodCall.subSub();&gt;" lineNumber="-1" charStart="858" charEnd="864">
+                                       <sedMethodReturn xml:id="_4e05f3ce-44cc-448d-9364-2482698108c5" name="&lt;return of StaticMethodCall.sub();&gt;" lineNumber="-1" charStart="799" charEnd="802">
+                                          <sedMethodCall xml:id="_d337c7cd-ca20-4724-9bd2-fd8ae73146b5" name="StaticMethodCall.sub();" lineNumber="-1" charStart="799" charEnd="802">
+                                             <sedStatement xml:id="_befbe337-7e40-4816-a6e3-f53702456752" name="return subSub()+2;" lineNumber="-1" charStart="810" charEnd="830">
+                                                <sedMethodCall xml:id="_5190b068-ce07-433d-b981-81ea0e25adf1" name="StaticMethodCall.subSub();" lineNumber="-1" charStart="858" charEnd="864">
+                                                   <sedStatement xml:id="_66c7156f-411e-44a7-a8f0-ba5ec01bc7e5" name="return 2;" lineNumber="-1" charStart="872" charEnd="881">
+                                                      <sedMethodReturn xml:id="_7cb9d8ee-ba01-4342-836e-35c17cf153d3" name="&lt;return of StaticMethodCall.subSub();&gt;" lineNumber="-1" charStart="858" charEnd="864">
+                                                         <sedMethodReturn xml:id="_78ec352d-8c1b-4099-ba97-8aa0c937afea" name="&lt;return of StaticMethodCall.sub();&gt;" lineNumber="-1" charStart="799" charEnd="802">
+                                                            <sedStatement xml:id="_4ec573a4-6114-4530-a570-e7cd2a91a6c4" name="return x;" lineNumber="-1" charStart="718" charEnd="727">
+                                                               <sedMethodReturn xml:id="_78ad8718-4e1e-4546-90fe-2e71ac2c5b66" name="&lt;return of StaticMethodCall.main();&gt;" lineNumber="-1" charStart="662" charEnd="666">
+                                                                  <sedTermination xml:id="_11486534-049e-48ae-bc2c-7bcf620e8138" name="&lt;end&gt;">
                                                                   </sedTermination>
                                                                </sedMethodReturn>
                                                             </sedStatement>

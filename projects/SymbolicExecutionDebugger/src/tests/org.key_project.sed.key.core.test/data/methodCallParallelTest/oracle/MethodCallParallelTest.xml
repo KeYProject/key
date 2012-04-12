@@ -1,37 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget name="JML normal_behavior operation contract [id: -2147483648 / MethodCallParallelTest::main]" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread name="KeY Default Thread">
-         <sedMethodCall name="self.main();" lineNumber="-1" charStart="53" charEnd="57">
-            <sedStatement name="int a = a();" lineNumber="-1" charStart="65" charEnd="77">
-               <sedMethodCall name="self.a();" lineNumber="-1" charStart="131" charEnd="132">
-                  <sedStatement name="int b1 = b();" lineNumber="-1" charStart="140" charEnd="153">
-                     <sedMethodCall name="self.b();" lineNumber="-1" charStart="230" charEnd="231">
-                        <sedStatement name="return c();" lineNumber="-1" charStart="239" charEnd="250">
-                           <sedMethodCall name="self.c();" lineNumber="-1" charStart="271" charEnd="272">
-                              <sedStatement name="return 42;" lineNumber="-1" charStart="280" charEnd="290">
-                                 <sedMethodReturn name="&lt;return of self.c();&gt;" lineNumber="-1" charStart="271" charEnd="272">
-                                    <sedMethodReturn name="&lt;return of self.b();&gt;" lineNumber="-1" charStart="230" charEnd="231">
-                                       <sedStatement name="int b2 = b();" lineNumber="-1" charStart="157" charEnd="170">
-                                          <sedMethodCall name="self.b();" lineNumber="-1" charStart="230" charEnd="231">
-                                             <sedStatement name="return c();" lineNumber="-1" charStart="239" charEnd="250">
-                                                <sedMethodCall name="self.c();" lineNumber="-1" charStart="271" charEnd="272">
-                                                   <sedStatement name="return 42;" lineNumber="-1" charStart="280" charEnd="290">
-                                                      <sedMethodReturn name="&lt;return of self.c();&gt;" lineNumber="-1" charStart="271" charEnd="272">
-                                                         <sedMethodReturn name="&lt;return of self.b();&gt;" lineNumber="-1" charStart="230" charEnd="231">
-                                                            <sedStatement name="int c = c();" lineNumber="-1" charStart="174" charEnd="186">
-                                                               <sedMethodCall name="self.c();" lineNumber="-1" charStart="271" charEnd="272">
-                                                                  <sedStatement name="return 42;" lineNumber="-1" charStart="280" charEnd="290">
-                                                                     <sedMethodReturn name="&lt;return of self.c();&gt;" lineNumber="-1" charStart="271" charEnd="272">
-                                                                        <sedStatement name="return b1+b2+c;" lineNumber="-1" charStart="190" charEnd="209">
-                                                                           <sedMethodReturn name="&lt;return of self.a();&gt;" lineNumber="-1" charStart="131" charEnd="132">
-                                                                              <sedStatement name="int x = x();" lineNumber="-1" charStart="81" charEnd="93">
-                                                                                 <sedMethodCall name="self.x();" lineNumber="-1" charStart="311" charEnd="312">
-                                                                                    <sedStatement name="return 2;" lineNumber="-1" charStart="320" charEnd="329">
-                                                                                       <sedMethodReturn name="&lt;return of self.x();&gt;" lineNumber="-1" charStart="311" charEnd="312">
-                                                                                          <sedStatement name="return a*x;" lineNumber="-1" charStart="97" charEnd="110">
-                                                                                             <sedMethodReturn name="&lt;return of self.main();&gt;" lineNumber="-1" charStart="53" charEnd="57">
-                                                                                                <sedTermination name="&lt;end&gt;">
+   <sedTarget xml:id="_d8c3035f-3b02-467c-a14e-2c0ea93bc91c" name="MethodCallParallelTest[MethodCallParallelTest::main()].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_7b0f3db4-6512-4d26-81be-b2a0a261605c" name="KeY Default Thread">
+         <sedMethodCall xml:id="_86ddb66e-df09-4697-bd4b-ebb07427c71e" name="self.main();" lineNumber="-1" charStart="53" charEnd="57">
+            <sedStatement xml:id="_cce7d5e8-a72e-4cc0-ad47-e8bf5222638f" name="int a = a();" lineNumber="-1" charStart="65" charEnd="77">
+               <sedMethodCall xml:id="_9284d258-dd47-43a4-8508-43df52966aed" name="self.a();" lineNumber="-1" charStart="131" charEnd="132">
+                  <sedStatement xml:id="_46fced34-f52a-483e-a166-9dbee6e7c011" name="int b1 = b();" lineNumber="-1" charStart="140" charEnd="153">
+                     <sedMethodCall xml:id="_a25c0559-79db-4346-9277-2cce3c40cb06" name="self.b();" lineNumber="-1" charStart="230" charEnd="231">
+                        <sedStatement xml:id="_cd89b7a4-5109-467f-b17c-387fa5ed566b" name="return c();" lineNumber="-1" charStart="239" charEnd="250">
+                           <sedMethodCall xml:id="_22064244-1317-4135-b125-bdbfbddb3468" name="self.c();" lineNumber="-1" charStart="271" charEnd="272">
+                              <sedStatement xml:id="_41d60d3b-cb46-4591-ad96-c1e58ee931d0" name="return 42;" lineNumber="-1" charStart="280" charEnd="290">
+                                 <sedMethodReturn xml:id="_fe5aa95d-56a3-4f91-baf3-75e4a571ceea" name="&lt;return of self.c();&gt;" lineNumber="-1" charStart="271" charEnd="272">
+                                    <sedMethodReturn xml:id="_b7483e79-b91f-46ea-9656-a70152f06e8d" name="&lt;return of self.b();&gt;" lineNumber="-1" charStart="230" charEnd="231">
+                                       <sedStatement xml:id="_5f029a0e-fe2d-4dec-b828-a0abbe09eaf4" name="int b2 = b();" lineNumber="-1" charStart="157" charEnd="170">
+                                          <sedMethodCall xml:id="_84ef3270-f25b-4ef9-9fda-53cce54d51e6" name="self.b();" lineNumber="-1" charStart="230" charEnd="231">
+                                             <sedStatement xml:id="_83502d41-b160-495b-87af-e0dc121edae5" name="return c();" lineNumber="-1" charStart="239" charEnd="250">
+                                                <sedMethodCall xml:id="_238f68a1-f187-43c8-a086-0e0876eb98d4" name="self.c();" lineNumber="-1" charStart="271" charEnd="272">
+                                                   <sedStatement xml:id="_7d989ad5-767f-4c64-8a47-866122f510e5" name="return 42;" lineNumber="-1" charStart="280" charEnd="290">
+                                                      <sedMethodReturn xml:id="_c6300aa8-3d1e-4fa3-b522-081b95a0e5ed" name="&lt;return of self.c();&gt;" lineNumber="-1" charStart="271" charEnd="272">
+                                                         <sedMethodReturn xml:id="_28d09ae4-ab08-4fc4-8d37-1091315c1720" name="&lt;return of self.b();&gt;" lineNumber="-1" charStart="230" charEnd="231">
+                                                            <sedStatement xml:id="_4f7522c4-dd40-4b45-981e-4c2b4f713938" name="int c = c();" lineNumber="-1" charStart="174" charEnd="186">
+                                                               <sedMethodCall xml:id="_ae192939-2f48-4fc5-93d7-ec5bf79b0bfd" name="self.c();" lineNumber="-1" charStart="271" charEnd="272">
+                                                                  <sedStatement xml:id="_a6681e73-a7a0-4660-ac54-cd74ba8a9637" name="return 42;" lineNumber="-1" charStart="280" charEnd="290">
+                                                                     <sedMethodReturn xml:id="_f6ee9687-07fa-4b67-9a9e-74838a0c7412" name="&lt;return of self.c();&gt;" lineNumber="-1" charStart="271" charEnd="272">
+                                                                        <sedStatement xml:id="_7d95dcba-e2b3-4c30-9883-1abed41405c0" name="return b1+b2+c;" lineNumber="-1" charStart="190" charEnd="209">
+                                                                           <sedMethodReturn xml:id="_5f8c62dc-9127-4dd6-bcdd-fddc653c81a8" name="&lt;return of self.a();&gt;" lineNumber="-1" charStart="131" charEnd="132">
+                                                                              <sedStatement xml:id="_a4639daa-9713-4f7e-abe7-40c0f11b6701" name="int x = x();" lineNumber="-1" charStart="81" charEnd="93">
+                                                                                 <sedMethodCall xml:id="_d7359bf5-b1f3-41d3-b5e0-282444706e7b" name="self.x();" lineNumber="-1" charStart="311" charEnd="312">
+                                                                                    <sedStatement xml:id="_7cac7acb-01c5-4bb5-a268-6f3bd189f6cc" name="return 2;" lineNumber="-1" charStart="320" charEnd="329">
+                                                                                       <sedMethodReturn xml:id="_0b7241d5-8faa-4a91-944c-8f0bd70c86f8" name="&lt;return of self.x();&gt;" lineNumber="-1" charStart="311" charEnd="312">
+                                                                                          <sedStatement xml:id="_99f79510-d6b0-467d-95a8-986c1906533e" name="return a*x;" lineNumber="-1" charStart="97" charEnd="110">
+                                                                                             <sedMethodReturn xml:id="_fd643aea-cf06-4879-9d24-1e1e2675df18" name="&lt;return of self.main();&gt;" lineNumber="-1" charStart="53" charEnd="57">
+                                                                                                <sedTermination xml:id="_46bde765-28c3-4008-b507-3bf55f6fdf23" name="&lt;end&gt;">
                                                                                                 </sedTermination>
                                                                                              </sedMethodReturn>
                                                                                           </sedStatement>

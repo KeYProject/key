@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget name="JML normal_behavior operation contract [id: -2147483648 / FlatSteps::doSomething]" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread name="KeY Default Thread">
-         <sedMethodCall name="self.doSomething(_asdf,_a,_b);" lineNumber="-1" charStart="228" charEnd="239">
-            <sedStatement name="int x = 1;" lineNumber="-1" charStart="276" charEnd="286">
-               <sedStatement name="int y = 2;" lineNumber="-1" charStart="290" charEnd="300">
-                  <sedStatement name="int z = 3;" lineNumber="-1" charStart="304" charEnd="314">
-                     <sedMethodReturn name="&lt;return of self.doSomething(_asdf,_a,_b);&gt;" lineNumber="-1" charStart="228" charEnd="239">
-                        <sedTermination name="&lt;end&gt;">
+   <sedTarget xml:id="_c66553d0-91a5-4552-8df2-915df73a221f" name="FlatSteps[FlatSteps::doSomething(int,java.lang.String,boolean)].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_8efd0c4c-095c-40d5-b483-9207e3f0d193" name="KeY Default Thread">
+         <sedMethodCall xml:id="_abe1578c-7cd1-42c4-bcb9-a30ba2b45b6f" name="self.doSomething(_asdf,_a,_b);" lineNumber="-1" charStart="228" charEnd="239">
+            <sedStatement xml:id="_138f65d0-ab1f-4131-b3e2-b363a17520d8" name="int x = 1;" lineNumber="-1" charStart="276" charEnd="286">
+               <sedStatement xml:id="_41793347-5b58-4cde-92f4-669d66686a17" name="int y = 2;" lineNumber="-1" charStart="290" charEnd="300">
+                  <sedStatement xml:id="_c838d716-efc8-4e81-9132-1cfb770844d5" name="int z = 3;" lineNumber="-1" charStart="304" charEnd="314">
+                     <sedMethodReturn xml:id="_fca27411-6329-412c-9e93-2d680dd589e4" name="&lt;return of self.doSomething(_asdf,_a,_b);&gt;" lineNumber="-1" charStart="228" charEnd="239">
+                        <sedTermination xml:id="_aa82a9c0-7f14-4f16-8abb-469ee90fd79f" name="&lt;end&gt;">
                         </sedTermination>
                      </sedMethodReturn>
                   </sedStatement>
