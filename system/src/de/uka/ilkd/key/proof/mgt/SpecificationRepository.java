@@ -204,15 +204,18 @@ public final class SpecificationRepository {
     private KeYJavaType getEnclosingKJT(KeYJavaType kjt) {
 	//HACK, this should be easier
 	if(kjt.getJavaType() instanceof ClassDeclaration) {
+
+	    
 	    final String name = kjt.getJavaType().getFullName();
+	    
 	    if(name.contains(".")) {
-		final String enclosingName 
-			= name.substring(0, name.lastIndexOf("."));
-		final KeYJavaType result 
-			= services.getJavaInfo().getKeYJavaType(enclosingName);
-		return result;
+	        final String enclosingName 
+	        = name.substring(0, name.lastIndexOf("."));
+	        final KeYJavaType result 
+	        = services.getJavaInfo().getTypeByName(enclosingName);
+	        return result;
 	    } else {
-		return null;
+	        return null;
 	    }
 	} else {
 	    return null;
