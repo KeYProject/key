@@ -7,6 +7,7 @@ import junit.framework.TestCase;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.junit.Test;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
+import org.key_project.key4eclipse.test.util.TestKeY4EclipseUtil;
 import org.key_project.swtbot.swing.bot.SwingBotJButton;
 import org.key_project.swtbot.swing.bot.SwingBotJDialog;
 import org.key_project.swtbot.swing.bot.SwingBotJFrame;
@@ -47,7 +48,7 @@ public class SWTBotExampleTest extends TestCase {
             loadButton.clickAndWait();
             // Start proof
             TestUtilsUtil.keyStartSelectedProofInProofManagementDiaolog();
-            TestUtilsUtil.keyCheckProofs("JML operation contract [id: 7 / MyClass::MyClass]", "JML operation contract [id: 7 / MyClass::MyClass]");
+            TestUtilsUtil.keyCheckProofs(TestKeY4EclipseUtil.createOperationContractId("MyClass", "MyClass()", "0", null), TestKeY4EclipseUtil.createOperationContractId("MyClass", "MyClass()", "0", null));
             // Finish proof automatically
             TestUtilsUtil.keyFinishSelectedProofAutomatically(frame, MethodTreatment.EXPAND);
             // Clear proof list
