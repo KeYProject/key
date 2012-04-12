@@ -1215,12 +1215,20 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       try {
          if (e.getSource() == proof) {
             analyzeProof(proof);
-            super.suspend();
          }
       }
       catch (Exception exception) {
          LogUtil.getLogger().logError(exception);
          LogUtil.getLogger().openErrorDialog(null, exception);
+      }
+      finally {
+         try {
+            super.suspend();
+         }
+         catch (DebugException e1) {
+            LogUtil.getLogger().logError(e1);
+            LogUtil.getLogger().openErrorDialog(null, e1);
+         }
       }
    }
 }

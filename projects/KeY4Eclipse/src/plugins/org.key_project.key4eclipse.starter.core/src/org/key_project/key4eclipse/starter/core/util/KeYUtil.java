@@ -611,6 +611,7 @@ public final class KeYUtil {
              main.getNotificationManager().removeNotificationTask(task);
           }
           // Start interactive proof automatically
+          main.getMediator().setProof(proof);
           main.getMediator().startAutoMode(proof.openEnabledGoals());
           // Wait for interactive prover
           KeYUtil.waitWhileMainWindowIsFrozen(main);
