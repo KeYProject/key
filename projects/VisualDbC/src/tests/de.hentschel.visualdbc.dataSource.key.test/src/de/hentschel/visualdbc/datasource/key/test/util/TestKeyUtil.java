@@ -338,11 +338,11 @@ public final class TestKeyUtil {
       con.addPackage(paycard);
       MemoryClass cardException = createCardException("CardException");
       paycard.addClass(cardException);
-      MemoryClass logFile = createLogFile("LogFile", "paycard.LogFile", "paycard.LogRecord", new String[] {"0", "1", "2"}, new String[] {"0", "2", "1"});
+      MemoryClass logFile = createLogFile("LogFile", "paycard.LogFile", "paycard.LogRecord", new String[] {"0", "1", "2"}, new String[] {"0", "2", "0"});
       paycard.addClass(logFile);
-      MemoryClass logRecord = createLogRecord("LogRecord", "paycard.LogRecord", new String[] {"4", "6"}, new String[] {"2", "4", "3", "4", "7"});
+      MemoryClass logRecord = createLogRecord("LogRecord", "paycard.LogRecord", new String[] {"4", "6"}, new String[] {"0", "0", "0", "0", "7"});
       paycard.addClass(logRecord);
-      MemoryClass payCard = createPayCard("PayCard", "paycard.PayCard", "paycard.LogFile", new String[] {"8", "9", "11", "13"}, new String[] {"5", "8", "7", "6", "9", "10", "10"});
+      MemoryClass payCard = createPayCard("PayCard", "paycard.PayCard", "paycard.LogFile", new String[] {"8", "9", "11", "13"}, new String[] {"0", "0", "1", "0", "0", "0", "0"});
       paycard.addClass(payCard);
       return con;
    }
@@ -354,11 +354,11 @@ public final class TestKeyUtil {
     */   
    public static IDSConnection createExpectedPackageTestModel_NoPackages() {
       MemoryConnection con = new MemoryConnection();
-      MemoryClass payCard = createPayCard("PayCard", "PayCard", "packageA.LogFile", new String[] {"0", "1", "3", "5"}, new String[] {"0", "3", "2", "1", "4", "5", "5"});
+      MemoryClass payCard = createPayCard("PayCard", "PayCard", "packageA.LogFile", new String[] {"0", "1", "3", "5"}, new String[] {"0", "0", "1", "0", "0", "0", "0"});
       con.addClass(payCard);
-      MemoryClass logFile = createLogFile("packageA.LogFile", "packageA.LogFile", "packageB.p1.LogRecord", new String[] {"7", "8", "9"}, new String[] {"6", "8", "7"});
+      MemoryClass logFile = createLogFile("packageA.LogFile", "packageA.LogFile", "packageB.p1.LogRecord", new String[] {"7", "8", "9"}, new String[] {"0", "8", "0"});
       con.addClass(logFile);
-      MemoryClass logRecord = createLogRecord("packageB.p1.LogRecord", "packageB.p1.LogRecord", new String[] {"11", "13"}, new String[] {"8", "9", "9", "10", "13"});
+      MemoryClass logRecord = createLogRecord("packageB.p1.LogRecord", "packageB.p1.LogRecord", new String[] {"11", "13"}, new String[] {"0", "0", "0", "0", "13"});
       con.addClass(logRecord);
       MemoryClass cardException = createCardException("packageB.p2.p2a.CardException");
       con.addClass(cardException);
@@ -372,15 +372,15 @@ public final class TestKeyUtil {
     */   
    public static IDSConnection createExpectedPackageTestModel_FlatList() {
       MemoryConnection con = new MemoryConnection();
-      MemoryClass payCard = createPayCard("PayCard", "PayCard", "packageA.LogFile", new String[] {"0", "1", "3", "5"}, new String[] {"0", "3", "2", "1", "4", "5", "5"});
+      MemoryClass payCard = createPayCard("PayCard", "PayCard", "packageA.LogFile", new String[] {"0", "1", "3", "5"}, new String[] {"0", "0", "1", "0", "0", "0", "0"});
       con.addClass(payCard);
       MemoryPackage packageA = new MemoryPackage("packageA");
       con.addPackage(packageA);
-      MemoryClass logFile = createLogFile("LogFile", "packageA.LogFile", "packageB.p1.LogRecord", new String[] {"7", "8", "9"}, new String[] {"6", "8", "7"});
+      MemoryClass logFile = createLogFile("LogFile", "packageA.LogFile", "packageB.p1.LogRecord", new String[] {"7", "8", "9"}, new String[] {"0", "8", "0"});
       packageA.addClass(logFile);
       MemoryPackage packageB_p1 = new MemoryPackage("packageB.p1");
       con.addPackage(packageB_p1);
-      MemoryClass logRecord = createLogRecord("LogRecord", "packageB.p1.LogRecord", new String[] {"11", "13"}, new String[] {"8", "9", "9", "10", "13"});
+      MemoryClass logRecord = createLogRecord("LogRecord", "packageB.p1.LogRecord", new String[] {"11", "13"}, new String[] {"0", "0", "0", "0", "13"});
       packageB_p1.addClass(logRecord);
       MemoryPackage packageB_p2_p2a = new MemoryPackage("packageB.p2.p2a");
       con.addPackage(packageB_p2_p2a);
@@ -396,17 +396,17 @@ public final class TestKeyUtil {
     */   
    public static IDSConnection createExpectedPackageTestModel_Hierarchy() {
       MemoryConnection con = new MemoryConnection();
-      MemoryClass payCard = createPayCard("PayCard", "PayCard", "packageA.LogFile", new String[] {"0", "1", "3", "5"}, new String[] {"0", "3", "2", "1", "4", "5", "5"});
+      MemoryClass payCard = createPayCard("PayCard", "PayCard", "packageA.LogFile", new String[] {"0", "1", "3", "5"}, new String[] {"0", "0", "1", "0", "0", "0", "0"});
       con.addClass(payCard);
       MemoryPackage packageA = new MemoryPackage("packageA");
       con.addPackage(packageA);
-      MemoryClass logFile = createLogFile("LogFile", "packageA.LogFile", "packageB.p1.LogRecord", new String[] {"7", "8", "9"}, new String[] {"6", "8", "7"});
+      MemoryClass logFile = createLogFile("LogFile", "packageA.LogFile", "packageB.p1.LogRecord", new String[] {"7", "8", "9"}, new String[] {"0", "8", "0"});
       packageA.addClass(logFile);
       MemoryPackage packageB = new MemoryPackage("packageB");
       con.addPackage(packageB);
       MemoryPackage packageB_p1 = new MemoryPackage("p1");
       packageB.addPackage(packageB_p1);
-      MemoryClass logRecord = createLogRecord("LogRecord", "packageB.p1.LogRecord", new String[] {"11", "13"}, new String[] {"8", "9", "9", "10", "13"});
+      MemoryClass logRecord = createLogRecord("LogRecord", "packageB.p1.LogRecord", new String[] {"11", "13"}, new String[] {"0", "0", "0", "0", "13"});
       packageB_p1.addClass(logRecord);
       MemoryPackage packageB_p2 = new MemoryPackage("p2");
       packageB.addPackage(packageB_p2);
@@ -475,7 +475,7 @@ public final class TestKeyUtil {
       result.addConstructor(constructor);
       MemoryMethod setRecord = new MemoryMethod("setRecord(balance : int)", "void", DSVisibility.PUBLIC);
       addOperationObligations(setRecord, true, true, true);
-      MemoryOperationContract sr = new MemoryOperationContract("JML normal_behavior operation contract [id: " + operationContractIds[0] + " / " + logRecordFullqualifiedName + "::setRecord]", 
+      MemoryOperationContract sr = new MemoryOperationContract(createOperationContractId(logRecordFullqualifiedName, "setRecord(int)", operationContractIds[0], "normal_behavior"),
                                                                "balance >= 0 & self.<inv>", 
                                                                "self.balance = balance\n" +
                                                                "&   self.transactionId\n" +
@@ -491,13 +491,17 @@ public final class TestKeyUtil {
       result.addMethod(setRecord);
       MemoryMethod getBalance = new MemoryMethod("getBalance()", "int", DSVisibility.PUBLIC);
       addOperationObligations(getBalance, true, true, true);
-      MemoryOperationContract gb2 = new MemoryOperationContract("JML normal_behavior operation contract [id: " + operationContractIds[2] + " / " + logRecordFullqualifiedName + "::getBalance]", "self.<inv>", "result = self.balance & self.<inv> & exc = null", "{}", "diamond");
+      MemoryOperationContract gb2 = new MemoryOperationContract(createOperationContractId(logRecordFullqualifiedName, "getBalance()", operationContractIds[2], "normal_behavior"),
+                                                                "self.<inv>", 
+                                                                "result = self.balance & self.<inv> & exc = null", "{}", "diamond");
       addAllOperationContractObligations(gb2);
       getBalance.addOperationContract(gb2);
       result.addMethod(getBalance);
       MemoryMethod getTransactionId = new MemoryMethod("getTransactionId()", "int", DSVisibility.PUBLIC);
       addOperationObligations(getTransactionId, true, true, true);
-      MemoryOperationContract gti2 = new MemoryOperationContract("JML normal_behavior operation contract [id: " + operationContractIds[3] + " / " + logRecordFullqualifiedName + "::getTransactionId]", "self.<inv>", "result = self.transactionId & self.<inv> & exc = null", "{}", "diamond");
+      MemoryOperationContract gti2 = new MemoryOperationContract(createOperationContractId(logRecordFullqualifiedName, "getTransactionId()", operationContractIds[3], "normal_behavior"),
+                                                                 "self.<inv>", 
+                                                                 "result = self.transactionId & self.<inv> & exc = null", "{}", "diamond");
       addAllOperationContractObligations(gti2);
       getTransactionId.addOperationContract(gti2);
       result.addMethod(getTransactionId);
@@ -535,7 +539,7 @@ public final class TestKeyUtil {
       result.addConstructor(constructor);
       MemoryMethod createJuniorCard = new MemoryMethod("createJuniorCard()", qualifiedPaycardName, DSVisibility.PUBLIC, true);
       addOperationObligations(createJuniorCard, true, true, true);
-      MemoryOperationContract cjc = new MemoryOperationContract("JML operation contract [id: " + operationContractIDs[0] + " / " + qualifiedPaycardName + "::createJuniorCard]", 
+      MemoryOperationContract cjc = new MemoryOperationContract(createOperationContractId(qualifiedPaycardName, "createJuniorCard()", operationContractIDs[0], ""), 
                                                                 "true", 
                                                                 "(exc = null -> result.limit = 100 & !result = null)\n" +
                                                                 "& exc = null", 
@@ -546,7 +550,7 @@ public final class TestKeyUtil {
       result.addMethod(createJuniorCard);
       MemoryMethod charge = new MemoryMethod("charge(amount : int)", "boolean", DSVisibility.PUBLIC);
       addOperationObligations(charge, true, true, true);
-      MemoryOperationContract c1 = new MemoryOperationContract("JML exceptional_behavior operation contract [id: " + operationContractIDs[1] + " / " + qualifiedPaycardName + "::charge]", 
+      MemoryOperationContract c1 = new MemoryOperationContract(createOperationContractId(qualifiedPaycardName, "charge(int)", operationContractIDs[1], "exceptional_behavior"), 
                                                                "amount <= 0 & self.<inv>", 
                                                                "!exc = null\n" +
                                                                "& (  (   java.lang.Exception::instance(exc) = TRUE\n" +
@@ -556,7 +560,7 @@ public final class TestKeyUtil {
                                                                "allLocs", 
                                                                "diamond");
       addAllOperationContractObligations(c1);
-      MemoryOperationContract c2 = new MemoryOperationContract("JML normal_behavior operation contract [id: " + operationContractIDs[2] + " / " + qualifiedPaycardName + "::charge]", 
+      MemoryOperationContract c2 = new MemoryOperationContract(createOperationContractId(qualifiedPaycardName, "charge(int)", operationContractIDs[2], "normal_behavior"),
                                                                "(  javaAddInt(amount, self.balance) >= self.limit\n" +
                                                                "   | !self.isValid() = TRUE)\n" +
                                                                "& amount >  0\n" +
@@ -572,7 +576,7 @@ public final class TestKeyUtil {
                                                                "{(self, unsuccessfulOperations)}", 
                                                                "diamond");
       addAllOperationContractObligations(c2);
-      MemoryOperationContract c3 = new MemoryOperationContract("JML normal_behavior operation contract [id: " + operationContractIDs[3] + " / " + qualifiedPaycardName + "::charge]", 
+      MemoryOperationContract c3 = new MemoryOperationContract(createOperationContractId(qualifiedPaycardName, "charge(int)", operationContractIDs[3], "normal_behavior"),
                                                                "javaAddInt(amount, self.balance) < self.limit\n" +
                                                                "& self.isValid() = TRUE\n" +
                                                                "& amount >  0\n" +
@@ -592,7 +596,7 @@ public final class TestKeyUtil {
       result.addMethod(charge);
       MemoryMethod chargeAndRecord = new MemoryMethod("chargeAndRecord(amount : int)", "void", DSVisibility.PUBLIC);
       addOperationObligations(chargeAndRecord, true, true, true);
-      MemoryOperationContract car = new MemoryOperationContract("JML normal_behavior operation contract [id: " + operationContractIDs[4] + " / " + qualifiedPaycardName + "::chargeAndRecord]", 
+      MemoryOperationContract car = new MemoryOperationContract(createOperationContractId(qualifiedPaycardName, "chargeAndRecord(int)", operationContractIDs[4], "normal_behavior"), 
                                                                 "amount >  0 & self.<inv>", 
                                                                 "self.balance >= int::select(heapAtPre, self, balance)\n" +
                                                                 "& self.<inv>\n" +
@@ -604,7 +608,7 @@ public final class TestKeyUtil {
       result.addMethod(chargeAndRecord);
       MemoryMethod isValid = new MemoryMethod("isValid()", "boolean", DSVisibility.PUBLIC);
       addOperationObligations(isValid, true, true, true);
-      MemoryOperationContract iv2 = new MemoryOperationContract("JML normal_behavior operation contract [id: " + operationContractIDs[6] + " / " + qualifiedPaycardName + "::isValid]", 
+      MemoryOperationContract iv2 = new MemoryOperationContract(createOperationContractId(qualifiedPaycardName, "isValid()", operationContractIDs[6], "normal_behavior"), 
                                                                 "self.<inv>", 
                                                                 "(result = TRUE <-> self.unsuccessfulOperations <= 3)\n" +
                                                                 "& self.<inv>\n" +
@@ -631,6 +635,21 @@ public final class TestKeyUtil {
    }
    
    /**
+    * Creates an operation contract ID.
+    * @param qualifiedName The qualified class name.
+    * @param method The method signature.
+    * @param id The unique ID.
+    * @param behavior The behavior.
+    * @return The created operation contract ID:
+    */
+   public static String createOperationContractId(String qualifiedName,
+                                                  String method,
+                                                  String id,
+                                                  String behavior) {
+      return qualifiedName + "[" + qualifiedName + "::" + method + "].JML " + (StringUtil.isEmpty(behavior) ? "" : behavior + " ") + "operation contract." + id + "";
+   }
+   
+   /**
     * Creates the class "LogFile".
     * @param className The name to use.
     * @param qualifiedLogFileClass The full qualified class name.
@@ -650,7 +669,7 @@ public final class TestKeyUtil {
       result.addConstructor(constructor);
       MemoryMethod addRecord = new MemoryMethod("addRecord(balance : int)", "void", DSVisibility.PUBLIC);
       addOperationObligations(addRecord, true, true, true);
-      MemoryOperationContract ar1 = new MemoryOperationContract("JML normal_behavior operation contract [id: " + operationContractIds[0] + " / " + qualifiedLogFileClass + "::addRecord]", 
+      MemoryOperationContract ar1 = new MemoryOperationContract(createOperationContractId(qualifiedLogFileClass, "addRecord(int)", operationContractIds[0], "normal_behavior"),
                                                                 "balance >= 0 & self.<inv>", 
                                                                 "\\if (!  javaAddInt(int::select(heapAtPre,\n" +
                                                                 "                                 self,\n" +
@@ -673,7 +692,7 @@ public final class TestKeyUtil {
       result.addMethod(addRecord);
       MemoryMethod getMaximumRecord = new MemoryMethod("getMaximumRecord()", qualifiedLogRecordClass, DSVisibility.PUBLIC);
       addOperationObligations(getMaximumRecord, true, true, true);
-      MemoryOperationContract mr2 = new MemoryOperationContract("JML normal_behavior operation contract [id: " + operationContractIds[2] + " / " + qualifiedLogFileClass + "::getMaximumRecord]", 
+      MemoryOperationContract mr2 = new MemoryOperationContract(createOperationContractId(qualifiedLogFileClass, "getMaximumRecord()", operationContractIds[2], "normal_behavior"), 
                                                                 "self.<inv>", 
                                                                 "\\forall int i;\n" +
                                                                 "    (   0 <= i & i < self.logArray.length & inInt(i)\n" +
@@ -795,7 +814,7 @@ public final class TestKeyUtil {
       b.addConstructor(new MemoryConstructor("B(x : int)", DSVisibility.DEFAULT));
       b.addInvariant(new MemoryInvariant("JML class invariant nr 0 in B", "self.c.<inv>"));
       MemoryAxiom axiom = new MemoryAxiom("Class invariant axiom for test.B", "equiv(java.lang.Object::<inv>(heap,self),java.lang.Object::<inv>(heap,test.Test::select(heap,self,test.B::$c)))");
-      MemoryAxiomContract axiomContract = new MemoryAxiomContract("JML accessible clause [id: 0 / java.lang.Object::<inv> for B]", "self.<inv>", "allFields(self) \\cup allFields(self.c)");
+      MemoryAxiomContract axiomContract = new MemoryAxiomContract("test.B[java.lang.Object::<inv>()].JML accessible clause.0", "self.<inv>", "allFields(self) \\cup allFields(self.c)");
       addAllOperationContractObligations(axiomContract);
       axiom.addAxiomContract(axiomContract);
       b.addAxiom(axiom);
@@ -880,19 +899,36 @@ public final class TestKeyUtil {
       b.addAttribute(new MemoryAttribute("x", "int", bugAttributeVisibility(DSVisibility.PRIVATE)));
       b.addConstructor(createDefaultConstructor("ModelFieldTest()", null, false));
       MemoryMethod doubleX = new MemoryMethod("doubleX()", "int", DSVisibility.PUBLIC);
-      MemoryOperationContract doubleXcontract = new MemoryOperationContract("JML operation contract [id: " + (includeAxiomContract ? 1 : 0) + " / ModelFieldTest::doubleX]", "self.<inv>", "(exc = null -> result = self.f & self.<inv>)\n& exc = null", "allLocs", "diamond");
+      MemoryOperationContract doubleXcontract = new MemoryOperationContract(createOperationContractId("ModelFieldTest", "doubleX()", "0", null),
+                                                                            "self.<inv>", 
+                                                                            "(exc = null -> result = self.f & self.<inv>)\n& exc = null", 
+                                                                            "allLocs", 
+                                                                            "diamond");
       addAllOperationContractObligations(doubleXcontract);
       doubleX.addOperationContract(doubleXcontract);
       b.addMethod(doubleX);
       MemoryAxiom axiom1 = new MemoryAxiom("JML represents clause for ModelFieldTest::$f", "equals(ModelFieldTest::$f(heap,self),javaMulInt(Z(2(#)),int::select(heap,self,ModelFieldTest::$x)))");
       if (includeAxiomContract) {
-         MemoryAxiomContract axiom1contract = new MemoryAxiomContract("JML accessible clause [id: 0 / ModelFieldTest::$f for ModelFieldTest]", "self.<inv>", "{(self, x)}");
+         MemoryAxiomContract axiom1contract = new MemoryAxiomContract(createAxiomContractId("ModelFieldTest", "$f()", "0"),
+                                                                      "self.<inv>", 
+                                                                      "{(self, x)}");
          addAllOperationContractObligations(axiom1contract);
          axiom1.addAxiomContract(axiom1contract);
       }
       b.addAxiom(axiom1);
       con.addClass(b);
       return con;
+   }
+
+   /**
+    * Creates the ID for an axiom contract.
+    * @param qualifiedName The full qualified class name.
+    * @param field The field.
+    * @param id The unique ID.
+    * @return the create axiom contract ID.
+    */
+   public static String createAxiomContractId(String qualifiedName, String field, String id) {
+      return qualifiedName + "[" + qualifiedName + "::" + field+ "].JML accessible clause." + id;
    }
 
    /**

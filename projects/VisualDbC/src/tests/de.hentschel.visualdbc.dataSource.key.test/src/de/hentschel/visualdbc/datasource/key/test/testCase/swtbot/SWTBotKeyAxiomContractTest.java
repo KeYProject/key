@@ -52,7 +52,7 @@ public class SWTBotKeyAxiomContractTest extends TestCase {
                                    }
                                 },
                                 KeyConnection.PROOF_OBLIGATION_OPERATION_CONTRACT,
-                                "JML accessible clause [id: 0 / ModelFieldTest::$f for ModelFieldTest]",
+                                TestKeyUtil.createAxiomContractId("ModelFieldTest", "$f()", "0"),
                                 true,
                                 MethodTreatment.EXPAND,
                                 null,
@@ -79,7 +79,7 @@ public class SWTBotKeyAxiomContractTest extends TestCase {
                                    }
                                 },
                                 KeyConnection.PROOF_OBLIGATION_OPERATION_CONTRACT,
-                                "JML accessible clause [id: 0 / ModelFieldTest::$f for ModelFieldTest]",
+                                TestKeyUtil.createAxiomContractId("ModelFieldTest", "$f()", "0"),
                                 true,
                                 MethodTreatment.EXPAND,
                                 null,

@@ -60,7 +60,7 @@ public class SWTBotKeyOperationContractTest extends TestCase {
                                    }
                                 },
                                 KeyConnection.PROOF_OBLIGATION_OPERATION_CONTRACT,
-                                "JML normal_behavior operation contract [id: 1 / MCDemo::init]",
+                                TestKeyUtil.createOperationContractId("MCDemo", "init(int)", "0", "normal_behavior"),
                                 true,
                                 MethodTreatment.CONTRACTS,
                                 new IDSProvableReferenceSelector() {
@@ -105,7 +105,7 @@ public class SWTBotKeyOperationContractTest extends TestCase {
                                    }
                                 },
                                 KeyConnection.PROOF_OBLIGATION_OPERATION_CONTRACT,
-                                "JML normal_behavior operation contract [id: 1 / MCDemo::init]",
+                                TestKeyUtil.createOperationContractId("MCDemo", "init(int)", "0", "normal_behavior"),
                                 true,
                                 MethodTreatment.EXPAND,
                                 new IDSProvableReferenceSelector() {
@@ -149,7 +149,7 @@ public class SWTBotKeyOperationContractTest extends TestCase {
                                    }
                                 },
                                 KeyConnection.PROOF_OBLIGATION_OPERATION_CONTRACT,
-                                "JML normal_behavior operation contract [id: 10 / paycard.PayCard::isValid]",
+                                TestKeyUtil.createOperationContractId("paycard.PayCard", "isValid()", "0", "normal_behavior"),
                                 true,
                                 MethodTreatment.EXPAND,
                                 null,
@@ -176,7 +176,7 @@ public class SWTBotKeyOperationContractTest extends TestCase {
                                    }
                                 },
                                 KeyConnection.PROOF_OBLIGATION_OPERATION_CONTRACT,
-                                "JML normal_behavior operation contract [id: 10 / paycard.PayCard::isValid]",
+                                TestKeyUtil.createOperationContractId("paycard.PayCard", "isValid()", "0", "normal_behavior"),
                                 true,
                                 MethodTreatment.EXPAND,
                                 null,
