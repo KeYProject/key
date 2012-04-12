@@ -101,7 +101,7 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
                                    new TerminationCreateFeature(this),
                                    new ThreadCreateFeature(this)};
    }
-   
+
    /**
     * {@inheritDoc}
     */
@@ -228,11 +228,17 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
       }
    }
    
+   /**
+    * {@inheritDoc}
+    */
    @Override
    public IDeleteFeature getDeleteFeature(IDeleteContext context) {
       return new ExecutionTreeDeleteFeature(this);
    }
 
+   /**
+    * {@inheritDoc}
+    */
    @Override
    public IRemoveFeature getRemoveFeature(IRemoveContext context) {
       return new ExecutionTreeRemoveFeature(this);

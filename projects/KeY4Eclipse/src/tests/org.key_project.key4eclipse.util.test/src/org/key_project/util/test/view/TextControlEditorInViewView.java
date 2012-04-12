@@ -2,7 +2,6 @@ package org.key_project.util.test.view;
 
 import org.eclipse.ui.IEditorActionBarContributor;
 import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorPart;
 import org.key_project.util.eclipse.view.editorInView.AbstractEditorInViewView;
 import org.key_project.util.test.editor.TextControlEditor;
 
@@ -11,7 +10,7 @@ import org.key_project.util.test.editor.TextControlEditor;
  * a message.
  * @author Martin Hentschel
  */
-public class TextControlEditorInViewView extends AbstractEditorInViewView {
+public class TextControlEditorInViewView extends AbstractEditorInViewView<TextControlEditor> {
    /**
     * The ID of this view.
     */
@@ -28,7 +27,7 @@ public class TextControlEditorInViewView extends AbstractEditorInViewView {
     * {@inheritDoc}
     */
    @Override
-   protected IEditorPart createEditorPart() {
+   protected TextControlEditor createEditorPart() {
       return new TextControlEditor();
    }
 
@@ -44,7 +43,7 @@ public class TextControlEditorInViewView extends AbstractEditorInViewView {
     * {@inheritDoc}
     */
    @Override
-   protected IEditorInput getEditorInput() {
+   protected IEditorInput createEditorInput() {
       return null;
    }
 

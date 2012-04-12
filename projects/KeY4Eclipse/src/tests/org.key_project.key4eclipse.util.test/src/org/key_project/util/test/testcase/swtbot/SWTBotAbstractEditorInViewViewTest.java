@@ -31,8 +31,10 @@ import org.key_project.util.test.view.TextControlEditorInViewView;
  */
 public class SWTBotAbstractEditorInViewViewTest extends TestCase {
    /**
-    * Tests {@link AbstractEditorInViewView#getMessage()} and
-    * {@link AbstractEditorInViewView#setMessage(String)}.
+    * Tests {@link AbstractEditorInViewView#getMessage()},
+    * {@link AbstractEditorInViewView#setMessage(String)},
+    * {@link AbstractEditorInViewView#isEditorShown()} and
+    * {@link AbstractEditorInViewView#isMessageShown()}.
     */
    @Test
    public void testMessage() throws Exception {
@@ -42,7 +44,7 @@ public class SWTBotAbstractEditorInViewViewTest extends TestCase {
          SWTWorkbenchBot bot = new SWTWorkbenchBot();
          TestUtilsUtil.closeWelcomeView(bot);
          // Open view
-         final IViewPart part = TestUtilsUtil.openView(TextControlEditorInViewView.VIEW_ID);
+         final TextControlEditorInViewView part = (TextControlEditorInViewView)TestUtilsUtil.openView(TextControlEditorInViewView.VIEW_ID);
          view = bot.viewById(TextControlEditorInViewView.VIEW_ID);
          assertTrue(view.isActive());
          assertTrue(part instanceof TextControlEditorInViewView);
@@ -53,31 +55,43 @@ public class SWTBotAbstractEditorInViewViewTest extends TestCase {
          SWTBotLabel label = view.bot().label();
          assertEquals("Initial message from TextControlEditorInViewView.", label.getText());
          assertTrue(label.isVisible());
+         assertFalse(part.isEditorShown());
+         assertTrue(part.isMessageShown());
          // Show new text
          textView.setMessage("Hello World!");
          assertEquals("Hello World!", label.getText());
          assertTrue(label.isVisible());
+         assertFalse(part.isEditorShown());
+         assertTrue(part.isMessageShown());
          // Show editor
          textView.setMessage(null);
          assertFalse(label.isVisible());
          SWTBotText text = view.bot().text();
          assertEquals("This is an Editor.", text.getText());
          assertTrue(text.isVisible());
+         assertTrue(part.isEditorShown());
+         assertFalse(part.isMessageShown());
          // Show editor again
          textView.setMessage(null);
          assertFalse(label.isVisible());
          assertEquals("This is an Editor.", text.getText());
          assertTrue(text.isVisible());
+         assertTrue(part.isEditorShown());
+         assertFalse(part.isMessageShown());
          // Show new text
          textView.setMessage("Hello World Again!");
          assertEquals("Hello World Again!", label.getText());
          assertTrue(label.isVisible());
          assertFalse(text.isVisible());
+         assertFalse(part.isEditorShown());
+         assertTrue(part.isMessageShown());
          // Show editor again
          textView.setMessage(null);
          assertFalse(label.isVisible());
          assertEquals("This is an Editor.", text.getText());
          assertTrue(text.isVisible());
+         assertTrue(part.isEditorShown());
+         assertFalse(part.isMessageShown());
       }
       finally {
          if (view != null) {

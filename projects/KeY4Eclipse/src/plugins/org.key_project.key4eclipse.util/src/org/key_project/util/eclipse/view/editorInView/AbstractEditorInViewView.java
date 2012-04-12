@@ -19,6 +19,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.part.ViewPart;
 import org.key_project.util.eclipse.swt.SWTUtil;
+import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.StringUtil;
 
 /**
@@ -26,7 +27,7 @@ import org.key_project.util.java.StringUtil;
  * Provides a basic implementation to show an {@link IEditorPart} in
  * an {@link IViewPart}. Subclasses have to instantiate the used {@link IEditorPart}
  * in {@link #createEditorPart()} and the {@link IEditorInput} to use via
- * {@link #getEditorInput()}. If an {@link IEditorActionBarContributor} should
+ * {@link #createEditorInput()}. If an {@link IEditorActionBarContributor} should
  * be used it must be created via {@link #createEditorActionBarContributor()}.
  * </p>
  * <p>
@@ -44,11 +45,11 @@ import org.key_project.util.java.StringUtil;
  * @see EditorInViewEditorSite
  * @see EditorInViewWorkbenchPage
  */
-public abstract class AbstractEditorInViewView extends ViewPart {
+public abstract class AbstractEditorInViewView<T extends IEditorPart> extends ViewPart {
    /**
     * The shown {@link IEditorPart}.
     */
-   private IEditorPart editorPart;
+   private T editorPart;
    
    /**
     * The used {@link IEditorActionBarContributor} of {@link #editorPart}.
@@ -126,22 +127,24 @@ public abstract class AbstractEditorInViewView extends ViewPart {
    public void init(IViewSite site) throws PartInitException {
       // Initialize view
       super.init(site);
-      // Initialize action bars
-      initActionBars(getViewSite(), getViewSite().getActionBars());
       // Create editor to show in this view
       editorPart = createEditorPart();
       Assert.isNotNull(editorPart);
       editorActionBarContributor = createEditorActionBarContributor();
       virtualEditorWorkbenchPage = new EditorInViewWorkbenchPage(getViewSite(), editorPart);
       virtualEditorSite = new EditorInViewEditorSite(getViewSite(), virtualEditorWorkbenchPage, editorActionBarContributor);
-      editorPart.init(virtualEditorSite, getEditorInput());
+      initActionBars(getViewSite(), virtualEditorSite.getActionBars());
+      if (editorActionBarContributor != null) {
+         editorActionBarContributor.init(virtualEditorSite.getActionBars(), virtualEditorWorkbenchPage);
+      }
+      editorPart.init(virtualEditorSite, createEditorInput());
    }
 
    /**
     * Creates an {@link IEditorPart} which should be shown in this {@link IViewPart}.
     * @return The created {@link IEditorPart}.
     */
-   protected abstract IEditorPart createEditorPart();
+   protected abstract T createEditorPart();
    
    /**
     * Creates an {@link IEditorActionBarContributor} to use together with the created {@link IEditorPart}.
@@ -153,7 +156,7 @@ public abstract class AbstractEditorInViewView extends ViewPart {
     * Creates the {@link IEditorInput} which should be shown in the created {@link IEditorPart}.
     * @return The {@link IEditorInput} to show in the created {@link IEditorPart}.
     */
-   protected abstract IEditorInput getEditorInput();
+   protected abstract IEditorInput createEditorInput();
 
    /**
     * This method can be overwritten to initialize the used {@link IActionBars}.
@@ -253,5 +256,37 @@ public abstract class AbstractEditorInViewView extends ViewPart {
          layout.topControl = editorComposite;
       }
       root.layout();
+   }
+
+   /**
+    * Returns the contained {@link IEditorPart}.
+    * @return The {@link IEditorPart} or {@code null} if it was not instantiated yet.
+    */
+   protected T getEditorPart() {
+      return editorPart;
+   }
+
+   /**
+    * Returns the used {@link IEditorActionBarContributor} of {@link #getEditorPart()}.
+    * @return The {@link IEditorActionBarContributor} or {@code null} if it was not instantiated yet/is not available.
+    */
+   protected IEditorActionBarContributor getEditorActionBarContributor() {
+      return editorActionBarContributor;
+   }
+   
+   /**
+    * Checks if a message is shown.
+    * @return {@code true} a message is shown, {@code false} no message is shown.
+    */
+   public boolean isMessageShown() {
+      return ObjectUtil.equals(rootLayout.topControl, messageLabel);
+   }
+   
+   /**
+    * Checks if the {@link IEditorPart} is shown.
+    * @return {@code true} the {@link IEditorPart} is shown, {@code false} the {@link IEditorPart} is not shown.
+    */
+   public boolean isEditorShown() {
+      return ObjectUtil.equals(rootLayout.topControl, editorComposite);
    }
 }

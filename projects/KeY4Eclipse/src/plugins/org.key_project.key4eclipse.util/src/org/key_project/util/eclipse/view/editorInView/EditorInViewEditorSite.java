@@ -70,9 +70,19 @@ public class EditorInViewEditorSite extends PartSite implements IEditorSite, IDi
       this.page = page;
       this.wrapperViewSite = wrapperViewSite;
       this.wrappedEditorContributor = wrappedEditorContributor;
-      if (wrappedEditorContributor != null) {
-         wrappedEditorContributor.init(wrapperViewSite.getActionBars(), getPage());
-      }
+   }
+
+   /**
+    * <p>
+    * {@inheritDoc}
+    * </p>
+    * <p>
+    * The call is delegated to the {@link IViewSite}.
+    * </p>
+    */
+   @Override
+   public IActionBars getActionBars() {
+      return wrapperViewSite.getActionBars();
    }
 
    /**
@@ -269,19 +279,6 @@ public class EditorInViewEditorSite extends PartSite implements IEditorSite, IDi
    @Override
    public void setSelectionProvider(ISelectionProvider provider) {
       wrapperViewSite.setSelectionProvider(provider);
-   }
-
-   /**
-    * <p>
-    * {@inheritDoc}
-    * </p>
-    * <p>
-    * The call is delegated to the {@link IViewSite}.
-    * </p>
-    */
-   @Override
-   public IActionBars getActionBars() {
-      return wrapperViewSite.getActionBars();
    }
 
    /**

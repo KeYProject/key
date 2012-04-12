@@ -26,6 +26,7 @@ public abstract class AbstractDebugNodeLayoutFeature extends AbstractLayoutFeatu
     * {@link ILayoutContext#getProperty(Object)}.
     */
    public static final String WIDTH_TO_SET = "newWidth";
+   
    /**
     * Property for an {@link Integer} value which defines a new height
     * which is set on the {@link PictogramElement} during the layout process.

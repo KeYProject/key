@@ -1,12 +1,17 @@
 package org.key_project.sed.ui.visualization.util;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
+import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.ui.editor.DiagramEditorInput;
 
 /**
@@ -104,5 +109,24 @@ public final class GraphitiUtil {
          }
       }
       return result;
+   }
+   
+   /**
+    * Returns all contained {@link PictogramElement}s in the given {@link Diagram}.
+    * @param diagram The {@link Diagram} to list contained {@link PictogramElement}s.
+    * @return The contained {@link PictogramElement}s.
+    */
+   public static PictogramElement[] getAllPictogramElements(Diagram diagram) {
+      List<PictogramElement> result = new LinkedList<PictogramElement>();
+      if (diagram != null) {
+         TreeIterator<EObject> iter = diagram.eAllContents();
+         while (iter.hasNext()) {
+            EObject next = iter.next();
+            if (next instanceof PictogramElement) {
+               result.add((PictogramElement)next);
+            }
+         }
+      }
+      return result.toArray(new PictogramElement[result.size()]);
    }
 }

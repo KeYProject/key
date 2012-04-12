@@ -57,26 +57,9 @@ public class ExecutionTreeDiagramTypeProvider extends AbstractDiagramTypeProvide
     * Constructor.
     */
    public ExecutionTreeDiagramTypeProvider() {
-      super();
       setFeatureProvider(new ExecutionTreeFeatureProvider(this));
    }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public boolean isAutoUpdateAtRuntime() {
-      return true;
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public boolean isAutoUpdateAtStartup() {
-      return true;
-   }
-
+   
    /**
     * {@inheritDoc}
     */

@@ -26,8 +26,14 @@ import org.key_project.util.eclipse.WorkbenchUtil;
  * @author Martin Hentschel
  */
 public abstract class AbstractDebugNodeCreateFeature extends AbstractCreateFeature implements ICustomUndoableFeature {
+   /**
+    * The created {@link ISEDDebugNode}.
+    */
    private ISEDDebugNode createdNode;
    
+   /**
+    * The index on {@link ISEDDebugNode#getParent()} where the created node ({@link #createdNode}) was added to.
+    */
    private int indexOnParent;
    
    /**

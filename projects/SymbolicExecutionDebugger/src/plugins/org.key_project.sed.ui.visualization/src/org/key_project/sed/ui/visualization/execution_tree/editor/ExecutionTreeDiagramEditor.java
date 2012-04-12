@@ -3,20 +3,44 @@ package org.key_project.sed.ui.visualization.execution_tree.editor;
 import java.io.OutputStream;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.debug.core.DebugEvent;
+import org.eclipse.debug.core.DebugPlugin;
+import org.eclipse.debug.core.IDebugEventSetListener;
+import org.eclipse.debug.core.model.IDebugElement;
+import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
+import org.eclipse.graphiti.features.IFeatureProvider;
+import org.eclipse.graphiti.mm.pictograms.Diagram;
+import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
+import org.eclipse.swt.widgets.Display;
+import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.serialization.SEDXMLWriter;
 import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeDiagramTypeProvider;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
+import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 import org.key_project.sed.ui.visualization.util.LogUtil;
 import org.key_project.sed.ui.visualization.util.PaletteHideableDiagramEditor;
+import org.key_project.util.java.ArrayUtil;
 
 /**
  * {@link DiagramEditor} for Symbolic Execution Tree Diagrams.
  * @author Martin Hentschel
  */
 // TODO: Reload diagram when the domain model file has changed.
+// TODO: Synchronize selection with debug view
+// TODO: Implement outline view
 public class ExecutionTreeDiagramEditor extends PaletteHideableDiagramEditor {
+   /**
+    * Listens for debug events.
+    */
+   private IDebugEventSetListener debugListener = new IDebugEventSetListener() {
+      @Override
+      public void handleDebugEvents(DebugEvent[] events) {
+         ExecutionTreeDiagramEditor.this.handleDebugEvents(events);
+      }
+   };
+   
    /**
     * {@inheritDoc}
     */
@@ -41,5 +65,100 @@ public class ExecutionTreeDiagramEditor extends PaletteHideableDiagramEditor {
          LogUtil.getLogger().logError(e);
          throw new RuntimeException(e);
       }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void doSaveAs() {
+      // TODO: Implement save as
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @SuppressWarnings("restriction")
+   @Override
+   protected void registerBOListener() {
+      super.registerBOListener();
+      DebugPlugin.getDefault().addDebugEventListener(debugListener);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @SuppressWarnings("restriction")
+   @Override
+   protected void unregisterBOListener() {
+      super.unregisterBOListener();
+      DebugPlugin.getDefault().removeDebugEventListener(debugListener);
+   }
+
+   /**
+    * Handles the detected debug events.
+    * @param events The detected debug events.
+    */
+   protected void handleDebugEvents(DebugEvent[] events) {
+      // Check if an update of the diagram is required.
+      Object[] diagramBOs = getAllDiagramBusinessObjects();
+      boolean updateRequired = false;
+      int i = 0;
+      while (!updateRequired && i < events.length) {
+         if (DebugEvent.SUSPEND == events[i].getDetail() ||
+             DebugEvent.SUSPEND == events[i].getDetail()) {
+            if (events[i].getSource() instanceof IDebugElement) {
+               IDebugTarget target = ((IDebugElement)events[i].getSource()).getDebugTarget();
+               if (target instanceof ISEDDebugTarget) {
+                  updateRequired = ArrayUtil.contains(diagramBOs, target);
+               }
+            }
+         }
+         i++;
+      }
+      // Update diagram content if required.
+      if (updateRequired) {
+         // Do an asynchronous update in the UI thread (same behavior as DomainModelChangeListener which is responsible for changes in EMF objects)
+         Display.getDefault().asyncExec(new Runnable() {
+            @SuppressWarnings("restriction")
+            @Override
+            public void run() {
+               if (getDiagramTypeProvider().isAutoUpdateAtRuntime()) {
+                  PictogramElement[] oldSelection = getSelectedPictogramElements();
+                  PictogramElement[] elements = GraphitiUtil.getAllPictogramElements(getDiagram());
+                  getDiagramTypeProvider().getNotificationService().updatePictogramElements(elements);
+                  selectPictogramElements(oldSelection);
+               }
+               else {
+                  refreshContent();
+               }
+            }
+         });
+      }
+   }
+   
+   /**
+    * Returns the shown {@link Diagram}.
+    * @return The shown {@link Diagram}.
+    */
+   protected Diagram getDiagram() {
+      IDiagramTypeProvider typeProvider = getDiagramTypeProvider();
+      return typeProvider != null ? typeProvider.getDiagram() : null;
+   }
+
+   /**
+    * Returns all linked business objects of the shown {@link Diagram}.
+    * @return All linked business objects of the shown {@link Diagram}.
+    */
+   protected Object[] getAllDiagramBusinessObjects() {
+      Object[] result = null;
+      IDiagramTypeProvider typeProvider = getDiagramTypeProvider();
+      if (typeProvider != null) {
+         IFeatureProvider featureProvider = typeProvider.getFeatureProvider();
+         if (featureProvider != null) {
+            result = featureProvider.getAllBusinessObjectsForPictogramElement(typeProvider.getDiagram());
+         }
+      }
+      return result;
    }
 }

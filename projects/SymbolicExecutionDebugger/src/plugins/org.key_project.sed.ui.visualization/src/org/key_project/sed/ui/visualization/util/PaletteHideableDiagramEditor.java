@@ -1,12 +1,28 @@
 package org.key_project.sed.ui.visualization.util;
 
+import org.eclipse.gef.commands.CommandStack;
 import org.eclipse.gef.ui.palette.FlyoutPaletteComposite.FlyoutPreferences;
+import org.eclipse.graphiti.dt.IDiagramTypeProvider;
+import org.eclipse.graphiti.features.IFeature;
+import org.eclipse.graphiti.features.context.IContext;
+import org.eclipse.graphiti.internal.command.CommandContainer;
+import org.eclipse.graphiti.internal.command.GenericFeatureCommandWithContext;
+import org.eclipse.graphiti.internal.command.ICommand;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
+import org.eclipse.graphiti.ui.internal.command.GefCommandWrapper;
 
 /**
+ * <p>
  * Extended {@link DiagramEditor} which allows to hide the palette.
+ * </p>
+ * <p>
+ * This class allows also to execute {@link IFeature} and Graphiti {@link ICommand}
+ * instances via {@link #executeFeature(IFeature, IContext)} and
+ * {@link #executeCommand(ICommand)}.
+ * </p>
  * @author Martin Hentschel
  */
+@SuppressWarnings("restriction")
 public class PaletteHideableDiagramEditor extends DiagramEditor {
    /**
     * Defines if the palette is hidden or not.
@@ -14,9 +30,36 @@ public class PaletteHideableDiagramEditor extends DiagramEditor {
    private boolean paletteHidden;
 
    /**
+    * Executes the given {@link IFeature} with the given {@link IContext}.
+    * @param feature The {@link IFeature} to execute.
+    * @param context the {@link IContext} to use.
+    */
+   public void executeFeature(IFeature feature, IContext context) {
+      CommandContainer commandContainer = new CommandContainer(feature.getFeatureProvider());
+      commandContainer.add(new GenericFeatureCommandWithContext(feature, context));
+      executeCommand(commandContainer);
+   }
+   
+   /**
+    * Executes the given {@link ICommand} on the editing domain.
+    * @param command The {@link ICommand} to execute.
+    */
+   protected void executeCommand(ICommand command) {
+      CommandStack commandStack = getEditDomain().getCommandStack();
+      commandStack.execute(new GefCommandWrapper(command, getEditingDomain()));
+   }   
+   
+   /**
     * {@inheritDoc}
     */
-   @SuppressWarnings("restriction")
+   @Override
+   public IDiagramTypeProvider getDiagramTypeProvider() {
+      return super.getDiagramTypeProvider();
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
    @Override
    protected FlyoutPreferences getPalettePreferences() {
       final FlyoutPreferences superPreferences = super.getPalettePreferences(); // Modification of this preferences is not possible, because the changes are shared with real editors

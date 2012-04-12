@@ -13,6 +13,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
@@ -36,6 +37,28 @@ import org.key_project.util.test.util.ArrayObjectLabelProvider;
  * @author Martin Hentschel
  */
 public class SWTUtilTest extends TestCase {
+    /**
+     * Tests {@link SWTUtil#toArray(org.eclipse.jface.viewers.ISelection)}
+     */
+    @Test
+    public void testToArray_ISelection() {
+        Object[] result = SWTUtil.toArray(null);
+        assertNotNull(result);
+        assertEquals(0, result.length);
+        result = SWTUtil.toArray(new StructuredSelection());
+        assertNotNull(result);
+        assertEquals(0, result.length);
+        result = SWTUtil.toArray(new StructuredSelection("A"));
+        assertNotNull(result);
+        assertEquals(1, result.length);
+        assertEquals("A", result[0]);
+        result = SWTUtil.toArray(new StructuredSelection(new String[] {"A", "B"}));
+        assertNotNull(result);
+        assertEquals(2, result.length);
+        assertEquals("A", result[0]);
+        assertEquals("B", result[1]);
+    }
+   
     /**
      * Tests {@link SWTUtil#add(Combo, String))}
      */

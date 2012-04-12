@@ -42,15 +42,17 @@ public class DebugTargetUpdateFeature extends AbstractDebugNodeUpdateFeature {
     */
    @Override
    protected boolean haveAllBusinessObjectChildrenHaveGraphicalRepresentation(PictogramElement pictogramElement) throws DebugException {
-      Object bo = getBusinessObjectForPictogramElement(pictogramElement);
       boolean childrenHavePictogramElement = true;
-      if (bo instanceof ISEDDebugTarget) {
-         ISEDThread[] threads = ((ISEDDebugTarget)bo).getSymbolicThreads();
-         int i = 0;
-         while (childrenHavePictogramElement && i < threads.length) {
-            PictogramElement threadPE = getPictogramElementForBusinessObject(threads[i]);
-            childrenHavePictogramElement = threadPE != null;
-            i++;
+      Object[] bos = getAllBusinessObjectsForPictogramElement(pictogramElement);
+      for (Object bo : bos) {
+         if (bo instanceof ISEDDebugTarget) {
+            ISEDThread[] threads = ((ISEDDebugTarget)bo).getSymbolicThreads();
+            int i = 0;
+            while (childrenHavePictogramElement && i < threads.length) {
+               PictogramElement threadPE = getPictogramElementForBusinessObject(threads[i]);
+               childrenHavePictogramElement = threadPE != null;
+               i++;
+            }
          }
       }
       return childrenHavePictogramElement;
@@ -69,13 +71,15 @@ public class DebugTargetUpdateFeature extends AbstractDebugNodeUpdateFeature {
     */
    @Override
    protected boolean updateChildren(PictogramElement pictogramElement) throws DebugException {
-      Object bo = getBusinessObjectForPictogramElement(pictogramElement);
-      if (bo instanceof ISEDDebugTarget) {
-         ISEDThread[] threads = ((ISEDDebugTarget)bo).getSymbolicThreads();
-         for (ISEDDebugNode thread : threads) {
-            PictogramElement threadPE = getPictogramElementForBusinessObject(thread);
-            if (threadPE == null) {
-               createGraphicalRepresentationForSubtree(null, thread);
+      Object[] bos = getAllBusinessObjectsForPictogramElement(pictogramElement);
+      for (Object bo : bos) {
+         if (bo instanceof ISEDDebugTarget) {
+            ISEDThread[] threads = ((ISEDDebugTarget)bo).getSymbolicThreads();
+            for (ISEDDebugNode thread : threads) {
+               PictogramElement threadPE = getPictogramElementForBusinessObject(thread);
+               if (threadPE == null) {
+                  createGraphicalRepresentationForSubtree(null, thread);
+               }
             }
          }
       }

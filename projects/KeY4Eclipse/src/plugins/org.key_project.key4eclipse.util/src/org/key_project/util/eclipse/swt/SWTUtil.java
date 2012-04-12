@@ -20,6 +20,8 @@ import org.eclipse.jdt.internal.ui.viewsupport.FilteredElementTreeSelectionDialo
 import org.eclipse.jdt.internal.ui.wizards.TypedViewerFilter;
 import org.eclipse.jdt.internal.ui.wizards.buildpaths.FolderSelectionDialog;
 import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -447,6 +449,21 @@ public final class SWTUtil {
     public static void add(Combo control, String text) {
         if (control != null) {
             control.add(text != null ? text : StringUtil.EMPTY_STRING);
+        }
+    }
+
+    /**
+     * Converts the given {@link ISelection} into an array if it is an
+     * {@link IStructuredSelection}.
+     * @param selection The {@link ISelection} to convert.
+     * @return The selected elements in the given {@link ISelection} as array.
+     */
+    public static Object[] toArray(ISelection selection) {
+        if (selection instanceof IStructuredSelection) {
+            return ((IStructuredSelection)selection).toArray();
+        }
+        else {
+            return new Object[0];
         }
     }
 }

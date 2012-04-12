@@ -3,7 +3,10 @@ package org.key_project.util.java;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Provides static methods to work with {@link Collection}s.
@@ -81,6 +84,25 @@ public class CollectionUtil {
       }
       else {
          return new ArrayList<T>(0);
+      }
+   }
+
+   /**
+    * Converts the given objects into a {@link Set}.
+    * @param <T> The type of the objects.
+    * @param objects The objects array to convert.
+    * @return The created {@link Set}.
+    */
+   public static <T> Set<T> toSet(T... objects) {
+      if (objects != null) {
+         Set<T> result = new LinkedHashSet<T>(objects.length);
+         for (T obj : objects) {
+            result.add(obj);
+         }
+         return result;
+      }
+      else {
+         return new LinkedHashSet<T>(0);
       }
    }
    
@@ -199,5 +221,43 @@ public class CollectionUtil {
          }
       }
       return count;
+   }
+
+   /**
+    * <p>
+    * Checks if the given two {@link Collection}s contains the same elements
+    * in any order.
+    * </p>
+    * <p>
+    * Empty {@link Collection}s and {@code null} parameters are treated as equal.
+    * </p> 
+    * @param first The first {@link Collection}.
+    * @param second The second {@link Collection}.
+    * @return {@code true} both {@link Collection}s contains same elements, {@code false} {@link Collection}s are different.
+    */
+   public static <T> boolean containsSame(Collection<T> first, Collection<T> second) {
+      if (first != null) {
+         if (second != null) {
+            if (first.size() == second.size()) {
+               Collection<T> firstCopy = new LinkedList<T>(first);
+               boolean same = true;
+               Iterator<T> secondIter = second.iterator();
+               while (same && secondIter.hasNext()) {
+                  T secondNext = secondIter.next();
+                  same = firstCopy.remove(secondNext);
+               }
+               return same;
+            }
+            else {
+               return false;
+            }
+         }
+         else {
+            return first.size() == 0;
+         }
+      }
+      else {
+         return second == null || second.size() == 0;
+      }
    }
 }

@@ -1,7 +1,12 @@
 package org.key_project.util.test.testcase;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import junit.framework.TestCase;
 
@@ -14,6 +19,138 @@ import org.key_project.util.java.IFilter;
  * @author Martin Hentschel
  */
 public class CollectionUtilTest extends TestCase {
+   /**
+    * Tests {@link CollectionUtil#containsSame(java.util.Set, java.util.Set)}.
+    */
+   @Test
+   public void testContainsSame_List() {
+      // Create model
+      List<String> empty = new LinkedList<String>();
+      List<String> one = Collections.singletonList("A");
+      List<String> oneCopy = Collections.singletonList("A");
+      List<String> oneDifferent = Collections.singletonList("B");
+      List<String> two = CollectionUtil.toList("A", "B");
+      List<String> twoCopy = CollectionUtil.toList("A", "B");
+      List<String> twoDifferent = CollectionUtil.toList("C", "B");
+      List<String> twoChangedOrder = CollectionUtil.toList("B", "A");
+      List<String> three = CollectionUtil.toList("A", "B", "A");
+      List<String> threeCopy = CollectionUtil.toList("A", "B", "A");
+      List<String> threeDifferent = CollectionUtil.toList("A", "B", "B");
+      List<String> threeChangedOrder = CollectionUtil.toList("A", "A", "B");
+      List<String> four = CollectionUtil.toList("A", "B", null, "A");
+      List<String> fourCopy = CollectionUtil.toList("A", "B", null, "A");
+      List<String> fourDifferent = CollectionUtil.toList("A", null, null, "B");
+      List<String> fourChangedOrder = CollectionUtil.toList(null, "A", "A", "B");
+      // Test handlig of null
+      assertTrue(CollectionUtil.containsSame(null, null));
+      assertTrue(CollectionUtil.containsSame(empty, null));
+      assertTrue(CollectionUtil.containsSame(null, empty));
+      assertFalse(CollectionUtil.containsSame(null, one));
+      assertFalse(CollectionUtil.containsSame(one, null));
+      // Test one elements
+      assertTrue(CollectionUtil.containsSame(one, one));
+      assertTrue(CollectionUtil.containsSame(one, oneCopy));
+      assertFalse(CollectionUtil.containsSame(one, oneDifferent));
+      assertFalse(CollectionUtil.containsSame(one, two));
+      assertFalse(CollectionUtil.containsSame(one, twoCopy));
+      assertFalse(CollectionUtil.containsSame(one, twoDifferent));
+      assertFalse(CollectionUtil.containsSame(one, twoChangedOrder));
+      assertFalse(CollectionUtil.containsSame(one, three));
+      assertFalse(CollectionUtil.containsSame(one, threeCopy));
+      assertFalse(CollectionUtil.containsSame(one, threeDifferent));
+      assertFalse(CollectionUtil.containsSame(one, threeChangedOrder));
+      assertFalse(CollectionUtil.containsSame(one, four));
+      assertFalse(CollectionUtil.containsSame(one, fourCopy));
+      assertFalse(CollectionUtil.containsSame(one, fourDifferent));
+      assertFalse(CollectionUtil.containsSame(one, fourChangedOrder));
+      // Test two elements
+      assertFalse(CollectionUtil.containsSame(two, one));
+      assertFalse(CollectionUtil.containsSame(two, oneCopy));
+      assertFalse(CollectionUtil.containsSame(two, oneDifferent));
+      assertTrue(CollectionUtil.containsSame(two, two));
+      assertTrue(CollectionUtil.containsSame(two, twoCopy));
+      assertFalse(CollectionUtil.containsSame(two, twoDifferent));
+      assertTrue(CollectionUtil.containsSame(two, twoChangedOrder));
+      assertFalse(CollectionUtil.containsSame(two, three));
+      assertFalse(CollectionUtil.containsSame(two, threeCopy));
+      assertFalse(CollectionUtil.containsSame(two, threeDifferent));
+      assertFalse(CollectionUtil.containsSame(two, threeChangedOrder));
+      assertFalse(CollectionUtil.containsSame(two, four));
+      assertFalse(CollectionUtil.containsSame(two, fourCopy));
+      assertFalse(CollectionUtil.containsSame(two, fourDifferent));
+      assertFalse(CollectionUtil.containsSame(two, fourChangedOrder));
+      // Test three elements
+      assertFalse(CollectionUtil.containsSame(three, one));
+      assertFalse(CollectionUtil.containsSame(three, oneCopy));
+      assertFalse(CollectionUtil.containsSame(three, oneDifferent));
+      assertFalse(CollectionUtil.containsSame(three, two));
+      assertFalse(CollectionUtil.containsSame(three, twoCopy));
+      assertFalse(CollectionUtil.containsSame(three, twoDifferent));
+      assertFalse(CollectionUtil.containsSame(three, twoChangedOrder));
+      assertTrue(CollectionUtil.containsSame(three, three));
+      assertTrue(CollectionUtil.containsSame(three, threeCopy));
+      assertFalse(CollectionUtil.containsSame(three, threeDifferent));
+      assertTrue(CollectionUtil.containsSame(three, threeChangedOrder));
+      assertFalse(CollectionUtil.containsSame(three, four));
+      assertFalse(CollectionUtil.containsSame(three, fourCopy));
+      assertFalse(CollectionUtil.containsSame(three, fourDifferent));
+      assertFalse(CollectionUtil.containsSame(three, fourChangedOrder));
+      // Test four elements
+      assertFalse(CollectionUtil.containsSame(four, one));
+      assertFalse(CollectionUtil.containsSame(four, oneCopy));
+      assertFalse(CollectionUtil.containsSame(four, oneDifferent));
+      assertFalse(CollectionUtil.containsSame(four, two));
+      assertFalse(CollectionUtil.containsSame(four, twoCopy));
+      assertFalse(CollectionUtil.containsSame(four, twoDifferent));
+      assertFalse(CollectionUtil.containsSame(four, twoChangedOrder));
+      assertFalse(CollectionUtil.containsSame(four, three));
+      assertFalse(CollectionUtil.containsSame(four, threeCopy));
+      assertFalse(CollectionUtil.containsSame(four, threeDifferent));
+      assertFalse(CollectionUtil.containsSame(four, threeChangedOrder));
+      assertTrue(CollectionUtil.containsSame(four, four));
+      assertTrue(CollectionUtil.containsSame(four, fourCopy));
+      assertFalse(CollectionUtil.containsSame(four, fourDifferent));
+      assertTrue(CollectionUtil.containsSame(four, fourChangedOrder));
+   }
+   
+   /**
+    * Tests {@link CollectionUtil#containsSame(java.util.Set, java.util.Set)}.
+    */
+   @Test
+   public void testContainsSame_Set() {
+      // Create model
+      Set<String> empty = new HashSet<String>();
+      Set<String> one = Collections.singleton("A");
+      Set<String> oneCopy = Collections.singleton("A");
+      Set<String> oneDifferent = Collections.singleton("B");
+      Set<String> two = CollectionUtil.toSet("A", "B");
+      Set<String> twoCopy = CollectionUtil.toSet("A", "B");
+      Set<String> twoDifferent = CollectionUtil.toSet("C", "B");
+      Set<String> twoChangedOrder = CollectionUtil.toSet("B", "A");
+      // Test handlig of null
+      assertTrue(CollectionUtil.containsSame(null, null));
+      assertTrue(CollectionUtil.containsSame(empty, null));
+      assertTrue(CollectionUtil.containsSame(null, empty));
+      assertFalse(CollectionUtil.containsSame(null, one));
+      assertFalse(CollectionUtil.containsSame(one, null));
+      // Test one elements
+      assertTrue(CollectionUtil.containsSame(one, one));
+      assertTrue(CollectionUtil.containsSame(one, oneCopy));
+      assertFalse(CollectionUtil.containsSame(one, oneDifferent));
+      assertFalse(CollectionUtil.containsSame(one, two));
+      assertFalse(CollectionUtil.containsSame(one, twoCopy));
+      assertFalse(CollectionUtil.containsSame(one, twoDifferent));
+      assertFalse(CollectionUtil.containsSame(one, twoChangedOrder));
+      // Test two elements
+      assertFalse(CollectionUtil.containsSame(two, one));
+      assertFalse(CollectionUtil.containsSame(two, oneCopy));
+      assertFalse(CollectionUtil.containsSame(two, oneDifferent));
+      assertTrue(CollectionUtil.containsSame(two, two));
+      assertTrue(CollectionUtil.containsSame(two, twoCopy));
+      assertFalse(CollectionUtil.containsSame(two, twoDifferent));
+      assertTrue(CollectionUtil.containsSame(two, twoChangedOrder));
+   }
+   
    /**
     * Tests {@link CollectionUtil#count(Iterable, IFilter)}.
     */
@@ -285,6 +422,46 @@ public class CollectionUtilTest extends TestCase {
       assertEquals("E", collection.get(4));
       assertEquals("F", collection.get(5));
       assertEquals("G", collection.get(6));
+   }
+
+   /**
+    * Test for {@link CollectionUtil#toSet(Object...)}
+    */
+   @Test
+   public void testToSet() {
+      Set<String> result = CollectionUtil.toSet();
+      assertEquals(0, result.size());
+      result = CollectionUtil.toSet((String[])null);
+      assertEquals(0, result.size());
+      result = CollectionUtil.toSet("A");
+      assertCollectionItems(result, "A");
+      result = CollectionUtil.toSet("A", "B");
+      assertCollectionItems(result, "A", "B");
+      result = CollectionUtil.toSet("A", "B", "C");
+      assertCollectionItems(result, "A", "B", "C");
+      result = CollectionUtil.toSet(new String[] {"A"});
+      assertCollectionItems(result, "A");
+      result = CollectionUtil.toSet(new String[] {"A", "B"});
+      assertCollectionItems(result, "A", "B");
+      result = CollectionUtil.toSet(new String[] {"A", "B", "C"});
+      assertCollectionItems(result, "A", "B", "C");
+   }
+   
+   /**
+    * Makes sure that the collection contains the given items.
+    * @param collection The {@link Collections} to test.
+    * @param expectedItems The expected items.
+    */
+   protected <T> void assertCollectionItems(Collection<T> collection, T... expectedItems) {
+      assertNotNull(collection);
+      assertEquals(collection.size(), expectedItems.length);
+      Iterator<T> iter = collection.iterator();
+      int i = 0;
+      while (iter.hasNext()) {
+         assertEquals(expectedItems[i], iter.next());
+         i++;
+      }
+      assertEquals(expectedItems.length, i);
    }
 
    /**
