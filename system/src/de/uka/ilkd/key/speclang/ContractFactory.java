@@ -11,6 +11,7 @@
 
 package de.uka.ilkd.key.speclang;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -416,5 +417,50 @@ public class ContractFactory {
     @Override
     public int hashCode() {
         return services == null ? 0 : services.hashCode();
+    }
+    
+    
+    public static String generateDisplayName(String myBaseName,
+                                             KeYJavaType myKjt,
+                                             ObserverFunction myTarget,
+                                             int myId) {
+        return myBaseName + " " + myId +
+                (myKjt.equals(myTarget.getContainerType())
+                  ? ""
+                  : " for "
+                    + myKjt.getJavaType().getFullName());
+    }
+    
+    
+    public static String generateContractName(String myBaseName,
+                                              KeYJavaType myKjt,
+                                              ObserverFunction myTarget,
+                                              int myId) {
+        return generateContractTypeName(myBaseName, myKjt, myTarget)
+               + "." + myId;
+    }
+
+
+    public static String generateContractTypeName(String myBaseName,
+                                                  KeYJavaType myKjt,
+                                                  ObserverFunction myTarget) {
+        return myKjt.getJavaType().getFullName() + "[" +
+               myTarget + "(" +
+               concadinate(",", myTarget.getParamTypes()) + ")" + "]"
+               + "." + myBaseName;
+               
+    }
+    
+    
+    private static String concadinate(String delim,
+                                      ImmutableArray<KeYJavaType> elems) {
+        StringBuilder b = new StringBuilder();
+        for (int i = 0; i < elems.size(); i++) {
+            b.append(elems.get(i).getFullName());
+            if (i + 1 < elems.size()) {
+                b.append(delim);
+            }
+        }
+        return b.toString();
     }
 }
