@@ -12,10 +12,16 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.transaction.RecordingCommand;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
+import org.eclipse.graphiti.datatypes.IDimension;
+import org.eclipse.graphiti.mm.algorithms.styles.Font;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.ui.editor.DiagramEditorFactory;
 import org.eclipse.graphiti.ui.editor.DiagramEditorInput;
+import org.eclipse.graphiti.ui.services.GraphitiUi;
+import org.eclipse.swt.widgets.Display;
+import org.key_project.util.java.thread.AbstractRunnableWithResult;
+import org.key_project.util.java.thread.IRunnableWithResult;
 
 /**
  * Provides static utility methods for Graphiti.
@@ -26,6 +32,24 @@ public final class GraphitiUtil {
     * Forbid instances.
     */
    private GraphitiUtil() {
+   }
+   
+   /**
+    * Calculates the text size of the given text in the given {@link Font}.
+    * @param text The text.
+    * @param font The {@link Font}.
+    * @return The calculated text size.
+    */
+   // TODO: Implement test.
+   public static IDimension calculateTextSize(final String text, final Font font) {
+      IRunnableWithResult<IDimension> run = new AbstractRunnableWithResult<IDimension>() {
+         @Override
+         public void run() {
+            setResult(GraphitiUi.getUiLayoutService().calculateTextSize(text, font));
+         }
+      };
+      Display.getDefault().syncExec(run);
+      return run.getResult();
    }
    
    /**

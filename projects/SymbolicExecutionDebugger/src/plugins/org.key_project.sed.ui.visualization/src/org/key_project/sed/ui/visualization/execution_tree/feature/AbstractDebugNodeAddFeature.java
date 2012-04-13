@@ -24,7 +24,6 @@ import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.services.IGaService;
 import org.eclipse.graphiti.services.IPeCreateService;
-import org.eclipse.graphiti.ui.services.GraphitiUi;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeStyleUtil;
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
@@ -195,7 +194,7 @@ public abstract class AbstractDebugNodeAddFeature extends AbstractAddShapeFeatur
     */
    public static int computeInitialHeight(Diagram targetDiagram, String text, Font font) {
       int minHeight = computeMinHeight(targetDiagram);
-      IDimension textSize = GraphitiUi.getUiLayoutService().calculateTextSize(text, font);
+      IDimension textSize = GraphitiUtil.calculateTextSize(text, font);
       if (textSize.getHeight() < minHeight) {
          return minHeight;
       }
@@ -213,7 +212,7 @@ public abstract class AbstractDebugNodeAddFeature extends AbstractAddShapeFeatur
     */
    public static int computeInitialWidth(Diagram targetDiagram, String text, Font font) {
       int minWidth = computeMinWidth(targetDiagram);
-      IDimension textSize = GraphitiUi.getUiLayoutService().calculateTextSize(text, font);
+      IDimension textSize = GraphitiUtil.calculateTextSize(text, font);
       textSize.setWidth(textSize.getWidth() + MARGIN + IMAGE_WIDTH + MARGIN + MARGIN);
       if (textSize.getWidth() < minWidth) {
          return minWidth;

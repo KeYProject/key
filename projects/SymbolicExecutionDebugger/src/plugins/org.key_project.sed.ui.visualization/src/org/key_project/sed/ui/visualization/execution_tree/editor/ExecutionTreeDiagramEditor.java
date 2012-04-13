@@ -3,19 +3,26 @@ package org.key_project.sed.ui.visualization.execution_tree.editor;
 import java.io.OutputStream;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.IDebugEventSetListener;
 import org.eclipse.debug.core.model.IDebugElement;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
+import org.eclipse.graphiti.features.IFeature;
+import org.eclipse.graphiti.features.context.IContext;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
+import org.eclipse.graphiti.notification.INotificationService;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.swt.widgets.Display;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.serialization.SEDXMLWriter;
 import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeDiagramTypeProvider;
+import org.key_project.sed.ui.visualization.execution_tree.service.SEDNotificationService;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
 import org.key_project.sed.ui.visualization.execution_tree.wizard.SaveAsExecutionTreeDiagramWizard;
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
@@ -102,9 +109,35 @@ public class ExecutionTreeDiagramEditor extends PaletteHideableDiagramEditor {
       super.unregisterBOListener();
       DebugPlugin.getDefault().removeDebugEventListener(debugListener);
    }
+   
+   /**
+    * Executes the given {@link IFeature} with the given {@link IContext}.
+    * @param feature The {@link IFeature} to execute.
+    * @param context the {@link IContext} to use.
+    */
+   public void executeFeatureInJob(String jobName, 
+                                   final IFeature feature, 
+                                   final IContext context) {
+      new AbstractExecutionTreeDiagramEditorJob(jobName, this) {
+         @Override
+         protected IStatus run(IProgressMonitor monitor) {
+            try {
+               context.putProperty(ExecutionTreeUtil.CONTEXT_PROPERTY_MONITOR, monitor);
+               executeFeature(feature, context);
+               return Status.OK_STATUS;
+            }
+            catch (OperationCanceledException e) {
+               return Status.CANCEL_STATUS;
+            }
+            catch (Exception e) {
+               return LogUtil.getLogger().createErrorStatus(e);
+            }
+         }
+      }.schedule();
+   }
 
    /**
-    * Handles the detected debug events.
+    * Handles the detected debug events. 
     * @param events The detected debug events.
     */
    protected void handleDebugEvents(DebugEvent[] events) {
@@ -127,29 +160,65 @@ public class ExecutionTreeDiagramEditor extends PaletteHideableDiagramEditor {
       // Update diagram content if required.
       if (updateRequired) {
          // Do an asynchronous update in the UI thread (same behavior as DomainModelChangeListener which is responsible for changes in EMF objects)
-         Display.getDefault().asyncExec(new Runnable() {
-            @SuppressWarnings("restriction")
+         new AbstractExecutionTreeDiagramEditorJob("Updating Symbolic Execution Tree", this) {
             @Override
-            public void run() {
-               if (getDiagramTypeProvider().isAutoUpdateAtRuntime()) {
-                  PictogramElement[] oldSelection = getSelectedPictogramElements();
-                  PictogramElement[] elements = GraphitiUtil.getAllPictogramElements(getDiagram());
-                  getDiagramTypeProvider().getNotificationService().updatePictogramElements(elements);
-                  try {
-                     selectPictogramElements(oldSelection);
-                  }
-                  catch (Exception e) {
-                     // Can go wrong, nothing to do.
-                  }
-               }
-               else {
-                  refreshContent();
-               }
+            protected IStatus run(IProgressMonitor monitor) {
+               return updateDiagramInJob(monitor);
             }
-         });
+         }.schedule();
       }
    }
    
+   /**
+    * Changes the content of the shown {@link Diagram}.
+    * @param monitor The {@link IProgressMonitor} to use.
+    * @return The result {@link IStatus}.
+    */
+   protected IStatus updateDiagramInJob(IProgressMonitor monitor) {
+      try {
+         if (getDiagramTypeProvider().isAutoUpdateAtRuntime()) {
+            PictogramElement[] oldSelection = getSelectedPictogramElements();
+            PictogramElement[] elements = GraphitiUtil.getAllPictogramElements(getDiagram());
+            INotificationService notificationService = getDiagramTypeProvider().getNotificationService();
+            if (notificationService instanceof SEDNotificationService) {
+               ((SEDNotificationService)notificationService).updatePictogramElements(elements, monitor);
+            }
+            else {
+               notificationService.updatePictogramElements(elements);
+            }
+            selectPictogramElementsThreadSave(oldSelection);
+         }
+         else {
+            refreshContent();
+         }
+         return Status.OK_STATUS;
+      }
+      catch (OperationCanceledException e) {
+         return Status.CANCEL_STATUS;
+      }
+      catch (Exception e) {
+         return LogUtil.getLogger().createErrorStatus(e);
+      }
+   }
+   
+   /**
+    * Thread and exception save execution of {@link #selectPictogramElements(PictogramElement[])}.
+    * @param pictogramElements The {@link PictogramElement}s to select.
+    */
+   protected void selectPictogramElementsThreadSave(final PictogramElement[] pictogramElements) {
+      Display.getDefault().syncExec(new Runnable() {
+         @Override
+         public void run() {
+            try {
+               selectPictogramElements(pictogramElements);
+            }
+            catch (Exception e) {
+               // Can go wrong, nothing to do.
+            }
+         }
+      });
+   }
+
    /**
     * Returns the shown {@link Diagram}.
     * @return The shown {@link Diagram}.

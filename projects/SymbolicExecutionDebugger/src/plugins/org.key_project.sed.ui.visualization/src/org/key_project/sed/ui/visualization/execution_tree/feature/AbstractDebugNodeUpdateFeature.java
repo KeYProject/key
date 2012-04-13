@@ -192,6 +192,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
    /**
     * {@inheritDoc}
     */
+   // TODO: Use in IUpdateContext defined IProgressMonitor.
    @Override
    public boolean update(IUpdateContext context) {
       try {

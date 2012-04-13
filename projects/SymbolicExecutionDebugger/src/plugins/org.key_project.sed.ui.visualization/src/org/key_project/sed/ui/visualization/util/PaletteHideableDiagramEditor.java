@@ -8,6 +8,7 @@ import org.eclipse.graphiti.features.context.IContext;
 import org.eclipse.graphiti.internal.command.CommandContainer;
 import org.eclipse.graphiti.internal.command.GenericFeatureCommandWithContext;
 import org.eclipse.graphiti.internal.command.ICommand;
+import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.graphiti.ui.internal.command.GefCommandWrapper;
 
@@ -50,13 +51,57 @@ public class PaletteHideableDiagramEditor extends DiagramEditor {
    }   
    
    /**
+    * <p>
     * {@inheritDoc}
+    * </p>
+    * <p>
+    * Overwritten to ignore warnings.
+    * </p>
     */
    @Override
    public IDiagramTypeProvider getDiagramTypeProvider() {
       return super.getDiagramTypeProvider();
    }
    
+   /**
+    * <p>
+    * {@inheritDoc}
+    * </p>
+    * <p>
+    * Overwritten to ignore warnings.
+    * </p>
+    */
+   @Override
+   public void selectPictogramElements(PictogramElement[] pictogramElements) {
+      super.selectPictogramElements(pictogramElements);
+   }
+
+   /**
+    * <p>
+    * {@inheritDoc}
+    * </p>
+    * <p>
+    * Overwritten to ignore warnings.
+    * </p>
+    */
+   @Override
+   public void refreshContent() {
+      super.refreshContent();
+   }
+
+   /**
+    * <p>
+    * {@inheritDoc}
+    * </p>
+    * <p>
+    * Overwritten to ignore warnings.
+    * </p>
+    */
+   @Override
+   public PictogramElement[] getSelectedPictogramElements() {
+      return super.getSelectedPictogramElements();
+   }
+
    /**
     * {@inheritDoc}
     */

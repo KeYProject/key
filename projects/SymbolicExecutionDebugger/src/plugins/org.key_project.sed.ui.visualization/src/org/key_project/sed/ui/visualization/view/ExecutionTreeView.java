@@ -162,7 +162,7 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
                ICustomFeature feature = new DebugTargetConnectFeature(featureProvider);
                ICustomContext context = new CustomContext(new PictogramElement[] {typeProvider.getDiagram()});
                context.putProperty(DebugTargetConnectFeature.PROPERTY_DEBUG_TARGETS, targets.toArray(new ISEDDebugTarget[targets.size()]));
-               editor.executeFeature(feature, context);
+               editor.executeFeatureInJob("Changing Symbolic Execution Tree", feature, context);
                // Unset message
                setMessage(null);
             }
