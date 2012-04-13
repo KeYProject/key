@@ -225,6 +225,11 @@ public class KeyConnection extends MemoryConnection {
    private Map<KeYJavaType, IDSType> typesMapping;
    
    /**
+    * Contains all instantiated {@link KeyProof}s to dispose them on disconnect.
+    */
+   private List<KeyProof> proofs;
+   
+   /**
     * The used listener to observe {@link #main}.
     */
    private GUIListener mainGuiListener = new GUIListener() {
@@ -268,6 +273,7 @@ public class KeyConnection extends MemoryConnection {
          axiomsMapping = new HashMap<ClassAxiom, IDSAxiom>();
          attributesMapping = new HashMap<Field, IDSAttribute>();
          enumLiteralsMapping = new HashMap<Field, IDSEnumLiteral>();
+         proofs = new LinkedList<KeyProof>();
          // Get settings
          final File location = getLocation(connectionSettings);
          final List<File> classPathEntries = getClassPathEntries(connectionSettings);
@@ -1616,6 +1622,11 @@ public class KeyConnection extends MemoryConnection {
     * @throws DSException Occurred Exception.
     */
    protected void disconnect(final boolean closeKeYMain) throws DSException {
+      // Dispose proofs
+      for (KeyProof proof : proofs) {
+         proof.dispose();
+      }
+      // Remove listener and proof environment
       if (main != null) {
          main.getMediator().removeGUIListener(mainGuiListener);
          try {
@@ -1654,6 +1665,7 @@ public class KeyConnection extends MemoryConnection {
       typesMapping = null;
       attributesMapping = null;
       enumLiteralsMapping = null;
+      proofs = null;
       super.disconnect();
    }
    
@@ -1831,5 +1843,14 @@ public class KeyConnection extends MemoryConnection {
    @SuppressWarnings("deprecation")
    public void closeTaskWithoutInteraction() {
       main.closeTaskWithoutInteraction();
+   }
+   
+   /**
+    * Registers the {@link KeyProof} in this {@link KeyConnection}.
+    * @param proof The {@link KeyProof} to register.
+    */
+   public void registerProof(KeyProof proof) {
+      Assert.isTrue(proofs != null, "Connection is not established.");
+      proofs.add(proof);
    }
 }

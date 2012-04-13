@@ -15,6 +15,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.ui.services.IDisposable;
+import org.key_project.util.java.ObjectUtil;
 
 import de.hentschel.visualdbc.datasource.key.intern.helper.OpenedProof;
 import de.hentschel.visualdbc.datasource.key.rule.KeyProofReferenceUtil;
@@ -23,8 +25,12 @@ import de.hentschel.visualdbc.datasource.model.IDSProvableReference;
 import de.hentschel.visualdbc.datasource.model.event.DSProofEvent;
 import de.hentschel.visualdbc.datasource.model.exception.DSException;
 import de.hentschel.visualdbc.datasource.model.memory.MemoryProof;
+import de.uka.ilkd.key.gui.AutoModeListener;
+import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
@@ -34,7 +40,7 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
  * Special KeY implementation of {@link IDSProof}.
  * @author Martin Hentschel
  */
-public class KeyProof extends MemoryProof {
+public class KeyProof extends MemoryProof implements IDisposable {
    /**
     * The opened proof instance or {@code null} if no proof is opened.
     */
@@ -51,6 +57,52 @@ public class KeyProof extends MemoryProof {
    private List<IDSProvableReference> inputReferences = null;
    
    /**
+    * Indicates that the auto mode is active or not.
+    */
+   private boolean autoModeActive = false;
+   
+   /**
+    * Listens for changes on {@link #proof}.
+    */
+   private ProofTreeListener proofTreeListener = new ProofTreeAdapter() {
+      @Override
+      public void proofClosed(ProofTreeEvent e) {
+         handleProofClosed(e);
+      }
+
+      @Override
+      public void proofStructureChanged(ProofTreeEvent e) {
+         handleProofStructureChanged(e);
+      }
+
+      @Override
+      public void proofExpanded(ProofTreeEvent e) {
+         handleProofExpanded(e);
+      }
+
+      @Override
+      public void proofPruned(ProofTreeEvent e) {
+         handleProofPruned(e);
+      }
+   };
+   
+   /**
+    * Listens for auto mode changes on the {@link KeYMediator} of
+    * {@link MainWindow#getInstance()}.
+    */
+   private AutoModeListener autoModeListener = new AutoModeListener() {
+      @Override
+      public void autoModeStopped(ProofEvent e) {
+         handleAutoModeStopped(e);
+      }
+      
+      @Override
+      public void autoModeStarted(ProofEvent e) {
+         handleAutoModeStarted(e);
+      }
+   };
+   
+   /**
     * Constructor
     * @param proof The KeY proof to represent.
     * @param connection The {@link KeyConnection} that has created this instance.
@@ -64,28 +116,32 @@ public class KeyProof extends MemoryProof {
       Assert.isNotNull(connection);
       this.proof = proofResult.getProof();
       this.connection = connection;
-      proof.addProofTreeListener(new ProofTreeAdapter() {
-         @Override
-         public void proofClosed(ProofTreeEvent e) {
-            handleProofClosed(e);
-         }
-
-         @Override
-         public void proofStructureChanged(ProofTreeEvent e) {
-            handleProofStructureChanged(e);
-         }
-
-         @Override
-         public void proofExpanded(ProofTreeEvent e) {
-            handleProofExpanded(e);
-         }
-
-         @Override
-         public void proofPruned(ProofTreeEvent e) {
-            handleProofPruned(e);
-         }
-      });
+      this.connection.registerProof(this); // Register KeyProof in KeyConnection to make sure that it is disposed during disconnect.
+      proof.addProofTreeListener(proofTreeListener);
+      MainWindow.getInstance().getMediator().addAutoModeListener(autoModeListener);
       analyzeProofInput(proofResult);
+   }
+
+   /**
+    * When the auto mode was started.
+    * @param e The event.
+    */
+   protected void handleAutoModeStarted(ProofEvent e) {
+      if (ObjectUtil.equals(proof, e.getSource())) {
+         autoModeActive = true;
+      }
+   }
+
+   
+   /**
+    * When the auto mode was stopped.
+    * @param e The event.
+    */
+   protected void handleAutoModeStopped(ProofEvent e) {
+      if (ObjectUtil.equals(proof, e.getSource())) {
+         autoModeActive = false;
+         updateReferences();
+      }
    }
 
    /**
@@ -114,7 +170,9 @@ public class KeyProof extends MemoryProof {
     * @param e The event to handle.
     */
    protected void handleProofExpanded(ProofTreeEvent e) {
-      updateReferences();
+      if (e.getNode() != null) { // Update references only if a rule was applied.
+         updateReferences();
+      }
    }
 
    /**
@@ -122,7 +180,9 @@ public class KeyProof extends MemoryProof {
     * @param e The event to handle.
     */
    protected void handleProofPruned(ProofTreeEvent e) {
-      updateReferences();
+      if (e.getNode() != null) { // Update references only if a rule was applied.
+         updateReferences();
+      }
    }
 
    /**
@@ -130,7 +190,9 @@ public class KeyProof extends MemoryProof {
     * @param e The event to handle.
     */
    protected void handleProofStructureChanged(ProofTreeEvent e) {
-      updateReferences();
+      if (e.getNode() != null) { // Update references only if a rule was applied.
+         updateReferences();
+      }
    }
    
    /**
@@ -138,16 +200,18 @@ public class KeyProof extends MemoryProof {
     */
    // TODO: Implement test for pruned proof trees
    protected void updateReferences() {
-      // Get required parameters
-      Services services = connection.getServices();
-      // Analyze tree
-      List<IDSProvableReference> references = KeyProofReferenceUtil.analyzeProof(connection, services, proof);
-      // Add initial references from the ProofObjInput.
-      if (inputReferences != null) {
-         references.addAll(inputReferences);
+      if (!autoModeActive) {
+         // Get required parameters
+         Services services = connection.getServices();
+         // Analyze tree
+         List<IDSProvableReference> references = KeyProofReferenceUtil.analyzeProof(connection, services, proof);
+         // Add initial references from the ProofObjInput.
+         if (inputReferences != null) {
+            references.addAll(inputReferences);
+         }
+         // Update the available references.
+         setReferences(references);
       }
-      // Update the available references.
-      setReferences(references);
    }
    
    /**
@@ -176,5 +240,14 @@ public class KeyProof extends MemoryProof {
     */
    public Proof getProof() {
       return proof;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void dispose() {
+      proof.removeProofTreeListener(proofTreeListener);
+      MainWindow.getInstance().getMediator().removeAutoModeListener(autoModeListener);
    }
 }
