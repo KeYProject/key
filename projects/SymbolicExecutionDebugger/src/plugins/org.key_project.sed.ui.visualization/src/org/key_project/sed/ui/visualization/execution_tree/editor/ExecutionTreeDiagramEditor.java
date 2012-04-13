@@ -9,7 +9,6 @@ import org.eclipse.debug.core.IDebugEventSetListener;
 import org.eclipse.debug.core.model.IDebugElement;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
-import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
@@ -18,6 +17,7 @@ import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.serialization.SEDXMLWriter;
 import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeDiagramTypeProvider;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
+import org.key_project.sed.ui.visualization.execution_tree.wizard.SaveAsExecutionTreeDiagramWizard;
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 import org.key_project.sed.ui.visualization.util.LogUtil;
 import org.key_project.sed.ui.visualization.util.PaletteHideableDiagramEditor;
@@ -71,8 +71,16 @@ public class ExecutionTreeDiagramEditor extends PaletteHideableDiagramEditor {
     * {@inheritDoc}
     */
    @Override
+   public boolean isSaveAsAllowed() {
+      return true;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
    public void doSaveAs() {
-      // TODO: Implement save as
+      SaveAsExecutionTreeDiagramWizard.openWizard(getSite().getShell(), getDiagramTypeProvider());
    }
 
    /**
@@ -101,7 +109,7 @@ public class ExecutionTreeDiagramEditor extends PaletteHideableDiagramEditor {
     */
    protected void handleDebugEvents(DebugEvent[] events) {
       // Check if an update of the diagram is required.
-      Object[] diagramBOs = getAllDiagramBusinessObjects();
+      ISEDDebugTarget[] targets = ExecutionTreeUtil.getAllDebugTargets(getDiagramTypeProvider());
       boolean updateRequired = false;
       int i = 0;
       while (!updateRequired && i < events.length) {
@@ -110,7 +118,7 @@ public class ExecutionTreeDiagramEditor extends PaletteHideableDiagramEditor {
             if (events[i].getSource() instanceof IDebugElement) {
                IDebugTarget target = ((IDebugElement)events[i].getSource()).getDebugTarget();
                if (target instanceof ISEDDebugTarget) {
-                  updateRequired = ArrayUtil.contains(diagramBOs, target);
+                  updateRequired = ArrayUtil.contains(targets, target);
                }
             }
          }
@@ -127,7 +135,12 @@ public class ExecutionTreeDiagramEditor extends PaletteHideableDiagramEditor {
                   PictogramElement[] oldSelection = getSelectedPictogramElements();
                   PictogramElement[] elements = GraphitiUtil.getAllPictogramElements(getDiagram());
                   getDiagramTypeProvider().getNotificationService().updatePictogramElements(elements);
-                  selectPictogramElements(oldSelection);
+                  try {
+                     selectPictogramElements(oldSelection);
+                  }
+                  catch (Exception e) {
+                     // Can go wrong, nothing to do.
+                  }
                }
                else {
                   refreshContent();
@@ -144,21 +157,5 @@ public class ExecutionTreeDiagramEditor extends PaletteHideableDiagramEditor {
    protected Diagram getDiagram() {
       IDiagramTypeProvider typeProvider = getDiagramTypeProvider();
       return typeProvider != null ? typeProvider.getDiagram() : null;
-   }
-
-   /**
-    * Returns all linked business objects of the shown {@link Diagram}.
-    * @return All linked business objects of the shown {@link Diagram}.
-    */
-   protected Object[] getAllDiagramBusinessObjects() {
-      Object[] result = null;
-      IDiagramTypeProvider typeProvider = getDiagramTypeProvider();
-      if (typeProvider != null) {
-         IFeatureProvider featureProvider = typeProvider.getFeatureProvider();
-         if (featureProvider != null) {
-            result = featureProvider.getAllBusinessObjectsForPictogramElement(typeProvider.getDiagram());
-         }
-      }
-      return result;
    }
 }

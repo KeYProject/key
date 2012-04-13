@@ -10,8 +10,11 @@ import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.transaction.RecordingCommand;
+import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
+import org.eclipse.graphiti.ui.editor.DiagramEditorFactory;
 import org.eclipse.graphiti.ui.editor.DiagramEditorInput;
 
 /**
@@ -23,6 +26,38 @@ public final class GraphitiUtil {
     * Forbid instances.
     */
    private GraphitiUtil() {
+   }
+   
+   /**
+    * Creates a {@link TransactionalEditingDomain} and a {@link Resource}
+    * for the given {@link URI} which contains the given {@link Diagram} as only content.
+    * @param diagram The {@link Diagram} to add to a new {@link Resource}.
+    * @param uri The {@link URI} of the new {@link Resource}.
+    * @return The used {@link TransactionalEditingDomain}.
+    */
+   public static TransactionalEditingDomain createDomainAndResource(final Diagram diagram, URI uri) {
+      if (uri == null) {
+         throw new IllegalArgumentException("The URI is null.");
+      }
+      if (diagram != null && diagram.eResource() != null) {
+         throw new IllegalArgumentException("The Diagram is already contained in a Resource.");
+      }
+      TransactionalEditingDomain domain = DiagramEditorFactory.createResourceSetAndEditingDomain();
+      final Resource resource = domain.getResourceSet().createResource(uri);
+      if (diagram != null) {
+         domain.getCommandStack().execute(new RecordingCommand(domain) {
+            @Override
+            protected void doExecute() {
+               resource.getContents().add(diagram);
+            }
+
+            @Override
+            public boolean canUndo() {
+               return false;
+            }
+         });
+      }
+      return domain;
    }
    
    /**

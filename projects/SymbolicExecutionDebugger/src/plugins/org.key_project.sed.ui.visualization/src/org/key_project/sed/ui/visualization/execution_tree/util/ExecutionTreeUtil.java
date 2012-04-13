@@ -3,12 +3,20 @@ package org.key_project.sed.ui.visualization.execution_tree.util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.URIConverter;
 import org.eclipse.emf.ecore.resource.impl.ExtensibleURIConverterImpl;
+import org.eclipse.emf.transaction.TransactionalEditingDomain;
+import org.eclipse.graphiti.dt.IDiagramTypeProvider;
+import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.ui.services.GraphitiUi;
+import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.StringUtil;
 
@@ -108,5 +116,38 @@ public final class ExecutionTreeUtil {
       else {
          return null;
       }
+   }
+   
+   /**
+    * Returns all {@link ISEDDebugTarget}s which are linked to the
+    * {@link Diagram} managed by the given {@link IDiagramTypeProvider}.
+    * @param diagramTypeProvider The {@link IDiagramTypeProvider}.
+    * @return The linked {@link ISEDDebugTarget}s.
+    */
+   public static ISEDDebugTarget[] getAllDebugTargets(IDiagramTypeProvider diagramTypeProvider) {
+      List<ISEDDebugTarget> result = new LinkedList<ISEDDebugTarget>();
+      if (diagramTypeProvider != null) {
+         IFeatureProvider featureProvider = diagramTypeProvider.getFeatureProvider();
+         if (featureProvider != null) {
+            Object[] bos = featureProvider.getAllBusinessObjectsForPictogramElement(diagramTypeProvider.getDiagram());
+            for (Object bo : bos) {
+               if (bo instanceof ISEDDebugTarget) {
+                  result.add((ISEDDebugTarget)bo);
+               }
+            }
+         }
+      }
+      return result.toArray(new ISEDDebugTarget[result.size()]);
+   }
+   
+   /**
+    * Creates a {@link TransactionalEditingDomain} and a {@link Resource}
+    * for an invalid {@link URI} which contains the given {@link Diagram} as only content.
+    * @param diagram The {@link Diagram} to add to a new {@link Resource}.
+    * @return The used {@link TransactionalEditingDomain}.
+    */
+   public static TransactionalEditingDomain createDomainAndResource(Diagram diagram) {
+      URI uri = URI.createURI("INVALID" + ExecutionTreeUtil.DIAGRAM_FILE_EXTENSION_WITH_DOT);
+      return GraphitiUtil.createDomainAndResource(diagram, uri);
    }
 }

@@ -15,7 +15,10 @@ import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.edit.command.AddCommand;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.emf.workspace.WorkspaceEditingDomainFactory;
+import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
+import org.eclipse.graphiti.mm.pictograms.PictogramElement;
+import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.ui.editor.DiagramEditorInput;
 import org.eclipse.graphiti.ui.services.GraphitiUi;
@@ -30,6 +33,99 @@ import org.key_project.util.test.util.TestUtilsUtil;
  * @author Martin Hentschel
  */
 public class GraphitiUtilTest extends TestCase {
+   /**
+    * Tests {@link GraphitiUtil#getAllPictogramElements(Diagram)}
+    */
+   @Test
+   public void testGetAllPictogramElements() {
+      // Test null
+      PictogramElement[] elements = GraphitiUtil.getAllPictogramElements(null);
+      assertPictogramElements(elements);
+      // Test empty diagram
+      Diagram diagram = Graphiti.getPeCreateService().createDiagram(ExecutionTreeDiagramTypeProvider.TYPE, "Test", true);
+      elements = GraphitiUtil.getAllPictogramElements(diagram);
+      assertPictogramElements(elements);
+      // Test with container
+      ContainerShape container = Graphiti.getCreateService().createContainerShape(diagram, false);
+      elements = GraphitiUtil.getAllPictogramElements(diagram);
+      assertPictogramElements(elements, container);
+      // Test with container one child
+      ContainerShape firstChild = Graphiti.getCreateService().createContainerShape(container, false);
+      elements = GraphitiUtil.getAllPictogramElements(diagram);
+      assertPictogramElements(elements, container, firstChild);
+      // Test with container two children
+      ContainerShape secondChild = Graphiti.getCreateService().createContainerShape(container, false);
+      elements = GraphitiUtil.getAllPictogramElements(diagram);
+      assertPictogramElements(elements, container, firstChild, secondChild);
+      // Test with container two children and one child cihld
+      Shape fistChildChild = Graphiti.getCreateService().createShape(firstChild, false);
+      elements = GraphitiUtil.getAllPictogramElements(diagram);
+      assertPictogramElements(elements, container, firstChild, fistChildChild, secondChild);
+   }
+   
+   /**
+    * Makes sure that the given {@link PictogramElement}s are equal.
+    * @param actualElements The actual {@link PictogramElement}s.
+    * @param expectedElements The expected {@link PictogramElement}s.
+    */
+   protected void assertPictogramElements(PictogramElement[] actualElements, PictogramElement... expectedElements) {
+      assertEquals(expectedElements.length, actualElements.length);
+      for (int i = 0; i < actualElements.length; i++) {
+         assertSame(expectedElements[i], actualElements[i]);
+      }
+   }
+   
+   /**
+    * Tests {@link GraphitiUtil#createDomainAndResource(Diagram, URI)}
+    */
+   @Test
+   public void testCreateDomainAndResource() throws IOException {
+      // Test null URI
+      Diagram diagram = Graphiti.getPeCreateService().createDiagram(ExecutionTreeDiagramTypeProvider.TYPE, "Test", true);
+      try {
+         GraphitiUtil.createDomainAndResource(diagram, null);
+         fail("Should not be possible.");
+      }
+      catch (IllegalArgumentException e) {
+         assertEquals("The URI is null.", e.getMessage());
+         assertNull(diagram.eResource());
+      }
+      // Test null diagram
+      IProject project = TestUtilsUtil.createProject("GraphitiUtilTest_testCreateDomainAndResource");
+      IFile file = project.getFile("NewFile.diagram");
+      assertFalse(file.exists());
+      URI uri = URI.createPlatformResourceURI(file.getFullPath().toString(), true);
+      TransactionalEditingDomain domain = GraphitiUtil.createDomainAndResource(null, uri);
+      assertNotNull(domain);
+      assertFalse(file.exists());
+      assertNull(diagram.eResource());
+      // Test diagram and URI
+      domain = GraphitiUtil.createDomainAndResource(diagram, uri);
+      assertNotNull(domain);
+      assertFalse(file.exists());
+      Resource resource = diagram.eResource();
+      assertNotNull(resource);
+      assertEquals(uri, diagram.eResource().getURI());
+      // Save diagram
+      diagram.eResource().save(Collections.EMPTY_MAP);
+      assertTrue(file.exists());
+      // Try to create a domain again
+      IFile newFile = project.getFile("NewFileAgain.diagram");
+      assertFalse(newFile.exists());
+      URI newURI = URI.createPlatformResourceURI(newFile.getFullPath().toString(), true);
+      try {
+         GraphitiUtil.createDomainAndResource(diagram, newURI);
+         fail("Should not be possible.");
+      }
+      catch (IllegalArgumentException e) {
+         assertEquals("The Diagram is already contained in a Resource.", e.getMessage());
+         assertSame(resource, diagram.eResource());
+         assertEquals(uri, diagram.eResource().getURI());
+         assertTrue(file.exists());
+         assertFalse(newFile.exists());
+      }
+   }
+   
    /**
     * Tests {@link GraphitiUtil#getFile(org.eclipse.graphiti.ui.editor.DiagramEditorInput)}
     */

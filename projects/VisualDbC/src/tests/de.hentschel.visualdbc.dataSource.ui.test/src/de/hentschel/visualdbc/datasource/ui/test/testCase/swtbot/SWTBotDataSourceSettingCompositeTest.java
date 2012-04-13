@@ -20,7 +20,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Display;
@@ -33,6 +32,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.junit.Test;
 import org.key_project.util.eclipse.ResourceUtil;
+import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithResult;
 import org.key_project.util.java.thread.IRunnableWithResult;
 import org.key_project.util.test.util.TestUtilsUtil;
@@ -87,7 +87,7 @@ public class SWTBotDataSourceSettingCompositeTest extends TestCase {
       else {
          project = ResourcesPlugin.getWorkspace().getRoot().getProject("SWTBotDataSourceSettingCompositeTest");
       }
-      final IStructuredSelection selection = new StructuredSelection(project);
+      final IStructuredSelection selection = SWTUtil.createSelection(project);
       // Create shell and UI control instance and set initial value
       IRunnableWithResult<DataSourceSettingComposite> createRun = new AbstractRunnableWithResult<DataSourceSettingComposite>() {
          @Override

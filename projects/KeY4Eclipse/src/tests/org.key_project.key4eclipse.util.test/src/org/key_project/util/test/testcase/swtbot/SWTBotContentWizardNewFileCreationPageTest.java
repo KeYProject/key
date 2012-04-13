@@ -8,7 +8,6 @@ import junit.framework.TestCase;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Display;
@@ -19,6 +18,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 import org.junit.Test;
 import org.key_project.util.eclipse.WorkbenchUtil;
+import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.eclipse.swt.wizard.page.ContentWizardNewFileCreationPage;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
@@ -41,7 +41,7 @@ public class SWTBotContentWizardNewFileCreationPageTest extends TestCase {
          @Override
          public void run() {
             TestWizard wizard = new TestWizard();
-            wizard.init(PlatformUI.getWorkbench(), new StructuredSelection(project));
+            wizard.init(PlatformUI.getWorkbench(), SWTUtil.createSelection(project));
             WizardDialog dialog = new WizardDialog(WorkbenchUtil.getActiveShell(), wizard);
             dialog.open();
          }

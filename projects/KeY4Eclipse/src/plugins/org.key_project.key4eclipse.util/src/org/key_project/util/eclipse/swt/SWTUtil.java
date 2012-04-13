@@ -25,6 +25,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
@@ -464,6 +465,48 @@ public final class SWTUtil {
         }
         else {
             return new Object[0];
+        }
+    }
+
+    /**
+     * Creates an {@link IStructuredSelection} for the given {@link Object}.
+     * @param obj The given {@link Object}.
+     * @return The {@link IStructuredSelection} which contains the given {@link Object}.
+     */
+    public static IStructuredSelection createSelection(Object obj) {
+        if (obj != null) {
+            return new StructuredSelection(obj);
+        }
+        else {
+            return StructuredSelection.EMPTY;
+        }
+    }
+
+    /**
+     * Creates an {@link IStructuredSelection} for the given {@link Object}s.
+     * @param objs The given {@link Object}s.
+     * @return The {@link IStructuredSelection} which contains the given {@link Object}.
+     */
+    public static IStructuredSelection createSelection(Object[] objs) {
+        if (objs != null && objs.length >= 1) {
+            return new StructuredSelection(objs);
+        }
+        else {
+            return StructuredSelection.EMPTY;
+        }
+    }
+
+    /**
+     * Creates an {@link IStructuredSelection} for the given {@link Object}s.
+     * @param objs The given {@link Object}s.
+     * @return The {@link IStructuredSelection} which contains the given {@link Object}.
+     */
+    public static IStructuredSelection createSelection(List<?> objs) {
+        if (objs != null && !objs.isEmpty()) {
+            return new StructuredSelection(objs);
+        }
+        else {
+            return StructuredSelection.EMPTY;
         }
     }
 }

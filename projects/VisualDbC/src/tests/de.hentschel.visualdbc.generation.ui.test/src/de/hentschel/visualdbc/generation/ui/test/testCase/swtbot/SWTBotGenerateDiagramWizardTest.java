@@ -16,13 +16,13 @@ import java.util.Map;
 import junit.framework.TestCase;
 
 import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.junit.Before;
 import org.junit.Test;
 import org.key_project.util.eclipse.ResourceUtil;
+import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.hentschel.visualdbc.datasource.model.IDSConnection;
@@ -70,7 +70,7 @@ public class SWTBotGenerateDiagramWizardTest extends TestCase {
          IDSDriver driver = DriverUtil.getDriver(UIDummyDriver1.class.getCanonicalName());
          assertNotNull(driver);
          IDSConnection connection = driver.createConnection();
-         Map<String, Object> settings = TestGenerationUtil.createDefaultSettings(driver, new StructuredSelection(javaProject.getPath()));
+         Map<String, Object> settings = TestGenerationUtil.createDefaultSettings(driver, SWTUtil.createSelection(javaProject.getPath()));
          settings.put(UIDummyDriver1.SETTING_BOOLEAN, Boolean.FALSE);
          settings.put(UIDummyDriver1.SETTING_PACKAGE, ResourceUtil.getLocation(javaProject.getProject()));
          connection.connect(settings, false, null);
@@ -154,7 +154,7 @@ public class SWTBotGenerateDiagramWizardTest extends TestCase {
          IDSDriver driver = DriverUtil.getDriver(UIDummyDriver1.class.getCanonicalName());
          assertNotNull(driver);
          IDSConnection connection = driver.createConnection();
-         Map<String, Object> settings = TestGenerationUtil.createDefaultSettings(driver, new StructuredSelection(javaProject.getPath()));
+         Map<String, Object> settings = TestGenerationUtil.createDefaultSettings(driver, SWTUtil.createSelection(javaProject.getPath()));
          connection.connect(settings, false, null);
          // Open new wizard
          TestGenerationUIUtil.createDiagramViaGenerateDiagramWizard(bot, 

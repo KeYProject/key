@@ -19,7 +19,6 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -497,7 +496,7 @@ public class KeYProjectPropertyPage extends PropertyPage implements IWorkbenchPr
      * @param toSelect The {@link KeYClassPathEntry} instances to select.
      */
     protected void selectClassPathEntries(List<KeYClassPathEntry> toSelect) {
-        ISelection selection = toSelect != null ? new StructuredSelection(toSelect) : new StructuredSelection();
+        ISelection selection = SWTUtil.createSelection(toSelect);
         classPathTableViewer.setSelection(selection);
     }
 
@@ -506,7 +505,7 @@ public class KeYProjectPropertyPage extends PropertyPage implements IWorkbenchPr
      * @param toSelect The {@link KeYClassPathEntry} to select.
      */
     protected void selectClassPathEntry(KeYClassPathEntry toSelect) {
-        ISelection selection = toSelect != null ? new StructuredSelection(toSelect) : new StructuredSelection();
+       ISelection selection = SWTUtil.createSelection(toSelect);
         classPathTableViewer.setSelection(selection);
     }
 

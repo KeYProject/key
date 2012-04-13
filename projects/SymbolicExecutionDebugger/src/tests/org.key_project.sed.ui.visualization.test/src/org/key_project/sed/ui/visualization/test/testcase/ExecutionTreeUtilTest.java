@@ -11,16 +11,25 @@ import junit.framework.TestCase;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.debug.core.DebugException;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
+import org.eclipse.emf.transaction.RecordingCommand;
+import org.eclipse.emf.transaction.TransactionalEditingDomain;
+import org.eclipse.emf.transaction.util.TransactionUtil;
+import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.ui.services.GraphitiUi;
 import org.junit.Test;
+import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
+import org.key_project.sed.ui.visualization.execution_tree.editor.ExecutionTreeDiagramEditor;
 import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeDiagramTypeProvider;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
+import org.key_project.sed.ui.visualization.test.util.TestVisualizationUtil;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
@@ -29,6 +38,101 @@ import org.key_project.util.test.util.TestUtilsUtil;
  * @author Martin Hentschel
  */
 public class ExecutionTreeUtilTest extends TestCase {
+   /**
+    * Tests {@link ExecutionTreeUtil#getAllDebugTargets(org.eclipse.graphiti.dt.IDiagramTypeProvider)}
+    */
+   @Test
+   public void testGetAllDebugTargets() throws CoreException, IOException {
+      // Test null
+      ISEDDebugTarget[] targets = ExecutionTreeUtil.getAllDebugTargets(null);
+      assertDebugTargets(targets);
+      // Test diagram type provider without diagram
+      final IDiagramTypeProvider typeProvider = GraphitiUi.getExtensionManager().createDiagramTypeProvider(ExecutionTreeDiagramTypeProvider.PROVIDER_ID);
+      targets = ExecutionTreeUtil.getAllDebugTargets(typeProvider);
+      assertDebugTargets(targets);
+      // Test diagram type provider with diagram but without linked targets
+      IProject project = TestUtilsUtil.createProject("ExecutionTreeUtilTest_testGetAllDebugTargets");
+      IFile diagramFile = project.getFile("Diagram" + ExecutionTreeUtil.DIAGRAM_FILE_EXTENSION_WITH_DOT);
+      IFile modelFile = project.getFile("Diagram" + ExecutionTreeUtil.DOMAIN_FILE_EXTENSION_WITH_DOT);
+      final Diagram diagram = TestVisualizationUtil.createEmptyExecutionTreeDiagram(diagramFile, modelFile);
+      typeProvider.init(diagram, new ExecutionTreeDiagramEditor());
+      assertSame(diagram, typeProvider.getDiagram());
+      targets = ExecutionTreeUtil.getAllDebugTargets(typeProvider);
+      assertDebugTargets(targets);
+      // Test empty linked debug targets
+      final ISEDDebugTarget[] expectedTargets = new ISEDDebugTarget[0];
+      TransactionalEditingDomain domain = TransactionUtil.getEditingDomain(diagram);
+      domain.getCommandStack().execute(new RecordingCommand(domain) {
+         @Override
+         protected void doExecute() {
+            typeProvider.getFeatureProvider().link(diagram, expectedTargets);
+         }
+      });
+      targets = ExecutionTreeUtil.getAllDebugTargets(typeProvider);
+      assertDebugTargets(targets);
+      // Test one linked debug target
+      SEDMemoryDebugTarget firstTarget = new SEDMemoryDebugTarget(null);
+      final ISEDDebugTarget[] expectedTargetsOne = {firstTarget};
+      domain.getCommandStack().execute(new RecordingCommand(domain) {
+         @Override
+         protected void doExecute() {
+            typeProvider.getFeatureProvider().link(diagram, expectedTargetsOne);
+         }
+      });
+      targets = ExecutionTreeUtil.getAllDebugTargets(typeProvider);
+      assertDebugTargets(targets, firstTarget);
+      // Test two linked debug targets
+      SEDMemoryDebugTarget secondTarget = new SEDMemoryDebugTarget(null);
+      final ISEDDebugTarget[] expectedTargetsTwo = {firstTarget, secondTarget};
+      domain.getCommandStack().execute(new RecordingCommand(domain) {
+         @Override
+         protected void doExecute() {
+            typeProvider.getFeatureProvider().link(diagram, expectedTargetsTwo);
+         }
+      });
+      targets = ExecutionTreeUtil.getAllDebugTargets(typeProvider);
+      assertDebugTargets(targets, firstTarget, secondTarget);
+   }
+   
+   /**
+    * Makes sure that the correct {@link ISEDDebugTarget} are given.
+    * @param actualTargets The current {@link ISEDDebugTarget}s.
+    * @param expectedTargets The expected {@link ISEDDebugTarget}s.
+    * @throws DebugException Occurred Exception.
+    */
+   protected void assertDebugTargets(ISEDDebugTarget[] actualTargets, ISEDDebugTarget...expectedTargets) throws DebugException {
+      assertNotNull(actualTargets);
+      assertEquals(actualTargets.length, expectedTargets.length);
+      for (int i = 0; i < actualTargets.length; i++) {
+         assertSame(actualTargets[i], expectedTargets[i]);
+      }
+   }
+
+   /**
+    * Tests {@link ExecutionTreeUtil#createDomainAndResource(Diagram)}
+    */
+   @Test
+   public void testCreateDomainAndResource() {
+      // Test null diagram
+      TransactionalEditingDomain domain = ExecutionTreeUtil.createDomainAndResource(null);
+      assertNotNull(domain);
+      // Test diagram
+      Diagram diagram = Graphiti.getPeCreateService().createDiagram(ExecutionTreeDiagramTypeProvider.TYPE, "Test", true);
+      domain = ExecutionTreeUtil.createDomainAndResource(diagram);
+      assertNotNull(domain);
+      Resource resource = diagram.eResource();
+      assertNotNull(resource);
+      // Try to create a domain again
+      try {
+         ExecutionTreeUtil.createDomainAndResource(diagram);
+         fail("Should not be possible.");
+      }
+      catch (IllegalArgumentException e) {
+         assertEquals("The Diagram is already contained in a Resource.", e.getMessage());
+         assertSame(resource, diagram.eResource());
+      }
+   }
+   
    /**
     * Tests {@link ExecutionTreeUtil#writeDomainFile(Diagram)}.
     */

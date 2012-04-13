@@ -9,8 +9,6 @@ import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.debug.ui.IDebugView;
 import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.transaction.RecordingCommand;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.features.IFeatureProvider;
@@ -20,7 +18,6 @@ import org.eclipse.graphiti.features.custom.ICustomFeature;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.services.Graphiti;
-import org.eclipse.graphiti.ui.editor.DiagramEditorFactory;
 import org.eclipse.graphiti.ui.editor.DiagramEditorInput;
 import org.eclipse.graphiti.ui.services.GraphitiUi;
 import org.eclipse.jface.viewers.ISelection;
@@ -117,19 +114,7 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
       URI domainURI = URI.createURI("INVALID" + ExecutionTreeUtil.DOMAIN_FILE_EXTENSION_WITH_DOT);
       GraphitiUi.getPeService().setPropertyValue(diagram, ExecutionTreeUtil.USER_PROPERTY_DOMAIN_MODEL_FILE, domainURI.toString());
       // Create editing domain and resource that contains the diagram
-      TransactionalEditingDomain domain = DiagramEditorFactory.createResourceSetAndEditingDomain();
-      final Resource resource = domain.getResourceSet().createResource(URI.createURI("INVALID" + ExecutionTreeUtil.DIAGRAM_FILE_EXTENSION_WITH_DOT));
-      domain.getCommandStack().execute(new RecordingCommand(domain) {
-         @Override
-         protected void doExecute() {
-            resource.getContents().add(diagram);
-         }
-
-         @Override
-         public boolean canUndo() {
-            return false;
-         }
-      });
+      TransactionalEditingDomain domain = ExecutionTreeUtil.createDomainAndResource(diagram);
       return DiagramEditorInput.createEditorInput(diagram, domain, ExecutionTreeDiagramTypeProvider.PROVIDER_ID, true);
    }
 
