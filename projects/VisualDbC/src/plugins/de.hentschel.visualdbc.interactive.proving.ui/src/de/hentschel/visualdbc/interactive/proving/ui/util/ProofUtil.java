@@ -217,34 +217,36 @@ public final class ProofUtil {
     * @param proof The proof in model to reset.
     */
    public static void resetProof(ShapeNodeEditPart proofEditPart, DbcProof proof) {
-      CompoundCommand compoundCmd = new CompoundCommand("Proof reset");
-      if (isProofReferenceResetRequired(proof)) {
-         // Compute the edit parts to delete
-         List<Object> editPartsToDelete = new LinkedList<Object>();
-         for (DbcProofReference refToDel : proof.getProofReferences()) {
-            Collection<EditPart> targetEditPart = findEditParts(proofEditPart, refToDel);
-            editPartsToDelete.addAll(targetEditPart);
-         }
-         // Create delete reference commands
-         // See: org.eclipse.gef.ui.actions.DeleteAction#createDeleteCommand(java.util.List)
-         GroupRequest deleteReq = new GroupRequest(RequestConstants.REQ_DELETE);
-         deleteReq.setEditParts(editPartsToDelete);
-         for (int i = 0; i < editPartsToDelete.size(); i++) {
-            EditPart object = (EditPart) editPartsToDelete.get(i);
-            org.eclipse.gef.commands.Command cmd = object.getCommand(deleteReq);
-            if (cmd != null) {
-               compoundCmd.add(cmd);
+      if (isEditPartAlive(proofEditPart)) {
+         CompoundCommand compoundCmd = new CompoundCommand("Proof reset");
+         if (isProofReferenceResetRequired(proof)) {
+            // Compute the edit parts to delete
+            List<Object> editPartsToDelete = new LinkedList<Object>();
+            for (DbcProofReference refToDel : proof.getProofReferences()) {
+               Collection<EditPart> targetEditPart = findEditParts(proofEditPart, refToDel);
+               editPartsToDelete.addAll(targetEditPart);
+            }
+            // Create delete reference commands
+            // See: org.eclipse.gef.ui.actions.DeleteAction#createDeleteCommand(java.util.List)
+            GroupRequest deleteReq = new GroupRequest(RequestConstants.REQ_DELETE);
+            deleteReq.setEditParts(editPartsToDelete);
+            for (int i = 0; i < editPartsToDelete.size(); i++) {
+               EditPart object = (EditPart) editPartsToDelete.get(i);
+               org.eclipse.gef.commands.Command cmd = object.getCommand(deleteReq);
+               if (cmd != null) {
+                  compoundCmd.add(cmd);
+               }
             }
          }
+         if (isProofResetRequired(proof)) {
+            // Add set status command
+            Request request = new EditCommandRequestWrapper(new SetRequest(proof, DbcmodelPackage.Literals.DBC_PROOF__STATUS, DbcProofStatus.OPEN));
+            org.eclipse.gef.commands.Command setCmd = proofEditPart.getCommand(request); 
+            compoundCmd.add(setCmd);
+         }
+         // Execute delete command
+         proofEditPart.getDiagramEditDomain().getDiagramCommandStack().execute(compoundCmd);
       }
-      if (isProofResetRequired(proof)) {
-         // Add set status command
-         Request request = new EditCommandRequestWrapper(new SetRequest(proof, DbcmodelPackage.Literals.DBC_PROOF__STATUS, DbcProofStatus.OPEN));
-         org.eclipse.gef.commands.Command setCmd = proofEditPart.getCommand(request); 
-         compoundCmd.add(setCmd);
-      }
-      // Execute delete command
-      proofEditPart.getDiagramEditDomain().getDiagramCommandStack().execute(compoundCmd);
    }
    
    /**
@@ -253,16 +255,18 @@ public final class ProofUtil {
     * @param proof The proof to reset.
     */
    public static void resetProof(EditingDomain domain, DbcProof proof) {
-      org.eclipse.emf.common.command.CompoundCommand cmd = new org.eclipse.emf.common.command.CompoundCommand("Proof reset");
-      if (isProofStatusResetRequired(proof)) {
-         Command setStatusCmd = SetCommand.create(domain, proof, DbcmodelPackage.Literals.DBC_PROOF__STATUS, DbcProofStatus.OPEN);
-         cmd.append(setStatusCmd);
+      if (isEditingDomainAlive(domain)) {
+         org.eclipse.emf.common.command.CompoundCommand cmd = new org.eclipse.emf.common.command.CompoundCommand("Proof reset");
+         if (isProofStatusResetRequired(proof)) {
+            Command setStatusCmd = SetCommand.create(domain, proof, DbcmodelPackage.Literals.DBC_PROOF__STATUS, DbcProofStatus.OPEN);
+            cmd.append(setStatusCmd);
+         }
+         if (isProofReferenceResetRequired(proof)) {
+            Command delReferencesCmd = DeleteCommand.create(domain, proof.getProofReferences());
+            cmd.append(delReferencesCmd);
+         }
+         domain.getCommandStack().execute(cmd);
       }
-      if (isProofReferenceResetRequired(proof)) {
-         Command delReferencesCmd = DeleteCommand.create(domain, proof.getProofReferences());
-         cmd.append(delReferencesCmd);
-      }
-      domain.getCommandStack().execute(cmd);
    }
 
    /**
@@ -272,13 +276,31 @@ public final class ProofUtil {
     */
    public static void closeProof(EditingDomain domain, DbcProof proof) {
       // Check if status change is possible and required
-      if (proof != null && !DbcProofStatus.FULFILLED.equals(proof.getStatus())) {
+      if (proof != null && !DbcProofStatus.FULFILLED.equals(proof.getStatus()) && isEditingDomainAlive(domain)) {
          // Change status to fulfilled
          Command cmd = SetCommand.create(domain, proof, DbcmodelPackage.Literals.DBC_PROOF__STATUS, DbcProofStatus.FULFILLED);
          domain.getCommandStack().execute(cmd);
       }
    }
-   
+
+   /**
+    * Makes sure that the given {@link EditingDomain} is still alive.
+    * @param domain The {@link EditingDomain} to check.
+    * @return {@code true} is alive, {@code false} is disposed.
+    */
+   protected static boolean isEditingDomainAlive(EditingDomain domain) {
+      return domain != null && domain.getCommandStack() != null;
+   }
+
+   /**
+    * Makes sure that the given {@link ShapeNodeEditPart} is still alive.
+    * @param editPart The {@link ShapeNodeEditPart} to check.
+    * @return {@code true} is alive, {@code false} is disposed.
+    */
+   protected static boolean isEditPartAlive(ShapeNodeEditPart editPart) {
+      return editPart != null && isEditingDomainAlive(editPart.getEditingDomain());
+   }
+
    /**
     * Creates a new proof references in the domain model and removes
     * old ones if required.
@@ -343,26 +365,28 @@ public final class ProofUtil {
     * @param referencesToDelete The references to delete.
     */
    public static void deleteReferences(ShapeNodeEditPart proofEditPart, List<DbcProofReference> referencesToDelete) {
-      // Compute the edit parts to delete
-      List<Object> editPartsToDelete = new LinkedList<Object>();
-      for (DbcProofReference refToDel : referencesToDelete) {
-         Collection<EditPart> targetEditPart = findEditParts(proofEditPart, refToDel);
-         editPartsToDelete.addAll(targetEditPart);
-      }
-      // Create delete reference commands
-      // See: org.eclipse.gef.ui.actions.DeleteAction#createDeleteCommand(java.util.List)
-      GroupRequest deleteReq = new GroupRequest(RequestConstants.REQ_DELETE);
-      deleteReq.setEditParts(editPartsToDelete);
-      CompoundCommand compoundCmd = new CompoundCommand(GEFMessages.DeleteAction_ActionDeleteCommandName);
-      for (int i = 0; i < editPartsToDelete.size(); i++) {
-         EditPart object = (EditPart) editPartsToDelete.get(i);
-         org.eclipse.gef.commands.Command cmd = object.getCommand(deleteReq);
-         if (cmd != null) {
-            compoundCmd.add(cmd);
+      if (isEditPartAlive(proofEditPart)) {
+         // Compute the edit parts to delete
+         List<Object> editPartsToDelete = new LinkedList<Object>();
+         for (DbcProofReference refToDel : referencesToDelete) {
+            Collection<EditPart> targetEditPart = findEditParts(proofEditPart, refToDel);
+            editPartsToDelete.addAll(targetEditPart);
          }
+         // Create delete reference commands
+         // See: org.eclipse.gef.ui.actions.DeleteAction#createDeleteCommand(java.util.List)
+         GroupRequest deleteReq = new GroupRequest(RequestConstants.REQ_DELETE);
+         deleteReq.setEditParts(editPartsToDelete);
+         CompoundCommand compoundCmd = new CompoundCommand(GEFMessages.DeleteAction_ActionDeleteCommandName);
+         for (int i = 0; i < editPartsToDelete.size(); i++) {
+            EditPart object = (EditPart) editPartsToDelete.get(i);
+            org.eclipse.gef.commands.Command cmd = object.getCommand(deleteReq);
+            if (cmd != null) {
+               compoundCmd.add(cmd);
+            }
+         }
+         // Execute delete command
+         proofEditPart.getDiagramEditDomain().getDiagramCommandStack().execute(compoundCmd);
       }
-      // Execute delete command
-      proofEditPart.getDiagramEditDomain().getDiagramCommandStack().execute(compoundCmd);
    }
 
    /**
@@ -406,8 +430,10 @@ public final class ProofUtil {
     * @param referencesToDelete The references to delete.
     */
    public static void deleteReferences(EditingDomain domain, DbcProof proof, List<DbcProofReference> referencesToDelete) {
-      Command removeCmd = RemoveCommand.create(domain, proof, DbcmodelPackage.Literals.DBC_PROOF__PROOF_REFERENCES, referencesToDelete);
-      domain.getCommandStack().execute(removeCmd);
+      if (isEditingDomainAlive(domain)) {
+         Command removeCmd = RemoveCommand.create(domain, proof, DbcmodelPackage.Literals.DBC_PROOF__PROOF_REFERENCES, referencesToDelete);
+         domain.getCommandStack().execute(removeCmd);
+      }
    }
 
    /**
@@ -421,11 +447,13 @@ public final class ProofUtil {
                                       DbcProof proof,
                                       IDbCProofReferencable target,
                                       String label){
-      DbcProofReference newReference = DbcmodelFactory.eINSTANCE.createDbcProofReference();
-      newReference.setKind(label);
-      newReference.setTarget(target);
-      Command cmd = AddCommand.create(domain, proof, DbcmodelPackage.Literals.DBC_PROOF__PROOF_REFERENCES, newReference);
-      domain.getCommandStack().execute(cmd);
+      if (isEditingDomainAlive(domain)) {
+         DbcProofReference newReference = DbcmodelFactory.eINSTANCE.createDbcProofReference();
+         newReference.setKind(label);
+         newReference.setTarget(target);
+         Command cmd = AddCommand.create(domain, proof, DbcmodelPackage.Literals.DBC_PROOF__PROOF_REFERENCES, newReference);
+         domain.getCommandStack().execute(cmd);
+      }
    }
    
    /**
@@ -437,26 +465,28 @@ public final class ProofUtil {
    public static void createReference(ShapeNodeEditPart proofEditPart,
                                       IDbCProofReferencable target,
                                       String label) {
-      // Find target edit part
-      EditPart targetEditPart = proofEditPart.findEditPart(proofEditPart.getRoot(), target);
-      // Create create reference request
-      CreateConnectionViewAndElementRequest viewAndElementRequest = new CreateConnectionViewAndElementRequest(
-            DbCElementTypes.DbcProofReference_4002,
-            ((IHintedType)DbCElementTypes.DbcProofReference_4002).getSemanticHint(), 
-            proofEditPart.getDiagramPreferencesHint());
-      Map<Object, Object> extendedData = new HashMap<Object, Object>();
-      extendedData.put(DbcmodelPackage.Literals.DBC_PROOF_REFERENCE__KIND, label);
-      viewAndElementRequest.setExtendedData(extendedData); // This information is handled in DbcProofReferenceCreateCommand
-      // Create create reference command
-      ICommand createReferenceCmd = new DeferredCreateConnectionViewAndElementCommand(
-            viewAndElementRequest,
-            new EObjectAdapter((EObject) proofEditPart.getModel()),
-            targetEditPart, 
-            proofEditPart.getViewer());
-      ICommandProxy createReferenceProxy = new ICommandProxy(createReferenceCmd);
-      CompoundCommand cc = new CompoundCommand("Create Proof Reference");
-      cc.add(createReferenceProxy);
-      // Execute create reference command
-      proofEditPart.getDiagramEditDomain().getDiagramCommandStack().execute(cc);
+      if (isEditPartAlive(proofEditPart)) {
+         // Find target edit part
+         EditPart targetEditPart = proofEditPart.findEditPart(proofEditPart.getRoot(), target);
+         // Create create reference request
+         CreateConnectionViewAndElementRequest viewAndElementRequest = new CreateConnectionViewAndElementRequest(
+               DbCElementTypes.DbcProofReference_4002,
+               ((IHintedType)DbCElementTypes.DbcProofReference_4002).getSemanticHint(), 
+               proofEditPart.getDiagramPreferencesHint());
+         Map<Object, Object> extendedData = new HashMap<Object, Object>();
+         extendedData.put(DbcmodelPackage.Literals.DBC_PROOF_REFERENCE__KIND, label);
+         viewAndElementRequest.setExtendedData(extendedData); // This information is handled in DbcProofReferenceCreateCommand
+         // Create create reference command
+         ICommand createReferenceCmd = new DeferredCreateConnectionViewAndElementCommand(
+               viewAndElementRequest,
+               new EObjectAdapter((EObject) proofEditPart.getModel()),
+               targetEditPart, 
+               proofEditPart.getViewer());
+         ICommandProxy createReferenceProxy = new ICommandProxy(createReferenceCmd);
+         CompoundCommand cc = new CompoundCommand("Create Proof Reference");
+         cc.add(createReferenceProxy);
+         // Execute create reference command
+         proofEditPart.getDiagramEditDomain().getDiagramCommandStack().execute(cc);
+      }
    }
 }
