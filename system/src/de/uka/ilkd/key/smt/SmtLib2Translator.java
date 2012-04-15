@@ -146,7 +146,7 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
     
     private StringBuffer createAssumptions( ArrayList<StringBuffer> assumptions,
     	    ArrayList<ContextualBlock> assumptionBlocks){
-    	String [] commentAssumption = new String[8];
+    	String [] commentAssumption = new String[9];
     	commentAssumption[ContextualBlock.ASSUMPTION_DUMMY_IMPLEMENTATION] = "Assumptions for dummy variables:";
     	commentAssumption[ContextualBlock.ASSUMPTION_FUNCTION_DEFINTION] = "Assumptions for function definitions:"; 
     	commentAssumption[ContextualBlock.ASSUMPTION_SORT_PREDICATES] = "Assumptions for sort predicates:";
@@ -155,6 +155,8 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
     	commentAssumption[ContextualBlock.ASSUMPTION_DISTINCT]= "Assumptions for uniqueness of functions:";
     	commentAssumption[ContextualBlock.ASSUMPTION_INTEGER]= "Assumptions for very small and very big integers:";
     	commentAssumption[ContextualBlock.ASSUMPTION_MULTIPLICATION]= "Assumptions for uninterpreted multiplication:";
+    	commentAssumption[ContextualBlock.ASSUMPTION_SORTS_NOT_EMPTY]= "Assumptions for sorts (There is at least one object of every sort.):";
+    	
     	
     	//add the assumptions
     	ArrayList<StringBuffer> AssumptionsToRemove = new ArrayList<StringBuffer>();
@@ -641,67 +643,9 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
 	return toReturn;
     }
 
-    private StringBuffer removeIllegalChars(StringBuffer template, ArrayList<String> toReplace, ArrayList<String> replacement) {
-	//replace one String
-	for (int i = 0; i < toReplace.size(); i++) {
-	    String toRep = toReplace.get(i);
-	    String replace = replacement.get(i);
-	    int index = template.indexOf(toRep);
-	    while (index >= 0) {
-		template.replace(index, index + toRep.length(), replace);
-		index = template.indexOf(toRep);
-	    }
-	}
-	
-	return template;
-    }
+
     
-    
-    
-    private StringBuffer makeUnique(StringBuffer name) {
-	StringBuffer toReturn = new StringBuffer(name);
-	
-	//build the replacement pairs
-	ArrayList<String> toReplace = new ArrayList<String>();
-	ArrayList<String> replacement = new ArrayList<String>();
-	
-	toReplace.add("[]");
-	replacement.add("_Array");
-	
-	toReplace.add("<");
-	replacement.add("_abo_");
-	
-	toReplace.add(">");
-	replacement.add("_abc_");
-	
-	toReplace.add("{");
-	replacement.add("_cbo_");
-	
-	toReplace.add("}");
-	replacement.add("_cbc_");
-	
-	toReplace.add(".");
-	replacement.add("_dot_");
-	
-	toReplace.add(":");
-	replacement.add("_col_");
-	
-	toReplace.add("\\");
-	replacement.add("_");
-	
-	toReplace.add("$");
-	replacement.add("_dollar_");
-	
-	toReturn = this.removeIllegalChars(toReturn, toReplace, replacement);
-	// names are must not begin with special characters
-	toReturn = (new StringBuffer()).append("a").append(toReturn);
-	
-	toReturn.append("_").append(counter);
-	counter++;
-	return toReturn;
-    }
-    
-    
+      
     
     protected StringBuffer translateComment(int newLines, String comment){
     	StringBuffer buffer = new StringBuffer();

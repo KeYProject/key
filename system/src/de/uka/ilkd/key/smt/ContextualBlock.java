@@ -57,6 +57,8 @@ class ContextualBlock {
     
     public static final int ASSUMPTION_MULTIPLICATION = 7;
     
+    public static final int ASSUMPTION_SORTS_NOT_EMPTY = 8;
+    
     
     
     /**

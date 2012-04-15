@@ -12,6 +12,7 @@ package de.uka.ilkd.key.smt;
 
 
 import java.util.*;
+import java.util.Map.Entry;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
@@ -71,6 +72,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         }
 
         private static final TermBuilder TB = TermBuilder.DF;
+        
+        private int nameCounter =0;
 
         private Sort integerSort;
 
@@ -357,12 +360,18 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                 toReturn.size() - 1,
                                 ContextualBlock.ASSUMPTION_INTEGER));
                 start = toReturn.size();
+                toReturn.addAll(buildAssumptionsForSorts(services));
+                assumptionTypes.add(new ContextualBlock(start,
+                        toReturn.size() - 1,
+                        ContextualBlock.ASSUMPTION_SORTS_NOT_EMPTY));
+                start = toReturn.size();
                 if (isUsingUninterpretedMultiplication()) {
                         toReturn.addAll(buildAssumptionsForUninterpretedMultiplication(services));
                 }
                 assumptionTypes.add(new ContextualBlock(start,
                                 toReturn.size() - 1,
                                 ContextualBlock.ASSUMPTION_MULTIPLICATION));
+     
                 return toReturn;
         }
 
@@ -843,6 +852,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 }
                 return distinct;
         }
+        
+     
 
         private Term createLogicalVar(Services services, String baseName,
                         Sort sort) {
@@ -914,6 +925,24 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                         }
                 }
                 return result;
+        }
+        
+        private ArrayList<StringBuffer> buildAssumptionsForSorts(Services services){
+        	ArrayList<StringBuffer> result = new ArrayList<StringBuffer>();
+        	if(this.isMultiSorted()){
+         		for(Sort sort : usedRealSort.keySet()){
+         	
+             		if(!isSomeIntegerSort(sort)){
+             			Term var = createLogicalVar(services, "x", sort);
+             			StringBuffer sVar = translateVariable(var.op());
+            			//StringBuffer var = this.makeUnique(new StringBuffer("x"));
+             			StringBuffer typePredicate = this.getTypePredicate(sort, sVar);
+             			StringBuffer assumption = translateLogicalExist(sVar, this.standardSort, typePredicate);
+             			result.add(assumption);
+             		}
+        		}	
+        	}
+        	return result;        	
         }
 
         private HashMap<Long, StringBuffer> getRightConstantContainer(
@@ -2472,6 +2501,73 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         protected boolean isSomeIntegerSort(Sort s) {
                 return s == integerSort;
         }
+        
+        
+        
+        private StringBuffer removeIllegalChars(StringBuffer template, ArrayList<String> toReplace, ArrayList<String> replacement) {
+    	//replace one String
+    	for (int i = 0; i < toReplace.size(); i++) {
+    	    String toRep = toReplace.get(i);
+    	    String replace = replacement.get(i);
+    	    int index = template.indexOf(toRep);
+    	    while (index >= 0) {
+    		template.replace(index, index + toRep.length(), replace);
+    		index = template.indexOf(toRep);
+    	    }
+    	}
+    	
+    	return template;
+        }
+        
+        
+        protected StringBuffer makeUnique(StringBuffer name) {
+        	StringBuffer toReturn = new StringBuffer(name);
+        	
+        	//build the replacement pairs
+        	ArrayList<String> toReplace = new ArrayList<String>();
+        	ArrayList<String> replacement = new ArrayList<String>();
+        	
+        	toReplace.add("[]");
+        	replacement.add("_Array");
+        	
+        	toReplace.add("<");
+        	replacement.add("_abo_");
+        	
+        	toReplace.add(">");
+        	replacement.add("_abc_");
+        	
+        	toReplace.add("{");
+        	replacement.add("_cbo_");
+        	
+        	toReplace.add("}");
+        	replacement.add("_cbc_");
+        	
+        	toReplace.add(".");
+        	replacement.add("_dot_");
+        	
+        	toReplace.add(":");
+        	replacement.add("_col_");
+        	
+        	toReplace.add("\\");
+        	replacement.add("_");
+        	
+        	toReplace.add("$");
+        	replacement.add("_dollar_");
+        	
+        	toReturn = this.removeIllegalChars(toReturn, toReplace, replacement);
+        	// names are must not begin with special characters
+        	
+        	if(!('A' <= toReturn.charAt(0) && toReturn.charAt(0) <= 'Z') &&
+        	   !('a' <= toReturn.charAt(0) && toReturn.charAt(0) <= 'z')){
+        	toReturn = (new StringBuffer()).append("a_").append(toReturn);
+        	}
+        	
+        	toReturn.append("_").append(nameCounter);
+        	nameCounter++;
+        	return toReturn;
+            }
+
+        
 
         /**
          * Translates the list <code>tacletFormulae</code> to the given syntax.
