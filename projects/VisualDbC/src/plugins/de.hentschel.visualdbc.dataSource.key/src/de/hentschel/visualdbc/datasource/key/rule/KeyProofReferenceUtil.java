@@ -26,8 +26,8 @@ import de.hentschel.visualdbc.datasource.key.util.LogUtil;
 import de.hentschel.visualdbc.datasource.model.IDSProvableReference;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Node.NodeIterator;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofVisitor;
 
 /**
  * Provides static methods to extract references from proofs in KeY.
@@ -110,28 +110,16 @@ public final class KeyProofReferenceUtil {
     * @param proof The {@link Proof} to analyze.
     * @return The found references that are might be empty if no references were found.
     */
-   public static List<IDSProvableReference> analyzeProof(KeyConnection connection, Services services, Proof proof) {
-      return analyzeProofTree(connection, services, proof.root());
-   }
-   
-   /**
-    * Computes all available proof references by analyzing the complete
-    * proof tree recursive. The references of each {@link Node} are computed
-    * via {@link #getReferences(KeyConnection, Services, Node)}.
-    * @param connection The {@link KeyConnection} to use.
-    * @param services The {@link Services} to use.
-    * @param node The {@link Node} to analyze.
-    * @return The found references that are might be empty if no references were found.
-    */
-   public static List<IDSProvableReference> analyzeProofTree(KeyConnection connection,
-                                                             Services services, 
-                                                             Node node) {
-      List<IDSProvableReference> result = new LinkedList<IDSProvableReference>();
-      result.addAll(getReferences(connection, services, node));
-      NodeIterator iter = node.childrenIterator();
-      while (iter.hasNext()) {
-         result.addAll(analyzeProofTree(connection, services, iter.next()));
-      }
+   public static List<IDSProvableReference> analyzeProof(final KeyConnection connection, 
+                                                         final Services services, 
+                                                         Proof proof) {
+      final List<IDSProvableReference> result = new LinkedList<IDSProvableReference>();
+      proof.breadthFirstSearch(proof.root(), new ProofVisitor() {
+         @Override
+         public void visit(Proof proof, Node visitedNode) {
+            result.addAll(getReferences(connection, services, visitedNode));
+         }
+      });
       return result;
    }
    

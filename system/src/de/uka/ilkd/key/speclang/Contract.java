@@ -117,4 +117,10 @@ public interface Contract extends SpecificationElement {
      * the KeYJavaType and ObserverFunction are set to the new values.
      */
     public Contract setTarget(KeYJavaType newKJT, ObserverFunction newPM);
+    
+    
+    /**
+     * Returns technical name for the contract type.
+     */
+    public String getTypeName();
 }

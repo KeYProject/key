@@ -47,7 +47,11 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.PreferencesUtil;
+import org.eclipse.ui.intro.IIntroManager;
 import org.key_project.swtbot.swing.bot.AbstractSwingBotComponent;
 import org.key_project.swtbot.swing.bot.SwingBot;
 import org.key_project.swtbot.swing.bot.SwingBotJButton;
@@ -82,6 +86,14 @@ public class TestUtilsUtil {
     * Forbid instances.
     */
    private TestUtilsUtil() {
+   }
+
+   /**
+    * Closes the welcome view if it is opened. Otherwise nothing is done.
+    */
+   public static void closeWelcomeView() {
+      IIntroManager introManager = PlatformUI.getWorkbench().getIntroManager(); 
+      introManager.closeIntro(introManager.getIntro());
    }
    
    /**
@@ -606,13 +618,21 @@ public class TestUtilsUtil {
        */
       CONTRACTS
    }
-
+   
    /**
-    * Executes the "Start/stop automated proof search" on the given KeY frame.
+    * Sets the method treatment in KeY's main window.
+    * @param methodTreatment The method treatment to use.
+    */
+   public static void keySetMethodTreatment(MethodTreatment methodTreatment) {
+      keySetMethodTreatment(keyGetMainWindow(), methodTreatment);
+   }
+   
+   /**
+    * Sets the method treatment in KeY.
     * @param frame The given KeY frame.
     * @param methodTreatment The method treatment to use.
     */
-   public static void keyFinishSelectedProofAutomatically(SwingBotJFrame frame, MethodTreatment methodTreatment) {
+   public static void keySetMethodTreatment(SwingBotJFrame frame, MethodTreatment methodTreatment) {
       // Set proof search strategy settings
       SwingBotJTabbedPane pane = frame.bot().jTabbedPane();
       TestCase.assertEquals("Proof Search Strategy", pane.getTitleAt(2));
@@ -627,6 +647,15 @@ public class TestUtilsUtil {
       }
       TestCase.assertEquals("Proof", pane.getTitleAt(0));
       pane.select(0);
+   }
+
+   /**
+    * Executes the "Start/stop automated proof search" on the given KeY frame.
+    * @param frame The given KeY frame.
+    * @param methodTreatment The method treatment to use.
+    */
+   public static void keyFinishSelectedProofAutomatically(SwingBotJFrame frame, MethodTreatment methodTreatment) {
+      keySetMethodTreatment(frame, methodTreatment);
       // Run proof completion
       frame.bot().jTree().unselectAll();
       frame.bot().waitWhile(Conditions.hasSelection(frame.bot().jTree()));
@@ -805,5 +834,46 @@ public class TestUtilsUtil {
       public SWTBotEditor getEditor() {
          return editor;
       }
+   }
+
+   /**
+    * Activates the given {@link SWTBotView}.
+    * @param view The {@link SWTBotView} to activate.
+    */
+   public static void activateView(final SWTBotView view) {
+      TestCase.assertNotNull(view);
+      Display.getDefault().syncExec(new Runnable() {
+         @Override
+         public void run() {
+            view.getReference().getPage().activate(view.getReference().getPart(true));
+         }
+      });
+      TestCase.assertTrue(view.isActive());
+   }
+
+   /**
+    * Opens a view with the given ID in the active {@link IWorkbenchPage}.
+    * @param viewId The view ID to open.
+    * @return The opened {@link IViewPart}.
+    * @throws Exception Occurred Exception.
+    */
+   public static IViewPart openView(final String viewId) throws Exception {
+      IRunnableWithResult<IViewPart> run = new AbstractRunnableWithResult<IViewPart>() {
+         @Override
+         public void run() {
+            try {
+               setResult(WorkbenchUtil.openView(viewId));
+            }
+            catch (Exception e) {
+               setException(e);
+            }
+         }
+      };
+      Display.getDefault().syncExec(run);
+      if (run.getException() != null) {
+         throw run.getException();
+      }
+      TestCase.assertNotNull(run.getResult());
+      return run.getResult();
    }
 }

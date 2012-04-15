@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget xml:id="_d2304454-478d-4b9e-9ad4-cac25bd44ae6" name="StatementKindTest[StatementKindTest::main()].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_c45600f3-17a2-43e9-874f-831d7ddbac61" name="KeY Default Thread">
+         <sedMethodCall xml:id="_31256dfa-fe32-4cdc-ab26-d134b096f7f3" name="self.main();" lineNumber="-1" charStart="49" charEnd="53">
+            <sedStatement xml:id="_f70c936e-4b6a-4890-b781-e76fa5a7c317" name="foo();" lineNumber="-1" charStart="79" charEnd="85">
+               <sedMethodCall xml:id="_8d25548c-d0d0-4754-837b-7c3b138e6b5b" name="self.foo();" lineNumber="-1" charStart="308" charEnd="311">
+                  <sedMethodReturn xml:id="_98658a72-8cc6-44bc-9181-6c5e7554d78c" name="&lt;return of self.foo();&gt;" lineNumber="-1" charStart="308" charEnd="311">
+                     <sedStatement xml:id="_11f07613-0745-4381-bc57-970658aa21d3" name="int i;" lineNumber="-1" charStart="108" charEnd="114">
+                        <sedStatement xml:id="_a0aef619-f413-41a0-842c-e67cfc3719c3" name="boolean b = true;" lineNumber="-1" charStart="118" charEnd="135">
+                           <sedStatement xml:id="_ee94cd08-c9f7-4f70-944e-256aee315317" name="i=0;" lineNumber="-1" charStart="157" charEnd="163">
+                              <sedStatement xml:id="_bd8c2546-6e02-42bb-a866-bb6ca574153c" name="i=i+1;" lineNumber="-1" charStart="167" charEnd="177">
+                                 <sedStatement xml:id="_2fbdd65a-f66e-405c-87e4-e1ca92dbb836" name="i+=2;" lineNumber="-1" charStart="181" charEnd="188">
+                                    <sedStatement xml:id="_6b93c0b5-d239-4b80-bdb3-a293d83a03b9" name="i++;" lineNumber="-1" charStart="192" charEnd="197">
+                                       <sedStatement xml:id="_c663d2cb-ca09-497e-8f08-483739295692" name="i--;" lineNumber="-1" charStart="201" charEnd="206">
+                                          <sedStatement xml:id="_ce5942ef-56d4-4f1e-b878-65242c928d2e" name="i-=2;" lineNumber="-1" charStart="210" charEnd="217">
+                                             <sedStatement xml:id="_16cbe5c2-b89b-4792-b815-5e9ac0198342" name="i*=2;" lineNumber="-1" charStart="221" charEnd="228">
+                                                <sedStatement xml:id="_ef141142-520e-4cc9-aa4f-a2016069f0b8" name="i/=2;" lineNumber="-1" charStart="232" charEnd="239">
+                                                   <sedStatement xml:id="_fc98b6c7-e3aa-4c32-a10c-805ec89fc4c7" name="i%=4;" lineNumber="-1" charStart="243" charEnd="250">
+                                                      <sedStatement xml:id="_c3197a5d-4e9c-4e1f-9a31-ed173250d440" name="i=get42();" lineNumber="-1" charStart="254" charEnd="266">
+                                                         <sedMethodCall xml:id="_7e4fd66e-c913-4e14-8460-af93ae66de8f" name="self.get42();" lineNumber="-1" charStart="336" charEnd="341">
+                                                            <sedStatement xml:id="_b945e92f-29b4-4f06-95cd-88c75f1869aa" name="return 42;" lineNumber="-1" charStart="349" charEnd="359">
+                                                               <sedMethodReturn xml:id="_9b157065-2ac4-48c5-86dc-1e5b4f1d1ef7" name="&lt;return of self.get42();&gt;" lineNumber="-1" charStart="336" charEnd="341">
+                                                                  <sedStatement xml:id="_b1d57d50-de68-48eb-8846-3431d07afba8" name="i=(2+4)*2;" lineNumber="-1" charStart="270" charEnd="286">
+                                                                     <sedMethodReturn xml:id="_7a7fdbc6-1b5c-4781-8e3f-cccf100750f0" name="&lt;return of self.main();&gt;" lineNumber="-1" charStart="49" charEnd="53">
+                                                                        <sedTermination xml:id="_9a8edcc6-49d2-4fc7-b00f-dd0dd9428c7b" name="&lt;end&gt;">
+                                                                        </sedTermination>
+                                                                     </sedMethodReturn>
+                                                                  </sedStatement>
+                                                               </sedMethodReturn>
+                                                            </sedStatement>
+                                                         </sedMethodCall>
+                                                      </sedStatement>
+                                                   </sedStatement>
+                                                </sedStatement>
+                                             </sedStatement>
+                                          </sedStatement>
+                                       </sedStatement>
+                                    </sedStatement>
+                                 </sedStatement>
+                              </sedStatement>
+                           </sedStatement>
+                        </sedStatement>
+                     </sedStatement>
+                  </sedMethodReturn>
+               </sedMethodCall>
+            </sedStatement>
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>

@@ -13,6 +13,23 @@ import org.key_project.util.java.StringUtil;
  */
 public class StringUtilTest extends TestCase {
    /**
+    * Tests {@link StringUtil#createLine(String, int)}
+    */
+   @Test
+   public void testCreateLine() {
+      // Test line with one character
+      assertEquals("", StringUtil.createLine("#", -1));
+      assertEquals("", StringUtil.createLine("#", 0));
+      assertEquals("-", StringUtil.createLine("-", 1));
+      assertEquals("AA", StringUtil.createLine("A", 2));
+      assertEquals("#####", StringUtil.createLine("#", 5));
+      // Test line with multiple characters
+      assertEquals("ABABAB", StringUtil.createLine("AB", 3));
+      // Test null text
+      assertEquals("nullnullnullnull", StringUtil.createLine(null, 4));
+   }
+   
+   /**
     * Tests {@link StringUtil#createIgnoreCaseComparator()}.
     */
    @Test

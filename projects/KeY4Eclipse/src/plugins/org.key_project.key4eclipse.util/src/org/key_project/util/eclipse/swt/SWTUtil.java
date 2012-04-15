@@ -20,9 +20,12 @@ import org.eclipse.jdt.internal.ui.viewsupport.FilteredElementTreeSelectionDialo
 import org.eclipse.jdt.internal.ui.wizards.TypedViewerFilter;
 import org.eclipse.jdt.internal.ui.wizards.buildpaths.FolderSelectionDialog;
 import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
@@ -30,7 +33,9 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
@@ -173,6 +178,17 @@ public final class SWTUtil {
      * @param text The text to set.
      */
     public static void setText(Text control, String text) {
+        if (control != null) {
+            control.setText(text != null ? text : StringUtil.EMPTY_STRING);
+        }
+    }
+    
+    /**
+     * Sets the given text in the given {@link Label} control.
+     * @param control The {@link Label} control o set text in.
+     * @param text The text to set.
+     */
+    public static void setText(Label control, String text) {
         if (control != null) {
             control.setText(text != null ? text : StringUtil.EMPTY_STRING);
         }
@@ -424,5 +440,73 @@ public final class SWTUtil {
             }
         }
         return sb.toString();
+    }
+
+    /**
+     * Adds the given text as item to the given {@link Combo}.
+     * @param control The {@link Combo} to add the item to.
+     * @param text The item to add.
+     */
+    public static void add(Combo control, String text) {
+        if (control != null) {
+            control.add(text != null ? text : StringUtil.EMPTY_STRING);
+        }
+    }
+
+    /**
+     * Converts the given {@link ISelection} into an array if it is an
+     * {@link IStructuredSelection}.
+     * @param selection The {@link ISelection} to convert.
+     * @return The selected elements in the given {@link ISelection} as array.
+     */
+    public static Object[] toArray(ISelection selection) {
+        if (selection instanceof IStructuredSelection) {
+            return ((IStructuredSelection)selection).toArray();
+        }
+        else {
+            return new Object[0];
+        }
+    }
+
+    /**
+     * Creates an {@link IStructuredSelection} for the given {@link Object}.
+     * @param obj The given {@link Object}.
+     * @return The {@link IStructuredSelection} which contains the given {@link Object}.
+     */
+    public static IStructuredSelection createSelection(Object obj) {
+        if (obj != null) {
+            return new StructuredSelection(obj);
+        }
+        else {
+            return StructuredSelection.EMPTY;
+        }
+    }
+
+    /**
+     * Creates an {@link IStructuredSelection} for the given {@link Object}s.
+     * @param objs The given {@link Object}s.
+     * @return The {@link IStructuredSelection} which contains the given {@link Object}.
+     */
+    public static IStructuredSelection createSelection(Object[] objs) {
+        if (objs != null && objs.length >= 1) {
+            return new StructuredSelection(objs);
+        }
+        else {
+            return StructuredSelection.EMPTY;
+        }
+    }
+
+    /**
+     * Creates an {@link IStructuredSelection} for the given {@link Object}s.
+     * @param objs The given {@link Object}s.
+     * @return The {@link IStructuredSelection} which contains the given {@link Object}.
+     */
+    public static IStructuredSelection createSelection(List<?> objs) {
+        if (objs != null && !objs.isEmpty()) {
+            return new StructuredSelection(objs);
+        }
+        else {
+            return StructuredSelection.EMPTY;
+        }
     }
 }

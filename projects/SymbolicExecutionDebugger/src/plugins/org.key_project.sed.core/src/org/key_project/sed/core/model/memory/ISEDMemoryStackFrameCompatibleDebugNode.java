@@ -7,13 +7,7 @@ import org.key_project.sed.core.model.impl.AbstractSEDStackFrameCompatibleDebugN
  * Provides the set method in a public version of {@link AbstractSEDStackFrameCompatibleDebugNode}.
  * @author Martin Hentschel
  */
-public interface ISEDMemoryStackFrameCompatibleDebugNode extends IStackFrame {
-   /**
-    * Sets the name of this node.
-    * @param name the name to set.
-    */
-   public void setName(String name);
-   
+public interface ISEDMemoryStackFrameCompatibleDebugNode extends ISEDMemoryDebugNode, IStackFrame {
    /**
     * Sets the line number.
     * @param lineNumber The line number or {@code -1} if it is unknown.

@@ -52,7 +52,7 @@ public class SWTBotWorkbenchUtilTest extends TestCase {
         Display.getDefault().syncExec(new Runnable() {
             @Override
             public void run() {
-                provider.setSelection(new StructuredSelection());
+                provider.setSelection(StructuredSelection.EMPTY);
             }
         });
         bot.waitWhile(TestUtilsUtil.hasSelection(view.bot().tree()));

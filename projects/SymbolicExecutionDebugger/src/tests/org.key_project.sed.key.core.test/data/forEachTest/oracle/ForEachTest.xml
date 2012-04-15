@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget xml:id="_9f912f1d-63c8-4151-b969-8ea82d023fe1" name="ForEachTest[ForEachTest::main()].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_cb4efe9b-238f-4919-aff5-8bce443709e4" name="KeY Default Thread">
+         <sedMethodCall xml:id="_1dda5402-eadb-4e01-be93-b7c2e9b81330" name="self.main();" lineNumber="-1" charStart="91" charEnd="95">
+            <sedStatement xml:id="_b364b883-ce63-42c9-be60-cc8d95326de8" name="int[] array = new int[3];" lineNumber="-1" charStart="103" charEnd="128">
+               <sedBranchCondition xml:id="_978dcf3c-b6a0-4fa7-a601-dcaa012051cd" name="Normal Execution (newObject != null )">
+                  <sedStatement xml:id="_b8d4db6e-0613-46f1-9a55-20378c7c56b5" name="int result = 0;" lineNumber="-1" charStart="132" charEnd="147">
+                     <sedLoopNode xml:id="_8c66bcf8-3f9e-4d04-b62e-bcf34e056e84" name="for (int element : array) {   result_1++; }" lineNumber="-1" charStart="151" charEnd="198">
+                        <sedBranchCondition xml:id="_85e6fc6f-a36d-4f69-bfd3-53b105e453ec" name="Normal Execution (x_arr_3 != null)">
+                           <sedBranchCondition xml:id="_3ad94c93-aedc-4e5a-880a-1803e9d892c6" name="Normal Execution (x_arr_3 != null)">
+                              <sedStatement xml:id="_ffb8b0e8-2a95-4896-82b0-cf00c5dd46bf" name="result_1++;" lineNumber="-1" charStart="183" charEnd="193">
+                                 <sedBranchCondition xml:id="_339eae60-356f-4a64-9ad5-dcb4154db622" name="Normal Execution (x_arr_3 != null)">
+                                    <sedBranchCondition xml:id="_517f1420-61ca-4f1e-9011-4c761cb3d37b" name="Normal Execution (x_arr_3 != null)">
+                                       <sedStatement xml:id="_e4289dcc-e015-44ba-a909-66de61164afa" name="result_1++;" lineNumber="-1" charStart="183" charEnd="193">
+                                          <sedBranchCondition xml:id="_fb545faf-9328-4997-a8a6-909e6b3c6f8c" name="Normal Execution (x_arr_3 != null)">
+                                             <sedBranchCondition xml:id="_4286a004-c902-4df1-85ab-c16045e7528c" name="Normal Execution (x_arr_3 != null)">
+                                                <sedStatement xml:id="_c60f51ce-3421-4c3d-8b3f-8f50a8eeeab2" name="result_1++;" lineNumber="-1" charStart="183" charEnd="193">
+                                                   <sedBranchCondition xml:id="_1ca25b5b-5d6c-4fc4-b131-f65fa77f8001" name="Normal Execution (x_arr_3 != null)">
+                                                      <sedStatement xml:id="_e2609c5c-f06b-42dc-9eae-6719cd79719c" name="return result_1;" lineNumber="-1" charStart="202" charEnd="216">
+                                                         <sedMethodReturn xml:id="_2351b464-f8ae-49f4-b20a-42c34e8bfb73" name="&lt;return of self.main();&gt;" lineNumber="-1" charStart="91" charEnd="95">
+                                                            <sedTermination xml:id="_f8430f1a-2889-4b7c-bbbc-ca187a980536" name="&lt;end&gt;">
+                                                            </sedTermination>
+                                                         </sedMethodReturn>
+                                                      </sedStatement>
+                                                   </sedBranchCondition>
+                                                </sedStatement>
+                                             </sedBranchCondition>
+                                          </sedBranchCondition>
+                                       </sedStatement>
+                                    </sedBranchCondition>
+                                 </sedBranchCondition>
+                              </sedStatement>
+                           </sedBranchCondition>
+                        </sedBranchCondition>
+                     </sedLoopNode>
+                  </sedStatement>
+               </sedBranchCondition>
+            </sedStatement>
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>

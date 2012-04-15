@@ -15,17 +15,7 @@ import org.key_project.sed.core.model.ISourceNameProvider;
  * with the Eclipse debug API.
  * @author Martin Hentschel
  */
-public abstract class AbstractSEDStackFrameCompatibleDebugNode extends AbstractSEDDebugNode implements IStackFrame, ISourceNameProvider {
-   /**
-    * The {@link ISEDThread} in that this node is contained.
-    */
-   private ISEDThread thread;
-   
-   /**
-    * The name of this debug node.
-    */
-   private String name;
-   
+public abstract class AbstractSEDStackFrameCompatibleDebugNode extends AbstractSEDTerminateCompatibleDebugNode implements IStackFrame, ISourceNameProvider {
    /**
     * The source name.
     */
@@ -55,16 +45,7 @@ public abstract class AbstractSEDStackFrameCompatibleDebugNode extends AbstractS
    public AbstractSEDStackFrameCompatibleDebugNode(ISEDDebugTarget target,
                                                    ISEDDebugNode parent, 
                                                    ISEDThread thread) {
-      super(target, parent);
-      this.thread = thread;
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public ISEDThread getThread() {
-      return thread;
+      super(target, parent, thread);
    }
 
    /**
@@ -198,46 +179,6 @@ public abstract class AbstractSEDStackFrameCompatibleDebugNode extends AbstractS
     * {@inheritDoc}
     */
    @Override
-   public boolean canTerminate() {
-      return getDebugTarget().canTerminate();
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public boolean isTerminated() {
-      return getDebugTarget().isTerminated();
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public void terminate() throws DebugException {
-      getDebugTarget().terminate();
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public String getName() throws DebugException {
-      return name;
-   }
-
-   /**
-    * Sets the name of this node.
-    * @param name the name to set.
-    */
-   protected void setName(String name) {
-      this.name = name;
-   }
-   
-   /**
-    * {@inheritDoc}
-    */
-   @Override
    public int getLineNumber() throws DebugException {
       return lineNumber;
    }
@@ -309,6 +250,24 @@ public abstract class AbstractSEDStackFrameCompatibleDebugNode extends AbstractS
       }
       else {
          return super.getAdapter(adapter);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String toString() {
+      try {
+         if (getCharStart() >= 0 && getCharEnd() >= 0) {
+            return super.toString() + " at source location " + getCharStart() + ", " + getCharEnd();
+         }
+         else {
+            return super.toString() + " at line " + getLineNumber();
+         }
+      }
+      catch (DebugException e) {
+         return e.getMessage();
       }
    }
 }

@@ -34,7 +34,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.util.eclipse.ResourceUtil;
-import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.SwingUtil;
@@ -107,7 +106,6 @@ import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.ProblemLoader;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -227,6 +225,11 @@ public class KeyConnection extends MemoryConnection {
    private Map<KeYJavaType, IDSType> typesMapping;
    
    /**
+    * Contains all instantiated {@link KeyProof}s to dispose them on disconnect.
+    */
+   private List<KeyProof> proofs;
+   
+   /**
     * The used listener to observe {@link #main}.
     */
    private GUIListener mainGuiListener = new GUIListener() {
@@ -270,6 +273,7 @@ public class KeyConnection extends MemoryConnection {
          axiomsMapping = new HashMap<ClassAxiom, IDSAxiom>();
          attributesMapping = new HashMap<Field, IDSAttribute>();
          enumLiteralsMapping = new HashMap<Field, IDSEnumLiteral>();
+         proofs = new LinkedList<KeyProof>();
          // Get settings
          final File location = getLocation(connectionSettings);
          final List<File> classPathEntries = getClassPathEntries(connectionSettings);
@@ -1618,6 +1622,11 @@ public class KeyConnection extends MemoryConnection {
     * @throws DSException Occurred Exception.
     */
    protected void disconnect(final boolean closeKeYMain) throws DSException {
+      // Dispose proofs
+      for (KeyProof proof : proofs) {
+         proof.dispose();
+      }
+      // Remove listener and proof environment
       if (main != null) {
          main.getMediator().removeGUIListener(mainGuiListener);
          try {
@@ -1656,6 +1665,7 @@ public class KeyConnection extends MemoryConnection {
       typesMapping = null;
       attributesMapping = null;
       enumLiteralsMapping = null;
+      proofs = null;
       super.disconnect();
    }
    
@@ -1817,24 +1827,6 @@ public class KeyConnection extends MemoryConnection {
    public void selectProof(Proof proof) {
       Assert.isNotNull(proof);
       main.getMediator().setProof(proof);
-   }   
-   
-   /**
-    * Checks if the {@link Proof} exists in the user interface.
-    * @param proof The {@link Proof} to check.
-    * @return {@code true} = in UI, {@code false} = not in UI.
-    */
-   public boolean isProofInUI(Proof proof) {
-      boolean inUI = false;
-      if (proof != null) {
-         Set<ProofAggregate> proofAggregates = initConfig.getProofEnv().getProofs();
-         Iterator<ProofAggregate> iter = proofAggregates.iterator();
-         while (!inUI && iter.hasNext()) {
-            ProofAggregate next = iter.next();
-            inUI = ArrayUtil.contains(next.getProofs(), proof);
-         }
-      }
-      return inUI;
    }
 
    /**
@@ -1851,5 +1843,14 @@ public class KeyConnection extends MemoryConnection {
    @SuppressWarnings("deprecation")
    public void closeTaskWithoutInteraction() {
       main.closeTaskWithoutInteraction();
+   }
+   
+   /**
+    * Registers the {@link KeyProof} in this {@link KeyConnection}.
+    * @param proof The {@link KeyProof} to register.
+    */
+   public void registerProof(KeyProof proof) {
+      Assert.isTrue(proofs != null, "Connection is not established.");
+      proofs.add(proof);
    }
 }

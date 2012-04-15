@@ -15,7 +15,7 @@ import org.key_project.sed.core.model.impl.AbstractSEDExceptionalTermination;
  * information in the memory.
  * @author Martin Hentschel
  */
-public class SEDMemoryExceptionalTermination extends AbstractSEDExceptionalTermination {
+public class SEDMemoryExceptionalTermination extends AbstractSEDExceptionalTermination implements ISEDMemoryDebugNode {
    /**
     * The contained child nodes.
     */
@@ -28,7 +28,7 @@ public class SEDMemoryExceptionalTermination extends AbstractSEDExceptionalTermi
     * @param thread The {@link ISEDThread} in that this exceptional termination is contained.
     */
    public SEDMemoryExceptionalTermination(ISEDDebugTarget target, 
-                                          ISEDDebugNode parent, 
+                                          ISEDDebugNode parent,
                                           ISEDThread thread) {
       super(target, parent, thread);
    }
@@ -42,12 +42,45 @@ public class SEDMemoryExceptionalTermination extends AbstractSEDExceptionalTermi
    }
    
    /**
-    * Adds a new {@link ISEDDebugNode} child node.
-    * @param child The {@link ISEDDebugNode} to add.
+    * {@inheritDoc}
     */
+   @Override
    public void addChild(ISEDDebugNode child) {
       if (child != null) {
          children.add(child);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */   
+   @Override
+   public void removeChild(ISEDDebugNode child) {
+      if (child != null) {
+         children.remove(child);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */   
+   @Override
+   public void addChild(int index, ISEDDebugNode child) {
+      if (child != null) {
+         children.add(index, child);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public int indexOfChild(ISEDDebugNode child) {
+      if (child != null) {
+         return children.indexOf(child);
+      }
+      else {
+         return -1;
       }
    }
    
@@ -73,33 +106,7 @@ public class SEDMemoryExceptionalTermination extends AbstractSEDExceptionalTermi
     * </p>
     */
    @Override
-   public void setLineNumber(int lineNumber) {
-      super.setLineNumber(lineNumber);
-   }
-
-   /**
-    * <p>
-    * {@inheritDoc}
-    * </p>
-    * <p>
-    * Changed visibility to public.
-    * </p>
-    */
-   @Override
-   public void setCharStart(int charStart) {
-      super.setCharStart(charStart);
-   }
-
-   /**
-    * <p>
-    * {@inheritDoc}
-    * </p>
-    * <p>
-    * Changed visibility to public.
-    * </p>
-    */
-   @Override
-   public void setCharEnd(int charEnd) {
-      super.setCharEnd(charEnd);
+   public void setId(String id) {
+      super.setId(id);
    }
 }

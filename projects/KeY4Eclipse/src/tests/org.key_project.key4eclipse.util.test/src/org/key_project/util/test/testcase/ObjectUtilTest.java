@@ -18,6 +18,15 @@ import org.key_project.util.test.model.ClassB;
  */
 public class ObjectUtilTest extends TestCase {
    /**
+    * Tests {@link ObjectUtil#getClass()}.
+    */
+   @Test
+   public void testGetClass() {
+      assertNull(ObjectUtil.getClass(null));
+      assertEquals(String.class, "A".getClass());
+   }
+
+   /**
     * Tests {@link ObjectUtil#createEqualsComparator()}.
     */
    @Test

@@ -15,7 +15,7 @@ import org.key_project.sed.core.model.impl.AbstractSEDTermination;
  * information in the memory.
  * @author Martin Hentschel
  */
-public class SEDMemoryTermination extends AbstractSEDTermination implements ISEDMemoryStackFrameCompatibleDebugNode {
+public class SEDMemoryTermination extends AbstractSEDTermination implements ISEDMemoryDebugNode {
    /**
     * The contained child nodes.
     */
@@ -25,10 +25,10 @@ public class SEDMemoryTermination extends AbstractSEDTermination implements ISED
     * Constructor.
     * @param target The {@link ISEDDebugTarget} in that this termination is contained.
     * @param parent The parent in that this node is contained as child.
-    * @param thread The {@link ISEDThread} in that this termination is contained.
+    * @param thread The {@link ISEDThread} in that this node is contained.
     */
    public SEDMemoryTermination(ISEDDebugTarget target, 
-                               ISEDDebugNode parent, 
+                               ISEDDebugNode parent,
                                ISEDThread thread) {
       super(target, parent, thread);
    }
@@ -42,12 +42,45 @@ public class SEDMemoryTermination extends AbstractSEDTermination implements ISED
    }
    
    /**
-    * Adds a new {@link ISEDDebugNode} child node.
-    * @param child The {@link ISEDDebugNode} to add.
+    * {@inheritDoc}
     */
+   @Override
    public void addChild(ISEDDebugNode child) {
       if (child != null) {
          children.add(child);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */   
+   @Override
+   public void removeChild(ISEDDebugNode child) {
+      if (child != null) {
+         children.remove(child);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */   
+   @Override
+   public void addChild(int index, ISEDDebugNode child) {
+      if (child != null) {
+         children.add(index, child);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public int indexOfChild(ISEDDebugNode child) {
+      if (child != null) {
+         return children.indexOf(child);
+      }
+      else {
+         return -1;
       }
    }
    
@@ -73,46 +106,7 @@ public class SEDMemoryTermination extends AbstractSEDTermination implements ISED
     * </p>
     */
    @Override
-   public void setLineNumber(int lineNumber) {
-      super.setLineNumber(lineNumber);
-   }
-
-   /**
-    * <p>
-    * {@inheritDoc}
-    * </p>
-    * <p>
-    * Changed visibility to public.
-    * </p>
-    */
-   @Override
-   public void setCharStart(int charStart) {
-      super.setCharStart(charStart);
-   }
-
-   /**
-    * <p>
-    * {@inheritDoc}
-    * </p>
-    * <p>
-    * Changed visibility to public.
-    * </p>
-    */
-   @Override
-   public void setCharEnd(int charEnd) {
-      super.setCharEnd(charEnd);
-   }
-   
-   /**
-    * <p>
-    * {@inheritDoc}
-    * </p>
-    * <p>
-    * Changed visibility to public.
-    * </p>
-    */
-   @Override
-   public void setSourceName(String sourceName) {
-      super.setSourceName(sourceName);
+   public void setId(String id) {
+      super.setId(id);
    }
 }

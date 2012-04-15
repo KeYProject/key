@@ -18,4 +18,5 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: KeY Project
 Export-Package: org.key_project.key4eclipse.test.suite,
- org.key_project.key4eclipse.test.suite.swtbot
+ org.key_project.key4eclipse.test.suite.swtbot,
+ org.key_project.key4eclipse.test.util

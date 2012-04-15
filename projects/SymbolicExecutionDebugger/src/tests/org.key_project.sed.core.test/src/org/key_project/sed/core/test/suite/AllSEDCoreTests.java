@@ -2,6 +2,8 @@ package org.key_project.sed.core.test.suite;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
+import org.key_project.sed.core.test.testcase.LogUtilTest;
+import org.key_project.sed.core.test.testcase.SEDIteratorTest;
 import org.key_project.sed.core.test.testcase.SEDPreferenceUtilInitializerTest;
 import org.key_project.sed.core.test.testcase.SEDPreferenceUtilTest;
 
@@ -11,6 +13,8 @@ import org.key_project.sed.core.test.testcase.SEDPreferenceUtilTest;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
+   LogUtilTest.class,
+   SEDIteratorTest.class,
    SEDPreferenceUtilInitializerTest.class,
    SEDPreferenceUtilTest.class
 })

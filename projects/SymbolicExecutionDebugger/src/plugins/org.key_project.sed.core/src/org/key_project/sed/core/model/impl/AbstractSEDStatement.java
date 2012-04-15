@@ -22,4 +22,12 @@ public abstract class AbstractSEDStatement extends AbstractSEDStackFrameCompatib
                                ISEDThread thread) {
       super(target, parent, thread);
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getNodeType() {
+      return "Statement";
+   }
 }

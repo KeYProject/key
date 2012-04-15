@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget xml:id="_72f5364b-a1c4-44a7-84eb-ef9ac1508e09" name="DoWhileFalseTest[DoWhileFalseTest::main()].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_4339aa7f-dcc5-481d-8fa5-2848a62391c9" name="KeY Default Thread">
+         <sedMethodCall xml:id="_2b610aec-b171-4347-b07e-9e8f23c89464" name="self.main();" lineNumber="-1" charStart="96" charEnd="100">
+            <sedStatement xml:id="_92280316-8b29-4b49-a70d-058dd6be140b" name="int result = 0;" lineNumber="-1" charStart="108" charEnd="123">
+               <sedLoopNode xml:id="_6a9bbbb8-ad96-4ccc-8c0c-9c7d769492ce" name="do {result_1++;}while ( false );" lineNumber="-1" charStart="127" charEnd="169">
+                  <sedStatement xml:id="_823e3757-ac82-4e35-9c0c-c0bb9cd98984" name="result_1++;" lineNumber="-1" charStart="136" charEnd="146">
+                     <sedLoopCondition xml:id="_e0871537-0343-4c58-8c2d-ed86eae80405" name="false" lineNumber="-1" charStart="-1" charEnd="-1">
+                        <sedBranchCondition xml:id="_bb186a40-002a-43ca-b3ab-f4f35d575d6a" name="if false false">
+                           <sedStatement xml:id="_2a4792b0-3598-465f-8436-dc45cc0fe837" name="return result_1;" lineNumber="-1" charStart="173" charEnd="187">
+                              <sedMethodReturn xml:id="_a919889e-5f8b-4270-92c6-5bb9efb08ee3" name="&lt;return of self.main();&gt;" lineNumber="-1" charStart="96" charEnd="100">
+                                 <sedTermination xml:id="_cd2a1456-ddcd-4e83-aa1a-d34a8a767348" name="&lt;end&gt;">
+                                 </sedTermination>
+                              </sedMethodReturn>
+                           </sedStatement>
+                        </sedBranchCondition>
+                     </sedLoopCondition>
+                  </sedStatement>
+               </sedLoopNode>
+            </sedStatement>
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>

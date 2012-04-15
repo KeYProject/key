@@ -98,21 +98,7 @@ public class ObserverFunction extends Function {
     //-------------------------------------------------------------------------
     //public interface
     //-------------------------------------------------------------------------
-    
-    public boolean equals (Object o){
-        if (o instanceof ObserverFunction){
-            ObserverFunction p = (ObserverFunction)o;
-            boolean b = (p.isStatic == isStatic);
-            b = b && MiscTools.equalsOrNull(p.name(), name());
-            b = b && MiscTools.equalsOrNull(p.container, container);
-            b = b && MiscTools.equalsOrNull(p.paramTypes, paramTypes);
-            b = b && MiscTools.equalsOrNull(p.type, type);
-            return b;
-        } else {
-            return false;
-        }
-    }
-    
+        
     /**
      * Returns the result type of this symbol.
      */

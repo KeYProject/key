@@ -5,6 +5,8 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.IPerspectiveDescriptor;
+import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
@@ -28,6 +30,38 @@ public final class WorkbenchUtil {
      * Forbid instances.
      */
     private WorkbenchUtil() {
+    }
+    
+    /**
+     * Opens the perspective with the given ID in the active {@link IWorkbenchPage}.
+     * @param perspectiveId The ID of the perspective to open.
+     * @return The opened {@link IPerspectiveDescriptor} or {@code null} if no {@link IWorkbenchPage} is active.
+     */
+    public static IPerspectiveDescriptor openPerspective(String perspectiveId) {
+       IWorkbenchPage page = getActivePage();
+       if (page != null) {
+          IPerspectiveDescriptor perspective = PlatformUI.getWorkbench().getPerspectiveRegistry().findPerspectiveWithId(perspectiveId);
+          page.setPerspective(perspective);
+          return perspective;
+       }
+       else {
+          return null;
+       }
+    }
+
+    /**
+     * Closes the given {@link IPerspectiveDescriptor} in the active {@link IWorkbenchPage}.
+     * @param perspectiveToClose The {@link IPerspectiveDescriptor} to close.
+     * @param saveParts Whether the page's parts should be saved if closed
+     * @param closePage Close the {@link IWorkbenchPage}? 
+     */
+    public static void closePerspective(IPerspectiveDescriptor perspectiveToClose, boolean saveParts, boolean closePage) {
+       if (perspectiveToClose != null) {
+          IWorkbenchPage page = getActivePage();
+          if (page != null) {
+             page.closePerspective(perspectiveToClose, saveParts, closePage);
+          }
+       }
     }
     
     /**
@@ -168,5 +202,62 @@ public final class WorkbenchUtil {
         else {
             return true;
         }
+    }
+
+    /**
+     * Shows the view identified by the given view id in this page and gives it focus. 
+     * If there is a view identified by the given view id (and with no secondary id) already open in this page, 
+     * it is given focus.
+     * @param viewId The ID of the view to open.
+     * @return The opened or reactivated {@link IViewPart} that has now the focus.
+     * @throws PartInitException Occurred Exception.
+     */
+    public static IViewPart openView(String viewId) throws PartInitException {
+        IWorkbenchPage page = getActivePage();
+        if (page != null) {
+            return page.showView(viewId);
+        }
+        else {
+            return null;
+        }
+    }
+    
+    /**
+     * Checks if the given {@link IWorkbenchPart} is active.
+     * @param part The {@link IWorkbenchPart} to check.
+     * @return {@code true} is active, {@code false} is not active.
+     */
+    public static boolean isActive(IWorkbenchPart part) {
+        return part != null && part.getSite().getPage().getActivePart() == part;
+    }
+
+    /**
+     * Activates the given part. The part will be brought to the front and given focus. The part must belong to this page.
+     * @param part Activates the given {@link IWorkbenchPart}.
+     */
+    public static void activate(IWorkbenchPart part) {
+        if (part != null) {
+            part.getSite().getPage().activate(part);
+        }
+    }
+
+    /**
+     * Closes the given {@link IViewPart}. 
+     * @param part The {@link IViewPart} to close.
+     */
+    public static void closeView(IViewPart view) {
+        if (view != null) {
+           view.getSite().getPage().hideView(view);
+        }
+    }
+
+    /**
+     * Searches an {@link IViewPart} with the given ID in the active {@link IWorkbenchPage}.
+     * @param viewId The view ID to search.
+     * @return The found {@link IViewPart} or {@code null} if no one was found.
+     */
+    public static IViewPart findView(String viewId) {
+        IWorkbenchPage page = getActivePage();
+        return page != null ? page.findView(viewId) : null;
     }
 }

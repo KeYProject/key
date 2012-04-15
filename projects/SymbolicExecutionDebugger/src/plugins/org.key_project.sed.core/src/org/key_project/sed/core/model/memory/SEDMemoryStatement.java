@@ -14,7 +14,7 @@ import org.key_project.sed.core.model.impl.AbstractSEDStatement;
  * information in the memory.
  * @author Martin Hentschel
  */
-public class SEDMemoryStatement extends AbstractSEDStatement implements ISEDMemoryStackFrameCompatibleDebugNode {
+public class SEDMemoryStatement extends AbstractSEDStatement implements ISEDMemoryStackFrameCompatibleDebugNode, ISEDMemoryDebugNode {
    /**
     * The contained child nodes.
     */
@@ -41,12 +41,45 @@ public class SEDMemoryStatement extends AbstractSEDStatement implements ISEDMemo
    }
    
    /**
-    * Adds a new {@link ISEDDebugNode} child node.
-    * @param child The {@link ISEDDebugNode} to add.
+    * {@inheritDoc}
     */
+   @Override
    public void addChild(ISEDDebugNode child) {
       if (child != null) {
          children.add(child);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */   
+   @Override
+   public void removeChild(ISEDDebugNode child) {
+      if (child != null) {
+         children.remove(child);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */   
+   @Override
+   public void addChild(int index, ISEDDebugNode child) {
+      if (child != null) {
+         children.add(index, child);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public int indexOfChild(ISEDDebugNode child) {
+      if (child != null) {
+         return children.indexOf(child);
+      }
+      else {
+         return -1;
       }
    }
    
@@ -113,5 +146,18 @@ public class SEDMemoryStatement extends AbstractSEDStatement implements ISEDMemo
    @Override
    public void setSourceName(String sourceName) {
       super.setSourceName(sourceName);
+   }
+
+   /**
+    * <p>
+    * {@inheritDoc}
+    * </p>
+    * <p>
+    * Changed visibility to public.
+    * </p>
+    */
+   @Override
+   public void setId(String id) {
+      super.setId(id);
    }
 }

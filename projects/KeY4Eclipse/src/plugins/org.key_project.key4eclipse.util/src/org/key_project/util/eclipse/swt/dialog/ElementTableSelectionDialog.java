@@ -7,7 +7,6 @@ import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -16,6 +15,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
 import org.eclipse.ui.dialogs.SelectionStatusDialog;
+import org.key_project.util.eclipse.swt.SWTUtil;
 
 /**
  * <p>
@@ -81,7 +81,7 @@ public class ElementTableSelectionDialog extends SelectionStatusDialog {
         setViewerContent(contentProvider, labelProvider, input);
 
         List<?> iniitalSelection = getInitialElementSelections();
-        setSelection(iniitalSelection != null ? new StructuredSelection(iniitalSelection) : new StructuredSelection());
+        setSelection(SWTUtil.createSelection(iniitalSelection));
 
         return contents;
     }

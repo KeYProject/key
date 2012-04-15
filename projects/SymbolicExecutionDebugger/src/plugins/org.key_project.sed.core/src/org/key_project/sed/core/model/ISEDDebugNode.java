@@ -43,6 +43,17 @@ public interface ISEDDebugNode extends ISEDDebugElement {
    public ISEDDebugNode[] getChildren() throws DebugException;
    
    /**
+    * Returns the {@link ISEDThread} in that this {@link ISEDDebugNode} is contained 
+    * as child. An {@link ISEDThread} returns itself.
+    * @return The {@link ISEDThread}.
+    * @throws DebugException if this method fails.  Reasons include:
+    * <ul><li>Failure communicating with the VM.  The DebugException's
+    * status code contains the underlying exception responsible for
+    * the failure.</li>
+    */
+   public ISEDThread getThread() throws DebugException;
+   
+   /**
     * Returns the parent in that this node is contained as child.
     * @return The parent {@link ISEDDebugNode} or {@code null} if it is the root of the symbolic execution tree.
     * @throws DebugException DebugException if this method fails.  Reasons include:
@@ -51,4 +62,24 @@ public interface ISEDDebugNode extends ISEDDebugElement {
     * the failure.</li>
     */
    public ISEDDebugNode getParent() throws DebugException;
+   
+   /**
+    * Returns a human readable name.
+    * @return The name of this node.
+    * @throws DebugException DebugException if this method fails.  Reasons include:
+    * <ul><li>Failure communicating with the VM.  The DebugException's
+    * status code contains the underlying exception responsible for
+    * the failure.</li>
+    */
+   public String getName() throws DebugException;
+   
+   /**
+    * Returns a human readable node type name.
+    * @return The human readable node type.
+    * @throws DebugException DebugException if this method fails.  Reasons include:
+    * <ul><li>Failure communicating with the VM.  The DebugException's
+    * status code contains the underlying exception responsible for
+    * the failure.</li>
+    */
+   public String getNodeType() throws DebugException; 
 }

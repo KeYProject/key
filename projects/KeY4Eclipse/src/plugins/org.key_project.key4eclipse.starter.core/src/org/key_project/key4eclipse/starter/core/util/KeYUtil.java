@@ -3,7 +3,11 @@ package org.key_project.key4eclipse.starter.core.util;
 import java.awt.Component;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.swing.JOptionPane;
 
@@ -21,8 +25,8 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.key_project.key4eclipse.starter.core.job.AbstractKeYMainWindowJob;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.util.eclipse.ResourceUtil;
-import org.key_project.util.java.IFilter;
-import org.key_project.util.java.ObjectUtil;
+import org.key_project.util.java.ArrayUtil;
+import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.SwingUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithException;
 import org.key_project.util.java.thread.AbstractRunnableWithResult;
@@ -30,11 +34,13 @@ import org.key_project.util.java.thread.IRunnableWithException;
 import org.key_project.util.java.thread.IRunnableWithResult;
 import org.key_project.util.jdt.JDTUtil;
 
+import recoder.parser.JavaCharStream;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofManagementDialog;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.notification.NotificationEventID;
 import de.uka.ilkd.key.gui.notification.NotificationTask;
 import de.uka.ilkd.key.java.JavaInfo;
@@ -43,7 +49,7 @@ import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.ProblemLoader;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.Node.NodeIterator;
+import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -74,6 +80,21 @@ import de.uka.ilkd.key.rule.RuleApp;
  */
 public final class KeYUtil {
     /**
+     * Key for the choice option "runtimeExceptions".
+     */
+    public static final String CHOICE_SETTING_RUNTIME_EXCEPTIONS = "runtimeExceptions";
+   
+    /**
+     * Value in choice option "runtimeExceptions" to ban exceptions.
+     */
+    public static final String CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_BAN = "runtimeExceptions:ban";
+    
+    /**
+     * Value in choice option "runtimeExceptions" to allow exceptions.
+     */
+    public static final String CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW = "runtimeExceptions:allow";
+   
+    /**
      * The file extension for *.key files.
      */
     public static final String KEY_FILE_EXTENSION = "key";
@@ -82,6 +103,11 @@ public final class KeYUtil {
      * The file extension for *.proof files.
      */
     public static final String PROOF_FILE_EXTENSION = "proof";
+    
+    /**
+     * The used tab size in KeY's recorder component.
+     */
+    public static final int RECORDER_TAB_SIZE = 8;
     
     /**
      * Forbid instances.
@@ -585,6 +611,7 @@ public final class KeYUtil {
              main.getNotificationManager().removeNotificationTask(task);
           }
           // Start interactive proof automatically
+          main.getMediator().setProof(proof);
           main.getMediator().startAutoMode(proof.openEnabledGoals());
           // Wait for interactive prover
           KeYUtil.waitWhileMainWindowIsFrozen(main);
@@ -595,77 +622,143 @@ public final class KeYUtil {
           }
        }
     }
-    
-    /**
-     * Finds a child node {@link Node} of the given {@link Node} which is 
-     * accepted by the given {@link IFilter}. The node itself is also included
-     * in the search.
-     * @param node The {@link Node} to start search from.
-     * @param filter The {@link IFilter} to select a node.
-     * @return The found {@link Node} or {@code null} if no {@link Node} was found.
-     */
-    public static Node findChild(Node node, IFilter<Node> filter) {
-       Node result = null;
-       if (node != null && filter != null) {
-          if (filter.select(node)) {
-             result =  node;
-          }
-          else {
-             NodeIterator iter = node.childrenIterator();
-             while (result == null && iter.hasNext()) {
-                result = findChild(iter.next(), filter);
-             }
-          }
-       }
-       return result;
-    }
-    
-    /**
-     * Finds a parent {@link Node} of the given {@link Node} which is 
-     * accepted by the given {@link IFilter}.
-     * @param node The {@link Node} to start search from.
-     * @param filter The {@link IFilter} to select a node.
-     * @return The found {@link Node} or {@code null} if no {@link Node} was found.
-     */
-    public static Node findParent(Node node, IFilter<Node> filter) {
-       if (node != null && filter != null) {
-          Node parent = node.parent();
-          if (parent != null) {
-             if (filter.select(parent)) {
-                return parent;
-             }
-             else {
-                return findParent(parent, filter);
-             }
-          }
-          else {
-             return null;
-          }
-       }
-       else {
-          return null;
-       }
-    }
-    
-    /**
-     * Makes sure that the given {@link Node} to check is a child of
-     * the possible parent {@link Node}.
-     * @param toCheck The child {@link Node}.
-     * @param possibleParent The expected parent {@link Node}.
-     * @return {@code true} parent relationship is correct, {@code false} parent relationship is not available.
-     */
-    public static boolean hasParent(Node toCheck, Node possibleParent) {
-       if (toCheck != null) {
-          Node parent = toCheck.parent();
-          if (ObjectUtil.equals(parent, possibleParent)) {
-             return true;
-          }
-          else {
-             return hasParent(parent, possibleParent);
-          }
-       }
-       else {
-          return false;
-       }
-    }
+
+   /**
+    * Returns the default choice value.
+    * <b>Attention: </b> This method returns {@code null} if it is called before
+    * a proof is instantiated the first time. It can be checked via
+    * {@link #isChoiceSettingInitialised()}.
+    * @param key The choice key.
+    * @return The choice value.
+    */
+   public static String getChoiceSetting(String key) {
+      Map<String, String> settings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
+      return settings.get(key);
+   }
+   
+   /**
+    * Sets the default choice value.
+    * <b>Attention: </b> Settings should not be changed before the first proof
+    * is instantiated in KeY. Otherwise the default settings are not loaded.
+    * If default settings are defined can be checked via {@link #isChoiceSettingInitialised()}.
+    * @param key The choice key to modify.
+    * @param value The new choice value to set.
+    */
+   public static void setChoiceSetting(String key, String value) {
+      HashMap<String, String> settings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
+      HashMap<String, String> clone = new HashMap<String, String>();
+      clone.putAll(settings);
+      clone.put(key, value);
+      ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().setDefaultChoices(clone);
+   }
+
+   /**
+    * Checks if the choice settings are initialized.
+    * @return {@code true} settings are initialized, {@code false} settings are not initialized.
+    */
+   public static boolean isChoiceSettingInitialised() {
+      return !ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices().isEmpty();
+   }   
+   
+   /**
+    * Checks if the {@link Proof} exists in the user interface.
+    * @param proof The {@link Proof} to check.
+    * @return {@code true} = in UI, {@code false} = not in UI.
+    */
+   public static boolean isProofInUI(Proof proof) {
+      boolean inUI = false;
+      if (proof != null) {
+         Set<ProofAggregate> proofAggregates = proof.env().getProofs();
+         Iterator<ProofAggregate> iter = proofAggregates.iterator();
+         while (!inUI && iter.hasNext()) {
+            ProofAggregate next = iter.next();
+            inUI = ArrayUtil.contains(next.getProofs(), proof);
+         }
+      }
+      return inUI;
+   }
+
+   /**
+    * <p>
+    * Normalizes the given column index computed by KeY's recorder component into
+    * a normal column index in that each tab ({@code '\t'}) character has a fixed tab size 
+    * of one which means that a tab is treated as a normal character.
+    * </p>
+    * <p>
+    * KeY's recorder component has a default tab size of {@link #RECORDER_TAB_SIZE}.
+    * But instead of using this fixed tab size the recorder component uses the following
+    * simplified code to compute the column index:
+    * <pre><code>
+    * int column = 0;
+    * for (char sign : signs) {
+    *    switch (sign) {
+    *        case '\t' : column += (tabSize - (column % tabSize));
+    *                    break;
+    *        default : column ++;
+    *     }
+    * }
+    * </code></pre>
+    * The class of recorder which does the mentioned computation is {@link JavaCharStream}.
+    * </p>
+    * @param column The column computed by KeY's recorder component.
+    * @param tabIndices The indices of tab ({@code '\t'}) characters in the current line. They can be computed for instance via {@link IOUtil#computeLineInformation(File)}. 
+    * @return The normalized column index in that each tab ({@code '\t'}) character has a fixed tab size of one which means that a tab is treated as a normal character.
+    */   
+   public static int normalizeRecorderColumn(int column, int[] tabIndices) {
+      return normalizeRecorderColumn(column, RECORDER_TAB_SIZE, tabIndices);
+   }
+   
+   /**
+    * <p>
+    * Normalizes the given column index computed by KeY's recorder component into
+    * a normal column index in that each tab ({@code '\t'}) character has a fixed tab size 
+    * of one which means that a tab is treated as a normal character.
+    * </p>
+    * <p>
+    * KeY's recorder component has a default tab size of {@link #RECORDER_TAB_SIZE}.
+    * But instead of using this fixed tab size the recorder component uses the following
+    * simplified code to compute the column index:
+    * <pre><code>
+    * int column = 0;
+    * for (char sign : signs) {
+    *    switch (sign) {
+    *        case '\t' : column += (tabSize - (column % tabSize));
+    *                    break;
+    *        default : column ++;
+    *     }
+    * }
+    * </code></pre>
+    * The class of recorder which does the mentioned computation is {@link JavaCharStream}.
+    * </p>
+    * @param column The column computed by KeY's recorder component.
+    * @param tabSize The tab size to use.
+    * @param tabIndices The indices of tab ({@code '\t'}) characters in the current line. They can be computed for instance via {@link IOUtil#computeLineInformation(File)}. 
+    * @return The normalized column index in that each tab ({@code '\t'}) character has a fixed tab size of one which means that a tab is treated as a normal character.
+    */
+   public static int normalizeRecorderColumn(int column, int tabSize, int[] tabIndices) {
+      if (column >= 0 && tabSize >= 2 && tabIndices != null) {
+         int result = 0;
+         int i = 0;
+         int lastTab = -1;
+         int tabOverhead = 0;
+         while (i < tabIndices.length) {
+            if (lastTab >= 0) {
+               result += tabIndices[i] - lastTab;
+            }
+            else {
+               result = tabIndices[i];
+            }
+            if (result < column) {
+               tabOverhead += (tabSize - (result % tabSize) - 1);
+               result += (tabSize - (result % tabSize) - 1);
+            }
+            lastTab = tabIndices[i];
+            i++;
+         }
+         return column - tabOverhead;
+      }
+      else {
+         return column;
+      }
+   }
 }

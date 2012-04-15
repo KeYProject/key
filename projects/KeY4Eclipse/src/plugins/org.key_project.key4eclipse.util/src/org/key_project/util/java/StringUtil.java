@@ -82,4 +82,18 @@ public final class StringUtil {
          }
       };
    }
+   
+   /**
+    * Creates a line which consists of the given text.
+    * @param text The text to repeate.
+    * @param repetitions The number of repetitions.
+    * @return The created line.
+    */
+   public static String createLine(String text, int repetitions) {
+      StringBuffer sb = new StringBuffer();
+      for (int i = 0; i < repetitions; i++) {
+         sb.append(text);
+      }
+      return sb.toString();
+   }
 }

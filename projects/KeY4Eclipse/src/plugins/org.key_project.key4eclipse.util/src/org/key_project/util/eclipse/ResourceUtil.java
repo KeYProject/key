@@ -4,12 +4,14 @@ import java.io.File;
 import java.net.URI;
 
 import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.model.IWorkbenchAdapter;
+import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.StringUtil;
 
 /**
@@ -21,6 +23,20 @@ public class ResourceUtil {
     * Forbid instances by this private constructor.
     */
    private ResourceUtil() {
+   }
+   
+   /**
+    * Returns the file name without file extension for the given {@link IFile}.
+    * @param file The {@link IFile} for that the file name without extension is needed.
+    * @return The file name without extension or {@code null} if it was not possible to compute it.
+    */
+   public static String getFileNameWithoutExtension(IFile file) {
+      if (file != null) {
+         return IOUtil.getFileNameWithoutExtension(file.getName());
+      }
+      else {
+         return null;
+      }
    }
    
    /**

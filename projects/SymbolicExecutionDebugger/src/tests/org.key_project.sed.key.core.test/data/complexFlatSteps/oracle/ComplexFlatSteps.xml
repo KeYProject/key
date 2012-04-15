@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget xml:id="_d31d37ce-21a7-4674-8db2-8e9d297d9140" name="ComplexFlatSteps[ComplexFlatSteps::doSomething()].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_5185d64a-c562-41e0-ba85-c4f944208bc6" name="KeY Default Thread">
+         <sedMethodCall xml:id="_c8e6b0e0-fb05-48fe-b137-c08c913bddf2" name="self.doSomething();" lineNumber="-1" charStart="244" charEnd="255">
+            <sedStatement xml:id="_2bc5a43e-bf37-4201-bf00-414094924685" name="int x = 1+2;" lineNumber="-1" charStart="263" charEnd="277">
+               <sedStatement xml:id="_fd456c5e-9c0c-4a27-9ab0-182b74b4237f" name="int y = 2*4*9;" lineNumber="-1" charStart="281" charEnd="299">
+                  <sedStatement xml:id="_0d8b2910-8bb4-4f6f-afc1-e42a5262afff" name="int z = 3*(4/(2-3));" lineNumber="-1" charStart="303" charEnd="329">
+                     <sedMethodReturn xml:id="_0ec6b9f0-a84b-4669-8d36-bb877869849d" name="&lt;return of self.doSomething();&gt;" lineNumber="-1" charStart="244" charEnd="255">
+                        <sedTermination xml:id="_b55ed2a9-d05b-4a6b-97e2-ab3697e0e23b" name="&lt;end&gt;">
+                        </sedTermination>
+                     </sedMethodReturn>
+                  </sedStatement>
+               </sedStatement>
+            </sedStatement>
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>

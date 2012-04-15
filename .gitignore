@@ -15,6 +15,7 @@ system/resources/de/uka/ilkd/key/util/sha1
 eclipse/.classpath
 eclipse/.settings
 eclipse/KeYPlugin/bin
+eclipse/bin
 eclipse/VisualDebugger/.settings
 eclipse/VisualDebugger/bin
 system/argfile

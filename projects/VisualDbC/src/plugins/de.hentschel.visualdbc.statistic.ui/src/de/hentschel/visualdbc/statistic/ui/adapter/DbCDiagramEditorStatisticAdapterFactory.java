@@ -18,7 +18,7 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.gef.EditPart;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.StructuredSelection;
+import org.key_project.util.eclipse.swt.SWTUtil;
 
 import de.hentschel.visualdbc.dbcmodel.DbcModel;
 import de.hentschel.visualdbc.dbcmodel.diagram.part.DbCDiagramEditor;
@@ -66,7 +66,7 @@ public class DbCDiagramEditorStatisticAdapterFactory extends AbstractStatisticAd
                      }
                   }
                   // Select EditParts
-                  editor.getDiagramGraphicalViewer().setSelection(new StructuredSelection(parts));
+                  editor.getDiagramGraphicalViewer().setSelection(SWTUtil.createSelection(parts));
                }
             }
          }};

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget xml:id="_80ff26c0-08c1-4e58-9c20-ec814adb355c" name="MethodHierarchyCallWithExceptionTest[MethodHierarchyCallWithExceptionTest::main()].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_2eb57522-2cb7-4098-bd53-e2d71ee8f7ed" name="KeY Default Thread">
+         <sedMethodCall xml:id="_f8c209c8-28d4-40dc-9a96-2d1da7ef41c6" name="self.main();" lineNumber="-1" charStart="125" charEnd="129">
+            <sedStatement xml:id="_bdf82a00-e272-4424-9ed2-0cc01b4599ca" name="a();" lineNumber="-1" charStart="141" charEnd="145">
+               <sedMethodCall xml:id="_2ee70058-c91f-40ff-b457-5dd438bcd792" name="self.a();" lineNumber="-1" charStart="173" charEnd="174">
+                  <sedStatement xml:id="_6efb18d5-8950-430f-883e-d5cbbf1c4b92" name="b();" lineNumber="-1" charStart="202" charEnd="206">
+                     <sedMethodCall xml:id="_f55d117b-8bda-47ea-88bf-e744fd2d96e5" name="self.b();" lineNumber="-1" charStart="330" charEnd="331">
+                        <sedStatement xml:id="_a9437548-2d9d-45bf-b151-15cfa8b3be85" name="c();" lineNumber="-1" charStart="343" charEnd="347">
+                           <sedMethodCall xml:id="_b2015ddd-99aa-480a-994f-3070eb95c512" name="self.c();" lineNumber="-1" charStart="375" charEnd="376">
+                              <sedStatement xml:id="_7f133dff-201d-48e5-87a1-d52701905bbb" name="throw new RuntimeException ();" lineNumber="-1" charStart="388" charEnd="417">
+                                 <sedBranchCondition xml:id="_1ae24e24-f022-403e-869f-b3978567747d" name="Normal Execution (r_1 != null)">
+                                    <sedBranchCondition xml:id="_1b8a67f3-78e1-4db5-a83d-69e87fde608a" name="Normal Execution (r instanceof RuntimeException)">
+                                       <sedStatement xml:id="_65e5ce2d-6ee3-4282-b161-9a549d66129f" name="int ae = -1;" lineNumber="-1" charStart="262" charEnd="274">
+                                          <sedStatement xml:id="_83c021d5-366d-496c-9825-6598fdab7c31" name="int a1 = 1;" lineNumber="-1" charStart="291" charEnd="302">
+                                             <sedMethodReturn xml:id="_e2f30cbf-ecdc-4f17-9ae8-c4da47629e81" name="&lt;return of self.a();&gt;" lineNumber="-1" charStart="173" charEnd="174">
+                                                <sedMethodReturn xml:id="_86f4c606-d87c-482e-bd98-ff3a8d3ef84b" name="&lt;return of self.main();&gt;" lineNumber="-1" charStart="125" charEnd="129">
+                                                   <sedTermination xml:id="_6cec30be-53a4-448b-8182-97863226637b" name="&lt;end&gt;">
+                                                   </sedTermination>
+                                                </sedMethodReturn>
+                                             </sedMethodReturn>
+                                          </sedStatement>
+                                       </sedStatement>
+                                    </sedBranchCondition>
+                                 </sedBranchCondition>
+                              </sedStatement>
+                           </sedMethodCall>
+                        </sedStatement>
+                     </sedMethodCall>
+                  </sedStatement>
+               </sedMethodCall>
+            </sedStatement>
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>

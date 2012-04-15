@@ -2,11 +2,9 @@ package org.key_project.sed.core.test.testcase.swtbot;
 
 import junit.framework.TestCase;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotPerspective;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
-import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.junit.Test;
 import org.key_project.sed.core.model.ISEDDebugElement;
@@ -19,13 +17,13 @@ import org.key_project.util.test.util.TestUtilsUtil;
  * shown in the debug view of the Eclipse debug API.
  * @author Martin Hentschel
  */
-public class DebugViewHierarchyTest extends TestCase {
+public class SWTBotDebugViewHierarchyTest extends TestCase {
    /**
     * Makes sure that the tree is updated when the user switches between
     * normal and compact view.
     */
    @Test
-   public void testSwitchingBetweenCompactAndNormalHierarchy() throws CoreException {
+   public void testSwitchingBetweenCompactAndNormalHierarchy() throws Exception {
       // Close welcome view
       SWTWorkbenchBot bot = new SWTWorkbenchBot();
       SWTBotPerspective defaultPerspective = bot.activePerspective();
@@ -36,13 +34,13 @@ public class DebugViewHierarchyTest extends TestCase {
       try {
          TestUtilsUtil.closeWelcomeView(bot);
          // Open symbolic debug perspective
-         TestSedCoreUtil.openSymbolicDebugPerspective(bot);
+         TestSedCoreUtil.openSymbolicDebugPerspective();
          // Launch fixed example
          TestSedCoreUtil.launchFixedExample();
          // Find the launched ILaunch in the debug view
          SWTBotView debugView = TestSedCoreUtil.getDebugView(bot);
          debugTree = debugView.bot().tree();
-         bot.waitUntil(Conditions.treeHasRows(debugTree, 1));
+         TestSedCoreUtil.waitUntilDebugTreeHasDebugTarget(bot, debugTree);
          // Expand all tree items
          TestUtilsUtil.expandAll(debugTree);
          TestUtilsUtil.sleep(TestSedCoreUtil.USER_INTERFACE_DEBUG_TREE_WAIT_TIME); // Give the user interface the chance to update the tree
@@ -80,7 +78,7 @@ public class DebugViewHierarchyTest extends TestCase {
     * compact symbolic execution tree option.
     */
    @Test
-   public void testCompactHierarchy() throws CoreException {
+   public void testCompactHierarchy() throws Exception {
       // Close welcome view
       SWTWorkbenchBot bot = new SWTWorkbenchBot();
       SWTBotPerspective defaultPerspective = bot.activePerspective();
@@ -91,13 +89,13 @@ public class DebugViewHierarchyTest extends TestCase {
       try {
          TestUtilsUtil.closeWelcomeView(bot);
          // Open symbolic debug perspective
-         TestSedCoreUtil.openSymbolicDebugPerspective(bot);
+         TestSedCoreUtil.openSymbolicDebugPerspective();
          // Launch fixed example
          TestSedCoreUtil.launchFixedExample();
          // Find the launched ILaunch in the debug view
          SWTBotView debugView = TestSedCoreUtil.getDebugView(bot);
          debugTree = debugView.bot().tree();
-         bot.waitUntil(Conditions.treeHasRows(debugTree, 1));
+         TestSedCoreUtil.waitUntilDebugTreeHasDebugTarget(bot, debugTree);
          // Expand all tree items
          TestUtilsUtil.expandAll(debugTree);
          TestUtilsUtil.sleep(TestSedCoreUtil.USER_INTERFACE_DEBUG_TREE_WAIT_TIME); // Give the user interface the chance to update the tree
@@ -118,7 +116,7 @@ public class DebugViewHierarchyTest extends TestCase {
     * in the debug view of the Eclipse debug API.
     */
    @Test
-   public void testHierarchy() throws CoreException {
+   public void testHierarchy() throws Exception {
       // Close welcome view
       SWTWorkbenchBot bot = new SWTWorkbenchBot();
       SWTBotPerspective defaultPerspective = bot.activePerspective();
@@ -129,13 +127,13 @@ public class DebugViewHierarchyTest extends TestCase {
       try {
          TestUtilsUtil.closeWelcomeView(bot);
          // Open symbolic debug perspective
-         TestSedCoreUtil.openSymbolicDebugPerspective(bot);
+         TestSedCoreUtil.openSymbolicDebugPerspective();
          // Launch fixed example
          TestSedCoreUtil.launchFixedExample();
          // Find the launched ILaunch in the debug view
          SWTBotView debugView = TestSedCoreUtil.getDebugView(bot);
          debugTree = debugView.bot().tree();
-         bot.waitUntil(Conditions.treeHasRows(debugTree, 1));
+         TestSedCoreUtil.waitUntilDebugTreeHasDebugTarget(bot, debugTree);
          // Expand all tree items
          TestUtilsUtil.expandAll(debugTree);
          TestUtilsUtil.sleep(TestSedCoreUtil.USER_INTERFACE_DEBUG_TREE_WAIT_TIME); // Give the user interface the chance to update the tree

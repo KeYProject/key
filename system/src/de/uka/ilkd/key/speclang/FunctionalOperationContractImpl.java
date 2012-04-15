@@ -115,7 +115,9 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
         assert excVar != null;
         assert heapAtPreVar != null;
         this.baseName               = baseName;
-        this.name                   = generateName(baseName, name, kjt, pm, id);
+        this.name = name != null 
+                  ? name 
+                  : ContractFactory.generateContractName(baseName, kjt, pm, id);
         this.pm          	    = pm;
         this.kjt                    = kjt;
         this.modality               = modality;
@@ -801,7 +803,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 	        	        
     @Override
     public String getDisplayName() {
-	return getName();
+        return ContractFactory.generateDisplayName(baseName, kjt, pm, id);
     }
 
 
@@ -863,5 +865,11 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
                                                    id,
                                                    toBeSaved && newKJT.equals(
                 kjt));
+    }
+    
+    
+    @Override
+    public String getTypeName() {
+        return ContractFactory.generateContractTypeName(baseName, kjt, pm);
     }
 }

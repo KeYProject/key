@@ -2,6 +2,7 @@ package org.key_project.key4eclipse.starter.core.test.testcase.swtbot;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -19,17 +20,18 @@ import org.junit.Test;
 import org.key_project.key4eclipse.starter.core.test.Activator;
 import org.key_project.key4eclipse.starter.core.test.util.TestStarterCoreUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
+import org.key_project.key4eclipse.test.util.TestKeY4EclipseUtil;
 import org.key_project.swtbot.swing.bot.SwingBot;
 import org.key_project.swtbot.swing.bot.SwingBotJDialog;
 import org.key_project.swtbot.swing.bot.SwingBotJLabel;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.eclipse.ResourceUtil;
-import org.key_project.util.java.IFilter;
 import org.key_project.util.java.SwingUtil;
 import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Node.NodeIterator;
 import de.uka.ilkd.key.proof.Proof;
@@ -40,140 +42,85 @@ import de.uka.ilkd.key.proof.init.InitConfig;
  * @author Martin Hentschel
  */
 public class SWTBotKeYUtilTest extends TestCase {
+
    /**
-    * Tests {@link KeYUtil#findChild(Node, IFilter)}.
+    * Tests {@link KeYUtil#isProofInUI(Proof)}
     */
    @Test
-   public void testFindChild() throws Exception {
-      try {
-         // Create test project
-         IJavaProject project = TestUtilsUtil.createJavaProject("KeYUtilTest_testFindChild");
-         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/statements", project.getProject().getFolder("src"));
-         // Get method
-         IMethod method = TestUtilsUtil.getJdtMethod(project, "FlatSteps", "doSomething", "I", "QString;", "Z");
-         // Instantiate proof and try to close it in automatic mode
-         Proof proof = TestStarterCoreUtil.instantiateProofWithGeneratedContract(method);
-         KeYUtil.runProofInAutomaticModeWithoutResultDialog(proof);
-         // Find nodes for the test
-         Node callNode = KeYUtil.findChild(proof.root(), new IFilter<Node>() {
-            @Override
-            public boolean select(Node element) {
-               return "methodBodyExpand".equals(KeYUtil.getRuleDisplayName(element));
-            }
-         });
-         assertNotNull(callNode);
-         IFilter<Node> returnFilter = new IFilter<Node>() {
-            @Override
-            public boolean select(Node element) {
-               return "methodCallEmpty".equals(KeYUtil.getRuleDisplayName(element));
-            }
-         };
-         Node returnNode = KeYUtil.findChild(proof.root(), returnFilter);
-         assertNotNull(returnNode);
-         // Test method
-         assertNull(KeYUtil.findChild(null, null));
-         assertNull(KeYUtil.findChild(null, returnFilter));
-         assertNull(KeYUtil.findChild(returnNode, null));
-         assertEquals(returnNode, KeYUtil.findChild(callNode, returnFilter));
-         assertSame(returnNode, KeYUtil.findChild(returnNode, returnFilter));
-         assertNull(KeYUtil.findChild(returnNode, new IFilter<Node>() {
-            @Override
-            public boolean select(Node element) {
-               return false;
-            }
-         }));
-      }
-      finally {
-         // Remove proof
-         KeYUtil.clearProofList(MainWindow.getInstance());
-         TestCase.assertTrue(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
-         // Close main window
-         TestUtilsUtil.keyCloseMainWindow();
-      }
+   public void testIsProofInUI() throws CoreException, InterruptedException, InvocationTargetException {
+       // Open main window
+       KeYUtil.openMainWindow();
+       assertNotNull(MainWindow.getInstance());
+       assertTrue(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
+       // Load a resource
+       IJavaProject javaProject = TestUtilsUtil.createJavaProject("SWTBotKeYUtilTest_testIsProofInUI_1");
+       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/banking", javaProject.getProject().getFolder("src"));
+       KeYUtil.loadAsync(javaProject.getProject());
+       TestUtilsUtil.keyStartSelectedProofInProofManagementDiaolog();
+       TestUtilsUtil.keyCheckProofs(TestKeY4EclipseUtil.createOperationContractId("banking.LoggingPayCard", "charge(int)", "0", null), TestKeY4EclipseUtil.createOperationContractId("banking.LoggingPayCard", "charge(int)", "0", null));
+       assertNotNull(MainWindow.getInstance());
+       assertFalse(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
+       Proof firstProof = TestUtilsUtil.keyGetProofEnv(0).getProofs().iterator().next().getFirstProof();
+       assertNotNull(firstProof);
+       assertTrue(KeYUtil.isProofInUI(firstProof));
+       // Load second java project
+       IJavaProject secondProject = TestUtilsUtil.createJavaProject("SWTBotKeYUtilTest_testIsProofInUI_2");
+       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/MCDemo", secondProject.getProject().getFolder("src"));
+       KeYUtil.loadAsync(secondProject.getProject());
+       TestUtilsUtil.keyStartSelectedProofInProofManagementDiaolog();
+       TestUtilsUtil.keyCheckProofs(TestKeY4EclipseUtil.createOperationContractId("MCDemo", "inc(int)", "0", "normal_behavior"), TestKeY4EclipseUtil.createOperationContractId("banking.LoggingPayCard", "charge(int)", "0", null), TestKeY4EclipseUtil.createOperationContractId("MCDemo", "inc(int)", "0", "normal_behavior"));
+       assertNotNull(MainWindow.getInstance());
+       assertFalse(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
+       Proof secondProof = TestUtilsUtil.keyGetProofEnv(1).getProofs().iterator().next().getFirstProof();
+       assertNotNull(secondProof);
+       assertTrue(KeYUtil.isProofInUI(firstProof));
+       assertTrue(KeYUtil.isProofInUI(secondProof));
+       // Remove first proof
+       KeYUtil.removeFromProofList(MainWindow.getInstance(), firstProof.env());
+       TestCase.assertFalse(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
+       TestUtilsUtil.keyCheckProofs(TestKeY4EclipseUtil.createOperationContractId("MCDemo", "inc(int)", "0", "normal_behavior"), TestKeY4EclipseUtil.createOperationContractId("MCDemo", "inc(int)", "0", "normal_behavior"));
+       assertFalse(KeYUtil.isProofInUI(firstProof));
+       assertTrue(KeYUtil.isProofInUI(secondProof));
+       // Remove first proof again
+       KeYUtil.removeFromProofList(MainWindow.getInstance(), secondProof.env());
+       TestCase.assertTrue(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
+       assertFalse(KeYUtil.isProofInUI(firstProof));
+       assertFalse(KeYUtil.isProofInUI(secondProof));
+       // Test null
+       assertFalse(KeYUtil.isProofInUI(null));
+       // Close main window
+       TestUtilsUtil.keyCloseMainWindow();
    }
    
    /**
-    * Tests {@link KeYUtil#findParent(Node, IFilter)}.
+    * Tests {@link KeYUtil#getChoiceSetting(String)} and
+    * {@link KeYUtil#setChoiceSetting(String, String)} and
+    * {@link KeYUtil#isChoiceSettingInitialised()}.
     */
    @Test
-   public void testFindParent() throws Exception {
+   public void testGetAndSetChoiceSetting() throws Exception {
       try {
          // Create test project
-         IJavaProject project = TestUtilsUtil.createJavaProject("KeYUtilTest_testFindParent");
+         IJavaProject project = TestUtilsUtil.createJavaProject("KeYUtilTest_testGetAndSetChoiceSetting");
          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/statements", project.getProject().getFolder("src"));
          // Get method
          IMethod method = TestUtilsUtil.getJdtMethod(project, "FlatSteps", "doSomething", "I", "QString;", "Z");
-         // Instantiate proof and try to close it in automatic mode
-         Proof proof = TestStarterCoreUtil.instantiateProofWithGeneratedContract(method);
-         KeYUtil.runProofInAutomaticModeWithoutResultDialog(proof);
-         // Find nodes for the test
-         IFilter<Node> callFilter = new IFilter<Node>() {
-            @Override
-            public boolean select(Node element) {
-               return "methodBodyExpand".equals(KeYUtil.getRuleDisplayName(element));
-            }
-         };
-         Node callNode = KeYUtil.findChild(proof.root(), callFilter);
-         assertNotNull(callNode);
-         Node returnNode = KeYUtil.findChild(proof.root(), new IFilter<Node>() {
-            @Override
-            public boolean select(Node element) {
-               return "methodCallEmpty".equals(KeYUtil.getRuleDisplayName(element));
-            }
-         });
-         assertNotNull(returnNode);
-         // Test method
-         assertNull(KeYUtil.findParent(null, null));
-         assertNull(KeYUtil.findParent(null, callFilter));
-         assertNull(KeYUtil.findParent(returnNode, null));
-         assertEquals(callNode, KeYUtil.findParent(returnNode, callFilter));
-         assertNull(KeYUtil.findParent(callNode, callFilter));
-      }
-      finally {
-         // Remove proof
-         KeYUtil.clearProofList(MainWindow.getInstance());
-         TestCase.assertTrue(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
-         // Close main window
-         TestUtilsUtil.keyCloseMainWindow();
-      }
-   }
-   
-   /**
-    * Tests {@link KeYUtil#hasParent(Node, Node)}.
-    */
-   @Test
-   public void testHasParent() throws Exception {
-      try {
-         // Create test project
-         IJavaProject project = TestUtilsUtil.createJavaProject("KeYUtilTest_testHasParent");
-         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/statements", project.getProject().getFolder("src"));
-         // Get method
-         IMethod method = TestUtilsUtil.getJdtMethod(project, "FlatSteps", "doSomething", "I", "QString;", "Z");
-         // Instantiate proof and try to close it in automatic mode
-         Proof proof = TestStarterCoreUtil.instantiateProofWithGeneratedContract(method);
-         KeYUtil.runProofInAutomaticModeWithoutResultDialog(proof);
-         // Find nodes for the test
-         Node callNode = KeYUtil.findChild(proof.root(), new IFilter<Node>() {
-            @Override
-            public boolean select(Node element) {
-               return "methodBodyExpand".equals(KeYUtil.getRuleDisplayName(element));
-            }
-         });
-         assertNotNull(callNode);
-         Node returnNode = KeYUtil.findChild(proof.root(), new IFilter<Node>() {
-            @Override
-            public boolean select(Node element) {
-               return "methodCallEmpty".equals(KeYUtil.getRuleDisplayName(element));
-            }
-         });
-         assertNotNull(returnNode);
-         // Test method
-         assertFalse(KeYUtil.hasParent(null, null));
-         assertFalse(KeYUtil.hasParent(null, callNode));
-         assertTrue(KeYUtil.hasParent(returnNode, null));
-         assertTrue(KeYUtil.hasParent(returnNode, callNode));
-         assertFalse(KeYUtil.hasParent(callNode, returnNode));
-         assertFalse(KeYUtil.hasParent(callNode, callNode));
+         // Instantiate proof to load default settings
+         TestStarterCoreUtil.instantiateProofWithGeneratedContract(method);
+         // Make sure that default settings are loaded
+         assertTrue(KeYUtil.isChoiceSettingInitialised());
+         // Store default choice settings
+         HashMap<String, String> defaultSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
+         assertFalse(defaultSettings.isEmpty());
+         // Test initial value
+         assertEquals(KeYUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_BAN, KeYUtil.getChoiceSetting(KeYUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS));
+         // Change value and make sure that it has changed
+         KeYUtil.setChoiceSetting(KeYUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, KeYUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW);
+         assertEquals(KeYUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW, KeYUtil.getChoiceSetting(KeYUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS));
+         // Make sure that all other settings are loaded.
+         HashMap<String, String> changedSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
+         defaultSettings.put(KeYUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, KeYUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW);
+         assertEquals(defaultSettings, changedSettings);
       }
       finally {
          // Remove proof
@@ -322,18 +269,18 @@ public class SWTBotKeYUtilTest extends TestCase {
         // Load java project with one source directory
         KeYUtil.startProofAsync(chargeMehtod);
         TestUtilsUtil.keyStartSelectedProofInProofManagementDiaolog();
-        TestUtilsUtil.keyCheckProofs("JML operation contract [id: 1 / banking.PayCard::charge]", "JML operation contract [id: 1 / banking.PayCard::charge]");
+        TestUtilsUtil.keyCheckProofs(TestKeY4EclipseUtil.createOperationContractId("banking.PayCard", "charge(int)", "0", null), TestKeY4EclipseUtil.createOperationContractId("banking.PayCard", "charge(int)", "0", null));
         // Load second java project
         IJavaProject secondProject = TestUtilsUtil.createJavaProject("SWTBotKeYUtilTest_testStartProof_Java2");
         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/MCDemo", secondProject.getProject().getFolder("src"));
         IMethod incMethod = TestUtilsUtil.getJdtMethod(secondProject, "MCDemo", "inc", Signature.C_INT + "");
         KeYUtil.startProofAsync(incMethod);
         TestUtilsUtil.keyStartSelectedProofInProofManagementDiaolog();
-        TestUtilsUtil.keyCheckProofs("JML normal_behavior operation contract [id: 0 / MCDemo::inc]", "JML operation contract [id: 1 / banking.PayCard::charge]", "JML normal_behavior operation contract [id: 0 / MCDemo::inc]");
+        TestUtilsUtil.keyCheckProofs(TestKeY4EclipseUtil.createOperationContractId("MCDemo", "inc(int)", "0", "normal_behavior"), TestKeY4EclipseUtil.createOperationContractId("banking.PayCard", "charge(int)", "0", null), TestKeY4EclipseUtil.createOperationContractId("MCDemo", "inc(int)", "0", "normal_behavior"));
         // Open first project again to make sure that only the proof is selected again and no second proof environment is created
         KeYUtil.startProofAsync(chargeMehtod);
         TestUtilsUtil.keyGoToSelectedProofInProofManagementDiaolog();
-        TestUtilsUtil.keyCheckProofs("JML operation contract [id: 1 / banking.PayCard::charge]", "JML operation contract [id: 1 / banking.PayCard::charge]", "JML normal_behavior operation contract [id: 0 / MCDemo::inc]");
+        TestUtilsUtil.keyCheckProofs(TestKeY4EclipseUtil.createOperationContractId("banking.PayCard", "charge(int)", "0", null), TestKeY4EclipseUtil.createOperationContractId("banking.PayCard", "charge(int)", "0", null), TestKeY4EclipseUtil.createOperationContractId("MCDemo", "inc(int)", "0", "normal_behavior"));
         // Clear proof list
         KeYUtil.clearProofList(MainWindow.getInstance());
         TestCase.assertTrue(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
@@ -355,7 +302,7 @@ public class SWTBotKeYUtilTest extends TestCase {
         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/banking", javaProject.getProject().getFolder("src"));
         KeYUtil.loadAsync(javaProject.getProject());
         TestUtilsUtil.keyStartSelectedProofInProofManagementDiaolog();
-        TestUtilsUtil.keyCheckProofs("JML operation contract [id: 0 / banking.LoggingPayCard::charge]", "JML operation contract [id: 0 / banking.LoggingPayCard::charge]");
+        TestUtilsUtil.keyCheckProofs(TestKeY4EclipseUtil.createOperationContractId("banking.LoggingPayCard", "charge(int)", "0", null), TestKeY4EclipseUtil.createOperationContractId("banking.LoggingPayCard", "charge(int)", "0", null));
         assertNotNull(MainWindow.getInstance());
         assertFalse(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
         // Load second java project
@@ -363,7 +310,7 @@ public class SWTBotKeYUtilTest extends TestCase {
         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/MCDemo", secondProject.getProject().getFolder("src"));
         KeYUtil.loadAsync(secondProject.getProject());
         TestUtilsUtil.keyStartSelectedProofInProofManagementDiaolog();
-        TestUtilsUtil.keyCheckProofs("JML normal_behavior operation contract [id: 0 / MCDemo::inc]", "JML operation contract [id: 0 / banking.LoggingPayCard::charge]", "JML normal_behavior operation contract [id: 0 / MCDemo::inc]");
+        TestUtilsUtil.keyCheckProofs(TestKeY4EclipseUtil.createOperationContractId("MCDemo", "inc(int)", "0", "normal_behavior"), TestKeY4EclipseUtil.createOperationContractId("banking.LoggingPayCard", "charge(int)", "0", null), TestKeY4EclipseUtil.createOperationContractId("MCDemo", "inc(int)", "0", "normal_behavior"));
         assertNotNull(MainWindow.getInstance());
         assertFalse(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
         // Check first environment
@@ -402,7 +349,7 @@ public class SWTBotKeYUtilTest extends TestCase {
         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/banking", javaProject.getProject().getFolder("src"));
         KeYUtil.loadAsync(javaProject.getProject());
         TestUtilsUtil.keyStartSelectedProofInProofManagementDiaolog();
-        TestUtilsUtil.keyCheckProofs("JML operation contract [id: 0 / banking.LoggingPayCard::charge]", "JML operation contract [id: 0 / banking.LoggingPayCard::charge]");
+        TestUtilsUtil.keyCheckProofs(TestKeY4EclipseUtil.createOperationContractId("banking.LoggingPayCard", "charge(int)", "0", null), TestKeY4EclipseUtil.createOperationContractId("banking.LoggingPayCard", "charge(int)", "0", null));
         assertNotNull(MainWindow.getInstance());
         assertFalse(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
         // Load second java project
@@ -410,13 +357,13 @@ public class SWTBotKeYUtilTest extends TestCase {
         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/MCDemo", secondProject.getProject().getFolder("src"));
         KeYUtil.loadAsync(secondProject.getProject());
         TestUtilsUtil.keyStartSelectedProofInProofManagementDiaolog();
-        TestUtilsUtil.keyCheckProofs("JML normal_behavior operation contract [id: 0 / MCDemo::inc]", "JML operation contract [id: 0 / banking.LoggingPayCard::charge]", "JML normal_behavior operation contract [id: 0 / MCDemo::inc]");
+        TestUtilsUtil.keyCheckProofs(TestKeY4EclipseUtil.createOperationContractId("MCDemo", "inc(int)", "0", "normal_behavior"), TestKeY4EclipseUtil.createOperationContractId("banking.LoggingPayCard", "charge(int)", "0", null), TestKeY4EclipseUtil.createOperationContractId("MCDemo", "inc(int)", "0", "normal_behavior"));
         assertNotNull(MainWindow.getInstance());
         assertFalse(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
         // Remove first proof
         KeYUtil.removeFromProofList(MainWindow.getInstance(), TestUtilsUtil.keyGetProofEnv(0));
         TestCase.assertFalse(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
-        TestUtilsUtil.keyCheckProofs("JML normal_behavior operation contract [id: 0 / MCDemo::inc]", "JML normal_behavior operation contract [id: 0 / MCDemo::inc]");
+        TestUtilsUtil.keyCheckProofs(TestKeY4EclipseUtil.createOperationContractId("MCDemo", "inc(int)", "0", "normal_behavior"), TestKeY4EclipseUtil.createOperationContractId("MCDemo", "inc(int)", "0", "normal_behavior"));
         // Remove first proof again
         KeYUtil.removeFromProofList(MainWindow.getInstance(), TestUtilsUtil.keyGetProofEnv(0));
         TestCase.assertTrue(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
@@ -438,7 +385,7 @@ public class SWTBotKeYUtilTest extends TestCase {
         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/banking", javaProject.getProject().getFolder("src"));
         KeYUtil.loadAsync(javaProject.getProject());
         TestUtilsUtil.keyStartSelectedProofInProofManagementDiaolog();
-        TestUtilsUtil.keyCheckProofs("JML operation contract [id: 0 / banking.LoggingPayCard::charge]", "JML operation contract [id: 0 / banking.LoggingPayCard::charge]");
+        TestUtilsUtil.keyCheckProofs(TestKeY4EclipseUtil.createOperationContractId("banking.LoggingPayCard", "charge(int)", "0", null), TestKeY4EclipseUtil.createOperationContractId("banking.LoggingPayCard", "charge(int)", "0", null));
         assertNotNull(MainWindow.getInstance());
         assertFalse(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
         // Load second java project
@@ -446,7 +393,7 @@ public class SWTBotKeYUtilTest extends TestCase {
         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/MCDemo", secondProject.getProject().getFolder("src"));
         KeYUtil.loadAsync(secondProject.getProject());
         TestUtilsUtil.keyStartSelectedProofInProofManagementDiaolog();
-        TestUtilsUtil.keyCheckProofs("JML normal_behavior operation contract [id: 0 / MCDemo::inc]", "JML operation contract [id: 0 / banking.LoggingPayCard::charge]", "JML normal_behavior operation contract [id: 0 / MCDemo::inc]");
+        TestUtilsUtil.keyCheckProofs(TestKeY4EclipseUtil.createOperationContractId("MCDemo", "inc(int)", "0", "normal_behavior"), TestKeY4EclipseUtil.createOperationContractId("banking.LoggingPayCard", "charge(int)", "0", null), TestKeY4EclipseUtil.createOperationContractId("MCDemo", "inc(int)", "0", "normal_behavior"));
         assertNotNull(MainWindow.getInstance());
         assertFalse(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
         // Remove proof
@@ -470,7 +417,7 @@ public class SWTBotKeYUtilTest extends TestCase {
         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/banking", javaProject.getProject().getFolder("src"));
         KeYUtil.loadAsync(javaProject.getProject());
         TestUtilsUtil.keyStartSelectedProofInProofManagementDiaolog();
-        TestUtilsUtil.keyCheckProofs("JML operation contract [id: 0 / banking.LoggingPayCard::charge]", "JML operation contract [id: 0 / banking.LoggingPayCard::charge]");
+        TestUtilsUtil.keyCheckProofs(TestKeY4EclipseUtil.createOperationContractId("banking.LoggingPayCard", "charge(int)", "0", null), TestKeY4EclipseUtil.createOperationContractId("banking.LoggingPayCard", "charge(int)", "0", null));
         assertNotNull(MainWindow.getInstance());
         assertFalse(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
         // Remove proof
@@ -515,17 +462,17 @@ public class SWTBotKeYUtilTest extends TestCase {
         // Load java project with one source directory
         KeYUtil.loadAsync(javaProject.getProject());
         TestUtilsUtil.keyStartSelectedProofInProofManagementDiaolog();
-        TestUtilsUtil.keyCheckProofs("JML operation contract [id: 0 / banking.LoggingPayCard::charge]", "JML operation contract [id: 0 / banking.LoggingPayCard::charge]");
+        TestUtilsUtil.keyCheckProofs(TestKeY4EclipseUtil.createOperationContractId("banking.LoggingPayCard", "charge(int)", "0", null), TestKeY4EclipseUtil.createOperationContractId("banking.LoggingPayCard", "charge(int)", "0", null));
         // Load second java project
         IJavaProject secondProject = TestUtilsUtil.createJavaProject("SWTBotKeYUtilTest_testLoad_Java2");
         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/MCDemo", secondProject.getProject().getFolder("src"));
         KeYUtil.loadAsync(secondProject.getProject());
         TestUtilsUtil.keyStartSelectedProofInProofManagementDiaolog();
-        TestUtilsUtil.keyCheckProofs("JML normal_behavior operation contract [id: 0 / MCDemo::inc]", "JML operation contract [id: 0 / banking.LoggingPayCard::charge]", "JML normal_behavior operation contract [id: 0 / MCDemo::inc]");
+        TestUtilsUtil.keyCheckProofs(TestKeY4EclipseUtil.createOperationContractId("MCDemo", "inc(int)", "0", "normal_behavior"), TestKeY4EclipseUtil.createOperationContractId("banking.LoggingPayCard", "charge(int)", "0", null), TestKeY4EclipseUtil.createOperationContractId("MCDemo", "inc(int)", "0", "normal_behavior"));
         // Open first project again to make sure that only the proof is selected again and no second proof environment is created
         KeYUtil.loadAsync(javaProject.getProject());
         TestUtilsUtil.keyGoToSelectedProofInProofManagementDiaolog();
-        TestUtilsUtil.keyCheckProofs("JML operation contract [id: 0 / banking.LoggingPayCard::charge]", "JML operation contract [id: 0 / banking.LoggingPayCard::charge]", "JML normal_behavior operation contract [id: 0 / MCDemo::inc]");
+        TestUtilsUtil.keyCheckProofs(TestKeY4EclipseUtil.createOperationContractId("banking.LoggingPayCard", "charge(int)", "0", null), TestKeY4EclipseUtil.createOperationContractId("banking.LoggingPayCard", "charge(int)", "0", null), TestKeY4EclipseUtil.createOperationContractId("MCDemo", "inc(int)", "0", "normal_behavior"));
         // Clear proof list
         KeYUtil.clearProofList(MainWindow.getInstance());
         TestCase.assertTrue(KeYUtil.isProofListEmpty(MainWindow.getInstance()));

@@ -17,6 +17,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.junit.Test;
+import org.key_project.key4eclipse.test.util.TestKeY4EclipseUtil;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.test.util.TestUtilsUtil.MethodTreatment;
 
@@ -60,7 +61,7 @@ public class SWTBotKeyOperationContractTest extends TestCase {
                                    }
                                 },
                                 KeyConnection.PROOF_OBLIGATION_OPERATION_CONTRACT,
-                                "JML normal_behavior operation contract [id: 1 / MCDemo::init]",
+                                TestKeY4EclipseUtil.createOperationContractId("MCDemo", "init(int)", "0", "normal_behavior"),
                                 true,
                                 MethodTreatment.CONTRACTS,
                                 new IDSProvableReferenceSelector() {
@@ -74,10 +75,8 @@ public class SWTBotKeyOperationContractTest extends TestCase {
                                       TestCase.assertNotNull(dsInitMethod);
                                       IDSMethod dsIncMethod = dsClass.getMethod("inc(x : int)");
                                       TestCase.assertNotNull(dsIncMethod);
-                                      List<MemoryProvableReference> firstEvent = CollectionUtil.toList(new MemoryProvableReference(dsInitMethod, KeyProofReferenceUtil.METHOD_BODY_EXPAND));
-                                      result.add(firstEvent);
-                                      List<MemoryProvableReference> secondEvent = CollectionUtil.toList(new MemoryProvableReference(dsInitMethod, KeyProofReferenceUtil.METHOD_BODY_EXPAND), new MemoryProvableReference(dsIncMethod.getOperationContracts().get(0), KeyProofReferenceUtil.USE_OPERATION_CONTRACT));
-                                      result.add(secondEvent);
+                                      List<MemoryProvableReference> event = CollectionUtil.toList(new MemoryProvableReference(dsInitMethod, KeyProofReferenceUtil.METHOD_BODY_EXPAND), new MemoryProvableReference(dsIncMethod.getOperationContracts().get(0), KeyProofReferenceUtil.USE_OPERATION_CONTRACT));
+                                      result.add(event);
                                       return result;
                                    }
                                 },
@@ -105,7 +104,7 @@ public class SWTBotKeyOperationContractTest extends TestCase {
                                    }
                                 },
                                 KeyConnection.PROOF_OBLIGATION_OPERATION_CONTRACT,
-                                "JML normal_behavior operation contract [id: 1 / MCDemo::init]",
+                                TestKeY4EclipseUtil.createOperationContractId("MCDemo", "init(int)", "0", "normal_behavior"),
                                 true,
                                 MethodTreatment.EXPAND,
                                 new IDSProvableReferenceSelector() {
@@ -119,10 +118,8 @@ public class SWTBotKeyOperationContractTest extends TestCase {
                                       TestCase.assertNotNull(dsInitMethod);
                                       IDSMethod dsIncMethod = dsClass.getMethod("inc(x : int)");
                                       TestCase.assertNotNull(dsIncMethod);
-                                      List<MemoryProvableReference> firstEvent = CollectionUtil.toList(new MemoryProvableReference(dsInitMethod, KeyProofReferenceUtil.METHOD_BODY_EXPAND));
-                                      result.add(firstEvent);
-                                      List<MemoryProvableReference> secondEvent = CollectionUtil.toList(new MemoryProvableReference(dsInitMethod, KeyProofReferenceUtil.METHOD_BODY_EXPAND), new MemoryProvableReference(dsIncMethod, KeyProofReferenceUtil.METHOD_BODY_EXPAND));
-                                      result.add(secondEvent);
+                                      List<MemoryProvableReference> event = CollectionUtil.toList(new MemoryProvableReference(dsInitMethod, KeyProofReferenceUtil.METHOD_BODY_EXPAND), new MemoryProvableReference(dsIncMethod, KeyProofReferenceUtil.METHOD_BODY_EXPAND));
+                                      result.add(event);
                                       return result;
                                    }
                                 },
@@ -149,7 +146,7 @@ public class SWTBotKeyOperationContractTest extends TestCase {
                                    }
                                 },
                                 KeyConnection.PROOF_OBLIGATION_OPERATION_CONTRACT,
-                                "JML normal_behavior operation contract [id: 10 / paycard.PayCard::isValid]",
+                                TestKeY4EclipseUtil.createOperationContractId("paycard.PayCard", "isValid()", "0", "normal_behavior"),
                                 true,
                                 MethodTreatment.EXPAND,
                                 null,
@@ -176,7 +173,7 @@ public class SWTBotKeyOperationContractTest extends TestCase {
                                    }
                                 },
                                 KeyConnection.PROOF_OBLIGATION_OPERATION_CONTRACT,
-                                "JML normal_behavior operation contract [id: 10 / paycard.PayCard::isValid]",
+                                TestKeY4EclipseUtil.createOperationContractId("paycard.PayCard", "isValid()", "0", "normal_behavior"),
                                 true,
                                 MethodTreatment.EXPAND,
                                 null,

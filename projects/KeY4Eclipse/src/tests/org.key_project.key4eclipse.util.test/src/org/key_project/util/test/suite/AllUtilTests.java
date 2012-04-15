@@ -8,6 +8,7 @@ import org.key_project.util.test.testcase.ArrayUtilTest;
 import org.key_project.util.test.testcase.BeanTest;
 import org.key_project.util.test.testcase.BundleUtilTest;
 import org.key_project.util.test.testcase.CollectionUtilTest;
+import org.key_project.util.test.testcase.DefaultEntryTest;
 import org.key_project.util.test.testcase.IOUtilTest;
 import org.key_project.util.test.testcase.JDTUtilTest;
 import org.key_project.util.test.testcase.LoggerTest;
@@ -16,6 +17,7 @@ import org.key_project.util.test.testcase.ResourceUtilTest;
 import org.key_project.util.test.testcase.SWTUtilTest;
 import org.key_project.util.test.testcase.StringUtilTest;
 import org.key_project.util.test.testcase.WorkbenchUtilTest;
+import org.key_project.util.test.testcase.XMLUtilTest;
 
 /**
  * Run all contained JUnit 4 test cases.
@@ -30,6 +32,7 @@ import org.key_project.util.test.testcase.WorkbenchUtilTest;
     BeanTest.class,
     BundleUtilTest.class,
     CollectionUtilTest.class,
+    DefaultEntryTest.class,
     IOUtilTest.class,
     JDTUtilTest.class,
     LoggerTest.class,
@@ -37,7 +40,8 @@ import org.key_project.util.test.testcase.WorkbenchUtilTest;
     ResourceUtilTest.class,
     StringUtilTest.class,
     SWTUtilTest.class,
-    WorkbenchUtilTest.class
+    WorkbenchUtilTest.class,
+    XMLUtilTest.class
 })
 public class AllUtilTests {
 }

@@ -4,6 +4,7 @@ import java.io.CharArrayWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -13,6 +14,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
@@ -20,10 +23,13 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.widgets.Combo;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.junit.Test;
 import org.key_project.util.eclipse.swt.SWTUtil;
+import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.StringUtil;
 import org.key_project.util.test.util.ArrayObject;
@@ -34,6 +40,112 @@ import org.key_project.util.test.util.ArrayObjectLabelProvider;
  * @author Martin Hentschel
  */
 public class SWTUtilTest extends TestCase {
+    /**
+     * Tests {@link SWTUtil#createSelection(List)}
+     */
+    @Test
+    public void testCreateSelection_Object_List() {
+        // Test null and empty
+        assertSame(StructuredSelection.EMPTY, SWTUtil.createSelection((List<?>)null));
+        assertSame(StructuredSelection.EMPTY, SWTUtil.createSelection(Collections.EMPTY_LIST));
+        // Test array with one element
+        IStructuredSelection selection = SWTUtil.createSelection(Collections.singletonList("A"));
+        assertNotNull(selection);
+        Object[] content = selection.toArray();
+        assertEquals(1, content.length);
+        assertEquals("A", content[0]);
+        // Test array with two elements
+        selection = SWTUtil.createSelection(CollectionUtil.toList("A", "B"));
+        assertNotNull(selection);
+        content = selection.toArray();
+        assertEquals(2, content.length);
+        assertEquals("A", content[0]);
+        assertEquals("B", content[1]);
+    }
+   
+    /**
+     * Tests {@link SWTUtil#createSelection(Object[])}
+     */
+    @Test
+    public void testCreateSelection_Object_Array() {
+        // Test null and empty
+        assertSame(StructuredSelection.EMPTY, SWTUtil.createSelection((Object[])null));
+        assertSame(StructuredSelection.EMPTY, SWTUtil.createSelection(new String[0]));
+        // Test array with one element
+        IStructuredSelection selection = SWTUtil.createSelection(new String[] {"A"});
+        assertNotNull(selection);
+        Object[] content = selection.toArray();
+        assertEquals(1, content.length);
+        assertEquals("A", content[0]);
+        // Test array with two elements
+        selection = SWTUtil.createSelection(new String[] {"A", "B"});
+        assertNotNull(selection);
+        content = selection.toArray();
+        assertEquals(2, content.length);
+        assertEquals("A", content[0]);
+        assertEquals("B", content[1]);
+    }
+   
+    /**
+     * Tests {@link SWTUtil#createSelection(Object)}
+     */
+    @Test
+    public void testCreateSelection_Object() {
+        assertSame(StructuredSelection.EMPTY, SWTUtil.createSelection((Object)null));
+        IStructuredSelection selection = SWTUtil.createSelection("A");
+        assertNotNull(selection);
+        Object[] content = selection.toArray();
+        assertEquals(1, content.length);
+        assertEquals("A", content[0]);
+    }
+   
+    /**
+     * Tests {@link SWTUtil#toArray(org.eclipse.jface.viewers.ISelection)}
+     */
+    @Test
+    public void testToArray_ISelection() {
+        Object[] result = SWTUtil.toArray(null);
+        assertNotNull(result);
+        assertEquals(0, result.length);
+        result = SWTUtil.toArray(StructuredSelection.EMPTY);
+        assertNotNull(result);
+        assertEquals(0, result.length);
+        result = SWTUtil.toArray(SWTUtil.createSelection("A"));
+        assertNotNull(result);
+        assertEquals(1, result.length);
+        assertEquals("A", result[0]);
+        result = SWTUtil.toArray(SWTUtil.createSelection(new String[] {"A", "B"}));
+        assertNotNull(result);
+        assertEquals(2, result.length);
+        assertEquals("A", result[0]);
+        assertEquals("B", result[1]);
+    }
+   
+    /**
+     * Tests {@link SWTUtil#add(Combo, String))}
+     */
+    @Test
+    public void testAdd() {
+        // Create UI
+        Shell shell = new Shell();
+        Combo combo = new Combo(shell, SWT.READ_ONLY);
+        // Set "A"
+        SWTUtil.add(combo, "A");
+        assertEquals("A", combo.getItem(combo.getItemCount() - 1));
+        // Set "B"
+        SWTUtil.add(combo, "B");
+        assertEquals("B", combo.getItem(combo.getItemCount() - 1));
+        // Set ""
+        SWTUtil.add(combo, "");
+        assertEquals("", combo.getItem(combo.getItemCount() - 1));
+        // Set "C"
+        SWTUtil.add(combo, "C");
+        assertEquals("C", combo.getItem(combo.getItemCount() - 1));
+        // Set null
+        SWTUtil.add(combo, null);
+        assertEquals("", combo.getItem(combo.getItemCount() - 1));
+    }
+   
     /**
      * Tests {@link SWTUtil#csvExport(org.eclipse.swt.widgets.Table)},
      * {@link SWTUtil#csvExport(org.eclipse.swt.widgets.Table, java.io.File)} and
@@ -244,7 +356,7 @@ public class SWTUtilTest extends TestCase {
      * Tests {@link SWTUtil#setText(org.eclipse.swt.widgets.Text, String)}
      */
     @Test
-    public void testSetText() {
+    public void testSetText_Text() {
         // Create UI
         Shell shell = new Shell();
         Text text = new Text(shell, SWT.BORDER);
@@ -263,5 +375,30 @@ public class SWTUtilTest extends TestCase {
         // Set null
         SWTUtil.setText(text, null);
         assertEquals("", text.getText());
+    }
+    
+    /**
+     * Tests {@link SWTUtil#setText(org.eclipse.swt.widgets.Label, String)}
+     */
+    @Test
+    public void testSetText_Label() {
+        // Create UI
+        Shell shell = new Shell();
+        Label label = new Label(shell, SWT.BORDER);
+        // Set "A"
+        SWTUtil.setText(label, "A");
+        assertEquals("A", label.getText());
+        // Set "B"
+        SWTUtil.setText(label, "B");
+        assertEquals("B", label.getText());
+        // Set ""
+        SWTUtil.setText(label, "");
+        assertEquals("", label.getText());
+        // Set "C"
+        SWTUtil.setText(label, "C");
+        assertEquals("C", label.getText());
+        // Set null
+        SWTUtil.setText(label, null);
+        assertEquals("", label.getText());
     }
 }

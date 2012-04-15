@@ -51,7 +51,7 @@ public class KeYSourcePathComputerDelegateTest extends TestCase {
       try {
          // Create test project
          IJavaProject project = TestUtilsUtil.createJavaProject("KeYSourcePathComputerDelegateTest_testConfigurationWithKeYSpecificClassPathEntries");
-         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/statements", project.getProject().getFolder("src"));
+         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/statements/test", project.getProject().getFolder("src"));
          // Get method
          IMethod method = TestUtilsUtil.getJdtMethod(project, "FlatSteps", "doSomething", "I", "QString;", "Z");
          // Create configuration
@@ -101,7 +101,7 @@ public class KeYSourcePathComputerDelegateTest extends TestCase {
       try {
          // Create test project
          IJavaProject project = TestUtilsUtil.createJavaProject("KeYSourcePathComputerDelegateTest_testConfigurationWithKeYSpecificProperties");
-         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/statements", project.getProject().getFolder("src"));
+         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/statements/test", project.getProject().getFolder("src"));
          // Get method
          IMethod method = TestUtilsUtil.getJdtMethod(project, "FlatSteps", "doSomething", "I", "QString;", "Z");
          // Create configuration
@@ -171,7 +171,7 @@ public class KeYSourcePathComputerDelegateTest extends TestCase {
    public void testConfigurationWithoutKeYSpecificProperties() throws CoreException, InterruptedException {
       // Create test project
       IJavaProject project = TestUtilsUtil.createJavaProject("KeYSourcePathComputerDelegateTest_testConfigurationWithoutKeYSpecificProperties");
-      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/statements", project.getProject().getFolder("src"));
+      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/statements/test", project.getProject().getFolder("src"));
       // Get method
       IMethod method = TestUtilsUtil.getJdtMethod(project, "FlatSteps", "doSomething", "I", "QString;", "Z");
       // Create configuration

@@ -27,7 +27,15 @@ public abstract class AbstractSEDThread extends AbstractSEDDebugNode implements 
     * @param target The {@link ISEDDebugTarget} in that this thread is contained.
     */
    public AbstractSEDThread(ISEDDebugTarget target) {
-      super(target, null);
+      super(target, null, null);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDThread getThread() {
+      return this;
    }
 
    /**
@@ -210,5 +218,26 @@ public abstract class AbstractSEDThread extends AbstractSEDDebugNode implements 
    @Override
    public void terminate() throws DebugException {
       getDebugTarget().terminate();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String toString() {
+      try {
+         return getName();
+      }
+      catch (DebugException e) {
+         return e.getMessage();
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getNodeType() {
+      return "Thread";
    }
 }

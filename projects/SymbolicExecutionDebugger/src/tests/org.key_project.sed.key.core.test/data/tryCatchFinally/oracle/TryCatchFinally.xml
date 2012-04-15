@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget xml:id="_3a95358d-c8c1-4088-856d-27fb04c227b5" name="TryCatchFinally[TryCatchFinally::tryCatchFinally(int)].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_b13d320b-56ea-4ac3-8f23-592c92f1ef15" name="KeY Default Thread">
+         <sedMethodCall xml:id="_2814f4fe-54bf-4383-87e0-d7c32fe6e09d" name="self.tryCatchFinally(_input);" lineNumber="-1" charStart="97" charEnd="112">
+            <sedStatement xml:id="_52c73784-37cd-4a9e-a19e-3663f0e850c2" name="int result = 0;" lineNumber="-1" charStart="129" charEnd="144">
+               <sedStatement xml:id="_c3320be3-4220-4148-a26e-c4e7c4a99a5d" name="result_1=1/_input;" lineNumber="-1" charStart="158" charEnd="177">
+                  <sedBranchCondition xml:id="_89a61e80-81a3-437f-99cd-fac28143ee6e" name="input = 0 TRUE">
+                     <sedBranchCondition xml:id="_62603c52-65d8-4acc-ba88-8f4a08daad95" name="Normal Execution (a_1 != null)">
+                        <sedBranchCondition xml:id="_8d923174-3750-4693-a6d6-9deca5310506" name="if a instanceof ArithmeticException true">
+                           <sedBranchCondition xml:id="_1f763cf3-9413-4378-9915-f25ab0738c88" name="Normal Execution (a instanceof ArithmeticException)">
+                              <sedStatement xml:id="_caaaf780-9f44-45d0-98e8-b1e66885225c" name="result_1=2;" lineNumber="-1" charStart="222" charEnd="233">
+                                 <sedStatement xml:id="_b74ac1f6-8ea0-4921-ac22-3785d026ed0f" name="result_1=result_1*2;" lineNumber="-1" charStart="256" charEnd="276">
+                                    <sedStatement xml:id="_193e795d-7c42-4a43-a8b8-3b998eb667e3" name="return result_1;" lineNumber="-1" charStart="285" charEnd="299">
+                                       <sedMethodReturn xml:id="_5669d7a0-ed72-49d0-9296-9c5d9b663cf5" name="&lt;return of self.tryCatchFinally(_input);&gt;" lineNumber="-1" charStart="97" charEnd="112">
+                                          <sedTermination xml:id="_03d00036-5180-41f1-95be-24fec536e7f4" name="&lt;end&gt;">
+                                          </sedTermination>
+                                       </sedMethodReturn>
+                                    </sedStatement>
+                                 </sedStatement>
+                              </sedStatement>
+                           </sedBranchCondition>
+                        </sedBranchCondition>
+                     </sedBranchCondition>
+                  </sedBranchCondition>
+                  <sedBranchCondition xml:id="_04f4dae2-f757-4339-a910-27f22f33d329" name="input = 0 FALSE">
+                     <sedStatement xml:id="_8f2a209f-6ce5-4df5-8ded-6c07ab278aee" name="result_1=result_1*2;" lineNumber="-1" charStart="256" charEnd="276">
+                        <sedStatement xml:id="_2c42344f-2c2f-41e5-8a5b-2deb425e3005" name="return result_1;" lineNumber="-1" charStart="285" charEnd="299">
+                           <sedMethodReturn xml:id="_81c6ce29-e4ad-4a4b-a825-6b599cfee9a6" name="&lt;return of self.tryCatchFinally(_input);&gt;" lineNumber="-1" charStart="97" charEnd="112">
+                              <sedTermination xml:id="_ef35e435-960e-405d-8c92-0c48f003e054" name="&lt;end&gt;">
+                              </sedTermination>
+                           </sedMethodReturn>
+                        </sedStatement>
+                     </sedStatement>
+                  </sedBranchCondition>
+               </sedStatement>
+            </sedStatement>
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>

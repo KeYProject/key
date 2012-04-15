@@ -16,6 +16,26 @@ public final class ArrayUtil {
    }
    
    /**
+    * Searches an element in the given {@link Iterable} instance.
+    * @param array The instance to search in.
+    * @param filter The filter to select an element.
+    * @return The found element or {@code null} if no element was found.
+    */
+   public static <T> T search(T[] array, IFilter<T> filter) {
+      T result = null;
+      if (array != null && filter != null) {
+         int i = 0;
+         while (result == null && i < array.length) {
+            if (filter.select(array[i])) {
+               result = array[i];
+            }
+            i++;
+         }
+      }
+      return result;
+   }   
+   
+   /**
     * <p>
     * Adds the given elements to the existing array. The result is a new
     * array that contains the other elements in the end.
@@ -68,7 +88,7 @@ public final class ArrayUtil {
     * thrown.
     * </p>
     * @param array The array to extend.
-    * @param toAddT The element to add.
+    * @param toAdd The element to add.
     * @return The new created array with one more element.
     * @throws IllegalArgumentException Both parameters are {@code null}.
     */
@@ -89,6 +109,27 @@ public final class ArrayUtil {
            else {
                throw new IllegalArgumentException("Can not create an array if both paramters are null.");
            }
+       }
+   }
+   
+   /**
+    * <p>
+    * Adds the given element to the existing array. The result is a new
+    * array that contains one more element.
+    * </p>
+    * @param array The array to extend.
+    * @param toAdd The element to add.
+    * @return The new created array with one more element.
+    */
+   public static int[] add(int[] array, int toAdd) {
+       if (array != null) {
+           int[] result = new int[array.length + 1];
+           System.arraycopy(array, 0, result, 0, array.length);
+           result[array.length] = toAdd;
+           return result;
+       }
+       else {
+           return new int[] {toAdd};
        }
    }
 
@@ -114,22 +155,47 @@ public final class ArrayUtil {
     * @throws IllegalArgumentException If the comparator is {@code null}.
     */
    public static <T> boolean contains(T[] array, T toSearch, Comparator<T> comparator) {
-      boolean contains = false;
+      return indexOf(array, toSearch, comparator) >= 0;
+   }
+
+   /**
+    * Returns the first index in the given array that contains the
+    * element to search.
+    * @param array The array to search in.
+    * @param toSearch The element to search.
+    * @return The first index in the array that contains the element to search or {@code -1} if the elment is not containd in the array.
+    */
+   public static <T> int indexOf(T[] array, T toSearch) {
+      return indexOf(array, toSearch, ObjectUtil.createEqualsComparator());
+   }
+   
+   /**
+    * Returns the first index in the given array that contains the
+    * element to search. The equality is
+    * computed via the comparator. Objects are equal if the comparison result is {@code 0}.
+    * @param array The array to search in.
+    * @param toSearch The element to search.
+    * @param comparator the {@link Comparator} to use.
+    * @return The first index in the array that contains the element to search or {@code -1} if the elment is not containd in the array.
+    * @throws IllegalArgumentException If the comparator is {@code null}.
+    */
+   public static <T> int indexOf(T[] array, T toSearch, Comparator<T> comparator) {
+      int index = -1;
       if (array != null) {
          if (comparator == null) {
             throw new IllegalArgumentException("Comparator is null.");
          }
          else {
             int i = 0;
-            while (i < array.length && !contains) {
+            while (i < array.length && index < 0) {
                if (comparator.compare(array[i], toSearch) == 0) {
-                  contains = true;
+                  index = i;
                }
                i++;
             }
          }
       }
-      return contains;
+      return index;
    }
 
    /**
@@ -199,6 +265,38 @@ public final class ArrayUtil {
        if (array != null) {
            boolean afterFirst = false;
            for (T element : array) {
+               if (afterFirst) {
+                   sb.append(separator);
+               }
+               else {
+                   afterFirst = true;
+               }
+               sb.append(ObjectUtil.toString(element));
+           }
+       }
+       return sb.toString();
+   }
+
+   /**
+    * Converts the given array into a {@link String}.
+    * @param array The array to convert.
+    * @return The array as {@link String}.
+    */
+   public static String toString(int[] array) {
+       return toString(array, ", ");
+   }
+   
+   /**
+    * Converts the given array into a {@link String}.
+    * @param array The array to convert.
+    * @param separator The separator between to array elements.
+    * @return The array as {@link String}.
+    */
+   public static String toString(int[] array, String separator) {
+       StringBuffer sb = new StringBuffer();
+       if (array != null) {
+           boolean afterFirst = false;
+           for (int element : array) {
                if (afterFirst) {
                    sb.append(separator);
                }
