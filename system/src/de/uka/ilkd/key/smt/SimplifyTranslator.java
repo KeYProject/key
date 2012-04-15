@@ -19,9 +19,7 @@ import de.uka.ilkd.key.logic.Sequent;
 
 
 public class SimplifyTranslator extends AbstractSMTTranslator {
-    
-//  counter used for making names unique
-    private int counter = 0;
+
 
     private static StringBuffer INTSTRING = new StringBuffer("int");
 

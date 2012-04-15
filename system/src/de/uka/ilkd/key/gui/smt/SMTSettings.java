@@ -28,8 +28,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.Taclet;
 
 
-import de.uka.ilkd.key.smt.SolverType;
-
 
 import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets;
 

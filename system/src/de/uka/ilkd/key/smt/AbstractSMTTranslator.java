@@ -12,7 +12,6 @@ package de.uka.ilkd.key.smt;
 
 
 import java.util.*;
-import java.util.Map.Entry;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;

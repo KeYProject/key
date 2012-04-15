@@ -20,8 +20,6 @@ import de.uka.ilkd.key.util.Debug;
 public class SmtLibTranslator extends AbstractSMTTranslator {
 
 
-    // counter used for making names unique
-    private int counter = 0;
 
     private static StringBuffer INTSTRING = new StringBuffer("Int");
 

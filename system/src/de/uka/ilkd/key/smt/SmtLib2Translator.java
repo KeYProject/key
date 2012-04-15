@@ -20,10 +20,6 @@ import de.uka.ilkd.key.logic.sort.Sort;
 public class SmtLib2Translator extends AbstractSMTTranslator {
 
 
-
-	// counter used for making names unique
-    private int counter = 0;
-
     private static StringBuffer INTSTRING = new StringBuffer("Int");
     
     private static final StringBuffer BOOL = new StringBuffer("Bool");
