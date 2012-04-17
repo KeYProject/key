@@ -13,6 +13,22 @@ import org.key_project.util.java.StringUtil;
  */
 public class StringUtilTest extends TestCase {
    /**
+    * Tests {@link StringUtil#contains(String, CharSequence)}
+    */
+   @Test
+   public void testContains() {
+      assertFalse(StringUtil.contains(null, "A"));
+      assertFalse(StringUtil.contains("A", null));
+      assertFalse(StringUtil.contains("A", "B"));
+      assertTrue(StringUtil.contains("A", "A"));
+      assertTrue(StringUtil.contains("A", ""));
+      assertFalse(StringUtil.contains("", "A"));
+      assertTrue(StringUtil.contains("Hello", "He"));
+      assertTrue(StringUtil.contains("Hello", "ell"));
+      assertTrue(StringUtil.contains("Hello", "ello"));
+   }
+   
+   /**
     * Tests {@link StringUtil#createLine(String, int)}
     */
    @Test

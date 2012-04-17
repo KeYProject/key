@@ -96,4 +96,19 @@ public final class StringUtil {
       }
       return sb.toString();
    }
+
+   /**
+    * <p>
+    * Checks if the given string contains the substring.
+    * </p>
+    * <p>
+    * <b>Attention:</b> The empty string is contained in every string. 
+    * </p>
+    * @param string The string that should contain the substring.
+    * @param substring The substring to check.
+    * @return {@code true} strings are not {@code null} and the string contains the substring, {@code false} if at least one string is {@code null} or the string does not contain the substring.
+    */
+   public static boolean contains(String string, CharSequence substring) {
+      return string != null && substring != null ? string.contains(substring) : false;
+   }
 }
