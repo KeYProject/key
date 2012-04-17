@@ -22,10 +22,9 @@ import de.hentschel.visualdbc.datasource.model.IDSProvableReference;
 import de.hentschel.visualdbc.datasource.model.memory.MemoryProvableReference;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.rule.PosTacletApp;
+import de.uka.ilkd.key.proof.NodeInfo;
 
 /**
  * Implementation of {@link IRuleAnalyst} for rule: methodBodyExpand
@@ -33,16 +32,13 @@ import de.uka.ilkd.key.rule.PosTacletApp;
  */
 public class MethodBodyExpandRuleAnalyst implements IRuleAnalyst {
    /**
-    * The name of the schema variable that is used in proof step "methodBodyExpand".
-    */
-   public static final String METHOD_BODY_EXPAND_SCHEMA_VARIABLE_NAME = "#mb";
-
-   /**
     * {@inheritDoc}
     */
    @Override
    public boolean canHandle(KeyConnection connection, Services services, Node node) {
-      return node != null && node.getNodeInfo() != null && node.getNodeInfo().getActiveStatement() instanceof MethodBodyStatement;
+      return node != null && 
+             node.getNodeInfo() != null && 
+             node.getNodeInfo().getActiveStatement() instanceof MethodBodyStatement;
    }
 
    /**
@@ -51,13 +47,12 @@ public class MethodBodyExpandRuleAnalyst implements IRuleAnalyst {
    @Override
    public List<IDSProvableReference> getReferences(KeyConnection connection, Services services, Node node) {
       List<IDSProvableReference> result = new LinkedList<IDSProvableReference>();
-      // Get applied rule
-      Assert.isTrue(node.getAppliedRuleApp() instanceof PosTacletApp);
-      PosTacletApp appliedRule = (PosTacletApp)node.getAppliedRuleApp();
-      // Get value
-      Object value = appliedRule.instantiations().lookupValue(new Name(METHOD_BODY_EXPAND_SCHEMA_VARIABLE_NAME));
-      Assert.isTrue(value instanceof MethodBodyStatement);
-      MethodBodyStatement mbs = (MethodBodyStatement)value;
+      // Get node info
+      NodeInfo info = node.getNodeInfo();
+      Assert.isNotNull(info);
+      // Get active statement
+      Assert.isTrue(info.getActiveStatement() instanceof MethodBodyStatement);
+      MethodBodyStatement mbs = (MethodBodyStatement)info.getActiveStatement();
       // Get referenced program method.
       ProgramMethod pm = mbs.getProgramMethod(services);
       // Get data source instance
