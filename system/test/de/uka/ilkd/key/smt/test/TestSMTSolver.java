@@ -99,6 +99,11 @@ public long getMinimumInteger() {
         return ProofDependentSMTSettings.getDefaultSettingsData().minInteger;
 }
 
+@Override
+public String getLogic() {
+	return "AUFLIA";
+}
+
     
 }
 
@@ -260,7 +265,7 @@ public abstract class TestSMTSolver extends TestCommons {
 	if (isValid && result != null) {
 	    return result.isValid() != SMTSolverResult.ThreeValuedTruth.FALSIFIABLE; 
 	} else {
-	    return result.isValid() != SMTSolverResult.ThreeValuedTruth.TRUE;
+	    return result.isValid() != SMTSolverResult.ThreeValuedTruth.VALID;
 	}
     }
     

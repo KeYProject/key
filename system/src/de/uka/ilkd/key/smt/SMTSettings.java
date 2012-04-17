@@ -84,6 +84,11 @@ public interface SMTSettings {
      */
     public boolean useAssumptionsForBigSmallIntegers();
     
+    /**
+     * @return Returns the logic used by solvers using SMT-Lib-Format
+     */
+    public String getLogic();
+    
     public long getMaximumInteger();
     
     public long getMinimumInteger();

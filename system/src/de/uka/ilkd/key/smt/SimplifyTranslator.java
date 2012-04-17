@@ -19,9 +19,7 @@ import de.uka.ilkd.key.logic.Sequent;
 
 
 public class SimplifyTranslator extends AbstractSMTTranslator {
-    
-//  counter used for making names unique
-    private int counter = 0;
+
 
     private static StringBuffer INTSTRING = new StringBuffer("int");
 
@@ -89,13 +87,13 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
 	    ArrayList<ContextualBlock> predicateBlocks,
 	    ArrayList<StringBuffer> types, SortHierarchy sortHierarchy,
 	    SMTSettings settings) {
-	
+
 	StringBuffer toReturn = new StringBuffer();
 	
 	String [] commentPredicate = new String[2];
 	commentPredicate[ContextualBlock.PREDICATE_FORMULA] = "\n;Predicates used in formula:\n";
 	commentPredicate[ContextualBlock.PREDICATE_TYPE]    = "\n;Types expressed by predicates:\n";
-	String [] commentAssumption = new String[8];
+	String [] commentAssumption = new String[9];
 	commentAssumption[ContextualBlock.ASSUMPTION_DUMMY_IMPLEMENTATION] = "\n\n;Assumptions for dummy variables:\n";
 	commentAssumption[ContextualBlock.ASSUMPTION_FUNCTION_DEFINTION] = "\n\n;Assumptions for function definitions:\n"; 
 	commentAssumption[ContextualBlock.ASSUMPTION_SORT_PREDICATES] = "\n\n;Assumptions for sort predicates:\n";
@@ -104,6 +102,8 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
 	commentAssumption[ContextualBlock.ASSUMPTION_DISTINCT]= "\n\n;Assumptions for uniqueness of functions:\n";
 	commentAssumption[ContextualBlock.ASSUMPTION_INTEGER]= "\n\n;Assumptions for very small and very big integers:\n";
 	commentAssumption[ContextualBlock.ASSUMPTION_MULTIPLICATION]= "\n\n;Assumptions for uninterpreted multiplication:\n";
+	commentAssumption[ContextualBlock.ASSUMPTION_SORTS_NOT_EMPTY]= "\n\n;Assumptions for sorts (There is at least one object of every sort.):\n";
+	
 	
 	
 	StringBuffer comment = new StringBuffer("\n\n;The formula:\n");
@@ -150,7 +150,7 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
 	
 	toReturn.append(preds);
 	toReturn.append("\n");
-	
+
 	ArrayList<StringBuffer> AssumptionsToRemove = new ArrayList<StringBuffer>();
         StringBuffer assump = new StringBuffer();
 	
@@ -218,7 +218,8 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
 	/* End of adding part */
 	
 	toReturn.append(formula);
-	
+	//toReturn.append("\n\n\"");
+	//toReturn.append("\n\04");
 	return toReturn;
     }
 
@@ -485,61 +486,6 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
 	    toReturn.append(")");
 	return toReturn;
     }
-    
-    private StringBuffer removeIllegalChars(StringBuffer template, ArrayList<String> toReplace, ArrayList<String> replacement) {
-	//replace one String
-	for (int i = 0; i < toReplace.size(); i++) {
-	    String toRep = toReplace.get(i);
-	    String replace = replacement.get(i);
-	    int index = template.indexOf(toRep);
-	    while (index >= 0) {
-		template.replace(index, index + toRep.length(), replace);
-		index = template.indexOf(toRep);
-	    }
-	}
-	
-	return template;
-    }
-    
-    private StringBuffer makeUnique(StringBuffer name) {
-	StringBuffer toReturn = new StringBuffer(name);
-	
-	//build the replacement pairs
-	ArrayList<String> toReplace = new ArrayList<String>();
-	ArrayList<String> replacement = new ArrayList<String>();
-	
-	toReplace.add("[]");
-	replacement.add("_Array");
-	
-	toReplace.add("<");
-	replacement.add("_abo_");
-	
-	toReplace.add(">");
-	replacement.add("_abc_");
-	
-	toReplace.add("{");
-	replacement.add("_cbo_");
-	
-	toReplace.add("}");
-	replacement.add("_cbc_");
-	
-	toReplace.add(".");
-	replacement.add("_dot_");
-	
-	toReplace.add(":");
-	replacement.add("_col_");
-	
-	toReplace.add("\\");
-	replacement.add("_");
-	
-	toReplace.add("$");
-	replacement.add("");
-	
-	toReturn = this.removeIllegalChars(toReturn, toReplace, replacement);
-	
-	toReturn.append("_").append(counter);
-	counter++;
-	return toReturn;
-    }
+
     
 }

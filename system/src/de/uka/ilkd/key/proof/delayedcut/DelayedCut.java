@@ -25,7 +25,7 @@ public class DelayedCut {
         private final Term decisionPredicate;
         private final RuleApp firstAppliedRuleApp;
         private NoPosTacletApp hideApp = null;
-        private ImmutableList<Goal> goalsAfterUncovering = null;
+        private ImmutableList<NodeGoalPair> goalsAfterUncovering = null;
         private Goal                remainingGoal = null;
         
        
@@ -71,7 +71,7 @@ public class DelayedCut {
         }
         
         void setGoalsAfterUncovering(
-                ImmutableList<Goal> goalsAfterUncovering) {
+                ImmutableList<NodeGoalPair> goalsAfterUncovering) {
             if(this.goalsAfterUncovering != null){
                 throw new IllegalArgumentException("There already exists a list of goals.");
             }
@@ -86,7 +86,7 @@ public class DelayedCut {
             return remainingGoal;
         }
         
-        public ImmutableList<Goal> getGoalsAfterUncovering() {
+        public ImmutableList<NodeGoalPair> getGoalsAfterUncovering() {
             return goalsAfterUncovering;
         }
         

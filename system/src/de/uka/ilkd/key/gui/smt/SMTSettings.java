@@ -28,8 +28,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.Taclet;
 
 
-import de.uka.ilkd.key.smt.SolverType;
-
 
 import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets;
 
@@ -195,6 +193,11 @@ public class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings{
         public long getMinimumInteger() {
                 return pdSettings.minInteger;
         }
+
+		@Override
+		public String getLogic() {
+			return "AUFLIA";
+		}
 
         
 

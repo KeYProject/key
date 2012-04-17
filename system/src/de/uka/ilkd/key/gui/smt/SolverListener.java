@@ -188,7 +188,7 @@ public class SolverListener implements SolverLauncherListener {
 
         private void applyResults() {
                 for (SMTProblem problem : smtProblems) {
-                        if (problem.getFinalResult().isValid() == ThreeValuedTruth.TRUE) {
+                        if (problem.getFinalResult().isValid() == ThreeValuedTruth.VALID) {
                                 problem
                                                 .getGoal()
                                                 .apply(
@@ -417,7 +417,7 @@ public class SolverListener implements SolverLauncherListener {
     
                 if (problem.solver.wasInterrupted()) {
                         interrupted(problem);
-                } else if (problem.solver.getFinalResult().isValid() == ThreeValuedTruth.TRUE) {
+                } else if (problem.solver.getFinalResult().isValid() == ThreeValuedTruth.VALID) {
         
                         successfullyStopped(problem,x,y);
                 } else if (problem.solver.getFinalResult().isValid() == ThreeValuedTruth.FALSIFIABLE) {

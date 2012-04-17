@@ -126,7 +126,7 @@ public class DelayedCutProcessor implements Runnable {
          result = hide(delayedCut,hide);
                   
          // rebuild the tree that has been pruned before.
-         List<Goal> openLeaves = rebuildSubTrees(delayedCut, result.head());
+         List<NodeGoalPair> openLeaves = rebuildSubTrees(delayedCut, result.head());
      
          // uncover the decision predicate.
          uncoverDecisionPredicate(delayedCut, openLeaves);
@@ -242,23 +242,12 @@ public class DelayedCutProcessor implements Runnable {
         
     }
     
-    private static class NodeGoalPair{
-        final Node node; 
-        final Goal goal;
-        public NodeGoalPair(Node node, Goal goal) {
-            super();
-            this.node = node;
-            this.goal = goal;
-        }
-        
-    }
-    
     /**
      * Rebuilds the subtree pruned by the process, that is the rules are replayed. 
      *  */
-    private List<Goal> rebuildSubTrees(DelayedCut cut, Goal goal){
+    private List<NodeGoalPair> rebuildSubTrees(DelayedCut cut, Goal goal){
         LinkedList<NodeGoalPair> pairs = new LinkedList<NodeGoalPair>();
-        LinkedList<Goal>  openLeaves = new LinkedList<Goal>();
+        LinkedList<NodeGoalPair>  openLeaves = new LinkedList<NodeGoalPair>();
  
         add(pairs,openLeaves,cut.getSubtrees().iterator(),
         		  apply(cut.getNode(),goal,cut.getFirstAppliedRuleApp(),cut.getServices()));
@@ -437,7 +426,7 @@ public class DelayedCutProcessor implements Runnable {
      * Return by reference: both <code>pairs</code> and <code>openLeaves</code> are manipulated. 
      *     */
     private int add(LinkedList<NodeGoalPair> pairs,
-                     LinkedList<Goal> openLeaves, 
+                     LinkedList<NodeGoalPair> openLeaves, 
                      Iterator<Node> iterator, LinkedList<Goal> goals){
         
         int leafNumber = 0;
@@ -452,7 +441,7 @@ public class DelayedCutProcessor implements Runnable {
                 pairs.add(new NodeGoalPair(child,matchedGoal));
             }else{
                 if(!matchedGoal.node().isClosed()){
-                    openLeaves.add(matchedGoal);
+                    openLeaves.add(new NodeGoalPair(child,matchedGoal));
                 }          
                 leafNumber++;
             }
@@ -464,10 +453,10 @@ public class DelayedCutProcessor implements Runnable {
     /**
      * This function uncovers the decision predicate that is hidden after applying the cut rule. 
      */
-    private void uncoverDecisionPredicate(DelayedCut cut, List<Goal> openLeaves){
-        ImmutableList<Goal> list = ImmutableSLList.<Goal>nil();
-        for(Goal goal : openLeaves){
-            list = list.append(goal.apply(cut.getHideApp()));
+    private void uncoverDecisionPredicate(DelayedCut cut, List<NodeGoalPair> openLeaves){
+        ImmutableList<NodeGoalPair> list = ImmutableSLList.<NodeGoalPair>nil();
+        for(NodeGoalPair pair : openLeaves){
+            list = list.append(new NodeGoalPair(pair.node,pair.goal.apply(cut.getHideApp()).head()));
         }
         cut.setGoalsAfterUncovering(list);
     }
