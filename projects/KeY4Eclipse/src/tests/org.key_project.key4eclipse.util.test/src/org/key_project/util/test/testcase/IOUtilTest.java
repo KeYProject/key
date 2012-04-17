@@ -1,11 +1,14 @@
 package org.key_project.util.test.testcase;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.CharArrayWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -14,6 +17,7 @@ import junit.framework.TestCase;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Path;
 import org.junit.Test;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.eclipse.ResourceUtil;
@@ -124,14 +128,62 @@ public class IOUtilTest extends TestCase {
       // Create test files
       IProject project = TestUtilsUtil.createProject("IOUtilTest_testComputeLineStartIndices_File"); 
       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/lineIndicesTest", project);
+      IFile file = project.getFile("Text.txt");
       // Test null
       assertLineInformation((IFile)null);
       // Test unix file
-      assertLineInformation(project.getFile("Text_Unix.txt"), 0, 1, 2, 9, 16, 17, 24, 50, 23661, 23662, 23663, 23671, 23672);
+      assertLineInformation(convertTextFile(file, "Text_Unix.txt", "\r"), 0, 1, 2, 9, 16, 17, 24, 50, 23661, 23662, 23663, 23671, 23672);
       // Test mac file
-      assertLineInformation(project.getFile("Text_Mac.txt"), 0, 1, 2, 9, 16, 17, 24, 50, 23661, 23662, 23663, 23671, 23672);
+      assertLineInformation(convertTextFile(file, "Text_Mac.txt", "\n"), 0, 1, 2, 9, 16, 17, 24, 50, 23661, 23662, 23663, 23671, 23672);
       // Test dos file
-      assertLineInformation(project.getFile("Text_DOS.txt"), 0, 2, 4, 12, 20, 22, 30, 57, 23669, 23671, 23673, 23682, 23684);
+      assertLineInformation(convertTextFile(file, "Text_DOS.txt", "\r\n"), 0, 2, 4, 12, 20, 22, 30, 57, 23669, 23671, 23673, 23682, 23684);
+   }
+   
+   /**
+    * <p>
+    * Creates a new text file with the given name which contains the
+    * content of the given source {@link IFile} but with the new defined
+    * line breaks.
+    * </p>
+    * <p>
+    * This method is required because GIT changes the line breaks. For this
+    * reason it is not possible to commit/checkout the test data files directly.
+    * </p>
+    * @param source The {@link IFile} with the source text.
+    * @param newFileName The new file name.
+    * @param lineBreak The line break to use.
+    * @return The created {@link IFile} with the same text but with new line breaks.
+    * @throws CoreException Occurred Exception
+    * @throws IOException Occurred Exception
+    */
+   protected IFile convertTextFile(IFile source, String newFileName, String lineBreak) throws CoreException, IOException {
+      assertNotNull(source);
+      assertTrue(source.exists());
+      assertNotNull(newFileName);
+      // Create new file content
+      CharArrayWriter writer = new CharArrayWriter();
+      BufferedReader reader = new BufferedReader(new InputStreamReader(source.getContents()));
+      try {
+         String line = null;
+         while ((line = reader.readLine()) != null) {
+            writer.write(line);
+            writer.write(lineBreak);
+         }
+         String newText = writer.toString();
+         // Create new file
+         IFile target = source.getParent().getFile(new Path(newFileName));
+         if (!target.exists()) {
+            target.create(new ByteArrayInputStream(newText.getBytes()), true, null);
+         }
+         else {
+            target.setContents(new ByteArrayInputStream(newText.getBytes()), true, true, null);
+         }
+         return target;
+      }
+      finally {
+         reader.close();
+         writer.close();
+      }
    }
 
    /**
