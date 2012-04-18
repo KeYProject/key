@@ -64,7 +64,7 @@ if (not $option{'file'}) {
 } else {
   $testFile = $option{'file'};
 }
-print "Reading from $testFile.\n".
+print "Reading from $testFile.\n";
 my @automatic_JAVADL;
 open (AUTOMATIC, $testFile) or
   die $testFile." couldn't be opened.";
@@ -122,7 +122,6 @@ foreach my $dotkey (@automatic_JAVADL) {
        . "\n\n";
 }
 chdir "../";
-print &getcwd;
 
 print "\n$correct/$counter prover runs according to spec.\n".
      "$failures failures and $errors errors occurred.\n";
