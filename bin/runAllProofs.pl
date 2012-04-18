@@ -64,7 +64,8 @@ if (not $option{'file'}) {
 } else {
   $testFile = $option{'file'};
 }
-print "Reading from $testFile.\n";
+print "Reading from $testFile.\n\n";
+
 my @automatic_JAVADL;
 open (AUTOMATIC, $testFile) or
   die $testFile." couldn't be opened.";
