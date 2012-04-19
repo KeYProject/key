@@ -40,7 +40,6 @@ public final class GraphitiUtil {
     * @param font The {@link Font}.
     * @return The calculated text size.
     */
-   // TODO: Implement test.
    public static IDimension calculateTextSize(final String text, final Font font) {
       IRunnableWithResult<IDimension> run = new AbstractRunnableWithResult<IDimension>() {
          @Override

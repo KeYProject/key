@@ -15,6 +15,8 @@ import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.edit.command.AddCommand;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.emf.workspace.WorkspaceEditingDomainFactory;
+import org.eclipse.graphiti.datatypes.IDimension;
+import org.eclipse.graphiti.mm.algorithms.styles.Font;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
@@ -22,6 +24,7 @@ import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.ui.editor.DiagramEditorInput;
 import org.eclipse.graphiti.ui.services.GraphitiUi;
+import org.eclipse.swt.widgets.Display;
 import org.junit.Test;
 import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeDiagramTypeProvider;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
@@ -33,6 +36,83 @@ import org.key_project.util.test.util.TestUtilsUtil;
  * @author Martin Hentschel
  */
 public class GraphitiUtilTest extends TestCase {
+   /**
+    * Tests {@link GraphitiUtil#calculateTextSize(String, org.eclipse.graphiti.mm.algorithms.styles.Font)}
+    */
+   @Test
+   public void testCalculateTextSize() throws InterruptedException {
+      // Create font
+      Diagram diagram = Graphiti.getPeCreateService().createDiagram(ExecutionTreeDiagramTypeProvider.TYPE, "Test", true);
+      Font font = Graphiti.getGaService().manageFont(diagram, "Arial", 8);
+      // Test null font or text
+      assertNull(GraphitiUtil.calculateTextSize(null, null));
+      assertNull(GraphitiUtil.calculateTextSize("Hello World", null));
+      assertNull(GraphitiUtil.calculateTextSize(null, font));
+      // Test valid font and text in displays thread
+      IDimension dimension = GraphitiUtil.calculateTextSize("Hello World", font);
+      assertNotNull(dimension);
+      assertTrue(dimension.getWidth() > 0);
+      assertTrue(dimension.getHeight() > 0);
+      // Test valid font and text in different thread
+      CalculateTextSizeThread thread = new CalculateTextSizeThread("Hello World", font);
+      thread.start();
+      while (thread.isAlive()) {
+         Display.getDefault().readAndDispatch();
+      }
+      assertNotNull(thread.getDimension());
+      assertTrue(thread.getDimension().getWidth() > 0);
+      assertTrue(thread.getDimension().getHeight() > 0);
+   }
+   
+   /**
+    * Utility {@link Thread} for test purpose to execute
+    * {@link GraphitiUtil#calculateTextSize(String, Font)}.
+    * @author Martin Hentschel
+    */
+   private static class CalculateTextSizeThread extends Thread {
+      /**
+       * The text.
+       */
+      private String text;
+      
+      /**
+       * The font.
+       */
+      private Font font;
+      
+      /**
+       * The computed {@link IDimension}.
+       */
+      private IDimension dimension;
+
+      /**
+       * Constructor.
+       * @param text The text.
+       * @param font The font.
+       */
+      public CalculateTextSizeThread(String text, Font font) {
+         super();
+         this.text = text;
+         this.font = font;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void run() {
+         dimension = GraphitiUtil.calculateTextSize(text, font);
+      }
+
+      /**
+       * Returns the computed {@link IDimension}.
+       * @return The computed {@link IDimension}.
+       */
+      public IDimension getDimension() {
+         return dimension;
+      }
+   }
+   
    /**
     * Tests {@link GraphitiUtil#getAllPictogramElements(Diagram)}
     */
