@@ -4,6 +4,7 @@ import org.eclipse.ui.IEditorActionBarContributor;
 import org.eclipse.ui.IEditorInput;
 import org.key_project.util.eclipse.view.editorInView.AbstractEditorInViewView;
 import org.key_project.util.test.editor.TextControlEditor;
+import org.key_project.util.test.editor.TextControlEditorContributor;
 
 /**
  * Contains a {@link TextControlEditor} instance but shows by default
@@ -36,7 +37,7 @@ public class TextControlEditorInViewView extends AbstractEditorInViewView<TextCo
     */
    @Override
    protected IEditorActionBarContributor createEditorActionBarContributor() {
-      return null;
+      return new TextControlEditorContributor();
    }
 
    /**
@@ -58,5 +59,31 @@ public class TextControlEditorInViewView extends AbstractEditorInViewView<TextCo
    @Override
    public void setMessage(String message) {
       super.setMessage(message);
+   }
+
+   /**
+    * <p>
+    * {@inheritDoc}
+    * </p>
+    * <p>
+    * Changed visibility to public.
+    * </p>
+    */
+   @Override
+   public TextControlEditor getEditorPart() {
+      return super.getEditorPart();
+   }
+
+   /**
+    * <p>
+    * {@inheritDoc}
+    * </p>
+    * <p>
+    * Changed visibility to public.
+    * </p>
+    */
+   @Override
+   public TextControlEditorContributor getEditorActionBarContributor() {
+      return (TextControlEditorContributor)super.getEditorActionBarContributor();
    }
 }

@@ -2,26 +2,27 @@ package org.key_project.util.test.testcase;
 
 import java.beans.PropertyChangeEvent;
 
-import org.key_project.util.bean.Bean;
+import org.eclipse.swt.widgets.Composite;
+import org.key_project.util.eclipse.swt.view.AbstractBeanViewPart;
 
 /**
- * Tests for {@link Bean}.
+ * Tests for {@link AbstractBeanViewPart}.
  * @author Martin Hentschel
  */
-public class BeanTest extends AbstractIBeanTest {
+public class AbstractBeanViewPartTest extends AbstractIBeanTest {
    /**
     * {@inheritDoc}
     */
    @Override
    protected ITestBean createTestBean() {
-      return new TestBean();
+      return new TestBeanViewPart();
    }
    
    /**
     * The uesed example bean.
     * @author Martin Hentschel
     */
-   private static class TestBean extends Bean implements ITestBean {       
+   private static class TestBeanViewPart extends AbstractBeanViewPart implements ITestBean {       
       /**
        * An object value.
        */
@@ -166,6 +167,20 @@ public class BeanTest extends AbstractIBeanTest {
       @Override
       public void fireInvalidEvent() {
          firePropertyChange(new PropertyChangeEvent(this, "INVALID", "INVALID_OLD", "INVALID_NEW"));
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void createPartControl(Composite parent) {
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void setFocus() {
       }
    }
 }

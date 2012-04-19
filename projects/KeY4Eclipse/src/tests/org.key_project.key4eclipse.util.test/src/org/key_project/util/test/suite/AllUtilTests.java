@@ -2,6 +2,7 @@ package org.key_project.util.test.suite;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
+import org.key_project.util.test.testcase.AbstractBeanViewPartTest;
 import org.key_project.util.test.testcase.AbstractRunnableWithProgressAndResultTest;
 import org.key_project.util.test.testcase.AbstractRunnableWithResultTest;
 import org.key_project.util.test.testcase.ArrayUtilTest;
@@ -25,6 +26,7 @@ import org.key_project.util.test.testcase.XMLUtilTest;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
+    AbstractBeanViewPartTest.class,
     AbstractRunnableWithResultTest.class,
     AbstractRunnableWithProgressAndResultTest.class,
     AbstractRunnableWithResultTest.class,

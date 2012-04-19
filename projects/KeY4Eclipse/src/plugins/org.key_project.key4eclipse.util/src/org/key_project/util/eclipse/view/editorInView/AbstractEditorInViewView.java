@@ -1,5 +1,7 @@
 package org.key_project.util.eclipse.view.editorInView;
 
+import java.beans.PropertyChangeListener;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.swt.SWT;
@@ -17,8 +19,8 @@ import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.actions.ActionFactory;
-import org.eclipse.ui.part.ViewPart;
 import org.key_project.util.eclipse.swt.SWTUtil;
+import org.key_project.util.eclipse.swt.view.AbstractBeanViewPart;
 import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.StringUtil;
 
@@ -41,11 +43,29 @@ import org.key_project.util.java.StringUtil;
  * SWT {@link Widget}s instead of the editor by overwriting {@link #createAdditionalControls(Composite)}
  * and {@link #updateShownControl(Composite, StackLayout)}. 
  * </p>
+ * <p>
+ * If the used {@link IEditorPart} and/or {@link IEditorActionBarContributor}
+ * is also an instance of {@link IGlobalEnablement} his global enablement state
+ * is synchronized with {@link #isEditorShown()} value. This can be used to 
+ * disable actions and keyboard shortcuts of the editor/contributor when
+ * a message is shown. 
+ * </p>
  * @author Martin Hentschel
  * @see EditorInViewEditorSite
  * @see EditorInViewWorkbenchPage
+ * @see IGlobalEnablement
  */
-public abstract class AbstractEditorInViewView<T extends IEditorPart> extends ViewPart {
+public abstract class AbstractEditorInViewView<T extends IEditorPart> extends AbstractBeanViewPart {
+   /**
+    * Property of {@link #isEditorShown()} which can be observed via a {@link PropertyChangeListener}.
+    */
+   public static final String PROP_EDITOR_SHOWN = "editorShown";
+   
+   /**
+    * Property of {@link #isMessageShown()} which can be observed via a {@link PropertyChangeListener}.
+    */
+   public static final String PROP_MESSAGE_SHOWN = "messageShown";
+   
    /**
     * The shown {@link IEditorPart}.
     */
@@ -249,6 +269,8 @@ public abstract class AbstractEditorInViewView<T extends IEditorPart> extends Vi
     * @param layout The {@link StackLayout} used in the given root {@link Composite}.
     */
    protected void updateShownControl(Composite root, StackLayout layout) {
+      boolean oldEditorShown = isEditorShown();
+      boolean oldMessageShown = isMessageShown();
       if (!StringUtil.isEmpty(messageText)) {
          layout.topControl = messageLabel;
       }
@@ -256,6 +278,15 @@ public abstract class AbstractEditorInViewView<T extends IEditorPart> extends Vi
          layout.topControl = editorComposite;
       }
       root.layout();
+      boolean editorShown = isEditorShown();
+      if (editorActionBarContributor instanceof IGlobalEnablement) {
+         ((IGlobalEnablement)editorActionBarContributor).setGlobalEnabled(editorShown);
+      }
+      if (editorPart instanceof IGlobalEnablement) {
+         ((IGlobalEnablement)editorPart).setGlobalEnabled(editorShown);
+      }
+      firePropertyChange(PROP_EDITOR_SHOWN, oldEditorShown, editorShown);
+      firePropertyChange(PROP_MESSAGE_SHOWN, oldMessageShown, isMessageShown());
    }
 
    /**
@@ -279,7 +310,7 @@ public abstract class AbstractEditorInViewView<T extends IEditorPart> extends Vi
     * @return {@code true} a message is shown, {@code false} no message is shown.
     */
    public boolean isMessageShown() {
-      return ObjectUtil.equals(rootLayout.topControl, messageLabel);
+      return rootLayout != null && ObjectUtil.equals(rootLayout.topControl, messageLabel);
    }
    
    /**
@@ -287,6 +318,6 @@ public abstract class AbstractEditorInViewView<T extends IEditorPart> extends Vi
     * @return {@code true} the {@link IEditorPart} is shown, {@code false} the {@link IEditorPart} is not shown.
     */
    public boolean isEditorShown() {
-      return ObjectUtil.equals(rootLayout.topControl, editorComposite);
+      return rootLayout != null && ObjectUtil.equals(rootLayout.topControl, editorComposite);
    }
 }

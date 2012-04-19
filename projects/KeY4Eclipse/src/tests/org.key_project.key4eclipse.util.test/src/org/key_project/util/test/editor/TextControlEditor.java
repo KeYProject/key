@@ -9,17 +9,23 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
+import org.key_project.util.eclipse.view.editorInView.IGlobalEnablement;
 
 /**
  * A simple {@link IEditorPart} which contains one {@link Text} instance.
  * @author Martin Hentschel
  */
-public class TextControlEditor extends EditorPart {
+public class TextControlEditor extends EditorPart implements IGlobalEnablement {
    /**
     * The contained {@link Text} instance.
     */
    private Text text;
 
+   /**
+    * The global enabled state.
+    */
+   private boolean globalEnabled;
+   
    /**
     * {@inheritDoc}
     */
@@ -76,5 +82,21 @@ public class TextControlEditor extends EditorPart {
    @Override
    public void setFocus() {
       text.setFocus();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isGlobalEnabled() {
+      return globalEnabled;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void setGlobalEnabled(boolean globalEnabled) {
+      this.globalEnabled = globalEnabled;
    }
 }

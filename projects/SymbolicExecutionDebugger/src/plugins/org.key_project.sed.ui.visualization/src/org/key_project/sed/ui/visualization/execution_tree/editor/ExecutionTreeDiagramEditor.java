@@ -48,7 +48,7 @@ public class ExecutionTreeDiagramEditor extends PaletteHideableDiagramEditor {
          ExecutionTreeDiagramEditor.this.handleDebugEvents(events);
       }
    };
-   
+
    /**
     * {@inheritDoc}
     */

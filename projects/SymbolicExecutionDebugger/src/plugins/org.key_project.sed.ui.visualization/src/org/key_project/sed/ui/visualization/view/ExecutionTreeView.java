@@ -75,7 +75,7 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
    public ExecutionTreeView() {
       setMessage(MESSAGE_DEBUG_VIEW_NOT_OPENED);
    }
-
+   
    /**
     * {@inheritDoc}
     */
@@ -197,8 +197,8 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
       // Handle new view
       if (newDebugView != null) {
          newDebugView.getSite().getSelectionProvider().addSelectionChangedListener(debugViewSelectionListener);
-         updateDiagram(getDebugView().getSite().getSelectionProvider().getSelection());
          setMessage(MESSAGE_NO_DEBUG_TARGET_SELECTED);
+         updateDiagram(getDebugView().getSite().getSelectionProvider().getSelection());
       }
       else {
          setMessage(MESSAGE_DEBUG_VIEW_NOT_OPENED);

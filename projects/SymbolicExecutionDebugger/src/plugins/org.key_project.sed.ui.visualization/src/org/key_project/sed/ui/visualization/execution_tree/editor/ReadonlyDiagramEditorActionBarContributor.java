@@ -1,8 +1,6 @@
 package org.key_project.sed.ui.visualization.execution_tree.editor;
 
-import org.eclipse.gef.ui.actions.ActionBarContributor;
 import org.eclipse.gef.ui.actions.GEFActionConstants;
-import org.eclipse.gef.ui.actions.ZoomComboContributionItem;
 import org.eclipse.gef.ui.actions.ZoomInRetargetAction;
 import org.eclipse.gef.ui.actions.ZoomOutRetargetAction;
 import org.eclipse.graphiti.platform.IPlatformImageConstants;
@@ -20,6 +18,8 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.actions.RetargetAction;
+import org.key_project.sed.ui.visualization.action.AbstractEditorInViewActionBarContributor;
+import org.key_project.sed.ui.visualization.action.GlobalEnablementZoomComboContributionItem;
 
 /**
  * Contains a subset of the provided actions of {@link DiagramEditorActionBarContributor}
@@ -27,9 +27,8 @@ import org.eclipse.ui.actions.RetargetAction;
  * @author Martin Hentschel
  * @see DiagramEditorActionBarContributor
  */
-// TODO: Disable contributions if a message is shown in the ExecutionTreeView
 @SuppressWarnings("restriction")
-public class ReadonlyDiagramEditorActionBarContributor extends ActionBarContributor {
+public class ReadonlyDiagramEditorActionBarContributor extends AbstractEditorInViewActionBarContributor {
    /**
     * {@inheritDoc}
     */
@@ -73,7 +72,8 @@ public class ReadonlyDiagramEditorActionBarContributor extends ActionBarContribu
       
       tbm.add(getAction(GEFActionConstants.ZOOM_OUT));
       tbm.add(getAction(GEFActionConstants.ZOOM_IN));
-      ZoomComboContributionItem zoomCombo = new ZoomComboContributionItem(getPage());
+      GlobalEnablementZoomComboContributionItem zoomCombo = new GlobalEnablementZoomComboContributionItem(getPage());
+      registerGlobalEnablement(zoomCombo);
       tbm.add(zoomCombo);
       tbm.add(new Separator());
    }

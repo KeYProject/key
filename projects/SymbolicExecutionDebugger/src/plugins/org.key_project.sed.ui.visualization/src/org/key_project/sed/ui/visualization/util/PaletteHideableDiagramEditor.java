@@ -1,5 +1,8 @@
 package org.key_project.sed.ui.visualization.util;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.eclipse.gef.commands.CommandStack;
 import org.eclipse.gef.ui.palette.FlyoutPaletteComposite.FlyoutPreferences;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
@@ -11,6 +14,10 @@ import org.eclipse.graphiti.internal.command.ICommand;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.graphiti.ui.internal.command.GefCommandWrapper;
+import org.eclipse.jface.action.IAction;
+import org.key_project.sed.ui.visualization.action.GlobalEnablementWrapperAction;
+import org.key_project.util.eclipse.view.editorInView.AbstractEditorInViewView;
+import org.key_project.util.eclipse.view.editorInView.IGlobalEnablement;
 
 /**
  * <p>
@@ -21,14 +28,47 @@ import org.eclipse.graphiti.ui.internal.command.GefCommandWrapper;
  * instances via {@link #executeFeature(IFeature, IContext)} and
  * {@link #executeCommand(ICommand)}.
  * </p>
+ * <p>
+ * This editor realizes also the {@link IGlobalEnablement} which is required
+ * for the usage in an {@link AbstractEditorInViewView} to disable keyboard
+ * shortcuts when a message is shown. This is possible, because keyboard
+ * shortcuts registered via {@link #registerAction(IAction)} are wrapped
+ * with a {@link GlobalEnablementWrapperAction} which is registered in
+ * {@link #childGlobalEnablements}. The global enabled state of this editor
+ * is shared with all contained child {@link IGlobalEnablement}s. Other
+ * {@link IGlobalEnablement} can be registered in sub classes via 
+ * {@link #registerGlobalEnablement(IGlobalEnablement)}.
+ * </p>
  * @author Martin Hentschel
  */
 @SuppressWarnings("restriction")
-public class PaletteHideableDiagramEditor extends DiagramEditor {
+public class PaletteHideableDiagramEditor extends DiagramEditor implements IGlobalEnablement {
    /**
     * Defines if the palette is hidden or not.
     */
    private boolean paletteHidden;
+   
+   /**
+    * The global enablement state which is shared with child {@link IGlobalEnablement} ({@link #childGlobalEnablements}).
+    */
+   private boolean globalEnabled;
+   
+   /**
+    * Contains child {@link IGlobalEnablement} which have always the same global enablement state.
+    */
+   private List<IGlobalEnablement> childGlobalEnablements = new LinkedList<IGlobalEnablement>();
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void dispose() {
+      for (IGlobalEnablement child : childGlobalEnablements) {
+         child.dispose();
+      }
+      childGlobalEnablements.clear();
+      super.dispose();
+   }
 
    /**
     * Executes the given {@link IFeature} with the given {@link IContext}.
@@ -161,5 +201,50 @@ public class PaletteHideableDiagramEditor extends DiagramEditor {
     */
    public void setPaletteHidden(boolean paletteHidden) {
       this.paletteHidden = paletteHidden;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected void registerAction(IAction action) {
+      if (action instanceof IGlobalEnablement) {
+         registerGlobalEnablement((IGlobalEnablement)action);
+         super.registerAction(action);
+      }
+      else {
+         GlobalEnablementWrapperAction wrapper = new GlobalEnablementWrapperAction(action); 
+         registerGlobalEnablement(wrapper);
+         super.registerAction(wrapper);
+      }
+   }
+   
+   /**
+    * Registers the new child {@link IGlobalEnablement} in {@link #childGlobalEnablements}
+    * and sets the global enablement state on it to the state of this {@link IGlobalEnablement}.
+    * @param globalEnablement The child {@link IGlobalEnablement} to register.
+    */
+   public void registerGlobalEnablement(IGlobalEnablement globalEnablement) {
+      childGlobalEnablements.add(globalEnablement);
+      globalEnablement.setGlobalEnabled(isGlobalEnabled());
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isGlobalEnabled() {
+      return globalEnabled;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void setGlobalEnabled(boolean globalEnabled) {
+      this.globalEnabled = globalEnabled;
+      for (IGlobalEnablement child : childGlobalEnablements) {
+         child.setGlobalEnabled(globalEnabled);
+      }
    }
 }
