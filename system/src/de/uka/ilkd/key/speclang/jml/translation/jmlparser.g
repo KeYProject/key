@@ -1400,7 +1400,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
     SLExpression e2 = null;
     SLExpression e3 = null;
     KeYJavaType typ;
-    Term t, t2;
+    Term t, t2 = null;
     Token tk = null;
     Pair<KeYJavaType,ImmutableList<LogicVariable>> declVars = null;    
 }
@@ -1631,20 +1631,31 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
         
     |   UNIONINF 
         LPAREN 
-        declVars=quantifiedvardecls SEMI
+        declVars=quantifiedvardecls
+        SEMI
         {
             resolverManager.pushLocalVariablesNamespace();
             resolverManager.putIntoTopLocalVariablesNamespace(declVars.second, declVars.first);
-        } 
+        }
+        ((predicate SEMI) => t2=predicate SEMI | SEMI )? 
         t=storeref 
         RPAREN
         {
-	    resolverManager.popLocalVariablesNamespace();
-	    result = new SLExpression(TB.infiniteUnion(services,
-	                                               declVars.second.toArray(new QuantifiableVariable[declVars.second.size()]),
-	                                               t),
-	                              javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));        
-        }        
+               resolverManager.popLocalVariablesNamespace();
+               if(t2 == null) {
+                  // unguarded version
+	          result = new SLExpression(TB.infiniteUnion(services,
+                                                       declVars.second.toArray(new QuantifiableVariable[declVars.second.size()]),
+                                                       t),
+                                      javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
+               } else {
+                  // guarded version
+                  result = new SLExpression(TB.guardedInfiniteUnion(services,
+                                                       declVars.second.toArray(new QuantifiableVariable[declVars.second.size()]),
+                                                       t2, t),
+                                      javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
+               }
+        }
 
     |   pd:DISJOINT LPAREN tlist=storeRefList RPAREN {
             result = translator.translate(pd.getText(), SLExpression.class, tlist, services);
