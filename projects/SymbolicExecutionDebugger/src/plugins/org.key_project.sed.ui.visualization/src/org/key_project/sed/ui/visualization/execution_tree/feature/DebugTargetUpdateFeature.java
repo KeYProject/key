@@ -1,5 +1,6 @@
 package org.key_project.sed.ui.visualization.execution_tree.feature;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.IUpdateFeature;
@@ -62,7 +63,8 @@ public class DebugTargetUpdateFeature extends AbstractDebugNodeUpdateFeature {
     * {@inheritDoc}
     */
    @Override
-   protected boolean updateName(PictogramElement pictogramElement) throws DebugException {
+   protected boolean updateName(PictogramElement pictogramElement,
+                                IProgressMonitor monitor) throws DebugException {
       return true; // Nothing to do
    }
 
@@ -70,19 +72,26 @@ public class DebugTargetUpdateFeature extends AbstractDebugNodeUpdateFeature {
     * {@inheritDoc}
     */
    @Override
-   protected boolean updateChildren(PictogramElement pictogramElement) throws DebugException {
-      Object[] bos = getAllBusinessObjectsForPictogramElement(pictogramElement);
-      for (Object bo : bos) {
-         if (bo instanceof ISEDDebugTarget) {
-            ISEDThread[] threads = ((ISEDDebugTarget)bo).getSymbolicThreads();
-            for (ISEDDebugNode thread : threads) {
-               PictogramElement threadPE = getPictogramElementForBusinessObject(thread);
-               if (threadPE == null) {
-                  createGraphicalRepresentationForSubtree(null, thread);
+   protected boolean updateChildren(PictogramElement pictogramElement,
+                                    IProgressMonitor monitor) throws DebugException {
+      monitor.beginTask("Update children", IProgressMonitor.UNKNOWN);
+      try {
+         Object[] bos = getAllBusinessObjectsForPictogramElement(pictogramElement);
+         for (Object bo : bos) {
+            if (bo instanceof ISEDDebugTarget) {
+               ISEDThread[] threads = ((ISEDDebugTarget)bo).getSymbolicThreads();
+               for (ISEDDebugNode thread : threads) {
+                  PictogramElement threadPE = getPictogramElementForBusinessObject(thread);
+                  if (threadPE == null) {
+                     createGraphicalRepresentationForSubtree(null, thread, monitor);
+                  }
                }
             }
          }
+         return true;
       }
-      return true;
+      finally {
+         monitor.done();
+      }
    }
 }

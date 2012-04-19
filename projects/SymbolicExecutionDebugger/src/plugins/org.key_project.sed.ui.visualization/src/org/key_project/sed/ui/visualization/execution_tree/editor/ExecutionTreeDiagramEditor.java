@@ -28,6 +28,7 @@ import org.key_project.sed.ui.visualization.execution_tree.wizard.SaveAsExecutio
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 import org.key_project.sed.ui.visualization.util.LogUtil;
 import org.key_project.sed.ui.visualization.util.PaletteHideableDiagramEditor;
+import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.ArrayUtil;
 
 /**
@@ -122,6 +123,7 @@ public class ExecutionTreeDiagramEditor extends PaletteHideableDiagramEditor {
          @Override
          protected IStatus run(IProgressMonitor monitor) {
             try {
+               SWTUtil.checkCanceled(monitor);
                context.putProperty(ExecutionTreeUtil.CONTEXT_PROPERTY_MONITOR, monitor);
                executeFeature(feature, context);
                return Status.OK_STATUS;
@@ -176,6 +178,7 @@ public class ExecutionTreeDiagramEditor extends PaletteHideableDiagramEditor {
     */
    protected IStatus updateDiagramInJob(IProgressMonitor monitor) {
       try {
+         SWTUtil.checkCanceled(monitor);
          if (getDiagramTypeProvider().isAutoUpdateAtRuntime()) {
             PictogramElement[] oldSelection = getSelectedPictogramElements();
             PictogramElement[] elements = GraphitiUtil.getAllPictogramElements(getDiagram());

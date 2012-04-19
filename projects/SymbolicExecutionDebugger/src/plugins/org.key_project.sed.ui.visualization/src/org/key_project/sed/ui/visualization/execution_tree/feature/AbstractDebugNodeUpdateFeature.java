@@ -1,5 +1,8 @@
 package org.key_project.sed.ui.visualization.execution_tree.feature;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.IReason;
@@ -16,6 +19,7 @@ import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
 import org.key_project.sed.ui.visualization.util.LogUtil;
 import org.key_project.util.java.ObjectUtil;
 
@@ -192,16 +196,28 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
    /**
     * {@inheritDoc}
     */
-   // TODO: Use in IUpdateContext defined IProgressMonitor.
    @Override
    public boolean update(IUpdateContext context) {
       try {
+         // Define monitor to use
+         IProgressMonitor monitor;
+         Object contextMonitor = context.getProperty(ExecutionTreeUtil.CONTEXT_PROPERTY_MONITOR);
+         if (contextMonitor instanceof IProgressMonitor) {
+            monitor = (IProgressMonitor)contextMonitor;
+         }
+         else {
+            monitor = new NullProgressMonitor();
+         }
          // Retrieve name from business model
          PictogramElement pictogramElement = context.getPictogramElement();
-         boolean success = updateName(pictogramElement);
+         monitor.beginTask("Update element: " + pictogramElement, 2);
+         boolean success = updateName(pictogramElement, new SubProgressMonitor(monitor, 1));
+         monitor.worked(1);
          if (success) {
-            success = updateChildren(pictogramElement);
+            success = updateChildren(pictogramElement, new SubProgressMonitor(monitor, 1));
          }
+         monitor.worked(2);
+         monitor.done();
          return success;
       }
       catch (DebugException e) {
@@ -213,26 +229,35 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
    /**
     * Updates the shown name in the given {@link PictogramElement}.
     * @param pictogramElement The {@link PictogramElement} to update.
+    * @param monitor The {@link IProgressMonitor} to use.
     * @return {@code true}, if update process was successful
     * @throws DebugException Occurred Exception.
     */
-   protected boolean updateName(PictogramElement pictogramElement) throws DebugException {
-      // Set name in pictogram model
-      Text text = findNameText(pictogramElement);
-      if (text != null) {
-         // Change value
-         String businessName = getBusinessName(pictogramElement);
-         text.setValue(businessName);
-         // Optimize layout
-         LayoutContext layoutContext = new LayoutContext(pictogramElement);
-         layoutContext.putProperty(AbstractDebugNodeLayoutFeature.WIDTH_TO_SET, AbstractDebugNodeAddFeature.computeInitialWidth(getDiagram(), businessName, text.getFont()));
-         layoutContext.putProperty(AbstractDebugNodeLayoutFeature.HEIGHT_TO_SET, AbstractDebugNodeAddFeature.computeInitialHeight(getDiagram(), businessName, text.getFont()));
-         getFeatureProvider().layoutIfPossible(layoutContext);
-         // Add children
-         return true;
+   protected boolean updateName(PictogramElement pictogramElement, 
+                                IProgressMonitor monitor) throws DebugException {
+      try {
+         // Set name in pictogram model
+         monitor.beginTask("Update labels", 1);
+         Text text = findNameText(pictogramElement);
+         if (text != null) {
+            // Change value
+            String businessName = getBusinessName(pictogramElement);
+            text.setValue(businessName);
+            // Optimize layout
+            LayoutContext layoutContext = new LayoutContext(pictogramElement);
+            layoutContext.putProperty(AbstractDebugNodeLayoutFeature.WIDTH_TO_SET, AbstractDebugNodeAddFeature.computeInitialWidth(getDiagram(), businessName, text.getFont()));
+            layoutContext.putProperty(AbstractDebugNodeLayoutFeature.HEIGHT_TO_SET, AbstractDebugNodeAddFeature.computeInitialHeight(getDiagram(), businessName, text.getFont()));
+            getFeatureProvider().layoutIfPossible(layoutContext);
+            // Add children
+            return true;
+         }
+         else {
+            return false;
+         }
       }
-      else {
-         return false;
+      finally {
+         monitor.worked(1);
+         monitor.done();
       }
    }
    
@@ -240,21 +265,29 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
     * Updates the children of the {@link ISEDDebugNode} represented
     * by the given {@link PictogramElement}.
     * @param pictogramElement The {@link PictogramElement} to update.
+    * @param monitor The {@link IProgressMonitor} to use.
     * @return {@code true}, if update process was successful
     * @throws DebugException Occurred Exception.
     */
-   protected boolean updateChildren(PictogramElement pictogramElement) throws DebugException {
-      Object bo = getBusinessObjectForPictogramElement(pictogramElement);
-      if (bo instanceof ISEDDebugNode) {
-         ISEDDebugNode[] children = ((ISEDDebugNode)bo).getChildren();
-         for (ISEDDebugNode child : children) {
-            PictogramElement childPE = getPictogramElementForBusinessObject(child);
-            if (childPE == null) {
-               createGraphicalRepresentationForSubtree(pictogramElement, child);
+   protected boolean updateChildren(PictogramElement pictogramElement, 
+                                    IProgressMonitor monitor) throws DebugException {
+      monitor.beginTask("Update children", IProgressMonitor.UNKNOWN);
+      try {
+         Object bo = getBusinessObjectForPictogramElement(pictogramElement);
+         if (bo instanceof ISEDDebugNode) {
+            ISEDDebugNode[] children = ((ISEDDebugNode)bo).getChildren();
+            for (ISEDDebugNode child : children) {
+               PictogramElement childPE = getPictogramElementForBusinessObject(child);
+               if (childPE == null) {
+                  createGraphicalRepresentationForSubtree(pictogramElement, child, monitor);
+               }
             }
          }
+         return true;
       }
-      return true;
+      finally {
+         monitor.done();
+      }
    }
    
    /**
@@ -262,9 +295,12 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
     * and all of his children.
     * @param parent The {@link PictogramElement} of {@link ISEDDebugNode#getParent()}.
     * @param root The {@link ISEDDebugNode} for that a graphical representation is needed.
+    * @param monitor The {@link IProgressMonitor} to use.
     * @throws DebugException Occurred Exception.
     */
-   protected void createGraphicalRepresentationForSubtree(PictogramElement parent, ISEDDebugNode root) throws DebugException {
+   protected void createGraphicalRepresentationForSubtree(PictogramElement parent, 
+                                                          ISEDDebugNode root,
+                                                          IProgressMonitor monitor) throws DebugException {
       // Add root ISEDDebugNode
       AreaContext areaContext = new AreaContext();
       if (parent != null) {
@@ -281,7 +317,8 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
       // Add subtree of the given root ISEDDebugNode
       ISEDDebugNode[] children = root.getChildren();
       for (ISEDDebugNode child : children) {
-         createGraphicalRepresentationForSubtree(parent, child);
+         createGraphicalRepresentationForSubtree(parent, child, monitor);
       }
+      monitor.worked(1);
    }
 }
