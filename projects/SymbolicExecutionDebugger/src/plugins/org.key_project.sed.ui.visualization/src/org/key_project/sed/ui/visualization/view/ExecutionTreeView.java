@@ -37,6 +37,7 @@ import org.key_project.sed.ui.visualization.util.LogUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IOUtil;
+import org.key_project.util.java.ObjectUtil;
 
 /**
  * This view shows the symbolic execution tree of selected {@link ISEDDebugTarget}s
@@ -133,7 +134,11 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
     * @param event The event.
     */
    protected void handleSelectionChanged(SelectionChangedEvent event) {
-      updateDiagram(event.getSelection());
+      // Make sure that event was provided by debug's viewer and not by something else what can happen if a maximized view is minimized.
+      if (ObjectUtil.equals(event.getSource(), getDebugView().getViewer())) {
+         // Update diagram
+         updateDiagram(event.getSelection());
+      }
    }
    
    /**
