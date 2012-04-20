@@ -88,12 +88,12 @@ class Pipe<T>{
 	 */
 	private abstract class Worker extends Thread{
 		@SuppressWarnings("unused")
-		private final String name; // for testing
+
 		
 		
 		public Worker(String name) {
 			super();
-			this.name = name;
+			this.setName(name);
 			this.setDaemon(true);
 		}
 
@@ -161,6 +161,7 @@ class Pipe<T>{
 					  throw new RuntimeException(e);
 				}
 			}
+	
 		}
 
 

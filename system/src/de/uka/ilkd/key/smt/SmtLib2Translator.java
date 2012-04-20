@@ -151,7 +151,7 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
     	commentAssumption[ContextualBlock.ASSUMPTION_DISTINCT]= "Assumptions for uniqueness of functions:";
     	commentAssumption[ContextualBlock.ASSUMPTION_INTEGER]= "Assumptions for very small and very big integers:";
     	commentAssumption[ContextualBlock.ASSUMPTION_MULTIPLICATION]= "Assumptions for uninterpreted multiplication:";
-    	commentAssumption[ContextualBlock.ASSUMPTION_SORTS_NOT_EMPTY]= "Assumptions for sorts (There is at least one object of every sort.):";
+    	commentAssumption[ContextualBlock.ASSUMPTION_SORTS_NOT_EMPTY]= "Assumptions for sorts - there is at least one object of every sort:";
     	
     	
     	//add the assumptions

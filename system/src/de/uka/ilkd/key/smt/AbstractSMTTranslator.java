@@ -85,19 +85,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         /** The translation result is stored in this variable. */
         protected String text;
 
-        /** StringBuffer contains all declared predicate symbols. */
-        protected final StringBuffer predicate = new StringBuffer();
+        protected SMTTranslation translation = new SMTTranslation();
 
-        /** StringBuffer to store text which could be usefull for the user */
-        protected final StringBuffer notes = new StringBuffer();
-
-        /** remember all printed predicates */
-        protected final Set<Operator> predicateSet = new HashSet<Operator>();
-
-        /** remember all printed functions */
-        protected final Set<Operator> functionSet = new HashSet<Operator>();
-
-        protected final Set<Sort> sortSet = new HashSet<Sort>();
 
         /** remember all function declarations */
 

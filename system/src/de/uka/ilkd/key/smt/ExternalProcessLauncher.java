@@ -98,8 +98,9 @@ public class ExternalProcessLauncher<T> {
   
             // wait until the pipe 
             pipe.waitForPipe();
+           
 	     	}finally{
-	     	  cleanUp();
+	     		cleanUp();
 	     	}	     			
 	}
 	
@@ -114,6 +115,8 @@ public class ExternalProcessLauncher<T> {
 	
 	public void stop(){
 	    pipe.close();
+	    process.destroy();
+	    
 	}
 	
 	public void cleanUp(){
