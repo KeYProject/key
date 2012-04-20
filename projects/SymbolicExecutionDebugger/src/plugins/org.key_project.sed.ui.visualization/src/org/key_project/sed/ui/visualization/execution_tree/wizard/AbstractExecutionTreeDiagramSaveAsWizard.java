@@ -47,17 +47,29 @@ public abstract class AbstractExecutionTreeDiagramSaveAsWizard extends BasicNewR
       super.addPages();
       setWindowTitle("Create Symbolic Execution Tree Diagram");
       diagramPage = new ContentWizardNewFileCreationPage("diagramPage", getSelection());
-      diagramPage.setTitle("Create Symbolic Execution Tree Diagram");
+      diagramPage.setTitle(getDiagramPageTitle());
       diagramPage.setDescription("Select file that will contain diagram model."); 
       diagramPage.setFileExtension(ExecutionTreeUtil.DIAGRAM_FILE_EXTENSION);
       addPage(diagramPage);
       modelPage = new ContentWizardNewFileCreationPage("modelPage", getSelection());
-      modelPage.setTitle("Create Symbolic Execution Tree Domain Model");
+      modelPage.setTitle(getModelPageTitle());
       modelPage.setDescription("Select file that will contain domain model."); 
       modelPage.setFileExtension(ExecutionTreeUtil.DOMAIN_FILE_EXTENSION);
       addPage(modelPage);
    }
+   
+   /**
+    * Returns the title of wizard page to define the diagram file.
+    * @return The title.
+    */
+   protected abstract String getDiagramPageTitle();
 
+   /**
+    * Returns the title of wizard page to define the model file.
+    * @return The title.
+    */
+   protected abstract String getModelPageTitle();
+   
    /**
     * {@inheritDoc}
     */

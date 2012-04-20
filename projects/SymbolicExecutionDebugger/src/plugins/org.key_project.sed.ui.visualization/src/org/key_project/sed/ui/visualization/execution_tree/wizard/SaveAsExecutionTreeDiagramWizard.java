@@ -51,6 +51,22 @@ public class SaveAsExecutionTreeDiagramWizard extends AbstractExecutionTreeDiagr
       Diagram diagram = diagramTypeProvider.getDiagram();
       return EcoreUtil.copy(diagram); // Return a copy because it is modified during save process (URL to domain file)
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected String getDiagramPageTitle() {
+      return "Save Symbolic Execution Tree Diagram";
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected String getModelPageTitle() {
+      return "Save Symbolic Execution Tree Domain Model";
+   }
    
    /**
     * Opens the wizard.

@@ -28,4 +28,20 @@ public class NewExecutionTreeDiagramWizard extends AbstractExecutionTreeDiagramS
                                                          IOUtil.getFileNameWithoutExtension(getDiagramPage().getFileName()), 
                                                          true);
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected String getDiagramPageTitle() {
+      return "Create Symbolic Execution Tree Diagram";
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected String getModelPageTitle() {
+      return "Create Symbolic Execution Tree Domain Model";
+   }
 }
