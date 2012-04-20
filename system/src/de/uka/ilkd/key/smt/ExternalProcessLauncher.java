@@ -115,7 +115,9 @@ public class ExternalProcessLauncher<T> {
 	
 	public void stop(){
 	    pipe.close();
-	    process.destroy();
+	    if(process != null){
+	    	process.destroy();
+	    }
 	    
 	}
 	

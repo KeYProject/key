@@ -87,7 +87,7 @@ class Pipe<T>{
 	 * workers.
 	 */
 	private abstract class Worker extends Thread{
-		@SuppressWarnings("unused")
+
 
 		
 		

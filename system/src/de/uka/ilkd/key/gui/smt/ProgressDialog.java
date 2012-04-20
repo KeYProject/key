@@ -127,6 +127,7 @@ public class ProgressDialog extends JDialog{
                     infoMenu.add(item);
                 }
                 getInfoButton().setVisible(true);
+                this.pack();
                 
         }
         
