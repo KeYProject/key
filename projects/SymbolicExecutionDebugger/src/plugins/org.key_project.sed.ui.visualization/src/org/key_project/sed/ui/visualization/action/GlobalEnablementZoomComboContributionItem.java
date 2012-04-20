@@ -5,6 +5,7 @@ import org.eclipse.gef.ui.actions.ZoomComboContributionItem;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IPartService;
+import org.eclipse.ui.IWorkbenchPart;
 import org.key_project.util.eclipse.view.editorInView.IGlobalEnablement;
 
 /**
@@ -22,6 +23,12 @@ public class GlobalEnablementZoomComboContributionItem extends ZoomComboContribu
     * The contributed UI control.
     */
    private Control control;
+   
+   /**
+    * If this {@link ZoomManager} is defined it always used instead of
+    * the {@link ZoomManager} which is provided by the active {@link IWorkbenchPart}.
+    */
+   private ZoomManager fixedZoomManager;
    
    /**
     * Constructor for ComboToolItem.
@@ -82,7 +89,12 @@ public class GlobalEnablementZoomComboContributionItem extends ZoomComboContribu
     */
    @Override
    public void setZoomManager(ZoomManager zm) {
-      super.setZoomManager(zm);
+      if (fixedZoomManager == null) {
+         super.setZoomManager(zm);
+      }
+      else {
+         super.setZoomManager(fixedZoomManager);
+      }
       updateEnablement();
    }
    
@@ -110,5 +122,24 @@ public class GlobalEnablementZoomComboContributionItem extends ZoomComboContribu
    public void setGlobalEnabled(boolean globalEnabled) {
       this.globalEnabled = globalEnabled;
       updateEnablement();
+   }
+
+   /**
+    * Returns the fixed {@link ZoomManager} which is always used instead
+    * of the provided {@link ZoomManager} by the active {@link IWorkbenchPart}.
+    * @return The fixed {@link ZoomManager}.
+    */
+   public ZoomManager getFixedZoomManager() {
+      return fixedZoomManager;
+   }
+
+   /**
+    * Sets the fixed {@link ZoomManager} which is always used instead
+    * of the provided {@link ZoomManager} by the active {@link IWorkbenchPart}.
+    * @param fixedZoomManager The fixed {@link ZoomManager} to set.
+    */
+   public void setFixedZoomManager(ZoomManager fixedZoomManager) {
+      this.fixedZoomManager = fixedZoomManager;
+      setZoomManager(fixedZoomManager);
    }
 }

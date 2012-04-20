@@ -5,7 +5,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.graphiti.ui.editor.DiagramEditorActionBarContributor;
-import org.eclipse.ui.IEditorActionBarContributor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.part.FileEditorInput;
@@ -20,7 +19,7 @@ import org.key_project.util.test.testcase.swtbot.SWTBotAbstractEditorInViewViewT
  * {@link SWTBotAbstractEditorInViewViewTest}.
  * @author Martin Hentschel
  */
-public class GraphitiEditorInViewView extends AbstractEditorInViewView<DiagramEditor> {
+public class GraphitiEditorInViewView extends AbstractEditorInViewView<DiagramEditor, DiagramEditorActionBarContributor> {
    /**
     * The ID of this view.
     */
@@ -38,7 +37,7 @@ public class GraphitiEditorInViewView extends AbstractEditorInViewView<DiagramEd
     * {@inheritDoc}
     */
    @Override
-   protected IEditorActionBarContributor createEditorActionBarContributor() {
+   protected DiagramEditorActionBarContributor createEditorActionBarContributor() {
       return new DiagramEditorActionBarContributor();
    }
 

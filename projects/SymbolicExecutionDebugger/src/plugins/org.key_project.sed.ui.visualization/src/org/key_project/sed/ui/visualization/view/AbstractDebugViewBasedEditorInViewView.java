@@ -1,6 +1,7 @@
 package org.key_project.sed.ui.visualization.view;
 
 import org.eclipse.debug.ui.IDebugView;
+import org.eclipse.ui.IEditorActionBarContributor;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IViewPart;
@@ -25,7 +26,7 @@ import org.key_project.util.java.ObjectUtil;
  * </p>
  * @author Martin Hentschel
  */
-public abstract class AbstractDebugViewBasedEditorInViewView<T extends IEditorPart> extends AbstractEditorInViewView<T> {
+public abstract class AbstractDebugViewBasedEditorInViewView<E extends IEditorPart, C extends IEditorActionBarContributor> extends AbstractEditorInViewView<E, C> {
    /**
     * Listens for changes on the {@link IWorkbenchPage} of this {@link IViewSite}.
     */

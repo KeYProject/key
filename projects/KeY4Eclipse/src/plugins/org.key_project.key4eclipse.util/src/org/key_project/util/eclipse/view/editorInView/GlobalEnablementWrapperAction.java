@@ -1,4 +1,4 @@
-package org.key_project.sed.ui.visualization.action;
+package org.key_project.util.eclipse.view.editorInView;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -11,7 +11,6 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.widgets.Event;
-import org.key_project.util.eclipse.view.editorInView.IGlobalEnablement;
 
 /**
  * Wrapps existing {@link IAction} to add a global enabled state defined
@@ -19,6 +18,7 @@ import org.key_project.util.eclipse.view.editorInView.IGlobalEnablement;
  * @author Martin Hentschel
  * @see IGlobalEnablement
  */
+//TODO: Implement tests
 public class GlobalEnablementWrapperAction implements IAction, IGlobalEnablement {
    /**
     * The {@link IAction} to wrapp.

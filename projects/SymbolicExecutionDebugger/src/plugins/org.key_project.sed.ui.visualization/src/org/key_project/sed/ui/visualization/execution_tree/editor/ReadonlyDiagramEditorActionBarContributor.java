@@ -1,5 +1,6 @@
 package org.key_project.sed.ui.visualization.execution_tree.editor;
 
+import org.eclipse.gef.editparts.ZoomManager;
 import org.eclipse.gef.ui.actions.GEFActionConstants;
 import org.eclipse.gef.ui.actions.ZoomInRetargetAction;
 import org.eclipse.gef.ui.actions.ZoomOutRetargetAction;
@@ -15,11 +16,13 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.actions.RetargetAction;
 import org.key_project.sed.ui.visualization.action.AbstractEditorInViewActionBarContributor;
 import org.key_project.sed.ui.visualization.action.GlobalEnablementZoomComboContributionItem;
+import org.key_project.util.eclipse.view.editorInView.SaveAsAction;
 
 /**
  * Contains a subset of the provided actions of {@link DiagramEditorActionBarContributor}
@@ -30,11 +33,30 @@ import org.key_project.sed.ui.visualization.action.GlobalEnablementZoomComboCont
 @SuppressWarnings("restriction")
 public class ReadonlyDiagramEditorActionBarContributor extends AbstractEditorInViewActionBarContributor {
    /**
+    * The {@link ZoomManager} which should be always used independent
+    * of the provided {@link ZoomManager} of the active {@link IWorkbenchPart}.
+    */
+   private ZoomManager zoomManager;
+   
+   /**
+    * The provided {@link GlobalEnablementZoomComboContributionItem}.
+    */
+   private GlobalEnablementZoomComboContributionItem zoomCombo;
+
+   /**
+    * Constructor.
+    * @param fixedPart The fixed {@link IWorkbenchPart} which should always be used as source in {@link RetargetAction}s.
+    */
+   public ReadonlyDiagramEditorActionBarContributor(IWorkbenchPart fixedPart) {
+      super(fixedPart);
+   }
+   
+   /**
     * {@inheritDoc}
     */
    @Override
    protected void buildActions() {
-      addAction(ActionFactory.SAVE_AS.create(PlatformUI.getWorkbench().getActiveWorkbenchWindow()));
+      addAction(new SaveAsAction(getFixedPart()));
 
       addRetargetAction((RetargetAction) ActionFactory.PRINT.create(PlatformUI.getWorkbench().getActiveWorkbenchWindow()));
       addRetargetAction((RetargetAction) ActionFactory.SELECT_ALL.create(PlatformUI.getWorkbench().getActiveWorkbenchWindow()));
@@ -72,7 +94,8 @@ public class ReadonlyDiagramEditorActionBarContributor extends AbstractEditorInV
       
       tbm.add(getAction(GEFActionConstants.ZOOM_OUT));
       tbm.add(getAction(GEFActionConstants.ZOOM_IN));
-      GlobalEnablementZoomComboContributionItem zoomCombo = new GlobalEnablementZoomComboContributionItem(getPage());
+      zoomCombo = new GlobalEnablementZoomComboContributionItem(getPage());
+      zoomCombo.setFixedZoomManager(zoomManager);
       registerGlobalEnablement(zoomCombo);
       tbm.add(zoomCombo);
       tbm.add(new Separator());
@@ -97,5 +120,17 @@ public class ReadonlyDiagramEditorActionBarContributor extends AbstractEditorInV
       menubar.add(new Separator());
       menubar.add(getAction(SaveImageAction.ACTION_ID));
       menubar.add(getAction(ActionFactory.PRINT.getId()));
+   }
+   
+   /**
+    * Sets the {@link ZoomManager} which should be always used independent
+    * of the provided {@link ZoomManager} of the active {@link IWorkbenchPart}.
+    * @param zoomManager The {@link ZoomManager} to use.
+    */
+   public void setZoomManager(ZoomManager zoomManager) {
+      this.zoomManager = zoomManager;
+      if (zoomCombo != null) {
+         zoomCombo.setFixedZoomManager(zoomManager);
+      }
    }
 }

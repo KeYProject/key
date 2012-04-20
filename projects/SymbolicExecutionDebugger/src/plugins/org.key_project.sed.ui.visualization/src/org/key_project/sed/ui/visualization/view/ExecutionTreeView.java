@@ -10,6 +10,7 @@ import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.debug.ui.IDebugView;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
+import org.eclipse.gef.editparts.ZoomManager;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICustomContext;
@@ -24,7 +25,6 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.ui.IActionBars;
-import org.eclipse.ui.IEditorActionBarContributor;
 import org.eclipse.ui.IViewSite;
 import org.key_project.sed.core.model.ISEDDebugElement;
 import org.key_project.sed.core.model.ISEDDebugTarget;
@@ -43,7 +43,7 @@ import org.key_project.util.java.IOUtil;
  * graphically as Graphiti diagram.
  * @author Martin Hentschel
  */
-public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<ExecutionTreeDiagramEditor> {
+public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<ExecutionTreeDiagramEditor, ReadonlyDiagramEditorActionBarContributor> {
    /**
     * The message which is shown to the user if the debug view is not opened.
     */
@@ -82,16 +82,9 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
    @Override
    protected ExecutionTreeDiagramEditor createEditorPart() {
       ExecutionTreeDiagramEditor editor = new ExecutionTreeDiagramEditor();
+      editor.setReadOnly(true);
       editor.setPaletteHidden(true);
       return editor;
-   }
-   
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   protected IEditorActionBarContributor createEditorActionBarContributor() {
-      return new ReadonlyDiagramEditorActionBarContributor();
    }
 
    /**
@@ -100,6 +93,23 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
    @Override
    protected void initActionBars(IViewSite viewSite, IActionBars actionBars) {
       // Nothing to do because the own ReadonlyDiagramEditorActionBarContributor is used.
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected ReadonlyDiagramEditorActionBarContributor createEditorActionBarContributor() {
+      return new ReadonlyDiagramEditorActionBarContributor(this);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected void editorPartControlCreated(ExecutionTreeDiagramEditor editorPart, ReadonlyDiagramEditorActionBarContributor contributor) {
+      ZoomManager zoomManager = (ZoomManager)editorPart.getAdapter(ZoomManager.class);
+      contributor.setZoomManager(zoomManager);
    }
    
    /**

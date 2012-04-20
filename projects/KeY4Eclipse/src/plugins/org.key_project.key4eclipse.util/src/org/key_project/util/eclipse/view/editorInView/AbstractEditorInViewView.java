@@ -3,6 +3,7 @@ package org.key_project.util.eclipse.view.editorInView;
 import java.beans.PropertyChangeListener;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StackLayout;
@@ -14,6 +15,7 @@ import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorActionBarContributor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchActionConstants;
@@ -55,7 +57,7 @@ import org.key_project.util.java.StringUtil;
  * @see EditorInViewWorkbenchPage
  * @see IGlobalEnablement
  */
-public abstract class AbstractEditorInViewView<T extends IEditorPart> extends AbstractBeanViewPart {
+public abstract class AbstractEditorInViewView<E extends IEditorPart, C extends IEditorActionBarContributor> extends AbstractBeanViewPart implements ISaveablePart {
    /**
     * Property of {@link #isEditorShown()} which can be observed via a {@link PropertyChangeListener}.
     */
@@ -69,12 +71,12 @@ public abstract class AbstractEditorInViewView<T extends IEditorPart> extends Ab
    /**
     * The shown {@link IEditorPart}.
     */
-   private T editorPart;
+   private E editorPart;
    
    /**
     * The used {@link IEditorActionBarContributor} of {@link #editorPart}.
     */
-   private IEditorActionBarContributor editorActionBarContributor;
+   private C editorActionBarContributor;
    
    /**
     * The used {@link EditorInViewWorkbenchPage}.
@@ -125,12 +127,22 @@ public abstract class AbstractEditorInViewView<T extends IEditorPart> extends Ab
       editorComposite = new Composite(rootComposite, SWT.NONE);
       editorComposite.setLayout(new FillLayout());
       editorPart.createPartControl(editorComposite);
+      editorPartControlCreated(editorPart, editorActionBarContributor);
       // Create message label
       createAdditionalControls(rootComposite);
       // Show editor or message text
       updateShownControl(rootComposite, rootLayout);
    }
-   
+
+   /**
+    * Can be overwritten in subclasses to do some work after the editor control
+    * is created.
+    * @param editorPart The {@link IEditorPart} for that the part control was created
+    * @param contributor The {@link IEditorActionBarContributor} which is used for the {@link IEditorPart}.
+    */
+   protected void editorPartControlCreated(E editorPart, C contributor) {
+   }
+
    /**
     * Creates additional controls like the message {@link Label}.
     * @param parent The parent {@link Composite}.
@@ -164,13 +176,13 @@ public abstract class AbstractEditorInViewView<T extends IEditorPart> extends Ab
     * Creates an {@link IEditorPart} which should be shown in this {@link IViewPart}.
     * @return The created {@link IEditorPart}.
     */
-   protected abstract T createEditorPart();
+   protected abstract E createEditorPart();
    
    /**
     * Creates an {@link IEditorActionBarContributor} to use together with the created {@link IEditorPart}.
     * @return The {@link IEditorActionBarContributor} to use or {@code null} if no one should be used.
     */
-   protected abstract IEditorActionBarContributor createEditorActionBarContributor();
+   protected abstract C createEditorActionBarContributor();
    
    /**
     * Creates the {@link IEditorInput} which should be shown in the created {@link IEditorPart}.
@@ -287,13 +299,14 @@ public abstract class AbstractEditorInViewView<T extends IEditorPart> extends Ab
       }
       firePropertyChange(PROP_EDITOR_SHOWN, oldEditorShown, editorShown);
       firePropertyChange(PROP_MESSAGE_SHOWN, oldMessageShown, isMessageShown());
+      firePropertyChange(PROP_DIRTY); // Fire event to update save and saveAs in workbench window
    }
 
    /**
     * Returns the contained {@link IEditorPart}.
     * @return The {@link IEditorPart} or {@code null} if it was not instantiated yet.
     */
-   protected T getEditorPart() {
+   protected E getEditorPart() {
       return editorPart;
    }
 
@@ -301,7 +314,7 @@ public abstract class AbstractEditorInViewView<T extends IEditorPart> extends Ab
     * Returns the used {@link IEditorActionBarContributor} of {@link #getEditorPart()}.
     * @return The {@link IEditorActionBarContributor} or {@code null} if it was not instantiated yet/is not available.
     */
-   protected IEditorActionBarContributor getEditorActionBarContributor() {
+   protected C getEditorActionBarContributor() {
       return editorActionBarContributor;
    }
    
@@ -319,5 +332,74 @@ public abstract class AbstractEditorInViewView<T extends IEditorPart> extends Ab
     */
    public boolean isEditorShown() {
       return rootLayout != null && ObjectUtil.equals(rootLayout.topControl, editorComposite);
+   }
+
+   /**
+    * <p>
+    * {@inheritDoc}
+    * </p>
+    * <p>
+    * Request is delegated to the contained {@link IEditorPart}.
+    * </p>
+    */
+   @Override
+   public void doSave(IProgressMonitor monitor) {
+      if (editorPart != null) {
+         editorPart.doSave(monitor);
+      }
+   }
+
+   /**
+    * <p>
+    * {@inheritDoc}
+    * </p>
+    * <p>
+    * Request is delegated to the contained {@link IEditorPart}.
+    * </p>
+    */
+   @Override
+   public void doSaveAs() {
+      if (editorPart != null) {
+         editorPart.doSaveAs();
+      }
+   }
+
+   /**
+    * <p>
+    * {@inheritDoc}
+    * </p>
+    * <p>
+    * Request is delegated to the contained {@link IEditorPart}.
+    * </p>
+    */
+   @Override
+   public boolean isDirty() {
+      return isEditorShown() && editorPart.isDirty();
+   }
+
+   /**
+    * <p>
+    * {@inheritDoc}
+    * </p>
+    * <p>
+    * Request is delegated to the contained {@link IEditorPart}.
+    * </p>
+    */
+   @Override
+   public boolean isSaveAsAllowed() {
+      return isEditorShown() && editorPart.isSaveAsAllowed();
+   }
+
+   /**
+    * <p>
+    * {@inheritDoc}
+    * </p>
+    * <p>
+    * Request is delegated to the contained {@link IEditorPart}.
+    * </p>
+    */
+   @Override
+   public boolean isSaveOnCloseNeeded() {
+      return isEditorShown() && editorPart.isSaveOnCloseNeeded();
    }
 }

@@ -15,8 +15,8 @@ import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.graphiti.ui.internal.command.GefCommandWrapper;
 import org.eclipse.jface.action.IAction;
-import org.key_project.sed.ui.visualization.action.GlobalEnablementWrapperAction;
 import org.key_project.util.eclipse.view.editorInView.AbstractEditorInViewView;
+import org.key_project.util.eclipse.view.editorInView.GlobalEnablementWrapperAction;
 import org.key_project.util.eclipse.view.editorInView.IGlobalEnablement;
 
 /**
@@ -68,6 +68,22 @@ public class PaletteHideableDiagramEditor extends DiagramEditor implements IGlob
       }
       childGlobalEnablements.clear();
       super.dispose();
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected void registerAction(IAction action) {
+      if (action instanceof IGlobalEnablement) {
+         registerGlobalEnablement((IGlobalEnablement)action);
+         super.registerAction(action);
+      }
+      else {
+         GlobalEnablementWrapperAction wrapper = new GlobalEnablementWrapperAction(action); // Required to disable keyboard shortcuts if a message is shown.
+         registerGlobalEnablement(wrapper);
+         super.registerAction(wrapper);
+      }
    }
 
    /**
@@ -202,22 +218,6 @@ public class PaletteHideableDiagramEditor extends DiagramEditor implements IGlob
    public void setPaletteHidden(boolean paletteHidden) {
       this.paletteHidden = paletteHidden;
    }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   protected void registerAction(IAction action) {
-      if (action instanceof IGlobalEnablement) {
-         registerGlobalEnablement((IGlobalEnablement)action);
-         super.registerAction(action);
-      }
-      else {
-         GlobalEnablementWrapperAction wrapper = new GlobalEnablementWrapperAction(action); 
-         registerGlobalEnablement(wrapper);
-         super.registerAction(wrapper);
-      }
-   }
    
    /**
     * Registers the new child {@link IGlobalEnablement} in {@link #childGlobalEnablements}
@@ -246,5 +246,32 @@ public class PaletteHideableDiagramEditor extends DiagramEditor implements IGlob
       for (IGlobalEnablement child : childGlobalEnablements) {
          child.setGlobalEnabled(globalEnabled);
       }
+   }
+   
+   /**
+    * <p>
+    * {@inheritDoc}
+    * </p>
+    * <p>
+    * Overwritten to ignore warnings.
+    * </p>
+    */   
+   @SuppressWarnings("rawtypes")
+   @Override
+   public Object getAdapter(Class type) {
+      return super.getAdapter(type);
+   }
+
+   /**
+    * <p>
+    * {@inheritDoc}
+    * </p>
+    * <p>
+    * Overwritten to ignore warnings.
+    * </p>
+    */   
+   @Override
+   public boolean isDirty() {
+      return super.isDirty();
    }
 }

@@ -6,8 +6,12 @@ import java.util.List;
 import org.eclipse.gef.ui.actions.ActionBarContributor;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.ui.IEditorActionBarContributor;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.actions.RetargetAction;
 import org.key_project.util.eclipse.view.editorInView.AbstractEditorInViewView;
+import org.key_project.util.eclipse.view.editorInView.GlobalEnablementWrapperAction;
 import org.key_project.util.eclipse.view.editorInView.IGlobalEnablement;
+import org.key_project.util.eclipse.view.editorInView.NoRetargetWrapperRetargetAction;
 
 /**
  * <p>
@@ -42,6 +46,20 @@ public abstract class AbstractEditorInViewActionBarContributor extends ActionBar
     * Contains child {@link IGlobalEnablement} which have always the same global enablement state.
     */
    private List<IGlobalEnablement> childGlobalEnablements = new LinkedList<IGlobalEnablement>();
+   
+   /**
+    * The fixed {@link IWorkbenchPart} which should always be used as source in {@link RetargetAction}s.
+    */
+   private IWorkbenchPart fixedPart;
+
+   /**
+    * Constructor
+    * @param fixedPart The fixed {@link IWorkbenchPart} which should always be used as source in {@link RetargetAction}s.
+    */
+   public AbstractEditorInViewActionBarContributor(IWorkbenchPart fixedPart) {
+      super();
+      this.fixedPart = fixedPart;
+   }
 
    /**
     * {@inheritDoc}
@@ -54,8 +72,6 @@ public abstract class AbstractEditorInViewActionBarContributor extends ActionBar
       childGlobalEnablements.clear();
       super.dispose();
    }
-   
-   // TODO: Wrap registered RetargetAction to keep them enabled if the view part is not active.
 
    /**
     * {@inheritDoc}
@@ -67,9 +83,22 @@ public abstract class AbstractEditorInViewActionBarContributor extends ActionBar
          super.addAction(action);
       }
       else {
-         GlobalEnablementWrapperAction wrapper = new GlobalEnablementWrapperAction(action); 
+         GlobalEnablementWrapperAction wrapper = new GlobalEnablementWrapperAction(action);
          registerGlobalEnablement(wrapper);
          super.addAction(wrapper);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected void addRetargetAction(RetargetAction action) {
+      if (action instanceof NoRetargetWrapperRetargetAction) {
+         super.addRetargetAction(action);
+      }
+      else {
+         super.addRetargetAction(new NoRetargetWrapperRetargetAction(action, fixedPart));
       }
    }
 
@@ -100,5 +129,13 @@ public abstract class AbstractEditorInViewActionBarContributor extends ActionBar
       for (IGlobalEnablement child : childGlobalEnablements) {
          child.setGlobalEnabled(globalEnabled);
       }
+   }
+   
+   /**
+    * Returns the fixed {@link IWorkbenchPart} which should always be used as source in {@link RetargetAction}s.
+    * @return The fixed {@link IWorkbenchPart} which should always be used as source in {@link RetargetAction}s.
+    */
+   public IWorkbenchPart getFixedPart() {
+      return fixedPart;
    }
 }

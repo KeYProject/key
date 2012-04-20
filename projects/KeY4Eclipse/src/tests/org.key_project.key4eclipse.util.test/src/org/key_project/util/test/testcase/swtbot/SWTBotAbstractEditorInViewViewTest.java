@@ -2,6 +2,7 @@ package org.key_project.util.test.testcase.swtbot;
 
 import junit.framework.TestCase;
 
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.gef.editparts.ZoomManager;
 import org.eclipse.gef.ui.actions.GEFActionConstants;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
@@ -33,15 +34,11 @@ import org.key_project.util.test.view.TextControlEditorInViewView;
  */
 public class SWTBotAbstractEditorInViewViewTest extends TestCase {
    /**
-    * Tests {@link AbstractEditorInViewView#getMessage()},
-    * {@link AbstractEditorInViewView#setMessage(String)},
-    * {@link AbstractEditorInViewView#isEditorShown()},
-    * {@link AbstractEditorInViewView#isMessageShown()},
-    * the events observed via {@link AbstractEditorInViewView#addPropertyChangeListener(String, java.beans.PropertyChangeListener)} and
-    * that the {@link IGlobalEnablement} of contained editor/contributor is correctly updated.
+    * Tests {@link AbstractEditorInViewView#doSave(org.eclipse.core.runtime.IProgressMonitor)} and
+    * {@link AbstractEditorInViewView#doSaveAs()}.
     */
    @Test
-   public void testMessage() throws Exception {
+   public void testSaveAndSaveAs() throws Exception {
       SWTBotView view = null;
       try {
          // Close welcome view
@@ -55,11 +52,59 @@ public class SWTBotAbstractEditorInViewViewTest extends TestCase {
          assertNotNull(textView.getEditorActionBarContributor());
          view = bot.viewById(TextControlEditorInViewView.VIEW_ID);
          assertTrue(view.isActive());
+         // Make sure that no real editor is opened
+         assertEquals(0, bot.editors().size());
+         // Make sure that message is shown
+         assertEquals(0, textView.getEditorPart().getSaveCount());
+         assertEquals(0, textView.getEditorPart().getSaveAsCount());
+         // Call save
+         textView.doSave(new NullProgressMonitor());
+         assertEquals(1, textView.getEditorPart().getSaveCount());
+         assertEquals(0, textView.getEditorPart().getSaveAsCount());
+         // Call save as
+         textView.doSaveAs();
+         assertEquals(1, textView.getEditorPart().getSaveCount());
+         assertEquals(1, textView.getEditorPart().getSaveAsCount());
+      }
+      finally {
+         if (view != null) {
+            view.close();
+         }
+      }
+   }
+   
+   /**
+    * Tests {@link AbstractEditorInViewView#getMessage()},
+    * {@link AbstractEditorInViewView#setMessage(String)},
+    * {@link AbstractEditorInViewView#isEditorShown()},
+    * {@link AbstractEditorInViewView#isMessageShown()},
+    * the events observed via {@link AbstractEditorInViewView#addPropertyChangeListener(String, java.beans.PropertyChangeListener)},
+    * that the {@link IGlobalEnablement} of contained editor/contributor is correctly updated and
+    * {@link AbstractEditorInViewView#isDirty()},
+    * {@link AbstractEditorInViewView#isSaveAsAllowed()} and
+    * {@link AbstractEditorInViewView#isSaveOnCloseNeeded()}.
+    */
+   @Test
+   public void testMessage() throws Exception {
+      SWTBotView view = null;
+      TextControlEditorInViewView textView = null;
+      try {
+         // Close welcome view
+         SWTWorkbenchBot bot = new SWTWorkbenchBot();
+         TestUtilsUtil.closeWelcomeView(bot);
+         // Open view
+         IViewPart part = TestUtilsUtil.openView(TextControlEditorInViewView.VIEW_ID);
+         assertTrue(part instanceof TextControlEditorInViewView);
+         textView = (TextControlEditorInViewView)part;
+         assertNotNull(textView.getEditorPart());
+         assertNotNull(textView.getEditorActionBarContributor());
+         view = bot.viewById(TextControlEditorInViewView.VIEW_ID);
+         assertTrue(view.isActive());
          PropertyChangeListenerLogger editorListener = new PropertyChangeListenerLogger();
          textView.addPropertyChangeListener(AbstractEditorInViewView.PROP_EDITOR_SHOWN, editorListener);
          PropertyChangeListenerLogger messageListener = new PropertyChangeListenerLogger();
          textView.addPropertyChangeListener(AbstractEditorInViewView.PROP_MESSAGE_SHOWN, messageListener);
-         // Make sure that no editor is opened
+         // Make sure that no real editor is opened
          assertEquals(0, bot.editors().size());
          // Make sure that message is shown
          SWTBotLabel label = view.bot().label();
@@ -70,6 +115,9 @@ public class SWTBotAbstractEditorInViewViewTest extends TestCase {
          PropertyChangeListenerLogger.assertNoLoggerEvent(editorListener, messageListener);
          assertFalse(textView.getEditorPart().isGlobalEnabled());
          assertFalse(textView.getEditorActionBarContributor().isGlobalEnabled());
+         assertFalse(textView.isDirty());
+         assertFalse(textView.isSaveAsAllowed());
+         assertFalse(textView.isSaveOnCloseNeeded());
          // Show new text
          textView.setMessage("Hello World!");
          assertEquals("Hello World!", label.getText());
@@ -79,6 +127,9 @@ public class SWTBotAbstractEditorInViewViewTest extends TestCase {
          PropertyChangeListenerLogger.assertNoLoggerEvent(editorListener, messageListener);
          assertFalse(textView.getEditorPart().isGlobalEnabled());
          assertFalse(textView.getEditorActionBarContributor().isGlobalEnabled());
+         assertFalse(textView.isDirty());
+         assertFalse(textView.isSaveAsAllowed());
+         assertFalse(textView.isSaveOnCloseNeeded());
          // Show editor
          textView.setMessage(null);
          assertFalse(label.isVisible());
@@ -93,6 +144,14 @@ public class SWTBotAbstractEditorInViewViewTest extends TestCase {
          PropertyChangeListenerLogger.assertLoggerEvent(part, AbstractEditorInViewView.PROP_EDITOR_SHOWN, false, true, editorListener);
          assertTrue(textView.getEditorPart().isGlobalEnabled());
          assertTrue(textView.getEditorActionBarContributor().isGlobalEnabled());
+         assertFalse(textView.isDirty());
+         assertTrue(textView.isSaveAsAllowed());
+         assertFalse(textView.isSaveOnCloseNeeded());
+         // Make editor dirty
+         textView.getEditorPart().setDirty(true);
+         assertTrue(textView.isDirty());
+         assertTrue(textView.isSaveAsAllowed());
+         assertTrue(textView.isSaveOnCloseNeeded());
          // Show editor again
          textView.setMessage(null);
          assertFalse(label.isVisible());
@@ -103,6 +162,14 @@ public class SWTBotAbstractEditorInViewViewTest extends TestCase {
          PropertyChangeListenerLogger.assertNoLoggerEvent(editorListener, messageListener);
          assertTrue(textView.getEditorPart().isGlobalEnabled());
          assertTrue(textView.getEditorActionBarContributor().isGlobalEnabled());
+         assertTrue(textView.isDirty());
+         assertTrue(textView.isSaveAsAllowed());
+         assertTrue(textView.isSaveOnCloseNeeded());
+         // Make editor not dirty
+         textView.getEditorPart().setDirty(false);
+         assertFalse(textView.isDirty());
+         assertTrue(textView.isSaveAsAllowed());
+         assertFalse(textView.isSaveOnCloseNeeded());
          // Show new text
          textView.setMessage("Hello World Again!");
          assertEquals("Hello World Again!", label.getText());
@@ -114,6 +181,9 @@ public class SWTBotAbstractEditorInViewViewTest extends TestCase {
          PropertyChangeListenerLogger.assertLoggerEvent(part, AbstractEditorInViewView.PROP_EDITOR_SHOWN, true, false, editorListener);
          assertFalse(textView.getEditorPart().isGlobalEnabled());
          assertFalse(textView.getEditorActionBarContributor().isGlobalEnabled());
+         assertFalse(textView.isDirty());
+         assertFalse(textView.isSaveAsAllowed());
+         assertFalse(textView.isSaveOnCloseNeeded());
          // Show editor again
          textView.setMessage(null);
          assertFalse(label.isVisible());
@@ -125,8 +195,14 @@ public class SWTBotAbstractEditorInViewViewTest extends TestCase {
          PropertyChangeListenerLogger.assertLoggerEvent(part, AbstractEditorInViewView.PROP_EDITOR_SHOWN, false, true, editorListener);
          assertTrue(textView.getEditorPart().isGlobalEnabled());
          assertTrue(textView.getEditorActionBarContributor().isGlobalEnabled());
+         assertFalse(textView.isDirty());
+         assertTrue(textView.isSaveAsAllowed());
+         assertFalse(textView.isSaveOnCloseNeeded());
       }
       finally {
+         if (textView != null) {
+            textView.getEditorPart().setDirty(false);
+         }
          if (view != null) {
             view.close();
          }

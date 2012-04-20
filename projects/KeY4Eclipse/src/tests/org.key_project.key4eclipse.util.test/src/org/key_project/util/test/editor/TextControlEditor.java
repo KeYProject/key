@@ -27,10 +27,26 @@ public class TextControlEditor extends EditorPart implements IGlobalEnablement {
    private boolean globalEnabled;
    
    /**
+    * Dirty flag.
+    */
+   private boolean dirty = false;
+   
+   /**
+    * Counts the calls of {@link #doSave(IProgressMonitor)}.
+    */
+   private int saveCount = 0;
+   
+   /**
+    * Counts the calls of {@link #doSaveAs()}.
+    */
+   private int saveAsCount = 0;
+   
+   /**
     * {@inheritDoc}
     */
    @Override
    public void doSave(IProgressMonitor monitor) {
+      saveCount++;
    }
 
    /**
@@ -38,6 +54,7 @@ public class TextControlEditor extends EditorPart implements IGlobalEnablement {
     */
    @Override
    public void doSaveAs() {
+      saveAsCount++;
    }
 
    /**
@@ -56,7 +73,7 @@ public class TextControlEditor extends EditorPart implements IGlobalEnablement {
     */
    @Override
    public boolean isDirty() {
-      return false;
+      return dirty;
    }
 
    /**
@@ -64,7 +81,16 @@ public class TextControlEditor extends EditorPart implements IGlobalEnablement {
     */
    @Override
    public boolean isSaveAsAllowed() {
-      return false;
+      return true;
+   }
+
+   /**
+    * Defines if this editor is dirty or not.
+    * @param dirty {@code true} editor is dirty, {@code false} editor is not dirty.
+    */
+   public void setDirty(boolean dirty) {
+      this.dirty = dirty;
+      firePropertyChange(PROP_DIRTY);
    }
 
    /**
@@ -98,5 +124,21 @@ public class TextControlEditor extends EditorPart implements IGlobalEnablement {
    @Override
    public void setGlobalEnabled(boolean globalEnabled) {
       this.globalEnabled = globalEnabled;
+   }
+
+   /**
+    * Returns how often save ({@link #doSave(IProgressMonitor)}) was called.
+    * @return The number of called saves.
+    */
+   public int getSaveCount() {
+      return saveCount;
+   }
+
+   /**
+    * Returns how often save as ({@link #doSaveAs()}) was called.
+    * @return The number of called saves as .
+    */
+   public int getSaveAsCount() {
+      return saveAsCount;
    }
 }

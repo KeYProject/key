@@ -40,6 +40,11 @@ import org.key_project.util.java.ArrayUtil;
 // TODO: Implement outline view
 public class ExecutionTreeDiagramEditor extends PaletteHideableDiagramEditor {
    /**
+    * Indicates that this editor is read-onl or editable otherwise.
+    */
+   private boolean readOnly;
+
+   /**
     * Listens for debug events.
     */
    private IDebugEventSetListener debugListener = new IDebugEventSetListener() {
@@ -48,7 +53,7 @@ public class ExecutionTreeDiagramEditor extends PaletteHideableDiagramEditor {
          ExecutionTreeDiagramEditor.this.handleDebugEvents(events);
       }
    };
-
+   
    /**
     * {@inheritDoc}
     */
@@ -229,5 +234,29 @@ public class ExecutionTreeDiagramEditor extends PaletteHideableDiagramEditor {
    protected Diagram getDiagram() {
       IDiagramTypeProvider typeProvider = getDiagramTypeProvider();
       return typeProvider != null ? typeProvider.getDiagram() : null;
+   }
+   
+   /**
+    * Checks if this editor is read-only or editable.
+    * @return {@code true} read-only, {@code false} editable
+    */
+   public boolean isReadOnly() {
+      return readOnly;
+   }
+
+   /**
+    * Defines if this editor is read-only or editable.
+    * @param readOnly {@code true} read-only, {@code false} editable
+    */
+   public void setReadOnly(boolean readOnly) {
+      this.readOnly = readOnly;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isDirty() {
+      return !isReadOnly() && super.isDirty();
    }
 }

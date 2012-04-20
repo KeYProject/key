@@ -18,7 +18,7 @@ import org.key_project.util.test.editor.TextControlEditor;
  * @author Martin Hentschel
  * @see AbstractDebugViewBasedEditorInViewViewTest
  */
-public class LoggingDebugViewBasedEditorInViewView extends AbstractDebugViewBasedEditorInViewView<TextControlEditor> {
+public class LoggingDebugViewBasedEditorInViewView extends AbstractDebugViewBasedEditorInViewView<TextControlEditor, IEditorActionBarContributor> {
    /**
     * The ID of this view.
     */
