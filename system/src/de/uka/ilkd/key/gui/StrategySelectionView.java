@@ -69,6 +69,7 @@ public final class StrategySelectionView extends JPanel {
     ButtonGroup nonLinArithGroup = new ButtonGroup();
     ButtonGroup quantifierGroup = new ButtonGroup();
     ButtonGroup stopModeGroup = new ButtonGroup();    
+    ButtonGroup autoInductionGroup = new ButtonGroup(); //chrisg    
     ButtonGroup[] userTacletsGroup = new ButtonGroup[StrategyProperties.USER_TACLETS_NUM];
     {
         for (int i = 0; i < StrategyProperties.USER_TACLETS_NUM; ++i)
@@ -96,6 +97,9 @@ public final class StrategySelectionView extends JPanel {
     private JRadioButtonHashMap quantifierNonSplitting;
     private JRadioButtonHashMap quantifierNonSplittingWithProgs;
     private JRadioButtonHashMap quantifierInstantiate;
+    private JRadioButtonHashMap autoInductionOff; //chrisg
+    private JRadioButtonHashMap autoInductionOn; 
+    private JRadioButtonHashMap autoInductionLemmaOn; 
     
     private KeYMediator mediator;
     
@@ -482,6 +486,59 @@ public final class StrategySelectionView extends JPanel {
         addJavaDLOptionSpace ( javaDLOptionsLayout, yCoord );
 
         ////////////////////////////////////////////////////////////////////////
+        //chrisg
+        
+        ++yCoord;
+        
+        addJavaDLOption ( new JLabel ( "Auto Induction" ),
+                    javaDLOptionsLayout, 1, yCoord, 7 );
+        
+        ++yCoord;
+
+        autoInductionOff = new JRadioButtonHashMap("Off", 
+                         StrategyProperties.AUTO_INDUCTION_OFF, true, false);
+        autoInductionOff.setToolTipText ( "<html>" +
+            "Deactivates automatic creation of inductive proofs.<br>" +
+            "In order to make use of auto induction, activate <br>" +
+            "auto induction early in proofs before the <br>" +
+            "quantified formula that is to be proven inductively<br>" +
+            "is Skolemized (using the delta rule). Auto induction<br>" +
+            "is not applied on Skolemized formulas in order to<br>" +
+            "limit the number of inductive proofs." +
+            "</html>" );
+        autoInductionGroup.add(autoInductionOff);
+        addJavaDLOption ( autoInductionOff, javaDLOptionsLayout, 2, yCoord, 2 );
+
+        autoInductionOn = new JRadioButtonHashMap("On", 
+                             StrategyProperties.AUTO_INDUCTION_ON, false, false);
+        autoInductionOn.setToolTipText ( "<html>" +
+            "Create an inductive proof for formulas of the form:<br>" +
+            "      ==>  \\forall int i; 0<=i->phi <br>" +
+            "and certain other forms. The induction hypothesis<br>" +
+            "is the subformula phi. The rule is applied before<br>" +
+            "beta rules are applied." +
+            "</html>" );
+        autoInductionGroup.add(autoInductionOn);
+        addJavaDLOption ( autoInductionOn, javaDLOptionsLayout, 4, yCoord, 2 );
+        
+
+        autoInductionLemmaOn = new JRadioButtonHashMap("Use as Lemma", 
+                             StrategyProperties.AUTO_INDUCTION_LEMMA_ON, false, false);
+        autoInductionLemmaOn.setToolTipText ( "<html>" +
+            "Auto induction is activated on formulas of the form<br>" +
+            "      ==>  (\\forall int i; 0<=i->phi) & psi <br>" +
+            "and certain other forms. The quantified formula<br>" +
+            "is used in the Use Case branch as a lemma for psi,<br>" +
+            "i.e., the sequent in the Use Case has the form:<br>" +
+            "      (\\forall int i; 0<=i->phi) ==>  psi <br>" +
+            "</html>" );
+        autoInductionGroup.add(autoInductionLemmaOn);
+        addJavaDLOption ( autoInductionLemmaOn, javaDLOptionsLayout, 6, yCoord, 2 );
+        
+        ++yCoord;
+        addJavaDLOptionSpace ( javaDLOptionsLayout, yCoord );
+
+        ////////////////////////////////////////////////////////////////////////
 
         ++yCoord;
 
@@ -607,6 +664,9 @@ public final class StrategySelectionView extends JPanel {
         quantifierNonSplitting.addActionListener(optListener);
         quantifierNonSplittingWithProgs.addActionListener(optListener);
         quantifierInstantiate.addActionListener(optListener);
+        autoInductionOff.addActionListener(optListener);
+        autoInductionOn.addActionListener(optListener);
+        autoInductionLemmaOn.addActionListener(optListener);
     }
 
     private void addUserTacletsOptions(GridBagLayout javaDLOptionsLayout,
@@ -856,7 +916,11 @@ public final class StrategySelectionView extends JPanel {
             String stopmodeOptions = p.getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY);
             JRadioButton bStopModeActive = getStrategyOptionButton(stopmodeOptions, 
                     StrategyProperties.STOPMODE_OPTIONS_KEY);
-            bStopModeActive.setSelected(true);        
+            bStopModeActive.setSelected(true);  
+            String autoInductionOptions = p.getProperty(StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY); //chrisg
+            JRadioButton bAutoInductionOptions = getStrategyOptionButton(autoInductionOptions, 
+                    StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY);
+            bAutoInductionOptions.setSelected(true);   
          
             for (int i = 1; i <= StrategyProperties.USER_TACLETS_NUM; ++i) {
                 String userTacletsOptions =
@@ -965,6 +1029,8 @@ public final class StrategySelectionView extends JPanel {
                        quantifierGroup.getSelection().getActionCommand());
         p.setProperty( StrategyProperties.STOPMODE_OPTIONS_KEY, 
                        stopModeGroup.getSelection().getActionCommand());
+        p.setProperty( StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY, //chrisg
+                       autoInductionGroup.getSelection().getActionCommand());
         
         for (int i = 1; i <= StrategyProperties.USER_TACLETS_NUM; ++i) {
             p.setProperty( StrategyProperties.USER_TACLETS_OPTIONS_KEY(i), 
