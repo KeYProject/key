@@ -108,9 +108,12 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
         .getProperty(StrategyProperties.QUERY_OPTIONS_KEY);
         final Feature queryF;
         if (queryProp.equals(StrategyProperties.QUERY_ON)) {
-                queryF = querySpecFeature(longConst(200));
+                //queryF = querySpecFeature(longConst(200));
+        	    queryF = querySpecFeature(new QueryExpandCost(true,false,false,false)); 
+        } else if (queryProp.equals(StrategyProperties.QUERY_RESTRICTED)) {
+    	    queryF = querySpecFeature(new QueryExpandCost(true,true,true,true)); 
         } else if (queryProp.equals(StrategyProperties.QUERY_OFF)) {
-                queryF = querySpecFeature(inftyConst());
+        		queryF = querySpecFeature(inftyConst());
         } else {
                 queryF = null;
                 assert false;

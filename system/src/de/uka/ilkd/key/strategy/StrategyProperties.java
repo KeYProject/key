@@ -47,6 +47,7 @@ public final class StrategyProperties extends Properties {
 
     public final static String QUERY_OPTIONS_KEY = "QUERY_NEW_OPTIONS_KEY";
     public final static String QUERY_ON = "QUERY_ON";
+    public final static String QUERY_RESTRICTED = "QUERY_RESTRICTED";
     public final static String QUERY_OFF = "QUERY_OFF";
 
     

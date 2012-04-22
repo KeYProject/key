@@ -89,6 +89,7 @@ public final class StrategySelectionView extends JPanel {
     private JRadioButtonHashMap depOn;
     private JRadioButtonHashMap depOff;
     private JRadioButtonHashMap queryOn;
+    private JRadioButtonHashMap queryRestricted; //chrisg
     private JRadioButtonHashMap queryOff;
     private JRadioButtonHashMap nonLinArithNone;
     private JRadioButtonHashMap nonLinArithDefOps;
@@ -360,11 +361,17 @@ public final class StrategySelectionView extends JPanel {
         queryGroup.add(queryOn);
         addJavaDLOption ( queryOn, javaDLOptionsLayout, 2, yCoord, 2 );        
         
+        queryRestricted = new JRadioButtonHashMap("Restricted", 
+                StrategyProperties.QUERY_RESTRICTED, false, false);
+        queryRestricted.setToolTipText ( "<html>TODO: See QueryExpandCost.java .</html>" );
+        queryGroup.add(queryRestricted);
+        addJavaDLOption ( queryRestricted, javaDLOptionsLayout, 4, yCoord, 2 );        
+
         queryOff = new JRadioButtonHashMap("Off", 
-                StrategyProperties.QUERY_OFF, false, false);
+                StrategyProperties.QUERY_OFF, true, false);
         queryOff.setToolTipText ( "<html>Rewrite query to a method call so that contracts or inlining can be used.</html>" );
         queryGroup.add(queryOff);
-        addJavaDLOption ( queryOff, javaDLOptionsLayout, 4, yCoord, 2 );
+        addJavaDLOption ( queryOff, javaDLOptionsLayout, 6, yCoord, 2 );
 
         
         ++yCoord;
@@ -513,7 +520,7 @@ public final class StrategySelectionView extends JPanel {
                              StrategyProperties.AUTO_INDUCTION_ON, false, false);
         autoInductionOn.setToolTipText ( "<html>" +
             "Create an inductive proof for formulas of the form:<br>" +
-            "      ==>  \\forall int i; 0<=i->phi <br>" +
+            "      ==>  \\forall int i; 0&lt;=i->phi <br>" +
             "and certain other forms. The induction hypothesis<br>" +
             "is the subformula phi. The rule is applied before<br>" +
             "beta rules are applied." +
@@ -526,11 +533,11 @@ public final class StrategySelectionView extends JPanel {
                              StrategyProperties.AUTO_INDUCTION_LEMMA_ON, false, false);
         autoInductionLemmaOn.setToolTipText ( "<html>" +
             "Auto induction is activated on formulas of the form<br>" +
-            "      ==>  (\\forall int i; 0<=i->phi) & psi <br>" +
+            "      ==>  (\\forall int i; 0&lt;=i->phi) & psi <br>" +
             "and certain other forms. The quantified formula<br>" +
             "is used in the Use Case branch as a lemma for psi,<br>" +
             "i.e., the sequent in the Use Case has the form:<br>" +
-            "      (\\forall int i; 0<=i->phi) ==>  psi <br>" +
+            "      (\\forall int i; 0&lt;=i->phi) ==>  psi <br>" +
             "</html>" );
         autoInductionGroup.add(autoInductionLemmaOn);
         addJavaDLOption ( autoInductionLemmaOn, javaDLOptionsLayout, 6, yCoord, 2 );
