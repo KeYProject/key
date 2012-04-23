@@ -1417,6 +1417,8 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
     |
         (LPAREN BSUM) => result=bsumterm
     |
+        (LPAREN SEQDEF) => result=seqdefterm
+    |
 	(OLD | PRE) => result=oldexpression
 	
     |   result = transactionUpdated
@@ -1794,6 +1796,36 @@ bsumterm returns [SLExpression result=null] throws SLTranslationException
         resolverManager.popLocalVariablesNamespace();
         throw ex;
         }   
+
+
+seqdefterm returns [SLExpression result=null] throws SLTranslationException
+{
+    SLExpression a = null;
+    SLExpression b = null;
+    SLExpression t = null;
+    Pair<KeYJavaType,ImmutableList<LogicVariable>> decls = null;
+}:
+        LPAREN
+        q:SEQDEF decls=quantifiedvardecls 
+        {	    
+            resolverManager.pushLocalVariablesNamespace();
+            resolverManager.putIntoTopLocalVariablesNamespace(decls.second, decls.first);
+        } 
+        SEMI
+        (
+            a=expression SEMI  b=expression SEMI t=expression
+        )
+        {
+            result = translator.translate(q.getText(), SLExpression.class, a, b, t, decls.first, decls.second, services);
+            resolverManager.popLocalVariablesNamespace();
+        }
+        RPAREN
+; exception
+        catch [SLTranslationException ex] {
+        resolverManager.popLocalVariablesNamespace();
+        throw ex;
+        }   
+
 
 quantifiedvardecls returns [Pair<KeYJavaType,ImmutableList<LogicVariable>> result = null]
                    throws SLTranslationException
