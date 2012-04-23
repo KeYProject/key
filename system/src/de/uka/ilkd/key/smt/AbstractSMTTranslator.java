@@ -98,7 +98,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         /** The translation result is stored in this variable. */
         protected String text;
 
-        protected SMTTranslation translation = new SMTTranslation();
+//        protected SMTTranslation translation = new SMTTranslation();
 
 
         /** remember all function declarations */
