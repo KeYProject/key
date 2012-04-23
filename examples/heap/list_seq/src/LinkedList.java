@@ -104,7 +104,7 @@ final class LinkedList implements List {
 	size++;
     }
     
-    // to be done
+    // proved!
     public void remove(Object o) {
 	if(size == 0)
 	    return;
