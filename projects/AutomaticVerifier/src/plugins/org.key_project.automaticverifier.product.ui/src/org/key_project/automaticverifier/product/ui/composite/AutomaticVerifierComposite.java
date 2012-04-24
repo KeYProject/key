@@ -13,7 +13,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnWeightData;
@@ -26,6 +25,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
@@ -35,6 +35,7 @@ import org.key_project.automaticverifier.product.ui.model.AutomaticProof;
 import org.key_project.automaticverifier.product.ui.provider.AutomaticProofLabelProvider;
 import org.key_project.automaticverifier.product.ui.util.LogUtil;
 import org.key_project.automaticverifier.product.ui.view.AutomaticVerifierView;
+import org.key_project.key4eclipse.starter.core.job.AbstractKeYMainWindowJob;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
 
@@ -64,6 +65,26 @@ public class AutomaticVerifierComposite extends Composite {
      * Key to store the show main window flag in an {@link IMemento}.
      */
     public static final String MEMENTO_KEY_SHOW_WINDOW = "showKeYMainWindow";
+
+    /**
+     * Key to store the method treatment option in an {@link IMemento}.
+     */
+    public static final String MEMENTO_KEY_EXPAND_METHODS = "expandMethods";
+
+    /**
+     * Key to store the use dependency contracts option in an {@link IMemento}.
+     */
+    public static final String MEMENTO_KEY_USE_DEPENDENCY_CONTRACTS = "useDependencyContracts";
+
+    /**
+     * Key to store the use query treatment option in an {@link IMemento}.
+     */
+    public static final String MEMENTO_KEY_USE_QUERY = "useQuery";
+
+    /**
+     * Key to store the use arithmetic treatment option in an {@link IMemento}.
+     */
+    public static final String MEMENTO_KEY_USE_DEF_OPS = "useDefOps";
     
     /**
      * Defines the location.
@@ -81,6 +102,46 @@ public class AutomaticVerifierComposite extends Composite {
     private TableViewer proofViewer;
     
     /**
+     * Defines the proof search strategy option "Method Treatment" with option "Contract".
+     */
+    private Button methodTreatmentContractButton;
+    
+    /**
+     * Defines the proof search strategy option "Method Treatment" with option "Expand".
+     */
+    private Button methodTreatmentExpandButton;
+    
+    /**
+     * Defines the proof search strategy option "Dependency contracts" with option "On".
+     */
+    private Button dependencyContractsOnButton;
+    
+    /**
+     * Defines the proof search strategy option "Dependency contracts" with option "Off".
+     */
+    private Button dependencyContractsOffButton;
+    
+    /**
+     * Defines the proof search strategy option "Query treatment" with option "On".
+     */
+    private Button queryTreatmentOnButton;
+    
+    /**
+     * Defines the proof search strategy option "Query treatment" with option "Off".
+     */
+    private Button queryTreatmentOffButton;
+    
+    /**
+     * Defines the proof search strategy option "Arithmetic treatment" with option "Base".
+     */
+    private Button arithmeticTreatmentBaseButton;
+    
+    /**
+     * Defines the proof search strategy option "Arithmetic treatment" with option "DefOps".
+     */
+    private Button arithmeticTreatmentDefOpsButton;
+    
+    /**
      * Constructor.
      * @param parent The parent {@link Composite}.
      * @param style The style to use.
@@ -88,10 +149,12 @@ public class AutomaticVerifierComposite extends Composite {
     public AutomaticVerifierComposite(Composite parent, int style) {
         super(parent, style);
         setLayout(new GridLayout(1, false));
+        // Source group
         Group sourceGroup = new Group(this, SWT.NONE);
         sourceGroup.setText("Source");
         sourceGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         sourceGroup.setLayout(new GridLayout(1, false));
+        // Location
         Composite locationComposite = new Composite(sourceGroup, SWT.NONE);
         locationComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         locationComposite.setLayout(new GridLayout(2, false));
@@ -103,9 +166,9 @@ public class AutomaticVerifierComposite extends Composite {
         loadComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         loadComposite.setLayout(new GridLayout(2, false)); 
         showKeYWindowButton = new Button(loadComposite, SWT.CHECK);
-        showKeYWindowButton.setText("&Show KeY main window");
+        showKeYWindowButton.setText("Sho&w KeY main window");
         Button loadSourceButton = new Button(loadComposite, SWT.PUSH);
-        loadSourceButton.setText("&Load");
+        loadSourceButton.setText("Loa&d");
         loadSourceButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         loadSourceButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -113,10 +176,48 @@ public class AutomaticVerifierComposite extends Composite {
                 loadSource();
             }
         });
+        // Proof group
         Group proofGroup = new Group(this, SWT.NONE);
         proofGroup.setText("Proofs");
         proofGroup.setLayoutData(new GridData(GridData.FILL_BOTH));
         proofGroup.setLayout(new GridLayout(1, false));
+        // Proof search strategy
+        Composite proofSearchStrategyOptionComposite = new Composite(proofGroup, SWT.NONE);
+        proofSearchStrategyOptionComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        proofSearchStrategyOptionComposite.setLayout(new GridLayout(4, true));
+        Group methodTreatmentGroup = new Group(proofSearchStrategyOptionComposite, SWT.NONE);
+        methodTreatmentGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        methodTreatmentGroup.setLayout(new GridLayout(2, false));
+        methodTreatmentGroup.setText("Method Treatment");
+        methodTreatmentContractButton = new Button(methodTreatmentGroup, SWT.RADIO);
+        methodTreatmentContractButton.setText("&Contract");
+        methodTreatmentExpandButton = new Button(methodTreatmentGroup, SWT.RADIO);
+        methodTreatmentExpandButton.setText("E&xpand");
+        Group dependencyContractsGroup = new Group(proofSearchStrategyOptionComposite, SWT.NONE);
+        dependencyContractsGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        dependencyContractsGroup.setLayout(new GridLayout(2, false));
+        dependencyContractsGroup.setText("Dependency Contracts");
+        dependencyContractsOnButton = new Button(dependencyContractsGroup, SWT.RADIO);
+        dependencyContractsOnButton.setText("O&n");
+        dependencyContractsOffButton = new Button(dependencyContractsGroup, SWT.RADIO);
+        dependencyContractsOffButton.setText("O&ff");
+        Group queryTreatmentGroup = new Group(proofSearchStrategyOptionComposite, SWT.NONE);
+        queryTreatmentGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        queryTreatmentGroup.setLayout(new GridLayout(2, false));
+        queryTreatmentGroup.setText("Query Treatment");
+        queryTreatmentOnButton = new Button(queryTreatmentGroup, SWT.RADIO);
+        queryTreatmentOnButton.setText("On");
+        queryTreatmentOffButton = new Button(queryTreatmentGroup, SWT.RADIO);
+        queryTreatmentOffButton.setText("Off");
+        Group arithmeticTreatmentGroup = new Group(proofSearchStrategyOptionComposite, SWT.NONE);
+        arithmeticTreatmentGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        arithmeticTreatmentGroup.setLayout(new GridLayout(2, false));
+        arithmeticTreatmentGroup.setText("Arithmetic Treatment");
+        arithmeticTreatmentBaseButton = new Button(arithmeticTreatmentGroup, SWT.RADIO);
+        arithmeticTreatmentBaseButton.setText("&Base");
+        arithmeticTreatmentDefOpsButton = new Button(arithmeticTreatmentGroup, SWT.RADIO);
+        arithmeticTreatmentDefOpsButton.setText("DefO&ps");
+        // Proof viewer
         Composite proofViewerComposite = new Composite(proofGroup, SWT.NONE);
         proofViewerComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
         TableColumnLayout proofViewerLayout = new TableColumnLayout();
@@ -197,14 +298,34 @@ public class AutomaticVerifierComposite extends Composite {
             LogUtil.getLogger().openErrorDialog(getShell(), e);
         }
     }
+    
+    /**
+     * Enables or disables the controls with proof specific options.
+     * @param enabled {@code true} set enabled state, {@code false} set disabled state.
+     */
+    protected void setProofSearchStrategyOptionsEnabled(boolean enabled) {
+       methodTreatmentContractButton.setEnabled(enabled);
+       methodTreatmentExpandButton.setEnabled(enabled);
+       dependencyContractsOnButton.setEnabled(enabled);
+       dependencyContractsOffButton.setEnabled(enabled);
+       queryTreatmentOnButton.setEnabled(enabled);
+       queryTreatmentOffButton.setEnabled(enabled);
+       arithmeticTreatmentBaseButton.setEnabled(enabled);
+       arithmeticTreatmentDefOpsButton.setEnabled(enabled);
+    }
 
     /**
      * Starts all available proofs.
      */
     public void startProofs() {
         if (proofViewer.getInput() instanceof List<?>) {
+            setProofSearchStrategyOptionsEnabled(false);
             final List<?> input = (List<?>)proofViewer.getInput();
-            new Job("Proving") {
+            final boolean expandMethods = methodTreatmentExpandButton.getSelection();
+            final boolean useDependencyContracts = dependencyContractsOnButton.getSelection();
+            final boolean useQuery = queryTreatmentOnButton.getSelection();
+            final boolean useDefOps = arithmeticTreatmentDefOpsButton.getSelection();
+            new AbstractKeYMainWindowJob("Proving") {
                 @Override
                 protected IStatus run(IProgressMonitor monitor) {
                     try {
@@ -213,7 +334,7 @@ public class AutomaticVerifierComposite extends Composite {
                         for (Object obj : input) {
                             SWTUtil.checkCanceled(monitor);
                             if (obj instanceof AutomaticProof) {
-                                ((AutomaticProof)obj).startProof();
+                                ((AutomaticProof)obj).startProof(expandMethods, useDependencyContracts, useQuery, useDefOps);
                             }
                             monitor.worked(1);
                         }
@@ -227,6 +348,12 @@ public class AutomaticVerifierComposite extends Composite {
                     }
                     finally {
                         monitor.done();
+                        Display.getDefault().syncExec(new Runnable() {
+                           @Override
+                           public void run() {
+                              setProofSearchStrategyOptionsEnabled(true);
+                           }
+                        });
                     }
                 }
             }.schedule();
@@ -264,7 +391,7 @@ public class AutomaticVerifierComposite extends Composite {
             final File location = new File(locationText.getText());
             final boolean showKeYMainWindow = showKeYWindowButton.getSelection();
             if (location.exists()) {
-                new Job("Loading in KeY") {
+                new AbstractKeYMainWindowJob("Loading in KeY") {
                     @Override
                     protected IStatus run(IProgressMonitor monitor) {
                         try {
@@ -360,8 +487,21 @@ public class AutomaticVerifierComposite extends Composite {
      */
     public void loadState(IMemento memento) {
         if (memento != null) {
-            locationText.setText(memento.getString(MEMENTO_KEY_LOCATION));
-            showKeYWindowButton.setSelection(memento.getBoolean(MEMENTO_KEY_SHOW_WINDOW));
+            SWTUtil.setText(locationText, memento.getString(MEMENTO_KEY_LOCATION)); 
+            Boolean showKeYWindow = memento.getBoolean(MEMENTO_KEY_SHOW_WINDOW);
+            showKeYWindowButton.setSelection(showKeYWindow != null && showKeYWindow.booleanValue());
+            Boolean expandMethods = memento.getBoolean(MEMENTO_KEY_EXPAND_METHODS);
+            methodTreatmentContractButton.setSelection(expandMethods != null && !expandMethods.booleanValue());
+            methodTreatmentExpandButton.setSelection(expandMethods == null || expandMethods.booleanValue());
+            Boolean useDependencyContracts = memento.getBoolean(MEMENTO_KEY_USE_DEPENDENCY_CONTRACTS);
+            dependencyContractsOnButton.setSelection(useDependencyContracts == null || useDependencyContracts.booleanValue());
+            dependencyContractsOffButton.setSelection(useDependencyContracts != null && !useDependencyContracts.booleanValue());
+            Boolean useQuery = memento.getBoolean(MEMENTO_KEY_USE_QUERY);
+            queryTreatmentOnButton.setSelection(useQuery == null || useQuery.booleanValue());
+            queryTreatmentOffButton.setSelection(useQuery != null && !useQuery.booleanValue());
+            Boolean useDefOpy = memento.getBoolean(MEMENTO_KEY_USE_DEF_OPS);
+            arithmeticTreatmentBaseButton.setSelection(useDefOpy != null && !useDefOpy.booleanValue());
+            arithmeticTreatmentDefOpsButton.setSelection(useDefOpy == null || useDefOpy.booleanValue());
         }
     }
 
@@ -373,6 +513,10 @@ public class AutomaticVerifierComposite extends Composite {
         if (memento != null) {
             memento.putString(MEMENTO_KEY_LOCATION, locationText.getText());
             memento.putBoolean(MEMENTO_KEY_SHOW_WINDOW, showKeYWindowButton.getSelection());
+            memento.putBoolean(MEMENTO_KEY_EXPAND_METHODS, methodTreatmentExpandButton.getSelection());
+            memento.putBoolean(MEMENTO_KEY_USE_DEPENDENCY_CONTRACTS, dependencyContractsOnButton.getSelection());
+            memento.putBoolean(MEMENTO_KEY_USE_QUERY, queryTreatmentOnButton.getSelection());
+            memento.putBoolean(MEMENTO_KEY_USE_DEF_OPS, arithmeticTreatmentDefOpsButton.getSelection());
         }
     }
 }

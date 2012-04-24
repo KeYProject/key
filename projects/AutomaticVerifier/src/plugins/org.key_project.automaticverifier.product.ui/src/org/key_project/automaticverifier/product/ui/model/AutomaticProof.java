@@ -8,6 +8,7 @@ import org.key_project.util.java.thread.AbstractRunnableWithResult;
 import org.key_project.util.java.thread.IRunnableWithResult;
 
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
@@ -16,6 +17,7 @@ import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 
 /**
  * Represents an automatic proof.
@@ -156,8 +158,18 @@ public class AutomaticProof extends Bean {
      * Starts the proof in KeY and tries to fulfill it automatically.
      * @throws Exception Occurred Exception.
      */
-    public void startProof() throws Exception {
-       // Make sure that the proof was not executed before.
+    public void startProof(final boolean expandMethods,
+                           final boolean useDependencyContracts,
+                           final boolean useQuery,
+                           final boolean useDefOps) throws Exception {
+       // Check if the proof is still valid
+       if (proof != null && !KeYUtil.isProofInUI(proof)) {
+          // proof is invalid, reset this automatic proof instance
+          proof = null; 
+          setResult(AutomaticProofResult.UNKNOWN);
+          updateStatistics();
+       }
+       // Instantiate new proof if required
        if (proof == null) {
            IRunnableWithResult<Proof> run = new AbstractRunnableWithResult<Proof>() {
                @Override
@@ -191,11 +203,29 @@ public class AutomaticProof extends Bean {
                }
            });
            setResult(AutomaticProofResult.OPEN);
-           // Start interactive proof automatically
-           proofStartTime = System.currentTimeMillis();
-           KeYUtil.runProofInAutomaticModeWithoutResultDialog(proof);
-           // Update statistics
-           updateStatistics();
+       }
+       // Start auto mode if the proof has opened goals.
+       if (proof != null && !proof.openEnabledGoals().isEmpty()) {
+          SwingUtil.invokeAndWait(new Runnable() {
+             @Override
+             public void run() {
+                // Set proof strategy options
+                StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
+                sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, expandMethods ? StrategyProperties.METHOD_EXPAND : StrategyProperties.METHOD_CONTRACT);
+                sp.setProperty(StrategyProperties.DEP_OPTIONS_KEY, useDependencyContracts ? StrategyProperties.DEP_ON : StrategyProperties.DEP_OFF);
+                sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY, useQuery ? StrategyProperties.QUERY_ON : StrategyProperties.QUERY_OFF);
+                sp.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY, useDefOps ? StrategyProperties.NON_LIN_ARITH_DEF_OPS : StrategyProperties.NON_LIN_ARITH_NONE);
+                proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
+                // Make sure that the new options are used
+                ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setActiveStrategyProperties(sp);
+                proof.setActiveStrategy(MainWindow.getInstance().getMediator().getProfile().getDefaultStrategyFactory().create(proof, sp));
+             }
+          });
+          // Start interactive proof automatically
+          proofStartTime = System.currentTimeMillis();
+          KeYUtil.runProofInAutomaticModeWithoutResultDialog(proof);
+          // Update statistics
+          updateStatistics();
        }
     }
 
@@ -212,9 +242,9 @@ public class AutomaticProof extends Bean {
      * {@link #getNodes()}, {@link #getBranches()} and {@link #getTime()}.
      */
     protected void updateStatistics() {
-        setTime(System.currentTimeMillis() - proofStartTime);
-        setNodes(proof.countNodes());
-        setBranches(proof.countBranches());
+        setTime(proof != null ? getTime() + (System.currentTimeMillis() - proofStartTime) : 0l);
+        setNodes(proof != null ? proof.countNodes() : 0);
+        setBranches(proof != null ? proof.countBranches() : 0);
     }
 
     /**
