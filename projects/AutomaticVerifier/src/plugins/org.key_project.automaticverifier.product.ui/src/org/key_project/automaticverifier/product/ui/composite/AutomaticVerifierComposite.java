@@ -231,6 +231,7 @@ public class AutomaticVerifierComposite extends Composite {
         loadComposite.setLayout(new GridLayout(4, false)); 
         showKeYWindowButton = new Button(loadComposite, SWT.CHECK);
         showKeYWindowButton.setText("Sho&w KeY main window");
+        showKeYWindowButton.setSelection(true);
         Button loadSourceButton = new Button(loadComposite, SWT.PUSH);
         loadSourceButton.setText("Loa&d");
         loadSourceButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -260,6 +261,7 @@ public class AutomaticVerifierComposite extends Composite {
         methodTreatmentContractButton = new Button(methodTreatmentGroup, SWT.RADIO);
         methodTreatmentContractButton.setText("&Contract");
         methodTreatmentExpandButton = new Button(methodTreatmentGroup, SWT.RADIO);
+        methodTreatmentExpandButton.setSelection(true);
         methodTreatmentExpandButton.setText("E&xpand");
         Group dependencyContractsGroup = new Group(proofSearchStrategyOptionComposite, SWT.NONE);
         dependencyContractsGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -267,6 +269,7 @@ public class AutomaticVerifierComposite extends Composite {
         dependencyContractsGroup.setText("Dependency Contracts");
         dependencyContractsOnButton = new Button(dependencyContractsGroup, SWT.RADIO);
         dependencyContractsOnButton.setText("O&n");
+        dependencyContractsOnButton.setSelection(true);
         dependencyContractsOffButton = new Button(dependencyContractsGroup, SWT.RADIO);
         dependencyContractsOffButton.setText("O&ff");
         Group queryTreatmentGroup = new Group(proofSearchStrategyOptionComposite, SWT.NONE);
@@ -275,6 +278,7 @@ public class AutomaticVerifierComposite extends Composite {
         queryTreatmentGroup.setText("Query Treatment");
         queryTreatmentOnButton = new Button(queryTreatmentGroup, SWT.RADIO);
         queryTreatmentOnButton.setText("On");
+        queryTreatmentOnButton.setSelection(true);
         queryTreatmentOffButton = new Button(queryTreatmentGroup, SWT.RADIO);
         queryTreatmentOffButton.setText("Off");
         Group arithmeticTreatmentGroup = new Group(proofSearchStrategyOptionComposite, SWT.NONE);
@@ -285,6 +289,7 @@ public class AutomaticVerifierComposite extends Composite {
         arithmeticTreatmentBaseButton.setText("&Base");
         arithmeticTreatmentDefOpsButton = new Button(arithmeticTreatmentGroup, SWT.RADIO);
         arithmeticTreatmentDefOpsButton.setText("DefO&ps");
+        arithmeticTreatmentDefOpsButton.setSelection(true);
         // Proof viewer
         Composite proofViewerComposite = new Composite(proofGroup, SWT.NONE);
         proofViewerComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -662,7 +667,7 @@ public class AutomaticVerifierComposite extends Composite {
         if (memento != null) {
             SWTUtil.setText(locationText, memento.getString(MEMENTO_KEY_LOCATION)); 
             Boolean showKeYWindow = memento.getBoolean(MEMENTO_KEY_SHOW_WINDOW);
-            showKeYWindowButton.setSelection(showKeYWindow != null && showKeYWindow.booleanValue());
+            showKeYWindowButton.setSelection(showKeYWindow == null || showKeYWindow.booleanValue());
             Boolean expandMethods = memento.getBoolean(MEMENTO_KEY_EXPAND_METHODS);
             methodTreatmentContractButton.setSelection(expandMethods != null && !expandMethods.booleanValue());
             methodTreatmentExpandButton.setSelection(expandMethods == null || expandMethods.booleanValue());
