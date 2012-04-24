@@ -660,6 +660,7 @@ public final class StrategySelectionView extends JPanel {
         depOn.addActionListener(optListener);
         depOff.addActionListener(optListener);
         queryOn.addActionListener(optListener);
+        queryRestricted.addActionListener(optListener);
         queryOff.addActionListener(optListener);
         splittingNormal.addActionListener(optListener);
         splittingDelayed.addActionListener(optListener);
