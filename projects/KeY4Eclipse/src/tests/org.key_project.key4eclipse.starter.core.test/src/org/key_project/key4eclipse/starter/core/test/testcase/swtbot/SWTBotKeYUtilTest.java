@@ -281,6 +281,20 @@ public class SWTBotKeYUtilTest extends TestCase {
         KeYUtil.startProofAsync(chargeMehtod);
         TestUtilsUtil.keyGoToSelectedProofInProofManagementDiaolog();
         TestUtilsUtil.keyCheckProofs(TestKeY4EclipseUtil.createOperationContractId("banking.PayCard", "charge(int)", "0", null), TestKeY4EclipseUtil.createOperationContractId("banking.PayCard", "charge(int)", "0", null), TestKeY4EclipseUtil.createOperationContractId("MCDemo", "inc(int)", "0", "normal_behavior"));
+        // Open proof for default constructor of PayCard
+        IMethod defaultConstructor = TestUtilsUtil.getJdtMethod(javaProject, "banking.PayCard", "PayCard");
+        assertNotNull(defaultConstructor);
+        assertTrue(defaultConstructor.isConstructor());
+        KeYUtil.startProofAsync(defaultConstructor);
+        TestUtilsUtil.keyStartSelectedProofInProofManagementDiaolog();
+        TestUtilsUtil.keyCheckProofs(TestKeY4EclipseUtil.createOperationContractId("banking.PayCard", "PayCard()", "0", null), TestKeY4EclipseUtil.createOperationContractId("banking.PayCard", "charge(int)", "0", null), TestKeY4EclipseUtil.createOperationContractId("MCDemo", "inc(int)", "0", "normal_behavior"));
+        // Open proof for int constructor of PayCard
+        IMethod intConstructor = TestUtilsUtil.getJdtMethod(javaProject, "banking.PayCard", "PayCard", Signature.C_INT + "");
+        assertNotNull(intConstructor);
+        assertTrue(intConstructor.isConstructor());
+        KeYUtil.startProofAsync(intConstructor);
+        TestUtilsUtil.keyStartSelectedProofInProofManagementDiaolog();
+        TestUtilsUtil.keyCheckProofs(TestKeY4EclipseUtil.createOperationContractId("banking.PayCard", "PayCard(int)", "0", null), TestKeY4EclipseUtil.createOperationContractId("banking.PayCard", "charge(int)", "0", null), TestKeY4EclipseUtil.createOperationContractId("MCDemo", "inc(int)", "0", "normal_behavior"));
         // Clear proof list
         KeYUtil.clearProofList(MainWindow.getInstance());
         TestCase.assertTrue(KeYUtil.isProofListEmpty(MainWindow.getInstance()));

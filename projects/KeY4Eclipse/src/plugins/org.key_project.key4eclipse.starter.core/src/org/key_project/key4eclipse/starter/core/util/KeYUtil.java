@@ -435,10 +435,16 @@ public final class KeYUtil {
             Assert.isNotNull(containerKJT, "Can't find type \"" + containerTypeName + "\" in KeY.\nIt can happen when Java packages are based on links in Eclipse.");
             // Determine parameter types
             ImmutableList<KeYJavaType> signature = getParameterKJTs(method, javaInfo);
-            // Determine name ("<init>" for constructors)
-            String methodName = method.isConstructor() ? "<init>" : method.getElementName();
+            // Determine name
+            String methodName = method.getElementName();
             // Ask javaInfo
-            ProgramMethod result = javaInfo.getProgramMethod(containerKJT, methodName, signature, containerKJT);
+            ProgramMethod result;
+            if (method.isConstructor()) {
+               result = javaInfo.getConstructor(containerKJT, signature);
+            }
+            else {
+               result = javaInfo.getProgramMethod(containerKJT, methodName, signature, containerKJT);
+            }
             if (result == null) {
                 throw new ProofInputException("Error looking up method: " +
                                               "ProgramMethod not found: \""  +
