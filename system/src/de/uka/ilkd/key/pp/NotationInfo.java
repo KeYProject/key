@@ -152,7 +152,7 @@ public final class NotationInfo {
      * a Notation registered.  Otherwise, we see if there is one for the
      * <em>class</em> of the operator.
      */
-    private HashMap<Object, Notation> tbl;
+    private HashMap<Object, Notation> notationTable;
 
     /**
      * Caches for the different kinds of notations.
@@ -191,10 +191,11 @@ public final class NotationInfo {
     @SuppressWarnings("unchecked")
     private void createDefaultNotationTable() {
         if (defaultNotationCache != null){
-            tbl = defaultNotationCache;
+            notationTable = defaultNotationCache;
             return;
         }
-	tbl = new HashMap<Object,Notation>();
+    defaultNotationCache = new HashMap<Object,Notation>();
+    HashMap<Object,Notation> tbl = defaultNotationCache;
 	
 	tbl.put(Junctor.TRUE ,new Notation.Constant("true", PRIORITY_ATOM));
 	tbl.put(Junctor.FALSE,new Notation.Constant("false", PRIORITY_ATOM));
@@ -226,7 +227,7 @@ public final class NotationInfo {
 	tbl.put(SchemaVariable.class, new Notation.SchemaVariableNotation());
 	
 	tbl.put(Sort.CAST_NAME, new Notation.CastFunction("(",")",PRIORITY_CAST, PRIORITY_BOTTOM));
-	defaultNotationCache = (HashMap<Object, Notation>) tbl.clone();
+	this.notationTable = tbl;
     }
         
     
@@ -237,9 +238,12 @@ public final class NotationInfo {
     @SuppressWarnings("unchecked")
     private void addFancyNotations(Services services) {
         if (fancyNotationCache != null){
-            tbl = fancyNotationCache;
+            notationTable = fancyNotationCache;
             return;
         }
+        fancyNotationCache = (HashMap<Object,Notation>) defaultNotationCache.clone();
+    HashMap<Object,Notation> tbl = fancyNotationCache; 
+     
 	//arithmetic operators
 	final IntegerLDT integerLDT 
 		= services.getTypeConverter().getIntegerLDT();	
@@ -281,7 +285,7 @@ public final class NotationInfo {
 	tbl.put(charListLDT.getClCons(), new CharListNotation());
 	tbl.put(charListLDT.getClEmpty(), new Notation.Constant("\"\"",PRIORITY_BOTTOM));
 	
-	    fancyNotationCache = (HashMap<Object, Notation>) tbl.clone();
+	    this.notationTable = tbl;
     }
     
     /**
@@ -291,9 +295,12 @@ public final class NotationInfo {
     @SuppressWarnings("unchecked")
     private void addVeryFancyNotations(Services services){
         if (veryFancyNotationCache != null){
-            tbl = veryFancyNotationCache;
+            notationTable = veryFancyNotationCache;
             return;
         }
+        veryFancyNotationCache = (HashMap<Object, Notation>) fancyNotationCache.clone();
+        HashMap<Object,Notation> tbl = veryFancyNotationCache;
+        
         final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();  
         final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
         tbl.put(Junctor.TRUE ,new Notation.Constant(""+UnicodeHelper.TOP, PRIORITY_ATOM));
@@ -313,7 +320,7 @@ public final class NotationInfo {
         tbl.put(setLDT.getSetMinus(), new Notation.Infix(""+UnicodeHelper.SETMINUS, PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
         tbl.put(setLDT.getElementOf(), new Notation.ElementOfNotation(" " + UnicodeHelper.IN + " "));
         tbl.put(setLDT.getSubset(), new Notation.Infix(""+UnicodeHelper.SUBSET, PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
-        veryFancyNotationCache = (HashMap<Object, Notation>) tbl.clone();
+        this.notationTable = tbl;
     }
 
 
@@ -323,6 +330,7 @@ public final class NotationInfo {
     
     public void refresh(Services services) {
 	createDefaultNotationTable();
+	assert defaultNotationCache != null;
 	if(PRETTY_SYNTAX && services != null) {
 	    addFancyNotations(services);
 	    if (UNICODE_ENABLED)
@@ -345,25 +353,25 @@ public final class NotationInfo {
      * If no notation is registered, a Function notation is returned.
      */
     public Notation getNotation(Operator op, @SuppressWarnings("unused") Services services) {
-        Notation result = tbl.get(op);
+        Notation result = notationTable.get(op);
         if(result != null) {
             return result;
         }
 
-        result = tbl.get(op.getClass());
+        result = notationTable.get(op.getClass());
         if(result != null) {
             return result;
         }
 
         if(op instanceof SchemaVariable) {
-            result = tbl.get(SchemaVariable.class);
+            result = notationTable.get(SchemaVariable.class);
             if(result != null) {
                 return result;
             }
         }
 
         if(op instanceof SortDependingFunction) {
-            result = tbl.get(((SortDependingFunction)op).getKind());
+            result = notationTable.get(((SortDependingFunction)op).getKind());
             if(result != null) {
                 return result;
             }
