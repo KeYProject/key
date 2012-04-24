@@ -16,6 +16,8 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.jface.viewers.ILabelProviderListener;
+import org.eclipse.jface.viewers.LabelProviderChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
@@ -32,12 +34,14 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IMemento;
 import org.key_project.automaticverifier.product.ui.model.AutomaticProof;
+import org.key_project.automaticverifier.product.ui.model.AutomaticProofResult;
 import org.key_project.automaticverifier.product.ui.provider.AutomaticProofLabelProvider;
 import org.key_project.automaticverifier.product.ui.util.LogUtil;
 import org.key_project.automaticverifier.product.ui.view.AutomaticVerifierView;
 import org.key_project.key4eclipse.starter.core.job.AbstractKeYMainWindowJob;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
+import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.ClassTree;
@@ -102,6 +106,46 @@ public class AutomaticVerifierComposite extends Composite {
     private TableViewer proofViewer;
     
     /**
+     * Contains all proofs shown in {@link #proofViewer}.
+     */
+    private List<AutomaticProof> proofs;
+    
+    /**
+     * The used {@link AutomaticProofLabelProvider} in {@link #proofViewer}.
+     */
+    private AutomaticProofLabelProvider labelProvider;
+    
+    /**
+     * Listens for changes on {@link #labelProvider}.
+     */
+    private ILabelProviderListener labelProviderListener = new ILabelProviderListener() {
+       @Override
+       public void labelProviderChanged(LabelProviderChangedEvent event) {
+          handleLabelProviderChanged(event);
+       }
+    };
+    
+    /**
+     * {@link TableViewerColumn} of {@link #proofViewer} which shows the proof result.
+     */
+    private TableViewerColumn proofResultColumn;
+    
+    /**
+     * {@link TableViewerColumn} of {@link #proofViewer} which shows the nodes.
+     */
+    private TableViewerColumn proofNodesColumn;
+
+    /**
+     * {@link TableViewerColumn} of {@link #proofViewer} which shows the branches.
+     */
+    private TableViewerColumn proofBranchesColumn;
+
+    /**
+     * {@link TableViewerColumn} of {@link #proofViewer} which shows the time.
+     */
+    private TableViewerColumn proofTimeColumn;
+    
+    /**
      * Defines the proof search strategy option "Method Treatment" with option "Contract".
      */
     private Button methodTreatmentContractButton;
@@ -142,9 +186,24 @@ public class AutomaticVerifierComposite extends Composite {
     private Button arithmeticTreatmentDefOpsButton;
     
     /**
+     * Label for {@link #loadTimeText}.
+     */
+    private Label loadLabel;
+    
+    /**
      * Shows the time which was needed to load the source code in KeY.
      */
     private Text loadTimeText;
+    
+    /**
+     * The time shown in {@link #loadTimeText}.
+     */
+    private long loadingTime;
+    
+    /**
+     * Shows accumulated values.
+     */
+    private Text sumText;
     
     /**
      * Constructor.
@@ -181,7 +240,7 @@ public class AutomaticVerifierComposite extends Composite {
                 loadSource();
             }
         });
-        Label loadLabel = new Label(loadComposite, SWT.NONE);
+        loadLabel = new Label(loadComposite, SWT.NONE);
         loadLabel.setText("Load &Time (milliseconds)");
         loadTimeText = new Text(loadComposite, SWT.BORDER);
         loadTimeText.setEditable(false);
@@ -245,26 +304,38 @@ public class AutomaticVerifierComposite extends Composite {
         contractColumn.getColumn().setText("Contract");
         contractColumn.getColumn().setMoveable(true);
         proofViewerLayout.setColumnData(contractColumn.getColumn(), new ColumnWeightData(35));
-        TableViewerColumn proofResultColumn = new TableViewerColumn(proofViewer, style);
+        proofResultColumn = new TableViewerColumn(proofViewer, style);
         proofResultColumn.getColumn().setText("Proof Result");
         proofResultColumn.getColumn().setMoveable(true);
         proofViewerLayout.setColumnData(proofResultColumn.getColumn(), new ColumnWeightData(15));
-        TableViewerColumn proofNodesColumn = new TableViewerColumn(proofViewer, style);
+        proofNodesColumn = new TableViewerColumn(proofViewer, style);
         proofNodesColumn.getColumn().setText("Nodes");
         proofNodesColumn.getColumn().setMoveable(true);
         proofViewerLayout.setColumnData(proofNodesColumn.getColumn(), new ColumnWeightData(5));
-        TableViewerColumn proofBranchesColumn = new TableViewerColumn(proofViewer, style);
+        proofBranchesColumn = new TableViewerColumn(proofViewer, style);
         proofBranchesColumn.getColumn().setText("Branches");
         proofBranchesColumn.getColumn().setMoveable(true);
         proofViewerLayout.setColumnData(proofBranchesColumn.getColumn(), new ColumnWeightData(5));
-        TableViewerColumn proofTimeColumn = new TableViewerColumn(proofViewer, style);
+        proofTimeColumn = new TableViewerColumn(proofViewer, style);
         proofTimeColumn.getColumn().setText("Time (milliseconds)");
         proofTimeColumn.getColumn().setMoveable(true);
         proofViewerLayout.setColumnData(proofTimeColumn.getColumn(), new ColumnWeightData(5));
         
         SWTUtil.makeTableColumnsSortable(proofViewer);
         proofViewer.setContentProvider(ArrayContentProvider.getInstance());
-        proofViewer.setLabelProvider(new AutomaticProofLabelProvider());
+        labelProvider = new AutomaticProofLabelProvider();
+        labelProvider.addListener(labelProviderListener);
+        proofViewer.setLabelProvider(labelProvider);
+        // Accumulated values
+        Composite sumComposite = new Composite(proofGroup, SWT.NONE);
+        sumComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        sumComposite.setLayout(new GridLayout(2, false));
+        Label sumLabel = new Label(sumComposite, SWT.NONE);
+        sumLabel.setText("S&um");
+        sumText = new Text(sumComposite, SWT.BORDER);
+        sumText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        sumText.setEditable(false);
+        // Buttons
         Composite buttonComposite = new Composite(proofGroup, SWT.NONE);
         buttonComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         buttonComposite.setLayout(new GridLayout(3, false));
@@ -295,6 +366,72 @@ public class AutomaticVerifierComposite extends Composite {
         });
     }
 
+   /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void dispose() {
+       labelProvider.removeListener(labelProviderListener);
+       labelProvider.dispose();
+       super.dispose();
+    }
+
+    /**
+     * When the label provider has changed.
+     * @param event The event.
+     */
+    protected void handleLabelProviderChanged(LabelProviderChangedEvent event) {
+       updateSumText();
+    }
+
+    /**
+     * Updates the shown value in the sum text.
+     */
+    protected void updateSumText() {
+       // Compute sums
+       long branches = 0;
+       long nodes = 0;
+       long time = 0;
+       int closedCount = 0;
+       for (AutomaticProof proof : proofs) {
+          branches += proof.getBranches();
+          nodes += proof.getNodes();
+          time += proof.getTime();
+          if (AutomaticProofResult.CLOSED.equals(proof.getResult())) {
+             closedCount ++;
+          }
+       }
+       // Compute sum text to show
+       StringBuffer sb = new StringBuffer();
+       sb.append(proofResultColumn.getColumn().getText());
+       sb.append(" = ");
+       sb.append(closedCount);
+       sb.append(" / ");
+       sb.append(proofs.size());
+       sb.append(" ");
+       sb.append(AutomaticProofResult.CLOSED.getDisplayText());
+       sb.append(", ");
+       sb.append(proofNodesColumn.getColumn().getText());
+       sb.append(" = ");
+       sb.append(nodes);
+       sb.append(", ");
+       sb.append(proofBranchesColumn.getColumn().getText());
+       sb.append(" = ");
+       sb.append(branches);
+       sb.append(", ");
+       sb.append(proofTimeColumn.getColumn().getText());
+       sb.append(" = ");
+       sb.append(time);
+       sb.append(", ");
+       sb.append(proofTimeColumn.getColumn().getText());
+       sb.append(" + ");
+       sb.append(loadLabel.getText());
+       sb.append(" = ");
+       sb.append(loadingTime + time);
+       // Show sum text
+       sumText.setText(sb.toString());
+    }
+    
     /**
      * Opens the main window of KeY.
      */
@@ -307,20 +444,22 @@ public class AutomaticVerifierComposite extends Composite {
             LogUtil.getLogger().openErrorDialog(getShell(), e);
         }
     }
-    
-    /**
+
+   /**
      * Enables or disables the controls with proof specific options.
      * @param enabled {@code true} set enabled state, {@code false} set disabled state.
      */
     protected void setProofSearchStrategyOptionsEnabled(boolean enabled) {
-       methodTreatmentContractButton.setEnabled(enabled);
-       methodTreatmentExpandButton.setEnabled(enabled);
-       dependencyContractsOnButton.setEnabled(enabled);
-       dependencyContractsOffButton.setEnabled(enabled);
-       queryTreatmentOnButton.setEnabled(enabled);
-       queryTreatmentOffButton.setEnabled(enabled);
-       arithmeticTreatmentBaseButton.setEnabled(enabled);
-       arithmeticTreatmentDefOpsButton.setEnabled(enabled);
+       if (!isDisposed()) {
+          methodTreatmentContractButton.setEnabled(enabled);
+          methodTreatmentExpandButton.setEnabled(enabled);
+          dependencyContractsOnButton.setEnabled(enabled);
+          dependencyContractsOffButton.setEnabled(enabled);
+          queryTreatmentOnButton.setEnabled(enabled);
+          queryTreatmentOffButton.setEnabled(enabled);
+          arithmeticTreatmentBaseButton.setEnabled(enabled);
+          arithmeticTreatmentDefOpsButton.setEnabled(enabled);
+       }
     }
 
     /**
@@ -394,8 +533,6 @@ public class AutomaticVerifierComposite extends Composite {
      */
     public void loadSource() {
         try {
-            // Unload old source
-            proofViewer.setInput(Collections.EMPTY_LIST);
             // Load new source
             final File location = new File(locationText.getText());
             final boolean showKeYMainWindow = showKeYWindowButton.getSelection();
@@ -405,6 +542,23 @@ public class AutomaticVerifierComposite extends Composite {
                     protected IStatus run(IProgressMonitor monitor) {
                        final long loadStartTime = System.currentTimeMillis();
                         try {
+                            // Remove old proofs
+                            if (proofs != null) {
+                               for (AutomaticProof proof : proofs) {
+                                  proof.removeProofEnvFromKeY();
+                               }
+                            }
+                            // Unload old source
+                            Display.getDefault().syncExec(new Runnable() {
+                               @Override
+                               public void run() {
+                                  proofs = null;
+                                  loadingTime = 0l;
+                                  proofViewer.setInput(Collections.EMPTY_LIST);
+                                  loadTimeText.setText(StringUtil.EMPTY_STRING);
+                                  sumText.setText(StringUtil.EMPTY_STRING);
+                               }
+                            });
                             // Open main window to avoid repaint problems.
                             if (showKeYMainWindow) {
                                 KeYUtil.openMainWindow();
@@ -443,7 +597,7 @@ public class AutomaticVerifierComposite extends Composite {
                             monitor.done();
                             // List all contracts
                             SWTUtil.checkCanceled(monitor);
-                            final List<AutomaticProof> proofs = new LinkedList<AutomaticProof>();
+                            proofs = new LinkedList<AutomaticProof>();
                             monitor.beginTask("Analysing types", kjtsarr.length);
                             for (KeYJavaType type : kjtsarr) {
                                 SWTUtil.checkCanceled(monitor);
@@ -477,12 +631,15 @@ public class AutomaticVerifierComposite extends Composite {
                         }
                         finally {
                             monitor.done();
-                            loadTimeText.getDisplay().syncExec(new Runnable() {
-                              @Override
-                              public void run() {
-                                 loadTimeText.setText((System.currentTimeMillis() - loadStartTime) + "");
-                              }
-                           });
+                            loadingTime = System.currentTimeMillis() - loadStartTime;
+                            if (!loadTimeText.isDisposed()) {
+                               loadTimeText.getDisplay().syncExec(new Runnable() {
+                                  @Override
+                                  public void run() {
+                                     loadTimeText.setText(loadingTime + "");
+                                  }
+                               });
+                            }
                         }
                     }
                 }.schedule();

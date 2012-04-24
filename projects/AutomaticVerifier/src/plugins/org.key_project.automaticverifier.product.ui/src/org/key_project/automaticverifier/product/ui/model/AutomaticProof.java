@@ -318,4 +318,14 @@ public class AutomaticProof extends Bean {
     public boolean hasResult() {
         return getResult() != null && !AutomaticProofResult.UNKNOWN.equals(getResult());
     }
+
+    /**
+     * Removes the complete proof environment of the current KeY proof
+     * from the {@link MainWindow}.  
+     */
+    public void removeProofEnvFromKeY() {
+       if (proof != null) {
+          KeYUtil.removeFromProofList(MainWindow.getInstance(), proof.env());
+       }
+    }
 }
