@@ -142,6 +142,11 @@ public class AutomaticVerifierComposite extends Composite {
     private Button arithmeticTreatmentDefOpsButton;
     
     /**
+     * Shows the time which was needed to load the source code in KeY.
+     */
+    private Text loadTimeText;
+    
+    /**
      * Constructor.
      * @param parent The parent {@link Composite}.
      * @param style The style to use.
@@ -164,7 +169,7 @@ public class AutomaticVerifierComposite extends Composite {
         locationText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         Composite loadComposite = new Composite(sourceGroup, SWT.NONE);
         loadComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        loadComposite.setLayout(new GridLayout(2, false)); 
+        loadComposite.setLayout(new GridLayout(4, false)); 
         showKeYWindowButton = new Button(loadComposite, SWT.CHECK);
         showKeYWindowButton.setText("Sho&w KeY main window");
         Button loadSourceButton = new Button(loadComposite, SWT.PUSH);
@@ -176,6 +181,10 @@ public class AutomaticVerifierComposite extends Composite {
                 loadSource();
             }
         });
+        Label loadLabel = new Label(loadComposite, SWT.NONE);
+        loadLabel.setText("Load &Time (milliseconds)");
+        loadTimeText = new Text(loadComposite, SWT.BORDER);
+        loadTimeText.setEditable(false);
         // Proof group
         Group proofGroup = new Group(this, SWT.NONE);
         proofGroup.setText("Proofs");
@@ -394,6 +403,7 @@ public class AutomaticVerifierComposite extends Composite {
                 new AbstractKeYMainWindowJob("Loading in KeY") {
                     @Override
                     protected IStatus run(IProgressMonitor monitor) {
+                       final long loadStartTime = System.currentTimeMillis();
                         try {
                             // Open main window to avoid repaint problems.
                             if (showKeYMainWindow) {
@@ -467,6 +477,12 @@ public class AutomaticVerifierComposite extends Composite {
                         }
                         finally {
                             monitor.done();
+                            loadTimeText.getDisplay().syncExec(new Runnable() {
+                              @Override
+                              public void run() {
+                                 loadTimeText.setText((System.currentTimeMillis() - loadStartTime) + "");
+                              }
+                           });
                         }
                     }
                 }.schedule();
