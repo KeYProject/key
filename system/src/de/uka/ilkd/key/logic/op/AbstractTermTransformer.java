@@ -98,6 +98,7 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
 
     public static final AbstractTermTransformer ADD_CAST = new AddCast();    
 
+    public static final AbstractTermTransformer EXPAND_QUERIES = new ExpandQueriesMetaConstruct();
     
     protected static final TermFactory termFactory = TermFactory.DEFAULT;
     protected static final TermBuilder TB = TermBuilder.DF;

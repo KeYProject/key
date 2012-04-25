@@ -177,13 +177,14 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             assert false;
         }
 
-        final String queryProp = strategyProperties
-        .getProperty(StrategyProperties.QUERY_OPTIONS_KEY);
+        final String queryProp = strategyProperties.getProperty(StrategyProperties.QUERY_OPTIONS_KEY);
         final Feature queryF;
         if (queryProp.equals(StrategyProperties.QUERY_ON)) {
-                queryF = querySpecFeature(longConst(200));
+       	    queryF = querySpecFeature(new QueryExpandCost(200,2,0,false)); 
+        } else if (queryProp.equals(StrategyProperties.QUERY_RESTRICTED)) {
+    	    queryF = querySpecFeature(new QueryExpandCost(200,1,20,false)); 
         } else if (queryProp.equals(StrategyProperties.QUERY_OFF)) {
-                queryF = querySpecFeature(inftyConst());
+        	queryF = querySpecFeature(inftyConst());
         } else {
                 queryF = null;
                 assert false;
@@ -486,6 +487,21 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         // the queue and do not have to be considered again).
         setupInstantiationWithoutRetry ( d, p_proof );
         
+        //chrisg: The following rule, if active, must be applied delta rules.
+        if(autoInductionEnabled()){
+        	bindRuleSet ( d, "auto_induction", -6500 ); //chrisg
+        }else{
+        	bindRuleSet ( d, "auto_induction", inftyConst () ); //chrisg
+        }
+        
+        //chrisg: The following rule is a beta rule that, if active, must have a higher priority than other beta rules.
+        if(autoInductionLemmaEnabled()){
+        	bindRuleSet ( d, "auto_induction_lemma", -300 ) ; 
+        }else{
+            bindRuleSet ( d, "auto_induction_lemma", inftyConst());        	
+        }
+
+        
         return d;
     }
 
@@ -772,6 +788,19 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                  ( StrategyProperties.QUANTIFIERS_OPTIONS_KEY ) );
     }
 
+    private boolean autoInductionEnabled () { //chrisg
+    	//Negated!
+        return !StrategyProperties.AUTO_INDUCTION_OFF.equals (
+                 strategyProperties.getProperty
+                 ( StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY ) );
+    }
+
+    private boolean autoInductionLemmaEnabled () {  //chrisg
+        return StrategyProperties.AUTO_INDUCTION_LEMMA_ON.equals (
+                 strategyProperties.getProperty
+                 ( StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY ) );
+    }
+
     private Feature allowSplitting(ProjectionToTerm focus) {
         if ( normalSplitting () ) return longConst ( 0 );
         
@@ -816,6 +845,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
              longConst ( 20 )
           } ) );
 
+        
         bindRuleSet ( d, "split_cond", longConst ( 1 ) );
 
         bindRuleSet ( d, "cut_direct",
