@@ -620,7 +620,9 @@ public final class KeYUtil {
           main.getMediator().setProof(proof);
           main.getMediator().startAutoMode(proof.openEnabledGoals());
           // Wait for interactive prover
+System.out.println("Start wait");          
           KeYUtil.waitWhileMainWindowIsFrozen(main);
+System.out.println("End wait");          
        }
        finally {
           if (task != null) {

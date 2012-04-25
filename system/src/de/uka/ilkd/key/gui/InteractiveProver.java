@@ -168,6 +168,8 @@ public class InteractiveProver {
             }
         }
 
+        mediator().stopInterface(true);
+        mediator().setInteractive(false);
         worker = new AutoModeWorker(goals);
         worker.start();
     }
@@ -505,11 +507,21 @@ public class InteractiveProver {
         applyStrategy.removeProverTaskObserver(ptl);        
     }
     
-    /* Invoking start() on the SwingWorker causes a new Thread
+    /* <p>
+     * Invoking start() on the SwingWorker causes a new Thread
      * to be created that will call construct(), and then
      * finished().  Note that finished() is called even if
      * the worker is interrupted because we catch the
      * InterruptedException in doWork().
+     * </p>
+     * <p>
+     * <b>Attention:</b> Before this thread is started it is required to
+     * freeze the MainWindow via
+     * {@code 
+     * mediator().stopInterface(true);
+     *   mediator().setInteractive(false);
+     * }. The thread itself unfreezes the UI when it is finished. 
+     * </p>
      */
     private class AutoModeWorker extends SwingWorker {
          
@@ -524,9 +536,6 @@ public class InteractiveProver {
         }
         
         public Object doWork() {
-            mediator().stopInterface(true);
-            mediator().setInteractive(false);
-            
             boolean stopMode = proof.getSettings().getStrategySettings()
                     .getActiveStrategyProperties().getProperty(
                             StrategyProperties.STOPMODE_OPTIONS_KEY)
