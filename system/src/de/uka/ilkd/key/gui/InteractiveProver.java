@@ -29,6 +29,7 @@ import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedRuleApplicationManager;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.Debug;
 
 public class InteractiveProver {
@@ -39,12 +40,6 @@ public class InteractiveProver {
     /** the user focused goal */
     private Goal focusedGoal;
     
-
-    /** list of observers */
-    private List<ProverTaskListener> proverTaskObservers = new ArrayList<ProverTaskListener> ();
-
-
-
     /** the central strategy processor including GUI signalling */
     private ApplyStrategy applyStrategy;
     private final ProverTaskListener focussedAutoModeTaskListener =
@@ -532,7 +527,13 @@ public class InteractiveProver {
             mediator().stopInterface(true);
             mediator().setInteractive(false);
             
-            return applyStrategy.start ( proof, goals, mediator ().getMaxAutomaticSteps(), getTimeout() );                    
+            boolean stopMode = proof.getSettings().getStrategySettings()
+                    .getActiveStrategyProperties().getProperty(
+                            StrategyProperties.STOPMODE_OPTIONS_KEY)
+                            .equals(StrategyProperties.STOPMODE_NONCLOSE);
+
+            
+            return applyStrategy.start ( proof, goals, mediator ().getMaxAutomaticSteps(), getTimeout(), stopMode );                    
         }
         
         /**
