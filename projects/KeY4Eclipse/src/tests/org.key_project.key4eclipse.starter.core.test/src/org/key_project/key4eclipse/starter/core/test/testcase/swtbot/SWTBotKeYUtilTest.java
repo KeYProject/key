@@ -16,6 +16,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.Signature;
+import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.junit.Test;
 import org.key_project.key4eclipse.starter.core.test.Activator;
 import org.key_project.key4eclipse.starter.core.test.util.TestStarterCoreUtil;
@@ -26,6 +27,7 @@ import org.key_project.swtbot.swing.bot.SwingBotJDialog;
 import org.key_project.swtbot.swing.bot.SwingBotJLabel;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.eclipse.ResourceUtil;
+import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.SwingUtil;
 import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
@@ -42,54 +44,60 @@ import de.uka.ilkd.key.proof.init.InitConfig;
  * @author Martin Hentschel
  */
 public class SWTBotKeYUtilTest extends TestCase {
-
    /**
     * Tests {@link KeYUtil#isProofInUI(Proof)}
     */
    @Test
    public void testIsProofInUI() throws CoreException, InterruptedException, InvocationTargetException {
-       // Open main window
-       KeYUtil.openMainWindow();
-       assertNotNull(MainWindow.getInstance());
-       assertTrue(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
-       // Load a resource
-       IJavaProject javaProject = TestUtilsUtil.createJavaProject("SWTBotKeYUtilTest_testIsProofInUI_1");
-       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/banking", javaProject.getProject().getFolder("src"));
-       KeYUtil.loadAsync(javaProject.getProject());
-       TestUtilsUtil.keyStartSelectedProofInProofManagementDiaolog();
-       TestUtilsUtil.keyCheckProofs(TestKeY4EclipseUtil.createOperationContractId("banking.LoggingPayCard", "charge(int)", "0", null), TestKeY4EclipseUtil.createOperationContractId("banking.LoggingPayCard", "charge(int)", "0", null));
-       assertNotNull(MainWindow.getInstance());
-       assertFalse(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
-       Proof firstProof = TestUtilsUtil.keyGetProofEnv(0).getProofs().iterator().next().getFirstProof();
-       assertNotNull(firstProof);
-       assertTrue(KeYUtil.isProofInUI(firstProof));
-       // Load second java project
-       IJavaProject secondProject = TestUtilsUtil.createJavaProject("SWTBotKeYUtilTest_testIsProofInUI_2");
-       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/MCDemo", secondProject.getProject().getFolder("src"));
-       KeYUtil.loadAsync(secondProject.getProject());
-       TestUtilsUtil.keyStartSelectedProofInProofManagementDiaolog();
-       TestUtilsUtil.keyCheckProofs(TestKeY4EclipseUtil.createOperationContractId("MCDemo", "inc(int)", "0", "normal_behavior"), TestKeY4EclipseUtil.createOperationContractId("banking.LoggingPayCard", "charge(int)", "0", null), TestKeY4EclipseUtil.createOperationContractId("MCDemo", "inc(int)", "0", "normal_behavior"));
-       assertNotNull(MainWindow.getInstance());
-       assertFalse(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
-       Proof secondProof = TestUtilsUtil.keyGetProofEnv(1).getProofs().iterator().next().getFirstProof();
-       assertNotNull(secondProof);
-       assertTrue(KeYUtil.isProofInUI(firstProof));
-       assertTrue(KeYUtil.isProofInUI(secondProof));
-       // Remove first proof
-       KeYUtil.removeFromProofList(MainWindow.getInstance(), firstProof.env());
-       TestCase.assertFalse(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
-       TestUtilsUtil.keyCheckProofs(TestKeY4EclipseUtil.createOperationContractId("MCDemo", "inc(int)", "0", "normal_behavior"), TestKeY4EclipseUtil.createOperationContractId("MCDemo", "inc(int)", "0", "normal_behavior"));
-       assertFalse(KeYUtil.isProofInUI(firstProof));
-       assertTrue(KeYUtil.isProofInUI(secondProof));
-       // Remove first proof again
-       KeYUtil.removeFromProofList(MainWindow.getInstance(), secondProof.env());
-       TestCase.assertTrue(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
-       assertFalse(KeYUtil.isProofInUI(firstProof));
-       assertFalse(KeYUtil.isProofInUI(secondProof));
-       // Test null
-       assertFalse(KeYUtil.isProofInUI(null));
-       // Close main window
-       TestUtilsUtil.keyCloseMainWindow();
+       long originalTimeout = SWTBotPreferences.TIMEOUT; 
+       try {
+          SWTBotPreferences.TIMEOUT = SWTBotPreferences.TIMEOUT * 2;
+          // Open main window
+          KeYUtil.openMainWindow();
+          assertNotNull(MainWindow.getInstance());
+          assertTrue(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
+          // Load a resource
+          IJavaProject javaProject = TestUtilsUtil.createJavaProject("SWTBotKeYUtilTest_testIsProofInUI_1");
+          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/banking", javaProject.getProject().getFolder("src"));
+          KeYUtil.loadAsync(javaProject.getProject());
+          TestUtilsUtil.keyStartSelectedProofInProofManagementDiaolog();
+          TestUtilsUtil.keyCheckProofs(TestKeY4EclipseUtil.createOperationContractId("banking.LoggingPayCard", "charge(int)", "0", null), TestKeY4EclipseUtil.createOperationContractId("banking.LoggingPayCard", "charge(int)", "0", null));
+          assertNotNull(MainWindow.getInstance());
+          assertFalse(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
+          Proof firstProof = TestUtilsUtil.keyGetProofEnv(0).getProofs().iterator().next().getFirstProof();
+          assertNotNull(firstProof);
+          assertTrue(KeYUtil.isProofInUI(firstProof));
+          // Load second java project
+          IJavaProject secondProject = TestUtilsUtil.createJavaProject("SWTBotKeYUtilTest_testIsProofInUI_2");
+          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/MCDemo", secondProject.getProject().getFolder("src"));
+          KeYUtil.loadAsync(secondProject.getProject());
+          TestUtilsUtil.keyStartSelectedProofInProofManagementDiaolog();
+          TestUtilsUtil.keyCheckProofs(TestKeY4EclipseUtil.createOperationContractId("MCDemo", "inc(int)", "0", "normal_behavior"), TestKeY4EclipseUtil.createOperationContractId("banking.LoggingPayCard", "charge(int)", "0", null), TestKeY4EclipseUtil.createOperationContractId("MCDemo", "inc(int)", "0", "normal_behavior"));
+          assertNotNull(MainWindow.getInstance());
+          assertFalse(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
+          Proof secondProof = TestUtilsUtil.keyGetProofEnv(1).getProofs().iterator().next().getFirstProof();
+          assertNotNull(secondProof);
+          assertTrue(KeYUtil.isProofInUI(firstProof));
+          assertTrue(KeYUtil.isProofInUI(secondProof));
+          // Remove first proof
+          KeYUtil.removeFromProofList(MainWindow.getInstance(), firstProof.env());
+          TestCase.assertFalse(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
+          TestUtilsUtil.keyCheckProofs(TestKeY4EclipseUtil.createOperationContractId("MCDemo", "inc(int)", "0", "normal_behavior"), TestKeY4EclipseUtil.createOperationContractId("MCDemo", "inc(int)", "0", "normal_behavior"));
+          assertFalse(KeYUtil.isProofInUI(firstProof));
+          assertTrue(KeYUtil.isProofInUI(secondProof));
+          // Remove first proof again
+          KeYUtil.removeFromProofList(MainWindow.getInstance(), secondProof.env());
+          TestCase.assertTrue(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
+          assertFalse(KeYUtil.isProofInUI(firstProof));
+          assertFalse(KeYUtil.isProofInUI(secondProof));
+          // Test null
+          assertFalse(KeYUtil.isProofInUI(null));
+       }
+       finally {
+          SWTBotPreferences.TIMEOUT = originalTimeout;
+          // Close main window
+          TestUtilsUtil.keyCloseMainWindow();
+       }
    }
    
    /**
@@ -149,7 +157,7 @@ public class SWTBotKeYUtilTest extends TestCase {
          KeYUtil.runProofInAutomaticModeWithoutResultDialog(proof);
          // Collect applied rule names
          List<String> ruleNames = collectRuleNames(proof);
-         assertTrue(ruleNames.contains("methodCallEmpty"));
+         assertTrue(CollectionUtil.toString(ruleNames), ruleNames.contains("methodCallEmpty"));
       }
       finally {
          // Remove proof
