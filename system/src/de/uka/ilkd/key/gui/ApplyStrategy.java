@@ -31,7 +31,6 @@ import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.proofevent.NodeReplacement;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -77,8 +76,8 @@ public class ApplyStrategy {
 
     }
 
-    static class ApplyStrategyInfo {
-        private final String reason;        
+    public static class ApplyStrategyInfo {
+        private final String message;        
         private final Goal nonCloseableGoal;
 
         private final Throwable error;
@@ -86,10 +85,12 @@ public class ApplyStrategy {
         private final long time;
         private final int appliedRuleAppsCount;
         private final int nrClosedGoals;
+        private final Proof proof;
 
-        public ApplyStrategyInfo(String reason, Throwable error, Goal nonCloseableGoal, 
+        public ApplyStrategyInfo(String message, Proof proof, Throwable error, Goal nonCloseableGoal, 
                 long time, int appliedRuleAppsCount, int nrClosedGoals) {
-            this.reason = reason;
+            this.message = message;
+            this.proof = proof;
             this.error   = error;
             this.nonCloseableGoal = nonCloseableGoal;
             this.time    = time;
@@ -98,7 +99,7 @@ public class ApplyStrategy {
         }
 
         public String reason() {
-            return reason;
+            return message;
         }
 
         public Goal nonCloseableGoal() {
@@ -124,7 +125,24 @@ public class ApplyStrategy {
         public int getAppliedRuleApps() {
             return appliedRuleAppsCount;
         }
+        
+        public Proof getProof() {
+            return proof;
+        }
 
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Apply Strategy Info:");
+            sb.append("\n Message: " + message);
+            sb.append("\n Error:" + isError());
+            if (isError()) {
+                sb.append("\n "+error.getMessage());
+            }
+            sb.append("\n Applied Rules: "+appliedRuleAppsCount);
+            sb.append("\n Time: "+time);
+            sb.append("\n Closed Goals: "+nrClosedGoals);
+            return sb.toString();
+        }
 
     }
 
@@ -211,7 +229,7 @@ public class ApplyStrategy {
             while (!timeoutOrMaxSteps) {     
                 srInfo = applyAutomaticRule(stopAtFirstNonCloseableGoal); 
                 if (!srInfo.isSuccess()) {                    
-                    return new ApplyStrategyInfo(srInfo.message(), null,
+                    return new ApplyStrategyInfo(srInfo.message(), proof, null,
                             srInfo.getGoal(), System.currentTimeMillis()-time, countApplied, closedGoals);
                 }
                 countApplied++;
@@ -222,16 +240,16 @@ public class ApplyStrategy {
                 timeoutOrMaxSteps = maxRuleApplicationOrTimeoutExceeded();
             }
             if (timeoutOrMaxSteps) {
-                return new ApplyStrategyInfo("Maximal number of rule applicatins reached or timed out.", null, 
+                return new ApplyStrategyInfo("Maximal number of rule applicatins reached or timed out.", proof, null, 
                         (Goal) null, System.currentTimeMillis()-time, countApplied, closedGoals);
             }
         } catch (InterruptedException e) {
-            return new ApplyStrategyInfo("Interrupted.", null, 
+            return new ApplyStrategyInfo("Interrupted.", proof, null, 
                     goalChooser.getNextGoal(), System.currentTimeMillis()-time, countApplied, closedGoals);
         } catch (Throwable t) { // treated later in finished()
             System.err.println(t);
             t.printStackTrace();
-            return new ApplyStrategyInfo("Error.", t, null, System.currentTimeMillis()-time, countApplied, closedGoals);
+            return new ApplyStrategyInfo("Error.", proof, t, null, System.currentTimeMillis()-time, countApplied, closedGoals);
         } finally{
             time = System.currentTimeMillis()-time;
             Debug.out("Strategy stopped.");
@@ -239,7 +257,7 @@ public class ApplyStrategy {
             Debug.out("Time elapsed: ", time);
         }
         assert srInfo != null;
-        return new ApplyStrategyInfo(srInfo.message(), null, srInfo.getGoal(), time, countApplied, closedGoals);
+        return new ApplyStrategyInfo(srInfo.message(), proof, null, srInfo.getGoal(), time, countApplied, closedGoals);
     }
 
 
@@ -295,15 +313,10 @@ public class ApplyStrategy {
      */
 
 
-    public Object start(Proof proof, ImmutableList<Goal> goals, int maxSteps, long timeout) {
+    public ApplyStrategyInfo start(Proof proof, ImmutableList<Goal> goals, int maxSteps, long timeout, boolean stopAtFirstNonCloseableGoal) {
         assert proof != null;
 
-        stopAtFirstNonCloseableGoal = 
-                proof.getSettings().getStrategySettings()
-                .getActiveStrategyProperties().getProperty(
-                        StrategyProperties.STOPMODE_OPTIONS_KEY)
-                        .equals(StrategyProperties.STOPMODE_NONCLOSE);
-
+        this.stopAtFirstNonCloseableGoal = stopAtFirstNonCloseableGoal; 
 
         ProofTreeListener treeListener = new ProofTreeAdapter() {            
             @Override

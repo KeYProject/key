@@ -10,25 +10,13 @@
 
 package de.uka.ilkd.key.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Cursor;
-import java.awt.EventQueue;
-import java.awt.FlowLayout;
-import java.awt.Frame;
-import java.awt.GridBagLayout;
-import java.awt.Point;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -36,70 +24,14 @@ import java.util.Set;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.Box;
-import javax.swing.ButtonGroup;
-import javax.swing.JButton;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JRadioButtonMenuItem;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JToggleButton;
-import javax.swing.JToolBar;
-import javax.swing.JViewport;
-import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
-import javax.swing.ToolTipManager;
-import javax.swing.UIManager;
-import javax.swing.WindowConstants;
+import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.MouseInputAdapter;
 
-import de.uka.ilkd.key.gui.actions.AbandonTaskAction;
-import de.uka.ilkd.key.gui.actions.AboutAction;
-import de.uka.ilkd.key.gui.actions.AutoModeAction;
-import de.uka.ilkd.key.gui.actions.EditMostRecentFileAction;
-import de.uka.ilkd.key.gui.actions.ExitMainAction;
-import de.uka.ilkd.key.gui.actions.FontSizeAction;
-import de.uka.ilkd.key.gui.actions.LemmaGenerationAction;
-import de.uka.ilkd.key.gui.actions.LemmaGenerationBatchModeAction;
-import de.uka.ilkd.key.gui.actions.LicenseAction;
-import de.uka.ilkd.key.gui.actions.MainWindowAction;
-import de.uka.ilkd.key.gui.actions.MinimizeInteraction;
-import de.uka.ilkd.key.gui.actions.OneStepSimplificationToggleAction;
-import de.uka.ilkd.key.gui.actions.OpenExampleAction;
-import de.uka.ilkd.key.gui.actions.OpenFileAction;
-import de.uka.ilkd.key.gui.actions.OpenMostRecentFileAction;
-import de.uka.ilkd.key.gui.actions.PrettyPrintToggleAction;
-import de.uka.ilkd.key.gui.actions.ProofManagementAction;
-import de.uka.ilkd.key.gui.actions.SMTOptionsAction;
-import de.uka.ilkd.key.gui.actions.SaveFileAction;
-import de.uka.ilkd.key.gui.actions.SearchInProofTreeAction;
-import de.uka.ilkd.key.gui.actions.ShowActiveSettingsAction;
-import de.uka.ilkd.key.gui.actions.ShowActiveTactletOptionsAction;
-import de.uka.ilkd.key.gui.actions.ShowKnownTypesAction;
-import de.uka.ilkd.key.gui.actions.ShowProofStatistics;
-import de.uka.ilkd.key.gui.actions.ShowUsedContractsAction;
-import de.uka.ilkd.key.gui.actions.TacletOptionsAction;
-import de.uka.ilkd.key.gui.actions.ToolTipOptionsAction;
-import de.uka.ilkd.key.gui.actions.UndoLastStepAction;
-import de.uka.ilkd.key.gui.configuration.Config;
-import de.uka.ilkd.key.gui.configuration.GeneralSettings;
-import de.uka.ilkd.key.gui.configuration.PathConfig;
-import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.gui.configuration.SettingsListener;
-import de.uka.ilkd.key.gui.configuration.StrategySettings;
+import de.uka.ilkd.key.gui.actions.*;
+import de.uka.ilkd.key.gui.configuration.*;
 import de.uka.ilkd.key.gui.nodeviews.NonGoalInfoView;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.gui.notification.NotificationManager;
@@ -112,11 +44,7 @@ import de.uka.ilkd.key.gui.smt.SMTSettings;
 import de.uka.ilkd.key.gui.smt.SolverListener;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
-import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.pp.ProgramPrinter;
-import de.uka.ilkd.key.pp.SequentPrintFilter;
+import de.uka.ilkd.key.pp.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.ProblemLoader;
 import de.uka.ilkd.key.proof.Proof;
@@ -131,8 +59,6 @@ import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.GuiUtilities;
-import de.uka.ilkd.key.util.KeYExceptionHandler;
-import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.PreferenceSaver;
 import de.uka.ilkd.key.util.UnicodeHelper;
 
@@ -433,7 +359,6 @@ public final class MainWindow extends JFrame  {
         lemmaGenerationBatchModeAction    = new LemmaGenerationBatchModeAction(this);
         
 
-        
 	
 	
 	mediator.addKeYSelectionListener(OneStepSimplifier.INSTANCE);
@@ -571,7 +496,7 @@ public final class MainWindow extends JFrame  {
         oneStep.setHideActionText(true);
         toolBar.addSeparator();
         toolBar.add(oneStep);
-	return toolBar;
+        return toolBar;
     }
     
     private void createViews() {
@@ -1083,18 +1008,6 @@ public final class MainWindow extends JFrame  {
     
     
     /** saves a proof */
-    private void saveProof() {
-        final KeYFileChooser jFC = GuiUtilities.getFileChooser("Choose filename to save proof");
-        final String defaultName 
-        	= MiscTools.toValidFileName(mediator.getSelectedProof()
-        		                            .name()
-        		                            .toString()).toString();
-        boolean saved = jFC.showSaveDialog(this, defaultName + ".proof");
-        if (saved) {
-            saveProof(jFC.getSelectedFile());
-        }
-    }
-    
     public void saveProof(File proofFile) {
         String filename = proofFile.getAbsolutePath();    
         ProofSaver saver = new ProofSaver(getMediator().getSelectedProof(), filename, Main.INTERNAL_VERSION);
@@ -1377,10 +1290,8 @@ public final class MainWindow extends JFrame  {
             if ( proof.getSettings().getStrategySettings() == (StrategySettings) e.getSource() ) {
                 // updateAutoModeConfigButton();
             }         
-        }
-        
-    }
-        
+        }        
+    }        
     
     /** displays some status information */
     void displayResults ( long time, int appliedRules, int closedGoals, int openGoals ) {

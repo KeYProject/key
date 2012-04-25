@@ -481,17 +481,24 @@ public class ProofSaver {
             if (val instanceof Term) {
                 return printTerm((Term) val, services, true).toString();
             }
-            else 
-                if (val==null){
+            else if (val instanceof Sequent) {
+                return printSequent((Sequent) val, services);
+            } else if (val==null){
                     return null;
-                }
-                else {
-                    System.err.println("Don't know how to prettyprint "+val.getClass());
-                    // try to String by chance
-                    return val.toString();
-                }
+            }
+            else {
+                System.err.println("Don't know how to prettyprint "+val.getClass());
+                // try to String by chance
+                return val.toString();
+            }
     }
 
+
+    private static String printSequent(Sequent val, Services services) {
+        LogicPrinter printer = createLogicPrinter(services, services == null);
+        printer.printSequent(val);
+        return printer.toString();
+    }
 
     private static LogicPrinter createLogicPrinter(Services serv, 
             boolean shortAttrNotation) {
