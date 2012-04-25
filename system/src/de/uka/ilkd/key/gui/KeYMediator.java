@@ -714,7 +714,6 @@ public class KeYMediator {
      * @param b true iff interactive mode is to be turned on
      */
     public void setInteractive ( boolean b ) {
-        interactiveProver.setInteractive ( b );
         if (getProof() != null) {
             if ( b  ) {
                 getProof().setRuleAppIndexToInteractiveMode ();
@@ -800,15 +799,10 @@ public class KeYMediator {
       };
       GuiUtilities.invokeAndWait(interfaceSignaller);
    }
-   
-
-  
-    
     
     public boolean autoMode() {
         return autoMode;
     }
-
 
     class KeYMediatorProofTreeListener extends ProofTreeAdapter {
 	private boolean pruningInProcess;
@@ -872,7 +866,8 @@ public class KeYMediator {
 
 	/** invoked if automatic execution has started
 	 */
-	public void autoModeStarted(ProofEvent e) {
+	public void autoModeStarted(ProofEvent e) {	 
+	    resetNrGoalsClosedByHeuristics();
 	    autoMode = true;
 	}
 	

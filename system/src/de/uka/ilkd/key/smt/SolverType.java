@@ -104,7 +104,7 @@ public interface SolverType extends PipeListener<SolverCommunication> {
                 @Override
                 public SMTTranslator getTranslator(Services services) {
                         return new SmtLib2Translator(services,
-                                        new Configuration(false));
+                                        new Configuration(false,false));
                 }
 
 
@@ -130,11 +130,16 @@ public interface SolverType extends PipeListener<SolverCommunication> {
                 
 				@Override
 				public void messageIncoming(Pipe<SolverCommunication> pipe, String message, int type) {
-					 if(type == Pipe.ERROR_MESSAGE || message.startsWith("(error")){
+					SolverCommunication sc = pipe.getSession();
+					if(type == Pipe.ERROR_MESSAGE || message.startsWith("(error")){
+						 sc.addMessage(message);
+						 if(message.indexOf("WARNING:")>-1){
+							return;
+						 }
 						 throw new RuntimeException("Error while executing Z3:\n" +message);
 					 }
 			
-				SolverCommunication sc = pipe.getSession();
+			
 				switch (sc.getState()) {
 				case WAIT_FOR_RESULT:
 					 if(message.equals("unsat")){
@@ -195,13 +200,13 @@ public interface SolverType extends PipeListener<SolverCommunication> {
                 }
                 
                 public String[] getDelimiters() {
-                	return new String [] {"CVC>","C>","\n"};
+                	return new String [] {"CVC>","C>"};
                 };
 
                 @Override
                 public SMTTranslator getTranslator(Services services) {
                         return new SmtLibTranslator(services,
-                                        new Configuration(false));
+                                        new Configuration(false,true));
                 }
                 
                 public boolean supportsIfThenElse() {
@@ -262,7 +267,7 @@ public interface SolverType extends PipeListener<SolverCommunication> {
                 @Override
                 public SMTTranslator getTranslator(Services services) {
                         return new SmtLibTranslator(services,
-                                        new Configuration(true));
+                                        new Configuration(true,true));
                 }
 
                          
@@ -377,6 +382,10 @@ public interface SolverType extends PipeListener<SolverCommunication> {
 					if(message.indexOf("Invalid.")>-1){
 						 sc.setFinalResult(SMTSolverResult.createInvalidResult(getName()));						 
 						 pipe.close();
+					}
+					
+					if(message.indexOf("Bad input:")>-1){
+						pipe.close();
 					}
 					
 							

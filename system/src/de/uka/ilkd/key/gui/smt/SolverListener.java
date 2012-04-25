@@ -292,8 +292,6 @@ public class SolverListener implements SolverLauncherListener {
                         @Override
                         public void run() {
                                 progressDialog.setVisible(true);
-                                // progressDialog.setVisible(true);
-
                         }
                 });
 

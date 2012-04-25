@@ -739,10 +739,6 @@ public final class MainWindow extends JFrame  {
         return "";
     }
     
-    /** the number of goals the goal list currently contains */
-    public int displayedOpenGoalNumber() {
-        return goalList.getModel().getSize();
-    }
     
     /**
      * create the goal list, proof tree, proof list. Add to their respective
@@ -1385,71 +1381,12 @@ public final class MainWindow extends JFrame  {
         
     }
         
-
-    /** 
-     * used when in batch mode to write out some statistic data
-     * @param file the String with the filename where to write the statistic data
-     * @param result the Object encapsulating informtation about the result, e.g.
-     * String "Error" if an error has occurred. 
-     * @param time the long giving the needed time in ms 
-     * @param appliedRules the int giving the number of applied rules
-     */
-    private void printStatistics(String file, Object result, 
-            long time, int appliedRules) {
-        try {
-            final FileWriter statistics = new FileWriter ( file, true );
-            final PrintWriter statPrinter = new PrintWriter ( statistics );
-            
-            String fileName = Main.getFileNameOnStartUp();
-            final int slashIndex = fileName.lastIndexOf ( "examples/" );
-            if ( slashIndex >= 0 )
-                fileName = fileName.substring ( slashIndex );
-            
-            statPrinter.print ( fileName + ", " );
-            if ("Error".equals ( result ) )
-                statPrinter.println ( "-1, -1" );
-            else
-                statPrinter.println ( "" + appliedRules + ", " + time );                
-            statPrinter.close();
-        } catch ( IOException e ) {}
-    }
-
-    /**
-     * This mechanism is not good and will vanish.
-     * @param info
-     */
-    @Deprecated
-    public void taskFinished(TaskFinishedInfo info) {
-        final MainStatusLine sl = getStatusLine();
-
-        if (info.getSource() instanceof ApplyStrategy) {
-            sl.reset();
-            displayResults(info.getTime(), 
-                    info.getAppliedRules(), 
-                    info.getClosedGoals());                
-        } else if (info.getSource() instanceof ProblemLoader) {
-            if (!"".equals(info.getResult())) {
-                final KeYExceptionHandler exceptionHandler = 
-                    ((ProblemLoader)info.getSource()).getExceptionHandler();
-                ExceptionDialog.showDialog(MainWindow.this,     
-                        exceptionHandler.getExceptions());
-                exceptionHandler.clear();
-            } else {
-                sl.reset();                    
-                mediator.getNotationInfo().refresh(mediator.getServices());
-            }
-        } else {
-            sl.reset();
-        }
-    }
     
     /** displays some status information */
-    void displayResults ( long time, int appliedRules, int closedGoals ) {
+    void displayResults ( long time, int appliedRules, int closedGoals, int openGoals ) {
         String message;       
         String timeString = "" + (time/1000)+"."+((time%1000)/100);        
-        
-        int closed = getMediator().getNrGoalsClosedByAutoMode();
-        
+                
         // display message in the status bar
         
         if ( appliedRules != 0 ) {
@@ -1457,8 +1394,8 @@ public final class MainWindow extends JFrame  {
             if ( appliedRules != 1 ) message += "s";
             message += " (" + timeString + " sec), ";
             message += " closed " + closedGoals + " goal";
-            if ( closed != 1 ) message += "s";             
-            message += ", " + displayedOpenGoalNumber ();
+            if ( closedGoals != 1 ) message += "s";             
+            message += ", " + openGoals;
             message += " remaining"; 
             setStatusLine ( message );
         }                              

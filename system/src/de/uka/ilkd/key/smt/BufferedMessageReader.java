@@ -25,9 +25,10 @@ public class BufferedMessageReader {
 	 */
 	public String readMessage() {
 		int length = -1;
-		char buf[] = new char[128];
+		
 		String message = null;
 		do{
+		  char buf[] = new char[128]; // create buffer in every loop cycle!
 		  message = getNextMessage();
 		  if(message!= null){			
 			  return message;
@@ -63,9 +64,8 @@ public class BufferedMessageReader {
 		if(index == -1){
 			return null;
 		}
-		
 		String message = index > 0 ? messageBuffer.substring(0, index) : null;
-		messageBuffer = messageBuffer.delete(0, index+responsibleMark.length());
+		messageBuffer = new StringBuffer(messageBuffer.substring( index+responsibleMark.length()));
 		return message;
 	}
 	

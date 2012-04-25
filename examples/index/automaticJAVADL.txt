@@ -7,337 +7,349 @@
 # See LICENSE.TXT for details.
 
 #
-# This file describes the benchmark problems which can
-# be closed automatically.
+# This file describes the benchmark problems.
+# Files marked as provable should be closed automatically.
+# Files marked as nonprovable should be not closable.
 #
 # It is used by bin/runAllProofs.pl.
 #
 
-./heap/information_flow/ArrayList_contains.key
-./heap/information_flow/ArrayList_get.key
-./heap/information_flow/ArrayList_size.key
-./heap/information_flow/UpdateAbstraction_ex7_3_secure.key
-./heap/information_flow/UpdateAbstraction_ex7_4_secure.key
-./heap/information_flow/UpdateAbstraction_ex7_5_secure.key
-./heap/information_flow/UpdateAbstraction_ex7_6_secure.key
-./heap/information_flow/UpdateAbstraction_ex9_secure.key
-./heap/list/ArrayList_add.key
-./heap/list/ArrayList_ArrayList.key
-./heap/list/ArrayList_concatenate.key
-./heap/list/ArrayList_contains_dep.key
-./heap/list/ArrayList_enlarge.key
-./heap/list/ArrayList_footprint.key
-./heap/list/ArrayList_get_dep.key
-./heap/list/ArrayList_get_exceptional.key
-./heap/list/ArrayList_get_normal.key
-./heap/list/ArrayList_inv.key
-./heap/list/ArrayList_iterator.key
-./heap/list/ArrayList_size_dep.key
-./heap/list/ArrayList_size.key
-./heap/list/ArrayList.ArrayListIterator_ArrayListIterator.key
-./heap/list/ArrayList.ArrayListIterator_hasNext_dep.key
-./heap/list/ArrayList.ArrayListIterator_hasNext.key
-./heap/list/ArrayList.ArrayListIterator_inv.key
-./heap/list/ArrayList.ArrayListIterator_list.key
-./heap/list/ArrayList.ArrayListIterator_next_exceptional.key
-./heap/list/ArrayList.ArrayListIterator_next_normal.key
-./heap/list/ArrayList.ArrayListIterator_pos.key
-./heap/list/Client_m.key
-./heap/list/Client_n.key
-./heap/list/LinkedList_get_exceptional.key
-./heap/list/LinkedList_get_normal.key
-./heap/list/LinkedList_LinkedList.key
-./heap/list/LinkedList_size_dep.key
-./heap/list/LinkedList_size.key
-./heap/list/MySet_footprint.key
-./heap/list/MySet_MySet.key
-./heap/list_ghost/ArrayList_add.key
-./heap/list_ghost/ArrayList_ArrayList.key
-./heap/list_ghost/ArrayList_enlarge.key
-./heap/list_ghost/ArrayList_get_dep.key
-./heap/list_ghost/ArrayList_get_exceptional.key
-./heap/list_ghost/ArrayList_get_normal.key
-./heap/list_ghost/ArrayList_inv.key
-./heap/list_ghost/ArrayList_size_dep.key
-./heap/list_ghost/ArrayList_size.key
-./heap/observer/ExampleObserver_ExampleObserver.key
-./heap/observer/ExampleObserver_inv.key
-./heap/observer/ExampleObserver_subject.key
-./heap/observer/ExampleObserver_update.key
-./heap/observer/ExampleObserver_upToDate.key
-./heap/observer/ExampleObserver_value.key
-./heap/observer/ExampleSubject_addObserver.key
-./heap/observer/ExampleSubject_change.key
-./heap/observer/ExampleSubject_ExampleSubject.key
-./heap/observer/ExampleSubject_footprint.key
-./heap/observer/ExampleSubject_inv.key
-./heap/observer/ExampleSubject_notifyObservers.key
-./heap/observer/ExampleSubject_value_dep.key
-./heap/observer/ExampleSubject_value.key
-./heap/saddleback_search/Saddleback_search.key
-./heap/simple/anonymise_datagroup.key
-./heap/simple/array_creation.key
-./heap/simple/arrays_with_disjoint_sorts.key
-./heap/simple/arrays.key
-./heap/simple/attributes.key
-./heap/simple/constructor_contracts.key
-./heap/simple/dependencies.key
-./heap/simple/dependency_contracts.key
-./heap/simple/invariant_preservation.key
-./heap/simple/locsets.key
-./heap/simple/loop1.key
-./heap/simple/loop2.key
-./heap/simple/modifies_datagroup.key
-./heap/simple/modifies.key
-./heap/simple/object_creation.key
-./heap/simple/operation_contracts.key
-./heap/simple/select_store.key
-./heap/simple/selection_sort.key
-./heap/simple/seq.key
-./heap/SmansEtAl/ArrayList_add.key
-./heap/SmansEtAl/ArrayList_ArrayList.key
-./heap/SmansEtAl/ArrayList_footprint.key
-./heap/SmansEtAl/ArrayList_get_dep.key
-./heap/SmansEtAl/ArrayList_get.key
-./heap/SmansEtAl/ArrayList_inv.key
-./heap/SmansEtAl/ArrayList_size_dep.key
-./heap/SmansEtAl/ArrayList_size.key
-./heap/SmansEtAl/Cell_Cell.key
-./heap/SmansEtAl/Cell_footprint.key
-./heap/SmansEtAl/Cell_getX_dep.key
-./heap/SmansEtAl/Cell_getX.key
-./heap/SmansEtAl/Cell_inv.key
-./heap/SmansEtAl/Cell_setX.key
-./heap/SmansEtAl/CellClient_m.key
-./heap/SmansEtAl/Iterator_footprint.key
-./heap/SmansEtAl/Iterator_hasNext_dep.key
-./heap/SmansEtAl/Iterator_hasNext.key
-./heap/SmansEtAl/Iterator_inv.key
-./heap/SmansEtAl/Iterator_Iterator.key
-./heap/SmansEtAl/Iterator_list_dep.key
-./heap/SmansEtAl/Iterator_list.key
-./heap/SmansEtAl/Iterator_next.key
-./heap/SmansEtAl/Stack_footprint.key
-./heap/SmansEtAl/Stack_inv.key
-./heap/SmansEtAl/Stack_push.key
-./heap/SmansEtAl/Stack_size_dep.key
-./heap/SmansEtAl/Stack_size.key
-./heap/SmansEtAl/Stack_Stack.key
-./heap/SmansEtAl/Stack_switchContents.key
-./heap/vacid0_01_SparseArray/Harness_sparseArrayTestHarness1.key
-./heap/vacid0_01_SparseArray/Harness_sparseArrayTestHarness2.key
-./heap/vacid0_01_SparseArray/MemoryAllocator_alloc_unsigned.key
-./heap/vacid0_01_SparseArray/MemoryAllocator_alloc.key
-./heap/vacid0_01_SparseArray/SparseArray_get_dep.key
-./heap/vacid0_01_SparseArray/SparseArray_get.key
-./heap/vacid0_01_SparseArray/SparseArray_inv.key
-./heap/vacid0_01_SparseArray/SparseArray_SparseArray.key
-./heap/vstte10_01_SumAndMax/SumAndMax_sumAndMax.key
-./heap/vstte10_03_LinkedList/Node_cons.key
-./heap/vstte10_03_LinkedList/Node_inv.key
-./heap/vstte10_03_LinkedList/Node_search.key
-./heap/vstte10_04_Queens/Queens_isConsistent.key
-./heap/vstte10_04_Queens/Queens_nQueens.key
-./heap/vstte10_05_Queue/AmortizedQueue_AmortizedQueue.key
-./heap/vstte10_05_Queue/AmortizedQueue_front.key
-./heap/vstte10_05_Queue/LinkedList_concat.key
-./heap/vstte10_05_Queue/LinkedList_cons.key
-./heap/vstte10_05_Queue/LinkedList_head.key
-./heap/vstte10_05_Queue/LinkedList_inv.key
-./heap/vstte10_05_Queue/LinkedList_length.key
-./heap/vstte10_05_Queue/LinkedList_LinkedList1.key
-./heap/vstte10_05_Queue/LinkedList_LinkedList2.key
-./heap/vstte10_05_Queue/LinkedList_LinkedList3.key
-./heap/vstte10_05_Queue/LinkedList_reverse.key
-./heap/vstte10_05_Queue/LinkedList_tail.key
-./heap/WeideEtAl_01_AddAndMultiply/AddAndMultiply_add.key
-./heap/WeideEtAl_01_AddAndMultiply/AddAndMultiply_mul.key
-./heap/WeideEtAl_02_BinarySearch/BinarySearch_search.key
-./heap/strictly_pure/strictlyPureMethod.key
-./heap/strictly_pure/useStrictlyPureMethod.key
-./standard_key/arith/binomial1.key
-./standard_key/arith/binomial2.key
-./standard_key/arith/check_jdiv.key
-./standard_key/arith/check_jdiv_concrete.key
-./standard_key/arith/check_jdiv_instantiated.key
-./standard_key/arith/check_jmod.key
-./standard_key/arith/complexExpressions.key
-./standard_key/arith/compound_unaryMinus.key
-./standard_key/arith/computation.key
-./standard_key/arith/cubicSum.key
-./standard_key/arith/divByZero.key
-./standard_key/arith/divisionAssoc.key
-./standard_key/arith/divisionBy2.key
-./standard_key/arith/euclidean/gcdHelp-post.key
-./standard_key/arith/gemplusDecimal/add.key
-./standard_key/arith/jdivevenodd.key
-./standard_key/arith/median.key
-./standard_key/arith/mod1.key
-./standard_key/arith/mod2.key
-./standard_key/arith/mod7.key
-./standard_key/arith/overflow_hija.key
-./standard_key/arith/poly_division0.key
-./standard_key/arith/poly_division1.key
-./standard_key/arrays/arrayStoreException/array2DimPrim.key
-./standard_key/arrays/arrayStoreException/arrayStoreKnownDynType.key
-./standard_key/arrays/arrayStoreException/reverseArray.key
-./standard_key/arrays/arrayStoreException/throwArrayStoreException.key
-./standard_key/arrays/creation/arrayCreation1.key
-./standard_key/BookExamples/chap02FirstOrderLogic/Ex2.58.key
-./standard_key/inEqSimp/division.key
-./standard_key/inEqSimp/inequations0.key
-./standard_key/inEqSimp/inequations1.key
-./standard_key/inEqSimp/inequations2.key
-./standard_key/inEqSimp/linApprox.key
-./standard_key/inEqSimp/nonLinInEqExample0.key
-./standard_key/inEqSimp/nonLinInEqExample2.key
-./standard_key/inEqSimp/nonLinInEqExample3.key
-./standard_key/inEqSimp/nonLinInEqExample4.key
-./standard_key/inEqSimp/quadraticInEq.key
-./standard_key/inEqSimp/quadraticInEq10.key
-./standard_key/inEqSimp/quadraticInEq13.key
-./standard_key/inEqSimp/quadraticInEq14.key
-./standard_key/inEqSimp/quadraticInEq2.key
-./standard_key/inEqSimp/quadraticInEq3.key
-./standard_key/inEqSimp/quadraticInEq4.key
-./standard_key/inEqSimp/quadraticInEq5.key
-./standard_key/inEqSimp/quadraticInEq6.key
-./standard_key/inEqSimp/quadraticInEq7.key
-./standard_key/inEqSimp/quadraticInEq8.key
-./standard_key/inEqSimp/simplify0.key
-./standard_key/inEqSimp/simplify1.key
-./standard_key/inEqSimp/simplify2.key
-./standard_key/inEqSimp/simplify3.key
-./standard_key/inEqSimp/simplify4.key
-./standard_key/inEqSimp/simplify5.key
-./standard_key/inEqSimp/subsumptionExample.key
-./standard_key/instanceCreation/instanceCreation1.key
-./standard_key/instanceCreation/instanceCreation2.key
-./standard_key/instanceCreation/interfacesAndAbstractClassesHaveNoInstances.key
-./standard_key/instanceCreation/successiveCreatedObjectsAreDistinct.key
-./standard_key/java_dl/SimpleAttributes.key
-./standard_key/java_dl/arrayMax.key
-./standard_key/java_dl/arrayUpdateSimp.key
-./standard_key/java_dl/attributes.key
-./standard_key/java_dl/break.key
-./standard_key/java_dl/char.key
-./standard_key/java_dl/compileTimeConstants.key
-./standard_key/java_dl/continue1.key
-./standard_key/java_dl/continue2.key
-./standard_key/java_dl/complexAssignment.key
-./standard_key/java_dl/danglingElseSolution1.key
-./standard_key/java_dl/danglingElseSolution2.key
-./standard_key/java_dl/exceptions.key
-./standard_key/java_dl/exceptions1.key
-./standard_key/java_dl/exceptions2.key
-./standard_key/java_dl/exceptions3.key
-./standard_key/java_dl/exchange.key
-./standard_key/java_dl/if.key
-./standard_key/java_dl/incrementcounter.key
-./standard_key/java_dl/innerClasses/inner.key
-./standard_key/java_dl/iteratedAssignment.key
-./standard_key/java_dl/java5/vararg.key
-./standard_key/java_dl/jml-bigint/cast.key
+provable: ./heap/information_flow/ArrayList_contains.key
+provable: ./heap/information_flow/ArrayList_get.key
+provable: ./heap/information_flow/ArrayList_size.key
+provable: ./heap/information_flow/UpdateAbstraction_ex7_3_secure.key
+provable: ./heap/information_flow/UpdateAbstraction_ex7_4_secure.key
+provable: ./heap/information_flow/UpdateAbstraction_ex7_5_secure.key
+provable: ./heap/information_flow/UpdateAbstraction_ex7_6_secure.key
+provable: ./heap/information_flow/UpdateAbstraction_ex9_secure.key
+provable: ./heap/list/ArrayList_add.key
+provable: ./heap/list/ArrayList_ArrayList.key
+provable: ./heap/list/ArrayList_concatenate.key
+provable: ./heap/list/ArrayList_contains_dep.key
+provable: ./heap/list/ArrayList_enlarge.key
+provable: ./heap/list/ArrayList_footprint.key
+provable: ./heap/list/ArrayList_get_dep.key
+provable: ./heap/list/ArrayList_get_exceptional.key
+provable: ./heap/list/ArrayList_get_normal.key
+provable: ./heap/list/ArrayList_inv.key
+provable: ./heap/list/ArrayList_iterator.key
+provable: ./heap/list/ArrayList_size_dep.key
+provable: ./heap/list/ArrayList_size.key
+provable: ./heap/list/ArrayList.ArrayListIterator_ArrayListIterator.key
+provable: ./heap/list/ArrayList.ArrayListIterator_hasNext_dep.key
+provable: ./heap/list/ArrayList.ArrayListIterator_hasNext.key
+provable: ./heap/list/ArrayList.ArrayListIterator_inv.key
+provable: ./heap/list/ArrayList.ArrayListIterator_list.key
+provable: ./heap/list/ArrayList.ArrayListIterator_next_exceptional.key
+provable: ./heap/list/ArrayList.ArrayListIterator_next_normal.key
+provable: ./heap/list/ArrayList.ArrayListIterator_pos.key
+provable: ./heap/list/Client_m.key
+provable: ./heap/list/Client_n.key
+provable: ./heap/list/LinkedList_get_exceptional.key
+provable: ./heap/list/LinkedList_get_normal.key
+provable: ./heap/list/LinkedList_LinkedList.key
+provable: ./heap/list/LinkedList_size_dep.key
+provable: ./heap/list/LinkedList_size.key
+provable: ./heap/list/MySet_footprint.key
+provable: ./heap/list/MySet_MySet.key
+provable: ./heap/list_ghost/ArrayList_add.key
+provable: ./heap/list_ghost/ArrayList_ArrayList.key
+provable: ./heap/list_ghost/ArrayList_enlarge.key
+provable: ./heap/list_ghost/ArrayList_get_dep.key
+provable: ./heap/list_ghost/ArrayList_get_exceptional.key
+provable: ./heap/list_ghost/ArrayList_get_normal.key
+provable: ./heap/list_ghost/ArrayList_inv.key
+provable: ./heap/list_ghost/ArrayList_size_dep.key
+provable: ./heap/list_ghost/ArrayList_size.key
+provable: ./heap/observer/ExampleObserver_ExampleObserver.key
+provable: ./heap/observer/ExampleObserver_inv.key
+provable: ./heap/observer/ExampleObserver_subject.key
+provable: ./heap/observer/ExampleObserver_update.key
+provable: ./heap/observer/ExampleObserver_upToDate.key
+provable: ./heap/observer/ExampleObserver_value.key
+provable: ./heap/observer/ExampleSubject_addObserver.key
+provable: ./heap/observer/ExampleSubject_change.key
+provable: ./heap/observer/ExampleSubject_ExampleSubject.key
+provable: ./heap/observer/ExampleSubject_footprint.key
+provable: ./heap/observer/ExampleSubject_inv.key
+provable: ./heap/observer/ExampleSubject_notifyObservers.key
+provable: ./heap/observer/ExampleSubject_value_dep.key
+provable: ./heap/observer/ExampleSubject_value.key
+provable: ./heap/saddleback_search/Saddleback_search.key
+provable: ./heap/simple/anonymise_datagroup.key
+provable: ./heap/simple/array_creation.key
+provable: ./heap/simple/arrays_with_disjoint_sorts.key
+provable: ./heap/simple/arrays.key
+provable: ./heap/simple/attributes.key
+provable: ./heap/simple/constructor_contracts.key
+provable: ./heap/simple/dependencies.key
+provable: ./heap/simple/dependency_contracts.key
+provable: ./heap/simple/invariant_preservation.key
+provable: ./heap/simple/locsets.key
+provable: ./heap/simple/loop1.key
+provable: ./heap/simple/loop2.key
+provable: ./heap/simple/modifies_datagroup.key
+provable: ./heap/simple/modifies.key
+provable: ./heap/simple/object_creation.key
+provable: ./heap/simple/operation_contracts.key
+provable: ./heap/simple/select_store.key
+provable: ./heap/simple/selection_sort.key
+provable: ./heap/simple/seq.key
+provable: ./heap/SmansEtAl/ArrayList_add.key
+provable: ./heap/SmansEtAl/ArrayList_ArrayList.key
+provable: ./heap/SmansEtAl/ArrayList_footprint.key
+provable: ./heap/SmansEtAl/ArrayList_get_dep.key
+provable: ./heap/SmansEtAl/ArrayList_get.key
+provable: ./heap/SmansEtAl/ArrayList_inv.key
+provable: ./heap/SmansEtAl/ArrayList_size_dep.key
+provable: ./heap/SmansEtAl/ArrayList_size.key
+provable: ./heap/SmansEtAl/Cell_Cell.key
+provable: ./heap/SmansEtAl/Cell_footprint.key
+provable: ./heap/SmansEtAl/Cell_getX_dep.key
+provable: ./heap/SmansEtAl/Cell_getX.key
+provable: ./heap/SmansEtAl/Cell_inv.key
+provable: ./heap/SmansEtAl/Cell_setX.key
+provable: ./heap/SmansEtAl/CellClient_m.key
+provable: ./heap/SmansEtAl/Iterator_footprint.key
+provable: ./heap/SmansEtAl/Iterator_hasNext_dep.key
+provable: ./heap/SmansEtAl/Iterator_hasNext.key
+provable: ./heap/SmansEtAl/Iterator_inv.key
+provable: ./heap/SmansEtAl/Iterator_Iterator.key
+provable: ./heap/SmansEtAl/Iterator_list_dep.key
+provable: ./heap/SmansEtAl/Iterator_list.key
+provable: ./heap/SmansEtAl/Iterator_next.key
+provable: ./heap/SmansEtAl/Stack_footprint.key
+provable: ./heap/SmansEtAl/Stack_inv.key
+provable: ./heap/SmansEtAl/Stack_push.key
+provable: ./heap/SmansEtAl/Stack_size_dep.key
+provable: ./heap/SmansEtAl/Stack_size.key
+provable: ./heap/SmansEtAl/Stack_Stack.key
+provable: ./heap/SmansEtAl/Stack_switchContents.key
+provable: ./heap/vacid0_01_SparseArray/Harness_sparseArrayTestHarness1.key
+provable: ./heap/vacid0_01_SparseArray/Harness_sparseArrayTestHarness2.key
+provable: ./heap/vacid0_01_SparseArray/MemoryAllocator_alloc_unsigned.key
+provable: ./heap/vacid0_01_SparseArray/MemoryAllocator_alloc.key
+provable: ./heap/vacid0_01_SparseArray/SparseArray_get_dep.key
+provable: ./heap/vacid0_01_SparseArray/SparseArray_get.key
+provable: ./heap/vacid0_01_SparseArray/SparseArray_inv.key
+provable: ./heap/vacid0_01_SparseArray/SparseArray_SparseArray.key
+provable: ./heap/vstte10_01_SumAndMax/SumAndMax_sumAndMax.key
+provable: ./heap/vstte10_03_LinkedList/Node_cons.key
+provable: ./heap/vstte10_03_LinkedList/Node_inv.key
+provable: ./heap/vstte10_03_LinkedList/Node_search.key
+provable: ./heap/vstte10_04_Queens/Queens_isConsistent.key
+provable: ./heap/vstte10_04_Queens/Queens_nQueens.key
+provable: ./heap/vstte10_05_Queue/AmortizedQueue_AmortizedQueue.key
+provable: ./heap/vstte10_05_Queue/AmortizedQueue_front.key
+provable: ./heap/vstte10_05_Queue/LinkedList_concat.key
+provable: ./heap/vstte10_05_Queue/LinkedList_cons.key
+provable: ./heap/vstte10_05_Queue/LinkedList_head.key
+provable: ./heap/vstte10_05_Queue/LinkedList_inv.key
+provable: ./heap/vstte10_05_Queue/LinkedList_length.key
+provable: ./heap/vstte10_05_Queue/LinkedList_LinkedList1.key
+provable: ./heap/vstte10_05_Queue/LinkedList_LinkedList2.key
+provable: ./heap/vstte10_05_Queue/LinkedList_LinkedList3.key
+provable: ./heap/vstte10_05_Queue/LinkedList_reverse.key
+provable: ./heap/vstte10_05_Queue/LinkedList_tail.key
+provable: ./heap/WeideEtAl_01_AddAndMultiply/AddAndMultiply_add.key
+provable: ./heap/WeideEtAl_01_AddAndMultiply/AddAndMultiply_mul.key
+provable: ./heap/WeideEtAl_02_BinarySearch/BinarySearch_search.key
+provable: ./heap/strictly_pure/strictlyPureMethod.key
+provable: ./heap/strictly_pure/useStrictlyPureMethod.key
+provable: ./standard_key/arith/binomial1.key
+provable: ./standard_key/arith/binomial2.key
+provable: ./standard_key/arith/check_jdiv.key
+provable: ./standard_key/arith/check_jdiv_concrete.key
+provable: ./standard_key/arith/check_jdiv_instantiated.key
+provable: ./standard_key/arith/check_jmod.key
+provable: ./standard_key/arith/complexExpressions.key
+provable: ./standard_key/arith/compound_unaryMinus.key
+provable: ./standard_key/arith/computation.key
+provable: ./standard_key/arith/cubicSum.key
+provable: ./standard_key/arith/divByZero.key
+provable: ./standard_key/arith/divisionAssoc.key
+provable: ./standard_key/arith/divisionBy2.key
+provable: ./standard_key/arith/euclidean/gcdHelp-post.key
+provable: ./standard_key/arith/gemplusDecimal/add.key
+provable: ./standard_key/arith/jdivevenodd.key
+provable: ./standard_key/arith/median.key
+provable: ./standard_key/arith/mod1.key
+provable: ./standard_key/arith/mod2.key
+provable: ./standard_key/arith/mod7.key
+provable: ./standard_key/arith/overflow_hija.key
+provable: ./standard_key/arith/poly_division0.key
+provable: ./standard_key/arith/poly_division1.key
+provable: ./standard_key/arrays/arrayStoreException/array2DimPrim.key
+provable: ./standard_key/arrays/arrayStoreException/arrayStoreKnownDynType.key
+provable: ./standard_key/arrays/arrayStoreException/reverseArray.key
+provable: ./standard_key/arrays/arrayStoreException/throwArrayStoreException.key
+provable: ./standard_key/arrays/creation/arrayCreation1.key
+provable: ./standard_key/BookExamples/chap02FirstOrderLogic/Ex2.58.key
+provable: ./standard_key/inEqSimp/division.key
+provable: ./standard_key/inEqSimp/inequations0.key
+provable: ./standard_key/inEqSimp/inequations1.key
+provable: ./standard_key/inEqSimp/inequations2.key
+provable: ./standard_key/inEqSimp/linApprox.key
+provable: ./standard_key/inEqSimp/nonLinInEqExample0.key
+provable: ./standard_key/inEqSimp/nonLinInEqExample2.key
+provable: ./standard_key/inEqSimp/nonLinInEqExample3.key
+provable: ./standard_key/inEqSimp/nonLinInEqExample4.key
+provable: ./standard_key/inEqSimp/quadraticInEq.key
+provable: ./standard_key/inEqSimp/quadraticInEq10.key
+provable: ./standard_key/inEqSimp/quadraticInEq13.key
+provable: ./standard_key/inEqSimp/quadraticInEq14.key
+provable: ./standard_key/inEqSimp/quadraticInEq2.key
+provable: ./standard_key/inEqSimp/quadraticInEq3.key
+provable: ./standard_key/inEqSimp/quadraticInEq4.key
+provable: ./standard_key/inEqSimp/quadraticInEq5.key
+provable: ./standard_key/inEqSimp/quadraticInEq6.key
+provable: ./standard_key/inEqSimp/quadraticInEq7.key
+provable: ./standard_key/inEqSimp/quadraticInEq8.key
+provable: ./standard_key/inEqSimp/simplify0.key
+provable: ./standard_key/inEqSimp/simplify1.key
+provable: ./standard_key/inEqSimp/simplify2.key
+provable: ./standard_key/inEqSimp/simplify3.key
+provable: ./standard_key/inEqSimp/simplify4.key
+provable: ./standard_key/inEqSimp/simplify5.key
+provable: ./standard_key/inEqSimp/subsumptionExample.key
+provable: ./standard_key/instanceCreation/instanceCreation1.key
+provable: ./standard_key/instanceCreation/instanceCreation2.key
+provable: ./standard_key/instanceCreation/interfacesAndAbstractClassesHaveNoInstances.key
+provable: ./standard_key/instanceCreation/successiveCreatedObjectsAreDistinct.key
+provable: ./standard_key/java_dl/SimpleAttributes.key
+provable: ./standard_key/java_dl/arrayMax.key
+provable: ./standard_key/java_dl/arrayUpdateSimp.key
+provable: ./standard_key/java_dl/attributes.key
+provable: ./standard_key/java_dl/break.key
+provable: ./standard_key/java_dl/char.key
+provable: ./standard_key/java_dl/compileTimeConstants.key
+provable: ./standard_key/java_dl/continue1.key
+provable: ./standard_key/java_dl/continue2.key
+provable: ./standard_key/java_dl/complexAssignment.key
+provable: ./standard_key/java_dl/danglingElseSolution1.key
+provable: ./standard_key/java_dl/danglingElseSolution2.key
+provable: ./standard_key/java_dl/exceptions.key
+provable: ./standard_key/java_dl/exceptions1.key
+provable: ./standard_key/java_dl/exceptions2.key
+provable: ./standard_key/java_dl/exceptions3.key
+provable: ./standard_key/java_dl/exchange.key
+provable: ./standard_key/java_dl/if.key
+provable: ./standard_key/java_dl/incrementcounter.key
+provable: ./standard_key/java_dl/innerClasses/inner.key
+provable: ./standard_key/java_dl/iteratedAssignment.key
+provable: ./standard_key/java_dl/java5/vararg.key
+provable: ./standard_key/java_dl/jml-bigint/cast.key
 # commented out as proof gets too long
 # requires further investigations
-#./standard_key/java_dl/jml-information-flow.key
-./standard_key/java_dl/methodCall.key
-./standard_key/java_dl/methodCall1.key
-./standard_key/java_dl/methodCall1box.key
-./standard_key/java_dl/methodCall2.key
-./standard_key/java_dl/methodCall3.key
-./standard_key/java_dl/polishFlagSort.key
-./standard_key/java_dl/postConditionTaclets1.key
-./standard_key/java_dl/postConditionTaclets2.key
-./standard_key/java_dl/reverseArray.key
-./standard_key/java_dl/reverseArray2.key
-./standard_key/java_dl/simpleAssignment.key
-./standard_key/java_dl/simpleAssignment2.key
+#provable: ./standard_key/java_dl/jml-information-flow.key
+provable: ./standard_key/java_dl/methodCall.key
+provable: ./standard_key/java_dl/methodCall1.key
+provable: ./standard_key/java_dl/methodCall1box.key
+provable: ./standard_key/java_dl/methodCall2.key
+provable: ./standard_key/java_dl/methodCall3.key
+provable: ./standard_key/java_dl/polishFlagSort.key
+provable: ./standard_key/java_dl/postConditionTaclets1.key
+provable: ./standard_key/java_dl/postConditionTaclets2.key
+provable: ./standard_key/java_dl/reverseArray.key
+provable: ./standard_key/java_dl/reverseArray2.key
+provable: ./standard_key/java_dl/simpleAssignment.key
+provable: ./standard_key/java_dl/simpleAssignment2.key
 # commented out as proof gets too long
 # requires further investigations
-#./standard_key/java_dl/symmArray.key
-./standard_key/java_dl/testcontext.key
-./standard_key/polySimp/simplify0.key
-./standard_key/polySimp/simplify1.key
-./standard_key/polySimp/simplify10.key
-./standard_key/polySimp/simplify11.key
-./standard_key/polySimp/simplify12.key
-./standard_key/polySimp/simplify13.key
-./standard_key/polySimp/simplify14.key
-./standard_key/polySimp/simplify15.key
-./standard_key/polySimp/simplify16.key
-./standard_key/polySimp/simplify17.key
-./standard_key/polySimp/simplify18.key
-./standard_key/polySimp/simplify19.key
-./standard_key/polySimp/simplify2.key
-./standard_key/polySimp/simplify20.key
-./standard_key/polySimp/simplify21.key
-./standard_key/polySimp/simplify22.key
-./standard_key/polySimp/simplify23.key
-./standard_key/polySimp/simplify24.key
-./standard_key/polySimp/simplify25.key
-./standard_key/polySimp/simplify3.key
-./standard_key/polySimp/simplify4.key
-./standard_key/polySimp/simplify5.key
-./standard_key/polySimp/simplify6.key
-./standard_key/polySimp/simplify7.key
-./standard_key/polySimp/simplify8.key
-./standard_key/polySimp/simplify9.key
-./standard_key/pred_log/equalities2.key
-./standard_key/pred_log/equalities3.key
-./standard_key/quantifiers/elimination0.key
-./standard_key/quantifiers/heuristic_PUZ001p1-eq.key
-./standard_key/quantifiers/heuristic_PUZ001p1.key
-./standard_key/quantifiers/heuristic_PUZ031p1.key
-./standard_key/quantifiers/heuristic_SYN036p2.key
-./standard_key/quantifiers/injectivity.key
-./standard_key/quantifiers/normalisation0.key
-./standard_key/quantifiers/normalisation1.key
-./standard_key/quantifiers/normalisation2.key
-./standard_key/quantifiers/normalisation3.key
-./standard_key/quantifiers/normalisation4.key
-./standard_key/quantifiers/normalisation5.key
-./standard_key/quantifiers/normalisation6.key
-./standard_key/quantifiers/normalisation7.key
-./standard_key/quantifiers/normalisation8.key
-./standard_key/quantifiers/normalisation9.key
-./standard_key/quantifiers/normalisation10.key
-./standard_key/quantifiers/normalisation11.key
-./standard_key/quantifiers/normalisation12.key
-./standard_key/quantifiers/normalisation13.key
-./standard_key/quantifiers/triggers0.key
-./standard_key/staticInitialisation/cascadeStaticInitialisation.key
-./standard_key/staticInitialisation/erroneousClassImpliesErroneousSubclass.key
-./standard_key/staticInitialisation/initializedSubclassImpliesInitializedSuperclass.key
-./standard_key/staticInitialisation/localDeclared.key
-./standard_key/staticInitialisation/localDeclaredMethod.key
-./standard_key/staticInitialisation/objectOfErroneousClass.key
-./standard_key/staticInitialisation/staticInitialisersAreNonSimple.key
-./standard_key/strings/charAt0.key
-./standard_key/strings/charAt1.key
-./standard_key/strings/concat1.key
-./standard_key/strings/concat2.key
-./standard_key/strings/deriveLength1.key
-./standard_key/strings/emptyStringLengthZero.key
-./standard_key/strings/implicitBooleanStringConversion.key
-./standard_key/strings/implicitBooleanStringConversion2.key
-./standard_key/strings/implicitIntStringConversion.key
-./standard_key/strings/implicitNullStringConversion.key
-./standard_key/strings/implicitNullStringConversion2.key
-./standard_key/strings/implicitObjectStringConversion.key
-./standard_key/strings/literalEquality.key
-./standard_key/strings/replace0.key
-./standard_key/strings/replace1.key
-./standard_key/strings/simpleAssignment.key
-./standard_key/strings/simpleLengthComp.key
-./standard_key/strings/stringCompileTimeConstant1.key
-./standard_key/strings/stringCompileTimeConstant2.key
-./standard_key/strings/stringEquality1.key
-./standard_key/strings/stringEquality2.key
-./standard_key/strings/substring0.key
-./standard_key/strings/substring1.key
-./standard_key/strings/substring2.key
-./standard_key/strings/substring3.key
-./standard_key/strings/substring4.key
-./standard_key/strings/substring5.key
-./_testcase/classpath/classpath.key
+#provable: ./standard_key/java_dl/symmArray.key
+provable: ./standard_key/java_dl/testcontext.key
+provable: ./standard_key/polySimp/simplify0.key
+provable: ./standard_key/polySimp/simplify1.key
+provable: ./standard_key/polySimp/simplify10.key
+provable: ./standard_key/polySimp/simplify11.key
+provable: ./standard_key/polySimp/simplify12.key
+provable: ./standard_key/polySimp/simplify13.key
+provable: ./standard_key/polySimp/simplify14.key
+provable: ./standard_key/polySimp/simplify15.key
+provable: ./standard_key/polySimp/simplify16.key
+provable: ./standard_key/polySimp/simplify17.key
+provable: ./standard_key/polySimp/simplify18.key
+provable: ./standard_key/polySimp/simplify19.key
+provable: ./standard_key/polySimp/simplify2.key
+provable: ./standard_key/polySimp/simplify20.key
+provable: ./standard_key/polySimp/simplify21.key
+provable: ./standard_key/polySimp/simplify22.key
+provable: ./standard_key/polySimp/simplify23.key
+provable: ./standard_key/polySimp/simplify24.key
+provable: ./standard_key/polySimp/simplify25.key
+provable: ./standard_key/polySimp/simplify3.key
+provable: ./standard_key/polySimp/simplify4.key
+provable: ./standard_key/polySimp/simplify5.key
+provable: ./standard_key/polySimp/simplify6.key
+provable: ./standard_key/polySimp/simplify7.key
+provable: ./standard_key/polySimp/simplify8.key
+provable: ./standard_key/polySimp/simplify9.key
+provable: ./standard_key/pred_log/equalities2.key
+provable: ./standard_key/pred_log/equalities3.key
+provable: ./standard_key/quantifiers/elimination0.key
+provable: ./standard_key/quantifiers/heuristic_PUZ001p1-eq.key
+provable: ./standard_key/quantifiers/heuristic_PUZ001p1.key
+provable: ./standard_key/quantifiers/heuristic_PUZ031p1.key
+provable: ./standard_key/quantifiers/heuristic_SYN036p2.key
+provable: ./standard_key/quantifiers/injectivity.key
+provable: ./standard_key/quantifiers/normalisation0.key
+provable: ./standard_key/quantifiers/normalisation1.key
+provable: ./standard_key/quantifiers/normalisation2.key
+provable: ./standard_key/quantifiers/normalisation3.key
+provable: ./standard_key/quantifiers/normalisation4.key
+provable: ./standard_key/quantifiers/normalisation5.key
+provable: ./standard_key/quantifiers/normalisation6.key
+provable: ./standard_key/quantifiers/normalisation7.key
+provable: ./standard_key/quantifiers/normalisation8.key
+provable: ./standard_key/quantifiers/normalisation9.key
+provable: ./standard_key/quantifiers/normalisation10.key
+provable: ./standard_key/quantifiers/normalisation11.key
+provable: ./standard_key/quantifiers/normalisation12.key
+provable: ./standard_key/quantifiers/normalisation13.key
+provable: ./standard_key/quantifiers/triggers0.key
+provable: ./standard_key/staticInitialisation/cascadeStaticInitialisation.key
+provable: ./standard_key/staticInitialisation/erroneousClassImpliesErroneousSubclass.key
+provable: ./standard_key/staticInitialisation/initializedSubclassImpliesInitializedSuperclass.key
+provable: ./standard_key/staticInitialisation/localDeclared.key
+provable: ./standard_key/staticInitialisation/localDeclaredMethod.key
+provable: ./standard_key/staticInitialisation/objectOfErroneousClass.key
+provable: ./standard_key/staticInitialisation/staticInitialisersAreNonSimple.key
+provable: ./standard_key/strings/charAt0.key
+provable: ./standard_key/strings/charAt1.key
+provable: ./standard_key/strings/concat1.key
+provable: ./standard_key/strings/concat2.key
+provable: ./standard_key/strings/deriveLength1.key
+provable: ./standard_key/strings/emptyStringLengthZero.key
+provable: ./standard_key/strings/implicitBooleanStringConversion.key
+provable: ./standard_key/strings/implicitBooleanStringConversion2.key
+provable: ./standard_key/strings/implicitIntStringConversion.key
+provable: ./standard_key/strings/implicitNullStringConversion.key
+provable: ./standard_key/strings/implicitNullStringConversion2.key
+provable: ./standard_key/strings/implicitObjectStringConversion.key
+provable: ./standard_key/strings/literalEquality.key
+provable: ./standard_key/strings/replace0.key
+provable: ./standard_key/strings/replace1.key
+provable: ./standard_key/strings/simpleAssignment.key
+provable: ./standard_key/strings/simpleLengthComp.key
+provable: ./standard_key/strings/stringCompileTimeConstant1.key
+provable: ./standard_key/strings/stringCompileTimeConstant2.key
+provable: ./standard_key/strings/stringEquality1.key
+provable: ./standard_key/strings/stringEquality2.key
+provable: ./standard_key/strings/substring0.key
+provable: ./standard_key/strings/substring1.key
+provable: ./standard_key/strings/substring2.key
+provable: ./standard_key/strings/substring3.key
+provable: ./standard_key/strings/substring4.key
+provable: ./standard_key/strings/substring5.key
+provable: ./_testcase/classpath/classpath.key
+
+notprovable: ./heap/inconsistent_represents/MyClass_m.key
+notprovable: ./heap/inconsistent_represents/MyClass_n.key
+notprovable: ./heap/information_flow/UpdateAbstraction_ex7_1_insecure.key
+notprovable: ./heap/information_flow/UpdateAbstraction_ex7_2_insecure.key
+notprovable: ./standard_key/arrays/arrayStoreException/array2Dim.key
+notprovable: ./standard_key/arrays/arrayStoreException/array2DimClose.key
+notprovable: ./standard_key/arrays/arrayStoreException/throwASEForPrim.key
+notprovable: ./standard_key/java_dl/danglingElse.key
+
+# End -- please do not remove this line.

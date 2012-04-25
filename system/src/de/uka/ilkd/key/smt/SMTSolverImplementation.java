@@ -286,7 +286,32 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
         }
 
 
+        
+        private static String indent(String string) {
 
+            StringBuilder sb = new StringBuilder();
+            int indention = 0;
+
+            for (int i = 0; i < string.length(); i++) {
+                char c = string.charAt(i);
+                switch (c) {
+                case '(':
+                    sb.append("\n");
+                    for (int j = 0; j < indention; j++)
+                        sb.append(" ");
+                    sb.append("(");
+                    indention++;
+                    break;
+                case ')':
+                    indention--;
+                    // fall through
+                default:
+                    sb.append(c);
+                }
+            }
+
+            return sb.toString();
+        }
 
 
        private String[] translateToCommand(Term term)
@@ -294,9 +319,9 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
 
                 SMTTranslator trans = getType().getTranslator(services);
                 // instantiateTaclets(trans);
-         
-                problemString = trans.translateProblem(term, services,
-                                smtSettings).toString();
+
+                problemString = indent(trans.translateProblem(term, services,
+                                smtSettings).toString());
             
                 tacletTranslation = ((AbstractSMTTranslator) trans)
                                 .getTacletSetTranslation();

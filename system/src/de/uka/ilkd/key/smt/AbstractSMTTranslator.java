@@ -53,20 +53,33 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                  */
                 private final boolean supportsOnlySimpleMultiplication;
                 private final boolean hasNumberLimit;
+                
+                /**
+                 * Used for SMT2 format: if true the (set-logic AUFLIA) command is used otherwise
+                 * the logic is not set. For instance Z3 then uses automatically the appropriate 
+                 * logic. 
+                 */
+                private final boolean mentionLogic;
 
 
-                public Configuration(boolean supportsOnlySimpleMultiplication) {
-                        this(supportsOnlySimpleMultiplication,false);                       
+                public Configuration(boolean supportsOnlySimpleMultiplication, boolean mentionLogic) {
+                        this(supportsOnlySimpleMultiplication,false,mentionLogic);                       
                 }
                 
-                public Configuration(boolean supportsOnlySimpleMultiplication,boolean hasNumberLimit) {
+                public Configuration(boolean supportsOnlySimpleMultiplication,boolean hasNumberLimit,
+                					 boolean mentionLogic) {
                         super();
                         this.supportsOnlySimpleMultiplication = supportsOnlySimpleMultiplication;
                         this.hasNumberLimit = hasNumberLimit;
+                        this.mentionLogic = mentionLogic;
                 }
                 public boolean hasNumberLimit(){
                         return hasNumberLimit;
                 }
+                
+                public boolean mentionLogic() {
+					return mentionLogic;
+				}
 
         }
 
@@ -85,19 +98,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         /** The translation result is stored in this variable. */
         protected String text;
 
-        /** StringBuffer contains all declared predicate symbols. */
-        protected final StringBuffer predicate = new StringBuffer();
+//        protected SMTTranslation translation = new SMTTranslation();
 
-        /** StringBuffer to store text which could be usefull for the user */
-        protected final StringBuffer notes = new StringBuffer();
-
-        /** remember all printed predicates */
-        protected final Set<Operator> predicateSet = new HashSet<Operator>();
-
-        /** remember all printed functions */
-        protected final Set<Operator> functionSet = new HashSet<Operator>();
-
-        protected final Set<Sort> sortSet = new HashSet<Sort>();
 
         /** remember all function declarations */
 
@@ -265,6 +267,10 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         protected final SMTSettings getSettings() {
                 return smtSettings;
         }
+        
+        public Configuration getConfig() {
+			return config;
+		}
 
         private Function getMultiplicationFunction(Services services) {
                 if (multiplicationFunction == null) {

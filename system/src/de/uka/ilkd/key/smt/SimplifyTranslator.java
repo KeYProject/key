@@ -102,7 +102,7 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
 	commentAssumption[ContextualBlock.ASSUMPTION_DISTINCT]= "\n\n;Assumptions for uniqueness of functions:\n";
 	commentAssumption[ContextualBlock.ASSUMPTION_INTEGER]= "\n\n;Assumptions for very small and very big integers:\n";
 	commentAssumption[ContextualBlock.ASSUMPTION_MULTIPLICATION]= "\n\n;Assumptions for uninterpreted multiplication:\n";
-	commentAssumption[ContextualBlock.ASSUMPTION_SORTS_NOT_EMPTY]= "\n\n;Assumptions for sorts (There is at least one object of every sort.):\n";
+	commentAssumption[ContextualBlock.ASSUMPTION_SORTS_NOT_EMPTY]= "\n\n;Assumptions for sorts - there is at least one object of every sort.:\n";
 	
 	
 	

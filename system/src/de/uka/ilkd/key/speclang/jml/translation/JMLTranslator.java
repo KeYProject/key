@@ -75,6 +75,7 @@ final class JMLTranslator {
         NUM_OF ("\\num_of"),
         PRODUCT ("\\product"),
         SUM ("\\sum"),
+        SEQ_DEF ("\\seq_def"),
         EQUIVALENCE ("<==>"),
         ANTIVALENCE ("<=!=>"),
         EQ ("=="),
@@ -401,6 +402,39 @@ final class JMLTranslator {
                     Term hi,
                     Term body) {
                 return TB.bsum(qv, lo, hi, body, services);
+            }
+        });
+        translationMethods.put(JMLKeyWord.SEQ_DEF, new JMLTranslationMethod() {
+
+            @Override
+            public SLExpression translate(
+                    SLTranslationExceptionManager excManager,
+                    Object... params)
+                    throws SLTranslationException {
+                checkParameters(params,
+                                SLExpression.class, SLExpression.class,
+                                SLExpression.class, KeYJavaType.class,
+                                ImmutableList.class, Services.class);
+                SLExpression a = (SLExpression) params[0];
+                SLExpression b = (SLExpression) params[1];
+                SLExpression t = (SLExpression) params[2];
+                KeYJavaType declsType = (KeYJavaType) params[3];
+                ImmutableList<LogicVariable> declVars =
+                        (ImmutableList<LogicVariable>) params[4];
+                Services services = (Services) params[5];
+
+                if (!(declsType.getJavaType().equals(PrimitiveType.JAVA_INT)
+                        || declsType.getJavaType().equals(PrimitiveType.JAVA_BIGINT))) {
+                    throw new SLTranslationException("sequence definition variable must be of type int or \\bigint");
+                } else if (declVars.size() != 1) {
+                    throw new SLTranslationException(
+                            "sequence definition must declare exactly one variable");
+                }
+                LogicVariable qv = (LogicVariable) declVars.head();
+                Term resultTerm = TB.seqDef(qv, a.getTerm(), b.getTerm(), t.getTerm(), services);
+                final KeYJavaType seqtype =
+                        services.getJavaInfo().getPrimitiveKeYJavaType("\\seq");
+                return new SLExpression(resultTerm, seqtype);
             }
         });
 

@@ -1,9 +1,12 @@
 package de.uka.ilkd.key.gui;
 
+import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.ProblemLoader;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 
@@ -68,9 +71,34 @@ public class WindowUserInterface implements UserInterface {
         final MainStatusLine sl = mainWindow.getStatusLine();
         if (info.getSource() instanceof ApplyStrategy) {
             sl.reset();
+            
+            ApplyStrategy.ApplyStrategyInfo result = (ApplyStrategyInfo) info.getResult();
+
+            Goal g = result.nonCloseableGoal();
+            if(g == null) { // Maybe the proof was removed from the proof list and #clear() has set the proof reference to null. It is possible because this statement is executed after MainWindow#frozen is set to false.              
+                g = info.getProof().openGoals().head();
+            }                    
+            if (g != null) {
+                mainWindow.getMediator().goalChosen(g);
+            }
+            if (info.getProof().getSettings().getStrategySettings()
+                    .getActiveStrategyProperties().getProperty(
+                            StrategyProperties.STOPMODE_OPTIONS_KEY)
+                            .equals(StrategyProperties.STOPMODE_NONCLOSE)) {
+
+                // iff Stop on non-closeable Goal is selected a little
+                // popup is generated and proof is stopped              
+
+                AutoDismissDialog dialog = new AutoDismissDialog(
+                        "Couldn't close Goal Nr. "
+                                + g.node().serialNr()
+                                + " automatically");
+                dialog.show();
+            }
             mainWindow.displayResults(info.getTime(), 
                            info.getAppliedRules(), 
-                           info.getClosedGoals());                
+                           info.getClosedGoals(),
+                           info.getProof().openGoals().size());                
         } else if (info.getSource() instanceof ProblemLoader) {
             if (!"".equals(info.getResult())) {
                 final KeYExceptionHandler exceptionHandler = 

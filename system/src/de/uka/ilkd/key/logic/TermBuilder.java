@@ -1616,4 +1616,15 @@ public final class TermBuilder {
     public Term seqReverse(Services services, Term s) {
 	return func(services.getTypeConverter().getSeqLDT().getSeqReverse(), s);
     }
+    
+    
+    public Term seqDef(QuantifiableVariable qv,
+                       Term a,
+                       Term b,
+                       Term t,
+                       Services services) {
+        return func(services.getTypeConverter().getSeqLDT().getSeqDef(),
+                    new Term[]{a, b, t},
+                    new ImmutableArray<QuantifiableVariable>(qv));
     }
+}

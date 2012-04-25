@@ -110,8 +110,10 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
     	    ArrayList<ContextualBlock> predicateBlocks,
     	    ArrayList<StringBuffer> types, SortHierarchy sortHierarchy,
     	    SMTSettings settings){
-    	StringBuffer result = new StringBuffer("(set-logic");
-    	result.append(" "+settings.getLogic() +" )\n");
+    	StringBuffer result = new StringBuffer();
+    	if(getConfig().mentionLogic()){	
+    		result.append("(set-logic "+settings.getLogic() +" )\n");
+    	}
     	result.append("(set-option :print-success true) \n");
     	result.append("(set-option :produce-unsat-cores true)\n");
     	result.append("(set-option :produce-models true)\n");
@@ -151,7 +153,7 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
     	commentAssumption[ContextualBlock.ASSUMPTION_DISTINCT]= "Assumptions for uniqueness of functions:";
     	commentAssumption[ContextualBlock.ASSUMPTION_INTEGER]= "Assumptions for very small and very big integers:";
     	commentAssumption[ContextualBlock.ASSUMPTION_MULTIPLICATION]= "Assumptions for uninterpreted multiplication:";
-    	commentAssumption[ContextualBlock.ASSUMPTION_SORTS_NOT_EMPTY]= "Assumptions for sorts (There is at least one object of every sort.):";
+    	commentAssumption[ContextualBlock.ASSUMPTION_SORTS_NOT_EMPTY]= "Assumptions for sorts - there is at least one object of every sort:";
     	
     	
     	//add the assumptions

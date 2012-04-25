@@ -76,7 +76,7 @@ public class ProofEnvironment {
     }
 
 
-    /** returns the object managing the rules in this environement and
+    /** returns the object managing the rules in this environment and
      * their justifications. The object is unique to this environment. 
      */
     public RuleJustificationInfo getJustifInfo() {
