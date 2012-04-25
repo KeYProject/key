@@ -231,8 +231,8 @@ public final class QueryAxiom extends ClassAxiom {
 	tacletBuilder.setName(MiscTools.toValidTacletName(name));
 	tacletBuilder.addRuleSet(new RuleSet(new Name("simplify")));
 	
-	// return DefaultImmutableSet.<Taclet>nil().add(tacletBuilder.getTaclet()); //chrisg: Tip von Christoph Scheben (email vom 14.2.2012)
-	return DefaultImmutableSet.<Taclet>nil();
+	// return DefaultImmutableSet.<Taclet>nil(); //chrisg: Tip von Christoph Scheben (email vom 14.2.2012)
+	return DefaultImmutableSet.<Taclet>nil().add(tacletBuilder.getTaclet()); 
     }    
     
     
