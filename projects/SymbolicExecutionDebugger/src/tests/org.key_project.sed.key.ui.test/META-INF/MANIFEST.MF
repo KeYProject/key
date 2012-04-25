@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Test
+Bundle-Name: Symbolic Execution Debugger (SED) KeY UI Test
 Bundle-SymbolicName: org.key_project.sed.key.ui.test
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.key_project.sed.key.ui.test.Activator
@@ -25,3 +25,4 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: org.key_project.sed.key.ui.test.suite,
  org.key_project.sed.key.ui.test.suite.swtbot
+Bundle-Vendor: KeY Project

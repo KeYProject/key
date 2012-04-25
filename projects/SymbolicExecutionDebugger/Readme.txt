@@ -32,7 +32,20 @@ It provides the following file structure:
 (3) Provided Eclipse features and plug-ins
 ------------------------------------------
 - org.key_project.sed.feature // Contains all SED plug-ins
+  - org.key_project.sed.core // Extension of Debug API for Symbolic Execution
+  - org.key_project.sed.key.core // Implementation of Symbolic Execution with KeY
+  - org.key_project.sed.key.ui // User interface for Symbolic Execution with KeY
   - org.key_project.sed.product.ui // Product definition and branding
+  - org.key_project.sed.ui // User interface for Debug API with Symbolic Execution
+  - org.key_project.sed.ui.visualization 
+    // Visualization of Debug API for Symbolic Execution
+- <tests>
+  - org.key_project.sed.core.all.test // Allows to execute all tests at once
+  - org.key_project.sed.core.test // Tests for org.key_project.sed.core
+  - org.key_project.sed.key.core.test // Tests for org.key_project.sed.key.core
+  - org.key_project.sed.key.ui.test // Tests for org.key_project.sed.key.ui
+  - org.key_project.sed.ui.test // Tests for org.key_project.sed.ui
+  - org.key_project.sed.ui.visualization.test // Tests for org.key_project.sed.ui.visualization 
 
 
 (4) Setup development IDE
@@ -90,7 +103,14 @@ To add the required Eclipse projects follow these steps:
 
 (7) Start automated tests
 -------------------------
-Coming soon...
+- Start JUnit tests:
+  Run class org.key_project.sed.core.all.test.suite.AllSEDTests as 
+  "JUnit Plug-in Test". 
+   
+- Start SWTBot tests:
+  Run class org.key_project.sed.core.all.test.suite.swtbot.SWTBotAllSEDTests
+  as "SWTBot Test". Use the JVM settings defined in the JavaDoc comment of 
+  this class.
 
 
 (8) Deploy the product

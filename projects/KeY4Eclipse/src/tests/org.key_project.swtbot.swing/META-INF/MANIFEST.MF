@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Swing
+Bundle-Name: SWTBot extension for Swing
 Bundle-SymbolicName: org.key_project.swtbot.swing
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.key_project.swtbot.swing.Activator
@@ -12,3 +12,4 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: org.key_project.swtbot.swing.bot,
  org.key_project.swtbot.swing.bot.finder.waits,
  org.key_project.swtbot.swing.finder.matchers
+Bundle-Vendor: KeY Project
