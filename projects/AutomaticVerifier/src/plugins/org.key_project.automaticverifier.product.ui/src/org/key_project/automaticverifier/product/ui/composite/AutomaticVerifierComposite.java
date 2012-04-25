@@ -64,6 +64,11 @@ public class AutomaticVerifierComposite extends Composite {
      * Key to store the location in an {@link IMemento}.
      */
     public static final String MEMENTO_KEY_LOCATION = "location";
+    
+    /**
+     * Key to store the boot class path in an {@link IMemento}.
+     */
+    public static final String MEMENTO_KEY_BOOT_CLASS_PATH = "bootClassPath";
 
     /**
      * Key to store the show main window flag in an {@link IMemento}.
@@ -94,6 +99,11 @@ public class AutomaticVerifierComposite extends Composite {
      * Defines the location.
      */
     private Text locationText;
+    
+    /**
+     * Defines the boot class path.
+     */
+    private Text bootClassPathText;
     
     /**
      * Defines if the main window should be shown or not.
@@ -226,6 +236,10 @@ public class AutomaticVerifierComposite extends Composite {
         locationLabel.setText("&Location");
         locationText = new Text(locationComposite, SWT.BORDER);
         locationText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        Label bootClassPathLabel = new Label(locationComposite, SWT.NONE);
+        bootClassPathLabel.setText("&Boot Class Path");
+        bootClassPathText = new Text(locationComposite, SWT.BORDER);
+        bootClassPathText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         Composite loadComposite = new Composite(sourceGroup, SWT.NONE);
         loadComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         loadComposite.setLayout(new GridLayout(4, false)); 
@@ -540,6 +554,7 @@ public class AutomaticVerifierComposite extends Composite {
         try {
             // Load new source
             final File location = new File(locationText.getText());
+            final File bootClassPath = !StringUtil.isTrimmedEmpty(bootClassPathText.getText()) ? new File(bootClassPathText.getText()) : null;
             final boolean showKeYMainWindow = showKeYWindowButton.getSelection();
             if (location.exists()) {
                 new AbstractKeYMainWindowJob("Loading in KeY") {
@@ -547,6 +562,7 @@ public class AutomaticVerifierComposite extends Composite {
                     protected IStatus run(IProgressMonitor monitor) {
                        final long loadStartTime = System.currentTimeMillis();
                         try {
+                            SWTUtil.checkCanceled(monitor);
                             // Remove old proofs
                             if (proofs != null) {
                                for (AutomaticProof proof : proofs) {
@@ -569,9 +585,8 @@ public class AutomaticVerifierComposite extends Composite {
                                 KeYUtil.openMainWindow();
                             }
                             // Load 
-                            SWTUtil.checkCanceled(monitor);
                             monitor.beginTask("Loading in KeY", IProgressMonitor.UNKNOWN);
-                            InitConfig init = KeYUtil.internalLoad(location, null, null, showKeYMainWindow);
+                            InitConfig init = KeYUtil.internalLoad(location, null, bootClassPath, showKeYMainWindow);
                             Services services = init.getServices();
                             boolean skipLibraryClasses = true;
                             // get all classes
@@ -666,6 +681,7 @@ public class AutomaticVerifierComposite extends Composite {
     public void loadState(IMemento memento) {
         if (memento != null) {
             SWTUtil.setText(locationText, memento.getString(MEMENTO_KEY_LOCATION)); 
+            SWTUtil.setText(bootClassPathText, memento.getString(MEMENTO_KEY_BOOT_CLASS_PATH)); 
             Boolean showKeYWindow = memento.getBoolean(MEMENTO_KEY_SHOW_WINDOW);
             showKeYWindowButton.setSelection(showKeYWindow == null || showKeYWindow.booleanValue());
             Boolean expandMethods = memento.getBoolean(MEMENTO_KEY_EXPAND_METHODS);
@@ -690,6 +706,7 @@ public class AutomaticVerifierComposite extends Composite {
     public void saveState(IMemento memento) {
         if (memento != null) {
             memento.putString(MEMENTO_KEY_LOCATION, locationText.getText());
+            memento.putString(MEMENTO_KEY_BOOT_CLASS_PATH, bootClassPathText.getText());
             memento.putBoolean(MEMENTO_KEY_SHOW_WINDOW, showKeYWindowButton.getSelection());
             memento.putBoolean(MEMENTO_KEY_EXPAND_METHODS, methodTreatmentExpandButton.getSelection());
             memento.putBoolean(MEMENTO_KEY_USE_DEPENDENCY_CONTRACTS, dependencyContractsOnButton.getSelection());
