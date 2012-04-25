@@ -1,0 +1,21 @@
+Toolnames
+=========
+- Automatic Verifier
+  => Indicates that the verification is automatic what is wrong.
+- KeYAuto oder AutoKeY
+  => Abbreviation with the same problem
+- KeYStarter
+  => A tool with that name already exist
+- KeYMonkey
+  => A tool with that name already exist
+- BatchKeY
+  => A batch mode is something running in a Console without an user interface
+- UltimateKeY
+- AutomatedKeY
+- KeYnudge, KeYpush, KeYjog
+- KeYUnit
+- PushKeY
+- MonKeY
+  => Already a tool for accounting, but with different spelling in different sector
+  => Favorite of Thomas, Sven and Ina
+  => A monkey is someone who does lower jobs which is true for the tool
