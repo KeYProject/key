@@ -65,6 +65,7 @@ import de.uka.ilkd.key.strategy.feature.NotInScopeOfModalityFeature;
 import de.uka.ilkd.key.strategy.feature.OnlyInScopeOfQuantifiersFeature;
 import de.uka.ilkd.key.strategy.feature.PolynomialValuesCmpFeature;
 import de.uka.ilkd.key.strategy.feature.PurePosDPathFeature;
+import de.uka.ilkd.key.strategy.feature.QueryExpandCost;
 import de.uka.ilkd.key.strategy.feature.ReducibleMonomialsFeature;
 import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
 import de.uka.ilkd.key.strategy.feature.ScaleFeature;
