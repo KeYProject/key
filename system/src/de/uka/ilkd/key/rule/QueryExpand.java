@@ -6,6 +6,7 @@ import java.util.Vector;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
@@ -84,6 +85,13 @@ public class QueryExpand implements BuiltInRule {
            //Names for additional symbols
            	final VariableNameProposer vnp = VariableNameProposer.DEFAULT;
           
+           	/* copied from WhileInvRule::getNewLocalVariable
+           	getNewLocalvariable(varNameBase, 
+                                   javaInfo.getKeYJavaType(varType), services)
+                                   
+          	KeYJavaASTFactory.localVariable(services.getVariableNamer().
+                                             getTemporaryNameProposal(varNameBase), varType);
+           	 */
            final String calleeName     = vnp.getNameProposal("callee", services, node);
            final String progResultName = vnp.getNameProposal("result", services, node);
            final String logicResultName= vnp.getNameProposal("res_"+method.getName(), services, node);
@@ -171,22 +179,23 @@ public class QueryExpand implements BuiltInRule {
 
     
     /** 
-     * Apply "evaluate query" to the queries that occur in term. The query evaluations/expansions are inserted 
-     * into a copy of term that is returned. 
+     * Apply "evaluate query" to the queries that occur in <code>term</code>. The query evaluations/expansions are inserted 
+     * into a copy of <code>term</code> that is returned. 
      * @param services
      * @param node   The node of the current goal in the proof
      * @param newGoal The new goal that will result from query evaluation. This is needed to register new symbols.
      * @param term  A formula that potentially contains queries that should be evaluated/expanded.
+     * @param positiveContext Set false iff the <code>term</code> is in a logically negated context wrt. to the succedent.
      * @return A modified version of the <code>term</code> with inserted "query evalutions".
      * @author gladisch
      */
-    public Term evaluateQueries(Services services, Node node, Goal newGoal, Term term){
+    public Term evaluateQueries(Services services, Node node, Goal newGoal, Term term, boolean positiveContext){
     	System.out.println("---------- evaluateQueries on:  ---------------- "+term+"\n-------------------------------\n");
     	final int depth =term.depth(); 
     	Vector<QueryEvalPos> qeps = new Vector<QueryEvalPos>();
     	Vector<Integer> path = new Vector<Integer>(depth);
     	path.setSize(depth);
-    	findQueriesAndEvaluationPositions(term, 0, path, true, 0, true, qeps);
+    	findQueriesAndEvaluationPositions(term, 0, path, positiveContext, 0, positiveContext, qeps);
     	final Term result;
     	//QueryEvalPos qep = qeps.get(7);
 
