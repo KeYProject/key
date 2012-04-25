@@ -21,18 +21,12 @@ import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
+import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.pp.PosInSequent;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofEvent;
-import de.uka.ilkd.key.proof.RuleAppIndex;
-import de.uka.ilkd.key.proof.TacletFilter;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedRuleApplicationManager;
 import de.uka.ilkd.key.util.Debug;
@@ -44,10 +38,12 @@ public class InteractiveProver {
 
     /** the user focused goal */
     private Goal focusedGoal;
+    
 
-    /** true iff in interactive mode */
+    /** list of observers */
+    private List<ProverTaskListener> proverTaskObservers = new ArrayList<ProverTaskListener> ();
 
-    private boolean interactive = true;
+
 
     /** the central strategy processor including GUI signalling */
     private ApplyStrategy applyStrategy;
@@ -67,14 +63,19 @@ public class InteractiveProver {
     
     private boolean resumeAutoMode = false;
 
+    private AutoModeWorker worker;
+
 
     /** creates a new interactive prover object 
      */
     public InteractiveProver(KeYMediator mediator) {
-	selListener = new InteractiveProverKeYSelectionListener();
-	this.mediator = mediator;
-	mediator.addKeYSelectionListener(selListener);
-	applyStrategy = new ApplyStrategy(mediator);
+        selListener = new InteractiveProverKeYSelectionListener();
+        this.mediator = mediator;
+        mediator.addKeYSelectionListener(selListener);
+
+        mediator.getProfile().setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);//XXX
+
+        applyStrategy = new ApplyStrategy(mediator.getProfile().getSelectedGoalChooserBuilder().create());
         applyStrategy.addProverTaskObserver(mediator().getProverTaskListener());
     }
 
@@ -131,14 +132,6 @@ public class InteractiveProver {
 	return resumeAutoMode;
     }
 
-    public boolean interactiveMode() {
-	return interactive;
-    }
-
-    public void setInteractive(boolean interact) {
-	interactive=interact;
-    }
-
 
     /**
      * Apply a RuleApp and continue with update simplification or strategy 
@@ -179,17 +172,18 @@ public class InteractiveProver {
                 return;
             }
         }
-        
-        if ( Main.batchMode ) {
-            interactive = false;
-        }
-        
-        applyStrategy.start ( proof, goals, mediator ().getMaxAutomaticSteps(), getTimeout() );
+
+        worker = new AutoModeWorker(goals);
+        worker.start();
     }
+    
+    
+    
+
     
     /** stops the execution of rules */
     public void stopAutoMode () {
-        applyStrategy.stop();
+        worker.stop();
     }
     
     /**
@@ -516,4 +510,54 @@ public class InteractiveProver {
         applyStrategy.removeProverTaskObserver(ptl);        
     }
     
+    /* Invoking start() on the SwingWorker causes a new Thread
+     * to be created that will call construct(), and then
+     * finished().  Note that finished() is called even if
+     * the worker is interrupted because we catch the
+     * InterruptedException in doWork().
+     */
+    private class AutoModeWorker extends SwingWorker {
+         
+        private ImmutableList<Goal> goals;
+
+        public AutoModeWorker(ImmutableList<Goal> goals) {
+            this.goals = goals;
+        }
+
+        public Object construct() {
+            return doWork();
+        }
+        
+        public Object doWork() {
+            mediator().stopInterface(true);
+            mediator().setInteractive(false);
+            
+            return applyStrategy.start ( proof, goals, mediator ().getMaxAutomaticSteps(), getTimeout() );                    
+        }
+        
+        /**
+         * Called by the "Stop" button, interrupts the worker thread 
+         * which is running this.doWork().  Note that the doWork() 
+         * method handles InterruptedExceptions cleanly.
+         */
+        public void stop () {
+           interrupt();
+        }
+
+        public void finished() {
+            final ApplyStrategyInfo result = (ApplyStrategyInfo) get ();
+
+            mediator().setInteractive( true );            
+            mediator().startInterface( true );
+
+            if (result.isError()) {
+                mediator ().notify
+                (new GeneralFailureEvent("An exception occurred during" 
+                        + " strategy execution.\n Exception:" + result.getException()));  
+            }   
+
+        }       
+    }
+
+
 }
