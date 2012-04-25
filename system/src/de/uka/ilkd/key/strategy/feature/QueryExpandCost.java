@@ -37,20 +37,32 @@ public class QueryExpandCost implements Feature {
     /** Constant that represents the boolean value false */
     public static final RuleAppCost TOP_COST  = TopRuleAppCost.INSTANCE;
     
-    public final boolean preventRepetitionAtSamePos;
-    public final boolean computeCostFromIntLiterals;
-    public final boolean computeCostFromTermSize;
-    public final boolean computeCostFromOuterTerm;
-
-    public QueryExpandCost(boolean preventRepetitionAtSamePos, 
-    		               boolean computeCostFromIntLiterals,
-    		               boolean computeCostFromTermSize,
-    		               boolean computeCostFromOuterTerm){
+    private final int baseCost; 
+    private final int maxRepetitionsOnSameTerm;
+    private final int termAgeFactor;
+    private final boolean useExperimentalHeuristics;
+    
+    /**
+     * @param baseCost Should be set to 200. This was the cost before this class was introduced.
+     * @param maxRepetitionsOnSameTerm Search in the current branch if query expand 
+     *       has been already applied on this term. For each such application a penalty cost is added. 
+     *        If this limit is exceeded the cost is set to TOP_COST, i.e. the rule is not applied. 
+     * @param termAgeFactor This factor (must be >=0) sets the cost of older queries lower, than that
+     *       of younger queries (i.e. that occur later in proofs). The effect is a breath-first search
+     *       on the expansion of queries.
+     *       In class <code>QueryExpand</code> the time is stored, when queries can be
+     *       expanded for the first time. 
+     * @param useExperimentalHeuristics Activates experimental, pattern-based heuristics.
+     */
+    public QueryExpandCost(int baseCost, 
+    		               int maxRepetitionsOnSameTerm,
+    		               int termAgeFactor,
+    		               boolean useExperimentalHeuristics){
 		super();
-		this.preventRepetitionAtSamePos = preventRepetitionAtSamePos;
-		this.computeCostFromIntLiterals = computeCostFromIntLiterals;
-		this.computeCostFromTermSize    = computeCostFromTermSize;
-		this.computeCostFromOuterTerm   = computeCostFromOuterTerm;
+		this.baseCost=baseCost;
+		this.maxRepetitionsOnSameTerm=maxRepetitionsOnSameTerm;
+		this.termAgeFactor=termAgeFactor;
+		this.useExperimentalHeuristics=useExperimentalHeuristics;
 	}
     
 	@Override
@@ -60,72 +72,36 @@ public class QueryExpandCost implements Feature {
 		final Term t = pos.subTerm();
 
 		// System.out.print("G:"+goal.hashCode()+"   ");
-		int cost=200; 
+		long cost=baseCost; 
 	
 	
 		
-		//if(computeCostFromIntLiterals){
+		if(useExperimentalHeuristics){
 			// System.out.print("literal sum: "+literalsInArgumentsToCost(t,integerLDT,services));
-	//    int litcost = literalsInArgumentsToCost(t,integerLDT,services)*50; //If the factor is too small, then higher cost has no effect for some reason.
-	//		if(!isStepCaseBranch(goal)){
-	//			cost += litcost;
-	//		}
-			/*else{
-				//cost -= litcost;
-				if(!pos.isInAntec()){
-					cost = 100;
-				}
-			}
-			*/
-			/*if(litCost != 0){
-			// System.out.println("LiteralToCost:"+litCost + "  final cost:"+cost);
-			return LongRuleAppCost.create(cost);
-			}
-			 */
-		//}
+			int litcost = literalsInArgumentsToCost(t,integerLDT,services)*10; //If the factor is too small, then higher cost has no effect for some reason.
+			cost += litcost;
+		}
 			
-		if(preventRepetitionAtSamePos ){
+		if(maxRepetitionsOnSameTerm!=-1 && maxRepetitionsOnSameTerm<Integer.MAX_VALUE){
 				int count = queryExpandAlreadyAppliedAtPos(app,pos,goal);
-				if(count>1){
+				if(count>maxRepetitionsOnSameTerm){
 					return TOP_COST;
 				}else{
-					cost += count*2000;
+					cost += count*2000l;
 				}
 		}
-/*			
-		if(computeCostFromTermSize){
-			int depth = t.depth();
-			int depthcost = (depth*(depth+10)*5)-100;
-			
-			// System.out.print("  query term depth: "+t.depth());
-			cost += depthcost;   //Subtract 100 because t.depth() is usually greater than 2. 
-		}
-*/
-/*		
-		if(computeCostFromOuterTerm){
-			PosInOccurrence posUp=pos.up();
-			int depth=0;
-			Term posChild = t;
-			Term upTerm=null;
-			//Compute the depth of the outer term.
-			while(posUp!=null && posUp.subTerm().sort()!=Sort.FORMULA){
-				 upTerm= posUp.subTerm();
-				 for(int i=0;i<upTerm.arity();i++){
-					 Term sub=upTerm.sub(i);
-					 if(sub==posChild) continue; //skip the term that leads to the query in focus of the rule application.
-					 depth=Math.max(depth, sub.depth());
-				 }
-				 depth++;
-				 posChild=upTerm;
-				 posUp=posUp.up();
+		
+		if(termAgeFactor>0){
+			Long qtime = QueryExpand.INSTANCE.getTimeOfQuery(t);
+			if(qtime!=null){
+					cost += qtime * (long)termAgeFactor;
+			}else{
+				System.err.println("QueryExpandCost::compute. Time of query should have been set already. The query was:"+t);
 			}
-
-			// System.out.print("  outer depth: "+depth);
-			cost += depth*(depth+10)*5;
 		}
-*/
-		String tStr = t.toString(); int maxLen = tStr.length()>50?50:tStr.length();
-		System.out.println("  cost="+cost + "    query:.."+tStr.substring(15, maxLen-1)+"..");
+
+		//String tStr = t.toString(); int maxLen = tStr.length()>50?50:tStr.length();
+		//System.out.println("  cost="+cost + "    query:.."+tStr.substring(15, maxLen-1)+"..");
 
 		return LongRuleAppCost.create(cost);
 	}
@@ -198,22 +174,19 @@ public class QueryExpandCost implements Feature {
 	 *  at the same position in the sequent. This method detects repetitive rule
 	 *  applications and is used to prevent loops in the proof tree.
 	 */
-	protected static int queryExpandAlreadyAppliedAtPos(RuleApp app, PosInOccurrence pos, Goal goal){
+	protected int queryExpandAlreadyAppliedAtPos(RuleApp app, PosInOccurrence pos, Goal goal){
 		 int count=0;
 		 ImmutableList<RuleApp> l =goal.appliedRuleApps();
 	        if(l!=null && !l.isEmpty()){
 	        	Iterator<RuleApp> i=l.iterator();
 	        	while(i.hasNext()){
 	        		RuleApp ra = i.next();
-	        		SequentFormula racf = ra.posInOccurrence().constrainedFormula();
-	        		SequentFormula curcf = pos.constrainedFormula();
 	        		Term raterm = ra.posInOccurrence().subTerm();
 	        		Term curterm = pos.subTerm();
-	        		//if(ra.posInOccurrence().eqEquals(pos) && ra.rule()==QueryExpand.INSTANCE){
 	        		if(raterm.equals(curterm)){
-	        			 System.out.println("Rule already applied:"+app.rule().displayName()+ " on "+raterm.toString());
+	        			//System.out.println("Rule already applied:"+app.rule().displayName()+ " on "+raterm.toString());
 	        			count++;
-	        			if(count>2) break;
+	        			if(count>maxRepetitionsOnSameTerm) break;
 	        		}
 	        	}
 	        }
@@ -227,7 +200,7 @@ public class QueryExpandCost implements Feature {
 			if(ni!=null && ni.getBranchLabel()!=null){
 				String branchName = ni.getBranchLabel().toLowerCase();
 				if(branchName.indexOf("step case")>=0 || branchName.indexOf("body preserves")>=0){
-					System.out.println("Step Case found!");
+					//System.out.println("Step Case found!");
 					return true;
 				}else if(branchName.indexOf("base case")>=0 || 
 						branchName.indexOf("invariant initially")>=0 ||
@@ -241,5 +214,39 @@ public class QueryExpandCost implements Feature {
 		return false;
 	}
 
+	private static int computeCostFromTermSize(Term t){
+		int depth = t.depth();
+		int depthcost = (depth*(depth+10)*5)-100;
+		
+		// System.out.print("  query term depth: "+t.depth());
+		return depthcost;   //Subtract 100 because t.depth() is usually greater than 2. 		
+	}
+	
+	private static int computeCostFromOuterTerm(PosInOccurrence pos){
+		PosInOccurrence posUp=pos.up();
+		final Term t = pos.subTerm();
+		int depth=0;
+		Term posChild = t;
+		Term upTerm=null;
+		//Compute the depth of the outer term.
+		while(posUp!=null && posUp.subTerm().sort()!=Sort.FORMULA){
+			 upTerm= posUp.subTerm();
+			 for(int i=0;i<upTerm.arity();i++){
+				 Term sub=upTerm.sub(i);
+				 if(sub==posChild) continue; //skip the term that leads to the query in focus of the rule application.
+				 depth=Math.max(depth, sub.depth());
+			 }
+			 depth++;
+			 posChild=upTerm;
+			 posUp=posUp.up();
+		}
+
+		// System.out.print("  outer depth: "+depth);
+		return depth*(depth+10)*5;
+	}
+
+	public int getMaxRepetitionsOnSameTerm(){
+		return maxRepetitionsOnSameTerm;
+	}
 }
 

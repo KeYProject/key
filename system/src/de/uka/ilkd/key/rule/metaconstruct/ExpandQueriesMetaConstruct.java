@@ -8,8 +8,10 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.QueryExpand;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 
 
 /**
@@ -22,7 +24,7 @@ public class ExpandQueriesMetaConstruct extends AbstractTermTransformer {
 	public static final String name= "#ExpandQueries";
 	
     public ExpandQueriesMetaConstruct() {
-    	super(new Name(name), 2);
+    	super(new Name(name), 2, Sort.FORMULA);
     }
 
 /** term.sub(0) is the term that possibly contains queries.
@@ -41,20 +43,16 @@ public class ExpandQueriesMetaConstruct extends AbstractTermTransformer {
     	}else {
     		throw new RuntimeException("Second argument of the meta construct "+name+ " must be true or false, but it is: "+arg2);
     	}
-    	
-    	return arg1;
-    	
-/*    	QueryExpand.INSTANCE.evaluateQueries(services, node, newGoal, term, positiveContext);
-    	intArg1 = new
-    	    BigInteger(convertToDecimalString(arg1, services));
-    	intArg2 = new
-    	    BigInteger(convertToDecimalString(arg2, services));
-    	
-    	Integer intResult = Integer.valueOf(intArg1.intValue() & intArg2.intValue());
-    	
-    	IntLiteral lit = new IntLiteral(intResult.toString());
-    	return services.getTypeConverter().convertToLogicElement(lit);
-*/
+    	    	
+    	final Term result;
+    	final StrategyProperties props = services.getProof().getSettings().getStrategySettings().getActiveStrategyProperties();
+    	if(props.getProperty(StrategyProperties.QUERY_OPTIONS_KEY)==StrategyProperties.QUERY_ON || 
+    	   props.getProperty(StrategyProperties.QUERY_OPTIONS_KEY)==StrategyProperties.QUERY_RESTRICTED){
+    		result = QueryExpand.INSTANCE.evaluateQueries(services, arg1, positiveContext);
+    	}else{
+    		result = arg1;
+    	}
+    	return result;
    }
 
 }
