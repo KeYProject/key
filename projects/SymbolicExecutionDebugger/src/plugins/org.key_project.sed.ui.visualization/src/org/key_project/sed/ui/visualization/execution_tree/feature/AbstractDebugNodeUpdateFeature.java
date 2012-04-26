@@ -236,20 +236,25 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
    protected boolean updateName(PictogramElement pictogramElement, 
                                 IProgressMonitor monitor) throws DebugException {
       try {
-         // Set name in pictogram model
-         monitor.beginTask("Update labels", 1);
-         Text text = findNameText(pictogramElement);
-         if (text != null) {
-            // Change value
-            String businessName = getBusinessName(pictogramElement);
-            text.setValue(businessName);
-            // Optimize layout
-            LayoutContext layoutContext = new LayoutContext(pictogramElement);
-            layoutContext.putProperty(AbstractDebugNodeLayoutFeature.WIDTH_TO_SET, AbstractDebugNodeAddFeature.computeInitialWidth(getDiagram(), businessName, text.getFont()));
-            layoutContext.putProperty(AbstractDebugNodeLayoutFeature.HEIGHT_TO_SET, AbstractDebugNodeAddFeature.computeInitialHeight(getDiagram(), businessName, text.getFont()));
-            getFeatureProvider().layoutIfPossible(layoutContext);
-            // Add children
-            return true;
+         if (!monitor.isCanceled()) {
+            // Set name in pictogram model
+            monitor.beginTask("Update labels", 1);
+            Text text = findNameText(pictogramElement);
+            if (text != null) {
+               // Change value
+               String businessName = getBusinessName(pictogramElement);
+               text.setValue(businessName);
+               // Optimize layout
+               LayoutContext layoutContext = new LayoutContext(pictogramElement);
+               layoutContext.putProperty(AbstractDebugNodeLayoutFeature.WIDTH_TO_SET, AbstractDebugNodeAddFeature.computeInitialWidth(getDiagram(), businessName, text.getFont()));
+               layoutContext.putProperty(AbstractDebugNodeLayoutFeature.HEIGHT_TO_SET, AbstractDebugNodeAddFeature.computeInitialHeight(getDiagram(), businessName, text.getFont()));
+               getFeatureProvider().layoutIfPossible(layoutContext);
+               // Add children
+               return true;
+            }
+            else {
+               return false;
+            }
          }
          else {
             return false;
@@ -273,13 +278,17 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
                                     IProgressMonitor monitor) throws DebugException {
       monitor.beginTask("Update children", IProgressMonitor.UNKNOWN);
       try {
-         Object bo = getBusinessObjectForPictogramElement(pictogramElement);
-         if (bo instanceof ISEDDebugNode) {
-            ISEDDebugNode[] children = ((ISEDDebugNode)bo).getChildren();
-            for (ISEDDebugNode child : children) {
-               PictogramElement childPE = getPictogramElementForBusinessObject(child);
-               if (childPE == null) {
-                  createGraphicalRepresentationForSubtree(pictogramElement, child, monitor);
+         if (!monitor.isCanceled()) {
+            Object bo = getBusinessObjectForPictogramElement(pictogramElement);
+            if (bo instanceof ISEDDebugNode) {
+               ISEDDebugNode[] children = ((ISEDDebugNode)bo).getChildren();
+               for (ISEDDebugNode child : children) {
+                  if (!monitor.isCanceled()) {
+                     PictogramElement childPE = getPictogramElementForBusinessObject(child);
+                     if (childPE == null) {
+                        createGraphicalRepresentationForSubtree(pictogramElement, child, monitor);
+                     }
+                  }
                }
             }
          }
@@ -301,23 +310,25 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
    protected void createGraphicalRepresentationForSubtree(PictogramElement parent, 
                                                           ISEDDebugNode root,
                                                           IProgressMonitor monitor) throws DebugException {
-      // Add root ISEDDebugNode
-      AreaContext areaContext = new AreaContext();
-      if (parent != null) {
-         GraphicsAlgorithm parentGA = parent.getGraphicsAlgorithm();
-         areaContext.setX(parentGA.getX()); 
-         areaContext.setY(parentGA.getY() + parentGA.getHeight() + OFFSET_TO_PARENT);
-      }
-      else {
-         areaContext.setLocation(0, 0);
-      }
-      AddContext addContext = new AddContext(areaContext, root);
-      addContext.setTargetContainer(getDiagram());
-      parent = getFeatureProvider().addIfPossible(addContext);
-      // Add subtree of the given root ISEDDebugNode
-      ISEDDebugNode[] children = root.getChildren();
-      for (ISEDDebugNode child : children) {
-         createGraphicalRepresentationForSubtree(parent, child, monitor);
+      if (!monitor.isCanceled()) {
+         // Add root ISEDDebugNode
+         AreaContext areaContext = new AreaContext();
+         if (parent != null) {
+            GraphicsAlgorithm parentGA = parent.getGraphicsAlgorithm();
+            areaContext.setX(parentGA.getX()); 
+            areaContext.setY(parentGA.getY() + parentGA.getHeight() + OFFSET_TO_PARENT);
+         }
+         else {
+            areaContext.setLocation(0, 0);
+         }
+         AddContext addContext = new AddContext(areaContext, root);
+         addContext.setTargetContainer(getDiagram());
+         parent = getFeatureProvider().addIfPossible(addContext);
+         // Add subtree of the given root ISEDDebugNode
+         ISEDDebugNode[] children = root.getChildren();
+         for (ISEDDebugNode child : children) {
+            createGraphicalRepresentationForSubtree(parent, child, monitor);
+         }
       }
       monitor.worked(1);
    }

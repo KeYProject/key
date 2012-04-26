@@ -94,25 +94,33 @@ public class DebugTargetConnectFeature extends AbstractCustomFeature {
             monitor.beginTask("Change diagram content", 2);
             Object[] oldLinkedObjects = getAllBusinessObjectsForPictogramElement(getDiagram());
             for (Object oldObj : oldLinkedObjects) {
-               if (oldObj instanceof ISEDDebugTarget) {
+               if (!monitor.isCanceled() && oldObj instanceof ISEDDebugTarget) {
                   ISEDThread[] threads = ((ISEDDebugTarget)oldObj).getSymbolicThreads();
                   for (ISEDThread thread : threads) {
-                     PictogramElement[] elements = getFeatureProvider().getAllPictogramElementsForBusinessObject(thread);
-                     for (PictogramElement pictogramElement : elements) {
-                        IRemoveContext removeContext = new RemoveContext(pictogramElement);
-                        IRemoveFeature feature = getFeatureProvider().getRemoveFeature(removeContext);
-                        feature.execute(removeContext);
+                     if (!monitor.isCanceled()) {
+                        PictogramElement[] elements = getFeatureProvider().getAllPictogramElementsForBusinessObject(thread);
+                        for (PictogramElement pictogramElement : elements) {
+                           if (!monitor.isCanceled()) {
+                              IRemoveContext removeContext = new RemoveContext(pictogramElement);
+                              IRemoveFeature feature = getFeatureProvider().getRemoveFeature(removeContext);
+                              feature.execute(removeContext);
+                           }
+                        }
                      }
                   }
                }
             }
             monitor.worked(1);
             // Recreate diagram with new content
-            link(getDiagram(), (ISEDDebugTarget[])obj);
+            if (!monitor.isCanceled()) {
+               link(getDiagram(), (ISEDDebugTarget[])obj);
+            }
             // Update diagram
-            UpdateContext updateContext = new UpdateContext(getDiagram());
-            updateContext.putProperty(ExecutionTreeUtil.CONTEXT_PROPERTY_MONITOR, new SubProgressMonitor(monitor, 1));
-            getFeatureProvider().updateIfPossible(updateContext);
+            if (!monitor.isCanceled()) {
+               UpdateContext updateContext = new UpdateContext(getDiagram());
+               updateContext.putProperty(ExecutionTreeUtil.CONTEXT_PROPERTY_MONITOR, new SubProgressMonitor(monitor, 1));
+               getFeatureProvider().updateIfPossible(updateContext);
+            }
             changesDone = true;
             monitor.worked(1);
             monitor.done();

@@ -124,6 +124,7 @@ public class ExecutionTreeDiagramEditor extends PaletteHideableDiagramEditor {
    public void executeFeatureInJob(String jobName, 
                                    final IFeature feature, 
                                    final IContext context) {
+      AbstractExecutionTreeDiagramEditorJob.cancelJobs(this);
       new AbstractExecutionTreeDiagramEditorJob(jobName, this) {
          @Override
          protected IStatus run(IProgressMonitor monitor) {
@@ -167,6 +168,7 @@ public class ExecutionTreeDiagramEditor extends PaletteHideableDiagramEditor {
       // Update diagram content if required.
       if (updateRequired) {
          // Do an asynchronous update in the UI thread (same behavior as DomainModelChangeListener which is responsible for changes in EMF objects)
+         AbstractExecutionTreeDiagramEditorJob.cancelJobs(this);
          new AbstractExecutionTreeDiagramEditorJob("Updating Symbolic Execution Tree", this) {
             @Override
             protected IStatus run(IProgressMonitor monitor) {
