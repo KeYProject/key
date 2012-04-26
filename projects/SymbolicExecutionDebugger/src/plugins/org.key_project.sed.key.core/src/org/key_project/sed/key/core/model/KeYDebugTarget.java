@@ -63,6 +63,9 @@ import org.key_project.util.java.StringUtil;
 import org.key_project.util.java.collection.DefaultEntry;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.gui.ApplyStrategy;
+import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.gui.AutoModeListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.Expression;
@@ -70,8 +73,13 @@ import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.reference.IExecutionContext;
 import de.uka.ilkd.key.java.reference.MethodReference;
+import de.uka.ilkd.key.java.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.BranchStatement;
 import de.uka.ilkd.key.java.statement.Do;
 import de.uka.ilkd.key.java.statement.EnhancedFor;
@@ -80,16 +88,29 @@ import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.ProgramPrefix;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.ProofVisitor;
+import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.key.util.ProofStarter;
 
 /**
  * Implementation if {@link ISEDDebugTarget} which uses KeY to symbolically
@@ -698,28 +719,26 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
                                                      PositionInfo posInfo,
                                                      Node callNode,
                                                      ISEDMethodCall callSEDNode) throws DebugException {
-//      // Find last return node
-//      Node returnNode = KeYUtil.findParent(node, new IFilter<Node>() {
-//         @Override
-//         public boolean select(Node element) {
-//            return "methodCallReturn".equals(KeYUtil.getRuleDisplayName(element));
-//         }
-//      });
-//      // Make sure that the return node is a child of the call node and not of a call earlier in the call stack
-//      if (!KeYUtil.hasParent(returnNode, callNode)) {
-//         returnNode = null;
-//      }
-      
-      // Compute return value
+      // Compute return value if possible
       Object returnValue = null;
-//      if (callNode != null) {
-//         MethodBodyStatement mbs = (MethodBodyStatement)callNode.getNodeInfo().getActiveStatement();
-//         IProgramVariable resultVar = mbs.getResultVariable();
-//         if (resultVar != null) {
-            // TODO: Compute result value with a side proof in that the result variable is assigned with correct SIMPLIFIED value.
-//            returnValue = getValue(node.parent().parent(), resultVar);
-//         }
-//      }
+      if (callNode != null) {
+         // Check if a result variable is available
+         MethodBodyStatement mbs = (MethodBodyStatement)callNode.getNodeInfo().getActiveStatement();
+         IProgramVariable resultVar = mbs.getResultVariable();
+         if (resultVar != null) {
+            // Search the node with applied rule "methodCallReturn" which provides the required updates
+            Node methodReturnNode = findMethodReturnNode(node);
+            if (methodReturnNode != null) {
+               // Start site proof to extract the value of the result variable.
+               SiteProofVariableValueInput sequentToProve = createExtractVariableValueSequent(mbs.getBodySourceAsTypeReference(),  
+                                                                                              mbs.getDesignatedContext(), 
+                                                                                              methodReturnNode, 
+                                                                                              resultVar);
+               ApplyStrategy.ApplyStrategyInfo info = startSiteProof(sequentToProve.getSequentToProve());
+               returnValue = extractOperatorValue(info, sequentToProve.getOperator());
+            }
+         }
+      }
       // Compute method name
       String name = createMethodReturnName(returnValue, callSEDNode.getName());
       // Create new node and fill it
@@ -733,41 +752,188 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       newNode.setCharEnd(callSEDNode.getCharEnd());
       return newNode;
    }
+   
+   /**
+    * Creates a {@link Sequent} which can be used in site proofs to
+    * extract the value of the given {@link IProgramVariable} from the
+    * sequent of the given {@link Node}.
+    * @param contextObjectType The type of the current object (this reference).
+    * @param contextObject The current object (this reference).
+    * @param node The original {@link Node} which provides the sequent to extract from.
+    * @param variable The {@link IProgramVariable} of the value which is interested.
+    * @return The created {@link SiteProofVariableValueInput} with the created sequent and the predicate which will contain the value.
+    */
+   protected SiteProofVariableValueInput createExtractVariableValueSequent(TypeReference contextObjectType,
+                                                                           ReferencePrefix contextObject,
+                                                                           Node node,
+                                                                           IProgramVariable variable) {
+      // Create execution context in that the method was called.
+      IExecutionContext context = new ExecutionContext(contextObjectType, contextObject);
+      // Create sequent
+      return createExtractVariableValueSequent(context, node, variable);
+   }
 
-//   protected Object getValue(Node node, IProgramVariable var) {
-//      Object result = null;
-//      PosInOccurrence posInOccurrence = node.getAppliedRuleApp().posInOccurrence();
-//      Term currentTerm = posInOccurrence.constrainedFormula().formula();
-//      // Make sure that the sequence has the expected form
-//      if (currentTerm.op() instanceof UpdateApplication) {
-//         if (currentTerm.sub(1).op() instanceof Modality &&
-//             posInOccurrence.subTerm() == currentTerm.sub(1)) {
-//            Term updateToApply = currentTerm.sub(0);
-//            result = getValue(updateToApply, var);
-//         }
-//      }
-//      return result;
-//   }
-//   
-//   protected Object getValue(Term term, IProgramVariable var) {
-//      Object result = null;
-//      if (term.op() instanceof UpdateJunctor) {
-//         // Parallel updates
-//         Iterator<Term> subTermsIter = term.subs().iterator();
-//         while (result == null && subTermsIter.hasNext()) {
-//            Term subTerm = subTermsIter.next();
-//            result = getValue(subTerm, var);
-//         }
-//      }
-//      else if (term.op() instanceof ElementaryUpdate) {
-//         // Elementary update
-//         ElementaryUpdate operator = (ElementaryUpdate)term.op();
-//         if (ObjectUtil.equals(var, operator.lhs())) {
-//            result = term.sub(0);
-//         }
-//      }
-//      return result;
-//   }
+   /**
+    * Creates a {@link Sequent} which can be used in site proofs to
+    * extract the value of the given {@link IProgramVariable} from the
+    * sequent of the given {@link Node}.
+    * @param context The {@link IExecutionContext} that defines the current object (this reference).
+    * @param node The original {@link Node} which provides the sequent to extract from.
+    * @param variable The {@link IProgramVariable} of the value which is interested.
+    * @return The created {@link SiteProofVariableValueInput} with the created sequent and the predicate which will contain the value.
+    */
+   protected SiteProofVariableValueInput createExtractVariableValueSequent(IExecutionContext context,
+                                                                           Node node,
+                                                                           IProgramVariable variable) {
+      // Make sure that correct parameters are given
+      Assert.isNotNull(context);
+      Assert.isNotNull(node);
+      Assert.isTrue(variable instanceof ProgramVariable);
+      // Create method frame which will be executed in site proof
+      Statement originalReturnStatement = (Statement)node.getNodeInfo().getActiveStatement();
+      MethodFrame newMethodFrame = new MethodFrame(variable, context, new StatementBlock(originalReturnStatement));
+      JavaBlock newJavaBlock = JavaBlock.createJavaBlock(new StatementBlock(newMethodFrame));
+      // Create predicate which will be used in formulas to store the value interested in.
+      Function newPredicate = new Function(new Name(TermBuilder.DF.newName(proof.getServices(), "ResultPredicate")), Sort.FORMULA, variable.sort());
+      // Create formula which contains the value interested in.
+      Term newTerm = TermBuilder.DF.func(newPredicate, TermBuilder.DF.var((ProgramVariable)variable));
+      // Combine method frame with value formula in a modality.
+      Term modalityTerm = TermBuilder.DF.dia(newJavaBlock, newTerm);
+      // Get the updates from the return node which includes the value interested in.
+      Term originalModifiedFormula = node.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
+      ImmutableList<Term> originalUpdates = MiscTools.goBelowUpdates2(originalModifiedFormula).first;
+      // Combine method frame, formula with value predicate and the updates which provides the values
+      Term newSuccedentToProve = TermBuilder.DF.applySequential(originalUpdates, modalityTerm);
+      // Create new sequent with the original antecedent and the formulas in the succedent which were not modified by the applied rule
+      PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
+      Sequent originalSequentWithoutMethodFrame = node.sequent().removeFormula(pio).sequent();
+      Sequent sequentToProve = originalSequentWithoutMethodFrame.addFormula(new SequentFormula(newSuccedentToProve), false, true).sequent();
+      // Return created sequent and the used predicate to identify the value interested in.
+      return new SiteProofVariableValueInput(sequentToProve, newPredicate);
+   }
+   
+   /**
+    * Helper class which represents the return value of
+    * {@link KeYDebugTarget#createExtractVariableValueSequent(TypeReference, ReferencePrefix, Node, IProgramVariable)} and
+    * {@link KeYDebugTarget#createExtractVariableValueSequent(IExecutionContext, Node, IProgramVariable)}.
+    * @author Martin Hentschel
+    */
+   protected static class SiteProofVariableValueInput {
+      /**
+       * The sequent to prove.
+       */
+      private Sequent sequentToProve;
+      
+      /**
+       * The {@link Operator} which is the predicate that contains the value interested in.
+       */
+      private Operator operator;
+      
+      /**
+       * Constructor.
+       * @param sequentToProve he sequent to prove.
+       * @param operator The {@link Operator} which is the predicate that contains the value interested in.
+       */
+      public SiteProofVariableValueInput(Sequent sequentToProve, Operator operator) {
+         super();
+         this.sequentToProve = sequentToProve;
+         this.operator = operator;
+      }
+      
+      /**
+       * Returns the sequent to prove.
+       * @return The sequent to prove.
+       */
+      public Sequent getSequentToProve() {
+         return sequentToProve;
+      }
+      
+      /**
+       * Returns the {@link Operator} which is the predicate that contains the value interested in.
+       * @return The {@link Operator} which is the predicate that contains the value interested in.
+       */
+      public Operator getOperator() {
+         return operator;
+      }
+   }
+   
+   /**
+    * Starts a site proof for the given {@link Sequent}.
+    * @param sequentToProve The {@link Sequent} to prove.
+    * @return The proof result represented as {@link ApplyStrategyInfo} instance.
+    * @throws DebugException Occurred Exception.
+    */
+   protected ApplyStrategyInfo startSiteProof(Sequent sequentToProve) throws DebugException {
+      try {
+         // Make sure that valid parameters are given
+         Assert.isNotNull(sequentToProve);
+         // Create ProofStarter
+         ProofStarter starter = new ProofStarter();
+         // Configure ProofStarter
+         starter.init(sequentToProve, proof.env());
+         starter.setMaxRuleApplications(1000);
+         StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties(); // Is a clone that can be modified
+         sp.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY, StrategyProperties.SPLITTING_OFF); // Logical Splitting: Off
+         sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, StrategyProperties.METHOD_NONE); // Method Treatement: Off
+         sp.setProperty(StrategyProperties.DEP_OPTIONS_KEY, StrategyProperties.DEP_OFF); // Dependency Contracts: Off
+         sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY, StrategyProperties.QUERY_OFF); // Query Treatment: Off
+         sp.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY, StrategyProperties.NON_LIN_ARITH_DEF_OPS); // Arithmetic Treatment: DefOps
+         sp.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY, StrategyProperties.QUANTIFIERS_NONE); // Quantifier treatment: All except Free 
+         starter.setStrategy(sp);
+         // Execute proof in the current thread
+         return starter.start();
+      }
+      catch (ProofInputException e) {
+         throw new DebugException(LogUtil.getLogger().createErrorStatus(e));
+      }
+   }
+   
+   /**
+    * Extracts the value for the formula with the given {@link Operator}
+    * from the site proof result ({@link ApplyStrategyInfo}).
+    * @param info The site proof result.
+    * @param operator The {@link Operator} for the formula which should be extracted.
+    * @return The value of the formula with the given {@link Operator}.
+    */
+   protected String extractOperatorValue(ApplyStrategyInfo info, final Operator operator) {
+      // Make sure that valid parameters are given
+      Assert.isNotNull(info);
+      Assert.isTrue(info.getProof().openGoals().size() == 1);
+      // Get node of open goal
+      Node goalNode = info.getProof().openGoals().head().node();
+      // Search formula with the given operator in sequent
+      SequentFormula sf = CollectionUtil.search(goalNode.sequent(), new IFilter<SequentFormula>() {
+         @Override
+         public boolean select(SequentFormula element) {
+            return ObjectUtil.equals(element.formula().op(), operator);
+         }
+      });
+      if (sf != null) {
+         // Format found value
+         StringBuffer sb = ProofSaver.printTerm(sf.formula().sub(0), info.getProof().getServices(), true);
+         return sb.toString();
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * Searches from the given {@link Node} the parent which applies
+    * the rule "methodCallReturn".
+    * @param node The {@link Node} to start search from.
+    * @return The found {@link Node} with rule "methodCallReturn" or {@code null} if no node was found.
+    */
+   protected Node findMethodReturnNode(Node node) {
+      Node resultNode = null;
+      while (node != null && resultNode == null) {
+         if ("methodCallReturn".equals(KeYUtil.getRuleDisplayName(node))) {
+            resultNode = node;
+         }
+         node = node.parent();
+      }
+      return resultNode;
+   }
 
    /**
     * Creates the human readable name which is shown in {@link ISEDMethodReturn} instances.
@@ -777,7 +943,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
     */
    public static String createMethodReturnName(Object returnValue, String methodName) {
       return INTERNAL_NODE_START + "return" +
-             (returnValue != null ? " " + returnValue + " as result" : StringUtil.EMPTY_STRING) +
+             (returnValue != null ? " '" + returnValue + "' as result" : StringUtil.EMPTY_STRING) +
              (!StringUtil.isTrimmedEmpty(methodName) ? " of " + methodName : StringUtil.EMPTY_STRING) +
              INTERNAL_NODE_END;
    }

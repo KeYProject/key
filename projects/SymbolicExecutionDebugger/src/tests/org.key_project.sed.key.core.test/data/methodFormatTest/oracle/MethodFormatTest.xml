@@ -1,32 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_82b6bcf8-2e99-4b0d-abbb-b6a1294d2533" name="MethodFormatTest[MethodFormatTest::main()].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_25ea2b50-f07a-46a9-b6a5-53f002d9c38b" name="KeY Default Thread">
-         <sedMethodCall xml:id="_3604561e-f582-4ef8-91ec-506f1c49b73e" name="MethodFormatTest.main();" lineNumber="-1" charStart="54" charEnd="58">
-            <sedStatement xml:id="_1a8aa074-e5d2-43a7-bc1d-670c70eaef94" name="return a();" lineNumber="-1" charStart="62" charEnd="73">
-               <sedMethodCall xml:id="_e5c3cab5-e30d-4b1d-86c7-a3dbe1cc20d6" name="MethodFormatTest.a();" lineNumber="-1" charStart="100" charEnd="101">
-                  <sedStatement xml:id="_b5533255-c1c1-4f26-ad3b-cfc43f46f414" name="return b();" lineNumber="-1" charStart="105" charEnd="116">
-                     <sedMethodCall xml:id="_145f8394-ec2b-416a-808c-174c62b8e4dd" name="MethodFormatTest.b();" lineNumber="-1" charStart="136" charEnd="137">
-                        <sedStatement xml:id="_62779ca9-5c60-4da6-b1d4-8a852b31ac94" name="return c();" lineNumber="-1" charStart="142" charEnd="153">
-                           <sedMethodCall xml:id="_655d46d8-4a50-492d-a226-45defb361156" name="MethodFormatTest.c();" lineNumber="-1" charStart="173" charEnd="174">
-                              <sedStatement xml:id="_c429a094-33af-408f-be31-5e11c96559c2" name="return d();" lineNumber="-1" charStart="178" charEnd="189">
-                                 <sedMethodCall xml:id="_9804e630-280e-4f06-a940-54b181f7477e" name="MethodFormatTest.d();" lineNumber="-1" charStart="214" charEnd="215">
-                                    <sedStatement xml:id="_59f3e975-b502-4f0f-ad5c-8e76c226b05c" name="return e();" lineNumber="-1" charStart="219" charEnd="230">
-                                       <sedMethodCall xml:id="_6e507892-951a-43c5-977f-62daf1a63ef4" name="MethodFormatTest.e();" lineNumber="-1" charStart="252" charEnd="253">
-                                          <sedStatement xml:id="_4c696d31-eb62-47f3-9bd7-81f4739ed391" name="return f();" lineNumber="-1" charStart="257" charEnd="268">
-                                             <sedMethodCall xml:id="_2c530b11-a84c-40ba-bb3e-3f3a8f3ef902" name="MethodFormatTest.f();" lineNumber="-1" charStart="294" charEnd="295">
-                                                <sedStatement xml:id="_17132b86-5824-416f-9852-4f66985f6787" name="return g();" lineNumber="-1" charStart="299" charEnd="310">
-                                                   <sedMethodCall xml:id="_a02c7336-bf9f-4fd0-b43c-89c5bbd7dfeb" name="MethodFormatTest.g();" lineNumber="-1" charStart="332" charEnd="333">
-                                                      <sedStatement xml:id="_d2f2f71f-b336-467e-ab06-3425d205e66b" name="return 42;" lineNumber="-1" charStart="341" charEnd="351">
-                                                         <sedMethodReturn xml:id="_40314346-9eaf-49d1-b273-de623d239198" name="&lt;return of MethodFormatTest.g();&gt;" lineNumber="-1" charStart="332" charEnd="333">
-                                                            <sedMethodReturn xml:id="_75f82b57-a016-457d-b1df-32350e82244b" name="&lt;return of MethodFormatTest.f();&gt;" lineNumber="-1" charStart="294" charEnd="295">
-                                                               <sedMethodReturn xml:id="_02efb10e-a4db-4e33-adb6-8f03a76cc7f3" name="&lt;return of MethodFormatTest.e();&gt;" lineNumber="-1" charStart="252" charEnd="253">
-                                                                  <sedMethodReturn xml:id="_0480022a-4082-449f-80d6-477a4c15ee08" name="&lt;return of MethodFormatTest.d();&gt;" lineNumber="-1" charStart="214" charEnd="215">
-                                                                     <sedMethodReturn xml:id="_06cf6ec9-7485-4865-8f3d-ec62bebaef0f" name="&lt;return of MethodFormatTest.c();&gt;" lineNumber="-1" charStart="173" charEnd="174">
-                                                                        <sedMethodReturn xml:id="_e61299c6-dc2b-4cbc-b1ac-000ed7e93065" name="&lt;return of MethodFormatTest.b();&gt;" lineNumber="-1" charStart="136" charEnd="137">
-                                                                           <sedMethodReturn xml:id="_801db2bd-50f7-460f-9861-bea57c35f35d" name="&lt;return of MethodFormatTest.a();&gt;" lineNumber="-1" charStart="100" charEnd="101">
-                                                                              <sedMethodReturn xml:id="_8a84e542-3b92-401b-9e93-c3ef9465b11e" name="&lt;return of MethodFormatTest.main();&gt;" lineNumber="-1" charStart="54" charEnd="58">
-                                                                                 <sedTermination xml:id="_0c64d945-f9c6-4396-b593-9ef073d11a82" name="&lt;end&gt;">
+   <sedTarget xml:id="_a14ac32c-e645-4379-ae06-2799797328c2" name="MethodFormatTest[MethodFormatTest::main()].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_a18d97f9-53c7-46bb-b107-5c9c82eb6be2" name="KeY Default Thread">
+         <sedMethodCall xml:id="_186319b4-ac0b-449f-aa48-1cbde7a690bd" name="MethodFormatTest.main();" lineNumber="-1" charStart="54" charEnd="58">
+            <sedStatement xml:id="_8e67e01c-04b1-4774-a4ff-abdae4243b0a" name="return a();" lineNumber="-1" charStart="62" charEnd="73">
+               <sedMethodCall xml:id="_483bbb73-4c3d-4409-b8e9-2277a63ce112" name="MethodFormatTest.a();" lineNumber="-1" charStart="100" charEnd="101">
+                  <sedStatement xml:id="_afe94028-72c3-4270-bb98-40ba5cfd2113" name="return b();" lineNumber="-1" charStart="105" charEnd="116">
+                     <sedMethodCall xml:id="_3a8b2e1c-f73f-4488-9a37-8324d0a3d30a" name="MethodFormatTest.b();" lineNumber="-1" charStart="136" charEnd="137">
+                        <sedStatement xml:id="_ec9e2cef-34c0-4401-a4d4-a58de478d686" name="return c();" lineNumber="-1" charStart="142" charEnd="153">
+                           <sedMethodCall xml:id="_79747fb5-02b5-4758-b0db-ebfe36708045" name="MethodFormatTest.c();" lineNumber="-1" charStart="173" charEnd="174">
+                              <sedStatement xml:id="_a24c7276-d18e-49b3-bac4-bb9390a61f31" name="return d();" lineNumber="-1" charStart="178" charEnd="189">
+                                 <sedMethodCall xml:id="_dd26c386-9f31-480d-afb3-b19f5b66c07c" name="MethodFormatTest.d();" lineNumber="-1" charStart="214" charEnd="215">
+                                    <sedStatement xml:id="_eed4aeb2-0e91-42bd-ba1f-ff010ce14b73" name="return e();" lineNumber="-1" charStart="219" charEnd="230">
+                                       <sedMethodCall xml:id="_b63c1dac-2387-4260-8cb1-3c243c16e8ca" name="MethodFormatTest.e();" lineNumber="-1" charStart="252" charEnd="253">
+                                          <sedStatement xml:id="_e05c0706-ac26-4ed3-96e8-9079515cb139" name="return f();" lineNumber="-1" charStart="257" charEnd="268">
+                                             <sedMethodCall xml:id="_6f82c024-d8cf-48fc-9566-c507234510ed" name="MethodFormatTest.f();" lineNumber="-1" charStart="294" charEnd="295">
+                                                <sedStatement xml:id="_23dabd05-685e-4577-8e89-4da9f06e1144" name="return g();" lineNumber="-1" charStart="299" charEnd="310">
+                                                   <sedMethodCall xml:id="_826daa17-97ec-489c-86c5-7ab62f7f3fff" name="MethodFormatTest.g();" lineNumber="-1" charStart="332" charEnd="333">
+                                                      <sedStatement xml:id="_808a5107-42e4-496e-a60c-8b4e9b708fc6" name="return 42;" lineNumber="-1" charStart="341" charEnd="351">
+                                                         <sedMethodReturn xml:id="_ae6e0695-803d-4c9a-a28b-37db190705c0" name="&lt;return &apos;42&apos; as result of MethodFormatTest.g();&gt;" lineNumber="-1" charStart="332" charEnd="333">
+                                                            <sedMethodReturn xml:id="_fd377a5b-7d42-4184-af1d-7bbfb9867363" name="&lt;return &apos;42&apos; as result of MethodFormatTest.f();&gt;" lineNumber="-1" charStart="294" charEnd="295">
+                                                               <sedMethodReturn xml:id="_a9b59428-c91d-4132-b291-adf56c9cece8" name="&lt;return &apos;42&apos; as result of MethodFormatTest.e();&gt;" lineNumber="-1" charStart="252" charEnd="253">
+                                                                  <sedMethodReturn xml:id="_d98726af-af9d-4038-a996-e434e48eff65" name="&lt;return &apos;42&apos; as result of MethodFormatTest.d();&gt;" lineNumber="-1" charStart="214" charEnd="215">
+                                                                     <sedMethodReturn xml:id="_554e7a5e-ffc7-4f19-80bd-ea6def722969" name="&lt;return &apos;42&apos; as result of MethodFormatTest.c();&gt;" lineNumber="-1" charStart="173" charEnd="174">
+                                                                        <sedMethodReturn xml:id="_b9870745-bae1-400a-ae63-60857277e9d6" name="&lt;return &apos;42&apos; as result of MethodFormatTest.b();&gt;" lineNumber="-1" charStart="136" charEnd="137">
+                                                                           <sedMethodReturn xml:id="_e04de3c5-ec1e-483f-9acb-27490c6a00eb" name="&lt;return &apos;42&apos; as result of MethodFormatTest.a();&gt;" lineNumber="-1" charStart="100" charEnd="101">
+                                                                              <sedMethodReturn xml:id="_a653341a-0f7f-48df-af09-ac2b91307085" name="&lt;return &apos;42&apos; as result of MethodFormatTest.main();&gt;" lineNumber="-1" charStart="54" charEnd="58">
+                                                                                 <sedTermination xml:id="_3861eebc-23c6-4864-9474-1eda1d54832c" name="&lt;end&gt;">
                                                                                  </sedTermination>
                                                                               </sedMethodReturn>
                                                                            </sedMethodReturn>

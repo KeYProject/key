@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_4d5b230f-3d10-4a91-b292-d98163fbf8fb" name="WhileFalseTest[WhileFalseTest::main()].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_7326b9cf-b134-416d-b26f-a9d11dec4d14" name="KeY Default Thread">
-         <sedMethodCall xml:id="_aebb482b-592d-480b-bedb-f079f7742176" name="self.main();" lineNumber="-1" charStart="94" charEnd="98">
-            <sedStatement xml:id="_f4df0a70-c2ec-4265-bf4a-41f508c15fff" name="int result = 0;" lineNumber="-1" charStart="106" charEnd="121">
-               <sedLoopNode xml:id="_67a1acbe-1072-406e-ac8d-dea14de169e3" name="while ( false ) {   result_1++; }" lineNumber="-1" charStart="125" charEnd="160">
-                  <sedLoopCondition xml:id="_6704b670-ddf8-48a7-a500-f0a8516b5e31" name="false" lineNumber="-1" charStart="-1" charEnd="-1">
-                     <sedBranchCondition xml:id="_56d6e713-6d92-4976-b4f4-44ad3299e05d" name="if false false">
-                        <sedStatement xml:id="_b50e3892-bf67-491c-b3ec-cd547f02e95b" name="return result_1;" lineNumber="-1" charStart="164" charEnd="178">
-                           <sedMethodReturn xml:id="_0e3ac1ac-5dd0-4715-a70e-90e1c53dd171" name="&lt;return of self.main();&gt;" lineNumber="-1" charStart="94" charEnd="98">
-                              <sedTermination xml:id="_7446855c-2b6a-4c87-87ef-1a096402b590" name="&lt;end&gt;">
+   <sedTarget xml:id="_d051450d-adca-4985-91dc-8c84276db5db" name="WhileFalseTest[WhileFalseTest::main()].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_b50a738d-1c72-44d6-960f-9e30e38a84db" name="KeY Default Thread">
+         <sedMethodCall xml:id="_09dc98ba-2bbd-425c-b9e3-de83818f8ec3" name="self.main();" lineNumber="-1" charStart="94" charEnd="98">
+            <sedStatement xml:id="_98de68ed-3291-4afb-b351-ba9878142601" name="int result = 0;" lineNumber="-1" charStart="106" charEnd="121">
+               <sedLoopNode xml:id="_b26dd532-4284-4679-82bf-f863f449e041" name="while ( false ) {   result_1++; }" lineNumber="-1" charStart="125" charEnd="160">
+                  <sedLoopCondition xml:id="_c9db35ad-7203-4523-b2d4-ee1884a2b77f" name="false" lineNumber="-1" charStart="-1" charEnd="-1">
+                     <sedBranchCondition xml:id="_8ab62576-434c-430e-b5ac-46955b9aa05a" name="if false false">
+                        <sedStatement xml:id="_96de532e-a735-4bf1-b6ac-f1e96f4d2427" name="return result_1;" lineNumber="-1" charStart="164" charEnd="178">
+                           <sedMethodReturn xml:id="_3e89db8f-f620-434f-a792-4ef77280386d" name="&lt;return &apos;0&apos; as result of self.main();&gt;" lineNumber="-1" charStart="94" charEnd="98">
+                              <sedTermination xml:id="_51142285-4e40-4447-9317-5e4691a82510" name="&lt;end&gt;">
                               </sedTermination>
                            </sedMethodReturn>
                         </sedStatement>

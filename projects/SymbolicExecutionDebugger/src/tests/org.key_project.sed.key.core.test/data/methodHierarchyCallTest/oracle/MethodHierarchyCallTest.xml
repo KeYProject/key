@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_61d337e4-d17c-43f9-9d6f-00db88b9b2e2" name="MethodHierarchyCallTest[MethodHierarchyCallTest::main()].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_cc05e938-c84b-41c6-a70f-9fdb496c24a3" name="KeY Default Thread">
-         <sedMethodCall xml:id="_1e8d25b0-c333-4e41-b824-5262cd871e97" name="self.main();" lineNumber="-1" charStart="54" charEnd="58">
-            <sedStatement xml:id="_96150cda-b325-4250-87b2-c7337eebc203" name="return a();" lineNumber="-1" charStart="66" charEnd="77">
-               <sedMethodCall xml:id="_81350282-80e0-4620-bd80-e9844e471226" name="self.a();" lineNumber="-1" charStart="98" charEnd="99">
-                  <sedStatement xml:id="_1aa38f6d-79d0-4374-be85-5f0a7938370a" name="return b();" lineNumber="-1" charStart="107" charEnd="118">
-                     <sedMethodCall xml:id="_2998e27b-1175-46dd-b6c8-27a518429fba" name="self.b();" lineNumber="-1" charStart="139" charEnd="140">
-                        <sedStatement xml:id="_b6b636b1-9c6e-444c-91b7-95f736e428bb" name="return c();" lineNumber="-1" charStart="148" charEnd="159">
-                           <sedMethodCall xml:id="_c30bb958-bf8c-48f7-9aac-f99f32667768" name="self.c();" lineNumber="-1" charStart="180" charEnd="181">
-                              <sedStatement xml:id="_b1def4c2-e697-4095-b489-31fc1091daa9" name="return 42;" lineNumber="-1" charStart="189" charEnd="199">
-                                 <sedMethodReturn xml:id="_dedf5243-081f-49fa-a5ef-21b9c4160baa" name="&lt;return of self.c();&gt;" lineNumber="-1" charStart="180" charEnd="181">
-                                    <sedMethodReturn xml:id="_8e06b374-fb7f-4809-9d40-9027cf8d80ab" name="&lt;return of self.b();&gt;" lineNumber="-1" charStart="139" charEnd="140">
-                                       <sedMethodReturn xml:id="_ebf5e4c3-4faf-44c0-a0bc-4c896250fb3d" name="&lt;return of self.a();&gt;" lineNumber="-1" charStart="98" charEnd="99">
-                                          <sedMethodReturn xml:id="_8aaaa2ab-8649-41c4-b56d-64af10862f97" name="&lt;return of self.main();&gt;" lineNumber="-1" charStart="54" charEnd="58">
-                                             <sedTermination xml:id="_a77c517c-d0b0-4e70-8b60-59660dc0cbe1" name="&lt;end&gt;">
+   <sedTarget xml:id="_5a29b8d1-b89d-41d3-abef-bb0aedba9bcc" name="MethodHierarchyCallTest[MethodHierarchyCallTest::main()].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_23612a94-be55-4dbf-8320-005a210ed554" name="KeY Default Thread">
+         <sedMethodCall xml:id="_867e66ce-9abd-4944-8c6d-eca8fa365300" name="self.main();" lineNumber="-1" charStart="54" charEnd="58">
+            <sedStatement xml:id="_4bf26279-fec1-43ee-8d2e-58624ce2b8f4" name="return a();" lineNumber="-1" charStart="66" charEnd="77">
+               <sedMethodCall xml:id="_c8e80546-c464-498e-abb1-4213e4284407" name="self.a();" lineNumber="-1" charStart="98" charEnd="99">
+                  <sedStatement xml:id="_36c307c1-cd1e-4575-a810-d6e471d2fe98" name="return b();" lineNumber="-1" charStart="107" charEnd="118">
+                     <sedMethodCall xml:id="_c419079e-55d3-48c9-af2f-27084a0ccaf1" name="self.b();" lineNumber="-1" charStart="139" charEnd="140">
+                        <sedStatement xml:id="_8e4b6b32-2b5a-4d9f-b9ca-a908949dc01e" name="return c();" lineNumber="-1" charStart="148" charEnd="159">
+                           <sedMethodCall xml:id="_f089674f-5e2c-4699-880d-f4bf2fbda10a" name="self.c();" lineNumber="-1" charStart="180" charEnd="181">
+                              <sedStatement xml:id="_0b727d48-572a-49f4-b3d2-7d295c56fadf" name="return 42;" lineNumber="-1" charStart="189" charEnd="199">
+                                 <sedMethodReturn xml:id="_920ac967-ef3d-410d-a93d-58665276788f" name="&lt;return &apos;42&apos; as result of self.c();&gt;" lineNumber="-1" charStart="180" charEnd="181">
+                                    <sedMethodReturn xml:id="_145b4301-4f22-4282-81bf-f2456e84133a" name="&lt;return &apos;42&apos; as result of self.b();&gt;" lineNumber="-1" charStart="139" charEnd="140">
+                                       <sedMethodReturn xml:id="_03a4d5b5-9a23-46a4-8d2c-e3849d9f94b3" name="&lt;return &apos;42&apos; as result of self.a();&gt;" lineNumber="-1" charStart="98" charEnd="99">
+                                          <sedMethodReturn xml:id="_fadfb0d1-6d25-4c94-8744-eb4ac4bb4205" name="&lt;return &apos;42&apos; as result of self.main();&gt;" lineNumber="-1" charStart="54" charEnd="58">
+                                             <sedTermination xml:id="_45680206-9925-4738-9cf4-c8b0b19a2f7e" name="&lt;end&gt;">
                                              </sedTermination>
                                           </sedMethodReturn>
                                        </sedMethodReturn>

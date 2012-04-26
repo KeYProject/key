@@ -115,6 +115,17 @@ public class ProofStarter {
         proof = input.getPO().getFirstProof();
         proof.setProofEnv(env);
     }
+
+    /**
+     * creates a new proof object for sequentToProve and registers it in the given environment
+     * 
+     * @throws ProofInputException 
+     */
+    public void init(Sequent sequentToProve, ProofEnvironment env) throws ProofInputException {
+       final ProofOblInput input = new UserProvidedInput(sequentToProve, env);
+       proof = input.getPO().getFirstProof();
+       proof.setProofEnv(env);
+    }
     
     /** 
      * set timeout
