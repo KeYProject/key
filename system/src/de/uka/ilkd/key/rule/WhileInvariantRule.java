@@ -10,16 +10,11 @@
 
 package de.uka.ilkd.key.rule;
 
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Vector;
-
-import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.gui.InvariantConfigurator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
@@ -38,7 +33,6 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.WhileInvRule;
 import de.uka.ilkd.key.speclang.LoopInvariant;
@@ -114,7 +108,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                                                     services),
                                                     services),
                                                     (Term) null);
-            inv = MainWindow.getInstance().getLoopInvariant(inv,services);
+            inv = InvariantConfigurator.getInstance().getLoopInvariant(inv,services,false);
         } else {
             boolean requiresVariant = false;
             // Check if a variant is required
@@ -124,7 +118,7 @@ public final class WhileInvariantRule implements BuiltInRule {
             }
             if (getInvariant(services, inv) == null
                     || requiresVariant) {
-                inv = MainWindow.getInstance()
+                inv = InvariantConfigurator.getInstance()
                 .getLoopInvariant(
                         inv,
                         services,

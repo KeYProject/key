@@ -1069,26 +1069,6 @@ public final class MainWindow extends JFrame  {
         return proof;
     }
     
-
-    // Moved from Main.java in branch dreinerInvariantDialog
-    // TODO: the main window is still not the right place for it
-    public LoopInvariant getLoopInvariant(LoopInvariant loopInvariant,
-                            Services service,
-                            boolean requiresVariant) throws RuleAbortException {
-    return InvariantConfigurator.getInstance().getLoopInvariant(
-                            loopInvariant,
-                            service,
-                            requiresVariant);
-    }
-    
-    public LoopInvariant getLoopInvariant(LoopInvariant loopInvariant,
-                            Services service) throws RuleAbortException {
-    return InvariantConfigurator.getInstance().getLoopInvariant(
-                            loopInvariant,
-                            service,
-                            false);
-    }
-
     
     /**
      * The progress monitor that displays a progress bar in a corner of the main window.
