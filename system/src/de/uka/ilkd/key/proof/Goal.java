@@ -606,7 +606,8 @@ public class Goal  {
         
         proof.getServices().saveNameRecorder(n);
         
-        if ( goalList.isEmpty() ) {
+        if (goalList != null){
+        if (goalList.isEmpty() ) {
             proof.closeGoal ( this );           
         } else {
             proof.replace ( this, goalList );
@@ -614,6 +615,7 @@ public class Goal  {
                     ((TacletApp)ruleApp).taclet ().closeGoal () )
                 // the first new goal is the one to be closed
                 proof.closeGoal ( goalList.head () );
+        }
         }
 
         final RuleAppInfo ruleAppInfo = journal.getRuleAppInfo(p_ruleApp);

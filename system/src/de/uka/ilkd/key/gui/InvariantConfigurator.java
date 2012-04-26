@@ -25,6 +25,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
+import javax.swing.WindowConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
@@ -108,6 +109,7 @@ public class InvariantConfigurator {
             private final String INVARIANTTITLE = "Invariant: ";
             private final String VARIANTTITLE = "Variant: ";
             private final String MODIFIESTITLE = "Modifies: ";
+            private final Dimension SIZE = new Dimension(500,400);
 
 
             /**
@@ -118,6 +120,7 @@ public class InvariantConfigurator {
 
                 // set Title and Layout
                 setTitle("Invariant Configurator");
+                
                 getContentPane().setLayout(new BorderLayout());
 
                 // set up the storage for invariants candidates
@@ -146,6 +149,11 @@ public class InvariantConfigurator {
                 initButtonPanel(buttonPanel);
                 getContentPane().add(buttonPanel, BorderLayout.SOUTH);
 
+                
+                setPreferredSize(SIZE);
+                setMinimumSize(SIZE);
+                setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+                
                 parse();
                 this.pack();
                 this.setVisible(true);
