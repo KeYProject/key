@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="de.hentschel.visualdbc.dataSource.dataSources">
+      <dataSource
+            class="de.hentschel.visualdbc.interactive.proving.ui.test.model.SimpleProofModelDriver">
+      </dataSource>
+   </extension>
+   <extension
+         point="de.hentschel.visualdbc.interactive.proving.ui.dsFinder">
+      <finder
+            class="de.hentschel.visualdbc.interactive.proving.ui.test.dummyFinder.DSFinderFactoryMinus1">
+      </finder>
+      <finder
+            class="de.hentschel.visualdbc.interactive.proving.ui.test.dummyFinder.DSFinderFactory1">
+      </finder>
+      <finder
+            class="de.hentschel.visualdbc.interactive.proving.ui.test.dummyFinder.DSFinderFactory0">
+      </finder>
+      <finder
+            class="de.hentschel.visualdbc.interactive.proving.ui.test.dummyFinder.DSFinderFactory2">
+      </finder>
+      <finder
+            class="de.hentschel.visualdbc.interactive.proving.ui.test.dummyFinder.DSFinderFactoryMinus2">
+      </finder>
+   </extension>
+   <extension
+         point="de.hentschel.visualdbc.interactive.proving.ui.dbcFinder">
+      <finder
+            class="de.hentschel.visualdbc.interactive.proving.ui.test.dummyFinder.DbcFinderFactoryMinus1">
+      </finder>
+      <finder
+            class="de.hentschel.visualdbc.interactive.proving.ui.test.dummyFinder.DbcFinderFactory1">
+      </finder>
+      <finder
+            class="de.hentschel.visualdbc.interactive.proving.ui.test.dummyFinder.DbcFinderFactory0">
+      </finder>
+      <finder
+            class="de.hentschel.visualdbc.interactive.proving.ui.test.dummyFinder.DbcFinderFactory2">
+      </finder>
+      <finder
+            class="de.hentschel.visualdbc.interactive.proving.ui.test.dummyFinder.DbcFinderFactoryMinus2">
+      </finder>
+   </extension>
+
+</plugin>

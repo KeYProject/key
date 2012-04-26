@@ -14,6 +14,10 @@ package de.uka.ilkd.key.proof;
 public class MissingSortException 
     extends SVInstantiationExceptionWithPosition {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 2491948230461429971L;
     private String toInstantiate;
          
     public MissingSortException( String toInstantiate, 

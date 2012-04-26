@@ -63,24 +63,15 @@ public class For extends LoopStatement implements VariableScope {
     }
 
     public For(ExtList children) {
-	super((ILoopInit)children.get(ILoopInit.class), 
-	      (IGuard)children.get(IGuard.class),
-	      (IForUpdates)children.get(IForUpdates.class),
-	      (Statement)children.get(Statement.class),
+	super(children.get(ILoopInit.class), 
+	      children.get(IGuard.class),
+	      children.get(IForUpdates.class),
+	      children.get(Statement.class),
 	      children);
     }
 
     public SourceElement getLastElement() {
         return (body != null) ? body.getLastElement() : this;
-    }
-
-    /**
-     *      Is exit condition.
-     *      @return the boolean value.
-     */
-
-    public boolean isExitCondition() {
-        return false;
     }
 
     /**

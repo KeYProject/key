@@ -10,6 +10,8 @@
 
 package de.uka.ilkd.key.logic;
 
+import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import java.util.Iterator;
 
 public class NamespaceSet {
@@ -200,5 +202,15 @@ public class NamespaceSet {
 	    "ProgramVariables: " + programVariables() + "\n" +
 	    "Heuristics: " + ruleSets() + "\n" +
 	    "Taclet Options: " + choices() + "\n";
+    }
+    
+    
+    public <T extends Name> boolean contains(ImmutableSet<T> names) {
+        for (Name name : names) {
+            if (lookupLogicSymbol(name) == null) {
+                return false;
+            }
+        }
+        return true;
     }
 }

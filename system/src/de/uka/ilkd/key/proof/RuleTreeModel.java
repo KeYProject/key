@@ -29,6 +29,10 @@ import de.uka.ilkd.key.rule.Taclet;
 
 public class RuleTreeModel extends DefaultTreeModel {
     
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -6398875364204732175L;
     protected Goal goal;
     protected MutableTreeNode builtInRoot 
     = new DefaultMutableTreeNode("Built-In");

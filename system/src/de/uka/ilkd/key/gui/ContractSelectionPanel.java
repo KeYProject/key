@@ -35,6 +35,10 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
  */
 class ContractSelectionPanel extends JPanel {
     
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1681223715264203991L;
     private final Services services;
     private final JList contractList;
     private final TitledBorder border;
@@ -76,6 +80,10 @@ class ContractSelectionPanel extends JPanel {
         });
         final Services serv = services;
         contractList.setCellRenderer(new DefaultListCellRenderer() {
+            /**
+             * 
+             */
+            private static final long serialVersionUID = 9066658130231994408L;
             private final Font PLAINFONT = getFont().deriveFont(Font.PLAIN);
             
 	    public Component getListCellRendererComponent(
@@ -108,9 +116,16 @@ class ContractSelectionPanel extends JPanel {
 		//set border
 		TitledBorder border = new TitledBorder(
 				BorderFactory.createEtchedBorder(),
-                                contract.getName());
-		border.setTitleFont(border.getTitleFont()
-					  .deriveFont(Font.BOLD));
+                                contract.getDisplayName());
+
+                Font borderFont = border.getTitleFont();
+                if (borderFont == null) { // MS Windows issues
+                    borderFont = result.getFont();
+                    if (borderFont == null) {
+                        borderFont = PLAINFONT;
+                    }
+                }
+		border.setTitleFont(borderFont.deriveFont(Font.BOLD));
 		result.setBorder(border);
 		
 		return result;

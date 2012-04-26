@@ -45,6 +45,11 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
     private static class Node<S extends Comparable<S>> extends ImmutableLeftistHeap<S> {
 
 	/**
+         * 
+         */
+        private static final long serialVersionUID = 4913355498617409303L;
+
+    /**
 	 * Length of the right spine, i.e. the length of the path from the
 	 * root to rightmost leaf
 	 */

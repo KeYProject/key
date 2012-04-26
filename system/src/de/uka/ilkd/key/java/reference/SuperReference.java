@@ -52,7 +52,7 @@ public class SuperReference extends JavaNonTerminalProgramElement
      * @param children the children of this AST element as KeY classes.
      */ 
     public SuperReference(ExtList children) {
-	prefix =(ReferencePrefix)children.get(ReferencePrefix.class);
+	prefix =children.get(ReferencePrefix.class);
     }
 
 

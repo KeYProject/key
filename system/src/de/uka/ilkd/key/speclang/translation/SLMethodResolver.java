@@ -59,7 +59,7 @@ public final class SLMethodResolver extends SLExpressionResolver {
         Term recTerm = receiver.getTerm(); 
         
         
-        while(pm == null) {
+        while (true) {
             pm = javaInfo.getToplevelPM(containingType, methodName, signature);
             LocationVariable et = (LocationVariable) javaInfo.getAttribute(
                     ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, containingType);
@@ -105,14 +105,13 @@ public final class SLMethodResolver extends SLExpressionResolver {
             subs[i++] = slExpression.getTerm();
         }
         
-        if (pm.getKeYJavaType() == null) {
-            // return type is void
+        if (pm.isVoid()) {
             throw manager.excManager.createException("can not use void " +
             		"method \"" + methodName + "\" in specification expression.");
         }
         
         return new SLExpression(TB.tf().createTerm(pm, subs), 
-        	                pm.getKeYJavaType());
+        	                pm.getReturnType());
     }
 
 }

@@ -57,7 +57,7 @@ public class StatementBlock extends JavaStatement
     public StatementBlock(ExtList children) {
         super(children);
         body = new
-            ImmutableArray<Statement>((Statement[])children.collect(Statement.class));
+            ImmutableArray<Statement>(children.collect(Statement.class));
         
         prefixElementArray = computePrefixElements(body);
     }

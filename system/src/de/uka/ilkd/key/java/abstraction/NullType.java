@@ -199,4 +199,12 @@ public class NullType implements ClassType {
 	return null;
     }
 
+    public boolean equals(Object o){
+        return o == JAVA_NULL;
+    }
+    
+    public int hashCode() {
+        //singleton
+        return System.identityHashCode(this);
+    }
 }

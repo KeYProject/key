@@ -26,14 +26,9 @@ import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.parser.KeYLexer;
 import de.uka.ilkd.key.parser.KeYParser;
 import de.uka.ilkd.key.parser.ParserMode;
-import de.uka.ilkd.key.rule.AntecTaclet;
-import de.uka.ilkd.key.rule.NoFindTaclet;
-import de.uka.ilkd.key.rule.RewriteTaclet;
-import de.uka.ilkd.key.rule.RewriteTacletBuilder;
-import de.uka.ilkd.key.rule.RewriteTacletGoalTemplate;
-import de.uka.ilkd.key.rule.SuccTaclet;
-import de.uka.ilkd.key.rule.SuccTacletBuilder;
-import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
+import de.uka.ilkd.key.rule.tacletbuilder.SuccTacletBuilder;
 
 
 /** 

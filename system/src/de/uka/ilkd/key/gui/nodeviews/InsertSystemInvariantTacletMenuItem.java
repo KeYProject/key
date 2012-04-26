@@ -23,13 +23,18 @@ import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.rule.NoFindTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.TacletGoalTemplate;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
 /**
  * This menu item groups all taclets which allow to insert class invariants 
  */
 public class InsertSystemInvariantTacletMenuItem extends InsertionTacletBrowserMenuItem {
    
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -4303059934911952345L;
+
     /**
      * creates an instance of the insert hidden menu item
      * @param parent the JFrame with the parent frame

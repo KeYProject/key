@@ -20,7 +20,9 @@ import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.util.MiscTools;
 
 
 /**
@@ -57,10 +59,14 @@ public class NodeInfo {
 
     private static List<Name> symbolicExecNames = new ArrayList<Name>(5);
     static {
+        symbolicExecNames.add(new Name("method_expand"));
         symbolicExecNames.add(new Name("simplify_prog"));
         symbolicExecNames.add(new Name("simplify_autoname"));
         symbolicExecNames.add(new Name("executeIntegerAssignment"));
         symbolicExecNames.add(new Name("simplify_object_creation"));
+        symbolicExecNames.add(new Name("split_if"));
+        symbolicExecNames.add(new Name("simplify_expression"));
+        symbolicExecNames.add(new Name("loop_expand"));
     }
 
 
@@ -72,10 +78,11 @@ public class NodeInfo {
         if (determinedFstAndActiveStatement)
             return;
         final RuleApp ruleApp = node.getAppliedRuleApp();
+        // TODO: unify with MiscTools getActiveStatement
         if (ruleApp instanceof PosTacletApp) {
             PosTacletApp pta = (PosTacletApp) ruleApp;
             if (!isSymbolicExecution(pta.taclet())) return;
-            Term t = pta.posInOccurrence().subTerm();
+            Term t = MiscTools.goBelowUpdates(pta.posInOccurrence().subTerm());
             final ProgramElement pe = t.javaBlock().program();
             if (pe != null) {
                 firstStatement = pe.getFirstElement();
@@ -90,6 +97,15 @@ public class NodeInfo {
             determinedFstAndActiveStatement = true;
         }
     }
+    
+    void updateNoteInfo(){
+        determinedFstAndActiveStatement = false;
+        firstStatement = null;
+        firstStatementString = null;
+        activeStatement = null;
+        determineFirstAndActiveStatement();
+    }
+  
     
     private boolean isSymbolicExecution(Taclet t) {
         ImmutableList<RuleSet> list = t.getRuleSets();
@@ -170,6 +186,7 @@ public class NodeInfo {
         determineFirstAndActiveStatement();
         if (s == null)
             return;
+        if(node.parent() == null){ return;}
         RuleApp ruleApp = node.parent().getAppliedRuleApp();
         if (ruleApp instanceof TacletApp) { 
             TacletApp tacletApp = (TacletApp) ruleApp; // XXX
@@ -196,7 +213,10 @@ public class NodeInfo {
                 m.appendReplacement(sb, res.replace("$", "\\$"));
             }
             m.appendTail(sb);
-            branchLabel = sb.toString();
+            // eliminate annoying whitespaces
+            Pattern whiteSpacePattern = Pattern.compile("\\s+");
+            Matcher whiteSpaceMatcher = whiteSpacePattern.matcher(sb);
+            branchLabel = whiteSpaceMatcher.replaceAll(" ");
         } else {
             branchLabel = s; 
         }

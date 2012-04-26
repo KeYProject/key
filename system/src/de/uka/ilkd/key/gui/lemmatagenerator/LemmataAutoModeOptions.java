@@ -22,7 +22,7 @@ public class LemmataAutoModeOptions {
         private static final String SAVE_RESULTS_TO_FILE = KEY_PREFIX
                         + "saveProofToFile";
         private static final String FILE_FOR_AXIOMS = KEY_PREFIX + "axioms";
-        private static final String FILE_FOR_DEFINITION = KEY_PREFIX +"definitions";
+        private static final String FILE_FOR_DEFINITION = KEY_PREFIX +"signature";
 
         private static final String PROOF_POSTFIX = ".key.proof";
 
@@ -200,7 +200,7 @@ public class LemmataAutoModeOptions {
                 test = new File(pathOfResult);
                 if (!test.isDirectory()) {
                         throwError("Error while setting the folder of the results:\n"
-                                        + pathOfRuleFile + " is not a folder.");
+                                        + pathOfResult + " is not a folder.");
                 }
                 
         }
@@ -212,7 +212,6 @@ public class LemmataAutoModeOptions {
         private String generatePath(String path, String reference) {
                 if (path.equals("")) {
                         File temp = new File(reference);
-                        System.out.println(temp.getAbsolutePath());
                         int index = temp.getAbsolutePath().lastIndexOf(File.separator);
                         path = temp.getAbsolutePath().substring(0, index + 1);
                 }

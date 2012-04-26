@@ -23,6 +23,10 @@ import de.uka.ilkd.key.proof.ProofAggregate;
 
 public class TaskTreeModel extends DefaultTreeModel {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -4168248377205879699L;
     private Map proofToTask = new HashMap();
 
     public TaskTreeModel() {

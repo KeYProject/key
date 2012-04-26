@@ -57,7 +57,7 @@ public class ThisReference
      */ 
     public ThisReference(ExtList children) {
 	super(children);
-	prefix = (TypeReference)children.get(TypeReference.class);
+	prefix = children.get(TypeReference.class);
     }
 
 

@@ -10,6 +10,8 @@
 
 package de.uka.ilkd.key.rule;
 
+import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -1344,7 +1346,7 @@ public abstract class Taclet implements Rule, Named {
 	    itVC.hasNext()) {
 	    sb = sb.append("\\varcond(");
 	    while (itVarsNew.hasNext()) {
-		sb=sb.append(itVarsNew.next());
+	    sb=sb.append(itVarsNew.next());
 		if (itVarsNew.hasNext() || itVarsNotFreeIn.hasNext())
 		    sb=sb.append(", "); 
 	    }

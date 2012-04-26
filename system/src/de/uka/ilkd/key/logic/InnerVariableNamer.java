@@ -81,7 +81,8 @@ public class InnerVariableNamer extends VariableNamer {
 	// Name proposal = services.getProof().getNameRecorder().getProposal();
 	Name proposal = null;
 
-	if (!oldProgVarProposals.isEmpty()) {
+	final Services services = goal.proof().getServices();
+    if (!oldProgVarProposals.isEmpty()) {
 	    proposal = oldProgVarProposals.head();
 	    oldProgVarProposals = oldProgVarProposals.tail();
 	} else {
@@ -94,7 +95,7 @@ public class InnerVariableNamer extends VariableNamer {
 	    newname = new ProgramElementName(proposal.toString(), nci);
 	}
 	if (newname == null || !isUniqueInGlobals(newname.toString(), globals)
-	        || goal.proof().getServices().getNamespaces()
+	        || services.getNamespaces()
 	        .lookupLogicSymbol(newname)!=null) {
 	    newname = createName(bai.basename, bai.index, nci);
             int newcounter = getMaxCounterInGlobalsAndProgram(
@@ -102,7 +103,7 @@ public class InnerVariableNamer extends VariableNamer {
                             globals,
                             getProgramFromPIO(posOfFind),
                             null);
-            final NamespaceSet namespaces = goal.proof().getServices().getNamespaces();
+            final NamespaceSet namespaces = services.getNamespaces();
             while (!isUniqueInGlobals(newname.toString(), globals) ||
                     namespaces.lookupLogicSymbol(newname)!=null) {
 	        newcounter += 1; 
@@ -111,17 +112,18 @@ public class InnerVariableNamer extends VariableNamer {
 	}
         
         ProgramVariable newvar = var;
-        
         if (!newname.equals(name)) {        
-            newvar = new LocationVariable(newname,
-                    			  var.getKeYJavaType());
+            newvar = new LocationVariable(newname, var.getKeYJavaType());
             map.put(var, newvar);
             renamingHistory = map;
             //execute renaming
             ProgVarReplacer pvr = new ProgVarReplacer(map, services);
             pvr.replace(goal);
         }
-        
+
+        assert newvar != null;
+        assert isUniqueInGlobals(newvar.name().toString(), globals);
+        assert services.getNamespaces().lookupLogicSymbol(newvar.name())==null;
         return newvar;
     }
 

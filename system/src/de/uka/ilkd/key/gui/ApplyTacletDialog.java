@@ -38,6 +38,10 @@ import de.uka.ilkd.key.util.pp.StringBackend;
 public abstract class ApplyTacletDialog extends JDialog {
 
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -411398660828882035L;
     // buttons
     protected JButton cancelButton;
     protected JButton applyButton;
@@ -65,11 +69,11 @@ public abstract class ApplyTacletDialog extends JDialog {
 	mediator.requestModalAccess(this); 
 	addWindowListener(new WindowAdapter() {
 		public void windowClosed(WindowEvent e) {
-		    ApplyTacletDialog.this.closeDlg();		    
+		    //ApplyTacletDialog.this.closeDlg();		    
 		}
 
 		public void windowClosing(WindowEvent e) {
-		    ApplyTacletDialog.this.closeDlg();
+		    //ApplyTacletDialog.this.closeDlg();
 		}
 	    });
     }

@@ -15,11 +15,9 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 
-
 import junit.framework.Assert;
-
 import de.uka.ilkd.key.gui.configuration.PathConfig;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.gui.smt.ProofDependentSMTSettings;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -27,16 +25,11 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SMTSolverResult;
 import de.uka.ilkd.key.smt.SolverLauncher;
-
 import de.uka.ilkd.key.smt.SolverType;
 
 class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings{
 
-    
-    @Override
-    public String getCommand(SolverType type) {
-	return type.getDefaultExecutionCommand();
-    }
+
 
     @Override
     public int getMaxConcurrentProcesses() {
@@ -50,12 +43,12 @@ class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings{
 
     @Override
     public String getSMTTemporaryFolder() {
-	return   PathConfig.KEY_CONFIG_DIR
+	return   PathConfig.getKeyConfigDir()
 	    + File.separator + "smt_formula";
     }
 
     @Override
-    public Collection<Taclet> getTaclets(Services services) {
+    public Collection<Taclet> getTaclets() {
 	return null;
     }
 
@@ -93,6 +86,24 @@ class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings{
     public boolean useUninterpretedMultiplicationIfNecessary() {
 	return false;
     }
+
+@Override
+public long getMaximumInteger() {
+
+        return ProofDependentSMTSettings.getDefaultSettingsData().maxInteger;
+}
+
+@Override
+public long getMinimumInteger() {
+
+        return ProofDependentSMTSettings.getDefaultSettingsData().minInteger;
+}
+
+@Override
+public String getLogic() {
+	return "AUFLIA";
+}
+
     
 }
 
@@ -191,11 +202,13 @@ public abstract class TestSMTSolver extends TestCommons {
     }
     
     public void testTermIte1() {
-	Assert.assertTrue(correctResult(testFile + "termite1.key", true));
+            if(getSolverType().supportsIfThenElse())
+                    Assert.assertTrue(correctResult(testFile + "termite1.key", true));
     }
     
     public void testTermlIte2() {
-	Assert.assertTrue(correctResult(testFile + "termite2.key", false));
+            if(getSolverType().supportsIfThenElse())
+                    Assert.assertTrue(correctResult(testFile + "termite2.key", false));
     }
     
     public void testEqual1() {
@@ -252,7 +265,7 @@ public abstract class TestSMTSolver extends TestCommons {
 	if (isValid && result != null) {
 	    return result.isValid() != SMTSolverResult.ThreeValuedTruth.FALSIFIABLE; 
 	} else {
-	    return result.isValid() != SMTSolverResult.ThreeValuedTruth.TRUE;
+	    return result.isValid() != SMTSolverResult.ThreeValuedTruth.VALID;
 	}
     }
     

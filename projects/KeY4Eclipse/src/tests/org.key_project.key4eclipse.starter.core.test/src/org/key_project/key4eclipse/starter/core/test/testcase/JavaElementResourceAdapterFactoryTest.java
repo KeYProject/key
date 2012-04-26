@@ -1,0 +1,52 @@
+package org.key_project.key4eclipse.starter.core.test.testcase;
+
+import junit.framework.TestCase;
+
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.Signature;
+import org.junit.Test;
+import org.key_project.key4eclipse.starter.core.adapter.JavaElementResourceAdapterFactory;
+import org.key_project.key4eclipse.starter.core.test.Activator;
+import org.key_project.util.eclipse.BundleUtil;
+import org.key_project.util.test.util.TestUtilsUtil;
+
+/**
+ * Tests for {@link JavaElementResourceAdapterFactory}.
+ * @author Martin Hentschel
+ */
+public class JavaElementResourceAdapterFactoryTest extends TestCase {
+    /**
+     * Tries to convert an {@link IMethod} into an {@link IResource}
+     * via the adapter concept ({@link IMethod#getAdapter(Class)}).
+     */
+    @Test
+    public void testAdaptingAnIMethodIntoAnIResource() throws CoreException, InterruptedException {
+        // Create test project
+        IJavaProject javaProject = TestUtilsUtil.createJavaProject("JavaElementResourceAdapterFactoryTest_testAdaptingAnIMethodIntoAnIResource");
+        IFolder banking = javaProject.getProject().getFolder("src").getFolder("banking");
+        if (!banking.exists()) {
+            banking.create(true, true, null);
+        }
+        BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/banking", banking);
+        IFile paycardFile = banking.getFile("PayCard.java");
+        assertNotNull(paycardFile);
+        assertTrue(paycardFile.exists());
+        // Get method to test
+        IMethod chargeMethod = TestUtilsUtil.getJdtMethod(javaProject, "banking.PayCard", "charge", Signature.C_INT + "");
+        assertNotNull(chargeMethod);
+        // Test direct conversion
+        JavaElementResourceAdapterFactory factory = new JavaElementResourceAdapterFactory();
+        IResource result = (IResource)factory.getAdapter(chargeMethod, IResource.class);
+        assertNotNull(result);
+        assertEquals(paycardFile, result);
+        // Test adaptable concept
+        IResource adaptedResource = (IResource)chargeMethod.getAdapter(IResource.class);
+        assertNotNull(adaptedResource);
+        assertEquals(paycardFile, adaptedResource);
+    }
+}

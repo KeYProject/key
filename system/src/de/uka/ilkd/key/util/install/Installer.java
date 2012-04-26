@@ -16,11 +16,16 @@ import javax.swing.JFrame;
 
 public class Installer extends JFrame {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -1362348387316872810L;
+
     public static void main ( String[] args ) {
 	String os = System.getProperty ( "os.name" );
 	String currentDir = System.getProperty ( "user.dir" );
-	String defaultKeYHome = System.getProperty ( "user.home" ) + File.separatorChar;
-	defaultKeYHome = ( defaultKeYHome == null ?  "" :  defaultKeYHome ) +
+	String defaultKeYHome = System.getProperty ( "user.home" );  
+	defaultKeYHome = ( defaultKeYHome == null ?  File.separator :  File.separator + defaultKeYHome ) +
 	    "KeY" + File.separator;
 	String defaultKeYLib = defaultKeYHome + "key-ext-jars";
 	String javaHome = System.getProperty ( "java.home" );

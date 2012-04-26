@@ -231,6 +231,8 @@ public final class DLSpecFactory {
 	assert name != null;
 	assert fma != null;
 	assert modifies != null;
+	
+	final ContractFactory cf = new ContractFactory(services);
 
 	//extract parts of fma
 	final Term pre = extractPre(fma);
@@ -266,7 +268,7 @@ public final class DLSpecFactory {
 	}
 
 	//result variable may be omitted
-	if(resultVar == null && pm.getKeYJavaType() != null) {
+	if(resultVar == null && !pm.isVoid()) {
 	    resultVar = TB.resultVar(services, pm, false);
 	}
 
@@ -288,14 +290,15 @@ public final class DLSpecFactory {
 	final boolean isLibraryClass 
 		= ((TypeDeclaration)pm.getContainerType() 
 			              .getJavaType()).isLibraryClass();
-	return new FunctionalOperationContractImpl(name,
+	return cf.func(name,
 					 pm.getContainerType(),		
 					 pm, 
 					 modality, 
 					 pre,
-					 null,//measured_by in DL contracts not supported yet					 
+					 null,// TODO measured_by in DL contracts not supported yet
 					 post, 
 					 modifies, 
+					 true, // TODO strictly pure in DL contracts not supported yet
 					 selfVar, 
 					 paramVars, 
 					 resultVar, 

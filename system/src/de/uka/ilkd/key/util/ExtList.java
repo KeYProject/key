@@ -17,17 +17,19 @@ import java.util.LinkedList;
 
 /** extends java.util.LinkedList in order to collect elements
  * according to their type */
-public class ExtList extends LinkedList {
+public class ExtList extends LinkedList<Object> {
+
+    private static final long serialVersionUID = 9182017368310263908L;
 
     public ExtList() {
-	super();
+        super();
     }
 
     /** copies list to array (array has type of cl) */
-    private Object toArray(Class cl, LinkedList list) {
-	Object array=java.lang.reflect.Array.newInstance(cl,list.size());
-	System.arraycopy(list.toArray(),0,array,0,list.size());
-	return array;
+    private static <T>T[] toArray(Class<T> cl, LinkedList<T> list) {
+        T[] array= (T[]) java.lang.reflect.Array.newInstance(cl,list.size());
+        System.arraycopy(list.toArray(),0,array,0,list.size());
+        return array;
     }
 
     /**
@@ -35,35 +37,35 @@ public class ExtList extends LinkedList {
      * @param cl Class the type of the elements that are selected
      * @return array with type cl
      */
-    public Object collect(Class cl) {
-	LinkedList colls=new LinkedList();
-	Iterator it=iterator();
-	while(it.hasNext()) {
-	    Object next=it.next();
-	    if (cl.isInstance(next) && (next!=null)) {
-		colls.add(next);
-	    }	    
-	}
+    @SuppressWarnings("unchecked")
+    public <T>T[] collect(Class<T> cl) {
+        LinkedList<T> colls=new LinkedList<T>();
+        for (Object next: this) {
+            if (cl.isInstance(next) && (next!=null)) {
+                colls.add((T)next);
+            }	    
+        }
 
-	return toArray(cl,colls); 
+        return toArray(cl,colls); 
 
     }
-    
+
     /**
      * returns first element in list of type cl
      * @param cl the type to be searched in list
      * @return the first element with type cl in list
      */
-    public Object get(Class cl) {
-	Iterator it=iterator();
-	while(it.hasNext()) {
-	    Object next=it.next();
-	    if (cl.isInstance(next) && (next!=null)) {
-		return next;
-	    }	    
-	}
-	
-	return null; 
+    @SuppressWarnings("unchecked")
+    public <T>T get(Class<T> cl) {
+        Iterator<Object> it=iterator();
+        while(it.hasNext()) {
+            Object next=it.next();
+            if (cl.isInstance(next) && (next!=null)) {
+                return (T)next;
+            }	    
+        }
+
+        return null; 
     }
 
     /**
@@ -73,17 +75,18 @@ public class ExtList extends LinkedList {
      * @param cl the type to be searched in list
      * @return the first element with type cl in list
      */
-    public Object removeFirstOccurrence(Class cl) {
-	Iterator it = iterator();
-	while(it.hasNext()) {
-	    Object next = it.next();
-	    if (cl.isInstance(next) && (next!=null)) {
-		it.remove();
-		return next;
-	    }	    
-	}
-	
-	return null; 
+    @SuppressWarnings("unchecked")
+    public <T>T removeFirstOccurrence(Class<T> cl) {
+        Iterator<Object> it = iterator();
+        while(it.hasNext()) {
+            Object next = it.next();
+            if (cl.isInstance(next) && (next!=null)) {
+                it.remove();
+                return (T)next;
+            }	    
+        }
+
+        return null; 
     }
 
 

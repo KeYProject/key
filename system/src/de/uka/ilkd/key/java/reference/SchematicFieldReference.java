@@ -41,7 +41,7 @@ public class SchematicFieldReference extends FieldReference
 
 
     public SchematicFieldReference(ExtList children, ReferencePrefix prefix) {
-	this.schemaVariable = (SchemaVariable)children.get(SchemaVariable.class);
+	this.schemaVariable = children.get(SchemaVariable.class);
 	this.prefix   = prefix;
     }
 

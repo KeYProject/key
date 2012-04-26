@@ -17,6 +17,10 @@ import java.util.Set;
 
 public final class StrategyProperties extends Properties {
     
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 8651946636880456925L;
     public final static String STOPMODE_OPTIONS_KEY = "STOPMODE_OPTIONS_KEY";
     public final static String STOPMODE_DEFAULT = "STOPMODE_DEFAULT";
     public final static String STOPMODE_NONCLOSE = "STOPMODE_NONCLOSE";    
@@ -43,6 +47,7 @@ public final class StrategyProperties extends Properties {
 
     public final static String QUERY_OPTIONS_KEY = "QUERY_NEW_OPTIONS_KEY";
     public final static String QUERY_ON = "QUERY_ON";
+    public final static String QUERY_RESTRICTED = "QUERY_RESTRICTED";
     public final static String QUERY_OFF = "QUERY_OFF";
 
     
@@ -62,7 +67,11 @@ public final class StrategyProperties extends Properties {
     public final static String VBT_QUAN_INST = "VBT_QUAN_INST";
     public final static String VBT_MODEL_GEN = "VBT_MODEL_GEN";
     
-
+    //chrisg
+    public final static String AUTO_INDUCTION_OPTIONS_KEY          = "AUTO_INDUCTION_OPTIONS_KEY"; 
+    public final static String AUTO_INDUCTION_OFF      = "AUTO_INDUCTION_OFF"; 
+    public final static String AUTO_INDUCTION_ON       = "AUTO_INDUCTION_ON"; 
+    public final static String AUTO_INDUCTION_LEMMA_ON = "AUTO_INDUCTION_LEMMA_ON";
 
     public final static int USER_TACLETS_NUM = 3;
     private final static String USER_TACLETS_OPTIONS_KEY_BASE = "USER_TACLETS_OPTIONS_KEY";
@@ -86,6 +95,7 @@ public final class StrategyProperties extends Properties {
             defaultMap.setProperty(USER_TACLETS_OPTIONS_KEY(i), USER_TACLETS_OFF);
         defaultMap.setProperty(STOPMODE_OPTIONS_KEY, STOPMODE_DEFAULT);
         defaultMap.setProperty(VBT_PHASE, VBT_SYM_EX);
+        defaultMap.setProperty(AUTO_INDUCTION_OPTIONS_KEY, AUTO_INDUCTION_OFF); //chrisg        
     }
     
     public StrategyProperties() {
@@ -100,6 +110,7 @@ public final class StrategyProperties extends Properties {
             put(USER_TACLETS_OPTIONS_KEY(i), defaultMap.get(USER_TACLETS_OPTIONS_KEY(i)));
         put(STOPMODE_OPTIONS_KEY, defaultMap.get(STOPMODE_OPTIONS_KEY));
         put(VBT_PHASE, defaultMap.getProperty(VBT_PHASE));
+        put(AUTO_INDUCTION_OPTIONS_KEY, defaultMap.getProperty(AUTO_INDUCTION_OPTIONS_KEY));
     }
 
     public static String getDefaultProperty(String key) {
@@ -126,6 +137,7 @@ public final class StrategyProperties extends Properties {
             sp.put(USER_TACLETS_OPTIONS_KEY(i), readSingleOption(p,USER_TACLETS_OPTIONS_KEY(i)));
         sp.put(STOPMODE_OPTIONS_KEY, readSingleOption(p,STOPMODE_OPTIONS_KEY));
         sp.put(VBT_PHASE, readSingleOption(p,VBT_PHASE));
+        sp.put(AUTO_INDUCTION_OPTIONS_KEY, readSingleOption(p,AUTO_INDUCTION_OPTIONS_KEY));
         return sp;
     }
 
@@ -150,6 +162,7 @@ public final class StrategyProperties extends Properties {
             p.put("[StrategyProperty]"+USER_TACLETS_OPTIONS_KEY(i), get(USER_TACLETS_OPTIONS_KEY(i)));
         p.put("[StrategyProperty]"+STOPMODE_OPTIONS_KEY, get(STOPMODE_OPTIONS_KEY));
         p.put("[StrategyProperty]"+VBT_PHASE, get(VBT_PHASE));
+        p.put("[StrategyProperty]"+AUTO_INDUCTION_OPTIONS_KEY, get(AUTO_INDUCTION_OPTIONS_KEY));
     }
 
     

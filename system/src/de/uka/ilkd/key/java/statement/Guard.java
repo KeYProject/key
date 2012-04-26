@@ -29,7 +29,7 @@ public class Guard extends JavaNonTerminalProgramElement
     }
 
     public Guard(ExtList children) {
-	expr=(Expression)children.get(Expression.class);
+	expr=children.get(Expression.class);
     }
 
     public Expression getExpression() {

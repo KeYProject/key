@@ -1,0 +1,28 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: KeY Project Utilities
+Bundle-SymbolicName: org.key_project.util
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.key_project.util.Activator
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.core.resources;bundle-version="3.6.1",
+ org.eclipse.ui,
+ org.eclipse.ui.ide;bundle-version="3.7.0",
+ org.eclipse.jdt.core;bundle-version="3.6.2",
+ org.eclipse.jdt.ui;bundle-version="3.7.1"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-Vendor: KeY Project
+Export-Package: org.key_project.util.bean,
+ org.key_project.util.eclipse,
+ org.key_project.util.eclipse.job,
+ org.key_project.util.eclipse.swt,
+ org.key_project.util.eclipse.swt.dialog,
+ org.key_project.util.eclipse.swt.view,
+ org.key_project.util.eclipse.swt.viewer,
+ org.key_project.util.eclipse.swt.wizard.page,
+ org.key_project.util.eclipse.view.editorInView,
+ org.key_project.util.java,
+ org.key_project.util.java.collection,
+ org.key_project.util.java.thread,
+ org.key_project.util.jdt

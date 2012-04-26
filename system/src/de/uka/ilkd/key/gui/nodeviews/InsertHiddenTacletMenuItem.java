@@ -18,7 +18,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.rule.NoFindTaclet;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletGoalTemplate;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
 /**
  * This item groups all insert hidden taclets and offers a
@@ -28,6 +28,11 @@ import de.uka.ilkd.key.rule.TacletGoalTemplate;
 public class InsertHiddenTacletMenuItem extends InsertionTacletBrowserMenuItem {
     
    
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -2221016383998349319L;
+
     /**
      * creates an instance of the insert hidden menu item
      * @param parent the JFrame with the parent frame

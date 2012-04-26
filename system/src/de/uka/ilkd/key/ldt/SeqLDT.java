@@ -15,10 +15,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.EmptySeqLiteral;
-import de.uka.ilkd.key.java.expression.operator.SeqConcat;
-import de.uka.ilkd.key.java.expression.operator.SeqReverse;
-import de.uka.ilkd.key.java.expression.operator.SeqSingleton;
-import de.uka.ilkd.key.java.expression.operator.SeqSub;
+import de.uka.ilkd.key.java.expression.operator.adt.*;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
@@ -36,13 +33,15 @@ public final class SeqLDT extends LDT {
     //getters
     private final SortDependingFunction seqGet;
     private final Function seqLen;
+    private final Function seqIndexOf; 
     
     //constructors
     private final Function seqEmpty;
     private final Function seqSingleton;
     private final Function seqConcat;
     private final Function seqSub;
-    private final Function seqReverse;    
+    private final Function seqReverse;   
+    private final Function seqDef;
     
     
     public SeqLDT(Services services) {
@@ -53,7 +52,9 @@ public final class SeqLDT extends LDT {
         seqSingleton  = addFunction(services, "seqSingleton");
         seqConcat     = addFunction(services, "seqConcat");
         seqSub        = addFunction(services, "seqSub");
-        seqReverse    = addFunction(services, "seqReverse");        
+        seqReverse    = addFunction(services, "seqReverse");
+        seqIndexOf    = addFunction(services, "seqIndexOf");
+        seqDef         = addFunction(services, "seqDef");
     }
     
     
@@ -92,6 +93,11 @@ public final class SeqLDT extends LDT {
     }
 
     
+    public Function getSeqDef() {
+	return seqDef;
+    }
+
+    
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
                                  Term[] subs, 
@@ -119,7 +125,10 @@ public final class SeqLDT extends LDT {
 	return op instanceof SeqSingleton
 	       || op instanceof SeqConcat
 	       || op instanceof SeqSub
-	       || op instanceof SeqReverse;
+	       || op instanceof SeqReverse
+	       || op instanceof SeqIndexOf
+	       || op instanceof SeqGet
+	       || op instanceof SeqLength;
     }
 
 
@@ -142,6 +151,12 @@ public final class SeqLDT extends LDT {
 	    return seqSub;
 	} else if(op instanceof SeqReverse) {
 	    return seqReverse;
+	} else if(op instanceof SeqIndexOf) {
+	    return seqIndexOf;
+	} else if(op instanceof SeqGet){
+	    return seqGet;
+	} else if(op instanceof SeqLength){
+	    return seqLen;
 	}
 	assert false;
 	return null;
@@ -168,5 +183,10 @@ public final class SeqLDT extends LDT {
     public final Type getType(Term t) {
 	assert false;
 	return null;
+    }
+
+
+    public Function getSeqIndexOf() {
+	return seqIndexOf;
     }    
 }

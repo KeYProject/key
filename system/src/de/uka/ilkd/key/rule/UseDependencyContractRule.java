@@ -19,7 +19,7 @@ import java.util.Map;
 import javax.swing.JOptionPane;
 
 import de.uka.ilkd.key.collection.*;
-import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -360,7 +360,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	//open dialog
 	final TermStringWrapper heapWrapper 
 		= (TermStringWrapper)JOptionPane.showInputDialog(
-				Main.getInstance(),
+				MainWindow.getInstance(),
 				"Please select a base heap:",
 				"Instantiation",
 				JOptionPane.QUESTION_MESSAGE,
@@ -397,7 +397,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	
 	//choose a step
 	final PosInOccurrence step;
-	if(Main.getInstance().mediator().autoMode()) {
+	if(MainWindow.getInstance().getMediator().autoMode()) {
 	    step = findStepInIfInsts(steps, app, services);
 	    assert step != null 
 	           : "The strategy failed to properly "
@@ -486,7 +486,8 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	    return false;
 	}
 
-	//heap term of observer must be store-term
+	//heap term of observer must be store-term (or anon, create, 
+	//memset, ...)
 	final Services services = goal.proof().getServices();
 	if(!hasRawSteps(focus.sub(0), goal.sequent(), services)) {
 	    return false;
@@ -525,16 +526,24 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	final PosInOccurrence pio = ruleApp.posInOccurrence();	
         final Term focus = pio.subTerm();
         final ObserverFunction target = (ObserverFunction) focus.op();
-        final Term selfTerm = target.isStatic() ? null : focus.sub(1);
+ 
+        
+        final Term selfTerm;
+        final KeYJavaType kjt;
+
+        if (target.isStatic()) {
+            selfTerm = null; 
+            kjt = target.getContainerType();
+        } else {
+            selfTerm = focus.sub(1);
+            kjt = services.getJavaInfo().getKeYJavaType(selfTerm.sort());
+        }
+       
         ImmutableList<Term> paramTerms = ImmutableSLList.<Term>nil();
         for(int i = target.isStatic() ? 1 : 2, n = focus.arity(); i < n; i++) {
             paramTerms = paramTerms.append(focus.sub(i));
         }
-        final KeYJavaType kjt
-        	= target.isStatic() 
-		  ? target.getContainerType()
-	          : services.getJavaInfo().getKeYJavaType(selfTerm.sort());
-		   
+        
         //configure contract
         final DependencyContract contract;
         if(ruleApp instanceof ContractRuleApp) {
@@ -552,6 +561,14 @@ public final class UseDependencyContractRule implements BuiltInRule {
         				    goal.sequent(), 
         				    services, 
         				    (BuiltInRuleApp)ruleApp);
+        //create justification
+        final RuleJustificationBySpec just 
+                = new RuleJustificationBySpec(contract);
+        final ComplexRuleJustificationBySpec cjust
+                = (ComplexRuleJustificationBySpec)
+                    goal.proof().env().getJustifInfo().getJustification(this);
+        cjust.add(ruleApp, just);
+        
         if(baseHeapAndChangedLocs == null) {
             return goal.split(1);
         }
@@ -575,7 +592,8 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	}
         final Term pre = contract.getPre(baseHeapAndChangedLocs.first,
         	                         selfTerm, 
-        	                         paramTerms, 
+        	                         paramTerms,
+                                         null, 
         	                         services);
         final Term dep = contract.getDep(baseHeapAndChangedLocs.first, 
         				 selfTerm, 
@@ -603,14 +621,6 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	}        
         final Term cutFormula 
         	= TB.and(new Term[]{freePre, pre, disjoint, mbyOk});
-        
-        //create justification
-        final RuleJustificationBySpec just 
-        	= new RuleJustificationBySpec(contract);
-        final ComplexRuleJustificationBySpec cjust 
-            	= (ComplexRuleJustificationBySpec)
-            	    goal.proof().env().getJustifInfo().getJustification(this);
-        cjust.add(ruleApp, just);        
         
         //bail out if obviously not helpful
         if(!baseHeapAndChangedLocs.second.op().equals(locSetLDT.getEmpty())) {

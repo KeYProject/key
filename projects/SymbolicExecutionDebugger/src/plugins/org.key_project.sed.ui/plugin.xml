@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="org.key_project.sed.ui.perspective.SymbolicDebugPerspectiveFactory"
+            icon="icons/symbolic_debug.gif"
+            id="org.key_project.sed.ui.perspective"
+            name="Symbolic Debug">
+      </perspective>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="org.eclipse.jdt.ui.JavaPerspective">
+         <perspectiveShortcut
+               id="org.key_project.sed.ui.perspective">
+         </perspectiveShortcut>
+      </perspectiveExtension>
+      <perspectiveExtension
+            targetID="org.eclipse.jdt.ui.JavaHierarchyPerspective">
+         <perspectiveShortcut
+               id="org.key_project.sed.ui.perspective">
+         </perspectiveShortcut>
+      </perspectiveExtension>
+      <perspectiveExtension
+            targetID="org.eclipse.jdt.ui.JavaBrowsingPerspective">
+         <perspectiveShortcut
+               id="org.key_project.sed.ui.perspective">
+         </perspectiveShortcut>
+      </perspectiveExtension>
+      <perspectiveExtension
+            targetID="org.eclipse.debug.ui.DebugPerspective">
+         <perspectiveShortcut
+               id="org.key_project.sed.ui.perspective">
+         </perspectiveShortcut>
+      </perspectiveExtension>
+   </extension>
+      <extension
+            point="org.eclipse.ui.menus">
+         <menuContribution
+               allPopups="false"
+               locationURI="menu:org.eclipse.debug.ui.DebugView">
+            <menu
+                  id="org.key_project.sed.ui.symbolicDebugSubmenu"
+                  label="Symbolic Execution Debugger (SED)"
+                  mnemonic="S">
+               <dynamic
+                     class="org.key_project.sed.ui.menu.contribution.ToggleShowCompactSymbolicExecutionTreeContributionItem"
+                     id="org.key_project.sed.ui.symbolicDebugSubmenu.ToggleShowCompactSymbolicExecutionTreeContributionItem">
+               </dynamic>
+            </menu>
+         </menuContribution>
+      </extension>
+</plugin>

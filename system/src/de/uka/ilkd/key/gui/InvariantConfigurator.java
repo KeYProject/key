@@ -122,7 +122,7 @@ public class InvariantConfigurator {
              * Creates the Dialog
              */
             public InvariantDialog() throws RuleAbortException {
-                super(Main.getInstance(), true);
+                super(MainWindow.getInstance(), true);
 
                 // set Title and Layout
                 setTitle("Invariant Configurator");
@@ -223,21 +223,21 @@ public class InvariantConfigurator {
 
                 String[] loopInvStr = new String[3];
                 if (loopInv.getInvariant(loopInv.getInternalSelfTerm(), loopInv
-                        .getInternalHeapAtPre(), null) == null) {
+                        .getInternalHeapAtPre(), loopInv.getInternalSavedHeapAtPre(), null) == null) {
                     loopInvStr[0] = "true";
                 } else {
                     loopInvStr[0] = printTerm(loopInv.getInvariant(loopInv
                             .getInternalSelfTerm(), loopInv
-                            .getInternalHeapAtPre(), null));
+                            .getInternalHeapAtPre(), loopInv.getInternalSavedHeapAtPre(), null));
                 }
 
                 if (loopInv.getModifies(loopInv.getInternalSelfTerm(), loopInv
-                        .getInternalHeapAtPre(), null) == null) {
+                        .getInternalHeapAtPre(), loopInv.getInternalSavedHeapAtPre(),null) == null) {
                     loopInvStr[1] = "allLocs";
                 } else {
                     loopInvStr[1] = printTerm(loopInv.getModifies(loopInv
                             .getInternalSelfTerm(), loopInv
-                            .getInternalHeapAtPre(), null));
+                            .getInternalHeapAtPre(), loopInv.getInternalSavedHeapAtPre(),null));
                 }
 
                 if (loopInv.getVariant(loopInv.getInternalSelfTerm(), loopInv
@@ -649,7 +649,7 @@ public class InvariantConfigurator {
                 
                 
                result =  parser.parse(new StringReader(invariants.get(index)[0]), Sort.ANY, services, services.getNamespaces(),
-                Main.getInstance().mediator().getNotationInfo().getAbbrevMap());
+                MainWindow.getInstance().getMediator().getNotationInfo().getAbbrevMap());
 
                 return result;
             }
@@ -661,7 +661,7 @@ public class InvariantConfigurator {
                 // antlr
                 result = parser.parse(
                         new StringReader(invariants.get(index)[1]), Sort.ANY,
-                        services, services.getNamespaces(), Main.getInstance().mediator().getNotationInfo().getAbbrevMap());
+                        services, services.getNamespaces(), MainWindow.getInstance().getMediator().getNotationInfo().getAbbrevMap());
                 return result;
             }
 
@@ -672,7 +672,7 @@ public class InvariantConfigurator {
                 // antlr
                 result = parser.parse(
                         new StringReader(invariants.get(index)[2]), Sort.ANY,
-                        services, services.getNamespaces(), Main.getInstance().mediator().getNotationInfo().getAbbrevMap());
+                        services, services.getNamespaces(), MainWindow.getInstance().getMediator().getNotationInfo().getAbbrevMap());
                 return result;
             }
 

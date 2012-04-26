@@ -31,7 +31,7 @@ public class VariableReference extends JavaNonTerminalProgramElement
 
     public VariableReference(ExtList children) {
 	super(children);	
-	variable=(ProgramVariable)children.get(ProgramVariable.class);
+	variable=children.get(ProgramVariable.class);
     }
 
     public VariableReference(ProgramVariable variable, PositionInfo pi) {

@@ -17,6 +17,11 @@ import recoder.java.reference.TypeReference;
 //deepClone@AnnotationUseSpecification is called
 public class KeYAnnotationUseSpecification extends AnnotationUseSpecification {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 2163251956161988258L;
+
     public KeYAnnotationUseSpecification(){
         super();
     }

@@ -414,7 +414,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
 
         return new ProgramMethod(md, 
         	                 arrayType, 
-        			 null,
+        			 KeYJavaType.VOID_TYPE,
         			 PositionInfo.UNDEFINED,
         			 heapSort);
     }

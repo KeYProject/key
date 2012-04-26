@@ -10,13 +10,17 @@
 
 package de.uka.ilkd.key.gui.smt;
 
+import java.awt.Color;
 import java.awt.Component;
-import java.awt.ScrollPane;
 import java.util.Collection;
 
 import javax.swing.JDialog;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.Element;
 
 
 
@@ -46,17 +50,56 @@ public class InformationWindow extends JDialog {
        for(Information el : information){
 	  getTabbedPane().addTab(el.title, newTab(el)); 
        }
-       setSize(400, 300);
+       setSize(600, 500);
        this.getContentPane().add(getTabbedPane());
        this.setModalExclusionType(ModalExclusionType.APPLICATION_EXCLUDE);
+       this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+       this.setLocationByPlatform(true);
        this.setTitle(title);
        this.setVisible(true);
    }
    
    private Component newTab(Information information){
-       ScrollPane pane = new ScrollPane();
-       pane.add(new JTextArea(information.content));
-       return pane;
+	    final JTextArea lines = new JTextArea("1");
+	    final JTextArea content = new JTextArea();
+		 
+		lines.setBackground(Color.LIGHT_GRAY);
+		lines.setEditable(false);
+
+		content.getDocument().addDocumentListener(new DocumentListener(){
+			public String getText(){
+				int caretPosition = content.getDocument().getLength();
+				Element root = content.getDocument().getDefaultRootElement();
+				String text = "1" + System.getProperty("line.separator");
+				for(int i = 2; i < root.getElementIndex( caretPosition ) + 2; i++){
+					text += i + System.getProperty("line.separator");
+				}
+				return text;
+			}
+			@Override
+			public void changedUpdate(DocumentEvent de) {
+				lines.setText(getText());
+			}
+
+			@Override
+			public void insertUpdate(DocumentEvent de) {
+				lines.setText(getText());
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent de) {
+				lines.setText(getText());
+			}
+
+		});
+		content.setText(information.content);
+		JScrollPane pane = new JScrollPane();
+		pane.getViewport().add(content);
+		pane.setRowHeaderView(lines);
+		pane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+	   
+     
+        return pane;
    }
    
    

@@ -31,6 +31,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
             ImmutableSLList.<PositionedString>nil();
     private ImmutableList<PositionedString> assignable =
             ImmutableSLList.<PositionedString>nil();
+    private ImmutableList<PositionedString> assignable_backup =
+            ImmutableSLList.<PositionedString>nil();
     private ImmutableList<PositionedString> accessible =
             ImmutableSLList.<PositionedString>nil();
     private ImmutableList<PositionedString> ensures =
@@ -43,13 +45,6 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
             ImmutableSLList.<PositionedString>nil();
     private ImmutableList<PositionedString> depends =
             ImmutableSLList.<PositionedString>nil();
-    private ImmutableList<PositionedString> secureFor =
-            ImmutableSLList.<PositionedString>nil();
-    private ImmutableList<PositionedString> declassify =
-            ImmutableSLList.<PositionedString>nil();
-    private ImmutableList<PositionedString> declassifyVar =
-            ImmutableSLList.<PositionedString>nil();
-    private PositionedString name = new PositionedString("");
 
 
     public TextualJMLSpecCase(ImmutableList<String> mods,
@@ -61,7 +56,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
 
     public void addName(PositionedString n) {
-        this.name = n;
+        this.name = n.text;
     }
 
 
@@ -92,6 +87,15 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     public void addAssignable(ImmutableList<PositionedString> l) {
         assignable = assignable.append(l);
+    }
+
+    public void addAssignableBackup(PositionedString ps) {
+        assignable_backup = assignable_backup.append(ps);
+    }
+
+
+    public void addAssignableBackup(ImmutableList<PositionedString> l) {
+        assignable_backup = assignable_backup.append(l);
     }
 
 
@@ -135,36 +139,6 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
 
 
-    public void addSecureFor(PositionedString ps) {
-        secureFor = secureFor.append(ps);
-    }
-
-
-    public void addSecureFor(ImmutableList<PositionedString> l) {
-        secureFor = secureFor.append(l);
-    }
-
-
-    public void addDeclassify(PositionedString ps) {
-        declassify = declassify.append(ps);
-    }
-
-
-    public void addDeclassify(ImmutableList<PositionedString> l) {
-        declassify = declassify.append(l);
-    }
-
-
-    public void addDeclassifyVar(PositionedString ps) {
-        declassifyVar = declassifyVar.append(ps);
-    }
-
-
-    public void addDeclassifyVar(ImmutableList<PositionedString> l) {
-        declassifyVar = declassifyVar.append(l);
-    }
-
-
     public void setWorkingSpace(PositionedString ps) {
         workingSpace = ps;
     }
@@ -199,6 +173,9 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return assignable;
     }
 
+    public ImmutableList<PositionedString> getAssignableBackup() {
+        return assignable_backup;
+    }
 
     public ImmutableList<PositionedString> getAccessible() {
         return accessible;
@@ -210,7 +187,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
 
 
-    public PositionedString getName() {
+    public String getName() {
         return name;
     }
 
@@ -240,21 +217,6 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
 
 
-    public ImmutableList<PositionedString> getSecureFor() {
-        return secureFor;
-    }
-
-
-    public ImmutableList<PositionedString> getDeclassify() {
-        return declassify;
-    }
-
-
-    public ImmutableList<PositionedString> getDeclassifyVar() {
-        return declassifyVar;
-    }
-
-
     @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
@@ -268,6 +230,10 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         it = assignable.iterator();
         while (it.hasNext()) {
             sb.append("assignable: ").append(it.next()).append("\n");
+        }
+        it = assignable_backup.iterator();
+        while (it.hasNext()) {
+            sb.append("assignable_backup: ").append(it.next()).append("\n");
         }
         it = accessible.iterator();
         while (it.hasNext()) {
@@ -293,19 +259,6 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         while (it.hasNext()) {
             sb.append("depends: ").append(it.next()).append("\n");
         }
-        it = secureFor.iterator();
-        while (it.hasNext()) {
-            sb.append("saveFor: ").append(it.next()).append("\n");
-        }
-        it = declassify.iterator();
-        while (it.hasNext()) {
-            sb.append("declassify: ").append(it.next()).append("\n");
-        }
-        it = declassifyVar.iterator();
-        while (it.hasNext()) {
-            sb.append("declassifyVar: ").append(it.next()).append("\n");
-        }
-
         return sb.toString();
     }
 
@@ -320,15 +273,13 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                && behavior.equals(sc.behavior)
                && requires.equals(sc.requires)
                && assignable.equals(sc.assignable)
+               && assignable_backup.equals(sc.assignable_backup)
                && accessible.equals(sc.accessible)
                && ensures.equals(sc.ensures)
                && signals.equals(sc.signals)
                && signalsOnly.equals(sc.signalsOnly)
                && diverges.equals(sc.diverges)
-               && depends.equals(sc.depends)
-               && secureFor.equals(sc.secureFor)
-               && declassify.equals(sc.declassify)
-               && declassifyVar.equals(sc.declassifyVar);
+               && depends.equals(sc.depends);
     }
 
 
@@ -338,14 +289,12 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                + behavior.hashCode()
                + requires.hashCode()
                + assignable.hashCode()
+               + assignable_backup.hashCode()
                + accessible.hashCode()
                + ensures.hashCode()
                + signals.hashCode()
                + signalsOnly.hashCode()
                + diverges.hashCode()
-               + depends.hashCode()
-               + secureFor.hashCode()
-               + declassify.hashCode()
-               + declassifyVar.hashCode();
+               + depends.hashCode();
     }
 }

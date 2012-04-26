@@ -16,6 +16,8 @@ import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
+import de.uka.ilkd.key.util.MiscTools;
+
 public class KeYFileChooser {
 
     private final JFileChooser fileChooser;
@@ -24,6 +26,11 @@ public class KeYFileChooser {
 
     public KeYFileChooser(String initDir) {
 	fileChooser = new JFileChooser(new File(initDir)) {
+                /**
+         * 
+         */
+        private static final long serialVersionUID = -7598570660247063980L;
+
                 public void approveSelection() {
                     File file = getSelectedFile();
                     if (saveDialog && file.exists() &&

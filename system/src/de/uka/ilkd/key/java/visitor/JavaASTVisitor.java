@@ -16,6 +16,17 @@ import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.expression.PassiveExpression;
 import de.uka.ilkd.key.java.expression.literal.*;
 import de.uka.ilkd.key.java.expression.operator.*;
+import de.uka.ilkd.key.java.expression.operator.adt.AllFields;
+import de.uka.ilkd.key.java.expression.operator.adt.SeqConcat;
+import de.uka.ilkd.key.java.expression.operator.adt.SeqGet;
+import de.uka.ilkd.key.java.expression.operator.adt.SeqIndexOf;
+import de.uka.ilkd.key.java.expression.operator.adt.SeqLength;
+import de.uka.ilkd.key.java.expression.operator.adt.SeqReverse;
+import de.uka.ilkd.key.java.expression.operator.adt.SeqSingleton;
+import de.uka.ilkd.key.java.expression.operator.adt.SeqSub;
+import de.uka.ilkd.key.java.expression.operator.adt.SetMinus;
+import de.uka.ilkd.key.java.expression.operator.adt.SetUnion;
+import de.uka.ilkd.key.java.expression.operator.adt.Singleton;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -195,6 +206,27 @@ public abstract class JavaASTVisitor extends JavaASTWalker
     @Override
     public void performActionOnSeqReverse(SeqReverse x) {
 	doDefaultAction(x);
+    } 
+    
+    @Override
+    public void performActionOnDLEmbeddedExpression(DLEmbeddedExpression x) {
+        doDefaultAction(x);
+    }
+    
+
+    @Override
+    public void performActionOnSeqIndexOf(SeqIndexOf x) {
+	doDefaultAction(x);
+    }
+    
+    @Override
+    public void performActionOnSeqGet(SeqGet x){
+        doDefaultAction(x);
+    }
+    
+    @Override
+    public void performActionOnSeqLength(SeqLength x){
+        doDefaultAction(x);
     }
     
     @Override
@@ -799,4 +831,10 @@ public abstract class JavaASTVisitor extends JavaASTWalker
     public void performActionOnLoopInvariant(LoopInvariant x) {
         //do nothing
     }
+
+    @Override    
+    public void performActionOnTransactionStatement(TransactionStatement x) {
+    doDefaultAction(x);
+    }
+
 }

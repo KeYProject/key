@@ -16,6 +16,10 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 public class ExecCtxtSVWrapper extends ExecutionContext 
     implements KeYRecoderExtension, SVWrapper{
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 2299515454738715766L;
     SchemaVariable sv=null;
 
     

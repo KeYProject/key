@@ -50,6 +50,7 @@ public interface Contract extends SpecificationElement {
      */
     public Term getPre(ProgramVariable selfVar, 
 	    	       ImmutableList<ProgramVariable> paramVars,
+                       ProgramVariable savedHeapAtPreVar,
 	    	       Services services);
     
     /**
@@ -58,6 +59,7 @@ public interface Contract extends SpecificationElement {
     public Term getPre(Term heapTerm,
 	               Term selfTerm, 
 	    	       ImmutableList<Term> paramTerms,
+                       Term savedHeapAtPre,
 	    	       Services services);    
     
     
@@ -77,19 +79,6 @@ public interface Contract extends SpecificationElement {
 	               Services services);
     
     /**
-     * Returns another contract like this one but with the passed id.
-     */
-    public Contract setID(int id);
-    
-    /**
-     * Returns another contract like this one, except that it refers to the 
-     * passed target. 
-     */
-    public Contract setTarget(KeYJavaType newKJT,
-	    	              ObserverFunction newTarget,
-	    		      Services services);        
-            
-    /**
      * Returns the contract in pretty HTML format.
      */
     public String getHTMLText(Services services);
@@ -100,6 +89,8 @@ public interface Contract extends SpecificationElement {
      * specified directly in DL, but not for JML contracts)
      */
     public boolean toBeSaved();
+
+    public boolean transactionContract();
     
     /**
      * Returns a parseable String representation of the contract. 
@@ -113,4 +104,23 @@ public interface Contract extends SpecificationElement {
      */
     public ProofOblInput createProofObl(InitConfig initConfig,
 	    Contract contract);
+    
+    /**
+     * Returns a contract which is identical this contract except that
+     * the id is set to the new id.
+     */
+    public Contract setID(int newId);
+    
+    
+    /**
+     * Returns a contract which is identical this contract except that
+     * the KeYJavaType and ObserverFunction are set to the new values.
+     */
+    public Contract setTarget(KeYJavaType newKJT, ObserverFunction newPM);
+    
+    
+    /**
+     * Returns technical name for the contract type.
+     */
+    public String getTypeName();
 }

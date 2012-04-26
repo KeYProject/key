@@ -56,7 +56,7 @@ public class LabeledStatement extends JavaStatement
 	super(children, pos);
 	name=label;	        
 
-	body=(Statement)children.get(Statement.class);
+	body=children.get(Statement.class);
         prefixElementArray = computePrefix(body);
         
         // otherwise it will crash later

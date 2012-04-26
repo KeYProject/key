@@ -46,6 +46,12 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationException;
  */
 public final class JMLTransformer extends RecoderModelTransformer {
     
+    /**
+     * JML markers left and right.
+     */
+    private static final String JML = "/*@";
+    private static final String JMR = "@*/";
+
     private static final ImmutableList<String> javaMods
         = ImmutableSLList.<String>nil().prepend(new String[]{"abstract",
                                                          "final", 
@@ -148,7 +154,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
      * in JML markers.
      */
     private String getJMLModString(ImmutableList<String> mods) {
-        StringBuffer sb = new StringBuffer("/*@");
+        StringBuffer sb = new StringBuffer(JML);
         
         for(String mod : mods) {
             if(!javaMods.contains(mod)) {
@@ -156,7 +162,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
             }
         }
         
-        sb.append("@*/");
+        sb.append(JMR);
         return sb.toString();
     }
     
@@ -251,8 +257,12 @@ public final class JMLTransformer extends RecoderModelTransformer {
             }
         }
         if(!(isGhost || isModel)) {
+            String s = decl.getDecl().text;
+            s = s.substring(0, s.indexOf(' '));
             throw new SLTranslationException(
-                            "JML field declaration has to be ghost or model!",
+                            "Could not translate JML specification. "+
+                            "You have either tried to use an unsupported keyword ("+s +") "+
+                            "or a JML field declaration without a ghost or model modifier.",
                             declWithMods.fileName,
                             declWithMods.pos);
         }        
@@ -273,7 +283,12 @@ public final class JMLTransformer extends RecoderModelTransformer {
 
                 if(decl.getMods().contains("instance")) {
                     fieldDecl = new FieldDeclaration((FieldDeclaration)fieldDecl) {
-                	@Override
+                	/**
+                         * 
+                         */
+                        private static final long serialVersionUID = -5013131875224970650L;
+
+                    @Override
                 	public boolean isStatic() {
                 	    return false;
                 	}

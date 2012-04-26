@@ -24,7 +24,7 @@ import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletBuilder;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 
 /**
  * an instance of this class describes the initial configuration of the prover.

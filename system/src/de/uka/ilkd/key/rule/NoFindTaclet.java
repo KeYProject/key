@@ -10,6 +10,8 @@
 
 package de.uka.ilkd.key.rule;
 
+import de.uka.ilkd.key.rule.tacletbuilder.NoFindTacletBuilder;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;

@@ -10,59 +10,75 @@
 
 package de.uka.ilkd.key.taclettranslation;
 
-
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Visitor;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.FindTaclet;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
 
 public abstract class TacletVisitor extends Visitor {
+        private String failureDescription = null;
 
-    /** collects all variables in a Semisequent 
-     * @param semiseq the Semisequent to visit
-     */
-    private void visit(Semisequent semiseq) {
-        for (SequentFormula aSemiseq : semiseq) {
-            aSemiseq.formula().execPostOrder(this);
-        }
-    }
-
-    /** goes through the given sequent an collects all vars found
-     * @param seq the Sequent to visit
-     */
-    public void visit(Sequent seq) {
-	visit(seq.antecedent());
-	visit(seq.succedent());
-    }
-
-    /** collects all variables in a Taclet
-     * @param taclet the Taclet where the variables have to be collected to
-     * @param visitAddrules a boolean that contols if the addrule sections are
-     * to be ignored (iff false) or if the visitor descends into them (iff true) 
-     */
-    public void visit(Taclet taclet, boolean visitAddrules) {
-	visit(taclet.ifSequent());
-	if (taclet instanceof FindTaclet) {
-	    (((FindTaclet)taclet).find()).execPostOrder(this);
-	}
-        for (TacletGoalTemplate tacletGoalTemplate : taclet.goalTemplates()) {
-            TacletGoalTemplate gt = tacletGoalTemplate;
-            visit(gt.sequent());
-            if (gt instanceof RewriteTacletGoalTemplate) {
-                ((RewriteTacletGoalTemplate) gt).replaceWith().execPostOrder(this);
-            } else {
-                if (gt instanceof AntecSuccTacletGoalTemplate) {
-                    visit(((AntecSuccTacletGoalTemplate) gt).replaceWith());
+        private void visit(Semisequent semiseq) {
+                for (SequentFormula aSemiseq : semiseq) {
+                        aSemiseq.formula().execPostOrder(this);
                 }
-            }
-            if (visitAddrules) {
-                for (Taclet taclet1 : gt.rules()) {
-                    visit(taclet1, true);
-                }
-            }
         }
-    }
+
+
+        public void visit(Sequent seq) {
+                visit(seq.antecedent());
+                visit(seq.succedent());
+        }
+
+        public String visit(Taclet taclet, boolean visitAddrules) {
+                visit(taclet.ifSequent());
+                visitFindPart(taclet);
+                visitGoalTemplates(taclet, visitAddrules);
+                return failureDescription;
+        }
+        
+        public String visit(Taclet taclet){
+                return visit(taclet,false);
+        }
+        
+        protected final void failureOccurred(String description){
+                failureDescription = description;
+        }
+
+        protected void visitFindPart(Taclet taclet) {
+                if (taclet instanceof FindTaclet) {
+                        (((FindTaclet) taclet).find()).execPostOrder(this);
+                }
+        }
+
+        protected void visitGoalTemplates(Taclet taclet, boolean visitAddrules) {
+                for (TacletGoalTemplate tacletGoalTemplate : taclet
+                                .goalTemplates()) {
+                        TacletGoalTemplate gt = tacletGoalTemplate;
+                        visit(gt.sequent());
+                        if (gt instanceof RewriteTacletGoalTemplate) {
+                                ((RewriteTacletGoalTemplate) gt).replaceWith()
+                                                .execPostOrder(this);
+                        } else {
+                                if (gt instanceof AntecSuccTacletGoalTemplate) {
+                                        visit(((AntecSuccTacletGoalTemplate) gt)
+                                                        .replaceWith());
+                                }
+                        }
+                        if (visitAddrules) {
+                                for (Taclet taclet1 : gt.rules()) {
+                                        visit(taclet1, true);
+                                }
+                        }
+                }
+        }
+
+
 
 }

@@ -16,7 +16,7 @@
 Uses code by Hans Muller and Kathy Walrath from
 http://java.sun.com/products/jfc/tsc/articles/threads/threads2.html
 
-*/
+ */
 
 
 package de.uka.ilkd.key.gui;
@@ -25,67 +25,178 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
-
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.gui.configuration.StrategySettings;
-import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.proofevent.NodeReplacement;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.Debug;
 
 /**
- * Applies rules in an automated fashion in a separate thread.
+ * Applies rules in an automated fashion.
+ * The caller should ensure that the strategy runs in its one thread
  */
 public class ApplyStrategy {
 
+    /** 
+     * Instances of this class are used to store if a rule could be applied automatically and if not 
+     * to store the reason why no rule applications could be performed. Because of performance reason the
+     * success case returns the singleton {@link SingleRuleApplicationInfo#SUCCESS} 
+     */
+    private static class SingleRuleApplicationInfo {
+
+        static final SingleRuleApplicationInfo SUCCESS = new SingleRuleApplicationInfo() {
+            public boolean isSuccess() {
+                return true;
+            }
+        };
+
+        private final String message;
+        private final Goal nonCloseableGoal;
+
+        private SingleRuleApplicationInfo() {
+            message = "Rule applied successful";
+            nonCloseableGoal = null;
+        }
+
+        SingleRuleApplicationInfo(String message, Goal nonCloseableGoal) {
+            this.message = message;
+            this.nonCloseableGoal = nonCloseableGoal;            
+        }
+
+
+        public boolean isSuccess() {
+            return false;
+        }
+
+        public Goal getGoal() {
+            return nonCloseableGoal;
+        }
+
+        public String message() {
+            return message;
+        }
+
+    }
+
+    /** The final result of the strategy application is stored in this container
+     * and returned to the instance that started the strategies.
+     * 
+     * It contains statistic information about the number of applied rules, time needed or 
+     * number of closed goals. In case teh rule application stopped at a non closeable goal,
+     * this goal is also stored to allow the caller to e.g. present it to the user for interaction.
+     * 
+     * In case of an unexpected, the thrown exception can be also retrieved from this container.
+     */
+    public static class ApplyStrategyInfo {
+        private final String message;        
+        private final Goal nonCloseableGoal;
+
+        private final Throwable error;
+
+        private final long time;
+        private final int appliedRuleAppsCount;
+        private final int nrClosedGoals;
+        private final Proof proof;
+
+        public ApplyStrategyInfo(String message, Proof proof, Throwable error, Goal nonCloseableGoal, 
+                long time, int appliedRuleAppsCount, int nrClosedGoals) {
+            this.message = message;
+            this.proof = proof;
+            this.error   = error;
+            this.nonCloseableGoal = nonCloseableGoal;
+            this.time    = time;
+            this.appliedRuleAppsCount = appliedRuleAppsCount;
+            this.nrClosedGoals = nrClosedGoals;
+        }
+
+        public String reason() {
+            return message;
+        }
+
+        public Goal nonCloseableGoal() {
+            return nonCloseableGoal;
+        }
+
+        public boolean isError() {
+            return error != null;
+        }
+
+        public Throwable getException() {
+            return error;
+        }
+
+        public long getTime() {
+            return time;
+        }
+
+        public int getClosedGoals() {
+            return nrClosedGoals;
+        }
+
+        public int getAppliedRuleApps() {
+            return appliedRuleAppsCount;
+        }
+        
+        public Proof getProof() {
+            return proof;
+        }
+
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Apply Strategy Info:");
+            sb.append("\n Message: " + message);
+            sb.append("\n Error:" + isError());
+            if (isError()) {
+                sb.append("\n "+error.getMessage());
+            }
+            sb.append("\n Applied Rules: "+appliedRuleAppsCount);
+            sb.append("\n Time: "+time);
+            sb.append("\n Closed Goals: "+nrClosedGoals);
+            return sb.toString();
+        }
+
+    }
+
     private static final String PROCESSING_STRATEGY = "Processing Strategy";
-    
-    private KeYMediator medi;
+
     /** the proof that is worked with */ 
     private Proof proof;
     /** the maximum of allowed rule applications */
     private int maxApplications;
-    
+
     /** chooses goals to which rules are applied*/
     private IGoalChooser goalChooser;
-    
-    private SwingWorker worker;
-    
+
     /** number of rules automatically applied */
     private int countApplied = 0;
     private long time;
-    
+
     /** interrupted by the user? */
     private boolean autoModeActive = false;
 
-    private boolean startedAsInteractive;
-    
     private List<ProverTaskListener> proverTaskObservers = new ArrayList<ProverTaskListener> ();
 
     /** time in ms after which rule application shall be aborted, -1 disables timeout */
     private long timeout = -1;
 
-    
+    private boolean stopAtFirstNonCloseableGoal;
+
+    protected int closedGoals;
+
+
     // Please create this object beforehand and re-use it.
     // Otherwise the addition/removal of the InteractiveProofListener
     // can cause a ConcurrentModificationException during ongoing operation
-    public ApplyStrategy(KeYMediator medi) {
-	    this.medi = medi;
-        medi.addRuleAppListener( new ProofListener() );        
+    public ApplyStrategy(IGoalChooser goalChooser) {
+        this.goalChooser = goalChooser;
     }
-    
-    
 
     /** applies rules that are chosen by the active strategy 
      * @return true iff a rule has been applied, false otherwise
      */
-    private synchronized boolean applyAutomaticRule () {
+    private synchronized SingleRuleApplicationInfo applyAutomaticRule (boolean stopAtFirstNonClosableGoal) {
         // Look for the strategy ...
         RuleApp               app = null;
         Goal                  g;
@@ -93,41 +204,26 @@ public class ApplyStrategy {
             app = g.getRuleAppManager().next();
             //Hack: built in rules may become applicable without BuiltInRuleAppIndex noticing---->
             if(app == null) {
-        	g.ruleAppIndex().scanBuiltInRules(g);
-        	app = g.getRuleAppManager().next();
+                g.ruleAppIndex().scanBuiltInRules(g);
+                app = g.getRuleAppManager().next();
             }
             //<-------
 
-            if (app == null) {
-        	if (medi.getProof().getSettings().getStrategySettings()
-                                   .getActiveStrategyProperties().getProperty(
-                                    StrategyProperties.STOPMODE_OPTIONS_KEY)
-                            .equals(StrategyProperties.STOPMODE_NONCLOSE)) {
-                    // iff Stop on non-closeable Goal is selected a little
-                    // popup is generated and proof is stopped
-                    JOptionPane pane = new JOptionPane(
-                            "Couldn't close Goal Nr. "
-                                    + g.node().serialNr()
-                                    + " automatically",
-                            JOptionPane.INFORMATION_MESSAGE,
-                            JOptionPane.DEFAULT_OPTION);
-                    JDialog dialog = pane.createDialog(medi.mainFrame(),
-                            "The KeY Project");
-                    dialog.setVisible(true);
-                    medi.goalChosen(g);
-                    return false;
-        	}
-        	goalChooser.removeGoal(g);
+            if (app == null) {        	
+                if (stopAtFirstNonClosableGoal) {
+                    return new SingleRuleApplicationInfo("Could not close goal.", g);      
+                }
+                goalChooser.removeGoal(g);
             } else {
-        	break;
+                break;
             }
         }
-        if (app == null) {
-            return false;      
+         if (app == null) {          
+            return new SingleRuleApplicationInfo("No more rules automatically applicable to any goal.", g);      
         } else {
             assert g != null;
             g.apply(app);
-            return true;
+            return SingleRuleApplicationInfo.SUCCESS;
         }
     }
 
@@ -136,33 +232,45 @@ public class ApplyStrategy {
      * applies rules until this is no longer
      * possible or the thread is interrupted.
      */
-    Object doWork() {
-        mediator().resetNrGoalsClosedByHeuristics();
+    synchronized Object doWork() {
         time = System.currentTimeMillis();
+        SingleRuleApplicationInfo srInfo = null;
         try{
-	   Debug.out("Strategy started.");
-	   while (!maxRuleApplicationOrTimeoutExceeded()) {     
-               if (!applyAutomaticRule()) {
-                   // no more rules applicable
-                   break;
-               }
-               countApplied++;
-               fireTaskProgress ();
-               if (Thread.interrupted()) throw new InterruptedException();
-	   }
+            Debug.out("Strategy started.");
+            boolean timeoutOrMaxSteps = maxRuleApplicationOrTimeoutExceeded();
+
+            while (!timeoutOrMaxSteps) {     
+                srInfo = applyAutomaticRule(stopAtFirstNonCloseableGoal); 
+                if (!srInfo.isSuccess()) {                    
+                    return new ApplyStrategyInfo(srInfo.message(), proof, null,
+                            srInfo.getGoal(), System.currentTimeMillis()-time, countApplied, closedGoals);
+                }
+                countApplied++;
+                fireTaskProgress ();
+                if (Thread.interrupted()) { 
+                    throw new InterruptedException();
+                }                
+                timeoutOrMaxSteps = maxRuleApplicationOrTimeoutExceeded();
+            }
+            if (timeoutOrMaxSteps) {
+                return new ApplyStrategyInfo("Maximal number of rule applicatins reached or timed out.", proof, null, 
+                        (Goal) null, System.currentTimeMillis()-time, countApplied, closedGoals);
+            }
         } catch (InterruptedException e) {
-            return "Interrupted";  // SwingWorker.get() returns this
+            return new ApplyStrategyInfo("Interrupted.", proof, null, 
+                    goalChooser.getNextGoal(), System.currentTimeMillis()-time, countApplied, closedGoals);
         } catch (Throwable t) { // treated later in finished()
             System.err.println(t);
             t.printStackTrace();
-            return "Error";
-	} finally{
-	    time = System.currentTimeMillis()-time;
-	    Debug.out("Strategy stopped.");
-	    Debug.out("Applied ", countApplied);
-	    Debug.out("Time elapsed: ", time);
+            return new ApplyStrategyInfo("Error.", proof, t, null, System.currentTimeMillis()-time, countApplied, closedGoals);
+        } finally{
+            time = System.currentTimeMillis()-time;
+            Debug.out("Strategy stopped.");
+            Debug.out("Applied ", countApplied);
+            Debug.out("Time elapsed: ", time);
         }
-        return "Done.";
+        assert srInfo != null;
+        return new ApplyStrategyInfo(srInfo.message(), proof, null, srInfo.getGoal(), time, countApplied, closedGoals);
     }
 
 
@@ -181,14 +289,14 @@ public class ApplyStrategy {
     private synchronized void fireTaskStarted () {
         for (int i = 0, sz = proverTaskObservers.size(); i<sz; i++) {
             proverTaskObservers.get(i)
-                .taskStarted(PROCESSING_STRATEGY, maxApplications);
+            .taskStarted(PROCESSING_STRATEGY, maxApplications);
         }
     }
 
     private synchronized void fireTaskProgress () {
         for (int i = 0, sz = proverTaskObservers.size(); i<sz; i++) {
             proverTaskObservers.get(i)
-                .taskProgress(countApplied);
+            .taskProgress(countApplied);
         }
     }
 
@@ -199,53 +307,66 @@ public class ApplyStrategy {
     }
 
 
-    private void init(Proof proof, ImmutableList<Goal> goals, int maxSteps, long timeout) {
-        this.proof = proof;
+    private void init(Proof newProof, ImmutableList<Goal> goals, int maxSteps, long timeout) {
+        this.proof      = newProof;
         maxApplications = maxSteps;
-        this.timeout = timeout;
-        countApplied = 0; 
-        StrategySettings sSettings =proof.getSettings().getStrategySettings();
-       	medi.getProfile().setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);//XXX
-
-	this.goalChooser = medi.getProfile().getSelectedGoalChooserBuilder().create();//Use this independently of StrategyProperties.GOALCHOOSER_OPTIONS_KEY
-
-        goalChooser.init ( proof, goals );
+        this.timeout    = timeout;
+        countApplied    = 0; 
+        closedGoals     = 0;        
+        goalChooser.init ( newProof, goals );
         setAutoModeActive(true);
-        startedAsInteractive = !mediator().autoMode();
-        if ( startedAsInteractive ) {
-            mediator().stopInterface(true);
-        }
-        mediator().setInteractive(false);
+
         fireTaskStarted ();
     }
+
     
-
-    private KeYMediator mediator() {
-        return medi;
-    }
-    
-
-
-    public void start(Proof proof, ImmutableList<Goal> goals, int maxSteps, long timeout) {
+    public ApplyStrategyInfo start(Proof proof, ImmutableList<Goal> goals, int maxSteps, long timeout, boolean stopAtFirstNonCloseableGoal) {
         assert proof != null;
+
+        this.stopAtFirstNonCloseableGoal = stopAtFirstNonCloseableGoal; 
+
+        ProofTreeListener treeListener = new ProofTreeAdapter() {            
+            @Override
+            public void proofGoalsAdded(ProofTreeEvent e) {
+                ImmutableList<Goal> newGoals = e.getGoals();
+                // Check for a closed goal ...
+                if (newGoals.size() == 0){
+                    // No new goals have been generated ...
+                    closedGoals++;
+                }
+            }            
+        };
+
+        proof.addProofTreeListener(treeListener);
+
         init(proof, goals, maxSteps, timeout);
 
-        worker = new AutoModeWorker();
-        worker.start();
+        ProofListener pl = new ProofListener();
+        Goal.addRuleAppListener( pl );        
+
+        ApplyStrategyInfo result = null;
+        try {  
+            result = (ApplyStrategyInfo) doWork();
+        } finally {
+            proof.removeProofTreeListener(treeListener);
+            Goal.removeRuleAppListener(pl);            
+            setAutoModeActive(false);
+        }
+
+        if (result != null) {
+            if (proof != null) { // Maybe the proof was removed from the proof list and #clear() has set the proof reference to null. It is possible because this statement is executed after MainWindow#frozen is set to false.
+                proof.addAutoModeTime(result.getTime());
+            }
+            
+            fireTaskFinished (new DefaultTaskFinishedInfo(this, result, 
+                    proof, result.getTime(), 
+                    result.getAppliedRuleApps(), result.getClosedGoals()));
+        }
+
+        return result;
     }
 
-    /**
-     * Called by the "Stop" button, interrupts the worker thread 
-     * which is running this.doWork().  Note that the doWork() 
-     * method handles InterruptedExceptions cleanly.
-     */
-    public void stop () {
-        if(worker!=null){
-            worker.interrupt();
-        }
-    }
-    
-    
+
     public synchronized void addProverTaskObserver(ProverTaskListener observer) {
         proverTaskObservers.add(observer);
     }
@@ -255,89 +376,31 @@ public class ApplyStrategy {
     }
 
 
-    
-    /* Invoking start() on the SwingWorker causes a new Thread
-     * to be created that will call construct(), and then
-     * finished().  Note that finished() is called even if
-     * the worker is interrupted because we catch the
-     * InterruptedException in doWork().
-     */
-    private class AutoModeWorker extends SwingWorker {
-         
-        public Object construct() {
-            return  doWork();
-        }
-
-        public void finished() {
-            setAutoModeActive(false);	               
-            
-            final Object result = get ();
-
-            if ("Error".equals ( result )) {
-                mediator ().startInterface ( true );                        
-                mediator ().notify
-                (new GeneralFailureEvent("An exception occurred during" 
-                        + " strategy execution."));  
-            } else {
-                if (startedAsInteractive){
-                    if (medi.getProof().getSettings().getStrategySettings()
-			.getActiveStrategyProperties().getProperty(
-			       StrategyProperties.STOPMODE_OPTIONS_KEY)
-			.equals(StrategyProperties.STOPMODE_NONCLOSE)){
-			Goal g = mediator().getSelectedGoal();
-			mediator().startInterface(true);
-			if(g != null) {
-			    mediator().goalChosen(g);
-			}
-		    }else{
-			mediator().startInterface(true);
-			Goal g = goalChooser.getNextGoal();
-			if(g == null) {
-			    g = proof.openGoals().head();
-			}
-			if(g != null) {
-			    mediator().goalChosen(g);
-			}
-		    }
-		}
-            }
-            proof.addAutoModeTime(time);
-            fireTaskFinished (new DefaultTaskFinishedInfo(ApplyStrategy.this, result, 
-                    proof, time, 
-                    countApplied, mediator().getNrGoalsClosedByAutoMode()));	  
-
-            mediator().resetNrGoalsClosedByHeuristics();
-            
-            mediator().setInteractive( true );  
-        }
-    }
-    
     private class ProofListener implements RuleAppListener {
-    
-	/** invoked when a rule has been applied */
-	public void ruleApplied(ProofEvent e) {
-            if (!isAutoModeActive() || e.getSource() != proof) return;            
-	    RuleAppInfo rai = e.getRuleAppInfo ();
-	    if ( rai == null )
-		return;
 
-	    synchronized ( ApplyStrategy.this ) {
-		ImmutableList<Goal>                newGoals = ImmutableSLList.<Goal>nil();
-		Iterator<NodeReplacement> it       = rai.getReplacementNodes ();
-		Node                      node;
-		Goal                      goal;          
-                
-		while ( it.hasNext () ) {
-		    node = it.next ().getNode ();
-		    goal = proof.getGoal ( node );
-		    if ( goal != null )
-			newGoals = newGoals.prepend ( goal );
-		}
+        /** invoked when a rule has been applied */
+        public void ruleApplied(ProofEvent e) {
+            if (!isAutoModeActive() || e.getSource() != proof) return;            
+            RuleAppInfo rai = e.getRuleAppInfo ();
+            if ( rai == null )
+                return;
+
+            synchronized ( ApplyStrategy.this ) {
+                ImmutableList<Goal>                newGoals = ImmutableSLList.<Goal>nil();
+                Iterator<NodeReplacement> it       = rai.getReplacementNodes ();
+                Node                      node;
+                Goal                      goal;          
+
+                while ( it.hasNext () ) {
+                    node = it.next ().getNode ();
+                    goal = proof.getGoal ( node );
+                    if ( goal != null )
+                        newGoals = newGoals.prepend ( goal );
+                }
 
                 goalChooser.updateGoalList ( rai.getOriginalNode (), newGoals );
-	    }
-	}
-	
+            }
+        }
     }
 
     public boolean isAutoModeActive() {
@@ -352,7 +415,6 @@ public class ApplyStrategy {
      * When a proof obligation is abandoned all references to the proof must be reset.
      * @author gladisch */
     public void clear(){
-        stop();
         proof = null;
         if(goalChooser!=null){
             goalChooser.init(null, ImmutableSLList.<Goal>nil());

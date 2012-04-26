@@ -1,0 +1,25 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Visual DbC Examples Test
+Bundle-SymbolicName: de.hentschel.visualdbc.example.test
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: de.hentschel.visualdbc.example.test.Activator
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.core.resources;bundle-version="3.6.1",
+ org.eclipse.ui.intro;bundle-version="3.4.0",
+ org.eclipse.emf;bundle-version="2.6.0",
+ org.junit4;bundle-version="4.8.1",
+ org.eclipse.swtbot.go;bundle-version="2.0.4",
+ org.key_project.swtbot.swing;bundle-version="1.0.0",
+ org.key_project.util;bundle-version="1.0.0",
+ org.key_project.util.test;bundle-version="1.0.0",
+ de.hentschel.visualdbc.dbcmodel;bundle-version="1.0.0",
+ de.hentschel.visualdbc.dataSource.key;bundle-version="1.0.0",
+ de.hentschel.visualdbc.generation.ui.test;bundle-version="1.0.0",
+ de.hentschel.visualdbc.example;bundle-version="1.0.0"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: de.hentschel.visualdbc.example.test.suite,
+ de.hentschel.visualdbc.example.test.suite.swtbot
+Bundle-Vendor: Martin Hentschel

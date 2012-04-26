@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         name="DbCDiagramLayoutProvider"
+         point="org.eclipse.gmf.runtime.diagram.ui.layoutProviders">
+      <layoutProvider
+            class="de.hentschel.visualdbc.dbcmodel.diagram.custom.layout.DbcDiagramLayoutProvider">
+         <Priority
+               name="High">
+         </Priority>
+      </layoutProvider>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="de.hentschel.visualdbc.dbcmodel.diagram.general"
+            class="de.hentschel.visualdbc.dbcmodel.diagram.custom.preference.DbCModelLayoutPreferencePage"
+            id="de.hentschel.visualdbc.dbcmodel.diagram.custom.preference.DbCModelPreferencePage"
+            name="Layout">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="de.hentschel.visualdbc.dbcmodel.diagram.custom.util.CustomPreferencesInitializer">
+      </initializer>
+   </extension>
+</plugin>

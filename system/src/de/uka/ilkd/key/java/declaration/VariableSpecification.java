@@ -100,7 +100,7 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
 				  int dim, Type type) {
 	super(children);
 	this.var    = var;
-	initializer = (Expression)children.get(Expression.class);
+	initializer = children.get(Expression.class);
 	dimensions  = dim;
 	this.type   = type;
     }

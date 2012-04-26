@@ -11,13 +11,13 @@
 package de.uka.ilkd.key.util;
 
 
-import java.util.EventObject;
+import java.util.*;
 
 
 public class KeYRecoderExcHandler extends KeYExceptionHandlerImpl 
                                   implements recoder.service.ErrorHandler {
 
-    private ExtList recoderExceptions = new ExtList();
+    private List<Throwable> recoderExceptions = new LinkedList<Throwable>();
     private int recoderErrorCount = 0;
     private int recoderErrorThreshold;
     
@@ -46,17 +46,22 @@ public class KeYRecoderExcHandler extends KeYExceptionHandlerImpl
     @Override    
     public void clear() {
 	super.clear();
-	recoderExceptions = new ExtList();
+	recoderExceptions = new LinkedList<Throwable>();
 	recoderErrorCount = 0;
     }
     
 
     @Override    
-    public ExtList getExceptions() {
-	ExtList excList = new ExtList();
-	if (!(exceptions==null))excList.addAll(exceptions);
-	if (!(recoderExceptions==null))excList.addAll(recoderExceptions);
-	return excList;
+    public List<Throwable> getExceptions() {
+        List<Throwable> result = new LinkedList<Throwable>();
+        
+        if(exceptions != null)
+            result.addAll(exceptions);
+        
+        if(recoderExceptions != null)
+            result.addAll(recoderExceptions);
+        
+	return result;
     }
 
     
@@ -85,7 +90,7 @@ public class KeYRecoderExcHandler extends KeYExceptionHandlerImpl
         String msg = "Recoder: " + recoderErrorCount + " errors have occurred - aborting.";
 	recoderErrorCount = 0;
         ExceptionHandlerException ex = new ExceptionHandlerException(msg);
-        ex.initCause((Throwable)recoderExceptions.getFirst());
+        ex.initCause(recoderExceptions.get(0));
         recoderExceptions.clear();
         
         throw ex;

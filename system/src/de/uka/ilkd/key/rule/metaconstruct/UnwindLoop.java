@@ -27,16 +27,12 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  *   i++
  * }  
  * </code> becomes 
- * <code>
- * l1: { 
- *   if (i<10) { i++} 
- *        else break l1;
- * l2: {
- *   while ( i<10 ) {
- *     i++
+ * if (i<10) 
+ *   l1:{
+ *      l2:{ i++; }
+ *      while (i<10) { i++; }
  *   }
- * }}  
- * </code> becomes          
+ *
  */
 public class UnwindLoop extends ProgramTransformer {
 

@@ -91,7 +91,7 @@ public abstract class VariableDeclaration
      */
     public VariableDeclaration(ExtList children, boolean parentIsInterfaceDeclaration) { 
         super(children);
-	typeReference = (TypeReference)children.get(TypeReference.class);
+	typeReference = children.get(TypeReference.class);
 	this.parentIsInterfaceDeclaration = parentIsInterfaceDeclaration;
     }
 

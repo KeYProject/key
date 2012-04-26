@@ -13,6 +13,10 @@ package de.uka.ilkd.key.parser;
 class UnfittingReplacewithException 
     extends antlr.SemanticException {
     
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -497885048593588941L;
     private String description;
     
     public UnfittingReplacewithException(String description,

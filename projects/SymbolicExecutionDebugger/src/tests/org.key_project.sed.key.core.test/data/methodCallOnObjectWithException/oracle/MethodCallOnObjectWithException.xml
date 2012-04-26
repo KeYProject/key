@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget xml:id="_be901e76-1ad9-4f21-b15f-1a1d90b2d3b1" name="MethodCallOnObjectWithException[MethodCallOnObjectWithException::main()].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_c48917d9-89ee-41a6-ae82-38aba4cf4a75" name="KeY Default Thread">
+         <sedMethodCall xml:id="_ad9333f2-f6c0-43cf-b008-6469e325377a" name="MethodCallOnObjectWithException.main();" lineNumber="-1" charStart="69" charEnd="73">
+            <sedStatement xml:id="_d2c0472f-9841-4f95-9446-4dba5b1747b1" name="MethodCallOnObjectWithException x = new MethodCallOnObjectWithException ();" lineNumber="-1" charStart="91" charEnd="165">
+               <sedBranchCondition xml:id="_9742f323-d651-4b5f-8fa0-3ae9f931053f" name="Normal Execution (m != null)">
+                  <sedStatement xml:id="_d20ae074-ba0b-4b70-8ea3-75bea316ccfc" name="return x.doSomething();" lineNumber="-1" charStart="170" charEnd="193">
+                     <sedBranchCondition xml:id="_839ef769-f89a-450b-ad88-61eaa4729c4f" name="Normal Execution (x != null)">
+                        <sedMethodCall xml:id="_f83f63d9-ceed-4e7e-a7e6-8716333d8cbf" name="x.doSomething();" lineNumber="-1" charStart="364" charEnd="375">
+                           <sedStatement xml:id="_a6d8ee1b-6298-43ec-a42e-c4a92fc87e38" name="MethodCallOnObjectWithException x = null;" lineNumber="-1" charStart="383" charEnd="424">
+                              <sedStatement xml:id="_4c8f89f7-34e2-4436-83c9-480218e9a71d" name="return x_3.return42();" lineNumber="-1" charStart="428" charEnd="448">
+                                 <sedBranchCondition xml:id="_e79d084c-4bf5-45fa-b7c2-3d1b95369008" name="Null Reference (x_3 = null)">
+                                    <sedBranchCondition xml:id="_bcfad743-2f7f-49ca-87a1-fe7e8a21754b" name="Normal Execution (n_1 != null)">
+                                       <sedBranchCondition xml:id="_35fee24e-f6e8-4786-928d-743050e7211e" name="Normal Execution (n instanceof NullPointerException)">
+                                          <sedStatement xml:id="_7c17f82a-b64b-41fc-b3c5-b5ecf02c0f3b" name="MethodCallOnObjectWithException y = new MethodCallOnObjectWithException ();" lineNumber="-1" charStart="239" charEnd="313">
+                                             <sedBranchCondition xml:id="_42e0bec0-cb5e-4884-9371-02d7c7d7cda6" name="Normal Execution (m_3 != null)">
+                                                <sedStatement xml:id="_bd2b9619-919d-493e-b678-2e5a7dfc9f18" name="return y.return42();" lineNumber="-1" charStart="318" charEnd="338">
+                                                   <sedBranchCondition xml:id="_1c3a2e66-9a16-4d8f-a2fd-0fecc0f49c61" name="Normal Execution (y != null)">
+                                                      <sedMethodCall xml:id="_7be5e0a6-a21e-41c8-8ea8-bfad3cc5a9ec" name="y.return42();" lineNumber="-1" charStart="469" charEnd="477">
+                                                         <sedStatement xml:id="_056e8f37-0182-40da-8b2a-0537163dbc7b" name="return 42;" lineNumber="-1" charStart="485" charEnd="495">
+                                                            <sedMethodReturn xml:id="_7a083bb6-485a-43e9-9258-a25ebe2ab000" name="&lt;return &apos;42&apos; as result of y.return42();&gt;" lineNumber="-1" charStart="469" charEnd="477">
+                                                               <sedMethodReturn xml:id="_97540042-40aa-4734-9929-7eeb895d0893" name="&lt;return &apos;42&apos; as result of MethodCallOnObjectWithException.main();&gt;" lineNumber="-1" charStart="69" charEnd="73">
+                                                                  <sedTermination xml:id="_7c3265e0-4854-4643-977f-67db0a5b2f1c" name="&lt;end&gt;">
+                                                                  </sedTermination>
+                                                               </sedMethodReturn>
+                                                            </sedMethodReturn>
+                                                         </sedStatement>
+                                                      </sedMethodCall>
+                                                   </sedBranchCondition>
+                                                </sedStatement>
+                                             </sedBranchCondition>
+                                          </sedStatement>
+                                       </sedBranchCondition>
+                                    </sedBranchCondition>
+                                 </sedBranchCondition>
+                              </sedStatement>
+                           </sedStatement>
+                        </sedMethodCall>
+                     </sedBranchCondition>
+                  </sedStatement>
+               </sedBranchCondition>
+            </sedStatement>
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>

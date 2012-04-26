@@ -18,6 +18,10 @@ import java.util.Map;
  */
 public class LRUCache<K,V> extends LinkedHashMap<K,V> {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 4962274836567079680L;
     /** maximal cache size */
     private final int maxEntries;
 

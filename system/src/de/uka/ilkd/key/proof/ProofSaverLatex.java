@@ -16,11 +16,10 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Iterator;
 
-import de.uka.ilkd.key.gui.IMain;
-import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 
 
 public class ProofSaverLatex extends ProofSaver {

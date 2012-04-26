@@ -116,6 +116,8 @@ public final class DependencyContractPO extends AbstractPO
 	if(target instanceof ProgramMethod) {
 	    target = javaInfo.getToplevelPM(contract.getKJT(), 
 		    			    (ProgramMethod)target);
+	    // FIXME: for some reason the above method call returns null now and then, the following line (hopefully) is a work-around
+	    if (target == null) target = contract.getTarget();
 	}
 	
 	//prepare variables
@@ -142,7 +144,7 @@ public final class DependencyContractPO extends AbstractPO
 			                     contract.getKJT(), 
 					     paramVars,
 					     anonHeap),
-			        contract.getPre(selfVar, paramVars, services));
+			        contract.getPre(selfVar, paramVars, null, services));
 	final Term dep = getContract().getDep(selfVar, paramVars, services);
 	
 	//prepare update
@@ -179,7 +181,7 @@ public final class DependencyContractPO extends AbstractPO
                         	         TB.apply(update, targetTerm)));
 	
         //save in field
-        poTerms = new Term[]{po};
+        assignPOTerms(po);
         
         //add axioms
         collectClassAxioms(contract.getKJT());

@@ -147,8 +147,8 @@ public class Recoder2KeY implements JavaReader {
      * @param tc
      *            the type converter, not null
      */
-    public Recoder2KeY(KeYCrossReferenceServiceConfiguration servConf, KeYRecoderMapping rec2key, NamespaceSet nss, TypeConverter tc) {
-        this(servConf, null, rec2key, nss, tc);
+    public Recoder2KeY(Services services, KeYCrossReferenceServiceConfiguration servConf, KeYRecoderMapping rec2key, NamespaceSet nss, TypeConverter tc) {
+        this(services, servConf, null, rec2key, nss, tc);
     }
 
     /**
@@ -163,10 +163,10 @@ public class Recoder2KeY implements JavaReader {
      * @param services
      *            services to retrieve objects from, not null
      * @param nss
-     *            nthe namespaces to work upon, not null
+     *            the namespaces to work upon, not null
      */
     public Recoder2KeY(Services services, NamespaceSet nss) {
-        this(services.getJavaInfo().getKeYProgModelInfo().getServConf(), null, services.getJavaInfo().rec2key(), nss, services.getTypeConverter());
+        this(services,services.getJavaInfo().getKeYProgModelInfo().getServConf(), null, services.getJavaInfo().rec2key(), nss, services.getTypeConverter());
     }
 
     /**
@@ -189,7 +189,7 @@ public class Recoder2KeY implements JavaReader {
      * @throws IllegalArgumentException
      *             if arguments are not valid (null e.g.)
      */
-    public Recoder2KeY(KeYCrossReferenceServiceConfiguration servConf, String classPath, 
+    private Recoder2KeY(Services services, KeYCrossReferenceServiceConfiguration servConf, String classPath, 
 	    KeYRecoderMapping rec2key, NamespaceSet nss, TypeConverter tc) {
 
         if (servConf == null)
@@ -206,8 +206,8 @@ public class Recoder2KeY implements JavaReader {
 
         this.servConf = servConf;
         this.mapping = rec2key;
-        this.converter = makeConverter();
-        this.typeConverter = new Recoder2KeYTypeConverter(tc, nss, this);
+        this.converter = makeConverter(services, nss);
+        this.typeConverter = new Recoder2KeYTypeConverter(services, tc, nss, this);
         
         // set up recoder:
         recoder.util.Debug.setLevel(500);
@@ -218,14 +218,19 @@ public class Recoder2KeY implements JavaReader {
 
     }
     
+    
+    
     /**
      * create the ast converter. This is overwritten in SchemaRecoder2KeY to use
      * schema-aware converters.
+     * @param services 
+     * 
+     * @param nss the namespaces provided to the constructor 
      * 
      * @return a newley created converter
      */
-    protected Recoder2KeYConverter makeConverter() {
-        return new Recoder2KeYConverter(this);
+    protected Recoder2KeYConverter makeConverter(Services services, NamespaceSet nss) {
+        return new Recoder2KeYConverter(this, services, nss);
     }
 
     /**
@@ -506,10 +511,8 @@ public class Recoder2KeY implements JavaReader {
     	        ConvertException e2 = new ConvertException("While parsing "+loc+"\n"+ex.getMessage());
                 e2.initCause(ex);
                 throw e2;
-            } finally {
-        	if (f != null) {
+            } finally {        
         	    f.close();
-        	}
             }
             
             
@@ -665,6 +668,9 @@ public class Recoder2KeY implements JavaReader {
                 }
                 methDecl.setBody(null);
             }
+            /*
+            // This is deactivated to allow compile time constants in declaration stub files.
+            // see bug #1114 
             if (pe instanceof recoder.java.declaration.FieldSpecification) {
                 recoder.java.declaration.FieldSpecification fieldSpec = 
                     (recoder.java.declaration.FieldSpecification) pe;
@@ -674,6 +680,7 @@ public class Recoder2KeY implements JavaReader {
                 }
                 fieldSpec.setInitializer(null);
             }
+            */
             if (pe instanceof ClassInitializer) {
                 ClassInitializer classInit = (ClassInitializer) pe;
                 if(!allowed && classInit.getBody() != null) {

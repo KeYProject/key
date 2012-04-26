@@ -49,7 +49,7 @@ public class TestJMLPreTranslator extends TestCase {
         assertTrue(specCase.getSignals().size() == 0);
         assertTrue(specCase.getSignalsOnly().size() == 0);
         
-        assertTrue(specCase.getRequires().head().text.trim().equals("true;"));
+        assertTrue(specCase.getRequires().head().text.trim().equals("requires true;"));
     }
     
 

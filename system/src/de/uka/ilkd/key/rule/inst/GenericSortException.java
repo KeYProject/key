@@ -23,6 +23,11 @@ import de.uka.ilkd.key.collection.ImmutableList;
 public class GenericSortException extends SortException {
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = 1372231759025588273L;
+
+    /**
      * often used singleton
      */
     public static final GenericSortException UNINSTANTIATED_GENERIC_SORT =
@@ -31,14 +36,18 @@ public class GenericSortException extends SortException {
     private ImmutableList<GenericSortCondition> conditions;
     
     public GenericSortException(String description, ImmutableList<GenericSortCondition> pConditions) {
-	super(description);
-	this.conditions = pConditions;
+            super(description);
+            this.conditions = pConditions;
     } 
     
     public GenericSortException(String description) {
 	super(description);
     } 
 
+    public void setConditions(ImmutableList<GenericSortCondition> pConditions) {
+            this.conditions = pConditions;
+    }
+    
     public String getMessage() {
 	return super.getMessage() + (conditions == null ? "" : conditions);
     }

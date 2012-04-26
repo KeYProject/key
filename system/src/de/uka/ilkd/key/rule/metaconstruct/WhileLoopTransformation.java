@@ -502,30 +502,32 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 	        body = new LabeledStatement(breakInnerLabel.getLabel(), body);
 	    }
 	    
-	    final int updateSize = 
-		(updates == null ? 0 : updates.size());
+	    final int updateSize = updates == null ? 0 : updates.size();
 	    Statement innerBlockStatements[] = new Statement[updateSize + 2];
 	    innerBlockStatements[0] = body;
-	    for (int copyStatements = 0; copyStatements < updateSize; copyStatements++) {
-	        innerBlockStatements[copyStatements+1] = (ExpressionStatement) 
-		    updates.getExpressionAt(copyStatements);
+
+	    if (updates != null) {
+	        for (int copyStatements = 0; copyStatements < updateSize; copyStatements++) {
+	            innerBlockStatements[copyStatements+1] = (ExpressionStatement) 
+	                    updates.getExpressionAt(copyStatements);	        
+	        }
 	    }
 	    innerBlockStatements[updateSize+1] = remainder;
 
 
+	    final int initSize = inits == null ? 0 : inits.size();
 
-	    final int initSize = (inits == null ? 0 : inits.size());
-            Statement outerBlockStatements[] = new Statement[initSize + 1];
+	    final Statement outerBlockStatements[] = new Statement[initSize + 1];
 
-            for (int copyStatements=0; copyStatements<initSize; copyStatements++) {
-                outerBlockStatements[copyStatements] = 
-		    inits.getInits().get(copyStatements);
+	    if (inits != null) {
+	        for (int copyStatements=0; copyStatements<initSize; copyStatements++) {
+	            outerBlockStatements[copyStatements] = inits.getInits().get(copyStatements);
+	        }
 	    }
             
 	    outerBlockStatements[initSize] = 
-		new If(guard.getExpression(),
-		       new Then(new StatementBlock(new ImmutableArray<Statement>
-						   (innerBlockStatements))));
+	            new If(guard.getExpression(),
+	                    new Then(new StatementBlock(new ImmutableArray<Statement>(innerBlockStatements))));
 	    
 	    if (outerLabelNeeded() && breakOuterLabel!=null) {
 	        addChild(new LabeledStatement

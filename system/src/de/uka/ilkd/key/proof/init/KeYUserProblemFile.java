@@ -20,6 +20,7 @@ import de.uka.ilkd.key.proof.CountingBufferedReader;
 import de.uka.ilkd.key.proof.ProblemLoader;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.io.KeYFile;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
@@ -157,7 +158,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
     @Override
     public ProofAggregate getPO() throws ProofInputException {
         assert problemTerm != null;
-	String name = name();
+        String name = name();
         ProofSettings settings = getPreferences();
         return ProofAggregate.createProofAggregate(
                 new Proof(name, 

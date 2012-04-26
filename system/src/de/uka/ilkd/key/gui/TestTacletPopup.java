@@ -9,6 +9,13 @@
 //
 
 package de.uka.ilkd.key.gui;
+import de.uka.ilkd.key.rule.tacletbuilder.NoFindTacletBuilder;
+import de.uka.ilkd.key.rule.tacletbuilder.AntecTacletBuilder;
+import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
+import de.uka.ilkd.key.rule.tacletbuilder.SuccTacletBuilder;
 import java.io.StringReader;
 
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -77,8 +84,8 @@ public class TestTacletPopup {
 	AntecTacletBuilder impleftbuilder=new AntecTacletBuilder();
 	b=SchemaVariableFactory.createFormulaSV(new Name("b"), false);
 	SchemaVariable b0 = SchemaVariableFactory.createFormulaSV(new Name("b0"), false);
-	Term t_b= TB.var((SchemaVariable)b);
-	Term t_b0= TB.var((SchemaVariable)b0);
+	Term t_b= TB.var(b);
+	Term t_b0= TB.var(b0);
 	Term t_bimpb0=TB.tf().createTerm(Junctor.IMP,new Term[]{t_b, t_b0});
 	Term t_bandb0 = TB.tf().createTerm(Junctor.AND, t_b, t_b0);
 	Term t_borb0 = TB.tf().createTerm(Junctor.OR, t_b, t_b0);
@@ -204,7 +211,7 @@ public class TestTacletPopup {
 	SuccTacletBuilder allrightbuilder=new SuccTacletBuilder();
 	x = SchemaVariableFactory.createVariableSV(new Name("x"),nat);
 	t0 = SchemaVariableFactory.createTermSV(new Name("t0"),nat);
-	Term t_t0=TB.var((SchemaVariable)t0);
+	Term t_t0=TB.var(t0);
 	Term t_allxb=TB.all((VariableSV)x, t_b);
 	Term t_subxt0b=TB.subst(WarySubstOp.SUBST,(QuantifiableVariable)x,t_t0,t_b);
 	allrightbuilder.setFind(t_allxb);

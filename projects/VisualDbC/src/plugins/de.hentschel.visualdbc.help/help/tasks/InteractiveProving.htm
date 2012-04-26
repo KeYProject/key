@@ -1,0 +1,21 @@
+<html>
+   <head>
+      <title>Interactive Proving</title>
+   </head>
+   <body>
+      <h1>Interactive Proving</h1>
+      <p>
+         This task describes how to execute proofs from an opened
+         DbC Diagram Editor. It requires that the diagram was <a href="CreateDiagramFromDataSource.htm">created from a data source</a>.
+      </p>
+      <p>
+         Execute the following steps to proof a property of the diagram:
+         <ol>
+            <li>Add a new "Proof" element from the Palette to the diagram.</li>
+            <li>Name the added "Proof" element with the proof obligation to show. If the proof obligation is invalid an error message is shown in step 4 that shows the available proof obligations.</li>
+            <li>Connect the "Proof" element with a "Proof Target" relation with the element to proof.</li>
+            <li>Open the context menu of the "Proof" element and select <a href='javascript:executeCommand("de.hentschel.visualdbc.dbcmodel.diagram.openProof")'>Open Proof</a>. The proof is now instantiated in the data source user interface. References during proof are automatically detected and added to the diagram. The proof status is automatically updated when the proof is closed in the data source user interface.</li>
+         </ol>
+      </p>
+   </body>
+</html>

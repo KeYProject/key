@@ -37,7 +37,7 @@ public class Else extends BranchImp {
      */ 
     public Else(ExtList children) {
 	super(children);
-	body=(Statement)children.get(Statement.class);
+	body=children.get(Statement.class);
     }
 
 

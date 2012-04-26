@@ -12,7 +12,6 @@ package de.uka.ilkd.key.smt;
 
 import java.util.Collection;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.rule.Taclet;
 
 public interface SMTSettings {
@@ -23,13 +22,6 @@ public interface SMTSettings {
      */
     public long getTimeout();
 
-    /**
-     * Returns the generic command that should be used for starting a solver of
-     * type <code>type</code>.<br>
-     * Allowed place holders:<br>
-     * %f Filename %p Problem formula.
-     */
-    public String getCommand(SolverType type);
 
     /**
      * The path of the folder, where the smt files are stored temporarily.
@@ -69,7 +61,7 @@ public interface SMTSettings {
      * by the translation. In case that a taclet is not supported, it is
      * ignored.
      */
-    public Collection<Taclet> getTaclets(Services services);
+    public Collection<Taclet> getTaclets();
     
     /**
      * Returns <code>true</code> if the uniqueness property should be translated 
@@ -91,5 +83,15 @@ public interface SMTSettings {
      * are not supported) a constant should be introduced.
      */
     public boolean useAssumptionsForBigSmallIntegers();
+    
+    /**
+     * @return Returns the logic used by solvers using SMT-Lib-Format
+     */
+    public String getLogic();
+    
+    public long getMaximumInteger();
+    
+    public long getMinimumInteger();
+  
 
 }

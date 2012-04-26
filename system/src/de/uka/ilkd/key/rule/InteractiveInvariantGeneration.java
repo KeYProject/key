@@ -8,6 +8,7 @@ import javax.swing.JOptionPane;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.Statement;
@@ -94,7 +95,7 @@ public class InteractiveInvariantGeneration implements Rule, BuiltInRule {
                 LoopInvariant newInv;
                 // Get the new invariantloopInvariant
                 try {
-                    newInv = Main.getInstance().getLoopInvariant(inv,
+                    newInv = MainWindow.getInstance().getLoopInvariant(inv,
                                 services, requiresVariant);
                 } catch (Exception e) {
                     throw new RuleAbortException("Lazy User!!!");
@@ -134,7 +135,7 @@ public class InteractiveInvariantGeneration implements Rule, BuiltInRule {
         public boolean isApplicable(Goal goal, PosInOccurrence pio) {
 
                 // 1. Auto Mode? => NO
-                if (Main.getInstance().mediator().autoMode()) {
+                if (MainWindow.getInstance().getMediator().autoMode()) {
                         return false;
                 } else {
                         // Check if While Rule is applicable

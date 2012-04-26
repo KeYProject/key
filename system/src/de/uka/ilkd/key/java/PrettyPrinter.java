@@ -27,6 +27,7 @@ import de.uka.ilkd.key.java.expression.*;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.expression.literal.*;
 import de.uka.ilkd.key.java.expression.operator.*;
+import de.uka.ilkd.key.java.expression.operator.adt.*;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -364,13 +365,16 @@ public class PrettyPrinter {
     }
 
     protected Position getRelativePosition(SourceElement first) {
-	//	System.out.println(indentMap);
-	if (indentMap.containsKey(first)) {
-	    return indentMap.get(first);
-	} else {
-	    if (first!=null) return first.getRelativePosition();
-	    else return Position.UNDEFINED;
-	}
+        try {
+            if (indentMap.containsKey(first)) {
+                return indentMap.get(first);
+            } else {
+                if (first!=null) return first.getRelativePosition();
+
+            }
+        } finally {
+            return Position.UNDEFINED;
+        }
     }
 
     /**
@@ -905,6 +909,15 @@ public class PrettyPrinter {
         write(x.getValue());
         printFooter(x);
     }
+    
+
+
+    public void printBigintLiteral(BigintLiteral x) throws IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+        write(x.getValue());
+        printFooter(x);
+    }
 
     public void printBooleanLiteral(BooleanLiteral x) throws java.io.IOException {
         printHeader(x);
@@ -920,7 +933,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
     
-    public void printSingleton(de.uka.ilkd.key.java.expression.operator.Singleton x) throws java.io.IOException {
+    public void printSingleton(de.uka.ilkd.key.java.expression.operator.adt.Singleton x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
         writeToken(0, "\\singleton", x);
@@ -930,7 +943,7 @@ public class PrettyPrinter {
         printFooter(x);
     } 
     
-    public void printSetUnion(de.uka.ilkd.key.java.expression.operator.SetUnion x) throws java.io.IOException {
+    public void printSetUnion(de.uka.ilkd.key.java.expression.operator.adt.SetUnion x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
         writeToken(0, "\\set_union", x);
@@ -954,7 +967,7 @@ public class PrettyPrinter {
         printFooter(x);
     }    
 
-    public void printSetMinus(de.uka.ilkd.key.java.expression.operator.SetMinus x) throws java.io.IOException {
+    public void printSetMinus(de.uka.ilkd.key.java.expression.operator.adt.SetMinus x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
         writeToken(0, "\\set_minus", x);
@@ -966,7 +979,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
     
-    public void printAllFields(de.uka.ilkd.key.java.expression.operator.AllFields x) throws java.io.IOException {
+    public void printAllFields(de.uka.ilkd.key.java.expression.operator.adt.AllFields x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
         writeToken(0, "\\all_fields", x);
@@ -983,7 +996,25 @@ public class PrettyPrinter {
         printFooter(x);
     }
     
-    public void printSeqSingleton(de.uka.ilkd.key.java.expression.operator.SeqSingleton x) throws java.io.IOException {
+    public void printSeqLength(SeqLength x) throws java.io.IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+        writeElement(0, x.getChildAt(0));
+        write(".length");
+        printFooter(x);
+    }
+    
+    public void printSeqGet(SeqGet x) throws java.io.IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+        writeElement(0, x.getChildAt(0));
+        write("[");
+        writeElement(1, x.getChildAt(1));
+        write("]");
+        printFooter(x);
+    }
+    
+    public void printSeqSingleton(de.uka.ilkd.key.java.expression.operator.adt.SeqSingleton x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
         writeToken(0, "\\seq_singleton", x);
@@ -993,7 +1024,7 @@ public class PrettyPrinter {
         printFooter(x);
     } 
     
-    public void printSeqConcat(de.uka.ilkd.key.java.expression.operator.SeqConcat x) throws java.io.IOException {
+    public void printSeqConcat(de.uka.ilkd.key.java.expression.operator.adt.SeqConcat x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
         writeToken(0, "\\seq_concat", x);
@@ -1004,8 +1035,20 @@ public class PrettyPrinter {
         write(")");
         printFooter(x);
     }    
+
+    public void printIndexOf(de.uka.ilkd.key.java.expression.operator.adt.SeqIndexOf x) throws java.io.IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+        writeToken(0, "\\indexOf", x);
+        write("(");
+        writeElement(0, x.getChildAt(0));
+        write(",");
+        writeElement(0, x.getChildAt(1));
+        write(")");
+        printFooter(x);
+    }    
     
-    public void printSeqSub(de.uka.ilkd.key.java.expression.operator.SeqSub x) throws java.io.IOException {
+    public void printSeqSub(de.uka.ilkd.key.java.expression.operator.adt.SeqSub x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
         writeToken(0, "\\seq_sub", x);
@@ -1019,7 +1062,7 @@ public class PrettyPrinter {
         printFooter(x);
     }  
     
-    public void printSeqReverse(de.uka.ilkd.key.java.expression.operator.SeqReverse x) throws java.io.IOException {
+    public void printSeqReverse(de.uka.ilkd.key.java.expression.operator.adt.SeqReverse x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
         writeToken(0, "\\seq_reverse", x);
@@ -1028,6 +1071,22 @@ public class PrettyPrinter {
         write(")");
         printFooter(x);
     }          
+    
+    public void printDLEmbeddedExpression(
+            DLEmbeddedExpression x) throws IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+        writeToken(0, "\\dl_" + x.getFunctionSymbol().name(), x);
+        write("(");
+        for (int i = 0; i < x.getChildCount(); i++) {
+            if(i != 0) {
+                write(",");
+            }
+            writeElement(0, x.getChildAt(i));
+        }
+        write(")");
+        printFooter(x); 
+    } 
 
     public void printStringLiteral(StringLiteral x) throws java.io.IOException {
         printHeader(x);
@@ -2640,7 +2699,7 @@ public class PrettyPrinter {
     public void printElse(Else x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
-        write("else");
+        write("else ");
         if (x.getBody() != null) {
 	    if (x.getBody() instanceof StatementBlock) {
 		writeElement(1, 0, x.getBody());
@@ -2793,6 +2852,23 @@ public class PrettyPrinter {
         }
         write(")");
 	output();
-    }    
+    }
 
+    public void printTransactionStatement(TransactionStatement x) throws java.io.IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+    
+    // Mark statement start ...
+    markStart(0,x);
+
+        write(x.toString());
+        write(";");
+
+        // Mark statement end ...
+    markEnd(0,x);
+
+        printFooter(x);
+    }
+
+    
 }

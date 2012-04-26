@@ -10,11 +10,21 @@
 
 package de.uka.ilkd.key.util;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.NameAbstractionTable;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -27,12 +37,29 @@ import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.CreatingASTVisitor;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.ProgramPrefix;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.ObserverFunction;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.Quantifier;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.RuleSet;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.WhileInvariantRule;
 
 
 /**
@@ -153,7 +180,7 @@ public final class MiscTools {
                     stack.push(new ExtList());
                     walk(root());
                     ExtList el = stack.peek();
-                    return (ProgramElement) el.get(ProgramElement.class); 
+                    return el.get(ProgramElement.class); 
                 }
                 
                 public void doAction(ProgramElement node) {
@@ -224,6 +251,23 @@ public final class MiscTools {
 	}
     }
     
+    /**
+     * <p>
+     * Returns the {@link Sort}s of the given {@link Term}s.
+     * </p>
+     * <p>
+     * This method is used for instance by the Symbolic Execution Debugger.
+     * </p>
+     * @param terms The given {@link Term}s.
+     * @return The {@link Term} {@link Sort}s.
+     */
+    public static ImmutableList<Sort> getSorts(Iterable<Term> terms) {
+        ImmutableList<Sort> result = ImmutableSLList.<Sort>nil();
+        for (Term t : terms) {
+            result = result.append(t.sort());
+        }
+        return result;
+    }
     
     /**
      * Removes all formulas from the passed goal.
@@ -439,6 +483,148 @@ public final class MiscTools {
 	return result;
     }
     
+    /**
+     * True if both are <code>null</code> or <code>a.equals(b)</code> with <code>equals</code> from type T.
+     */
+    public static <T> boolean equalsOrNull(T a, Object b){
+        if (a == null) {
+            return b == null;
+        } else {
+            return a.equals(b);
+        }
+    }
+    
+    public static <T> boolean equalsOrNull(T a, Object... bs){
+        boolean result = true;
+        for (Object b: bs){
+            result = result && equalsOrNull(a, b);
+        }
+        return result;
+    }
+    
+    /**
+     * Separates the single directory entries in a filename.
+     * The first element is an empty String iff the filename is absolute.
+     * (For a Windows filename, it contains a drive letter and a colon).
+     * Ignores double slashes and slashes at the end, removes references to the cwd.
+     * E.g., "/home//daniel/./key/" yields {"","home","daniel","key"}.
+     * Tries to automatically detect UNIX or Windows directory delimiters.
+     * There is no check whether all other characters are valid for filenames.
+     */
+    static List<String> disectFilename(String filename){
+        final char sep = File.separatorChar;
+        List<String> res = new ArrayList<String>();
+        // if filename contains slashes, take it as UNIX filename, otherwise Windows
+        if (filename.indexOf("/") != -1) assert sep == '/' : "\""+filename+"\" contains both / and \\";
+        else if (filename.indexOf("\\") != -1) assert sep == '\\': "\""+filename+"\" contains both / and \\";
+        else {
+            res.add(filename);
+            return res;
+        }
+        int i = 0;
+        while (i < filename.length()){
+            int j = filename.indexOf(sep,i);
+            if (j == -1){ // no slash anymore
+                final String s = filename.substring(i, filename.length());
+                if (!s.equals("."))
+                    res.add(s);
+                break;
+            }
+            if (i == j) {
+                // empty string between slashes
+                if (i == 0)
+                    // leading slash
+                    res.add("");
+            } else {
+                // contains "/./"
+                final String s = filename.substring(i, j);
+                if (!s.equals(".")) {
+                    res.add(s);
+                }
+            }
+            i = j+1;
+        }
+        return res;
+    }
+    
+    /** Returns a filename relative to another one.
+     * The second parameter needs to be absolute and is expected to refer to directory
+     * This method only operates on Strings, not on real files!
+     * Note that it treats Strings case-sensitive.
+     * The resulting filename always uses UNIX directory delimiters.
+     */
+    public static String makeFilenameRelative(String origFilename, String toFilename){
+        String[] a = disectFilename(origFilename).toArray(new String[0]);
+        String[] b = disectFilename(toFilename).toArray(new String[0]);
+        
+        // check for Windows paths
+        if (a[0].length() == 2 && a[0].charAt(1) == ':') {
+            // FIXME: UNIX filenames may well contain colons, too
+            char drive = Character.toUpperCase(a[0].charAt(0));
+            if (!(b[0].length() == 2 && Character.toUpperCase(b[0].charAt(0)) == drive && b[0].charAt(1) == ':'))
+                throw new RuntimeException("cannot make paths on different drives relative");
+            // remove drive letter
+            a[0] = ""; b[0] = "";
+        }
+        
+        if (!a[0].equals("")){ // already relative
+            String res = "";
+            for (String s: a){
+                res += s;
+            }
+            return res;
+        }
+        if (!b[0].equals("")) 
+            throw new RuntimeException("\""+toFilename+ "\" is a relative path. Please use absolute paths to make others relative to them.");
+        
+        // remove ".." from paths
+        a = removeDotDot(a);
+        b = removeDotDot(b);
+        
+        // FIXME: there may be leading ..'s
+        
+        int i = 1; boolean diff= false;
+        String s = "";
+        String t = "";
+        while (i < b.length){
+            // shared until i
+            if (i >= a.length || !a[i].equals(b[i])) diff = true;
+            // add ".." for each remaining element in b
+            // and collect the remaining elements of a
+            if (diff) {
+                s = s + "../";
+                if (i < a.length) 
+                    t = t + (a[i].equals("")? "" : "/")+ a[i];
+            }
+            i++;
+        }
+        while (i < a.length)
+            t = t +(a[i].equals("")? "" : "/")+ a[i++];
+        // strip leading slash
+        if (t.length()>0 && t.charAt(0) == '/')
+            t = t.substring(1);
+        // strip ending slash
+        t = s + t;
+        if (t.length() > 0 && t.charAt(t.length()-1) == '/')
+            t = t.substring(0,t.length()-1);
+        return t;
+    }
+
+
+    private static String[] removeDotDot(String[] a) {
+        String[] newa = new String[a.length];
+        int k = 0;
+        for (int j = 0; j < a.length-1; j++){
+            if (a[j].equals("..") || !a[j+1].equals("..")){
+                newa[k++] = a[j];
+            } else
+                j++;
+        }
+        if (!a[a.length-1].equals("..")){
+            newa[k++] = a[a.length-1];
+        }
+        return Arrays.copyOf(newa, k);
+    }
     
     
     //-------------------------------------------------------------------------
@@ -525,10 +711,125 @@ public final class MiscTools {
     
     
     public static String toValidFileName(String s) {
-        s = s.replaceAll("\\$|<|>", "_")
+        s = s.replace("\\", "_")
+             .replace("$", "_")
+             .replace("?", "_")
+             .replace("|", "_")
+             .replace("<", "_")
+             .replace(">", "_")
+             .replace(":", "_")
+             .replace("*", "+")
+             .replace("\"", "'")
              .replace("/", "-")
              .replace("[", "(")
              .replace("]", ")");
         return s;
     }
+
+    /**
+     * Join the string representations of a collection of objects into onw
+     * string. The individual elements are separated by a delimiter.
+     * 
+     * {@link Object#toString()} is used to turn the objects into strings.
+     * 
+     * @param collection
+     *            an arbitrary non-null collection
+     * @param delimiter
+     *            a non-null string which is put between the elements.
+     * 
+     * @return the concatenation of all string representations separated by the
+     *         delimiter
+     */
+    public static String join(Iterable<?> collection, String delimiter) {
+        StringBuilder sb = new StringBuilder();
+        for (Object obj : collection) {
+            if(sb.length() > 0) {
+                sb.append(delimiter);
+            }
+            sb.append(obj);
+        }
+        
+        return sb.toString();
+    }
+    
+    /**
+     * Join the string representations of an array of objects into one
+     * string. The individual elements are separated by a delimiter.
+     * 
+     * {@link Object#toString()} is used to turn the objects into strings.
+     * 
+     * @param collection
+     *            an arbitrary non-null array of objects
+     * @param delimiter
+     *            a non-null string which is put between the elements.
+     * 
+     * @return the concatenation of all string representations separated by the
+     *         delimiter
+     */
+    public static String join(Object[] collection, String delimiter) {
+        return join(Arrays.asList(collection), delimiter);
+    }
+
+    /**
+     * Takes a string and returns a string which is potentially shorter and
+     * contains a sub-collection of the original characters.
+     * 
+     * All alphabetic characters (A-Z and a-z) are copied to the result while
+     * all other characters are removed.
+     * 
+     * @param string
+     *            an arbitrary string
+     * @return a string which is a sub-structure of the original character
+     *         sequence
+     * 
+     * @author mattias ulbrich
+     */
+    public static /*@NonNull*/ String filterAlphabetic(/*@NonNull*/ String string) {
+        StringBuilder res = new StringBuilder();
+        for (int i = 0; i < string.length(); i++) {
+            char c = string.charAt(i);
+            if((c >= 'A' && c <= 'Z') || (c >= 'A' && c <= 'Z')) {
+                res.append(c);
+            }
+        }
+        return res.toString();
+    }
+    
+    /** Checks whether a string contains another one as a whole word
+     * (i.e., separated by whitespaces or a semicolon at the end).
+     * @param s string to search in
+     * @param word string to be searched for
+     */
+    public static boolean containsWholeWord(String s, String word){
+        if (s == null || word == null) return false;
+        int i = -1;
+        final int wl = word.length();
+        while (true) {
+            i = s.indexOf(word, i+1);
+            if (i < 0 || i >= s.length()) break;
+            if (i == 0 || Character.isWhitespace(s.charAt(i-1))) {
+                if (i+wl == s.length() || Character.isWhitespace(s.charAt(i+wl)) || s.charAt(i+wl) == ';') {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
+
+    /** There are different kinds of JML markers.
+     * See Section 4.4 "Annotation markers" of the JML reference manual.
+     * @param comment
+     * @return
+     */
+    public static boolean isJMLComment(String comment) {
+        try {
+        return (comment.startsWith("/*@") || comment.startsWith("//@")
+                || comment.startsWith("/*+KeY@") || comment.startsWith("//+KeY@")
+                || (comment.startsWith("/*-")&& !comment.substring(3,6).equals("KeY") && comment.contains("@"))
+                || (comment.startsWith("//-") && !comment.substring(3,6).equals("KeY") && comment.contains("@")));
+        } catch (IndexOutOfBoundsException e){
+            return false;
+        }
+    }   
 }

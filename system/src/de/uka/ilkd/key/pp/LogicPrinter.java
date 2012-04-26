@@ -10,12 +10,16 @@
 
 package de.uka.ilkd.key.pp;
 
+import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
+import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.*;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -94,7 +98,7 @@ public final class LogicPrinter {
         if (services != null) {
             ni.refresh(services);
         }
-        LogicPrinter p = new LogicPrinter(null, 
+        LogicPrinter p = new LogicPrinter(new ProgramPrinter(), 
                                           ni, 
                                           services);
         try {
@@ -102,6 +106,36 @@ public final class LogicPrinter {
         } catch (IOException ioe) {
             return t.toString();
         }
+        return p.result().toString();
+    }
+    
+    public static String quickPrintSemisequent(Semisequent s, Services services) {
+        final NotationInfo ni = new NotationInfo();
+        if (services != null) {
+            ni.refresh(services);
+        }
+        LogicPrinter p = new LogicPrinter(new ProgramPrinter(), 
+                                          ni, 
+                                          services);
+
+        try {
+			p.printSemisequent(s);
+		} catch (IOException e) {
+			return s.toString();
+		}
+        return p.result().toString();
+    }
+    
+    
+    public static String quickPrintSequent(Sequent s, Services services) {
+        final NotationInfo ni = new NotationInfo();
+        if (services != null) {
+            ni.refresh(services);
+        }
+        LogicPrinter p = new LogicPrinter(new ProgramPrinter(), 
+                                          ni, 
+                                          services);
+        p.printSequent(s);
         return p.result().toString();
     }
     
@@ -341,7 +375,8 @@ public final class LogicPrinter {
      *           The Taclet to be pretty-printed.
      */
     public void printTaclet(Taclet taclet) {
-        printTaclet(taclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true, false);
+        // the last argument used to be false. Changed that - M.Ulbrich
+        printTaclet(taclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true, true); 
     }
 
     protected void printAttribs(Taclet taclet) throws IOException{
@@ -1097,7 +1132,36 @@ public final class LogicPrinter {
 	markStartSub();	 
 	printTerm(t.sub(2));
 	markEndSub();	
-    }      
+    }     
+    
+    public void printElementOf(Term t, String symbol) throws IOException {
+        if (symbol == null) {
+            printElementOf(t);
+            return;
+        }
+
+        assert t.arity() == 3;
+        startTerm(3);
+        
+        layouter.print("(").beginC(0);
+        
+        markStartSub();  
+        printTerm(t.sub(0));
+        markEndSub();
+        
+        layouter.print(",").brk(1,0);
+        
+        markStartSub();  
+        printTerm(t.sub(1));
+        markEndSub();
+
+        layouter.print(")").end();
+        layouter.print(symbol);
+        
+        markStartSub();  
+        printTerm(t.sub(2));
+        markEndSub();   
+    }
     
 
     /** Print a unary term in prefix style.  For instance
@@ -1292,7 +1356,7 @@ public final class LogicPrinter {
             final QuantifiableVariable v = vars.get (j);
             if(v instanceof LogicVariable) {
                 Term t =
-                    TermFactory.DEFAULT.createTerm((LogicVariable) v);
+                    TermFactory.DEFAULT.createTerm(v);
                 if(notationInfo.getAbbrevMap().containsTerm(t)) {
                     layouter.print (v.sort().name().toString() + " " +
                                     notationInfo.getAbbrevMap().getAbbrev(t));

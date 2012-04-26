@@ -1,0 +1,43 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Martin Hentschel.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Martin Hentschel - initial API and implementation
+ *******************************************************************************/
+
+package de.hentschel.visualdbc.interactive.proving.ui.test.dummyFinder;
+
+import de.hentschel.visualdbc.datasource.model.IDSConnection;
+import de.hentschel.visualdbc.datasource.test.dummyModel.DummyModelDriver;
+import de.hentschel.visualdbc.interactive.proving.ui.finder.DefaultDSFinder;
+import de.hentschel.visualdbc.interactive.proving.ui.finder.IDSFinder;
+import de.hentschel.visualdbc.interactive.proving.ui.finder.IDSFinderFactory;
+
+public class DSFinderFactory0 implements IDSFinderFactory {
+   @Override
+   public int getPriority() {
+      return 0;
+   }
+
+   @Override
+   public boolean canHandle(IDSConnection connection) {
+      return connection != null && 
+             connection.getDriver() != null && 
+             DummyModelDriver.class.equals(connection.getDriver().getClass());
+   }
+
+   @Override
+   public IDSFinder createFinder(IDSConnection connection) {
+      return new Finder0(connection);
+   }
+   
+   public static class Finder0 extends DefaultDSFinder {
+      public Finder0(IDSConnection connection) {
+         super(connection);
+      }
+   }
+}

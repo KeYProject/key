@@ -23,10 +23,16 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import de.uka.ilkd.key.gui.IconFactory;
+
 
 
 public class ChoiceSelector extends JDialog {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -4470713015801365801L;
     private ChoiceSettings settings;
     private HashMap<String, String> category2DefaultChoice;
     private HashMap<String, Set<String>> category2Choices;
@@ -68,6 +74,7 @@ public class ChoiceSelector extends JDialog {
 
     /** layout */
     protected void layoutChoiceSelector() {
+        setIconImage(IconFactory.keyLogo());
 	Object[] cats = category2DefaultChoice.keySet().toArray();
         java.util.Arrays.sort(cats);
 	catList = new JList(cats);

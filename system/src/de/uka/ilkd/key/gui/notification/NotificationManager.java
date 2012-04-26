@@ -118,11 +118,11 @@ public class NotificationManager {
     }
 
     /**
-     * find the notificatin task associated with the given event id
+     * find the notification task associated with the given event id
      * @param eventId int identifying the event
-     * @return the notificatin task associated with the given event id
+     * @return the notification task associated with the given event id
      */
-    private NotificationTask getNotificationTask(int eventId) {
+    public NotificationTask getNotificationTask(int eventId) {
         final Iterator<NotificationTask> it = getNotificationTasks();
         while (it.hasNext()) {
             final NotificationTask task = it.next();

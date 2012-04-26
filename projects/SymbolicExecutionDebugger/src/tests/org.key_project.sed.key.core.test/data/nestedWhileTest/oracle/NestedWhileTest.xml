@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget xml:id="_95c6d186-6a30-4d4f-92a8-995f7266df23" name="NestedWhileTest[NestedWhileTest::mainNested()].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_563f3c65-9d75-453e-8c4c-d10914dfeba0" name="KeY Default Thread">
+         <sedMethodCall xml:id="_e1bcd216-5d56-4a95-ac13-926b2b937abb" name="self.mainNested();" lineNumber="-1" charStart="95" charEnd="105">
+            <sedStatement xml:id="_31c690a7-9960-45e4-9a53-05541f792030" name="int result = 0;" lineNumber="-1" charStart="113" charEnd="128">
+               <sedStatement xml:id="_c3fc2440-f9ed-4217-8c9c-ab5ce8b1c37d" name="int i = 0;" lineNumber="-1" charStart="132" charEnd="142">
+                  <sedLoopNode xml:id="_0e439442-932f-4cb9-8f00-715a9b44edac" name="while ( i&lt;3 ) {while ( i&lt;3 ) {while ( i&lt;2 ) {       result_1++;       i++;     }     result_1++;     i++;   }   result_1++;   i++; }" lineNumber="-1" charStart="146" charEnd="298">
+                     <sedLoopCondition xml:id="_050767eb-4769-474c-9d1a-84404a234138" name="i&lt;3" lineNumber="-1" charStart="153" charEnd="158">
+                        <sedLoopNode xml:id="_70e88bd2-e925-42e8-8eea-e2af558940b6" name="while ( i&lt;3 ) {while ( i&lt;2 ) {     result_1++;     i++;   }   result_1++;   i++; }" lineNumber="-1" charStart="166" charEnd="269">
+                           <sedLoopCondition xml:id="_62747fc2-8b69-4959-b3ff-7d1cd072a67d" name="i&lt;3" lineNumber="-1" charStart="173" charEnd="178">
+                              <sedLoopNode xml:id="_79bf1bce-ec8e-4105-af0e-7f4014ec2a15" name="while ( i&lt;2 ) {   result_1++;   i++; }" lineNumber="-1" charStart="187" charEnd="237">
+                                 <sedLoopCondition xml:id="_f32e47b0-5676-467d-8b8c-099cff9802f6" name="i&lt;2" lineNumber="-1" charStart="194" charEnd="199">
+                                    <sedStatement xml:id="_0774b15f-f939-4711-a291-2147d081894c" name="result_1++;" lineNumber="-1" charStart="209" charEnd="219">
+                                       <sedStatement xml:id="_67130376-9ec0-40d1-9aab-9414e09de2ef" name="i++;" lineNumber="-1" charStart="226" charEnd="230">
+                                          <sedLoopCondition xml:id="_4d0a561d-9bf2-4504-b653-fb2cf4822366" name="i&lt;2" lineNumber="-1" charStart="194" charEnd="199">
+                                             <sedStatement xml:id="_10adecb0-aa86-469e-85ce-f5c851d9d18b" name="result_1++;" lineNumber="-1" charStart="209" charEnd="219">
+                                                <sedStatement xml:id="_f45e26c9-1bdd-4fd7-8525-757efe4caa01" name="i++;" lineNumber="-1" charStart="226" charEnd="230">
+                                                   <sedLoopCondition xml:id="_f249797d-24cf-4c87-b34b-459c13939e52" name="i&lt;2" lineNumber="-1" charStart="194" charEnd="199">
+                                                      <sedStatement xml:id="_54a34e5f-6b1b-4a3d-a66b-ec90ed493908" name="result_1++;" lineNumber="-1" charStart="243" charEnd="253">
+                                                         <sedStatement xml:id="_6f0ad9d4-a55b-4ae8-8cbb-d2b7de3ac5a1" name="i++;" lineNumber="-1" charStart="259" charEnd="263">
+                                                            <sedLoopCondition xml:id="_ce8e1d00-6066-4d8b-9058-1551d50690ac" name="i&lt;3" lineNumber="-1" charStart="173" charEnd="178">
+                                                               <sedStatement xml:id="_81c0bf81-16ed-4f7d-ba80-b181f1b2fd8d" name="result_1++;" lineNumber="-1" charStart="274" charEnd="284">
+                                                                  <sedStatement xml:id="_44c42ab8-41d0-4d45-a4d1-15b6badb676a" name="i++;" lineNumber="-1" charStart="289" charEnd="293">
+                                                                     <sedLoopCondition xml:id="_d43cc7d1-2b6f-4f46-b256-49c923dc879b" name="i&lt;3" lineNumber="-1" charStart="153" charEnd="158">
+                                                                        <sedStatement xml:id="_79a8f036-e104-46ca-a545-3790e7d01f81" name="return result_1;" lineNumber="-1" charStart="302" charEnd="316">
+                                                                           <sedMethodReturn xml:id="_dfe3a082-b487-41f1-845a-f0f431cecb36" name="&lt;return &apos;4&apos; as result of self.mainNested();&gt;" lineNumber="-1" charStart="95" charEnd="105">
+                                                                              <sedTermination xml:id="_c6e6c49c-b661-4c19-865c-540029223b49" name="&lt;end&gt;">
+                                                                              </sedTermination>
+                                                                           </sedMethodReturn>
+                                                                        </sedStatement>
+                                                                     </sedLoopCondition>
+                                                                  </sedStatement>
+                                                               </sedStatement>
+                                                            </sedLoopCondition>
+                                                         </sedStatement>
+                                                      </sedStatement>
+                                                   </sedLoopCondition>
+                                                </sedStatement>
+                                             </sedStatement>
+                                          </sedLoopCondition>
+                                       </sedStatement>
+                                    </sedStatement>
+                                 </sedLoopCondition>
+                              </sedLoopNode>
+                           </sedLoopCondition>
+                        </sedLoopNode>
+                     </sedLoopCondition>
+                  </sedLoopNode>
+               </sedStatement>
+            </sedStatement>
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>

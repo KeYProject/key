@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+  <extension
+      point="org.eclipse.graphiti.ui.diagramTypes">
+    <diagramType
+      description="This is the diagram type for Symbolic Execution Trees"
+      id="org.key_project.sed.ui.graphiti.ExecutionTreeDiagramType"
+      name="Symbolic Execution Tree"
+      type="symbolicExecutionTreeDiagram">
+    </diagramType>
+  </extension>
+ 
+  <extension
+      point="org.eclipse.graphiti.ui.diagramTypeProviders">
+    <diagramTypeProvider
+      class="org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeDiagramTypeProvider"
+      description="This is my editor for the Graphiti tutorial"
+      id="org.key_project.sed.ui.graphiti.ExecutionTreeDiagramTypeProvider"
+      name="Symbolic Execution Tree Editor">
+      <diagramType
+        id="org.key_project.sed.ui.graphiti.ExecutionTreeDiagramType">
+      </diagramType>
+      <imageProvider
+            id="org.key_project.sed.ui.visualization.execution_tree.provider.MyTutorialImageProvider">
+      </imageProvider>
+    </diagramTypeProvider>
+  </extension>
+  
+    <extension
+         point="org.eclipse.graphiti.ui.imageProviders">
+      <imageProvider
+            class="org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeImageProvider"
+            id="org.key_project.sed.ui.visualization.execution_tree.provider.MyTutorialImageProvider">
+      </imageProvider>
+   </extension>
+    <extension
+          point="org.eclipse.ui.newWizards">
+       <category
+             id="org.key_project.sed.ui.visualization.category"
+             name="Symbolic Execution Debugger (SED)">
+       </category>
+       <wizard
+             category="org.key_project.sed.ui.visualization.category"
+             class="org.key_project.sed.ui.visualization.execution_tree.wizard.NewExecutionTreeDiagramWizard"
+             icon="icons/symbolic_debug.gif"
+             id="org.key_project.sed.ui.visualization.execution_tree.wizard.NewExecutionTreeDiagramWizard"
+             name="Symbolic Execution Tree Diagram"
+             project="false">
+          <description>
+             Create a new Symbolic Execution Tree Diagram
+          </description>
+       </wizard>
+    </extension>
+    <extension
+          point="org.eclipse.ui.editors">
+       <editor
+             class="org.key_project.sed.ui.visualization.execution_tree.editor.ExecutionTreeDiagramEditor"
+             contributorClass="org.eclipse.graphiti.ui.editor.DiagramEditorActionBarContributor"
+             default="true"
+             extensions="set_diagram"
+             icon="icons/symbolic_debug.gif"
+             id="org.key_project.sed.ui.visualization.symbolicExecutionTreeDiagramEditor"
+             name="Symbolic Execution Tree Diagram Editor">
+          <contentTypeBinding
+                contentTypeId="org.eclipse.graphiti.content.diagram">
+          </contentTypeBinding>
+       </editor>
+       <editor
+             class="org.eclipse.ui.editors.text.TextEditor"
+             contributorClass="org.eclipse.ui.editors.text.TextEditorActionContributor"
+             default="false"
+             icon="icons/symbolic_debug.gif"
+             id="org.key_project.sed.ui.visualization.symbolicExecutionTreeEditor"
+             name="Symbolic Execution Tree Editor">
+          <contentTypeBinding
+                contentTypeId="org.eclipse.core.runtime.xml">
+          </contentTypeBinding>
+       </editor>
+    </extension>
+    <extension
+          point="org.eclipse.core.contenttype.contentTypes">
+       <file-association
+             content-type="org.eclipse.graphiti.content.diagram"
+             file-extensions="set_diagram">
+       </file-association>
+       <file-association
+             content-type="org.eclipse.core.runtime.xml"
+             file-extensions="set">
+       </file-association>
+    </extension>
+      <extension
+          point="org.eclipse.ui.views.properties.tabbed.propertyContributor">
+          <propertyContributor contributorId="symbolicExecutionTreeDiagram.PropertyContributor">
+              <propertyCategory category="Graphiti">
+              </propertyCategory>
+          </propertyContributor>
+      </extension>
+       
+      <extension
+          point="org.eclipse.ui.views.properties.tabbed.propertyTabs">
+          <propertyTabs contributorId="symbolicExecutionTreeDiagram.PropertyContributor">
+              <propertyTab label="Debug" category="Graphiti"
+                  id="org.key_project.sed.ui.visualization.debug.tab">
+              </propertyTab>
+          </propertyTabs>
+      </extension>
+       
+      <extension
+          point="org.eclipse.ui.views.properties.tabbed.propertySections">
+          <propertySections contributorId="symbolicExecutionTreeDiagram.PropertyContributor">
+              <propertySection tab="org.key_project.sed.ui.visualization.debug.tab"           
+               class="org.key_project.sed.ui.visualization.execution_tree.property.SEDDebugNodePropertySection"
+               filter="org.key_project.sed.ui.visualization.execution_tree.property.SEDDebugNodeTreeFilter"
+               id="org.key_project.sed.ui.visualization.debug.tab.SEDDebugNodePropertySection">
+              </propertySection>
+          </propertySections>
+      </extension>    
+
+  <extension
+        point="org.eclipse.ui.views">
+     <category
+           id="org.key_project.sed.ui.graphiti.category"
+           name="Symbolic Execution Debugger (SED)">
+     </category>
+     <view
+           category="org.key_project.sed.ui.graphiti.category"
+           class="org.key_project.sed.ui.visualization.view.ExecutionTreeView"
+           icon="icons/symbolic_debug.gif"
+           id="org.key_project.sed.ui.graphiti.view.ExecutionTreeView"
+           name="Symbolic Execution Tree"
+           restorable="true">
+     </view>
+  </extension>
+  <extension
+        point="org.eclipse.ui.perspectiveExtensions">
+     <perspectiveExtension
+           targetID="org.key_project.sed.ui.perspective">
+        <view
+              id="org.key_project.sed.ui.graphiti.view.ExecutionTreeView"
+              minimized="false"
+              relationship="right"
+              relative="org.eclipse.debug.ui.DebugView"
+              visible="true">
+        </view>
+        <viewShortcut
+              id="org.key_project.sed.ui.graphiti.view.ExecutionTreeView">
+        </viewShortcut>
+     </perspectiveExtension>
+  </extension>
+</plugin>

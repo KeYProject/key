@@ -110,7 +110,6 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
      * differently. (<Default> for instance) 
      */
     private TypeReference makeTyRef(ClassDeclaration recoderClass) {
-        TypeReference tyref;
         Identifier id = recoderClass.getIdentifier();
         if(id instanceof ImplicitIdentifier) 
             return new TypeReference(id);

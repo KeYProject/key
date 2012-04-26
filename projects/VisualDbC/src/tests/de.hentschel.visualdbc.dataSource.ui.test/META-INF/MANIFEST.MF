@@ -1,0 +1,24 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Visual DbC Data Source UI Test
+Bundle-SymbolicName: de.hentschel.visualdbc.dataSource.ui.test;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: de.hentschel.visualdbc.datasource.ui.test.Activator
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.core.resources;bundle-version="3.6.1",
+ org.eclipse.jdt.core;bundle-version="3.6.2",
+ org.junit4;bundle-version="4.8.1",
+ org.eclipse.swtbot.go;bundle-version="2.0.4",
+ org.key_project.util.test;bundle-version="1.0.0",
+ org.key_project.util;bundle-version="1.0.0",
+ de.hentschel.visualdbc.dataSource;bundle-version="1.0.0",
+ de.hentschel.visualdbc.dataSource.test;bundle-version="1.0.0",
+ de.hentschel.visualdbc.dataSource.ui;bundle-version="1.0.0"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: de.hentschel.visualdbc.datasource.ui.test.dataSource,
+ de.hentschel.visualdbc.datasource.ui.test.suite,
+ de.hentschel.visualdbc.datasource.ui.test.suite.swtbot,
+ de.hentschel.visualdbc.datasource.ui.test.util
+Bundle-Vendor: Martin Hentschel

@@ -16,6 +16,10 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 
 public class SLTranslationException extends ProofInputException {
       
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 6600131411834400587L;
     private final String fileName;
     private final Position pos;
     
@@ -53,6 +57,12 @@ public class SLTranslationException extends ProofInputException {
     }
     
     
+    public SLTranslationException(String message, Throwable cause) {
+        this(message);
+        initCause(cause);
+    }
+
+
     public String getFileName() {
         return fileName;
     }

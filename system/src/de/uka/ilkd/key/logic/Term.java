@@ -132,5 +132,10 @@ public interface Term extends SVSubstitute {
      * operator, sort, arity, varsBoundHere and javaBlock as this object
      * modulo bound renaming
      */  
-    public boolean equalsModRenaming(Object o);    
+    public boolean equalsModRenaming(Object o);  
+    
+    /**
+     * Returns a serial number for a term. The serial number is not persistent.
+     *  */
+    public int serialNumber();
 }

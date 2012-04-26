@@ -20,6 +20,7 @@ import de.uka.ilkd.key.util.ProgressMonitor;
  * 
  * It is a first step to a better separation between GUI and prover.
  */
+@Deprecated
 public interface IMain {
 
     public abstract String getInternalVersion();

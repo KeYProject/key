@@ -11,17 +11,19 @@
 
 package de.uka.ilkd.key.proof;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.RuleAppListener;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.proofevent.NodeChangeJournal;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
@@ -218,16 +220,8 @@ public class Goal  {
     }
 
     public void setGlobalProgVars(ImmutableSet<ProgramVariable> s) {
-        ImmutableSet<ProgramVariable> globalProgVars = getGlobalProgVars();
-        Namespace ns = proof().getNamespaces().programVariables();
-        Iterator<ProgramVariable> it = s.iterator();
-        while (it.hasNext()) {
-            ProgramVariable pv = it.next();
-            if (!globalProgVars.contains(pv)) {
-                ns.addSafely(pv);
-            }
-        }
-	node.setGlobalProgVars(s);
+        assert node.proof().getNamespaces().contains(names(s)) : "\""+names(s)+ "\" not found in namespace.";
+        node.setGlobalProgVars(s);
     }
 
     /** 
@@ -464,9 +458,9 @@ public class Goal  {
 	while (it.hasNext()) {
 	    s = s.add((ProgramVariable)it.next());
 	}
-        proof().getNamespaces().programVariables().reset();
         node().setGlobalProgVars(DefaultImmutableSet.<ProgramVariable>nil());
-	setGlobalProgVars(s);
+        proof().getNamespaces().programVariables().set(s);
+        setGlobalProgVars(s);
     }
 
 
@@ -507,12 +501,13 @@ public class Goal  {
     /**
      * PRECONDITION: appliedRuleApps.size () > 0
      */
-    public void removeAppliedRuleApp () {
+    public void removeLastAppliedRuleApp () {
 	appliedRuleApps = appliedRuleApps.tail ();
-	node ().setAppliedRuleApp ( null );
+	//node ().setAppliedRuleApp ( null );
     }
 
     
+   
     /** creates n new nodes as children of the
      * referenced node and new 
      * n goals that have references to these new nodes.
@@ -555,67 +550,18 @@ public class Goal  {
 	return goalList;
     }
 
-    /**
-     * sets back the proof step that led to this goal. This goal is set to
-     * the parent node of the node corresponding to this goal. Goals given in
-     * the goal list parameter are removed from that list, if their
-     * corresponding nodes are leaves of the parent node of this goal.
-     * @param goalList the IList<Goal> with the goals to be removed 
-     * @return the new list of goals where goals mapped to the leaves of
-     * the parent to this goal are removed from compared to the given list.
-     */
-    public ImmutableList<Goal> setBack(ImmutableList<Goal> goalList) {
-	final Node parent = node.parent();
-	final Iterator<Node> leavesIt = parent.leavesIterator();
-	while (leavesIt.hasNext()) {
-	    Node n = leavesIt.next();
-	 
-	    final Iterator<Goal> goalIt = goalList.iterator();
-	    while (goalIt.hasNext()) {
-		final Goal g = goalIt.next();
-	
-		if (g.node()==n && g!=this) {
-		    goalList=goalList.removeFirst(g);		   
-		}
-	    }
-	}
 
-	//	ruleAppIndex.tacletIndex().setTaclets(parent.getNoPosTacletApps());
+    
+    
 
-        removeTaclets();
-	setGlobalProgVars(parent.getGlobalProgVars());
-
-	if (node.proof().env()!=null) { // do not break everything
-	                                // because of ProofMgt
-	    node.proof().mgt().ruleUnApplied(parent.getAppliedRuleApp());
-	}
-
-	Iterator<Node> siblings=parent.childrenIterator();
-	Node[] sibls=new Node[parent.childrenCount()];
-	int i=0;
-	while (siblings.hasNext()) {
-	    sibls[i]=siblings.next(); 
-	    i++;
-	}
-
-	for (i=0; i<sibls.length; i++) {
-	    sibls[i].remove();
-	}
-
-	setNode(parent);
-	removeAppliedRuleApp ();
-        
-        updateRuleAppIndex();
-        
-	return goalList;
-    }
 
     private void resetTagManager() {
+    
         tagManager = new FormulaTagManager ( this );
     }
 
     private void removeTaclets() {
-    	final Iterator<NoPosTacletApp> it = node.getNoPosTacletApps().iterator();
+    	final Iterator<NoPosTacletApp> it = node.getLocalIntroducedRules().iterator();
     	while ( it.hasNext () )
            ruleAppIndex.removeNoPosTacletApp(it.next ());
     }
@@ -635,6 +581,10 @@ public class Goal  {
 	}
     }    
     
+    void pruneToParent(){
+            setNode(node().parent());
+            removeLastAppliedRuleApp();
+    }
     
     public ImmutableList<Goal> apply( RuleApp p_ruleApp ) {
 //System.err.println(Thread.currentThread());    
@@ -656,10 +606,7 @@ public class Goal  {
         
         proof.getServices().saveNameRecorder(n);
         
-        if ( goalList == null ) {
-            // this happens for the simplify decision procedure
-            // we do nothing in this case
-        } else if ( goalList.isEmpty() ) {
+        if ( goalList.isEmpty() ) {
             proof.closeGoal ( this );           
         } else {
             proof.replace ( this, goalList );
@@ -693,5 +640,13 @@ public class Goal  {
 	synchronized(ruleAppListenerList) {	
 	    ruleAppListenerList.remove(p);
 	}
+    }
+    
+    private <T extends Named> ImmutableSet<Name> names(ImmutableSet<T> set) {
+        ImmutableSet<Name> names = DefaultImmutableSet.<Name>nil();
+        for (T elem : set) {
+            names = names.add(elem.name());
+        }
+        return names;
     }
 }

@@ -174,12 +174,12 @@ public class Layouter {
     private Printer out;
 
     /** The list of scanned tokens not yet output. */
-    private List stream = new java.util.LinkedList();
+    private List<StreamToken> stream = new java.util.LinkedList<StreamToken>();
 
     /** A stack of <code>OpenBlockToken</code>s and
      * <code>BreakToken</code>s in <code>stream</code>, waiting for
      * their size to be determined.*/
-    private List delimStack = new java.util.LinkedList();
+    private List<StreamToken> delimStack = new java.util.LinkedList<StreamToken>();
 
     /*
      * Some Invariants:
@@ -577,7 +577,7 @@ public class Layouter {
     /** Pop the topmost Token from the delimStack */
     private StreamToken pop()  {
 	try {
-	    return (StreamToken)(delimStack.remove(delimStack.size()-1));
+	    return (delimStack.remove(delimStack.size()-1));
 	} catch (IndexOutOfBoundsException e) {
 	    throw new UnbalancedBlocksException();
 	}
@@ -587,7 +587,7 @@ public class Layouter {
      * delimStack */
     private StreamToken popBottom()  {
 	try {
-	    return (StreamToken)(delimStack.remove(0));
+	    return (delimStack.remove(0));
 	} catch (IndexOutOfBoundsException e) {
 	    throw new UnbalancedBlocksException();
 	}
@@ -596,7 +596,7 @@ public class Layouter {
     /** Return the top of the delimStack, without popping it. */
     private StreamToken top()  {
 	try {
-	    return (StreamToken)delimStack.get(delimStack.size()-1);
+	    return delimStack.get(delimStack.size()-1);
 	} catch (IndexOutOfBoundsException e) {
 	    throw new UnbalancedBlocksException();
 	}
@@ -612,7 +612,7 @@ public class Layouter {
     
     /** Get the front token from the stream. */
     private StreamToken dequeue() {
-	return (StreamToken)(stream.remove(0));
+	return (stream.remove(0));
     }
 
     /** Send tokens from <code>stream<code> to <code>out</code> as long
@@ -622,7 +622,7 @@ public class Layouter {
     {
 	StreamToken t;
 	while (! stream.isEmpty() &&
-	       ((t=(StreamToken)stream.get(0)).followingSizeKnown())) {
+	       ((t=stream.get(0)).followingSizeKnown())) {
 	    t.print();
 	    stream.remove(0);
 	    totalOutput+=t.size();

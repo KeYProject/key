@@ -77,8 +77,10 @@ public class BuiltInRuleApp implements RuleApp {
 	} catch (Exception e) {
 	    result = null;
     }
-	if (result == null)
-	    goal.removeAppliedRuleApp();
+    if (result == null){
+        goal.removeLastAppliedRuleApp();
+        goal.node().setAppliedRuleApp(null);
+    }
 	return result;
     }
     

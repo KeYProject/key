@@ -1,0 +1,228 @@
+package de.uka.ilkd.key.gui.utilities;
+
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+
+
+/**
+ * This class offers a simple solution for receiving checked user input. 
+ * It describes a panel consisting of a text field for user input and a 
+ * traffic light. By means of the interface <code>CheckedUserInputInspector</code>
+ * one can check the input the user makes instantaneously.  
+ * 
+ * If you want to see how the component looks like, execute the method <code>main</code> 
+ * at the bottom of this file.
+ */
+public class CheckedUserInput extends JPanel{
+    private static final long serialVersionUID = 1L;
+   
+
+
+
+    static public interface CheckedUserInputInspector{
+        
+        public static final String NO_USER_INPUT = " ";
+        /**
+         * @param toBeChecked the user input to be checked.
+         * @return <code>null</code> if the user input is valid, otherwise a string describing the error. 
+         */
+        public String check(String toBeChecked);
+        
+        
+    }
+    
+    /**
+     * Used for observing the checked user input.
+     */
+    static public interface CheckedUserInputListener{
+        public void userInputChanged(String input,boolean valid);
+      
+    }
+   
+    
+    private TrafficLight trafficLight;
+    private JTextPane    inputFieldForFormula;
+    private JLabel       infoLabel;
+
+    private final CheckedUserInputInspector inspector; 
+    private final List<CheckedUserInputListener> listeners = new LinkedList<CheckedUserInputListener>();
+    
+    public CheckedUserInput(CheckedUserInputInspector inspector, boolean showInformation) {
+        this.inspector = inspector;
+        this.setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
+        Box horzBox = Box.createHorizontalBox();
+        JScrollPane pane = new JScrollPane(getInputFieldForFormula());
+        horzBox.add(pane);
+        horzBox.add(Box.createHorizontalStrut(5));
+        horzBox.add(getTrafficLight());
+        Dimension dim = pane.getPreferredSize();
+        dim.height = getTrafficLight().getPreferredSize().height;
+        pane.setPreferredSize(dim);
+        pane.setMinimumSize(dim);
+        this.add(horzBox);
+        this.add(Box.createVerticalStrut(2));
+        horzBox = Box.createHorizontalBox();
+        if(showInformation){
+            horzBox.add(getInfoLabel());
+        }
+        horzBox.add(Box.createHorizontalGlue());
+        this.add(horzBox);
+        setInput("");
+    }
+
+    
+    private TrafficLight getTrafficLight(){
+        if(trafficLight == null) {
+            trafficLight = new TrafficLight(10);            
+        }
+        return trafficLight;
+    }
+    
+    private JLabel getInfoLabel(){
+        if(infoLabel == null){
+            infoLabel = new JLabel();
+            infoLabel.setBackground(this.getBackground());
+            infoLabel.setFont(this.getFont());
+            infoLabel.setText(" ");
+            
+        }
+        return infoLabel;
+    }
+    
+    private JTextPane getInputFieldForFormula(){
+        if(inputFieldForFormula == null){
+                inputFieldForFormula = new JTextPane();
+                inputFieldForFormula.getDocument().addDocumentListener(new DocumentListener() {
+                                    
+                 @Override
+                 public void removeUpdate(DocumentEvent e) {
+                      checkInput();  
+                         
+                 }                 
+                 @Override
+                 public void insertUpdate(DocumentEvent e) {
+                       checkInput();
+                         
+                 }                 
+                 @Override
+                 public void changedUpdate(DocumentEvent e) {
+                        
+                 }
+         });
+                
+        }
+        return inputFieldForFormula;
+}
+    
+    private void checkInput(){
+        String text = inputFieldForFormula.getText();
+        String result = inspector.check(text);
+        setValid(result);
+        for(CheckedUserInputListener listener : listeners){
+            listener.userInputChanged(text,result==null);
+        }
+    }
+    
+    public void addListener(CheckedUserInputListener listener){
+        listeners.add(listener);
+    }
+    
+
+    public void removeListener(CheckedUserInputListener listener){
+        listeners.remove(listener);
+    }
+    
+    public String getInput(){
+        return getInputFieldForFormula().getText();
+    }
+    
+    public void setInput(String input){
+        getInputFieldForFormula().setText((input == null) ? "" : input);
+        checkInput();
+    }
+
+private void setValid(String result){
+        if(result == null){
+            getInfoLabel().setText(" ");
+        }else{
+            getInfoLabel().setText(result);
+        }
+        getTrafficLight().setGreen(result == null);
+
+}
+    
+    public static String showAsDialog(String title,String description,
+                                        final String helpText,
+                                        String defaultInput,
+                                       CheckedUserInputInspector inspector,
+                                       boolean showInformation
+                                       
+                                       ) {
+        CheckedUserInput userInput = new CheckedUserInput(inspector,showInformation);
+        
+        Box vertBox = Box.createVerticalBox();
+        if(description != null){
+            Box horzBox = Box.createHorizontalBox();
+            horzBox.add(new JLabel(description));
+            horzBox.add(Box.createHorizontalGlue());
+            vertBox.add(horzBox);
+            vertBox.add(Box.createVerticalStrut(5));
+        }
+        vertBox.add(userInput);
+        final StdDialog dialog = new StdDialog(title,
+                vertBox, 5, helpText!= null);
+        userInput.addListener(new CheckedUserInputListener(){
+
+            @Override
+            public void userInputChanged(String input, boolean valid) {
+               dialog.getOkayButton().setEnabled(valid);                
+            }            
+        });
+
+        dialog.getHelpButton().addActionListener(new ActionListener() {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+               JOptionPane.showMessageDialog(dialog, helpText,"Help" ,
+                       JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
+        
+        userInput.setInput(defaultInput);
+        Dimension dim = dialog.getPreferredSize();
+        dialog.setSize(Math.max(dim.width,dialog.getOkayButton().getWidth()*4),dim.height);
+        dialog.setVisible(true);
+        
+        if(dialog.okayButtonHasBeenPressed()){
+            return userInput.getInput();
+        }
+        return null;  
+    }
+    
+    
+    
+    public static void main(String [] args){
+        showAsDialog("Checked user input embedded in a dialog.","type 'test'","that is only a test","default",
+                new CheckedUserInputInspector() {
+            
+            @Override
+            public String check(String toBeChecked) {
+
+                return toBeChecked.equals("test") ? null : "Syntax Error";
+            }
+        },true);
+    }
+}

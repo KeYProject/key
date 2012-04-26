@@ -41,11 +41,6 @@ public abstract class KeYInstaller {
 	"antlr.jar", "recoderKey.jar"
     };
 
-    /** optional external binaries */
-    private static final String[] optBinaries = new String[] {
-	"Simplify"
-    };
-
     /* necessary environment information */
 
     /** the directory where your Java interpreter is installed */

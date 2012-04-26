@@ -54,7 +54,7 @@ public class MetaClassReference extends JavaNonTerminalProgramElement
      */ 
     public MetaClassReference(ExtList children) {
 	super(children);
-	typeReference=(TypeReference)children.get(TypeReference.class);
+	typeReference=children.get(TypeReference.class);
     }
 
     /**

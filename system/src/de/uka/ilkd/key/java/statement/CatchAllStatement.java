@@ -34,8 +34,8 @@ public class CatchAllStatement extends JavaNonTerminalProgramElement
     
     public CatchAllStatement(ExtList children) {
     	super(children); // for comments
-    	this.body = (StatementBlock) children.get(StatementBlock.class);
-    	this.param = (LocationVariable) children.get(LocationVariable.class);
+    	this.body = children.get(StatementBlock.class);
+    	this.param = children.get(LocationVariable.class);
     }
     
     

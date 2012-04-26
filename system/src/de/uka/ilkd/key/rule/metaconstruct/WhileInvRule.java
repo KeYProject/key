@@ -21,6 +21,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.statement.If;
 import de.uka.ilkd.key.java.statement.MethodFrame;
+import de.uka.ilkd.key.java.statement.TransactionStatement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
@@ -149,7 +150,6 @@ public class WhileInvRule extends AbstractTermTransformer {
             breakIfCascade.add(KeYJavaASTFactory.ifThen(newVar, s));
         }
         
-        
         WhileInvariantTransformation w = 
             new WhileInvariantTransformation(body,
                                              (ProgramElementName)
@@ -230,12 +230,15 @@ public class WhileInvRule extends AbstractTermTransformer {
         }
         
         Modality loopBodyModality = modality;
-        
+        final boolean transaction = (loopBodyModality == Modality.DIA_TRANSACTION || loopBodyModality == Modality.BOX_TRANSACTION);
         return TB.prog(loopBodyModality, 
-        	      JavaBlock.createJavaBlock(new StatementBlock(resSta)), 
+        	      JavaBlock.createJavaBlock(transaction ? 
+        	         new StatementBlock(new Statement[]{
+        	                  resSta, 
+        	                  new TransactionStatement(de.uka.ilkd.key.java.recoderext.TransactionStatement.FINISH)})
+        	      : new StatementBlock(resSta)), 
         	      result); 
     }
-
 
     /**
      * creates a new program variable 

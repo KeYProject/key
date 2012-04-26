@@ -26,6 +26,10 @@ import recoder.list.generic.ASTList;
 public class ContextStatementBlock
     extends StatementBlock implements KeYRecoderExtension{
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -7812560435975572578L;
     private ExecutionContext ec;
         
     /**

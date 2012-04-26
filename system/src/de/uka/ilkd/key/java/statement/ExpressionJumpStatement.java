@@ -36,7 +36,7 @@ public abstract class ExpressionJumpStatement extends JumpStatement implements E
      */
     public ExpressionJumpStatement(ExtList children) {
 	super(children);
-	expression=(Expression)children.get(Expression.class);	
+	expression=children.get(Expression.class);	
     }
 
     /**

@@ -37,6 +37,7 @@ class KeYLexer extends Lexer;
 options {
     k=2;
     defaultErrorHandler = true;
+    charVocabulary='\u0000'..'\uFFFE';
 }
 
 tokens {
@@ -72,9 +73,11 @@ tokens {
 	DISJOINTMODULONULL  = "\\disjointModuloNull";
 	DROP_EFFECTLESS_ELEMENTARIES = "\\dropEffectlessElementaries";
 	DROP_EFFECTLESS_STORES = "\\dropEffectlessStores";	
+	SIMPLIFY_IF_THEN_ELSE_UPDATE = "\\simplifyIfThenElseUpdate";
 	ENUM_CONST = "\\enumConstant";	
         FREELABELIN = "\\freeLabelIn";
 	HASSORT = "\\hasSort";
+	FIELDTYPE = "\\fieldType";
 	ELEMSORT = "\\elemSort";        
 	ISARRAY="\\isArray";
 	ISARRAYLENGTH="\\isArrayLength";	
@@ -99,8 +102,8 @@ tokens {
 	INSTANTIATE_GENERIC = "\\instantiateGeneric";
 
 	// Quantifiers, binding, substitution
-	FORALL = "\\forall";
-	EXISTS = "\\exists";
+        FORALL = "\\forall";
+        EXISTS = "\\exists";
         SUBST  = "\\subst";
 	IF   = "\\if";
 	IFEX   = "\\ifEx";
@@ -156,6 +159,11 @@ tokens {
         CONTAINERTYPE = "\\containerType";
         
         LIMITED = "$lmtd";
+        
+        // types that need to be declared as keywords
+        LOCSET = "\\locset";
+        SEQ = "\\seq";
+        BIGINT = "\\bigint";
 }
 
 {
@@ -215,36 +223,24 @@ tokens {
    static {
       modNames.put("\\<","diamond");
       modNames.put("\\diamond","diamond");
-      modNames.put("\\diamond_tra","diamond_tra");
-      modNames.put("\\diamond_trc","diamond_trc");
-      modNames.put("\\diamond_susp","diamond_susp");
+      modNames.put("\\diamond_transaction","diamond_transaction");
       modNames.put("\\[","box");
       modNames.put("\\box","box");
-      modNames.put("\\box_tra","box_tra");
-      modNames.put("\\box_trc","box_trc");
-      modNames.put("\\box_susp","box_susp");
+      modNames.put("\\box_transaction","box_transaction");
       modNames.put("\\[[","throughout");
       modNames.put("\\throughout","throughout");
-      modNames.put("\\throughout_tra","throughout_tra");
-      modNames.put("\\throughout_trc","throughout_trc");
-      modNames.put("\\throughout_susp","throughout_susp");
+      modNames.put("\\throughout_transaction","throughout_transaction");
 
       modPairs.put("\\<","\\>");
       modPairs.put("\\modality","\\endmodality");
       modPairs.put("\\diamond","\\endmodality");
-      modPairs.put("\\diamond_tra","\\endmodality");
-      modPairs.put("\\diamond_trc","\\endmodality");
-      modPairs.put("\\diamond_susp","\\endmodality");
+      modPairs.put("\\diamond_transaction","\\endmodality");
       modPairs.put("\\[","\\]");
       modPairs.put("\\box","\\endmodality");
-      modPairs.put("\\box_tra","\\endmodality");
-      modPairs.put("\\box_trc","\\endmodality");
-      modPairs.put("\\box_susp","\\endmodality");
+      modPairs.put("\\box_transaction","\\endmodality");
       modPairs.put("\\[[","\\]]");
       modPairs.put("\\throughout","\\endmodality");
-      modPairs.put("\\throughout_tra","\\endmodality");
-      modPairs.put("\\throughout_trc","\\endmodality");
-      modPairs.put("\\throughout_susp","\\endmodality");
+      modPairs.put("\\throughout_transaction","\\endmodality");
    }
 
    private void matchAndTransformModality(int beginIndex) throws antlr.RecognitionException {
@@ -584,7 +580,7 @@ options {
 }
 :
   '<' '='
-;
+    ;
 
 protected IMPLICIT_IDENT
 options {
@@ -771,81 +767,83 @@ options {
     paraphrase = "All possible modalities, including schema.";
 }
 :	'\\' ( (LETTER | '_')+ | "<" | "[" | "[[") {
-	   modalityBegin = text.toString();
-           Debug.out("modalityBegin == ", modalityBegin);
-           int literalTest = testLiteralsTable(MODALITY);
-           Debug.out("testLiteralsTable == ", literalTest);
-		_ttype = testLiteralsTable(_ttype);
-           if(literalTest == MODALITY && modPairs.get(modalityBegin) != null) {
-              /* This while with the following call to mMODALITYEND is 
-	       * and alternative to calling mJAVABLOCK, but it should be faster
-	       */
-              while(true) {
-		if(LA(1) == '/' && LA(2) == '/') {
-		   mSL_COMMENT(false); continue;
-		}
-		if(LA(1) == '/' && LA(2) == '*') {
-		   mML_COMMENT(false); continue;
-		}
-		if(LA(1) == '/' && LA(2) == '*') {
-		   mML_COMMENT(false); continue;
-		}
-		if(LA(1) == '\"') {
-                   mQUOTED_STRING_LITERAL(false); continue;
-		}
-		if(LA(1) == '\'') {
-                   mCHAR_LITERAL(false); continue;
-		}
-		if((LA(1) == '\r' && LA(2) != '\n') ||
-		    LA(1) == '\n') newline();
-	        if(LA(1) == '\\') break;
-		matchNot(EOF_CHAR);
-	      }
-	      mMODALITYEND(false);
-//              mJAVABLOCK(false);
-	      matchAndTransformModality(_begin);
-           }else{
-	        if("\\includeFile".equals(modalityBegin)) {
-		  // File inclusion 
-                  while(LA(1) == ' ' || LA(1) == '\t' || LA(1) == '\n')
-		    match(LA(1));
-		  int startIndex = text.length()+1;
-		  mQUOTED_STRING_LITERAL(false);
-		  int stopIndex = text.length()-1;
-                  while(LA(1) == ' ' || LA(1) == '\t' || LA(1) == '\n')
-		    match(LA(1));
-		  mSEMI(false);
-		  _ttype = Token.SKIP;
-		  String fileName = text.toString().substring(startIndex,stopIndex);
-		  Debug.out("File to be included: ", fileName);
-		  File incf = new File(fileName);
-		  File f = new File(getFilename());
-		  if((f.isAbsolute() || f.getParentFile() != null) && !incf.isAbsolute()) {
-		    f = new File(f.getParentFile(), fileName);
-		    fileName = f.getAbsolutePath();
-		  }
-		  Debug.out("File to be included: ", fileName);
-       		  try {
-                    KeYLexer sublexer =
-		      new KeYLexer(
-		        new DataInputStream(new  
-			FileInputStream(fileName)),
-			keh, selector);
-                    sublexer.setFilename(fileName);
-                    selector.push(sublexer);
-		    Debug.out("Pushed lexer: ", sublexer);
-                    selector.retry();
-                  } catch (FileNotFoundException fnf) {
-                     throw new RecognitionException("File '" + fileName + "' not found.",
-	               getFilename(), getLine(), getColumn());
-                  }
-		} else {
-		_ttype = IDENT; // make it an IDENT starting with '\\'
-		                // (it will not contain digits!)
-		}
-	   }
-	}
-	;
+    modalityBegin = text.toString();
+    Debug.out("modalityBegin == ", modalityBegin);
+    int literalTest = testLiteralsTable(MODALITY);
+    Debug.out("testLiteralsTable == ", literalTest);
+    _ttype = testLiteralsTable(_ttype);
+    if(literalTest == MODALITY && modPairs.get(modalityBegin) != null) {
+        /* This while with the following call to mMODALITYEND is 
+         * and alternative to calling mJAVABLOCK, but it should be faster
+         */
+        while(true) {
+            if(LA(1) == '/' && LA(2) == '/') {
+                mSL_COMMENT(false); continue;
+            }
+            if(LA(1) == '/' && LA(2) == '*') {
+                mML_COMMENT(false); continue;
+            }
+            if(LA(1) == '/' && LA(2) == '*') {
+                mML_COMMENT(false); continue;
+            }
+            if(LA(1) == '\"') {
+                mQUOTED_STRING_LITERAL(false); continue;
+            }
+            if(LA(1) == '\'') {
+                mCHAR_LITERAL(false); continue;
+            }
+            if((LA(1) == '\r' && LA(2) != '\n') ||
+                    LA(1) == '\n') newline();
+            if(LA(1) == '\\' && (LA(2) == 'e' || LA(2) == '>' || LA(2) == ']'))
+                // check whether it follows an ENDMODALITY
+                break;
+            matchNot(EOF_CHAR);
+        }
+        mMODALITYEND(false);
+        //              mJAVABLOCK(false);
+        matchAndTransformModality(_begin);
+    }else{
+        if("\\includeFile".equals(modalityBegin)) {
+            // File inclusion 
+            while(LA(1) == ' ' || LA(1) == '\t' || LA(1) == '\n')
+                match(LA(1));
+            int startIndex = text.length()+1;
+            mQUOTED_STRING_LITERAL(false);
+            int stopIndex = text.length()-1;
+            while(LA(1) == ' ' || LA(1) == '\t' || LA(1) == '\n')
+                match(LA(1));
+            mSEMI(false);
+            _ttype = Token.SKIP;
+            String fileName = text.toString().substring(startIndex,stopIndex);
+            Debug.out("File to be included: ", fileName);
+            File incf = new File(fileName);
+            File f = new File(getFilename());
+            if((f.isAbsolute() || f.getParentFile() != null) && !incf.isAbsolute()) {
+                f = new File(f.getParentFile(), fileName);
+                fileName = f.getAbsolutePath();
+            }
+            Debug.out("File to be included: ", fileName);
+            try {
+                KeYLexer sublexer =
+                    new KeYLexer(
+                            new DataInputStream(new  
+                                    FileInputStream(fileName)),
+                                    keh, selector);
+                sublexer.setFilename(fileName);
+                selector.push(sublexer);
+                Debug.out("Pushed lexer: ", sublexer);
+                selector.retry();
+            } catch (FileNotFoundException fnf) {
+                throw new RecognitionException("File '" + fileName + "' not found.",
+                        getFilename(), getLine(), getColumn());
+            }
+        } else {
+            _ttype = IDENT; // make it an IDENT starting with '\\'
+            // (it will not contain digits!)
+        }
+    }
+}
+;
 
 protected MODALITYEND
 options {

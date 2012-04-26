@@ -1,31 +1,29 @@
 package de.uka.ilkd.key.gui.lemmatagenerator;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
-import java.util.Vector;
+import java.util.List;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.ProofSaver;
-import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProblemInitializer.ProblemInitializerListener;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.taclettranslation.TacletSoundnessPOLoader;
-import de.uka.ilkd.key.taclettranslation.TacletSoundnessPOLoader.LoaderListener;
-import de.uka.ilkd.key.taclettranslation.TacletSoundnessPOLoader.TacletFilter;
-import de.uka.ilkd.key.taclettranslation.TacletSoundnessPOLoader.TacletInfo;
 import de.uka.ilkd.key.taclettranslation.lemma.AutomaticProver;
+import de.uka.ilkd.key.taclettranslation.lemma.TacletLoader;
+import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader;
+import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.LoaderListener;
+import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletFilter;
+import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletInfo;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
 public class LemmataHandler implements TacletFilter {
@@ -63,6 +61,21 @@ public class LemmataHandler implements TacletFilter {
                 File fileForDefinitions =  options.getPathOfRuleFile() != "" ? new File(options.getPathOfDefinitionFile()) :file;
                 Collection<File> filesForAxioms = createFilesForAxioms(options.getFilesForAxioms());
                 
+                final ProblemInitializer problemInitializer = new ProblemInitializer(null,
+                                profile, new Services(
+                                                new KeYRecoderExcHandler()),
+                                false, new Listener());
+                
+                TacletLoader tacletLoader = new TacletLoader.TacletFromFileLoader(null,
+                                                      new Listener(),
+                                                      problemInitializer,
+                                                      profile,
+                                                      fileForDefinitions ,
+                                                      file,
+                                                      filesForAxioms,
+                                                      null);
+                
+                
                 LoaderListener loaderListener = new LoaderListener() {
 
                         @Override
@@ -72,7 +85,7 @@ public class LemmataHandler implements TacletFilter {
 
                         @Override
                         public void stopped(ProofAggregate pa,
-                                        ImmutableSet<Taclet> taclets) {
+                                        ImmutableSet<Taclet> taclets,boolean addAsAxioms) {
                                 if (pa == null) {
                                         println("There is no taclet to be proven.");
                                         return;
@@ -91,10 +104,28 @@ public class LemmataHandler implements TacletFilter {
                         public void started() {
                                 println("Start loading the problem");
                         }
+
+                        @Override
+                        public void progressStarted(Object sender) {
+                
+                                
+                        }
+
+                        @Override
+                        public void reportStatus(Object sender, String string) {
+                  
+                                
+                        }
+
+                        @Override
+                        public void resetStatus(Object sender) {
+                  
+                                
+                        }
                 };
-                TacletSoundnessPOLoader loader = new TacletSoundnessPOLoader(
-                                null, file, createEnvironment(),
-                                loaderListener, new Listener(), this,filesForAxioms,fileForDefinitions);
+      
+                TacletSoundnessPOLoader loader = new TacletSoundnessPOLoader(loaderListener,this,true,tacletLoader);
+                
                 loader.start();
         }
         
@@ -106,29 +137,7 @@ public class LemmataHandler implements TacletFilter {
                 return list;
         }
 
-        private ProofEnvironment createEnvironment() throws IOException,
-                        ProofInputException {
-                File dummyFile = createDummyKeYFile();
-                KeYUserProblemFile dummyKeYFile = new KeYUserProblemFile(
-                                dummyFile.getName(), dummyFile, null);
 
-                ProblemInitializer pi = new ProblemInitializer(null, profile,
-                                new Services(new KeYRecoderExcHandler()),
-                                false, new Listener());
-
-                return pi.prepare(dummyKeYFile).getProofEnv();
-        }
-
-        private File createDummyKeYFile() throws IOException {
-                File file = new File(options.getHomePath() + File.separator
-                                + "lemmataGenDummy.key");
-                file.deleteOnExit();
-                String s = "\\problem{true}";
-                FileWriter writer = new FileWriter(file);
-                writer.write(s);
-                writer.close();
-                return file;
-        }
 
         private void handleException(Throwable exception) {
                 printException(exception);
@@ -212,7 +221,7 @@ public class LemmataHandler implements TacletFilter {
         }
 
         @Override
-        public ImmutableSet<Taclet> filter(Vector<TacletInfo> taclets) {
+        public ImmutableSet<Taclet> filter(List<TacletInfo> taclets) {
                 ImmutableSet<Taclet> set = DefaultImmutableSet.nil();
                 for (TacletInfo tacletInfo : taclets) {
                         if (!tacletInfo.isAlreadyInUse()

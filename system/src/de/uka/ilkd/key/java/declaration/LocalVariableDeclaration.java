@@ -108,8 +108,7 @@ public class LocalVariableDeclaration
         super(children, false);
         
 	this.varSpecs = new
-	    ImmutableArray<VariableSpecification>((VariableSpecification[]) 
-			 children.collect(VariableSpecification.class));
+	    ImmutableArray<VariableSpecification>(children.collect(VariableSpecification.class));
     }
 
     public ImmutableArray<VariableSpecification> getVariableSpecifications() {

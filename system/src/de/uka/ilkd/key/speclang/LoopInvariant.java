@@ -32,6 +32,7 @@ public interface LoopInvariant extends SpecificationElement {
      */
     public Term getInvariant(Term selfTerm, 
             		     Term heapAtPre,
+            		     Term savedHeapAtPre,
             		     Services services);
     
     /**
@@ -39,6 +40,7 @@ public interface LoopInvariant extends SpecificationElement {
      */
     public Term getModifies(Term selfTerm, 
             		    Term heapAtPre,
+            		    Term savedHeapAtPre,
             		    Services services);
     
     /**
@@ -58,7 +60,12 @@ public interface LoopInvariant extends SpecificationElement {
      * Returns the operator internally used for the pre-heap.
      */
     public Term getInternalHeapAtPre();
-    
+
+    /**
+     * Returns the operator internally used for the saved pre-heap.
+     */
+    public Term getInternalSavedHeapAtPre();
+
     /**
      * Returns a new loop invariant where the loop reference has been
      * replaced with the passed one.
@@ -67,12 +74,13 @@ public interface LoopInvariant extends SpecificationElement {
     
     /**
      * Returns a new loop invariant where the invariant formula has been
-     * repaced with the passed one. Take care: the variables used for
+     * replaced with the passed one. Take care: the variables used for
      * the receiver, parameters, and local variables must stay the same!
      */
     public LoopInvariant setInvariant(Term invariant, 
             			      Term selfTerm,
             			      Term heapAtPre,
+            			      Term savedHeapAtPre,
             			      Services services); 
     
     /** 

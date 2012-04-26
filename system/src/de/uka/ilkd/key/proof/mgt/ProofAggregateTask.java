@@ -20,6 +20,10 @@ import de.uka.ilkd.key.proof.SingleProof;
 public class ProofAggregateTask extends DefaultMutableTreeNode 
     implements TaskTreeNode{
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 2292876929382788414L;
     private TaskTreeNode[] proofs;
     private ProofAggregate proofList;
     private String descr;

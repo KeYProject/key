@@ -10,6 +10,9 @@
 
 package de.uka.ilkd.key.rule;
 
+import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableMap;
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -148,11 +151,11 @@ public final class RewriteTaclet extends FindTaclet {
 		op = t.op ();
 
 		if ( op instanceof UpdateApplication &&
-		     it.getChild () == ((UpdateApplication)op).targetPos()) {		    
+		     it.getChild () == UpdateApplication.targetPos()) {		    
 		    if ( getStateRestriction() == IN_SEQUENT_STATE || veto(t) ) {
 			return null;
 		    } else {
-			Term update = ((UpdateApplication) op).getUpdate(t);
+			Term update = UpdateApplication.getUpdate(t);
 			svi = svi.addUpdate ( update );
 		    }
 		    
@@ -219,7 +222,7 @@ public final class RewriteTaclet extends FindTaclet {
 				 	MatchConditions    matchCond) {
 	Term term = posOfFind.constrainedFormula().formula();
 	IntIterator it = posOfFind.posInTerm().iterator();
-	Term rwTemplate=((RewriteTacletGoalTemplate)gt).replaceWith();
+	Term rwTemplate=gt.replaceWith();
 
 	Term formula = replace(term, 
 		       	       rwTemplate, 

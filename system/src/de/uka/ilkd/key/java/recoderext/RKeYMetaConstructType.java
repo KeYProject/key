@@ -28,6 +28,10 @@ public class RKeYMetaConstructType extends TypeReference
 
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = -8028793181207056503L;
+    /**
      Child
      */
     protected Expression child=null;
@@ -36,7 +40,7 @@ public class RKeYMetaConstructType extends TypeReference
     protected RKeYMetaConstructType(RKeYMetaConstructType proto) {
         super(proto);
         if (proto.child != null) {
-            child = (Expression)proto.child.deepClone();
+            child = proto.child.deepClone();
         }
     }
 

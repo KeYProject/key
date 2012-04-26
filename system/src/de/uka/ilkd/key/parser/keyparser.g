@@ -34,8 +34,10 @@ header {
 
   import de.uka.ilkd.key.proof.*;
   import de.uka.ilkd.key.proof.init.*;
+  import de.uka.ilkd.key.proof.io.*;
 
   import de.uka.ilkd.key.rule.*;
+  import de.uka.ilkd.key.rule.tacletbuilder.*;
   import de.uka.ilkd.key.rule.conditions.*;
  
   import de.uka.ilkd.key.speclang.*;
@@ -55,6 +57,7 @@ header {
   import de.uka.ilkd.key.java.StatementBlock;
   import de.uka.ilkd.key.java.declaration.VariableDeclaration;
   import de.uka.ilkd.key.java.recoderext.*;
+  import de.uka.ilkd.key.java.recoderext.adt.*;
   import de.uka.ilkd.key.pp.AbbrevMap;
   import de.uka.ilkd.key.pp.LogicPrinter;
 }
@@ -239,7 +242,7 @@ options {
 		     Services services,
 		     NamespaceSet nss) {
 	this(mode, lexer, 
-	     new Recoder2KeY(
+	     new Recoder2KeY(services,
 		new KeYCrossReferenceServiceConfiguration(
 		   services.getExceptionHandler()), 
 		services.getJavaInfo().rec2key(), new NamespaceSet(), 
@@ -306,7 +309,29 @@ options {
         this.taclets = null;
         this.keh = new KeYRecoderExcHandler();
     }
- 
+
+
+    /**
+     * Parses taclet from string.
+     */
+    public static Taclet parseTaclet(String s, Services services) {
+   	try {
+	    KeYParser p =
+                new KeYParser(ParserMode.TACLET,
+                              new KeYLexer(new StringReader(s),null),
+                              "No file. KeYParser.parseTaclet(\n" + s + ")\n",
+                              services,
+                              services.getNamespaces());
+	    return p.taclet(DefaultImmutableSet.<Choice>nil());
+	} catch (Exception e) {
+	    StringWriter sw = new StringWriter();
+	    PrintWriter pw = new PrintWriter(sw);
+	    e.printStackTrace(pw);
+	    throw new RuntimeException("Exc while Parsing:\n" + sw );
+	}
+    }
+
+
     public String getChooseContract() {
       return chooseContract;
     }
@@ -1696,6 +1721,8 @@ one_schema_var_decl
     boolean makeVariableSV  = false;
     boolean makeSkolemTermSV = false;
     String id = null;
+    String parameter = null;
+    String nameString = null;
     ImmutableList<String> ids = null;
     SchemaVariableModifierSet mods = null;
 } :   
@@ -1706,8 +1733,12 @@ one_schema_var_decl
     PROGRAM
     { mods = new SchemaVariableModifierSet.ProgramSV (); }
     ( schema_modifiers[mods] ) ?
-    id = simple_ident  {
-       s = (Sort)ProgramSVSort.name2sort().get(new Name(id));
+    id = simple_ident ( LBRACKET nameString = simple_ident EQUALS parameter = simple_ident_dots RBRACKET )? {
+       if(nameString != null && !"name".equals(nameString)) {
+         semanticError("Unrecognized token '"+nameString+"', expected 'name'");
+       }
+       ProgramSVSort psv = ProgramSVSort.name2sort().get(new Name(id));
+       s = (Sort) (parameter != null ? psv.createInstance(parameter) : psv);
        if (s == null) {
          semanticError
            ("Program SchemaVariable of type "+id+" not found.");
@@ -2126,6 +2157,9 @@ any_sortId_check_help [boolean checkSort] returns [Pair<Sort,Type> result = null
             } else if(name.equals(PrimitiveType.JAVA_LONG.getName())) {
                 t = PrimitiveType.JAVA_LONG;
                 name = PrimitiveType.JAVA_INT.getName();
+            } else if(name.equals(PrimitiveType.JAVA_BIGINT.getName())){
+                t = PrimitiveType.JAVA_BIGINT;
+                name = PrimitiveType.JAVA_BIGINT.getName();
             }
             
             Sort s = lookupSort(name);
@@ -2256,20 +2290,14 @@ formula returns [Term a = null]
         }
     ;
 
-term returns [Term a = null] 
-    :
-        a=term10 
-    ;
-
-
-term10 returns [Term result = null]
+term returns [Term result = null]
 {
     Term a = null;
 }
     :
-        result=term10_2
+        result=elementary_update_term
         (
-           PARALLEL a=term10_2
+           PARALLEL a=elementary_update_term
            {
                result = tf.createTerm(UpdateJunctor.PARALLEL_UPDATE, result, a);
            }
@@ -2283,13 +2311,13 @@ term10 returns [Term result = null]
         }
         
         
-term10_2 returns[Term result=null]
+elementary_update_term returns[Term result=null]
 {
     Term a = null;
 }  :
-        result=term20 
+        result=equivalence_term 
         (
-            ASSIGN a=term20
+            ASSIGN a=equivalence_term
             {
                 result = TermBuilder.DF.elementary(getServices(), result, a);
             }
@@ -2302,12 +2330,12 @@ term10_2 returns[Term result=null]
         }
 
 
-term20 returns [Term a = null] 
+equivalence_term returns [Term a = null] 
 {
     Term a1;
 }
-    :   a=term30 
-        (EQV a1=term30 
+    :   a=implication_term 
+        (EQV a1=implication_term 
             { a = tf.createTerm(Equality.EQV, new Term[]{a, a1});} )*
 ; exception
         catch [TermCreationException ex] {
@@ -2316,12 +2344,12 @@ term20 returns [Term a = null]
 			(ex.getMessage(), getFilename(), getLine(), getColumn()));
         }
 
-term30 returns [Term a = null] 
+implication_term returns [Term a = null] 
 {
     Term a1;
 }
-    :   a=term40 
-        (IMP a1=term30 
+    :   a=disjunction_term 
+        (IMP a1=implication_term 
             { a = tf.createTerm(Junctor.IMP, new Term[]{a, a1});} )?
 ; exception
         catch [TermCreationException ex] {
@@ -2330,12 +2358,12 @@ term30 returns [Term a = null]
 			(ex.getMessage(), getFilename(), getLine(), getColumn()));
         }
 
-term40 returns [Term a = null] 
+disjunction_term returns [Term a = null] 
 {
     Term a1;
 }
-    :   a=term50 
-        (OR a1=term50 
+    :   a=conjunction_term 
+        (OR a1=conjunction_term 
             { a = tf.createTerm(Junctor.OR, new Term[]{a, a1});} )*
 ; exception
         catch [TermCreationException ex] {
@@ -2344,7 +2372,7 @@ term40 returns [Term a = null]
 			(ex.getMessage(), getFilename(), getLine(), getColumn()));
         }
 
-term50 returns [Term a = null] 
+conjunction_term returns [Term a = null] 
 {
     Term a1;
 }
@@ -2362,7 +2390,7 @@ term50 returns [Term a = null]
 term60 returns [Term a = null] 
     :  
         a = unary_formula
-    |   a = term70
+    |   a = equality_term
 ; exception
         catch [TermCreationException ex] {
               keh.reportException
@@ -2383,7 +2411,8 @@ unary_formula returns [Term a = null]
 			(ex.getMessage(), getFilename(), getLine(), getColumn()));
         }
 
-term70 returns [Term a = null] 
+
+equality_term returns [Term a = null] 
 {
     Term a1;
     boolean negated = false;
@@ -2481,7 +2510,7 @@ logicTermReEntry returns [Term a = null]
   Function op = null;
 }
 :
-   a = term90 ((relation_op)=> op = relation_op a1=term90 {
+   a = weak_arith_op_term ((relation_op)=> op = relation_op a1=weak_arith_op_term {
                  a = tf.createTerm(op, a, a1);
               })?
 ; exception
@@ -2492,13 +2521,13 @@ logicTermReEntry returns [Term a = null]
         }
 
 
-term90 returns [Term a = null]
+weak_arith_op_term returns [Term a = null]
 {
   Term a1 = null;
   Function op = null;
 }
 :
-   a = term100 ( op = weak_arith_op a1=term100 {
+   a = strong_arith_op_term ( op = weak_arith_op a1=strong_arith_op_term {
                   a = tf.createTerm(op, a, a1);
                 })*
 ; exception
@@ -2508,7 +2537,7 @@ term90 returns [Term a = null]
 			(ex.getMessage(), getFilename(), getLine(), getColumn()));
         }
 
-term100 returns [Term a = null]
+strong_arith_op_term returns [Term a = null]
 {
   Term a1 = null;
   Function op = null;
@@ -2776,7 +2805,7 @@ accessterm returns [Term result = null]
         {isStaticAttribute()}?            // look for package1.package2.Class.attr
         result = static_attribute_suffix
       | 	
-        result = term130
+        result = atom
       )   
          ( result = array_access_suffix[result] | result = attribute_or_query_suffix[result] )*
  ; exception
@@ -2835,7 +2864,7 @@ accesstermlist returns [HashSet accessTerms = new HashSet()] {Term t = null;}:
      (t=accessterm {accessTerms.add(t);} ( COMMA t=accessterm {accessTerms.add(t);})* )? ;
 
 
-term130 returns [Term a = null]
+atom returns [Term a = null]
     :
         {isTermTransformer()}? a = specialTerm
     |   a = funcpredvarterm
@@ -3069,7 +3098,10 @@ one_schema_bound_variable returns[QuantifiableVariable v=null]
    id = simple_ident {
       ts = (Operator) variables().lookup(new Name(id));   
       if ( ! (ts instanceof VariableSV)) {
-        semanticError(ts+" is not allowed in a quantifier.");
+        semanticError(ts+" is not allowed in a quantifier. Note, that you can't "
+        + "use the normal syntax for quantifiers of the form \"\\exists int i;\""
+        + " in taclets. You have to define the variable as a schema variable"
+        + " and use the syntax \"\\exists i;\" instead.");
       }
       v = (QuantifiableVariable) ts;
       bindVar();
@@ -3447,16 +3479,18 @@ varexp[TacletBuilder b]
 :
   ( varcond_applyUpdateOnRigid[b]
     | varcond_dropEffectlessElementaries[b]
-    | varcond_dropEffectlessStores[b]  
+    | varcond_dropEffectlessStores[b] 
     | varcond_enum_const[b] 
     | varcond_free[b]  
     | varcond_hassort[b]
+    | varcond_fieldtype[b]
     | varcond_equalUnique[b]
     | varcond_new[b]
     | varcond_newlabel[b] 
     | varcond_observer[b]
     | varcond_different[b]
     | varcond_metadisjoint[b]
+    | varcond_simplifyIfThenElseUpdate[b]
   ) 
   | 
   ( (NOT {negated = true;} )? 
@@ -3522,6 +3556,25 @@ varcond_dropEffectlessStores[TacletBuilder b]
       							       (TermSV)f,
       							       (TermSV)x, 
                                                                (TermSV)result));
+   }
+;
+
+varcond_simplifyIfThenElseUpdate[TacletBuilder b]
+{
+  ParsableVariable u1 = null;
+  ParsableVariable u2 = null;
+  ParsableVariable commonFormula  = null;
+  ParsableVariable phi = null;
+  ParsableVariable result = null;
+}
+:
+   SIMPLIFY_IF_THEN_ELSE_UPDATE LPAREN phi=varId COMMA u1=varId COMMA u2=varId COMMA commonFormula=varId COMMA result=varId RPAREN 
+   {
+      b.addVariableCondition(new SimplifyIfThenElseUpdateCondition((FormulaSV) phi,
+      															   (UpdateSV) u1,
+      															   (UpdateSV) u2,
+      															   (FormulaSV) commonFormula,
+                                                                   (SchemaVariable)result));
    }
 ;
 
@@ -3674,6 +3727,36 @@ varcond_hassort [TacletBuilder b]
      }
    }
 ;
+
+varcond_fieldtype [TacletBuilder b]
+{
+    ParsableVariable x = null;
+    Sort s = null;
+}
+:
+    FIELDTYPE
+    LPAREN
+    x=varId
+    COMMA 
+    s=any_sortId_check[true] 
+    RPAREN
+    {
+        if(!(s instanceof GenericSort)) {
+            throw new GenericSortException("sort",
+                                        "Generic sort expected", 
+                                        s,
+                                        getFilename(),
+                                        getLine(), 
+                                        getColumn());
+        } else if(!FieldTypeToSortCondition.checkSortedSV((SchemaVariable)x)) {
+            semanticError("Expected schema variable of kind EXPRESSION or TYPE, " 
+                          + "but is " + x);
+        } else {
+            b.addVariableCondition(new FieldTypeToSortCondition((SchemaVariable)x, 
+                                                               (GenericSort)s));
+        }
+    }
+;      
 
 varcond_enumtype [TacletBuilder b, boolean negated]
 {
@@ -4248,11 +4331,12 @@ proofBody [ProblemLoader prl] :
     ;
 
 
-pseudosexpr [ProblemLoader prl] { char eid='0'; String str = null; } :
+pseudosexpr [ProblemLoader prl] { char eid='0'; String str = ""; } :
         LPAREN (eid=expreid
-            (str = string_literal { prl.beginExpr(eid,str); } )? 
+            (str = string_literal )? 
+               { prl.beginExpr(eid,str); } 
             ( pseudosexpr[prl] )* ) ?
-        { prl.endExpr(eid, stringLiteralLine); }
+               { prl.endExpr(eid, stringLiteralLine); }
         RPAREN   
     ;
 

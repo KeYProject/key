@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %pluginName
+Bundle-SymbolicName: de.hentschel.visualdbc.dbcmodel;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-ClassPath: .
+Bundle-Vendor: %providerName
+Bundle-Localization: plugin
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: de.hentschel.visualdbc.dbcmodel,
+ de.hentschel.visualdbc.dbcmodel.impl,
+ de.hentschel.visualdbc.dbcmodel.util
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.emf.ecore;bundle-version="2.7.0";visibility:=reexport
+Bundle-ActivationPolicy: lazy

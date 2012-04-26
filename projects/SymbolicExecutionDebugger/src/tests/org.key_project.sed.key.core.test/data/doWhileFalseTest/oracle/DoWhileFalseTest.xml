@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget xml:id="_c46a3b01-b0d5-4e47-894e-2c6d837a53cd" name="DoWhileFalseTest[DoWhileFalseTest::main()].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_4e9746ef-688a-4e2b-a03e-8af8c6f1a971" name="KeY Default Thread">
+         <sedMethodCall xml:id="_08f54f96-a482-4b90-8267-1fab883a79ab" name="self.main();" lineNumber="-1" charStart="96" charEnd="100">
+            <sedStatement xml:id="_0ccfd8bb-74b3-43d1-8ad3-44425b00b677" name="int result = 0;" lineNumber="-1" charStart="108" charEnd="123">
+               <sedLoopNode xml:id="_b6735d2e-ebbc-46fc-8d95-5fba0a19711d" name="do {result_1++;}while ( false );" lineNumber="-1" charStart="127" charEnd="169">
+                  <sedStatement xml:id="_41f97243-6f21-4fed-a567-e774470f14d5" name="result_1++;" lineNumber="-1" charStart="136" charEnd="146">
+                     <sedLoopCondition xml:id="_446fdc19-21c0-493f-b188-b883bedd5049" name="false" lineNumber="-1" charStart="-1" charEnd="-1">
+                        <sedBranchCondition xml:id="_4b500173-ac51-4fb3-92b4-7bfeba8f07ed" name="if false false">
+                           <sedStatement xml:id="_2e2f631a-9b77-4709-8214-c09ac752208d" name="return result_1;" lineNumber="-1" charStart="173" charEnd="187">
+                              <sedMethodReturn xml:id="_5f16408c-11e2-4e09-88e6-f6ed2e79f120" name="&lt;return &apos;1&apos; as result of self.main();&gt;" lineNumber="-1" charStart="96" charEnd="100">
+                                 <sedTermination xml:id="_5bbc22ee-e57e-4b2d-97ea-e6fdc6e6afa6" name="&lt;end&gt;">
+                                 </sedTermination>
+                              </sedMethodReturn>
+                           </sedStatement>
+                        </sedBranchCondition>
+                     </sedLoopCondition>
+                  </sedStatement>
+               </sedLoopNode>
+            </sedStatement>
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>

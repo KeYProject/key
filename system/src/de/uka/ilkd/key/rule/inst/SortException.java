@@ -15,6 +15,11 @@ package de.uka.ilkd.key.rule.inst;
  * (and not generic) */
 public class SortException extends IllegalInstantiationException {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -1659749880755516351L;
+
     public SortException(String description) {
 	super(description);
     } 

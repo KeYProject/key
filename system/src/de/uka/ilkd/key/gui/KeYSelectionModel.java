@@ -200,11 +200,9 @@ public class KeYSelectionModel {
 	while ( g == null && it.hasNext () ) {
 	    g = it.next ();
 	    if ( firstG == null )
-		firstG = g;
-	    if ( false /* g.getClosureConstraint ().isSatisfiable () */)
-		g = null;
+		firstG = g;	    
 	}
-
+	
 	/** Order of preference:
 	 * 1. Not yet closable goals
 	 * 2. Goals which are not closed for all metavariable

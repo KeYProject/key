@@ -37,19 +37,24 @@ tokens {
     TRUE = "true";    
     VOID = "void";
 
-    ACCESSIBLE                  = "accessible";
-    ASSIGNABLE 			= "assignable";
-    ENSURES 			= "ensures";
-    DECLASSIFY                  = "declassify";
-    DECLASSIFY_VAR              = "declassify_var";
-    DEPENDS                     = "depends";
-    REPRESENTS			= "represents";
-    SECURE_FOR                  = "secure_for";
-    SIGNALS 			= "signals";
-    SIGNALS_ONLY 		= "signals_only";
+    ACCESSIBLE      = "accessible";
+    ASSIGNABLE      = "assignable";
+    ENSURES         = "ensures";
+    DECLASSIFY      = "declassify";
+    DEPENDS         = "depends";
+    REPRESENTS      = "represents";
+    REQUIRES        = "requires";
+    RESPECTS        = "respects";
+    SECURE_FOR      = "secure_for";
+    SIGNALS         = "signals";
+    SIGNALS_ONLY    = "signals_only";
+    
+    NULLABLE        = "nullable";
+    NON_NULL        = "non_null";
 }
 
 AND : "&";
+BACKUP : "\\backup";
 BIGINT : "\\bigint";
 BITWISENOT : "~";
 BSUM : "\\bsum";  //KeY extension, not official JML
@@ -90,13 +95,11 @@ MINUS : "-";
 MOD : "%";
 MULT : "*";
 NONNULLELEMENTS : "\\nonnullelements";
-NON_NULL : "\\non_null";
-NULLABLE : "\\nullable";
 NOT : "!";
 NOT_MODIFIED : "\\not_modified";
 NOT_SPECIFIED : "\\not_specified";
 NOTHING : "\\nothing";
-NOWARN : "\\nowarn";
+LESS_THAN_NOTHING : "\\less_than_nothing";   //KeY extension for strict purity, not official JML (MU)
 OLD : "\\old";
 OTHER : "\\other";
 OUTER_SCOPE : "\\outerScope"; //KeY extension, not official JML
@@ -117,6 +120,7 @@ SHIFTLEFT : "<<";
 SHIFTRIGHT : ">>";
 SPACE : "\\space";
 STRING_EQUAL : "\\string_equal";
+TRANSACTIONUPDATED: "\\transactionUpdated";
 TYPEOF : "\\typeof";
 TYPE_SMALL : "\\type";
 TYPE : "\\TYPE";
@@ -139,17 +143,24 @@ SUBSET : "\\subset";
 NEWELEMSFRESH : "\\new_elems_fresh";
 
 SEQ : "\\seq";
+SEQGET : "\\seq_get";
 SEQEMPTY : "\\seq_empty";
 SEQSINGLETON : "\\seq_singleton";
 SEQCONCAT : "\\seq_concat";
 SEQSUB : "\\seq_sub";
 SEQREVERSE : "\\seq_reverse";
+SEQREPLACE : "\\seq_put";
+INDEXOF : "\\indexOf";
+SEQCONTAINS : "\\contains"; // temp workaround as long as sets are not yet implemented
+SEQDEF : "\\seq_def";
 
 MEASURED_BY : "\\measured_by";
 
 FROM : "\\from";
 TO : "\\to";
 IF : "\\if";
+
+DL_ESCAPE : "\\dl_"  LETTER  ( LETTERORDIGIT )*  ;
 
 EQV_ANTIV: "<==>" | "<=!=>";
 EQ_NEQ : "==" | "!=";
@@ -221,7 +232,7 @@ QUANTIFIER
     |
         "\\sum"
     ;
-    
+
 protected
 LETTER
 options {
@@ -267,9 +278,9 @@ options {
     testLiterals = true;
     paraphrase = "an identifier";
 }:
-        LETTER (LETTERORDIGIT)*
+   LETTER (LETTERORDIGIT)*
 ;
-
+    
 HEXNUMERAL
     :
         '0'! ('x'!|'X'!) (HEXDIGIT)+
@@ -321,6 +332,7 @@ options {
 	|	'\t'
 	|	'\n'  { newline(); }
 	|	'\r'
+	| PRAGMA (~';')* SEMI
         |       '\u000C'
         |       '@')
 		{ $setType(Token.SKIP); }
@@ -365,4 +377,13 @@ options {
 	)*
 	"*/"
 	{ $setType(Token.SKIP);  }
+	;
+
+
+	protected PRAGMA
+	    options {
+	        paraphrase = "lexical pragma (see Sect. 4.2 of JML reference)";
+	    }
+	    :
+	    "\\nowarn"
 	;

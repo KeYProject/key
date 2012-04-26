@@ -1,570 +1,206 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
-
 package de.uka.ilkd.key.gui.smt;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
-import javax.swing.AbstractCellEditor;
+
+
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.JTable;
 import javax.swing.JTree;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableCellRenderer;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
-public class SettingsDialog {
-    public final static SettingsDialog INSTANCE = new SettingsDialog();
-    public final static Component EMPTY_LINE = createSeperator();
-
-    Settings settings;
-
-    public void showDialog(Settings set) {
-	this.settings = set;
-
-	init();
-	getJDialog().setModal(true);
-	getJDialog().setVisible(true);
-	
-
-    }
-
-    void init(DefaultMutableTreeNode node) {
-	for (int i = 0; i < node.getChildCount(); i++) {
-	    init((DefaultMutableTreeNode) node.getChildAt(i));
-	}
-	if (node.getUserObject() instanceof ContentItem) {
-	    ((ContentItem) node.getUserObject()).init();
-	}
-    }
-
-    private JDialog jDialog = null; // @jve:decl-index=0:visual-constraint="123,23"
-    private JPanel jContentPane = null;
-    private JSplitPane splitPane = null;
-    private JTree optionTree = null;
-    private JScrollPane jScrollPane = null;
-    private JScrollPane jScrollPane1 = null;
-    private OptionTable optionTable = null; // @jve:decl-index=0:visual-constraint="885,171"
-    private JPanel panel = null;
-    private JButton applyButton = null;
-    private JButton okButton = null;
-    private JButton cancelButton = null;
-
-    /**
-     * This method initializes jDialog
-     * 
-     * @return javax.swing.JDialog
-     */
-    private JDialog getJDialog() {
-
-	if (jDialog == null) {
-	    jDialog = new JDialog();
-
-	    int left = getOptionTree().getPreferredSize().width, right = 650, height = getOptionTable()
-		    .getPreferredScrollableViewportSize().height;
-
-	    jDialog.setSize(new Dimension(left + right, (int) (1.25 * height)));
-	    jDialog.setTitle("Decision Procedure Settings");
-	    jDialog.setContentPane(getJContentPane());
-	    jDialog.setLocationByPlatform(true);
-	    getSplitPane().setDividerLocation(
-		    (int) (1.5 * getOptionTree().getPreferredSize().width));
-
-	}
-	return jDialog;
-    }
-
-    private static Component createSeperator() {
-	JPanel label = new JPanel();
-	label.setPreferredSize(new Dimension(10, 10));
-	return label;
-    }
-
-    /**
-     * This method initializes jContentPane
-     * 
-     * @return javax.swing.JPanel
-     */
-    private JPanel getJContentPane() {
-	if (jContentPane == null) {
-	    jContentPane = new JPanel();
-	    jContentPane.setLayout(new BorderLayout());
-	    jContentPane.add(getPanel(), BorderLayout.CENTER);
-	}
-	return jContentPane;
-    }
-
-    /**
-     * This method initializes splitPane
-     * 
-     * @return javax.swing.JSplitPane
-     */
-    private JSplitPane getSplitPane() {
-	if (splitPane == null) {
-	    splitPane = new JSplitPane();
-	    splitPane.setLeftComponent(getJScrollPane());
-	    splitPane.setRightComponent(getJScrollPane1());
-	}
-	return splitPane;
-    }
-
-    /**
-     * This method initializes optionTree
-     * 
-     * @return javax.swing.JTree
-     */
-    private JTree getOptionTree() {
-	if (optionTree == null) {
-	    optionTree = new JTree();
-	    optionTree.addMouseListener(new MouseAdapter() {
-		@Override
-		public void mouseClicked(MouseEvent e) {
-		    TreePath path = optionTree.getPathForLocation(e.getX(), e
-			    .getY());
-		    if (path != null) {
-			Object o = path.getLastPathComponent();
-			if (o != null) {
-			    o = ((DefaultMutableTreeNode) o).getUserObject();
-			    if (o instanceof ContentItem) {
-				viewOptions((ContentItem) o);
-
-			    }
-			}
-		    }
-		}
-	    });
-	}
-	return optionTree;
-    }
-
-    /**
-     * This method initializes saveToFilePanel
-     * 
-     * @return javax.swing.JPanel
-     */
-
-    /**
-     * This method initializes jScrollPane
-     * 
-     * @return javax.swing.JScrollPane
-     */
-    private JScrollPane getJScrollPane() {
-	if (jScrollPane == null) {
-	    jScrollPane = new JScrollPane();
-	    jScrollPane.setViewportView(getOptionTree());
-	}
-	return jScrollPane;
-    }
-
-    /**
-     * This method initializes jScrollPane1
-     * 
-     * @return javax.swing.JScrollPane
-     */
-    JScrollPane getJScrollPane1() {
-	if (jScrollPane1 == null) {
-	    jScrollPane1 = new JScrollPane();
-	}
-	return jScrollPane1;
-    }
-
-    private abstract static class CellEditor extends AbstractCellEditor
-	    implements TableCellEditor {
-
-	/**
-             * 
-             */
-	private static final long serialVersionUID = 1L;
-
-    }
-
-    OptionTable getOptionTable() {
-	if (optionTable == null) {
-	    optionTable = new OptionTable();
-	    
-	    optionTable.setBackground(getPanel().getBackground());
+import de.uka.ilkd.key.gui.IconFactory;
 
 
-	}
-	return optionTable;
-    }
 
-    /**
-     * This method initializes panel
-     * 
-     * @return javax.swing.JPanel
-     */
-    private JPanel getPanel() {
-	if (panel == null) {
-	    GridBagConstraints gridBagConstraints11 = new GridBagConstraints();
-	    gridBagConstraints11.gridx = 2;
-	    gridBagConstraints11.insets = new Insets(0, 5, 5, 5);
-	    gridBagConstraints11.anchor = GridBagConstraints.SOUTHEAST;
-	    gridBagConstraints11.weightx = 0.0;
-	    gridBagConstraints11.gridy = 1;
-	    GridBagConstraints gridBagConstraints10 = new GridBagConstraints();
-	    gridBagConstraints10.gridx = 1;
-	    gridBagConstraints10.insets = new Insets(0, 5, 5, 0);
-	    gridBagConstraints10.anchor = GridBagConstraints.SOUTHEAST;
-	    gridBagConstraints10.weightx = 0.0;
-	    gridBagConstraints10.gridy = 1;
-	    GridBagConstraints gridBagConstraints9 = new GridBagConstraints();
-	    gridBagConstraints9.fill = GridBagConstraints.BOTH;
-	    gridBagConstraints9.gridy = 0;
-	    gridBagConstraints9.weightx = 1.0;
-	    gridBagConstraints9.weighty = 1.0;
-	    gridBagConstraints9.gridwidth = 3;
-	    gridBagConstraints9.insets = new Insets(0, 0, 5, 0);
-	    gridBagConstraints9.gridx = 0;
-	    GridBagConstraints gridBagConstraints8 = new GridBagConstraints();
-	    gridBagConstraints8.gridx = 0;
-	    gridBagConstraints8.anchor = GridBagConstraints.SOUTHEAST;
-	    gridBagConstraints8.weightx = 1.0;
-	    gridBagConstraints8.insets = new Insets(0, 0, 5, 0);
-	    gridBagConstraints8.gridy = 1;
-	    panel = new JPanel();
-	    panel.setLayout(new GridBagLayout());
-	    panel.add(getApplyButton(), gridBagConstraints8);
-	    panel.add(getSplitPane(), gridBagConstraints9);
-	    panel.add(getOkButton(), gridBagConstraints10);
-	    panel.add(getCancelButton(), gridBagConstraints11);
-	}
-	return panel;
-    }
-
-    /**
-     * This method initializes applyButton
-     * 
-     * @return javax.swing.JButton
-     */
-    private JButton getApplyButton() {
-	if (applyButton == null) {
-	    applyButton = new JButton();
-	    applyButton.setText("Apply");
-	    applyButton.addActionListener(new ActionListener() {
-
-		public void actionPerformed(ActionEvent e) {
-		    applyChanges();
-		    SettingsDialog.this.getJScrollPane1().repaint();
-		}
-	    });
-	}
-	return applyButton;
-    }
-
-    /**
-     * This method initializes okButton
-     * 
-     * @return javax.swing.JButton
-     */
-    private JButton getOkButton() {
-	if (okButton == null) {
-	    okButton = new JButton();
-	    okButton.setText("OK");
-	    okButton.addActionListener(new ActionListener() {
-
-		public void actionPerformed(ActionEvent e) {
-		    getJDialog().setVisible(false);
-		    applyChanges();
-		}
-	    });
-	}
-	return okButton;
-    }
-
-    private void applyChanges() {
-	settings.applyChanges();
-
-    }
-
-    /**
-     * This method initializes cancelButton
-     * 
-     * @return javax.swing.JButton
-     */
-    private JButton getCancelButton() {
-	if (cancelButton == null) {
-	    cancelButton = new JButton();
-	    cancelButton.setText("Cancel");
-	    cancelButton.addActionListener(new ActionListener() {
-
-		public void actionPerformed(ActionEvent arg0) {
-		    getJDialog().setVisible(false);
-		}
-	    });
-	}
-	return cancelButton;
-    }
-
-    private int getRow(DefaultTableModel model, TableComponent component) {
-	for (int i = 0; i < model.getRowCount(); i++) {
-	    TableComponent comp = ((TableComponent) model.getValueAt(i, 2));
-	    if (comp == component) {
-		return i;
-	    }
-	}
-	return -1;
-    }
-
-    void setModel(DefaultTableModel model) {
-	getOptionTable().setModel(model);
-
-	int width = 0;
-
-	for (int i = 0; i < model.getRowCount(); i++) {
-	    if (model.getValueAt(i, Settings.OPTIONCOL) instanceof TableComponent) {
-		final TableComponent component = ((TableComponent) model
-		        .getValueAt(i, Settings.OPTIONCOL));
-
-	
-		if (component.getInfo() != null && 
-		    !(getOptionTable().getModel().getValueAt( i,
-			    Settings.OPTIONCOL + 1) instanceof TableInfoButton)) {
-		    
-		    TableInfoButton button = new TableInfoButton(model,
-			    component) {
-
-			@Override
-			public void eventChange() {
-			    boolean change = isSelected() != isShowingInfo();
-
-			    this.setShowInfo(this.isSelected());
-			    DefaultTableModel m = (DefaultTableModel) getUserObject();
-			    if (change) {
-				int row = getRow(m, this);
-				if (isShowingInfo() && row != -1) {
-				    Object o[] = { Settings.seperator,
-					    getExplanation(),
-					    Settings.seperator };
-				  //  getExplanation().getRendererComponent().setBackground(
-					//    getOptionTable().getBackground());
-
-				    m.insertRow(row + 1, o);
-				    getOptionTable()
-					    .setRowHeight(
-					            row + 1,
-					            getExplanation().getHeight());
-
-				} else if (row != -1) {
-				    m.removeRow(row + 1);
-				}
-			    }
-
-			}
-
-			public boolean prepareValues() {
-			    // this.setTitle("Info");
-			    this.setSelected(isShowingInfo());
-
-			    return true;
-			}
-
-		    };
-		    
-		
-		 
-		   
-		    getOptionTable().getModel().setValueAt(button, i,
-			    Settings.OPTIONCOL + 1);
-		}
-		
-		if((getOptionTable().getModel().getValueAt( i,
-			    Settings.OPTIONCOL + 1) instanceof TableInfoButton)){
-		    TableInfoButton button =  ((TableInfoButton)getOptionTable().getModel().getValueAt( i,Settings.OPTIONCOL + 1));
-	
-		    width = Math.max(button.getEditorComponent()
-			    .getPreferredSize().width + 5, width);
-		}
-
-		//getOptionTable().setRowHeight(i,
-		  //      Math.max(component.getHeight(), height));
-
-	    }
-
-	}
-	
-	getOptionTable().setRowHeight();
-	
-	for (int i = 0; i < getOptionTable().getColumnModel().getColumnCount(); i++) {
-	    if (Settings.OPTIONCOL != i) {
-		int w = width;
-		if (i == 0)
-		    w = Settings.width[i];
-
-		getOptionTable().getColumnModel().getColumn(i).setWidth(w);
-		getOptionTable().getColumnModel().getColumn(i).setMaxWidth(w);
-		getOptionTable().getColumnModel().getColumn(i).setMinWidth(w);
-	    }
-
-	}
-
-    }
-    
-    void removeModel(DefaultTableModel model){
-	for (int i = 0; i < model.getRowCount(); i++) {
-	    if (model.getValueAt(i, Settings.OPTIONCOL+1) instanceof TableComponent) {
-		
-		
-	    }
-	}
-    }
-
-    void viewOptions(ContentItem item) {
-	if (item.getModel() != null) {
-	    setModel(item.getModel());
-	    getJScrollPane1().setViewportView(getOptionTable());
-	} else if (item.getComponent() != null) {
-	    getJScrollPane1().setViewportView(item.getComponent());
-	}
-
-    }
-
-    private void init() {
-	getOptionTree().setModel(settings.getContent());
-	viewOptions(settings.getDefaultItem());
-	getJScrollPane1().setViewportView(getOptionTable());
-
-    }
-    
-    class OptionTable extends JTable{
+class OptionContentNode extends DefaultMutableTreeNode{
         private static final long serialVersionUID = 1L;
-	DefaultTableCellRenderer renderer; 
-	TableCellEditor editor;
-	
-	public OptionTable() {
-	    setShowGrid(false);
-	    setTableHeader(null);
-	    renderer = new DefaultTableCellRenderer() {
-		private static final long serialVersionUID = 1L;
+        private final JComponent component;
+        
+       
+        public OptionContentNode(String title,JComponent component) {
+                super();
+                this.component = component;
+                this.setUserObject(title);
+        }
 
+        public JComponent getComponent(){
+                return component;
+        }
+                
+}
 
-		@Override
-		public Component getTableCellRendererComponent(
-			JTable table, Object value, boolean isSelected,
-			boolean hasFocus, int row, int column) {
+public class SettingsDialog extends JDialog{
+        private static final long serialVersionUID = 1L;
+        public static final int APPLY_BUTTON =0;
+        public static final int CANCEL_BUTTON =1;
 
-		    if (!(value instanceof TableComponent)) {
-			return (Component) value;
-		    }
-		    // ((TableComponent) value).eventChange();
+        public static final int OKAY_BUTTON =3;
+        private JTree optionTree;
+        private JSplitPane splitPane;
+        private JPanel optionPanel;
+        private JButton applyButton;
+        private JButton okayButton;
+        private JButton cancelButton;
 
-		    setToolTipText("This is a tooltip");
-	
-		    ((TableComponent) value).setParent(table);
-		    if (((TableComponent) value).prepareValues()) {
-			return ((TableComponent) value)
-			.getRendererComponent();
-		    } else {
-			return EMPTY_LINE;
-		    }
-		}
-	    };
+        private final ActionListener listener;
+        private final ActionListener buttonListener = new ActionListener() {
+                
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                        ActionEvent action = null;
+                       if(e.getSource() == getApplyButton()){
+                               action = new ActionEvent(SettingsDialog.this,APPLY_BUTTON,"pushed");
+                       }
+                       if(e.getSource() == getCancelButton()){
+                               action = new ActionEvent(SettingsDialog.this,CANCEL_BUTTON,"pushed");
+                       }
+                       if(e.getSource() == getOkayButton()){
+                               action = new ActionEvent(SettingsDialog.this,OKAY_BUTTON,"pushed");
+                       }
 
-	    editor = new CellEditor() {
-		private static final long serialVersionUID = 1L;
-		TableComponent currentValue = null;
+                       if(action != null){
+                               listener.actionPerformed(action);
+                       }
+                        
+                }
+        };
+        
+        
+        public  SettingsDialog(TreeModel model, JComponent startComponent, ActionListener listener, JComponent bottomComponent){
+                this.listener = listener;
+                this.getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
+                Box box = Box.createHorizontalBox();
+                box.add(getSplitPane());
+                this.getContentPane().add(box);
+                this.getContentPane().add(Box.createVerticalStrut(5));
+                box = Box.createHorizontalBox();
+                box.add(Box.createHorizontalStrut(5));
+                box.add(bottomComponent);
+                box.add(Box.createHorizontalStrut(5));
+                box.add(Box.createHorizontalGlue());
+                box.add(getApplyButton());
+                box.add(Box.createHorizontalStrut(5));
+                box.add(getOkayButton());
+                box.add(Box.createHorizontalStrut(5));
+                box.add(getCancelButton());
+                box.add(Box.createHorizontalStrut(5));
+                this.getContentPane().add(box);
+                this.getOptionTree().setModel(model);
+                getSplitPane().setRightComponent(startComponent);
+          
+                this.getOptionTree().getParent().setMinimumSize(getOptionTree().getPreferredSize());
+                this.getContentPane().setPreferredSize(computePreferredSize(model));
+                this.setLocationByPlatform(true);
+                this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+                setIconImage(IconFactory.keyLogo());
+                this.pack();
+                
+        }
+        
+        private Dimension computePreferredSize(TreeModel model){
+                DefaultMutableTreeNode node = (DefaultMutableTreeNode)model.getRoot();
+                Dimension dim = computePreferredSize(node);
+                dim.width = dim.width + getOptionTree().getPreferredSize().width+80;
+                dim.height = Math.min(dim.height,400);
+                return dim;
+        }
+        
+        private Dimension computePreferredSize(DefaultMutableTreeNode node){
+                
+                Dimension dim = node instanceof OptionContentNode ? new Dimension(((OptionContentNode)node).getComponent().getPreferredSize()) : new Dimension(0,0);
+                                
+                for(int i=0; i<node.getChildCount(); i++){
+                            Dimension dimChild = computePreferredSize((DefaultMutableTreeNode)node.getChildAt(i));
+                            dim.width = Math.max(dimChild.width,dim.width);
+                            dim.height = Math.max(dimChild.height,dim.height);
+                        
+                }
+                return dim;
+        }
+        
+        
+        private JTree getOptionTree(){
+                if(optionTree == null){
+                        optionTree = new JTree();  
+                        optionTree.addTreeSelectionListener(new TreeSelectionListener() {
+                            
+                            @Override
+                            public void valueChanged(TreeSelectionEvent e) {
+                                TreePath path = e.getNewLeadSelectionPath();
+                                        
+                                        if (path != null) {
+                                                Object node = path.getLastPathComponent();
+                                                if (node != null && node instanceof OptionContentNode) {
+                                                        getSplitPane().setRightComponent(((OptionContentNode)node).getComponent());
+                                          
+                                                }
+                                        }
+                            }
+                        });
+                }
+                return optionTree;
+        }
+        
+        private JSplitPane getSplitPane(){
+                if(splitPane == null){
+                        
+                        splitPane = new JSplitPane();
+                        splitPane.setAlignmentX(LEFT_ALIGNMENT);
+                        splitPane.setLeftComponent(new JScrollPane(getOptionTree()));
+                        splitPane.setRightComponent(getOptionPanel());
+                        //splitPane.setResizeWeight(0.2);
+                }
+                return splitPane;
+                
+        }
+        
+        private JPanel getOptionPanel(){
+                if(optionPanel == null){
+                        optionPanel = new JPanel();
+                }
+                return optionPanel;
+        }
+        
+        public JButton getOkayButton() {
+                if(okayButton == null){
+                        okayButton = new JButton("Okay");
+                        okayButton.addActionListener(buttonListener);
+                }
+                return okayButton;
+        }
+        
+        public JButton getCancelButton() {
+                if(cancelButton == null){
+                        cancelButton = new JButton("Cancel");
+                        cancelButton.addActionListener(buttonListener);
+                }
+                return cancelButton;
+        }
+        
+        public JButton getApplyButton() {
+                if(applyButton == null){
+                        applyButton = new JButton("Apply");
+                        applyButton.addActionListener(buttonListener);
+                }
+                return applyButton;
+        }
+        
 
-		public Object getCellEditorValue() {
+        
+        
 
-		    return currentValue;
-		}
-
-		public Component getTableCellEditorComponent(JTable table,
-			Object value, boolean isSelected, int row,
-			int column) {
-
-		    if (!(value instanceof TableComponent)) {
-			return null;
-		    }
-
-		    currentValue = (TableComponent) value;
-		    // ((TableComponent) value).eventChange();
-		    currentValue.setParent(table);
-		    if (currentValue.prepare()) {
-			return currentValue.getEditorComponent();
-		    } else {
-			return EMPTY_LINE;
-		    }
-		}
-
-	    };
-	    
-	    
-	    addComponentListener(new ComponentListener() {
-	        
-	        
-	        
-	        public void componentResized(ComponentEvent e) {
-	         	setRowHeight();
-	        
-	        }
-	        
-	        public void componentMoved(ComponentEvent e) {}	        
-	        public void componentHidden(ComponentEvent e) {}
-	        public void componentShown(ComponentEvent e) {}
-	    });
-
-
-	};
-	@Override
-	public TableCellRenderer getCellRenderer(int row, int column) {
-	    return renderer;
-	}
-
-	@Override
-	public TableCellEditor getCellEditor(int row, int column) {
-	    return editor;
-	}
-	
-	private int getHeight(Object o){
-	    if(o instanceof TableComponent){
-		TableComponent comp = ((TableComponent)o);
-		return comp.visible() ? comp.getHeight():0;
-	    }
-	    if(o instanceof Component){
-		return ((Component)o).getPreferredSize().height;
-	    }
-	    return 0;
-	}
-	
-	public void setRowHeight(){
-	    for (int row = 0; row < getModel().getRowCount(); row++){
-		int height =0;
-		for(int col =0; col < getModel().getColumnCount(); col++){
-		   Object obj = getValueAt(row, col);
-		   height = Math.max(height, getHeight(obj));    
-		}	
-		setRowHeight(row,height);
-	    }
-	}
-	
-	
-
-    }
-
+        
 }

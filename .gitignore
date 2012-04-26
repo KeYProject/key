@@ -12,7 +12,10 @@ system/GenMakefile
 system/Makefile.mk
 system/resources/de/uka/ilkd/key/util/version
 system/resources/de/uka/ilkd/key/util/sha1
+eclipse/.classpath
+eclipse/.settings
 eclipse/KeYPlugin/bin
+eclipse/bin
 eclipse/VisualDebugger/.settings
 eclipse/VisualDebugger/bin
 system/argfile
@@ -33,3 +36,4 @@ tags
 /netbeans/eclipse/build/
 /netbeans/eclipse/nbproject/private/
 /netbeans/eclipse/dist/
+*.class

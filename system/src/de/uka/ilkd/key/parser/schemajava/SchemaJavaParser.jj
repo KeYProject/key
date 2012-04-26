@@ -56,6 +56,7 @@ import de.uka.ilkd.key.logic.sort.ProgramSVSort;
    Augmented with meta constructs and schema variables for use of a schematic 
    Java in Taclets.
  */
+@SuppressWarnings("all")
 public class SchemaJavaParser {
 
     public static final void initialize(Reader r) {
@@ -508,6 +509,7 @@ TOKEN :
   }
 | < BOOLEAN: "boolean" >
 | < BREAK: "break" >
+| < BIGINT: "\\bigint" >
 | < BYTE: "byte" >
 | < CASE: "case" >
 | < CATCH: "catch" >
@@ -558,6 +560,10 @@ TOKEN :
 		    | < THIS: "this" >
 		    | < THROW: "throw" >
 		    | < THROWS: "throws" >
+                    | < TRANSACTIONBEGIN: "#beginJavaCardTransaction" >
+                    | < TRANSACTIONCOMMIT: "#commitJavaCardTransaction" >
+                    | < TRANSACTIONFINISH: "#finishJavaCardTransaction" >
+                    | < TRANSACTIONABORT: "#abortJavaCardTransaction" >
 		    | < TRANSIENT: "transient" >
 		    | < TRUE: "true" >
 		    | < TRY: "try" >
@@ -743,6 +749,7 @@ TOKEN :
 
 
 /* >'s need special attention due to generics syntax. */
+
 TOKEN :
 {
   < RUNSIGNEDSHIFT: ">>>" >
@@ -2092,9 +2099,13 @@ TypeReference PrimitiveType() :
      | "long"
      | "float"
      | "double"
+     | "\\seq"
+     | "\\locset"
+     | "\\bigint"
      )
 	{
-	    Identifier id = factory.createIdentifier(token.image);
+        String type = token.image;
+	    Identifier id = factory.createIdentifier(type);
 	    setPrefixInfo(id);
 	    result = factory.createTypeReference(id);
 	    checkConstruction(result);
@@ -3515,6 +3526,7 @@ Statement Statement() :
      | result = KeYMetaConstructStatement()
      | result = DoStatement()
      | result = ForStatement()
+     | result = TransactionStatement()
      | result = BreakStatement()
      | result = ContinueStatement()
      | result = ReturnStatement()
@@ -4515,6 +4527,29 @@ ASTList<Expression> ForUpdate() :
 	checkConstruction(result);
 	return result;
     }
+}
+TransactionStatement TransactionStatement() :
+{
+  String name;
+}
+{
+  (  ( <TRANSACTIONBEGIN> { name = token.image; } )
+   | ( <TRANSACTIONCOMMIT> { name = token.image; } )
+   | ( <TRANSACTIONFINISH> { name = token.image; } )
+   | ( <TRANSACTIONABORT> { name = token.image; } ) ) ";" 
+  {
+     int type = 0;
+     if(name.indexOf("#begin") != -1) {
+        type = TransactionStatement.BEGIN;
+     } else if(name.indexOf("#commit") != -1) {
+        type = TransactionStatement.COMMIT;
+     } else if(name.indexOf("#finish") != -1) {
+        type = TransactionStatement.FINISH;
+     } else if(name.indexOf("#abort") != -1) {
+        type = TransactionStatement.ABORT;
+     }
+     return new TransactionStatement(type);
+  }
 }
 
 Break BreakStatement() :

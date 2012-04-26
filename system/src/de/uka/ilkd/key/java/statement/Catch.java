@@ -64,9 +64,8 @@ public class Catch extends BranchImp implements ParameterContainer,
      */ 
     public Catch(ExtList children) {
 	super(children);
-	parameter=(ParameterDeclaration)children.get
-	    (ParameterDeclaration.class);
-	body=(StatementBlock)children.get(StatementBlock.class);
+	parameter=children.get(ParameterDeclaration.class);
+	body=children.get(StatementBlock.class);
     }
 
     public SourceElement getLastElement() {

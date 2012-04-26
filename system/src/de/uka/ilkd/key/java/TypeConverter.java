@@ -18,6 +18,7 @@ import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.expression.literal.*;
 import de.uka.ilkd.key.java.expression.operator.*;
+import de.uka.ilkd.key.java.expression.operator.adt.Singleton;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.ldt.*;
@@ -41,7 +42,9 @@ public final class TypeConverter {
     private LocSetLDT locSetLDT;
     private HeapLDT heapLDT;
     private SeqLDT seqLDT;
+    @SuppressWarnings("unused")
     private FloatLDT floatLDT;
+    @SuppressWarnings("unused")
     private DoubleLDT doubleLDT;
     private CharListLDT charListLDT;
     
@@ -88,11 +91,6 @@ public final class TypeConverter {
     
     public ImmutableList<LDT> getModels() {
         return models;
-    }
-
-    
-    public Services getServices() {
-	return services;
     }
     
 
@@ -169,13 +167,17 @@ public final class TypeConverter {
 	} else if(op instanceof Conditional) {
 	    assert subs.length == 3;
 	    return TB.ife(subs[0], subs[1], subs[2]);
+	} else if(op instanceof DLEmbeddedExpression) {
+	    DLEmbeddedExpression emb = (DLEmbeddedExpression) op;
+	    Function f = emb.getFunctionSymbol();
+	    // TODO make a sensible error recovery
+	    return TB.func(f, subs);
 	} else {
 	    Debug.out("typeconverter: no data type model "+
 		      "available to convert:", op, op.getClass());		
 	    throw new IllegalArgumentException("TypeConverter could not handle"
 					       +" this operator: " + op);
 	}
-	
 	return TB.func(responsibleLDT.getFunctionFor(op, services, ec), subs);
     }
    
@@ -458,6 +460,10 @@ public final class TypeConverter {
                         t2 == PrimitiveType.JAVA_CHAR||
                         t2 == PrimitiveType.JAVA_LONG)) { 
             return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LONG);
+    	} else if ((t1 == PrimitiveType.JAVA_BIGINT) && isIntegerType(t2)) {
+    	    return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
+        } else if ((t2 == PrimitiveType.JAVA_BIGINT) && isIntegerType(t2)) {
+            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
     	} else if (t1 == PrimitiveType.JAVA_LOCSET && t2 == PrimitiveType.JAVA_LOCSET) { 
             return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LOCSET);
     	} else if (t1 == PrimitiveType.JAVA_SEQ && t2 == PrimitiveType.JAVA_SEQ) { 
@@ -470,6 +476,11 @@ public final class TypeConverter {
             throw new RuntimeException("Could not determine promoted type "
         	    	               + "of " + t1 + " and " + t2);
         }
+    }
+
+    public boolean isIntegerType(Type t2){
+        return (t2 == PrimitiveType.JAVA_BYTE || t2 == PrimitiveType.JAVA_CHAR || t2 == PrimitiveType.JAVA_INT
+                || t2 == PrimitiveType.JAVA_LONG || t2 == PrimitiveType.JAVA_SHORT || t2 == PrimitiveType.JAVA_BIGINT);
     }
 
 
@@ -490,6 +501,8 @@ public final class TypeConverter {
 	    return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LOCSET);
 	if (t1 == PrimitiveType.JAVA_SEQ) 
 	    return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SEQ);	
+	if (t1 == PrimitiveType.JAVA_BIGINT)
+	    return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
 	throw new RuntimeException("Could not determine promoted type "+
 				   "of "+type1);
     }
@@ -754,8 +767,8 @@ public final class TypeConverter {
 	return
 	    ( to instanceof PrimitiveType &&
 	      isImplicitNarrowing ( expr, (PrimitiveType)to ) ) ||
-	    isIdentical ( expr.getKeYJavaType ( getServices (), ec ), to ) ||
-	    isWidening  ( expr.getKeYJavaType ( getServices (), ec ), to );
+	    isIdentical ( expr.getKeYJavaType ( services, ec ), to ) ||
+	    isWidening  ( expr.getKeYJavaType ( services, ec ), to );
     }
 
     

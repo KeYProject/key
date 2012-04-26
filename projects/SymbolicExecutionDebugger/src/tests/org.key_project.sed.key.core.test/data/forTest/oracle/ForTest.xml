@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget xml:id="_ddfec3e3-5622-421d-8c63-3efd6161fd91" name="ForTest[ForTest::main()].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_e8681d76-0092-47a8-bddb-96a28373cf1a" name="KeY Default Thread">
+         <sedMethodCall xml:id="_62bfd95a-916b-4e7a-9f4b-bc8262c20410" name="self.main();" lineNumber="-1" charStart="87" charEnd="91">
+            <sedStatement xml:id="_6f24d533-163c-4e3d-81a9-c5dc1d9c31f9" name="int result = 0;" lineNumber="-1" charStart="99" charEnd="114">
+               <sedLoopNode xml:id="_8941565d-b681-4e27-948b-286c9379d757" name="for ( int i = 0; i&lt;3; i++ ) {   result_1++; }" lineNumber="-1" charStart="118" charEnd="167">
+                  <sedStatement xml:id="_54c1c488-8e66-4216-9ad1-fd31b85d986b" name="int i = 0;" lineNumber="-1" charStart="123" charEnd="132">
+                     <sedLoopCondition xml:id="_5693c665-4e7b-4807-a2fd-a60f198f838c" name="i&lt;3" lineNumber="-1" charStart="134" charEnd="139">
+                        <sedStatement xml:id="_389b4134-d99a-481e-a186-8be81957096d" name="result_1++;" lineNumber="-1" charStart="152" charEnd="162">
+                           <sedStatement xml:id="_e675f951-bf7a-4703-9915-78e705ce8287" name="i++;" lineNumber="-1" charStart="141" charEnd="144">
+                              <sedLoopCondition xml:id="_33460ad0-92df-45bc-8522-eaadb85fccf4" name="i&lt;3" lineNumber="-1" charStart="134" charEnd="139">
+                                 <sedStatement xml:id="_63389dbd-7530-43a4-8ef7-0f7845f61e0d" name="result_1++;" lineNumber="-1" charStart="152" charEnd="162">
+                                    <sedStatement xml:id="_3726fd2b-7912-42f1-bf7a-e3e487424748" name="i++;" lineNumber="-1" charStart="141" charEnd="144">
+                                       <sedLoopCondition xml:id="_808e2bb3-e078-4bb8-835c-0d9d24ae6e64" name="i&lt;3" lineNumber="-1" charStart="134" charEnd="139">
+                                          <sedStatement xml:id="_4ecc7a62-1559-452d-9de3-5663aadd27a2" name="result_1++;" lineNumber="-1" charStart="152" charEnd="162">
+                                             <sedStatement xml:id="_33154bd8-988a-4a01-b9f2-2b1f7083c5ae" name="i++;" lineNumber="-1" charStart="141" charEnd="144">
+                                                <sedLoopCondition xml:id="_42dfb9d6-df93-45ca-98c3-b88a23824c99" name="i&lt;3" lineNumber="-1" charStart="134" charEnd="139">
+                                                   <sedStatement xml:id="_a5abb623-fe4c-4499-8cc6-050881c2bef3" name="return result_1;" lineNumber="-1" charStart="171" charEnd="185">
+                                                      <sedMethodReturn xml:id="_104a5ced-0b5d-4ae1-a039-9643f7e5fc39" name="&lt;return &apos;3&apos; as result of self.main();&gt;" lineNumber="-1" charStart="87" charEnd="91">
+                                                         <sedTermination xml:id="_019b3bf1-989d-441c-bbbf-dd2f8c269445" name="&lt;end&gt;">
+                                                         </sedTermination>
+                                                      </sedMethodReturn>
+                                                   </sedStatement>
+                                                </sedLoopCondition>
+                                             </sedStatement>
+                                          </sedStatement>
+                                       </sedLoopCondition>
+                                    </sedStatement>
+                                 </sedStatement>
+                              </sedLoopCondition>
+                           </sedStatement>
+                        </sedStatement>
+                     </sedLoopCondition>
+                  </sedStatement>
+               </sedLoopNode>
+            </sedStatement>
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>

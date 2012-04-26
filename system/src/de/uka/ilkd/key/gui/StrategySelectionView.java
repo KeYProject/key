@@ -11,7 +11,12 @@
 
 package de.uka.ilkd.key.gui;
 
-import java.awt.*;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -20,20 +25,37 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Iterator;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.rule.QueryExpand;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.strategy.feature.QueryExpandCost;
 
 
 public final class StrategySelectionView extends JPanel {
     
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 4543901758512289107L;
+
     private static final String JAVACARDDL_STRATEGY_NAME 
     	= "JavaCardDLStrategy";
 
@@ -49,6 +71,7 @@ public final class StrategySelectionView extends JPanel {
     ButtonGroup nonLinArithGroup = new ButtonGroup();
     ButtonGroup quantifierGroup = new ButtonGroup();
     ButtonGroup stopModeGroup = new ButtonGroup();    
+    ButtonGroup autoInductionGroup = new ButtonGroup(); //chrisg    
     ButtonGroup[] userTacletsGroup = new ButtonGroup[StrategyProperties.USER_TACLETS_NUM];
     {
         for (int i = 0; i < StrategyProperties.USER_TACLETS_NUM; ++i)
@@ -68,6 +91,7 @@ public final class StrategySelectionView extends JPanel {
     private JRadioButtonHashMap depOn;
     private JRadioButtonHashMap depOff;
     private JRadioButtonHashMap queryOn;
+    private JRadioButtonHashMap queryRestricted; //chrisg
     private JRadioButtonHashMap queryOff;
     private JRadioButtonHashMap nonLinArithNone;
     private JRadioButtonHashMap nonLinArithDefOps;
@@ -76,6 +100,9 @@ public final class StrategySelectionView extends JPanel {
     private JRadioButtonHashMap quantifierNonSplitting;
     private JRadioButtonHashMap quantifierNonSplittingWithProgs;
     private JRadioButtonHashMap quantifierInstantiate;
+    private JRadioButtonHashMap autoInductionOff; //chrisg
+    private JRadioButtonHashMap autoInductionOn; 
+    private JRadioButtonHashMap autoInductionLemmaOn; 
     
     private KeYMediator mediator;
     
@@ -85,6 +112,11 @@ public final class StrategySelectionView extends JPanel {
     
     JPanel javaDLOptionsPanel = new JPanel() {
         
+        /**
+         * 
+         */
+        private static final long serialVersionUID = -6053300204350121172L;
+
         public void setEnabled(boolean enabled) {
              super.setEnabled(enabled);
              setChildrenEnabled(this, enabled);
@@ -109,10 +141,11 @@ public final class StrategySelectionView extends JPanel {
     Border loweredetched = 
 //        BorderFactory.createEtchedBorder(EtchedBorder.LOWERED);
         BorderFactory.createEmptyBorder();
-  
+
+    private final MainWindow mainWindow;
     
-    
-    public StrategySelectionView () {        
+    public StrategySelectionView (MainWindow mainWindow) {        
+        this.mainWindow = mainWindow;
         layoutPane();       
         refresh(mediator == null ? null : mediator.getSelectedProof());
 	setVisible( true );
@@ -296,6 +329,8 @@ public final class StrategySelectionView extends JPanel {
 
         depOn = new JRadioButtonHashMap("On", 
                 StrategyProperties.DEP_ON, false, false);
+        depOn.setToolTipText("<html>Uses, e.g., the information in JML's <tt>assignable</tt> clauses<br>" +
+        		             "in order to simplify heap terms.</html>");
         depGroup.add(depOn);
         addJavaDLOption ( depOn, javaDLOptionsLayout, 2, yCoord, 2 );        
         
@@ -327,14 +362,33 @@ public final class StrategySelectionView extends JPanel {
 
         queryOn = new JRadioButtonHashMap("On", 
                 StrategyProperties.QUERY_ON, false, false);
+        queryOn.setToolTipText("<html>Rewrite query to a method call so that contracts or inlining can be used.<br>" +
+        		               "Whether contracts or inlining are used depends on the Method Treatment settings.<br>" +
+        		               "Queries are expanded randomly. However, the strategy tries to limit unnecessary <br>" +
+        		               "reexpansions of a query.</html>");
         queryGroup.add(queryOn);
         addJavaDLOption ( queryOn, javaDLOptionsLayout, 2, yCoord, 2 );        
         
+        queryRestricted = new JRadioButtonHashMap("Restricted", 
+                StrategyProperties.QUERY_RESTRICTED, false, false);
+        queryRestricted.setToolTipText ( "<html>Rewrite query to a method call (expanded) so that contracts or inlining can be used.<br>" +
+        		                         "<ul><li> Queries are expanded after the loop body in the \"Preserves Invariant\"<br>" +
+        		                         " branch of the loop invariant rule.</li>" +
+        		                         "<li> Queries are expanded in the Base Case and the conclusio of the Step Case <br>" +
+        		                         " branch when using Auto Induction.</li>" +
+        		                         "<li> Queries occuring earlier on a branch get a higher chance to be expanded <br>" +
+        		                         " than queries introduced more recently. This results in a breath-first search<br>" +
+        		                         " with respect to query expansion.</li>" +
+        		                         "<li> Reexpansion of the same query is very limited (e.g. one time).</li>" +
+        		                         "</ul>(Attention: This radio button is buggy, it doesn't always show the correct state.)</html>" ); 
+        queryGroup.add(queryRestricted);
+        addJavaDLOption ( queryRestricted, javaDLOptionsLayout, 4, yCoord, 2 );        
+
         queryOff = new JRadioButtonHashMap("Off", 
-                StrategyProperties.QUERY_OFF, false, false);
+                StrategyProperties.QUERY_OFF, false, true);
         queryOff.setToolTipText ( "<html>Rewrite query to a method call so that contracts or inlining can be used.</html>" );
         queryGroup.add(queryOff);
-        addJavaDLOption ( queryOff, javaDLOptionsLayout, 4, yCoord, 2 );
+        addJavaDLOption ( queryOff, javaDLOptionsLayout, 6, yCoord, 2 );
 
         
         ++yCoord;
@@ -456,6 +510,59 @@ public final class StrategySelectionView extends JPanel {
         addJavaDLOptionSpace ( javaDLOptionsLayout, yCoord );
 
         ////////////////////////////////////////////////////////////////////////
+        //chrisg
+        
+        ++yCoord;
+        
+        addJavaDLOption ( new JLabel ( "Auto Induction" ),
+                    javaDLOptionsLayout, 1, yCoord, 7 );
+        
+        ++yCoord;
+
+        autoInductionOff = new JRadioButtonHashMap("Off", 
+                         StrategyProperties.AUTO_INDUCTION_OFF, true, false);
+        autoInductionOff.setToolTipText ( "<html>" +
+            "Deactivates automatic creation of inductive proofs.<br>" +
+            "In order to make use of auto induction, activate <br>" +
+            "auto induction early in proofs before the <br>" +
+            "quantified formula that is to be proven inductively<br>" +
+            "is Skolemized (using the delta rule). Auto induction<br>" +
+            "is not applied on Skolemized formulas in order to<br>" +
+            "limit the number of inductive proofs." +
+            "</html>" );
+        autoInductionGroup.add(autoInductionOff);
+        addJavaDLOption ( autoInductionOff, javaDLOptionsLayout, 2, yCoord, 2 );
+
+        autoInductionOn = new JRadioButtonHashMap("On", 
+                             StrategyProperties.AUTO_INDUCTION_ON, false, false);
+        autoInductionOn.setToolTipText ( "<html>" +
+            "Create an inductive proof for formulas of the form:<br>" +
+            "      ==>  \\forall int i; 0&lt;=i->phi <br>" +
+            "and certain other forms. The induction hypothesis<br>" +
+            "is the subformula phi. The rule is applied before<br>" +
+            "beta rules are applied." +
+            "</html>" );
+        autoInductionGroup.add(autoInductionOn);
+        addJavaDLOption ( autoInductionOn, javaDLOptionsLayout, 4, yCoord, 2 );
+        
+
+        autoInductionLemmaOn = new JRadioButtonHashMap("Use as Lemma", 
+                             StrategyProperties.AUTO_INDUCTION_LEMMA_ON, false, false);
+        autoInductionLemmaOn.setToolTipText ( "<html>" +
+            "Auto induction is activated on formulas of the form<br>" +
+            "      ==>  (\\forall int i; 0&lt;=i->phi) & psi <br>" +
+            "and certain other forms. The quantified formula<br>" +
+            "is used in the Use Case branch as a lemma for psi,<br>" +
+            "i.e., the sequent in the Use Case has the form:<br>" +
+            "      (\\forall int i; 0&lt;=i->phi) ==>  psi <br>" +
+            "</html>" );
+        autoInductionGroup.add(autoInductionLemmaOn);
+        addJavaDLOption ( autoInductionLemmaOn, javaDLOptionsLayout, 6, yCoord, 2 );
+        
+        ++yCoord;
+        addJavaDLOptionSpace ( javaDLOptionsLayout, yCoord );
+
+        ////////////////////////////////////////////////////////////////////////
 
         ++yCoord;
 
@@ -488,7 +595,7 @@ public final class StrategySelectionView extends JPanel {
             }
         });
         
-        JButton go = new JButton(Main.autoModeAction);
+        JButton go = new JButton(mainWindow.getAutoModeAction());
 
         JPanel timeout = createTimeoutSpinner();
 
@@ -570,6 +677,7 @@ public final class StrategySelectionView extends JPanel {
         depOn.addActionListener(optListener);
         depOff.addActionListener(optListener);
         queryOn.addActionListener(optListener);
+        queryRestricted.addActionListener(optListener);
         queryOff.addActionListener(optListener);
         splittingNormal.addActionListener(optListener);
         splittingDelayed.addActionListener(optListener);
@@ -581,6 +689,9 @@ public final class StrategySelectionView extends JPanel {
         quantifierNonSplitting.addActionListener(optListener);
         quantifierNonSplittingWithProgs.addActionListener(optListener);
         quantifierInstantiate.addActionListener(optListener);
+        autoInductionOff.addActionListener(optListener);
+        autoInductionOn.addActionListener(optListener);
+        autoInductionLemmaOn.addActionListener(optListener);
     }
 
     private void addUserTacletsOptions(GridBagLayout javaDLOptionsLayout,
@@ -794,7 +905,9 @@ public final class StrategySelectionView extends JPanel {
             
             String activeS = proof.getActiveStrategy().name().toString();
             JRadioButton bactive = JRadioButtonHashMap.getButton(activeS);
-            bactive.setSelected(true);
+            if (bactive != null) { // That bactive is null is a valid scenario for instance in the symbolic execution debugger
+               bactive.setSelected(true);
+            }
             
             StrategyProperties p = proof.
                 getSettings().getStrategySettings().
@@ -830,7 +943,11 @@ public final class StrategySelectionView extends JPanel {
             String stopmodeOptions = p.getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY);
             JRadioButton bStopModeActive = getStrategyOptionButton(stopmodeOptions, 
                     StrategyProperties.STOPMODE_OPTIONS_KEY);
-            bStopModeActive.setSelected(true);        
+            bStopModeActive.setSelected(true);  
+            String autoInductionOptions = p.getProperty(StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY); //chrisg
+            JRadioButton bAutoInductionOptions = getStrategyOptionButton(autoInductionOptions, 
+                    StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY);
+            bAutoInductionOptions.setSelected(true);   
          
             for (int i = 1; i <= StrategyProperties.USER_TACLETS_NUM; ++i) {
                 String userTacletsOptions =
@@ -939,6 +1056,8 @@ public final class StrategySelectionView extends JPanel {
                        quantifierGroup.getSelection().getActionCommand());
         p.setProperty( StrategyProperties.STOPMODE_OPTIONS_KEY, 
                        stopModeGroup.getSelection().getActionCommand());
+        p.setProperty( StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY, //chrisg
+                       autoInductionGroup.getSelection().getActionCommand());
         
         for (int i = 1; i <= StrategyProperties.USER_TACLETS_NUM; ++i) {
             p.setProperty( StrategyProperties.USER_TACLETS_OPTIONS_KEY(i), 

@@ -12,6 +12,7 @@ import junit.framework.TestCase;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
+@SuppressWarnings("unchecked")
 public class TestKey extends TestCase {
 
     static Class[] utilityTests = new Class[] {
@@ -44,12 +45,13 @@ public class TestKey extends TestCase {
 
     static Class[] ruleTests = new Class[] {
 	de.uka.ilkd.key.rule.TestSchemaModalOperators.class,
-	de.uka.ilkd.key.rule.TestTacletBuild.class,
+	de.uka.ilkd.key.rule.tacletbuilder.TestTacletBuild.class,
 	de.uka.ilkd.key.rule.TestCollisionResolving.class,
 	de.uka.ilkd.key.rule.TestMatchTaclet.class,
 	de.uka.ilkd.key.rule.TestApplyTaclet.class,
 	de.uka.ilkd.key.rule.inst.TestGenericSortInstantiations.class,
-	de.uka.ilkd.key.rule.metaconstruct.TestProgramMetaConstructs.class
+	de.uka.ilkd.key.rule.metaconstruct.TestProgramMetaConstructs.class,
+	de.uka.ilkd.key.rule.conditions.TestDropEffectlessElementary.class
     };
 
 
@@ -105,7 +107,7 @@ public class TestKey extends TestCase {
      
     public static junit.framework.Test suite() {
 	de.uka.ilkd.key.util.Debug.ENABLE_DEBUG = false;
-	de.uka.ilkd.key.gui.Main.setVisibleMode(false);
+	de.uka.ilkd.key.gui.MainWindow.setVisibleMode(false);
         
 	TestSuite suite = new TestSuite();
 	suite.addTest(createSuite(utilityTests, "Testing Utilities and Collections"));

@@ -21,6 +21,8 @@ import javax.swing.*;
 import javax.swing.border.BevelBorder;
 
 class MainStatusLine extends JPanel {
+    private static final String DEFAULT_STATUSLINE = "Integrated Deductive Software Design: Ready  (Hint: type F3 to search in proof trees or sequents.)";
+    private static final long serialVersionUID = -4324361226332870737L;
     private JLabel       text;
     private JPanel       progressPanel;
     private JProgressBar progressBar;
@@ -86,7 +88,7 @@ class MainStatusLine extends JPanel {
      */
     public void reset () {
 	setProgressPanelVisible ( false );
-	setStatusText ("Integrated Deductive Software Design: Ready  (Hint: type F3 to search in sequents.)" );
+	setStatusText (DEFAULT_STATUSLINE );
     }
 
     /**
@@ -100,9 +102,15 @@ class MainStatusLine extends JPanel {
     /**
      * Set the value the progress bar currently displays
      */
-    public void setProgress(int value){
-	progressBar.setValue(value);
-	progressBar.paintImmediately(0, 0, progressBar.getWidth(), progressBar.getHeight());
+    public void setProgress(final int value){
+	         SwingUtilities.invokeLater(new Runnable() {
+                
+                @Override
+                public void run() {
+                        progressBar.setValue(value);
+                  
+                }
+        });
     }
 
     /**
@@ -123,7 +131,7 @@ class MainStatusLine extends JPanel {
 			    progressPanel.removeComponentListener ( this );
 			    Dimension s = progressPanel.getSize ();
 			    s           = new Dimension ( 0, (int)s.getHeight () );
-			    add ( Box.createRigidArea ( s ) );
+			    add(Box.createRigidArea(s));
 			}
 		    };
 		progressPanel.addComponentListener ( phantomAdder );

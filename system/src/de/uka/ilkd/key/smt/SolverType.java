@@ -12,389 +12,492 @@ package de.uka.ilkd.key.smt;
 
 import java.io.File;
 
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.smt.AbstractSMTTranslator.Configuration;
 
-public interface SolverType {
+public interface SolverType extends PipeListener<SolverCommunication> {
 
-    public SMTSolver createSolver(SMTProblem problem, SolverListener listener,
-	    Services services);
+        public SMTSolver createSolver(SMTProblem problem,
+                        SolverListener listener, Services services);
 
-    public String getName();
+        public String getName();
 
-    public boolean isInstalled(boolean recheck);
+        /**
+         * Checks whether the solver is installed. If <code>recheck</code> is set to true
+         * the method should check for the path variable of the system and for the absolute path,
+         * otherwise it can return the result of the previous call.
+         */
+        public boolean isInstalled(boolean recheck);
 
-    public void useTaclets(boolean b);
+        /**
+         * Some specific information about the solver which can be presented. <code>null</code> means no information. 
+         */
+        public String getInfo();
 
-    public SMTSolverResult interpretAnswer(String text, String error, int val);
+        /**
+         * The currently used parameters for the solver.
+         */
+        public String getSolverParameters();
+        public void setSolverParameters(String s);
+        /** The default parameters which should be used for starting a solver */
+        public String getDefaultSolverParameters();
+        
+        
+        /** the command for starting the solver. For example "z3" if it is registered in the PATH variable,
+         * otherwise "ABSOLUTE_PATH/z3"*/        
+        public String getSolverCommand();
+        public void setSolverCommand(String s);
+        public String getDefaultSolverCommand();
+      
+       
+        /**
+         * The translator to be used. So far each solver supports only one format. 
+         */
+        public SMTTranslator getTranslator(Services services);
+        /**
+         * The delimiters of the messages that are sent from the solver to KeY. For example it could be "\n"
+         */
+        public String[]  getDelimiters();
+        
+        public boolean supportsIfThenElse();
+        
+        /**
+         * Directly before the problem description is sent to the solver one can modify the problem string by using
+         * this method.
+         */
+        public String modifyProblem(String problem);
 
-    public String getInfo();
-    
+        /**
+         * Class for the Z3 solver. It makes use of the SMT2-format.
+         */
+        static public final SolverType Z3_SOLVER = new AbstractSolverType() {
+
+                      
+                public String getDefaultSolverCommand() {
+                    return "z3";                    
+                };
+                
+                public String getDefaultSolverParameters() {
+                    return "-in -smt2";
+                };
+
+                @Override
+                public SMTSolver createSolver(SMTProblem problem,
+                                SolverListener listener, Services services) {
+                        return new SMTSolverImplementation(problem, listener,
+                                        services, this);
+                }
+
+                @Override
+                public String getName() {
+                        return "Z3";
+                }
+                
+                public String[] getDelimiters() {
+                	return new String [] {"\n","\r"};
+                };
+
+                public boolean supportsIfThenElse() {
+                        return true;
+                };
+                @Override
+                public SMTTranslator getTranslator(Services services) {
+                        return new SmtLib2Translator(services,
+                                        new Configuration(false,false));
+                }
 
 
-    /**
-     * Get the command for executing the external prover. This is a hardcoded
-     * default value. It might be overridden by user settings
-     * 
-     * @param filename
-     *            the location, where the file is stored.
-     * @param formula
-     *            the formula, that was created by the translator
-     * @return Array of Strings, that can be used for executing an external
-     *         decider.
-     */
-    public String getExecutionCommand(String filename, String formula);
+                @Override
+                public String getInfo() {
 
-    public String getExecutionCommand();
+                        return "Z3 does not use quantifier elimination by default. This means for example that"
+                                        + " the following problem cannot be solved automatically by default:\n\n"
+                                        + "\\functions{\n"
+                                        + "\tint n;\n"
+                                        + "}\n\n"
+                                        + "\\problem{\n"
+                                        + "\t((\\forall int x;(x<=0 | x >= n+1)) & n >= 1)->false\n"
+                                        + "}"
+                                        + "\n\n"
+                                        + "You can activate quantifier elimination by appending QUANT_FM=true to"
+                                        + " the execution command.";
+                }
 
-    public void setExecutionCommand(String s);
+                private static final int WAIT_FOR_RESULT = 0;
+                private static final int WAIT_FOR_DETAILS =1;
+                
+                
+				@Override
+				public void messageIncoming(Pipe<SolverCommunication> pipe, String message, int type) {
+					SolverCommunication sc = pipe.getSession();
+					if(type == Pipe.ERROR_MESSAGE || message.startsWith("(error")){
+						 sc.addMessage(message);
+						 if(message.indexOf("WARNING:")>-1){
+							return;
+						 }
+						 throw new RuntimeException("Error while executing Z3:\n" +message);
+					 }
+			
+			
+				switch (sc.getState()) {
+				case WAIT_FOR_RESULT:
+					 if(message.equals("unsat")){
+						 sc.setFinalResult(SMTSolverResult.createValidResult(getName()));
+						 pipe.sendMessage("(get-proof)\n");
+						 pipe.sendMessage("(exit)\n");
+						 sc.setState(WAIT_FOR_DETAILS);
+					 }
+					 if(message.equals("sat")){
+						 sc.setFinalResult(SMTSolverResult.createInvalidResult(getName()));
+						 pipe.sendMessage("(get-model)");
+						 pipe.sendMessage("(exit)\n");
+						 sc.setState(WAIT_FOR_DETAILS);
+						
+					 }
+					 if(message.equals("unkown")){
+						 sc.setFinalResult(SMTSolverResult.createUnknownResult(getName()));
+					 }
+					break;
+					
+				case WAIT_FOR_DETAILS:
+					if(message.equals("success")){
+						pipe.close();	
+					}else{
+						sc.addMessage(message);
+					}						
+					break;						
+				}
+			}
 
-    public String getDefaultExecutionCommand();
+        };
+        
+        
+        /**
+         * Class for the CVC3 solver. It makes use of the SMT1-format.
+         */
+        static public final SolverType CVC3_SOLVER = new AbstractSolverType() {
 
-    public SMTTranslator getTranslator(Services services);
+                @Override
+                public String getName() {
+                        return "CVC3";
+                }
 
-    static public final SolverType Z3_SOLVER = new AbstractSolverType() {
+                @Override
+                public SMTSolver createSolver(SMTProblem problem,
+                                SolverListener listener, Services services) {
+                        return new SMTSolverImplementation(problem, listener,
+                                        services, this);
+                }
 
-	@Override
-	public String getExecutionCommand(String filename, String formula) {
-	    return "z3 -smt -m " + filename;
-	}
+                public String getDefaultSolverCommand() {
+                    return "cvc3";
+                };
+                
+                @Override
+                public String getDefaultSolverParameters() {
+                    return "+lang smt +model +int";
+                }
+                
+                public String[] getDelimiters() {
+                	return new String [] {"CVC>","C>"};
+                };
 
-	@Override
-	public SMTSolver createSolver(SMTProblem problem,
-	        SolverListener listener, Services services) {
-	    return new SMTSolverImplementation(problem, listener, services,
-		    this);
-	}
+                @Override
+                public SMTTranslator getTranslator(Services services) {
+                        return new SmtLibTranslator(services,
+                                        new Configuration(false,true));
+                }
+                
+                public boolean supportsIfThenElse() {
+                        return true;
+                };
 
-	@Override
-	public String getName() {
-	    return "Z3";
-	}
+                @Override
+                public String getInfo() {
+                        return null;
+                }
 
-	@Override
-	public SMTTranslator getTranslator(Services services) {
-	    return new SmtLibTranslator(services,new Configuration(false));
-	}
+               
+                
+                final static int WAIT_FOR_RESULT=0;
+                final static int FINISH = 1;
+				@Override
+				public void messageIncoming(Pipe<SolverCommunication> pipe, String message, int type) {
+					 SolverCommunication sc = pipe.getSession();
+					 sc.addMessage(message);
+					 if(type == Pipe.ERROR_MESSAGE){
+						 throw new RuntimeException("Error while executing CVC:\n" +message);
+					 }
+					 
+					 if(sc.getState() == WAIT_FOR_RESULT ){
+						 if(message.indexOf(" sat") > -1){
+							 sc.setFinalResult(SMTSolverResult.createInvalidResult(getName()));
+						 }
+						 if(message.indexOf(" unsat") > -1){
+							 sc.setFinalResult(SMTSolverResult.createValidResult(getName()));
+						 }
+						 sc.setState(FINISH);
+					     pipe.close();
+					     
+					 }
+					
+				}
 
-	public SMTSolverResult interpretAnswer(String text, String error,
-	        int val) {
-	    if (val == 0) {
-		// no error occured
-		if (text.contains("unsat")) {
-		    return SMTSolverResult.createValidResult(text, getName());
-		} else if (text.contains("sat")) {
-		    return SMTSolverResult.createInvalidResult(text, getName());
-		} else {
-		    return SMTSolverResult.createUnknownResult(text, getName());
-		}
-	    } else if ((val == 112 && text.contains("unknown")) || val == 139) {
-		// the result was unknown
-		return SMTSolverResult.createUnknownResult(text, getName());
-	    } else {
-		// something went wrong
-		throw new IllegalResultException("Code " + val + ": " + error);
-	    }
-	}
+        };
+        
+        
+        /**
+         * Class for the Yices solver. It makes use of the SMT1-format.
+         */
+        static public final SolverType YICES_SOLVER = new AbstractSolverType() {
 
-	@Override
-	public String getInfo() {
+                @Override
+                public String getName() {
+                        return "Yices";
+                }
 
-	    return "Z3 does not use quantifier elimination by default. This means for example that"
-		    + " the following problem cannot be solved automatically by default:\n\n"
-		    + "\\functions{\n"
-		    + "\tint n;\n"
-		    + "}\n\n"
-		    + "\\problem{\n"
-		    + "\t((\\forall int x;(x<=0 | x >= n+1)) & n >= 1)->false\n"
-		    + "}"
-		    + "\n\n"
-		    + "You can activate quantifier elimination by appending QUANT_FM=true to"
-		    + " the execution command.";
-	}
-	
+                @Override
+                public SMTSolver createSolver(SMTProblem problem,
+                                SolverListener listener, Services services) {
+                        return new SMTSolverImplementation(problem, listener,
+                                        services, this);
+                }
 
-	
+                @Override
+                public SMTTranslator getTranslator(Services services) {
+                        return new SmtLibTranslator(services,
+                                        new Configuration(true,true));
+                }
 
-    };
-    static public final SolverType CVC3_SOLVER = new AbstractSolverType() {
+                         
+                @Override
+                public String getDefaultSolverCommand() {
+                          return "yices";
+                }
+                
+                public String[] getDelimiters() {
+                	return new String [] {"\n","\r"};
+                };
+                
+                @Override
+                public String getDefaultSolverParameters() {
+                         return "-i -e -smt";
+                }
 
-	@Override
-	public String getName() {
-	    return "CVC3";
-	}
+                @Override
+                public String getInfo() {
+                        return "Use the newest release of version 1.x instead of version 2. Yices 2 does not support the "
+                                        + "required logic AUFLIA.";
+                }
+                
+                public boolean supportsIfThenElse() {
+                        return true;
+                };
 
-	@Override
-	public SMTSolver createSolver(SMTProblem problem,
-	        SolverListener listener, Services services) {
-	    return new SMTSolverImplementation(problem, listener, services,
-		    this);
-	}
+  
 
-	@Override
-	public String getExecutionCommand(String filename, String formula) {
-	    return "cvc3 -lang smt +model " + filename;
-	}
+				@Override
+				public void messageIncoming(Pipe<SolverCommunication> pipe, String message, int type) {
+					SolverCommunication sc = pipe.getSession();
+					message = message.replaceAll("\n","");
+					sc.addMessage(message);		
+					
+							
+					if(message.equals("unsat")){
+						 sc.setFinalResult(SMTSolverResult.createValidResult(getName()));						
+						 pipe.close();
+					}
+					if(message.equals("sat")){
+						 sc.setFinalResult(SMTSolverResult.createInvalidResult(getName()));						 
+						 pipe.close();
+					}
+					
+				}
+				
+				public String modifyProblem(String problem) {
+					return problem += "\n\n check\n";
+				};
 
-	@Override
-	public SMTTranslator getTranslator(Services services) {
-	    return new SmtLibTranslator(services,new Configuration(false));
-	}
+        };
+        
+        /**
+         * Class for the CVC3 solver. It makes use of its own format.
+         */
+        static public final SolverType SIMPLIFY_SOLVER = new AbstractSolverType() {
 
-	@Override
-	public String getInfo() {
-	    return null;
-	}
 
-	@Override
-	public SMTSolverResult interpretAnswer(String text, String error,
-	        int val) {
-	    if (val == 0) {
-		// normal termination, no error
-		if (text.startsWith("unsat\n")) {
-		    return SMTSolverResult.createValidResult(text, getName());
-		} else if (text.startsWith("sat\n")) {
-		    return SMTSolverResult.createInvalidResult(text, getName());
-		} else {
-		    return SMTSolverResult.createUnknownResult(text, getName());
-		}
-	    } else {
-		// error termination
-		throw new IllegalResultException(error);
-	    }
-	}
+                @Override
+                public String getName() {
+                        return "Simplify";
+                }
 
-    };
-    static public final SolverType YICES_SOLVER = new AbstractSolverType() {
+                @Override
+                public SMTSolver createSolver(SMTProblem problem,
+                                SolverListener listener, Services services) {
+                        return new SMTSolverImplementation(problem, listener,
+                                        services, this);
+                }
 
-	@Override
-	public String getName() {
-	    return "Yices";
-	}
+                @Override
+                public SMTTranslator getTranslator(Services services) {
+                        return new SimplifyTranslator(services,
+                                        new Configuration(false,true));
+                }
+                
+                public String getDefaultSolverCommand() {
+                    return "simplify";
+                };
+                
+                public String[] getDelimiters() {
+                	return new String [] {">"};
+                };
+                
+                public String getDefaultSolverParameters() {
+                    return "-print";
+                };
 
-	@Override
-	public SMTSolver createSolver(SMTProblem problem,
-	        SolverListener listener, Services services) {
-	    return new SMTSolverImplementation(problem, listener, services,
-		    this);
-	}
+         
+                @Override
+                public String getInfo() {
+                        return "Simplify only supports integers within the interval [-2147483646,2147483646]=[-2^31+2,2^31-2].";
+                }
+                
+                public boolean supportsIfThenElse() {
+                        return false;
+                };
+ 
 
-	@Override
-	public SMTTranslator getTranslator(Services services) {
-	    return new SmtLibTranslator(services,new Configuration(true));
-	}
-
-	@Override
-	public String getExecutionCommand(String filename, String formula) {
-	    return "yices -tc -e -smt " + filename;
-	}
-
-	@Override
-	public String getInfo() {
-	    return "Use the newest release of version 1.x instead of version 2. Yices 2 does not support the "
-		    + "required logic AUFLIA.";
-	}
-
-	@Override
-	public SMTSolverResult interpretAnswer(String text, String error,
-	        int val) {
-	    if (val == 0) {
-		if (text.startsWith("unsat\n")) {
-		    return SMTSolverResult.createValidResult(text, getName());
-		} else if (text.startsWith("sat\n")) {
-		    return SMTSolverResult.createInvalidResult(text, getName());
-		} else {
-		    return SMTSolverResult.createUnknownResult(text, getName());
-		}
-
-	    } else {
-		throw new IllegalResultException(error);
-	    }
-
-	}
-	
-
-    };
-    static public final SolverType SIMPLIFY_SOLVER = new AbstractSolverType() {
-
-	@Override
-	public String getName() {
-	    return "Simplify";
-	}
-
-	@Override
-	public SMTSolver createSolver(SMTProblem problem,
-	        SolverListener listener, Services services) {
-	    return new SMTSolverImplementation(problem, listener, services,
-		    this);
-	}
-
-	@Override
-	public SMTTranslator getTranslator(Services services) {
-	    return new SimplifyTranslator(services, new Configuration(false));
-	}
-
-	@Override
-	public String getExecutionCommand(String filename, String formula) {
-	    return "simplify " + filename;
-	}
-
-	@Override
-	public String getInfo() {
-	    return "Simplify only supports integers within the interval [-2147483646,2147483646]=[-2^31+2,2^31-2].";
-	}
-	
-
-	@Override
-	public SMTSolverResult interpretAnswer(String text, String error,
-	        int val) {
-	    if (val == 0) {
-		// no error occured
-		if (meansValid(text)) {
-		    return SMTSolverResult.createValidResult(text, getName());
-		} else if (meansInvalid(text)) {
-		    return SMTSolverResult.createInvalidResult(text, getName());
-		} else if (meansBadInput(text)) {
-		    throw new IllegalResultException(text);
-
-		} else {
-		    return SMTSolverResult.createUnknownResult(text, getName());
-		}
-	    } else {
-		// error occured
-		throw new IllegalResultException(error);
-	    }
-
-	}
-
-	private boolean meansBadInput(String text) {
-	    return text.indexOf("Bad input") >= 0;
-	}
-
-	private boolean meansValid(String text) {
-	    boolean toReturn = false;
-	    String wanted = "Valid.";
-	    int pos = text.indexOf(wanted);
-	    if (pos != -1) {
-		// Valid. is found. check, if it is on the end of the String and
-		// if only \n are following
-		toReturn = true;
-		pos = pos + wanted.length();
-		for (int i = pos + 1; i < text.length(); i++) {
-		    if (text.charAt(i) != '\n' && text.charAt(i) != ' ') {
-			toReturn = false;
-		    }
-		}
-	    }
-	    return toReturn;
-	}
-
-	private boolean meansInvalid(String text) {
-	    boolean toReturn = false;
-	    String wanted = "Invalid.";
-	    int pos = text.indexOf(wanted);
-	    if (pos != -1) {
-		// Valid. is found. check, if it is on the end of the String and
-		// if only \n are following
-		toReturn = true;
-		pos = pos + wanted.length();
-		for (int i = pos + 1; i < text.length(); i++) {
-		    if (text.charAt(i) != '\n' && text.charAt(i) != ' ') {
-			toReturn = false;
-		    }
-		}
-	    }
-	    return toReturn;
-	}
-    };
+				@Override
+				public void messageIncoming(Pipe<SolverCommunication> pipe,String message, int type) {
+					SolverCommunication sc = pipe.getSession();
+					sc.addMessage(message);		
+					
+							
+					if(message.indexOf("Valid.")>-1){
+						 sc.setFinalResult(SMTSolverResult.createValidResult(getName()));						
+						 pipe.close();
+					}
+					
+					if(message.indexOf("Invalid.")>-1){
+						 sc.setFinalResult(SMTSolverResult.createInvalidResult(getName()));						 
+						 pipe.close();
+					}
+					
+					if(message.indexOf("Bad input:")>-1){
+						pipe.close();
+					}
+					
+							
+					
+				}
+        };
 
 }
 
 abstract class AbstractSolverType implements SolverType {
-    private boolean installWasChecked = false;
-    private boolean isInstalled = false;
-    private String executionCommand = getDefaultExecutionCommand();
+        private boolean installWasChecked = false;
+        private boolean isInstalled = false;
+        private String solverParameters = getDefaultSolverParameters();
+        private String solverCommand    = getDefaultSolverCommand();
 
-    public static boolean isInstalled(String cmd) {
 
-	int first = cmd.indexOf(" ");
-	if (first >= 0) {
-	    cmd = cmd.substring(0, first);
-	}
+        public static boolean isInstalled(String cmd) {
 
-	if (checkEnvVariable(cmd)) {
-	    return true;
-	} else {
+         
+                if (checkEnvVariable(cmd)) {
+                        return true;
+                } else {
 
-	    File file = new File(cmd);
+                        File file = new File(cmd);
 
-	    return file.exists();
+                        return file.exists();
 
-	}
-    }
+                }
+        }
 
-    @Override
-    public void useTaclets(boolean b) {
 
-    }
 
-    /**
-     * check, if this solver is installed and can be used.
-     * 
-     * @param recheck
-     *            if false, the solver is not checked again, if a cached value
-     *            for this exists.
-     * @return true, if it is installed.
-     */
-    public boolean isInstalled(boolean recheck) {
-	if (recheck || !installWasChecked) {
+        /**
+         * check, if this solver is installed and can be used.
+         * 
+         * @param recheck
+         *                if false, the solver is not checked again, if a cached
+         *                value for this exists.
+         * @return true, if it is installed.
+         */
+        public boolean isInstalled(boolean recheck) {
+                if (recheck || !installWasChecked) {
 
-	    String cmd = getExecutionCommand();
-	    isInstalled = isInstalled(cmd);
-	    if (isInstalled) {
-		installWasChecked = true;
-	    }
+                        String cmd = getSolverCommand();
+                    
+                        isInstalled = isInstalled(cmd);
+                        if (isInstalled) {
+                                installWasChecked = true;
+                        }
 
-	}
-	return isInstalled;
-    }
+                }
+                return isInstalled;
+        }
 
-    private static boolean checkEnvVariable(String cmd) {
-	String filesep = System.getProperty("file.separator");
-	String path = System.getenv("PATH");
-	String[] res = path.split(System.getProperty("path.separator"));
-	for (String s : res) {
-	    File file = new File(s + filesep + cmd);
-	    if (file.exists()) {
-		return true;
-	    }
-	}
+        private static boolean checkEnvVariable(String cmd) {
+                String filesep = System.getProperty("file.separator");
+                String path = System.getenv("PATH");
+  
+                String[] res = path.split(System.getProperty("path.separator"));
+                for (String s : res) {
+                        File file = new File(s + filesep + cmd);
+                        if (file.exists()) {
+                                return true;
+                        }
+                }
 
-	return false;
+                return false;
 
-    }
+        }
+  
 
-    /**
-     * get the hard coded execution command from this solver. The filename od a
-     * problem is indicated by %f, the problem itsself with %p
-     */
-    @Override
-    public String getDefaultExecutionCommand() {
-	return this.getExecutionCommand("%f", "%p");
-    }
+        public String getSolverParameters() {
+                if(solverParameters == null){
+                    return getDefaultSolverParameters();
+                }
+                return solverParameters;
+        }
 
-    public String getExecutionCommand() {
-	return executionCommand;
-    }
+        public void setSolverParameters(String s) {
 
-    public void setExecutionCommand(String s) {
+                solverParameters= s;
+        }
+        
+        @Override
+        public void setSolverCommand(String s) {
+            solverCommand = s;
+        }
+        
+        @Override
+        public final String getSolverCommand() {
+            if(solverCommand == null || solverCommand.isEmpty()){
+                return getDefaultSolverCommand();
+            }
+            return solverCommand;
+        }
+        
+        
+        @Override
+        public void exceptionOccurred(Pipe<SolverCommunication> pipe,
+        	Throwable exception) {
+        	pipe.getSession().addException(exception);
+        
+        }
+        
 
-	executionCommand = s;
-    }
-
-    public String toString() {
-	return getName();
-    }
-    
+        public String toString() {
+                return getName();
+        }
+        
+        @Override
+        public String modifyProblem(String problem) {
+        return problem;
+        }
 
 }

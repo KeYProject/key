@@ -16,13 +16,12 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.DefaultGoalChooserBuilder;
 import de.uka.ilkd.key.proof.DepthFirstGoalChooserBuilder;
 import de.uka.ilkd.key.proof.GoalChooserBuilder;
-import de.uka.ilkd.key.proof.RuleSource;
+import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.BuiltInRule;
@@ -41,7 +40,7 @@ public abstract class AbstractProfile implements Profile {
     private GoalChooserBuilder prototype;
 
     protected AbstractProfile(String standardRuleFilename,
-            ImmutableSet<GoalChooserBuilder> supportedGCB, IMain main) {
+            ImmutableSet<GoalChooserBuilder> supportedGCB) {
 
         standardRules = new RuleCollection(RuleSource
                 .initRuleFile(standardRuleFilename),
@@ -68,14 +67,10 @@ public abstract class AbstractProfile implements Profile {
     }
 
     public AbstractProfile(String standardRuleFilename) {
-        this(standardRuleFilename, null);
-    }
-
-    public AbstractProfile(String standardRuleFilename, IMain main) {
         this(standardRuleFilename,
                 DefaultImmutableSet.<GoalChooserBuilder>nil().
                 add(new DefaultGoalChooserBuilder()).
-                add(new DepthFirstGoalChooserBuilder()), main);
+                add(new DepthFirstGoalChooserBuilder()));
     }
 
     public RuleCollection getStandardRules() {

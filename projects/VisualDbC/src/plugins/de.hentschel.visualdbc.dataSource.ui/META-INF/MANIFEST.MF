@@ -1,0 +1,23 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Visual DbC Data Source UI
+Bundle-SymbolicName: de.hentschel.visualdbc.dataSource.ui;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: de.hentschel.visualdbc.datasource.ui.Activator
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.ui,
+ org.eclipse.core.resources;bundle-version="3.6.1",
+ org.eclipse.jdt.core;bundle-version="3.6.2",
+ org.eclipse.jdt.ui;bundle-version="3.6.2",
+ org.eclipse.emf.common.ui;bundle-version="2.6.0",
+ org.key_project.util;bundle-version="1.0.0",
+ de.hentschel.visualdbc.dataSource;bundle-version="1.0.0"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: de.hentschel.visualdbc.datasource.ui.composite,
+ de.hentschel.visualdbc.datasource.ui.composite.event,
+ de.hentschel.visualdbc.datasource.ui.setting,
+ de.hentschel.visualdbc.datasource.ui.setting.event,
+ de.hentschel.visualdbc.datasource.ui.util,
+ de.hentschel.visualdbc.datasource.ui.wizard.page
+Bundle-Vendor: Martin Hentschel

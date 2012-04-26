@@ -10,15 +10,20 @@
 
 package de.uka.ilkd.key.parser;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
+import de.uka.ilkd.key.rule.tacletbuilder.NoFindTacletBuilder;
+import de.uka.ilkd.key.rule.tacletbuilder.SuccTacletBuilder;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
+import de.uka.ilkd.key.rule.tacletbuilder.AntecTacletBuilder;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 
 import junit.framework.TestCase;
-import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.collection.DefaultImmutableSet;
-import de.uka.ilkd.key.collection.DefaultImmutableSet;
-import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.ContextStatementBlock;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
@@ -28,9 +33,6 @@ import de.uka.ilkd.key.java.reference.ArrayReference;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.parser.KeYLexer;
-import de.uka.ilkd.key.parser.KeYParser;
-import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.rule.*;
 
 /** class tests the parser for Taclets
@@ -53,6 +55,7 @@ public class TestTacletParser extends TestCase {
     //  set up
     //
 
+    @Override
     public void setUp() {
 	nss =new NamespaceSet();
 	services = TacletForTests.services();

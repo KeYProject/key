@@ -96,7 +96,6 @@ public class Function extends AbstractSortedOperator {
 		          : "{" + whereToBind() + "}"));
     }
     
-
     /**
      * Returns a parsable string representation of the declaration of this
      * function or predicate symbol.

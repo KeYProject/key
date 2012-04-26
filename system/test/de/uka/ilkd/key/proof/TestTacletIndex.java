@@ -11,6 +11,7 @@
 /** tests the TacletIndex class.*/
 package de.uka.ilkd.key.proof;
 
+import de.uka.ilkd.key.rule.TacletForTests;
 import junit.framework.TestCase;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;

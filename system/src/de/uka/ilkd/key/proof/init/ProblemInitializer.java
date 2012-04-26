@@ -11,7 +11,11 @@
 package de.uka.ilkd.key.proof.init;
 
 import java.io.File;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Vector;
 
 import recoder.io.PathList;
 import recoder.io.ProjectSettings;
@@ -28,7 +32,11 @@ import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Named;
+import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -37,8 +45,16 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.proof.init.LDTInput.LDTInputListener;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.JavaModel;
+import de.uka.ilkd.key.proof.ProblemLoader;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.io.EnvInput;
+import de.uka.ilkd.key.proof.io.KeYFile;
+import de.uka.ilkd.key.proof.io.LDTInput;
+import de.uka.ilkd.key.proof.io.LDTInput.LDTInputListener;
+import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.GlobalProofMgt;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
@@ -445,9 +461,9 @@ public final class ProblemInitializer {
 	}
 	alreadyParsed.clear();
 
-	//the first time, read in standard rules
-	if(baseConfig == null) {
-	    baseConfig = new InitConfig(services, profile);
+        //the first time, read in standard rules
+        if(baseConfig == null) {
+            baseConfig = new InitConfig(services, profile);
 
 	    RuleSource tacletBase = profile.getStandardRules().getTacletBase();
 	    if(tacletBase != null) {
@@ -468,45 +484,48 @@ public final class ProblemInitializer {
         
 	//register built in rules
         for(Rule r : profile.getStandardRules().getStandardBuiltInRules()) {
-    	    initConfig.getProofEnv().registerRule(r, 
-    		    				  profile.getJustification(r));
+            initConfig.getProofEnv().registerRule(r, 
+                    profile.getJustification(r));
         }
-        
-	//read Java
+
+        //read Java
         readJava(envInput, initConfig);
-        
+
         //register function and predicate symbols defined by Java program
         final JavaInfo javaInfo = initConfig.getServices().getJavaInfo();
         final Namespace functions 
-        	= initConfig.getServices().getNamespaces().functions();
+        = initConfig.getServices().getNamespaces().functions();
         final HeapLDT heapLDT 
-        	= initConfig.getServices().getTypeConverter().getHeapLDT();
+        = initConfig.getServices().getTypeConverter().getHeapLDT();
         assert heapLDT != null;
-        functions.add(initConfig.getServices().getJavaInfo().getInv());
-        for(KeYJavaType kjt : javaInfo.getAllKeYJavaTypes()) {
-            final Type type = kjt.getJavaType();
-            if(type instanceof ClassDeclaration 
-        	     || type instanceof InterfaceDeclaration) {
-        	for(Field f : javaInfo.getAllFields((TypeDeclaration)type)) {
-        	    final ProgramVariable pv 
-        	    	= (ProgramVariable)f.getProgramVariable();
-        	    if(pv instanceof LocationVariable) {
-        		heapLDT.getFieldSymbolForPV((LocationVariable)pv, 
-        					    initConfig.getServices());
-        	    }
-        	}
+        if (javaInfo != null) {
+            functions.add(javaInfo.getInv());
+            for(KeYJavaType kjt : javaInfo.getAllKeYJavaTypes()) {
+                final Type type = kjt.getJavaType();
+                if(type instanceof ClassDeclaration 
+                        || type instanceof InterfaceDeclaration) {
+                    for(Field f : javaInfo.getAllFields((TypeDeclaration)type)) {
+                        final ProgramVariable pv 
+                        = (ProgramVariable)f.getProgramVariable();
+                        if(pv instanceof LocationVariable) {
+                            heapLDT.getFieldSymbolForPV((LocationVariable)pv, 
+                                    initConfig.getServices());
+                        }
+                    }
+                }
+                for(ProgramMethod pm
+                        : javaInfo.getAllProgramMethodsLocallyDeclared(kjt)) {
+                    if(!(pm.isVoid() || pm.isConstructor())) {
+                        functions.add(pm);
+                    }
+                }
             }
-            for(ProgramMethod pm
-        	    : javaInfo.getAllProgramMethodsLocallyDeclared(kjt)) {
-        	if(pm.getKeYJavaType() != null) {
-        	    functions.add(pm);
-        	}
-            }
-        }
+        } else
+                throw new ProofInputException("Problem initialization without JavaInfo!");
 
         //read envInput
         readEnvInput(envInput, initConfig);
-        
+
         //done
         if(listener !=null){
            listener.progressStopped(this); 
@@ -515,7 +534,7 @@ public final class ProblemInitializer {
     }
 
     
-    public void startProver(InitConfig initConfig, ProofOblInput po) 
+    public Proof startProver(InitConfig initConfig, ProofOblInput po) 
     		throws ProofInputException {
 	assert initConfig != null;
 	if(listener!= null){
@@ -536,6 +555,7 @@ public final class ProblemInitializer {
     	    if(listener != null){
                 listener.proofCreated(this, pa);
             }
+          return pa.getFirstProof();
                	    
         } catch (ProofInputException e) {    
             if(listener != null){

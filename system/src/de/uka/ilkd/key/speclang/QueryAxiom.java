@@ -10,6 +10,8 @@
 
 package de.uka.ilkd.key.speclang;
 
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
@@ -42,7 +44,7 @@ public final class QueryAxiom extends ClassAxiom {
     public QueryAxiom(String name, ProgramMethod target, KeYJavaType kjt) {
 	assert name != null;
 	assert target != null;
-	assert target.getKeYJavaType() != null;	
+	assert target.getReturnType() != null;	
 	assert kjt != null;
 	this.name = name;
 	this.target = target;	
@@ -117,10 +119,7 @@ public final class QueryAxiom extends ClassAxiom {
 				ProgramSVSort.VARIABLE, 
 				false);
 	final ProgramSV[] paramProgSVs = new ProgramSV[target.getNumParams()];
-	for(int i = 0; i < paramProgSVs.length; i++) {
-	    final String paramName = target.getParameterDeclarationAt(i)
-	                                   .getVariableSpecification()
-	                                   .getName();
+	for(int i = 0; i < paramProgSVs.length; i++) {	    
 	    paramProgSVs[i] = SchemaVariableFactory.createProgramSV(
 		    		new ProgramElementName("#p" + i), 
 		    		ProgramSVSort.VARIABLE, 
@@ -150,7 +149,7 @@ public final class QueryAxiom extends ClassAxiom {
 	}
 	final Term post = TB.imp(TB.reachableValue(services, 
 						   TB.var(resultProgSV), 
-						   target.getKeYJavaType()),
+						   target.getReturnType()),
 	                  	 TB.equals(TB.var(skolemSV), TB.var(resultProgSV)));
 	
 	//create java block
@@ -223,7 +222,7 @@ public final class QueryAxiom extends ClassAxiom {
 		    		     target.getParamType(i).getJavaType());
 	}
 	tacletBuilder.addVarsNew(resultProgSV, 
-				 target.getKeYJavaType().getJavaType());
+				 target.getReturnType().getJavaType());
 	tacletBuilder.setStateRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);
 	tacletBuilder.addTacletGoalTemplate
 	    (new RewriteTacletGoalTemplate(addedSeq,
@@ -232,7 +231,8 @@ public final class QueryAxiom extends ClassAxiom {
 	tacletBuilder.setName(MiscTools.toValidTacletName(name));
 	tacletBuilder.addRuleSet(new RuleSet(new Name("simplify")));
 	
-	return DefaultImmutableSet.<Taclet>nil().add(tacletBuilder.getTaclet());
+	// return DefaultImmutableSet.<Taclet>nil(); //chrisg: Tip von Christoph Scheben (email vom 14.2.2012)
+	return DefaultImmutableSet.<Taclet>nil().add(tacletBuilder.getTaclet()); 
     }    
     
     
@@ -247,10 +247,6 @@ public final class QueryAxiom extends ClassAxiom {
     public String toString() {
 	return "query axiom for " + target;
     }
-
-
-    @Override
-    public String getDisplayName() {
-	return getName();
-    }
+    
 }
+ 

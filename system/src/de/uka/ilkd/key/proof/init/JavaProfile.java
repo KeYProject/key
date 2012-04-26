@@ -12,13 +12,11 @@ package de.uka.ilkd.key.proof.init;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.proof.GoalChooserBuilder;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustification;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.*;
-//import de.uka.ilkd.key.rule.InteractiveInvariantGeneration;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 
@@ -32,21 +30,16 @@ public class JavaProfile extends AbstractProfile {
         new JavaCardDLStrategy.Factory();
 
 
-    protected JavaProfile(String standardRules, ImmutableSet<GoalChooserBuilder> gcb,
-            IMain main) {
-        super(standardRules, gcb, main);
+    protected JavaProfile(String standardRules, ImmutableSet<GoalChooserBuilder> gcb) {
+        super(standardRules, gcb);
      }
 
-    protected JavaProfile(String standardRules, IMain main) {
-        super(standardRules, main);
+    protected JavaProfile(String standardRules) {
+        super(standardRules);
      }
 
     public JavaProfile() {
-        this("standardRules.key", null);
-    }
-
-    public JavaProfile(IMain main) {
-        this("standardRules.key", main);
+        this("standardRules.key");
     }
 
     protected ImmutableSet<StrategyFactory> getStrategyFactories() {

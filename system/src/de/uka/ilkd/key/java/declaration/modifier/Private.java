@@ -41,4 +41,14 @@ public class Private extends VisibilityModifier {
     protected String getSymbol() {
         return "private";
     }
+
+    @Override
+    public int compareTo(VisibilityModifier arg0) {
+        if (arg0 instanceof Private) return 0;
+        if (arg0 == null) return 1;
+        if (arg0 instanceof Protected) return 2;
+        if (arg0 instanceof Public) return 3;
+        assert false;
+        return 0;
+    }
 }

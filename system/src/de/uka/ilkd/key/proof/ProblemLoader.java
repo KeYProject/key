@@ -15,6 +15,7 @@ import java.io.FileNotFoundException;
 import java.io.StringReader;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Stack;
 import java.util.Vector;
 
@@ -22,8 +23,8 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.DefaultTaskFinishedInfo;
-import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofManagementDialog;
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.gui.SwingWorker;
@@ -31,12 +32,12 @@ import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.LogicVariable;
@@ -48,13 +49,13 @@ import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.init.DependencyContractPO;
-import de.uka.ilkd.key.proof.init.EnvInput;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.KeYFile;
 import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.io.EnvInput;
+import de.uka.ilkd.key.proof.io.KeYFile;
 import de.uka.ilkd.key.rule.BuiltInRuleApp;
 import de.uka.ilkd.key.rule.ContractRuleApp;
 import de.uka.ilkd.key.rule.IfFormulaInstDirect;
@@ -76,7 +77,9 @@ import de.uka.ilkd.key.util.ProgressMonitor;
 public final class ProblemLoader implements Runnable {
 
     private File file;
-    private IMain main;    
+    private List<File> classPath;
+    private File bootClassPath;
+    private MainWindow main;    
     private KeYMediator mediator;
 
     private Proof proof = null;
@@ -104,14 +107,20 @@ public final class ProblemLoader implements Runnable {
     private SwingWorker worker;
     private ProgressMonitor pm;
     private ProverTaskListener ptl;
+
+    public ProblemLoader(File file, MainWindow main) {
+        this(file, null, null, main);
+    }
     
-    public ProblemLoader(File file, IMain main) {
+    public ProblemLoader(File file, List<File> classPath, File bootClassPath, MainWindow main) {
         this.main = main;
-        this.mediator  = main.mediator();        
+        this.mediator  = main.getMediator();        
         this.file = file;
+        this.classPath = classPath;
+        this.bootClassPath = bootClassPath;
         this.exceptionHandler = mediator.getExceptionHandler();
 
-        addProgressMonitor(main.getProgressMonitor());
+        addProgressMonitor(main.getUserInterface());
     }    
       
     public void addProgressMonitor(ProgressMonitor pm) {
@@ -195,7 +204,12 @@ public final class ProblemLoader implements Runnable {
      * @throws IllegalArgumentException if the user has selected a file with an unsupported extension
      *                          an exception is thrown to indicate this
      */
-    protected EnvInput createEnvInput(File file) 
+    public EnvInput createEnvInput(File file) 
+    throws FileNotFoundException {                
+        return createEnvInput(file, null, null);
+    }
+    
+    public EnvInput createEnvInput(File file, List<File> classPath, File bootClassPath) 
     throws FileNotFoundException {                
         
         final String filename = file.getName();
@@ -203,9 +217,9 @@ public final class ProblemLoader implements Runnable {
         if (filename.endsWith(".java")){ 
             // java file, probably enriched by specifications
             if(file.getParentFile() == null) {
-                return new SLEnvInput(".");
+                return new SLEnvInput(".", classPath, bootClassPath);
             } else {
-                return new SLEnvInput(file.getParentFile().getAbsolutePath());
+                return new SLEnvInput(file.getParentFile().getAbsolutePath(), classPath, bootClassPath);
             }            
         } else if (filename.endsWith(".key") || 
                 filename.endsWith(".proof")) {
@@ -215,7 +229,7 @@ public final class ProblemLoader implements Runnable {
         } else if (file.isDirectory()){ 
             // directory containing java sources, probably enriched 
             // by specifications
-            return new SLEnvInput(file.getPath());
+            return new SLEnvInput(file.getPath(), classPath, bootClassPath);
         } else {
             if (filename.lastIndexOf('.') != -1) {
                 throw new IllegalArgumentException
@@ -237,7 +251,7 @@ public final class ProblemLoader implements Runnable {
        ProofOblInput po = null;
        try{
            try{
-               envInput = createEnvInput(file);
+               envInput = createEnvInput(file, classPath, bootClassPath);
                init = main.createProblemInitializer(); 
                InitConfig initConfig = init.prepare(envInput);
 
@@ -258,15 +272,9 @@ public final class ProblemLoader implements Runnable {
         	   if(contract == null) {
         	       throw new RuntimeException("Contract not found: " 
         		                          + chooseContract);
-        	   } else if(contract instanceof FunctionalOperationContract) {
-        	       po = new FunctionalOperationContractPO(
-        		       		initConfig, 
-        		       		(FunctionalOperationContract)contract);
         	   } else {
-        	       po = new DependencyContractPO(
-        		       		initConfig, 
-        		       		(DependencyContract)contract);
-        	   }
+                       po = contract.createProofObl(initConfig, contract);
+                   }
         	   
                } else { 
         	   ProofManagementDialog.showInstance(initConfig);
@@ -292,11 +300,12 @@ public final class ProblemLoader implements Runnable {
 	       setStandardStatusLine();
            
 	   } catch (ExceptionHandlerException e) {
+//	       e.printStackTrace();
 	       throw e;
 	   } catch (Throwable thr) {
 	       exceptionHandler.reportException(thr);
                status =  thr.getMessage();
-               System.out.println("2");
+               System.err.println("2");
 	   }
        } catch (ExceptionHandlerException ex){
 	       setStatusLine("Failed to load " 
@@ -715,22 +724,17 @@ public final class ProblemLoader implements Runnable {
 
     private static class AppConstructionException extends Exception {
 
-        AppConstructionException(String s) {
-            super(s);
-        }
-
-        AppConstructionException(Throwable t) {
-            super(t);
-        }
-
-        AppConstructionException(String s, Throwable t) {
-            super(s, t);
-        }
-
-    }
+        /**
+         * 
+         */
+        private static final long serialVersionUID = -6534063595443883709L; }
 
     private static class BuiltInConstructionException extends Exception {
-	BuiltInConstructionException(String s) {
+	/**
+         * 
+         */
+        private static final long serialVersionUID = -735474220502290816L;
+    BuiltInConstructionException(String s) {
 	    super(s);
 	}
 	BuiltInConstructionException(Throwable cause) {
@@ -740,15 +744,5 @@ public final class ProblemLoader implements Runnable {
 
     public KeYExceptionHandler getExceptionHandler() {
         return exceptionHandler;
-    }
-
-    private static class PairOfString {
-        public String left;
-        public String right;
-
-        public PairOfString ( String p_left, String p_right ) {
-            left  = p_left;
-            right = p_right;
-        }
     }
 }

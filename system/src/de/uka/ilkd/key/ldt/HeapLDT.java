@@ -69,6 +69,7 @@ public final class HeapLDT extends LDT {
     
     //heap pv
     private final LocationVariable heap;
+    private final LocationVariable savedHeap;
     
     
     
@@ -101,6 +102,7 @@ public final class HeapLDT extends LDT {
         acc               = addFunction(services, "acc");
         reach             = addFunction(services, "reach");
         heap	          = (LocationVariable) progVars.lookup(new Name("heap"));    
+        savedHeap	  = (LocationVariable) progVars.lookup(new Name("savedHeap"));    
     }
     
     
@@ -276,6 +278,10 @@ public final class HeapLDT extends LDT {
     
     public LocationVariable getHeap() {
 	return heap;
+    }
+
+    public LocationVariable getSavedHeap() {
+	return savedHeap;
     }
     
     
