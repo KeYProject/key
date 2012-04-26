@@ -60,9 +60,9 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 
     private JScrollPane tablePane;
  
-    public TacletMatchCompletionDialog(ApplyTacletDialogModel[] model,
+    public TacletMatchCompletionDialog(JFrame parent, ApplyTacletDialogModel[] model,
 				       Goal goal, KeYMediator mediator) { 
-	super(model, mediator);	
+	super(parent, model, mediator);	
 	this.goal    = goal;
 	this.current = 0;
 	dataTable = new DataTable[model.length];
@@ -76,29 +76,13 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
         // layout dialog
 	layoutDialog();
 	pack();
-	// set at the middle of the main frame
-	//setLocation(dialogPosition());
-//	setSize(800,(int)getSize().getHeight());
-//	setLocation(50,50);
+
 	setVisible(true);
     }
     
+       
     
-
-    public TacletMatchCompletionDialog(ApplyTacletDialogModel model,
-				       Goal goal,
-				       KeYMediator mediator) { 
-	this(new ApplyTacletDialogModel[]{model}, goal, mediator);
-    }
-
-    public static void completeAndApplyApp(TacletApp app, Goal goal,
-            KeYMediator medi) {
-        LinkedList<TacletApp> l = new LinkedList<TacletApp>();
-        l.add(app);
-        completeAndApplyApp(l, goal, medi);
-    }
-
-    public static void completeAndApplyApp(java.util.List<TacletApp> apps, Goal goal,
+    public static ApplyTacletDialogModel[] completeAndApplyApp(java.util.List<TacletApp> apps, Goal goal,
             KeYMediator medi) {
         ApplyTacletDialogModel[] origInstModels = new ApplyTacletDialogModel[apps.size()];
         LinkedList<ApplyTacletDialogModel> recentInstModels = new LinkedList<ApplyTacletDialogModel>();
@@ -138,7 +122,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
             models[i++] = model;
         }
 
-        new TacletMatchCompletionDialog(models, goal, medi);
+        return models;
     }
 
     public static ApplyTacletDialogModel createModel(TacletApp app, Goal goal, 

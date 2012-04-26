@@ -8,8 +8,8 @@ import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.gui.ExceptionDialog;
 import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
 import de.uka.ilkd.key.gui.utilities.InspectorForFormulas;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -56,7 +56,7 @@ public class JoinMenuItem extends JMenuItem {
            
            @Override
            public void exceptionWhileJoining(Throwable e) {
-              ExceptionDialog.showDialog(mediator.mainFrame(), e);   
+              mediator.notify(new ExceptionFailureEvent(e.getMessage(), e));   
               mediator.startInterface(true);
            }
            

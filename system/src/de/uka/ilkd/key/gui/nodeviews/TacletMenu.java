@@ -10,8 +10,6 @@
 
 package de.uka.ilkd.key.gui.nodeviews;
 
-import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
-import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -22,6 +20,7 @@ import javax.swing.*;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.join.JoinMenuItem;
 import de.uka.ilkd.key.gui.smt.SMTMenuItem;
@@ -36,11 +35,11 @@ import de.uka.ilkd.key.pp.AbbrevException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.TacletFilter;
 import de.uka.ilkd.key.proof.join.JoinIsApplicable;
-import de.uka.ilkd.key.proof.join.JoinProcessor;
 import de.uka.ilkd.key.proof.join.ProspectivePartner;
 import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
@@ -323,11 +322,11 @@ class TacletMenu extends JMenu {
 	List<TacletMenuItem> items = new LinkedList<TacletMenuItem>();
 	
         final InsertHiddenTacletMenuItem insHiddenItem = 
-            new InsertHiddenTacletMenuItem(mediator.mainFrame(), 
+            new InsertHiddenTacletMenuItem(MainWindow.getInstance(), 
                     mediator.getNotationInfo(), mediator.getServices());
         
         final InsertionTacletBrowserMenuItem insSystemInvItem = 
-            new InsertSystemInvariantTacletMenuItem(mediator.mainFrame(), 
+            new InsertSystemInvariantTacletMenuItem(MainWindow.getInstance(), 
                     mediator.getNotationInfo(), mediator.getServices());
        
         

@@ -81,11 +81,10 @@ public class TaskTree extends JPanel {
 
     public boolean removeTask(TaskTreeNode tn) {
 
-        int option = JOptionPane.showConfirmDialog(
-                mediator.mainFrame(),"Are you sure?\n",
-                "Abandon Proof", JOptionPane.YES_NO_OPTION);
+        boolean removalConfirmed = mediator.getUI().confirmTaskRemoval("Are you sure?"); 
+        		
 
-        if (option == JOptionPane.YES_OPTION) {
+        if (removalConfirmed) {
 	    removeTaskWithoutInteraction(tn);
 	    return true;
         }

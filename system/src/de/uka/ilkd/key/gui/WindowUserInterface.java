@@ -1,14 +1,17 @@
 package de.uka.ilkd.key.gui;
 
+import java.io.File;
+import java.util.List;
+
+import javax.swing.JOptionPane;
+
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.ProblemLoader;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.ui.UserInterface;
+import de.uka.ilkd.key.ui.AbstractUserInterface;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 
 /**
@@ -22,14 +25,24 @@ import de.uka.ilkd.key.util.KeYExceptionHandler;
  * @author mattias ulbrich
  */
 
-public class WindowUserInterface implements UserInterface {
+public class WindowUserInterface extends AbstractUserInterface {
 
     private MainWindow mainWindow;
     
     public WindowUserInterface(MainWindow mainWindow) {
         this.mainWindow = mainWindow;
     }
-
+    
+    public void loadProblem(File file, List<File> classPath, File bootClassPath, KeYMediator mediator) {
+        mainWindow.addRecentFile(file.getAbsolutePath());
+        super.loadProblem(file, classPath, bootClassPath, mediator);
+    }
+    
+	@Override
+    public void loadProblem(File file) {
+		loadProblem(file, null, null, mainWindow.getMediator());
+	}
+    
     @Override
     public void progressStarted(Object sender) {
         mainWindow.getMediator().stopInterface(true);
@@ -69,47 +82,48 @@ public class WindowUserInterface implements UserInterface {
 
     @Override
     public void taskFinished(TaskFinishedInfo info) {
-        final MainStatusLine sl = mainWindow.getStatusLine();
         if (info.getSource() instanceof ApplyStrategy) {
-            sl.reset();            
+            resetStatus(this);            
             ApplyStrategy.ApplyStrategyInfo result = 
                     (ApplyStrategyInfo) info.getResult();
 
-            Goal g = result.nonCloseableGoal();
-            if(g == null) {               
-                g = info.getProof().openGoals().head();
-            } else {
-                mainWindow.getMediator().goalChosen(g);
-            }
             
-            if (inStopAtFirstUncloseableGoalMode(info.getProof())) {
-                // iff Stop on non-closeable Goal is selected a little
-                // popup is generated and proof is stopped
-                AutoDismissDialog dialog = new AutoDismissDialog(
-                        "Couldn't close Goal Nr. "
-                                + g.node().serialNr()
-                                + " automatically");
-                dialog.show();
-            }
+        	Proof proof = info.getProof();
+        	if (!proof.closed()) {
+                Goal g = result.nonCloseableGoal();
+                if(g == null) {            
+                	g = proof.openGoals().head();
+                }
+                mainWindow.getMediator().goalChosen(g);
+                if (inStopAtFirstUncloseableGoalMode(info.getProof())) {
+                    // iff Stop on non-closeable Goal is selected a little
+                    // popup is generated and proof is stopped
+                    AutoDismissDialog dialog = new AutoDismissDialog(
+                            "Couldn't close Goal Nr. "
+                                    + g.node().serialNr()
+                                    + " automatically");
+                    dialog.show();
+                }
+        	}             
             mainWindow.displayResults(info.getTime(), 
                            info.getAppliedRules(), 
                            info.getClosedGoals(),
                            info.getProof().openGoals().size());                
         } else if (info.getSource() instanceof ProblemLoader) {
-            if (!"".equals(info.getResult())) {
+        	if (!"".equals(info.getResult())) {
                 final KeYExceptionHandler exceptionHandler = 
                     ((ProblemLoader)info.getSource()).getExceptionHandler();
                         ExceptionDialog.showDialog(mainWindow,     
                                 exceptionHandler.getExceptions());
                         exceptionHandler.clear();
             } else {
-                sl.reset();                    
+                resetStatus(this);
                 KeYMediator mediator = mainWindow.getMediator();
                 mediator.getNotationInfo().refresh(mediator.getServices());
             }
         } else {
-            sl.reset();
-            if(info.toString() != ""){
+        	resetStatus(this);
+        	if(info.toString() != ""){
                     mainWindow.displayResults(info.toString());
             }
         }
@@ -141,6 +155,39 @@ public class WindowUserInterface implements UserInterface {
     @Override
     public void setProgress(int progress) {
         mainWindow.getStatusLine().setProgress(progress);
+    }
+
+    @Override
+    public void notifyAutoModeBeingStarted() {
+        mainWindow.setCursor(new java.awt.Cursor(java.awt.Cursor.WAIT_CURSOR));        
+    }
+
+    @Override
+    public void notifyAutomodeStopped() {
+        mainWindow.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));        
+    }
+
+    @Override
+    public void notify(NotificationEvent event) {
+    	mainWindow.notify(event);
+    }
+
+    @Override
+    public void completeAndApplyTacletMatch(ApplyTacletDialogModel[] models, Goal goal) {
+        new TacletMatchCompletionDialog(mainWindow, models, goal, mainWindow.getMediator());
+    }
+
+	@Override
+    public boolean confirmTaskRemoval(String string) {
+		int answer = JOptionPane.showConfirmDialog(
+				MainWindow.getInstance(),string,
+				"Abandon Proof", JOptionPane.YES_NO_OPTION);
+	    return answer == JOptionPane.YES_OPTION;
+    }
+
+	@Override
+    public void openExamples() {
+		mainWindow.openExamples();
     }
 
 }

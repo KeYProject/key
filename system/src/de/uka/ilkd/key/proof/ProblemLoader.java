@@ -13,62 +13,31 @@ package de.uka.ilkd.key.proof;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.StringReader;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Stack;
-import java.util.Vector;
+import java.util.*;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.DefaultTaskFinishedInfo;
-import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.ProofManagementDialog;
-import de.uka.ilkd.key.gui.ProverTaskListener;
-import de.uka.ilkd.key.gui.SwingWorker;
-import de.uka.ilkd.key.gui.TaskFinishedInfo;
+import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SkolemTermSV;
-import de.uka.ilkd.key.logic.op.VariableSV;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
-import de.uka.ilkd.key.proof.init.DependencyContractPO;
-import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.EnvInput;
 import de.uka.ilkd.key.proof.io.KeYFile;
-import de.uka.ilkd.key.rule.BuiltInRuleApp;
-import de.uka.ilkd.key.rule.ContractRuleApp;
-import de.uka.ilkd.key.rule.IfFormulaInstDirect;
-import de.uka.ilkd.key.rule.IfFormulaInstSeq;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
-import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.speclang.DependencyContract;
-import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
+import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.key.util.ProgressMonitor;
@@ -79,8 +48,8 @@ public final class ProblemLoader implements Runnable {
     private File file;
     private List<File> classPath;
     private File bootClassPath;
-    private MainWindow main;    
-    private KeYMediator mediator;
+    private UserInterface ui;    
+    private KeYMediator mediator;    
 
     private Proof proof = null;
     private Iterator<Node> children = null;
@@ -92,8 +61,8 @@ public final class ProblemLoader implements Runnable {
     private int currFormula = 0;
     private PosInTerm currPosInTerm = PosInTerm.TOP_LEVEL;
     private Contract currContract = null;
-    private Stack stack = new Stack();
-    private LinkedList loadedInsts = null;
+    private Stack<Iterator<Node>> stack = new Stack<Iterator<Node>>();
+    private LinkedList<String> loadedInsts = null;
     private ImmutableList<IfFormulaInstantiation> ifFormulaList 
     	= ImmutableSLList.<IfFormulaInstantiation>nil();
     private ImmutableList<PosInOccurrence> builtinIfInsts;
@@ -107,20 +76,20 @@ public final class ProblemLoader implements Runnable {
     private SwingWorker worker;
     private ProgressMonitor pm;
     private ProverTaskListener ptl;
-
-    public ProblemLoader(File file, MainWindow main) {
-        this(file, null, null, main);
+        
+    public ProblemLoader(File file, KeYMediator mediator) {
+        this(file, null, null, mediator);
     }
     
-    public ProblemLoader(File file, List<File> classPath, File bootClassPath, MainWindow main) {
-        this.main = main;
-        this.mediator  = main.getMediator();        
+    public ProblemLoader(File file, List<File> classPath, File bootClassPath, KeYMediator mediator) {
+    	this.ui = mediator.getUI();
+    	this.mediator  = mediator;        
         this.file = file;
         this.classPath = classPath;
         this.bootClassPath = bootClassPath;
         this.exceptionHandler = mediator.getExceptionHandler();
 
-        addProgressMonitor(main.getUserInterface());
+        addProgressMonitor(ui);
     }    
       
     public void addProgressMonitor(ProgressMonitor pm) {
@@ -131,37 +100,6 @@ public final class ProblemLoader implements Runnable {
         this.ptl = ptl;
     }
     
-    /** 
-     * updates a possibly existing status line with the given information
-     * @param status the String to be printed in the status line
-     */
-    public void setStatusLine(String status) {
-        if (main != null) {
-            main.setStatusLine(status);
-        }
-    }
-
-    /**
-     * updates a possibly existing status line with the given status information
-     * and sets a maximum value for the progress bar
-     * @param status the String with the status information
-     * @param nr the int used a maximum value for a progress bar
-     */
-    public void setStatusLine(String status, int nr) {
-        if (main != null) {
-            main.setStatusLine(status, nr);
-        }
-    }
-    
-    /**
-     * resets a possibly existing statusline to its standard text
-     */
-    public void setStandardStatusLine() {
-        if (main != null) {
-            main.setStandardStatusLine();
-        }        
-    }
-
 
     public void run() {
         /* Invoking start() on the SwingWorker causes a new Thread
@@ -192,7 +130,9 @@ public final class ProblemLoader implements Runnable {
 		}
         };
         mediator.stopInterface(true);
-        if (ptl != null) ptl.taskStarted("Loading problem ...", 0);
+        if (ptl != null) { 
+        	ptl.taskStarted("Loading problem ...", 0);
+        }
         worker.start();
     }
 
@@ -244,7 +184,7 @@ public final class ProblemLoader implements Runnable {
             }
         }                
     }
-
+    
    private Object doWork() {
        String status = "";
        EnvInput envInput = null;
@@ -252,7 +192,10 @@ public final class ProblemLoader implements Runnable {
        try{
            try{
                envInput = createEnvInput(file, classPath, bootClassPath);
-               init = main.createProblemInitializer(); 
+               
+               init = new ProblemInitializer(ui, mediator.getProfile(),  
+            		   new Services(mediator.getExceptionHandler()), true, ui);; 
+               
                InitConfig initConfig = init.prepare(envInput);
 
                final String chooseContract;
@@ -277,7 +220,7 @@ public final class ProblemLoader implements Runnable {
                    }
         	   
                } else { 
-        	   ProofManagementDialog.showInstance(initConfig);
+        	   ProofManagementDialog.showInstance(mediator, initConfig);
         	   if(ProofManagementDialog.startedProof()) {
         	       return status;
         	   } else {
@@ -289,16 +232,14 @@ public final class ProblemLoader implements Runnable {
 
                proof = mediator.getSelectedProof();
                mediator.stopInterface(true); // first stop (above) is not enough
-               // as there is no problem at that time
-               setStatusLine("Loading proof");
+               
                currNode = proof.root(); // initialize loader
                children = currNode.childrenIterator(); // --"--
                iconfig = proof.env().getInitConfig();
                if(envInput instanceof KeYUserProblemFile) {
-        	   init.tryReadProof(this, (KeYUserProblemFile)envInput);
+            	   init.tryReadProof(this, (KeYUserProblemFile)envInput);
                }
-	       setStandardStatusLine();
-           
+               ui.resetStatus(this);
 	   } catch (ExceptionHandlerException e) {
 //	       e.printStackTrace();
 	       throw e;
@@ -308,9 +249,11 @@ public final class ProblemLoader implements Runnable {
                System.err.println("2");
 	   }
        } catch (ExceptionHandlerException ex){
-	       setStatusLine("Failed to load " 
+	       String errorMessage = "Failed to load " 
 		             + (envInput == null 
-		        	 ? "problem/proof" : envInput.name()));
+		        	 ? "problem/proof" : envInput.name());
+    	   ui.notify(new ExceptionFailureEvent(errorMessage, ex));
+	       ui.reportStatus(this, errorMessage);
 	       status =  ex.toString();
        }
        finally {
@@ -373,7 +316,7 @@ public final class ProblemLoader implements Runnable {
             break;
 
         case 'i' :
-            if (loadedInsts == null) loadedInsts = new LinkedList();
+            if (loadedInsts == null) loadedInsts = new LinkedList<String>();
             loadedInsts.add(s);
             break;
             
@@ -452,7 +395,7 @@ public final class ProblemLoader implements Runnable {
         //read no new commands until ignored branch closes
         switch (id) {
         case 'b' :
-            children = (Iterator<Node>) stack.pop();           
+            children = stack.pop();           
             break;
         case 'a' :
             if (currNode != null) {
@@ -635,9 +578,9 @@ public final class ProblemLoader implements Runnable {
         ImmutableSet<SchemaVariable> uninsts = app.uninstantiatedVars();
 
         // first pass: add variables
-        Iterator it = loadedInsts.iterator();
+        Iterator<String> it = loadedInsts.iterator();
         while (it.hasNext()) {
-            String s = (String) it.next();
+            String s = it.next();
             int eq = s.indexOf('=');
             String varname = s.substring(0, eq);
             String value = s.substring(eq+1, s.length());
@@ -659,7 +602,7 @@ public final class ProblemLoader implements Runnable {
         uninsts = app.uninstantiatedVars();
         it = loadedInsts.iterator();
         while (it.hasNext()) {
-            String s = (String) it.next();
+            String s = it.next();
             int eq = s.indexOf('=');
             String varname = s.substring(0, eq);
             String value = s.substring(eq + 1, s.length());

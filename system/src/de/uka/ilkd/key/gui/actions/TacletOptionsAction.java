@@ -24,7 +24,7 @@ public class TacletOptionsAction extends MainWindowAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (getMediator().getProof() == null) {
-            getMediator().notify(
+            mainWindow.notify(
                     new GeneralInformationEvent(
                             "No contracts available.",
                             "If you wish to see the available options "

@@ -10,19 +10,18 @@
 
 package de.uka.ilkd.key.gui;
 
-import java.awt.Component;
 import java.util.Iterator;
+import java.util.LinkedList;
 
 import javax.swing.Action;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
-import javax.swing.WindowConstants;
 import javax.swing.event.EventListenerList;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
+import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.notification.events.ProofClosedNotificationEvent;
 import de.uka.ilkd.key.gui.utilities.CheckedUserInput;
@@ -34,14 +33,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.PosInSequent;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofEvent;
-import de.uka.ilkd.key.proof.ProofTreeAdapter;
-import de.uka.ilkd.key.proof.ProofTreeEvent;
-import de.uka.ilkd.key.proof.TacletFilter;
-import de.uka.ilkd.key.proof.TermTacletAppIndexCacheSet;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCut;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCutListener;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCutProcessor;
@@ -61,10 +53,10 @@ import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
 
-public class KeYMediator {
+public class KeYMediator {    
 
-    private MainWindow mainFrame;
-
+	/** The user interface */
+    private UserInterface ui;
 
     private InteractiveProver interactiveProver;
 
@@ -96,8 +88,8 @@ public class KeYMediator {
     /** creates the KeYMediator with a reference to the application's
      * main frame and the current proof settings
     */
-    public KeYMediator(MainWindow mainWindow) {
-	this.mainFrame = mainWindow;
+    public KeYMediator(UserInterface ui) {
+	this.ui             = ui;
 	notationInfo        = new NotationInfo();
 	proofListener       = new KeYMediatorProofListener();
 	proofTreeListener   = new KeYMediatorProofTreeListener();
@@ -109,20 +101,6 @@ public class KeYMediator {
 	defaultExceptionHandler = new KeYRecoderExcHandler();
     }
 
-// not used
-//    public void addinterruptListener(InterruptListener il) {
-//	this.interruptListener.add(il);
-//    }
-    
-//    public void removeInterruptListener(InterruptListener il) {
-//	this.interruptListener.remove(il);
-//    }
-    
-//    public void interrupted(ActionEvent e) {
-//	for (InterruptListener il : interruptListener) {
-//	    il.interruptionPerformed(e);
-//	}
-//    }
     
     /** returns the used NotationInfo
      * @return the used NotationInfo
@@ -214,17 +192,9 @@ public class KeYMediator {
        stupidMode = b;
     }
 
-    public boolean ensureProofLoadedSilent() {
-	return getProof() != null;
-    }
-
     public boolean ensureProofLoaded() {
-	final boolean loaded = ensureProofLoadedSilent();
-	if (!loaded) {
-	    popupWarning("No proof.", "Oops...");
-	}
-	return loaded;
-    }
+    	return getProof() != null;
+    }   
     
     /**
      * Returns a filter that is used for filtering taclets that should not be showed while
@@ -258,27 +228,22 @@ public class KeYMediator {
 	}
     }
 
-        public void setBack(Node node) {
-                if (ensureProofLoaded()) {
-                        getProof().pruneProof(node);
-                        finishSetBack(node.proof());
+    public void setBack(Node node) {
+    	node.proof().pruneProof(node);
+    	finishSetBack(node.proof());
+    }
 
-                }
-        }
+    public void setBack(Goal goal) {
+    	if (getProof() != null) {
+    		goal.proof().pruneProof(goal);
+    		finishSetBack(goal.proof());
 
-        public void setBack(Goal goal) {
-                if (ensureProofLoaded()) {
-                        if (getProof() != null) {
-                                getProof().pruneProof(goal);
-                                finishSetBack(getProof());
-
-                        } 
-                }
-        }
+    	} 
+    }
     
     
     private void finishSetBack(final Proof proof){
-        this.mainFrame.getUserInterface().taskFinished(
+        this.ui.taskFinished(
                         new DefaultTaskFinishedInfo(this, null, 
                                         proof, 0, 
                                         0, getNrGoalsClosedByAutoMode()){
@@ -410,9 +375,7 @@ public class KeYMediator {
 	ImmutableSet<TacletApp> applics = 
            getTacletApplications(goal, taclet.name().toString(), pos);
         if (applics.size() == 0) {
-	   JOptionPane.showMessageDialog(mainFrame(), "Taclet application failed." 
-					 + "\n" + taclet.name(), "Bummer!",
-					 JOptionPane.ERROR_MESSAGE);
+            notify(new GeneralFailureEvent("Taclet application failed." + taclet.name()));
            return false;
         }
 	Iterator<TacletApp> it = applics.iterator();	
@@ -436,10 +399,12 @@ public class KeYMediator {
                
             }            
 	    if (ifSeqInteraction || !firstApp.complete()) {             
-                TacletMatchCompletionDialog.completeAndApplyApp(
-                    firstApp, goal, this);
+	    	LinkedList<TacletApp> l = new LinkedList<TacletApp>();
+	    	l.add(firstApp);
+            ApplyTacletDialogModel[] models = TacletMatchCompletionDialog.completeAndApplyApp(l, goal, this);                   
+	    	ui.completeAndApplyTacletMatch(models, goal);
 	    } else {
-		applyInteractive(firstApp, goal);
+	    	applyInteractive(firstApp, goal);
 	    }
 	} else if (applics.size() > 1) {
             java.util.List<TacletApp> appList = new java.util.LinkedList<TacletApp>();
@@ -454,8 +419,10 @@ public class KeYMediator {
                  return false;
             }
 
-            TacletMatchCompletionDialog.completeAndApplyApp(
-                appList, goal, this);
+            ApplyTacletDialogModel[] models = TacletMatchCompletionDialog.completeAndApplyApp(
+                    appList, goal, this);
+                    
+            ui.completeAndApplyTacletMatch(models, goal);
             
         }
         return true;
@@ -588,11 +555,11 @@ public class KeYMediator {
 	keySelectionModel.setSelectedGoal(goal);
     }
 
-    /** returns the main frame
-     * @return the main frame 
+    /** returns the user interface
+     * @return the user interface 
      */
-    public MainWindow mainFrame() {
-	return mainFrame;
+    public UserInterface getUI() {
+        return ui;
     }
 
     /** notifies that a node that is not a goal has been chosen
@@ -723,37 +690,6 @@ public class KeYMediator {
         }
     }
 
-    public void popupInformationMessage(Object message, String title) {
-        JOptionPane.showMessageDialog
-	    (mainFrame(), message,
-	     title, JOptionPane.INFORMATION_MESSAGE);
-    }
-
-    public void popupWarning(Object message, String title) {
-        JOptionPane.showMessageDialog(mainFrame(), message, title, 
-                JOptionPane.WARNING_MESSAGE);
-    }
-
-    /**
-     * Brings up a dialog displaying a message.
-     * @param modal whether or not the message should be displayed in a modal dialog.
-     */
-    public void popupInformationMessage(Object message, String title, boolean modal) {
-        if (modal) {
-	    popupInformationMessage(message, title);
-	} else {
-	    if (!(message instanceof Component))
-		throw new InternalError("only messages of type " + Component.class + " supported, yet");
-	    // JFrame dlg = new JDialog(mainFrame(),title, modal);
-	    JFrame dlg = new JFrame(title);
-	    dlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-	    dlg.getContentPane().add((Component)message);
-	    dlg.pack();
-	    GuiUtilities.setCenter(dlg, mainFrame());
-	    dlg.setVisible(true);
-	}
-    }
-
     private int goalsClosedByAutoMode=0;
 
 
@@ -776,7 +712,7 @@ public class KeYMediator {
       final boolean b = fullStop;
       Runnable interfaceSignaller = new Runnable() {
          public void run() {
-	     mainFrame().setCursor(new java.awt.Cursor(java.awt.Cursor.WAIT_CURSOR));
+            ui.notifyAutoModeBeingStarted(); 
             if (b) {
                interactiveProver.fireAutoModeStarted(
                   new ProofEvent(getProof()));
@@ -792,7 +728,7 @@ public class KeYMediator {
          public void run() {
             if ( b )
                interactiveProver.fireAutoModeStopped (new ProofEvent(getProof()));
-            mainFrame().setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+            ui.notifyAutomodeStopped(); 
             if (getProof() != null)
                 keySelectionModel.fireSelectedProofChanged();
          }
@@ -805,51 +741,51 @@ public class KeYMediator {
     }
 
     class KeYMediatorProofTreeListener extends ProofTreeAdapter {
-	private boolean pruningInProcess;
+    	private boolean pruningInProcess;
 
-        public void proofClosed(ProofTreeEvent e) {
-	    KeYMediator.this.notify
-	        (new ProofClosedNotificationEvent(e.getSource()));
-	}
+    	public void proofClosed(ProofTreeEvent e) {
+    		KeYMediator.this.notify
+    		(new ProofClosedNotificationEvent(e.getSource()));
+    	}
 
-	public void proofPruningInProcess(ProofTreeEvent e) {
-	    pruningInProcess = true;
-	}
-	
-	public void proofPruned(final ProofTreeEvent e) {	    
-	    SwingUtilities.invokeLater(new Runnable() {
-	        public void run () {
-	            if (!e.getSource().find(getSelectedNode())) {	
-                     keySelectionModel.setSelectedNode(e.getNode());                     
-                }
-            }});
-	        pruningInProcess = false;
-	}
-    
-	public void proofGoalsAdded(ProofTreeEvent e) {
-	    ImmutableList<Goal> newGoals = e.getGoals();
-	    // Check for a closed goal ...
-	    if (newGoals.size() == 0){
-		// No new goals have been generated ...
-		closedAGoal();
-	    }
-	}
+    	public void proofPruningInProcess(ProofTreeEvent e) {
+    		pruningInProcess = true;
+    	}
 
-	public void proofStructureChanged(ProofTreeEvent e) {
-	    if (autoMode() || pruningInProcess) return;
-	    Proof p = e.getSource();
-	    if (p == getSelectedProof()) {
-		Node sel_node = getSelectedNode();
-		if (!p.find(sel_node)) {
-		    keySelectionModel.defaultSelection();
-		} else {
-		    // %%% hack does need to be done proper
-		    // needed top update that the selected node nay have
-		    // changed its status 
-		    keySelectionModel.setSelectedNode(sel_node);
-		}
-	    }
-	}
+    	public void proofPruned(final ProofTreeEvent e) {	    
+    		SwingUtilities.invokeLater(new Runnable() {
+    			public void run () {
+    				if (!e.getSource().find(getSelectedNode())) {	
+    					keySelectionModel.setSelectedNode(e.getNode());                     
+    				}
+    			}});
+    		pruningInProcess = false;
+    	}
+
+    	public void proofGoalsAdded(ProofTreeEvent e) {
+    		ImmutableList<Goal> newGoals = e.getGoals();
+    		// Check for a closed goal ...
+    		if (newGoals.size() == 0){
+    			// No new goals have been generated ...
+    			closedAGoal();
+    		}
+    	}
+
+    	public void proofStructureChanged(ProofTreeEvent e) {
+    		if (autoMode() || pruningInProcess) return;
+    		Proof p = e.getSource();
+    		if (p == getSelectedProof()) {
+    			Node sel_node = getSelectedNode();
+    			if (!p.find(sel_node)) {
+    				keySelectionModel.defaultSelection();
+    			} else {
+    				// %%% hack does need to be done proper
+    				// needed top update that the selected node nay have
+    				// changed its status 
+    				keySelectionModel.setSelectedNode(sel_node);
+    			}
+    		}
+    	}
     }
 
     private final class KeYMediatorProofListener implements RuleAppListener, 
@@ -910,8 +846,8 @@ public class KeYMediator {
      * @param event the NotificationEvent
      */
     public void notify(NotificationEvent event) {        
-        if (mainFrame != null) {
-            mainFrame.notify(event);
+        if (ui != null) { 
+            ui.notify(event);
         }
     }
 
@@ -957,7 +893,7 @@ public class KeYMediator {
      */
     // TODO used 1 time, drop it? (MU)
     public ProverTaskListener getProverTaskListener() {
-        return mainFrame.getUserInterface();
+        return ui;
     }
 
     public boolean processDelayedCut(final Node invokedNode) {
@@ -967,15 +903,15 @@ public class KeYMediator {
                             "Please supply a formula:",
                             null,
                             "",
-                    new InspectorForDecisionPredicates(getProof().getServices(),invokedNode,   DelayedCut.DECISION_PREDICATE_IN_ANTECEDENT) ,
-                    true
-                    );    
-            if(result == null){
+                    new InspectorForDecisionPredicates(getProof().getServices(),invokedNode,   
+                            DelayedCut.DECISION_PREDICATE_IN_ANTECEDENT), true);    
+            
+            if (result == null) {
                 return false;
             }
             
             Term formula = InspectorForDecisionPredicates.translate(getProof().getServices(),result);
-            final UserInterface ui = KeYMediator.this.mainFrame.getUserInterface();
+            
             DelayedCutProcessor processor = new DelayedCutProcessor(getProof(),
                     invokedNode,
                     formula,
@@ -1024,11 +960,12 @@ public class KeYMediator {
                 @Override
                 public void eventException(Throwable throwable) {
                     KeYMediator.this.startInterface(true);
+
                     throwable.printStackTrace();
-                    ExceptionDialog.showDialog(
-                            KeYMediator.this.mainFrame(),
-                            new RuntimeException("The cut could not be processed successfully. In order to " +
-                            		"preserve consistency the proof is pruned. For more information see details or output of your console.", throwable));
+                    KeYMediator.this.notify(new ExceptionFailureEvent("The cut could" +
+                            "not be processed successfully. In order to " +
+                            		"preserve consistency the proof is pruned." +
+                            " For more information see details or output of your console.", throwable));
                     
                     SwingUtilities.invokeLater(new Runnable() {
                         

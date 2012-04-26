@@ -13,7 +13,7 @@
  */
 package de.uka.ilkd.key.gui.notification.actions;
 
-import java.awt.Component;
+import java.awt.Frame;
 
 import javax.swing.JOptionPane;
 
@@ -29,7 +29,7 @@ import de.uka.ilkd.key.proof.Proof;
 public class ProofClosedJTextPaneDisplay extends ShowDisplayPane {
   
     
-    public ProofClosedJTextPaneDisplay(Component parentComponent) {
+    public ProofClosedJTextPaneDisplay(Frame parentComponent) {
         super(parentComponent);
     }
     /**
