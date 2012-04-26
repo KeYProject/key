@@ -39,7 +39,11 @@ import de.uka.ilkd.key.util.Debug;
  */
 public class ApplyStrategy {
 
-
+    /** 
+     * Instances of this class are used to store if a rule could be applied automatically and if not 
+     * to store the reason why no rule applications could be performed. Because of performance reason the
+     * success case returns the singleton {@link SingleRuleApplicationInfo#SUCCESS} 
+     */
     private static class SingleRuleApplicationInfo {
 
         static final SingleRuleApplicationInfo SUCCESS = new SingleRuleApplicationInfo() {
@@ -76,6 +80,15 @@ public class ApplyStrategy {
 
     }
 
+    /** The final result of the strategy application is stored in this container
+     * and returned to the instance that started the strategies.
+     * 
+     * It contains statistic information about the number of applied rules, time needed or 
+     * number of closed goals. In case teh rule application stopped at a non closeable goal,
+     * this goal is also stored to allow the caller to e.g. present it to the user for interaction.
+     * 
+     * In case of an unexpected, the thrown exception can be also retrieved from this container.
+     */
     public static class ApplyStrategyInfo {
         private final String message;        
         private final Goal nonCloseableGoal;
@@ -219,7 +232,7 @@ public class ApplyStrategy {
      * applies rules until this is no longer
      * possible or the thread is interrupted.
      */
-    Object doWork() {
+    synchronized Object doWork() {
         time = System.currentTimeMillis();
         SingleRuleApplicationInfo srInfo = null;
         try{
@@ -306,13 +319,7 @@ public class ApplyStrategy {
         fireTaskStarted ();
     }
 
-
-    /* private KeYMediator mediator() {
-        return medi;
-    }
-     */
-
-
+    
     public ApplyStrategyInfo start(Proof proof, ImmutableList<Goal> goals, int maxSteps, long timeout, boolean stopAtFirstNonCloseableGoal) {
         assert proof != null;
 

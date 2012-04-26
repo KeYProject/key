@@ -240,7 +240,6 @@ public class WhileInvRule extends AbstractTermTransformer {
         	      result); 
     }
 
-
     /**
      * creates a new program variable 
      * @param varNameBase a String specifying the basename of the new variable

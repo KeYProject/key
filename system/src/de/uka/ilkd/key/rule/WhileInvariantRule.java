@@ -10,9 +10,13 @@
 
 package de.uka.ilkd.key.rule;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Vector;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
@@ -32,9 +36,11 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.WhileInvRule;
 import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 
@@ -418,9 +424,19 @@ public final class WhileInvariantRule implements BuiltInRule {
 		                           (Name) new ProgramElementName(sv.name().toString()), 
 		                           services);
 	}
+	
+	final Term invTerm2;
+	final StrategyProperties props = goal.proof().getSettings().getStrategySettings().getActiveStrategyProperties();
+	if(props.getProperty(StrategyProperties.QUERY_OPTIONS_KEY)==StrategyProperties.QUERY_ON || 
+	   props.getProperty(StrategyProperties.QUERY_OPTIONS_KEY)==StrategyProperties.QUERY_RESTRICTED){
+	   invTerm2 = QueryExpand.INSTANCE.evaluateQueries(services, invTerm, true); //chrisg
+	}else{
+	   invTerm2 = invTerm;
+	}
+	
 	Term bodyTerm = TB.tf().createTerm(wir, 
 					   inst.progPost,
-					   TB.and(new Term[]{invTerm,
+					   TB.and(new Term[]{invTerm2,
 						   	     frameCondition,
 						   	     variantPO}));
 	bodyTerm = wir.transform(bodyTerm, svInst, services);

@@ -106,4 +106,5 @@ public final class TermFactory {
     public Term createTerm(Operator op) {
 	return createTerm(op, NO_SUBTERMS, null, null);
     }
+
 }

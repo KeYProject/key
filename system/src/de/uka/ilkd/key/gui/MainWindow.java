@@ -403,19 +403,6 @@ public final class MainWindow extends JFrame  {
         splitPane.setName("splitPane");
         getContentPane().add(splitPane, BorderLayout.CENTER);
         
-//      // work around bug in
-//      // com.togethersoft.util.ui.plaf.metal.OIMetalSplitPaneUI
-//      // removed since together is no longer supported (mulbrich 2011)        
-//        {
-//            public void setUI(javax.swing.plaf.SplitPaneUI ui) {
-//                try {
-//                    super.setUI(ui);
-//                } catch (NullPointerException e) {
-//                    Debug.out("Exception thrown by class Main at setUI");
-//                }
-//            }
-//        }; 
-        
         statusLine = new MainStatusLine("<html>" + PARA + Main.COPYRIGHT + PARA
                 + "KeY is free software and comes with ABSOLUTELY NO WARRANTY."
                 + " See About | License.", getFont());
