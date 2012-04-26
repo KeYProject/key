@@ -49,7 +49,6 @@ import de.uka.ilkd.key.util.Pair;
 
 public final class WhileInvariantRule implements BuiltInRule {
 
-    private static final MainWindow MAINWINDOW = MainWindow.getInstance();
 
     public static final WhileInvariantRule INSTANCE = new WhileInvariantRule();
 
@@ -97,7 +96,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 	final While loop = (While) activeStatement;
     LoopInvariant inv = services.getSpecificationRepository().getLoopInvariant(loop);
 
-    if (!MAINWINDOW.getMediator().autoMode()) {
+    if (!MainWindow.getInstance().getMediator().autoMode()) {
         if (inv == null) {
             inv = new LoopInvariantImpl(
                     loop,
@@ -115,7 +114,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                                                     services),
                                                     services),
                                                     (Term) null);
-            inv = MAINWINDOW.getLoopInvariant(inv,services);
+            inv = MainWindow.getInstance().getLoopInvariant(inv,services);
         } else {
             boolean requiresVariant = false;
             // Check if a variant is required
@@ -125,7 +124,7 @@ public final class WhileInvariantRule implements BuiltInRule {
             }
             if (getInvariant(services, inv) == null
                     || requiresVariant) {
-                inv = MAINWINDOW
+                inv = MainWindow.getInstance()
                 .getLoopInvariant(
                         inv,
                         services,
@@ -242,7 +241,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
         
 	//instantiation must succeed
-	if(!MAINWINDOW.getMediator().autoMode()) return true; 
+	if(!MainWindow.getInstance().getMediator().autoMode()) return true; 
 	Instantiation inst;
     try {
         inst = instantiate(pio.subTerm(), 
