@@ -20,8 +20,7 @@ public class InteractiveInvariantGeneration implements Rule, BuiltInRule {
 
         public static InteractiveInvariantGeneration INSTANCE = new InteractiveInvariantGeneration();
 
-        private String name = "Loop Invariant - interactive";
-        private String displayName = "LI";
+        private static final Name NAME = new Name("Loop Invariant (Interactive)");
 
         private InteractiveInvariantGeneration() {
         }
@@ -93,17 +92,19 @@ public class InteractiveInvariantGeneration implements Rule, BuiltInRule {
                 return WhileInvariantRule.INSTANCE.apply(goal, services,
                                 ruleApp);
         }
+        
+        public String toString(){
+            return NAME.toString();
+        }
 
         @Override
         public String displayName() {
-
-                return displayName;
+                return NAME.toString();
         }
 
         @Override
         public Name name() {
-
-                return name();
+            return NAME;
         }
 
         @Override

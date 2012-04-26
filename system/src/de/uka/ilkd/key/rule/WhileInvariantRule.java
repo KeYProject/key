@@ -557,7 +557,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     
     @Override
     public String toString() {
-	return NAME.toString();
+	return NAME.toString()+" (Auto)";
     }
 
     
