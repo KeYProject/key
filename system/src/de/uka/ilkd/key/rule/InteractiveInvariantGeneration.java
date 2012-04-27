@@ -16,6 +16,11 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 
+/**
+ * Represents the invariant rule in case the invariant is entered interactively.
+ * See also WhileInvariantRule.
+ *
+ */
 public class InteractiveInvariantGeneration implements Rule, BuiltInRule {
 
         public static InteractiveInvariantGeneration INSTANCE = new InteractiveInvariantGeneration();
@@ -24,15 +29,18 @@ public class InteractiveInvariantGeneration implements Rule, BuiltInRule {
 
         private InteractiveInvariantGeneration() {
         }
+        
+
+        static boolean autoMode() {
+            return MainWindow.getInstance().getMediator().autoMode();
+        }
 
         @Override
         public ImmutableList<Goal> apply(Goal goal, Services services,
                         RuleApp ruleApp) throws RuleAbortException {
 
-                WhileInvariantRule WIR = WhileInvariantRule.INSTANCE;
                 // leading update?
-                Pair<Term, Term> update = WIR.applyUpdates(ruleApp.posInOccurrence().subTerm());
-                final Term u = update.first;
+                Pair<Term, Term> update = WhileInvariantRule.applyUpdates(ruleApp.posInOccurrence().subTerm());
                 final Term progPost = update.second;
 
                 // active statement must be while loop
@@ -44,27 +52,14 @@ public class InteractiveInvariantGeneration implements Rule, BuiltInRule {
 
                 // The invariant could be nonexistent
                 if (inv == null) {
-                        inv = new LoopInvariantImpl(
-                                        loop,
-                                        MiscTools.getInnermostMethodFrame(progPost
-                                                        .javaBlock(), services) == null ? null
-                                                        : MiscTools
-                                                                        .getSelfTerm(
-                                                                                        MiscTools
-                                                                                                        .getInnermostMethodFrame(
-                                                                                                                        progPost
-                                                                                                                                        .javaBlock(),
-                                                                                                                        services),
-                                                                                        services),
+                        inv = new LoopInvariantImpl(loop,
+                                        MiscTools.getInnermostMethodFrame(progPost.javaBlock(), services) == null ? null
+                                                        : MiscTools.getSelfTerm(MiscTools.getInnermostMethodFrame(progPost.javaBlock(),services),services),
                                         (Term) null);
                 }
 
                 // Check wether termination must be proved
-                boolean requiresVariant = false;
-                // Check if a variant is required
-                if (progPost.op() == Modality.DIA) {
-                        requiresVariant = true;
-                }
+                boolean requiresVariant = ((Modality)progPost.op()).terminationSensitive();
 
                 LoopInvariant newInv;
                 // Get the new invariantloopInvariant
@@ -72,7 +67,7 @@ public class InteractiveInvariantGeneration implements Rule, BuiltInRule {
                     newInv = InvariantConfigurator.getInstance().getLoopInvariant(inv,
                                 services, requiresVariant);
                 } catch (Exception e) {
-                    throw new RuleAbortException("Lazy User!!!");
+                    throw new RuleAbortException("Invariant rule application aborted by user");
                 }
                 
                 
@@ -99,7 +94,7 @@ public class InteractiveInvariantGeneration implements Rule, BuiltInRule {
 
         @Override
         public String displayName() {
-                return NAME.toString();
+            return NAME.toString();
         }
 
         @Override
@@ -111,12 +106,11 @@ public class InteractiveInvariantGeneration implements Rule, BuiltInRule {
         public boolean isApplicable(Goal goal, PosInOccurrence pio) {
 
                 // 1. Auto Mode? => NO
-                if (MainWindow.getInstance().getMediator().autoMode()) {
+                if (autoMode()) {
                         return false;
                 } else {
                         // Check if While Rule is applicable
-                        WhileInvariantRule WIR = WhileInvariantRule.INSTANCE;
-                        if (WIR.checkApplicability(goal, pio)) {
+                        if (WhileInvariantRule.checkApplicability(goal, pio)) {
 
                                 return true;
 

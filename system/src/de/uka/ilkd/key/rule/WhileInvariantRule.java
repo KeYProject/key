@@ -15,7 +15,6 @@ import java.util.Map;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.InvariantConfigurator;
-import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.Statement;
@@ -92,7 +91,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 	// try to get invariant from JML specification
     LoopInvariant inv = services.getSpecificationRepository().getLoopInvariant(loop);
 
-    if (!MainWindow.getInstance().getMediator().autoMode()) {
+    if (!InteractiveInvariantGeneration.autoMode()) {
         if (inv == null) { // no invariant present, get it interactively
             inv = new LoopInvariantImpl(
                     loop,
@@ -243,7 +242,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
         // Always applicable in interactive mode.
         // Do not instantiate in this case because this immediately raises the dialog
-        if(!MainWindow.getInstance().getMediator().autoMode()) return true;
+        if(!InteractiveInvariantGeneration.autoMode()) return true;
         
         Instantiation inst;
         try {

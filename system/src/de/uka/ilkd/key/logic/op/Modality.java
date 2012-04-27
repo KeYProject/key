@@ -91,6 +91,8 @@ public final class Modality extends AbstractSortedOperator {
         return (this == DIA || this == DIA_TRANSACTION);
     }
     
+    /** Whether this is a transaction modality 
+     */
     public boolean transaction(){
         return (this == BOX_TRANSACTION || this == DIA_TRANSACTION);
     }

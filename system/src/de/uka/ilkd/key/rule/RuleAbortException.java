@@ -1,5 +1,4 @@
 package de.uka.ilkd.key.rule;
-import java.lang.*;
 
 /**
  * 
@@ -12,20 +11,14 @@ import java.lang.*;
 
 public class RuleAbortException extends Exception {
 
-    private static final long serialVersionUID = 1L;
-    private String msg;
-    
+    private static final long serialVersionUID = -645034125571021135L;
+
     public RuleAbortException() {
-        msg = new String("");
-        // TODO Auto-generated constructor stub
+        super("A rule application has been aborted");
     }
     
     public RuleAbortException(String msg) {
-        this.msg = msg;
-    }
-    
-    public String getMessage() {
-        return msg;
+        super(msg);
     }
     
 }
