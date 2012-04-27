@@ -88,10 +88,12 @@ public final class WhileInvariantRule implements BuiltInRule {
 	    return null;
 	}
 	final While loop = (While) activeStatement;
+	
+	// try to get invariant from JML specification
     LoopInvariant inv = services.getSpecificationRepository().getLoopInvariant(loop);
 
     if (!MainWindow.getInstance().getMediator().autoMode()) {
-        if (inv == null) {
+        if (inv == null) { // no invariant present, get it interactively
             inv = new LoopInvariantImpl(
                     loop,
                     MiscTools
@@ -109,15 +111,16 @@ public final class WhileInvariantRule implements BuiltInRule {
                                                     services),
                                                     (Term) null);
             inv = InvariantConfigurator.getInstance().getLoopInvariant(inv,services,false);
-        } else {
+        } else { // in interactive mode and there is an invariant in the repository
             boolean requiresVariant = false;
             // Check if a variant is required
-            if (progPost.op() == Modality.DIA
-                    && getVariant(services, inv) == null) {
+            if (((Modality)progPost.op()).terminationSensitive()
+                    && extractVariant(services, inv) == null) {
                 requiresVariant = true;
             }
-            if (getInvariant(services, inv) == null
+            if (extractInvariant(services, inv) == null
                     || requiresVariant) {
+                // get invariant or variant interactively
                 inv = InvariantConfigurator.getInstance()
                 .getLoopInvariant(
                         inv,
@@ -125,11 +128,11 @@ public final class WhileInvariantRule implements BuiltInRule {
                         requiresVariant);
             }
         }
-    } else {
+    } else { // in auto mode
         if (inv == null
-                || getInvariant(services, inv) == null
-                        || progPost.op() == Modality.DIA
-                        && getVariant(services, inv) == null) {
+                || extractInvariant(services, inv) == null
+                        || ((Modality)progPost.op()).terminationSensitive()
+                        && extractVariant(services, inv) == null) {
             return null;
         }
     }
@@ -161,7 +164,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
 
-    private static Term getVariant(Services services, final LoopInvariant inv) {
+    private static Term extractVariant(Services services, final LoopInvariant inv) {
         return inv.getVariant(
                 inv.getInternalSelfTerm(),
                 inv.getInternalHeapAtPre(),
@@ -169,7 +172,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
 
-    private static Term getInvariant(Services services, final LoopInvariant inv) {
+    private static Term extractInvariant(Services services, final LoopInvariant inv) {
         return inv.getInvariant(inv.getInternalSelfTerm(),inv.getInternalHeapAtPre(),inv.getInternalSavedHeapAtPre(),services);
     }
 
@@ -233,17 +236,17 @@ public final class WhileInvariantRule implements BuiltInRule {
         if (!checkApplicability(goal,pio))
             return false;
 
-        
-	//instantiation must succeed
-	if(!MainWindow.getInstance().getMediator().autoMode()) return true; 
-	Instantiation inst;
-    try {
-        inst = instantiate(pio.subTerm(), 
-        	                         goal.proof().getServices());
-    } catch (RuleAbortException e) {
-        return false;
-    }
-	return inst != null;
+        // always applicable in interactive mode
+        if(!MainWindow.getInstance().getMediator().autoMode()) return true;
+        Instantiation inst;
+        try {
+            //instantiation must succeed
+            inst = instantiate(pio.subTerm(), 
+                    goal.proof().getServices());
+        } catch (RuleAbortException e) {
+            return false;
+        }
+        return inst != null;
     }
 
     //focus must be top level succedent
@@ -394,7 +397,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 	final LocationVariable variantPV = new LocationVariable(variantName, 
 								intKJT);
 	services.getNamespaces().programVariables().addSafely(variantPV);
-	final boolean dia = (inst.progPost.op() == Modality.DIA || inst.progPost.op() == Modality.DIA_TRANSACTION);
+	final boolean dia = ((Modality)inst.progPost.op()).terminationSensitive();
 	final Term variantUpdate 
 		= dia ? TB.elementary(services, variantPV, variant) : TB.skip();
 	final Term variantNonNeg 
