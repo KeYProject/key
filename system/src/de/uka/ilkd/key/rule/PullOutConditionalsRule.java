@@ -210,5 +210,12 @@ public final class PullOutConditionalsRule implements BuiltInRule {
     @Override
     public String toString() {
         return displayName();
+    }
+
+
+
+	@Override
+    public BuiltInRuleApp createApp(PosInOccurrence pos) {
+	    return new BuiltInRuleApp(this, pos);
     }    
 }

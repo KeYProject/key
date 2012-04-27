@@ -23,6 +23,7 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
+import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.*;
@@ -135,8 +136,8 @@ public class InteractiveProver {
      * @param goal
      */
     public void applyInteractive ( RuleApp app, Goal goal ) {
-        goal.node().getNodeInfo().setInteractiveRuleApplication(true);
- 		goal.apply(app);
+        goal.node().getNodeInfo().setInteractiveRuleApplication(true); 		        
+        goal.apply(app);
     }
 
 
@@ -157,17 +158,10 @@ public class InteractiveProver {
      * is handed over and on the new goals an applied rule adds
      */
     public void startAutoMode ( ImmutableList<Goal> goals ) {
-        if ( goals.isEmpty () ) {
-            if ( Main.batchMode ) {
-                // Everything is already proven.
-                // Nothing to be saved. Exit successfully.
-                System.exit ( 0 );
-            } else {
-                mediator ().popupWarning ( "No enabled goals available", "Oops..." );
-                return;
-            }
+        if ( goals.isEmpty () ) {                        
+        	mediator ().notify(new GeneralInformationEvent("No enabled goals available."));
+        	return;
         }
-
         mediator().stopInterface(true);
         mediator().setInteractive(false);
         worker = new AutoModeWorker(goals);

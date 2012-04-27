@@ -19,7 +19,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -42,22 +41,16 @@ import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.gui.smt.ComplexButton;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
 import de.uka.ilkd.key.gui.smt.SolverListener;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.*;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.ProblemLoader;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
-import de.uka.ilkd.key.rule.OneStepSimplifier;
-import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
-import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.GuiUtilities;
@@ -216,14 +209,9 @@ public final class MainWindow extends JFrame  {
         proofListener = new MainProofListener();
         guiListener = new MainGUIListener();
         
-        // will be: userInterface = new WindowUserInterface(this);
-        userInterface = Main.makeUserInterface();
+        userInterface = new WindowUserInterface(this);
         
-//        taskListener = (Main.batchMode ? (ProverTaskListener)
-//                new MainTaskListenerBatchMode() : 
-//            (ProverTaskListener) new MainTaskListener());
-        
-        setMediator(new KeYMediator(this));
+        setMediator(new KeYMediator(userInterface));
         
         initNotification();
         layoutMain();
@@ -258,30 +246,9 @@ public final class MainWindow extends JFrame  {
 
     
     private void initNotification() {
-        if (!Main.batchMode) {
-            notificationManager = new NotificationManager(mediator);
-        }
+    	notificationManager = new NotificationManager(mediator, this);
     }
     
-//    public void updateUI() {
-//        if (goalView != null)
-//            goalView.updateUI();
-//        if (proofView != null)
-//            proofView.updateUI();
-//        if (openGoalsView != null)
-//            openGoalsView.updateUI();
-//        if (ruleView != null)
-//            ruleView.updateUI();
-//        if (proofListView != null)
-//            proofListView.updateUI();
-//    }
-    
-    public ProblemInitializer createProblemInitializer(){
-        ProblemInitializer pi = new ProblemInitializer(getUserInterface(),
-                getMediator().getProfile(), new Services(getMediator()
-                        .getExceptionHandler()), true, getUserInterface());
-        return pi;
-    }
     
     /**
      * sets the mediator to corresspond with other gui elements
@@ -333,7 +300,7 @@ public final class MainWindow extends JFrame  {
         // FIXME FIXME
         recentFiles = new RecentFileMenu(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                loadProblem(new File(recentFiles.getAbsolutePath((JMenuItem) e.getSource())));
+                mediator.getUI().loadProblem(new File(recentFiles.getAbsolutePath((JMenuItem) e.getSource())));
             }
         }, MAX_RECENT_FILES, null);
         recentFiles.load(PathConfig.getRecentFileStorage());
@@ -363,7 +330,6 @@ public final class MainWindow extends JFrame  {
 
 	
 	
-	mediator.addKeYSelectionListener(OneStepSimplifier.INSTANCE);
         
 
 	// create empty views
@@ -639,7 +605,7 @@ public final class MainWindow extends JFrame  {
     
  
     public void makePrettyView() {
-        if (getMediator().ensureProofLoadedSilent()) {
+        if (getMediator().ensureProofLoaded()) {
             getMediator().getNotationInfo().refresh(mediator.getServices());
             getMediator().getProof().fireProofGoalsChanged();
         }        
@@ -896,7 +862,6 @@ public final class MainWindow extends JFrame  {
 	   }
     
     JCheckBoxMenuItem saveSMTFile;
-//    private JCheckBoxMenuItem waitForAllProvers;
     
     private JMenuItem setupSpeclangMenu() {
         JMenu result = new JMenu("Specification Parser");       
@@ -939,12 +904,6 @@ public final class MainWindow extends JFrame  {
         return proofTreeView;
     }
     
-//    /**
-//     * returns the toolbar
-//     */
-//    public JToolBar getToolBar() {
-//        return toolBar;
-//    }
     
     /**
      * Sets the content of the current goal view. Do not use this method from outside, take method
@@ -1014,18 +973,6 @@ public final class MainWindow extends JFrame  {
         }
     }
     
-    public void loadProblem(File file) {
-        loadProblem(file, null, null);
-    }
-            
-    public void loadProblem(File file, List<File> classPath, File bootClassPath) {
-        recentFiles.addRecentFile(file.getAbsolutePath());
-        final ProblemLoader pl = 
-            new ProblemLoader(file, classPath, bootClassPath, this);
-        pl.addTaskListener(getUserInterface());
-        pl.run();
-    }
-
     // FIXME DOES NOT DO THE SAME AS THE ONE ONE ABOVE
     @Deprecated
     public void closeTaskWithoutInteraction() {
@@ -1193,9 +1140,6 @@ public final class MainWindow extends JFrame  {
 
     private synchronized void setProofNodeDisplay() {
         // FIXME
-        if(Main.batchMode) {
-            return;
-        }
         if (!disableCurrentGoalView) {
             Goal goal;
             if(getMediator()!=null && getMediator().getSelectedProof()!=null){
@@ -1595,7 +1539,8 @@ public final class MainWindow extends JFrame  {
 	  
 	public void actionPerformed(ActionEvent e) {
 	    if (!mediator.ensureProofLoaded() || solverUnion ==SolverTypeCollection.EMPTY_COLLECTION){
-		return;
+            MainWindow.this.popupWarning("No proof loaded or no solvers selected.", "Oops...");
+	    	return;
 	    }
 	    final Proof proof = mediator.getProof();
 	  
@@ -1639,14 +1584,6 @@ public final class MainWindow extends JFrame  {
         return solverUnion.hashCode() * 7;
     }
 
-    }
-    
-    public void loadCommandLineFile() {
-        if (Main.getFileNameOnStartUp() != null) {
-            loadProblem(new File(Main.getFileNameOnStartUp()));
-        } else if(Main.getExamplesDir() != null && Main.showExampleChooserIfExamplesDirIsDefined) {
-            openExampleAction.actionPerformed(null);
-        }
     }
     
     /**
@@ -1707,17 +1644,7 @@ public final class MainWindow extends JFrame  {
         if(instance == null) {
             // TODO Come up with a better exception class
             throw new IllegalStateException("There is no GUI main window. Sorry.");
-        }
-        
-        // in a getter method the state ought not be changed. -> Lead to trouble.
-//        if(visible && !instance.isVisible()) {
-//            GuiUtilities.invokeOnEventQueue(new Runnable() {
-//                public void run() {                            
-//                    instance.setVisible(true);
-//                }
-//            });
-//        }
-        
+        }        
         return instance;
     }
 
@@ -1728,6 +1655,39 @@ public final class MainWindow extends JFrame  {
 	    instance.initialize(title);
 	}
     }
+    
+    
+    public void popupInformationMessage(Object message, String title) {
+        JOptionPane.showMessageDialog
+        (this, message,
+         title, JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    public void popupWarning(Object message, String title) {
+        JOptionPane.showMessageDialog(this, message, title, 
+                JOptionPane.WARNING_MESSAGE);
+    }
+
+    /**
+     * Brings up a dialog displaying a message.
+     * @param modal whether or not the message should be displayed in a modal dialog.
+     */
+    public void popupInformationMessage(Object message, String title, boolean modal) {
+        if (modal) {
+        popupInformationMessage(message, title);
+    } else {
+        if (!(message instanceof Component))
+        throw new InternalError("only messages of type " + Component.class + " supported, yet");
+        // JFrame dlg = new JDialog(mainFrame(),title, modal);
+        JFrame dlg = new JFrame(title);
+        dlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        dlg.getContentPane().add((Component)message);
+        dlg.pack();
+        GuiUtilities.setCenter(dlg, this);
+        dlg.setVisible(true);
+    }
+    }
+
 
     public static void setVisibleMode(boolean visible) {
 	MainWindow.visible = visible;
@@ -1793,4 +1753,15 @@ public final class MainWindow extends JFrame  {
     public NotificationManager getNotificationManager() {
         return notificationManager;
     }
-}
+
+	protected void addRecentFile(String absolutePath) {
+		recentFiles.addRecentFile(absolutePath);
+	}
+
+	public void openExamples() {
+		openExampleAction.actionPerformed(null);    }
+
+	public void loadProblem(File file) {
+		getUserInterface().loadProblem(file);
+	}
+	}

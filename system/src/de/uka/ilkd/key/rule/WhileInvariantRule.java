@@ -603,4 +603,11 @@ public final class WhileInvariantRule implements BuiltInRule {
 	    this.innermostExecutionContext = innermostExecutionContext;
 	}
     }
+
+
+
+	@Override
+    public BuiltInRuleApp createApp(PosInOccurrence pos) {
+	    return new BuiltInRuleApp(this, pos);
+    }
 }

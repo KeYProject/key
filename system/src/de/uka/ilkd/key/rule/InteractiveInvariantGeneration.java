@@ -21,7 +21,7 @@ import de.uka.ilkd.key.logic.Term;
  * See also WhileInvariantRule.
  *
  */
-public class InteractiveInvariantGeneration implements Rule, BuiltInRule {
+public class InteractiveInvariantGeneration implements BuiltInRule {
 
         public static InteractiveInvariantGeneration INSTANCE = new InteractiveInvariantGeneration();
 
@@ -117,6 +117,12 @@ public class InteractiveInvariantGeneration implements Rule, BuiltInRule {
                         }
                 }
                 return false;
+        }
+
+
+        @Override
+        public BuiltInRuleApp createApp(PosInOccurrence pos) {
+            return new BuiltInRuleApp(this, pos);
         }
 
 }

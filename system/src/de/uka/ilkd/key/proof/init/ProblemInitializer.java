@@ -78,7 +78,6 @@ public final class ProblemInitializer {
     }    
     private static InitConfig baseConfig;
  
-    //private final IMain main;
     private final Profile profile;
     private final Services services;
     private final ProgressMonitor progMon;

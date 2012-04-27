@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import de.uka.ilkd.key.gui.Main;
-import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 
@@ -57,9 +56,9 @@ public class BatchMode {
 
         try {
             // a copy with running number to compare different runs
-            saveProof ( f.getAbsolutePath() );
+            saveProof (proof, f.getAbsolutePath() );
             // save current proof under common name as well
-            saveProof ( baseName + ".auto.proof" );
+            saveProof (proof, baseName + ".auto.proof" );
         } catch (IOException e) {
             System.exit( 1 );
         }
@@ -67,7 +66,8 @@ public class BatchMode {
         
         if (proof.openGoals ().size () == 0) {
             // Says that all Proofs have succeeded
-            if (proof.getBasicTask().getStatus().getProofClosedButLemmasLeft()) {
+            if (proof.getBasicTask() != null && 
+            		proof.getBasicTask().getStatus().getProofClosedButLemmasLeft()) {
                 // Says that the proof is closed by depends on (unproved) lemmas                
                 System.exit ( 0 ); //XXX, was: 2 
             }
@@ -106,8 +106,9 @@ public class BatchMode {
         } catch ( IOException e ) {}
     }
     
-    private void saveProof(String filename) throws IOException {
-        ProofSaver saver = new ProofSaver(MainWindow.getInstance().getMediator().getProof(), filename, Main.INTERNAL_VERSION);
+    private void saveProof(Proof proof, String filename) throws IOException {
+        ProofSaver saver = 
+        		new ProofSaver(proof, filename, Main.INTERNAL_VERSION);
         saver.save();
     }
 

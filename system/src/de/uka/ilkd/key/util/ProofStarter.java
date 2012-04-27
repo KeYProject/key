@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.util;
 
 import de.uka.ilkd.key.gui.ApplyStrategy;
+import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.logic.Semisequent;
@@ -16,6 +17,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
 /**
@@ -98,12 +100,22 @@ public class ProofStarter {
 
     private StrategyProperties strategyProperties = new StrategyProperties();
 
+    private ProverTaskListener ptl;
+    
     /**
      * creates an instance of the ProofStarter
      * @param the ProofEnvironment in which the proof shall be performed
      */
     public ProofStarter() {}
     
+    /**
+     * creates an instance of the ProofStarter
+     * @param the ProofEnvironment in which the proof shall be performed
+     */
+    public ProofStarter(ProverTaskListener ptl) {
+    	this.ptl = ptl;
+    }
+
     
     /**
      * creates a new proof object for formulaToProve and registers it in the given environment
@@ -148,6 +160,7 @@ public class ProofStarter {
         this.strategyProperties = (StrategyProperties) sp.clone();
     }
     
+    
    /**
     * starts proof attempt
     * @return the proof after the attempt terminated  
@@ -157,10 +170,16 @@ public class ProofStarter {
         final Profile profile = proof.env().getInitConfig().getProfile();
         proof.setActiveStrategy(profile.getDefaultStrategyFactory().create(proof, strategyProperties));
         
+        if (proof.getSettings().getGeneralSettings().oneStepSimplification()) {
+        	OneStepSimplifier.INSTANCE.refresh(proof);
+        }
+        
         profile.setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);        
         
         ApplyStrategy prover = 
                 new ApplyStrategy(proof.env().getInitConfig().getProfile().getSelectedGoalChooserBuilder().create());
+        
+        if (ptl != null) prover.addProverTaskObserver(ptl);
         
         ApplyStrategy.ApplyStrategyInfo result = 
                 prover.start(proof, proof.openGoals(), maxSteps, timeout, false);
@@ -169,7 +188,18 @@ public class ProofStarter {
             throw new RuntimeException("Proof attempt failed due to exception:"+result.getException(),
                     result.getException());
         }
-        
+
+        if (ptl != null) prover.removeProverTaskObserver(ptl);
+
         return result;
+    }
+
+
+    public void init(ProofAggregate proofAggregate) {
+    	this.proof = proofAggregate.getFirstProof();
+    	
+    	this.setMaxRuleApplications(proof.getSettings().getStrategySettings().getMaxSteps());
+    	this.setTimeout(proof.getSettings().getStrategySettings().getTimeout());
+    	this.setStrategy(proof.getSettings().getStrategySettings().getActiveStrategyProperties());
     }    
 }

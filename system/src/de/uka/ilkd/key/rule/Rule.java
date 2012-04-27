@@ -31,7 +31,7 @@ public interface Rule {
      * resulting from the rule application
      * @throws Exception 
      */
-    ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) throws Exception;
+    ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) throws RuleAbortException;
     
     /** 
      * the name of the rule

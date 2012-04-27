@@ -42,6 +42,8 @@ public final class SaveFileAction extends MainWindowAction {
             if (saved) {
                 mainWindow.saveProof(jFC.getSelectedFile());
             }
+        } else {
+            mainWindow.popupWarning("No proof.", "Oops...");
         }
     }
 }

@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 
-
 import de.uka.ilkd.key.gui.configuration.GeneralSettings;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
@@ -39,13 +38,7 @@ public class Main {
 
 
     private static final boolean VERBOSE_UI = Boolean.getBoolean("key.verbose-ui");
-
-    /** if true then automatically start startAutoMode after the key-file is loaded*/
-    static boolean batchMode = false;
-    
-    /** if true then only load the file and exit afterwards (for testing load features)*/
-    private static boolean batchLoadOnly = false;
-    
+        
     private static String statisticsFile = null;
 
     private static String examplesDir = null;
@@ -74,24 +67,17 @@ public class Main {
         // does no harm on non macs
         System.setProperty("apple.laf.useScreenMenuBar","true");
 
-        evaluateOptions(args);
-        if(batchMode) {
-            // Delete this when UI is refactored.
-            MainWindow.visible = false;
+        UserInterface userInterface = evaluateOptions(args);
+
+        loadCommandLineFile(userInterface);        
+    }
+    
+    public static void loadCommandLineFile(UserInterface ui) {
+        if (Main.getFileNameOnStartUp() != null) {
+            ui.loadProblem(new File(Main.getFileNameOnStartUp()));
+        } else if(Main.getExamplesDir() != null && Main.showExampleChooserIfExamplesDirIsDefined) {
+            ui.openExamples();
         }
-
-        GuiUtilities.invokeAndWait(new Runnable() {
-            public void run() {
-                MainWindow.createInstance(getMainWindowTitle());  
-                MainWindow key = MainWindow.getInstance();
-                key.setVisible(true);
-                key.loadCommandLineFile();
-            }
-        });
-        
-
-        MainWindow key = MainWindow.getInstance();
-        
     }
     
     /**
@@ -103,15 +89,17 @@ public class Main {
        return "KeY " + KeYResourceManager.getManager().getVersion();
     }
 
-    public static void evaluateOptions(String[] opt) {
-        int index = 0;
+    public static UserInterface evaluateOptions(String[] opt) {
+        UserInterface ui = null;
+    	int index = 0;
         ProofSettings.DEFAULT_SETTINGS.setProfile(new JavaProfile());
+        String uiMode = "INTERACTIVE";
         while (opt.length > index) {
             if ((new File(opt[index])).exists()) {
                 fileNameOnStartUp=opt[index];
             } else {
                 opt[index] = opt[index].toUpperCase();
-                if (opt[index].equals("NO_DEBUG")) {
+				if (opt[index].equals("NO_DEBUG")) {
                     de.uka.ilkd.key.util.Debug.ENABLE_DEBUG = false;
                 } else if (opt[index].equals("DEBUG")) {
                     de.uka.ilkd.key.util.Debug.ENABLE_DEBUG = true;
@@ -129,12 +117,9 @@ public class Main {
                     evaluateLemmataOptions(options);
                     // is last option 
                     break; 
-                } else if (opt[index].equals("AUTO")) {
-                    batchMode = true;
-                } else if (opt[index].equals("AUTO_LOADONLY")) {
-                    batchMode = true;
-                    batchLoadOnly = true;
-                } else if (opt[index].equals("TIMEOUT")) {
+                } else if (opt[index].startsWith("AUTO")) {
+                        uiMode = opt[index];
+				} else if (opt[index].equals("TIMEOUT")) {
                     long timeout = -1;
                     try {
                         timeout = Long.parseLong(opt[index + 1]);
@@ -158,6 +143,7 @@ public class Main {
                     printUsageAndExit ();
                 }		
             }
+
             index++;
         }	
         if (Debug.ENABLE_DEBUG) {
@@ -168,11 +154,25 @@ public class Main {
         if (Debug.ENABLE_ASSERTION) {
             System.out.println("Using assertions ...");	   
         } else {
-            System.out.println("Not using assertions ...");	   
+        	System.out.println("Not using assertions ...");	   
         }
-
-
-    }
+        
+        if (uiMode.startsWith("AUTO")) {
+        	BatchMode batch = new BatchMode(fileNameOnStartUp, 
+        		uiMode.equals("AUTO_LOADONLY"));            
+        	ui = new ConsoleUserInterface(batch, VERBOSE_UI);
+        } else {
+        	GuiUtilities.invokeAndWait(new Runnable() {
+        		public void run() {
+        			MainWindow.createInstance(getMainWindowTitle());  
+        			MainWindow key = MainWindow.getInstance();
+        			key.setVisible(true);
+        		}
+        	});    
+        	ui = MainWindow.getInstance().getUserInterface();
+        }
+        return ui;
+    }    
 
     private static void evaluateLemmataOptions(LinkedList<String> options){
         LemmataAutoModeOptions opt;
@@ -239,15 +239,5 @@ public class Main {
      */
     public static String getFileNameOnStartUp() {
         return fileNameOnStartUp;
-    }
-
-
-    public static UserInterface makeUserInterface() {
-        if(batchMode) {
-            BatchMode batch = new BatchMode(fileNameOnStartUp, batchLoadOnly);
-            return new ConsoleUserInterface(MainWindow.getInstance(), batch, VERBOSE_UI);
-        } else {
-            return new WindowUserInterface(MainWindow.getInstance());
-        }
     }
 }

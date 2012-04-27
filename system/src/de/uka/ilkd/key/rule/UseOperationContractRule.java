@@ -11,8 +11,6 @@
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.collection.*;
-import de.uka.ilkd.key.gui.ContractConfigurator;
-import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
@@ -215,13 +213,26 @@ public final class UseOperationContractRule implements BuiltInRule {
 	return result;
     }
     
+    
+	public static ImmutableSet<FunctionalOperationContract> getApplicableContracts(
+            Instantiation inst, Services services) {
+    	
+		if(inst == null) {
+    		return DefaultImmutableSet.
+    				<FunctionalOperationContract>nil();
+    	}
+
+    	//there must be applicable contracts for the operation
+    	return getApplicableContracts(services, inst.pm, inst.staticType, inst.mod);
+
+    }
        
     /**
      * Returns the operation contracts which are applicable for the passed 
      * operation and the passed modality
      */
     private static ImmutableSet<FunctionalOperationContract> getApplicableContracts(
-	    						  Services services, 
+	    						  						  Services services, 
                                                           ProgramMethod pm, 
                                                           KeYJavaType kjt,
                                                           Modality modality) {
@@ -245,42 +256,6 @@ public final class UseOperationContractRule implements BuiltInRule {
         return result;
     }
 
-    
-    /**
-     * Chooses a contract to be applied. 
-     * This is done either automatically or by asking the user.
-     */
-    private static FunctionalOperationContract configureContract(Services services, 
-                                                       ProgramMethod pm,
-                                                       KeYJavaType kjt,
-                                                       Modality modality) {
-	ImmutableSet<FunctionalOperationContract> contracts
-                = getApplicableContracts(services, pm, kjt, modality);
-	for(FunctionalOperationContract c : contracts) {
-	    if(!services.getProof().mgt().isContractApplicable(c)) {
-		contracts = contracts.remove(c);
-	    }
-	}
-	assert !contracts.isEmpty();
-        if(MainWindow.getInstance().getMediator().autoMode()) {
-            return services.getSpecificationRepository()
-                           .combineOperationContracts(contracts);
-        } else {
-            FunctionalOperationContract[] contractsArr 
-            	= contracts.toArray(new FunctionalOperationContract[contracts.size()]);
-            ContractConfigurator cc 
-                    = new ContractConfigurator(MainWindow.getInstance(),
-                                               services,
-                                               contractsArr,
-                                               "Contracts for " + pm.getName(),
-                                               true);
-            if(cc.wasSuccessful()) {
-                return (FunctionalOperationContract) cc.getContract();
-            } else {
-                return null;
-            }
-        }
-    }
     
     
     /**
@@ -539,22 +514,9 @@ public final class UseOperationContractRule implements BuiltInRule {
         final JavaBlock jb = inst.progPost.javaBlock();
         
         //configure contract
-        final FunctionalOperationContract contract;
-        if(ruleApp instanceof ContractRuleApp) {
-            //the contract is already fixed 
-            //(probably because we're in the process of reading in a 
-            //proof from a file)
-            contract = (FunctionalOperationContract)((ContractRuleApp) ruleApp)
-                                           .getInstantiation();            
-        } else { 
-            contract = configureContract(services, 
-        	    		         inst.pm, 
-        	    		         inst.staticType, 
-        	    		         inst.mod);
-            if(contract == null) {
-        	return null;
-            }
-        }
+        final FunctionalOperationContract contract = 
+        		(FunctionalOperationContract)((AbstractContractRuleApp) ruleApp)
+                .getInstantiation(); 
         assert contract.getTarget().equals(inst.pm);
         final boolean transaction = contract.transactionContract();
 	//prepare heapBefore_method
@@ -873,5 +835,15 @@ public final class UseOperationContractRule implements BuiltInRule {
 	    this.pm = pm;
 	    this.actualParams = actualParams;
 	}
-    }    
+    }
+
+
+
+	@Override
+    public ContractRuleApp createApp(PosInOccurrence pos) {
+		return new ContractRuleApp(this, pos);
+    }
+
+
+
 }

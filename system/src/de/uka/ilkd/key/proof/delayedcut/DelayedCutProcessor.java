@@ -17,14 +17,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.TacletFilter;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.BuiltInRuleApp;
-import de.uka.ilkd.key.rule.FindTaclet;
-import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.PosTacletApp;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
     
 /**
@@ -349,9 +342,9 @@ public class DelayedCutProcessor implements Runnable {
                     ,services);
         }
 
-        if(oldRuleApp instanceof BuiltInRuleApp){
+        if(oldRuleApp instanceof AbstractBuiltInRuleApp){
             BuiltInRuleApp app = (BuiltInRuleApp) oldRuleApp;
-            return new BuiltInRuleApp(app.rule(),newPos, app.ifInsts());
+            return app.replacePos(newPos);
         }
         
         return oldRuleApp;
@@ -362,7 +355,7 @@ public class DelayedCutProcessor implements Runnable {
         if(newPos == null){
             return;
         }
-    	if(app instanceof BuiltInRuleApp){
+    	if(app instanceof AbstractBuiltInRuleApp){
     		BuiltInRule rule = (BuiltInRule) app.rule();
     		if(rule.isApplicable(goal, newPos)){
     			return;

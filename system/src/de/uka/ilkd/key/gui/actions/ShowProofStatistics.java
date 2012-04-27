@@ -26,7 +26,7 @@ public class ShowProofStatistics extends MainWindowAction {
     public void actionPerformed(ActionEvent e) {
 	final Proof proof = getMediator().getSelectedProof();
         if(proof == null) {
-            getMediator().notify(new GeneralInformationEvent("No statistics available.",
+            mainWindow.notify(new GeneralInformationEvent("No statistics available.",
                     "If you wish to see the statistics "
                     + "for a proof you have to load one first"));
         } else {

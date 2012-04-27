@@ -569,4 +569,9 @@ public final class OneStepSimplifier implements BuiltInRule,
 	              + (numAppliedRules > 1 ? " rules)" : "rule)");
 	}
     }
+
+	@Override
+    public BuiltInRuleApp createApp(PosInOccurrence pos) {
+	    return new BuiltInRuleApp(this, pos);
+    }
 }
