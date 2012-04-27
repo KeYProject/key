@@ -78,6 +78,21 @@ public interface LoopInvariant extends SpecificationElement {
     public Term getInternalSavedHeapAtPre();
 
     /**
+     * Returns the term internally used for the invariant. 
+     * Use with care - it is likely that this is *not* the right "self" for you.
+     */
+    Term getInternalInvariant();
+
+    /**
+     * Returns the term internally used for the variant. 
+     * Use with care - it is likely that this is *not* the right "self" for you.
+     */
+    Term getInternalVariant();
+
+
+
+    
+    /**
      * Returns a new loop invariant where the loop reference has been
      * replaced with the passed one.
      */
@@ -100,4 +115,5 @@ public interface LoopInvariant extends SpecificationElement {
      * perform some action/transformation on this element.
      */
     public void visit(Visitor v);
+
 }

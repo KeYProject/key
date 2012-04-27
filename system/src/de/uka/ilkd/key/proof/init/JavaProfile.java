@@ -53,7 +53,6 @@ public class JavaProfile extends AbstractProfile {
         ImmutableList<BuiltInRule> builtInRules = super.initBuiltInRules();
         
         builtInRules = builtInRules.prepend(WhileInvariantRule.INSTANCE)
-                                   .prepend(InteractiveInvariantGeneration.INSTANCE)
                                    .prepend(UseDependencyContractRule.INSTANCE)
                                    .prepend(OneStepSimplifier.INSTANCE)
         			   //.prepend(PullOutConditionalsRule.INSTANCE)  // rule at the moment unsound

@@ -12,9 +12,9 @@ package de.uka.ilkd.key.rule;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.InvariantConfigurator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.Statement;
@@ -35,7 +35,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.WhileInvRule;
 import de.uka.ilkd.key.speclang.LoopInvariant;
-import de.uka.ilkd.key.speclang.LoopInvariantImpl;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
@@ -64,8 +63,11 @@ public final class WhileInvariantRule implements BuiltInRule {
     //internal methods
     //-------------------------------------------------------------------------
     
-    private Instantiation instantiate(Term focusTerm, Services services) throws RuleAbortException {
-	if(focusTerm == lastFocusTerm
+    private Instantiation instantiate(InvariantBuiltInRuleApp app, Services services) throws RuleAbortException {
+	
+    Term focusTerm = app.posInOccurrence().subTerm();
+        
+    if(focusTerm == lastFocusTerm
 	   && lastInstantiation.inv 
 	       == services.getSpecificationRepository()
 	                  .getLoopInvariant(lastInstantiation.loop)) {
@@ -74,68 +76,20 @@ public final class WhileInvariantRule implements BuiltInRule {
 
 	//leading update?
 	Pair<Term, Term> update = applyUpdates(focusTerm);
-	final Term u = update.first;
+	final Term u        = update.first;
 	final Term progPost = update.second;
 
 	//focus (below update) must be modality term
-	if (!checkFocus(progPost)) return null;
-
-	//active statement must be while loop
-	SourceElement activeStatement 
-		= MiscTools.getActiveStatement(progPost.javaBlock());
-	if(!(activeStatement instanceof While)) {
+	if (!checkFocus(progPost)) {
 	    return null;
 	}
-	final While loop = (While) activeStatement;
+
+	//active statement must be while loop
+	final While loop = (While) app.getLoopStatement();
 	
 	// try to get invariant from JML specification
-    LoopInvariant inv = services.getSpecificationRepository().getLoopInvariant(loop);
-
-    if (!InteractiveInvariantGeneration.autoMode()) {
-        if (inv == null) { // no invariant present, get it interactively
-            inv = new LoopInvariantImpl(
-                    loop,
-                    MiscTools
-                    .getInnermostMethodFrame(
-                            progPost
-                            .javaBlock(),
-                            services) == null ? null
-                                    : MiscTools
-                                    .getSelfTerm(
-                                            MiscTools
-                                            .getInnermostMethodFrame(
-                                                    progPost
-                                                    .javaBlock(),
-                                                    services),
-                                                    services),
-                                                    (Term) null);
-            inv = InvariantConfigurator.getInstance().getLoopInvariant(inv,services,false);
-        } else { // in interactive mode and there is an invariant in the repository
-            boolean requiresVariant = false;
-            // Check if a variant is required
-            if (((Modality)progPost.op()).terminationSensitive()
-                    && extractVariant(services, inv) == null) {
-                requiresVariant = true;
-            }
-            if (extractInvariant(services, inv,((Modality)progPost.op()).transaction()) == null
-                    || requiresVariant) {
-                // get invariant or variant interactively
-                inv = InvariantConfigurator.getInstance()
-                .getLoopInvariant(
-                        inv,
-                        services,
-                        requiresVariant);
-            }
-        }
-    } else { // in auto mode
-        if (inv == null
-                || extractInvariant(services, inv,((Modality)progPost.op()).transaction()) == null
-                        || ((Modality)progPost.op()).terminationSensitive()
-                        && extractVariant(services, inv) == null) {
-            return null;
-        }
-    }
-
+    LoopInvariant inv = app.getInvariant(); 
+         
 	//collect self, execution context
 	final MethodFrame innermostMethodFrame 
 		= MiscTools.getInnermostMethodFrame(progPost.javaBlock(), 
@@ -162,23 +116,6 @@ public final class WhileInvariantRule implements BuiltInRule {
 	return result;
     }
 
-
-    /** Extract variant term from LoopInvariant object */
-    private static Term extractVariant(Services services, final LoopInvariant inv) {
-        return inv.getVariant(
-                inv.getInternalSelfTerm(),
-                inv.getInternalHeapAtPre(),
-                services);
-    }
-
-
-    /** Extract invariant term from LoopInvariant object.
-     * Note: the invariant differs whether transactions are used!
-     */
-    private static Term extractInvariant(Services services, final LoopInvariant inv, boolean transaction) {
-        return inv.getInvariant(inv.getInternalSelfTerm(),inv.getInternalHeapAtPre(),
-                transaction? inv.getInternalSavedHeapAtPre() : null,services);
-    }
 
     
     /**
@@ -237,22 +174,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     @Override
     public boolean isApplicable(Goal goal, 
             PosInOccurrence pio) {
-        if (!checkApplicability(goal,pio))
-            return false;
-
-        // Always applicable in interactive mode.
-        // Do not instantiate in this case because this immediately raises the dialog
-        if(!InteractiveInvariantGeneration.autoMode()) return true;
-        
-        Instantiation inst;
-        try {
-            //instantiation must succeed
-            inst = instantiate(pio.subTerm(), 
-                    goal.proof().getServices());
-        } catch (RuleAbortException e) {
-            return false;
-        }
-        return inst != null;
+        return checkApplicability(goal,pio);
     }
 
     //focus must be top level succedent
@@ -294,8 +216,8 @@ public final class WhileInvariantRule implements BuiltInRule {
 		= services.getJavaInfo()
 	                  .getPrimitiveKeYJavaType(PrimitiveType.JAVA_INT);
 	//get instantiation
-	Instantiation inst = instantiate(ruleApp.posInOccurrence().subTerm(), 
-				         services);
+	Instantiation inst = instantiate((InvariantBuiltInRuleApp) ruleApp, services);	
+	
     final boolean transaction = ((Modality)inst.progPost.op()).transaction(); 
 
     final Term heapAtMethodPre = inst.inv.getInternalHeapAtPre();
@@ -403,6 +325,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 	final LocationVariable variantPV = new LocationVariable(variantName, 
 								intKJT);
 	services.getNamespaces().programVariables().addSafely(variantPV);
+	
 	final boolean dia = ((Modality)inst.progPost.op()).terminationSensitive();
 	final Term variantUpdate 
 		= dia ? TB.elementary(services, variantPV, variant) : TB.skip();
@@ -566,13 +489,13 @@ public final class WhileInvariantRule implements BuiltInRule {
     
     @Override
     public String toString() {
-	return NAME.toString()+" (Auto)";
+	return NAME.toString();
     }
 
 
     @Override
-    public DefaultBuiltInRuleApp createApp(PosInOccurrence pos) {
-        return new DefaultBuiltInRuleApp(this, pos);
+    public InvariantBuiltInRuleApp createApp(PosInOccurrence pos) {
+        return new InvariantBuiltInRuleApp(this, pos);
     }
     
     //-------------------------------------------------------------------------

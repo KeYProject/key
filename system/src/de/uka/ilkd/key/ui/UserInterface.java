@@ -5,13 +5,11 @@ import java.util.List;
 
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.ApplyTacletDialogModel;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProblemInitializer.ProblemInitializerListener;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 public interface UserInterface extends ProblemInitializerListener,
@@ -68,14 +66,14 @@ public interface UserInterface extends ProblemInitializerListener,
 	 */
 	void openExamples();
 
-	/**
+    /**
 	 * completes rule applications of built in rules
 	 * @param app the DefaultBuiltInRuleApp to be completed
-	 * @param goal the Goal where the app will later be applied to
-	 * @param services the Services
+     * @param goal the Goal where the app will later be applied to
+     * @param forced TODO
 	 * @return a complete app or null if no completion was possible
 	 */
-	IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, Services services);    
+	IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, boolean forced);    
 
 	/**
 	 * <p>

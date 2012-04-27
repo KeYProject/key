@@ -200,7 +200,13 @@ class TacletMenu extends JMenu {
     private void addBuiltInRuleItem(BuiltInRule builtInRule,
 				    MenuControl control) {
         JMenuItem item;
-        item = new DefaultBuiltInRuleMenuItem(builtInRule);                       
+        if (builtInRule == WhileInvariantRule.INSTANCE) {
+            // we add to items in this case: one for auto one for interactive
+            item = new DefaultBuiltInRuleMenuItem(builtInRule.displayName() + "(Auto)", builtInRule, true);
+            item.addActionListener(control);
+            add(item);
+        } 
+        item = new DefaultBuiltInRuleMenuItem(builtInRule);        
         item.addActionListener(control);
         add(item);
     }
@@ -415,10 +421,12 @@ class TacletMenu extends JMenu {
         	thread.start();            
             }           
             else if (e.getSource() instanceof BuiltInRuleMenuItem) {
-        	   
-                   mediator.selectedBuiltInRule
-                    (((BuiltInRuleMenuItem) e.getSource()).connectedTo(), 
-                     pos.getPosInOccurrence());
+
+                final BuiltInRuleMenuItem birmi = (BuiltInRuleMenuItem) e
+                        .getSource();
+                mediator.selectedBuiltInRule(
+                        birmi.connectedTo(), pos.getPosInOccurrence(), 
+                        birmi.forcedApplication());
         	
 	    } else if (e.getSource() instanceof FocussedRuleApplicationMenuItem) {
 	        mediator.getInteractiveProver ()
