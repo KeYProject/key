@@ -35,9 +35,7 @@ class DefaultBuiltInRuleMenuItem extends JMenuItem implements BuiltInRuleMenuIte
     } 
 
     public DefaultBuiltInRuleMenuItem(BuiltInRule connectedTo, boolean forced) {
-        super(connectedTo.toString());
-        this.connectedTo = connectedTo;
-        this.forced = forced;
+        this(connectedTo.toString(),connectedTo, forced);
     } 
 
     public DefaultBuiltInRuleMenuItem(BuiltInRule connectedTo) {

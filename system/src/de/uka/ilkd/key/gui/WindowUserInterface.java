@@ -213,29 +213,29 @@ public class WindowUserInterface extends AbstractUserInterface {
 		mainWindow.openExamples();
 	}
 
-    @Override
+	@Override
 	public IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, boolean forced) {
-		if (mainWindow.getMediator().autoMode()) {
-			return super.completeBuiltInRuleApp(app, goal, forced);
-		}
-		
-		IBuiltInRuleApp result = app;
-		for (InteractiveRuleApplicationCompletion compl : completions ) {
-		    if (compl.canComplete(app)) {
-		        result = compl.complete(app, goal, forced);
-		        break;
-		    }
-		}
-		return result.complete() ? result : null;
+	    if (mainWindow.getMediator().autoMode()) {
+	        return super.completeBuiltInRuleApp(app, goal, forced);
+	    }
+
+	    IBuiltInRuleApp result = app;
+	    for (InteractiveRuleApplicationCompletion compl : completions ) {
+	        if (compl.canComplete(app)) {
+	            result = compl.complete(app, goal, forced);
+	            break;
+	        }
+	    }
+	    return (result != null && result.complete()) ? result : null;
 	}
 
-   @Override
-   public ProblemInitializer createProblemInitializer() {
-      ProblemInitializer pi = new ProblemInitializer(this, 
-                                                     mainWindow.getMediator().getProfile(), 
-                                                     new Services(mainWindow.getMediator().getExceptionHandler()), 
-                                                     true, 
-                                                     this);
-       return pi;
-   }
+	@Override
+	public ProblemInitializer createProblemInitializer() {
+	    ProblemInitializer pi = new ProblemInitializer(this, 
+	            mainWindow.getMediator().getProfile(), 
+	            new Services(mainWindow.getMediator().getExceptionHandler()), 
+	            true, 
+	            this);
+	    return pi;
+	}
 }
