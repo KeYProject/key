@@ -10,7 +10,6 @@
 
 package de.uka.ilkd.key.speclang;
 
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -107,12 +106,12 @@ public final class LoopInvariantImpl implements LoopInvariant {
     //internal methods
     //-------------------------------------------------------------------------
     
-    private Map /*Operator, Operator, Term -> Term*/ getReplaceMap(
+    private Map /*Operator, Operator, Term -> Term*/<Term, Term> getReplaceMap(
             Term selfTerm,
             Term heapAtPre,
             Term savedHeapAtPre,
             Services services) {
-        final Map result = new LinkedHashMap();
+        final Map<Term, Term> result = new LinkedHashMap<Term, Term>();
         
         //self
         if(selfTerm != null) {
@@ -141,17 +140,15 @@ public final class LoopInvariantImpl implements LoopInvariant {
     }
     
     
-    private Map /*Term -> Term*/ getInverseReplaceMap(
+    private Map<Term,Term> getInverseReplaceMap(
             Term selfTerm,
             Term heapAtPre,
             Term savedHeapAtPre,
             Services services) {
-       final Map result = new LinkedHashMap();
-       final Map replaceMap = getReplaceMap(selfTerm, heapAtPre, savedHeapAtPre, services);
-       final Iterator<Map.Entry> it = replaceMap.entrySet().iterator();
-       while(it.hasNext()) {
-           Map.Entry entry = it.next();
-           result.put(entry.getValue(), entry.getKey());
+       final Map<Term,Term> result = new LinkedHashMap<Term,Term>();
+       final Map<Term, Term> replaceMap = getReplaceMap(selfTerm, heapAtPre, savedHeapAtPre, services);
+       for(Map.Entry<Term, Term> next: replaceMap.entrySet()) {
+           result.put(next.getValue(), next.getKey());
        }
        return result;
     }
@@ -174,7 +171,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
             		     Term savedHeapAtPre,
             		     Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
-        Map replaceMap = getReplaceMap(selfTerm, heapAtPre, savedHeapAtPre, services);
+        Map<Term, Term> replaceMap = getReplaceMap(selfTerm, heapAtPre, savedHeapAtPre, services);
         OpReplacer or = new OpReplacer(replaceMap);
         return or.replace(savedHeapAtPre == null ? originalInvariant : originalTransactionInvariant);
     }
@@ -186,7 +183,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
             		    Term savedHeapAtPre,
             		    Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
-        Map replaceMap = 
+        Map<Term, Term> replaceMap = 
             getReplaceMap(selfTerm, heapAtPre, savedHeapAtPre, services);
         OpReplacer or = new OpReplacer(replaceMap);
         return or.replace(savedHeapAtPre == null ? originalModifies : originalModifiesBackup);
@@ -198,7 +195,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
             		   Term heapAtPre,
             		   Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
-        Map replaceMap = 
+        Map<Term, Term> replaceMap = 
             getReplaceMap(selfTerm, heapAtPre, null, services);
         OpReplacer or = new OpReplacer(replaceMap);
         return or.replace(originalVariant);
