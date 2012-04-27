@@ -40,10 +40,7 @@ import de.uka.ilkd.key.proof.delayedcut.DelayedCutProcessor;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.join.JoinProcessor;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.strategy.feature.AbstractBetaFeature;
 import de.uka.ilkd.key.strategy.feature.IfThenElseMalusFeature;
 import de.uka.ilkd.key.ui.UserInterface;
@@ -98,7 +95,14 @@ public class KeYMediator {
 	
 	addRuleAppListener(proofListener);
 	addAutoModeListener(proofListener);
+	
 	defaultExceptionHandler = new KeYRecoderExcHandler();
+
+	
+	// moved from layout main here; but does not actually belong here at all;
+	// we should get that rule to behave like a noral built-in rule
+	addKeYSelectionListener(OneStepSimplifier.INSTANCE);
+
     }
 
     

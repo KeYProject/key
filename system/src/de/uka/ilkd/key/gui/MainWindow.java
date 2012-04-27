@@ -48,7 +48,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
-import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
@@ -331,7 +330,6 @@ public final class MainWindow extends JFrame  {
 
 	
 	
-	mediator.addKeYSelectionListener(OneStepSimplifier.INSTANCE);
         
 
 	// create empty views

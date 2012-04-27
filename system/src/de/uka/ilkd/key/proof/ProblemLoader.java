@@ -415,7 +415,11 @@ public final class ProblemLoader implements Runnable {
             break;
         case 'n' :
             try {
-                currGoal.apply(constructBuiltinApp());
+            	BuiltInRuleApp app = constructBuiltinApp();
+            	if (!app.complete()) {
+            		app = ((AbstractContractRuleApp) app).tryToInstantiate(currGoal);
+            	}                	
+                currGoal.apply(app);
                 children = currNode.childrenIterator();
                 currNode = null;
             } catch (BuiltInConstructionException e) {
@@ -449,7 +453,8 @@ public final class ProblemLoader implements Runnable {
      */
     private BuiltInRuleApp constructBuiltinApp()
                                throws BuiltInConstructionException {
-        BuiltInRuleApp ourApp = null;
+
+    	BuiltInRuleApp ourApp = null;
         //PosInSequent posInSeq = null;
         PosInOccurrence pos = null;
 
@@ -503,7 +508,6 @@ public final class ProblemLoader implements Runnable {
     }
 
     private TacletApp constructApp() throws AppConstructionException {
-
         TacletApp ourApp = null;
         PosInOccurrence pos = null;
 

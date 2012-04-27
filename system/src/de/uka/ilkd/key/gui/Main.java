@@ -143,6 +143,7 @@ public class Main {
                     printUsageAndExit ();
                 }		
             }
+
             index++;
         }	
         if (Debug.ENABLE_DEBUG) {
