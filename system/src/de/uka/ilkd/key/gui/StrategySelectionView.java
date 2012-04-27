@@ -91,7 +91,7 @@ public final class StrategySelectionView extends JPanel {
     private JRadioButtonHashMap depOn;
     private JRadioButtonHashMap depOff;
     private JRadioButtonHashMap queryOn;
-    private JRadioButtonHashMap queryRestricted; //chrisg
+    private JRadioButtonHashMap queryRestricted; 
     private JRadioButtonHashMap queryOff;
     private JRadioButtonHashMap nonLinArithNone;
     private JRadioButtonHashMap nonLinArithDefOps;
@@ -100,7 +100,7 @@ public final class StrategySelectionView extends JPanel {
     private JRadioButtonHashMap quantifierNonSplitting;
     private JRadioButtonHashMap quantifierNonSplittingWithProgs;
     private JRadioButtonHashMap quantifierInstantiate;
-    private JRadioButtonHashMap autoInductionOff; //chrisg
+    private JRadioButtonHashMap autoInductionOff; 
     private JRadioButtonHashMap autoInductionOn; 
     private JRadioButtonHashMap autoInductionLemmaOn; 
     
@@ -301,14 +301,23 @@ public final class StrategySelectionView extends JPanel {
         
         ++yCoord;
 
-        rdBut12 = new JRadioButtonHashMap("Expand", StrategyProperties.METHOD_EXPAND, true, false);
-        methodGroup.add(rdBut12);
-        addJavaDLOption ( rdBut12, javaDLOptionsLayout, 4, yCoord, 2 );        
-
         rdBut13 = new JRadioButtonHashMap(
                 "Contract", StrategyProperties.METHOD_CONTRACT, false, false);
+        rdBut13.setToolTipText("<html>Replace method calls by contracts. In some cases<br>" +
+        		               "a method call may also be replaced by its method body.<br>" +
+        		               "If query treatment is activated, this behavior applies<br>" +
+        		               "to queries as well.</html>");
         methodGroup.add(rdBut13);
         addJavaDLOption ( rdBut13, javaDLOptionsLayout, 2, yCoord, 2 );        
+
+        rdBut12 = new JRadioButtonHashMap("Expand", StrategyProperties.METHOD_EXPAND, true, false);
+        rdBut12.setToolTipText("<html>Replace method calls by their bodies, i.e. by their<br>" +
+        		               "implementation. Method contracts are strictly deactivated.<br>" +
+        		               "This setting activates replacement of queries by their<br>" +
+        		               "implementation (using the query axiom rule) even if query<br>" +
+        		               "treatment is deactivated.<br></html>");
+        methodGroup.add(rdBut12);
+        addJavaDLOption ( rdBut12, javaDLOptionsLayout, 4, yCoord, 2 );        
 
         rdBut14 = new JRadioButtonHashMap("None",
                 StrategyProperties.METHOD_NONE, false, false);
@@ -372,21 +381,24 @@ public final class StrategySelectionView extends JPanel {
         queryRestricted = new JRadioButtonHashMap("Restricted", 
                 StrategyProperties.QUERY_RESTRICTED, false, false);
         queryRestricted.setToolTipText ( "<html>Rewrite query to a method call (expanded) so that contracts or inlining can be used.<br>" +
+                                         "<li> Queries occuring earlier on a branch get a higher chance to be expanded <br>" +
+        		                         " than queries introduced more recently. This results in a breath-first search<br>" +
+                                         " with respect to query expansion.</li>" +
+        		                         "<li> Reexpansion of the same query is very limited (e.g. one time).</li>" +
         		                         "<ul><li> Queries are expanded after the loop body in the \"Preserves Invariant\"<br>" +
         		                         " branch of the loop invariant rule.</li>" +
         		                         "<li> Queries are expanded in the Base Case and the conclusio of the Step Case <br>" +
         		                         " branch when using Auto Induction.</li>" +
-        		                         "<li> Queries occuring earlier on a branch get a higher chance to be expanded <br>" +
-        		                         " than queries introduced more recently. This results in a breath-first search<br>" +
-        		                         " with respect to query expansion.</li>" +
-        		                         "<li> Reexpansion of the same query is very limited (e.g. one time).</li>" +
-        		                         "</ul>(Attention: This radio button is buggy, it doesn't always show the correct state.)</html>" ); 
+        		                         "</ul>(Attention: This radio button is buggy, it doesn't always show the correct <br>" +
+        		                         "state. Switching it OFF and ON again will ensure that this strategy is activated.)</html>" ); 
         queryGroup.add(queryRestricted);
         addJavaDLOption ( queryRestricted, javaDLOptionsLayout, 4, yCoord, 2 );        
 
         queryOff = new JRadioButtonHashMap("Off", 
                 StrategyProperties.QUERY_OFF, false, true);
-        queryOff.setToolTipText ( "<html>Rewrite query to a method call so that contracts or inlining can be used.</html>" );
+        queryOff.setToolTipText ( "<html>Attention: even if query treatment is deactivated,<br>" +
+        		                  "queries may be expanded by their implementation if method<br>" +
+        		                  "treatment is set to \"expand\".</html>" );
         queryGroup.add(queryOff);
         addJavaDLOption ( queryOff, javaDLOptionsLayout, 6, yCoord, 2 );
 
