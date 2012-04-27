@@ -21,7 +21,7 @@ import de.uka.ilkd.key.gui.smt.InformationWindow.Information;
 import de.uka.ilkd.key.gui.smt.ProgressDialog.Modus;
 import de.uka.ilkd.key.gui.smt.ProgressDialog.ProgressDialogListener;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.BuiltInRuleApp;
+import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.SMTSolver.ReasonOfInterruption;
 import de.uka.ilkd.key.smt.SMTSolver.SolverState;
@@ -173,7 +173,7 @@ public class SolverListener implements SolverLauncherListener {
         private void applyResults() {
                 for (SMTProblem problem : smtProblems) {
                         if (problem.getFinalResult().isValid() == ThreeValuedTruth.VALID) {
-                        	BuiltInRuleApp app = 
+                        	IBuiltInRuleApp app = 
                         			( (RuleAppSMT) 
                         					(RuleAppSMT.rule.createApp( null ) )).
                         					     setTitle( getTitle(problem) );

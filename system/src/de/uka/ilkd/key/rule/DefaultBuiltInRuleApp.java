@@ -12,33 +12,40 @@ package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.proof.Goal;
 
 /** 
  * this class represents an application of a built in rule
  * application
  */
-public class BuiltInRuleApp extends AbstractBuiltInRuleApp  {
+public class DefaultBuiltInRuleApp extends AbstractBuiltInRuleApp  {
    
-    protected BuiltInRuleApp(BuiltInRule builtInRule, 
+    protected DefaultBuiltInRuleApp(BuiltInRule builtInRule, 
 			  PosInOccurrence pio) {
-	this.builtInRule    = builtInRule;
-	this.pio            = pio;
+        super(builtInRule, pio);
     }
     
     
-    protected BuiltInRuleApp(BuiltInRule builtInRule, 
+    protected DefaultBuiltInRuleApp(BuiltInRule builtInRule, 
 			  PosInOccurrence pio,
 			  ImmutableList<PosInOccurrence> ifInsts) {
-	this(builtInRule, pio);
-	this.ifInsts = ifInsts;
+        super(builtInRule, pio, ifInsts);
     }
-    
+
+    @Override
+    public DefaultBuiltInRuleApp replacePos(PosInOccurrence newPos) {
+	    return new DefaultBuiltInRuleApp(builtInRule, newPos, ifInsts);
+    }
+
+    @Override
+    public DefaultBuiltInRuleApp tryToInstantiate(Goal goal) {
+        return this;
+    }
 
 
     @Override
-    public RuleApp replacePos(PosInOccurrence newPos) {
-	    return new BuiltInRuleApp(builtInRule, newPos, ifInsts);
+    public DefaultBuiltInRuleApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {
+        return new DefaultBuiltInRuleApp(builtInRule, pio, ifInsts);
     }
-
 
 }

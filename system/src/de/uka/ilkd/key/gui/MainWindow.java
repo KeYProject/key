@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -1764,4 +1765,8 @@ public final class MainWindow extends JFrame  {
 	public void loadProblem(File file) {
 		getUserInterface().loadProblem(file);
 	}
-	}
+
+   public void loadProblem(File file, List<File> classPath, File bootClassPath) {
+      getUserInterface().loadProblem(file, classPath, bootClassPath);
+   }
+}

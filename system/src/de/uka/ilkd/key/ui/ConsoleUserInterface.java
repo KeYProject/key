@@ -1,11 +1,13 @@
 package de.uka.ilkd.key.ui;
 
 import java.io.File;
+import java.util.List;
 
 import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.ApplyTacletDialogModel;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.ProblemLoader;
@@ -181,9 +183,23 @@ public class ConsoleUserInterface extends AbstractUserInterface {
 		super.loadProblem(file, null, null, mediator);
 	}
 
+   @Override
+   public void loadProblem(File file, List<File> classPath, File bootClassPath) {
+      super.loadProblem(file, classPath, bootClassPath, mediator);
+   }
+
 	@Override
     public void openExamples() {
 		System.out.println("Open Examples not suported by console UI.");
     }
-    
+
+   @Override
+   public ProblemInitializer createProblemInitializer() {
+      ProblemInitializer pi = new ProblemInitializer(this, 
+            mediator.getProfile(), 
+            new Services(mediator.getExceptionHandler()), 
+            true, 
+            this);
+      return pi;
+   }
 }

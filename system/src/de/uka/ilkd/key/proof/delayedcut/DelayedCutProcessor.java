@@ -342,8 +342,8 @@ public class DelayedCutProcessor implements Runnable {
                     ,services);
         }
 
-        if(oldRuleApp instanceof AbstractBuiltInRuleApp){
-            BuiltInRuleApp app = (BuiltInRuleApp) oldRuleApp;
+        if(oldRuleApp instanceof IBuiltInRuleApp){
+            IBuiltInRuleApp app = (IBuiltInRuleApp) oldRuleApp;
             return app.replacePos(newPos);
         }
         
@@ -355,7 +355,7 @@ public class DelayedCutProcessor implements Runnable {
         if(newPos == null){
             return;
         }
-    	if(app instanceof AbstractBuiltInRuleApp){
+    	if(app instanceof IBuiltInRuleApp){
     		BuiltInRule rule = (BuiltInRule) app.rule();
     		if(rule.isApplicable(goal, newPos)){
     			return;

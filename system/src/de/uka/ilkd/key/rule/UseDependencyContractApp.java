@@ -24,30 +24,30 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
 
 	public UseDependencyContractApp(BuiltInRule builtInRule, PosInOccurrence pio,
 			Contract instantiation, PosInOccurrence step) {
-	    this(builtInRule, pio, instantiation, ImmutableSLList.<PosInOccurrence>nil(), step);
+	    this(builtInRule, pio, ImmutableSLList.<PosInOccurrence>nil(), instantiation, step);
     }
 	
     public UseDependencyContractApp(BuiltInRule rule,
-            PosInOccurrence pio, Contract contract,
-            ImmutableList<PosInOccurrence> ifInsts, PosInOccurrence step) {
+            PosInOccurrence pio, ImmutableList<PosInOccurrence> ifInsts,
+            Contract contract, PosInOccurrence step) {
 	    super(rule, pio, ifInsts, contract);
 	    this.step = step;
 
     }
 
-	public UseDependencyContractApp replacePos(PosInOccurrence newPos) {
-	    return new UseDependencyContractApp(rule(), newPos, instantiation, step);
+    public UseDependencyContractApp replacePos(PosInOccurrence newPos) {
+	    return new UseDependencyContractApp(rule(), newPos, ifInsts, instantiation, step);
     }
 
     public boolean isSufficientlyComplete() {
-    	return super.complete() && instantiation != null && !ifInsts.isEmpty();    	
+    	return pio != null && instantiation != null && !ifInsts.isEmpty();    	
     }
     
     public boolean complete() {
-    	return super.complete() && instantiation != null && step != null;
+    	return super.complete() && step != null;
     }
 
-	public UseDependencyContractApp computeStep(Sequent seq, Services services) {
+	private UseDependencyContractApp computeStep(Sequent seq, Services services) {
 		assert this.step == null;
 		final List<PosInOccurrence> steps = 
 				UseDependencyContractRule.
@@ -71,13 +71,13 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
 	public UseDependencyContractApp setStep(PosInOccurrence p_step) {
 	    assert this.step == null;
 		return new UseDependencyContractApp(rule(), 
-	    		posInOccurrence(), instantiation, ifInsts(), p_step);
+	    		posInOccurrence(), ifInsts(), instantiation, p_step);
     }
 
 	@Override
     public UseDependencyContractApp setContract(Contract contract) {
-	    return new UseDependencyContractApp(builtInRule, posInOccurrence(), contract, 
-	    		ifInsts, step);
+	    return new UseDependencyContractApp(builtInRule, posInOccurrence(), ifInsts, 
+	    		contract, step);
     }
 	
     public UseDependencyContractRule rule() {
@@ -122,6 +122,11 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
     		return setContract(contracts.iterator().next());
     	}
 	    return this;
+    }
+
+    @Override
+    public UseDependencyContractApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {
+        return new UseDependencyContractApp(builtInRule, pio, ifInsts, instantiation, step);
     }
 
 

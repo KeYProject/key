@@ -20,9 +20,9 @@ public abstract class AbstractUserInterface implements UserInterface {
 	}
 
 	@Override
-	public  RuleApp completeBuiltInRuleApp(RuleApp app, Goal goal, Services services) {
-		if (app instanceof AbstractContractRuleApp) {
-			app = ((AbstractContractRuleApp)app).tryToInstantiate(goal);
+	public  IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, Services services) {
+		if (app instanceof IBuiltInRuleApp) {
+			app = ((IBuiltInRuleApp)app).tryToInstantiate(goal);
 		}
 		// cannot complete that app
 		return app.complete() ? app : null;
