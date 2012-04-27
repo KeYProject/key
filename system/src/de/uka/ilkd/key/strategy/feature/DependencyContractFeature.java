@@ -16,7 +16,7 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.rule.BuiltInRuleApp;
+import de.uka.ilkd.key.rule.DefaultBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 
@@ -34,7 +34,7 @@ public final class DependencyContractFeature extends BinaryFeature {
 	    final RuleApp app = node.getAppliedRuleApp();
 	    if(app.rule() instanceof UseDependencyContractRule
 	       && app.posInOccurrence().subTerm().equals(focus)) {
-		final BuiltInRuleApp bapp = (BuiltInRuleApp) app;
+		final DefaultBuiltInRuleApp bapp = (DefaultBuiltInRuleApp) app;
 		for(PosInOccurrence ifInst : bapp.ifInsts()) {
 		    steps.remove(ifInst);
 		}
@@ -48,7 +48,7 @@ public final class DependencyContractFeature extends BinaryFeature {
     protected boolean filter(RuleApp app,
 	    		     PosInOccurrence pos,
 	    		     Goal goal) {
-	final BuiltInRuleApp bapp = (BuiltInRuleApp) app; 
+	final DefaultBuiltInRuleApp bapp = (DefaultBuiltInRuleApp) app; 
 	final UseDependencyContractRule rule 
 		= (UseDependencyContractRule) bapp.rule();
 	final Term focus = pos.subTerm();

@@ -415,9 +415,9 @@ public final class ProblemLoader implements Runnable {
             break;
         case 'n' :
             try {
-            	BuiltInRuleApp app = constructBuiltinApp();
+                IBuiltInRuleApp app = constructBuiltinApp();
             	if (!app.complete()) {
-            		app = ((AbstractContractRuleApp) app).tryToInstantiate(currGoal);
+            		app = (IBuiltInRuleApp) ((IBuiltInRuleApp) app).tryToInstantiate(currGoal);
             	}                	
                 currGoal.apply(app);
                 children = currNode.childrenIterator();
@@ -451,10 +451,10 @@ public final class ProblemLoader implements Runnable {
      *
      * @return current rule application for updateSimplification
      */
-    private BuiltInRuleApp constructBuiltinApp()
+    private IBuiltInRuleApp constructBuiltinApp()
                                throws BuiltInConstructionException {
 
-    	BuiltInRuleApp ourApp = null;
+    	IBuiltInRuleApp ourApp = null;
         //PosInSequent posInSeq = null;
         PosInOccurrence pos = null;
 
@@ -502,7 +502,7 @@ public final class ProblemLoader implements Runnable {
                     "@ " + pos);
             }
         }
-        ourApp = (BuiltInRuleApp) ruleApps.iterator().next();
+        ourApp = (DefaultBuiltInRuleApp) ruleApps.iterator().next();
         builtinIfInsts = null;
         return ourApp;
     }

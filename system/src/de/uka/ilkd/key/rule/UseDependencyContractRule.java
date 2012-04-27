@@ -320,7 +320,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 
     public static PosInOccurrence findStepInIfInsts(
 	    		List<PosInOccurrence> steps,
-	    		BuiltInRuleApp app,
+	    		UseDependencyContractApp app,
 	    		Services services) {
     	for(PosInOccurrence pio : app.ifInsts()) {
     		if(steps.contains(pio)) {
@@ -338,7 +338,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	    			PosInOccurrence pos,
 	    			Sequent seq,
 	    			Services services,
-	    			BuiltInRuleApp app) {
+	    			AbstractBuiltInRuleApp app) {
 	final Term focus = pos.subTerm();
 	assert app != null;
 	assert focus.op() instanceof ObserverFunction;
@@ -470,7 +470,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
         	= getBaseHeapAndChangedLocs(pio, 
         				    goal.sequent(), 
         				    services, 
-        				    (BuiltInRuleApp)ruleApp);
+        				    (DefaultBuiltInRuleApp)ruleApp);
         //create justification
         final RuleJustificationBySpec just 
                 = new RuleJustificationBySpec(contract);

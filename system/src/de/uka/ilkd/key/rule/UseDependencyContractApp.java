@@ -24,18 +24,18 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
 
 	public UseDependencyContractApp(BuiltInRule builtInRule, PosInOccurrence pio,
 			Contract instantiation, PosInOccurrence step) {
-	    this(builtInRule, pio, instantiation, ImmutableSLList.<PosInOccurrence>nil(), step);
+	    this(builtInRule, pio, ImmutableSLList.<PosInOccurrence>nil(), instantiation, step);
     }
 	
     public UseDependencyContractApp(BuiltInRule rule,
-            PosInOccurrence pio, Contract contract,
-            ImmutableList<PosInOccurrence> ifInsts, PosInOccurrence step) {
+            PosInOccurrence pio, ImmutableList<PosInOccurrence> ifInsts,
+            Contract contract, PosInOccurrence step) {
 	    super(rule, pio, ifInsts, contract);
 	    this.step = step;
 
     }
 
-	public UseDependencyContractApp replacePos(PosInOccurrence newPos) {
+    public UseDependencyContractApp replacePos(PosInOccurrence newPos) {
 	    return new UseDependencyContractApp(rule(), newPos, instantiation, step);
     }
 
@@ -71,13 +71,13 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
 	public UseDependencyContractApp setStep(PosInOccurrence p_step) {
 	    assert this.step == null;
 		return new UseDependencyContractApp(rule(), 
-	    		posInOccurrence(), instantiation, ifInsts(), p_step);
+	    		posInOccurrence(), ifInsts(), instantiation, p_step);
     }
 
 	@Override
     public UseDependencyContractApp setContract(Contract contract) {
-	    return new UseDependencyContractApp(builtInRule, posInOccurrence(), contract, 
-	    		ifInsts, step);
+	    return new UseDependencyContractApp(builtInRule, posInOccurrence(), ifInsts, 
+	    		contract, step);
     }
 	
     public UseDependencyContractRule rule() {
@@ -122,6 +122,11 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
     		return setContract(contracts.iterator().next());
     	}
 	    return this;
+    }
+
+    @Override
+    public UseDependencyContractApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {
+        return new UseDependencyContractApp(builtInRule, pio, ifInsts, instantiation, step);
     }
 
 

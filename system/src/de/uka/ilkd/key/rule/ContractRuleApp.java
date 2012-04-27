@@ -11,6 +11,7 @@
 package de.uka.ilkd.key.rule;
 
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -35,6 +36,11 @@ public class ContractRuleApp extends AbstractContractRuleApp {
     	super(rule, pio, instantiation);
     }
     
+    public ContractRuleApp(BuiltInRule rule, PosInOccurrence pio,
+            ImmutableList<PosInOccurrence> ifInsts, Contract instantiation) {
+        super(rule, pio, ifInsts, instantiation);
+    }
+
     public ContractRuleApp replacePos(PosInOccurrence newPos) {
 	    return new ContractRuleApp(rule(), newPos, instantiation);
     }
@@ -60,6 +66,11 @@ public class ContractRuleApp extends AbstractContractRuleApp {
     	return setContract(services.getSpecificationRepository()
     	                .combineOperationContracts(
     	                		contracts));
+    }
+
+    @Override
+    public ContractRuleApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {
+        return new ContractRuleApp(builtInRule, pio, ifInsts, instantiation);
     }
 
 }

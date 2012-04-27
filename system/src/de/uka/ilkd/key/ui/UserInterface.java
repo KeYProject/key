@@ -69,7 +69,7 @@ public interface UserInterface extends ProblemInitializerListener,
 
 	/**
 	 * completes rule applications of built in rules
-	 * @param app the BuiltInRuleApp to be completed
+	 * @param app the DefaultBuiltInRuleApp to be completed
 	 * @param goal the Goal where the app will later be applied to
 	 * @param services the Services
 	 * @return a complete app or null if no completion was possible

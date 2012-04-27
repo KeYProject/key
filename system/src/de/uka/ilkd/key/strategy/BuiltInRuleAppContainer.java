@@ -33,7 +33,7 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
     private final FormulaTag      positionTag;
     private final PosInOccurrence applicationPosition;
     
-    private final BuiltInRuleApp bir;
+    private final DefaultBuiltInRuleApp bir;
     
     
 
@@ -41,7 +41,7 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
     //constructors
     //-------------------------------------------------------------------------
         
-    private BuiltInRuleAppContainer(BuiltInRuleApp bir,
+    private BuiltInRuleAppContainer(DefaultBuiltInRuleApp bir,
 			     	    PosInOccurrence pio,
 			     	    RuleAppCost     cost,
 			     	    Goal            goal) {
@@ -113,7 +113,7 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
      * the cost may be an instance of <code>TopRuleAppCost</code>.
      */
     static ImmutableList<RuleAppContainer> createAppContainers( 
-	    					BuiltInRuleApp bir,
+	    					DefaultBuiltInRuleApp bir,
 	    					PosInOccurrence pio,
 	    					Goal goal,
 	    					Strategy strategy ) {
@@ -159,11 +159,11 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
         }                
         
         final BuiltInRule rule = bir.rule();
-        BuiltInRuleApp app = rule.createApp(pio);
-		app.setIfInsts(bir.ifInsts());
+        IBuiltInRuleApp app = rule.createApp(pio);
 		
-		if (!app.complete() && app instanceof AbstractContractRuleApp) {
-			app = ((AbstractContractRuleApp)app).tryToInstantiate(goal);
+		if (!app.complete()) {
+		    app.setIfInsts(bir.ifInsts());	        
+			app = (AbstractBuiltInRuleApp) ((IBuiltInRuleApp)app).tryToInstantiate(goal);
 		}
 
 		return app.complete() ? app : null;

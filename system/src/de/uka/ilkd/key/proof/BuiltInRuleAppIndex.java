@@ -13,11 +13,7 @@ package de.uka.ilkd.key.proof;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.BuiltInRuleApp;
-import de.uka.ilkd.key.rule.QueryExpand;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.UseDependencyContractRule;
+import de.uka.ilkd.key.rule.*;
 
 public class BuiltInRuleAppIndex {
 
@@ -87,7 +83,7 @@ public class BuiltInRuleAppIndex {
             final BuiltInRule bir = builtInRule;
             
             if(bir.isApplicable(goal, null)) {
-                BuiltInRuleApp app = bir.createApp( null );                            
+                IBuiltInRuleApp app = bir.createApp( null );                            
                 listener.ruleAdded ( app, null );
             }
             
@@ -123,7 +119,7 @@ public class BuiltInRuleAppIndex {
         if(rule instanceof UseDependencyContractRule || rule instanceof QueryExpand) {//HACK
             scanSimplificationRule(rule, goal, pos, listener);
         } else if (rule.isApplicable ( goal, pos ) ) {
-            BuiltInRuleApp app = rule.createApp( pos );                            
+            IBuiltInRuleApp app = rule.createApp( pos );                            
             listener.ruleAdded ( app, pos );
         }
     }
@@ -134,7 +130,7 @@ public class BuiltInRuleAppIndex {
                                           PosInOccurrence pos,
                                           NewRuleListener listener ) {
         if (rule.isApplicable ( goal, pos ) ) {
-            BuiltInRuleApp app = rule.createApp( pos );                            
+            IBuiltInRuleApp app = rule.createApp( pos );                            
             listener.ruleAdded ( app, pos );
         }
         for(int i = 0, n = pos.subTerm().arity(); i < n; i++) {
