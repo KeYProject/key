@@ -126,8 +126,8 @@ public class InteractiveInvariantGeneration implements BuiltInRule {
 
 
         @Override
-        public BuiltInRuleApp createApp(PosInOccurrence pos) {
-            return new BuiltInRuleApp(this, pos);
+        public DefaultBuiltInRuleApp createApp(PosInOccurrence pos) {
+            return new DefaultBuiltInRuleApp(this, pos);
         }
 
 }
