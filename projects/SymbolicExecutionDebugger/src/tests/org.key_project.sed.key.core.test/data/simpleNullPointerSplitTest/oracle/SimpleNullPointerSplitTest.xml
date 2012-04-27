@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget xml:id="_a5006cc5-a7fb-44e1-bd62-044d93fca976" name="SimpleNullPointerSplitTest[SimpleNullPointerSplitTest::main(SimpleNullPointerSplitTest)].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_56cb7295-fe7f-4a68-bc39-4f393a3fcfff" name="KeY Default Thread">
+         <sedMethodCall xml:id="_1f28f887-9543-4672-86af-e1ba92023ed0" name="self.main(_instance);" lineNumber="-1" charStart="77" charEnd="81">
+            <sedStatement xml:id="_16780c76-f844-4280-a0d8-578d150b2472" name="return _instance.x;" lineNumber="-1" charStart="124" charEnd="142">
+               <sedBranchCondition xml:id="_42ede5d4-f313-4fcd-b283-df36884db890" name="Normal Execution (_instance != null)">
+                  <sedMethodReturn xml:id="_e51f44ed-8aa0-4490-a722-8fbfbacae0ff" name="&lt;return &apos;instance.x&apos; as result of self.main(_instance);&gt;" lineNumber="-1" charStart="77" charEnd="81">
+                     <sedTermination xml:id="_2d7a1f56-3b72-4242-8edb-3968ba922490" name="&lt;end&gt;">
+                     </sedTermination>
+                  </sedMethodReturn>
+               </sedBranchCondition>
+               <sedBranchCondition xml:id="_5c82aefe-1d50-4780-8b51-a50d0d37cd08" name="Null Reference (_instance = null)">
+                  <sedTermination xml:id="_c51265d4-340f-40b3-a046-86dccf4a7247" name="&lt;end&gt;">
+                  </sedTermination>
+               </sedBranchCondition>
+            </sedStatement>
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>

@@ -95,6 +95,18 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     * Tests the suspend/resume functionality on the {@link IDebugTarget}.
     */
    @Test
+   public void testSimpleNullPointerSplitTest() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testSimpleNullPointerSplitTest",
+                     "data/simpleNullPointerSplitTest/test",
+                     false,
+                     createMethodSelector("SimpleNullPointerSplitTest", "main", "QSimpleNullPointerSplitTest;"),
+                     "data/simpleNullPointerSplitTest/oracle/SimpleNullPointerSplitTest.xml");
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
    public void testForEach() throws Exception {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testForEach",
                      "data/forEachTest/test",
