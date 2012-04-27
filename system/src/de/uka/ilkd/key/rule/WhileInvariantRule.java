@@ -569,7 +569,11 @@ public final class WhileInvariantRule implements BuiltInRule {
 	return NAME.toString()+" (Auto)";
     }
 
-    
+
+    @Override
+    public BuiltInRuleApp createApp(PosInOccurrence pos) {
+        return new BuiltInRuleApp(this, pos);
+    }
     
     //-------------------------------------------------------------------------
     //inner classes
@@ -605,9 +609,4 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
 
-
-	@Override
-    public BuiltInRuleApp createApp(PosInOccurrence pos) {
-	    return new BuiltInRuleApp(this, pos);
-    }
 }

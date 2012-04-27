@@ -32,7 +32,12 @@ public class InteractiveInvariantGeneration implements BuiltInRule {
         
 
         static boolean autoMode() {
-            return MainWindow.getInstance().getMediator().autoMode();
+            try {
+                return MainWindow.getInstance().getMediator().autoMode();
+            } catch (IllegalStateException e){
+                // there is no main window at all
+                return true;
+            }
         }
 
         @Override
