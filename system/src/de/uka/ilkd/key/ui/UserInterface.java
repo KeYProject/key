@@ -10,6 +10,7 @@ import de.uka.ilkd.key.proof.ApplyTacletDialogModel;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProblemInitializer.ProblemInitializerListener;
+import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
@@ -74,7 +75,7 @@ public interface UserInterface extends ProblemInitializerListener,
 	 * @param services the Services
 	 * @return a complete app or null if no completion was possible
 	 */
-	RuleApp completeBuiltInRuleApp(RuleApp app, Goal goal, Services services);
+	IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, Services services);    
 
 	/**
 	 * <p>

@@ -356,7 +356,7 @@ public class KeYMediator {
      * @return
      * 				a SetOf<RuleApp> with all possible applications of the rule
      */
-    public ImmutableSet<RuleApp> getBuiltInRuleApplications(String name, PosInOccurrence pos)
+    public ImmutableSet<IBuiltInRuleApp> getBuiltInRuleApplications(String name, PosInOccurrence pos)
     {
     	return interactiveProver.getBuiltInRuleAppsForName(name, pos);
     }
@@ -442,7 +442,7 @@ public class KeYMediator {
     	Goal goal = keySelectionModel.getSelectedGoal();
     	assert goal != null;
 
-    	ImmutableSet<RuleApp> set = interactiveProver.
+    	ImmutableSet<IBuiltInRuleApp> set = interactiveProver.
     			getBuiltInRuleApp(rule, pos);
     	if (set.size() > 1) {
     		System.err.println("keymediator:: Expected a single app. If " +
@@ -453,7 +453,7 @@ public class KeYMediator {
     				"taking the first in list.");
     	}
     	
-    	RuleApp app = set.iterator().next();
+    	IBuiltInRuleApp app = set.iterator().next();
 
     	if (!app.complete()) {    		
     		app = ui.completeBuiltInRuleApp(app, goal, goal.proof().getServices());

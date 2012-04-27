@@ -38,15 +38,15 @@ public class BuiltInRuleAppIndex {
      * returns a list of built-in rules application applicable
      * for the given goal and position
      */
-    public ImmutableList<RuleApp> getBuiltInRule(Goal            goal, 
+    public ImmutableList<IBuiltInRuleApp> getBuiltInRule(Goal            goal, 
 						 PosInOccurrence pos) {
 
-	ImmutableList<RuleApp> result = ImmutableSLList.<RuleApp>nil();
+	ImmutableList<IBuiltInRuleApp> result = ImmutableSLList.<IBuiltInRuleApp>nil();
 
         for (BuiltInRule builtInRule : index.rules()) {
             BuiltInRule bir = builtInRule;
             if (bir.isApplicable(goal, pos)) {
-                RuleApp app = bir.createApp(pos);
+                IBuiltInRuleApp app = bir.createApp(pos);
                 result = result.prepend(app);
             }
         }

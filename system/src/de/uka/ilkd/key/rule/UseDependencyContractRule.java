@@ -338,7 +338,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	    			PosInOccurrence pos,
 	    			Sequent seq,
 	    			Services services,
-	    			AbstractBuiltInRuleApp app) {
+	    			IBuiltInRuleApp app) {
 	final Term focus = pos.subTerm();
 	assert app != null;
 	assert focus.op() instanceof ObserverFunction;
@@ -470,7 +470,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
         	= getBaseHeapAndChangedLocs(pio, 
         				    goal.sequent(), 
         				    services, 
-        				    (DefaultBuiltInRuleApp)ruleApp);
+        				    (IBuiltInRuleApp)ruleApp);
         //create justification
         final RuleJustificationBySpec just 
                 = new RuleJustificationBySpec(contract);

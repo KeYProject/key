@@ -6,12 +6,29 @@ import de.uka.ilkd.key.proof.Goal;
 
 public interface IBuiltInRuleApp extends RuleApp {
 
-    public abstract RuleApp tryToInstantiate(Goal goal);
+    /**
+     * returns the built in rule of this rule application
+     */
+    BuiltInRule rule();
 
-    public abstract boolean isSufficientlyComplete();
+    /**
+     * tries to complete the rule application from the available information
+     * Attention: Do neither add GUI code to the rules nor use this method directly 
+     * Instead ask the implementation of the {@link de.uka.ilkd.key.ui.UserInterface} to complete a built-in rule
+     * For an example implementation see e.g. {@link UseOperationContractRule} or {@link UseDependencyContractRule}.    
+     */
+    IBuiltInRuleApp tryToInstantiate(Goal goal);
 
-    public abstract ImmutableList<PosInOccurrence> ifInsts();
+    /**
+     * returns true if tryToInstantiate can complete the app
+     * @return
+     */
+    boolean isSufficientlyComplete();
+    
+    ImmutableList<PosInOccurrence> ifInsts();
 
-    public abstract IBuiltInRuleApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts);
+    IBuiltInRuleApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts);
+
+    IBuiltInRuleApp replacePos(PosInOccurrence newPos);
 
 }

@@ -123,7 +123,7 @@ public class RuleAppSMT extends AbstractBuiltInRuleApp {
     }
 
     @Override
-    public RuleApp tryToInstantiate(Goal goal) {
+    public RuleAppSMT tryToInstantiate(Goal goal) {
         return this;
     }
 

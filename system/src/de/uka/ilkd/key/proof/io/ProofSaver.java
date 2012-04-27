@@ -256,7 +256,7 @@ public class ProofSaver {
                                           appliedRuleApp.posInOccurrence()));
         tree.append(newNames2Proof(node));
         tree.append(builtinRuleIfInsts(node, 
-        	                       ((DefaultBuiltInRuleApp)appliedRuleApp).ifInsts()));
+        	                       ((IBuiltInRuleApp)appliedRuleApp).ifInsts()));
 
         if (appliedRuleApp.rule() instanceof UseOperationContractRule 
             || appliedRuleApp.rule() instanceof UseDependencyContractRule) {

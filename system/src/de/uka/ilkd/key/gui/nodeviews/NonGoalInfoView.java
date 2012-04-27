@@ -34,15 +34,7 @@ import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.op.FormulaSV;
-import de.uka.ilkd.key.logic.op.ModalOperatorSV;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SkolemTermSV;
-import de.uka.ilkd.key.logic.op.TermSV;
-import de.uka.ilkd.key.logic.op.UpdateSV;
-import de.uka.ilkd.key.logic.op.VariableSV;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.*;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.*;
@@ -273,7 +265,7 @@ public class NonGoalInfoView extends JTextArea {
 	    if ( app instanceof TacletApp ) {	 
 		highlightIfFormulas ( (TacletApp)app );	 
 	    } else if(app instanceof IBuiltInRuleApp) {
-		highlightIfInsts ( (DefaultBuiltInRuleApp)app );	 		
+		highlightIfInsts ( (IBuiltInRuleApp)app );	 		
 	    }
 
 	    if ( r != null ) makeRangeVisible ( r );	 
@@ -344,7 +336,7 @@ public class NonGoalInfoView extends JTextArea {
     }	 
     
     
-    private void highlightIfInsts(DefaultBuiltInRuleApp bapp) 
+    private void highlightIfInsts(IBuiltInRuleApp bapp) 
     		throws BadLocationException {
 	final ImmutableList<PosInOccurrence> ifs = bapp.ifInsts();
 	for(PosInOccurrence pio : ifs) {

@@ -53,6 +53,10 @@ public class ContractRuleApp extends AbstractContractRuleApp {
     	return (UseOperationContractRule) super.rule();
     }
 
+    public boolean isSufficientlyComplete() {
+        return pio != null;      
+    }
+    
     public ContractRuleApp tryToInstantiate(Goal goal) {
     	if (complete()) {
     		return this;

@@ -258,13 +258,13 @@ public class WindowUserInterface extends AbstractUserInterface {
 	}
 
 	@Override
-	public RuleApp completeBuiltInRuleApp(RuleApp app, Goal goal,
+	public IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal,
 	        Services services) {
 		if (mainWindow.getMediator().autoMode()) {
 			return super.completeBuiltInRuleApp(
 			        app, goal, services);
 		}
-		RuleApp result = app;
+		IBuiltInRuleApp result = app;
 		if (app.rule() instanceof UseOperationContractRule) {
 			Instantiation inst = UseOperationContractRule.computeInstantiation(
 			        app.posInOccurrence().subTerm(), services);

@@ -32,12 +32,12 @@ public abstract class AbstractContractRuleApp extends AbstractBuiltInRuleApp {
     }
 		
     @Override
-    public abstract RuleApp tryToInstantiate(Goal goal);
+    public abstract AbstractContractRuleApp tryToInstantiate(Goal goal);
 
     public abstract AbstractContractRuleApp setContract(Contract contract);
 
 	public boolean complete() {
-    	return super.complete() && instantiation != null;
+    	return super.complete() && pio != null && instantiation != null;
     }
 
     

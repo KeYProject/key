@@ -31,16 +31,14 @@ public class DefaultBuiltInRuleApp extends AbstractBuiltInRuleApp  {
 			  ImmutableList<PosInOccurrence> ifInsts) {
         super(builtInRule, pio, ifInsts);
     }
-    
-
 
     @Override
-    public IBuiltInRuleApp replacePos(PosInOccurrence newPos) {
+    public DefaultBuiltInRuleApp replacePos(PosInOccurrence newPos) {
 	    return new DefaultBuiltInRuleApp(builtInRule, newPos, ifInsts);
     }
 
     @Override
-    public RuleApp tryToInstantiate(Goal goal) {
+    public DefaultBuiltInRuleApp tryToInstantiate(Goal goal) {
         return this;
     }
 

@@ -343,7 +343,7 @@ public class DelayedCutProcessor implements Runnable {
         }
 
         if(oldRuleApp instanceof IBuiltInRuleApp){
-            DefaultBuiltInRuleApp app = (DefaultBuiltInRuleApp) oldRuleApp;
+            IBuiltInRuleApp app = (IBuiltInRuleApp) oldRuleApp;
             return app.replacePos(newPos);
         }
         

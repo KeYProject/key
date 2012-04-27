@@ -59,7 +59,7 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
     return result;
     }
 
-    public abstract IBuiltInRuleApp replacePos(PosInOccurrence newPos);
+    public abstract AbstractBuiltInRuleApp replacePos(PosInOccurrence newPos);
     
     @Override
     public abstract IBuiltInRuleApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts);
@@ -73,7 +73,7 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
      * @see de.uka.ilkd.key.rule.IBuiltInRuleApp#tryToInstantiate(de.uka.ilkd.key.proof.Goal)
      */
     @Override
-    public abstract RuleApp tryToInstantiate(Goal goal);
+    public abstract AbstractBuiltInRuleApp tryToInstantiate(Goal goal);
 
     /* (non-Javadoc)
      * @see de.uka.ilkd.key.rule.IBuiltInRuleApp#isSufficientlyComplete()

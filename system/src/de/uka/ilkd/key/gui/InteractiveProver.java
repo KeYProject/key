@@ -267,14 +267,14 @@ public class InteractiveProver {
      *            the BuiltInRule for which the applications are collected
      * @param pos
      *            the PosInSequent the position information
-     * @return a SetOf<RuleApp> with all possible rule applications
+     * @return a SetOf<IBuiltInRuleApp> with all possible rule applications
      */
-    public ImmutableSet<RuleApp> getBuiltInRuleApp(BuiltInRule rule, 
+    public ImmutableSet<IBuiltInRuleApp> getBuiltInRuleApp(BuiltInRule rule, 
 					  PosInOccurrence     pos) {
 	
-	ImmutableSet<RuleApp> result = DefaultImmutableSet.<RuleApp>nil();
+	ImmutableSet<IBuiltInRuleApp> result = DefaultImmutableSet.<IBuiltInRuleApp>nil();
 
-        for (final RuleApp app : getInteractiveRuleAppIndex().
+        for (final IBuiltInRuleApp app : getInteractiveRuleAppIndex().
                 getBuiltInRules(focusedGoal, pos)) {
             if (app.rule() == rule) {
                 result = result.add(app);
@@ -293,9 +293,9 @@ public class InteractiveProver {
      * @return
      * 				a SetOf<RuleApp> with all possible applications of the rule
      */
-    protected ImmutableSet<RuleApp> getBuiltInRuleAppsForName(String name, PosInOccurrence pos)
+    protected ImmutableSet<IBuiltInRuleApp> getBuiltInRuleAppsForName(String name, PosInOccurrence pos)
     {
-        ImmutableSet<RuleApp> result = DefaultImmutableSet.<RuleApp>nil();
+        ImmutableSet<IBuiltInRuleApp> result = DefaultImmutableSet.<IBuiltInRuleApp>nil();
         ImmutableList<BuiltInRule> match = ImmutableSLList.<BuiltInRule>nil();
                 
         //get all possible rules for current position in sequent

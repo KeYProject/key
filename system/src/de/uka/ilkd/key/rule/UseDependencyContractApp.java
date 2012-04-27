@@ -40,7 +40,7 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
     }
 
     public boolean isSufficientlyComplete() {
-    	return super.complete() && instantiation != null && !ifInsts.isEmpty();    	
+    	return pio != null && instantiation != null && !ifInsts.isEmpty();    	
     }
     
     public boolean complete() {

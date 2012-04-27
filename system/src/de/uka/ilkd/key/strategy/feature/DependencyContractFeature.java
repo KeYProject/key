@@ -13,10 +13,11 @@ package de.uka.ilkd.key.strategy.feature;
 import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.rule.DefaultBuiltInRuleApp;
+import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 
@@ -34,7 +35,7 @@ public final class DependencyContractFeature extends BinaryFeature {
 	    final RuleApp app = node.getAppliedRuleApp();
 	    if(app.rule() instanceof UseDependencyContractRule
 	       && app.posInOccurrence().subTerm().equals(focus)) {
-		final DefaultBuiltInRuleApp bapp = (DefaultBuiltInRuleApp) app;
+		final IBuiltInRuleApp bapp = (IBuiltInRuleApp) app;
 		for(PosInOccurrence ifInst : bapp.ifInsts()) {
 		    steps.remove(ifInst);
 		}
@@ -48,14 +49,12 @@ public final class DependencyContractFeature extends BinaryFeature {
     protected boolean filter(RuleApp app,
 	    		     PosInOccurrence pos,
 	    		     Goal goal) {
-	final DefaultBuiltInRuleApp bapp = (DefaultBuiltInRuleApp) app; 
-	final UseDependencyContractRule rule 
-		= (UseDependencyContractRule) bapp.rule();
+	final IBuiltInRuleApp bapp = (IBuiltInRuleApp) app; 
 	final Term focus = pos.subTerm();
 
 	//determine possible steps
 	final List<PosInOccurrence> steps 
-		= rule.getSteps(pos, 
+		= UseDependencyContractRule.getSteps(pos, 
 				goal.sequent(), 
 				goal.proof().getServices());
 	if(steps.isEmpty()) {

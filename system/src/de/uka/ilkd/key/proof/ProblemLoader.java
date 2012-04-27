@@ -485,7 +485,7 @@ public final class ProblemLoader implements Runnable {
             return ourApp;
         }
 
-        final ImmutableSet<RuleApp> ruleApps =
+        final ImmutableSet<IBuiltInRuleApp> ruleApps =
             mediator.getBuiltInRuleApplications(currTacletName, pos);
 
         if (ruleApps.size() != 1) {
@@ -502,7 +502,7 @@ public final class ProblemLoader implements Runnable {
                     "@ " + pos);
             }
         }
-        ourApp = (DefaultBuiltInRuleApp) ruleApps.iterator().next();
+        ourApp = (IBuiltInRuleApp) ruleApps.iterator().next();
         builtinIfInsts = null;
         return ourApp;
     }
