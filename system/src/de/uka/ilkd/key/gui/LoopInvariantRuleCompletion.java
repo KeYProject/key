@@ -36,21 +36,12 @@ public class LoopInvariantRuleCompletion implements
 
         LoopInvariant inv = loopApp.getInvariant();
         if (inv == null) { // no invariant present, get it interactively
-            if (!forced) {
-                inv = new LoopInvariantImpl(loop,
-                        MiscTools.getInnermostMethodFrame(progPost.javaBlock(),
-                                services) == null ? null : MiscTools
-                                .getSelfTerm(MiscTools.getInnermostMethodFrame(
-                                        progPost.javaBlock(), services),
-                                        services), (Term) null);
-            } else {
-                inv = new LoopInvariantImpl(loop,
-                        MiscTools.getInnermostMethodFrame(progPost.javaBlock(),
-                                services) == null ? null : MiscTools
-                                .getSelfTerm(MiscTools.getInnermostMethodFrame(
-                                        progPost.javaBlock(), services),
-                                        services), (Term) null);
-            }
+            inv = new LoopInvariantImpl(loop,
+                    MiscTools.getInnermostMethodFrame(progPost.javaBlock(),
+                            services) == null ? null : MiscTools
+                                    .getSelfTerm(MiscTools.getInnermostMethodFrame(
+                                            progPost.javaBlock(), services),
+                                            services), (Term) null);
             try {
                 inv = InvariantConfigurator.getInstance().getLoopInvariant(inv,
                         services, false);
@@ -62,7 +53,7 @@ public class LoopInvariantRuleCompletion implements
             boolean requiresVariant = loopApp.variantRequired()
                     && !loopApp.variantAvailable();
             // Check if a variant is required
-            if (!loopApp.invariantAvailable() || requiresVariant) {
+            if (!forced || !loopApp.invariantAvailable() || requiresVariant) {
                 // get invariant or variant interactively
                 try {
                     inv = InvariantConfigurator.getInstance().getLoopInvariant(
@@ -73,7 +64,7 @@ public class LoopInvariantRuleCompletion implements
             }
         }
 
-        if (inv != null && !forced) {
+        if (inv != null && forced) {
             // overwrite old loop invariant in spec repo
             services.getSpecificationRepository().setLoopInvariant(inv);
         }
