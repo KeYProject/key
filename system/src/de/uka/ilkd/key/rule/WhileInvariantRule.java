@@ -63,7 +63,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     //internal methods
     //-------------------------------------------------------------------------
     
-    private Instantiation instantiate(InvariantBuiltInRuleApp app, Services services) throws RuleAbortException {
+    private Instantiation instantiate(LoopInvariantBuiltInRuleApp app, Services services) throws RuleAbortException {
 	
     Term focusTerm = app.posInOccurrence().subTerm();
         
@@ -88,7 +88,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 	final While loop = (While) app.getLoopStatement();
 	
 	// try to get invariant from JML specification
-    LoopInvariant inv = app.getInvariant(); 
+	LoopInvariant inv = app.getInvariant(); 
          
 	//collect self, execution context
 	final MethodFrame innermostMethodFrame 
@@ -164,8 +164,8 @@ public final class WhileInvariantRule implements BuiltInRule {
     
     private static boolean checkFocus(final Term progPost) {
         // focus (below update) must be modality term
-        return (progPost.op() instanceof Modality);
-        }
+        return progPost.op() instanceof Modality;
+    }
     
     //-------------------------------------------------------------------------
     //public interface
@@ -216,7 +216,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 		= services.getJavaInfo()
 	                  .getPrimitiveKeYJavaType(PrimitiveType.JAVA_INT);
 	//get instantiation
-	Instantiation inst = instantiate((InvariantBuiltInRuleApp) ruleApp, services);	
+	Instantiation inst = instantiate((LoopInvariantBuiltInRuleApp) ruleApp, services);	
 	
     final boolean transaction = ((Modality)inst.progPost.op()).transaction(); 
 
@@ -494,8 +494,8 @@ public final class WhileInvariantRule implements BuiltInRule {
 
 
     @Override
-    public InvariantBuiltInRuleApp createApp(PosInOccurrence pos) {
-        return new InvariantBuiltInRuleApp(this, pos);
+    public LoopInvariantBuiltInRuleApp createApp(PosInOccurrence pos) {
+        return new LoopInvariantBuiltInRuleApp(this, pos);
     }
     
     //-------------------------------------------------------------------------

@@ -13,6 +13,7 @@ package de.uka.ilkd.key.util;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Iterator;
@@ -153,6 +154,45 @@ public class DesignTests {
 	return badClasses;
     }
 
+    /** does not test if GUI is used within methods */
+    public LinkedList testGuiSep() {
+        LinkedList badClasses = new LinkedList();
+        for (int i = 0; i<allClasses.length; i++) {
+            if (de.uka.ilkd.key.rule.Rule.class.isAssignableFrom(allClasses[i]) ||
+                    allClasses[i].getPackage().getName().contains("key.rule") ||
+                    allClasses[i].getPackage().getName().contains("key.logic")  ||
+                    allClasses[i].getPackage().getName().contains("key.proof") ||
+                    allClasses[i].getPackage().getName().contains("key.java") ||   
+                    allClasses[i].getPackage().getName().contains("key.strategy")   
+                    ) {
+                for (Field f : allClasses[i].getDeclaredFields()) {
+                    Package pkg = f.getType().getPackage();
+                    String pkgname = pkg != null ? pkg.getName() : "";
+                    if (java.awt.Component.class.isAssignableFrom(f.getType())) { //|| pkgname.contains("key.gui")) { as long as the mediator and settings are in the GUI
+                        System.out.println("Illegal GUI reference at field " + f.getName() + " declared in class " + allClasses[i].getName());
+                        badClasses.add(allClasses[i]);
+                    }                
+                }
+                                
+                for (Method m : allClasses[i].getDeclaredMethods()) {
+                    if (java.awt.Component.class.isAssignableFrom(m.getReturnType())) {
+                        System.out.println("Illegal GUI reference as return type of " + m.getName() + " declared in class " + allClasses[i].getName());
+                        badClasses.add(allClasses[i]);
+                    }
+                    for (Class<?> t : m.getParameterTypes())
+                    if (java.awt.Component.class.isAssignableFrom(t)) {
+                        System.out.println("Illegal GUI reference as parameter type of " + m.getName() + " declared in class " + allClasses[i].getName());
+                        badClasses.add(allClasses[i]);
+                    }                    
+                }                
+            }
+        }
+        if (badClasses.size()>0) {
+            message = "No GUI is allowd in the packages and there sub packages";
+        }
+        return badClasses;
+    }
+
 
 
     public void runTests() {
@@ -174,12 +214,16 @@ public class DesignTests {
 		    failures += badClasses.size() > 0 ? 1 : 0;
 		    printBadClasses(badClasses);
 		} catch (Exception e) {
+		    e.printStackTrace();
 		    System.err.println("Could not invoke method "+meth[i]);
 		}
 	    }
 	}	
 	System.out.println("\n[Design tests finished. ("+(testcases-failures)+
 			   "/"+testcases+") tests passed.]");
+	if (failures > 0) {
+	    System.exit(1);	    
+	}
     }
     
     public static void main(String[] args) {

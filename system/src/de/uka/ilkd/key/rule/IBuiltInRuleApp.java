@@ -20,7 +20,7 @@ public interface IBuiltInRuleApp extends RuleApp {
     IBuiltInRuleApp tryToInstantiate(Goal goal);
 
     /**
-     * returns true if tryToInstantiate can complete the app
+     * returns true if tryToInstantiate may be able to complete the app
      * @return
      */
     boolean isSufficientlyComplete();
