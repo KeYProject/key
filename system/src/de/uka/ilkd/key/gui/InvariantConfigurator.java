@@ -679,6 +679,7 @@ public class InvariantConfigurator {
         }
 
         // Create the Dialog
+        userPressedCancel = false;
         InvariantDialog dia = new InvariantDialog();
         dia.dispose();
         if(this.userPressedCancel) {
