@@ -23,23 +23,22 @@ import de.uka.ilkd.key.rule.RuleApp;
 
 public class RuleAppSMT extends BuiltInRuleApp{ //implements RuleApp {
 
-    private final static SMTRule rule = new SMTRule();
-    private String title;
+    public final static SMTRule rule = new SMTRule();
+    private final String title;
 
 
-   
+    RuleAppSMT( SMTRule rule, PosInOccurrence pio ) {
+    	super(rule, null);
+    	title = "SMT Rule App";
+    }
     
-    public RuleAppSMT(Goal goal, String title) {
-    	super(rule,null);
-	this.title = title;
-	goal.proof().env().getJustifInfo().addJustification(rule,
-	        new RuleJustification() {
-
-		    @Override
-		    public boolean isAxiomJustification() {
-		        return false;
-		    }
-	        });
+    private RuleAppSMT(SMTRule rule, String title) {
+    	super(rule, null);
+    	this.title = title;
+    }
+    
+	public RuleApp replacePos(PosInOccurrence newPos) {
+	    return this;
     }
 
     @Override
@@ -62,9 +61,14 @@ public class RuleAppSMT extends BuiltInRuleApp{ //implements RuleApp {
 	return rule;
     }
 
-    private static class SMTRule implements BuiltInRule {
+    public static class SMTRule implements BuiltInRule {
 	private Name name = new Name("SMTRule");
 
+	public BuiltInRuleApp createApp( PosInOccurrence pos ) {
+		return new RuleAppSMT( this, pos );
+	}
+
+	
 	@Override
 	public boolean isApplicable(Goal goal, PosInOccurrence pio) {
 	    return false;
@@ -73,6 +77,17 @@ public class RuleAppSMT extends BuiltInRuleApp{ //implements RuleApp {
 	@Override
 	public ImmutableList<Goal> apply(Goal goal, Services services,
 	        RuleApp ruleApp) {
+		if (goal.proof().env().getJustifInfo().getJustification(rule) == null) {
+			goal.proof().env().getJustifInfo().addJustification(rule,
+					new RuleJustification() {
+
+				@Override
+				public boolean isAxiomJustification() {
+					return false;
+				}
+			});
+		}
+
 		goal.split(1);	
 		RuleAppSMT app = (RuleAppSMT) ruleApp;
 		goal.setBranchLabel(app.getTitle());
@@ -93,6 +108,10 @@ public class RuleAppSMT extends BuiltInRuleApp{ //implements RuleApp {
 	    return name;
 	}
 
+    }
+
+	public BuiltInRuleApp setTitle(String title2) {
+	    return null;
     }
 
 }

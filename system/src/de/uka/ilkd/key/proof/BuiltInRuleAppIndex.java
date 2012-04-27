@@ -50,7 +50,7 @@ public class BuiltInRuleAppIndex {
         for (BuiltInRule builtInRule : index.rules()) {
             BuiltInRule bir = builtInRule;
             if (bir.isApplicable(goal, pos)) {
-                RuleApp app = new BuiltInRuleApp(bir, pos);
+                RuleApp app = bir.createApp(pos);
                 result = result.prepend(app);
             }
         }
@@ -87,7 +87,7 @@ public class BuiltInRuleAppIndex {
             final BuiltInRule bir = builtInRule;
             
             if(bir.isApplicable(goal, null)) {
-                BuiltInRuleApp app = new BuiltInRuleApp(bir, null );                            
+                BuiltInRuleApp app = bir.createApp( null );                            
                 listener.ruleAdded ( app, null );
             }
             
@@ -123,7 +123,7 @@ public class BuiltInRuleAppIndex {
         if(rule instanceof UseDependencyContractRule || rule instanceof QueryExpand) {//HACK
             scanSimplificationRule(rule, goal, pos, listener);
         } else if (rule.isApplicable ( goal, pos ) ) {
-            BuiltInRuleApp app = new BuiltInRuleApp(rule, pos );                            
+            BuiltInRuleApp app = rule.createApp( pos );                            
             listener.ruleAdded ( app, pos );
         }
     }
@@ -134,7 +134,7 @@ public class BuiltInRuleAppIndex {
                                           PosInOccurrence pos,
                                           NewRuleListener listener ) {
         if (rule.isApplicable ( goal, pos ) ) {
-            BuiltInRuleApp app = new BuiltInRuleApp(rule, pos );                            
+            BuiltInRuleApp app = rule.createApp( pos );                            
             listener.ruleAdded ( app, pos );
         }
         for(int i = 0, n = pos.subTerm().arity(); i < n; i++) {

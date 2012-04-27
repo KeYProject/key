@@ -10,15 +10,11 @@
 
 package de.uka.ilkd.key.proof;
 
-import java.io.IOException;
 import java.util.HashMap;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.util.Debug;
 
 /**

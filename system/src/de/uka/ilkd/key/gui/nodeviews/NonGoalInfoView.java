@@ -272,7 +272,7 @@ public class NonGoalInfoView extends JTextArea {
 
 	    if ( app instanceof TacletApp ) {	 
 		highlightIfFormulas ( (TacletApp)app );	 
-	    } else if(app instanceof BuiltInRuleApp) {
+	    } else if(app instanceof AbstractBuiltInRuleApp) {
 		highlightIfInsts ( (BuiltInRuleApp)app );	 		
 	    }
 

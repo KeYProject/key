@@ -4,9 +4,11 @@ import java.io.File;
 
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.ApplyTacletDialogModel;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.init.ProblemInitializer.ProblemInitializerListener;
+import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 public interface UserInterface extends ProblemInitializerListener,
@@ -53,6 +55,15 @@ public interface UserInterface extends ProblemInitializerListener,
 	/** 
 	 * called to open the build in examples 
 	 */
-	void openExamples();    
+	void openExamples();
+
+	/**
+	 * completes rule applications of built in rules
+	 * @param app the BuiltInRuleApp to be completed
+	 * @param goal the Goal where the app will later be applied to
+	 * @param services the Services
+	 * @return a complete app or null if no completion was possible
+	 */
+	RuleApp completeBuiltInRuleApp(RuleApp app, Goal goal, Services services);    
 
 }

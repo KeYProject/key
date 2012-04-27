@@ -435,25 +435,30 @@ public class KeYMediator {
      * rule 
      */
     public void selectedBuiltInRule(BuiltInRule rule, PosInOccurrence pos) {
-	Goal goal = keySelectionModel.getSelectedGoal();
-	assert goal != null;
+    	Goal goal = keySelectionModel.getSelectedGoal();
+    	assert goal != null;
 
-	ImmutableSet<RuleApp> set = interactiveProver.
-	    getBuiltInRuleApp(rule, pos);
-	if (set.size() > 1) {
-	    System.err.println("keymediator:: Expected a single app. If " +
-		      "it is OK that there are more than one " +
-		      "built-in rule apps. You have to add a " +
-		      "selection dialog here");
-	    System.err.println("keymediator:: Ambigous applications, " +
-		      "taking the first in list.");
-	}
+    	ImmutableSet<RuleApp> set = interactiveProver.
+    			getBuiltInRuleApp(rule, pos);
+    	if (set.size() > 1) {
+    		System.err.println("keymediator:: Expected a single app. If " +
+    				"it is OK that there are more than one " +
+    				"built-in rule apps. You have to add a " +
+    				"selection dialog here");
+    		System.err.println("keymediator:: Ambigous applications, " +
+    				"taking the first in list.");
+    	}
+    	
+    	RuleApp app = set.iterator().next();
 
-	RuleApp app = set.iterator().next();
-	if (app != null && app.rule() == rule) {
-	    goal.apply(app);
-	    return;
-	}
+    	if (!app.complete()) {    		
+    		app = ui.completeBuiltInRuleApp(app, goal, goal.proof().getServices());
+    	}
+    	
+    	if (app != null && app.rule() == rule) {
+    		goal.apply(app);
+    		return;
+    	}
     }
      
       

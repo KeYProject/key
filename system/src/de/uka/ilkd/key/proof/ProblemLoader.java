@@ -36,6 +36,7 @@ import de.uka.ilkd.key.proof.io.EnvInput;
 import de.uka.ilkd.key.proof.io.KeYFile;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
@@ -463,7 +464,14 @@ public final class ProblemLoader implements Runnable {
         }
 
         if (currContract != null) {
-            ourApp = new ContractRuleApp(pos, currContract);
+        	BuiltInRule useContractRule = 
+        			currContract instanceof OperationContract 
+        			? UseOperationContractRule.INSTANCE
+        					: UseDependencyContractRule.INSTANCE;
+            
+
+        	ourApp = ((AbstractContractRuleApp)useContractRule.
+        			createApp(pos)).setContract(currContract);
             currContract = null;
             if(builtinIfInsts != null) {
         	ourApp.setIfInsts(builtinIfInsts);

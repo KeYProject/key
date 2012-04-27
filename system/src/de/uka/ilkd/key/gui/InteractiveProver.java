@@ -136,8 +136,8 @@ public class InteractiveProver {
      * @param goal
      */
     public void applyInteractive ( RuleApp app, Goal goal ) {
-        goal.node().getNodeInfo().setInteractiveRuleApplication(true);
- 		goal.apply(app);
+        goal.node().getNodeInfo().setInteractiveRuleApplication(true); 		        
+        goal.apply(app);
     }
 
 
