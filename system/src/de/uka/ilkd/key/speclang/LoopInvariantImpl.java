@@ -164,6 +164,10 @@ public final class LoopInvariantImpl implements LoopInvariant {
         return loop;
     }
 
+    @Override
+    public Term getInvariant(Term selfTerm, Term heapAtPre, Services services){
+        return getInvariant(selfTerm,heapAtPre,null,services);
+    }
     
     @Override    
     public Term getInvariant(Term selfTerm,
@@ -176,6 +180,10 @@ public final class LoopInvariantImpl implements LoopInvariant {
         return or.replace(savedHeapAtPre == null ? originalInvariant : originalTransactionInvariant);
     }
     
+    @Override
+    public Term getModifies(Term selfTerm, Term heapAtPre, Services services){
+        return getModifies(selfTerm, heapAtPre, null, services);
+    }
     
     @Override
     public Term getModifies(Term selfTerm,
@@ -240,7 +248,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
             			      Term savedHeapAtPre,
             			      Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
-        Map inverseReplaceMap 
+        Map<Term, Term> inverseReplaceMap 
             = getInverseReplaceMap(selfTerm, heapAtPre, savedHeapAtPre, services);
         OpReplacer or = new OpReplacer(inverseReplaceMap);
         final boolean transaction = savedHeapAtPre != null;

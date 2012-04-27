@@ -90,4 +90,8 @@ public final class Modality extends AbstractSortedOperator {
     public boolean terminationSensitive(){
         return (this == DIA || this == DIA_TRANSACTION);
     }
+    
+    public boolean transaction(){
+        return (this == BOX_TRANSACTION || this == DIA_TRANSACTION);
+    }
 }

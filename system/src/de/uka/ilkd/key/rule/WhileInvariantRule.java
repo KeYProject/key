@@ -118,7 +118,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                     && extractVariant(services, inv) == null) {
                 requiresVariant = true;
             }
-            if (extractInvariant(services, inv) == null
+            if (extractInvariant(services, inv,((Modality)progPost.op()).transaction()) == null
                     || requiresVariant) {
                 // get invariant or variant interactively
                 inv = InvariantConfigurator.getInstance()
@@ -130,7 +130,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         }
     } else { // in auto mode
         if (inv == null
-                || extractInvariant(services, inv) == null
+                || extractInvariant(services, inv,((Modality)progPost.op()).transaction()) == null
                         || ((Modality)progPost.op()).terminationSensitive()
                         && extractVariant(services, inv) == null) {
             return null;
@@ -164,6 +164,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
 
+    /** Extract variant term from LoopInvariant object */
     private static Term extractVariant(Services services, final LoopInvariant inv) {
         return inv.getVariant(
                 inv.getInternalSelfTerm(),
@@ -172,8 +173,12 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
 
-    private static Term extractInvariant(Services services, final LoopInvariant inv) {
-        return inv.getInvariant(inv.getInternalSelfTerm(),inv.getInternalHeapAtPre(),inv.getInternalSavedHeapAtPre(),services);
+    /** Extract invariant term from LoopInvariant object.
+     * Note: the invariant differs whether transactions are used!
+     */
+    private static Term extractInvariant(Services services, final LoopInvariant inv, boolean transaction) {
+        return inv.getInvariant(inv.getInternalSelfTerm(),inv.getInternalHeapAtPre(),
+                transaction? inv.getInternalSavedHeapAtPre() : null,services);
     }
 
     
@@ -221,7 +226,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 	return new Pair<Term,Term>(anonUpdate, anonHeapTerm);
     }
     
-    private boolean checkFocus(final Term progPost) {
+    private static boolean checkFocus(final Term progPost) {
         // focus (below update) must be modality term
         return (progPost.op() instanceof Modality);
         }
@@ -236,8 +241,10 @@ public final class WhileInvariantRule implements BuiltInRule {
         if (!checkApplicability(goal,pio))
             return false;
 
-        // always applicable in interactive mode
+        // Always applicable in interactive mode.
+        // Do not instantiate in this case because this immediately raises the dialog
         if(!MainWindow.getInstance().getMediator().autoMode()) return true;
+        
         Instantiation inst;
         try {
             //instantiation must succeed
@@ -250,7 +257,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
     //focus must be top level succedent
-    public boolean checkApplicability (Goal g, PosInOccurrence pio){
+    static boolean checkApplicability (Goal g, PosInOccurrence pio){
         if (pio == null || !pio.isTopLevel() || pio.isInAntec())
             return false;
 
@@ -271,7 +278,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
     
 
-    Pair<Term, Term> applyUpdates(Term focusTerm) {
+    static Pair<Term, Term> applyUpdates(Term focusTerm) {
         if (focusTerm.op() instanceof UpdateApplication) {
             return new Pair<Term, Term>(UpdateApplication.getUpdate(focusTerm),
                     UpdateApplication.getTarget(focusTerm));
@@ -290,7 +297,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 	//get instantiation
 	Instantiation inst = instantiate(ruleApp.posInOccurrence().subTerm(), 
 				         services);
-    final boolean transaction = (inst.progPost.op() == Modality.DIA_TRANSACTION || inst.progPost.op() == Modality.BOX_TRANSACTION); 
+    final boolean transaction = ((Modality)inst.progPost.op()).transaction(); 
 
     final Term heapAtMethodPre = inst.inv.getInternalHeapAtPre();
     final Term savedHeapAtMethodPre = inst.inv.getInternalSavedHeapAtPre();

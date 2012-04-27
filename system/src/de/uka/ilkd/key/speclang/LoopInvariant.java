@@ -27,13 +27,24 @@ public interface LoopInvariant extends SpecificationElement {
      */
     public LoopStatement getLoop();
 
+    
+    /** Returns the invariant formula (may not be a transaction invariant). */
+    public Term getInvariant(Term selfTerm, Term heapAtPre, Services services);
+    
     /**
-     * Returns the invariant formula.
+     * Returns the invariant formula (may be the transaction invariant).
      */
     public Term getInvariant(Term selfTerm, 
             		     Term heapAtPre,
             		     Term savedHeapAtPre,
             		     Services services);
+
+    /**
+     * Returns the modifies clause.
+     */
+    public Term getModifies(Term selfTerm, 
+                        Term heapAtPre,
+                        Services services);
     
     /**
      * Returns the modifies clause.
