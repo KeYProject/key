@@ -17,6 +17,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
 /**
@@ -168,6 +169,10 @@ public class ProofStarter {
         
         final Profile profile = proof.env().getInitConfig().getProfile();
         proof.setActiveStrategy(profile.getDefaultStrategyFactory().create(proof, strategyProperties));
+        
+        if (proof.getSettings().getGeneralSettings().oneStepSimplification()) {
+        	OneStepSimplifier.INSTANCE.refresh(proof);
+        }
         
         profile.setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);        
         
