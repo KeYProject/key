@@ -359,7 +359,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	assert changedLocs != null;
 	
 	//store insts in rule app
-	app.setIfInsts(changedLocs.second.prepend(step));
+	app = app.setIfInsts(changedLocs.second.prepend(step));
 
 	//return step heap and changed locs
 	return new Pair<Term,Term>(step.subTerm().sub(0), changedLocs.first);

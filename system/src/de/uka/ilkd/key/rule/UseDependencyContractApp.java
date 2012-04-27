@@ -36,7 +36,7 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
     }
 
     public UseDependencyContractApp replacePos(PosInOccurrence newPos) {
-	    return new UseDependencyContractApp(rule(), newPos, instantiation, step);
+	    return new UseDependencyContractApp(rule(), newPos, ifInsts, instantiation, step);
     }
 
     public boolean isSufficientlyComplete() {
@@ -44,10 +44,10 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
     }
     
     public boolean complete() {
-    	return super.complete() && instantiation != null && step != null;
+    	return super.complete() && step != null;
     }
 
-	public UseDependencyContractApp computeStep(Sequent seq, Services services) {
+	private UseDependencyContractApp computeStep(Sequent seq, Services services) {
 		assert this.step == null;
 		final List<PosInOccurrence> steps = 
 				UseDependencyContractRule.

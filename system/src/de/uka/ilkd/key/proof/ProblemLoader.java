@@ -417,7 +417,7 @@ public final class ProblemLoader implements Runnable {
             try {
                 IBuiltInRuleApp app = constructBuiltinApp();
             	if (!app.complete()) {
-            		app = (IBuiltInRuleApp) ((IBuiltInRuleApp) app).tryToInstantiate(currGoal);
+            		app = app.tryToInstantiate(currGoal);
             	}                	
                 currGoal.apply(app);
                 children = currNode.childrenIterator();
@@ -455,7 +455,6 @@ public final class ProblemLoader implements Runnable {
                                throws BuiltInConstructionException {
 
     	IBuiltInRuleApp ourApp = null;
-        //PosInSequent posInSeq = null;
         PosInOccurrence pos = null;
 
         if (currFormula != 0) { // otherwise we have no pos
@@ -479,7 +478,7 @@ public final class ProblemLoader implements Runnable {
         			createApp(pos)).setContract(currContract);
             currContract = null;
             if(builtinIfInsts != null) {
-        	ourApp.setIfInsts(builtinIfInsts);
+                ourApp = ourApp.setIfInsts(builtinIfInsts);
         	builtinIfInsts = null;
             }
             return ourApp;

@@ -161,7 +161,7 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
         IBuiltInRuleApp app = rule.createApp(pio);
 		
 		if (!app.complete()) {
-		    app.setIfInsts(bir.ifInsts());	        
+		    app = app.setIfInsts(bir.ifInsts());	        
 			app = (AbstractBuiltInRuleApp) ((IBuiltInRuleApp)app).tryToInstantiate(goal);
 		}
 

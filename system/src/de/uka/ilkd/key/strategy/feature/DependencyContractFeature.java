@@ -49,7 +49,7 @@ public final class DependencyContractFeature extends BinaryFeature {
     protected boolean filter(RuleApp app,
 	    		     PosInOccurrence pos,
 	    		     Goal goal) {
-	final IBuiltInRuleApp bapp = (IBuiltInRuleApp) app; 
+	IBuiltInRuleApp bapp = (IBuiltInRuleApp) app; 
 	final Term focus = pos.subTerm();
 
 	//determine possible steps
@@ -68,7 +68,7 @@ public final class DependencyContractFeature extends BinaryFeature {
 	}
 	
 	//instantiate with arbitrary remaining step
-	bapp.setIfInsts(ImmutableSLList.<PosInOccurrence>nil()
+	bapp = bapp.setIfInsts(ImmutableSLList.<PosInOccurrence>nil()
 		        .prepend(steps.get(0)));
 	return true;
     }

@@ -496,7 +496,7 @@ public final class OneStepSimplifier implements BuiltInRule,
 		            + (inst.getNumAppliedRules() > 1 
 		               ? " rules" 
 		               : " rule"));
-	((DefaultBuiltInRuleApp)ruleApp).setIfInsts(inst.getIfInsts());
+	ruleApp = ((IBuiltInRuleApp)ruleApp).setIfInsts(inst.getIfInsts());
 	
 	return result;
     }

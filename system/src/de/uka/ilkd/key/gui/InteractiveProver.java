@@ -174,7 +174,7 @@ public class InteractiveProver {
     
     /** stops the execution of rules */
     public void stopAutoMode () {
-        worker.stop();
+        if (worker != null) worker.stop();
     }
     
     /**
