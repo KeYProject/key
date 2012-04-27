@@ -93,6 +93,7 @@ public class Main {
         UserInterface ui = null;
     	int index = 0;
         ProofSettings.DEFAULT_SETTINGS.setProfile(new JavaProfile());
+        String uiMode = "INTERACTIVE";
         while (opt.length > index) {
             if ((new File(opt[index])).exists()) {
                 fileNameOnStartUp=opt[index];
@@ -117,8 +118,7 @@ public class Main {
                     // is last option 
                     break; 
                 } else if (opt[index].startsWith("AUTO")) {
-                        BatchMode batch = new BatchMode(fileNameOnStartUp, opt[index].equals("AUTO_LOADONLY"));            
-            			ui = new ConsoleUserInterface(batch, VERBOSE_UI);
+                        uiMode = opt[index];
 				} else if (opt[index].equals("TIMEOUT")) {
                     long timeout = -1;
                     try {
@@ -155,7 +155,12 @@ public class Main {
         } else {
         	System.out.println("Not using assertions ...");	   
         }
-        if (ui == null) {
+        
+        if (uiMode.startsWith("AUTO")) {
+        	BatchMode batch = new BatchMode(fileNameOnStartUp, 
+        		uiMode.equals("AUTO_LOADONLY"));            
+        	ui = new ConsoleUserInterface(batch, VERBOSE_UI);
+        } else {
         	GuiUtilities.invokeAndWait(new Runnable() {
         		public void run() {
         			MainWindow.createInstance(getMainWindowTitle());  
