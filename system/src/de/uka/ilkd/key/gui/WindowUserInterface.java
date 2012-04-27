@@ -44,10 +44,10 @@ public class WindowUserInterface extends AbstractUserInterface {
 	}
 
 	public void loadProblem(File file, List<File> classPath,
-	        File bootClassPath, KeYMediator mediator) {
+	        File bootClassPath) {
 		mainWindow.addRecentFile(file.getAbsolutePath());
 		super.loadProblem(
-		        file, classPath, bootClassPath, mediator);
+		        file, classPath, bootClassPath, mainWindow.getMediator());
 	}
 
 	@Override
@@ -313,4 +313,13 @@ public class WindowUserInterface extends AbstractUserInterface {
 		}
 	}
 
+   @Override
+   public ProblemInitializer createProblemInitializer() {
+      ProblemInitializer pi = new ProblemInitializer(this, 
+                                                     mainWindow.getMediator().getProfile(), 
+                                                     new Services(mainWindow.getMediator().getExceptionHandler()), 
+                                                     true, 
+                                                     this);
+       return pi;
+   }
 }

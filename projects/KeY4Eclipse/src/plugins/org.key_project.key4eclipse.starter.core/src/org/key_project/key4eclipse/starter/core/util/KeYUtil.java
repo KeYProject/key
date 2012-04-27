@@ -239,7 +239,7 @@ public final class KeYUtil {
                         InitConfig alreadyLoadedConfig = getInitConfig(location); 
                         if (alreadyLoadedConfig != null) {
                             // Open proof management dialog
-                            ProofManagementDialog.showInstance(alreadyLoadedConfig);
+                            ProofManagementDialog.showInstance(MainWindow.getInstance().getMediator(), alreadyLoadedConfig);
                         }
                         else {
                             // Load local file
@@ -356,7 +356,7 @@ public final class KeYUtil {
                         ProgramMethod pm = getProgramMethod(method, initConfig.getServices().getJavaInfo());
                         Assert.isNotNull(pm, "Can't find method \"" + method + "\" in KeY.");
                         // Start proof by showing the proof management dialog
-                        ProofManagementDialog.showInstance(initConfig, pm.getContainerType(), pm);
+                        ProofManagementDialog.showInstance(MainWindow.getInstance().getMediator(), initConfig, pm.getContainerType(), pm);
                     }
                     catch (Exception e) {
                         setException(e);
@@ -398,10 +398,10 @@ public final class KeYUtil {
                     InitConfig initConfig = getInitConfig(location);
                     if (initConfig == null) {
                         // Load local file
-                        ProblemLoader loader = new ProblemLoader(location, main);
+                        ProblemLoader loader = new ProblemLoader(location, main.getMediator());
                         main.getRecentFiles().addRecentFile(location.getAbsolutePath());
                         EnvInput envInput = loader.createEnvInput(location, classPaths, bootClassPath);
-                        ProblemInitializer init = main.createProblemInitializer();
+                        ProblemInitializer init = main.getUserInterface().createProblemInitializer();
                         initConfig = init.prepare(envInput);
                     }
                     setResult(initConfig);

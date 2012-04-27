@@ -1,12 +1,14 @@
 package de.uka.ilkd.key.ui;
 
 import java.io.File;
+import java.util.List;
 
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.ApplyTacletDialogModel;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProblemInitializer.ProblemInitializerListener;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.ProgressMonitor;
@@ -52,6 +54,14 @@ public interface UserInterface extends ProblemInitializerListener,
 	 */
 	void loadProblem(File file);
 	
+	/**
+	 * loads the problem or proof from the given file
+	 * @param file the File with the problem description or the proof
+	 * @param classPath the class path entries to use.
+	 * @param bootClassPath the boot class path to use. 
+	 */
+	void loadProblem(File file, List<File> classPath, File bootClassPath);
+	
 	/** 
 	 * called to open the build in examples 
 	 */
@@ -64,6 +74,18 @@ public interface UserInterface extends ProblemInitializerListener,
 	 * @param services the Services
 	 * @return a complete app or null if no completion was possible
 	 */
-	RuleApp completeBuiltInRuleApp(RuleApp app, Goal goal, Services services);    
+	RuleApp completeBuiltInRuleApp(RuleApp app, Goal goal, Services services);
 
+	/**
+	 * <p>
+	 * Creates a new {@link ProblemInitializer} instance which is configured
+	 * for this {@link UserInterface}.
+	 * </p>
+	 * <p>
+	 * This method is used by nearly all Eclipse based product that
+	 * uses KeY.
+	 * </p>
+	 * @return The instantiated {@link ProblemInitializer}.
+	 */
+   ProblemInitializer createProblemInitializer();    
 }

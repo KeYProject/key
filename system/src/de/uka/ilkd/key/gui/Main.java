@@ -225,7 +225,16 @@ public class Main {
     public static String getExamplesDir() {
         return examplesDir;
     }
-
+    
+    /**
+     * Defines the examples directory. This method is used by the 
+     * Eclipse integration (KeY4Eclipse) to use the examples extract
+     * from the plug-in into the workspace.
+     * @param newExamplesDir The new examples directory to use.
+     */
+    public static void setExamplesDir(String newExamplesDir) {
+       examplesDir = newExamplesDir;
+    }
 
     /**
      * @return the statisticsFile
