@@ -247,7 +247,7 @@ public class ProofSaver {
          tree.append(")\n");
       }      
         
-      if (appliedRuleApp instanceof BuiltInRuleApp) {
+      if (appliedRuleApp instanceof AbstractBuiltInRuleApp) {
         tree.append(prefix); 
       	tree.append("(builtin \"");
       	tree.append(appliedRuleApp.rule().name().toString());

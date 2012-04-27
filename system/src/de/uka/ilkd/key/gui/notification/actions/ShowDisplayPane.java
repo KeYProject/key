@@ -13,7 +13,7 @@
  */
 package de.uka.ilkd.key.gui.notification.actions;
 
-import java.awt.Component;
+import java.awt.Frame;
 
 import de.uka.ilkd.key.gui.notification.NotificationAction;
 
@@ -28,13 +28,13 @@ public abstract class ShowDisplayPane implements NotificationAction {
      * the message to be displayed
      */
     private String message = "";
-    protected Component parentComponent;
+    protected Frame parentComponent;
     
     
     /**
      * creates an instance of this action kind
      */
-    public ShowDisplayPane(Component parentComponent) {
+    public ShowDisplayPane(Frame parentComponent) {
         this.parentComponent=parentComponent;
     }
     

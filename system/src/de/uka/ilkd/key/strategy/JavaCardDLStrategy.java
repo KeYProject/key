@@ -183,7 +183,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         if (queryProp.equals(StrategyProperties.QUERY_ON)) {
        	    queryF = querySpecFeature(new QueryExpandCost(200,2,0,false)); 
         } else if (queryProp.equals(StrategyProperties.QUERY_RESTRICTED)) {
-    	    queryF = querySpecFeature(new QueryExpandCost(200,1,20,false)); 
+        	// All tests in the example directory pass with this strategy. 
+        	//Hence, the old query_on strategy is obsolete.
+    	    queryF = querySpecFeature(new QueryExpandCost(200,1,20,false));  
         } else if (queryProp.equals(StrategyProperties.QUERY_OFF)) {
         	queryF = querySpecFeature(inftyConst());
         } else {
@@ -407,7 +409,13 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         	= strategyProperties.getProperty(
         			StrategyProperties.METHOD_OPTIONS_KEY);
         if (methProp.equals(StrategyProperties.METHOD_CONTRACT)) {
-            bindRuleSet(d, "method_expand", longConst(200));	
+        	/* If method treatment by contracts is chosen, this does not mean 
+        	 * that method expansion is disabled. The original cost was 200 
+        	 * and is now increased to 2000 in order to repress method expansion 
+        	 * stronger when method treatment by contracts is chosen. 
+        	 */
+            bindRuleSet(d, "method_expand", longConst(2000));   	
+        	//bindRuleSet(d, "method_expand", inftyConst()); //This seems to be more correct, but the then some proofs from the example directory do not work.
         } else if (methProp.equals(StrategyProperties.METHOD_EXPAND)) {
             bindRuleSet(d, "method_expand", longConst(100));	   
         } else if (methProp.equals(StrategyProperties.METHOD_NONE)) {

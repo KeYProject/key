@@ -30,8 +30,7 @@ public class ShowActiveTactletOptionsAction extends MainWindowAction {
     private void showActivatedChoices() {
         Proof currentProof = getMediator().getProof();
         if (currentProof == null) {
-            getMediator()
-            .notify(new GeneralInformationEvent("No Options available.",
+            mainWindow.notify(new GeneralInformationEvent("No Options available.",
                     "If you wish to see Taclet Options "
                     + "for a proof you have to load one first"));
         } else {

@@ -15,9 +15,7 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.FormulaTag;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.BuiltInRuleApp;
-import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.*;
 
 
 /**
@@ -158,11 +156,16 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
         final PosInOccurrence pio = getPosInOccurrence (goal);
         if(!strategy.isApprovedApp(bir, pio, goal)) {
             return null;
-        }
+        }                
         
         final BuiltInRule rule = bir.rule();
-        final ImmutableList<PosInOccurrence> ifInsts = bir.ifInsts();
-	
-        return new BuiltInRuleApp(rule, pio, ifInsts);
+        BuiltInRuleApp app = rule.createApp(pio);
+		app.setIfInsts(bir.ifInsts());
+		
+		if (!app.complete() && app instanceof AbstractContractRuleApp) {
+			app = ((AbstractContractRuleApp)app).tryToInstantiate(goal);
+		}
+
+		return app.complete() ? app : null;
     }
 }
