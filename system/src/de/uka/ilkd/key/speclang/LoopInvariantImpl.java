@@ -209,6 +209,16 @@ public final class LoopInvariantImpl implements LoopInvariant {
         return or.replace(originalVariant);
     }
     
+    @Override
+    public Term getInternalInvariant() {
+        return originalInvariant;
+    }
+
+    @Override
+    public Term getInternalVariant() {
+        return originalVariant;
+    }
+
     
     @Override
     public Term getInternalSelfTerm() {
