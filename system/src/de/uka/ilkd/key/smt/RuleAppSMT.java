@@ -119,7 +119,9 @@ public class RuleAppSMT extends AbstractBuiltInRuleApp {
 
     @Override
     public RuleAppSMT setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {
-        return new RuleAppSMT(rule, posInOccurrence(), ifInsts, title);
+        setMutable(ifInsts);
+        return this;
+       // return new RuleAppSMT(rule, posInOccurrence(), ifInsts, title);
     }
 
     @Override

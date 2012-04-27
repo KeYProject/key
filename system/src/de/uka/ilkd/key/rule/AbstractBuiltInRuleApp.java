@@ -11,7 +11,7 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
 	protected final BuiltInRule builtInRule;
 
 	protected final PosInOccurrence pio;
-	protected final ImmutableList<PosInOccurrence> ifInsts;
+	protected ImmutableList<PosInOccurrence> ifInsts;
 
 	protected AbstractBuiltInRuleApp(BuiltInRule rule,
             PosInOccurrence pio, ImmutableList<PosInOccurrence> ifInsts) {
@@ -24,6 +24,14 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
 	        PosInOccurrence pio) {
 	    this(rule, pio, null);
 	}
+	
+	/** HACK: but strategies do not work otherwise in the moment; I need to have a closer look on what is going on there 
+	 * This restores the behaviour as it was before my previous commit for the moment 
+	 */
+    public void setMutable(ImmutableList<PosInOccurrence> ifInsts) {
+        this.ifInsts = ifInsts;
+    }
+
 
     /**
      * returns the rule of this rule application

@@ -40,5 +40,6 @@ public abstract class AbstractContractRuleApp extends AbstractBuiltInRuleApp {
     	return super.complete() && pio != null && instantiation != null;
     }
 
+
     
 }

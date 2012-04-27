@@ -74,7 +74,9 @@ public class ContractRuleApp extends AbstractContractRuleApp {
 
     @Override
     public ContractRuleApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {
-        return new ContractRuleApp(builtInRule, pio, ifInsts, instantiation);
+        super.setMutable(ifInsts);
+        return this;
+        //return new ContractRuleApp(builtInRule, pio, ifInsts, instantiation);
     }
 
 }

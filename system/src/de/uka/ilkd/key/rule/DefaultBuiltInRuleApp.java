@@ -45,7 +45,9 @@ public class DefaultBuiltInRuleApp extends AbstractBuiltInRuleApp  {
 
     @Override
     public DefaultBuiltInRuleApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {
-        return new DefaultBuiltInRuleApp(builtInRule, pio, ifInsts);
+        setMutable(ifInsts);
+        return this;
+        //return new DefaultBuiltInRuleApp(builtInRule, pio, ifInsts);
     }
 
 }

@@ -126,7 +126,9 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
 
     @Override
     public UseDependencyContractApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {
-        return new UseDependencyContractApp(builtInRule, pio, ifInsts, instantiation, step);
+        setMutable(ifInsts);
+        return this;
+        //return new UseDependencyContractApp(builtInRule, pio, ifInsts, instantiation, step);
     }
 
 
