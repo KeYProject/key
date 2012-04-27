@@ -30,4 +30,13 @@ public class ExceptionHandlerException extends RuntimeException {
     public ExceptionHandlerException(Throwable ex) {
 	super(ex);
     }
+    
+    
+    public String getMessage() {
+    	return toString();
+    }
+    
+    public String toString() {
+    	return super.getMessage();
+    }
 }

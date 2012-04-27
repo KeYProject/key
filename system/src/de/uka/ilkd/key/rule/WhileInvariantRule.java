@@ -10,13 +10,9 @@
 
 package de.uka.ilkd.key.rule;
 
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Vector;
 
-import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
@@ -36,7 +32,6 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.WhileInvRule;
 import de.uka.ilkd.key.speclang.LoopInvariant;
@@ -523,5 +518,12 @@ public final class WhileInvariantRule implements BuiltInRule {
 	    this.selfTerm = selfTerm;
 	    this.innermostExecutionContext = innermostExecutionContext;
 	}
+    }
+
+
+
+	@Override
+    public DefaultBuiltInRuleApp createApp(PosInOccurrence pos) {
+	    return new DefaultBuiltInRuleApp(this, pos);
     }
 }

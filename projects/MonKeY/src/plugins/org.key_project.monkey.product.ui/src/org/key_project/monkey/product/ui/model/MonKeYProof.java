@@ -181,7 +181,7 @@ public class MonKeYProof extends Bean {
                        Assert.isTrue(MainWindow.hasInstance());
                        MainWindow main = MainWindow.getInstance();
                        Assert.isNotNull(main);
-                       ProblemInitializer init = main.createProblemInitializer();
+                       ProblemInitializer init = main.getUserInterface().createProblemInitializer();
                        Assert.isNotNull(init);
                        Proof proof = init.startProver(initConfig, input);
                        Assert.isNotNull(proof);

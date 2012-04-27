@@ -444,7 +444,7 @@ public final class JavaInfo {
     public KeYJavaType getKeYJavaType(String fullName) {
         KeYJavaType result = getPrimitiveKeYJavaType(fullName);
         return (result == null ?
-            (KeYJavaType)getTypeByClassName(fullName) :
+            (KeYJavaType)getKeYJavaTypeByClassName(fullName) :
             result);
     }
 
@@ -926,20 +926,19 @@ public final class JavaInfo {
      */
     public ProgramVariable getAttribute(String programName, 
             String qualifiedClassName) {
-	if (qualifiedClassName == null || qualifiedClassName.length() == 0) {
-            throw new IllegalArgumentException("Missing qualified classname");
-        }
-        KeYJavaType kjt = null;
-	try {
-	    kjt = getKeYJavaTypeByClassName(qualifiedClassName);
-	} catch (Exception e) {
-	    if (qualifiedClassName.endsWith("]")) {
-		readJavaBlock("{" + qualifiedClassName + " k;}");
-		kjt = getKeYJavaType(qualifiedClassName);
-	    }
-	}
-        return getAttribute(programName, 
-			    getKeYJavaTypeByClassName(qualifiedClassName));
+    	if (qualifiedClassName == null || qualifiedClassName.length() == 0) {
+    		throw new IllegalArgumentException("Missing qualified classname");
+    	}
+    	KeYJavaType kjt = null;
+    	try {
+    		kjt = getKeYJavaTypeByClassName(qualifiedClassName);
+    	} catch (Exception e) {
+    		if (qualifiedClassName.endsWith("]")) {
+    			readJavaBlock("{" + qualifiedClassName + " k;}");
+    			kjt = getKeYJavaType(qualifiedClassName);
+    		}
+    	}
+    	return getAttribute(programName, kjt);
     }
 
     

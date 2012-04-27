@@ -13,7 +13,7 @@ package de.uka.ilkd.key.strategy;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.BuiltInRuleApp;
+import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.Debug;
@@ -81,9 +81,9 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
 	    return TacletAppContainer.createAppContainers
 		( (NoPosTacletApp)p_app, p_pio, p_goal, p_strategy );
 
-	if ( p_app instanceof BuiltInRuleApp )
+	if ( p_app instanceof IBuiltInRuleApp )
 	    return BuiltInRuleAppContainer.createAppContainers
-		( (BuiltInRuleApp)p_app, p_pio, p_goal, p_strategy );
+		( (IBuiltInRuleApp)p_app, p_pio, p_goal, p_strategy );
 
 	Debug.fail ( "Unexpected kind of rule." );
 

@@ -72,7 +72,7 @@ public class KeYProgModelInfo{
      * @return a Set object containing the KeY-elements.
      */
 
-    public Set allElements(){
+    public Set<?> allElements(){
         return rec2key().elemsKeY();
     }
     

@@ -102,6 +102,7 @@ import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Node.NodeIterator;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
@@ -303,6 +304,11 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       private Map<Node, ISEDDebugNode> addToMapping = new HashMap<Node, ISEDDebugNode>();
 
       /**
+       * Maps the {@link Node} with branch conditions in KeY's proof tree to the {@link ISEDDebugNode} of the debugger where the {@link Node}s children should be added to.
+       */
+      private Map<Node, ISEDDebugNode> branchConditionAddToMapping = new HashMap<Node, ISEDDebugNode>();
+      
+      /**
        * Branch conditions ({@link ISEDBranchCondition}) are only applied to the 
        * debug model if they have at least one child. For this reason they are
        * added to the model in {@link #completeTree()} after the whole proof
@@ -328,40 +334,39 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       public void visit(Proof proof, Node visitedNode) {
          try {
             // Find the parent node (ISEDDebugNode) to that the debug model representation of the given KeY's proof tree node should be added.
-            ISEDDebugNode parentToAddTo;
-            Node parent = visitedNode.parent(); 
-            if (parent != null) {
-               parentToAddTo = addToMapping.get(parent);
-            }
-            else {
-               parentToAddTo = thread;
-            }
-            // Check if the current node has a branch condition which should be added to the debug model
-            boolean hasMultipleBranches = parent != null && parent.childrenCount() >= 2;
-            if (hasMultipleBranches && // Filter out branch conditions which don't split the tree. E.g. The number of applied rules during one step simplification
-                !(parentToAddTo instanceof ISEDThread) && // Ignore branch conditions before starting with code execution
-                hasBranchCondition(visitedNode) &&
-                !isInImplicitMethod(visitedNode)) { // Check if the child has a branch condition
-               if (!visitedNode.isClosed()) { // Filter out branches that are closed
-                  // Create branch condition
-                  ISEDBranchCondition condition = createBranchConditionNode(parentToAddTo, visitedNode.getNodeInfo());
-                  // Add branch condition to the branch condition attributes for later adding to the proof tree. This is required for instance to filter out branches after the symbolic execution has finished.
-                  List<ISEDBranchCondition> list = parentToBranchConditionMapping.get(parentToAddTo);
-                  if (list == null) {
-                     list = new LinkedList<ISEDBranchCondition>();
-                     branchConditionsStack.addFirst(new DefaultEntry<ISEDDebugNode, List<ISEDBranchCondition>>(parentToAddTo, list));
-                     parentToBranchConditionMapping.put(parentToAddTo, list);
-                  }
-                  list.add(condition);
-                  // Transform the current node into a debug node if possible
-                  parentToAddTo = analyzeNode(visitedNode, condition);
-                  addToMapping.put(visitedNode, parentToAddTo);
+            ISEDDebugNode parentToAddTo = branchConditionAddToMapping.get(visitedNode);
+            if (parentToAddTo == null) {
+               Node parent = visitedNode.parent(); 
+               if (parent != null) {
+                  parentToAddTo = addToMapping.get(parent);
+               }
+               else {
+                  parentToAddTo = thread;
                }
             }
-            else {
-               // No branch condition, transform the current node into a debug node if possible
-               parentToAddTo = analyzeNode(visitedNode, parentToAddTo);
-               addToMapping.put(visitedNode, parentToAddTo);
+            // transform the current node into a debug node if possible
+            parentToAddTo = analyzeNode(visitedNode, parentToAddTo);
+            addToMapping.put(visitedNode, parentToAddTo);
+            // Check if the current node has branch conditions which should be added to the debug model
+            if (!(parentToAddTo instanceof ISEDThread) && // Ignore branch conditions before starting with code execution
+                hasBranchCondition(visitedNode)) {
+               NodeIterator iter = visitedNode.childrenIterator();
+               while (iter.hasNext()) {
+                  Node childNode = iter.next();
+                  if (!visitedNode.isClosed()) { // Filter out branches that are closed
+                     // Create branch condition
+                     ISEDBranchCondition condition = createBranchConditionNode(parentToAddTo, childNode.getNodeInfo());
+                     // Add branch condition to the branch condition attributes for later adding to the proof tree. This is required for instance to filter out branches after the symbolic execution has finished.
+                     List<ISEDBranchCondition> list = parentToBranchConditionMapping.get(parentToAddTo);
+                     if (list == null) {
+                        list = new LinkedList<ISEDBranchCondition>();
+                        branchConditionsStack.addFirst(new DefaultEntry<ISEDDebugNode, List<ISEDBranchCondition>>(parentToAddTo, list));
+                        parentToBranchConditionMapping.put(parentToAddTo, list);
+                     }
+                     list.add(condition);
+                     branchConditionAddToMapping.put(childNode, condition);
+                  }
+               }
             }
          }
          catch (Exception e) {
@@ -540,22 +545,66 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
     * @return {@code true} is in implicit method, {@code false} is not in implicit method.
     */
    protected boolean isInImplicitMethod(Node node) {
-      return false; // TODO: Implement this method to filter out branch conditions
+      Node callNode = findMethodCallNode(node);
+      if (callNode != null) {
+         NodeInfo callInfo = callNode.getNodeInfo();
+         SourceElement callStatement = callInfo.getActiveStatement();
+         return !isMethodCallNode(callNode, callInfo, callStatement);
+      }
+      else {
+         return true;
+      }
    }
 
    /**
     * Checks if the given {@link Node} has a branch condition.
     * @param node The {@link Node} to check.
     * @return {@code true} has branch condition, {@code false} has no branch condition.
+    * @throws DebugException Occurred Exception
     */
-   protected boolean hasBranchCondition(Node node) {
-      NodeInfo info = node.getNodeInfo();
-      if (info != null) {
-         return !StringUtil.isEmpty(info.getBranchLabel());
+   protected boolean hasBranchCondition(Node node) throws DebugException {
+      if (node.childrenCount() >= 2) { // Check if it is a possible branch node, otherwise there is no need for complex computation to filter out not relevant branches
+         int openChildrenCount = 0;
+         NodeIterator childIter = node.childrenIterator();
+         while (childIter.hasNext()) {
+            Node child = childIter.next();
+            // Make sure that the branch is not closed
+            if (!child.isClosed()) {
+               // Check if the current method on stack is not an implicit method
+               Node nextSymbolicExecutionNode = searchLinearNextSymbolicExecutionNode(child);
+               if (!isInImplicitMethod(nextSymbolicExecutionNode)) { // Ignore branch conditions from implicit methods (requires runtime option eagerSplitting: on)
+                  openChildrenCount ++;
+               }
+            }
+         }
+         return openChildrenCount >= 2;
       }
       else {
          return false;
       }
+   }
+
+   /**
+    * Searches linear in the children of the given {@link Node} the
+    * first one which has a symbolic execution statement.
+    * @param node The {@link Node} to start search in.
+    * @return The found {@link Node} with the symbolic statement or {@code null} if no one was found.
+    * @throws DebugException Thrown {@link Exception} if the children branches before a symbolic statement was applied.
+    */
+   protected Node searchLinearNextSymbolicExecutionNode(Node node) throws DebugException {
+      while (node != null && node.getNodeInfo().getActiveStatement() == null) {
+         int childCount = node.childrenCount();
+         if (childCount == 0) {
+            node = null;
+         }
+         else if (childCount == 1) {
+            node = node.child(0);
+         }
+         else {
+            throw new DebugException(LogUtil.getLogger().createErrorStatus("Assumption that after a split a symoblic execution is done before a branch occurre does not hold."));
+         }
+      }
+      return node;
    }
 
    /**
@@ -713,6 +762,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
     * @return The created {@link ISEDMethodCall}.
     * @throws DebugException Occurred Exception.
     */
+   // TODO: Return value can be unknown in SET, e.g. quotient in TryCatchFinally test
    protected ISEDMethodReturn createMethodReturnNode(ISEDDebugNode parent, 
                                                      Node node, 
                                                      SourceElement statement, 

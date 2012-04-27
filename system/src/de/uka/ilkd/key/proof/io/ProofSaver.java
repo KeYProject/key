@@ -247,7 +247,7 @@ public class ProofSaver {
          tree.append(")\n");
       }      
         
-      if (appliedRuleApp instanceof BuiltInRuleApp) {
+      if (appliedRuleApp instanceof IBuiltInRuleApp) {
         tree.append(prefix); 
       	tree.append("(builtin \"");
       	tree.append(appliedRuleApp.rule().name().toString());
@@ -256,7 +256,7 @@ public class ProofSaver {
                                           appliedRuleApp.posInOccurrence()));
         tree.append(newNames2Proof(node));
         tree.append(builtinRuleIfInsts(node, 
-        	                       ((BuiltInRuleApp)appliedRuleApp).ifInsts()));
+        	                       ((IBuiltInRuleApp)appliedRuleApp).ifInsts()));
 
         if (appliedRuleApp.rule() instanceof UseOperationContractRule 
             || appliedRuleApp.rule() instanceof UseDependencyContractRule) {

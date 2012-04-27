@@ -163,7 +163,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
                         throw new CoreException(LogUtil.getLogger().createErrorStatus("Contract of class \"" + contract.getClass().getCanonicalName() + "\" are not supported."));
 //                        input = contract.createProofObl(initConfig, contract);                        
                     }
-                    ProblemInitializer init = main.createProblemInitializer();
+                    ProblemInitializer init = main.getUserInterface().createProblemInitializer();
                     Proof proof = init.startProver(initConfig, input);
                     setResult(proof);
                 }

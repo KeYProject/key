@@ -7,7 +7,6 @@ import java.util.WeakHashMap;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
@@ -20,7 +19,6 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.VariableNameProposer;
 
 
@@ -533,6 +531,11 @@ public class QueryExpand implements BuiltInRule {
     	}
     	return timeOfTerm.get(t);
     	
+    }
+
+	@Override
+    public DefaultBuiltInRuleApp createApp(PosInOccurrence pos) {
+	    return new DefaultBuiltInRuleApp(this, pos);
     }
     
 

@@ -24,6 +24,11 @@ public class GeneralFailureEvent extends NotificationEvent {
 
     private String errorMessage = "Unknown Error.";
     
+    
+    protected GeneralFailureEvent(int id) {
+        super(id);
+    }
+
     /**
      * creates an instance of this event
      * @param errorMessage a String describing the failure
@@ -33,6 +38,7 @@ public class GeneralFailureEvent extends NotificationEvent {
         this.errorMessage = errorMessage;
     }
     
+
     /**
      * @return the error message describing the reason for
      * this event    
