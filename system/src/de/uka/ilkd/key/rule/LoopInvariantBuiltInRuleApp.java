@@ -70,8 +70,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     @Override
     public LoopInvariantBuiltInRuleApp replacePos(PosInOccurrence newPos) {
-        return new LoopInvariantBuiltInRuleApp(builtInRule, newPos, ifInsts,
-                inv);
+        return new LoopInvariantBuiltInRuleApp(builtInRule, newPos, ifInsts, inv);
     }
 
     public LoopInvariant retrieveLoopInvariantFromSpecification(
@@ -98,8 +97,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
         if (inv != null) {
             return this;
         }
-        final Services services = goal.proof().getServices();
-        final LoopInvariant inv = retrieveLoopInvariantFromSpecification(services);
+        final LoopInvariant inv = retrieveLoopInvariantFromSpecification(goal.proof().getServices());
 
         if (inv == null) {
             return this;
