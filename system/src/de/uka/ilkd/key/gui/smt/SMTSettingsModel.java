@@ -103,6 +103,7 @@ class GeneralOptions extends TablePanel{
         private JComboBox        progressModeBox;
         private JTextField       maxProcesses;
         private JTextField       timeoutField;
+        private JCheckBox  solverSupportCheck;
         private final ProofIndependentSMTSettings settings;
         
         public final static String PROGRESS_MODE_USER = "Progress dialog remains open after executing solvers.";
@@ -130,12 +131,10 @@ class GeneralOptions extends TablePanel{
                         + "2. Option: The progress dialog is closed once the "
                         + "external provers have done their work or the time limit "
                         + "has been exceeded.\n";// +
-        // "\n"+
-        // "3. Option: The progress dialog is closed once the first "
-        // +
-        // "external prover has successfully solved all given goals "
-        // +
-        // "or the time limit has been exceeded.";;
+        private static final String infoCheckForSupport = "If this option is activated, each time before a solver is started" +
+        		" it is checked whether the version of that solver is supported. If the version is not supported, a warning is" +
+        		" presented in the progress dialog.";
+
         private final static String infoMaxProcesses = "Maximal number or processes that are allowed to run concurrently.";;
         private final static String infoTimeoutField = "Timeout for the external solvers in seconds. Fractions of a second are allowed.\n"
                         + "Example: 6.5";;
@@ -153,6 +152,7 @@ class GeneralOptions extends TablePanel{
                 getProgressModeBox();
                 getTimeoutField();
                 getMaxProcesses();
+                getSolverSupportCheck();
                 
         }
         
@@ -215,6 +215,21 @@ class GeneralOptions extends TablePanel{
                 return progressModeBox;
         }
 
+        public JCheckBox getSolverSupportCheck() {
+        	if(solverSupportCheck == null){
+        	      solverSupportCheck = addCheckBox("Check for support when a solver is started.",
+                                         infoCheckForSupport,
+                                         settings.checkForSupport
+                                         , new ActionListener() {
+                                                 @Override
+                                                 public void actionPerformed(ActionEvent e) {
+                                                       settings.checkForSupport = solverSupportCheck.isSelected(); 
+                                                 }
+                                         });
+        	}    
+                      	
+        	return solverSupportCheck;
+		}
         
         
         public FileChooserPanel getSaveToFilePanel() {
@@ -258,7 +273,11 @@ class SolverOptions extends TablePanel{
         private JTextField solverCommand;
         private JTextField solverParameters;
         private JTextField solverInstalled;
+        private JTextField solverSupported;
         private JButton    toDefaultButton;
+
+        
+        private JButton    checkForSupportButton;
         
         private final SolverType solverType; 
         private final ProofIndependentSMTSettings settings;
@@ -268,19 +287,31 @@ class SolverOptions extends TablePanel{
         private static final String infoSolverName =
         "There are two ways to make supported provers applicable for KeY:\n"
         + "1. Specify the absolute path of the prover in the field 'Command'.\n"
-        + "2. Change the enviroment variable $PATH of your system, so that it "
+        + "2. Change the environment variable $PATH of your system, so that it "
         + "refers to the installed prover. In that case you must specify the name of the solver in 'Command'";
         
-        private static final String infoSolverParameters ="Editing the start command:\n"
-                        + "Specify the start command for an external procedure in such a way that it can be executed "
-                        + "to solve a problem file. Feel free to use any parameter to finetune the program.\n\n"
-                        + "Use %f as placeholder for the filename containing the problemdescription.\n\n"
-                        + "Use %p as placeholder for the problem directly. This should be needed in special cases only.";
+        private static final String infoSolverParameters ="In this field you can specify which parameters are passed to the " +
+        		"solver when the solver is started. Note that the default parameters are crucial for a stable run of the" +
+        		"solver.";
         private static final String infoSolverCommand ="The command for the solver.\n\n" +
         		"Either you specify the absolute path of your solver or just the command for starting it.\n" +
         		"In the latter case you have to modify the PATH-variable of your system.\n" +
         		"Please note that you also have to specify the filename extension\n" +
         		"For example: z3.exe";
+        
+        private static final String infoSolverSupport = "For the KeY system only some particular versions of this solver " +
+        		"have been tested. It is highly recommended to use those versions, because otherwise it is not guaranteed that " +
+        		"the connection to this solver is stable.\n\n" +
+        		"If you want to check whether the installed solver is supported, please click on the button below.\n\n";
+        
+
+        
+        private static final String solverSupportText[] = {"Version of solver is supported.",
+        	"Version of solver may not be supported.",
+      "Support has not been checked, yet."};
+        private static final int SOLVER_SUPPORTED = 0;
+        private static final int SOLVER_NOT_SUPPOTED = 1;
+        private static final int SOLVER_SUPPORT_NOT_CHECKED = 2;
 
         public SolverOptions(SolverType solverType,ProofIndependentSMTSettings settings) {
                 super();
@@ -299,6 +330,9 @@ class SolverOptions extends TablePanel{
         @Override
         protected void updateOptions() {
                 getSolverInstalled().setText(Boolean.toString(solverType.isInstalled(true)));
+                if(checkForSupportButton != null){
+                	checkForSupportButton.setEnabled(solverType.isInstalled(false));
+                }
         }
 
 
@@ -308,30 +342,77 @@ class SolverOptions extends TablePanel{
                 getSolverInstalled();
                 getSolverCommand();
                 getSolverParameters();
-                getToDefaultButton();
+                getSolverSupported();
+                createButtons();
                 
                
         }
         
 
-        public JButton getToDefaultButton() {
-            if(toDefaultButton == null){
-                toDefaultButton = new JButton("Set parameters to default.");
-                Box box= addComponent(toDefaultButton, null);
+        
+        
+        public void createButtons() {
+                 toDefaultButton = new JButton("Set parameters to default.");
+       
                 toDefaultButton.addActionListener(new ActionListener() {
                     
                     @Override
                     public void actionPerformed(ActionEvent arg0) {
                         getSolverParameters().setText(solverType.getDefaultSolverParameters());
                         settings.setParameters(solverType, solverParameters.getText());  
-                        
+                      
                     }
                 });
+                
+            
+                checkForSupportButton = new JButton("Check for support.");
+                checkForSupportButton.addActionListener(new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent arg0) {
+						solverType.checkForSupport();
+						getSolverSupported().setText(getSolverSupportText());
+					}
+				}); 
+                checkForSupportButton.setEnabled(solverType.isInstalled(false));
+
+                Box box  = addComponent(null,toDefaultButton,checkForSupportButton);
+                
                 box.add(Box.createHorizontalGlue());
-            }
-              
-            return toDefaultButton;
+            
+                
         }
+        
+
+        
+        private String createSupportedVersionText(){
+        	String [] versions =solverType.getSupportedVersions();
+        	String result = versions.length>1 ? "The following versions are supported: " :	
+        			"The following version is supported: ";
+        	for(int i=0; i < versions.length; i++){
+        		result += versions[i];
+        		result += i<versions.length-1 ? ", ":"";
+        	}
+        	return result;
+        }
+        
+        private String getSolverSupportText(){
+        	if(solverType.supportHasBeenChecked()){
+        		 return solverType.isSupportedVersion() ? solverSupportText[SOLVER_SUPPORTED] : solverSupportText[SOLVER_NOT_SUPPOTED];
+        	}else{
+        		return solverSupportText[SOLVER_SUPPORT_NOT_CHECKED];
+        	}
+        }
+        
+        public JTextField getSolverSupported() {
+            if(solverSupported == null){
+                solverSupported = addTextField("Support",minWidthOfTitle,getSolverSupportText(),
+                		infoSolverSupport+createSupportedVersionText(),null);
+                solverSupported.setEditable(false);
+                
+            }
+			return solverSupported;
+		}
 
         
         public JTextField getSolverParameters() {
@@ -685,7 +766,7 @@ class TranslationOptions extends TablePanel{
                         box.add(createTitledComponent("Minimum:",minWidthOfTitle, minField));
                         
                         
-                        addComponent(box, infoUseConstantsForIntegers);
+                        addComponent(infoUseConstantsForIntegers,box);
                 }
                 return useConstantsForIntegers;
        }

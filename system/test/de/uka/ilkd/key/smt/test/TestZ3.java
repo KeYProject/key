@@ -21,15 +21,24 @@ public class TestZ3 extends TestSMTSolver {
     
     @Override
     public boolean toolNotInstalled() {
-	if (!installChecked) {    
-	    isInstalled = getSolverType().isInstalled(true);
-	    installChecked = true;
-	    if(!isInstalled) {
-		System.out.println("Warning: " + getSolverType().getName() + " is not installed, tests skipped.");
-	    }	    
-	}
-	
-        return false;
+    	if (!installChecked) {    
+    		isInstalled = getSolverType().isInstalled(true);
+    		installChecked = true;
+    		if(!isInstalled) {
+    			System.out.println("Warning: " + getSolverType().getName() + " is not installed, tests skipped.");
+    		}	  
+    		
+    		if(isInstalled &&!getSolverType().supportHasBeenChecked()){
+    			if(!getSolverType().checkForSupport()){
+    				System.out.println("Warning: " + "The version of the solver "+ getSolverType().getName() + " used for the following tests may not be supported.");
+    			}    			
+    		}
+    	}
+
+    	
+    	
+
+        return !isInstalled;
     }
     
     @Override

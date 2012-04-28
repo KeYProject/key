@@ -199,6 +199,11 @@ public class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings{
 			return "AUFLIA";
 		}
 
+		@Override
+		public boolean checkForSupport() {
+			return piSettings.checkForSupport;
+		}
+
         
 
         

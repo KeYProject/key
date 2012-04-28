@@ -14,6 +14,7 @@ import java.awt.Color;
 import java.io.*;
 import java.util.*;
 
+import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
 
@@ -150,7 +151,9 @@ public class SolverListener implements SolverLauncherListener {
 
                 }
                 if (!problemsWithException.isEmpty()) {
-                      progressDialog.setAdditionalInformation("Exception for...", Color.RED,problemsWithException);
+                	 for(InternSMTProblem problem : problemsWithException){
+                		progressDialog.addInformation("Exception for "+problem.toString()+".", Color.RED,problem);
+                	 }
                 } else {
                         if (settings.getModeOfProgressDialog() == ProofIndependentSMTSettings.PROGRESS_MODE_CLOSE) {
                                 applyEvent(launcher);
@@ -256,19 +259,34 @@ public class SolverListener implements SolverLauncherListener {
 
                         @Override
                         public void additionalInformationChosen(Object obj) {
-                              showInformation((InternSMTProblem)obj);                                
+                        	  if(obj instanceof String){
+                        		  JOptionPane.showOptionDialog(progressDialog,
+                                          obj,
+                                          "Warning",
+                                          JOptionPane.DEFAULT_OPTION,
+                                          JOptionPane.WARNING_MESSAGE,
+                                          null,
+                                          null,
+                                          null);
+                          	  }else if(obj instanceof InternSMTProblem){
+                        		  showInformation((InternSMTProblem)obj);   
+                        	  }
                         }
                 };
                 
                
                 
-                
-
-                 
+                    
 
                 progressDialog = new ProgressDialog(
                                 progressModel,listener,RESOLUTION,smtproblems.size()*solverTypes.size(), new String[] {}, titles);
 
+                for(SolverType type : solverTypes){
+                	if(type.supportHasBeenChecked() && !type.isSupportedVersion()){
+                		addWarning(type);
+                	}
+                }
+         
                 SwingUtilities.invokeLater(new Runnable() {
 
                         @Override
@@ -279,7 +297,9 @@ public class SolverListener implements SolverLauncherListener {
 
         }
         
-        private InternSMTProblem getProblem(int col,int row){
+       
+
+		private InternSMTProblem getProblem(int col,int row){
                 for(InternSMTProblem problem : problems){
                         if(problem.problemIndex == row && problem.solverIndex == col){
                                 return problem;
@@ -308,6 +328,7 @@ public class SolverListener implements SolverLauncherListener {
                         final Collection<SolverType> solverTypes,
                         final SolverLauncher launcher) {
                 prepareDialog(smtproblems, solverTypes, launcher);
+               
                 setProgressText(0);
                 timer.schedule(new TimerTask() {
                         @Override
@@ -534,6 +555,25 @@ public class SolverListener implements SolverLauncherListener {
 
                 return path;
         }
+
+		
+		public void addWarning(SolverType type) {
+			String message = "You are using a version of "+type.getName()+
+					         " which has not been tested for this version of KeY.\nIt can therefore be that" +
+					         " errors occur that would not occur\nusing " +
+					         (type.getSupportedVersions().length > 1 ? 
+					         "one of the following versions:\n" :
+					        	 "the following version:\n");		
+				for(String version : type.getSupportedVersions()){
+					message += version;
+				}
+			
+			
+			progressDialog.addInformation("Warning: Your version of "+type.toString()+" may not be supported by KeY.", Color.ORANGE,message);			
+				
+		
+		}
+	
 
 
 }
