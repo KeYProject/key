@@ -1,22 +1,17 @@
 package de.uka.ilkd.key.gui;
 
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.parser.DefaultTermParser;
-import de.uka.ilkd.key.proof.io.ProofSaver;
-import de.uka.ilkd.key.rule.RuleAbortException;
-import de.uka.ilkd.key.speclang.LoopInvariant;
-import de.uka.ilkd.key.speclang.LoopInvariantImpl;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -32,10 +27,18 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
+
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.java.PrettyPrinter;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.statement.LoopStatement;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
-import java.awt.Color;
-import java.io.StringReader;
-import java.io.StringWriter;
+import de.uka.ilkd.key.parser.DefaultTermParser;
+import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.rule.RuleAbortException;
+import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.speclang.LoopInvariantImpl;
 
 /**
  * @author Dreiner
@@ -112,7 +115,6 @@ public class InvariantConfigurator {
             private final String INVARIANTTITLE = "Invariant: ";
             private final String VARIANTTITLE = "Variant: ";
             private final String MODIFIESTITLE = "Modifies: ";
-            private final Dimension SIZE = new Dimension(500,400);
 
 
             /**
@@ -135,26 +137,34 @@ public class InvariantConfigurator {
 
                 inputPane = new JTabbedPane();
                 initInputPane();
+                
+                
 
+                                
                 JTextArea loopRep = initLoopPresentation();
                 JPanel leftPanel = new JPanel();
                 leftPanel.setLayout(new BorderLayout());
                 leftPanel.add(new JSplitPane(JSplitPane.VERTICAL_SPLIT,
                         new JScrollPane(loopRep), new JScrollPane(errorPanel)));
 
+                final int charXWidth = loopRep.getFontMetrics(loopRep.getFont()).charWidth('X');
+                final int fontHeight = loopRep.getFontMetrics(loopRep.getFont()).getHeight();
+                leftPanel.setMinimumSize(new Dimension(charXWidth * 25, fontHeight * 10));
+                leftPanel.setPreferredSize(new Dimension(charXWidth * 40, fontHeight * 15));
+                
                 JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
                         true, leftPanel, inputPane);
 
                 getContentPane().add(split, BorderLayout.CENTER);
 
+                split.setDividerLocation(0.7);
+                
                 // Add the buttons
                 JPanel buttonPanel = new JPanel();
                 initButtonPanel(buttonPanel);
                 getContentPane().add(buttonPanel, BorderLayout.SOUTH);
 
                 
-                setPreferredSize(SIZE);
-                setMinimumSize(SIZE);
                 setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
                 
                 parse();
@@ -233,7 +243,7 @@ public class InvariantConfigurator {
                 if (invariant == null) {
                     loopInvStr[0] = "true";
                 } else {
-                    loopInvStr[0] = printTerm(invariant);
+                    loopInvStr[0] = printTerm(invariant, true);
                 }
 
                 final Term modifies = loopInv.getModifies(loopInv.getInternalSelfTerm(), loopInv
@@ -242,15 +252,16 @@ public class InvariantConfigurator {
                 if (modifies == null) {
                     loopInvStr[1] = "allLocs";
                 } else {
-                    loopInvStr[1] = printTerm(modifies);
+                    // pretty syntax cannot be parsed yet for modifies
+                    loopInvStr[1] = printTerm(modifies, false);
                 }
 
                 final Term variant = loopInv.getVariant(loopInv.getInternalSelfTerm(), loopInv
                         .getInternalHeapAtPre(), services);
                 if (variant == null) {
                     loopInvStr[2] = "";
-                } else {
-                    loopInvStr[2] = printTerm(variant);
+                } else {                    
+                    loopInvStr[2] = printTerm(variant, true);
                 }
 
                 if (!mapLoopsToInvariants.containsKey(loopInv.getLoop())) {
@@ -280,8 +291,8 @@ public class InvariantConfigurator {
              * @param t
              * @return the String Representation of the Term
              */
-            private String printTerm(Term t) {                
-                return ProofSaver.printTerm(t, services, true).toString();
+            private String printTerm(Term t, boolean pretty) {                
+                return ProofSaver.printTerm(t, services, pretty).toString();
 
             }
 
@@ -299,7 +310,16 @@ public class InvariantConfigurator {
                 panel.add(modarea);
                 panel.add(vararea);
 
-                return new JScrollPane(panel);
+                JScrollPane rightPane = new JScrollPane(panel);;
+                
+                final int charXWidth = invarea.getFontMetrics(invarea.getFont()).charWidth('X');
+                final int fontHeight = invarea.getFontMetrics(invarea.getFont()).getHeight();
+                
+                rightPane.setMinimumSize(new Dimension(charXWidth * 72, fontHeight * 15));
+                rightPane.setPreferredSize(new Dimension(charXWidth * 80, fontHeight * 20));
+
+                
+                return rightPane;
 
             }
 
