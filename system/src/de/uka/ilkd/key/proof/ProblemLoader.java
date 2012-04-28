@@ -415,9 +415,9 @@ public final class ProblemLoader implements Runnable {
             break;
         case 'n' :
             try {
-            	BuiltInRuleApp app = constructBuiltinApp();
+                IBuiltInRuleApp app = constructBuiltinApp();
             	if (!app.complete()) {
-            		app = ((AbstractContractRuleApp) app).tryToInstantiate(currGoal);
+            		app = app.tryToInstantiate(currGoal);
             	}                	
                 currGoal.apply(app);
                 children = currNode.childrenIterator();
@@ -451,11 +451,10 @@ public final class ProblemLoader implements Runnable {
      *
      * @return current rule application for updateSimplification
      */
-    private BuiltInRuleApp constructBuiltinApp()
+    private IBuiltInRuleApp constructBuiltinApp()
                                throws BuiltInConstructionException {
 
-    	BuiltInRuleApp ourApp = null;
-        //PosInSequent posInSeq = null;
+    	IBuiltInRuleApp ourApp = null;
         PosInOccurrence pos = null;
 
         if (currFormula != 0) { // otherwise we have no pos
@@ -479,13 +478,13 @@ public final class ProblemLoader implements Runnable {
         			createApp(pos)).setContract(currContract);
             currContract = null;
             if(builtinIfInsts != null) {
-        	ourApp.setIfInsts(builtinIfInsts);
+                ourApp = ourApp.setIfInsts(builtinIfInsts);
         	builtinIfInsts = null;
             }
             return ourApp;
         }
 
-        final ImmutableSet<RuleApp> ruleApps =
+        final ImmutableSet<IBuiltInRuleApp> ruleApps =
             mediator.getBuiltInRuleApplications(currTacletName, pos);
 
         if (ruleApps.size() != 1) {
@@ -502,7 +501,7 @@ public final class ProblemLoader implements Runnable {
                     "@ " + pos);
             }
         }
-        ourApp = (BuiltInRuleApp) ruleApps.iterator().next();
+        ourApp = (IBuiltInRuleApp) ruleApps.iterator().next();
         builtinIfInsts = null;
         return ourApp;
     }

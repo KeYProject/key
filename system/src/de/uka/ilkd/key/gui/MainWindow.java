@@ -1017,7 +1017,6 @@ public final class MainWindow extends JFrame  {
         return proof;
     }
     
-
     
     /**
      * The progress monitor that displays a progress bar in a corner of the main window.

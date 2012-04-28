@@ -16,4 +16,6 @@ public interface BuiltInRuleMenuItem {
 
     BuiltInRule connectedTo();
 
+    boolean forcedApplication();
+
 }

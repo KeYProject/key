@@ -356,7 +356,7 @@ public class KeYMediator {
      * @return
      * 				a SetOf<RuleApp> with all possible applications of the rule
      */
-    public ImmutableSet<RuleApp> getBuiltInRuleApplications(String name, PosInOccurrence pos)
+    public ImmutableSet<IBuiltInRuleApp> getBuiltInRuleApplications(String name, PosInOccurrence pos)
     {
     	return interactiveProver.getBuiltInRuleAppsForName(name, pos);
     }
@@ -437,12 +437,15 @@ public class KeYMediator {
      * @param rule the selected built-in rule
      * @param pos the PosInSequent describes the position where to apply the
      * rule 
+     * @param forced a boolean indicating that if the rule is complete or can be made complete
+     * automatically then the rule should be applied automatically without asking the user at all
+     * (e.g. if a loop invariant is available do not ask the user to provide one)
      */
-    public void selectedBuiltInRule(BuiltInRule rule, PosInOccurrence pos) {
+    public void selectedBuiltInRule(BuiltInRule rule, PosInOccurrence pos, boolean forced) {
     	Goal goal = keySelectionModel.getSelectedGoal();
     	assert goal != null;
 
-    	ImmutableSet<RuleApp> set = interactiveProver.
+    	ImmutableSet<IBuiltInRuleApp> set = interactiveProver.
     			getBuiltInRuleApp(rule, pos);
     	if (set.size() > 1) {
     		System.err.println("keymediator:: Expected a single app. If " +
@@ -453,10 +456,10 @@ public class KeYMediator {
     				"taking the first in list.");
     	}
     	
-    	RuleApp app = set.iterator().next();
+    	IBuiltInRuleApp app = set.iterator().next();
 
     	if (!app.complete()) {    		
-    		app = ui.completeBuiltInRuleApp(app, goal, goal.proof().getServices());
+    		app = ui.completeBuiltInRuleApp(app, goal, forced);
     	}
     	
     	if (app != null && app.rule() == rule) {

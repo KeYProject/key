@@ -39,8 +39,8 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 
-
 public final class WhileInvariantRule implements BuiltInRule {
+
 
     public static final WhileInvariantRule INSTANCE = new WhileInvariantRule();
 
@@ -63,8 +63,11 @@ public final class WhileInvariantRule implements BuiltInRule {
     //internal methods
     //-------------------------------------------------------------------------
     
-    private Instantiation instantiate(Term focusTerm, Services services) {
-	if(focusTerm == lastFocusTerm
+    private Instantiation instantiate(LoopInvariantBuiltInRuleApp app, Services services) throws RuleAbortException {
+	
+    Term focusTerm = app.posInOccurrence().subTerm();
+        
+    if(focusTerm == lastFocusTerm
 	   && lastInstantiation.inv 
 	       == services.getSpecificationRepository()
 	                  .getLoopInvariant(lastInstantiation.loop)) {
@@ -72,44 +75,21 @@ public final class WhileInvariantRule implements BuiltInRule {
 	}
 
 	//leading update?
-	final Term u;
-	final Term progPost;
-	if(focusTerm.op() instanceof UpdateApplication) {
-	    u = UpdateApplication.getUpdate(focusTerm);
-	    progPost = UpdateApplication.getTarget(focusTerm);
-	} else {
-	    u = TB.skip();
-	    progPost = focusTerm;
-	}
+	Pair<Term, Term> update = applyUpdates(focusTerm);
+	final Term u        = update.first;
+	final Term progPost = update.second;
 
 	//focus (below update) must be modality term
-	if(progPost.op() != Modality.BOX && progPost.op() != Modality.DIA
-	    && progPost.op() != Modality.BOX_TRANSACTION && progPost.op() != Modality.DIA_TRANSACTION) {
+	if (!checkFocus(progPost)) {
 	    return null;
 	}
 
 	//active statement must be while loop
-	SourceElement activeStatement 
-		= MiscTools.getActiveStatement(progPost.javaBlock());
-	if(!(activeStatement instanceof While)) {
-	    return null;
-	}
-	final While loop = (While) activeStatement;
-
-	//an invariant must be present for the loop
-	final LoopInvariant inv 
-		= services.getSpecificationRepository().getLoopInvariant(loop);
-	if(inv == null 
-           || inv.getInvariant(inv.getInternalSelfTerm(), 
-        	   	       inv.getInternalHeapAtPre(), null, 
-			       services) == null
-	   || (progPost.op() == Modality.DIA 
-	       && inv.getVariant(inv.getInternalSelfTerm(), 
-		       		 inv.getInternalHeapAtPre(), 
-		       		 services) == null)) {
-	    return null;
-	}
-
+	final While loop = (While) app.getLoopStatement();
+	
+	// try to get invariant from JML specification
+	LoopInvariant inv = app.getInvariant(); 
+         
 	//collect self, execution context
 	final MethodFrame innermostMethodFrame 
 		= MiscTools.getInnermostMethodFrame(progPost.javaBlock(), 
@@ -135,6 +115,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 	lastInstantiation = result;
 	return result;
     }
+
 
     
     /**
@@ -181,7 +162,10 @@ public final class WhileInvariantRule implements BuiltInRule {
 	return new Pair<Term,Term>(anonUpdate, anonHeapTerm);
     }
     
-    
+    private static boolean checkFocus(final Term progPost) {
+        // focus (below update) must be modality term
+        return progPost.op() instanceof Modality;
+    }
     
     //-------------------------------------------------------------------------
     //public interface
@@ -189,30 +173,52 @@ public final class WhileInvariantRule implements BuiltInRule {
 
     @Override
     public boolean isApplicable(Goal goal, 
-	    			PosInOccurrence pio) {
-	//focus must be top level succedent
-	if(pio == null || !pio.isTopLevel() || pio.isInAntec()) {
-	    return false;
-	}
-
-	//instantiation must succeed
-	Instantiation inst = instantiate(pio.subTerm(), 
-		                         goal.proof().getServices());
-	return inst != null;
+            PosInOccurrence pio) {
+        return checkApplicability(goal,pio);
     }
 
+    //focus must be top level succedent
+    static boolean checkApplicability (Goal g, PosInOccurrence pio){
+        if (pio == null || !pio.isTopLevel() || pio.isInAntec())
+            return false;
+
+        Pair<Term, Term> up = applyUpdates(pio.subTerm());
+        final Term progPost = up.second;
+
+        if (!checkFocus(progPost)) {
+            return false;
+        }
+
+        // active statement must be while loop
+        SourceElement activeStatement = MiscTools
+        .getActiveStatement(progPost.javaBlock());
+        if (!(activeStatement instanceof While)) {
+            return false;
+        }
+        return true;
+    }
     
+
+    static Pair<Term, Term> applyUpdates(Term focusTerm) {
+        if (focusTerm.op() instanceof UpdateApplication) {
+            return new Pair<Term, Term>(UpdateApplication.getUpdate(focusTerm),
+                    UpdateApplication.getTarget(focusTerm));
+        } else {
+            return new Pair<Term, Term>(TB.skip(), focusTerm);
+        }
+    }
+
     @Override
-    public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
+    public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) throws RuleAbortException {
 	final KeYJavaType booleanKJT = services.getTypeConverter()
 	                                       .getBooleanType();
 	final KeYJavaType intKJT 
 		= services.getJavaInfo()
 	                  .getPrimitiveKeYJavaType(PrimitiveType.JAVA_INT);
 	//get instantiation
-	Instantiation inst = instantiate(ruleApp.posInOccurrence().subTerm(), 
-				         services);
-    final boolean transaction = (inst.progPost.op() == Modality.DIA_TRANSACTION || inst.progPost.op() == Modality.BOX_TRANSACTION); 
+	Instantiation inst = instantiate((LoopInvariantBuiltInRuleApp) ruleApp, services);	
+	
+    final boolean transaction = ((Modality)inst.progPost.op()).transaction(); 
 
     final Term heapAtMethodPre = inst.inv.getInternalHeapAtPre();
     final Term savedHeapAtMethodPre = inst.inv.getInternalSavedHeapAtPre();
@@ -319,7 +325,8 @@ public final class WhileInvariantRule implements BuiltInRule {
 	final LocationVariable variantPV = new LocationVariable(variantName, 
 								intKJT);
 	services.getNamespaces().programVariables().addSafely(variantPV);
-	final boolean dia = (inst.progPost.op() == Modality.DIA || inst.progPost.op() == Modality.DIA_TRANSACTION);
+	
+	final boolean dia = ((Modality)inst.progPost.op()).terminationSensitive();
 	final Term variantUpdate 
 		= dia ? TB.elementary(services, variantPV, variant) : TB.skip();
 	final Term variantNonNeg 
@@ -485,7 +492,11 @@ public final class WhileInvariantRule implements BuiltInRule {
 	return NAME.toString();
     }
 
-    
+
+    @Override
+    public LoopInvariantBuiltInRuleApp createApp(PosInOccurrence pos) {
+        return new LoopInvariantBuiltInRuleApp(this, pos);
+    }
     
     //-------------------------------------------------------------------------
     //inner classes
@@ -521,9 +532,4 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
 
-
-	@Override
-    public BuiltInRuleApp createApp(PosInOccurrence pos) {
-	    return new BuiltInRuleApp(this, pos);
-    }
 }

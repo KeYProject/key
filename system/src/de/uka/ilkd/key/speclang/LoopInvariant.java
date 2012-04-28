@@ -27,13 +27,24 @@ public interface LoopInvariant extends SpecificationElement {
      */
     public LoopStatement getLoop();
 
+    
+    /** Returns the invariant formula (may not be a transaction invariant). */
+    public Term getInvariant(Term selfTerm, Term heapAtPre, Services services);
+    
     /**
-     * Returns the invariant formula.
+     * Returns the invariant formula (may be the transaction invariant).
      */
     public Term getInvariant(Term selfTerm, 
             		     Term heapAtPre,
             		     Term savedHeapAtPre,
             		     Services services);
+
+    /**
+     * Returns the modifies clause.
+     */
+    public Term getModifies(Term selfTerm, 
+                        Term heapAtPre,
+                        Services services);
     
     /**
      * Returns the modifies clause.
@@ -67,6 +78,21 @@ public interface LoopInvariant extends SpecificationElement {
     public Term getInternalSavedHeapAtPre();
 
     /**
+     * Returns the term internally used for the invariant. 
+     * Use with care - it is likely that this is *not* the right "self" for you.
+     */
+    Term getInternalInvariant();
+
+    /**
+     * Returns the term internally used for the variant. 
+     * Use with care - it is likely that this is *not* the right "self" for you.
+     */
+    Term getInternalVariant();
+
+
+
+    
+    /**
      * Returns a new loop invariant where the loop reference has been
      * replaced with the passed one.
      */
@@ -89,4 +115,5 @@ public interface LoopInvariant extends SpecificationElement {
      * perform some action/transformation on this element.
      */
     public void visit(Visitor v);
+
 }

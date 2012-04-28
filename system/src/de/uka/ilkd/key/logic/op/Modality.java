@@ -82,4 +82,18 @@ public final class Modality extends AbstractSortedOperator {
     public static Modality getModality(String str) {
         return nameMap.get(str);
     }
+    
+    /** Whether this modality is termination sensitive,
+     * i.e., it is a "diamond-kind" modality.
+     * @return
+     */
+    public boolean terminationSensitive(){
+        return (this == DIA || this == DIA_TRANSACTION);
+    }
+    
+    /** Whether this is a transaction modality 
+     */
+    public boolean transaction(){
+        return (this == BOX_TRANSACTION || this == DIA_TRANSACTION);
+    }
 }

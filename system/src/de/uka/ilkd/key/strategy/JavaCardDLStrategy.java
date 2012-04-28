@@ -181,11 +181,11 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final String queryProp = strategyProperties.getProperty(StrategyProperties.QUERY_OPTIONS_KEY);
         final Feature queryF;
         if (queryProp.equals(StrategyProperties.QUERY_ON)) {
-       	    queryF = querySpecFeature(new QueryExpandCost(200,2,0,false)); 
+       	    queryF = querySpecFeature(new QueryExpandCost(200,2,1,false)); 
         } else if (queryProp.equals(StrategyProperties.QUERY_RESTRICTED)) {
         	// All tests in the example directory pass with this strategy. 
         	//Hence, the old query_on strategy is obsolete.
-    	    queryF = querySpecFeature(new QueryExpandCost(200,1,20,false));  
+    	    queryF = querySpecFeature(new QueryExpandCost(500,0,20,false));  
         } else if (queryProp.equals(StrategyProperties.QUERY_OFF)) {
         	queryF = querySpecFeature(inftyConst());
         } else {
@@ -193,6 +193,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 assert false;
         }
         
+
         final Feature depSpecF;
         final String depProp
         	= strategyProperties.getProperty(
@@ -422,6 +423,17 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             bindRuleSet(d, "method_expand", inftyConst());	  
         } else throw new RuntimeException("Unexpected strategy property "+
                                           methProp);
+
+        
+        final String queryAxProp = strategyProperties.
+                           getProperty(StrategyProperties.QUERYAXIOM_OPTIONS_KEY);
+        if (queryAxProp.equals(StrategyProperties.QUERYAXIOM_ON)) {
+            bindRuleSet ( d, "query_axiom", longConst(0) ); //Originally the QueryAxiom rule was assigned the strategy "simplify". Hence, the cost should be probably low.
+        } else if (queryAxProp.equals(StrategyProperties.QUERYAXIOM_OFF)) {
+            bindRuleSet ( d, "query_axiom", inftyConst());
+        } else {
+                assert false;
+        }
         
         bindRuleSet ( d, "loop_expand",
                       useLoopExpand ? longConst ( 0 )

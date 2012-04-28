@@ -6,20 +6,34 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 
-public abstract class AbstractBuiltInRuleApp implements RuleApp {
+public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
 
-	protected BuiltInRule builtInRule;
+	protected final BuiltInRule builtInRule;
 
-	public abstract RuleApp replacePos(PosInOccurrence newPos);
+	protected final PosInOccurrence pio;
+	protected ImmutableList<PosInOccurrence> ifInsts;
 
-	protected PosInOccurrence pio;
-	protected ImmutableList<PosInOccurrence> ifInsts = ImmutableSLList.<PosInOccurrence>nil();
-
-	public AbstractBuiltInRuleApp() {
-		super();
+	protected AbstractBuiltInRuleApp(BuiltInRule rule,
+            PosInOccurrence pio, ImmutableList<PosInOccurrence> ifInsts) {
+        this.builtInRule = rule;
+	    this.pio     = pio;
+	    this.ifInsts = (ifInsts == null ? ImmutableSLList.<PosInOccurrence>nil() : ifInsts);	    
 	}
 
-	/**
+	protected AbstractBuiltInRuleApp(BuiltInRule rule,
+	        PosInOccurrence pio) {
+	    this(rule, pio, null);
+	}
+	
+	/** HACK: but strategies do not work otherwise in the moment; I need to have a closer look on what is going on there 
+	 * This restores the behaviour as it was before my previous commit for the moment 
+	 */
+    public void setMutable(ImmutableList<PosInOccurrence> ifInsts) {
+        this.ifInsts = ifInsts;
+    }
+
+
+    /**
      * returns the rule of this rule application
      */
     @Override
@@ -45,7 +59,11 @@ public abstract class AbstractBuiltInRuleApp implements RuleApp {
     @Override
     public ImmutableList<Goal> execute(Goal goal, Services services) {
     goal.addAppliedRuleApp(this);	
-    ImmutableList<Goal> result = builtInRule.apply(goal, services, this);
+    ImmutableList<Goal> result = null;
+    try {
+        result = builtInRule.apply(goal, services, this);
+    } catch (RuleAbortException rae) {
+    }
     if (result == null){
         goal.removeLastAppliedRuleApp();
         goal.node().setAppliedRuleApp(null);
@@ -53,15 +71,30 @@ public abstract class AbstractBuiltInRuleApp implements RuleApp {
     return result;
     }
 
-    public void setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {
-	assert ifInsts != null;
-	this.ifInsts = ifInsts;
-    }
+    public abstract AbstractBuiltInRuleApp replacePos(PosInOccurrence newPos);
     
+    @Override
+    public abstract IBuiltInRuleApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts);
     
+    @Override
     public ImmutableList<PosInOccurrence> ifInsts() {
 	return ifInsts;
     }
+    
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.rule.IBuiltInRuleApp#tryToInstantiate(de.uka.ilkd.key.proof.Goal)
+     */
+    @Override
+    public abstract AbstractBuiltInRuleApp tryToInstantiate(Goal goal);
+
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.rule.IBuiltInRuleApp#isSufficientlyComplete()
+     */
+    @Override
+    public boolean isSufficientlyComplete() {
+        return complete();      
+    }
+
     
 	/** returns true if all variables are instantiated 
      * @return true if all variables are instantiated 
@@ -75,5 +108,6 @@ public abstract class AbstractBuiltInRuleApp implements RuleApp {
     public String toString() {
     return "BuiltInRule: " + rule().name() + " at pos " + pio.subTerm();
     }
+
 
 }

@@ -320,7 +320,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 
     public static PosInOccurrence findStepInIfInsts(
 	    		List<PosInOccurrence> steps,
-	    		BuiltInRuleApp app,
+	    		UseDependencyContractApp app,
 	    		Services services) {
     	for(PosInOccurrence pio : app.ifInsts()) {
     		if(steps.contains(pio)) {
@@ -330,42 +330,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
     	return null;
     }
         
-    
-    
-    
-    
-    private static Pair<Term,Term> getBaseHeapAndChangedLocs(
-	    			PosInOccurrence pos,
-	    			Sequent seq,
-	    			Services services,
-	    			BuiltInRuleApp app) {
-	final Term focus = pos.subTerm();
-	assert app != null;
-	assert focus.op() instanceof ObserverFunction;
-	
-	//get step
-	final PosInOccurrence step = ((UseDependencyContractApp)app).step(seq, services); 
-
-	assert !step.equals(focus);
-	
-	
-	
-	//get changed locs and used equalities
-	final Pair<Term,ImmutableList<PosInOccurrence>> changedLocs 
-		= getChangedLocsForStep(focus.sub(0), 
-					step.subTerm().sub(0), 
-					seq, 
-					services);
-	assert changedLocs != null;
-	
-	//store insts in rule app
-	app.setIfInsts(changedLocs.second.prepend(step));
-
-	//return step heap and changed locs
-	return new Pair<Term,Term>(step.subTerm().sub(0), changedLocs.first);
-    }
-    
-    
+        
     /**
      * Returns the dependency contracts which are applicable for the passed 
      * target.
@@ -466,11 +431,27 @@ public final class UseDependencyContractRule implements BuiltInRule {
         final DependencyContract contract = 
         		(DependencyContract)((UseDependencyContractApp) ruleApp).getInstantiation();            
         assert contract != null;
-        final Pair<Term,Term> baseHeapAndChangedLocs 
-        	= getBaseHeapAndChangedLocs(pio, 
-        				    goal.sequent(), 
-        				    services, 
-        				    (BuiltInRuleApp)ruleApp);
+        
+        //get step
+        final PosInOccurrence step = 
+                ((UseDependencyContractApp)ruleApp).step(goal.sequent(), services); 
+
+        assert !step.equals(focus);
+        
+        //get changed locs and used equalities
+        final Term subStep = step.subTerm().sub(0);
+
+        final Pair<Term,ImmutableList<PosInOccurrence>> changedLocs 
+            = getChangedLocsForStep(focus.sub(0), 
+                        subStep, 
+                        goal.sequent(), 
+                        services);
+        
+        assert changedLocs != null;
+        
+        //store insts in rule app
+        ruleApp = ((IBuiltInRuleApp) ruleApp).setIfInsts(changedLocs.second.prepend(step));
+
         //create justification
         final RuleJustificationBySpec just 
                 = new RuleJustificationBySpec(contract);
@@ -479,38 +460,34 @@ public final class UseDependencyContractRule implements BuiltInRule {
                     goal.proof().env().getJustifInfo().getJustification(this);
         cjust.add(ruleApp, just);
         
-        if(baseHeapAndChangedLocs == null) {
-            return goal.split(1);
-        }
-        
         //get precondition, dependency term, measured_by
         Term freePre 
-        	= TB.and(TB.wellFormed(services, baseHeapAndChangedLocs.first),
+        	= TB.and(TB.wellFormed(services, subStep),
         		 TB.wellFormed(services, focus.sub(0)));
 	if(!target.isStatic()) {
 	    freePre = TB.and(freePre, TB.not(TB.equals(selfTerm, TB.NULL(services))));
 	    freePre = TB.and(freePre, TB.created(services,
-				                 baseHeapAndChangedLocs.first,
+				                 subStep,
         	                    		 selfTerm));
 	}
 	int i = 0;
 	for(Term paramTerm : paramTerms) {
 	    freePre = TB.and(freePre, TB.reachableValue(services,
-					       		baseHeapAndChangedLocs.first,
+					       		subStep,
 					       		paramTerm, 
 					       		target.getParamType(i++)));
 	}
-        final Term pre = contract.getPre(baseHeapAndChangedLocs.first,
+        final Term pre = contract.getPre(subStep,
         	                         selfTerm, 
         	                         paramTerms,
                                          null, 
         	                         services);
-        final Term dep = contract.getDep(baseHeapAndChangedLocs.first, 
+        final Term dep = contract.getDep(subStep, 
         				 selfTerm, 
         				 paramTerms, 
         				 services);
         final Term mby = contract.hasMby() 
-        	         ? contract.getMby(baseHeapAndChangedLocs.first, 
+        	         ? contract.getMby(subStep, 
         	         	           selfTerm, 
         	         	           paramTerms, 
         	        	           services) 
@@ -518,7 +495,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
         
         //prepare cut formula
         final Term disjoint 
-        	= TB.disjoint(services, baseHeapAndChangedLocs.second, dep);
+        	= TB.disjoint(services, changedLocs.first, dep);
 	final ContractPO po 
 		= services.getSpecificationRepository()
 			  .getPOForProof(goal.proof());        
@@ -533,10 +510,10 @@ public final class UseDependencyContractRule implements BuiltInRule {
         	= TB.and(new Term[]{freePre, pre, disjoint, mbyOk});
         
         //bail out if obviously not helpful
-        if(!baseHeapAndChangedLocs.second.op().equals(locSetLDT.getEmpty())) {
+        if(!changedLocs.first.op().equals(locSetLDT.getEmpty())) {
             final ImmutableSet<Term> changed 
             	= addEqualDefs(MiscTools.unionToSet(
-            				      baseHeapAndChangedLocs.second, 
+            				      changedLocs.first, 
             				      services), 
             				      goal);
             if(changed.contains(dep)) {
@@ -549,7 +526,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
         final Goal preGoal = result.head();
         final Goal postGoal = result.tail().head();
         final String changeString 
-        	= LogicPrinter.quickPrintTerm(baseHeapAndChangedLocs.second, 
+        	= LogicPrinter.quickPrintTerm(changedLocs.first, 
         				      services);
         preGoal.setBranchLabel("Dependencies changed by write to " 
         	               + changeString);
@@ -563,7 +540,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
         
         //create "Post" branch
         final Term[] subs = focus.subs().toArray(new Term[focus.arity()]);
-        subs[0] = baseHeapAndChangedLocs.first;
+        subs[0] = subStep;
         final Term termWithBaseHeap = TB.func(target, subs);
         postGoal.addFormula(new SequentFormula(TB.equals(focus, termWithBaseHeap)), true, false);
         postGoal.addFormula(new SequentFormula(cutFormula),

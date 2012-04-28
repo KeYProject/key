@@ -17,27 +17,30 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.BuiltInRuleApp;
-import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.*;
 
-public class RuleAppSMT extends BuiltInRuleApp{ //implements RuleApp {
+public class RuleAppSMT extends AbstractBuiltInRuleApp { 
 
     public final static SMTRule rule = new SMTRule();
     private final String title;
 
 
     RuleAppSMT( SMTRule rule, PosInOccurrence pio ) {
-    	super(rule, null);
-    	title = "SMT Rule App";
+    	this(rule, pio,  null, "SMT Rule App");
     }
+
+    private RuleAppSMT(SMTRule rule, PosInOccurrence pio, ImmutableList<PosInOccurrence> ifInsts, String title) {
+        super(rule, pio, ifInsts);
+        this.title = title;
+    }
+
     
     private RuleAppSMT(SMTRule rule, String title) {
     	super(rule, null);
     	this.title = title;
     }
     
-	public RuleApp replacePos(PosInOccurrence newPos) {
+	public RuleAppSMT replacePos(PosInOccurrence newPos) {
 	    return this;
     }
 
@@ -64,7 +67,7 @@ public class RuleAppSMT extends BuiltInRuleApp{ //implements RuleApp {
     public static class SMTRule implements BuiltInRule {
 	private Name name = new Name("SMTRule");
 
-	public BuiltInRuleApp createApp( PosInOccurrence pos ) {
+	public RuleAppSMT createApp( PosInOccurrence pos ) {
 		return new RuleAppSMT( this, pos );
 	}
 
@@ -110,8 +113,20 @@ public class RuleAppSMT extends BuiltInRuleApp{ //implements RuleApp {
 
     }
 
-	public BuiltInRuleApp setTitle(String title2) {
-	    return null;
+	public RuleAppSMT setTitle(String title) {
+	    return new RuleAppSMT(rule, title);
+    }
+
+    @Override
+    public RuleAppSMT setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {
+        setMutable(ifInsts);
+        return this;
+       // return new RuleAppSMT(rule, posInOccurrence(), ifInsts, title);
+    }
+
+    @Override
+    public RuleAppSMT tryToInstantiate(Goal goal) {
+        return this;
     }
 
 }

@@ -229,7 +229,7 @@ public final class QueryAxiom extends ClassAxiom {
 					   ImmutableSLList.<Taclet>nil(),
 					   replacewith));
 	tacletBuilder.setName(MiscTools.toValidTacletName(name));
-	tacletBuilder.addRuleSet(new RuleSet(new Name("method_expand"))); // Used to be "simplify"
+	tacletBuilder.addRuleSet(new RuleSet(new Name("query_axiom"))); // Originally used to be "simplify"
 	
 	return DefaultImmutableSet.<Taclet>nil().add(tacletBuilder.getTaclet());
 	//return DefaultImmutableSet.<Taclet>nil();

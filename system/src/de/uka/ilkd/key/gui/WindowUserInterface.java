@@ -1,25 +1,18 @@
 package de.uka.ilkd.key.gui;
 
 import java.io.File;
-import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.JOptionPane;
 
-import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.rule.UseOperationContractRule.Instantiation;
-import de.uka.ilkd.key.speclang.FunctionalOperationContract;
+import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.ui.AbstractUserInterface;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
@@ -39,8 +32,15 @@ public class WindowUserInterface extends AbstractUserInterface {
 
 	private MainWindow mainWindow;
 
+
+    private LinkedList<InteractiveRuleApplicationCompletion> completions =
+            new LinkedList<InteractiveRuleApplicationCompletion>();
+	
 	public WindowUserInterface(MainWindow mainWindow) {
 		this.mainWindow = mainWindow;
+	    completions.add(new FunctionalOperationContractCompletion());
+		completions.add(new DependencyContractCompletion());
+		completions.add(new LoopInvariantRuleCompletion());
 	}
 
 	public void loadProblem(File file, List<File> classPath,
@@ -213,113 +213,29 @@ public class WindowUserInterface extends AbstractUserInterface {
 		mainWindow.openExamples();
 	}
 
-	private static PosInOccurrence letUserChooseStep(
-	        List<PosInOccurrence> steps, Services services) {
-		// prepare array of possible base heaps
-		final TermStringWrapper[] heaps = new TermStringWrapper[steps.size()];
-		int i = 0;
-		final LogicPrinter lp = new LogicPrinter(null, new NotationInfo(),
-		        services);
-		lp.setLineWidth(120);
-		for (PosInOccurrence step : steps) {
-			final Term heap = step.subTerm().sub(0);
-			lp.reset();
-			try {
-				lp.printTerm(heap);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-			String prettyprint = lp.toString();
-			prettyprint = "<html><tt>" + LogicPrinter.escapeHTML(
-			        prettyprint, true) + "</tt></html>";
-			heaps[i++] = new TermStringWrapper(heap, prettyprint);
-		}
+	@Override
+	public IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, boolean forced) {
+	    if (mainWindow.getMediator().autoMode()) {
+	        return super.completeBuiltInRuleApp(app, goal, forced);
+	    }
 
-		// open dialog
-		final TermStringWrapper heapWrapper = (TermStringWrapper) JOptionPane
-		        .showInputDialog(
-		                MainWindow.getInstance(), "Please select a base heap:",
-		                "Instantiation", JOptionPane.QUESTION_MESSAGE, null,
-		                heaps, heaps.length > 0 ? heaps[0] : null);
-		
-		if (heapWrapper == null) {
-			return null;
-		}
-		final Term heap = heapWrapper.term;
-
-		// find corresponding step
-		for (PosInOccurrence step : steps) {
-			if (step.subTerm().sub(0).equals(heap)) {
-				return step;
-			}
-		}
-		assert false;
-		return null;
+	    IBuiltInRuleApp result = app;
+	    for (InteractiveRuleApplicationCompletion compl : completions ) {
+	        if (compl.canComplete(app)) {
+	            result = compl.complete(app, goal, forced);
+	            break;
+	        }
+	    }
+	    return (result != null && result.complete()) ? result : null;
 	}
 
 	@Override
-	public RuleApp completeBuiltInRuleApp(RuleApp app, Goal goal,
-	        Services services) {
-		if (mainWindow.getMediator().autoMode()) {
-			return super.completeBuiltInRuleApp(
-			        app, goal, services);
-		}
-		RuleApp result = app;
-		if (app.rule() instanceof UseOperationContractRule) {
-			Instantiation inst = UseOperationContractRule.computeInstantiation(
-			        app.posInOccurrence().subTerm(), services);
-			ImmutableSet<FunctionalOperationContract> contracts = UseOperationContractRule
-			        .getApplicableContracts(
-			                inst, services);
-			FunctionalOperationContract[] contractsArr = contracts
-			        .toArray(new FunctionalOperationContract[contracts.size()]);
-			ContractConfigurator cc = new ContractConfigurator(
-			        MainWindow.getInstance(), services, contractsArr,
-			        "Contracts for " + inst.pm.getName(), true);
-			if (cc.wasSuccessful()) {
-				result = ((UseOperationContractRule) app.rule()).createApp(
-				        app.posInOccurrence()).setContract(
-				        cc.getContract());
-			}
-		} else if (app.rule() instanceof UseDependencyContractRule) {
-			UseDependencyContractApp cApp = (UseDependencyContractApp) result;
-			
-			cApp = cApp.tryToInstantiateContract(services);	
-			
-			final List<PosInOccurrence> steps = 
-					UseDependencyContractRule.
-					 getSteps(cApp.posInOccurrence(), goal.sequent(), services);                
-			PosInOccurrence step = letUserChooseStep(steps, services);
-			if (step == null) {
-				return null;
-			}
-			result = cApp.setStep(step);
-		}
-		return result.complete() ? result : null;
+	public ProblemInitializer createProblemInitializer() {
+	    ProblemInitializer pi = new ProblemInitializer(this, 
+	            mainWindow.getMediator().getProfile(), 
+	            new Services(mainWindow.getMediator().getExceptionHandler()), 
+	            true, 
+	            this);
+	    return pi;
 	}
-
-	private static final class TermStringWrapper {
-		final Term term;
-		final String string;
-
-		TermStringWrapper(Term term, String string) {
-			this.term = term;
-			this.string = string;
-		}
-
-		@Override
-		public String toString() {
-			return string;
-		}
-	}
-
-   @Override
-   public ProblemInitializer createProblemInitializer() {
-      ProblemInitializer pi = new ProblemInitializer(this, 
-                                                     mainWindow.getMediator().getProfile(), 
-                                                     new Services(mainWindow.getMediator().getExceptionHandler()), 
-                                                     true, 
-                                                     this);
-       return pi;
-   }
 }

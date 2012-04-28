@@ -50,6 +50,9 @@ public final class StrategyProperties extends Properties {
     public final static String QUERY_RESTRICTED = "QUERY_RESTRICTED";
     public final static String QUERY_OFF = "QUERY_OFF";
 
+    public final static String QUERYAXIOM_OPTIONS_KEY = "QUERYAXIOM_OPTIONS_KEY";
+    public final static String QUERYAXIOM_ON  = "QUERYAXIOM_ON";
+    public final static String QUERYAXIOM_OFF = "QUERYAXIOM_OFF";
     
     public final static String NON_LIN_ARITH_OPTIONS_KEY = "NON_LIN_ARITH_OPTIONS_KEY";
     public final static String NON_LIN_ARITH_NONE = "NON_LIN_ARITH_NONE";
@@ -89,6 +92,7 @@ public final class StrategyProperties extends Properties {
         defaultMap.setProperty(METHOD_OPTIONS_KEY, METHOD_CONTRACT);
         defaultMap.setProperty(DEP_OPTIONS_KEY, DEP_ON);
         defaultMap.setProperty(QUERY_OPTIONS_KEY, QUERY_OFF);
+        defaultMap.setProperty(QUERYAXIOM_OPTIONS_KEY, QUERYAXIOM_ON);
         defaultMap.setProperty(NON_LIN_ARITH_OPTIONS_KEY, NON_LIN_ARITH_NONE);
         defaultMap.setProperty(QUANTIFIERS_OPTIONS_KEY, QUANTIFIERS_NON_SPLITTING_WITH_PROGS);
         for (int i = 1; i <= USER_TACLETS_NUM; ++i)
@@ -104,6 +108,7 @@ public final class StrategyProperties extends Properties {
         put(METHOD_OPTIONS_KEY, defaultMap.get(METHOD_OPTIONS_KEY));
         put(DEP_OPTIONS_KEY, defaultMap.get(DEP_OPTIONS_KEY));
         put(QUERY_OPTIONS_KEY, defaultMap.get(QUERY_OPTIONS_KEY));
+        put(QUERYAXIOM_OPTIONS_KEY, defaultMap.get(QUERYAXIOM_OPTIONS_KEY));
         put(NON_LIN_ARITH_OPTIONS_KEY, defaultMap.get(NON_LIN_ARITH_OPTIONS_KEY));
         put(QUANTIFIERS_OPTIONS_KEY, defaultMap.get(QUANTIFIERS_OPTIONS_KEY));
         for (int i = 1; i <= USER_TACLETS_NUM; ++i)
@@ -131,6 +136,7 @@ public final class StrategyProperties extends Properties {
         sp.put(METHOD_OPTIONS_KEY, readSingleOption(p, METHOD_OPTIONS_KEY));
         sp.put(DEP_OPTIONS_KEY, readSingleOption(p,DEP_OPTIONS_KEY));
         sp.put(QUERY_OPTIONS_KEY, readSingleOption(p,QUERY_OPTIONS_KEY));
+        sp.put(QUERYAXIOM_OPTIONS_KEY, readSingleOption(p,QUERYAXIOM_OPTIONS_KEY));
         sp.put(NON_LIN_ARITH_OPTIONS_KEY, readSingleOption(p,NON_LIN_ARITH_OPTIONS_KEY));
         sp.put(QUANTIFIERS_OPTIONS_KEY, readSingleOption(p,QUANTIFIERS_OPTIONS_KEY));
         for (int i = 1; i <= USER_TACLETS_NUM; ++i)
@@ -156,6 +162,7 @@ public final class StrategyProperties extends Properties {
         p.put("[StrategyProperty]"+METHOD_OPTIONS_KEY, get(METHOD_OPTIONS_KEY));
         p.put("[StrategyProperty]"+DEP_OPTIONS_KEY, get(DEP_OPTIONS_KEY));              
         p.put("[StrategyProperty]"+QUERY_OPTIONS_KEY, get(QUERY_OPTIONS_KEY));              
+        p.put("[StrategyProperty]"+QUERYAXIOM_OPTIONS_KEY, get(QUERYAXIOM_OPTIONS_KEY));              
         p.put("[StrategyProperty]"+NON_LIN_ARITH_OPTIONS_KEY, get(NON_LIN_ARITH_OPTIONS_KEY));              
         p.put("[StrategyProperty]"+QUANTIFIERS_OPTIONS_KEY, get(QUANTIFIERS_OPTIONS_KEY));              
         for (int i = 1; i <= USER_TACLETS_NUM; ++i)

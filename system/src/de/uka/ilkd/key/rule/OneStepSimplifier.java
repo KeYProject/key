@@ -496,7 +496,7 @@ public final class OneStepSimplifier implements BuiltInRule,
 		            + (inst.getNumAppliedRules() > 1 
 		               ? " rules" 
 		               : " rule"));
-	((BuiltInRuleApp)ruleApp).setIfInsts(inst.getIfInsts());
+	ruleApp = ((IBuiltInRuleApp)ruleApp).setIfInsts(inst.getIfInsts());
 	
 	return result;
     }
@@ -571,7 +571,7 @@ public final class OneStepSimplifier implements BuiltInRule,
     }
 
 	@Override
-    public BuiltInRuleApp createApp(PosInOccurrence pos) {
-	    return new BuiltInRuleApp(this, pos);
+    public DefaultBuiltInRuleApp createApp(PosInOccurrence pos) {
+	    return new DefaultBuiltInRuleApp(this, pos);
     }
 }
