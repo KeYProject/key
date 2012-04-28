@@ -28,10 +28,15 @@ public class TestSimplify extends TestSMTSolver {
 	    installChecked = true;
 	    if(!isInstalled) {
 		System.out.println("Warning: " + getSolverType().getName() + " is not installed, tests skipped.");
-	    }	    
+		}	    
+		if(isInstalled &&!getSolverType().supportHasBeenChecked()){
+			if(!getSolverType().checkForSupport()){
+				System.out.println("Warning: " + "The version of the solver "+ getSolverType().getName() + " used for the following tests may not be supported.");
+			}    			
+		}
 	}
 	
-        return false;
+        return !isInstalled;
     }
     
     @Override
