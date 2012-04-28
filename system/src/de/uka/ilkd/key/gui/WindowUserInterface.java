@@ -52,8 +52,7 @@ public class WindowUserInterface extends AbstractUserInterface {
 
 	@Override
 	public void loadProblem(File file) {
-		loadProblem(
-		        file, null, null, mainWindow.getMediator());
+		loadProblem(file, null, null);
 	}
 
 	@Override
