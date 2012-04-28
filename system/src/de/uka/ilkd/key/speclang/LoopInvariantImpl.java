@@ -166,7 +166,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
 
     @Override
     public Term getInvariant(Term selfTerm, Term heapAtPre, Services services){
-        return getInvariant(selfTerm,heapAtPre,null,services);
+        return getInvariant(selfTerm, heapAtPre, null, services);
     }
     
     @Override    

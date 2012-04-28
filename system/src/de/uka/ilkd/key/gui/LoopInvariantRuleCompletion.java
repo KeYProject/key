@@ -3,6 +3,7 @@ package de.uka.ilkd.key.gui;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
@@ -35,6 +36,7 @@ public class LoopInvariantRuleCompletion implements
         final While loop = loopApp.getLoopStatement();
 
         LoopInvariant inv = loopApp.getInvariant();
+        final boolean isTransaction = ((Modality)loopApp.programTerm().op()).transaction();
         if (inv == null) { // no invariant present, get it interactively
             inv = new LoopInvariantImpl(loop,
                     MiscTools.getInnermostMethodFrame(progPost.javaBlock(),
@@ -44,12 +46,12 @@ public class LoopInvariantRuleCompletion implements
                                             services), (Term) null);
             try {
                 inv = InvariantConfigurator.getInstance().getLoopInvariant(inv,
-                        services, false);
+                        services, false, isTransaction);
             } catch (RuleAbortException e) {
                 return null;
             }
         } else { // in interactive mode and there is an invariant in the
-                 // repository
+                 // repository            
             boolean requiresVariant = loopApp.variantRequired()
                     && !loopApp.variantAvailable();
             // Check if a variant is required
@@ -57,7 +59,7 @@ public class LoopInvariantRuleCompletion implements
                 // get invariant or variant interactively
                 try {
                     inv = InvariantConfigurator.getInstance().getLoopInvariant(
-                            inv, services, requiresVariant);
+                            inv, services, requiresVariant, isTransaction);
                 } catch (RuleAbortException e) {
                     return null;
                 }

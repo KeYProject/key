@@ -5,6 +5,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.parser.DefaultTermParser;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.LoopInvariantImpl;
@@ -76,10 +77,12 @@ public class InvariantConfigurator {
      * 
      * @param loopInv
      * @param services
+     * @param isTransaction 
      * @return LoopInvariant
      */
     public LoopInvariant getLoopInvariant (final LoopInvariant loopInv,
-            final Services services, final boolean requiresVariant) throws RuleAbortException {
+            final Services services, final boolean requiresVariant,
+            final boolean isTransaction) throws RuleAbortException {
         // Check if there is a LoopInvariant
         if (loopInv == null) {
             return null;
@@ -222,31 +225,32 @@ public class InvariantConfigurator {
             private void initInvariants() {
 
                 String[] loopInvStr = new String[3];
-                if (loopInv.getInvariant(loopInv.getInternalSelfTerm(), loopInv
-                        .getInternalHeapAtPre(), loopInv.getInternalSavedHeapAtPre(), null) == null) {
+                
+                
+                final Term savedHeapAtPre = isTransaction? loopInv.getInternalSavedHeapAtPre() : null;
+                final Term invariant = loopInv.getInvariant(loopInv.getInternalSelfTerm(), loopInv
+                        .getInternalHeapAtPre(), savedHeapAtPre, services);
+                if (invariant == null) {
                     loopInvStr[0] = "true";
                 } else {
-                    loopInvStr[0] = printTerm(loopInv.getInvariant(loopInv
-                            .getInternalSelfTerm(), loopInv
-                            .getInternalHeapAtPre(), loopInv.getInternalSavedHeapAtPre(), null));
+                    loopInvStr[0] = printTerm(invariant);
                 }
 
-                if (loopInv.getModifies(loopInv.getInternalSelfTerm(), loopInv
-                        .getInternalHeapAtPre(), loopInv.getInternalSavedHeapAtPre(),null) == null) {
+                final Term modifies = loopInv.getModifies(loopInv.getInternalSelfTerm(), loopInv
+                        .getInternalHeapAtPre(), savedHeapAtPre, services);
+                
+                if (modifies == null) {
                     loopInvStr[1] = "allLocs";
                 } else {
-                    loopInvStr[1] = printTerm(loopInv.getModifies(loopInv
-                            .getInternalSelfTerm(), loopInv
-                            .getInternalHeapAtPre(), loopInv.getInternalSavedHeapAtPre(),null));
+                    loopInvStr[1] = printTerm(modifies);
                 }
 
-                if (loopInv.getVariant(loopInv.getInternalSelfTerm(), loopInv
-                        .getInternalHeapAtPre(), null) == null) {
+                final Term variant = loopInv.getVariant(loopInv.getInternalSelfTerm(), loopInv
+                        .getInternalHeapAtPre(), services);
+                if (variant == null) {
                     loopInvStr[2] = "";
                 } else {
-                    loopInvStr[2] = printTerm(loopInv.getVariant(loopInv
-                            .getInternalSelfTerm(), loopInv
-                            .getInternalHeapAtPre(), null));
+                    loopInvStr[2] = printTerm(variant);
                 }
 
                 if (!mapLoopsToInvariants.containsKey(loopInv.getLoop())) {
@@ -276,16 +280,8 @@ public class InvariantConfigurator {
              * @param t
              * @return the String Representation of the Term
              */
-            private String printTerm(Term t) {
-                /*try {
-                    int start = printer.result().length();
-                    printer.printTerm(t);
-                    return printer.result().substring(start - 1);
-                } catch (Exception e) {
-                    return t.toString();
-                }*/
-                
-                return t.toString();
+            private String printTerm(Term t) {                
+                return ProofSaver.printTerm(t, services, true).toString();
 
             }
 

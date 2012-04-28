@@ -38,7 +38,7 @@ public class WindowUserInterface extends AbstractUserInterface {
 	
 	public WindowUserInterface(MainWindow mainWindow) {
 		this.mainWindow = mainWindow;
-	    completions.add(new FunctionalOperationContractCompletion());
+	        completions.add(new FunctionalOperationContractCompletion());
 		completions.add(new DependencyContractCompletion());
 		completions.add(new LoopInvariantRuleCompletion());
 	}
