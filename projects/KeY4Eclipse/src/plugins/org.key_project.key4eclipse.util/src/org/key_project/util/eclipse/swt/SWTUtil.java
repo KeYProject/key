@@ -4,32 +4,19 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
-import org.eclipse.core.resources.IContainer;
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.jdt.internal.ui.viewsupport.FilteredElementTreeSelectionDialog;
-import org.eclipse.jdt.internal.ui.wizards.TypedViewerFilter;
-import org.eclipse.jdt.internal.ui.wizards.buildpaths.FolderSelectionDialog;
-import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
-import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
-import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -37,24 +24,22 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
-import org.eclipse.ui.model.WorkbenchContentProvider;
-import org.eclipse.ui.model.WorkbenchLabelProvider;
-import org.eclipse.ui.views.navigator.ResourceComparator;
-import org.key_project.util.eclipse.swt.viewer.FileSelectionValidator;
 import org.key_project.util.java.StringUtil;
 
 /**
  * Provides utility methods for SWT.
  * @author Martin Hentschel
  */
-@SuppressWarnings("restriction")
 public final class SWTUtil {
+    /**
+     * Separator between CSV values.
+     */
+    public static final String CSV_VALUE_SEPARATOR = "; ";
+   
     /**
      * Forbid instances.
      */
@@ -195,103 +180,6 @@ public final class SWTUtil {
     }
     
     /**
-     * Opens a select folder dialog.
-     * @param parent The parent {@link Shell}.
-     * @param title The title.
-     * @param message The message. 
-     * @param allowMultipleSelection Allow multiple selections?
-     * @param initialSelection Optional initial selection.
-     * @param viewerFilters Optional viewer filters.
-     * @return The selected {@link IContainer}s or {@code null} if the dialog was canceled.
-     */
-    public static IContainer[] openFolderSelection(Shell parent,
-                                                   String title,
-                                                   String message,
-                                                   boolean allowMultipleSelection,
-                                                   Object[] initialSelection,
-                                                   Collection<? extends ViewerFilter> viewerFilters) {
-        ILabelProvider labelProvider = new WorkbenchLabelProvider();
-        ITreeContentProvider contentProvider = new WorkbenchContentProvider();
-        FolderSelectionDialog dialog = new FolderSelectionDialog(parent, labelProvider, contentProvider);
-        dialog.setInput(ResourcesPlugin.getWorkspace().getRoot());
-        dialog.setTitle(title);
-        dialog.setMessage(message);
-        dialog.setAllowMultiple(allowMultipleSelection);
-        if (initialSelection != null) {
-            dialog.setInitialSelections(initialSelection);
-        }
-        ViewerFilter projectAndFolderFilter = new TypedViewerFilter(new Class[] {IProject.class, IFolder.class});
-        dialog.addFilter(projectAndFolderFilter);
-        if (viewerFilters != null) {
-            for (ViewerFilter filter : viewerFilters) {
-                dialog.addFilter(filter);
-            }
-        }
-        dialog.setComparator(new ResourceComparator(ResourceComparator.NAME));
-        if (dialog.open() == FolderSelectionDialog.OK) {
-            Object[] result = dialog.getResult();
-            List<IContainer> containerResult = new ArrayList<IContainer>(result.length);
-            for (Object obj : result) {
-                if (obj instanceof IContainer) {
-                    containerResult.add((IContainer)obj);
-                }
-            }
-            return containerResult.toArray(new IContainer[containerResult.size()]);
-        }
-        else {
-            return null;
-        }
-    }
-    
-    /**
-     * Opens a select folder dialog.
-     * @param parent The parent {@link Shell}.
-     * @param title The title.
-     * @param message The message. 
-     * @param allowMultipleSelection Allow multiple selections?
-     * @param initialSelection Optional initial selection.
-     * @param viewerFilters Optional viewer filters.
-     * @return The selected {@link IContainer}s or {@code null} if the dialog was canceled.
-     */
-    public static IFile[] openFileSelection(Shell parent,
-                                            String title,
-                                            String message,
-                                            boolean allowMultipleSelection,
-                                            Object[] initialSelection,
-                                            Collection<? extends ViewerFilter> viewerFilters) {
-        ILabelProvider labelProvider = new WorkbenchLabelProvider();
-        ITreeContentProvider contentProvider = new WorkbenchContentProvider();
-        ElementTreeSelectionDialog dialog = new FilteredElementTreeSelectionDialog(parent, labelProvider, contentProvider);
-        dialog.setInput(ResourcesPlugin.getWorkspace().getRoot());
-        dialog.setTitle(title);
-        dialog.setMessage(message);
-        dialog.setAllowMultiple(allowMultipleSelection);
-        if (initialSelection != null) {
-            dialog.setInitialSelections(initialSelection);
-        }
-        if (viewerFilters != null) {
-            for (ViewerFilter filter : viewerFilters) {
-                dialog.addFilter(filter);
-            }
-        }
-        dialog.setComparator(new ResourceComparator(ResourceComparator.NAME));
-        dialog.setValidator(new FileSelectionValidator(false, allowMultipleSelection));
-        if (dialog.open() == FolderSelectionDialog.OK) {
-            Object[] result = dialog.getResult();
-            List<IFile> containerResult = new ArrayList<IFile>(result.length);
-            for (Object obj : result) {
-                if (obj instanceof IFile) {
-                    containerResult.add((IFile)obj);
-                }
-            }
-            return containerResult.toArray(new IFile[containerResult.size()]);
-        }
-        else {
-            return null;
-        }
-    }
-    
-    /**
      * <p>
      * Makes the columns in the given {@link TableViewer} sortable.
      * </p>
@@ -409,7 +297,7 @@ public final class SWTUtil {
                 boolean afterFirst = false;
                 for (int index : columnOrder) {
                     if (afterFirst) {
-                        sb.append("; ");
+                        sb.append(CSV_VALUE_SEPARATOR);
                     }
                     else {
                         afterFirst = true;
@@ -425,7 +313,7 @@ public final class SWTUtil {
                     boolean afterFirst = false;
                     for (int index : columnOrder) {
                         if (afterFirst) {
-                            sb.append("; ");
+                            sb.append(CSV_VALUE_SEPARATOR);
                         }
                         else {
                             afterFirst = true;

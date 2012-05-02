@@ -15,3 +15,11 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: KeY Project
+Export-Package: org.key_project.monkey.product.ui.application,
+ org.key_project.monkey.product.ui.batch,
+ org.key_project.monkey.product.ui.composite,
+ org.key_project.monkey.product.ui.model,
+ org.key_project.monkey.product.ui.perspective,
+ org.key_project.monkey.product.ui.provider,
+ org.key_project.monkey.product.ui.util,
+ org.key_project.monkey.product.ui.view

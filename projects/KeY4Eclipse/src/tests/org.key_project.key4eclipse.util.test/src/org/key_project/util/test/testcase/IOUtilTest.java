@@ -32,6 +32,16 @@ import org.key_project.util.test.util.TestUtilsUtil;
  */
 public class IOUtilTest extends TestCase {
    /**
+    * Tests {@link IOUtil#getHomeDirectory()}.
+    */
+   @Test
+   public void testGetHomeDirectory() {
+      File home = IOUtil.getHomeDirectory();
+      assertNotNull(home);
+      assertEquals(System.getProperty("user.home"), home.toString());
+   }
+   
+   /**
     * Tests {@link IOUtil#getFileNameWithoutExtension(String)}.
     */
    @Test

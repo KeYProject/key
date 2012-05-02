@@ -37,6 +37,20 @@ public final class IOUtil {
    }
    
    /**
+    * Returns the home directory.
+    * @return The home directory.
+    */
+   public static File getHomeDirectory() {
+      String path = System.getProperty("user.home");
+      if (path != null) {
+         return new File(path);
+      }
+      else {
+         return null;
+      }
+   }
+   
+   /**
     * Returns the file name without file extension for the given file name with extension.
     * @param file The file name with extension for that the file name without extension is needed.
     * @return The file name without extension or {@code null} if it was not possible to compute it.
