@@ -128,4 +128,6 @@ respect this knowledge Mac OS will cause deadlocks!
 3. Define "Root directory" e.g. "MonKeY" and "Destination Directory"
    e.g. "C:\Temp".
 4. Finish the wizard.
-5. Windows only: Copy KeYonly.bat into root directory 
+5. Windows only: Copy content from 
+   org.key_project.monkey.product.ui/deployment/win32
+   into the created root directory. 
