@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,7 @@ import org.key_project.sed.core.model.ISEDBranchCondition;
 import org.key_project.sed.core.model.ISEDBranchNode;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDExceptionalTermination;
 import org.key_project.sed.core.model.ISEDLoopCondition;
 import org.key_project.sed.core.model.ISEDLoopNode;
 import org.key_project.sed.core.model.ISEDMethodCall;
@@ -42,6 +44,7 @@ import org.key_project.sed.core.model.memory.ISEDMemoryStackFrameCompatibleDebug
 import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
 import org.key_project.sed.core.model.memory.SEDMemoryBranchNode;
 import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
+import org.key_project.sed.core.model.memory.SEDMemoryExceptionalTermination;
 import org.key_project.sed.core.model.memory.SEDMemoryLoopCondition;
 import org.key_project.sed.core.model.memory.SEDMemoryLoopNode;
 import org.key_project.sed.core.model.memory.SEDMemoryMethodCall;
@@ -75,18 +78,21 @@ import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.BranchStatement;
+import de.uka.ilkd.key.java.statement.Catch;
 import de.uka.ilkd.key.java.statement.Do;
 import de.uka.ilkd.key.java.statement.EnhancedFor;
 import de.uka.ilkd.key.java.statement.For;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
+import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -95,11 +101,14 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.UpdateJunctor;
+import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Node.NodeIterator;
@@ -111,6 +120,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ProofStarter;
 
 /**
@@ -209,15 +219,22 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
    private LinkedList<Node> methodCallStack;
    
    /**
+    * Contains the exception variable which is used to check if the executed program in proof terminates normally.
+    */
+   private IProgramVariable exceptionVariable;
+   
+   /**
     * Constructor.
     * @param launch The parent {@link ILaunch}.
     * @param proof The {@link Proof} in KeY to treat.
+    * @throws DebugException Occurred Exception
     */
-   public KeYDebugTarget(ILaunch launch, Proof proof) {
+   public KeYDebugTarget(ILaunch launch, Proof proof) throws DebugException {
       super(launch);
       // Update references
       Assert.isNotNull(proof);
       this.proof = proof;
+      this.exceptionVariable = extractExceptionVariable(proof);
       // Update initial model
       setModelIdentifier(MODEL_IDENTIFIER);
       setName(proof.name() != null ? proof.name().toString() : "Unnamed");
@@ -230,6 +247,45 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       methodCallStack = new LinkedList<Node>();
       // Observe frozen state of KeY Main Frame
       MainWindow.getInstance().getMediator().addAutoModeListener(autoModeListener);
+   }
+   
+   /**
+    * Extracts the exception variable which is used to check if the executed program in proof terminates normally.
+    * @param proof The {@link Proof} to extract variable from.
+    * @return The extract variable.
+    * @throws DebugException Thrown exception if the exception variable was not found.
+    */
+   protected IProgramVariable extractExceptionVariable(Proof proof) throws DebugException {
+      Node root = proof.root();
+      if (root.sequent().succedent().size() == 1) {
+         Term succedent = root.sequent().succedent().getFirst().formula(); // Succedent term
+         if (succedent.subs().size() == 2) {
+            Term updateApplication = succedent.subs().get(1);
+            if (updateApplication.subs().size() == 2) {
+               JavaProgramElement updateContent = updateApplication.subs().get(1).javaBlock().program();
+               if (updateContent instanceof StatementBlock) { // try catch inclusive
+                  ImmutableArray<? extends Statement> updateContentBody = ((StatementBlock)updateContent).getBody();
+                  if (updateContentBody.size() == 2 && updateContentBody.get(1) instanceof Try) {
+                     Try tryStatement = (Try)updateContentBody.get(1);
+                     if (tryStatement.getBranchCount() == 1 && tryStatement.getBranchList().get(0) instanceof Catch) {
+                        Catch catchStatement = (Catch)tryStatement.getBranchList().get(0);
+                        if (catchStatement.getBody() instanceof StatementBlock) {
+                           StatementBlock  catchBlock = (StatementBlock)catchStatement.getBody();
+                           if (catchBlock.getBody().size() == 1 && catchBlock.getBody().get(0) instanceof Assignment) {
+                              Assignment assignment = (Assignment)catchBlock.getBody().get(0);
+                              if (assignment.getFirstElement() instanceof IProgramVariable) {
+                                 IProgramVariable var = (IProgramVariable)assignment.getFirstElement();
+                                 return var;
+                              }
+                           }
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
+      throw new DebugException(LogUtil.getLogger().createErrorStatus("Can't extract exception variable from proof."));
    }
 
    /**
@@ -524,7 +580,13 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
             }
          }
          else if (isTerminationNode(node, info, statement, posInfo)) {
-            result = createTerminationNode(parent, statement, posInfo);
+            String exceptionSort = extractExceptionSort(node);
+            if (exceptionSort != null) {
+               result = createExceptionalTerminationNode(exceptionSort, parent, statement, posInfo);
+            }
+            else {
+               result = createTerminationNode(parent, statement, posInfo);
+            }
          }
          else if (isBranchNode(node, info, statement, posInfo)) {
             result = createBranchNode(parent, statement, posInfo);
@@ -655,6 +717,55 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       return newNode;
    }
    
+
+   protected String extractExceptionSort(Node terminationNode) throws DebugException {
+      String result = null;
+      if (terminationNode != null) {
+         // Search final value of the exceptional variable which is used to check if the verified program terminates normally
+         ImmutableArray<Term> value = null;
+         for (SequentFormula f : terminationNode.sequent().succedent()) {
+            Pair<ImmutableList<Term>,Term> updates = MiscTools.goBelowUpdates2(f.formula());
+            Iterator<Term> iter = updates.first.iterator();
+            while (value == null && iter.hasNext()) {
+               value = extractValueFromUpdate(iter.next(), exceptionVariable);
+            }
+         }
+         // An exceptional termination is found if the exceptional variable is not null
+         if (value != null && value.size() == 1) {
+            Sort sort = value.get(0).sort();
+            if (sort != null && !(sort instanceof NullSort)) {
+               result = sort.toString();
+            }
+         }
+      }
+      return result;
+   }
+   
+   /**
+    * Utility method to extract the value of the {@link IProgramVariable}
+    * from the given update term.
+    * @param term The given update term.
+    * @param variable The {@link IProgramVariable} for that the value is needed.
+    * @return The found value or {@code null} if it is not defined in the given update term.
+    */
+   protected ImmutableArray<Term> extractValueFromUpdate(Term term,
+                                                         IProgramVariable variable) {
+      ImmutableArray<Term> result = null;
+      if (term.op() instanceof ElementaryUpdate) {
+         ElementaryUpdate update = (ElementaryUpdate)term.op();;
+         if (ObjectUtil.equals(variable, update.lhs())) {
+            result = term.subs();
+         }
+      }
+      else if (term.op() instanceof UpdateJunctor) {
+         Iterator<Term> iter = term.subs().iterator();
+         while (result == null && iter.hasNext()) {
+            result = extractValueFromUpdate(iter.next(), variable);
+         }
+      }
+      return result;
+   }
+   
    /**
     * Checks if the given node should be represented as termination.
     * @param node The current {@link Node} in the proof tree of KeY.
@@ -665,6 +776,28 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
     */
    protected boolean isTerminationNode(Node node, NodeInfo info, SourceElement statement, PositionInfo posInfo) {
       return "emptyModality".equals(KeYUtil.getRuleDisplayName(node));
+   }
+   
+   /**
+    * Creates a new {@link ISEDExceptionalTermination} for the given {@link SourceElement}.
+    * @param exceptionSort The sort of the thrown exception.
+    * @param parent The parent {@link ISEDDebugNode}.
+    * @param statement The given {@link SourceElement} to represent as {@link ISEDExceptionalTermination}.
+    * @param posInfo The {@link PositionInfo} to use.
+    * @return The created {@link ISEDExceptionalTermination}.
+    * @throws DebugException Occurred Exception.
+    */
+   protected ISEDExceptionalTermination createExceptionalTerminationNode(String exceptionSort,
+                                                                         ISEDDebugNode parent, 
+                                                                         SourceElement statement, 
+                                                                         PositionInfo posInfo) throws DebugException {
+      Assert.isNotNull(exceptionSort);
+      // Compute method name
+      String name = INTERNAL_NODE_START + "uncaught " + exceptionSort + INTERNAL_NODE_END;
+      // Create new node and fill it
+      SEDMemoryExceptionalTermination newNode = new SEDMemoryExceptionalTermination(getDebugTarget(), parent, thread);
+      newNode.setName(name);
+      return newNode;
    }
    
    /**

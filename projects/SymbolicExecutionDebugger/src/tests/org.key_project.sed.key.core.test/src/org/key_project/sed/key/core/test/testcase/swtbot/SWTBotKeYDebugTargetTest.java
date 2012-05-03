@@ -95,6 +95,30 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     * Tests the suspend/resume functionality on the {@link IDebugTarget}.
     */
    @Test
+   public void testThrowVariableTest() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testThrowVariableTest",
+                     "data/throwVariableTest/test",
+                     false,
+                     createMethodSelector("ThrowVariableTest", "main"),
+                     "data/throwVariableTest/oracle/ThrowVariableTest.xml");
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
+   public void testThrowTest() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testThrowTest",
+                     "data/throwTest/test",
+                     false,
+                     createMethodSelector("ThrowTest", "main"),
+                     "data/throwTest/oracle/ThrowTest.xml");
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
    public void testSimpleNullPointerSplitTest() throws Exception {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testSimpleNullPointerSplitTest",
                      "data/simpleNullPointerSplitTest/test",
@@ -499,7 +523,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
                      false,
                      createMethodSelector("RecursiveFibonacci", "fibonacci10"),
                      "data/recursiveFibonacci/oracle/RecursiveFibonacci.xml",
-                     20);
+                     30);
    }
    
    /**
