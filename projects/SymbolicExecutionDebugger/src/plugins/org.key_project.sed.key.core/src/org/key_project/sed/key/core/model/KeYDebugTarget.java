@@ -26,6 +26,7 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.internal.ui.javaeditor.ASTProvider;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
+import org.key_project.key4eclipse.starter.core.util.NodePreorderIterator;
 import org.key_project.sed.core.model.ISEDBranchCondition;
 import org.key_project.sed.core.model.ISEDBranchNode;
 import org.key_project.sed.core.model.ISEDDebugNode;
@@ -344,7 +345,10 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
     */
    protected void analyzeProof(Proof proof) throws DebugException {
       AnalyzerProofVisitor visitor = new AnalyzerProofVisitor();
-      proof.breadthFirstSearch(proof.root(), visitor); // This visitor pattern must be used because a recursive iteration causes StackOverflowErrors if the proof tree in KeY is to deep (e.g. simple list with 2000 elements during computation of fibonacci(7)
+      NodePreorderIterator iter = new NodePreorderIterator(proof.root());
+      while (iter.hasNext()) {
+         visitor.visit(proof, iter.next()); // This visitor pattern must be used because a recursive iteration causes StackOverflowErrors if the proof tree in KeY is to deep (e.g. simple list with 2000 elements during computation of fibonacci(7)
+      }
       visitor.completeTree();
    }
    
@@ -1077,11 +1081,14 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
     * @param info The site proof result.
     * @param operator The {@link Operator} for the formula which should be extracted.
     * @return The value of the formula with the given {@link Operator}.
+    * @thorws DebugException Occurred Exception.
     */
-   protected String extractOperatorValue(ApplyStrategyInfo info, final Operator operator) {
+   protected String extractOperatorValue(ApplyStrategyInfo info, final Operator operator) throws DebugException {
       // Make sure that valid parameters are given
       Assert.isNotNull(info);
-      Assert.isTrue(info.getProof().openGoals().size() == 1);
+      if (info.getProof().openGoals().size() != 1) {
+         throw new DebugException(LogUtil.getLogger().createErrorStatus("Assumption that return value extraction has one goal does not hold because " + info.getProof().openGoals().size() + " goals are available."));
+      }
       // Get node of open goal
       Node goalNode = info.getProof().openGoals().head().node();
       // Search formula with the given operator in sequent

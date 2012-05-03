@@ -5,12 +5,12 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.junit.Test;
 import org.key_project.sed.core.model.ISEDDebugElement;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.memory.ISEDMemoryDebugNode;
 import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
 import org.key_project.sed.core.model.memory.SEDMemoryStatement;
@@ -23,7 +23,7 @@ import org.key_project.sed.core.util.SEDIterator;
  */
 public class SEDIteratorTest extends TestCase {
    /**
-    * Tests an empty {@link ISEDDebugTarget}.
+    * Tests a tree with {@link ISEDDebugNode} up to level three.
     */
    @Test
    public void testNodesThreeLevel() throws DebugException {
@@ -49,7 +49,7 @@ public class SEDIteratorTest extends TestCase {
    }
    
    /**
-    * Tests an empty {@link ISEDDebugTarget}.
+    * Tests a tree with {@link ISEDDebugNode} up to level two.
     */
    @Test
    public void testNodesTwoLevel() throws DebugException {
@@ -73,7 +73,7 @@ public class SEDIteratorTest extends TestCase {
    }
    
    /**
-    * Tests an empty {@link ISEDDebugTarget}.
+    * Tests a tree with {@link ISEDDebugNode} up to level one.
     */
    @Test
    public void testNodesOneLevel() throws DebugException {
@@ -93,7 +93,8 @@ public class SEDIteratorTest extends TestCase {
    }
 
    /**
-    * Tests an empty {@link ISEDDebugTarget}.
+    * Tests a tree which contains some {@link ISEDThread}s but
+    * no {@link ISEDDebugNode}s.
     */
    @Test
    public void testThreadsOnly() throws DebugException {
@@ -133,11 +134,19 @@ public class SEDIteratorTest extends TestCase {
       assertFalse(iter.hasNext());
    }
    
+   /**
+    * Makes sure that the nodes returned by the given {@link SEDIterator}
+    * are equal to the defined model.
+    * @param iter The {@link SEDIterator} to test.
+    * @param expectedRoots The expected model.
+    * @param iterateOverSubtree Start new sub tree iteration at the current node?
+    * @throws DebugException Occurred Exception.
+    */
    protected void assertExpectedNodes(SEDIterator iter, 
                                       ExpectedNode[] expectedRoots,
                                       boolean iterateOverSubtree) throws DebugException {
       if (expectedRoots != null) {
-         Assert.isNotNull(iter);
+         assertNotNull(iter);
          for (ExpectedNode node : expectedRoots) {
             assertTrue(iter.hasNext());
             ISEDDebugElement next = iter.next();

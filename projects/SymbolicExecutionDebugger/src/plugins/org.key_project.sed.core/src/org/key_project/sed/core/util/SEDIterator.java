@@ -98,9 +98,35 @@ public class SEDIterator {
     * @throws DebugException Occurred Exception.
     */
    protected ISEDDebugElement getNextOnParent(ISEDDebugNode node) throws DebugException {
+      ISEDDebugNode parent = node.getParent();
+      // Search next debug node
+      while (parent instanceof ISEDDebugNode) {
+         ISEDDebugNode[] parentChildren = parent.getChildren();
+         int nodeIndex = ArrayUtil.indexOf(parentChildren, node);
+         if (nodeIndex < 0) {
+            throw new DebugException(LogUtil.getLogger().createErrorStatus("Parent node \"" + parent + "\" does not contain child \"" + node + "."));
+         }
+         if (nodeIndex + 1 < parentChildren.length) {
+            if (parentChildren[nodeIndex] != start) {
+               return parentChildren[nodeIndex + 1];
+            }
+            else {
+               return null;
+            }
+         }
+         else {
+            if (parentChildren[parentChildren.length - 1] != start) {
+               node = parent;
+               parent = parent.getParent(); // Continue search on parent without recursive call!
+            }
+            else {
+               return null;
+            }
+         }
+      }
+      // Search of debug node failed, try to search next thread
       if (node instanceof ISEDThread) {
-         ISEDDebugTarget parent = node.getDebugTarget();
-         ISEDThread[] parentChildren = parent.getSymbolicThreads();
+         ISEDThread[] parentChildren = node.getDebugTarget().getSymbolicThreads();
          int nodeIndex = ArrayUtil.indexOf(parentChildren, node);
          if (nodeIndex < 0) {
             throw new DebugException(LogUtil.getLogger().createErrorStatus("Debug target \"" + parent + "\" does not contain thread \"" + node + "."));
@@ -118,31 +144,7 @@ public class SEDIterator {
          }
       }
       else {
-         ISEDDebugNode parent = node.getParent();
-         if (parent == null) {
-            throw new DebugException(LogUtil.getLogger().createErrorStatus("Node \"" + node + "\" has no parent."));
-         }
-         ISEDDebugNode[] parentChildren = parent.getChildren();
-         int nodeIndex = ArrayUtil.indexOf(parentChildren, node);
-         if (nodeIndex < 0) {
-            throw new DebugException(LogUtil.getLogger().createErrorStatus("Parent node \"" + parent + "\" does not contain child \"" + node + "."));
-         }
-         if (nodeIndex + 1 < parentChildren.length) {
-            if (parentChildren[nodeIndex] != start) {
-               return parentChildren[nodeIndex + 1];
-            }
-            else {
-               return null;
-            }
-         }
-         else {
-            if (parentChildren[parentChildren.length - 1] != start) {
-               return getNextOnParent(parent);
-            }
-            else {
-               return null;
-            }
-         }
+         return null; // Search failed, no more elements available.
       }
    }
 }
