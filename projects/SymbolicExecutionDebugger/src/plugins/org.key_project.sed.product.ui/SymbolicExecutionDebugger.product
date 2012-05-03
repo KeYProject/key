@@ -391,6 +391,12 @@ Developed as part of the KeY project.
    <features>
       <feature id="org.eclipse.platform" version="3.7.1.r37x_v20110729-9gF7UHOxFtniV7mI3T556iZN9AU8bEZ1lHMcVK"/>
       <feature id="org.eclipse.jdt" version="3.7.1.r371_v20110810-0800-7z8gFcoFMLfTabvKsR5Qm9rBGEBK"/>
+      <feature id="org.eclipse.gef" version="3.7.1.v20110830-1143-777D181B3Bz06C853D8863365"/>
+      <feature id="org.eclipse.emf" version="2.7.1.v20110913-1526"/>
+      <feature id="org.eclipse.emf.validation" version="1.5.0.v20110502-1600-479-9oB56N5BBR6LCA6"/>
+      <feature id="org.eclipse.emf.transaction" version="1.5.0.v20110502-1600-377-8s734C3E7D15D6B"/>
+      <feature id="org.eclipse.emf.workspace" version="1.5.1.v20110823-1800-37708s734D3C7D3CCC1"/>
+      <feature id="org.eclipse.graphiti.feature" version="0.8.1.v20110907-0857"/>
       <feature id="org.key_project.key4eclipse.bugfix_mac_os" version="1.0.0.qualifier"/>
       <feature id="org.key_project.sed.feature" version="1.0.0.qualifier"/>
    </features>
