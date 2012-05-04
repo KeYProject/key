@@ -27,6 +27,7 @@ import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.key_project.sed.core.model.ISEDDebugElement;
 import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.util.ISEDIterator;
 import org.key_project.sed.core.util.SEDPreorderIterator;
@@ -88,6 +89,12 @@ import org.key_project.util.java.ObjectUtil;
  * @author Martin Hentschel
  */
 public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeature {
+   /**
+    * The maximal x coordinate which is used by the previous
+    * {@link ISEDDebugTarget} in {@link #updateChildren(PictogramElement, IProgressMonitor)}.
+    */
+   private int maxX;
+   
    /**
     * Constructor.
     * @param fp The {@link IFeatureProvider} which provides this {@link IUpdateFeature}.
@@ -332,13 +339,14 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
                                     IProgressMonitor monitor) throws DebugException {
       monitor.beginTask("Update children", IProgressMonitor.UNKNOWN);
       final int OFFSET = getDiagram().getGridUnit() * 2;
+      maxX = 0;
       try {
          if (!monitor.isCanceled()) {
             Object[] bos = getAllBusinessObjectsForPictogramElement(pictogramElement);
             for (Object bo : bos) {
                if (bo instanceof ISEDDebugElement) {
                   // Add all children left aligned
-                  Set<ISEDDebugNode> leafs = updateChildrenLeftAligned((ISEDDebugElement)bo, monitor, OFFSET);
+                  Set<ISEDDebugNode> leafs = updateChildrenLeftAligned((ISEDDebugElement)bo, monitor, OFFSET, maxX + OFFSET);
                   // Center sub tree
                   centerChildren(leafs, monitor);
                }
@@ -357,12 +365,14 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
     * @param businessObject The business object to create graphical representations for.
     * @param monitor The {@link IProgressMonitor} to use.
     * @param offsetBetweenPictogramElements The offset between {@link PictogramElement}s.
+    * @param initialX The initial X value which is used if no parentPE is defined.
     * @return The found leaf {@link ISEDDebugNode}s.
     * @throws DebugException Occurred Exception.
     */
    protected Set<ISEDDebugNode> updateChildrenLeftAligned(ISEDDebugElement businessObject, 
-                                                           IProgressMonitor monitor, 
-                                                           int offsetBetweenPictogramElements) throws DebugException {
+                                                          IProgressMonitor monitor, 
+                                                          int offsetBetweenPictogramElements,
+                                                          int initialX) throws DebugException {
       Set<ISEDDebugNode> leafs = new LinkedHashSet<ISEDDebugNode>();
       ISEDIterator iter = new SEDPreorderIterator(businessObject);
       PictogramElement parentPE = null;
@@ -372,8 +382,15 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
          if (nextPE == null) {
             if (next instanceof ISEDDebugNode) { // Ignore ISEDDebugTarget which has no graphical representation
                ISEDDebugNode nextNode = (ISEDDebugNode)next;
-               createGraphicalRepresentationForSubtree(parentPE, nextNode, offsetBetweenPictogramElements);
+               createGraphicalRepresentationForSubtree(parentPE, nextNode, offsetBetweenPictogramElements, initialX);
                nextPE = getPictogramElementForBusinessObject(next);
+               if (nextPE != null) {
+                  // Update maxX to make sure that ISEDDebugTargets don't overlap each other.
+                  GraphicsAlgorithm nextGA = nextPE.getGraphicsAlgorithm();
+                  if (nextGA.getX() + nextGA.getWidth() > maxX) {
+                     maxX = nextGA.getX() + nextGA.getWidth();
+                  }
+               }
                if (ArrayUtil.isEmpty(nextNode.getChildren())) {
                   leafs.add(nextNode);
                }
@@ -389,11 +406,13 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
     * @param parentPE The {@link PictogramElement} of {@link ISEDDebugNode#getParent()} or {@code null} if it is an {@link ISEDThread}.
     * @param root The {@link ISEDDebugNode} for that a graphical representation is needed.
     * @param offsetBetweenPictogramElements The offset between {@link PictogramElement}s, e.g. to parent or to previous sibling.
+    * @param initialX The initial X value which is used if no parentPE is defined.
     * @throws DebugException Occurred Exception.
     */
    protected void createGraphicalRepresentationForSubtree(PictogramElement parentPE,
                                                           ISEDDebugNode root,
-                                                          int offsetBetweenPictogramElements) throws DebugException {
+                                                          int offsetBetweenPictogramElements,
+                                                          int initialX) throws DebugException {
       AreaContext areaContext = new AreaContext();
       if (parentPE != null) {
          ISEDDebugNode parent = root.getParent();
@@ -429,7 +448,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
          }
       }
       else {
-         areaContext.setLocation(0, 0);
+         areaContext.setLocation(initialX, 0);
       }
       AddContext addContext = new AddContext(areaContext, root);
       addContext.setTargetContainer(getDiagram());
