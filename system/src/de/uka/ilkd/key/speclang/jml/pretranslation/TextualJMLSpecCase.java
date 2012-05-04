@@ -10,28 +10,34 @@
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import java.util.Iterator;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.speclang.PositionedString;
-
-
 
 /**
  * A JML specification case (i.e., more or less an operation contract) in 
  * textual form.
  */
 public final class TextualJMLSpecCase extends TextualJMLConstruct {
+   
+    static final List<String> validHeaps = new ArrayList<String>();
+
+    static {
+      validHeaps.add("heap");
+      validHeaps.add("savedHeap");
+      // validHeaps.add("permissions");
+    }; 
 
     private final Behavior behavior;
     private PositionedString workingSpace = null;
     private ImmutableList<PositionedString> requires =
             ImmutableSLList.<PositionedString>nil();
     private ImmutableList<PositionedString> measuredBy =
-            ImmutableSLList.<PositionedString>nil();
-    private ImmutableList<PositionedString> assignable =
-            ImmutableSLList.<PositionedString>nil();
-    private ImmutableList<PositionedString> assignable_backup =
             ImmutableSLList.<PositionedString>nil();
     private ImmutableList<PositionedString> accessible =
             ImmutableSLList.<PositionedString>nil();
@@ -46,12 +52,17 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     private ImmutableList<PositionedString> depends =
             ImmutableSLList.<PositionedString>nil();
 
+    private Map<String, ImmutableList<PositionedString>>
+      assignables = new HashMap<String, ImmutableList<PositionedString>>();
 
     public TextualJMLSpecCase(ImmutableList<String> mods,
                               Behavior behavior) {
         super(mods);
         assert behavior != null;
         this.behavior = behavior;
+        for(String hName : validHeaps) {
+          assignables.put(hName, ImmutableSLList.<PositionedString>nil());
+        }
     }
 
 
@@ -81,22 +92,37 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
 
     public void addAssignable(PositionedString ps) {
-        assignable = assignable.append(ps);
+        String t = ps.text;
+        if(!t.startsWith("<")) {
+           ImmutableList<PositionedString> l = assignables.get("heap");
+           l = l.append(ps);
+           assignables.put("heap", l);
+           return; 
+        }
+        List<String> hs = new ArrayList<String>();
+        for(String hName : validHeaps) {
+          String h = "<" + hName + ">";
+          if(t.startsWith(h)) {
+            hs.add(hName);
+            t = t.substring(h.length());
+          }
+        }
+        ps = new PositionedString(t, ps.fileName, ps.pos);
+        for(String h : hs) {
+           ImmutableList<PositionedString> l = assignables.get(h);
+           l = l.append(ps);
+           assignables.put(h, l); 
+        }
     }
 
-
-    public void addAssignable(ImmutableList<PositionedString> l) {
-        assignable = assignable.append(l);
-    }
-
-    public void addAssignableBackup(PositionedString ps) {
-        assignable_backup = assignable_backup.append(ps);
-    }
+//    public void addAssignableBackup(PositionedString ps) {
+        //assignable_backup = assignable_backup.append(ps);
+//    }
 
 
-    public void addAssignableBackup(ImmutableList<PositionedString> l) {
-        assignable_backup = assignable_backup.append(l);
-    }
+//    public void addAssignableBackup(ImmutableList<PositionedString> l) {
+        //assignable_backup = assignable_backup.append(l);
+//    }
 
 
     public void addAccessible(PositionedString ps) {
@@ -170,11 +196,15 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
 
     public ImmutableList<PositionedString> getAssignable() {
-        return assignable;
+        return assignables.get("heap");
+    }
+
+    public ImmutableList<PositionedString> getAssignable(String hName) {
+        return assignables.get(hName);
     }
 
     public ImmutableList<PositionedString> getAssignableBackup() {
-        return assignable_backup;
+        return assignables.get("savedHeap");
     }
 
     public ImmutableList<PositionedString> getAccessible() {
@@ -227,13 +257,11 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         while (it.hasNext()) {
             sb.append("requires: ").append(it.next()).append("\n");
         }
-        it = assignable.iterator();
-        while (it.hasNext()) {
-            sb.append("assignable: ").append(it.next()).append("\n");
-        }
-        it = assignable_backup.iterator();
-        while (it.hasNext()) {
-            sb.append("assignable_backup: ").append(it.next()).append("\n");
+        for(String h : TextualJMLSpecCase.validHeaps) {
+          it = assignables.get(h).iterator();
+          while(it.hasNext()) {
+            sb.append("assignable<"+h+">: " + it.next() + "\n");
+          }
         }
         it = accessible.iterator();
         while (it.hasNext()) {
@@ -272,8 +300,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return mods.equals(sc.mods)
                && behavior.equals(sc.behavior)
                && requires.equals(sc.requires)
-               && assignable.equals(sc.assignable)
-               && assignable_backup.equals(sc.assignable_backup)
+               && assignables.equals(sc.assignables)
                && accessible.equals(sc.accessible)
                && ensures.equals(sc.ensures)
                && signals.equals(sc.signals)
@@ -288,8 +315,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return mods.hashCode()
                + behavior.hashCode()
                + requires.hashCode()
-               + assignable.hashCode()
-               + assignable_backup.hashCode()
+               + assignables.hashCode()
                + accessible.hashCode()
                + ensures.hashCode()
                + signals.hashCode()

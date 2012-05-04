@@ -12,6 +12,10 @@
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import java.util.Iterator;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -28,16 +32,17 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
             = ImmutableSLList.<PositionedString>nil();
     private ImmutableList<PositionedString> transaction_invariant          
             = ImmutableSLList.<PositionedString>nil();
-    private ImmutableList<PositionedString> assignable         
-            = ImmutableSLList.<PositionedString>nil();
-    private ImmutableList<PositionedString> assignable_backup         
-            = ImmutableSLList.<PositionedString>nil();
     private PositionedString variant                  
             = null;
+    private Map<String, ImmutableList<PositionedString>>
+      assignables = new HashMap<String, ImmutableList<PositionedString>>();
     
     
     public TextualJMLLoopSpec(ImmutableList<String> mods) {
         super(mods);
+        for(String hName : TextualJMLSpecCase.validHeaps) {
+          assignables.put(hName, ImmutableSLList.<PositionedString>nil());
+        }
     }
 
        
@@ -51,12 +56,32 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
     
     
     public void addAssignable(PositionedString ps) {
-        assignable = assignable.append(ps);
+        String t = ps.text;
+        if(!t.startsWith("<")) {
+           ImmutableList<PositionedString> l = assignables.get("heap");
+           l = l.append(ps);
+           assignables.put("heap", l);
+           return; 
+        }
+        List<String> hs = new ArrayList<String>();
+        for(String hName : TextualJMLSpecCase.validHeaps) {
+          String h = "<" + hName + ">";
+          if(t.startsWith(h)) {
+            hs.add(hName);
+            t = t.substring(h.length());
+          }
+        }
+        ps = new PositionedString(t, ps.fileName, ps.pos);
+        for(String h : hs) {
+           ImmutableList<PositionedString> l = assignables.get(h);
+           l = l.append(ps);
+           assignables.put(h, l); 
+        }
     }
     
-    public void addAssignableBackup(PositionedString ps) {
-        assignable_backup = assignable_backup.append(ps);
-    }
+//    public void addAssignableBackup(PositionedString ps) {
+//        assignable_backup = assignable_backup.append(ps);
+//    }
     
     public void setVariant(PositionedString ps) {
         assert variant == null;
@@ -73,11 +98,11 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
     }
     
     public ImmutableList<PositionedString> getAssignable() {
-        return assignable;
+        return assignables.get("heap");
     }
 
     public ImmutableList<PositionedString> getAssignableBackup() {
-        return assignable_backup;
+        return assignables.get("savedHeap");
     }
     
     
@@ -99,13 +124,11 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
         while(it.hasNext()) {
             sb.append("transaction_invariant: " + it.next() + "\n");
         }
-        it = assignable.iterator();
-        while(it.hasNext()) {
-            sb.append("assignable: " + it.next() + "\n");
-        }
-        it = assignable_backup.iterator();
-        while (it.hasNext()) {
-            sb.append("assignable_backup: ").append(it.next()).append("\n");
+        for(String h : TextualJMLSpecCase.validHeaps) {
+          it = assignables.get(h).iterator();
+          while(it.hasNext()) {
+            sb.append("assignable<"+h+">: " + it.next() + "\n");
+          }
         }
         if(variant != null) {
             sb.append("decreases: " + variant);
@@ -124,8 +147,7 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
         return mods.equals(ls.mods)
                && invariant.equals(ls.invariant)
                && transaction_invariant.equals(ls.transaction_invariant)
-               && assignable.equals(ls.assignable)
-               && assignable_backup.equals(ls.assignable_backup)
+               && assignables.equals(ls.assignables)
                && (variant == null && ls.variant == null
                    || variant != null && variant.equals(ls.variant));
     }
@@ -135,7 +157,6 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
         return mods.hashCode()
                 + invariant.hashCode() 
                 + transaction_invariant.hashCode() 
-                + assignable.hashCode()
-                + assignable_backup.hashCode();
+                + assignables.hashCode();
     }
 }

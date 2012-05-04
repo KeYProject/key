@@ -567,7 +567,6 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 :
     (
 	    ps=assignable_clause     { sc.addAssignable(ps); }
-	|   ps=assignable_backup_clause { sc.addAssignableBackup(ps); }
 	|   ps=accessible_clause     { sc.addAccessible(ps); }
 	|   ps=ensures_clause        { sc.addEnsures(ps); }
 	|   ps=signals_clause        { sc.addSignals(ps); }
@@ -600,26 +599,24 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 //simple specification body clauses
 //-----------------------------------------------------------------------------
 
-assignable_backup_clause 
-	returns [PositionedString result = null] 
-	throws SLTranslationException
-:
-    assignable_backup_keyword result=expression { result = result.prepend("assignable "); }
-;
-
-assignable_backup_keyword
-:
-    	ASSIGNABLE_TRA 
-    |   MODIFIABLE_TRA 
-    |   MODIFIES_TRA
-;
-
-
 assignable_clause 
 	returns [PositionedString result = null] 
 	throws SLTranslationException
 :
-    assignable_keyword result=expression { result = result.prepend("assignable "); }
+    assignable_keyword result=expression { 
+      String t = result.text;
+      while(t.startsWith(" ")) t = t.substring(1);
+      String p = "assignable ";
+      for(String hString : TextualJMLSpecCase.validHeaps) {
+        String l = "<"+hString+">";
+        if(t.startsWith(l)) {
+           p = l + p;
+           t = t.substring(l.length());
+        }
+        result = new PositionedString(t, result.fileName, result.pos);
+      }
+      result = result.prepend(p); 
+    }
 ;
 
 
@@ -1091,7 +1088,6 @@ loop_specification[ImmutableList<String> mods]
     	    ps=loop_invariant       { ls.addInvariant(ps); }
         |   ps=loop_invariant_tra   { ls.addTransactionInvariant(ps); }
         |   ps=assignable_clause    { ls.addAssignable(ps); }
-	|   ps=assignable_backup_clause { ls.addAssignableBackup(ps); }
         |   ps=variant_function     { ls.setVariant(ps); } 
     )+
 ;
