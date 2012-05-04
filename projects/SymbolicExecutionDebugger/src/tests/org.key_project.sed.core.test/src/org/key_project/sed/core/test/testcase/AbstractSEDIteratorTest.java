@@ -15,13 +15,86 @@ import org.key_project.sed.core.model.memory.ISEDMemoryDebugNode;
 import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
 import org.key_project.sed.core.model.memory.SEDMemoryStatement;
 import org.key_project.sed.core.model.memory.SEDMemoryThread;
-import org.key_project.sed.core.util.SEDIterator;
+import org.key_project.sed.core.util.ISEDIterator;
 
 /**
- * Contains tests for {@link SEDIterator}.
+ * Provides the basic methods a {@link TestCase} of an
+ * {@link ISEDIterator} implementation needs.
  * @author Martin Hentschel
  */
-public class SEDIteratorTest extends TestCase {
+public abstract class AbstractSEDIteratorTest extends TestCase {
+   /**
+    * Tests one empty {@link ISEDDebugNode} only for debugging purpose.
+    */
+   @Test
+   public void testEmptyNode() throws DebugException {
+      // Create tree to test
+      SEDMemoryDebugTarget target = appendDebugTarget("target");
+      SEDMemoryThread thread1 = appendThread(target, "T1");
+      appendStatement(target, thread1, thread1, "T1S1");
+      appendStatement(target, thread1, thread1, "T1S2");
+      appendStatement(target, thread1, thread1, "T1S3");
+      SEDMemoryThread thread2 = appendThread(target, "T2");
+      SEDMemoryStatement t2s1 = appendStatement(target, thread2, thread2, "T2S1");
+      // Test tree
+      assertTarget(t2s1, createExpectedNode("T2S1"));
+   }
+   
+   /**
+    * Tests one empty {@link ISEDThread} only for debugging purpose.
+    */
+   @Test
+   public void testEmptyThread() throws DebugException {
+      // Create tree to test
+      SEDMemoryDebugTarget target = appendDebugTarget("target");
+      SEDMemoryThread t1 = appendThread(target, "T1");
+      appendThread(target, "T2");
+      appendThread(target, "T3");
+      // Test tree
+      assertTarget(t1, createExpectedNode("T1"));
+   }
+   
+   /**
+    * Tests the tree in the wikipedia example 
+    * <a href="http://en.wikipedia.org/wiki/Tree_traversal">http://en.wikipedia.org/wiki/Tree_traversal</a>:
+    * <pre>
+    *        F
+    *    B       G
+    * A    D       I
+    *    C   E   H
+    * </pre>
+    * Depth-first
+    * <ul>
+    *    <li>Preorder traversal sequence: F, B, A, D, C, E, G, I, H (root, left, right)</li>
+    *    <li>Inorder traversal sequence: A, B, C, D, E, F, G, H, I (left, root, right); note how this produces a sorted sequence</li>
+    *    <li>Postorder traversal sequence: A, C, E, D, B, H, I, G, F (left, right, root)</li>
+    * </ul>
+    * Breadth-first
+    * <ul>
+    *    <li>Level-order traversal sequence: F, B, G, A, D, I, C, E, H</li>
+    * </ul>
+    */
+   @Test
+   public void testWikipediaTree() throws DebugException {
+      // Create tree to test
+      SEDMemoryDebugTarget f = appendDebugTarget("F");
+      SEDMemoryThread b = appendThread(f, "B");
+      appendStatement(f, b, b, "A");
+      SEDMemoryStatement d = appendStatement(f, b, b, "D");
+      appendStatement(f, d, b, "C");
+      appendStatement(f, d, b, "E");
+      SEDMemoryThread g = appendThread(f, "G");
+      SEDMemoryStatement i = appendStatement(f, g, g, "I");
+      appendStatement(f, i, g, "H");
+      // Test tree
+      ExpectedNode[] expected_h = createExpectedNodes("H");
+      ExpectedNode[] expected_i = createExpectedNodes(new String[] {"I"}, expected_h);
+      ExpectedNode[] expected_ce = createExpectedNodes("C", "E");
+      ExpectedNode[] expected_ad = createExpectedNodes(new String[] {"A", "D"}, null, expected_ce);
+      ExpectedNode[] expected_bg = createExpectedNodes(new String[] {"B", "G"}, expected_ad, expected_i);
+      assertTarget(f, createExpectedNode("F", expected_bg));
+   }
+   
    /**
     * Tests a tree with {@link ISEDDebugNode} up to level three.
     */
@@ -45,7 +118,7 @@ public class SEDIteratorTest extends TestCase {
       ExpectedNode[] level2c = createExpectedNodes("T1S3a", "T1S3b");
       ExpectedNode[] level1 = createExpectedNodes(new String[] {"T1S1", "T1S2", "T1S3"}, null, level2b, level2c);
       ExpectedNode[] threads = createExpectedNodes(new String[] {"T1"}, level1);
-      assertTarget(target, createExpectedNodes(new String[] {"target"}, threads));
+      assertTarget(target, createExpectedNode("target", threads));
    }
    
    /**
@@ -69,7 +142,7 @@ public class SEDIteratorTest extends TestCase {
       ExpectedNode[] level2c = createExpectedNodes("T1S3a", "T1S3b");
       ExpectedNode[] level1 = createExpectedNodes(new String[] {"T1S1", "T1S2", "T1S3"}, null, level2b, level2c);
       ExpectedNode[] threads = createExpectedNodes(new String[] {"T1"}, level1);
-      assertTarget(target, createExpectedNodes(new String[] {"target"}, threads));
+      assertTarget(target, createExpectedNode("target", threads));
    }
    
    /**
@@ -89,7 +162,7 @@ public class SEDIteratorTest extends TestCase {
       ExpectedNode[] level1T1 = createExpectedNodes("T1S1", "T1S2", "T1S3");
       ExpectedNode[] level1T2 = createExpectedNodes("T2S1");
       ExpectedNode[] threads = createExpectedNodes(new String[] {"T1", "T2"}, level1T1, level1T2);
-      assertTarget(target, createExpectedNodes(new String[] {"target"}, threads));
+      assertTarget(target, createExpectedNode("target", threads));
    }
 
    /**
@@ -105,7 +178,7 @@ public class SEDIteratorTest extends TestCase {
       appendThread(target, "T3");
       // Test tree
       ExpectedNode[] threads = createExpectedNodes("T1", "T2", "T3");
-      assertTarget(target, createExpectedNodes(new String[] {"target"}, threads));
+      assertTarget(target, createExpectedNode("target", threads));
    }
    
    /**
@@ -116,57 +189,43 @@ public class SEDIteratorTest extends TestCase {
       // Create tree to test
       SEDMemoryDebugTarget target = appendDebugTarget("target");
       // Test tree
-      assertTarget(target, createExpectedNodes("target"));
+      assertTarget(target, createExpectedNode("target"));
    }
    
    /**
-    * Makes sure that a {@link SEDIterator} which iterates over the given
-    * {@link ISEDDebugElement} returns nodes in preorder iteration over the
-    * expected trees.
+    * Creates a new {@link ISEDIterator} to test.
+    * @param start The start {@link ISEDDebugElement}.
+    * @return The created {@link ISEDIterator}.
+    * @throws DebugException Occurred Exception.
+    */
+   protected abstract ISEDIterator createIterator(ISEDDebugElement start) throws DebugException;
+   
+   /**
+    * Makes sure that a {@link ISEDIterator} which iterates over the given
+    * {@link ISEDDebugElement} returns nodes in defined order.
     * @param element The {@link ISEDDebugElement} to iterate over.
-    * @param expectedRoots The expected values.
+    * @param root The expected root of the test oracle.
     * @throws DebugException Occurred Exception.
     */
    protected void assertTarget(ISEDDebugElement element, 
-                               ExpectedNode[] expectedRoots) throws DebugException {
-      SEDIterator iter = new SEDIterator(element);
-      assertExpectedNodes(iter, expectedRoots, false);
+                               ExpectedNode root) throws DebugException {
+      ISEDIterator iter = createIterator(element);
+      assertNotNull(iter);
+      assertExpectedNodes(iter, root, false);
       assertFalse(iter.hasNext());
    }
    
    /**
-    * Makes sure that the nodes returned by the given {@link SEDIterator}
-    * are equal to the defined model.
-    * @param iter The {@link SEDIterator} to test.
-    * @param expectedRoots The expected model.
+    * Makes sure that the nodes returned by the given {@link ISEDIterator}
+    * are equal to the defined model regarding the iteration order.
+    * @param iter The {@link ISEDIterator} to test.
+    * @param root The expected root of the test oracle.
     * @param iterateOverSubtree Start new sub tree iteration at the current node?
     * @throws DebugException Occurred Exception.
     */
-   protected void assertExpectedNodes(SEDIterator iter, 
-                                      ExpectedNode[] expectedRoots,
-                                      boolean iterateOverSubtree) throws DebugException {
-      if (expectedRoots != null) {
-         assertNotNull(iter);
-         for (ExpectedNode node : expectedRoots) {
-            assertTrue(iter.hasNext());
-            ISEDDebugElement next = iter.next();
-            assertNotNull(next);
-            if (next instanceof ISEDDebugTarget) {
-               assertEquals(node.getExpectedName(), ((ISEDDebugTarget)next).getName());
-            }
-            else if (next instanceof ISEDDebugNode) {
-               assertEquals(node.getExpectedName(), ((ISEDDebugNode)next).getName());
-            }
-            else {
-               fail("Unknown element \"" + next + "\".");
-            }
-            if (iterateOverSubtree) {
-               assertTarget(next, new ExpectedNode[] {node});
-            }
-            assertExpectedNodes(iter, node.getExpectedChildren(), true);
-         }
-      }
-   }
+   protected abstract void assertExpectedNodes(ISEDIterator iter, 
+                                               ExpectedNode root,
+                                               boolean iterateOverSubtree) throws DebugException;   
    
    /**
     * Forms the expected tree.
@@ -183,6 +242,11 @@ public class SEDIteratorTest extends TestCase {
        */
       private ExpectedNode[] expectedChildren;
 
+      /**
+       * The parent {@link ExpectedNode}.
+       */
+      private ExpectedNode parent;
+      
       /**
        * Constructor.
        * @param expectedName The expected name.
@@ -216,6 +280,22 @@ public class SEDIteratorTest extends TestCase {
       public ExpectedNode[] getExpectedChildren() {
          return expectedChildren;
       }
+
+      /**
+       * Returns the parent {@link ExpectedNode}.
+       * @return The parent {@link ExpectedNode}.
+       */
+      public ExpectedNode getParent() {
+         return parent;
+      }
+
+      /**
+       * Sets the parent {@link ExpectedNode}.
+       * @param parent The parent {@link ExpectedNode} to set.
+       */
+      public void setParent(ExpectedNode parent) {
+         this.parent = parent;
+      }
    }
 
    /**
@@ -228,9 +308,40 @@ public class SEDIteratorTest extends TestCase {
       assertEquals(names.length, children.length);
       List<ExpectedNode> result = new LinkedList<ExpectedNode>();
       for (int i = 0; i < names.length; i++) {
-         result.add(new ExpectedNode(names[i], children[i]));
+         ExpectedNode newNode = new ExpectedNode(names[i], children[i]);
+         if (children[i] != null) {
+            for (ExpectedNode child : children[i]) {
+               child.setParent(newNode);
+            }
+         }
+         result.add(newNode);
       }
       return result.toArray(new ExpectedNode[result.size()]);
+   }
+   
+   /**
+    * Creates a new {@link ExpectedNode} with the given name.
+    * @param names The given name.
+    * @param children The given children.
+    * @return The created {@link ExpectedNode}.
+    */
+   protected ExpectedNode createExpectedNode(String name, ExpectedNode[] children) {
+      ExpectedNode newNode = new ExpectedNode(name, children);
+      if (children != null) {
+         for (ExpectedNode child : children) {
+            child.setParent(newNode);
+         }
+      }
+      return newNode;
+   }
+   
+   /**
+    * Creates a new {@link ExpectedNode} with the given name.
+    * @param names The given name.
+    * @return The created {@link ExpectedNode}.
+    */
+   protected ExpectedNode createExpectedNode(String name) {
+      return new ExpectedNode(name);
    }
    
    /**

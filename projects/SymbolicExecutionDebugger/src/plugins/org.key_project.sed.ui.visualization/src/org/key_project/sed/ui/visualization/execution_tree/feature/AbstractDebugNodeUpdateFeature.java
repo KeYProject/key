@@ -1,5 +1,11 @@
 package org.key_project.sed.ui.visualization.execution_tree.feature;
 
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
@@ -22,17 +28,65 @@ import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.key_project.sed.core.model.ISEDDebugElement;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDThread;
-import org.key_project.sed.core.util.SEDIterator;
+import org.key_project.sed.core.util.ISEDIterator;
+import org.key_project.sed.core.util.SEDPreorderIterator;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
 import org.key_project.sed.ui.visualization.util.LogUtil;
 import org.key_project.util.java.ArrayUtil;
+import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.ObjectUtil;
 
 /**
+ * <p>
  * Provides a basic implementation of {@link IUpdateFeature} for {@link ISEDDebugNode}s.
+ * </p>
+ * </p>
+ * A subtree is constructed as follows during execution of {@link #update(IUpdateContext)}
+ * 
+ * <ol>
+ *    <li>Update label of current node via {@link #updateName(PictogramElement, IProgressMonitor)} </li>
+ *    <li>
+ *       Update sub tree via {@link #updateChildren(PictogramElement, IProgressMonitor)}
+ *       <ol>
+ *          <li>
+ *             Add missing graphical representations in a tree where each branch is left centered.
+ *             Result is a list of leaf nodes computed via {@link #updateChildrenLeftAligned(ISEDDebugElement, IProgressMonitor, int)}
+ *             <ol>
+ *                <li>Iterate over subtree in order.</li>
+ *                <li>First branch (ends in first leaf node) is completely left centered with x = 0.</li>
+ *                <li>
+ *                   If a new branch is detected, the maximal width of the previous 
+ *                   child branch is computed via {@link #computeSubTreeBounds(ISEDDebugNode)}
+ *                   and the x coordinate is the maximal bound (x + width) + a given offset of two grid units.
+ *                </li>
+ *             </ol>
+ *          </li>
+ *          <li>
+ *             Center whole sub tree starting from its branches leaf nodes via {@link #centerChildren(Set, IProgressMonitor)}.
+ *             <ol>
+ *                <li>Iterate over all given leaf nodes. (Start with the found one via {@link #updateChildrenLeftAligned(ISEDDebugElement, IProgressMonitor, int)})</li>
+ *                <li>
+ *                   If leaf node has children (added during step 4) compute x offset to center branch under his children.
+ *                </li>
+ *                <li>
+ *                   Go back to parents until root is reached (parent is {@code null} or multiple children are detected.
+ *                   During backward iteration collect maximal width of the elements.
+ *                </li>
+ *                <li>
+ *                   If the iteration stopped because the parent has multiple children,
+ *                   at the parent to leaf node to layout it later on same way. 
+ *                </li>
+ *                <li>
+ *                   Go back to starting child (leaf node) and center each element with the computed maximal width.
+ *                </li>
+ *             </ol>
+ *          </li>
+ *       </ol>
+ *    </li>
+ * </ol>
+ * <p>
  * @author Martin Hentschel
  */
-// TODO: Implement algorithm to layout a beautiful tree
 public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeature {
    /**
     * Constructor.
@@ -277,27 +331,16 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
    protected boolean updateChildren(PictogramElement pictogramElement, 
                                     IProgressMonitor monitor) throws DebugException {
       monitor.beginTask("Update children", IProgressMonitor.UNKNOWN);
-      final int OFFSET_TO_PARENT = getDiagram().getGridUnit() * 2;
+      final int OFFSET = getDiagram().getGridUnit() * 2;
       try {
          if (!monitor.isCanceled()) {
             Object[] bos = getAllBusinessObjectsForPictogramElement(pictogramElement);
             for (Object bo : bos) {
                if (bo instanceof ISEDDebugElement) {
-                  SEDIterator iter = new SEDIterator((ISEDDebugElement)bo);
-                  PictogramElement parentPE = null;
-                  while (iter.hasNext()) {
-                     if (!monitor.isCanceled()) {
-                        ISEDDebugElement next = iter.next();
-                        PictogramElement childPE = getPictogramElementForBusinessObject(next);
-                        if (childPE == null) {
-                           if (next instanceof ISEDDebugNode) { // Ignore ISEDDebugTarget which has no graphical representation
-                              createGraphicalRepresentationForSubtree(parentPE, (ISEDDebugNode)next, OFFSET_TO_PARENT);
-                              childPE = getPictogramElementForBusinessObject(next);
-                           }
-                        }
-                        parentPE = childPE;
-                     }
-                  }
+                  // Add all children left aligned
+                  Set<ISEDDebugNode> leafs = updateChildrenLeftAligned((ISEDDebugElement)bo, monitor, OFFSET);
+                  // Center sub tree
+                  centerChildren(leafs, monitor);
                }
             }
          }
@@ -306,6 +349,39 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
       finally {
          monitor.done();
       }
+   }
+
+   /**
+    * Creates for each element starting at the given business object
+    * a graphical representation and forms a left aligned tree.
+    * @param businessObject The business object to create graphical representations for.
+    * @param monitor The {@link IProgressMonitor} to use.
+    * @param offsetBetweenPictogramElements The offset between {@link PictogramElement}s.
+    * @return The found leaf {@link ISEDDebugNode}s.
+    * @throws DebugException Occurred Exception.
+    */
+   protected Set<ISEDDebugNode> updateChildrenLeftAligned(ISEDDebugElement businessObject, 
+                                                           IProgressMonitor monitor, 
+                                                           int offsetBetweenPictogramElements) throws DebugException {
+      Set<ISEDDebugNode> leafs = new LinkedHashSet<ISEDDebugNode>();
+      ISEDIterator iter = new SEDPreorderIterator(businessObject);
+      PictogramElement parentPE = null;
+      while (iter.hasNext() && !monitor.isCanceled()) {
+         ISEDDebugElement next = iter.next();
+         PictogramElement nextPE = getPictogramElementForBusinessObject(next);
+         if (nextPE == null) {
+            if (next instanceof ISEDDebugNode) { // Ignore ISEDDebugTarget which has no graphical representation
+               ISEDDebugNode nextNode = (ISEDDebugNode)next;
+               createGraphicalRepresentationForSubtree(parentPE, nextNode, offsetBetweenPictogramElements);
+               nextPE = getPictogramElementForBusinessObject(next);
+               if (ArrayUtil.isEmpty(nextNode.getChildren())) {
+                  leafs.add(nextNode);
+               }
+            }
+         }
+         parentPE = nextPE;
+      }
+      return leafs;
    }
    
    /**
@@ -369,7 +445,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
    protected Rectangle computeSubTreeBounds(ISEDDebugNode root) throws DebugException {
       Rectangle result = null;
       if (root != null) {
-         SEDIterator iter = new SEDIterator(root);
+         ISEDIterator iter = new SEDPreorderIterator(root);
          while (iter.hasNext()) {
             ISEDDebugElement next = iter.next();
             PictogramElement nextPE = getPictogramElementForBusinessObject(next);
@@ -396,5 +472,71 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
          }
       }
       return result;
+   }
+   
+   /**
+    * Centers all nodes starting from the given leaf nodes.
+    * @param leafs All leaf nodes.
+    * @param monitor The {@link IProgressMonitor} to use.
+    * @throws DebugException Occurred Exception
+    */
+   protected void centerChildren(Set<ISEDDebugNode> leafs, 
+                                 IProgressMonitor monitor) throws DebugException {
+      while (!leafs.isEmpty() && !monitor.isCanceled()) {
+         // Get leaf to center
+         ISEDDebugNode next = CollectionUtil.removeFirst(leafs);
+         PictogramElement nextPE = getPictogramElementForBusinessObject(next);
+         // Compute new x margin to center current branch under his children 
+         int xMargin;
+         int xStart;
+         if (!ArrayUtil.isEmpty(next.getChildren())) {
+            ISEDDebugNode firstChild = ArrayUtil.getFirst(next.getChildren());
+            ISEDDebugNode lastChild = ArrayUtil.getLast(next.getChildren());
+            PictogramElement firstChildPE = getPictogramElementForBusinessObject(firstChild);
+            PictogramElement lastChildPE = getPictogramElementForBusinessObject(lastChild);
+            int childWidth = lastChildPE.getGraphicsAlgorithm().getX() + lastChildPE.getGraphicsAlgorithm().getWidth() - 
+                             firstChildPE.getGraphicsAlgorithm().getX(); 
+            xMargin = (childWidth - nextPE.getGraphicsAlgorithm().getWidth()) / 2;
+            xStart = firstChildPE.getGraphicsAlgorithm().getX();
+         }
+         else {
+            xMargin = 0;
+            xStart = nextPE.getGraphicsAlgorithm().getX();
+         }
+         // Go back to root or branch split and collect descendants while computing max width
+         // If a parent node has more than one child it is treated as leaf node in a further iteration by adding it to leafs
+         List<PictogramElement> descendantsPE = new LinkedList<PictogramElement>();
+         int maxWidth = 0;
+         boolean maxInitialised = false;
+         do {
+            nextPE = getPictogramElementForBusinessObject(next);
+            descendantsPE.add(nextPE);
+            int currentWidth = nextPE.getGraphicsAlgorithm().getWidth();
+            if (maxInitialised) {
+               if (currentWidth > maxWidth) {
+                  maxWidth = currentWidth;
+               }
+            }
+            else {
+               maxWidth = currentWidth;
+               maxInitialised = true;
+            }
+            ISEDDebugNode child = next;
+            next = child.getParent();
+            if (next != null && next.getChildren().length != 1) {
+               if (ArrayUtil.isLast(next.getChildren(), child)) {  // Update parent only if all of his branches are correctly centered
+                  leafs.add(next);
+               }
+               next = null;
+            }
+         } while (next != null && !monitor.isCanceled());
+         // Center collected descendants based on the computed maximal element width
+         Iterator<PictogramElement> descendantIter = descendantsPE.iterator();
+         while (descendantIter.hasNext() && !monitor.isCanceled()) {
+            PictogramElement pe = descendantIter.next();
+            GraphicsAlgorithm ga = pe.getGraphicsAlgorithm();
+            ga.setX(xMargin + xStart + (maxWidth - ga.getWidth()) / 2);
+         }
+      }
    }
 }

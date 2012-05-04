@@ -13,19 +13,20 @@ import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
-import org.key_project.sed.core.util.SEDIterator;
+import org.key_project.sed.core.util.ISEDIterator;
 import org.key_project.sed.core.util.SEDPreferenceUtil;
+import org.key_project.sed.core.util.SEDPreorderIterator;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 /**
- * Tests for {@link SEDIterator}.
+ * Tests for {@link SEDPreorderIterator}.
  * @author Martin Hentschel
  */
 public class SWTBotSEDIteratorTest extends TestCase {
    /**
     * Makes sure that all children of an {@link ISEDDebugTarget} are
-    * traversed by {@link SEDIterator} in the correct order. The tested
-    * methods are {@link SEDIterator#hasNext()} and {@link SEDIterator#next()}.
+    * traversed by {@link SEDPreorderIterator} in the correct order. The tested
+    * methods are {@link SEDPreorderIterator#hasNext()} and {@link SEDPreorderIterator#next()}.
     */
    @Test
    public void testNext() throws Exception {
@@ -47,7 +48,7 @@ public class SWTBotSEDIteratorTest extends TestCase {
          debugTree = debugView.bot().tree();
          ISEDDebugTarget target = TestSedCoreUtil.waitUntilDebugTreeHasDebugTarget(bot, debugTree);
          // Test iterator
-         SEDIterator iterator = new SEDIterator(target);
+         ISEDIterator iterator = new SEDPreorderIterator(target);
          assertTrue(iterator.hasNext());
          assertNext(target, iterator);
          assertFalse(iterator.hasNext());
@@ -60,7 +61,7 @@ public class SWTBotSEDIteratorTest extends TestCase {
       }
    }
 
-   protected void assertNext(ISEDDebugTarget target, SEDIterator iterator) throws DebugException {
+   protected void assertNext(ISEDDebugTarget target, ISEDIterator iterator) throws DebugException {
       assertNotNull(target);
       assertTrue(iterator.hasNext());
       ISEDDebugElement next = iterator.next();
@@ -70,7 +71,7 @@ public class SWTBotSEDIteratorTest extends TestCase {
       }
    }
 
-   protected void assertNext(ISEDDebugNode node, SEDIterator iterator) throws DebugException {
+   protected void assertNext(ISEDDebugNode node, ISEDIterator iterator) throws DebugException {
       assertNotNull(node);
       assertTrue(iterator.hasNext());
       ISEDDebugElement next = iterator.next();

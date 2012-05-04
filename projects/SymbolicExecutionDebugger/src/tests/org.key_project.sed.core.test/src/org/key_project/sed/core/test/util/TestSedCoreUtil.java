@@ -56,9 +56,10 @@ import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.ISEDStatement;
 import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.core.model.ISEDThread;
+import org.key_project.sed.core.util.ISEDIterator;
 import org.key_project.sed.core.util.LaunchUtil;
-import org.key_project.sed.core.util.SEDIterator;
 import org.key_project.sed.core.util.SEDPreferenceUtil;
+import org.key_project.sed.core.util.SEDPreorderIterator;
 import org.key_project.sed.ui.perspective.SymbolicDebugPerspectiveFactory;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.java.ObjectUtil;
@@ -720,8 +721,8 @@ public final class TestSedCoreUtil {
     * @throws DebugException Occurred Exception.
     */
    public static void compareDebugTarget(ISEDDebugTarget expected, ISEDDebugTarget current, boolean compareId) throws DebugException {
-      SEDIterator expectedIter = new SEDIterator(expected);
-      SEDIterator currentIter = new SEDIterator(current);
+      ISEDIterator expectedIter = new SEDPreorderIterator(expected);
+      ISEDIterator currentIter = new SEDPreorderIterator(current);
       while (expectedIter.hasNext()) {
          TestCase.assertTrue(currentIter.hasNext());
          ISEDDebugElement expectedNext = expectedIter.next();
