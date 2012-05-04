@@ -18,7 +18,10 @@ import org.eclipse.graphiti.mm.algorithms.Text;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
+import org.key_project.sed.core.model.ISEDDebugElement;
 import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.model.ISEDThread;
+import org.key_project.sed.core.util.SEDIterator;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
 import org.key_project.sed.ui.visualization.util.LogUtil;
 import org.key_project.util.java.ObjectUtil;
@@ -29,11 +32,6 @@ import org.key_project.util.java.ObjectUtil;
  */
 // TODO: Implement algorithm to layout a beautiful tree
 public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeature {
-   /**
-    * The offset between the parent graphical representation and new added graphical representations.
-    */
-   public static final int OFFSET_TO_PARENT = 20;
-   
    /**
     * Constructor.
     * @param fp The {@link IFeatureProvider} which provides this {@link IUpdateFeature}.
@@ -277,16 +275,25 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
    protected boolean updateChildren(PictogramElement pictogramElement, 
                                     IProgressMonitor monitor) throws DebugException {
       monitor.beginTask("Update children", IProgressMonitor.UNKNOWN);
+      final int OFFSET_TO_PARENT = getDiagram().getGridUnit() * 2;
       try {
          if (!monitor.isCanceled()) {
-            Object bo = getBusinessObjectForPictogramElement(pictogramElement);
-            if (bo instanceof ISEDDebugNode) {
-               ISEDDebugNode[] children = ((ISEDDebugNode)bo).getChildren();
-               for (ISEDDebugNode child : children) {
-                  if (!monitor.isCanceled()) {
-                     PictogramElement childPE = getPictogramElementForBusinessObject(child);
-                     if (childPE == null) {
-                        createGraphicalRepresentationForSubtree(pictogramElement, child, monitor);
+            Object[] bos = getAllBusinessObjectsForPictogramElement(pictogramElement);
+            for (Object bo : bos) {
+               if (bo instanceof ISEDDebugElement) {
+                  SEDIterator iter = new SEDIterator((ISEDDebugElement)bo);
+                  PictogramElement parentPE = null;
+                  while (iter.hasNext()) {
+                     if (!monitor.isCanceled()) {
+                        ISEDDebugElement next = iter.next();
+                        PictogramElement childPE = getPictogramElementForBusinessObject(next);
+                        if (childPE == null) {
+                           if (next instanceof ISEDDebugNode) { // Ignore ISEDDebugTarget which has no graphical representation
+                              createGraphicalRepresentationForSubtree(parentPE, (ISEDDebugNode)next, OFFSET_TO_PARENT);
+                              childPE = getPictogramElementForBusinessObject(next);
+                           }
+                        }
+                        parentPE = childPE;
                      }
                   }
                }
@@ -300,36 +307,26 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
    }
    
    /**
-    * Creates a new graphical representation for the given {@link ISEDDebugNode}
-    * and all of his children.
-    * @param parent The {@link PictogramElement} of {@link ISEDDebugNode#getParent()}.
+    * Creates a new graphical representation for the given {@link ISEDDebugNode}.
+    * @param parent The {@link PictogramElement} of {@link ISEDDebugNode#getParent()} or {@code null} if it is an {@link ISEDThread}.
     * @param root The {@link ISEDDebugNode} for that a graphical representation is needed.
-    * @param monitor The {@link IProgressMonitor} to use.
+    * @param offsetToParent The offset to the parent graphical representation.
     * @throws DebugException Occurred Exception.
     */
    protected void createGraphicalRepresentationForSubtree(PictogramElement parent, 
                                                           ISEDDebugNode root,
-                                                          IProgressMonitor monitor) throws DebugException {
-      if (!monitor.isCanceled()) {
-         // Add root ISEDDebugNode
-         AreaContext areaContext = new AreaContext();
-         if (parent != null) {
-            GraphicsAlgorithm parentGA = parent.getGraphicsAlgorithm();
-            areaContext.setX(parentGA.getX()); 
-            areaContext.setY(parentGA.getY() + parentGA.getHeight() + OFFSET_TO_PARENT);
-         }
-         else {
-            areaContext.setLocation(0, 0);
-         }
-         AddContext addContext = new AddContext(areaContext, root);
-         addContext.setTargetContainer(getDiagram());
-         parent = getFeatureProvider().addIfPossible(addContext);
-         // Add subtree of the given root ISEDDebugNode
-         ISEDDebugNode[] children = root.getChildren();
-         for (ISEDDebugNode child : children) {
-            createGraphicalRepresentationForSubtree(parent, child, monitor);
-         }
+                                                          int offsetToParent) throws DebugException {
+      AreaContext areaContext = new AreaContext();
+      if (parent != null) {
+         GraphicsAlgorithm parentGA = parent.getGraphicsAlgorithm();
+         areaContext.setX(parentGA.getX()); 
+         areaContext.setY(parentGA.getY() + parentGA.getHeight() + offsetToParent);
       }
-      monitor.worked(1);
+      else {
+         areaContext.setLocation(0, 0);
+      }
+      AddContext addContext = new AddContext(areaContext, root);
+      addContext.setTargetContainer(getDiagram());
+      getFeatureProvider().addIfPossible(addContext);
    }
 }
