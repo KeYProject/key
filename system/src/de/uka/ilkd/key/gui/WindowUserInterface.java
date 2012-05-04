@@ -38,7 +38,7 @@ public class WindowUserInterface extends AbstractUserInterface {
 	
 	public WindowUserInterface(MainWindow mainWindow) {
 		this.mainWindow = mainWindow;
-	    completions.add(new FunctionalOperationContractCompletion());
+	        completions.add(new FunctionalOperationContractCompletion());
 		completions.add(new DependencyContractCompletion());
 		completions.add(new LoopInvariantRuleCompletion());
 	}
@@ -52,8 +52,7 @@ public class WindowUserInterface extends AbstractUserInterface {
 
 	@Override
 	public void loadProblem(File file) {
-		loadProblem(
-		        file, null, null, mainWindow.getMediator());
+		loadProblem(file, null, null);
 	}
 
 	@Override

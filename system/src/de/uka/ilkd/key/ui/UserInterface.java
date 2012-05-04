@@ -69,7 +69,9 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
      * completes rule applications of built in rules
      * @param app the DefaultBuiltInRuleApp to be completed
      * @param goal the Goal where the app will later be applied to
-     * @param forced TODO
+     * @param forced a boolean indicating if the rule should be applied without any 
+     * additional interaction from the user provided that the application object can be 
+     * made complete automatically
      * @return a complete app or null if no completion was possible
      */
     IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, boolean forced);    
