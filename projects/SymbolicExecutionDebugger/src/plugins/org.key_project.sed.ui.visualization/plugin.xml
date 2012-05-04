@@ -131,6 +131,14 @@
            name="Symbolic Execution Tree"
            restorable="true">
      </view>
+     <view
+           category="org.key_project.sed.ui.graphiti.category"
+           class="org.key_project.sed.ui.visualization.view.ExecutionTreeThumbNailView"
+           icon="icons/symbolic_debug.gif"
+           id="org.key_project.sed.ui.graphiti.view.ExecutionTreeThumbNailView"
+           name="Symbolic Execution Tree (Thumbnail)"
+           restorable="true">
+     </view>
   </extension>
   <extension
         point="org.eclipse.ui.perspectiveExtensions">
@@ -145,6 +153,17 @@
         </view>
         <viewShortcut
               id="org.key_project.sed.ui.graphiti.view.ExecutionTreeView">
+        </viewShortcut>
+        <view
+              id="org.key_project.sed.ui.graphiti.view.ExecutionTreeThumbNailView"
+              minimized="false"
+              ratio="0.80"
+              relationship="bottom"
+              relative="org.key_project.sed.ui.graphiti.view.ExecutionTreeView"
+              visible="true">
+        </view>
+        <viewShortcut
+              id="org.key_project.sed.ui.graphiti.view.ExecutionTreeThumbNailView">
         </viewShortcut>
      </perspectiveExtension>
   </extension>

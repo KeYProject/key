@@ -23,6 +23,14 @@
             name="Text Control Editor In View"
             restorable="true">
       </view>
+      <view
+            category="org.key_project.util.test.category"
+            class="org.key_project.util.test.view.LoggingAbstractViewBasedView"
+            icon="icons/symbolic_debug.gif"
+            id="org.key_project.util.test.view.LoggingAbstractViewBasedView"
+            name="Logging View Based View"
+            restorable="true">
+      </view>
    </extension>
    <extension
          point="org.eclipse.ui.editors">
