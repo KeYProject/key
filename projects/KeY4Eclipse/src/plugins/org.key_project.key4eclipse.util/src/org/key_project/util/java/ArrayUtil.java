@@ -317,4 +317,33 @@ public final class ArrayUtil {
    public static <T> boolean isEmpty(T[] array) {
       return array == null || array.length == 0;
    }
+
+   /**
+    * Returns the previous element if available from the array.
+    * @param array The array to search in.
+    * @param toSearch The element for that the previous one is needed.
+    * @return The previous element or {@code null} if no element was found.
+    */
+   public static <T> T getPrevious(T[] array, T toSearch) {
+      return getPrevious(array, toSearch, ObjectUtil.<T>createEqualsComparator());
+   }
+
+   /**
+    * Returns the previous element if available from the array. The equality is
+    * computed via the comparator. Objects are equal if the comparison result is {@code 0}.
+    * @param array The array to search in.
+    * @param toSearch The element for that the previous one is needed.
+    * @param comparator the {@link Comparator} to use.
+    * @return The previous element or {@code null} if no element was found.
+    * @throws IllegalArgumentException If the comparator is {@code null}.
+    */
+   public static <T> T getPrevious(T[] array, T toSearch, Comparator<T> comparator) throws IllegalArgumentException {
+      int index = indexOf(array, toSearch, comparator);
+      if (index >= 1) {
+         return array[index - 1];
+      }
+      else {
+         return null;
+      }
+   }
 }

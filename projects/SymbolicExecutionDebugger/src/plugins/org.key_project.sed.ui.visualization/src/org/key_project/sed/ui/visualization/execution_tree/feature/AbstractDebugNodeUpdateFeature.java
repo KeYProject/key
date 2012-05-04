@@ -4,6 +4,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.IReason;
 import org.eclipse.graphiti.features.IUpdateFeature;
@@ -24,6 +25,7 @@ import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.util.SEDIterator;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
 import org.key_project.sed.ui.visualization.util.LogUtil;
+import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.ObjectUtil;
 
 /**
@@ -308,19 +310,47 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
    
    /**
     * Creates a new graphical representation for the given {@link ISEDDebugNode}.
-    * @param parent The {@link PictogramElement} of {@link ISEDDebugNode#getParent()} or {@code null} if it is an {@link ISEDThread}.
+    * @param parentPE The {@link PictogramElement} of {@link ISEDDebugNode#getParent()} or {@code null} if it is an {@link ISEDThread}.
     * @param root The {@link ISEDDebugNode} for that a graphical representation is needed.
-    * @param offsetToParent The offset to the parent graphical representation.
+    * @param offsetBetweenPictogramElements The offset between {@link PictogramElement}s, e.g. to parent or to previous sibling.
     * @throws DebugException Occurred Exception.
     */
-   protected void createGraphicalRepresentationForSubtree(PictogramElement parent, 
+   protected void createGraphicalRepresentationForSubtree(PictogramElement parentPE,
                                                           ISEDDebugNode root,
-                                                          int offsetToParent) throws DebugException {
+                                                          int offsetBetweenPictogramElements) throws DebugException {
       AreaContext areaContext = new AreaContext();
-      if (parent != null) {
-         GraphicsAlgorithm parentGA = parent.getGraphicsAlgorithm();
-         areaContext.setX(parentGA.getX()); 
-         areaContext.setY(parentGA.getY() + parentGA.getHeight() + offsetToParent);
+      if (parentPE != null) {
+         ISEDDebugNode parent = root.getParent();
+         if (parent != null) {
+            ISEDDebugNode previousSibling = ArrayUtil.getPrevious(parent.getChildren(), root);
+            if (previousSibling != null) {
+               // Compute bounds of the sub tree starting by the previous sibling.
+               Rectangle previousBounds = computeSubTreeBounds(previousSibling);
+               if (previousBounds != null) {
+                  // Add right to the previous sibling directly under parent
+                  areaContext.setX(previousBounds.width() + offsetBetweenPictogramElements); 
+                  areaContext.setY(previousBounds.y());
+               }
+               else {
+                  // Add directly under parent
+                  GraphicsAlgorithm parentGA = parentPE.getGraphicsAlgorithm();
+                  areaContext.setX(parentGA.getX()); 
+                  areaContext.setY(parentGA.getY() + parentGA.getHeight() + offsetBetweenPictogramElements);
+               }
+            }
+            else {
+               // Add directly under parent
+               GraphicsAlgorithm parentGA = parentPE.getGraphicsAlgorithm();
+               areaContext.setX(parentGA.getX()); 
+               areaContext.setY(parentGA.getY() + parentGA.getHeight() + offsetBetweenPictogramElements);
+            }
+         }
+         else {
+            // Add directly under parent
+            GraphicsAlgorithm parentGA = parentPE.getGraphicsAlgorithm();
+            areaContext.setX(parentGA.getX()); 
+            areaContext.setY(parentGA.getY() + parentGA.getHeight() + offsetBetweenPictogramElements);
+         }
       }
       else {
          areaContext.setLocation(0, 0);
@@ -328,5 +358,43 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
       AddContext addContext = new AddContext(areaContext, root);
       addContext.setTargetContainer(getDiagram());
       getFeatureProvider().addIfPossible(addContext);
+   }
+
+   /**
+    * Computes the bounds of the sub tree starting at the given {@link ISEDDebugNode}.
+    * @param root The sub tree.
+    * @return The bounds of the subtree where {@link Rectangle#x()}, {@link Rectangle#y()} is the minimal point and {@link Rectangle#width()}, {@link Rectangle#height()} the maximal point. The result is {@code null} if the subtree is {@code null} or has no graphical representations.
+    * @throws DebugException Occurred Exception.
+    */
+   protected Rectangle computeSubTreeBounds(ISEDDebugNode root) throws DebugException {
+      Rectangle result = null;
+      if (root != null) {
+         SEDIterator iter = new SEDIterator(root);
+         while (iter.hasNext()) {
+            ISEDDebugElement next = iter.next();
+            PictogramElement nextPE = getPictogramElementForBusinessObject(next);
+            if (nextPE != null) {
+               GraphicsAlgorithm nextGA = nextPE.getGraphicsAlgorithm();
+               if (result == null) {
+                  result = new Rectangle(nextGA.getX(), nextGA.getY(), nextGA.getWidth(), nextGA.getHeight());
+               }
+               else {
+                  if (nextGA.getX() < result.x()) {
+                     result.setX(nextGA.getX());
+                  }
+                  if (nextGA.getY() < result.y()) {
+                     result.setY(nextGA.getY());
+                  }
+                  if (nextGA.getX() + nextGA.getWidth() > result.width()) {
+                     result.setWidth(nextGA.getX() + nextGA.getWidth());
+                  }
+                  if (nextGA.getY() + nextGA.getHeight() > result.height()) {
+                     result.setHeight(nextGA.getY() + nextGA.getHeight());
+                  }
+               }
+            }
+         }
+      }
+      return result;
    }
 }
