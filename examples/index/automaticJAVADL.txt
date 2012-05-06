@@ -61,6 +61,9 @@ provable: ./heap/list_ghost/ArrayList_get_normal.key
 provable: ./heap/list_ghost/ArrayList_inv.key
 provable: ./heap/list_ghost/ArrayList_size_dep.key
 provable: ./heap/list_ghost/ArrayList_size.key
+provable: ./heap/list_recursiveSpec/ListOperationsNonNull_getNextNN_normal_behavior.key
+provable: ./heap/list_recursiveSpec/ListOperationsNonNull_setValueAt_normal_behavior.key
+provable: ./heap/list_recursiveSpec/ListOperationsNonNull_remove_normal_behavior.key
 provable: ./heap/observer/ExampleObserver_ExampleObserver.key
 provable: ./heap/observer/ExampleObserver_inv.key
 provable: ./heap/observer/ExampleObserver_subject.key
