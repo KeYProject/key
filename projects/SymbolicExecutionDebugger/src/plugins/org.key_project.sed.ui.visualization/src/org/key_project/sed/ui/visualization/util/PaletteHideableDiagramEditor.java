@@ -3,8 +3,11 @@ package org.key_project.sed.ui.visualization.util;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.gef.GraphicalViewer;
+import org.eclipse.gef.SnapToGrid;
 import org.eclipse.gef.commands.CommandStack;
+import org.eclipse.gef.ui.actions.GEFActionConstants;
 import org.eclipse.gef.ui.palette.FlyoutPaletteComposite.FlyoutPreferences;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.features.IFeature;
@@ -106,7 +109,26 @@ public class PaletteHideableDiagramEditor extends DiagramEditor implements IGlob
    protected void executeCommand(ICommand command) {
       CommandStack commandStack = getEditDomain().getCommandStack();
       commandStack.execute(new GefCommandWrapper(command, getEditingDomain()));
-   }   
+   }
+   
+   /**
+    * Checks if the grid is visible.
+    * @return {@code true} grid is visible, {@code false} grid is hidden.
+    */
+   public boolean isGridVisible() {
+      Object prop = getGraphicalViewer().getProperty(SnapToGrid.PROPERTY_GRID_VISIBLE);
+      return prop instanceof Boolean && ((Boolean)prop).booleanValue();
+   }
+   
+   /**
+    * Sets the grid visible or hides it.
+    * @param showGrid {@code true} show grid, {@code false} hide grid.
+    */
+   public void setGridVisible(boolean showGrid) {
+      IAction action = getActionRegistry().getAction(GEFActionConstants.TOGGLE_GRID_VISIBILITY);
+      Assert.isNotNull(action);
+      action.run();
+   }
    
    /**
     * <p>

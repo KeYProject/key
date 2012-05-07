@@ -110,6 +110,7 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
     */
    @Override
    protected void editorPartControlCreated(ExecutionTreeDiagramEditor editorPart, ReadonlyDiagramEditorActionBarContributor contributor) {
+      editorPart.setGridVisible(false);
       ZoomManager zoomManager = (ZoomManager)editorPart.getAdapter(ZoomManager.class);
       contributor.setZoomManager(zoomManager);
    }
