@@ -646,12 +646,7 @@ conditionalexpr returns [SLExpression result=null] throws SLTranslationException
 	(
 	    QUESTIONMARK a=conditionalexpr COLON b=conditionalexpr
 	    {
-	    	Term ife = TB.ife(TB.convertToFormula(result.getTerm(), services), a.getTerm(), b.getTerm());
-	    	if(a.getType() != null && a.getType().equals(b.getType())) {
-		    result = new SLExpression(ife, a.getType());
-		} else {
-		    result = new SLExpression(ife);
-		}
+	    	result = translator.translate(JMLTranslator.JMLKeyWord.CONDITIONAL, services, result, a, b);
 	    }
 	)?
     ;

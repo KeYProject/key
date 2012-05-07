@@ -62,6 +62,7 @@ final class JMLTranslator {
         ACCESSIBLE ("accessible"),
         ASSIGNABLE ("assignable"),
         CAST ("cast"),
+        CONDITIONAL ("conditional"),
         DEPENDS ("depends"),
         ENSURES ("ensures"),
         REPRESENTS ("represents"),
@@ -859,8 +860,16 @@ final class JMLTranslator {
                         throw excManager.createException("Casting of type variables not (yet) supported.");
                     }
                     assert result.isTerm();
+                    Sort origType = result.getTerm().sort();
 
-                    if(intHelper.isIntegerTerm(result)) {
+                    if (origType == Sort.FORMULA) {
+                        // This case might occur since boolean expressions
+                        // get converted prematurely (see bug #1121).
+                        // Just check whether there is a cast to boolean.
+                        if (type != services.getTypeConverter().getBooleanType()){
+                            excManager.createException("Cannot cast from boolean to "+type+".");
+                        }
+                    } else if(intHelper.isIntegerTerm(result)) {
                         result = intHelper.buildCastExpression(type, result);
                     } else {result = new SLExpression(
                             TB.cast(services, type.getSort(), result.getTerm()), 
@@ -872,6 +881,30 @@ final class JMLTranslator {
                 return result;
             }});
         
+        translationMethods.put(JMLKeyWord.CONDITIONAL, new JMLTranslationMethod(){
+
+            @Override
+            public Object translate(SLTranslationExceptionManager excManager,
+                    Object... params) throws SLTranslationException {
+                checkParameters(params, Services.class, SLExpression.class, SLExpression.class, SLExpression.class);
+                Services services = (Services)params[0];
+                SLExpression result = (SLExpression)params[1];
+                SLExpression a = (SLExpression)params[2];
+                SLExpression b = (SLExpression)params[3];
+                
+                // handle cases where a and b are of sort FORMULA and boolean respectively (which are incompatible, unfortunately)
+                final KeYJavaType bool = services.getTypeConverter().getBooleanType();
+                Term aTerm = a.getType() == bool ? TB.convertToFormula(a.getTerm(), services) : a.getTerm();
+                Term bTerm = b.getType() == bool ? TB.convertToFormula(b.getTerm(), services) : b.getTerm();
+
+                Term ife = TB.ife(TB.convertToFormula(result.getTerm(), services), aTerm, bTerm);
+                if(a.getType() != null && a.getType().equals(b.getType())) {
+                    result = new SLExpression(ife, a.getType());
+                } else {
+                    result = new SLExpression(ife);
+                }
+                return result;
+            }});
         
         translationMethods.put(JMLKeyWord.COMMENTARY,
                                new JMLTranslationMethod() {
