@@ -293,6 +293,11 @@ public class JMLSpecFactory {
     }
 
 
+    /**
+     * Clauses are expected to be conjoined in a right-associative way, i.e. A & (B & ( C (...& N))).
+     * When using auto induction with lemmas, then A will be used as a lemma for B, 
+     * A & B will be used as a lemma for C and so on. This mimics the Isabelle-style of proving.
+     */
     private Term translateAndClauses(
             ProgramMethod pm,
             ProgramVariable selfVar,
@@ -303,14 +308,18 @@ public class JMLSpecFactory {
             Term savedHeapAtPre,
             ImmutableList<PositionedString> originalClauses)
             throws SLTranslationException {
+        //The array is used to invert the order in which the elements are read.
+        PositionedString[] array = new PositionedString[originalClauses.size()]; 
+        originalClauses.toArray(array);
+
         Term result = TB.tt();
-        for (PositionedString expr : originalClauses) {
+        for (int i=array.length-1; i>=0 ; i--) {
             Term translated =
-                    JMLTranslator.translate(expr, pm.getContainerType(),
+                    JMLTranslator.translate(array[i], pm.getContainerType(),
                                             selfVar, paramVars, resultVar,
                                             excVar, heapAtPre, savedHeapAtPre,
                                             Term.class, services);
-            result = TB.and(result, TB.convertToFormula(translated,services));
+            result = TB.and(TB.convertToFormula(translated,services), result);
         }
         return result;
     }
