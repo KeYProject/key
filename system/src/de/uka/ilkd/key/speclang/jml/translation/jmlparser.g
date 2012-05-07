@@ -1084,22 +1084,7 @@ castexpr returns  [SLExpression result = null] throws SLTranslationException
 :
 LPAREN type=typespec RPAREN result=unaryexpr
 {
-    if (type != null) {
-    if (result.isType()) {
-        raiseError("Casting of type variables not (yet) supported.");
-    }
-    assert result.isTerm();
-    
-    if(intHelper.isIntegerTerm(result)) {
-        result = intHelper.buildCastExpression(type, result);
-    } else {
-        result = new SLExpression(
-            TB.cast(services, type.getSort(), result.getTerm()), 
-            type);
-    }
-    } else {
-        raiseError("Please provide a type to cast to.");
-    }
+    result = translator.translate(JMLTranslator.JMLKeyWord.CAST, services, intHelper, type, result);
 }
 ;
 

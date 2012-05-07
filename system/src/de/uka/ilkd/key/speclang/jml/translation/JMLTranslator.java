@@ -61,6 +61,7 @@ final class JMLTranslator {
         INV_FOR ("\\invariant_for"),
         ACCESSIBLE ("accessible"),
         ASSIGNABLE ("assignable"),
+        CAST ("cast"),
         DEPENDS ("depends"),
         ENSURES ("ensures"),
         REPRESENTS ("represents"),
@@ -105,6 +106,11 @@ final class JMLTranslator {
 
 
         public String jmlName() {
+            return jmlName;
+        }
+        
+        @Override
+        public String toString(){
             return jmlName;
         }
 
@@ -837,6 +843,35 @@ final class JMLTranslator {
             
         });
         
+        translationMethods.put(JMLKeyWord.CAST, new JMLTranslationMethod(){
+
+            @Override
+            public Object translate(SLTranslationExceptionManager excManager,
+                    Object... params) throws SLTranslationException {
+                checkParameters(params, Services.class, JavaIntegerSemanticsHelper.class, KeYJavaType.class, SLExpression.class);
+                Services services = (Services)params[0];
+                JavaIntegerSemanticsHelper intHelper = (JavaIntegerSemanticsHelper)params[1];
+                KeYJavaType type = (KeYJavaType)params[2];
+                SLExpression result = (SLExpression)params[3];
+
+                if (type != null) {
+                    if (result.isType()) {
+                        throw excManager.createException("Casting of type variables not (yet) supported.");
+                    }
+                    assert result.isTerm();
+
+                    if(intHelper.isIntegerTerm(result)) {
+                        result = intHelper.buildCastExpression(type, result);
+                    } else {result = new SLExpression(
+                            TB.cast(services, type.getSort(), result.getTerm()), 
+                            type);
+                    }
+                } else {
+                    throw excManager.createException("Please provide a type to cast to.");
+                }
+                return result;
+            }});
+        
         
         translationMethods.put(JMLKeyWord.COMMENTARY,
                                new JMLTranslationMethod() {
@@ -1259,6 +1294,21 @@ final class JMLTranslator {
         } catch (TermCreationException e) {
             throw excManager.createException(e.getMessage());
         }
+    }
+    
+    public <T> T translate(JMLKeyWord keyword, Class<T> resultClass, Object... params)
+    throws SLTranslationException {
+        return translate(keyword.toString(), resultClass, params);
+    }
+    
+    public SLExpression translate(String jmlKeyWordName, Object... params)
+    throws SLTranslationException {
+        return translate(jmlKeyWordName, SLExpression.class, params);
+    }
+    
+    public SLExpression translate(JMLKeyWord keyword, Object...params)
+    throws SLTranslationException {
+        return translate(keyword.toString(), SLExpression.class, params);
     }
 
 
