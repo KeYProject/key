@@ -3505,6 +3505,7 @@ varexp[TacletBuilder b]
         | varcond_static[b,negated]
         | varcond_staticmethod[b,negated]  
         | varcond_typecheck[b, negated]
+        | varcond_induction_variable[b, negated]
       )
   )
 ;
@@ -3954,6 +3955,18 @@ varcond_freeLabelIn [TacletBuilder b, boolean negated]
     	(SchemaVariable) statement, negated ));
     }
 ;
+
+varcond_induction_variable [TacletBuilder b, boolean negated]
+{
+  ParsableVariable x = null;
+}
+:
+   ISINDUCTVAR LPAREN x=varId RPAREN {
+     b.addVariableCondition(new InductionVariableCondition (
+       (SchemaVariable)x, negated ));
+   }
+;
+
 
 goalspecs[TacletBuilder b] :
         CLOSEGOAL
