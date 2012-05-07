@@ -181,7 +181,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final String queryProp = strategyProperties.getProperty(StrategyProperties.QUERY_OPTIONS_KEY);
         final Feature queryF;
         if (queryProp.equals(StrategyProperties.QUERY_ON)) {
-       	    queryF = querySpecFeature(new QueryExpandCost(200,2,1,false)); 
+       	    queryF = querySpecFeature(new QueryExpandCost(200,1,1,false)); 
         } else if (queryProp.equals(StrategyProperties.QUERY_RESTRICTED)) {
         	// All tests in the example directory pass with this strategy. 
         	//Hence, the old query_on strategy is obsolete.

@@ -394,9 +394,7 @@ public final class StrategySelectionView extends JPanel {
         		                         " branch of the loop invariant rule.</li>" +
         		                         "<li> Queries are expanded in the Base Case and the conclusio of the Step Case <br>" +
         		                         " branch when using Auto Induction.</li>" +
-        		                         "</ul>(Attention: This radio button is buggy, it doesn't always show the correct <br>" +
-        		                         "state when KeY is started. Switching it OFF and ON again will ensure that this <br>" +
-        		                         "strategy is activated.)</html>" ); 
+        		                         "</ul></html>" ); 
         queryGroup.add(queryRestricted);
         addJavaDLOption ( queryRestricted, javaDLOptionsLayout, 4, yCoord, 2 );        
 

@@ -84,6 +84,23 @@ public final class StrategyProperties extends Properties {
     public final static String USER_TACLETS_LOW = "USER_TACLETS_LOW";
     public final static String USER_TACLETS_HIGH = "USER_TACLETS_HIGH";
 
+    //String identities.
+    private static final String[] stringPool = {
+    	STOPMODE_OPTIONS_KEY, STOPMODE_DEFAULT, STOPMODE_NONCLOSE,    
+    	SPLITTING_OPTIONS_KEY, SPLITTING_NORMAL, SPLITTING_OFF, SPLITTING_DELAYED,
+    	LOOP_OPTIONS_KEY, LOOP_EXPAND, LOOP_EXPAND_BOUNDED, LOOP_INVARIANT, LOOP_NONE,
+    	METHOD_OPTIONS_KEY, METHOD_EXPAND, METHOD_CONTRACT, METHOD_NONE,
+    	DEP_OPTIONS_KEY, DEP_ON, DEP_OFF,
+    	QUERY_OPTIONS_KEY, QUERY_ON, QUERY_RESTRICTED, QUERY_OFF,
+    	QUERYAXIOM_OPTIONS_KEY, QUERYAXIOM_ON, QUERYAXIOM_OFF,
+    	NON_LIN_ARITH_OPTIONS_KEY, NON_LIN_ARITH_NONE, NON_LIN_ARITH_DEF_OPS, NON_LIN_ARITH_COMPLETION,
+    	QUANTIFIERS_OPTIONS_KEY, QUANTIFIERS_NONE, QUANTIFIERS_NON_SPLITTING, QUANTIFIERS_NON_SPLITTING_WITH_PROGS, QUANTIFIERS_INSTANTIATE,
+    	VBT_PHASE, VBT_SYM_EX, VBT_QUAN_INST, VBT_MODEL_GEN,
+    	AUTO_INDUCTION_OPTIONS_KEY, AUTO_INDUCTION_OFF,  AUTO_INDUCTION_ON,  AUTO_INDUCTION_LEMMA_ON,
+    	USER_TACLETS_OPTIONS_KEY_BASE, USER_TACLETS_OFF, USER_TACLETS_LOW, USER_TACLETS_HIGH, 
+    	USER_TACLETS_OPTIONS_KEY(1), USER_TACLETS_OPTIONS_KEY(2), USER_TACLETS_OPTIONS_KEY(3)};
+    
+   
     private static final Properties defaultMap = new Properties();
     
     static {
@@ -151,9 +168,9 @@ public final class StrategyProperties extends Properties {
      * @param p
      */
     private static Object readSingleOption(Properties p, String key) {
-        Object o = p.get("[StrategyProperty]"+key);
-        if (o == null) o = defaultMap.get(key);
-        return o;
+        String o = (String)p.get("[StrategyProperty]"+key);
+        if (o == null) o = (String)defaultMap.get(key);
+        return getUniqueString(o);
     }
 
     public void write(Properties p) {                
@@ -191,5 +208,19 @@ public final class StrategyProperties extends Properties {
 	    }
 	}
 	return result;
+    }
+    
+    /** 
+     * @param in A keyword from the strategy properties. It must be registered in <code>stringPool<\code>.
+     * @return Returns the same string but possibly with a different but unique object identity.
+     */
+    private final static String getUniqueString(String in){
+    	for(String id:stringPool){
+    		if(id.equals(in)){
+    			return id; 
+    		}
+    	}
+    	System.err.println("The string \""+in+"\" is not registered in the string pool of StrategyProperties. Update the string pool!");
+    	return null;
     }
 }
