@@ -176,15 +176,15 @@ public class QueryExpandCost implements Feature {
 	 */
 	protected int queryExpandAlreadyAppliedAtPos(RuleApp app, PosInOccurrence pos, Goal goal){
 		 int count=0;
-		 ImmutableList<RuleApp> l =goal.appliedRuleApps();
-	        if(l!=null && !l.isEmpty()){
-	        	Iterator<RuleApp> i=l.iterator();
-	        	while(i.hasNext()){
-	        		RuleApp ra = i.next();
-	        		Term raterm = ra.posInOccurrence().subTerm();
+		 ImmutableList<RuleApp> appliedRuleApps =goal.appliedRuleApps();
+	        if(appliedRuleApps!=null && !appliedRuleApps.isEmpty()){
+	        	Iterator<RuleApp> appliedRuleAppIter=appliedRuleApps.iterator();
+	        	while(appliedRuleAppIter.hasNext()){
+	        		RuleApp appliedRuleApp = appliedRuleAppIter.next();
+	        		Term oldterm = appliedRuleApp.posInOccurrence().subTerm();
 	        		Term curterm = pos.subTerm();
-	        		if(raterm.equals(curterm)){
-	        			//System.out.println("Rule already applied:"+app.rule().displayName()+ " on "+raterm.toString());
+	        		if(appliedRuleApp.rule().equals(QueryExpand.INSTANCE) && 
+	        				oldterm.equals(curterm)){
 	        			count++;
 	        			if(count>maxRepetitionsOnSameTerm) break;
 	        		}
