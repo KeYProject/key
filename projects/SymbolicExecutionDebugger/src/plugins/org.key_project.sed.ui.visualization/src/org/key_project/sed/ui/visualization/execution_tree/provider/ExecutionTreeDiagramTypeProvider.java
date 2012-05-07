@@ -2,10 +2,12 @@ package org.key_project.sed.ui.visualization.execution_tree.provider;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.graphiti.dt.AbstractDiagramTypeProvider;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.features.IFeatureProvider;
@@ -16,11 +18,13 @@ import org.eclipse.graphiti.tb.IToolBehaviorProvider;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
 import org.key_project.sed.core.model.serialization.SEDXMLReader;
+import org.key_project.sed.core.model.serialization.SEDXMLWriter;
 import org.key_project.sed.ui.visualization.execution_tree.editor.ExecutionTreeDiagramEditor;
 import org.key_project.sed.ui.visualization.execution_tree.service.SEDIndependenceSolver;
 import org.key_project.sed.ui.visualization.execution_tree.service.SEDNotificationService;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
 import org.key_project.sed.ui.visualization.util.LogUtil;
+import org.key_project.util.java.ObjectUtil;
 
 /**
  * {@link IDiagramTypeProvider} specific implementation for execution tree diagrams.
@@ -129,6 +133,27 @@ public class ExecutionTreeDiagramTypeProvider extends AbstractDiagramTypeProvide
       catch (Exception e) {
          LogUtil.getLogger().logError(e);
          LogUtil.getLogger().openErrorDialog(null, e);
+         throw new RuntimeException(e);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void resourcesSaved(Diagram diagram, Resource[] savedResources) {
+      try {
+         // Super stuff
+         super.resourcesSaved(diagram, savedResources);
+         // Save domain file
+         if (ObjectUtil.equals(getDiagram(), diagram)) {
+            OutputStream out = ExecutionTreeUtil.writeDomainFile(diagram);
+            SEDXMLWriter writer = new SEDXMLWriter();
+            writer.write(getDebugTargets(), SEDXMLWriter.DEFAULT_ENCODING, out);
+         }
+      }
+      catch (Exception e) {
+         LogUtil.getLogger().logError(e);
          throw new RuntimeException(e);
       }
    }

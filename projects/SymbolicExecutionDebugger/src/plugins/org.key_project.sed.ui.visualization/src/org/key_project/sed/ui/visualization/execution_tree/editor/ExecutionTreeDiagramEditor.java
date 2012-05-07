@@ -1,7 +1,5 @@
 package org.key_project.sed.ui.visualization.execution_tree.editor;
 
-import java.io.OutputStream;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
@@ -21,8 +19,6 @@ import org.eclipse.graphiti.notification.INotificationService;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.swt.widgets.Display;
 import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.serialization.SEDXMLWriter;
-import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeDiagramTypeProvider;
 import org.key_project.sed.ui.visualization.execution_tree.service.SEDNotificationService;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
 import org.key_project.sed.ui.visualization.execution_tree.wizard.SaveAsExecutionTreeDiagramWizard;
@@ -54,32 +50,6 @@ public class ExecutionTreeDiagramEditor extends PaletteHideableDiagramEditor {
          ExecutionTreeDiagramEditor.this.handleDebugEvents(events);
       }
    };
-   
-   /**
-    * {@inheritDoc}
-    */
-   @SuppressWarnings("restriction")
-   @Override
-   public void doSave(IProgressMonitor monitor) {
-      try {
-         // Save diagram file
-         super.doSave(monitor);
-         // Save domain file
-         IDiagramTypeProvider diagramTypeProvider = getDiagramTypeProvider();
-         if (diagramTypeProvider instanceof ExecutionTreeDiagramTypeProvider) {
-            ExecutionTreeDiagramTypeProvider provider = (ExecutionTreeDiagramTypeProvider)diagramTypeProvider;
-            // Open output stream to domain file
-            OutputStream out = ExecutionTreeUtil.writeDomainFile(diagramTypeProvider.getDiagram());
-            // Save domain file
-            SEDXMLWriter writer = new SEDXMLWriter();
-            writer.write(provider.getDebugTargets(), SEDXMLWriter.DEFAULT_ENCODING, out);
-         }
-      }
-      catch (Exception e) {
-         LogUtil.getLogger().logError(e);
-         throw new RuntimeException(e);
-      }
-   }
 
    /**
     * {@inheritDoc}
