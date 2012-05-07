@@ -597,10 +597,10 @@ public final class StrategySelectionView extends JPanel {
                     StrategyProperties.AUTO_INDUCTION_RESTRICTED, false, false);
        autoInductionRestricted.setToolTipText ( "<html>" +
     		"Performs auto induction only on quantified formulas that<br>" +
-    		"fullfil a certain pattern (as described for the \"on\"option)<br>" +
-    		"and whose quantified variable has the suffix \"Ind\" or \"IND\".<br>" +
+    		"(a) fullfill a certain pattern (as described for the \"on\"option)<br>" +
+    		"and (b) whose quantified variable has the suffix \"Ind\" or \"IND\".<br>" +
     		"For instance, auto induction will be applied on:<br>" +
-            "      ==>  \\forall int iInd; 0&lt;=iInd->phi <br>" +
+            "      ==>  \\forall int iIND; 0&lt;=iIND->phi <br>" +
             "but not on: <br>" +
             "      ==>  \\forall int i; 0&lt;=i->phi <br>" +
             "</html>" );
