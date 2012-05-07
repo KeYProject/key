@@ -96,7 +96,7 @@ public class QueryExpand implements BuiltInRule {
                                              getTemporaryNameProposal(varNameBase), varType);
            	 */
            final String calleeName     = vnp.getNewName(services, new Name("callee")).toString(); //if someone has a better idea, then replace this.
-           final String progResultName = vnp.getNewName(services, new Name("result")).toString();
+           final String progResultName = vnp.getNewName(services, new Name("queryResult")).toString();
            final String logicResultName= vnp.getNewName(services, new Name("res_"+method.getName())).toString();
            
            final ProgramVariable callee;
@@ -119,7 +119,7 @@ public class QueryExpand implements BuiltInRule {
 
            final MethodReference mr = new MethodReference(args, method.getProgramElementName(), callee);
            final Function placeHolderResult = new Function(new Name(logicResultName), query.sort());
-
+           final Term placeHolderResultTrm  = tb.func(placeHolderResult);
            // construct method call   {heap:=h || p1:arg1 || ... || pn:=argn} 
            //                                  \[ res = o.m(p1,..,pn); \] (c = res) 
 
@@ -129,7 +129,7 @@ public class QueryExpand implements BuiltInRule {
                    new StatementBlock(assignment));
            final JavaBlock jb = JavaBlock.createJavaBlock(new StatementBlock(mf));	
 
-           final Term methodCall = tb.dia(jb, tb.not(tb.equals(tb.var(result),tb.func(placeHolderResult))));  //Not sure if box or diamond should be used.
+           final Term methodCall = tb.dia(jb, tb.not(tb.equals(tb.var(result),placeHolderResultTrm)));  //Not sure if box or diamond should be used.
            //final Term methodCall = tb.box(jb, tb.equals(tb.var(result), query));
            
            Term update = tb.elementary(services, services.getTypeConverter().getHeapLDT().getHeap(), query.sub(0));
@@ -147,7 +147,7 @@ public class QueryExpand implements BuiltInRule {
            Term topLevel = tb.not(tb.apply(update, methodCall));
 
            // chrisg: the following additional equation increases performance (sometimes significantly, e.g. by factor 10). 
-           topLevel = tb.and(topLevel, tb.equals(query,tb.func(placeHolderResult)));
+           topLevel = tb.and(topLevel, tb.equals(query,placeHolderResultTrm));
            
            //register variables in namespace
            final Namespace progvarsNS = services.getNamespaces().programVariables();
@@ -161,7 +161,7 @@ public class QueryExpand implements BuiltInRule {
            }
            //newGoal.addProgramVariable(result);
            progvarsNS.addSafely(result);
-           services.getNamespaces().functions().add(placeHolderResult);
+           services.getNamespaces().functions().addSafely(placeHolderResult);
 
            return topLevel;
     }
