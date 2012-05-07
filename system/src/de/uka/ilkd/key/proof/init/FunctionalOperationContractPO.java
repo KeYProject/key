@@ -10,6 +10,7 @@
 package de.uka.ilkd.key.proof.init;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -227,6 +228,9 @@ public class FunctionalOperationContractPO
 
         final LocationVariable savedHeapAtPreVar = getContract().transactionContract() ? TB.heapAtPreVar(services,
                                                               "savedHeapAtPre", true) : null;
+        Map<String,LocationVariable> atPreVars = new LinkedHashMap<String,LocationVariable>();
+        atPreVars.put("heap", heapAtPreVar);
+        atPreVars.put("savedHeap", savedHeapAtPreVar);
 
         final Map<Term, Term> savedToAtPre = new HashMap<Term, Term>();
         if(savedHeapAtPreVar != null) {
@@ -248,15 +252,14 @@ public class FunctionalOperationContractPO
         final Term pre = TB.and(buildFreePre(selfVar,
                                              contract.getKJT(),
                                              paramVars),
-                                contract.getPre(selfVar, paramVars, savedHeapAtPreVar, services));
+                                contract.getPre(selfVar, paramVars, atPreVars, services));
 
         //build program term
         final Term postTerm = getContract().getPost(selfVar,
                                                     paramVars,
                                                     resultVar,
                                                     exceptionVar,
-                                                    heapAtPreVar,
-                                                    savedHeapAtPreVar,
+                                                    atPreVars,
                                                     services);
         final Term frameTerm;
         
@@ -264,7 +267,7 @@ public class FunctionalOperationContractPO
         if(getContract().hasModifiesClause()) {
             frameTerm = TB.frame(services, TB.heap(services),
                     normalToAtPre, 
-                    getContract().getMod(selfVar,
+                    getContract().getMod("heap", selfVar,
                             paramVars,
                             services));
         } else {
@@ -274,7 +277,7 @@ public class FunctionalOperationContractPO
         final Term post = TB.and(getContract().transactionContract() ?
                 new Term[] {postTerm, frameTerm, TB.frame(services, TB.savedHeap(services),
                                           savedToAtPre,
-                                          getContract().getBackupMod(selfVar,
+                                          getContract().getMod("savedHeap", selfVar,
                                                                paramVars,
                                                                services))}
              :

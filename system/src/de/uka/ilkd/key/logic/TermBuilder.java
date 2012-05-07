@@ -1196,16 +1196,26 @@ public final class TermBuilder {
         return func(services.getTypeConverter().getHeapLDT().getNull());
     }
 
-    
     public Term heap(Services services) {
-        return var(services.getTypeConverter().getHeapLDT().getHeap());
-    }
+       return heap("heap", services);
+    }    
 
     public Term savedHeap(Services services) {
-        return var(services.getTypeConverter().getHeapLDT().getSavedHeap());
+       return heap("savedHeap", services);
+    }    
+
+    public Term heap(String name, Services services) {
+        LocationVariable l = null;
+        if(name.equals("heap")) {
+          l = services.getTypeConverter().getHeapLDT().getHeap();
+        }else if(name.equals("savedHeap")) {
+          l = services.getTypeConverter().getHeapLDT().getSavedHeap();
+        }else{
+          throw new TermCreationException("Unknown global Heap variable: "+name);
+        }
+        return var(l);
     }
-    
-    
+
     public Term wellFormed(Services services, Term h) {
         return func(services.getTypeConverter().getHeapLDT().getWellFormed(), 
         	    h);

@@ -15,7 +15,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -35,7 +35,7 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
     private PositionedString variant                  
             = null;
     private Map<String, ImmutableList<PositionedString>>
-      assignables = new HashMap<String, ImmutableList<PositionedString>>();
+      assignables = new LinkedHashMap<String, ImmutableList<PositionedString>>();
     
     
     public TextualJMLLoopSpec(ImmutableList<String> mods) {

@@ -10,6 +10,8 @@
 
 package de.uka.ilkd.key.speclang;
 
+import java.util.Map;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
@@ -39,8 +41,7 @@ public interface FunctionalOperationContract extends OperationContract {
 	    	        ImmutableList<ProgramVariable> paramVars, 
 	    	        ProgramVariable resultVar, 
 	    	        ProgramVariable excVar,
-	    	        ProgramVariable heapAtPreVar,
-	    	        ProgramVariable savedHeapAtPreVar,
+	    	        Map<String,? extends ProgramVariable> atPreVars,
 	    	        Services services);
     
     /**
@@ -51,8 +52,7 @@ public interface FunctionalOperationContract extends OperationContract {
 	    	        ImmutableList<Term> paramTerms, 
 	    	        Term resultTerm, 
 	    	        Term excTerm,
-	    	        Term heapAtPre,
-                        Term savedHeapAtPre,
+	    	        Map<String,Term> atPres,
 	    	        Services services);
 
 

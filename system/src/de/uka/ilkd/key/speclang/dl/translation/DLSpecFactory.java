@@ -10,6 +10,9 @@
 
 package de.uka.ilkd.key.speclang.dl.translation;
 
+import java.util.Map;
+import java.util.LinkedHashMap;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
@@ -266,6 +269,10 @@ public final class DLSpecFactory {
 	if(heapAtPreVar == null) {
 	    heapAtPreVar = TB.heapAtPreVar(services, "heapAtPre", false);
 	}
+        Map<String,LocationVariable> atPreVars = new LinkedHashMap<String,LocationVariable>();
+        atPreVars.put("heap", heapAtPreVar);
+        Map<String,Term> mods = new LinkedHashMap<String,Term>();
+        mods.put("heap", modifies);
 
 	//result variable may be omitted
 	if(resultVar == null && !pm.isVoid()) {
@@ -297,13 +304,13 @@ public final class DLSpecFactory {
 					 pre,
 					 null,// TODO measured_by in DL contracts not supported yet
 					 post, 
-					 modifies, 
+					 mods, 
 					 true, // TODO strictly pure in DL contracts not supported yet
 					 selfVar, 
 					 paramVars, 
 					 resultVar, 
 					 excVar,
-					 heapAtPreVar,
+					 atPreVars,
 					 !isLibraryClass);
     }
 }

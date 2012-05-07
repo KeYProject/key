@@ -13,7 +13,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -25,7 +25,7 @@ import de.uka.ilkd.key.speclang.PositionedString;
  */
 public final class TextualJMLSpecCase extends TextualJMLConstruct {
    
-    static final List<String> validHeaps = new ArrayList<String>();
+    public static final List<String> validHeaps = new ArrayList<String>();
 
     static {
       validHeaps.add("heap");
@@ -53,7 +53,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
             ImmutableSLList.<PositionedString>nil();
 
     private Map<String, ImmutableList<PositionedString>>
-      assignables = new HashMap<String, ImmutableList<PositionedString>>();
+      assignables = new LinkedHashMap<String, ImmutableList<PositionedString>>();
 
     public TextualJMLSpecCase(ImmutableList<String> mods,
                               Behavior behavior) {

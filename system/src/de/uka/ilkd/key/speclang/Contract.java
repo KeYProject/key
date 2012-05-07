@@ -10,6 +10,8 @@
 
 package de.uka.ilkd.key.speclang;
 
+import java.util.Map;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -50,7 +52,7 @@ public interface Contract extends SpecificationElement {
      */
     public Term getPre(ProgramVariable selfVar, 
 	    	       ImmutableList<ProgramVariable> paramVars,
-                       ProgramVariable savedHeapAtPreVar,
+                       Map<String,? extends ProgramVariable> atPreVars,
 	    	       Services services);
     
     /**
@@ -59,7 +61,7 @@ public interface Contract extends SpecificationElement {
     public Term getPre(Term heapTerm,
 	               Term selfTerm, 
 	    	       ImmutableList<Term> paramTerms,
-                       Term savedHeapAtPre,
+                       Map<String,Term> atPres,
 	    	       Services services);    
     
     

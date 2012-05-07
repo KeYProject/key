@@ -10,6 +10,9 @@
 
 package de.uka.ilkd.key.rule;
 
+import java.util.Map;
+import java.util.LinkedHashMap;
+
 import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -532,6 +535,10 @@ public final class UseOperationContractRule implements BuiltInRule {
         final Term heapAtPre = TB.var(heapAtPreVar);
         final Term savedHeapAtPre = savedHeapAtPreVar != null ? TB.var(savedHeapAtPreVar) : null;
 
+        Map<String,Term> atPres = new LinkedHashMap<String,Term>();
+        atPres.put("heap", heapAtPre);
+        atPres.put("savedHeap", savedHeapAtPre);
+
         //create variables for result and exception
         final ProgramVariable resultVar 
         	= inst.pm.isConstructor()
@@ -564,22 +571,21 @@ public final class UseOperationContractRule implements BuiltInRule {
         final Term pre  = contract.getPre(TB.heap(services), 
         				  contractSelf, 
         				  contractParams,
-                          savedHeapAtPre,
+                                          atPres,
         				  services);
         final Term post = contract.getPost(TB.heap(services),
         	                               contractSelf, 
         				                   contractParams, 
                                            contractResult, 
                                            TB.var(excVar), 
-                                           heapAtPre,
-                                           savedHeapAtPre,
+                                           atPres,
                                            services);
-        final Term mod = contract.getMod(TB.heap(services),
+        final Term mod = contract.getMod("heap", TB.heap(services),
         	                         contractSelf,
         	                         contractParams, 
         	                         services);
         final Term modBackup = transaction ? 
-                contract.getBackupMod(TB.savedHeap(services),
+                contract.getMod("savedHeap", TB.savedHeap(services),
                 contractSelf,
                 contractParams, 
                 services) : null;

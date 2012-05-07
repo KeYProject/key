@@ -37,7 +37,7 @@ import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
 
 /**
  * Standard implementation of the OperationContract interface.
@@ -55,14 +55,16 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
     final Term originalPre;
     final Term originalMby;    
     final Term originalPost;
-    final Term originalMod;
-    final Term originalModBackup;
+//    final Term originalMod;
+//    final Term originalModBackup;
+    final Map<String,Term> originalMods; // indexed by heap name
     final ProgramVariable originalSelfVar;
     final ImmutableList<ProgramVariable> originalParamVars;
     final ProgramVariable originalResultVar;
     final ProgramVariable originalExcVar;
-    final LocationVariable originalHeapAtPreVar;
-    final LocationVariable originalSavedHeapAtPreVar;
+//    final LocationVariable originalHeapAtPreVar;
+//    final LocationVariable originalSavedHeapAtPreVar;
+    final Map<String,LocationVariable> originalAtPreVars; // indexed by heap name
     final int id;
     final boolean transaction;
     final boolean toBeSaved;
@@ -87,15 +89,13 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
             		          Term pre,
             		          Term mby,
             		          Term post,
-            		          Term mod,
+            		          Map<String,Term> mods,
             		          boolean hasRealMod,
-                                  Term modBackup,
             		          ProgramVariable selfVar,
             		          ImmutableList<ProgramVariable> paramVars,
             		          ProgramVariable resultVar,
             		          ProgramVariable excVar,
-                                  LocationVariable heapAtPreVar,
-                                  LocationVariable savedHeapAtPreVar,
+                                  Map<String,LocationVariable> atPreVars,
                                   int id,
                                   boolean toBeSaved) {
 	assert !(name == null && baseName == null);
@@ -113,7 +113,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
             assert (!pm.isVoid() && !pm.isConstructor()) : "non-null result variable for void method or constructor "+pm+" with return type "+pm.getReturnType();
         }
         assert excVar != null;
-        assert heapAtPreVar != null;
+        assert atPreVars.size() != 0;
         this.baseName               = baseName;
         this.name = name != null 
                   ? name 
@@ -124,17 +124,15 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 	this.originalPre            = pre;
 	this.originalMby            = mby;
 	this.originalPost           = post;
-	this.originalMod            = mod;
+	this.originalMods           = mods;
 	this.hasRealModifiesClause  = hasRealMod;
-	this.originalModBackup      = modBackup;
 	this.originalSelfVar        = selfVar;
 	this.originalParamVars      = paramVars;
 	this.originalResultVar      = resultVar;
 	this.originalExcVar         = excVar;
-	this.originalHeapAtPreVar   = heapAtPreVar;
-	this.originalSavedHeapAtPreVar = savedHeapAtPreVar;
+	this.originalAtPreVars      = atPreVars;
 	this.id                     = id;
-        this.transaction            = (modBackup != null);
+        this.transaction            = (mods.get("savedHeap") != null);
         this.poModality             = (modality == Modality.DIA_TRANSACTION ? 
                                           Modality.DIA : 
                                           (modality == Modality.BOX_TRANSACTION ? Modality.BOX : modality));	
@@ -177,15 +175,13 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
             		         Term pre,
             		         Term mby,            		         
             		         Term post,
-            		         Term mod,
+            		         Map<String,Term> mods,
             		         boolean hasMod,
-                                 Term modBackup,
             		         ProgramVariable selfVar,
             		         ImmutableList<ProgramVariable> paramVars,
             		         ProgramVariable resultVar,
             		         ProgramVariable excVar,
-                                 LocationVariable heapAtPreVar,
-                                 LocationVariable savedHeapAtPreVar,
+                                 Map<String,LocationVariable> atPreVars,
                                  boolean toBeSaved) {
         this(baseName,
              null,
@@ -195,15 +191,13 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
              pre,
              mby,
              post,
-             mod,
+             mods,
              hasMod,
-             modBackup,
              selfVar,
              paramVars,
              resultVar,
              excVar,
-             heapAtPreVar,
-             savedHeapAtPreVar,
+             atPreVars,
              INVALID_ID,
              toBeSaved);
     }
@@ -244,8 +238,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 	    		      ImmutableList<ProgramVariable> paramVars, 
 	    		      ProgramVariable resultVar, 
 	    		      ProgramVariable excVar,
-	    		      ProgramVariable heapAtPreVar,
-	    		      ProgramVariable savedHeapAtPreVar,
+	    		      Map<String,? extends ProgramVariable> atPreVars,
 	    		      Services services) {
 	final Map<ProgramVariable, ProgramVariable> result = new LinkedHashMap<ProgramVariable, ProgramVariable>();
 	
@@ -279,18 +272,15 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 	    assert originalExcVar.sort().equals(excVar.sort());
 	    result.put(originalExcVar, excVar);
 	}
-        
-        //atPre-functions
-	if(heapAtPreVar != null) {
-	    assert originalHeapAtPreVar.sort().equals(heapAtPreVar.sort());
-	    result.put(originalHeapAtPreVar, heapAtPreVar);
-	}
 
-        //savedAtPre-functions
-	if(savedHeapAtPreVar != null) {
-	    assert originalSavedHeapAtPreVar.sort().equals(savedHeapAtPreVar.sort());
-	    result.put(originalSavedHeapAtPreVar, savedHeapAtPreVar);
-	}
+        if(atPreVars != null) {
+          for(String h : TextualJMLSpecCase.validHeaps) {
+             if(atPreVars.get(h) != null) {
+                assert originalAtPreVars.get(h).sort().equals(atPreVars.get(h).sort());
+                result.put(originalAtPreVars.get(h), atPreVars.get(h));
+             }
+          }        
+        }
 
 	return result;
     }
@@ -302,8 +292,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 	    		      ImmutableList<Term> paramTerms, 
 	    		      Term resultTerm, 
 	    		      Term excTerm,
-	    		      Term heapAtPre,
-	    		      Term savedHeapAtPre,
+                              Map<String,Term> atPres,
 	    		      Services services) {
 	final Map<Term,Term> result = new LinkedHashMap<Term,Term>();
 	
@@ -344,19 +333,16 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 	    assert originalExcVar.sort().equals(excTerm.sort());
 	    result.put(TB.var(originalExcVar), excTerm);
 	}
+
+        if(atPres != null) {
+          for(String h : TextualJMLSpecCase.validHeaps) {
+            if(atPres.get(h) != null) {
+              assert originalAtPreVars.get(h).sort().equals(atPres.get(h).sort());
+	      result.put(TB.var(originalAtPreVars.get(h)), atPres.get(h));
+            }
+          }
+        }
         
-        //atPre-functions
-	if(heapAtPre != null) {
-	    assert originalHeapAtPreVar.sort().equals(heapAtPre.sort());
-	    result.put(TB.var(originalHeapAtPreVar), heapAtPre);
-	}
-
-        //savedAtPre-functions
-	if(savedHeapAtPre != null) {
-	    assert originalSavedHeapAtPreVar.sort().equals(savedHeapAtPre.sort());
-	    result.put(TB.var(originalSavedHeapAtPreVar), savedHeapAtPre);
-	}
-
 	return result;
     }    
     
@@ -399,7 +385,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
     @Override
     public Term getPre(ProgramVariable selfVar, 
 	    	       ImmutableList<ProgramVariable> paramVars,
-                       ProgramVariable savedHeapAtPreVar,
+                       Map<String,? extends ProgramVariable> atPreVars,
                        Services services) {
         assert (selfVar == null) == (originalSelfVar == null);
         assert paramVars != null;
@@ -409,8 +395,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
                                              paramVars, 
                                              null, 
                                              null,
-                                             null,
-                                             savedHeapAtPreVar, 
+                                             atPreVars, 
                                              services);
 	final OpReplacer or = new OpReplacer(replaceMap);
 	return or.replace(originalPre);
@@ -421,7 +406,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
     public Term getPre(Term heapTerm,
 	               Term selfTerm, 
 	    	       ImmutableList<Term> paramTerms,
-                       Term savedHeapAtPre,
+                       Map<String,Term> atPres,
                        Services services) {
 	assert heapTerm != null;		
         assert (selfTerm == null) == (originalSelfVar == null);
@@ -432,9 +417,8 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 					     selfTerm, 
 					     paramTerms, 
 					     null, 
-					     null, 
 					     null,
-                                             savedHeapAtPre, 
+                                             atPres, 
 					     services);
 	final OpReplacer or = new OpReplacer(replaceMap);
 	return or.replace(originalPre);
@@ -451,7 +435,6 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
         assert services != null;
 	final Map<ProgramVariable, ProgramVariable> replaceMap = getReplaceMap(selfVar, 
                                              paramVars, 
-                                             null, 
                                              null,
                                              null,
                                              null,
@@ -474,7 +457,6 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 	final Map<Term, Term> replaceMap = getReplaceMap(heapTerm, 
 					     selfTerm, 
 					     paramTerms, 
-					     null, 
 					     null, 
 					     null, 
                                              null,
@@ -517,8 +499,17 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
         		    ? LogicPrinter.quickPrintTerm(originalMby, services)
         	            : null;        
         final String post = LogicPrinter.quickPrintTerm(originalPost, services);
-        final String mod  = LogicPrinter.quickPrintTerm(originalMod, services);
-        final String modBackup = originalModBackup != null ? LogicPrinter.quickPrintTerm(originalModBackup, services) : null;
+        
+        String mods = "";
+        for(String h : TextualJMLSpecCase.validHeaps) {
+           if(originalMods.get(h) != null) {
+             mods = mods +"<br><b>mod["+h+"]</b> " +
+               LogicPrinter.escapeHTML(LogicPrinter.quickPrintTerm(originalMods.get(h), services), false);
+             if(h.equals("heap") && !hasRealModifiesClause) {
+               mods = mods + "<b>, creates no new objects</b>";
+             }
+           }
+        }
                       
         return "<html>"
                 + "<i>" + LogicPrinter.escapeHTML(sig.toString(), false) + "</i>"
@@ -526,10 +517,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
                 + LogicPrinter.escapeHTML(pre, false)
                 + "<br><b>post</b> "
                 + LogicPrinter.escapeHTML(post, false)
-                + "<br><b>mod</b> "
-                + LogicPrinter.escapeHTML(mod, false)
-                + (hasRealModifiesClause ? "" : "<b>, creates no new objects</b>")
-                + (modBackup != null ? "<br><b>mod_backup</b> "+ LogicPrinter.escapeHTML(modBackup, false) : "")
+                + mods
                 + (hasMby() 
                    ? "<br><b>measured-by</b> " + LogicPrinter.escapeHTML(mby, 
                 	   						 false)
@@ -564,7 +552,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 	    sb.append("    ").append(originalResultVar.proofToString());
 	}
 	sb.append("    ").append(originalExcVar.proofToString());
-	sb.append("    ").append(originalHeapAtPreVar.proofToString());	
+	sb.append("    ").append(originalAtPreVars.get("heap").proofToString());	
 	sb.append("  }\n");
 
 	//prepare Java program
@@ -593,7 +581,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 	//print contract term
 	final Term update 
 		= TB.tf().createTerm(
-			ElementaryUpdate.getInstance(originalHeapAtPreVar),
+			ElementaryUpdate.getInstance(originalAtPreVars.get("heap")),
 			TB.heap(services));	
 	final Term modalityTerm 
 		= TB.tf().createTerm(modality, 
@@ -619,7 +607,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 	//print modifies
 	lp.reset();
 	try {
-	    lp.printTerm(originalMod);
+	    lp.printTerm(originalMods.get("heap"));
 	} catch(IOException e) {
 	    throw new RuntimeException(e);
 	}
@@ -646,22 +634,20 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
                         ImmutableList<ProgramVariable> paramVars, 
                         ProgramVariable resultVar, 
                         ProgramVariable excVar,
-                        ProgramVariable heapAtPreVar,
-                        ProgramVariable savedHeapAtPreVar,
+                        Map<String,? extends ProgramVariable> atPreVars,
                         Services services) {
         assert (selfVar == null) == (originalSelfVar == null);
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
         assert (resultVar == null) == (originalResultVar == null);
         assert excVar != null;
-        assert heapAtPreVar != null;
+        assert atPreVars.size() != 0;
         assert services != null;
 	final Map<ProgramVariable, ProgramVariable> replaceMap = getReplaceMap(selfVar, 
                                        	     paramVars, 
                                        	     resultVar, 
                                        	     excVar, 
-                                       	     heapAtPreVar,
-                                             savedHeapAtPreVar, 
+                                       	     atPreVars,
                                        	     services);
 	final OpReplacer or = new OpReplacer(replaceMap);
 	return or.replace(originalPost);
@@ -674,8 +660,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
                         ImmutableList<Term> paramTerms, 
                         Term resultTerm, 
                         Term excTerm,
-                        Term heapAtPre,
-                        Term savedHeapAtPre,
+                        Map<String,Term> atPres,
                         Services services) {
 	assert heapTerm != null;
         assert (selfTerm == null) == (originalSelfVar == null);
@@ -683,22 +668,21 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
         assert paramTerms.size() == originalParamVars.size();
         assert (resultTerm == null) == (originalResultVar == null);
         assert excTerm != null;
-        assert heapAtPre != null;
+        assert atPres.size() != 0;
         assert services != null;
 	final Map<Term, Term> replaceMap = getReplaceMap(heapTerm,
 		                             selfTerm, 
                                              paramTerms, 
                                              resultTerm, 
                                              excTerm, 
-                                       	     heapAtPre,
-                                             savedHeapAtPre, 
+                                       	     atPres,
                                        	     services);
 	final OpReplacer or = new OpReplacer(replaceMap);
 	return or.replace(originalPost);
     }    
 
     public boolean isReadOnlyContract() {
-        return originalMod.toString().equals("empty");
+        return originalMods.get("heap").toString().equals("empty");
     }
     
     public Term getAnyMod(Term mod, ProgramVariable selfVar, 
@@ -711,7 +695,6 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 	final Map<ProgramVariable, ProgramVariable> replaceMap = getReplaceMap(selfVar, 
                                              paramVars, 
                                              null, 
-                                             null, 
                                              null,
                                              null,
                                              services);
@@ -720,18 +703,18 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
     }
 
     @Override
-    public Term getMod(ProgramVariable selfVar, 
+    public Term getMod(String hName, ProgramVariable selfVar, 
                        ImmutableList<ProgramVariable> paramVars,
                        Services services) {
-       return getAnyMod(this.originalMod, selfVar, paramVars, services);
+       return getAnyMod(this.originalMods.get(hName), selfVar, paramVars, services);
     }
 
-    @Override
-    public Term getBackupMod(ProgramVariable selfVar, 
-                       ImmutableList<ProgramVariable> paramVars,
-                       Services services) {
-       return getAnyMod(this.originalModBackup, selfVar, paramVars, services);
-    }
+//    @Override
+//    public Term getBackupMod(ProgramVariable selfVar, 
+//                       ImmutableList<ProgramVariable> paramVars,
+//                       Services services) {
+//       return getAnyMod(this.originalModBackup, selfVar, paramVars, services);
+//    }
 
     private Term getAnyMod(Term mod, Term heapTerm,
 	               Term selfTerm, 
@@ -746,7 +729,6 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 		                             selfTerm, 
                                              paramTerms, 
                                              null, 
-                                             null, 
                                              null,
                                              null, 
                                              services);
@@ -760,20 +742,20 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
     }
   
     @Override    
-    public Term getMod(Term heapTerm,
+    public Term getMod(String hName, Term heapTerm,
 	               Term selfTerm, 
 	    	       ImmutableList<Term> paramTerms,
                        Services services) {
-        return getAnyMod(this.originalMod, heapTerm, selfTerm, paramTerms, services);
+        return getAnyMod(this.originalMods.get(hName), heapTerm, selfTerm, paramTerms, services);
     }    
 
-    @Override    
-    public Term getBackupMod(Term heapTerm,
-	               Term selfTerm, 
-	    	       ImmutableList<Term> paramTerms,
-                       Services services) {
-        return getAnyMod(this.originalModBackup, heapTerm, selfTerm, paramTerms, services);
-    }    
+//    @Override    
+//    public Term getBackupMod(Term heapTerm,
+//	               Term selfTerm, 
+//	    	       ImmutableList<Term> paramTerms,
+//                       Services services) {
+//        return getAnyMod(this.originalModBackup, heapTerm, selfTerm, paramTerms, services);
+//    }    
     
     @Override
     public String toString() {
@@ -783,11 +765,10 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 		+ originalMby
 		+ "; post: " 
 		+ originalPost 
-		+ "; mod: " 
-		+ originalMod
+		+ "; mods: " 
+		+ originalMods
 		+ "; hasMod: "
 		+ hasRealModifiesClause
-                + (originalModBackup != null ? "; mod_backup: " + originalModBackup : "")
 		+ "; termination: "
 		+ getModality();
     }
@@ -827,15 +808,13 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
                                                    originalPre,
                                                    originalMby,
                                                    originalPost,
-                                                   originalMod,
+                                                   originalMods,
                                                    hasRealModifiesClause,
-                                                   originalModBackup,
                                                    originalSelfVar,
                                                    originalParamVars,
                                                    originalResultVar,
                                                    originalExcVar,
-                                                   originalHeapAtPreVar,
-                                                   originalSavedHeapAtPreVar,
+                                                   originalAtPreVars,
                                                    newId,
                                                    toBeSaved);
     }
@@ -853,15 +832,13 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
                                                    originalPre,
                                                    originalMby,
                                                    originalPost,
-                                                   originalMod,
+                                                   originalMods,
                                                    hasRealModifiesClause,
-                                                   originalModBackup,
                                                    originalSelfVar,
                                                    originalParamVars,
                                                    originalResultVar,
                                                    originalExcVar,
-                                                   originalHeapAtPreVar,
-                                                   originalSavedHeapAtPreVar,
+                                                   originalAtPreVars,
                                                    id,
                                                    toBeSaved && newKJT.equals(
                 kjt));

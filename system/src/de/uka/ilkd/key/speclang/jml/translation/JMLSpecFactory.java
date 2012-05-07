@@ -11,6 +11,8 @@ package de.uka.ilkd.key.speclang.jml.translation;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.Services;
@@ -78,8 +80,9 @@ public class JMLSpecFactory {
 
         public Term requires;
         public Term measuredBy;
-        public Term assignable;
-        public Term assignable_backup;
+        // public Term assignable;
+        // public Term assignable_backup;
+        public Map<String,Term> assignables = new LinkedHashMap<String,Term>();
         public Term accessible;
         public Term ensures;
         public Term signals;
@@ -197,11 +200,14 @@ public class JMLSpecFactory {
         progVar.paramVars = TB.paramVars(services, pm, false);
         progVar.resultVar = TB.resultVar(services, pm, false);
         progVar.excVar = TB.excVar(services, pm, false);
-        progVar.heapAtPreVar = TB.heapAtPreVar(services, "heapAtPre", false);
-        progVar.heapAtPre = TB.var(progVar.heapAtPreVar);
-        progVar.savedHeapAtPreVar = TB.heapAtPreVar(services, "savedHeapAtPre",
-                                                    false);
-        progVar.savedHeapAtPre = TB.var(progVar.savedHeapAtPreVar);
+
+        progVar.atPreVars = new LinkedHashMap<String,LocationVariable>();
+        progVar.atPres = new LinkedHashMap<String,Term>();
+        for(String h : new String[]{"heap", "savedHeap"}) {
+           LocationVariable lv = TB.heapAtPreVar(services, h+"AtPre", false);
+           progVar.atPreVars.put(h, lv);
+           progVar.atPres.put(h, TB.var(lv));
+        }     
         return progVar;
     }
 
@@ -213,7 +219,7 @@ public class JMLSpecFactory {
             throws SLTranslationException {
         ContractClauses clauses = new ContractClauses();
         Term savedHeapAtPre = textualSpecCase.getMods().contains("transaction")
-                              ? progVars.savedHeapAtPre : null;
+                              ? progVars.atPres.get("savedHeap") : null;
         clauses.requires =
                 translateAndClauses(pm, progVars.selfVar, progVars.paramVars,
                                     null, null, null, savedHeapAtPre,
@@ -222,27 +228,25 @@ public class JMLSpecFactory {
                 translateMeasuredBy(pm, progVars.selfVar,
                                     progVars.paramVars,
                                     textualSpecCase.getMeasuredBy());
-        clauses.assignable =
-                translateAssignable(pm, progVars.selfVar,
-                                    progVars.paramVars,
-                                    textualSpecCase.getAssignable());
         clauses.strictlyPure =
                 translateStrictlyPure(pm, progVars.selfVar,
                         progVars.paramVars,
                         textualSpecCase.getAssignable());
-        if (textualSpecCase.getMods().contains("transaction")) {
-            clauses.assignable_backup =
-                    translateAssignable(pm, progVars.selfVar,
-                                        progVars.paramVars,
-                                        textualSpecCase.getAssignableBackup());
-        } else {
-            if (textualSpecCase.getAssignableBackup().size() != 0) {
-                throw new SLTranslationException(
-                        "assignable_backup not allowed in a non-transaction spec case.",
-                        textualSpecCase.getAssignableBackup().head().fileName,
-                        textualSpecCase.getAssignableBackup().head().pos);
-            }
-            clauses.assignable_backup = null;
+        for(String h : TextualJMLSpecCase.validHeaps) {
+           if(h.equals("savedHeap") && !textualSpecCase.getMods().contains("transaction")) {
+             if(textualSpecCase.getAssignable(h).size() != 0) {
+                 throw new SLTranslationException(
+                        "accessing savedHeap not allowed in a non-transaction spec case.",
+                        textualSpecCase.getAssignable(h).head().fileName,
+                        textualSpecCase.getAssignable(h).head().pos);
+             }else{
+                clauses.assignables.put(h, null);
+                continue;
+             }
+           }
+           clauses.assignables.put(h, translateAssignable(pm, progVars.selfVar,
+                                    progVars.paramVars,
+                                    textualSpecCase.getAssignable(h)));
         }
         clauses.accessible =
                 translateAccessible(pm, progVars.selfVar,
@@ -251,13 +255,13 @@ public class JMLSpecFactory {
         clauses.ensures = translateEnsures(pm, progVars.selfVar,
                                            progVars.paramVars,
                                            progVars.resultVar, progVars.excVar,
-                                           progVars.heapAtPre, savedHeapAtPre,
+                                           progVars.atPres,
                                            originalBehavior,
                                            textualSpecCase.getEnsures());
         clauses.signals = translateSignals(pm, progVars.selfVar,
                                            progVars.paramVars,
                                            progVars.resultVar, progVars.excVar,
-                                           progVars.heapAtPre, savedHeapAtPre,
+                                           progVars.atPres,
                                            originalBehavior,
                                            textualSpecCase.getSignals());
         clauses.signalsOnly =
@@ -391,8 +395,7 @@ public class JMLSpecFactory {
             ImmutableList<ProgramVariable> paramVars,
             ProgramVariable resultVar,
             ProgramVariable excVar,
-            Term heapAtPre,
-            Term savedHeapAtPre,
+            Map<String,Term> atPres,
             Behavior originalBehavior,
             ImmutableList<PositionedString> originalClauses)
             throws SLTranslationException {
@@ -401,7 +404,7 @@ public class JMLSpecFactory {
             return TB.ff();
         } else {
             return translateAndClauses(pm, selfVar, paramVars, resultVar,
-                                       excVar, heapAtPre, savedHeapAtPre,
+                                       excVar, atPres != null ? atPres.get("heap") : null, atPres != null ? atPres.get("savedHeap") : null,
                                        originalClauses);
         }
     }
@@ -412,7 +415,7 @@ public class JMLSpecFactory {
                                       Behavior originalBehavior,
                                       ImmutableList<PositionedString> originalClauses)
             throws SLTranslationException {
-        return translateSignals(pm, null, null, null, excVar, null, null,
+        return translateSignals(pm, null, null, null, excVar, null,
                                 originalBehavior, originalClauses);
     }
 
@@ -422,8 +425,7 @@ public class JMLSpecFactory {
                                   ImmutableList<ProgramVariable> paramVars,
                                   ProgramVariable resultVar,
                                   ProgramVariable excVar,
-                                  Term heapAtPre,
-                                  Term savedHeapAtPre,
+                                  Map<String,Term> atPres,
                                   Behavior originalBehavior,
                                   ImmutableList<PositionedString> originalClauses)
             throws SLTranslationException {
@@ -432,7 +434,7 @@ public class JMLSpecFactory {
             return TB.ff();
         } else {
             return translateAndClauses(pm, selfVar, paramVars, resultVar,
-                                       excVar, heapAtPre, savedHeapAtPre,
+                                       excVar, atPres.get("heap"), atPres.get("savedHeap"),
                                        originalClauses);
         }
     }
@@ -566,41 +568,27 @@ public class JMLSpecFactory {
         if (clauses.diverges.equals(TB.ff())) {
             FunctionalOperationContract contract = cf.func(
                     name, pm, true, TB.convertToFormula(clauses.requires,services),
-                    clauses.measuredBy, post, clauses.assignable, 
+                    clauses.measuredBy, post, clauses.assignables, 
                     !clauses.strictlyPure, progVars);
-            if(clauses.assignable_backup != null) {
-               contract = cf.setModifiesBackup(contract, clauses.assignable_backup);
-               contract = cf.setModality(contract, Modality.DIA_TRANSACTION);
-            }
             result = result.add(contract);
         } else if (clauses.diverges.equals(TB.tt())) {
             FunctionalOperationContract contract = cf.func(
                     name, pm, false, TB.convertToFormula(clauses.requires,services),
-                    clauses.measuredBy, post, clauses.assignable, !clauses.strictlyPure, progVars);
-            if(clauses.assignable_backup != null) {
-               contract = cf.setModifiesBackup(contract, clauses.assignable_backup);
-               contract = cf.setModality(contract, Modality.BOX_TRANSACTION);
-            }
+                    clauses.measuredBy, post, clauses.assignables, !clauses.strictlyPure, progVars);
             result = result.add(contract);
         } else {
             FunctionalOperationContract contract1 = cf.func(
                     name, pm, true,
                     TB.and(TB.convertToFormula(clauses.requires,services), TB.not(TB.convertToFormula(clauses.diverges,services))),
-                    clauses.measuredBy, post, clauses.assignable,
+                    clauses.measuredBy, post, clauses.assignables,
                     !clauses.strictlyPure, progVars);
             FunctionalOperationContract contract2 =
                     cf.func(name, pm, false,
                                                         clauses.requires,
                                                         clauses.measuredBy, post,
-                                                        clauses.assignable,
+                                                        clauses.assignables,
                                                         !clauses.strictlyPure,
                                                         progVars);
-            if(clauses.assignable_backup != null) {
-               contract1 = cf.setModifiesBackup(contract1, clauses.assignable_backup);
-               contract1 = cf.setModality(contract1, Modality.DIA_TRANSACTION);
-               contract2 = cf.setModifiesBackup(contract2, clauses.assignable_backup);
-               contract2 = cf.setModality(contract2, Modality.BOX_TRANSACTION);
-            }
             result = result.add(contract1).add(contract2);
         }
         return result;

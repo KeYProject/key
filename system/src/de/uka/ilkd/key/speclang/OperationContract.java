@@ -10,6 +10,8 @@
 
 package de.uka.ilkd.key.speclang;
 
+import java.util.Map;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
@@ -32,7 +34,7 @@ public interface OperationContract extends Contract {
     /**
      * Returns the modifies clause of the contract.
      */
-    public Term getMod(ProgramVariable selfVar, 
+    public Term getMod(String heapName, ProgramVariable selfVar, 
 	    	       ImmutableList<ProgramVariable> paramVars,
                        Services services);
     
@@ -40,7 +42,7 @@ public interface OperationContract extends Contract {
     /**
      * Returns the modifies clause of the contract.
      */
-    public Term getMod(Term heapTerm,
+    public Term getMod(String heapName, Term heapTerm,
 	               Term selfTerm, 
 	    	       ImmutableList<Term> paramTerms,
                        Services services);
@@ -48,17 +50,17 @@ public interface OperationContract extends Contract {
     /**
      * Returns the modifies_backup clause of the contract.
      */
-    public Term getBackupMod(ProgramVariable selfVar, 
-	    	       ImmutableList<ProgramVariable> paramVars,
-                       Services services);
+//    public Term getBackupMod(ProgramVariable selfVar, 
+//	    	       ImmutableList<ProgramVariable> paramVars,
+//                       Services services);
     
     
     /**
      * Returns the modifies_backup clause of the contract.
      */
-    public Term getBackupMod(Term heapTerm,
-	               Term selfTerm, 
-	    	       ImmutableList<Term> paramTerms,
-                       Services services);
+//    public Term getBackupMod(Term heapTerm,
+//	               Term selfTerm, 
+//	    	       ImmutableList<Term> paramTerms,
+//                       Services services);
     
 }
