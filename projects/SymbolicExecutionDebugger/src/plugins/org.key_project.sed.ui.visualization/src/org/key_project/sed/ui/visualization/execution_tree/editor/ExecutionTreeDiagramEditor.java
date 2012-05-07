@@ -37,7 +37,6 @@ import org.key_project.util.java.ArrayUtil;
  */
 // TODO: Reload diagram when the domain model file has changed.
 // TODO: Synchronize selection with debug view
-// TODO: Implement outline view
 public class ExecutionTreeDiagramEditor extends PaletteHideableDiagramEditor {
    /**
     * Indicates that this editor is read-onl or editable otherwise.
