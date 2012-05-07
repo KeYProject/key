@@ -3,6 +3,7 @@ package org.key_project.sed.ui.visualization.util;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.gef.GraphicalViewer;
 import org.eclipse.gef.commands.CommandStack;
 import org.eclipse.gef.ui.palette.FlyoutPaletteComposite.FlyoutPreferences;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
@@ -14,6 +15,7 @@ import org.eclipse.graphiti.internal.command.ICommand;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.graphiti.ui.internal.command.GefCommandWrapper;
+import org.eclipse.graphiti.ui.internal.config.IConfigurationProvider;
 import org.eclipse.jface.action.IAction;
 import org.key_project.util.eclipse.view.editorInView.AbstractEditorInViewView;
 import org.key_project.util.eclipse.view.editorInView.GlobalEnablementWrapperAction;
@@ -273,5 +275,31 @@ public class PaletteHideableDiagramEditor extends DiagramEditor implements IGlob
    @Override
    public boolean isDirty() {
       return super.isDirty();
+   }
+
+   /**
+    * <p>
+    * {@inheritDoc}
+    * </p>
+    * <p>
+    * Overwritten to ignore warnings.
+    * </p>
+    */   
+   @Override
+   public GraphicalViewer getGraphicalViewer() {
+      return super.getGraphicalViewer();
+   }
+
+   /**
+    * <p>
+    * {@inheritDoc}
+    * </p>
+    * <p>
+    * Overwritten to ignore warnings.
+    * </p>
+    */   
+   @Override
+   public IConfigurationProvider getConfigurationProvider() {
+      return super.getConfigurationProvider();
    }
 }

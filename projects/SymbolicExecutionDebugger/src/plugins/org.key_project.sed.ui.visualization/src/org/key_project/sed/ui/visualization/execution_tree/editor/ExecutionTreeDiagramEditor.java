@@ -11,6 +11,7 @@ import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.IDebugEventSetListener;
 import org.eclipse.debug.core.model.IDebugElement;
 import org.eclipse.debug.core.model.IDebugTarget;
+import org.eclipse.gef.ContextMenuProvider;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.features.IFeature;
 import org.eclipse.graphiti.features.context.IContext;
@@ -25,6 +26,7 @@ import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTre
 import org.key_project.sed.ui.visualization.execution_tree.service.SEDNotificationService;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
 import org.key_project.sed.ui.visualization.execution_tree.wizard.SaveAsExecutionTreeDiagramWizard;
+import org.key_project.sed.ui.visualization.util.CustomizableDiagramEditorContextMenuProvider;
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 import org.key_project.sed.ui.visualization.util.LogUtil;
 import org.key_project.sed.ui.visualization.util.PaletteHideableDiagramEditor;
@@ -259,5 +261,17 @@ public class ExecutionTreeDiagramEditor extends PaletteHideableDiagramEditor {
    @Override
    public boolean isDirty() {
       return !isReadOnly() && super.isDirty();
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected ContextMenuProvider createContextMenuProvider() {
+      return new CustomizableDiagramEditorContextMenuProvider(getGraphicalViewer(), 
+                                                              getActionRegistry(), 
+                                                              getConfigurationProvider(),
+                                                              !isReadOnly(),
+                                                              !isReadOnly());
    }
 }

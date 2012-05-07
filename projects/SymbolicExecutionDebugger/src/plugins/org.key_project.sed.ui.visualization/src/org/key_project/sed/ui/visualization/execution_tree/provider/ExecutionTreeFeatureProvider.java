@@ -1,18 +1,43 @@
 package org.key_project.sed.ui.visualization.execution_tree.provider;
 
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
+import org.eclipse.graphiti.features.IAddBendpointFeature;
 import org.eclipse.graphiti.features.IAddFeature;
+import org.eclipse.graphiti.features.ICreateConnectionFeature;
 import org.eclipse.graphiti.features.ICreateFeature;
 import org.eclipse.graphiti.features.IDeleteFeature;
+import org.eclipse.graphiti.features.IDirectEditingFeature;
+import org.eclipse.graphiti.features.IFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.ILayoutFeature;
+import org.eclipse.graphiti.features.IMoveAnchorFeature;
+import org.eclipse.graphiti.features.IMoveBendpointFeature;
+import org.eclipse.graphiti.features.IMoveConnectionDecoratorFeature;
+import org.eclipse.graphiti.features.IMoveShapeFeature;
+import org.eclipse.graphiti.features.IPasteFeature;
+import org.eclipse.graphiti.features.IReconnectionFeature;
+import org.eclipse.graphiti.features.IRemoveBendpointFeature;
 import org.eclipse.graphiti.features.IRemoveFeature;
+import org.eclipse.graphiti.features.IResizeShapeFeature;
 import org.eclipse.graphiti.features.IUpdateFeature;
+import org.eclipse.graphiti.features.context.IAddBendpointContext;
 import org.eclipse.graphiti.features.context.IAddContext;
+import org.eclipse.graphiti.features.context.ICustomContext;
 import org.eclipse.graphiti.features.context.IDeleteContext;
+import org.eclipse.graphiti.features.context.IDirectEditingContext;
 import org.eclipse.graphiti.features.context.ILayoutContext;
+import org.eclipse.graphiti.features.context.IMoveAnchorContext;
+import org.eclipse.graphiti.features.context.IMoveBendpointContext;
+import org.eclipse.graphiti.features.context.IMoveConnectionDecoratorContext;
+import org.eclipse.graphiti.features.context.IMoveShapeContext;
+import org.eclipse.graphiti.features.context.IPasteContext;
+import org.eclipse.graphiti.features.context.IPictogramElementContext;
+import org.eclipse.graphiti.features.context.IReconnectionContext;
+import org.eclipse.graphiti.features.context.IRemoveBendpointContext;
 import org.eclipse.graphiti.features.context.IRemoveContext;
+import org.eclipse.graphiti.features.context.IResizeShapeContext;
 import org.eclipse.graphiti.features.context.IUpdateContext;
+import org.eclipse.graphiti.features.custom.ICustomFeature;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.ui.features.DefaultFeatureProvider;
 import org.key_project.sed.core.model.ISEDBranchCondition;
@@ -77,6 +102,11 @@ import org.key_project.sed.ui.visualization.execution_tree.service.SEDIndependen
  */
 public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
    /**
+    * Indicates that the diagram is read-only or editable.
+    */
+   private boolean readOnly = false;
+   
+   /**
     * Constructor.
     * @param dtp The diagram type provider for that this {@link IFeatureProvider} is used.
     */
@@ -86,20 +116,33 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
    }
 
    /**
+    * Returns the used {@link SEDIndependenceSolver}.
+    * @return The used {@link SEDIndependenceSolver}.
+    */
+   public SEDIndependenceSolver getSEDIndependenceSolver() {
+      return (SEDIndependenceSolver)getIndependenceSolver();
+   }
+
+   /**
     * {@inheritDoc}
     */
    @Override
    public ICreateFeature[] getCreateFeatures() {
-      return new ICreateFeature[] {new BranchConditionCreateFeature(this),
-                                   new BranchNodeCreateFeature(this),
-                                   new ExceptionalTerminationCreateFeature(this),
-                                   new LoopConditionCreateFeature(this),
-                                   new LoopNodeCreateFeature(this),
-                                   new MethodCallCreateFeature(this),
-                                   new MethodReturnCreateFeature(this),
-                                   new StatementCreateFeature(this),
-                                   new TerminationCreateFeature(this),
-                                   new ThreadCreateFeature(this)};
+      if (!isReadOnly()) {
+         return new ICreateFeature[] {new BranchConditionCreateFeature(this),
+                                      new BranchNodeCreateFeature(this),
+                                      new ExceptionalTerminationCreateFeature(this),
+                                      new LoopConditionCreateFeature(this),
+                                      new LoopNodeCreateFeature(this),
+                                      new MethodCallCreateFeature(this),
+                                      new MethodReturnCreateFeature(this),
+                                      new StatementCreateFeature(this),
+                                       new TerminationCreateFeature(this),
+                                       new ThreadCreateFeature(this)};
+      }
+      else {
+         return new ICreateFeature[0];
+      }
    }
 
    /**
@@ -108,7 +151,7 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
    @Override
    public IAddFeature getAddFeature(IAddContext context) {
       if (context.getNewObject() instanceof ISEDBranchCondition) {
-          return new BranchConditionAddFeature(this);
+         return new BranchConditionAddFeature(this);
       }
       else if (context.getNewObject() instanceof ISEDBranchNode) {
          return new BranchNodeAddFeature(this);
@@ -233,7 +276,12 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
     */
    @Override
    public IDeleteFeature getDeleteFeature(IDeleteContext context) {
-      return new ExecutionTreeDeleteFeature(this);
+      if (!isReadOnly()) {
+         return new ExecutionTreeDeleteFeature(this);
+      }
+      else {
+         return null;
+      }
    }
 
    /**
@@ -241,14 +289,206 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
     */
    @Override
    public IRemoveFeature getRemoveFeature(IRemoveContext context) {
+      if (!isReadOnly()) {
+         return getRemoveFeatureIgnoreReadonlyState(context);
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * Returns the {@link IRemoveFeature} for the given {@link IRemoveContext}
+    * ignoring the read-only state ({@link #isReadOnly()}).
+    * @param removeContext The {@link IRemoveContext} for that an {@link IRemoveFeature} is requested.
+    * @return The {@link IRemoveFeature} to use or {@code null} if no {@link IRemoveFeature} is available.
+    */
+   public IRemoveFeature getRemoveFeatureIgnoreReadonlyState(IRemoveContext removeContext) {
       return new ExecutionTreeRemoveFeature(this);
    }
    
    /**
-    * Returns the used {@link SEDIndependenceSolver}.
-    * @return The used {@link SEDIndependenceSolver}.
+    * {@inheritDoc}
     */
-   public SEDIndependenceSolver getSEDIndependenceSolver() {
-      return (SEDIndependenceSolver)getIndependenceSolver();
+   @Override
+   public IAddBendpointFeature getAddBendpointFeature(IAddBendpointContext context) {
+      if (!isReadOnly()) {
+         return super.getAddBendpointFeature(context);
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ICustomFeature[] getCustomFeatures(ICustomContext context) {
+      if (!isReadOnly()) {
+         return super.getCustomFeatures(context);
+      }
+      else {
+         return new ICustomFeature[0];
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IMoveAnchorFeature getMoveAnchorFeature(IMoveAnchorContext context) {
+      if (!isReadOnly()) {
+         return super.getMoveAnchorFeature(context);
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IMoveBendpointFeature getMoveBendpointFeature(IMoveBendpointContext context) {
+      if (!isReadOnly()) {
+         return super.getMoveBendpointFeature(context);
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IMoveConnectionDecoratorFeature getMoveConnectionDecoratorFeature(IMoveConnectionDecoratorContext context) {
+      if (!isReadOnly()) {
+         return super.getMoveConnectionDecoratorFeature(context);
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IMoveShapeFeature getMoveShapeFeature(IMoveShapeContext context) {
+      if (!isReadOnly()) {
+         return super.getMoveShapeFeature(context);
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IPasteFeature getPasteFeature(IPasteContext context) {
+      if (!isReadOnly()) {
+         return super.getPasteFeature(context);
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IRemoveBendpointFeature getRemoveBendpointFeature(IRemoveBendpointContext context) {
+      if (!isReadOnly()) {
+         return super.getRemoveBendpointFeature(context);
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IResizeShapeFeature getResizeShapeFeature(IResizeShapeContext context) {
+      if (!isReadOnly()) {
+         return super.getResizeShapeFeature(context);
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ICreateConnectionFeature[] getCreateConnectionFeatures() {
+      if (!isReadOnly()) {
+         return super.getCreateConnectionFeatures();
+      }
+      else {
+         return new ICreateConnectionFeature[0];
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IDirectEditingFeature getDirectEditingFeature(IDirectEditingContext context) {
+      if (!isReadOnly()) {
+         return super.getDirectEditingFeature(context);
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IReconnectionFeature getReconnectionFeature(IReconnectionContext context) {
+      if (!isReadOnly()) {
+         return super.getReconnectionFeature(context);
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IFeature[] getDragAndDropFeatures(IPictogramElementContext context) {
+      if (!isReadOnly()) {
+         return super.getDragAndDropFeatures(context);
+      }
+      else {
+         return new IFeature[0];
+      }
+   }
+
+   /**
+    * Checks if the diagram is read-only or editable.
+    * @return {@code true} read-only, {@code false} editable.
+    */
+   public boolean isReadOnly() {
+      return readOnly;
+   }
+
+   /**
+    * Defines if the diagram is read-only or editable.
+    * @param readOnly {@code true} read-only, {@code false} editable.
+    */
+   public void setReadOnly(boolean readOnly) {
+      this.readOnly = readOnly;
    }
 }

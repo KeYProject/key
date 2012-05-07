@@ -1,10 +1,10 @@
 package org.key_project.sed.ui.visualization.execution_tree.feature;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.debug.core.DebugException;
-import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.IRemoveFeature;
 import org.eclipse.graphiti.features.IUpdateFeature;
 import org.eclipse.graphiti.features.context.ICustomContext;
@@ -17,6 +17,7 @@ import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDThread;
+import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeFeatureProvider;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
 import org.key_project.sed.ui.visualization.util.LogUtil;
 
@@ -41,10 +42,18 @@ public class DebugTargetConnectFeature extends AbstractCustomFeature {
    
    /**
     * Constructor.
-    * @param fp The {@link IFeatureProvider} which provides this {@link IUpdateFeature}.
+    * @param fp The {@link ExecutionTreeFeatureProvider} which provides this {@link IUpdateFeature}.
     */
-   public DebugTargetConnectFeature(IFeatureProvider fp) {
+   public DebugTargetConnectFeature(ExecutionTreeFeatureProvider fp) {
       super(fp);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ExecutionTreeFeatureProvider getFeatureProvider() {
+      return (ExecutionTreeFeatureProvider)super.getFeatureProvider();
    }
 
    /**
@@ -102,7 +111,8 @@ public class DebugTargetConnectFeature extends AbstractCustomFeature {
                         for (PictogramElement pictogramElement : elements) {
                            if (!monitor.isCanceled()) {
                               IRemoveContext removeContext = new RemoveContext(pictogramElement);
-                              IRemoveFeature feature = getFeatureProvider().getRemoveFeature(removeContext);
+                              IRemoveFeature feature = getFeatureProvider().getRemoveFeatureIgnoreReadonlyState(removeContext);
+                              Assert.isNotNull(feature, "No remove feature available for \"" + removeContext + "\".");
                               feature.execute(removeContext);
                            }
                         }

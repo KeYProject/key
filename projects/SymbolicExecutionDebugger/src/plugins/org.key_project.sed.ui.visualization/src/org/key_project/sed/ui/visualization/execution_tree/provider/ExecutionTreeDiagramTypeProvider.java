@@ -47,7 +47,7 @@ public class ExecutionTreeDiagramTypeProvider extends AbstractDiagramTypeProvide
     * Contains the available {@link IToolBehaviorProvider}s which are instantiated
     * lazily via {@link #getAvailableToolBehaviorProviders()}.
     */
-   private IToolBehaviorProvider[] toolBehaviorProviders;
+   private ExecutionTreeToolBehaviorProvider[] toolBehaviorProviders;
    
    /**
     * Contains the available {@link ISEDDebugTarget}s.
@@ -70,6 +70,14 @@ public class ExecutionTreeDiagramTypeProvider extends AbstractDiagramTypeProvide
     * {@inheritDoc}
     */
    @Override
+   public ExecutionTreeFeatureProvider getFeatureProvider() {
+      return (ExecutionTreeFeatureProvider)super.getFeatureProvider();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
    public SEDNotificationService getNotificationService() {
       if (notificationService == null) {
          notificationService = new SEDNotificationService(this);
@@ -81,9 +89,9 @@ public class ExecutionTreeDiagramTypeProvider extends AbstractDiagramTypeProvide
     * {@inheritDoc}
     */
    @Override
-   public IToolBehaviorProvider[] getAvailableToolBehaviorProviders() {
+   public ExecutionTreeToolBehaviorProvider[] getAvailableToolBehaviorProviders() {
       if (toolBehaviorProviders == null) {
-         toolBehaviorProviders = new IToolBehaviorProvider[] {new ExecutionTreeToolBehaviorProvider(this)};
+         toolBehaviorProviders = new ExecutionTreeToolBehaviorProvider[] {new ExecutionTreeToolBehaviorProvider(this)};
       }
       return toolBehaviorProviders;
    }
@@ -96,6 +104,11 @@ public class ExecutionTreeDiagramTypeProvider extends AbstractDiagramTypeProvide
       try {
          // Make sure that the editor is compatible with this diagram
          Assert.isTrue(diagramEditor instanceof ExecutionTreeDiagramEditor, "The diagram type " + TYPE + " must be used in ExecutionTreeDiagramEditor instances.");
+         boolean readonly = ((ExecutionTreeDiagramEditor)diagramEditor).isReadOnly();
+         getFeatureProvider().setReadOnly(readonly);
+         for (ExecutionTreeToolBehaviorProvider behaviorProvider : getAvailableToolBehaviorProviders()) {
+            behaviorProvider.setReadOnly(readonly);
+         }
          // Initialize type provider
          super.init(diagram, diagramEditor);
          // Load domain model file
@@ -119,7 +132,7 @@ public class ExecutionTreeDiagramTypeProvider extends AbstractDiagramTypeProvide
          throw new RuntimeException(e);
       }
    }
-   
+
    /**
     * Makes sure that at least one {@link ISEDDebugTarget} is available
     * via {@link #getDebugTargets()}.
@@ -132,7 +145,7 @@ public class ExecutionTreeDiagramTypeProvider extends AbstractDiagramTypeProvide
          debugTargets.add(target);
       }
    }
-   
+
    /**
     * Returns the available {@link ISEDDebugTarget}s.
     * @return The available {@link ISEDDebugTarget}s.

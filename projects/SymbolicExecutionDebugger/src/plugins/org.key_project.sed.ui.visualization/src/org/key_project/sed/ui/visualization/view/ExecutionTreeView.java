@@ -32,6 +32,7 @@ import org.key_project.sed.ui.visualization.execution_tree.editor.ExecutionTreeD
 import org.key_project.sed.ui.visualization.execution_tree.editor.ReadonlyDiagramEditorActionBarContributor;
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugTargetConnectFeature;
 import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeDiagramTypeProvider;
+import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeFeatureProvider;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
 import org.key_project.sed.ui.visualization.util.LogUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
@@ -173,8 +174,8 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
                final IDiagramTypeProvider typeProvider = editor.getDiagramTypeProvider();
                Assert.isNotNull(typeProvider);
                final IFeatureProvider featureProvider = typeProvider.getFeatureProvider();
-               Assert.isNotNull(featureProvider);
-               ICustomFeature feature = new DebugTargetConnectFeature(featureProvider);
+               Assert.isTrue(featureProvider instanceof ExecutionTreeFeatureProvider);
+               ICustomFeature feature = new DebugTargetConnectFeature((ExecutionTreeFeatureProvider)featureProvider);
                ICustomContext context = new CustomContext(new PictogramElement[] {typeProvider.getDiagram()});
                context.putProperty(DebugTargetConnectFeature.PROPERTY_DEBUG_TARGETS, targets.toArray(new ISEDDebugTarget[targets.size()]));
                editor.executeFeatureInJob("Changing Symbolic Execution Tree", feature, context);
