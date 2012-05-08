@@ -58,6 +58,7 @@ final class JMLTranslator {
     
     public static enum JMLKeyWord {
         ARRAY_REF ("array reference"),
+        INV ("\\inv"),
         INV_FOR ("\\invariant_for"),
         ACCESSIBLE ("accessible"),
         ASSIGNABLE ("assignable"),
@@ -461,6 +462,24 @@ final class JMLTranslator {
         });
 
         // primary expressions
+        translationMethods.put(JMLKeyWord.INV, new JMLTranslationMethod() {
+
+            /** Need to handle this one differently from INV_FOR
+             * since here also static invariants may occur.
+             */
+            @Override
+            public Object translate(SLTranslationExceptionManager excManager,
+                    Object... params) throws SLTranslationException {
+                checkParameters(params, Services.class, LogicVariable.class, KeYJavaType.class);
+                final Services services = (Services)params[0];
+                final LogicVariable selfVar = (LogicVariable)params[1];
+                final KeYJavaType targetType = (KeYJavaType)params[2];
+                final boolean isStatic = selfVar == null;
+                assert targetType != null || !isStatic;
+                final Term result = isStatic? TB.staticInv(services, targetType): TB.inv(services, TB.var(selfVar));
+                return new SLExpression(result);
+            }});
+        
         translationMethods.put(JMLKeyWord.INV_FOR,
                                new JMLTranslationMethod() {
 

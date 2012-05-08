@@ -1227,6 +1227,10 @@ public final class TermBuilder {
     public Term inv(Services services, Term o) {
 	return inv(services, heap(services),  o);
     }
+    
+    public Term staticInv(Services services, KeYJavaType t){
+        return func(services.getJavaInfo().getStaticInv(t), heap(services));
+    }
 
     
     public Term select(Services services, Sort asSort, Term h, Term o, Term f) {

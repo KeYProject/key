@@ -51,6 +51,7 @@ options {
 
     private Services services;
     private JavaInfo javaInfo;
+    private KeYJavaType containerType;
     private IntegerLDT intLDT;
     private HeapLDT heapLDT;
     private LocSetLDT locSetLDT;
@@ -88,6 +89,7 @@ options {
 	// save parameters
 	this.services       = services;
 	this.javaInfo       = services.getJavaInfo();
+	containerType  =   specInClass;
 	this.intLDT         = services.getTypeConverter().getIntegerLDT();
 	this.heapLDT        = services.getTypeConverter().getHeapLDT();
 	this.locSetLDT      = services.getTypeConverter().getLocSetLDT();
@@ -1160,7 +1162,7 @@ primaryexpr returns [SLExpression result=null] throws SLTranslationException
 :
 	result=constant
     |   id:IDENT     { result = lookupIdentifier(id.getText(), null, null, id); }
-    |   INV          { result = new SLExpression(TB.inv(services, TB.var(selfVar)));}
+    |   inv:INV      { result = translator.translate(inv.getText(),services,selfVar,containerType);}
     |   TRUE         { result = new SLExpression(TB.tt()); }
     |   FALSE        { result = new SLExpression(TB.ff()); }
     |   NULL         { result = new SLExpression(TB.NULL(services)); }
@@ -1230,7 +1232,7 @@ primarysuffix[SLExpression receiver, String fullyQualifiedName]
     |
     DOT INV
     {
-        result = new SLExpression(TB.inv(services, receiver.getTerm()));
+        result = translator.translate("\\inv",services,receiver.getTerm(),receiver.getType());
     }
     |	{
     	    if(receiver != null) {

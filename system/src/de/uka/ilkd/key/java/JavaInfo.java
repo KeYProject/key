@@ -1287,7 +1287,19 @@ public final class JavaInfo {
 	}
 	return inv;
     }
-    
+
+    /**
+     * Returns the special symbol <code>&lt;staticInv&gt;</code> which stands for the static invariant of a type.
+     */
+    public ObserverFunction getStaticInv(KeYJavaType target) {
+        return new ObserverFunction("<$inv>",
+                           Sort.FORMULA,
+                           null,
+                           services.getTypeConverter().getHeapLDT().targetSort(),
+                           target,
+                           true,
+                           new ImmutableArray<KeYJavaType>());
+    }
     
     /**
      * inner class used to filter certain types of program elements

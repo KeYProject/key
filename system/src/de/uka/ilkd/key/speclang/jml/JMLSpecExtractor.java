@@ -357,15 +357,17 @@ public final class JMLSpecExtractor implements SpecExtractor {
             }
 
             //add invariants
-            if(!pm.isStatic() && !isHelper) {
+            if(!isHelper) {
+                // for a static method translate \inv once again, otherwise use the internal symbol
+                final String invString = pm.isStatic()? "\\inv": "<inv>";
                 if(!pm.isConstructor()) {
-                    specCase.addRequires(new PositionedString("<inv>"));
+                    specCase.addRequires(new PositionedString(invString)); // XXX DB: why is there no preceding "requires"??
                 }
                 if(specCase.getBehavior() != Behavior.EXCEPTIONAL_BEHAVIOR) {
-                    specCase.addEnsures(new PositionedString("ensures <inv>"));
+                    specCase.addEnsures(new PositionedString("ensures "+invString));
                 }
                 if(specCase.getBehavior() != Behavior.NORMAL_BEHAVIOR) {
-                    specCase.addSignals(new PositionedString("signals (Exception e) <inv>"));
+                    specCase.addSignals(new PositionedString("signals (Exception e) "+invString));
                 }
             }
 

@@ -680,7 +680,8 @@ public class JMLSpecFactory {
         // check whether the invariant is static
         final ImmutableList<String> mods = textualInv.getMods();
         final boolean isStatic = (mods.contains("static") || // modifier "static" 
-                (services.getJavaInfo().isInterface(kjt) && !mods.contains("instance"))); // in an interface "static" is the default
+                // in an interface "static" is the default (see Sect. 2.5 of the reference manual)
+                (services.getJavaInfo().isInterface(kjt) && !mods.contains("instance")));
         
         //create variable for self
         ProgramVariable selfVar = isStatic? null: TB.selfVar(services, kjt, false);
