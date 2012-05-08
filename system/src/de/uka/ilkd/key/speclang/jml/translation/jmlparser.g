@@ -1162,7 +1162,8 @@ primaryexpr returns [SLExpression result=null] throws SLTranslationException
 :
 	result=constant
     |   id:IDENT     { result = lookupIdentifier(id.getText(), null, null, id); }
-    |   inv:INV      { result = translator.translate(inv.getText(),services,selfVar,containerType);}
+    |   inv:INV      { result = translator.translate(inv.getText(),services,
+                                selfVar==null? null: TB.var(selfVar),containerType);}
     |   TRUE         { result = new SLExpression(TB.tt()); }
     |   FALSE        { result = new SLExpression(TB.ff()); }
     |   NULL         { result = new SLExpression(TB.NULL(services)); }

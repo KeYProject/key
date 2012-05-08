@@ -36,15 +36,17 @@ public final class PartialInvAxiom extends ClassAxiom {
     private final ClassInvariant inv;
     private final ObserverFunction target;
     
-    public PartialInvAxiom(ClassInvariant inv, Services services) {
+    public PartialInvAxiom(ClassInvariant inv, boolean isStatic, Services services) {
 	assert inv != null;
 	this.inv = inv;
-	this.target = services.getJavaInfo().getInv();
+	assert !isStatic || inv.isStatic();
+	this.target = isStatic? services.getJavaInfo().getStaticInv(inv.getKJT())
+	            : services.getJavaInfo().getInv();
 	assert target != null;
     }
     
     public PartialInvAxiom(ClassInvariant inv, String displayName, Services services){
-        this(inv, services);
+        this(inv, false, services);
         this.displayName = displayName;
     }
     
@@ -81,6 +83,7 @@ public final class PartialInvAxiom extends ClassAxiom {
         for (int i = 0; i < 2; i++) {
             TacletGenerator TG = TacletGenerator.getInstance();
             Name name = MiscTools.toValidTacletName("Partial inv axiom for "
+                                                    + (target.isStatic()? "static ": "")
                                                     + inv.getName()
                                                     + (i == 0 ? "" : " EQ"));
             

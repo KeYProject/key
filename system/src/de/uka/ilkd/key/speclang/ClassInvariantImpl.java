@@ -68,7 +68,8 @@ public final class ClassInvariantImpl implements ClassInvariant {
         this.originalSelfVar = selfVar;
         final OpCollector oc = new OpCollector();
         originalInv.execPostOrder(oc);
-        this.isStatic        = !oc.contains(originalSelfVar);
+        this.isStatic        = selfVar == null;
+//        assert isStatic == !oc.contains(originalSelfVar);
     }
     
 

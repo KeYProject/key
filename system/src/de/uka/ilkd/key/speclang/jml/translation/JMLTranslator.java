@@ -470,13 +470,13 @@ final class JMLTranslator {
             @Override
             public Object translate(SLTranslationExceptionManager excManager,
                     Object... params) throws SLTranslationException {
-                checkParameters(params, Services.class, LogicVariable.class, KeYJavaType.class);
+                checkParameters(params, Services.class, Term.class, KeYJavaType.class);
                 final Services services = (Services)params[0];
-                final LogicVariable selfVar = (LogicVariable)params[1];
+                final Term selfVar = (Term)params[1];
                 final KeYJavaType targetType = (KeYJavaType)params[2];
                 final boolean isStatic = selfVar == null;
                 assert targetType != null || !isStatic;
-                final Term result = isStatic? TB.staticInv(services, targetType): TB.inv(services, TB.var(selfVar));
+                final Term result = isStatic? TB.staticInv(services, targetType): TB.inv(services, selfVar);
                 return new SLExpression(result);
             }});
         

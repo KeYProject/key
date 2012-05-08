@@ -690,8 +690,12 @@ public final class SpecificationRepository {
         final KeYJavaType kjt = inv.getKJT();
         invs.put(kjt, getClassInvariants(kjt).add(inv));
         
-        addClassAxiom(new PartialInvAxiom(inv, services));
-        
+        // in any case, create axiom with non-static target
+        addClassAxiom(new PartialInvAxiom(inv, false, services));
+        // for a static invariant, create also an axiom with a static target
+        if (inv.isStatic())
+            addClassAxiom(new PartialInvAxiom(inv, true, services));
+        // inherit non-private, non-static invariants
         if(!inv.isStatic() && VisibilityModifier.allowsInheritance(inv.getVisibility())) {
             final ImmutableList<KeYJavaType> subs 
             	= services.getJavaInfo().getAllSubtypes(kjt);
