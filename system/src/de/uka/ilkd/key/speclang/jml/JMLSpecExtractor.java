@@ -367,8 +367,8 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 // for a static method translate \inv once again, otherwise use the internal symbol
                 final String invString = pm.isStatic()? "\\inv": "<inv>";
                 if(!pm.isConstructor()) {
-                    specCase.addRequires(new PositionedString(invString)); // XXX DB: why is there no preceding "requires"??
-                } else {
+                    specCase.addRequires(new PositionedString(invString));
+                } else if (addInvariant) {
                     // add static invariant to constructor's precondition
                     specCase.addRequires(new PositionedString(""+pm.getName()+".\\inv"));
                 }

@@ -300,7 +300,7 @@ public final class SLEnvInput extends AbstractEnvInput {
             for(ProgramMethod constructor : constructors) {
         	assert constructor.isConstructor();
         	final ImmutableSet<SpecificationElement> constructorSpecs 
-			= specExtractor.extractMethodSpecs(constructor);
+			= specExtractor.extractMethodSpecs(constructor, staticInvPresent);
         	specRepos.addSpecs(constructorSpecs);
             }
         }
