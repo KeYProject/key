@@ -464,6 +464,10 @@ public final class JavaInfo {
     public boolean isSubtype(KeYJavaType subType, KeYJavaType superType) {
         return kpmi.isSubtype(subType, superType);
     }
+    
+    public boolean isInterface(KeYJavaType t){
+        return (t.getJavaType() instanceof InterfaceDeclaration);
+    }
 
     /** 
      * returns a KeYJavaType having the given sort

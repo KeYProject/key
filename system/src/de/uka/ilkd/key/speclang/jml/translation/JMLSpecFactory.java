@@ -676,8 +676,13 @@ public class JMLSpecFactory {
             KeYJavaType kjt,
             TextualJMLClassInv textualInv)
             throws SLTranslationException {
+        // check whether the invariant is static
+        final ImmutableList<String> mods = textualInv.getMods();
+        final boolean isStatic = (mods.contains("static") || // modifier "static" 
+                (services.getJavaInfo().isInterface(kjt) && !mods.contains("instance"))); // in an interface "static" is the default
+        
         //create variable for self
-        ProgramVariable selfVar = TB.selfVar(services, kjt, false);
+        ProgramVariable selfVar = isStatic? null: TB.selfVar(services, kjt, false);
 
         //translateToTerm expression
         Term inv = TB.convertToFormula(JMLTranslator.translate(textualInv.getInv(), kjt, selfVar,
