@@ -10,6 +10,7 @@
 package de.uka.ilkd.key.java.visitor;
 
 import java.util.HashSet;
+import java.util.Map;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -74,35 +75,41 @@ public final class ProgramVariableCollector extends JavaASTVisitor {
         TermProgramVariableCollector tpvc = 
             new TermProgramVariableCollector(services);
         Term selfTerm = x.getInternalSelfTerm();
-        Term heapAtPre = x.getInternalHeapAtPre();
-        Term savedHeapAtPre = x.getInternalSavedHeapAtPre();
+        //Term heapAtPre = x.getInternalHeapAtPre();
+        //Term savedHeapAtPre = x.getInternalSavedHeapAtPre();
         
+        Map<String,Term> atPres = x.getInternalAtPres();
+
+        //transaction invariant
+        Term transInv = x.getInvariant(selfTerm, atPres, services);
+        if(transInv != null) {
+            transInv.execPostOrder(tpvc);
+        }
+
+        //modifies
+        Term modBackup = x.getModifies("savedHeap",selfTerm, atPres, services);
+        if(modBackup != null) {
+            modBackup.execPostOrder(tpvc);
+        }
+        
+        atPres.put("savedHeap", null);
+
         //invariant
-        Term inv = x.getInvariant(selfTerm, heapAtPre, null, services);
+        Term inv = x.getInvariant(selfTerm, atPres, services);
         if(inv != null) {
             inv.execPostOrder(tpvc);
         }
 
-        //transaction invariant
-        Term transInv = x.getInvariant(selfTerm, heapAtPre, savedHeapAtPre, services);
-        if(transInv != null) {
-            transInv.execPostOrder(tpvc);
-        }
                 
         //modifies
-        Term mod = x.getModifies(selfTerm, heapAtPre, null, services);
+        Term mod = x.getModifies("heap",selfTerm, atPres, services);
         if(mod != null) {
             mod.execPostOrder(tpvc);
         }
 
-        //modifies
-        Term modBackup = x.getModifies(selfTerm, heapAtPre, savedHeapAtPre, services);
-        if(modBackup != null) {
-            modBackup.execPostOrder(tpvc);
-        }
 
         //variant
-        Term v = x.getVariant(selfTerm, heapAtPre, services);
+        Term v = x.getVariant(selfTerm, atPres, services);
         if(v != null) {
             v.execPostOrder(tpvc);
         }

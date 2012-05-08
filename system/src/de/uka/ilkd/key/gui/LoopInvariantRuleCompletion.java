@@ -43,7 +43,7 @@ public class LoopInvariantRuleCompletion implements
                             services) == null ? null : MiscTools
                                     .getSelfTerm(MiscTools.getInnermostMethodFrame(
                                             progPost.javaBlock(), services),
-                                            services), (Term) null);
+                                            services), null);
             try {
                 inv = InvariantConfigurator.getInstance().getLoopInvariant(inv,
                         services, false, isTransaction);

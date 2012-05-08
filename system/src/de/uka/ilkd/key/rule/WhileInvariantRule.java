@@ -220,24 +220,32 @@ public final class WhileInvariantRule implements BuiltInRule {
 	
     final boolean transaction = ((Modality)inst.progPost.op()).transaction(); 
 
-    final Term heapAtMethodPre = inst.inv.getInternalHeapAtPre();
-    final Term savedHeapAtMethodPre = inst.inv.getInternalSavedHeapAtPre();
-    final Term regularInv = inst.inv.getInvariant(inst.selfTerm, heapAtMethodPre, null, services);
-    final Term transactionInv = transaction ? inst.inv.getInvariant(inst.selfTerm, heapAtMethodPre, savedHeapAtMethodPre, services) : null;
+//    final Term heapAtMethodPre = inst.inv.getInternalHeapAtPre();
+//    final Term savedHeapAtMethodPre = inst.inv.getInternalSavedHeapAtPre();
+
+    final Map<String,Term> atPres = inst.inv.getInternalAtPres();
+
+    final Term transactionInv = transaction ? inst.inv.getInvariant(inst.selfTerm, atPres, services) : null;
+
+    final Term s = atPres.get("savedHeap");
+
+    final Term mod = inst.inv.getModifies("heap", inst.selfTerm, 
+					      atPres, 
+					      services);
+	// This on the other hand should never be null
+    final Term modBackup = inst.inv.getModifies("savedHeap",inst.selfTerm, 
+            atPres, 
+            services);
+
+    atPres.put("savedHeap", null);
+    final Term regularInv = inst.inv.getInvariant(inst.selfTerm, atPres, services);
     // NOTE even when a transaction is on, the transactionInv can still be null (no loop_invariant_transaction given)
 	final Term invTerm  = transactionInv != null ?
 	     TB.and(regularInv, transactionInv) : regularInv;
-	final Term mod = inst.inv.getModifies(inst.selfTerm, 
-					      heapAtMethodPre, null, 
-					      services);
-	// This on the other hand should never be null
-    final Term modBackup = inst.inv.getModifies(inst.selfTerm, 
-            heapAtMethodPre, savedHeapAtMethodPre, 
-            services);
 	final Term variant = inst.inv.getVariant(inst.selfTerm, 
-						 heapAtMethodPre, 
+						 atPres, 
 						 services);
-	
+	atPres.put("savedHeap", s);
 	//collect input and output local variables, 
 	//prepare reachableIn and reachableOut
 	final ImmutableSet<ProgramVariable> localIns 
@@ -255,25 +263,27 @@ public final class WhileInvariantRule implements BuiltInRule {
 		                  TB.reachableValue(services, pv));
 	}
 	
-	//prepare heapBeforeLoop, localOutBeforeLoop
-	final LocationVariable heapBeforeLoop 
-		= TB.heapAtPreVar(services, "heapBeforeLoop", true);
-	services.getNamespaces().programVariables().addSafely(heapBeforeLoop);
-	Term beforeLoopUpdate = TB.elementary(services, 
-					      heapBeforeLoop, 
-				              TB.heap(services));
-    final Map<Term,Term> savedToBeforeLoop = new HashMap<Term,Term>();
-	if(transaction) {
-	    final LocationVariable savedHeapBeforeLoop
-	        = TB.heapAtPreVar(services, "savedHeapBeforeLoop", true);
-	    beforeLoopUpdate = TB.parallel(beforeLoopUpdate, TB.elementary(services, 
-                savedHeapBeforeLoop, 
-                    TB.savedHeap(services)));
-	    savedToBeforeLoop.put(TB.savedHeap(services), TB.var(savedHeapBeforeLoop));
-        savedToBeforeLoop.put(TB.heap(services), TB.var(savedHeapBeforeLoop));
-	}
+	Term beforeLoopUpdate = null;
+        final Map<Term,Term> savedToBeforeLoop = new HashMap<Term,Term>();
 	final Map<Term,Term> normalToBeforeLoop = new HashMap<Term,Term>();
-	normalToBeforeLoop.put(TB.heap(services), TB.var(heapBeforeLoop));
+        for(String h : atPres.keySet()) {
+          if(!transaction && h.equals("savedHeap")) 
+            continue;
+          final LocationVariable lv = TB.heapAtPreVar(services, h+"BeforeLoop", true);
+	  services.getNamespaces().programVariables().addSafely(lv);
+          final Term u = TB.elementary(services, lv, TB.heap(h, services));
+          if(beforeLoopUpdate == null) {
+             beforeLoopUpdate = u;
+          }else{
+             beforeLoopUpdate = TB.parallel(beforeLoopUpdate, u);
+          }
+          if(h.equals("savedHeap")) {
+	    savedToBeforeLoop.put(TB.heap(h, services), TB.var(lv));
+          }else{
+	    normalToBeforeLoop.put(TB.heap(h, services), TB.var(lv));
+          }
+        }
+
 	for(ProgramVariable pv : localOuts) {
 	    final String pvBeforeLoopName 
 	    	= TB.newName(services, pv.name().toString() + "BeforeLoop");
@@ -313,7 +323,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                mod);
 	}
 	final Term transactionFrameCondition = transaction ?
-	          TB.frame(services, TB.savedHeap(services), savedToBeforeLoop, modBackup)
+	          TB.frame(services, TB.heap("savedHeap",services), savedToBeforeLoop, modBackup)
 	        : null;
 
 	final Term frameCondition = transactionFrameCondition != null ?

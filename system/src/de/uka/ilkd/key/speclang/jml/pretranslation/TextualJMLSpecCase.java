@@ -203,9 +203,9 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return assignables.get(hName);
     }
 
-    public ImmutableList<PositionedString> getAssignableBackup() {
-        return assignables.get("savedHeap");
-    }
+//    public ImmutableList<PositionedString> getAssignableBackup() {
+//        return assignables.get("savedHeap");
+//    }
 
     public ImmutableList<PositionedString> getAccessible() {
         return accessible;

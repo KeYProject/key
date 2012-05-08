@@ -31,12 +31,13 @@ header {
     import de.uka.ilkd.key.speclang.PositionedString;
     import de.uka.ilkd.key.speclang.translation.*;
     import de.uka.ilkd.key.util.Pair;
-    import de.uka.ilkd.key.util.Triple;    
+    import de.uka.ilkd.key.util.Triple; 
+    import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
 
     import java.math.BigInteger;
-import java.util.List;
+    import java.util.List;
     import java.util.Map;
-import java.util.LinkedHashMap;
+    import java.util.LinkedHashMap;
 }
 
 class KeYJMLParser extends Parser;
@@ -64,8 +65,7 @@ options {
     private ImmutableList<ProgramVariable> paramVars;
     private ProgramVariable resultVar;
     private ProgramVariable excVar;
-    private Term heapAtPre;
-    private Term savedHeapAtPre;
+    private Map<String,Term> atPres;
     
     // Helper objects
     private JMLResolverManager resolverManager;
@@ -81,8 +81,7 @@ options {
 		ImmutableList<ProgramVariable> paramVars,
 		ProgramVariable result,
 		ProgramVariable exc,
-		Term heapAtPre,
-                Term savedHeapAtPre) {
+		Map<String,Term> atPres) {
 	this(lexer);
 
 	// save parameters
@@ -101,9 +100,7 @@ options {
 	this.paramVars      = paramVars;
 	this.resultVar      = result;
 	this.excVar	    = exc;
-	this.heapAtPre      = heapAtPre;
-        this.savedHeapAtPre = savedHeapAtPre;
-
+	this.atPres         = atPres;
 
         intHelper = new JavaIntegerSemanticsHelper(services, excManager);
 	// initialize helper objects
@@ -130,8 +127,7 @@ options {
 		ImmutableList<ProgramVariable> paramVars,
 		ProgramVariable result,
 		ProgramVariable exc,
-		Term heapAtPre,
-                Term savedHeapAtPre) {
+		Map<String,Term> atPres) {
 	this(new KeYJMLLexer(new StringReader(ps.text)), 
 	     ps.fileName, 
 	     ps.pos,
@@ -141,8 +137,7 @@ options {
 	     paramVars,
 	     result,
 	     exc,
-	     heapAtPre,
-             savedHeapAtPre);
+	     atPres);
     }
 
 
@@ -248,22 +243,25 @@ options {
      */
     // TODO: remove when all clients have been moved to JMLTranslator
     private Term convertToOld(Term term) {
-	assert heapAtPre != null;
+	assert atPres != null && atPres.get("heap") != null;
 	Map map = new LinkedHashMap();
-	map.put(TB.heap(services), heapAtPre);
-        if(savedHeapAtPre != null) {
-	  map.put(TB.savedHeap(services), savedHeapAtPre);
+        for(String h : TextualJMLSpecCase.validHeaps) {
+            Term t = atPres.get(h);
+            if(t != null) {
+              map.put(TB.heap(h, services), t);
+            }
         }
+
 	OpReplacer or = new OpReplacer(map);
 	return or.replace(term);
     }
 
     private Term convertToBackup(Term term) {
-	assert savedHeapAtPre != null;
+	assert atPres != null && atPres.get("savedHeap") != null;
 	Map map = new LinkedHashMap();
-	map.put(TB.heap(services), TB.savedHeap(services));
-        if(heapAtPre != null) {
-	  map.put(heapAtPre, savedHeapAtPre);
+	map.put(TB.heap("heap", services), TB.heap("savedHeap", services));
+        if(atPres.get("heap") != null) {
+	  map.put(atPres.get("heap"), atPres.get("savedHeap"));
         }
 	OpReplacer or = new OpReplacer(map);
 	return or.replace(term);
@@ -1425,7 +1423,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
     |
 	BACKUP LPAREN result=expression RPAREN
 	{
-	    if (savedHeapAtPre == null) {
+	    if (atPres == null || atPres.get("savedHeap") == null) {
 		raiseError("JML construct " +
 			   "\\backup not allowed in this context.");
 	    }	    
@@ -1472,7 +1470,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 	{
 	    // was: raiseNotSupported("informal predicates");
 	    result = translator.translate("(* *)", SLExpression.class, services, desc, 
-	        selfVar, resultVar, paramVars, heapAtPre);
+	        selfVar, resultVar, paramVars, atPres == null ? null : atPres.get("heap"));
 	}
 	
     |   escape:DL_ESCAPE LPAREN ( list=expressionlist )? RPAREN
@@ -1482,12 +1480,12 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
         
     |   NOT_MODIFIED LPAREN t=storeRefUnion RPAREN
         {
-        result = new SLExpression(translator.translate("\\not_modified", Term.class, services, heapAtPre, t));
+        result = new SLExpression(translator.translate("\\not_modified", Term.class, services, atPres == null ? null : atPres.get("heap"), t));
         } 
 	
     |   FRESH LPAREN list=expressionlist RPAREN
 	{
-	    if(heapAtPre == null) {
+	    if(atPres == null || atPres.get("heap") == null) {
 	        raiseError("\\fresh not allowed in this context");
 	    }
 	    t = TB.tt();
@@ -1499,14 +1497,14 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 	            t = TB.and(t, 
 	                       TB.equals(TB.select(services,
 	                                           booleanLDT.targetSort(),
-	                                           heapAtPre,
+	                                           atPres.get("heap"),
 	                                           expr.getTerm(),
 	                                           TB.func(heapLDT.getCreated())),
 	                                 TB.FALSE(services)));
 	        } else if(expr.getTerm().sort().extendsTrans(locSetLDT.targetSort())) {
 	            t = TB.and(t, TB.subset(services, 
 	                                    expr.getTerm(), 
-	                                    TB.freshLocs(services, heapAtPre)));
+	                                    TB.freshLocs(services, atPres.get("heap"))));
 	        } else {
 	            raiseError("Wrong type: " + expr);
 	        }
@@ -1675,7 +1673,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
                                                 TB.union(services,
                                                          convertToOld(t),
                                                          TB.freshLocs(services, 
-                                                         	      heapAtPre))));
+                                                         	      atPres == null ? null : atPres.get("heap")))));
                                                         
         }
         
@@ -1752,7 +1750,7 @@ oldexpression returns [SLExpression result=null] throws SLTranslationException
     OLD LPAREN result=expression (COMMA id:IDENT)? RPAREN
     )
     {
-        if (heapAtPre == null) {
+        if (atPres == null || atPres.get("heap") == null) {
         raiseError("JML construct " +
                "\\old not allowed in this context.");
         }

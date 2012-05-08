@@ -20,6 +20,7 @@ import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
 
 
 /**
@@ -30,12 +31,10 @@ public final class LoopInvariantImpl implements LoopInvariant {
     private final LoopStatement loop;
     private final Term originalInvariant;
     private final Term originalTransactionInvariant;
-    private final Term originalModifies;
-    private final Term originalModifiesBackup;
+    private final Map<String,Term> originalModifies;
     private final Term originalVariant;
     private final Term originalSelfTerm;
-    private final Term originalHeapAtPre;
-    private final Term originalSavedHeapAtPre;
+    private final Map<String,Term> originalAtPres;
     
     
     //-------------------------------------------------------------------------
@@ -54,12 +53,10 @@ public final class LoopInvariantImpl implements LoopInvariant {
     public LoopInvariantImpl(LoopStatement loop,
                              Term invariant,
                              Term transactionInvariant,
-                             Term modifies,  
-                             Term modifiesBackup,  
+                             Map<String,Term> modifies,  
                              Term variant, 
                              Term selfTerm,
-                             Term heapAtPre,
-                             Term savedHeapAtPre) {
+                             Map<String,Term> atPres) {
         assert loop != null;
         //assert modifies != null;
         //assert heapAtPre != null;
@@ -68,19 +65,17 @@ public final class LoopInvariantImpl implements LoopInvariant {
         this.originalTransactionInvariant = transactionInvariant;
         this.originalVariant            = variant;
         this.originalModifies           = modifies;
-        this.originalModifiesBackup     = modifiesBackup;
         this.originalSelfTerm           = selfTerm;   
-        this.originalHeapAtPre          = heapAtPre;
-        this.originalSavedHeapAtPre     = savedHeapAtPre;
+        this.originalAtPres             = atPres;
     }
 
     public LoopInvariantImpl(LoopStatement loop,
                              Term invariant,
-                             Term modifies,   
+                             Map<String,Term> modifies,   
                              Term variant, 
                              Term selfTerm,
-                             Term heapAtPre) {
-        this(loop,invariant,null,modifies,null,variant,selfTerm,heapAtPre,null);
+                             Map<String,Term> atPres) {
+        this(loop,invariant,null,modifies,variant,selfTerm,atPres);
     }
     
     /**
@@ -88,16 +83,14 @@ public final class LoopInvariantImpl implements LoopInvariant {
      */
     public LoopInvariantImpl(LoopStatement loop, 
 	    		     Term selfTerm, 
-	    		     Term heapAtPre) {
+	    		     Map<String,Term> atPres) {
         this(loop, 
              null, 
              null, 
              null,
              null,
-             null,
              selfTerm,
-             null,
-             null);
+             atPres);
     }
     
     
@@ -108,8 +101,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
     
     private Map /*Operator, Operator, Term -> Term*/<Term, Term> getReplaceMap(
             Term selfTerm,
-            Term heapAtPre,
-            Term savedHeapAtPre,
+            Map<String,Term> atPres,
             Services services) {
         final Map<Term, Term> result = new LinkedHashMap<Term, Term>();
         
@@ -125,16 +117,14 @@ public final class LoopInvariantImpl implements LoopInvariant {
         //-parameters and other local variables are always kept up to
         // date by the ProgVarReplaceVisitor
 
-        //atPre heap
-        if(heapAtPre != null) {
-	    assert originalHeapAtPre.sort().equals(heapAtPre.sort());
-	    result.put(originalHeapAtPre, heapAtPre);
+        if(atPres != null) {
+          for(String h : TextualJMLSpecCase.validHeaps) {
+             if(atPres.get(h) != null) {
+	       assert originalAtPres.get(h).sort().equals(atPres.get(h).sort());
+	       result.put(originalAtPres.get(h), atPres.get(h));
+             }
+          }
         }
-
-        if(savedHeapAtPre != null) {
-            assert originalSavedHeapAtPre.sort().equals(savedHeapAtPre.sort());
-            result.put(originalSavedHeapAtPre, savedHeapAtPre);
-            }
 
         return result;
     }
@@ -142,11 +132,10 @@ public final class LoopInvariantImpl implements LoopInvariant {
     
     private Map<Term,Term> getInverseReplaceMap(
             Term selfTerm,
-            Term heapAtPre,
-            Term savedHeapAtPre,
+            Map<String,Term> atPres,
             Services services) {
        final Map<Term,Term> result = new LinkedHashMap<Term,Term>();
-       final Map<Term, Term> replaceMap = getReplaceMap(selfTerm, heapAtPre, savedHeapAtPre, services);
+       final Map<Term, Term> replaceMap = getReplaceMap(selfTerm, atPres, services);
        for(Map.Entry<Term, Term> next: replaceMap.entrySet()) {
            result.put(next.getValue(), next.getKey());
        }
@@ -164,47 +153,35 @@ public final class LoopInvariantImpl implements LoopInvariant {
         return loop;
     }
 
-    @Override
-    public Term getInvariant(Term selfTerm, Term heapAtPre, Services services){
-        return getInvariant(selfTerm, heapAtPre, null, services);
-    }
-    
     @Override    
     public Term getInvariant(Term selfTerm,
-            		     Term heapAtPre,
-            		     Term savedHeapAtPre,
+            		     Map<String,Term> atPres,
             		     Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
-        Map<Term, Term> replaceMap = getReplaceMap(selfTerm, heapAtPre, savedHeapAtPre, services);
+        Map<Term, Term> replaceMap = getReplaceMap(selfTerm, atPres, services);
         OpReplacer or = new OpReplacer(replaceMap);
-        return or.replace(savedHeapAtPre == null ? originalInvariant : originalTransactionInvariant);
+        return or.replace((atPres == null || atPres.get("savedHeap") == null) ? originalInvariant : originalTransactionInvariant);
     }
     
     @Override
-    public Term getModifies(Term selfTerm, Term heapAtPre, Services services){
-        return getModifies(selfTerm, heapAtPre, null, services);
-    }
-    
-    @Override
-    public Term getModifies(Term selfTerm,
-            		    Term heapAtPre,
-            		    Term savedHeapAtPre,
+    public Term getModifies(String heapName, Term selfTerm,
+            		    Map<String,Term> atPres,
             		    Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
         Map<Term, Term> replaceMap = 
-            getReplaceMap(selfTerm, heapAtPre, savedHeapAtPre, services);
+            getReplaceMap(selfTerm, atPres, services);
         OpReplacer or = new OpReplacer(replaceMap);
-        return or.replace(savedHeapAtPre == null ? originalModifies : originalModifiesBackup);
+        return or.replace(originalModifies.get(heapName));
     }
     
 
     @Override
     public Term getVariant(Term selfTerm, 
-            		   Term heapAtPre,
+            		   Map<String,Term> atPres,
             		   Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
         Map<Term, Term> replaceMap = 
-            getReplaceMap(selfTerm, heapAtPre, null, services);
+            getReplaceMap(selfTerm, atPres, services);
         OpReplacer or = new OpReplacer(replaceMap);
         return or.replace(originalVariant);
     }
@@ -227,13 +204,12 @@ public final class LoopInvariantImpl implements LoopInvariant {
     
     
     @Override
-    public Term getInternalHeapAtPre() {
-        return originalHeapAtPre;
-    }
-
-    @Override
-    public Term getInternalSavedHeapAtPre() {
-        return originalSavedHeapAtPre;
+    public Map<String,Term> getInternalAtPres() {
+        Map<String,Term> result = new LinkedHashMap<String,Term>();
+        for(String h : originalAtPres.keySet()) {
+          result.put(h, originalAtPres.get(h));
+        }
+        return result;
     }
 
     
@@ -243,34 +219,29 @@ public final class LoopInvariantImpl implements LoopInvariant {
                                      originalInvariant,
                                      originalTransactionInvariant,
                                      originalModifies,
-                                     originalModifiesBackup,
                                      originalVariant,
                                      originalSelfTerm,
-                                     originalHeapAtPre,
-                                     originalSavedHeapAtPre);
+                                     originalAtPres);
     }
     
     
     @Override
     public LoopInvariant setInvariant(Term invariant, 
             			      Term selfTerm,
-            			      Term heapAtPre,
-            			      Term savedHeapAtPre,
+            			      Map<String,Term> atPres,
             			      Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
         Map<Term, Term> inverseReplaceMap 
-            = getInverseReplaceMap(selfTerm, heapAtPre, savedHeapAtPre, services);
+            = getInverseReplaceMap(selfTerm, atPres, services);
         OpReplacer or = new OpReplacer(inverseReplaceMap);
-        final boolean transaction = savedHeapAtPre != null;
+        final boolean transaction = atPres != null && atPres.get("savedHeap") != null;
         return new LoopInvariantImpl(loop, 
                                      transaction ? originalInvariant : or.replace(invariant), 
                                      transaction ? or.replace(invariant) :  originalTransactionInvariant,  
                                      originalModifies, 
-                                     originalModifiesBackup, 
                                      originalVariant, 
                                      originalSelfTerm,
-                                     originalHeapAtPre,
-                                     originalSavedHeapAtPre);
+                                     originalAtPres);
     }
     
     
@@ -288,8 +259,6 @@ public final class LoopInvariantImpl implements LoopInvariant {
                 + originalTransactionInvariant
                 + "; modifies: " 
                 + originalModifies
-                + "; modifies_backup: " 
-                + originalModifiesBackup
                 + "; variant: "
                 + originalVariant;
     }

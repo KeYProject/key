@@ -10,6 +10,9 @@
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import java.util.Map;
+import java.util.LinkedHashMap;
+
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -30,7 +33,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.LoopInvariantImpl;
 import de.uka.ilkd.key.util.Pair;
-
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
 
 
 public final class IntroAtPreDefsOp extends AbstractTermTransformer {
@@ -87,18 +90,25 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
         
         //create atPre heap
         final String methodName = frame.getProgramMethod().getName();
-	final LocationVariable heapAtPreVar 
-		= TB.heapAtPreVar(services, "heapBefore_" + methodName, true);
-	final LocationVariable savedHeapAtPreVar = TB.heapAtPreVar(services, "savedHeapBefore_" + methodName, true);
-	services.getNamespaces().programVariables().addSafely(heapAtPreVar);
-	final Term heapAtPre = TB.var(heapAtPreVar);
-	final Term savedHeapAtPre = TB.var(savedHeapAtPreVar);
-	final Term heapAtPreUpdate = transaction ? 
-          TB.parallel(
-             TB.elementary(services, heapAtPreVar, TB.heap(services)),
-             TB.elementary(services, savedHeapAtPreVar, TB.savedHeap(services)))
-           :
-           TB.elementary(services, heapAtPreVar, TB.heap(services));
+
+        Term atPreUpdate = null;
+        Map<String,Term> atPres = new LinkedHashMap<String,Term>();
+        for(String heapName : TextualJMLSpecCase.validHeaps) {
+          if(!transaction && heapName.equals("savedHeap")) {
+             continue;
+          }
+          final LocationVariable l = TB.heapAtPreVar(services, heapName+"Before_" + methodName, true);
+          final Term u = TB.elementary(services,
+            l,
+            TB.heap(heapName,services));
+          if(atPreUpdate == null) {
+             atPreUpdate =u;
+          }else{
+             atPreUpdate = TB.parallel(atPreUpdate, u);
+          }
+          atPres.put(heapName, TB.var(l));
+        }
+
         //update loop invariants
         for(LoopStatement loop : loops) {
             LoopInvariant inv 
@@ -108,33 +118,40 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                     //we're calling a static method from an instance context
                     selfTerm = null;
                 }
-                final Term newInvariant 
-                    = inv.getInvariant(selfTerm, heapAtPre, null, services);
-                final Term newModifies
-                    = inv.getModifies(selfTerm, heapAtPre, null, services);
                 final Term newTransactionInvariant =
                   transaction ?
-                     inv.getInvariant(selfTerm, heapAtPre, savedHeapAtPre, services)
+                     inv.getInvariant(selfTerm, atPres, services)
                    : null;
                 final Term newBackupModifies =
-                     inv.getModifies(selfTerm, heapAtPre, savedHeapAtPre, services);
+                     inv.getModifies("savedHeap",selfTerm, atPres, services);
+
+                final Term s = atPres.get("savedHeap");
+                atPres.put("savedHeap", null);
+
+                final Term newInvariant 
+                    = inv.getInvariant(selfTerm, atPres, services);
+                final Term newModifies
+                    = inv.getModifies("heap", selfTerm, atPres, services);
                 final Term newVariant
-                    = inv.getVariant(selfTerm, heapAtPre, services);
+                    = inv.getVariant(selfTerm, atPres, services);
+                  
+                atPres.put("savedHeap", s);
                 
+                Map<String,Term> mods = new LinkedHashMap<String,Term>();
+                mods.put("heap", newModifies);
+                mods.put("savedHeap", newBackupModifies);
                 final LoopInvariant newInv 
              	       = new LoopInvariantImpl(loop, 
                                             newInvariant,
                                             newTransactionInvariant,
-                                            newModifies, 
-                                            newBackupModifies,
+                                            mods, 
                                             newVariant, 
                                             selfTerm,
-                                            heapAtPre,
-                                            savedHeapAtPre);
+                                            atPres);
                 services.getSpecificationRepository().setLoopInvariant(newInv);                
             }
         }
         
-        return TB.apply(heapAtPreUpdate, target);
+        return TB.apply(atPreUpdate, target);
     }
 }

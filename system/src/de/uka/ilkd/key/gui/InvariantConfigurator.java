@@ -11,6 +11,8 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.LinkedHashMap;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -236,18 +238,19 @@ public class InvariantConfigurator {
 
                 String[] loopInvStr = new String[3];
                 
-                
-                final Term savedHeapAtPre = isTransaction? loopInv.getInternalSavedHeapAtPre() : null;
-                final Term invariant = loopInv.getInvariant(loopInv.getInternalSelfTerm(), loopInv
-                        .getInternalHeapAtPre(), savedHeapAtPre, services);
+                final Map<String,Term> atPres = loopInv.getInternalAtPres();
+                if(!isTransaction) {
+                  atPres.put("savedHeap", null);
+                } 
+                final Term invariant = loopInv.getInvariant(loopInv.getInternalSelfTerm(), atPres, services);
                 if (invariant == null) {
                     loopInvStr[0] = "true";
                 } else {
                     loopInvStr[0] = printTerm(invariant, true);
                 }
 
-                final Term modifies = loopInv.getModifies(loopInv.getInternalSelfTerm(), loopInv
-                        .getInternalHeapAtPre(), savedHeapAtPre, services);
+                // FIXME TODO !!! This should also deal with savedHeap and other heaps, if any
+                final Term modifies = loopInv.getModifies("heap", loopInv.getInternalSelfTerm(), atPres, services);
                 
                 if (modifies == null) {
                     loopInvStr[1] = "allLocs";
@@ -256,8 +259,7 @@ public class InvariantConfigurator {
                     loopInvStr[1] = printTerm(modifies, false);
                 }
 
-                final Term variant = loopInv.getVariant(loopInv.getInternalSelfTerm(), loopInv
-                        .getInternalHeapAtPre(), services);
+                final Term variant = loopInv.getVariant(loopInv.getInternalSelfTerm(), atPres, services);
                 if (variant == null) {
                     loopInvStr[2] = "";
                 } else {                    
@@ -566,11 +568,12 @@ public class InvariantConfigurator {
                 }
 
                 if (requirementsAreMet) {
-
+                    Map<String,Term> mods = new LinkedHashMap<String,Term>();
+                    mods.put("heap", modifiesTerm);
                     newInvariant = new LoopInvariantImpl(loopInv.getLoop(),
-                            invariantTerm, modifiesTerm, variantTerm, loopInv
+                            invariantTerm, mods, variantTerm, loopInv
                                     .getInternalSelfTerm(), loopInv
-                                    .getInternalHeapAtPre());
+                                    .getInternalAtPres());
                     return true;
                 } else
                     return false;

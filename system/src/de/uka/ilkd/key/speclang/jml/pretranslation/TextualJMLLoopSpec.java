@@ -101,9 +101,17 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
         return assignables.get("heap");
     }
 
-    public ImmutableList<PositionedString> getAssignableBackup() {
-        return assignables.get("savedHeap");
+    public ImmutableList<PositionedString> getAssignable(String hName) {
+        return assignables.get(hName);
     }
+
+    public Map<String,ImmutableList<PositionedString>> getAssignables() {
+        return assignables;
+    }
+
+//    public ImmutableList<PositionedString> getAssignableBackup() {
+//        return assignables.get("savedHeap");
+//    }
     
     
     public PositionedString getVariant() {

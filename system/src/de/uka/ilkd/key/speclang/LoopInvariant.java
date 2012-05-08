@@ -10,6 +10,8 @@
 
 package de.uka.ilkd.key.speclang;
 
+import java.util.Map;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -28,37 +30,19 @@ public interface LoopInvariant extends SpecificationElement {
     public LoopStatement getLoop();
 
     
-    /** Returns the invariant formula (may not be a transaction invariant). */
-    public Term getInvariant(Term selfTerm, Term heapAtPre, Services services);
-    
-    /**
-     * Returns the invariant formula (may be the transaction invariant).
-     */
-    public Term getInvariant(Term selfTerm, 
-            		     Term heapAtPre,
-            		     Term savedHeapAtPre,
-            		     Services services);
+    /** Returns the invariant formula. */
+    public Term getInvariant(Term selfTerm, Map<String,Term> atPres, Services services);
 
     /**
      * Returns the modifies clause.
      */
-    public Term getModifies(Term selfTerm, 
-                        Term heapAtPre,
-                        Services services);
-    
-    /**
-     * Returns the modifies clause.
-     */
-    public Term getModifies(Term selfTerm, 
-            		    Term heapAtPre,
-            		    Term savedHeapAtPre,
-            		    Services services);
+    public Term getModifies(String heapName, Term selfTerm, Map<String,Term> atPres, Services services);
     
     /**
      * Returns the variant term. 
      */
     public Term getVariant(Term selfTerm, 
-            		   Term heapAtPre,
+            		   Map<String,Term> atPres,
             		   Services services);
     
     /**
@@ -68,14 +52,9 @@ public interface LoopInvariant extends SpecificationElement {
     public Term getInternalSelfTerm();
     
     /**
-     * Returns the operator internally used for the pre-heap.
+     * Returns operators internally used for the pre-heap.
      */
-    public Term getInternalHeapAtPre();
-
-    /**
-     * Returns the operator internally used for the saved pre-heap.
-     */
-    public Term getInternalSavedHeapAtPre();
+    public Map<String,Term> getInternalAtPres();
 
     /**
      * Returns the term internally used for the invariant. 
@@ -89,9 +68,6 @@ public interface LoopInvariant extends SpecificationElement {
      */
     Term getInternalVariant();
 
-
-
-    
     /**
      * Returns a new loop invariant where the loop reference has been
      * replaced with the passed one.
@@ -105,8 +81,7 @@ public interface LoopInvariant extends SpecificationElement {
      */
     public LoopInvariant setInvariant(Term invariant, 
             			      Term selfTerm,
-            			      Term heapAtPre,
-            			      Term savedHeapAtPre,
+            			      Map<String,Term> atPres,
             			      Services services); 
     
     /** 
