@@ -262,13 +262,22 @@ public final class SLEnvInput extends AbstractEnvInput {
             	= specExtractor.extractClassSpecs(kjt);
             specRepos.addSpecs(classSpecs);
             
+            // check whether a static invariant is present
+            boolean staticInvPresent = false;
+            for (SpecificationElement s: classSpecs){
+                if (s instanceof ClassInvariant && ((ClassInvariant)s).isStatic()) {
+                    staticInvPresent = true;
+                    break;
+                }
+            }
+            
             //contracts, loop invariants
             final ImmutableList<ProgramMethod> pms 
                 = javaInfo.getAllProgramMethodsLocallyDeclared(kjt);
             for(ProgramMethod pm : pms) {
                 //contracts
         	final ImmutableSet<SpecificationElement> methodSpecs
-        	    = specExtractor.extractMethodSpecs(pm);
+        	    = specExtractor.extractMethodSpecs(pm,staticInvPresent);
         	specRepos.addSpecs(methodSpecs);
                 
                 //loop invariants

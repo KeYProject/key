@@ -205,7 +205,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
         	}
                 for(FieldSpecification field 
                       : ((FieldDeclaration) member).getFieldSpecifications()) {
-                    boolean isStatic = ((FieldDeclaration)member).isStatic();
+                    boolean isStatic = member.isStatic();
                     
                     //add invariant only for fields of reference types
                     //and not for implicit fields.
@@ -298,9 +298,15 @@ public final class JMLSpecExtractor implements SpecExtractor {
         return result;
     }
 
-    
+
     @Override    
     public ImmutableSet<SpecificationElement> extractMethodSpecs(ProgramMethod pm)
+    throws SLTranslationException {
+        return extractMethodSpecs(pm,true);
+    }
+    
+    @Override    
+    public ImmutableSet<SpecificationElement> extractMethodSpecs(ProgramMethod pm, boolean addInvariant)
     throws SLTranslationException {
         ImmutableSet<SpecificationElement> result 
         = DefaultImmutableSet.<SpecificationElement>nil();
@@ -357,11 +363,14 @@ public final class JMLSpecExtractor implements SpecExtractor {
             }
 
             //add invariants
-            if(!isHelper) {
+            if(!isHelper && (!pm.isStatic() || addInvariant)) {
                 // for a static method translate \inv once again, otherwise use the internal symbol
                 final String invString = pm.isStatic()? "\\inv": "<inv>";
                 if(!pm.isConstructor()) {
                     specCase.addRequires(new PositionedString(invString)); // XXX DB: why is there no preceding "requires"??
+                } else {
+                    // add static invariant to constructor's precondition
+                    specCase.addRequires(new PositionedString(""+pm.getName()+".\\inv"));
                 }
                 if(specCase.getBehavior() != Behavior.EXCEPTIONAL_BEHAVIOR) {
                     specCase.addEnsures(new PositionedString("ensures "+invString));
