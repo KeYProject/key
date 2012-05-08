@@ -205,6 +205,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
         	}
                 for(FieldSpecification field 
                       : ((FieldDeclaration) member).getFieldSpecifications()) {
+                    boolean isStatic = ((FieldDeclaration)member).isStatic();
                     
                     //add invariant only for fields of reference types
                     //and not for implicit fields.
@@ -216,7 +217,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 		    fileName, member.getEndPosition(),services);
                 	for(PositionedString classInv : nonNullInvs) {
                 	    result = result.add(jsf.createJMLClassInvariant(kjt,
-                		    					    visibility,
+                		    					    visibility, isStatic,
                 		            				    classInv));
                 	}
                     }

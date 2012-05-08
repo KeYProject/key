@@ -649,13 +649,14 @@ public class JMLSpecFactory {
     //-------------------------------------------------------------------------
     public ClassInvariant createJMLClassInvariant(KeYJavaType kjt,
                                                   VisibilityModifier visibility,
+                                                  boolean isStatic,
                                                   PositionedString originalInv)
             throws SLTranslationException {
         assert kjt != null;
         assert originalInv != null;
 
         //create variable for self
-        ProgramVariable selfVar = TB.selfVar(services, kjt, false);
+        ProgramVariable selfVar = isStatic? null: TB.selfVar(services, kjt, false);
 
         //translateToTerm expression
         Term inv = TB.convertToFormula(JMLTranslator.translate(originalInv, kjt, selfVar, null, null,
