@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -357,6 +358,21 @@ public final class SWTUtil {
     }
 
     /**
+     * Converts the given {@link ISelection} into a {@link List} if it is an
+     * {@link IStructuredSelection}.
+     * @param selection The {@link ISelection} to convert.
+     * @return The selected elements in the given {@link ISelection} as {@link List}.
+     */
+    public static List<?> toList(ISelection selection) {
+        if (selection instanceof IStructuredSelection) {
+            return ((IStructuredSelection)selection).toList();
+        }
+        else {
+            return Collections.EMPTY_LIST;
+        }
+    }
+
+    /**
      * Creates an {@link IStructuredSelection} for the given {@link Object}.
      * @param obj The given {@link Object}.
      * @return The {@link IStructuredSelection} which contains the given {@link Object}.
@@ -375,7 +391,7 @@ public final class SWTUtil {
      * @param objs The given {@link Object}s.
      * @return The {@link IStructuredSelection} which contains the given {@link Object}.
      */
-    public static IStructuredSelection createSelection(Object[] objs) {
+    public static IStructuredSelection createSelection(Object... objs) {
         if (objs != null && objs.length >= 1) {
             return new StructuredSelection(objs);
         }
@@ -396,5 +412,24 @@ public final class SWTUtil {
         else {
             return StructuredSelection.EMPTY;
         }
+    }
+    
+    /**
+     * Thread save execution of {@link Viewer#setSelection(ISelection, boolean)}.
+     * @param viewer The {@link Viewer} to change selection.
+     * @param selection The new selection to set.
+     * @param reveal {@code true} if the selection is to be made visible, and {@code false} otherwise.
+     */
+    public static void select(final Viewer viewer, 
+                              final ISelection selection, 
+                              final boolean reveal) {
+       if (viewer != null && !viewer.getControl().isDisposed()) {
+          viewer.getControl().getDisplay().syncExec(new Runnable() {
+             @Override
+             public void run() {
+                viewer.setSelection(selection, reveal);
+             }
+          });
+       }
     }
 }

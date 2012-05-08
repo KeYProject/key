@@ -1,5 +1,8 @@
 package org.key_project.sed.ui.visualization.execution_tree.feature;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -15,11 +18,13 @@ import org.eclipse.graphiti.features.custom.AbstractCustomFeature;
 import org.eclipse.graphiti.features.custom.ICustomFeature;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
+import org.eclipse.graphiti.platform.IDiagramEditor;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeFeatureProvider;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
 import org.key_project.sed.ui.visualization.util.LogUtil;
+import org.key_project.util.java.CollectionUtil;
 
 /**
  * An {@link ICustomFeature} that connects the given {@link Diagram}
@@ -32,8 +37,14 @@ public class DebugTargetConnectFeature extends AbstractCustomFeature {
    /**
     * Property for an {@link ISEDDebugTarget} array which contains
     * the {@link ISEDDebugTarget} to link with {@link #getDiagram()}.
-    */   
+    */
    public static final String PROPERTY_DEBUG_TARGETS = "debugTargets";
+
+   /**
+    * Property for an {@link Object} array which contains
+    * the {@link Object}s to select after reconstructing {@link #getDiagram()}.
+    */
+   public static final Object PROPERTY_ELEMENTS_TO_SELECT = "elementsToSelect";
 
    /**
     * Indicates that changes were made in {@link #execute(ICustomContext)} or not.
@@ -100,7 +111,7 @@ public class DebugTargetConnectFeature extends AbstractCustomFeature {
          Object obj = context.getProperty(PROPERTY_DEBUG_TARGETS);
          if (obj instanceof ISEDDebugTarget[]) {
             // Clear diagram
-            monitor.beginTask("Change diagram content", 2);
+            monitor.beginTask("Change diagram content", 3);
             Object[] oldLinkedObjects = getAllBusinessObjectsForPictogramElement(getDiagram());
             for (Object oldObj : oldLinkedObjects) {
                if (!monitor.isCanceled() && oldObj instanceof ISEDDebugTarget) {
@@ -132,6 +143,20 @@ public class DebugTargetConnectFeature extends AbstractCustomFeature {
                getFeatureProvider().updateIfPossible(updateContext);
             }
             changesDone = true;
+            monitor.worked(1);
+            // Select elements
+            Object toSelect = context.getProperty(PROPERTY_ELEMENTS_TO_SELECT);
+            if (toSelect instanceof Object[]) {
+               IDiagramEditor editor = getFeatureProvider().getDiagramTypeProvider().getDiagramEditor();
+               if (editor != null) {
+                  List<PictogramElement> pes = new LinkedList<PictogramElement>();
+                  for (Object businessObject : (Object[])toSelect) {
+                     PictogramElement[] boPes = getFeatureProvider().getAllPictogramElementsForBusinessObject(businessObject);
+                     CollectionUtil.addAll(pes, boPes);
+                  }
+                  editor.setPictogramElementsForSelection(pes.toArray(new PictogramElement[pes.size()]));
+               }
+            }
             monitor.worked(1);
             monitor.done();
          }

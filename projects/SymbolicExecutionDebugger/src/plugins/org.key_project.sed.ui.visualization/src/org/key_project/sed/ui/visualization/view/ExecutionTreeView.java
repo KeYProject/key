@@ -1,15 +1,23 @@
 package org.key_project.sed.ui.visualization.view;
 
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.debug.ui.IDebugView;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
+import org.eclipse.gef.EditPart;
 import org.eclipse.gef.editparts.ZoomManager;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.features.IFeatureProvider;
@@ -24,10 +32,14 @@ import org.eclipse.graphiti.ui.services.GraphitiUi;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IViewSite;
 import org.key_project.sed.core.model.ISEDDebugElement;
+import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.ui.visualization.execution_tree.editor.ExecutionTreeDiagramEditor;
 import org.key_project.sed.ui.visualization.execution_tree.editor.ReadonlyDiagramEditorActionBarContributor;
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugTargetConnectFeature;
@@ -35,8 +47,11 @@ import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTre
 import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeFeatureProvider;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
 import org.key_project.sed.ui.visualization.util.LogUtil;
+import org.key_project.util.eclipse.JobUtil;
+import org.key_project.util.eclipse.job.ScheduledJobCollector;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.IFilter;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.ObjectUtil;
 
@@ -62,12 +77,22 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
    private Set<ISEDDebugTarget> shownDebugTargets;
    
    /**
+    * Listens for selection changes on {@link #getEditorPart()}.
+    */
+   private ISelectionChangedListener editorSelectionListener = new ISelectionChangedListener() {
+      @Override
+      public void selectionChanged(SelectionChangedEvent event) {
+         handleEditorSelectionChanged(event);
+      }
+   };
+   
+   /**
     * Listens for selection changes on {@link #getDebugView()}.
     */
    private ISelectionChangedListener debugViewSelectionListener = new ISelectionChangedListener() {
       @Override
       public void selectionChanged(SelectionChangedEvent event) {
-         handleSelectionChanged(event);
+         handleDebugViewSelectionChanged(event);
       }
    };
    
@@ -77,16 +102,17 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
    public ExecutionTreeView() {
       setMessage(MESSAGE_DEBUG_VIEW_NOT_OPENED);
    }
-   
+
    /**
     * {@inheritDoc}
     */
    @Override
    protected ExecutionTreeDiagramEditor createEditorPart() {
-      ExecutionTreeDiagramEditor editor = new ExecutionTreeDiagramEditor();
-      editor.setReadOnly(true);
-      editor.setPaletteHidden(true);
-      return editor;
+      ExecutionTreeDiagramEditor editorPart = new ExecutionTreeDiagramEditor();
+      editorPart.setDefaultSelectionSynchronizationEnabled(false);
+      editorPart.setReadOnly(true);
+      editorPart.setPaletteHidden(true);
+      return editorPart;
    }
 
    /**
@@ -110,6 +136,7 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
     */
    @Override
    protected void editorPartControlCreated(ExecutionTreeDiagramEditor editorPart, ReadonlyDiagramEditorActionBarContributor contributor) {
+      editorPart.getSite().getSelectionProvider().addSelectionChangedListener(editorSelectionListener);
       editorPart.setGridVisible(false);
       ZoomManager zoomManager = (ZoomManager)editorPart.getAdapter(ZoomManager.class);
       contributor.setZoomManager(zoomManager);
@@ -135,11 +162,122 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
     * When the selection on {@link #getDebugView()} has changed.
     * @param event The event.
     */
-   protected void handleSelectionChanged(SelectionChangedEvent event) {
+   protected void handleDebugViewSelectionChanged(SelectionChangedEvent event) {
       // Make sure that event was provided by debug's viewer and not by something else what can happen if a maximized view is minimized.
       if (ObjectUtil.equals(event.getSource(), getDebugView().getViewer())) {
          // Update diagram
          updateDiagram(event.getSelection());
+      }
+   }
+   
+   /**
+    * When the selection on {@link #getEditorPart()} has changed.
+    * @param event The event.
+    */
+   protected void handleEditorSelectionChanged(final SelectionChangedEvent event) {
+      // List all selected business objects
+      Object[] elements = SWTUtil.toArray(event.getSelection());
+      final List<Object> businessObjects = new LinkedList<Object>();
+      for (Object element : elements) {
+         // Optional convert GMF instance to Graphiti instance
+         if (element instanceof EditPart) {
+            element = ((EditPart)element).getModel();
+         }
+         // Optional convert Graphiti instance to model (ISEDDebugElement)
+         if (element instanceof PictogramElement) {
+            element = getEditorPart().getDiagramTypeProvider().getFeatureProvider().getBusinessObjectForPictogramElement((PictogramElement)element);
+         }
+         businessObjects.add(element);
+      }
+      // Make sure that the old selected business objects are different to the new one
+      ISelection oldSelection = getDebugView().getViewer().getSelection();
+      if (!businessObjects.equals(SWTUtil.toList(oldSelection))) {
+         // Change selection in debug view if new elements are selected in a Job because the debug view uses Jobs itself to expand the debug model and it is required to wait for them.
+         Job selectJob = new Job("Synchronizing selection") {
+            @Override
+            protected IStatus run(IProgressMonitor monitor) {
+               // Expand viewer up to the elements to select.
+               final Viewer debugViewer = getDebugView().getViewer();
+               if (debugViewer instanceof TreeViewer) {
+                  TreeViewer treeViewer = (TreeViewer)debugViewer;
+                  for (Object element : businessObjects) {
+                     try {
+                        expandTreeUpToElement(treeViewer, element);
+                     }
+                     catch (DebugException e) {
+                        LogUtil.getLogger().logError("Can't expand debug view to element \"" + element + "\".", e);
+                     }
+                  }
+               }
+               // Select new elements
+               ISelection newSelection = SWTUtil.createSelection(businessObjects);
+               SWTUtil.select(debugViewer, newSelection, true);
+               return Status.OK_STATUS;
+            }
+         };
+         selectJob.setSystem(true);
+         selectJob.schedule();
+      }
+   }
+
+   /**
+    * Expands the shown tree in the given {@link TreeViewer} until
+    * the given element is visible.
+    * @param treeViewer The {@link TreeViewer} to expand in.
+    * @param element The element to make visible.
+    * @throws DebugException Occurred Exception.
+    */
+   protected void expandTreeUpToElement(final TreeViewer treeViewer, Object element) throws DebugException {
+      // List parents to expand them from root up to element to select.
+      LinkedList<Object> expandQue = new LinkedList<Object>();
+      boolean afterFirst = false;
+      while (element != null) {
+         if (afterFirst) { // Ignore first element
+            expandQue.addFirst(element);
+         }
+         else {
+            afterFirst = true;
+         }
+         if (element instanceof ISEDThread) {
+            element = ((ISEDThread)element).getDebugTarget();
+         }
+         else if (element instanceof ISEDDebugNode) {
+            element = ((ISEDDebugNode)element).getParent();
+         }
+         else if (element instanceof ISEDDebugTarget) {
+            element = ((ISEDDebugTarget)element).getLaunch();
+         }
+         else {
+            element = null;
+         }
+      }
+      // Expand elements starting at the root
+      for (final Object toExpand : expandQue) {
+         IFilter<Job> jobFilter = new IFilter<Job>() {
+            @Override
+            public boolean select(Job element) {
+               String className = element.getClass().getName();
+               return className.startsWith("org.eclipse.debug");
+            }
+         };
+         ScheduledJobCollector collector = new ScheduledJobCollector(jobFilter);
+         try {
+            // Start collecting update jobs started by the debug view
+            collector.start();
+            // Expand tree
+            treeViewer.getTree().getDisplay().syncExec(new Runnable() {
+               @Override
+               public void run() {
+                  treeViewer.setExpandedState(toExpand, true);
+               }
+            });
+         }
+         finally {
+            // Stop collecting update jobs
+            collector.stop();
+         }
+         // Wait until all update jobs have finished before 
+         JobUtil.waitFor(collector.getJobs(), 10);
       }
    }
    
@@ -150,41 +288,49 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
     */
    protected void updateDiagram(ISelection debugViewSelection) {
       try {
-         // Collect ISEDDebugTargets to show
-         final Set<ISEDDebugTarget> targets = new LinkedHashSet<ISEDDebugTarget>();
-         Object[] elements = SWTUtil.toArray(debugViewSelection);
-         for (Object element : elements) {
-            if (element instanceof ISEDDebugElement) {
-               targets.add(((ISEDDebugElement)element).getDebugTarget());
-            }
-            else if (element instanceof ILaunch) {
-               IDebugTarget[] launchTargets = ((ILaunch)element).getDebugTargets();
-               for (IDebugTarget target : launchTargets) {
-                  if (target instanceof ISEDDebugTarget) {
-                     targets.add((ISEDDebugTarget)target);
+         ExecutionTreeDiagramEditor editor = getEditorPart();
+         // Make sure that the editor is already created; ignore event otherwise.
+         if (editor != null && editor.getGraphicalViewer() != null) { 
+            // Collect ISEDDebugTargets to show
+            final Set<ISEDDebugTarget> targets = new LinkedHashSet<ISEDDebugTarget>();
+            Object[] elements = SWTUtil.toArray(debugViewSelection);
+            for (Object element : elements) {
+               if (element instanceof ISEDDebugElement) {
+                  targets.add(((ISEDDebugElement)element).getDebugTarget());
+               }
+               else if (element instanceof ILaunch) {
+                  IDebugTarget[] launchTargets = ((ILaunch)element).getDebugTargets();
+                  for (IDebugTarget target : launchTargets) {
+                     if (target instanceof ISEDDebugTarget) {
+                        targets.add((ISEDDebugTarget)target);
+                     }
                   }
                }
             }
-         }
-         // Check if new targets are selected
-         if (!CollectionUtil.containsSame(targets, shownDebugTargets)) {
-            // Check if a target was found
-            shownDebugTargets = targets;
-            if (!targets.isEmpty()) {
-               ExecutionTreeDiagramEditor editor = getEditorPart();
-               final IDiagramTypeProvider typeProvider = editor.getDiagramTypeProvider();
-               Assert.isNotNull(typeProvider);
-               final IFeatureProvider featureProvider = typeProvider.getFeatureProvider();
-               Assert.isTrue(featureProvider instanceof ExecutionTreeFeatureProvider);
-               ICustomFeature feature = new DebugTargetConnectFeature((ExecutionTreeFeatureProvider)featureProvider);
-               ICustomContext context = new CustomContext(new PictogramElement[] {typeProvider.getDiagram()});
-               context.putProperty(DebugTargetConnectFeature.PROPERTY_DEBUG_TARGETS, targets.toArray(new ISEDDebugTarget[targets.size()]));
-               editor.executeFeatureInJob("Changing Symbolic Execution Tree", feature, context);
-               // Unset message
-               setMessage(null);
+            // Check if new targets are selected
+            if (!CollectionUtil.containsSame(targets, shownDebugTargets)) {
+               // Check if a target was found
+               shownDebugTargets = targets;
+               if (!targets.isEmpty()) {
+                  final IDiagramTypeProvider typeProvider = editor.getDiagramTypeProvider();
+                  Assert.isNotNull(typeProvider);
+                  final IFeatureProvider featureProvider = typeProvider.getFeatureProvider();
+                  Assert.isTrue(featureProvider instanceof ExecutionTreeFeatureProvider);
+                  ICustomFeature feature = new DebugTargetConnectFeature((ExecutionTreeFeatureProvider)featureProvider);
+                  ICustomContext context = new CustomContext(new PictogramElement[] {typeProvider.getDiagram()});
+                  context.putProperty(DebugTargetConnectFeature.PROPERTY_DEBUG_TARGETS, targets.toArray(new ISEDDebugTarget[targets.size()]));
+                  context.putProperty(DebugTargetConnectFeature.PROPERTY_ELEMENTS_TO_SELECT, elements);
+                  editor.executeFeatureInJob("Changing Symbolic Execution Tree", feature, context);
+                  // Unset message
+                  setMessage(null);
+               }
+               else {
+                  setMessage(MESSAGE_NO_DEBUG_TARGET_SELECTED);
+               }
             }
             else {
-               setMessage(MESSAGE_NO_DEBUG_TARGET_SELECTED);
+               // Synchronize selection by selecting selected elements from debug view also in diagram editor
+               editor.selectBusinessObjects(elements);
             }
          }
       }
@@ -227,6 +373,7 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
     */
    @Override
    public void dispose() {
+      getEditorPart().getSite().getSelectionProvider().removeSelectionChangedListener(editorSelectionListener);
       IDebugView debugView = getDebugView();
       if (debugView != null) {
          debugView.getSite().getSelectionProvider().removeSelectionChangedListener(debugViewSelectionListener);

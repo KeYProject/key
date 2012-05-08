@@ -50,7 +50,7 @@ public class Logger {
    
    /**
     * Logs the warning.
-    * @param message The warning.
+    * @param message The warning message.
     */
    public void logWarning(String message) {
       if (message != null) {
@@ -62,7 +62,7 @@ public class Logger {
    
    /**
     * Logs the error.
-    * @param message The warning.
+    * @param message The error message.
     */
    public void logError(String message) {
       if (message != null) {
@@ -80,6 +80,20 @@ public class Logger {
       if (t != null) {
          t.printStackTrace();
          IStatus status = createErrorStatus(t);
+         plugin.getLog().log(status);
+      }
+   }
+   
+   /**
+    * Logs the error.
+    * @param message The error message.
+    * @param t The error to log.
+    */
+   public void logError(String message, Throwable t) {
+      if (message != null) {
+         System.out.print(message + " caused by ");
+         t.printStackTrace();
+         IStatus status = new Status(IStatus.ERROR, plugInId, message, t);
          plugin.getLog().log(status);
       }
    }

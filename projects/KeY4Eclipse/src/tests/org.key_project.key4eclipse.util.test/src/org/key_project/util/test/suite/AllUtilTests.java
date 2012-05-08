@@ -13,10 +13,12 @@ import org.key_project.util.test.testcase.CollectionUtilTest;
 import org.key_project.util.test.testcase.DefaultEntryTest;
 import org.key_project.util.test.testcase.IOUtilTest;
 import org.key_project.util.test.testcase.JDTUtilTest;
+import org.key_project.util.test.testcase.JobUtilTest;
 import org.key_project.util.test.testcase.LoggerTest;
 import org.key_project.util.test.testcase.ObjectUtilTest;
 import org.key_project.util.test.testcase.ResourceUtilTest;
 import org.key_project.util.test.testcase.SWTUtilTest;
+import org.key_project.util.test.testcase.ScheduledJobCollectorTest;
 import org.key_project.util.test.testcase.StringUtilTest;
 import org.key_project.util.test.testcase.WorkbenchUtilTest;
 import org.key_project.util.test.testcase.XMLUtilTest;
@@ -39,9 +41,11 @@ import org.key_project.util.test.testcase.XMLUtilTest;
     DefaultEntryTest.class,
     IOUtilTest.class,
     JDTUtilTest.class,
+    JobUtilTest.class,
     LoggerTest.class,
     ObjectUtilTest.class,
     ResourceUtilTest.class,
+    ScheduledJobCollectorTest.class,
     StringUtilTest.class,
     SWTUtilTest.class,
     WorkbenchUtilTest.class,

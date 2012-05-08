@@ -106,6 +106,39 @@ public class LoggerTest extends TestCase {
    }
    
    /**
+    * Tests {@link Logger#logError(String, Throwable)}
+    */
+   @Test
+   public void testLogError_String_Throwable() {
+      LogLogger logger = new LogLogger();
+      try {
+         Activator.getDefault().getLog().addLogListener(logger);
+         Exception exception = new Exception("The exception");
+         TestUtilsUtil.createLogger().logError("The message", exception);
+         Map<String, List<IStatus>> log = logger.getLog();
+         assertEquals(1, log.size());
+         assertTrue(log.containsKey(Activator.PLUGIN_ID));
+         List<IStatus> statusLog = log.get(Activator.PLUGIN_ID);
+         assertNotNull(statusLog);
+         assertEquals(1, statusLog.size());
+         IStatus status = statusLog.get(0);
+         assertNotNull(status);
+         assertNotNull(status.getChildren());
+         assertEquals(0, status.getChildren().length);
+         assertEquals(0, status.getCode());
+         assertEquals(exception, status.getException());
+         assertEquals("The message", status.getMessage());
+         assertEquals(Activator.PLUGIN_ID, status.getPlugin());
+         assertEquals(IStatus.ERROR, status.getSeverity());
+         assertEquals(false, status.isMultiStatus());
+         assertEquals(false, status.isOK());
+      }
+      finally {
+         Activator.getDefault().getLog().removeLogListener(logger);
+      }
+   }
+   
+   /**
     * Tests {@link Logger#logError(Throwable)}
     */
    @Test

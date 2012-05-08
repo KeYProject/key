@@ -11,6 +11,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.draw2d.geometry.Rectangle;
+import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.IReason;
 import org.eclipse.graphiti.features.IUpdateFeature;
@@ -452,7 +453,12 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
       }
       AddContext addContext = new AddContext(areaContext, root);
       addContext.setTargetContainer(getDiagram());
-      getFeatureProvider().addIfPossible(addContext);
+
+      // Execute add feature manually because getFeatureProvider().addIfPossible(addContext) changes the selection
+      IAddFeature feature = getFeatureProvider().getAddFeature(addContext);
+      if (feature != null && feature.canExecute(addContext)) {
+         feature.execute(addContext);
+      }
    }
 
    /**
