@@ -139,7 +139,7 @@ if($option{'storefailed'}) {
   &storeFailedProofs
 }
 
-if($failures + $errors > 0) {
+if($failures + $errors + scalar(@reloadFailed) > 0) {
     exit -1;
 } else {
     exit 0;
