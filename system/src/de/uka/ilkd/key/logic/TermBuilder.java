@@ -1465,7 +1465,7 @@ public final class TermBuilder {
 	
 	final OpReplacer or = new OpReplacer(normalToAtPre);
 	final Term modAtPre = or.replace(mod);
-	final Term createdAtPre = or.replace(created(services, objVarTerm));
+	final Term createdAtPre = or.replace(created(services, heapTerm, objVarTerm));
 
         ImmutableList<QuantifiableVariable> quantVars =
                 ImmutableSLList.<QuantifiableVariable>nil();

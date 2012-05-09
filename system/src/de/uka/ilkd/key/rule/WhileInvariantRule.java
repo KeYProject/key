@@ -325,7 +325,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 	final Term transactionFrameCondition = transaction ?
 	          TB.frame(services, TB.heap("savedHeap",services), savedToBeforeLoop, modBackup)
 	        : null;
-
+        
 	final Term frameCondition = transactionFrameCondition != null ?
 	        TB.and(normalFrameCondition,transactionFrameCondition) : normalFrameCondition;
 	
