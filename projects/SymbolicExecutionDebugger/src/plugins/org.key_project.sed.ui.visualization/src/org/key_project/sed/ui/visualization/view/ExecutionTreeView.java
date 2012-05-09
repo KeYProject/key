@@ -280,7 +280,8 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
             @Override
             public boolean select(Job element) {
                String className = element.getClass().getName();
-               return className.startsWith("org.eclipse.debug");
+               return className.startsWith("org.eclipse.debug") ||
+                      className.startsWith("org.eclipse.ui.internal.progress");
             }
          };
          ScheduledJobCollector collector = new ScheduledJobCollector(jobFilter);
@@ -291,7 +292,10 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
             treeViewer.getTree().getDisplay().syncExec(new Runnable() {
                @Override
                public void run() {
-                  treeViewer.setExpandedState(toExpand, true);
+                  if (!treeViewer.getExpandedState(toExpand)) {
+                     treeViewer.reveal(toExpand); // Make item visible first, because children are only loaded lazily if they are visible.
+                     treeViewer.setExpandedState(toExpand, true);
+                  }
                }
             });
          }
