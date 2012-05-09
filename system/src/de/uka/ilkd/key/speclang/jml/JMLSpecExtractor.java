@@ -205,6 +205,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
         	}
                 for(FieldSpecification field 
                       : ((FieldDeclaration) member).getFieldSpecifications()) {
+                    // add a static invariant for static fields
                     boolean isStatic = member.isStatic();
                     
                     //add invariant only for fields of reference types
@@ -305,6 +306,11 @@ public final class JMLSpecExtractor implements SpecExtractor {
         return extractMethodSpecs(pm,true);
     }
     
+    /**
+     * Extracts method specifications (i.e., contracts) from Java+JML input.
+     * @param pm method to extract for
+     * @param addInvariant whether to add <i>static</i> invarants to pre- and post-conditions
+     */
     @Override    
     public ImmutableSet<SpecificationElement> extractMethodSpecs(ProgramMethod pm, boolean addInvariant)
     throws SLTranslationException {

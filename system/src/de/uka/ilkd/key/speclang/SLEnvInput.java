@@ -262,7 +262,9 @@ public final class SLEnvInput extends AbstractEnvInput {
             	= specExtractor.extractClassSpecs(kjt);
             specRepos.addSpecs(classSpecs);
             
-            // check whether a static invariant is present
+            // Check whether a static invariant is present.
+            // Later, we will only add static invariants to contracts per default if
+            // there is an explicit static invariant present.
             boolean staticInvPresent = false;
             for (SpecificationElement s: classSpecs){
                 if (s instanceof ClassInvariant && ((ClassInvariant)s).isStatic()) {

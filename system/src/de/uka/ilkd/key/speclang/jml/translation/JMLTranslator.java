@@ -466,6 +466,7 @@ final class JMLTranslator {
 
             /** Need to handle this one differently from INV_FOR
              * since here also static invariants may occur.
+             * For a static invariant, take the passed type as receiver.
              */
             @Override
             public Object translate(SLTranslationExceptionManager excManager,

@@ -779,6 +779,7 @@ public class JMLSpecFactory {
     }
 
 
+    @SuppressWarnings("unchecked")
     public ClassAxiom createJMLRepresents(KeYJavaType kjt,
                                           TextualJMLRepresents textualRep)
             throws SLTranslationException {

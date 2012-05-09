@@ -36,6 +36,12 @@ public final class PartialInvAxiom extends ClassAxiom {
     private final ClassInvariant inv;
     private final ObserverFunction target;
     
+    /** Creates a new class axiom.
+     * 
+     * @param inv (partial) invariant from which the axiom is derived 
+     * @param isStatic whether the axiom should match static invariants (i.e., &lt;$inv&gt;) or instance invariants (i.e., &lt;inv&gt;)
+     * @param services
+     */
     public PartialInvAxiom(ClassInvariant inv, boolean isStatic, Services services) {
 	assert inv != null;
 	this.inv = inv;
