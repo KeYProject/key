@@ -6,6 +6,8 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.draw2d.TextUtilities;
+import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
@@ -13,12 +15,16 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.transaction.RecordingCommand;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.datatypes.IDimension;
+import org.eclipse.graphiti.internal.datatypes.impl.DimensionImpl;
 import org.eclipse.graphiti.mm.algorithms.styles.Font;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.ui.editor.DiagramEditorFactory;
 import org.eclipse.graphiti.ui.editor.DiagramEditorInput;
+import org.eclipse.graphiti.ui.internal.services.impl.GefService;
+import org.eclipse.graphiti.ui.internal.util.DataTypeTransformation;
 import org.eclipse.graphiti.ui.services.GraphitiUi;
+import org.eclipse.graphiti.ui.services.IUiLayoutService;
 import org.eclipse.swt.widgets.Display;
 import org.key_project.util.java.thread.AbstractRunnableWithResult;
 import org.key_project.util.java.thread.IRunnableWithResult;
@@ -27,6 +33,7 @@ import org.key_project.util.java.thread.IRunnableWithResult;
  * Provides static utility methods for Graphiti.
  * @author Martin Hentschel
  */
+@SuppressWarnings("restriction")
 public final class GraphitiUtil {
    /**
     * Forbid instances.
@@ -35,12 +42,13 @@ public final class GraphitiUtil {
    }
    
    /**
-    * Calculates the text size of the given text in the given {@link Font}.
+    * Calculates the string size of the given text in the given {@link Font}.
+    * Line breaks and tabs are ignored and treated as normal space.
     * @param text The text.
     * @param font The {@link Font}.
     * @return The calculated text size.
     */
-   public static IDimension calculateTextSize(final String text, final Font font) {
+   public static IDimension calculateStringSize(final String text, final Font font) {
       IRunnableWithResult<IDimension> run = new AbstractRunnableWithResult<IDimension>() {
          @Override
          public void run() {
@@ -49,6 +57,46 @@ public final class GraphitiUtil {
       };
       Display.getDefault().syncExec(run);
       return run.getResult();
+   }
+   
+   /**
+    * <p>
+    * Calculates the text size of the given text in the given {@link Font}.
+    * Linebreaks and tabs are treated as real line break/tab.
+    * </p>
+    * <p>
+    * The implementation is a modified copy of {@link GefService#calculateTextSize(String, Font)}
+    * which is the internal implementation of {@link IUiLayoutService#calculateTextSize(String, Font)}.
+    * But the provided Graphiti implementation calculates the string size and not the text size.
+    * </p>
+    * @param text The text.
+    * @param font The {@link Font}.
+    * @return The calculated text size.
+    */
+   public static IDimension calculateTextSize(final String text, final Font font) {
+      if (text == null || font == null || font.getName() == null) {
+         return null;
+      }
+      else {
+         IRunnableWithResult<IDimension> run = new AbstractRunnableWithResult<IDimension>() {
+            @Override
+            public void run() {
+               org.eclipse.swt.graphics.Font swtFont = DataTypeTransformation.toSwtFont(font);
+               if (swtFont != null) {
+                  Dimension se = TextUtilities.INSTANCE.getTextExtents(text, swtFont);
+                  if (se != null) {
+                     IDimension dimension = new DimensionImpl(se.width, se.height);
+                     setResult(dimension);
+                  }
+                  if (!swtFont.isDisposed()) {
+                     swtFont.dispose();
+                  }
+               }
+            }
+         };
+         Display.getDefault().syncExec(run);
+         return run.getResult();
+      }
    }
    
    /**

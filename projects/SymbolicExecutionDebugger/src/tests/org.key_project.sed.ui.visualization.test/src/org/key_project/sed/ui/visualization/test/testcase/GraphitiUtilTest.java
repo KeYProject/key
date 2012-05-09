@@ -37,6 +37,34 @@ import org.key_project.util.test.util.TestUtilsUtil;
  */
 public class GraphitiUtilTest extends TestCase {
    /**
+    * Tests {@link GraphitiUtil#calculateStringSize(String, Font)}
+    */
+   @Test
+   public void testCalculateStringSize() throws InterruptedException {
+      // Create font
+      Diagram diagram = Graphiti.getPeCreateService().createDiagram(ExecutionTreeDiagramTypeProvider.TYPE, "Test", true);
+      Font font = Graphiti.getGaService().manageFont(diagram, "Arial", 8);
+      // Test null font or text
+      assertNull(GraphitiUtil.calculateStringSize(null, null));
+      assertNull(GraphitiUtil.calculateStringSize("Hello World", null));
+      assertNull(GraphitiUtil.calculateStringSize(null, font));
+      // Test valid font and text in displays thread
+      IDimension dimension = GraphitiUtil.calculateStringSize("Hello World", font);
+      assertNotNull(dimension);
+      assertTrue(dimension.getWidth() > 0);
+      assertTrue(dimension.getHeight() > 0);
+      // Test valid font and text in different thread
+      CalculateSizeThread thread = new CalculateSizeThread("Hello World", font, true);
+      thread.start();
+      while (thread.isAlive()) {
+         Display.getDefault().readAndDispatch();
+      }
+      assertNotNull(thread.getDimension());
+      assertTrue(thread.getDimension().getWidth() > 0);
+      assertTrue(thread.getDimension().getHeight() > 0);
+   }
+   
+   /**
     * Tests {@link GraphitiUtil#calculateTextSize(String, org.eclipse.graphiti.mm.algorithms.styles.Font)}
     */
    @Test
@@ -54,7 +82,7 @@ public class GraphitiUtilTest extends TestCase {
       assertTrue(dimension.getWidth() > 0);
       assertTrue(dimension.getHeight() > 0);
       // Test valid font and text in different thread
-      CalculateTextSizeThread thread = new CalculateTextSizeThread("Hello World", font);
+      CalculateSizeThread thread = new CalculateSizeThread("Hello World", font, false);
       thread.start();
       while (thread.isAlive()) {
          Display.getDefault().readAndDispatch();
@@ -66,10 +94,11 @@ public class GraphitiUtilTest extends TestCase {
    
    /**
     * Utility {@link Thread} for test purpose to execute
-    * {@link GraphitiUtil#calculateTextSize(String, Font)}.
+    * {@link GraphitiUtil#calculateTextSize(String, Font)} or
+    * {@link GraphitiUtil#calculateStringSize(String, Font)}.
     * @author Martin Hentschel
     */
-   private static class CalculateTextSizeThread extends Thread {
+   private static class CalculateSizeThread extends Thread {
       /**
        * The text.
        */
@@ -86,14 +115,21 @@ public class GraphitiUtilTest extends TestCase {
       private IDimension dimension;
 
       /**
+       * If {@code true} {@link GraphitiUtil#calculateStringSize(String, Font)} is executed and {@link GraphitiUtil#calculateTextSize(String, Font)} otherwise.
+       */
+      private boolean stringSize;
+      
+      /**
        * Constructor.
        * @param text The text.
        * @param font The font.
+       * @param stringSize If {@code true} {@link GraphitiUtil#calculateStringSize(String, Font)} is executed and {@link GraphitiUtil#calculateTextSize(String, Font)} otherwise.
        */
-      public CalculateTextSizeThread(String text, Font font) {
+      public CalculateSizeThread(String text, Font font, boolean stringSize) {
          super();
          this.text = text;
          this.font = font;
+         this.stringSize = stringSize;
       }
 
       /**
@@ -101,7 +137,12 @@ public class GraphitiUtilTest extends TestCase {
        */
       @Override
       public void run() {
-         dimension = GraphitiUtil.calculateTextSize(text, font);
+         if (stringSize) {
+            dimension = GraphitiUtil.calculateStringSize(text, font);
+         }
+         else {
+            dimension = GraphitiUtil.calculateTextSize(text, font);
+         }
       }
 
       /**
