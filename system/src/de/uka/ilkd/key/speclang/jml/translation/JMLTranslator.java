@@ -58,9 +58,12 @@ final class JMLTranslator {
     
     public static enum JMLKeyWord {
         ARRAY_REF ("array reference"),
+        INV ("\\inv"),
         INV_FOR ("\\invariant_for"),
         ACCESSIBLE ("accessible"),
         ASSIGNABLE ("assignable"),
+        CAST ("cast"),
+        CONDITIONAL ("conditional"),
         DEPENDS ("depends"),
         ENSURES ("ensures"),
         REPRESENTS ("represents"),
@@ -105,6 +108,11 @@ final class JMLTranslator {
 
 
         public String jmlName() {
+            return jmlName;
+        }
+        
+        @Override
+        public String toString(){
             return jmlName;
         }
 
@@ -454,6 +462,25 @@ final class JMLTranslator {
         });
 
         // primary expressions
+        translationMethods.put(JMLKeyWord.INV, new JMLTranslationMethod() {
+
+            /** Need to handle this one differently from INV_FOR
+             * since here also static invariants may occur.
+             * For a static invariant, take the passed type as receiver.
+             */
+            @Override
+            public Object translate(SLTranslationExceptionManager excManager,
+                    Object... params) throws SLTranslationException {
+                checkParameters(params, Services.class, Term.class, KeYJavaType.class);
+                final Services services = (Services)params[0];
+                final Term selfVar = (Term)params[1];
+                final KeYJavaType targetType = (KeYJavaType)params[2];
+                final boolean isStatic = selfVar == null;
+                assert targetType != null || !isStatic;
+                final Term result = isStatic? TB.staticInv(services, targetType): TB.inv(services, selfVar);
+                return new SLExpression(result);
+            }});
+        
         translationMethods.put(JMLKeyWord.INV_FOR,
                                new JMLTranslationMethod() {
 
@@ -837,6 +864,67 @@ final class JMLTranslator {
             
         });
         
+        translationMethods.put(JMLKeyWord.CAST, new JMLTranslationMethod(){
+
+            @Override
+            public Object translate(SLTranslationExceptionManager excManager,
+                    Object... params) throws SLTranslationException {
+                checkParameters(params, Services.class, JavaIntegerSemanticsHelper.class, KeYJavaType.class, SLExpression.class);
+                Services services = (Services)params[0];
+                JavaIntegerSemanticsHelper intHelper = (JavaIntegerSemanticsHelper)params[1];
+                KeYJavaType type = (KeYJavaType)params[2];
+                SLExpression result = (SLExpression)params[3];
+
+                if (type != null) {
+                    if (result.isType()) {
+                        throw excManager.createException("Casting of type variables not (yet) supported.");
+                    }
+                    assert result.isTerm();
+                    Sort origType = result.getTerm().sort();
+
+                    if (origType == Sort.FORMULA) {
+                        // This case might occur since boolean expressions
+                        // get converted prematurely (see bug #1121).
+                        // Just check whether there is a cast to boolean.
+                        if (type != services.getTypeConverter().getBooleanType()){
+                            excManager.createException("Cannot cast from boolean to "+type+".");
+                        }
+                    } else if(intHelper.isIntegerTerm(result)) {
+                        result = intHelper.buildCastExpression(type, result);
+                    } else {result = new SLExpression(
+                            TB.cast(services, type.getSort(), result.getTerm()), 
+                            type);
+                    }
+                } else {
+                    throw excManager.createException("Please provide a type to cast to.");
+                }
+                return result;
+            }});
+        
+        translationMethods.put(JMLKeyWord.CONDITIONAL, new JMLTranslationMethod(){
+
+            @Override
+            public Object translate(SLTranslationExceptionManager excManager,
+                    Object... params) throws SLTranslationException {
+                checkParameters(params, Services.class, SLExpression.class, SLExpression.class, SLExpression.class);
+                Services services = (Services)params[0];
+                SLExpression result = (SLExpression)params[1];
+                SLExpression a = (SLExpression)params[2];
+                SLExpression b = (SLExpression)params[3];
+                
+                // handle cases where a and b are of sort FORMULA and boolean respectively (which are incompatible, unfortunately)
+                final KeYJavaType bool = services.getTypeConverter().getBooleanType();
+                Term aTerm = a.getType() == bool ? TB.convertToFormula(a.getTerm(), services) : a.getTerm();
+                Term bTerm = b.getType() == bool ? TB.convertToFormula(b.getTerm(), services) : b.getTerm();
+
+                Term ife = TB.ife(TB.convertToFormula(result.getTerm(), services), aTerm, bTerm);
+                if(a.getType() != null && a.getType().equals(b.getType())) {
+                    result = new SLExpression(ife, a.getType());
+                } else {
+                    result = new SLExpression(ife);
+                }
+                return result;
+            }});
         
         translationMethods.put(JMLKeyWord.COMMENTARY,
                                new JMLTranslationMethod() {
@@ -1257,6 +1345,21 @@ final class JMLTranslator {
         } catch (TermCreationException e) {
             throw excManager.createException(e.getMessage());
         }
+    }
+    
+    public <T> T translate(JMLKeyWord keyword, Class<T> resultClass, Object... params)
+    throws SLTranslationException {
+        return translate(keyword.toString(), resultClass, params);
+    }
+    
+    public SLExpression translate(String jmlKeyWordName, Object... params)
+    throws SLTranslationException {
+        return translate(jmlKeyWordName, SLExpression.class, params);
+    }
+    
+    public SLExpression translate(JMLKeyWord keyword, Object...params)
+    throws SLTranslationException {
+        return translate(keyword.toString(), SLExpression.class, params);
     }
 
 

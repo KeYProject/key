@@ -4,7 +4,7 @@ public interface List {
     //@ public accessible \inv: footprint;
     //@ public accessible footprint: footprint;  
     
-    //@ public invariant 0 <= size();
+    //@ public instance invariant 0 <= size();
     
     
     /*@ public normal_behaviour

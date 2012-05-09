@@ -35,7 +35,7 @@ public final class IfThenElse extends AbstractOperator {
     
     private Sort getCommonSuperSort(Sort s1, Sort s2) {
         if(s1 == Sort.FORMULA) {
-            assert s2 == Sort.FORMULA;
+            assert s2 == Sort.FORMULA: "Sorts FORMULA and "+s2+" are incompatible.";
             return Sort.FORMULA;
         } else if(s1.extendsTrans(s2)) {
             return s2;

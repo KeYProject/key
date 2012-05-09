@@ -817,9 +817,15 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     }
 
     private boolean autoInductionLemmaEnabled () {  //chrisg
+    	final String prop =strategyProperties.getProperty
+                             ( StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY ) ;
+    	return prop.equals(StrategyProperties.AUTO_INDUCTION_LEMMA_ON) ||
+    	       prop.equals(StrategyProperties.AUTO_INDUCTION_RESTRICTED);
+    	/*
         return StrategyProperties.AUTO_INDUCTION_LEMMA_ON.equals (
                  strategyProperties.getProperty
                  ( StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY ) );
+         */
     }
 
     private Feature allowSplitting(ProjectionToTerm focus) {

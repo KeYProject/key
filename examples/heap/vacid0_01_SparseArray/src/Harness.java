@@ -1,6 +1,6 @@
 public class Harness {
     
-    static SparseArray a, b;
+    static /*@ nullable @*/ SparseArray a, b;
     
     
     /*@ normal_behaviour

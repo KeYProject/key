@@ -80,8 +80,9 @@ tokens {
 	FIELDTYPE = "\\fieldType";
 	ELEMSORT = "\\elemSort";        
 	ISARRAY="\\isArray";
-	ISARRAYLENGTH="\\isArrayLength";	
+	ISARRAYLENGTH="\\isArrayLength";
         ISENUMTYPE="\\isEnumType";
+	ISINDUCTVAR="\\isInductVar";	
 	ISLOCALVARIABLE = "\\isLocalVariable";
 	ISOBSERVER = "\\isObserver";
 	DIFFERENT = "\\different";		

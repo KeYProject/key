@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.rule;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Vector;
@@ -7,8 +8,12 @@ import java.util.WeakHashMap;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.java.KeYJavaASTFactory;
+import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -81,24 +86,23 @@ public class QueryExpand implements BuiltInRule {
     public Term queryEvalTerm(Services services, Term query){
     	
     	   final ProgramMethod method = (ProgramMethod)query.op();
+    	   
+           final ImmutableArray<ProgramVariable> args = getRegisteredArgumentVariables(method.getParameters(), services);
 
 
-           final ImmutableArray<ProgramVariable> args = getArgumentVariables(method.getParameters(), services);
-           
            //Names for additional symbols
-           	final VariableNameProposer vnp = VariableNameProposer.DEFAULT; 
-          
-           	/* copied from WhileInvRule::getNewLocalVariable
-           	getNewLocalvariable(varNameBase, 
-                                   javaInfo.getKeYJavaType(varType), services)
-                                   
-          	KeYJavaASTFactory.localVariable(services.getVariableNamer().
-                                             getTemporaryNameProposal(varNameBase), varType);
-           	 */
-           final String calleeName     = vnp.getNewName(services, new Name("callee")).toString(); //if someone has a better idea, then replace this.
-           final String progResultName = vnp.getNewName(services, new Name("result")).toString();
-           final String logicResultName= vnp.getNewName(services, new Name("res_"+method.getName())).toString();
            
+           final String calleeName     = tb.newName(services, "callee");
+           final String progResultName = tb.newName(services, "queryResult");
+           final String logicResultName= tb.newName(services, "res_"+method.getName());
+           //For declaring the symbol that stores the result in a logical term a trick is done.
+           //The new symbolc is introduced as a logical variable that is later skolemized by the ex_left rule.
+           //  LogicVariable logicResultQV = new LogicVariable(new Name("res_"+method.getName()),query.sort());
+           
+           KeYJavaType calleeType = services.getJavaInfo().getKeYJavaType(query.sub(1).sort());
+           KeYJavaType progResultType = method.getReturnType();
+
+
            final ProgramVariable callee;
            final int offset;
            if (method.isStatic()) {
@@ -106,30 +110,47 @@ public class QueryExpand implements BuiltInRule {
                offset = 0;
            } else {
                callee = new LocationVariable(
-                       new ProgramElementName(calleeName),
-                               services.getJavaInfo().getKeYJavaType(query.sub(1).sort()));
+                       new ProgramElementName(calleeName), calleeType);
                offset = 1;
            }
 
            final ProgramVariable result = 
                    new LocationVariable(
                            new ProgramElementName(progResultName), 
-                                   method.getReturnType());
+                                   progResultType);
 
 
            final MethodReference mr = new MethodReference(args, method.getProgramElementName(), callee);
+           
            final Function placeHolderResult = new Function(new Name(logicResultName), query.sort());
-
+           //final LocationVariable placeHoderResult = new LocationVariable(new ProgramElementName(logicResultName), logicResultType);
+           
+           //final Term placeHolderResultTrm = tb.var(logicResultQV);
+           final Term placeHolderResultTrm = tb.func(placeHolderResult);
+           services.getNamespaces().functions().addSafely(placeHolderResult);
+         
            // construct method call   {heap:=h || p1:arg1 || ... || pn:=argn} 
            //                                  \[ res = o.m(p1,..,pn); \] (c = res) 
 
+           ArrayList<ProgramElement> stmnt = new ArrayList<ProgramElement>();
+           
+           stmnt.add(KeYJavaASTFactory.declare(result, progResultType));
+           
            final CopyAssignment assignment = new CopyAssignment(result, mr);
+
+           stmnt.add(assignment);
+           
+           StatementBlock s = new StatementBlock(stmnt.toArray(new Statement[stmnt.size()]));
+
+           
+           
            final MethodFrame mf = new MethodFrame(null, 
                    new ExecutionContext(new TypeRef(method.getContainerType()), null),
-                   new StatementBlock(assignment));
+                   //new StatementBlock(assignment)
+                   s);
            final JavaBlock jb = JavaBlock.createJavaBlock(new StatementBlock(mf));	
 
-           final Term methodCall = tb.dia(jb, tb.not(tb.equals(tb.var(result),tb.func(placeHolderResult))));  //Not sure if box or diamond should be used.
+           final Term methodCall = tb.dia(jb, tb.not(tb.equals(tb.var(result),placeHolderResultTrm)));  //Not sure if box or diamond should be used.
            //final Term methodCall = tb.box(jb, tb.equals(tb.var(result), query));
            
            Term update = tb.elementary(services, services.getTypeConverter().getHeapLDT().getHeap(), query.sub(0));
@@ -146,43 +167,35 @@ public class QueryExpand implements BuiltInRule {
 
            Term topLevel = tb.not(tb.apply(update, methodCall));
 
-           // chrisg: the following additional equation increases performance (sometimes significantly, e.g. by factor 10). 
-           topLevel = tb.and(topLevel, tb.equals(query,tb.func(placeHolderResult)));
+
+           // The following additional equation increases performance (sometimes significantly, e.g. by factor 10). 
+           topLevel = tb.and(topLevel, tb.equals(query,placeHolderResultTrm));
            
-           //register variables in namespace
-           final Namespace progvarsNS = services.getNamespaces().programVariables();
-           for (final ProgramVariable pv : args) { // add new program variables for arguments
-               //newGoal.addProgramVariable(pv);
-               progvarsNS.addSafely(pv);
-           }	
-           if (callee != null) { 
-        	   //newGoal.addProgramVariable(callee);
-        	   progvarsNS.addSafely(callee);
-           }
-           //newGoal.addProgramVariable(result);
-           progvarsNS.addSafely(result);
-           services.getNamespaces().functions().add(placeHolderResult);
+           //topLevel = tb.ex(logicResultQV, topLevel); //Alternative way to declare the symbol
+
 
            return topLevel;
     }
 
     
     
-    private ImmutableArray<ProgramVariable> getArgumentVariables(
+    private ImmutableArray<ProgramVariable> getRegisteredArgumentVariables(
             ImmutableArray<ParameterDeclaration> paramDecls, Services services) {
 
+        final Namespace progvarsNS = services.getNamespaces().programVariables();
         final ProgramVariable[] args = new ProgramVariable[paramDecls.size()];
         int i = 0;
         for (final ParameterDeclaration pdecl : paramDecls) {
-            final ProgramElementName argVarName = 
-                    new ProgramElementName(VariableNameProposer.DEFAULT.
-                            getNewName(services, new Name(pdecl.getVariableSpecification().getName())).toString());
-
+        	final String baseName = pdecl.getVariableSpecification().getName();
+        	final String newName = tb.newName(services,baseName);
+            final ProgramElementName argVarName = new ProgramElementName(newName);
             args[i] = new LocationVariable(argVarName, 
                     pdecl.getVariableSpecification().getProgramVariable().getKeYJavaType());
+            progvarsNS.addSafely(args[i]);
+            //newGoal.addProgramVariable(pv);
             i++;
         }
-
+        
         return new ImmutableArray<ProgramVariable>(args);
     }
 

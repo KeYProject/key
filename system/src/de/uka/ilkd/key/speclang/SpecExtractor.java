@@ -26,6 +26,9 @@ public interface SpecExtractor {
      */
     public ImmutableSet<SpecificationElement> extractMethodSpecs(ProgramMethod pm)
         throws SLTranslationException;
+
+    public ImmutableSet<SpecificationElement> extractMethodSpecs(ProgramMethod pm, boolean addInvariant)
+        throws SLTranslationException;
     
     /**
      * Returns the class invariants for the passed type.

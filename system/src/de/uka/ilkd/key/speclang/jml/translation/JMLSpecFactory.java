@@ -299,6 +299,11 @@ public class JMLSpecFactory {
     }
 
 
+    /**
+     * Clauses are expected to be conjoined in a right-associative way, i.e. A & (B & ( C (...& N))).
+     * When using auto induction with lemmas, then A will be used as a lemma for B, 
+     * A & B will be used as a lemma for C and so on. This mimics the Isabelle-style of proving.
+     */
     private Term translateAndClauses(
             ProgramMethod pm,
             ProgramVariable selfVar,
@@ -308,14 +313,18 @@ public class JMLSpecFactory {
             Map<String,Term> atPres,
             ImmutableList<PositionedString> originalClauses)
             throws SLTranslationException {
+        //The array is used to invert the order in which the elements are read.
+        PositionedString[] array = new PositionedString[originalClauses.size()]; 
+        originalClauses.toArray(array);
+
         Term result = TB.tt();
-        for (PositionedString expr : originalClauses) {
+        for (int i=array.length-1; i>=0 ; i--) {
             Term translated =
-                    JMLTranslator.translate(expr, pm.getContainerType(),
+                    JMLTranslator.translate(array[i], pm.getContainerType(),
                                             selfVar, paramVars, resultVar,
                                             excVar, atPres,
                                             Term.class, services);
-            result = TB.and(result, TB.convertToFormula(translated,services));
+            result = TB.and(TB.convertToFormula(translated,services), result);
         }
         return result;
     }
@@ -629,13 +638,14 @@ public class JMLSpecFactory {
     //-------------------------------------------------------------------------
     public ClassInvariant createJMLClassInvariant(KeYJavaType kjt,
                                                   VisibilityModifier visibility,
+                                                  boolean isStatic,
                                                   PositionedString originalInv)
             throws SLTranslationException {
         assert kjt != null;
         assert originalInv != null;
 
         //create variable for self
-        ProgramVariable selfVar = TB.selfVar(services, kjt, false);
+        ProgramVariable selfVar = isStatic? null: TB.selfVar(services, kjt, false);
 
         //translateToTerm expression
         Term inv = TB.convertToFormula(JMLTranslator.translate(originalInv, kjt, selfVar, null, null,
@@ -656,8 +666,14 @@ public class JMLSpecFactory {
             KeYJavaType kjt,
             TextualJMLClassInv textualInv)
             throws SLTranslationException {
+        // check whether the invariant is static
+        final ImmutableList<String> mods = textualInv.getMods();
+        final boolean isStatic = (mods.contains("static") || // modifier "static" 
+                // in an interface "static" is the default (see Sect. 2.5 of the reference manual)
+                (services.getJavaInfo().isInterface(kjt) && !mods.contains("instance")));
+        
         //create variable for self
-        ProgramVariable selfVar = TB.selfVar(services, kjt, false);
+        ProgramVariable selfVar = isStatic? null: TB.selfVar(services, kjt, false);
 
         //translateToTerm expression
         Term inv = TB.convertToFormula(JMLTranslator.translate(textualInv.getInv(), kjt, selfVar,
@@ -752,6 +768,7 @@ public class JMLSpecFactory {
     }
 
 
+    @SuppressWarnings("unchecked")
     public ClassAxiom createJMLRepresents(KeYJavaType kjt,
                                           TextualJMLRepresents textualRep)
             throws SLTranslationException {

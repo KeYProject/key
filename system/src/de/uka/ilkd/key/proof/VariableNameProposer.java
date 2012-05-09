@@ -82,6 +82,10 @@ public class VariableNameProposer implements InstantiationProposer {
     }
 
 
+    /**
+     * Warning: this method is buggy. It causes problems with proof reloading.
+     * Use the method TermBuilder.newName instead.
+     */
     public Name getNewName(Services services, Name baseName) {
         NamespaceSet namespaces = services.getNamespaces();
 
