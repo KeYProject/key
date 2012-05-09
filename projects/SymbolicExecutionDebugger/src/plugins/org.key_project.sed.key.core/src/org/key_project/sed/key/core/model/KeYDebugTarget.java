@@ -225,17 +225,28 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
    private IProgramVariable exceptionVariable;
    
    /**
+    * If this is {@code true} an {@link ISEDMethodReturn} will contain the return value,
+    * but the performance will suffer.
+    * If it is {@code false} only the name of the returned method is shown in an {@link ISEDMethodReturn}.
+    */
+   private boolean showMethodReturnValuesInDebugNodes;
+   
+   /**
     * Constructor.
     * @param launch The parent {@link ILaunch}.
     * @param proof The {@link Proof} in KeY to treat.
+    * @param showMethodReturnValuesInDebugNodes
     * @throws DebugException Occurred Exception
     */
-   public KeYDebugTarget(ILaunch launch, Proof proof) throws DebugException {
+   public KeYDebugTarget(ILaunch launch, 
+                         Proof proof, 
+                         boolean showMethodReturnValuesInDebugNodes) throws DebugException {
       super(launch);
       // Update references
       Assert.isNotNull(proof);
       this.proof = proof;
       this.exceptionVariable = extractExceptionVariable(proof);
+      this.showMethodReturnValuesInDebugNodes = showMethodReturnValuesInDebugNodes; 
       // Update initial model
       setModelIdentifier(MODEL_IDENTIFIER);
       setName(proof.name() != null ? proof.name().toString() : "Unnamed");
@@ -908,7 +919,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
                                                      ISEDMethodCall callSEDNode) throws DebugException {
       // Compute return value if possible
       Object returnValue = null;
-      if (callNode != null) {
+      if (showMethodReturnValuesInDebugNodes && callNode != null) {
          // Check if a result variable is available
          MethodBodyStatement mbs = (MethodBodyStatement)callNode.getNodeInfo().getActiveStatement();
          IProgramVariable resultVar = mbs.getResultVariable();

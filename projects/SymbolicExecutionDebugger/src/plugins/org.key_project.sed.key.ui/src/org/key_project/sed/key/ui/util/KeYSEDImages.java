@@ -24,6 +24,11 @@ public final class KeYSEDImages {
      * The key for the image that is used in the main tab group of the launch configuration.
      */
     public static final String LAUNCH_MAIN_TAB_GROUP = "org.key_project.sed.key.ui.images.launchMainTabGroup";
+
+    /**
+     * The key for the image that is used in the performance tab group of the launch configuration.
+     */
+    public static final String LAUNCH_PERFORMANCE_TAB_GROUP = "org.key_project.sed.key.ui.images.launchPerformanceTabGroup";
     
     /**
      * Forbid instances.
@@ -60,6 +65,9 @@ public final class KeYSEDImages {
        String path = null;
        if (LAUNCH_MAIN_TAB_GROUP.equals(key)) {
            path = "icons/logo16.gif";
+       }
+       else if (LAUNCH_PERFORMANCE_TAB_GROUP.equals(key)) {
+           path = "icons/keyPerformance.gif";
        }
        // Load image if possible
        if (path != null) {

@@ -72,7 +72,8 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
               throw new CoreException(LogUtil.getLogger().createErrorStatus("Proof was not instantiated."));
           }
           // Add debug target to ILaunch
-          KeYDebugTarget target = new KeYDebugTarget(launch, proof);
+          boolean showMethodReturnValues = KeySEDUtil.isShowMethodReturnValuesInDebugNodes(configuration);
+          KeYDebugTarget target = new KeYDebugTarget(launch, proof, showMethodReturnValues);
           launch.addDebugTarget(target);
        }
        catch (CoreException e) {
