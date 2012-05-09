@@ -127,10 +127,9 @@ public final class WhileInvariantRule implements BuiltInRule {
 	    			ImmutableSet<ProgramVariable> localOuts,
 	    			Services services) {
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-	final Name anonHeapName = new Name("anon_"+heapName+"_loop");
+	final Name anonHeapName = new Name(TB.newName(services, "anon_"+heapName+"_loop"));
 	final Function anonHeapFunc = new Function(anonHeapName,
 					     heapLDT.targetSort());
-        System.out.println(anonHeapFunc);
 	services.getNamespaces().functions().addSafely(anonHeapFunc);
 	final Term anonHeapTerm = TB.func(anonHeapFunc);
 	
