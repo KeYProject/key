@@ -86,8 +86,8 @@ public class VBTStrategy extends JavaCardDLStrategy {
             clearRuleSetBindings (rsd, "beta" );
             bindRuleSet (rsd, "beta", -1000);
         
-            clearRuleSetBindings (rsd, "inReachableStateImplication" );
-            bindRuleSet (rsd, "inReachableStateImplication", inftyConst());
+//            clearRuleSetBindings (rsd, "inReachableStateImplication" ); // Do not change this rule behavior because if it is enabled branches with negative array length are not closed.
+//            bindRuleSet (rsd, "inReachableStateImplication", inftyConst());
             clearRuleSetBindings (rsd, "cut_direct" );
             bindRuleSet (rsd, "cut_direct",inftyConst());
     
