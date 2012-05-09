@@ -41,13 +41,23 @@ It provides the following file structure:
 
 (4) Setup development IDE
 -------------------------
-1. Download Eclipse 3.7 SR1 (Indigo) (e.g. in 32 bit version) as bundle 
+1. Download Eclipse 3.7 SR2 (Indigo) (e.g. in 32 bit version) as bundle 
    "Eclipse Modeling Tools" from
-   http://www.eclipse.org/downloads/packages/eclipse-modeling-tools/indigosr1
+   http://www.eclipse.org/downloads/packages/eclipse-modeling-tools/indigosr2
 2. Install find bugs
    => Help -> Eclipse Marketplace...
    => Type in Field "Find:" the value "findbugs" and press enter.
    => Install "FindBugs Eclipse Plugin" with all features.
+3. Install SWTBot
+   => Help -> Eclipse Marketplace...
+   => Type in Field "Find:" the value "swtbot" and press enter.
+   => Install "SWTBot" with all features.
+4. Install SWTBot IDE
+   => Help -> Install New Software...
+   => Select "--All Available Sites--" in field "Work with:"
+   => Select "SWTBot IDE Support (incubation)/SWTBot IDE Features (incubation)" 
+      (Version 2.0.4...)
+   => Install it by finishing the wizard
 
 
 (5) Development (Workspace configuration)

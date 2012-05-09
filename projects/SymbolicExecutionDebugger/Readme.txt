@@ -50,18 +50,26 @@ It provides the following file structure:
 
 (4) Setup development IDE
 -------------------------
-1. Download Eclipse 3.7 SR1 (Indigo) (e.g. in 32 bit version) as bundle 
+1. Download Eclipse 3.7 SR2 (Indigo) (e.g. in 32 bit version) as bundle 
    "Eclipse Modeling Tools" from
-   http://www.eclipse.org/downloads/packages/eclipse-modeling-tools/indigosr1
-2. Install find bugs
+   http://www.eclipse.org/downloads/packages/eclipse-modeling-tools/indigosr2
+2. Install Graphiti
+   => Help -> Install New Software...
+   => Select "--All Available Sites--" in field "Work with:"
+   => Select the following subitems of "Modeling":
+      - Graphiti (Incubation) (Version 0.8.2...)
+      - Graphiti SDK (Incubation) (Version 0.8.2...)
+      - Graphiti Examples (Incubation) (Version 0.8.2...)
+   => Install it by finishing the wizard
+3. Install find bugs
    => Help -> Eclipse Marketplace...
    => Type in Field "Find:" the value "findbugs" and press enter.
    => Install "FindBugs Eclipse Plugin" with all features.
-3. Install SWTBot
+4. Install SWTBot
    => Help -> Eclipse Marketplace...
    => Type in Field "Find:" the value "swtbot" and press enter.
    => Install "SWTBot" with all features.
-4. Install SWTBot IDE
+5. Install SWTBot IDE
    => Help -> Install New Software...
    => Select "--All Available Sites--" in field "Work with:"
    => Select "SWTBot IDE Support (incubation)/SWTBot IDE Features (incubation)" 
