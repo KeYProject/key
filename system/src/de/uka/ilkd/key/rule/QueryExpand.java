@@ -99,7 +99,11 @@ public class QueryExpand implements BuiltInRule {
            //The new symbolc is introduced as a logical variable that is later skolemized by the ex_left rule.
            //  LogicVariable logicResultQV = new LogicVariable(new Name("res_"+method.getName()),query.sort());
            
-           KeYJavaType calleeType = services.getJavaInfo().getKeYJavaType(query.sub(1).sort());
+           KeYJavaType calleeType = services.getJavaInfo().getKeYJavaType(
+             query.subs().size() == 1 ? // static query
+                query.sort()
+                :
+                query.sub(1).sort());
            KeYJavaType progResultType = method.getReturnType();
 
 
