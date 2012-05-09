@@ -344,13 +344,17 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
       try {
          if (!monitor.isCanceled()) {
             Object[] bos = getAllBusinessObjectsForPictogramElement(pictogramElement);
-            for (Object bo : bos) {
-               if (bo instanceof ISEDDebugElement) {
+            int i = 0;
+            while (i < bos.length && !monitor.isCanceled()) {
+               if (bos[i] instanceof ISEDDebugElement) {
                   // Add all children left aligned
-                  Set<ISEDDebugNode> leafs = updateChildrenLeftAligned((ISEDDebugElement)bo, monitor, OFFSET, maxX + OFFSET);
+                  Set<ISEDDebugNode> leafs = updateChildrenLeftAligned((ISEDDebugElement)bos[i], monitor, OFFSET, maxX + OFFSET);
+                  monitor.worked(1);
                   // Center sub tree
                   centerChildren(leafs, monitor);
+                  monitor.worked(1);
                }
+               i++;
             }
          }
          return true;
@@ -398,6 +402,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
             }
          }
          parentPE = nextPE;
+         monitor.worked(1);
       }
       return leafs;
    }
@@ -449,7 +454,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
          }
       }
       else {
-         areaContext.setLocation(initialX, 0);
+         areaContext.setLocation(initialX, getDiagram().getGridUnit());
       }
       AddContext addContext = new AddContext(areaContext, root);
       addContext.setTargetContainer(getDiagram());
@@ -562,6 +567,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
             GraphicsAlgorithm ga = pe.getGraphicsAlgorithm();
             ga.setX(xMargin + xStart + (maxWidth - ga.getWidth()) / 2);
          }
+         monitor.worked(1);
       }
    }
 }
