@@ -294,7 +294,7 @@ public class TacletGenerator {
         ImmutableSet<Taclet> result = DefaultImmutableSet.<Taclet>nil();
         
         //instantiate axiom with schema variables
-        final Term rawAxiom = OpReplacer.replace(TB.heap(services),
+        final Term rawAxiom = OpReplacer.replace(TB.heap(TB.BASE_HEAP_NAME, services),
                                                  TB.var(heapSV),
                                                  term);
         final TermAndBoundVarPair schemaAxiom =

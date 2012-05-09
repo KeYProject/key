@@ -121,19 +121,16 @@ public final class WhileInvariantRule implements BuiltInRule {
     /**
      * @return (anon update, anon heap)
      */
-    private Pair<Term,Term> createAnonUpdate(
+    private Pair<Term,Term> createAnonUpdate(String heapName,
 	    			While loop, 
 	    			Term mod,
 	    			ImmutableSet<ProgramVariable> localOuts,
 	    			Services services) {
-	//heap
-    // shortcut - localOuts == null means we create the anon-update for the savedHeap
-    final boolean transaction = (localOuts == null);
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-	final Name anonHeapName 
-		= new Name(TB.newName(services, transaction ? "anonSavedHeap_loop" : "anonHeap_loop"));
+	final Name anonHeapName = new Name("anon_"+heapName+"_loop");
 	final Function anonHeapFunc = new Function(anonHeapName,
 					     heapLDT.targetSort());
+        System.out.println(anonHeapFunc);
 	services.getNamespaces().functions().addSafely(anonHeapFunc);
 	final Term anonHeapTerm = TB.func(anonHeapFunc);
 	
@@ -142,11 +139,11 @@ public final class WhileInvariantRule implements BuiltInRule {
 	if(TB.lessThanNothing().equals(mod)) {
 	    anonUpdate = TB.skip();
 	} else {
-	    anonUpdate = TB.anonUpd(services, mod, anonHeapTerm, transaction);
+	    anonUpdate = TB.anonUpd(heapName, services, mod, anonHeapTerm);
 	}
 	
 	//local output vars
-	if(!transaction) {
+	if(localOuts != null) {
 	    for(ProgramVariable pv : localOuts) {
 	        final String anonFuncName 
 	    	    = TB.newName(services, pv.name().toString());
@@ -227,17 +224,17 @@ public final class WhileInvariantRule implements BuiltInRule {
 
     final Term transactionInv = transaction ? inst.inv.getInvariant(inst.selfTerm, atPres, services) : null;
 
-    final Term s = atPres.get("savedHeap");
+    final Term s = atPres.get(TermBuilder.SAVED_HEAP_NAME);
 
-    final Term mod = inst.inv.getModifies("heap", inst.selfTerm, 
+    final Term mod = inst.inv.getModifies(TermBuilder.BASE_HEAP_NAME, inst.selfTerm, 
 					      atPres, 
 					      services);
 	// This on the other hand should never be null
-    final Term modBackup = inst.inv.getModifies("savedHeap",inst.selfTerm, 
+    final Term modBackup = inst.inv.getModifies(TermBuilder.SAVED_HEAP_NAME,inst.selfTerm, 
             atPres, 
             services);
 
-    atPres.put("savedHeap", null);
+    atPres.put(TermBuilder.SAVED_HEAP_NAME, null);
     final Term regularInv = inst.inv.getInvariant(inst.selfTerm, atPres, services);
     // NOTE even when a transaction is on, the transactionInv can still be null (no loop_invariant_transaction given)
 	final Term invTerm  = transactionInv != null ?
@@ -245,7 +242,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 	final Term variant = inst.inv.getVariant(inst.selfTerm, 
 						 atPres, 
 						 services);
-	atPres.put("savedHeap", s);
+	atPres.put(TermBuilder.SAVED_HEAP_NAME, s);
 	//collect input and output local variables, 
 	//prepare reachableIn and reachableOut
 	final ImmutableSet<ProgramVariable> localIns 
@@ -267,7 +264,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         final Map<Term,Term> savedToBeforeLoop = new HashMap<Term,Term>();
 	final Map<Term,Term> normalToBeforeLoop = new HashMap<Term,Term>();
         for(String h : atPres.keySet()) {
-          if(!transaction && h.equals("savedHeap")) 
+          if(!transaction && h.equals(TermBuilder.SAVED_HEAP_NAME)) 
             continue;
           final LocationVariable lv = TB.heapAtPreVar(services, h+"BeforeLoop", true);
    	  services.getNamespaces().programVariables().addSafely(lv);
@@ -277,7 +274,7 @@ public final class WhileInvariantRule implements BuiltInRule {
           }else{
              beforeLoopUpdate = TB.parallel(beforeLoopUpdate, u);
           }
-          if(h.equals("savedHeap")) {
+          if(h.equals(TermBuilder.SAVED_HEAP_NAME)) {
 	    savedToBeforeLoop.put(TB.heap(h, services), TB.var(lv));
           }else{
 	    normalToBeforeLoop.put(TB.heap(h, services), TB.var(lv));
@@ -300,12 +297,12 @@ public final class WhileInvariantRule implements BuiltInRule {
 	
 	//prepare anon update, frame condition
 	final Pair<Term,Term> anonUpdateAndHeap 
-		= createAnonUpdate(inst.loop, mod, localOuts, services);
+		= createAnonUpdate(TermBuilder.BASE_HEAP_NAME, inst.loop, mod, localOuts, services);
 	final Term anonUpdate;
 	final Term anonHeapWellFormed;
 	if(transaction) {
 	    final Pair<Term,Term> anonUpdateAndHeapSaved  
-	      = createAnonUpdate(inst.loop, modBackup, null, services);
+	      = createAnonUpdate(TermBuilder.SAVED_HEAP_NAME, inst.loop, modBackup, null, services);
 	  anonUpdate = TB.parallel(anonUpdateAndHeap.first, anonUpdateAndHeapSaved.first);
 	  anonHeapWellFormed   = TB.and(TB.wellFormed(services, anonUpdateAndHeap.second), TB.wellFormed(services, anonUpdateAndHeapSaved.second));
 	}else{
@@ -316,14 +313,14 @@ public final class WhileInvariantRule implements BuiltInRule {
 	// special case frame condition for strictly pure loops
 	final Term normalFrameCondition;
 	if(TB.lessThanNothing().equals(mod)) {
-	    normalFrameCondition = TB.frameStrictlyEmpty(services, TB.heap(services), normalToBeforeLoop); 
+	    normalFrameCondition = TB.frameStrictlyEmpty(services, TB.heap(TermBuilder.BASE_HEAP_NAME, services), normalToBeforeLoop); 
 	} else {
-	    normalFrameCondition = TB.frame(services, TB.heap(services),
+	    normalFrameCondition = TB.frame(services, TB.heap(TermBuilder.BASE_HEAP_NAME, services),
                normalToBeforeLoop, 
                mod);
 	}
 	final Term transactionFrameCondition = transaction ?
-	          TB.frame(services, TB.heap("savedHeap",services), savedToBeforeLoop, modBackup)
+	          TB.frame(services, TB.heap(TermBuilder.SAVED_HEAP_NAME,services), savedToBeforeLoop, modBackup)
 	        : null;
         
 	final Term frameCondition = transactionFrameCondition != null ?
@@ -399,7 +396,11 @@ public final class WhileInvariantRule implements BuiltInRule {
 	
 	//"Invariant Initially Valid":
 	// \replacewith (==> inv );
-	final Term reachableState = TB.and(TB.wellFormedHeap(services), 
+	final Term reachableState = transaction ?
+           TB.and(TB.wellFormedHeap(TermBuilder.SAVED_HEAP_NAME, services),TB.and(TB.wellFormedHeap(TermBuilder.BASE_HEAP_NAME, services), 
+		                           reachableIn))
+           :
+           TB.and(TB.wellFormedHeap(TermBuilder.BASE_HEAP_NAME, services), 
 		                           reachableIn);
 	initGoal.changeFormula(new SequentFormula(
 		                 TB.apply(inst.u, 

@@ -30,7 +30,6 @@ import de.uka.ilkd.key.speclang.jml.translation.ProgramVariableCollection;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Triple;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
 
 /**
  * Contracts should only be created through methods of this class
@@ -208,7 +207,7 @@ public class ContractFactory {
     
     public FunctionalOperationContract func (String baseName, ProgramMethod pm, boolean terminates, Term pre, Term mby, Term post, Map<String,Term> mods, boolean hasMod, ProgramVariableCollection pv ){
         Modality modality = null;
-        boolean transaction = (mods.get("savedHeap") != null);
+        boolean transaction = (mods.get(TermBuilder.SAVED_HEAP_NAME) != null);
         if(!transaction) {
           modality = terminates ? Modality.DIA : Modality.BOX;
         } else {
@@ -333,7 +332,7 @@ public class ContractFactory {
                 // no need to update mod.
             } else {
                 hasMod = true;
-                for(String h : TextualJMLSpecCase.validHeaps) {
+                for(String h : TermBuilder.VALID_HEAP_NAMES) {
                    Term m1 = mods.get(h);
                    Term m2 = other.getMod(h,t.originalSelfVar, 
                                          t.originalParamVars, 

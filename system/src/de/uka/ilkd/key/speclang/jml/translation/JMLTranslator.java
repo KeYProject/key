@@ -466,7 +466,7 @@ final class JMLTranslator {
                 final Services services = (Services)params[0];
                 Function inv = services.getJavaInfo().getInv();
                 Term obj = ((SLExpression) params[1]).getTerm();
-                return new SLExpression(TB.func(inv, TB.heap(services), obj));
+                return new SLExpression(TB.func(inv, TB.heap(TB.BASE_HEAP_NAME, services), obj));
             }
         });
         
@@ -612,7 +612,7 @@ final class JMLTranslator {
                                               ? new LogicVariable(new Name("n"),
                                                                   services.getTypeConverter().getIntegerLDT().targetSort())
                         : null;
-                final Term h = TB.heap(services);
+                final Term h = TB.heap(TB.BASE_HEAP_NAME, services);
                 final Term s = getFields(excManager, t, services);
                 final Term o = e1.getTerm();
                 final Term o2 = e2.getTerm();
@@ -645,7 +645,7 @@ final class JMLTranslator {
                                               ? new LogicVariable(new Name("n"),
                                                                   services.getTypeConverter().getIntegerLDT().targetSort())
                         : null;
-                final Term h = TB.heap(services);
+                final Term h = TB.heap(TB.BASE_HEAP_NAME, services);
                 final Term s = getFields(excManager, t, services);
                 final Term o = e1.getTerm();
                 final Term o2 = TB.var(objLV);
@@ -927,7 +927,7 @@ final class JMLTranslator {
                         args = new Term[0];
                     } else {
 
-                        Term heap = TB.heap(services);
+                        Term heap = TB.heap(TB.BASE_HEAP_NAME, services);
 
                         // special casing "implicit heap" arguments:
                         // omitting one argument means first argument is "heap"
@@ -1538,7 +1538,7 @@ final class JMLTranslator {
         protected Term convertToOld(Services services, Term heapAtPre, Term term) {
             assert heapAtPre != null;
             Map<Term,Term> map = new LinkedHashMap<Term, Term>();
-            map.put(TB.heap(services), heapAtPre);
+            map.put(TB.heap(TB.BASE_HEAP_NAME, services), heapAtPre);
             OpReplacer or = new OpReplacer(map);
             return or.replace(term);
         }

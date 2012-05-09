@@ -593,7 +593,7 @@ public final class JavaInfo {
 				     String className) {
 	ImmutableList<KeYJavaType> sig = ImmutableSLList.<KeYJavaType>nil();
 	Term[] subs = new Term[args.length+2];
-	subs[0] = TermBuilder.DF.heap(services);
+	subs[0] = TermBuilder.DF.heap(TermBuilder.BASE_HEAP_NAME, services);
 	subs[1] = prefix;
 	for(int i = 2; i < subs.length; i++) {
               Term t = args[i-2];             

@@ -20,6 +20,7 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.ExtList;
@@ -101,8 +102,8 @@ public final class HeapLDT extends LDT {
         wellFormed        = addFunction(services, "wellFormed");
         acc               = addFunction(services, "acc");
         reach             = addFunction(services, "reach");
-        heap	          = (LocationVariable) progVars.lookup(new Name("heap"));    
-        savedHeap	  = (LocationVariable) progVars.lookup(new Name("savedHeap"));    
+        heap	          = (LocationVariable) progVars.lookup(new Name(TermBuilder.BASE_HEAP_NAME));    
+        savedHeap	  = (LocationVariable) progVars.lookup(new Name(TermBuilder.SAVED_HEAP_NAME));    
     }
     
     

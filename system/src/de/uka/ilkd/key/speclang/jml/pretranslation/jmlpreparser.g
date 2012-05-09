@@ -18,6 +18,7 @@ header {
     import de.uka.ilkd.key.java.Position;
     import de.uka.ilkd.key.speclang.*;
     import de.uka.ilkd.key.speclang.translation.*;
+    import de.uka.ilkd.key.logic.TermBuilder;
 }
 
 
@@ -607,7 +608,7 @@ assignable_clause
       String t = result.text;
       while(t.startsWith(" ")) t = t.substring(1);
       String p = "assignable ";
-      for(String hString : TextualJMLSpecCase.validHeaps) {
+      for(String hString : TermBuilder.VALID_HEAP_NAMES) {
         String l = "<"+hString+">";
         if(t.startsWith(l)) {
            p = l + p;

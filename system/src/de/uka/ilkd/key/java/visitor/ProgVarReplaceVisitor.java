@@ -24,6 +24,7 @@ import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.speclang.LoopInvariant;
@@ -235,12 +236,12 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
         //backup modifies
         Term newBackupModifies
-            = replaceVariablesInTerm(inv.getModifies("savedHeap",selfTerm, 
+            = replaceVariablesInTerm(inv.getModifies(TermBuilder.SAVED_HEAP_NAME,selfTerm, 
                                      atPres,
                                      services));
 
-        final Term s = atPres.get("savedHeap");
-        atPres.put("savedHeap", null);
+        final Term s = atPres.get(TermBuilder.SAVED_HEAP_NAME);
+        atPres.put(TermBuilder.SAVED_HEAP_NAME, null);
 
         //invariant
         Term newInvariant 
@@ -251,7 +252,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
         //modifies
         Term newModifies
-            = replaceVariablesInTerm(inv.getModifies("heap", selfTerm, 
+            = replaceVariablesInTerm(inv.getModifies(TermBuilder.BASE_HEAP_NAME, selfTerm, 
                                      atPres,
                                      services));
 
@@ -264,7 +265,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         
         Term newSelfTerm = replaceVariablesInTerm(selfTerm); 
 
-        atPres.put("savedHeap", s);
+        atPres.put(TermBuilder.SAVED_HEAP_NAME, s);
         for(String h : atPres.keySet()) {
            final Term t = atPres.get(h);
            if(t == null) continue;
@@ -272,8 +273,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         }
 
         Map<String,Term> mods = new LinkedHashMap<String,Term>();
-        mods.put("heap", newModifies);
-        mods.put("savedHeap", newBackupModifies);
+        mods.put(TermBuilder.BASE_HEAP_NAME, newModifies);
+        mods.put(TermBuilder.SAVED_HEAP_NAME, newBackupModifies);
         LoopInvariant newInv 
             = new LoopInvariantImpl(newLoop, 
                                     newInvariant,

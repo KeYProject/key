@@ -35,6 +35,7 @@ import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.proof.io.ProofSaver;
@@ -240,7 +241,7 @@ public class InvariantConfigurator {
                 
                 final Map<String,Term> atPres = loopInv.getInternalAtPres();
                 if(!isTransaction) {
-                  atPres.put("savedHeap", null);
+                  atPres.put(TermBuilder.SAVED_HEAP_NAME, null);
                 } 
                 final Term invariant = loopInv.getInvariant(loopInv.getInternalSelfTerm(), atPres, services);
                 if (invariant == null) {
@@ -250,7 +251,7 @@ public class InvariantConfigurator {
                 }
 
                 // FIXME TODO !!! This should also deal with savedHeap and other heaps, if any
-                final Term modifies = loopInv.getModifies("heap", loopInv.getInternalSelfTerm(), atPres, services);
+                final Term modifies = loopInv.getModifies(TermBuilder.BASE_HEAP_NAME, loopInv.getInternalSelfTerm(), atPres, services);
                 
                 if (modifies == null) {
                     loopInvStr[1] = "allLocs";
@@ -569,7 +570,7 @@ public class InvariantConfigurator {
 
                 if (requirementsAreMet) {
                     Map<String,Term> mods = new LinkedHashMap<String,Term>();
-                    mods.put("heap", modifiesTerm);
+                    mods.put(TermBuilder.BASE_HEAP_NAME, modifiesTerm);
                     newInvariant = new LoopInvariantImpl(loopInv.getLoop(),
                             invariantTerm, mods, variantTerm, loopInv
                                     .getInternalSelfTerm(), loopInv

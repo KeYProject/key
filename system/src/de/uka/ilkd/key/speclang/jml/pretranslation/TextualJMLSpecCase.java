@@ -18,6 +18,7 @@ import java.util.LinkedHashMap;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.logic.TermBuilder;
 
 /**
  * A JML specification case (i.e., more or less an operation contract) in 
@@ -25,14 +26,6 @@ import de.uka.ilkd.key.speclang.PositionedString;
  */
 public final class TextualJMLSpecCase extends TextualJMLConstruct {
    
-    public static final List<String> validHeaps = new ArrayList<String>();
-
-    static {
-      validHeaps.add("heap");
-      validHeaps.add("savedHeap");
-      // validHeaps.add("permissions");
-    }; 
-
     private final Behavior behavior;
     private PositionedString workingSpace = null;
     private ImmutableList<PositionedString> requires =
@@ -60,7 +53,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         super(mods);
         assert behavior != null;
         this.behavior = behavior;
-        for(String hName : validHeaps) {
+        for(String hName : TermBuilder.VALID_HEAP_NAMES) {
           assignables.put(hName, ImmutableSLList.<PositionedString>nil());
         }
     }
@@ -94,13 +87,13 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     public void addAssignable(PositionedString ps) {
         String t = ps.text;
         if(!t.startsWith("<")) {
-           ImmutableList<PositionedString> l = assignables.get("heap");
+           ImmutableList<PositionedString> l = assignables.get(TermBuilder.BASE_HEAP_NAME);
            l = l.append(ps);
-           assignables.put("heap", l);
+           assignables.put(TermBuilder.BASE_HEAP_NAME, l);
            return; 
         }
         List<String> hs = new ArrayList<String>();
-        for(String hName : validHeaps) {
+        for(String hName : TermBuilder.VALID_HEAP_NAMES) {
           String h = "<" + hName + ">";
           if(t.startsWith(h)) {
             hs.add(hName);
@@ -196,16 +189,12 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
 
     public ImmutableList<PositionedString> getAssignable() {
-        return assignables.get("heap");
+        return assignables.get(TermBuilder.BASE_HEAP_NAME);
     }
 
     public ImmutableList<PositionedString> getAssignable(String hName) {
         return assignables.get(hName);
     }
-
-//    public ImmutableList<PositionedString> getAssignableBackup() {
-//        return assignables.get("savedHeap");
-//    }
 
     public ImmutableList<PositionedString> getAccessible() {
         return accessible;
@@ -257,7 +246,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         while (it.hasNext()) {
             sb.append("requires: ").append(it.next()).append("\n");
         }
-        for(String h : TextualJMLSpecCase.validHeaps) {
+        for(String h : TermBuilder.VALID_HEAP_NAMES) {
           it = assignables.get(h).iterator();
           while(it.hasNext()) {
             sb.append("assignable<"+h+">: " + it.next() + "\n");

@@ -52,7 +52,10 @@ public final class TermBuilder {
     private static final Term tt = TermFactory.DEFAULT.createTerm(Junctor.TRUE); 
     private static final Term ff = TermFactory.DEFAULT.createTerm(Junctor.FALSE); 
 
-    
+    public static final String BASE_HEAP_NAME = "heap";
+    public static final String SAVED_HEAP_NAME = "savedHeap";
+    public static final String[] VALID_HEAP_NAMES = {BASE_HEAP_NAME, SAVED_HEAP_NAME};
+
     private TermBuilder() {
     }
     
@@ -684,7 +687,7 @@ public final class TermBuilder {
 
 
     public Term elementary(Services services, Term heapTerm) {
-        return elementary(services, heap(services), heapTerm);
+        return elementary(services, heap(BASE_HEAP_NAME, services), heapTerm);
     }
 
 
@@ -1183,7 +1186,7 @@ public final class TermBuilder {
     public Term createdLocs(Services services) {
         return setMinus(services, 
         	        allLocs(services), 
-                        freshLocs(services, heap(services))); 
+                        freshLocs(services, heap(BASE_HEAP_NAME, services))); 
     }    
     
     
@@ -1196,19 +1199,11 @@ public final class TermBuilder {
         return func(services.getTypeConverter().getHeapLDT().getNull());
     }
 
-    public Term heap(Services services) {
-       return heap("heap", services);
-    }    
-
-    public Term savedHeap(Services services) {
-       return heap("savedHeap", services);
-    }    
-
     public Term heap(String name, Services services) {
         LocationVariable l = null;
-        if(name.equals("heap")) {
+        if(name.equals(BASE_HEAP_NAME)) {
           l = services.getTypeConverter().getHeapLDT().getHeap();
-        }else if(name.equals("savedHeap")) {
+        }else if(name.equals(SAVED_HEAP_NAME)) {
           l = services.getTypeConverter().getHeapLDT().getSavedHeap();
         }else{
           throw new TermCreationException("Unknown global Heap variable: "+name);
@@ -1222,8 +1217,8 @@ public final class TermBuilder {
     }
     
 
-    public Term wellFormedHeap(Services services) {
-        return wellFormed(services, heap(services));
+    public Term wellFormedHeap(String heapName, Services services) {
+        return wellFormed(services, heap(heapName, services));
     }
     
     
@@ -1235,7 +1230,7 @@ public final class TermBuilder {
     
     
     public Term inv(Services services, Term o) {
-	return inv(services, heap(services),  o);
+	return inv(services, heap(BASE_HEAP_NAME, services),  o);
     }
 
     
@@ -1248,7 +1243,7 @@ public final class TermBuilder {
 
     
     public Term dot(Services services, Sort asSort, Term o, Term f) {
-        return select(services, asSort, heap(services), o, f);
+        return select(services, asSort, heap(BASE_HEAP_NAME, services), o, f);
     }
 
     
@@ -1257,7 +1252,7 @@ public final class TermBuilder {
 		= services.getTypeConverter().getHeapLDT().getFieldSort();
         return f.sort() == fieldSort
                ? dot(services, asSort, o, func(f))
-               : func(f, heap(services), o);
+               : func(f, heap(BASE_HEAP_NAME, services), o);
     }
     
 
@@ -1271,7 +1266,7 @@ public final class TermBuilder {
 		= services.getTypeConverter().getHeapLDT().getFieldSort();
 	return f.sort() == fieldSort
 	       ? staticDot(services, asSort, func(f))
-	       : func(f, heap(services));
+	       : func(f, heap(BASE_HEAP_NAME, services));
     }
     
 
@@ -1299,7 +1294,7 @@ public final class TermBuilder {
         
         return select(services, 
         	      elementSort, 
-        	      heap(services), 
+        	      heap(BASE_HEAP_NAME, services), 
         	      ref, 
         	      arr(services, idx));
     }    
@@ -1323,7 +1318,7 @@ public final class TermBuilder {
 
 
     public Term created(Services services, Term o) {
-	return created(services, heap(services), o);
+	return created(services, heap(BASE_HEAP_NAME, services), o);
     }
 
     
@@ -1397,7 +1392,7 @@ public final class TermBuilder {
     
                
     public Term fieldStore(Services services, Term o, Function f, Term v) {
-        return store(services, heap(services), o, func(f), v);
+        return store(services, heap(BASE_HEAP_NAME, services), o, func(f), v);
     }
     
     
@@ -1408,7 +1403,7 @@ public final class TermBuilder {
     
     public Term arrayStore(Services services, Term o, Term i, Term v) {
         return store(services, 
-        	     heap(services), 
+        	     heap(BASE_HEAP_NAME, services), 
         	     o, 
         	     func(services.getTypeConverter().getHeapLDT().getArr(), i),
         	     v);
@@ -1437,7 +1432,7 @@ public final class TermBuilder {
 
 
     public Term reachableValue(Services services, Term t, KeYJavaType kjt) {
-	return reachableValue(services, heap(services), t, kjt);
+	return reachableValue(services, heap(BASE_HEAP_NAME, services), t, kjt);
     }
     
     
@@ -1531,12 +1526,20 @@ public final class TermBuilder {
     }
     
     
-    public Term anonUpd(Services services, Term mod, Term anonHeap, boolean savedHeap) {
+    public Term anonUpd(String name, Services services, Term mod, Term anonHeap) {
+        LocationVariable l = null;
+        if(name.equals(BASE_HEAP_NAME)) {
+          l = services.getTypeConverter().getHeapLDT().getHeap();
+        }else if(name.equals(SAVED_HEAP_NAME)) {
+          l = services.getTypeConverter().getHeapLDT().getSavedHeap();
+        }else{
+          throw new TermCreationException("Unknown global Heap variable: "+name);
+        }
+
 	return elementary(services,
-		          savedHeap ? services.getTypeConverter().getHeapLDT().getSavedHeap()
-		                    : services.getTypeConverter().getHeapLDT().getHeap(),
+		          l,
 		          anon(services, 
-		               savedHeap ? savedHeap(services) : heap(services), 
+		               heap(name,services), 
 		               mod, 
 		               anonHeap));
     }

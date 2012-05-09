@@ -203,7 +203,7 @@ public class JMLSpecFactory {
 
         progVar.atPreVars = new LinkedHashMap<String,LocationVariable>();
         progVar.atPres = new LinkedHashMap<String,Term>();
-        for(String h : new String[]{"heap", "savedHeap"}) {
+        for(String h : TermBuilder.VALID_HEAP_NAMES) {
            LocationVariable lv = TB.heapAtPreVar(services, h+"AtPre", false);
            progVar.atPreVars.put(h, lv);
            progVar.atPres.put(h, TB.var(lv));
@@ -220,7 +220,7 @@ public class JMLSpecFactory {
         ContractClauses clauses = new ContractClauses();
         Map<String,Term> atPres = new LinkedHashMap<String,Term>();
         if(textualSpecCase.getMods().contains("transaction")) {
-           atPres.put("savedHeap", progVars.atPres.get("savedHeap"));
+           atPres.put(TermBuilder.SAVED_HEAP_NAME, progVars.atPres.get(TermBuilder.SAVED_HEAP_NAME));
         }
         clauses.requires =
                 translateAndClauses(pm, progVars.selfVar, progVars.paramVars,
@@ -234,11 +234,11 @@ public class JMLSpecFactory {
                 translateStrictlyPure(pm, progVars.selfVar,
                         progVars.paramVars,
                         textualSpecCase.getAssignable());
-        for(String h : TextualJMLSpecCase.validHeaps) {
-           if(h.equals("savedHeap") && !textualSpecCase.getMods().contains("transaction")) {
+        for(String h : TermBuilder.VALID_HEAP_NAMES) {
+           if(h.equals(TermBuilder.SAVED_HEAP_NAME) && !textualSpecCase.getMods().contains("transaction")) {
              if(textualSpecCase.getAssignable(h).size() != 0) {
                  throw new SLTranslationException(
-                        "accessing savedHeap not allowed in a non-transaction spec case.",
+                        "accessing "+TermBuilder.SAVED_HEAP_NAME+" not allowed in a non-transaction spec case.",
                         textualSpecCase.getAssignable(h).head().fileName,
                         textualSpecCase.getAssignable(h).head().pos);
              }else{
@@ -910,13 +910,13 @@ public class JMLSpecFactory {
                 collectLocalVariables(pm.getBody(), loop);
         paramVars = paramVars.append(localVars);
 
-        Term heapAtPre = TB.var(TB.heapAtPreVar(services, "heapAtPre", false));
-        Term savedHeapAtPre = TB.var(TB.heapAtPreVar(services, "savedHeapAtPre",
+        Term heapAtPre = TB.var(TB.heapAtPreVar(services, TermBuilder.BASE_HEAP_NAME+"AtPre", false));
+        Term savedHeapAtPre = TB.var(TB.heapAtPreVar(services, TermBuilder.SAVED_HEAP_NAME+"AtPre",
                                                      false));
 
         Map<String,Term> atPres = new LinkedHashMap<String,Term>();
-        atPres.put("heap", heapAtPre);
-        atPres.put("savedHeap", null);
+        atPres.put(TermBuilder.BASE_HEAP_NAME, heapAtPre);
+        atPres.put(TermBuilder.SAVED_HEAP_NAME, null);
 
         //translateToTerm invariant
         Term invariant;
@@ -937,7 +937,7 @@ public class JMLSpecFactory {
         if (originalTransactionInvariant.isEmpty()) {
             transactionInvariant = null;
         } else {
-            atPres.put("savedHeap", savedHeapAtPre);
+            atPres.put(TermBuilder.SAVED_HEAP_NAME, savedHeapAtPre);
             transactionInvariant = TB.tt();
             for (PositionedString expr : originalTransactionInvariant) {
                 Term translated =
@@ -975,14 +975,14 @@ public class JMLSpecFactory {
         if (originalVariant == null) {
             variant = null;
         } else {
-            atPres.put("savedHeap", null);
+            atPres.put(TermBuilder.SAVED_HEAP_NAME, null);
             Term translated =
                     JMLTranslator.translate(originalVariant,
                                             pm.getContainerType(), selfVar,
                                             paramVars, null, null, atPres, Term.class, services);
             variant = translated;
         }
-        atPres.put("savedHeap", savedHeapAtPre);
+        atPres.put(TermBuilder.SAVED_HEAP_NAME, savedHeapAtPre);
         //create loop invariant annotation
         Term selfTerm = selfVar == null ? null : TB.var(selfVar);
         return new LoopInvariantImpl(loop,

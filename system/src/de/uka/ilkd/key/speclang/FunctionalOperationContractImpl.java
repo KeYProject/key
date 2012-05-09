@@ -37,7 +37,6 @@ import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
 
 /**
  * Standard implementation of the OperationContract interface.
@@ -132,7 +131,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 	this.originalExcVar         = excVar;
 	this.originalAtPreVars      = atPreVars;
 	this.id                     = id;
-        this.transaction            = (mods.get("savedHeap") != null);
+        this.transaction            = (mods.get(TermBuilder.SAVED_HEAP_NAME) != null);
         this.poModality             = (modality == Modality.DIA_TRANSACTION ? 
                                           Modality.DIA : 
                                           (modality == Modality.BOX_TRANSACTION ? Modality.BOX : modality));	
@@ -274,7 +273,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 	}
 
         if(atPreVars != null) {
-          for(String h : TextualJMLSpecCase.validHeaps) {
+          for(String h : TermBuilder.VALID_HEAP_NAMES) {
              if(atPreVars.get(h) != null) {
                 assert originalAtPreVars.get(h).sort().equals(atPreVars.get(h).sort());
                 result.put(originalAtPreVars.get(h), atPreVars.get(h));
@@ -301,7 +300,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 	assert heapTerm.sort().equals(services.getTypeConverter()
 		                              .getHeapLDT()
 		                              .targetSort());
-	result.put(TB.heap(services), heapTerm);
+	result.put(TB.heap(TB.BASE_HEAP_NAME, services), heapTerm);
 	
         //self
 	if(selfTerm != null) {
@@ -335,7 +334,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 	}
 
         if(atPres != null) {
-          for(String h : TextualJMLSpecCase.validHeaps) {
+          for(String h : TermBuilder.VALID_HEAP_NAMES) {
             if(atPres.get(h) != null) {
               assert originalAtPreVars.get(h).sort().equals(atPres.get(h).sort());
 	      result.put(TB.var(originalAtPreVars.get(h)), atPres.get(h));
@@ -501,11 +500,11 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
         final String post = LogicPrinter.quickPrintTerm(originalPost, services);
         
         String mods = "";
-        for(String h : TextualJMLSpecCase.validHeaps) {
+        for(String h : TermBuilder.VALID_HEAP_NAMES) {
            if(originalMods.get(h) != null) {
              mods = mods +"<br><b>mod["+h+"]</b> " +
                LogicPrinter.escapeHTML(LogicPrinter.quickPrintTerm(originalMods.get(h), services), false);
-             if(h.equals("heap") && !hasRealModifiesClause) {
+             if(h.equals(TB.BASE_HEAP_NAME) && !hasRealModifiesClause) {
                mods = mods + "<b>, creates no new objects</b>";
              }
            }
@@ -552,7 +551,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 	    sb.append("    ").append(originalResultVar.proofToString());
 	}
 	sb.append("    ").append(originalExcVar.proofToString());
-	sb.append("    ").append(originalAtPreVars.get("heap").proofToString());	
+	sb.append("    ").append(originalAtPreVars.get(TB.BASE_HEAP_NAME).proofToString());	
 	sb.append("  }\n");
 
 	//prepare Java program
@@ -581,8 +580,8 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 	//print contract term
 	final Term update 
 		= TB.tf().createTerm(
-			ElementaryUpdate.getInstance(originalAtPreVars.get("heap")),
-			TB.heap(services));	
+			ElementaryUpdate.getInstance(originalAtPreVars.get(TB.BASE_HEAP_NAME)),
+			TB.heap(TB.BASE_HEAP_NAME, services));	
 	final Term modalityTerm 
 		= TB.tf().createTerm(modality, 
 				     new Term[]{originalPost}, 
@@ -607,7 +606,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 	//print modifies
 	lp.reset();
 	try {
-	    lp.printTerm(originalMods.get("heap"));
+	    lp.printTerm(originalMods.get(TB.BASE_HEAP_NAME));
 	} catch(IOException e) {
 	    throw new RuntimeException(e);
 	}
@@ -682,7 +681,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
     }    
 
     public boolean isReadOnlyContract() {
-        return originalMods.get("heap").toString().equals("empty");
+        return originalMods.get(TB.BASE_HEAP_NAME).toString().equals("empty");
     }
     
     public Term getAnyMod(Term mod, ProgramVariable selfVar, 

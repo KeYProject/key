@@ -20,6 +20,7 @@ import java.util.LinkedHashMap;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.logic.TermBuilder;
 
 
 /**
@@ -40,7 +41,7 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
     
     public TextualJMLLoopSpec(ImmutableList<String> mods) {
         super(mods);
-        for(String hName : TextualJMLSpecCase.validHeaps) {
+        for(String hName : TermBuilder.VALID_HEAP_NAMES) {
           assignables.put(hName, ImmutableSLList.<PositionedString>nil());
         }
     }
@@ -58,13 +59,13 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
     public void addAssignable(PositionedString ps) {
         String t = ps.text;
         if(!t.startsWith("<")) {
-           ImmutableList<PositionedString> l = assignables.get("heap");
+           ImmutableList<PositionedString> l = assignables.get(TermBuilder.BASE_HEAP_NAME);
            l = l.append(ps);
-           assignables.put("heap", l);
+           assignables.put(TermBuilder.BASE_HEAP_NAME, l);
            return; 
         }
         List<String> hs = new ArrayList<String>();
-        for(String hName : TextualJMLSpecCase.validHeaps) {
+        for(String hName : TermBuilder.VALID_HEAP_NAMES) {
           String h = "<" + hName + ">";
           if(t.startsWith(h)) {
             hs.add(hName);
@@ -98,7 +99,7 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
     }
     
     public ImmutableList<PositionedString> getAssignable() {
-        return assignables.get("heap");
+        return assignables.get(TermBuilder.BASE_HEAP_NAME);
     }
 
     public ImmutableList<PositionedString> getAssignable(String hName) {
@@ -109,11 +110,6 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
         return assignables;
     }
 
-//    public ImmutableList<PositionedString> getAssignableBackup() {
-//        return assignables.get("savedHeap");
-//    }
-    
-    
     public PositionedString getVariant() {
         return variant;
     }
@@ -132,7 +128,7 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
         while(it.hasNext()) {
             sb.append("transaction_invariant: " + it.next() + "\n");
         }
-        for(String h : TextualJMLSpecCase.validHeaps) {
+        for(String h : TermBuilder.VALID_HEAP_NAMES) {
           it = assignables.get(h).iterator();
           while(it.hasNext()) {
             sb.append("assignable<"+h+">: " + it.next() + "\n");

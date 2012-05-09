@@ -16,6 +16,7 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.TermProgramVariableCollector;
 import de.uka.ilkd.key.speclang.LoopInvariant;
@@ -87,12 +88,12 @@ public final class ProgramVariableCollector extends JavaASTVisitor {
         }
 
         //modifies
-        Term modBackup = x.getModifies("savedHeap",selfTerm, atPres, services);
+        Term modBackup = x.getModifies(TermBuilder.SAVED_HEAP_NAME, selfTerm, atPres, services);
         if(modBackup != null) {
             modBackup.execPostOrder(tpvc);
         }
         
-        atPres.put("savedHeap", null);
+        atPres.put(TermBuilder.SAVED_HEAP_NAME, null);
 
         //invariant
         Term inv = x.getInvariant(selfTerm, atPres, services);
@@ -102,7 +103,7 @@ public final class ProgramVariableCollector extends JavaASTVisitor {
 
                 
         //modifies
-        Term mod = x.getModifies("heap",selfTerm, atPres, services);
+        Term mod = x.getModifies(TermBuilder.BASE_HEAP_NAME,selfTerm, atPres, services);
         if(mod != null) {
             mod.execPostOrder(tpvc);
         }

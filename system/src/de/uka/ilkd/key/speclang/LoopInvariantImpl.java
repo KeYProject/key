@@ -20,8 +20,6 @@ import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.OpReplacer;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
-
 
 /**
  * Standard implementation of the LoopInvariant interface.
@@ -118,7 +116,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
         // date by the ProgVarReplaceVisitor
 
         if(atPres != null) {
-          for(String h : TextualJMLSpecCase.validHeaps) {
+          for(String h : TermBuilder.VALID_HEAP_NAMES) {
              if(atPres.get(h) != null) {
 	       assert originalAtPres.get(h).sort().equals(atPres.get(h).sort());
 	       result.put(originalAtPres.get(h), atPres.get(h));
@@ -160,7 +158,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
         assert (selfTerm == null) == (originalSelfTerm == null);
         Map<Term, Term> replaceMap = getReplaceMap(selfTerm, atPres, services);
         OpReplacer or = new OpReplacer(replaceMap);
-        return or.replace((atPres == null || atPres.get("savedHeap") == null) ? originalInvariant : originalTransactionInvariant);
+        return or.replace((atPres == null || atPres.get(TermBuilder.SAVED_HEAP_NAME) == null) ? originalInvariant : originalTransactionInvariant);
     }
     
     @Override
@@ -234,7 +232,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
         Map<Term, Term> inverseReplaceMap 
             = getInverseReplaceMap(selfTerm, atPres, services);
         OpReplacer or = new OpReplacer(inverseReplaceMap);
-        final boolean transaction = atPres != null && atPres.get("savedHeap") != null;
+        final boolean transaction = atPres != null && atPres.get(TermBuilder.SAVED_HEAP_NAME) != null;
         return new LoopInvariantImpl(loop, 
                                      transaction ? originalInvariant : or.replace(invariant), 
                                      transaction ? or.replace(invariant) :  originalTransactionInvariant,  

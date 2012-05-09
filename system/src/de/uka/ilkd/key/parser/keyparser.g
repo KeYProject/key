@@ -831,7 +831,7 @@ options {
             }
             result = TermBuilder.DF.select(getServices(), 
                                            sv.sort(), 
-                                           TermBuilder.DF.heap(getServices()), 
+                                           TermBuilder.DF.heap(TermBuilder.BASE_HEAP_NAME, getServices()), 
                                            prefix, 
                                            tf.createTerm(attribute));
         } else {
@@ -3239,7 +3239,7 @@ funcpredvarterm returns [Term a = null]
                 
         {  
             if(varfuncid.equals("inReachableState") && args == null) {
-	        a = TermBuilder.DF.wellFormedHeap(getServices());
+	        a = TermBuilder.DF.wellFormedHeap(TermBuilder.BASE_HEAP_NAME, getServices());
 	    } else if(varfuncid.equals("skip") && args == null) {
 	        a = tf.createTerm(UpdateJunctor.SKIP);
 	    } else {

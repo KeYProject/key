@@ -174,7 +174,7 @@ public final class DependencyContractImpl implements DependencyContract {
 	assert paramTerms.size() == originalParamVars.size();
 	assert services != null;
 	Map<SVSubstitute, SVSubstitute> map = new HashMap<SVSubstitute, SVSubstitute>();
-	map.put(TB.heap(services), heapTerm);
+	map.put(TB.heap(TB.BASE_HEAP_NAME, services), heapTerm);
 	if (originalSelfVar != null) {
             map.put(TB.var(originalSelfVar), selfTerm);
         }
@@ -222,7 +222,7 @@ public final class DependencyContractImpl implements DependencyContract {
 	assert paramTerms.size() == originalParamVars.size();
 	assert services != null;
 	Map<SVSubstitute, SVSubstitute> map = new HashMap<SVSubstitute, SVSubstitute>();
-	map.put(TB.heap(services), heapTerm);
+	map.put(TB.heap(TB.BASE_HEAP_NAME, services), heapTerm);
 	if (originalSelfVar != null) {
 	    map.put(TB.var(originalSelfVar), selfTerm);
 	}
@@ -302,7 +302,7 @@ public final class DependencyContractImpl implements DependencyContract {
 	assert paramTerms.size() == originalParamVars.size();
 	assert services != null;
 	Map<SVSubstitute, SVSubstitute> map = new HashMap<SVSubstitute, SVSubstitute>();
-	map.put(TB.heap(services), heapTerm);
+	map.put(TB.heap(TB.BASE_HEAP_NAME, services), heapTerm);
 	if (originalSelfVar != null) {
             map.put(TB.var(originalSelfVar), selfTerm);
         }

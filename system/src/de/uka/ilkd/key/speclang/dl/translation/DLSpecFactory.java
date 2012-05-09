@@ -78,7 +78,7 @@ public final class DLSpecFactory {
 	    if(!(eu.lhs() instanceof ProgramVariable)) {
 		throw new ProofInputException("Program variable expected, "
 				              + "but found: " + eu.lhs());
-	    } else if(!update.sub(0).equals(TB.heap(services))) {
+	    } else if(!update.sub(0).equals(TB.heap(TB.BASE_HEAP_NAME, services))) {
 		throw new ProofInputException("heap expected, "
 					      + "but found: " + update.sub(0));
 	    } else {
@@ -267,12 +267,12 @@ public final class DLSpecFactory {
 	
 	//heapAtPre variable may be omitted
 	if(heapAtPreVar == null) {
-	    heapAtPreVar = TB.heapAtPreVar(services, "heapAtPre", false);
+	    heapAtPreVar = TB.heapAtPreVar(services, TermBuilder.BASE_HEAP_NAME+"AtPre", false);
 	}
         Map<String,LocationVariable> atPreVars = new LinkedHashMap<String,LocationVariable>();
-        atPreVars.put("heap", heapAtPreVar);
+        atPreVars.put(TB.BASE_HEAP_NAME, heapAtPreVar);
         Map<String,Term> mods = new LinkedHashMap<String,Term>();
-        mods.put("heap", modifies);
+        mods.put(TB.BASE_HEAP_NAME, modifies);
 
 	//result variable may be omitted
 	if(resultVar == null && !pm.isVoid()) {

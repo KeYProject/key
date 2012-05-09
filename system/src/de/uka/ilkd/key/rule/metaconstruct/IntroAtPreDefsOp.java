@@ -26,6 +26,7 @@ import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -33,8 +34,6 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.LoopInvariantImpl;
 import de.uka.ilkd.key.util.Pair;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
-
 
 public final class IntroAtPreDefsOp extends AbstractTermTransformer {
           
@@ -93,8 +92,8 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
 
         Term atPreUpdate = null;
         Map<String,Term> atPres = new LinkedHashMap<String,Term>();
-        for(String heapName : TextualJMLSpecCase.validHeaps) {
-          if(!transaction && heapName.equals("savedHeap")) {
+        for(String heapName : TermBuilder.VALID_HEAP_NAMES) {
+          if(!transaction && heapName.equals(TermBuilder.SAVED_HEAP_NAME)) {
              continue;
           }
           final LocationVariable l = TB.heapAtPreVar(services, heapName+"Before_" + methodName, true);
@@ -123,23 +122,23 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                      inv.getInvariant(selfTerm, atPres, services)
                    : null;
                 final Term newBackupModifies =
-                     inv.getModifies("savedHeap",selfTerm, atPres, services);
+                     inv.getModifies(TermBuilder.SAVED_HEAP_NAME,selfTerm, atPres, services);
 
-                final Term s = atPres.get("savedHeap");
-                atPres.put("savedHeap", null);
+                final Term s = atPres.get(TermBuilder.SAVED_HEAP_NAME);
+                atPres.put(TermBuilder.SAVED_HEAP_NAME, null);
 
                 final Term newInvariant 
                     = inv.getInvariant(selfTerm, atPres, services);
                 final Term newModifies
-                    = inv.getModifies("heap", selfTerm, atPres, services);
+                    = inv.getModifies(TermBuilder.BASE_HEAP_NAME, selfTerm, atPres, services);
                 final Term newVariant
                     = inv.getVariant(selfTerm, atPres, services);
                   
-                atPres.put("savedHeap", s);
+                atPres.put(TermBuilder.SAVED_HEAP_NAME, s);
                 
                 Map<String,Term> mods = new LinkedHashMap<String,Term>();
-                mods.put("heap", newModifies);
-                mods.put("savedHeap", newBackupModifies);
+                mods.put(TermBuilder.BASE_HEAP_NAME, newModifies);
+                mods.put(TermBuilder.SAVED_HEAP_NAME, newBackupModifies);
                 final LoopInvariant newInv 
              	       = new LoopInvariantImpl(loop, 
                                             newInvariant,

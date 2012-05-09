@@ -32,7 +32,6 @@ header {
     import de.uka.ilkd.key.speclang.translation.*;
     import de.uka.ilkd.key.util.Pair;
     import de.uka.ilkd.key.util.Triple; 
-    import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
 
     import java.math.BigInteger;
     import java.util.List;
@@ -243,9 +242,9 @@ options {
      */
     // TODO: remove when all clients have been moved to JMLTranslator
     private Term convertToOld(Term term) {
-	assert atPres != null && atPres.get("heap") != null;
+	assert atPres != null && atPres.get(TermBuilder.BASE_HEAP_NAME) != null;
 	Map map = new LinkedHashMap();
-        for(String h : TextualJMLSpecCase.validHeaps) {
+        for(String h : TermBuilder.VALID_HEAP_NAMES) {
             Term t = atPres.get(h);
             if(t != null) {
               map.put(TB.heap(h, services), t);
@@ -257,11 +256,11 @@ options {
     }
 
     private Term convertToBackup(Term term) {
-	assert atPres != null && atPres.get("savedHeap") != null;
+	assert atPres != null && atPres.get(TermBuilder.SAVED_HEAP_NAME) != null;
 	Map map = new LinkedHashMap();
-	map.put(TB.heap("heap", services), TB.heap("savedHeap", services));
-        if(atPres.get("heap") != null) {
-	  map.put(atPres.get("heap"), atPres.get("savedHeap"));
+	map.put(TB.heap(TermBuilder.BASE_HEAP_NAME, services), TB.heap(TermBuilder.SAVED_HEAP_NAME, services));
+        if(atPres.get(TermBuilder.BASE_HEAP_NAME) != null) {
+	  map.put(atPres.get(TermBuilder.BASE_HEAP_NAME), atPres.get(TermBuilder.SAVED_HEAP_NAME));
         }
 	OpReplacer or = new OpReplacer(map);
 	return or.replace(term);
@@ -1423,7 +1422,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
     |
 	BACKUP LPAREN result=expression RPAREN
 	{
-	    if (atPres == null || atPres.get("savedHeap") == null) {
+	    if (atPres == null || atPres.get(TermBuilder.SAVED_HEAP_NAME) == null) {
 		raiseError("JML construct " +
 			   "\\backup not allowed in this context.");
 	    }	    
@@ -1470,7 +1469,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 	{
 	    // was: raiseNotSupported("informal predicates");
 	    result = translator.translate("(* *)", SLExpression.class, services, desc, 
-	        selfVar, resultVar, paramVars, atPres == null ? null : atPres.get("heap"));
+	        selfVar, resultVar, paramVars, atPres == null ? null : atPres.get(TermBuilder.BASE_HEAP_NAME));
 	}
 	
     |   escape:DL_ESCAPE LPAREN ( list=expressionlist )? RPAREN
@@ -1480,12 +1479,12 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
         
     |   NOT_MODIFIED LPAREN t=storeRefUnion RPAREN
         {
-        result = new SLExpression(translator.translate("\\not_modified", Term.class, services, atPres == null ? null : atPres.get("heap"), t));
+        result = new SLExpression(translator.translate("\\not_modified", Term.class, services, atPres == null ? null : atPres.get(TermBuilder.BASE_HEAP_NAME), t));
         } 
 	
     |   FRESH LPAREN list=expressionlist RPAREN
 	{
-	    if(atPres == null || atPres.get("heap") == null) {
+	    if(atPres == null || atPres.get(TermBuilder.BASE_HEAP_NAME) == null) {
 	        raiseError("\\fresh not allowed in this context");
 	    }
 	    t = TB.tt();
@@ -1497,14 +1496,14 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 	            t = TB.and(t, 
 	                       TB.equals(TB.select(services,
 	                                           booleanLDT.targetSort(),
-	                                           atPres.get("heap"),
+	                                           atPres.get(TermBuilder.BASE_HEAP_NAME),
 	                                           expr.getTerm(),
 	                                           TB.func(heapLDT.getCreated())),
 	                                 TB.FALSE(services)));
 	        } else if(expr.getTerm().sort().extendsTrans(locSetLDT.targetSort())) {
 	            t = TB.and(t, TB.subset(services, 
 	                                    expr.getTerm(), 
-	                                    TB.freshLocs(services, atPres.get("heap"))));
+	                                    TB.freshLocs(services, atPres.get(TermBuilder.BASE_HEAP_NAME))));
 	        } else {
 	            raiseError("Wrong type: " + expr);
 	        }
@@ -1673,7 +1672,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
                                                 TB.union(services,
                                                          convertToOld(t),
                                                          TB.freshLocs(services, 
-                                                         	      atPres == null ? null : atPres.get("heap")))));
+                                                         	      atPres == null ? null : atPres.get(TermBuilder.BASE_HEAP_NAME)))));
                                                         
         }
         
@@ -1750,7 +1749,7 @@ oldexpression returns [SLExpression result=null] throws SLTranslationException
     OLD LPAREN result=expression (COMMA id:IDENT)? RPAREN
     )
     {
-        if (atPres == null || atPres.get("heap") == null) {
+        if (atPres == null || atPres.get(TermBuilder.BASE_HEAP_NAME) == null) {
         raiseError("JML construct " +
                "\\old not allowed in this context.");
         }
