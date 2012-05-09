@@ -199,7 +199,7 @@ public abstract class AbstractDebugNodeAddFeature extends AbstractAddShapeFeatur
          return minHeight;
       }
       else {
-         return textSize.getHeight();
+         return GraphitiUtil.nextGrid(targetDiagram, textSize.getHeight());
       }
    }
 
@@ -218,7 +218,7 @@ public abstract class AbstractDebugNodeAddFeature extends AbstractAddShapeFeatur
          return minWidth;
       }
       else {
-         return textSize.getWidth();
+         return GraphitiUtil.nextGrid(targetDiagram, textSize.getWidth());
       }
    }
    
