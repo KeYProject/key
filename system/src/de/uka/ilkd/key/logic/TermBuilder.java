@@ -1238,7 +1238,7 @@ public final class TermBuilder {
     }
     
     public Term staticInv(Services services, KeYJavaType t){
-        return func(services.getJavaInfo().getStaticInv(t), heap(services));
+        return func(services.getJavaInfo().getStaticInv(t), heap(BASE_HEAP_NAME, services));
     }
 
     
