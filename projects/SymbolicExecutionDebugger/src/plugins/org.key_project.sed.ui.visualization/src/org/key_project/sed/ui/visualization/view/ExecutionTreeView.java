@@ -69,12 +69,27 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
    /**
     * The message which is shown if no {@link ISEDDebugTarget} is selected.
     */
-   private static final String MESSAGE_NO_DEBUG_TARGET_SELECTED = "No debug target is selected in View \"Debug\".";
+   private static final String MESSAGE_NO_DEBUG_TARGET_SELECTED = "No symbolic debug target is selected in View \"Debug\".";
   
    /**
     * Contains the shown debug targets.
     */
    private Set<ISEDDebugTarget> shownDebugTargets;
+   
+   /**
+    * <p>
+    * This flag is set to {@code true} during execution of {@link #handleDebugViewChanged(IDebugView, IDebugView)}
+    * and set back to {@code false} during execution of {@link #handleEditorSelectionChanged(SelectionChangedEvent)}.
+    * In this case no selection synchronization is done in {@link #handleEditorSelectionChanged(SelectionChangedEvent)}.
+    * </p>
+    * <p>
+    * To skip the selection synchronization is important, because it is possible 
+    * that the debug view and the diagram have different selections, e.g. if
+    * a launch instance is selected in debug view. In this case is the diagram
+    * selected represents the debug target instance.
+    * </p>
+    */
+   private boolean internalSelectionUpdate = false;
    
    /**
     * Listens for selection changes on {@link #getEditorPart()}.
@@ -175,48 +190,56 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
     * @param event The event.
     */
    protected void handleEditorSelectionChanged(final SelectionChangedEvent event) {
-      // List all selected business objects
-      Object[] elements = SWTUtil.toArray(event.getSelection());
-      final List<Object> businessObjects = new LinkedList<Object>();
-      for (Object element : elements) {
-         // Optional convert GMF instance to Graphiti instance
-         if (element instanceof EditPart) {
-            element = ((EditPart)element).getModel();
-         }
-         // Optional convert Graphiti instance to model (ISEDDebugElement)
-         if (element instanceof PictogramElement) {
-            element = getEditorPart().getDiagramTypeProvider().getFeatureProvider().getBusinessObjectForPictogramElement((PictogramElement)element);
-         }
-         businessObjects.add(element);
+      // Check if the selection changed was caused programmatically during synchronization or by the user.
+      if (internalSelectionUpdate) {
+         // Unset the internal flag to make sure that further selection changes
+         // in the diagram are synchronized with the debug view.
+         internalSelectionUpdate = false;
       }
-      // Make sure that the old selected business objects are different to the new one
-      ISelection oldSelection = getDebugView().getViewer().getSelection();
-      if (!businessObjects.equals(SWTUtil.toList(oldSelection))) {
-         // Change selection in debug view if new elements are selected in a Job because the debug view uses Jobs itself to expand the debug model and it is required to wait for them.
-         Job selectJob = new Job("Synchronizing selection") {
-            @Override
-            protected IStatus run(IProgressMonitor monitor) {
-               // Expand viewer up to the elements to select.
-               final Viewer debugViewer = getDebugView().getViewer();
-               if (debugViewer instanceof TreeViewer) {
-                  TreeViewer treeViewer = (TreeViewer)debugViewer;
-                  for (Object element : businessObjects) {
-                     try {
-                        expandTreeUpToElement(treeViewer, element);
-                     }
-                     catch (DebugException e) {
-                        LogUtil.getLogger().logError("Can't expand debug view to element \"" + element + "\".", e);
+      else {
+         // List all selected business objects
+         Object[] elements = SWTUtil.toArray(event.getSelection());
+         final List<Object> businessObjects = new LinkedList<Object>();
+         for (Object element : elements) {
+            // Optional convert GMF instance to Graphiti instance
+            if (element instanceof EditPart) {
+               element = ((EditPart)element).getModel();
+            }
+            // Optional convert Graphiti instance to model (ISEDDebugElement)
+            if (element instanceof PictogramElement) {
+               element = getEditorPart().getDiagramTypeProvider().getFeatureProvider().getBusinessObjectForPictogramElement((PictogramElement)element);
+            }
+            businessObjects.add(element);
+         }
+         // Make sure that the old selected business objects are different to the new one
+         ISelection oldSelection = getDebugView().getViewer().getSelection();
+         if (!businessObjects.equals(SWTUtil.toList(oldSelection))) {
+            // Change selection in debug view if new elements are selected in a Job because the debug view uses Jobs itself to expand the debug model and it is required to wait for them.
+            Job selectJob = new Job("Synchronizing selection") {
+               @Override
+               protected IStatus run(IProgressMonitor monitor) {
+                  // Expand viewer up to the elements to select.
+                  final Viewer debugViewer = getDebugView().getViewer();
+                  if (debugViewer instanceof TreeViewer) {
+                     TreeViewer treeViewer = (TreeViewer)debugViewer;
+                     for (Object element : businessObjects) {
+                        try {
+                           expandTreeUpToElement(treeViewer, element);
+                        }
+                        catch (DebugException e) {
+                           LogUtil.getLogger().logError("Can't expand debug view to element \"" + element + "\".", e);
+                        }
                      }
                   }
+                  // Select new elements
+                  ISelection newSelection = SWTUtil.createSelection(businessObjects);
+                  SWTUtil.select(debugViewer, newSelection, true);
+                  return Status.OK_STATUS;
                }
-               // Select new elements
-               ISelection newSelection = SWTUtil.createSelection(businessObjects);
-               SWTUtil.select(debugViewer, newSelection, true);
-               return Status.OK_STATUS;
-            }
-         };
-         selectJob.setSystem(true);
-         selectJob.schedule();
+            };
+            selectJob.setSystem(true);
+            selectJob.schedule();
+         }
       }
    }
 
@@ -312,6 +335,13 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
                // Check if a target was found
                shownDebugTargets = targets;
                if (!targets.isEmpty()) {
+                  // Set internal flag to indicate that the next selection change in diagram should be ignored.
+                  // This is required because the selection can be different, for instance if a launch instance is selected in debug view.
+                  // In this case is the diagram shown and the diagram itself is selected which has the debug target as business object.
+                  internalSelectionUpdate = true;
+                  editor.selectPictogramElements(new PictogramElement[0]); // If the unset is not executed multiple selection events are thrown during diagram recreation
+                  internalSelectionUpdate = true;
+                  // Recrate diagram
                   final IDiagramTypeProvider typeProvider = editor.getDiagramTypeProvider();
                   Assert.isNotNull(typeProvider);
                   final IFeatureProvider featureProvider = typeProvider.getFeatureProvider();
@@ -329,6 +359,10 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
                }
             }
             else {
+               // Set internal flag to indicate that the next selection change in diagram should be ignored.
+               // This is required because the selection can be different, for instance if a launch instance is selected in debug view.
+               // In this case is the diagram shown and the diagram itself is selected which has the debug target as business object.
+               internalSelectionUpdate = true;
                // Synchronize selection by selecting selected elements from debug view also in diagram editor
                editor.selectBusinessObjects(elements);
             }
