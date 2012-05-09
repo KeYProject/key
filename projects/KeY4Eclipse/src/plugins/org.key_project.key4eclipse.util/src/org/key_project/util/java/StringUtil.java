@@ -1,5 +1,6 @@
 package org.key_project.util.java;
 
+import java.util.Arrays;
 import java.util.Comparator;
 
 /**
@@ -110,5 +111,41 @@ public final class StringUtil {
     */
    public static boolean contains(String string, CharSequence substring) {
       return string != null && substring != null ? string.contains(substring) : false;
+   }
+
+   /**
+    * Converts the optional multi lined {@link String} in a single lined {@link String}
+    * by replacing all line breaks and tabs with a space.
+    * @param text The text to convert.
+    * @return The single lined text.
+    */
+   public static String toSingleLinedString(String text) {
+      return replaceAll(text, new char[] {'\n', '\r', '\t'}, ' ');
+   }
+
+   /**
+    * Replaces all occurrences of a search sign with the replacement sign.
+    * @param text The text to search and replace in.
+    * @param toSearch The signs to search.
+    * @param toReplace The sign to replace with.
+    * @return The new created {@link String}.
+    */
+   public static String replaceAll(String text, char[] toSearch, char toReplace) {
+      if (text != null && toSearch != null) {
+         // Sort toSearch
+         Arrays.sort(toSearch);
+         // Create new String.
+         char[] signs = text.toCharArray();
+         for (int i = 0; i < signs.length; i++) {
+            int index = Arrays.binarySearch(toSearch, signs[i]);
+            if (index >= 0) {
+               signs[i] = toReplace;
+            }
+         }
+         return new String(signs);
+      }
+      else {
+         return text;
+      }
    }
 }
