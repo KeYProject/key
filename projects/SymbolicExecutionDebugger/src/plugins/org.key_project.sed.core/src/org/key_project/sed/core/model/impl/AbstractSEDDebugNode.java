@@ -9,11 +9,11 @@ import org.eclipse.debug.internal.ui.viewers.model.provisional.IModelSelectionPo
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IModelSelectionPolicyFactory;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IPresentationContext;
 import org.eclipse.debug.internal.ui.viewers.update.DefaultSelectionPolicy;
+import org.key_project.sed.core.model.ISEDDebugElement;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.provider.SEDDebugNodeContentProvider;
-import org.key_project.sed.core.util.LogUtil;
 
 /**
  * Provides a basic implementation of {@link ISEDDebugNode}.
@@ -85,28 +85,22 @@ public abstract class AbstractSEDDebugNode extends AbstractSEDDebugElement imple
                return new DefaultSelectionPolicy((IDebugElement)element) {
                   @Override
                   protected boolean overrides(Object existing, Object candidate) {
-                     try {
-                        if (existing instanceof ISEDDebugNode && candidate instanceof ISEDDebugNode) {
-                           // Handle debug nodes like IStackFrames in super implementation
-                           ISEDDebugNode curr = (ISEDDebugNode) existing;
-                           ISEDDebugNode next = (ISEDDebugNode) candidate;
-                           return curr.getThread().equals(next.getThread()) || !isSticky(existing);
-                        }
-                        else {
-                           return super.overrides(existing, candidate);
-                        }
+                     if (existing instanceof ISEDDebugElement && candidate instanceof ISEDDebugElement) {
+                        // Handle symbolic debug elements like IStackFrames in super implementation
+                        ISEDDebugElement curr = (ISEDDebugElement)existing;
+                        ISEDDebugElement next = (ISEDDebugElement)candidate;
+                        return curr.getDebugTarget().equals(next.getDebugTarget()) || !isSticky(existing);
                      }
-                     catch (DebugException e) {
-                        LogUtil.getLogger().logError(e);
-                        return false;
+                     else {
+                        return super.overrides(existing, candidate);
                      }
                   }
 
                   @Override
                   protected boolean isSticky(Object element) {
-                     if (element instanceof ISEDDebugNode) {
-                        // Handle debug nodes like IStackFrames in super implementation
-                        ISEDDebugNode node = (ISEDDebugNode) element;
+                     if (element instanceof ISEDDebugElement) {
+                        // Handle symbolic debug elements like IStackFrames in super implementation
+                        ISEDDebugElement node = (ISEDDebugElement)element;
                         ISEDDebugTarget target = node.getDebugTarget();
                         if (target.isSuspended()) {
                            return true;
