@@ -19,6 +19,20 @@ public class JobUtil {
     * @param jobs The given {@link Job}s to wait for.
     * @param sleepTime The time to sleep before the next check is done.
     */
+   public static void waitFor(Job[] jobs, int sleepTime) {
+      if (jobs != null) {
+         for (Job job : jobs) {
+            waitFor(job, sleepTime);
+         }
+      }
+   }
+
+   /**
+    * Blocks the current {@link Thread} until all given {@link Job}s 
+    * have finished.
+    * @param jobs The given {@link Job}s to wait for.
+    * @param sleepTime The time to sleep before the next check is done.
+    */
    public static void waitFor(Iterable<Job> jobs, int sleepTime) {
       if (jobs != null) {
          for (Job job : jobs) {

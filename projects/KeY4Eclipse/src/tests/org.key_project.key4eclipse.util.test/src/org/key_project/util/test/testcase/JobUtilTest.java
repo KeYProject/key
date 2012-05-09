@@ -18,6 +18,26 @@ import org.key_project.util.eclipse.JobUtil;
  */
 public class JobUtilTest extends TestCase {
    /**
+    * Tests {@link JobUtil#waitFor(Job[], int)}.
+    */
+   @Test
+   public void testWaitFor_array() {
+      // Test null
+      JobUtil.waitFor((Job[])null, 50); // No exception, dead lock expected.
+      // Test valid job
+      Job firstJob = new WaitForJob();
+      Job secondJob = new WaitForJob();
+      Job[] jobs = {firstJob, secondJob};
+      firstJob.schedule();
+      secondJob.schedule();
+      assertNotSame(Job.NONE, firstJob.getState());
+      assertNotSame(Job.NONE, secondJob.getState());
+      JobUtil.waitFor(jobs, 50);
+      assertSame(Job.NONE, firstJob.getState());
+      assertSame(Job.NONE, secondJob.getState());
+   }
+   
+   /**
     * Tests {@link JobUtil#waitFor(Iterable, int)}.
     */
    @Test

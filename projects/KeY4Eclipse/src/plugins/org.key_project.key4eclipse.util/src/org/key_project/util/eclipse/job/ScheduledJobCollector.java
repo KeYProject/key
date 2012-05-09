@@ -1,5 +1,6 @@
 package org.key_project.util.eclipse.job;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -28,7 +29,7 @@ public class ScheduledJobCollector {
    /**
     * The found {@link Job}s.
     */
-   private List<Job> jobs = new LinkedList<Job>();
+   private List<Job> jobs = Collections.synchronizedList(new LinkedList<Job>());
    
    /**
     * An optional {@link IFilter} to filter {@link Job}s added to {@link #getJobs()}.
@@ -73,7 +74,9 @@ public class ScheduledJobCollector {
    protected void scheduled(IJobChangeEvent event) {
       Job job = event.getJob(); 
       if (selectJob(job)) {
-         jobs.add(job);
+         synchronized (jobs) {
+            jobs.add(job);
+         }
       }
    }
    
@@ -97,15 +100,19 @@ public class ScheduledJobCollector {
     * Returns the found {@link Job}s.
     * @return The found {@link Job}s.
     */
-   public List<Job> getJobs() {
-      return jobs;
+   public Job[] getJobs() {
+      synchronized (jobs) {
+         return jobs.toArray(new Job[jobs.size()]);
+      }
    }
 
    /**
     * Removes all found {@link Job}s.
     */
    public void clearJobs() {
-      jobs.clear();
+      synchronized (jobs) {
+         jobs.clear();
+      }
    }
 
    /**

@@ -1,8 +1,5 @@
 package org.key_project.util.test.testcase;
 
-import java.util.Iterator;
-import java.util.List;
-
 import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -131,16 +128,12 @@ public class ScheduledJobCollectorTest extends TestCase {
     */
    protected void assertJobs(ScheduledJobCollector collector, String... expectedJobNames) {
       assertNotNull(collector);
-      List<Job> jobs = collector.getJobs();
+      Job[] jobs = collector.getJobs();
       assertNotNull(jobs);
-      assertEquals(expectedJobNames.length, jobs.size());
-      Iterator<Job> jobIter = jobs.iterator();
-      for (String name : expectedJobNames) {
-         assertTrue(jobIter.hasNext());
-         Job next = jobIter.next();
-         assertEquals(name, next.getName());
+      assertEquals(expectedJobNames.length, jobs.length);
+      for (int i = 0; i < expectedJobNames.length; i++) {
+         assertEquals(expectedJobNames[i], jobs[i].getName());
       }
-      assertFalse(jobIter.hasNext());
       collector.clearJobs();
    }
    
