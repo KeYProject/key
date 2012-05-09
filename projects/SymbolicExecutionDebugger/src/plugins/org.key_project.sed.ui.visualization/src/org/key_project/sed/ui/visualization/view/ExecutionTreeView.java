@@ -51,7 +51,6 @@ import org.key_project.util.eclipse.JobUtil;
 import org.key_project.util.eclipse.job.ScheduledJobCollector;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.ObjectUtil;
 
@@ -276,15 +275,7 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
       }
       // Expand elements starting at the root
       for (final Object toExpand : expandQue) {
-         IFilter<Job> jobFilter = new IFilter<Job>() {
-            @Override
-            public boolean select(Job element) {
-               String className = element.getClass().getName();
-               return className.startsWith("org.eclipse.debug") ||
-                      className.startsWith("org.eclipse.ui.internal.progress");
-            }
-         };
-         ScheduledJobCollector collector = new ScheduledJobCollector(jobFilter);
+         ScheduledJobCollector collector = new ScheduledJobCollector();
          try {
             // Start collecting update jobs started by the debug view
             collector.start();
