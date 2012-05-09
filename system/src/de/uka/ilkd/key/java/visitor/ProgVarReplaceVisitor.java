@@ -264,7 +264,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         
         Term newSelfTerm = replaceVariablesInTerm(selfTerm); 
 
-        atPres.put("savedInvariant", s);
+        atPres.put("savedHeap", s);
         for(String h : atPres.keySet()) {
            final Term t = atPres.get(h);
            if(t == null) continue;

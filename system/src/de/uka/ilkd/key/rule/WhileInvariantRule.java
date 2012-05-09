@@ -270,7 +270,7 @@ public final class WhileInvariantRule implements BuiltInRule {
           if(!transaction && h.equals("savedHeap")) 
             continue;
           final LocationVariable lv = TB.heapAtPreVar(services, h+"BeforeLoop", true);
-	  services.getNamespaces().programVariables().addSafely(lv);
+   	  services.getNamespaces().programVariables().addSafely(lv);
           final Term u = TB.elementary(services, lv, TB.heap(h, services));
           if(beforeLoopUpdate == null) {
              beforeLoopUpdate = u;

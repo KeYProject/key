@@ -532,6 +532,9 @@ public final class UseOperationContractRule implements BuiltInRule {
      				  "savedHeapBefore_" + inst.pm.getName(), 
      				  true) : null;
      	goal.addProgramVariable(heapAtPreVar);
+        if(transaction) {
+     	  goal.addProgramVariable(savedHeapAtPreVar);
+        }
         final Term heapAtPre = TB.var(heapAtPreVar);
         final Term savedHeapAtPre = savedHeapAtPreVar != null ? TB.var(savedHeapAtPreVar) : null;
 
