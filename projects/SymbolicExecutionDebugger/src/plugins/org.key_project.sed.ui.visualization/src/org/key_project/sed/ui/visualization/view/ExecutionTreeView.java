@@ -47,6 +47,7 @@ import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.ui.visualization.execution_tree.editor.ExecutionTreeDiagramEditor;
 import org.key_project.sed.ui.visualization.execution_tree.editor.ReadonlyDiagramEditorActionBarContributor;
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugTargetConnectFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.DebugTargetConnectFeature.IProgressHandler;
 import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeDiagramTypeProvider;
 import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeFeatureProvider;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
@@ -400,6 +401,17 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
                   ICustomContext context = new CustomContext(new PictogramElement[] {typeProvider.getDiagram()});
                   context.putProperty(DebugTargetConnectFeature.PROPERTY_DEBUG_TARGETS, targets.toArray(new ISEDDebugTarget[targets.size()]));
                   context.putProperty(DebugTargetConnectFeature.PROPERTY_ELEMENTS_TO_SELECT, elements);
+                  context.putProperty(DebugTargetConnectFeature.PROPERTY_PROGRESS_HANDLER, new IProgressHandler() {
+                     @Override
+                     public void executionStarted(DebugTargetConnectFeature feature) {
+                        setEditorEnabled(false);
+                     }
+
+                     @Override
+                     public void executionFinished(DebugTargetConnectFeature feature) {
+                        setEditorEnabled(true);
+                     }
+                  });
                   editor.executeFeatureInJob("Changing Symbolic Execution Tree", feature, context);
                   // Unset message
                   setMessage(null);

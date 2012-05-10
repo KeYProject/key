@@ -34,6 +34,77 @@ import org.key_project.util.test.view.TextControlEditorInViewView;
  */
 public class SWTBotAbstractEditorInViewViewTest extends TestCase {
    /**
+    * <p>
+    * Tests {@link AbstractEditorInViewView#isEditorEnabled()} and
+    * {@link AbstractEditorInViewView#setEditorEnabled(boolean)}.
+    * </p>
+    * <p>
+    * The test makes also sure that the global enabled state of editor
+    * and action bar contribution is only {@code true} if no message
+    * is shown in view and the editor is enabled.
+    * </p>
+    */
+   @Test
+   public void testEditorEnabled() throws Exception {
+      SWTBotView view = null;
+      try {
+         // Close welcome view
+         SWTWorkbenchBot bot = new SWTWorkbenchBot();
+         TestUtilsUtil.closeWelcomeView(bot);
+         // Open view
+         IViewPart part = TestUtilsUtil.openView(TextControlEditorInViewView.VIEW_ID);
+         assertTrue(part instanceof TextControlEditorInViewView);
+         TextControlEditorInViewView textView = (TextControlEditorInViewView)part;
+         assertNotNull(textView.getEditorPart());
+         assertNotNull(textView.getEditorActionBarContributor());
+         view = bot.viewById(TextControlEditorInViewView.VIEW_ID);
+         assertTrue(view.isActive());
+         // Make sure that no editor is opened
+         assertTrue(textView.isMessageShown());
+         assertTrue(textView.isEditorEnabled());
+         assertTrue(textView.isEditorCompositeEnabled());
+         assertFalse(textView.getEditorPart().isGlobalEnabled());
+         assertFalse(textView.getEditorActionBarContributor().isGlobalEnabled());
+         // Disable editor
+         textView.setEditorEnabled(false);
+         assertFalse(textView.isEditorEnabled());
+         assertFalse(textView.isEditorCompositeEnabled());
+         assertFalse(textView.getEditorPart().isGlobalEnabled());
+         assertFalse(textView.getEditorActionBarContributor().isGlobalEnabled());
+         // Enable editor
+         textView.setEditorEnabled(true);
+         assertTrue(textView.isEditorEnabled());
+         assertTrue(textView.isEditorCompositeEnabled());
+         assertFalse(textView.getEditorPart().isGlobalEnabled());
+         assertFalse(textView.getEditorActionBarContributor().isGlobalEnabled());
+         // Hide message
+         textView.setMessage(null);
+         assertFalse(textView.isMessageShown());
+         assertTrue(textView.isEditorEnabled());
+         assertTrue(textView.isEditorCompositeEnabled());
+         assertTrue(textView.getEditorPart().isGlobalEnabled());
+         assertTrue(textView.getEditorActionBarContributor().isGlobalEnabled());
+         // Disable editor
+         textView.setEditorEnabled(false);
+         assertFalse(textView.isEditorEnabled());
+         assertFalse(textView.isEditorCompositeEnabled());
+         assertFalse(textView.getEditorPart().isGlobalEnabled());
+         assertFalse(textView.getEditorActionBarContributor().isGlobalEnabled());
+         // Enable editor
+         textView.setEditorEnabled(true);
+         assertTrue(textView.isEditorEnabled());
+         assertTrue(textView.isEditorCompositeEnabled());
+         assertTrue(textView.getEditorPart().isGlobalEnabled());
+         assertTrue(textView.getEditorActionBarContributor().isGlobalEnabled());
+      }
+      finally {
+         if (view != null) {
+            view.close();
+         }
+      }
+   }
+   
+   /**
     * Tests {@link AbstractEditorInViewView#doSave(org.eclipse.core.runtime.IProgressMonitor)} and
     * {@link AbstractEditorInViewView#doSaveAs()}.
     */

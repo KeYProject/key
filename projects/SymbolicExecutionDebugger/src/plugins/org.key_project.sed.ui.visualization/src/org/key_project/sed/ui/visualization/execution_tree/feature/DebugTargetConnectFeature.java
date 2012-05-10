@@ -45,6 +45,11 @@ public class DebugTargetConnectFeature extends AbstractCustomFeature {
     * the {@link Object}s to select after reconstructing {@link #getDiagram()}.
     */
    public static final Object PROPERTY_ELEMENTS_TO_SELECT = "elementsToSelect";
+   /**
+    * Property for an {@link IProgressHandler} instance which is used
+    * to detect when the feature execution has started and is stopped.
+    */
+   public static final Object PROPERTY_PROGRESS_HANDLER = "progressHandler";
 
    /**
     * Indicates that changes were made in {@link #execute(ICustomContext)} or not.
@@ -97,6 +102,13 @@ public class DebugTargetConnectFeature extends AbstractCustomFeature {
     */
    @Override
    public void execute(ICustomContext context) {
+      // Get progress handler
+      Object contextHandler = context.getProperty(PROPERTY_PROGRESS_HANDLER);
+      IProgressHandler handler = null;
+      if (contextHandler instanceof IProgressHandler) {
+         handler = (IProgressHandler)contextHandler;
+         handler.executionStarted(this);
+      }
       try {
          // Define monitor to use
          IProgressMonitor monitor;
@@ -165,6 +177,11 @@ public class DebugTargetConnectFeature extends AbstractCustomFeature {
          LogUtil.getLogger().logError(e);
          throw new RuntimeException(e);
       }
+      finally {
+         if (handler != null) {
+            handler.executionFinished(this);
+         }
+      }
    }
 
    /**
@@ -173,5 +190,23 @@ public class DebugTargetConnectFeature extends AbstractCustomFeature {
    @Override
    public boolean hasDoneChanges() {
       return changesDone;
+   }
+   
+   /**
+    * Instances of this class are used to observe the execution progress.
+    * @author Martin Hentschel
+    */
+   public static interface IProgressHandler {
+      /**
+       * When the execution has started.
+       * @param feature The {@link DebugTargetConnectFeature}.
+       */
+      public void executionStarted(DebugTargetConnectFeature feature);
+      
+      /**
+       * When the execution has finished.
+       * @param feature The {@link DebugTargetConnectFeature}.
+       */
+      public void executionFinished(DebugTargetConnectFeature feature);
    }
 }
