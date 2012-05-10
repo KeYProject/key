@@ -11,7 +11,11 @@ recursive definitions are needed.
 The proofs for ArrayList require straight forward interaction or run
 automatically.
 
-The proofs for LinkedList require more interaction. The proof of
-"remove" has not been finished entirely, yet.
+The proofs for LinkedList require more interaction but can all be 
+proved.
+
+The class SimplifiedLL.java contains specification and code for a
+specification/verification comparison with examples in directory
+../list_recursiveSpec.
 
 Apr 2012, M.U.

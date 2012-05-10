@@ -61,9 +61,9 @@ final class LinkedList implements List {
 	}
 	
 	Node node = first;
-	/*@ loop_invariant 0 <= i && i < size && \reach(first.next, first, node, i)
-	  @   && (\forall int x; 0 <= x && x < i; get(x) != o);
-	  @ assignable \nothing;
+	/*@ loop_invariant 0 <= i && i < size && node == (Node)nodeseq[i]
+	  @   && (\forall int x; 0 <= x && x < i; seq[x] != o);
+	  @ assignable \less_than_nothing;
 	  @ decreases size - 1 - i;
 	  @*/
 	for(int i = 0; i < size - 1; i++) {
